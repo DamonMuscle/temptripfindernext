@@ -1,0 +1,120 @@
+﻿{
+
+	"comparisonOperatorText":
+	{
+		"After": "之后",
+		"Before": "之前",
+		"OnOrAfter": "之后或等于",
+		"OnOrBefore": "之前或等于",
+		"Contains": "包含",
+		"DoesNotContain": "不包含",
+		"EqualTo": "等于",
+		"EndsWith": "结束于",
+		"GreaterThan": "大于",
+		"GreaterThanOrEqualTo": "大于或等于",
+		"In": "在内",
+		"IsTrue": "为真",
+		"IsFalse": "为假",
+		"IsNull": "为空",
+		"IsNotNull": "不为空",
+		"LessThan": "小于",
+		"LessThanOrEqualTo": "小于或等于",
+		"NotEqualTo": "不等于",
+		"NotIn": "不在内",
+		"StartsWith": "起始于"
+	},
+	"common":
+	{
+		"setting": "设置",
+		"person_info":
+		{
+			"name_label": "姓名",
+			"title_label": "职位"
+		},
+		"contact_info":
+		{
+			"phone_number_label": "电话号码",
+			"phone_extension_label": "分机号",
+			"fax_number_label": "传真号码",
+			"email_address_label": "电子邮件地址"
+		},
+		"address_info":
+		{
+			"address_line_1_placeholder": "第一行地址",
+			"address_line_2_placeholder": "第二行地址",
+			"city_placeholder": "城市",
+			"state_placeholder": "州",
+			"zipcode_placeholder": "邮编"
+		}
+	},
+	"entitytype":
+	{
+		"school": "学校",
+		"district": "学区"
+	},
+	"dataentry":
+	{
+		"school":
+		{
+			"general_information_section_label": "基本信息",
+			"general_information_section":
+			{
+				"school_name": "名称",
+				"schoolcode_label": "代码",
+				"capacity_label": "最大容量",
+				"grade_label": "年级",
+				"feeding_label": "升学学校",
+				"accept_sif_label": "接收SIF学生",
+				"allow_transfer_label": "做为中转学校",
+				"is_private_school_label": "私立学校"
+			},
+			"contact_infomration_section_label": "联系信息",
+			"time_section_label": "时间",
+			"time_section":
+			{
+				"arrival_time_label": "到达",
+				"departure_time_label": "出发",
+				"begin_time_label": "开始",
+				"end_time_label": "结束"
+			}
+		},
+		"common":
+		{
+			"page_title_edit": "编辑__type__",
+			"page_title_add": "添加__type__",
+			"geocoding":
+			{
+				"address_section_label": "地址",
+				"mailing_address_label": "邮寄地址",
+				"copy_address_button": "拷贝邮寄地址",
+				"geocode_address_label": "地理解码地址",
+				"geocode_button": "地理解码",
+				"map_set_label": "地图库",
+				"geocode_map_label": "地理解码地址地图"
+			},
+			"userdefinedfields":
+			{
+				"userdefined_label": "自定义",
+				"text_section_label": "文本",
+				"number_section_label": "数字",
+				"date_section_label": "日期",
+				"text_1_label": "User_Char1",
+				"text_2_label": "User_Char2",
+				"text_3_label": "User_Char3",
+				"text_4_label": "User_Char4",
+				"text_5_label": "User_Char5",
+				"text_6_label": "User_Char6",
+				"text_7_label": "User_Char7",
+				"text_8_label": "User_Char8",
+				"number_1_label": "User_Num1",
+				"number_2_label": "User_Num2",
+				"number_3_label": "User_Num3",
+				"number_4_label": "User_Num4",
+				"date_1_label": "User_Date1",
+				"date_2_label": "User_Date2",
+				"date_3_label": "User_Date3",
+				"date_4_label": "User_Date4"
+			}
+		}
+	}
+}
