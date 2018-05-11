@@ -39,56 +39,11 @@ module.exports = function(grunt) {
 		},
 		less: {
 			build: {
-				files: [{
-					expand: true,
-					cwd: 'tripfinderweb/Global/Css',
-					src: [
-						'tripfinder.less',
-						'PublicDashboard.less',
-						'Grid.less',
-						'PublicDashboardCategory.less',
-						'navigation.less',
-						'settings.less',
-						'BootstrapContainers.less',
-						'BootstrapEditing.less',
-						'BootstrapModal.less',
-						'contextmenu.less',
-						'enhance.less',
-						'error.less',
-						'Icons.less',
-						'input.less',
-						'esrimap.less'
-					],
-					dest: 'tripfinderweb/Global/Css',
-					ext: '.css',
-					extDot: 'last'
-				}]
-			},
-			create: {
-				files: [{
-					expand: true,
-					cwd: 'tripfinderweb/Global/Css',
-					src: [
-						'tripfinder.less',
-						'PublicDashboard.less',
-						'Grid.less',
-						'PublicDashboardCategory.less',
-						'navigation.less',
-						'settings.less',
-						'BootstrapContainers.less',
-						'BootstrapEditing.less',
-						'BootstrapModal.less',
-						'contextmenu.less',
-						'enhance.less',
-						'error.less',
-						'Icons.less',
-						'input.less',
-						'esrimap.less'
-					],
-					dest: 'build/Global/Css',
-					ext: '.css',
-					extDot: 'last'
-				}]
+				files: {
+					"build/Global/css/tripfinder.css": "TripfinderWeb/Global/css/tripfinder.less",
+					//Because cssconcat won't look at build folder, so output to here for cssconcat's use
+					"TripfinderWeb/Global/css/tripfinder.css": "TripfinderWeb/Global/css/tripfinder.less"
+				}
 			}
 		},
 
@@ -116,25 +71,14 @@ module.exports = function(grunt) {
 			},
 			jsbuild: {
 				files: [{
-						cwd: 'tripfinderweb/Global/ThirdParty',
-						src: [
-							'**/*.*'
-						],
-						dest: 'build/Global/ThirdParty',
-						expand: true,
-						filter: 'isFile'
-					},
-					{
-						cwd: 'tripfinderweb/Global',
-						src: [
-							'JavaScript/Framework/Map/ClusterLayer.js',
-							'JavaScript/Framework/Map/DirectionalLineSymbol.js'
-						],
-						dest: 'build/Global',
-						expand: true,
-						filter: 'isFile'
-					}
-				]
+					cwd: 'tripfinderweb/Global/ThirdParty',
+					src: [
+						'**/*.*'
+					],
+					dest: 'build/Global/ThirdParty',
+					expand: true,
+					filter: 'isFile'
+				}]
 			},
 			html: {
 				files: [{
@@ -185,7 +129,7 @@ module.exports = function(grunt) {
 			localization: {
 				files: [{
 					expand: true,
-					cwd: 'tripfinderweb/Resources',
+					cwd: 'tripfinderweb/localization',
 					src: ['**/*.json'],
 					dest: 'build/localization',
 					filter: 'isFile'
@@ -250,9 +194,6 @@ module.exports = function(grunt) {
 					sourceMap: false
 				},
 				files: {
-					'build/Global/JavaScript/tripfinderadmin.js': ['build/Global/JavaScript/tripfinderadmin.js'],
-					'build/Global/JavaScript/tripfinderprivatesite.js': ['build/Global/JavaScript/tripfinderprivatesite.js'],
-					'build/Global/JavaScript/tripfinderLogin.js': ['build/Global/JavaScript/tripfinderLogin.js'],
 					'build/Global/JavaScript/tripfinder.js': ['build/Global/JavaScript/tripfinder.js']
 				}
 			}
@@ -351,13 +292,7 @@ module.exports = function(grunt) {
 		},
 
 		useminPrepare: {
-			html: [
-				'tripfinderweb/admin.html',
-				'tripfinderweb/privatesite.html',
-				'tripfinderweb/login.html',
-				'tripfinderweb/index.html',
-				'tripfinderweb/error.html'
-			],
+			html: 'tripfinderweb/index.html',
 			options: {
 				dest: 'build/',
 				flow: {
@@ -374,13 +309,7 @@ module.exports = function(grunt) {
 			}
 		},
 		usemin: {
-			html: [
-				'build/admin.html',
-				'build/privatesite.html',
-				'build/login.html',
-				'build/index.html',
-				'build/error.html'
-			],
+			html: 'build/index.html',
 			options: {
 				assetsDirs: [
 					'build'

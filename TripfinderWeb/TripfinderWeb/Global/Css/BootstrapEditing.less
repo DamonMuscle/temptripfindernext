@@ -1,0 +1,380 @@
+﻿@import 'z-index';
+
+.panel-edit {
+	width: 780px;
+	/* includes default 15px padding */
+}
+
+.panel-edit>.panel-body>.container {
+	width: 750px;
+}
+
+.HorizontalReadonlyControl {
+	margin-bottom: 10px;
+}
+
+.HorizontalReadonlyControl>.form-control-static {
+	margin-left: 10px;
+}
+
+div.form-control {
+	overflow-y: auto;
+}
+
+.float-upload-container {
+	box-shadow: 3px 3px 12px 1px rgba(0, 0, 0, 0.2);
+	border: 1px solid #c5c5c5;
+
+	.k-upload-status .k-upload-action {
+		//display: none;
+	}
+
+	.upload-header {
+		color: #fff;
+		background-color: #333;
+		border: none;
+		height: 35px;
+
+		.close-button {
+			float: right;
+			font-size: 19px;
+			font-weight: bold;
+			line-height: 1;
+			padding: 0;
+			cursor: pointer;
+			background: transparent;
+			border: 0;
+			-webkit-appearance: none;
+			color: #fff;
+			margin-right: 15px;
+			margin-top: 8px;
+			opacity: 1;
+		}
+	}
+
+	.k-upload.k-header {
+		border: none;
+	}
+
+	.k-dropzone {
+		display: none;
+	}
+
+	ul.k-upload-files {
+		border-top: none;
+	}
+
+	.k-button.k-upload-selected {
+		display: none;
+	}
+
+	.k-upload-files.k-reset {
+		max-height: 120px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		margin-bottom: 0;
+
+		li:last-child {
+			border-bottom: none;
+		}
+	}
+}
+
+.upload-section.k-content {
+	margin-top: 10px;
+
+	.k-button.k-upload-selected {
+		display: none;
+	}
+
+	.k-button.k-upload-button {
+		-webkit-box-shadow: none;
+		box-shadow: none;
+	}
+
+	.k-upload-files.k-reset {
+		max-height: 120px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		margin-bottom: 0;
+
+		li:last-child {
+			border-bottom: none;
+		}
+	}
+}
+
+.bv-form .help-block {
+	height: 0;
+	margin-top: 0;
+	position: relative;
+	top: 1px;
+	white-space: nowrap;
+}
+
+.input-group .bootstrap-typeahead-wrap .form-control {
+	border-radius: 0;
+}
+
+.input-group.disabled {
+	.bootstrap-typeahead-wrap .form-control,
+	.input-group-btn .btn {
+		pointer-events: none;
+		cursor: default;
+
+		.caret {
+			opacity: 0.5;
+		}
+	}
+}
+
+/*.input-group .bootstrap-typeahead-wrap:first-child .form-control
+{
+	border-bottom-left-radius: 4px;
+	border-top-left-radius: 4px;
+}*/
+
+.input-group .bootstrap-typeahead-wrap:last-child .form-control {
+	border-bottom-right-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.bootstrap-typeahead-wrap {
+	position: relative;
+}
+
+.bootstrap-typeahead-wrap .typeahead {
+	width: 100%;
+}
+
+.bootstrap-typeahead-wrap .typeahead.dropdown-menu>li>a {
+	min-height: 23px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.bootstrap-typeahead-wrap .typeahead>li>strong {
+	padding-left: 8px;
+}
+
+.input-group-addon {
+	border-left-width: 0;
+}
+
+.input-group-addon:first-child {
+	border-left-width: 1px;
+}
+
+.white-space-inherit .help-block {
+	white-space: inherit;
+}
+
+.form-control-feedback {
+	height: 22px;
+	width: 22px;
+	line-height: 22px;
+}
+
+.tripDataEntry .form-control-feedback {
+	height: 15px;
+	width: 12px;
+	line-height: 15px;
+}
+
+.has-feedback-left .form-control-feedback {
+	right: auto;
+	left: 0;
+	pointer-events: inherit;
+}
+
+.has-feedback-left .form-control {
+	padding-right: 8px;
+	padding-left: 8px;
+}
+
+.has-feedback .form-control-feedback {
+	display: none;
+}
+
+.has-info-error .form-control-feedback {
+	color: #D0503C;
+	display: block;
+}
+
+.has-info-error .form-control {
+	padding-left: 28px;
+}
+
+.has-error,
+.has-success {
+	.form-control,
+	.form-control:focus {
+		border-color: #ccc;
+		box-shadow: none;
+	}
+}
+
+.has-error .help-block {
+	color: #ff0000;
+}
+
+.form-group {
+	margin-bottom: 18px;
+
+	&.tf-validate {
+		height: 59px;
+		margin-bottom: 4px;
+	}
+
+	.checkbox {
+		color: #333;
+	}
+}
+
+.form-group-left {
+	margin-left: 20px;
+}
+
+.glyphicon-pencil:before {
+	opacity: 1;
+}
+
+.glyphicon-plus:before {
+	opacity: 1;
+}
+
+.glyphicon-minus:before {
+	opacity: 0.65;
+}
+
+.typeahead {
+	min-width: 0;
+	z-index: @ent-typeahead-z-index;
+	max-height: 200px;
+	overflow-y: auto;
+	margin-top: -1px;
+	border-radius: 0;
+
+	&>li {
+		&.group {
+			min-height: 23px;
+		}
+
+		>a {
+			font-size: 12px;
+			min-height: 23px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			padding: 3px 8px;
+		}
+
+		>strong {
+			padding-left: 8px;
+		}
+	}
+
+
+	&>.active>a,
+	&>.selected>a {
+		&,
+		&:hover,
+		&:focus {
+			min-height: 23px;
+			/*color: darkgrey;*/
+			text-decoration: none;
+			outline: 0;
+			background-color: #DDEDFB;
+			color: #333;
+		}
+	}
+
+	&>.split-line>a {
+		&,
+		&:hover,
+		&:focus {
+			background-color: transparent;
+			cursor: default;
+		}
+	}
+
+
+	&.dropdown-menu {
+		.disable {
+			pointer-events: none;
+
+			a {
+				color: #808080;
+			}
+		}
+	}
+}
+
+.has-error .input-group-addon {
+	color: #555;
+	border-color: #ccc;
+	background-color: #eee;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu {
+	border-radius: 0;
+	margin: 0;
+	margin-left: -2px;
+	box-shadow: none;
+
+	&:before {
+		display: none;
+	}
+
+	&:after {
+		display: none;
+	}
+}
+
+.btn,
+.k-textbox>input,
+.k-autocomplete .k-input,
+.k-multiselect-wrap,
+.k-block,
+.k-button,
+.k-textbox,
+.k-drag-clue,
+.k-touch-scrollbar,
+.k-window,
+.k-window-titleless .k-window-content,
+.k-window-action,
+.k-inline-block,
+.k-grid .k-filter-options,
+.k-grouping-header .k-group-indicator,
+.k-autocomplete,
+.k-multiselect,
+.k-combobox,
+.k-dropdown,
+.k-dropdown-wrap,
+.k-datepicker,
+.k-timepicker,
+.k-colorpicker,
+.k-datetimepicker,
+.k-notification,
+.k-numerictextbox,
+.k-picker-wrap,
+.k-numeric-wrap,
+.k-colorpicker,
+.k-list-container,
+.k-calendar-container,
+.k-calendar td,
+.k-calendar .k-link,
+.k-treeview .k-in,
+.k-editor-inline,
+.k-tooltip,
+.k-tile,
+.k-slider-track,
+.k-slider-selection,
+.k-upload,
+.k-split-button .k-gantt-views,
+.k-gantt-views>.k-current-view {
+	border-radius: 0;
+}
+
+.k-input {
+	color: #555;
+}

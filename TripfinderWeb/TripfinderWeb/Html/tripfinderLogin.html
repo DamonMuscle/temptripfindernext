@@ -1,0 +1,125 @@
+﻿<div class="container-fluid login-page-header">
+	<div class="page-header">
+		<h2 class="text-center">
+			<span class="title"></span>
+		</h2>
+	</div>
+</div>
+<div class="container tf-login" data-bind="uiInit:$parent.containerLoaded,finish:init.bind($data)">
+	<div class="visible-lg-block" style="margin-top:calc(39px + 15vh )"></div>
+	<div class="visible-sm-block visible-md-block" style="margin-top:calc(10vh )"></div>
+	<div class="visible-xs-block" style="margin-top:20px"></div>
+	<div class="row tf-login-row" data-bind="visible:$parent.obShowLogin()">
+		<div class="col-sm-12 col-md-10 col-lg-8">
+			<div class="col-sm-24" style="padding-left:0px;margin-top:10px;">
+				<div class="logo-container" style="margin-bottom: calc(5vh + 20px);"></div>
+			</div>
+			<div class="panel">
+				<div class="panel-body">
+					<div>
+						<form class="form-horizontal loginform" role="form">
+							<div class="form-group" style="margin-top: 10px" data-bind="css: obClientKeyWarning()?'has-error':''">
+								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
+									<label for="firstName">
+										Client ID
+									</label>
+									<input type="text" id="firstName" name="clientId" class="form-control" placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId" data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
+								</div>
+							</div>
+							<div class="form-group" data-bind="css: obUsernameWarning()?'has-error':''">
+								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
+									<label for="userName">
+										User Name
+									</label>
+									<input type="text" id="userName" name="userName" class="form-control" placeholder="Username" data-bind="value:obUsername, click:cleanErrorMessage">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName" data-bv-result="INVALID" data-bind="visible:obUsernameWarning">required</small>
+								</div>
+							</div>
+							<div class="form-group" data-bind="css: obPasswordWarning()?'has-error':''">
+								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
+									<label for="password">
+										Password
+									</label>
+									<input type="password" id="password" name="password" autocomplete="off" class="form-control" placeholder="Password" data-bind="value:obPassword, click:cleanErrorMessage">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="password" data-bv-result="INVALID" data-bind="visible:obPasswordWarning" style="float:left">required</small>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<div class="checkbox">
+										<label style="padding-left: 20px;">
+											<input style="margin-left: -20px;" type="checkbox" data-bind="checked:obRememberMe" />Remember Me
+										</label>
+									</div>
+								</div>
+								<div class="col-sm-12">
+									<a class="forget-password pull-right" data-bind="click:$parent.forgotPasswordClick">Forgot Password?</a>
+								</div>
+							</div>
+							<div class="login-error" data-bind="style: {visibility: obLoginErrorMessage? 'visible': 'hidden'}">
+								<span data-bind="text:obLoginErrorMessage"></span>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-24">
+									<button type="submit" class="btn btn-login bv-hidden-submit" data-bind="click:$parent.positiveClick">Log In</button>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="version-release-info" style="text-align:center;">
+									<span class="tf-version">Version 1.0.9999</span>
+									<div class="" style="display: inline-block; background-color: #6B6D70; height: 12px; margin: 0 5px -2px; width: 1px;"></div>
+									<a class="release-notes" href="http://www.mytransfinder.com/release/release_notes_viewfinder.asp" title="Release Notes" target="_blank">Release Notes</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row tf-login-row" data-bind="visible:!$parent.obShowLogin()">
+		<div class="col-sm-12 col-md-10 col-lg-10">
+			<div class="panel panel-default">
+				<div class="panel-heading">Reset Password</div>
+				<div class="panel-body">
+					<div>
+						<div class="form-horizontal resetForm" role="form">
+							<div class="form-group">
+								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
+									<label for="userName">
+										User Name
+									</label>
+									<input type="text" id="userNameRP" name="userNameRP" required class="form-control" disabled="disabled" data-bind="value:obUsernameRP">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
+									<label for="passwordRP" class="requirestar">
+										Password
+									</label>
+									<input type="password" name="passwordRP" autocomplete="off" autofocus="autofocus" id="passwordRP" required class="form-control" placeholder="Password" data-bind="value:obPasswordRP">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
+									<label for="passwordRP" class="requirestar">
+										Verify Password
+									</label>
+									<input type="password" name="verifyPasswordRP" id="verifyPasswordRP" autocomplete="off" required class="form-control" placeholder="Verify Password" data-bind="value:obVerifyPasswordRP">
+								</div>
+							</div>
+							<div class="login-error" data-bind="style: {visibility: obLoginErrorMessageRP? 'visible': 'hidden'}">
+								<span data-bind="text:obLoginErrorMessageRP"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="edit-bottombar">
+					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.resetPasswordClick" style="margin-right:10px;">Reset Password</button>
+					<button type="button" class="btn tf-btn-gray" data-bind="click:$parent.cancelClick">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

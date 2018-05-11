@@ -1,0 +1,276 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Tripfinder</title>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link href="Global/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0"
+	/>
+	<meta name="format-detection" content="telephone=no" />
+	<link rel="stylesheet" href="Global/ThirdParty/bootstrap/css/bootstrap.min.css" />
+	<!-- build:cssconcat Global/Css/tripfinder.css -->
+	<link rel="stylesheet" href="Global/Css/tripfinder.css"></link>
+	<!-- endbuild -->
+	<script src="local_settings.js"></script>
+	<script src="Global/ThirdParty/jquery-1.11.1.min.js"></script>
+	<script src="Global/ThirdParty/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="Global/ThirdParty/moment-with-locales.min.js"></script>
+	<script src="Global/ThirdParty/i18next-1.7.7.min.js"></script>
+	<script src="Global/ThirdParty/knockout/knockout-3.3.0.debug.js"></script>
+	<script src="Global/ThirdParty/knockout/knockout-sortable.min.js"></script>
+	<script src="Global/ThirdParty/knockout/koExternalTemplateEngine_all.js"></script>
+	<script src="Global/ThirdParty/Kendo/kendo.all.min.js"></script>
+	<script src="Global/ThirdParty/bootstrap/js/bootstrap.min.js"></script>
+	<script src="Global/ThirdParty/bootstrapvalidator/js/bootstrapValidator.js"></script>
+	<script src="Global/ThirdParty/store.min.js"></script>
+	<script src="Global/ThirdParty/linq.min.js"></script>
+	<script src="Global/ThirdParty/bootbox.min.js"></script>
+	<script src="Global/ThirdParty/bootstrap/js/bootstrap3-typeahead.js"></script>
+	<!-- build:js Global/JavaScript/tripfinder.js -->
+	<script src="Global/JavaScript/Framework/Namespacing.js"></script>
+	<script src="Global/JavaScript/Framework/UserPreferenceManager.js"></script>
+	<script src="Global/JavaScript/Framework/Api.js"></script>
+	<script src="Global/JavaScript/Framework/Ajax.js"></script>
+	<script src="Global/JavaScript/Framework/AuthManager.js"></script>
+	<script src="Global/JavaScript/Framework/ContextMenuManager.js"></script>
+	<script src="Global/JavaScript/Framework/DatasourceManager.js"></script>
+	<script src="Global/JavaScript/Framework/LoadingIndicator.js"></script>
+	<script src="Global/JavaScript/Framework/ModalHelper.js"></script>
+	<script src="Global/JavaScript/Framework/ModalManager.js"></script>
+	<script src="Global/JavaScript/Framework/PromiseAjax.js"></script>
+	<script src="Global/JavaScript/Framework/Events/KeyCode.js"></script>
+	<script src="Global/JavaScript/Framework/Events/EventData.js"></script>
+	<script src="Global/JavaScript/Framework/Events/Event.js"></script>
+	<script src="Global/JavaScript/Framework/Events/PromiseEvent.js"></script>
+	<script src="Global/JavaScript/Framework/ShortCutKeys.js"></script>
+	<script src="Global/JavaScript/Framework/SoftSessionValidator.js"></script>
+	<script src="Global/JavaScript/Framework/StorageManager.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Knockout.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/contextMenuClick.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/singleClick.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/slideVisible.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/stopBinding.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/uiInit.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/Value.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/customInput.js"></script>
+	<script src="Global/JavaScript/Framework/PromiseBootbox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/BaseBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/StringBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DisabledBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/IntegerBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DecimalBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/NumberBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DateTimeBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/TimeBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DataListBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DateBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/BooleanBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/PhoneBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/SelectBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/ColorBox.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/typeahead.js"></script>
+	<script src="Global/JavaScript/Framework/PageManager.js"></script>
+
+	<script src="Global/JavaScript/ViewModel/Controls/BaseControl.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/LoginViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/DataSourceChangeViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripPage.js"></script>
+
+
+	<script src="Global/JavaScript/Modal/BaseModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/TripfinderLoginModel.js"></script>
+	<script src="Global/JavaScript/Modal/TripfinderLoginViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/DatasourceChangeModalViewModel.js"></script>
+
+	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/UserPreferenceDataModel.js"></script>
+
+	<script src="Global/JavaScript/Main.js"></script>
+	<script src="Global/JavaScript/Startup.js"></script>
+	<!-- endbuild -->
+</head>
+
+<body>
+	<!--<div class="navigation-container">
+		left navigationbar
+	</div> -->
+	<div id="pageContent" class="page-container">
+		<div class="main-body" data-bind="template:{ name:page().contentTemplate, data: page().data }">
+		</div>
+	</div>
+	<div class="tfmodal-container">
+		<!-- ko foreach: obBaseModalViewModels -->
+		<div class="tfmodal modal hide" data-bind="css:{hide:$parent.obBaseModalViewModels().length==0}">
+			<div class="modal-dialog" data-bind="css:sizeCss,style:{width:modalWidth}" style="margin:0;">
+				<div class="modal-content">
+					<!-- ko if: title() -->
+					<div class="modal-header">
+						<button type="button" class="close" aria-hidden="true" data-bind="visible:obCloseButtonVisible,event:{click:closeClick}">&times;</button>
+						<div class="panel-heading" data-bind="text: title"></div>
+					</div>
+					<!-- /ko -->
+					<div class="modal-body" data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
+					</div>
+					<!-- ko if: buttonTemplate() -->
+					<div class="modal-footer">
+						<div data-bind="template:{ name:buttonTemplate }"></div>
+						<div></div>
+					</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<!--/ko-->
+	</div>
+	<div id="loadingindicator">
+		<div class="overlay">
+			<div class="spinner">
+				<div class="spinner-icon-container">
+					<style type='text/css'>
+						@-webkit-keyframes uil-default-anim {
+							0% {
+								opacity: 1;
+							}
+
+							100% {
+								opacity: 0;
+							}
+						}
+
+						@keyframes uil-default-anim {
+							0% {
+								opacity: 1;
+							}
+
+							100% {
+								opacity: 0;
+							}
+						}
+
+						.uil-default-css {
+							position: relative;
+							left: -78px;
+							top: -78px;
+							background: none;
+							width: 200px;
+							height: 200px;
+						}
+
+						.uil-default-css>div:nth-of-type(1) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.35s;
+							animation-delay: -0.35s;
+						}
+
+						.uil-default-css>div:nth-of-type(2) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.29166666666666663s;
+							animation-delay: -0.29166666666666663s;
+						}
+
+						.uil-default-css>div:nth-of-type(3) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.23333333333333334s;
+							animation-delay: -0.23333333333333334s;
+						}
+
+						.uil-default-css>div:nth-of-type(4) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.17500000000000002s;
+							animation-delay: -0.17500000000000002s;
+						}
+
+						.uil-default-css>div:nth-of-type(5) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.11666666666666667s;
+							animation-delay: -0.11666666666666667s;
+						}
+
+						.uil-default-css>div:nth-of-type(6) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.05833333333333329s;
+							animation-delay: -0.05833333333333329s;
+						}
+
+						.uil-default-css>div:nth-of-type(7) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -5.551115123125783e-17s;
+							animation-delay: -5.551115123125783e-17s;
+						}
+
+						.uil-default-css>div:nth-of-type(8) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.05833333333333329s;
+							animation-delay: 0.05833333333333329s;
+						}
+
+						.uil-default-css>div:nth-of-type(9) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.11666666666666664s;
+							animation-delay: 0.11666666666666664s;
+						}
+
+						.uil-default-css>div:nth-of-type(10) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.17500000000000004s;
+							animation-delay: 0.17500000000000004s;
+						}
+
+						.uil-default-css>div:nth-of-type(11) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.2333333333333334s;
+							animation-delay: 0.2333333333333334s;
+						}
+
+						.uil-default-css>div:nth-of-type(12) {
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.29166666666666663s;
+							animation-delay: 0.29166666666666663s;
+						}
+					</style>
+					<div class="uil-default-css" style="transform: scale(0.22);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);"></div>
+					</div>
+				</div>
+				<div class="subtitle">
+					<div class="subtitle-text" data-bind="text: subtitle"></div>
+				</div>
+			</div>
+			<div class="progressbar">
+				<div class="progress">
+					<div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 100%">
+						Processing
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="contextmenu-wrapper"></div>
+</body>
+
+</html>

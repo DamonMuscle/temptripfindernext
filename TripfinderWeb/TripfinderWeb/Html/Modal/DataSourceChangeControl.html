@@ -1,0 +1,20 @@
+﻿<div class="row">
+	<div class="col-xs-24 description"> Set the Data Source to the one you would like to use with this Dashboard. Changing the Data Source will not change it for any other user using this Dashboard, it will only apply to you. </div>
+</div>
+<div class="row " data-bind="uiInit:init">
+	<form role="form" class="col-sm-24">
+		<div class="form-group">
+			<label class="requirestar"><strong>Data Source</strong></label>
+			<div class="input-group">
+				<div data-bind="typeahead:{source:datasources,format:function(obj){return (obj.SubdirectoryExists?'':'[disable]')+(obj.name || obj.DatabaseName); },drowDownShow:true,notSort:true,selectedValue:selectedDatabase}">
+					<!-- ko customInput:{type:"Select",value:obSelectedDatabaseText,attributes:{class:"form-control"}} --><!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
