@@ -87,6 +87,7 @@
 		var self = this;
 		self.libraryInitialization().then(function()
 		{
+			tf.fullScreenHelper = new TF.FullScreenHelper();
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
 			tf.loadingIndicator = self._createLoadingIndicator();

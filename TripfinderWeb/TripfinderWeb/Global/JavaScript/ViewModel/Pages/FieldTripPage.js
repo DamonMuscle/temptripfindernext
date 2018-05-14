@@ -6,6 +6,23 @@
 		self.type = "fieldtrip";
 		self.searchGridInited = ko.observable(false);
 		self.options = {};
+		self.bulkMenu = null;
+
+		self.requestPauseEvent = new TF.Events.Event();
+		self.requestHoldEvent = new TF.Events.Event();
+		self.requestResumeEvent = new TF.Events.Event();
+		self.releaseHoldEvent = new TF.Events.Event();
+		self.enableRefreshEvent = new TF.Events.Event();
+		self.obEmail = ko.observable(true);
+		self.obNewGrids = ko.observable(true);
+		self.obReportLists = ko.observable(false);
+		self.obNoRecordsSelected = ko.observable(false);
+		self.openSelectedClick = self.openSelectedClick.bind(self);
+		self.kendoGridScroll = null;
+		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
+		self.saveAsClick = this.saveAsClick.bind(self);
+		self.sendEmailClick = self.sendEmailClick.bind(self);
+		self.sendToClick = self.sendToClick.bind(self);
 	}
 
 	FieldTripPage.prototype.constructor = FieldTripPage;
@@ -34,7 +51,7 @@
 				Name: "Today",
 				IsValid: true
 			},
-			{
+		{
 				Id: -2,
 				Name: "Vehicle Scheduled",
 				IsValid: true
@@ -46,7 +63,7 @@
 				WhereClause: " FieldTripStageId = 1 or FieldTripStageId = 3 or FieldTripStageId = 5 or FieldTripStageId = 7",
 				GridType: self.type
 			},
-			{
+				{
 				Id: -4,
 				Name: "Declined",
 				IsValid: true,
@@ -98,35 +115,95 @@
 	FieldTripPage.prototype.createGrid = function(option) {
 		var self = this,
 			baseOptions = {
-				storageKey: "grid.currentlayout." + self.type,
-				gridType: self.type,
-				showBulkMenu: true,
-				showLockedColumn: true,
-				showOmittedCount: option.showOmittedCount,
-				showSelectedCount: option.showSelectedCount,
-				gridTypeInPageInfo: option.gridTypeInPageInfo,
-				supportMobileMultipleSelect: true,
-				reminderOptionHide: true,
-				url: pathCombine(tf.api.apiPrefix(), "search", self.type)
-			};
+			storageKey: "grid.currentlayout." + self.type,
+			gridType: self.type,
+			showBulkMenu: true,
+			showLockedColumn: true,
+			showOmittedCount: option.showOmittedCount,
+			showSelectedCount: option.showSelectedCount,
+			gridTypeInPageInfo: option.gridTypeInPageInfo,
+			url: pathCombine(tf.api.apiPrefix(), "search", self.type),
+			onDataBound: function(option)
+			{
+				self.onDataBound.bind(self)(option);
+			}
+		};
 
 		self.searchGrid = new TF.Grid.KendoGrid(self.$element.find('.kendo-grid-container'), $.extend(baseOptions, option), new TF.Grid.GridState({
-			gridFilterId: null,
-			filteredIds: option.filteredIds
-		}));
+				gridFilterId: null,
+				filteredIds: option.filteredIds
+			}));
 		self.searchGrid.filterMenuClick = self.searchGrid.filterMenuClick.bind(self);
 		self.searchGrid.onRowsChanged.subscribe(function(e, data) {
 			self.selectedRecordIds = Enumerable.From(data).Select(function(c) {
 				return c.Id;
 			}).ToArray();
 		}.bind(self));
-		self.searchGrid.onDoubleClick.subscribe(function(e, data) {
-			if (!self.obShowSplitmap() && self.type !== "busfinderhistorical" && tf.pageManager.pageType() !== "3" && self.searchGrid.getSelectedIds().length > 0) {
-				self.showDetailsClick();
+
+		self._openBulkMenu();
+		self.targetID = ko.observable();
+		self.searchGridInited(true);
+	};
+
+	FieldTripPage.prototype.copyToClipboardClick = function()
+	{
+	};
+
+	FieldTripPage.prototype.saveAsClick = function()
+	{
+	};
+
+	FieldTripPage.prototype.sendEmailClick = function()
+	{
+	};
+
+	FieldTripPage.prototype.sendToClick = function()
+	{
+	};
+
+	FieldTripPage.prototype.openSelectedClick = function()
+	{
+	};
+
+	FieldTripPage.prototype._openBulkMenu = function()
+	{
+		var self = this;
+		self.$element.delegate("table.k-selectable tr", "mousedown", function(e, parentE)
+		{
+			var element = e;
+			if (parentE)
+			{
+				element = parentE;
 			}
+			if (element.button == 2)
+			{
+				self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
+				var $virsualTarget = $("<div></div>").css(
+					{
+						position: "absolute",
+						left: element.clientX,
+						top: element.clientY
+					});
+				$("body").append($virsualTarget);
+				self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid", self.type, "bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
+				tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
+				return false;
+			}
+			return true;
 		});
 
-		self.searchGridInited(true);
+		self.$element.delegate(".kendogrid-blank-fullfill .fillItem", "mousedown", function(e)
+		{
+			var uid = $(e.currentTarget).data("id");
+			var items = self.$element.find("table.k-selectable tr").filter(function(a, b)
+			{
+				return $(b).data("kendoUid") == uid;
+			});
+			if (items.length > 0)
+			{
+				$(items[0]).trigger("mousedown", [e]);
+			}
+		});
 	};
 
 	FieldTripPage.prototype.initSearchGridCompute = function() {
@@ -161,5 +238,87 @@
 		self.noApplyFilterNoModified = ko.computed(function() {
 			return self.searchGridInited() && self.searchGrid.noApplyFilterNoModified();
 		}, self);
+	};
+
+	FieldTripPage.prototype.onDataBound = function(option)
+	{
+		var self = this;
+		self.selectedRecordIds = [];
+		self.autoScrollInit();
+
+		if (option && option.IsCallout)
+		{
+			delete option.IsCallout;
+		}
+
+		self.obGridNoAction = ko.computed(function()
+		{
+			self.obNoRecordsSelected(false);
+			var ids = self.searchGrid.getSelectedIds();
+			if (self.searchGrid.kendoGrid && self.searchGrid.kendoGrid.dataSource._total > 0 && self.searchGrid.getSelectedIds().length == 0)
+			{
+				self.obNoRecordsSelected(true);
+				return false;
+			}
+			if (self.searchGrid.kendoGrid && self.searchGrid.kendoGrid.dataSource._total == 0 && self.searchGrid.getSelectedIds().length == 0)
+			{
+				return true;
+			}
+			if (self.targetID() && ids.indexOf(self.targetID()) < 0)
+			{
+				return true;
+			}
+			return false;
+		}.bind(this));
+	};
+
+	FieldTripPage.prototype.autoScrollInit = function()
+	{
+		var self = this;
+		if (!self.kendoGridScroll)
+		{
+			self.kendoGridScroll = new TF.KendoGrid.AutoScroll(self.searchGrid);
+			self.kendoGridScroll.onScrollAtBottom.subscribe(function()
+			{
+				self.releaseHoldEvent.notify();
+				self.startAutoScroll();
+			}.bind(self));
+
+			if (tf.fullScreenHelper.obIsFullScreen())
+			{
+				self.startAutoScroll();
+			}
+		}
+	};
+
+	FieldTripPage.prototype.startAutoScroll = function()
+	{
+		var self = this;
+		if (self.kendoGridScroll != null)
+		{
+			self.kendoGridScroll.startAutoScroll();
+			self.requestHoldEvent.notify();
+		}
+	};
+
+	FieldTripPage.prototype.dispose = function()
+	{
+		var self = this;
+		if (self.searchGrid)
+		{
+			self.searchGrid.dispose();
+			self.searchGrid = null;
+		}
+
+		// release the objects
+		for (var i in self)
+		{
+			self[i] = null;
+		}
+		self.requestResumeEvent.unsubscribeAll();
+		self.requestPauseEvent.unsubscribeAll();
+		self.requestHoldEvent.unsubscribeAll();
+		self.releaseHoldEvent.unsubscribeAll();
+		self.enableRefreshEvent.unsubscribeAll();
 	};
 })();

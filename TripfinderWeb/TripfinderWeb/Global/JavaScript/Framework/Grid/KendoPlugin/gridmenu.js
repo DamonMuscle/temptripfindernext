@@ -1,15 +1,5 @@
 ﻿(function()
 {
-	createNamespace("TF.ContextMenu").BaseGeneralMenuViewModel = BaseGeneralMenuViewModel;
-
-	function BaseGeneralMenuViewModel()
-	{
-
-	}
-})();
-
-(function()
-{
 	createNamespace("TF.Grid").GridMenuViewModel = GridMenuViewModel;
 
 	function GridMenuViewModel(gridViewModel, kendoGrid)

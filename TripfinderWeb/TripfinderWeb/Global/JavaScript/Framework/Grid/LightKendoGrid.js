@@ -2388,24 +2388,24 @@
 					if (ddlFilterTypes.hasClass('islessthanorequalto'))
 						self.popup.element.addClass('lg-filter-dropdownlist');
 
-					var orgHeight = self.popup.element.height();
+					var $listContainer = self.popup.element,
+						$listParent = self.popup.element.find('.k-list').parent();
 
-					if (ddlFilterTypes.hasClass('list') && ddlFilterTypes.hasClass('custom'))
-						orgHeight += 36;
-					else if (ddlFilterTypes.hasClass('custom'))
-						orgHeight += 13;
+					$listContainer.css({ "height": "", "display": "block" });
+					$listParent.find('.k-list').parent().css({ "height": "" });
+					$listContainer.find("div, ul, li").css("box-sizing", "content-box");
 
-					orgHeight += this.options.dataSource.length * 1;
+					var orgHeight = $listParent[0].scrollHeight;
 
 					setTimeout(function()
 					{
-						self.popup.element.find('.k-list').parent().height(orgHeight);
-						self.popup.element.height(orgHeight);
+						$listParent.height(orgHeight);
+						$listContainer.height(orgHeight);
+						$listContainer.find("div, ul, li").css("box-sizing", "");
 					}, 10);
 
-					self.popup.element.addClass('has-set-filter-ddl-size');
+					$listContainer.addClass('has-set-filter-ddl-size');
 				});
-
 			}
 		});
 	};

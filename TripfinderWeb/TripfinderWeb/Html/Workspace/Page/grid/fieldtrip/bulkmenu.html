@@ -1,0 +1,84 @@
+﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
+	<ul class="tf-contextmenu grid-menu">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
+			<div class=" menu-icon copytoclipboard">
+			</div>
+			<div class="menu-label">
+				Copy
+				<span class="hotkey">Ctrl + C</span>
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
+			<div class=" menu-icon saveas">
+			</div>
+			<div class="menu-label">
+				Save As
+				<span class="hotkey">Ctrl + S</span>
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
+			<div class="menu-icon email">
+			</div>
+			<div class="menu-label">
+				Email
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendToClick">
+			<div class="menu-icon sendTo">
+			</div>
+			<div class="menu-label">
+				Send To
+			</div>
+		</li>
+		<li class="menu-item" data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				New Grid
+			</div>
+			<ul class="tf-contextmenu">
+				<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label">
+						Field Trip
+					</div>
+				</li>
+			</ul>
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
+			<div class=" menu-icon">
+			</div>
+			<div class="menu-label">
+				Select All Records
+				<span class="hotkey">Ctrl + A</span>
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.invertSelection.bind(searchGrid)">
+			<div class=" menu-icon">
+			</div>
+			<div class="menu-label">
+				Invert Selected Records
+				<span class="hotkey">Ctrl + I</span>
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.omitSelection.bind(searchGrid)">
+			<div class=" menu-icon">
+			</div>
+			<div class="menu-label">
+				Omit Selected Records
+				<span class="hotkey">Ctrl + O</span>
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearSelection.bind(searchGrid)">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Clear All Records
+			</div>
+		</li>
+	</ul>
+</div>

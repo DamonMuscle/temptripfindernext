@@ -1,0 +1,444 @@
+﻿@import 'z-index';
+
+#contextmenu-wrapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 0;
+	height: 0;
+}
+
+#contextmenu-wrapper {
+	z-index: @contextmenu-wrapper-z-index;
+}
+
+#contextmenu-wrapper.is-phone {
+	z-index: @phone-contextmenu-wrapper-z-index;
+}
+
+.tf-contextmenu {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	border: solid #9b9b9b 1px;
+	background: white;
+	cursor: default;
+	overflow-y: auto;
+	overflow-x: hidden;
+	max-height: 200px;
+}
+
+.tf-contextmenu .menu-item:not(.disabled) {
+	cursor: pointer;
+
+	span {
+		cursor: pointer;
+	}
+}
+
+.tf-contextmenu .menu-item:not(.disabled):hover, .tf-contextmenu .menu-item:not(.disabled).document-hover {
+	background-color: #ddedfb !important;
+}
+.tf-contextmenu.dragenter .menu-item:not(.disabled):hover{
+	background-color: inherit !important;
+}
+
+.tf-contextmenu .menu-item::before, .tf-contextmenu .menu-item::after {
+	content: "";
+	display: block;
+	clear: both;
+}
+
+.tf-contextmenu .menu-item.disabled {
+	pointer-events: none;
+	color: #b1b1b1;
+}
+
+.tf-contextmenu .menu-item.disabled:hover {
+	background-color: inherit;
+}
+
+.tf-contextmenu .menu-item .menu-icon {
+	float: left;
+	background: #4b4b4b;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 14px 14px;
+	width: 22px;
+	height: 24px;
+	padding: 1px 0 1px 0;
+}
+
+.tf-contextmenu .menu-item.light .menu-icon {
+	background-color: #B1B1B1;
+}
+
+.tf-contextmenu .menu-item .menu-label {
+	line-height: 24px;
+	margin-left: 22px;
+	padding: 0 20px 0 10px;
+	min-width: 100px;
+	white-space: nowrap;
+	font-size: 12px;
+	position: relative;
+}
+
+.tf-contextmenu .menu-item .menu-label .hotkey-hint {
+	/*can't use this in firefox*/
+	/*float: right;*/
+	position: absolute;
+	left: 75%;
+}
+
+.tf-contextmenu .menu-item .menu-label:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	right: 15px;
+	width: 16px;
+	top: 4px;
+	background-repeat: no-repeat;
+	height: 16px;
+	background-image: url(Default/sprite.png);
+	background-position: 0 -192px;
+}
+
+.tf-contextmenu .menu-item.disabled .menu-label:not(:last-child)::after {
+	opacity: 0.4;
+}
+
+.tf-contextmenu .menu-divider:before {
+	content: "";
+	float: left;
+	background: #4b4b4b;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 14px 14px;
+	width: 22px;
+}
+
+.tf-contextmenu .menu-divider:before {
+	height: 5px;
+}
+
+.tf-contextmenu .menu-divider.light:before {
+	background-color: #B1B1B1;
+}
+
+.tf-contextmenu .menu-divider::after {
+	content: "";
+	display: block;
+	clear: both;
+}
+
+.tf-contextmenu .menu-divider .rule {
+	background-color: #9b9b9b;
+	height: 1px;
+	width: calc(~"100% - 43px");
+	margin-left: 32px;
+	position: relative;
+	top: 1px;
+}
+
+.tf-contextmenu .disabled {
+	color: #B1B1B1;
+	cursor: default;
+}
+
+.tf-contextmenu .menu-item .menu-icon.copytoclipboard {
+	background-image: url('../img/menu/Copy-white.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.saveas {
+	background-image: url('../../global/img/menu/Save-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.map {
+	background-image: url('../../global/img/menu/Map-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.globalreplace {
+	background-image: url('../../global/img/menu/GlobalReplace-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.opennewgird {
+	background-image: url('../../global/img/menu/Newgrid-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.mailmerge {
+	background-image: url('../../global/img/menu/MailMerge-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.delete {
+	background-image: url('../../global/img/menu/Delete-Black.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.email {
+	background-image: url('../../global/img/Icons/Email-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.sendTo {
+	background-image: url('../../global/img/Icons/send-white.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.edit {
+	background-image: url('../../global/img/menu/Edit-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.report {
+	background-image: url('../../global/img/menu/ViewReport-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.print {
+	background-image: url('../../global/img/menu/Print-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.addexception {
+	background-image: url('../../global/img/menu/AddException-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.assgintoshuttle {
+	background-image: url('../../global/img/menu/AssignShuttle-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.googleearth {
+	background-image: url('../../global/img/menu/GoogleEarth-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.resouurcescheduler {
+	background-image: url('../../global/img/menu/ResourceSched-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.findassignments {
+	background-image: url('../../global/img/menu/ViewRecord-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.generatetripplan {
+	background-image: url('../../global/img/menu/GenerateTripPlan-White.png');
+}
+
+.tf-contextmenu .menu-item .menu-icon.checked {
+	background-image: url('../../global/img/grid/green_check.png');
+}
+
+.tf-contextmenu.index-menu {
+	border-color: #d3d3d3;
+	line-height: 20px;
+	width: 250px;
+	margin-top: -3px;
+	border-top: 3px solid #db4d37;
+}
+
+.tf-contextmenu.index-menu li {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.tf-contextmenu.index-menu .menu-title {
+	font-weight: bold;
+	font-size: 13px;
+	margin-top: 20px;
+}
+
+.tf-contextmenu .index-menu-top {
+	height: 30px;
+	width: 100%;
+	line-height: 40px;
+}
+
+.tf-contextmenu .index-menu-bottom {
+	border: 1px solid #3b3b3b;
+	background-color: #6b6b6b;
+	min-height: 5px;
+	color: #ffffff;
+	width: 100%;
+	line-height: 2.8;
+	margin-top: 30px;
+	cursor: pointer;
+}
+
+.tf-contextmenu .index-menu-title {
+	border-bottom: 1px solid #d3d3d3;
+	line-height: 1;
+	height: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.tf-contextmenu .index-menu-title h4 {
+	margin: 0 0 8px 0;
+}
+
+.submenu-padding-template() {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.tf-submenu {
+	background: white;
+	position: absolute;
+	left: -247px;
+	border: 1px solid #ACACAC;
+	width: 250px;
+	margin-top: -20px;
+	box-shadow: 1px 1px 1px #888888;
+
+	.tf-horizontal {
+		background-color: #F2F2F2;
+		margin-top: 20px;
+	}
+
+	.submenu-view-all {
+		.submenu-padding-template;
+		margin-top: 20px;
+	}
+
+	.submenu-manage {
+		.submenu-padding-template;
+		border: 1px solid #3b3b3b;
+		background-color: #6b6b6b;
+		min-height: 5px;
+		color: #ffffff;
+		width: 100%;
+		line-height: 2.8;
+		margin-top: 8px;
+		cursor: pointer;
+	}
+
+	.submenu-group {
+		margin-bottom: 20px;
+
+		.submenu-header {
+			.submenu-padding-template;
+			font-weight: bold;
+			margin-top: 3px;
+			margin-bottom: 3px;
+			font-size: 14px;
+
+			.span-right {
+				font-weight: normal;
+				margin-left: 5px;
+			}
+		}
+
+		.submenu-single {
+			.submenu-padding-template;
+			line-height: 24px;
+			height: 24px;
+
+			&:hover {
+				background-color: #ddedfb !important;
+			}
+
+			.iconbutton {
+				float: left;
+				background-size: 12px 12px;
+				height: 24px;
+			}
+
+			.submenu-single-option {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				padding-left: 5px;
+
+				.parenthesis-text {
+					color: #666666;
+				}
+			}
+		}
+	}
+}
+
+.editColumnMenu-wrap {
+	.ui-sortable-placeholder {
+		background: #eaeaea;
+		height: 47px;
+	}
+
+	.mobile-modal-grid-description {
+		a, a:hover {
+			text-decoration: none;
+		}
+
+		a {
+			display: none;
+		}
+
+		&.more {
+			.btn-less {
+				display: none;
+			}
+
+			.btn-more {
+				display: inline;
+			}
+		}
+
+		&.less {
+			.btn-more {
+				display: none;
+			}
+
+			.btn-less {
+				display: inline;
+			}
+		}
+	}
+
+	.scroll-container {
+		height: calc(~"100% - 68px");
+		overflow-y: auto;
+	}
+
+	.mobile-list-view {
+		.item {
+			background-color: white;
+			padding: 8px 15px;
+
+			> div {
+				position: relative;
+			}
+
+			color: #999999;
+
+			.checkmark {
+				visibility: hidden;
+			}
+
+			&.selected {
+				color: #434343;
+				font-weight: bold;
+
+				.checkmark {
+					visibility: visible;
+				}
+			}
+
+			&.ui-sortable-helper {
+				border: 1px solid #d9d9d9;
+			}
+		}
+
+		&.selected .item {
+			.name {
+				padding-left: 20px;
+			}
+
+			&.selected .drag-handler {
+				display: block;
+			}
+		}
+	}
+
+	.drag-handler {
+		background: url(../../global/img/grid/more-ellipsis.png) center center no-repeat;
+		transform: rotate(90deg);
+		display: inline-block;
+		position: absolute;
+		width: 30px;
+		height: 30px;
+		top: -5px;
+		left: -12px;
+		display: none;
+	}
+}
