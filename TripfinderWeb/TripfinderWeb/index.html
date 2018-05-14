@@ -6,13 +6,19 @@
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link href="Global/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0"
-	/>
-	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
+	<meta name ="format-detection" content="telephone=no" />
+
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datetimepicker.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.common.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.default.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.fiori.css" />
+
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
 	<link rel="stylesheet" href="Global/Css/tripfinder.css"></link>
 	<!-- endbuild -->
+
 	<script src="local_settings.js"></script>
 	<script src="Global/ThirdParty/jquery-1.11.1.min.js"></script>
 	<script src="Global/ThirdParty/jquery-ui-1.10.4.custom.min.js"></script>
@@ -28,9 +34,13 @@
 	<script src="Global/ThirdParty/linq.min.js"></script>
 	<script src="Global/ThirdParty/bootbox.min.js"></script>
 	<script src="Global/ThirdParty/bootstrap/js/bootstrap3-typeahead.js"></script>
+	<script src="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datepicker.js"></script>
+	<script src="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datetimepicker.js"></script>
+	<script src="Global/ThirdParty/pubsub.js"></script>
 	<!-- build:js Global/JavaScript/tripfinder.js -->
 	<script src="Global/JavaScript/Framework/Namespacing.js"></script>
 	<script src="Global/JavaScript/Framework/UserPreferenceManager.js"></script>
+	<script src="Global/JavaScript/Framework/UserDefinedFieldUtil.js"></script>
 	<script src="Global/JavaScript/Framework/Api.js"></script>
 	<script src="Global/JavaScript/Framework/Ajax.js"></script>
 	<script src="Global/JavaScript/Framework/AuthManager.js"></script>
@@ -47,6 +57,8 @@
 	<script src="Global/JavaScript/Framework/ShortCutKeys.js"></script>
 	<script src="Global/JavaScript/Framework/SoftSessionValidator.js"></script>
 	<script src="Global/JavaScript/Framework/StorageManager.js"></script>
+	<script src="Global/JavaScript/Framework/PromiseBootbox.js"></script>
+
 	<script src="Global/JavaScript/Framework/Knockout/Knockout.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/contextMenuClick.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/singleClick.js"></script>
@@ -55,7 +67,8 @@
 	<script src="Global/JavaScript/Framework/Knockout/Binding/uiInit.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/Value.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/customInput.js"></script>
-	<script src="Global/JavaScript/Framework/PromiseBootbox.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/typeahead.js"></script>
+
 	<script src="Global/JavaScript/Framework/Input/BaseBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/StringBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/DisabledBox.js"></script>
@@ -70,14 +83,33 @@
 	<script src="Global/JavaScript/Framework/Input/PhoneBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/SelectBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/ColorBox.js"></script>
-	<script src="Global/JavaScript/Framework/Knockout/Binding/typeahead.js"></script>
 	<script src="Global/JavaScript/Framework/PageManager.js"></script>
+
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridAlert.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridmenu.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/filter.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/KendoGridFilterMenu.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/layout.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/summary.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/kendoCustomizedTimePicker.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/kendoCustomizedDateTimePicker.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/SearchParameters.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/Sorting.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/Filtering.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoGridHackHelper.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/LightKendoGrid.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoGrid.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/gridAutoScroll.js"></script>
+
+	<script src="Global/JavaScript/Framework/Helper/DateBoxHelper.js"></script>
+
+	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripGridDefinition.js"></script>
 
 	<script src="Global/JavaScript/ViewModel/Controls/BaseControl.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/LoginViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/DataSourceChangeViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Controls/FieldTripPage.js"></script>
-
+	<script src="Global/JavaScript/ViewModel/Controls/ListFilterDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/FieldTripPage.js"></script>
 
 	<script src="Global/JavaScript/Modal/BaseModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/TripfinderLoginModel.js"></script>
@@ -86,6 +118,8 @@
 
 	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/UserPreferenceDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/GridLayoutExtendedDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/GridFilterDataModel.js"></script>
 
 	<script src="Global/JavaScript/Main.js"></script>
 	<script src="Global/JavaScript/Startup.js"></script>
@@ -97,8 +131,6 @@
 		left navigationbar
 	</div> -->
 	<div id="pageContent" class="page-container">
-		<div class="main-body" data-bind="template:{ name:page().contentTemplate, data: page().data }">
-		</div>
 	</div>
 	<div class="tfmodal-container">
 		<!-- ko foreach: obBaseModalViewModels -->
@@ -129,27 +161,34 @@
 			<div class="spinner">
 				<div class="spinner-icon-container">
 					<style type='text/css'>
-						@-webkit-keyframes uil-default-anim {
-							0% {
+						@-webkit-keyframes uil-default-anim
+						{
+							0%
+							{
 								opacity: 1;
 							}
 
-							100% {
+							100%
+							{
 								opacity: 0;
 							}
 						}
 
-						@keyframes uil-default-anim {
-							0% {
+						@keyframes uil-default-anim
+						{
+							0%
+							{
 								opacity: 1;
 							}
 
-							100% {
+							100%
+							{
 								opacity: 0;
 							}
 						}
 
-						.uil-default-css {
+						.uil-default-css
+						{
 							position: relative;
 							left: -78px;
 							top: -78px;
@@ -158,84 +197,96 @@
 							height: 200px;
 						}
 
-						.uil-default-css>div:nth-of-type(1) {
+						.uil-default-css > div:nth-of-type(1)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.35s;
 							animation-delay: -0.35s;
 						}
 
-						.uil-default-css>div:nth-of-type(2) {
+						.uil-default-css > div:nth-of-type(2)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.29166666666666663s;
 							animation-delay: -0.29166666666666663s;
 						}
 
-						.uil-default-css>div:nth-of-type(3) {
+						.uil-default-css > div:nth-of-type(3)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.23333333333333334s;
 							animation-delay: -0.23333333333333334s;
 						}
 
-						.uil-default-css>div:nth-of-type(4) {
+						.uil-default-css > div:nth-of-type(4)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.17500000000000002s;
 							animation-delay: -0.17500000000000002s;
 						}
 
-						.uil-default-css>div:nth-of-type(5) {
+						.uil-default-css > div:nth-of-type(5)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.11666666666666667s;
 							animation-delay: -0.11666666666666667s;
 						}
 
-						.uil-default-css>div:nth-of-type(6) {
+						.uil-default-css > div:nth-of-type(6)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.05833333333333329s;
 							animation-delay: -0.05833333333333329s;
 						}
 
-						.uil-default-css>div:nth-of-type(7) {
+						.uil-default-css > div:nth-of-type(7)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -5.551115123125783e-17s;
 							animation-delay: -5.551115123125783e-17s;
 						}
 
-						.uil-default-css>div:nth-of-type(8) {
+						.uil-default-css > div:nth-of-type(8)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.05833333333333329s;
 							animation-delay: 0.05833333333333329s;
 						}
 
-						.uil-default-css>div:nth-of-type(9) {
+						.uil-default-css > div:nth-of-type(9)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.11666666666666664s;
 							animation-delay: 0.11666666666666664s;
 						}
 
-						.uil-default-css>div:nth-of-type(10) {
+						.uil-default-css > div:nth-of-type(10)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.17500000000000004s;
 							animation-delay: 0.17500000000000004s;
 						}
 
-						.uil-default-css>div:nth-of-type(11) {
+						.uil-default-css > div:nth-of-type(11)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.2333333333333334s;
 							animation-delay: 0.2333333333333334s;
 						}
 
-						.uil-default-css>div:nth-of-type(12) {
+						.uil-default-css > div:nth-of-type(12)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.29166666666666663s;

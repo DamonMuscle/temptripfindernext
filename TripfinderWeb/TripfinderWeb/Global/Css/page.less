@@ -5,6 +5,43 @@ body,
 	float: left;
 	overflow-y: auto;
 	-ms-overflow-style: scrollbar;
+	width: 100%;
+
+	.main-body {
+		height: 100%;
+		width: 100%;
+
+		.page-container {
+			height: 100%;
+			width: 100%;
+
+			.page-title {
+				padding-left: 16px;
+				font-weight: bold;
+				letter-spacing: 3px;
+				font-size: 26px;
+				color: #262626;
+				line-height: 56px;
+				white-space: nowrap;
+				font-family: "SourceSansPro-SemiBold";
+				height: 56px;
+				border-bottom: 2px solid #f2f2f2;
+			}
+
+			.grid-icons {
+				float: left;
+				width: 100%;
+				padding: 0 16px;
+				height: 28px;
+			}
+
+			.grid-wrap {
+				width: 100%;
+				float: left;
+				height: calc(~"100% - 86px");
+			}
+		}
+	}
 }
 
 html,
@@ -44,7 +81,7 @@ body {
 	position: fixed;
 
 
-	>.overlay {
+	> .overlay {
 		background: rgba(102, 102, 102, 0.8);
 		position: absolute;
 		top: 0;
@@ -52,6 +89,7 @@ body {
 		left: 0;
 		right: 0;
 	}
+
 	.spinner {
 		position: absolute;
 		margin: auto;
@@ -67,6 +105,7 @@ body {
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
+
 		.subtitle {
 			/* the subtitle starts off hidden */
 			/* center the subtitle region.
@@ -74,6 +113,7 @@ body {
 			margin-top: -5px;
 			width: 350px;
 		}
+
 		.subtitle-text {
 			/* Text style */
 			color: white;
@@ -86,17 +126,20 @@ body {
 			text-align: center;
 		}
 	}
+
 	.spinner-icon {
 		display: flex;
 	}
+
 	.spinner-icon-container {
 		height: 50px;
 		width: 44px;
 	}
+
 	&.no-overlay {
 		position: initial;
 
-		>.overlay {
+		> .overlay {
 			position: initial;
 		}
 	}

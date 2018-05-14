@@ -1,61 +1,77 @@
-(function() {
+(function()
+{
 	createNamespace("TF").Startup = Startup;
 
-	tf.showSelectDataSourceModel = function(databaseName) {
+	tf.showSelectDataSourceModel = function(databaseName)
+	{
 		return tf.modalManager.showModal(
-				new TF.Modal.DataSourceChangeModalViewModel(databaseName)
-			)
-			.then(function(datasource) {
-				if (!datasource) {
-					if ((!databaseName)) {
+			new TF.Modal.DataSourceChangeModalViewModel(databaseName)
+		)
+			.then(function(datasource)
+			{
+				if (!datasource)
+				{
+					if ((!databaseName))
+					{
 						return tf.showSelectDataSourceModel();
 					}
 					return Promise.resolve(true);
 				}
 
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), datasource.Id, "datasource", "test", datasource.DBType))
-					.then(function() {
+					.then(function()
+					{
 						//connection passed
 						var notValidDatabaseName = datasource.DatabaseName;
 						return tf.datasourceManager.verifyDataBaseNeedToRebuild(datasource.Id, datasource.DBType)
-							.then(function(isValidate) {
-								if (!isValidate) {
+							.then(function(isValidate)
+							{
+								if (!isValidate)
+								{
 									//self.clearDBInfo();
 									return tf.DBNeedToRebuildAlert(notValidDatabaseName);
 								}
 								return Promise.resolve(true);
 							});
 					})
-					.catch(function() { // failed to connection
+					.catch(function()
+					{ // failed to connection
 						return tf.promiseBootbox.dialog({
-								message: datasource.DatabaseName + " could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative (support@transfinder.com or 888-427-2403).",
-								title: "Could Not Load",
-								closeButton: true,
-								buttons: {
-									ok: {
-										label: "OK",
-										className: "tf-btn-black"
-									}
+							message: datasource.DatabaseName + " could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative (support@transfinder.com or 888-427-2403).",
+							title: "Could Not Load",
+							closeButton: true,
+							buttons: {
+								ok: {
+									label: "OK",
+									className: "tf-btn-black"
 								}
-							})
-							.then(function() { //maybe need logoff
+							}
+						})
+							.then(function()
+							{ //maybe need logoff
 								return Promise.resolve(false);
 							});
 					})
-					.then(function(isPass) {
-						if (isPass) {
+					.then(function(isPass)
+					{
+						if (isPass)
+						{
 							//verify datasource is change
-							if (datasource && datasource.Id) {
+							if (datasource && datasource.Id)
+							{
 								var p1 = tf.storageManager.save("databaseType", datasource.DBType);
 								var p2 = tf.storageManager.save("datasourceId", datasource.Id);
 								var p3 = tf.storageManager.save("databaseName", datasource.DatabaseName);
-								return Promise.all([p1, p2]).then(function() {
+								return Promise.all([p1, p2]).then(function()
+								{
 									location.reload();
 									return "loginpage";
 								});
 							}
-						} else {
-							if (!databaseName) {
+						} else
+						{
+							if (!databaseName)
+							{
 								tf.datasourceManager.clearDBInfo();
 								return tf.showSelectDataSourceModel();
 							}
@@ -65,10 +81,12 @@
 			}.bind(this));
 	};
 
-	function Startup() {}
-	Startup.prototype.start = function() {
+	function Startup() { }
+	Startup.prototype.start = function()
+	{
 		var self = this;
-		self.libraryInitialization().then(function() {
+		self.libraryInitialization().then(function()
+		{
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
 			tf.loadingIndicator = self._createLoadingIndicator();
@@ -84,35 +102,47 @@
 			tf.pageManager = new TF.Page.PageManager();
 
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
-				.then(function() {
+				.then(function()
+				{
 					return sessionValidator.activate();
 				})
-				.then(function() {
+				.then(function()
+				{
 					tf.loadingIndicator.showImmediately();
 					var p1 = tf.userPreferenceManager.getAllKey();
-					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "timezonetotalminutes")).then(function(apiResponse) {
-						moment().constructor.prototype.currentTimeZoneTime = function() {
+					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "timezonetotalminutes")).then(function(apiResponse)
+					{
+						moment().constructor.prototype.currentTimeZoneTime = function()
+						{
 							var now = moment().utcOffset(apiResponse.Items[0]);
 							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 						};
 					});
 					return Promise.all([p1, p2])
-						.then(function() {
-							var validateAllDB = function() {
+						.then(function()
+						{
+							var validateAllDB = function()
+							{
 								return tf.datasourceManager.validateAllDBs()
-									.then(function(valResult) {
-										if (valResult.Items[0].AnyDBPass) {
-											if (valResult.Items[0].DBlength == 1) {
+									.then(function(valResult)
+									{
+										if (valResult.Items[0].AnyDBPass)
+										{
+											if (valResult.Items[0].DBlength == 1)
+											{
 												tf.storageManager.save("databaseType", valResult.Items[0].DBType);
 												tf.storageManager.save("datasourceId", valResult.Items[0].DBId);
 												tf.storageManager.save("databaseName", valResult.Items[0].DBName);
 												return tf.datasourceManager.validate();
 											}
 											return false;
-										} else {
-											if (valResult.Items[0].DBlength == 1) {
+										} else
+										{
+											if (valResult.Items[0].DBlength == 1)
+											{
 												invalidateMessage = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-											} else {
+											} else
+											{
 												invalidateMessage = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
 											}
 											return "nodatasource";
@@ -120,38 +150,50 @@
 									});
 							}
 							currentDatabaseId = tf.storageManager.get("datasourceId");
-							if (!currentDatabaseId || currentDatabaseId < 0) {
+							if (!currentDatabaseId || currentDatabaseId < 0)
+							{
 								return validateAllDB();
 							}
-							if (currentDatabaseId) {
-								return tf.datasourceManager.validate().then(function(result) {
-									if (result === false) {
+							if (currentDatabaseId)
+							{
+								return tf.datasourceManager.validate().then(function(result)
+								{
+									if (result === false)
+									{
 										return validateAllDB();
 									}
 									return result;
 								});
-							} else {
+							} else
+							{
 								return validateAllDB();
 							}
 						})
-						.then(function(validateResult) {
-							if (validateResult === "nodatasource") {
+						.then(function(validateResult)
+						{
+							if (validateResult === "nodatasource")
+							{
 								tf.loadingIndicator.tryHide();
 								return tf.promiseBootbox.alert(invalidateMessage, "No Validate Data Source")
-									.then(function() {
+									.then(function()
+									{
 										tf.storageManager.save("token", "", true);
 										location.reload();
 										return null;
 									});
-							} else if (validateResult) {
+							} else if (validateResult)
+							{
 								return tf.datasourceManager.verifyDataBaseNeedToRebuild(tf.datasourceManager.databaseId, tf.datasourceManager.databaseType)
-									.then(function(noRebuild) {
-										if (!noRebuild) {
+									.then(function(noRebuild)
+									{
+										if (!noRebuild)
+										{
 											return tf.DBNeedToRebuildAlert(tf.datasourceManager.databaseName);
 										}
 										return Promise.resolve(true);
 									});
-							} else {
+							} else
+							{
 								tf.loadingIndicator.tryHide();
 								// cannot validate the connections string
 								var databaseName = tf.storageManager.get("databaseName"),
@@ -170,11 +212,14 @@
 											className: "btn-default btn-sm btn-default-link"
 										}
 									}
-								}).then(function(result) {
+								}).then(function(result)
+								{
 									//set db to null and basic settings to null
-									if (result === true) {
+									if (result === true)
+									{
 										return Promise.resolve(false);
-									} else {
+									} else
+									{
 										tf.storageManager.save("token", "", true);
 										location.reload();
 										return null;
@@ -182,19 +227,24 @@
 								});
 							}
 						})
-						.then(function(isPass) {
-							if (isPass === null) {
+						.then(function(isPass)
+						{
+							if (isPass === null)
+							{
 								return null;
-							} else if (!isPass) {
+							} else if (!isPass)
+							{
 								tf.datasourceManager.clearDBInfo();
 								return tf.showSelectDataSourceModel();
 							}
 							tf.loadingIndicator.tryHide();
 							return true;
 						})
-						.then(function(value) {
+						.then(function(value)
+						{
 
-							if (value !== null) {
+							if (value !== null)
+							{
 								tf.pageManager.openNewPage("fieldtrip");
 								return true;
 							}
@@ -204,15 +254,27 @@
 		});
 	};
 
-	Startup.prototype._createLoadingIndicator = function() {
+	Startup.prototype._createLoadingIndicator = function()
+	{
 		var loadingIndicator = new TF.LoadingIndicator($('#loadingindicator'));
 		var loadingElement = document.getElementById("loadingindicator");
 		ko.applyBindings(ko.observable(loadingIndicator, loadingElement), loadingElement);
 		return loadingIndicator;
 	};
 
-	Startup.prototype.libraryInitialization = function() {
-
+	Startup.prototype.libraryInitialization = function()
+	{
+		tf.localization = {
+			Postal: 'Zip Code',
+			AreaName: 'State',
+			LocalName: 'United States',
+			MeasureSystem: 'US',
+			UnitsOfMeasure: 'Miles',
+			PerHour: 'MPH',
+			Abbrev: 'mi',
+			Vehicle: 'MPG',
+			PostalCodeLength: 5
+		};
 		moment.locale("en-US");
 		return Promise.resolve(i18n.init({
 			fallbackLng: "en-US",
