@@ -11,11 +11,11 @@
 			$content, $pageContent = $("#pageContent");
 
 		$pageContent.empty();
-		var permissinon = tf.authManager.isAuthorizedFor(type, "read");
+		var permission = tf.authManager.isAuthorizedFor(type, "read");
 		switch (type)
 		{
 			case "fieldtrip":
-				if (permissinon)
+				if (permission)
 				{
 					pageData = new TF.Page.FieldTripPage();
 					templateType = "fieldtrip";
