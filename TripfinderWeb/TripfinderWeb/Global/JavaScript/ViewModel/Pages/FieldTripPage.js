@@ -37,6 +37,7 @@
 		self.updateOptions();
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
+		self.bindButtonEvent();
 	};
 
 	FieldTripPage.prototype.updateOptions = function() {
@@ -239,6 +240,68 @@
 			return self.searchGridInited() && self.searchGrid.noApplyFilterNoModified();
 		}, self);
 	};
+
+	FieldTripPage.prototype.bindEvent = function(buttonSelector, bindEvent) {
+		var self = this;
+		event = TF.isMobileDevice ? "touchstart" : "click";
+		self.$element.find(buttonSelector).on(event, function(e) {
+			//e.stopPropagation();
+			//e.preventDefault();
+			bindEvent.call(self, self, e);
+		});
+	};
+
+	FieldTripPage.prototype.bindButtonEvent = function() {
+		var self = this;
+		self.bindEvent(".iconbutton.filter", self.filterMenuClick);
+		self.bindEvent(".iconbutton.addremovecolumn", function(model, e) {
+			self.searchGrid.addRemoveColumnClick(model, e);
+		});
+		self.bindEvent(".iconbutton.layout", self.layoutIconClick);
+		self.bindEvent(".iconbutton.refresh", function(model, e) {
+			self.searchGrid.refreshClick(model, e);
+		});
+	};
+
+	FieldTripPage.prototype.layoutIconClick = function(viewModel, e) {
+		var cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e);
+		var cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
+
+		if (cacheOperatorBeforeHiddenMenu)
+			TF.menuHelper.hiddenMenu();
+
+		if (cacheOperatorBeforeOpenMenu) {
+			//tf.pageManager.showContextMenu(e.currentTarget);
+			tf.contextMenuManager.showMenu(e.currentTarget, new TF.ContextMenu.TemplateContextMenu("workspace/grid/layoutcontextmenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid), function() {
+				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
+				if (self._gridMap && iconWrap.length > 0) {
+					iconWrap.css("display", "block");
+					self.updateResizePanel();
+				}
+			}));
+		}
+	};
+
+	FieldTripPage.prototype.filterMenuClick = function(viewModel, e) {
+		var self = this,
+			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
+			cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
+
+		if (cacheOperatorBeforeHiddenMenu)
+			TF.menuHelper.hiddenMenu();
+
+		if (cacheOperatorBeforeOpenMenu) {
+			tf.pageManager.showContextMenu(e.currentTarge);
+			self.searchGrid.filterMenuClick(e, function() {
+				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
+				if (self._gridMap && iconWrap.length > 0) {
+					iconWrap.css("display", "block");
+					self.updateResizePanel();
+				}
+			});
+		}
+	};
+
 
 	FieldTripPage.prototype.onDataBound = function(option)
 	{

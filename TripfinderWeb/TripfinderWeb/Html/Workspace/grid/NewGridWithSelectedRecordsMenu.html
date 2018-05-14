@@ -1,0 +1,209 @@
+<div class="tf-contextmenu-wrap overflowmenu-wrap">
+  <ul class="tf-contextmenu">
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[gridViewModel.type])">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'altsite'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('student','altsite'),css:{disabled:!tf.authManager.isAuthorizedFor('student','read')}, visible:gridViewModel.type == 'altsite'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Student')">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'busfinderhistorical'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','vehicleeventid'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'busfinderhistorical'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Trip')">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'georegion'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('altsite','georegion'),css:{disabled:!tf.authManager.isAuthorizedFor('altsite','read')}, visible:gridViewModel.type == 'georegion'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Alternate Site')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('school','georegion'),css:{disabled:!tf.authManager.isAuthorizedFor('school','read')}, visible:gridViewModel.type == 'georegion'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('School')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('student','georegion'),css:{disabled:!tf.authManager.isAuthorizedFor('student','read')}, visible:gridViewModel.type == 'georegion'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Student')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','georegion'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'georegion'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Trip Stop')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.showTodoWarningClick, visible:gridViewModel.type == 'georegion'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label">
+        Report On Selected Records(not implemented)
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.showTodoWarningClick, visible:gridViewModel.type == 'georegion'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label">
+        Mail Merge with Selected Records(not implemented)
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'school'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('student','school'),css:{disabled:!tf.authManager.isAuthorizedFor('student','read')}, visible:gridViewModel.type == 'school'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Student')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','tripbyschoolIds'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'school'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Trip')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','tripstopbyschoolIds'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'school'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Stop')">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'student'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','amtripbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('AM Trip')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','pmtripbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('PM Trip')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','amtransfertripsbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('AM Transfer Trip')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','pmtransfertripsbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('PM Transfer Trip')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('altsite','altsitebystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('altsite','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Alternate Site')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','amtripstopbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('AM Stop')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','pmtripstopbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('PM Stop')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','amtransfertripstopbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('AM Transfer Stop')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','pmtransfertripstopbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('PM Transfer Stop')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','alltripstopbystudentIds'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'student'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('All Stop')">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'trip'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('aide','trip'), visible:gridViewModel.type == 'trip'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label">
+        Aides
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('driver','trip'), visible:gridViewModel.type == 'trip'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Driver')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('vehicle','trip'),css:{disabled:!tf.authManager.isAuthorizedFor('vehicle','read')}, visible:gridViewModel.type == 'trip'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Vehicle')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('student','trip'),css:{disabled:!tf.authManager.isAuthorizedFor('student','read')}, visible:gridViewModel.type == 'trip'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Student')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('tripstop','trip'),css:{disabled:!tf.authManager.isAuthorizedFor('tripstop','read')}, visible:gridViewModel.type == 'trip'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Stop')">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'tripstop'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('school','tripstop'),css:{disabled:!tf.authManager.isAuthorizedFor('school','read')}, visible:gridViewModel.type == 'tripstop'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('School')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('student','tripstop'),css:{disabled:!tf.authManager.isAuthorizedFor('student','read')}, visible:gridViewModel.type == 'tripstop'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Student')">
+      </div>
+    </li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','tripstop'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'tripstop'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Trip')">
+      </div>
+    </li>
+
+    <li class="menu-divider" data-bind="visible:gridViewModel.type == 'vehicle'"><div class="rule"></div></li>
+    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('trip','tripbyvehicleIds'),css:{disabled:!tf.authManager.isAuthorizedFor('trip','read')}, visible:gridViewModel.type == 'vehicle'">
+      <div class="menu-icon">
+      </div>
+      <div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Trip')">
+      </div>
+    </li>
+  </ul>
+</div>

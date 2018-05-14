@@ -1,0 +1,73 @@
+﻿<div class="tf-contextmenu-wrap optionmenu-wrap layoutmenu-wrap phone-wrap">
+	<ul class="tf-contextmenu">
+		<li class="menu-divider"></li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.saveLayoutClick.bind(searchGrid)">
+			<div class="menu-icon saveas">
+			</div>
+			<div class="menu-label">
+				Save
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.saveAsNewLayoutClick">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Save As New Layout
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.mangeLayoutClick">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Manage Layouts
+			</div>
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.resetLayoutClick.bind(searchGrid)">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Reset
+			</div>
+		</li>
+		<!--ko if:searchGrid.obContextMenuDisplayGridLayoutExtendedDataModels().length > 0 -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+		<!--ko if:TF.isPhoneDevice -->
+		<div data-bind="css:{'special-item-container':!gridViewModel.obShowSplitmap()}">
+			<!--ko foreach:searchGrid.obContextMenuDisplayGridLayoutExtendedDataModels -->
+			<li class="menu-item" data-bind="
+				contextMenuClick:$parent.searchGrid.gridLayoutClick.bind($parent.searchGrid),
+				attr: { title: description },
+				css:{'menu-item-checked':$data.name()==$parent.searchGrid.obSelectedGridLayoutName()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label" data-bind="text:name">
+				</div>
+				<div class="menu-icon menu-icon-mobile">
+				</div>
+			</li>
+			<!--/ko -->
+		</div>
+		<!--/ko -->
+		<!--ko if:!TF.isPhoneDevice -->
+		<!--ko foreach:searchGrid.obContextMenuDisplayGridLayoutExtendedDataModels -->
+		<li class="menu-item" data-bind="
+				contextMenuClick:$parent.searchGrid.gridLayoutClick.bind($parent.searchGrid),
+				attr: { title: description },
+				css:{'menu-item-checked':$data.name()==$parent.searchGrid.obSelectedGridLayoutName()}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:name">
+			</div>
+		</li>
+		<!--/ko -->
+		<!--/ko -->
+
+		<li class="menu-divider"></li>
+	</ul>
+</div>
