@@ -1,24 +1,39 @@
-(function() {
+(function()
+{
 	createNamespace("TF.Page").PageManager = PageManager;
 
-	function PageManager() {}
+	function PageManager() { }
 
-	PageManager.prototype.openNewPage = function(type) {
+	PageManager.prototype.openNewPage = function(type)
+	{
 		var self = this,
 			pageData, templateType,
 			$content, $pageContent = $("#pageContent");
 
 		$pageContent.empty();
-		switch (type) {
+		var permissinon = tf.authManager.isAuthorizedFor(type, "read");
+		switch (type)
+		{
 			case "fieldtrip":
-				pageData = new TF.Page.FieldTripPage();
-				templateType = "fieldtrip";
+				if (permissinon)
+				{
+					pageData = new TF.Page.FieldTripPage();
+					templateType = "fieldtrip";
+				} else
+				{
+					return tf.promiseBootbox.alert("You have no Trip Field view permission!")
+						.then(function()
+						{
+							tf.modalManager.showModal(new TF.Modal.TripfinderLoginModel());
+						});
+				}
 				break;
 		}
 		$content = $("<div class='main-body'><!-- ko template:{ name:'workspace/page/" + templateType + "',data:$data }--><!-- /ko --></div>");
 		$pageContent.append($content);
 
-		if (pageData) {
+		if (pageData)
+		{
 			ko.applyBindings(ko.observable(pageData), $content[0]);
 		}
 	};
