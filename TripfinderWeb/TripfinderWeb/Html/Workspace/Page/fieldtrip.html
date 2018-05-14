@@ -1,6 +1,38 @@
-﻿<div data-bind="uiInit:init" class="page-container">
+﻿<div data-bind="uiInit:init" class="document-grid page-container">
 	<div class="page-title">FIELD TRIP</div>
-	<div class="grid-icons"></div>
+	<div class="grid-icons" data-bind="css:{'is-mobile-device':isMobileDevice}">
+		<div class="iconrow" data-bind="css:{'is-mobile-device':isMobileDevice}">
+			<div class="iconbutton mobile addremovecolumn" title="Show/Hide Grid Columns"></div>
+			<div class="iconbutton mobile layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
+			<div class="iconbutton mobile filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
+			<div class="divider" title=""></div>
+			<div class="iconbutton refresh" title="Refresh"></div>
+		</div>
+		<div class="pull-right grid-staterow-wrap">
+			<div class="grid-staterow">
+				<div class="grid-staterow-status text-overflow filter">
+					<span class="title pull-left">Filter:</span>
+					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
+					    style="max-width: 150px;"></span>
+					<!-- ko if:obSelectedGridFilterModifiedMessage -->
+					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
+					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
+					<span data-bind="visible:noApplyFilterNoModified" class="right-parenthesis-no-padding">)</span>
+					<!-- /ko -->
+				</div>
+				<div class="grid-staterow-status text-overflow layout">
+					<span class="comma-split">,&nbsp;</span>
+					<span class="title">Layout:</span>
+					<span data-bind="text:obSelectedGridLayoutName,attr:{'title':obSelectedGridLayoutName}"></span>
+					<!-- ko if:obSelectedGridLayoutModified -->
+					<span class="left-parenthesis-no-padding">(</span>
+					<span class="modified" data-bind="text:obSelectedGridLayoutModified"></span>
+					<span class="right-parenthesis-no-padding">)</span>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="grid-wrap">
 		<div class="kendo-grid kendo-grid-container"></div>
 	</div>
