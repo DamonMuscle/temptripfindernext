@@ -245,6 +245,8 @@
 
 							if (value !== null)
 							{
+								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
+								self.changePermissions();
 								tf.pageManager.openNewPage("fieldtrip");
 								return true;
 							}

@@ -177,10 +177,19 @@
 
 	KendoGridLayoutMenu.prototype._selectedGridLayoutNameComputer = function()
 	{
+		this.obResetLayout();
 		this._setgridStateTwoRowWhenOverflow();
 		if (this._obSelectedGridLayoutExtendedDataModel())
 		{
 			return this._obSelectedGridLayoutExtendedDataModel().name();
+		}
+		else if (this.options.fromSearch && !this._gridLoadingEnd)//IF the request from search,  first go to view display " All Columns".
+		{
+			return " All Columns";
+		}
+		else if (this.options.isTemporaryFilter && this.options.layoutName)//IF is temporary open grid, use the given layout name
+		{
+			return " " + this.options.layoutName;
 		}
 		else
 		{
@@ -231,7 +240,7 @@
 		);
 		var hasFilterIdChange = currentlyLayoutDataModel.filterId() != initLayoutDataModel.filterId();
 
-		var hasFilterNameChange = initLayoutDataModel.filterId()>0 && currentlyLayoutDataModel.filterName() != initLayoutDataModel.filterName();
+		var hasFilterNameChange = initLayoutDataModel.filterId() > 0 && currentlyLayoutDataModel.filterName() != initLayoutDataModel.filterName();
 
 		if ((!hasLayoutColumnsChange && !hasFilterIdChange && !hasFilterNameChange))
 		{
@@ -253,7 +262,10 @@
 		var filterId = currentlyLayoutDataModel._entityBackup.FilterId ||
 			tf.storageManager.get(self._storageFilterDataKey) ||
 			this._obCurrentGridLayoutExtendedDataModel().filterId();
-
+		if (isNaN(filterId))
+		{
+			return;
+		}
 		return TF.Grid.FilterHelper.validFilterId(filterId)
 			.then(function(canRevertLayoutFilterId)
 			{
@@ -292,7 +304,7 @@
 		}).Select(function(c)
 		{
 			return $.extend(
-			{}, c)
+				{}, c)
 		}).ToArray();
 	};
 
@@ -325,29 +337,33 @@
 				var gridLayoutExtendedDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items.slice(1));
 				this.obGridLayoutExtendedDataModels(gridLayoutExtendedDataModels);
 				this._sortGridLayoutExtendedDataModels();
-				var selectGridLayoutExtendedEntityId = tf.storageManager.get(this._storageLayoutDataKey);
-				var selectGridLayoutExtendedEntity = null;
-				if (selectGridLayoutExtendedEntityId && selectGridLayoutExtendedEntityId !== '')
+				var selectGridLayoutExtendedEntity = null, currentGridLayoutExtendedEntity = null;
+				//IF the request from search, do not use the sticky layout.
+				if (!this.options.fromSearch && !this.options.isTemporaryFilter)
 				{
-					selectGridLayoutExtendedEntity = Enumerable.From(gridLayoutExtendedDataModels).Where(function(c)
+					var selectGridLayoutExtendedEntityId = tf.storageManager.get(this._storageLayoutDataKey);
+					if (selectGridLayoutExtendedEntityId && selectGridLayoutExtendedEntityId !== '')
 					{
-						return c.name() == selectGridLayoutExtendedEntityId;
-					}).FirstOrDefault();
-				}
-				var currentGridLayoutExtendedEntity = tf.storageManager.get(this.options.storageKey);
-				//set lock
-				if (currentGridLayoutExtendedEntity && currentGridLayoutExtendedEntity.LayoutColumns.length > 0)
-				{
-					currentGridLayoutExtendedEntity.LayoutColumns.forEach(function(columnInStorage)
-					{
-						if (columnInStorage.locked && columnInStorage.locked == true)
+						selectGridLayoutExtendedEntity = Enumerable.From(gridLayoutExtendedDataModels).Where(function(c)
 						{
-							self.tobeLockedColumns.push(
+							return c.name() == selectGridLayoutExtendedEntityId;
+						}).FirstOrDefault();
+					}
+					currentGridLayoutExtendedEntity = tf.storageManager.get(this.options.storageKey);
+					//set lock
+					if (currentGridLayoutExtendedEntity && currentGridLayoutExtendedEntity.LayoutColumns.length > 0)
+					{
+						currentGridLayoutExtendedEntity.LayoutColumns.forEach(function(columnInStorage)
+						{
+							if (columnInStorage.locked && columnInStorage.locked == true)
 							{
-								field: columnInStorage.FieldName
-							});
-						}
-					});
+								self.tobeLockedColumns.push(
+									{
+										field: columnInStorage.FieldName
+									});
+							}
+						});
+					}
 				}
 				if (selectGridLayoutExtendedEntity)
 				{
@@ -478,47 +494,53 @@
 		return Promise.resolve(true);
 	};
 
-	KendoGridLayoutMenu.prototype._setConfiguration = function()
+	KendoGridLayoutMenu.prototype._setConfiguration = function(showAllColumns)
 	{
-		var visibleColumns = [];
-		var hiddenColumns = [];
-		var layoutColumns = this._obCurrentGridLayoutExtendedDataModel().layoutColumns();
-		for (var i = 0, len = this._gridDefinition.Columns.length; i < len; i++)
+		var self = this, visibleColumns = [], hiddenColumns = [],
+			layoutColumns = this._obCurrentGridLayoutExtendedDataModel().layoutColumns(), orderColumns = [];
+		//If show all columns
+		if (showAllColumns)
 		{
-			var fieldName = this._gridDefinition.Columns[i].FieldName;
-			var layoutColumn = Enumerable.From(layoutColumns).Where(function(c)
-			{
-				return c.FieldName == fieldName
-			}).ToArray()[0];
-			if (layoutColumn)
-			{
-				if (layoutColumn.Width)
-				{
-					this._gridDefinition.Columns[i].Width = layoutColumn.Width;
-				}
-				if (layoutColumn.locked)
-				{
-					this._gridDefinition.Columns[i].locked = layoutColumn.locked;
-				}
-				visibleColumns.push(this._gridDefinition.Columns[i]);
-			}
-			else
-			{
-				hiddenColumns.push(this._gridDefinition.Columns[i]);
-			}
+			orderColumns = this._gridDefinition.Columns;
 		}
-
-		var orderColumns = [];
-		for (var i = 0, len = layoutColumns.length; i < len; i++)
+		else
 		{
-			var fieldName = layoutColumns[i].FieldName;
-			var layoutColumn = Enumerable.From(visibleColumns).Where(function(c)
+			for (var i = 0, len = this._gridDefinition.Columns.length; i < len; i++)
 			{
-				return c.FieldName == fieldName
-			}).ToArray()[0];
-			if (layoutColumn)
+				var fieldName = this._gridDefinition.Columns[i].FieldName;
+				var layoutColumn = Enumerable.From(layoutColumns).Where(function(c)
+				{
+					return c.FieldName == fieldName
+				}).ToArray()[0];
+				if (layoutColumn)
+				{
+					if (layoutColumn.Width)
+					{
+						this._gridDefinition.Columns[i].Width = layoutColumn.Width;
+					}
+					if (layoutColumn.locked)
+					{
+						this._gridDefinition.Columns[i].locked = layoutColumn.locked;
+					}
+					visibleColumns.push(this._gridDefinition.Columns[i]);
+				}
+				else
+				{
+					hiddenColumns.push(this._gridDefinition.Columns[i]);
+				}
+			}
+
+			for (var i = 0, len = layoutColumns.length; i < len; i++)
 			{
-				orderColumns.push(layoutColumn);
+				var fieldName = layoutColumns[i].FieldName;
+				var layoutColumn = Enumerable.From(visibleColumns).Where(function(c)
+				{
+					return c.FieldName == fieldName
+				}).ToArray()[0];
+				if (layoutColumn)
+				{
+					orderColumns.push(layoutColumn);
+				}
 			}
 		}
 
@@ -614,6 +636,11 @@
 		this._obDefaultLayoutDataModel(gridLayoutExtendedDataModel);
 		this._obDefaultLayoutDataModel().apiIsDirty(true);
 		//if (this._gridTypeNoCloumnsSticky.indexOf(this.options.gridType) == -1)
+		//IF the request from search, do not sticky the layout.
+		if (this.options.fromSearch || this.options.isTemporaryFilter)
+		{
+			return;
+		}
 		tf.storageManager.save(this.options.storageKey, gridLayoutExtendedDataModel.toData(), null, null, false);
 	};
 
@@ -663,6 +690,12 @@
 		this.obAggregationMap([]);
 		this.obSummaryGridVisible(false);
 		this._applyingLayout = false;
+		this.obResetLayout(true);
+		//IF the request from search, do not sticky the layout.
+		if (this.options.fromSearch || this.options.isTemporaryFilter)
+		{
+			return;
+		}
 		tf.storageManager.save(this._storageLayoutDataKey, null);
 	};
 
@@ -773,6 +806,11 @@
 								})
 								.then(function(result)
 								{
+									//IF the request from search, do not sticky the filter.
+									if (this.options.fromSearch || this.options.isTemporaryFilter)
+									{
+										return self.applyLayoutExtended(gridLayoutExtendDataModel);
+									}
 									return tf.storageManager.save(self._storageFilterDataKey, gridLayoutExtendDataModel.filterId())
 										.then(function()
 										{
@@ -880,20 +918,46 @@
 			this.obSelectedGridFilterId(null);
 		}
 
+		if (this.relatedFilterEntity)
+		{
+			delete this.relatedFilterEntity;
+		}
+		if (this.obCallOutFilterName())
+		{
+			this.obCallOutFilterName(null);
+		}
+		if (this.options.callOutFilterName)
+		{
+			this.options.callOutFilterName = null;
+		}
+		if (this._gridState.filteredIds)
+		{
+			this._gridState.filteredIds = null;
+		}
+		if (this.isFromRelated())
+		{
+			this.isFromRelated(false);
+		}
+
 		if (gridLayoutExtendDataModel.filterId() && selectedObGridFilterDataModels.length === 0)
 		{
 			this._obSelectedGridLayoutExtendedDataModel().filterId(null);
 			this.obSelectedGridFilterId(null);
 			this.gridAlert.show(
-			{
-				alert: this.gridAlert.alertOption.danger,
-				message: "The layout filter doesn't exist. No filter applied."
-			});
+				{
+					alert: this.gridAlert.alertOption.danger,
+					message: "The layout filter doesn't exist. No filter applied."
+				});
 		}
 
 		this._setConfiguration();
 		this._setGridState();
 		this._obCurrentGridLayoutExtendedDataModel().apiIsDirty(false);
+		//IF the request from search, do not sticky the layout.
+		if (this.options.fromSearch || this.options.isTemporaryFilter)
+		{
+			return;
+		}
 		tf.storageManager.save(this._storageLayoutDataKey, gridLayoutExtendDataModel.name());
 	};
 
@@ -919,9 +983,9 @@
 		this._resetAppliedLayoutInitState(this._obSelectedGridLayoutExtendedDataModel());
 		this._updateGridLayoutExtendedDataModels(this._obSelectedGridLayoutExtendedDataModel());
 		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "gridlayout"),
-		{
-			data: this._obSelectedGridLayoutExtendedDataModel().toData()
-		});
+			{
+				data: this._obSelectedGridLayoutExtendedDataModel().toData()
+			});
 	};
 
 	KendoGridLayoutMenu.prototype._updateGridLayoutExtendedDataModels = function(gridLayoutExtendedDataModel)
@@ -963,12 +1027,12 @@
 	KendoGridLayoutMenu.prototype.saveAndEditLayout = function(isNew, gridLayoutExtendedDataModel, isNoConfirm)
 	{
 		return tf.modalManager.showModal(new TF.Modal.Grid.ModifyLayoutModalViewModel(
-				this._gridType,
-				isNew,
-				gridLayoutExtendedDataModel ? gridLayoutExtendedDataModel : this._obCurrentGridLayoutExtendedDataModel(),
-				this.obGridFilterDataModels,
-				this.obSelectedGridFilterId
-			))
+			this._gridType,
+			isNew,
+			gridLayoutExtendedDataModel ? gridLayoutExtendedDataModel : this._obCurrentGridLayoutExtendedDataModel(),
+			this.obGridFilterDataModels,
+			this.obSelectedGridFilterId
+		))
 			.then(function(result)
 			{
 				if (!result)
@@ -990,7 +1054,7 @@
 				}
 				else
 				{
-					if (this._obSelectedGridLayoutExtendedDataModel() && isNew !== "new" && this._obSelectedGridLayoutExtendedDataModel().id()==gridLayoutExtendedDataModel.id())
+					if (this._obSelectedGridLayoutExtendedDataModel() && isNew !== "new" && this._obSelectedGridLayoutExtendedDataModel().id() == gridLayoutExtendedDataModel.id())
 					{
 						this.applyLayout(gridLayoutExtendedDataModel, isNoConfirm);
 					}
@@ -1031,7 +1095,7 @@
 		// 4.find layout A not exist, user 1's grid page reload
 		if (self._obSelectedGridLayoutExtendedDataModel() && !Enumerable.From(this.obGridLayoutExtendedDataModels()).Where(function(c)
 		{
-				return c == self._obSelectedGridLayoutExtendedDataModel()
+			return c.id() == self._obSelectedGridLayoutExtendedDataModel().id()
 		}).ToArray()[0])
 		{
 			this._resetLayout();

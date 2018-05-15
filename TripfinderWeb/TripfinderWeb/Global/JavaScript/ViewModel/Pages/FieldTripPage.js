@@ -326,7 +326,7 @@
 
 		if (cacheOperatorBeforeOpenMenu)
 		{
-			tf.pageManager.showContextMenu(e.currentTarge);
+			//tf.pageManager.showContextMenu(e.currentTarge);
 			self.searchGrid.filterMenuClick(e, function()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");

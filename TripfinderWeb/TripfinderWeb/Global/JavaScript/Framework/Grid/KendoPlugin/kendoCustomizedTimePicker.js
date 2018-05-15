@@ -114,14 +114,17 @@
 					that.inputElement.data('DateTimePicker').date(moment(that._parse(value)));
 				} else
 				{
-					that.inputElement.data('DateTimePicker').clear();
 					that.inputElement.val('');
+					if (that.inputElement.data('DateTimePicker'))
+						that.inputElement.data('DateTimePicker').clear();
 				}
 			}
 			if (!value)
 			{
-				that.inputElement.data('DateTimePicker').clear();
 				that.inputElement.val('');
+				if (that.inputElement.data('DateTimePicker'))
+					that.inputElement.data('DateTimePicker').clear();
+				
 			}
 		}
 	});

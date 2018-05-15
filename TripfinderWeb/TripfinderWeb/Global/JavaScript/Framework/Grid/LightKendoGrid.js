@@ -37,8 +37,13 @@
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate'];
 
-	function LightKendoGrid($container, options, gridState)
+	function LightKendoGrid($container, options, gridState, geoFields)
 	{
+		this.geoFields = geoFields;
+		if (geoFields)
+		{
+			this.geoData = [];
+		}
 		this.initParameter($container, options, gridState);
 		this.loadAndCreateGrid();
 	}
@@ -54,83 +59,96 @@
 
 	LightKendoGrid.prototype.initParameter = function($container, options, gridState)
 	{
-		this.listFilters = TF.ListFilterHelper.initListFilters();
-		this.$container = $container;
-		this.options = $.extend(true, {}, defaults, options);
+		var self = this;
+		self.listFilters = TF.ListFilterHelper.initListFilters();
+		self.$container = $container;
+		self.options = $.extend(true, {}, defaults, options);
+		self.subscriptions = [];
+
+
 		if (!gridState)
 		{
 			gridState = { gridFilterId: null, filteredIds: null, filteredExcludeAnyIds: null, filterClause: null };
 		}
-		this.obSelectedGridFilterClause = ko.observable("");
-		this.obHeaderFilters = ko.observableArray();
-		this.obHeaderFilterSets = ko.observableArray();
-		this._filteredIds = gridState.filteredIds;
-		this._showBulkMenu = this.options.showBulkMenu === false ? false : true;
-		this._gridState = gridState;
+		self.obSelectedGridFilterClause = ko.observable("");
+		self.obHeaderFilters = ko.observableArray([]);
+		self.obHeaderFilterSets = ko.observableArray([]);
+		self._filteredIds = gridState.filteredIds;
+		self._showBulkMenu = self.options.showBulkMenu === false ? false : true;
+		self._gridState = gridState;
 
-		this._gridType = this.options.gridType;
+		// These two variables are for geo-search or any other outer source to affect grid filter ids.
+		self.additionalFilterIds = null;
+		// Because the geo-search is based on the grid content, so the first search should ignore geo-search filter id list.
+		self.shouldIncludeAdditionFilterIds = false;
 
-		this.options.gridDefinition = this._excludeOnlyForFilterColumns(this.options.gridDefinition);
-		this._gridDefinition = this.options.gridDefinition =
-			this.extendAdditionGridDefinition(this.options.gridDefinition, this.options.additionGridDefinition);
-		this._filterHeight = 0;
+		self._gridType = self.options.gridType;
 
-		this.kendoGrid = null;
-		this.searchOption = null;
-		this._availableColumns = [];
-		this._obSelectedColumns = ko.observableArray([]);
+		self.options.gridDefinition = self._excludeOnlyForFilterColumns(self.options.gridDefinition);
+		self._gridDefinition = self.options.gridDefinition =
+			self.extendAdditionGridDefinition(self.options.gridDefinition, self.options.additionGridDefinition);
+		self._filterHeight = 0;
 
-		this.obFilteredExcludeAnyIds = ko.observable(this._gridState.filteredExcludeAnyIds);
-		this.obTempOmitExcludeAnyIds = ko.observable([]);
-		this.obTempOmitExcludeAnyIds.subscribe(this._omitIdsChange, this);
-		this.getSelectedIds = ko.observableArray([]);
-		this.getSelectedIds.subscribe(this._selectedIdsChange, this);
-		this.getSelectedRecords = ko.observableArray([]);
-		this._obSortedItems = ko.observableArray([]);
+		self.kendoGrid = null;
+		self.searchOption = null;
+		self._availableColumns = [];
+		self._obSelectedColumns = ko.observableArray([]);
 
-		this.onDoubleClick = new TF.Events.Event();
-		this.onRowsChangeCheck = new TF.Events.Event();
-		this.onRowsChanged = new TF.Events.Event();
-		this.onDataBoundEvent = new TF.Events.Event();
-		this.onCtrlIPress = this.onCtrlIPress.bind(this);
-		this.onCtrlOPress = this.onCtrlOPress.bind(this);
-		this.onCtrlAPress = this.onCtrlAPress.bind(this);
-		this.onShiftDown = this.onShiftDown.bind(this);
-		this.onShiftUp = this.onShiftUp.bind(this);
-		this.refreshClick = this.refreshClick.bind(this);
+		self.obFilteredExcludeAnyIds = ko.observable(self._gridState.filteredExcludeAnyIds);
+		self.obTempOmitExcludeAnyIds = ko.observable([]);
+		self.obTempOmitExcludeAnyIds.subscribe(self._omitIdsChange, self);
+		self.getSelectedIds = ko.observableArray([]);
+		self.getSelectedIds.subscribe(self._selectedIdsChange, self);
+		self.getSelectedRecords = ko.observableArray([]);
+		self._obSortedItems = ko.observableArray([]);
 
-		this.userDefinedFieldUtil = new TF.UserDefinedFieldUtil(this.options.gridType);
-		if (this.options.showOmittedCount)
+		self.onDoubleClick = new TF.Events.Event();
+		self.onRowsChangeCheck = new TF.Events.Event();
+		self.onRowsChanged = new TF.Events.Event();
+		self.onDataBoundEvent = new TF.Events.Event();
+		self.onIdsChanged = new TF.Events.Event();
+		self.onCtrlIPress = self.onCtrlIPress.bind(self);
+		self.onCtrlOPress = self.onCtrlOPress.bind(self);
+		self.onCtrlAPress = self.onCtrlAPress.bind(self);
+		self.onShiftDown = self.onShiftDown.bind(self);
+		self.onShiftUp = self.onShiftUp.bind(self);
+		self.refreshClick = self.refreshClick.bind(self);
+
+		self.userDefinedFieldUtil = new TF.UserDefinedFieldUtil(self.options.gridType);
+		if (self.options.showOmittedCount)
 		{
-			tf.shortCutKeys.bind("ctrl+o", this.onCtrlOPress, this.options.routeState);
+			tf.shortCutKeys.bind("ctrl+o", self.onCtrlOPress, self.options.routeState);
 		}
-		if (this.options.selectable && this.options.selectable.indexOf("multiple") != -1)
+		if (self.options.selectable && self.options.selectable.indexOf("multiple") != -1)
 		{
-			tf.shortCutKeys.bind("ctrl+a", this.onCtrlAPress, this.options.routeState);
-			tf.shortCutKeys.bind("ctrl+i", this.onCtrlIPress, this.options.routeState);
+			tf.shortCutKeys.bind("ctrl+a", self.onCtrlAPress, self.options.routeState);
+			tf.shortCutKeys.bind("ctrl+i", self.onCtrlIPress, self.options.routeState);
 		}
 
-		this.obFilteredRecordCount = ko.observable(0);
-		this.obTotalRecordCount = ko.observable(0);
-		this.obIsScrollAtBottom = ko.observable(false);
-		this.tobeLockedColumns = [];
-		this.allIds = [];
-		this.obAllIds = ko.observableArray([]);
-		this.overlay = true;
-		this.obcheckRecords = ko.observableArray([]);
-		this.onEyeCheckChanged = new TF.Events.Event();
+		self.obFilteredRecordCount = ko.observable(0);
+		self.obTotalRecordCount = ko.observable(0);
+		self.obIsScrollAtBottom = ko.observable(false);
+		self.tobeLockedColumns = [];
+		self.allIds = [];
+		self.obAllIds = ko.observableArray([]);
+		self.overlay = true;
+		self.obcheckRecords = ko.observableArray([]);
+		self.onEyeCheckChanged = new TF.Events.Event();
 
-		this.obShowEyeColumn = ko.observable(this.options.showEyeColumn);
-		this.permanentLockCount = ko.computed(function()
+		self.obShowEyeColumn = ko.observable(self.options.showEyeColumn);
+		self.permanentLockCount = ko.computed(function()
 		{
-			return this.options.permanendLockCount || this.obShowEyeColumn() ? 2 : 1; //There is always a locked column on the left; "map visible" column can be activated by openning map section.
-		}.bind(this));
-		this.filterDropDownListTimer;
+			return self.options.permanendLockCount || self.obShowEyeColumn() ? 2 : 1; //There is always a locked column on the left; "map visible" column can be activated by openning map section.
+		});
+		self.filterDropDownListTimer;
 
-		this.$alert = $(".gridAlert");
-		this.gridAlert = new TF.Grid.GridAlertViewModel(this.$alert);
-		this.suspendRefresh = false;
-		this.isBigGrid = options.isBigGrid === true || Enumerable.From(bigGridTypes).Contains(this._gridType) && !options.isSmallGrid;
+		self.$alert = $(".gridAlert");
+		self.gridAlert = new TF.Grid.GridAlertViewModel(self.$alert);
+		self.suspendRefresh = false;
+		self.isBigGrid = options.isBigGrid === true || Enumerable.From(bigGridTypes).Contains(self._gridType) && !options.isSmallGrid;
+		self.currentDisplayColumns = ko.observableArray();
+
+		self.obResetLayout = ko.observable(false);
 	};
 
 	LightKendoGrid.prototype.loadAndCreateGrid = function()
@@ -155,26 +173,25 @@
 
 	LightKendoGrid.prototype.onChange = function(e)
 	{
-		var self = this;
-		var records = [];
-		var selectedItems = $.map(this.kendoGrid.select(), function(item)
-		{
-			var row = $(item).closest("tr");
-			var dataItem = self.kendoGrid.dataItem(row);
-			if (dataItem &&
-				$.isNumeric(dataItem[self.options.Id]) &&
-				!Enumerable.From(records).Any(function(x) { return x[self.options.Id] === dataItem[self.options.Id]; })
-			)
+		var self = this, records = [],
+			selectedItems = $.map(self.kendoGrid.select(), function(item)
 			{
-				records.push(dataItem);
-				return item;
-			}
-		}.bind(this));
+				var row = $(item).closest("tr");
+				var dataItem = self.kendoGrid.dataItem(row);
+				if (dataItem &&
+					$.isNumeric(dataItem[self.options.Id]) &&
+					!Enumerable.From(records).Any(function(x) { return x[self.options.Id] === dataItem[self.options.Id]; })
+				)
+				{
+					records.push(dataItem);
+					return item;
+				}
+			});
 
-		this.onRowsChangeCheck.notify(selectedItems);
+		self.onRowsChangeCheck.notify(selectedItems);
 
-		this.getSelectedRecords(records);
-		this.onRowsChanged.notify(records);
+		self.getSelectedRecords(records);
+		self.onRowsChanged.notify(records);
 	};
 
 	LightKendoGrid.prototype.bindDoubleClickEvent = function()
@@ -188,47 +205,12 @@
 
 	LightKendoGrid.prototype.onGridDoubleClick = function(e)
 	{
-		var self = this;
 		if (e.shiftKey || e.ctrlKey)
 		{
 			return;
 		}
 		var records = this.getSelectedRecords();
-		if (self.typeToTerm(self._gridType) !== "")
-		{
-			var seletedIds = Enumerable.From(records).Select(function(item)
-			{
-				return item.Id;
-			}).ToArray();
-			tf.modalManager.showModal(
-				new TF.Modal.ModifyRecordOfGridModalViewModel(
-					{
-						title: 'Edit ' + self.typeToTerm(self._gridType),
-						id: seletedIds,
-						type: self.typeToTerm(self._gridType)
-					})
-			)
-				.then(function(result)
-				{
-					if (result)
-					{
-						PubSub.publish(topicCombine(pb.DATA_CHANGE, self._gridType, pb.EDIT), seletedIds);
-					}
-				}.bind(this));
-		}
 		this.onDoubleClick.notify(records[records.length - 1]);
-	};
-
-	LightKendoGrid.prototype.typeToTerm = function(type)
-	{ //this function is used by reports menu
-		switch (type)
-		{
-			case "vehicle":
-				return "Vehicle";
-			case "category":
-				return "Category";
-		}
-		return "";
 	};
 
 	LightKendoGrid.prototype._initLinkTd = function()
@@ -385,29 +367,32 @@
 
 	LightKendoGrid.prototype.refresh = function()
 	{
-		this.overlayShow = true;
-		this.getSelectedIds([]);
-		if (this.kendoGrid)
+		var self = this;
+		self.overlayShow = true;
+		self.getSelectedIds([]);
+		if (self.kendoGrid)
 		{
-			this.kendoGrid.lastClickItemId = 0;
+			self.kendoGrid.lastClickItemId = 0;
 		}
-		this.allIds = [];
-		if (this.options.showOverlay)
+		self.allIds = [];
+		if (self.options.showOverlay)
 		{
 			tf.loadingIndicator.showImmediately();
+			//console.log("LightKendoGrid +1");
 		}
 
-		if (this.kendoGrid && this.kendoGrid.dataSource)
+		if (self.kendoGrid && self.kendoGrid.dataSource)
 		{
-			this.kendoGrid.dataSource.read();
+			self.kendoGrid.dataSource.read();
 		}
-		if (this.options.showOverlay)
+		if (self.options.showOverlay)
 		{
 			setTimeout(function()
 			{
-				this.overlayShow = false;
+				self.overlayShow = false;
 				tf.loadingIndicator.tryHide();
-			}.bind(this), 1500);
+				//console.log("LightKendoGrid -1");
+			}, 1500);
 		}
 
 	};
@@ -418,6 +403,7 @@
 		return new Promise(function(resolve)
 		{
 			tf.loadingIndicator.showImmediately();
+			//console.log("LightKendoGrid +1");
 			setTimeout(function()
 			{
 				resolve();
@@ -425,6 +411,12 @@
 		})
 			.then(function()
 			{
+				if (!this.kendoGrid)
+				{
+					tf.loadingIndicator.tryHide();
+					//console.log("LightKendoGrid -1");
+					return Promise.reject();
+				}
 				this.getSelectedIds([]);
 				this.getSelectedRecords([]);
 				this.overlayShow = true;
@@ -439,6 +431,7 @@
 				}
 				kendoOptions.sortable.mode = this.sortModel;
 				this._removeInvisibleListFilterItems(this.getKendoColumn());
+				kendoOptions.autoBind = true;
 				this.kendoGrid.setOptions(kendoOptions);
 				this._initFilterDropDownListTimer();
 				TF.CustomFilterHelper.initCustomFilterBtn(this.$container);
@@ -452,7 +445,7 @@
 				this.createFilterClearAll();
 				if (kendoOptions.columns.length == 1 && this.options.showLockedColumn)
 				{
-					this.$container.find("div.k-grid-content").children("table.k-selectable").width(40);
+					this.$container.find("div.k-grid-content").children("table.k-selectable").width(30);
 				}
 				this.autoLoadDataOnScrollBottom();
 				this.bindCalendarButton();
@@ -706,11 +699,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-			{
-				extra: true,
-				mode: "menu row",
-				operators: TF.Grid.LightKendoGrid.DefaultOperator
-			},
+				{
+					extra: true,
+					mode: "menu row",
+					operators: TF.Grid.LightKendoGrid.DefaultOperator
+				},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -881,7 +874,7 @@
 			logicDropDown.trigger("change");
 		}
 
-		var onDropDownListChange = function(e, $input)
+		var onDropDownListChange = function(e, $input, $inputNumberCell)
 		{
 			var isNormalInput = true;
 			var kendoGridDomain = this;
@@ -889,25 +882,41 @@
 			{
 				TF.FilterHelper.disableFilterCellInput($input, isNormalInput);
 				TF.FilterHelper.clearFilterCellInput($input);
+				if ($inputNumberCell)
+				{
+					var kendoNumericTextBox = $($inputNumberCell).data('kendoNumericTextBox');
+					if (kendoNumericTextBox !== undefined)
+						kendoNumericTextBox.enable(false);
+				}
 			}
 			else
+			{
 				TF.FilterHelper.enableFilterCellInput($input, isNormalInput);
+				if ($inputNumberCell)
+				{
+					var kendoNumericTextBox = $($inputNumberCell).data('kendoNumericTextBox');
+					if (kendoNumericTextBox !== undefined)
+						kendoNumericTextBox.enable(true);
+				}
+			}
 		};
 
 		var firstValueDropDown = e.container.find("select:eq(0)").data("kendoDropDownList");
 		var firstInputCell = e.container.find("input:eq(0)");
+		var firstNumberInputCell = e.container.find("input").length == 2 ? null : e.container.find("input:eq(1)");
 		TF.CustomFilterHelper.removeSpecialDDLItem(firstValueDropDown);
 		firstValueDropDown.bind("change", function(e)
 		{
-			onDropDownListChange.bind(self)(e, firstInputCell);
+			onDropDownListChange.bind(self)(e, firstInputCell, firstNumberInputCell);
 		});
 
 		var secondValueDropDown = e.container.find("select:eq(2)").data("kendoDropDownList");
-		var secondInputCell = e.container.find("input:eq(1)");
+		var secondInputCell = e.container.find("input").length == 2 ? e.container.find("input:eq(1)") : e.container.find("input:eq(2)");
+		var secondNumberInputCell = e.container.find("input").length == 2 ? null : e.container.find("input:eq(3)");
 		TF.CustomFilterHelper.removeSpecialDDLItem(secondValueDropDown);
 		secondValueDropDown.bind("change", function(e)
 		{
-			onDropDownListChange.bind(self)(e, secondInputCell);
+			onDropDownListChange.bind(self)(e, secondInputCell, secondNumberInputCell);
 		});
 
 		var onCustomFilterPopupOpen = function(e, field)
@@ -1008,6 +1017,7 @@
 				return;
 
 			$button.parent().find('input:text').focus();
+			// self._showCannotSupportSelectAllModal();
 		});
 	};
 
@@ -1197,6 +1207,16 @@
 			if (!isTypeSetDisplayInSequence(columnType))
 			{
 				filterLeft.value = hackDomain.hackDisplayFilterCells[kendoFilterCellDomainField].originalFilterValue;
+				if (filterLeft.operator === 'isnotempty' || filterLeft.operator === 'isempty')
+				{
+					var displayVal = hackDomain._buildCustomFilterCellDisplayVal(findResult.filters[0], findResult.filters[1], findResult.logic, columnType);
+					var filterType = 'customFilter';
+					setTimeout(function()
+					{
+						// force update filter after other ui render
+						hackDomain.setKendoFilterCellInputValue(kendoFilterCellDomain.wrapper, displayVal, filterType, columnType);
+					}, 500);
+				}
 			}
 			else
 			{
@@ -1211,13 +1231,16 @@
 			}
 
 			if (
-				findResult.filters && findResult.filters[0].value !== "" &&
+				findResult.filters && (findResult.filters[0].value !== "" || findResult.filters[0].operator.indexOf('empty') >= 0) &&
 				kendoFilterCellDomain.wrapper.find('.clear-custom-filter-menu-btn').length === 0)
 			{
 				var $customInput = $(kendoFilterCellDomain.wrapper.find('.k-filter-custom-input'));
 				$customInput.parent().parent().find('button').css('display', 'none');
 				var $clearButton = '<button type="button" class="k-button k-button-icon clear-custom-filter-menu-btn" ><span class="k-icon k-i-close"></span></button>';
 				kendoFilterCellDomain.wrapper.find('.k-filter-custom-input').closest('span').append($clearButton);
+
+				var $filterCellInner = $customInput.closest(".k-filtercell").find('> span');
+				$filterCellInner.addClass("hide-cross-button");
 
 				// $customInput.width($customInput.width() - 20);
 				TF.CustomFilterHelper.addCustomFilterEllipsisClass($customInput);
@@ -1245,7 +1268,7 @@
 	{
 		$filterCell.find('input[type=text]').attr('title', displayVal);
 		if (filterType === 'listFilter' ||
-			filterType === 'customFilter' && isTypeSetDisplayInSequence(columnType))
+			filterType === 'customFilter')//&& (isTypeSetDisplayInSequence(columnType) || (displayVal && displayVal.indexOf('Empty') >= 0)))
 			$filterCell.find('input[type=text]').val(displayVal);
 	};
 
@@ -1319,12 +1342,20 @@
 
 	LightKendoGrid.prototype.getIdsWithCurrentFiltering = function(isCopyRequest)
 	{
-		if (this.kendoGrid.dataSource.options.serverPaging == false)
+		if (this.kendoGrid.dataSource.options.serverPaging == false
+			|| (this.options.kendoGridOption && this.options.kendoGridOption.dataSource && this.options.kendoGridOption.dataSource.serverPaging == false))
 		{
 			var datasource = this.kendoGrid.dataSource;
-			var p = (new kendo.data.Query(datasource.data()).filter(datasource.filter())).data;
-			p = (new kendo.data.Query(p).sort(datasource.sort())).data;
-			return Promise.resolve(p.map(function(item) { return item.Id; }));
+			if (datasource.options.serverFiltering == false)
+			{
+				var data = (new kendo.data.Query(datasource.data()).filter(datasource.filter())).data;
+				data = (new kendo.data.Query(data).sort(datasource.sort())).data;
+			}
+			else
+			{
+				data = datasource.data();
+			}
+			return Promise.resolve(data.map(function(item) { return item.Id; }));
 		}
 		if (this.allIds && this.allIds.length > 0)
 		{
@@ -1339,7 +1370,11 @@
 				this.allIds = apiResponse.Items[0];
 				this.obAllIds(this.allIds);
 				return this.allIds.slice(0);
-			}.bind(this));
+			}.bind(this))
+			.catch(function()
+			{
+
+			});
 	};
 
 	LightKendoGrid.prototype.blurFilterInputWhenClickGrid = function()
@@ -1389,27 +1424,27 @@
 
 	LightKendoGrid.prototype.createFilterClearAll = function()
 	{
-		var tr;
-		if (this.filterClearButtonInUnLockedArea)
+		var self = this, tr;
+		if (self.filterClearButtonInUnLockedArea)
 		{
-			tr = this.$container.find("div.k-grid-header").find("tr.k-filter-row");
+			tr = self.$container.find("div.k-grid-header").find("tr.k-filter-row");
 		}
 		else
 		{
-			tr = this.$container.find("div.k-grid-header-locked").find("tr.k-filter-row");
+			tr = self.$container.find("div.k-grid-header-locked").find("tr.k-filter-row");
 		}
 		if (tr !== undefined)
 		{
-			var td = tr.children("th:first");
+			var td = tr.children("th:first"),
+				div = $('<div class="grid-filter-clear-all"></div>');
+
 			td.text("");
-			var div = $('<div class="grid-filter-clear-all"></div>');
 			td.append(div);
 
-			var that = this;
 			div.mousedown(function(e)
 			{
 				e.stopPropagation();
-				var buttons = that.$container.find("tr.k-filter-row").find("button.k-button:visible");
+				var buttons = self.$container.find("tr.k-filter-row").find("button.k-button:visible");
 				if (buttons !== undefined)
 				{
 					buttons.trigger("click");
@@ -1417,26 +1452,28 @@
 
 				function forceClearListFilter()
 				{
-					that.listFilters = {};
-					that.obHeaderFilters([]);
-					that.clearQuickFilterAndRefresh();
-					var $filterListInputs = $.find('input.k-filter-list-input[type="text"]');
-					$filterListInputs.map(function(filterListInput, idx)
-					{
-						$(filterListInput).val('');
-					});
+					self.listFilters = {};
+					self.obHeaderFilters([]);
+					self.getSelectedIds([]);
+					self.obTempOmitExcludeAnyIds([]);
+					self.clearKendoGridQuickFilter();
+					self.rebuildGrid();
 				}
 
 				forceClearListFilter();
 			});
-
-			var txt = that.$container.find("tr.k-filter-row").find("input.k-input");
-			if (txt !== undefined)
-			{
-				//txt.off("focusout");
-			}
 		}
 	};
+
+	LightKendoGrid.prototype.clearKendoGridQuickFilter = function()
+	{
+		var self = this;
+		self.listFilters = TF.ListFilterHelper.initListFilters();
+		TF.CustomFilterHelper.clearCustomFilter();
+		self.kendoGrid.dataSource.filter({});
+		return Promise.resolve(true);
+	};
+
 
 	LightKendoGrid.prototype._isFilterDropDownListPopup = function($dropDownList)
 	{
@@ -1487,7 +1524,10 @@
 
 	LightKendoGrid.prototype._findDDLInput = function(e)
 	{
-		var $input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input");
+
+		var parentId = $(e.currentTarget).parent().find("[id]")[0].id,
+			$input = $("[aria-activedescendant='" + parentId + "']").prev().find("input");
+
 		return $input;
 	}
 
@@ -1667,26 +1707,24 @@
 								listFilterOption,
 								requestOptions
 							)
-						)
-							.then(function(selectedFilterItems)
+						).then(function(selectedFilterItems)
+						{
+							if (selectedFilterItems !== false)
 							{
-								if (selectedFilterItems !== false)
+								selectedFilterItems = allItems.filter(function(item)
 								{
-									selectedFilterItems = allItems.filter(function(item)
-									{
-										return Array.contain(selectedFilterItems, getItem(item));
-									});
-								}
-								selectedFilterItems = TF.ListMoverForListFilterHelper.processSelectedData(selectedFilterItems, listFilterTemplate.filterField);
+									return Array.contain(selectedFilterItems, getItem(item));
+								});
+							}
+							selectedFilterItems = TF.ListMoverForListFilterHelper.processSelectedData(selectedFilterItems, listFilterTemplate.filterField);
 
-								TF.ListFilterHelper.handleWithSearchGridListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName);
-								//TF.ListFilterHelper.handleDefaultListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName, listFilterTemplate);
-							});
+							TF.ListFilterHelper.handleWithSearchGridListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName);
+							//TF.ListFilterHelper.handleDefaultListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName, listFilterTemplate);
+						});
 					});
 				case 'Enum':
 					var allItems = listFilterTemplate.AllItems;
 					var selectedFilterItems = TF.ListFilterHelper.getSelectedFilterItemsForDefaultType(self.listFilters, listFilterTemplate, fieldName);
-
 					var listFilterOption = TF.ListFilterHelper.getDefaultListFilterOption(listFilterTemplate.DisplayFilterTypeName);
 					listFilterOption = $.extend({}, listFilterOption, listFilterTemplate);
 
@@ -1718,6 +1756,9 @@
 
 		self.addListFilterToKendoDataSource(selectedFilterItems, fieldName, selectedIds);
 
+		if (currentlySelectedFilterItemsCnt < originalSelectedFilterItemsCnt)
+			self._showCannotSupportSelectAllModal();
+
 		self.kendoGrid.dataSource.read(); // Paul: will call search twice, not found soluntion yet
 	};
 
@@ -1725,7 +1766,6 @@
 	{
 		var self = this;
 		var displayInputVal = selectedFilterItems.length ? selectedFilterItems.join(',') : '';
-
 
 		var wrappers = $('.doc.wrapper');
 		var $filterCellsAll;
@@ -1779,7 +1819,9 @@
 		fieldNames.map(function(fieldName)
 		{
 			if (self.listFilters[fieldName] &&
-				self.listFilters[fieldName].selectedFilterItems)
+				self.listFilters[fieldName].selectedFilterItems &&
+				self.listFilters[fieldName].selectedFilterItems.length &&
+				self.listFilters[fieldName].selectedFilterItems.length > 0)
 			{
 				self.deleteListFilterItemsByFieldName(options, fieldName);
 
@@ -1909,6 +1951,7 @@
 		if (this.options.showOverlay)
 		{
 			tf.loadingIndicator.showImmediately();
+			//console.log("LightKendoGrid +1");
 		}
 
 		if (this.kendoGrid && this.kendoGrid.dataSource)
@@ -1922,6 +1965,7 @@
 			{
 				this.overlayShow = false;
 				tf.loadingIndicator.tryHide();
+				//console.log("LightKendoGrid -1");
 			}.bind(this), 1500);
 		}
 
@@ -2157,7 +2201,12 @@
 
 	LightKendoGrid.prototype.addFilterClass = function()
 	{
-		var self = this, $listContainer = $(".k-list-container");
+		var self = this, $listContainer = $(".k-list-container:not(.not-lightkendogrid)");
+		$listContainer = $listContainer.filter(function()
+		{
+			return $(this).parents('form.k-filter-menu').length == 0;
+		});
+
 		for (var key in this.filterNames)
 		{
 			var cssSelectorStr = 'li:contains("' + key + '")';
@@ -2259,6 +2308,7 @@
 				var $filterCellInner = $filterCell.find('> span');
 
 				var input = $filterCell.find("input[type=text]");
+				TF.FilterHelper.clearFilterCellInput(input);
 				//remove display css for clear button
 				TF.CustomFilterHelper.removeCustomFilterEllipsisClass(input);
 				if (isSpecialFilterType(input))  //User should not type in values when "empty" or "not empty" filters are applied
@@ -2300,22 +2350,59 @@
 	LightKendoGrid.prototype.setColumnCurrentFilterIcon = function()
 	{
 		var self = this;
-		this.$container.find(".k-filtercell .k-dropdown-wrap .k-input").each(function(i, item)
+		self.$container.find(".k-filtercell .k-dropdown-wrap .k-input").each(function(idx, item)
 		{
+			if (!self.kendoGrid)
+			{
+				return;
+			}
 			var $item = $(item),
 				text = $item.text();
+			var filter = self.kendoGrid.dataSource.filter();
+			var fieldName = $item.closest('span[data-kendo-field]').attr('data-kendo-field');
+			if (filter && filter.filters)
+			{
+				for (var i = 0; i < filter.filters.length; i++)
+				{
+					if (filter.filters[i].filters && filter.filters[i].filters.length > 0)
+					{
+						for (var j = 0; j < filter.filters[i].filters.length; j++)
+						{
+							if (filter.filters[i].filters[j].FieldName == fieldName)
+							{
+								text = "Custom";
+								$item.text(text);
+								break;
+							}
+						}
+					}
+					else if (filter.filters[i].FieldName == fieldName)
+					{
+						for (var key in self.filterNames)
+						{
+							if (self.filterNames[key] == self.operatorKendoMapFilterNameValue[filter.filters[i].operator])
+							{
+								text = key;
+								$item.text(text);
+								break;
+							}
+						}
+						break;
+					}
+				}
+			}
 			for (var key in self.filterNames)
 			{
 				if (text === key)
 				{
 					if (text === 'List')
 					{
-						self.visibleListFilterBtn2($item, i);
-						self.bindListFilterBtnEvent($item, i);
+						self.visibleListFilterBtn2($item, idx);
+						self.bindListFilterBtnEvent($item, idx);
 					}
 					else if (text === 'Custom')
 					{
-						self.visibleCustomFilterBtn($item, i);
+						self.visibleCustomFilterBtn($item, idx);
 					}
 
 					var $filterBtn = $item.next().children(".k-filter");
@@ -2406,6 +2493,7 @@
 
 					$listContainer.addClass('has-set-filter-ddl-size');
 				});
+
 			}
 		});
 	};
@@ -2413,7 +2501,8 @@
 	LightKendoGrid.prototype.disableFilterCellWhenEmptyOrNotEmptyApplied = function()    //User should not type in values when "empty" or "not empty" filters are applied
 	{
 		var self = this;
-		this.$container.find(".k-filtercell .k-dropdown-wrap .k-input").each(function(i, item)
+
+		self.$container.find(".k-filtercell .k-dropdown-wrap .k-input").each(function(i, item)
 		{
 			var $item = $(item),
 				text = $item.text();
@@ -2443,6 +2532,10 @@
 	{
 		var self = this;
 		this.disableFilterCellWhenEmptyOrNotEmptyApplied();
+		if (!self.kendoGrid)
+		{
+			return;
+		}
 		this.$container.find(".k-filtercell .k-dropdown-wrap .k-input").each(function(i, item)
 		{
 			var $item = $(item),
@@ -2468,7 +2561,7 @@
 										if (String(dataItem.valueField) === filter.Value)
 										{
 											kendoDropDwonList.select(idx);
-											kendoDropDwonList.trigger("change");
+											//kendoDropDwonList.trigger("change");
 										}
 									});
 									break;
@@ -2482,27 +2575,6 @@
 		});
 	};
 
-	LightKendoGrid.AllFilterTypes = ['contains', 'isequalto', 'isnotequalto', 'startswith',
-		'doesnotcontain', 'endswith', 'islessthanorequalto', 'isgreaterthanorequalto',
-		'isgreaterthan', 'islessthan', 'isempty', 'isnotempty', 'custom', 'list'];
-
-	LightKendoGrid.prototype.filterNames = {
-		'Contains': 'contains',
-		'Equal To': 'isequalto',
-		'Not Equal To': 'isnotequalto',
-		'Starts With': 'startswith',
-		'Does Not Contain': 'doesnotcontain',
-		'Ends With': 'endswith',
-		'Less Than or Equal To': 'islessthanorequalto',
-		'Greater Than or Equal To': 'isgreaterthanorequalto',
-		'Greater Than': 'isgreaterthan',
-		'Less Than': 'islessthan',
-		'Empty': 'isempty',
-		'Not Empty': 'isnotempty',
-		'Custom': 'custom',
-		'List': 'list'
-	};
-
 	LightKendoGrid.prototype.getKendoSortColumn = function()
 	{
 		return [];
@@ -2510,7 +2582,7 @@
 
 	LightKendoGrid.prototype.getKendoColumn = function()
 	{
-		var currentColumns, columnsdefalultColumnWidth = '150px';
+		var currentColumns, columnsdefalultColumnWidth = '150px', self = this;
 		if (this._obSelectedColumns() && this._obSelectedColumns().length > 0)
 		{
 			currentColumns = this._obSelectedColumns();
@@ -2542,7 +2614,7 @@
 				{
 					field: "bulk_menu",
 					title: "<div></div>",
-					width: '40px',
+					width: '30px',
 					sortable: false,
 					filterable: false,
 					locked: true
@@ -2569,6 +2641,7 @@
 			if (needProcess.length > 0)
 				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithList;
 		});
+		this.currentDisplayColumns(columns);
 		return columns;
 	};
 
@@ -2632,7 +2705,7 @@
 														}
 													});
 												};
-												tf.ajax["post"](pathCombine(tf.api.apiPrefix(), "search", this._gridType == "vehicle" ? "fleet" : this._gridType, "aggregate"), options, { overlay: false });
+												tf.ajax["post"](pathCombine(tf.api.apiPrefix(), "search", this._gridType, "aggregate"), options, { overlay: false });
 											}
 											else if (this._gridType === "busfinderhistorical")
 											{
@@ -2663,7 +2736,7 @@
 			case "number":
 				if (column.FieldName.indexOf('UserNum') !== 0)
 				{
-					column.format = definition.format ? definition.format : "{0:n2}";
+					column.format = definition.format || "{0:n2}";
 				}
 				column.filterable = {
 					cell: {
@@ -2671,23 +2744,21 @@
 						template: function(args)
 						{
 							args.element.kendoNumericTextBox({
-								decimals: definition.Precision ? definition.Precision : 2,
-								format: definition.format ? definition.format : "{0:n2}"
+								decimals: definition.Precision || 2,
+								format: definition.format || "{0:n2}"
 							});
 						}
 					}
 				};
 				break;
 			case "integer":
-				column.format = definition.format ? definition.format : "{0:n0}";
+				column.format = definition.format || "{0:n0}";
 				column.filterable = {
 					cell: {
 						operator: "eq",
 						template: function(args)
 						{
-							args.element.kendoNumericTextBox({
-								format: "n0"
-							});
+							args.element.kendoNumericTextBox({ format: "n0" });
 							$(args.element[0]).on("keypress", function(event, e)
 							{
 								if (event.which == 46)
@@ -2701,7 +2772,7 @@
 				};
 				break;
 			case "time":
-				column.format = definition.format ? definition.format : "{0:h:mm tt}";
+				column.format = definition.format || "{0:h:mm tt}";
 				column.filterable = {
 					cell: {
 						template: function(args)
@@ -2720,7 +2791,7 @@
 					{
 						var buildDataTimePickBtn = function($kendoElement)
 						{
-							var $dataTimePickBtn = $('<span style="width: 158px" class="input-group tf-filter" data-kendo-role="customizedtimepicker"></span>');
+							var $dataTimePickBtn = $('<span style="width: 13.2em" class="input-group tf-filter" data-kendo-role="customizedtimepicker"></span>');
 
 							var kendoDataBindStr = $kendoElement.data('kendo-bind');
 							$dataTimePickBtn.attr('data-kendo-bind', kendoDataBindStr);
@@ -2776,14 +2847,14 @@
 					{
 						var buildDataTimePickBtn = function($kendoElement)
 						{
-							var $dataTimePickBtn = $('<span style="width: 158px" class="input-group tf-filter" data-kendo-role="customizeddatetimepicker"></span>');
+							var $dataTimePickBtn = $('<span style="width: 13.2em" class="input-group tf-filter" data-kendo-role="customizeddatetimepicker"></span>');
 
 							var kendoDataBindStr = $kendoElement.data('kendo-bind');
 							$dataTimePickBtn.attr('data-kendo-bind', kendoDataBindStr);
 
 							$kendoElement.replaceWith($dataTimePickBtn);
 							$kendoElement.kendoCustomizedDateTimePicker({});
-						}.bind(self);
+						}.bind(this);
 
 						var $dataTimePickBtn = buildDataTimePickBtn(element);
 
@@ -2798,13 +2869,17 @@
 						{
 							args.element.kendoDropDownList({
 								dataSource: new kendo.data.DataSource({
-									data: this.getBoolenFilterableDataSource(definition.FieldName)
+									data: [
+										{ someField: "", valueField: "" },
+										{ someField: "True", valueField: "true" },
+										{ someField: "False", valueField: "false" }
+									]
 								}),
 								dataTextField: "someField",
 								dataValueField: "valueField",
 								valuePrimitive: true
 							});
-						}.bind(this),
+						},
 						showOperators: false
 					}
 				};
@@ -2823,24 +2898,6 @@
 								valuePrimitive: true,
 								valueTemplate: '<span class="icon-select-item #:data.someField#"></span>',
 								template: '<span class="icon-select-item #:data.someField#"></span>'
-							});
-						}.bind(this),
-						showOperators: false
-					}
-				};
-				break;
-			case "Enum":
-				column.filterable = {
-					cell: {
-						template: function(args)
-						{
-							args.element.kendoDropDownList({
-								dataSource: {
-									data: this.getEnumFilterableDataSource(definition.FieldName)
-								},
-								dataTextField: "someField",
-								dataValueField: "valueField",
-								valuePrimitive: true
 							});
 						}.bind(this),
 						showOperators: false
@@ -2922,75 +2979,42 @@
 		return columns;
 	}
 
-	LightKendoGrid.prototype.getEnumFilterableDataSource = function(fieldName)
-	{
-		var dataSource = [];
-		switch (fieldName)
-		{
-			case "MapDisplay":
-				dataSource.push({ someField: tf.categoryGridDefinition.gridDefinition().getEnum_MapDisplay("0"), valueField: "0" });
-				dataSource.push({ someField: tf.categoryGridDefinition.gridDefinition().getEnum_MapDisplay("1"), valueField: "1" });
-				dataSource.push({ someField: tf.categoryGridDefinition.gridDefinition().getEnum_MapDisplay("2"), valueField: "2" });
-				break;
-		}
-		return dataSource;
-	}
-
-	LightKendoGrid.prototype.getBoolenFilterableDataSource = function(fieldName)
-	{
-		var dataSource = [];
-		switch (fieldName)
-		{
-			case "Active":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: "True", valueField: "false" });
-				dataSource.push({ someField: "False", valueField: "true" });
-				break;
-			default:
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: "True", valueField: "true" });
-				dataSource.push({ someField: "False", valueField: "false" });
-				break;
-		}
-		return dataSource;
-	}
-
 	LightKendoGrid.prototype.getImageFilterableDataSource = function(fieldName)
 	{
 		var dataSource = [];
-		// switch (fieldName)
-		// {
-		// 	case "Ampmschedule":
-		// 		dataSource.push({ someField: "", valueField: "" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("14"), valueField: "14" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("15"), valueField: "15" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("16"), valueField: "16" });
-		// 		break;
-		// 	case "Ampmtransportation":
-		// 		dataSource.push({ someField: "", valueField: "" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("10"), valueField: "10" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("11"), valueField: "11" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("12"), valueField: "12" });
-		// 		break;
-		// 	case "RidershipStatus":
-		// 		dataSource.push({ someField: "", valueField: "" });
-		// 		dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("37"), valueField: "37" });
-		// 		dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("39"), valueField: "39" });
-		// 		break;
-		// 	case "PolicyDeviation":
-		// 		dataSource.push({ someField: "", valueField: "" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_PolicyDeviation("37"), valueField: "37" });
-		// 		break;
-		// 	case "Notes":
-		// 		dataSource.push({ someField: "", valueField: "" });
-		// 		dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Notes("5"), valueField: "5" });
-		// 		break;
-		// 	case "IsLocked":
-		// 		dataSource.push({ someField: "", valueField: "" });
-		// 		dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked("6"), valueField: "6" });
-		// 		dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked(""), valueField: "neq" });
-		// 		break;
-		// }
+		switch (fieldName)
+		{
+			case "Ampmschedule":
+				dataSource.push({ someField: "", valueField: "" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("14"), valueField: "14" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("15"), valueField: "15" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("16"), valueField: "16" });
+				break;
+			case "Ampmtransportation":
+				dataSource.push({ someField: "", valueField: "" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("10"), valueField: "10" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("11"), valueField: "11" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("12"), valueField: "12" });
+				break;
+			case "RidershipStatus":
+				dataSource.push({ someField: "", valueField: "" });
+				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("37"), valueField: "37" });
+				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("39"), valueField: "39" });
+				break;
+			case "PolicyDeviation":
+				dataSource.push({ someField: "", valueField: "" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_PolicyDeviation("37"), valueField: "37" });
+				break;
+			case "Notes":
+				dataSource.push({ someField: "", valueField: "" });
+				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Notes("5"), valueField: "5" });
+				break;
+			case "IsLocked":
+				dataSource.push({ someField: "", valueField: "" });
+				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked("6"), valueField: "6" });
+				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked(""), valueField: "neq" });
+				break;
+		}
 		return dataSource;
 	}
 
@@ -3018,6 +3042,7 @@
 			switch (definition.type)
 			{
 				case "string":
+				case "boolean":
 					field.type = "string";
 					break;
 				case "integer":
@@ -3029,10 +3054,8 @@
 				case "date":
 					field.type = "date";
 					break;
-				case "boolean":
-					field.type = "string";
-					break;
 			}
+			field.validation = definition.validation;
 			fields[definition.FieldName] = field;
 		});
 		return fields;
@@ -3059,7 +3082,8 @@
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
 		var self = this,
-			excludeAnyIds = this.getExcludeAnyIds(),
+			includeOnlyIds = self.getIncludeOnlyIds(),
+			excludeAnyIds = self.getExcludeAnyIds(),
 			sortItems = kendoOptions.data.sort ? kendoOptions.data.sort.map(function(item)
 			{
 				return {
@@ -3078,11 +3102,11 @@
 				},
 				data: {
 					sortItems: sortItems,
-					idFilter: (this._gridState && (this._gridState.filteredIds || excludeAnyIds)) ? {
-						IncludeOnly: this._gridState.filteredIds,
+					idFilter: (includeOnlyIds || excludeAnyIds) ? {
+						IncludeOnly: includeOnlyIds,
 						ExcludeAny: excludeAnyIds
 					} : null,
-					filterSet: (this._gridState && this._gridState.filterSet) ? this._gridState.filterSet : null,
+					filterSet: (self._gridState && self._gridState.filterSet) ? self._gridState.filterSet : null,
 					filterClause: ""
 				},
 				success: function(result)
@@ -3125,34 +3149,37 @@
 				traditional: true
 			};
 
-		if (this._gridState && this._gridState.filterClause)
+		if (self._gridState && self._gridState.filterClause)
 		{
-			options.data.filterClause = this._gridState.filterClause;
+			options.data.filterClause = self._gridState.filterClause;
 			if (self.obSelectedGridFilterClause())
 			{
 				options.data.filterClause += " and " + self.obSelectedGridFilterClause();
 			}
-
 		} else
 		{
 			options.data.filterClause = self.obSelectedGridFilterClause() ? self.obSelectedGridFilterClause() : "";
 		}
-		if (this.options.kendoGridOption.dataSource && this.options.kendoGridOption.dataSource.serverPaging === false)
+		if (self.obSelectedGridFilterType && self.obSelectedGridFilterType() !== null && self.obSelectedGridFilterType() !== undefined)
+		{
+			options.data.isQuickSearch = self.obSelectedGridFilterType();
+		}
+		if (self.options.kendoGridOption.dataSource && self.options.kendoGridOption.dataSource.serverPaging === false)
 		{
 			options.paramData = {};
 		}
-		this.overlay = true;
+		self.overlay = true;
 		var fields = Enumerable.From(self._obSelectedColumns() && self._obSelectedColumns().length > 0 ? self._obSelectedColumns() : self._gridDefinition.Columns).Where(function(c) { return !c.hidden; }).Select(function(c) { return c.FieldName }).ToArray();
-		if (this.isBigGrid && this.options.loadAllFields === false)
+		if (self.isBigGrid && self.options.loadAllFields === false)
 		{
 			options.data.sortItems = options.data.sortItems.concat([{
-				Name: this.options.Id,
+				Name: self.options.Id,
 				isAscending: "asc",
 				Direction: "Ascending"
 			}]);
-			if (!Enumerable.From(fields).Contains(this.options.Id))
+			if (!Enumerable.From(fields).Contains(self.options.Id))
 			{
-				fields = fields.concat([this.options.Id]);
+				fields = fields.concat([self.options.Id]);
 			}
 			fields = self.bindNeedFileds(self._gridType, fields);
 			options.data.fields = fields;
@@ -3169,18 +3196,24 @@
 		//verify ajax by filter control or real ajax request
 		if (kendoOptions.data.isFromAutoComplete !== true)
 		{
-			this._obSortedItems(sortItems ? sortItems : []);
-			//filter
-			if (this.obHeaderFilters && !(options.data.filterSet && options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0))
+			if (JSON.stringify(self._obSortedItems()) != JSON.stringify(sortItems ? sortItems : []))
 			{
-				this.obHeaderFilters.removeAll();
+				self._obSortedItems(sortItems ? sortItems : []);
 			}
-			else if (!(options.data.filterSet && options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0))
-				this.obHeaderFilters([]);
 
-			if (this.obHeaderFilterSets)
+			//filter
+			if (self.obHeaderFilters && self.obHeaderFilters().length > 0 && !(options.data.filterSet && options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0))
 			{
-				this.obHeaderFilterSets([]);
+				self.obHeaderFilters.removeAll();
+			}
+			else if (!(options.data.filterSet && options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0) && self.obHeaderFilters().length > 0)
+			{
+				self.obHeaderFilters([]);
+			}
+
+			if (self.obHeaderFilterSets && self.obHeaderFilterSets().length > 0)
+			{
+				self.obHeaderFilterSets([]);
 			}
 
 			//verify is scroll paging or not，scroll paging will not clear slect ids and no overlay
@@ -3190,7 +3223,7 @@
 				newFields = JSON.stringify(fields),
 				newIdIncludeOnlyFilter = JSON.stringify(options.data.idFilter.IncludeOnly),
 				newIdExcludeAnyFilter = JSON.stringify(options.data.idFilter.ExcludeAny);
-			if ((newIdIncludeOnlyFilter !== this._oldIdIncludeOnlyFilter || newFilterId !== this._oldFilterId || newFilterString !== this._oldFilterString || newSortString !== (this._oldSortString ? this._oldSortString : "[]") || newFields !== this._oldFields))
+			if ((newIdIncludeOnlyFilter !== self._oldIdIncludeOnlyFilter || newFilterId !== self._oldFilterId || newFilterString !== self._oldFilterString || newSortString !== (self._oldSortString ? self._oldSortString : "[]") || newFields !== self._oldFields))
 			{
 				self.getSelectedIds([]);
 				if (self.kendoGrid)
@@ -3203,15 +3236,15 @@
 			// {
 			// 	this.overlay = false;
 			// }
-			this._oldFilterString = newFilterString;
-			this._oldSortString = newSortString;
-			this._oldFilterId = newFilterId;
-			this._oldFields = newFields;
-			this._oldIdIncludeOnlyFilter = newIdIncludeOnlyFilter;
-			this._oldIdExcludeAnyFilter = newIdExcludeAnyFilter;
+			self._oldFilterString = newFilterString;
+			self._oldSortString = newSortString;
+			self._oldFilterId = newFilterId;
+			self._oldFields = newFields;
+			self._oldIdIncludeOnlyFilter = newIdIncludeOnlyFilter;
+			self._oldIdExcludeAnyFilter = newIdExcludeAnyFilter;
 		}
 
-		if (kendoOptions.data.filter || this._gridState.filterSet)
+		if (kendoOptions.data.filter || self._gridState.filterSet)
 		{
 			//options.data.filterSet = self.convertKendo2RequestFilterSet.bind(self)(options.data.filterSet, kendoOptions.data.filter);
 
@@ -3223,23 +3256,36 @@
 			}
 			else if (kendoOptions.data.isFromAutoComplete !== true)
 			{
+				var oldInitialFilter = self.initialFilter, change = false;
+				self.initialFilter = true;
 				if (options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0)
-					this.obHeaderFilters(options.data.filterSet.FilterItems);
+				{
+					self.obHeaderFilters(options.data.filterSet.FilterItems);
+					change = true;
+				}
 
 				if (options.data.filterSet.FilterSets && options.data.filterSet.FilterSets.length > 0)
-					this.obHeaderFilterSets(options.data.filterSet.FilterSets);
+				{
+					self.obHeaderFilterSets(options.data.filterSet.FilterSets);
+					change = true;
+				}
+				self.initialFilter = oldInitialFilter;
+				if (change && self._currentFilterChange)
+				{
+					self._currentFilterChange();
+				}
 			}
 		}
 
-		var sortColumns = TF.FilterHelper.getSortColumns(this._gridDefinition.Columns);
+		var sortColumns = TF.FilterHelper.getSortColumns(self._gridDefinition.Columns);
 		options = TF.FilterHelper.setSortItems(options, sortColumns);
 
-		self._removeInvisibleListFilterItems(this.getKendoColumn());
-		options = this.setListFilterRequestOption.bind(this)(options);
+		self._removeInvisibleListFilterItems(self.getKendoColumn());
+		options = self.setListFilterRequestOption.bind(self)(options);
 		removeEmptyFilterItems(options);
 
-		if (this.options.setRequestOption)
-			options = this.options.setRequestOption(options);
+		if (self.options.setRequestOption)
+			options = self.options.setRequestOption(options);
 
 		if (options.data.filterSet && self.isEmptyFilterSet(options.data.filterSet))
 			delete options.data.filterSet;
@@ -3250,7 +3296,7 @@
 
 		if (kendoOptions.data.isFromAutoComplete !== true)
 		{
-			this.searchOption = options;
+			self.searchOption = options;
 		}
 
 		return options;
@@ -3340,7 +3386,12 @@
 				if (kendofilterFilter.filters && kendofilterFilter.filters.length === 2)
 					kendofilterFilter.isMenuFilter = true;
 				else
-					kendofilterFilter.isMenuFilter = Array.contain(fieldNamsApplyiedMenuFilter, kendofilterFilter.field);
+				{
+					var field = kendofilterFilter.field;
+					if (!field && kendofilterFilter.filters && kendofilterFilter.filters.length > 0 && kendofilterFilter.filters[0].field)
+						field = kendofilterFilter.filters[0].field;
+					kendofilterFilter.isMenuFilter = Array.contain(fieldNamsApplyiedMenuFilter, field);
+				}
 			});
 
 			var menuFilters = kendofilterFilters.filter(function(kendofilterFilter) { return kendofilterFilter.isMenuFilter; });
@@ -3473,11 +3524,8 @@
 		})[0];
 		if (griddefinition)
 		{
-			if (griddefinition.TypeHint)
-			{
-				filter.TypeHint = griddefinition.TypeHint;
-			}
-			else if (griddefinition.type === "number")
+			filter.TypeHint = "String";
+			if (griddefinition.type === "number")
 			{
 				filter.TypeHint = griddefinition.Precision ? griddefinition.Precision : 2;
 			}
@@ -3490,7 +3538,9 @@
 				}
 				else if (moment(kendo.parseDate(filter.Value)).isValid())
 				{
-					filter.Value = toISOStringWithoutTimeZone(moment(kendo.parseDate(filter.Value)));
+					var format1 = 'h:m tt';
+					var timeValue = kendo.parseDate(filter.Value, format1) || kendo.parseDate(filter.Value);
+					filter.Value = toISOStringWithoutTimeZone(moment(timeValue));
 				}
 			}
 			else if (griddefinition.type === "datetime")
@@ -3502,6 +3552,11 @@
 			{
 				filter.TypeHint = "Date";
 				filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+			}
+
+			if (griddefinition.TypeHint)
+			{
+				filter.TypeHint = griddefinition.TypeHint;
 			}
 
 			if (griddefinition.type === "integer" || griddefinition.TypeHint === "integer")
@@ -3544,31 +3599,31 @@
 
 	LightKendoGrid.bindNeedFileds = function(type, fields)
 	{
-		// if (type === 'student' || type === 'fieldtrip' || type === 'school')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('School'))
-		// 	{
-		// 		fields = fields.concat(['School']);
-		// 	}
-		// }
-		// if (type === 'trip')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('Schools'))
-		// 	{
-		// 		fields = fields.concat(['Schools']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('Name'))
-		// 	{
-		// 		fields = fields.concat(['Name']);
-		// 	}
-		// }
-		// if (type === 'school')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('School'))
-		// 	{
-		// 		fields = fields.concat(['School']);
-		// 	}
-		// }
+		if (type === 'student' || type === 'fieldtrip' || type === 'school')
+		{
+			if (!Enumerable.From(fields).Contains('School'))
+			{
+				fields = fields.concat(['School']);
+			}
+		}
+		if (type === 'trip')
+		{
+			if (!Enumerable.From(fields).Contains('Schools'))
+			{
+				fields = fields.concat(['Schools']);
+			}
+			if (!Enumerable.From(fields).Contains('Name'))
+			{
+				fields = fields.concat(['Name']);
+			}
+		}
+		if (type === 'school')
+		{
+			if (!Enumerable.From(fields).Contains('School'))
+			{
+				fields = fields.concat(['School']);
+			}
+		}
 		if (type === 'vehicle')
 		{
 			if (!Enumerable.From(fields).Contains('BusNum'))
@@ -3576,76 +3631,76 @@
 				fields = fields.concat(['BusNum']);
 			}
 		}
-		// if (type === 'altsite' || type === 'georegion' || type === 'district' || type === 'contractor' || type === 'fieldtriptemplate')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('Name'))
-		// 	{
-		// 		fields = fields.concat(['Name']);
-		// 	}
-		// }
-		// if (type === 'student')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('FirstName'))
-		// 	{
-		// 		fields = fields.concat(['FirstName']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('LastName'))
-		// 	{
-		// 		fields = fields.concat(['LastName']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('Grade'))
-		// 	{
-		// 		fields = fields.concat(['Grade']);
-		// 	}
-		// }
-		// if (type === 'tripstop')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('TripId'))
-		// 	{
-		// 		fields = fields.concat(['TripId']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('Street'))
-		// 	{
-		// 		fields = fields.concat(['Street']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('Sequence'))
-		// 	{
-		// 		fields = fields.concat(['Sequence']);
-		// 	}
-		// }
-		// if (type === 'staff')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('FirstName'))
-		// 	{
-		// 		fields = fields.concat(['FirstName']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('LastName'))
-		// 	{
-		// 		fields = fields.concat(['LastName']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('StaffTypes'))
-		// 	{
-		// 		fields = fields.concat(['StaffTypes']);
-		// 	}
-		// }
-		// if (type === 'fieldtrip')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('Name'))
-		// 	{
-		// 		fields = fields.concat(['Name']);
-		// 	}
-		// 	if (!Enumerable.From(fields).Contains('DepartDateTime'))
-		// 	{
-		// 		fields = fields.concat(['DepartDateTime']);
-		// 	}
-		// }
-		// if (type === 'document')
-		// {
-		// 	if (!Enumerable.From(fields).Contains('Filename'))
-		// 	{
-		// 		fields = fields.concat(['Filename']);
-		// 	}
-		// }
+		if (type === 'altsite' || type === 'georegion' || type === 'district' || type === 'contractor' || type === 'fieldtriptemplate')
+		{
+			if (!Enumerable.From(fields).Contains('Name'))
+			{
+				fields = fields.concat(['Name']);
+			}
+		}
+		if (type === 'student')
+		{
+			if (!Enumerable.From(fields).Contains('FirstName'))
+			{
+				fields = fields.concat(['FirstName']);
+			}
+			if (!Enumerable.From(fields).Contains('LastName'))
+			{
+				fields = fields.concat(['LastName']);
+			}
+			if (!Enumerable.From(fields).Contains('Grade'))
+			{
+				fields = fields.concat(['Grade']);
+			}
+		}
+		if (type === 'tripstop')
+		{
+			if (!Enumerable.From(fields).Contains('TripId'))
+			{
+				fields = fields.concat(['TripId']);
+			}
+			if (!Enumerable.From(fields).Contains('Street'))
+			{
+				fields = fields.concat(['Street']);
+			}
+			if (!Enumerable.From(fields).Contains('Sequence'))
+			{
+				fields = fields.concat(['Sequence']);
+			}
+		}
+		if (type === 'staff')
+		{
+			if (!Enumerable.From(fields).Contains('FirstName'))
+			{
+				fields = fields.concat(['FirstName']);
+			}
+			if (!Enumerable.From(fields).Contains('LastName'))
+			{
+				fields = fields.concat(['LastName']);
+			}
+			if (!Enumerable.From(fields).Contains('StaffTypes'))
+			{
+				fields = fields.concat(['StaffTypes']);
+			}
+		}
+		if (type === 'fieldtrip')
+		{
+			if (!Enumerable.From(fields).Contains('Name'))
+			{
+				fields = fields.concat(['Name']);
+			}
+			if (!Enumerable.From(fields).Contains('DepartDateTime'))
+			{
+				fields = fields.concat(['DepartDateTime']);
+			}
+		}
+		if (type === 'document')
+		{
+			if (!Enumerable.From(fields).Contains('Filename'))
+			{
+				fields = fields.concat(['Filename']);
+			}
+		}
 		return fields;
 	};
 
@@ -3763,9 +3818,69 @@
 		return new TF.Grid.GridState({ gridFilterId: this.obSelectedGridFilterId(), filteredIds: this._filteredIds, filteredExcludeAnyIds: this.obFilteredExcludeAnyIds() });
 	};
 
+	/**
+	 * Get the includeOnly filter id list.
+	 * @return {Array}
+	 */
+	LightKendoGrid.prototype.getIncludeOnlyIds = function()
+	{
+		var self = this,
+			gridFilterIds = (self._gridState && self._gridState.filteredIds) ? self._gridState.filteredIds.slice() : null;
+
+		if (self.additionalFilterIds && self.shouldIncludeAdditionFilterIds)
+		{
+			gridFilterIds = self.mergeTwoFilterIds(true, gridFilterIds, self.additionalFilterIds);
+		}
+
+		return gridFilterIds;
+	};
+
 	LightKendoGrid.prototype.getExcludeAnyIds = function()
 	{
 		return this.obFilteredExcludeAnyIds() ? this.obFilteredExcludeAnyIds().concat(this.obTempOmitExcludeAnyIds()) : this.obTempOmitExcludeAnyIds();
+	};
+
+	/**
+	 * Merge two filter id lists.
+	 * @param {boolean} isInclude Whether they are includeOnly id lists.
+	 * @param {Array} idList1 The first id list.
+	 * @param {Array} idList2 The second id list.
+	 * @return {Array} The merged id list.
+	 */
+	LightKendoGrid.prototype.mergeTwoFilterIds = function(isInclude, idList1, idList2)
+	{
+		// have not considered efficiency, could be optimized if got time.
+		if (idList1 && idList2)
+		{
+			var result = [];
+			if (isInclude)
+			{
+				idList1.map(function(id)
+				{
+					if (idList2.indexOf(id) !== -1)
+					{
+						result.push(id);
+					}
+				});
+			}
+			else
+			{
+				var appendUniqueValue = function(id)
+				{
+					if (result.indexOf(id) === -1)
+					{
+						result.push(id);
+					}
+				};
+				idList1.map(appendUniqueValue);
+				idList2.map(appendUniqueValue);
+			}
+			return result;
+		}
+		else
+		{
+			return idList1 || idList2;
+		}
 	};
 
 	LightKendoGrid.prototype.getSelectedIdsWithWarning = function()
@@ -3813,25 +3928,29 @@
 	LightKendoGrid.prototype.onCtrlIPress = function(e, keyCombination)
 	{
 		e.preventDefault();
-		if (this.disableShortCutKey == true)
+		var self = this;
+		self.baseKeyPress();
+		if (self.disableShortCutKey == true)
 		{
 			return;
 		}
-		this.invertSelection();
+		self.invertSelection();
 	};
 
 	LightKendoGrid.prototype.onCtrlOPress = function(e, keyCombination)
 	{
 		e.stopPropagation();
 		e.preventDefault(); // Prevent open new file by chrome
-		if (this.disableShortCutKey == true)
+		var self = this;
+		self.baseKeyPress();
+		if (self.disableShortCutKey == true)
 		{
 			return;
 		}
 		setTimeout(function()
 		{
-			this.omitSelection();
-		}.bind(this), 0);
+			self.omitSelection();
+		}, 0);
 		setTimeout(function()
 		{
 			e.stopPropagation();
@@ -3842,13 +3961,30 @@
 	LightKendoGrid.prototype.onCtrlAPress = function(e, keyCombination)
 	{
 		e.preventDefault();
-		if (this.disableShortCutKey == true)
+		var self = this;
+		self.baseKeyPress();
+		if (self.disableShortCutKey == true)
 		{
 			return;
 		}
-		this.allSelection();
+		// self._showCannotSupportSelectAllModal();
+		self.allSelection();
 	};
 
+	/**
+	 * Both all key press will be doing some thing on ViewFinder.
+	 * @returns {void} 
+	 */
+	LightKendoGrid.prototype.baseKeyPress = function()
+	{
+		//To do some thing on ViewFinder.
+	};
+
+	LightKendoGrid.prototype._showCannotSupportSelectAllModal = function()
+	{
+		// if (this.options.showCannotSupportSelectAllModal)
+		// 	this.options.showCannotSupportSelectAllModal();
+	};
 
 	LightKendoGrid.prototype.onShiftDown = function(e, keyCombination)
 	{
@@ -3874,46 +4010,60 @@
 				{
 					return Promise.resolve(true);
 				});
-			// return this.options.beforeSendFirstRequest(hackDomain)
-			// 	.then(function(hackKendoFilterSet)
-			// 	{
-			// 		if (self.getQuickFilter && Object.keys(self.getQuickFilter().data).length !== 0)
-			// 		{
-			// 			var quickFilterData = self.getQuickFilter().data;
-
-			// 			if (self._gridType === "busfinderhistorical")
-			// 			 	quickFilterData = TF.FilterHelper.removeBusfinderHistoricalInitFilterFromStickQuickFilter(quickFilterData);
-
-			// 			TF.ListFilterHelper.initListFilterIdsByQuickFilter(quickFilterData, self.listFilters, self._gridDefinition.Columns);
-			// 			var kendoQuickFilterSet = self.convertRequest2KendoFilterSet(quickFilterData.filterSet);
-			// 			var tmpFilterSet = TF.FilterHelper.mergeFilterSet(kendoQuickFilterSet, hackKendoFilterSet);
-
-			// 			return Promise.resolve(tmpFilterSet);
-			// 		}
-
-			// 		return Promise.resolve(hackKendoFilterSet);
-			// 	});
 		}
 
 		return Promise.resolve(true);
 	};
 
+	LightKendoGrid.prototype._loadIdsWhenOnDataBound = function()
+	{
+		var self = this;
+
+		var filterIdUrl = pathCombine(self.getApiRequestURL(self.options.url), "id");
+		tf.ajax.ajaxRequests.forEach(function(ajaxRequest)
+		{
+			if (ajaxRequest &&
+				ajaxRequest.requestUrl &&
+				ajaxRequest.requestUrl.indexOf(filterIdUrl) >= 0)
+			{
+				ajaxRequest.abort();
+				// ajaxRequest.error(function(){
+				// 		arguments[0].status = 200;
+				// 		arguments[1] = 200;
+				// 		arguments[2] = undefined;
+				// 	});
+			}
+
+		});
+		return self.getIdsWithCurrentFiltering().then(
+			function()
+			{
+				return true;
+			},
+			function()
+			{
+				// catch exception thrown by reject.
+			}
+		);
+	}
+
 	LightKendoGrid.prototype.onDataBound = function()
 	{
 		var self = this;
-		self.kendoGrid = this.$container.data("kendoGrid");
+
+		self.kendoGrid = self.$container.data("kendoGrid");
 		self.bindScrollXMoveSummayBarEvent();
 		var selected = $.map(self.kendoGrid.items(), function(item)
 		{
-			var row = $(item).closest("tr");
-			var dataItem = self.kendoGrid.dataItem(row);
-			var selectedId = Enumerable.From(self.getSelectedIds());
+			var row = $(item).closest("tr"),
+				dataItem = self.kendoGrid.dataItem(row),
+				selectedId = Enumerable.From(self.getSelectedIds());
 			if (dataItem && dataItem[self.options.Id] && selectedId.Contains(dataItem[self.options.Id]))
 			{
 				return item;
 			}
 		});
-		if (this.kendoGrid.options.selectable)
+		if (self.kendoGrid.options.selectable)
 		{
 			self.kendoGrid.select(selected);
 		}
@@ -3923,43 +4073,57 @@
 			onKendoGridTRClickEvent.call(this, e, self);
 		});
 
+		if (self.options.isDataRowHover)
+		{
+			switch (self.options.gridType)
+			{
+				case "student":
+					self.$container.find(".k-grid-content tr").Popover(new TF.Popover.StudentPopoverViewModel(self.kendoGrid));
+					break;
+				case "tripstop":
+					self.$container.find(".k-grid-content tr").Popover(new TF.Popover.TripStopPopoverViewModel(self.kendoGrid));
+					break;
+				case "trip":
+					self.$container.find(".k-grid-content tr").Popover(new TF.Popover.TripPopoverViewModel(self.kendoGrid));
+					break;
+			}
+		}
+
 		if (self.options.onDataBound)
 		{
 			self.options.onDataBound();
 		}
 		//self.$container.off("click.eyeColumnClick").on("click.eyeColumnClick", ".eyecolumn", self.eyeColumnClick.bind(self));
-		if (this.kendoGrid.options.selectable)
+		if (self.kendoGrid.options.selectable)
 		{
-			TF.LightKendoGridHelper._cancelKendoGridSelectedArea.bind(self)(this.kendoGrid);
+			TF.LightKendoGridHelper._cancelKendoGridSelectedArea.bind(self)(self.kendoGrid);
 		}
 
 		self._fullfillGridBlank.bind(self)();
 
 		self._initLinkTd();
-		self.onDataBoundEvent.notify();
-		this._setCustomizetimePickerborderradius();
-		this.setFilterDropDownListSize();
+		self._setCustomizetimePickerborderradius();
+		self.setFilterDropDownListSize();
 
-		if (this.kendoGrid._data.length === 0) //RW-850 Message should display when there are no associated documents
+		if (self.kendoGrid._data.length === 0) //RW-850 Message should display when there are no associated documents
 		{
-			var $nomatching = this.$container.find(".no-matching-records");
-			if ($nomatching.length > 0)
+			var $nomatching = self.$container.find(".no-matching-records");
+			if ($nomatching.length === 0)
 			{
-				return;
+				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
+				$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				$parent.find("table").css("display", "none");
+				$parent.find(".kendogrid-blank-fullfill").css("display", "none");
 			}
-			var $parent = this.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
-			$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
-			$parent.find("table").css("display", "none");
-			$parent.find(".kendogrid-blank-fullfill").css("display", "none");
 		}
 		else
 		{
-			var $nomatching = this.$container.find(".no-matching-records");
+			var $nomatching = self.$container.find(".no-matching-records");
 			if ($nomatching.length > 0)
 			{
 				$nomatching.remove();
 			}
-			var $parent = this.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
+			var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
 			$parent.find("table").css("display", "");
 			$parent.find(".kendogrid-blank-fullfill").css("display", "");
 		}
@@ -4004,15 +4168,84 @@
 		}
 
 		//RW-997 once staff grid and the record without type dirver and bus aide, then no drag.
-		if (this._gridType == "staff")
+		if (self._gridType == "staff")
 		{
-			this._staffGridDraggable();
+			self._staffGridDraggable();
 		}
+
+		if ((self.geoFields && self.geoFields.length > 0) || self._gridType === "trip")
+		{
+			tf.loadingIndicator.showImmediately();
+		}
+		var oldIds = self.obAllIds(), newIds;
+		self._loadIdsWhenOnDataBound()
+			.then(function()
+			{
+				newIds = self.obAllIds();
+				if (oldIds.sort().join(',') === newIds.sort().join(','))
+				{
+					if (newIds.length === 0)
+					{
+						self.onIdsChanged.notify();
+					}
+					self.onDataBoundEvent.notify();
+					tf.loadingIndicator.tryHide();
+				}
+				else
+				{
+					if (self._gridType === "trip")
+					{
+						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "trip", "batch", "mini", "?include=tripstop"),
+							{
+								data: {
+									ids: self.allIds,
+									now: toISOStringWithoutTimeZone(moment().currentTimeZoneTime()),
+									date: toISOStringWithoutTimeZone(moment().currentTimeZoneTime())
+								}
+							})
+							.then(function(response)
+							{
+								self.geoData = response;
+								self.onIdsChanged.notify();
+								self.onDataBoundEvent.notify();
+								tf.loadingIndicator.tryHide();
+							}.bind(this));
+					}
+					else if (self.geoFields && self.geoFields.length > 0)
+					{
+						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
+							{
+								data:
+									{
+										fields: self.geoFields,
+										IdFilter:
+											{
+												IncludeOnly: self.allIds
+											}
+									}
+							})
+							.then(function(response)
+							{
+								self.geoData = response;
+								self.onIdsChanged.notify();
+								self.onDataBoundEvent.notify();
+								tf.loadingIndicator.tryHide();
+							});
+					}
+					else
+					{
+						self.onIdsChanged.notify();
+						self.onDataBoundEvent.notify();
+						tf.loadingIndicator.tryHide();
+					}
+				}
+			});
 	};
 
 	LightKendoGrid.prototype._onGridItemClick = function(dataItem, e)
 	{
 		var self = this;
+
 		if (dataItem && $.isNumeric(dataItem[self.options.Id]))
 		{
 			if (TF.isMobileDevice && this.options.supportMobileMultipleSelect)
@@ -4023,23 +4256,27 @@
 					self.getSelectedIds.push(dataItem[self.options.Id]);
 				return;
 			}
+
 			if (this.options.selectable == "row")
 			{
 				self.getSelectedIds([dataItem[self.options.Id]]);
 				return;
 			}
+
 			if (!e.shiftKey)
 			{
 				self.kendoGrid.lastClickItemId = dataItem[self.options.Id];
 			}
-			if (e.ctrlKey)
+
+			//self.getIdsWithCurrentFiltering();
+			if (e.ctrlKey && this.kendoGrid.options.selectable != "row")
 			{
 				if (Array.contain(self.getSelectedIds(), dataItem[self.options.Id]))
-					//Array.remove(self.getSelectedIds(), dataItem.Id);
 					self.getSelectedIds.remove(function(id) { return id === dataItem[self.options.Id]; });
 				else
 					self.getSelectedIds.push(dataItem[self.options.Id]);
-			} else if (e.shiftKey)
+			}
+			else if (e.shiftKey && this.kendoGrid.options.selectable != "row")
 			{
 				self.getIdsWithCurrentFiltering().then(function(data)
 				{
@@ -4071,11 +4308,6 @@
 		}
 	};
 
-	LightKendoGrid.prototype._slicePX = function(data)
-	{
-		return parseFloat(data.slice(0, -2));
-	};
-
 	LightKendoGrid.prototype._fullfillGridBlank = function()
 	{
 		var self = this;
@@ -4084,6 +4316,7 @@
 
 		var $blankFiller = $('<div class="kendogrid-blank-fullfill"></div>');
 		var $trs = $canver.find('table tr');
+		$canver.find('table').css("display", "block");
 		$trs.map(function(idx, tr)
 		{
 			var $tr = $(tr);
@@ -4125,9 +4358,9 @@
 		{
 			var $fillItem = $($fillItems[idx]);
 
-			var $tr = $(tr);
-			var fillItemColor = self._getFillItemColor($tr);
-			var fillItemHeight = self._caculateFillItemHeight($tr);
+			var $tr = $(tr),
+				fillItemColor = self._getFillItemColor($tr),
+				fillItemHeight = self._caculateFillItemHeight($tr);
 			$fillItem.height(fillItemHeight);
 			$fillItem.css('background-color', fillItemColor);
 		});
@@ -4135,9 +4368,7 @@
 
 	LightKendoGrid.prototype._caculateFillItemHeight = function($tr)
 	{
-		var self = this;
-		var $td = $($tr.find('td')[0]);
-		return $td.height() + self._slicePX($td.css('padding-top')) + self._slicePX($td.css('padding-bottom'));
+		return $($tr.find('td')[0]).outerHeight();
 	};
 
 	LightKendoGrid.prototype._getFillItemColor = function($tr)
@@ -4186,7 +4417,7 @@
 					Where(function(x) { return x.FieldName === column.FieldName }).SingleOrDefault();
 			column = $.extend(column, additionColumn);
 			this.updateGridDefinitionWidth(column);
-			this._updateGridDefinitionDisplayNameFromTerm(column);
+			//this._updateGridDefinitionDisplayNameFromTerm(column);
 		}
 
 		return gridDefinition;
@@ -4200,21 +4431,21 @@
 			column.DisplayName = column.FieldName;
 		}
 
-		// var temp = column.DisplayName;
-		//
-		// for (var i = 0; i < tf.APPLICATIONTERMDEFAULTVALUES.length; i++)
-		// {
-		// 	var key = tf.APPLICATIONTERMDEFAULTVALUES[i];
-		//
-		// 	if (tf.applicationTerm[key.Term])
-		// 	{
-		// 		temp = temp.replace(new RegExp('\\b' + key.Singular + '\\b', 'ig'), tf.applicationTerm[key.Term].Singular);
-		// 		temp = temp.replace(new RegExp('\\b' + key.Plural + '\\b', 'ig'), tf.applicationTerm[key.Term].Plural);
-		// 		temp = temp.replace(new RegExp('\\b' + key.Abbreviation + '\\b', 'ig'), tf.applicationTerm[key.Term].Abbreviation);
-		// 	}
-		// }
-		//
-		// column.DisplayName = temp;
+		var temp = column.DisplayName;
+
+		for (var i = 0; i < tf.APPLICATIONTERMDEFAULTVALUES.length; i++)
+		{
+			var key = tf.APPLICATIONTERMDEFAULTVALUES[i];
+
+			if (tf.applicationTerm[key.Term])
+			{
+				temp = temp.replace(new RegExp('\\b' + key.Singular + '\\b', 'ig'), tf.applicationTerm[key.Term].Singular);
+				temp = temp.replace(new RegExp('\\b' + key.Plural + '\\b', 'ig'), tf.applicationTerm[key.Term].Plural);
+				temp = temp.replace(new RegExp('\\b' + key.Abbreviation + '\\b', 'ig'), tf.applicationTerm[key.Term].Abbreviation);
+			}
+		}
+
+		column.DisplayName = temp;
 	};
 
 
@@ -4234,58 +4465,55 @@
 
 	LightKendoGrid.prototype.resizeHeightOnWindowResize = function()
 	{
-		var timeout = null;
-		this._onWindowResize = function()
+		var self = this, timeout = null;
+		self._onWindowResize = function()
 		{
 			clearTimeout(timeout);
 			timeout = setTimeout(function()
 			{
-				this.fitContainer();
-			}.bind(this), 50);
-		}.bind(this);
-		$(window).on("resize.lightKendoGrid", this._onWindowResize);
+				self.fitContainer();
+			}, 50);
+		};
+		$(window).off("resize.lightKendoGrid").on("resize.lightKendoGrid", self._onWindowResize);
 	};
 
 	LightKendoGrid.prototype.fitContainer = function()
 	{
-		var height = this.getGridFullHeight();
-		var filterRow = this.$container.find(".k-grid-header").find(".k-filter-row");
+		var self = this, height = self.getGridFullHeight(), pagerHeight = 0,
+			filterRow = self.$container.find(".k-grid-header").find(".k-filter-row");
+
 		if (filterRow == undefined || filterRow.length == 0)
 		{
-			this._filterHeight = 38;
+			self._filterHeight = 38;
 		}
 
-		var pagerHeight = 0;
-		if (this.options.kendoGridOption.pageable == false)
+		if (self.options.kendoGridOption.pageable == false)
 		{//some grid don't have pager, need set pager height in content height either.
 			pagerHeight += 32.8;
 		}
-		var contentHeight = height - 105 + this._filterHeight + pagerHeight;
-		this.$container.height(height).find(".k-grid-content-locked,.k-grid-content").height(contentHeight);
-		if (this.$container.find(".k-grid-content [role=grid]").width() > this.$container.find(".k-grid-content>div:eq(0)").width())
-		{
-			this.$container.height(height).find(".k-grid-content-locked").height(contentHeight - 18);
-		}
+
+		var contentHeight = height - 105 + self._filterHeight + pagerHeight;
+		self.$container.height(height).find(".k-grid-content-locked,.k-grid-content").height(contentHeight);
+		self.$container.next(".kendo-summarygrid-container").find(".k-grid-content-locked,.k-grid-content").height(self.summaryHeight);
+
+		self.resetGridContainerHorizontalLayout();
+	};
+
+	/** */
+	LightKendoGrid.prototype.resetGridContainerHorizontalLayout = function()
+	{
+		var self = this, $item,
+			$summaryGrid = self.$container.next(),
+			warpWidth = self.$container.width(),
+			lockHeaderWidth = self.$container.find('.k-grid-header-locked').width(),
+			remainedWidth = warpWidth - lockHeaderWidth,
+			paddingRight = parseInt(self.$container.find(".k-grid-content").css("padding-right"));;
 
 
-		this.$container.next(".kendo-summarygrid-container").find(".k-grid-content-locked,.k-grid-content").height(this.summaryHeight);
-
-
-		var currentPanelWidth = this.$container.parent().width(),
-			lockedHeaderWidth = this.$container.find('.k-grid-header-locked').width();
-		paddingRight = parseInt(this.$container.find(".k-grid-content").css("padding-right"));
-		[this.$container].forEach(function(container)
-		{
-			if (container)
-				container.find(".k-auto-scrollable,.k-grid-content").width(currentPanelWidth - lockedHeaderWidth - paddingRight - 2);
-		});
-
-		[this.$summaryContainer].forEach(function(container)
-		{
-			if (container)
-				container.find(".k-auto-scrollable,.k-grid-content").width(currentPanelWidth - lockedHeaderWidth - 2);
-		});
-
+		self.$container.find(".k-grid-content").css("width", remainedWidth - paddingRight);
+		self.$container.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-grid-content").css("width", remainedWidth);
+		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth);
 	};
 
 	LightKendoGrid.prototype.getGridFullHeight = function()
@@ -4455,7 +4683,17 @@
 		this.onRowsChangeCheck.unsubscribeAll();
 		this.onRowsChanged.unsubscribeAll();
 		this.onEyeCheckChanged.unsubscribeAll();
+		this.onDataBoundEvent.unsubscribeAll();
+		if (this.onClearGridFilterClickEvent)
+		{
+			this.onClearGridFilterClickEvent.unsubscribeAll();
+		}
 		this._onWindowResize = null;
+		for (var i in this.subscriptions)
+		{
+			this.subscriptions[i].dispose();
+			this.subscriptions[i] = null;
+		}
 		if (this.kendoGrid)
 		{
 			this.kendoGrid.destroy();
@@ -4469,6 +4707,44 @@
 			}
 		});
 	};
+
+	LightKendoGrid.AllFilterTypes = ['contains', 'isequalto', 'isnotequalto', 'startswith',
+		'doesnotcontain', 'endswith', 'islessthanorequalto', 'isgreaterthanorequalto',
+		'isgreaterthan', 'islessthan', 'isempty', 'isnotempty', 'custom', 'list'];
+
+	LightKendoGrid.prototype.filterNames = {
+		'Equal To': 'isequalto',
+		'Not Equal To': 'isnotequalto',
+		'Does Not Contain': 'doesnotcontain',
+		'Contains': 'contains',
+		'Starts With': 'startswith',
+		'Ends With': 'endswith',
+		'Greater Than': 'isgreaterthan',
+		'Greater Than or Equal To': 'isgreaterthanorequalto',
+		'Less Than': 'islessthan',
+		'Less Than or Equal To': 'islessthanorequalto',
+		'Empty': 'isempty',
+		'Not Empty': 'isnotempty',
+		'Custom': 'custom',
+		'List': 'list'
+	};
+
+	LightKendoGrid.prototype.operatorKendoMapFilterNameValue = {
+		'eq': 'isequalto',
+		'neq': 'isnotequalto',
+		'doesnotcontain': 'doesnotcontain',
+		'contains': 'contains',
+		'startswith': 'startswith',
+		'endswith': 'endswith',
+		'gt': 'isgreaterthan',
+		'gte': 'isgreaterthanorequalto',
+		'lt': 'islessthan',
+		'lte': 'islessthanorequalto',
+		'isempty': 'isempty',
+		'isnotempty': 'isnotempty',
+		'custom': 'custom',
+		'list': 'list'
+	}
 
 	LightKendoGrid.prototype.operatorKendoMapTF = {
 		'eq': 'EqualTo',
@@ -4514,8 +4790,6 @@
 		}
 		return items;
 	};
-
-
 })();
 
 (function()
@@ -4551,28 +4825,6 @@
 		requestOptions.data.sortItems = sortItems;
 		return requestOptions;
 	}
-
-	FilterHelper.mergeFilterSet = function(filterSet1, filterSet2)
-	{
-		var filterSet2Fields = filterSet2.map(function(item)
-		{
-			return item.field || item.filters[0].field;
-		});
-
-		var result = filterSet1.filter(function(item)
-		{
-			var field = item.field;
-			if (filterSet2Fields.indexOf(field) >= 0)
-				return false;
-			else if (item.logic && filterSet2Fields.indexOf(item.filters[0].field))
-				return false
-			else
-				return true;
-
-		})
-		result = result.concat(filterSet2);
-		return result;
-	};
 
 	FilterHelper.buildEmptyDSFilterSet = function()
 	{
@@ -4632,29 +4884,20 @@
 		if (columnType === 'time')
 		{
 			var str = moment(val).format('h:mm A');
-			if (str === 'Invalid date')
-				return val;
-			else
-				return str;
+			return (str === 'Invalid date') ? val : str;
 		}
 		else if (columnType === 'date')
 		{
 			var str = moment(val).format('l');
-			if (str === 'Invalid date')
-				return val;
-			else
-				return str;
+			return (str === 'Invalid date') ? val : str;
 		}
 		else if (columnType === 'datetime')
 		{
 			var str = moment(val).format('MM/DD/YYYY hh:mm A');
-			if (str === 'Invalid date')
-				return val;
-			else
-				return str;
+			return (str === 'Invalid date') ? val : str;
 		}
-		else
-			return val;
+
+		return val;
 	};
 
 	FilterHelper.clearFilterCellInput = function($input)
@@ -4717,6 +4960,7 @@
 			filterItem.TypeHint !== 'Date' &&
 			filterItem.TypeHint !== 'Time' &&
 			filterItem.TypeHint !== 'DateTime' &&
+			filterItem.TypeHint !== 'BoolToChar' && //used for georegion geo column
 			filterItem.Operator !== 'Empty' && filterItem.Operator !== 'IsNotNull' && filterItem.Operator !== 'IsNull' &&
 			(filterItem.Value === '' || filterItem.Value === "Invalid date")
 		);
@@ -4945,8 +5189,10 @@
 	ListFilterHelper.getSelectedFilterItemsForDefaultType = function(cachedListFilters, listFilterTemplate, fieldName)
 	{
 		var allItems = listFilterTemplate.AllItems;
-		if (cachedListFilters[fieldName].selectedFilterItems)
+		if (cachedListFilters[fieldName] && cachedListFilters[fieldName].selectedFilterItems)
+		{
 			return cachedListFilters[fieldName].selectedFilterItems;
+		}
 
 		var selectedIds = cachedListFilters[fieldName].ids || [];
 

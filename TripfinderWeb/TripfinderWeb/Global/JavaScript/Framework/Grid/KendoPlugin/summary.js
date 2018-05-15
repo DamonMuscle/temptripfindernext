@@ -22,65 +22,47 @@
 
 	KendoGridSummaryGrid.prototype.createSummaryGrid = function()
 	{
-		// var scrollLeft = 0;
-		// this.summaryKendoGrid = this.$summaryContainer.data("kendoGrid"),
-		// 	this.summaryKendoGrid && (scrollLeft = this.$summaryContainer.find(".k-grid-content").scrollLeft(),
-		// 		this.summaryKendoGrid.destroy(),
-		// 		this.$summaryContainer.empty());
-		// var data = {};
-		// this.kendoGrid.getOptions().columns.forEach(function(scrollLeft)
-		// {
-		// 	data[scrollLeft.field] = ""
-		// });
-
-		var scrollLeft = 0;
-		this.summaryKendoGrid = this.$summaryContainer.data("kendoGrid");
-		if (this.summaryKendoGrid)
+		var self = this, scrollLeft = 0;
+		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
+		if (self.summaryKendoGrid)
 		{
-			scrollLeft = this.$summaryContainer.find(".k-grid-content").scrollLeft();
-			this.summaryKendoGrid.destroy();
-			this.$summaryContainer.empty();
+			scrollLeft = self.$summaryContainer.find(".k-grid-content").scrollLeft();
+			self.summaryKendoGrid.destroy();
+			self.$summaryContainer.empty();
 		}
 
 
 		var data = {};
-		this.kendoGrid.getOptions().columns.forEach(function(item)
+		self.kendoGrid.getOptions().columns.forEach(function(item)
 		{
 			data[item.field] = "";
 		});
 
-		this.$summaryContainer.kendoGrid({
+		self.$summaryContainer.kendoGrid({
 			dataSource: {
 				data: [data],
 				schema: {
 					model: {
-						fields: this.getSummaryField()
+						fields: self.getSummaryField()
 					}
 				}
 			},
 			height: 40,
 			filterable: {
-				extra: !1,
+				extra: false,
 				mode: "row"
 			},
-			columns: this.getSummaryColumns()
+			columns: self.getSummaryColumns(),
+			dataBound: function()
+			{
+				self.resetGridContainerHorizontalLayout();
+			}
 		});
-		this.summaryKendoGrid = this.$summaryContainer.data("kendoGrid");
-		this.initSummaryGridDataSource();
-		this.reRenderSummaryGrid();
-		this.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
-		this.resetWidth();
+		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
+		self.initSummaryGridDataSource();
+		self.reRenderSummaryGrid();
+		self.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
 	};
-
-	KendoGridSummaryGrid.prototype.resetWidth = function()
-	{
-		var currentPanelWidth = this.$container.parent().width();
-		var lockedHeaderWidth = this.$container.find('.k-grid-header-locked').width();
-		//var paddingRight = parseInt(this.$container.find(".k-grid-content").css("padding-right"));
-
-		//this.$summaryContainer.find(".k-grid-content").width(currentPanelWidth - lockedHeaderWidth - paddingRight - 2);
-		this.$summaryContainer.find(".k-auto-scrollable, .k-grid-content").width(currentPanelWidth - lockedHeaderWidth - 2);
-	}
 
 	KendoGridSummaryGrid.prototype.createSummaryFilterClearAll = function()
 	{
@@ -160,7 +142,6 @@
 			this.reRenderSummaryGrid();
 			this.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
 			this.lockSummaryFirstColumn();
-			this.resetWidth();
 		}
 	};
 
@@ -173,8 +154,8 @@
 			var summaryBodyTable = this.summaryKendoGrid.lockedTable;
 			if (summaryHeaderTable.parent().find("col").length === 1)
 			{
-				summaryHeaderTable.attr("style", "width:40px");
-				summaryBodyTable.attr("style", "width:40px");
+				summaryHeaderTable.attr("style", "width:30px");
+				summaryBodyTable.attr("style", "width:30px");
 			}
 			else//if the lock area has more than one column,keep the width of lock area donnot change
 			{
@@ -187,8 +168,8 @@
 				summaryHeaderTable.attr("style", "width:" + width + "px");
 				summaryBodyTable.attr("style", "width:" + width + "px");
 			}
-			summaryHeaderTable.parent().find("col").eq(this.resizeIdx).attr("style", "width:40px");
-			summaryBodyTable.parent().find("col").eq(this.resizeIdx).attr("style", "width:40px");
+			summaryHeaderTable.parent().find("col").eq(this.resizeIdx).attr("style", "width:30px");
+			summaryBodyTable.parent().find("col").eq(this.resizeIdx).attr("style", "width:30px");
 		}
 	};
 
@@ -305,9 +286,9 @@
 		var includeIds = this._gridState.filteredIds;
 		var excludeIds = this.getExcludeAnyIds();
 		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), this.obSelectedGridFilterClause(), includeIds, excludeIds);
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", this.options.gridType == "vehicle" ? "fleet" : this.options.gridType, "aggregate"), {
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", this.options.gridType, "aggregate"), {
 			paramData: { FieldName: fildName, AggregateOperator: operator },
-			data: searchData.data,
+			data: this.searchOption.data,
 			traditional: true
 		}, { overlay: true });
 	};
@@ -336,6 +317,7 @@
 					return this.getFormatedValue(column, item, operator);
 				}.bind(this));
 				ans = ans.join(' - ');
+				ans = ans === " - " ? "" : ans;
 			} else
 			{
 				ans = this.getFormatedValue(column, ans, operator);
@@ -353,10 +335,17 @@
 			{
 				return value;
 			}
-			if ((column.type === "date" || column.type === "time") && new Date(value) != 'Invalid Date')
+			if ((column.type === "date" || column.type === "time"))
 			{
-				value = moment(value).toDate();
-				return kendo.format(column.format, value);
+				if (new Date(value) != 'Invalid Date' && moment(value).isValid() === true && value !== 0)
+				{
+					value = moment(value).toDate();
+					return kendo.format(column.format, value);
+				}
+				else
+				{
+					return "";
+				}
 			}
 			if (operator == 'Average' || ((operator == 'Sum' || operator == 'Min' || operator == 'Max') && column.type == 'number'))
 			{
