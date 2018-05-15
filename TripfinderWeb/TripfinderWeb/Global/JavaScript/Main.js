@@ -254,6 +254,15 @@ function toISOStringWithoutTimeZone(m)
 	return m.format('YYYY-MM-DDTHH:mm:ss.SSS');
 }
 
+function getTitleByType(type)
+{
+	switch (type.toLowerCase())
+	{
+		case "fieldtrip":
+			return "Field Trip";
+	}
+}
+
 function addStyle(styleId, content)
 {
 	var doc = document,
