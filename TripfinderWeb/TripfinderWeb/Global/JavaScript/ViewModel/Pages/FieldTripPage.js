@@ -280,6 +280,10 @@
 	FieldTripPage.prototype.bindButtonEvent = function()
 	{
 		var self = this;
+		self.bindEvent(".iconbutton.summarybar", function(model, e)
+		{
+			self.searchGrid.summarybarIconClick(model, e);
+		});
 		self.bindEvent(".iconbutton.filter", self.filterMenuClick);
 		self.bindEvent(".iconbutton.addremovecolumn", function(model, e)
 		{

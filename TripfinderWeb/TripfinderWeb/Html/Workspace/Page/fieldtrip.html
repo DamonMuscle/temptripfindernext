@@ -2,6 +2,7 @@
 	<div class="page-title">FIELD TRIP</div>
 	<div class="grid-icons" data-bind="css:{'is-mobile-device':isMobileDevice}">
 		<div class="iconrow" data-bind="css:{'is-mobile-device':isMobileDevice}">
+			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()},visible:!isPhoneDevice()"></div>
 			<div class="iconbutton mobile addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton mobile layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
 			<div class="iconbutton mobile filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
@@ -13,7 +14,7 @@
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
 					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
-					    style="max-width: 150px;"></span>
+					 style="max-width: 150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
@@ -35,5 +36,6 @@
 	</div>
 	<div class="grid-wrap">
 		<div class="kendo-grid kendo-grid-container"></div>
+		<div class="kendo-grid kendo-summarygrid-container" data-bind="visible:obSummaryGridVisible()"></div>
 	</div>
 </div>
