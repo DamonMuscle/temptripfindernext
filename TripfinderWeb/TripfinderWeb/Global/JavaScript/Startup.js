@@ -268,16 +268,6 @@
 	{
 		var self = this;
 
-		var rep = tf.authManager.isAuthorizedFor("reports", "read");
-		var rep1 = tf.authManager.isAuthorizedFor("reports", "add");
-		var rep2 = tf.authManager.isAuthorizedFor("reports", "edit");
-		var rep3 = tf.authManager.isAuthorizedFor("reports", "delete");
-
-		var schduleRep = tf.authManager.isAuthorizedFor("scheduleReport", "read");
-		var schduleRep1 = tf.authManager.isAuthorizedFor("scheduleReport", "add");
-		var schduleRep2 = tf.authManager.isAuthorizedFor("scheduleReport", "edit");
-		var schduleRep3 = tf.authManager.isAuthorizedFor("scheduleReport", "delete");
-
 		var ft1 = tf.authManager.isAuthorizedFor("level1Requestor", "read");
 		var ft2 = tf.authManager.isAuthorizedFor("level2Administrator", "read");
 		var ft3 = tf.authManager.isAuthorizedFor("level3Administrator", "read");
@@ -285,90 +275,40 @@
 		var ft5 = tf.authManager.isAuthorizedFor("transportationAdministrator", "read");
 		var ft = ft1 || ft2 || ft3 || ft4 || ft5;
 
-		var p1 = tf.authManager.isAuthorizedFor("trip", "read");
-		var p2 = tf.authManager.isAuthorizedFor("busfinder", "read");
-		var p3 = tf.authManager.isAuthorizedFor("staff", "read");
-		var p4 = tf.authManager.isAuthorizedFor("vehicle", "read");
-		var p5 = tf.authManager.isAuthorizedFor("student", "read");
+		//var p1 = tf.authManager.isAuthorizedFor("trip", "read");
+		//var p2 = tf.authManager.isAuthorizedFor("busfinder", "read");
+		//var p3 = tf.authManager.isAuthorizedFor("staff", "read");
+		//var p4 = tf.authManager.isAuthorizedFor("vehicle", "read");
+		//var p5 = tf.authManager.isAuthorizedFor("student", "read");
 		var fltRead = tf.authManager.isAuthorizedFor("filters", "read");
 		var fltAdd = tf.authManager.isAuthorizedFor("filters", "add");
 		var fltEdit = tf.authManager.isAuthorizedFor("filters", "edit");
 		var fltDelete = tf.authManager.isAuthorizedFor("filters", "delete");
-		var pAltSite = tf.authManager.isAuthorizedFor("alternateSite", "read");
-		var pContractor = tf.authManager.isAuthorizedFor("contractor", "read");
-		var pDistrict = tf.authManager.isAuthorizedFor("district", "read");
-		var pGeoRegion = tf.authManager.isAuthorizedFor("geoRegions", "read");
-		var pSchool = tf.authManager.isAuthorizedFor("school", "read");
-		var busfinder = self.isBusfinder && p2;
-		var pAttendance = tf.authManager.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
+		//var pAltSite = tf.authManager.isAuthorizedFor("alternateSite", "read");
+		//var pContractor = tf.authManager.isAuthorizedFor("contractor", "read");
+		//var pDistrict = tf.authManager.isAuthorizedFor("district", "read");
+		//var pGeoRegion = tf.authManager.isAuthorizedFor("geoRegions", "read");
+		//var pSchool = tf.authManager.isAuthorizedFor("school", "read");
+		//var busfinder = self.isBusfinder && p2;
+		//var pAttendance = tf.authManager.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
 		var pAdmin = tf.authManager.authorizationInfo.isAdmin;
 
 		if (!tf.permissions)
 		{
 			tf.permissions = {
-				obTrips: ko.observable(p1),
 				obFieldTrips: ko.observable(ft),
-				obStudent: ko.observable(p5),
-				obVehicle: ko.observable(p4),
-				obAltsite: ko.observable(pAltSite),
-				obContractor: ko.observable(pContractor),
-				obDistrict: ko.observable(pDistrict),
-				obGeoRegions: ko.observable(pGeoRegion),
-				obSchool: ko.observable(pSchool),
-				obStaff: ko.observable(p3),
-				obTripstop: ko.observable(p1),
-				obPlannedTripsVsActual: ko.observable(p1 && busfinder),
-				obBusfinder: ko.observable(busfinder),
-				obAttendance: ko.observable(pAttendance),
-				obSummary: ko.observable(p1 && p3 && p4 && p5 && ft),
-				reports: {
-					obRead: ko.observable(rep || schduleRep),
-					obAdd: ko.observable(rep1 || schduleRep1),
-					obEdit: ko.observable(rep2 || schduleRep2),
-					obDelete: ko.observable(rep3 || schduleRep3)
-				},
 				filtersRead: fltRead,
 				filtersAdd: fltAdd,
 				filtersEdit: fltEdit,
 				filtersDelete: fltDelete,
 				obIsAdmin: ko.observable(pAdmin),
 				isHost: self.isHost,
-				hasAuthorized: p1 || p2 || p3 || p4 || p5 || ft || rep || schduleRep || pAltSite || pContractor || pDistrict || pGeoRegion || pSchool || pAttendance
+				hasAuthorized: ft
 			};
-
-			tf.permissions.obDashboards = ko.computed(function()
-			{
-				return tf.permissions.obTrips() || tf.permissions.obFieldTrips() || tf.permissions.obSummary() || tf.permissions.obPlannedTripsVsActual() || tf.permissions.obAttendance();
-			});
-
-			tf.permissions.obGrids = ko.computed(function()
-			{
-				return tf.permissions.obTrips() || tf.permissions.obFieldTrips() || tf.permissions.obAltsite() || tf.permissions.obContractor() || tf.permissions.obDistrict() ||
-					tf.permissions.obGeoRegions() || tf.permissions.obSchool() || tf.permissions.obStaff() || tf.permissions.obStudent() || tf.permissions.obVehicle() || tf.permissions.obBusfinder();
-			});
 		} else
 		{
-			tf.permissions.hasAuthorized = p1 || p2 || p3 || p4 || p5 || ft || rep || schduleRep || pAltSite || pContractor || pDistrict || pGeoRegion || pSchool || pAttendance;
-
-			tf.permissions.obTrips(p1);
+			tf.permissions.hasAuthorized = ft;
 			tf.permissions.obFieldTrips(ft);
-			tf.permissions.obStudent(p5);
-			tf.permissions.obVehicle(p4);
-			tf.permissions.obAltsite(pAltSite);
-			tf.permissions.obContractor(pContractor);
-			tf.permissions.obDistrict(pDistrict);
-			tf.permissions.obGeoRegions(pGeoRegion);
-			tf.permissions.obSchool(pSchool);
-			tf.permissions.obStaff(p3);
-			tf.permissions.obTripstop(p1);
-			tf.permissions.obPlannedTripsVsActual(p1 && busfinder);
-			tf.permissions.obBusfinder(busfinder);
-			tf.permissions.obAttendance(pAttendance);
-			tf.permissions.obSummary(p1 && p3 && p4 && p5 && ft);
-			tf.permissions.reports.obRead(rep || schduleRep);
-			tf.permissions.reports.obAdd(rep1 || schduleRep1);
-			tf.permissions.reports.obEdit(rep2 || schduleRep2);
-			tf.permissions.reports.obDelete(rep3 || schduleRep3);
 			tf.permissions.obIsAdmin(pAdmin);
 
 			tf.permissions.filtersRead = fltRead;

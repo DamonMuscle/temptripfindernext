@@ -6,27 +6,26 @@
 
 	PageManager.prototype.openNewPage = function(type)
 	{
-		var self = this,
+		var self = this, permission,
 			pageData, templateType,
 			$content, $pageContent = $("#pageContent");
 
-		$pageContent.empty();
-		var permission = tf.authManager.isAuthorizedFor(type, "read");
+		self.removeCurrentPage();
+		permission = tf.authManager.isAuthorizedFor(type, "read");
+		if (!permission)
+		{
+			return tf.promiseBootbox.alert("You have no Trip Field view permission!")
+				.then(function()
+				{
+					tf.modalManager.showModal(new TF.Modal.TripfinderLoginModel());
+				});
+		}
+
 		switch (type)
 		{
 			case "fieldtrip":
-				if (permission)
-				{
-					pageData = new TF.Page.FieldTripPage();
-					templateType = "fieldtrip";
-				} else
-				{
-					return tf.promiseBootbox.alert("You have no Trip Field view permission!")
-						.then(function()
-						{
-							tf.modalManager.showModal(new TF.Modal.TripfinderLoginModel());
-						});
-				}
+				pageData = new TF.Page.FieldTripPage();
+				templateType = "basegridpage";
 				break;
 		}
 		$content = $("<div class='main-body'><!-- ko template:{ name:'workspace/page/" + templateType + "',data:$data }--><!-- /ko --></div>");
@@ -38,4 +37,22 @@
 		}
 	};
 
+	PageManager.prototype.removeCurrentPage = function()
+	{
+		var $pageContent = $("#pageContent"), $page = $pageContent.find(".page-container"),
+			pageData;
+
+		if ($pageContent.length === 0 || $page.length === 0)
+		{
+			$pageContent.empty();
+			return;
+		}
+
+		pageData = ko.dataFor($page[0]);
+		if (pageData && pageData.dispose)
+		{
+			pageData.dispose();
+		}
+		$pageContent.empty();
+	};
 })();

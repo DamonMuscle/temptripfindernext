@@ -1,11 +1,11 @@
 ﻿<div data-bind="uiInit:init" class="document-grid page-container">
-	<div class="page-title">FIELD TRIP</div>
-	<div class="grid-icons" data-bind="css:{'is-mobile-device':isMobileDevice}">
-		<div class="iconrow" data-bind="css:{'is-mobile-device':isMobileDevice}">
-			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()},visible:!isPhoneDevice()"></div>
-			<div class="iconbutton mobile addremovecolumn" title="Show/Hide Grid Columns"></div>
-			<div class="iconbutton mobile layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
-			<div class="iconbutton mobile filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
+	<div class="page-title" data-bind="text:type"></div>
+	<div class="grid-icons">
+		<div class="iconrow">
+			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
+			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
+			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
+			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
 			<div class="divider" title=""></div>
 			<div class="iconbutton refresh" title="Refresh"></div>
 		</div>
@@ -14,7 +14,7 @@
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
 					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
-					 style="max-width: 150px;"></span>
+						  style="max-width: 150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
