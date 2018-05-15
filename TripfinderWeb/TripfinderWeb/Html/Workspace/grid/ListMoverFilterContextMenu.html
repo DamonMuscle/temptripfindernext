@@ -1,0 +1,74 @@
+﻿<div class="tf-contextmenu-wrap filtermenu-wrap phone-wrap">
+	<ul class="tf-contextmenu overFlow-Hidden">
+		<!--ko if:searchGrid.reminderMenuVisible -->
+		<li class="menu-divider"></li>
+		<li class="menu-item menu-item-quick-filter" data-bind="contextMenuClick:searchGrid.quickFilterBarClick,css:searchGrid.obQuickFilterBarCheckIcon">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Quick Filter Bar
+			</div>
+			<div class="menu-icon menu-icon-mobile">
+			</div>
+		</li>
+		<li class="menu-divider" data-bind="visible:searchGrid.reminderMenuVisible&&searchGrid.reminderMenuVisible()"><div class="rule"></div></li>
+		<li class="menu-item" data-bind="visible:searchGrid.reminderMenuVisible&&searchGrid.reminderMenuVisible(),contextMenuClick:searchGrid.setReminder.bind(searchGrid)">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="html:(searchGrid.obReminderId&&searchGrid.obReminderId()>0)?'Remove Reminder':'Set Reminder'">
+			</div>
+		</li>
+		<li class="menu-divider"><div class="rule"></div></li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearGridFilterClick.bind(searchGrid)">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Clear
+			</div>
+		</li>
+		<!--ko if:!TF.isPhoneDevice -->
+		<!--ko if:searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate -->
+		<li class="menu-divider"><div class="rule"></div></li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.options.specialFilterMenuItemTemplate.menuItemClick.bind(searchGrid)">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:searchGrid.options.specialFilterMenuItemTemplate.menuItemText">
+			</div>
+		</li>
+		<!--/ko -->
+		<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase && searchGrid.obGridFilterDataModelsFromDataBase().length > 0 -->
+		<li class="menu-divider"><div class="rule"></div></li>
+
+		<!--ko foreach:searchGrid.obGridFilterDataModelsFromDataBase -->
+		<li class="menu-item" data-bind="
+					contextMenuClick: $parent.searchGrid.gridFilterClick.bind($parent.searchGrid),
+					attr: {
+						title: ($data.isValid() ? whereClause:'Filter syntax is invalid. It cannot be applied.')
+					},
+					css: {
+						'menu-item-broken': !$data.isValid(),
+						'menu-item-checked': $data.id()==$parent.searchGrid.obSelectedGridFilterId()
+					}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:name">
+			</div>
+		</li>
+		<!--/ko -->
+		<!--/ko -->
+		<!--/ko -->
+		<li class="menu-divider"></li>
+		<!--/ko -->
+		<!--ko if:gridViewModel.obFilterCheckboxText -->
+		<li class="menu-item" data-bind="
+			contextMenuClick:gridViewModel.onEnableCheckboxClick.bind(gridViewModel),
+			css: {'menu-item-checked': gridViewModel.obShowEnabled }
+		">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:gridViewModel.obFilterCheckboxText">
+			</div>
+		</li>
+		<!--/ko -->
+	</ul>
+</div>

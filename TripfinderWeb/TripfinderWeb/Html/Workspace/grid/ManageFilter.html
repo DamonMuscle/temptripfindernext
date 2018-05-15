@@ -1,0 +1,16 @@
+﻿<div class="description tf-incress-description">
+	<pre class="titleNotify">Filters may be applied, created, edited, or deleted.  A filter may be created based on the grid quick filters.</pre>
+</div>
+<div class="row">
+	<div class="col-xs-5">
+	<!--ko if:tf.permissions.filtersAdd -->
+		<button type="button" data-bind="click:newFilterButtonClick" class="btn tf-btn-light-grey btn-sm" style="margin-bottom:6px;">New</button>
+	<!--/ko -->
+	</div>
+</div>
+<div class="row" data-bind="uiInit:$parent.containerLoaded,finish:init">
+	<div class="col-xs-24">
+		<div data-bind="" class="vertical-size-large grid-container managefiltergrid-container kendo-grid">
+		</div>
+	</div>
+</div>

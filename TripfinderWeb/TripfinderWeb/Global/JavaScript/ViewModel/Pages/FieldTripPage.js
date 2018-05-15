@@ -237,24 +237,10 @@
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridFilterName();
 		}, self);
-		self.obSelectedGridFilterName.subscribe(function(result)
-		{
-			setTimeout(function()
-			{
-				self.updateResizePanel();
-			});
-		});
 		self.obSelectedGridLayoutName = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutName();
 		}, self);
-		self.obSelectedGridLayoutName.subscribe(function(result)
-		{
-			setTimeout(function()
-			{
-				self.updateResizePanel();
-			});
-		});
 		self.obSummaryGridVisible = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSummaryGridVisible();
@@ -310,10 +296,9 @@
 			tf.contextMenuManager.showMenu(e.currentTarget, new TF.ContextMenu.TemplateContextMenu("workspace/grid/layoutcontextmenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid), function()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
-				if (self._gridMap && iconWrap.length > 0)
+				if (iconWrap.length > 0)
 				{
 					iconWrap.css("display", "block");
-					self.updateResizePanel();
 				}
 			}));
 		}
@@ -334,10 +319,9 @@
 			self.searchGrid.filterMenuClick(e, function()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
-				if (self._gridMap && iconWrap.length > 0)
+				if (iconWrap.length > 0)
 				{
 					iconWrap.css("display", "block");
-					self.updateResizePanel();
 				}
 			});
 		}

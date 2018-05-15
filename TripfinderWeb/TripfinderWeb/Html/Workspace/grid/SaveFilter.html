@@ -1,0 +1,180 @@
+<form data-bind="uiInit:initialize">
+	<div class="row" data-bind="visible:$parent.description">
+		<div class="col-xs-24 description">
+			<pre class="titleNotify" data-bind="text:$parent.description"></pre>
+		</div>
+	</div>
+	<div class="document-dataentry">
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+	</div>
+	<div class="row">
+		<div class="col-xs-10">
+			<div class="form-group" style="height:56px">
+				<label class="requirestar bold-Label">Name</label>
+				<input type="text" name="filterName" data-bv-error-name="Filter Name" maxlength="80" class="form-control" data-bind="value:gridFilterDataModel.name,valueUpdate:'keyup'"
+				/>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-10">
+			<div class="form-group">
+				<label class="bold-Label">Field</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obGridDefinitionColumns,format:function(obj){return obj.DisplayName == ' '?' ':obj.DisplayName+' ('+obj.PersistenceName+')';},drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
+						<!-- ko customInput:{type:"Select",value:obSelectedFieldText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="form-group">
+				<label class="bold-Label">Operator</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obOperatorSource,drowDownShow:true,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:selectedOperator,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group" data-bind="event:{keypress:valueKeypress}">
+				<label class="bold-Label">Value</label>
+				<div>
+					<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField"} -->
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="form-group">
+				<label class="bold-Label">Logical</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obLogicalOperatorSource,drowDownShow:true,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:selectedLogicalOperator,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group" style="height:112px">
+				<label style="display:none">Filter Statement</label>
+				<textarea class="form-control verticalResize" rows="5" name="sqlStatement" data-bind="value:gridFilterDataModel.whereClause,valueUpdate:'keyup',domReference:textAreaElement"></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-4">
+			<div class="form-group verifybutton-form-group">
+				<button type="button" data-bind="event : { mousedown : verifyClick.bind($data)},disable:gridFilterDataModel.whereClause()==''"
+				 class="btn tf-btn-light-grey btn-sm">Verify</button>
+			</div>
+		</div>
+	</div>
+	<div class="row" data-bind="visible:showApplyFilter">
+		<div class="col-xs-24">
+			<div class="form-group applycheckbox-form-group">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" data-bind="checked:obApplyOnSave">Apply filter changes upon saving
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--ko if:obOmitRecords().length > 0-->
+	<div class="row">
+		<div class="col-xs-20" style="margin-bottom:30px;width: 100%;">
+			<div>
+				<h4 class="section-title" style="display: inline-block;">
+					<strong>Records Omitted</strong> (
+					<span data-bind="text: obOmitRecords().length"></span>) </h4>
+				&nbsp;
+				<a data-bind="click:removeAllOmitRecords" class="color-system" href="#">clear all</a>
+			</div>
+			<div>
+				<div class="tab-flat pull-left omit-container">
+					<!--ko foreach:obOmitRecords()-->
+					<div class="doc-item doc-select pull-left omitRecord">
+						<div class="pull-left" style="overflow: hidden;text-overflow: ellipsis;margin-left:5px;" data-bind="html:Name"></div>
+						<button type="button" class="close" style="margin-left:10px;line-height:inherit;" data-bind="click:$root.currentBaseModalViewModel.modifyFilterViewModel.cleanOmittedRecord($data,$element)">×</button>
+					</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /ko -->
+	<!--ko if:obSetReminder()-->
+	<div style="margin-bottom:30px;">
+		<div class="row">
+			<div class="col-xs-12">
+				<h4 class="section-title">
+					<strong>
+						Reminder
+					</strong>
+				</h4>
+			</div>
+			<div class="col-xs-12">
+				<div class="pull-right">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" data-bind="checked:obReminderEnable">Enable
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24 description" style="margin-top:0 ">
+				If you would like to be alerted when you log in that there are one or more records that meet this Filter. Enable the reminder,
+				specify a Name, and select the team memebers that you would like to share this with. This is automatically available
+				to you. It will be marked as a Private Reminder if you do not share it.
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="form-group">
+					<label class="requirestar bold-Label">Name</label>
+					<input type="text" name="reminderName" data-bv-error-name="Reminder Name" maxlength="200" class="form-control" data-bind="value:obReminderDataModel().name,disable:!obReminderEnable()"
+					/>
+				</div>
+			</div>
+			<div class="col-xs-12">
+				<label class=" bold-Label">Share With</label>
+				<div class="input-group">
+					<div class="form-control" style="height: 90px;" data-bind="attr:{disabled:!obReminderEnable()},foreach:obReminderDataModel().sharedWithList().map(function(item){return item.LastName+','+item.FirstName;})">
+						<div data-bind="text:$data"></div>
+					</div>
+					<div class="input-group-btn" style="vertical-align: top;">
+						<button type="button" class="btn btn-default btn-sharp" tabindex="-1" data-bind="click:reminderSelectUser.bind($data),disable:!obReminderEnable()">
+							<span class="glyphicon glyphicon-option-horizontal"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /ko -->
+</form>

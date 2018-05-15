@@ -1,0 +1,35 @@
+﻿<div class="row">
+	<div class="col-xs-24 description">
+		You may add columns to this grid, remove them, and adjust the left-to-right display order below. To add a column, select it and move it to the Selected list box.
+		To remove a column, select it and remove it to the Available list box.
+		To adjust the grid column display order, arrange the columns from top-to-bottom in the left-to-right order you would like them to display in the grid.
+	</div>
+</div>
+<div class="row list-mover-mover" data-bind="uiInit:$parent.containerLoaded,finish:init">
+	<div class="col-xs-11">
+		<div class="form-group">
+			<label class="bold-Label">Available</label>
+			<div data-bind="" class="vertical-size-medium grid-container availablecolumngrid-container">
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-1 vertical-size-medium" style="padding: 7% 0 0 0">
+		<a data-bind="click:toAllRightClick" class="btn btn-default btn-sm">&gt;&gt;</a>
+		<a data-bind="click:toRightClick,css:{disabled:!availableRowInfo.selected()}" class="btn btn-default btn-sm single">&gt;</a>
+		<a data-bind="click:toLeftClick,css:{disabled:!selectedRowInfo.selected()}" class="btn btn-default btn-sm single">&lt;</a>
+		<a data-bind="click:toAllLeftClick" class="btn btn-default btn-sm">&lt;&lt;</a>
+	</div>
+	<div class="col-xs-11">
+		<div class="form-group">
+			<label class="bold-Label">Selected</label>
+			<div data-bind="" class="vertical-size-medium vertical-fill grid-container selectedcolumngrid-container">
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-1 vertical-size-medium" style="padding: 7% 0 0 0 ;margin-left: -10px;">
+		<a data-bind="click:toTopClick" class="btn btn-default btn-sm"><span class="rotate90">|&lt;</span></a>
+		<a data-bind="click:toUpClick,css:{disabled:selectedRowInfo.selected()?selectedRowInfo.top()<=0:true}" class="btn btn-default btn-sm"><span class="rotate90">&lt;</span></a>
+		<a data-bind="click:toDownClick,css:{disabled:selectedRowInfo.selected()?selectedRowInfo.bottom()>=selectedRowInfo.length()-1:true}" class="btn btn-default btn-sm"><span class="rotate90">&gt;</span></a>
+		<a data-bind="click:toBottomClick" class="btn btn-default btn-sm"><span class="rotate90">&gt;|</span></a>
+	</div>
+</div>
