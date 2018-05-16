@@ -699,11 +699,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-				{
-					extra: true,
-					mode: "menu row",
-					operators: TF.Grid.LightKendoGrid.DefaultOperator
-				},
+			{
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -3181,6 +3181,10 @@
 			{
 				fields = fields.concat([self.options.Id]);
 			}
+			if (self.options.extraFields && self.options.extraFields.length > 0)
+			{
+				fields = fields.concat(self.options.extraFields);
+			}
 			fields = self.bindNeedFileds(self._gridType, fields);
 			options.data.fields = fields;
 		}
@@ -4177,11 +4181,11 @@
 		{
 			tf.loadingIndicator.showImmediately();
 		}
-		var oldIds = self.obAllIds(), newIds;
+		var oldIds = self.obAllIds().slice(), newIds;
 		self._loadIdsWhenOnDataBound()
 			.then(function()
 			{
-				newIds = self.obAllIds();
+				newIds = self.obAllIds().slice();
 				if (oldIds.sort().join(',') === newIds.sort().join(','))
 				{
 					if (newIds.length === 0)
@@ -4216,13 +4220,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
+								{
+									fields: self.geoFields,
+									IdFilter:
 									{
-										fields: self.geoFields,
-										IdFilter:
-											{
-												IncludeOnly: self.allIds
-											}
+										IncludeOnly: self.allIds
 									}
+								}
 							})
 							.then(function(response)
 							{
