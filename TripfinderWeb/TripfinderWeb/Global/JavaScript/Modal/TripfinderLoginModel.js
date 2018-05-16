@@ -247,14 +247,9 @@
 
 									var flt = authorizationInfo.isAuthorizedFor("filters", "read");
 
-									var pAltSite = authorizationInfo.isAuthorizedFor("alternateSite", "read");
-									var pContractor = authorizationInfo.isAuthorizedFor("contractor", "read");
-									var pDistrict = authorizationInfo.isAuthorizedFor("district", "read");
-									var pGeoRegion = authorizationInfo.isAuthorizedFor("geoRegions", "read");
-									var pSchool = authorizationInfo.isAuthorizedFor("school", "read");
-									var pAttendance = authorizationInfo.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
+									var pfiledtrip = authorizationInfo.isAuthorizedFor("filedtrip", "read");
 
-									if (!(p1 || p2 || p3 || p4 || p5 || ft || rep || schduleRep || pAltSite || pContractor || pDistrict || pGeoRegion || pSchool || pAttendance))
+									if (!(p1 || p2 || p3 || p4 || p5 || ft || rep || schduleRep || pfiledtrip))
 									{
 										this.loginViewModel.obLoginErrorMessage('User is not authorized for any page.');
 										return;
@@ -269,6 +264,7 @@
 											//set clientKey in case to use it when get all preference
 											tf.authManager.clientKey = this.loginViewModel.obClientKey();
 											this.positiveClose(result);
+
 										} else
 										{
 											this.positiveClose(result);

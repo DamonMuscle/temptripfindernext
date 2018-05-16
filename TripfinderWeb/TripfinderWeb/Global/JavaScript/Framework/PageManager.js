@@ -11,16 +11,6 @@
 			$content, $pageContent = $("#pageContent");
 
 		self.removeCurrentPage();
-		permission = tf.authManager.isAuthorizedFor(type, "read");
-		if (!permission)
-		{
-			return tf.promiseBootbox.alert("You have no Trip Field view permission!")
-				.then(function()
-				{
-					tf.modalManager.showModal(new TF.Modal.TripfinderLoginModel());
-				});
-		}
-
 		switch (type)
 		{
 			case "fieldtrip":

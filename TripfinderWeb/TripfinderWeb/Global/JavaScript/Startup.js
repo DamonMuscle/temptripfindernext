@@ -275,22 +275,11 @@
 		var ft5 = tf.authManager.isAuthorizedFor("transportationAdministrator", "read");
 		var ft = ft1 || ft2 || ft3 || ft4 || ft5;
 
-		//var p1 = tf.authManager.isAuthorizedFor("trip", "read");
-		//var p2 = tf.authManager.isAuthorizedFor("busfinder", "read");
-		//var p3 = tf.authManager.isAuthorizedFor("staff", "read");
-		//var p4 = tf.authManager.isAuthorizedFor("vehicle", "read");
-		//var p5 = tf.authManager.isAuthorizedFor("student", "read");
 		var fltRead = tf.authManager.isAuthorizedFor("filters", "read");
 		var fltAdd = tf.authManager.isAuthorizedFor("filters", "add");
 		var fltEdit = tf.authManager.isAuthorizedFor("filters", "edit");
 		var fltDelete = tf.authManager.isAuthorizedFor("filters", "delete");
-		//var pAltSite = tf.authManager.isAuthorizedFor("alternateSite", "read");
-		//var pContractor = tf.authManager.isAuthorizedFor("contractor", "read");
-		//var pDistrict = tf.authManager.isAuthorizedFor("district", "read");
-		//var pGeoRegion = tf.authManager.isAuthorizedFor("geoRegions", "read");
-		//var pSchool = tf.authManager.isAuthorizedFor("school", "read");
-		//var busfinder = self.isBusfinder && p2;
-		//var pAttendance = tf.authManager.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
+
 		var pAdmin = tf.authManager.authorizationInfo.isAdmin;
 
 		if (!tf.permissions)

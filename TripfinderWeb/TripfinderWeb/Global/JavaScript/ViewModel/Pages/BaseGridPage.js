@@ -241,6 +241,16 @@
 		}
 	};
 
+	BaseGridPage.prototype.updateResizePanel = function()
+	{
+		var self = this, resizeablePanel;
+		if (self._gridMap)
+		{
+			resizeablePanel = self._gridMap.resizeablePanel;
+			resizeablePanel._setMapPanelWidth(resizeablePanel._rightPanel.css("display") === "none" ? "hide" : resizeablePanel._getInitPanelWidth());
+		}
+	};
+
 	BaseGridPage.prototype.onDataBound = function(option)
 	{
 		var self = this;
