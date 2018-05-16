@@ -67,57 +67,8 @@
 		var result = null;
 		switch (gridType)
 		{
-			case 'altsite':
-			case 'alternatesite':
-				result = tf.altsiteGridDefinition.gridDefinition();
-				break;
-			case 'contractor':
-				result = tf.contractorGridDefinition.gridDefinition();
-				break;
-			case 'district':
-				result = tf.districtGridDefinition.gridDefinition();
-				break;
 			case 'fieldtrip':
 				result = tf.fieldTripGridDefinition.gridDefinition();
-				break;
-			case 'vehicle':
-			case 'Vehicle':
-				result = tf.vehicleGridDefinition.gridDefinition();
-				break;
-			case 'school':
-				result = tf.schoolGridDefinition.gridDefinition();
-				break;
-			case 'trip':
-				result = tf.tripGridDefinition.gridDefinition();
-				break;
-			case 'georegion':
-				result = tf.georegionGridDefinition.gridDefinition();
-				break;
-			case 'student':
-				result = tf.studentGridDefinition.gridDefinition();
-				break;
-			case 'staff':
-			case 'Driver':
-				result = tf.staffGridDefinition.gridDefinition();
-				break;
-			case 'tripstop':
-			case 'TripStop':
-				result = tf.tripStopGridDefinition.gridDefinition();
-				break;
-			case 'equipment':
-				result = tf.equipmentGridDefinition.gridDefinition();
-				break;
-			case 'stopStudent':
-				result = tf.studentGridDefinition.gridDefinition();
-				break;
-			case 'ethnic_codes':
-				result = tf.ethnicGridDefinition.gridDefinition();
-				break;
-			case 'disability_codes':
-				result = tf.disabilityGridDefinition.gridDefinition();
-				break;
-			case 'busfinderhistorical':
-				result = tf.busfinderHistoricalGridDifinition.gridDefinition();
 				break;
 			default:
 		}

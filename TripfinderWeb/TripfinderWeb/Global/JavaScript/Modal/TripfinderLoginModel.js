@@ -225,13 +225,6 @@
 										return;
 									}
 
-									var rep = authorizationInfo.isAuthorizedFor("reports", "read");
-									var rep1 = authorizationInfo.isAuthorizedFor("reports", "add");
-									var rep2 = authorizationInfo.isAuthorizedFor("reports", "edit");
-									var rep3 = authorizationInfo.isAuthorizedFor("reports", "delete");
-
-									var schduleRep = authorizationInfo.isAuthorizedFor("scheduleReport", "read");
-
 									var ft1 = authorizationInfo.isAuthorizedFor("level1Requestor", "read");
 									var ft2 = authorizationInfo.isAuthorizedFor("level2Administrator", "read");
 									var ft3 = authorizationInfo.isAuthorizedFor("level3Administrator", "read");
@@ -249,7 +242,7 @@
 
 									var pfiledtrip = authorizationInfo.isAuthorizedFor("filedtrip", "read");
 
-									if (!(p1 || p2 || p3 || p4 || p5 || ft || rep || schduleRep || pfiledtrip))
+									if (!(p1 || p2 || p3 || p4 || p5 || ft || pfiledtrip))
 									{
 										this.loginViewModel.obLoginErrorMessage('User is not authorized for any page.');
 										return;
