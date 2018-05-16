@@ -47,19 +47,19 @@
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
-						tf.authManager.logOffTag = true;
-						location.reload();
-					})
+						tf.pageManager.logOff();
+					});
+				return;
 			}
 			if (!(auth && auth.noInterupt) && !!xmlHttpRequest.responseText && JSON.parse(xmlHttpRequest.responseText).Message === "Invalid Token")
 			{
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
-						tf.authManager.logOffTag = true;
 						tf.storageManager.save("token", "", true);
-						location.reload();
-					})
+						tf.pageManager.logOff();
+					});
+				return;
 			}
 			if (externalPointer)
 			{

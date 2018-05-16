@@ -55,4 +55,11 @@
 		}
 		$pageContent.empty();
 	};
+
+	PageManager.prototype.logOff = function()
+	{
+		var self = this;
+		self.removeCurrentPage();
+		tf.modalManager.showModal(new TF.Modal.TripfinderLoginModel());
+	}
 })();

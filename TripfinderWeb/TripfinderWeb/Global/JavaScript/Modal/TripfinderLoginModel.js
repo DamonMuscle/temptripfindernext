@@ -269,67 +269,6 @@
 											//set clientKey in case to use it when get all preference
 											tf.authManager.clientKey = this.loginViewModel.obClientKey();
 											this.positiveClose(result);
-
-											//tf.datasourceManager.validateAllDBs({
-											//	auth: {
-											//		noInterupt: true,
-											//		username: this.loginViewModel.obUsername(),
-											//		password: this.loginViewModel.obPassword()
-											//	}
-											//})
-											//	.then(function(valResult)
-											//	{
-											//		if (valResult.Items[0].AnyDBPass)
-											//		{
-											//			not all db connection failed
-											//			if (this.loginViewModel.obClientKey() !== "support")
-											//			{
-											//				tf.promiseAjax.get(pathCombine(tf.api.server(), this.loginViewModel.obClientKey(), "clientconfig", "timezonetotalminutes"), {}, {
-											//					auth: {
-											//						noInterupt: true,
-											//						username: this.loginViewModel.obUsername(),
-											//						password: this.loginViewModel.obPassword(),
-											//						token: tf.storageManager.get("token", true)
-											//					}
-											//				}).then(function(apiResponse)
-											//				{
-											//					moment().constructor.prototype.currentTimeZoneTime = function()
-											//					{
-											//						var now = moment().utcOffset(apiResponse.Items[0]);
-											//						return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
-
-											//					};
-											//				}.bind(this)).then(function()
-											//				{
-											//					if (valResult.Items[0].DBlength == 1)
-											//					{
-											//						tf.storageManager.save("databaseType", valResult.Items[0].DBType);
-											//						tf.storageManager.save("datasourceId", valResult.Items[0].DBId);
-											//						tf.storageManager.save("databaseName", valResult.Items[0].DBName);
-											//					}
-											//					this.positiveClose(result);
-
-											//				}.bind(this));
-											//			} else
-											//			{
-											//				this.positiveClose(result);
-											//			}
-											//		}
-											//		else
-											//		{//all db connection failed
-											//			var message = "";
-											//			if (valResult.Items[0].DBlength == 1)
-											//			{
-											//				message = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-											//			}
-											//			else
-											//			{
-											//				message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-											//			}
-											//			this.loginViewModel.obLoginErrorMessage(message);
-											//			return;
-											//		}
-											//	}.bind(this));
 										} else
 										{
 											this.positiveClose(result);
