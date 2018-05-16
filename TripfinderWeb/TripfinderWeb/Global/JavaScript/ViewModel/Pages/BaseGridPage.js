@@ -14,16 +14,12 @@
 		self.requestResumeEvent = new TF.Events.Event();
 		self.releaseHoldEvent = new TF.Events.Event();
 		self.enableRefreshEvent = new TF.Events.Event();
-		self.obEmail = ko.observable(true);
 		self.obNewGrids = ko.observable(true);
-		self.obReportLists = ko.observable(false);
 		self.obNoRecordsSelected = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
-		self.sendEmailClick = self.sendEmailClick.bind(self);
-		self.sendToClick = self.sendToClick.bind(self);
 	}
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
@@ -83,14 +79,6 @@
 	};
 
 	BaseGridPage.prototype.saveAsClick = function()
-	{
-	};
-
-	BaseGridPage.prototype.sendEmailClick = function()
-	{
-	};
-
-	BaseGridPage.prototype.sendToClick = function()
 	{
 	};
 
