@@ -596,45 +596,21 @@
 				// rebuildGrid is a promise method
 			});
 		}
-		if (TF.isPhoneDevice)
-		{
-			var cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e);
-			var cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
-
-			if (cacheOperatorBeforeHiddenMenu)
-			{
-				TF.menuHelper.hiddenMenu();
-			}
-
-			if (cacheOperatorBeforeOpenMenu)
-			{
-				tf.contextMenuManager.showMenu(e.target, new TF.ContextMenu.TemplateContextMenu("workspace/grid/EditKendoColumnForMobile",
-					new TF.Modal.Grid.EditKendoColumnModalViewModelForMobile(
-						this._availableColumns,
-						this._obSelectedColumns(),
-						this._defaultGridLayoutExtendedEntity.LayoutColumns,
-						changeColumn
-					)));
-			}
-		}
-		else
-		{
-			tf.modalManager.showModal(
-				new TF.Modal.Grid.EditKendoColumnModalViewModel(
-					this._availableColumns,
-					this._obSelectedColumns(),
-					this._defaultGridLayoutExtendedEntity.LayoutColumns
-				)
+		tf.modalManager.showModal(
+			new TF.Modal.Grid.EditKendoColumnModalViewModel(
+				this._availableColumns,
+				this._obSelectedColumns(),
+				this._defaultGridLayoutExtendedEntity.LayoutColumns
 			)
-				.then(function(editColumnViewModel)
+		)
+			.then(function(editColumnViewModel)
+			{
+				if (!editColumnViewModel)
 				{
-					if (!editColumnViewModel)
-					{
-						return;
-					}
-					changeColumn(editColumnViewModel);
-				}.bind(this));
-		}
+					return;
+				}
+				changeColumn(editColumnViewModel);
+			}.bind(this));
 	};
 
 	KendoGrid.prototype.raiseGridStateChange = function()

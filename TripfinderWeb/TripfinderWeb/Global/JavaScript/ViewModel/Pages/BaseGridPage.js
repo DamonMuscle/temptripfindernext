@@ -173,8 +173,7 @@
 	BaseGridPage.prototype.bindEvent = function(buttonSelector, bindEvent)
 	{
 		var self = this;
-		event = TF.isMobileDevice ? "touchstart" : "click";
-		self.$element.find(buttonSelector).on(event, function(e)
+		self.$element.find(buttonSelector).on("click", function(e)
 		{
 			bindEvent.call(self, self, e);
 		});

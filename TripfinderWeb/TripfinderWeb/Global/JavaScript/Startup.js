@@ -201,7 +201,7 @@
 								return tf.promiseBootbox.yesNo({
 									message: message,
 									title: "Data Source Not Available",
-									className: TF.isPhoneDevice ? "unsave-mobile" : null,
+									className: null,
 									buttons: {
 										yes: {
 											label: "Choose Data Source",

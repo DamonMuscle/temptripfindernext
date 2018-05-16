@@ -1,6 +1,5 @@
 @import 'z-index';
 @summaryGridHeight: 83px;
-@summaryGridMobileHeight: 65px;
 
 .sort-bar {
 	height: 25px;
@@ -118,17 +117,6 @@
 		height: 20px;
 		margin: 1px 3px;
 		float: left;
-	}
-}
-
-.k-mobile {
-	//set iconbutton ease to click on tablet
-	@media (max-width: 1024px) and (min-width: 768px) {
-		.document-grid .iconrow .iconbutton {
-			width: 24px;
-			height: 24px;
-			margin-right: 2px;
-		}
 	}
 }
 
@@ -1523,24 +1511,6 @@
 	border: none;
 }
 
-.k-mobile {
-	.kendo-summarygrid-container {
-		.k-grid-content {
-			min-height: @summaryGridMobileHeight;
-		}
-	}
-
-	.kendo-grid.summarybar-showing {
-		.k-pager-wrap {
-			bottom: -65px;
-		}
-
-		table {
-			padding-right: 0px;
-		}
-	}
-}
-
 .kendo-summarygrid-container {
 	border-top-width: 2px;
 	margin-top: -35px;
@@ -2032,21 +2002,6 @@
 	width: auto;
 }
 
-a.tf-grid-mobile-inner-link {
-	color: black;
-	text-decoration: none;
-	outline: none;
-	display: block;
-	height: 33px;
-	line-height: 33px;
-	width: 100%;
-	padding: 0 .6em;
-
-	&.link:hover {
-		color: black;
-	}
-}
-
 .kendo-grid {
 	.eyecolumn {
 		cursor: pointer;
@@ -2063,68 +2018,6 @@ a.tf-grid-mobile-inner-link {
 
 		&:checked:before {
 			content: "\e105";
-		}
-	}
-}
-
-@tf-mobile-grid-lockbar-color: #d5d5d5;
-@tf-mobile-grid-lockbar-hot-zone-width: 40px;
-@tf-mobile-grid-lockbar-thick-width: 4px;
-
-.tf-mobile-grid-lockbar {
-	position: absolute;
-	top: 0;
-	width: @tf-mobile-grid-lockbar-hot-zone-width;
-	background-color: transparent;
-	margin-left: (@tf-mobile-grid-lockbar-hot-zone-width - 20)/-2px;
-
-	&.clone {
-		width: @locked-content-right-border-width;
-		background-color: @tf-mobile-grid-lockbar-color;
-	}
-
-	&.move {
-		@thick-with-start: (@tf-mobile-grid-lockbar-hot-zone-width - @tf-mobile-grid-lockbar-thick-width) / 2;
-		@thick-with-end: ((@tf-mobile-grid-lockbar-hot-zone-width - @tf-mobile-grid-lockbar-thick-width) / 2)+@tf-mobile-grid-lockbar-thick-width;
-		background: linear-gradient( to right, transparent 0, transparent @thick-with-start, @tf-mobile-grid-lockbar-color @thick-with-start, @tf-mobile-grid-lockbar-color @thick-with-end, transparent @thick-with-end, transparent 100%);
-	}
-}
-
-.tf-mobile-virtual-grid-lockbar-gray {
-	width: 30px;
-	background-color: #f5f5f5;
-	position: absolute;
-	margin-left: (@tf-mobile-grid-lockbar-hot-zone-width - 18)/-2px;
-	border-color: #d5d5d5;
-	border-style: solid;
-	border-width: 0 1px 0 0;
-}
-
-.tf-mobile-virtual-grid-lockbar-white {
-	width: 95px;
-	left: 20px;
-	background-color: white;
-	position: absolute;
-	border-width: 0 0 0 0;
-}
-
-@locked-content-right-border-width: 2px;
-
-.tf-mobile-grid-column-loced-corver {
-	position: absolute;
-	top: 0;
-	background-color: grey;
-	opacity: .1;
-	border-right-width: @locked-content-right-border-width;
-	border-right-style: solid;
-}
-
-@media only screen and (max-width: 1024px) {
-	.k-mobile .kendo-grid {
-		.k-grid-content.overflow-hidden,
-		.k-grid-content.overflow-hidden .k-virtual-scrollable-wrap,
-		&.kendo-summarygrid-container .k-grid-content {
-			overflow: hidden;
 		}
 	}
 }
@@ -2770,14 +2663,6 @@ form.k-filter-menu {
 	padding-left: 2px;
 }
 
-.tf-contextmenu .menu-item .menu-icon.iconbutton.summarybarMobile {
-	background-image: url('../../global/img/grid/summary.png');
-
-	&.open {
-		background-image: url('../../global/img/grid/summaryBarOpen-purple.png');
-	}
-}
-
 .tf-contextmenu .menu-item .menu-icon.iconbutton.viewReport,
 .iconbutton.viewReport {
 	background-image: url('../../global/img/grid/ViewReport-Black.png');
@@ -2873,16 +2758,6 @@ form.k-filter-menu {
 	top: 0;
 }
 
-a.link.is-mobile,
-a.link.is-mobile:hover {
-	color: #2e2e2e;
-	text-decoration: none;
-}
-
-.menu-icon-mobile {
-	display: none;
-}
-
 .tf-contextmenu .menu-item.menu-item-quick-filter .menu-label:not(:last-child)::after {
 	display: none;
 }
@@ -2973,14 +2848,6 @@ a.link.is-mobile:hover {
 	border-bottom: none;
 }
 
-.border-top-for-gps-mobile-item-wrapper {
-	border-top: 1px solid #d9d9d9;
-}
-
-.mobile-modal-grid-modal .last-item-has-bottom-border.mobile-modal-grid-select-option:last-child {
-	border-bottom: 1px solid #d9d9d9;
-}
-
 .retry {
 	background-image: url('../../global/img/icons/retry.png');
 	background-repeat: no-repeat;
@@ -2988,10 +2855,6 @@ a.link.is-mobile:hover {
 	width: 22px;
 	opacity: 0.8;
 	margin: 15px -2px 0 3px;
-}
-
-.mobile-button-text-center {
-	text-align: center;
 }
 
 .list-mover-icon-container .iconrow .iconbutton {
