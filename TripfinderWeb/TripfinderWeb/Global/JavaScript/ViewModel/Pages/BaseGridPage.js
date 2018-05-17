@@ -74,6 +74,12 @@
 		self.searchGridInited(true);
 	};
 
+	BaseGridPage.prototype.logout = function()
+	{
+		tf.storageManager.save("token", "", true);
+		tf.pageManager.logOff();
+	};
+
 	BaseGridPage.prototype.copyToClipboardClick = function()
 	{
 	};
