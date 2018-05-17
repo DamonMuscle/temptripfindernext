@@ -49,7 +49,14 @@
 	PageManager.prototype.logOff = function()
 	{
 		var self = this;
-		self.removeCurrentPage();
-		tf.modalManager.showModal(new TF.Modal.TripfinderLoginModel());
+		tf.storageManager.save("token", "", true);
+		location.reload();
+		var rememberMe = tf.storageManager.get("rememberMe", true) || false;
+		if (!rememberMe)
+		{
+			tf.storageManager.save("clientKey", "", true);
+			tf.storageManager.save("userName", "", true);
+			tf.storageManager.save("password", "", true);
+		}
 	}
 })();

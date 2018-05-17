@@ -76,7 +76,6 @@
 
 	BaseGridPage.prototype.logout = function()
 	{
-		tf.storageManager.save("token", "", true);
 		tf.pageManager.logOff();
 	};
 

@@ -56,7 +56,6 @@
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
-						tf.storageManager.save("token", "", true);
 						tf.pageManager.logOff();
 					});
 				return;
