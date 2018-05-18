@@ -1,1 +1,1 @@
-grunt jshint > view-finder-jshint-result.txt
+grunt jshint > trip-finder-jshint-result.txt
