@@ -1,0 +1,55 @@
+html.k-mobile {
+	min-height: auto;
+}
+
+.k-mobile {
+	body, html {
+		min-width: auto;
+		min-height: auto;
+	}
+
+	.page-container .main-body .page-container .grid-wrap {
+		width: 100%;
+		float: left;
+		height: calc(~"100% - 130px");
+	}
+
+	.mobile-header {
+		height: 44px;
+		background-color: #262626;
+
+		.icon {
+			background-position: center;
+			background-repeat: no-repeat;
+
+			&.logo {
+				background-image: url("../img/menu/tripfinderlogo.svg");
+				height: 37px;
+				width: 82px;
+				float: left;
+				margin-top: 3px;
+				margin-left: 15px;
+			}
+
+			&.float-right {
+				float: right;
+				height: 44px;
+				width: 48px;
+				background-color: #333333;
+
+				&.menu {
+					background-image: url("../img/menu/hamburger.svg");
+					margin-left: 1px;
+				}
+
+				&.add {
+					background-image: url("../img/menu/add.svg");
+				}
+			}
+		}
+	}
+
+	.tf-mobile-grid-lockbar {
+		display: none;
+	}
+}

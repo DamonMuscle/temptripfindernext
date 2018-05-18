@@ -2,7 +2,12 @@
 {
 	createNamespace("TF.Page").PageManager = PageManager;
 
-	function PageManager() { }
+	function PageManager()
+	{
+		var self = this;
+		self.obContextMenuVisible = ko.observable(false);
+		self.initContextMenuEvent();
+	}
 
 	PageManager.prototype.openNewPage = function(type)
 	{
@@ -58,5 +63,48 @@
 			tf.storageManager.save("userName", "", true);
 			tf.storageManager.save("password", "", true);
 		}
-	}
+	};
+
+	PageManager.prototype.showContextMenu = function(model, event)
+	{
+		setTimeout((function()
+		{
+			this.obContextMenuVisible(true);
+		}).bind(this), 0);
+	};
+
+	PageManager.prototype.initContextMenuEvent = function()
+	{
+		var clickHideContextMenu = (function(evt)
+		{
+			var $target = $(evt.target);
+			if ((($target.closest(".tf-contextmenu-wrap").length === 0 && !$target.hasClass("tf-contextmenu-wrap")) ||
+				$target.hasClass("contextmenu-overlay")) && (!$target.hasClass("mobile") || $target.hasClass("addremovecolumn")))
+			{
+				tf.contextMenuManager.dispose();
+				this.obContextMenuVisible(false);
+			}
+		}).bind(this);
+
+		// when the context menu is open, listen for clicks outside of
+		// the menu. When the click occurs, remove the listener and
+		// close the context menu.
+		this.obContextMenuVisible.subscribe(function(newValue)
+		{
+			var event = TF.isMobileDevice ? "touchstart" : "click";
+			if (newValue)
+			{
+				$(window).off(event + '.contextmenu');
+				//use timeout to prevent close contextmenu on ipad , after open on touchstart this close event will occur immeditatly
+				setTimeout(function()
+				{
+					$(window).on(event + '.contextmenu', clickHideContextMenu);
+				}, 100);
+			}
+			else
+			{
+				$(window).off(event + '.contextmenu', clickHideContextMenu);
+			}
+		});
+	};
 })();

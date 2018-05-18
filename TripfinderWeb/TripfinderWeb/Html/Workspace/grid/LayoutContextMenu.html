@@ -37,6 +37,21 @@
 			<div class="rule"></div>
 		</li>
 		<!--/ko -->
+		<!--ko if:TF.isPhoneDevice -->
+		<div class="special-item-container">
+			<!--ko foreach:searchGrid.obContextMenuDisplayGridLayoutExtendedDataModels -->
+			<li class="menu-item" data-bind="
+				contextMenuClick:$parent.searchGrid.gridLayoutClick.bind($parent.searchGrid),
+				attr: { title: description },
+				css:{'menu-item-checked':$data.name()==$parent.searchGrid.obSelectedGridLayoutName()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label" data-bind="text:name">
+				</div>
+			</li>
+			<!--/ko -->
+		</div>
+		<!--/ko -->
 		<!--ko if:!TF.isPhoneDevice -->
 		<!--ko foreach:searchGrid.obContextMenuDisplayGridLayoutExtendedDataModels -->
 		<li class="menu-item" data-bind="

@@ -55,6 +55,89 @@
 			</div>
 		</li>
 
+
+		<!--ko if:TF.isPhoneDevice -->
+		<!--ko if:
+			(searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate) ||
+			(searchGrid.obGridFilterDataModelsFromDataBase().length > 0) ||
+			(searchGrid.obGridFilterDataModelsFormDashBoard().length > 0)||
+			(searchGrid.obGridFilterDataModelsFromRelatedFilter().length > 0)
+		-->
+		<!--/ko -->
+		<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase().length > 0 -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+		<div class="special-item-container">
+			<!--ko if:searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate -->
+			<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase().length == 0 -->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!--/ko -->
+			<li class="menu-item" data-bind="contextMenuClick:searchGrid.options.specialFilterMenuItemTemplate.menuItemClick.bind(searchGrid)">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label" data-bind="text:searchGrid.options.specialFilterMenuItemTemplate.menuItemText">
+				</div>
+			</li>
+			<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase().length > 0 -->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!--/ko -->
+			<!--/ko -->
+			<!--ko foreach:searchGrid.obGridFilterDataModelsFromRelatedFilter -->
+			<li class="menu-item" data-bind="
+					contextMenuClick: $parent.searchGrid.gridFilterClick.bind($parent.searchGrid),
+					attr: {
+						title: ($data.isValid() ? whereClause:'Filter syntax is invalid. It cannot be applied.')
+					},
+					css: {
+						'menu-item-broken': !$data.isValid(),
+						'menu-item-checked': $data.id()==$parent.searchGrid.obSelectedGridFilterId()
+					}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label" data-bind="text:name">
+				</div>
+			</li>
+			<!--/ko -->
+			<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase().length > 0 -->
+			<!--ko foreach:searchGrid.obGridFilterDataModelsFromDataBase -->
+			<li class="menu-item" data-bind="
+					contextMenuClick: $parent.searchGrid.gridFilterClick.bind($parent.searchGrid),
+					attr: {
+						title: ($data.isValid() ? whereClause:'Filter syntax is invalid. It cannot be applied.')
+					},
+					css: {
+						'menu-item-broken': !$data.isValid(),
+						'menu-item-checked': $data.id()==$parent.searchGrid.obSelectedGridFilterId()
+					}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label" data-bind="text:name">
+				</div>
+			</li>
+			<!--/ko -->
+			<!--/ko -->
+			<!--ko if:searchGrid.obGridFilterDataModelsFormDashBoard().length > 0 -->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!--ko foreach:searchGrid.obGridFilterDataModelsFormDashBoard -->
+			<li class="menu-item dashboad" data-bind="contextMenuClick:$parent.searchGrid.gridFilterClick.bind($parent.searchGrid),attr: { title: 'Filter is a Dashboard Drill Down. It cannot be modified.' },css:{'menu-item-checked':$data.id()==$parent.searchGrid.obSelectedGridFilterId()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label" data-bind="text:name">
+				</div>
+			</li>
+			<!--/ko -->
+			<!--/ko -->
+
+		</div>
+		<!--/ko -->
 		<!--ko if:!TF.isPhoneDevice -->
 		<!--ko if:searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate -->
 		<li class="menu-divider">

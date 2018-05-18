@@ -201,6 +201,7 @@
 
 		if (cacheOperatorBeforeOpenMenu)
 		{
+			tf.pageManager.showContextMenu(e.currentTarget);
 			tf.contextMenuManager.showMenu(e.currentTarget, new TF.ContextMenu.TemplateContextMenu("workspace/grid/layoutcontextmenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid), function()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
@@ -223,6 +224,7 @@
 
 		if (cacheOperatorBeforeOpenMenu)
 		{
+			tf.pageManager.showContextMenu(e.currentTarge);
 			self.searchGrid.filterMenuClick(e, function()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");

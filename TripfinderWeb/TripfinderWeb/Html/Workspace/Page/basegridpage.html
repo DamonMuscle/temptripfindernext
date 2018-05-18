@@ -1,5 +1,11 @@
 ﻿<div data-bind="uiInit:init" class="document-grid page-container">
-	<div style="position: absolute;right: 10px;top: 5px;cursor:pointer" data-bind="click:logout">Log out</div>
+	<!-- ko if:TF.isPhoneDevice-->
+	<div class="mobile-header">
+		<div class="icon logo"></div>
+		<div class="icon float-right menu"></div>
+		<div class="icon float-right add"></div>
+	</div>
+	<!-- /ko -->
 	<div class="page-title" data-bind="text:getTitleByType(type)"></div>
 	<div class="grid-icons">
 		<div class="iconrow">

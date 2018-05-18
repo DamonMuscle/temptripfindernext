@@ -20,11 +20,13 @@
 				{
 					valueAccessor().call(this, viewModel, e);
 
-					// if (cancelCloseMenuEvent($element))
-					if (!($element.hasClass("disable-auto-close") && TF.isPhoneDevice))
-					{
-						$element.trigger("contextMenuClose");
-					}
+					//Fix the context menu issue for now, maybe the context menu will be changed later.
+					//if (!($element.hasClass("disable-auto-close") && TF.isPhoneDevice))
+					//{
+
+					tf.contextMenuManager.dispose();
+					//$element.trigger("contextMenuClose");
+					//}
 				}
 			});
 

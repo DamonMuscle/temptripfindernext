@@ -26,19 +26,6 @@
 			this.setMenuMaxHeight(this.$menuContainer);
 			this.setMenuPosition(this.$menuContainer, this.target);
 
-			var mobileHelper = TF.ContextMenuMobileHelper;
-			if (TF.isPhoneDevice)
-			{
-				var specialMenuClass = mobileHelper.getSpecialMenuClass(this.$menuContainer);
-				if (specialMenuClass)
-				{
-					mobileHelper.setMenuHeightForPhoneDevice(this.$menuContainer, specialMenuClass);
-					mobileHelper.setMenuLeftForPhoneDevice(this.$menuContainer);
-					mobileHelper.setMenuTopForPhoneDevice(this.$menuContainer);
-					this._$container.off("mouseout");
-					this._$container.off("mouseover");
-				}
-			}
 			if (this.menuViewModel.afterRender)
 			{
 				this.menuViewModel.afterRender();

@@ -177,6 +177,7 @@
 	{
 		this.disposed = true;
 		clearTimeout(this._timer);
+		tf.pageManager.obContextMenuVisible(false);
 		this._$container.remove();
 		this._target.removeClass("contextmenu-open");
 		$(window).off("resize.contextmenu");
