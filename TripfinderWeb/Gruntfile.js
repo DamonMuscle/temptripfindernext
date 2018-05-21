@@ -9,7 +9,8 @@ module.exports = function(grunt)
 				files: [{
 					dot: true,
 					src: [
-						'build/{,*/}*'
+						'build/{,*/}*',
+						'!build/local_settings.js'
 					]
 				}]
 			},

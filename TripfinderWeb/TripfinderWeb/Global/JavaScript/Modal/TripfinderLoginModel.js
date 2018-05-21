@@ -233,17 +233,11 @@
 									var ft5 = authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
 									var ft = ft1 || ft2 || ft3 || ft4 || ft5;
 
-									var p1 = authorizationInfo.isAuthorizedFor("trip", "read");
-									var p2 = authorizationInfo.isAuthorizedFor("busfinder", "read");
-									var p3 = authorizationInfo.isAuthorizedFor("staff", "read");
-									var p4 = authorizationInfo.isAuthorizedFor("vehicle", "read");
-									var p5 = authorizationInfo.isAuthorizedFor("student", "read");
-
 									var flt = authorizationInfo.isAuthorizedFor("filters", "read");
 
 									var pfiledtrip = authorizationInfo.isAuthorizedFor("filedtrip", "read");
 
-									if (!(p1 || p2 || p3 || p4 || p5 || ft || pfiledtrip))
+									if (!(ft || pfiledtrip))
 									{
 										this.loginViewModel.obLoginErrorMessage('User is not authorized for any page.');
 										return;
