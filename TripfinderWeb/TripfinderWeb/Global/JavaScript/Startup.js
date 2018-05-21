@@ -198,7 +198,7 @@
 								tf.loadingIndicator.tryHide();
 								// cannot validate the connections string
 								var databaseName = tf.storageManager.get("databaseName"),
-									message = (databaseName && databaseName.length > 0 ? "[" + tf.storageManager.get("databaseName") + "]" : "Current Datasource") + " is not available. Viewfinder cannot be used without a data source. Would you like to choose a different data source?";
+									message = (databaseName && databaseName.length > 0 ? "[" + tf.storageManager.get("databaseName") + "]" : "Current Datasource") + " is not available. Tripfinder cannot be used without a data source. Would you like to choose a different data source?";
 								return tf.promiseBootbox.yesNo({
 									message: message,
 									title: "Data Source Not Available",
@@ -339,5 +339,14 @@
 			resGetPath: 'localization/en-US.json',
 			useCookie: false
 		}));
+	};
+
+	tf.DBNeedToRebuildAlert = function(datasourceName)
+	{
+		return tf.promiseBootbox.alert("This Data Source (" + datasourceName + ") needs to be rebuilt before it can be opened in Tripfinder. To rebuild this Data Source, open it in Routefinder Pro.", "Alert")
+			.then(function()
+			{
+				return Promise.resolve(false);
+			});
 	};
 })();
