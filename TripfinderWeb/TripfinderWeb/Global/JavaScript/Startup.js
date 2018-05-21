@@ -248,7 +248,10 @@
 							{
 								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 								self.changePermissions();
-								tf.pageManager.initNavgationBar();
+								if (!TF.isSafari && !TF.isMobileDevice && !TF.isPhoneDevice)
+								{
+									tf.pageManager.initNavgationBar();
+								}
 								tf.pageManager.openNewPage("fieldtrip");
 								return true;
 							}

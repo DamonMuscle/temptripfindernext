@@ -11,6 +11,8 @@
 		self.currentDatabaseName = ko.observable();
 		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
 		self.initContextMenuEvent();
+
+		self.resizeablePanel = new TF.ViewieControl.ResizeablePanel();
 	}
 
 	PageManager.prototype.initNavgationBar = function()
@@ -49,6 +51,13 @@
 			contentTemplate: 'workspace/page/' + templateType,
 			data: pageData
 		}]);
+
+		if (TF.isPhoneDevice)
+		{
+			$(".page-container").css("width", "100%");
+			self.resizeablePanel._setGridPanelWidth();
+		}
+
 	};
 
 	PageManager.prototype.removeCurrentPage = function()
