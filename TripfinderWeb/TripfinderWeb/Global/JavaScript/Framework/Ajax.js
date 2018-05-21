@@ -17,7 +17,6 @@
 			{
 				this.loadingIndicator.setSubtitle(settings.loadingSubtitle);
 				this.loadingIndicator.show();
-				//console.log("ajax +1");
 			}
 			if (externalPointer)
 			{
@@ -30,7 +29,6 @@
 			if (overlay == true)
 			{
 				this.loadingIndicator.tryHide();
-				//console.log("ajax -1");
 			}
 			if (externalPointer)
 			{
@@ -144,9 +142,6 @@
 				url: url,
 				dataType: 'json',
 				contentType: 'application/json; charset=utf-8',
-				//headers: {
-				//	'Authorization': authHeader.join(";")
-				//},
 				cache: false,
 				traditional: false,
 				loadingSubtitle: "Loading"

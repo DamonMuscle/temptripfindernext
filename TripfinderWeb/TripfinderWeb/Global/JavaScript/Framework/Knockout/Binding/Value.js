@@ -33,15 +33,6 @@
 					}
 				}
 			});
-			//.on("keyup", function(event)
-			//{
-			//	if (this.value === "")
-			//	{
-			//		return;
-			//	}
-			//	if (parseInt(this.value) < 1 || parseInt(this.value) > 31)
-			//		this.value = this.value.substring(0, this.value.length - 1);
-			//});
 		}
 	};
 })();

@@ -26,37 +26,25 @@
 			settings = {};
 		}
 
-		//return new Promise(function(resolve, reject)
-		//{
-		//settings.success = function()
-		//{
-		//	resolve.apply(this, arguments);
-		//}
-		//settings.error = function()
-		//{
-		//	reject.apply(this, arguments);
-		//}
-		//tf.ajax[httpVerb](url, settings, option);
-		//});
 		var self = this;
 		return (new Promise(function(resolve, reject)
 		{
 			Promise.resolve(self.ajax[httpVerb](url, settings, option))
-			.then(function(arg)
-			{
-				resolve(arg);
-			})
-			.catch(function(arg)
-			{
-				if (arg.responseJSON && arg.status == 401 && !(option && option.auth && option.auth.noInterupt))
+				.then(function(arg)
 				{
-					return;
-				}
-				reject(arg.responseJSON);
-			})
+					resolve(arg);
+				})
+				.catch(function(arg)
+				{
+					if (arg.responseJSON && arg.status == 401 && !(option && option.auth && option.auth.noInterupt))
+					{
+						return;
+					}
+					reject(arg.responseJSON);
+				})
 
 		}))
-		.then(this.ajaxSettings.onResolve,
+			.then(this.ajaxSettings.onResolve,
 			this.ajaxSettings.onReject);
 	}
 

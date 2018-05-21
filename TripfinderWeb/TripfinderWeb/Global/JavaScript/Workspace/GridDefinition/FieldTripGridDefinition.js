@@ -63,12 +63,6 @@
 					DisplayName: "Return Date",
 					Width: '160px',
 					type: "date",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.EstimatedReturnDateTime).format("MM/DD/YYYY");
-					// }
 				},
 				{
 					FieldName: "FieldTripContact",
@@ -107,7 +101,7 @@
 					FieldName: "Destination",
 					Width: '150px',
 					type: "string",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDestination","fieldtrip","Destination")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDestination", "fieldtrip", "Destination")
 				},
 				{
 					FieldName: "DestinationContact",
@@ -125,13 +119,7 @@
 					FieldName: "DepartDate",
 					DisplayName: "Departure Date",
 					Width: '160px',
-					type: "date",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.DepartDateTime).format("MM/DD/YYYY");
-					// }
+					type: "date"
 				},
 				{
 					FieldName: "NumberOfStudents",
@@ -179,25 +167,13 @@
 					FieldName: "DepartTime",
 					DisplayName: "Departure Time",
 					Width: '160px',
-					type: "time",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.DepartDateTime).format("hh:mm A");
-					// }
+					type: "time"
 				},
 				{
 					FieldName: "ReturnTime",
 					DisplayName: "Return Time",
 					Width: '160px',
-					type: "time",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.EstimatedReturnDateTime).format("hh:mm A");
-					// }
+					type: "time"
 				},
 				{
 					FieldName: "ClassificationName",
@@ -205,7 +181,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripClassification","fieldtrip","ClassificationName")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification
 				},
 				{
 					FieldName: "BillingClass",
@@ -213,7 +189,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripBillingClassification","fieldtrip","BillingClass")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification
 				},
 				{
 					FieldName: "Ftactivity",
@@ -221,7 +197,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripActivity","fieldtrip","Ftactivity")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity
 				},
 				{
 					FieldName: "Ftequipment",
@@ -229,7 +205,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripEquipment","fieldtrip","Ftequipment")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment
 				},
 
 				{
@@ -245,7 +221,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoCity","fieldtrip","DestinationCity")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoCity", "fieldtrip", "DestinationCity")
 				},
 				{
 					FieldName: "DestinationState",
@@ -260,7 +236,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoZipCode2","fieldtrip","DestinationZip")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoZipCode2", "fieldtrip", "DestinationZip")
 				},
 				{
 					FieldName: "DirectionNotes",
@@ -370,7 +346,7 @@
 					type: "string",
 					hidden: true,
 					onlyForGrid: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDistrictDepartment","fieldtrip","DepartmentName")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDistrictDepartment", "fieldtrip", "DepartmentName")
 				},
 				{
 					FieldName: "BillingNotes",

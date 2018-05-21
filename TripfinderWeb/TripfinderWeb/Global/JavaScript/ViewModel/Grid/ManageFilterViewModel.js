@@ -131,12 +131,6 @@
 				'padding-right': '0'
 			});
 		}
-		//if ($gridContent[0].clientHeight == $gridContent[0].scrollHeight)
-		//{
-		//	$gridContent.find("colgroup col:last").css({
-		//		width: 97
-		//	});
-		//}
 	};
 	ManageFilterViewModel.prototype.getIconTitle_IsValid = function(value, id)
 	{

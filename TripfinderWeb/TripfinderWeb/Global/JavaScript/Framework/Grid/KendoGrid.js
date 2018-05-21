@@ -80,9 +80,6 @@
 			{
 				this.obSummaryGridVisible.subscribe(this.fitContainer, this);
 				this.obSummaryGridVisible.subscribe(this.createSummaryGrid, this);
-				// if (TF.isMobileDevice){
-				//  	this.obSummaryGridVisible.subscribe(this.$lockbar._resetlockbarHeight, this);
-				// }
 				this._obSelectedColumns.subscribe(this._updateCurrentLayout, this);
 				this._obSelectedColumns.subscribe(this.updateSummaryGridColumns, this);
 				if (this._obDocumentFocusState())
@@ -111,7 +108,6 @@
 	{
 		if (this._obDocumentFocusState())
 		{
-			//this._fitContainer(false);
 			if (this._pendingRefresh)
 			{
 				this._pendingRefresh = false;
@@ -177,13 +173,13 @@
 						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefault"),
 							{
 								data:
-									{
-										Id: 0,
-										GridName: this.options.gridType,
-										Columns: columns.join(","),
-										ApiIsDirty: true,
-										ApiIsNew: true
-									}
+								{
+									Id: 0,
+									GridName: this.options.gridType,
+									Columns: columns.join(","),
+									ApiIsDirty: true,
+									ApiIsNew: true
+								}
 							});
 					}
 				}
@@ -496,7 +492,6 @@
 				e.preventDefault();
 				return;
 			}
-			//$("body").css("overflow", "hidden");
 			if (self.tobeLockedColumns.length == 0 || (self.tobeLockedColumns[0].field === 'bulk_menu'))
 			{
 				self.kendoGrid.columns.forEach(function(item)
@@ -517,7 +512,6 @@
 			}.bind(this), 10);
 		}.bind(this)).bind('dragend', function()
 		{
-			//$("body").css("overflow", "visible");
 			clearInterval(dragIntervalEvent);
 			self.tobeLockedColumns = [];
 			self.kendoGrid.columns.forEach(function(item)
@@ -635,15 +629,15 @@
 				var getDataUrl = url + '/getkey';
 				var getDataOption = {
 					paramData:
-						{
-							fileFormat: 'xls'
-						},
+					{
+						fileFormat: 'xls'
+					},
 					data:
-						{
-							"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
-							"selectedIds": selectedIds ? selectedIds : ids,
-							"sortItems": this.searchOption.data.sortItems
-						}
+					{
+						"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
+						"selectedIds": selectedIds ? selectedIds : ids,
+						"sortItems": this.searchOption.data.sortItems
+					}
 				};
 
 				if (self.options.gridType === "busfinderhistorical")
@@ -658,42 +652,42 @@
 						closeButton: true,
 						title: "Save As",
 						message: "Select the file format that you would like to save the selected records in." +
-							"<div class='col-xs-24'>" +
-							"<br/><label>Type</label>" +
-							"<div class='save-content'>" +
-							"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
-							"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-							"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-							"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
-							"<div>" +
-							"</div>",
+						"<div class='col-xs-24'>" +
+						"<br/><label>Type</label>" +
+						"<div class='save-content'>" +
+						"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
+						"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
+						"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
+						"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
+						"<div>" +
+						"</div>",
 						buttons:
+						{
+							save:
 							{
-								save:
+								label: "Save",
+								className: "btn tf-btn-black btn-sm",
+								callback: function()
+								{
+									var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
+									var databaseType = tf.datasourceManager.databaseType;
+									var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
+									if (TF.isMobileDevice)
 									{
-										label: "Save",
-										className: "btn tf-btn-black btn-sm",
-										callback: function()
-										{
-											var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
-											var databaseType = tf.datasourceManager.databaseType;
-											var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
-											if (TF.isMobileDevice)
-											{
-												window.open(fileUrl);
-											}
-											else
-											{
-												window.location = fileUrl;
-											}
-										}
-									},
-								cancel:
-									{
-										label: "Cancel",
-										className: "btn btn-link btn-sm"
+										window.open(fileUrl);
 									}
+									else
+									{
+										window.location = fileUrl;
+									}
+								}
+							},
+							cancel:
+							{
+								label: "Cancel",
+								className: "btn btn-link btn-sm"
 							}
+						}
 					})
 					.then(function(operation)
 					{
@@ -787,16 +781,12 @@
 			}.bind(this));
 			this.$lockbar._resetlockbarPosition();
 			this.$lockbar._resetlockbarHeight();
-			//this.obSummaryGridVisible.subscribe(this.$lockbar._resetlockbarHeight.bind(this), this);
 		}
 
 		if (this.initialFilter)
 		{
 			this.initialFilter = false;
 
-			//comment out by view-766
-			//if (!TF.Grid.FilterHelper.isDrillDownFillter(this.obSelectedGridFilterId()))
-			//{
 			var filterData = this.getQuickFilter().data;
 
 			if (filterData.callOutFilterName)
@@ -833,13 +823,11 @@
 					this.setColumnCurrentFilterInput();
 				}.bind(this), 50);
 				this.setFilterIconByKendoDSFilter();
-				// end
 			}
 			else if (filterData.idFilter && ((filterData.idFilter.ExcludeAny && filterData.idFilter.ExcludeAny.length > 0) || filterData.idFilter.IncludeOnly))
 			{
 				this.kendoGrid.dataSource.read();
 			}
-			//}
 		}
 		if ($(".grid-staterow").find('span') && $(".grid-staterow").find('span').length > 0)
 		{
@@ -851,7 +839,6 @@
 
 		self.fleetClickTimeout = setTimeout(function()
 		{
-			// console.log('on data bound');
 			self.fitContainer();
 		}, 200);
 	};
@@ -946,7 +933,6 @@
 				var gridLayoutExtendedDataModels =
 					TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items.slice(1));
 
-				/////////////////////////////////
 				// updated layout except applied
 				var stickLayoutId = stickGridConfig.stickLayoutModel ? stickGridConfig.stickLayoutModel.id() : null;
 				var layoutCnt = self.obGridLayoutExtendedDataModels().length;
@@ -965,7 +951,6 @@
 					else
 						unsyncedDBLayout = layout;
 				});
-				//////////////////////////////////
 
 				return Promise.resolve(unsyncedDBLayout);
 			});
@@ -1006,7 +991,7 @@
 				{
 					var syncedLayoutFilterModels = self.obGridFilterDataModels().filter(function(filter, idx)
 					{
-						return filter.id() === stickBackupFilterId; // ?????????????
+						return filter.id() === stickBackupFilterId;
 					});
 
 					if (syncedLayoutFilterModels && syncedLayoutFilterModels.length > 0)
@@ -1075,14 +1060,7 @@
 
 		if (modifiedStatus.isDeletedLayout)
 		{
-			// message = 'layout has been deleted';
-			// return tf.promiseBootbox.alert(message, 'Warning')
-			// .then(function() {
-			// stickLayoutId = stickGridConfig.stickLayoutModel.id();
-			// self._handleUnsyncedLayout(stickLayoutId);
-			// return self.loadPresetData();
 			return self.applyLayout(self._obCurrentGridLayoutExtendedDataModel());
-			// });
 		}
 		else if (modifiedStatus.isUpdatedLayout ||
 			modifiedStatus.isUpdatedLayoutOnlyFilterWhereCluase)
@@ -1102,16 +1080,6 @@
 					var isNoConfirm = true;
 					return self.applyLayout(self._obCurrentGridLayoutExtendedDataModel(), isNoConfirm);
 				});
-		}
-		else if (modifiedStatus.isDeletedFilter)
-		{
-			// ***this status has been handled by loadGridFilter function, so no need to handle here***
-
-			// message = 'The Filter that was applied has been deleted. The system default Filter will be applied to this grid.';
-			// return tf.promiseBootbox.alert(message, 'Warning')
-			// .then(function() {
-			//		return self.loadPresetData();
-			// });
 		}
 		else if (modifiedStatus.isUpdatedFilter)
 		{
@@ -1133,8 +1101,6 @@
 	{
 		var self = this;
 		TF.Grid.LightKendoGrid.prototype.refreshClick.apply(self);
-		// this._alertMessageWhenLayoutIsDeleted();
-		// this.syncFilter();
 	};
 
 	KendoGrid.prototype.toggleSummaryBar = function()
@@ -1154,17 +1120,6 @@
 		});
 		self.kendoGrid.resizable.bind("resize", function(e)
 		{
-			// if ($(e.currentTarget).data("th").data("kendoField") == "Color")
-			// {
-			// 	e.preventDefault();
-			// 	setTimeout(function ()
-			// 	{
-			// 		self.kendoGrid.wrapper.removeClass("k-grid-column-resizing");
-			// 		$(document.body).add(".k-grid th").css("cursor", "");
-			// 	});
-
-			// 	return;
-			// }
 			var dataTh = $(e.currentTarget).data("th");
 			var columnOptions = [];
 			if (dataTh) { columnOptions = self.kendoGrid.columns.filter(function(column) { return column.field == dataTh.data("kendoField") }); }
@@ -1190,7 +1145,6 @@
 				var tbodyWidth = tbody.width();
 				if (frozenWidth)
 					tbodyWidth = 0;
-				//tbodyWidth = frozenWidth;
 
 				self.$container.find(".k-grid-header-locked,.k-grid-content-locked").width(tbodyWidth);
 
@@ -1361,11 +1315,6 @@
 				{
 					var tmp = self.kendoGrid.columns[idx];
 					unlockColumn.push(tmp.field);
-					//self.kendoGrid.unlockColumn(tmp.field);
-					//if (self.summaryKendoGrid)
-					//{
-					//	self.summaryKendoGrid.unlockColumn(tmp.field);
-					//}
 				}
 			}
 			else //is the right-most locked column, unlock all
@@ -1374,11 +1323,6 @@
 				{
 					var tmp = self.kendoGrid.columns[idx];
 					unlockColumn.push(tmp.field);
-					//self.kendoGrid.unlockColumn(tmp.field);
-					//if (self.summaryKendoGrid)
-					//{
-					//	self.summaryKendoGrid.unlockColumn(tmp.field);
-					//}
 				}
 			}
 			for (var i = 0; i < self.tobeLockedColumns.length; i++)
@@ -1431,10 +1375,8 @@
 			var tempColumns = self.tooManyLockedColumns(self.tobeLockedColumns);
 
 			self.tobeLockedColumns = tempColumns;
-			//tf.loadingIndicator.show();
 			self.rebuildGrid().then(function()
 			{
-				// rebuildGrid is a promise method
 				self._showColumnLockedMessage();
 			});
 		}
@@ -1575,21 +1517,6 @@
 			}
 			tempColumns.push(tobeLockedColumns[i]);
 		}
-		////get total width of the current locked columns' width
-		//for (var i = 0; i < this.kendoGrid.columns.length; i++)
-		//{
-		//	var column = this.kendoGrid.columns[i];
-		//	if (column.locked)
-		//	{
-		//		var columnWidth = parseInt(column.width);
-		//		lockedWidth += columnWidth;
-		//	}
-		//}
-		//compare
-		//if (lockedWidth > (containerWidth - 200))
-		//{
-		//	return true;
-		//}
 		return tempColumns;
 	};
 

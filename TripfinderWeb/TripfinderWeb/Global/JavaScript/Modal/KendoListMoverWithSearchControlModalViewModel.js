@@ -11,8 +11,6 @@
 		this.contentTemplate(options.contentTemplate || "modal/KendoListMoverWithSearchControl");
 		this.buttonTemplate('modal/positivenegative');
 		this.obPositiveButtonLabel("Apply");
-		//this.kendoListMoverWithSearchControlViewModel = new TF.Control.KendoListMoverWithSearchControlViewModel(selectedData, options);
-		//this.data(this.kendoListMoverWithSearchControlViewModel);
 	}
 
 	KendoListMoverWithSearchControlModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);

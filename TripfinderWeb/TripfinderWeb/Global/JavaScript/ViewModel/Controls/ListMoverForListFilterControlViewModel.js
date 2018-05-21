@@ -16,7 +16,6 @@
 
 	ListMoverForListFilterControlViewModel.prototype.initGridScrollBar = function(container)
 	{
-		//need check soon.
 		var $gridContent = container.find(".k-grid-content");
 		$gridContent.css({
 			"overflow-y": "auto"

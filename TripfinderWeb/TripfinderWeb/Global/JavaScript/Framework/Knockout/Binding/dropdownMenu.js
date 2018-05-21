@@ -37,14 +37,7 @@ ko.bindingHandlers.dropDownMenu = {
 				{
 					$menu.css('top', (offset.top + height) + 'px');
 				}
-				// if ((offset.left - window.scrollX + $menu.width()) > ($(window).width() + $(window).scrollLeft()))
-				// {
-				// 	$menu.css('left', offset.left - window.scrollX + 'px');
-				// }
-				// else
-				// {
 				$menu.css('left', offset.left - window.scrollX + 'px');
-				// }
 			}
 		});
 		//click child item auto close menu

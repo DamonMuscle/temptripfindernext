@@ -1,7 +1,9 @@
-﻿(function() {
+﻿(function()
+{
 	createNamespace("TF").AuthManager = AuthManager;
 
-	function AuthManager() {
+	function AuthManager()
+	{
 		this.clientKey = null;
 		this.userName = null;
 		this.password = null;
@@ -14,67 +16,79 @@
 		var username = tf.storageManager.get("userName", true);
 		var password = tf.storageManager.get("password", true);
 		var token = tf.storageManager.get("token", true);
-		var isLoggedin = typeof(tf.storageManager.get("isLoggedin", true)) === 'undefined' ? false : JSON.parse(tf.storageManager.get("isLoggedin", true));
+		var isLoggedin = typeof (tf.storageManager.get("isLoggedin", true)) === 'undefined' ? false : JSON.parse(tf.storageManager.get("isLoggedin", true));
 		this.clientKey = clientKey;
 		this.userName = username;
 		this.password = password;
 		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(token);
 
-		if (this._hasLoggedin) {
+		if (this._hasLoggedin)
+		{
 			this.obIsLogIn(true);
 		}
-		// this._monitorAuth = this._monitorAuth.bind(this);
 	}
 
-	AuthManager.prototype.logOff = function() {
+	AuthManager.prototype.logOff = function()
+	{
 		tf.storageManager.save("token", "", true);
 		this.logOffWithoutRefresh()
-			.then(function() {
-				setTimeout(function() {
+			.then(function()
+			{
+				setTimeout(function()
+				{
 					location.reload();
 				});
 			});
 	};
 
-	AuthManager.prototype.logOffWithoutRefresh = function() {
+	AuthManager.prototype.logOffWithoutRefresh = function()
+	{
 		this.logOffTag = true;
 		return this.beforeLogOff.notify()
-			.then(function(results) {
-				//if (!array.contain(results, false))
-				//{
+			.then(function(results)
+			{
 				tf.storageManager.save("isLoggedin", false, true);
-				//}
 			})
 	};
 
-	AuthManager.prototype.auth = function(loginViewModal) {
+	AuthManager.prototype.auth = function(loginViewModal)
+	{
 		var p = null;
-		if (this._hasLoggedin) {
+		if (this._hasLoggedin)
+		{
 			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "auth", "authentication", "test"), null, {
-					auth: {
-						noInterupt: true
-					},
-					overlay: false
-				})
-				.then(function() {
+				auth: {
+					noInterupt: true
+				},
+				overlay: false
+			})
+				.then(function()
+				{
 					var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "clientconfig", "timezonetotalminutes"), {}, {
 						auth: {
 							noInterupt: true
 						},
 						overlay: false
-					}).then(function(apiResponse) {
-						moment().constructor.prototype.currentTimeZoneTime = function() {
+					}).then(function(apiResponse)
+					{
+						moment().constructor.prototype.currentTimeZoneTime = function()
+						{
 							var now = moment().utcOffset(apiResponse.Items[0]);
 							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 						};
-						if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== "tripfinder")) {
+						if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== "tripfinder"))
+						{
 							return tf.datasourceManager.validateAllDBs()
-								.then(function(valResult) {
-									if (!valResult.Items[0].AnyDBPass) { //all db connection failed
+								.then(function(valResult)
+								{
+									if (!valResult.Items[0].AnyDBPass)
+									{ //all db connection failed
 										var message = "";
-										if (valResult.Items[0].DBlength == 1) {
+										if (valResult.Items[0].DBlength == 1)
+										{
 											message = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-										} else {
+										} else
+										{
 											message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
 										}
 										return this._loginUseModal(loginViewModal, message);
@@ -84,26 +98,31 @@
 					}.bind(this));
 					return Promise.all([p1]);
 				}.bind(this))
-				.catch(function() {
+				.catch(function()
+				{
 					return Promise.resolve(false);
 				}.bind(this))
-		} else {
+		} else
+		{
 			p = this._loginUseModal(loginViewModal)
 		}
 		return p
-			.then(function(result) {
-				if (result === false) {
+			.then(function(result)
+			{
+				if (result === false)
+				{
 					tf.storageManager.save("token", "", true);
 					location.reload();
 					return Promise.reject("login failed");
 				}
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "auth", "authorization"), null, {
-						overlay: false,
-						auth: {
-							noInterupt: true
-						}
-					})
-					.then(function(apiResponse) {
+					overlay: false,
+					auth: {
+						noInterupt: true
+					}
+				})
+					.then(function(apiResponse)
+					{
 						tf.storageManager.save("isLoggedin", true, true);
 						this._hasLoggedin = true;
 						this.obIsLogIn(true);
@@ -112,43 +131,47 @@
 			}.bind(this));
 	};
 
-	AuthManager.prototype._loginUseModal = function(loginViewModal, message) {
+	AuthManager.prototype._loginUseModal = function(loginViewModal, message)
+	{
 		var self = this;
 		var loginViewModal = loginViewModal || new TF.Modal.LoginModalViewModel(this.clientKey);
-		if (message) { // used for cached data, no need to login again.
+		if (message)
+		{
+			// used for cached data, no need to login again.
 			loginViewModal.loginViewModel.obLoginErrorMessage(message);
 		}
 		return tf.modalManager.showModal(loginViewModal)
-			.then(function(result) {
+			.then(function(result)
+			{
 				this.clientKey = result.clientKey;
 				this.userName = result.username;
 				this.password = result.password;
 				tf.storageManager.save("clientKey", result.clientKey, true);
 				tf.storageManager.save("userName", result.username, true);
 				tf.storageManager.save("password", result.password, true);
-				//return tf.userPreferenceManager.getAllKey()
-				//.then(function()
-				//{
-				//tf.datasourceManager.setDatabaseInfo();
-				if (tf.datasourceManager.databaseId) { //when the datasource is selected, show all the menus
+				if (tf.datasourceManager.databaseId)
+				{
+					//when the datasource is selected, show all the menus
 					tf.datasourceManager.navbarDisplay(true);
 				}
 				return Promise.resolve(true);
-				//});
 			}.bind(this));
 	};
 
 
-	AuthManager.prototype.isAuthorizedFor = function() {
+	AuthManager.prototype.isAuthorizedFor = function()
+	{
 		return this.authorizationInfo.isAuthorizedFor.apply(this.authorizationInfo, arguments);
 	};
 
-	AuthManager.prototype.authorizationUrl = function() {
+	AuthManager.prototype.authorizationUrl = function()
+	{
 		Array.prototype.unshift.call(arguments, tf.api.apiPrefix());
 		return pathCombine.apply(null, arguments);
 	};
 
-	AuthManager.prototype.updateInfo = function() {
+	AuthManager.prototype.updateInfo = function()
+	{
 		this.clientKey = tf.storageManager.get("clientKey", true);
 		this.userName = tf.storageManager.get("userName", true);
 		this.password = tf.storageManager.get("password", true);
@@ -157,7 +180,8 @@
 
 	createNamespace("TF").AuthorizationInfo = AuthorizationInfo;
 
-	function AuthorizationInfo(authorizationInfoJson) {
+	function AuthorizationInfo(authorizationInfoJson)
+	{
 		var self = this;
 		self.isAdmin = authorizationInfoJson.IsAdmin;
 		self.authorizationTree = authorizationInfoJson.AuthorizationTree;
@@ -170,7 +194,8 @@
 	 * @param {object} authorizationInfoJson the newest authorization info.
 	 * @returns {void}
 	 */
-	AuthorizationInfo.prototype.updateAuthorized = function(authorizationInfoJson) {
+	AuthorizationInfo.prototype.updateAuthorized = function(authorizationInfoJson)
+	{
 		var self = this;
 		self.isAdmin = authorizationInfoJson.IsAdmin;
 		self.authorizationTree = authorizationInfoJson.AuthorizationTree;
@@ -178,14 +203,17 @@
 		self.onUpdateAuthorized.notify();
 	};
 
-	AuthorizationInfo.prototype.isAuthorizedFor = function() {
-		if (this.isAdmin) {
+	AuthorizationInfo.prototype.isAuthorizedFor = function()
+	{
+		if (this.isAdmin)
+		{
 			return true;
 		}
 		var securedItems = this.authorizationTree.securedItems;
 		var section0 = arguments[0];
 		var section1 = arguments[1];
-		if (securedItems[section0] && Array.contain(securedItems[section0], section1)) {
+		if (securedItems[section0] && Array.contain(securedItems[section0], section1))
+		{
 			return true;
 		}
 		return false;

@@ -6,7 +6,6 @@
 	{
 		this.datePicker = datePicker;
 		datePicker.element.on("keypress", this.keypress.bind(this));
-		datePicker.element.on("keyup", this.keyup.bind(this));
 		datePicker.element.on("blur", this.dateChange.bind(this));
 		this.trigger = null;
 		this.dateBox = dateBox;
@@ -45,7 +44,7 @@
 	DateBoxHelper.prototype.keypress = function(e)
 	{
 		var key = e.which || e.keyCode || 0;
-		if ((key < 45 || key > 57)&&TF.Input.BaseBox.notSpecialKey(e))
+		if ((key < 45 || key > 57) && TF.Input.BaseBox.notSpecialKey(e))
 		{
 			e.preventDefault();
 			return;
@@ -54,14 +53,6 @@
 		{
 			this.dateChange(e);
 		}
-	};
-
-	DateBoxHelper.prototype.keyup = function(viewModel, e)
-	{ //this might cause some corsor issues, so ignore it
-		// var selectionstart = this.datePicker.element[0].selectionStart;
-		// this.datePicker.element.val(this.datePicker.element.val().replace(/[^\d|//|\-|\.]/ig, ""));
-		// this.datePicker.element[0].selectionStart = selectionstart;
-		// this.datePicker.element[0].selectionEnd = selectionstart;
 	};
 
 	DateBoxHelper.prototype.convertToDateFormat = function(strValue)

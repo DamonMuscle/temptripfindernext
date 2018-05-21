@@ -324,7 +324,8 @@
 	};
 
 	PromiseBootbox.prototype.confirm = function(arg)
-	{// Changed the confirm style of ticket Application paging
+	{
+		// Changed the confirm style of ticket Application paging
 		var self = this;
 		var option = {};
 
@@ -380,7 +381,8 @@
 	};
 
 	PromiseBootbox.prototype.okRetry = function(arg)
-	{// Changed the confirm style of ticket Application paging
+	{
+		// Changed the confirm style of ticket Application paging
 		var self = this;
 		var option = { className: TF.isPhoneDevice ? "unsave-mobile" : "tfmodal" };
 		option.buttons = {

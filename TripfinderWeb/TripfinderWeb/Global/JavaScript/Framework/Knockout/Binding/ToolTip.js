@@ -1,6 +1,5 @@
 (function()
 {
-	//var contentMaxHeight = 100;
 	function calcArrowPosition(arrow, trigger)
 	{
 		var triggerOffset = trigger.offset();

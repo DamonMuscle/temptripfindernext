@@ -153,10 +153,6 @@
 
 		if (!(entity instanceof Object) || !(backup instanceof Object)) return false;
 
-		// if (entity.constructor !== backup.constructor)
-		// {
-		// 	return false;
-		// } 
 		if ($.isArray(entity) && entity.length != backup.length)
 		{
 			return false;

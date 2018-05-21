@@ -28,34 +28,34 @@
 			return Promise.resolve(true);//no datasource, but still could login.
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), databaseId, "datasource", "test"))
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
-				.then(function(apiResponse)
+				if (result)
 				{
-					var datasources = apiResponse.Items;
-					var datasource = Enumerable.From(datasources).Where(function(c) { return c.Id == databaseId }).ToArray()[0];
-					if (!datasource || datasource.IsSQLServer == false /*|| datasource.DbfullVersion != 13000004*/)
-					{
-						return false;
-					}
-					self.loginSource = datasource;
-					self.databaseId = databaseId;
-					self.databaseName = datasource.DatabaseName;
-					self.databaseNameWithWrapper = "(" + datasource.DatabaseName + ")";
-					self.databaseType = datasource.DBType;
-					return true;
-				});
-			}
+					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
+						.then(function(apiResponse)
+						{
+							var datasources = apiResponse.Items;
+							var datasource = Enumerable.From(datasources).Where(function(c) { return c.Id == databaseId }).ToArray()[0];
+							if (!datasource || datasource.IsSQLServer == false /*|| datasource.DbfullVersion != 13000004*/)
+							{
+								return false;
+							}
+							self.loginSource = datasource;
+							self.databaseId = databaseId;
+							self.databaseName = datasource.DatabaseName;
+							self.databaseNameWithWrapper = "(" + datasource.DatabaseName + ")";
+							self.databaseType = datasource.DBType;
+							return true;
+						});
+				}
 
-			return false;
-		})
-		.catch(function()
-		{
-			return false;
-		})
+				return false;
+			})
+			.catch(function()
+			{
+				return false;
+			})
 	};
 
 	DatasourceManager.prototype.validateAllDBs = function(auth)
@@ -74,14 +74,14 @@
 			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource", "test"), null, { overlay: false });
 		}
 		return p
-		.then(function(result)
-		{
-			return result;
-		})
-		.catch(function()
-		{
-			return false;
-		})
+			.then(function(result)
+			{
+				return result;
+			})
+			.catch(function()
+			{
+				return false;
+			})
 	};
 
 	DatasourceManager.prototype.setDatabaseInfo = function()
@@ -132,8 +132,6 @@
 				{
 					tf.loadingIndicator.setSubtitle('Loading ' + databaseName);
 					tf.loadingIndicator.showImmediately();
-					//$('#open-datasouce-loading').show();
-					//$('#open-datasouce-loading').find('.loading-name')[0].innerText = ;
 					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), databaseId, "datasource", "test", database.DBType))
 						.then(function()
 						{
@@ -185,17 +183,17 @@
 									}
 								}
 							})
-							.then(function(result)
-							{
-								if (!!result)
+								.then(function(result)
 								{
-									self.open();
-								}
-								else
-								{
-									return Promise.resolve(false);
-								}
-							});
+									if (!!result)
+									{
+										self.open();
+									}
+									else
+									{
+										return Promise.resolve(false);
+									}
+								});
 
 						})
 						.then(function(isPass)
@@ -214,11 +212,11 @@
 										}
 									}
 								})
-								.then(function()
-								{
+									.then(function()
+									{
 
-									tf.routeManager.loadSticky();
-								});
+										tf.routeManager.loadSticky();
+									});
 								tf.storageManager.save("datasourceId", databaseId);
 								tf.storageManager.save("databaseName", databaseName);
 								tf.storageManager.save("databaseType", database.DBType);

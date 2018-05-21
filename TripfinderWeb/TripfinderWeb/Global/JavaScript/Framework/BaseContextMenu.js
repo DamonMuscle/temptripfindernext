@@ -34,14 +34,12 @@
 			//NOTE: context menu close
 			self._timer = setTimeout(function()
 			{
-				//$container.hide();
 				self.dispose();
 			}, 300);
 		};
 
 		var contextMenuClose = function()
 		{
-			//$container.hide();
 			self.dispose();
 		};
 
@@ -50,7 +48,7 @@
 			$container.on("mouseover", _mouseover);
 			$container.on("mouseout", _mouseout);
 			$container.on("contextMenuClose", contextMenuClose);
-		}.bind(this), 200); // FLEET-327: fix issue of when trigger menu by multi touch bar, the mouseout will be triggered at same time, add code to delay events binding to fix it
+		}.bind(this), 200);
 
 
 		if (this.isElementTarget($target[0]))
@@ -158,9 +156,6 @@
 		$menuContainer.css(
 			{
 				//this messes with submenu, didn't find a solution yet
-				//overflowY: "auto",
-				//overflowX: "visible",
-				//maxHeight: isBottom ? screenHeight - this.handleHeight - offset.top : offset.top,
 				position: "absolute",
 				left: leftDiff < 0 ? 0 : -$menuContainer.outerWidth() + $target.outerWidth(),
 				top: topx

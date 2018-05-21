@@ -148,16 +148,6 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 			this._resetTimer,
 
 			/*
-			Object: scope name of the ShortCutKeys event scope.
-			*/
-			//this._scopeName,
-
-			/*
-			Object: scope name list of the ShortCutKeys event scope.
-			*/
-			//this._scopeNameList = [],
-
-			/*
 			Object: temporary state where we will ignore the next keyup.
 			*/
 			this._loseNextKeyup = false,
@@ -208,14 +198,6 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 		this._addClientEvent($(document), 'keypress', this._keyHandleEvent);
 		this._addClientEvent($(document), 'keydown', this._keyHandleEvent);
 		this._addClientEvent($(document), 'keyup', this._keyHandleEvent);
-
-		/*
-		expose ShortCutKeys as an AMD module;
-		*/
-		//if (typeof define === 'function' && define.amd)
-		//{
-		//	define(ShortCutKeys);
-		//}
 	}
 	/*
 	Pars: p1 {Element|HTMLDocument} object; p2 {string} type; p3 {Function} event function;
@@ -1356,14 +1338,4 @@ ShortCutKeys is a simple keyboard shortcut library for Javascript with no extern
 		var self = this;
 		this._shutdown = status;
 	}
-
-	/*
-	Func: exposes _keyHandle publicly so it can be overwritten by extensions;
-	*/
-	//keyHandle: this._keyHandle
-
-	/*
-	expose ShortCutKeys to the global object;
-	*/
-	//window.ShortCutKeys = ShortCutKeys;
 })();

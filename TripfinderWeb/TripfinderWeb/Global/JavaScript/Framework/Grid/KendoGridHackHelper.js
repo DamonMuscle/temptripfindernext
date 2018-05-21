@@ -1,8 +1,5 @@
 (function()
 {
-	//createNamespace("TF.Grid").KendoGridHackHelper = KendoGridHackHelper;
-
-
 	createNamespace("TF.Grid").KendoGridFilterCellHackHelper = KendoGridFilterCellHackHelper;
 	var KendoFilterCellPrototype = null;
 	var KendoSelectablePrototype = null;
@@ -78,10 +75,10 @@
 				filters = expression.filters,
 				filter,
 				result = that.dataSource.filter() ||
-				{
-					filters: [],
-					logic: "and"
-				},
+					{
+						filters: [],
+						logic: "and"
+					},
 				idx,
 				length;
 
@@ -107,10 +104,10 @@
 					if (result.logic !== "and")
 					{
 						result.filters = [
-						{
-							logic: result.logic,
-							filters: result.filters
-						}];
+							{
+								logic: result.logic,
+								filters: result.filters
+							}];
 						result.logic = "and";
 					}
 
@@ -141,9 +138,7 @@
 					(TF.isMobileDevice && TF.LightKendoGridHelper.isHotLinkNode($(e.event.target))))
 				{
 					var target = e.event.target;
-					// 				//	e.event.stopPropagation();
 					e.target = [];
-					// 				//	e = null;
 				}
 
 				if (TF.isMobileDevice && e && e.target.length)

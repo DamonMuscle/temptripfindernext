@@ -220,7 +220,6 @@
 			var htmlText = $(item).html(),
 				validateLink = this._validateLink(htmlText),
 				validateMail = this._validateMail(htmlText);
-			//if (validateLink || validateMail)
 			if (validateLink)
 			{
 				var content;
@@ -235,7 +234,6 @@
 				}
 				else
 					content = $('<div>' + htmlText + '</div>').addClass('link').css('padding', '0 .6em').css('cursor', 'pointer').attr('title', 'Press "Alt" and left click to open link');
-				// 	content = $('<div>' + htmlText + '</div>').addClass(validateLink ? 'link' : 'mail').css('padding', '0 .6em').css('cursor', 'pointer').attr('title', 'Press "Alt" and left click to open link');
 
 				$(item).empty().append(content);
 				$(item).addClass("has-link");
@@ -251,10 +249,6 @@
 			{
 				window.open($(e.currentTarget).children().html());
 			}
-			// else if ($(e.currentTarget).children('.mail').length > 0)
-			// {
-			// 	document.location.href = "mailto:" + $(e.currentTarget).children().html();
-			// }
 		}
 		else
 		{
@@ -313,16 +307,6 @@
 	{
 		var callRevert = false;
 		var htmlText = $(e.currentTarget).children().html();
-		if ($(e.currentTarget).children('.link').length > 0)
-		{
-			// $(e.currentTarget).children().html("<div class='tf-grid-mobile-inner-link' href='" + htmlText + "'>" + htmlText + "</div>");
-			// callRevert = true;
-		}
-		// else if ($(e.currentTarget).children('.mail').length > 0)
-		// {
-		// 	$(e.currentTarget).children().html("<a class='tf-grid-mobile-inner-link' href='mailto:" + htmlText + "'>" + htmlText + "</a>");
-		// 	callRevert = true;
-		// }
 		return callRevert;
 	};
 
@@ -378,7 +362,6 @@
 		if (self.options.showOverlay)
 		{
 			tf.loadingIndicator.showImmediately();
-			//console.log("LightKendoGrid +1");
 		}
 
 		if (self.kendoGrid && self.kendoGrid.dataSource)
@@ -391,7 +374,6 @@
 			{
 				self.overlayShow = false;
 				tf.loadingIndicator.tryHide();
-				//console.log("LightKendoGrid -1");
 			}, 1500);
 		}
 
@@ -399,11 +381,9 @@
 
 	LightKendoGrid.prototype.rebuildGrid = function()
 	{
-		//tf.loadingIndicator.showImmediately();
 		return new Promise(function(resolve)
 		{
 			tf.loadingIndicator.showImmediately();
-			//console.log("LightKendoGrid +1");
 			setTimeout(function()
 			{
 				resolve();
@@ -414,7 +394,6 @@
 				if (!this.kendoGrid)
 				{
 					tf.loadingIndicator.tryHide();
-					//console.log("LightKendoGrid -1");
 					return Promise.reject();
 				}
 				this.getSelectedIds([]);
@@ -439,7 +418,6 @@
 				this.addFilterClass();
 				this.setColumnCurrentFilterIcon();
 				this.setFilterIconByKendoDSFilter();
-				//this._refillAllCustomFilterFilterCellInput();
 				this._refillAllListFilterFilterCellInput();
 				this.disableFilterCellWhenEmptyOrNotEmptyApplied();
 				this.createFilterClearAll();
@@ -484,17 +462,12 @@
 		{
 			$(item).css("border-radius", "0");
 			$(item).css("float", "right");
-			// if ($(item).width() > 100) //VIEW-674 ListMover CustomizetimePickers style fix
-			// {
-			// 	//$(item).css("width", "115px");
-			// }
 			$(item).next().css("border-radius", "0");
 		});
 	};
 
 	LightKendoGrid.BaseOperator = {
 		string: {
-			//epty: "",
 			eq: "Equal To",
 			neq: "Not Equal To",
 			contains: "Contains",
@@ -505,7 +478,6 @@
 			isnotempty: "Not Empty"
 		},
 		number: {
-			//epty: "",
 			eq: "Equal To",
 			neq: "Not Equal To",
 			isempty: "Empty",
@@ -516,7 +488,6 @@
 			gte: "Greater Than or Equal To"
 		},
 		date: {
-			//epty: "",
 			eq: "Equal To",
 			neq: "Not Equal To",
 			isempty: "Empty",
@@ -527,7 +498,6 @@
 			gte: "Greater Than or Equal To"
 		},
 		enums: {
-			//epty: "",
 			eq: "Equal To",
 			neq: "Not Equal To"
 		}
@@ -600,7 +570,6 @@
 								{
 									var quickFilterData = self.getQuickFilter().data;
 									TF.ListFilterHelper.initListFilterIdsByQuickFilter(quickFilterData, self.listFilters, self._gridDefinition.Columns);
-									// var kendoQuickFilterSet = self.convertRequest2KendoFilterSet(quickFilterData.filterSet);
 								}
 								return Promise.resolve();
 							}
@@ -613,13 +582,6 @@
 								})
 								.then(function(result)
 								{
-									// if (typeof result !== 'boolean')
-									// {
-									// 	self.kendoGrid.dataSource.filter(result); // Paul: may cause call search result api twice, not found soluntion yet.
-									// 	options.data.filter = {}
-									// 	options.data.filter.filters = result;
-									// }
-
 									self.setFilterIconByKendoDSFilter.bind(self)();
 
 									tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
@@ -771,10 +733,6 @@
 					self.obFilteredRecordCount(self.result.FilteredRecordCount);
 					self.obTotalRecordCount(self.result.TotalRecordCount);
 					self.getDefaultCheckedRecords(self.result.Items);
-					if (self.isBigGrid)
-					{
-						//self.getIdsWithCurrentFiltering();
-					}
 					if (self.suspendRefresh)
 					{
 						e.preventDefault();
@@ -783,10 +741,6 @@
 			},
 			filterMenuInit: self.filterMenuInit.bind(self)
 		};
-		// if (isMobileDevice())
-		// {
-		// 	kendoGridOption.selectable = "row";
-		// }
 
 		if (this.options.dataSource)
 		{
@@ -943,10 +897,6 @@
 			}
 		};
 
-		// e.container.data("kendoPopup").bind("close", function (e) {
-		// 	console.log("filter menu closed");
-		// });
-
 		var field = e.field;
 		e.container.data("kendoPopup").bind("open", function(e)
 		{
@@ -1017,7 +967,6 @@
 				return;
 
 			$button.parent().find('input:text').focus();
-			// self._showCannotSupportSelectAllModal();
 		});
 	};
 
@@ -1044,14 +993,6 @@
 		var rootFilter = kendoFilterCellDomain.dataSource.filter();
 		if (rootFilter)
 		{
-			// 			var a = hackDomain.convertKendo2RequestFilterSet(null, rootFilter);
-			// 			var b = hackDomain.convertRequest2KendoFilterSet(a);
-			// 			var tmp = b.filter(function(filter)
-			// 			{
-			// 				return filter.logic !== undefined && filter.filters[0].field === kendoFilterCellDomainField;
-			// 			});
-			// 			var findResult = tmp[0];
-
 			var tmp = rootFilter.filters.filter(function(filter)
 			{
 				return filter.logic !== undefined && filter.filters[0].field === kendoFilterCellDomainField;
@@ -1085,8 +1026,6 @@
 							field: needCovert2CustomFilters[0].field,
 							operator: needCovert2CustomFilters[0].operator,
 							value: needCovert2CustomFilters[0].value
-							// operator: 'eq',
-							// value: ''
 						},
 						{
 							field: needCovert2CustomFilters[0].field,
@@ -1124,10 +1063,7 @@
 				});
 				findResult = tmp[0];
 			}
-			// 			else
-			// 			{
 			findResult = setFilterVauleForEmptyNotEmptyType(findResult);
-			// 			}
 		}
 
 		var currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
@@ -1137,7 +1073,7 @@
 		if (findResult)
 		{
 			var filterLeft = findResult.filters[0];
-			hackDomain.hackDisplayFilterCells[kendoFilterCellDomainField].originalFilterValue = filterLeft.value; //TF.Grid.TF.FilterHelper.formatFilterCellInputValue(filterLeft.value, columnType);
+			hackDomain.hackDisplayFilterCells[kendoFilterCellDomainField].originalFilterValue = filterLeft.value;
 
 
 			var filterRight = findResult.filters[1];
@@ -1179,11 +1115,7 @@
 			return;
 
 		var isCustomFilter = kendoFilterCellDomain.wrapper.find('input').hasClass('k-filter-custom-input');
-		// if(kendoFilterCellDomain.wrapper.find('input').hasClass('k-input k-filter-list-input'))
-		// {
-		// 	if(hackDomain.obHeaderFilters().length > 0)
-		// 		kendoFilterCellDomain.wrapper.find('input').val(hackDomain.obHeaderFilters()[0].Value);
-		// }
+
 		if (!isCustomFilter)
 			return;
 
@@ -1242,7 +1174,6 @@
 				var $filterCellInner = $customInput.closest(".k-filtercell").find('> span');
 				$filterCellInner.addClass("hide-cross-button");
 
-				// $customInput.width($customInput.width() - 20);
 				TF.CustomFilterHelper.addCustomFilterEllipsisClass($customInput);
 
 				$customInput.parent().find('.clear-custom-filter-menu-btn').bind("click", function(e)
@@ -1250,7 +1181,6 @@
 					this.setEmptyCustomFilterCommon(kendoFilterCellDomainField);
 
 					var $customInput = $(kendoFilterCellDomain.wrapper.find('.k-filter-custom-input'));
-					// $customInput.width($customInput.width() + 20);
 					TF.CustomFilterHelper.removeCustomFilterEllipsisClass($customInput);
 
 					$(e.currentTarget).remove();
@@ -1268,7 +1198,7 @@
 	{
 		$filterCell.find('input[type=text]').attr('title', displayVal);
 		if (filterType === 'listFilter' ||
-			filterType === 'customFilter')//&& (isTypeSetDisplayInSequence(columnType) || (displayVal && displayVal.indexOf('Empty') >= 0)))
+			filterType === 'customFilter')
 			$filterCell.find('input[type=text]').val(displayVal);
 	};
 
@@ -1305,8 +1235,6 @@
 	{
 		this.$container.find(".k-i-calendar").parent().on("click", function(e)
 		{
-			// if (!this.isOpen)
-			// {
 			var $input = $($(e.currentTarget).prev()[0]);
 			var $span = $(e.currentTarget);
 			if ($input.attr("aria-activedescendant"))
@@ -1319,12 +1247,6 @@
 					$calendar.css('left', leftPlus + "px");
 				}
 			}
-			// 	this.isOpen = true;
-			// }
-			// else
-			// {
-			// 	this.isOpen = false;
-			// }
 		}.bind(this));
 		this.$container.find(".k-i-calendar").parent().prev().on("blur", function(e)
 		{
@@ -1336,8 +1258,6 @@
 	{
 		var self = this;
 		TF.Grid.LightKendoGrid.prototype.refreshClick.apply(self);
-		// this._alertMessageWhenLayoutIsDeleted();
-		// this.syncFilter();
 	};
 
 	LightKendoGrid.prototype.getIdsWithCurrentFiltering = function(isCopyRequest)
@@ -1635,11 +1555,6 @@
 			return;
 
 		var listFilterTemplate = selectedColumns[0].ListFilterTemplate;
-		// 		if (listFilterTemplate === "DistinctListValue")
-		// 		{
-		// 			listFilterTemplate = TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue(selectedColumns[0].DisplayName, this._gridType, selectedColumns[0].FieldName);
-		// 		}
-		//$listBtn
 		$listBtn.unbind('click').bind('click', function(e)
 		{
 			e.stopPropagation();
@@ -1650,7 +1565,6 @@
 				case 'WithSearchGrid':
 					var selectedItems = TF.ListFilterHelper.getSelectedFilterItemsForWithSearchGridType(self.listFilters, listFilterTemplate, fieldName);
 					return tf.modalManager.showModal(
-						//new listFilterTemplate.ViewModel(selectedItems, listFilterTemplate)
 						new TF.Modal.ListMoverForListFilterControlModalViewModel(selectedItems, listFilterTemplate)
 					)
 						.then(function(selectedFilterItems)
@@ -1658,7 +1572,6 @@
 							TF.ListFilterHelper.handleWithSearchGridListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName);
 						});
 				case 'MapData':
-					//tf.ajax.get(this.setLeftGridRequestURL(this.options.getUrl(this.options.type, this.options)), requestOption)
 					var url = listFilterTemplate.getUrl(),
 						promiseAjaxRequest;
 					if (listFilterTemplate.requestMethod && listFilterTemplate.requestMethod == 'post')
@@ -1719,7 +1632,6 @@
 							selectedFilterItems = TF.ListMoverForListFilterHelper.processSelectedData(selectedFilterItems, listFilterTemplate.filterField);
 
 							TF.ListFilterHelper.handleWithSearchGridListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName);
-							//TF.ListFilterHelper.handleDefaultListFilterResult.bind(self)(self.listFilters, selectedFilterItems, fieldName, listFilterTemplate);
 						});
 					});
 				case 'Enum':
@@ -1841,7 +1753,6 @@
 		return options;
 	};
 
-	// moveToFilterHelper
 	LightKendoGrid.prototype.deleteListFilterItemsByFieldName = function(options, fieldName)
 	{
 		var deletedItems = options.data.filterSet.FilterItems.filter(function(item)
@@ -1877,7 +1788,6 @@
 		var $input = $filterBtn.parent().parent().parent().find('input');
 
 		self.visibleListFilterBtnCommon($listBtn, $input);
-		//this.hideAndClearSpecialFilterBtn.bind(this)(e, 'list');
 	};
 
 	LightKendoGrid.prototype.visibleListFilterBtnCommon = function($listBtn, $input)
@@ -1903,7 +1813,6 @@
 	{
 		var $input = this._findDDLInput(e);
 		$input.data('isempty', false);
-		//this.forceRefreshKendoGrid.bind(this)();
 	};
 
 	LightKendoGrid.prototype.hideAndClearListFilterBtn = function(e)
@@ -1919,22 +1828,12 @@
 		var fieldName = this._getSelectedFilterFieldName.bind(this)(e);
 
 		self.removeListFilterByFieldName(fieldName);
-
-		//this.forceRefreshKendoGrid.bind(this)();
 	};
 
 	LightKendoGrid.prototype.removeListFilterByFieldName = function(fieldName)
 	{
 		var self = this;
 		delete self.listFilters[fieldName];
-
-		// var rootFilters = self.kendoGrid.dataSource.filter();
-		// if (rootFilters.filters)
-		// {
-		// 	rootFilters.filters = rootFilters.filters.filter(function(filter){
-		// 		return filter.field !== fieldName;
-		// 	});
-		// }
 	};
 
 	LightKendoGrid.prototype.clearQuickFilterAndRefresh = function()
@@ -1951,7 +1850,6 @@
 		if (this.options.showOverlay)
 		{
 			tf.loadingIndicator.showImmediately();
-			//console.log("LightKendoGrid +1");
 		}
 
 		if (this.kendoGrid && this.kendoGrid.dataSource)
@@ -1965,11 +1863,8 @@
 			{
 				this.overlayShow = false;
 				tf.loadingIndicator.tryHide();
-				//console.log("LightKendoGrid -1");
 			}.bind(this), 1500);
 		}
-
-		//this.refreshClick();
 	};
 
 	LightKendoGrid.prototype.customFilterBtnClick = function(e)
@@ -2110,16 +2005,12 @@
 		if (clearFilterButton.length > 0)
 		{
 			clearFilterButton.remove();
-			// $input.width($input.width() + 20);
 		}
 		$input.data('iscustom', false);
 
 		var fieldName = self._getSelectedFilterFieldName.bind(self)(e);
 
 		self.clearCustomFilterByFieldName(fieldName);
-		// setTimeout(function(){ // force clear filter cell for the case of select custom filter, add filter value, select other filter, but filter cell not clear
-		// 	self.clearCustomFilterByFieldName(fieldName);
-		// });
 	};
 
 	LightKendoGrid.prototype.clearCustomFilterByFieldName = function(fieldName)
@@ -2152,9 +2043,6 @@
 
 		if (filterCellType !== 'empty' && $input.data('isempty'))
 			self.hideAndClearEmptyFilterBtn.bind(self)(e);
-
-		//  		if (!$input.data('is' + filterCellType))
-		//  			$input.val('');
 
 		if (filterCellType !== 'custom' &&
 			filterCellType !== 'list' &&
@@ -2268,10 +2156,6 @@
 								}
 							}
 							filters.push(filter);
-							// setTimeout(function()
-							// {
-							// 	self.kendoGrid.dataSource.filter({ logic: 'and', filters: filters });
-							// });
 							input.data("isempty", true);
 
 							self.hideAndClearSpecialFilterBtn.bind(self)(e, 'empty');
@@ -2313,15 +2197,12 @@
 				TF.CustomFilterHelper.removeCustomFilterEllipsisClass(input);
 				if (isSpecialFilterType(input))  //User should not type in values when "empty" or "not empty" filters are applied
 				{
-					// $filterCellInner.removeClass("hide-cross-button");
 					TF.FilterHelper.disableFilterCellInput(input);
-					// if (isNeedHideSpecialFilterType(input))
 					$filterCellInner.addClass("hide-cross-button");
 				}
 				else
 				{
 					TF.FilterHelper.enableFilterCellInput(input);
-					// if (isNeedHideSpecialFilterType(input))
 					$filterCellInner.removeClass("hide-cross-button");
 
 					if (input.val() === "" &&
@@ -2561,7 +2442,6 @@
 										if (String(dataItem.valueField) === filter.Value)
 										{
 											kendoDropDwonList.select(idx);
-											//kendoDropDwonList.trigger("change");
 										}
 									});
 									break;
@@ -2909,21 +2789,6 @@
 		}
 	};
 
-	//LightKendoGrid.prototype.dateChange = function(e)
-	//{
-	//	var strValue = this.element.val();
-	//	if (!strValue)
-	//	{
-	//		return true;
-	//	}
-	//	var dateTime = moment(TF.DateBoxHelper.convertToDateFormat(strValue));
-	//	if (dateTime.isValid())
-	//	{
-	//		this.value(toISOStringWithoutTimeZone(dateTime));
-	//		this.trigger("change");
-	//	}
-	//}
-
 	LightKendoGrid.prototype.getKendoColumnsExtend = function(currentColumns, defalultColumnWidth)
 	{
 		var self = this;
@@ -3236,10 +3101,6 @@
 				}
 				self.allIds = [];
 			}
-			// else if (newIdExcludeAnyFilter == this._oldIdExcludeAnyFilter && this.overlayShow !== true)  // comment this block for fix issue of apply busfinder/gps events reduce count filter, overlay not display
-			// {
-			// 	this.overlay = false;
-			// }
 			self._oldFilterString = newFilterString;
 			self._oldSortString = newSortString;
 			self._oldFilterId = newFilterId;
@@ -3250,13 +3111,9 @@
 
 		if (kendoOptions.data.filter || self._gridState.filterSet)
 		{
-			//options.data.filterSet = self.convertKendo2RequestFilterSet.bind(self)(options.data.filterSet, kendoOptions.data.filter);
-
 			if (self.isEmptyFilterSet(options.data.filterSet))
 			{
 				delete options.data.filterSet;
-				// this.obHeaderFilters();
-				// this.obHeaderFilterSets();
 			}
 			else if (kendoOptions.data.isFromAutoComplete !== true)
 			{
@@ -3366,7 +3223,6 @@
 		var self = this;
 
 		var kendofilterFilters = kendofilter.filters;
-		// var kendofilterFilters = kendofilter;
 		if (!kendofilterFilters || kendofilterFilters.length === 0)
 			return optionFilterSet;
 
@@ -3906,7 +3762,6 @@
 		this.getIdsWithCurrentFiltering().then(function(data)
 		{
 			var ids = data;
-			//var selectedId = Enumerable.From(this.getSelectedIds());
 			var selectedIds = ids.filter(function(id)
 			{
 				return !self.idsHash[id];
@@ -3971,7 +3826,6 @@
 		{
 			return;
 		}
-		// self._showCannotSupportSelectAllModal();
 		self.allSelection();
 	};
 
@@ -3986,8 +3840,6 @@
 
 	LightKendoGrid.prototype._showCannotSupportSelectAllModal = function()
 	{
-		// if (this.options.showCannotSupportSelectAllModal)
-		// 	this.options.showCannotSupportSelectAllModal();
 	};
 
 	LightKendoGrid.prototype.onShiftDown = function(e, keyCombination)
@@ -4031,11 +3883,6 @@
 				ajaxRequest.requestUrl.indexOf(filterIdUrl) >= 0)
 			{
 				ajaxRequest.abort();
-				// ajaxRequest.error(function(){
-				// 		arguments[0].status = 200;
-				// 		arguments[1] = 200;
-				// 		arguments[2] = undefined;
-				// 	});
 			}
 
 		});
@@ -4046,7 +3893,6 @@
 			},
 			function()
 			{
-				// catch exception thrown by reject.
 			}
 		);
 	}
@@ -4097,7 +3943,6 @@
 		{
 			self.options.onDataBound();
 		}
-		//self.$container.off("click.eyeColumnClick").on("click.eyeColumnClick", ".eyecolumn", self.eyeColumnClick.bind(self));
 		if (self.kendoGrid.options.selectable)
 		{
 			TF.LightKendoGridHelper._cancelKendoGridSelectedArea.bind(self)(self.kendoGrid);
@@ -4272,7 +4117,6 @@
 				self.kendoGrid.lastClickItemId = dataItem[self.options.Id];
 			}
 
-			//self.getIdsWithCurrentFiltering();
 			if (e.ctrlKey && this.kendoGrid.options.selectable != "row")
 			{
 				if (Array.contain(self.getSelectedIds(), dataItem[self.options.Id]))
@@ -4398,20 +4242,6 @@
 		}.bind(this));
 	};
 
-	//LightKendoGrid.prototype.eyeColumnClick = function(e, target)
-	//{
-	//	var $element = $(e.currentTarget);
-	//	if ($element[0].checked)
-	//	{
-	//		this.obcheckRecords.push($element.data("id"));
-	//	}
-	//	else
-	//	{
-	//		this.obcheckRecords.remove($element.data("id"));
-	//	}
-	//	this.onEyeCheckChanged.notify(this.obcheckRecords());
-	//}
-
 	LightKendoGrid.prototype.extendAdditionGridDefinition = function(gridDefinition, additionGridDefinition)
 	{
 		for (var i = 0; i < gridDefinition.Columns.length; i++)
@@ -4421,7 +4251,6 @@
 					Where(function(x) { return x.FieldName === column.FieldName }).SingleOrDefault();
 			column = $.extend(column, additionColumn);
 			this.updateGridDefinitionWidth(column);
-			//this._updateGridDefinitionDisplayNameFromTerm(column);
 		}
 
 		return gridDefinition;
@@ -4455,10 +4284,6 @@
 
 	LightKendoGrid.prototype.updateGridDefinitionWidth = function(column)
 	{
-		//if (column.type === "time" || column.type === "date")
-		//{
-		//	column.Width = "170px";
-		//}
 		var displayName = column.DisplayName ? column.DisplayName : column.FieldName;
 		if (displayName.length + 1 > 20)
 		{
@@ -4529,7 +4354,7 @@
 		}
 		else
 		{
-			height = this.$container.parent().height();//  $("body").height() - 172;
+			height = this.$container.parent().height();
 
 			if (this.options.containerHeight !== undefined)
 			{//used in view page grids
@@ -4563,7 +4388,6 @@
 		}
 		gridContent.bind("touchmove", function(e)
 		{
-			//e.preventDefault();
 			if (self.$summaryContainer)
 			{
 				var $summaryGrid = self.$summaryContainer.find(".k-grid-content");
@@ -4605,7 +4429,6 @@
 				filters: self._convertToKendoFilterItems(filterSet.FilterItems)
 			};
 
-			// tmp.filters[0].operator = 'custom';
 			return tmp;
 		});
 	};
@@ -4626,7 +4449,6 @@
 					{
 						case "time":
 							filterItem.Value = moment(filterItem.Value).format('h:mm A');
-							//filterItem.Value = new Date(moment(filterItem.Value));
 							break;
 						default:
 							break;
@@ -4646,8 +4468,6 @@
 
 	LightKendoGrid.prototype._staffGridDraggable = function()
 	{//RW-997 once staff grid and the record without type dirver and bus aide, then no drag.
-		//self.kendoGrid = this.$container.data("kendoGrid");
-		//self.bindScrollXMoveSummayBarEvent();
 		var self = this;
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "metastafftype"))
 			.then(function(staffTypes)
@@ -4784,8 +4604,6 @@
 		'In': 'list'
 	};
 
-	//LightKendoGrid.prototype._gridTypeNoCloumnsSticky = ["documentmini"];
-
 	LightKendoGrid.normalizeResultItem = function(items)
 	{
 		if (items.length === 1 && $.isArray(items[0]))
@@ -4877,7 +4695,7 @@
 
 		var DateTimePicker = $($input[0]).data('DateTimePicker');
 		if (DateTimePicker !== undefined)
-			DateTimePicker.enable(true); // DateTimePicker.disable(false);
+			DateTimePicker.enable(true);
 
 		if (isNormalInput)
 			$input.attr('disabled', false).removeClass('is-disabled-text-input');
@@ -5167,7 +4985,6 @@
 						});
 					}
 					cachedListFilters[field].selectedItems = selectedItems;
-					//cachedListFilters[field].selectedFilterItems = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField);
 					var tmp = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField)
 					cachedListFilters[field].selectedFilterItems = tmp.map(function(item) { return item.FilterItem; });;
 				});

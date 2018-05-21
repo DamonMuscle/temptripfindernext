@@ -436,45 +436,6 @@
 				}
 			});
 		}
-		else
-		{
-			//var scrollElements = tfModal.find(':visible').filter(function(index, element)
-			//{
-			//	var overflow = $(element).css("overflow");
-			//	return overflow == 'auto' || overflow == 'scroll';
-			//})
-
-			//tfModal.on("touchmove", function(e)
-			//{
-			//	//e.stopPropagation();
-			//	//e.preventDefault();
-			//});
-
-			//for (var i in scrollElements)
-			//{
-			//	var x = scrollElements[i]
-			//	new TF.TapHelper(dialog[0], {
-			//		swipingUp: function(e)
-			//		{
-			//			var modalBody = $(e.target).closest(".modal-body")[0];
-			//			if (modalBody && modalBody.scrollHeight - modalBody.scrollTop <= modalBody.clientHeight)
-			//			{
-			//				e.stopPropagation();
-			//				e.preventDefault();
-			//			}
-			//		},
-			//		swipingDown: function(e)
-			//		{
-			//			var modalBody = $(e.target).closest(".modal-body")[0];
-			//			if (modalBody && modalBody.scrollTop <= 0)
-			//			{
-			//				e.stopPropagation();
-			//				e.preventDefault();
-			//			}
-			//		}
-			//	});
-			//}
-		}
 		tfModal.modal(options);
 		this.currentBaseModalViewModel.obPageElement(tfModal);
 	};

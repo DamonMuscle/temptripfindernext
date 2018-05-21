@@ -300,10 +300,6 @@
 					});
 
 					self.columns = editColumnViewModel.selectedColumns;
-					// if(!self.options.listFilterType)
-					// {
-					// 	self.originalColumns = editColumnViewModel.selectedColumns;
-					// }
 					self.saveCurrentSelectedColumns(self.options.type, self.columns);
 					self.leftSearchGrid._gridDefinition.Columns = editColumnViewModel.selectedColumns;
 					self.leftSearchGrid.rebuildGrid();
@@ -489,9 +485,9 @@
 	{
 		var options = {
 			gridDefinition:
-				{
-					Columns: this.columns
-				},
+			{
+				Columns: this.columns
+			},
 			kendoGridOption: this.options.leftKendoGridOption || this.leftKendoGridOption,
 			showOmittedCount: false,
 			showSelectedCount: true,
@@ -521,7 +517,6 @@
 				this.bindRightGridDropTarget();
 				this.careteKendoDropTargetEvent();
 				this.onLeftDataBound();
-				//this.initGridScrollBar(this.availableColGridContainer);
 			}.bind(this)
 		};
 		this.initGridOption(options, 'left');
@@ -535,8 +530,6 @@
 			e.stopPropagation();
 			e.preventDefault();
 		});
-
-		//this._cancelKendoGridSelectedArea(this.leftSearchGrid.kendoGrid);
 	};
 
 	KendoListMoverWithSearchControlViewModel.prototype.getAllRecords = function()
@@ -649,8 +642,7 @@
 							item[define.FieldName] = moment(moment(new Date(item[define.FieldName])).format("L")).toDate();
 							break;
 						case "time":
-							item[define.FieldName] = moment(moment(item[define.FieldName]).format('1899/12/30 HH:mm:00')).toDate()
-							//item[define.FieldName] = moment(toISOStringWithoutTimeZone(moment(moment(item[define.FieldName]).format('1899/12/30 HH:mm:00')))).toDate()
+							item[define.FieldName] = moment(moment(item[define.FieldName]).format('1899/12/30 HH:mm:00')).toDate();
 							break;
 						case "boolean":
 							item[define.FieldName] = item[define.FieldName].toString();
@@ -732,18 +724,18 @@
 		{
 			options.kendoGridOption = {
 				filterable:
-					{
-						extra: false,
-						mode: "row"
-					},
+				{
+					extra: false,
+					mode: "row"
+				},
 				dataSource:
-					{
-						pageSize: 100,
-						serverPaging: false,
-						serverFiltering: false,
-						serverSorting: false,
-						transport: null
-					},
+				{
+					pageSize: 100,
+					serverPaging: false,
+					serverFiltering: false,
+					serverSorting: false,
+					transport: null
+				},
 				pageable: true
 			};
 			var originalDataBound = options.onDataBound;
@@ -755,9 +747,6 @@
 				}
 				self._changePageInfoDisplay(gridType)
 			}.bind(this);
-
-			//options.dataSource = this.allRecords;
-			//options.kendoGridOption.dataSource.data = this.allRecords;
 		}
 		options.routeState = "ListMover" + gridType + "KendoGrid";
 	};
@@ -803,15 +792,6 @@
 
 	};
 
-	// KendoListMoverWithSearchControlViewModel.prototype.initGridScrollBar = function(container)
-	// {
-	// 	var $gridContent = container.find(".k-grid-content");
-	// 	$gridContent.css(
-	// 	{
-	// 		"overflow-y": "auto"
-	// 	});
-	// };
-
 	KendoListMoverWithSearchControlViewModel.prototype.onLeftDBClick = function(e, rowData)
 	{
 		if (rowData)
@@ -840,9 +820,6 @@
 
 	KendoListMoverWithSearchControlViewModel.prototype.setLeftRequestOption = function(requestOptions)
 	{
-		//delete requestOptions.paramData.take;
-		//delete requestOptions.paramData.skip;
-
 		var excludeIds = this.obSelectedData ? this.obSelectedData() : [];
 		if (this.options && this.options.gridOptions && this.options.gridOptions.excludeIds && this.options.gridOptions.excludeIds.length > 0)
 		{
@@ -907,15 +884,14 @@
 
 	KendoListMoverWithSearchControlViewModel.prototype.leftKendoGridOption = {
 		filterable:
-			{
-				extra: false,
-				mode: "row"
-			},
+		{
+			extra: false,
+			mode: "row"
+		},
 		dataSource:
-			{
-				pageSize: 100
-			},
-		//selectable: "row",
+		{
+			pageSize: 100
+		},
 		pageable: true
 	};
 
@@ -923,9 +899,9 @@
 	{
 		var options = {
 			gridDefinition:
-				{
-					Columns: this.columns
-				},
+			{
+				Columns: this.columns
+			},
 			kendoGridOption: this.rightKendoGridOption,
 			showOmittedCount: false,
 			showSelectedCount: true,
@@ -961,8 +937,6 @@
 			e.stopPropagation();
 			e.preventDefault();
 		});
-
-		// this._cancelKendoGridSelectedArea(this.rightSearchGrid.kendoGrid);
 	};
 
 	KendoListMoverWithSearchControlViewModel.prototype.onLeftDataBound = function()
@@ -1059,12 +1033,12 @@
 		return {
 			filterable: false,
 			dataSource:
-				{
-					pageSize: 100,
-					serverPaging: this.options.serverPaging,
-					serverFiltering: false,
-					serverSorting: false
-				},
+			{
+				pageSize: 100,
+				serverPaging: this.options.serverPaging,
+				serverFiltering: false,
+				serverSorting: false
+			},
 			pageable: true
 		}
 	};
@@ -1080,13 +1054,6 @@
 			column.title = definition.DisplayName;
 			column.width = definition.Width || KendoListMoverWithSearchControlViewModel.defaults.columnWidth;
 			column.hidden = definition.hidden; // Overwrite the value of hidden attribute which setting in api.
-			// column.filterable = {
-			// 	cell:
-			// 	{
-			// 		showOperators: false,
-			// 		operator: "contains"
-			// 	}
-			// };
 			self.setColumnFilterableCell(column, definition, "listmover");
 			if (!column.filterable.cell)
 			{ }
@@ -1585,10 +1552,6 @@
 
 	KendoListMoverWithSearchControlViewModel.prototype.dispose = function()
 	{
-		//this.leftSearchGrid.destroy();
-		//this.rightSearchGrid.destroy();
-		//this.leftSearchGrid = null;
-		//this.rightSearchGrid = null;
 		tf.shortCutKeys.resetUsingGolbal(2);
 		tf.shortCutKeys.clearSpecialHashMap();
 		PubSub.unsubscribe(topicCombine(pb.DATA_CHANGE, "listmover"));

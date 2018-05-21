@@ -7,7 +7,6 @@
 	ListFilterDefinition.ListFilterTemplate = {};
 
 	var ListFilterTemplateDefaultOption = {
-		// ViewModel: TF.Modal.ListMoverForListFilterControlModalViewModel,
 		listFilterType: 'WithSearchGrid',
 		DisplayFilterTypeName: "",
 		GridType: "",
@@ -210,15 +209,12 @@
 	};
 
 	var ListFilterTemplateEnumOption = {
-		//ViewModel: TF.Modal.KendoListMoverControlModalViewModel,
 		listFilterType: 'Enum',
 		sortType: 'byAllItems',
 		DisplayFilterTypeName: '',
 		AllItems: [],
 		leftGridWithSearch: true
 	};
-
-	//-----------------------------------------------------------------------------
 
 	ListFilterDefinition.ColumnSource = {};
 
@@ -304,7 +300,6 @@
 			type: "string"
 		}];
 
-	// todo-----------------
 	ListFilterDefinition.ColumnSource.FieldTripActivity = [
 		{
 			FieldName: "Name",
@@ -373,7 +368,6 @@
 		}];
 	ListFilterDefinition.ColumnSource.GeoCity = [
 		{
-			//FieldName: "GeoCity",
 			FieldName: "Item",
 			DisplayName: "Name",
 			Width: "160px",
@@ -383,7 +377,6 @@
 
 	ListFilterDefinition.ColumnSource.GeoZipCode = [
 		{
-			//FieldName: "GeoZipCode",
 			FieldName: "Item",
 			DisplayName: "Name",
 			Width: "160px",

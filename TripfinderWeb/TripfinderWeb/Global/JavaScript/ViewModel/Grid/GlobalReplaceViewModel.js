@@ -35,29 +35,29 @@
 	GlobalReplaceViewModel.prototype.loadEntityDefinition = function()
 	{
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "globalreplacefielddefinition", this._entityType))
-		.then(function(apiResponse)
-		{
-			this._globalreplacefielddefinition = apiResponse.Items[0].Fields;
-		}.bind(this))
-		.catch(function(apiResponse)
-		{
-			if (apiResponse.StatusCode !== 404)
+			.then(function(apiResponse)
 			{
-				console.log(apiResponse.Message);
-			}
-		})
+				this._globalreplacefielddefinition = apiResponse.Items[0].Fields;
+			}.bind(this))
+			.catch(function(apiResponse)
+			{
+				if (apiResponse.StatusCode !== 404)
+				{
+					console.log(apiResponse.Message);
+				}
+			})
 
 		var userDefinedFieldUtil = new TF.UserDefinedFieldUtil(this._entityType);
 		Promise.all([p1, userDefinedFieldUtil.loadUserDefinedLabel()]).
-		then(function(userDefinedFieldUtil)
-		{
-			if (this._globalreplacefielddefinition !== undefined)
+			then(function(userDefinedFieldUtil)
 			{
-				var fields = userDefinedFieldUtil.mergeUserDefinedLabel(this._globalreplacefielddefinition).sort(function(a, b) { return a.DisplayName.localeCompare(b.DisplayName); })
-				fields.unshift({ DisplayName: " " })
-				this.obFields(fields);
-			}
-		}.bind(this, userDefinedFieldUtil));
+				if (this._globalreplacefielddefinition !== undefined)
+				{
+					var fields = userDefinedFieldUtil.mergeUserDefinedLabel(this._globalreplacefielddefinition).sort(function(a, b) { return a.DisplayName.localeCompare(b.DisplayName); })
+					fields.unshift({ DisplayName: " " })
+					this.obFields(fields);
+				}
+			}.bind(this, userDefinedFieldUtil));
 	};
 
 	GlobalReplaceViewModel.prototype.loadEntityData = function()
@@ -67,25 +67,19 @@
 			return;
 		}
 		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this._entityType, "ids"), { data: this._ids })
-		.then(function(apiResponse)
-		{
-			var entityData = apiResponse.Items;
-			var tripIds = { dlyPuTripId: undefined, dlyDoTripId: undefined, dlyPuTranTripId: undefined, dlyDoTranTripId: undefined };
-			//var	tripStopIds = { dlyPuTripStop: [], dlyDoTripStop: [], dlyPuTranTripStop: [], dlyDoTranTripStop: [] };
-			for (var i in entityData)
+			.then(function(apiResponse)
 			{
-				tripIds.dlyPuTripId = tripIds.dlyPuTripId == undefined ? entityData[i].DlyPuTripId : tripIds.dlyPuTripId == entityData[i].DlyPuTripId ? entityData[i].DlyPuTripId : "";
-				tripIds.dlyDoTripId = tripIds.dlyDoTripId == undefined ? entityData[i].DlyDoTripId : tripIds.dlyDoTripId == entityData[i].DlyDoTripId ? entityData[i].DlyDoTripId : "";
-				tripIds.dlyPuTranTripId = tripIds.dlyPuTranTripId == undefined ? entityData[i].DlyPuTranTripId : tripIds.dlyPuTranTripId == entityData[i].DlyPuTranTripId ? entityData[i].DlyPuTranTripId : "";
-				tripIds.dlyDoTranTripId = tripIds.dlyDoTranTripId == undefined ? entityData[i].DlyDoTranTripId : tripIds.dlyDoTranTripId == entityData[i].DlyDoTranTripId ? entityData[i].DlyDoTranTripId : "";
-				//tripStopIds.dlyPuTripStop.push(entityData[i].DlyPuTripStop);
-				//tripStopIds.dlyDoTripStop.push(entityData[i].DlyPuTripStop);
-				//tripStopIds.dlyPuTranTripStop.push(entityData[i].DlyPuTripStop);
-				//tripStopIds.dlyDoTranTripStop.push(entityData[i].DlyPuTripStop);
-			}
-			this._tripIds = tripIds;
-			//this._tripStopIds = tripStopIds;
-		}.bind(this))
+				var entityData = apiResponse.Items;
+				var tripIds = { dlyPuTripId: undefined, dlyDoTripId: undefined, dlyPuTranTripId: undefined, dlyDoTranTripId: undefined };
+				for (var i in entityData)
+				{
+					tripIds.dlyPuTripId = tripIds.dlyPuTripId == undefined ? entityData[i].DlyPuTripId : tripIds.dlyPuTripId == entityData[i].DlyPuTripId ? entityData[i].DlyPuTripId : "";
+					tripIds.dlyDoTripId = tripIds.dlyDoTripId == undefined ? entityData[i].DlyDoTripId : tripIds.dlyDoTripId == entityData[i].DlyDoTripId ? entityData[i].DlyDoTripId : "";
+					tripIds.dlyPuTranTripId = tripIds.dlyPuTranTripId == undefined ? entityData[i].DlyPuTranTripId : tripIds.dlyPuTranTripId == entityData[i].DlyPuTranTripId ? entityData[i].DlyPuTranTripId : "";
+					tripIds.dlyDoTranTripId = tripIds.dlyDoTranTripId == undefined ? entityData[i].DlyDoTranTripId : tripIds.dlyDoTranTripId == entityData[i].DlyDoTranTripId ? entityData[i].DlyDoTranTripId : "";
+				}
+				this._tripIds = tripIds;
+			}.bind(this))
 	}
 
 	GlobalReplaceViewModel.prototype.addFieldClick = function()
@@ -131,10 +125,6 @@
 			dlyPuTranTripId = this._tripIds.dlyPuTranTripId,
 			dlyDoTranTripId = this._tripIds.dlyDoTranTripId,
 			replaceItems = this.obReplaceItems();
-		//var dlyPuTripStop = jQuery.extend([], this._tripStopIds.dlyPuTripStop),
-		//	dlyDoTripStop = jQuery.extend([], this._tripStopIds.dlyDoTripStop),
-		//	dlyPuTranTripStop = jQuery.extend([], this._tripStopIds.dlyPuTranTripStop),
-		//	dlyDoTranTripStop = jQuery.extend([], this._tripStopIds.dlyDoTranTripStop);
 
 		for (var i in replaceItems)
 		{
@@ -152,16 +142,6 @@
 				case "DlyDoTranTripId":
 					dlyDoTranTripId = replaceItems[i].replaceRequest.UpdateValue;
 					break;
-					//case "DlyPuTripStop":
-					//	dlyPuTripStop = [replaceItems[i].replaceRequest.UpdateValue];
-					//	break;
-					//case "DlyDoTripStop":
-					//	break;
-					//case "DlyPuTranTripStop":
-					//	break;
-					//case "DlyDoTranTripStop":
-					//	break;
-
 			}
 		}
 		var promiseAll = [];
@@ -202,11 +182,11 @@
 			if (tripId)
 			{
 				promiseAll.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripstop", "trip", tripId))
-				.then(function(apiResponse)
-				{
-					var tripStopEntity = $.grep(apiResponse.Items, function(d) { return d.Id == this.valueOf(); }.bind(this));
-					return tripStopEntity.length == 0 ? "wrongTripStop" : "";
-				}.bind(replaceItems[i].replaceRequest.UpdateValue)));
+					.then(function(apiResponse)
+					{
+						var tripStopEntity = $.grep(apiResponse.Items, function(d) { return d.Id == this.valueOf(); }.bind(this));
+						return tripStopEntity.length == 0 ? "wrongTripStop" : "";
+					}.bind(replaceItems[i].replaceRequest.UpdateValue)));
 			}
 			else if (tripName)
 			{
@@ -237,68 +217,68 @@
 		var selectCount = i18n.t('grid.globalReplace.record', { count: self._ids.length });
 		var globalReplaceInfo = i18n.t("grid.globalReplace.globalReplaceInfo", { selectCount: selectCount });
 		return tf.promiseBootbox.yesNo(globalReplaceInfo, "Confirmation Message")
-		.then(function(result)
-		{
-			if (result == true)
+			.then(function(result)
 			{
-				var request = {
-					ReplaceRequests: replaceRequests,
-					Ids: self._ids
-				}
-
-				return self.verify().then(function(result)
+				if (result == true)
 				{
-					var wrongMessage = undefined;
-					if (result.indexOf("wrongTripStop") != -1 && result.indexOf("wrongTrip") != -1)
-					{
-						wrongMessage = "The Trip you have selected does not have the TripStop you have selected.";
+					var request = {
+						ReplaceRequests: replaceRequests,
+						Ids: self._ids
 					}
-					else if (result.indexOf("wrongTripStop") != -1)
+
+					return self.verify().then(function(result)
 					{
-						wrongMessage = "The TripStop you have selected was not found in the Trip which the student(s) has been assigned.";
-					}
-					else if (result.indexOf("wrongTrip") != -1)
-					{
-						wrongMessage = "The Trip you have selected does not have the TripStop which the student(s) has been assigned.";
-					}
-					if (wrongMessage)
-					{
-						return tf.promiseBootbox.alert(wrongMessage, "Cannot Replace")
-						.then(function()
+						var wrongMessage = undefined;
+						if (result.indexOf("wrongTripStop") != -1 && result.indexOf("wrongTrip") != -1)
 						{
-							return false;
-						});
-					}
-					else
-					{
-						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "globalreplace", self._entityType), {
-							data: request
-						})
-						.then(function(apiResponse)
+							wrongMessage = "The Trip you have selected does not have the TripStop you have selected.";
+						}
+						else if (result.indexOf("wrongTripStop") != -1)
 						{
-							var affectRows = apiResponse.Items[0];
-							var recordStr = "Record";
-							var hasStr = "has";
-							if (affectRows > 1)
-							{
-								recordStr = "Records";
-								hasStr = "have"
-							}
-							tf.promiseBootbox.alert(affectRows + " " + recordStr.toLowerCase() + " " + hasStr + " successfully been updated.", recordStr + " Successfully Updated");
-							return affectRows;
-						})
-						.catch(function()
+							wrongMessage = "The TripStop you have selected was not found in the Trip which the student(s) has been assigned.";
+						}
+						else if (result.indexOf("wrongTrip") != -1)
 						{
-							throw false;
-						})
-					}
-				});
-			}
-			else
-			{
-				return Promise.resolve(false);
-			}
-		})
+							wrongMessage = "The Trip you have selected does not have the TripStop which the student(s) has been assigned.";
+						}
+						if (wrongMessage)
+						{
+							return tf.promiseBootbox.alert(wrongMessage, "Cannot Replace")
+								.then(function()
+								{
+									return false;
+								});
+						}
+						else
+						{
+							return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "globalreplace", self._entityType), {
+								data: request
+							})
+								.then(function(apiResponse)
+								{
+									var affectRows = apiResponse.Items[0];
+									var recordStr = "Record";
+									var hasStr = "has";
+									if (affectRows > 1)
+									{
+										recordStr = "Records";
+										hasStr = "have"
+									}
+									tf.promiseBootbox.alert(affectRows + " " + recordStr.toLowerCase() + " " + hasStr + " successfully been updated.", recordStr + " Successfully Updated");
+									return affectRows;
+								})
+								.catch(function()
+								{
+									throw false;
+								})
+						}
+					});
+				}
+				else
+				{
+					return Promise.resolve(false);
+				}
+			})
 	};
 
 	GlobalReplaceViewModel.prototype.apply = function()
@@ -413,11 +393,9 @@
 		this.replaceChange = this.replaceChange.bind(this);
 		this.valueChange = this.valueChange.bind(this);
 		this.obSelectedField = ko.observable(null);
-		//this.obSelectedField.subscribe(this.replaceChange);
 		this.obValue.subscribe(this.valueChange);
 
 		this.typeCodeChange = new TF.Events.Event();
-		//this.obType.subscribe(this.typeCodeChange.notify, this.typeCodeChange);
 
 		this.replaceRequest = null;
 
@@ -432,27 +410,27 @@
 		if (field && field.FieldName)
 		{
 			this.getDataList(field.FieldName)
-			.then(function(datalist)
-			{
-				this.obType(field.TypeCode);
-				this.typeCodeChange.notify();
-				this.obAttributes({ name: field.TypeCode, type: field.TypeCode, class: "form-control", dataList: datalist, fieldName: field.FieldName });
-				if (field.TypeCode == "String")
+				.then(function(datalist)
 				{
-					this.replaceRequest = new ReplaceRequest(field.FieldName, this.obValue());
-				}
-				else
-				{
-					if (this.obValue())
+					this.obType(field.TypeCode);
+					this.typeCodeChange.notify();
+					this.obAttributes({ name: field.TypeCode, type: field.TypeCode, class: "form-control", dataList: datalist, fieldName: field.FieldName });
+					if (field.TypeCode == "String")
 					{
 						this.replaceRequest = new ReplaceRequest(field.FieldName, this.obValue());
 					}
 					else
 					{
-						this.replaceRequest = null;
+						if (this.obValue())
+						{
+							this.replaceRequest = new ReplaceRequest(field.FieldName, this.obValue());
+						}
+						else
+						{
+							this.replaceRequest = null;
+						}
 					}
-				}
-			}.bind(this));
+				}.bind(this));
 		}
 		else
 		{
@@ -494,13 +472,13 @@
 		{
 			case "District":
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "district"))
-				.then(function(data)
-				{
-					return data.Items.map(function(d)
+					.then(function(data)
 					{
-						return { text: d.Name, value: d.IdString };
-					});
-				}.bind(this));
+						return data.Items.map(function(d)
+						{
+							return { text: d.Name, value: d.IdString };
+						});
+					}.bind(this));
 				break;
 			case "SchoolCode":
 			case "ResidSchool":
@@ -508,23 +486,23 @@
 			case "DlyDoTschl":
 			case "DlyPuTschl":
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "school"))
-				.then(function(data)
-				{
-					var sortedList = data.Items.sort(function(a, b)
+					.then(function(data)
 					{
-						var nameA = a.Name.toLowerCase();
-						var nameB = b.Name.toLowerCase();
+						var sortedList = data.Items.sort(function(a, b)
+						{
+							var nameA = a.Name.toLowerCase();
+							var nameB = b.Name.toLowerCase();
 
-						if (nameA > nameB) { return 1; }
-						if (nameA < nameB) { return -1; }
-						return 0;
-					});
+							if (nameA > nameB) { return 1; }
+							if (nameA < nameB) { return -1; }
+							return 0;
+						});
 
-					return sortedList.map(function(d)
-					{
-						return { text: d.Name + " (" + d.SchoolCode + ")", value: d.SchoolCode };
-					});
-				}.bind(this));
+						return sortedList.map(function(d)
+						{
+							return { text: d.Name + " (" + d.SchoolCode + ")", value: d.SchoolCode };
+						});
+					}.bind(this));
 				break;
 			case "Sex":
 				return Promise.resolve([{ text: 'Female', value: 'F' }, { text: 'Male', value: 'M' }]);
@@ -532,40 +510,40 @@
 			case "DlyDoSite":
 			case "DlyPuSite":
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "altsite/public"))
-				.then(function(data)
-				{
-					var items = data.Items.map(function(d)
+					.then(function(data)
 					{
-						return { text: d.Name, value: d.Id };
-					});
-					return [{ value: 0, text: "Home" }, { value: -1, text: "None" }, { value: -2, text: "Parent Transport" }, { value: -3, text: "Walker" }].concat(items);
-				}.bind(this));
+						var items = data.Items.map(function(d)
+						{
+							return { text: d.Name, value: d.Id };
+						});
+						return [{ value: 0, text: "Home" }, { value: -1, text: "None" }, { value: -2, text: "Parent Transport" }, { value: -3, text: "Walker" }].concat(items);
+					}.bind(this));
 				break;
 			case "DlyPuTripId":
 			case "DlyDoTripId":
 			case "DlyPuTranTripId":
 			case "DlyDoTranTripId":
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "trip"))
-				.then(function(data)
-				{
-					return data.Items.map(function(d)
+					.then(function(data)
 					{
-						return { text: d.Name, value: d.Id };
-					});
-				}.bind(this));
+						return data.Items.map(function(d)
+						{
+							return { text: d.Name, value: d.Id };
+						});
+					}.bind(this));
 				break;
 			case "DlyPuTripStop":
 			case "DlyDoTripStop":
 			case "DlyDoTranTripStop":
 			case "DlyPuTranTripStop":
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripstop"))
-				.then(function(data)
-				{
-					return data.Items.map(function(d)
+					.then(function(data)
 					{
-						return { text: d.Street, value: d.Id };
-					});
-				}.bind(this));
+						return data.Items.map(function(d)
+						{
+							return { text: d.Street, value: d.Id };
+						});
+					}.bind(this));
 				break;
 		}
 		return Promise.resolve([]);

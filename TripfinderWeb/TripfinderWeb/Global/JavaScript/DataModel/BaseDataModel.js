@@ -56,10 +56,6 @@
 			fromMapping = mapping[index].fromMapping;
 			fromKey = mapping[index].from;
 			afterChange = mapping[index].afterChange;
-			if (!entity.hasOwnProperty(fromKey))
-			{
-				//console.warn("property doesn't exist for key " + fromKey);
-			}
 			value = entity[fromKey];
 			toKey = mapping[index].to;
 			if (!toKey)
@@ -241,8 +237,6 @@
 		var isDirty = this.IsDirty ? true : (modified.length > 0 ? true : false);
 		if (isNew || isDirty)
 		{
-			//output.IsNew = isNew;
-			//output.IsDirty = isDirty;
 			for (index in mapping)
 			{
 				if (mapping[index].required)

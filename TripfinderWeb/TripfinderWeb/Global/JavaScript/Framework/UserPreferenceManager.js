@@ -130,7 +130,6 @@
 		tf.promiseAjax.delete(pathCombine(apiPrefix, "userpreference", key), null, { overlay: false })
 			.then(function(apiResponse)
 			{
-				// console.log(apiResponse.Items[0]);
 			});
 	};
 
@@ -141,7 +140,6 @@
 		tf.promiseAjax.delete(pathCombine(apiPrefix, "userpreference/deleteRelated", relatedKey), null, { overlay: false })
 			.then(function(apiResponse)
 			{
-				// console.log(apiResponse.Items[0]);
 			});
 	};
 

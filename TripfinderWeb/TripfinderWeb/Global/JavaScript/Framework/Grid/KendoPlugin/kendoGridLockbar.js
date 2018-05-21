@@ -10,7 +10,8 @@
 		this.onDragEnd = new TF.Events.Event();
 	}
 
-	KendoGridLockbar.prototype._createLockbar = function ($container, kendoGrid) {
+	KendoGridLockbar.prototype._createLockbar = function($container, kendoGrid)
+	{
 		this.$container = $container;
 		this.kendoGrid = kendoGrid;
 		var $lockbar = this.$lockbar;
@@ -24,14 +25,14 @@
 		return this;
 	};
 
-	KendoGridLockbar.prototype.dispose = function () {
+	KendoGridLockbar.prototype.dispose = function()
+	{
 		this.$lockbar = null;
 		this.onDragEnd.unsubscribeAll();
-		// this.$container = null;
-		// this.kendoGrid = null;
 	};
 
-	KendoGridLockbar.prototype._resetlockbarPosition = function () {
+	KendoGridLockbar.prototype._resetlockbarPosition = function()
+	{
 		var $lockbar = this.$lockbar;
 		if (!$lockbar)
 			return;
@@ -45,7 +46,8 @@
 		$lockbar.css("left", left + "px");
 	};
 
-	KendoGridLockbar.prototype._resetlockbarHeight = function () {
+	KendoGridLockbar.prototype._resetlockbarHeight = function()
+	{
 		var $lockbar = this.$lockbar;
 		if (!$lockbar)
 			return;
@@ -53,44 +55,38 @@
 		var $lockedContent = this.$container.find(".k-grid-content-locked");
 		var height = $lockedContent.height();
 
-		// var obSummaryGridVisible = this.obSummaryGridVisible();
-		// if (obSummaryGridVisible)
-		// 	height += this.summaryHeight;
-
 		$lockbar.height(height);
 	};
 
-	KendoGridLockbar.prototype._bindEvent = function(){
+	KendoGridLockbar.prototype._bindEvent = function()
+	{
 		if (!this.$lockbar)
 			return;
 
 		this.$lockbar.kendoDraggable({
 			hint: this._hint.bind(this),
-			axis:'x',
-			holdToDrag:true,
-			// distance:5,
+			axis: 'x',
+			holdToDrag: true,
 			hold: this._draggableOnHold.bind(this),
-			// dragcancel: this._draggableOnDragCancel.bind(this),
 			dragstart: this._draggableOnDragStart.bind(this),
 			drag: this._draggableOnDrag.bind(this),
 			dragend: this._draggableOnDragEnd.bind(this),
 		});
 	};
 
-	KendoGridLockbar.prototype._hint = function() {
+	KendoGridLockbar.prototype._hint = function()
+	{
 		var $lockbar = this.$lockbar;
 		return $lockbar.clone().addClass("clone");
 	};
 
-	KendoGridLockbar.prototype._draggableOnHold = function(e) {
+	KendoGridLockbar.prototype._draggableOnHold = function(e)
+	{
 		this.$lockbar.addClass("move");
 	};
 
-	// KendoGridLockbar.prototype._draggableOnDragCancel = function(e) {
-	// 	this.$lockbar.remove("move");
-	// };
-
-	KendoGridLockbar.prototype._draggableOnDragStart = function(e) {
+	KendoGridLockbar.prototype._draggableOnDragStart = function(e)
+	{
 		var $gridContainer = this.$container;
 
 		var $corver = $('<div class="tf-mobile-grid-column-loced-corver"></div>');
@@ -102,7 +98,8 @@
 		$gridContainer.append($corver);
 	};
 
-	KendoGridLockbar.prototype._draggableOnDrag = function (e) {
+	KendoGridLockbar.prototype._draggableOnDrag = function(e)
+	{
 		var columns = this.kendoGrid.columns;
 
 		var lockbarOffsetX = $('.tf-mobile-grid-lockbar.clone').offset().left;
@@ -112,24 +109,28 @@
 		$lockedColumnCorver.css('width', lockedColumnCorverWidth + 'px');
 	};
 
-	KendoGridLockbar.prototype._getLockedColumnCorverWidth = function(columns, lockedColumnIdx) {
+	KendoGridLockbar.prototype._getLockedColumnCorverWidth = function(columns, lockedColumnIdx)
+	{
 		var corverWidth = 0;
-		columns.map(function(column, idx){
-			if(idx <= lockedColumnIdx && !column.hidden){
-				columnWidth = parseInt(column.width.replace('px',''));
+		columns.map(function(column, idx)
+		{
+			if (idx <= lockedColumnIdx && !column.hidden)
+			{
+				columnWidth = parseInt(column.width.replace('px', ''));
 				corverWidth += columnWidth;
 			}
 		});
 		return corverWidth;
 	};
 
-	KendoGridLockbar.prototype._draggableOnDragEnd = function(e) {
+	KendoGridLockbar.prototype._draggableOnDragEnd = function(e)
+	{
 		this.$lockbar.removeClass("move");
 		var $corver = $('.tf-mobile-grid-column-loced-corver');
 		$corver.remove();
 
 		var columns = this.kendoGrid.columns;
-		var offsetX = parseInt($('.tf-mobile-grid-lockbar.clone').css('left').replace('px','')); // e.clientX;
+		var offsetX = parseInt($('.tf-mobile-grid-lockbar.clone').css('left').replace('px', ''));
 
 		var lockedColumnIdx = this._getLockedColumnIdxByLockbarPosition(columns, offsetX);
 
@@ -137,31 +138,36 @@
 			this.onDragEnd.notify(lockedColumnIdx);
 	};
 
-	KendoGridLockbar.prototype._getLockedColumnIdxByLockbarPosition = function (columns, lockbarOffsetX) {
+	KendoGridLockbar.prototype._getLockedColumnIdxByLockbarPosition = function(columns, lockbarOffsetX)
+	{
 		var lockedColumnIdx = 0;
 
 		var columnRightBorderOffsetX = 0;
 		var findIdx = false;
-		columns.map(function(column, idx){
+		columns.map(function(column, idx)
+		{
 			if (findIdx)
 				return;
 
 			var columnWidth = 0;
-			if(!column.hidden){
-				columnWidth = parseInt(column.width.replace('px',''));
+			if (!column.hidden)
+			{
+				columnWidth = parseInt(column.width.replace('px', ''));
 				columnRightBorderOffsetX += columnWidth;
 			}
 
-			if (columnRightBorderOffsetX >= lockbarOffsetX){
+			if (columnRightBorderOffsetX >= lockbarOffsetX)
+			{
 				lockedColumnIdx = idx;
 				findIdx = true;
 			}
 
 			if (findIdx &&
 				lockedColumnIdx > 0 &&
-				lockbarOffsetX < columnRightBorderOffsetX - columnWidth / 2){
-					lockedColumnIdx--;
-				}
+				lockbarOffsetX < columnRightBorderOffsetX - columnWidth / 2)
+			{
+				lockedColumnIdx--;
+			}
 		});
 
 		return lockedColumnIdx;

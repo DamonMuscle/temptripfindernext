@@ -103,17 +103,6 @@
 	{
 		return this._promise;
 	};
-	//BaseModalViewModel.prototype.setSelectValue = function(field)
-	//{
-	//	return function(scope, event)
-	//	{
-	//		var observableField = this.obEntityDataModel()[field];
-	//		if (observableField() != event.target.value)
-	//		{
-	//			observableField(event.target.value);
-	//		}
-	//	}
-	//};
 
 	BaseModalViewModel.prototype.dispose = function()
 	{

@@ -24,11 +24,4 @@
 	DecimalBox.constructor = DecimalBox;
 
 	DecimalBox.prototype.type = "Decimal";
-
-	//DecimalBox.prototype.dispose = function()
-	//{
-	//	namespace.StringBox.prototype.dispose.call(this);
-	//	ko.cleanNode(this.getElement()[0]);
-	//	this.getElement().remove();
-	//}
 })();

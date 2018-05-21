@@ -41,8 +41,6 @@
 		tryHide: function()
 		{
 			this._counter--;
-			//console.log(this._counter);
-			//if (this._counter < 0) { console.log("!!!"); }
 			if (this._counter <= 0)
 			{
 				this._counter = 0;
@@ -58,7 +56,6 @@
 		show: function(progressbar, overlay, delayTime)
 		{
 			this._counter++;
-			//console.log(this._counter);
 			this._$element.show();
 			this.reminderLoadingStatus.notify(true);
 			var self = this;
@@ -90,7 +87,6 @@
 			}
 
 			this._counter++;
-			//console.log(this._counter);
 			this._$element.show(0);
 			this.reminderLoadingStatus.notify(true);
 			if (this._counter != 0)
@@ -133,56 +129,3 @@
 		}
 	};
 })();
-
-
-//(function()
-//{
-//	createNamespace("TF").LoadingIndicator = LoadingIndicator;
-
-//	//the main purpose of this class is not to indicate loading state but to block user input of different kinds
-//	function LoadingIndicator($element)
-//	{
-//		this._$element = $element;
-//		this._$overlay = $element.find(".overlay").hide();
-//		this._$spinner = $element.find(".spinner").hide();
-//		this._$progressbar = $element.find(".progressbar").hide();
-//		this._counter = 0;
-//	}
-
-//	LoadingIndicator.prototype = {
-//		tryHide: function()
-//		{
-//			this._counter--;
-//			if (this._counter <= 0)
-//			{
-//				this._counter = 0;
-//				this._$overlay.hide();
-//				this._$element.hide();
-//				this._$spinner.hide();
-//				this._$progressbar.hide();
-//			}
-//		},
-//		show: function(progressbar)
-//		{
-//			this._counter++;
-//			this._$element.show();
-//			var self = this;
-//			if (self._counter != 0)
-//			{
-//				this._$overlay.show();
-//				if (!progressbar)
-//				{
-//					this._$spinner.show();
-//				}
-//				else
-//				{
-//					this._$progressbar.show();
-//				}
-//			}
-//		},
-//		isShowing: function()
-//		{
-//			return this._counter != 0;
-//		}
-//	};
-//})();

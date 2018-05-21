@@ -17,12 +17,10 @@
 		this.mousedover = true;
 		this.$menu.find('.active').removeClass('active');
 		$(e.currentTarget).addClass('active');
-		//console.log("enter li ...");
 	};
 
 	$.fn.typeahead.Constructor.prototype.mouseleave = function(e)
 	{//hook the base li mouse leave function, to use ul mouse leave instead
-		//console.log("leave li ...");
 	};
 
 	ko.bindingHandlers.typeahead = {
@@ -356,10 +354,6 @@
 						return i[0];
 					});
 
-					// if (this.autoSelect && !activeFound) {
-					// 	items.first().addClass('active');
-					// 	this.$element.data('active', items.first().data('value'));
-					// }
 					if (groupName)
 					{
 						this.$menu.append('<li class="group"><strong>' + groupName + '</strong></li>');
@@ -486,14 +480,12 @@
 				typeaheadInput.$menu.on("mouseenter", function(e)
 				{// mouse in the div(may has scroll bar)
 					this.mousedover = true;
-					//console.log("enter ul ...");
 				}.bind(typeaheadInput));
 
 				typeaheadInput.$menu.on("mouseleave", function(e)
 				{//mouse out the div (may has scroll bar)
 					this.mousedover = false;
 					if (!this.focused && this.shown) this.hide();
-					//console.log("leave ul ...");
 				}.bind(typeaheadInput));
 			}
 		}

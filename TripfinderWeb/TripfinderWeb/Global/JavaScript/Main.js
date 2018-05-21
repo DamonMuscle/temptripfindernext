@@ -371,7 +371,6 @@ function colorRgb(sColor, transparency)
 	menuHelper.hiddenMenu = function()
 	{
 		tf.contextMenuManager.dispose();
-		//tf.pageManager.obContextMenuVisible(false);
 	};
 
 	menuHelper.isCurrentMenuOpened = function(e)
@@ -438,9 +437,9 @@ Function.prototype.createSequence = function(fcn, scope)
 };
 
 
-Function.prototype.createCallback = function( /*args...*/)
-{    // make args available, in function below
-
+Function.prototype.createCallback = function()
+{
+	// make args available, in function below
 	var args = arguments,
 		method = this;
 	return function()

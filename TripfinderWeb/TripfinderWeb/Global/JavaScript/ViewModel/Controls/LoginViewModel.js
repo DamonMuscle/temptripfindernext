@@ -88,9 +88,9 @@
 			},
 			{
 				auth:
-					{
-						noInterupt: true
-					}
+				{
+					noInterupt: true
+				}
 			})
 			.then(function(apiResponse)
 			{
@@ -99,17 +99,6 @@
 				tf.authManager.token = token;
 				return { clientKey: $.trim(this.obClientKey()), username: this.obUsername(), password: this.obPassword() };
 			}.bind(this))
-		//.catch(function(apiResponse)
-		//{
-		//	return apiResponse;
-		//	//switch (apiResponse.StatusCode)
-		//	//{
-		//	//	//API is not returning 404 when client id is wrong at this moment
-		//	//	//case 404:
-		//	//	//break;
-		//	//	case 401:
-		//	//}
-		//})
 	};
 
 	LoginViewModel.prototype._trimClientKey = function()

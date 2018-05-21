@@ -3,8 +3,8 @@
 {
 	// shorten references to variables. this is better for uglification
 	var kendo = window.kendo,
-        ui = kendo.ui,
-        Widget = ui.Widget,
+		ui = kendo.ui,
+		Widget = ui.Widget,
 		proxy = $.proxy,
 		CHANGE = "change",
 		extractFormat = kendo._extractFormat,
@@ -31,7 +31,7 @@
 
 			that.inputElement = element.find(".datepickerinput");
 			that.inputElement
-                .on("blur" + NS, proxy(that._blur, that))
+				.on("blur" + NS, proxy(that._blur, that))
 
 			kendo.notify(that);
 		},
@@ -66,8 +66,8 @@
 		_parse: function(value)
 		{
 			var that = this,
-                options = that.options,
-                current = that._value || TODAY;
+				options = that.options,
+				current = that._value || TODAY;
 
 			if (value instanceof DATE)
 			{
@@ -81,11 +81,7 @@
 				var isTimeColumn = TF.DateTimeBoxHelper.testIsTimeColumn(this.element);
 				if (isTimeColumn)
 					value = new DATE(current.getFullYear(), current.getMonth(), current.getDate(),
-                                 value.getHours(), value.getMinutes(), value.getSeconds(), value.getMilliseconds());	
-				//else
-// 					value = new DATE(value.getFullYear(), value.getMonth(), value.getDate(),
-//                                  value.getHours(), value.getMinutes(), value.getSeconds(), value.getMilliseconds());
-                    //value = new DATE(toISOStringWithoutTimeZone(moment(value)));
+						value.getHours(), value.getMinutes(), value.getSeconds(), value.getMilliseconds());
 			}
 
 			return value;

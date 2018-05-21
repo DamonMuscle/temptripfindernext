@@ -9,7 +9,6 @@
 		this.delayChange = delayChange;
 		this._dateTimePicker = null;
 		this.initialize.call(this);
-		//this.disableWeekend = disableWeekend;
 	};
 
 	DateBox.prototype = Object.create(namespace.BaseBox.prototype);

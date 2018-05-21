@@ -2,14 +2,6 @@
 {
 	createNamespace("TF").UserDefinedFieldUtil = UserDefinedFieldUtil;
 
-	//UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_LABELS = {
-	//	0: "User_Char1", 1: "User_Char2", 2: "User_Char3", 3: "User_Char4",
-	//	4: "User_Num1", 5: "User_Num2", 6: "User_Num3", 7: "User_Num4",
-	//	8: "User_Date1", 9: "User_Date2", 10: "User_Date3", 11: "User_Date4",
-	//	12: "User_Char5", 13: "User_Char6", 14: "User_Char7", 15: "User_Char8",
-	//	16: "User_Date5", 17: "User_Date6", 18: "User_Date7", 19: "User_Date8"
-	//}
-
 	UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_LABELS = {
 		0: { DisplayLabel: "User_Char1", Status: true }, 1: { DisplayLabel: "User_Char2", Status: true }, 2: { DisplayLabel: "User_Char3", Status: true }, 3: { DisplayLabel: "User_Char4", Status: true },
 		4: { DisplayLabel: "User_Num1", Status: true }, 5: { DisplayLabel: "User_Num2", Status: true }, 6: { DisplayLabel: "User_Num3", Status: true }, 7: { DisplayLabel: "User_Num4", Status: true },
@@ -25,19 +17,6 @@
 		12: "userChar5", 13: "userChar6", 14: "userChar7", 15: "userChar8",
 		16: "userDate5", 17: "userDate6", 18: "userDate7", 19: "userDate8"
 	}
-
-	//Object.defineProperty(
-	//	UserDefinedFieldUtil, "USER_DEFINED_FIELDS_COLUMN_LABELS",
-	//	{
-	//		varlue: {
-	//			0: "User_Char1", 1: "User_Char2", 2: "User_Char3", 3: "User_Char4",
-	//			4: "User_Num1", 5: "User_Num2", 6: "User_Num3", 7: "User_Num4",
-	//			8: "User_Date1", 9: "User_Date2", 10: "User_Date3", 11: "User_Date4",
-	//			12: "User_Char5", 13: "User_Char6", 14: "User_Char7", 15: "User_Char8",
-	//			16: "User_Date5", 17: "User_Date6", 18: "User_Date7", 19: "User_Date8"
-	//		},
-	//		writable: false
-	//	});
 
 	UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_INFO = [
 		{ FieldTypeID: 0, FieldLabel: "User Defined Char 1", FieldType: "Character", DisplayLabel: "User_Char1", Status: true },
@@ -95,8 +74,8 @@
 				"userChar1", "userChar2", "userChar3", "userChar4",
 				"userNum1", "userNum2", "userNum3", "userNum4",
 				"userDate1", "userDate2", "userDate3", "userDate4",
-				 "userChar5", "userChar6", "userChar7", "userChar8",
-				 "userDate5", "userDate6", "userDate7", "userDate8"],
+				"userChar5", "userChar6", "userChar7", "userChar8",
+				"userDate5", "userDate6", "userDate7", "userDate8"],
 			writable: false
 		});
 
@@ -110,14 +89,14 @@
 	{
 		var gridType = type ? type : this._gridType;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userdefinedlabel", gridType))
-		.then(function(apiResponse)
-		{
-			this._userDefinedLabels = apiResponse.Items[0];
-		}.bind(this))
-		.catch(function(apiResponse)
-		{
-			
-		});
+			.then(function(apiResponse)
+			{
+				this._userDefinedLabels = apiResponse.Items[0];
+			}.bind(this))
+			.catch(function(apiResponse)
+			{
+
+			});
 	};
 
 	UserDefinedFieldUtil.prototype.mergeUserDefinedLabel = function(columns, option)

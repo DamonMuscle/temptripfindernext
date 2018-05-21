@@ -144,9 +144,9 @@
 
 						widget.css(
 							{
-								top: this.$element.outerHeight(), //+ this.$element.offset().top - modal.offset().top,
+								top: this.$element.outerHeight(),
 								bottom: 'auto',
-								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2 //$button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2 - modal.offset().left
+								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2
 							});
 					}
 					else
@@ -162,7 +162,6 @@
 								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2
 							});
 					}
-					//widget.height(this.height - 10);
 				}
 			}
 			else if (widget && widget.offset())

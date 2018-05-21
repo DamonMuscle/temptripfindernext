@@ -30,9 +30,6 @@
 			var rightColumnKeys = Object.keys(rightColumn);
 			var differentKeys = leftColumnKeys.filter(function(leftColumnKey, idx)
 			{
-				// if (leftColumnKey === 'Width'||leftColumnKey === 'DisplayName'||leftColumnKey === 'type'||leftColumnKey==="hidden") // Width not stored in DB, so no need to compare
-				// 	return false;
-
 				if (!TF.Grid.LayoutHelper.compareLayoutColumnSortSetting(leftColumn, rightColumn))
 					return true; // Means has different keys
 
@@ -125,7 +122,6 @@
 		{
 			return this._obOnlyForUpdateSelectedGridLayoutModified();
 		}, this);
-		// 	this.obSelectedGridLayoutModified = ko.observable(null);
 
 		this.obGridLayoutExtendedDataModels = ko.observableArray();
 		this.obContextMenuDisplayGridLayoutExtendedDataModels = ko.computed(function()
@@ -198,14 +194,6 @@
 		}
 	};
 
-
-	// this function subsribed following knockout object status;
-	// this._obAppliedLayoutInitState();
-	// this._obSelectedGridLayoutExtendedDataModel();
-	// this._obSelectedGridLayoutExtendedDataModel().apiIsDirty();
-	// this._obCurrentGridLayoutExtendedDataModel().filterId();
-	// this._obOnlyForUpdateSelectedGridLayoutModified();
-	// this._obSelectedGridLayoutExtendedDataModel().showSummaryBar();
 	KendoGridLayoutMenu.prototype._selectedGridLayoutModifiedComputer = function()
 	{
 		var self = this;
@@ -635,7 +623,6 @@
 		gridLayoutExtendedDataModel.filterId(null);
 		this._obDefaultLayoutDataModel(gridLayoutExtendedDataModel);
 		this._obDefaultLayoutDataModel().apiIsDirty(true);
-		//if (this._gridTypeNoCloumnsSticky.indexOf(this.options.gridType) == -1)
 		//IF the request from search, do not sticky the layout.
 		if (this.options.fromSearch || this.options.isTemporaryFilter)
 		{
@@ -782,7 +769,6 @@
 
 	KendoGridLayoutMenu.prototype.applyLayout = function(gridLayoutExtendDataModel, isNoConfirm)
 	{
-		//tf.loadingIndicator.showImmediately();
 		var self = this;
 
 		return self._alertMessageWhenLayoutIsDeleted(gridLayoutExtendDataModel.name())
@@ -816,7 +802,6 @@
 										{
 											return self.applyLayoutExtended(gridLayoutExtendDataModel);
 										});
-									//return self.applyLayoutExtended(gridLayoutExtendDataModel);
 								});
 						}
 						else if (result === false)
@@ -838,18 +823,11 @@
 					}
 					return self.applyLayoutExtended(gridLayoutExtendDataModel);
 				}
-			}).then(function()
-			{
-				// setTimeout(function()
-				// {
-				// 	tf.loadingIndicator.tryHide();
-				// }, 1500);
 			});
 	};
 
 	KendoGridLayoutMenu.prototype._getLayoutRelatedFilterId = function(layoutId)
 	{
-		//return this._getLayoutExtendedById(layoutId)
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout/id", layoutId))
 			.then(function(apiResponse)
 			{
@@ -969,7 +947,6 @@
 			return self.saveAndEditLayout("new", self._obSelectedGridLayoutExtendedDataModel(), true);
 		else
 		{
-			//return self.saveLayout()
 			return self.syncFilter().then(self.saveLayout.bind(self)())
 				.then(function()
 				{

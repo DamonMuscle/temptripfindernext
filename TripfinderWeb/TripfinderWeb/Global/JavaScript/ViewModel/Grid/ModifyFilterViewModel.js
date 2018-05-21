@@ -7,8 +7,6 @@
 
 	function ModifyFilterViewModel(gridType, isNew, gridFilterDataModel, headerFilters, gridDefinition, omittedRecordIds, options, searchFilter)
 	{
-		//createNamespace("tf.debug").ModifyFilterViewModel = this;
-
 		this.isNew = isNew;
 		this.gridType = gridType;
 
@@ -172,10 +170,10 @@
 		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "omittedRecord", "ids"),
 			{
 				data:
-					{
-						ids: omittedRecordIds,
-						tableType: gridType
-					}
+				{
+					ids: omittedRecordIds,
+					tableType: gridType
+				}
 			})
 			.then(function(apiResponse)
 			{
@@ -276,7 +274,6 @@
 				}
 
 				// due the following code will reset focus on sql statement textArea
-				// /* $textArea.closest('.form-group').find(".help-block").display(); */
 				// so when filter name input box is activeElement and click verify button, textArea will get focus, 
 				// the following code is used to fix this issue.
 				var _activeElement = document.activeElement;
@@ -303,12 +300,8 @@
 			.catch(function()
 			{
 				tf.loadingIndicator.tryHide();
-
-				//var validationErrors = [];
 				var $field = $("textarea[name='sqlStatement']");
-				//validationErrors.push({ name: "sqlStatement", message: "SQL syntax is incorrect", field: $field });
 				this.pageLevelViewModel.obErrorMessageDivIsShow(true);
-				//this.obValidationErrors(validationErrors);
 				var validator = $.trim(this.gridFilterDataModel.whereClause()) === '' ? 'notEmpty' : 'callback';
 				this._$form.find('[data-bv-validator = "' + validator + '"][data-bv-for="sqlStatement"]').show().closest(".form-group").addClass("has-error");
 				$field.focus();
@@ -451,40 +444,6 @@
 		}.bind(this));
 	};
 
-	//ModifyFilterViewModel.prototype._InvalidateMessage = function()
-	//{
-	//	var self = this;
-	//	var validator = self._$form.data("bootstrapValidator");
-	//	var messages = validator.getMessages(validator.getInvalidFields());
-	//	var $fields = validator.getInvalidFields();
-	//	var validationErrors = [];
-	//	$fields.each(function(i, fielddata)
-	//	{
-	//		if (i === 0)
-	//		{
-	//			$(fielddata).focus();
-	//		}
-	//		var name = $(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $(fielddata).closest("div.form-group").find("label").text();
-	//		//VIEW-462 not show sqlStatement on errormessage
-	//		if (name === "sqlStatement")
-	//		{
-	//			name = "Filter Statement";
-	//		}
-	//		var message = messages[i].replace('&lt;', '<').replace('&gt;', '>');
-	//		if (message == " required")
-	//		{
-	//			message = " is required";
-	//		}
-	//		if (message == "Invalid Syntax")
-	//		{
-	//			message = " syntax is invalid";
-	//		}
-	//		validationErrors.push({ name: name, message: message, field: $(fielddata) });
-	//	});
-	//	self.obErrorMessageDivIsShow(validationErrors.length > 0);
-	//	self.obValidationErrors(validationErrors);
-	//};
-
 	ModifyFilterViewModel.prototype._save = function()
 	{
 		return this.saveReminder().then(function(reminder)
@@ -543,12 +502,6 @@
 
 	ModifyFilterViewModel.prototype.selectOperatorClick = function(viewModel, e)
 	{
-		// if (!this.selectOperatorOpen)
-		// {
-		// 	this.selectOperatorOpen = true;
-		// 	return;
-		// }
-		//this.selectOperatorOpen = false;
 		var value = this.selectedOperator();
 		if (value != " ")
 		{
@@ -556,30 +509,14 @@
 		}
 	};
 
-	// ModifyFilterViewModel.prototype.selectOperatorBlur = function(viewModel, e)
-	// {
-	// 	this.selectOperatorOpen = false;
-	// };
-
 	ModifyFilterViewModel.prototype.selectLogicalOperatorClick = function(viewModel, e)
 	{
-		//if (!this.selectLogicalOperatorOpen)
-		//{
-		//	this.selectLogicalOperatorOpen = true;
-		//	return;
-		//}
-		//this.selectLogicalOperatorOpen = false;
 		var value = this.selectedLogicalOperator();
 		if (value != " ")
 		{
 			this.insertFragmentToCurrentCursorPostion(value);
 		}
 	};
-
-	//ModifyFilterViewModel.prototype.selectLogicalOperatorBlur = function(viewModel, e)
-	//{
-	//	this.selectLogicalOperatorOpen = false;
-	//};
 
 	ModifyFilterViewModel.prototype.valueKeypress = function(viewModel, e)
 	{
@@ -667,115 +604,115 @@
 
 			var fields = {
 				filterName:
+				{
+					trigger: "change blur",
+					validators:
 					{
-						trigger: "change blur",
-						validators:
+						notEmpty:
+						{
+							message: " required"
+						},
+						callback:
+						{
+							message: " must be unique",
+							callback: function(value, validator, $field)
 							{
-								notEmpty:
-									{
-										message: " required"
-									},
-								callback:
-									{
-										message: " must be unique",
-										callback: function(value, validator, $field)
-										{
-											if (!value)
-											{
-												self.updateErrors($field, "unique");
-												return true;
-											}
-											else
-											{
-												self.updateErrors($field, "required");
-											}
+								if (!value)
+								{
+									self.updateErrors($field, "unique");
+									return true;
+								}
+								else
+								{
+									self.updateErrors($field, "required");
+								}
 
-											return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "gridfilter", "unique"),
-												{
-													data: this.gridFilterDataModel.toData(),
-													async: false
-												},
-												{
-													overlay: false
-												})
-												.then(function(apiResponse)
-												{
-													return apiResponse.Items[0];
-												});
-										}.bind(this)
-									}
-							}
-					},
-				sqlStatement:
-					{
-						trigger: "blur change",
-						validators:
-							{
-								callback:
+								return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "gridfilter", "unique"),
 									{
-										message: "Invalid Syntax",
-										callback: function(value, validator, $field)
-										{
-											if (!value)
-											{
-												self.updateErrors($field, "invalid");
-											}
-											else
-											{
-												self.updateErrors($field, "required");
-											}
-											if ($.trim(value) !== '')
-											{
-												return this.verify().then(function(response)
-												{
-													if (response.StatusCode === 400)
-													{
-														setTimeout(function()
-														{ //put data source name into message.
-															$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").text("Invalid Syntax");
-															self.pageLevelViewModel.obSuccessMessageDivIsShow(false);
-														}.bind(this));
-														return false;
-													}
-													return true;
-												}).catch(function()
-												{
-													setTimeout(function()
-													{ //put data source name into message.
-														$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").text("Invalid Syntax");
-														self.pageLevelViewModel.obSuccessMessageDivIsShow(false);
-													}.bind(this));
-													return false;
-												});
-											}
-											else
-											{
-												if (this.obOmitRecords().length === 0)
-												{
-													return {
-														valid: false, // or false
-														message: ' required'
-													};
-												}
-												else
-												{
-													return true;
-												}
-											}
-										}.bind(this)
-									}
-							}
+										data: this.gridFilterDataModel.toData(),
+										async: false
+									},
+									{
+										overlay: false
+									})
+									.then(function(apiResponse)
+									{
+										return apiResponse.Items[0];
+									});
+							}.bind(this)
+						}
 					}
+				},
+				sqlStatement:
+				{
+					trigger: "blur change",
+					validators:
+					{
+						callback:
+						{
+							message: "Invalid Syntax",
+							callback: function(value, validator, $field)
+							{
+								if (!value)
+								{
+									self.updateErrors($field, "invalid");
+								}
+								else
+								{
+									self.updateErrors($field, "required");
+								}
+								if ($.trim(value) !== '')
+								{
+									return this.verify().then(function(response)
+									{
+										if (response.StatusCode === 400)
+										{
+											setTimeout(function()
+											{ //put data source name into message.
+												$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").text("Invalid Syntax");
+												self.pageLevelViewModel.obSuccessMessageDivIsShow(false);
+											}.bind(this));
+											return false;
+										}
+										return true;
+									}).catch(function()
+									{
+										setTimeout(function()
+										{ //put data source name into message.
+											$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").text("Invalid Syntax");
+											self.pageLevelViewModel.obSuccessMessageDivIsShow(false);
+										}.bind(this));
+										return false;
+									});
+								}
+								else
+								{
+									if (this.obOmitRecords().length === 0)
+									{
+										return {
+											valid: false, // or false
+											message: ' required'
+										};
+									}
+									else
+									{
+										return true;
+									}
+								}
+							}.bind(this)
+						}
+					}
+				}
 			};
 
 			this._$form
 				.bootstrapValidator(
-					{
-						excluded: [':hidden', ':not(:visible)'],
-						live: 'enabled',
-						message: 'This value is not valid',
-						fields: fields
-					})
+				{
+					excluded: [':hidden', ':not(:visible)'],
+					live: 'enabled',
+					message: 'This value is not valid',
+					fields: fields
+				})
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		}.bind(this), 0);
 	};
@@ -853,8 +790,6 @@
 		}.bind(this);
 	};
 
-	/////////////
-
 	ModifyFilterViewModel.prototype.valueToSQL = function(type, value)
 	{
 		switch (type)
@@ -907,45 +842,45 @@
 					{
 						trigger: "blur",
 						validators:
+						{
+							notEmpty:
 							{
-								notEmpty:
-									{
-										message: "required"
-									},
-								callback:
-									{
-										message: " must be unique",
-										callback: function(value, validator, $field)
-										{
+								message: "required"
+							},
+							callback:
+							{
+								message: " must be unique",
+								callback: function(value, validator, $field)
+								{
 
-											if (!value)
-											{
-												this.updateErrors($field, "unique");
-												return true;
-											}
-											else
-											{
-												this.updateErrors($field, "required");
-											}
-
-											return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "reminder", "unique"),
-												{
-													data:
-														{
-															Name: value,
-															Id: 0
-														}
-												},
-												{
-													overlay: false
-												})
-												.then(function(apiResponse)
-												{
-													return apiResponse.Items[0];
-												});
-										}.bind(this)
+									if (!value)
+									{
+										this.updateErrors($field, "unique");
+										return true;
 									}
+									else
+									{
+										this.updateErrors($field, "required");
+									}
+
+									return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "reminder", "unique"),
+										{
+											data:
+											{
+												Name: value,
+												Id: 0
+											}
+										},
+										{
+											overlay: false
+										})
+										.then(function(apiResponse)
+										{
+											return apiResponse.Items[0];
+										});
+								}.bind(this)
 							}
+						}
 					});
 			}
 			else

@@ -6,7 +6,6 @@
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Global Replace");
-		//this.sizeCss = "modal-lg";
 		this.contentTemplate('workspace/grid/globalreplace');
 		this.buttonTemplate('modal/positivenegative');
 		this.obPositiveButtonLabel = ko.observable("Save");

@@ -47,7 +47,6 @@
 
 		_executeCall: function()
 		{
-			// this._grid
 			this._grid.refresh();
 		}
 	};

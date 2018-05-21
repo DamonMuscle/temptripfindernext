@@ -76,9 +76,6 @@
 		this.obSelectedGridFilterClause = ko.computed(this._selectedGridFilterWhereClauseComputer, this);
 		this.obSelectedGridFilterType = ko.computed(this._selectedGridFilterTypeComputer, this);
 		this.obSelectedGridFilterName = ko.computed(this._selectedGridFilterNameComputer, this);
-		// this.obIsFilterApplied = ko.computed(function() {
-		// 	return this.obSelectedGridFilterName() !== 'None';
-		// }, this);
 		this.subscriptions.push(this.obHeaderFilters.subscribe(this._currentFilterChange, this));
 		this.subscriptions.push(this.obHeaderFilterSets.subscribe(this._currentFilterChange, this));
 
@@ -91,8 +88,6 @@
 			$('.grid-filter-clear-all').toggleClass('quick-filter-applied', isQuickFilterApplied);
 
 		}, this);
-
-		// this.obTempOmitExcludeAnyIds.subscribe(this._currentFilterChange, this);
 
 		this.obSelectedGridFilterModified = ko.computed(this._selectedGridFilterModifiedComputer, this);
 		this.obSelectedGridFilterModifiedMessage = ko.computed(this._selectedGridFilterModifiedMessageComputer, this);
@@ -269,7 +264,6 @@
 	{
 		this._setgridStateTwoRowWhenOverflow && this._setgridStateTwoRowWhenOverflow();
 		if (
-			// (this.obSelectedGridFilterDataModel() && this.obTempOmitExcludeAnyIds().length > 0 ) || // View-910
 			this._selectedGridFilterModifiedComputer())
 		{
 			if (!this.obSelectedGridFilterDataModel() && !this.obCallOutFilterName() && (this.obSelectedGridFilterName() == 'None'))
@@ -434,10 +428,6 @@
 					{
 						selectGridFilterEntityId = parseInt(getQueryString("filterId"));
 					}
-					if (self._layoutFilterId)
-					{
-						//tf.storageManager.save(self._storageFilterDataKey, self._layoutFilterId);
-					}
 				}
 
 				// for the specific filters in the summary page of the viewfinderweb
@@ -524,8 +514,6 @@
 		var self = this;
 		return tf.userPreferenceManager.getAllKey().then(function()
 		{
-			// self._alertMessageWhenLayoutIsDeleted();
-
 			var filterId = filterId || tf.storageManager.get(self._storageFilterDataKey) || self.obSelectedGridFilterId();
 			var message = 'The Filter that was applied has been deleted. The system default Filter will be applied to this grid.';
 			return self._syncFilterAndNotifyStatusUpdated(filterId, message);
@@ -538,10 +526,6 @@
 
 		if (filterId && !message)
 			message = 'This Filter has been deleted. It cannot be applied.';
-		// else {
-		//filterId = tf.storageManager.get(self._storageFilterDataKey);
-		//message = 'The Filter that was applied has been deleted.';
-		// }
 
 		return TF.Grid.FilterHelper.validFilterId(filterId)
 			.then(function(filterExist)
@@ -576,7 +560,6 @@
 	KendoGridFilterMenu.prototype._deleteForeignKey = function(filterId)
 	{
 		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "gridfilter", filterId));
-		//return Promise.resolve(true);
 	};
 
 	KendoGridFilterMenu.prototype._deleteStickFilter = function(filterId)
@@ -602,7 +585,6 @@
 			if (self.obGridFilterDataModels()[i].id() === filterId)
 			{
 				self.obGridFilterDataModels.remove(self.obGridFilterDataModels()[i]);
-				//tf.storageManager.save(self._storageFilterDataKey, '');
 				i--;
 				break;
 			}
@@ -809,7 +791,6 @@
 		}
 		else if (!searchData.data.filterSet && this.obTempOmitExcludeAnyIds().length > 0) //only change omitted records
 		{
-			// var entity = { ids: omittedRecordIds, tableType: gridType }
 			return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "gridfilter"),
 				{
 					data: this.obSelectedGridFilterDataModel().toData()
@@ -855,7 +836,6 @@
 	KendoGridFilterMenu.prototype.applyGridFilter = function(gridFilterDataModel)
 	{
 		var self = this;
-		//return self.syncFilter(gridFilterDataModel.id())
 
 		var currentFilterId = self.obSelectedGridFilterId();
 		var nextFilterId = gridFilterDataModel.id();
@@ -1028,8 +1008,6 @@
 		{ //_filteredIds is the setting from outside, not grid inside.
 			this._gridState.filteredIds = this._filteredIds;
 		}
-		// if (!this._layoutFilterId)
-		// {
 
 		//IF the request from search, do not sticky fliter.
 		if (self.options.fromSearch || self.options.isTemporaryFilter)
@@ -1046,7 +1024,6 @@
 		{
 			tf.storageManager.save(this._storageFilterDataKey, this.obSelectedGridFilterId());
 		}
-		// }
 	};
 
 	KendoGridFilterMenu.prototype.findCurrentHeaderFilters = function()
@@ -1228,7 +1205,6 @@
 		}
 		var searchData = new TF.SearchParameters(skip, take, null, filterSet, filterClause, this._gridState.filteredIds, omitIds);
 		searchData.data.fields = ['Id'];
-		//searchData.data.idFilter = { IncludeOnly: null, ExcludeAny: [84] };
 		searchData.paramData.getCount = true;
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", this._gridType),
 			{

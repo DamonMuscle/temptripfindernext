@@ -6,7 +6,6 @@
 	{
 		this.Name = name;
 		this.Direction = isAscending ? 'Ascending' : 'Descending';
-		//this.sortColumn = sortColumn;
 	}
 
 	SortItem.prototype.isAscending = function()

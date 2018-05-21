@@ -53,17 +53,17 @@
 	{
 		var self = this;
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(valid)
-		{
-			if (valid)
+			.then(function(valid)
 			{
-				return self._save();
-			}
-			else
-			{
-				return Promise.reject();
-			}
-		}.bind(this))
+				if (valid)
+				{
+					return self._save();
+				}
+				else
+				{
+					return Promise.reject();
+				}
+			}.bind(this))
 	};
 
 
@@ -74,17 +74,17 @@
 			return tf.promiseAjax[this.isNew === "new" ? "post" : 'put'](pathCombine(tf.api.apiPrefix(), "gridlayout"), {
 				data: this.gridLayoutExtendedDataModel.toData()
 			})
-			.then(function(apiResponse)
-			{
-				this.gridLayoutExtendedDataModel.update(apiResponse.Items[0]);
-				return this.gridLayoutExtendedDataModel;
-			}.bind(this))
-			.catch(function(apiResponse)
-			{
-				this.obErrorMessageDivIsShow(true);
-				this.obValidationErrors([{ message: apiResponse.Message }]);
-				throw apiResponse;
-			})
+				.then(function(apiResponse)
+				{
+					this.gridLayoutExtendedDataModel.update(apiResponse.Items[0]);
+					return this.gridLayoutExtendedDataModel;
+				}.bind(this))
+				.catch(function(apiResponse)
+				{
+					this.obErrorMessageDivIsShow(true);
+					this.obValidationErrors([{ message: apiResponse.Message }]);
+					throw apiResponse;
+				})
 		}
 		else
 		{
@@ -175,84 +175,83 @@
 							{
 								return true;
 							}
-	}
+						}
 						errors.push(item);
 					});
 					self.pageLevelViewModel.obValidationErrors(errors);
 				};
 			this._$form
-			.bootstrapValidator({
-				excluded: [':hidden', ':not(:visible)'],
-				live: 'enabled',
-				message: 'This value is not valid',
-				fields: {
-				layoutName: {
-					trigger: "blur change",
-					validators: {
-						notEmpty: {
-							message: " required"
-						},
-						callback: {
-							message: " must be unique",
-								callback: function(value, validator, $field)
-								{
-									if (!value)
+				.bootstrapValidator({
+					excluded: [':hidden', ':not(:visible)'],
+					live: 'enabled',
+					message: 'This value is not valid',
+					fields: {
+						layoutName: {
+							trigger: "blur change",
+							validators: {
+								notEmpty: {
+									message: " required"
+								},
+								callback: {
+									message: " must be unique",
+									callback: function(value, validator, $field)
 									{
-										updateErrors($field, "unique");
-									return true;
-								}
-									else
-									{
-										updateErrors($field, "required");
-								}
-								return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "gridlayout", "unique"), {
-									data: this.gridLayoutExtendedDataModel.toData()
-								}, { overlay: false })
-									.then(function(apiResponse)
-									{
-										if (!apiResponse.Items[0] && this.obStatus() === 'selectfilter')
+										if (!value)
 										{
-											$field.parent().find("[data-bv-validator=callback]").css("display", "block");
-											$field.parent().find("[data-bv-validator=callback]").attr("data-bv-result", "INVALID");
-											$field.parent().addClass("has-error");
+											updateErrors($field, "unique");
+											return true;
 										}
-										return apiResponse.Items[0];
-									}.bind(this))
-							}.bind(this)
+										else
+										{
+											updateErrors($field, "required");
+										}
+										return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "gridlayout", "unique"), {
+											data: this.gridLayoutExtendedDataModel.toData()
+										}, { overlay: false })
+											.then(function(apiResponse)
+											{
+												if (!apiResponse.Items[0] && this.obStatus() === 'selectfilter')
+												{
+													$field.parent().find("[data-bv-validator=callback]").css("display", "block");
+													$field.parent().find("[data-bv-validator=callback]").attr("data-bv-result", "INVALID");
+													$field.parent().addClass("has-error");
+												}
+												return apiResponse.Items[0];
+											}.bind(this))
+									}.bind(this)
+								}
+							}
 						}
 					}
-				}
-				}
-			}).on('success.field.bv', function(e, data)
-			{
-				if (!isValidating)
+				}).on('success.field.bv', function(e, data)
 				{
-					isValidating = true;
-					self.pageLevelViewModel.saveValidate(data.element);
-					isValidating = false;
-				}
-			});
+					if (!isValidating)
+					{
+						isValidating = true;
+						self.pageLevelViewModel.saveValidate(data.element);
+						isValidating = false;
+					}
+				});
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		}.bind(this), 0);
-		//setTimeout(function() { this._$form.find(':text:eq(0)').focus() }.bind(this), 500);
 	};
 	ModifyLayoutViewModel.prototype.apply = function(viewModel, e)
 	{
 		return this.save()
-		.then(function(savedGridLayoutExtendedDataModel)
-		{
-			if (TF.menuHelper)
+			.then(function(savedGridLayoutExtendedDataModel)
 			{
-				TF.menuHelper.hiddenMenu();
-			}
-			return {
-				applyOnSave: this.obApplyOnSave(),
-				savedGridLayoutExtendedDataModel: savedGridLayoutExtendedDataModel
-			}
-			self.positiveClose(result);
-		}.bind(this), function()
-		{
-		});
+				if (TF.menuHelper)
+				{
+					TF.menuHelper.hiddenMenu();
+				}
+				return {
+					applyOnSave: this.obApplyOnSave(),
+					savedGridLayoutExtendedDataModel: savedGridLayoutExtendedDataModel
+				}
+				self.positiveClose(result);
+			}.bind(this), function()
+			{
+			});
 	};
 	ModifyLayoutViewModel.prototype.dispose = function()
 	{

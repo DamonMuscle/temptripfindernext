@@ -27,14 +27,14 @@
 							{
 								if (!isValidate)
 								{
-									//self.clearDBInfo();
 									return tf.DBNeedToRebuildAlert(notValidDatabaseName);
 								}
 								return Promise.resolve(true);
 							});
 					})
 					.catch(function()
-					{ // failed to connection
+					{
+						// failed to connection
 						return tf.promiseBootbox.dialog({
 							message: datasource.DatabaseName + " could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative (support@transfinder.com or 888-427-2403).",
 							title: "Could Not Load",
@@ -47,7 +47,8 @@
 							}
 						})
 							.then(function()
-							{ //maybe need logoff
+							{
+								//maybe need logoff
 								return Promise.resolve(false);
 							});
 					})
