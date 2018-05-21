@@ -1,428 +1,427 @@
 ﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-		<ProductVersion>
-		</ProductVersion>
-		<SchemaVersion>2.0</SchemaVersion>
-		<ProjectGuid>{97A0B6EE-526E-4793-930F-AD392ED6647C}</ProjectGuid>
-		<ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
-		<OutputType>Library</OutputType>
-		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>TripfinderWeb</RootNamespace>
-		<AssemblyName>TripfinderWeb</AssemblyName>
-		<TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-		<UseIISExpress>true</UseIISExpress>
-		<Use64BitIISExpress />
-		<IISExpressSSLPort />
-		<IISExpressAnonymousAuthentication />
-		<IISExpressWindowsAuthentication />
-		<IISExpressUseClassicPipelineMode />
-		<UseGlobalApplicationHostFile />
-		<NuGetPackageImportStamp>
-		</NuGetPackageImportStamp>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<OutputPath>bin\</OutputPath>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>pdbonly</DebugType>
-		<Optimize>true</Optimize>
-		<OutputPath>bin\</OutputPath>
-		<DefineConstants>TRACE</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-	</PropertyGroup>
-	<ItemGroup>
-		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="System.Web.DynamicData" />
-		<Reference Include="System.Web.Entity" />
-		<Reference Include="System.Web.ApplicationServices" />
-		<Reference Include="System.ComponentModel.DataAnnotations" />
-		<Reference Include="System" />
-		<Reference Include="System.Data" />
-		<Reference Include="System.Core" />
-		<Reference Include="System.Data.DataSetExtensions" />
-		<Reference Include="System.Web.Extensions" />
-		<Reference Include="System.Xml.Linq" />
-		<Reference Include="System.Drawing" />
-		<Reference Include="System.Web" />
-		<Reference Include="System.Xml" />
-		<Reference Include="System.Configuration" />
-		<Reference Include="System.Web.Services" />
-		<Reference Include="System.EnterpriseServices" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="Properties\AssemblyInfo.cs" />
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="Global\Css\bootstrapContainers.less" />
-		<Content Include="Global\Css\bootstrapEditing.less" />
-		<Content Include="Global\Css\bootstrapModal.less" />
-		<Content Include="Global\Css\common.less" />
-		<Content Include="Global\Css\contextmenu.less" />
-		<Content Include="Global\Css\dataentry.less" />
-		<Content Include="Global\Css\enhance.less" />
-		<Content Include="Global\Css\fontstyle.less" />
-		<Content Include="Global\Css\fonts\SourceSansPro_Bold.ttf" />
-		<Content Include="Global\Css\fonts\SourceSansPro_Italic.ttf" />
-		<Content Include="Global\Css\fonts\SourceSansPro_Regular.ttf" />
-		<Content Include="Global\Css\fonts\SourceSansPro_SemiBold.ttf" />
-		<Content Include="Global\Css\grid.less" />
-		<Content Include="Global\Css\Icons.less" />
-		<Content Include="Global\Css\login.less" />
-		<Content Include="Global\Css\main.less" />
-		<Content Include="Global\Css\mobilepage.less" />
-		<Content Include="Global\Css\page.less" />
-		<Content Include="Global\Css\tripfinder.less" />
-		<Content Include="Global\Css\util.less" />
-		<Content Include="Global\Css\z-index.less" />
-		<Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.eot" />
-		<Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.woff" />
-		<Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.woff2" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\kendo.common.less" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\kendo.default.less" />
-		<Content Include="localization\en-US.json" />
-		<Content Include="localization\zh-CN.json" />
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="Global\Css\Default\sprite.png" />
-		<Content Include="Global\Css\tripfinder.css" />
-		<Content Include="Global\Img\Filter\Contains.png" />
-		<Content Include="Global\Img\Filter\Custom.png" />
-		<Content Include="Global\Img\Filter\DoesNotContain.png" />
-		<Content Include="Global\Img\Filter\DoesNotEqual.png" />
-		<Content Include="Global\Img\Filter\Empty.png" />
-		<Content Include="Global\Img\Filter\EndsWith.png" />
-		<Content Include="Global\Img\Filter\Equals.png" />
-		<Content Include="Global\Img\Filter\GreaterThan.png" />
-		<Content Include="Global\Img\Filter\GreaterThanEqual.png" />
-		<Content Include="Global\Img\Filter\LessThan.png" />
-		<Content Include="Global\Img\Filter\LessThanEqual.png" />
-		<Content Include="Global\Img\Filter\List.png" />
-		<Content Include="Global\Img\Filter\NotEmpty.png" />
-		<Content Include="Global\Img\Filter\StartsWith.png" />
-		<Content Include="Global\Img\grid-filter-clear-all.png" />
-		<Content Include="Global\Img\grid\Add_Remove-Column.png" />
-		<Content Include="Global\Img\grid\column.png" />
-		<Content Include="Global\Img\grid\Copy-and-New-5.png" />
-		<Content Include="Global\Img\grid\DrillDown.png" />
-		<Content Include="Global\Img\grid\DrillDownApplied.png" />
-		<Content Include="Global\Img\grid\DrillDownBlack.png" />
-		<Content Include="Global\Img\grid\editor_pencil.png" />
-		<Content Include="Global\Img\grid\filter-applied-purple.png" />
-		<Content Include="Global\Img\grid\filter.png" />
-		<Content Include="Global\Img\grid\FilterOpen.png" />
-		<Content Include="Global\Img\grid\filter_applied.png" />
-		<Content Include="Global\Img\grid\green_check.png" />
-		<Content Include="Global\Img\grid\layout-applied-purple.png" />
-		<Content Include="Global\Img\grid\layout.png" />
-		<Content Include="Global\Img\grid\LayoutOpen.png" />
-		<Content Include="Global\Img\grid\New.png" />
-		<Content Include="Global\Img\grid\refresh.png" />
-		<Content Include="Global\Img\grid\summary.png" />
-		<Content Include="Global\Img\grid\SummaryBarClearAll.png" />
-		<Content Include="Global\Img\grid\SummaryBarOpen-purple.png" />
-		<Content Include="Global\Img\grid\SummaryBarOpen.png" />
-		<Content Include="Global\Img\Icons\check-white.png" />
-		<Content Include="Global\Img\Icons\Close.svg" />
-		<Content Include="Global\Img\Icons\cross-white.png" />
-		<Content Include="Global\Img\Icons\Email-White.png" />
-		<Content Include="Global\Img\Icons\error.png" />
-		<Content Include="Global\Img\Icons\send-white.png" />
-		<Content Include="Global\Img\Icons\success.png" />
-		<Content Include="Global\Img\loginlogo.svg" />
-		<Content Include="Global\Img\menu\add.svg" />
-		<Content Include="Global\Img\menu\Copy-white.png" />
-		<Content Include="Global\Img\menu\Delete-Black.png" />
-		<Content Include="Global\Img\menu\fieldtrips.svg" />
-		<Content Include="Global\Img\menu\hamburger.svg" />
-		<Content Include="Global\Img\menu\Save-White.png" />
-		<Content Include="Global\Img\menu\tripfinderlogo.svg" />
-		<Content Include="Global\Img\Transfinder-TripfinderText-Only.png" />
-		<Content Include="Global\JavaScript\DataModel\BaseDataModel.js" />
-		<Content Include="Global\JavaScript\DataModel\GridFilterDataModel.js" />
-		<Content Include="Global\JavaScript\DataModel\GridLayoutExtendedDataModel.js" />
-		<Content Include="Global\JavaScript\DataModel\UserPreferenceDataModel.js" />
-		<Content Include="Global\JavaScript\Framework\Ajax.js" />
-		<Content Include="Global\JavaScript\Framework\Api.js" />
-		<Content Include="Global\JavaScript\Framework\AuthManager.js" />
-		<Content Include="Global\JavaScript\Framework\BaseContextMenu.js" />
-		<Content Include="Global\JavaScript\Framework\BulkContextMenu.js" />
-		<Content Include="Global\JavaScript\Framework\ContextMenuManager.js" />
-		<Content Include="Global\JavaScript\Framework\DatasourceManager.js" />
-		<Content Include="Global\JavaScript\Framework\Events\Event.js" />
-		<Content Include="Global\JavaScript\Framework\Events\EventData.js" />
-		<Content Include="Global\JavaScript\Framework\Events\KeyCode.js" />
-		<Content Include="Global\JavaScript\Framework\Events\PromiseEvent.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\Filtering.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\gridAutoScroll.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoGrid.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoGridHackHelper.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\filter.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\gridAlert.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\gridmenu.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\kendoCustomizedDateTimePicker.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\kendoCustomizedTimePicker.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\KendoGridFilterMenu.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\kendoGridLockbar.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\layout.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\summary.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\LightKendoGrid.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\SearchParameters.js" />
-		<Content Include="Global\JavaScript\Framework\Grid\Sorting.js" />
-		<Content Include="Global\JavaScript\Framework\Helper\DateBoxHelper.js" />
-		<Content Include="Global\JavaScript\Framework\Helper\FullScreenHelper.js" />
-		<Content Include="Global\JavaScript\Framework\Input\BaseBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\BooleanBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\ColorBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\DataListBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\DateBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\DateTimeBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\DecimalBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\DisabledBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\IntegerBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\NumberBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\PhoneBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\SelectBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\StringBox.js" />
-		<Content Include="Global\JavaScript\Framework\Input\TimeBox.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\clickButton.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\contextMenuClick.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\customInput.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\DateTimeBinder.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\dropdownMenu.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\ForEachProp.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\htmlWithBinding.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\MouseStay.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\panelContentDrag.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\SingleClick.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\SlideVisible.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\SortableList.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\StopBinding.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\ToolTip.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\typeahead.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\uiInit.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Binding\Value.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\BootstrapSlider.js" />
-		<Content Include="Global\JavaScript\Framework\Knockout\Knockout.js" />
-		<Content Include="Global\JavaScript\Framework\LoadingIndicator.js" />
-		<Content Include="Global\JavaScript\Framework\ModalHelper.js" />
-		<Content Include="Global\JavaScript\Framework\ModalManager.js" />
-		<Content Include="Global\JavaScript\Framework\Namespacing.js" />
-		<Content Include="Global\JavaScript\Framework\PageManager.js" />
-		<Content Include="Global\JavaScript\Framework\PromiseAjax.js" />
-		<Content Include="Global\JavaScript\Framework\PromiseBootbox.js" />
-		<Content Include="Global\JavaScript\Framework\ShortCutKeys.js" />
-		<Content Include="Global\JavaScript\Framework\SoftSessionValidator.js" />
-		<Content Include="Global\JavaScript\Framework\StorageManager.js" />
-		<Content Include="Global\JavaScript\Framework\TemplateContextMenu.js" />
-		<Content Include="Global\JavaScript\Framework\UserDefinedFieldUtil.js" />
-		<Content Include="Global\JavaScript\Framework\UserPreferenceManager.js" />
-		<Content Include="Global\JavaScript\Main.js" />
-		<Content Include="Global\JavaScript\Modal\BaseModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\DatasourceChangeModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\Grid\EditKendoColumnModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\Grid\GlobalReplaceModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\Grid\ManageFilterModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\Grid\ManageLayoutModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\Grid\ModifyFilterModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\Grid\ModifyLayoutModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\KendoListMoverWithSearchControlModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\ListMoverForListFilterControlModalViewModel.js" />
-		<Content Include="Global\JavaScript\Modal\TripfinderLoginModel.js" />
-		<Content Include="Global\JavaScript\Modal\TripfinderLoginViewModel.js" />
-		<Content Include="Global\JavaScript\Startup.js" />
-		<Content Include="Global\JavaScript\ViewModel\Controls\BaseControl.js" />
-		<Content Include="Global\JavaScript\ViewModel\Controls\DataSourceChangeViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Controls\KendoListMoverWithSearchControlViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Controls\ListFilterDefinition.js" />
-		<Content Include="Global\JavaScript\ViewModel\Controls\ListMoverForListFilterControlViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Controls\LoginViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Grid\EditKendoColumnViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Grid\GlobalReplaceViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Grid\ManageFilterViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Grid\ManageLayoutViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Grid\ModifyFilterViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Grid\ModifyLayoutViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Helper\KendoListMoverHelper.js" />
-		<Content Include="Global\JavaScript\ViewModel\PageLevel\BasePageLevelViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\PageLevel\ListMoverPageLevelViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Pages\BaseGridPage.js" />
-		<Content Include="Global\JavaScript\ViewModel\Pages\FieldTripPage.js" />
-		<Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\BasePageLevelViewModel.js" />
-		<Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\ListMoverPageLevelViewModel.js" />
-		<Content Include="Global\JavaScript\Workspace\GridDefinition\FieldTripGridDefinition.js" />
-		<Content Include="Global\ThirdParty\bootbox.min.js" />
-		<Content Include="Global\ThirdParty\bootstrapdatetimepicker\bootstrap-datepicker.js" />
-		<Content Include="Global\ThirdParty\bootstrapdatetimepicker\bootstrap-datetimepicker.css" />
-		<Content Include="Global\ThirdParty\bootstrapdatetimepicker\bootstrap-datetimepicker.js" />
-		<Content Include="Global\ThirdParty\bootstrapvalidator\js\bootstrapValidator.js" />
-		<Content Include="Global\ThirdParty\bootstrap\css\bootstrap.min.css" />
-		<Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.svg" />
-		<Content Include="Global\ThirdParty\bootstrap\js\bootstrap.min.js" />
-		<Content Include="Global\ThirdParty\bootstrap\js\bootstrap3-typeahead.js" />
-		<Content Include="Global\ThirdParty\i18next-1.7.7.min.js" />
-		<Content Include="Global\ThirdParty\jquery-1.11.1.min.js" />
-		<Content Include="Global\ThirdParty\jquery-ui-1.10.4.custom.min.js" />
-		<Content Include="Global\ThirdParty\Kendo\kendo.all.min.js" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\editor.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\imagebrowser.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\indeterminate.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\loading-image.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\loading.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\loading_2x.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\markers.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\markers_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\slider-h.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\slider-v.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite_kpi.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite_kpi_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\editor.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\imagebrowser.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\indeterminate.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\loading-image.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\loading.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\loading_2x.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\markers.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\markers_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\slider-h.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\slider-v.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite_kpi.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite_kpi_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\editor.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\imagebrowser.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\indeterminate.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\loading-image.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\loading.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\loading_2x.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\markers.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\markers_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\slider-h.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\slider-v.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite_kpi.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite_kpi_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\kendo.common.css" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\kendo.css" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\kendo.default.css" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\kendo.fiori.css" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\editor.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\imagebrowser.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\indeterminate.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\loading-image.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\loading.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\loading_2x.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\markers.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\markers_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\slider-h.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\slider-v.gif" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite_kpi.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite_kpi_2x.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\brushed-metal.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots1.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots10.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots11.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots12.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots13.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots2.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots3.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots4.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots5.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots6.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots7.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots8.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\dots9.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\glass-lighter.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\glass.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\highlight.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\hsv-gradient.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\hue.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\leather1.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\leather2.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\noise.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe1.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe2.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe3.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe4.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe5.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe6.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\transparency.png" />
-		<Content Include="Global\ThirdParty\Kendo\Styles\textures\transtexture.png" />
-		<Content Include="Global\ThirdParty\knockout\knockout-3.3.0.debug.js" />
-		<Content Include="Global\ThirdParty\knockout\knockout-sortable.min.js" />
-		<Content Include="Global\ThirdParty\knockout\koExternalTemplateEngine_all.js" />
-		<Content Include="Global\ThirdParty\linq.min.js" />
-		<Content Include="Global\ThirdParty\moment-with-locales.min.js" />
-		<Content Include="Global\ThirdParty\pubsub.js" />
-		<Content Include="Global\ThirdParty\store.min.js" />
-		<Content Include="Html\Modal\DataSourceChangeControl.html" />
-		<Content Include="Html\Modal\KendoListMoverWithSearchControl.html" />
-		<Content Include="Html\Modal\Positive.html" />
-		<Content Include="Html\Modal\PositiveNegative.html" />
-		<Content Include="Html\Modal\PositiveNegativeOther.html" />
-		<Content Include="Html\tripfinderLogin.html" />
-		<Content Include="Html\Workspace\grid\EditColumn.html" />
-		<Content Include="Html\Workspace\grid\EditKendoColumn.html" />
-		<Content Include="Html\Workspace\grid\FilterContextMenu.html" />
-		<Content Include="Html\Workspace\grid\GlobalReplace.html" />
-		<Content Include="Html\Workspace\grid\LayoutContextMenu.html" />
-		<Content Include="Html\Workspace\grid\ListMoverFilterContextMenu.html" />
-		<Content Include="Html\Workspace\grid\ManageFilter.html" />
-		<Content Include="Html\Workspace\grid\ManageLayout.html" />
-		<Content Include="Html\Workspace\grid\ModifyReminderFilter.html" />
-		<Content Include="Html\Workspace\grid\NewGridWithSelectedRecordsMenu.html" />
-		<Content Include="Html\Workspace\grid\OverFlowMenu.html" />
-		<Content Include="Html\Workspace\grid\SaveFilter.html" />
-		<Content Include="Html\Workspace\grid\SaveLayout.html" />
-		<Content Include="Html\Workspace\PageLevel\Base.html" />
-		<Content Include="Html\Workspace\Page\basegridpage.html" />
-		<Content Include="Html\Workspace\Page\grid\fieldtrip\bulkmenu.html" />
-		<Content Include="index.html" />
-		<Content Include="local_settings.js" />
-		<Content Include="local_settings_template.js" />
-	</ItemGroup>
-	<PropertyGroup>
-		<VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-		<VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-	</PropertyGroup>
-	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-	<Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-	<Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
-	<ProjectExtensions>
-		<VisualStudio>
-			<FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-				<WebProjectProperties>
-					<UseIIS>True</UseIIS>
-					<AutoAssignPort>True</AutoAssignPort>
-					<DevelopmentServerPort>65338</DevelopmentServerPort>
-					<DevelopmentServerVPath>/</DevelopmentServerVPath>
-					<IISUrl>http://localhost:65338/</IISUrl>
-					<NTLMAuthentication>False</NTLMAuthentication>
-					<UseCustomServer>False</UseCustomServer>
-					<CustomServerUrl>
-					</CustomServerUrl>
-					<SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-				</WebProjectProperties>
-			</FlavorProperties>
-		</VisualStudio>
-	</ProjectExtensions>
-	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{97A0B6EE-526E-4793-930F-AD392ED6647C}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TripfinderWeb</RootNamespace>
+    <AssemblyName>TripfinderWeb</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Global\Css\bootstrapContainers.less" />
+    <Content Include="Global\Css\bootstrapEditing.less" />
+    <Content Include="Global\Css\bootstrapModal.less" />
+    <Content Include="Global\Css\common.less" />
+    <Content Include="Global\Css\contextmenu.less" />
+    <Content Include="Global\Css\dataentry.less" />
+    <Content Include="Global\Css\enhance.less" />
+    <Content Include="Global\Css\fontstyle.less" />
+    <Content Include="Global\Css\fonts\SourceSansPro_Bold.ttf" />
+    <Content Include="Global\Css\fonts\SourceSansPro_Italic.ttf" />
+    <Content Include="Global\Css\fonts\SourceSansPro_Regular.ttf" />
+    <Content Include="Global\Css\fonts\SourceSansPro_SemiBold.ttf" />
+    <Content Include="Global\Css\grid.less" />
+    <Content Include="Global\Css\Icons.less" />
+    <Content Include="Global\Css\login.less" />
+    <Content Include="Global\Css\main.less" />
+    <Content Include="Global\Css\mobilepage.less" />
+    <Content Include="Global\Css\page.less" />
+    <Content Include="Global\Css\tripfinder.less" />
+    <Content Include="Global\Css\util.less" />
+    <Content Include="Global\Css\z-index.less" />
+    <Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\kendo.common.less" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\kendo.default.less" />
+    <Content Include="localization\en-US.json" />
+    <Content Include="localization\zh-CN.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Global\Css\Default\sprite.png" />
+    <Content Include="Global\Css\tripfinder.css" />
+    <Content Include="Global\Img\Filter\Contains.png" />
+    <Content Include="Global\Img\Filter\Custom.png" />
+    <Content Include="Global\Img\Filter\DoesNotContain.png" />
+    <Content Include="Global\Img\Filter\DoesNotEqual.png" />
+    <Content Include="Global\Img\Filter\Empty.png" />
+    <Content Include="Global\Img\Filter\EndsWith.png" />
+    <Content Include="Global\Img\Filter\Equals.png" />
+    <Content Include="Global\Img\Filter\GreaterThan.png" />
+    <Content Include="Global\Img\Filter\GreaterThanEqual.png" />
+    <Content Include="Global\Img\Filter\LessThan.png" />
+    <Content Include="Global\Img\Filter\LessThanEqual.png" />
+    <Content Include="Global\Img\Filter\List.png" />
+    <Content Include="Global\Img\Filter\NotEmpty.png" />
+    <Content Include="Global\Img\Filter\StartsWith.png" />
+    <Content Include="Global\Img\grid-filter-clear-all.png" />
+    <Content Include="Global\Img\grid\Add_Remove-Column.png" />
+    <Content Include="Global\Img\grid\column.png" />
+    <Content Include="Global\Img\grid\Copy-and-New-5.png" />
+    <Content Include="Global\Img\grid\DrillDown.png" />
+    <Content Include="Global\Img\grid\DrillDownApplied.png" />
+    <Content Include="Global\Img\grid\DrillDownBlack.png" />
+    <Content Include="Global\Img\grid\editor_pencil.png" />
+    <Content Include="Global\Img\grid\filter-applied-purple.png" />
+    <Content Include="Global\Img\grid\filter.png" />
+    <Content Include="Global\Img\grid\FilterOpen.png" />
+    <Content Include="Global\Img\grid\filter_applied.png" />
+    <Content Include="Global\Img\grid\green_check.png" />
+    <Content Include="Global\Img\grid\layout-applied-purple.png" />
+    <Content Include="Global\Img\grid\layout.png" />
+    <Content Include="Global\Img\grid\LayoutOpen.png" />
+    <Content Include="Global\Img\grid\New.png" />
+    <Content Include="Global\Img\grid\refresh.png" />
+    <Content Include="Global\Img\grid\summary.png" />
+    <Content Include="Global\Img\grid\SummaryBarClearAll.png" />
+    <Content Include="Global\Img\grid\SummaryBarOpen-purple.png" />
+    <Content Include="Global\Img\grid\SummaryBarOpen.png" />
+    <Content Include="Global\Img\Icons\check-white.png" />
+    <Content Include="Global\Img\Icons\Close.svg" />
+    <Content Include="Global\Img\Icons\cross-white.png" />
+    <Content Include="Global\Img\Icons\Email-White.png" />
+    <Content Include="Global\Img\Icons\error.png" />
+    <Content Include="Global\Img\Icons\send-white.png" />
+    <Content Include="Global\Img\Icons\success.png" />
+    <Content Include="Global\Img\loginlogo.svg" />
+    <Content Include="Global\Img\menu\add.svg" />
+    <Content Include="Global\Img\menu\Copy-white.png" />
+    <Content Include="Global\Img\menu\Delete-Black.png" />
+    <Content Include="Global\Img\menu\fieldtrips.svg" />
+    <Content Include="Global\Img\menu\hamburger.svg" />
+    <Content Include="Global\Img\menu\Save-White.png" />
+    <Content Include="Global\Img\menu\tripfinderlogo.svg" />
+    <Content Include="Global\Img\Transfinder-TripfinderText-Only.png" />
+    <Content Include="Global\JavaScript\DataModel\BaseDataModel.js" />
+    <Content Include="Global\JavaScript\DataModel\GridFilterDataModel.js" />
+    <Content Include="Global\JavaScript\DataModel\GridLayoutExtendedDataModel.js" />
+    <Content Include="Global\JavaScript\DataModel\UserPreferenceDataModel.js" />
+    <Content Include="Global\JavaScript\Framework\Ajax.js" />
+    <Content Include="Global\JavaScript\Framework\Api.js" />
+    <Content Include="Global\JavaScript\Framework\AuthManager.js" />
+    <Content Include="Global\JavaScript\Framework\BaseContextMenu.js" />
+    <Content Include="Global\JavaScript\Framework\BulkContextMenu.js" />
+    <Content Include="Global\JavaScript\Framework\ContextMenuManager.js" />
+    <Content Include="Global\JavaScript\Framework\DatasourceManager.js" />
+    <Content Include="Global\JavaScript\Framework\Events\Event.js" />
+    <Content Include="Global\JavaScript\Framework\Events\EventData.js" />
+    <Content Include="Global\JavaScript\Framework\Events\KeyCode.js" />
+    <Content Include="Global\JavaScript\Framework\Events\PromiseEvent.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\Filtering.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\gridAutoScroll.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoGrid.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoGridHackHelper.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\filter.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\gridAlert.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\gridmenu.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\kendoCustomizedDateTimePicker.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\kendoCustomizedTimePicker.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\KendoGridFilterMenu.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\kendoGridLockbar.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\layout.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\KendoPlugin\summary.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\LightKendoGrid.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\SearchParameters.js" />
+    <Content Include="Global\JavaScript\Framework\Grid\Sorting.js" />
+    <Content Include="Global\JavaScript\Framework\Helper\DateBoxHelper.js" />
+    <Content Include="Global\JavaScript\Framework\Helper\FullScreenHelper.js" />
+    <Content Include="Global\JavaScript\Framework\Input\BaseBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\BooleanBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\ColorBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\DataListBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\DateBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\DateTimeBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\DecimalBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\DisabledBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\IntegerBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\NumberBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\PhoneBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\SelectBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\StringBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\TimeBox.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\clickButton.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\contextMenuClick.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\customInput.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\DateTimeBinder.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\dropdownMenu.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\ForEachProp.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\htmlWithBinding.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\MouseStay.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\panelContentDrag.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\SingleClick.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\SlideVisible.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\SortableList.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\StopBinding.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\ToolTip.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\typeahead.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\uiInit.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Binding\Value.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\BootstrapSlider.js" />
+    <Content Include="Global\JavaScript\Framework\Knockout\Knockout.js" />
+    <Content Include="Global\JavaScript\Framework\LoadingIndicator.js" />
+    <Content Include="Global\JavaScript\Framework\ModalHelper.js" />
+    <Content Include="Global\JavaScript\Framework\ModalManager.js" />
+    <Content Include="Global\JavaScript\Framework\Namespacing.js" />
+    <Content Include="Global\JavaScript\Framework\PageManager.js" />
+    <Content Include="Global\JavaScript\Framework\PromiseAjax.js" />
+    <Content Include="Global\JavaScript\Framework\PromiseBootbox.js" />
+    <Content Include="Global\JavaScript\Framework\ShortCutKeys.js" />
+    <Content Include="Global\JavaScript\Framework\SoftSessionValidator.js" />
+    <Content Include="Global\JavaScript\Framework\StorageManager.js" />
+    <Content Include="Global\JavaScript\Framework\TemplateContextMenu.js" />
+    <Content Include="Global\JavaScript\Framework\UserDefinedFieldUtil.js" />
+    <Content Include="Global\JavaScript\Framework\UserPreferenceManager.js" />
+    <Content Include="Global\JavaScript\Main.js" />
+    <Content Include="Global\JavaScript\Modal\BaseModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\DatasourceChangeModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\Grid\EditKendoColumnModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\Grid\GlobalReplaceModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\Grid\ManageFilterModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\Grid\ManageLayoutModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\Grid\ModifyFilterModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\Grid\ModifyLayoutModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\KendoListMoverWithSearchControlModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\ListMoverForListFilterControlModalViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\TripfinderLoginModel.js" />
+    <Content Include="Global\JavaScript\Modal\TripfinderLoginViewModel.js" />
+    <Content Include="Global\JavaScript\Startup.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\BaseControl.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\DataSourceChangeViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\KendoListMoverWithSearchControlViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\ListFilterDefinition.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\ListMoverForListFilterControlViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\LoginViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Grid\EditKendoColumnViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Grid\GlobalReplaceViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Grid\ManageFilterViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Grid\ManageLayoutViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Grid\ModifyFilterViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Grid\ModifyLayoutViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Helper\KendoListMoverHelper.js" />
+    <Content Include="Global\JavaScript\ViewModel\PageLevel\BasePageLevelViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\PageLevel\ListMoverPageLevelViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Pages\BaseGridPage.js" />
+    <Content Include="Global\JavaScript\ViewModel\Pages\FieldTripPage.js" />
+    <Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\BasePageLevelViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\ListMoverPageLevelViewModel.js" />
+    <Content Include="Global\JavaScript\Workspace\GridDefinition\FieldTripGridDefinition.js" />
+    <Content Include="Global\ThirdParty\bootbox.min.js" />
+    <Content Include="Global\ThirdParty\bootstrapdatetimepicker\bootstrap-datepicker.js" />
+    <Content Include="Global\ThirdParty\bootstrapdatetimepicker\bootstrap-datetimepicker.css" />
+    <Content Include="Global\ThirdParty\bootstrapdatetimepicker\bootstrap-datetimepicker.js" />
+    <Content Include="Global\ThirdParty\bootstrapvalidator\js\bootstrapValidator.js" />
+    <Content Include="Global\ThirdParty\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Global\ThirdParty\bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global\ThirdParty\bootstrap\js\bootstrap.min.js" />
+    <Content Include="Global\ThirdParty\bootstrap\js\bootstrap3-typeahead.js" />
+    <Content Include="Global\ThirdParty\i18next-1.7.7.min.js" />
+    <Content Include="Global\ThirdParty\jquery-1.11.1.min.js" />
+    <Content Include="Global\ThirdParty\jquery-ui-1.10.4.custom.min.js" />
+    <Content Include="Global\ThirdParty\Kendo\kendo.all.min.js" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\editor.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\imagebrowser.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\indeterminate.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\loading-image.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\loading.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\loading_2x.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\markers.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\markers_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\slider-h.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\slider-v.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite_kpi.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Black\sprite_kpi_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\editor.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\imagebrowser.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\indeterminate.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\loading-image.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\loading.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\loading_2x.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\markers.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\markers_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\slider-h.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\slider-v.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite_kpi.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Default\sprite_kpi_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\editor.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\imagebrowser.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\indeterminate.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\loading-image.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\loading.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\loading_2x.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\markers.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\markers_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\slider-h.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\slider-v.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite_kpi.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\Fiori\sprite_kpi_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\kendo.common.css" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\kendo.css" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\kendo.default.css" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\kendo.fiori.css" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\editor.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\imagebrowser.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\indeterminate.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\loading-image.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\loading.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\loading_2x.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\markers.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\markers_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\slider-h.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\slider-v.gif" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite_kpi.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\MetroBlack\sprite_kpi_2x.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\brushed-metal.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots1.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots10.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots11.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots12.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots13.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots2.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots3.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots4.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots5.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots6.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots7.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots8.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\dots9.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\glass-lighter.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\glass.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\highlight.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\hsv-gradient.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\hue.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\leather1.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\leather2.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\noise.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe1.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe2.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe3.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe4.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe5.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\stripe6.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\transparency.png" />
+    <Content Include="Global\ThirdParty\Kendo\Styles\textures\transtexture.png" />
+    <Content Include="Global\ThirdParty\knockout\knockout-3.3.0.debug.js" />
+    <Content Include="Global\ThirdParty\knockout\knockout-sortable.min.js" />
+    <Content Include="Global\ThirdParty\knockout\koExternalTemplateEngine_all.js" />
+    <Content Include="Global\ThirdParty\linq.min.js" />
+    <Content Include="Global\ThirdParty\moment-with-locales.min.js" />
+    <Content Include="Global\ThirdParty\pubsub.js" />
+    <Content Include="Global\ThirdParty\store.min.js" />
+    <Content Include="Html\Modal\DataSourceChangeControl.html" />
+    <Content Include="Html\Modal\KendoListMoverWithSearchControl.html" />
+    <Content Include="Html\Modal\Positive.html" />
+    <Content Include="Html\Modal\PositiveNegative.html" />
+    <Content Include="Html\Modal\PositiveNegativeOther.html" />
+    <Content Include="Html\tripfinderLogin.html" />
+    <Content Include="Html\Workspace\grid\EditColumn.html" />
+    <Content Include="Html\Workspace\grid\EditKendoColumn.html" />
+    <Content Include="Html\Workspace\grid\FilterContextMenu.html" />
+    <Content Include="Html\Workspace\grid\GlobalReplace.html" />
+    <Content Include="Html\Workspace\grid\LayoutContextMenu.html" />
+    <Content Include="Html\Workspace\grid\ListMoverFilterContextMenu.html" />
+    <Content Include="Html\Workspace\grid\ManageFilter.html" />
+    <Content Include="Html\Workspace\grid\ManageLayout.html" />
+    <Content Include="Html\Workspace\grid\ModifyReminderFilter.html" />
+    <Content Include="Html\Workspace\grid\NewGridWithSelectedRecordsMenu.html" />
+    <Content Include="Html\Workspace\grid\OverFlowMenu.html" />
+    <Content Include="Html\Workspace\grid\SaveFilter.html" />
+    <Content Include="Html\Workspace\grid\SaveLayout.html" />
+    <Content Include="Html\Workspace\PageLevel\Base.html" />
+    <Content Include="Html\Workspace\Page\basegridpage.html" />
+    <Content Include="Html\Workspace\Page\grid\fieldtrip\bulkmenu.html" />
+    <Content Include="index.html" />
+    <Content Include="local_settings_template.js" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>65338</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:65338/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

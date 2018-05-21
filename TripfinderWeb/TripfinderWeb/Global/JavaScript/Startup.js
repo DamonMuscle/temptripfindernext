@@ -128,7 +128,7 @@
 									{
 										if (valResult.Items[0].AnyDBPass)
 										{
-											if (valResult.Items[0].DBlength == 1)
+											if (valResult.Items[0].DBlength === 1)
 											{
 												tf.storageManager.save("databaseType", valResult.Items[0].DBType);
 												tf.storageManager.save("datasourceId", valResult.Items[0].DBId);
@@ -138,7 +138,7 @@
 											return false;
 										} else
 										{
-											if (valResult.Items[0].DBlength == 1)
+											if (valResult.Items[0].DBlength === 1)
 											{
 												invalidateMessage = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
 											} else
