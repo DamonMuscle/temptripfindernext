@@ -248,10 +248,17 @@
 							{
 								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 								self.changePermissions();
+								tf.pageManager.initNavgationBar();
 								tf.pageManager.openNewPage("fieldtrip");
 								return true;
 							}
 							return null;
+						}).then(function(value)
+						{
+							if (value !== null)
+							{
+								return tf.pageManager.loadDataSourceName();
+							}
 						});
 				});
 		});

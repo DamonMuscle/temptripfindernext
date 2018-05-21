@@ -5,9 +5,24 @@
 	function PageManager()
 	{
 		var self = this;
+		self.obPages = ko.observableArray();
 		self.obContextMenuVisible = ko.observable(false);
+		self.datasourceId = tf.storageManager.get("datasourceId");
+		self.currentDatabaseName = ko.observable();
+		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
 		self.initContextMenuEvent();
 	}
+
+	PageManager.prototype.initNavgationBar = function()
+	{
+		var self = this, navigationData,
+			$content, $navigationContent = $(".navigation-container");
+		navigationData = new TF.NavigationMenu();
+		$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
+		$navigationContent.append($content);
+
+		ko.applyBindings(ko.observable(navigationData), $content[0]);
+	};
 
 	PageManager.prototype.openNewPage = function(type)
 	{
@@ -30,6 +45,10 @@
 		{
 			ko.applyBindings(ko.observable(pageData), $content[0]);
 		}
+		self.obPages([{
+			contentTemplate: 'workspace/page/' + templateType,
+			data: pageData
+		}]);
 	};
 
 	PageManager.prototype.removeCurrentPage = function()
@@ -49,6 +68,25 @@
 			pageData.dispose();
 		}
 		$pageContent.empty();
+	};
+
+	PageManager.prototype.loadDataSourceName = function()
+	{
+		if (this.datasourceId)
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), this.datasourceId))
+				.then(function(apiResponse)
+				{
+					this.currentDatabaseName(apiResponse.Items[0].DatabaseName);
+					this.onCurrentDatabaseNameChanged.notify();
+				}.bind(this));
+		}
+		else
+		{
+			this.currentDatabaseName("");
+			this.onCurrentDatabaseNameChanged.notify();
+			//this.changeDataSourceClick();
+		}
 	};
 
 	PageManager.prototype.logOff = function()

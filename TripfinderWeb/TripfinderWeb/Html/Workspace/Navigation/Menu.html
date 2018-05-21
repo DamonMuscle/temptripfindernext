@@ -1,0 +1,37 @@
+<div class="navigation-menu animate" data-bind="uiInit:init,css:{expand:obIsExpand}">
+	<div class="navigation-header">
+		<div class="item-icon logo"></div>
+		<div class="toggle-button">
+			<div class="item-icon left-caret" data-bind="click:toggleMenuBtnClick"></div>
+		</div>
+	</div>
+	<!-- ko if: !tf.permissions.isSupport -->
+	<!-- ko template :{ name : "workspace/controls/searchcontrol",data:searchControlTemplate }-->
+	<!-- /ko -->
+	<!-- /ko -->
+	<div class="navigation-content" data-bind="css:tf.permissions.isSupport?'not-contain-quick-search':''">
+		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
+			<div class="item-icon fieldtrips"></div>
+			<div class="item-label">Field Trips</div>
+		</div>
+		<div class="navigation-item myrequests" pageType="myrequest" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
+			<div class="item-icon myrequests"></div>
+			<div class="item-label">My Requests</div>
+		</div>
+		<div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
+			<div class="item-icon approvals"></div>
+			<div class="item-label">My Pending Approvals</div>
+		</div>
+	</div>
+	<div class="navigation-toolbar">
+		<div class="toolbar-button item-icon more" data-bind="click:showMoreButtonClick">
+			<div class="count-down-number" data-bind="text:obRefreshCountDown">
+			</div>
+		</div>
+		<div class="toolbar-button item-icon logout" data-bind="click:tf.pageManager.logOffClick"></div>
+		<div class="toolbar-button item-icon setting"></div>
+		<div class="toolbar-button item-icon report"></div>
+	</div>
+</div>
+<!-- Do not delete this or the css style until another solution is applied. The time loading font-face would cause wrong size calculation, add this to preload the font-face  -->
+<div class="font-face-preload SSP-Bold">.</div>

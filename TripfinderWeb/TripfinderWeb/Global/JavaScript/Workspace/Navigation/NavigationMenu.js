@@ -1,0 +1,811 @@
+(function()
+{
+	createNamespace("TF").NavigationMenu = NavigationMenu;
+
+	function NavigationMenu()
+	{
+		var self = this;
+		self.$navigationMenu = null;
+		if (!tf.permissions.isSupport)
+		{
+			self.searchControlTemplate = new TF.Control.SearchControlViewModel();
+		}
+
+		self.pageCategoryHeight = 54;
+		self.pageItemHeight = 42;
+		self.collapseWidth = 60;
+		self.expandWidth = 300;
+		self.fullMenuWidth = 310;
+		self.defaultToggleNavAnimationDuration = 350;
+		self.defaultOpenMenuAnimationDuration = 250;
+
+		self.NavigationMenuExpandStatueKey = "viewfinder.navigationmenu.expandstatus";
+		self.obIsExpand = ko.observable();
+		self.isOnAnimation = false;
+		self.isBeginWithCollapse = false;
+		self.obReportPages = ko.observableArray([]);
+		self.obSettingPages = ko.observableArray([]);
+		self.obDashboardLoRes = ko.observable(false);
+
+		self.bindWithKnockout();
+		self.tooltip = new TF.Helper.TFTooltip();
+		self.obIsRefreshing = ko.observable(false);
+		self.obIsRefreshAvailable = ko.observable(true);
+
+		self.obRefreshCountDown = ko.computed(function()
+		{
+			if (self.obIsRefreshing() && self.obIsRefreshAvailable())
+			{
+				return tf.pageManager.obPages() && tf.pageManager.obPages()[0] && tf.pageManager.obPages()[0].data && tf.pageManager.obPages()[0].data.obCountDown()
+			}
+			return '';
+		});
+	}
+
+	/**
+	 * Bind data with html elements using knockout.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.bindWithKnockout = function()
+	{
+		tf.loadingIndicator.show();
+
+		var self = this,
+			$container = $(".navigation-container");
+		ko.applyBindings(self, $container[0]);
+		self.$container = $container;
+	};
+
+	/**
+	 * Init, called when knockout binding is done.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.init = function()
+	{
+		var self = this,
+			$nav = self.$container.find(".navigation-menu");
+
+		self.$navigationMenu = $nav;
+
+		self.bindRelatedEvents();
+		self.initTooltip();
+
+		tf.loadingIndicator.tryHide();
+	};
+	/**
+	 * Bind events.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.bindRelatedEvents = function()
+	{
+		var self = this,
+			itemList = self.$navigationMenu.find(".navigation-item");
+
+		itemList.on("mouseenter", self.onNavigationItemToggleHoverStatus.bind(self, true));
+		itemList.on("mouseleave", self.onNavigationItemToggleHoverStatus.bind(self, false));
+		tf.shortCutKeys.bind(["esc"], self.closeOpenedNavigationItemMenu.bind(self, false));
+		$(document).on("click.navigation-menu", self.closeOpenedNavigationItemMenu.bind(self, false));
+
+		if (self.searchControlTemplate)
+		{
+			self.searchControlTemplate.onSearchStatusToggle.subscribe(self.onQuickSearchStatusChange.bind(self));
+			self.searchControlTemplate.onSearchButtonClickEvent.subscribe(self.onQuickSearchIconClick.bind(self));
+			self.searchControlTemplate.onNavComplete.subscribe(function()
+			{
+				if (self.isBeginWithCollapse)
+				{
+					self.toggleNavigationMenu(false, self.defaultToggleNavAnimationDuration);
+					self.isBeginWithCollapse = false;
+				}
+			});
+		}
+	};
+
+	/**
+	 * Event handler when quick search icon is clicked.
+	 * @param {Event} evt 
+	 */
+	NavigationMenu.prototype.onQuickSearchButtonClick = function(evt)
+	{
+		var self = this;
+		if (!self.obIsExpand())
+		{
+			self.toggleNavigationMenu(true, self.defaultToggleNavAnimationDuration);
+		}
+	};
+
+	/**
+	 * Toggle the hover status.
+	 * @param {boolean} onHover 
+	 * @param {Event} evt 
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.onNavigationItemToggleHoverStatus = function(onHover, evt)
+	{
+		var self = this, hoverWidth,
+			widthBuffer = 1,
+			$item = $(evt.target).closest(".navigation-item");
+
+		if (!onHover)
+		{
+			$item.removeClass("hoverState", onHover);
+		}
+		else if (!self.isOnAnimation && self.$navigationMenu.find(".menu-opened").length === 0 && evt.which === 0)
+		{
+			$item.addClass("hoverState", onHover);
+		}
+		else
+		{ return; }
+
+		if (!self.obIsExpand())
+		{
+			if (onHover)
+			{
+				self.updateMenuContent($item.attr("pageType"));
+
+				if (!$item.hasClass("menu-opened"))
+				{
+					hoverWidth = $item.find(".item-icon").outerWidth() + $item.find(".item-label").outerWidth() + widthBuffer;
+					$item.css("width", hoverWidth);
+				}
+			}
+			else if (!$item.is($(evt.toElement).closest(".navigation-item")))
+			{
+				$item.css("width", "");
+			}
+		}
+	};
+
+	/**
+	 * Close currently opened navigation page menu
+	 * @param {boolean} noAnimation
+	 * @return {Deferred}
+	 */
+	NavigationMenu.prototype.closeOpenedNavigationItemMenu = function(noAnimation)
+	{
+		var self = this,
+			duration = noAnimation ? 0 : self.defaultOpenMenuAnimationDuration,
+			$openedElement = $(".menu-opened");
+
+		if ($openedElement.hasClass("navigation-toolbar"))
+		{
+			return self.toggleMoreToolbarButtonsDisplay(false, duration);
+		}
+		else if ($openedElement.hasClass("navigation-item"))
+		{
+			return self.togglePageMenuDisplay($openedElement, false, duration);
+		}
+	};
+
+	/**
+	 * The event handler for toggle navigation menu button click.
+	 * @param {Event} evt
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.toggleMenuBtnClick = function(data, evt)
+	{
+		evt.stopPropagation();
+
+		var self = this,
+			currentStatus = self.obIsExpand();
+
+		self.toggleNavigationMenu(!currentStatus, self.defaultToggleNavAnimationDuration);
+	};
+
+	/**
+	 * Toggle the expand/collapse status of the navigation menu.
+	 * @param {boolean} status Whether it is to expand or collapse
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.toggleNavigationMenu = function(status, duration)
+	{
+		var self = this,
+			duration = duration || 0;
+
+		if (!status)
+		{
+			self.closeOpenedNavigationItemMenu(false);
+		}
+
+		self.easeToggleNavigationAnimation(status, duration);
+		self.toggleMoreIcon(status);
+
+		if (!tf.permissions.isSupport)
+		{
+			tf.storageManager.save(self.NavigationMenuExpandStatueKey, status)
+				.catch(function(error)
+				{
+					// Catch the error so it would not appear in console.
+				});
+		}
+	};
+
+	/**
+	 * Toggle the status on "more" button
+	 * @param {boolean} status 
+	 */
+	NavigationMenu.prototype.toggleMoreIcon = function(status)
+	{
+		var self = this;
+		var $moreBtn = $('.navigation-menu .more');
+
+		if (self.obIsRefreshing())
+		{
+			$moreBtn.addClass('switch-more-icon');
+		}
+		else
+		{
+			$moreBtn.removeClass('switch-more-icon');
+		}
+	}
+
+	/**
+	 * Toggle the navigation menu expand/collapse status with animation.
+	 * @param {boolean} flag Whether it is to expand or collapse
+	 * @param {boolean} duration The animation duration
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.easeToggleNavigationAnimation = function(flag, duration)
+	{
+		var self = this, prevWidth, targetWidth, refreshObj,
+			fadeDuration = duration / 2,
+			$navMenu = self.$navigationMenu,
+			$navItems = $navMenu.find(".navigation-item:not(.menu-opened)"),
+			$caret = $navMenu.find(".navigation-header .left-caret"),
+			$toolbar = $navMenu.find(".navigation-toolbar"),
+			$quickSearch = $navMenu.find(".navigation-quick-search"),
+			$spinner = $navMenu.find(".quick-search-spinner"),
+			$navContent = $navMenu.find(".navigation-content"),
+			isQuickSearchActive = self.isQuicKSearchActive(),
+			// If the menu is already opened, do not fade out the label
+			$fadeOutElements = $navMenu.find(".item-icon.logo, .search-header .search-text, .search-header .clear-btn"),
+			$moreBtn = $toolbar.find(".more"),
+			$toolbarBtnOthers = $toolbar.find(".logout, .setting, .report"),
+			$gridMap = $("#pageContent"),
+			totalWidth = $(document).width(),
+			isToolbarOpened = $toolbar.hasClass("menu-opened"),
+			removeInlineOpacityFunc = function()
+			{
+				// after animation, remove these inline css styles, use inline class instead.
+				$moreBtn.css({ opacity: "", display: "" });
+				$toolbarBtnOthers.css({ opacity: "", display: "" });
+				$fadeOutElements.css("opacity", "");
+				$navItems.css("opacity", "");
+			};
+
+		if (isQuickSearchActive)
+		{
+			$navMenu.addClass("on-quick-search");
+			$fadeOutElements = $fadeOutElements.add(".type-selector, .search-content");
+		}
+		else
+		{
+			$fadeOutElements = $fadeOutElements.add(".navigation-item:not(.menu-opened) .item-label");
+		}
+
+		if (flag)
+		{
+			prevWidth = self.collapseWidth;
+			targetWidth = self.expandWidth;
+
+			$fadeOutElements.css("opacity", 0);
+			// No animation for toolbar if it is already opened.
+			$toolbarBtnOthers.css("opacity", isToolbarOpened ? 1 : 0);
+			// This used css "transition".
+			$caret.css("transform", "rotate(0deg)");
+			// If the quick search is active, the icons should be hidden.
+			$navContent.css("display", "block");
+			$quickSearch.css("height", 54);
+			$navItems.css({ opacity: 1 }).stop().animate({ opacity: isQuickSearchActive ? 0 : 1 }, { duration: fadeDuration, queue: false });
+			$spinner.css("left", "2px");
+			$moreBtn.css("opacity", isToolbarOpened ? 0 : 1).stop().animate({ opacity: 0 }, {
+				duration: fadeDuration, queue: false, done: function()
+				{
+					$navContent.css("display", "");
+					$quickSearch.css("height", "");
+					$toolbarBtnOthers.css("display", "block");
+					$fadeOutElements.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false });
+					$toolbarBtnOthers.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
+
+					if (isQuickSearchActive && self.searchControlTemplate)
+					{
+						self.searchControlTemplate.$searchText.focus();
+					}
+				}
+			});
+		}
+		else
+		{
+			prevWidth = self.expandWidth;
+			targetWidth = self.collapseWidth;
+
+			if (isQuickSearchActive)
+			{
+				$navItems.css("opacity", 0);
+			}
+
+			$moreBtn.css("opacity", 0);
+			$caret.css("transform", "rotate(180deg)");
+			$fadeOutElements.css("opacity", 1).stop().animate({ opacity: 0 }, { duration: fadeDuration, queue: false });
+			$toolbarBtnOthers.css("opacity", 1).stop().animate({ opacity: 0 }, {
+				duration: fadeDuration, queue: false, done: function()
+				{
+					if (isQuickSearchActive)
+					{
+						$navItems.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false });
+					}
+					$moreBtn.css("display", "block");
+					$moreBtn.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
+				}
+			});
+			$spinner.css("left", "22px");
+		}
+
+		// Set initial inline styles so the class styles would not take effect until the end of animation.
+		$gridMap.css("width", totalWidth - prevWidth);
+		$navMenu.css("width", prevWidth);
+		$navItems.css({ overflow: "hidden", width: "100%" });
+		self.obIsExpand(flag);
+		refreshObj = self.updatePageContentWidth();
+		self.isOnAnimation = true;
+		$gridMap.stop().animate({ width: totalWidth - targetWidth }, {
+			duration: duration, queue: false, step: function()
+			{
+			}
+		});
+		$navMenu.stop().animate({ width: targetWidth }, {
+			duration: duration, queue: false, done: function()
+			{
+				// Use calc to avoid display issue when there is vertical scroll in gridMap, remove if this is not happending.
+				if (refreshObj.currentInterval)
+				{
+					clearInterval(refreshObj.currentInterval);
+				}
+				if (refreshObj.function)
+				{
+					refreshObj.function();
+				}
+				self.isOnAnimation = false;
+				$navMenu.css({ overflow: "", width: "" });
+				$navItems.css({ overflow: "", width: "" });
+				$gridMap.css("width", "calc(100% - " + targetWidth + "px)");
+				$toolbar.removeClass("menu-opened");
+				if (self.obIsExpand() && self.searchControlTemplate)
+				{
+					self.searchControlTemplate.searchBoxPlaceHolderChanged();
+				}
+			}
+		});
+	};
+
+	/**
+	 * Update the map view/grid view's width after click the expand button.
+	 * @returns {Object} 
+	 */
+	NavigationMenu.prototype.updatePageContentWidth = function()
+	{
+		if (tf.pageManager.obPages().length === 0) { return {}; }
+
+		var self = this, refreshObj = {}, updateRefreshObj, resizeablePanel, templateName,
+			leftPanelWidth = $(".left-panel:not(.hide)").width(),
+			rightPanelWidth, borderWidth = 2;
+		if (!leftPanelWidth)
+		{
+			leftPanelWidth = $(".resize-wrap").width();
+		}
+
+		updateRefreshObj = function(index)
+		{
+			refreshObj.function = function()
+			{
+				var $container = $(".kendo-grid.kendo-grid-container.k-grid.k-widget");
+				var currentPanelWidth = $container.parent().width(),
+					lockedHeaderWidth = $container.find('.k-grid-header-locked').width(),
+					paddingRight = parseInt($container.find(".k-grid-content").css("padding-right")),
+					width = currentPanelWidth - lockedHeaderWidth - paddingRight - 2;
+				$container.find(".k-auto-scrollable,.k-grid-content").width(width);
+			};
+			refreshObj.currentInterval = setInterval(function()
+			{
+				refreshObj.function();
+			}, 50);
+		};
+		updateRefreshObj(0);
+		return refreshObj;
+	}
+
+	/**
+	 * Update the menu content with user permissons.
+	 * @param {string} type The page type
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.updateMenuContent = function(type)
+	{
+		var self = this, pageList, categoryName,
+			$item = self.$navigationMenu.find(".navigation-item." + type);
+
+		// Replace the display text if there is only one page avilable
+		// categoryName = pageList.length === 1 ? pageList[0].text : (type.charAt(0).toUpperCase() + type.slice(1));
+		// $item.find(".item-label").text(categoryName);
+	};
+
+	/**
+	 * The event handler for navigation page category click.
+	 * Open the menu for specified page type, if there is only one available page, open it directly.
+	 * @param {string} type The page type
+	 * @param {Object} data Bound data
+	 * @param {Event} evt The event object
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
+	{
+	};
+
+	/**
+	 * Toggle the display status of page menu.
+	 * @param {JQuery} $item  
+	 * @param {boolean} flag 
+	 * @param {number} duration
+	 * @return {Deferred}
+	 */
+	NavigationMenu.prototype.togglePageMenuDisplay = function($item, flag, duration)
+	{
+		var self = this, animationDeferred = $.Deferred(),
+			$itemMenu = $item.find(".item-menu"),
+			isOpened = $item.hasClass("menu-opened"),
+			pageCount = $itemMenu.find("ul:first-child>li").length;
+
+		var contentHeight = $(".navigation-toolbar").offset().top - $item.offset().top;
+		pageCount = self.isEllipsis($item, pageCount, contentHeight);
+
+		var duration = duration || 0,
+			menuHeight = pageCount * self.pageItemHeight + self.pageCategoryHeight, targetWidth,
+			initWidth = self.obIsExpand() ?
+				self.expandWidth :
+				$item.find(".item-icon").outerWidth() + $item.find(".item-label").outerWidth();
+		if ($itemMenu.width() == 620) 
+		{
+			targetWidth = 620;
+
+		} else
+		{
+			targetWidth = 310;
+		}
+
+
+		if (flag && !isOpened)
+		{
+			//If the item text is greater than 310, get the width.
+			$itemMenu.css({ width: "" });
+			$item.addClass("menu-opened");
+			targetWidth = targetWidth > $itemMenu.width() ? targetWidth : $itemMenu.width();
+			$item.removeClass("menu-opened");
+
+			$itemMenu.css({ width: initWidth, height: self.pageCategoryHeight, display: "block" });
+			self.isOnAnimation = true;
+			$item.addClass("onAnimation");
+			$item.addClass("menu-opened");
+			$itemMenu.stop().animate({ width: targetWidth, height: menuHeight }, {
+				duration: duration, queue: false, done: function()
+				{
+					self.isOnAnimation = false;
+					$item.removeClass("onAnimation");
+					// $itemMenu.css({ width: "", height: "", display: "" });
+					animationDeferred.resolve();
+				}
+			});
+		}
+		else if (!flag && isOpened)
+		{
+			//If the item text is greater than 310, get the width.
+			targetWidth = targetWidth > $itemMenu.width() ? targetWidth : $itemMenu.width();
+
+			$itemMenu.css({ width: targetWidth, height: menuHeight });
+			self.isOnAnimation = true;
+			$item.addClass("onAnimation");
+			$item.removeClass("menu-opened");
+			$itemMenu.stop().animate({ width: initWidth, height: self.pageCategoryHeight }, {
+				duration: duration, queue: false, done: function()
+				{
+					self.isOnAnimation = false;
+					$item.removeClass("onAnimation");
+					$itemMenu.css({ width: "", height: "", display: "" });
+					animationDeferred.resolve();
+				}
+			});
+		}
+		else
+		{
+			animationDeferred.resolve();
+		}
+
+		return animationDeferred;
+	};
+
+	/**
+	 * Click event for showMore button.
+	 * @param {Object} data
+	 * @param {Event} evt
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.showMoreButtonClick = function(data, evt)
+	{
+		evt.stopPropagation();
+
+		var self = this;
+
+		if (!self.closeOpenedNavigationItemMenu(false))
+		{
+			self.toggleMoreToolbarButtonsDisplay(true, self.defaultOpenMenuAnimationDuration);
+		}
+	};
+
+	/**
+	 * Toggle the display status of the toolbar at bottom.
+	 * @param {boolean} flag 
+	 * @param {number} duration
+	 * @return {Deferred} 
+	 */
+	NavigationMenu.prototype.toggleMoreToolbarButtonsDisplay = function(flag, duration)
+	{
+		var self = this, animationDeferred = $.Deferred(),
+			duration = duration || 0,
+			$toolbar = self.$navigationMenu.find(".navigation-toolbar"),
+			isOpened = $toolbar.hasClass("menu-opened");
+
+		if (self.obIsExpand()) { return; }
+		if (flag && !isOpened)
+		{
+			$toolbar.css("width", self.collapseWidth);
+			self.isOnAnimation = true;
+			$toolbar.addClass("onAnimation");
+			$toolbar.addClass("menu-opened");
+			$toolbar.stop().animate({ width: self.expandWidth }, {
+				duration: duration, queue: false, done: function()
+				{
+					self.isOnAnimation = false;
+					$toolbar.removeClass("onAnimation");
+					$toolbar.css("width", "");
+					animationDeferred.resolve();
+				}
+			});
+		}
+		else if (!flag && isOpened)
+		{
+			$toolbar.css("width", self.expandWidth)
+			self.isOnAnimation = true;
+			$toolbar.addClass("onAnimation");
+			$toolbar.removeClass("menu-opened");
+			$toolbar.stop().animate({ width: self.collapseWidth }, {
+				duration: duration, queue: false, done: function()
+				{
+					self.isOnAnimation = false;
+					$toolbar.removeClass("onAnimation");
+					$toolbar.css("width", "");
+					animationDeferred.resolve();
+				}
+			});
+		}
+		else
+		{
+			animationDeferred.resolve();
+		}
+
+		return animationDeferred;
+	};
+
+	/**
+	 * Switch the page by id.
+	 * @param {number} pageId The page id.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.switchToPageById = function(pageId)
+	{
+		var self = this;
+		tf.pageManager.changePage(parseInt(pageId));
+	};
+
+	/**
+	 * Set active state by page id.
+	 * @param {number} pageId 
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.setActiveStateByPageId = function(pageId)
+	{
+		var self = this;
+
+		if (!self.$navigationMenu) { return; }
+
+		var $pageItem = self.$navigationMenu.find(".item-menu li[pageId='" + pageId + "']"),
+			$categoryItem = $pageItem.closest(".navigation-item");
+
+		self.$navigationMenu.find(".navigation-item, .item-menu li").removeClass("active");
+
+		$pageItem.addClass("active");
+		$categoryItem.addClass("active");
+	};
+
+	/**
+	 * Initialize the tooltip.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.initTooltip = function()
+	{
+		var self = this;
+		$('.navigation-menu .toolbar-button').each(function(index, element)
+		{
+			var options = {};
+			if ($(element).hasClass('more'))
+			{
+				return;
+			}
+			else if ($(element).hasClass('logout'))
+			{
+				options.title = 'Log Out';
+				//options.className = 'left-tooltip';
+			} else if ($(element).hasClass('setting'))
+			{
+				options.title = 'Setting';
+			} else if ($(element).hasClass('report'))
+			{
+				options.title = 'report';
+			}
+			self.tooltip.init($(element), options);
+		});
+	};
+
+	/**
+	 * Destroy the tooltip.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.destroyTooltip = function()
+	{
+		this.tooltip.destroy($('.toolbar-button'));
+	};
+
+	/**
+	 * https://github.com/twbs/bootstrap/issues/16230
+	 * https://github.com/twbs/bootstrap/issues/16376
+	 * 
+	 * Do not remove setTimeout
+	 */
+	NavigationMenu.prototype.reinitTooltip = function()
+	{
+		this.destroyTooltip();
+		setTimeout(function()
+		{
+			this.initTooltip();
+		}.bind(this), 500);
+	};
+
+	/**
+	 * Refresh
+	 */
+	NavigationMenu.prototype.refresh = function()
+	{
+		var self = this;
+
+		if (!self.obIsRefreshAvailable())
+		{
+			return;
+		}
+
+		var isRefreshing = self.obIsRefreshing();
+		self.obIsRefreshing(!isRefreshing);
+		if (isRefreshing)
+		{
+			tf.pageManager.obPages()[0].data.pause();
+		}
+		else
+		{
+			tf.pageManager.obPages()[0].data.start();
+		}
+
+		self.reinitTooltip();
+		self.toggleMoreIcon(self.obIsExpand());
+	};
+
+	/**
+	 * When quick search icon is clicked.
+	 * @param {Event} evt
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.onQuickSearchIconClick = function(evt, data)
+	{
+		var self = this,
+			isActive = self.isQuicKSearchActive();
+
+		self.isBeginWithCollapse = !self.obIsExpand();
+		if (isActive && !self.obIsExpand())
+		{
+			self.toggleNavigationMenu(true, self.defaultToggleNavAnimationDuration);
+		}
+		else if (self.searchControlTemplate)
+		{
+			self.searchControlTemplate.toggleSearchControl(data);
+		}
+	};
+
+	/**
+	 * When quick search status has been changed.
+	 * @param {Event} evt
+	 * @param {boolean} status
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.onQuickSearchStatusChange = function(evt, status)
+	{
+		var self = this,
+			isActive = self.isQuicKSearchActive();
+
+		if (self.obIsExpand())
+		{
+			self.toggleQuickSearchDisplay(status, self.defaultOpenMenuAnimationDuration);
+			if (self.isBeginWithCollapse)
+			{
+				self.toggleNavigationMenu(false, self.defaultToggleNavAnimationDuration);
+				self.isBeginWithCollapse = false;
+			}
+		}
+		else
+		{
+			self.toggleNavigationMenu(true, self.defaultToggleNavAnimationDuration);
+		}
+	};
+
+	/**
+	 * Check if quick search is currently active.
+	 * @return {boolean} 
+	 */
+	NavigationMenu.prototype.isQuicKSearchActive = function()
+	{
+		var self = this;
+		return self.searchControlTemplate && self.searchControlTemplate.obIsActive();
+	};
+
+	/**
+	 * Toggle the display status of Quick Search.
+	 * @param {boolean} flag The target display status
+	 * @param {number} duration The animation duration
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.toggleQuickSearchDisplay = function(flag, duration)
+	{
+		var self = this, fadeDuration = duration / 2,
+			$navMenu = self.$navigationMenu,
+			$quickSearch = $navMenu.find(".navigation-quick-search"),
+			$quickSearchElements = $quickSearch.find(".type-selector, .search-content"),
+			$otherElements = $navMenu.find(".navigation-content, .navigation-toolbar"),
+			fadeInElements = flag ? $quickSearchElements : $otherElements,
+			fadeOutElements = flag ? $otherElements : $quickSearchElements,
+			isActive = $navMenu.hasClass("on-quick-search");
+
+		if (isActive == flag) { return; }
+
+		$quickSearch.css("height", $quickSearch.height());
+		fadeInElements.css({ display: "none", opacity: 0 });
+		fadeOutElements.css({ display: "block", opacity: 1 });
+		$navMenu.toggleClass("on-quick-search", flag);
+		fadeOutElements.stop().animate({ opacity: 0 }, {
+			duration: fadeDuration, queue: false, done: function()
+			{
+				$quickSearch.css("height", "");
+				fadeOutElements.css({ display: "", opacity: "" });
+				fadeInElements.css("display", "block").stop().animate({ opacity: 1 }, {
+					duration: fadeDuration, queue: false, done: function()
+					{
+						fadeInElements.css({ display: "", opacity: "" });
+					}
+				});
+			}
+		});
+	};
+
+	/**
+	 * The dispose function.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.dispose = function()
+	{
+		$(document).off("click.navigation-menu")
+	};
+})();
