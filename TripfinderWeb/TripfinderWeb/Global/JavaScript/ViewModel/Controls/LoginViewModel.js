@@ -41,7 +41,7 @@
 						message: "required",
 						callback: function(value, validator, $field)
 						{
-							if (value == " None")
+							if (value === " None")
 							{
 								return false;
 							}

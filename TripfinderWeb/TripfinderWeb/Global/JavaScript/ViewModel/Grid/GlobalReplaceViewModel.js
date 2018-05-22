@@ -29,7 +29,7 @@
 
 	GlobalReplaceViewModel.prototype._removeFieldButtonEnabledComputer = function()
 	{
-		return !(this.obReplaceItems().length == 1);
+		return !(this.obReplaceItems().length === 1);
 	};
 
 	GlobalReplaceViewModel.prototype.loadEntityDefinition = function()
@@ -62,7 +62,7 @@
 
 	GlobalReplaceViewModel.prototype.loadEntityData = function()
 	{
-		if (this._entityType != 'student')
+		if (this._entityType !== 'student')
 		{
 			return;
 		}
@@ -73,10 +73,10 @@
 				var tripIds = { dlyPuTripId: undefined, dlyDoTripId: undefined, dlyPuTranTripId: undefined, dlyDoTranTripId: undefined };
 				for (var i in entityData)
 				{
-					tripIds.dlyPuTripId = tripIds.dlyPuTripId == undefined ? entityData[i].DlyPuTripId : tripIds.dlyPuTripId == entityData[i].DlyPuTripId ? entityData[i].DlyPuTripId : "";
-					tripIds.dlyDoTripId = tripIds.dlyDoTripId == undefined ? entityData[i].DlyDoTripId : tripIds.dlyDoTripId == entityData[i].DlyDoTripId ? entityData[i].DlyDoTripId : "";
-					tripIds.dlyPuTranTripId = tripIds.dlyPuTranTripId == undefined ? entityData[i].DlyPuTranTripId : tripIds.dlyPuTranTripId == entityData[i].DlyPuTranTripId ? entityData[i].DlyPuTranTripId : "";
-					tripIds.dlyDoTranTripId = tripIds.dlyDoTranTripId == undefined ? entityData[i].DlyDoTranTripId : tripIds.dlyDoTranTripId == entityData[i].DlyDoTranTripId ? entityData[i].DlyDoTranTripId : "";
+					tripIds.dlyPuTripId = tripIds.dlyPuTripId === undefined ? entityData[i].DlyPuTripId : tripIds.dlyPuTripId === entityData[i].DlyPuTripId ? entityData[i].DlyPuTripId : "";
+					tripIds.dlyDoTripId = tripIds.dlyDoTripId === undefined ? entityData[i].DlyDoTripId : tripIds.dlyDoTripId === entityData[i].DlyDoTripId ? entityData[i].DlyDoTripId : "";
+					tripIds.dlyPuTranTripId = tripIds.dlyPuTranTripId === undefined ? entityData[i].DlyPuTranTripId : tripIds.dlyPuTranTripId === entityData[i].DlyPuTranTripId ? entityData[i].DlyPuTranTripId : "";
+					tripIds.dlyDoTranTripId = tripIds.dlyDoTranTripId === undefined ? entityData[i].DlyDoTranTripId : tripIds.dlyDoTranTripId === entityData[i].DlyDoTranTripId ? entityData[i].DlyDoTranTripId : "";
 				}
 				this._tripIds = tripIds;
 			}.bind(this))
@@ -115,7 +115,7 @@
 
 	GlobalReplaceViewModel.prototype.verify = function()
 	{
-		if (this._entityType != 'student')
+		if (this._entityType !== 'student')
 		{
 			return Promise.resolve("");
 		}
@@ -145,7 +145,7 @@
 			}
 		}
 		var promiseAll = [];
-		for (var i in replaceItems)
+		for (i in replaceItems)
 		{
 			var tripId = undefined, tripName = undefined;
 			switch (replaceItems[i].replaceRequest.FieldName)
@@ -163,19 +163,19 @@
 					tripId = dlyDoTranTripId;
 					break;
 				case "DlyPuTripId":
-					if (dlyPuTripId != this._tripIds.dlyPuTripId)
+					if (dlyPuTripId !== this._tripIds.dlyPuTripId)
 						tripName = replaceItems[i].replaceRequest.FieldName;
 					break;
 				case "DlyDoTripId":
-					if (dlyDoTripId != this._tripIds.dlyDoTripId)
+					if (dlyDoTripId !== this._tripIds.dlyDoTripId)
 						tripName = replaceItems[i].replaceRequest.FieldName;
 					break;
 				case "DlyPuTranTripId":
-					if (dlyPuTranTripId != this._tripIds.dlyPuTranTripId)
+					if (dlyPuTranTripId !== this._tripIds.dlyPuTranTripId)
 						tripName = replaceItems[i].replaceRequest.FieldName;
 					break;
 				case "DlyDoTranTripId":
-					if (dlyDoTranTripId != this._tripIds.dlyDoTranTripId)
+					if (dlyDoTranTripId !== this._tripIds.dlyDoTranTripId)
 						tripName = replaceItems[i].replaceRequest.FieldName;
 					break;
 			}
@@ -184,8 +184,8 @@
 				promiseAll.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripstop", "trip", tripId))
 					.then(function(apiResponse)
 					{
-						var tripStopEntity = $.grep(apiResponse.Items, function(d) { return d.Id == this.valueOf(); }.bind(this));
-						return tripStopEntity.length == 0 ? "wrongTripStop" : "";
+						var tripStopEntity = $.grep(apiResponse.Items, function(d) { return d.Id === this.valueOf(); }.bind(this));
+						return tripStopEntity.length === 0 ? "wrongTripStop" : "";
 					}.bind(replaceItems[i].replaceRequest.UpdateValue)));
 			}
 			else if (tripName)
@@ -209,7 +209,7 @@
 				replaceRequests.push(replaceItems[i].replaceRequest);
 			}
 		}
-		if (replaceRequests.length == 0)
+		if (replaceRequests.length === 0)
 		{
 			return Promise.resolve(false);
 		}
@@ -219,7 +219,7 @@
 		return tf.promiseBootbox.yesNo(globalReplaceInfo, "Confirmation Message")
 			.then(function(result)
 			{
-				if (result == true)
+				if (result === true)
 				{
 					var request = {
 						ReplaceRequests: replaceRequests,
@@ -229,15 +229,15 @@
 					return self.verify().then(function(result)
 					{
 						var wrongMessage = undefined;
-						if (result.indexOf("wrongTripStop") != -1 && result.indexOf("wrongTrip") != -1)
+						if (result.indexOf("wrongTripStop") !== -1 && result.indexOf("wrongTrip") !== -1)
 						{
 							wrongMessage = "The Trip you have selected does not have the TripStop you have selected.";
 						}
-						else if (result.indexOf("wrongTripStop") != -1)
+						else if (result.indexOf("wrongTripStop") !== -1)
 						{
 							wrongMessage = "The TripStop you have selected was not found in the Trip which the student(s) has been assigned.";
 						}
-						else if (result.indexOf("wrongTrip") != -1)
+						else if (result.indexOf("wrongTrip") !== -1)
 						{
 							wrongMessage = "The Trip you have selected does not have the TripStop which the student(s) has been assigned.";
 						}
@@ -415,7 +415,7 @@
 					this.obType(field.TypeCode);
 					this.typeCodeChange.notify();
 					this.obAttributes({ name: field.TypeCode, type: field.TypeCode, class: "form-control", dataList: datalist, fieldName: field.FieldName });
-					if (field.TypeCode == "String")
+					if (field.TypeCode === "String")
 					{
 						this.replaceRequest = new ReplaceRequest(field.FieldName, this.obValue());
 					}
@@ -444,7 +444,7 @@
 		var field = this.obSelectedField();
 		if (field)
 		{
-			if (field.TypeCode == "String")
+			if (field.TypeCode === "String")
 			{
 				this.replaceRequest = new ReplaceRequest(field.FieldName, this.obValue());
 			}
@@ -479,7 +479,6 @@
 							return { text: d.Name, value: d.IdString };
 						});
 					}.bind(this));
-				break;
 			case "SchoolCode":
 			case "ResidSchool":
 			case "Priorschool":
@@ -503,10 +502,8 @@
 							return { text: d.Name + " (" + d.SchoolCode + ")", value: d.SchoolCode };
 						});
 					}.bind(this));
-				break;
 			case "Sex":
 				return Promise.resolve([{ text: 'Female', value: 'F' }, { text: 'Male', value: 'M' }]);
-				break;
 			case "DlyDoSite":
 			case "DlyPuSite":
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "altsite/public"))
@@ -518,7 +515,6 @@
 						});
 						return [{ value: 0, text: "Home" }, { value: -1, text: "None" }, { value: -2, text: "Parent Transport" }, { value: -3, text: "Walker" }].concat(items);
 					}.bind(this));
-				break;
 			case "DlyPuTripId":
 			case "DlyDoTripId":
 			case "DlyPuTranTripId":
@@ -531,7 +527,6 @@
 							return { text: d.Name, value: d.Id };
 						});
 					}.bind(this));
-				break;
 			case "DlyPuTripStop":
 			case "DlyDoTripStop":
 			case "DlyDoTranTripStop":
@@ -544,7 +539,6 @@
 							return { text: d.Street, value: d.Id };
 						});
 					}.bind(this));
-				break;
 		}
 		return Promise.resolve([]);
 	}
