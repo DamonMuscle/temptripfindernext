@@ -189,6 +189,7 @@
 									{
 										if (!noRebuild)
 										{
+											tf.loadingIndicator.tryHide();
 											return tf.DBNeedToRebuildAlert(tf.datasourceManager.databaseName);
 										}
 										return Promise.resolve(true);
