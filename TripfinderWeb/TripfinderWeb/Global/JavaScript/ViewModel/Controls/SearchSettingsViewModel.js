@@ -13,7 +13,7 @@
 				{ name: "driver", display: "Driver", selected: true, permission: true },
 				{ name: "destination", display: "Destination", selected: true, permission: true },
 				{ name: "school", display: "School", selected: true, permission: true },
-				{ name: "department", display: "Department ", selected: true, permission: true },
+				{ name: "department", display: "Department", selected: true, permission: true },
 				{ name: "classification", display: "Classification", selected: true, permission: true },
 				{ name: "billingclassification", display: "Billing Classification", selected: true, permission: true }
 			];

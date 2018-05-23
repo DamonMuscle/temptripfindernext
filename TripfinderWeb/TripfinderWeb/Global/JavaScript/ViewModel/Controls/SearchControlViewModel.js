@@ -989,28 +989,26 @@
 		{
 			switch (name)
 			{
-				case 'altsite':
-					return 'Alternate Sites';
-				case 'contractor':
-					return 'Contractors';
-				case 'district':
-					return 'Districts';
-				case 'fieldtrip':
-					return 'Field Trips';
-				case 'georegion':
-					return 'Geo Regions';
-				case 'school':
-					return 'Schools';
-				case 'staff':
-					return 'Staff';
-				case 'student':
-					return 'Students';
-				case 'trip':
-					return 'Trips';
-				case 'tripstop':
-					return 'Trip Stops';
+				case 'tripname':
+					return 'Trip Name';
 				case 'vehicle':
-					return 'Vehicles';
+					return 'Vehicle';
+				case 'submitter':
+					return 'Submitter';
+				case 'tripdate':
+					return 'Trip Date';
+				case 'driver':
+					return 'Driver';
+				case 'destination':
+					return 'Destination';
+				case 'school':
+					return 'School';
+				case 'department':
+					return 'Department';
+				case 'classification':
+					return 'Classification';
+				case 'billingclassification':
+					return 'Billing Classification';
 			}
 			return '';
 		};

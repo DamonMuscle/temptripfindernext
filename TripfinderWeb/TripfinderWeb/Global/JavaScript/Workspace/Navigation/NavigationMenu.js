@@ -19,7 +19,7 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.NavigationMenuExpandStatueKey = "viewfinder.navigationmenu.expandstatus";
+		self.NavigationMenuExpandStatueKey = "tripfinder.navigationmenu.expandstatus";
 		self.obIsExpand = ko.observable();
 		self.isOnAnimation = false;
 		self.isBeginWithCollapse = false;
