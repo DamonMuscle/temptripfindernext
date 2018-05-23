@@ -472,6 +472,7 @@
 	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
 	{
 		var self = this;
+		self.setActiveStateByPageType(type);
 		self.pageManager.openNewPage(type);
 	};
 
@@ -490,7 +491,6 @@
 			pageCount = $itemMenu.find("ul:first-child>li").length;
 
 		var contentHeight = $(".navigation-toolbar").offset().top - $item.offset().top;
-		pageCount = self.isEllipsis($item, pageCount, contentHeight);
 
 		var duration = duration || 0,
 			menuHeight = pageCount * self.pageItemHeight + self.pageCategoryHeight, targetWidth,
@@ -644,18 +644,10 @@
 	 * @param {number} pageId 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.setActiveStateByPageId = function(pageId)
+	NavigationMenu.prototype.setActiveStateByPageType = function(pagetype)
 	{
-		var self = this;
-
-		if (!self.$navigationMenu) { return; }
-
-		var $pageItem = self.$navigationMenu.find(".item-menu li[pageId='" + pageId + "']"),
-			$categoryItem = $pageItem.closest(".navigation-item");
-
-		self.$navigationMenu.find(".navigation-item, .item-menu li").removeClass("active");
-
-		$pageItem.addClass("active");
+		var $categoryItem = $(".navigation-item[pagetype='" + pagetype + "']");
+		$(".navigation-item").removeClass("active");
 		$categoryItem.addClass("active");
 	};
 
