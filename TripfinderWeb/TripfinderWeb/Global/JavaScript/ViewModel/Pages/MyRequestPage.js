@@ -1,27 +1,27 @@
 (function()
 {
-	createNamespace("TF.Page").FieldTripPage = FieldTripPage;
+	createNamespace("TF.Page").MyRequestPage = MyRequestPage;
 
-	function FieldTripPage()
+	function MyRequestPage()
 	{
 		var self = this;
 		self.type = "fieldtrip";
-		self.pageType = "fieldtrip";
+		self.pageType = "myrequests";
 		TF.Page.BaseGridPage.apply(self, arguments);
 	}
 
-	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
-	FieldTripPage.prototype.constructor = FieldTripPage;
+	MyRequestPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
+	MyRequestPage.prototype.constructor = MyRequestPage;
 
-	FieldTripPage.prototype.updateOptions = function()
+	MyRequestPage.prototype.updateOptions = function()
 	{
 		var self = this;
 		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
 		self.options.showOmittedCount = false;
-		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip");
+		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
 		self.options.extraFields = ["FieldTripStageId"];
 		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
-		self.options.storageKey = "grid.currentlayout." + self.type;
+		self.options.storageKey = "grid.currentlayout." + self.pageType;
 		self.options.loadUserDefined = false;
 
 		self.options.summaryFilters = [{
@@ -96,20 +96,7 @@
 		};
 	};
 
-	FieldTripPage.prototype.openNavigationClick = function()
-	{
-		var self = this, navigationData,
-			$content, $navigationContent = $(".navigation-container").addClass("mobile");
-		$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
-		$navigationContent.append($content);
-
-		navigationData = new TF.NavigationMenu();
-
-		ko.applyBindings(ko.observable(navigationData), $content[0]);
-
-	};
-
-	FieldTripPage.prototype.dispose = function()
+	MyRequestPage.prototype.dispose = function()
 	{
 		var self = this;
 		TF.Page.BaseGridPage.prototype.dispose.call(self);

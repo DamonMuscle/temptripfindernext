@@ -30,6 +30,7 @@
 		self.bindWithKnockout();
 		self.resizeablePanel = new TF.ViewieControl.ResizeablePanel();
 		self.tooltip = new TF.Helper.TFTooltip();
+		self.pageManager = new TF.Page.PageManager();
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
 
@@ -470,6 +471,8 @@
 	 */
 	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
 	{
+		var self = this;
+		self.pageManager.openNewPage(type);
 	};
 
 	/**

@@ -39,6 +39,10 @@
 				pageData = new TF.Page.FieldTripPage();
 				templateType = "basegridpage";
 				break;
+			case "myrequests":
+				pageData = new TF.Page.MyRequestPage();
+				templateType = "basegridpage";
+				break;
 		}
 		$content = $("<div class='main-body'><!-- ko template:{ name:'workspace/page/" + templateType + "',data:$data }--><!-- /ko --></div>");
 		$pageContent.append($content);

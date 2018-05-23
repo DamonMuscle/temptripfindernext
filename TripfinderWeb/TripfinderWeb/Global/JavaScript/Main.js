@@ -256,11 +256,20 @@ function toISOStringWithoutTimeZone(m)
 
 function getTitleByType(type)
 {
-	switch (type.toLowerCase())
+	var pageTitile = "", pageType = type.toLowerCase();
+	switch (pageType)
 	{
 		case "fieldtrip":
-			return "Field Trip";
+			pageTitile = "Field Trips";
+			break;
+		case "myrequests":
+			pageTitile = "My Requests";
+			break;
+		case "approvals":
+			pageTitile = "My Pending Approvals";
+			break;
 	}
+	return pageTitile;
 }
 
 function addStyle(styleId, content)
