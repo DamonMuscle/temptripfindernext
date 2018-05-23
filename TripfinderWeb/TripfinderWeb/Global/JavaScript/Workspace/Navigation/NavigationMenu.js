@@ -473,6 +473,10 @@
 	{
 		var self = this;
 		self.setActiveStateByPageType(type);
+		if (TF.isPhoneDevice)
+		{
+			self.closeNavigation();
+		}
 		self.pageManager.openNewPage(type);
 	};
 
