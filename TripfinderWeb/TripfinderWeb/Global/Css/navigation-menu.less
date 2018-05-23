@@ -1,6 +1,4 @@
 @import "z-index";
-@systemColor: #8E52A1;
-
 .font-face-preload {
 	position: absolute;
 	bottom: 0;
@@ -271,7 +269,7 @@
 					.item-input {
 						display: block;
 					}
-						
+
 				}
 			}
 
@@ -281,7 +279,7 @@
 					box-shadow: none !important;
 
 					&.hoverState {
-						background-color: @HoverBackgroundColor !important;
+						background-color: @HoverBackgroundColor  !important;
 					}
 
 					.item-label {
@@ -717,13 +715,13 @@
 						&::-ms-input-placeholder {
 							font-size: 16px;
 						}
-						&.mobile{
+						&.mobile {
 							&::-webkit-input-placeholder {
 								color: white !important;
 							}
 
 							&:-moz-placeholder {
-								color:#ffffff !important;
+								color: #ffffff !important;
 							}
 							&::-moz-placeholder {
 								color: #ffffff !important;
@@ -737,15 +735,15 @@
 						}
 					}
 				}
-					.clear-btn {
-						top: 15px;
-						right: 0px;	
-						height: 24px;
-						width: 13px;
-						display: none;
-						background-size: 13px;
-						cursor: pointer;
-					}
+				.clear-btn {
+					top: 15px;
+					right: 0px;
+					height: 24px;
+					width: 13px;
+					display: none;
+					background-size: 13px;
+					cursor: pointer;
+				}
 
 				.quick-search-spinner {
 					display: none;
@@ -1154,9 +1152,9 @@
 		justify-content: center;
 		position: absolute;
 		overflow: hidden;
-		z-index:1000;
+		z-index: 1000;
 		top: 0;
-		right:0;
+		right: 0;
 		bottom: 0;
 		left: 0;
 		.navigation-content {
@@ -1164,50 +1162,49 @@
 			background-color: #000000;
 			opacity: 0.8;
 		}
-		.navigation-menu{
-			background-color:unset;
-				&.expand {
-					.navigation-quick-search {
-						height: 44px;
-						padding: 0 70px 0 18px;
+		.navigation-menu {
+			background-color: unset;
+			&.expand {
+				.navigation-quick-search {
+					height: 44px;
+					padding: 0 70px 0 18px;
+					background-color: #000000;
+					opacity: 0.8;
+					.search-header {
 						background-color: #000000;
-						opacity: 0.8;
-						.search-header{
+						height: 43px;
+						.search-text {
 							background-color: #000000;
-							height: 43px;
-							.search-text{
-								background-color: #000000; 
+						}
+					}
+					&.active {
+						height: 100%;
+						padding: 0;
+						.quick-search-container {
+							margin-right: 50px;
+							.search-header {
+								margin: 0;
 							}
 						}
-						&.active{
+						.search-content {
+							.recent-search-title {
+								color: #ffffff;
+							}
+						}
+						.search-control-row {
+							padding: 0 20px;
+						}
+						.search-content {
 							height: 100%;
-							padding: 0;
-							.quick-search-container{
-								margin-right: 50px;
-								.search-header{
-									margin: 0;
-								}
-							}
-							.search-content{
-								.recent-search-title{
-									color: #ffffff;
-								}
-							}
-							.search-control-row{
-								padding:0 20px;
-							}
-							.search-content{
-								height: 100%;
-								width: 100%;
-								margin: 0;
-								background-color: #000000; 
-								&.result{
-									.search-result{
-										.no-result {
-											color:#ffffff;
-											.result-head{
-												color: #ffffff;
-											}
+							width: 100%;
+							margin: 0;
+							background-color: #000000;
+							&.result {
+								.search-result {
+									.no-result {
+										color: #ffffff;
+										.result-head {
+											color: #ffffff;
 										}
 									}
 								}
@@ -1215,9 +1212,10 @@
 						}
 					}
 				}
+			}
 		}
-		
-		.navigation-closeBtn{
+
+		.navigation-closeBtn {
 			width: 48px;
 			height: 44px;
 			background-image: url("../img/navigation-menu/icon-Search Close.svg");
@@ -1230,10 +1228,10 @@
 			top: 0;
 			z-index: 25000;
 		}
-		.navigation-menu.expand{
+		.navigation-menu.expand {
 			width: 100%;
 		}
-		.navigation-toolbar{
+		.navigation-toolbar {
 			position: fixed;
 			bottom: 0;
 			display: flex;
@@ -1241,7 +1239,7 @@
 			align-items: center;
 			background-color: #000000 !important;
 			opacity: 0.85;
-			.toolbar-button{
+			.toolbar-button {
 				position: static;
 			}
 		}
