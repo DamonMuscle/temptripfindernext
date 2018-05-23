@@ -53,7 +53,9 @@
 
 		var self = this,
 			$container = $(".navigation-container");
-		ko.applyBindings(self, $container[0]);
+		// ko.cleanNode($container[0]);
+
+		// ko.applyBindings(self, $container[0]);
 		self.$container = $container;
 	};
 
@@ -67,7 +69,6 @@
 			$nav = self.$container.find(".navigation-menu");
 
 		self.$navigationMenu = $nav;
-
 		self.bindRelatedEvents();
 		self.initNavigationMenuState();
 		self.initTooltip();
@@ -85,6 +86,10 @@
 			typeList = ["fieldtrips", "myrequests", "approvals"],
 			isExpand = tf.storageManager.get(self.NavigationMenuExpandStatueKey);
 
+		if (TF.isPhoneDevice)
+		{
+			isExpand = "True";
+		}
 		if (isExpand && isExpand === "True") { self.toggleNavigationMenu(true); }
 
 		$.each(typeList, function(index, item)
@@ -363,40 +368,50 @@
 		}
 
 		// Set initial inline styles so the class styles would not take effect until the end of animation.
-		$gridMap.css("width", totalWidth - prevWidth);
-		$navMenu.css("width", prevWidth);
-		$navItems.css({ overflow: "hidden", width: "100%" });
-		self.obIsExpand(flag);
-		refreshObj = self.updatePageContentWidth();
-		self.isOnAnimation = true;
-		$gridMap.stop().animate({ width: totalWidth - targetWidth }, {
-			duration: duration, queue: false, step: function()
-			{
-			}
-		});
-		$navMenu.stop().animate({ width: targetWidth }, {
-			duration: duration, queue: false, done: function()
-			{
-				// Use calc to avoid display issue when there is vertical scroll in gridMap, remove if this is not happending.
-				if (refreshObj.currentInterval)
+		if (!TF.isPhoneDevice)
+		{
+			$gridMap.css("width", totalWidth - prevWidth);
+			$navMenu.css("width", prevWidth);
+			$navItems.css({ overflow: "hidden", width: "100%" });
+			self.obIsExpand(flag);
+			refreshObj = self.updatePageContentWidth();
+			self.isOnAnimation = true;
+			$gridMap.stop().animate({ width: totalWidth - targetWidth }, {
+				duration: duration, queue: false, step: function()
 				{
-					clearInterval(refreshObj.currentInterval);
 				}
-				if (refreshObj.function)
+			});
+			$navMenu.stop().animate({ width: targetWidth }, {
+				duration: duration, queue: false, done: function()
 				{
-					refreshObj.function();
+					// Use calc to avoid display issue when there is vertical scroll in gridMap, remove if this is not happending.
+					if (refreshObj.currentInterval)
+					{
+						clearInterval(refreshObj.currentInterval);
+					}
+					if (refreshObj.function)
+					{
+						refreshObj.function();
+					}
+					self.isOnAnimation = false;
+					$navMenu.css({ overflow: "", width: "" });
+					$navItems.css({ overflow: "", width: "" });
+					$gridMap.css("width", "calc(100% - " + targetWidth + "px)");
+					$toolbar.removeClass("menu-opened");
+					if (self.obIsExpand() && self.searchControlTemplate)
+					{
+						self.searchControlTemplate.searchBoxPlaceHolderChanged();
+					}
 				}
-				self.isOnAnimation = false;
-				$navMenu.css({ overflow: "", width: "" });
-				$navItems.css({ overflow: "", width: "" });
-				$gridMap.css("width", "calc(100% - " + targetWidth + "px)");
-				$toolbar.removeClass("menu-opened");
-				if (self.obIsExpand() && self.searchControlTemplate)
-				{
-					self.searchControlTemplate.searchBoxPlaceHolderChanged();
-				}
-			}
-		});
+			});
+		} else
+		{
+			$navMenu.css("width", "100%");
+			$navItems.css({ overflow: "hidden", width: "100%" });
+			$(".navigation-container").addClass("mobile");
+			self.obIsExpand(flag);
+		}
+
 	};
 
 	/**
@@ -814,6 +829,16 @@
 				});
 			}
 		});
+	};
+
+	/**
+	 * The close navigation page for mobile.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.closeNavigation = function()
+	{
+		$(".navigation-container.mobile").empty();
+		$(".navigation-container").removeClass("mobile");
 	};
 
 	/**

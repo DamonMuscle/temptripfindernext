@@ -1,10 +1,15 @@
 <div class="navigation-menu animate" data-bind="uiInit:init,css:{expand:obIsExpand}">
+	<!-- ko if:!TF.isPhoneDevice-->
 	<div class="navigation-header">
 		<div class="item-icon logo"></div>
 		<div class="toggle-button">
 			<div class="item-icon left-caret" data-bind="click:toggleMenuBtnClick"></div>
 		</div>
 	</div>
+	<!-- /ko -->
+	<!-- ko if:TF.isPhoneDevice-->
+	<div class="navigation-closeBtn " data-bind="click:closeNavigation"></div>
+	<!-- /ko -->
 	<!-- ko if: !tf.permissions.isSupport -->
 	<!-- ko template :{ name : "workspace/controls/searchcontrol",data:searchControlTemplate }-->
 	<!-- /ko -->
@@ -14,7 +19,7 @@
 			<div class="item-icon fieldtrips"></div>
 			<div class="item-label">Field Trips</div>
 		</div>
-		<div class="navigation-item myrequests" pageType="myrequest" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
+		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
 			<div class="item-icon myrequests"></div>
 			<div class="item-label">My Requests</div>
 		</div>

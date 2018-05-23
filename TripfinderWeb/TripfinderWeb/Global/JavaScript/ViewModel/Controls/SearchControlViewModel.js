@@ -155,6 +155,10 @@
 			self.searchBoxPlaceHolder("Search Trips...");
 		});
 
+		if (TF.isPhoneDevice)
+		{
+			self.$searchText.addClass("mobile");
+		}
 		self.$searchResult.on("scroll", function()
 		{
 			if (self.currentItems.length > 0 && self.currentItems[0].cards.length > 0)

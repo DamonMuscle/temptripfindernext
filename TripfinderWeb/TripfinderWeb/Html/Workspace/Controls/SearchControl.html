@@ -3,7 +3,8 @@
 		<div class="search-header" data-bind="css: obIsLoading()? 'searching':''">
 			<div class="item-icon quick-search-spinner"></div>
 			<div class="item-icon quick-search search-btn" data-bind="click:onSearchIconClick"></div>
-			<input class="search-text" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: searchBoxPlaceHoderText}" autocapitalize="off" spellcheck="false" />
+			<input class="search-text" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: searchBoxPlaceHoderText}"
+			 autocapitalize="off" spellcheck="false" />
 			<div class="item-icon clear-btn quick-search-close" data-bind="click:clearSearchClick"></div>
 		</div>
 	</div>
@@ -30,7 +31,8 @@
 				<!-- ko foreach: obRecentSearches -->
 				<div class="recent-search-item" data-bind="click: $parent.recentSearchRecordClick.bind($data)">
 					<div class="item-left">
-						<div class="item-name" data-bind="text: $data.text, attr: {title: $data.text}, css: $data.type === 'all' ? 'landscape-full':''" x-ms-format-detection="none"></div>
+						<div class="item-name" data-bind="text: $data.text, attr: {title: $data.text}, css: $data.type === 'all' ? 'landscape-full':''"
+						 x-ms-format-detection="none"></div>
 						<!-- ko if:$data.type !== "all" -->
 						<div class="item-type" data-bind="text: $parent.recentSearchSubtitleFormat($data.type), attr: {title: $parent.recentSearchSubtitleFormat($data.type)}"></div>
 						<!-- /ko-->
@@ -98,7 +100,8 @@
 									<!--/ko -->
 									<div class="card-left">
 										<div class="card-title" bind-field="title" data-bind="text: title, attr: {title: title}, css: {'full-height': !subtitle, 'no-content': !title}"></div>
-										<div class="card-subtitle" bind-field="subtitle" data-bind="text: subtitle, attr: {title: subtitle}, css:{'no-content': !subtitle, 'full-height': !title}" x-ms-format-detection="none"></div>
+										<div class="card-subtitle" bind-field="subtitle" data-bind="text: subtitle, attr: {title: subtitle}, css:{'no-content': !subtitle, 'full-height': !title}"
+										 x-ms-format-detection="none"></div>
 									</div>
 									<div class="icon right-caret"></div>
 								</div>
