@@ -13,6 +13,8 @@
 		self.initContextMenuEvent();
 
 		self.resizeablePanel = new TF.ViewieControl.ResizeablePanel();
+
+		self.logOffClick = self.logOffClick.bind(this);
 	}
 
 	PageManager.prototype.initNavgationBar = function()
@@ -102,10 +104,43 @@
 		}
 	};
 
-	PageManager.prototype.logOff = function()
+	PageManager.prototype.logOffClick = function()
 	{
 		var self = this;
-		tf.storageManager.save("token", "", true);
+		tf.promiseBootbox.confirm({
+			buttons: TF.isPhoneDevice ? {
+				OK: {
+					label: "Logout",
+					className: "btn-yes-mobile"
+				},
+				Cancel: {
+					label: "Cancel",
+					className: "btn-no-mobile"
+				}
+			} : {
+					OK: {
+						label: "Logout",
+						className: "btn-primary btn-sm btn-primary-black"
+					},
+					Cancel: {
+						label: "Cancel",
+						className: "btn-default btn-sm btn-default-link"
+					}
+				},
+			title: "Logout",
+			message: "Are you sure you want to logout?"
+		}).then(function(result)
+		{
+			if (result)
+			{
+				self.logout();
+			}
+		})
+	};
+
+	PageManager.prototype.logout = function()
+	{
+		tf.authManager.logOff();
 		location.reload();
 		var rememberMe = tf.storageManager.get("rememberMe", true) || false;
 		if (!rememberMe)
