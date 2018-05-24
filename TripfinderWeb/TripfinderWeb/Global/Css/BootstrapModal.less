@@ -1,16 +1,11 @@
 ﻿@import "z-index";
+
 button * {
 	cursor: pointer !important;
 }
 
 .modal-body {
 	overflow: auto;
-
-	.document-dataentry {
-		.bootstrap-datetimepicker-widget {
-			//position: fixed;
-		}
-	}
 }
 
 .modal-content {
@@ -43,6 +38,7 @@ button * {
 	color: #fff;
 	background-color: #333;
 	border-color: #ddd;
+
 	.round-border {
 		display: block;
 		border: 1px solid #fff;
@@ -144,6 +140,7 @@ button * {
 			&::first-letter {
 				min-width: 3px;
 			}
+
 			&.underline::first-letter {
 				text-decoration: underline;
 			}
@@ -160,25 +157,25 @@ button * {
 .modal-dialog .tf-btn-black:focus,
 .modal-dialog .tf-btn-black:active,
 .modal-dialog .tf-btn-black.active,
-.modal-dialog .open>.dropdown-toggle.tf-btn-black {
+.modal-dialog .open > .dropdown-toggle.tf-btn-black {
 	color: #ffffff;
 	background-color: #444444;
 	border-color: #333333;
 }
 
-.modal-dialog>.modal-content .modal-header>.close {
+.modal-dialog > .modal-content .modal-header > .close {
 	color: #fff;
 	margin-right: 10px;
 	margin-top: 8px;
 	opacity: 1;
 }
 
-.modal-dialog>.modal-content .modal-body .form-group .close {
+.modal-dialog > .modal-content .modal-body .form-group .close {
 	height: 25px;
 	width: 25px;
 }
 
-.modal-dialog>.modal-content .modal-body .form-group .close:enabled {
+.modal-dialog > .modal-content .modal-body .form-group .close:enabled {
 	opacity: 1;
 }
 
@@ -212,7 +209,7 @@ button * {
 }
 
 .k-mobile .unsave-mobile .modal-footer .btn.btn-yes-mobile {
-	background-color: @systemColor  !important;
+	background-color: @systemColor !important;
 }
 
 .modal-backdrop {
@@ -220,27 +217,27 @@ button * {
 	bottom: 0;
 }
 
-.modal-backdrop~.modal-backdrop {
+.modal-backdrop ~ .modal-backdrop {
 	z-index: @ent-tfmodal-z-index;
 }
 
-.modal~.modal {
+.modal ~ .modal {
 	z-index: @ent-tfmodal-z-index + 100;
 }
 
-.modal-backdrop~.modal-backdrop~.modal-backdrop {
+.modal-backdrop ~ .modal-backdrop ~ .modal-backdrop {
 	z-index: @ent-tfmodal-z-index + 150;
 }
 
-.modal~.modal~.modal {
+.modal ~ .modal ~ .modal {
 	z-index: @ent-tfmodal-z-index + 200;
 }
 
-.modal-backdrop~.modal-backdrop~.modal-backdrop~.modal-backdrop {
+.modal-backdrop ~ .modal-backdrop ~ .modal-backdrop ~ .modal-backdrop {
 	z-index: @ent-tfmodal-z-index + 250;
 }
 
-.modal~.modal~.modal~.modal {
+.modal ~ .modal ~ .modal ~ .modal {
 	z-index: @ent-tfmodal-z-index + 300;
 }
 
@@ -248,16 +245,16 @@ button * {
 	z-index: @ent-tfmodal-z-index + 350;
 }
 
-.bootbox~.modal-backdrop {
+.bootbox ~ .modal-backdrop {
 	z-index: @ent-tfmodal-z-index + 400;
 }
 
 .list-mover-drag-hint {
-	z-index: @ent-list-mover-drag-hint-z-index  !important;
+	z-index: @ent-list-mover-drag-hint-z-index !important;
 }
 
 .document-drag-hint {
-	z-index: @ent-document-drag-hint-z-index  !important;
+	z-index: @ent-document-drag-hint-z-index !important;
 }
 
 .tfmodal .savefilter-modal .applycheckbox-form-group {
@@ -305,9 +302,7 @@ button * {
 	border-radius: 0;
 }
 
-.modal-dialog .input-group-btn>button {
-	//padding-right: 6px;
-	//padding-left: 6px;
+.modal-dialog .input-group-btn > button {
 	background-color: #eeeeee;
 	min-width: 25px;
 	outline: none;
@@ -393,25 +388,14 @@ button * {
 	}
 }
 
-//@media (min-width: 768px) {
 .modal-dialog {
-	//position: absolute;
-	// left: 50%;
-	// top: 50%;
 	margin: 0;
 }
 
-.modal.fade .modal-dialog {
-	// transform: translate(-50%, -80%);
-	// -webkit-transform: translate(-50%, -80%);
-}
-
 .modal.in .modal-dialog {
-	transform: none; //transform: translate(-50%, -50%);
-	//-webkit-transform: translate(-50%, -50%);
+	transform: none;
 }
 
-//}
 .modal-fullscreen {
 	left: 0;
 	top: 0;
@@ -552,8 +536,8 @@ button * {
 	padding: 15px;
 	background-color: #F8F8F8;
 
-	>div,
-	>span {
+	> div,
+	> span {
 		color: #999;
 	}
 
@@ -657,7 +641,7 @@ button * {
 		.title {
 			padding-left: 0;
 
-			>div {
+			> div {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -713,15 +697,15 @@ button * {
 			-o-transition: .4s;
 		}
 
-		input:checked+.slider {
+		input:checked + .slider {
 			background-color: #77EE55;
 		}
 
-		input:focus+.slider {
+		input:focus + .slider {
 			box-shadow: 0 0 1px #77EE55;
 		}
 
-		input:checked+.slider .slider-block {
+		input:checked + .slider .slider-block {
 			-webkit-transform: translateX(20px);
 			-ms-transform: translateX(20px);
 			transform: translateX(20px);
@@ -823,14 +807,14 @@ button * {
 		&.form-group {
 			margin-bottom: 0;
 
-			>.help-block {
+			> .help-block {
 				position: absolute;
 				bottom: 5px;
 				left: 0;
 			}
 
 			&.sql-statement {
-				>.help-block {
+				> .help-block {
 					bottom: -20px;
 				}
 			}
@@ -876,14 +860,14 @@ button * {
 			}
 		}
 
-		>label {
+		> label {
 			flex: 1;
 
-			~* {
+			~ * {
 				flex: 5;
 			}
 
-			~.flex-1 {
+			~ .flex-1 {
 				flex: 1;
 			}
 		}
@@ -1191,10 +1175,7 @@ button * {
 
 			input.form-control.k-input[data-kendo-role=datepicker] {
 				text-align: right;
-				border: none; //background-color: white;
-				//min-height: 29px;
-				/*border-radius: 0;*/
-				/*box-shadow: none;*/
+				border: none;
 			}
 		}
 

@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').EditFieldTripStatusViewModel = EditFieldTripStatusViewModel;
 
-	function EditFieldTripStatusViewModel(selectedRecords, isApprove)
+	function EditFieldTripStatusViewModel(selectedRecords, isApprove, isCancel)
 	{
 		var self = this;
 		self.obComments = ko.observable("");
@@ -11,6 +11,7 @@
 		self.selectedRecords = selectedRecords;
 		self.fieldTripIds = selectedRecords.map(function(item) { return item.Id; });
 		self.isApprove = isApprove;
+		self.isCancel = isCancel;
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 
 		self.fieldTripStatus = [
@@ -70,7 +71,7 @@
 		var self = this, isValidating = false, validatorFields = {};
 		self.$form = $(el);
 
-		if (!self.isApprove)
+		if (!self.isApprove || self.isCancel)
 		{
 			validatorFields.comments = {
 				trigger: "blur change",
@@ -143,7 +144,7 @@
 
 	EditFieldTripStatusViewModel.prototype.apply = function(noComments)
 	{
-		var self = this, statusId = self.getStatusId();
+		var self = this, cancelStatus = 100, statusId = self.isCancel ? cancelStatus : self.getStatusId();
 		return self.pageLevelViewModel.saveValidate().then(function(result)
 		{
 			if (result)

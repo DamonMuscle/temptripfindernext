@@ -259,7 +259,7 @@ function getTitleByType(type)
 	var pageTitile = "", pageType = type.toLowerCase();
 	switch (pageType)
 	{
-		case "fieldtrip":
+		case "fieldtrips":
 			pageTitile = "Field Trips";
 			break;
 		case "myrequests":
