@@ -191,6 +191,10 @@
 	background-image: url('../../global/img/grid/decline.svg');
 }
 
+.iconbutton.cancel {
+	background-image: url('../../global/img/grid/decline.svg');
+}
+
 .grid-contextmenu-open(@image-url) {
 	margin-right: 0;
 	width: 23px;
@@ -412,9 +416,6 @@
 	}
 }
 
-// .iconbutton.refresh:hover {
-// 	transform: rotate(90deg);
-// }
 .iconbutton.disabled {
 	pointer-events: all;
 	opacity: 0.4;
@@ -1004,11 +1005,7 @@
 			background-color: #ecf2f9;
 		}
 	}
-	// .k-grid-content-locked {
-	// 	tr {
-	// 		background-color: rgba(204,204,204,0.19);
-	// 	}
-	// }
+
 	.k-input {
 		color: #333;
 	}
@@ -1217,7 +1214,7 @@
 
 						.tf-filter {
 							& + span + .k-button {
-								right: 2em; //2.3em;
+								right: 2em;
 								border-radius: 0;
 								border-right: 0;
 							}
@@ -1536,20 +1533,9 @@
 		overflow-x: scroll;
 		overflow-y: hidden;
 		margin-top: -65px;
-		min-height: @summaryGridHeight; // td {
-		// overflow: hidden;
-		// text-overflow: ellipsis;
-		// white-space: nowrap;
-		// height: 25px;
-		//
-		// &:first-child {
-		// 	border-left-width: 1px;
-		// }
-		// }
+		min-height: @summaryGridHeight;
 	}
-	/*.k-grid-content-locked {
-		border-right: none;
-	}*/
+
 	.k-grid-header {
 		margin-top: 27px;
 		position: relative;
@@ -1743,13 +1729,13 @@
 
 		&.drag-target-insert-after-cursor {
 			td {
-				border-bottom: @drag-target-cusor-them; //border-top-width: 3px;
+				border-bottom: @drag-target-cusor-them;
 			}
 		}
 
 		&.drag-target-insert-before-cursor {
 			td {
-				border-top: @drag-target-cusor-them; //border-top-width: 3px;
+				border-top: @drag-target-cusor-them;
 			}
 		}
 
@@ -1975,18 +1961,13 @@
 	z-index: @ent-grid-alert-z-index;
 
 	.title {
-		//color: #31708f;
 		font-weight: bold;
 	}
 
 	.close {
 		font-size: 16px;
-		right: 0; //color: #31708f;
+		right: 0;
 		opacity: 1;
-	}
-
-	.message {
-		//color: #5A93AD;
 	}
 }
 
@@ -2108,7 +2089,6 @@
 	padding-right: 5px;
 }
 
-// .kendo-grid .k-grid-header{
 .k-input,
 span.k-numeric-wrap.k-state-default,
 span.k-widget.k-numerictextbox,
@@ -2147,10 +2127,7 @@ span.k-dropdown-wrap.k-state-default {
 
 .k-numerictextbox .k-link {
 	height: 11px;
-	line-height: 9px; // .k-icon.k-i-arrow-n,
-	// .k-icon.k-i-arrow-s {
-	// 	background-position-x: 1px !important;
-	// }
+	line-height: 9px;
 }
 
 .k-filtercell {
@@ -2192,7 +2169,6 @@ span.k-dropdown-wrap.k-state-default {
 	}
 }
 
-// }
 .k-grid-header-wrap table tr th .k-filtercell > span .k-dropdown-operator {
 	background-position: 4px 3px;
 }
@@ -2229,9 +2205,7 @@ span.k-dropdown-wrap.k-state-default {
 			width: 22px;
 		}
 	}
-	// span.k-dropdown-wrap.k-state-default {
-	// 		width: 22px;
-	// }
+
 	.k-dropdown-wrap.k-state-default > .k-select {
 		width: 21px;
 	}
@@ -2401,7 +2375,7 @@ a.drill-down-links {
 		&:not(.datepickerinput) {
 			width: calc(~'100% - 42px') !important;
 		}
-		//&.datepickerinput,
+
 		&[data-kendo-role='datepicker'] {
 			width: calc(~'100% - 18px') !important;
 		}
@@ -2416,14 +2390,13 @@ a.drill-down-links {
 .k-grid .k-button.clear-custom-filter-menu-btn {
 	margin-left: 0;
 	margin-top: 0;
-	border: none; //border-left: blue 1px solid;
+	border: none;
 	border-left: 1px #B6B6B6 solid;
 	height: 20px;
 }
 
 .kendo-grid .k-grid-header .k-grid-header-wrap table tr th .k-filtercell > span .tf-filter[data-kendo-role="customizedtimepicker"] {
 	.k-filter-custom-input.text-ellipsis {
-		//width: calc(~'100% - 21px');
 		margin-top: 0;
 	}
 
@@ -2485,22 +2458,11 @@ form.k-filter-menu {
 	}
 }
 
-// .clearFilterMenu {
-// 	position: absolute;
-// 	right: 1.8em;
-// 	z-index: 2;
-// 	justify-content: center;
-// 	align-items: center;
-// 	cursor: pointer;
-// 	&:focus {
-// 		right: 21px !important;
-// 	}
-// }
 .k-header {
 	& > .k-grid-filter.k-filter-custom-btn {
 		height: 1.81em;
 		top: 3.5em;
-		border: none; // border-left: blue 1px solid;
+		border: none;
 		border-left: 1px #B6B6B6 solid;
 		height: 20px;
 	}
@@ -2641,7 +2603,6 @@ form.k-filter-menu {
 }
 
 .popup-reduce-records-model-btn {
-	//background-color:red;
 	background-image: url('../../global/thirdparty/kendo/styles/Black/sprite.png');
 	background-position: -32px -80px;
 	background-repeat: no-repeat;
@@ -2818,7 +2779,7 @@ form.k-filter-menu {
 }
 
 .k-header > .k-grid-filter.k-filter-custom-btn.data-picker-custom-filter {
-	width: 21px; //margin-right: 1px;
+	width: 21px;
 }
 
 .hide-cross-button .datepickerbutton {
@@ -2882,7 +2843,7 @@ span.k-widget.k-autocomplete.k-header.k-state-disabled,
 span.k-picker-wrap.k-state-disabled,
 span.k-numeric-wrap.k-state-disabled {
 	height: 20px;
-	border-color: #B6B6B6; // border-color:black;
+	border-color: #B6B6B6;
 }
 
 .kendo-grid .k-grid-header .k-grid-header-wrap table tr th .k-filtercell > span .k-header {
@@ -2891,9 +2852,6 @@ span.k-numeric-wrap.k-state-disabled {
 	background-color: #F3F3F3;
 }
 
-// .k-grid-filter.k-filter-custom-btn.k-state-active {
-// 	width: 22px;
-// }
 form.k-filter-menu.k-popup.k-group.k-reset.k-state-border-up {
 	margin-left: 1px;
 }

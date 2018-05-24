@@ -6,9 +6,10 @@
 	{
 		var self = this;
 		self.type = "fieldtrip";
-		self.pageType = "fieldtrip";
+		self.pageType = "fieldtrips";
 		TF.Page.BaseGridPage.apply(self, arguments);
-		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+		self.approveButton = true;
+		self.declineButton = true;
 	}
 
 	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -99,7 +100,7 @@
 
 	FieldTripPage.prototype.editFieldTripStatus = function(isApprove)
 	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = this.searchGrid.getSelectedRecords(), showEditModal = function(name)
+		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = self.searchGrid.getSelectedRecords(), showEditModal = function(name)
 		{
 			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, isApprove, name))
 				.then(function(data)
@@ -124,7 +125,7 @@
 				.then(function(response)
 				{
 					showEditModal(response.Items[0]);
-				}.bind(this));
+				});
 		}
 		else
 		{
@@ -146,6 +147,5 @@
 	{
 		var self = this;
 		TF.Page.BaseGridPage.prototype.dispose.call(self);
-		self.pageLevelViewModel.dispose();
 	};
 })();

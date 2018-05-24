@@ -1,8 +1,7 @@
 ﻿<div class="fieldtripstatus" data-bind="uiInit:init">
 	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 	<!-- /ko -->
-	<!-- ko if:isAdmin -->
-
+	<!-- ko if:isAdmin && !isCancel -->
 	<div class="input-group">
 		<div data-bind="typeahead:{source:obFieldTripStatus,format:function(obj){return obj.name;},drowDownShow:true,notSort:true,selectedValue:obSelectedStatus}">
 			<!-- ko customInput:{type:"Select",value:obSelectedStatusText,attributes:{class:"form-control",name:"status"}} --><!-- /ko -->
@@ -18,8 +17,3 @@
 		<textarea class="form-control" style="height: 150px;" name="comments" data-bind="value:obComments, attr:{placeholder:placehoder, required:!isApprove}" data-bv-error-name="Comments"></textarea>
 	</div>
 </div>
-
-
-
-
-

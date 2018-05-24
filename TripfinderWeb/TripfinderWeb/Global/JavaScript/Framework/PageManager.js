@@ -11,21 +11,21 @@
 		self.currentDatabaseName = ko.observable();
 		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
 		self.initContextMenuEvent();
+		self.navigationData = null;
 
 		self.resizeablePanel = new TF.ViewieControl.ResizeablePanel();
-
 		self.logOffClick = self.logOffClick.bind(this);
 	}
 
 	PageManager.prototype.initNavgationBar = function()
 	{
-		var self = this, navigationData,
+		var self = this,
 			$content, $navigationContent = $(".navigation-container");
-		navigationData = new TF.NavigationMenu();
+		self.navigationData = new TF.NavigationMenu();
 		$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
 		$navigationContent.append($content);
 
-		ko.applyBindings(ko.observable(navigationData), $content[0]);
+		ko.applyBindings(ko.observable(self.navigationData), $content[0]);
 	};
 
 	PageManager.prototype.openNewPage = function(type)
@@ -37,7 +37,7 @@
 		self.removeCurrentPage();
 		switch (type)
 		{
-			case "fieldtrip":
+			case "fieldtrips":
 				pageData = new TF.Page.FieldTripPage();
 				templateType = "basegridpage";
 				break;
@@ -48,6 +48,14 @@
 		}
 		$content = $("<div class='main-body'><!-- ko template:{ name:'workspace/page/" + templateType + "',data:$data }--><!-- /ko --></div>");
 		$pageContent.append($content);
+		if (self.navigationData)
+		{
+			setTimeout(function()
+			{
+				self.navigationData.setActiveStateByPageType(type);
+			});
+		}
+		tf.storageManager.save("tripfinder.page", type);
 
 		if (pageData)
 		{
@@ -100,7 +108,6 @@
 		{
 			this.currentDatabaseName("");
 			this.onCurrentDatabaseNameChanged.notify();
-			//this.changeDataSourceClick();
 		}
 	};
 

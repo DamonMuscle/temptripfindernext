@@ -253,7 +253,8 @@
 								{
 									tf.pageManager.initNavgationBar();
 								}
-								tf.pageManager.openNewPage("fieldtrip");
+
+								tf.pageManager.openNewPage(tf.storageManager.get("tripfinder.page") || "fieldtrips");
 								return true;
 							}
 							return null;

@@ -1,4 +1,5 @@
 @import "z-index";
+
 .font-face-preload {
 	position: absolute;
 	bottom: 0;
@@ -33,7 +34,7 @@
 		overflow: visible;
 		border-right: 1px solid #262626;
 
-		>div {
+		> div {
 			width: 100%;
 		}
 
@@ -44,7 +45,7 @@
 			background-color: #333;
 			overflow: hidden;
 
-			>div {
+			> div {
 				height: 54px;
 			}
 
@@ -114,7 +115,7 @@
 
 					.item-icon,
 					.item-label {
-						background-color: @HoverBackgroundColor  !important;
+						background-color: @HoverBackgroundColor !important;
 					}
 				}
 
@@ -122,8 +123,8 @@
 					overflow: visible;
 					box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 
-					&>div {
-						background-color: @HoverBackgroundColor  !important;
+					& > div {
+						background-color: @HoverBackgroundColor !important;
 					}
 
 					.item-label {
@@ -269,7 +270,6 @@
 					.item-input {
 						display: block;
 					}
-
 				}
 			}
 
@@ -279,7 +279,7 @@
 					box-shadow: none !important;
 
 					&.hoverState {
-						background-color: @HoverBackgroundColor  !important;
+						background-color: @HoverBackgroundColor !important;
 					}
 
 					.item-label {
@@ -358,9 +358,11 @@
 			&.myrequests {
 				background-image: url("../img/navigation-menu/myrequests.svg");
 			}
+
 			&.searchSettings {
 				background-image: url("../img/navigation-menu/icon-Adjust.svg");
 			}
+
 			&.approvals {
 				background-image: url("../img/navigation-menu/hamburger.svg");
 			}
@@ -410,7 +412,7 @@
 
 			&.onAnimation,
 			&.menu-opened {
-				background-color: @HoverBackgroundColor  !important;
+				background-color: @HoverBackgroundColor !important;
 				overflow-y: visible !important;
 				overflow-x: visible !important;
 
@@ -445,7 +447,7 @@
 							white-space: nowrap;
 
 							&.active {
-								background-color: @systemColor  !important;
+								background-color: @systemColor !important;
 							}
 
 							&:hover {
@@ -584,8 +586,7 @@
 			.quick-search-container {
 				border-bottom: 1px solid #4a4a4a;
 				margin: 0 -20px;
-				padding: 0 20px; //-webkit-transition: margin 0.35s, padding 0.35s;
-				//transition: margin 0.35s, padding 0.35s;
+				padding: 0 20px;
 			}
 
 			.search-header {
@@ -715,6 +716,7 @@
 						&::-ms-input-placeholder {
 							font-size: 16px;
 						}
+
 						&.mobile {
 							&::-webkit-input-placeholder {
 								color: #fff !important;
@@ -723,18 +725,22 @@
 							&:-moz-placeholder {
 								color: #ffffff !important;
 							}
+
 							&::-moz-placeholder {
 								color: #ffffff !important;
 							}
+
 							&:-ms-input-placeholder {
 								color: #ffffff !important;
 							}
+
 							&::-ms-input-placeholder {
 								color: #ffffff !important;
 							}
 						}
 					}
 				}
+
 				.clear-btn {
 					top: 15px;
 					right: 0px;
@@ -894,7 +900,7 @@
 							font-size: 16px;
 							cursor: pointer;
 
-							&>div {
+							& > div {
 								float: left;
 							}
 
@@ -949,8 +955,8 @@
 							height: 22px;
 							color: #777;
 
-							&>.head-label,
-							&>.search-text {
+							& > .head-label,
+							& > .search-text {
 								float: left;
 							}
 
@@ -1015,7 +1021,7 @@
 									color: @systemColor;
 									cursor: pointer;
 
-									&>span {
+									& > span {
 										float: right;
 										cursor: pointer;
 										margin-right: 6px;
@@ -1045,7 +1051,7 @@
 									background-color: #f2f2f2;
 									z-index: 1;
 
-									&+.data-cards {
+									& + .data-cards {
 										padding-top: 38px;
 									}
 								}
@@ -1072,7 +1078,7 @@
 										max-width: 205px;
 										position: relative;
 
-										&>div {
+										& > div {
 											.ellipsis;
 
 											&.full-height {
@@ -1119,7 +1125,7 @@
 										border-radius: 20px;
 										background-size: 40px;
 
-										&+.card-left {
+										& + .card-left {
 											max-width: 165px;
 											margin-left: 10px;
 										}
@@ -1146,6 +1152,7 @@
 			}
 		}
 	}
+
 	&.mobile {
 		display: flex;
 		align-items: center;
@@ -1157,57 +1164,70 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
+
 		.navigation-content {
 			height: calc(~"100% - 98px");
 			background-color: #000000;
 			opacity: 0.8;
 		}
+
 		.navigation-menu {
 			background-color: unset;
+
 			&.expand {
 				.navigation-quick-search {
 					height: 48px;
 					padding: 0 70px 0 18px;
 					background-color: #262626;
-					.quick-search-container{
+
+					.quick-search-container {
 						border: none;
+
 						.search-header {
 							height: 48px;
 						}
 					}
-					
+
 					&.active {
 						height: 100%;
 						padding: 0;
+
 						.quick-search-container {
-							margin:0 60px 0 20px;
+							margin: 0 60px 0 20px;
 							border-bottom: 1px solid #4a4a4a;
+
 							.search-header {
 								height: 47px;
 							}
 						}
+
 						.search-control-row {
 							padding: 0 20px;
 
-							.type-selector{
+							.type-selector {
 								margin-top: 12px;
 							}
-							.search-settings-btn{
+
+							.search-settings-btn {
 								height: 48px;
 							}
 						}
+
 						.search-content {
 							height: 100%;
 							width: 100%;
 							margin: 0;
 							background-color: #333333;
+
 							.recent-search-title {
 								color: #ffffff;
 							}
+
 							&.result {
 								.search-result {
 									.no-result {
 										color: #ffffff;
+
 										.result-head {
 											color: #ffffff;
 										}
@@ -1233,9 +1253,11 @@
 			top: 0;
 			z-index: 25000;
 		}
+
 		.navigation-menu.expand {
 			width: 100%;
 		}
+
 		.navigation-toolbar {
 			position: fixed;
 			bottom: 0;
@@ -1244,18 +1266,23 @@
 			align-items: center;
 			background-color: #000000 !important;
 			opacity: 0.85;
+
 			.toolbar-button {
 				position: static;
 			}
 		}
+
 		.navigation-item {
 			background-color: #000000 !important;
-			&.active{
-				background-color: #4a4a4a !important; 
-				.item-icon{
+
+			&.active {
+				background-color: #4a4a4a !important;
+
+				.item-icon {
 					background-color: #4a4a4a !important;
 				}
-				.item-label{
+
+				.item-label {
 					background-color: #4a4a4a !important;
 				}
 			}

@@ -18,10 +18,15 @@
 		self.obNoRecordsSelected = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
+
+		self.approveButton = false;
+		self.declineButton = false;
+		self.cancelButton = false;
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
@@ -41,7 +46,7 @@
 
 		self.searchGrid.getSelectedIds.subscribe(function()
 		{
-			if (self.searchGrid.getSelectedIds().length == 0)
+			if (self.searchGrid.getSelectedIds().length === 0)
 			{
 				self.obIsSelectRow(false);
 			}
@@ -115,7 +120,7 @@
 			{
 				element = parentE;
 			}
-			if (element.button == 2)
+			if (element.button === 2)
 			{
 				self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
 				var $virsualTarget = $("<div></div>").css(
@@ -137,7 +142,7 @@
 			var uid = $(e.currentTarget).data("id");
 			var items = self.$element.find("table.k-selectable tr").filter(function(a, b)
 			{
-				return $(b).data("kendoUid") == uid;
+				return $(b).data("kendoUid") === uid;
 			});
 			if (items.length > 0)
 			{
@@ -205,6 +210,10 @@
 		if (self.declineClick)
 		{
 			self.bindEvent(".iconbutton.decline", self.declineClick);
+		}
+		if (self.cancelClick)
+		{
+			self.bindEvent(".iconbutton.cancel", self.cancelClick);
 		}
 		self.bindEvent(".iconbutton.layout", self.layoutIconClick);
 		self.bindEvent(".iconbutton.refresh", function(model, e)
@@ -286,12 +295,12 @@
 		{
 			self.obNoRecordsSelected(false);
 			var ids = self.searchGrid.getSelectedIds();
-			if (self.searchGrid.kendoGrid && self.searchGrid.kendoGrid.dataSource._total > 0 && self.searchGrid.getSelectedIds().length == 0)
+			if (self.searchGrid.kendoGrid && self.searchGrid.kendoGrid.dataSource._total > 0 && self.searchGrid.getSelectedIds().length === 0)
 			{
 				self.obNoRecordsSelected(true);
 				return false;
 			}
-			if (self.searchGrid.kendoGrid && self.searchGrid.kendoGrid.dataSource._total == 0 && self.searchGrid.getSelectedIds().length == 0)
+			if (self.searchGrid.kendoGrid && self.searchGrid.kendoGrid.dataSource._total === 0 && self.searchGrid.getSelectedIds().length === 0)
 			{
 				return true;
 			}
@@ -325,7 +334,7 @@
 	BaseGridPage.prototype.startAutoScroll = function()
 	{
 		var self = this;
-		if (self.kendoGridScroll != null)
+		if (self.kendoGridScroll !== null)
 		{
 			self.kendoGridScroll.startAutoScroll();
 			self.requestHoldEvent.notify();
@@ -340,6 +349,8 @@
 			self.searchGrid.dispose();
 			self.searchGrid = null;
 		}
+
+		self.pageLevelViewModel.dispose();
 
 		self.requestResumeEvent.unsubscribeAll();
 		self.requestPauseEvent.unsubscribeAll();
