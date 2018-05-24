@@ -117,6 +117,12 @@
 										scrollContainer.data("keys", null);
 									}, 1000);
 								});
+
+								// Open the dropdown, it should scroll to selected item.
+								setTimeout(function()
+								{
+									jumpToItem(input.val());
+								}, 100);
 							}
 							else
 							{

@@ -1,4 +1,6 @@
 ﻿<div data-bind="uiInit:init" class="document-grid page-container">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
 	<!-- ko if:TF.isPhoneDevice-->
 	<div class="mobile-header">
 		<div class="icon logo"></div>
@@ -13,6 +15,10 @@
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
 			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
+			<div class="iconbutton approve" title="Approve" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<!-- ko if:!isAdmin-->
+			<div class="iconbutton decline" title="Decline" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<!-- /ko -->
 			<div class="divider" title=""></div>
 			<div class="iconbutton refresh" title="Refresh"></div>
 		</div>
