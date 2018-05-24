@@ -1166,39 +1166,44 @@
 			background-color: unset;
 			&.expand {
 				.navigation-quick-search {
-					height: 44px;
+					height: 48px;
 					padding: 0 70px 0 18px;
-					background-color: #000000;
-					opacity: 0.8;
-					.search-header {
-						background-color: #000000;
-						height: 43px;
-						.search-text {
-							background-color: #000000;
+					background-color: #262626;
+					.quick-search-container{
+						border: none;
+						.search-header {
+							height: 48px;
 						}
 					}
+					
 					&.active {
 						height: 100%;
 						padding: 0;
 						.quick-search-container {
-							margin-right: 50px;
+							margin:0 60px 0 20px;
+							border-bottom: 1px solid #4a4a4a;
 							.search-header {
-								margin: 0;
-							}
-						}
-						.search-content {
-							.recent-search-title {
-								color: #ffffff;
+								height: 47px;
 							}
 						}
 						.search-control-row {
 							padding: 0 20px;
+
+							.type-selector{
+								margin-top: 12px;
+							}
+							.search-settings-btn{
+								height: 48px;
+							}
 						}
 						.search-content {
 							height: 100%;
 							width: 100%;
 							margin: 0;
-							background-color: #000000;
+							background-color: #333333;
+							.recent-search-title {
+								color: #ffffff;
+							}
 							&.result {
 								.search-result {
 									.no-result {
@@ -1217,9 +1222,9 @@
 
 		.navigation-closeBtn {
 			width: 48px;
-			height: 44px;
+			height: 48px;
 			background-image: url("../img/navigation-menu/icon-Search Close.svg");
-			background-size: 50% 50%;
+			background-size: 40% 40%;
 			background-repeat: no-repeat;
 			background-position: center;
 			background-color: #4a4a4a;
@@ -1244,9 +1249,15 @@
 			}
 		}
 		.navigation-item {
-			background: #000000 !important;
+			background-color: #000000 !important;
 			&.active{
-				background-color: @systemColor !important; 
+				background-color: #4a4a4a !important; 
+				.item-icon{
+					background-color: #4a4a4a !important;
+				}
+				.item-label{
+					background-color: #4a4a4a !important;
+				}
 			}
 		}
 	}

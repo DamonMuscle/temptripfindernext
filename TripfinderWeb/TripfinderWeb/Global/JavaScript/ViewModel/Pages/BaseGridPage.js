@@ -310,18 +310,6 @@
 		}
 	};
 
-	BaseGridPage.prototype.openNavigationClick = function()
-	{
-		var self = this, navigationData,
-			$content, $navigationContent = $(".navigation-container").addClass("mobile");
-		$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
-		$navigationContent.append($content);
-
-		navigationData = new TF.NavigationMenu();
-
-		ko.applyBindings(ko.observable(navigationData), $content[0]);
-
-	};
 	BaseGridPage.prototype.dispose = function()
 	{
 		var self = this;
