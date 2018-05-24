@@ -138,17 +138,18 @@
 		{
 			statusId = 1;
 		}
+		return statusId;
 	}
 
 	EditFieldTripStatusViewModel.prototype.apply = function(noComments)
 	{
 		var self = this, statusId = self.getStatusId();
-		return this.pageLevelViewModel.saveValidate().then(function(result)
+		return self.pageLevelViewModel.saveValidate().then(function(result)
 		{
 			if (result)
 			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "status", statusId),
-					{ data: { Ids: self.fieldTripIds, Notes: noComments ? "" : self.obComments() } })
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "statuses"),
+					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Notes: noComments ? "" : self.obComments() } })
 					.then(function()
 					{
 						return true;
