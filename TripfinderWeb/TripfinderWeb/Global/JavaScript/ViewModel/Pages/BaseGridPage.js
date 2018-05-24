@@ -20,6 +20,8 @@
 		self.kendoGridScroll = null;
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
+		self.obIsSelectRow = ko.observable(false);
+		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 	}
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
@@ -36,6 +38,18 @@
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
 		self.bindButtonEvent();
+
+		self.searchGrid.getSelectedIds.subscribe(function()
+		{
+			if (self.searchGrid.getSelectedIds().length == 0)
+			{
+				self.obIsSelectRow(false);
+			}
+			else
+			{
+				self.obIsSelectRow(true);
+			}
+		});
 	};
 
 	BaseGridPage.prototype.createGrid = function(option)
@@ -184,6 +198,14 @@
 		{
 			self.searchGrid.addRemoveColumnClick(model, e);
 		});
+		if (self.approveClick)
+		{
+			self.bindEvent(".iconbutton.approve", self.approveClick);
+		}
+		if (self.declineClick)
+		{
+			self.bindEvent(".iconbutton.decline", self.declineClick);
+		}
 		self.bindEvent(".iconbutton.layout", self.layoutIconClick);
 		self.bindEvent(".iconbutton.refresh", function(model, e)
 		{
