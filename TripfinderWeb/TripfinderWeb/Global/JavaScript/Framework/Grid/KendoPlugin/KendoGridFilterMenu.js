@@ -381,10 +381,6 @@
 	{
 		var self = this;
 		var filterUrl = "gridfilter";
-		if (tf.isViewfinder)
-		{
-			filterUrl = "gridFilter/skipReadReminderData/";
-		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), filterUrl, self.options.gridType))
 			.then(function(apiResponse)
 			{
@@ -404,7 +400,7 @@
 					}
 					else if (tf.storageManager.get(self._storageFilterDataKey, true))
 					{
-						//open new grid in viewfinder is use local storage
+						//open new grid in tripfinder is use local storage
 						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey, true);
 						if (!TF.isPhoneDevice)
 						{
@@ -430,7 +426,7 @@
 					}
 				}
 
-				// for the specific filters in the summary page of the viewfinderweb
+				// for the specific filters in the summary page of the tripfinderweb
 				if (self.options.summaryFilters && self.options.summaryFilters.length > 0)
 				{
 					var summaryGridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, self.options.summaryFilters);

@@ -143,7 +143,7 @@
 									{
 										self.clearDBInfo();
 										return tf.promiseBootbox.dialog({
-											message: "This Data Source (" + databaseName + ") needs to be rebuilt before it can be opened in Routefinder Plus. To rebuild this Data Source, open it in Routefinder Pro.",
+											message: "This Data Source (" + databaseName + ") needs to be rebuilt before it can be opened in Tripfinder. To rebuild this Data Source, open it in Routefinder Pro.",
 											title: "Alert",
 											closeButton: true,
 											buttons: {

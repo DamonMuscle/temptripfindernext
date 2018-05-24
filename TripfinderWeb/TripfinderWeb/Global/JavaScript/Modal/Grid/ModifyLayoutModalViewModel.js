@@ -20,11 +20,23 @@
 		{
 			this.title('Save Layout');
 		}
-		this.sizeCss = "modal-dialog-lg";
-		this.modalClass = 'savelayout-modal';
-		this.contentTemplate('workspace/grid/savelayout');
-		this.buttonTemplate('modal/positivenegative');
-		this.obPositiveButtonLabel = ko.observable("Save");
+
+		if (TF.isPhoneDevice)
+		{
+			this.title(null);
+			this.sizeCss = "modal-fullscreen";
+			this.modalClass = 'mobile-modal-grid-modal';
+			this.contentTemplate('workspace/grid/SaveLayoutMobile');
+			$("#pageMenu .show-menu-button").css('z-index', '1');
+		}
+		else
+		{
+			this.sizeCss = "modal-dialog-lg";
+			this.modalClass = 'savelayout-modal';
+			this.contentTemplate('workspace/grid/savelayout');
+			this.buttonTemplate('modal/positivenegative');
+			this.obPositiveButtonLabel = ko.observable("Save");
+		}
 		this.modifyLayoutViewModel = new TF.Grid.ModifyLayoutViewModel(gridType, isNew, gridLayoutExtendDataModel, obGridFilterDataModels, obSelectedGridFilterId);
 		this.data(this.modifyLayoutViewModel);
 	}

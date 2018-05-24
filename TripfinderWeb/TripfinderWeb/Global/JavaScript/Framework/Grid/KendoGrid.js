@@ -173,13 +173,13 @@
 						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefault"),
 							{
 								data:
-								{
-									Id: 0,
-									GridName: this.options.gridType,
-									Columns: columns.join(","),
-									ApiIsDirty: true,
-									ApiIsNew: true
-								}
+									{
+										Id: 0,
+										GridName: this.options.gridType,
+										Columns: columns.join(","),
+										ApiIsDirty: true,
+										ApiIsNew: true
+									}
 							});
 					}
 				}
@@ -590,21 +590,45 @@
 				// rebuildGrid is a promise method
 			});
 		}
-		tf.modalManager.showModal(
-			new TF.Modal.Grid.EditKendoColumnModalViewModel(
-				this._availableColumns,
-				this._obSelectedColumns(),
-				this._defaultGridLayoutExtendedEntity.LayoutColumns
-			)
-		)
-			.then(function(editColumnViewModel)
+		if (TF.isPhoneDevice)
+		{
+			var cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e);
+			var cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
+
+			if (cacheOperatorBeforeHiddenMenu)
 			{
-				if (!editColumnViewModel)
+				TF.menuHelper.hiddenMenu();
+			}
+
+			if (cacheOperatorBeforeOpenMenu)
+			{
+				tf.contextMenuManager.showMenu(e.target, new TF.ContextMenu.TemplateContextMenu("workspace/grid/EditKendoColumnForMobile",
+					new TF.Modal.Grid.EditKendoColumnModalViewModelForMobile(
+						this._availableColumns,
+						this._obSelectedColumns(),
+						this._defaultGridLayoutExtendedEntity.LayoutColumns,
+						changeColumn
+					)));
+			}
+		}
+		else
+		{
+			tf.modalManager.showModal(
+				new TF.Modal.Grid.EditKendoColumnModalViewModel(
+					this._availableColumns,
+					this._obSelectedColumns(),
+					this._defaultGridLayoutExtendedEntity.LayoutColumns
+				)
+			)
+				.then(function(editColumnViewModel)
 				{
-					return;
-				}
-				changeColumn(editColumnViewModel);
-			}.bind(this));
+					if (!editColumnViewModel)
+					{
+						return;
+					}
+					changeColumn(editColumnViewModel);
+				}.bind(this));
+		}
 	};
 
 	KendoGrid.prototype.raiseGridStateChange = function()
@@ -629,15 +653,15 @@
 				var getDataUrl = url + '/getkey';
 				var getDataOption = {
 					paramData:
-					{
-						fileFormat: 'xls'
-					},
+						{
+							fileFormat: 'xls'
+						},
 					data:
-					{
-						"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
-						"selectedIds": selectedIds ? selectedIds : ids,
-						"sortItems": this.searchOption.data.sortItems
-					}
+						{
+							"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
+							"selectedIds": selectedIds ? selectedIds : ids,
+							"sortItems": this.searchOption.data.sortItems
+						}
 				};
 
 				if (self.options.gridType === "busfinderhistorical")
@@ -652,42 +676,42 @@
 						closeButton: true,
 						title: "Save As",
 						message: "Select the file format that you would like to save the selected records in." +
-						"<div class='col-xs-24'>" +
-						"<br/><label>Type</label>" +
-						"<div class='save-content'>" +
-						"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
-						"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-						"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-						"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
-						"<div>" +
-						"</div>",
+							"<div class='col-xs-24'>" +
+							"<br/><label>Type</label>" +
+							"<div class='save-content'>" +
+							"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
+							"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
+							"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
+							"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
+							"<div>" +
+							"</div>",
 						buttons:
-						{
-							save:
 							{
-								label: "Save",
-								className: "btn tf-btn-black btn-sm",
-								callback: function()
-								{
-									var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
-									var databaseType = tf.datasourceManager.databaseType;
-									var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
-									if (TF.isMobileDevice)
+								save:
 									{
-										window.open(fileUrl);
-									}
-									else
+										label: "Save",
+										className: "btn tf-btn-black btn-sm",
+										callback: function()
+										{
+											var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
+											var databaseType = tf.datasourceManager.databaseType;
+											var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
+											if (TF.isMobileDevice)
+											{
+												window.open(fileUrl);
+											}
+											else
+											{
+												window.location = fileUrl;
+											}
+										}
+									},
+								cancel:
 									{
-										window.location = fileUrl;
+										label: "Cancel",
+										className: "btn btn-link btn-sm"
 									}
-								}
-							},
-							cancel:
-							{
-								label: "Cancel",
-								className: "btn btn-link btn-sm"
 							}
-						}
 					})
 					.then(function(operation)
 					{

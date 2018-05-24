@@ -1,0 +1,107 @@
+﻿<div data-bind="uiInit:initialize">
+	<div class="view-finder mobile-modal-grid-body hide" data-bind="css:{show:obStatus()==='main'}">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 top-left" data-bind="click:$parent.negativeClick.bind($parent)">Cancel</label>
+			<label class="col-xs-16 text-center"><b data-bind="text:title"></b></label>
+			<label class="col-xs-4 top-right" data-bind="click:$parent.positiveClick.bind($parent)">Save</label>
+		</div>
+		<div class="mobile-modal-content-body" id="saveFilterMobileContentBody">
+			<div class="mobile-modal-grid-description less">
+				<span data-bind="text:obDescription"> </span>
+				<a class="color-system btn-more" data-bind="click:moreDescriptionClick">more...</a><a class="color-system btn-less" data-bind="click:lessDescriptionClick">less</a>
+			</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class="mobile-modal-grid-select-option form-group">
+					<label class="requirestar bold">Name</label>
+					<input type="text" class="form-control text-right" data-bind="value: gridFilterDataModel.name" name="filterName" required />
+				</div>
+			</div>
+			
+			<div class="mobile-modal-group-head"></div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option form-group'>
+					<label class="bold">Apply Filter changes on save</label>
+					<label class="switch">
+						<input type="checkbox" data-bind="checked:obApplyOnSave">
+						<div class="slider round">
+							<div class="slider-block"></div>
+						</div>
+					</label>
+				</div>
+			</div>
+
+			<div class="mobile-modal-group-head descriptive">STATEMENT</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class="mobile-modal-grid-select-option" data-bind="click:function(){goToSelect('field');}">
+					<label class="bold">Field</label>
+					<div class="flex-column">
+						<div class="text-right"><span>&nbsp;></span></div>
+					</div>
+				</div>
+				<div class="mobile-modal-grid-select-option" data-bind="click:function(){goToSelect('operator');}">
+					<label class="bold">Operator</label>
+					<div class="flex-column">
+						<div class="text-right"><span>&nbsp;></span></div>
+					</div>
+				</div>
+				<div class="mobile-modal-grid-select-option form-group" data-bind="css:{disabled:obValueFieldType()==='Disabled'}">
+					<label class="bold">Value</label>
+					<div class="flex-column">
+						<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control text-right"},events:{blur:function(){inputValue();}}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="mobile-modal-grid-select-option" data-bind="click:function(){goToSelect('logical');}">
+					<label class="bold">Logical</label>
+					<div class="flex-column">
+						<div class="text-right"><span>&nbsp;></span></div>
+					</div>
+				</div>
+				<div class="mobile-modal-grid-select-option form-group one-child sql-statement">
+					<textarea class="textarea" name="sqlStatement" data-bind="value:gridFilterDataModel.whereClause,valueUpdate:'keyup',domReference:textAreaElement"></textarea>
+				</div>
+			</div>
+			<input class="verify-btn btn" type="button" value="VERIFY" data-bind="click:verifyClick,disable:gridFilterDataModel.whereClause()==''" />
+			<div class="mobile-modal-group-head"></div>
+			<div class="omitted-record" data-bind="visible:obOmitRecords().length>0">
+				<div class="mobile-modal-group-head descriptive">
+					<span class="top-left">OMITTED RECORDS</span>
+					<span class="top-right color-system" data-bind="click:clearAllOmittedRecords">CLEAR ALL</span>
+				</div>
+				<div class="mobile-modal-grid-wrap" data-bind="foreach:{data:obVisibleOmitedRecords()}">
+					<div class="mobile-modal-grid-record">
+						<span class="name" data-bind="text:Name"></span>
+						<span class="clear-btn" data-bind="click:$parent.clearSingleOmittedRecord.bind($parent)">X</span>
+					</div>
+				</div>
+			</div>
+			<div class="omitted-record" data-bind="visible:obVisibleOmitedRecords().length < obOmitRecords().length ">
+				<div class="mobile-modal-grid-wrap mobile-button-text-center">
+					<div class="mobile-modal-grid-record" data-bind="click:loadMoreOmitedRecordClick">
+						<span class="name">LOAD MORE</span>
+					</div>
+				</div>
+			</div>
+			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}"></div>
+		</div>
+	</div>
+	<div class="view-finder mobile-modal-grid-body hide" data-bind="css:{show:obStatus()==='select'}">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 top-left" data-bind="click:goToMain">Cancel</label>
+			<label class="col-xs-16 text-center"><b data-bind="text:'SELECT '+obSelectType().toUpperCase()"></b></label>
+			<label class="col-xs-4"></label>
+		</div>
+		<div class="mobile-modal-grid-description" data-bind="style:{display:obSelectNeedSearch()?'block':'none'}">
+			<div class="search-group">
+				<input type="text" placeholder="Search" data-bind="value:obSearchFilter,valueUpdate:'input'" />
+				<button class="delete" data-bind="visible:obSearchFilter().length>0,click:emptySearch">x</button>
+			</div>
+		</div>
+		<div class="mobile-modal-content-body filter-select">
+			<div class="mobile-modal-grid-select-option-wrap" data-bind="foreach:obSelectToBeDisplayList()">
+				<div class="mobile-modal-grid-select-option" data-bind="click:$parent.selectFilter.bind($parent)">
+					<div data-bind="text:DisplayName"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

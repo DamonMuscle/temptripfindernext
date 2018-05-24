@@ -1,0 +1,45 @@
+﻿<div>
+	<div class="view-finder mobile-modal-grid-body">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 top-left" data-bind="click:$parent.negativeClick.bind($parent)">Close</label>
+			<label class="col-xs-16 text-center"><b>MANAGE FILTERS</b></label>
+			<label class="col-xs-4 top-right" data-bind="click:create">New</label>
+		</div>
+		<div class="mobile-modal-grid-description">
+			<div class="search-group">
+				Filters may be applied, created, edited, or deleted. Select a filter to apply it to this grid; press New to create a new filter.
+			</div>
+		</div>
+		<div class="mobile-modal-content-body has-filter manage-filter">
+			<div class="mobile-modal-grid-select-option-wrap" data-bind="foreach:{ data: obGridFilterDataModels(), afterRender: loaded.bind($data) }">
+				<!--ko if:$data.type()!=='relatedFilter' -->
+				<div class="mobile-modal-grid-select-option swipe" data-bind="click:$parent.select.bind($parent),css:{'checked':$data.name()==$parent.obSelectedGridFilterName()},attr:{'filter-id':$data.id()}">
+					<div class="col-xs-18 title">
+						<div data-bind="text:name"></div>
+					</div>
+					<div class="col-xs-4 status">
+						<div class="checked-icon"></div>
+						<div class="invalid-filter" data-bind="style:{display:($data.isValid()?'none':'inline')}">BROKEN</div>
+					</div>
+					<div class="operation">
+						<div class="copy-icon" data-bind="click:$parent.copy.bind($parent)">
+							<div class="icon"></div>
+							<div class="title">COPY</div>
+						</div>
+						<div class="delete-icon" data-bind="click:$parent.delete.bind($parent)">
+							<div class="icon"></div>
+							<div class="title">DELETE</div>
+						</div>
+						<div class="edit-icon" data-bind="click:$parent.edit.bind($parent)">
+							<div class="icon"></div>
+							<div class="title">EDIT</div>
+						</div>
+					</div>
+				</div>
+				<div class="mobile-modal-grid-select-divider"></div>
+				<!--/ko -->
+			</div>
+			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}"></div>
+		</div>
+	</div>
+</div>
