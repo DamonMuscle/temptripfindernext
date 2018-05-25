@@ -1376,10 +1376,11 @@
 			searchText = searchText.trim();
 
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "SearchRecord", "save"), {
-			data: JSON.stringify({
+			paramData: {
 				dataType: dataTypeValue,
-				searchText: searchText
-			})
+				searchText: searchText,
+				productInfo: TF.productName
+			}
 		}, { overlay: false });
 	};
 
@@ -1391,7 +1392,11 @@
 	{
 		var self = this;
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "searchByCurrentUser"), {}, { overlay: false })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "searchByCurrentUser"), {
+			paramData: {
+				productInfo: TF.productName
+			}
+		}, { overlay: false })
 			.then(function(response)
 			{
 				if (!response) { return; }

@@ -6,6 +6,7 @@
 
 	function EditKendoColumnModalViewModelForMobile(availableColumns, selectedColumns, defaultLayoutColumns, successCallback)
 	{
+		var self = this;
 		selectedColumns.forEach(function(item, i)
 		{
 			item.obSelected = ko.observable(true);
@@ -16,15 +17,15 @@
 			item.obSelected = ko.observable(false);
 			item.orderIndex = 1000;
 		});
-		this.allColumns = ko.observableArray(selectedColumns.concat(availableColumns));
-		this.activeType = ko.observable("Selected");
-		this.selectedColumns = ko.observableArray([]);
-		this.availableColumns = ko.observableArray([]);
-		this.successCallback = successCallback;
-		this.orignalSelectedColumns = selectedColumns.slice();
-		this.description = "You can add to, remove, and reorder the columns in this grid. Tap any column to move it into the selected columns group.  Tap any selected column to move it back into the list of available columns.  To adjust the column display order, arrange the columns from top to bottom in the left to right order you would like them to display in the grid.";
-		this.obDescription = ko.observable(this.description);
-		this.isFirstLoad = tf.storageManager.get(firstOpenKey) || true;
+		self.allColumns = ko.observableArray(selectedColumns.concat(availableColumns));
+		self.activeType = ko.observable("Selected");
+		self.selectedColumns = ko.observableArray(self._fillDisplayName(selectedColumns).slice());
+		self.availableColumns = ko.observableArray(self._fillDisplayName(availableColumns).slice().sort(self._sortByDisplayName));
+		self.successCallback = successCallback;
+		self.orignalSelectedColumns = selectedColumns.slice();
+		self.description = "You can add to, remove, and reorder the columns in this grid. Tap any column to move it into the selected columns group.  Tap any selected column to move it back into the list of available columns.  To adjust the column display order, arrange the columns from top to bottom in the left to right order you would like them to display in the grid.";
+		self.obDescription = ko.observable(self.description);
+		self.isFirstLoad = tf.storageManager.get(firstOpenKey) || true;
 	}
 
 	EditKendoColumnModalViewModelForMobile.prototype = Object.create(TF.ContextMenu.BaseGeneralMenuViewModel.prototype);
@@ -38,10 +39,31 @@
 		this.availableColumns(Enumerable.From(this.allColumns()).Where("$.obSelected()==false").OrderBy("$.DisplayName.toLowerCase()").ToArray());
 	};
 
+
+	EditKendoColumnModalViewModelForMobile.prototype._fillDisplayName = function(columns)
+	{
+		return columns.map(function(column)
+		{
+			if (!column["DisplayName"])
+			{
+				column["DisplayName"] = column.FieldName;
+			}
+			return column;
+		});
+	};
+
+	var _sortByDisplayName = function(a, b)
+	{
+		var x, y;
+		x = a["DisplayName"] ? a["DisplayName"].toLowerCase() : '';
+		y = b["DisplayName"] ? b["DisplayName"].toLowerCase() : '';
+		return (x == y ? 0 : (x > y ? 1 : -1));
+	};
 	var prevTarget;
 	EditKendoColumnModalViewModelForMobile.prototype.toggleSelectItem = function(model, e)
 	{
-		if(prevTarget){
+		if (prevTarget)
+		{
 			prevTarget.finish();
 		}
 		model.obSelected(!model.obSelected());
@@ -60,24 +82,26 @@
 			fromDivId = "editColumnMobileListView";
 			model.orderIndex = this.allColumns().length;
 		}
-		var $toDiv=$("#" + toDivId),
+		var $toDiv = $("#" + toDivId),
 			$fromDiv = $("#" + fromDivId);
 		$toDiv.finish();
 		$fromDiv.finish();
 		var newHeight = $toDiv.outerHeight() + target.outerHeight() - 1;
-		var newFromHeight = $fromDiv.outerHeight() - target.outerHeight()+1;
+		var newFromHeight = $fromDiv.outerHeight() - target.outerHeight() + 1;
 		$toDiv.animate(
-		{
-			height: newHeight
-		}, durection,function(){
-			$toDiv.css('height','auto');
-		});
+			{
+				height: newHeight
+			}, durection, function()
+			{
+				$toDiv.css('height', 'auto');
+			});
 		$fromDiv.animate(
-		{
-			height: newFromHeight
-		}, durection,function(){
-			$fromDiv.css('height','auto');
-		});
+			{
+				height: newFromHeight
+			}, durection, function()
+			{
+				$fromDiv.css('height', 'auto');
+			});
 		target.animate(
 			{
 				height: 0,
@@ -90,13 +114,13 @@
 			{
 				this.setSelectedAndAvailable();
 				this.setSortable();
-				
+
 				var $gridIconWrapper = $('.document-grid.grid-map-container .grid-icons');
-				if(this.selectedColumns().length < 1)
+				if (this.selectedColumns().length < 1)
 				{
 					var message = "At least one record must be selected.";
 					tf.promiseBootbox.alert(message, "Warning");
-					if($('.document-grid.grid-map-container .hover-touch-disabled').length <= 0)
+					if ($('.document-grid.grid-map-container .hover-touch-disabled').length <= 0)
 					{
 						var divHover = '<div class="hover-touch-disabled" style="z-index:22001; position:absolute; top:0; width:100%"></div>';
 
@@ -107,7 +131,7 @@
 				}
 				else
 				{
-					if($gridIconWrapper.find('.hover-touch-disabled').length > 0)
+					if ($gridIconWrapper.find('.hover-touch-disabled').length > 0)
 						$gridIconWrapper.find('.hover-touch-disabled').remove();
 				}
 			}.bind(this));
@@ -122,7 +146,8 @@
 		if (this.isFirstLoad !== true)
 		{
 			this.lessDescriptionClick();
-		}else{
+		} else
+		{
 			this.moreDescriptionClick();
 		}
 		tf.storageManager.save(firstOpenKey, "loaded");
@@ -150,10 +175,10 @@
 	{
 		this.$description.removeClass('less').addClass('more');
 		var $testWidth = $("<div></div>").css(
-		{
-			"position": "absolute",
-			"left": 10000
-		}).width($(document).width() - 30);
+			{
+				"position": "absolute",
+				"left": 10000
+			}).width($(document).width() - 30);
 		$("body").append($testWidth);
 		var description = "";
 		for (var i = 0; i <= this.description.length; i++)
@@ -184,25 +209,25 @@
 			$("#editColumnMobileListView").sortable("destroy");
 		}
 		$("#editColumnMobileListView").sortable(
-		{
-			handle: ".drag-handler",
-			placeholder: "ui-sortable-placeholder",
-			stop: function(event, ui)
 			{
-				var ans = {};
-				$("#editColumnMobileListView").find("[fieldName]").each(function(index, item)
+				handle: ".drag-handler",
+				placeholder: "ui-sortable-placeholder",
+				stop: function(event, ui)
 				{
-					ans[$(item).attr("fieldName")] = index;
-				});
-				self.allColumns().forEach(function(item)
-				{
-					if (item.obSelected())
+					var ans = {};
+					$("#editColumnMobileListView").find("[fieldName]").each(function(index, item)
 					{
-						item.orderIndex = ans[item.FieldName];
-					}
-				});
-			}
-		});
+						ans[$(item).attr("fieldName")] = index;
+					});
+					self.allColumns().forEach(function(item)
+					{
+						if (item.obSelected())
+						{
+							item.orderIndex = ans[item.FieldName];
+						}
+					});
+				}
+			});
 	};
 
 	EditKendoColumnModalViewModelForMobile.prototype.dispose = function()
@@ -211,10 +236,10 @@
 		if (Enumerable.From(this.orignalSelectedColumns).Select("$.FieldName").ToArray().join(",") != Enumerable.From(this.selectedColumns()).Select("$.FieldName").ToArray().join(","))
 		{
 			this.successCallback(
-			{
-				selectedColumns: this.selectedColumns(),
-				availableColumns: this.availableColumns()
-			});
+				{
+					selectedColumns: this.selectedColumns(),
+					availableColumns: this.availableColumns()
+				});
 		}
 	};
 
