@@ -150,7 +150,7 @@
 			if (result)
 			{
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "statuses"),
-					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Notes: noComments ? "" : self.obComments() } })
+					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Note: noComments ? "" : self.obComments() } })
 					.then(function()
 					{
 						return true;
@@ -163,7 +163,7 @@
 		});
 	};
 
-	EditFieldTripStatusViewModel.prototype.applyWithComments = function()
+	EditFieldTripStatusViewModel.prototype.applyWithoutComments = function()
 	{
 		return this.apply(true);
 	};

@@ -40,7 +40,7 @@
 	EditFieldTripStatusModalViewModel.prototype.otherClick = function()
 	{
 		var self = this;
-		self.editFieldTripStatusViewModel.apply().then(function(result)
+		self.editFieldTripStatusViewModel.applyWithoutComments().then(function(result)
 		{
 			if (result)
 			{
@@ -52,7 +52,7 @@
 	EditFieldTripStatusModalViewModel.prototype.positiveClick = function()
 	{
 		var self = this;
-		self.editFieldTripStatusViewModel.applyWithComments().then(function(result)
+		self.editFieldTripStatusViewModel.apply().then(function(result)
 		{
 			if (result)
 			{
