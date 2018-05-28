@@ -157,7 +157,7 @@
 		{
 			$item.removeClass("hoverState", onHover);
 		}
-		else if (!self.isOnAnimation && self.$navigationMenu.find(".menu-opened").length === 0 && evt.which === 0)
+		else if (!self.isOnAnimation && self.$navigationMenu.find(".menu-opened").length === 0 && evt.type === "mouseenter")
 		{
 			$item.addClass("hoverState", onHover);
 		}
@@ -662,6 +662,7 @@
 	NavigationMenu.prototype.initTooltip = function()
 	{
 		var self = this;
+		if (TF.isPhoneDevice) { return; }
 		$('.navigation-menu .toolbar-button').each(function(index, element)
 		{
 			var options = {};
