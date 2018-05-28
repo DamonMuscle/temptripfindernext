@@ -43,7 +43,9 @@
 	SearchSettingsViewModel.prototype.clearUserSearch = function()
 	{
 		var self = this;
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "SearchRecord", "delete")).then(function()
+		tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "SearchRecord"), {
+			data: JSON.stringify(TF.productName)
+		}).then(function()
 		{
 			self.onClearRecentSearchEvent.notify();
 			self.pageLevelViewModel.popupSuccessMessage("Recent Searches successfully cleared.");

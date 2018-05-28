@@ -12,7 +12,7 @@
 		this.obShowLogin = ko.observable(true);
 		this.title('');
 		this.sizeCss = 'modal-fullscreen';
-		this.type = "tripfinder";
+		this.type = TF.productName;
 		this.contentTemplate('tripfinderLogin');
 		this.buttonTemplate('');
 		this.loginViewModel = new TF.TripfinderLoginViewModel();
@@ -176,7 +176,7 @@
 					this.loginViewModel.obLoginErrorMessage(message);
 				} else
 				{
-					tf.promiseBootbox.alert("An email could not be sent. Please contact your System Administrator to verify Tripfinder's email configuration and settings.", "Password Reset Email Could Not be Sent")
+					tf.promiseBootbox.alert("An email could not be sent. Please contact your System Administrator to verify " + TF.productName + "'s email configuration and settings.", "Password Reset Email Could Not be Sent")
 						.then(function()
 						{
 							$("#password").focus();
@@ -269,11 +269,11 @@
 				{
 					if (apiResponse.Message === "Invalid Time")
 					{
-						apiResponse.Message = "You cannot login. Your computer's current time does not match the server Tripfinder is installed on. Contact your System Administrator.";
+						apiResponse.Message = "You cannot login. Your computer's current time does not match the server " + TF.productName + " is installed on. Contact your System Administrator.";
 					}
 					if (apiResponse.Message === "Invalid Configurations")
 					{
-						apiResponse.Message = "Tripfinder is not properly configured.  You cannot login.  Contact us at support@transfinder.com or 888-427-2403.";
+						apiResponse.Message = TF.productName + " is not properly configured.  You cannot login.  Contact us at support@transfinder.com or 888-427-2403.";
 					}
 					if (apiResponse.StatusCode == 401)
 					{

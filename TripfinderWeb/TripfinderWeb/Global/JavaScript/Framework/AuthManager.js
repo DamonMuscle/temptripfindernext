@@ -76,7 +76,7 @@
 							var now = moment().utcOffset(apiResponse.Items[0]);
 							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 						};
-						if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== "tripfinder"))
+						if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== TF.productName))
 						{
 							return tf.datasourceManager.validateAllDBs()
 								.then(function(valResult)

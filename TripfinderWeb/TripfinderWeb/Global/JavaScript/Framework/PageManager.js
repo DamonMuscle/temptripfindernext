@@ -32,7 +32,8 @@
 	{
 		var self = this, permission,
 			pageData, templateType,
-			$content, $pageContent = $("#pageContent");
+			$content, $pageContent = $("#pageContent"),
+			storageKey = TF.productName + ".page";
 
 		self.removeCurrentPage();
 		switch (type)
@@ -55,7 +56,7 @@
 				self.navigationData.setActiveStateByPageType(type);
 			}, 100);
 		}
-		tf.storageManager.save("tripfinder.page", type);
+		tf.storageManager.save(storageKey, type);
 
 		if (pageData)
 		{

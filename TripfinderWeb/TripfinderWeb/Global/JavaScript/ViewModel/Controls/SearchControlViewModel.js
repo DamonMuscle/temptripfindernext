@@ -54,17 +54,16 @@
 
 		//Results
 		self.cardStyle = {
-			// "altsite": { title: "Alternate Sites", color: "#5B548F" },
-			// "fieldtrip": { title: "Field Trips", color: "#944D6D" },
-			// "contractor": { title: "Contractors", color: "#666" },
-			// "district": { title: "Districts", color: "#FFB229" },
-			// "georegion": { title: "Geo Regions", color: "#8D604B" },
-			// "school": { title: "Schools", color: "#DA534F" },
-			// "staff": { title: "Staff", color: "#ED7D31" },
-			// "student": { title: "Students", color: "#1CB09A" },
-			// "trip": { title: "Trips", color: "#C36" },
-			// "tripstop": { title: "Trip Stops", color: "#C39" },
-			// "vehicle": { title: "Vehicles", color: "#418BCA" }
+			"tripname": { title: "Trip Name", color: "#5B548F" },
+			"vehicle": { title: "Vehicle", color: "#944D6D" },
+			"submitter": { title: "Submitter", color: "#666" },
+			"tripdate": { title: "Trip Date", color: "#FFB229" },
+			"driver": { title: "Driver", color: "#8D604B" },
+			"destination": { title: "Destination", color: "#DA534F" },
+			"school": { title: "School", color: "#ED7D31" },
+			"department": { title: "Department", color: "#1CB09A" },
+			"classification": { title: "Classification", color: "#C36" },
+			"billingclassification": { title: "Billing Classification", color: "#C39" },
 		};
 		self.obSuggestedResult = ko.observable([]);
 		self.recentSearches = ["Recent Search 1", "Recent Search 2", "Recent Search 3"];
@@ -1181,7 +1180,7 @@
 			queryString += "&count=" + count;
 		}
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", type, "simple", queryString), {}, { overlay: false })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "simple", queryString), {}, { overlay: false })
 			.then(function(data)
 			{
 				if (data.Items[0] && data.Items[0].SimpleEntities && data.Items[0].SimpleEntities.length > 0)
@@ -1211,7 +1210,7 @@
 		var self = this;
 		var queryString = "?text=" + encodeURIComponent(value);
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", type, "simple", "ids", queryString)).then(function(Ids)
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "simple", "ids", queryString)).then(function(Ids)
 		{
 			return Ids.length;
 		});
@@ -1233,7 +1232,7 @@
 			queryString = "?text=" + encodeURIComponent(searchText);
 
 		Promise.all([self.saveUserSearch(dataType, searchText),
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", model.type, "simple", "ids", queryString)).then(function(Ids)
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "simple", "ids", queryString)).then(function(Ids)
 		{
 			options.filteredIds = Ids;
 		})]).then(function()
@@ -1375,11 +1374,12 @@
 			dataTypeValue = dataType.value,
 			searchText = searchText.trim();
 
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "SearchRecord", "save"), {
-			data: JSON.stringify({
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "save"), {
+			paramData: {
 				dataType: dataTypeValue,
-				searchText: searchText
-			})
+				searchText: searchText,
+				productInfo: TF.productName
+			}
 		}, { overlay: false });
 	};
 
@@ -1391,7 +1391,11 @@
 	{
 		var self = this;
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "searchByCurrentUser"), {}, { overlay: false })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "searchByCurrentUser"), {
+			paramData: {
+				productInfo: TF.productName
+			}
+		}, { overlay: false })
 			.then(function(response)
 			{
 				if (!response) { return; }
