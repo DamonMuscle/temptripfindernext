@@ -135,12 +135,12 @@
 		{
 			statusId = self.isApprove ? 3 : 2;
 		}
-		else if (authInfo.isAuthorizedFor("level1Administrator", "edit"))
+		else if (authInfo.isAuthorizedFor("level1Requestor", "edit"))
 		{
 			statusId = 1;
 		}
 		return statusId;
-	}
+	};
 
 	EditFieldTripStatusViewModel.prototype.apply = function(noComments)
 	{

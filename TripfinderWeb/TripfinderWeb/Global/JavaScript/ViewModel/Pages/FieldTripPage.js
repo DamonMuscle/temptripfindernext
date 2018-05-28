@@ -4,12 +4,18 @@
 
 	function FieldTripPage()
 	{
-		var self = this;
+		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;
 		self.type = "fieldtrip";
 		self.pageType = "fieldtrips";
 		TF.Page.BaseGridPage.apply(self, arguments);
-		self.approveButton = true;
-		self.declineButton = true;
+
+		isLevel1User = !self.isAdmin && !authInfo.isAuthorizedFor("level4Administrator", "edit") && !authInfo.isAuthorizedFor("level3Administrator", "edit")
+			&& !authInfo.isAuthorizedFor("level2Administrator", "edit") && authInfo.isAuthorizedFor("level1Requestor", "edit");
+		if (!isLevel1User)
+		{
+			self.approveButton = true;
+			self.declineButton = true;
+		}
 	}
 
 	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);

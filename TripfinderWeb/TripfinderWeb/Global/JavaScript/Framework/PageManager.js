@@ -53,7 +53,7 @@
 			setTimeout(function()
 			{
 				self.navigationData.setActiveStateByPageType(type);
-			});
+			}, 100);
 		}
 		tf.storageManager.save("tripfinder.page", type);
 

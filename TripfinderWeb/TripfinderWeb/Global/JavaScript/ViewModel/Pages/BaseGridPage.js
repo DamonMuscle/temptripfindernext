@@ -98,14 +98,17 @@
 		tf.pageManager.logOff();
 	};
 
+	//TODO right click menu feature
 	BaseGridPage.prototype.copyToClipboardClick = function()
 	{
 	};
 
+	//TODO right click menu feature
 	BaseGridPage.prototype.saveAsClick = function()
 	{
 	};
 
+	//TODO right click menu feature
 	BaseGridPage.prototype.openSelectedClick = function()
 	{
 	};
