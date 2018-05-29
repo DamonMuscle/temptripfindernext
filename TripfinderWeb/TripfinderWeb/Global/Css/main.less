@@ -21,6 +21,8 @@ body {
 	font-size: 12px;
 }
 
+@systemColor: #D0503C;
+
 .color-system {
 	color: @systemColor;
 	text-decoration: none;
@@ -596,11 +598,13 @@ input[type=text].text-right {
 	border-color:#707070;
 }*/
 
+
 /*
 #leftpanel
 {
 	display:none;
 }*/
+
 
 /*.layerWithMap
 {
@@ -1872,6 +1876,25 @@ fieldset[disabled] .form-control {
 
 .no-bold {
 	font-weight: normal;
+}
+
+.mobile-padding {
+	padding: 15px;
+}
+
+.mobile-list-view {
+	border-top: 1px solid #d9d9d9;
+
+	.item {
+		border: 1px solid #d9d9d9;
+		border-right: none;
+		border-left: none;
+		margin-top: -1px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 14px;
+	}
 }
 
 .display-flex {
