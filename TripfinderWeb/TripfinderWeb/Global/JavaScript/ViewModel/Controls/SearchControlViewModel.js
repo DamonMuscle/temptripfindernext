@@ -18,12 +18,10 @@
 		self.obInputTextHint = ko.observable("");
 		self.obIsLoading = ko.observable(false);
 		self.searchTextFocused = false;
-		//self.showResultPanel = ko.observable(false);
 		self.clearFocusTimeout = null;
 		self.deferSearchTimeout = null;
 		self.obHasSearchBeenConducted = ko.observable(false);
 		self.elementContentHelper = new TF.Helper.ElementContentHelper();
-		// self.photoHelper = new TF.Control.EditPhotoViewModel();
 		self.isMouseDownInSearchZone = false;
 		self.requireScrollTopReset = false;
 		self.pendingSearch = { searchText: "", dataType: "" };
@@ -229,7 +227,6 @@
 				&& $target.closest(".toggle-button").length <= 0
 				&& !$target.hasClass("search-text"))
 			{
-				//self.showResultPanel(false);
 				self.isMouseDownInSearchZone = false;
 				if (self.$searchText.val().trim() === "" && self.obIsActive())
 				{
@@ -297,7 +294,6 @@
 				self.$element.addClass("active");
 				self.obIsActive(true);
 			}
-			//self.showResultPanel(true);
 			self.checkIfToResetScrollTop();
 			self.userInputChanged();
 		});
@@ -461,7 +457,6 @@
 	SearchControlViewModel.prototype.clearSearchClick = function(model, e)
 	{
 		this.clearText();
-		// self.$searchText.blur();
 		e.stopPropagation();
 	};
 

@@ -52,7 +52,6 @@
 		this.isFirstLoad = tf.storageManager.get(firstOpenKey) || true;
 
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
-		//this.pageLevelViewModel.autoFocus = false;
 		this.getOmittedRecordsName();
 
 		this.obSelectToBeDisplayList = ko.computed(function()
@@ -205,11 +204,8 @@
 			{
 				tf.loadingIndicator.tryHide();
 
-				//var validationErrors = [];
 				var $field = $("textarea[name='sqlStatement']");
-				//validationErrors.push({ name: "sqlStatement", message: "SQL syntax is incorrect", field: $field });
 				this.pageLevelViewModel.obErrorMessageDivIsShow(true);
-				//this.obValidationErrors(validationErrors);
 				var validator = $.trim(this.gridFilterDataModel.whereClause()) === '' ? 'notEmpty' : 'callback';
 				this._$form.find('[data-bv-validator = "' + validator + '"][data-bv-for="sqlStatement"]').show().closest(".form-group").addClass("has-error");
 				$field.focus();
@@ -227,10 +223,10 @@
 	{
 		this.$description.removeClass('less').addClass('more');
 		var $testWidth = $("<div></div>").css(
-		{
-			"position": "absolute",
-			"left": 10000
-		}).width($(document).width() - 30);
+			{
+				"position": "absolute",
+				"left": 10000
+			}).width($(document).width() - 30);
 		$("body").append($testWidth);
 		var description = "";
 		for (var i = 0; i <= this.description.length; i++)

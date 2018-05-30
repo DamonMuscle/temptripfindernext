@@ -44,9 +44,6 @@
 
 		var self = this,
 			$container = $(".navigation-container");
-		// ko.cleanNode($container[0]);
-
-		// ko.applyBindings(self, $container[0]);
 		self.$container = $container;
 	};
 
@@ -450,10 +447,6 @@
 	{
 		var self = this, pageList, categoryName,
 			$item = self.$navigationMenu.find(".navigation-item." + type);
-
-		// Replace the display text if there is only one page avilable
-		// categoryName = pageList.length === 1 ? pageList[0].text : (type.charAt(0).toUpperCase() + type.slice(1));
-		// $item.find(".item-label").text(categoryName);
 	};
 
 	/**
@@ -523,7 +516,6 @@
 				{
 					self.isOnAnimation = false;
 					$item.removeClass("onAnimation");
-					// $itemMenu.css({ width: "", height: "", display: "" });
 					animationDeferred.resolve();
 				}
 			});
@@ -668,7 +660,6 @@
 			else if ($(element).hasClass('logout'))
 			{
 				options.title = 'Log Out';
-				//options.className = 'left-tooltip';
 			} else if ($(element).hasClass('setting'))
 			{
 				options.title = 'Setting';
