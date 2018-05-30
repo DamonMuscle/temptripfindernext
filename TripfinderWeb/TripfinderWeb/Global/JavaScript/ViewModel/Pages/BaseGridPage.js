@@ -280,7 +280,6 @@
 		navigationData = new TF.NavigationMenu();
 
 		ko.applyBindings(ko.observable(navigationData), $content[0]);
-
 	};
 
 	BaseGridPage.prototype.onDataBound = function(option)

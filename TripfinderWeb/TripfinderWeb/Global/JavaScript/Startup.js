@@ -249,7 +249,7 @@
 							{
 								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 								self.changePermissions();
-								if (!TF.isSafari && !TF.isMobileDevice && !TF.isPhoneDevice)
+								if (!TF.isPhoneDevice)
 								{
 									tf.pageManager.initNavgationBar();
 								}
