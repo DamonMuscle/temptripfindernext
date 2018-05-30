@@ -12,7 +12,6 @@
 		self.initContextMenuEvent();
 		self.navigationData = null;
 
-		self.resizeablePanel = new TF.ViewieControl.ResizeablePanel();
 		self.logOffClick = self.logOffClick.bind(this);
 	}
 
@@ -65,7 +64,6 @@
 		if (TF.isPhoneDevice)
 		{
 			$(".page-container").css("width", "100%");
-			self.resizeablePanel._setGridPanelWidth();
 		}
 	};
 

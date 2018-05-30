@@ -28,7 +28,6 @@
 		self.obDashboardLoRes = ko.observable(false);
 
 		self.bindWithKnockout();
-		self.resizeablePanel = new TF.ViewieControl.ResizeablePanel();
 		self.tooltip = new TF.Helper.TFTooltip();
 		self.pageManager = new TF.Page.PageManager();
 		self.obIsRefreshing = ko.observable(false);
@@ -414,9 +413,9 @@
 	 */
 	NavigationMenu.prototype.updatePageContentWidth = function()
 	{
-		var self = this, refreshObj = {}, updateRefreshObj, resizeablePanel, templateName,
-			leftPanelWidth = $(".left-panel:not(.hide)").width(),
-			rightPanelWidth, borderWidth = 2;
+		var self = this, refreshObj = {}, updateRefreshObj, templateName,
+			leftPanelWidth = $(".left-panel:not(.hide)").width(), $container,
+			rightPanelWidth, borderWidth = 2, currentPanelWidth, lockedHeaderWidth, paddingRight, width;
 		if (!leftPanelWidth)
 		{
 			leftPanelWidth = $(".resize-wrap").width();
@@ -426,7 +425,12 @@
 		{
 			refreshObj.function = function()
 			{
-				self.resizeablePanel._setGridPanelWidth();
+				$container = $(".kendo-grid.kendo-grid-container.k-grid.k-widget");
+				currentPanelWidth = $container.parent().width();
+				lockedHeaderWidth = $container.find('.k-grid-header-locked').width();
+				paddingRight = parseInt($container.find(".k-grid-content").css("padding-right"));
+				width = currentPanelWidth - lockedHeaderWidth - paddingRight - 2;
+				$container.find(".k-auto-scrollable,.k-grid-content").width(width);
 			};
 			refreshObj.currentInterval = setInterval(function()
 			{
