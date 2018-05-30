@@ -20,13 +20,18 @@
 
 		self.obPositiveButtonLabel = ko.observable((isCancel ? "Cancel " : (isAdmin ? "Change " : (isApprove ? "Approve " : "Decline "))) + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " Trip" + (fieldTripRecords.length > 1 ? "s" : ""));
 		self.obNegativeButtonLabel = ko.observable("Cancel");
-		if (isAdmin)
+
+		if (isCancel)
 		{
-			self.obOtherButtonLabel = ko.observable((isCancel ? "Cancel" : "Change") + " without Commenting");
+			self.obOtherButtonLabel = ko.observable("");
+		}
+		else if (isAdmin)
+		{
+			self.obOtherButtonLabel = ko.observable("Change without Commenting");
 		}
 		else
 		{
-			self.obOtherButtonLabel = ko.observable(isApprove ? ((isCancel ? "Cancel" : "Approve") + " without Commenting") : "");
+			self.obOtherButtonLabel = ko.observable(isApprove ? "Approve without Commenting" : "");
 		}
 		self.editFieldTripStatusViewModel = new TF.Control.EditFieldTripStatusViewModel(fieldTripRecords, isApprove, isCancel);
 		self.data(self.editFieldTripStatusViewModel);
