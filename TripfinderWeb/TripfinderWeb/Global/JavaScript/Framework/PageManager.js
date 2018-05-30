@@ -5,7 +5,6 @@
 	function PageManager()
 	{
 		var self = this;
-		self.obPages = ko.observableArray();
 		self.obContextMenuVisible = ko.observable(false);
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
@@ -62,17 +61,12 @@
 		{
 			ko.applyBindings(ko.observable(pageData), $content[0]);
 		}
-		self.obPages([{
-			contentTemplate: 'workspace/page/' + templateType,
-			data: pageData
-		}]);
 
 		if (TF.isPhoneDevice)
 		{
 			$(".page-container").css("width", "100%");
 			self.resizeablePanel._setGridPanelWidth();
 		}
-
 	};
 
 	PageManager.prototype.removeCurrentPage = function()

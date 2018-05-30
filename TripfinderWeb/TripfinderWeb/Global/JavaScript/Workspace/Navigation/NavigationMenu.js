@@ -33,15 +33,6 @@
 		self.pageManager = new TF.Page.PageManager();
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
-
-		self.obRefreshCountDown = ko.computed(function()
-		{
-			if (self.obIsRefreshing() && self.obIsRefreshAvailable())
-			{
-				return tf.pageManager.obPages() && tf.pageManager.obPages()[0] && tf.pageManager.obPages()[0].data && tf.pageManager.obPages()[0].data.obCountDown()
-			}
-			return '';
-		});
 	}
 
 	/**
@@ -423,8 +414,6 @@
 	 */
 	NavigationMenu.prototype.updatePageContentWidth = function()
 	{
-		if (tf.pageManager.obPages().length === 0) { return {}; }
-
 		var self = this, refreshObj = {}, updateRefreshObj, resizeablePanel, templateName,
 			leftPanelWidth = $(".left-panel:not(.hide)").width(),
 			rightPanelWidth, borderWidth = 2;
@@ -709,33 +698,6 @@
 		{
 			this.initTooltip();
 		}.bind(this), 500);
-	};
-
-	/**
-	 * Refresh
-	 */
-	NavigationMenu.prototype.refresh = function()
-	{
-		var self = this;
-
-		if (!self.obIsRefreshAvailable())
-		{
-			return;
-		}
-
-		var isRefreshing = self.obIsRefreshing();
-		self.obIsRefreshing(!isRefreshing);
-		if (isRefreshing)
-		{
-			tf.pageManager.obPages()[0].data.pause();
-		}
-		else
-		{
-			tf.pageManager.obPages()[0].data.start();
-		}
-
-		self.reinitTooltip();
-		self.toggleMoreIcon(self.obIsExpand());
 	};
 
 	/**
