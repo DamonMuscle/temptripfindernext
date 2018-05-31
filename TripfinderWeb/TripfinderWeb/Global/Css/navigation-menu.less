@@ -720,22 +720,32 @@
 						&.mobile {
 							&::-webkit-input-placeholder {
 								color: #fff !important;
+								opacity: 1;
+								font-family: "SourceSansPro-Regular", Arial;
 							}
 
 							&:-moz-placeholder {
 								color: #ffffff !important;
+								opacity: 1;
+								font-family: "SourceSansPro-Regular", Arial;
 							}
 
 							&::-moz-placeholder {
 								color: #ffffff !important;
+								opacity: 1;
+								font-family: "SourceSansPro-Regular", Arial;
 							}
 
 							&:-ms-input-placeholder {
 								color: #ffffff !important;
+								opacity: 1;
+								font-family: "SourceSansPro-Regular", Arial;
 							}
 
 							&::-ms-input-placeholder {
 								color: #ffffff !important;
+								opacity: 1;
+								font-family: "SourceSansPro-Regular", Arial;
 							}
 						}
 					}
@@ -1165,26 +1175,39 @@
 		bottom: 0;
 		left: 0;
 
-		.navigation-content {
-			height: calc(~"100% - 102px");
-			background-color: #000000;
-			opacity: 0.8;
-		}
-
 		.navigation-menu {
 			background-color: unset;
+			.navigation-content {
+				height: 100%;
+				background: rgba(0, 0, 0, 0.9);
+				.navigation-item {
+					background-color:initial;
+					
+					&.active {
+						background-color: #4a4a4a;
+						.item-icon {
+							background-color: #4a4a4a;
+						}
+						.item-label {
+							background-color: #4a4a4a;
+						}
+					}
+				}
+			}
 
 			&.expand {
+				width: 100%;
 				.navigation-quick-search {
-					height: 48px;
+					height: 47px;
 					padding: 0 70px 0 18px;
 					background-color: #262626;
 
 					.quick-search-container {
+						height: 47px;
 						border: none;
 
 						.search-header {
-							height: 48px;
+							height: 47px;
 						}
 					}
 
@@ -1234,6 +1257,18 @@
 						}
 					}
 				}
+				.navigation-toolbar {
+					position: absolute;
+					bottom: 0;
+					display: flex;
+					justify-content: space-around;
+					align-items: center;
+					background-color: #000000 !important;
+					padding: 0 14px;
+					.toolbar-button {
+						position: static;
+					}
+				}
 			}
 		}
 
@@ -1249,40 +1284,6 @@
 			right: 0;
 			top: 0;
 			z-index: 25000;
-		}
-
-		.navigation-menu.expand {
-			width: 100%;
-		}
-
-		.navigation-toolbar {
-			position: fixed;
-			bottom: 0;
-			display: flex;
-			justify-content: space-around;
-			align-items: center;
-			background-color: #000000 !important;
-			opacity: 0.85;
-
-			.toolbar-button {
-				position: static;
-			}
-		}
-
-		.navigation-item {
-			background-color: #000000 !important;
-
-			&.active {
-				background-color: #4a4a4a !important;
-
-				.item-icon {
-					background-color: #4a4a4a !important;
-				}
-
-				.item-label {
-					background-color: #4a4a4a !important;
-				}
-			}
 		}
 	}
 }
