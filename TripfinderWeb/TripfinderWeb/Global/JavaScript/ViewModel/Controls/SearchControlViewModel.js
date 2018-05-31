@@ -45,7 +45,7 @@
 
 		//Types
 		self.defaultAllTypes = [
-			{ text: "All Data Types", value: "all", permission: true },
+			{ text: "All Columns", value: "all", permission: true },
 			{ text: "Trip Name", value: "tripname", permission: true },
 			{ text: "Submitter", value: "submitter", permission: true },
 			{ text: "Trip Date", value: "tripdate", permission: true },
@@ -1016,7 +1016,7 @@
 			return '';
 		};
 		self.allTypes = [];
-		self.allTypes.push({ text: "All Data Types", value: "all", permission: true });
+		self.allTypes.push({ text: "All Columns", value: "all", permission: true });
 		$.each(searchSettings.DataTypeConfig, function(index, item)
 		{
 			if (item.selected)
