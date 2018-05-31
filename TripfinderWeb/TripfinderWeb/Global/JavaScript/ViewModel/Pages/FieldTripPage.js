@@ -2,11 +2,12 @@
 {
 	createNamespace("TF.Page").FieldTripPage = FieldTripPage;
 
-	function FieldTripPage()
+	function FieldTripPage(gridOptions)
 	{
 		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;
 		self.type = "fieldtrip";
 		self.pageType = "fieldtrips";
+		self.gridOptions = gridOptions;
 		TF.Page.BaseGridPage.apply(self, arguments);
 
 		isLevel1User = !self.isAdmin && !authInfo.isAuthorizedFor("level4Administrator", "edit") && !authInfo.isAuthorizedFor("level3Administrator", "edit")
@@ -24,6 +25,12 @@
 	FieldTripPage.prototype.updateOptions = function()
 	{
 		var self = this;
+		if (self.gridOptions)
+		{
+			self.options.fromSearch = self.gridOptions.fromSearch;
+			self.options.searchFilter = self.gridOptions.searchFilter;
+			self.options.filteredIds = self.gridOptions.filteredIds;
+		}
 		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
 		self.options.showOmittedCount = false;
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");

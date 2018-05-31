@@ -26,7 +26,7 @@
 		ko.applyBindings(ko.observable(self.navigationData), $content[0]);
 	};
 
-	PageManager.prototype.openNewPage = function(type)
+	PageManager.prototype.openNewPage = function(type, gridOptions)
 	{
 		var self = this, permission,
 			pageData, templateType,
@@ -37,7 +37,7 @@
 		switch (type)
 		{
 			case "fieldtrips":
-				pageData = new TF.Page.FieldTripPage();
+				pageData = new TF.Page.FieldTripPage(gridOptions);
 				templateType = "basegridpage";
 				break;
 			case "myrequests":
