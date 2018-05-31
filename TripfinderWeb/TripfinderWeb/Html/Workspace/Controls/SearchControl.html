@@ -112,10 +112,10 @@
 					</div>
 					<div class="result-count">
 						<!-- ko if: obAllResultsCount() === obSingleResultCount() -->
-						<pre class="titleNotify"><span data-bind="text:obAllResultsCount"></span> results returned</pre>
+						<pre class="titleNotify"><span data-bind="text:obAllResultsCount"></span> unique results returned</pre>
 						<!-- /ko -->
 						<!-- ko if: obAllResultsCount() !== obSingleResultCount() -->
-						<pre class="titleNotify"><span data-bind="text:obSingleResultCount"></span> of <span data-bind="text:obAllResultsCount"></span> results returned; <span class="show-all" data-bind="click: showAllClick">Show All</span></pre>
+						<pre class="titleNotify"><span data-bind="text:obSingleResultCount"></span> of <span data-bind="text:obAllResultsCount"></span> unique results returned; <span class="show-all" data-bind="click: showAllClick">Show All</span></pre>
 						<!-- /ko -->
 					</div>
 					<!-- /ko -->

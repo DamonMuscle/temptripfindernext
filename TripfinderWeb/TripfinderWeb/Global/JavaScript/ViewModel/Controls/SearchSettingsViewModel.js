@@ -7,10 +7,8 @@
 		var self = this,
 			allDataTypes = [
 				{ name: "tripname", display: "Trip Name", selected: true, permission: true },
-				{ name: "vehicle", display: "Vehicle", selected: true, permission: true },
 				{ name: "submitter", display: "Submitter", selected: true, permission: true },
 				{ name: "tripdate", display: "Trip Date", selected: true, permission: true },
-				{ name: "driver", display: "Driver", selected: true, permission: true },
 				{ name: "destination", display: "Destination", selected: true, permission: true },
 				{ name: "school", display: "School", selected: true, permission: true },
 				{ name: "department", display: "Department", selected: true, permission: true },

@@ -27,6 +27,8 @@
 		self.isMouseDownInSearchZone = false;
 		self.requireScrollTopReset = false;
 		self.pendingSearch = { searchText: "", dataType: "" };
+		self.searchResult = [];
+		self.allResultsCount = 0;
 		self.obSearchKeywords = ko.computed(function()
 		{
 			var searchText = self.obInputTextHint().replace(/\\/g, "\\\\");
@@ -46,6 +48,14 @@
 		//Types
 		self.defaultAllTypes = [
 			{ text: "All Data Types", value: "all", permission: true },
+			{ text: "Trip Name", value: "tripname", permission: true },
+			{ text: "Submitter", value: "submitter", permission: true },
+			{ text: "Trip Date", value: "tripdate", permission: true },
+			{ text: "Destination", value: "destination", permission: true },
+			{ text: "School", value: "school", permission: true },
+			{ text: "Department", value: "department", permission: true },
+			{ text: "Classification", value: "classification", permission: true },
+			{ text: "Billing Classification", value: "billingclassification", permission: true }
 		];
 		self.allTypes = null;
 		self.updateAllDataTypes();
@@ -54,16 +64,14 @@
 
 		//Results
 		self.cardStyle = {
-			"tripname": { title: "Trip Name", color: "#5B548F" },
-			"vehicle": { title: "Vehicle", color: "#944D6D" },
-			"submitter": { title: "Submitter", color: "#666" },
-			"tripdate": { title: "Trip Date", color: "#FFB229" },
-			"driver": { title: "Driver", color: "#8D604B" },
-			"destination": { title: "Destination", color: "#DA534F" },
-			"school": { title: "School", color: "#ED7D31" },
-			"department": { title: "Department", color: "#1CB09A" },
-			"classification": { title: "Classification", color: "#C36" },
-			"billingclassification": { title: "Billing Classification", color: "#C39" },
+			"tripname": { title: "Trip Name", color: "#5B548F", field: "Name" },
+			"submitter": { title: "Submitter", color: "#666", field: "UserName" },
+			"tripdate": { title: "Trip Date", color: "#FFB229", field: "DepartDate" },
+			"destination": { title: "Destination", color: "#DA534F", field: "Destination" },
+			"school": { title: "School", color: "#ED7D31", field: "SchoolName" },
+			"department": { title: "Department", color: "#1CB09A", field: "Department" },
+			"classification": { title: "Classification", color: "#C36", field: "ClassificationName" },
+			"billingclassification": { title: "Billing Classification", color: "#C39", field: "BillingClass" },
 		};
 		self.obSuggestedResult = ko.observable([]);
 		self.recentSearches = ["Recent Search 1", "Recent Search 2", "Recent Search 3"];
@@ -689,13 +697,9 @@
 			self.obSuggestedResult([]);
 			return Promise.resolve();
 		}
-		else
+		else if (!self.currentItems[0].cards || self.currentItems[0].cards.length <= 0)
 		{
-			cardsCount = self.currentItems[0].cards.length;
-			if (cardsCount <= 0)
-			{
-				return Promise.resolve();
-			}
+			return Promise.resolve();
 		}
 
 		self.topDelta = self.resultHeaderHeight + self.sectionHeight;
@@ -1053,69 +1057,44 @@
 		else if (type !== "all")
 		{
 			var PromiseAll = [], curType;
-			PromiseAll.push(self.getSuggestedResultByType(type, processedText));
-			for (var i = 0, len = self.allTypes.length; i < len; i++)
-			{
-				curType = self.allTypes[i];
-				if (curType.value !== "all" && curType.permission && curType.value !== type)
-				{
-					PromiseAll.push(self.getSuggestedResultsCountByType(curType.value, processedText));
+			PromiseAll.push(self.getSuggestedResultByType(type, processedText, Number.MAX_SAFE_INTEGER));
+			PromiseAll.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "bycolumns"), {
+				paramData: {
+					column: "all",
+					text: encodeURIComponent(processedText)
 				}
-			}
+			}, { overlay: false }));
 			Promise.all(PromiseAll).then(function(result)
 			{
-				var allResultsCount = 0, singleResultCount = 0;
-				for (var i = 0; i < result.length; i++)
-				{
-					if (i === 0)
-					{
-						if (result[i] && result[i].count)
-						{
-							allResultsCount += result[i].count;
-							singleResultCount = result[i].count;
-						}
-					}
-					else if (result[i])
-					{
-						allResultsCount += result[i];
-					}
-				}
+				var singleResult = result[0], allResults = result[1].Items[0];
+
 				var primise = Promise.resolve();
-				if (!result[0])
+				if (singleResult.length <= 0)
 				{
 					primise = self.checkAllDBs();
 				}
 				primise.then(function()
 				{
-					self.obAllResultsCount(allResultsCount);
-					self.obSingleResultCount(singleResultCount)
-					Deferred.resolve(createResponseObj(value, type, result[0] ? [result[0]] : []));
+					self.obAllResultsCount(allResults.SimpleEntities.length);
+					self.obSingleResultCount(singleResult[0].cards.length);
+					Deferred.resolve(createResponseObj(value, type, singleResult[0] ? [singleResult[0]] : []));
 				});
 			});
 		}
 		else
 		{
-			var count = self.getResultCountPerDataType(), PromiseAll = [], curType;
-			for (var i = 0, len = self.allTypes.length; i < len; i++)
+			var count = self.getResultCountPerDataType();
+			self.getSuggestedResultByType(type, processedText, count).then(function(result)
 			{
-				curType = self.allTypes[i]
-				if (curType.value !== "all" && curType.permission)
-				{
-					PromiseAll.push(self.getSuggestedResultByType(curType.value, processedText, count));
-				}
-			}
-
-			Promise.all(PromiseAll).then(function(result)
-			{
-				var allResultsCount = 0,
-					searchResult = $.grep(result, function(item)
-					{
-						if (item && item.count)
-						{
-							allResultsCount += item.count;
-						}
-						return item;
-					});
+				var allResultsCount = self.allResultsCount,
+					searchResult = result;
+				// {
+				// 	if (item && item.count)
+				// 	{
+				// 		allResultsCount += item.count;
+				// 	}
+				// 	return item;
+				// });
 				var primise = Promise.resolve();
 				if (searchResult.length === 0)
 				{
@@ -1174,36 +1153,58 @@
 	SearchControlViewModel.prototype.getSuggestedResultByType = function(type, value, count)
 	{
 		var self = this;
-		var queryString = "?text=" + encodeURIComponent(value);
-		if (typeof count === "number")
-		{
-			queryString += "&count=" + count;
-		}
-
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "simple", queryString), {}, { overlay: false })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "bycolumns"), {
+			paramData: {
+				column: self.cardStyle[type] ? self.cardStyle[type].field : type,
+				text: encodeURIComponent(value)
+			}
+		}, { overlay: false })
 			.then(function(data)
 			{
+				var result = [];
 				if (data.Items[0] && data.Items[0].SimpleEntities && data.Items[0].SimpleEntities.length > 0)
 				{
-					var style = self.cardStyle[type],
-						entities = data.Items[0].SimpleEntities,
-						cards = entities.map(function(item)
-						{
-							return {
-								Id: item.Id, title: item.Title, subtitle: item.SubTitle, type: type, whereQuery: data.Items[0].WhereQuery, imageSrc: undefined
-							}
-						});
-					return {
-						type: type,
-						title: style.title,
-						color: style.color,
-						count: data.TotalRecordCount,
-						cards: cards,
-						whereQuery: data.Items[0].WhereQuery
-					};
+					self.allResultsCount = data.Items[0].SimpleEntities.length;
+					result = self.getTypeEntities(data.Items[0], type, count);
 				}
+				return result;
 			});
 	};
+
+	SearchControlViewModel.prototype.getTypeEntities = function(entities, type, count)
+	{
+		var self = this, result = [], columnResult;
+
+		for (var key in self.cardStyle)
+		{
+			columnResult = { type: key, title: self.cardStyle[key].title, color: self.cardStyle[key].color, whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
+
+			for (var i = 0; i < entities.SimpleEntities.length; i++)
+			{
+				if (entities.SimpleEntities[i].ColumnsMapping[key] && (type === "all" || type === key))
+				{
+					if (columnResult.cards.length < count)
+					{
+						columnResult.cards.push({
+							Id: entities.SimpleEntities[i].Id,
+							title: entities.SimpleEntities[i].Title,
+							subtitle: entities.SimpleEntities[i].ColumnsMapping[key],
+							type: key,
+							whereQuery: entities.WhereQuery,
+							imageSrc: undefined
+						});
+					}
+					columnResult.count++;
+					columnResult.ids.push(entities.SimpleEntities[i].Id);
+				}
+			}
+			if (columnResult.cards.length > 0)
+			{
+				result.push(columnResult);
+			}
+		}
+		return result;
+	}
 
 	SearchControlViewModel.prototype.getSuggestedResultsCountByType = function(type, value)
 	{
@@ -1227,20 +1228,13 @@
 			searchText = self.$searchText.val().trim(),
 			options = {
 				fromSearch: true,
-				searchFilter: model.whereQuery
-			},
-			queryString = "?text=" + encodeURIComponent(searchText);
+				searchFilter: model.whereQuery,
+				filteredIds: model.ids
+			};
 
-		Promise.all([self.saveUserSearch(dataType, searchText),
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "simple", "ids", queryString)).then(function(Ids)
-		{
-			options.filteredIds = Ids;
-		})]).then(function()
-		{
-			self.goToGrid(model.type, options);
-			self.updateRecentSearches();
-			self.onNavComplete.notify();
-		});
+		self.goToGrid(options);
+		self.updateRecentSearches();
+		self.onNavComplete.notify();
 	};
 
 	/**
@@ -1284,12 +1278,12 @@
 	 * @param {object} options The options for grid.
 	 * @returns {void} 
 	 */
-	SearchControlViewModel.prototype.goToGrid = function(type, options)
+	SearchControlViewModel.prototype.goToGrid = function(options)
 	{
 		var self = this;
 		tf.loadingIndicator.showImmediately();
 		self.collapseSearch();
-		tf.pageManager.changePage(tf.pageManager.getPageId(type), null, null, options);
+		tf.pageManager.openNewPage("fieldtrips", options);
 		self.$searchText.blur();
 		tf.loadingIndicator.tryHide();
 	};

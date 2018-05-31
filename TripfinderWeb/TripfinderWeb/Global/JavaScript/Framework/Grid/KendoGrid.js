@@ -90,6 +90,7 @@
 				this._gridLayoutExtendedDataModelsChange();
 				this._gridFilterDataModelsChange();
 				PubSub.subscribe(topicCombine(pb.DATA_CHANGE, this._gridType), this._dataChangeReceive);
+				this._gridLoadingEnd = true;
 			}.bind(this));
 	};
 
