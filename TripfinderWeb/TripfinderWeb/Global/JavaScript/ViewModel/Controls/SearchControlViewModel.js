@@ -168,8 +168,13 @@
 		{
 			if (self.currentItems.length > 0 && self.currentItems[0].cards.length > 0)
 			{
-				self.setCurrentSearchItem();
-				self.userInputChanged();
+				var scrollHeight = self.$searchResult[0].scrollHeight, height = self.$searchResult.height(), scrollTop =
+					self.$searchResult.scrollTop();
+				if (scrollHeight > (height + scrollTop))
+				{
+					self.setCurrentSearchItem();
+					self.userInputChanged();
+				}
 			}
 			var sections = self.$searchResult.find(".section");
 			if (sections.length === 1)
