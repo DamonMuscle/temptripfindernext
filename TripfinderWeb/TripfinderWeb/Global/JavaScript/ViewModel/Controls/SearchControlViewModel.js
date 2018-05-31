@@ -64,7 +64,7 @@
 		self.cardStyle = {
 			"tripname": { title: "Trip Name", color: "#5B548F", field: "Name" },
 			"submitter": { title: "Submitter", color: "#666", field: "UserName" },
-			"tripdate": { title: "Trip Date", color: "#FFB229", field: "DepartDate" },
+			"tripdate": { title: "Trip Date", color: "#FFB229", field: "DepartDateTime" },
 			"destination": { title: "Destination", color: "#DA534F", field: "Destination" },
 			"school": { title: "School", color: "#ED7D31", field: "SchoolName" },
 			"department": { title: "Department", color: "#1CB09A", field: "Department" },
@@ -1101,9 +1101,9 @@
 					self.obSingleResultCount(allResultsCount)
 					if (searchResult.length === 1)
 					{
-						self.getSuggestedResultByType(searchResult[0].type, processedText).then(function(result)
+						self.getSuggestedResultByType(searchResult[0].type, processedText, Number.MAX_SAFE_INTEGER).then(function(result)
 						{
-							Deferred.resolve(createResponseObj(value, type, result ? [result] : []));
+							Deferred.resolve(createResponseObj(value, type, result ? result : []));
 						});
 					}
 					else
