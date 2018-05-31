@@ -1071,7 +1071,10 @@
 				primise.then(function()
 				{
 					self.obAllResultsCount(allResults.SimpleEntities.length);
-					self.obSingleResultCount(singleResult[0].cards.length);
+					if (singleResult.length > 0)
+					{
+						self.obSingleResultCount(singleResult[0].cards.length);
+					}
 					Deferred.resolve(createResponseObj(value, type, singleResult[0] ? [singleResult[0]] : []));
 				});
 			});
