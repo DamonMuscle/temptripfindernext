@@ -1227,6 +1227,11 @@
 				filteredIds: model.ids
 			};
 
+		if (TF.isPhoneDevice)
+		{
+			$(".navigation-container.mobile").empty();
+			$(".navigation-container").removeClass("mobile");
+		}
 		self.goToGrid(options);
 		self.updateRecentSearches();
 		self.onNavComplete.notify();
