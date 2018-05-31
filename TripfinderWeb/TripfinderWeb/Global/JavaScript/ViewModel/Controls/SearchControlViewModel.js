@@ -1243,33 +1243,7 @@
 	 */
 	SearchControlViewModel.prototype.suggestedResultClick = function(model, e)
 	{
-		var self = this,
-			dataType = self.obSelectType(),
-			searchText = self.$searchText.val(),
-			options = {
-				fromSearch: true,
-				highlightRecordId: model.Id
-			}, idString;
-
-		self.saveUserSearch(dataType, searchText).then(function()
-		{
-			var curPageTitle = tf.pageManager.pageTitle(),
-				availableGridPageTitles = self.allTypes.map(function(item) { return item.text; });
-			if (availableGridPageTitles.indexOf(curPageTitle) !== -1)
-			{
-				var gridViewie = tf.pageManager.getGridViewie();
-				if (gridViewie) 
-				{
-					gridViewie.openDetailViewByRecordId(model.Id, model.type);
-				}
-			}
-			else
-			{
-				self.goToGrid(model.type, options);
-			}
-			self.updateRecentSearches();
-			self.onNavComplete.notify();
-		});
+		//TO DO
 	};
 
 	/**
