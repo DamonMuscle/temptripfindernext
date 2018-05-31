@@ -1091,13 +1091,6 @@
 			{
 				var allResultsCount = self.allResultsCount,
 					searchResult = result;
-				// {
-				// 	if (item && item.count)
-				// 	{
-				// 		allResultsCount += item.count;
-				// 	}
-				// 	return item;
-				// });
 				var primise = Promise.resolve();
 				if (searchResult.length === 0)
 				{
