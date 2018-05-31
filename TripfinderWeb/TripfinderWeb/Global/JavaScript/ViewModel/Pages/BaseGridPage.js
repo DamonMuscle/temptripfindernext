@@ -46,14 +46,7 @@
 
 		self.searchGrid.getSelectedIds.subscribe(function()
 		{
-			if (self.searchGrid.getSelectedIds().length === 0)
-			{
-				self.obIsSelectRow(false);
-			}
-			else
-			{
-				self.obIsSelectRow(true);
-			}
+			self.obIsSelectRow(self.searchGrid.getSelectedIds().length !== 0);
 		});
 	};
 
