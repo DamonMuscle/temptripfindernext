@@ -35,6 +35,27 @@
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
+		<!-- ko if:gridViewModel.approveButton-->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel)">
+			<div class=" menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>0? 'Approve Trips': 'Approve Trip'">
+				<span class="hotkey"></span>
+			</div>
+		</li>
+		<!-- /ko -->
+		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel)">
+			<div class=" menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>0? 'Decline Trips': 'Decline Trip'">
+				<span class="hotkey"></span>
+			</div>
+		</li>
+		<!-- /ko -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
 			<div class=" menu-icon">
 			</div>

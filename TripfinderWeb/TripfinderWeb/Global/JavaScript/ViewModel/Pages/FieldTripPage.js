@@ -111,51 +111,6 @@
 		};
 	};
 
-	FieldTripPage.prototype.editFieldTripStatus = function(isApprove)
-	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = self.searchGrid.getSelectedRecords(), showEditModal = function(name)
-		{
-			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, isApprove, name))
-				.then(function(data)
-				{
-					if (data)
-					{
-						self.searchGrid.refreshClick();
-						self.pageLevelViewModel.popupSuccessMessage((isApprove ? "Approved " : "Declined ") + (selectedRecords.length > 1 ? selectedRecords.length : "")
-							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
-					}
-				});
-		};
-
-		if (selectedIds.length === 0)
-		{
-			return;
-		}
-
-		if (selectedIds.length === 1)
-		{
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "getEntityNames"), { data: selectedIds })
-				.then(function(response)
-				{
-					showEditModal(response.Items[0]);
-				});
-		}
-		else
-		{
-			showEditModal();
-		}
-	};
-
-	FieldTripPage.prototype.approveClick = function(viewModel, e)
-	{
-		this.editFieldTripStatus(true);
-	};
-
-	FieldTripPage.prototype.declineClick = function(viewModel, e)
-	{
-		this.editFieldTripStatus(false);
-	};
-
 	FieldTripPage.prototype.dispose = function()
 	{
 		var self = this;
