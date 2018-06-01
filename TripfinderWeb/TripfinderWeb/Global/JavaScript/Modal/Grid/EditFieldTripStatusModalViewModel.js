@@ -11,11 +11,11 @@
 
 		if (fieldTripRecords.length > 1)
 		{
-			self.title((isCancel ? "Cancel " : (isAdmin ? "Change status of " : (isApprove ? "Approve " : "Decline "))) + fieldTripRecords.length + " Trips");
+			self.title((isCancel ? "Cancel " : (isAdmin ? "Change Status of " : (isApprove ? "Approve " : "Decline "))) + fieldTripRecords.length + " Trips");
 		}
 		else
 		{
-			self.title((isCancel ? "Cancel Trip " : (isAdmin ? "Change status of Trip " : (isApprove ? "Approve " : "Decline "))) + "[ " + name + " ]");
+			self.title((isCancel ? "Cancel Trip " : (isAdmin ? "Change Status of Trip " : (isApprove ? "Approve " : "Decline "))) + "[ " + name + " ]");
 		}
 
 		self.obPositiveButtonLabel = ko.observable((isCancel ? "Cancel " : (isAdmin ? "Change " : (isApprove ? "Approve " : "Decline "))) + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " Trip" + (fieldTripRecords.length > 1 ? "s" : ""));
