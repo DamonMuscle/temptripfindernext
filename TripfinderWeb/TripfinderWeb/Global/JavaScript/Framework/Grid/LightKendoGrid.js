@@ -661,11 +661,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-			{
-				extra: true,
-				mode: "menu row",
-				operators: TF.Grid.LightKendoGrid.DefaultOperator
-			},
+				{
+					extra: true,
+					mode: "menu row",
+					operators: TF.Grid.LightKendoGrid.DefaultOperator
+				},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -2991,6 +2991,7 @@
 					}
 
 					//verify ajax by filter control or real ajax request
+					result.TotalRecordCount = self.searchOption.data.filterSet ? self.obTotalRecordCount() : result.TotalRecordCount;
 					self.result = result;
 					kendoOptions.success({
 						d: {
@@ -4056,13 +4057,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
-								{
-									fields: self.geoFields,
-									IdFilter:
 									{
-										IncludeOnly: self.allIds
+										fields: self.geoFields,
+										IdFilter:
+											{
+												IncludeOnly: self.allIds
+											}
 									}
-								}
 							})
 							.then(function(response)
 							{
