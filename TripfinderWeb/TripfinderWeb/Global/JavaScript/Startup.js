@@ -244,7 +244,6 @@
 						})
 						.then(function(value)
 						{
-
 							if (value !== null)
 							{
 								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
@@ -252,9 +251,14 @@
 								if (!TF.isPhoneDevice)
 								{
 									tf.pageManager.initNavgationBar();
+									tf.pageManager.initResizePanel();
 								}
 
-								tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips");
+								tf.pageManager.resizablePage.onLoaded.subscribe(function()
+								{
+									tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
+									tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips");
+								});
 								return true;
 							}
 							return null;

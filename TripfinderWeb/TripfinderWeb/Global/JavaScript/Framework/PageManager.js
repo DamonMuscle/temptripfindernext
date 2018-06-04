@@ -26,27 +26,39 @@
 		ko.applyBindings(ko.observable(self.navigationData), $content[0]);
 	};
 
+	PageManager.prototype.initResizePanel = function()
+	{
+		var self = this,
+			$content, $pageContent = $("#pageContent");
+		self.resizablePage = new TF.Page.ResizablePage();
+		$content = $("<!-- ko template:{ name:'workspace/page/resizablepage',data:$data }--><!-- /ko -->");
+		$pageContent.append($content);
+
+		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
+	};
+
 	PageManager.prototype.openNewPage = function(type, gridOptions)
 	{
 		var self = this, permission,
-			pageData, templateType,
-			$content, $pageContent = $("#pageContent"),
+			pageData, templateName,
+			$content, $leftPage = $("#pageContent .left-page"), notFirstLoad = self.resizablePage.obLeftData(),
 			storageKey = TF.productName + ".page";
 
-		self.removeCurrentPage();
+		self.resizablePage.clearContent();
 		switch (type)
 		{
 			case "fieldtrips":
 				pageData = new TF.Page.FieldTripPage(gridOptions);
-				templateType = "basegridpage";
+				templateName = "workspace/page/basegridpage";
 				break;
 			case "myrequests":
 				pageData = new TF.Page.MyRequestPage();
-				templateType = "basegridpage";
+				templateName = "workspace/page/basegridpage";
 				break;
 		}
-		$content = $("<div class='main-body'><!-- ko template:{ name:'workspace/page/" + templateType + "',data:$data }--><!-- /ko --></div>");
-		$pageContent.append($content);
+
+		self.resizablePage.setLeftPage(templateName, pageData);
+
 		if (self.navigationData)
 		{
 			setTimeout(function()
@@ -56,34 +68,10 @@
 		}
 		tf.storageManager.save(storageKey, type);
 
-		if (pageData)
-		{
-			ko.applyBindings(ko.observable(pageData), $content[0]);
-		}
-
 		if (TF.isPhoneDevice)
 		{
 			$(".page-container").css("width", "100%");
 		}
-	};
-
-	PageManager.prototype.removeCurrentPage = function()
-	{
-		var $pageContent = $("#pageContent"), $page = $pageContent.find(".page-container"),
-			pageData;
-
-		if ($pageContent.length === 0 || $page.length === 0)
-		{
-			$pageContent.empty();
-			return;
-		}
-
-		pageData = ko.dataFor($page[0]);
-		if (pageData && pageData.dispose)
-		{
-			pageData.dispose();
-		}
-		$pageContent.empty();
 	};
 
 	PageManager.prototype.loadDataSourceName = function()

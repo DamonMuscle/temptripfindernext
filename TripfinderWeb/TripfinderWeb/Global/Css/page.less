@@ -6,6 +6,50 @@ body,
 	overflow-y: auto;
 	-ms-overflow-style: scrollbar;
 	width: calc(~"100% - 60px");
+	position: relative;
+
+	.resizable-page {
+		height: 100%;
+		float: left;
+		width: 100%;
+		display: flex;
+
+		.left-page, .right-page {
+			height: 100%;
+			width: 50%;
+		}
+
+		.right-page {
+			margin-left: 3px;
+		}
+
+		.resize-handler {
+			position: absolute;
+			left: 0;
+			width: 3px;
+			height: 100%;
+			background-color: #4b4b4b;
+			cursor: ew-resize;
+			z-index: 2;
+			left: 50%;
+
+			.sliderbar-button {
+				position: absolute;
+				left: 0;
+				top: calc(~"50% - 19.5px");
+				width: 44px;
+				height: 39px;
+				background-color: transparent;
+				background: linear-gradient(90deg, #484848, #484848) no-repeat left center / 8px 39px;
+				border-radius: 0;
+				cursor: pointer;
+
+				&:hover {
+					background: repeating-linear-gradient(90deg, #868686, #868686 1px, #4b4b4b 1px, #4b4b4b 4px) no-repeat 16px center / 9px 18px, #4b4b4b !important;
+				}
+			}
+		}
+	}
 
 	.main-body {
 		height: 100%;

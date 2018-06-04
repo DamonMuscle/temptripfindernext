@@ -29,7 +29,6 @@
 
 		self.bindWithKnockout();
 		self.tooltip = new TF.Helper.TFTooltip();
-		self.pageManager = new TF.Page.PageManager();
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
 	}
@@ -465,7 +464,7 @@
 		{
 			self.closeNavigation();
 		}
-		self.pageManager.openNewPage(type);
+		tf.pageManager.openNewPage(type);
 	};
 
 	/**

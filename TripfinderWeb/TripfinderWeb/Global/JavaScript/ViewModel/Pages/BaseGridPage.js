@@ -18,6 +18,7 @@
 		self.obNoRecordsSelected = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
+		self.detailView = null;
 
 		self.approveButton = false;
 		self.declineButton = false;
@@ -79,11 +80,41 @@
 			{
 				return c.Id;
 			}).ToArray();
+
+			if (self.detailView)
+			{
+				self.detailView.setEntity(self.selectedRecordIds[0]);
+			}
 		}.bind(self));
+		self.searchGrid.onDoubleClick.subscribe(function(e, data)
+		{
+			self.showDetailsClick();
+		});
 
 		self._openBulkMenu();
 		self.targetID = ko.observable();
 		self.searchGridInited(true);
+	};
+
+	BaseGridPage.prototype.showDetailsClick = function()
+	{
+		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedId;
+
+		if (!selectedIds || selectedIds.length <= 0)
+		{
+			return;
+		}
+
+		selectedId = selectedIds[0];
+		if (self.detailView)
+		{
+			self.detailView.setEntity(selectedId);
+		}
+		else
+		{
+			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
+			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+		}
 	};
 
 	BaseGridPage.prototype.logout = function()
