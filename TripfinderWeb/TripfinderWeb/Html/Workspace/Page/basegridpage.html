@@ -11,6 +11,7 @@
 	<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
 	<div class="grid-icons">
 		<div class="iconrow">
+			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()}"></div>
 			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>

@@ -1,7 +1,7 @@
 <div data-bind="uiInit:init" class="resizable-page">
 	<div class="left-page">
 	</div>
-	<div class="resize-handler">
+	<div class="resize-handler" data-bind="visible:obLeftData()&&obRightData">
 		<div class="sliderbar-button" style="display: block;">
 		</div>
 	</div>

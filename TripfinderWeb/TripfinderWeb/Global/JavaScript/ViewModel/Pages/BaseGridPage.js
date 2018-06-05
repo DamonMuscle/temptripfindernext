@@ -16,6 +16,7 @@
 		self.enableRefreshEvent = new TF.Events.Event();
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
+		self.obShowDetailPanel = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
 		self.detailView = null;
@@ -81,7 +82,7 @@
 				return c.Id;
 			}).ToArray();
 
-			if (self.detailView)
+			if (self.obShowDetailPanel())
 			{
 				self.detailView.setEntity(self.selectedRecordIds[0]);
 			}
@@ -106,7 +107,7 @@
 		}
 
 		selectedId = selectedIds[0];
-		if (self.detailView)
+		if (self.obShowDetailPanel())
 		{
 			self.detailView.setEntity(selectedId);
 		}
@@ -115,11 +116,7 @@
 			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
 			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
 		}
-	};
-
-	BaseGridPage.prototype.logout = function()
-	{
-		tf.pageManager.logOff();
+		self.obShowDetailPanel(true);
 	};
 
 	//TODO right click menu feature
@@ -237,6 +234,10 @@
 		if (self.declineClick)
 		{
 			self.bindEvent(".iconbutton.decline", self.declineClick);
+		}
+		if (self.gridViewClick)
+		{
+			self.bindEvent(".iconbutton.gridview", self.gridViewClick);
 		}
 		if (self.cancelClick)
 		{
@@ -447,6 +448,13 @@
 	{
 		var self = this;
 		self.editFieldTripStatus(false);
+	};
+
+	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
+	{
+		var self = this;
+		self.obShowDetailPanel(false);
+		tf.pageManager.resizablePage.closeRightPage();
 	};
 
 	BaseGridPage.prototype.dispose = function()

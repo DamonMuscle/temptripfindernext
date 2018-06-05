@@ -13,6 +13,8 @@
 		self.obRightData = ko.observable();
 		self.obLeftTemplate = ko.observable();
 		self.obRightTemplate = ko.observable();
+		self.leftPageSizeKey = "leftpagesize.";
+		self.leftPageType = "";
 		self.minLeftWidth = 300;
 		self.minRightWidth = 580;
 
@@ -38,11 +40,7 @@
 		var self = this, notFirstLoad = self.obLeftData(),
 			$content;
 
-		if (self.obLeftData() && self.obLeftData().dispose)
-		{
-			self.obLeftData().dispose();
-		}
-		self.$leftPage.empty();
+		self.clearLeftContent();
 
 		self.obLeftTemplate(templateName);
 		self.obLeftData(data);
@@ -53,17 +51,15 @@
 		{
 			ko.applyBindings(ko.observable(self), $content[0]);
 		}
+
+		self.reLayoutPage();
 	};
 
 	ResizablePage.prototype.setRightPage = function(templateName, data)
 	{
 		var self = this, $content;
 
-		if (self.obRightData() && self.obRightData().dispose)
-		{
-			self.obRightData().dispose();
-		}
-		self.$rightPage.empty();
+		self.clearRightContent();
 
 		self.obRightTemplate(templateName);
 		self.obRightData(data);
@@ -71,6 +67,34 @@
 
 		self.$rightPage.append($content);
 		ko.applyBindings(ko.observable(self), $content[0]);
+
+		self.reLayoutPage();
+	};
+
+	ResizablePage.prototype.reLayoutPage = function()
+	{
+		var self = this, leftWidth, totalWidth = self.$element.outerWidth();
+
+		leftWidth = tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || totalWidth / 2;
+
+		if (!self.obLeftData())
+		{
+			return;
+		}
+
+		if (self.obRightData())
+		{
+			self.$leftPage.width(leftWidth);
+			self.$rightPage.width(totalWidth - leftWidth);
+			self.$dragHandler.css("left", leftWidth + "px");
+			self.resizeGrid(leftWidth);
+		}
+		else
+		{
+			self.$rightPage.width(0);
+			self.$leftPage.width("100%");
+			self.resizeGrid(totalWidth);
+		}
 	};
 
 	ResizablePage.prototype.initDragHandler = function()
@@ -86,6 +110,7 @@
 				},
 				stop: function(e, ui)
 				{
+					tf.storageManager.save(self.leftPageSizeKey + self.leftPageType, ui.position.left);
 				},
 				drag: function(e, ui)
 				{
@@ -108,26 +133,44 @@
 
 	ResizablePage.prototype.resize = function(left)
 	{
-		var self = this, totalWidth = self.$element.outerWidth(), $grid;
-		self.$leftPage.width(left);
+		var self = this, totalWidth = self.$element.outerWidth();
 
+		self.$leftPage.width(left);
+		self.resizeGrid(left);
+		self.$rightPage.width(totalWidth - left);
+	};
+
+	ResizablePage.prototype.resizeGrid = function(left)
+	{
+		var self = this, $grid, lockedHeaderWidth, paddingRight, width;
 		$grid = self.$leftPage.find(".kendo-grid");
 
 		if ($grid.length > 0)
 		{
-			var lockedHeaderWidth = $grid.find('.k-grid-header-locked').width(),
-				paddingRight = parseInt($grid.find(".k-grid-content").css("padding-right")),
-				width = left - lockedHeaderWidth - paddingRight;
+			lockedHeaderWidth = $grid.find('.k-grid-header-locked').width();
+			paddingRight = parseInt($grid.find(".k-grid-content").css("padding-right"));
+			width = left - lockedHeaderWidth - paddingRight;
 
 			$.each($grid, function(index, container)
 			{
 				$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
 			});
 		}
-		self.$rightPage.width(totalWidth - left);
 	};
 
-	ResizablePage.prototype.clearContent = function()
+	ResizablePage.prototype.clearRightContent = function()
+	{
+		var self = this;
+
+		if (self.obRightData() && self.obRightData().dispose)
+		{
+			self.obRightData().dispose();
+		}
+		self.$rightPage.empty();
+		self.obRightData(null);
+	};
+
+	ResizablePage.prototype.clearLeftContent = function()
 	{
 		var self = this;
 
@@ -135,12 +178,22 @@
 		{
 			self.obLeftData().dispose();
 		}
-		if (self.obRightData() && self.obRightData().dispose)
-		{
-			self.obRightData().dispose();
-		}
-
 		self.$leftPage.empty();
-		self.$rightPage.empty();
+		self.obLeftData(null);
+	};
+
+	ResizablePage.prototype.closeRightPage = function()
+	{
+		var self = this;
+
+		self.clearRightContent();
+		self.reLayoutPage();
+	};
+
+	ResizablePage.prototype.clearContent = function()
+	{
+		var self = this;
+		self.clearRightContent();
+		self.clearLeftContent();
 	};
 })();
