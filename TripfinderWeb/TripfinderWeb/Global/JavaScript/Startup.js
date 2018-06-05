@@ -257,7 +257,7 @@
 								tf.pageManager.resizablePage.onLoaded.subscribe(function()
 								{
 									tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
-									tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips");
+									tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
 								});
 								return true;
 							}

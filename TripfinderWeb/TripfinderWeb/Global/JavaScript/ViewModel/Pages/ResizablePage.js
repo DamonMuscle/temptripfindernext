@@ -35,10 +35,9 @@
 		self.onLoaded.notify();
 	};
 
-	ResizablePage.prototype.setLeftPage = function(templateName, data)
+	ResizablePage.prototype.setLeftPage = function(templateName, data, firstLoad)
 	{
-		var self = this, notFirstLoad = self.obLeftData(),
-			$content;
+		var self = this, $content;
 
 		self.clearLeftContent();
 
@@ -47,7 +46,7 @@
 		$content = $("<div class='main-body' data-bind='template:{ name: obLeftTemplate, data: obLeftData }'></div>");
 
 		self.$leftPage.append($content);
-		if (notFirstLoad)
+		if (!firstLoad)
 		{
 			ko.applyBindings(ko.observable(self), $content[0]);
 		}
@@ -107,9 +106,14 @@
 				containment: "parent",
 				start: function(e, ui)
 				{
+					if ($(e.originalEvent.target).hasClass("sliderbar-button"))
+					{
+						$(e.currentTarget).find(".sliderbar-button").addClass("slider-tapped");
+					}
 				},
 				stop: function(e, ui)
 				{
+					$(e.currentTarget).find(".sliderbar-button").removeClass("slider-tapped");
 					tf.storageManager.save(self.leftPageSizeKey + self.leftPageType, ui.position.left);
 				},
 				drag: function(e, ui)
@@ -142,9 +146,10 @@
 
 	ResizablePage.prototype.resizeGrid = function(left)
 	{
-		var self = this, $grid, lockedHeaderWidth, paddingRight, width;
-		$grid = self.$leftPage.find(".kendo-grid");
+		var self = this, $grid, lockedHeaderWidth, paddingRight, width,
+			iconRow, wrapRow, iconRowTop, iconRowLeft;
 
+		$grid = self.$leftPage.find(".kendo-grid");
 		if ($grid.length > 0)
 		{
 			lockedHeaderWidth = $grid.find('.k-grid-header-locked').width();
@@ -155,6 +160,46 @@
 			{
 				$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
 			});
+
+			//update toolbar
+
+			iconRow = self.$leftPage.find(".iconrow");
+			wrapRow = self.$leftPage.find(".grid-staterow-wrap");
+			iconRow.css("display", "block");
+			wrapRow.removeClass("pull-left").addClass("pull-right");
+			wrapRow.css("width", "auto");
+			iconRow.css("width", "auto");
+			$(document).off(".iconhover");
+			wrapRow.off(".iconhover");
+			if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
+			{
+				iconRow.css("display", "none");
+				wrapRow.removeClass("pull-right").addClass("pull-left").css("width", "100%");
+				wrapRow.on("mousemove.iconhover", function()
+				{
+					wrapRow.css("display", "none");
+					iconRow.css("display", "block");
+					iconRow.css("width", "100%");
+				});
+				$(document).on("mousemove.iconhover", function(e)
+				{
+					iconRowTop = iconRow.offset().top, iconRowLeft = iconRow.offset().left;
+					if (!(e.pageY > iconRowTop && e.pageY < iconRowTop + iconRow.outerHeight()
+						&& e.pageX > iconRowLeft && e.pageX < iconRowLeft + iconRow.outerWidth()))
+					{
+						iconRow.css("display", "none");
+						wrapRow.css("display", "block");
+						wrapRow.css("width", "100%");
+					}
+				});
+			}
+			else
+			{
+				wrapRow.css("width", "auto");
+				iconRow.css("width", "auto");
+				wrapRow.css("display", "block");
+				iconRow.css("display", "block");
+			}
 		}
 	};
 

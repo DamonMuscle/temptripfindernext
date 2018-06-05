@@ -37,11 +37,11 @@
 		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
 	};
 
-	PageManager.prototype.openNewPage = function(type, gridOptions)
+	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad)
 	{
 		var self = this, permission,
 			pageData, templateName,
-			$content, $leftPage = $("#pageContent .left-page"), notFirstLoad = self.resizablePage.obLeftData(),
+			$content, $leftPage = $("#pageContent .left-page"),
 			storageKey = TF.productName + ".page";
 
 		self.resizablePage.clearContent();
@@ -59,7 +59,7 @@
 
 
 		self.resizablePage.leftPageType = type;
-		self.resizablePage.setLeftPage(templateName, pageData);
+		self.resizablePage.setLeftPage(templateName, pageData, firstLoad);
 
 		if (self.navigationData)
 		{
