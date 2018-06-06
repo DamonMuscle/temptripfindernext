@@ -20,7 +20,8 @@
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
 		self.detailView = null;
-
+		self.fieldTripDataEntry = null;
+		// self.type = null;
 		self.approveButton = false;
 		self.declineButton = false;
 		self.cancelButton = false;
@@ -29,6 +30,10 @@
 		self.obIsSelectRow = ko.observable(false);
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+
+		self.applicationTabSource = {
+			ViewSource: {}, DataEntrySource: {}, GridSource: {}
+		};
 	}
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
@@ -248,6 +253,7 @@
 		{
 			self.searchGrid.refreshClick(model, e);
 		});
+		self.bindEvent(".new", self.addClick);
 	};
 
 	BaseGridPage.prototype.layoutIconClick = function(viewModel, e)
@@ -448,6 +454,27 @@
 	{
 		var self = this;
 		self.editFieldTripStatus(false);
+	};
+
+	BaseGridPage.prototype.addClick = function(viewModel, e)
+	{
+		var self = this,
+			documentData = new TF.Document.DocumentData("DataEntry",
+				{
+					type: "fieldtrip",
+					ids: [],
+					mode: "Add",
+				}),
+			view = {
+				id: documentData.data.ids[0],
+				documentType: documentData.documentType,
+				type: documentData.data.type,
+			};
+		self.applicationTabSource.DataEntrySource[documentData.data.type] = [];
+		self.applicationTabSource.DataEntrySource[documentData.data.type].push(view);
+		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(self.applicationTabSource.DataEntrySource[documentData.data.type], view);
+		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+
 	};
 
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)

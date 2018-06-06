@@ -1,6 +1,51 @@
 (function()
 {
 	createNamespace("TF").Startup = Startup;
+	tf.applicationTerm = {};
+
+	tf.applicationTerm.getApplicationTermByName = function(term, type)
+	{
+		var result;
+		if (!term)
+		{
+			return term;
+		}
+		if (tf.applicationTerm[term] && tf.applicationTerm[term][type])
+		{
+			result = tf.applicationTerm[term][type];
+		}
+		else
+		{
+			var terms = term.split(" "), results = [];
+			for (var i = 0; i < terms.length; i++)
+			{
+				if (tf.applicationTerm[terms[i]] && tf.applicationTerm[terms[i]][type])
+				{
+					results.push(tf.applicationTerm[terms[i]][type]);
+				}
+				else
+				{
+					results.push(terms[i]);
+				}
+			}
+			result = results.join(" ");
+		}
+		return result;
+	}
+
+	tf.applicationTerm.getApplicationTermSingularByName = function(term)
+	{
+		return tf.applicationTerm.getApplicationTermByName(term, "Singular");
+	};
+	tf.applicationTerm.getApplicationTermPluralByName = function(term)
+	{
+		return tf.applicationTerm.getApplicationTermByName(term, "Plural");
+	};
+	tf.applicationTerm.getApplicationTermAbbrByName = function(term)
+	{
+		return tf.applicationTerm.getApplicationTermByName(term, "Abbreviation");
+	};
+
 	tf.showSelectDataSourceModel = function(databaseName)
 	{
 		return tf.modalManager.showModal(
@@ -106,6 +151,11 @@
 				.then(function()
 				{
 					return sessionValidator.activate();
+				})
+				.then(function()
+				{
+					tf.setting = new TF.Setting();
+					return tf.setting.getRoutingConfig();
 				})
 				.then(function()
 				{
