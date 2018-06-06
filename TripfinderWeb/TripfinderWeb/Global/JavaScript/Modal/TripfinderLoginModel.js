@@ -219,7 +219,7 @@
 								.then(function(response)
 								{
 									this.loginViewModel.obLoginErrorMessage('');
-									if (response.Items[0].Products.indexOf("Tripfinder") == -1)
+									if (response.Items[0].Products.indexOf("Tripfinder") === -1)
 									{
 										this.loginViewModel.obLoginErrorMessage('Tripfinder is not enabled for this Client ID.  Contact us at support@transfinder.com or 888-427-2403 to inquire about enabling this product.');
 										return;
