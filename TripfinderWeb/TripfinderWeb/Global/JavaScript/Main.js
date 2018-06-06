@@ -262,12 +262,17 @@ function getTitleByType(type)
 		case "fieldtrips":
 			pageTitile = "Field Trips";
 			break;
+		case "fieldtrip":
+			pageTitile = "Field Trip";
+			break;
 		case "myrequests":
 			pageTitile = "My Requests";
 			break;
 		case "approvals":
 			pageTitile = "My Pending Approvals";
 			break;
+		default:
+			break
 	}
 	return pageTitile;
 }

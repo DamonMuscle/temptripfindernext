@@ -1,0 +1,89 @@
+<div class="tf-contextmenu-wrap optionmenu-wrap layoutmenu-wrap phone-wrap">
+	<ul class="tf-contextmenu">
+		<li class="menu-divider"></li>
+		<!--ko if: obNeedShown() -->
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label disabled" style="text-transform: capitalize;" data-bind="text:obDefaultTitle">
+			</div>
+		</li>
+		<!--ko if: type == "grid" -->
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:changeColumns">
+				Show/Hide columns
+			</div>
+		</li>
+		<!-- /ko -->
+		<!--ko if: type !== "section-header" && type !== "spacer"  && type !== "horizontalLine"  && type !== "verticalLine" -->
+
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:editClicked,css:{disabled:!obEditAppearanceEnable()||type === 'grid'||type === 'File'}">
+				Edit
+			</div>
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:openConditionalAppearanceModal,css:{disabled: !obConditionalAppearanceEnable()}">
+				Conditional Formatting
+			</div>
+		</li>
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" style="padding-right:40px;">
+				Change Data Point
+			</div>
+			<ul class="tf-contextmenu" data-bind="foreach: blocks">
+				<li class="menu-item">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label" data-bind="text:$data.title,contextMenuClick:$parent.changeDataPoint">
+					</div>
+				</li>
+			</ul>
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!-- /ko -->
+		<!-- /ko -->
+		<!--ko if: !obNeedShown()&&type !== "section-header"&& type!=="spacer" &&type !== "horizontalLine"&& type!=="verticalLine" -->
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:imageChange">
+				Upload Image
+			</div>
+		</li>
+		<!-- /ko -->
+		<!--ko if: type !== "horizontalLine"  && type !== "verticalLine" -->
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:groupDataPoint">
+				New Group from Block
+			</div>
+		</li>
+		<!-- /ko -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:deleteDataPoint">
+				Delete Block
+			</div>
+		</li>
+		<li class="menu-divider"></li>
+	</ul>
+</div>
