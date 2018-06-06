@@ -1,0 +1,121 @@
+<div class="conditional-appearance-modal" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="condition-container">
+		<div class="condition-list" data-bind="foreach:{data:obConditionList,afterRender:onConditionListUpdate}">
+			<div class="condition-item" data-bind="css:{'detail':$data.showDetail},event:{ mouseover:$parent.onConditionMouseEvent, mouseout:$parent.onConditionMouseEvent }">
+				<button type="button" class="btn btn-default" data-bind="click:$parent.onToggleConditionDetailBtnClick">
+					<span class="caret"></span>
+				</button>
+				<div class="condition-content detail">
+					<div>
+						If&nbsp;
+						<div selectType="dataPoint" data-bind="text:$data.title,click:$parent.onConditionSelectElementClick"></div>&nbsp;is&nbsp;
+						<div selectType="operator" data-bind="text:$data.operator().text,click:$parent.onConditionSelectElementClick"></div>&nbsp;
+						<div selectType="input" data-bind="text:$parent.getDisplayValue($data.format(),$data.value(),$data.type()),click:$parent.onConditionSelectElementClick,visible: ($data.operator().name!=='Empty'&&$data.operator().name!=='NotEmpty')&&$data.displayValue()"></div>
+
+						<!-- ko if: $data.operator().name === 'Between' -->
+						&nbsp;And&nbsp;
+						<div selectType="extraInput" data-bind="text:$parent.getDisplayValue($data.format(),$data.extraValue(),$data.type()),click:$parent.onConditionSelectElementClick,visible: ($data.operator().name!=='Empty'&&$data.operator().name!=='NotEmpty')&&$data.displayValue()"></div>
+						<!-- /ko -->
+						<!-- ko if: $data.type() === 'Time' -->
+						<!-- ko customInput:{type:"Time",value:$data.value,attributes:{class:"form-control timeValue", required:"", name:"startTime"}} -->
+						<!-- /ko -->
+						<!-- ko if: $data.operator().name === 'Between' -->
+						<!-- ko customInput:{type:"Time",value:$data.extraValue,attributes:{class:"form-control timeExtraValue", required:"", name:"startTime"}} -->
+						<!-- /ko -->
+						<!-- /ko -->
+						<!-- /ko -->
+
+						<input type="text" class="condition-value" data-bind="visible: ($data.operator().name!=='Empty'&&$data.operator().name!=='NotEmpty')&&!$data.displayValue(),event: { keydown: $parent.onInputKeyDown, blur: $parent.onInputBlur }, attr:{type:$data.type()==='Number'?'number':'text'}" />&nbsp;then display the background of this block as&nbsp;
+						<div class="color-picker-container" type="backgroundColor">
+							<div class="color-picker-display">
+								<div class="color-picker-label" data-bind="text:$data.backgroundColor"></div>
+								<div class="color-picker-example" data-bind="style:{background:$data.backgroundColor}"></div>
+							</div>
+							<div class="color-picker-select">
+								<input class="form-control" name="color" />
+							</div>
+						</div>
+						,&nbsp;
+						<div class="color-picker-container line-example" type="borderColor" data-bind="css:{'noBorder':$data.borderColor()==='None'}">
+							<div class="color-picker-display">
+								<div class="color-picker-label" data-bind="text:$data.borderColor"></div>
+								<div class="color-picker-example" data-bind="style:{background:$data.borderColor}"></div>
+							</div>
+							<div class="color-picker-select">
+								<input class="form-control" name="color" />
+							</div>
+						</div>
+						&nbsp;border,&nbsp;title text as&nbsp;
+						<div class="color-picker-container" type="titleColor">
+							<div class="color-picker-display">
+								<div class="color-picker-label" data-bind="text:$data.titleColor"></div>
+								<div class="color-picker-example" data-bind="style:{background:$data.titleColor}"></div>
+							</div>
+							<div class="color-picker-select">
+								<input class="form-control" name="color" />
+							</div>
+						</div>
+						,&nbsp;and data text as&nbsp;
+						<div class="color-picker-container" type="contentColor">
+							<div class="color-picker-display">
+								<div class="color-picker-label" data-bind="text:$data.contentColor"></div>
+								<div class="color-picker-example" data-bind="style:{background:$data.contentColor}"></div>
+							</div>
+							<div class="color-picker-select">
+								<input class="form-control" name="color" />
+							</div>
+						</div>
+						.
+					</div>
+				</div>
+				<div class="condition-content abbreviation">
+					<div>
+						<div selectType="dataPoint" data-bind="text:$data.title,click:$parent.onConditionSelectElementClick"></div>&nbsp;
+						<div selectType="operator" data-bind="text:$data.operator().text,click:$parent.onConditionSelectElementClick"></div>&nbsp;
+						<div selectType="input" data-bind="text:$parent.getDisplayValue($data.format(),$data.value(),$data.type()),click:$parent.onConditionSelectElementClick,visible: ($data.operator().name!=='Empty'&&$data.operator().name!=='NotEmpty')&&$data.displayValue()"></div>
+
+						<!-- ko if: $data.operator().name === 'Between' -->
+						&nbsp;And&nbsp;
+						<div selectType="extraInput" data-bind="text:$parent.getDisplayValue($data.format(),$data.extraValue(),$data.type()),click:$parent.onConditionSelectElementClick,visible: ($data.operator().name!=='Empty'&&$data.operator().name!=='NotEmpty')&&$data.displayValue()"></div>
+						<!-- /ko -->
+						<!-- ko if: $data.type() === 'Time' || $data.format() === "Time" -->
+						<!-- ko customInput:{type:"Time",value:$data.value,attributes:{class:"form-control timeValue", required:"", name:"value"}} -->
+						<!-- /ko -->
+						<!-- ko if: $data.operator().name === 'Between' -->
+						<!-- ko customInput:{type:"Time",value:$data.extraValue,attributes:{class:"form-control timeExtraValue", required:"", name:"extraValue"}} -->
+						<!-- /ko -->
+						<!-- /ko -->
+						<!-- /ko -->
+
+						<input type="text" class="condition-value" data-bind="visible:($data.operator().name!=='Empty'&&$data.operator().name!=='NotEmpty')&& !$data.displayValue(),event: { keydown: $parent.onInputKeyDown, blur: $parent.onInputBlur }, attr:{type:$data.type()==='Number'?'number':'text'}" />
+					</div>
+				</div>
+				<div class="condition-button delete-btn" data-bind="click:$parent.onDeleteBtnClick"></div>
+			</div>
+		</div>
+		<div class="add-new-condition" data-bind="click:onAddNewBtnClick">
+			<span>Add New</span>
+			<div class="condition-button addNew-btn"></div>
+		</div>
+	</div>
+	<div class="condition-preview" data-bind="html:obPreviewContent">
+	</div>
+	<div class="dropdown-menu">
+		<!-- ko if: obDropDownMenuContent().length>0 -->
+		<div class="list-container">
+			<ul data-bind="foreach:{data:obDropDownMenuContent}">
+				<li data-bind="click:$parent.onDropDownMenuItemClick">
+					<div class="item-icon" data-bind="css:$data.name"></div>
+					<div class="item-label" data-bind="text:$data.text"></div>
+				</li>
+			</ul>
+		</div>
+		<!-- /ko -->
+		<!-- ko if: obDropDownMenuContent().length<=0 -->
+		<div class="calendar-container k-animation-container">
+		</div>
+		<!-- /ko -->
+	</div>
+</div>

@@ -1,2 +1,100 @@
-<div>Detail View</div>
-<div data-bind="text:obId"></div>
+<div class="detail-view-panel right-panel">
+	<div class="detail-view" data-bind="uiInit:init">
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+		<div class="template-info form-group " data-bind="css: {hide :isReadMode()}">
+			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
+			 placeholder="Name Layout..." maxlength="80" />
+			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
+				<div class="iconbutton settings" data-bind="click:openManageLayouts"></div>
+				<div class="iconbutton font-size-slider" data-bind="click:showSlider"></div>
+				<div class="iconbutton layout" data-bind="click: showColumnPopup"></div>
+				<div class="type-selector save-selector">
+					<div class="iconbutton save" data-bind="click:preSave"></div>
+					<div class="dropdown-menu">
+						<ul>
+							<li data-bind="click:save">Save</li>
+							<li data-bind="click:saveAsNew">Save as New</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="detail-header">
+			<!--ko if: obRecordPicture -->
+			<div class="head-picture">
+				<span data-bind="style:{'background-image':obRecordPicture},css:{'default-image':!isReadMode()}"> </span>
+			</div>
+			<!--/ko -->
+			<div class="head-text" data-bind="css: {hide :!isReadMode(), 'no-subtitle' :obSubTitleDisplay() == null || obSubTitleDisplay().length === 0}">
+				<label class="title" style="padding-top: 2px;" data-bind="text:obTitle"></label>
+				<label class="sub-title" data-bind="text:obSubTitleDisplay()"></label>
+			</div>
+			<div class="head-text" data-bind="css: {hide :isReadMode()}" style="width:auto">
+				<label class="title" style="padding-top: 2px;" data-bind="text:obTitle"></label>
+				<div class="type-selector sub-title-selector" data-bind="click:subtitleMenuClick">
+					<div class="select-type sub-title" data-bind="text:obSubTitleDisplay() || 'SubTitle'"></div>
+					<div class="icon bottom-caret"></div>
+					<div class="dropdown-menu">
+						<ul>
+							<li data-bind="click:selectItemClick">(none)</li>
+							<!--ko foreach: obDataPoints -->
+							<!--ko if: $data.field -->
+							<li data-bind="text:title, click:$parent.selectItemClick"></li>
+							<!--/ko -->
+							<!--/ko -->
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="buttons" data-bind="css: {hide :!isReadMode()}">
+				<div class="selector-menu" data-bind="click:templateMenuClick">
+					<div class="select-type" data-bind="text:obSelectName,afterRender:updateDetailViewPanelHeader"></div>
+					<div class="icon bottom-caret"></div>
+				</div>
+				<div class="iconbutton print" data-bind="click:printClick"></div>
+				<div class="iconbutton new-window" data-bind="click:newWindowClick"></div>
+			</div>
+			<div class="group-buttons" data-bind="css: {hide :!isReadMode()}">
+				<div class="button-icon" data-bind="click:onHeaderMoreButtonClick"></div>
+				<div class="tf-contextmenu-wrap tf-contextmenu-white">
+					<div class="tf-contextmenu">
+						<ul>
+							<li class="menu-item" style="min-width:200px;max-width: 300px;" data-bind="event:{mouseenter:templateMenuClick, mouseleave:closeTemplateMenu}">
+								<div class="select-type" data-bind="text:obSelectName"></div>
+								<div class="icon bottom-caret"></div>
+							</li>
+							<li class="menu-item" data-bind="click:newWindowClick">
+								<div class="select-type">Open in New Window</div>
+								<div class="iconbutton new-window"></div>
+							</li>
+							<li class="menu-item" data-bind="click:printClick">
+								<div class="select-type">Print</div>
+								<div class="iconbutton print"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="preload">
+		</div>
+		<div class="right-container container-fluid" data-bind="css:{edit: !isReadMode(), 'group-mode': isGroupMode}">
+			<div class="grid-stack">
+			</div>
+		</div>
+		<div class="save-group-container" data-bind="css: {hide :!isGroupMode()}">
+			<div>
+				<div class="save group-button" data-bind="click:saveGroup">Save as new Group</div>
+				<div class="cancel group-button" data-bind="click:cancelGroup">Cancel</div>
+			</div>
+		</div>
+		<div class="slider-container" data-bind="css:{hide: !obShowSlider()}">
+			<div class="caret"></div>
+			<label class="minus"></label>
+			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25"
+			 data-bind="bootstrapSlider:{value:obSliderFontRate}">
+			<label class="plus"></label>
+		</div>
+	</div>
+</div>

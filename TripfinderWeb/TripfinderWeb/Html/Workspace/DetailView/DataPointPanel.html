@@ -1,0 +1,62 @@
+<div class="panel-container" data-bind="uiInit:init">
+	<div class="page-title detail">
+		<div class="pageTitle" data-bind="text:pageTitle"></div>
+		<div class="closeButton pull-right" data-bind="click:closeEditMode">Close Edit Mode</div>
+	</div>
+	<div class="content">
+		<div class="data-point-wrapper">
+			<div class="filter-bar">
+				<input class="filter-text" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: obFilterPlaceHoderText}" autocapitalize="off" spellcheck="false"
+				/>
+				<div class="item-icon clear-btn quick-search-close" data-bind="click:clearFilterClick"></div>
+			</div>
+			<div class="left data-point-container" data-bind="foreach:{data:obColumns,afterRender:initDataPoint}">
+				<div class="category" data-bind="css:{group:$data.title ==='Groups'}">
+					<div class="sub-title">
+						<span data-bind="text:title"></span>
+					</div>
+					<div class="sub-content">
+						<!-- ko foreach: columns -->
+						<span data-bind="event:{mousedown:$parents[1].onDataGroupMouseDown},attr:{field:$data['field'],displayValue:$data['displayValue']||'None',defaultValue:$data['defaultValue']||'None',title:$data['title'],format:$data['format'],
+						  type:$data['type'],url:$data['url'],subUrl:$data['subUrl'],minHeight:$parents[1].getMinHeight($data),minWidth:$parents[1].getMinWidth($data)}" class="data-point-item">
+							<span class="title" data-bind="text:title"></span>
+							<span class="folder" data-bind="click:$parents[1].openGroupMenu"></span>
+						</span>
+						<!-- /ko -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="right non-date-element-container">
+			<div class="section-header data-point-item" type="section-header" data-bind="attr:{minWidth:obGridWidth}"></div>
+			<div class="horizontal-line" type="horizontal-line"></div>
+			<div class="vertical-line" type="vertical-line"></div>
+			<div class="spacer data-point-item" type="spacer"></div>
+			<div class="image data-point-item" type="image" minHeight=2></div>
+		</div>
+	</div>
+	<div class="preload">
+		<div class="calendar-dom">
+			<div class="calendar"></div>
+		</div>
+		<div class="map-dom">
+			<div class="map"></div>
+		</div>
+	</div>
+
+
+	<!-- ko if: currentGroup() &&currentGroup().items().length>0 -->
+	<div class="group-context-menu">
+		<div class="up-arrow"></div>
+		<div class="group-context-menu-container">
+			<!-- ko foreach: currentGroup().items -->
+			<div class="group-menu-item data-point-item" data-bind="text:$parent.getGroupMenuTitle($data),
+				 attr:{minHeight:$data['h'],minWidth:$data['w'], isGroupItem:true, id:$data['id'], groupName:$parent['currentGroup']()['title']}, css:{disable:$data['disable']}"></div>
+			<!-- /ko -->
+			<div class="split-line"></div>
+			<div class="delete-group" data-bind="click:deleteGroup">Delete Group</div>
+		</div>
+	</div>
+	<!-- /ko -->
+</div>
