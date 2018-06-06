@@ -6,10 +6,11 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function LayoutMenuViewModel(options)
+	function LayoutMenuViewModel(options, detailView)
 	{
 		var self = this;
 		self.options = options;
+		self.detailView = detailView;
 		self.stickyName = "grid.detailscreenlayoutid." + options.gridType;
 
 		self.obSelectLayoutID = ko.observable(tf.storageManager.get(self.stickyName));
@@ -98,7 +99,12 @@
 	LayoutMenuViewModel.prototype.editLayoutClick = function(viewModel, e)
 	{
 		var self = this;
-		self.modifyItemEvent.notify({ id: self.obSelectLayoutID() });
+		self.detailView.initTitle();
+		self.detailView.setStackBlocks();
+		self.detailView.updateNameContainer();
+		var dataPoinViewViewModel = new TF.DetailView.DataPointPanel(self.detailView);
+		tf.pageManager.resizablePage.setLeftPage("workspace/detailview/DataPointPanel", dataPoinViewViewModel);
+		//self.modifyItemEvent.notify({ id: self.obSelectLayoutID() });
 	};
 
 	/**

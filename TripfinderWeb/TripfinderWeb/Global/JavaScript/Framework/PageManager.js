@@ -57,9 +57,8 @@
 				break;
 		}
 
-
 		self.resizablePage.leftPageType = type;
-		self.resizablePage.setLeftPage(templateName, pageData, firstLoad);
+		self.resizablePage.setLeftPage(templateName, pageData, true, firstLoad);
 
 		if (self.navigationData)
 		{

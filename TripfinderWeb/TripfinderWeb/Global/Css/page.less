@@ -14,8 +14,15 @@ body,
 		width: 100%;
 		display: flex;
 
-		.left-page, .right-page {
+		.left-page,
+		.right-page {
 			height: 100%;
+
+			.grid-page,
+			other-page {
+				height: 100%;
+				width: 100%;
+			}
 		}
 
 		.right-page {
@@ -166,7 +173,7 @@ body {
 	position: fixed;
 
 
-	> .overlay {
+	>.overlay {
 		background: rgba(102, 102, 102, 0.8);
 		position: absolute;
 		top: 0;
@@ -224,7 +231,7 @@ body {
 	&.no-overlay {
 		position: initial;
 
-		> .overlay {
+		>.overlay {
 			position: initial;
 		}
 	}
@@ -281,7 +288,7 @@ body {
 		line-height: 30px;
 		font-size: 24px;
 
-		> .title {
+		>.title {
 			background: url("../img/Transfinder-TripfinderText-Only.png") no-repeat center/100%;
 			background-size: 100% 100%;
 			display: block;
@@ -356,7 +363,7 @@ body {
 .main-body {
 	height: 100%;
 
-	.gridrow .page-title,
+	.data-points-panel .page-title,
 	.dashboard-page-title,
 	.setting-configuration .page-title {
 		padding-left: 16px;
@@ -440,11 +447,11 @@ body {
 	}
 }
 
-.checkbox > label {
+.checkbox>label {
 	line-height: 1.8;
 }
 
-.radio > label {
+.radio>label {
 	line-height: 1.8;
 }
 

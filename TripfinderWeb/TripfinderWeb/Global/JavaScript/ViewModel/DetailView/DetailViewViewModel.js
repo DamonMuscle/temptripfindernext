@@ -65,7 +65,7 @@
 		self.defaultColors = {
 			backgroundColor: "#FFFFFF",
 			borderColor: "transparent",
-			titleColor: "#8E52A1",
+			titleColor: "#70A130",
 			contentColor: "#000000"
 		};
 
@@ -662,7 +662,7 @@
 				}
 				else
 				{
-					$item.find(".verti-line, .hori-line").css("borderColor", "#8e52a1");
+					$item.find(".verti-line, .hori-line").css("borderColor", "#70A130");
 				}
 				nodeX = parseInt(node.x);
 				nodeWidth = parseInt(node.width || 0);
@@ -4635,7 +4635,7 @@
 				movingDistance: isFromMoreButton ? 0 : target.outerWidth(),
 				top: isFromMoreButton ? 0 - target.outerHeight() : -24
 			},
-				layoutMenu = new TF.DetailView.LayoutMenuViewModel(options);
+				layoutMenu = new TF.DetailView.LayoutMenuViewModel(options, self);
 
 			layoutMenu.loadingFinishEvent.subscribe(function()
 			{

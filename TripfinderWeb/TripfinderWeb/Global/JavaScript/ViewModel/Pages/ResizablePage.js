@@ -8,11 +8,18 @@
 		self.$element = null;
 		self.$leftPage = null;
 		self.$rightPage = null;
+		self.$gridPage = null;
+		self.$otherPage = null;
 		self.$dragHandler = null;
-		self.obLeftData = ko.observable();
+
+		self.obShowGrid = ko.observable(true);
+		self.obGridData = ko.observable();
+		self.obOtherData = ko.observable();
 		self.obRightData = ko.observable();
-		self.obLeftTemplate = ko.observable();
+		self.obGridTemplate = ko.observable();
+		self.obOtherTemplate = ko.observable();
 		self.obRightTemplate = ko.observable();
+
 		self.leftPageSizeKey = "leftpagesize.";
 		self.leftPageType = "";
 		self.minLeftWidth = 300;
@@ -28,6 +35,8 @@
 		var self = this;
 		self.$element = $(element);
 		self.$leftPage = self.$element.find(".left-page");
+		self.$gridPage = self.$leftPage.find(".grid-page");
+		self.$otherPage = self.$leftPage.find(".other-page");
 		self.$rightPage = self.$element.find(".right-page");
 		self.$dragHandler = self.$element.find(".resize-handler");
 
@@ -35,20 +44,39 @@
 		self.onLoaded.notify();
 	};
 
-	ResizablePage.prototype.setLeftPage = function(templateName, data, firstLoad)
+	ResizablePage.prototype.setLeftPage = function(templateName, data, newGrid, firstLoad)
 	{
 		var self = this, $content;
 
-		self.clearLeftContent();
-
-		self.obLeftTemplate(templateName);
-		self.obLeftData(data);
-		$content = $("<div class='main-body' data-bind='template:{ name: obLeftTemplate, data: obLeftData }'></div>");
-
-		self.$leftPage.append($content);
-		if (!firstLoad)
+		//grid page
+		if (data.isGridPage)
 		{
+			if (newGrid)
+			{
+				self.clearLeftContent();
+
+				self.obGridTemplate(templateName);
+				self.obGridData(data);
+				$content = $("<div class='main-body' data-bind='template:{ name: obGridTemplate, data: obGridData }'></div>");
+
+				self.$gridPage.append($content);
+				if (!firstLoad)
+				{
+					ko.applyBindings(ko.observable(self), $content[0]);
+				}
+			}
+			self.obShowGrid(true);
+		}
+		else
+		{
+			self.clearLeftOtherContent();
+
+			self.obOtherTemplate(templateName);
+			self.obOtherData(data);
+			$content = $("<div class='main-body' data-bind='template:{ name: obOtherTemplate, data: obOtherData }'></div>");
+			self.$otherPage.append($content);
 			ko.applyBindings(ko.observable(self), $content[0]);
+			self.obShowGrid(false);
 		}
 
 		self.reLayoutPage();
@@ -72,18 +100,37 @@
 
 	ResizablePage.prototype.reLayoutPage = function()
 	{
-		var self = this, leftWidth, totalWidth = self.$element.outerWidth();
+		var self = this, leftWidth, totalWidth;
 
-		leftWidth = tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || totalWidth / 2;
+		if (!self.$element)
+		{
+			return;
+		}
 
-		if (!self.obLeftData())
+		totalWidth = self.$element.outerWidth();
+		leftWidth = totalWidth * (tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || 0.5);
+
+		if (!self.obGridData() && !self.obOtherData())
 		{
 			return;
 		}
 
 		if (self.obRightData())
 		{
+			if (leftWidth < self.minLeftWidth)
+			{
+				leftWidth = self.minLeftWidth;
+			}
+			else if (totalWidth - leftWidth < self.minRightWidth)
+			{
+				leftWidth = totalWidth - self.minRightWidth;
+			}
+
 			self.$leftPage.width(leftWidth);
+			if (!self.obShowGrid())
+			{
+				self.$otherPage.width(leftWidth);
+			}
 			self.$rightPage.width(totalWidth - leftWidth);
 			self.$dragHandler.css("left", leftWidth + "px");
 			self.resizeGrid(leftWidth);
@@ -98,7 +145,7 @@
 
 	ResizablePage.prototype.initDragHandler = function()
 	{
-		var self = this;
+		var self = this, totalWidth = self.$element.outerWidth();
 		self.$dragHandler.draggable(
 			{
 				distance: 0,
@@ -114,7 +161,7 @@
 				stop: function(e, ui)
 				{
 					$(e.currentTarget).find(".sliderbar-button").removeClass("slider-tapped");
-					tf.storageManager.save(self.leftPageSizeKey + self.leftPageType, ui.position.left);
+					self.savePageRate();
 				},
 				drag: function(e, ui)
 				{
@@ -135,12 +182,32 @@
 			});
 	};
 
+	ResizablePage.prototype.savePageRate = function()
+	{
+		var self = this, totalWidth;
+
+		if (!self.$element)
+		{
+			return;
+		}
+
+		totalWidth = self.$element.outerWidth();
+		tf.storageManager.save(self.leftPageSizeKey + self.leftPageType, self.$leftPage.width() / totalWidth);
+	};
+
 	ResizablePage.prototype.resize = function(left)
 	{
 		var self = this, totalWidth = self.$element.outerWidth();
 
 		self.$leftPage.width(left);
-		self.resizeGrid(left);
+		if (!self.obShowGrid())
+		{
+			self.$otherPage.width(left);
+		}
+		else
+		{
+			self.resizeGrid(left);
+		}
 		self.$rightPage.width(totalWidth - left);
 	};
 
@@ -162,7 +229,6 @@
 			});
 
 			//update toolbar
-
 			iconRow = self.$leftPage.find(".iconrow");
 			wrapRow = self.$leftPage.find(".grid-staterow-wrap");
 			iconRow.css("display", "block");
@@ -215,16 +281,44 @@
 		self.obRightData(null);
 	};
 
+	ResizablePage.prototype.clearLeftGridContent = function()
+	{
+		var self = this;
+
+		if (self.obGridData() && self.obGridData().dispose)
+		{
+			self.obGridData().dispose();
+		}
+
+		self.$gridPage.empty();
+		self.obGridData(null);
+	};
+
+	ResizablePage.prototype.clearLeftOtherContent = function()
+	{
+		var self = this;
+
+		if (self.obOtherData() && self.obOtherData().dispose)
+		{
+			self.obOtherData().dispose();
+		}
+
+		self.$otherPage.empty();
+		self.obOtherData(null);
+
+		if (self.obGridData())
+		{
+			self.obShowGrid(true);
+			self.resizeGrid(self.$leftPage.width());
+		}
+	};
+
 	ResizablePage.prototype.clearLeftContent = function()
 	{
 		var self = this;
 
-		if (self.obLeftData() && self.obLeftData().dispose)
-		{
-			self.obLeftData().dispose();
-		}
-		self.$leftPage.empty();
-		self.obLeftData(null);
+		self.clearLeftGridContent();
+		self.clearLeftOtherContent();
 	};
 
 	ResizablePage.prototype.closeRightPage = function()
