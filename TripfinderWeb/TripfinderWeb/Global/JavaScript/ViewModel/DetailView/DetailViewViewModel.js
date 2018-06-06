@@ -1,4 +1,4 @@
-(function ()
+(function()
 {
 	createNamespace("TF.DetailView").DetailViewViewModel = DetailViewViewModel;
 
@@ -10,11 +10,11 @@
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
 
-	DetailViewViewModel.prototype.init = function (model, element)
+	DetailViewViewModel.prototype.init = function(model, element)
 	{
 	};
 
-	DetailViewViewModel.prototype.setEntity = function (id)
+	DetailViewViewModel.prototype.setEntity = function(id)
 	{
 		var self = this;
 		self.obId(id);

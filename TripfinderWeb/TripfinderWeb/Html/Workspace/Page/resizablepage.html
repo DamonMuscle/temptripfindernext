@@ -1,7 +1,9 @@
 <div data-bind="uiInit:init" class="resizable-page">
 	<div class="left-page">
+		<div class="grid-page" data-bind="visible:obShowGrid"></div>
+		<div class="other-page" data-bind="visible:!obShowGrid()"></div>
 	</div>
-	<div class="resize-handler" data-bind="visible:obLeftData()&&obRightData">
+	<div class="resize-handler" data-bind="visible:(obGridData() || obOtherData()) && obRightData()">
 		<div class="sliderbar-button" style="display: block;">
 		</div>
 	</div>

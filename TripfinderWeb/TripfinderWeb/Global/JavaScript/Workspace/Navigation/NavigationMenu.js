@@ -379,6 +379,10 @@
 					if (refreshObj.function)
 					{
 						refreshObj.function();
+						if (tf.pageManager.resizablePage)
+						{
+							tf.pageManager.resizablePage.savePageRate();
+						}
 					}
 					self.isOnAnimation = false;
 					$navMenu.css({ overflow: "", width: "" });
@@ -417,23 +421,21 @@
 			leftPanelWidth = $(".resize-wrap").width();
 		}
 
-		updateRefreshObj = function(index)
+		updateRefreshObj = function()
 		{
 			refreshObj.function = function()
 			{
-				$container = $(".kendo-grid.kendo-grid-container.k-grid.k-widget");
-				currentPanelWidth = $container.parent().width();
-				lockedHeaderWidth = $container.find('.k-grid-header-locked').width();
-				paddingRight = parseInt($container.find(".k-grid-content").css("padding-right"));
-				width = currentPanelWidth - lockedHeaderWidth - paddingRight - 2;
-				$container.find(".k-auto-scrollable,.k-grid-content").width(width);
+				if (tf.pageManager.resizablePage)
+				{
+					tf.pageManager.resizablePage.reLayoutPage();
+				}
 			};
 			refreshObj.currentInterval = setInterval(function()
 			{
 				refreshObj.function();
 			}, 50);
 		};
-		updateRefreshObj(0);
+		updateRefreshObj();
 		return refreshObj;
 	}
 

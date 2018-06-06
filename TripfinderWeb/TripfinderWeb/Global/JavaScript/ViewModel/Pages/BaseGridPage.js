@@ -20,6 +20,7 @@
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
 		self.detailView = null;
+		self.isGridPage = true;
 
 		self.approveButton = false;
 		self.declineButton = false;
@@ -87,10 +88,14 @@
 				self.detailView.setEntity(self.selectedRecordIds[0]);
 			}
 		}.bind(self));
-		self.searchGrid.onDoubleClick.subscribe(function(e, data)
+
+		if (!TF.isPhoneDevice)
 		{
-			self.showDetailsClick();
-		});
+			self.searchGrid.onDoubleClick.subscribe(function(e, data)
+			{
+				self.showDetailsClick();
+			});
+		}
 
 		self._openBulkMenu();
 		self.targetID = ko.observable();
