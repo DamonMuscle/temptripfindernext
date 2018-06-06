@@ -219,12 +219,11 @@
 								.then(function(response)
 								{
 									this.loginViewModel.obLoginErrorMessage('');
-									//TODO The current client key doesn't contains "Tripfinder", Cait is working on it, comment it now
-									//if (response.Items[0].Products.indexOf("Tripfinder") == -1)
-									//{
-									//	this.loginViewModel.obLoginErrorMessage('Tripfinder is not enabled for this Client ID.  Contact us at support@transfinder.com or 888-427-2403 to inquire about enabling this product.');
-									//	return;
-									//}
+									if (response.Items[0].Products.indexOf("Tripfinder") == -1)
+									{
+										this.loginViewModel.obLoginErrorMessage('Tripfinder is not enabled for this Client ID.  Contact us at support@transfinder.com or 888-427-2403 to inquire about enabling this product.');
+										return;
+									}
 
 									var ft1 = authorizationInfo.isAuthorizedFor("level1Requestor", "read");
 									var ft2 = authorizationInfo.isAuthorizedFor("level2Administrator", "read");
