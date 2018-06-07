@@ -903,30 +903,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-				{
-					callback: {
-						message: "Name already exists",
-						callback: function(value, validator, $field)
+			{
+				callback: {
+					message: "Name already exists",
+					callback: function(value, validator, $field)
+					{
+						if (!value)
 						{
-							if (!value)
-							{
-								return true;
-							}
-
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-								paramData: {
-									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-									name: value,
-									dataType: self.gridType
-								}
-							}, { overlay: false }).then(function(response)
-							{
-								var isUnique = response.Items[0];
-								return isUnique;
-							});
+							return true;
 						}
+
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+							paramData: {
+								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+								name: value,
+								dataType: self.gridType
+							}
+						}, { overlay: false }).then(function(response)
+						{
+							var isUnique = response.Items[0];
+							return isUnique;
+						});
 					}
 				}
+			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -1513,7 +1513,7 @@
 		self.grid.container.on("resizestart.container", self.onDataBlockResizeStart.bind(self));
 		self.grid.container.on("gsresizestop.container", self.onDataBlockResizeStop.bind(self));
 		self.grid.container.on("resize.container", function(e) { e.stopPropagation(); });
-		$stackItems.draggable("option", "containment", ".main-body");
+		$stackItems.draggable("option", "containment", "#pageContent");
 		$stackItems.resizable("option", "containment", $containment);
 		self.updateDragHandlerStatus();
 	};
@@ -1992,7 +1992,7 @@
 		}
 		if (self.$gridStack.data('gridstack'))
 		{
-			self.$gridStack.data('gridstack').destory();
+			self.$gridStack.data('gridstack').destroy();
 		}
 		var options = {
 			acceptWidgets: '.data-point-item',
@@ -4654,7 +4654,7 @@
 						self.updateNameContainer();
 						if (!data.isDeleted)
 						{
-							self.onToggleDataPointPanelEvent.notify(self.dataPointPanel);
+							self.toggleDataPointPanel(self.dataPointPanel);
 						}
 					});
 				});
@@ -4671,6 +4671,30 @@
 				tf.contextMenuManager.showMenu(e.currentTarget, contextmenu);
 			});
 		}
+
+	};
+
+	/**
+ * Toggle the Data Point Panel display status.
+ * @param {Object} data The data object.
+ * @return {void} 
+ */
+	DetailViewViewModel.prototype.toggleDataPointPanel = function(data)
+	{
+		var self = this;
+		//if (!self.dataPointPanel)
+		//{
+		if (self.dataPointPanel)
+		{
+			self.dataPointPanel.dispose();
+			self.dataPointPanel = null;
+		}
+		self.dataPointPanel = data;
+		self.dataPointPanel.onCloseDataPointPanelEvent.subscribe(function()
+		{
+			self.searchGrid.fitContainer();
+		});
+		tf.pageManager.resizablePage.setLeftPage("workspace/detailview/DataPointPanel", self.dataPointPanel);
 
 	};
 

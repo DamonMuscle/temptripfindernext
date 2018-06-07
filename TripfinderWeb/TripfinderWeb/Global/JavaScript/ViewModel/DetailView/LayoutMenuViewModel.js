@@ -99,12 +99,7 @@
 	LayoutMenuViewModel.prototype.editLayoutClick = function(viewModel, e)
 	{
 		var self = this;
-		self.detailView.initTitle();
-		self.detailView.setStackBlocks();
-		self.detailView.updateNameContainer();
-		var dataPoinViewViewModel = new TF.DetailView.DataPointPanel(self.detailView);
-		tf.pageManager.resizablePage.setLeftPage("workspace/detailview/DataPointPanel", dataPoinViewViewModel);
-		//self.modifyItemEvent.notify({ id: self.obSelectLayoutID() });
+		self.modifyItemEvent.notify({ id: self.obSelectLayoutID() });
 	};
 
 	/**
