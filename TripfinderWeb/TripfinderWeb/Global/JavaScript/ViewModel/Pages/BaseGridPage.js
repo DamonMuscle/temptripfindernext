@@ -50,6 +50,11 @@
 		self.searchGrid.getSelectedIds.subscribe(function()
 		{
 			self.obIsSelectRow(self.searchGrid.getSelectedIds().length !== 0);
+			self.selectedRecordIds = self.searchGrid.getSelectedIds()
+			if (self.obShowDetailPanel() && self.selectedRecordIds[0])
+			{
+				self.detailView.showDetailViewById(self.selectedRecordIds[0]);
+			}
 		});
 	};
 
@@ -80,19 +85,6 @@
 		{
 			self.showDetailsClick();
 		}.bind(self));
-		self.searchGrid.onRowsChanged.subscribe(function(e, data)
-		{
-			self.selectedRecordIds = Enumerable.From(data).Select(function(c)
-			{
-				return c.Id;
-			}).ToArray();
-
-			if (self.obShowDetailPanel() && self.selectedRecordIds[0])
-			{
-				self.detailView.showDetailViewById(self.selectedRecordIds[0]);
-			}
-		}.bind(self));
-
 		if (!TF.isPhoneDevice)
 		{
 			self.searchGrid.onDoubleClick.subscribe(function(e, data)
@@ -123,7 +115,15 @@
 		else
 		{
 			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
-			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+			if (TF.isPhoneDevice)
+			{
+				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+			}
+			else
+			{
+				tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+			}
+
 		}
 		self.obShowDetailPanel(true);
 	};
@@ -235,6 +235,10 @@
 		self.bindEvent(".iconbutton.addremovecolumn", function(model, e)
 		{
 			self.searchGrid.addRemoveColumnClick(model, e);
+		});
+		self.bindEvent(".iconbutton.details", function(model, e)
+		{
+			self.showDetailsClick();
 		});
 		if (self.approveClick)
 		{
