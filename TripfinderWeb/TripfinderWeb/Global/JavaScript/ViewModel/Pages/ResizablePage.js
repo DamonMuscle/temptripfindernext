@@ -90,7 +90,7 @@
 
 		self.obRightTemplate(templateName);
 		self.obRightData(data);
-		$content = $("<div data-bind='template:{ name: obRightTemplate, data: obRightData }'></div>");
+		$content = $("<div class='main-body' data-bind='template:{ name: obRightTemplate, data: obRightData }'></div>");
 
 		self.$rightPage.append($content);
 		ko.applyBindings(ko.observable(self), $content[0]);
