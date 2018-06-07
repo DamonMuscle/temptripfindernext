@@ -149,13 +149,6 @@
 								<button type="button" class="btn btn-default btn-sharp">
 									<span class="caret"></span>
 								</button>
-								<button data-bind="click:generateFunction(editNewEntity,'school',GetSchoolId(obEntityDataModel().school()),obCurrentSchoolName()), visible:obIsSchoolEdit, disable: schoolDisable(), css:schoolCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button type="button" class="btn btn-default btn-sharp" data-bind="click:generateFunction(addNewEntity,'school'), visible:obIsSchoolAdd">
-									<span class="glyphicon glyphicon-plus"></span>
-								</button>
 							</div>
 						</div>
 					</div>
@@ -507,6 +500,8 @@
 				<div class="view-form-grid resources" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeResources.bind($parent)}">
 				</div>
 				<!-- /ko -->
+				<div class="iconbutton popout pull-right icon-cursor" style="position: absolute;top: 25px;right: 15px;" title="Resources"
+				 data-bind="click:viewResourceClick"></div>
 			</div>
 			<div class="col-xs-24">
 				<div>

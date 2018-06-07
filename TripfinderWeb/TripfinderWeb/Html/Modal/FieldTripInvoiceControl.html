@@ -1,0 +1,72 @@
+﻿<div class="document-dataentry" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group">
+				<label class="requirestar">Account Name</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true}">
+						<!-- ko customInput:{type:"String",value:obSelectedAccountText,attributes:{class:"form-control",name:"name"}} --><!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<h4><strong>Billing</strong></h4>
+		</div>
+	</div>
+	<!--ko if: obEntityType()=="fieldtrip"-->
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label>Amount</label>
+				<input type="text" class="form-control" data-bind="value:obEntityDataModel().amount" maxlength="10">
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label>PO</label>
+				<input type="text" class="form-control" data-bind="value:obEntityDataModel().purchaseOrder" maxlength="10">
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label>Invoice Date</label>
+				<!-- ko customInput:{type:"Date",value:obEntityDataModel().invoiceDate,attributes:{class:"form-control",name:"invoiceDate"}} -->
+				<!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label>Payment Date</label>
+				<!-- ko customInput:{type:"Date",value:obEntityDataModel().paymentDate,attributes:{class:"form-control",name:"paymentDate"}} -->
+				<!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<!--/ko-->
+	<!--ko if: obEntityType()=="fieldtriptemplate"-->
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="form-group">
+				<label>Amount</label>
+				<input type="text" class="form-control" data-bind="value:obEntityDataModel().amount" maxlength="10">
+			</div>
+		</div>
+	</div>
+	<!--/ko-->
+</div>
+
+
+
+

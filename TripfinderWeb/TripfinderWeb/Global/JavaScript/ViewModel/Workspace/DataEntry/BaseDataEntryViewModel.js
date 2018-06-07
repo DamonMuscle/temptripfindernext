@@ -801,7 +801,11 @@
 
 	BaseDataEntryViewModel.prototype.closeClick = function(viewModel, e)
 	{
-		this.onRequestClose.notify(this.obEntityDataModel());
+		// this.onRequestClose.notify(this.obEntityDataModel());
+		// $(".right-page").empty();
+		$(".right-page").hide();
+		$(".resize-handler").hide();
+		// tf.pageManager.resizablePage.reLayoutPage();
 	};
 
 	BaseDataEntryViewModel.prototype.pendingSave = function()
