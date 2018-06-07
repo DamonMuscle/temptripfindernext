@@ -21,7 +21,8 @@
 		self.kendoGridScroll = null;
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
-		// self.type = null;
+		self.isGridPage = true;
+
 		self.approveButton = false;
 		self.declineButton = false;
 		self.cancelButton = false;
@@ -80,6 +81,10 @@
 			filteredIds: option.filteredIds
 		}));
 		self.searchGrid.filterMenuClick = self.searchGrid.filterMenuClick.bind(self);
+		self.searchGrid.onDoubleClick.subscribe(function(e, data)
+		{
+			self.showDetailsClick();
+		}.bind(self));
 		self.searchGrid.onRowsChanged.subscribe(function(e, data)
 		{
 			self.selectedRecordIds = Enumerable.From(data).Select(function(c)
@@ -87,15 +92,19 @@
 				return c.Id;
 			}).ToArray();
 
-			if (self.obShowDetailPanel())
+			if (self.obShowDetailPanel() && self.selectedRecordIds[0])
 			{
-				self.detailView.setEntity(self.selectedRecordIds[0]);
+				self.detailView.showDetailViewById(self.selectedRecordIds[0]);
 			}
 		}.bind(self));
+
+		if (!TF.isPhoneDevice)
+		{
 		self.searchGrid.onDoubleClick.subscribe(function(e, data)
 		{
 			self.showDetailsClick();
 		});
+		}
 
 		self._openBulkMenu();
 		self.targetID = ko.observable();
@@ -112,9 +121,9 @@
 		}
 
 		selectedId = selectedIds[0];
-		if (self.obShowDetailPanel())
+		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
-			self.detailView.setEntity(selectedId);
+			self.detailView.showDetailViewById(selectedId);
 		}
 		else
 		{

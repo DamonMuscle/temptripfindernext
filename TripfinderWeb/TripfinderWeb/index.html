@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.default.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.fiori.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrapslider/css/bootstrap-slider.min.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/StackBlock/gridstack.css" />
 
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
 	<link rel="stylesheet" href="Global/Css/tripfinder.css"></link>
@@ -44,6 +45,9 @@
 	<script src="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datetimepicker.js"></script>
 	<script src="Global/ThirdParty/pubsub.js"></script>
 	<script src="Global/ThirdParty/bootstrapslider/bootstrap-slider.min.js"></script>
+	<script src="Global/ThirdParty/StackBlock/lodash.min.js"></script>
+	<script src="Global/ThirdParty/StackBlock/gridstack.js"></script>
+	<script src="Global/ThirdParty/StackBlock/gridstack.jQueryUI.js"></script>
 	<!-- build:js Global/JavaScript/tripfinder.js -->
 	<script src="Global/JavaScript/Framework/Namespacing.js"></script>
 	<script src="Global/JavaScript/Framework/UserPreferenceManager.js"></script>
@@ -152,7 +156,16 @@
 	<script src="Global/JavaScript/ViewModel/Controls/AddTwoFieldsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/FieldTripDestinationViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/FieldTripBillingClassificationViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ManageDetailScreenLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointsJSON.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointPanel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointGroupHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/LineBlockHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/LayoutMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlocksMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/ConditionalAppearanceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/EditDataBlockAppearance.js"></script>
 
 	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GridDefinition/FieldTripGridDefinition.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
@@ -186,6 +199,8 @@
 	<script src="Global/JavaScript/Modal/FieldTripDestinationModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/FieldTripBillingClassificationModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/ModifyDataEntryListItemModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ManageDetailScreenLayoutModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ConditionalAppearanceModalViewModel.js"></script>
 
 	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/UserPreferenceDataModel.js"></script>
@@ -206,6 +221,7 @@
 	<script src="Global/JavaScript/DataModel/VehicleMakeDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/VehicleMakeOfBodyDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/VehicleCategoryDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/DetailScreenLayoutDataModel.js"></script>
 
 	<script src="Global/JavaScript/Main.js"></script>
 	<script src="Global/JavaScript/Startup.js"></script>

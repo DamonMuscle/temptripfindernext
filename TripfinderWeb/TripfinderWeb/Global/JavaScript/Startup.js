@@ -301,8 +301,8 @@
 								if (!TF.isPhoneDevice)
 								{
 									tf.pageManager.initNavgationBar();
-									tf.pageManager.initResizePanel();
 								}
+								tf.pageManager.initResizePanel();
 
 								tf.pageManager.resizablePage.onLoaded.subscribe(function()
 								{

@@ -55,3 +55,22 @@
 @QUICK_FILTER_CLEAR_BUTTON: 3;
 @DRAGGABLE_DRAGGING: 1003;
 @GRID_MASK: 1200;
+
+@basefontsize: 13px;
+
+html,
+body {
+	.fontSize(1,
+	0);
+}
+
+.fontSize(@times,
+@increasement) {
+	font-size: @times*@basefontsize + @increasement;
+}
+
+.fontSize(@times,
+@increasement,
+@flag) {
+	font-size: @times*@basefontsize + @increasement  !important;
+}
