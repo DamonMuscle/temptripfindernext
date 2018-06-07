@@ -638,7 +638,7 @@
 			$nonDataElements = self.$element.find(".right > .data-point-item:not(.ui-draggable)");
 
 		$nonDataElements.draggable({
-			containment: ".main-body",
+			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false,
 			cursorAt: { top: 0, left: 0 },
@@ -986,7 +986,7 @@
 	{
 		var self = this, HLine = self.$element.find(".right .horizontal-line"), VLine = self.$element.find(".right .vertical-line");
 		HLine.draggable({
-			containment: ".main-body",
+			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false,
 			cursorAt: { top: 0, left: 0 },
@@ -1018,7 +1018,7 @@
 		});
 
 		VLine.draggable({
-			containment: ".main-body",
+			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false,
 			cursorAt: { top: 0, left: 0 },
@@ -1136,7 +1136,7 @@
 				}
 				self.currentGroup(null);
 			},
-			containment: ".main-body",
+			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false
 		});
@@ -1304,7 +1304,6 @@
 	DataPointPanel.prototype.dispose = function()
 	{
 		var self = this, kendoCalendar;
-		self.ArcGIS = null;
 		self.onCloseDataPointPanelEvent.unsubscribeAll();
 		if (self.$calendar)
 		{
