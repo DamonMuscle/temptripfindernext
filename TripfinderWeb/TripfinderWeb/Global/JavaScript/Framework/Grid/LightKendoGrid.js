@@ -83,6 +83,7 @@
 		self.shouldIncludeAdditionFilterIds = false;
 
 		self._gridType = self.options.gridType;
+		self.pageType = self.options.pageType;
 
 		self.options.gridDefinition = self._excludeOnlyForFilterColumns(self.options.gridDefinition);
 		self._gridDefinition = self.options.gridDefinition =
@@ -663,11 +664,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-				{
-					extra: true,
-					mode: "menu row",
-					operators: TF.Grid.LightKendoGrid.DefaultOperator
-				},
+			{
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -4054,13 +4055,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
+								{
+									fields: self.geoFields,
+									IdFilter:
 									{
-										fields: self.geoFields,
-										IdFilter:
-											{
-												IncludeOnly: self.allIds
-											}
+										IncludeOnly: self.allIds
 									}
+								}
 							})
 							.then(function(response)
 							{

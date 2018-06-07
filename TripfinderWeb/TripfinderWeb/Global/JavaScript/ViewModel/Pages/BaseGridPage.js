@@ -59,6 +59,7 @@
 			baseOptions = {
 				storageKey: "grid.currentlayout." + self.type,
 				gridType: self.type,
+				pageType: self.pageType,
 				showBulkMenu: true,
 				showLockedColumn: true,
 				showOmittedCount: option.showOmittedCount,
