@@ -83,6 +83,7 @@
 		self.shouldIncludeAdditionFilterIds = false;
 
 		self._gridType = self.options.gridType;
+		self.pageType = self.options.pageType;
 
 		self.options.gridDefinition = self._excludeOnlyForFilterColumns(self.options.gridDefinition);
 		self._gridDefinition = self.options.gridDefinition =
@@ -205,14 +206,12 @@
 
 	LightKendoGrid.prototype.onGridDoubleClick = function(e)
 	{
-		var self = this, records = self.getSelectedRecords(),
-			dataItem = self.kendoGrid.dataItem($(e.target).closest("tr"));
 		if (e.shiftKey || e.ctrlKey)
 		{
 			return;
 		}
-		self._onGridItemClick(dataItem, e);
-		self.onDoubleClick.notify(records[records.length - 1]);
+		var records = this.getSelectedRecords();
+		this.onDoubleClick.notify(records[records.length - 1]);
 	};
 
 	LightKendoGrid.prototype._initLinkTd = function()
@@ -663,11 +662,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-				{
-					extra: true,
-					mode: "menu row",
-					operators: TF.Grid.LightKendoGrid.DefaultOperator
-				},
+			{
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -3912,6 +3911,12 @@
 			self.kendoGrid.select(selected);
 		}
 
+		self.$container.find(".k-grid-content-locked tr, .k-grid-content tr").click(function(e)
+		{
+			onKendoGridTRClickEvent.call(this, e, self);
+		});
+
+
 		if (self.options.isDataRowHover)
 		{
 			switch (self.options.gridType)
@@ -4054,13 +4059,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
+								{
+									fields: self.geoFields,
+									IdFilter:
 									{
-										fields: self.geoFields,
-										IdFilter:
-											{
-												IncludeOnly: self.allIds
-											}
+										IncludeOnly: self.allIds
 									}
+								}
 							})
 							.then(function(response)
 							{
