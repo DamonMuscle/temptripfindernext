@@ -1334,42 +1334,6 @@
 
 		$(window).resize(this.onResizeHandler);
 		this.onResizeHandler();
-
-		if (!self.opts.staticGrid && typeof self.opts.removable === 'string')
-		{
-			var trashZone = $(self.opts.removable);
-			if (!this.dd.isDroppable(trashZone))
-			{
-				this.dd.droppable(trashZone, {
-					accept: '.' + self.opts.itemClass,
-					tolerance: 'pointer'
-				});
-			}
-			this.dd
-				.on(trashZone, 'dropover', function(event, ui)
-				{
-					var el = $(ui.draggable);
-					var node = el.data('_gridstack_node');
-					if (node._grid !== self)
-					{
-						return;
-					}
-					el.addClass('removing');
-					self._setupRemovingTimeout(el);
-				})
-				.on(trashZone, 'dropout', function(event, ui)
-				{
-					var el = $(ui.draggable);
-					var node = el.data('_gridstack_node');
-					if (node._grid !== self)
-					{
-						return;
-					}
-					el.removeClass('removing');
-					self._clearRemovingTimeout(el);
-				});
-		}
-
 		if (!self.opts.staticGrid && self.opts.acceptWidgets)
 		{
 			var draggingElement = null;
@@ -1994,6 +1958,47 @@
 
 		this._prepareElementsByNode(el, node);
 	};
+
+
+
+	GridStack.prototype.setRemovingBound = function()
+	{
+		var self = this;
+		if (!self.opts.staticGrid && typeof self.opts.removable === 'string')
+		{
+			var trashZone = $(self.opts.removable);
+			if (!this.dd.isDroppable(trashZone))
+			{
+				this.dd.droppable(trashZone, {
+					accept: '.' + self.opts.itemClass,
+					tolerance: 'pointer'
+				});
+			}
+			this.dd
+				.on(trashZone, 'dropover', function(event, ui)
+				{
+					var el = $(ui.draggable);
+					var node = el.data('_gridstack_node');
+					if (node._grid !== self)
+					{
+						return;
+					}
+					el.addClass('removing');
+					self._setupRemovingTimeout(el);
+				})
+				.on(trashZone, 'dropout', function(event, ui)
+				{
+					var el = $(ui.draggable);
+					var node = el.data('_gridstack_node');
+					if (node._grid !== self)
+					{
+						return;
+					}
+					el.removeClass('removing');
+					self._clearRemovingTimeout(el);
+				});
+		}
+	}
 
 	GridStack.prototype.setAnimation = function(enable)
 	{

@@ -1304,7 +1304,6 @@
 	DataPointPanel.prototype.dispose = function()
 	{
 		var self = this, kendoCalendar;
-		self.ArcGIS = null;
 		self.onCloseDataPointPanelEvent.unsubscribeAll();
 		if (self.$calendar)
 		{

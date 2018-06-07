@@ -2002,7 +2002,7 @@
 				autoHide: true,
 				handles: 'n, ne, e, se, s, sw, w, nw'
 			},
-			removable: '.data-points-panel.left-panel',
+			removable: '.other-page',
 			removeTimeout: 100,
 			animate: true
 		};
@@ -4692,10 +4692,10 @@
 		self.dataPointPanel = data;
 		self.dataPointPanel.onCloseDataPointPanelEvent.subscribe(function()
 		{
-			self.searchGrid.fitContainer();
+			tf.pageManager.resizablePage.clearLeftOtherContent();
 		});
 		tf.pageManager.resizablePage.setLeftPage("workspace/detailview/DataPointPanel", self.dataPointPanel);
-
+		self.grid.setRemovingBound();
 	};
 
 	/**
@@ -5214,7 +5214,6 @@
 				calendar.destroy();
 			}
 		}
-		self.ArcGIS = null;
 		self.onToggleDataPointPanelEvent.unsubscribeAll();
 		self.onClosePanelEvent.unsubscribeAll();
 		self.onCloseEditMode.unsubscribeAll();
