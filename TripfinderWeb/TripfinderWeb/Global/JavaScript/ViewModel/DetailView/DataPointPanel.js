@@ -418,7 +418,7 @@
 
 	DataPointPanel.prototype.updateDataPoints = function()
 	{
-		var self = this, dataPoints = dataPointsJSON, category = "Field Trip", dataPointGroup, result,
+		var self = this, dataPoints = dataPointsJSON, category = "fieldtrip", dataPointGroup, result,
 			dataPointsForCurrentPage = dataPoints[category], subCategories = Object.keys(dataPointsForCurrentPage);
 
 		self.groups.length = 0;

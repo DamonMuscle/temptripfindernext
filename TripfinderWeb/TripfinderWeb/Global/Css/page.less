@@ -61,6 +61,16 @@ body,
 		height: 100%;
 		width: 100%;
 
+		.icon {
+			width: 16px;
+			height: 20px;
+			float: left;
+			margin-right: 5px;
+			cursor: pointer;
+			background-position-y: 2px;
+			background-repeat: no-repeat;
+		}
+
 		.page-container {
 			height: 100%;
 			width: 100%;
@@ -173,7 +183,7 @@ body {
 	position: fixed;
 
 
-	>.overlay {
+	> .overlay {
 		background: rgba(102, 102, 102, 0.8);
 		position: absolute;
 		top: 0;
@@ -231,7 +241,7 @@ body {
 	&.no-overlay {
 		position: initial;
 
-		>.overlay {
+		> .overlay {
 			position: initial;
 		}
 	}
@@ -288,7 +298,7 @@ body {
 		line-height: 30px;
 		font-size: 24px;
 
-		>.title {
+		> .title {
 			background: url("../img/Transfinder-TripfinderText-Only.png") no-repeat center/100%;
 			background-size: 100% 100%;
 			display: block;
@@ -423,6 +433,7 @@ body {
 		.gridrow {
 			height: 100%;
 			position: relative;
+			overflow-x: hidden;
 
 			.kendo-grid {
 				border-width: 0;
@@ -447,11 +458,11 @@ body {
 	}
 }
 
-.checkbox>label {
+.checkbox > label {
 	line-height: 1.8;
 }
 
-.radio>label {
+.radio > label {
 	line-height: 1.8;
 }
 
@@ -499,4 +510,60 @@ body {
 
 .document-grid.page-container {
 	overflow-x: hidden;
+}
+
+.modal-body.saveNewThematic-modal .thematic-name {
+	height: 64px;
+}
+
+.modal-body .thematic-name {
+	margin-bottom: 5px;
+
+	&.has-error {
+		input {
+			border-color: #E71931;
+
+			&.delay-show {
+				border-color: #bcbcbc;
+			}
+		}
+	}
+
+	label {
+		width: 100%;
+		font-weight: bold;
+		color: #333333;
+		font-size: 14px;
+		font-family: "SourceSansPro-SemiBold";
+		padding-top: 3px;
+	}
+
+	input {
+		width: 100%;
+		font-size: 15px;
+		border: none;
+		border-bottom: 1px solid #bcbcbc;
+		outline-color: transparent;
+		color: #333333;
+		padding-bottom: 4px;
+		height: 24px;
+	}
+
+	.help-block {
+		font-family: "SourceSansPro-Italic";
+	}
+
+	small.help-block {
+		font-size: 10px;
+		padding-bottom: 6px;
+		color: #E71931 !important;
+
+		&.always-show {
+			display: block !important;
+		}
+
+		&.always-hide {
+			display: none !important;
+		}
+	}
 }

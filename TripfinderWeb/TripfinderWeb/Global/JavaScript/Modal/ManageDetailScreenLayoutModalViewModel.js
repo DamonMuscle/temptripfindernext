@@ -14,9 +14,10 @@
 		self.sizeCss = "modal-dialog-lg";
 		self.title("Manage Layout");
 		self.contentTemplate("Modal/ManageDetailScreenLayout");
-		self.buttonTemplate("modal/positivenegative");
+		self.buttonTemplate("modal/positivenegativeother");
 		self.obPositiveButtonLabel("Apply");
 		self.obNegativeButtonLabel("Close");
+		self.obOtherButtonLabel("Import Layout");
 
 		self.manageLayoutViewModel = new TF.Control.ManageDetailScreenLayoutViewModel(gridType, selectId, alwaysApply);
 		self.applyToPanel = self.applyToPanel.bind(self);
@@ -36,15 +37,11 @@
 	ManageDetailScreenLayoutModalViewModel.prototype.positiveClick = function()
 	{
 		var self = this;
-		self.manageLayoutViewModel.apply().then(function(data)
+		self.manageLayoutViewModel.apply().then(function(response)
 		{
-			if (data)
+			if (response !== false)
 			{
-				self.positiveClose({ isOpenTemp: false, data: data });
-			}
-			else
-			{
-				self.positiveClose(false);
+				self.positiveClose(response ? { isOpenTemp: false, data: response } : false);
 			}
 		});
 	};
@@ -121,12 +118,24 @@
 	};
 
 	/**
+	 * The click event handler for other button.
+	 * @param {Event} e 
+	 * @param {Object} data 
+	 * @return {void}
+	 */
+	ManageDetailScreenLayoutModalViewModel.prototype.otherClick = function(e, data)
+	{
+		this.manageLayoutViewModel.openImportLayoutFileInput();
+	};
+
+	/**
 	 * The dispose function.
 	 * @returns {void}
 	 */
 	ManageDetailScreenLayoutModalViewModel.prototype.dispose = function()
 	{
 		var self = this;
+		self.manageLayoutViewModel.pageLevelViewModel.clearError();
 		self.manageLayoutViewModel.dispose();
 	};
 })();

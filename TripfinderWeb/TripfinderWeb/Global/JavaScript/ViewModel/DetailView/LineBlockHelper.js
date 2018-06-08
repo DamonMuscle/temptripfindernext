@@ -82,7 +82,7 @@
 	};
 
 	//Temporary
-	LineBlockHelper.prototype.vLineDraggingIn = function($vline)
+	LineBlockHelper.prototype.vLineDraggingIn = function($vline, $helper)
 	{
 		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), unitHeight = self.detailView.UNITHEIGHT + 1, height, left,
 			unitWidth = $(".line-container").outerWidth(), x, y, placeholder, gridWidth = self.detailView.getCurrentWidth(),
@@ -91,13 +91,16 @@
 
 		$gridStack.find(".placeholder-line").remove();
 
-		if (left < 0)
+		if ($helper)
 		{
-			$vline.addClass('removing');
-		}
-		else
-		{
-			$vline.removeClass('removing');
+			if (left < 0)
+			{
+				$helper.addClass('removing');
+			}
+			else
+			{
+				$helper.removeClass('removing');
+			}
 		}
 
 		y = parseInt(top / unitHeight);
@@ -136,7 +139,7 @@
 		}, x, y, 0, height);
 	};
 
-	LineBlockHelper.prototype.hLineDraggingIn = function($hline)
+	LineBlockHelper.prototype.hLineDraggingIn = function($hline, $helper)
 	{
 		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), unitHeight = self.detailView.UNITHEIGHT + 1, width,
 			unitWidth = $(".line-container").outerWidth(), x, y, placeholder, gridWidth = self.detailView.getCurrentWidth(),
@@ -145,13 +148,16 @@
 
 		$gridStack.find(".placeholder-line").remove();
 
-		if (left < 0)
+		if ($helper)
 		{
-			$hline.addClass('removing');
-		}
-		else
-		{
-			$hline.removeClass('removing');
+			if (left < 0)
+			{
+				$helper.addClass('removing');
+			}
+			else
+			{
+				$helper.removeClass('removing');
+			}
 		}
 
 		y = parseInt(top / unitHeight);
@@ -282,26 +288,45 @@
 		});
 		$gridStack.append($line);
 		$line.draggable({
-			containment: "#pageContent",
+			containment: ".main-body",
 			appendTo: "body",
 			// left should greater than 2, because vertical line has -2px margin-left css,
 			// otherwise lineContainer will not trigger drop event.
 			cursorAt: { left: 3, top: 8 },
 			scroll: false,
-			drag: function(evt)
+			helper: function(e)
 			{
-				self.vLineDraggingIn($line);
+				var $helper = $(e.target).clone(), height = $(e.target).height();
+				$helper.addClass("disable-animation");
+				$helper.css({
+					width: '1px',
+					height: height
+				});
+				return $helper;
+			},
+			drag: function(evt, ui)
+			{
+				var helperOffset = $(ui.helper).offset(),
+					containerOffset = $gridStack.offset();
+				$line.css({
+					left: helperOffset.left - containerOffset.left + 'px',
+					top: helperOffset.top - containerOffset.top + 'px'
+				});
+
+				self.vLineDraggingIn($line, ui.helper);
 			},
 			start: function()
 			{
+				$line.addClass('dragging');
 				$(".right-container .line-container").addClass("drag-line");
 				$line.addClass("disable-animation");
 			},
 			stop: function(e, ui)
 			{
+				$line.removeClass('dragging');
 				if (ui.helper.hasClass('removing'))
 				{
-					ui.helper.remove();
+					$line.remove();
 				}
 				else
 				{
@@ -432,24 +457,43 @@
 		});
 		$gridStack.append($line);
 		$line.draggable({
-			containment: "#pageContent",
+			containment: ".main-body",
 			appendTo: "body",
 			cursorAt: { left: 8, top: 0 },
 			scroll: false,
-			drag: function(evt)
+			helper: function(e)
 			{
-				self.hLineDraggingIn($line);
+				var $helper = $(e.target).clone(), width = $(e.target).width();
+				$helper.addClass("disable-animation");
+				$helper.css({
+					width: width,
+					height: '1px'
+				});
+				return $helper;
+			},
+			drag: function(evt, ui)
+			{
+				var helperOffset = $(ui.helper).offset(),
+					containerOffset = $gridStack.offset();
+				$line.css({
+					left: helperOffset.left - containerOffset.left + 'px',
+					top: helperOffset.top - containerOffset.top + 'px'
+				});
+
+				self.hLineDraggingIn($line, ui.helper);
 			},
 			start: function()
 			{
+				$line.addClass('dragging');
 				$(".right-container .line-container").addClass("drag-line");
 				$line.addClass("disable-animation");
 			},
 			stop: function(e, ui)
 			{
+				$line.removeClass('dragging');
 				if (ui.helper.hasClass('removing'))
 				{
-					ui.helper.remove();
+					$line.remove();
 				}
 				else
 				{

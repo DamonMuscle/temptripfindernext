@@ -182,4 +182,33 @@
 			}
 		});
 	};
+
+	/**
+	 * Get the page title by name.
+	 * @param {String} pageName
+	 * @return {String} 
+	 */
+	PageManager.prototype.getPageTitleByPageName = function(pageName)
+	{
+		var self = this;
+		switch (pageName)
+		{
+			case "fieldtrip":
+				return "Field Trips";
+			default:
+				return null;
+		}
+	};
+
+	/**
+ * Get all data types that current user has permission to access.
+ * @return {Array}
+ */
+	PageManager.prototype.getAvailableDataTypes = function()
+	{
+		var allDataTypes = [
+			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
+		];
+		return allDataTypes.filter(function(item) { return item.permission; });
+	};
 })();

@@ -8,20 +8,46 @@
 	 */
 	function ManageDetailScreenLayoutViewModel(gridType, selectId, alwaysApply)
 	{
-		var self = this;
+		var self = this, selectedDataType,
+			availableDataTypes = tf.pageManager.getAvailableDataTypes()
+
+		availableDataTypes.unshift({ name: "all", label: "All Data Types" });
+		availableDataTypes = availableDataTypes.map(function(item)
+		{
+			return {
+				name: ko.observable(item.name),
+				label: ko.observable(item.label),
+			}
+		});
+		selectedDataType = availableDataTypes.filter(function(item) { return item.name() === gridType; })[0];
+
+		self.userMessages = {
+			"WRONG_LAYOUT_TYPE": "This layout cannot be used with this data type. Please select a different layout.",
+			"FAIL_VALIDATION_MSG": "File is unreadable. For more information, contact support.",
+			"NO_PERMISSION_MSG": "You don't have the permission to this layout's grid type.",
+			"WRONG_FILE_TYPE_MSG": "Incorrect file type. Please upload a [.tfdetaillayout] to import."
+		};
+
 		self.gridType = gridType;
-		self.selectedIdOnPanel = selectId ? selectId : null;
-		self.selectedId = selectId ? selectId : null;
-		self.selectedName = "";
+		self.selectedIdOnPanel = selectId || null;
+		self.selectedRowId = selectId || null;
+		self.selectedRowName = "";
 		self.isDeleted = false;
 		self.alwaysApply = alwaysApply;
 
+		self.obSelectedType = ko.observable(selectedDataType);
+		self.obAvailableDataTypes = ko.observableArray(availableDataTypes);
 		self.obGridCountSummary = ko.observable("");
 		self.layoutEntities = [];
 
 		//Events
 		self.onApplyToPanel = new TF.Events.Event();
 		self.onEditToPanel = new TF.Events.Event();
+
+		self.onSelectedDataTypeChanged = self.onSelectedDataTypeChanged.bind(self);
+		self.onLayoutJsonFileSelected = self.onLayoutJsonFileSelected.bind(self);
+
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	};
 
 	/**
@@ -32,14 +58,16 @@
 	 */
 	ManageDetailScreenLayoutViewModel.prototype.init = function(viewModel, el)
 	{
-		var self = this;
+		var self = this, selectedType = self.obSelectedType().name();
 
 		self.$element = $(el);
 		self.$grid = self.$element.find(".managefiltergrid-container");
 		self.$footer = self.$element.closest(".modal-content").find(".modal-footer");
+		self.$importLayoutInput = self.$element.find("#import-layout");
 		self.kendoGrid = null;
+		self.detailViewHelper = new TF.DetailView.DetailViewHelper();
 
-		self.initData(self.gridType).then(function()
+		self.initData(selectedType).then(function()
 		{
 			self.initParameters();
 			self.initGrid();
@@ -63,13 +91,28 @@
 				}
 			},
 			{
-				command: [{
-					name: "edit",
-					click: self.editBtnClick.bind(self)
-				}, {
-					name: "delete",
-					click: self.deleteBtnClick.bind(self)
-				}],
+				field: "DataType",
+				title: "Data Type",
+				width: "160px",
+				template: function(dataItem)
+				{
+					return tf.pageManager.getPageTitleByPageName(dataItem.Table);
+				}
+			},
+			{
+				command: [
+					{
+						name: "export",
+						click: self.exportBtnClick.bind(self)
+					},
+					{
+						name: "edit",
+						click: self.editBtnClick.bind(self)
+					},
+					{
+						name: "delete",
+						click: self.deleteBtnClick.bind(self)
+					}],
 				title: "Action",
 				width: "80px",
 				attributes: {
@@ -87,7 +130,7 @@
 	ManageDetailScreenLayoutViewModel.prototype.initData = function(gridType)
 	{
 		var self = this, paramData = {};
-		if (gridType)
+		if (gridType && gridType !== "all")
 		{
 			paramData.table = gridType;
 		}
@@ -126,7 +169,7 @@
 		self.$grid.kendoGrid({
 			dataSource: {
 				data: entities,
-				sort: { field: "Name", dir: "asc" }
+				sort: { field: "Table", dir: "asc" }
 			},
 			height: 300,
 			scrollable: true,
@@ -148,9 +191,19 @@
 			uid = self.kendoGrid.select().attr("data-kendo-uid"),
 			dataRow = self.kendoGrid.dataSource.getByUid(uid);
 
-		self.$footer.find(".btn.positive").prop("disabled", false);
-		self.selectedId = dataRow.Id;
-		self.selectedName = dataRow.Name;
+		if (dataRow)
+		{
+			self.$footer.find(".btn.positive").prop("disabled", false);
+			self.selectedRowId = dataRow.Id;
+			self.selectedRowName = dataRow.Name;
+			self.selectedRowType = dataRow.Table;
+		}
+		else
+		{
+			self.$footer.find(".btn.positive").prop("disabled", true);
+			self.selectedId = null;
+			self.selectedName = "";
+		}
 	};
 
 	/**
@@ -162,6 +215,7 @@
 	{
 		var self = this, dataList, $row, isAnySelected = false;
 
+		// Highlight current layout.
 		self.kendoGrid = self.$grid.data("kendoGrid");
 		dataList = self.kendoGrid.dataSource.data();
 
@@ -170,10 +224,18 @@
 			$row = $("[data-kendo-uid=\"" + item.uid + "\"]");
 			$row.dblclick(function()
 			{
-				self.onApplyToPanel.notify(self.apply(item.Id, item.Name));
+				self.pageLevelViewModel.clearError();
+				if (self.gridType !== item.Table)
+				{
+					self.pageLevelViewModel.popupErrorMessage("Please select a valid layout.");
+				}
+				else
+				{
+					self.onApplyToPanel.notify(self.apply(item.Id, item.Name));
+				}
 			});
 
-			if (item["Id"] === self.selectedId)
+			if (item["Id"] === self.selectedRowId)
 			{
 				self.kendoGrid.select($row);
 				isAnySelected = true;
@@ -181,6 +243,17 @@
 		});
 
 		self.$footer.find(".btn.positive").prop("disabled", !isAnySelected);
+
+		// Alter for scrollbar
+		var headerPaddingRight = 0,
+			$gridContent = self.$grid.find(".k-grid-content");
+		if ($gridContent.children('table').height() > $gridContent.height())
+		{
+			headerPaddingRight = 17;
+		}
+		self.$grid.find('.k-grid-header').css({
+			'padding-right': headerPaddingRight + 'px'
+		});
 	};
 
 	/**
@@ -203,6 +276,21 @@
 	};
 
 	/**
+	 * The click event handler for export layout button.
+	 * @param {Event} e The click event.
+	 * @return {void}
+	 */
+	ManageDetailScreenLayoutViewModel.prototype.exportBtnClick = function(e)
+	{
+		e.preventDefault();
+
+		var self = this, entity = self.getEntityDataModelForEvent(e),
+			id = entity.id();
+
+		window.location = pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "download", id);
+	};
+
+	/**
 	 * The click event handler for Edit entity button.
 	 * @param {Event} e The click event.
 	 * @return {void}
@@ -212,11 +300,19 @@
 		e.preventDefault();
 
 		var self = this,
-			entity = self.getEntityDataModelForEvent(e),
-			selectData = {
+			entity = self.getEntityDataModelForEvent(e);
+
+		if (self.gridType === entity.table())
+		{
+			self.onEditToPanel.notify({
 				id: entity.id()
-			};
-		self.onEditToPanel.notify(selectData);
+			});
+		}
+		else
+		{
+			self.pageLevelViewModel.clearError();
+			self.pageLevelViewModel.popupErrorMessage(self.userMessages["WRONG_LAYOUT_TYPE"]);
+		}
 	};
 
 	/**
@@ -252,8 +348,8 @@
 	 */
 	ManageDetailScreenLayoutViewModel.prototype.refreshGrid = function()
 	{
-		var self = this;
-		self.initData(self.gridType).then(function()
+		var self = this, selectedType = self.obSelectedType().name();
+		self.initData(selectedType).then(function()
 		{
 			self.initGrid();
 		});
@@ -313,16 +409,164 @@
 	 */
 	ManageDetailScreenLayoutViewModel.prototype.apply = function(id, name)
 	{
-		var self = this, selectId = id ? id : self.selectedId, selectData;
+		var self = this, selectId = id || self.selectedRowId, selectData;
+
+		if (self.gridType !== self.selectedRowType)
+		{
+			self.pageLevelViewModel.clearError();
+			self.pageLevelViewModel.popupErrorMessage(self.userMessages["WRONG_LAYOUT_TYPE"]);
+			return Promise.resolve(false);
+		}
+
 		if (self.selectedIdOnPanel !== selectId || self.alwaysApply)
 		{
 			selectData = {
 				selectId: selectId,
-				selectName: name ? name : self.selectedName,
+				selectName: name || self.selectedRowName,
 				isDeleted: self.isDeleted
 			};
 		}
 		return Promise.resolve(selectData);
+	};
+
+	/**
+ * The event handler when selected data type is updated.
+ * @param {Object} model 
+ * @param {Event} e 
+ */
+	ManageDetailScreenLayoutViewModel.prototype.onSelectedDataTypeChanged = function(model, e)
+	{
+		var self = this;
+		self.refreshGrid();
+	};
+
+	/**
+	 * The event handler when a layout json file is selected in the file input.
+	 * @param {Object} model 
+	 * @param {Event} e 
+	 */
+	ManageDetailScreenLayoutViewModel.prototype.onLayoutJsonFileSelected = function(model, e)
+	{
+		var self = this,
+			fileInput = self.$importLayoutInput[0],
+			selectedFile = fileInput.files[0],
+			reader = new FileReader();
+
+		reader.onload = function(e)
+		{
+			var layoutType, jsonStr = this.result;
+			try
+			{
+				// Check if json string is valid json.
+				entity = JSON.parse(jsonStr);
+				entity.Layout = JSON.parse(entity.Layout);
+				layoutType = entity.Table;
+
+				// Check if the grid type is valid.
+				if (!tf.pageManager.getPageTitleByPageName(layoutType))
+				{
+					throw "FAIL_VALIDATION_MSG";
+				}
+				else
+				{
+					// Check if the user has permission to the grid type.
+					var layoutGridTypeObj = self.obAvailableDataTypes().filter(function(item) { return item.name() === layoutType; })[0];
+					if (!layoutGridTypeObj)
+					{
+						throw "NO_PERMISSION_MSG";
+					}
+					// Validate the layout entity content.
+					else if (self.detailViewHelper.validateLayoutEntity(entity, layoutType))
+					{
+						self.saveLayoutEntity(entity);
+						if (layoutType !== self.obSelectedType().name())
+						{
+							self.changeGridSelectionByName("all");
+						}
+
+						var successMsg = "\"" + entity.Name + "\" (" + layoutGridTypeObj.label() + ") " + "has been successfully imported.";
+						self.pageLevelViewModel.clearError();
+						self.pageLevelViewModel.popupSuccessMessage(successMsg);
+					}
+					else
+					{
+						throw "FAIL_VALIDATION_MSG";
+					}
+				}
+			}
+			catch (e)
+			{
+				var msg = self.userMessages[e] || self.userMessages["FAIL_VALIDATION_MSG"];
+				self.pageLevelViewModel.clearError();
+				self.pageLevelViewModel.popupErrorMessage(msg);
+			}
+			fileInput.value = null;
+		};
+
+		// The filename must have correct extension.
+		if (selectedFile.name.endsWith(".tfdetaillayout"))
+		{
+			reader.readAsText(selectedFile);
+		}
+		else
+		{
+			self.pageLevelViewModel.clearError();
+			self.pageLevelViewModel.popupErrorMessage(self.userMessages["WRONG_FILE_TYPE_MSG"]);
+		}
+	};
+
+	/**
+	 * Open the import layout file browser.
+	 * @return {void}
+	 */
+	ManageDetailScreenLayoutViewModel.prototype.openImportLayoutFileInput = function()
+	{
+		var self = this;
+		self.$importLayoutInput.click();
+	};
+
+	/**
+	 * Import a layout entity.
+	 * @param {Object} entity 
+	 * @return {void}
+	 */
+	ManageDetailScreenLayoutViewModel.prototype.saveLayoutEntity = function(entity)
+	{
+		var self = this,
+			saveCopy = new TF.DataModel.DetailScreenLayoutDataModel();
+
+		var data = saveCopy.toData();
+		data.Name = entity.Name;
+		data.SubTitle = entity.SubTitle;
+		data.Table = entity.Table;
+		data.Layout = JSON.stringify(entity.Layout);
+		data.Id = 0;
+		data.APIIsNew = true;
+
+		tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+			data: data
+		}).then(function(response)
+		{
+			self.refreshGrid();
+		});
+	};
+
+	/**
+	 * Change the on-select grid type by name.
+	 * @param {string} type 
+	 */
+	ManageDetailScreenLayoutViewModel.prototype.changeGridSelectionByName = function(type)
+	{
+		var self = this,
+			selectedType = self.obAvailableDataTypes().filter(function(item)
+			{
+				return type === item.name();
+			})[0];
+
+		if (selectedType)
+		{
+			self.obSelectedType(selectedType);
+		}
 	};
 
 	/**

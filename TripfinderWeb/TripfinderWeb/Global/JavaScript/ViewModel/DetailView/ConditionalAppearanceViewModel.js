@@ -766,7 +766,7 @@
 	ConditionalAppearanceViewModel.prototype.getDataPoints = function()
 	{
 		var self = this, categorys, key, dataPoints = [],
-			dataPointObj = dataPointsJSON[getTitleByType(self.gridType)],
+			dataPointObj = dataPointsJSON[self.gridType],
 			currentAvailableTypes = ["boolean", "string", "number", "date", "time"];
 		if (dataPointObj)
 		{

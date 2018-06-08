@@ -232,10 +232,10 @@
 	{
 		var self = this, $line, $hLines, $vLines, x, y, width, height;
 
-		$hLines = $(self.gridStackContainer).find(".hori-line:not(.ui-draggable-dragging):not(.ui-resizable-resizing)," +
+		$hLines = $(self.gridStackContainer).find(".hori-line:not(.dragging):not(.ui-draggable-dragging):not(.ui-resizable-resizing)," +
 			".placeholder-line.horizontal");
 
-		$vLines = $(self.gridStackContainer).find(".verti-line:not(.ui-draggable-dragging):not(.ui-resizable-resizing)," +
+		$vLines = $(self.gridStackContainer).find(".verti-line:not(.dragging):not(.ui-draggable-dragging):not(.ui-resizable-resizing)," +
 			".placeholder-line.vertical");
 
 		self.lines = [];
@@ -1151,7 +1151,7 @@
 			}),
 			draggable: _.defaults(opts.draggable || {}, {
 				handle: (opts.handleClass ? '.' + opts.handleClass : (opts.handle ? opts.handle : '')) ||
-					'.grid-stack-item-content',
+				'.grid-stack-item-content',
 				scroll: false,
 				appendTo: 'body'
 			}),
@@ -1720,10 +1720,14 @@
 
 		var dragOrResize = function(event, ui)
 		{
-			var x = Math.round(ui.position.left / cellWidth);
-			var y = Math.floor((ui.position.top + (cellHeight) / 2 + self.opts.verticalMargin) / (cellHeight + self.opts.verticalMargin));
-			var width;
-			var height;
+			var containerOffset = self.container.offset(),
+				helperOffset = ui.helper.offset(),
+				left = helperOffset.left - containerOffset.left,
+				top = helperOffset.top - containerOffset.top,
+				x = Math.round(left / cellWidth),
+				y = Math.floor((top + (cellHeight) / 2 + self.opts.verticalMargin) / (cellHeight + self.opts.verticalMargin)),
+				width, height;
+
 			if (event.type != 'drag')
 			{
 				width = Math.round(ui.size.width / cellWidth);
@@ -1794,7 +1798,15 @@
 			node.lastTriedHeight = height;
 			self.grid.moveNode(node, x, y, width, height);
 			self._updateContainerHeight();
-			self.container.trigger('resizeBlock', $(this));
+
+			if (event.type === 'drag')
+			{
+				node.el.find('.grid-stack-item').trigger('drag');
+			}
+			else
+			{
+				self.container.trigger('resizeBlock', $(this));
+			}
 		};
 
 		var onStartMoving = function(event, ui)
@@ -1825,6 +1837,10 @@
 			if (event.type == 'resizestart')
 			{
 				o.find('.grid-stack-item').trigger('resizestart');
+			}
+			if (event.type === 'dragstart')
+			{
+				o.find('.grid-stack-item').trigger('dragstart');
 			}
 		};
 
@@ -1903,6 +1919,11 @@
 				self.container.trigger('gsresizestop', o);
 			}
 			self.container.trigger('resizeBlock', o);
+
+			if (event.type === 'dragstop')
+			{
+				o.find('.grid-stack-item').trigger('dragstop');
+			}
 		};
 
 		this.dd
@@ -1983,6 +2004,7 @@
 					{
 						return;
 					}
+					ui.helper.addClass('removing');
 					el.addClass('removing');
 					self._setupRemovingTimeout(el);
 				})
@@ -1994,6 +2016,7 @@
 					{
 						return;
 					}
+					ui.helper.removeClass('removing');
 					el.removeClass('removing');
 					self._clearRemovingTimeout(el);
 				});

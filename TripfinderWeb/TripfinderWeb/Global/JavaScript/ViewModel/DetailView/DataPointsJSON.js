@@ -1,6 +1,6 @@
 var today = (new Date()).toDateString(),
 	dataPointsJSON = {
-		"Alternate Site": {
+		"altsite": {
 			"Main": [{
 				"field": "Name",
 				"title": "Name",
@@ -91,14 +91,14 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "80906"
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
 				"min-height": "3"
 			},
 			{
-				"field": "",
+				"field": "Map",
 				"title": "Map",
 				"type": "Map",
 				"defaultValue": "Map",
@@ -169,6 +169,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}],
 			"Grid": [{
+				field: "StudentGrid",
 				title: "Student Grid",
 				type: "grid",
 				url: "student",
@@ -176,7 +177,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			}]
 		},
-		"Contractor": {
+		"contractor": {
 			"Main": [{
 				"field": "Name",
 				"title": "Name",
@@ -244,7 +245,7 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -315,7 +316,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}]
 		},
-		"District": {
+		"district": {
 			"Main": [{
 				"field": "IdString",
 				"title": "Code",
@@ -383,13 +384,13 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "Calendar",
 				"title": "Calendar",
 				"type": "Calendar",
 				"min-height": "4"
 			},
 			{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -460,7 +461,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}]
 		},
-		"Field Trip": {
+		"fieldtrip": {
 			"Main": [{
 				"field": "Name",
 				"title": "Name",
@@ -900,7 +901,7 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Mrs. Perlstein"
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -913,7 +914,7 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			}]
 		},
-		"Geo Region": {
+		"georegion": {
 			"Main": [
 				{
 					"field": "Name",
@@ -1031,14 +1032,14 @@ var today = (new Date()).toDateString(),
 				}],
 			"Miscellaneous": [
 				{
-					"field": "",
+					"field": "File",
 					"title": "Documents",
 					"type": "File",
 					"defaultValue": "File list/browser",
 					"min-height": "3"
 				},
 				{
-					"field": "",
+					"field": "Map",
 					"title": "Map",
 					"type": "Map",
 					"min-height": "4"
@@ -1116,12 +1117,14 @@ var today = (new Date()).toDateString(),
 				}],
 			"Grid": [
 				{
+					field: "TripGrid",
 					title: "Trip Grid",
 					type: "grid",
 					url: "trip",
 					subUrl: "georegion",
 					"min-height": "3"
 				}, {
+					field: "AltsiteGrid",
 					title: "Alternate Site Grid",
 					type: "grid",
 					url: "altsite",
@@ -1129,6 +1132,7 @@ var today = (new Date()).toDateString(),
 					"min-height": "3"
 				},
 				{
+					field: "SchoolGrid",
 					title: "School Grid",
 					type: "grid",
 					url: "school",
@@ -1136,6 +1140,7 @@ var today = (new Date()).toDateString(),
 					"min-height": "3"
 				},
 				{
+					field: "StudentGrid",
 					title: "Student Grid",
 					type: "grid",
 					url: "student",
@@ -1143,6 +1148,7 @@ var today = (new Date()).toDateString(),
 					"min-height": "3"
 				},
 				{
+					field: "TripStopGrid",
 					title: "Trip Stop Grid",
 					type: "grid",
 					url: "tripstop",
@@ -1150,7 +1156,7 @@ var today = (new Date()).toDateString(),
 					"min-height": "3"
 				}]
 		},
-		"School": {
+		"school": {
 			"Main": [{
 				"field": "SchoolCode",
 				"title": "Code",
@@ -1210,14 +1216,18 @@ var today = (new Date()).toDateString(),
 				"title": "Allow Transfers at this School",
 				"type": "Boolean",
 				"defaultValue": "Yes",
-				"displayValue": "Transfers Allowed"
+				"displayValue": "Transfers Allowed",
+				"positiveLabel": "Transfers Allowed",
+				"negativeLabel": "Transfers not Allowed"
 			},
 			{
 				"field": "Private",
 				"title": "Private School",
 				"type": "Boolean",
 				"defaultValue": "Yes",
-				"displayValue": "Private School"
+				"displayValue": "Private School",
+				"positiveLabel": "Private School",
+				"negativeLabel": "Public School"
 			},
 			{
 				"field": "Contact",
@@ -1254,7 +1264,9 @@ var today = (new Date()).toDateString(),
 				"title": "Accept Sif Students",
 				"type": "Boolean",
 				"defaultValue": "true",
-				"displayValue": "SIF Students Accepted"
+				"displayValue": "SIF Students Accepted",
+				"positiveLabel": "SIF Students Accepted",
+				"negativeLabel": "SIF Students not Accepted"
 			},
 			{
 				"field": "Capacity",
@@ -1322,7 +1334,7 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "12305"
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -1335,13 +1347,13 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			},
 			{
-				"field": "",
+				"field": "Map",
 				"title": "Map",
 				"type": "Map",
 				"min-height": "4"
 			},
 			{
-				"field": "",
+				"field": "Calendar",
 				"title": "Calendar",
 				"type": "Calendar",
 				"min-height": "4"
@@ -1411,6 +1423,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}],
 			"Grid": [{
+				field: "StudentGrid",
 				title: "Student Grid",
 				type: "grid",
 				url: "student",
@@ -1418,6 +1431,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "TripGrid",
 				title: "Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -1425,6 +1439,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "StopGrid",
 				title: "Stop Grid",
 				type: "grid",
 				url: "tripstop",
@@ -1432,7 +1447,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			}]
 		},
-		"Staff": {
+		"staff": {
 			"Primary Information": [{
 				"field": "StaffLocalId",
 				"title": "Local ID",
@@ -1444,7 +1459,9 @@ var today = (new Date()).toDateString(),
 				"title": "Status",
 				"type": "Boolean",
 				"defaultValue": "True",
-				"displayValue": "Active"
+				"displayValue": "Active",
+				"positiveLabel": "Active",
+				"negativeLabel": "Inactive"
 			},
 			{
 				"field": "StaffName",
@@ -1732,13 +1749,13 @@ var today = (new Date()).toDateString(),
 				"defaultValue": today
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "Schedule",
 				"title": "Schedule",
 				"type": "Schedule",
 				"min-height": "3"
 			},
 			{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -1839,7 +1856,7 @@ var today = (new Date()).toDateString(),
 			// 	"type": "Number"
 			// }]
 		},
-		"Student": {
+		"student": {
 			"Primary Information": [
 				{
 					"field": "LocalId",
@@ -1926,35 +1943,45 @@ var today = (new Date()).toDateString(),
 					"title": "Eligible for Transport",
 					"type": "Boolean",
 					"defaultValue": "True",
-					"displayValue": "Eligible for Transport"
+					"displayValue": "Eligible for Transport",
+					"positiveLabel": "Eligible for Transport",
+					"negativeLabel": "Not Eligible for Transport"
 				},
 				{
 					"field": "AidEligible",
 					"title": "Eligible for Aid",
 					"type": "Boolean",
 					"defaultValue": "False",
-					"displayValue": "Not Eligible for Aid"
+					"displayValue": "Not Eligible for Aid",
+					"positiveLabel": "Eligible for Aid",
+					"negativeLabel": "Not Eligible for Aid"
 				},
 				{
 					"field": "InActive",
 					"title": "Inactive",
 					"type": "Boolean",
 					"defaultValue": "False",
-					"displayValue": "Active"
+					"displayValue": "Active",
+					"positiveLabel": "Inactive",
+					"negativeLabel": "Active"
 				},
 				{
 					"field": "AideReq",
 					"title": "Bus Aide Required",
 					"type": "Boolean",
 					"defaultValue": "True",
-					"displayValue": "Bus Aide Required"
+					"displayValue": "Bus Aide Required",
+					"positiveLabel": "Bus Aide Required",
+					"negativeLabel": "Bus Aid Not Required"
 				},
 				{
 					"field": "Disabled",
 					"title": "Disabled",
 					"type": "Boolean",
 					"defaultValue": "False",
-					"displayValue": "Not Disabled"
+					"displayValue": "Not Disabled",
+					"positiveLabel": "Disabled",
+					"negativeLabel": "Not Disabled"
 				}
 			],
 			"Codes": [
@@ -2090,7 +2117,7 @@ var today = (new Date()).toDateString(),
 			],
 			"Miscellaneous": [
 				{
-					"field": "",
+					"field": "Map",
 					"title": "Map",
 					"type": "Map",
 					"min-height": "4"
@@ -2101,7 +2128,7 @@ var today = (new Date()).toDateString(),
 				// 	"type": "String"
 				// },
 				{
-					"field": "",
+					"field": "Schedule",
 					"title": "Schedule",
 					"type": "Schedule",
 					"min-height": "4"
@@ -2112,7 +2139,7 @@ var today = (new Date()).toDateString(),
 				// 	"type": "String"
 				// },
 				{
-					"field": "",
+					"field": "File",
 					"title": "Documents",
 					"type": "File",
 					"defaultValue": "File list/browser",
@@ -2214,6 +2241,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"Grid": [{
+				field: "AMTripGrid",
 				title: "AM Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -2221,6 +2249,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "PMTripGrid",
 				title: "PM Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -2228,6 +2257,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "AMTransferTripGrid",
 				title: "AM Transfer Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -2235,6 +2265,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "PMTransferTripGrid",
 				title: "PM Transfer Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -2242,6 +2273,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "AllTripGrid",
 				title: "All Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -2249,6 +2281,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "AltsiteGrid",
 				title: "Alternate Site Grid",
 				type: "grid",
 				url: "altsite",
@@ -2256,6 +2289,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "AMStopGrid",
 				title: "AM Stop Grid",
 				type: "grid",
 				url: "tripstop",
@@ -2263,6 +2297,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "PMStopGrid",
 				title: "PM Stop Grid",
 				type: "grid",
 				url: "tripstop",
@@ -2270,6 +2305,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "AMTransferStopGrid",
 				title: "AM Transfer Stop Grid",
 				type: "grid",
 				url: "tripstop",
@@ -2277,6 +2313,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "PMTransferStopGrid",
 				title: "PM Transfer Stop Grid",
 				type: "grid",
 				url: "tripstop",
@@ -2284,6 +2321,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "AllStopGrid",
 				title: "All Stop Grid",
 				type: "grid",
 				url: "trip",
@@ -2291,7 +2329,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			}]
 		},
-		"Trip Stop": {
+		"tripstop": {
 			"Main": [{
 				"field": "TripName",
 				"title": "Trip Name",
@@ -2380,14 +2418,14 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
 				"min-height": "3"
 			},
 			{
-				"field": "",
+				"field": "Map",
 				"title": "Map",
 				"type": "Map",
 				"min-height": "4"
@@ -2457,6 +2495,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}],
 			"Grid": [{
+				field: "SchoolGrid",
 				title: "School Grid",
 				type: "grid",
 				url: "school",
@@ -2464,6 +2503,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "StudentGrid",
 				title: "Student Grid",
 				type: "grid",
 				url: "student",
@@ -2471,6 +2511,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "TripGrid",
 				title: "Trip Grid",
 				type: "grid",
 				url: "trip",
@@ -2478,7 +2519,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			}]
 		},
-		"Trip": {
+		"trip": {
 			"Main": [{
 				"field": "Name",
 				"title": "Name",
@@ -2575,14 +2616,18 @@ var today = (new Date()).toDateString(),
 				"title": "Home To School",
 				"type": "Boolean",
 				"defaultValue": "True",
-				"displayValue": "Home To School"
+				"displayValue": "Home To School",
+				"positiveLabel": "Home To School",
+				"negativeLabel": "No Home To School"
 			},
 			{
 				"field": "HomeTrans",
 				"title": "Home to Transfer",
 				"type": "Boolean",
 				"defaultValue": "False",
-				"displayValue": "No Home to Transfer"
+				"displayValue": "No Home to Transfer",
+				"positiveLabel": "Home To Transfer",
+				"negativeLabel": "No Home To Transfer"
 			},
 			{
 				"field": "Shuttle",
@@ -2596,28 +2641,36 @@ var today = (new Date()).toDateString(),
 				"title": "Activity Trip",
 				"type": "Boolean",
 				"defaultValue": "False",
-				"displayValue": "No Activity Trip"
+				"displayValue": "No Activity Trip",
+				"positiveLabel": "Activity Trip",
+				"negativeLabel": "No Activity Trip"
 			},
 			{
 				"field": "HasBusAide",
 				"title": "Bus Aide on This Trip",
 				"type": "Boolean",
 				"defaultValue": "False",
-				"displayValue": "No Bus Aide on This Trip"
+				"displayValue": "No Bus Aide on This Trip",
+				"positiveLabel": "Bus Aide on This Trip",
+				"negativeLabel": "No Bus Aide on This Trip"
 			},
 			{
 				"field": "NonDisabled",
 				"title": "Non-Disabled Students",
 				"type": "Boolean",
 				"defaultValue": "True",
-				"displayValue": "Not Non-Disabled Students"
+				"displayValue": "Not Non-Disabled Students",
+				"positiveLabel": "Non-Disabled Students",
+				"negativeLabel": "Not Non-Disabled Students"
 			},
 			{
 				"field": "Disabled",
 				"title": "Disabled Students",
 				"type": "Boolean",
 				"defaultValue": "False",
-				"displayValue": "Not Disabled Students"
+				"displayValue": "Not Disabled Students",
+				"positiveLabel": "Disabled Students",
+				"negativeLabel": "Not Disabled Students"
 			},
 			{
 				"field": "Schools",
@@ -2647,7 +2700,9 @@ var today = (new Date()).toDateString(),
 				"title": "Visible",
 				"type": "Boolean",
 				"defaultValue": "True",
-				"displayValue": "Visible"
+				"displayValue": "Visible",
+				"positiveLabel": "Visible",
+				"negativeLabel": "Not Visible"
 			},
 			{
 				"field": "IName",
@@ -2666,10 +2721,12 @@ var today = (new Date()).toDateString(),
 				"title": "Busfinder Enabled",
 				"type": "Boolean",
 				"defaultValue": "True",
-				"displayValue": "Busfinder Enabled"
+				"displayValue": "Busfinder Enabled",
+				"positiveLabel": "Busfinder Enabled",
+				"negativeLabel": "Busfinder Not Enabled"
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -2682,17 +2739,17 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			},
 			{
-				"field": "",
+				"field": "Map",
 				"title": "Map",
 				"type": "Map",
 				"min-height": "4"
 			},
 			{
-				"field": "",
+				"field": "Student",
 				"title": "Student"
 			},
 			{
-				"field": "",
+				"field": "Calendar",
 				"title": "Calendar",
 				"type": "Calendar",
 				"min-height": "4"
@@ -2762,6 +2819,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}],
 			"Grid": [{
+				field: "AideGrid",
 				title: "Aides Grid",
 				type: "grid",
 				url: "aide",
@@ -2769,6 +2827,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "DriverGrid",
 				title: "Driver Grid",
 				type: "grid",
 				url: "driver",
@@ -2776,6 +2835,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "VehicleGrid",
 				title: "Vehicle Grid",
 				type: "grid",
 				url: "vehicle",
@@ -2783,6 +2843,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "StudentGrid",
 				title: "Student Grid",
 				type: "grid",
 				url: "student",
@@ -2790,6 +2851,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			},
 			{
+				field: "StopGrid",
 				title: "Stop Grid",
 				type: "grid",
 				url: "tripstop",
@@ -2797,7 +2859,7 @@ var today = (new Date()).toDateString(),
 				"min-height": "3"
 			}]
 		},
-		"Vehicle": {
+		"vehicle": {
 			"Main": [{
 				"field": "VehicleName",
 				"title": "Vehicle",
@@ -2821,7 +2883,9 @@ var today = (new Date()).toDateString(),
 				"title": "Inactive",
 				"type": "Boolean",
 				"defaultValue": "False",
-				"displayValue": "Active"
+				"displayValue": "Active",
+				"positiveLabel": "Inactive",
+				"negativeLabel": "Active"
 			},
 			{
 				"field": "AssetId",
@@ -3050,13 +3114,13 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Proton Packs, Ecto Goggles, PKE Meters"
 			}],
 			"Miscellaneous": [{
-				"field": "",
+				"field": "Map",
 				"title": "Map",
 				"type": "Map",
 				"min-height": "4"
 			},
 			{
-				"field": "",
+				"field": "File",
 				"title": "Documents",
 				"type": "File",
 				"defaultValue": "File list/browser",
@@ -3069,7 +3133,7 @@ var today = (new Date()).toDateString(),
 				"defaultValue": "Lorem ipsum dolor sit amet."
 			},
 			{
-				"field": "",
+				"field": "Schedule",
 				"title": "Schedule",
 				"type": "Schedule",
 				"min-height": "3"
@@ -3139,6 +3203,7 @@ var today = (new Date()).toDateString(),
 				"type": "Number"
 			}],
 			"Grid": [{
+				field: "TripGrid",
 				title: "Trip Grid",
 				type: "grid",
 				url: "trip",

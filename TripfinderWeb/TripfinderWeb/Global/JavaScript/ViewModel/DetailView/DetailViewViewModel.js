@@ -14,7 +14,7 @@
 		self.UNITHEIGHT = 58;
 		//vertical margin not support cannot set to 0, so set to 1, looks the same.
 		self.PADDING = 1;
-		self.INITINPUTWIDTH = 365;
+		self.INITINPUTWIDTH = 359;
 		self.EXTRAWIDTH = 220;
 		self.defaultLayout = {
 			width: 4,
@@ -1472,8 +1472,8 @@
 		else
 		{
 			self.updateDataBlocks();
-			self.$gridStack.on('added.gridStack', self.onNewElementAdded.bind(self));
-			self.$gridStack.on('resizeBlock.gridStack', self.onBlockResized.bind(self));
+			self.$gridStack.off('added.gridStack').on('added.gridStack', self.onNewElementAdded.bind(self));
+			self.$gridStack.off('resizeBlock.gridStack').on('resizeBlock.gridStack', self.onBlockResized.bind(self));
 
 			if (!layout.items || layout.items.length === 0)
 			{
@@ -1495,7 +1495,10 @@
 			grid = $grid.data("kendoGrid");
 			setTimeout(function()
 			{
-				grid.refresh();
+				if (grid)
+				{
+					grid.refresh();
+				}
 			}, 250);
 		}
 	};
@@ -1513,7 +1516,50 @@
 		self.grid.container.on("resizestart.container", self.onDataBlockResizeStart.bind(self));
 		self.grid.container.on("gsresizestop.container", self.onDataBlockResizeStop.bind(self));
 		self.grid.container.on("resize.container", function(e) { e.stopPropagation(); });
-		$stackItems.draggable("option", "containment", "#pageContent");
+
+		$stackItems.on("dragstart.grid-stack-item", function(e)
+		{
+			$(e.target).addClass('dragging');
+		});
+		$stackItems.on("dragstop.grid-stack-item", function(e)
+		{
+			$(e.target).removeClass('dragging');
+		});
+		$stackItems.on("drag.grid-stack-item", function(e)
+		{
+			var draggingOffset = $('.data-point.ui-draggable-dragging').offset(),
+				containerOffset = $(self.grid.container).offset();
+			$(e.target).css({
+				left: draggingOffset.left - containerOffset.left + 'px',
+				top: draggingOffset.top - containerOffset.top + 'px'
+			});
+		});
+		$stackItems.draggable("option", "containment", ".main-body");
+		$stackItems.draggable("option", "appendTo", "body");
+		$stackItems.draggable("option", "helper", function(e)
+		{
+			var $gridItem = $(e.target).closest('.grid-stack-item'),
+				$target = $gridItem.find('.grid-stack-item-content'),
+				width = $gridItem.width() + 'px',
+				height = $gridItem.height() + 'px',
+				$wrapper = $('<div class="dragging-helper-wrapper"></div>'),
+				$helper = $('<div class="data-point dragging-helper"></div>');
+
+			$wrapper.append($target.clone());
+			if ($gridItem.hasClass('section-header-stack-item'))
+			{
+				$wrapper.addClass('section-header-stack-item');
+			}
+
+			$helper.css({
+				width: width,
+				height: height
+			});
+			$helper.append($wrapper);
+
+			return $helper[0];
+		});
+
 		$stackItems.resizable("option", "containment", $containment);
 		self.updateDragHandlerStatus();
 	};
@@ -2031,7 +2077,9 @@
 			conditionalAppearance: item.conditionalAppearance,
 			url: item.url,
 			subUrl: item.subUrl,
-			uniqueClassName: this.getDomUniqueClassName(itemDom)
+			uniqueClassName: this.getDomUniqueClassName(itemDom),
+			positiveLabel: item.positiveLabel,
+			negativeLabel: item.negativeLabel
 		});
 	};
 
@@ -2099,27 +2147,21 @@
 				{
 					content = self.entity[item.field];
 
-					if ((self.gridType === "student" || self.gridType === "school" || self.gridType === "trip" || self.gridType === "vehicle" || self.gridType === "staff") && item.type === "Boolean")
+					if (item.type === "Boolean")
 					{
-						contentBoolean = content;
-						newContent = self.changeBooleanText(content, self.gridType, item.title);
+						newContent = content ? item.positiveLabel : item.negativeLabel;
 					}
+
 					displayNone = content === undefined || content === "" || content === null;
 					item.minHeight = item.h;
 				}
 				else
 				{
 					content = item.defaultValue;
-					if ((self.gridType === "student" || self.gridType === "school" || self.gridType === "trip" || self.gridType === "vehicle" || self.gridType === "staff") && item.type === "Boolean")
+					if (item.type === "Boolean")
 					{
-						if (content === "False")
-						{
-							contentBoolean = false;
-						} else
-						{
-							contentBoolean = true;
-						}
-						newContent = self.changeBooleanText(contentBoolean, self.gridType, item.title);
+						contentBoolean = content !== "False";
+						newContent = contentBoolean ? item.positiveLabel : item.negativeLabel;
 					}
 				}
 
@@ -2130,7 +2172,6 @@
 						self.addSpacerStackBlock(item);
 						break
 					case "section-header":
-						item.w = layout.width;
 						self.addSectionHeaderStackBlock(item);
 						break;
 					case "Calendar":
@@ -2171,7 +2212,7 @@
 						self.lineBlockHelper.addVertiLine(item.x, item.y, item.h);
 						break;
 					case "File":
-						var $scheduleDom = self.addDocumentStackBlock(item, dataBlockStyles);
+						self.addDocumentStackBlock(item, dataBlockStyles);
 						break;
 					case "Schedule":
 						self.addScheduleStackBlock(item, dataBlockStyles);
@@ -2206,185 +2247,6 @@
 	{
 		return 'grid-unique-' + Math.random().toString(36).substring(7);
 	}
-
-	/**
-	 * Change the text of boolean content.
-	 * @param {Object} item 
-	 * @param {String} content 
-	 * @return {String}
-	 */
-	DetailViewViewModel.prototype.changeBooleanText = function(content, type, title)
-	{
-		switch (title)
-		{
-			case "Allow Transfers at this School":
-				if (content)
-				{
-					content = "Transfers Allowed";
-				} else
-				{
-					content = "Transfers not Allowed";
-				}
-				break;
-			case "Accept Sif Students":
-				if (content)
-				{
-					content = "SIF Students Accepted";
-				} else
-				{
-					content = "SIF Students not Accepted";
-				}
-				break;
-			case "Private School":
-				if (content)
-				{
-					content = "Private School";
-				} else
-				{
-					content = "Public School";
-				}
-				break;
-			case "Eligible for Transport":
-				if (content)
-				{
-					content = "Eligible for Transport";
-				} else
-				{
-					content = "Not Eligible for Transport";
-				}
-				break;
-			case "Eligible for Aid":
-				if (content)
-				{
-					content = "Eligible for Aid";
-				} else
-				{
-					content = "Not Eligible for Aid";
-				}
-				break;
-			case "Inactive":
-				if (content)
-				{
-					content = "Inactive";
-				} else
-				{
-					content = "Active";
-				}
-				break;
-			case "Bus Aide Required":
-				if (content)
-				{
-					content = "Bus Aide Required";
-				} else
-				{
-					content = "Bus Aid Not Required";
-				}
-				break;
-			case "Disabled":
-				if (content)
-				{
-					content = "Disabled";
-				} else
-				{
-					content = "Not Disabled";
-				}
-				break;
-			case "Bus Aide on This Trip":
-				if (content)
-				{
-					content = "Bus Aide on This Trip";
-				} else
-				{
-					content = "No Bus Aide on This Trip";
-				}
-				break;
-			case "Non-Disabled Students":
-				if (content)
-				{
-					content = "Non-Disabled Students";
-				} else
-				{
-					content = "Not Non-Disabled Students";
-				}
-				break;
-			case "Disabled Students":
-				if (content)
-				{
-					content = "Disabled Students";
-				} else
-				{
-					content = "Not Disabled Students";
-				}
-				break;
-			case "Visible":
-				if (content)
-				{
-					content = "Visible";
-				} else
-				{
-					content = "Not Visible";
-				}
-				break;
-			case "Busfinder Enabled":
-				if (content)
-				{
-					content = "Busfinder Enabled";
-				} else
-				{
-					content = "Busfinder Not Enabled";
-				}
-				break;
-			case "Status":
-				if (content)
-				{
-					content = "Active ";
-				} else
-				{
-					content = "Inactive";
-				}
-				break;
-			case "Home To School":
-				if (content)
-				{
-					content = "Home To School ";
-				} else
-				{
-					content = "No Home To School";
-				}
-				break;
-			case "Home to Transfer":
-				if (content)
-				{
-					content = "Home to Transfer";
-				} else
-				{
-					content = "No Home to Transfer";
-				}
-				break;
-			case "Transfer to School":
-				if (content)
-				{
-					content = "Transfer to School";
-				} else
-				{
-					content = "No Transfer to School";
-				}
-				break;
-			case "Activity Trip":
-				if (content)
-				{
-					content = "Activity Trip";
-				} else
-				{
-					content = "No Activity Trip";
-				}
-				break;
-			default:
-				break;
-		}
-
-		return content;
-	};
 
 	/**
 	 * Process the data content.
@@ -2878,9 +2740,13 @@
 							</div>\
 						</div>").addClass(randomClass);
 
-		self.updateStackBlockOrignalHeight(randomClass, item.h);
+		item.w = self.getCurrentWidth();
+		item.h = 1;
+		item.x = 0;
+
+		self.updateStackBlockOrignalHeight(randomClass, 1);
 		self.setStackBlockData($itemDom, item);
-		grid.addWidget($itemDom, item.x, item.y, item.w, item.h);
+		grid.addWidget($itemDom, 0, item.y, item.w, 1);
 
 		self.$element.find(".grid-stack .section-header-stack-item input.item-title").off("blur.section-header").on("blur.section-header", function(e)
 		{
@@ -3013,7 +2879,6 @@
 	DetailViewViewModel.prototype.addImageStackBlock = function(item, grid)
 	{
 		var self = this, grid = grid || self.grid,
-			styles = self.getNonDataElementStyles(item),
 			inputElement = "", imageElement = "";
 
 		if (self.isReadMode())
@@ -3026,7 +2891,7 @@
 		imageElement = "<img class='uploadedPhoto' style = 'opacity:0.4;width:auto;height:auto;max-width:100%;max-height:100%'/>";
 		randomClass = item.uniqueClassName || self.generateUniqueClassName(),
 			$itemDom = $("<div class='image'>\
-						<div class='grid-stack-item-content image-stack-item ' type='"+ item.type + "style='width: " + styles.w + "px; height: " + styles.h + "px;'" + ">\
+						<div class='grid-stack-item-content image-stack-item ' type='image'>\
 						<label for='inputImage"+ item.imageId + "' style='width:100%; height: 100% '>" + inputElement + imageElement + "</label>\
 							</div >\
 					   </div > ").addClass(randomClass);
@@ -3192,7 +3057,7 @@
 		self.updateStackBlockOrignalHeight(randomClass, item.h);
 		self.setStackBlockData($itemDom, item);
 
-		switch (item.serializedDataWidth)
+		switch (self.getCurrentWidth())
 		{
 			case 1:
 				minWidth = 1;
@@ -4084,7 +3949,7 @@
 			callback = function()
 			{
 				var data = self.entityDataModel.toData();
-				var dataTemp = data;
+
 				if (self.isSaveAsNew)
 				{
 					data.Id = 0;
@@ -4489,7 +4354,6 @@
 					y: node.y,
 					w: node.width,
 					h: node.height,
-					serializedDataWidth: serializedData.width,
 					field: $el.data("field") || $el.attr("field"),
 					title: $el.data("title") || $el.attr("title"),
 					type: $el.data("type") || $el.attr("type"),
@@ -4502,7 +4366,9 @@
 					url: $el.data("url") || $el.attr("url"),
 					subUrl: $el.data("subUrl") || $el.attr("subUrl"),
 					columns: $el.data("columns"),
-					sort: sort
+					sort: sort,
+					positiveLabel: $el.data("positiveLabel") || $el.attr("positiveLabel"),
+					negativeLabel: $el.data("negativeLabel") || $el.attr("negativeLabel")
 				}
 			}
 
@@ -4754,21 +4620,6 @@
 		return styles;
 	};
 
-	DetailViewViewModel.prototype.getNonDataElementStyles = function(item)
-	{
-		var self = this,
-			gridOpt = self.$gridStack.data("gridstack").opts,
-			cellWidth = self.$gridStack.outerWidth() / gridOpt.width,
-			cellHeight = gridOpt.cellHeight;
-
-		return {
-			x: item.x * cellWidth,
-			y: item.y * cellHeight,
-			w: item.w * cellWidth,
-			h: item.h * cellHeight,
-		};
-	};
-
 	/**
 	 * Check if the record match with the condition.
 	* @param {Object} condition
@@ -4871,7 +4722,7 @@
 		var self = this;
 		if (self.$element && self.$element.css("display") !== "none" && self.isReadMode())
 		{
-			var isWidthEnougn,
+			var isWidthEnough,
 				$header = self.$element.find(".detail-header"),
 				$title = $header.find(".head-text:not(.hide)"),
 				$buttons = $header.find(".buttons");
@@ -5088,8 +4939,8 @@
 	 */
 	DetailViewViewModel.prototype.getDefaultValueByCategoryAndField = function(category, field)
 	{
-		var defaultValue, self = this, type = getTitleByType(self.gridType);
-		$.each(dataPointsJSON[type][category], function(index, item)
+		var self = this, defaultValue;
+		$.each(dataPointsJSON[self.gridType][category], function(index, item)
 		{
 			if (item.field && item.field === field)
 			{
