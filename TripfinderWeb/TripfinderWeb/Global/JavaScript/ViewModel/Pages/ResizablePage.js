@@ -40,6 +40,10 @@
 		self.$rightPage = self.$element.find(".right-page");
 		self.$dragHandler = self.$element.find(".resize-handler");
 
+		if (window.opener && window.name === "new-detailWindow")
+		{
+			self.$dragHandler.hide();
+		}
 		self.initDragHandler();
 		self.onLoaded.notify();
 		$(window).off(".resizepage").on("resize.resizepage", self.reLayoutPage.bind(self));
