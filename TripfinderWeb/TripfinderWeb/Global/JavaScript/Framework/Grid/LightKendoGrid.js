@@ -380,7 +380,7 @@
 
 	};
 
-	LightKendoGrid.prototype.rebuildGrid = function()
+	LightKendoGrid.prototype.rebuildGrid = function(sortInfo)
 	{
 		return new Promise(function(resolve)
 		{
@@ -404,7 +404,7 @@
 				var kendoOptions = this.kendoGrid.getOptions();
 				kendoOptions.height = this.getGridFullHeight();
 				kendoOptions.columns = this.getKendoColumn();
-				kendoOptions.dataSource.sort = this.getKendoSortColumn();
+				kendoOptions.dataSource.sort = sortInfo || this.getKendoSortColumn();
 				if (kendoOptions.columns.length == 1)
 				{
 					kendoOptions.columns[0].locked = false;
@@ -662,11 +662,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-			{
-				extra: true,
-				mode: "menu row",
-				operators: TF.Grid.LightKendoGrid.DefaultOperator
-			},
+				{
+					extra: true,
+					mode: "menu row",
+					operators: TF.Grid.LightKendoGrid.DefaultOperator
+				},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -4059,13 +4059,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
-								{
-									fields: self.geoFields,
-									IdFilter:
 									{
-										IncludeOnly: self.allIds
+										fields: self.geoFields,
+										IdFilter:
+											{
+												IncludeOnly: self.allIds
+											}
 									}
-								}
 							})
 							.then(function(response)
 							{

@@ -1060,7 +1060,8 @@
 
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
 	{
-		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" };
+		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" },
+			sort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort();
 		tf.modalManager.showModal(new e.data.modal(option))
 			.then(function(data)
 			{
@@ -1071,10 +1072,11 @@
 
 					this.obInvoiceGridDataSource.push(data);
 					var resourceSource = new kendo.data.DataSource({
-						data: this.obInvoiceGridDataSource()
+						data: this.obInvoiceGridDataSource(),
+						sort: sort
 					});
 					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(sort);
 				}
 			}.bind(this));
 	}
