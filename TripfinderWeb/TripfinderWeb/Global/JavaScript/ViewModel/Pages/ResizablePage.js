@@ -42,6 +42,7 @@
 
 		self.initDragHandler();
 		self.onLoaded.notify();
+		$(window).off(".resizepage").on("resize.resizepage", self.reLayoutPage.bind(self));
 	};
 
 	ResizablePage.prototype.setLeftPage = function(templateName, data, newGrid, firstLoad)
