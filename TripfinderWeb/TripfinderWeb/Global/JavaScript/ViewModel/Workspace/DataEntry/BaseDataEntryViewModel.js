@@ -77,7 +77,6 @@
 			tf.shortCutKeys.bind("left", this.leftPress, this._view.document.routeState);
 			tf.shortCutKeys.bind("right", this.rightPress, this._view.document.routeState);
 		}
-
 		this.obUserDefinedColumns = ko.observable($.extend(true, Object, TF.UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_LABELS));
 		this.entityNames = TF.UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_ENTITY_NAMES;
 		this.obUserDefinedCharacterLeft = ko.observableArray();
@@ -794,18 +793,15 @@
 			{
 				if (e)
 				{
-					this.onRequestClose.notify(this.obEntityDataModel());
+					tf.pageManager.resizablePage.closeRightPage();
 				}
 			}.bind(this));
 	};
 
 	BaseDataEntryViewModel.prototype.closeClick = function(viewModel, e)
 	{
-		// this.onRequestClose.notify(this.obEntityDataModel());
-		// $(".right-page").empty();
-		$(".right-page").hide();
-		$(".resize-handler").hide();
-		// tf.pageManager.resizablePage.reLayoutPage();
+		var self = this;
+		tf.pageManager.resizablePage.closeRightPage();
 	};
 
 	BaseDataEntryViewModel.prototype.pendingSave = function()

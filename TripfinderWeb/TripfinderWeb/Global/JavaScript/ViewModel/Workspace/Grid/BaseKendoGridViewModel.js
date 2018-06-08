@@ -768,6 +768,9 @@
 		return this.type.substring(0, 1).toUpperCase() + this.type.substring(1);
 	};
 
+	BaseKendoGridViewModel.prototype.editClick = function(viewModel, e)
+	{
+	}
 	BaseKendoGridViewModel.prototype.copyToClipboardClick = function(viewModel, e)
 	{
 		var selectedIds = this.searchGrid.getSelectedIds();
@@ -856,42 +859,6 @@
 			}.bind(this));
 	};
 
-	BaseKendoGridViewModel.prototype.editClick = function(viewModel, e)
-	{
-		var selectedIds = this.searchGrid.getSelectedIds();
-		if (selectedIds.length == 0)
-		{
-			return;
-		}
-
-		if (this.type == "document" || this.type == "documentmini")
-		{
-			//this.searchGrid.gridAlert.show({
-			//	message: "Not Implement!"
-			//});
-			var documentData = tf.modalManager.showModal(new TF.Modal.DocumentModalViewModel(
-				{
-					documentId: selectedIds[0]
-				}));
-			return;
-		}
-
-		var selectedIds = this.searchGrid.getSelectedIds();
-		var selectedRecords = this.searchGrid.getSelectedRecords();
-
-		tf.DataEntryHelper.getTabNamesByIds(this.type, selectedIds).then(function(tabNames)
-		{
-			var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry,
-				{
-					type: this.type,
-					ids: selectedIds,
-					mode: "Edit",
-					tabNames: tabNames,
-				});
-			tf.documentManagerViewModel.add(documentData, TF.DocumentManagerViewModel.isOpenNewWindow(e));
-		}.bind(this));
-	};
-
 	BaseKendoGridViewModel.prototype.viewClick = function(viewModel, e)
 	{
 		var selectedIds = this.searchGrid.getSelectedIds();
@@ -924,21 +891,6 @@
 
 	BaseKendoGridViewModel.prototype.addClick = function(viewModel, e)
 	{
-		if (this.type == "document" || this.type == "documentmini")
-		{
-			var documentData = tf.modalManager.showModal(new TF.Modal.DocumentModalViewModel(
-				{}));
-		}
-		else
-		{
-			var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry,
-				{
-					type: this.type,
-					ids: [],
-					mode: "Add",
-				});
-			tf.documentManagerViewModel.add(documentData, TF.DocumentManagerViewModel.isOpenNewWindow(e));
-		}
 	};
 
 	BaseKendoGridViewModel.prototype.newCopyClick = function(viewModel, e)

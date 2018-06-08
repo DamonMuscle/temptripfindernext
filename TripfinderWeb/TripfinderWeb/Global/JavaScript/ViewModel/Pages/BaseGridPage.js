@@ -31,10 +31,6 @@
 		self.obIsSelectRow = ko.observable(false);
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
-
-		self.applicationTabSource = {
-			ViewSource: {}, DataEntrySource: {}, GridSource: {}
-		};
 	}
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
@@ -64,7 +60,6 @@
 			baseOptions = {
 				storageKey: "grid.currentlayout." + self.type,
 				gridType: self.type,
-				pageType: self.pageType,
 				showBulkMenu: true,
 				showLockedColumn: true,
 				showOmittedCount: option.showOmittedCount,
@@ -101,10 +96,10 @@
 
 		if (!TF.isPhoneDevice)
 		{
-		self.searchGrid.onDoubleClick.subscribe(function(e, data)
-		{
-			self.showDetailsClick();
-		});
+			self.searchGrid.onDoubleClick.subscribe(function(e, data)
+			{
+				self.showDetailsClick();
+			});
 		}
 
 		self._openBulkMenu();
@@ -137,6 +132,7 @@
 	//TODO right click menu feature
 	BaseGridPage.prototype.copyToClipboardClick = function()
 	{
+
 	};
 
 	//TODO right click menu feature
@@ -466,6 +462,39 @@
 		self.editFieldTripStatus(false);
 	};
 
+	BaseGridPage.prototype.editClick = function(viewModel, e)
+	{
+		var self = this,
+			selectedIds = self.searchGrid.getSelectedIds(),
+			selectedRecords = self.searchGrid.getSelectedRecords();
+		if (selectedIds.length == 0)
+		{
+			return;
+		}
+
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), self.type, "getTabNames"), {
+			data: selectedIds
+		})
+			.then(function(response)
+			{
+				var documentData = new TF.Document.DocumentData("DataEntry",
+					{
+						type: "fieldtrip",
+						ids: selectedIds,
+						mode: "Edit",
+						tabNames: response.Items,
+					}),
+					view = {
+						id: documentData.data.ids[0],
+						documentType: documentData.documentType,
+						type: documentData.data.type,
+					};
+				self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
+				tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+
+			});
+	};
+
 	BaseGridPage.prototype.addClick = function(viewModel, e)
 	{
 		var self = this,
@@ -480,13 +509,10 @@
 				documentType: documentData.documentType,
 				type: documentData.data.type,
 			};
-		self.applicationTabSource.DataEntrySource[documentData.data.type] = [];
-		self.applicationTabSource.DataEntrySource[documentData.data.type].push(view);
-		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(self.applicationTabSource.DataEntrySource[documentData.data.type], view);
+		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
 		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
 
 	};
-
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
 	{
 		var self = this;

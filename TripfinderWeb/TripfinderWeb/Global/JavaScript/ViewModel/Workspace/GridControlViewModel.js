@@ -92,40 +92,6 @@
 			case 'tripstop':
 				this.title(tf.applicationTerm.getApplicationTermPluralByName("Trip Stop"));
 				gridViewModelType = TF.Grid.TripStopGridViewModel;
-				//gridLayoutExtendedDataModel = new TF.DataModel.GridLayoutExtendedDataModel();
-				//gridLayoutExtendedDataModel.gridType(this._gridType);
-				//if (this._entityType == "exception")
-				//{
-				//	gridLayoutExtendedDataModel.layoutColumns([
-				//						{
-				//							FieldName: "Session",
-				//							minWidth: 100,
-				//							width: 100
-				//						},
-				//						{
-				//							FieldName: "Name",
-				//							minWidth: 100,
-				//							width: 100
-				//						},
-				//						{
-				//							FieldName: "Street",
-				//							minWidth: 200,
-				//							width: 200
-				//						},
-				//						{
-				//							FieldName: "Schoolname",
-				//							minWidth: 130,
-				//							width: 130
-				//						},
-				//						{
-				//							FieldName: "StopTime",
-				//							minWidth: 100,
-				//							width: 100
-				//						}]);
-				//	this._showBulkMenu = true;
-				//	tf.storageManager.save(tf.storageManager.gridInViewCurrentLayout(this._gridType + this._entityType), gridLayoutExtendedDataModel.toData());
-				//}
-
 				this.obCanOpenNewGrid(true);
 				break;
 			case 'district':
@@ -152,24 +118,24 @@
 				var gridLayoutExtendedDataModel = new TF.DataModel.GridLayoutExtendedDataModel();
 				gridLayoutExtendedDataModel.gridType(this._gridType);
 				gridLayoutExtendedDataModel.layoutColumns([
-				{ FieldName: "Filename" },
-				{ FieldName: "Description" },
-				{
-					FieldName: "DocumentClassification"
-				},
-				{
-					FieldName: "FileSizeKb",
-					minWidth: 74,
-					width: 74
-				},
-				{ FieldName: "LastUpdated" },
-				{ FieldName: "LastUpdatedName" },
-				{
-					FieldName: "Action",
-					minWidth: 60,
-					width: 60,
-					action: true
-				}]);
+					{ FieldName: "Filename" },
+					{ FieldName: "Description" },
+					{
+						FieldName: "DocumentClassification"
+					},
+					{
+						FieldName: "FileSizeKb",
+						minWidth: 74,
+						width: 74
+					},
+					{ FieldName: "LastUpdated" },
+					{ FieldName: "LastUpdatedName" },
+					{
+						FieldName: "Action",
+						minWidth: 60,
+						width: 60,
+						action: true
+					}]);
 				this._defaultGridLayoutExtendedEntity = gridLayoutExtendedDataModel;
 				break;
 			case 'documentmini':
@@ -336,8 +302,8 @@
 				var gridLayoutExtendedDataModel = new TF.DataModel.GridLayoutExtendedDataModel();
 				gridLayoutExtendedDataModel.gridType(this._gridType);
 				gridLayoutExtendedDataModel.layoutColumns([
-				{ FieldName: "AccountName" },
-				{ FieldName: "Amount" }]);
+					{ FieldName: "AccountName" },
+					{ FieldName: "Amount" }]);
 				this._defaultGridLayoutExtendedEntity = gridLayoutExtendedDataModel;
 				this._showBulkMenu = true;
 				option.entityType = this._entityType;
