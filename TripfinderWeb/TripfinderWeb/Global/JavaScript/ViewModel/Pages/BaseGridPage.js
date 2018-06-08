@@ -551,7 +551,8 @@
 				type: documentData.data.type,
 			};
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
-		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		if(TF.isPhoneDevice)	tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		else	tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
 
 	};
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)

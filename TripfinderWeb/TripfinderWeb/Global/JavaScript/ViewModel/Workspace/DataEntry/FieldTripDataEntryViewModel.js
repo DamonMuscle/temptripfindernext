@@ -45,6 +45,7 @@
 
 		this.baseDeletion = new TF.Executor.FieldtripDeletion();
 		this.obNeedSaveTemplate(true);
+		this.obNeedSaveAndClose(!TF.isPhoneDevice);
 		this.obResourceId = ko.observable(0);
 
 		//drop down list

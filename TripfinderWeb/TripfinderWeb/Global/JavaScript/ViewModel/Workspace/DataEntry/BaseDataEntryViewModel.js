@@ -22,6 +22,7 @@
 		};
 		this.obCurrentBookMark = ko.observable(null);
 		this.obNeedSaveTemplate = ko.observable(false);
+		this.obNeedSaveAndClose = ko.observable(true);
 		// this.obDataEntryViewModel = ko.observable(null);
 
 		this.onRequestClose = new TF.Events.Event();
