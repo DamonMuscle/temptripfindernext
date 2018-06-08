@@ -206,14 +206,12 @@
 
 	LightKendoGrid.prototype.onGridDoubleClick = function(e)
 	{
-		var self = this, records = self.getSelectedRecords(),
-			dataItem = self.kendoGrid.dataItem($(e.target).closest("tr"));
 		if (e.shiftKey || e.ctrlKey)
 		{
 			return;
 		}
-		self._onGridItemClick(dataItem, e);
-		self.onDoubleClick.notify(records[records.length - 1]);
+		var records = this.getSelectedRecords();
+		this.onDoubleClick.notify(records[records.length - 1]);
 	};
 
 	LightKendoGrid.prototype._initLinkTd = function()
@@ -3912,6 +3910,12 @@
 		{
 			self.kendoGrid.select(selected);
 		}
+
+		self.$container.find(".k-grid-content-locked tr, .k-grid-content tr").click(function(e)
+		{
+			onKendoGridTRClickEvent.call(this, e, self);
+		});
+
 
 		if (self.options.isDataRowHover)
 		{

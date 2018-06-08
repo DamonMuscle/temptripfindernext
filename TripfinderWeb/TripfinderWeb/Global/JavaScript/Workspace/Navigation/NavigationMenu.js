@@ -60,6 +60,10 @@
 		self.initNavigationMenuState();
 		self.initTooltip();
 
+		if (window.opener && window.name === "new-detailWindow")
+		{
+			$(".navigation-container").addClass("hide");
+		}
 		tf.loadingIndicator.tryHide();
 	};
 

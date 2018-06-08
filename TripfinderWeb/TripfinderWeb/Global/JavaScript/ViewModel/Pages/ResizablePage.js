@@ -40,8 +40,13 @@
 		self.$rightPage = self.$element.find(".right-page");
 		self.$dragHandler = self.$element.find(".resize-handler");
 
+		if (window.opener && window.name === "new-detailWindow")
+		{
+			self.$dragHandler.hide();
+		}
 		self.initDragHandler();
 		self.onLoaded.notify();
+		$(window).off(".resizepage").on("resize.resizepage", self.reLayoutPage.bind(self));
 	};
 
 	ResizablePage.prototype.setLeftPage = function(templateName, data, newGrid, firstLoad)
@@ -90,7 +95,7 @@
 
 		self.obRightTemplate(templateName);
 		self.obRightData(data);
-		$content = $("<div data-bind='template:{ name: obRightTemplate, data: obRightData }'></div>");
+		$content = $("<div class='main-body' data-bind='template:{ name: obRightTemplate, data: obRightData }'></div>");
 
 		self.$rightPage.append($content);
 		ko.applyBindings(ko.observable(self), $content[0]);

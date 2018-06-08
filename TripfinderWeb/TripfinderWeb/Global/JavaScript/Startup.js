@@ -307,7 +307,17 @@
 								tf.pageManager.resizablePage.onLoaded.subscribe(function()
 								{
 									tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
-									tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
+
+									if (window.opener && window.name === "new-detailWindow")
+									{
+										var id = getParameterByName('id'),
+											detailView = new TF.DetailView.DetailViewViewModel(id);
+										tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView);
+									}
+									else
+									{
+										tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
+									}
 								});
 								return true;
 							}

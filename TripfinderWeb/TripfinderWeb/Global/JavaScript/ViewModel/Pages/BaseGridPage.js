@@ -56,7 +56,7 @@
 
 	BaseGridPage.prototype.createGrid = function(option)
 	{
-		var self = this,
+		var self = this, iconRow, statusRow, toolRow, containerWidth,
 			baseOptions = {
 				storageKey: "grid.currentlayout." + self.type,
 				gridType: self.type,
@@ -100,6 +100,47 @@
 			{
 				self.showDetailsClick();
 			});
+		}
+		else
+		{
+			ko.computed(function()
+			{
+				if (TF.isPhoneDevice && self.searchGrid.obSelectedGridFilterName() && self.searchGrid.obSelectedGridLayoutName())
+				{
+					iconRow = self.$element.find(".grid-icons");
+					containerWidth = iconRow.outerWidth();
+					setTimeout(function()
+					{
+						statusRow = iconRow.find(".grid-staterow-wrap");
+						toolRow = iconRow.find(".iconrow");
+						statusRow.width("auto");
+						toolRow.width("auto");
+						statusRow.css("marginLeft", "0px");
+						toolRow.css("marginLeft", "0px");
+						statusRow.addClass("pull-right");
+						if (iconRow.height() > 28)
+						{
+							statusRow.css("marginLeft", containerWidth + "px");
+							statusRow.width("100%");
+							toolRow.width("100%");
+							statusRow.removeClass("pull-right");
+							detectswipe(self.$element.find(".grid-icons"), function(el, d)
+							{
+								if (d === "l" && toolRow.css("marginLeft") === "0px")
+								{
+									toolRow.animate({ marginLeft: -containerWidth }, 200);
+									statusRow.animate({ marginLeft: 0 }, 200);
+								}
+								else if (d === "r" && statusRow.css("marginLeft") === "0px")
+								{
+									toolRow.animate({ marginLeft: 0 }, 200);
+									statusRow.animate({ marginLeft: containerWidth }, 200);
+								}
+							});
+						}
+					})
+				}
+			}, self);
 		}
 
 		self._openBulkMenu();
@@ -523,6 +564,8 @@
 	BaseGridPage.prototype.dispose = function()
 	{
 		var self = this;
+
+		self.$element.find(".grid-icons").off(".swipe");
 		if (self.searchGrid)
 		{
 			self.searchGrid.dispose();

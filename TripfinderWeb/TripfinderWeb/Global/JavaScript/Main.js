@@ -52,6 +52,17 @@ function pathCombine()
 	return output;
 }
 
+function getParameterByName(name, url)
+{
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 function toCamelCase(input)
 {
 	if (input.length < 1)
@@ -247,6 +258,61 @@ function removeEmptyProperties(obj)
 			delete obj[i];
 		}
 	}
+}
+
+//swipe event for mobile
+function detectswipe(ele, func)
+{
+	swipe_det = new Object();
+	swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+	var min_x = 30,  //min x swipe for horizontal swipe
+		max_x = 30,  //max x difference for vertical swipe
+		min_y = 50,  //min y swipe for vertical swipe
+		max_y = 60,  //max y difference for horizontal swipe
+		direc = "",
+		start,
+		move,
+		end;
+
+	start = function(e)
+	{
+		var t = e.originalEvent.touches[0];
+		swipe_det.sX = t.screenX;
+		swipe_det.sY = t.screenY;
+	};
+	move = function(e)
+	{
+		e.preventDefault();
+		var t = e.originalEvent.touches[0];
+		swipe_det.eX = t.screenX;
+		swipe_det.eY = t.screenY;
+	};
+	end = function(e)
+	{
+		//horizontal detection
+		if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX)) && ((swipe_det.eY < swipe_det.sY + max_y) && (swipe_det.sY > swipe_det.eY - max_y) && (swipe_det.eX > 0))))
+		{
+			if (swipe_det.eX > swipe_det.sX) direc = "r";
+			else direc = "l";
+		}
+		//vertical detection
+		else if ((((swipe_det.eY - min_y > swipe_det.sY) || (swipe_det.eY + min_y < swipe_det.sY)) && ((swipe_det.eX < swipe_det.sX + max_x) && (swipe_det.sX > swipe_det.eX - max_x) && (swipe_det.eY > 0))))
+		{
+			if (swipe_det.eY > swipe_det.sY) direc = "d";
+			else direc = "u";
+		}
+
+		if (direc != "")
+		{
+			if (typeof func == 'function') func(ele, direc);
+		}
+		direc = "";
+		swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+	};
+	ele.off(".swipe");
+	ele.on('touchstart.swipe', start);
+	ele.on('touchmove.swipe', move);
+	ele.on('touchend.swipe', end);
 }
 
 function toISOStringWithoutTimeZone(m)

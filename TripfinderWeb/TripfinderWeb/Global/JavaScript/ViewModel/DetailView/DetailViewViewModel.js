@@ -4910,7 +4910,7 @@
 	DetailViewViewModel.prototype.newWindowClick = function(data, e)
 	{
 		var self = this;
-		window.open('#/' + tf.pageManager.getPageId(self.gridType) + "?" + "ids= " + data.entitySelectId, "new-detailWindow");
+		window.open("#/?id=" + data.entitySelectId, "new-detailWindow");
 	};
 
 	/**
