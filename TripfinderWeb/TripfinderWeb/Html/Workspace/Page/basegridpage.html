@@ -13,6 +13,7 @@
 		<div class="iconrow">
 			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()}"></div>
 			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
+			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
 			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
@@ -33,7 +34,7 @@
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
 					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
-						  style="max-width: 150px;"></span>
+					 style="max-width: 150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
