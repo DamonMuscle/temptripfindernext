@@ -81,16 +81,9 @@
 		this.obSelectedDestination.subscribe(
 			this.setSelectValue("destination", "obSelectedDestination", function(obj)
 			{
-				return obj ? obj.Id : 0;
+				return obj ? obj.Name : 0;
 			}), this);
-		this.obCurrentDestinationName = ko.computed(
-			this.setSelectTextComputer("obDestinationDataModels", "destination", function(obj)
-			{
-				return obj.Id;
-			}, function(obj)
-				{
-					return obj.Name;
-				}), this);
+		this.obCurrentDestinationName = ko.computed(this.setSelectTextComputer("obDestinationDataModels", "destination", function(obj) { return obj.Name; }, function(obj) { return obj.Name; }), this);
 		this.obSelectedDestination.subscribe(function()
 		{
 			this._fieldsUpdateFromModal("destination", this.obSelectedDestination());

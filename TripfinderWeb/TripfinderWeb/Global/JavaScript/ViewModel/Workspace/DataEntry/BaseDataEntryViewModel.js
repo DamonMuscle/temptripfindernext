@@ -613,20 +613,6 @@
 			};
 		});
 
-		this.$form.find("input[data-tf-input-type=Phone]").each(function(n, field)
-		{
-			var name = $(field).attr("name");
-			validatorFields[name] = {
-				trigger: "blur change",
-				validators: {
-					phone: {
-						country: tfRegion.toUpperCase(),
-						message: " The value is not valid phone number"
-					}
-				}
-			}
-		});
-
 		this.$form.find("input[data-tf-validation=notInFuture]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
@@ -779,7 +765,13 @@
 
 	BaseDataEntryViewModel.prototype.saveClick = function(viewModel, e)
 	{
-		return this.trySave();
+		return this.trySave().then(function(e)
+		{
+			if (e)
+			{
+				tf.pageManager.resizablePage.refreshLeftGrid();
+			}
+		}.bind(this));
 	};
 
 	BaseDataEntryViewModel.prototype.saveAsTemplateClick = function(viewModel, e)
@@ -1342,7 +1334,7 @@
 			}
 			this[textName](item.text);
 		}
-	}
+	};
 
 	BaseDataEntryViewModel.prototype.setSelectTextComputer = function(sourceName, field, valueFormat, Textformat)
 	{

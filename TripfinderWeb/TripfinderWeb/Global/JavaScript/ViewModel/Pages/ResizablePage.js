@@ -103,6 +103,14 @@
 		self.reLayoutPage();
 	};
 
+	ResizablePage.prototype.refreshLeftGrid = function()
+	{
+		var self = this, $grid, grid;
+		$grid = self.$leftPage.find(".kendo-grid");
+		grid = $grid.data("kendoGrid");
+		grid.dataSource.read();
+	};
+
 	ResizablePage.prototype.reLayoutPage = function()
 	{
 		var self = this, leftWidth, totalWidth;
