@@ -35,6 +35,7 @@
 		self.changeDataPointEvent = new TF.Events.Event();
 		self.toggleResizableEvent = new TF.Events.Event();
 		self.onColumnChangedEvent = new TF.Events.Event();
+		self.onCloseDetailEvent = new TF.Events.Event();
 		self.onCloseEditMode = new TF.Events.Event();
 		self.selectItemClick = self.selectItemClick.bind(self);
 		self.saveGroup = self.saveGroup.bind(self);
@@ -4764,6 +4765,12 @@
 		window.open("#/?id=" + data.entitySelectId, "new-detailWindow");
 	};
 
+	DetailViewViewModel.prototype.closeDetailClick = function(data, e)
+	{
+		var self = this;
+		self.onCloseDetailEvent.notify();
+	};
+
 	/**
 	 * Copy GridStack css to print document.
 	* @param {PrintDocument} printDoc
@@ -5065,6 +5072,7 @@
 				calendar.destroy();
 			}
 		}
+		self.onCloseDetailEvent.unsubscribeAll();
 		self.onToggleDataPointPanelEvent.unsubscribeAll();
 		self.onClosePanelEvent.unsubscribeAll();
 		self.onCloseEditMode.unsubscribeAll();

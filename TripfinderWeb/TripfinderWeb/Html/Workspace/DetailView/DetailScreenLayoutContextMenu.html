@@ -1,6 +1,7 @@
 <div class="tf-contextmenu-wrap tf-contextmenu-white detail-screen-contextmenu" data-bind="style:{right:obMoveDistance, top:obTop}">
 	<ul class="tf-contextmenu">
 		<!-- ko if: obNewWindow -->
+		<!--ko if :!TF.isPhoneDevice-->
 		<li class="menu-item" data-bind="contextMenuClick:newLayoutClick">
 			New
 		</li>
@@ -25,6 +26,7 @@
 			<div class="rule"></div>
 		</li>
 		<!--/ko -->
+		<!--/ko-->
 		<!--/ko -->
 		<!--ko foreach: obLayouts -->
 		<li class="menu-item" data-bind="attr: { title: comments },

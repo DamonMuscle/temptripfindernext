@@ -157,6 +157,9 @@
 		else
 		{
 			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
+			self.detailView.onCloseDetailEvent.subscribe(
+				self.closeDetailClick.bind(self)
+			);
 			if (TF.isPhoneDevice)
 			{
 				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
@@ -168,6 +171,16 @@
 
 		}
 		self.obShowDetailPanel(true);
+	};
+
+
+	BaseGridPage.prototype.closeDetailClick = function()
+	{
+		var self = this;
+		tf.pageManager.resizablePage.clearLeftOtherContent();
+		self.detailView.dispose();
+		self.detailView = null;
+		self.obShowDetailPanel(false);
 	};
 
 	//TODO right click menu feature
