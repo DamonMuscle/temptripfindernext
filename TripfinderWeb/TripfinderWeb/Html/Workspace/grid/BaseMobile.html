@@ -1,4 +1,4 @@
-﻿<div class="doc document-grid" data-bind="uiInit:afterRender">
+<div class="doc document-grid" data-bind="uiInit:afterRender">
 	<!--ko if:!obIsHideTitle()-->
 	<div class="toppart gridTop">
 		<!--ko if:obIsDocument-->
@@ -29,6 +29,7 @@
 			<div class="view-grid-header-count">(
 				<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)</div>
 			<!-- /ko -->
+            <div style="clear:both">
 			<!--ko if:!$parent.obCanOperation()-->
 			<!--ko if: $parent.obMapCanOperation()-->
 			<div class="iconbutton gridview" title="Grid View" data-bind="click:gridIconClicked,css:{open:!obShowSplitmap()}"></div>
@@ -85,8 +86,10 @@
 			<!--ko if:$parent.obCanOpenNewGrid()-->
 			<div class="iconbutton newGrid pull-right" style="width:16px; margin-right:-5px;" data-bind="click:newGridClick, attr:{title: $parent.obTooltipOpenNewGrid || 'Open New Grid'}"></div>
 			<!-- /ko -->
+			</div>
+			<div style="clear:both">
 			<!--ko if:$parent.obIsDocument && searchGrid.obLayoutFilterOperation() -->
-			<div style="height:22px;float: right;padding-top: 7px;">
+			<div style="height:auto;float:left;">
 				<div class="grid-staterow">
 					<span class="title">Filter:</span>
 					<span data-bind="text:searchGrid.obSelectedGridFilterName,visible:searchGrid.noApplyFilterNoModified"></span>
@@ -108,6 +111,8 @@
 					<span>)</span>
 					<!-- /ko -->
 				</div>
+			</div>
+			<!-- /ko -->
 			</div>
 			<!-- /ko -->
 		</div>

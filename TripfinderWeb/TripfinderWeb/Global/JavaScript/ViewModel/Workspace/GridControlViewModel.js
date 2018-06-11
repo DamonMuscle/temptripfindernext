@@ -37,14 +37,17 @@
 			this.obIsHideTitle(true);
 		}
 
-		this.isDataRowHover = isDataRowHover ? isDataRowHover : false;
+		this.isDataRowHover = isDataRowHover ? isDataRowHover : false;	
 		this.dataSource = dataSource;
 		this._routeState = routeState ? routeState : this._gridType;
 	};
 
 	GridControlViewModel.prototype.constructor = GridControlViewModel;
 
-	GridControlViewModel.prototype.templateName = 'workspace/grid/base';
+	GridControlViewModel.prototype.templateName = function()
+	{
+		return TF.isPhoneDevice ? 'workspace/grid/basemobile' : 'workspace/grid/base';
+	}
 
 	GridControlViewModel.prototype.openNewDocumentClick = function(viewModel, e)
 	{
