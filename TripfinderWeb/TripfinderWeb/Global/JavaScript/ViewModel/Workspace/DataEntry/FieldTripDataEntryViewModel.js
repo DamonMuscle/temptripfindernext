@@ -6,7 +6,7 @@
 
 	function FieldTripDataEntryViewModel(ids, view)
 	{
-		// $.extend(this, new TF.Helper.FieldTripResourcesHelper());
+		$.extend(this, new TF.Helper.FieldTripResourcesHelper());
 
 		this.pageLevelViewModel = new TF.PageLevel.FieldTripDataEntryPageLevelViewModel();
 		namespace.BaseDataEntryViewModel.call(this, ids, view);
@@ -604,30 +604,37 @@
 			}
 
 		}.bind(this));
-
-		var resourceSource = new kendo.data.DataSource({
-			data: this.obFieldTripResourceGroupData()
-		});
+		var resourceSort = this.obResourcesGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+			resourceSource = new kendo.data.DataSource({
+				data: this.obFieldTripResourceGroupData(),
+				sort: resourceSort
+			});
 		this.obResourcesGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-		this.obResourcesGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+		this.obResourcesGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 
-		var vehicleSource = new kendo.data.DataSource({
-			data: this.obVehicleGridSource()
-		});
+		var vehicleSort = this.obVehicleGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+			vehicleSource = new kendo.data.DataSource({
+				data: this.obVehicleGridSource(),
+				sort: vehicleSort
+			});
 		this.obVehicleGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(vehicleSource);
-		this.obVehicleGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+		this.obVehicleGridViewModel().obGridViewModel().searchGrid.rebuildGrid(vehicleSort);
 
-		var driverSource = new kendo.data.DataSource({
-			data: this.obDriversGridSource()
-		});
+		var driverSort = this.obVehicleGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+			driverSource = new kendo.data.DataSource({
+				data: this.obDriversGridSource(),
+				sort: driverSort
+			});
 		this.obDriversGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(driverSource);
-		this.obDriversGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+		this.obDriversGridViewModel().obGridViewModel().searchGrid.rebuildGrid(driverSort);
 
-		var aideSource = new kendo.data.DataSource({
-			data: this.obBusAideGridSource()
-		});
+		var aideSort = this.obVehicleGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+			aideSource = new kendo.data.DataSource({
+				data: this.obBusAideGridSource(),
+				sort: aideSort
+			});
 		this.obBusAideGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(aideSource);
-		this.obBusAideGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+		this.obBusAideGridViewModel().obGridViewModel().searchGrid.rebuildGrid(aideSort);
 	}
 
 	FieldTripDataEntryViewModel.prototype.loadInvoicing = function()
@@ -1061,8 +1068,7 @@
 
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
 	{
-		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" },
-			sort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort();
+		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" };
 		tf.modalManager.showModal(new e.data.modal(option))
 			.then(function(data)
 			{
@@ -1072,12 +1078,13 @@
 					this.obInvoiceResourceId(data.resourceId + 1);
 
 					this.obInvoiceGridDataSource.push(data);
-					var resourceSource = new kendo.data.DataSource({
-						data: this.obInvoiceGridDataSource(),
-						sort: sort
-					});
+					var resourceSort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+						resourceSource = new kendo.data.DataSource({
+							data: this.obInvoiceGridDataSource(),
+							sort: resourceSort
+						});
 					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(sort);
+					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 				}
 			}.bind(this));
 	}
@@ -1105,12 +1112,14 @@
 							source.push(item);
 						}.bind(this));
 
-						var resourceSource = new kendo.data.DataSource({
-							data: source
-						});
+						var resourceSort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+							resourceSource = new kendo.data.DataSource({
+								data: source,
+								sort: resourceSort
+							});
 						this.obInvoiceGridDataSource(source);
 						this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-						this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+						this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 					}
 				}.bind(this));
 		}
@@ -1133,12 +1142,14 @@
 				source.push(item);
 			}.bind(this));
 
-			var resourceSource = new kendo.data.DataSource({
-				data: source
-			});
+			var resourceSort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+				resourceSource = new kendo.data.DataSource({
+					data: source,
+					sort: resourceSort
+				});
 			this.obInvoiceGridDataSource(source);
 			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid();
+			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 		}
 	}
 
