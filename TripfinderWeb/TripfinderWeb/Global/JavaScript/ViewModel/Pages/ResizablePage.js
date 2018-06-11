@@ -218,10 +218,11 @@
 
 	ResizablePage.prototype.resizeGrid = function(left)
 	{
-		var self = this, $grid, lockedHeaderWidth, paddingRight, width,
-			iconRow, wrapRow, iconRowTop, iconRowLeft;
+		var self = this, $grid, lockedHeaderWidth, paddingRight, width, totalWidth = self.$element.outerWidth(),
+			iconRow, wrapRow, iconRowTop, iconRowLeft, $rightGrid;
 
 		$grid = self.$leftPage.find(".kendo-grid");
+		$rightGrid = self.$rightPage.find(".kendo-grid");
 		if ($grid.length > 0)
 		{
 			lockedHeaderWidth = $grid.find('.k-grid-header-locked').width();
@@ -271,6 +272,17 @@
 				wrapRow.css("display", "block");
 				iconRow.css("display", "block");
 			}
+		}
+		if ($rightGrid && $rightGrid.length > 0)
+		{
+			lockedHeaderWidth = $rightGrid.find('.k-grid-header-locked').width();
+			paddingRight = parseInt($rightGrid.find(".k-grid-content").css("padding-right"));
+			width = $rightGrid.find(".k-grid-header").outerWidth() - lockedHeaderWidth - paddingRight;
+
+			$.each($rightGrid, function(index, container)
+			{
+				$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
+			});
 		}
 	};
 
