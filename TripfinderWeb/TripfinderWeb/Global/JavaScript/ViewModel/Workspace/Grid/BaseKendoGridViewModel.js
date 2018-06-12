@@ -107,36 +107,6 @@
 			this.initExtraSettings();
 
 			var url = option.url ? option.url : (this.type == "documentmini" ? "search/document" : "search/" + this.type);
-			// 			this.searchGrid = new TF.Grid.KendoGrid(this.$container.find('.kendo-grid-container'),
-			// 			{
-			// 				gridDefinition: option.gridDefinition,
-			// 				storageKey: option.storageKey ? option.storageKey : "grid.currentlayout." + (this.type == "attendance" ? "attendancerecords" : this.type),
-			// 				loadLayout: option.loadLayout,
-			// 				gridType: this.type,
-			// 				url: pathCombine(tf.api.apiPrefix(), url),
-			// 				obDocumentFocusState: this._obFocusState,
-			// 				onGridStateChange: this.onGridStateChange,
-			// 				showBulkMenu: this._showBulkMenu,
-			// 				showLockedColumn: this._showBulkMenu,
-			// 				loadUserDefined: this._loadUserDefined,
-			// 				containerHeight: option.height,
-			// 				expandColumns: option.expandColumns,
-			// 				isDataRowHover: option.isDataRowHover,
-			// 				dataSource: option.dataSource,
-			// 				onDataBound: option.onDataBound,
-			// 				noNeedDefaultLayout: option.noNeedDefaultLayout,
-			// 				selectable: option.selectable,
-			// 				isFromRelated: option.isFromRelated,
-			// 				fromMenu: option.fromMenu,
-			// 				kendoGridOption: option.kendoGridOption,
-			// 				directory: this.directoryViewDataModel,
-			// 				isSmallGrid: option.isSmallGrid,
-			// 				showOmittedCount: option.showOmittedCount,
-			// 				showSelectedCount: option.showSelectedCount,
-			// 				gridTypeInPageInfo: option.gridTypeInPageInfo,
-			// 				routeState: option.routeState,
-			// 				setRequestOption: option.setRequestOption
-			// 			}, this._gridState);
 
 			var defaultOption = {
 				storageKey: option.storageKey ? option.storageKey : "grid.currentlayout." + (this.type == "attendance" ? "attendancerecords" : this.type),
@@ -149,6 +119,17 @@
 				loadUserDefined: this._loadUserDefined,
 				containerHeight: option.height,
 				directory: this.directoryViewDataModel,
+				onSelectRowChange: function(e)
+				{
+					if (e && e.length > 0)
+					{
+						this.obIsSelectRow(true);
+					}
+					else
+					{
+						this.obIsSelectRow(false);
+					}
+				}.bind(this)
 			}
 
 			var newOption = $.extend({}, defaultOption, option);
@@ -174,13 +155,6 @@
 				{
 					this.obIsSelectRow(true);
 				}
-
-				// interact with map
-				if (this.obShowSplitmap())
-				{
-					//this.loadFeatures();
-				};
-
 			}, this);
 			this.obNoRecordSelected = this.obGridNoSelection;
 			this.targetID = ko.observable();

@@ -193,6 +193,10 @@
 
 		self.getSelectedRecords(records);
 		self.onRowsChanged.notify(records);
+		if (self.options.onSelectRowChange)
+		{
+			self.options.onSelectRowChange(self.kendoGrid.select());
+		}
 	};
 
 	LightKendoGrid.prototype.bindDoubleClickEvent = function()
