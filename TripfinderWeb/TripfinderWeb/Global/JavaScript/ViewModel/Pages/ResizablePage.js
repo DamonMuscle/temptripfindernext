@@ -243,42 +243,45 @@
 			});
 
 			//update toolbar
-			iconRow = self.$leftPage.find(".iconrow");
-			wrapRow = self.$leftPage.find(".grid-staterow-wrap");
-			iconRow.css("display", "block");
-			wrapRow.removeClass("pull-left").addClass("pull-right");
-			wrapRow.css("width", "auto");
-			iconRow.css("width", "auto");
-			$(document).off(".iconhover");
-			wrapRow.off(".iconhover");
-			if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
+			if (!TF.isPhoneDevice)
 			{
-				iconRow.css("display", "none");
-				wrapRow.removeClass("pull-right").addClass("pull-left").css("width", "100%");
-				wrapRow.on("mousemove.iconhover", function()
-				{
-					wrapRow.css("display", "none");
-					iconRow.css("display", "block");
-					iconRow.css("width", "100%");
-				});
-				$(document).on("mousemove.iconhover", function(e)
-				{
-					iconRowTop = iconRow.offset().top, iconRowLeft = iconRow.offset().left;
-					if (!(e.pageY > iconRowTop && e.pageY < iconRowTop + iconRow.outerHeight()
-						&& e.pageX > iconRowLeft && e.pageX < iconRowLeft + iconRow.outerWidth()))
-					{
-						iconRow.css("display", "none");
-						wrapRow.css("display", "block");
-						wrapRow.css("width", "100%");
-					}
-				});
-			}
-			else
-			{
+				iconRow = self.$leftPage.find(".iconrow");
+				wrapRow = self.$leftPage.find(".grid-staterow-wrap");
+				iconRow.css("display", "block");
+				wrapRow.removeClass("pull-left").addClass("pull-right");
 				wrapRow.css("width", "auto");
 				iconRow.css("width", "auto");
-				wrapRow.css("display", "block");
-				iconRow.css("display", "block");
+				$(document).off(".iconhover");
+				wrapRow.off(".iconhover");
+				if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
+				{
+					iconRow.css("display", "none");
+					wrapRow.removeClass("pull-right").addClass("pull-left").css("width", "100%");
+					wrapRow.on("mousemove.iconhover", function()
+					{
+						wrapRow.css("display", "none");
+						iconRow.css("display", "block");
+						iconRow.css("width", "100%");
+					});
+					$(document).on("mousemove.iconhover", function(e)
+					{
+						iconRowTop = iconRow.offset().top, iconRowLeft = iconRow.offset().left;
+						if (!(e.pageY > iconRowTop && e.pageY < iconRowTop + iconRow.outerHeight()
+							&& e.pageX > iconRowLeft && e.pageX < iconRowLeft + iconRow.outerWidth()))
+						{
+							iconRow.css("display", "none");
+							wrapRow.css("display", "block");
+							wrapRow.css("width", "100%");
+						}
+					});
+				}
+				else
+				{
+					wrapRow.css("width", "auto");
+					iconRow.css("width", "auto");
+					wrapRow.css("display", "block");
+					iconRow.css("display", "block");
+				}
 			}
 		}
 		if ($rightGrid && $rightGrid.length > 0)
@@ -334,10 +337,7 @@
 		if (self.obGridData())
 		{
 			self.obShowGrid(true);
-			if (!TF.isPhoneDevice)
-			{
-				self.resizeGrid(self.$leftPage.width());
-			}
+			self.resizeGrid(self.$leftPage.width());
 		}
 	};
 

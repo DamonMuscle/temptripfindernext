@@ -88,9 +88,9 @@
 				return c.Id;
 			}).ToArray();
 
-			if (self.obShowDetailPanel() && self.selectedRecordIds[0])
+			if (self.obShowDetailPanel() && self.selectedRecordIds[ 0 ])
 			{
-				self.detailView.showDetailViewById(self.selectedRecordIds[0]);
+				self.detailView.showDetailViewById(self.selectedRecordIds[ 0 ]);
 			}
 		}.bind(self));
 
@@ -103,44 +103,32 @@
 		}
 		else
 		{
-			ko.computed(function()
+			iconRow = self.$element.find(".grid-icons");
+			containerWidth = iconRow.outerWidth();
+			statusRow = iconRow.find(".grid-staterow-wrap");
+			toolRow = iconRow.find(".iconrow");
+			statusRow.width("auto");
+			toolRow.width("auto");
+			statusRow.css("marginLeft", "0px");
+			toolRow.css("marginLeft", "0px");
+			statusRow.addClass("pull-right");
+			statusRow.css("marginLeft", containerWidth + "px");
+			statusRow.width("100%");
+			toolRow.width("100%");
+			statusRow.removeClass("pull-right");
+			detectswipe(self.$element.find(".grid-icons"), function(el, d)
 			{
-				if (TF.isPhoneDevice && self.searchGrid.obSelectedGridFilterName() && self.searchGrid.obSelectedGridLayoutName())
+				if (d === "l" && toolRow.css("marginLeft") === "0px")
 				{
-					iconRow = self.$element.find(".grid-icons");
-					containerWidth = iconRow.outerWidth();
-					setTimeout(function()
-					{
-						statusRow = iconRow.find(".grid-staterow-wrap");
-						toolRow = iconRow.find(".iconrow");
-						statusRow.width("auto");
-						toolRow.width("auto");
-						statusRow.css("marginLeft", "0px");
-						toolRow.css("marginLeft", "0px");
-						statusRow.addClass("pull-right");
-						if (iconRow.height() > 28)
-						{
-							statusRow.css("marginLeft", containerWidth + "px");
-							statusRow.width("100%");
-							toolRow.width("100%");
-							statusRow.removeClass("pull-right");
-							detectswipe(self.$element.find(".grid-icons"), function(el, d)
-							{
-								if (d === "l" && toolRow.css("marginLeft") === "0px")
-								{
-									toolRow.animate({ marginLeft: -containerWidth }, 200);
-									statusRow.animate({ marginLeft: 0 }, 200);
-								}
-								else if (d === "r" && statusRow.css("marginLeft") === "0px")
-								{
-									toolRow.animate({ marginLeft: 0 }, 200);
-									statusRow.animate({ marginLeft: containerWidth }, 200);
-								}
-							});
-						}
-					})
+					toolRow.animate({ marginLeft: -containerWidth }, 200);
+					statusRow.animate({ marginLeft: 0 }, 200);
 				}
-			}, self);
+				else if (d === "r" && statusRow.css("marginLeft") === "0px")
+				{
+					toolRow.animate({ marginLeft: 0 }, 200);
+					statusRow.animate({ marginLeft: containerWidth }, 200);
+				}
+			});
 		}
 
 		self._openBulkMenu();
@@ -157,7 +145,7 @@
 			return;
 		}
 
-		selectedId = selectedIds[0];
+		selectedId = selectedIds[ 0 ];
 		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
 			self.detailView.showDetailViewById(selectedId);
@@ -222,7 +210,7 @@
 			});
 			if (items.length > 0)
 			{
-				$(items[0]).trigger("mousedown", [e]);
+				$(items[ 0 ]).trigger("mousedown", [ e ]);
 			}
 		});
 	};
@@ -357,7 +345,7 @@
 
 		navigationData = new TF.NavigationMenu();
 
-		ko.applyBindings(ko.observable(navigationData), $content[0]);
+		ko.applyBindings(ko.observable(navigationData), $content[ 0 ]);
 	};
 
 	BaseGridPage.prototype.onDataBound = function(option)
@@ -447,7 +435,7 @@
 			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "getEntityNames"), { data: selectedIds })
 				.then(function(response)
 				{
-					showEditModal(response.Items[0]);
+					showEditModal(response.Items[ 0 ]);
 				});
 		}
 		else
@@ -482,7 +470,7 @@
 			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "getEntityNames"), { data: selectedIds })
 				.then(function(response)
 				{
-					showEditModal(response.Items[0]);
+					showEditModal(response.Items[ 0 ]);
 				});
 		}
 		else
@@ -526,7 +514,7 @@
 						tabNames: response.Items,
 					}),
 					view = {
-						id: documentData.data.ids[0],
+						id: documentData.data.ids[ 0 ],
 						documentType: documentData.documentType,
 						type: documentData.data.type,
 					};
@@ -546,13 +534,13 @@
 					mode: "Add",
 				}),
 			view = {
-				id: documentData.data.ids[0],
+				id: documentData.data.ids[ 0 ],
 				documentType: documentData.documentType,
 				type: documentData.data.type,
 			};
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
-		if(TF.isPhoneDevice)	tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
-		else	tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		if (TF.isPhoneDevice) tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		else tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
 
 	};
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
@@ -583,7 +571,7 @@
 		// release the objects
 		for (var i in self)
 		{
-			self[i] = null;
+			self[ i ] = null;
 		}
 	};
 })();
