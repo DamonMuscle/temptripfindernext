@@ -786,6 +786,7 @@
 			{
 				if (e)
 				{
+					tf.pageManager.resizablePage.refreshLeftGrid();
 					tf.pageManager.resizablePage.closeRightPage();
 				}
 			}.bind(this));
