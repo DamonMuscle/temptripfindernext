@@ -9,7 +9,7 @@
 		this.baseDeletion = new TF.Executor.FieldtripInvoiceDeletion();
 		var self = this;
 		this.options.gridDefinition = tf.FieldTripInvoiceGridDefinition.gridDefinition();
-		if (kendoGridState.entityType == "fieldtripEntity")
+		if (kendoGridState.entityType == "fieldtripEntry")
 		{
 			this.options.kendoGridOption = {
 				pageable: false
