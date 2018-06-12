@@ -151,15 +151,23 @@
 					}
 					else
 					{
-						var top = this.$element.outerHeight();
+						var top = this.$element.outerHeight(), left;
 						if (($button.offset().top + $button.outerHeight() + this.height + 67) > document.body.offsetHeight)
 						{
 							top = -this.height;
 						}
+						if (document.body.offsetWidth - $button[0].getBoundingClientRect().right > widget.outerWidth() / 2)
+						{
+							left = $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2;
+						}
+						else
+						{
+							left = widget.outerWidth() - widget.innerWidth();
+						}
 						widget.css(
 							{
 								top: top,
-								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2
+								left: left
 							});
 					}
 				}
