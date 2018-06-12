@@ -33,18 +33,19 @@
 			{
 				imageId = obj.Id;
 			}
-		}else
+		} else
 		{
-			if (imageType == "vehicle"){
+			if (imageType == "vehicle")
+			{
 				placeholderImage = "vehicle";
 			}
 		}
 		this.getImage(imageType, imageId, placeholderImage)
-		.then(function(image)
-		{
-			$(element).attr("src", 'data:image/jpeg;base64,' + image);
+			.then(function(image)
+			{
+				$(element).attr("src", 'data:image/jpeg;base64,' + image);
 
-		}.bind(this));
+			}.bind(this));
 
 		return "";
 	}
@@ -66,12 +67,12 @@
 
 	FieldTripResourcesHelper.prototype.calculatedMileageRateComputer = function(fieldTripResourceDataEntry)
 	{
-		return (fieldTripResourceDataEntry.Endingodometer - fieldTripResourceDataEntry.Startingodometer) * fieldTripResourceDataEntry.MileageRate;
+		return (Number(fieldTripResourceDataEntry.Endingodometer) - Number(fieldTripResourceDataEntry.Startingodometer)) * Number(fieldTripResourceDataEntry.MileageRate);
 	}
 
 	FieldTripResourcesHelper.prototype.vehicleCostComputer = function(fieldTripResourceDataEntry)
 	{
-		return this.calculatedMileageRateComputer(fieldTripResourceDataEntry) + fieldTripResourceDataEntry.VehFixedCost;
+		return this.calculatedMileageRateComputer(fieldTripResourceDataEntry) + Number(fieldTripResourceDataEntry.VehFixedCost);
 	}
 
 	FieldTripResourcesHelper.prototype.driverCostComputer = function(fieldTripResourceDataEntry)
@@ -80,7 +81,7 @@
 		{
 			return 0;
 		}
-		return fieldTripResourceDataEntry.DriverHours * fieldTripResourceDataEntry.DriverRate + fieldTripResourceDataEntry.DriverOthours * fieldTripResourceDataEntry.DriverOtrate + fieldTripResourceDataEntry.DriverFixedCost;
+		return Number(fieldTripResourceDataEntry.DriverHours) * Number(fieldTripResourceDataEntry.DriverRate) + Number(fieldTripResourceDataEntry.DriverOthours) * Number(fieldTripResourceDataEntry.DriverOtrate) + Number(fieldTripResourceDataEntry.DriverFixedCost);
 	}
 
 	FieldTripResourcesHelper.prototype.driverTotalCostComputer = function(fieldTripResourceDataEntry)
@@ -90,19 +91,19 @@
 
 	FieldTripResourcesHelper.prototype.busAideCostComputer = function(fieldTripResourceDataEntry)
 	{
-		return fieldTripResourceDataEntry.AideHours * fieldTripResourceDataEntry.AideRate + fieldTripResourceDataEntry.AideOthours * fieldTripResourceDataEntry.AideOtrate + fieldTripResourceDataEntry.AideFixedCost;
+		return Number(fieldTripResourceDataEntry.AideHours) * Number(fieldTripResourceDataEntry.AideRate) + Number(fieldTripResourceDataEntry.AideOthours) * Number(fieldTripResourceDataEntry.AideOtrate) + Number(fieldTripResourceDataEntry.AideFixedCost);
 	}
 
 	FieldTripResourcesHelper.prototype.resourceSubTotalComputer = function(fieldTripResourceDataEntry)
 	{
 		return this.vehicleCostComputer(fieldTripResourceDataEntry) +
-				this.driverTotalCostComputer(fieldTripResourceDataEntry) +
-				this.busAideCostComputer(fieldTripResourceDataEntry);
+			this.driverTotalCostComputer(fieldTripResourceDataEntry) +
+			this.busAideCostComputer(fieldTripResourceDataEntry);
 	}
 
 	FieldTripResourcesHelper.prototype.expensesComputer = function(fieldTripResourceDataEntry)
 	{
-		return fieldTripResourceDataEntry.DriverExpMeals + fieldTripResourceDataEntry.DriverExpMisc + fieldTripResourceDataEntry.DriverExpParking + fieldTripResourceDataEntry.DriverExpTolls
+		return Number(fieldTripResourceDataEntry.DriverExpMeals) + Number(fieldTripResourceDataEntry.DriverExpMisc) + Number(fieldTripResourceDataEntry.DriverExpParking) + Number(fieldTripResourceDataEntry.DriverExpTolls);
 	}
 
 	FieldTripResourcesHelper.prototype.resourcesTotalComputer = function()
