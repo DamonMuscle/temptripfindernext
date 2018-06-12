@@ -311,10 +311,19 @@
 	{
 		var self = this;
 
-		if (self.obRightData() && self.obRightData().dispose)
+		if (self.obRightData())
 		{
-			self.obRightData().dispose();
+			if (self.obGridData())
+			{
+				self.obGridData().clearRelatedRightPage(self.obRightData().pageType);
+			}
+
+			if (self.obRightData().dispose)
+			{
+				self.obRightData().dispose();
+			}
 		}
+
 		self.$rightPage.empty();
 		self.obRightData(null);
 	};

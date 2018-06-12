@@ -17,6 +17,7 @@
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
 		self.obShowDetailPanel = ko.observable(false);
+		self.obShowFieldTripDEPanel = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
 		self.detailView = null;
@@ -52,9 +53,18 @@
 		{
 			self.obIsSelectRow(self.searchGrid.getSelectedIds().length !== 0);
 			self.selectedRecordIds = self.searchGrid.getSelectedIds()
-			if (self.obShowDetailPanel() && self.selectedRecordIds[0])
+			if (self.selectedRecordIds[0])
 			{
-				self.detailView.showDetailViewById(self.selectedRecordIds[0]);
+				if (self.obShowDetailPanel())
+				{
+					self.detailView.showDetailViewById(self.selectedRecordIds[0]);
+				}
+				else if (self.obShowFieldTripDEPanel())
+				{
+					self.fieldTripDataEntry._view.id = self.selectedRecordIds[0];
+					self.fieldTripDataEntry.loadSupplement()
+						.then(self.fieldTripDataEntry.loadRecord);
+				}
 			}
 		});
 	};
@@ -82,10 +92,7 @@
 			filteredIds: option.filteredIds
 		}));
 		self.searchGrid.filterMenuClick = self.searchGrid.filterMenuClick.bind(self);
-		self.searchGrid.onDoubleClick.subscribe(function(e, data)
-		{
-			self.showDetailsClick();
-		}.bind(self));
+
 		if (!TF.isPhoneDevice)
 		{
 			self.searchGrid.onDoubleClick.subscribe(function(e, data)
@@ -138,6 +145,29 @@
 		self._openBulkMenu();
 		self.targetID = ko.observable();
 		self.searchGridInited(true);
+	};
+
+	BaseGridPage.prototype.clearRelatedRightPage = function(type)
+	{
+		var self = this;
+
+		switch (type)
+		{
+			case "detailview":
+				self.detailView = null;
+				self.obShowDetailPanel(false);
+				break;
+			case "fieldtripde":
+				self.fieldTripDataEntry = null;
+				self.obShowFieldTripDEPanel(false);
+				break;
+			default:
+				self.detailView = null;
+				self.fieldTripDataEntry = null;
+				self.obShowFieldTripDEPanel(false);
+				self.obShowDetailPanel(false);
+				break;
+		}
 	};
 
 	BaseGridPage.prototype.showDetailsClick = function()
@@ -548,8 +578,8 @@
 						type: documentData.data.type,
 					};
 				self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
+				self.obShowFieldTripDEPanel(true);
 				tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
-
 			});
 	};
 
@@ -568,10 +598,17 @@
 				type: documentData.data.type,
 			};
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
-		if(TF.isPhoneDevice)	tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
-		else	tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
-
+		self.obShowFieldTripDEPanel(true);
+		if (TF.isPhoneDevice)
+		{
+			tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		}
+		else
+		{
+			tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		}
 	};
+
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
 	{
 		var self = this;

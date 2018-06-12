@@ -13,6 +13,7 @@
 
 		this.initializationFrontdesk = new TF.InitializationFrontdesk(1, this.initialize);
 		this.dataModelType = TF.DataModel.FieldTripDataModel;
+		this.pageType = "fieldtripde";
 		this.obTitle(tf.applicationTerm.getApplicationTermSingularByName("Field Trip"));
 		this.obgridTitle("FieldTrip");
 		this.dataEntryTemplateName = "workspace/dataentry/fieldtrip/form";
@@ -1152,29 +1153,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
+				{
+					message: " must be unique",
+					callback: function(value, validator, $field)
 					{
-						message: " must be unique",
-						callback: function(value, validator, $field)
+						if (value == "" || this.obEntityDataModel().id())
 						{
-							if (value == "" || this.obEntityDataModel().id())
-							{
-								return true;
-							}
+							return true;
+						}
 
-							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-								paramData: {
-									name: this.obEntityDataModel().name()
-								}
-							}, {
-									overlay: false
-								})
-								.then(function(apiResponse)
-								{
-									return apiResponse.Items[0] == false;
-								})
-						}.bind(this)
-					}
+						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+							paramData: {
+								name: this.obEntityDataModel().name()
+							}
+						}, {
+								overlay: false
+							})
+							.then(function(apiResponse)
+							{
+								return apiResponse.Items[0] == false;
+							})
+					}.bind(this)
+				}
 			}
 		};
 

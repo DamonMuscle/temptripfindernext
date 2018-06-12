@@ -10,6 +10,7 @@
 	{
 		var self = this;
 		self.gridType = "fieldtrip";
+		self.pageType = "detailview";
 		self.optionId = optionId ? optionId : null;
 		self.UNITHEIGHT = 58;
 		//vertical margin not support cannot set to 0, so set to 1, looks the same.
