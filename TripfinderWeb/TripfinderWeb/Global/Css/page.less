@@ -27,6 +27,7 @@ body,
 
 		.right-page {
 			margin-left: 3px;
+			overflow: auto;
 		}
 
 		.resize-handler {
@@ -36,7 +37,7 @@ body,
 			height: 100%;
 			background-color: #4b4b4b;
 			cursor: ew-resize;
-			z-index: 2;
+			z-index: 1000;
 
 			.sliderbar-button {
 				position: absolute;
@@ -75,19 +76,38 @@ body,
 			height: 100%;
 			width: 100%;
 
-			.page-title {
-				padding-left: 16px;
+			.desktop-header {
+				height: 56px;
+				border-bottom: 2px solid #f2f2f2;
+				padding: 0 16px;
+				font-family: "SourceSansPro-SemiBold";
 				font-weight: bold;
+
+			.page-title {
 				letter-spacing: 3px;
 				font-size: 26px;
 				color: #262626;
 				line-height: 56px;
 				white-space: nowrap;
-				font-family: "SourceSansPro-SemiBold";
 				height: 56px;
-				border-bottom: 2px solid #f2f2f2;
 				text-transform: uppercase;
+					float: left;
 			}
+
+				.new {
+					width: 60px;
+					height: 36px;
+					border: 1px solid @systemColor;
+					border-radius: 5px;
+					font-size: 20px;
+					color: @systemColor;
+					float: right;
+					line-height: 36px;
+					text-align: center;
+					margin-top: 10px;
+				}
+			}
+
 
 			.grid-icons {
 				float: left;
@@ -388,7 +408,6 @@ body {
 		border-bottom: 2px solid #f2f2f2;
 	}
 
-
 	.document-grid {
 		height: 100%;
 		background-color: #fff;
@@ -450,6 +469,16 @@ body {
 			z-index: 1000;
 			margin-left: 2px;
 			min-width: 580px;
+		}
+	}
+
+	.view-form-grid.small {
+		.document-grid {
+			.iconrow {
+				float: unset;
+				white-space: unset;
+				height: unset;
+			}
 		}
 	}
 
@@ -566,4 +595,20 @@ body {
 			display: none !important;
 		}
 	}
+}
+
+.help-block {
+	margin-bottom: 0;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.resources .grid-staterow {
+	margin-right: 20px;
+}
+
+.document-dataentry .tf-btn-black {
+	margin-left: 15px;
 }

@@ -222,9 +222,9 @@
 		this._gridDefinition.Columns = this.userDefinedFieldUtil.mergeUserDefinedLabel(this._gridDefinition.Columns);
 	};
 
-	KendoGrid.prototype.rebuildGrid = function()
+	KendoGrid.prototype.rebuildGrid = function(sortInfo)
 	{
-		return TF.Grid.LightKendoGrid.prototype.rebuildGrid.apply(this)
+		return TF.Grid.LightKendoGrid.prototype.rebuildGrid.apply(this, sortInfo)
 			.then(function()
 			{
 				this.createDragDelete();

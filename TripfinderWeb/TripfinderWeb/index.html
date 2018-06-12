@@ -20,7 +20,10 @@
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
 	<link rel="stylesheet" href="Global/Css/tripfinder.css"></link>
 	<!-- endbuild -->
-
+	<!--  Override above variables  in local_settings.js if you want them to be different-->
+	<script>
+		var tfRegion = "{{region}}";
+	</script>
 	<script src="local_settings.js"></script>
 	<script src="Global/ThirdParty/jquery-1.11.1.min.js"></script>
 	<script src="Global/ThirdParty/jquery-ui-1.10.4.custom.min.js"></script>
@@ -32,6 +35,7 @@
 	<script src="Global/ThirdParty/Kendo/kendo.all.min.js"></script>
 	<script src="Global/ThirdParty/bootstrap/js/bootstrap.min.js"></script>
 	<script src="Global/ThirdParty/bootstrapvalidator/js/bootstrapValidator.js"></script>
+	<script src="Global/ThirdParty/phoneformat.js"></script>
 	<script src="Global/ThirdParty/store.min.js"></script>
 	<script src="Global/ThirdParty/linq.min.js"></script>
 	<script src="Global/ThirdParty/bootbox.min.js"></script>
@@ -54,6 +58,7 @@
 	<script src="Global/JavaScript/Framework/ContextMenuManager.js"></script>
 	<script src="Global/JavaScript/Framework/DatasourceManager.js"></script>
 	<script src="Global/JavaScript/Framework/LoadingIndicator.js"></script>
+	<script src="Global/JavaScript/Framework/InitializationFrontdesk.js"></script>
 	<script src="Global/JavaScript/Framework/ModalHelper.js"></script>
 	<script src="Global/JavaScript/Framework/ModalManager.js"></script>
 	<script src="Global/JavaScript/Framework/PromiseAjax.js"></script>
@@ -87,6 +92,7 @@
 	<script src="Global/JavaScript/Framework/Input/IntegerBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/DecimalBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/NumberBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/CurrencyBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/DateTimeBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/TimeBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/DataListBox.js"></script>
@@ -122,11 +128,14 @@
 
 	<script src="Global/JavaScript/ViewModel/Helper/KendoListMoverHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/TapHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/FieldTripResourcesHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/DropDownMenuHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/BaseControl.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/LoginViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/DataSourceChangeViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/ListFilterDefinition.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/KendoListMoverWithSearchControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ModifyDataEntryListItemViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SearchControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SaveTemplateNameViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Grid/EditKendoColumnViewModel.js"></script>
@@ -148,6 +157,16 @@
 	<script src="Global/JavaScript/ViewModel/Controls/KendoListMoverWithSearchControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/ListMoverForListFilterControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SearchSettingsViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/AddOneFieldViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/AddTwoFieldsViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripDestinationViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripBillingClassificationViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripResourceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripViewResourceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripResourceVehicleViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripResourceDriverViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripResourceAideViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripInvoiceViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/ManageDetailScreenLayoutViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointsJSON.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointPanel.js"></script>
@@ -160,13 +179,29 @@
 	<script src="Global/JavaScript/ViewModel/DetailView/EditDataBlockAppearance.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewHelper.js"></script>
 
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GridDefinition/FieldTripGridDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DocumentData.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/GridControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/BasePageLevelViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/ListMoverPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/FieldTripDataEntryPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/FieldTripDestinationPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/FieldTripBillingClassificationPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/BaseDataEntryPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/AddTwoFieldsPageViewModel.js"></script>
 
 	<script src="Global/JavaScript/Modal/BaseModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/TripfinderLoginModel.js"></script>
 	<script src="Global/JavaScript/Modal/TripfinderLoginViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripViewResourceModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/DatasourceChangeModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/AddOneFieldModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripResourceModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripResourceVehicleModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripResourceDriverModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripResourceAideModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripInvoiceModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/Grid/EditKendoColumnModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/Grid/EditKendoColumnModalViewModelForMobile.js"></script>
 	<script src="Global/JavaScript/Modal/Grid/ManageFilterModalViewModel.js"></script>
@@ -179,19 +214,53 @@
 	<script src="Global/JavaScript/Modal/ListMoverForListFilterControlModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/BootstrapSlider.js"></script>
 	<script src="Global/JavaScript/Modal/SearchSettingsModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/AddTwoFieldsModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripDestinationModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripBillingClassificationModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ModifyDataEntryListItemModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/ManageDetailScreenLayoutModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/ConditionalAppearanceModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/SaveTemplateNameModalViewModel.js"></script>
-
 
 	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/UserPreferenceDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/GridLayoutExtendedDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/GridFilterDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripDistrictDepartmentDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripClassificationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripActivityDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripEquipmentDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripDestinationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripBillingClassificationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripResourceDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripInvoiceDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripTemplatesDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/DocumentClassificationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleBodyTypeDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleBrakeTypeDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleFuelTypeDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleModelDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleMakeDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleMakeOfBodyDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/VehicleCategoryDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/DetailScreenLayoutDataModel.js"></script>
 
 	<script src="Global/JavaScript/Main.js"></script>
 	<script src="Global/JavaScript/Startup.js"></script>
+	<script src="Global/JavaScript/Setting.js"></script>
+
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/BaseDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripInvoiceDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/BaseKendoGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/FieldTripGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/FieldTripInvoiceGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DataEntry/BaseDataEntryViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DataEntry/FieldTripDataEntryViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/ReportsGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/FieldTripResourceGroupGridViewModel.js"></script>
+
 	<!-- endbuild -->
 </head>
 

@@ -20,6 +20,7 @@
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
 		self.detailView = null;
+		self.fieldTripDataEntry = null;
 		self.isGridPage = true;
 
 		self.approveButton = false;
@@ -64,7 +65,6 @@
 			baseOptions = {
 				storageKey: "grid.currentlayout." + self.type,
 				gridType: self.type,
-				pageType: self.pageType,
 				showBulkMenu: true,
 				showLockedColumn: true,
 				showOmittedCount: option.showOmittedCount,
@@ -186,6 +186,7 @@
 	//TODO right click menu feature
 	BaseGridPage.prototype.copyToClipboardClick = function()
 	{
+
 	};
 
 	//TODO right click menu feature
@@ -316,6 +317,7 @@
 		{
 			self.searchGrid.refreshClick(model, e);
 		});
+		self.bindEvent(".new", self.addClick);
 	};
 
 	BaseGridPage.prototype.layoutIconClick = function(viewModel, e)
@@ -518,6 +520,58 @@
 		self.editFieldTripStatus(false);
 	};
 
+	BaseGridPage.prototype.editClick = function(viewModel, e)
+	{
+		var self = this,
+			selectedIds = self.searchGrid.getSelectedIds(),
+			selectedRecords = self.searchGrid.getSelectedRecords();
+		if (selectedIds.length == 0)
+		{
+			return;
+		}
+
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), self.type, "getTabNames"), {
+			data: selectedIds
+		})
+			.then(function(response)
+			{
+				var documentData = new TF.Document.DocumentData("DataEntry",
+					{
+						type: "fieldtrip",
+						ids: selectedIds,
+						mode: "Edit",
+						tabNames: response.Items,
+					}),
+					view = {
+						id: documentData.data.ids[0],
+						documentType: documentData.documentType,
+						type: documentData.data.type,
+					};
+				self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
+				tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+
+			});
+	};
+
+	BaseGridPage.prototype.addClick = function(viewModel, e)
+	{
+		var self = this,
+			documentData = new TF.Document.DocumentData("DataEntry",
+				{
+					type: "fieldtrip",
+					ids: [],
+					mode: "Add",
+				}),
+			view = {
+				id: documentData.data.ids[0],
+				documentType: documentData.documentType,
+				type: documentData.data.type,
+			};
+		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
+		if(TF.isPhoneDevice)	tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		else	tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+
+	};
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
 	{
 		var self = this;

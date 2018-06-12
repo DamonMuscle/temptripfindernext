@@ -1,0 +1,10 @@
+﻿<div class="row document-dataentry">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="col-xs-24" data-bind="uiInit:init">
+		<div class="form-group" style="height: 39px;">
+			<label class="requirestar" data-bind="text:obFieldName"></label>
+			<input type="text" name="fieldName" class="form-control" data-bind="value:obEntityDataModel()[fieldName]" required />
+		</div>
+	</div>
+</div>
