@@ -29,90 +29,86 @@
 			<div class="view-grid-header-count">(
 				<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)</div>
 			<!-- /ko -->
-            <div style="clear:both">
-			<!--ko if:!$parent.obCanOperation()-->
-			<!--ko if: $parent.obMapCanOperation()-->
-			<div class="iconbutton gridview" title="Grid View" data-bind="click:gridIconClicked,css:{open:!obShowSplitmap()}"></div>
-			<!--ko ifnot:type == 'document'-->
-			<div class="iconbutton mapview" title="Map View" data-bind="click:mapIconClicked,css:{open:obShowSplitmap()}"></div>
-			<!--/ko-->
-			<!--ko if:type == 'document'-->
-			<div class="iconbutton directory" title="Directory View" data-bind="click:directoryIconClicked,css:{open:obShowSplitmap()}"></div>
-			<!--/ko-->
-			<div class="divider"></div>
-			<!--/ko-->
-			<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
-			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
-			<div class="divider"></div>
-			<!--ko if: searchGrid.obLayoutFilterOperation()-->
-			<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
-			<div class="iconbutton filter" title="Filters" data-bind="click:filterMenuClick"></div>
-			<!-- /ko -->
-			<div class="iconbutton refresh" title="Refresh" data-bind="click:searchGrid.refreshClick"></div>
-			<div class="divider"></div>
-			<div class="iconbutton view" title="View" data-bind="click:viewClick, css:obIsSelectRow()?'':'disabled'"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obOnlyLayout()-->
-			<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
-			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
-			<div class="divider"></div>
-			<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
-			<div class="iconbutton filter" title="Filters" data-bind="click:filterMenuClick"></div>
-			<div class="iconbutton refresh" title="Refresh" data-bind="click:searchGrid.refreshClick"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obEditDivider()-->
-			<div class="divider"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obCanEdit()-->
-			<div class="iconbutton pencil" title="Edit" data-bind="click:editClick,css:obIsSelectRow()?'':'disabled'"></div>
-			<div class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, css:obIsSelectRow()?'':'disabled'"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obCanCopy()-->
-			<div class="divider"></div>
-			<div class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, css:(obIsSelectRow()&&(!!$data.obIsSingleSelect?obIsSingleSelect():true))?'':'disabled'"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obAddDivider()-->
-			<div class="divider"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obCanAddNew()-->
-			<div class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'}"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obPrintDivider()-->
-			<div class="divider"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obCanPrint && $parent.obCanPrint()-->
-			<div class="iconbutton print" title="Print" data-bind="click:printClick"></div>
-			<!-- /ko -->
-			<!--ko if:$parent.obCanOpenNewGrid()-->
-			<div class="iconbutton newGrid pull-right" style="width:16px; margin-right:-5px;" data-bind="click:newGridClick, attr:{title: $parent.obTooltipOpenNewGrid || 'Open New Grid'}"></div>
-			<!-- /ko -->
+			<div style="clear:both">
+				<!--ko if:!$parent.obCanOperation()-->
+				<!--ko if: $parent.obMapCanOperation()-->
+				<div class="iconbutton gridview" title="Grid View" data-bind="click:gridIconClicked,css:{open:!obShowSplitmap()}"></div>
+				<!--ko ifnot:type == 'document'-->
+				<div class="iconbutton mapview" title="Map View" data-bind="click:mapIconClicked,css:{open:obShowSplitmap()}"></div>
+				<!--/ko-->
+				<!--ko if:type == 'document'-->
+				<div class="iconbutton directory" title="Directory View" data-bind="click:directoryIconClicked,css:{open:obShowSplitmap()}"></div>
+				<!--/ko-->
+				<div class="divider"></div>
+				<!--/ko-->
+				<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
+				<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
+				<div class="divider"></div>
+				<!--ko if: searchGrid.obLayoutFilterOperation()-->
+				<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
+				<!-- /ko -->
+				<div class="divider"></div>
+				<div class="iconbutton view" title="View" data-bind="click:viewClick, css:obIsSelectRow()?'':'disabled'"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obOnlyLayout()-->
+				<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
+				<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
+				<div class="divider"></div>
+				<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obEditDivider()-->
+				<div class="divider"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obCanEdit()-->
+				<div class="iconbutton pencil" title="Edit" data-bind="click:editClick,css:obIsSelectRow()?'':'disabled'"></div>
+				<div class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, css:obIsSelectRow()?'':'disabled'"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obCanCopy()-->
+				<div class="divider"></div>
+				<div class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, css:(obIsSelectRow()&&(!!$data.obIsSingleSelect?obIsSingleSelect():true))?'':'disabled'"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obAddDivider()-->
+				<div class="divider"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obCanAddNew()-->
+				<div class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'}"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obPrintDivider()-->
+				<div class="divider"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obCanPrint && $parent.obCanPrint()-->
+				<div class="iconbutton print" title="Print" data-bind="click:printClick"></div>
+				<!-- /ko -->
+				<!--ko if:$parent.obCanOpenNewGrid()-->
+				<div class="iconbutton newGrid pull-right" style="width:16px; margin-right:-5px;" data-bind="click:newGridClick, attr:{title: $parent.obTooltipOpenNewGrid || 'Open New Grid'}"></div>
+				<!-- /ko -->
 			</div>
 			<div style="clear:both">
-			<!--ko if:$parent.obIsDocument && searchGrid.obLayoutFilterOperation() -->
-			<div style="height:auto;float:left;">
-				<div class="grid-staterow">
-					<span class="title">Filter:</span>
-					<span data-bind="text:searchGrid.obSelectedGridFilterName,visible:searchGrid.noApplyFilterNoModified"></span>
-					<!-- ko if:searchGrid.obSelectedGridFilterModifiedMessage -->
-					<span>&nbsp</span>
-					<span data-bind="visible:searchGrid.noApplyFilterNoModified">(</span>
-					<span class="modified" data-bind="text:searchGrid.obSelectedGridFilterModifiedMessage"></span>
-					<span data-bind="visible:searchGrid.noApplyFilterNoModified">)</span>
-					<!-- /ko -->
-					<span>,</span>
-					<span class="title">Layout:</span>
-					<span data-bind="text:searchGrid.obSelectedGridLayoutName"></span>
-					<span data-bind="visible:searchGrid.obReminderName">, </span>
-					<span class="title" data-bind="visible:searchGrid.obReminderName">Reminder:</span>
-					<span data-bind="text:searchGrid.obReminderName" data-bind="visible:searchGrid.obReminderName"></span>
-					<!-- ko if:searchGrid.obSelectedGridLayoutModified -->
-					<span>(</span>
-					<span class="modified" data-bind="text:searchGrid.obSelectedGridLayoutModified"></span>
-					<span>)</span>
-					<!-- /ko -->
+				<!--ko if:$parent.obIsDocument && searchGrid.obLayoutFilterOperation() -->
+				<div style="height:auto;float:left;">
+					<div class="grid-staterow">
+						<span class="title">Filter:</span>
+						<span data-bind="text:searchGrid.obSelectedGridFilterName,visible:searchGrid.noApplyFilterNoModified"></span>
+						<!-- ko if:searchGrid.obSelectedGridFilterModifiedMessage -->
+						<span>&nbsp</span>
+						<span data-bind="visible:searchGrid.noApplyFilterNoModified">(</span>
+						<span class="modified" data-bind="text:searchGrid.obSelectedGridFilterModifiedMessage"></span>
+						<span data-bind="visible:searchGrid.noApplyFilterNoModified">)</span>
+						<!-- /ko -->
+						<span>,</span>
+						<span class="title">Layout:</span>
+						<span data-bind="text:searchGrid.obSelectedGridLayoutName"></span>
+						<span data-bind="visible:searchGrid.obReminderName">, </span>
+						<span class="title" data-bind="visible:searchGrid.obReminderName">Reminder:</span>
+						<span data-bind="text:searchGrid.obReminderName" data-bind="visible:searchGrid.obReminderName"></span>
+						<!-- ko if:searchGrid.obSelectedGridLayoutModified -->
+						<span>(</span>
+						<span class="modified" data-bind="text:searchGrid.obSelectedGridLayoutModified"></span>
+						<span>)</span>
+						<!-- /ko -->
+					</div>
 				</div>
-			</div>
-			<!-- /ko -->
+				<!-- /ko -->
 			</div>
 			<!-- /ko -->
 		</div>
