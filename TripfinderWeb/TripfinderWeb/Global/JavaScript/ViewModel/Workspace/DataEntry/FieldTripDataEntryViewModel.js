@@ -526,6 +526,9 @@
 				}.bind(this));
 				this.obFieldTripResourceGroupData(resources);
 
+				this.obVehicleGridSource([]);
+				this.obDriversGridSource([]);
+				this.obBusAideGridSource([]);
 				this.obFieldTripResourceGroupData().forEach(function(item)
 				{
 					if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
@@ -757,7 +760,16 @@
 				obProperty = "fieldTripEquipmentId";
 				break;
 			case "destination":
-				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", id);
+				var items = this.obDestinationDataModels(), destinationId;
+				for (var i = 0; i < items.length; i++)
+				{
+					if (items[i].Name === id)
+					{
+						destinationId = items[i].Id;
+					}
+				}
+
+				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", destinationId);
 				obModelList = this.obDestinationDataModels;
 				obProperty = "destination";
 				break;
@@ -780,7 +792,14 @@
 				obModelList(
 					obModelList().map(function(item)
 					{
-						if (item.Id == id)
+						if (type === "destination")
+						{
+							if (item.Name == id)
+							{
+								return data;
+							}
+						}
+						else if (item.Id == id)
 						{
 							return data;
 						}
@@ -788,7 +807,7 @@
 					})
 				);
 
-				this.obEntityDataModel()[obProperty](data.Id);
+				this.obEntityDataModel()[obProperty](type === "destination" ? data.Name : data.Id);
 				this._fieldsUpdateFromModal(type, data);
 			}.bind(this));
 	}
@@ -907,6 +926,17 @@
 		var entity = this.obEntityDataModel().toData();
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
+
+		entity.FieldTripResourceGroups.map(function(item)
+		{
+			item.APIIsDirty = true;
+			item.APIIsNew = true;
+		});
+		entity.FieldTripInvoice.map(function(item)
+		{
+			item.APIIsDirty = true;
+			item.APIIsNew = true;
+		});
 		return entity;
 	}
 

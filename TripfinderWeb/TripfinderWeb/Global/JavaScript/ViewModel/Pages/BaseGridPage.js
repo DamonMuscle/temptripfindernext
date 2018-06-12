@@ -100,46 +100,34 @@
 				self.showDetailsClick();
 			});
 		}
-		else
+		else if (TF.isPhoneDevice)
 		{
-			ko.computed(function()
+			iconRow = self.$element.find(".grid-icons");
+			containerWidth = iconRow.outerWidth();
+			statusRow = iconRow.find(".grid-staterow-wrap");
+			toolRow = iconRow.find(".iconrow");
+			statusRow.width("auto");
+			toolRow.width("auto");
+			statusRow.css("marginLeft", "0px");
+			toolRow.css("marginLeft", "0px");
+			statusRow.addClass("pull-right");
+			statusRow.css("marginLeft", containerWidth + "px");
+			statusRow.width("100%");
+			toolRow.width("100%");
+			statusRow.removeClass("pull-right");
+			detectswipe(self.$element.find(".grid-icons"), function(el, d)
 			{
-				if (TF.isPhoneDevice && self.searchGrid.obSelectedGridFilterName() && self.searchGrid.obSelectedGridLayoutName())
+				if (d === "l" && toolRow.css("marginLeft") === "0px")
 				{
-					iconRow = self.$element.find(".grid-icons");
-					containerWidth = iconRow.outerWidth();
-					setTimeout(function()
-					{
-						statusRow = iconRow.find(".grid-staterow-wrap");
-						toolRow = iconRow.find(".iconrow");
-						statusRow.width("auto");
-						toolRow.width("auto");
-						statusRow.css("marginLeft", "0px");
-						toolRow.css("marginLeft", "0px");
-						statusRow.addClass("pull-right");
-						if (iconRow.height() > 28)
-						{
-							statusRow.css("marginLeft", containerWidth + "px");
-							statusRow.width("100%");
-							toolRow.width("100%");
-							statusRow.removeClass("pull-right");
-							detectswipe(self.$element.find(".grid-icons"), function(el, d)
-							{
-								if (d === "l" && toolRow.css("marginLeft") === "0px")
-								{
-									toolRow.animate({ marginLeft: -containerWidth }, 200);
-									statusRow.animate({ marginLeft: 0 }, 200);
-								}
-								else if (d === "r" && statusRow.css("marginLeft") === "0px")
-								{
-									toolRow.animate({ marginLeft: 0 }, 200);
-									statusRow.animate({ marginLeft: containerWidth }, 200);
-								}
-							});
-						}
-					})
+					toolRow.animate({ marginLeft: -containerWidth }, 200);
+					statusRow.animate({ marginLeft: 0 }, 200);
 				}
-			}, self);
+				else if (d === "r" && statusRow.css("marginLeft") === "0px")
+				{
+					toolRow.animate({ marginLeft: 0 }, 200);
+					statusRow.animate({ marginLeft: containerWidth }, 200);
+				}
+			});
 		}
 
 		self._openBulkMenu();

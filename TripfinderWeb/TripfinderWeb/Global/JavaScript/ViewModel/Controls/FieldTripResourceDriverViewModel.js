@@ -38,30 +38,29 @@
 		//drop down list
 		this.obSelectedVehicle = ko.observable();
 		this.obSelectedVehicle.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "vehicleId", "obSelectedVehicle", function(obj) { return obj ? obj.Id : 0; }), this);
-		this.obSelectedVehicleText = ko.observable();
+		this.obSelectedVehicleText = ko.observable(source ? source.VehicleName : undefined);
 
 		this.obSelectedDriver = ko.observable();
 		this.obSelectedDriver.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "driverId", "obSelectedDriver", function(obj) { return obj ? obj.Id : 0; }), this);
-		this.obSelectedDriverText = ko.observable();
-
+		this.obSelectedDriverText = ko.observable(source ? source.DriverName : undefined);
 	}
 
 	FieldTripResourceDriverViewModel.prototype.save = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				var entity = this.obEntityDataModel().toData();
-				entity.VehicleName = this.obSelectedVehicleText();
-				if (entity.DriverId != 0)
+				if (result)
 				{
-					entity.DriverName = this.obSelectedDriverText();
+					var entity = this.obEntityDataModel().toData();
+					entity.VehicleName = this.obSelectedVehicleText();
+					if (entity.DriverId != 0)
+					{
+						entity.DriverName = this.obSelectedDriverText();
+					}
+					return entity;
 				}
-				return entity;
-			}
-		}.bind(this));
+			}.bind(this));
 	}
 
 	FieldTripResourceDriverViewModel.prototype.init = function(viewModel, el)
@@ -112,19 +111,19 @@
 	FieldTripResourceDriverViewModel.prototype.load = function()
 	{
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicle"))
-		.then(function(data)
-		{
-			this.obVehicleSource(data.Items);
+			.then(function(data)
+			{
+				this.obVehicleSource(data.Items);
 
-		}.bind(this));
+			}.bind(this));
 
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"))
-		.then(function(data)
-		{
-			//data.Items.unshift({ FullName: " [None]", Id: "0" })
-			this.obDriverSource(data.Items);
+			.then(function(data)
+			{
+				//data.Items.unshift({ FullName: " [None]", Id: "0" })
+				this.obDriverSource(data.Items);
 
-		}.bind(this));
+			}.bind(this));
 
 		return Promise.all([p0, p1]);
 	};
@@ -132,13 +131,13 @@
 	FieldTripResourceDriverViewModel.prototype.apply = function()
 	{
 		return this.save()
-		.then(function(data)
-		{
-			return data;
+			.then(function(data)
+			{
+				return data;
 
-		}, function()
-		{
-		});
+			}, function()
+			{
+			});
 	};
 
 	FieldTripResourceDriverViewModel.prototype.generateFunction = function(fn)
