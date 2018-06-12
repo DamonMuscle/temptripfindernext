@@ -162,10 +162,8 @@
 			this.searchGrid.onDoubleClick.subscribe(this._viewfromDBClick.bind(this));
 			this.bookMarkKey = {
 			};
-			this.loadBookmark();
 			this.searchGrid.onEyeCheckChanged.subscribe(this._onAdditionalSelectionChange.bind(this));
 			PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "bookmark", "grid", this.type), this.updateBookmark.bind(this));
-			this.searchGrid.obSelectedGridFilterId.subscribe(this.loadBookmark, this);
 			this.searchGrid.getSelectedIds.subscribe(function()
 			{
 				if (this.searchGrid.getSelectedIds().length == 0)
@@ -460,29 +458,6 @@
 					}
 				}
 			}.bind(this));
-	};
-
-	BaseKendoGridViewModel.prototype.loadBookmark = function()
-	{
-		this.bookMarkKey.Type = "rfweb." + this.type + ".grid" + (this.searchGrid.obSelectedGridFilterId() == null ? "" : ("." + this.searchGrid.obSelectedGridFilterId()));
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "Bookmark", this.bookMarkKey.Type))
-			.then(function(response)
-			{
-				var bookmark = response.Items[0];
-				if (bookmark == undefined || bookmark == "")
-				{
-					bookmark = "nonbookmark";
-				}
-				else if (bookmark == "True")
-				{
-					bookmark = "favoriteBookmarked";
-				}
-				else
-				{
-					bookmark = "bookmarked";
-				}
-				this.obCurrentBookMark(bookmark);
-			}.bind(this))
 	};
 
 	BaseKendoGridViewModel.prototype.updateBookmark = function(path, args)
@@ -1036,7 +1011,6 @@
 	BaseKendoGridViewModel.prototype.dispose = function()
 	{
 		this.searchGrid.dispose();
-		this.splitmap.dispose();
 	};
 
 	// Map View

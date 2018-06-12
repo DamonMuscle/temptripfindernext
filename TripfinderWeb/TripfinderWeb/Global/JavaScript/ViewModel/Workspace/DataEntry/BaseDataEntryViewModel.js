@@ -387,28 +387,6 @@
 		}
 	};
 
-	BaseDataEntryViewModel.prototype.loadBookmark = function()
-	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "Bookmark", this.bookMarkKey.Type))
-			.then(function(response)
-			{
-				var bookmark = response.Items[0];
-				if (bookmark == undefined || bookmark == "")
-				{
-					bookmark = "nonbookmark";
-				}
-				else if (bookmark == "True")
-				{
-					bookmark = "favoriteBookmarked";
-				}
-				else
-				{
-					bookmark = "bookmarked";
-				}
-				this.obCurrentBookMark(bookmark);
-			}.bind(this))
-	}
-
 	BaseDataEntryViewModel.prototype.load = function()
 	{
 		if (this.$form)
@@ -483,8 +461,6 @@
 
 	BaseDataEntryViewModel.prototype.initialize = function()
 	{
-		this.loadBookmark();
-
 		//not sure why refresh url when initialize  by Weple
 		//this.onContentChange.notify();
 		this.loadSupplement()

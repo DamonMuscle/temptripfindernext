@@ -552,52 +552,33 @@
 
 	BaseGridPage.prototype.editClick = function(viewModel, e)
 	{
-		var self = this,
-			selectedIds = self.searchGrid.getSelectedIds(),
-			selectedRecords = self.searchGrid.getSelectedRecords();
-		if (selectedIds.length == 0)
+		var self = this, view,
+			selectedIds = self.searchGrid.getSelectedIds();
+
+		if (selectedIds.length === 0)
 		{
 			return;
 		}
-
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), self.type, "getTabNames"), {
-			data: selectedIds
-		})
-			.then(function(response)
-			{
-				var documentData = new TF.Document.DocumentData("DataEntry",
-					{
-						type: "fieldtrip",
-						ids: selectedIds,
-						mode: "Edit",
-						tabNames: response.Items,
-					}),
-					view = {
-						id: documentData.data.ids[0],
-						documentType: documentData.documentType,
-						type: documentData.data.type,
-					};
-				self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
-				self.obShowFieldTripDEPanel(true);
-				tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
-			});
+		view = {
+			id: selectedIds[0],
+			documentType: "DataEntry",
+			type: "fieldtrip",
+		};
+		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(selectedIds, view);
+		self.obShowFieldTripDEPanel(true);
+		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
 	};
 
 	BaseGridPage.prototype.addClick = function(viewModel, e)
 	{
 		var self = this,
-			documentData = new TF.Document.DocumentData("DataEntry",
-				{
-					type: "fieldtrip",
-					ids: [],
-					mode: "Add",
-				}),
 			view = {
-				id: documentData.data.ids[0],
-				documentType: documentData.documentType,
-				type: documentData.data.type,
+				id: undefined,
+				documentType: "DataEntry",
+				type: "fieldtrip",
 			};
-		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(documentData.data.ids, view);
+
+		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel([], view);
 		self.obShowFieldTripDEPanel(true);
 		if (TF.isPhoneDevice)
 		{
