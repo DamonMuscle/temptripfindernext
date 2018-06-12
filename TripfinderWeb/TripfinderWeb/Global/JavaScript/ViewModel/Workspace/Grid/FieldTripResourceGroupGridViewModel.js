@@ -112,14 +112,14 @@
 						format: "{0:0}"
 					},
 					{
-						FieldName: "DriverOTHours",
+						FieldName: "DriverOthours",
 						DisplayName: "OT Hours",
 						type: "number",
 						Precision: 2,
 						format: "{0:0}"
 					},
 					{
-						FieldName: "DriverOTRate",
+						FieldName: "DriverOtrate",
 						DisplayName: "OT Rate",
 						type: "number",
 						Precision: 2,
@@ -157,14 +157,14 @@
 						format: "{0:0}"
 					},
 					{
-						FieldName: "AideOTHours",
+						FieldName: "AideOthours",
 						DisplayName: "OT Hours",
 						type: "number",
 						Precision: 2,
 						format: "{0:0}"
 					},
 					{
-						FieldName: "AideOTRate",
+						FieldName: "AideOtrate",
 						DisplayName: "OT Rate",
 						type: "number",
 						Precision: 2,
