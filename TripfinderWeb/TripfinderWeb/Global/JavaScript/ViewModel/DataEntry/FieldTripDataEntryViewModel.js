@@ -524,7 +524,6 @@
 				this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
 				this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
 				this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
-				//return;
 
 			}.bind(this));
 	}

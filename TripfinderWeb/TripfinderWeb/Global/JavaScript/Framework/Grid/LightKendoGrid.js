@@ -743,6 +743,13 @@
 						e.preventDefault();
 					}
 				}
+				else if (this.options.dataSource)
+				{
+					setTimeout(function()
+					{
+						self.$container.children(".k-pager-wrap").find(".pageInfo").html(self.options.dataSource.length + " of " + self.options.dataSource.length);
+					});
+				}
 			},
 			filterMenuInit: self.filterMenuInit.bind(self)
 		};
@@ -3617,9 +3624,9 @@
 		if (!this.options.showOmittedCount && !this.options.showSelectedCount && this.options.gridTypeInPageInfo === "") { return; }
 
 		var pageInfoList = [];
-		if (this.options.showSelectedCount && this.getSelectedIds().length > 0)
+		if (this.options.showSelectedCount && this.kendoGrid.select()) 
 		{
-			pageInfoList.push(this.getSelectedIds().length + " selected");
+			pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
 		}
 
 		if (this.options.showOmittedCount)
@@ -4151,6 +4158,10 @@
 			{
 				self.getSelectedIds([dataItem[self.options.Id]]);
 			}
+		}
+		else
+		{
+			self._resetPageInfoSelect();
 		}
 	};
 

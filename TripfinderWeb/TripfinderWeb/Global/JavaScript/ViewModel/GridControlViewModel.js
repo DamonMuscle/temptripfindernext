@@ -37,7 +37,7 @@
 			this.obIsHideTitle(true);
 		}
 
-		this.isDataRowHover = isDataRowHover ? isDataRowHover : false;	
+		this.isDataRowHover = isDataRowHover ? isDataRowHover : false;
 		this.dataSource = dataSource;
 		this._routeState = routeState ? routeState : this._gridType;
 	};
