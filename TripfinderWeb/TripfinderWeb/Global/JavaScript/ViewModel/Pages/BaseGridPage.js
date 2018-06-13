@@ -61,9 +61,17 @@
 				}
 				else if (self.obShowFieldTripDEPanel())
 				{
-					self.fieldTripDataEntry._view.id = self.selectedRecordIds[0];
-					self.fieldTripDataEntry.loadSupplement()
-						.then(self.fieldTripDataEntry.loadRecord);
+					if (self.fieldTripDataEntry)
+					{
+						self.fieldTripDataEntry._view.id = self.selectedRecordIds[0];
+						self.fieldTripDataEntry.obMode("Edit");
+						self.fieldTripDataEntry.loadSupplement()
+							.then(self.fieldTripDataEntry.loadRecord);
+					}
+					else
+					{
+						self.editClick();
+					}
 				}
 			}
 		});
@@ -575,6 +583,7 @@
 		else
 		{
 			tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+			self.obShowFieldTripDEPanel(true);
 		}
 	};
 
