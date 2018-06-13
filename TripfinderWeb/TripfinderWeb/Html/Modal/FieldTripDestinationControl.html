@@ -74,17 +74,11 @@
 				<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
 				<input type="text" name="Email" class="form-control" data-bind="value:obEntityDataModel().email" maxlength="100" />
 			</div>
-			<div class="col-xs-8 no-padding-right no-padding-left">
+			<div class="col-xs-12 no-padding-right no-padding-left">
 				<div class="form-group tf-validate">
 					<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Phone')"></label>
 					<!-- ko customInput:{type:"Phone",value:obEntityDataModel().phone,attributes:{class:"form-control",name:"phone",maxlength:"30"}} -->
 					<!-- /ko -->
-				</div>
-			</div>
-			<div class="col-xs-4 no-padding-right">
-				<div class="form-group tf-validate">
-					<label data-bind="text: tf.applicationTerm.getApplicationTermAbbrByName('Extension')"></label>
-					<input type="text" name="phoneExt" class="form-control" data-bind="value:obEntityDataModel().phoneExt" maxlength="10" />
 				</div>
 			</div>
 			<div class="col-xs-12 no-padding-right">

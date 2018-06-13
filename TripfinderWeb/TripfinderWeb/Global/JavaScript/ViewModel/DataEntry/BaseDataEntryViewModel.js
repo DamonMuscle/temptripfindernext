@@ -509,6 +509,20 @@
 			};
 		});
 
+		this.$form.find("input[data-tf-input-type=Phone]").each(function(n, field)
+		{
+			var name = $(field).attr("name");
+			validatorFields[name] = {
+				trigger: "blur change",
+				validators: {
+					phone: {
+						country: tfRegion.toUpperCase(),
+						message: " The value is not valid phone number"
+					}
+				}
+			}
+		});
+
 		this.$form.find("input[data-tf-validation=notInFuture]").each(function(n, field)
 		{
 			var name = $(field).attr("name");

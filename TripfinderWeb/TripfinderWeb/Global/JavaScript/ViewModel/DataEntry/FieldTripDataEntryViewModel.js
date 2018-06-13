@@ -446,6 +446,7 @@
 			{
 				if (item.Id == this.obSelectedTemplateSource().Id)
 				{
+					item.FieldTripStageId = 1;
 					var dataModel = new TF.DataModel.FieldTripDataModel(item);
 					var dirtyModel = new TF.DataModel.FieldTripDataModel();
 					var dirtyFields = this.obEntityDataModel().getDirtyFields().concat();
@@ -1535,7 +1536,6 @@
 					this.obEntityDataModel().destinationContactTitle("");
 					this.obEntityDataModel().destinationFax("");
 					this.obEntityDataModel().destinationContactPhone("");
-					this.obEntityDataModel().destinationPhoneExt("");
 				}
 				else
 				{
@@ -1550,7 +1550,6 @@
 					this.obEntityDataModel().destinationContactTitle(data.ContactTitle);
 					this.obEntityDataModel().destinationFax(data.Fax);
 					this.obEntityDataModel().destinationContactPhone(data.Phone);
-					this.obEntityDataModel().destinationPhoneExt(data.PhoneExt);
 				}
 				break;
 			case "billingClassification":
