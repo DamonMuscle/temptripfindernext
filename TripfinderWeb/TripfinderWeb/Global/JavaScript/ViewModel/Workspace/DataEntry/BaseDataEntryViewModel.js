@@ -771,7 +771,8 @@
 	BaseDataEntryViewModel.prototype.closeClick = function(viewModel, e)
 	{
 		var self = this;
-		tf.pageManager.resizablePage.closeRightPage();
+		if (TF.isPhoneDevice) tf.pageManager.resizablePage.clearLeftOtherContent();
+		else tf.pageManager.resizablePage.closeRightPage();
 	};
 
 	BaseDataEntryViewModel.prototype.pendingSave = function()
