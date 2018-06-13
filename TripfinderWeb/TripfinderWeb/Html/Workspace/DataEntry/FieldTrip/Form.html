@@ -10,7 +10,7 @@
 				<div class="form-group" data-bind="visible:!obEntityDataModel().id()">
 					<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trip') + ' Template'"></label>
 					<div class="input-group">
-						<div data-bind="typeahead:{source:obTemplateSource,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedTemplateSource}">
+						<div data-bind="typeahead:{source:obTemplateSource,format:function(obj){return obj.Name;},notSort:true,drowDownShow:true,selectedValue:obSelectedTemplateSource}">
 							<!-- ko customInput:{type:"Select",value:obTemplateName,attributes:{name:"fieldTripTemplate",class:"form-control"}} -->
 							<!-- /ko -->
 						</div>

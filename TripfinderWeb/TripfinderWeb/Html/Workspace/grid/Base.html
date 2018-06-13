@@ -81,15 +81,17 @@
 			<!--ko if:$parent.obIsDocument && searchGrid.obLayoutFilterOperation() -->
 			<div style="height:22px;float: right;padding-top: 7px;">
 				<div class="grid-staterow">
+					<!-- TODO don't need filter info for now
 					<span class="title">Filter:</span>
 					<span data-bind="text:searchGrid.obSelectedGridFilterName,visible:searchGrid.noApplyFilterNoModified"></span>
-					<!-- ko if:searchGrid.obSelectedGridFilterModifiedMessage -->
+					ko if:searchGrid.obSelectedGridFilterModifiedMessage
 					<span>&nbsp</span>
 					<span data-bind="visible:searchGrid.noApplyFilterNoModified">(</span>
 					<span class="modified" data-bind="text:searchGrid.obSelectedGridFilterModifiedMessage"></span>
 					<span data-bind="visible:searchGrid.noApplyFilterNoModified">)</span>
-					<!-- /ko -->
+					/ko
 					<span>,</span>
+					-->
 					<span class="title">Layout:</span>
 					<span data-bind="text:searchGrid.obSelectedGridLayoutName"></span>
 					<span data-bind="visible:searchGrid.obReminderName">, </span>

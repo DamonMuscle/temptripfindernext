@@ -238,9 +238,16 @@
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate"))
 			.then(function(data)
 			{
-				data.Items.unshift({ Name: "None", Id: 0 })
+				data.Items = data.Items.sort(function(a, b)
+				{
+					if (a.Name.toUpperCase() === b.Name.toUpperCase())
+					{
+						return 0;
+					}
+					return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
+				});
+				data.Items.unshift({ Name: "None", Id: 0 });
 				this.obTemplateSource(data.Items);
-
 			}.bind(this));
 
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "school"))
@@ -530,7 +537,6 @@
 
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
-
 		this.obVehicleGridSource([]);
 		this.obDriversGridSource([]);
 		this.obBusAideGridSource([]);
@@ -592,6 +598,8 @@
 			});
 		this.obBusAideGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(aideSource);
 		this.obBusAideGridViewModel().obGridViewModel().searchGrid.rebuildGrid(aideSort);
+
+		tf.loadingIndicator.showImmediately();
 	}
 
 	FieldTripDataEntryViewModel.prototype.loadInvoicing = function()

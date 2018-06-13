@@ -308,10 +308,6 @@
 			subDataModelType = mapping[index].subDataModelType;
 			fromMapping = mapping[index].fromMapping;
 			fromKey = mapping[index].from;
-			if (!entity.hasOwnProperty(fromKey))
-			{
-				console.warn("property doesn't exist for key " + fromKey);
-			}
 			value = entity[fromKey];
 			toKey = mapping[index].to;
 			if (!toKey)
