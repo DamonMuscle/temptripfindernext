@@ -17,19 +17,19 @@
 	FieldTripDestinationViewModel.prototype.save = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				var isNew = this.obEntityDataModel().id() ? false : true;
-				return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.fieldName, isNew ? "" : this.obEntityDataModel().id()), { data: this.obEntityDataModel().toData() })
-				.then(function(data)
+				if (result)
 				{
-					PubSub.publish(topicCombine(pb.DATA_CHANGE, this.fieldName, pb.EDIT));
-					return data.Items[0];
-				}.bind(this))
-			}
-		}.bind(this));
+					var isNew = this.obEntityDataModel().id() ? false : true;
+					return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.fieldName, isNew ? "" : this.obEntityDataModel().id()), { data: this.obEntityDataModel().toData() })
+						.then(function(data)
+						{
+							PubSub.publish(topicCombine(pb.DATA_CHANGE, this.fieldName, pb.EDIT));
+							return data.Items[0];
+						}.bind(this))
+				}
+			}.bind(this));
 	}
 
 	FieldTripDestinationViewModel.prototype.init = function(viewModel, el)
@@ -54,6 +54,15 @@
 				self.pageLevelViewModel.obValidationErrors(errors);
 			};
 
+		validatorFields.Email = {
+			trigger: "blur change",
+			validators: {
+				emailAddress: {
+					message: " invalid email"
+				}
+			}
+		}
+
 		validatorFields.name = {
 			trigger: "blur change",
 			validators: {
@@ -76,10 +85,10 @@
 						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), fieldName, "unique"), {
 							data: new TF.DataModel.FieldTripDestinationDataModel({ Name: value, Id: this.obEntityDataModel().id() }).toData()
 						}, { overlay: false })
-						.then(function(apiResponse)
-						{
-							return apiResponse.Items[0];
-						})
+							.then(function(apiResponse)
+							{
+								return apiResponse.Items[0];
+							})
 					}.bind(this)
 				}
 			}
@@ -108,18 +117,18 @@
 	FieldTripDestinationViewModel.prototype.load = function()
 	{
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.fieldName, "mail_city"))
-		.then(function(data)
-		{
-			this.obMailCityDataModels(data.Items);
-		}.bind(this));
+			.then(function(data)
+			{
+				this.obMailCityDataModels(data.Items);
+			}.bind(this));
 
 		if (this.obEntityDataModel().id())
 		{
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.fieldName, this.obEntityDataModel().id()))
-			.then(function(data)
-			{
-				this.obEntityDataModel(new TF.DataModel.FieldTripDestinationDataModel(data.Items[0]));
-			}.bind(this))
+				.then(function(data)
+				{
+					this.obEntityDataModel(new TF.DataModel.FieldTripDestinationDataModel(data.Items[0]));
+				}.bind(this))
 		}
 
 		this.pageLevelViewModel.load(this.$form.data("bootstrapValidator"));
@@ -128,13 +137,13 @@
 	FieldTripDestinationViewModel.prototype.apply = function()
 	{
 		return this.save()
-		.then(function(data)
-		{
-			return data;
-			this.dispose();
-		}, function()
-		{
-		});
+			.then(function(data)
+			{
+				return data;
+				this.dispose();
+			}, function()
+				{
+				});
 	};
 
 	FieldTripDestinationViewModel.prototype.generateFunction = function(fn)
@@ -146,29 +155,29 @@
 	{
 		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.fieldName, this.localization);
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
-		.then(function(data)
-		{
-			if (modifyDataEntryListItemModalViewModel.newDataList.length > 0)
+			.then(function(data)
 			{
-				for (var i in modifyDataEntryListItemModalViewModel.newDataList)
+				if (modifyDataEntryListItemModalViewModel.newDataList.length > 0)
 				{
-					parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
+					for (var i in modifyDataEntryListItemModalViewModel.newDataList)
+					{
+						parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
+					}
+					if (parameters[2])
+					{
+						this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
+					}
 				}
+				if (!data)
+				{
+					return;
+				}
+				parameters[1].push(data);
 				if (parameters[2])
 				{
-					this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
+					this.obEntityDataModel()[parameters[2]](data.Item);
 				}
-			}
-			if (!data)
-			{
-				return;
-			}
-			parameters[1].push(data);
-			if (parameters[2])
-			{
-				this.obEntityDataModel()[parameters[2]](data.Item);
-			}
-		}.bind(this));
+			}.bind(this));
 	}
 
 	FieldTripDestinationViewModel.prototype.dispose = function()
