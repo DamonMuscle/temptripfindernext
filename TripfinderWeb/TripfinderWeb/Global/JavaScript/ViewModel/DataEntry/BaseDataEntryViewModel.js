@@ -81,9 +81,9 @@
 		this.obUserDefinedNumericRight = ko.observableArray();
 		this.obUserDefinedDateFieldsLeft = ko.observableArray();
 		this.obUserDefinedDateFieldsRight = ko.observableArray();
-		this.CharacterTypeID = view.type == "student" ? ["0", "1", "2", "3", "12", "13", "14", "15"] : ["0", "1", "2", "3"];
-		this.NumericTypeID = ["4", "5", "6", "7"];
-		this.dateFieldsTypeID = view.type == "staff" ? ["8", "9", "10", "11", "16", "17", "18", "19"] : ["8", "9", "10", "11"];
+		this.CharacterTypeID = view.type == "student" ? [ "0", "1", "2", "3", "12", "13", "14", "15" ] : [ "0", "1", "2", "3" ];
+		this.NumericTypeID = [ "4", "5", "6", "7" ];
+		this.dateFieldsTypeID = view.type == "staff" ? [ "8", "9", "10", "11", "16", "17", "18", "19" ] : [ "8", "9", "10", "11" ];
 		this.obUserDefinedDisplay = ko.computed(this.userDefinedDisplayComputer, this);
 
 		this.obPageNavName = ko.computed(this._pageNavComputer, this);
@@ -222,39 +222,39 @@
 	{
 		for (var i in this.obUserDefinedColumns())
 		{
-			if (this.CharacterTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[i].Status)
+			if (this.CharacterTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[ i ].Status)
 			{
 				if (this.obUserDefinedCharacterLeft().length == this.obUserDefinedCharacterRight().length)
 				{
-					this.obUserDefinedCharacterLeft.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
+					this.obUserDefinedCharacterLeft.push({ column: this.obUserDefinedColumns()[ i ], value: this.getUserDefinedValue(i) });
 				}
 				else
 				{
-					this.obUserDefinedCharacterRight.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
+					this.obUserDefinedCharacterRight.push({ column: this.obUserDefinedColumns()[ i ], value: this.getUserDefinedValue(i) });
 				}
 				continue;
 			}
-			if (this.NumericTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[i].Status)
+			if (this.NumericTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[ i ].Status)
 			{
 				if (this.obUserDefinedNumericLeft().length == this.obUserDefinedNumericRight().length)
 				{
-					this.obUserDefinedNumericLeft.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
+					this.obUserDefinedNumericLeft.push({ column: this.obUserDefinedColumns()[ i ], value: this.getUserDefinedValue(i) });
 				}
 				else
 				{
-					this.obUserDefinedNumericRight.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
+					this.obUserDefinedNumericRight.push({ column: this.obUserDefinedColumns()[ i ], value: this.getUserDefinedValue(i) });
 				}
 				continue;
 			}
-			if (this.dateFieldsTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[i].Status)
+			if (this.dateFieldsTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[ i ].Status)
 			{
 				if (this.obUserDefinedDateFieldsLeft().length == this.obUserDefinedDateFieldsRight().length)
 				{
-					this.obUserDefinedDateFieldsLeft.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
+					this.obUserDefinedDateFieldsLeft.push({ column: this.obUserDefinedColumns()[ i ], value: this.getUserDefinedValue(i) });
 				}
 				else
 				{
-					this.obUserDefinedDateFieldsRight.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
+					this.obUserDefinedDateFieldsRight.push({ column: this.obUserDefinedColumns()[ i ], value: this.getUserDefinedValue(i) });
 				}
 				continue;
 			}
@@ -263,11 +263,11 @@
 
 	BaseDataEntryViewModel.prototype.getUserDefinedValue = function(num)
 	{
-		var value = ko.observable(this.obEntityDataModel()[this.entityNames[num]]());
+		var value = ko.observable(this.obEntityDataModel()[ this.entityNames[ num ] ]());
 		value.subscribe(function(value)
 		{
 			var self = this.self;
-			self.obEntityDataModel()[self.entityNames[this.num]](value);
+			self.obEntityDataModel()[ self.entityNames[ this.num ] ](value);
 		}.bind({ self: this, num: num }), this);
 		return value;
 	}
@@ -365,7 +365,7 @@
 						return Promise.reject(response);
 					}
 
-					var item = response.Items[0];
+					var item = response.Items[ 0 ];
 					this.obEntityDataModel(new this.dataModelType(item));
 
 					this.getUserDefinedDisplayData();
@@ -399,7 +399,7 @@
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "localization"))
 			.then(function(response)
 			{
-				this.localization(response.Items[0]);
+				this.localization(response.Items[ 0 ]);
 			}.bind(this))
 			.catch(function(response)
 			{
@@ -427,9 +427,9 @@
 			.then(function(data)
 			{
 				var userDefinedColumns = this.obUserDefinedColumns();
-				for (var i in data.Items[0])
+				for (var i in data.Items[ 0 ])
 				{
-					userDefinedColumns[i] = data.Items[0][i];
+					userDefinedColumns[ i ] = data.Items[ 0 ][ i ];
 				}
 				this.obUserDefinedColumns(userDefinedColumns);
 			}.bind(this));
@@ -451,7 +451,7 @@
 		this.$form.find("input[required]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
+			validatorFields[ name ] = {
 				trigger: "blur change",
 				validators: {
 					notEmpty: {
@@ -475,7 +475,7 @@
 		this.$form.find("div[required]").find("input").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
+			validatorFields[ name ] = {
 				trigger: "blur change",
 				validators: {
 					notEmpty: {
@@ -499,7 +499,7 @@
 		this.$form.find("input[data-tf-input-type=Email]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
+			validatorFields[ name ] = {
 				trigger: "blur change",
 				validators: {
 					emailAddress: {
@@ -512,7 +512,7 @@
 		this.$form.find("input[data-tf-validation=notInFuture]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
+			validatorFields[ name ] = {
 				trigger: "blur change",
 				validators: {
 					date: {
@@ -527,7 +527,7 @@
 		this.$form.find("input[data-tf-input-type=Date]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
+			validatorFields[ name ] = {
 				trigger: "blur change",
 				validators: {
 					date: {
@@ -540,7 +540,7 @@
 		this.$form.find("input[data-tf-input-type=Time]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
+			validatorFields[ name ] = {
 				trigger: "blur change",
 				validators: {
 					notEmpty: {
@@ -569,7 +569,7 @@
 		this.validatorFields = this.getSpecialValidatorFields(validatorFields);
 
 		return this.$form.bootstrapValidator({
-			excluded: [':hidden', ':not(:visible)'],
+			excluded: [ ':hidden', ':not(:visible)' ],
 			live: 'enabled',
 			message: 'This value is not valid',
 			fields: this.validatorFields
@@ -705,7 +705,7 @@
 	{
 		var obEntityDataModel = this.obEntityDataModel();
 		var isNew = obEntityDataModel.id() ? false : true;
-		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.type, isNew ? "" : obEntityDataModel.id()),
+		return tf.promiseAjax[ isNew ? "post" : "put" ](pathCombine(tf.api.apiPrefix(), this.type, isNew ? "" : obEntityDataModel.id()),
 			{
 				data: this.getSaveData(),
 				//async:true will generate an non user interaction, which will make window.open opens a Popup
@@ -713,17 +713,17 @@
 			})
 			.then(function(data)
 			{
-				obEntityDataModel.update(data.Items[0]);
+				obEntityDataModel.update(data.Items[ 0 ]);
 				this._view.id = obEntityDataModel.id();
 				this._view.tabName = tf.DataEntryHelper.getTabNameByEntityDataModel(this._view.type, obEntityDataModel);
-				tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.tabNames = [this._view.tabName];
+				tf.documentManagerViewModel.obHashArray()[ this._view.document.routeState ].DocumentData.data.tabNames = [ this._view.tabName ];
 				this.onContentChange.notify();
 				if (isNew)
 				{//change the url and sticky
 					this._view.mode = "Edit";
 					this.obMode(this._view.mode);
-					tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.ids = [this._view.id];
-					tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.mode = this._view.mode;
+					tf.documentManagerViewModel.obHashArray()[ this._view.document.routeState ].DocumentData.data.ids = [ this._view.id ];
+					tf.documentManagerViewModel.obHashArray()[ this._view.document.routeState ].DocumentData.data.mode = this._view.mode;
 				}
 				tf.documentManagerViewModel.updateUserPreference(this._view.document);
 				PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
@@ -747,7 +747,7 @@
 				this.obEntityDataModel().name(data);
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this.type + "template"),
 					{
-						data: this.getSaveData(),
+						data: this.getSaveData(true),
 						//async:true will generate an non user interaction, which will make window.open opens a Popup
 						async: false
 					})
@@ -936,7 +936,7 @@
 				{ overlay: false })
 				.then(function(response)
 				{
-					this.obUpdateStatus(response.Items[0]);
+					this.obUpdateStatus(response.Items[ 0 ]);
 					return true;
 				}.bind(this))
 		}
@@ -1052,7 +1052,7 @@
 
 	BaseDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
 	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type, this.localization);
+		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[ 0 ], this.type, this.localization);
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
 			.then(function(data)
 			{
@@ -1060,11 +1060,11 @@
 				{
 					for (var i in modifyDataEntryListItemModalViewModel.newDataList)
 					{
-						parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
+						parameters[ 1 ].push(modifyDataEntryListItemModalViewModel.newDataList[ i ]);
 					}
-					if (parameters[2])
+					if (parameters[ 2 ])
 					{
-						this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
+						this.obEntityDataModel()[ parameters[ 2 ] ](modifyDataEntryListItemModalViewModel.newDataList[ i ].Item);
 					}
 				}
 				if (!data)
@@ -1072,33 +1072,33 @@
 					return;
 				}
 				data.Text = data.Item;
-				parameters[1].push(data);
-				if (parameters[2])
+				parameters[ 1 ].push(data);
+				if (parameters[ 2 ])
 				{
-					this.obEntityDataModel()[parameters[2]](data.Item);
+					this.obEntityDataModel()[ parameters[ 2 ] ](data.Item);
 				}
 			}.bind(this));
 	}
 
 	BaseDataEntryViewModel.prototype.EditDataEntryListItem = function(parameters)
 	{
-		var select = $.grep(parameters[1](), function(d) { return d.Item == parameters[3] });
+		var select = $.grep(parameters[ 1 ](), function(d) { return d.Item == parameters[ 3 ] });
 		if (select.length > 0)
 		{
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type, this.localization, select[0].Id))
+			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[ 0 ], this.type, this.localization, select[ 0 ].Id))
 				.then(function(data)
 				{
 					if (!data)
 					{
 						return;
 					}
-					var index = parameters[1].indexOf(select[0]);
-					parameters[1].splice(index, 1);
+					var index = parameters[ 1 ].indexOf(select[ 0 ]);
+					parameters[ 1 ].splice(index, 1);
 					data.Text = data.Item;
-					parameters[1].push(data);
-					if (parameters[2])
+					parameters[ 1 ].push(data);
+					if (parameters[ 2 ])
 					{
-						this.obEntityDataModel()[parameters[2]](data.Item);
+						this.obEntityDataModel()[ parameters[ 2 ] ](data.Item);
 					}
 				}.bind(this));
 		}
@@ -1106,15 +1106,15 @@
 
 	BaseDataEntryViewModel.prototype.addNewEntity = function(parameters, viewModel, e)
 	{
-		var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry, { type: parameters[0], ids: [] });
+		var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry, { type: parameters[ 0 ], ids: [] });
 		tf.documentManagerViewModel.add(documentData, TF.DocumentManagerViewModel.isOpenNewWindow(e));
 	};
 
 	BaseDataEntryViewModel.prototype.editNewEntity = function(parameters, viewModel, e)
 	{
-		if (parameters[1])
+		if (parameters[ 1 ])
 		{
-			var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry, { type: parameters[0], ids: [parameters[1]], tabNames: [parameters[2]] });
+			var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry, { type: parameters[ 0 ], ids: [ parameters[ 1 ] ], tabNames: [ parameters[ 2 ] ] });
 			tf.documentManagerViewModel.add(documentData, TF.DocumentManagerViewModel.isOpenNewWindow(e));
 		}
 	};
@@ -1132,7 +1132,7 @@
 	{
 		if (this._view && this._view.id)
 		{
-			this.baseDeletion.execute([this._view.id])
+			this.baseDeletion.execute([ this._view.id ])
 				.then(function(deletedIds)
 				{
 					if (deletedIds && deletedIds.length > 0)
@@ -1171,7 +1171,7 @@
 	BaseDataEntryViewModel.prototype.omitCurrentRecord = function()
 	{
 		var currentPage = this.obCurrentPage();
-		this.obIds.remove(this.obIds()[currentPage]);
+		this.obIds.remove(this.obIds()[ currentPage ]);
 		if (currentPage > this.obIds().length - 1)
 		{
 			this.obCurrentPage(currentPage - 1);
@@ -1211,24 +1211,24 @@
 	{
 		return function()
 		{
-			var observableField = this.obEntityDataModel()[field];
-			if (this[itemName] && observableField() != format(this[itemName]()))
+			var observableField = this.obEntityDataModel()[ field ];
+			if (this[ itemName ] && observableField() != format(this[ itemName ]()))
 			{
-				observableField(format(this[itemName]()));
+				observableField(format(this[ itemName ]()));
 			}
 		}
 	};
 
 	BaseDataEntryViewModel.prototype.setSelectText = function(source, field, textName, valueName)
 	{
-		var item = $.grep(source, function(d) { return d.value == this.obEntityDataModel()[field]() }.bind(this))[0];
+		var item = $.grep(source, function(d) { return d.value == this.obEntityDataModel()[ field ]() }.bind(this))[ 0 ];
 		if (item)
 		{
 			if (valueName)
 			{
-				this[valueName](item);
+				this[ valueName ](item);
 			}
-			this[textName](item.text);
+			this[ textName ](item.text);
 		}
 	};
 
@@ -1236,10 +1236,10 @@
 	{
 		return function()
 		{
-			var item = Enumerable.From(this[sourceName]()).Where(function(c)
+			var item = Enumerable.From(this[ sourceName ]()).Where(function(c)
 			{
-				return valueFormat(c) === this.obEntityDataModel()[field]()
-			}.bind(this)).ToArray()[0];
+				return valueFormat(c) === this.obEntityDataModel()[ field ]()
+			}.bind(this)).ToArray()[ 0 ];
 			return item ? Textformat(item) : "";
 		}
 	};
@@ -1285,7 +1285,7 @@
 	{
 		return array.map(function(item)
 		{
-			return item[key];
+			return item[ key ];
 		});
 	};
 

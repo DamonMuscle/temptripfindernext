@@ -124,7 +124,7 @@
 			if (collection.indexOf(inputValue) == -1)
 			{
 				$(m.currentTarget).val('');
-				this.obEntityDataModel()[key]('');
+				this.obEntityDataModel()[ key ]('');
 			}
 		}.bind(this);
 
@@ -316,7 +316,7 @@
 				this.obMailZipDataModels(data.Items);
 			}.bind(this));
 
-		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
+		return Promise.all([ p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]);
 	};
 
 	FieldTripDataEntryViewModel.prototype.load = function()
@@ -370,7 +370,7 @@
 				this.obEntityDataModel().apiIsDirty(false);
 				//reset the shortCutKeys golbal used
 				tf.shortCutKeys.resetUsingGolbal(5);
-				return Promise.all([p0, p1]);
+				return Promise.all([ p0, p1 ]);
 
 
 			}.bind(this)).catch(function(response)
@@ -451,7 +451,7 @@
 					var dirtyFields = this.obEntityDataModel().getDirtyFields().concat();
 					for (var i in dirtyFields)
 					{
-						dirtyModel[dirtyFields[i]](this.obEntityDataModel()[dirtyFields[i]]());
+						dirtyModel[ dirtyFields[ i ] ](this.obEntityDataModel()[ dirtyFields[ i ] ]());
 					}
 					if (item.Id == 0)
 					{
@@ -462,7 +462,7 @@
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
 					for (var i in dirtyFields)
 					{
-						this.obEntityDataModel()[dirtyFields[i]](dirtyModel[dirtyFields[i]]());
+						this.obEntityDataModel()[ dirtyFields[ i ] ](dirtyModel[ dirtyFields[ i ] ]());
 					}
 					this.$form.data('bootstrapValidator').resetForm();
 				}
@@ -678,16 +678,16 @@
 				{
 					for (var i in mvModel.newDataList)
 					{
-						obModelList.push(mvModel.newDataList[i]);
+						obModelList.push(mvModel.newDataList[ i ]);
 					}
-					this.obEntityDataModel()[obProperty](mvModel.newDataList[i].Id);
+					this.obEntityDataModel()[ obProperty ](mvModel.newDataList[ i ].Id);
 				}
 				if (!data)
 				{
 					return;
 				}
 				obModelList.push(data);
-				this.obEntityDataModel()[obProperty](data.Id);
+				this.obEntityDataModel()[ obProperty ](data.Id);
 				this._fieldsUpdateFromModal(type, data);
 				if (inputName)
 				{
@@ -731,9 +731,9 @@
 				var items = this.obDestinationDataModels(), destinationId;
 				for (var i = 0; i < items.length; i++)
 				{
-					if (items[i].Name === id)
+					if (items[ i ].Name === id)
 					{
-						destinationId = items[i].Id;
+						destinationId = items[ i ].Id;
 					}
 				}
 
@@ -775,7 +775,7 @@
 					})
 				);
 
-				this.obEntityDataModel()[obProperty](type === "destination" ? data.Name : data.Id);
+				this.obEntityDataModel()[ obProperty ](type === "destination" ? data.Name : data.Id);
 				this._fieldsUpdateFromModal(type, data);
 			}.bind(this));
 	}
@@ -801,7 +801,7 @@
 		var json = {};
 		items.forEach(function(data)
 		{
-			json[data.FieldName] = { Label: data.Label, Required: data.Required };
+			json[ data.FieldName ] = { Label: data.Label, Required: data.Required };
 		}.bind(this));
 
 		this.obRequiredFields(json);
@@ -881,7 +881,7 @@
 
 	}
 
-	FieldTripDataEntryViewModel.prototype.getSaveData = function()
+	FieldTripDataEntryViewModel.prototype.getSaveData = function(isTemplate)
 	{
 		if (!this.obEntityDataModel().departDate())
 		{
@@ -894,7 +894,10 @@
 		var entity = this.obEntityDataModel().toData();
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
-
+		if (isTemplate)
+		{
+			entity.APIIsNew = true;
+		}
 		entity.FieldTripResourceGroups.map(function(item)
 		{
 			item.APIIsDirty = true;
@@ -984,16 +987,16 @@
 
 		this.obFieldTripResourceGroupData().forEach(function(item)
 		{
-			item.VehFixedCost = curBilling[0].VehFixedCost ? curBilling[0].VehFixedCost : 0;
-			item.MileageRate = curBilling[0].MileageRate ? curBilling[0].MileageRate : 0;
+			item.VehFixedCost = curBilling[ 0 ].VehFixedCost ? curBilling[ 0 ].VehFixedCost : 0;
+			item.MileageRate = curBilling[ 0 ].MileageRate ? curBilling[ 0 ].MileageRate : 0;
 
-			item.DriverRate = curBilling[0].DriverRate ? curBilling[0].DriverRate : 0;
-			item.DriverFixedCost = curBilling[0].DriverFixedCost ? curBilling[0].DriverFixedCost : 0;
-			item.DriverOtrate = curBilling[0].DriverOtrate ? curBilling[0].DriverOtrate : 0;
+			item.DriverRate = curBilling[ 0 ].DriverRate ? curBilling[ 0 ].DriverRate : 0;
+			item.DriverFixedCost = curBilling[ 0 ].DriverFixedCost ? curBilling[ 0 ].DriverFixedCost : 0;
+			item.DriverOtrate = curBilling[ 0 ].DriverOtrate ? curBilling[ 0 ].DriverOtrate : 0;
 
-			item.AideRate = curBilling[0].AideRate ? curBilling[0].AideRate : 0;
-			item.AideFixedCost = curBilling[0].AideFixedCost ? curBilling[0].AideFixedCost : 0;
-			item.AideOtrate = curBilling[0].AideOtrate ? curBilling[0].AideOtrate : 0;
+			item.AideRate = curBilling[ 0 ].AideRate ? curBilling[ 0 ].AideRate : 0;
+			item.AideFixedCost = curBilling[ 0 ].AideFixedCost ? curBilling[ 0 ].AideFixedCost : 0;
+			item.AideOtrate = curBilling[ 0 ].AideOtrate ? curBilling[ 0 ].AideOtrate : 0;
 
 		}.bind(this));
 
@@ -1170,7 +1173,7 @@
 							})
 							.then(function(apiResponse)
 							{
-								return apiResponse.Items[0] == false;
+								return apiResponse.Items[ 0 ] == false;
 							})
 					}.bind(this)
 				}
@@ -1422,25 +1425,25 @@
 
 	FieldTripDataEntryViewModel.prototype.addLinkToDate = function(e)
 	{
-		$(this.$form.parents()[3]).find(".linktoDepartDate").on("click", function()
+		$(this.$form.parents()[ 3 ]).find(".linktoDepartDate").on("click", function()
 		{
 			this.$form.find("#departDate input[name=departDate]").focus();
 			//e.preventDefault();
 		}.bind(this));
 
-		$(this.$form.parents()[3]).find(".linktoReturnDate").on("click", function()
+		$(this.$form.parents()[ 3 ]).find(".linktoReturnDate").on("click", function()
 		{
 			this.$form.find("#returnDate input[name=estimatedReturnDate]").focus();
 			//e.preventDefault();
 		}.bind(this));
 
-		$(this.$form.parents()[3]).find(".linktoDepartTime").on("click", function()
+		$(this.$form.parents()[ 3 ]).find(".linktoDepartTime").on("click", function()
 		{
 			this.$form.find("#departTime input[name=departTime]").focus();
 			//e.preventDefault();
 		}.bind(this));
 
-		$(this.$form.parents()[3]).find(".linktoReturnTime").on("click", function()
+		$(this.$form.parents()[ 3 ]).find(".linktoReturnTime").on("click", function()
 		{
 			this.$form.find("#returnTime input[name=estimatedReturnTime]").focus();
 			//e.preventDefault();
@@ -1454,12 +1457,12 @@
 			return item.SchoolCode == school;
 		});
 
-		return (filters[0] && filters[0].Id) ? filters[0].Id : null;
+		return (filters[ 0 ] && filters[ 0 ].Id) ? filters[ 0 ].Id : null;
 	};
 
 	FieldTripDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
 	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", this.localization);
+		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[ 0 ], "fieldtripdestination", this.localization);
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
 			.then(function(data)
 			{
@@ -1467,48 +1470,48 @@
 				{
 					for (var i in modifyDataEntryListItemModalViewModel.newDataList)
 					{
-						parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
+						parameters[ 1 ].push(modifyDataEntryListItemModalViewModel.newDataList[ i ]);
 					}
-					if (parameters[2])
+					if (parameters[ 2 ])
 					{
-						this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
+						this.obEntityDataModel()[ parameters[ 2 ] ](modifyDataEntryListItemModalViewModel.newDataList[ i ].Item);
 					}
 				}
 				if (!data)
 				{
 					return;
 				}
-				parameters[1].push(data);
-				if (parameters[2])
+				parameters[ 1 ].push(data);
+				if (parameters[ 2 ])
 				{
-					this.obEntityDataModel()[parameters[2]](data.Item);
+					this.obEntityDataModel()[ parameters[ 2 ] ](data.Item);
 				}
 			}.bind(this));
 	}
 
 	FieldTripDataEntryViewModel.prototype.EditDataEntryListItem = function(parameters)
 	{
-		var select = $.grep(parameters[1](), function(d) { return d.Item == parameters[3] });
+		var select = $.grep(parameters[ 1 ](), function(d) { return d.Item == parameters[ 3 ] });
 		if (select.length > 0)
 		{
-			if (select[0].Id == 0)
+			if (select[ 0 ].Id == 0)
 			{//once select None
 				return;
 			}
 
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", this.localization, select[0].Id))
+			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[ 0 ], "fieldtripdestination", this.localization, select[ 0 ].Id))
 				.then(function(data)
 				{
 					if (!data)
 					{
 						return;
 					}
-					var index = parameters[1].indexOf(select[0]);
-					parameters[1].splice(index, 1);
-					parameters[1].push(data);
-					if (parameters[2])
+					var index = parameters[ 1 ].indexOf(select[ 0 ]);
+					parameters[ 1 ].splice(index, 1);
+					parameters[ 1 ].push(data);
+					if (parameters[ 2 ])
 					{
-						this.obEntityDataModel()[parameters[2]](data.Item);
+						this.obEntityDataModel()[ parameters[ 2 ] ](data.Item);
 					}
 				}.bind(this));
 		}
