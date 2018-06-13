@@ -58,18 +58,25 @@
 		if (!self._validator) return Promise.resolve();
 		if ($field)
 		{
-			var isContainingField = false;
+			var isContainingField = false, currentItem;
 			$.each(self.obValidationErrors().concat(self.obValidationErrorsSpecifed()), function(index, item)
 			{
 				if (item.field && $field[0] === item.field[0])
 				{
+					currentItem = item;
 					isContainingField = true;
-					return Promise.resolve(false);
+					return false;
 				}
 			});
 			if (!isContainingField)
 			{
 				return Promise.resolve();
+			}
+			else
+			{
+				self.obValidationErrors.remove(currentItem);
+				self.obValidationErrorsSpecifed.remove(currentItem);
+				return Promise.resolve(false);
 			}
 		}
 		self.obValidationErrors.removeAll();
