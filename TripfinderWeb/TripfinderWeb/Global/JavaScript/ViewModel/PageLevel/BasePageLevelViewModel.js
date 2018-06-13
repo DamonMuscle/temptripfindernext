@@ -157,6 +157,7 @@
 	{
 		var self = this;
 		self.obValidationErrors.removeAll();
+		self.obValidationErrorsSpecifed.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
 	};

@@ -6,8 +6,9 @@
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link href="Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
-	<meta name ="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0"
+	/>
+	<meta name="format-detection" content="telephone=no" />
 
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrap/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datetimepicker.css" />
@@ -123,6 +124,10 @@
 	<script src="Global/JavaScript/Framework/Helper/DateBoxHelper.js"></script>
 	<script src="Global/JavaScript/Framework/Helper/FullScreenHelper.js"></script>
 
+	<script src="Global/JavaScript/Main.js"></script>
+	<script src="Global/JavaScript/Startup.js"></script>
+	<script src="Global/JavaScript/Setting.js"></script>
+
 	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/Navigation/NavigationMenu.js"></script>
 
@@ -138,23 +143,6 @@
 	<script src="Global/JavaScript/ViewModel/Controls/ModifyDataEntryListItemViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SearchControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SaveTemplateNameViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/EditKendoColumnViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Pages/ResizablePage.js"></script>
-	<script src="Global/JavaScript/ViewModel/Pages/BaseGridPage.js"></script>
-	<script src="Global/JavaScript/ViewModel/Pages/FieldTripPage.js"></script>
-	<script src="Global/JavaScript/ViewModel/Pages/MyRequestPage.js"></script>
-	<script src="Global/JavaScript/ViewModel/PageLevel/BasePageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/PageLevel/ListMoverPageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ManageFilterViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ManageFilterViewMobileModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ManageLayoutViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ManageLayoutViewMobileModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ModifyFilterViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ModifyFilterViewMobileModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ModifyLayoutViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/GlobalReplaceViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/EditFieldTripStatusViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Controls/KendoListMoverWithSearchControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/ListMoverForListFilterControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SearchSettingsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/AddOneFieldViewModel.js"></script>
@@ -178,18 +166,41 @@
 	<script src="Global/JavaScript/ViewModel/DetailView/ConditionalAppearanceViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/EditDataBlockAppearance.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewHelper.js"></script>
-
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GridDefinition/FieldTripGridDefinition.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/DocumentData.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/GridControlViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/BasePageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/ListMoverPageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/FieldTripDataEntryPageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/FieldTripDestinationPageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/FieldTripBillingClassificationPageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/BaseDataEntryPageLevelViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/PageLevel/AddTwoFieldsPageViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/BaseDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripInvoiceDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/DataEntry/BaseDataEntryViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DataEntry/FieldTripDataEntryViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DocumentData.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/ResizablePage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/BaseGridPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/FieldTripPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/MyRequestPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/GridControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/EditKendoColumnViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageFilterViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageFilterViewMobileModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageLayoutViewMobileModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ModifyFilterViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ModifyFilterViewMobileModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ModifyLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/GlobalReplaceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/EditFieldTripStatusViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/BaseKendoGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/FieldTripGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/FieldTripInvoiceGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ReportsGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/FieldTripResourceGroupGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/GridDefinition/FieldTripGridDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/BasePageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/ListMoverPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/FieldTripDataEntryPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/FieldTripDestinationPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/FieldTripBillingClassificationPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/BaseDataEntryPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/AddTwoFieldsPageViewModel.js"></script>
 
 	<script src="Global/JavaScript/Modal/BaseModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/TripfinderLoginModel.js"></script>
@@ -246,21 +257,6 @@
 	<script src="Global/JavaScript/DataModel/VehicleCategoryDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/DetailScreenLayoutDataModel.js"></script>
 
-	<script src="Global/JavaScript/Main.js"></script>
-	<script src="Global/JavaScript/Startup.js"></script>
-	<script src="Global/JavaScript/Setting.js"></script>
-
-	<script src="Global/JavaScript/ViewModel/Executor/Deletion/BaseDeletion.js"></script>
-	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripDeletion.js"></script>
-	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripInvoiceDeletion.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/BaseKendoGridViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/FieldTripGridViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/FieldTripInvoiceGridViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/DataEntry/BaseDataEntryViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/DataEntry/FieldTripDataEntryViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/ReportsGridViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Workspace/Grid/FieldTripResourceGroupGridViewModel.js"></script>
-
 	<!-- endbuild -->
 </head>
 
@@ -298,34 +294,27 @@
 			<div class="spinner">
 				<div class="spinner-icon-container">
 					<style type='text/css'>
-						@-webkit-keyframes uil-default-anim
-						{
-							0%
-							{
+						@-webkit-keyframes uil-default-anim {
+							0% {
 								opacity: 1;
 							}
 
-							100%
-							{
+							100% {
 								opacity: 0;
 							}
 						}
 
-						@keyframes uil-default-anim
-						{
-							0%
-							{
+						@keyframes uil-default-anim {
+							0% {
 								opacity: 1;
 							}
 
-							100%
-							{
+							100% {
 								opacity: 0;
 							}
 						}
 
-						.uil-default-css
-						{
+						.uil-default-css {
 							position: relative;
 							left: -78px;
 							top: -78px;
@@ -334,96 +323,84 @@
 							height: 200px;
 						}
 
-						.uil-default-css > div:nth-of-type(1)
-						{
+						.uil-default-css>div:nth-of-type(1) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.35s;
 							animation-delay: -0.35s;
 						}
 
-						.uil-default-css > div:nth-of-type(2)
-						{
+						.uil-default-css>div:nth-of-type(2) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.29166666666666663s;
 							animation-delay: -0.29166666666666663s;
 						}
 
-						.uil-default-css > div:nth-of-type(3)
-						{
+						.uil-default-css>div:nth-of-type(3) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.23333333333333334s;
 							animation-delay: -0.23333333333333334s;
 						}
 
-						.uil-default-css > div:nth-of-type(4)
-						{
+						.uil-default-css>div:nth-of-type(4) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.17500000000000002s;
 							animation-delay: -0.17500000000000002s;
 						}
 
-						.uil-default-css > div:nth-of-type(5)
-						{
+						.uil-default-css>div:nth-of-type(5) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.11666666666666667s;
 							animation-delay: -0.11666666666666667s;
 						}
 
-						.uil-default-css > div:nth-of-type(6)
-						{
+						.uil-default-css>div:nth-of-type(6) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.05833333333333329s;
 							animation-delay: -0.05833333333333329s;
 						}
 
-						.uil-default-css > div:nth-of-type(7)
-						{
+						.uil-default-css>div:nth-of-type(7) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -5.551115123125783e-17s;
 							animation-delay: -5.551115123125783e-17s;
 						}
 
-						.uil-default-css > div:nth-of-type(8)
-						{
+						.uil-default-css>div:nth-of-type(8) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.05833333333333329s;
 							animation-delay: 0.05833333333333329s;
 						}
 
-						.uil-default-css > div:nth-of-type(9)
-						{
+						.uil-default-css>div:nth-of-type(9) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.11666666666666664s;
 							animation-delay: 0.11666666666666664s;
 						}
 
-						.uil-default-css > div:nth-of-type(10)
-						{
+						.uil-default-css>div:nth-of-type(10) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.17500000000000004s;
 							animation-delay: 0.17500000000000004s;
 						}
 
-						.uil-default-css > div:nth-of-type(11)
-						{
+						.uil-default-css>div:nth-of-type(11) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.2333333333333334s;
 							animation-delay: 0.2333333333333334s;
 						}
 
-						.uil-default-css > div:nth-of-type(12)
-						{
+						.uil-default-css>div:nth-of-type(12) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.29166666666666663s;
