@@ -35,7 +35,7 @@
 		}.bind(this));
 		this.value.subscribe(function(value)
 		{
-			var datetime = moment.utc(this.value(), [this.formatString, moment.ISO_8601]);
+			var datetime = moment.utc(this.value(), [ this.formatString, moment.ISO_8601 ]);
 			if (value == "Empty" || value == 'Not empty' || !value || !datetime.isValid())
 			{
 				this._dateTimePicker.date(null);
@@ -102,7 +102,7 @@
 
 		this._dateTimePicker = $element.data('DateTimePicker');
 		this.value.valueHasMutated();
-		ko.applyBindings(this, $element[0]);
+		ko.applyBindings(this, $element[ 0 ]);
 		this.$element = $element;
 
 		var delayTimeOut;
@@ -151,23 +151,27 @@
 					}
 					else
 					{
-						var top = this.$element.outerHeight(), left;
+						var top = this.$element.outerHeight(), left, right;
 						if (($button.offset().top + $button.outerHeight() + this.height + 67) > document.body.offsetHeight)
 						{
 							top = -this.height;
 						}
-						if (document.body.offsetWidth - $button[0].getBoundingClientRect().right > widget.outerWidth() / 2)
+						if (document.body.offsetWidth - $button[ 0 ].getBoundingClientRect().right > widget.outerWidth() / 2)
 						{
 							left = $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2;
+							right = 'auto';
 						}
 						else
 						{
-							left = widget.outerWidth() - widget.innerWidth();
+							left = 'auto';
+							right = widget.outerWidth() - widget.innerWidth();
 						}
 						widget.css(
 							{
 								top: top,
-								left: left
+								left: left,
+								right: right,
+								bottom: 'auto'
 							});
 					}
 				}
@@ -217,24 +221,45 @@
 					{
 						var windowHeight = $(window).height();
 						var offset = this.$element.offset();
-						if (offset.top + widget.height() * 1.5 >= $(window).height() + $(window).scrollTop() &&
-							widget.height() + this.$element.outerHeight() < offset.top)
+						var overlay = $("body>.bootstrap-datetimepicker-overlay");
+						if (overlay.length == 0)
 						{
-							//top
+							var top;
+							if (document.body.offsetHeight - $button[ 0 ].getBoundingClientRect().bottom > 160)
+							{
+								top = $button.outerHeight();
+							}
+							else
+							{
+								top = -widget.outerHeight();
+							}
 							widget.css(
 								{
-									top: 'auto',
-									bottom: windowHeight - this.$element.offset().top
+									top: top,
+									bottom: 'auto'
 								});
 						}
 						else
 						{
-							//bottom
-							widget.css(
-								{
-									top: 'auto',
-									bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
-								});
+							if (offset.top + widget.height() * 1.5 >= $(window).height() + $(window).scrollTop() &&
+								widget.height() + this.$element.outerHeight() < offset.top)
+							{
+								//top
+								widget.css(
+									{
+										top: 'auto',
+										bottom: windowHeight - this.$element.offset().top
+									});
+							}
+							else
+							{
+								//bottom
+								widget.css(
+									{
+										top: 'auto',
+										bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
+									});
+							}
 						}
 					}.bind(this), 100);
 				}
@@ -262,7 +287,7 @@
 		{
 			setTimeout(function()
 			{
-				$(viewModel.$element[0]).blur();
+				$(viewModel.$element[ 0 ]).blur();
 			}.bind(this), 0);
 		}
 		return true;
@@ -321,20 +346,20 @@
 			{
 				$(item).data("scrollTop", item.scrollTop)
 			});
-			scrollableParents[method]("scroll.datatimebox", this._resizeProxy.bind(this));
-			scrollableParents[method]("mousedown.datatimebox", this.$element.data("DateTimePicker").hide);
-			$(window)[method]("scroll.datatimebox", this._resizeProxy.bind(this));
+			scrollableParents[ method ]("scroll.datatimebox", this._resizeProxy.bind(this));
+			scrollableParents[ method ]("mousedown.datatimebox", this.$element.data("DateTimePicker").hide);
+			$(window)[ method ]("scroll.datatimebox", this._resizeProxy.bind(this));
 			if (!TF.isPhoneDevice) //VIEW-1252 Date Control is not visible when focus is still set to input
 			{
-				$(window)[method]("resize.datatimebox", this.$element.data("DateTimePicker").hide);
+				$(window)[ method ]("resize.datatimebox", this.$element.data("DateTimePicker").hide);
 			}
 		}
 		else
 		{
-			scrollableParents[method]("scroll.datatimebox");
-			scrollableParents[method]("mousedown.datatimebox");
-			$(window)[method]("scroll.datatimebox");
-			$(window)[method]("resize.datatimebox");
+			scrollableParents[ method ]("scroll.datatimebox");
+			scrollableParents[ method ]("mousedown.datatimebox");
+			$(window)[ method ]("scroll.datatimebox");
+			$(window)[ method ]("resize.datatimebox");
 		}
 	};
 
@@ -373,7 +398,7 @@
 	DateTimeBox.prototype.dispose = function()
 	{
 		this._dateTimePicker.destroy();
-		ko.removeNode(this.$element[0]);
+		ko.removeNode(this.$element[ 0 ]);
 		namespace.BaseBox.prototype.dispose.call(this);
 	};
 })();
