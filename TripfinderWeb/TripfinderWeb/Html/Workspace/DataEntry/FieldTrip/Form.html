@@ -167,7 +167,7 @@
 					</div>
 					<div class="form-group">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().ContactEMail&&obRequiredFields().ContactEMail.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
-						<input type="text" class="form-control" data-bind="value:obEntityDataModel().contactEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().contactEmail?obRequiredFields().contactEmail.Required:null)"
+						<input type="text" class="form-control" name="email" data-tf-input-type="Email" data-bind="value:obEntityDataModel().contactEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().contactEmail?obRequiredFields().contactEmail.Required:null)"
 						 maxlength="100">
 					</div>
 				</div>
@@ -430,7 +430,7 @@
 					</div>
 					<div class="form-group">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationEMail&&obRequiredFields().DestinationEMail.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
-						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().destinationEmail?obRequiredFields().destinationEmail.Required:null)"
+						<input type="text" class="form-control" name="email" data-tf-input-type="Email" data-bind="value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().destinationEmail?obRequiredFields().destinationEmail.Required:null)"
 						 maxlength="100">
 					</div>
 					<div class="col-xs-12 form-group no-padding-left">
