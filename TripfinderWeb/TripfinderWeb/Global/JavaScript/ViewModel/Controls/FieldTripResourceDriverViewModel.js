@@ -43,6 +43,7 @@
 		this.obSelectedDriver = ko.observable();
 		this.obSelectedDriver.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "driverId", "obSelectedDriver", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedDriverText = ko.observable(source ? source.DriverName : undefined);
+		this.obEntityDataModel().apiIsDirty(false);
 	}
 
 	FieldTripResourceDriverViewModel.prototype.save = function()

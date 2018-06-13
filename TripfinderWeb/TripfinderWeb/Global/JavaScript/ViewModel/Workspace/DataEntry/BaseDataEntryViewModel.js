@@ -10,17 +10,12 @@
 		this.printClick = this.printClick.bind(this);
 		this.nextClick = this.nextClick.bind(this);
 		this.previousClick = this.previousClick.bind(this);
-		this.bookmarkClick = this.bookmarkClick.bind(this);
 		this.leftPress = this.leftPress.bind(this);
 		this.rightPress = this.rightPress.bind(this);
 		this.loadRecord = this.loadRecord.bind(this);
 		this._updateEntityStatusMessage = this._updateEntityStatusMessage.bind(this);
 		this.newCopyClick = this.newCopyClick.bind(this);
 
-		this.bookMarkKey = {
-			Type: "rfweb." + view.type + ".edit" + (view.id == undefined ? "" : ("." + view.id))
-		};
-		this.obCurrentBookMark = ko.observable(null);
 		this.obNeedSaveTemplate = ko.observable(false);
 		this.obNeedSaveAndClose = ko.observable(true);
 		// this.obDataEntryViewModel = ko.observable(null);
@@ -307,59 +302,12 @@
 
 	};
 
-	BaseDataEntryViewModel.prototype.bookmarkClick = function(viewModel, e)
-	{
-		switch (this.obCurrentBookMark())
-		{
-			case "nonbookmark":
-				this.bookMarkKey.Favorite = false;
-				break;
-			case "bookmarked":
-				this.bookMarkKey.Favorite = true;
-				break;
-			case "favoriteBookmarked":
-				this.obCurrentBookMark("nonbookmark");
-				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "Bookmark", this.bookMarkKey.Type));
-				break;
-		}
-		this.bookMarkKey.BookmarkUrl = location.href;
-
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "Bookmark"), { data: this.bookMarkKey })
-			.then(function(data)
-			{
-				if (data.StatusCode == 404)
-				{
-					tf.promiseBootbox.alert(data.Message, "Warning");
-				}
-				else
-				{
-					switch (this.obCurrentBookMark())
-					{
-						case "nonbookmark":
-							this.obCurrentBookMark("bookmarked");
-							break;
-						case "bookmarked":
-							this.obCurrentBookMark("favoriteBookmarked");
-							break;
-					}
-				}
-			}.bind(this));
-	};
-
 	BaseDataEntryViewModel.prototype.rightPress = function(e, keyCombination)
 	{
-		// if (this.obFocusState())
-		// {
-		// 	this._changePage(1);
-		// }
 	};
 
 	BaseDataEntryViewModel.prototype.leftPress = function(e, keyCombination)
 	{
-		// if (this.obFocusState())
-		// {
-		// 	this._changePage(-1);
-		// }
 	};
 
 	BaseDataEntryViewModel.prototype._changePage = function(pagePath)
@@ -461,40 +409,12 @@
 
 	BaseDataEntryViewModel.prototype.initialize = function()
 	{
-		//not sure why refresh url when initialize  by Weple
-		//this.onContentChange.notify();
 		this.loadSupplement()
 			.then(function()
 			{
-				// this.$form = $(this._documentElement).find(".form");
 				this.$form = $(".form");
 				this.loadRecord();
 			}.bind(this));
-
-		// this.obFocusState.subscribe(this.focusStateChange, this);
-
-		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "bookmark", "edit", this.type), this.updateBookmark.bind(this));
-	};
-
-	BaseDataEntryViewModel.prototype.updateBookmark = function(path, args)
-	{
-		var pageID = args[0];
-		var action = args[1];
-		if (pageID != undefined && this._view)
-		{
-			var viewModalID = this._view.id;
-			if (pageID == "empty" && viewModalID == undefined)
-			{
-				this.obCurrentBookMark(action);
-			}
-			else
-			{
-				if (pageID == viewModalID)
-				{
-					this.obCurrentBookMark(action);
-				}
-			}
-		}
 	};
 
 	BaseDataEntryViewModel.prototype.loadSupplement = function()
@@ -680,8 +600,6 @@
 		this._disposeCheckEntityStatus();
 		this.pageLevelViewModel.obErrorMessageDivIsShow(false);
 		this.pageLevelViewModel.obSuccessMessageDivIsShow(false);
-		//not sure why refresh url when initialize  by Weple
-		//this.onContentChange.notify();
 		this.load()
 			.then(function()
 			{

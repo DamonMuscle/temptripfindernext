@@ -14,11 +14,6 @@
 			<div class="title"></div>
 			<pre class="message titleNotify"></pre>
 		</div>
-		<div class="dataentry-paginator clearafter">
-			<div class="iconbutton" data-bind="click:obGridViewModel()?obGridViewModel().bookmarkClick:null, css: obGridViewModel()?obGridViewModel().obCurrentBookMark():''"
-			 role="button"></div>
-			<div class="iconbutton help" title="todo" role="button"></div>
-		</div>
 		<!-- /ko -->
 		<!--ko with:obGridViewModel-->
 		<div style="height:14px;">
@@ -26,8 +21,10 @@
 		<div class="iconrow">
 			<!--ko if:!$parent.obIsDocument()-->
 			<div class="view-grid-header" data-bind="text:$parent.title"></div>
-			<div class="view-grid-header-count">(
-				<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)</div>
+			<div class="view-grid-header-count">
+				(
+				<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)
+			</div>
 			<!-- /ko -->
 			<div style="clear:both">
 				<!--ko if:!$parent.obCanOperation()-->

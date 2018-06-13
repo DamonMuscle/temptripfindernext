@@ -39,21 +39,22 @@
 		//drop down list
 		this.obSelectedVehicle = ko.observable();
 		this.obSelectedVehicle.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "vehicleId", "obSelectedVehicle", function(obj) { return obj ? obj.Id : 0; }), this);
-		this.obSelectedVehicleText = ko.observable();
+		this.obSelectedVehicleText = ko.observable(source ? source.VehicleName : undefined);
+		this.obEntityDataModel().apiIsDirty(false);
 	}
 
 	FieldTripResourceVehicleViewModel.prototype.save = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				var entity = this.obEntityDataModel().toData();
-				entity.VehicleName = this.obSelectedVehicleText();
-				return entity;
-			}
-		}.bind(this));
+				if (result)
+				{
+					var entity = this.obEntityDataModel().toData();
+					entity.VehicleName = this.obSelectedVehicleText();
+					return entity;
+				}
+			}.bind(this));
 	}
 
 	FieldTripResourceVehicleViewModel.prototype.init = function(viewModel, el)
@@ -97,28 +98,28 @@
 	FieldTripResourceVehicleViewModel.prototype.load = function()
 	{
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicle"))
-		.then(function(data)
-		{
-			this.obVehicleSource(data.Items);
-
-			if (this.source)
+			.then(function(data)
 			{
-				this.obEntityDataModel().vehicleId(this.source.VehicleId);
-			}
+				this.obVehicleSource(data.Items);
 
-		}.bind(this));
+				if (this.source)
+				{
+					this.obEntityDataModel().vehicleId(this.source.VehicleId);
+				}
+
+			}.bind(this));
 	};
 
 	FieldTripResourceVehicleViewModel.prototype.apply = function()
 	{
 		return this.save()
-		.then(function(data)
-		{
-			return data;
+			.then(function(data)
+			{
+				return data;
 
-		}, function()
-		{
-		});
+			}, function()
+			{
+			});
 	};
 
 	FieldTripResourceVehicleViewModel.prototype.generateFunction = function(fn)

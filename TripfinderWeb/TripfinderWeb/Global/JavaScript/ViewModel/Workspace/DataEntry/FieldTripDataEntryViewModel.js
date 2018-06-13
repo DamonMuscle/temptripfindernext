@@ -26,7 +26,6 @@
 		this.obSchoolDataModels = ko.observableArray();
 		this.obDepartmentDataModels = ko.observableArray();
 		this.obActivityDataModels = ko.observableArray();
-		this.obStageDataModels = ko.observableArray();
 		this.obClassificationDataModels = ko.observableArray();
 		this.obEquipmentDataModels = ko.observableArray();
 		this.obDestinationDataModels = ko.observableArray();
@@ -65,10 +64,6 @@
 		this.obSelectedActivity = ko.observable();
 		this.obSelectedActivity.subscribe(this.setSelectValue("fieldTripActivityId", "obSelectedActivity", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obCurrentActivityName = ko.computed(this.setSelectTextComputer("obActivityDataModels", "fieldTripActivityId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
-
-		this.obSelectedStage = ko.observable();
-		this.obSelectedStage.subscribe(this.setSelectValue("fieldTripStageId", "obSelectedStage", function(obj) { return obj ? obj.FieldTripStageId : 0; }), this);
-		this.obCurrentStageName = ko.computed(this.setSelectTextComputer("obStageDataModels", "fieldTripStageId", function(obj) { return obj.FieldTripStageId; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedClassification = ko.observable();
 		this.obSelectedClassification.subscribe(this.setSelectValue("fieldTripClassificationId", "obSelectedClassification", function(obj) { return obj ? obj.Id : 0; }), this);
@@ -225,9 +220,6 @@
 			this.resetEmpty(m, collection, 'billingClassificationId');
 		}.bind(this);
 
-
-		this.stageDisable = ko.computed(function() { return !this.obEntityDataModel().id(); }, this);
-
 		this.stageCss = function() { return this.obEntityDataModel().id() ? this.opacityCssSource.enable : this.opacityCssSource.disable; };
 
 	};
@@ -239,7 +231,6 @@
 	FieldTripDataEntryViewModel.prototype.dataChangeReceive = function(changeName)
 	{
 		this.loadSupplement();
-		//this.load();
 	};
 
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
@@ -270,63 +261,55 @@
 			.then(function(data)
 			{
 				this.obActivityDataModels(data.Items);
-
 			}.bind(this));
 
-		var p4 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripstage"))
-			.then(function(data)
-			{
-				this.obStageDataModels(data.Items);
-
-			}.bind(this));
-
-		var p5 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripclassification"))
+		var p4 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripclassification"))
 			.then(function(data)
 			{
 				this.obClassificationDataModels(data.Items);
 
 			}.bind(this));
 
-		var p6 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripequipment"))
+		var p5 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripequipment"))
 			.then(function(data)
 			{
 				this.obEquipmentDataModels(data.Items);
 
 			}.bind(this));
 
-		var p7 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripdestination"))
+		var p6 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripdestination"))
 			.then(function(data)
 			{
 				this.obDestinationDataModels(data.Items);
 
 			}.bind(this));
 
-		var p8 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripbillingclassification"))
+		var p7 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripbillingclassification"))
 			.then(function(data)
 			{
 				this.obBillingClassificationDataModels(data.Items);
 
 			}.bind(this));
 
-		var p9 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "requiredfield/FIELDTRIP"))
+		var p8 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "requiredfield/FIELDTRIP"))
 			.then(function(data)
 			{
 				this.ConvertToJson(data.Items);
 			}.bind(this));
 
-		var p10 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", "fieldtripdestination", "mail_city"))
+		var p9 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", "fieldtripdestination", "mail_city"))
 			.then(function(data)
 			{
 				this.obMailCityDataModels(data.Items);
 			}.bind(this));
 
-		var p11 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", "fieldtripdestination", "mail_zip"))
+		var p10 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", "fieldtripdestination", "mail_zip"))
 			.then(function(data)
 			{
 				this.obMailZipDataModels(data.Items);
 			}.bind(this));
 
-		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11]);
+		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
 	};
 
 	FieldTripDataEntryViewModel.prototype.load = function()
@@ -346,7 +329,6 @@
 			{
 				if (this.obMode() === "Edit")
 				{
-					//to load bookmark
 					if (this.obEntityDataModel().departDateTime() == "1900-01-01T00:00:00.000" ||
 						this.obEntityDataModel().estimatedReturnDateTime() == "1900-01-01T00:00:00.000" ||
 						this.obEntityDataModel().departDateTime() == null ||
@@ -366,39 +348,18 @@
 						this.obDuration(this.calculateDateTimeDiff("day"));
 					}
 
-					this.bookMarkKey.Bookmark = this.obEntityDataModel().name() + " (" + this.obDepartureAndReturnDateTime() + ")";
-
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
 					this.obEntityDataModel().updateEntityBackup();
 				}
 				else
 				{
-					//to load bookmark
-					this.bookMarkKey.Bookmark = "Add";
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripstage"))
-						.then(function(data)
-						{
-							if (data)
-							{
-								data.Items.some(function(item)
-								{
-									if (item.Name == "Level 1 - Request Submitted")
-									{
-										this.obEntityDataModel().fieldTripStageId(item.FieldTripStageId);
-										this.obEntityDataModel().fieldTripStageName(item.Name);
-										this.obEntityDataModel().updateClone(this.obEntityDataModel());
-										this.obEntityDataModel().updateEntityBackup();
-										return true;
-									}
-								}.bind(this));
-							}
-
-						}.bind(this));
+					this.obEntityDataModel().fieldTripStageId(1);
+					this.obEntityDataModel().updateClone(this.obEntityDataModel());
+					this.obEntityDataModel().updateEntityBackup();
 				}
 				var p0 = this.loadInvoicing();
 				var p1 = this.loadResources();
 
-				this._oldStatus = this.obEntityDataModel().fieldTripStageId();
 				this.obEntityDataModel().apiIsDirty(false);
 				//reset the shortCutKeys golbal used
 				tf.shortCutKeys.resetUsingGolbal(5);
@@ -1544,34 +1505,6 @@
 					}
 				}.bind(this));
 		}
-	}
-
-	FieldTripDataEntryViewModel.prototype._saveStatusCheck = function()
-	{
-		return namespace.BaseDataEntryViewModel.prototype._saveStatusCheck.call(this)
-			.then(function(result)
-			{
-				if (result && this._oldStatus && this._oldStatus != this.obEntityDataModel().fieldTripStageId())
-				{
-					return tf.modalManager.showModal(new TF.Modal.FieldTripStatusModalViewModel(this.obStageDataModels(), this.obSelectedStage(), this.obEntityDataModel().id()))
-						.then(function(item)
-						{
-							if (item)
-							{
-								this.obEntityDataModel().fieldTripStageNotes(item.notes);
-								this.obEntityDataModel().fieldTripStageId(item.selectStage.FieldTripStageId);
-								this.obEntityDataModel().isFieldTripStageNotesChange(item.isNotesChange);
-								return true;
-							}
-							else
-								return false;
-						}.bind(this));
-				}
-				else
-				{
-					return result;
-				}
-			}.bind(this));
 	}
 
 	FieldTripDataEntryViewModel.prototype._fieldsUpdateFromModal = function(type, data)

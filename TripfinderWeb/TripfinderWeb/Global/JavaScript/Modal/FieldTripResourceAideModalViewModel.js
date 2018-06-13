@@ -45,9 +45,7 @@
 
 	FieldTripResourceAideModalViewModel.prototype.negativeClose = function(returnData)
 	{
-		if (this.fieldTripResourceViewModel.obEntityDataModel().apiIsDirty() ||
-			!!this.fieldTripResourceViewModel.obSelectedVehicleText() ||
-			!!this.fieldTripResourceViewModel.obSelectedBusAideText())
+		if (this.fieldTripResourceViewModel.obEntityDataModel().apiIsDirty())
 		{
 			return tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes prior to closing?", backdrop: true, title: "Unsaved Changes", closeButton: true })
 				.then(function(result)

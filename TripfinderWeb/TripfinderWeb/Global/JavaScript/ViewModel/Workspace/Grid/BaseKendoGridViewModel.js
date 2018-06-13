@@ -62,9 +62,6 @@
 		this.obFilterIconCss = ko.observable("iconbutton eye-hide");
 		this.options = $.extend(this.options, option);
 
-		this.bookmarkClick = this.bookmarkClick.bind(this);
-		this.obCurrentBookMark = ko.observable(null);
-
 		this.documentType = TF.Document.DocumentData.Grid;
 		this.obCurrentPage = ko.observable();
 		this.obPages = ko.observable([]);
@@ -141,10 +138,7 @@
 			this._openBulkMenu();
 			this.searchGrid.filterMenuClick = this.searchGrid.filterMenuClick.bind(this);
 			this.searchGrid.onDoubleClick.subscribe(this._viewfromDBClick.bind(this));
-			this.bookMarkKey = {
-			};
 			this.searchGrid.onEyeCheckChanged.subscribe(this._onAdditionalSelectionChange.bind(this));
-			PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "bookmark", "grid", this.type), this.updateBookmark.bind(this));
 			this.searchGrid.getSelectedIds.subscribe(function()
 			{
 				if (this.searchGrid.getSelectedIds().length == 0)
@@ -383,66 +377,6 @@
 			container.find(".k-auto-scrollable,.k-grid-content").width(currentPanelWidth - lockedHeaderWidth - paddingRight);
 		});
 		this._leftPanelMaxWidth = this.$container.width() - 4;
-	};
-
-	BaseKendoGridViewModel.prototype.bookmarkClick = function(viewModel, e)
-	{
-		//var that = this.obGridViewModel().searchGrid;
-
-		switch (this.obCurrentBookMark())
-		{
-			case "nonbookmark":
-				this.bookMarkKey.Favorite = false;
-				break;
-			case "bookmarked":
-				this.bookMarkKey.Favorite = true;
-				break;
-			case "favoriteBookmarked":
-				this.obCurrentBookMark("nonbookmark");
-				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "Bookmark", this.bookMarkKey.Type));
-				break;
-		}
-		this.bookMarkKey.BookmarkUrl = location.href;
-		this.bookMarkKey.Bookmark = this.type;
-		if (this.searchGrid.obSelectedGridFilterName())
-		{
-			this.bookMarkKey.Bookmark += "(" + this.searchGrid.obSelectedGridFilterName() + ")";
-		}
-
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "Bookmark"),
-			{
-				data: this.bookMarkKey
-			})
-			.then(function(data)
-			{
-				if (data.StatusCode == 404)
-				{
-					tf.promiseBootbox.alert(data.Message, "Warning");
-				}
-				else
-				{
-					switch (this.obCurrentBookMark())
-					{
-						case "nonbookmark":
-							this.obCurrentBookMark("bookmarked");
-							break;
-						case "bookmarked":
-							this.obCurrentBookMark("favoriteBookmarked");
-							break;
-					}
-				}
-			}.bind(this));
-	};
-
-	BaseKendoGridViewModel.prototype.updateBookmark = function(path, args)
-	{
-		var pageID = args[0];
-		var action = args[1];
-		var filterId = args[2];
-		if (pageID != undefined && pageID == "empty" && filterId == this.searchGrid.obSelectedGridFilterId())
-		{
-			this.obCurrentBookMark(action);
-		}
 	};
 
 	BaseKendoGridViewModel.prototype.loadOtherInfoForPopover = function()
