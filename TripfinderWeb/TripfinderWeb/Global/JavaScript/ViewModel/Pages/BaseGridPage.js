@@ -561,8 +561,8 @@
 			type: "fieldtrip",
 		};
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(selectedIds, view);
-		self.obShowFieldTripDEPanel(true);
 		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		self.obShowFieldTripDEPanel(true);
 	};
 
 	BaseGridPage.prototype.addClick = function(viewModel, e)
@@ -575,7 +575,6 @@
 			};
 
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel([], view);
-		self.obShowFieldTripDEPanel(true);
 		if (TF.isPhoneDevice)
 		{
 			tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
@@ -583,8 +582,8 @@
 		else
 		{
 			tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
-			self.obShowFieldTripDEPanel(true);
 		}
+		self.obShowFieldTripDEPanel(true);
 	};
 
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
