@@ -1110,6 +1110,14 @@
 		if (row.length)
 		{
 			var data = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
+			if (data.InvoiceDate)
+			{
+				data.InvoiceDate = moment(data.InvoiceDate).format("YYYY-MM-DD");
+			}
+			if (data.PaymentDate)
+			{
+				data.PaymentDate = moment(data.PaymentDate).format("YYYY-MM-DD");
+			}
 			var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", data: data };
 			tf.modalManager.showModal(new TF.Modal.FieldTripInvoiceModalViewModel(option))
 				.then(function(data)
@@ -1174,29 +1182,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
+				{
+					message: " must be unique",
+					callback: function(value, validator, $field)
 					{
-						message: " must be unique",
-						callback: function(value, validator, $field)
+						if (value == "" || this.obEntityDataModel().id())
 						{
-							if (value == "" || this.obEntityDataModel().id())
-							{
-								return true;
-							}
+							return true;
+						}
 
-							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-								paramData: {
-									name: this.obEntityDataModel().name()
-								}
-							}, {
-									overlay: false
-								})
-								.then(function(apiResponse)
-								{
-									return apiResponse.Items[0] == false;
-								})
-						}.bind(this)
-					}
+						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+							paramData: {
+								name: this.obEntityDataModel().name()
+							}
+						}, {
+								overlay: false
+							})
+							.then(function(apiResponse)
+							{
+								return apiResponse.Items[0] == false;
+							})
+					}.bind(this)
+				}
 			}
 		};
 
