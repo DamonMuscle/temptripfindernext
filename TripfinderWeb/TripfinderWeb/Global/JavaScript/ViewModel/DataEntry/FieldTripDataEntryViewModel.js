@@ -235,20 +235,7 @@
 
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
 	{
-		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate"))
-			.then(function(data)
-			{
-				data.Items = data.Items.sort(function(a, b)
-				{
-					if (a.Name.toUpperCase() === b.Name.toUpperCase())
-					{
-						return 0;
-					}
-					return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
-				});
-				data.Items.unshift({ Name: "None", Id: 0 });
-				this.obTemplateSource(data.Items);
-			}.bind(this));
+		var p0 = this.getTemplate();
 
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "school"))
 			.then(function(data)
@@ -319,6 +306,23 @@
 		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
 	};
 
+	FieldTripDataEntryViewModel.prototype.getTemplate = function()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate"))
+			.then(function(data)
+			{
+				data.Items = data.Items.sort(function(a, b)
+				{
+					if (a.Name.toUpperCase() === b.Name.toUpperCase())
+					{
+						return 0;
+					}
+					return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
+				});
+				data.Items.unshift({ Name: "None", Id: 0 });
+				this.obTemplateSource(data.Items);
+			}.bind(this));
+	}
 	FieldTripDataEntryViewModel.prototype.load = function()
 	{
 		this.$form.find("input[name='name']").focus();

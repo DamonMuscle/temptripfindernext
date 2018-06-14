@@ -796,14 +796,13 @@
 					})
 					.then(function(data)
 					{
-
+						this.getTemplate();
 					}.bind(this))
 					.catch(function(response)
 					{
 					}.bind(this))
 			}.bind(this));
 	};
-
 
 	BaseDataEntryViewModel.prototype.getSaveData = function()
 	{
