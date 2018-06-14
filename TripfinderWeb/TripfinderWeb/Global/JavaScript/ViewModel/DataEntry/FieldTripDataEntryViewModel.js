@@ -124,7 +124,7 @@
 			if (collection.indexOf(inputValue) == -1)
 			{
 				$(m.currentTarget).val('');
-				this.obEntityDataModel()[ key ]('');
+				this.obEntityDataModel()[key]('');
 			}
 		}.bind(this);
 
@@ -316,7 +316,7 @@
 				this.obMailZipDataModels(data.Items);
 			}.bind(this));
 
-		return Promise.all([ p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]);
+		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
 	};
 
 	FieldTripDataEntryViewModel.prototype.load = function()
@@ -370,7 +370,7 @@
 				this.obEntityDataModel().apiIsDirty(false);
 				//reset the shortCutKeys golbal used
 				tf.shortCutKeys.resetUsingGolbal(5);
-				return Promise.all([ p0, p1 ]);
+				return Promise.all([p0, p1]);
 
 
 			}.bind(this)).catch(function(response)
@@ -452,7 +452,7 @@
 					var dirtyFields = this.obEntityDataModel().getDirtyFields().concat();
 					for (var i in dirtyFields)
 					{
-						dirtyModel[ dirtyFields[ i ] ](this.obEntityDataModel()[ dirtyFields[ i ] ]());
+						dirtyModel[dirtyFields[i]](this.obEntityDataModel()[dirtyFields[i]]());
 					}
 					if (item.Id == 0)
 					{
@@ -463,7 +463,7 @@
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
 					for (var i in dirtyFields)
 					{
-						this.obEntityDataModel()[ dirtyFields[ i ] ](dirtyModel[ dirtyFields[ i ] ]());
+						this.obEntityDataModel()[dirtyFields[i]](dirtyModel[dirtyFields[i]]());
 					}
 					this.$form.data('bootstrapValidator').resetForm();
 				}
@@ -479,62 +479,72 @@
 			vehicle.dispose();
 		}
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripresourcegroup/byfieldTripId", this.obEntityDataModel().id()))
-			.then(function(response)
-			{
-				resources = response.Items;
-				resources.forEach(function(item)
+		if (this.obMode() === "Edit")
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripresourcegroup/byfieldTripId", this.obEntityDataModel().id()))
+				.then(function(response)
 				{
-					if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
+					resources = response.Items;
+					resources.forEach(function(item)
 					{
-						item.Chaperone = "None";
-					}
-					this.obResourceId(this.obResourceId() + 1);
-					item.resourceId = this.obResourceId();
+						if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
+						{
+							item.Chaperone = "None";
+						}
+						this.obResourceId(this.obResourceId() + 1);
+						item.resourceId = this.obResourceId();
+
+					}.bind(this));
+					this.obFieldTripResourceGroupData(resources);
+
+					this.obVehicleGridSource([]);
+					this.obDriversGridSource([]);
+					this.obBusAideGridSource([]);
+					this.obFieldTripResourceGroupData().forEach(function(item)
+					{
+						if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
+						{
+							item.Chaperone = "None";
+						}
+
+						if (item.VehicleId && item.Vehicle)
+						{
+							item.VehTotal = this.vehicleCostComputer(item);
+							item.VehicleName = item.Vehicle.BusNum;
+							this.obVehicleGridSource.push(item);
+						}
+
+						if (item.DriverId && item.Driver)
+						{
+							item.driverTotal = this.driverTotalCostComputer(item);
+							item.DriverName = item.Driver.FirstName + " " + item.Driver.LastName;
+							this.obDriversGridSource.push(item);
+						}
+
+						if (item.AideId && item.Aide)
+						{
+							item.aideTotal = this.busAideCostComputer(item);
+							item.AideName = item.Aide.FirstName + " " + item.Aide.LastName;
+							this.obBusAideGridSource.push(item);
+						}
+
+					}.bind(this));
+					this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
+					this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
+					this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
+					this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
 
 				}.bind(this));
-				this.obFieldTripResourceGroupData(resources);
+		}
+		else
+		{
+			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
+			this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
+			this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
+			this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
+		}
 
-				this.obVehicleGridSource([]);
-				this.obDriversGridSource([]);
-				this.obBusAideGridSource([]);
-				this.obFieldTripResourceGroupData().forEach(function(item)
-				{
-					if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
-					{
-						item.Chaperone = "None";
-					}
-
-					if (item.VehicleId && item.Vehicle)
-					{
-						item.VehTotal = this.vehicleCostComputer(item);
-						item.VehicleName = item.Vehicle.BusNum;
-						this.obVehicleGridSource.push(item);
-					}
-
-					if (item.DriverId && item.Driver)
-					{
-						item.driverTotal = this.driverTotalCostComputer(item);
-						item.DriverName = item.Driver.FirstName + " " + item.Driver.LastName;
-						this.obDriversGridSource.push(item);
-					}
-
-					if (item.AideId && item.Aide)
-					{
-						item.aideTotal = this.busAideCostComputer(item);
-						item.AideName = item.Aide.FirstName + " " + item.Aide.LastName;
-						this.obBusAideGridSource.push(item);
-					}
-
-				}.bind(this));
-
-				this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-				this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
-				this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
-				this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
-
-			}.bind(this));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
@@ -610,22 +620,29 @@
 		{
 			invoicing.dispose();
 		}
-
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripinvoice", this.obEntityDataModel().id(), "fieldtripinvoices"))
-			.then(function(response)
-			{
-				response.Items.forEach(function(item)
+		if (this.obMode() === "Edit")
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripinvoice", this.obEntityDataModel().id(), "fieldtripinvoices"))
+				.then(function(response)
 				{
-					item.resourceId = this.obInvoiceResourceId();
-					this.obInvoiceResourceId(item.resourceId + 1);
+					response.Items.forEach(function(item)
+					{
+						item.resourceId = this.obInvoiceResourceId();
+						this.obInvoiceResourceId(item.resourceId + 1);
+					}.bind(this));
+
+					this.obInvoiceGridDataSource(response.Items);
+
+					var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
+					this.obInvoicingGridViewModel(invoiceGrid);
+
 				}.bind(this));
-
-				this.obInvoiceGridDataSource(response.Items);
-
-				var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
-				this.obInvoicingGridViewModel(invoiceGrid);
-
-			}.bind(this));
+		}
+		else
+		{
+			var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
+			this.obInvoicingGridViewModel(invoiceGrid);
+		}
 	}
 
 	FieldTripDataEntryViewModel.prototype.addObjectClick = function(type)
@@ -679,16 +696,16 @@
 				{
 					for (var i in mvModel.newDataList)
 					{
-						obModelList.push(mvModel.newDataList[ i ]);
+						obModelList.push(mvModel.newDataList[i]);
 					}
-					this.obEntityDataModel()[ obProperty ](mvModel.newDataList[ i ].Id);
+					this.obEntityDataModel()[obProperty](mvModel.newDataList[i].Id);
 				}
 				if (!data)
 				{
 					return;
 				}
 				obModelList.push(data);
-				this.obEntityDataModel()[ obProperty ](data.Id);
+				this.obEntityDataModel()[obProperty](data.Id);
 				this._fieldsUpdateFromModal(type, data);
 				if (inputName)
 				{
@@ -732,9 +749,9 @@
 				var items = this.obDestinationDataModels(), destinationId;
 				for (var i = 0; i < items.length; i++)
 				{
-					if (items[ i ].Name === id)
+					if (items[i].Name === id)
 					{
-						destinationId = items[ i ].Id;
+						destinationId = items[i].Id;
 					}
 				}
 
@@ -776,7 +793,7 @@
 					})
 				);
 
-				this.obEntityDataModel()[ obProperty ](type === "destination" ? data.Name : data.Id);
+				this.obEntityDataModel()[obProperty](type === "destination" ? data.Name : data.Id);
 				this._fieldsUpdateFromModal(type, data);
 			}.bind(this));
 	}
@@ -802,7 +819,7 @@
 		var json = {};
 		items.forEach(function(data)
 		{
-			json[ data.FieldName ] = { Label: data.Label, Required: data.Required };
+			json[data.FieldName] = { Label: data.Label, Required: data.Required };
 		}.bind(this));
 
 		this.obRequiredFields(json);
@@ -988,16 +1005,16 @@
 
 		this.obFieldTripResourceGroupData().forEach(function(item)
 		{
-			item.VehFixedCost = curBilling[ 0 ].VehFixedCost ? curBilling[ 0 ].VehFixedCost : 0;
-			item.MileageRate = curBilling[ 0 ].MileageRate ? curBilling[ 0 ].MileageRate : 0;
+			item.VehFixedCost = curBilling[0].VehFixedCost ? curBilling[0].VehFixedCost : 0;
+			item.MileageRate = curBilling[0].MileageRate ? curBilling[0].MileageRate : 0;
 
-			item.DriverRate = curBilling[ 0 ].DriverRate ? curBilling[ 0 ].DriverRate : 0;
-			item.DriverFixedCost = curBilling[ 0 ].DriverFixedCost ? curBilling[ 0 ].DriverFixedCost : 0;
-			item.DriverOtrate = curBilling[ 0 ].DriverOtrate ? curBilling[ 0 ].DriverOtrate : 0;
+			item.DriverRate = curBilling[0].DriverRate ? curBilling[0].DriverRate : 0;
+			item.DriverFixedCost = curBilling[0].DriverFixedCost ? curBilling[0].DriverFixedCost : 0;
+			item.DriverOtrate = curBilling[0].DriverOtrate ? curBilling[0].DriverOtrate : 0;
 
-			item.AideRate = curBilling[ 0 ].AideRate ? curBilling[ 0 ].AideRate : 0;
-			item.AideFixedCost = curBilling[ 0 ].AideFixedCost ? curBilling[ 0 ].AideFixedCost : 0;
-			item.AideOtrate = curBilling[ 0 ].AideOtrate ? curBilling[ 0 ].AideOtrate : 0;
+			item.AideRate = curBilling[0].AideRate ? curBilling[0].AideRate : 0;
+			item.AideFixedCost = curBilling[0].AideFixedCost ? curBilling[0].AideFixedCost : 0;
+			item.AideOtrate = curBilling[0].AideOtrate ? curBilling[0].AideOtrate : 0;
 
 		}.bind(this));
 
@@ -1155,29 +1172,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
-				{
-					message: " must be unique",
-					callback: function(value, validator, $field)
 					{
-						if (value == "" || this.obEntityDataModel().id())
+						message: " must be unique",
+						callback: function(value, validator, $field)
 						{
-							return true;
-						}
-
-						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-							paramData: {
-								name: this.obEntityDataModel().name()
-							}
-						}, {
-								overlay: false
-							})
-							.then(function(apiResponse)
+							if (value == "" || this.obEntityDataModel().id())
 							{
-								return apiResponse.Items[ 0 ] == false;
-							})
-					}.bind(this)
-				}
+								return true;
+							}
+
+							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+								paramData: {
+									name: this.obEntityDataModel().name()
+								}
+							}, {
+									overlay: false
+								})
+								.then(function(apiResponse)
+								{
+									return apiResponse.Items[0] == false;
+								})
+						}.bind(this)
+					}
 			}
 		};
 
@@ -1426,25 +1443,25 @@
 
 	FieldTripDataEntryViewModel.prototype.addLinkToDate = function(e)
 	{
-		$(this.$form.parents()[ 3 ]).find(".linktoDepartDate").on("click", function()
+		$(this.$form.parents()[3]).find(".linktoDepartDate").on("click", function()
 		{
 			this.$form.find("#departDate input[name=departDate]").focus();
 			//e.preventDefault();
 		}.bind(this));
 
-		$(this.$form.parents()[ 3 ]).find(".linktoReturnDate").on("click", function()
+		$(this.$form.parents()[3]).find(".linktoReturnDate").on("click", function()
 		{
 			this.$form.find("#returnDate input[name=estimatedReturnDate]").focus();
 			//e.preventDefault();
 		}.bind(this));
 
-		$(this.$form.parents()[ 3 ]).find(".linktoDepartTime").on("click", function()
+		$(this.$form.parents()[3]).find(".linktoDepartTime").on("click", function()
 		{
 			this.$form.find("#departTime input[name=departTime]").focus();
 			//e.preventDefault();
 		}.bind(this));
 
-		$(this.$form.parents()[ 3 ]).find(".linktoReturnTime").on("click", function()
+		$(this.$form.parents()[3]).find(".linktoReturnTime").on("click", function()
 		{
 			this.$form.find("#returnTime input[name=estimatedReturnTime]").focus();
 			//e.preventDefault();
@@ -1458,12 +1475,12 @@
 			return item.SchoolCode == school;
 		});
 
-		return (filters[ 0 ] && filters[ 0 ].Id) ? filters[ 0 ].Id : null;
+		return (filters[0] && filters[0].Id) ? filters[0].Id : null;
 	};
 
 	FieldTripDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
 	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[ 0 ], "fieldtripdestination", this.localization);
+		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", this.localization);
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
 			.then(function(data)
 			{
@@ -1471,48 +1488,48 @@
 				{
 					for (var i in modifyDataEntryListItemModalViewModel.newDataList)
 					{
-						parameters[ 1 ].push(modifyDataEntryListItemModalViewModel.newDataList[ i ]);
+						parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
 					}
-					if (parameters[ 2 ])
+					if (parameters[2])
 					{
-						this.obEntityDataModel()[ parameters[ 2 ] ](modifyDataEntryListItemModalViewModel.newDataList[ i ].Item);
+						this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
 					}
 				}
 				if (!data)
 				{
 					return;
 				}
-				parameters[ 1 ].push(data);
-				if (parameters[ 2 ])
+				parameters[1].push(data);
+				if (parameters[2])
 				{
-					this.obEntityDataModel()[ parameters[ 2 ] ](data.Item);
+					this.obEntityDataModel()[parameters[2]](data.Item);
 				}
 			}.bind(this));
 	}
 
 	FieldTripDataEntryViewModel.prototype.EditDataEntryListItem = function(parameters)
 	{
-		var select = $.grep(parameters[ 1 ](), function(d) { return d.Item == parameters[ 3 ] });
+		var select = $.grep(parameters[1](), function(d) { return d.Item == parameters[3] });
 		if (select.length > 0)
 		{
-			if (select[ 0 ].Id == 0)
+			if (select[0].Id == 0)
 			{//once select None
 				return;
 			}
 
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[ 0 ], "fieldtripdestination", this.localization, select[ 0 ].Id))
+			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", this.localization, select[0].Id))
 				.then(function(data)
 				{
 					if (!data)
 					{
 						return;
 					}
-					var index = parameters[ 1 ].indexOf(select[ 0 ]);
-					parameters[ 1 ].splice(index, 1);
-					parameters[ 1 ].push(data);
-					if (parameters[ 2 ])
+					var index = parameters[1].indexOf(select[0]);
+					parameters[1].splice(index, 1);
+					parameters[1].push(data);
+					if (parameters[2])
 					{
-						this.obEntityDataModel()[ parameters[ 2 ] ](data.Item);
+						this.obEntityDataModel()[parameters[2]](data.Item);
 					}
 				}.bind(this));
 		}

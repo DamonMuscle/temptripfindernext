@@ -136,7 +136,7 @@
 			.then(function()
 			{
 				return Promise.all([
-					this.loadGridFilter(), this.loadUserDefinedLabel()
+					this.loadUserDefinedLabel()
 				]).then(function()
 				{
 					this._mergeUserDefinedLabel();

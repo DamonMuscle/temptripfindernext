@@ -703,14 +703,35 @@
 	BaseDataEntryViewModel.prototype.closeClick = function(viewModel, e)
 	{
 		var self = this;
-		if (TF.isPhoneDevice)
+		if (self.obEntityDataModel().toData().APIIsDirty)
 		{
-			tf.pageManager.resizablePage.clearLeftOtherContent();
-		}
-		else
+			tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes prior to closing this form?", backdrop: true, title: "Unsaved Changes", closeButton: true })
+				.then(function(result)
+				{
+					if (!result)
+					{
+						if (TF.isPhoneDevice) 
+						{
+							tf.pageManager.resizablePage.clearLeftOtherContent();
+						}
+						else
+						{
+							tf.pageManager.resizablePage.closeRightPage();
+						}
+					}
+				});
+		} else
 		{
-			tf.pageManager.resizablePage.closeRightPage();
+			if (TF.isPhoneDevice)
+			{
+				tf.pageManager.resizablePage.clearLeftOtherContent();
+			}
+			else
+			{
+				tf.pageManager.resizablePage.closeRightPage();
+			}
 		}
+
 	};
 
 	BaseDataEntryViewModel.prototype.pendingSave = function()
