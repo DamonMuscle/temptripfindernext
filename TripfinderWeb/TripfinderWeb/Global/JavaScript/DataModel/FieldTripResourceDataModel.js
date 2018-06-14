@@ -18,6 +18,7 @@
 		{ from: "AideFixedCost", default: 0 },
 		{ from: "AideHours", default: 0 },
 		{ from: "AideId", default: 0 },
+		{ from: "AideName", default: "" },
 		{ from: "AideOthours", default: 0 },
 		{ from: "AideOtrate", default: 0 },
 		{ from: "AideRate", default: 0 },
@@ -33,6 +34,7 @@
 		{ from: "DriverFixedCost", default: 0 },
 		{ from: "DriverHours", default: 0 },
 		{ from: "DriverId", default: 0 },
+		{ from: "DriverName", default: "" },
 		{ from: "DriverOthours", default: 0 },
 		{ from: "DriverOtrate", default: 0 },
 		{ from: "DriverRate", default: 0 },
@@ -43,6 +45,7 @@
 		{ from: "VehFixedCost", default: 0 },
 		{ from: "Vehicle", default: "" },
 		{ from: "VehicleId", default: 0 },
+		{ from: "VehicleName", default: "" },
 		{ from: "resourceId", default: 0 }
 	];
 

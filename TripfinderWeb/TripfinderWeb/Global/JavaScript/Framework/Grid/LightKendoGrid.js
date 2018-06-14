@@ -747,7 +747,7 @@
 				{
 					setTimeout(function()
 					{
-						self.$container.children(".k-pager-wrap").find(".pageInfo").html(self.options.dataSource.length + " of " + self.options.dataSource.length);
+						self.$container.children(".k-pager-wrap").find(".pageInfo").html(self.kendoGrid.dataSource.total() + " of " + self.kendoGrid.dataSource.total());
 					});
 				}
 			},
