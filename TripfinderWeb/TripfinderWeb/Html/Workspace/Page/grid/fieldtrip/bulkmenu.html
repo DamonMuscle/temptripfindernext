@@ -1,14 +1,14 @@
 ﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
 	<ul class="tf-contextmenu grid-menu">
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
-			<div class=" menu-icon edit">
+			<div class="menu-icon edit">
 			</div>
 			<div class="menu-label">
 				Edit Trip
 			</div>
 		</li>
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
-			<div class=" menu-icon copytoclipboard">
+			<div class="menu-icon copytoclipboard">
 			</div>
 			<div class="menu-label">
 				Copy
@@ -16,7 +16,7 @@
 			</div>
 		</li>
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
-			<div class=" menu-icon saveas">
+			<div class="menu-icon saveas">
 			</div>
 			<div class="menu-label">
 				Save As
@@ -45,7 +45,7 @@
 		</li>
 		<!-- ko if:gridViewModel.approveButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel)">
-			<div class=" menu-icon">
+			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Approve Trips': 'Approve Trip'">
 				<span class="hotkey"></span>
@@ -54,7 +54,7 @@
 		<!-- /ko -->
 		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel)">
-			<div class=" menu-icon">
+			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Decline Trips': 'Decline Trip'">
 				<span class="hotkey"></span>
@@ -63,7 +63,7 @@
 		<!-- /ko -->
 		<!-- ko if:gridViewModel.cancelButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel)">
-			<div class=" menu-icon">
+			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel Trips': 'Cancel Trip'">
 				<span class="hotkey"></span>
@@ -75,7 +75,7 @@
 		</li>
 		<!-- /ko -->
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
-			<div class=" menu-icon">
+			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
 				Select All Records
@@ -83,7 +83,7 @@
 			</div>
 		</li>
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.invertSelection.bind(searchGrid)">
-			<div class=" menu-icon">
+			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
 				Invert Selected Records
@@ -91,7 +91,7 @@
 			</div>
 		</li>
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.omitSelection.bind(searchGrid)">
-			<div class=" menu-icon">
+			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
 				Omit Selected Records

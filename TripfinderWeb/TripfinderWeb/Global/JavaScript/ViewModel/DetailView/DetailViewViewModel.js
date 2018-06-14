@@ -1536,7 +1536,7 @@
 				top: draggingOffset.top - containerOffset.top + 'px'
 			});
 		});
-		$stackItems.draggable("option", "containment", ".main-body");
+		$stackItems.draggable("option", "containment", "#pageContent");
 		$stackItems.draggable("option", "appendTo", "body");
 		$stackItems.draggable("option", "helper", function(e)
 		{

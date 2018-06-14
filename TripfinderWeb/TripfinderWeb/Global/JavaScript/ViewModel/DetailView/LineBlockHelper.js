@@ -288,7 +288,7 @@
 		});
 		$gridStack.append($line);
 		$line.draggable({
-			containment: ".main-body",
+			containment: "#pageContent",
 			appendTo: "body",
 			// left should greater than 2, because vertical line has -2px margin-left css,
 			// otherwise lineContainer will not trigger drop event.
@@ -457,7 +457,7 @@
 		});
 		$gridStack.append($line);
 		$line.draggable({
-			containment: ".main-body",
+			containment: "#pageContent",
 			appendTo: "body",
 			cursorAt: { left: 8, top: 0 },
 			scroll: false,

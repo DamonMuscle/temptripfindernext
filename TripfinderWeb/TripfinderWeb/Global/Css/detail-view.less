@@ -1271,6 +1271,9 @@
 			float: right;
 			padding: 16px 0;
 			max-width: calc(~"100% - 200px");
+			@media (max-width: 768px) {
+				max-width: calc(~"100% - 100px");
+			}
 
 			&.disabled {
 				.iconbutton {
@@ -1356,7 +1359,7 @@
 
 			&.open {
 				.button-icon {
-					background-color: #8E52A1 !important;
+					background-color: @systemColor  !important;
 					background-image: url(../img/navigation-menu/icon-ellipsis.svg);
 				}
 
@@ -1405,6 +1408,9 @@
 
 							&.new-window {
 								background-image: url("../../global/img/detail-screen/new_window_16x16-pos.svg");
+							}
+							&.close-detail {
+								background-image: url("../../global/img/icons/Close.svg");
 							}
 						}
 					}
@@ -1806,9 +1812,9 @@
 				.handle {
 					width: 7px;
 					height: 7px;
-					border: 1px solid #8e52a1;
+					border: 1px solid @systemColor;
 					background-image: none;
-					background-color: #8e52a1;
+					background-color: @systemColor;
 
 					&.disable {
 						background-color: #fff;
@@ -3402,6 +3408,46 @@ body .detail-view-panel .document-dataentry.page-level-message-container {
 
 .grid-stack-item.ui-draggable.ui-resizable.ui-draggable-handle.ui-resizable-resizing.item-resizing {
 	z-index: 3;
+}
+
+.tf-tooltip.tooltip {
+	.fontSize(1,
+	2);
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+	border: none;
+	padding: 0px;
+	opacity: 1 !important;
+	.tooltip-inner {
+		border-radius: 0px;
+		background-color: #4A4A4A;
+		color: #FFFFFF;
+		padding: 0px;
+		padding: 3px 8px 4px;
+		text-align: center;
+		font-family: "SourceSansPro-SemiBold";
+	}
+}
+
+.tf-tooltip.tooltip.top {
+	margin-top: -6px;
+
+	.tooltip-arrow {
+		border-top-color: #4A4A4A;
+		bottom: -4px;
+		border-width: 4px 4px 0;
+	}
+
+	&.left-tooltip {
+		left: 5px !important;
+	}
+}
+
+.tf-tooltip.tooltip.left {
+	.tooltip-arrow {
+		border-left-color: #4A4A4A;
+		border-width: 4px 0 4px 4px;
+		right: -4px;
+	}
 }
 
 .input-group.vf-custom-input {

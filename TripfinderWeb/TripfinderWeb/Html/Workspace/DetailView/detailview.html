@@ -4,7 +4,7 @@
 		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
 			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
-				   placeholder="Name Layout..." maxlength="80" />
+			 placeholder="Name Layout..." maxlength="80" />
 			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
 				<div class="iconbutton settings" data-bind="click:openManageLayouts"></div>
 				<div class="iconbutton font-size-slider" data-bind="click:showSlider"></div>
@@ -55,7 +55,7 @@
 				<div class="iconbutton print" data-bind="click:printClick"></div>
 				<div class="iconbutton" data-bind="click:TF.isPhoneDevice?closeDetailClick:newWindowClick,css:TF.isPhoneDevice?'close-detail':'new-window'"></div>
 			</div>
-			<div class=" group-buttons" data-bind="css: {hide :!isReadMode()}">
+			<div class="group-buttons" data-bind="css: {hide :!isReadMode()}">
 				<div class="button-icon" data-bind="click:onHeaderMoreButtonClick"></div>
 				<div class="tf-contextmenu-wrap tf-contextmenu-white">
 					<div class="tf-contextmenu">
@@ -65,13 +65,13 @@
 								<div class="select-type" data-bind="text:obSelectName"></div>
 								<div class="icon bottom-caret"></div>
 							</li>
-							<li class="menu-item" data-bind="click:newWindowClick">
-								<div class="select-type">Open in New Window</div>
-								<div class="iconbutton new-window"></div>
-							</li>
 							<li class="menu-item" data-bind="click:printClick">
 								<div class="select-type">Print</div>
 								<div class="iconbutton print"></div>
+							</li>
+							<li class="menu-item" data-bind="click:TF.isPhoneDevice?closeDetailClick:newWindowClick">
+								<div class="select-type" data-bind="text:TF.isPhoneDevice?'Close this Page':'Open in New Window'"></div>
+								<div class="iconbutton" data-bind="css:TF.isPhoneDevice?'close-detail':'new-window'"></div>
 							</li>
 						</ul>
 					</div>
@@ -93,7 +93,8 @@
 		<div class="slider-container" data-bind="css:{hide: !obShowSlider()}">
 			<div class="caret"></div>
 			<label class="minus"></label>
-			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25" data-bind="bootstrapSlider:{value:obSliderFontRate}">
+			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25"
+			 data-bind="bootstrapSlider:{value:obSliderFontRate}">
 			<label class="plus"></label>
 		</div>
 	</div>
