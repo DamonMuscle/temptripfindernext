@@ -776,7 +776,9 @@
 
 	BaseDataEntryViewModel.prototype.saveTemplate = function()
 	{
-		var title = "Save " + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template";
+		var title = "Save " + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template",
+			fieldTripEntity = this.getSaveData(true),
+			fieldTripTemplateEntity = fieldTripEntity;
 		tf.modalManager.showModal(new TF.Modal.AddOneFieldModalViewModel(title, this.type + "template", "Name", new TF.DataModel.FieldTripTemplatesDataModel()))
 			.then(function(data)
 			{
@@ -784,11 +786,11 @@
 				{
 					return;
 				}
-
-				this.obEntityDataModel().name(data);
+				fieldTripTemplateEntity["FieldTripName"] = fieldTripEntity.Name;
+				fieldTripTemplateEntity.Name = data;
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this.type + "template"),
 					{
-						data: this.getSaveData(true),
+						data: fieldTripTemplateEntity,
 						//async:true will generate an non user interaction, which will make window.open opens a Popup
 						async: false
 					})

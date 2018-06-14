@@ -449,6 +449,7 @@
 					item.FieldTripStageId = 1;
 					var dataModel = new TF.DataModel.FieldTripDataModel(item);
 					var dirtyModel = new TF.DataModel.FieldTripDataModel();
+					var templateDataModel = new TF.DataModel.FieldTripTemplatesDataModel(item);
 					var dirtyFields = this.obEntityDataModel().getDirtyFields().concat();
 					for (var i in dirtyFields)
 					{
@@ -460,6 +461,7 @@
 					}
 					dataModel.id(0);
 					this.obEntityDataModel(dataModel);
+					this.obEntityDataModel().name(templateDataModel.fieldTripName());
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
 					for (var i in dirtyFields)
 					{
