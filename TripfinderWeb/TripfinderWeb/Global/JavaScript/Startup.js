@@ -146,7 +146,7 @@
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
 			tf.pageManager = new TF.Page.PageManager();
-
+			tf.kendoHackHelper = new TF.KendoHackHelper()
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{

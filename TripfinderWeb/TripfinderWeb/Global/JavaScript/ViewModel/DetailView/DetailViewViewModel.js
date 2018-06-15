@@ -18,7 +18,7 @@
 		self.INITINPUTWIDTH = 359;
 		self.EXTRAWIDTH = 220;
 		self.defaultLayout = {
-			width: 4,
+			width: 2,
 			items: []
 		};
 		self.startUpdateAfterAddBlock = false;
@@ -505,7 +505,7 @@
 		self.$preload = self.$element.find(".preload");
 		self.$gridStack = $(".grid-stack");
 		self.initStackGrid();
-		self.initColumnPopup();
+		//self.initColumnPopup();
 
 		$("body").on("mousedown.detailViewPanelSubTitle", function(e)
 		{
@@ -514,10 +514,10 @@
 			{
 				self.$element.find(".sub-title-selector .dropdown-menu").hide();
 			}
-			if ($target.closest(".iconbutton.layout").length === 0 && $target.closest(".column-selector").length === 0 && self.$columnPopup.css("display") !== "none")
-			{
-				self.$columnPopup.hide();
-			}
+			// if ($target.closest(".iconbutton.layout").length === 0 && $target.closest(".column-selector").length === 0 && self.$columnPopup.css("display") !== "none")
+			// {
+			// 	self.$columnPopup.hide();
+			// }
 		});
 
 		$("body").on("mousedown.detailViewPanelSave", function(e)
@@ -562,18 +562,6 @@
 			'<table><tr><td><div></div></td><td><div></div></td></tr></table>' +
 			'</div>' +
 			'<div class="column-title">2 Columns</div>' +
-			'</div>' +
-			'<div class="column-container">' +
-			'<div class="column-item">' +
-			'<table><tr><td><div></div></td><td><div></div></td><td><div></div></td></tr></table>' +
-			'</div>' +
-			'<div class="column-title">3 Columns</div>' +
-			'</div>' +
-			'<div class="column-container">' +
-			'<div class="column-item">' +
-			'<table><tr><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr></table>' +
-			'</div>' +
-			'<div class="column-title">4 Columns</div>' +
 			'</div>' +
 			'</div>' +
 			'</div>');
@@ -756,12 +744,12 @@
 	 */
 	DetailViewViewModel.prototype.getCurrentWidth = function()
 	{
-		var self = this, layout, width = 4;
-		if (self.entityDataModel && self.entityDataModel.layout)
-		{
-			layout = self.entityDataModel.layout();
-			width = !layout ? self.defaultLayout.width : JSON.parse(layout).width;
-		}
+		var self = this, layout, width = 2;
+		// if (self.entityDataModel && self.entityDataModel.layout)
+		// {
+		// 	layout = self.entityDataModel.layout();
+		// 	width = !layout ? self.defaultLayout.width : JSON.parse(layout).width;
+		// }
 		return width;
 	}
 
@@ -1456,13 +1444,13 @@
 
 		layout = options && options.layout || self.entityDataModel.layout();
 
-		var layoutObj = !layout ? self.defaultLayout : JSON.parse(layout);
+		//var layoutObj = !layout ? self.defaultLayout : JSON.parse(layout);
 		self.resetPreloadControl();
 		//self.destroyControls();
 		self.$gridStack.off('.gridStack');
 		self.grid.removeAll();
 		self.$gridStack.empty();
-		self.grid.setGridWidth(layoutObj.width);
+		self.grid.setGridWidth(2);
 		self.addStackBlocks(layout);
 		self.manageLayout();
 
@@ -2095,6 +2083,7 @@
 			layout = layout || self.entityDataModel.layout(),
 			container = self.$element.find(".right-container");
 		layout = !layout ? self.defaultLayout : JSON.parse(layout);
+		layout.width = 2;
 		items = layout.items;
 		self.gridStackItemOrignalHeight = [];
 		self.heighteningBlockIdentifierGroups = [];
@@ -5090,7 +5079,7 @@
 		{
 			self.$gridStack.data('gridstack').destroy();
 		}
-		self.$columnPopup.find(".column-container").off(".changeColumn");
-		self.$columnPopup.remove();
+		// self.$columnPopup.find(".column-container").off(".changeColumn");
+		// self.$columnPopup.remove();
 	};
 }());
