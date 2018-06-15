@@ -39,7 +39,7 @@
 	if (typeof define === 'function' && define.amd)
 	{
 		// AMD is used - Register as an anonymous module.
-		define(['jquery', 'moment'], factory);
+		define([ 'jquery', 'moment' ], factory);
 	} else if (typeof exports === 'object')
 	{
 		factory(require('jquery'), require('moment'));
@@ -95,10 +95,10 @@
 					navStep: 10
 				}
 			],
-			viewModes = ['days', 'months', 'years'],
-			verticalModes = ['top', 'bottom', 'auto'],
-			horizontalModes = ['left', 'right', 'auto'],
-			toolbarPlacements = ['default', 'top', 'bottom'],
+			viewModes = [ 'days', 'months', 'years' ],
+			verticalModes = [ 'top', 'bottom', 'auto' ],
+			horizontalModes = [ 'left', 'right', 'auto' ],
+			toolbarPlacements = [ 'default', 'top', 'bottom' ],
 			keyMap = {
 				'up': 38,
 				38: 'up',
@@ -270,7 +270,7 @@
 
 				return $('<div>').addClass('timepicker-picker')
 					.append($('<table>').addClass('table-condensed')
-						.append([topRow, middleRow, bottomRow]));
+						.append([ topRow, middleRow, bottomRow ]));
 			},
 
 			getTimePickerTemplate = function()
@@ -281,7 +281,7 @@
 						.append($('<table>').addClass('table-condensed')),
 					secondsView = $('<div>').addClass('timepicker-seconds')
 						.append($('<table>').addClass('table-condensed')),
-					ret = [getTimePickerMainTemplate()];
+					ret = [ getTimePickerMainTemplate() ];
 
 				if (isEnabled('h'))
 				{
@@ -394,9 +394,9 @@
 				$.each(options, function(key)
 				{
 					var attributeName = 'date' + key.charAt(0).toUpperCase() + key.slice(1);
-					if (eData[attributeName] !== undefined)
+					if (eData[ attributeName ] !== undefined)
 					{
-						dataOptions[key] = eData[attributeName];
+						dataOptions[ key ] = eData[ attributeName ];
 					}
 				});
 				return dataOptions;
@@ -540,7 +540,7 @@
 				{
 					currentViewMode = Math.max(minViewModeNumber, Math.min(2, currentViewMode + dir));
 				}
-				widget.find('.datepicker > div').hide().filter('.datepicker-' + datePickerModes[currentViewMode].clsName).show();
+				widget.find('.datepicker > div').hide().filter('.datepicker-' + datePickerModes[ currentViewMode ].clsName).show();
 			},
 
 			fillDow = function()
@@ -563,12 +563,12 @@
 
 			isInDisabledDates = function(testDate)
 			{
-				return options.disabledDates[testDate.format('YYYY-MM-DD')] === true;
+				return options.disabledDates[ testDate.format('YYYY-MM-DD') ] === true;
 			},
 
 			isInEnabledDates = function(testDate)
 			{
-				return options.enabledDates[testDate.format('YYYY-MM-DD')] === true;
+				return options.enabledDates[ testDate.format('YYYY-MM-DD') ] === true;
 			},
 
 			isValid = function(targetMoment, granularity)
@@ -960,13 +960,13 @@
 			actions = {
 				next: function()
 				{
-					viewDate.add(datePickerModes[currentViewMode].navStep, datePickerModes[currentViewMode].navFnc);
+					viewDate.add(datePickerModes[ currentViewMode ].navStep, datePickerModes[ currentViewMode ].navFnc);
 					fillDate();
 				},
 
 				previous: function()
 				{
-					viewDate.subtract(datePickerModes[currentViewMode].navStep, datePickerModes[currentViewMode].navFnc);
+					viewDate.subtract(datePickerModes[ currentViewMode ].navStep, datePickerModes[ currentViewMode ].navFnc);
 					fillDate();
 				},
 
@@ -1174,7 +1174,7 @@
 				{
 					return false;
 				}
-				actions[$(e.currentTarget).data('action')].apply(picker, arguments);
+				actions[ $(e.currentTarget).data('action') ].apply(picker, arguments);
 				return false;
 			},
 
@@ -1216,7 +1216,7 @@
 					currentMoment = moment();
 					if (typeof options.useCurrent === 'string')
 					{
-						currentMoment = useCurrentGranularity[options.useCurrent](currentMoment);
+						currentMoment = useCurrentGranularity[ options.useCurrent ](currentMoment);
 					}
 					setValue(currentMoment);
 				}
@@ -1243,7 +1243,7 @@
 				widget.show();
 				place();
 
-				if (!input.is(':focus') && !TF.isMobileDevice)
+				if (!input.is(':focus'))// && !TF.isMobileDevice)
 				{
 					input.focus();
 				}
@@ -1285,36 +1285,36 @@
 					allModifiersPressed,
 					pressed = 'p';
 
-				keyState[currentKey] = pressed;
+				keyState[ currentKey ] = pressed;
 
 				for (index in keyState)
 				{
-					if (keyState.hasOwnProperty(index) && keyState[index] === pressed)
+					if (keyState.hasOwnProperty(index) && keyState[ index ] === pressed)
 					{
 						pressedKeys.push(index);
 						if (parseInt(index, 10) !== currentKey)
 						{
-							pressedModifiers[index] = true;
+							pressedModifiers[ index ] = true;
 						}
 					}
 				}
 
-				if ((keyMap[currentKey] == "left" || keyMap[currentKey] == "right") && (!widget || !hasDate()))
+				if ((keyMap[ currentKey ] == "left" || keyMap[ currentKey ] == "right") && (!widget || !hasDate()))
 				{
 					return;
 				}
 
 				for (index in options.keyBinds)
 				{
-					if (options.keyBinds.hasOwnProperty(index) && typeof (options.keyBinds[index]) === 'function')
+					if (options.keyBinds.hasOwnProperty(index) && typeof (options.keyBinds[ index ]) === 'function')
 					{
 						keyBindKeys = index.split(' ');
-						if (keyBindKeys.length === pressedKeys.length && keyMap[currentKey] === keyBindKeys[keyBindKeys.length - 1])
+						if (keyBindKeys.length === pressedKeys.length && keyMap[ currentKey ] === keyBindKeys[ keyBindKeys.length - 1 ])
 						{
 							allModifiersPressed = true;
 							for (index2 = keyBindKeys.length - 2; index2 >= 0; index2--)
 							{
-								if (!(keyMap[keyBindKeys[index2]] in pressedModifiers))
+								if (!(keyMap[ keyBindKeys[ index2 ] ] in pressedModifiers))
 								{
 									allModifiersPressed = false;
 									break;
@@ -1322,7 +1322,7 @@
 							}
 							if (allModifiersPressed)
 							{
-								handler = options.keyBinds[index];
+								handler = options.keyBinds[ index ];
 								break;
 							}
 						}
@@ -1339,7 +1339,7 @@
 
 			keyup = function(e)
 			{
-				keyState[e.which] = 'r';
+				keyState[ e.which ] = 'r';
 				e.stopPropagation();
 				e.preventDefault();
 			},
@@ -1398,7 +1398,7 @@
 					var dDate = parseInputDate(this);
 					if (dDate.isValid())
 					{
-						givenDatesIndexed[dDate.format('YYYY-MM-DD')] = true;
+						givenDatesIndexed[ dDate.format('YYYY-MM-DD') ] = true;
 					}
 				});
 				return (Object.keys(givenDatesIndexed).length) ? givenDatesIndexed : false;
@@ -1520,9 +1520,9 @@
 			$.extend(true, options, newOptions);
 			$.each(options, function(key, value)
 			{
-				if (picker[key] !== undefined)
+				if (picker[ key ] !== undefined)
 				{
-					picker[key](value);
+					picker[ key ](value);
 				} else
 				{
 					throw new TypeError('option ' + key + ' is not recognized!');
@@ -1856,7 +1856,7 @@
 
 		picker.useCurrent = function(useCurrent)
 		{
-			var useCurrentOptions = ['year', 'month', 'day', 'hour', 'minute'];
+			var useCurrentOptions = [ 'year', 'month', 'day', 'hour', 'minute' ];
 			if (arguments.length === 0)
 			{
 				return options.useCurrent;
@@ -2246,7 +2246,7 @@
 			}
 		}
 
-		component = $(element[1]);
+		component = $(element[ 1 ]);
 
 		if (!options.inline && !input.is('input'))
 		{
