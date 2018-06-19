@@ -1,0 +1,214 @@
+﻿<div class="view-finder document-dataentry" data-bind="uiInit:$parent.containerLoaded, finish:init">
+	<div class="row">
+		<div class="col-xs-24 description" data-bind="text:obPageDescription">
+		</div>
+	</div>
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="clearfix">
+		<div class="col-xs-24 ">
+			<div class="row">
+				<div class="col-xs-24 ">
+					<h4><strong>Report</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label class="requirestar"><strong>Name</strong></label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obReportDataSourceModels,format:function(obj){return obj.Name;},drowDownShow:true,notSort:true,selectedValue:obReport,isSelect:true}">
+								<!-- ko customInput:{type:"Select",value:obReportText,attributes:{class:"form-control", name:"selReportType"}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label>Title</label>
+						<input type="text" name="reporttitle" class="form-control" data-bind="value:obEntityDataModel().reportTitle" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label class="requirestar">Output To</label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obOutputTos,format:function(obj){return obj.name;},drowDownShow:true,notSort:true,selectedValue:obOutputTo,isSelect:true}">
+								<!-- ko customInput:{type:"Select",value:obOutputToText,attributes:{class:"form-control", name:"selOutputTo"}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label>Subtitle</label>
+						<input type="text" name="subtitle" class="form-control" data-bind="value:obEntityDataModel().subTitle" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label>Preparer</label>
+						<input type="text" name="preparer" class="form-control" data-bind="value:obEntityDataModel().preparer" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-24 ">
+					<div class="form-group">
+						<label>Description</label>
+						<textarea class="form-control" style="height: 103px;" name="repeortdescription" data-bind="value:obEntityDataModel().description" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-24 ">
+					<h4><strong>Filter Records</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-24 description">
+					You may filter the records that are used for this report by using a Filter or by selecting specific records. Unless a Filter or
+					Specific Records are selected, all records will be used for the report.
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label class="requirestar"><strong>Specify Records</strong></label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obSpecifyRecords,format:function(obj){return obj.name;},drowDownShow:true,notSort:true,selectedValue:obSpecifyRecordOption},disable:obDisabledSpecifyRecords">
+								<!-- ko customInput:{disable:obDisabledSpecifyRecords,type:"Select",value:obSpecifyRecordOptionText,attributes:{class:"form-control", name:"specifyrecord"}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obDisabledSpecifyRecords">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 ">
+					<div class="checkbox margin-top-20" data-bind="visible:obShowIncludeInActiveRecords">
+						<label>
+							<input type="checkbox" data-bind="checked:obEntityDataModel().includeInActiveFlag"> Include Inactive Records
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 ">
+					<div class="form-group">
+						<label>Filter Name</label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obFilterDataModels,format:function(obj){return obj.name();},drowDownShow:true,notSort:true,selectedValue:obFilter},disable:obDisabledFilteName">
+								<!-- ko customInput:{disable:obDisabledFilteName,type:"Select",value:obFilterText,attributes:{class:"form-control"}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obDisabledFilteName">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+						<div class="iconbutton new pull-right" title="New" data-bind="" style="position: absolute; margin-top: -19px; right: -3px; display:none;"></div>
+						<input type="text" name="filterName" class="form-control notinput-required-message" data-bind="value:obFilterNameStringForValidation" required />
+					</div>
+					<div class="form-group">
+						<label>Statement</label>
+						<textarea class="form-control" style="height: 103px;" data-bind="value:obEntityDataModel().filterSpec" disabled />
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label>Specific Records</label>
+						<div class="input-group">
+							<div class="form-control" style="height: 162px; position: inherit" data-bind="foreach:obSelectedSpecificRecord().map(specificRecordFormatter),attr:{disabled:obDisabledSpecificRecord||obDisabledFilteRecords}">
+								<div data-bind="text:$data"></div>
+							</div>
+							<div class="input-group-btn" style="vertical-align: top;">
+								<button type="button" class="btn btn-default btn-sharp" data-bind="event:{click:selectRecordClick},attr:{disabled:obDisabledSpecificRecord||obDisabledFilteRecords}"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+							</div>
+						</div>
+						<input type="text" name="specificRecords" class="form-control notinput-required-message" data-bind="value:obSpecificRecordStringForValidation" required />
+					</div>
+				</div>
+			</div>
+			<!--ko if: isBusfinderReport -->
+			<div data-bind="if: tf.authManager.isAuthorizedFor('busfinder', 'read' )">
+				<div class="row">
+					<div class="col-xs-24 ">
+						<h4><strong>GPS Events</strong></h4>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-24 description">
+						Specify when you would like the report to run for (date and time). This section applies only to reports with GPS data.
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-6">
+
+						<div class="form-group">
+							<label data-bind="css: {requirestar: isBusfinderReport}"><strong>Run For</strong></label>
+							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="today" />Today</label></div>
+							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="yesterday" />Yesterday</label></div>
+							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="weektodate" />Week to Date</label></div>
+							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="monthtodate" />Month to Date</label></div>
+						</div>
+
+
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label data-bind="css: {requirestar: isBusfinderReport}"><strong>Time From</strong></label>
+							<!-- ko customInput:{
+							type:"Time",
+							attributes: {
+							class:"form-control",
+							required:"",
+							name:"timefrom"
+							},
+							disable: isNotBusfinderReport,
+							value: obEntityDataModel().reportParameterTimeFrom
+							} -->
+							<!-- /ko -->
+						</div>
+					</div>
+
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label data-bind="css: {requirestar: isBusfinderReport}"><strong>Time To</strong></label>
+							<!-- ko customInput:{
+							type:"Time",
+							attributes: {
+								class:"form-control",
+								required:"",
+								name:"timeto"
+								},
+								disable: isNotBusfinderReport,
+								value: obEntityDataModel().reportParameterTimeTo
+							} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

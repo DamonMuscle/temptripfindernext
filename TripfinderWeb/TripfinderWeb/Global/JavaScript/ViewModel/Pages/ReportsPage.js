@@ -77,6 +77,18 @@
 	{
 	};
 
+	ReportsPage.prototype.generateReport = function(udReport, type, gridMenuViewModel)
+	{
+		var self = this;
+		if (!udReport)
+		{
+			self = gridMenuViewModel.gridViewModel;
+			var selectedId = gridMenuViewModel.searchGrid.getSelectedIds()[0];
+			udReport = Enumerable.From(gridMenuViewModel.searchGrid.kendoGrid.dataSource.data()).Where('$.Id==' + selectedId).First();
+		}
+		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(udReport, type));
+	};
+
 	ReportsPage.prototype.dispose = function()
 	{
 		var self = this;
