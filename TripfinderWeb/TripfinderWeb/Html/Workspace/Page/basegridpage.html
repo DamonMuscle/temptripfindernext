@@ -10,13 +10,17 @@
 	<!-- /ko -->
 	<div class="desktop-header">
 		<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
+		<!-- ko if:type === "fieldtrip"-->
 		<div class="new">New</div>
+		<!-- /ko -->
 	</div>
 	<div class="grid-icons">
 		<div class="iconrow">
 			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></div>
 			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
+			<!-- ko if:detailButton-->
 			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
+			<!-- /ko -->
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
 			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
@@ -28,6 +32,11 @@
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
 			<div class="iconbutton cancel" title="Cancel" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<!-- /ko -->
+			<!-- ko if: pageType === "reports"-->
+			<div class="divider" title=""></div>
+			<div class="iconbutton reportuserinformation" title="Cancel" data-bind="click:openReportUserInformationModel"></div>
+			<div class="iconbutton managereports" title="Cancel" data-bind="click:openManageYouReportsModel"></div>
 			<!-- /ko -->
 			<div class="divider" title=""></div>
 			<div class="iconbutton refresh" title="Refresh"></div>

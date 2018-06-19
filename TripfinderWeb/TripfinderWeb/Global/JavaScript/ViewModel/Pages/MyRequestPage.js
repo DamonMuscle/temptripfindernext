@@ -9,6 +9,7 @@
 		self.pageType = "myrequests";
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = true;
+		self.detailButton = false;
 	}
 
 	MyRequestPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);

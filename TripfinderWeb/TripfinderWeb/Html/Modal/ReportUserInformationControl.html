@@ -1,0 +1,276 @@
+﻿<div class="document-dataentry">
+	<div class="eidt-error" style="margin-left: 0px;margin-right: 100px;margin-bottom: 10px;" data-bind="visible:obErrorMessageDivIsShow">
+		<div><span class="iconbutton error"></span></div>
+		<div>
+			<span class="error-title" data-bind="text: obErrorMessageTitle"></span><br />
+			<span data-bind="text: obErrorMessageDescription"></span><br />
+			<ul>
+				<!--ko foreach:obValidationErrors-->
+				<li><a data-bind="text:name, click :$parent.focusField"></a><span data-bind="text:message"></span></li>
+				<!-- /ko -->
+			</ul>
+		</div>
+	</div>
+	<div class="fieldtrip" data-bind="uiInit:init">
+		<div class="form">
+			<div class="row">
+				<div class="col-xs-8">
+					<h4 class="section-title"><strong>Company/District</strong></h4>
+				</div>
+				<div class="col-xs-8">
+					<h4 class="section-title"><strong>Address</strong></h4>
+				</div>
+				<div class="col-xs-8">
+					<h4 class="section-title"><strong>Report Preparer</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-8">
+					<div class="form-group">
+						<label>Name</label>
+						<input type="text" name="companyName" class="form-control" maxlength="30" data-bind="value:obEntityDataModel().companyName">
+					</div>
+					<div class="form-group">
+						<label>DBA</label>
+						<input type="text" name="dba" class="form-control" maxlength="30" data-bind="value:obEntityDataModel().dba">
+					</div>
+					<div class="form-group">
+						<label>Employer ID</label>
+						<input type="text" name="companyId" class="form-control" maxlength="15" data-bind="value:obEntityDataModel().companyId">
+					</div>
+					<div class="form-group">
+						<label>Business Hours</label>
+						<input type="text" name="hours" class="form-control" maxlength="64" data-bind="value:obEntityDataModel().hours">
+					</div>
+
+				</div>
+				<div class="col-xs-8">
+					<div class="form-group">
+						<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Mailing Address')"></label>
+						<input type="text" name="street1" class="form-control" data-bind="value:obEntityDataModel().street1,attr: {placeholder: tf.applicationTerm.getApplicationTermSingularByName('Street 1').toLowerCase()}" maxlength="30" />
+					</div>
+					<div class="form-group">
+						<input type="text" name="street2" class="form-control" data-bind="value:obEntityDataModel().street2, attr: {placeholder: tf.applicationTerm.getApplicationTermSingularByName('Street 2').toLowerCase()}" maxlength="30" />
+					</div>
+					<div class="form-group">
+						<input type="text" name="county" class="form-control" data-bind="value:obEntityDataModel().county, attr: {placeholder: tf.applicationTerm.getApplicationTermSingularByName('county').toLowerCase()}" maxlength="25" />
+					</div>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-xs-19 no-padding-right">
+								<div class="input-group">
+									<div class="address-mail-city" data-bind="typeahead:{source:obMailCityDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedMailCity}">
+										<!-- ko customInput:{type:"String",value:obEntityDataModel().city,attributes:{name:"city",placeholder:tf.applicationTerm.getApplicationTermSingularByName('select City').toLowerCase()},events:{blur:mailCityOnBlur}} --><!-- /ko -->
+									</div>
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-default">
+											<span class="caret"></span>
+										</button>
+										<button data-bind="click:generateFunction(editFieldItem, 'mailingcity'), disable:mailCityDisable(), visible:obIsAdmin,css:mailCityCss()" type="button" class="btn btn-default btn-sharp">
+											<span class="glyphicon glyphicon-pencil"></span>
+										</button>
+										<button data-bind="click:generateFunction(addFieldItem, 'mailingcity'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
+											<span class="glyphicon glyphicon-plus"></span>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="col-xs-5 ">
+								<input type="text" name="state" class="form-control" data-bind="value:obEntityDataModel().state, attr: {placeholder: tf.applicationTerm.getApplicationTermAbbrByName('Street')}" maxlength="2" />
+							</div>
+
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="address-mail-zip" data-bind="typeahead:{source:obMailZipDataModels,format:function(obj){return obj.Postal;},drowDownShow:true,selectedValue:obSelectedMailZip}">
+								<!-- ko customInput:{type:"Integer",value:obEntityDataModel().zip,attributes:{name:"zip",placeholder:"zip code"},events:{blur:mailZipOnBlur}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default">
+									<span class="caret"></span>
+								</button>
+								<button data-bind="click:generateFunction(editFieldItem, 'mailingpostalcode'), disable:mailZipDisable(), visible:obIsAdmin,css:mailZipCss()" " type=" button" class="btn btn-default btn-sharp">
+									<span class="glyphicon glyphicon-pencil"></span>
+								</button>
+								<button data-bind="click:generateFunction(addFieldItem, 'mailingpostalcode'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
+									<span class="glyphicon glyphicon-plus"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-8">
+					<div class="form-group">
+						<label>Name</label>
+						<input type="text" name="officeName" class="form-control" maxlength="30" data-bind="value:obEntityDataModel().officeName">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-8">
+					<h4 class="section-title"><strong>Contact 1</strong></h4>
+				</div>
+				<div class="col-xs-8">
+					<h4 class="section-title"><strong>Contact 2</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-8">
+					<div class="form-group">
+						<label>Name</label>
+						<input type="text" name="personName" class="form-control" data-bind="value:obEntityDataModel().personName" maxlength="64">
+					</div>
+					<div class="form-group">
+						<label>Title</label>
+						<input type="text" name="personTitle" class="form-control" data-bind="value:obEntityDataModel().personTitle" maxlength="64">
+					</div>
+					<div class="row">
+						<div class="col-xs-8">
+							<div class="form-group">
+								<label>Phone</label>
+								<input type="text" name="phone" class="form-control" data-bind="value:obEntityDataModel().phone" maxlength="19">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-8">
+					<div class="form-group">
+						<label>Name</label>
+						<input type="text" name="person2Name" class="form-control" data-bind="value:obEntityDataModel().person2Name" maxlength="64">
+					</div>
+					<div class="form-group">
+						<label>Title</label>
+						<input type="text" name="person2Title" class="form-control" data-bind="value:obEntityDataModel().person2Title" maxlength="64">
+					</div>
+					<div class="row">
+						<div class="col-xs-8">
+							<div class="form-group">
+								<label>Phone</label>
+								<input type="text" name="phone2" class="form-control" data-bind="value:obEntityDataModel().phone2" maxlength="19">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-8">
+					<h4 class="section-title"><strong>User Defined</strong>(Character)</h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-8">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 1</label>
+								<input type="text" name="user1" class="form-control" data-bind="value:obEntityDataModel().user1" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 2</label>
+								<input type="text" name="user2" class="form-control" data-bind="value:obEntityDataModel().user2" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 3</label>
+								<input type="text" name="user3" class="form-control" data-bind="value:obEntityDataModel().user3" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 4</label>
+								<input type="text" name="user4" class="form-control" data-bind="value:obEntityDataModel().user4" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 5</label>
+								<input type="text" name="user5" class="form-control" data-bind="value:obEntityDataModel().user5" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 6</label>
+								<input type="text" name="user6" class="form-control" data-bind="value:obEntityDataModel().user6" v>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-8">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 7</label>
+								<input type="text" name="user7" class="form-control" data-bind="value:obEntityDataModel().user7" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 8</label>
+								<input type="text" name="user8" class="form-control" data-bind="value:obEntityDataModel().user8" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 9</label>
+								<input type="text" name="user9" class="form-control" data-bind="value:obEntityDataModel().user9" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 10</label>
+								<input type="text" name="user10" class="form-control" data-bind="value:obEntityDataModel().user10" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 11</label>
+								<input type="text" name="user11" class="form-control" data-bind="value:obEntityDataModel().user11" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 12</label>
+								<input type="text" name="user12" class="form-control" data-bind="value:obEntityDataModel().user12" maxlength="255">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-8">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 13</label>
+								<input type="text" name="user13" class="form-control" data-bind="value:obEntityDataModel().user13" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 14</label>
+								<input type="text" name="user14" class="form-control" data-bind="value:obEntityDataModel().user14" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 15</label>
+								<input type="text" name="user15" class="form-control" data-bind="value:obEntityDataModel().user15" maxlength="255">
+							</div>
+						</div>
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label>User_Char 16</label>
+								<input type="text" name="user16" class="form-control" data-bind="value:obEntityDataModel().user16" maxlength="255">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+</div>

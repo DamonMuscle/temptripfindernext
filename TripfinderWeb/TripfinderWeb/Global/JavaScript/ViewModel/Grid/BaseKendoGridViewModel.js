@@ -178,14 +178,7 @@
 				}
 				return false;
 			}.bind(this));
-
-			this.loadReportLists();
 		},
-
-		//_loadGridConfiguration: function(id)
-		//{
-		//	this.searchGrid.loadConfiguration(id);
-		//},
 
 		_openBulkMenu: function()
 		{
@@ -799,22 +792,6 @@
 		document.location.href = "mailto:" + value;
 	};
 
-	BaseKendoGridViewModel.prototype.loadReportLists = function()
-	{
-		var reportTypeId = this.typeToReportTypeNumber();
-		if (reportTypeId != -1)
-		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "report", "basetype", reportTypeId))
-				.then(function(data)
-				{
-					if (data && data.Items && data.Items.length > 0)
-					{
-						this.obReportLists(data.Items);
-					}
-				}.bind(this));
-		}
-	};
-
 	BaseKendoGridViewModel.prototype.viewReportClick = function(viewModel, e)
 	{
 		var selectedIds = this.searchGrid.getSelectedIds();
@@ -839,21 +816,6 @@
 			{
 				selectedRecordId: ids
 			}));
-	};
-
-
-	BaseKendoGridViewModel.prototype.typeToReportTypeNumber = function()
-	{
-		var type = this.type;
-		var reportDataType = TF.Grid.ReportsGridViewModel.dataTypeList.filter(function(item)
-		{
-			return item.gridType === type;
-		});
-		if (reportDataType && reportDataType.length > 0)
-		{
-			return reportDataType[0].id;
-		}
-		return -1;
 	};
 
 	BaseKendoGridViewModel.prototype.mergeMinigridColumns = function()

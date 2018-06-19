@@ -17,6 +17,7 @@
 			self.approveButton = true;
 			self.declineButton = true;
 		}
+		self.detailButton = false;
 	}
 
 	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
