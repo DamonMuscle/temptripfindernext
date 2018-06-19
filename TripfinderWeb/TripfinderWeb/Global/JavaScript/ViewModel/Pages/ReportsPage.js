@@ -64,8 +64,23 @@
 		];
 	};
 
+	ReportsPage.prototype.bindButtonEvent = function()
+	{
+		var self = this;
+		TF.Page.BaseGridPage.prototype.bindButtonEvent.call(self);
+		self.bindEvent(".iconbutton.openReportUserInformationModel", function(model, e)
+		{
+			self.openReportUserInformationModel(model, e);
+		});
+		self.bindEvent(".iconbutton.openManageYouReportsModel", function(model, e)
+		{
+			self.openManageYouReportsModel(model, e);
+		});
+	};
+
 	ReportsPage.prototype.showDetailsClick = function()
 	{
+		return;
 	};
 
 	ReportsPage.prototype.openReportUserInformationModel = function(viewModel, e)
@@ -75,6 +90,14 @@
 
 	ReportsPage.prototype.openManageYouReportsModel = function(viewModel, e)
 	{
+		var self = this;
+		tf.modalManager.showModal(new TF.Modal.ManageReportsModalViewModel()).then(function(result)
+		{
+			if (result)
+			{
+				self.refreshClick();
+			}
+		});
 	};
 
 	ReportsPage.prototype.generateReport = function(udReport, type, gridMenuViewModel)

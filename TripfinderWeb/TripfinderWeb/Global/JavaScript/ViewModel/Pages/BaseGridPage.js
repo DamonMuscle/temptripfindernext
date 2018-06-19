@@ -318,14 +318,7 @@
 		{
 			self.searchGrid.addRemoveColumnClick(model, e);
 		});
-		self.bindEvent(".iconbutton.openReportUserInformationModel", function(model, e)
-		{
-			self.openReportUserInformationModel(model, e);
-		});
-		self.bindEvent(".iconbutton.openManageYouReportsModel", function(model, e)
-		{
-			self.openManageYouReportsModel(model, e);
-		});
+
 		self.bindEvent(".iconbutton.details", function(model, e)
 		{
 			self.showDetailsClick();
