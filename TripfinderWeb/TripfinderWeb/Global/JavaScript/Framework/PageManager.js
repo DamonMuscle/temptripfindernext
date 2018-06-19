@@ -59,6 +59,10 @@
 				pageData = new TF.Page.ReportsPage();
 				templateName = "workspace/page/basegridpage";
 				break;
+			case "settings":
+				pageData = new TF.Page.SettingsConfigurationPage();
+				templateName = "workspace/admin/settings_configuration";
+				break;
 		}
 
 		self.resizablePage.leftPageType = type;

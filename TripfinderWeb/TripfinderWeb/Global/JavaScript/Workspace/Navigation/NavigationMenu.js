@@ -74,7 +74,7 @@
 	NavigationMenu.prototype.initNavigationMenuState = function()
 	{
 		var self = this,
-			typeList = ["fieldtrips", "myrequests", "approvals"],
+			typeList = ["fieldtrips", "myrequests", "approvals", "settings"],
 			isExpand = tf.storageManager.get(self.NavigationMenuExpandStatueKey);
 
 		if (TF.isPhoneDevice)
@@ -667,10 +667,10 @@
 				options.title = 'Log Out';
 			} else if ($(element).hasClass('setting'))
 			{
-				options.title = 'Setting';
+				options.title = 'Settings';
 			} else if ($(element).hasClass('report'))
 			{
-				options.title = 'report';
+				options.title = 'Reports';
 			}
 			self.tooltip.init($(element), options);
 		});

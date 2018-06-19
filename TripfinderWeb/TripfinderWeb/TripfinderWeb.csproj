@@ -152,6 +152,7 @@
     <Content Include="Global\JavaScript\DataModel\GridFilterDataModel.js" />
     <Content Include="Global\JavaScript\DataModel\GridLayoutExtendedDataModel.js" />
     <Content Include="Global\JavaScript\DataModel\UserPreferenceDataModel.js" />
+    <Content Include="Global\JavaScript\DataModel\SettingsConfigurationDataModal.js">
     <Content Include="Global\JavaScript\Framework\Ajax.js" />
     <Content Include="Global\JavaScript\Framework\Api.js" />
     <Content Include="Global\JavaScript\Framework\AuthManager.js" />
@@ -240,6 +241,7 @@
     <Content Include="Global\JavaScript\Modal\ListMoverForListFilterControlModalViewModel.js" />
     <Content Include="Global\JavaScript\Modal\TripfinderLoginModel.js" />
     <Content Include="Global\JavaScript\Modal\TripfinderLoginViewModel.js" />
+    <Content Include="Global\JavaScript\Modal\TestEmailModalViewModel.js" />
     <Content Include="Global\JavaScript\Startup.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\BaseControl.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\DataSourceChangeViewModel.js" />
@@ -247,6 +249,7 @@
     <Content Include="Global\JavaScript\ViewModel\Controls\ListFilterDefinition.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\ListMoverForListFilterControlViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\LoginViewModel.js" />
+    <Content Include="Global\JavaScript\ViewModel\Controls\TestEmailViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\EditKendoColumnViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\GlobalReplaceViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\ManageFilterViewModel.js" />
@@ -258,6 +261,7 @@
     <Content Include="Global\JavaScript\ViewModel\PageLevel\ListMoverPageLevelViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Pages\BaseGridPage.js" />
     <Content Include="Global\JavaScript\ViewModel\Pages\FieldTripPage.js" />
+    <Content Include="Global\JavaScript\ViewModel\Pages\SettingsConfigurationPage.js">
     <Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\BasePageLevelViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\ListMoverPageLevelViewModel.js" />
     <Content Include="Global\JavaScript\Workspace\GridDefinition\FieldTripGridDefinition.js" />
@@ -376,6 +380,7 @@
     <Content Include="Html\Modal\Positive.html" />
     <Content Include="Html\Modal\PositiveNegative.html" />
     <Content Include="Html\Modal\PositiveNegativeOther.html" />
+    <Content Include="Html\Modal\TestEmailControl.html" />
     <Content Include="Html\tripfinderLogin.html" />
     <Content Include="Html\Workspace\grid\EditColumn.html" />
     <Content Include="Html\Workspace\grid\EditKendoColumn.html" />
@@ -393,6 +398,7 @@
     <Content Include="Html\Workspace\PageLevel\Base.html" />
     <Content Include="Html\Workspace\Page\basegridpage.html" />
     <Content Include="Html\Workspace\Page\grid\fieldtrip\bulkmenu.html" />
+    <Content Include="Html\Workspace\Admin\settings_configuration.html" />
     <Content Include="index.html" />
     <Content Include="local_settings_template.js" />
   </ItemGroup>

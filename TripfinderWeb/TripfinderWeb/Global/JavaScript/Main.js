@@ -340,6 +340,9 @@ function getTitleByType(type)
 		case "approvals":
 			pageTitile = "My Pending Approvals";
 			break;
+		case "settings":
+			pageTitile = "Settings";
+			break;
 		default:
 			break;
 	}
