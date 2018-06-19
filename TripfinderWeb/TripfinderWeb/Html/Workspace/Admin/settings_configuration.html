@@ -1,184 +1,184 @@
 <div class="view-finder document-dataentry setting-configuration" data-bind="uiInit:init,css:obIsHost()?'host':''">
-    <div class="page-title">
-        SETTINGS
-    </div>
-    <div class="clearfix" data-bind="visible:obIsHost()">
-        <div class="col-lg-18 col-xs-24">
-            <div class="pull-right">
-                <div class="input-group" style="width: 200px;">
-                    <div data-bind="typeahead:{source:obClientsOptions,drowDownShow:true,notSort:true}">
-                        <!-- ko customInput:{type:"Select",value:obSelectedClientId,attributes:{class:"form-control"},enabled:false} -->
-                        <!-- /ko -->
-                    </div>
-                    <div class="input-group-btn">
-                        <button type="button" class="btn btn-default btn-sharp">
-                            <span class="caret"></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
-    <!-- /ko -->
-    <div class="edit-content">
-        <!-- ko if: !tf.permissions.isHost-->
-        <div class="row">
-            <div class="col-lg-6 col-xs-24" style="display:none;">
-                <h4>
-                    <strong>General</strong>
-                </h4>
-                <div class="form-group">
-                    <label class="requirestar">Client ID</label>
-                    <input type="text" name="clientId" class="form-control" data-bind="value:obEntityDataModel().clientId,attr:{disabled:obIsUpdate()}"
-                        required />
-                </div>
-                <div class="form-group">
-                    <label class="requirestar">Transfinder Data Folder</label>
-                    <input type="text" name="transfinderDataFolder" class="form-control" data-bind="value:obEntityDataModel().transfinderDataFolder,attr:{disabled:!obIsHost()}"
-                        required maxlength="200" />
-                </div>
-                <div class="form-group">
-                    <label class="requirestar">Installation Location</label>
-                    <input type="text" name="installationLocation" class="form-control" data-bind="value:obEntityDataModel().installationLocation"
-                        disabled="" />
-                </div>
-                <div class="form-group">
-                    <label class="requirestar">Time Zone(UTC)</label>
-                    <div class="input-group">
-                        <div data-bind="typeahead:{source:obTimeZoneList,drowDownShow:true,notSort:true}">
-                            <!-- ko customInput:{type:"Select",value:obEntityDataModel().timeZone,attributes:{class:"form-control"}} -->
-                            <!-- /ko -->
-                        </div>
-                        <div class="input-group-btn">
-                            <button type="button" class="btn btn-default btn-sharp">
-                                <span class="caret"></span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkbox margin-top-20">
-                    <label>
-                        <input type="checkbox" name="isRespectDaylight" data-bind="checked:obEntityDataModel().isRespectDaylight"> Respect Daylight Savings Time
-                    </label>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xs-24" style="margin-left:20px">
-                <h4>
-                    <strong>SMTP Server</strong>
-                </h4>
-                <div class="form-group">
-                    <label>Host</label>
-                    <input type="text" name="smtphost" class="form-control" data-bind="value:obEntityDataModel().smtphost" maxlength="256" />
-                </div>
-                <div class="form-group">
-                    <label>Port</label>
-                    <!-- ko customInput:{type:"Integer",value:obEntityDataModel().smtpport,attributes:{class:"form-control",name:"smtpport"}} -->
-                    <!-- /ko -->
-                </div>
-                <div class="form-group">
-                    <label>User Name</label>
-                    <input type="text" name="smtpuserName" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtpuserName"
-                        data-tf-input-type="Email" maxlength="256" />
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <!--this password is used to disable chrome auto complete-->
-                    <input type="password" name="smtppasswordhidden" class="hidden" autocomplete="off">
-                    <input type="password" name="smtppassword" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtppassword"
-                        maxlength="256" />
-                </div>
-                <div class="checkbox margin-top-20">
-                    <label>
-                        <input type="checkbox" name="smtpssl" data-bind="checked:obEntityDataModel().smtpssl"> Use SSL
-                    </label>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-gray btn-xs btn-sharp" data-bind="click:testSentEmailClick">Send Test Email</button>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xs-24">
-                <h4>
-                    <strong>From Email</strong>
-                </h4>
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" name="emailAddress" class="form-control" data-bind="value:obEntityDataModel().emailAddress" data-tf-input-type="Email"
-                        maxlength="256" />
-                </div>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="emailName" class="form-control" data-bind="value:obEntityDataModel().emailName" maxlength="100"
-                    />
-                </div>
-            </div>
-        </div>
-        <!-- /ko -->
-        <div class="row" style="display:none;">
-            <div class="col-lg-12 col-xs-24" data-bind="visible:!tf.permissions.isHost">
-                <h4>
-                    <strong>Database Server</strong>
-                </h4>
-            </div>
-            <div class="col-lg-6 col-xs-24">
-                <h4>
-                    <strong>Cluster Map Points</strong>
-                </h4>
-            </div>
-        </div>
-        <div class="row" style="display:none;">
-            <!-- ko if: !tf.permissions.isHost-->
-            <div class="col-lg-6 col-xs-24">
-                <div class="form-group">
-                    <label class="requirestar">Name</label>
-                    <input type="text" name="databaseName" data-bind="value:obEntityDataModel().databaseName,attr:{disabled:!obIsHost()}" class="form-control"
-                        required maxlength="50" />
-                </div>
-                <div class="form-group">
-                    <label class="requirestar">Server</label>
-                    <input type="text" name="serverName" data-bind="value:obEntityDataModel().databaseServer,attr:{disabled:!obIsHost()}" class="form-control"
-                        required maxlength="50" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-xs-24">
-                <div class="form-group">
-                    <label class="requirestar">Login ID</label>
-                    <input type="text" name="databaseLoginId" data-bind="value:obEntityDataModel().databaseLoginId,attr:{disabled:!obIsHost()}"
-                        required maxlength="50" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label class="requirestar">Password</label>
-                    <input type="password" name="databasePassword" autocomplete="off" data-bind="value:obEntityDataModel().databasePassword,attr:{disabled:!obIsHost()}"
-                        required maxlength="50" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-gray btn-xs btn-sharp" data-bind="click:upgradeDatabases,visible:obIsHost()&&obSelectedClientId()=='New'">Upgrade Databases</button>
-                </div>
-            </div>
-            <!-- /ko -->
-            <div class="col-lg-6 col-xs-24">
-                <div class="checkbox margin-top-20">
-                    <label>
-                        <input type="checkbox" name="groupPoints" data-bind="checked:obEntityDataModel().groupPoints, click:changeGroupPoints"> Group data points displayed on the map
-                    </label>
-                </div>
-                <div class="form-group" style="margin: 20px -15px 0;">
-                    <div class="col-lg-12 col-lg-12 col-xs-12">
-                        <div class="form-group">
-                            <label data-bind="css: {requirestar: obEntityDataModel().groupPoints}">Minimum Map Points</label>
-                            <input type="text" name="clusterMinMapPoints" class="form-control" data-bind="value:obEntityDataModel().clusterMinMapPoints, enable:obEntityDataModel().groupPoints,attr:{required:obEntityDataModel().groupPoints}, event:{keypress:numericValidation}"
-                                min="1" />
-                        </div>
-                    </div>
-                    <div class="col-lg-12 col-lg-12 col-xs-12">
-                        <div class="form-group">
-                            <label data-bind="css: {requirestar: obEntityDataModel().groupPoints}">Tolerance</label>
-                            <input type="text" name="clusterTolerance" class="form-control" data-bind="value:obEntityDataModel().clusterTolerance,enable:obEntityDataModel().groupPoints,attr:{required:obEntityDataModel().groupPoints}, event:{keypress:decimalsValidation}"
-                                min="0" step="0.5" />
-                        </div>
-                    </div>
-                </div>
-                <!-- <div class="form-group">
+	<div class="page-title">
+		SETTINGS
+	</div>
+	<div class="clearfix" data-bind="visible:obIsHost()">
+		<div class="col-lg-18 col-xs-24">
+			<div class="pull-right">
+				<div class="input-group" style="width: 200px;">
+					<div data-bind="typeahead:{source:obClientsOptions,drowDownShow:true,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedClientId,attributes:{class:"form-control"},enabled:false} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="edit-content">
+		<!-- ko if: !tf.permissions.isHost-->
+		<div class="row">
+			<div class="col-lg-6 col-xs-24" style="display:none;">
+				<h4>
+					<strong>General</strong>
+				</h4>
+				<div class="form-group">
+					<label class="requirestar">Client ID</label>
+					<input type="text" name="clientId" class="form-control" data-bind="value:obEntityDataModel().clientId,attr:{disabled:obIsUpdate()}"
+					 required />
+				</div>
+				<div class="form-group">
+					<label class="requirestar">Transfinder Data Folder</label>
+					<input type="text" name="transfinderDataFolder" class="form-control" data-bind="value:obEntityDataModel().transfinderDataFolder,attr:{disabled:!obIsHost()}"
+					 required maxlength="200" />
+				</div>
+				<div class="form-group">
+					<label class="requirestar">Installation Location</label>
+					<input type="text" name="installationLocation" class="form-control" data-bind="value:obEntityDataModel().installationLocation"
+					 disabled="" />
+				</div>
+				<div class="form-group">
+					<label class="requirestar">Time Zone(UTC)</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obTimeZoneList,drowDownShow:true,notSort:true}">
+							<!-- ko customInput:{type:"Select",value:obEntityDataModel().timeZone,attributes:{class:"form-control"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="checkbox margin-top-20">
+					<label>
+						<input type="checkbox" name="isRespectDaylight" data-bind="checked:obEntityDataModel().isRespectDaylight"> Respect Daylight Savings Time
+					</label>
+				</div>
+			</div>
+			<div class="col-lg-6 col-xs-24" style="margin-left:20px">
+				<h4>
+					<strong>SMTP Server</strong>
+				</h4>
+				<div class="form-group">
+					<label>Host</label>
+					<input type="text" name="smtphost" class="form-control" data-bind="value:obEntityDataModel().smtphost" maxlength="256" />
+				</div>
+				<div class="form-group">
+					<label>Port</label>
+					<!-- ko customInput:{type:"Integer",value:obEntityDataModel().smtpport,attributes:{class:"form-control",name:"smtpport"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="form-group">
+					<label>User Name</label>
+					<input type="text" name="smtpuserName" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtpuserName"
+					 data-tf-input-type="Email" maxlength="256" />
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<!--this password is used to disable chrome auto complete-->
+					<input type="password" name="smtppasswordhidden" class="hidden" autocomplete="off">
+					<input type="password" name="smtppassword" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtppassword"
+					 maxlength="256" />
+				</div>
+				<div class="checkbox margin-top-20">
+					<label>
+						<input type="checkbox" name="smtpssl" data-bind="checked:obEntityDataModel().smtpssl"> Use SSL
+					</label>
+				</div>
+				<div class="form-group">
+					<button type="button" class="btn btn-gray btn-xs btn-sharp" data-bind="click:testSentEmailClick">Send Test Email</button>
+				</div>
+			</div>
+			<div class="col-lg-6 col-xs-24">
+				<h4>
+					<strong>From Email</strong>
+				</h4>
+				<div class="form-group">
+					<label>Address</label>
+					<input type="text" name="emailAddress" class="form-control" data-bind="value:obEntityDataModel().emailAddress" data-tf-input-type="Email"
+					 maxlength="256" />
+				</div>
+				<div class="form-group">
+					<label>Name</label>
+					<input type="text" name="emailName" class="form-control" data-bind="value:obEntityDataModel().emailName" maxlength="100"
+					/>
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+		<div class="row" style="display:none;">
+			<div class="col-lg-12 col-xs-24" data-bind="visible:!tf.permissions.isHost">
+				<h4>
+					<strong>Database Server</strong>
+				</h4>
+			</div>
+			<div class="col-lg-6 col-xs-24">
+				<h4>
+					<strong>Cluster Map Points</strong>
+				</h4>
+			</div>
+		</div>
+		<div class="row" style="display:none;">
+			<!-- ko if: !tf.permissions.isHost-->
+			<div class="col-lg-6 col-xs-24">
+				<div class="form-group">
+					<label class="requirestar">Name</label>
+					<input type="text" name="databaseName" data-bind="value:obEntityDataModel().databaseName,attr:{disabled:!obIsHost()}" class="form-control"
+					 required maxlength="50" />
+				</div>
+				<div class="form-group">
+					<label class="requirestar">Server</label>
+					<input type="text" name="serverName" data-bind="value:obEntityDataModel().databaseServer,attr:{disabled:!obIsHost()}" class="form-control"
+					 required maxlength="50" />
+				</div>
+			</div>
+			<div class="col-lg-6 col-xs-24">
+				<div class="form-group">
+					<label class="requirestar">Login ID</label>
+					<input type="text" name="databaseLoginId" data-bind="value:obEntityDataModel().databaseLoginId,attr:{disabled:!obIsHost()}"
+					 required maxlength="50" class="form-control" />
+				</div>
+				<div class="form-group">
+					<label class="requirestar">Password</label>
+					<input type="password" name="databasePassword" autocomplete="off" data-bind="value:obEntityDataModel().databasePassword,attr:{disabled:!obIsHost()}"
+					 required maxlength="50" class="form-control" />
+				</div>
+				<div class="form-group">
+					<button type="button" class="btn btn-gray btn-xs btn-sharp" data-bind="click:upgradeDatabases,visible:obIsHost()&&obSelectedClientId()=='New'">Upgrade Databases</button>
+				</div>
+			</div>
+			<!-- /ko -->
+			<div class="col-lg-6 col-xs-24">
+				<div class="checkbox margin-top-20">
+					<label>
+						<input type="checkbox" name="groupPoints" data-bind="checked:obEntityDataModel().groupPoints, click:changeGroupPoints"> Group data points displayed on the map
+					</label>
+				</div>
+				<div class="form-group" style="margin: 20px -15px 0;">
+					<div class="col-lg-12 col-lg-12 col-xs-12">
+						<div class="form-group">
+							<label data-bind="css: {requirestar: obEntityDataModel().groupPoints}">Minimum Map Points</label>
+							<input type="text" name="clusterMinMapPoints" class="form-control" data-bind="value:obEntityDataModel().clusterMinMapPoints, enable:obEntityDataModel().groupPoints,attr:{required:obEntityDataModel().groupPoints}, event:{keypress:numericValidation}"
+							 min="1" />
+						</div>
+					</div>
+					<div class="col-lg-12 col-lg-12 col-xs-12">
+						<div class="form-group">
+							<label data-bind="css: {requirestar: obEntityDataModel().groupPoints}">Tolerance</label>
+							<input type="text" name="clusterTolerance" class="form-control" data-bind="value:obEntityDataModel().clusterTolerance,enable:obEntityDataModel().groupPoints,attr:{required:obEntityDataModel().groupPoints}, event:{keypress:decimalsValidation}"
+							 min="0" step="0.5" />
+						</div>
+					</div>
+				</div>
+				<!-- <div class="form-group">
                     <label>
                         Zoom Level Range (
                         <span data-bind="text:obClusterMinZoomLevel"></span>)
@@ -187,20 +187,20 @@
                         data-slider-ticks-labels='["0","","","3","","","6","","","9","","","12","","","15","","","18","","","21","","23"]'
                         data-slider-step="1" data-slider-tooltip="hide" data-bind="bootstrapSlider:{ value:obClusterMinZoomLevel,slideStop:updateClusterMinZoomLevel}">
                 </div> -->
-                <div class="form-group slider-bottom-bar">
-                    <div class="text-label" style="margin: 0px -5px 0px;">(world)</div>
-                    <div style="text-align: right; margin: -20px -5px 0px; position:absolute; right:15px;">(street)</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="version">
-        <span data-bind="text:tf.pageManager.obVersion"></span>
-    </div>
-    <div class="edit-bottombar">
-        <button type="submit" class="btn tf-btn-black tt" disabled="disabled" data-bind="click:saveClick">Save</button>
-        <button type="button" class="btn btn-link btn-black" disabled="disabled" data-bind="click:cancelClick,visible:!obIsHost()">
-            Close
-        </button>
-    </div>
+				<div class="form-group slider-bottom-bar">
+					<div class="text-label" style="margin: 0px -5px 0px;">(world)</div>
+					<div style="text-align: right; margin: -20px -5px 0px; position:absolute; right:15px;">(street)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="version">
+		<span data-bind="text:tf.pageManager.obVersion"></span>
+	</div>
+	<div class="edit-bottombar">
+		<button type="submit" class="btn tf-btn-black tt" disabled="disabled" data-bind="click:saveClick">Save</button>
+		<button type="button" class="btn btn-link btn-black" disabled="disabled" data-bind="click:cancelClick,visible:!obIsHost()">
+			Close
+		</button>
+	</div>
 </div>

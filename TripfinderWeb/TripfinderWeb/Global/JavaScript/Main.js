@@ -37,15 +37,15 @@ function topicCombine()
 
 function pathCombine()
 {
-	var output = arguments[ 0 ];
+	var output = arguments[0];
 	for (var i = 1, len = arguments.length; i < len; i++)
 	{
 		if (output.substr(output.length - 1) != "/")
 		{
-			output += "/" + arguments[ i ];
+			output += "/" + arguments[i];
 		} else
 		{
-			output += arguments[ i ];
+			output += arguments[i];
 		}
 	}
 	output = output.replace(/[/]+/g, "/").replace("http:/", "http://").replace("https:/", "https://");
@@ -59,8 +59,8 @@ function getParameterByName(name, url)
 	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
 		results = regex.exec(url);
 	if (!results) return null;
-	if (!results[ 2 ]) return '';
-	return decodeURIComponent(results[ 2 ].replace(/\+/g, " "));
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 function toCamelCase(input)
@@ -69,7 +69,7 @@ function toCamelCase(input)
 	{
 		return input;
 	}
-	return input[ 0 ].toUpperCase() + input.toLowerCase().substring(1, input.length);
+	return input[0].toUpperCase() + input.toLowerCase().substring(1, input.length);
 }
 
 function isFunction(x)
@@ -120,9 +120,9 @@ function getQueryString(name)
 {
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"),
 		hash = window.location.hash.split("?"),
-		search = hash.length > 1 ? hash[ 1 ] : "";
+		search = hash.length > 1 ? hash[1] : "";
 	var r = search.match(reg);
-	return r != null ? r[ 2 ] : null;
+	return r != null ? r[2] : null;
 }
 
 Array.remove = function(array, item)
@@ -140,7 +140,7 @@ Array.extend = function(arr1, arr2)
 	{
 		for (var i = 1; i < arguments.length; i++)
 		{
-			Array.prototype.push.apply(arr1, arguments[ i ]);
+			Array.prototype.push.apply(arr1, arguments[i]);
 		}
 	}
 	return arr1;
@@ -166,12 +166,12 @@ Array.equals = function(arr1, arr2)
 	for (var i = 0, l = arr1.length; i < l; i++)
 	{
 		// Check if we have nested arrays
-		if (arr1[ i ] instanceof Array && arr2[ i ] instanceof Array)
+		if (arr1[i] instanceof Array && arr2[i] instanceof Array)
 		{
 			// recurse into the nested arrays
-			if (!arr1[ i ].equals(arr2[ i ]))
+			if (!arr1[i].equals(arr2[i]))
 				return false;
-		} else if (arr1[ i ] != arr2[ i ])
+		} else if (arr1[i] != arr2[i])
 		{
 			// Warning - two different object instances will never be equal: {x:20} != {x:20}
 			return false;
@@ -203,7 +203,7 @@ if (!Array.prototype.findIndex)
 			}
 
 			// 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-			var thisArg = arguments[ 1 ];
+			var thisArg = arguments[1];
 
 			// 5. Let k be 0.
 			var k = 0;
@@ -215,7 +215,7 @@ if (!Array.prototype.findIndex)
 				// b. Let kValue be ? Get(O, Pk).
 				// c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
 				// d. If testResult is true, return k.
-				var kValue = o[ k ];
+				var kValue = o[k];
 				if (predicate.call(thisArg, kValue, k, o))
 				{
 					return k;
@@ -235,7 +235,7 @@ String.format = function(format)
 	var args = Array.prototype.slice.call(arguments, 1);
 	return format.replace(/{(\d+)}/g, function(match, number)
 	{
-		return typeof args[ number ] != 'undefined' ? args[ number ] : match;
+		return typeof args[number] != 'undefined' ? args[number] : match;
 	});
 };
 
@@ -253,9 +253,9 @@ function removeEmptyProperties(obj)
 {
 	for (var i in obj)
 	{
-		if (obj[ i ] === null || obj[ i ] === undefined)
+		if (obj[i] === null || obj[i] === undefined)
 		{
-			delete obj[ i ];
+			delete obj[i];
 		}
 	}
 }
@@ -276,14 +276,14 @@ function detectswipe(ele, func)
 
 	start = function(e)
 	{
-		var t = e.originalEvent.touches[ 0 ];
+		var t = e.originalEvent.touches[0];
 		swipe_det.sX = t.screenX;
 		swipe_det.sY = t.screenY;
 	};
 	move = function(e)
 	{
 		e.preventDefault();
-		var t = e.originalEvent.touches[ 0 ];
+		var t = e.originalEvent.touches[0];
 		swipe_det.eX = t.screenX;
 		swipe_det.eY = t.screenY;
 	};
@@ -355,7 +355,7 @@ function addStyle(styleId, content)
 		css = doc.createElement("style");
 		css.id = styleId;
 		css.type = "text/css";
-		doc.getElementsByTagName("head")[ 0 ].appendChild(css);
+		doc.getElementsByTagName("head")[0].appendChild(css);
 	}
 
 	if (css.styleSheet)
@@ -388,7 +388,7 @@ function compareTimeColumn2(a, b)
 	return ret;
 }
 
-createNamespace("tf").colorSource = [ "#FF0000", "#3333FF", "#FF6700", "#FF00FF", "#00FFFF", "#73D952", "#7F7FD0", "#AA0000", "#0000A2", "#CC5200", "#E10087", "#00CCCC", "#006600", "#FFCC00", "#D47F7F", "#FFFF00", "#E5A87F", "#F07FC3", "#7FE5E5", "#7FB27F", "#FFE57F" ];
+createNamespace("tf").colorSource = ["#FF0000", "#3333FF", "#FF6700", "#FF00FF", "#00FFFF", "#73D952", "#7F7FD0", "#AA0000", "#0000A2", "#CC5200", "#E10087", "#00CCCC", "#006600", "#FFCC00", "#D47F7F", "#FFFF00", "#E5A87F", "#F07FC3", "#7FE5E5", "#7FB27F", "#FFE57F"];
 
 function colorRgb(sColor, transparency)
 {
@@ -397,7 +397,7 @@ function colorRgb(sColor, transparency)
 	{
 		sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
 	}
-	return "RGBA(" + sColorChange[ 0 ] + "," + sColorChange[ 1 ] + "," + sColorChange[ 2 ] + "," + transparency + ")";
+	return "RGBA(" + sColorChange[0] + "," + sColorChange[1] + "," + sColorChange[2] + "," + transparency + ")";
 }
 
 (function()
@@ -533,8 +533,8 @@ Function.prototype.createCallback = function()
 
 Function.prototype.interceptBefore = function(object, methodName, fn, scope)
 {
-	var method = object[ methodName ] || function() { };
-	return (object[ methodName ] = function()
+	var method = object[methodName] || function() { };
+	return (object[methodName] = function()
 	{
 		var ret = fn.apply(scope || this, arguments);
 		method.apply(this, arguments);
@@ -544,8 +544,8 @@ Function.prototype.interceptBefore = function(object, methodName, fn, scope)
 
 Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 {
-	var method = object[ methodName ] || function() { };
-	return (object[ methodName ] = function()
+	var method = object[methodName] || function() { };
+	return (object[methodName] = function()
 	{
 		method.apply(this, arguments);
 		return fn.apply(scope || this, arguments);
