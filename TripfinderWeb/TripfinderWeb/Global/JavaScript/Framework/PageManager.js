@@ -55,6 +55,10 @@
 				pageData = new TF.Page.MyRequestPage();
 				templateName = "workspace/page/basegridpage";
 				break;
+			case "reports":
+				pageData = new TF.Page.ReportsPage();
+				templateName = "workspace/page/basegridpage";
+				break;
 			case "settings":
 				pageData = new TF.Page.SettingsConfigurationPage();
 				templateName = "workspace/admin/settings_configuration";

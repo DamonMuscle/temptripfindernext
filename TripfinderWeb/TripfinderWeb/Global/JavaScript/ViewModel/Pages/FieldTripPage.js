@@ -17,6 +17,7 @@
 			self.approveButton = true;
 			self.declineButton = true;
 		}
+		self.detailButton = false;
 	}
 
 	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -35,7 +36,6 @@
 		self.options.showOmittedCount = false;
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
 		self.options.extraFields = ["FieldTripStageId"];
-		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
 		self.options.storageKey = "grid.currentlayout." + self.type;
 		self.options.loadUserDefined = false;
 

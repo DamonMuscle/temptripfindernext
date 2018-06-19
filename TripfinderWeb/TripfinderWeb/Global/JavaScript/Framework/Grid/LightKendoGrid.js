@@ -688,7 +688,7 @@
 			columns: self.getKendoColumn(),
 			columnResize: self.columnResizeEvent.bind(this),
 			columnReorder: self.columnReorderEvent.bind(this),
-			selectable: this.options.selectable,
+			selectable: self.options.selectable,
 			change: self.onChange.bind(this),
 			columnHide: self.columnHideEvent.bind(this),
 			columnShow: self.columnShowEvent.bind(this),
@@ -3168,6 +3168,22 @@
 			options.data.filterSet.FilterItems)
 			options.data.filterSet.FilterItems = processVehicleExternalName(options.data.filterSet.FilterItems);
 
+		if (self.options.initFilter)
+		{
+			if (!options.data.filterSet)
+			{
+				options.data.filterSet = {
+					FilterItems: [self.options.initFilter],
+					FilterSets: [],
+					LogicalOperator: "and"
+				}
+			}
+			else
+			{
+				options.data.filterSet.FilterItems.push(self.options.initFilter);
+			}
+		}
+
 		if (kendoOptions.data.isFromAutoComplete !== true)
 		{
 			self.searchOption = options;
@@ -3624,9 +3640,12 @@
 		if (!this.options.showOmittedCount && !this.options.showSelectedCount && this.options.gridTypeInPageInfo === "") { return; }
 
 		var pageInfoList = [];
-		if (this.options.showSelectedCount && this.kendoGrid.select()) 
+		if (this.options.showSelectedCount) 
 		{
-			pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
+			if (this.options.selectable && this.kendoGrid.select())
+			{
+				pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
+			}
 		}
 
 		if (this.options.showOmittedCount)

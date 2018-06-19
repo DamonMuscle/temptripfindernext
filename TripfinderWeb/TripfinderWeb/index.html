@@ -78,7 +78,6 @@
 	<script src="Global/JavaScript/Framework/TemplateContextMenu.js"></script>
 	<script src="Global/JavaScript/Framework/BulkContextMenu.js"></script>
 	<script src="Global/JavaScript/Framework/PrintDocument.js"></script>
-
 	<script src="Global/JavaScript/Framework/Knockout/Knockout.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/contextMenuClick.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/singleClick.js"></script>
@@ -88,7 +87,6 @@
 	<script src="Global/JavaScript/Framework/Knockout/Binding/Value.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/customInput.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/typeahead.js"></script>
-
 	<script src="Global/JavaScript/Framework/Input/BaseBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/StringBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/DisabledBox.js"></script>
@@ -105,7 +103,6 @@
 	<script src="Global/JavaScript/Framework/Input/SelectBox.js"></script>
 	<script src="Global/JavaScript/Framework/Input/ColorBox.js"></script>
 	<script src="Global/JavaScript/Framework/PageManager.js"></script>
-
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridAlert.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridmenu.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/filter.js"></script>
@@ -122,8 +119,6 @@
 	<script src="Global/JavaScript/Framework/Grid/LightKendoGrid.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoGrid.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/gridAutoScroll.js"></script>
-
-
 	<script src="Global/JavaScript/Framework/Helper/DateBoxHelper.js"></script>
 	<script src="Global/JavaScript/Framework/Helper/FullScreenHelper.js"></script>
 	<script src="Global/JavaScript/Framework/Helper/KendoHackHelper.js"></script>
@@ -133,6 +128,9 @@
 	<script src="Global/JavaScript/Setting.js"></script>
 
 	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/GeoregionGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/ReportGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/Navigation/NavigationMenu.js"></script>
 
 	<script src="Global/JavaScript/ViewModel/Helper/KendoListMoverHelper.js"></script>
@@ -160,6 +158,9 @@
 	<script src="Global/JavaScript/ViewModel/Controls/FieldTripResourceAideViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/FieldTripInvoiceViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/ManageDetailScreenLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/GenerateReportViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SendEmailViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ListMoverSelectRecordControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/TestEmailViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointsJSON.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointPanel.js"></script>
@@ -181,6 +182,7 @@
 	<script src="Global/JavaScript/ViewModel/Pages/BaseGridPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/FieldTripPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/MyRequestPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/ReportsPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/SettingsConfigurationPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/GridControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Grid/EditKendoColumnViewModel.js"></script>
@@ -196,10 +198,9 @@
 	<script src="Global/JavaScript/ViewModel/Grid/BaseKendoGridViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Grid/FieldTripGridViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Grid/FieldTripInvoiceGridViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/ReportsGridViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Grid/FieldTripResourceGroupGridViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/GridDefinition/FieldTripGridDefinition.js"></script>
-	<script src="Global/JavaScript/ViewModel/Grid/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ReportUserInformationViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageReportsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/PageLevel/BasePageLevelViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/PageLevel/ListMoverPageLevelViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/PageLevel/FieldTripDataEntryPageLevelViewModel.js"></script>
@@ -227,6 +228,8 @@
 	<script src="Global/JavaScript/Modal/Grid/GlobalReplaceModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/Grid/ModifyLayoutModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/Grid/EditFieldTripStatusModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/ReportUserInformationModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/ManageReportsModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/KendoListMoverWithSearchControlModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/ListMoverForListFilterControlModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/BootstrapSlider.js"></script>
@@ -238,6 +241,9 @@
 	<script src="Global/JavaScript/Modal/ManageDetailScreenLayoutModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/ConditionalAppearanceModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/SaveTemplateNameModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/GenerateReportModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/SendEmailModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ListMoverSelectRecordControlModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/TestEmailModalViewModel.js"></script>
 
 	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
@@ -263,7 +269,10 @@
 	<script src="Global/JavaScript/DataModel/VehicleMakeOfBodyDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/VehicleCategoryDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/DetailScreenLayoutDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/ReportUserInformationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/GenerateReportDataModal.js"></script>
 	<script src="Global/JavaScript/DataModel/SettingsConfigurationDataModal.js"></script>
+	<script src="Global/JavaScript/DataModel/ScheduledReportReceiptDataModel.js"></script>
 
 	<!-- endbuild -->
 </head>

@@ -334,6 +334,9 @@ function getTitleByType(type)
 		case "myrequests":
 			pageTitile = "My Requests";
 			break;
+		case "reports":
+			pageTitile = "Reports";
+			break;
 		case "approvals":
 			pageTitile = "My Pending Approvals";
 			break;
@@ -341,7 +344,7 @@ function getTitleByType(type)
 			pageTitile = "Settings";
 			break;
 		default:
-			break
+			break;
 	}
 	return pageTitile;
 }
