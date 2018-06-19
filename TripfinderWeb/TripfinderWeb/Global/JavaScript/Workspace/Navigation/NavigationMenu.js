@@ -667,10 +667,10 @@
 				options.title = 'Log Out';
 			} else if ($(element).hasClass('setting'))
 			{
-				options.title = 'Setting';
+				options.title = 'Settings';
 			} else if ($(element).hasClass('report'))
 			{
-				options.title = 'report';
+				options.title = 'Reports';
 			}
 			self.tooltip.init($(element), options);
 		});
