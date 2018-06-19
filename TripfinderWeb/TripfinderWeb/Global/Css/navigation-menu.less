@@ -34,7 +34,7 @@
 		overflow: visible;
 		border-right: 1px solid #262626;
 
-		> div {
+		>div {
 			width: 100%;
 		}
 
@@ -45,7 +45,7 @@
 			background-color: #333;
 			overflow: hidden;
 
-			> div {
+			>div {
 				height: 54px;
 			}
 
@@ -115,7 +115,7 @@
 
 					.item-icon,
 					.item-label {
-						background-color: @HoverBackgroundColor !important;
+						background-color: @HoverBackgroundColor  !important;
 					}
 				}
 
@@ -123,8 +123,8 @@
 					overflow: visible;
 					box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 
-					& > div {
-						background-color: @HoverBackgroundColor !important;
+					&>div {
+						background-color: @HoverBackgroundColor  !important;
 					}
 
 					.item-label {
@@ -279,7 +279,7 @@
 					box-shadow: none !important;
 
 					&.hoverState {
-						background-color: @HoverBackgroundColor !important;
+						background-color: @HoverBackgroundColor  !important;
 					}
 
 					.item-label {
@@ -371,7 +371,7 @@
 				background-image: url("../img/navigation-menu/icon-Log Out.svg");
 			}
 
-			&.setting {
+			&.settings {
 				background-image: url("../img/navigation-menu/icon-Settings.svg");
 			}
 
@@ -412,7 +412,7 @@
 
 			&.onAnimation,
 			&.menu-opened {
-				background-color: @HoverBackgroundColor !important;
+				background-color: @HoverBackgroundColor  !important;
 				overflow-y: visible !important;
 				overflow-x: visible !important;
 
@@ -447,7 +447,7 @@
 							white-space: nowrap;
 
 							&.active {
-								background-color: @systemColor !important;
+								background-color: @systemColor  !important;
 							}
 
 							&:hover {
@@ -910,7 +910,7 @@
 							font-size: 16px;
 							cursor: pointer;
 
-							& > div {
+							&>div {
 								float: left;
 							}
 
@@ -965,8 +965,8 @@
 							height: 22px;
 							color: #777;
 
-							& > .head-label,
-							& > .search-text {
+							&>.head-label,
+							&>.search-text {
 								float: left;
 							}
 
@@ -1031,7 +1031,7 @@
 									color: @systemColor;
 									cursor: pointer;
 
-									& > span {
+									&>span {
 										float: right;
 										cursor: pointer;
 										margin-right: 6px;
@@ -1061,7 +1061,7 @@
 									background-color: #f2f2f2;
 									z-index: 1;
 
-									& + .data-cards {
+									&+.data-cards {
 										padding-top: 38px;
 									}
 								}
@@ -1088,7 +1088,7 @@
 										max-width: 205px;
 										position: relative;
 
-										& > div {
+										&>div {
 											.ellipsis;
 
 											&.full-height {
@@ -1135,7 +1135,7 @@
 										border-radius: 20px;
 										background-size: 40px;
 
-										& + .card-left {
+										&+.card-left {
 											max-width: 165px;
 											margin-left: 10px;
 										}
@@ -1181,8 +1181,8 @@
 				height: 100%;
 				background: rgba(0, 0, 0, 0.9);
 				.navigation-item {
-					background-color:initial;
-					
+					background-color: initial;
+
 					&.active {
 						background-color: #4a4a4a;
 						.item-icon {

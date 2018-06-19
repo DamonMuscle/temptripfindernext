@@ -23,7 +23,7 @@
 		$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
 		$navigationContent.append($content);
 
-		ko.applyBindings(ko.observable(self.navigationData), $content[0]);
+		ko.applyBindings(ko.observable(self.navigationData), $content[ 0 ]);
 	};
 
 	PageManager.prototype.initResizePanel = function()
@@ -34,7 +34,7 @@
 		$content = $("<!-- ko template:{ name:'workspace/page/resizablepage',data:$data }--><!-- /ko -->");
 		$pageContent.append($content);
 
-		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
+		ko.applyBindings(ko.observable(self.resizablePage), $content[ 0 ]);
 	};
 
 	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad)
@@ -54,6 +54,10 @@
 			case "myrequests":
 				pageData = new TF.Page.MyRequestPage();
 				templateName = "workspace/page/basegridpage";
+				break;
+			case "settings":
+				pageData = new TF.Page.SettingsConfigurationPage();
+				templateName = "workspace/admin/settings_configuration";
 				break;
 		}
 
@@ -82,7 +86,7 @@
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), this.datasourceId))
 				.then(function(apiResponse)
 				{
-					this.currentDatabaseName(apiResponse.Items[0].DatabaseName);
+					this.currentDatabaseName(apiResponse.Items[ 0 ].DatabaseName);
 					this.onCurrentDatabaseNameChanged.notify();
 				}.bind(this));
 		}

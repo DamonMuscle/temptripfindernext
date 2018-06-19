@@ -74,7 +74,7 @@
 	NavigationMenu.prototype.initNavigationMenuState = function()
 	{
 		var self = this,
-			typeList = ["fieldtrips", "myrequests", "approvals"],
+			typeList = [ "fieldtrips", "myrequests", "approvals", "settings" ],
 			isExpand = tf.storageManager.get(self.NavigationMenuExpandStatueKey);
 
 		if (TF.isPhoneDevice)
@@ -100,7 +100,7 @@
 
 		itemList.on("mouseenter", self.onNavigationItemToggleHoverStatus.bind(self, true));
 		itemList.on("mouseleave", self.onNavigationItemToggleHoverStatus.bind(self, false));
-		tf.shortCutKeys.bind(["esc"], self.closeOpenedNavigationItemMenu.bind(self, false));
+		tf.shortCutKeys.bind([ "esc" ], self.closeOpenedNavigationItemMenu.bind(self, false));
 		$(document).on("click.navigation-menu", self.closeOpenedNavigationItemMenu.bind(self, false));
 
 		if (self.searchControlTemplate)
