@@ -146,69 +146,6 @@
 					</div>
 				</div>
 			</div>
-			<!--ko if: isBusfinderReport -->
-			<div data-bind="if: tf.authManager.isAuthorizedFor('busfinder', 'read' )">
-				<div class="row">
-					<div class="col-xs-24 ">
-						<h4><strong>GPS Events</strong></h4>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-24 description">
-						Specify when you would like the report to run for (date and time). This section applies only to reports with GPS data.
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col-xs-6">
-
-						<div class="form-group">
-							<label data-bind="css: {requirestar: isBusfinderReport}"><strong>Run For</strong></label>
-							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="today" />Today</label></div>
-							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="yesterday" />Yesterday</label></div>
-							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="weektodate" />Week to Date</label></div>
-							<div class="radio"><label><input data-bind="disable: isNotBusfinderReport, checked:obEntityDataModel().reportParameterRunFor" type="radio" name="ReportParameterRunFor" value="monthtodate" />Month to Date</label></div>
-						</div>
-
-
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label data-bind="css: {requirestar: isBusfinderReport}"><strong>Time From</strong></label>
-							<!-- ko customInput:{
-							type:"Time",
-							attributes: {
-							class:"form-control",
-							required:"",
-							name:"timefrom"
-							},
-							disable: isNotBusfinderReport,
-							value: obEntityDataModel().reportParameterTimeFrom
-							} -->
-							<!-- /ko -->
-						</div>
-					</div>
-
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label data-bind="css: {requirestar: isBusfinderReport}"><strong>Time To</strong></label>
-							<!-- ko customInput:{
-							type:"Time",
-							attributes: {
-								class:"form-control",
-								required:"",
-								name:"timeto"
-								},
-								disable: isNotBusfinderReport,
-								value: obEntityDataModel().reportParameterTimeTo
-							} -->
-							<!-- /ko -->
-						</div>
-					</div>
-				</div>
-
-			</div>
-			<!-- /ko -->
 		</div>
 	</div>
 </div>

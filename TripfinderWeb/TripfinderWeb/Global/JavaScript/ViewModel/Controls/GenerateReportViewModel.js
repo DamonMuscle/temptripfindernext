@@ -13,6 +13,7 @@
 
 		this.obPageDescription = ko.observable('Specify the report variables (i.e. Title, Subtitle, Preparer, and Description) and the records that you would like to include in the report. ');
 		this.obShowGPSEvents = ko.observable(true);
+		this.firstLoad = true;
 
 		if (tf.permissions.filtersRead)
 		{
@@ -83,20 +84,7 @@
 		this.obFilterDataModels = ko.observableArray();
 		this.obEntityDataModel = ko.observable(new TF.DataModel.GenerateReportDataModal());
 		this.obReport = ko.observable();
-		this.isNotBusfinderReport = ko.observable();
-		this.isBusfinderReport = ko.observable(true);
-		this.obReport.subscribe(function()
-		{
-			setTimeout(function()
-			{
-				if (this.obReport())
-				{
-					this.isNotBusfinderReport(this.obReport().type != "busfinder");
-					this.isBusfinderReport(this.obReport().type == "busfinder");
-				}
-			}.bind(this), 10);
 
-		}.bind(this));
 		this.obFilter = ko.observable();
 		this.obSpecifyRecordOption = ko.observable();
 		this.IsNotUpgradedDataSource = ko.observable(false);
@@ -149,7 +137,13 @@
 		}.bind(this));
 		this.obSpecificRecordStringForValidation = ko.computed(function()
 		{
-
+			if (!this.firstLoad)
+			{
+				setTimeout(function()
+				{
+					$("input[name=specificRecords]").change();
+				});
+			}
 			if (this.obDisabledFilteRecords() || this.obDisabledSpecificRecord() || this.obSelectedSpecificRecord().length > 0)
 			{
 				return "1";
@@ -161,6 +155,13 @@
 		}.bind(this));
 		this.obFilterNameStringForValidation = ko.computed(function()
 		{
+			if (!this.firstLoad)
+			{
+				setTimeout(function()
+				{
+					$("input[name=filterName]").change();
+				});
+			}
 			if (this.obDisabledFilteRecords() || this.obDisabledFilteName())
 			{
 				return "1";
@@ -178,25 +179,9 @@
 
 		this.load().then(function()
 		{
-			//if (udReport == null)
-			//{
-			//	this.isNew = true;
-			//} else
-			//{r
-			//this.isNew = false;
 			this.oldEntityDataModel_reportName = udReport.RepFileName;
 			this.bindDefaultReportInfo(udReport);
 			this.initSpecificRecord(udReport);
-			//this.obEntityDataModel();
-			//}
-			//if (scheduledReportId)
-			//{
-			//	this.obEntityDataModel().scheduledReportId(scheduledReportId);
-			//}
-
-			//if (!this.isNew)
-			//{
-			//var selectedRecordIds = this.obEntityDataModel().selectedRecordIds().map(function(item) { return item; });
 			var theDatas = Enumerable.From(this.reportDataSourceModels).Where(function(x)
 			{
 				return x.RepFileName.replace('.rpt', '') == this.oldEntityDataModel_reportName.replace('.rpt', '');
@@ -205,7 +190,7 @@
 			this.obReport(theDatas.length > 0 ? theDatas[0] : null);
 
 			this.getFilter();
-
+			this.firstLoad = false;
 		}.bind(this));
 		setTimeout(function()
 		{
@@ -271,9 +256,6 @@
 		this._$form.find("[name=selReportType]").focus();
 	};
 
-	//<!--ko if: isBusfinderReport -->
-	//	<div
-	//data - bind = "if: tf.authManager.isAuthorizedFor('busfinder', 'read' )" >
 	GenerateReportViewModel.prototype.initValidation = function()
 	{
 		var self = this,
@@ -284,7 +266,6 @@
 		}
 		setTimeout(function()
 		{
-			//this._$form.closest('.modal-body').css("max-height", $('body').height() - this._$form.closest('.modal-dialog').offset().top - 140);
 			var validatorFields = {};
 			validatorFields["filterName"] = {
 				trigger: "blur change",
@@ -292,7 +273,7 @@
 				{
 					notEmpty:
 					{
-						message: "is required"
+						message: "required"
 					}
 				}
 			};
@@ -307,50 +288,6 @@
 					}
 				}
 			};
-			if (this.isBusfinderReport() && tf.authManager.isAuthorizedFor('busfinder', 'read'))
-			{
-				validatorFields["timefrom"] = {
-					trigger: "blur change",
-					validators:
-					{
-						notEmpty:
-						{
-							message: "is required"
-						},
-						callback:
-						{
-							message: "",
-							callback: function(value, validator)
-							{
-								if (value != "")
-								{
-									var fromDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeFrom()));
-									var toDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeTo()));
-									self.clearDateTimeAlerts();
-									if (!toDate.isAfter(fromDate))
-									{
-										return {
-											message: 'must be <= Time To',
-											valid: false
-										};
-									}
-								}
-								return true;
-							}
-						}
-					}
-				};
-				validatorFields["timeto"] = {
-					trigger: "blur change",
-					validators:
-					{
-						notEmpty:
-						{
-							message: "is required"
-						}
-					}
-				};
-			}
 
 			this._$form.bootstrapValidator(
 				{
@@ -371,7 +308,6 @@
 					}
 				});
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
-			//validator.validate();
 
 		}.bind(this), 0);
 	};
@@ -475,10 +411,6 @@
 			return x.displayName;
 		}).ToArray();
 		this.obReportDataSourceModels(xxx);
-		//this.obReportDataSourceModels([{
-		//	displayName: 'Available for ' + tf.applicationTerm.getApplicationTermSingularByName("Grade"),
-		//	source: availableSource
-		//}]);
 	}
 
 	function buildReportDataSource(item, reportDataSourceModels, type, label)
@@ -585,7 +517,6 @@
 				this.obSpecifyRecordOption(theDatas[0]);
 			}
 		}
-
 	};
 
 	GenerateReportViewModel.prototype.reportNameChange = function()
@@ -607,19 +538,9 @@
 			{
 				this.obSpecifyRecordOption(this.obSpecifyRecords()[0]);
 				this.obSelectedSpecificRecord([]);
-				// this.obFilterDataSource(this.obActiveDataSources().length > 0 ? this.obActiveDataSources()[0] :
-				// 	this.obDataSources().length > 0 ? this.obDataSources()[0] : null);
-				//this.obFilterDataSource(this.obDataSourcesOption()[0]);
 				this.bindDefaultReportInfo(this.obReport());
-				//if (this._$form)
-				//{
-				//	var validator = this._$form.data("bootstrapValidator");
-				//	validator.validate();
-				//}
 				this.getFilter();
 			}
-
-
 		}
 	};
 
@@ -642,7 +563,6 @@
 		if (this.obSpecifyRecordOption())
 		{
 			this.obEntityDataModel().specifyRecordOption(this.obSpecifyRecordOption().id);
-
 		}
 		else
 		{
