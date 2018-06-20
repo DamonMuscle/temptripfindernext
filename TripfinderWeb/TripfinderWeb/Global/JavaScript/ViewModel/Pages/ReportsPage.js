@@ -22,6 +22,7 @@
 		self.options.showOmittedCount = false;
 		self.options.storageKey = "grid.currentlayout." + self.pageType;
 		self.options.loadUserDefined = false;
+		self.options.selectable = "row";
 
 		self.options.summaryFilters = [{
 			Id: -1,
@@ -72,20 +73,43 @@
 		{
 			self.sendReportAsMail();
 		});
-		self.bindEvent(".iconbutton.save", function(model, e)
+		self.bindEvent(".iconbutton.file", function(model, e)
 		{
-			self.saveEmailAsFile();
+			self.saveReportAsFile();
 		});
+	};
+
+	ReportsPage.prototype._openBulkMenu = function()
+	{
+		var self = this;
+		self.$element.delegate("table.k-selectable tr", "mousedown", function(e)
+		{
+			if (e.button == 2)
+			{
+				$(e.currentTarget).trigger('click');
+				self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
+				var $virsualTarget = $("<div></div>").css(
+					{
+						position: "absolute",
+						left: e.clientX,
+						top: e.clientY
+					});
+				$("body").append($virsualTarget);
+				tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid", self.type, "bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid)));
+				return false;
+			}
+			return true;
+		}.bind(this));
 	};
 
 	ReportsPage.prototype.sendReportAsMail = function()
 	{
-		return;
+		this.generateReport(null, "email", { gridViewModel: this });
 	};
 
-	ReportsPage.prototype.saveEmailAsFile = function()
+	ReportsPage.prototype.saveReportAsFile = function()
 	{
-		return;
+		this.generateReport(null, "saveas", { gridViewModel: this });
 	};
 
 	ReportsPage.prototype.showDetailsClick = function()
@@ -99,8 +123,8 @@
 		if (!udReport)
 		{
 			self = gridMenuViewModel.gridViewModel;
-			var selectedId = gridMenuViewModel.searchGrid.getSelectedIds()[0];
-			udReport = Enumerable.From(gridMenuViewModel.searchGrid.kendoGrid.dataSource.data()).Where('$.Id==' + selectedId).First();
+			var selectedId = self.searchGrid.getSelectedIds()[0];
+			udReport = Enumerable.From(self.searchGrid.kendoGrid.dataSource.data()).Where('$.Id==' + selectedId).First();
 		}
 		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(udReport, type));
 	};

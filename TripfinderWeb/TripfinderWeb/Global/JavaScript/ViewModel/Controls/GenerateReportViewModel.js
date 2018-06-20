@@ -17,48 +17,48 @@
 		if (tf.permissions.filtersRead)
 		{
 			this.obSpecifyRecords = ko.observableArray([
-			{
-				id: 1,
-				name: "All Records"
-			},
-			{
-				id: 2,
-				name: "Filter"
-			},
-			{
-				id: 3,
-				name: "Specific Records"
-			}]);
+				{
+					id: 1,
+					name: "All Records"
+				},
+				{
+					id: 2,
+					name: "Filter"
+				},
+				{
+					id: 3,
+					name: "Specific Records"
+				}]);
 		}
 		else
 		{
 			this.obSpecifyRecords = ko.observableArray([
+				{
+					id: 1,
+					name: "All Records"
+				},
+				{
+					id: 3,
+					name: "Specific Records"
+				}]);
+		}
+		this.obOutputTos = ko.observableArray([
+			{
+				id: 0,
+				name: "View"
+			},
 			{
 				id: 1,
-				name: "All Records"
+				name: "Export to File"
+			},
+			{
+				id: 2,
+				name: "Email"
 			},
 			{
 				id: 3,
-				name: "Specific Records"
+				name: "Print"
 			}]);
-		}
-		this.obOutputTos = ko.observableArray([
-		{
-			id: 0,
-			name: "View"
-		},
-		{
-			id: 1,
-			name: "Export to File"
-		},
-		{
-			id: 2,
-			name: "Email"
-		},
-		{
-			id: 3,
-			name: "Print"
-		}]);
 		this.obOutputTo = ko.observable();
 		switch (output)
 		{
@@ -161,15 +161,6 @@
 		}.bind(this));
 		this.obFilterNameStringForValidation = ko.computed(function()
 		{
-			setTimeout(function()
-			{
-				if (this._$form)
-				{
-					var validator = this._$form.data("bootstrapValidator");
-					validator.validate();
-				}
-			}.bind(this), 50);
-
 			if (this.obDisabledFilteRecords() || this.obDisabledFilteName())
 			{
 				return "1";
@@ -246,10 +237,10 @@
 				.then(function(data)
 				{
 					data.Items.unshift(
-					{
-						Name: " ",
-						Id: undefined
-					});
+						{
+							Name: " ",
+							Id: undefined
+						});
 					this.obFilterDataModels(TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, data.Items));
 				}.bind(this));
 		}
@@ -510,11 +501,11 @@
 			data = datas[0];
 		}
 		data.source.push($.extend(item,
-		{
-			type: type,
-			label: label,
-			groupName: label
-		}));
+			{
+				type: type,
+				label: label,
+				groupName: label
+			}));
 	}
 	GenerateReportViewModel.prototype.load = function()
 	{
@@ -777,16 +768,16 @@
 		if (type != undefined && type != "")
 		{
 			tf.modalManager.showModal(
-					new TF.Modal.ListMoverSelectRecordControlModalViewModel(
-						this.obSelectedSpecificRecord(),
-						$.extend(
+				new TF.Modal.ListMoverSelectRecordControlModalViewModel(
+					this.obSelectedSpecificRecord(),
+					$.extend(
 						{}, defaultOption,
 						{
 							type: this.getRealType(),
 							dataSource: tf.datasourceManager.databaseId
 						})
-					)
 				)
+			)
 				.then(function(selectedRecord)
 				{
 					if (selectedRecord && $.isArray(selectedRecord))
@@ -836,7 +827,7 @@
 			{
 				if (!valid)
 				{
-					return Promise.reject();
+					return false;
 				}
 				else
 				{
@@ -844,7 +835,7 @@
 					{
 						if (ans == "retry")
 						{
-							return Promise.reject();
+							return false;
 						}
 						return this.obEntityDataModel();
 					}.bind(this));
@@ -940,9 +931,9 @@
 								postSendEmail: function(sendData)
 								{
 									return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefix(), "report", "sendemail"),
-									{
-										data: $.extend(true, {}, sendData, reportData)
-									});
+										{
+											data: $.extend(true, {}, sendData, reportData)
+										});
 								}
 							}));
 					}
@@ -960,7 +951,7 @@
 									clearInterval(downloadTimer);
 									self._expireCookie("downloadVerify");
 									tf.promiseBootbox.alert(
-											report.reportOldName() + " has been successfully generated and saved as a pdf file", "Successfully Completed")
+										report.reportOldName() + " has been successfully generated and saved as a pdf file", "Successfully Completed")
 										.then(function()
 										{
 											resolve(true);

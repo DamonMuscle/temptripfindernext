@@ -21,13 +21,13 @@
 	GenerateReportModalViewModel.prototype.positiveClick = function(viewModel, e)
 	{
 		return this.addReportViewModel.apply()
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				this.positiveClose(result);
-			}
-		}.bind(this));
+				if (result)
+				{
+					this.positiveClose(result);
+				}
+			}.bind(this));
 	};
 
 	GenerateReportModalViewModel.prototype.negativeClick = function()
@@ -44,7 +44,7 @@
 
 	GenerateReportModalViewModel.prototype.dispose = function()
 	{
-		//this.addReportViewModel().destroy();
+		this.addReportViewModel.dispose();
 	};
 
 
