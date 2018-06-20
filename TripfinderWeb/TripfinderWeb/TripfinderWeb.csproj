@@ -242,6 +242,7 @@
     <Content Include="Global\JavaScript\Modal\TripfinderLoginModel.js" />
     <Content Include="Global\JavaScript\Modal\TripfinderLoginViewModel.js" />
     <Content Include="Global\JavaScript\Modal\TestEmailModalViewModel.js" />
+	<Content Include="Global\JavaScript\Modal\ListMoverSelectRecipientControlModalViewModel.js" />
     <Content Include="Global\JavaScript\Startup.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\BaseControl.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\DataSourceChangeViewModel.js" />
@@ -250,6 +251,7 @@
     <Content Include="Global\JavaScript\ViewModel\Controls\ListMoverForListFilterControlViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\LoginViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Controls\TestEmailViewModel.js" />
+	<Content Include="Global\JavaScript\ViewModel\Controls\ListMoverSelectRecipientControlViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\EditKendoColumnViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\GlobalReplaceViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\ManageFilterViewModel.js" />
