@@ -3168,22 +3168,6 @@
 			options.data.filterSet.FilterItems)
 			options.data.filterSet.FilterItems = processVehicleExternalName(options.data.filterSet.FilterItems);
 
-		if (self.options.initFilter)
-		{
-			if (!options.data.filterSet)
-			{
-				options.data.filterSet = {
-					FilterItems: [self.options.initFilter],
-					FilterSets: [],
-					LogicalOperator: "and"
-				}
-			}
-			else
-			{
-				options.data.filterSet.FilterItems.push(self.options.initFilter);
-			}
-		}
-
 		if (kendoOptions.data.isFromAutoComplete !== true)
 		{
 			self.searchOption = options;

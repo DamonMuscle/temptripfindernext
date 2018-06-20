@@ -68,36 +68,29 @@
 	{
 		var self = this;
 		TF.Page.BaseGridPage.prototype.bindButtonEvent.call(self);
-		self.bindEvent(".iconbutton.openReportUserInformationModel", function(model, e)
+		self.bindEvent(".iconbutton.mail", function(model, e)
 		{
-			self.openReportUserInformationModel(model, e);
+			self.sendReportAsMail();
 		});
-		self.bindEvent(".iconbutton.openManageYouReportsModel", function(model, e)
+		self.bindEvent(".iconbutton.save", function(model, e)
 		{
-			self.openManageYouReportsModel(model, e);
+			self.saveEmailAsFile();
 		});
+	};
+
+	ReportsPage.prototype.sendReportAsMail = function()
+	{
+		return;
+	};
+
+	ReportsPage.prototype.saveEmailAsFile = function()
+	{
+		return;
 	};
 
 	ReportsPage.prototype.showDetailsClick = function()
 	{
 		return;
-	};
-
-	ReportsPage.prototype.openReportUserInformationModel = function(viewModel, e)
-	{
-		tf.modalManager.showModal(new TF.Modal.ReportUserInformationModalViewModel());
-	};
-
-	ReportsPage.prototype.openManageYouReportsModel = function(viewModel, e)
-	{
-		var self = this;
-		tf.modalManager.showModal(new TF.Modal.ManageReportsModalViewModel()).then(function(result)
-		{
-			if (result)
-			{
-				self.refreshClick();
-			}
-		});
 	};
 
 	ReportsPage.prototype.generateReport = function(udReport, type, gridMenuViewModel)

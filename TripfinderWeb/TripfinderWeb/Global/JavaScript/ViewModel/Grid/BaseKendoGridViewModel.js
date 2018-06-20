@@ -159,10 +159,6 @@
 				{
 					return true;
 				}
-				// 				if (this.targetID() && ids.indexOf(this.targetID()) < 0)
-				// 				{
-				// 					return true
-				// 				}
 				return false;
 			}.bind(this));
 			this.obMouseOutTarget = ko.computed(function()
