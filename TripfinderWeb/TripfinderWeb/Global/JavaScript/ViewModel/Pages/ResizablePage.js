@@ -67,7 +67,7 @@
 				self.$gridPage.append($content);
 				if (!firstLoad)
 				{
-					ko.applyBindings(ko.observable(self), $content[ 0 ]);
+					ko.applyBindings(ko.observable(self), $content[0]);
 				}
 			}
 			self.obShowGrid(true);
@@ -80,7 +80,7 @@
 			self.obOtherData(data);
 			$content = $("<div class='main-body' data-bind='template:{ name: obOtherTemplate, data: obOtherData }'></div>");
 			self.$otherPage.append($content);
-			ko.applyBindings(ko.observable(self), $content[ 0 ]);
+			ko.applyBindings(ko.observable(self), $content[0]);
 			self.obShowGrid(false);
 		}
 
@@ -98,7 +98,7 @@
 		$content = $("<div class='main-body' data-bind='template:{ name: obRightTemplate, data: obRightData }'></div>");
 
 		self.$rightPage.append($content);
-		ko.applyBindings(ko.observable(self), $content[ 0 ]);
+		ko.applyBindings(ko.observable(self), $content[0]);
 
 		self.reLayoutPage();
 	};

@@ -29,11 +29,6 @@
 		this.selectedClientIdSubscribe = null;
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 
-		//this.toleranceUnits = [ "px", "em" ];
-		//this.obToleranceUnitList = ko.observableArray(this.toleranceUnits);
-		//this.obClusterMinZoomLevel = ko.observable(tf.map.clusterMinZoomLevel);
-		//this.enableToleranceUnitList = this.enableToleranceUnitList.bind(this);
-		//this.obEnableCluster = ko.computed(this.enableCluster, this);
 	}
 
 	SettingsConfigurationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -60,18 +55,10 @@
 
 	SettingsConfigurationPage.prototype.load = function()
 	{
-		this.obErrorMessageDivIsShow(false);
-		this.obSuccessMessageDivIsShow(false);
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "alltimezone"))
-			.then(function(result)
-			{
-				this.obTimeZoneList(result.Items);
-				this.getClients().then(function()
-				{
-					this.loadClientConfig();
-				}.bind(this));
-			}.bind(this));
-
+		this.getClients().then(function()
+		{
+			this.loadClientConfig();
+		}.bind(this));
 		$(window).on("resize.settingConfiguration", this.resize);
 	};
 
@@ -129,12 +116,8 @@
 			{
 				this.originalDatabaseServer = data.Items[0].DatabaseServer;
 				this.originalDatabaseName = data.Items[0].DatabaseName;
-				if (data.Items[0].ClusterMinMapPoints <= 0)
-				{
-					data.Items[0].ClusterMinMapPoints = 1;
-				}
+
 				this.obEntityDataModel(new TF.DataModel.SettingsConfigurationDataModal(data.Items[0]));
-				//this.obClusterMinZoomLevel(this.obEntityDataModel().clusterMinZoomLevel());
 				this.obIsUpdate(clientId !== "");
 				this.obEntityDataModel().apiIsDirty(false);
 				this.setValidation();
@@ -144,7 +127,6 @@
 					$("input[name=clientId]").focus();
 					this.setDefaultDatabaseNameSubscribe = this.obEntityDataModel().clientId.subscribe(this.setDefaultDatabaseName, this);
 				}
-				this.enableCluster();
 			}.bind(this));
 	};
 
@@ -211,10 +193,6 @@
 				if (!isValidating)
 				{
 					isValidating = true;
-					if (eleName === "clusterMinMapPoints" || eleName === "clusterTolerance")
-					{
-						self.clusterNumberValidation(data.element[0].value);
-					}
 					self.pageLevelViewModel.saveValidate(data.element).then(function()
 					{
 						isValidating = false;
@@ -265,31 +243,13 @@
 	SettingsConfigurationPage.prototype.postData = function()
 	{
 		this.obEntityDataModel().apiIsNew(!this.obIsUpdate());
-		if (this.obEntityDataModel().clusterMinMapPoints._latestValue == "") { this.obEntityDataModel().clusterMinMapPoints(tf.map.clusterMinMapPoints) };
-		if (this.obEntityDataModel().clusterTolerance._latestValue == "") { this.obEntityDataModel().clusterTolerance(tf.map.clusterTolerance) };
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
 			data: this.obEntityDataModel().toData()
 		}).then(function(data)
 		{
-			tf.map.groupPoints = data.Items[0].GroupPoints;
-			tf.map.clusterMinMapPoints = data.Items[0].ClusterMinMapPoints;
-			tf.map.clusterMinZoomLevel = data.Items[0].ClusterMinZoomLevel;
-			tf.map.clusterTolerance = data.Items[0].ClusterTolerance;
-
 			this.pageLevelViewModel.popupSuccessMessage();
 			this.obEntityDataModel().apiIsDirty(false);
-			if (!this.obIsHost())
-			{
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "timezonetotalminutes")).then(function(apiResponse)
-				{
-					moment().constructor.prototype.currentTimeZoneTime = function()
-					{
-						var now = moment().utcOffset(apiResponse.Items[0]);
-						return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 
-					};
-				});
-			}
 			if (!this.obIsUpdate())
 			{
 				this.getClients().then(function()
@@ -372,40 +332,6 @@
 	SettingsConfigurationPage.prototype.upgradeDatabases = function()
 	{
 		location.href = "#/upgrade-databases";
-	};
-
-	SettingsConfigurationPage.prototype.updateClusterMinZoomLevel = function()
-	{
-		var zoomLevel = this.obClusterMinZoomLevel();
-		this.obEntityDataModel().clusterMinZoomLevel(zoomLevel);
-	};
-
-	SettingsConfigurationPage.prototype.enableToleranceUnitList = function()
-	{
-		return this.obEntityDataModel().groupPoints();
-	}
-
-	SettingsConfigurationPage.prototype.enableCluster = function()
-	{
-		var enable = this.obEntityDataModel().groupPoints();
-		if (enable)
-		{
-			$("input[data-slider-id='cluster-zoom-level-slider']").slider("enable");
-			$(".slider-selection").css("background", "#149BDF");
-			$(".slider-handle").css("background", "#149BDF");
-		} else
-		{
-			$("input[data-slider-id='cluster-zoom-level-slider']").slider("disable");
-			$(".slider-selection").css("background", "#999999");
-			$(".slider-handle").css("background", "#999999");
-			this.pageLevelViewModel.clearError();
-		}
-	};
-
-	SettingsConfigurationPage.prototype.changeGroupPoints = function()
-	{
-		this.setValidation();
-		return true;
 	};
 
 	SettingsConfigurationPage.prototype.numericValidation = function(data, event)

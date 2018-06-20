@@ -31,11 +31,7 @@
 		{ from: "DatabaseName", default: "" },
 		{ from: "DatabaseLoginId", default: "" },
 		{ from: "DatabasePassword", default: "" },
-		{ from: "IsRespectDaylight", default: true },
-		{ from: "GroupPoints", default: true },
-		{ from: "ClusterMinMapPoints", default: 1 },
-		{ from: "ClusterMinZoomLevel", default: 14 },
-		{ from: "ClusterTolerance", default: 50 }
+		{ from: "IsRespectDaylight", default: true }
 	];
 
 })();
