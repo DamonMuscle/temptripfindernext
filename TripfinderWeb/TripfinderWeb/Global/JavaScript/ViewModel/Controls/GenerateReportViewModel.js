@@ -289,66 +289,66 @@
 			validatorFields["filterName"] = {
 				trigger: "blur change",
 				validators:
-				{
-					notEmpty:
 					{
-						message: "is required"
+						notEmpty:
+							{
+								message: "is required"
+							}
 					}
-				}
 			};
 
 			validatorFields["specificRecords"] = {
 				trigger: "blur change",
 				validators:
-				{
-					notEmpty:
 					{
-						message: " At least one record must be selected"
+						notEmpty:
+							{
+								message: " At least one record must be selected"
+							}
 					}
-				}
 			};
 			if (this.isBusfinderReport() && tf.authManager.isAuthorizedFor('busfinder', 'read'))
 			{
 				validatorFields["timefrom"] = {
 					trigger: "blur change",
 					validators:
-					{
-						notEmpty:
 						{
-							message: "is required"
-						},
-						callback:
-						{
-							message: "",
-							callback: function(value, validator)
-							{
-								if (value != "")
+							notEmpty:
 								{
-									var fromDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeFrom()));
-									var toDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeTo()));
-									self.clearDateTimeAlerts();
-									if (!toDate.isAfter(fromDate))
+									message: "is required"
+								},
+							callback:
+								{
+									message: "",
+									callback: function(value, validator)
 									{
-										return {
-											message: 'must be <= Time To',
-											valid: false
-										};
+										if (value != "")
+										{
+											var fromDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeFrom()));
+											var toDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeTo()));
+											self.clearDateTimeAlerts();
+											if (!toDate.isAfter(fromDate))
+											{
+												return {
+													message: 'must be <= Time To',
+													valid: false
+												};
+											}
+										}
+										return true;
 									}
 								}
-								return true;
-							}
 						}
-					}
 				};
 				validatorFields["timeto"] = {
 					trigger: "blur change",
 					validators:
-					{
-						notEmpty:
 						{
-							message: "is required"
+							notEmpty:
+								{
+									message: "is required"
+								}
 						}
-					}
 				};
 			}
 
@@ -514,7 +514,11 @@
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "report"))
 			.then(function(data)
 			{
-				this.handleReportSource(data.Items);
+				var fieldtripData = data.Items.filter(function(item)
+				{
+					return item.BaseDataType === 10;
+				});
+				this.handleReportSource(fieldtripData);
 			}.bind(this));
 		promises.push(p1);
 
@@ -759,10 +763,10 @@
 				selectedTitle: 'Selected',
 				mustSelect: true,
 				gridOptions:
-				{
-					forceFitColumns: true,
-					enableColumnReorder: true
-				}
+					{
+						forceFitColumns: true,
+						enableColumnReorder: true
+					}
 			};
 
 		if (type != undefined && type != "")
@@ -897,9 +901,9 @@
 				FileName: report.reportName(),
 				FilterClause: filterClause,
 				IdFilter:
-				{
-					IncludeOnly: includeOnlyIds
-				},
+					{
+						IncludeOnly: includeOnlyIds
+					},
 				Preparer: report.preparer(),
 				Title: report.reportTitle(),
 				SubTitle: report.subTitle(),
