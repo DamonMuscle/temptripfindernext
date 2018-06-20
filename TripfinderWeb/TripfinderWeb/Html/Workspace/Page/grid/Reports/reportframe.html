@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Routefinder Web</title>
+	<style>
+		html,body{
+			height: 100%;
+			width: 100%;
+		}
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		iframe {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<iframe id="frame" src="" frameborder="0" onload="pdfReady()" ></iframe>
+	<script>
+	function getQueryString(name)
+	{
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"),
+			hash = window.location.search.split("?"),
+			search = hash.length > 1 ? hash[1] : "";
+		var r = search.match(reg);
+		return r != null ? r[2] : null;
+	}
+	
+	window.onload = function()
+	{
+	 	document.getElementById("frame").src = decodeURIComponent(getQueryString("file"));
+	}
+
+	function pdfReady()
+	{
+		window.frames[0].focus();
+		window.frames[0].print();
+	}
+	</script>
+</body>
+</html>

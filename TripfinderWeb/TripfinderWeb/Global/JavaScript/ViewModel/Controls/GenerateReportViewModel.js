@@ -289,66 +289,66 @@
 			validatorFields["filterName"] = {
 				trigger: "blur change",
 				validators:
+				{
+					notEmpty:
 					{
-						notEmpty:
-							{
-								message: "is required"
-							}
+						message: "is required"
 					}
+				}
 			};
 
 			validatorFields["specificRecords"] = {
 				trigger: "blur change",
 				validators:
+				{
+					notEmpty:
 					{
-						notEmpty:
-							{
-								message: " At least one record must be selected"
-							}
+						message: " At least one record must be selected"
 					}
+				}
 			};
 			if (this.isBusfinderReport() && tf.authManager.isAuthorizedFor('busfinder', 'read'))
 			{
 				validatorFields["timefrom"] = {
 					trigger: "blur change",
 					validators:
+					{
+						notEmpty:
 						{
-							notEmpty:
+							message: "is required"
+						},
+						callback:
+						{
+							message: "",
+							callback: function(value, validator)
+							{
+								if (value != "")
 								{
-									message: "is required"
-								},
-							callback:
-								{
-									message: "",
-									callback: function(value, validator)
+									var fromDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeFrom()));
+									var toDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeTo()));
+									self.clearDateTimeAlerts();
+									if (!toDate.isAfter(fromDate))
 									{
-										if (value != "")
-										{
-											var fromDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeFrom()));
-											var toDate = self.normalizTime(new moment(self.obEntityDataModel().reportParameterTimeTo()));
-											self.clearDateTimeAlerts();
-											if (!toDate.isAfter(fromDate))
-											{
-												return {
-													message: 'must be <= Time To',
-													valid: false
-												};
-											}
-										}
-										return true;
+										return {
+											message: 'must be <= Time To',
+											valid: false
+										};
 									}
 								}
+								return true;
+							}
 						}
+					}
 				};
 				validatorFields["timeto"] = {
 					trigger: "blur change",
 					validators:
+					{
+						notEmpty:
 						{
-							notEmpty:
-								{
-									message: "is required"
-								}
+							message: "is required"
 						}
+					}
 				};
 			}
 
@@ -763,10 +763,10 @@
 				selectedTitle: 'Selected',
 				mustSelect: true,
 				gridOptions:
-					{
-						forceFitColumns: true,
-						enableColumnReorder: true
-					}
+				{
+					forceFitColumns: true,
+					enableColumnReorder: true
+				}
 			};
 
 		if (type != undefined && type != "")
@@ -901,9 +901,9 @@
 				FileName: report.reportName(),
 				FilterClause: filterClause,
 				IdFilter:
-					{
-						IncludeOnly: includeOnlyIds
-					},
+				{
+					IncludeOnly: includeOnlyIds
+				},
 				Preparer: report.preparer(),
 				Title: report.reportTitle(),
 				SubTitle: report.subTitle(),
@@ -926,7 +926,7 @@
 					}
 					else if (outputTo == "print")
 					{
-						window.open("../html/workspace/grid/reports/reportframe.html?file=" + encodeURIComponent(pathCombine(location.origin, tf.api.apiPrefix().replace(/http:\/\//, "").split("/")[1], tf.authManager.clientKey, tf.datasourceManager.databaseId, "report", report.reportName(), key, "view", tf.storageManager.get("databaseType")), "report"));
+						window.open("workspace/page/grid/reports/reportframe.html?file=" + encodeURIComponent(pathCombine(location.origin, tf.api.apiPrefix().replace(/http:\/\//, "").split("/")[1], tf.authManager.clientKey, tf.datasourceManager.databaseId, "report", report.reportName(), key, "view", tf.storageManager.get("databaseType")), "report"));
 					}
 					else if (outputTo == "email")
 					{

@@ -54,7 +54,7 @@
 		var self = this, $content;
 
 		//grid page
-		if (data.isGridPage)
+		if (data && data.isGridPage)
 		{
 			if (newGrid)
 			{
@@ -186,7 +186,7 @@
 				},
 				drag: function(e, ui)
 				{
-					if (!ui.position || ui.position.left === null || ui.position.left === undefined) { return; }
+					if (!ui.position || ui.position.left === null || ui.position.left === undefined) {return;}
 
 					var totalWidth = self.$element.outerWidth(), currentLeft = ui.position.left;
 					if (currentLeft < self.minLeftWidth)
