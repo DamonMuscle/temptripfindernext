@@ -114,7 +114,7 @@
 					deleteDataBlockEvent: self.deleteDataBlockEvent,
 					groupDataBlockEvent: self.groupDataBlockEvent,
 					changeDataPointEvent: self.changeDataPointEvent,
-					blocks: $.grep(self.dataPointPanel.allColumns, function(item) { return item.title !== "Groups" }),
+					blocks: $.grep(self.dataPointPanel.allColumns, function(item) {return item.title !== "Groups"}),
 					target: e.currentTarget,
 					toggleResizableEvent: self.toggleResizableEvent,
 					defaultColors: self.defaultColors,
@@ -129,7 +129,7 @@
 				var contextmenu = new TF.ContextMenu.TemplateContextMenu(
 					"workspace/detailview/datablockscontextmenu",
 					dataBlocksMenu,
-					function() { }
+					function() {}
 				);
 				var $virsualTarget = $("<div></div>").css(
 					{
@@ -234,7 +234,7 @@
 					break;
 			}
 
-			self.setStackBlocks({ layout: self.serializeLayout() });
+			self.setStackBlocks({layout: self.serializeLayout()});
 		});
 
 		self.toggleResizableEvent.subscribe(function(e, isResizable)
@@ -286,8 +286,8 @@
 		$(document).on("click.sectionheader", ".section-header-stack-item button.btn", function(e)
 		{
 			var sectionHeader = $(e.currentTarget).parents(".grid-stack-item");
-			var options = { sectionHeader: { className: self.getDomUniqueClassName(sectionHeader), isCollapsed: $(e.currentTarget).find(".up").length == 0 } }
-			self.setStackBlocks({ layout: self.serializeLayout(options) });
+			var options = {sectionHeader: {className: self.getDomUniqueClassName(sectionHeader), isCollapsed: $(e.currentTarget).find(".up").length == 0}}
+			self.setStackBlocks({layout: self.serializeLayout(options)});
 		});
 
 		self.onCloseEditMode.subscribe(function(e, data)
@@ -466,7 +466,7 @@
 	DetailViewViewModel.prototype.updateNameContainer = function(viewModel, e)
 	{
 		var self = this, $tempDiv, nameInput, name;
-		if (!self.$element) { return; }
+		if (!self.$element) {return;}
 
 		nameInput = self.$element.find(".name");
 		name = nameInput.val();
@@ -530,8 +530,8 @@
 
 		if (window.navigator.userAgent.toLocaleLowerCase().indexOf("firefox") > -1)
 		{
-			self.$element.find(".dropdown-menu ul").css({ "padding-right": "22px" });
-			self.$element.find(".dropdown-menu ul li").css({ "width": "calc(100% + 22px)" });
+			self.$element.find(".dropdown-menu ul").css({"padding-right": "22px"});
+			self.$element.find(".dropdown-menu ul li").css({"width": "calc(100% + 22px)"});
 		}
 
 		self.validationInit();
@@ -613,7 +613,7 @@
 		{
 			var needExpandSectionNames = self.collapsedSectionHeaderList.reduce(function(result, current)
 			{
-				if (current.items.filter(function(item) { return item.x + 1 > width }).length > 0)
+				if (current.items.filter(function(item) {return item.x + 1 > width}).length > 0)
 				{
 					result.push(current.headerClassName);
 				}
@@ -645,7 +645,7 @@
 					return item;
 				})
 
-				self.setStackBlocks({ layout: JSON.stringify(targetLayout) });
+				self.setStackBlocks({layout: JSON.stringify(targetLayout)});
 			}
 		}
 
@@ -655,7 +655,7 @@
 			//Find the barriers, show red border. if there is no barriers, reset blocks.
 			$.each(items, function(index, item)
 			{
-				var $item = $(item), node = $item.data('_gridstack_node') || { x: $item.attr("x"), y: $item.attr("y"), width: $item.attr("width") }, appearance;
+				var $item = $(item), node = $item.data('_gridstack_node') || {x: $item.attr("x"), y: $item.attr("y"), width: $item.attr("width")}, appearance;
 				//Reset border color
 				appearance = $item.data("appearance");
 				if ($item.find(".grid-stack-item-content").length > 0)
@@ -722,7 +722,7 @@
 					}
 				}, 5000));
 			});
-			self.pageLevelViewModel.obValidationErrorsSpecifed([{ message: "Remove block" + (barriers.length === 1 ? "" : "s") + " from the right column before changing the number of columns." }]);
+			self.pageLevelViewModel.obValidationErrorsSpecifed([{message: "Remove block" + (barriers.length === 1 ? "" : "s") + " from the right column before changing the number of columns."}]);
 			self.pageLevelViewModel.obErrorMessageDivIsShow(true);
 		}
 		else
@@ -742,7 +742,7 @@
 					}
 				});
 			}
-			self.entityDataModel.layout(self.serializeLayout({ width: width }));
+			self.entityDataModel.layout(self.serializeLayout({width: width}));
 			self.setStackBlocks();
 			self.lineBlockHelper.addLineContainers();
 			self.onColumnChangedEvent.notify(width);
@@ -921,7 +921,7 @@
 								name: value,
 								dataType: self.gridType
 							}
-						}, { overlay: false }).then(function(response)
+						}, {overlay: false}).then(function(response)
 						{
 							var isUnique = response.Items[0];
 							return isUnique;
@@ -1060,7 +1060,7 @@
 		{
 			self.getRecordEntity(gridType, id).then(function(entity)
 			{
-				if (!entity) { return; }
+				if (!entity) {return;}
 
 				self.entity = entity;
 				self.obRecordPicture(entity.ImageBase64 ? ("url(data:image/jpeg;base64," + entity.ImageBase64 + ")") : "");
@@ -1242,12 +1242,12 @@
 		switch (self.gridType)
 		{
 			case "district":
-				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), { paramData: { keys: Id, gridType: self.gridType } }).then(callback);
+				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), {paramData: {keys: Id, gridType: self.gridType}}).then(callback);
 				break;
 			case "school":
 				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "school", Id)).then(function(response)
 				{
-					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), { paramData: { keys: response.Items[0].SchoolCode, gridType: self.gridType } }).then(callback);
+					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), {paramData: {keys: response.Items[0].SchoolCode, gridType: self.gridType}}).then(callback);
 				});
 				break;
 			case "trip":
@@ -1452,7 +1452,7 @@
 	DetailViewViewModel.prototype.setStackBlocks = function(options)
 	{
 		var self = this, layout;
-		if (!self.grid) { return; }
+		if (!self.grid) {return;}
 
 		layout = options && options.layout || self.entityDataModel.layout();
 
@@ -1517,7 +1517,7 @@
 		self.grid.container.on("dragstop.container", self.onDataBlockDragStop.bind(self));
 		self.grid.container.on("resizestart.container", self.onDataBlockResizeStart.bind(self));
 		self.grid.container.on("gsresizestop.container", self.onDataBlockResizeStop.bind(self));
-		self.grid.container.on("resize.container", function(e) { e.stopPropagation(); });
+		self.grid.container.on("resize.container", function(e) {e.stopPropagation();});
 
 		$stackItems.on("dragstart.grid-stack-item", function(e)
 		{
@@ -1787,7 +1787,7 @@
 				{
 					shorteningCandidates[item.y] = [];
 				}
-				shorteningCandidates[item.y].push({ item: item, heightChange: heightChange });
+				shorteningCandidates[item.y].push({item: item, heightChange: heightChange});
 			}
 		});
 
@@ -1883,7 +1883,7 @@
 				if ((heighteningBlock.y + heighteningBlock.height <= item.y + item.height && heighteningBlock.y >= item.y)
 					|| (heighteningBlock.y > item.y && heighteningBlock.y < item.y + item.height)
 					|| (heighteningBlock.y < item.y + item.height && heighteningBlock.y + heighteningBlock.height > item.y)
-					&& affectedItems.map(function(affectItem) { return affectItem.x }).indexOf(item.x) == -1)
+					&& affectedItems.map(function(affectItem) {return affectItem.x}).indexOf(item.x) == -1)
 				{
 					affectedItems.push(item);
 				}
@@ -1900,11 +1900,11 @@
 	 */
 	DetailViewViewModel.prototype.addOmittedBlocks = function(shorteningCandidatesPerRow, allCandidates)
 	{
-		var self = this, columns = shorteningCandidatesPerRow.map(function(block) { return block.item.x }), affectedItems = [];
+		var self = this, columns = shorteningCandidatesPerRow.map(function(block) {return block.item.x}), affectedItems = [];
 
 		if (shorteningCandidatesPerRow.length == self.getCurrentWidth()) return shorteningCandidatesPerRow;
 
-		allCandidates = allCandidates.reduce(function(result, current) { return result.concat(current); }, []);
+		allCandidates = allCandidates.reduce(function(result, current) {return result.concat(current);}, []);
 		allCandidates.forEach(function(block)
 		{
 			var matched = shorteningCandidatesPerRow.every(function(candidate)
@@ -1939,7 +1939,7 @@
 	 */
 	DetailViewViewModel.prototype.getDomUniqueClassName = function($stackItem)
 	{
-		return $stackItem.attr('class').split(' ').map(function(name) { return name.trim() }).filter(function(name) { return name.indexOf('grid-unique') > -1; })[0];;
+		return $stackItem.attr('class').split(' ').map(function(name) {return name.trim()}).filter(function(name) {return name.indexOf('grid-unique') > -1;})[0];;
 	}
 
 	/**
@@ -1961,7 +1961,7 @@
 	 */
 	DetailViewViewModel.prototype.isDataBlockHidden = function(className)
 	{
-		return this.collapsedSectionHeaderList.filter(function(item) { return item.uniqueClassName === className }).length > 0;
+		return this.collapsedSectionHeaderList.filter(function(item) {return item.uniqueClassName === className}).length > 0;
 	}
 
 	/**
@@ -1972,7 +1972,7 @@
 		var self = this;
 		if (!self.heighteningBlockIdentifierGroups || self.heighteningBlockIdentifierGroups.length == 0) return [];
 
-		return self.heighteningBlockIdentifierGroups.reduce(function(accumulator, current) { return accumulator.concat(current) }, []);
+		return self.heighteningBlockIdentifierGroups.reduce(function(accumulator, current) {return accumulator.concat(current)}, []);
 	}
 
 	/**
@@ -1995,12 +1995,12 @@
 	 */
 	DetailViewViewModel.prototype.getBlockOrginalHeight = function(block)
 	{
-		return this.gridStackItemOrignalHeight.filter(function(i) { return block.el.hasClass(i.className) })[0].height;
+		return this.gridStackItemOrignalHeight.filter(function(i) {return block.el.hasClass(i.className)})[0].height;
 	}
 
 	DetailViewViewModel.prototype.getBlockOrginalHeightByClassName = function(className)
 	{
-		return this.gridStackItemOrignalHeight.filter(function(i) { return className === i.className })[0].height;
+		return this.gridStackItemOrignalHeight.filter(function(i) {return className === i.className})[0].height;
 	}
 
 	/**
@@ -2119,7 +2119,7 @@
 			{
 				if (item.isCollapsed)
 				{
-					self.collapsedSectionHeaderList.push({ headerClassName: item.uniqueClassName, items: [] })
+					self.collapsedSectionHeaderList.push({headerClassName: item.uniqueClassName, items: []})
 				}
 				if (item.isHidden)
 				{
@@ -2130,7 +2130,7 @@
 
 					if (sectionHeader.length == 0)
 					{
-						self.collapsedSectionHeaderList.push({ headerClassName: item.ownedBy, items: [item] })
+						self.collapsedSectionHeaderList.push({headerClassName: item.ownedBy, items: [item]})
 					}
 					else
 					{
@@ -2196,7 +2196,7 @@
 							{
 								$dom.attr("src", item.image.fileData || item.image);
 								$dom.css("opacity", "1");
-								$container.data("filePostData", { fileData: item.image.fileData || item.image });
+								$container.data("filePostData", {fileData: item.image.fileData || item.image});
 							});
 						} else
 						{
@@ -2239,7 +2239,7 @@
 
 		container.find('.hori-line, .verti-line').addClass('disable-animation');
 		self.lineBlockHelper.fixCollisions();
-		setTimeout(function() { container.find('.hori-line,.verti-line').removeClass('disable-animation') }, 250);
+		setTimeout(function() {container.find('.hori-line,.verti-line').removeClass('disable-animation')}, 250);
 	};
 
 	/**
@@ -2308,7 +2308,7 @@
 	 */
 	DetailViewViewModel.prototype.updateStackBlockOrignalHeight = function(className, height)
 	{
-		this.gridStackItemOrignalHeight.push({ className: className, height: height });
+		this.gridStackItemOrignalHeight.push({className: className, height: height});
 	}
 
 	/**
@@ -2392,19 +2392,19 @@
 				})
 				.then(function(result)
 				{
-					var ids = result.Items[0], newColumns = $.map(columns, function(column) { return column.FieldName });
+					var ids = result.Items[0], newColumns = $.map(columns, function(column) {return column.FieldName});
 					if (newColumns.indexOf("Id") < 0)
 					{
 						newColumns.push("Id");
 					}
 					tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", type), {
-						paramData: { take: 100000, skip: 0 },
+						paramData: {take: 100000, skip: 0},
 						data: {
 							fields: newColumns,
 							filterClause: "",
 							filterSet: null,
-							idFilter: { IncludeOnly: ids, ExcludeAny: [] },
-							sortItems: [{ Name: "Id", isAscending: "asc", Direction: "Ascending" }]
+							idFilter: {IncludeOnly: ids, ExcludeAny: []},
+							sortItems: [{Name: "Id", isAscending: "asc", Direction: "Ascending"}]
 						}
 					}).then(function(result)
 					{
@@ -2597,7 +2597,7 @@
 		kendoGrid = $grid.data("kendoGrid");
 		if (kendoGrid)
 		{
-			kendoGrid.setOptions({ "columns": self.getKendoColumnsExtend(editColumnViewModel.selectedColumns) });
+			kendoGrid.setOptions({"columns": self.getKendoColumnsExtend(editColumnViewModel.selectedColumns)});
 			self.updateGridFooter($grid, 0, 0);
 		}
 	}
@@ -2753,7 +2753,7 @@
 		self.$element.find(".grid-stack .section-header-stack-item input.item-title").off("blur.section-header").on("blur.section-header", function(e)
 		{
 			self.updateSectionHeaderTextInputWidth();
-			$(e.currentTarget).parents(".section-header-stack-item").data({ title: $(e.currentTarget).val() })
+			$(e.currentTarget).parents(".section-header-stack-item").data({title: $(e.currentTarget).val()})
 		});
 	};
 
@@ -3013,8 +3013,8 @@
 
 			reader.onload = function(event)
 			{
-				$(this).data("filePostData", { fileName: file.name, fileData: event.target.result });
-				$container.data("filePostData", { fileName: file.name, fileData: event.target.result });
+				$(this).data("filePostData", {fileName: file.name, fileData: event.target.result});
+				$container.data("filePostData", {fileName: file.name, fileData: event.target.result});
 			}.bind(e.target);
 			reader.readAsDataURL(file);
 			// if (/^image\/\w+$/.test(file.type) == false)
@@ -3087,7 +3087,7 @@
 				var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "trip", "tripbystudentIds"),
 					{
 						data: [self.entity.Id]
-					}).catch(function() { return null });
+					}).catch(function() {return null});
 				pList.push(p1);
 				var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "studentexception", self.entity.Id, "studentExceptions"));
 				pList.push(p2);
@@ -3401,7 +3401,7 @@
 			};
 
 
-			returnData.push({ "action": exception.ActionFlag, "sort": weekSort, "value": exceptionObj });
+			returnData.push({"action": exception.ActionFlag, "sort": weekSort, "value": exceptionObj});
 		}
 		return returnData;
 	};
@@ -3725,8 +3725,8 @@
 
 		if (previous.items.length !== current.items.length) return false;
 
-		previous.items.sort(function(a, b) { return a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
-		current.items.sort(function(a, b) { return a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
+		previous.items.sort(function(a, b) {return a.x - b.x != 0 ? a.x - b.x : a.y - b.y});
+		current.items.sort(function(a, b) {return a.x - b.x != 0 ? a.x - b.x : a.y - b.y});
 
 		for (var i = 0; i < previous.items.length; i++)
 		{
@@ -3908,10 +3908,17 @@
 					{
 						tf.storageManager.delete(self.stickyName);
 					}
-					self.dataPointPanel.closeClick();
-					self.applyLayoutTemplate(true, result.data.selectId).then(function()
-					{
-						self.showDetailViewById(self.entitySelectId);
+					var data = result.data;
+					self.onCloseEditMode.notify({
+						switchToLayoutId: data.id,
+						callback: function()
+						{
+							self.dataPointPanel.closeClick();
+							self.applyLayoutTemplate(true, result.data.selectId).then(function()
+							{
+								self.showDetailViewById(self.entitySelectId);
+							});
+						}
 					});
 				}
 			}
@@ -4072,7 +4079,7 @@
 	{
 		var self = this,
 			result = [],
-			sectionHeaderLayout = layoutObj.items.filter(function(item) { return item.uniqueClassName === sectionHeaderInfo.className })[0],
+			sectionHeaderLayout = layoutObj.items.filter(function(item) {return item.uniqueClassName === sectionHeaderInfo.className})[0],
 			matchedSectionHeaders = self.collapsedSectionHeaderList.filter(function(item)
 			{
 				return item.headerClassName === sectionHeaderInfo.className
@@ -4179,7 +4186,7 @@
 					return item;
 				})
 
-				self.collapsedSectionHeaderList.push({ headerClassName: sectionHeaderInfo.className, items: sectionHeaderOwnedItems })
+				self.collapsedSectionHeaderList.push({headerClassName: sectionHeaderInfo.className, items: sectionHeaderOwnedItems})
 			}
 			else
 			{
@@ -4222,7 +4229,7 @@
 				items: []
 			};
 
-		if (!self.grid || (items.length <= 0 && nonDataItems.length <= 0 && $lines.length <= 0)) { return JSON.stringify(serializedData); }
+		if (!self.grid || (items.length <= 0 && nonDataItems.length <= 0 && $lines.length <= 0)) {return JSON.stringify(serializedData);}
 
 		$.map(items, function(el)
 		{
@@ -4389,20 +4396,20 @@
 			serializedData.items = serializedData.items.concat(self.lineBlockHelper.serializeLines($lines));
 		}
 
-		var collapsedHeaders = serializedData.items.filter(function(item) { return item.isCollapsed });
+		var collapsedHeaders = serializedData.items.filter(function(item) {return item.isCollapsed});
 		if (options && options.sectionHeader && options.sectionHeader.className)
 		{
 			// click section header arrow icon
 			serializedData.items = self.handleRelatedBlocksWhenToggleSectionHeader(options.sectionHeader, serializedData);
-			collapsedHeaders = collapsedHeaders.filter(function(item) { return item.uniqueClassName !== options.sectionHeader.className });
+			collapsedHeaders = collapsedHeaders.filter(function(item) {return item.uniqueClassName !== options.sectionHeader.className});
 		}
 
 		collapsedHeaders.forEach(function(header)
 		{
-			serializedData.items = self.mergeHiddenBlockLayoutInfo({ className: header.uniqueClassName, isCollapsed: true }, serializedData, false);
+			serializedData.items = self.mergeHiddenBlockLayoutInfo({className: header.uniqueClassName, isCollapsed: true}, serializedData, false);
 		})
 
-		serializedData.items.sort(function(a, b) { return a.y - b.y });
+		serializedData.items.sort(function(a, b) {return a.y - b.y});
 
 		return JSON.stringify(serializedData);
 	}
@@ -4452,7 +4459,7 @@
 		else
 		{
 			// select nothing.
-			self.obSubTitle({ field: "(none)", title: "(none)" });
+			self.obSubTitle({field: "(none)", title: "(none)"});
 			self.obSubTitleDisplay("");
 		}
 		menu.hide();
@@ -4576,8 +4583,8 @@
 		self.obShowSlider(true);
 		if ($('.detial-view-overlay').length === 0)
 		{
-			var $overlay = $("<div></div>", { class: "detial-view-overlay" });
-			$overlay.append($("<div></div>", { class: "detial-view-background" }));
+			var $overlay = $("<div></div>", {class: "detial-view-overlay"});
+			$overlay.append($("<div></div>", {class: "detial-view-background"}));
 			$('body').append($overlay);
 		}
 	}
@@ -4839,7 +4846,7 @@
 			var link = links[i];
 			if (link.href.match(/\.css$/i) && link.rel.match(/stylesheet/i))
 			{
-				var xhr = $.ajax(link.href, { async: false });
+				var xhr = $.ajax(link.href, {async: false});
 				var cssText = xhr.responseText;
 
 				// Print document changed the path of css, need to update relative link with absolute link.
@@ -4908,7 +4915,7 @@
 		var addLogo = function()
 		{
 			var doc = printDoc._getDocument();
-			var xhr = $.ajax('Global/img/loginlogo.svg', { async: false });
+			var xhr = $.ajax('Global/img/loginlogo.svg', {async: false});
 			$(doc).find('.detail-header').append($('<div class="item-icon-container">' + xhr.responseText + '</div>'));
 		};
 
