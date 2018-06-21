@@ -183,7 +183,6 @@
 			}
 		});
 		this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
-
 	};
 
 	TestEmailViewModel.prototype.focusField = function(viewModel, e)

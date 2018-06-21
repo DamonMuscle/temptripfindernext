@@ -1,4 +1,4 @@
-<div class="document-dataentry setting-configuration" data-bind="uiInit:init,css:obIsHost()?'host':''">
+<div class="document-dataentry setting-configuration" data-bind="uiInit:init">
 	<!-- ko if:TF.isPhoneDevice-->
 	<div class="mobile-header">
 		<div class="icon logo"></div>
@@ -9,27 +9,9 @@
 	<div class="page-title">
 		SETTINGS
 	</div>
-	<div class="clearfix" data-bind="visible:obIsHost()">
-		<div class="col-lg-18 col-xs-24">
-			<div class="pull-right">
-				<div class="input-group" style="width: 200px;">
-					<div data-bind="typeahead:{source:obClientsOptions,drowDownShow:true,notSort:true}">
-						<!-- ko customInput:{type:"Select",value:obSelectedClientId,attributes:{class:"form-control"},enabled:false} -->
-						<!-- /ko -->
-					</div>
-					<div class="input-group-btn">
-						<button type="button" class="btn btn-default btn-sharp">
-							<span class="caret"></span>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 	<!-- /ko -->
 	<div class="edit-content">
-		<!-- ko if: !tf.permissions.isHost-->
 		<div class="row">
 			<div class="col-lg-6 col-xs-24">
 				<h4>
@@ -80,12 +62,11 @@
 				</div>
 			</div>
 		</div>
-		<!-- /ko -->
 	</div>
 	<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
 	<div class="edit-bottombar">
 		<button type="submit" class="btn tf-btn-black" data-bind="click:saveClick">Save</button>
-		<button type="button" class="btn btn-link btn-black" data-bind="click:cancelClick,visible:!obIsHost()">
+		<button type="button" class="btn btn-link btn-black" data-bind="click:cancelClick">
 			Close
 		</button>
 	</div>

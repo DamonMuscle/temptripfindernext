@@ -9,7 +9,6 @@
 			return tf.pageManager.handlePermissionDenied("Settings");
 		}
 
-		this.obIsHost = ko.observable();
 		this.obSuccessMessageDivIsShow = ko.observable(false);
 		this.obErrorMessage = ko.observable('');
 		this.obErrorMessageDivIsShow = ko.observable(false);
@@ -17,9 +16,7 @@
 		this.testSentEmailClick = this.testSentEmailClick.bind(this);
 		this.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
 		this.obIsUpdate = ko.observable(true);
-		this.obClientsOptions = ko.observableArray([]);
 		this.obSelectedClientId = ko.observable();
-		this.selectedClientIdSubscribe = null;
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 
 	}
@@ -29,19 +26,12 @@
 
 	SettingsConfigurationPage.prototype.authValidation = function()
 	{
-		this.obIsHost(tf.authManager.clientKey === "support");
-		if (this.obIsHost())
+		if (!tf.permissions.obIsAdmin())
 		{
-			this.obEntityDataModel().apiIsDirty(false);
-		} else
-		{
-			if (!tf.permissions.obIsAdmin())
+			return tf.pageManager.handlePermissionDenied("Settings").then(function()
 			{
-				return tf.pageManager.handlePermissionDenied("Settings").then(function()
-				{
-					return Promise.resolve(false);
-				});
-			}
+				return Promise.resolve(false);
+			});
 		}
 		return Promise.resolve(true);
 	};
@@ -52,24 +42,6 @@
 		{
 			this.loadClientConfig();
 		}.bind(this));
-		$(window).on("resize.settingConfiguration", this.resize);
-	};
-
-	/**
-	 * When the window was resized
-	 * @return {void}
-	 */
-	SettingsConfigurationPage.prototype.resize = function()
-	{
-		setTimeout(function()
-		{
-			var silder = $("input[data-slider-id='cluster-zoom-level-slider']").data("slider");
-			if (silder)
-			{
-				silder._state.size = silder.sliderElem.offsetWidth;
-				silder.relayout();
-			}
-		});
 	};
 
 	SettingsConfigurationPage.prototype.getClients = function()
@@ -77,27 +49,13 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "getClientIds"))
 			.then(function(result)
 			{
-				this.obClientsOptions(["New"].concat(result.Items));
-				if (this.obIsHost())
+				result.Items.forEach(function(item)
 				{
-					if (this.selectedClientIdSubscribe)
+					if (item.toLowerCase() === tf.authManager.clientKey.toLowerCase())
 					{
-						this.selectedClientIdSubscribe.dispose();
+						this.obSelectedClientId(item);
 					}
-					this.selectedClientIdSubscribe = this.obSelectedClientId.subscribe(this.changeClientId, this);
-					this.obSelectedClientId("New");
-				}
-				else
-				{
-					result.Items.forEach(function(item)
-					{
-						if (item.toLowerCase() === tf.authManager.clientKey.toLowerCase())
-						{
-							this.obSelectedClientId(item);
-						}
-					}, this);
-
-				}
+				}, this);
 			}.bind(this));
 	};
 
@@ -116,18 +74,6 @@
 					$("input[name=clientId]").focus();
 				}
 			}.bind(this));
-	};
-
-	SettingsConfigurationPage.prototype.changeClientId = function()
-	{
-		this.pageLevelViewModel.obErrorMessageDivIsShow(false);
-		this.pageLevelViewModel.obSuccessMessageDivIsShow(false);
-		this.loadClientConfig();
-	};
-
-	SettingsConfigurationPage.prototype.focusField = function(viewModel, e)
-	{
-		$(viewModel.field).focus();
 	};
 
 	SettingsConfigurationPage.prototype.init = function(viewModel, el)
@@ -149,7 +95,22 @@
 	{
 		setTimeout(function()
 		{
-			var validatorFields = {}, isValidating = false, self = this;
+			var validatorFields = {}, isValidating = false, self = this, updateErrors = function($field, errorInfo)
+			{
+				var errors = [];
+				$.each(self.pageLevelViewModel.obValidationErrors(), function(index, item)
+				{
+					if ($field[0] === item.field[0])
+					{
+						if (item.rightMessage.indexOf(errorInfo) >= 0)
+						{
+							return true;
+						}
+					}
+					errors.push(item);
+				});
+				self.pageLevelViewModel.obValidationErrors(errors);
+			};
 			var validator;
 			this._$form.find("input[required]:visible").each(function(n, field)
 			{
@@ -165,6 +126,31 @@
 					validators: validator
 				};
 			}.bind(this));
+			validatorFields.emailAddress = {
+				trigger: "blur change",
+				validators: {
+					callback:
+					{
+						message: "invalid email",
+						callback: function(value, validator, $field)
+						{
+							if (!value)
+							{
+								updateErrors($field, "email");
+								return true;
+							}
+							var emailRegExp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+							var isValid = emailRegExp.test(value);
+							if (!isValid)
+							{
+								return false;
+							}
+							return true;
+						}
+					}
+				}
+			};
+
 			if (this._$form.data("bootstrapValidator"))
 			{
 				this._$form.data("bootstrapValidator").destroy();
@@ -176,7 +162,7 @@
 				fields: validatorFields
 			}).on('success.field.bv', function(e, data)
 			{
-				var $parent = data.element.closest('.form-group'), eleName = data.element[0].name;
+				var $parent = data.element.closest('.form-group');
 				$parent.removeClass('has-success');
 				if (!isValidating)
 				{
@@ -278,12 +264,10 @@
 		{
 			tf.pageManager.openNewPage("fieldtrips");
 		}
-
 	};
 
 	SettingsConfigurationPage.prototype.dispose = function()
 	{
-		$(window).off("resize.settingConfiguration");
 		this.pageLevelViewModel.dispose();
 	};
 })();
