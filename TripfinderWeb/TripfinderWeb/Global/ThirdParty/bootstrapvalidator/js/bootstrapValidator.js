@@ -573,10 +573,11 @@
 		{
 			// Call default handler
 			// Check if whether the submit button is clicked
-			if (this.$submitButton)
-			{
-				isValid ? this._onSuccess(e) : this._onError(e);
-			}
+			// Comment out due to cause of issue
+			// if (this.$submitButton)
+			// {
+			// 	isValid ? this._onSuccess(e) : this._onError(e);
+			// }
 		},
 
         /**
