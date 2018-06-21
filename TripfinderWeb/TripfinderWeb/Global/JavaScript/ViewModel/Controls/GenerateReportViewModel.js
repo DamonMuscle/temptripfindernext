@@ -832,7 +832,11 @@
 					var outputTo = report.outputTo().toLowerCase();
 					if (outputTo == "view")
 					{
-						window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType")));
+						var w = window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"));
+						$(w).on("load", function()
+						{
+							$(w.document).find('html').append('<head><title>Tripfinder</title></head>');
+						});
 					}
 					else if (outputTo == "email")
 					{
