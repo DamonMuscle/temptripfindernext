@@ -11,7 +11,6 @@
 	namespace.SettingsConfigurationDataModal.prototype.constructor = namespace.SettingsConfigurationDataModal;
 
 	namespace.SettingsConfigurationDataModal.prototype.mapping = [
-		{ from: "TimeZone", default: "" },
 		{ from: "ClientId", default: "" },
 		{ from: "Smtphost", default: "" },
 		{ from: "Smtpport", default: 0 },
@@ -31,7 +30,6 @@
 		{ from: "DatabaseName", default: "" },
 		{ from: "DatabaseLoginId", default: "" },
 		{ from: "DatabasePassword", default: "" },
-		{ from: "IsRespectDaylight", default: true }
 	];
 
 })();

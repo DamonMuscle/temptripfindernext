@@ -14,16 +14,9 @@
 		this.obErrorMessage = ko.observable('');
 		this.obErrorMessageDivIsShow = ko.observable(false);
 		this.obValidationErrors = ko.observableArray([]);
-		this.obTimeZoneList = ko.observableArray([]);
 		this.testSentEmailClick = this.testSentEmailClick.bind(this);
 		this.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
-		this.originalDatabaseServer = "";
-		this.originalDatabaseName = "";
 		this.obIsUpdate = ko.observable(true);
-		this.obDataSourceIsChange = ko.computed(function()
-		{
-			return this.originalDatabaseServer !== this.obEntityDataModel().databaseServer() || this.originalDatabaseName !== this.obEntityDataModel().databaseName();
-		}, this);
 		this.obClientsOptions = ko.observableArray([]);
 		this.obSelectedClientId = ko.observable();
 		this.selectedClientIdSubscribe = null;
@@ -114,18 +107,13 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), { data: { clientId: clientId } })
 			.then(function(data)
 			{
-				this.originalDatabaseServer = data.Items[0].DatabaseServer;
-				this.originalDatabaseName = data.Items[0].DatabaseName;
-
 				this.obEntityDataModel(new TF.DataModel.SettingsConfigurationDataModal(data.Items[0]));
 				this.obIsUpdate(clientId !== "");
 				this.obEntityDataModel().apiIsDirty(false);
 				this.setValidation();
-				if (this.setDefaultDatabaseNameSubscribe) { this.setDefaultDatabaseNameSubscribe.dispose(); }
 				if (!this.obIsUpdate())
 				{
 					$("input[name=clientId]").focus();
-					this.setDefaultDatabaseNameSubscribe = this.obEntityDataModel().clientId.subscribe(this.setDefaultDatabaseName, this);
 				}
 			}.bind(this));
 	};
@@ -225,17 +213,7 @@
 				}
 				else
 				{
-					if (this.obDataSourceIsChange() && this.obIsUpdate())
-					{
-						tf.promiseBootbox.alert('You have updated the Database Server credentials.  Please note, that this will not physically move the database.')
-							.then(function()
-							{
-								return this.postData();
-							}.bind(this));
-					} else
-					{
-						return this.postData();
-					}
+					this.postData();
 				}
 			}.bind(this));
 	};
@@ -265,11 +243,6 @@
 			this.obErrorMessage(data.ExceptionMessage);
 			return false;
 		}.bind(this));
-	};
-
-	SettingsConfigurationPage.prototype.setDefaultDatabaseName = function(value)
-	{
-		this.obEntityDataModel().databaseName(value);
 	};
 
 	SettingsConfigurationPage.prototype.cancelClick = function()
@@ -302,77 +275,6 @@
 		}
 
 	};
-
-	SettingsConfigurationPage.prototype.tryGoAway = function(pageName)
-	{
-		if (this.obEntityDataModel().apiIsDirty() && tf.permissions.obIsAdmin())
-		{
-			return tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to opening up " + pageName + "?", "Unsaved Changes")
-				.then(function(result)
-				{
-					if (result)
-					{
-						return Promise.resolve()
-							.then(function(result)
-							{
-								return this.saveClick();
-							}.bind(this));
-					}
-					else
-					{
-						return Promise.resolve(result === false);
-					}
-				}.bind(this));
-		} else
-		{
-			return Promise.resolve(true);
-		}
-	};
-
-	SettingsConfigurationPage.prototype.upgradeDatabases = function()
-	{
-		location.href = "#/upgrade-databases";
-	};
-
-	SettingsConfigurationPage.prototype.numericValidation = function(data, event)
-	{
-		//[0-9] only
-		var code = event.charCode ? event.charCode : event.keyCode;
-		return (code >= 48 && code <= 57);
-	};
-
-	SettingsConfigurationPage.prototype.decimalsValidation = function(data, event)
-	{
-		var code = event.charCode ? event.charCode : event.keyCode;
-
-		if (code >= 48 && code <= 57)
-		{//[0-9]
-			return true;
-		} else if (code == 46)
-		{//[.] only once
-			if (event.target.value != "")
-			{
-				if (event.target.value.indexOf(".") == -1)
-				{
-					return true;
-				}
-			}
-		} else if (code == 8)
-		{
-			return true;
-		}
-		return false;
-	};
-	SettingsConfigurationPage.prototype.clusterNumberValidation = function(value)
-	{
-		var self = this;
-		if (value === "0")
-		{
-			this.pageLevelViewModel.obValidationErrorsSpecifed([{ message: 'The input number should greater than 0' }]);
-			this.pageLevelViewModel.obErrorMessageDivIsShow(true);
-			return false;
-		}
-	}
 
 	SettingsConfigurationPage.prototype.dispose = function()
 	{
