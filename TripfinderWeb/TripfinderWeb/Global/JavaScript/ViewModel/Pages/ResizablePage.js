@@ -80,7 +80,7 @@
 			self.obOtherData(data);
 			$content = $("<div class='main-body' data-bind='template:{ name: obOtherTemplate, data: obOtherData }'></div>");
 			self.$otherPage.append($content);
-			if (!ko.dataFor($content[0]))
+			if (!firstLoad)
 			{
 				ko.applyBindings(ko.observable(self), $content[0]);
 			}
