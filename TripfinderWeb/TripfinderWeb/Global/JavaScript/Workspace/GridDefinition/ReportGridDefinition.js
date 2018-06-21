@@ -11,12 +11,6 @@
 		return {
 			Columns: [
 				{
-					FieldName: "TypeName",
-					DisplayName: "Type",
-					Width: '150px',
-					type: "string"
-				},
-				{
 					FieldName: "Name",
 					DisplayName: "Name",
 					Width: '200px',
