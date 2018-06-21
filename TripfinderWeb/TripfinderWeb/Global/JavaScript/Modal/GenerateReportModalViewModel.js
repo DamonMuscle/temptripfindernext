@@ -41,11 +41,8 @@
 		}.bind(this));
 	};
 
-
 	GenerateReportModalViewModel.prototype.dispose = function()
 	{
 		this.addReportViewModel.dispose();
 	};
-
-
 })();

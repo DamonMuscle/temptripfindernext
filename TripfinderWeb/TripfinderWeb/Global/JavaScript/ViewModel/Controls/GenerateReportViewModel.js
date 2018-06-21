@@ -55,10 +55,6 @@
 			{
 				id: 2,
 				name: "Email"
-			},
-			{
-				id: 3,
-				name: "Print"
 			}]);
 		this.obOutputTo = ko.observable();
 		switch (output)
@@ -71,9 +67,6 @@
 				break;
 			case 'email':
 				this.obOutputTo(this.obOutputTos()[2]);
-				break;
-			case 'print':
-				this.obOutputTo(this.obOutputTos()[3]);
 				break;
 		}
 		this.obOutputToText = ko.computed(function()
@@ -611,9 +604,6 @@
 				case 2:
 					output = "email";
 					break;
-				case 3:
-					output = "print";
-					break;
 			}
 		}
 
@@ -843,10 +833,6 @@
 					if (outputTo == "view")
 					{
 						window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType")));
-					}
-					else if (outputTo == "print")
-					{
-						window.open("workspace/page/grid/reports/reportframe.html?file=" + encodeURIComponent(pathCombine(location.origin, tf.api.apiPrefix().replace(/http:\/\//, "").split("/")[1], tf.authManager.clientKey, tf.datasourceManager.databaseId, "report", report.reportName(), key, "view", tf.storageManager.get("databaseType")), "report"));
 					}
 					else if (outputTo == "email")
 					{
