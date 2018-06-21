@@ -403,6 +403,15 @@ function colorRgb(sColor, transparency)
 	return "RGBA(" + sColorChange[0] + "," + sColorChange[1] + "," + sColorChange[2] + "," + transparency + ")";
 }
 
+function booleanToCheckboxFormatter(value)
+{
+	var checked = "";
+	if (value && value !== "false")
+	{
+		checked = "checked";
+	}
+	return checked;
+}
 (function()
 {
 	//disable default right click menu

@@ -642,8 +642,8 @@
 	 */
 	NavigationMenu.prototype.setActiveStateByPageType = function(pagetype)
 	{
-		var $categoryItem = $(".navigation-item[pagetype='" + pagetype + "']");
-		var $bottomItem = $(".toolbar-button[pagetype='" + pagetype + "']");
+		var $categoryItem = $(".navigation-item[pagetype='" + pagetype + "']"),
+			$bottomItem = $(".toolbar-button[pagetype='" + pagetype + "']");
 		$(".navigation-item").removeClass("active");
 		$(".toolbar-button").removeClass("active");
 		$categoryItem.addClass("active");

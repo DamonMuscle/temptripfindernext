@@ -51,7 +51,7 @@
 					DisplayName: "Favorite",
 					Width: '180px',
 					type: "boolean",
-					template: "<input type='checkbox' disabled #: tf.georegionGridDefinition.gridDefinition().booleanToCheckboxFormatter(Favorite)# onclick='return false' />"
+					template: "<input type='checkbox' disabled #: booleanToCheckboxFormatter(Favorite)# onclick='return false' />"
 				}
 			]
 		}

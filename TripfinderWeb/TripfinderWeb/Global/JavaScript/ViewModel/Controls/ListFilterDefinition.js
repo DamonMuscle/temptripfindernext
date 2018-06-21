@@ -170,30 +170,6 @@
 			}
 		}, true);
 
-	// ListFilterDefinition.ListFilterTemplate.Cities = $.extend(
-	// {}, ListFilterTemplateDefaultOption,
-	// {
-	// 	DisplayFilterTypeName: "Cities",
-	// 	GridType: "city",
-	// 	filterField: "Item",
-	// 	getUrl: function()
-	// 	{
-	// 		return pathCombine(tf.api.apiPrefix(), "search", "city");
-	// 	}
-	// }, true);
-
-	// ListFilterDefinition.ListFilterTemplate.ZipCodes = $.extend(
-	// {}, ListFilterTemplateDefaultOption,
-	// {
-	// 	DisplayFilterTypeName: tf.applicationTerm.getApplicationTermSingularByName("Zip")+" Codes",
-	// 	GridType: "zipcode",
-	// 	filterField: "Item",
-	// 	getUrl: function()
-	// 	{
-	// 		return pathCombine(tf.api.apiPrefix(), "search", "zipcode");
-	// 	}
-	// }, true);
-
 	ListFilterDefinition.ListFilterTemplate.TripStop = $.extend(
 		{}, ListFilterTemplateDefaultOption,
 		{
@@ -396,24 +372,6 @@
 				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripaccount");
 			}
 		}, true);
-
-	// ListFilterDefinition.ListFilterTemplate.FieldTripAccountBillingCode.School = $.extend(
-	// {}, ListFilterDefinition.ListFilterTemplate.FieldTripAccountBillingCode,
-	// {
-	// 	filterField: "School",
-	// }, true);
-
-	// ListFilterDefinition.ListFilterTemplate.FieldTripAccountBillingCode.Department = $.extend(
-	// {}, ListFilterDefinition.ListFilterTemplate.FieldTripAccountBillingCode,
-	// {
-	// 	filterField: "Department",
-	// }, true);
-
-	// ListFilterDefinition.ListFilterTemplate.FieldTripAccountBillingCode.FieldTripActivity = $.extend(
-	// {}, ListFilterDefinition.ListFilterTemplate.FieldTripAccountBillingCode,
-	// {
-	// 	filterField: "FieldTripActivity",
-	// }, true);
 
 	ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification = $.extend(
 		{}, ListFilterTemplateDataManagementOption,
@@ -667,12 +625,6 @@
 			}
 		}, true);
 
-	// ListFilterDefinition.ListFilterTemplate.GeneralDataListsGeoRegionType.Boundary = $.extend(
-	// {}, ListFilterDefinition.ListFilterTemplate.GeneralDataListsGeoRegionType,
-	// {
-	// 	filterField: "Boundary"
-	// }, true);
-
 	var ListFilterTemplateMapDataOption = $.extend(
 		{}, ListFilterTemplateDefaultOption,
 		{
@@ -797,9 +749,6 @@
 			{}, TF.ListFilterDefinition.ListFilterTemplate.GeoZipCode(gridType, fieldName),
 			{
 				DisplayFilterTypeName: "Mailing Zip Codes",
-				//GridType: "GeneralDataListsMailingZipCode",
-				// filterField: "ZipCode",
-				// getUrl: function() { return pathCombine(tf.api.apiPrefix(), "search", "GeneralDataListsMailingZipCode"); }
 			}, true);
 	};
 
@@ -1384,23 +1333,6 @@
 			Width: '200px',
 			type: "string"
 		}];
-
-	// ListFilterDefinition.ColumnSource.GeneralDataListsMailingCity = [
-	// 	{
-	// 		FieldName: "Name",
-	// 		type: "string",
-	// 		isSortItem: true
-	// 	}
-	// ];
-
-	// ListFilterDefinition.ColumnSource.GeneralDataListsMailingZipCode = [
-	// 	{
-	// 		FieldName: "Zip",
-	// 		DisplayName: "Zip Code",
-	// 		type: "string",
-	// 		isSortItem: true
-	// 	}
-	// ];
 
 	ListFilterDefinition.ColumnSource.GeneralDataListsTripAlias = [
 		{
