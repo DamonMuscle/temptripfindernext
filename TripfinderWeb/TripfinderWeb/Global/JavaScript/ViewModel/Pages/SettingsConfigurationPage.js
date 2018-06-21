@@ -285,12 +285,12 @@
 						{
 							if (result)
 							{
-								tf.pageManager.redirectToDefaultPage(true);
+								tf.pageManager.openNewPage("fieldtrips");
 							}
 						});
 					} else if (result == false)
 					{
-						tf.pageManager.redirectToDefaultPage(true);
+						tf.pageManager.openNewPage("fieldtrips");
 					} else
 					{
 						return;
@@ -298,7 +298,7 @@
 				}.bind(this));
 		} else
 		{
-			tf.pageManager.redirectToDefaultPage(true);
+			tf.pageManager.openNewPage("fieldtrips");
 		}
 
 	};
