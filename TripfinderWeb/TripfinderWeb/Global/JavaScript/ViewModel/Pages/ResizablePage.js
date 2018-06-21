@@ -80,7 +80,10 @@
 			self.obOtherData(data);
 			$content = $("<div class='main-body' data-bind='template:{ name: obOtherTemplate, data: obOtherData }'></div>");
 			self.$otherPage.append($content);
-			ko.applyBindings(ko.observable(self), $content[0]);
+			if (!ko.dataFor($content[0]))
+			{
+				ko.applyBindings(ko.observable(self), $content[0]);
+			}
 			self.obShowGrid(false);
 		}
 
@@ -186,7 +189,7 @@
 				},
 				drag: function(e, ui)
 				{
-					if (!ui.position || ui.position.left === null || ui.position.left === undefined) {return;}
+					if (!ui.position || ui.position.left === null || ui.position.left === undefined) { return; }
 
 					var totalWidth = self.$element.outerWidth(), currentLeft = ui.position.left;
 					if (currentLeft < self.minLeftWidth)

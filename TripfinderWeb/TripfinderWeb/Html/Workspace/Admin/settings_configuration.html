@@ -40,14 +40,14 @@
 				<div class="form-group">
 					<label>User Name</label>
 					<input type="text" name="smtpuserName" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtpuserName"
-					 data-tf-input-type="Email" maxlength="256" />
+						   data-tf-input-type="Email" maxlength="256" />
 				</div>
 				<div class="form-group">
 					<label>Password</label>
 					<!--this password is used to disable chrome auto complete-->
 					<input type="password" name="smtppasswordhidden" class="hidden" autocomplete="off">
 					<input type="password" name="smtppassword" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtppassword"
-					 maxlength="256" />
+						   maxlength="256" />
 				</div>
 				<div class="checkbox margin-top-20">
 					<label>
@@ -57,6 +57,9 @@
 				<div class="form-group">
 					<button type="button" class="btn btn-gray btn-xs btn-sharp" data-bind="click:testSentEmailClick">Send Test Email</button>
 				</div>
+				<div class="form-group">
+					<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
+				</div>
 			</div>
 			<div class="col-lg-6 col-xs-24">
 				<h4>
@@ -65,12 +68,11 @@
 				<div class="form-group">
 					<label>Address</label>
 					<input type="text" name="emailAddress" class="form-control" data-bind="value:obEntityDataModel().emailAddress" data-tf-input-type="Email"
-					 maxlength="256" />
+						   maxlength="256" />
 				</div>
 				<div class="form-group">
 					<label>Name</label>
-					<input type="text" name="emailName" class="form-control" data-bind="value:obEntityDataModel().emailName" maxlength="100"
-					/>
+					<input type="text" name="emailName" class="form-control" data-bind="value:obEntityDataModel().emailName" maxlength="100" />
 				</div>
 			</div>
 		</div>

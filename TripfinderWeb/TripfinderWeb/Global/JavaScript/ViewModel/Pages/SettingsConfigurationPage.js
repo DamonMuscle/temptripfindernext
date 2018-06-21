@@ -202,6 +202,11 @@
 			}.bind(this));
 	};
 
+	SettingsConfigurationPage.prototype.legalLinkClick = function()
+	{
+		window.open("Workspace/LegalPage.html");
+	};
+
 	SettingsConfigurationPage.prototype.saveClick = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
