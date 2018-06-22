@@ -112,20 +112,7 @@
 				self.pageLevelViewModel.obValidationErrors(errors);
 			};
 			var validator;
-			this._$form.find("input[required]:visible").each(function(n, field)
-			{
-				var name = $(field).attr("name");
-				validator = {
-					notEmpty: {
-						message: "required"
-					}
-				};
 
-				validatorFields[name] = {
-					trigger: "blur change",
-					validators: validator
-				};
-			}.bind(this));
 			validatorFields.emailAddress = {
 				trigger: "blur change",
 				validators: {
@@ -181,11 +168,7 @@
 	{
 		tf.modalManager.showModal(
 			new TF.Modal.TestEmailModalViewModel(this.obEntityDataModel())
-		)
-			.then(function()
-			{
-
-			}.bind(this));
+		);
 	};
 
 	SettingsConfigurationPage.prototype.legalLinkClick = function()
@@ -240,10 +223,10 @@
 	{
 		if (this.obEntityDataModel().apiIsDirty())
 		{
-			return tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
+			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
 				.then(function(result)
 				{
-					if (result == true)
+					if (result === true)
 					{
 						this.saveClick().then(function(result)
 						{
@@ -252,7 +235,7 @@
 								tf.pageManager.openNewPage("fieldtrips");
 							}
 						});
-					} else if (result == false)
+					} else if (result === false)
 					{
 						tf.pageManager.openNewPage("fieldtrips");
 					} else
