@@ -5,7 +5,7 @@
 	function SendEmailViewModel(option)
 	{
 		this.option = option ||
-		{};
+			{};
 		this.selectRecipientToClick = this.selectRecipientToClick.bind(this);
 		this.deleteFileClick = this.deleteFileClick.bind(this);
 		this.obErrorMessageDivIsShow = ko.observable(false);
@@ -119,11 +119,11 @@
 							else
 							{
 								newList.push(
-									new TF.DataModel.ScheduledReportReceiptDataModel(
-									{
-										SelectedUserId: 0,
-										EmailAddress: item
-									})
+									new TF.DataModel.ReportReceiptDataModel(
+										{
+											SelectedUserId: 0,
+											EmailAddress: item
+										})
 								);
 							}
 
@@ -139,22 +139,22 @@
 		};
 
 		$(el).bootstrapValidator(
-		{
-			excluded: [':hidden', ':not(:visible)'],
-			live: 'enabled',
-			message: 'This value is not valid',
-			fields: validatorFields
-		}).on('success.field.bv', function(e, data)
-		{
-			var $parent = data.element.closest('.form-group');
-			$parent.removeClass('has-success');
-			if (!isValidating)
 			{
-				isValidating = true;
-				self.pageLevelViewModel.saveValidate(data.element);
-				isValidating = false;
-			}
-		});
+				excluded: [':hidden', ':not(:visible)'],
+				live: 'enabled',
+				message: 'This value is not valid',
+				fields: validatorFields
+			}).on('success.field.bv', function(e, data)
+			{
+				var $parent = data.element.closest('.form-group');
+				$parent.removeClass('has-success');
+				if (!isValidating)
+				{
+					isValidating = true;
+					self.pageLevelViewModel.saveValidate(data.element);
+					isValidating = false;
+				}
+			});
 		this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 
 		this.obEntityDataModel().apiIsDirty(false);
@@ -185,9 +185,9 @@
 			.then(function(apiResponse)
 			{
 				tf.modalManager.showModal(
-						new TF.Modal.ListMoverSelectRecipientControlModalViewModel(
-							apiResponse.Items
-						))
+					new TF.Modal.ListMoverSelectRecipientControlModalViewModel(
+						apiResponse.Items
+					))
 					.then(function(result)
 					{
 						if (result === true)
@@ -201,12 +201,12 @@
 							{
 								name = item.FirstName + " " + item.LastName;
 							}
-							return new TF.DataModel.ScheduledReportReceiptDataModel(
-							{
-								SelectedUserId: item.Id,
-								EmailAddress: item.Email,
-								UserName: name
-							});
+							return new TF.DataModel.ReportReceiptDataModel(
+								{
+									SelectedUserId: item.Id,
+									EmailAddress: item.Email,
+									UserName: name
+								});
 						});
 						$.each(this.obEmailToList(), function(n, item)
 						{
@@ -264,11 +264,11 @@
 							$(fielddata).focus();
 						}
 						validationErrors.push(
-						{
-							name: ($(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $(fielddata).closest("div.form-group").find("strong").text()),
-							message: messages[i].replace('&lt;', '<').replace('&gt;', '>'),
-							field: $(fielddata)
-						});
+							{
+								name: ($(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $(fielddata).closest("div.form-group").find("strong").text()),
+								message: messages[i].replace('&lt;', '<').replace('&gt;', '>'),
+								field: $(fielddata)
+							});
 
 					}.bind(this));
 					this.obErrorMessageDivIsShow(true);
@@ -285,11 +285,11 @@
 					{
 						var validationErrors = [];
 						validationErrors.push(
-						{
-							name: "mailToList",
-							message: "At least one recipient is required ",
-							field: $("input[name=mailToList]")
-						});
+							{
+								name: "mailToList",
+								message: "At least one recipient is required ",
+								field: $("input[name=mailToList]")
+							});
 
 						this.obErrorMessageDivIsShow(true);
 						this.obValidationErrors(validationErrors);
@@ -350,9 +350,9 @@
 					promisePost = function()
 					{
 						return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "gridemail"),
-						{
-							data: sendData
-						});
+							{
+								data: sendData
+							});
 					};
 				}
 				return promisePost(sendData).then(function(data)

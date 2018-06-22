@@ -146,7 +146,7 @@
 								else
 								{
 									newList.push(
-										new TF.DataModel.ScheduledReportReceiptDataModel({
+										new TF.DataModel.ReportReceiptDataModel({
 											SelectedUserId: 0,
 											EmailAddress: item
 										})
@@ -219,7 +219,7 @@
 							{
 								name = item.FirstName + " " + item.LastName;
 							}
-							return new TF.DataModel.ScheduledReportReceiptDataModel({
+							return new TF.DataModel.ReportReceiptDataModel({
 								SelectedUserId: item.Id,
 								EmailAddress: item.Email,
 								UserName: name
