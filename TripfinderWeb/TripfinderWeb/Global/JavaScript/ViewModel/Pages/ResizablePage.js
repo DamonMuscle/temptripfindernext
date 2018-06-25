@@ -357,6 +357,7 @@
 		}
 
 		self.$otherPage.empty();
+		self.$otherPage.css("width", "auto");
 		self.obOtherData(null);
 
 		if (self.obGridData())
