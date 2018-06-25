@@ -740,10 +740,10 @@
 
 		if (elementType === 'image')
 		{
-			if (!ui.helper.find(".in").hasClass("hide"))
+			if (self.isMouseWithinContainer(evt.clientX, evt.clientY, $(".detail-view-panel")[0].getBoundingClientRect()))
 			{
-				var $inputEle = self.detailView.$gridStack.find("input[type=file]");
-				$($inputEle[$inputEle.length - 1]).trigger('click');
+				var $inputEle = self.detailView.$gridStack.find("input[newimage=true][type=file]");
+				$inputEle.trigger('click');
 			}
 		}
 

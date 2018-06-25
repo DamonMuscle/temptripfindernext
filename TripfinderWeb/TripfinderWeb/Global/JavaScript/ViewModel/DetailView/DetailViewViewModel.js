@@ -933,30 +933,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-				{
-					callback: {
-						message: "Name already exists",
-						callback: function(value, validator, $field)
+			{
+				callback: {
+					message: "Name already exists",
+					callback: function(value, validator, $field)
+					{
+						if (!value)
 						{
-							if (!value)
-							{
-								return true;
-							}
-
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-								paramData: {
-									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-									name: value,
-									dataType: self.gridType
-								}
-							}, { overlay: false }).then(function(response)
-							{
-								var isUnique = response.Items[0];
-								return isUnique;
-							});
+							return true;
 						}
+
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+							paramData: {
+								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+								name: value,
+								dataType: self.gridType
+							}
+						}, { overlay: false }).then(function(response)
+						{
+							var isUnique = response.Items[0];
+							return isUnique;
+						});
 					}
 				}
+			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -1308,7 +1308,6 @@
 				});
 				break;
 			case "trip":
-				// p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), { paramData: { keys: self.entity.SchoolCodes.join(';'), gridType: "school", } }).then(callback);
 				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "attendance", "tripId", self.entity.Id, "attendances")).then(callback);
 				break;
 			default:
@@ -1449,7 +1448,6 @@
 
 		var layoutObj = !layout ? self.defaultLayout : JSON.parse(layout);
 		self.resetPreloadControl();
-		//self.destroyControls();
 		self.$gridStack.off('.gridStack');
 		self.grid.removeAll();
 		self.$gridStack.empty();
@@ -1557,14 +1555,12 @@
 		self.updateDragHandlerStatus();
 	};
 
-
-	DetailViewViewModel.prototype.onNewElementAdded = function()
+	DetailViewViewModel.prototype.onNewElementAdded = function(e, elements)
 	{
 		var self = this;
 		if (!self.startUpdateAfterAddBlock)
 		{
-			var currentLayout = self.serializeLayout();
-			// /self.destroyControls();
+			var currentLayout = self.serializeLayout(null, elements[0].el);
 			self.resetPreloadControl();
 			self.grid.removeAll();
 			self.$gridStack.empty();
@@ -1582,21 +1578,6 @@
 	{
 		var self = this;
 		self.$preload.find(">div").addClass("to-be-removed");
-
-		// for (var i in self.allCalendars)
-		// {
-		// 	var $calendar = self.allCalendars[i],
-		// 		match = self.$preload.find(">div.calendar[role=" + $calendar.attr("role") + "]");
-		// 	if (match.length === 0)
-		// 	{
-		// 		self.$preload.append($calendar);
-		// 	}
-		// 	else
-		// 	{
-		// 		match.removeClass("to-be-removed")
-		// 	}
-		// }
-
 		self.$preload.find(">div.to-be-removed").remove();
 	};
 
@@ -2405,10 +2386,10 @@
 						self.updateGridFooter($itemDom, result.FilteredRecordCount, result.TotalRecordCount);
 					});
 				}, function(error)
-					{
-						//  no permission
-						self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, item.sort, true, item.url);
-					});
+				{
+					//  no permission
+					self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, item.sort, true, item.url);
+				});
 		}
 		else
 		{
@@ -2830,10 +2811,10 @@
 
 		if (self.isReadMode())
 		{
-			inputElement = "<input class='uploadImg' id='inputImage" + item.imageId + "' name='file' type='file' accept='image/*'  disabled >";
+			inputElement = "<input class='uploadImg' id='inputImage" + item.imageId + "' name='file' type='file' accept='image/*' disabled >";
 		} else
 		{
-			inputElement = "<input class='uploadImg' id='inputImage" + item.imageId + "' name='file' type='file' accept='image/*' >";
+			inputElement = "<input class='uploadImg' id='inputImage" + item.imageId + "' name='file' type='file' accept='image/*'  newImage = '" + item.newImage + "' >";
 		}
 		imageElement = "<img class='uploadedPhoto' style = 'opacity:0.4;width:auto;height:auto;max-width:100%;max-height:100%'/>";
 		randomClass = item.uniqueClassName || self.generateUniqueClassName(),
@@ -2962,14 +2943,6 @@
 				$container.data("filePostData", { fileName: file.name, fileData: event.target.result });
 			}.bind(e.target);
 			reader.readAsDataURL(file);
-			// if (/^image\/\w+$/.test(file.type) == false)
-			// {
-			// 	this.oberrormessage('Choose an image file.');
-			// }
-			// if (file.type != "image/png" && file.type != "image/jpeg")
-			// {
-			// 	this.oberrormessage('Choose jpg or png.');
-			// }
 			if (file.size >= 2097152)
 			{
 				this.oberrormessage('Size too large (<2MB)');
@@ -2980,7 +2953,6 @@
 				var blobUrl = url.createObjectURL(file);
 				this.$uploadedPhoto.attr('src', blobUrl);
 				this.$uploadedPhoto.css('opacity', '1');
-				// this.imageUpdated = true;
 			}
 		}
 	};
@@ -3575,12 +3547,6 @@
 
 	DetailViewViewModel.prototype.obDataBlockDragStart = function(e, helper)
 	{
-		// var self = this, $block = helper.helper;
-		// switch ($block.data("type"))
-		// {
-		// 	default:
-		// 		break;
-		// }
 	};
 
 	/**
@@ -3745,7 +3711,7 @@
 						}
 					}
 				}
-				else if (keys[i] == "AllItems")//thi property came from grid->columns->ListFilterTemplate->AllItems
+				else if (keys[i] == "AllItems")//this property came from grid->columns->ListFilterTemplate->AllItems
 				{
 					var previousColumns = previousItem[keys[i]], currentColumns = currentItem[keys[i]];
 					previousColumns.sort();
@@ -3915,7 +3881,6 @@
 				{
 					if (apiResponse && apiResponse.Items && apiResponse.Items[0])
 					{
-						// self.imageId = apiResponse.Items[0].Id;
 						var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
 						dataItem.APIIsNew = false;
 						self.dataPointPanel.closeClick();
@@ -4159,7 +4124,7 @@
 	 * serialize the layout to JSON.
 	 * @returns {void}
 	 */
-	DetailViewViewModel.prototype.serializeLayout = function(options)
+	DetailViewViewModel.prototype.serializeLayout = function(options, $element)
 	{
 		var self = this, currentGroup, node,
 			width = options && options.width,
@@ -4289,6 +4254,10 @@
 					image: node.el.find("input").data("filePostData") || node.el.data("filePostData"),
 					imageId: node.el.find("input").length > 0 ? node.el.find("input")[0].id.split("inputImage")[1] : self.guid()
 				};
+				if ($el[0] === $element[0])
+				{
+					layoutItem.newImage = true;
+				}
 			}
 			else
 			{
@@ -4494,8 +4463,6 @@
 	DetailViewViewModel.prototype.toggleDataPointPanel = function(data)
 	{
 		var self = this;
-		//if (!self.dataPointPanel)
-		//{
 		if (self.dataPointPanel)
 		{
 			self.dataPointPanel.dispose();
