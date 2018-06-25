@@ -383,10 +383,6 @@
 					if (refreshObj.function)
 					{
 						refreshObj.function();
-						if (tf.pageManager.resizablePage)
-						{
-							tf.pageManager.resizablePage.savePageRate();
-						}
 					}
 					self.isOnAnimation = false;
 					$navMenu.css({ overflow: "", width: "" });
