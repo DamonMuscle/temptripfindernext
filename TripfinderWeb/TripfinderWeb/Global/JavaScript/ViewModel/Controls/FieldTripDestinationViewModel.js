@@ -142,8 +142,8 @@
 				return data;
 				this.dispose();
 			}, function()
-				{
-				});
+			{
+			});
 	};
 
 	FieldTripDestinationViewModel.prototype.generateFunction = function(fn)
@@ -153,7 +153,7 @@
 
 	FieldTripDestinationViewModel.prototype.addDataEntryListItem = function(parameters)
 	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.fieldName, this.localization);
+		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.fieldName);
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
 			.then(function(data)
 			{

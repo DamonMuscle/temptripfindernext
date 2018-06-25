@@ -2,12 +2,11 @@
 {
 	createNamespace('TF.Modal').ModifyDataEntryListItemModalViewModel = ModifyDataEntryListItemModalViewModel;
 
-	function ModifyDataEntryListItemModalViewModel(fieldName, modelType, localization, id)
+	function ModifyDataEntryListItemModalViewModel(fieldName, modelType, id)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.contentTemplate('modal/ModifyDataEntryListItemControl');
 		this.buttonTemplate('modal/positivenegative');
-		this.localization = localization;//observable
 		this.sizeCss = "modal-dialog-sm";
 
 		var viewTitle = id ? "Edit " : "Add ", changeName;
@@ -15,7 +14,7 @@
 		switch (fieldName)
 		{
 			case 'mailzip':
-				viewTitle += this.localization().Postal;
+				viewTitle += tf.localization.Postal;
 				if (!id)
 					this.buttonTemplate('modal/positivenegativeextend');
 				break;
@@ -73,7 +72,7 @@
 				viewTitle += "Cities";
 				break;
 			case 'zipcode':
-				viewTitle += tf.applicationTerm.getApplicationTermSingularByName("Zip")+" Codes";
+				viewTitle += tf.applicationTerm.getApplicationTermSingularByName("Zip") + " Codes";
 				break;
 			case 'fieldtriptemplate':
 				viewTitle = "Save " + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template";
@@ -86,7 +85,7 @@
 
 		this._fieldName = fieldName;
 
-		this.modifyDataEntryListItemViewModel = new TF.Control.ModifyDataEntryListItemViewModel(fieldName, modelType, localization, id, changeName);
+		this.modifyDataEntryListItemViewModel = new TF.Control.ModifyDataEntryListItemViewModel(fieldName, modelType, id, changeName);
 		this.data(this.modifyDataEntryListItemViewModel);
 	}
 	ModifyDataEntryListItemModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);

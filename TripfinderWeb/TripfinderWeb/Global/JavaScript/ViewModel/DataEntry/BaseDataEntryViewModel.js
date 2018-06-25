@@ -87,7 +87,6 @@
 		this.obUserDefinedDisplay = ko.computed(this.userDefinedDisplayComputer, this);
 
 		this.obPageNavName = ko.computed(this._pageNavComputer, this);
-		this.localization = ko.observable();
 		this.baseDeletion = null;
 		this.obShowControlPanel = ko.observable(false);
 
@@ -394,19 +393,6 @@
 		}
 	};
 
-	BaseDataEntryViewModel.prototype.loadLocalization = function()
-	{
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "localization"))
-			.then(function(response)
-			{
-				this.localization(response.Items[0]);
-			}.bind(this))
-			.catch(function(response)
-			{
-			}.bind(this))
-	}
-
-
 	BaseDataEntryViewModel.prototype.initialize = function()
 	{
 		this.loadSupplement()
@@ -634,10 +620,7 @@
 					{
 						this.isInPopup = false;
 					}.bind(this));
-			}.bind(this))
-
-		//TDB: load localization
-		this.loadLocalization();
+			}.bind(this));
 	};
 
 	BaseDataEntryViewModel.prototype.canClose = function()
@@ -1094,7 +1077,7 @@
 
 	BaseDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
 	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type, this.localization);
+		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type);
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
 			.then(function(data)
 			{
@@ -1127,7 +1110,7 @@
 		var select = $.grep(parameters[1](), function(d) { return d.Item == parameters[3] });
 		if (select.length > 0)
 		{
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type, this.localization, select[0].Id))
+			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type, select[0].Id))
 				.then(function(data)
 				{
 					if (!data)

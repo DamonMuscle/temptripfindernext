@@ -5,7 +5,7 @@
 	ModifyDataEntryListItemViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ModifyDataEntryListItemViewModel.prototype.constructor = ModifyDataEntryListItemViewModel;
 
-	function ModifyDataEntryListItemViewModel(fieldName, modelType, localization, id, changeName)
+	function ModifyDataEntryListItemViewModel(fieldName, modelType, id, changeName)
 	{
 		this.modelType = modelType;
 		this.fieldName = fieldName;
@@ -14,13 +14,12 @@
 		this.fieldTitle = tf.applicationTerm.getApplicationTermSingularByName("Name");
 		this.obMaxLength = ko.observable("");
 		this.obWidth = ko.observable("");
-		this.localization = localization;//observable
 		this.changeName = changeName;
 		switch (this.fieldName)
 		{
 			case 'mailzip':
 				this.fieldName = "mail_zip";
-				this.fieldTitle = this.localization().Postal;
+				this.fieldTitle = tf.localization.Postal;
 				this.obWidth("120px");
 				break;
 			case 'mailcity':
@@ -37,11 +36,11 @@
 		if (this.id)
 		{
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.id))
-			.then(function(data)
-			{
-				this.initFileText = data.Items[0].Item;
-				this.fileText(this.initFileText);
-			}.bind(this));
+				.then(function(data)
+				{
+					this.initFileText = data.Items[0].Item;
+					this.fileText(this.initFileText);
+				}.bind(this));
 		}
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
@@ -49,56 +48,56 @@
 	ModifyDataEntryListItemViewModel.prototype.save = function()
 	{
 		return this.saveValidate()
-		.then(function(valid)
-		{
-			if (!valid)
+			.then(function(valid)
 			{
-				return false;
-			}
-			else
-			{
-				if (this.fieldName === "fieldtriptemplate")
-				{// no need to save data in DB, so direct return the value.
-					return this.fileText();
-				}
-				if (this.id)
+				if (!valid)
 				{
-					return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.id, this.fileText()))
-					.then(function(data)
-					{
-						if (this.changeName)
-							PubSub.publish(topicCombine(pb.DATA_CHANGE, this.changeName, pb.EDIT));
-						return data.Items[0];
-					}.bind(this));
+					return false;
 				}
 				else
 				{
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.modelType, this.fieldName, this.fileText()))
-					.then(function(data)
+					if (this.fieldName === "fieldtriptemplate")
+					{// no need to save data in DB, so direct return the value.
+						return this.fileText();
+					}
+					if (this.id)
 					{
-						if (this.changeName)
-							PubSub.publish(topicCombine(pb.DATA_CHANGE, this.changeName, pb.EDIT));
-						return data.Items[0];
-					}.bind(this));
+						return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.id, this.fileText()))
+							.then(function(data)
+							{
+								if (this.changeName)
+									PubSub.publish(topicCombine(pb.DATA_CHANGE, this.changeName, pb.EDIT));
+								return data.Items[0];
+							}.bind(this));
+					}
+					else
+					{
+						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.modelType, this.fieldName, this.fileText()))
+							.then(function(data)
+							{
+								if (this.changeName)
+									PubSub.publish(topicCombine(pb.DATA_CHANGE, this.changeName, pb.EDIT));
+								return data.Items[0];
+							}.bind(this));
+					}
 				}
-			}
-		}.bind(this))
+			}.bind(this))
 	}
 
 	ModifyDataEntryListItemViewModel.prototype.saveValidate = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(valid)
-		{
-			if (!valid)
+			.then(function(valid)
 			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-		}.bind(this));
+				if (!valid)
+				{
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}.bind(this));
 	};
 
 	ModifyDataEntryListItemViewModel.prototype.init = function(viewModel, el)
@@ -126,14 +125,14 @@
 						{
 							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.modelType, "mail_city"),
 								null,
-										{ overlay: false })
-							.then(function(data)
-							{
-								return !data.Items.some(function(item)
+								{ overlay: false })
+								.then(function(data)
 								{
-									return item.Item.toLowerCase() === value.toLowerCase() && item.Id !== this.id;
+									return !data.Items.some(function(item)
+									{
+										return item.Item.toLowerCase() === value.toLowerCase() && item.Id !== this.id;
+									}.bind(this));
 								}.bind(this));
-							}.bind(this));
 						}.bind(this)
 					}
 				};
@@ -144,9 +143,9 @@
 						message: ' required'
 					},
 					stringLength: {
-						min: this.localization().PostalCodeLength,
-						max: this.localization().PostalCodeLength,
-						message: ' invalid ' + this.localization().Postal
+						min: tf.localization.PostalCodeLength,
+						max: tf.localization.PostalCodeLength,
+						message: ' invalid ' + tf.localization.Postal
 					},
 					callback: {
 						message: ' must be unique',
@@ -154,14 +153,14 @@
 						{
 							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.modelType, "mail_zip"),
 								null,
-										{ overlay: false })
-							.then(function(data)
-							{
-								return !data.Items.some(function(item)
+								{ overlay: false })
+								.then(function(data)
 								{
-									return item.Item.toLowerCase() === value.toLowerCase() && item.Id != this.id;
+									return !data.Items.some(function(item)
+									{
+										return item.Item.toLowerCase() === value.toLowerCase() && item.Id != this.id;
+									}.bind(this));
 								}.bind(this));
-							}.bind(this));
 						}.bind(this)
 					}
 				};
@@ -177,14 +176,14 @@
 						{
 							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate", "uniquenamecheck") + "?name=" + this.fileText(),
 								null,
-										{ overlay: false })
-							.then(function(data)
-							{
-								return !data.Items.some(function(item)
+								{ overlay: false })
+								.then(function(data)
 								{
-									return item;
+									return !data.Items.some(function(item)
+									{
+										return item;
+									}.bind(this));
 								}.bind(this));
-							}.bind(this));
 						}.bind(this)
 					}
 				};
@@ -200,14 +199,14 @@
 						{
 							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.modelType, this.fieldName),
 								null,
-										{ overlay: false })
-							.then(function(data)
-							{
-								return !data.Items.some(function(item)
+								{ overlay: false })
+								.then(function(data)
 								{
-									return item.Item.toLowerCase() === value.toLowerCase() && item.Id !== this.id;
+									return !data.Items.some(function(item)
+									{
+										return item.Item.toLowerCase() === value.toLowerCase() && item.Id !== this.id;
+									}.bind(this));
 								}.bind(this));
-							}.bind(this));
 						}.bind(this)
 					}
 				};

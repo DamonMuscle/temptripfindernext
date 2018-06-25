@@ -1494,7 +1494,7 @@
 
 	FieldTripDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
 	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", this.localization);
+		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination");
 		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
 			.then(function(data)
 			{
@@ -1531,7 +1531,7 @@
 				return;
 			}
 
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", this.localization, select[0].Id))
+			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", select[0].Id))
 				.then(function(data)
 				{
 					if (!data)

@@ -296,30 +296,33 @@
 						{
 							if (value !== null)
 							{
-								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
-								self.changePermissions();
-								if (!TF.isPhoneDevice)
+								return self._locatizationInitialization().then(function()
 								{
-									tf.pageManager.initNavgationBar();
-								}
-								tf.pageManager.initResizePanel();
-
-								tf.pageManager.resizablePage.onLoaded.subscribe(function()
-								{
-									tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
-
-									if (window.opener && window.name === "new-detailWindow")
+									tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
+									self.changePermissions();
+									if (!TF.isPhoneDevice)
 									{
-										var id = getParameterByName('id'),
-											detailView = new TF.DetailView.DetailViewViewModel(id);
-										tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView);
+										tf.pageManager.initNavgationBar();
 									}
-									else
+									tf.pageManager.initResizePanel();
+
+									tf.pageManager.resizablePage.onLoaded.subscribe(function()
 									{
-										tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
-									}
+										tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
+
+										if (window.opener && window.name === "new-detailWindow")
+										{
+											var id = getParameterByName('id'),
+												detailView = new TF.DetailView.DetailViewViewModel(id);
+											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView);
+										}
+										else
+										{
+											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
+										}
+									});
+									return true;
 								});
-								return true;
 							}
 							return null;
 						}).then(function(value)
@@ -386,6 +389,18 @@
 
 	Startup.prototype.libraryInitialization = function()
 	{
+		moment.locale("en-US");
+		return Promise.resolve(i18n.init({
+			fallbackLng: "en-US",
+			lng: "en-US",
+			load: "current",
+			resGetPath: 'localization/en-US.json',
+			useCookie: false
+		}));
+	};
+
+	Startup.prototype._locatizationInitialization = function()
+	{
 		tf.localization = {
 			Postal: 'Zip Code',
 			AreaName: 'State',
@@ -397,14 +412,16 @@
 			Vehicle: 'MPG',
 			PostalCodeLength: 5
 		};
-		moment.locale("en-US");
-		return Promise.resolve(i18n.init({
-			fallbackLng: "en-US",
-			lng: "en-US",
-			load: "current",
-			resGetPath: 'localization/en-US.json',
-			useCookie: false
-		}));
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "localization"))
+			.then(function(response)
+			{
+				if (response.Items && response.Items.length > 0)
+				{
+					tf.localization = response.Items[0];
+					tf.localization.PerHour = tf.localization.PerHour.toUpperCase();
+					tf.localization.Vehicle = tf.localization.Vehicle.toUpperCase();
+				}
+			}.bind(this));
 	};
 
 	tf.DBNeedToRebuildAlert = function(datasourceName)
