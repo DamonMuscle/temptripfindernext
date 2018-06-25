@@ -227,7 +227,7 @@
 				self.pageLevelViewModel.clearError();
 				if (self.gridType !== item.Table)
 				{
-					self.pageLevelViewModel.popupErrorMessage("Please select a valid layout.");
+					self.pageLevelViewModel.popupErrorMessage(self.userMessages["WRONG_LAYOUT_TYPE"]);
 				}
 				else
 				{

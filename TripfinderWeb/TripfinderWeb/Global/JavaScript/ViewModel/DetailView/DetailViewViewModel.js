@@ -70,7 +70,9 @@
 			titleColor: "#70A130",
 			contentColor: "#000000"
 		};
-
+		self.basicGridConfig = {
+			fieldtrip: { title: "Name", subTitle: "DepartDateTime" }
+		};
 		//Image
 		self.oberrormessage = ko.observable(null);
 		self.imageUpdated = false;
@@ -114,7 +116,7 @@
 					deleteDataBlockEvent: self.deleteDataBlockEvent,
 					groupDataBlockEvent: self.groupDataBlockEvent,
 					changeDataPointEvent: self.changeDataPointEvent,
-					blocks: $.grep(self.dataPointPanel.allColumns, function(item) { return item.title !== "Groups" }),
+					blocks: $.grep(self.dataPointPanel.obAllColumns(), function(item) { return item.title !== "Groups" }),
 					target: e.currentTarget,
 					toggleResizableEvent: self.toggleResizableEvent,
 					defaultColors: self.defaultColors,
@@ -294,6 +296,10 @@
 		{
 			self.checkLayoutChange(data && data.switchToLayoutId, data && data.callback)
 		});
+		self.obSelectName.subscribe(function(value)
+		{
+			tf.storageManager.save("current_detail_layout_name", value, true);
+		});
 	}
 
 	/**
@@ -363,7 +369,7 @@
 	 */
 	DetailViewViewModel.prototype.getEffectiveDetailLayoutId = function()
 	{
-		return tf.storageManager.get("grid.detailscreenlayoutid." + this.gridType);
+		return tf.storageManager.get(this.stickyName);
 	}
 
 	/**
@@ -534,13 +540,14 @@
 			self.$element.find(".dropdown-menu ul li").css({ "width": "calc(100% + 22px)" });
 		}
 
+		var gridType = self.gridType;
 		self.validationInit();
-		self.applyLayoutTemplate(true, tf.storageManager.get("grid.detailscreenlayoutid." + self.gridType)).then(function()
+		self.applyLayoutTemplate(true, tf.storageManager.get(self.stickyName)).then(function()
 		{
-			self.initTitle();
+			self.updateDetailViewTitle();
 			if (self.optionId)
 			{
-				self.show(self.optionId, self.gridType);
+				self.show(self.optionId, gridType);
 			}
 		});
 	};
@@ -850,12 +857,12 @@
 		self.obSelectName = ko.observable("Layout Name");
 		self.obTitle = ko.observable("");
 		self.obSubTitle = ko.observable("");
-		self.obSubTitleDisplay = ko.observable("");
 		self.obRecordPicture = ko.observable(null);
+		self.obSubTitleLabel = ko.observable("");
 		self.obDataPoints = ko.computed(function()
 		{
 			var dataPoints = [];
-			self.dataPointPanel.obColumns().forEach(function(item)
+			self.dataPointPanel.obAllColumns().forEach(function(item)
 			{
 				if (item.title !== "Groups")
 				{
@@ -873,6 +880,16 @@
 
 			return dataPoints;
 		});
+		self.obDataPointsForSubTitle = ko.computed(function()
+		{
+			return self.obDataPoints().filter(function(item)
+			{
+				excludeList = ["grid", "file", "map", "calendar", "schedule", "recordpicture"];
+				return item.defaultValue !== undefined
+					&& item.defaultValue !== null
+					&& excludeList.indexOf(item.type.toLowerCase()) === -1;
+			});
+		});
 
 		self.entityDataModel = new TF.DataModel.DetailScreenLayoutDataModel();
 	};
@@ -883,13 +900,22 @@
 	 */
 	DetailViewViewModel.prototype.getDataPointByField = function(field)
 	{
-		if (field)
+		var key, match, dataPoints = dataPointsJSON[this.gridType];
+		for (key in dataPoints)
 		{
-			return this.obDataPoints().filter(function(item)
+			$.each(dataPoints[key], function(index, item)
 			{
-				return item.field === field;
-			})[0];
+				if (item.field === field)
+				{
+					match = item;
+					return false;
+				}
+			});
+
+			if (!!match) { break; }
 		}
+
+		return match;
 	};
 
 	/**
@@ -905,30 +931,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-				{
-					callback: {
-						message: "Name already exists",
-						callback: function(value, validator, $field)
+			{
+				callback: {
+					message: "Name already exists",
+					callback: function(value, validator, $field)
+					{
+						if (!value)
 						{
-							if (!value)
-							{
-								return true;
-							}
-
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-								paramData: {
-									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-									name: value,
-									dataType: self.gridType
-								}
-							}, { overlay: false }).then(function(response)
-							{
-								var isUnique = response.Items[0];
-								return isUnique;
-							});
+							return true;
 						}
+
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+							paramData: {
+								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+								name: value,
+								dataType: self.gridType
+							}
+						}, { overlay: false }).then(function(response)
+						{
+							var isUnique = response.Items[0];
+							return isUnique;
+						});
 					}
 				}
+			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -1004,10 +1030,10 @@
 	 */
 	DetailViewViewModel.prototype.applyLayoutEntity = function(layoutEntity, isDeleted)
 	{
-		var self = this;
-		if (layoutEntity && !layoutEntity.SubTitle && self.gridType == layoutEntity.Table)
+		var self = this, gridType = self.gridType;
+		if (layoutEntity && !layoutEntity.SubTitle && gridType == layoutEntity.Table)
 		{
-			layoutEntity.SubTitle = self.getDefaultSubTitleColumnName();
+			layoutEntity.SubTitle = self.basicGridConfig[gridType].subTitle;
 		}
 		self.entityDataModel = new TF.DataModel.DetailScreenLayoutDataModel(layoutEntity);
 
@@ -1022,10 +1048,10 @@
 	};
 
 	/**
-	 * Open the detail screen panel.
-	 * @param {Array} ids the entity ids, which entities will be displayed
-	 * @returns {void} 
-	 */
+ 	* Open the detail screen panel.
+ 	* @param {Array} ids the entity ids, which entities will be displayed
+ 	* @returns {void} 
+ 	*/
 	DetailViewViewModel.prototype.show = function(ids, gridType)
 	{
 		var self = this;
@@ -1038,6 +1064,35 @@
 			self.showDetailViewById(ids[0]);
 		}
 	};
+
+	/**
+ 	* determine whether detail layout is alive
+ 	*/
+	DetailViewViewModel.prototype.checkDetailLayout = function()
+	{
+		var self = this;
+		var id = tf.storageManager.get(self.stickyName);
+		if (!!id)
+		{
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", id)).then(function(response)
+			{
+				if (response && response.Items && response.Items.length == 1)
+				{
+					self.applyLayoutEntity(response.Items[0]);
+				}
+				else
+				{
+					var layoutEntities = self.layoutMenu && self.layoutMenu.obLayouts().filter(function(item) { return item.id() === id });
+					var layoutName = layoutEntities && layoutEntities.length == 1 ? layoutEntities[0].name() : tf.storageManager.get("current_detail_layout_name", true);
+					tf.promiseBootbox.alert("The Detail Layout (" + layoutName + ") that you had applied has been deleted.  It is no longer available.");
+					self.applyLayoutEntity({});
+					self.obSelectName("Layout Name");
+					self.layoutMenu && self.layoutMenu.resetLayoutClick();
+					tf.storageManager.delete(self.stickyName);
+				}
+			});
+		}
+	}
 
 	/**
 	 * Show information in detail view panel in read mode by Id.
@@ -1064,7 +1119,7 @@
 
 				self.entity = entity;
 				self.obRecordPicture(entity.ImageBase64 ? ("url(data:image/jpeg;base64," + entity.ImageBase64 + ")") : "");
-				self.initTitle();
+				self.updateDetailViewTitle(entity);
 
 				// Open detail view in a new tab
 				if (window.opener && window.name === "new-detailWindow")
@@ -1121,7 +1176,7 @@
 			self.gridType = gridType;
 			self.pendingDataPointRefreshing = self.dataPointPanel.refreshData().then(function()
 			{
-				var savedTemplateId = tf.storageManager.get("grid.detailscreenlayoutid." + gridType);
+				var savedTemplateId = tf.storageManager.get(self.stickyName);
 				return self.applyLayoutTemplate(true, savedTemplateId).then(function()
 				{
 					self.pendingDataPointRefreshing = null;
@@ -1262,156 +1317,90 @@
 	};
 
 	/**
-	 * Set the title and sub title of the detail view.
-	 * @returns {void}
-	 */
-	DetailViewViewModel.prototype.initTitle = function()
+ * Update the detail view's title and subTitle.
+ * @param {Object} entity 
+ */
+	DetailViewViewModel.prototype.updateDetailViewTitle = function(entity)
 	{
-		var self = this, entity = self.entity, title = "", subTitle = self.getDefaultSubTitleValue(), subTitleColumnName = self.entityDataModel.subTitle(),
-			dataPoint = self.getDataPointByField(subTitleColumnName);
+		var self = this, subTitleLabel, titleLabel, subTitleDataPoint,
+			gridType = self.gridType,
+			layoutEntity = self.entityDataModel.toData(),
+			gridConfig = self.basicGridConfig[gridType],
+			titleFieldName = gridConfig.title,
+			subTitleFieldName = layoutEntity.SubTitle || gridConfig.subTitle;
 
-		if (!self.isReadMode())
+		// only read mode has entity.
+		if (!entity)
 		{
-			switch (self.gridType)
-			{
-				case "altsite":
-					title = self.getDefaultValueByCategoryAndField("Main", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = "Public";
-					}
-					break;
-				case "contractor":
-				case "district":
-					title = self.getDefaultValueByCategoryAndField("Main", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Main", self.getDefaultSubTitleColumnName());
-					}
-					break;
-				case "fieldtrip":
-					title = self.getDefaultValueByCategoryAndField("Main", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = moment(self.getDefaultValueByCategoryAndField("Destination", self.getDefaultSubTitleColumnName())).format("YYYY-MM-DD")
-					}
-					break;
-				case "georegion":
-					title = self.getDefaultValueByCategoryAndField("Main", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Main", self.getDefaultSubTitleColumnName());
-					}
-					break;
-				case "school":
-					title = self.getDefaultValueByCategoryAndField("Main", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Main", self.getDefaultSubTitleColumnName());
-					}
-					break;
-				case "student":
-					title = self.getDefaultValueByCategoryAndField("Primary Information", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Primary Information", self.getDefaultSubTitleColumnName());
-					}
-					break;
-				case "staff":
-					title = self.getDefaultValueByCategoryAndField("Primary Information", "StaffName");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Primary Information", self.getDefaultSubTitleColumnName());
-					}
-					break;
-				case "trip":
-					title = self.getDefaultValueByCategoryAndField("Main", "Name");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Main", self.getDefaultSubTitleColumnName());
-					}
-					break;
-				case "tripstop":
-					title = self.getDefaultValueByCategoryAndField("Main", "Street");
-					if (!subTitleColumnName)
-					{
-						subTitle = moment("2018-01-01T" + self.getDefaultValueByCategoryAndField("Main", self.getDefaultSubTitleColumnName())).format("hh:mm A");
-					}
-					break;
-				case "vehicle":
-					title = self.getDefaultValueByCategoryAndField("Main", "VehicleName");
-					if (!subTitleColumnName)
-					{
-						subTitle = self.getDefaultValueByCategoryAndField("Equipment", self.getDefaultSubTitleColumnName());
-					}
-					break;
-			}
-
-			self.obSubTitle(dataPoint);
-			self.obSubTitleDisplay(dataPoint ? (dataPoint.defaultValue || dataPoint.title) : subTitle);
+			// default value
+			titleLabel = self.getDataPointByField(titleFieldName).defaultValue;
+			subTitleLabel = self.getSubtitleDefaultValueByFieldName(subTitleFieldName);
 		}
-		else if (self.entity)
+		else
 		{
-			switch (self.gridType)
+			// record value
+			switch (gridType)
 			{
-				case "altsite":
-				case "contractor":
-				case "district":
-				case "fieldtrip":
-				case "georegion":
-				case "school":
-				case "trip":
-					title = entity.Name;
-					break;
 				case "staff":
-					title = entity.FullName;
+					titleLabel = entity.FullName;
 					break;
 				case "student":
-					title = entity.FirstName + " " + entity.LastName;
+					titleLabel = entity.FirstName + " " + entity.LastName;
 					break;
 				case "tripstop":
-					title = entity.Street;
+					titleLabel = entity.Street;
 					break;
 				case "vehicle":
-					title = entity.BusNum;
+					titleLabel = entity.BusNum;
 					break;
 				default:
+					titleLabel = entity.Name;
 					break;
 			}
 
-			self.obSubTitleDisplay(subTitleColumnName ? self.processDataContent(entity[subTitleColumnName], dataPoint.type, dataPoint.format) : subTitle);
+			if (subTitleFieldName)
+			{
+				subTitleDataPoint = self.getDataPointByField(subTitleFieldName);
+				subTitleLabel = self.formatDataContent(entity[subTitleFieldName], subTitleDataPoint.type, subTitleDataPoint.format);
+			}
 		}
 
-		self.obTitle(title);
+		self.obTitle(titleLabel);
+		self.obSubTitle(subTitleFieldName);
+		self.obSubTitleLabel(subTitleLabel);
+
 		self.updateDetailViewPanelHeader();
 	};
 
-	DetailViewViewModel.prototype.getDefaultSubTitleColumnName = function()
+	/**
+	 * Get the default subtitle value with specified field name.
+	 * @param {String} fieldName 
+	 * @return {String}
+	 */
+	DetailViewViewModel.prototype.getSubtitleDefaultValueByFieldName = function(fieldName)
 	{
-		switch (this.gridType)
+		var self = this, label;
+		switch (self.gridType)
 		{
 			case "altsite":
-				return "";
-			case "contractor":
-			case "school":
-			case "district":
-				return "Contact";
+				if (!fieldName)
+				{
+					label = "Public";
+				}
+				break;
 			case "fieldtrip":
-				return "DepartDateTime";
-			case "georegion":
-				return "GeoregionTypeName";
-			case "student":
-				return "Grade";
-			case "staff":
-				return "AllStaffTypes";
-			case "trip":
-				return "VehicleName";
+				label = self.getDataPointByField(fieldName).defaultValue;
+				label = moment(label).format("YYYY-MM-DD");
+				break;
 			case "tripstop":
-				return "StopTime";
-			case "vehicle":
-				return "MakeBody";
+				label = self.getDataPointByField(fieldName).defaultValue;
+				label = moment("2018-01-01T" + label).format("hh:mm A");
+			default:
+				label = self.getDataPointByField(fieldName).defaultValue;
+				break;
 		}
-	}
+		return label;
+	};
 
 	DetailViewViewModel.prototype.destroyControls = function()
 	{
@@ -1589,45 +1578,24 @@
 	 */
 	DetailViewViewModel.prototype.resetPreloadControl = function()
 	{
-		var self = this, preloadList = [],
-			prevItems = self.$preload.find(">div");
-		//self.$preload.empty();
+		var self = this;
+		self.$preload.find(">div").addClass("to-be-removed");
 
-		prevItems.addClass("to-be-removed");
-		for (var i in self.allCalendars)
-		{
-			var $calendar = self.allCalendars[i],
-				match = self.$preload.find(">div.calendar[role=" + $calendar.attr("role") + "]");
-			if (match.length === 0)
-			{
-				self.$preload.append($calendar);
-			}
-			else
-			{
-				match.removeClass("to-be-removed")
-			}
-		}
+		// for (var i in self.allCalendars)
+		// {
+		// 	var $calendar = self.allCalendars[i],
+		// 		match = self.$preload.find(">div.calendar[role=" + $calendar.attr("role") + "]");
+		// 	if (match.length === 0)
+		// 	{
+		// 		self.$preload.append($calendar);
+		// 	}
+		// 	else
+		// 	{
+		// 		match.removeClass("to-be-removed")
+		// 	}
+		// }
+
 		self.$preload.find(">div.to-be-removed").remove();
-	};
-
-	/**
-	 * 
-	 */
-	DetailViewViewModel.prototype.updateCachedItems = function(items)
-	{
-		var self = this,
-			calendarRoles = Object.keys(self.allCalendars);
-
-		$.each(items, function(index, item)
-		{
-			switch (item.type.toLowerCase())
-			{
-				case "calendar":
-					break;
-				default:
-					break;
-			}
-		});
 	};
 
 	/**
@@ -2220,7 +2188,7 @@
 						self.addScheduleStackBlock(item, dataBlockStyles);
 						break;
 					default:
-						content = displayNone ? " None" : self.processDataContent(content, item.type, item.format);
+						content = displayNone ? " None" : self.formatDataContent(content, item.type, item.format);
 						self.addGeneralStackBlock(content, item, dataBlockStyles);
 						break;
 				}
@@ -2256,8 +2224,13 @@
 	 * @param {String} content 
 	 * @return {String}
 	 */
-	DetailViewViewModel.prototype.processDataContent = function(content, type, format)
+	DetailViewViewModel.prototype.formatDataContent = function(content, type, format)
 	{
+		function formatNumber(num)
+		{
+			return num > 9 ? num : "0" + num;
+		}
+
 		switch (type)
 		{
 			case "Number":
@@ -2274,14 +2247,20 @@
 				content = moment(content).format("YYYY-MM-DD");
 				break;
 			case "Time":
-				var time = moment(content);
-				if (time.isValid())
+				if (format === "TimeSpan")
 				{
-					content = time.format("hh:mm A");
+					if (!isNaN(Number(content)))
+					{
+						var num = Number(content);
+						var hours = parseInt(num / 3600);
+						var remainder = num % 3600;
+						content = formatNumber(hours) + ":" + formatNumber(parseInt(remainder / 60)) + ":" + formatNumber(remainder % 60);
+					}
 				}
 				else
 				{
-					content = moment("2018-01-01T" + content).format("hh:mm A");
+					var time = moment(content);
+					content = time.isValid() ? time.format("hh:mm A") : moment("2018-01-01T" + content).format("hh:mm A");
 				}
 				break;
 			default:
@@ -2423,21 +2402,37 @@
 						}
 						self.updateGridFooter($itemDom, result.FilteredRecordCount, result.TotalRecordCount);
 					});
-				}.bind(this));
+				}, function(error)
+					{
+						//  no permission
+						self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, item.sort, true, item.url);
+					});
 		}
 		else
 		{
-			var dataSource = new kendo.data.DataSource({
+			self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, item.sort, false, item.url);
+		}
+	};
+
+	DetailViewViewModel.prototype.initEmptyDetailGrid = function(kendoGrid, $item, columns, sortFunc, noPermission, type)
+	{
+		var self = this,
+			dataSource = new kendo.data.DataSource({
 				schema: {
 					model: {
 						fields: self.getKendoField(columns)
 					}
 				},
 				data: [],
-				sort: item.sort
+				sort: sortFunc
 			});
-			kendoGrid.setDataSource(dataSource);
-			self.updateGridFooter($itemDom, 0, 0);
+		kendoGrid.setDataSource(dataSource);
+		self.updateGridFooter($item, 0, 0);
+
+		if (noPermission)
+		{
+			$item.find(".custom-grid").addClass("no-permission");
+			$item.find(".k-grid-content").empty().append("<p>You don't have permission to view " + tf.pageManager.getPageTitleByPageName(type) + " data.</p>");
 		}
 	};
 
@@ -2482,34 +2477,6 @@
 			pageFooter.append($("<div class='count-info'>" + filterCount + " of " + totalCount + "</div>"));
 		}
 	}
-
-	DetailViewViewModel.prototype.getKendoField = function(columns)
-	{
-		var fields = {};
-		columns.forEach(function(definition)
-		{
-			var field = {};
-			switch (definition.type)
-			{
-				case "string":
-				case "boolean":
-					field.type = "string";
-					break;
-				case "integer":
-				case "number":
-					field.type = "number";
-					break;
-				case "time":
-				case "datetime":
-				case "date":
-					field.type = "date";
-					break;
-			}
-			field.validation = definition.validation;
-			fields[definition.FieldName] = field;
-		});
-		return fields;
-	};
 
 	DetailViewViewModel.prototype.getDefinitionLayoutColumns = function(columns)
 	{
@@ -3464,14 +3431,14 @@
 				weekday = "Thursday";
 				break;
 			case 4:
-				break;
 				weekDay = "Friday";
+				break;
 			case 5:
-				break;
 				weekDay = "Saturday";
-			case 6:
 				break;
+			case 6:
 				weekDay = "Sunday";
+				break;
 			case 7:
 				weekDay = "Weekly";
 				break;
@@ -3867,7 +3834,7 @@
 						{
 							self.applyLayoutTemplate(false, data.id, data.isDeleted).then(function()
 							{
-								self.initTitle();
+								self.updateDetailViewTitle();
 								self.setStackBlocks();
 								self.updateNameContainer();
 							})
@@ -3953,7 +3920,6 @@
 						self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
 						{
 							self.showDetailViewById(self.entitySelectId);
-							self.stickyName = "grid.detailscreenlayoutid." + self.gridType;
 							tf.storageManager.save(self.stickyName, dataItem.Id);
 						});
 					}
@@ -4426,17 +4392,20 @@
 	 */
 	DetailViewViewModel.prototype.selectItemClick = function(model, e)
 	{
-		var self = this, menu = $(e.currentTarget).parents('.type-selector').find(".dropdown-menu");
-		if (model.field != null)
+		var self = this,
+			menu = $(e.currentTarget).parents('.type-selector').find(".dropdown-menu"),
+			selectedField = model.field;
+
+		if (!!selectedField)
 		{
-			self.obSubTitle(model);
-			self.obSubTitleDisplay(model.defaultValue || model.title);
+			self.obSubTitle(selectedField);
+			self.obSubTitleLabel(self.getSubtitleDefaultValueByFieldName(selectedField));
 		}
 		else
 		{
 			// select nothing.
-			self.obSubTitle({ field: "(none)", title: "(none)" });
-			self.obSubTitleDisplay("");
+			self.obSubTitle("(none)");
+			self.obSubTitleLabel("");
 		}
 		menu.hide();
 		e.stopPropagation();
@@ -4444,18 +4413,10 @@
 
 	DetailViewViewModel.prototype.closeTemplateMenu = function(model, e)
 	{
-		if (navigator.userAgent.indexOf('Firefox') >= 0)
+		if ((navigator.userAgent.indexOf('Firefox') >= 0 && $(e.relatedTarget).closest(".detail-screen-contextmenu").length <= 0)
+			|| $(e.toElement).closest(".detail-screen-contextmenu").length <= 0)
 		{
-			if ($(e.relatedTarget).closest(".detail-screen-contextmenu").length <= 0)
-			{
-				tf.contextMenuManager.dispose();
-			}
-		} else
-		{
-			if ($(e.toElement).closest(".detail-screen-contextmenu").length <= 0)
-			{
-				tf.contextMenuManager.dispose();
-			}
+			tf.contextMenuManager.dispose();
 		}
 	};
 
@@ -4472,8 +4433,6 @@
 			isFromMoreButton = target.closest(".selector-menu").length <= 0,
 			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
 			cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
-
-		//if ($contextMenu.length > 0 && $contextMenu.css("display") !== "none") { return ; }
 
 		if (cacheOperatorBeforeHiddenMenu)
 		{
@@ -4500,7 +4459,7 @@
 					data = data || {};
 					self.applyLayoutTemplate(false, data.id, data.isDeleted, null, data.name).then(function()
 					{
-						self.initTitle();
+						self.updateDetailViewTitle();
 						self.setStackBlocks();
 						self.updateNameContainer();
 						if (!data.isDeleted)
@@ -4625,7 +4584,7 @@
 				conditionValue = conditionValue.toLowerCase();
 				return self.compareTwoValues([entityFieldValue, conditionValue], conditionOperator);
 			case "number":
-				return self.compareTwoValues([self.processDataContent(entityFieldValue, "Number", condition.format), conditionValue], conditionOperator);
+				return self.compareTwoValues([self.formatDataContent(entityFieldValue, "Number", condition.format), conditionValue], conditionOperator);
 			case "time":
 			case "date":
 				var dataTime = moment(entityFieldValue),
@@ -4767,76 +4726,6 @@
 			printHelper = new TF.DetailView.PrintHelper();
 
 		printHelper.print($(e.target).closest('.right-page'));
-	};
-
-	/**
-	 * Get default value.
-	* @param {String} category
-	   * @param {String} field
-	 * @return {String}
-	 */
-	DetailViewViewModel.prototype.getDefaultValueByCategoryAndField = function(category, field)
-	{
-		var self = this, defaultValue;
-		$.each(dataPointsJSON[self.gridType][category], function(index, item)
-		{
-			if (item.field && item.field === field)
-			{
-				defaultValue = item.defaultValue;
-				return false;
-			}
-		});
-
-		return defaultValue;
-	};
-
-	/**
-	 * Get default subtitle value.
-	 * @return {String}
-	 */
-	DetailViewViewModel.prototype.getDefaultSubTitleValue = function()
-	{
-		var self = this, entity = self.entity, subTitle = "";
-		if (!entity) return;
-
-		switch (self.gridType)
-		{
-			case "altsite":
-				subTitle = entity.Public ? "Public" : "Private";
-				break;
-			case "contractor":
-			case "district":
-				subTitle = entity.Contact;
-				break;
-			case "fieldtrip":
-				subTitle = entity.DepartDateTime ? moment(entity.DepartDateTime).format("ddd MMM DD YYYY") : "";
-				break;
-			case "georegion":
-				subTitle = entity.GeoregionType ? entity.GeoregionType.Name : "None";
-				break;
-			case "school":
-				subTitle = entity.Contact;
-				break;
-			case "staff":
-				subTitle = entity.AllStaffTypes;
-				break;
-			case "student":
-				subTitle = entity.Grade;
-				break;
-			case "trip":
-				subTitle = entity.VehicleName;
-				break;
-			case "tripstop":
-				subTitle = entity.StopTime ? moment(entity.StopTime).format("hh:mm A") : "";
-				break;
-			case "vehicle":
-				subTitle = entity.MakeBody;
-				break;
-			default:
-				break;
-		}
-
-		return subTitle;
 	};
 
 	/**

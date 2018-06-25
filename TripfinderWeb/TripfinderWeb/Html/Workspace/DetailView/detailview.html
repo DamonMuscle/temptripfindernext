@@ -26,22 +26,20 @@
 				<span data-bind="style:{'background-image':obRecordPicture},css:{'default-image':!isReadMode()}"> </span>
 			</div>
 			<!--/ko -->
-			<div class="head-text" data-bind="css: {hide :!isReadMode(), 'no-subtitle' :obSubTitleDisplay() == null || obSubTitleDisplay().length === 0}">
+			<div class="head-text" data-bind="css: {hide :!isReadMode(), 'no-subtitle' :obSubTitleLabel() == null || obSubTitleLabel().length === 0}">
 				<label class="title" style="padding-top: 2px;" data-bind="text:obTitle"></label>
-				<label class="sub-title" data-bind="text:obSubTitleDisplay()"></label>
+				<label class="sub-title" data-bind="text:obSubTitleLabel()"></label>
 			</div>
 			<div class="head-text" data-bind="css: {hide :isReadMode()}" style="width:auto">
 				<label class="title" style="padding-top: 2px;" data-bind="text:obTitle"></label>
 				<div class="type-selector sub-title-selector" data-bind="click:subtitleMenuClick">
-					<div class="select-type sub-title" data-bind="text:obSubTitleDisplay() || 'SubTitle'"></div>
+					<div class="select-type sub-title" data-bind="text:obSubTitleLabel() || 'SubTitle'"></div>
 					<div class="icon bottom-caret"></div>
 					<div class="dropdown-menu">
 						<ul>
 							<li data-bind="click:selectItemClick">(none)</li>
-							<!--ko foreach: obDataPoints -->
-							<!--ko if: $data.field -->
+							<!--ko foreach: obDataPointsForSubTitle -->
 							<li data-bind="text:title, click:$parent.selectItemClick"></li>
-							<!--/ko -->
 							<!--/ko -->
 						</ul>
 					</div>

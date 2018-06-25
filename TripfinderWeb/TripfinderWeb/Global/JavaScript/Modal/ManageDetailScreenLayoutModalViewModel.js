@@ -80,7 +80,7 @@
 		}
 		else
 		{
-			self.resolve(returnData ? returnData : false);
+			self.resolve(returnData || false);
 		}
 	};
 

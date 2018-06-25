@@ -24,6 +24,7 @@
 		self.obGridWidth = ko.observable();
 		self.pageTitle = ko.observable(getTitleByType(self.gridType));
 		self.obColumns = ko.observableArray([]);
+		self.obAllColumns = ko.observableArray([]);
 		self.currentGroup = ko.observable(null);
 		self.currentGroupId = -1;
 
@@ -222,19 +223,20 @@
 
 	DataPointPanel.prototype.filter = function(text)
 	{
-		var self = this, text = text.trim().toUpperCase();
+		var self = this,
+			text = text.trim().toUpperCase(),
+			isGroupItemMatched = function(groupItem)
+			{
+				return groupItem.items.filter(function(point)
+				{
+					return self.getGroupMenuTitle(point).toUpperCase().indexOf(text) > -1
+				}).length > 0
+			};
+
 		if (text.length === 0)
 		{
 			self.obColumns(self.allColumns);
 			return;
-		}
-
-		var isGroupItemMatched = function(groupItem)
-		{
-			return groupItem.items.filter(function(point)
-			{
-				return self.getGroupMenuTitle(point).toUpperCase().indexOf(text) > -1
-			}).length > 0
 		}
 
 		self.obColumns(self.allColumns.reduce(function(accumulator, item)
@@ -449,6 +451,7 @@
 				self.allColumns.push({ title: subCategories[key], columns: ko.observableArray(columns) });
 			}
 			self.obColumns(self.allColumns);
+			self.obAllColumns(self.allColumns);
 			self.detailViewColumnChanged();
 		});
 	};
@@ -619,7 +622,7 @@
 					self.detailView.addRecordPictureStackBlock(content, item, dataBlockStyles, grid);
 					break;
 				default:
-					content = self.detailView.processDataContent(item.defaultValue, item.type);
+					content = self.detailView.formatDataContent(item.defaultValue, item.type);
 					self.detailView.addGeneralStackBlock(content, item, dataBlockStyles, grid);
 					break;
 			}
