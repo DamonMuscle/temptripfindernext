@@ -4254,7 +4254,7 @@
 					image: node.el.find("input").data("filePostData") || node.el.data("filePostData"),
 					imageId: node.el.find("input").length > 0 ? node.el.find("input")[0].id.split("inputImage")[1] : self.guid()
 				};
-				if ($el[0] === $element[0])
+				if ($element && $el[0] === $element[0])
 				{
 					layoutItem.newImage = true;
 				}
