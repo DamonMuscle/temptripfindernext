@@ -81,7 +81,9 @@
 		self.obNeedShown = ko.observable(true);
 
 		self.documentclassification = "documentclassification";
-	};
+
+		tf.pageManager.resizablePage.onSizeChanged.subscribe(self.manageLayout);
+	}
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
 
@@ -931,30 +933,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-			{
-				callback: {
-					message: "Name already exists",
-					callback: function(value, validator, $field)
-					{
-						if (!value)
+				{
+					callback: {
+						message: "Name already exists",
+						callback: function(value, validator, $field)
 						{
-							return true;
-						}
-
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-							paramData: {
-								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-								name: value,
-								dataType: self.gridType
+							if (!value)
+							{
+								return true;
 							}
-						}, { overlay: false }).then(function(response)
-						{
-							var isUnique = response.Items[0];
-							return isUnique;
-						});
+
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+								paramData: {
+									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+									name: value,
+									dataType: self.gridType
+								}
+							}, { overlay: false }).then(function(response)
+							{
+								var isUnique = response.Items[0];
+								return isUnique;
+							});
+						}
 					}
 				}
-			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -4792,6 +4794,7 @@
 				calendar.destroy();
 			}
 		}
+		tf.pageManager.resizablePage.onSizeChanged.unsubscribe(self.manageLayout);
 		self.onCloseDetailEvent.unsubscribeAll();
 		self.onToggleDataPointPanelEvent.unsubscribeAll();
 		self.onClosePanelEvent.unsubscribeAll();

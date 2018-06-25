@@ -26,6 +26,7 @@
 		self.minRightWidth = 580;
 
 		self.onLoaded = new TF.Events.Event();
+		self.onSizeChanged = new TF.Events.Event();
 	}
 
 	ResizablePage.prototype.constructor = ResizablePage;
@@ -238,6 +239,8 @@
 			self.resizeGrid(left);
 		}
 		self.$rightPage.width(totalWidth - left);
+		self.onSizeChanged.notify();
+
 	};
 
 	ResizablePage.prototype.resizeGrid = function(left)
