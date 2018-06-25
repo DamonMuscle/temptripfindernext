@@ -731,17 +731,20 @@
 	 * @param {Event} evt 
 	 * @return {void}
 	 */
-	DataPointPanel.prototype.onNonDataElementDragStop = function(evt)
+	DataPointPanel.prototype.onNonDataElementDragStop = function(evt, ui)
 	{
 		var self = this,
 			elementType = evt.target.getAttribute("type"),
 			$rightPanel = $(".detail-view-panel"),
 			$gridStack = $rightPanel.find(".grid-stack");
 
-		if (elementType == 'image')
+		if (elementType === 'image')
 		{
-			var $inputEle = self.detailView.$gridStack.find("input[type=file]");
-			$($inputEle[$inputEle.length - 1]).trigger('click');
+			if (!ui.helper.find(".in").hasClass("hide"))
+			{
+				var $inputEle = self.detailView.$gridStack.find("input[type=file]");
+				$($inputEle[$inputEle.length - 1]).trigger('click');
+			}
 		}
 
 		if (elementType === "vertical-line" || elementType === "horizontal-line")
