@@ -4014,7 +4014,7 @@
 	{
 		var self = this;
 		self.entityDataModel.name(self.obName());
-		self.entityDataModel.subTitle(self.obSubTitle() ? self.obSubTitle().field : "");
+		self.entityDataModel.subTitle(self.obSubTitle());
 		self.entityDataModel.layout(layout ? layout : self.serializeLayout());
 		self.entityDataModel.table(self.gridType);
 	};
