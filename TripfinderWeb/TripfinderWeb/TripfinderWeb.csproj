@@ -128,6 +128,7 @@
     <Content Include="Global\Img\grid\LayoutOpen.png" />
     <Content Include="Global\Img\grid\New.png" />
     <Content Include="Global\Img\grid\refresh.png" />
+	<Content Include="Global\Img\grid\scheduler.png" />
     <Content Include="Global\Img\grid\summary.png" />
     <Content Include="Global\Img\grid\SummaryBarClearAll.png" />
     <Content Include="Global\Img\grid\SummaryBarOpen-purple.png" />

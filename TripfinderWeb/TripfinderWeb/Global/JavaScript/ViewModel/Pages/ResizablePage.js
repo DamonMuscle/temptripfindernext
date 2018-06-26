@@ -237,6 +237,9 @@
 		else
 		{
 			self.resizeGrid(left);
+			var scheduler = $(".kendoscheduler").getKendoScheduler();
+			scheduler.wrapper.height(scheduler.wrapper.parent().height());
+			scheduler.refresh();
 		}
 		self.$rightPage.width(totalWidth - left);
 		self.onSizeChanged.notify();
@@ -246,7 +249,7 @@
 	ResizablePage.prototype.resizeGrid = function(left)
 	{
 		var self = this, $grid, lockedHeaderWidth, paddingRight, width, totalWidth = self.$element.outerWidth(),
-			iconRow, wrapRow, iconRowTop, iconRowLeft, $rightGrid;
+			iconRow, schedulerRow, wrapRow, iconRowTop, iconRowLeft, $rightGrid;
 
 		$grid = self.$leftPage.find(".kendo-grid");
 		$rightGrid = self.$rightPage.find(".kendo-grid");
@@ -265,11 +268,13 @@
 			if (!TF.isPhoneDevice)
 			{
 				iconRow = self.$leftPage.find(".iconrow");
+				schedulerRow = self.$leftPage.find(".kendoscheduler");
 				wrapRow = self.$leftPage.find(".grid-staterow-wrap");
 				iconRow.css("display", "block");
 				wrapRow.removeClass("pull-left").addClass("pull-right");
 				wrapRow.css("width", "auto");
 				iconRow.css("width", "auto");
+				schedulerRow.css("width", "auto");
 				$(document).off(".iconhover");
 				wrapRow.off(".iconhover");
 				if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
@@ -298,6 +303,7 @@
 				{
 					wrapRow.css("width", "auto");
 					iconRow.css("width", "auto");
+					schedulerRow.css("width", "auto");
 					wrapRow.css("display", "block");
 					iconRow.css("display", "block");
 				}
