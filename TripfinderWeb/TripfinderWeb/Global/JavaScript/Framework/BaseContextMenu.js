@@ -16,26 +16,25 @@
 	//this method needs to be called in subclass
 	BaseContextMenu.prototype.createContainer = function($wrapper, target)
 	{
-		var $target = $(target);
-		this._target = $target;
+		var $target = $(target), $container = $('<div></div>'), self = this;
+		self._$container = $container;
+		self._target = $target;
 
-		var $container = $('<div></div>');
-		this._$container = $container;
-		var self = this;
 
-		var _mouseover = function()
+		self._mouseover = function()
 		{
+			$(document).unbind("mousemove", self._mouseout);
 			clearTimeout(self._timer);
 		};
 
-		var _mouseout = function()
+		self._mouseout = function()
 		{
 			clearTimeout(self._timer);
 			//NOTE: context menu close
 			self._timer = setTimeout(function()
 			{
 				self.dispose();
-			}, 300);
+			}, 200);
 		};
 
 		var contextMenuClose = function()
@@ -45,10 +44,10 @@
 
 		setTimeout(function()
 		{
-			$container.on("mouseover", _mouseover);
-			$container.on("mouseout", _mouseout);
-			$container.on("contextMenuClose", contextMenuClose);
-		}.bind(this), 200);
+			self._$container.hover(self._mouseover, self._mouseout);
+			$(document).on("mousemove", self._mouseout);
+			self._$container.on("contextMenuClose", contextMenuClose);
+		}.bind(this), 50);
 
 
 		if (this.isElementTarget($target[0]))
@@ -170,12 +169,14 @@
 
 	BaseContextMenu.prototype.dispose = function()
 	{
-		this.disposed = true;
-		clearTimeout(this._timer);
+		var self = this;
+		self.disposed = true;
+		clearTimeout(self._timer);
 		tf.pageManager.obContextMenuVisible(false);
-		this._$container.remove();
-		this._target.removeClass("contextmenu-open");
+		self._$container.remove();
+		self._target.removeClass("contextmenu-open");
 		$(window).off("resize.contextmenu");
+		$(document).unbind("mousemove", self._mouseout);
 	};
 
 	BaseContextMenu.prototype.render = function()

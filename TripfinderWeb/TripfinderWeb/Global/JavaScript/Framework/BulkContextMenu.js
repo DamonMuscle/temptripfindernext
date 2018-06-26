@@ -57,6 +57,7 @@
 			{
 				topx = -topSpace;
 			}
+			topx += 1;
 		}
 		$menuContainer.css({
 			position: "absolute",
