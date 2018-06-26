@@ -354,7 +354,7 @@
 	DataPointPanel.prototype.onDataGroupMouseDown = function(group, e)
 	{
 		var self = this;
-		if (e.which === 3)
+		if (e.which === 3 && group.type === "group")
 		{
 			self.openGroupMenu(group, e);
 			e.stopPropagation();
