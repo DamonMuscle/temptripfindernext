@@ -3,7 +3,8 @@ html.k-mobile {
 }
 
 .k-mobile {
-	body, html {
+	body,
+	html {
 		min-width: auto;
 		min-height: auto;
 	}
@@ -51,5 +52,25 @@ html.k-mobile {
 
 	.tf-mobile-grid-lockbar {
 		display: none;
+	}
+
+	.page-container {
+		.other-page {
+			.main-body {
+				.detail-view-panel {
+					.buttons {
+						.iconbutton {
+							&.print {
+								display: none;
+							}
+						}
+						.selector-menu {
+							width: calc(~"100% - 36px");
+						}
+					}
+				}
+			}
+
+		}
 	}
 }
