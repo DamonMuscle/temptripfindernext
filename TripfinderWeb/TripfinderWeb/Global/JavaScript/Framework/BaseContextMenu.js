@@ -42,13 +42,10 @@
 			self.dispose();
 		};
 
-		setTimeout(function()
-		{
-			self._$container.hover(self._mouseover, self._mouseout);
-			$(document).on("mousemove", self._mouseout);
-			self._$container.on("contextMenuClose", contextMenuClose);
-		}.bind(this), 50);
-
+		self._$container.on("mouseover", self._mouseover);
+		self._$container.on("mouseout", self._mouseout);
+		$(document).on("mousemove", self._mouseout);
+		self._$container.on("contextMenuClose", contextMenuClose);
 
 		if (this.isElementTarget($target[0]))
 		{
