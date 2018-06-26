@@ -461,6 +461,13 @@
 	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
 	{
 		var self = this;
+
+		//skip the method if user click the link to the same page.
+		if ($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active"))
+		{
+			return;
+		}
+
 		self.setActiveStateByPageType(type);
 		if (TF.isPhoneDevice)
 		{

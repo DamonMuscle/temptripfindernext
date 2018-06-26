@@ -51,9 +51,9 @@
 
 		this.obValueFieldValue.subscribe(function()
 		{
-			if (this.obValueFieldType() === "Boolean" && this.obValueFieldValue() !== "")
+			if (this.obValueFieldValue() !== "")
 			{
-				this.insertFragmentToCurrentCursorPostion(this.valueToSQL("Boolean", this.obValueFieldValue()));
+				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
 			}
 		}.bind(this));
 
