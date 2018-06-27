@@ -832,7 +832,9 @@
 						var w = window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"));
 						$(w).on("load", function()
 						{
-							$(w.document).find('html').append('<head><title>Tripfinder</title></head>');
+							var head = $('<head>');
+							$(w.document).find('html').append(head);
+							head.append($('<title>Tripfinder</title> <link href="' + window.location.href + 'Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">'));
 						});
 					}
 					else if (outputTo == "email")
