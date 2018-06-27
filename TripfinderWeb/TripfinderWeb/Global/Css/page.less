@@ -156,7 +156,7 @@ body,
 			}
 
 			.edit-content {
-				min-height: calc(~"100% - 56px");
+				min-height: calc(~"100% - 98px");
 
 				.row {
 					margin-left: 0;
@@ -171,7 +171,7 @@ body,
 					margin-top: 6px;
 				}
 
-				.slider-bottom-bar > div {
+				.slider-bottom-bar>div {
 					.fontSize(1, 1);
 				}
 			}
@@ -257,7 +257,7 @@ body {
 	position: fixed;
 
 
-	> .overlay {
+	>.overlay {
 		background: rgba(102, 102, 102, 0.8);
 		position: absolute;
 		top: 0;
@@ -315,7 +315,7 @@ body {
 	&.no-overlay {
 		position: initial;
 
-		> .overlay {
+		>.overlay {
 			position: initial;
 		}
 	}
@@ -372,7 +372,7 @@ body {
 		line-height: 30px;
 		font-size: 24px;
 
-		> .title {
+		>.title {
 			background: url("../img/Transfinder-TripfinderText-Only.png") no-repeat center/100%;
 			background-size: 100% 100%;
 			display: block;
@@ -541,11 +541,11 @@ body {
 	}
 }
 
-.checkbox > label {
+.checkbox>label {
 	line-height: 1.8;
 }
 
-.radio > label {
+.radio>label {
 	line-height: 1.8;
 }
 
@@ -672,11 +672,11 @@ body {
 }
 
 .legal-link {
+	display: block;
 	cursor: pointer;
 	font-size: 14px;
-	position: absolute;
-	bottom: 56px;
-	left: 15px;
+	margin-bottom: 22px;
+	margin-left: 15px;
 }
 
 .detail-view-panel {
