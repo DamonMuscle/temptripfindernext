@@ -4,11 +4,6 @@
 
 	function SettingsConfigurationPage()
 	{
-		if (!tf.permissions.obIsAdmin())
-		{
-			return tf.pageManager.handlePermissionDenied("Settings");
-		}
-
 		this.obSuccessMessageDivIsShow = ko.observable(false);
 		this.obErrorMessage = ko.observable('');
 		this.obErrorMessageDivIsShow = ko.observable(false);
@@ -18,10 +13,8 @@
 		this.obIsUpdate = ko.observable(true);
 		this.obSelectedClientId = ko.observable();
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
-
 	}
 
-	SettingsConfigurationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
 
 	SettingsConfigurationPage.prototype.authValidation = function()

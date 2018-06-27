@@ -208,6 +208,28 @@
 		}
 	};
 
+	PageManager.prototype.handlePermissionDenied = function(pageName)
+	{
+		pageName = this.getPageTitleByPageName(pageName);
+		var self = this, desc = "You do not have permissions to view" + (pageName ? " " + pageName : ".");
+		if (!tf.permissions.hasAuthorized)
+		{
+			desc += " You are not authorized for any page.";
+			return tf.promiseBootbox.alert(desc, "Invalid Permissions")
+				.then(function()
+				{
+					self.logout();
+				}.bind(this));
+		}
+		desc += " You will be redirected to your default login screen.";
+		return tf.promiseBootbox.alert(desc, "Invalid Permissions")
+			.then(function()
+			{
+				self.openNewPage("fieldtrips");
+				tf.promiseBootbox.hideAllBox();
+			}.bind(this));
+	};
+
 	/**
  * Get all data types that current user has permission to access.
  * @return {Array}
