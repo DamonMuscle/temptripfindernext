@@ -5,7 +5,7 @@
 	function SchedulerViewPage()
 	{
 		var self = this;
-		//self.obSchedulerVisible = ko.observable(false);
+		self.detailView = null;
 
 		TF.Page.BaseGridPage.apply(self, arguments);
 
@@ -135,6 +135,21 @@
 				});
 			});
 		})
+	};
+	SchedulerViewPage.prototype.showDetailsClick = function(idFromScheduler)
+	{
+		var self = this, selectedId = idFromScheduler
+		self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
+		if (TF.isPhoneDevice)
+		{
+			//TODO mobile ui
+			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+		}
+		else
+		{
+			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+		}
+
 	};
 	SchedulerViewPage.prototype.dispose = function()
 	{
