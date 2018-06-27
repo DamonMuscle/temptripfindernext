@@ -167,19 +167,16 @@
 		}
 	};
 
-	BaseGridPage.prototype.showDetailsClick = function(idFromScheduler)
+	BaseGridPage.prototype.showDetailsClick = function()
 	{
 		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedId;
 
 		if (!selectedIds || selectedIds.length <= 0)
 		{
-			if (!idFromScheduler)
-			{
-				return;
-			}
+			return;
 		}
 
-		selectedId = idFromScheduler ? idFromScheduler : selectedIds[0];
+		selectedId = selectedIds[0];
 		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
 			self.detailView.showDetailViewById(selectedId);
@@ -632,29 +629,16 @@
 		}
 	};
 
-	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
-	{
-		var self = this;
-		self.obShowDetailPanel(false);
-		self.obSchedulerVisible(false);
-		tf.pageManager.resizablePage.closeRightPage();
-	};
-
 	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
 	{
-		var self = this;
-		self.obShowDetailPanel(false);
 		tf.pageManager.resizablePage.closeRightPage();
-		var scheduler = $(".kendoscheduler").getKendoScheduler();
-		scheduler.wrapper.height(scheduler.wrapper.parent().height());
-		scheduler.refresh();
+		$(".kendoscheduler").getKendoScheduler().refresh();
 	};
 
 	BaseGridPage.prototype.navClick = function(model, element)
 	{
 		var self = this, page = new TF.Page.SchedulerViewPage();
 		self.obSchedulerVisible(!self.obSchedulerVisible());
-		model.element = $(element);
-		page.initScheduler(self, self.$element.find(".kendoscheduler"));
+		page.init(self, self.$element.find(".kendoscheduler"));
 	};
 })();

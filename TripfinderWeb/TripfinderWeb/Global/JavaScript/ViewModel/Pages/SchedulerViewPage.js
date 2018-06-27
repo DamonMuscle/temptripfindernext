@@ -6,14 +6,33 @@
 	{
 		var self = this;
 		self.detailView = null;
-
-		TF.Page.BaseGridPage.apply(self, arguments);
-
 	}
 
-	SchedulerViewPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
-
 	SchedulerViewPage.prototype.constructor = SchedulerViewPage;
+
+	SchedulerViewPage.prototype.init = function(model, $element)
+	{
+		var self = this;
+
+		self.initScheduler(model, $element);
+
+		//fix kendoscheduler week view event not align properly
+		$(".kendoscheduler").on("click", '.k-view-week', function()
+		{
+			$(".kendoscheduler").getKendoScheduler().refresh();
+		});
+
+		$(".kendoscheduler").on("click", '.k-event', function(e)
+		{
+			var scheduler = $(".kendoscheduler").getKendoScheduler();
+			var element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event");
+			var event = scheduler.occurrenceByUid(element.data("kendoUid"));
+			self.showDetailsClick(event.id);
+			scheduler.refresh();
+		});
+
+
+	};
 
 	SchedulerViewPage.prototype.initScheduler = function(model, $element)
 	{
@@ -99,25 +118,6 @@
 					}
 				]
 			});
-
-			//fix kendoscheduler month view event not align properly
-			$(".kendoscheduler").on("click", '.k-view-week', function()
-			{
-				var scheduler = $(".kendoscheduler").getKendoScheduler();
-				scheduler.wrapper.height(scheduler.wrapper.parent().height());
-				scheduler.refresh();
-			});
-
-			$(".kendoscheduler").on("click", '.k-event', function(e)
-			{
-				var scheduler = $(".kendoscheduler").getKendoScheduler();
-				var element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event");
-				var event = scheduler.occurrenceByUid(element.data("kendoUid"));
-				self.showDetailsClick(event.id);
-				scheduler.wrapper.height(scheduler.wrapper.parent().height());
-				scheduler.refresh();
-			});
-
 			$(".stage-option :checkbox").change(function(e)
 			{
 				var checked = $.map($(".stage-option :checked"), function(checkbox)
@@ -138,11 +138,11 @@
 	};
 	SchedulerViewPage.prototype.showDetailsClick = function(idFromScheduler)
 	{
-		var self = this, selectedId = idFromScheduler
-		self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
+		var self = this;
+		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
 		if (TF.isPhoneDevice)
 		{
-			//TODO mobile ui
+			//TODO Mobile
 			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
 		}
 		else
@@ -154,6 +154,6 @@
 	SchedulerViewPage.prototype.dispose = function()
 	{
 		var self = this;
-		TF.Page.BaseGridPage.prototype.dispose.call(self);
+		self.SchedulerViewPage.dispose();
 	};
 })();

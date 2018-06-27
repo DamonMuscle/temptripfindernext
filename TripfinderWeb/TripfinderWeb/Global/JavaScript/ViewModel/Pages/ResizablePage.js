@@ -237,9 +237,7 @@
 		else
 		{
 			self.resizeGrid(left);
-			var scheduler = $(".kendoscheduler").getKendoScheduler();
-			scheduler.wrapper.height(scheduler.wrapper.parent().height());
-			scheduler.refresh();
+			$(".kendoscheduler").getKendoScheduler().refresh();
 		}
 		self.$rightPage.width(totalWidth - left);
 		self.onSizeChanged.notify();
