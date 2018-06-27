@@ -135,13 +135,26 @@
 			}.bind(this))
 			.then(function()
 			{
-				return Promise.all([
-					this.loadUserDefinedLabel()
-				]).then(function()
+				if (this.options.entityType)
 				{
-					this._mergeUserDefinedLabel();
-					return this._setConfiguration();
-				}.bind(this));
+					return Promise.all([
+						this.loadUserDefinedLabel()
+					]).then(function()
+					{
+						this._mergeUserDefinedLabel();
+						return this._setConfiguration();
+					}.bind(this));
+				} else
+				{
+					return Promise.all([
+						this.loadGridFilter(), this.loadUserDefinedLabel()
+					]).then(function()
+					{
+						this._mergeUserDefinedLabel();
+						return this._setConfiguration();
+					}.bind(this));
+				}
+
 			}.bind(this));
 	};
 
