@@ -46,7 +46,6 @@
 		self.dataPointGroupHelper = new TF.DetailView.DataPointGroupHelper(self);
 		self.lineBlockHelper = new TF.DetailView.LineBlockHelper(self);
 		self.dataPointPanel = new TF.DetailView.DataPointPanel(self);
-		//self.photoHelper = new TF.Control.EditPhotoViewModel();
 
 		self.defaultSliderFontRate = 0.5;
 		self.obSliderFontRate = ko.observable(self.defaultSliderFontRate);

@@ -182,7 +182,6 @@
 			selectName = viewModel.name();
 		if (selectId === self.obSelectLayoutID())
 		{
-			// self.resetLayoutClick();
 		}
 		else
 		{

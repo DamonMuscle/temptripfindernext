@@ -323,7 +323,6 @@
 
 	GenerateReportViewModel.prototype.convertHtmlTagToOptionText = function(option, item)
 	{
-		//return ko.applyBindingsToNode(option, { disable: item.DatabaseName === '<hr>', text: item.DatabaseName === '<hr>' ? '------------' : item.DatabaseName }, item);
 		var $optionNdoe = $('#filterDataSource').find(option);
 		if ($optionNdoe.text() === '<hr>')
 		{

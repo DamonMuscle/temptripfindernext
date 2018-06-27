@@ -460,11 +460,6 @@
 	{
 		var self = this, minY = Number.MAX_VALUE, maxY = 0;
 
-		// if (self.$element.find(".page-title.detail").outerHeight() > 58)
-		// {
-		// 	self.$element.find(".closeButton").css("display", "none");
-		// }
-
 		if ($data.type === "group")
 		{
 			$.each($data.items, function(index, item)

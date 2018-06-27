@@ -7,8 +7,6 @@
 		this.option = option;
 		this.obEntityType = ko.observable(option.entityType);
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripInvoiceDataModel(option.data));
-		//this.obEntityDataModel().id(option.id);
-		//this.obEntityDataModel().fieldTripId(option.entityId);
 
 		this.obAccountSource = ko.observableArray();
 
@@ -34,15 +32,15 @@
 	FieldTripInvoiceViewModel.prototype.save = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				var entity = this.obEntityDataModel().toData();
-				entity.AccountName = this.obSelectedAccountText();
-				return entity;
-			}
-		}.bind(this));
+				if (result)
+				{
+					var entity = this.obEntityDataModel().toData();
+					entity.AccountName = this.obSelectedAccountText();
+					return entity;
+				}
+			}.bind(this));
 	}
 
 	FieldTripInvoiceViewModel.prototype.init = function(viewModel, el)
@@ -86,35 +84,26 @@
 	FieldTripInvoiceViewModel.prototype.load = function()
 	{
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccount"))
-		.then(function(data)
-		{
-			this.obAccountSource(data.Items);
-			if (this.option.data)
+			.then(function(data)
 			{
-				this.obEntityDataModel().fieldTripAccountId(this.option.data.FieldTripAccountId);
-			}
-		}.bind(this));
-
-		//if (this.obEntityDataModel().id())
-		//{
-		//	tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripinvoice", this.obEntityDataModel().id()))
-		//	.then(function(data)
-		//	{
-		//		this.obEntityDataModel(new TF.DataModel.FieldTripInvoiceDataModel(data.Items[0]));
-		//	}.bind(this))
-		//}
+				this.obAccountSource(data.Items);
+				if (this.option.data)
+				{
+					this.obEntityDataModel().fieldTripAccountId(this.option.data.FieldTripAccountId);
+				}
+			}.bind(this));
 	};
 
 	FieldTripInvoiceViewModel.prototype.apply = function()
 	{
 		return this.save()
-		.then(function(data)
-		{
-			return data;
-			this.dispose();
-		}, function()
-		{
-		});
+			.then(function(data)
+			{
+				return data;
+				this.dispose();
+			}, function()
+			{
+			});
 	};
 
 	FieldTripInvoiceViewModel.prototype.dispose = function()

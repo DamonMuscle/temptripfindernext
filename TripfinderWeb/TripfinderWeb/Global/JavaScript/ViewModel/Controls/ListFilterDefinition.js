@@ -7,7 +7,6 @@
 	ListFilterDefinition.ListFilterTemplate = {};
 
 	var ListFilterTemplateDefaultOption = {
-		// ViewModel: TF.Modal.ListMoverForListFilterControlModalViewModel,
 		listFilterType: 'WithSearchGrid',
 		DisplayFilterTypeName: "",
 		GridType: "",
@@ -269,8 +268,7 @@
 	ListFilterDefinition.ListFilterTemplate.Staff.Driver = $.extend(
 		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff,
 		{
-			DisplayFilterTypeName: "Staff",//"Drivers",
-			// getUrl: function() { return pathCombine(tf.api.apiPrefix(), "search", "driver"); }
+			DisplayFilterTypeName: "Staff",
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "staff/bystafftypeid");
@@ -753,7 +751,6 @@
 	};
 
 	var ListFilterTemplateEnumOption = {
-		//ViewModel: TF.Modal.KendoListMoverControlModalViewModel,
 		listFilterType: 'Enum',
 		sortType: 'byAllItems',
 		DisplayFilterTypeName: '',
@@ -1353,7 +1350,6 @@
 
 	ListFilterDefinition.ColumnSource.GeoCity = [
 		{
-			//FieldName: "GeoCity",
 			FieldName: "Item",
 			DisplayName: "Name",
 			Width: "160px",
@@ -1363,7 +1359,6 @@
 
 	ListFilterDefinition.ColumnSource.GeoZipCode = [
 		{
-			//FieldName: "GeoZipCode",
 			FieldName: "Item",
 			DisplayName: "Name",
 			Width: "160px",

@@ -7,9 +7,6 @@
 		this.initialize = this.initialize.bind(this);
 		this.deleteClick = this.deleteClick.bind(this);
 		this.refreshClick = this.refreshClick.bind(this);
-		this.printClick = this.printClick.bind(this);
-		this.nextClick = this.nextClick.bind(this);
-		this.previousClick = this.previousClick.bind(this);
 		this.leftPress = this.leftPress.bind(this);
 		this.rightPress = this.rightPress.bind(this);
 		this.loadRecord = this.loadRecord.bind(this);
@@ -18,18 +15,15 @@
 
 		this.obNeedSaveTemplate = ko.observable(false);
 		this.obNeedSaveAndClose = ko.observable(true);
-		// this.obDataEntryViewModel = ko.observable(null);
 
 		this.onRequestClose = new TF.Events.Event();
 		this.onMainDataLoaded = new TF.Events.Event();
-		// this.localStorageDataModel = new TF.DataModel.LocalStorageDataModel();
 
 		this.initializationFrontdesk = null;
 
 		this._updateEntityStatusMessageHandler = null;
 
 		this.type = view ? view.type : null;
-		this.documentType = TF.Document.DocumentData.DataEntry;
 		this.obTitle = ko.observable();
 		this.obgridTitle = ko.observable();
 		this.dataModelType = null;
@@ -38,7 +32,6 @@
 
 
 		this._view = view;
-		// this._documentElement = documentElement;
 		this.dataEntryTemplateName = "";
 		this.obCurrentPage = ko.observable(this._view.orderID);
 
@@ -67,7 +60,6 @@
 			this.pageLevelViewModel = new TF.PageLevel.BaseDataEntryPageLevelViewModel();
 		}
 		this.obContentDivHeight = ko.computed(this.showMessageComputer, this);
-		//this.obCurrentPage.subscribe(this.loadRecord);// no need reload page anymore(application page)
 		if (this._view.document)
 		{
 			tf.shortCutKeys.bind("left", this.leftPress, this._view.document.routeState);
@@ -281,21 +273,6 @@
 		return (this.obCurrentPage() + 1) + ' of ' + this.obIds().length;
 	};
 
-	//BaseDataEntryViewModel.prototype.pendingSave = function()
-	//{
-	//	throw "Not implemented";
-	//};
-
-	BaseDataEntryViewModel.prototype.previousClick = function(viewModel, e)
-	{
-		this._changePage(-1);
-	};
-
-	BaseDataEntryViewModel.prototype.nextClick = function(viewModel, e)
-	{
-		this._changePage(1);
-	};
-
 	BaseDataEntryViewModel.prototype.newCopyClick = function(viewModel, e)
 	{//this is the copy function of the data entry form, now only for trip DE
 
@@ -307,31 +284,6 @@
 
 	BaseDataEntryViewModel.prototype.leftPress = function(e, keyCombination)
 	{
-	};
-
-	BaseDataEntryViewModel.prototype._changePage = function(pagePath)
-	{
-		var page = this.obCurrentPage() + pagePath;
-		if (page < 0 || page > this.obIds().length - 1)
-		{
-			return;
-		}
-		if (this.obApiIsDirty() || this.obModifiedMessage())
-		{
-			this.tryGoAway('changepage')
-				.then(function(result)
-				{
-					if (result)
-					{
-						tf.documentManagerViewModel.navigateToTab(page, this.type, this.documentType);
-						//this.obCurrentPage(page);
-					}
-				}.bind(this))
-		}
-		else
-		{
-			tf.documentManagerViewModel.navigateToTab(page, this.type, this.documentType);
-		}
 	};
 
 	BaseDataEntryViewModel.prototype.load = function()
@@ -346,12 +298,6 @@
 		$(this.$form.context).find("button").attr("tabindex", "-1");
 		$(this.$form.context).find("input[type=button]").attr("tabindex", "-1");
 		$(this.$form.context).find("input[data-tf-input-type=Select]").attr("tabindex", "-1");
-
-		if (this._view.documentType == TF.Document.DocumentData.UserProfile)
-		{
-			this.obEntityDataModel(new this.dataModelType());
-			return Promise.resolve();
-		}
 
 		if (this._view && this._view.id)
 		{
@@ -405,10 +351,6 @@
 
 	BaseDataEntryViewModel.prototype.loadSupplement = function()
 	{
-		if (this._view.documentType == TF.Document.DocumentData.UserProfile)
-		{
-			return;
-		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userdefinedlabel", this.type))
 			.then(function(data)
 			{
@@ -923,10 +865,6 @@
 
 	BaseDataEntryViewModel.prototype._setupCheckEntityStatus = function()
 	{
-		if (this._view.documentType == TF.Document.DocumentData.UserProfile)
-		{
-			return;
-		}
 		if (this.obIds().length > 0)
 		{
 			this._updateEntityStatusMessage();
@@ -944,11 +882,6 @@
 
 	BaseDataEntryViewModel.prototype._checkEntityStatusAndSetMessage = function()
 	{
-		if (this._view.documentType == TF.Document.DocumentData.UserProfile)
-		{
-			return Promise.resolve();
-		}
-
 		if (this._view && this._view.id)
 		{
 			var lastUpdated = this.obEntityDataModel().lastUpdated();
@@ -1144,15 +1077,6 @@
 		}
 	};
 
-	BaseDataEntryViewModel.prototype.printClick = function(viewModel, e)
-	{
-		var elements = $('[class=doc]');
-		var docs = elements.filter(function() { return $(this).css('visibility') == 'hidden' || $(this).css('display') == 'none' });
-		docs.css("display", "none");
-		window.print();
-		docs.css("display", "block");
-	};
-
 	BaseDataEntryViewModel.prototype.deleteClick = function(viewModel, e)
 	{
 		if (this._view && this._view.id)
@@ -1220,18 +1144,6 @@
 		return this.obMode() == "Edit";
 	};
 
-	//BaseDataEntryViewModel.prototype.setSelectValue = function(field)
-	//{
-	//	return function(scope, event)
-	//	{
-	//		var observableField = this.obEntityDataModel()[field];
-	//		if (observableField() != event.target.value)
-	//		{
-	//			observableField(event.target.value);
-	//		}
-	//	}
-	//};
-
 	BaseDataEntryViewModel.prototype.setSelectValue = function(field, itemName, format)
 	{
 		return function()
@@ -1269,34 +1181,8 @@
 		}
 	};
 
-	//BaseDataEntryViewModel.prototype.setSelectBlur = function(sourceName, format)
-	//{
-	//	return function(viewModel, e)
-	//	{
-	//		if (!this.isInPopup)
-	//		{
-	//			var selectData = $.grep(this[sourceName](), function(n)
-	//			{
-	//				return format(n) === viewModel.value();
-	//			})[0];
-	//			if (!selectData)
-	//			{
-	//				viewModel.value("");
-	//			}
-	//			else
-	//			{
-	//				viewModel.value(format(selectData));
-	//			}
-	//		}
-	//	}.bind(this)
-	//}
-
 	BaseDataEntryViewModel.prototype.isNotSpecialEdit = function()
 	{
-		if (this._view.documentType == TF.Document.DocumentData.UserProfile)
-		{
-			return false;
-		}
 		return true;
 	};
 

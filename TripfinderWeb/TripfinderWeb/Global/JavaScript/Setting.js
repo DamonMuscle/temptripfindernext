@@ -35,19 +35,6 @@
 							return TF.Color.toHTMLColorFromLongColor(c);
 						});
 					}
-					try
-					{
-						TF.Control.EditPhotoViewModel.prototype.getImage('userprofile', tf.authManager.authorizationInfo.authorizationTree.userId, "userprofile", tf.api.apiPrefixWithoutDatabase() + "/0").then(function(image)
-						{
-							if (image)
-							{
-								var head = 'data:image/jpeg;base64,' + image;
-								addStyle("userProfileImage", ".iconbutton.user{background-image:url(" + head + ")}");
-							}
-						}.bind(this));
-					}
-					catch (ex)
-					{ }
 				}
 			}.bind(this));
 	};
