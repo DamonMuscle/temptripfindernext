@@ -181,8 +181,6 @@
 			}.bind(this)).ToArray();
 
 			this.obReport(theDatas.length > 0 ? theDatas[0] : null);
-
-			this.getFilter();
 			this.firstLoad = false;
 		}.bind(this));
 		setTimeout(function()
