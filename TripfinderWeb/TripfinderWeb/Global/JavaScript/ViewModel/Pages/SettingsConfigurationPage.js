@@ -18,7 +18,6 @@
 		this.obIsUpdate = ko.observable(true);
 		this.obSelectedClientId = ko.observable();
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
-
 	}
 
 	SettingsConfigurationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -187,7 +186,7 @@
 				}
 				else
 				{
-					this.postData();
+					return this.postData();
 				}
 			}.bind(this));
 	};
