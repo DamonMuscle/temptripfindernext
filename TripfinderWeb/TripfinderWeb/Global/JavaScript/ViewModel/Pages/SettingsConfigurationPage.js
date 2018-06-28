@@ -11,14 +11,16 @@
 		self.obErrorMessage = ko.observable('');
 		self.obErrorMessageDivIsShow = ko.observable(false);
 		self.obValidationErrors = ko.observableArray([]);
-		self.testSentEmailClick = this.testSentEmailClick.bind(this);
+		self.testSentEmailClick = self.testSentEmailClick.bind(self);
 		self.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
 		self.obIsUpdate = ko.observable(true);
 		self.obSelectedClientId = ko.observable();
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+		TF.Page.BaseGridPage.apply(self, arguments);
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
+	SettingsConfigurationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 
 	SettingsConfigurationPage.prototype.authValidation = function()
 	{
@@ -34,14 +36,16 @@
 
 	SettingsConfigurationPage.prototype.load = function()
 	{
-		this.getClients().then(function()
+		var self = this;
+		self.getClients().then(function()
 		{
-			this.loadClientConfig();
+			self.loadClientConfig();
 		}.bind(this));
 	};
 
 	SettingsConfigurationPage.prototype.getClients = function()
 	{
+		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "getClientIds"))
 			.then(function(result)
 			{
@@ -49,7 +53,7 @@
 				{
 					if (item.toLowerCase() === tf.authManager.clientKey.toLowerCase())
 					{
-						this.obSelectedClientId(item);
+						self.obSelectedClientId(item);
 					}
 				}, this);
 			}.bind(this));
@@ -57,15 +61,15 @@
 
 	SettingsConfigurationPage.prototype.loadClientConfig = function()
 	{
-		var clientId = this.obSelectedClientId() !== "New" ? this.obSelectedClientId() : "";
+		var self = this, clientId = self.obSelectedClientId() !== "New" ? self.obSelectedClientId() : "";
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), { data: { clientId: clientId } })
 			.then(function(data)
 			{
-				this.obEntityDataModel(new TF.DataModel.SettingsConfigurationDataModal(data.Items[0]));
-				this.obIsUpdate(clientId !== "");
-				this.obEntityDataModel().apiIsDirty(false);
-				this.setValidation();
-				if (!this.obIsUpdate())
+				self.obEntityDataModel(new TF.DataModel.SettingsConfigurationDataModal(data.Items[0]));
+				self.obIsUpdate(clientId !== "");
+				self.obEntityDataModel().apiIsDirty(false);
+				self.setValidation();
+				if (!self.obIsUpdate())
 				{
 					$("input[name=clientId]").focus();
 				}
@@ -74,15 +78,21 @@
 
 	SettingsConfigurationPage.prototype.init = function(viewModel, el)
 	{
-		this.authValidation().then(function(response)
+		var self = this;
+		self.authValidation().then(function(response)
 		{
 			if (response)
 			{
-				this._$form = $(el);
+				self._$form = $(el);
 
-				this.setValidation();
-				this._$form.find("[name=clientId]").focus();
-				this.load();
+				self.setValidation();
+				self._$form.find("[name=clientId]").focus();
+				if (TF.isPhoneDevice)
+				{
+					self._$form.find(".mobile-header .add").hide();
+				}
+
+				self.load();
 			}
 		}.bind(this));
 	};
@@ -134,11 +144,11 @@
 				}
 			};
 
-			if (this._$form.data("bootstrapValidator"))
+			if (self._$form.data("bootstrapValidator"))
 			{
-				this._$form.data("bootstrapValidator").destroy();
+				self._$form.data("bootstrapValidator").destroy();
 			}
-			this._$form.bootstrapValidator({
+			self._$form.bootstrapValidator({
 				excluded: [':hidden', ':not(:visible)'],
 				live: 'enabled',
 				message: 'This value is not valid',
@@ -156,14 +166,15 @@
 					});
 				}
 			});
-			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
+			self.pageLevelViewModel.load(self._$form.data("bootstrapValidator"));
 		}.bind(this), 0);
 	};
 
 	SettingsConfigurationPage.prototype.testSentEmailClick = function()
 	{
+		var self = this;
 		tf.modalManager.showModal(
-			new TF.Modal.TestEmailModalViewModel(this.obEntityDataModel())
+			new TF.Modal.TestEmailModalViewModel(self.obEntityDataModel())
 		);
 	};
 
@@ -174,7 +185,8 @@
 
 	SettingsConfigurationPage.prototype.saveClick = function()
 	{
-		return this.pageLevelViewModel.saveValidate()
+		var self = this;
+		return self.pageLevelViewModel.saveValidate()
 			.then(function(valid)
 			{
 				if (!valid)
@@ -183,48 +195,50 @@
 				}
 				else
 				{
-					return this.postData();
+					return self.postData();
 				}
 			}.bind(this));
 	};
 
 	SettingsConfigurationPage.prototype.postData = function()
 	{
-		this.obEntityDataModel().apiIsNew(!this.obIsUpdate());
+		var self = this;
+		self.obEntityDataModel().apiIsNew(!self.obIsUpdate());
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
-			data: this.obEntityDataModel().toData()
+			data: self.obEntityDataModel().toData()
 		}).then(function(data)
 		{
-			this.pageLevelViewModel.popupSuccessMessage();
-			this.obEntityDataModel().apiIsDirty(false);
+			self.pageLevelViewModel.popupSuccessMessage();
+			self.obEntityDataModel().apiIsDirty(false);
 
-			if (!this.obIsUpdate())
+			if (!self.obIsUpdate())
 			{
-				this.getClients().then(function()
+				self.getClients().then(function()
 				{
-					this.obSelectedClientId(this.obEntityDataModel().clientId());
+					self.obSelectedClientId(self.obEntityDataModel().clientId());
 				}.bind(this));
-				this.obIsUpdate(true);
+				self.obIsUpdate(true);
 			}
 			return true;
 		}.bind(this), function(data)
 		{
-			this.obErrorMessageDivIsShow(true);
-			this.obErrorMessage(data.ExceptionMessage);
+			self.obErrorMessageDivIsShow(true);
+			self.obErrorMessage(data.ExceptionMessage);
 			return false;
 		}.bind(this));
 	};
 
 	SettingsConfigurationPage.prototype.cancelClick = function()
 	{
-		if (this.obEntityDataModel().apiIsDirty())
+		var self = this;
+		if (self.obEntityDataModel().apiIsDirty())
 		{
 			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
 				.then(function(result)
 				{
 					if (result === true)
 					{
-						this.saveClick().then(function(result)
+						self.saveClick().then(function(result)
 						{
 							if (result)
 							{
@@ -247,6 +261,7 @@
 
 	SettingsConfigurationPage.prototype.dispose = function()
 	{
-		this.pageLevelViewModel.dispose();
+		var self = this;
+		self.pageLevelViewModel.dispose();
 	};
 })();
