@@ -6,6 +6,8 @@
 	{
 		var self = this;
 		self.detailView = null;
+		self.type = "scheduler";
+		self.pageType = "scheduler";
 
 		self.isDetailPanelShown = ko.observable(false);
 	}

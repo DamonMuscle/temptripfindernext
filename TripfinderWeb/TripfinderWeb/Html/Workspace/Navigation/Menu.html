@@ -32,7 +32,7 @@
 		<div class="toolbar-button item-icon more" data-bind="click:showMoreButtonClick">
 		</div>
 		<div class="toolbar-button item-icon logout" data-bind="click:tf.pageManager.logOffClick"></div>
-		<div class="toolbar-button item-icon setting" pageType="settings" data-bind="click:navigationPageCategoryClick.bind($data, 'settings')"></div>
+		<div class="toolbar-button item-icon setting" pageType="settings" data-bind="visible:tf.permissions.obIsAdmin(), click:navigationPageCategoryClick.bind($data, 'settings')"></div>
 		<div class="toolbar-button item-icon report" pageType="reports" data-bind="click:navigationPageCategoryClick.bind($data, 'reports')"></div>
 	</div>
 </div>

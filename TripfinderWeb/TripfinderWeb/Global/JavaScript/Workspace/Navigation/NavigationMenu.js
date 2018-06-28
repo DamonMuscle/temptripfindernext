@@ -650,7 +650,10 @@
 		$(".navigation-item").removeClass("active");
 		$(".toolbar-button").removeClass("active");
 		$categoryItem.addClass("active");
-		$bottomItem.addClass("active");
+		if (pagetype !== 'settings')
+		{
+			$bottomItem.addClass("active");
+		}
 	};
 
 	/**

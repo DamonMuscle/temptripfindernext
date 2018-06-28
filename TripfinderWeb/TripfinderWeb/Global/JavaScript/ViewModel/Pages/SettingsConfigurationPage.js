@@ -4,6 +4,8 @@
 
 	function SettingsConfigurationPage()
 	{
+		self.type = "settings";
+		self.pageType = "settings";
 		this.obSuccessMessageDivIsShow = ko.observable(false);
 		this.obErrorMessage = ko.observable('');
 		this.obErrorMessageDivIsShow = ko.observable(false);
