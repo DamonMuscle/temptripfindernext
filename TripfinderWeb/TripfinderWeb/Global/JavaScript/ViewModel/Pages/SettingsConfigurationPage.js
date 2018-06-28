@@ -4,23 +4,20 @@
 
 	function SettingsConfigurationPage()
 	{
-		if (!tf.permissions.obIsAdmin())
-		{
-			return tf.pageManager.handlePermissionDenied("Settings");
-		}
-
-		this.obSuccessMessageDivIsShow = ko.observable(false);
-		this.obErrorMessage = ko.observable('');
-		this.obErrorMessageDivIsShow = ko.observable(false);
-		this.obValidationErrors = ko.observableArray([]);
-		this.testSentEmailClick = this.testSentEmailClick.bind(this);
-		this.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
-		this.obIsUpdate = ko.observable(true);
-		this.obSelectedClientId = ko.observable();
-		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+		var self = this;
+		self.type = "settings";
+		self.pageType = "settings";
+		self.obSuccessMessageDivIsShow = ko.observable(false);
+		self.obErrorMessage = ko.observable('');
+		self.obErrorMessageDivIsShow = ko.observable(false);
+		self.obValidationErrors = ko.observableArray([]);
+		self.testSentEmailClick = this.testSentEmailClick.bind(this);
+		self.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
+		self.obIsUpdate = ko.observable(true);
+		self.obSelectedClientId = ko.observable();
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
-	SettingsConfigurationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
 
 	SettingsConfigurationPage.prototype.authValidation = function()
