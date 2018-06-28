@@ -26,9 +26,9 @@
 
 		$(".kendoscheduler").on("dblclick", '.k-event', function(e)
 		{
-			var scheduler = $(".kendoscheduler").getKendoScheduler();
-			var element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event");
-			var event = scheduler.occurrenceByUid(element.data("kendoUid"));
+			var scheduler = $(".kendoscheduler").getKendoScheduler(),
+				element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event"),
+				event = scheduler.occurrenceByUid(element.data("kendoUid"));
 			self.showDetailsClick(event.id);
 			self.isDetailPanelShown(true);
 			scheduler.refresh();
@@ -38,13 +38,9 @@
 		{
 			if (self.isDetailPanelShown())
 			{
-				var scheduler = $(".kendoscheduler").getKendoScheduler();
-				var element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event");
-				var event = scheduler.occurrenceByUid(element.data("kendoUid"));
-				if (!self.detailView)
-				{
-					self.detailView = new TF.DetailView.DetailViewViewModel(event.id);
-				}
+				var scheduler = $(".kendoscheduler").getKendoScheduler(),
+					element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event"),
+					event = scheduler.occurrenceByUid(element.data("kendoUid"));
 				self.detailView.showDetailViewById(event.id);
 				scheduler.refresh();
 			}
@@ -153,6 +149,7 @@
 			});
 		})
 	};
+
 	MySchedulerPage.prototype.showDetailsClick = function(idFromScheduler)
 	{
 		var self = this;
@@ -178,15 +175,11 @@
 
 	MySchedulerPage.prototype.navToGridViewClick = function(model, element)
 	{
-		// self.obShowDetailPanel(false);
-		// var self = this, page = new TF.Page.MySchedulerPage();
-		// page.init(self, self.$element.find(".kendoscheduler"));
 		tf.pageManager.openNewPage("fieldtrips");
 	};
 
-
 	MySchedulerPage.prototype.dispose = function()
 	{
-
+		//TODO
 	};
 })();
