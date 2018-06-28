@@ -19,7 +19,6 @@
 		self.obShowDetailPanel = ko.observable(false);
 		self.obShowFieldTripDEPanel = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
-		self.obSchedulerVisible = ko.observable(false);
 		self.kendoGridScroll = null;
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
@@ -600,8 +599,13 @@
 	{
 		var self = this;
 		self.obShowDetailPanel(false);
-		self.obSchedulerVisible(false);
 		tf.pageManager.resizablePage.closeRightPage();
+	};
+
+	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
+	{
+		var self = this;
+		tf.pageManager.openNewPage("scheduler");
 	};
 
 	BaseGridPage.prototype.dispose = function()
@@ -627,18 +631,5 @@
 		{
 			self[i] = null;
 		}
-	};
-
-	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
-	{
-		tf.pageManager.resizablePage.closeRightPage();
-		$(".kendoscheduler").getKendoScheduler().refresh();
-	};
-
-	BaseGridPage.prototype.navClick = function(model, element)
-	{
-		var self = this, page = new TF.Page.SchedulerViewPage();
-		self.obSchedulerVisible(!self.obSchedulerVisible());
-		page.init(self, self.$element.find(".kendoscheduler"));
 	};
 })();

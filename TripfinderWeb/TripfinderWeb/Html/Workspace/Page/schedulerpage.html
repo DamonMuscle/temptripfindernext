@@ -1,0 +1,20 @@
+<div data-bind="uiInit:init" class="document-grid page-container">
+	<!-- ko if:TF.isPhoneDevice-->
+	<div class="mobile-header">
+		<div class="icon logo"></div>
+		<div class="icon float-right menu" data-bind="click:openNavigationClick"></div>
+		<div class="icon float-right add"></div>
+	</div>
+	<!-- /ko -->
+	<div class="desktop-header">
+		<div class="page-title">FieldTrip Scheduler View</div>
+	</div>
+	<div class="scheduler-icon">
+		<button class="calenderview" data-bind="click:schedulerViewClick">Scheduler View</button>
+		<button class="backtogridview" data-bind="click:navToGridViewClick">Back to Grid View</button>
+	</div>
+	<div class="scheduler-wrap" style="height:calc(100% - 166px); float:left; ">
+		<div class="stage-option"></div>
+		<div class="kendoscheduler"></div>
+	</div>
+</div>

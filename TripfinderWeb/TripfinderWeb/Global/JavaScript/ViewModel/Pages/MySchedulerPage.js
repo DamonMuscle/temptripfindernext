@@ -1,20 +1,22 @@
 (function()
 {
-	createNamespace("TF.Page").SchedulerViewPage = SchedulerViewPage;
+	createNamespace("TF.Page").MySchedulerPage = MySchedulerPage;
 
-	function SchedulerViewPage()
+	function MySchedulerPage()
 	{
 		var self = this;
 		self.detailView = null;
+
+		self.isDetailPanelShown = ko.observable(false);
 	}
 
-	SchedulerViewPage.prototype.constructor = SchedulerViewPage;
+	MySchedulerPage.prototype.constructor = MySchedulerPage;
 
-	SchedulerViewPage.prototype.init = function(model, $element)
+	MySchedulerPage.prototype.init = function()
 	{
 		var self = this;
 
-		self.initScheduler(model, $element);
+		self.initScheduler();
 
 		//fix kendoscheduler week view event not align properly
 		$(".kendoscheduler").on("click", '.k-view-week', function()
@@ -22,21 +24,38 @@
 			$(".kendoscheduler").getKendoScheduler().refresh();
 		});
 
-		$(".kendoscheduler").on("click", '.k-event', function(e)
+		$(".kendoscheduler").on("dblclick", '.k-event', function(e)
 		{
 			var scheduler = $(".kendoscheduler").getKendoScheduler();
 			var element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event");
 			var event = scheduler.occurrenceByUid(element.data("kendoUid"));
 			self.showDetailsClick(event.id);
+			self.isDetailPanelShown(true);
 			scheduler.refresh();
 		});
 
+		$(".kendoscheduler").on("click", '.k-event', function(e)
+		{
+			if (self.isDetailPanelShown())
+			{
+				var scheduler = $(".kendoscheduler").getKendoScheduler();
+				var element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event");
+				var event = scheduler.occurrenceByUid(element.data("kendoUid"));
+				if (!self.detailView)
+				{
+					self.detailView = new TF.DetailView.DetailViewViewModel(event.id);
+				}
+				self.detailView.showDetailViewById(event.id);
+				scheduler.refresh();
+			}
+		});
 
 	};
 
-	SchedulerViewPage.prototype.initScheduler = function(model, $element)
+	MySchedulerPage.prototype.initScheduler = function($element)
 	{
-		var self = this;
+		var self = this, $element = $(".kendoscheduler");
+		// Hard coded Only for prototype
 		tf.ajax.post(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission"),
 			{
 				"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
@@ -80,9 +99,7 @@
 			});
 
 			$element.empty();
-			model.isFetched = true;
-			model.CalendarId = 0;
-			model.calendarAction = "";
+
 			$element.kendoScheduler({
 				date: new Date("2015/9/9"),
 				startTime: new Date("2015/9/9 07:00 AM"),
@@ -136,7 +153,7 @@
 			});
 		})
 	};
-	SchedulerViewPage.prototype.showDetailsClick = function(idFromScheduler)
+	MySchedulerPage.prototype.showDetailsClick = function(idFromScheduler)
 	{
 		var self = this;
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
@@ -151,9 +168,25 @@
 		}
 
 	};
-	SchedulerViewPage.prototype.dispose = function()
+
+	MySchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
 	{
 		var self = this;
-		self.SchedulerViewPage.dispose();
+		self.isDetailPanelShown(true);
+		tf.pageManager.openNewPage("scheduler");
+	};
+
+	MySchedulerPage.prototype.navToGridViewClick = function(model, element)
+	{
+		// self.obShowDetailPanel(false);
+		// var self = this, page = new TF.Page.MySchedulerPage();
+		// page.init(self, self.$element.find(".kendoscheduler"));
+		tf.pageManager.openNewPage("fieldtrips");
+	};
+
+
+	MySchedulerPage.prototype.dispose = function()
+	{
+
 	};
 })();

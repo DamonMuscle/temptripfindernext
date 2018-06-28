@@ -63,6 +63,10 @@
 				pageData = new TF.Page.SettingsConfigurationPage();
 				templateName = "workspace/admin/settings_configuration";
 				break;
+			case "scheduler":
+				pageData = new TF.Page.MySchedulerPage();
+				templateName = "workspace/page/schedulerpage";
+				break;
 		}
 
 		self.resizablePage.leftPageType = type;

@@ -265,6 +265,7 @@
     <Content Include="Global\JavaScript\ViewModel\Pages\BaseGridPage.js" />
     <Content Include="Global\JavaScript\ViewModel\Pages\FieldTripPage.js" />
     <Content Include="Global\JavaScript\ViewModel\Pages\SettingsConfigurationPage.js">
+	<Content Include="Global\JavaScript\ViewModel\Pages\MySchedulerPage.js">
     <Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\BasePageLevelViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Workspace\PageLevel\ListMoverPageLevelViewModel.js" />
     <Content Include="Global\JavaScript\Workspace\GridDefinition\FieldTripGridDefinition.js" />
@@ -402,6 +403,7 @@
     <Content Include="Html\Workspace\Page\basegridpage.html" />
     <Content Include="Html\Workspace\Page\grid\fieldtrip\bulkmenu.html" />
     <Content Include="Html\Workspace\Admin\settings_configuration.html" />
+	<Content Include="Html\Workspace\Page\scheduler.html" />
     <Content Include="index.html" />
     <Content Include="local_settings_template.js" />
   </ItemGroup>

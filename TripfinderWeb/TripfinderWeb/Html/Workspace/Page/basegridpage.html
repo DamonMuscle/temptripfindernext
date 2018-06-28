@@ -14,7 +14,7 @@
 		<div class="new">New</div>
 		<!-- /ko -->
 	</div>
-	<div class="grid-icons" data-bind="visible:!obSchedulerVisible()">
+	<div class="grid-icons">
 		<div class="iconrow">
 			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></div>
 			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
@@ -41,7 +41,7 @@
 			<div class="divider" title=""></div>
 			<div class="iconbutton refresh" title="Refresh"></div>
 			<div class="divider" title=""></div>
-			<div class="iconbutton kendo-scheduler" title="Scheduler" data-bind="click:navClick"></div>
+			<div class="iconbutton kendo-scheduler" title="Scheduler" data-bind="click:schedulerViewClick"></div>
 		</div>
 		<div class="pull-right grid-staterow-wrap">
 			<div class="grid-staterow">
@@ -68,16 +68,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="scheduler-icon" data-bind="visible:obSchedulerVisible()">
-		<button class="calenderview" data-bind="click:schedulerViewClick">Scheduler View</button>
-		<button class="backtogridview" data-bind="click:gridViewClick">Back to Grid View</button>
-	</div>
-	<div class="grid-wrap" data-bind="visible:!obSchedulerVisible(), finish:initScheduler">
+	<div class="grid-wrap">
 		<div class="kendo-grid kendo-grid-container"></div>
 		<div class="kendo-grid kendo-summarygrid-container" data-bind="visible:obSummaryGridVisible()"></div>
-	</div>
-	<div class="scheduler-wrap" style="height:calc(100% - 166px); float:left; " data-bind="visible:obSchedulerVisible()">
-		<div class="stage-option"></div>
-		<div class="kendoscheduler"></div>
 	</div>
 </div>
