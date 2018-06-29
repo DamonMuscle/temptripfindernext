@@ -8,6 +8,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Generate Report");
 		this.sizeCss = "modal-lg";
+		this.obPositiveButtonLabel("Run");
 		this.contentTemplate('modal/GenerateReportControl');
 		this.buttonTemplate('modal/positivenegative');
 		this.addReportViewModel = new TF.Control.GenerateReportViewModel(udReport, output, options);
