@@ -1,4 +1,4 @@
-<div data-bind="uiInit:init" class="document-grid page-container">
+<div class="document-grid page-container">
 	<!-- ko if:TF.isPhoneDevice-->
 	<div class="mobile-header">
 		<div class="icon logo"></div>
@@ -14,7 +14,7 @@
 		<button class="backtogridview" data-bind="click:navToGridViewClick">Back to Grid View</button>
 	</div>
 	<div class="scheduler-wrap" style="height:calc(100% - 166px); float:left; ">
-		<div class="stage-option"></div>
-		<div class="kendoscheduler"></div>
+		<!-- ko template :{ name : "workspace/scheduler/base",data:calendarDataViewModel }-->
+		<!-- /ko -->
 	</div>
 </div>
