@@ -26,7 +26,7 @@
 
 				date: new Date(),
 
-				//startTime: new Date("2015/9/9 07:00 AM"),
+				startTime: new Date(),
 
 				height: 800,
 

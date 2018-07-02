@@ -37,10 +37,9 @@
 		});
 	}
 
-
 	FieldTripSchedulerViewModel.prototype.eventBinding = function()
 	{
-		var self = this;
+		var self = this, scheduler = $(".kendoscheduler").getKendoScheduler();
 
 		$(".stage-option :checkbox").change(function(e)
 		{
@@ -48,8 +47,6 @@
 			{
 				return parseInt($(checkbox).val());
 			});
-
-			var scheduler = $(".kendoscheduler").data("kendoScheduler");
 
 			scheduler.dataSource.filter({
 				operator: function(trip)
@@ -65,27 +62,54 @@
 			$(".kendoscheduler").getKendoScheduler().refresh();
 		});
 
-		$(".kendoscheduler").on("dblclick", '.k-event', function(e)
+		var doubleClickBind = function(e, selector)
 		{
-			var scheduler = $(".kendoscheduler").getKendoScheduler(),
-				element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event"),
+			var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
 				event = scheduler.occurrenceByUid(element.data("kendoUid"));
 			self.showDetailsClick(event.id);
 			self.isDetailPanelShown(true);
 			scheduler.refresh();
-		});
-
-		$(".kendoscheduler").on("click", '.k-event', function(e)
-		{
-			if (self.isDetailPanelShown())
+		},
+			clickBind = function(e, selector)
 			{
-				var scheduler = $(".kendoscheduler").getKendoScheduler(),
-					element = $(e.target).is(".k-event") ? $(e.target) : $(e.target).closest(".k-event"),
-					event = scheduler.occurrenceByUid(element.data("kendoUid"));
-				self.detailView.showDetailViewById(event.id);
-				scheduler.refresh();
-			}
-		});
+				if (self.isDetailPanelShown())
+				{
+					var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
+						event = scheduler.occurrenceByUid(element.data("kendoUid"));
+					self.detailView.showDetailViewById(event.id);
+					scheduler.refresh();
+				}
+			};
+
+		if (TF.isPhoneDevice)
+		{
+			//TODO
+		}
+		else
+		{
+			var eventselector = '.k-event';
+			var taskselector = '.k-task';
+			$(".kendoscheduler").on("dblclick", eventselector, function(e) 
+			{
+				doubleClickBind(e, eventselector);
+			});
+
+			$(".kendoscheduler").on("click", eventselector, function(e) 
+			{
+				clickBind(e, eventselector);
+			});
+			$(".kendoscheduler").on("dblclick", taskselector, function(e) 
+			{
+				doubleClickBind(e, taskselector);
+			});
+
+			$(".kendoscheduler").on("click", taskselector, function(e) 
+			{
+				clickBind(e, taskselector);
+			});
+		}
+
+
 	};
 
 	FieldTripSchedulerViewModel.prototype.getSchedulerDataSources = function(data)
