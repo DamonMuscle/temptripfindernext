@@ -17,9 +17,13 @@
 		self.obErrorMessageDescription = ko.observable("The following error occurred.");
 		self.obSuccessMessage = ko.observable(self.defaultSuccessMessage);
 		self.obPageLevelCss = ko.observable("");
+		self.obCurrentErrorIndex = ko.observable(0);
 
 		self.obSuccessMessageSpecifedDivIsShow = ko.observable(false);
 		self.obSuccessMessageSpecifed = ko.observableArray([]);
+
+		self.toPreError = self.toPreError.bind(self);
+		self.toNextError = self.toNextError.bind(self);
 		self.validationMessage = null;
 		self.autoFocus = true;
 	}
@@ -31,7 +35,7 @@
 	BasePageLevelViewModel.prototype.load = function(validator)
 	{
 		this._validator = validator;
-	}
+	};
 
 	BasePageLevelViewModel.prototype.initialized = function(viewModel, el)
 	{
@@ -43,8 +47,75 @@
 			$("body").append(self.validationMessage);
 		}
 
+		ko.computed(function()
+		{
+			var totalCount = self.obValidationErrors().length + self.obValidationErrorsSpecifed().length;
+			if (totalCount > 0)
+			{
+				// wait for the dom in html is changed.
+				setTimeout(function()
+				{
+					self.displayError();
+				});
+			}
+		});
+
 		self.$pageLevel = $pageLevel;
-	}
+	};
+
+	BasePageLevelViewModel.prototype.toPreError = function()
+	{
+		this.navigateError(false);
+	};
+
+	BasePageLevelViewModel.prototype.navigateError = function(toNext)
+	{
+		var self = this, totalCount, currentIndex = self.obCurrentErrorIndex();
+		totalCount = self.getErrorsCount();
+
+		if (totalCount <= 1)
+		{
+			return;
+		}
+
+		if (currentIndex + 1 >= totalCount && toNext)
+		{
+			self.obCurrentErrorIndex(0);
+		}
+		else if (currentIndex <= 0 && !toNext)
+		{
+			self.obCurrentErrorIndex(totalCount - 1);
+		}
+		else
+		{
+			self.obCurrentErrorIndex(toNext ? currentIndex + 1 : currentIndex - 1);
+		}
+
+		self.displayError();
+	};
+
+	BasePageLevelViewModel.prototype.displayError = function()
+	{
+		var self = this, totalCount = self.getErrorsCount();
+
+		if (totalCount === 0)
+		{
+			self.$pageLevel.find(".error-description").removeClass("hide");
+			return;
+		}
+
+		if (totalCount < self.obCurrentErrorIndex() + 1)
+		{
+			self.obCurrentErrorIndex(totalCount - 1);
+		}
+		self.$pageLevel.find(".error-description").addClass("hide");
+		self.$pageLevel.find(".error-description").eq(self.obCurrentErrorIndex()).removeClass("hide");
+	};
+
+	BasePageLevelViewModel.prototype.toNextError = function()
+	{
+		this.navigateError(true);
+	};
 
 	BasePageLevelViewModel.prototype.getErrorsCount = function()
 	{
@@ -79,6 +150,8 @@
 				return Promise.resolve(false);
 			}
 		}
+
+		self.obCurrentErrorIndex(0);
 		self.obValidationErrors.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
@@ -128,6 +201,7 @@
 			}
 		}
 
+		self.obCurrentErrorIndex(0);
 		self.obSuccessMessageDivIsShow(false);
 		return self._validator.validate()
 			.then(function(valid)
@@ -251,19 +325,19 @@
 			});
 		}
 		return validationErrors;
-	}
+	};
 
 	BasePageLevelViewModel.prototype.getValidationErrorsSpecifed = function()
 	{
 		var validationErrors = [];
 
 		return validationErrors;
-	}
+	};
 
 	BasePageLevelViewModel.prototype.getValidationErrorsSpecifedPromise = function()
 	{
 		return Promise.resolve();
-	}
+	};
 
 	BasePageLevelViewModel.prototype.setValidationErrors = function(validationErrors, validationErrorsSpecifed)
 	{
@@ -274,7 +348,7 @@
 			self.obValidationErrorsSpecifed(validationErrorsSpecifed);
 		if (self.obValidationErrors().length + self.obValidationErrorsSpecifed().length > 0)
 			self.obErrorMessageDivIsShow(true);
-	}
+	};
 
 	BasePageLevelViewModel.prototype.getMessage = function(message)
 	{
@@ -318,7 +392,7 @@
 		}
 
 		return message;
-	}
+	};
 
 	BasePageLevelViewModel.prototype.getMessageExpand = function(fielddata, messages, error)
 	{
@@ -328,12 +402,12 @@
 			messages = " email addresses are invalid.";
 		}
 		return messages;
-	}
+	};
 
 	BasePageLevelViewModel.prototype.successMessageShow = function()
 	{
 		this.obSuccessMessageDivIsShow(true);
-	}
+	};
 
 	/**
 	 * Display the page-level success message.
@@ -389,9 +463,10 @@
 		else
 		{
 			self.isClosed = true;
-			messageBox.remove();
+			self.obValidationErrors.removeAll();
+			self.obValidationErrorsSpecifed.removeAll();
 		}
-	}
+	};
 
 	BasePageLevelViewModel.prototype.focusField = function(viewModel, e)
 	{
@@ -399,7 +474,7 @@
 		{
 			$(viewModel.field).focus();
 		}
-	}
+	};
 
 	BasePageLevelViewModel.prototype.dispose = function()
 	{
@@ -408,6 +483,6 @@
 		{
 			self.validationMessage.remove();
 		}
-	}
+	};
 })();
 
