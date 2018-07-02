@@ -39,10 +39,11 @@
 
 	BasePageLevelViewModel.prototype.initialized = function(viewModel, el)
 	{
-		var self = this, $pageLevel = $(el);
-		if ($pageLevel.closest(".tfmodal-container").length > 0)
+		var self = this, $pageLevel = $(el), $container = $pageLevel.closest(".tfmodal-container");
+
+		if ($container.length > 0)
 		{
-			self.validationMessage = $pageLevel.closest(".tfmodal-container").find(".page-level-message-container");
+			self.validationMessage = $container.find(".page-level-message-container");
 			self.validationMessage.css("z-index", $pageLevel.closest(".tfmodal.modal").css("z-index"));
 			$("body").append(self.validationMessage);
 		}
@@ -96,11 +97,11 @@
 
 	BasePageLevelViewModel.prototype.displayError = function()
 	{
-		var self = this, totalCount = self.getErrorsCount();
+		var self = this, totalCount = self.getErrorsCount(), errorDesp = self.$pageLevel.find(".error-description");
 
 		if (totalCount === 0)
 		{
-			self.$pageLevel.find(".error-description").removeClass("hide");
+			errorDesp.removeClass("hide");
 			return;
 		}
 
@@ -108,8 +109,8 @@
 		{
 			self.obCurrentErrorIndex(totalCount - 1);
 		}
-		self.$pageLevel.find(".error-description").addClass("hide");
-		self.$pageLevel.find(".error-description").eq(self.obCurrentErrorIndex()).removeClass("hide");
+		errorDesp.addClass("hide");
+		errorDesp.eq(self.obCurrentErrorIndex()).removeClass("hide");
 	};
 
 	BasePageLevelViewModel.prototype.toNextError = function()
