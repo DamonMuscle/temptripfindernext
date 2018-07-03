@@ -119,6 +119,7 @@
 	{
 		var self = this, $element = $(".kendoscheduler");
 
+
 		$element.empty();
 
 		self.getOriginalDataSource(self.gridType).then(function(data)
@@ -135,11 +136,13 @@
 
 				views: self.getSchedulertView(self.extendDays),
 
-				editable: self.gridType === 'fieldtrip' ? false : true,
+				editable: self.gridType === 'fieldtrips' ? false : true,
 
 				resources: self.getSchedulerResources(data)
 			});
 
+			$(".kendoscheduler").find(".k-scheduler-toolbar li.k-nav-current .k-sm-date-format").css("display", "none");
+			$(".kendoscheduler").find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 			self.setFilterOpitons();
 
 			self.eventBinding();
@@ -259,12 +262,13 @@
 	{
 		var self = this;
 		self.isDetailPanelShown(true);
-		tf.pageManager.openNewPage("scheduler");
+		tf.pageManager.openNewPage(self.gridType + "Scheduler");
 	};
 
 	SchedulerPage.prototype.navToGridViewClick = function(model, element)
 	{
-		tf.pageManager.openNewPage("fieldtrips");
+		var self = this;
+		tf.pageManager.openNewPage(self.gridType);
 	};
 
 	SchedulerPage.prototype.dispose = function()
