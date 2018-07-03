@@ -1,27 +1,32 @@
 (function()
 {
-	createNamespace("TF.Scheduler").FieldTripSchedulerViewModel = FieldTripSchedulerViewModel;
+	createNamespace("TF.Page").SchedulerPage = SchedulerPage;
 
-	function FieldTripSchedulerViewModel()
+	function SchedulerPage(gridType)
 	{
 		var self = this;
 		self.height = 800;
 		self.detailView = null;
 		self.isDetailPanelShown = ko.observable(false);
-		self.type = "fieldtrip";
+		self.gridType = gridType || "fieldtrips";
+		self.pageType = "scheduler";
 		self.extendDays = 50;
 
 		self.schedulerDataSources = [];
 		self.schedulerResources = [];
 		self.schedulerOptions = [];
+	}
 
+	SchedulerPage.prototype.constructor = SchedulerPage;
+
+	SchedulerPage.prototype.init = function()
+	{
+		var self = this;
+
+		self.initScheduler();
 	};
 
-	FieldTripSchedulerViewModel.prototype.constructor = FieldTripSchedulerViewModel;
-
-	FieldTripSchedulerViewModel.prototype = Object.create(TF.Scheduler.BaseSchedulerViewModel.prototype);
-
-	FieldTripSchedulerViewModel.prototype.setFilterOpitons = function()
+	SchedulerPage.prototype.setFilterOpitons = function()
 	{
 		var self = this;
 		$(".stage-option").empty();
@@ -35,9 +40,9 @@
 				);
 			}
 		});
-	}
+	};
 
-	FieldTripSchedulerViewModel.prototype.eventBinding = function()
+	SchedulerPage.prototype.eventBinding = function()
 	{
 		var self = this, scheduler = $(".kendoscheduler").getKendoScheduler();
 
@@ -108,11 +113,63 @@
 				clickBind(e, taskselector);
 			});
 		}
-
-
 	};
 
-	FieldTripSchedulerViewModel.prototype.getSchedulerDataSources = function(data)
+	SchedulerPage.prototype.initScheduler = function($element)
+	{
+		var self = this, $element = $(".kendoscheduler");
+
+		$element.empty();
+
+		self.getOriginalDataSource(self.gridType).then(function(data)
+		{
+			$element.kendoScheduler({
+
+				date: new Date(),
+
+				//startTime: new Date("2015/9/9 07:00 AM"),
+
+				height: 800,
+
+				dataSource: self.getSchedulerDataSources(data),
+
+				views: self.getSchedulertView(self.extendDays),
+
+				editable: self.gridType === 'fieldtrip' ? false : true,
+
+				resources: self.getSchedulerResources(data)
+			});
+
+			self.setFilterOpitons();
+
+			self.eventBinding();
+		});
+	};
+
+	SchedulerPage.prototype.getOriginalDataSource = function(type)
+	{
+		var self = this, url, params;
+		//TODO add SchedulerHelper to manage
+		switch (type)
+		{
+			case "fieldtrips":
+				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
+				params = {
+					"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
+					"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
+					"filterSet": null,
+					"filterClause": "",
+					"isQuickSearch": false,
+					"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+				};
+				break;
+			default:
+				break;
+		}
+		return tf.ajax.post(url, params);
+	}
+
+	SchedulerPage.prototype.getSchedulerDataSources = function(data)
 	{
 		var self = this;
 		data.Items.forEach(item =>
@@ -144,7 +201,7 @@
 		}
 	};
 
-	FieldTripSchedulerViewModel.prototype.getSchedulerResources = function(data)
+	SchedulerPage.prototype.getSchedulerResources = function(data)
 	{
 		var self = this;
 		data.Items.forEach(item =>
@@ -164,24 +221,7 @@
 		]
 	};
 
-
-	FieldTripSchedulerViewModel.prototype.showDetailsClick = function(idFromScheduler)
-	{
-		var self = this;
-		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
-		if (TF.isPhoneDevice)
-		{
-			//TODO Mobile
-			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
-		}
-		else
-		{
-			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
-		}
-
-	};
-
-	FieldTripSchedulerViewModel.prototype.getSchedulertView = function()
+	SchedulerPage.prototype.getSchedulertView = function()
 	{
 		var CustomAgenda = kendo.ui.AgendaView.extend({
 			endDate: function()
@@ -199,7 +239,35 @@
 		return schedulerView;
 	};
 
-	FieldTripSchedulerViewModel.prototype.dispose = function()
+	SchedulerPage.prototype.showDetailsClick = function(idFromScheduler)
+	{
+		var self = this;
+		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
+		if (TF.isPhoneDevice)
+		{
+			//TODO Mobile
+			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+		}
+		else
+		{
+			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+		}
+
+	};
+
+	SchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
+	{
+		var self = this;
+		self.isDetailPanelShown(true);
+		tf.pageManager.openNewPage("scheduler");
+	};
+
+	SchedulerPage.prototype.navToGridViewClick = function(model, element)
+	{
+		tf.pageManager.openNewPage("fieldtrips");
+	};
+
+	SchedulerPage.prototype.dispose = function()
 	{
 		//TODO
 	};

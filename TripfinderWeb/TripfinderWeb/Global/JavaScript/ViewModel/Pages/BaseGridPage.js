@@ -605,7 +605,7 @@
 	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
 	{
 		var self = this;
-		tf.pageManager.openNewPage("scheduler");
+		tf.pageManager.openNewPage(self.pageType + "Scheduler");
 	};
 
 	BaseGridPage.prototype.dispose = function()

@@ -344,7 +344,7 @@ function getTitleByType(type)
 			pageTitile = "Settings";
 			break;
 		case "scheduler":
-			pageTitile = "FieldTrip Scheduler View";
+			pageTitile = "FieldTrip Scheduler";
 			break;
 		default:
 			break;
