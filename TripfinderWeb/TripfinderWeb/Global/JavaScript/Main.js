@@ -52,6 +52,18 @@ function pathCombine()
 	return output;
 }
 
+function sortArray(array, sortField)
+{
+	return array.sort(function(a, b)
+	{
+		if (a[sortField].toUpperCase() === b[sortField].toUpperCase())
+		{
+			return 0;
+		}
+		return a[sortField].toUpperCase() > b[sortField].toUpperCase() ? 1 : -1;
+	});
+}
+
 function getParameterByName(name, url)
 {
 	if (!url) url = window.location.href;

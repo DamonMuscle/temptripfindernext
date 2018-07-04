@@ -38,13 +38,13 @@
 			<!--/ko-->
 			<div class="divider"></div>
 			<!--/ko-->
-			<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
 			<!--ko if: searchGrid.obLayoutFilterOperation()-->
+			<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
 			<div class="divider"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
-			<!-- /ko -->
 			<div class="divider"></div>
+			<!-- /ko -->
 			<div class="iconbutton view" title="View" data-bind="click:viewClick, css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
 			<!--ko if:$parent.obOnlyLayout()-->

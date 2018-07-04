@@ -188,7 +188,7 @@
 			<div class="form-group">
 				<label class="" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')"></label>
 				<div class="input-group">
-					<div data-bind="typeahead:{source:obDriverSource,format:function(obj){return obj.FullName;},drowDownShow:true,selectedValue:obSelectedBusAide,notSort:true}">
+					<div data-bind="typeahead:{source:obBusaideSource,format:function(obj){return obj.FullName;},drowDownShow:true,selectedValue:obSelectedBusAide,notSort:true}">
 						<!-- ko customInput:{type:"String",value:obSelectedBusAideText,attributes:{class:"form-control",name:"aide"}} --><!-- /ko -->
 					</div>
 					<div class="input-group-btn">

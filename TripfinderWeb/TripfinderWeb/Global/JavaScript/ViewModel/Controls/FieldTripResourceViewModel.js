@@ -8,6 +8,7 @@
 		this.obEntityDataModel().fieldTripId(id);
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();
+		this.obBusaideSource = ko.observableArray();
 
 		this.obVehTotal = ko.computed(function()
 		{
@@ -56,23 +57,23 @@
 	FieldTripResourceViewModel.prototype.save = function()
 	{
 		return this.pageLevelViewModel.saveValidate()
-		.then(function(result)
-		{
-			if (result)
+			.then(function(result)
 			{
-				var entity = this.obEntityDataModel().toData();
-				entity.VehicleName = this.obSelectedVehicleText();
-				if (entity.DriverId != 0)
+				if (result)
 				{
-					entity.DriverName = this.obSelectedDriverText();
+					var entity = this.obEntityDataModel().toData();
+					entity.VehicleName = this.obSelectedVehicleText();
+					if (entity.DriverId != 0)
+					{
+						entity.DriverName = this.obSelectedDriverText();
+					}
+					if (entity.AideId != 0)
+					{
+						entity.AideName = this.obSelectedBusAideText();
+					}
+					return entity;
 				}
-				if (entity.AideId != 0)
-				{
-					entity.AideName = this.obSelectedBusAideText();
-				}
-				return entity;
-			}
-		}.bind(this));
+			}.bind(this));
 	}
 
 	FieldTripResourceViewModel.prototype.init = function(viewModel, el)
@@ -116,18 +117,25 @@
 	FieldTripResourceViewModel.prototype.load = function()
 	{
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicle"))
-		.then(function(data)
-		{
-			this.obVehicleSource(data.Items);
+			.then(function(data)
+			{
+				data.Items = sortArray(data.Items, "BusNum");
+				this.obVehicleSource(data.Items);
+			}.bind(this));
 
-		}.bind(this));
+		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff", "allstaff", 2))
+			.then(function(data)
+			{
+				data.Items = sortArray(data.Items, "FullName");
+				this.obDriverSource(data.Items);
+			}.bind(this));
 
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"))
-		.then(function(data)
-		{
-			this.obDriverSource(data.Items);
-
-		}.bind(this));
+		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff", "allstaff", 1))
+			.then(function(data)
+			{
+				data.Items = sortArray(data.Items, "FullName");
+				this.obBusaideSource(data.Items);
+			}.bind(this));
 
 		return Promise.all([p0, p1]);
 	};
@@ -135,13 +143,13 @@
 	FieldTripResourceViewModel.prototype.apply = function()
 	{
 		return this.save()
-		.then(function(data)
-		{
-			return data;
+			.then(function(data)
+			{
+				return data;
 
-		}, function()
-		{
-		});
+			}, function()
+			{
+			});
 	};
 
 	FieldTripResourceViewModel.prototype.generateFunction = function(fn)

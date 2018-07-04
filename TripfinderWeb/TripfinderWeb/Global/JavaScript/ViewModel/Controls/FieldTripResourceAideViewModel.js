@@ -115,15 +115,15 @@
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicle"))
 			.then(function(data)
 			{
+				data.Items = sortArray(data.Items, "BusNum");
 				this.obVehicleSource(data.Items);
-
 			}.bind(this));
 
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"))
+		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff", "allstaff", 1))
 			.then(function(data)
 			{
+				data.Items = sortArray(data.Items, "FullName");
 				this.obDriverSource(data.Items);
-
 			}.bind(this));
 
 		return Promise.all([p0, p1]);

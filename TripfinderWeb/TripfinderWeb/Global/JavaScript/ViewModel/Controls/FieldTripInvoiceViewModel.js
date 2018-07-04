@@ -86,6 +86,7 @@
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccount"))
 			.then(function(data)
 			{
+				data.Items = sortArray(data.Items, "Name");
 				this.obAccountSource(data.Items);
 				if (this.option.data)
 				{

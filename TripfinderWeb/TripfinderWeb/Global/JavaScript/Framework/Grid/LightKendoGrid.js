@@ -3697,9 +3697,12 @@
 
 	LightKendoGrid.prototype.saveState = function()
 	{
-		var columns = this.kendoGrid.getOptions().columns.slice(this.permanentLockCount());
-		columns = Enumerable.From(columns).Where("$.field!='bulk_menu'").ToArray();
-		this._obSelectedColumns(columns);
+		if (this.obLayoutFilterOperation && this.obLayoutFilterOperation())
+		{
+			var columns = this.kendoGrid.getOptions().columns.slice(this.permanentLockCount());
+			columns = Enumerable.From(columns).Where("$.field!='bulk_menu'").ToArray();
+			this._obSelectedColumns(columns);
+		}
 	};
 
 	LightKendoGrid.prototype.getGridState = function()

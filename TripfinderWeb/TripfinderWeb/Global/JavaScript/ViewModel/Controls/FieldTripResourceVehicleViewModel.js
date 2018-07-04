@@ -100,13 +100,13 @@
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicle"))
 			.then(function(data)
 			{
+				data.Items = sortArray(data.Items, "BusNum");
 				this.obVehicleSource(data.Items);
 
 				if (this.source)
 				{
 					this.obEntityDataModel().vehicleId(this.source.VehicleId);
 				}
-
 			}.bind(this));
 	};
 

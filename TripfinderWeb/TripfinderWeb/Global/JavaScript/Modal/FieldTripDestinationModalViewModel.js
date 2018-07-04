@@ -2,12 +2,12 @@
 {
 	createNamespace('TF.Modal').FieldTripDestinationModalViewModel = FieldTripDestinationModalViewModel;
 
-	function FieldTripDestinationModalViewModel(fieldName, id)
+	function FieldTripDestinationModalViewModel(fieldName, id, mailCities)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.contentTemplate('modal/fieldtripdestinationcontrol');
 		this.buttonTemplate('modal/positivenegative');
-		this.fieldTripDestinationViewModel = new TF.Control.FieldTripDestinationViewModel(fieldName, id);
+		this.fieldTripDestinationViewModel = new TF.Control.FieldTripDestinationViewModel(fieldName, id, mailCities);
 		this.data(this.fieldTripDestinationViewModel);
 		this.sizeCss = "modal-dialog-lg";
 

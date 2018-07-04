@@ -682,7 +682,7 @@
 				obProperty = "fieldTripEquipmentId";
 				break;
 			case "destination":
-				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination");
+				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", undefined, this.obMailCityDataModels());
 				obModelList = this.obDestinationDataModels;
 				obProperty = "destination";
 				inputName = "destination";
@@ -761,7 +761,7 @@
 					}
 				}
 
-				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", destinationId);
+				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", destinationId, this.obMailCityDataModels());
 				obModelList = this.obDestinationDataModels;
 				obProperty = "destination";
 				break;

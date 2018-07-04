@@ -565,7 +565,7 @@
 
 	KendoGridLayoutMenu.prototype._updateCurrentLayout = function()
 	{
-		if (this._applyingLayout)
+		if (this._applyingLayout || !this.obLayoutFilterOperation || !this.obLayoutFilterOperation())
 		{
 			return;
 		}

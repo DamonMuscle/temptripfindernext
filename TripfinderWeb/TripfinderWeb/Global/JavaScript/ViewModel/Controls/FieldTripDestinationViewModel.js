@@ -2,14 +2,14 @@
 {
 	createNamespace('TF.Control').FieldTripDestinationViewModel = FieldTripDestinationViewModel;
 
-	function FieldTripDestinationViewModel(fieldName, id)
+	function FieldTripDestinationViewModel(fieldName, id, mailCities)
 	{
 		this.fieldName = fieldName;
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripDestinationDataModel());
 		this.obEntityDataModel().id(id);
 		this.obEntityDataModel().apiIsDirty(false);
 		this.obEntityDataModel()._entityBackup = JSON.parse(JSON.stringify(this.obEntityDataModel().toData()));
-		this.obMailCityDataModels = ko.observableArray();
+		this.obMailCityDataModels = ko.observableArray(mailCities);
 
 		this.pageLevelViewModel = new TF.PageLevel.FieldTripDestinationPageLevelViewModel();
 	}
@@ -94,7 +94,6 @@
 			}
 		}
 
-
 		$(el).bootstrapValidator({
 			excluded: [':hidden', ':not(:visible)'],
 			live: 'enabled',
@@ -116,12 +115,6 @@
 
 	FieldTripDestinationViewModel.prototype.load = function()
 	{
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", this.fieldName, "mail_city"))
-			.then(function(data)
-			{
-				this.obMailCityDataModels(data.Items);
-			}.bind(this));
-
 		if (this.obEntityDataModel().id())
 		{
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.fieldName, this.obEntityDataModel().id()))
