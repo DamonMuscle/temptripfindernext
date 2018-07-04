@@ -74,7 +74,10 @@
 			this.createGrid();
 			this._setCustomizetimePickerborderradius();
 			this.resizeHeightOnWindowResize();
-			this._obCurrentGridLayoutExtendedDataModel().apiIsDirty(this._layoutFilterId != this._obCurrentGridLayoutExtendedDataModel().filterId());
+			if (this._obCurrentGridLayoutExtendedDataModel())
+			{
+				this._obCurrentGridLayoutExtendedDataModel().apiIsDirty(this._layoutFilterId != this._obCurrentGridLayoutExtendedDataModel().filterId());
+			}
 		}.bind(this))
 			.then(function()
 			{
@@ -103,7 +106,7 @@
 			$(item).css("float", "right");
 			$(item).next().css("border-radius", "0");
 		});
-	}
+	};
 
 	KendoGrid.prototype._documentFocusStateChange = function()
 	{
@@ -128,6 +131,10 @@
 
 	KendoGrid.prototype.loadPresetData = function()
 	{
+		if (!this.isBigGrid)
+		{
+			return Promise.resolve();
+		}
 		return this.loadGridDefaults()
 			.then(function()
 			{
@@ -135,13 +142,26 @@
 			}.bind(this))
 			.then(function()
 			{
-				return Promise.all([
-					this.loadUserDefinedLabel()
-				]).then(function()
+				if (this.options.entityType)
 				{
-					this._mergeUserDefinedLabel();
-					return this._setConfiguration();
-				}.bind(this));
+					return Promise.all([
+						this.loadUserDefinedLabel()
+					]).then(function()
+					{
+						this._mergeUserDefinedLabel();
+						return this._setConfiguration();
+					}.bind(this));
+				} else
+				{
+					return Promise.all([
+						this.loadGridFilter(), this.loadUserDefinedLabel()
+					]).then(function()
+					{
+						this._mergeUserDefinedLabel();
+						return this._setConfiguration();
+					}.bind(this));
+				}
+
 			}.bind(this));
 	};
 
@@ -174,13 +194,13 @@
 						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefault"),
 							{
 								data:
-									{
-										Id: 0,
-										GridName: this.options.gridType,
-										Columns: columns.join(","),
-										ApiIsDirty: true,
-										ApiIsNew: true
-									}
+								{
+									Id: 0,
+									GridName: this.options.gridType,
+									Columns: columns.join(","),
+									ApiIsDirty: true,
+									ApiIsNew: true
+								}
 							});
 					}
 				}
@@ -228,7 +248,7 @@
 			.then(function()
 			{
 				this.createDragDelete();
-				this.changeSortModel(); //bind the function of chang sort model in colunm mousedown
+				this.changeSortModel(); //bind the function of change sort model in column mouse down
 				this.resizableBinding();
 				this.lockUnlockColumn();
 				this.initDragHeadEvent();
@@ -654,15 +674,15 @@
 				var getDataUrl = url + '/getkey';
 				var getDataOption = {
 					paramData:
-						{
-							fileFormat: 'xls'
-						},
+					{
+						fileFormat: 'xls'
+					},
 					data:
-						{
-							"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
-							"selectedIds": selectedIds ? selectedIds : ids,
-							"sortItems": this.searchOption.data.sortItems
-						}
+					{
+						"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
+						"selectedIds": selectedIds ? selectedIds : ids,
+						"sortItems": this.searchOption.data.sortItems
+					}
 				};
 
 				if (self.options.gridType === "busfinderhistorical")
@@ -677,42 +697,42 @@
 						closeButton: true,
 						title: "Save As",
 						message: "Select the file format that you would like to save the selected records in." +
-							"<div class='col-xs-24'>" +
-							"<br/><label>Type</label>" +
-							"<div class='save-content'>" +
-							"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
-							"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-							"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-							"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
-							"<div>" +
-							"</div>",
+						"<div class='col-xs-24'>" +
+						"<br/><label>Type</label>" +
+						"<div class='save-content'>" +
+						"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
+						"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
+						"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
+						"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
+						"<div>" +
+						"</div>",
 						buttons:
+						{
+							save:
 							{
-								save:
+								label: "Save",
+								className: "btn tf-btn-black btn-sm",
+								callback: function()
+								{
+									var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
+									var databaseType = tf.datasourceManager.databaseType;
+									var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
+									if (TF.isMobileDevice)
 									{
-										label: "Save",
-										className: "btn tf-btn-black btn-sm",
-										callback: function()
-										{
-											var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
-											var databaseType = tf.datasourceManager.databaseType;
-											var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
-											if (TF.isMobileDevice)
-											{
-												window.open(fileUrl);
-											}
-											else
-											{
-												window.location = fileUrl;
-											}
-										}
-									},
-								cancel:
-									{
-										label: "Cancel",
-										className: "btn btn-link btn-sm"
+										window.open(fileUrl);
 									}
+									else
+									{
+										window.location = fileUrl;
+									}
+								}
+							},
+							cancel:
+							{
+								label: "Cancel",
+								className: "btn btn-link btn-sm"
 							}
+						}
 					})
 					.then(function(operation)
 					{

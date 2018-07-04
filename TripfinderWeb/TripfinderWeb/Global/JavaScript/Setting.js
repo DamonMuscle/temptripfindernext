@@ -6,7 +6,7 @@
 	{
 		this.userProfile = {
 			RoutingProfile:
-				{}
+			{}
 		};
 	}
 
@@ -35,19 +35,6 @@
 							return TF.Color.toHTMLColorFromLongColor(c);
 						});
 					}
-					try
-					{
-						TF.Control.EditPhotoViewModel.prototype.getImage('userprofile', tf.authManager.authorizationInfo.authorizationTree.userId, "userprofile", tf.api.apiPrefixWithoutDatabase() + "/0").then(function(image)
-						{
-							if (image)
-							{
-								var head = 'data:image/jpeg;base64,' + image;
-								addStyle("userProfileImage", ".iconbutton.user{background-image:url(" + head + ")}");
-							}
-						}.bind(this));
-					}
-					catch (ex)
-					{ }
 				}
 			}.bind(this));
 	};
@@ -72,12 +59,7 @@
 			'.kendo-grid .k-alt td{' +
 			'background-color:@gridAltRow@' +
 			'}';
-		// '.k-virtual-scrollable-wrap .kendogrid-blank-fullfill{' +
-		// 'background:repeating-linear-gradient(#ffffff 0, #ffffff 33px, @gridAltRow@ 33px, @gridAltRow@ 66px)' +
-		// '}' +
-		// '.k-virtual-scrollable-wrap .kendogrid-blank-fullfill .fillItem{' +
-		// 'background:none !important' +
-		// '}';
+
 		var closed = TF.Color.toHTMLColorFromLongColor(userProfile.CalEventClosed),
 			holiday = TF.Color.toHTMLColorFromLongColor(userProfile.CalEventHoliday),
 			session = TF.Color.toHTMLColorFromLongColor(userProfile.CalEventOpen),

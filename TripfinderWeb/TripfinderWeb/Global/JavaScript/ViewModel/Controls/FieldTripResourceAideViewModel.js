@@ -122,7 +122,6 @@
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"))
 			.then(function(data)
 			{
-				//data.Items.unshift({ FullName: " [None]", Id: "0" })
 				this.obDriverSource(data.Items);
 
 			}.bind(this));

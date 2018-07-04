@@ -23,7 +23,7 @@
 			{
 				var $target = tf.modalManager.obBaseModalViewModels()[tf.modalManager.obBaseModalViewModels().length - 1].$target;
 				var $modalBody = $target ? $target.find(".modal-body") : undefined;
-				if ($modalBody && $modalBody[0] && !$modalBody[0].contains(e.target) && focusList.indexOf(e.target.outerHTML) == -1)
+				if ($modalBody && $modalBody[0] && !$modalBody[0].contains(e.target) && !$(e.target).closest(".typeahead").length > 0 && focusList.indexOf(e.target.outerHTML) == -1)
 				{
 					//find the first input or textarea in modal which is opened
 					var $inputs = $modalBody.find("input[tabindex!=-1]:visible:enabled:first,textarea[tabindex!=-1]:visible:enabled:first");
@@ -45,16 +45,20 @@
 
 		self._$modalContainer.on('shown.bs.modal', function(e)
 		{
-			var $modal = $(e.target);
-			var baseModalViewModel = ko.dataFor($modal[0]);
+			var $modal = $(e.target), baseModalViewModel = ko.dataFor($modal[0]),
+				firstElement = $modal.find(':text,select,textarea,:checkbox,:password,:radio,:file').not(":disabled").eq(0);
 			baseModalViewModel.containerLoaded(true);
 			baseModalViewModel.$target = $modal;
 			if (!TF.isMobileDevice)
 			{
+				if (firstElement[0] === document.activeElement)
+				{
+					return;
+				}
 				$(document.activeElement).blur();
 				if (baseModalViewModel.focusInFirstElement)
 				{
-					$modal.find(':text,select,textarea,:checkbox,:password,:radio,:file').not(":disabled").eq(0).focus();
+					firstElement.focus();
 				}
 			}
 			else

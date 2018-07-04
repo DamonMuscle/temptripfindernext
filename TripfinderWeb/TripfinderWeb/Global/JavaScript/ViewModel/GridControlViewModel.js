@@ -151,28 +151,6 @@
 				this.obOnlyLayout(true);
 				this.obAddDivider(true);
 				gridViewModelType = TF.Grid.DocumentMiniGridViewModel;
-				//var gridLayoutExtendedDataModel = new TF.DataModel.GridLayoutExtendedDataModel();
-				//gridLayoutExtendedDataModel.gridType(this._gridType);
-				//gridLayoutExtendedDataModel.layoutColumns([
-				//{ FieldName: "Filename" },
-				//{ FieldName: "Description" },
-				//{
-				//	FieldName: "DocumentClassification"
-				//},
-				//{
-				//	FieldName: "FileSizeKb",
-				//	minWidth: 74,
-				//	width: 74
-				//},
-				//{ FieldName: "LastUpdated" },
-				//{ FieldName: "LastUpdatedName" },
-				//{
-				//	FieldName: "Action",
-				//	minWidth: 60,
-				//	width: 60,
-				//	action: true
-				//}]);
-				//this._defaultGridLayoutExtendedEntity = gridLayoutExtendedDataModel;
 				this.obCanOpenNewGrid(true);
 				break;
 			case 'staff':
@@ -313,10 +291,6 @@
 				break;
 		}
 		var gridViewModel = new gridViewModelType(this.obFocusState, element, this._gridState, this._gridShowType, this._defaultGridLayoutExtendedEntity, this._showBulkMenu, option);
-		//if (this._gridType == "document" || this._gridType == "studentexception" || this._gridType == "triphistory" || this._gridType == "documentmini")
-		//{
-		//	gridViewModel.addClick = gridViewModel.actionClick.bind(this);
-		//}
 		if (this.addClick)
 		{
 			gridViewModel.addClick = this.addClick.bind(this);
@@ -326,10 +300,7 @@
 		{
 			gridViewModel.afterClick = this.afterClick;
 		}
-		//gridViewModel.onGridStateChange.subscribe(this.raiseRouteChangeRequest.bind(this));
 		this.obGridViewModel(gridViewModel);
-		//this.raiseRouteChangeRequest();
-
 	};
 
 	GridControlViewModel.prototype.dispose = function()

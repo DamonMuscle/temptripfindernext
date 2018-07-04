@@ -6,7 +6,6 @@
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Test Email");
-		//this.sizeCss = "modal-lg";
 		this.contentTemplate('modal/TestEmailControl');
 		this.buttonTemplate('modal/positivenegative');
 		this.obPositiveButtonLabel("Send Test Email");

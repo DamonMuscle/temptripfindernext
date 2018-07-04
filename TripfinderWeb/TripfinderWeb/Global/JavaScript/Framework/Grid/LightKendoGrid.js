@@ -666,11 +666,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-				{
-					extra: true,
-					mode: "menu row",
-					operators: TF.Grid.LightKendoGrid.DefaultOperator
-				},
+			{
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -753,6 +753,11 @@
 			},
 			filterMenuInit: self.filterMenuInit.bind(self)
 		};
+
+		if (this.options.disableQuickFilter)
+		{
+			kendoGridOption.filterable = false;
+		}
 
 		if (this.options.dataSource)
 		{
@@ -2101,7 +2106,14 @@
 
 	LightKendoGrid.prototype.addFilterClass = function()
 	{
-		var self = this, $listContainer = $(".k-list-container:not(.not-lightkendogrid)");
+		var self = this, $listContainer;
+
+		if (self.options.disableQuickFilter)
+		{
+			return;
+		}
+
+		$listContainer = $(".k-list-container:not(.not-lightkendogrid)");
 		$listContainer = $listContainer.filter(function()
 		{
 			return $(this).parents('form.k-filter-menu').length == 0;
@@ -4074,13 +4086,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
+								{
+									fields: self.geoFields,
+									IdFilter:
 									{
-										fields: self.geoFields,
-										IdFilter:
-											{
-												IncludeOnly: self.allIds
-											}
+										IncludeOnly: self.allIds
 									}
+								}
 							})
 							.then(function(response)
 							{

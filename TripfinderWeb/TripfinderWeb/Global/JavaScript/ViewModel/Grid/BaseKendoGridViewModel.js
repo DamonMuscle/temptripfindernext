@@ -739,13 +739,6 @@
 			return;
 		}
 
-		//if (this.type == "document")
-		//{
-		//	this.searchGrid.gridAlert.show({
-		//		message: "Not Implement!"
-		//	});
-		//	return;
-		//}
 		var selectedRecords = this.searchGrid.getSelectedRecords();
 
 		tf.DataEntryHelper.getTabNamesByIds(this.type, selectedIds).then(function(tabNames)

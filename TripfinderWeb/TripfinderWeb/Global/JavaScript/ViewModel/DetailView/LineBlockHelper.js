@@ -344,7 +344,6 @@
 		});
 		$line.attr({ x: x, y: y, height: h, type: "verticalLine" });
 
-		//height*unitheight+(height- verticalMargin) +top&bottom padding
 		actualUnitHeight = (self.detailView.UNITHEIGHT + 1);
 
 		$line.resizable({

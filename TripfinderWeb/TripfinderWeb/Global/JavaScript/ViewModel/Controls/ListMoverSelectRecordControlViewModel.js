@@ -10,13 +10,7 @@
 			{
 				prefix = pathCombine(tf.api.apiPrefixWithoutDatabase(), options.dataSource);
 			}
-			//if (gridType === "vehicle")
-			//{
-			//	return pathCombine(tf.api.apiPrefix(), "vehicle", "vehiclegrid");
-			//} else
-			//{
 			return pathCombine(prefix, "search", gridType);
-			//}
 		};
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 		this.pageLevelViewModel = new TF.PageLevel.ListMoverPageLevelViewModel(this);
@@ -178,7 +172,7 @@
 			this.originalColumns = this.columns.map(function(item)
 			{
 				return $.extend(
-				{}, item);
+					{}, item);
 			});
 
 

@@ -18,7 +18,6 @@
 			filterSetField: "AccountEnabled"
 		};
 		TF.Modal.KendoListMoverWithSearchControlModalViewModel.call(this, selectedData, options);
-		//this.contentTemplate('modal/ListMoverSelectRecipientControl');
 		this.ListMoverSelectRecipientControlViewModel = new TF.Control.ListMoverSelectRecipientControlViewModel(selectedData, options);
 		this.data(this.ListMoverSelectRecipientControlViewModel);
 		this.inheritChildrenShortCutKey = false;

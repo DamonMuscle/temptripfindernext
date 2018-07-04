@@ -241,7 +241,6 @@
 		}
 		self.$rightPage.width(totalWidth - left);
 		self.onSizeChanged.notify();
-
 	};
 
 	ResizablePage.prototype.resizeGrid = function(left)

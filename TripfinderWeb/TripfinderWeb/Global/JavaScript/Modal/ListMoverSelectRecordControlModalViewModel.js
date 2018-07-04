@@ -7,7 +7,6 @@
 		options.displayCheckbox = false;
 		options.showRemoveColumnButton = true;
 		options.contentTemplate = "modal/ListMoverSelectRecordControl";
-		//options.mustSelect = false;
 		TF.Modal.KendoListMoverWithSearchControlModalViewModel.call(this, selectedData, options);
 		this.ListMoverSelectRecordControlViewModel = new TF.Control.ListMoverSelectRecordControlViewModel(selectedData, options);
 		this.data(this.ListMoverSelectRecordControlViewModel);

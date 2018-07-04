@@ -1242,8 +1242,6 @@
 						this.clearDateTimeAlerts("time");
 						this.pageLevelViewModel.activeLostfouseName = "departDate";
 						return { message: 'must be <= return Date', valid: false };
-						//this.$form.find("#departTime>small[data-bv-validator=callback]").text("must be <= return Date time");
-						//return false;
 					}
 					//validate passed, clear all messages.
 					this.clearDateTimeAlerts();
@@ -1277,8 +1275,6 @@
 						this.clearDateTimeAlerts("time");
 						this.pageLevelViewModel.activeLostfouseName = "returnDate";
 						return { message: 'must be >= Depart Date', valid: false };
-						//this.$form.find("#departTime>small[data-bv-validator=callback]").text("must be <= return Date time");
-						//return false;
 					}
 
 					//validate passed, clear all messages.
@@ -1315,8 +1311,6 @@
 					if (!this.obEntityDataModel().departDate())
 					{//this might never use, because the date is required when input time
 						return true;
-						//this.obEntityDataModel().departDate(moment().format("L"));
-						//this.$form.find("#departDate input[name=departDate]").trigger("blur");
 					}
 
 					var returnDate = new moment(this.obEntityDataModel().returnDate());
@@ -1340,8 +1334,6 @@
 						{//return time need greate than depart time
 							this.pageLevelViewModel.activeLostfouseName = "departTime";
 							return { message: 'must be <= return Time', valid: false };
-							//this.$form.find("#departTime>small[data-bv-validator=callback]").text("must be <= return Date time");
-							//return false;
 						}
 
 						//validate passed, clear all messages.
@@ -1380,15 +1372,11 @@
 					if (!m.isValid())
 					{
 						return { message: "invalid time", valid: false };
-						//this.$form.find("#returnTime>small[data-bv-validator=callback]").text("invalid time");
-						//return false;
 					}
 
 					if (!this.obEntityDataModel().returnDate())
 					{//this might never use, because the date is required when input time
 						return true;
-						//this.obEntityDataModel().returnDate(moment().format("L"));
-						//this.$form.find("#returnDate input[name=estimatedReturnDate]").trigger("blur");
 					}
 
 					var returnDate = new moment(this.obEntityDataModel().returnDate());
@@ -1412,8 +1400,6 @@
 						{//return time need greate than depart time
 							this.pageLevelViewModel.activeLostfouseName = "returnTime";
 							return { message: 'must be >= Depart Time', valid: false };
-							//this.$form.find("#departTime>small[data-bv-validator=callback]").text("must be <= return Date time");
-							//return false;
 						}
 
 						//validate passed, clear all messages.
@@ -1460,25 +1446,21 @@
 		$(this.$form.parents()[3]).find(".linktoDepartDate").on("click", function()
 		{
 			this.$form.find("#departDate input[name=departDate]").focus();
-			//e.preventDefault();
 		}.bind(this));
 
 		$(this.$form.parents()[3]).find(".linktoReturnDate").on("click", function()
 		{
 			this.$form.find("#returnDate input[name=estimatedReturnDate]").focus();
-			//e.preventDefault();
 		}.bind(this));
 
 		$(this.$form.parents()[3]).find(".linktoDepartTime").on("click", function()
 		{
 			this.$form.find("#departTime input[name=departTime]").focus();
-			//e.preventDefault();
 		}.bind(this));
 
 		$(this.$form.parents()[3]).find(".linktoReturnTime").on("click", function()
 		{
 			this.$form.find("#returnTime input[name=estimatedReturnTime]").focus();
-			//e.preventDefault();
 		}.bind(this));
 	}
 

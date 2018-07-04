@@ -124,14 +124,12 @@
 									if (str === null || item.substring(item.length - 1) != ">")
 									{
 										this.obEmailToErrorList.push(item);
-										//return;
 									} else
 									{
 										isValid = emailRegExp.test(str[str.length - 1]);
 										if (!isValid)
 										{
 											this.obEmailToErrorList.push(item);
-											//return;
 										}
 									}
 								}

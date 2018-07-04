@@ -118,14 +118,7 @@
 		TF.Control.KendoListMoverWithSearchControlViewModel.prototype.apply.call(this);
 		return new Promise(function(resolve, reject)
 		{
-			// if (this.options.mustSelect && this.selectedData.length === 0)
-			// {
-			// 	this.obErrorMessage("At least one record must be selected.");
-			// 	reject();
-			// } else
-			// {
 			resolve(this.selectedData);
-			// }
 		}.bind(this));
 	};
 

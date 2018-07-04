@@ -21,7 +21,6 @@
 			dataPoints = dataPointsJSON[gridType],
 			items = layout.items,
 			colNum = layout.width;
-		// sliderFontRate, width
 
 		$.each(items, function(index, item)
 		{

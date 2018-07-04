@@ -14,7 +14,8 @@
 			this.options.kendoGridOption = {
 				pageable: false
 			};
-
+			this.options.disableQuickFilter = true;
+			this.options.layoutAndFilterOperation = false;
 			this.options.onDataBound = this.onDataBound.bind(this);
 		}
 		this.hasRightClickEvent = false;
@@ -38,19 +39,6 @@
 				break;
 		}
 	};
-
-	// FieldTripInvoiceGridViewModel.prototype.mergeMinigridColumns = function()
-	// {
-	// 	TF.Grid.BaseKendoGridViewModel.prototype.mergeMinigridColumns.call(this);
-
-	// 	switch (this._gridState.entityType)
-	// 	{
-	// 		case "fieldtrip":
-	// 			this.options.gridDefinition.Columns[0].SortIndex = 0;
-	// 			this.options.gridDefinition.Columns[0].SortAscending = true;
-	// 			break;
-	// 	}
-	// };
 
 	FieldTripInvoiceGridViewModel.prototype.getFieldTripInvoiceDataModel = function(e)
 	{

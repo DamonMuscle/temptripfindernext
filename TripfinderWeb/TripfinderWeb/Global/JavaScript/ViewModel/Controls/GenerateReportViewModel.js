@@ -181,8 +181,6 @@
 			}.bind(this)).ToArray();
 
 			this.obReport(theDatas.length > 0 ? theDatas[0] : null);
-
-			this.getFilter();
 			this.firstLoad = false;
 		}.bind(this));
 		setTimeout(function()
@@ -325,7 +323,6 @@
 
 	GenerateReportViewModel.prototype.convertHtmlTagToOptionText = function(option, item)
 	{
-		//return ko.applyBindingsToNode(option, { disable: item.DatabaseName === '<hr>', text: item.DatabaseName === '<hr>' ? '------------' : item.DatabaseName }, item);
 		var $optionNdoe = $('#filterDataSource').find(option);
 		if ($optionNdoe.text() === '<hr>')
 		{
@@ -835,7 +832,9 @@
 						var w = window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"));
 						$(w).on("load", function()
 						{
-							$(w.document).find('html').append('<head><title>Tripfinder</title></head>');
+							var head = $('<head>');
+							$(w.document).find('html').append(head);
+							head.append($('<title>Tripfinder</title> <link href="' + window.location.href + 'Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">'));
 						});
 					}
 					else if (outputTo == "email")
