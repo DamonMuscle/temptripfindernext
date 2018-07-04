@@ -55,7 +55,7 @@
 		var self = this, $content;
 
 		//grid page
-		if (data && data.isGridPage)
+		if (data && data.isGridPage || data && data.isSchedulerPage)
 		{
 			if (newGrid)
 			{
@@ -233,11 +233,16 @@
 		if (!self.obShowGrid())
 		{
 			self.$otherPage.width(left);
-			$(".kendoscheduler").getKendoScheduler().refresh();
 		}
 		else
 		{
-			self.resizeGrid(left);
+			if (self.leftPageType.indexOf("Scheduler") === -1)
+			{
+				self.resizeGrid(left);
+			} else
+			{
+				$(".kendoscheduler").getKendoScheduler().refresh();
+			}
 		}
 		self.$rightPage.width(totalWidth - left);
 		self.onSizeChanged.notify();

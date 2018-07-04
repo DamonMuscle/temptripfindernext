@@ -12,12 +12,19 @@
 		self.pageType = "scheduler";
 		self.extendDays = 50;
 
+		TF.Page.BasePage.apply(self, arguments);
+
 		self.schedulerDataSources = [];
 		self.schedulerResources = [];
 		self.schedulerOptions = [];
+
+		self.isSchedulerPage = true;
+		var currentDetailId;
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;
+
+	SchedulerPage.prototype = Object.create(TF.Page.BasePage.prototype);
 
 	SchedulerPage.prototype.init = function()
 	{
@@ -51,14 +58,36 @@
 			var checked = $.map($(".stage-option :checked"), function(checkbox)
 			{
 				return parseInt($(checkbox).val());
-			});
+			}),
+				notContainCurrentDetailId = false,
+				notCheckedIds = [];
 
 			scheduler.dataSource.filter({
 				operator: function(trip)
 				{
+					if ($.inArray(trip.stageId, checked) < 0)
+					{
+						notCheckedIds.push(trip.id);
+					}
 					return $.inArray(trip.stageId, checked) >= 0;
 				}
 			});
+
+			notCheckedIds.forEach(function(id)
+			{
+				if (id === currentDetailId)
+				{
+					notContainCurrentDetailId = true;
+				}
+			});
+
+			if (notContainCurrentDetailId)
+			{
+				self.closeDetailClick(true);
+				$(".kendoscheduler").getKendoScheduler().refresh();
+				currentDetailId = -1;
+				self.isDetailPanelShown(false);
+			}
 		});
 
 		//fix kendoscheduler week view event not align properly
@@ -71,6 +100,7 @@
 		{
 			var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
 				event = scheduler.occurrenceByUid(element.data("kendoUid"));
+			currentDetailId = event.id;
 			self.showDetailsClick(event.id);
 			self.isDetailPanelShown(true);
 			scheduler.refresh();
@@ -81,6 +111,7 @@
 				{
 					var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
 						event = scheduler.occurrenceByUid(element.data("kendoUid"));
+					currentDetailId = event.id;
 					self.detailView.showDetailViewById(event.id);
 					scheduler.refresh();
 				}
