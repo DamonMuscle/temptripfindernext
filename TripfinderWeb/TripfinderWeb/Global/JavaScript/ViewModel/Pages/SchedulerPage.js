@@ -89,6 +89,11 @@
 				self.isDetailPanelShown(false);
 			}
 		});
+		$(document).on("mousedown.kendoscheduler", function(e)
+		{
+			0 === $(e.target).closest(".k-scheduler-views").length && $(".kendoscheduler").find(".k-state-expanded").removeClass("k-state-expanded"),
+				$(document).off("click..kendoScheduler")
+		});
 
 		//fix kendoscheduler week view event not align properly
 		$(".kendoscheduler").on("click", '.k-view-week', function()
