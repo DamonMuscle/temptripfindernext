@@ -154,6 +154,7 @@
 
 		self.obCurrentErrorIndex(0);
 		self.obValidationErrors.removeAll();
+		self.obValidationErrorsSpecifed.removeAll();
 		self.obErrorMessageDivIsShow(false);
 		self.obSuccessMessageDivIsShow(false);
 		return self._validator.validate()
@@ -374,6 +375,9 @@
 				break;
 			case "invalid email":
 				message = " is not a valid email.";
+				break;
+			case "invalid phone number":
+				message = " is not a valid phone number.";
 				break;
 			default:
 				message = " " + message;

@@ -8,7 +8,7 @@
 	{
 		$.extend(this, new TF.Helper.FieldTripResourcesHelper());
 
-		this.pageLevelViewModel = new TF.PageLevel.FieldTripDataEntryPageLevelViewModel();
+		this.pageLevelViewModel = new TF.PageLevel.FieldTripDataEntryPageLevelViewModel(this);
 		namespace.BaseDataEntryViewModel.call(this, ids, view);
 
 		this.initializationFrontdesk = new TF.InitializationFrontdesk(1, this.initialize);

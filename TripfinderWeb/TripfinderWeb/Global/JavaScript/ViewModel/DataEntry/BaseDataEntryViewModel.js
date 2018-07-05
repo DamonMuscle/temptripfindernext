@@ -445,7 +445,7 @@
 				validators: {
 					phone: {
 						country: tfRegion.toUpperCase(),
-						message: " The value is not valid phone number"
+						message: " invalid phone number"
 					}
 				}
 			}

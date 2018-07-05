@@ -3,14 +3,16 @@
 	var namespace = createNamespace('TF.PageLevel');
 	namespace.FieldTripDataEntryPageLevelViewModel = FieldTripDataEntryPageLevelViewModel;
 
-	function FieldTripDataEntryPageLevelViewModel()
+	function FieldTripDataEntryPageLevelViewModel(fieldTripDE)
 	{
-		namespace.BasePageLevelViewModel.call(this);
+		var self = this;
+		namespace.BasePageLevelViewModel.call(self);
 
-		this.inactiveDateEmpty = true;
-		this.activeDateEmpty = true;
+		self.inactiveDateEmpty = true;
+		self.activeDateEmpty = true;
+		self.fieldTripDE = fieldTripDE;
 
-		this.activeLostfouseName = "";
+		self.activeLostfouseName = "";
 	}
 
 	FieldTripDataEntryPageLevelViewModel.prototype.constructor = FieldTripDataEntryPageLevelViewModel;
@@ -19,27 +21,46 @@
 
 	FieldTripDataEntryPageLevelViewModel.prototype.getValidationErrorsSpecifed = function()
 	{
-		var validationErrors = [];
-		if (this.activeLostfouseName != "")
+		var self = this, validationErrors = [],
+			returnDate = new moment(self.fieldTripDE.obEntityDataModel().returnDate()),
+			departDate = new moment(self.fieldTripDE.obEntityDataModel().departDate()),
+			start = new moment(self.fieldTripDE.obEntityDataModel().departTime()),
+			end = new moment(self.fieldTripDE.obEntityDataModel().returnTime()),
+			isSameDay = returnDate.isSame(departDate, "day"),
+			isDateAfter = departDate.isAfter(returnDate),
+			isTimeAfter = false,
+			message;
+
+		start.year(2010);
+		start.dayOfYear(1);
+
+		end.year(2010);
+		end.dayOfYear(1);
+		isTimeAfter = start.isValid() && end.isValid() && start.isAfter(end);
+
+		if (!isSameDay && isDateAfter)
 		{
-			if (this.activeLostfouseName == "departDate")
+			if (self.activeLostfouseName === "departDate")
 			{
-				var message = 'Return Date must be greater than or equal to Depart Date';
+				message = 'Return Date must be greater than or equal to Depart Date';
 				validationErrors.push({ message: message });
 			}
-			else if (this.activeLostfouseName == "returnDate")
+			else
 			{
-				var message = 'Depart Date must be less than or equal to Return Date';
+				message = 'Depart Date must be less than or equal to Return Date';
 				validationErrors.push({ message: message });
 			}
-			else if (this.activeLostfouseName == "departTime")
+		}
+		else if (isSameDay && isTimeAfter)
+		{
+			if (self.activeLostfouseName === "departTime")
 			{
-				var message = 'Return Time must be greater than or equal to Depart Time';
+				message = 'Return Time must be greater than or equal to Depart Time';
 				validationErrors.push({ message: message });
 			}
-			else if (this.activeLostfouseName == "returnTime")
+			else
 			{
-				var message = 'Depart Time must be less than or equal to Return Time';
+				message = 'Depart Time must be less than or equal to Return Time';
 				validationErrors.push({ message: message });
 			}
 		}
