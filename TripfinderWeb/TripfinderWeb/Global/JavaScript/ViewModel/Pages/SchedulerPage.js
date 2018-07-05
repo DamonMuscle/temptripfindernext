@@ -159,7 +159,7 @@
 		}
 		$(document).on("click", function(e)
 		{
-			if ($(e.target).closest(".k-view-listview").length == 0)
+			if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
 			{
 				$(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
 				$(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
