@@ -9,9 +9,8 @@
 	function ManageDetailScreenLayoutViewModel(gridType, selectId, alwaysApply)
 	{
 		var self = this, selectedDataType,
-			availableDataTypes = tf.pageManager.getAvailableDataTypes()
+			availableDataTypes = tf.pageManager.getAvailableDataTypes();
 
-		availableDataTypes.unshift({ name: "all", label: "All Data Types" });
 		availableDataTypes = availableDataTypes.map(function(item)
 		{
 			return {
@@ -44,7 +43,6 @@
 		self.onApplyToPanel = new TF.Events.Event();
 		self.onEditToPanel = new TF.Events.Event();
 
-		self.onSelectedDataTypeChanged = self.onSelectedDataTypeChanged.bind(self);
 		self.onLayoutJsonFileSelected = self.onLayoutJsonFileSelected.bind(self);
 
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
@@ -430,17 +428,6 @@
 	};
 
 	/**
- * The event handler when selected data type is updated.
- * @param {Object} model 
- * @param {Event} e 
- */
-	ManageDetailScreenLayoutViewModel.prototype.onSelectedDataTypeChanged = function(model, e)
-	{
-		var self = this;
-		self.refreshGrid();
-	};
-
-	/**
 	 * The event handler when a layout json file is selected in the file input.
 	 * @param {Object} model 
 	 * @param {Event} e 
@@ -479,10 +466,6 @@
 					else if (self.detailViewHelper.validateLayoutEntity(entity, layoutType))
 					{
 						self.saveLayoutEntity(entity);
-						if (layoutType !== self.obSelectedType().name())
-						{
-							self.changeGridSelectionByName("all");
-						}
 
 						var successMsg = "\"" + entity.Name + "\" (" + layoutGridTypeObj.label() + ") " + "has been successfully imported.";
 						self.pageLevelViewModel.clearError();
@@ -549,24 +532,6 @@
 		{
 			self.refreshGrid();
 		});
-	};
-
-	/**
-	 * Change the on-select grid type by name.
-	 * @param {string} type 
-	 */
-	ManageDetailScreenLayoutViewModel.prototype.changeGridSelectionByName = function(type)
-	{
-		var self = this,
-			selectedType = self.obAvailableDataTypes().filter(function(item)
-			{
-				return type === item.name();
-			})[0];
-
-		if (selectedType)
-		{
-			self.obSelectedType(selectedType);
-		}
 	};
 
 	/**

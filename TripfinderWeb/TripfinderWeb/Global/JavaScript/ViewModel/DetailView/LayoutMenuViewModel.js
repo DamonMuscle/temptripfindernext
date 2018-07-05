@@ -167,6 +167,7 @@
 		var self = this;
 		self.obSelectLayoutID(null)
 		self.obSelectLayoutName("");
+		tf.storageManager.save(self.stickyName, null);
 	};
 
 	/**
