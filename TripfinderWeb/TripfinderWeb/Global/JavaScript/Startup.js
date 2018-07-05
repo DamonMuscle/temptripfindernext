@@ -314,7 +314,7 @@
 										{
 											var id = getParameterByName('id'),
 												detailView = new TF.DetailView.DetailViewViewModel(id);
-											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView);
+											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
 										}
 										else
 										{
