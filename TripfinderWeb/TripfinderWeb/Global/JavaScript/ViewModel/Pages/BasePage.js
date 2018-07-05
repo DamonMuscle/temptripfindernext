@@ -87,6 +87,7 @@
 			self.detailView.dispose();
 			self.detailView = null;
 			self.obShowDetailPanel(false);
+			$(".kendoscheduler").getKendoScheduler().refresh();
 		}
 
 	};

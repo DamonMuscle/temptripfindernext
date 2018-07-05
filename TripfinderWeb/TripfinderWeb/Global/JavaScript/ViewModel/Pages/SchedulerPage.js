@@ -19,7 +19,7 @@
 		self.schedulerOptions = [];
 
 		self.isSchedulerPage = true;
-		var currentDetailId;
+		self.currentDetailId = -1;
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;
@@ -75,7 +75,7 @@
 
 			notCheckedIds.forEach(function(id)
 			{
-				if (id === currentDetailId)
+				if (id === self.currentDetailId)
 				{
 					notContainCurrentDetailId = true;
 				}
@@ -85,7 +85,7 @@
 			{
 				self.closeDetailClick(true);
 				$(".kendoscheduler").getKendoScheduler().refresh();
-				currentDetailId = -1;
+				self.currentDetailId = -1;
 				self.isDetailPanelShown(false);
 			}
 		});
@@ -100,7 +100,7 @@
 		{
 			var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
 				event = scheduler.occurrenceByUid(element.data("kendoUid"));
-			currentDetailId = event.id;
+			self.currentDetailId = event.id;
 			self.showDetailsClick(event.id);
 			self.isDetailPanelShown(true);
 			scheduler.refresh();
@@ -111,20 +111,29 @@
 				{
 					var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
 						event = scheduler.occurrenceByUid(element.data("kendoUid"));
-					currentDetailId = event.id;
+					self.currentDetailId = event.id;
 					self.detailView.showDetailViewById(event.id);
 					scheduler.refresh();
 				}
 			};
 
+		var eventselector = '.k-event';
+		var taskselector = '.k-task';
 		if (TF.isPhoneDevice)
 		{
 			//TODO
+			$(".kendoscheduler").on("click", eventselector, function(e) 
+			{
+				doubleClickBind(e, eventselector);
+			});
+
+			$(".kendoscheduler").on("click", taskselector, function(e) 
+			{
+				doubleClickBind(e, taskselector);
+			});
 		}
 		else
 		{
-			var eventselector = '.k-event';
-			var taskselector = '.k-task';
 			$(".kendoscheduler").on("dblclick", eventselector, function(e) 
 			{
 				doubleClickBind(e, eventselector);
@@ -277,6 +286,9 @@
 	{
 		var self = this;
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
+		self.detailView.onCloseDetailEvent.subscribe(
+			self.closeDetailClick.bind(self)
+		);
 		if (TF.isPhoneDevice)
 		{
 			//TODO Mobile
