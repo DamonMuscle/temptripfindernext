@@ -126,7 +126,6 @@
 		var taskselector = '.k-task';
 		if (TF.isPhoneDevice)
 		{
-			//TODO
 			$(".kendoscheduler").on("click", eventselector, function(e) 
 			{
 				doubleClickBind(e, eventselector);
@@ -158,6 +157,18 @@
 				clickBind(e, taskselector);
 			});
 		}
+		$(document).on("click", function(e)
+		{
+			if ($(e.target).closest(".k-view-listview").length == 0)
+			{
+				$(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
+				$(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
+			} else
+			{
+				$(".k-state-default.k-header.k-nav-prev").css("display", "none");
+				$(".k-state-default.k-header.k-nav-next").css("display", "none");
+			}
+		});
 	};
 
 	SchedulerPage.prototype.initScheduler = function($element)
@@ -173,7 +184,7 @@
 
 				date: new Date(),
 
-				//startTime: new Date("2015/9/9 07:00 AM"),
+				// startTime: new Date("2015/9/9 07:00 AM"),
 
 				height: 800,
 
@@ -272,11 +283,17 @@
 	SchedulerPage.prototype.getSchedulertView = function()
 	{
 		var CustomAgenda = kendo.ui.AgendaView.extend({
+			startDate: function()
+			{
+				var date = new Date("1899/12/30");
+				return kendo.date.addDays(date, 1);
+			},
 			endDate: function()
 			{
 				var date = kendo.ui.AgendaView.fn.endDate.call(this);
-				return kendo.date.addDays(date, 2000);
+				return kendo.date.addDays(date, 20000);
 			}
+
 		});
 		var schedulerView = [
 			{ type: "day" },
@@ -296,7 +313,6 @@
 		);
 		if (TF.isPhoneDevice)
 		{
-			//TODO Mobile
 			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
 		}
 		else
