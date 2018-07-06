@@ -70,7 +70,7 @@
 		}
 
 		return validationErrors;
-	}
+	};
 
 	FieldTripDataEntryPageLevelViewModel.prototype.getValidationErrors = function(valid)
 	{
@@ -87,7 +87,7 @@
 			validationErrors.push(error);
 		});
 		return validationErrors;
-	}
+	};
 
 })();
 

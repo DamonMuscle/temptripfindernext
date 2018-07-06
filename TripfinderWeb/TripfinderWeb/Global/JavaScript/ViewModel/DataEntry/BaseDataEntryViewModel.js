@@ -619,8 +619,16 @@
 			{
 				if (e)
 				{
-					tf.pageManager.resizablePage.refreshLeftGrid();
-					tf.pageManager.resizablePage.closeRightPage();
+					if (TF.isPhoneDevice)
+					{
+						tf.pageManager.resizablePage.clearLeftOtherContent();
+						tf.pageManager.resizablePage.refreshLeftGrid();
+					}
+					else
+					{
+						tf.pageManager.resizablePage.refreshLeftGrid();
+						tf.pageManager.resizablePage.closeRightPage();
+					}
 				}
 			}.bind(this));
 	};
@@ -633,7 +641,7 @@
 			tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes prior to closing this form?", backdrop: true, title: "Unsaved Changes", closeButton: true })
 				.then(function(result)
 				{
-					if (!result)
+					if (result === false)
 					{
 						if (TF.isPhoneDevice) 
 						{
@@ -643,6 +651,10 @@
 						{
 							tf.pageManager.resizablePage.closeRightPage();
 						}
+					}
+					else if (result === true)
+					{
+						self.saveAndCloseClick();
 					}
 				});
 		} else

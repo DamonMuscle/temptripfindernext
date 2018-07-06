@@ -279,7 +279,6 @@
 		}
 
 		var id = this._view.id;
-		//PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "FieldTrip", "Invoice"), this.loadInvoicing.bind(this));
 
 		return namespace.BaseDataEntryViewModel.prototype.load.call(this)
 			.then(function()
@@ -839,7 +838,6 @@
 		this.$form.find('.busAides .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.addEvent.bind(this));
 		this.$form.find('.busAides .iconbutton.pencil').off("click").on("click", { gridView: this.obBusAideGridViewModel, modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.busAides .iconbutton.delete').off("click").on("click", { gridView: this.obBusAideGridViewModel, modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.deleteEvent.bind(this));
-
 	}
 
 	FieldTripDataEntryViewModel.prototype.getSaveData = function(isTemplate)

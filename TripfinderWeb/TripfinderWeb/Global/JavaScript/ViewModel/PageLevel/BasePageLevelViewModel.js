@@ -306,7 +306,7 @@
 				$fields = self._validator.getInvalidFields();
 			$fields.each(function(i, fielddata)
 			{
-				if (i == 0)
+				if (i === 0)
 				{
 					if (self.autoFocus)
 					{
