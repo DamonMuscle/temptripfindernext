@@ -235,93 +235,39 @@
 
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
 	{
-		var p0 = this.getTemplate();
-
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "school"))
+		var self = this, p0 = p1 = p2 = p3 = p4 = p5 = p6 = p7 = p8 = p9 = p10 = fieldtripData = null;
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata"))
 			.then(function(data)
 			{
-				this.obSchoolDataModels(data.Items);
-
-			}.bind(this));
-
-		var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripdistrictdepartment"))
-			.then(function(data)
-			{
-				this.obDepartmentDataModels(data.Items);
-
-			}.bind(this));
-
-		var p3 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripactivity"))
-			.then(function(data)
-			{
-				this.obActivityDataModels(data.Items);
-			}.bind(this));
-
-		var p4 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripclassification"))
-			.then(function(data)
-			{
-				this.obClassificationDataModels(data.Items);
-
-			}.bind(this));
-
-		var p5 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripequipment"))
-			.then(function(data)
-			{
-				this.obEquipmentDataModels(data.Items);
-
-			}.bind(this));
-
-		var p6 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripdestination"))
-			.then(function(data)
-			{
-				this.obDestinationDataModels(data.Items);
-
-			}.bind(this));
-
-		var p7 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripbillingclassification"))
-			.then(function(data)
-			{
-				this.obBillingClassificationDataModels(data.Items);
-
-			}.bind(this));
-
-		var p8 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "requiredfield/FIELDTRIP"))
-			.then(function(data)
-			{
-				this.ConvertToJson(data.Items);
-			}.bind(this));
-
-		var p9 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", "fieldtripdestination", "mail_city"))
-			.then(function(data)
-			{
-				this.obMailCityDataModels(data.Items);
-			}.bind(this));
-
-		var p10 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "dataentry", "list", "fieldtripdestination", "mail_zip"))
-			.then(function(data)
-			{
-				this.obMailZipDataModels(data.Items);
-			}.bind(this));
-
+				fieldtripData = data.Items[0];
+				p0 = self.getTemplate(fieldtripData.FieldTripTemplate);
+				p1 = self.obSchoolDataModels(fieldtripData.School);
+				p2 = self.obDepartmentDataModels(fieldtripData.FieldTripDistrictDepartment);
+				p3 = self.obActivityDataModels(fieldtripData.FieldTripActivity);
+				p4 = self.obClassificationDataModels(fieldtripData.FieldTripClassification);
+				p5 = self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
+				p6 = self.obDestinationDataModels(fieldtripData.FieldTripDestination);
+				p7 = self.obBillingClassificationDataModels(fieldtripData.FieldTripBillingClassification);
+				p8 = self.ConvertToJson(fieldtripData.RequiredField);
+				p9 = self.obMailCityDataModels(fieldtripData.MailCity);
+				p10 = self.obMailZipDataModels(fieldtripData.MailZip);
+			});
 		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
 	};
 
-	FieldTripDataEntryViewModel.prototype.getTemplate = function()
+	FieldTripDataEntryViewModel.prototype.getTemplate = function(data)
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate"))
-			.then(function(data)
+		var self = this;
+		data = data.sort(function(a, b)
+		{
+			if (a.Name.toUpperCase() === b.Name.toUpperCase())
 			{
-				data.Items = data.Items.sort(function(a, b)
-				{
-					if (a.Name.toUpperCase() === b.Name.toUpperCase())
-					{
-						return 0;
-					}
-					return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
-				});
-				data.Items.unshift({ Name: "None", Id: 0 });
-				this.obTemplateSource(data.Items);
-			}.bind(this));
+				return 0;
+			}
+			return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
+		});
+		data.unshift({ Name: "None", Id: 0 });
+		self.obTemplateSource(data);
 	}
 	FieldTripDataEntryViewModel.prototype.load = function()
 	{
@@ -333,7 +279,7 @@
 		}
 
 		var id = this._view.id;
-		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "FieldTrip", "Invoice"), this.loadInvoicing.bind(this));
+		//PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "FieldTrip", "Invoice"), this.loadInvoicing.bind(this));
 
 		return namespace.BaseDataEntryViewModel.prototype.load.call(this)
 			.then(function()
@@ -368,13 +314,13 @@
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
 					this.obEntityDataModel().updateEntityBackup();
 				}
-				var p0 = this.loadInvoicing();
-				var p1 = this.loadResources();
+				this.loadInvoicing();
+				this.loadResources();
 
 				this.obEntityDataModel().apiIsDirty(false);
 				//reset the shortCutKeys golbal used
 				tf.shortCutKeys.resetUsingGolbal(5);
-				return Promise.all([p0, p1]);
+				return true;
 
 
 			}.bind(this)).catch(function(response)
@@ -487,60 +433,55 @@
 
 		if (this.obMode() === "Edit")
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripresourcegroup/byfieldTripId", this.obEntityDataModel().id()))
-				.then(function(response)
+			var resources = this.obEntityDataModel().fieldTripResourceGroup();
+			resources.forEach(function(item)
+			{
+				if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
 				{
-					resources = response.Items;
-					resources.forEach(function(item)
-					{
-						if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
-						{
-							item.Chaperone = "None";
-						}
-						this.obResourceId(this.obResourceId() + 1);
-						item.resourceId = this.obResourceId();
+					item.Chaperone = "None";
+				}
+				this.obResourceId(this.obResourceId() + 1);
+				item.resourceId = this.obResourceId();
 
-					}.bind(this));
-					this.obFieldTripResourceGroupData(resources);
+			}.bind(this));
+			this.obFieldTripResourceGroupData(resources);
 
-					this.obVehicleGridSource([]);
-					this.obDriversGridSource([]);
-					this.obBusAideGridSource([]);
-					this.obFieldTripResourceGroupData().forEach(function(item)
-					{
-						if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
-						{
-							item.Chaperone = "None";
-						}
+			this.obVehicleGridSource([]);
+			this.obDriversGridSource([]);
+			this.obBusAideGridSource([]);
+			this.obFieldTripResourceGroupData().forEach(function(item)
+			{
+				if (item.Chaperone == "" && item.Chaperone2 == "" && item.Chaperone3 == "" && item.Chaperone4 == "")
+				{
+					item.Chaperone = "None";
+				}
 
-						if (item.VehicleId && item.Vehicle)
-						{
-							item.VehTotal = this.vehicleCostComputer(item);
-							item.VehicleName = item.Vehicle.BusNum;
-							this.obVehicleGridSource.push(item);
-						}
+				if (item.VehicleId && item.Vehicle)
+				{
+					item.VehTotal = this.vehicleCostComputer(item);
+					item.VehicleName = item.Vehicle.BusNum;
+					this.obVehicleGridSource.push(item);
+				}
 
-						if (item.DriverId && item.Driver)
-						{
-							item.driverTotal = this.driverTotalCostComputer(item);
-							item.DriverName = item.Driver.FirstName + " " + item.Driver.LastName;
-							this.obDriversGridSource.push(item);
-						}
+				if (item.DriverId && item.Driver)
+				{
+					item.driverTotal = this.driverTotalCostComputer(item);
+					item.DriverName = item.Driver.FirstName + " " + item.Driver.LastName;
+					this.obDriversGridSource.push(item);
+				}
 
-						if (item.AideId && item.Aide)
-						{
-							item.aideTotal = this.busAideCostComputer(item);
-							item.AideName = item.Aide.FirstName + " " + item.Aide.LastName;
-							this.obBusAideGridSource.push(item);
-						}
+				if (item.AideId && item.Aide)
+				{
+					item.aideTotal = this.busAideCostComputer(item);
+					item.AideName = item.Aide.FirstName + " " + item.Aide.LastName;
+					this.obBusAideGridSource.push(item);
+				}
 
-					}.bind(this));
-					this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-					this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
-					this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
-					this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
-
-				}.bind(this));
+			}.bind(this));
+			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
+			this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
+			this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
+			this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
 		}
 		else
 		{
@@ -628,21 +569,17 @@
 		}
 		if (this.obMode() === "Edit")
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripinvoice", this.obEntityDataModel().id(), "fieldtripinvoices"))
-				.then(function(response)
-				{
-					response.Items.forEach(function(item)
-					{
-						item.resourceId = this.obInvoiceResourceId();
-						this.obInvoiceResourceId(item.resourceId + 1);
-					}.bind(this));
+			var resources = this.obEntityDataModel().fieldTripInvoice();
+			resources.forEach(function(item)
+			{
+				item.resourceId = this.obInvoiceResourceId();
+				this.obInvoiceResourceId(item.resourceId + 1);
+			}.bind(this));
 
-					this.obInvoiceGridDataSource(response.Items);
+			this.obInvoiceGridDataSource(resources);
 
-					var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
-					this.obInvoicingGridViewModel(invoiceGrid);
-
-				}.bind(this));
+			var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
+			this.obInvoicingGridViewModel(invoiceGrid);
 		}
 		else
 		{
