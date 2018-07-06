@@ -28,8 +28,8 @@
 			end = new moment(self.fieldTripDE.obEntityDataModel().returnTime()),
 			isSameDay = returnDate.isSame(departDate, "day"),
 			isDateAfter = departDate.isAfter(returnDate),
-			isTimeAfter = false,
-			message;
+			isTimeAfter = false, $form = self.fieldTripDE.$form,
+			message, departDateInput, endDateInput, departTimeInput, endTimeInput;
 
 		start.year(2010);
 		start.dayOfYear(1);
@@ -37,31 +37,35 @@
 		end.year(2010);
 		end.dayOfYear(1);
 		isTimeAfter = start.isValid() && end.isValid() && start.isAfter(end);
+		departDateInput = $form.find("input[name='departDate']");
+		endDateInput = $form.find("input[name='estimatedReturnDate']");
+		departTimeInput = $form.find("input[name='departTime']");
+		endTimeInput = $form.find("input[name='estimatedReturnTime']");
 
 		if (!isSameDay && isDateAfter)
 		{
 			if (self.activeLostfouseName === "departDate")
 			{
-				message = 'Return Date must be greater than or equal to Depart Date';
-				validationErrors.push({ message: message });
+				message = 'Depart Date must be less than or equal to Return Date';
+				validationErrors.push({ message: message, field: departDateInput });
 			}
 			else
 			{
-				message = 'Depart Date must be less than or equal to Return Date';
-				validationErrors.push({ message: message });
+				message = 'Return Date must be greater than or equal to Depart Date';
+				validationErrors.push({ message: message, field: endDateInput });
 			}
 		}
 		else if (isSameDay && isTimeAfter)
 		{
 			if (self.activeLostfouseName === "departTime")
 			{
-				message = 'Return Time must be greater than or equal to Depart Time';
-				validationErrors.push({ message: message });
+				message = 'Depart Time must be less than or equal to Return Time';
+				validationErrors.push({ message: message, field: departTimeInput });
 			}
 			else
 			{
-				message = 'Depart Time must be less than or equal to Return Time';
-				validationErrors.push({ message: message });
+				message = 'Return Time must be greater than or equal to Depart Time';
+				validationErrors.push({ message: message, field: endTimeInput });
 			}
 		}
 
