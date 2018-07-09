@@ -188,7 +188,7 @@
 				date: new Date(),
 				dataSource: self.getSchedulerDataSources(data),
 				views: self.getSchedulertView(),
-				editable: self.gridType === 'fieldtrips' ? false : true,
+				editable: false,
 				resources: self.getSchedulerResources(data)
 			}).data("kendoScheduler");
 
@@ -208,6 +208,17 @@
 		{
 			case "fieldtrips":
 				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
+				params = {
+					"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
+					"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
+					"filterSet": null,
+					"filterClause": "",
+					"isQuickSearch": false,
+					"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+				};
+				break;
+			case "myrequests":
+				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
 				params = {
 					"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
 					"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
