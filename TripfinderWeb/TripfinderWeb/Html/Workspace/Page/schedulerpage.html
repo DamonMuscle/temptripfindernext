@@ -11,8 +11,8 @@
 		<button class="calenderview" data-bind="click:schedulerViewClick">Scheduler View</button>
 		<button class="backtogridview" data-bind="click:navToGridViewClick">Back to Grid View</button>
 	</div>
-	<div class="scheduler-wrap" style="height:calc(100% - 166px); float:left; ">
-		<div data-bind="uiInit:init">
+	<div class="scheduler-wrap">
+		<div data-bind="uiInit:init" class="scheduler-container">
 			<div class="stage-option"></div>
 			<div class="kendoscheduler"></div>
 		</div>

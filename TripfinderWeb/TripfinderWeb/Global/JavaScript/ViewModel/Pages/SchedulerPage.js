@@ -5,12 +5,10 @@
 	function SchedulerPage(gridType)
 	{
 		var self = this;
-		self.height = 800;
 		self.detailView = null;
 		self.isDetailPanelShown = ko.observable(false);
 		self.gridType = gridType || "fieldtrips";
 		self.pageType = "scheduler";
-		self.extendDays = 50;
 
 		TF.Page.BasePage.apply(self, arguments);
 
@@ -19,31 +17,39 @@
 		self.schedulerOptions = [];
 
 		self.isSchedulerPage = true;
+		self.kendoSchedule = null;
 		self.currentDetailId = -1;
+		self.$element = null;
+		self.$kendoscheduler = null;
+		self.$stageOption = null;
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;
 
 	SchedulerPage.prototype = Object.create(TF.Page.BasePage.prototype);
 
-	SchedulerPage.prototype.init = function()
+	SchedulerPage.prototype.init = function(model, element)
 	{
 		var self = this;
 
+		self.$element = $(element);
+		self.$kendoscheduler = self.$element.find(".kendoscheduler");
+		self.$stageOption = self.$element.find(".stage-option");
 		self.initScheduler();
 	};
 
 	SchedulerPage.prototype.setFilterOpitons = function()
 	{
 		var self = this;
-		$(".stage-option").empty();
+		self.$stageOption.empty();
 		$.each(self.schedulerResources, function(index, value)
 		{
-			if ($.inArray(value["value"], self.schedulerOptions) == -1)
+			if ($.inArray(value["value"], self.schedulerOptions) === -1)
 			{
 				self.schedulerOptions.push(value["value"]);
-				$(".stage-option").append(
-					'<div style="display: inline-block;"><div style="display: inline-block;height:15px; width:15px; margin-right:.2em; border:1px solid rgb(213, 213, 213); background-color:' + value["color"] + '"></div><span>' + value["text"] + ': </span>&nbsp;<input checked id="' + value["FieldTripStageName"] + '"type="checkbox" value="' + value["value"] + '">&nbsp;&nbsp;</div>'
+				self.$stageOption.append(
+					'<div style="display: inline-block;"><div style="display: inline-block;height:15px; width:15px; margin-right:.2em; border:1px solid rgb(213, 213, 213); background-color:'
+					+ value["color"] + '"></div><span>' + value["text"] + ': </span>&nbsp;<input checked id="' + value["text"] + '"type="checkbox" value="' + value["value"] + '">&nbsp;&nbsp;</div>'
 				);
 			}
 		});
@@ -51,7 +57,7 @@
 
 	SchedulerPage.prototype.eventBinding = function()
 	{
-		var self = this, scheduler = $(".kendoscheduler").getKendoScheduler();
+		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler();
 
 		$(".stage-option :checkbox").change(function(e)
 		{
@@ -84,21 +90,21 @@
 			if (notContainCurrentDetailId)
 			{
 				self.closeDetailClick(true);
-				$(".kendoscheduler").getKendoScheduler().refresh();
+				self.$kendoscheduler.getKendoScheduler().refresh();
 				self.currentDetailId = -1;
 				self.isDetailPanelShown(false);
 			}
 		});
 		$(document).on("mousedown.kendoscheduler", function(e)
 		{
-			0 === $(e.target).closest(".k-scheduler-views").length && $(".kendoscheduler").find(".k-state-expanded").removeClass("k-state-expanded"),
+			0 === $(e.target).closest(".k-scheduler-views").length && self.$kendoscheduler.find(".k-state-expanded").removeClass("k-state-expanded"),
 				$(document).off("click..kendoScheduler")
 		});
 
 		//fix kendoscheduler week view event not align properly
-		$(".kendoscheduler").on("click", '.k-view-week', function()
+		self.$kendoscheduler.on("click.kendoscheduler", '.k-view-week', function()
 		{
-			$(".kendoscheduler").getKendoScheduler().refresh();
+			self.$kendoscheduler.getKendoScheduler().refresh();
 		});
 
 		var doubleClickBind = function(e, selector)
@@ -126,38 +132,38 @@
 		var taskselector = '.k-task';
 		if (TF.isPhoneDevice)
 		{
-			$(".kendoscheduler").on("click", eventselector, function(e) 
+			self.$kendoscheduler.on("click.kendoscheduler", eventselector, function(e) 
 			{
 				doubleClickBind(e, eventselector);
 			});
 
-			$(".kendoscheduler").on("click", taskselector, function(e) 
+			self.$kendoscheduler.on("click.kendoscheduler", taskselector, function(e) 
 			{
 				doubleClickBind(e, taskselector);
 			});
 		}
 		else
 		{
-			$(".kendoscheduler").on("dblclick", eventselector, function(e) 
+			self.$kendoscheduler.on("dblclick.kendoscheduler", eventselector, function(e) 
 			{
 				doubleClickBind(e, eventselector);
 			});
 
-			$(".kendoscheduler").on("click", eventselector, function(e) 
+			self.$kendoscheduler.on("click.kendoscheduler", eventselector, function(e) 
 			{
 				clickBind(e, eventselector);
 			});
-			$(".kendoscheduler").on("dblclick", taskselector, function(e) 
+			self.$kendoscheduler.on("dblclick.kendoscheduler", taskselector, function(e) 
 			{
 				doubleClickBind(e, taskselector);
 			});
 
-			$(".kendoscheduler").on("click", taskselector, function(e) 
+			self.$kendoscheduler.on("click.kendoscheduler", taskselector, function(e) 
 			{
 				clickBind(e, taskselector);
 			});
 		}
-		$(document).on("click", function(e)
+		$(document).on("click.kendoscheduler", function(e)
 		{
 			if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
 			{
@@ -171,34 +177,23 @@
 		});
 	};
 
-	SchedulerPage.prototype.initScheduler = function($element)
+	SchedulerPage.prototype.initScheduler = function()
 	{
-		var self = this, $element = $(".kendoscheduler");
+		var self = this;
 
-
-		$element.empty();
-
+		self.$kendoscheduler.empty();
 		self.getOriginalDataSource(self.gridType).then(function(data)
 		{
-			$element.kendoScheduler({
-
+			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
 				date: new Date(),
-
-				// startTime: new Date("2015/9/9 07:00 AM"),
-
-				height: 800,
-
 				dataSource: self.getSchedulerDataSources(data),
-
-				views: self.getSchedulertView(self.extendDays),
-
+				views: self.getSchedulertView(),
 				editable: self.gridType === 'fieldtrips' ? false : true,
-
 				resources: self.getSchedulerResources(data)
-			});
+			}).data("kendoScheduler");
 
-			$(".kendoscheduler").find(".k-scheduler-toolbar li.k-nav-current .k-sm-date-format").css("display", "none");
-			$(".kendoscheduler").find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-sm-date-format").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 			self.setFilterOpitons();
 
 			self.eventBinding();
@@ -208,7 +203,7 @@
 	SchedulerPage.prototype.getOriginalDataSource = function(type)
 	{
 		var self = this, url, params;
-		//TODO add SchedulerHelper to manage
+
 		switch (type)
 		{
 			case "fieldtrips":
@@ -231,7 +226,7 @@
 	SchedulerPage.prototype.getSchedulerDataSources = function(data)
 	{
 		var self = this;
-		data.Items.forEach(item =>
+		data.Items.forEach(function(item)
 		{
 			self.schedulerDataSources.push({
 				"Id": item['Id'],
@@ -263,7 +258,7 @@
 	SchedulerPage.prototype.getSchedulerResources = function(data)
 	{
 		var self = this;
-		data.Items.forEach(item =>
+		data.Items.forEach(function(item)
 		{
 			self.schedulerResources.push({
 				"text": item['FieldTripStageName'],
@@ -319,7 +314,6 @@
 		{
 			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
 		}
-
 	};
 
 	SchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
@@ -337,6 +331,16 @@
 
 	SchedulerPage.prototype.dispose = function()
 	{
-		//TODO
+		var self = this;
+
+		$(document).off(".kendoscheduler");
+		if (self.$kendoscheduler)
+		{
+			self.$kendoscheduler.off(".kendoscheduler");
+		}
+		if (self.kendoSchedule)
+		{
+			self.kendoSchedule.destroy();
+		}
 	};
 })();
