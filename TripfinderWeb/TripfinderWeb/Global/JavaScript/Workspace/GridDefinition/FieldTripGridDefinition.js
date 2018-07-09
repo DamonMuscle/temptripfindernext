@@ -509,5 +509,261 @@
 		};
 	};
 
+	FieldTripGridDefinition.prototype.getRelatedGridDefinition = function(type)
+	{
+		var obj = {};
+		switch (type)
+		{
+			case "resource":
+				obj.Columns = [
+					{
+						FieldName: "VehicleName",
+						Width: '150px',
+						DisplayName: "Vehicle",
+						type: "string"
+					},
+					{
+						FieldName: "AideName",
+						Width: '150px',
+						DisplayName: "Bus Aide",
+						type: "string"
+					},
+					{
+						FieldName: "DriverName",
+						Width: '150px',
+						DisplayName: "Driver",
+						type: "string"
+					}
+				];
+				break;
+			case "driver":
+				obj.Columns = [
+					{
+						FieldName: "DriverName",
+						DisplayName: "Driver",
+						Width: '150px',
+						type: "string"
+					},
+					{
+						FieldName: "DriverHours",
+						DisplayName: "Hours",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0}"
+					},
+					{
+						FieldName: "DriverRate",
+						DisplayName: "Rate",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "DriverOTHours",
+						DisplayName: "OT Hours",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0}"
+					},
+					{
+						FieldName: "DriverOTRate",
+						DisplayName: "OT Rate",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "DriverFixedCost",
+						DisplayName: "Fixed Cost",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "DriverExpParking",
+						DisplayName: "Parking Expense",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "DriverExpTolls",
+						DisplayName: "Tolls Expense",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "DriverExpMeals",
+						DisplayName: "Meals Expense",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "DriverExpMisc",
+						DisplayName: "Misc Expense",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "driverTotal",
+						DisplayName: "Total",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					}
+				];
+				break;
+			case "aide":
+				obj.Columns = [
+					{
+						FieldName: "AideName",
+						DisplayName: "Bus Aide",
+						Width: '150px',
+						type: "string"
+					},
+					{
+						FieldName: "AideHours",
+						DisplayName: "Hours",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0}"
+					},
+					{
+						FieldName: "AideRate",
+						DisplayName: "Rate",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "AideOTHours",
+						DisplayName: "OT Hours",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0}"
+					},
+					{
+						FieldName: "AideOTRate",
+						DisplayName: "OT Rate",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "AideFixedCost",
+						DisplayName: "Fixed Cost",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "aideTotal",
+						DisplayName: "Total",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "Chaperone",
+						DisplayName: "Chaperone 1",
+						Width: '150px',
+						type: "string"
+					},
+					{
+						FieldName: "Chaperone2",
+						DisplayName: "Chaperone 2",
+						Width: '150px',
+						type: "string"
+					},
+					{
+						FieldName: "Chaperone3",
+						DisplayName: "Chaperone 3",
+						Width: '150px',
+						type: "string"
+					},
+					{
+						FieldName: "Chaperone4",
+						DisplayName: "Chaperone 4",
+						Width: '150px',
+						type: "string"
+					}
+				];
+				break;
+			case "vehicle":
+				obj.Columns = [
+					{
+						FieldName: "VehicleName",
+						DisplayName: "Vehicle",
+						Width: '150px',
+						type: "string"
+					},
+					{
+						FieldName: "Startingodometer",
+						DisplayName: "Odometer Start",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0}"
+					},
+					{
+						FieldName: "Endingodometer",
+						DisplayName: "Odometer End",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0}"
+					},
+					{
+						FieldName: "MileageRate",
+						DisplayName: "Mileage Rate",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "VehFixedCost",
+						DisplayName: "Fixed Cost",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					},
+					{
+						FieldName: "VehTotal",
+						DisplayName: "Total",
+						Width: '150px',
+						type: "number",
+						Precision: 2,
+						format: "{0:0.00}"
+					}
+				];
+				break;
+			default:
+				return null;
+		}
+
+		return obj;
+	};
+
 	tf.fieldTripGridDefinition = new TF.GridDefinition.FieldTripGridDefinition();
 })();

@@ -115,7 +115,7 @@
 		grid.dataSource.read();
 	};
 
-	ResizablePage.prototype.reLayoutPage = function()
+	ResizablePage.prototype.reLayoutPage = function(width)
 	{
 		var self = this, leftWidth, totalWidth;
 
@@ -125,7 +125,7 @@
 		}
 
 		totalWidth = self.$element.outerWidth();
-		leftWidth = totalWidth * (tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || 0.5);
+		leftWidth = width ? width : totalWidth * (tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || 0.5);
 
 		if (!self.obGridData() && !self.obOtherData())
 		{

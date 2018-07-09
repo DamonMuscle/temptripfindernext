@@ -6,6 +6,7 @@
 	{
 		var self = this;
 		self.$pagedMedia = null;
+		self.updateEndMapEvents = [];
 	};
 
 	PrintHelper.prototype.updatePagedMedia = function()
@@ -28,10 +29,23 @@
 		}
 	};
 
+	PrintHelper.prototype.destroyMapEvents = function()
+	{
+		var self = this;
+		$.each(self.updateEndMapEvents, function(i, item)
+		{
+			item.remove();
+			item = null;
+		});
+		self.updateEndMapEvents.length = 0;
+	};
+
 	PrintHelper.prototype.preLoadMapImage = function($detailViewElement)
 	{
 		var self = this, $maps = $detailViewElement.find('.grid-stack-item .map'),
 			map, $item, promiseAll = [];
+
+		self.destroyMapEvents();
 
 		$.each($maps, function(i, item)
 		{
@@ -41,11 +55,10 @@
 
 			promiseAll.push(new Promise(function(resolve, reject)
 			{
-				map.on("update-end", function()
+				self.updateEndMapEvents.push(map.on("update-end", function()
 				{
-					console.log("end");
 					resolve();
-				});
+				}));
 			}));
 		});
 
@@ -83,48 +96,52 @@
 	{
 		var self = this;
 		self.restorePageMedia();
+		self.destroyMapEvents();
 	};
 
 	PrintHelper.prototype.print = function(detailViewElement)
 	{
-		var self = this, $detailViewElement = $(detailViewElement);
-		self.preLoadMapImage($detailViewElement).then(function()
+		var self = this, $detailViewElement = $(detailViewElement),
+			$printElement = $detailViewElement.clone();
+		$printElement.width(String($detailViewElement.width()) + "px").height("100%");
+
+		return new Promise(function(resolve, reject)
 		{
-			var $printElement = $detailViewElement.clone(),
-				afterPrintFunc = function()
-				{
-					self.afterPrint();
-					self.resetMap($detailViewElement);
-					$printElement.remove();
-				};
-
-			// remove virtual scrollbar padding.
-			$printElement.find('.grid-stack-item-content .kendo-grid .k-grid-content,.grid-stack-item-content .kendo-grid .k-grid-header')
-				.css("padding-right", "0px");
-
-			$('body').append($printElement);
-			$printElement.hide();
-
-			self.beforePrint($printElement);
-			setTimeout(function()
+			self.preLoadMapImage($detailViewElement).then(function()
 			{
-				var wnd = window;
-				var hasAfterPrint = 'onafterprint' in wnd;
-				if (hasAfterPrint)
+				// remove virtual scrollbar padding.
+				$printElement.find('.grid-stack-item-content .kendo-grid .k-grid-content,.grid-stack-item-content .kendo-grid .k-grid-header')
+					.css("padding-right", "0px");
+
+				$('body').append($printElement);
+				$printElement.hide();
+
+				self.beforePrint($printElement);
+				setTimeout(function()
 				{
-					wnd.onafterprint = function()
+					var wnd = window;
+					var hasAfterPrint = 'onafterprint' in wnd;
+					if (hasAfterPrint)
 					{
-						afterPrintFunc();
-					};
-				}
+						wnd.onafterprint = function()
+						{
+							resolve();
+						};
+					}
 
-				wnd.print();
+					wnd.print();
 
-				if (!hasAfterPrint)
-				{
-					afterPrintFunc();
-				}
-			}, 200);
+					if (!hasAfterPrint)
+					{
+						resolve();
+					}
+				}, 200);
+			});
+		}.bind(this)).then(function()
+		{
+			self.afterPrint();
+			self.resetMap($detailViewElement);
+			$printElement.remove();
 		});
 	};
 

@@ -354,7 +354,7 @@
 	DataPointPanel.prototype.onDataGroupMouseDown = function(group, e)
 	{
 		var self = this;
-		if (e.which === 3 && group.type === "group")
+		if (e.which === 3)
 		{
 			self.openGroupMenu(group, e);
 			e.stopPropagation();
@@ -365,7 +365,7 @@
 	{
 		var self = this, $target = $(e.target), $container, $arrow, $menu, left, groupItems, moveToLeftOffset = 0,
 			detailViewWidth = self.detailView.getCurrentWidth();
-		if (!group)
+		if (!group || group.type !== "group")
 		{
 			return;
 		}

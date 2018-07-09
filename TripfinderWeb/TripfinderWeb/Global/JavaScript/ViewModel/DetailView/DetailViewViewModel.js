@@ -227,6 +227,11 @@
 						customizedTitle: '',
 						defaultValue: data.dataPoint.defaultValue
 					};
+					if (data.dataPoint.type === "Boolean")
+					{
+						currentData.negativeLabel = data.dataPoint.negativeLabel;
+						currentData.positiveLabel = data.dataPoint.positiveLabel;
+					}
 					if (data.dataPoint.type === "grid")
 					{
 						currentData.subUrl = data.dataPoint.subUrl;
@@ -1102,8 +1107,7 @@
 	 */
 	DetailViewViewModel.prototype.showDetailViewById = function(id, gridType)
 	{
-		var self = this, gridType = gridType || self.gridType,
-			promiseAll = [];
+		var self = this, gridType = gridType || self.gridType;
 
 		if (!self.isReadMode())
 		{
@@ -1123,7 +1127,7 @@
 				self.updateDetailViewTitle(entity);
 
 				// Open detail view in a new tab
-				if (window.opener && window.name === "new-detailWindow")
+				if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 				{
 					self.hideExtraElement();
 				}
@@ -1203,13 +1207,14 @@
 	{
 		$("body").css("min-width", "585px");
 		$(".page-container").css("width", "100%");
-		$(".detail-view-panel.right-panel").css("display", "block");
-		$(".detail-view-panel.right-panel").css("width", "100%");
-		$(".iconbutton.new-window").addClass("hide");
-		$(".iconbutton.print").css("margin-left", "20px");
+		$(".detail-view-panel.right-panel").css({ display: "block", width: "100%" });
+		$(".buttons .iconbutton.new-window").addClass("hide");
+		$(".buttons .iconbutton.print").css("margin-left", "20px");
+		$(".group-buttons .iconbutton.new-window").parents("li").hide()
 		$(".selector-menu").css("margin-left", "36px");
 		$(".sliderbar-button-wrap.ui-draggable").addClass("hide");
 		$(".detail-header.width-enough").find($(".sliderbar-button-wrap.ui-draggable")).addClass("hide");
+		this.updateDetailViewPanelHeader();
 	};
 	/**
 	 * Get calendar data.
@@ -2041,7 +2046,7 @@
 	 */
 	DetailViewViewModel.prototype.addStackBlocks = function(layout)
 	{
-		var self = this, content, containerHeight, items, displayNone = false, contentBoolean, newContent,
+		var self = this, content, items, displayNone = false, contentBoolean,
 			layout = layout || self.entityDataModel.layout(),
 			container = self.$element.find(".right-container");
 		layout = !layout ? self.defaultLayout : JSON.parse(layout);
@@ -2090,10 +2095,7 @@
 					return;
 				}
 
-				if (!item.appearance)
-				{
-					item.appearance = self.appearanceTemplate;
-				}
+				item.appearance = item.appearance || self.appearanceTemplate;
 
 				if (self.isReadMode())
 				{
@@ -2101,7 +2103,7 @@
 
 					if (item.type === "Boolean")
 					{
-						newContent = content ? item.positiveLabel : item.negativeLabel;
+						contentBoolean = !!content;
 					}
 
 					displayNone = content === undefined || content === "" || content === null;
@@ -2113,7 +2115,6 @@
 					if (item.type === "Boolean")
 					{
 						contentBoolean = content !== "False";
-						newContent = contentBoolean ? item.positiveLabel : item.negativeLabel;
 					}
 				}
 
@@ -2130,7 +2131,7 @@
 						self.addCalendarStackBlock(item, dataBlockStyles);
 						break;
 					case "Boolean":
-						self.addBooleanStackBlock(newContent, item, dataBlockStyles, null, contentBoolean);
+						self.addBooleanStackBlock(contentBoolean ? item.positiveLabel : item.negativeLabel, item, dataBlockStyles, null, contentBoolean);
 						break;
 					case "grid":
 						self.addGridStackBlock(item, dataBlockStyles);
@@ -2300,7 +2301,7 @@
 	DetailViewViewModel.prototype.addGridStackBlock = function(item, dataBlockStyles, grid)
 	{
 		var self = this, grid = grid || self.grid, type = item.url.toLowerCase(),
-			randomClass = item.uniqueClassName || self.generateUniqueClassName(), columns, kendoGrid,
+			randomClass = item.uniqueClassName || self.generateUniqueClassName(),
 			$itemDom = $("<div>\
 							<div class='grid-stack-item-content custom-grid' style='background:" + dataBlockStyles.backgroundColor + ";border-color:" + dataBlockStyles.borderColor + "'>\
 								<input class='item-title' type='text' style='color:" + dataBlockStyles.titleColor + "' value='" + (item.customizedTitle || item.title) + "' />\
@@ -2312,87 +2313,117 @@
 		self.setStackBlockData($itemDom, item);
 		grid.addWidget($itemDom, item.x, item.y, item.w, item.h, undefined, undefined, undefined, 3);
 
-		if (type === 'aide' || type === 'driver')
+		self.initDetailGrid(type, item, $itemDom);
+	};
+
+	/**
+	 * 
+	 * @param {String} dataType 
+	 * @param {String} dataIdentifier
+	 */
+	DetailViewViewModel.prototype.getGridRelatedData = function(dataType, dataIdentifier, columns)
+	{
+		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide", "fieldtripinvoice"];
+		if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
-			type = 'staff';
-		}
-		if (item.columns && item.columns.length > 0)
-		{
-			columns = item.columns;
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), dataType, "ids", dataIdentifier), { data: [self.entitySelectId] }).then(function(result)
+			{
+				var ids = result.Items[0], newColumns = $.map(columns, function(column) { return column.FieldName; });
+				if (newColumns.indexOf("Id") === -1)
+				{
+					newColumns.push("Id");
+				}
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", dataType), {
+					paramData: { take: 100000, skip: 0 },
+					data: {
+						fields: newColumns,
+						filterClause: "",
+						filterSet: null,
+						idFilter: { IncludeOnly: ids, ExcludeAny: [] },
+						sortItems: [{ Name: "Id", isAscending: "asc", Direction: "Ascending" }]
+					}
+				});
+			});
 		}
 		else
 		{
-			columns = Enumerable.From(self.getDefinitionLayoutColumns(self.getGridDefinitionByType(type))).Where(function(c)
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", self.entitySelectId, "fieldtripresource", dataType));
+		}
+	};
+
+	/**
+	 * 
+	 * @param {String} gridType 
+	 * @param {Object} dataItem 
+	 * @param {JQuery} $itemDom 
+	 */
+	DetailViewViewModel.prototype.initDetailGrid = function(gridType, dataItem, $itemDom)
+	{
+		var self = this, columns;
+		if (gridType === "aide" || gridType === "driver")
+		{
+			gridType = "staff";
+		}
+
+		if (dataItem.columns && dataItem.columns.length > 0)
+		{
+			columns = dataItem.columns;
+		}
+		else
+		{
+			columns = Enumerable.From(self.getDefinitionLayoutColumns(self.getGridDefinitionByType(gridType))).Where(function(c)
 			{
 				return !c.hidden;
 			}).Select(function(c)
 			{
-				return $.extend({}, c)
+				return $.extend({}, c);
 			}).ToArray();
 		}
-		$itemDom.data("columns", columns)
-		kendoGrid = $itemDom.find('.kendo-grid').kendoGrid({
+
+		$itemDom.data("columns", columns);
+
+		var kendoGrid = $itemDom.find(".kendo-grid").kendoGrid({
 			scrollable: {
 				virtual: true
 			},
 			pageable: {
 				numeric: false,
 				previousNext: false,
-				messages: {
+				message: {
 					display: " "
 				}
 			},
 			sortable: true,
 			columns: self.getKendoColumnsExtend(columns)
 		}).data("kendoGrid");
+
 		if (self.isReadMode() && self.entitySelectId)
 		{
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), item.url, "ids", item.subUrl),
+			self.getGridRelatedData(dataItem.url, dataItem.subUrl, columns).then(function(result)
+			{
+				if (result.Items.length > 0)
 				{
-					data: [self.entitySelectId]
-				})
-				.then(function(result)
-				{
-					var ids = result.Items[0], newColumns = $.map(columns, function(column) { return column.FieldName });
-					if (newColumns.indexOf("Id") < 0)
-					{
-						newColumns.push("Id");
-					}
-					tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", type), {
-						paramData: { take: 100000, skip: 0 },
-						data: {
-							fields: newColumns,
-							filterClause: "",
-							filterSet: null,
-							idFilter: { IncludeOnly: ids, ExcludeAny: [] },
-							sortItems: [{ Name: "Id", isAscending: "asc", Direction: "Ascending" }]
-						}
-					}).then(function(result)
-					{
-						if (result.Items.length > 0)
-						{
-							var dataSource = new kendo.data.DataSource({
-								schema: {
-									model: {
-										fields: self.getKendoField(columns)
-									}
-								},
-								data: result.Items,
-								sort: item.sort
-							});
-							kendoGrid.setDataSource(dataSource);
-						}
-						self.updateGridFooter($itemDom, result.FilteredRecordCount, result.TotalRecordCount);
+					var dataSource = new kendo.data.DataSource({
+						schema: {
+							model: {
+								fields: self.getKendoField(columns)
+							}
+						},
+						data: result.Items,
+						sort: dataItem.sort
 					});
-				}, function(error)
+					kendoGrid.setDataSource(dataSource);
+				}
+				self.updateGridFooter($itemDom, result.Items.length, result.TotalRecordCount);
+			}, function(error)
 				{
 					//  no permission
-					self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, item.sort, true, item.url);
+					self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, true, dataItem.url);
 				});
 		}
 		else
 		{
-			self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, item.sort, false, item.url);
+			self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, false, dataItem.url);
 		}
 	};
 
@@ -2477,6 +2508,16 @@
 		{
 			case "fieldtrip":
 				return tf.fieldTripGridDefinition.gridDefinition().Columns;
+			case "fieldtripresource":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("resource").Columns;
+			case "fieldtripvehicle":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("vehicle").Columns;
+			case "fieldtripdriver":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("driver").Columns;
+			case "fieldtripaide":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("aide").Columns;
+			case "fieldtripinvoice":
+				return tf.FieldTripInvoiceGridDefinition.gridDefinition().Columns;
 			default:
 				return;
 		}
@@ -4658,10 +4699,7 @@
 	 */
 	DetailViewViewModel.prototype.onHeaderMoreButtonClick = function(data, e)
 	{
-		var self = this,
-			$button = $(e.target).closest(".group-buttons");
-
-		$button.toggleClass("open");
+		$(e.target).closest(".group-buttons").toggleClass("open");
 	};
 
 	/**
@@ -4690,10 +4728,25 @@
 	 */
 	DetailViewViewModel.prototype.printClick = function(data, e)
 	{
-		var self = this,
-			printHelper = new TF.DetailView.PrintHelper();
+		var self = this, printSettingsModal = new TF.Modal.PrintSettingsModalViewModel(),
+			printHelper, $detailView, pageWidth, resizablePanel, oldDetailViewWidth;
 
-		printHelper.print($(e.target).closest('.right-page'));
+		tf.modalManager.showModal(printSettingsModal).then(function(result)
+		{
+			if (!result) return;
+
+			printHelper = new TF.DetailView.PrintHelper();
+			$detailView = $(e.target).closest('.detail-view-panel');
+			oldDetailViewWidth = $detailView.width();
+			pageWidth = printSettingsModal.model.getPageWidth();
+			resizablePanel = tf.pageManager.resizablePage;
+			resizablePanel.reLayoutPage(pageWidth);
+
+			printHelper.print($detailView).then(function(result)
+			{
+				resizablePanel.reLayoutPage(oldDetailViewWidth);
+			});
+		});
 	};
 
 	/**

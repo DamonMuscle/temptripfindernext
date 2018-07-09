@@ -1,0 +1,26 @@
+<div class="print-settigns">
+	<div class="row">
+		<div class="col-xs-12">
+			<label><strong>Paper Size</strong></label>
+			<div class="input-group vf-custom-input">
+				<div data-bind="typeahead:{source:obPaperSizes,drowDownShow:true,selectedValue:obSelectedPaperSize,notSort:true}">
+					<!-- ko customInput:{type:"Select", attributes:{class: "enableHotkey form-control"}, value:obSelectedPaperSize} -->
+					<!-- /ko -->
+				</div>
+				<div class="bottom-border"></div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label><strong>Orientation</strong></label>
+				<div class="radio"><label><input data-bind="checked:obSelectedOrientation" type="radio" name="Orientation" value="Portrait" />Portrait</label></div>
+				<div class="radio"><label><input data-bind="checked:obSelectedOrientation" type="radio" name="Orientation" value="Landscape" />Landscape</label></div>
+			</div>
+		</div>
+	</div>
+</div>

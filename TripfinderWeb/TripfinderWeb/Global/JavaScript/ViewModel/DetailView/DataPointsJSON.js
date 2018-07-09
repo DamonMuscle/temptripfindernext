@@ -720,187 +720,44 @@ var today = (new Date()).toDateString(),
 			],
 			"Resources": [
 				{
-					"field": "VehicleName",
-					"title": "Vehicle",
-					"type": "String",
-					"defaultValue": "The Magic School Bus"
+					field: "FieldTripResourceGrid",
+					title: "Field Trip Resource Grid",
+					type: "grid",
+					url: "fieldtripresource",
+					subUrl: "fieldtrip",
+					"min-height": 3
 				},
 				{
-					"field": "Startingodometer",
-					"title": "Vehicle Odometer start",
-					"type": "Number",
-					"defaultValue": "10000"
+					field: "FieldTripVehicleGrid",
+					title: "Field Trip Vehicle Grid",
+					type: "grid",
+					url: "fieldtripvehicle",
+					subUrl: "fieldtrip",
+					"min-height": 3
 				},
 				{
-					"field": "Endingodometer",
-					"title": "Vehicle Odometer Ending",
-					"type": "Number",
-					"defaultValue": "10050"
+					field: "FieldTripDriverGrid",
+					title: "Field Trip Driver Grid",
+					type: "grid",
+					url: "fieldtripdriver",
+					subUrl: "fieldtrip",
+					"min-height": 3
 				},
 				{
-					"field": "MileageRate",
-					"title": "Vehicle Mileage Rate",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "0.30"
+					field: "FieldTripAideGridz",
+					title: "Field Trip Aide Grid",
+					type: "grid",
+					url: "fieldtripaide",
+					subUrl: "fieldtrip",
+					"min-height": 3
 				},
 				{
-					"field": "VehFixedCost",
-					"title": "Vehicle Fixed Cost",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "200"
-				},
-				{
-					"field": "VehTotalCost",
-					"title": "Vehicle Total Cost",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "215"
-				},
-				{
-					"field": "DriverName",
-					"title": "Driver",
-					"type": "String",
-					"defaultValue": "Valerie Frizzle"
-				},
-				{
-					"field": "DriverHours",
-					"title": "Driver Hours",
-					"type": "Number",
-					"defaultValue": "4"
-				},
-				{
-					"field": "DriverRate",
-					"title": "Driver Rate",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "15"
-				},
-				{
-					"field": "DriverOTHours",
-					"title": "Driver OT Hours",
-					"type": "Number",
-					"defaultValue": "0"
-				},
-				{
-					"field": "DriverOtrate",
-					"title": "Driver OT Rate",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "22.50"
-				},
-				{
-					"field": "DriverFixedCost",
-					"title": "Driver Fixed Cost",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "100"
-				},
-				{
-					"field": "DriverExpParking",
-					"title": "Driver Parking",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "5"
-				},
-				{
-					"field": "DriverExpTolls",
-					"title": "Driver Tolls",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "4.25"
-				},
-				{
-					"field": "DriverExpMeals",
-					"title": "Driver Meals",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "20"
-				},
-				{
-					"field": "DriverExpMisc",
-					"title": "Driver Misc",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "15"
-				},
-				{
-					"field": "DriverTotalCost",
-					"title": "Driver Total Cost",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "204.25"
-				},
-				{
-					"field": "AideName",
-					"title": "Aide",
-					"type": "String",
-					"defaultValue": "Fiona Frizzle"
-				},
-				{
-					"field": "AideHours",
-					"title": "Aide Hours",
-					"type": "Number",
-					"defaultValue": "4"
-				},
-				{
-					"field": "AideRate",
-					"title": "Aide Rate",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "13.50"
-				},
-				{
-					"field": "AideOTHours",
-					"title": "Aide OT Hours",
-					"type": "Number",
-					"defaultValue": "0"
-				},
-				{
-					"field": "AideOTRate",
-					"title": "Aide OT Rate",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "20.25"
-				},
-				{
-					"field": "AideFixedCost",
-					"title": "Aide Fixed Cost",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "75"
-				},
-				{
-					"field": "AideFixedCost",
-					"title": "Aide Total Cost",
-					"type": "Number",
-					"format": "Money",
-					"defaultValue": "149.25"
-				},
-				{
-					"field": "Chaperone",
-					"title": "Aide Chaperone 1",
-					"type": "String",
-					"defaultValue": "Mrs. Li"
-				},
-				{
-					"field": "Chaperone2",
-					"title": "Aide Chaperone 2",
-					"type": "String",
-					"defaultValue": "Mrs. Franklin"
-				},
-				{
-					"field": "Chaperone3",
-					"title": "Aide Chaperone 3",
-					"type": "String",
-					"defaultValue": "Mr. Therese"
-				},
-				{
-					"field": "Chaperone4",
-					"title": "Aide Chaperone 4",
-					"type": "String",
-					"defaultValue": "Mrs. Perlstein"
+					field: "FieldTripInvoiceGrid",
+					title: "Field Trip Invoice Grid",
+					type: "grid",
+					url: "fieldtripinvoice",
+					subUrl: "fieldtrip",
+					"min-height": 3
 				}
 			],
 			"Miscellaneous": [
@@ -2258,7 +2115,7 @@ var today = (new Date()).toDateString(),
 					"field": "AllStopGrid",
 					"title": "All Stop Grid",
 					"type": "grid",
-					"url": "trip",
+					"url": "tripstop",
 					"subUrl": "alltripstopbystudentIds",
 					"min-height": "3"
 				}
@@ -2584,7 +2441,9 @@ var today = (new Date()).toDateString(),
 					"title": "Transfer to School",
 					"type": "Boolean",
 					"defaultValue": "False",
-					"displayValue": "No Transfer to School"
+					"displayValue": "No Transfer to School",
+					"positiveLabel": "Transfer to School",
+					"negativeLabel": "No Transfer to School"
 				},
 				{
 					"field": "ActivityTrip",

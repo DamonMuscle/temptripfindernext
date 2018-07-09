@@ -41,7 +41,7 @@
 	LayoutMenuViewModel.prototype.load = function()
 	{
 		var self = this, paramData = {};
-		if (window.opener && window.name === "new-detailWindow")
+		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
 			self.obNewWindow(false);
 		}
