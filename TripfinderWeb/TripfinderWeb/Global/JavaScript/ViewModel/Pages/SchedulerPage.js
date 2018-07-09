@@ -175,9 +175,139 @@
 				$(".k-state-default.k-header.k-nav-next").css("display", "none");
 			}
 		});
+
+		self.$kendoscheduler.on("click.k-view-listview", function()
+		{
+			var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
+			if (!calendarDate)
+			{
+				var today = new Date(),
+					todayDate = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
+				initScrollBar(todayDate);
+			}
+		});
 	};
 
-	SchedulerPage.prototype.initScheduler = function()
+	function initScrollBar(date)
+	{
+		setTimeout(function()
+		{
+			var schedulerSource = $(".kendoscheduler").getKendoScheduler(),
+				matchedDate,
+				dateFormat = Date.parse(date),
+				eventDateArray = [];
+
+			schedulerSource.dataSource.options.data.filter(function(trip)
+			{
+				var startDate = trip.start.toLocaleString().split(",")[0],
+					endDate = trip.end.toLocaleString().split(",")[0];
+				Array.prototype.push.apply(eventDateArray, getAll(startDate, endDate));
+			});
+			eventDateArray.sort(function(a, b) { return a - b; });
+			var beforeTodayDateArray = eventDateArray.filter(function(itemDate)
+			{
+				return itemDate <= dateFormat;
+			});
+
+			matchedDate = beforeTodayDateArray[beforeTodayDateArray.length - 1];
+			var matchedDateFormat = new Date(matchedDate);
+			matchedDate = matchedDateFormat.toLocaleString().split(",")[0];
+
+			$(".kendoscheduler table tbody .k-scheduler-content .k-scheduler-table tbody tr td.k-scheduler-datecolumn").each(function(index, dom)
+			{
+				var $element = $(dom),
+					dayString = $element.find(".k-scheduler-agendaday").text(),
+					dateArray = $element.find(".k-scheduler-agendadate").text().split(","),
+					dateMonth = dateArray[0],
+					dateYear = dateArray[1].replace(/\s+/g, "");
+				if (dayString.substr(0, 1) === "0")
+				{
+					dayString = dayString.slice(1);
+				}
+				switch (dateMonth)
+				{
+					case "January":
+						dateMonth = "1";
+						break;
+					case "February":
+						dateMonth = "2";
+						break;
+					case "March":
+						dateMonth = "3";
+						break;
+					case "April":
+						dateMonth = "4";
+						break;
+					case "May":
+						dateMonth = "5";
+						break;
+					case "June":
+						dateMonth = "6";
+						break;
+					case "July":
+						dateMonth = "7";
+						break;
+					case "August":
+						dateMonth = "8";
+						break;
+					case "September":
+						dateMonth = "9";
+						break;
+					case "October":
+						dateMonth = "10";
+						break;
+					case "November":
+						dateMonth = "11";
+						break;
+					case "December":
+						dateMonth = "12";
+						break;
+					default:
+						break;
+				}
+				var domDateString = dateMonth + "/" + dayString + "/" + dateYear;
+
+				if (domDateString === matchedDate)
+				{
+					var tableOffsetTop = $(".k-scheduler-table").offset().top;
+					$(".k-scheduler-content").scrollTop($element.offset().top - (tableOffsetTop + 28));
+					return false;
+				}
+			});
+		}, 50);
+	}
+
+	function format(date)
+	{
+		var s = '';
+		var mouth = date.getMonth() + 1;
+		var day = date.getDate();
+		s += mouth + "/"; // 获取月份。
+		s += day + "/"; // 获取日。
+		s += date.getFullYear(); // 获取年份。
+		return (s); // 返回日期。
+	}
+
+	function getAll(begin, end)
+	{
+		var ab = begin.split("/");
+		var ae = end.split("/");
+		var db = new Date();
+		db.setUTCFullYear(ab[2], ab[0] - 1, ab[1]);
+		var de = new Date();
+		de.setUTCFullYear(ae[2], ae[0] - 1, ae[1]);
+		var unixDb = db.getTime();
+		var unixDe = de.getTime();
+		var dateArray = [];
+		for (var k = unixDb; k <= unixDe;)
+		{
+			dateArray.push(Date.parse((format(new Date(parseInt(k))))));
+			k = k + 24 * 60 * 60 * 1000;
+		}
+		return dateArray;
+	}
+
+	SchedulerPage.prototype.initScheduler = function($element)
 	{
 		var self = this;
 
@@ -187,9 +317,25 @@
 			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
 				date: new Date(),
 				dataSource: self.getSchedulerDataSources(data),
-				views: self.getSchedulertView(),
+				views: self.getSchedulertView(self.extendDays),
 				editable: false,
-				resources: self.getSchedulerResources(data)
+				resources: self.getSchedulerResources(data),
+				navigate: function()
+				{
+					setTimeout(function()
+					{
+						if ($(".k-scheduler-layout.k-scheduler-agendaview").length > 0)
+						{
+							var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
+							if (calendarDate)
+							{
+								var calendarDateArray = calendarDate.split("/"),
+									selectCalendarDate = (parseInt(calendarDateArray[1]) + 1) + "/" + calendarDateArray[2] + "/" + calendarDateArray[0];
+								initScrollBar(selectCalendarDate);
+							}
+						}
+					});
+				}
 			}).data("kendoScheduler");
 
 			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-sm-date-format").css("display", "none");
