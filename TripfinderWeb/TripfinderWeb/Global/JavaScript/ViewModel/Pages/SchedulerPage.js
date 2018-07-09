@@ -48,8 +48,8 @@
 			{
 				self.schedulerOptions.push(value["value"]);
 				self.$stageOption.append(
-					'<div style="display: inline-block;"><div style="display: inline-block;height:15px; width:15px; margin-right:.2em; border:1px solid rgb(213, 213, 213); background-color:'
-					+ value["color"] + '"></div><span>' + value["text"] + ': </span>&nbsp;<input checked id="' + value["text"] + '"type="checkbox" value="' + value["value"] + '">&nbsp;&nbsp;</div>'
+					'<div class="content"><div class="stage-color" style="background-color:' + value["color"] + '"></div><span class="stage-name">' + value["text"] +
+					': </span><input class="stage-check-box" checked id="' + value["text"] + '"type="checkbox" value="' + value["value"] + '"></div>'
 				);
 			}
 		});
