@@ -130,6 +130,7 @@
 
 		var eventselector = '.k-event';
 		var taskselector = '.k-task';
+		var viewselector = '.k-view-listview';
 		if (TF.isPhoneDevice)
 		{
 			self.$kendoscheduler.on("click.kendoscheduler", eventselector, function(e) 
@@ -176,7 +177,7 @@
 			}
 		});
 
-		self.$kendoscheduler.on("click.k-view-listview", function()
+		self.$kendoscheduler.on("click.kendoscheduler", viewselector, function()
 		{
 			var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
 			if (!calendarDate)
