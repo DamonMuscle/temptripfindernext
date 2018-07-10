@@ -113,8 +113,63 @@ body,
 				}
 			}
 
+			.scheduler-wrap {
+				margin-left: 15px;
+				margin-right: 15px;
+				margin-top: 15px;
+				height: calc(~"100% - 166px");
+				float: left;
 
-			.grid-icons {
+				.scheduler-container {
+					height: 100%;
+				}
+
+				.stage-option {
+					width: 100%;
+					position: relative;
+					right: 0;
+					margin-bottom: 10px;
+
+					.content {
+						display: inline-block;
+
+						.stage-color {
+							display: inline-block;
+							height: 15px;
+							width: 15px;
+							margin-right: .2em;
+							border: 1px solid rgb(213, 213, 213);
+							float: left;
+						}
+
+						.stage-name {
+							float: left;
+						}
+
+						.stage-check-box {
+							float: left;
+							margin-top: 2px;
+							margin-left: 4px;
+							margin-right: 20px;
+						}
+					}
+
+					input {
+						margin-right: 20px;
+					}
+				}
+
+				.kendoscheduler {
+					height: 100%;
+				}
+
+				.k-nav-current > .k-link span + span {
+					max-width: 200px;
+				}
+			}
+
+			.grid-icons,
+			.scheduler-icon {
 				float: left;
 				width: 100%;
 				padding: 0 16px;

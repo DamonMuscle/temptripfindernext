@@ -1037,11 +1037,15 @@
 	DetailViewViewModel.prototype.applyLayoutEntity = function(layoutEntity, isDeleted)
 	{
 		var self = this, gridType = self.gridType;
-		if (layoutEntity && !layoutEntity.SubTitle && gridType == layoutEntity.Table)
+		if (layoutEntity && !layoutEntity.SubTitle && gridType === layoutEntity.Table)
 		{
 			layoutEntity.SubTitle = self.basicGridConfig[gridType].subTitle;
 		}
 		self.entityDataModel = new TF.DataModel.DetailScreenLayoutDataModel(layoutEntity);
+		if (!layoutEntity)
+		{
+			self.entityDataModel.subTitle(self.basicGridConfig[gridType].subTitle);
+		}
 
 		if (!self.isReadMode() && !isDeleted)
 		{

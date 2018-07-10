@@ -1,0 +1,20 @@
+<div class="document-grid page-container">
+	<!-- ko if:TF.isPhoneDevice-->
+	<div class="mobile-header">
+		<div class="icon logo"></div>
+	</div>
+	<!-- /ko -->
+	<div class="desktop-header">
+		<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
+	</div>
+	<div class="scheduler-icon">
+		<button class="calenderview" data-bind="click:schedulerViewClick">Scheduler View</button>
+		<button class="backtogridview" data-bind="click:navToGridViewClick">Back to Grid View</button>
+	</div>
+	<div class="scheduler-wrap">
+		<div data-bind="uiInit:init" class="scheduler-container">
+			<div class="stage-option"></div>
+			<div class="kendoscheduler"></div>
+		</div>
+	</div>
+</div>

@@ -16,12 +16,12 @@
 		self.enableRefreshEvent = new TF.Events.Event();
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
-		self.obShowDetailPanel = ko.observable(false);
-		self.obShowFieldTripDEPanel = ko.observable(false);
+		// self.obShowDetailPanel = ko.observable(false);
+		// self.obShowFieldTripDEPanel = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
-		self.detailView = null;
-		self.fieldTripDataEntry = null;
+		// self.detailView = null;
+		// self.fieldTripDataEntry = null;
 		self.isGridPage = true;
 
 		self.approveButton = false;
@@ -30,9 +30,13 @@
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
+
+		TF.Page.BasePage.apply(self, arguments);
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
+
+	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
 
@@ -141,88 +145,6 @@
 		self._openBulkMenu();
 		self.targetID = ko.observable();
 		self.searchGridInited(true);
-	};
-
-	BaseGridPage.prototype.clearRelatedRightPage = function(type)
-	{
-		var self = this;
-
-		switch (type)
-		{
-			case "detailview":
-				self.detailView = null;
-				self.obShowDetailPanel(false);
-				break;
-			case "fieldtripde":
-				self.fieldTripDataEntry = null;
-				self.obShowFieldTripDEPanel(false);
-				break;
-			default:
-				self.detailView = null;
-				self.fieldTripDataEntry = null;
-				self.obShowFieldTripDEPanel(false);
-				self.obShowDetailPanel(false);
-				break;
-		}
-	};
-
-	BaseGridPage.prototype.showDetailsClick = function()
-	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedId;
-
-		if (!selectedIds || selectedIds.length <= 0)
-		{
-			return;
-		}
-
-		selectedId = selectedIds[0];
-		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
-		{
-			self.detailView.showDetailViewById(selectedId);
-		}
-		else
-		{
-			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
-			self.detailView.onCloseDetailEvent.subscribe(
-				self.closeDetailClick.bind(self)
-			);
-			if (TF.isPhoneDevice)
-			{
-				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
-			}
-			else
-			{
-				tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
-			}
-
-		}
-		self.obShowDetailPanel(true);
-	};
-
-
-	BaseGridPage.prototype.closeDetailClick = function()
-	{
-		var self = this;
-		tf.pageManager.resizablePage.clearLeftOtherContent();
-		self.detailView.dispose();
-		self.detailView = null;
-		self.obShowDetailPanel(false);
-	};
-
-	//TODO right click menu feature
-	BaseGridPage.prototype.copyToClipboardClick = function()
-	{
-
-	};
-
-	//TODO right click menu feature
-	BaseGridPage.prototype.saveAsClick = function()
-	{
-	};
-
-	//TODO right click menu feature
-	BaseGridPage.prototype.openSelectedClick = function()
-	{
 	};
 
 	BaseGridPage.prototype._openBulkMenu = function()
@@ -600,6 +522,12 @@
 		var self = this;
 		self.obShowDetailPanel(false);
 		tf.pageManager.resizablePage.closeRightPage();
+	};
+
+	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
+	{
+		var self = this;
+		tf.pageManager.openNewPage(self.pageType + "Scheduler");
 	};
 
 	BaseGridPage.prototype.dispose = function()
