@@ -362,7 +362,8 @@
 							}
 						}
 					});
-				}
+				},
+				footer: false
 			}).data("kendoScheduler");
 			self.setFilterOpitons();
 
@@ -372,31 +373,22 @@
 
 	SchedulerPage.prototype.getOriginalDataSource = function(type)
 	{
-		var self = this, url, params;
+		var self = this, url, params = {
+			"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
+			"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
+			"filterSet": null,
+			"filterClause": "",
+			"isQuickSearch": false,
+			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+		};
 
 		switch (type)
 		{
 			case "fieldtrips":
 				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
-				params = {
-					"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
-					"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
-					"filterSet": null,
-					"filterClause": "",
-					"isQuickSearch": false,
-					"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
-				};
 				break;
 			case "myrequests":
 				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
-				params = {
-					"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
-					"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
-					"filterSet": null,
-					"filterClause": "",
-					"isQuickSearch": false,
-					"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
-				};
 				break;
 			default:
 				break;
