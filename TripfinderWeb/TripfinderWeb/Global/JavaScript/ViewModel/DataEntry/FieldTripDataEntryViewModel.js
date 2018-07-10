@@ -1121,29 +1121,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
-				{
-					message: " must be unique",
-					callback: function(value, validator, $field)
 					{
-						if (value == "" || this.obEntityDataModel().id())
+						message: " must be unique",
+						callback: function(value, validator, $field)
 						{
-							return true;
-						}
-
-						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-							paramData: {
-								name: this.obEntityDataModel().name()
-							}
-						}, {
-								overlay: false
-							})
-							.then(function(apiResponse)
+							if (value == "" || this.obEntityDataModel().id())
 							{
-								return apiResponse.Items[0] == false;
-							})
-					}.bind(this)
-				}
+								return true;
+							}
+
+							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+								paramData: {
+									name: this.obEntityDataModel().name()
+								}
+							}, {
+									overlay: false
+								})
+								.then(function(apiResponse)
+								{
+									return apiResponse.Items[0] == false;
+								})
+						}.bind(this)
+					}
 			}
 		};
 
@@ -1219,17 +1219,16 @@
 			}.bind(this)
 		};
 
-		if (this.obRequiredFields().DepartDateTime)
-		{//no need to check EstimatedReturnTime because it is not required.
-			if (this.obRequiredFields().DepartDateTime.Required)
+		if (this.obRequiredFields().departDateTime && this.obRequiredFields().departDateTime())
+		{
+			//no need to check EstimatedReturnTime because it is not required.
+			if (this.obRequiredFields().departDateTime.Required)
 			{
 				validatorFields.departDate.validators.notEmpty = { message: "required" };
-			}
-			else
-			{
-				delete validatorFields.departTime.validators.notEmpty;
+				validatorFields.departTime.validators.notEmpty = { message: "required" };
 			}
 		}
+
 		validatorFields.departTime.validators.callback = {
 			message: "invalid time",
 			callback: function(value, validator)
@@ -1284,17 +1283,14 @@
 			}.bind(this)
 		};
 
-		if (this.obRequiredFields().EstimatedReturnDateTime)
+		if (this.obRequiredFields().estimatedReturnDateTime && this.obRequiredFields().estimatedReturnDateTime())
 		{//no need to check EstimatedReturnTime because it is not required.
-			if (this.obRequiredFields().EstimatedReturnDateTime.Required)
+			if (this.obRequiredFields().estimatedReturnDateTime().Required)
 			{
 				validatorFields.estimatedReturnDate.validators.notEmpty = { message: "required" };
 			}
-			else
-			{
-				delete validatorFields.estimatedReturnTime.validators.notEmpty;
-			}
 		}
+		delete validatorFields.estimatedReturnTime.validators.notEmpty;
 
 		validatorFields.estimatedReturnTime.validators.callback = {
 			message: "invalid time",
