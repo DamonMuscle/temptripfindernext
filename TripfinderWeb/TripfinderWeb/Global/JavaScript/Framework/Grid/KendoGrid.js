@@ -880,12 +880,6 @@
 		}
 
 		this._delayHideLoadingIndicator();
-
-
-		self.fleetClickTimeout = setTimeout(function()
-		{
-			self.fitContainer();
-		}, 200);
 	};
 
 	KendoGrid.prototype._delayHideLoadingIndicator = function(delayTime)
