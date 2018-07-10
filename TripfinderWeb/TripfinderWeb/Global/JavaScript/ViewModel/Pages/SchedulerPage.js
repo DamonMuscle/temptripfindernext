@@ -326,12 +326,21 @@
 					{
 						if ($(".k-scheduler-layout.k-scheduler-agendaview").length > 0)
 						{
-							var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
-							if (calendarDate)
+							if ($(".k-state-default.k-header.k-nav-today.k-state-hover").length > 0)
 							{
-								var calendarDateArray = calendarDate.split("/"),
-									selectCalendarDate = (parseInt(calendarDateArray[1]) + 1) + "/" + calendarDateArray[2] + "/" + calendarDateArray[0];
-								initScrollBar(selectCalendarDate);
+								var today = new Date(),
+									todayDate = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
+								initScrollBar(todayDate);
+
+							} else
+							{
+								var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
+								if (calendarDate)
+								{
+									var calendarDateArray = calendarDate.split("/"),
+										selectCalendarDate = (parseInt(calendarDateArray[1]) + 1) + "/" + calendarDateArray[2] + "/" + calendarDateArray[0];
+									initScrollBar(selectCalendarDate);
+								}
 							}
 						}
 					});
