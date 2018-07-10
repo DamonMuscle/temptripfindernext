@@ -117,7 +117,7 @@
 
 	ResizablePage.prototype.reLayoutPage = function(width)
 	{
-		var self = this, leftWidth, totalWidth;
+		var self = this, leftWidth, totalWidth, result;
 
 		if (!self.$element)
 		{
@@ -150,13 +150,22 @@
 			}
 			self.$rightPage.width(totalWidth - leftWidth);
 			self.$dragHandler.css("left", leftWidth + "px");
-			self.resizeGrid(leftWidth);
+			result = leftWidth;
 		}
 		else
 		{
 			self.$rightPage.width(0);
 			self.$leftPage.width("100%");
-			self.resizeGrid(totalWidth);
+			result = totalWidth;
+		}
+
+		if (self.leftPageType.indexOf("Scheduler") === -1)
+		{
+			self.resizeGrid(result);
+		}
+		else if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
+		{
+			$(".kendoscheduler").getKendoScheduler().refresh();
 		}
 	};
 
