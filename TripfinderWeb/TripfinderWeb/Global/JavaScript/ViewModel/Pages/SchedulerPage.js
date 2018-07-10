@@ -168,12 +168,14 @@
 		{
 			if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
 			{
-				$(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
-				$(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
+				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
+				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
+				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
 			} else
 			{
-				$(".k-state-default.k-header.k-nav-prev").css("display", "none");
-				$(".k-state-default.k-header.k-nav-next").css("display", "none");
+				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
+				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
+				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 			}
 		});
 
@@ -362,9 +364,6 @@
 					});
 				}
 			}).data("kendoScheduler");
-
-			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-sm-date-format").css("display", "none");
-			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 			self.setFilterOpitons();
 
 			self.eventBinding();
