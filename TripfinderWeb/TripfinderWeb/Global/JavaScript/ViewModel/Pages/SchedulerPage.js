@@ -308,6 +308,14 @@
 		return dateArray;
 	}
 
+	function addDate(date, days)
+	{
+		var d = new Date(date);
+		d.setDate(d.getDate() + days);
+		var m = d.getMonth() + 1;
+		return d.getFullYear() + '-' + m + '-' + d.getDate();
+	}
+
 	SchedulerPage.prototype.initScheduler = function($element)
 	{
 		var self = this;
@@ -315,6 +323,13 @@
 		self.$kendoscheduler.empty();
 		self.getOriginalDataSource(self.gridType).then(function(data)
 		{
+			data.Items.forEach(function(item)
+			{
+				if (!item.EstimatedReturnDateTime)
+				{
+					item.EstimatedReturnDateTime = addDate(item.DepartDateTime, 1);
+				}
+			});
 			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
 				date: new Date(),
 				dataSource: self.getSchedulerDataSources(data),
