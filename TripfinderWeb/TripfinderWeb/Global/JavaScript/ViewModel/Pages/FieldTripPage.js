@@ -18,6 +18,7 @@
 			self.declineButton = true;
 		}
 		self.detailButton = true;
+		self.schedulerButton = true;
 	}
 
 	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);

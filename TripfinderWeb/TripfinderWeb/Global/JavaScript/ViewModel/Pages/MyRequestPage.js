@@ -10,6 +10,7 @@
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = true;
 		self.detailButton = true;
+		self.schedulerButton = true;
 	}
 
 	MyRequestPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);

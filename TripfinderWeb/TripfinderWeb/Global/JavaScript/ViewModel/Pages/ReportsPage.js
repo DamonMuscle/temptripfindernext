@@ -10,6 +10,7 @@
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = false;
 		self.detailButton = false;
+		self.schedulerButton = false;
 	}
 
 	ReportsPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
