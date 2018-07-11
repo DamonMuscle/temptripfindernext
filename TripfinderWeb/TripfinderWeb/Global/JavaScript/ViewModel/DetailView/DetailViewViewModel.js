@@ -4520,6 +4520,11 @@
 		self.dataPointPanel.onCloseDataPointPanelEvent.subscribe(function()
 		{
 			tf.pageManager.resizablePage.clearLeftOtherContent();
+			if ($(".kendoscheduler").length > 0)
+			{
+				$(".kendoscheduler").getKendoScheduler().refresh();
+			}
+
 		});
 		tf.pageManager.resizablePage.setLeftPage("workspace/detailview/DataPointPanel", self.dataPointPanel);
 		self.grid.setRemovingBound();
