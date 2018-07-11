@@ -186,7 +186,10 @@
 			{
 				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
 				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
-				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
+				if (!TF.isMobileDevice)
+				{
+					self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
+				}
 			} else
 			{
 				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
