@@ -85,6 +85,7 @@
 				}
 			});
 
+
 			notCheckedIds.forEach(function(id)
 			{
 				if (id === self.currentDetailId)
@@ -100,6 +101,15 @@
 				self.currentDetailId = -1;
 				self.isDetailPanelShown(false);
 			}
+
+			if (checked.length >= self.$stageOption.children().length)
+			{
+				self.getScrollBarPosition();
+			} else
+			{
+				$(".k-scheduler-content").scrollTop(0);
+			}
+
 		});
 		$(document).on("mousedown.kendoscheduler", function(e)
 		{
@@ -182,16 +192,6 @@
 				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
 				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
 				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
-			}
-		});
-
-		self.$kendoscheduler.on("click.kendoscheduler", viewselector, function()
-		{
-			var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
-			if (!calendarDate)
-			{
-				var today = new Date();
-				self.initScrollBar(today);
 			}
 		});
 	};
@@ -330,34 +330,44 @@
 				resources: self.getSchedulerResources(data),
 				navigate: function()
 				{
-					setTimeout(function()
-					{
-						if ($(".k-scheduler-layout.k-scheduler-agendaview").length > 0)
-						{
-							if ($(".k-state-default.k-header.k-nav-today.k-state-hover").length > 0)
-							{
-								var today = new Date();
-								self.initScrollBar(today);
-
-							} else
-							{
-								var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
-								if (calendarDate)
-								{
-									var calendarDateArray = calendarDate.split("/");
-									selectCalendarDate = (parseInt(calendarDateArray[1]) + 1) + "/" + calendarDateArray[2] + "/" + calendarDateArray[0];
-									selectCalendarDate = new Date(selectCalendarDate);
-									self.initScrollBar(selectCalendarDate);
-								}
-							}
-						}
-					});
+					self.getScrollBarPosition();
 				},
 				footer: false
 			}).data("kendoScheduler");
 			self.setFilterOpitons();
 
 			self.eventBinding();
+		});
+	};
+
+	SchedulerPage.prototype.getScrollBarPosition = function()
+	{
+		var self = this;
+		setTimeout(function()
+		{
+			if ($(".k-scheduler-layout.k-scheduler-agendaview").length > 0)
+			{
+				if ($(".k-state-default.k-header.k-nav-today.k-state-hover").length > 0)
+				{
+					var today = new Date();
+					self.initScrollBar(today);
+
+				} else
+				{
+					var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
+					if (calendarDate)
+					{
+						var calendarDateArray = calendarDate.split("/");
+						selectCalendarDate = (parseInt(calendarDateArray[1]) + 1) + "/" + calendarDateArray[2] + "/" + calendarDateArray[0];
+						selectCalendarDate = new Date(selectCalendarDate);
+						self.initScrollBar(selectCalendarDate);
+					} else
+					{
+						var today = new Date();
+						self.initScrollBar(today);
+					}
+				}
+			}
 		});
 	};
 
