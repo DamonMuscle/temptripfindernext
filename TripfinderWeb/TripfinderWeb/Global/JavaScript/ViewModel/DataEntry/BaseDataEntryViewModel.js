@@ -376,7 +376,7 @@
 				}
 			};
 
-		this.$form.find("input[required]").each(function(n, field)
+		this.$form.find("input[required],textarea[required]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
 			validatorFields[name] = {

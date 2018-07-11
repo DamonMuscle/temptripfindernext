@@ -235,24 +235,24 @@
 
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
 	{
-		var self = this, p0 = p1 = p2 = p3 = p4 = p5 = p6 = p7 = p8 = p9 = p10 = fieldtripData = null;
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata"))
+		var self = this, fieldtripData;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata"))
 			.then(function(data)
 			{
 				fieldtripData = data.Items[0];
-				p0 = self.getTemplate(fieldtripData.FieldTripTemplate);
-				p1 = self.obSchoolDataModels(fieldtripData.School);
-				p2 = self.obDepartmentDataModels(fieldtripData.FieldTripDistrictDepartment);
-				p3 = self.obActivityDataModels(fieldtripData.FieldTripActivity);
-				p4 = self.obClassificationDataModels(fieldtripData.FieldTripClassification);
-				p5 = self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
-				p6 = self.obDestinationDataModels(fieldtripData.FieldTripDestination);
-				p7 = self.obBillingClassificationDataModels(fieldtripData.FieldTripBillingClassification);
-				p8 = self.ConvertToJson(fieldtripData.RequiredField);
-				p9 = self.obMailCityDataModels(fieldtripData.MailCity);
-				p10 = self.obMailZipDataModels(fieldtripData.MailZip);
+				self.getTemplate(fieldtripData.FieldTripTemplate);
+				self.obSchoolDataModels(fieldtripData.School);
+				self.obDepartmentDataModels(fieldtripData.FieldTripDistrictDepartment);
+				self.obActivityDataModels(fieldtripData.FieldTripActivity);
+				self.obClassificationDataModels(fieldtripData.FieldTripClassification);
+				self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
+				self.obDestinationDataModels(fieldtripData.FieldTripDestination);
+				self.obBillingClassificationDataModels(fieldtripData.FieldTripBillingClassification);
+				self.ConvertToJson(fieldtripData.RequiredField);
+				self.obMailCityDataModels(fieldtripData.MailCity);
+				self.obMailZipDataModels(fieldtripData.MailZip);
+				return true;
 			});
-		return Promise.all([p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
 	};
 
 	FieldTripDataEntryViewModel.prototype.getTemplate = function(data)
@@ -1121,29 +1121,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
+				{
+					message: " must be unique",
+					callback: function(value, validator, $field)
 					{
-						message: " must be unique",
-						callback: function(value, validator, $field)
+						if (value == "" || this.obEntityDataModel().id())
 						{
-							if (value == "" || this.obEntityDataModel().id())
-							{
-								return true;
-							}
+							return true;
+						}
 
-							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-								paramData: {
-									name: this.obEntityDataModel().name()
-								}
-							}, {
-									overlay: false
-								})
-								.then(function(apiResponse)
-								{
-									return apiResponse.Items[0] == false;
-								})
-						}.bind(this)
-					}
+						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+							paramData: {
+								name: this.obEntityDataModel().name()
+							}
+						}, {
+								overlay: false
+							})
+							.then(function(apiResponse)
+							{
+								return apiResponse.Items[0] == false;
+							})
+					}.bind(this)
+				}
 			}
 		};
 
