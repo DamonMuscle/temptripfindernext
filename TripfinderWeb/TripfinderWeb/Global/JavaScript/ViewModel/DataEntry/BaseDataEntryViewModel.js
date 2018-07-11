@@ -319,6 +319,7 @@
 					{
 						this._view.id = undefined;
 					}
+					return true;
 				}.bind(this))
 				.catch(function(response)
 				{

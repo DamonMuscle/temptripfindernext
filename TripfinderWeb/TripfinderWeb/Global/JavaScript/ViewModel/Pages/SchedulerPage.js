@@ -66,7 +66,8 @@
 
 	SchedulerPage.prototype.eventBinding = function()
 	{
-		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler();
+		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler(), eventselector = '.k-event',
+			taskselector = ".k-task", tdselector = '.k-scheduler-agendaview .k-scheduler-content tr td:last-child';
 
 		$(".stage-option :checkbox").change(function(e)
 		{
@@ -125,7 +126,7 @@
 
 		var doubleClickBind = function(e, selector)
 		{
-			var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
+			var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
 				event = scheduler.occurrenceByUid(element.data("kendoUid"));
 			self.currentDetailId = event.id;
 			self.showDetailsClick(event.id);
@@ -136,7 +137,7 @@
 			{
 				if (self.isDetailPanelShown())
 				{
-					var element = $(e.target).is(selector) ? $(e.target) : $(e.target).closest(selector),
+					var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
 						event = scheduler.occurrenceByUid(element.data("kendoUid"));
 					self.currentDetailId = event.id;
 					self.detailView.showDetailViewById(event.id);
@@ -144,9 +145,6 @@
 				}
 			};
 
-		var eventselector = '.k-event';
-		var taskselector = '.k-task';
-		var viewselector = '.k-view-listview';
 		if (TF.isPhoneDevice)
 		{
 			self.$kendoscheduler.on("click.kendoscheduler", eventselector, function(e) 
@@ -154,7 +152,7 @@
 				doubleClickBind(e, eventselector);
 			});
 
-			self.$kendoscheduler.on("click.kendoscheduler", taskselector, function(e) 
+			self.$kendoscheduler.on("click.kendoscheduler", tdselector, function(e) 
 			{
 				doubleClickBind(e, taskselector);
 			});
@@ -170,12 +168,13 @@
 			{
 				clickBind(e, eventselector);
 			});
-			self.$kendoscheduler.on("dblclick.kendoscheduler", taskselector, function(e) 
+
+			self.$kendoscheduler.on("dblclick.kendoscheduler", tdselector, function(e) 
 			{
 				doubleClickBind(e, taskselector);
 			});
 
-			self.$kendoscheduler.on("click.kendoscheduler", taskselector, function(e) 
+			self.$kendoscheduler.on("click.kendoscheduler", tdselector, function(e) 
 			{
 				clickBind(e, taskselector);
 			});

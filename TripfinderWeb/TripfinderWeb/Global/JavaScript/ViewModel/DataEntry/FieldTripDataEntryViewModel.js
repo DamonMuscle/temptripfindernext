@@ -283,6 +283,12 @@
 		return namespace.BaseDataEntryViewModel.prototype.load.call(this)
 			.then(function()
 			{
+				if (!this.obEntityDataModel().estimatedReturnDateTime())
+				{
+					this.obEntityDataModel().returnDate(null);
+					this.obEntityDataModel().returnTime(null);
+				}
+
 				if (this.obMode() === "Edit")
 				{
 					if (this.obEntityDataModel().departDateTime() == "1900-01-01T00:00:00.000" ||
@@ -320,13 +326,10 @@
 				//reset the shortCutKeys golbal used
 				tf.shortCutKeys.resetUsingGolbal(5);
 				return true;
-
-
 			}.bind(this)).catch(function(response)
 			{//no need to do anything.
 
 			}.bind(this));
-
 	};
 
 	FieldTripDataEntryViewModel.prototype.feedingSchoolNameFormatter = function(schoolDataModel)
@@ -1219,13 +1222,15 @@
 			}.bind(this)
 		};
 
-		if (this.obRequiredFields().departDateTime && this.obRequiredFields().departDateTime())
+		if (this.obRequiredFields().DepartDateTime)
 		{
-			//no need to check EstimatedReturnTime because it is not required.
-			if (this.obRequiredFields().departDateTime.Required)
+			if (this.obRequiredFields().DepartDateTime.Required)
 			{
 				validatorFields.departDate.validators.notEmpty = { message: "required" };
-				validatorFields.departTime.validators.notEmpty = { message: "required" };
+			}
+			else
+			{
+				delete validatorFields.departTime.validators.notEmpty;
 			}
 		}
 
@@ -1283,14 +1288,18 @@
 			}.bind(this)
 		};
 
-		if (this.obRequiredFields().estimatedReturnDateTime && this.obRequiredFields().estimatedReturnDateTime())
-		{//no need to check EstimatedReturnTime because it is not required.
-			if (this.obRequiredFields().estimatedReturnDateTime().Required)
+		if (this.obRequiredFields().EstimatedReturnDateTime)
+		{
+			//no need to check EstimatedReturnTime because it is not required.
+			if (this.obRequiredFields().EstimatedReturnDateTime.Required)
 			{
 				validatorFields.estimatedReturnDate.validators.notEmpty = { message: "required" };
 			}
+			else
+			{
+				delete validatorFields.estimatedReturnTime.validators.notEmpty;
+			}
 		}
-		delete validatorFields.estimatedReturnTime.validators.notEmpty;
 
 		validatorFields.estimatedReturnTime.validators.callback = {
 			message: "invalid time",

@@ -380,7 +380,7 @@
 		if (self.obGridData())
 		{
 			self.obShowGrid(true);
-			self.resizeGrid(self.$leftPage.width());
+			self.resize(self.$leftPage.width());
 		}
 	};
 
