@@ -299,15 +299,7 @@
 				}
 			});
 		}, 50);
-	}
-
-	function addDate(date, days)
-	{
-		var d = new Date(date);
-		d.setDate(d.getDate() + days);
-		var m = d.getMonth() + 1;
-		return d.getFullYear() + '-' + m + '-' + d.getDate();
-	}
+	};
 
 	SchedulerPage.prototype.initScheduler = function($element)
 	{
@@ -321,7 +313,10 @@
 			{
 				if (!item.EstimatedReturnDateTime)
 				{
-					item.EstimatedReturnDateTime = addDate(item.DepartDateTime, 1);
+					var date = new Date(item.DepartDateTime);
+					date.setDate(date.getDate() + 1);
+					var month = date.getMonth() + 1;
+					item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
 				}
 			});
 			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
