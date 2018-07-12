@@ -103,13 +103,8 @@
 				self.isDetailPanelShown(false);
 			}
 
-			if (checked.length >= self.$stageOption.children().length)
-			{
-				self.getScrollBarPosition();
-			} else
-			{
-				$(".k-scheduler-content").scrollTop(0);
-			}
+			$(".k-scheduler-content").scrollTop(0);
+			self.getScrollBarPosition();
 
 		});
 		$(document).on("mousedown.kendoscheduler", function(e)
