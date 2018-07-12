@@ -356,7 +356,7 @@ function getTitleByType(type)
 			pageTitile = "Settings";
 			break;
 		case "scheduler":
-			pageTitile = "FieldTrip Scheduler";
+			pageTitile = "Field Trips Scheduler";
 			break;
 		default:
 			break;
