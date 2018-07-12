@@ -74,6 +74,13 @@
 				});
 		}
 		this._dateTimePicker = this.$element.data('kendoDatePicker');
+		this._dateTimePicker.bind("close", function()
+		{
+			setTimeout(function()
+			{
+				this.isOpen = false;
+			}.bind(this));
+		}.bind(this));
 		this.value.subscribe(function(value)
 		{
 			var datetime = moment.utc(this.value(), [this.formatString, moment.ISO_8601]);
