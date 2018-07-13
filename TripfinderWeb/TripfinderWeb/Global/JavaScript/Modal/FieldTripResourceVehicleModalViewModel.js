@@ -14,7 +14,7 @@
 		var viewTitle;
 
 		///this is going to check if the popup form is add new records or edit an existing record
-		if (id)
+		if (id > 0 && source)
 		{
 			viewTitle = "Edit " + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Resource - " + tf.applicationTerm.getApplicationTermSingularByName("Vehicle");
 		}

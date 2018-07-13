@@ -67,6 +67,10 @@
 
 	FieldTripResourcesHelper.prototype.calculatedMileageRateComputer = function(fieldTripResourceDataEntry)
 	{
+		if (fieldTripResourceDataEntry.FieldTripId == 0)
+		{
+			return 0 //FT-296 When add a new field trip the Endingodometer will be disable and the MileageRate will not be calculated.
+		}
 		return (Number(fieldTripResourceDataEntry.Endingodometer) - Number(fieldTripResourceDataEntry.Startingodometer)) * Number(fieldTripResourceDataEntry.MileageRate);
 	}
 

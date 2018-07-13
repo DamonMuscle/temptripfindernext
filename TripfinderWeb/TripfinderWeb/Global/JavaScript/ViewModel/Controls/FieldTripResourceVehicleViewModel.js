@@ -10,11 +10,15 @@
 		this.obEntityDataModel().fieldTripId(this.id);
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();
-
+		this.obEditTieldTrip = ko.observable(id == 0 ? false : true);
 		this.obVehTotal = ko.computed(function()
 		{
-			return (Number(this.obEntityDataModel().endingodometer()) - Number(this.obEntityDataModel().startingodometer())) * Number(this.obEntityDataModel().mileageRate())
-				+ Number(this.obEntityDataModel().vehFixedCost());
+			if (this.obEditTieldTrip())
+			{
+				return (Number(this.obEntityDataModel().endingodometer()) - Number(this.obEntityDataModel().startingodometer())) * Number(this.obEntityDataModel().mileageRate())
+					+ Number(this.obEntityDataModel().vehFixedCost());
+			}
+			else { return Number(this.obEntityDataModel().vehFixedCost()) }
 		}.bind(this));
 
 		this.obDriverTotal = ko.computed(function()
@@ -118,8 +122,8 @@
 				return data;
 
 			}, function()
-			{
-			});
+				{
+				});
 	};
 
 	FieldTripResourceVehicleViewModel.prototype.generateFunction = function(fn)

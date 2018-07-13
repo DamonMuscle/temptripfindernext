@@ -28,7 +28,7 @@
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Odometer End')"></label>
-				<!-- ko customInput:{type:"Integer",value:obEntityDataModel().endingodometer,attributes:{class:"form-control",name:"odoEnd",maxlength:"200"}} --><!-- /ko -->
+				<!-- ko customInput:{type:"Integer",value:obEntityDataModel().endingodometer,disable:!obEditTieldTrip(),attributes:{class:"form-control",name:"odoEnd",maxlength:"200"}} --><!-- /ko -->
 			</div>
 		</div>
 	</div>

@@ -9,11 +9,16 @@
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();
 		this.obBusaideSource = ko.observableArray();
+		this.obEditTieldTrip = ko.observable(id == 0 ? false : true);
 
 		this.obVehTotal = ko.computed(function()
 		{
-			return (Number(this.obEntityDataModel().endingodometer()) - Number(this.obEntityDataModel().startingodometer())) * Number(this.obEntityDataModel().mileageRate())
-				+ Number(this.obEntityDataModel().vehFixedCost());
+			if (this.obEditTieldTrip())
+			{
+				return (Number(this.obEntityDataModel().endingodometer()) - Number(this.obEntityDataModel().startingodometer())) * Number(this.obEntityDataModel().mileageRate())
+					+ Number(this.obEntityDataModel().vehFixedCost());
+			}
+			else { return Number(this.obEntityDataModel().vehFixedCost()) }
 		}.bind(this));
 
 		this.obDriverTotal = ko.computed(function()
@@ -49,7 +54,6 @@
 		this.obSelectedBusAide = ko.observable();
 		this.obSelectedBusAide.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "aideId", "obSelectedBusAide", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedBusAideText = ko.observable();
-
 		this.obEntityDataModel().apiIsDirty(false);
 		this.obEntityDataModel()._entityBackup = JSON.parse(JSON.stringify(this.obEntityDataModel().toData()));
 	}
@@ -148,8 +152,8 @@
 				return data;
 
 			}, function()
-			{
-			});
+				{
+				});
 	};
 
 	FieldTripResourceViewModel.prototype.generateFunction = function(fn)
