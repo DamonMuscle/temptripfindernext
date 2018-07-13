@@ -714,7 +714,7 @@
 
 	BaseDataEntryViewModel.prototype.saveTemplate = function()
 	{
-		var title = "Save " + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template",
+		var title = tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template",
 			fieldTripEntity = this.getSaveData(true),
 			fieldTripTemplateEntity = fieldTripEntity;
 		tf.modalManager.showModal(new TF.Modal.AddOneFieldModalViewModel(title, this.type + "template", "Name", new TF.DataModel.FieldTripTemplatesDataModel()))

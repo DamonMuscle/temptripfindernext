@@ -18,7 +18,7 @@
 		///this is going to check if the popup form is add new records or edit an existing record
 		if ((data.id && data.id() > 0) || type === "fieldtriptemplate")
 		{
-			viewTitle = "Edit " + viewTitle;
+			viewTitle = "Save " + viewTitle;
 		}
 		else
 		{
