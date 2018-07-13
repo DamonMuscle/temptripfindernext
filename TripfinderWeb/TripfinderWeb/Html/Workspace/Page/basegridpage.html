@@ -11,39 +11,42 @@
 	<div class="desktop-header">
 		<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
 		<!-- ko if:type === "fieldtrip"-->
-		<div class="new">New</div>
+		<div class="new">Submit New Request</div>
 		<!-- /ko -->
 	</div>
 	<div class="grid-icons">
 		<div class="iconrow">
+			<!-- ko if: pageType !== "reports"-->
 			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></div>
-			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
-			<!-- ko if:detailButton-->
-			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
+			<!-- ko if:schedulerButton-->
+			<div class="iconbutton kendo-scheduler" title="Scheduler" data-bind="click:schedulerViewClick"></div>
 			<!-- /ko -->
+			<div class="divider" title=""></div>
+			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
 			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
-			<!-- ko if:approveButton-->
-			<div class="iconbutton approve" title="Approve" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
-			<!-- /ko -->
+			<div class="divider" title=""></div>
 			<!-- ko if:!isAdmin && declineButton-->
 			<div class="iconbutton decline" title="Decline" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<!-- /ko -->
+			<!-- ko if:approveButton-->
+			<div class="iconbutton approve" title="Approve" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
 			<div class="iconbutton cancel" title="Cancel" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
+			<!-- /ko -->
 			<!-- ko if: pageType === "reports"-->
-			<div class="divider" title=""></div>
+			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
 			<div class="iconbutton mail" title="Send Mail" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<div class="iconbutton file" title="Save As File" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
+			<!-- ko if:detailButton-->
+			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
+			<!-- /ko -->
 			<div class="divider" title=""></div>
 			<div class="iconbutton refresh" title="Refresh"></div>
-			<!-- ko if:schedulerButton-->
-			<div class="divider" title=""></div>
-			<div class="iconbutton kendo-scheduler" title="Scheduler" data-bind="click:schedulerViewClick"></div>
-			<!-- /ko -->
 		</div>
 		<div class="pull-right grid-staterow-wrap">
 			<div class="grid-staterow">
