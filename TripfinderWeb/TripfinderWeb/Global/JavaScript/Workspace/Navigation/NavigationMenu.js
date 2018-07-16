@@ -277,14 +277,14 @@
 			// If the menu is already opened, do not fade out the label
 			$fadeOutElements = $navMenu.find(".item-icon.logo, .search-header .search-text, .search-header .clear-btn"),
 			$moreBtn = $toolbar.find(".more"),
-			$toolbarBtnOthers = $toolbar.find(".logout, .setting, .report"),
+			$toolbarBtnOthers = $toolbar.find(".others"),
 			$gridMap = $("#pageContent"),
 			totalWidth = $(document).width(),
 			isToolbarOpened = $toolbar.hasClass("menu-opened"),
 			removeInlineOpacityFunc = function()
 			{
 				// after animation, remove these inline css styles, use inline class instead.
-				$moreBtn.css({ opacity: "", display: "" });
+				$moreBtn.css({ opacity: "0", display: "none" });
 				$toolbarBtnOthers.css({ opacity: "", display: "" });
 				$fadeOutElements.css("opacity", "");
 				$navItems.css("opacity", "");
@@ -315,7 +315,7 @@
 			$quickSearch.css("height", 54);
 			$navItems.css({ opacity: 1 }).stop().animate({ opacity: isQuickSearchActive ? 0 : 1 }, { duration: fadeDuration, queue: false });
 			$spinner.css("left", "2px");
-			$moreBtn.css("opacity", isToolbarOpened ? 0 : 1).stop().animate({ opacity: 0 }, {
+			$moreBtn.css("opacity", 0).stop().animate({ opacity: 0 }, {
 				duration: fadeDuration, queue: false, done: function()
 				{
 					$navContent.css("display", "");
@@ -351,7 +351,7 @@
 					{
 						$navItems.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false });
 					}
-					$moreBtn.css("display", "block");
+					$moreBtn.css("display", "none");
 					$moreBtn.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
 				}
 			});

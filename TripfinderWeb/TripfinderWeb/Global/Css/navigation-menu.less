@@ -34,7 +34,7 @@
 		overflow: visible;
 		border-right: 1px solid #262626;
 
-		> div {
+		>div {
 			width: 100%;
 		}
 
@@ -45,7 +45,7 @@
 			background-color: #333;
 			overflow: hidden;
 
-			> div {
+			>div {
 				height: 54px;
 			}
 
@@ -115,7 +115,7 @@
 
 					.item-icon,
 					.item-label {
-						background-color: @HoverBackgroundColor !important;
+						background-color: @HoverBackgroundColor  !important;
 					}
 				}
 
@@ -123,8 +123,8 @@
 					overflow: visible;
 					box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 
-					& > div {
-						background-color: @HoverBackgroundColor !important;
+					&>div {
+						background-color: @HoverBackgroundColor  !important;
 					}
 
 					.item-label {
@@ -156,13 +156,16 @@
 				.item-menu {
 					display: none;
 				}
+				&.logout {
+					position: absolute;
+					bottom: -8px;
+				}
 			}
 		}
 
 		.navigation-toolbar {
 			height: 54px;
 			width: 100%;
-			background-color: #333;
 			position: relative;
 			overflow: hidden;
 
@@ -192,29 +195,10 @@
 				width: 54px;
 				position: absolute;
 
-				&.active {
-					background-color: @systemColor;
-				}
-				&:hover {
-					background-color: @HoverBackgroundColor;
-				}
-
-				&.logout {
-					left: 42px;
-				}
-
-				&.setting {
-					left: 123px;
-				}
-
-				&.report {
-					left: 204px;
-				}
-
 				&.more {
-					display: block;
+					display: none;
 					left: 0;
-					opacity: 1;
+					opacity: 0;
 					width: 60px;
 					z-index: 2;
 				}
@@ -282,7 +266,7 @@
 					box-shadow: none !important;
 
 					&.hoverState {
-						background-color: @HoverBackgroundColor !important;
+						background-color: @HoverBackgroundColor  !important;
 					}
 
 					.item-label {
@@ -294,7 +278,6 @@
 			.navigation-toolbar {
 				padding-left: 42px;
 				padding-right: 14px;
-				background-color: #333;
 				box-shadow: none;
 
 				.toolbar-button {
@@ -355,45 +338,35 @@
 			}
 
 			&.fieldtrips {
-				background-image: url("../img/navigation-menu/fieldtrips.svg");
+				background-image: url("../img/navigation-menu/grids.svg");
 			}
 
 			&.myrequests {
-				background-image: url("../img/navigation-menu/myrequests.svg");
+				background-image: url("../img/navigation-menu/my_requests.svg");
 			}
 
 			&.reports {
-				background-image: url("../img/navigation-menu/icon-Reports.svg");
+				background-image: url("../img/navigation-menu/reports.svg");
 			}
 
 			&.searchSettings {
 				background-image: url("../img/navigation-menu/icon-Adjust.svg");
 			}
 
-			&.approvals {
-				background-image: url("../img/navigation-menu/hamburger.svg");
+			&.settings {
+				background-image: url("../img/navigation-menu/settings.svg");
 			}
 
 			&.logout {
 				background-image: url("../img/navigation-menu/icon-Log Out.svg");
 			}
-
-			&.setting,
-			&.settings {
-				background-image: url("../img/navigation-menu/icon-Settings.svg");
-			}
-
 			&.report {
 				background-image: url("../img/navigation-menu/icon-Reports.svg");
 			}
 
-			&.setting {
-				background-image: url("../img/navigation-menu/icon-Settings.svg");
-			}
-
 			&.more {
 				text-align: center;
-				background-image: url("../img/navigation-menu/icon-ellipsis.svg");
+				display: none;
 
 				.count-down-number {
 					margin-top: 16px;
@@ -424,7 +397,7 @@
 
 			&.onAnimation,
 			&.menu-opened {
-				background-color: @HoverBackgroundColor !important;
+				background-color: @HoverBackgroundColor  !important;
 				overflow-y: visible !important;
 				overflow-x: visible !important;
 
@@ -459,7 +432,7 @@
 							white-space: nowrap;
 
 							&.active {
-								background-color: @systemColor !important;
+								background-color: @systemColor  !important;
 							}
 
 							&:hover {
@@ -922,7 +895,7 @@
 							font-size: 16px;
 							cursor: pointer;
 
-							& > div {
+							&>div {
 								float: left;
 							}
 
@@ -977,8 +950,8 @@
 							height: 22px;
 							color: #777;
 
-							& > .head-label,
-							& > .search-text {
+							&>.head-label,
+							&>.search-text {
 								float: left;
 							}
 
@@ -1043,7 +1016,7 @@
 									color: @systemColor;
 									cursor: pointer;
 
-									& > span {
+									&>span {
 										float: right;
 										cursor: pointer;
 										margin-right: 6px;
@@ -1073,7 +1046,7 @@
 									background-color: #f2f2f2;
 									z-index: 1;
 
-									& + .data-cards {
+									&+.data-cards {
 										padding-top: 38px;
 									}
 								}
@@ -1100,7 +1073,7 @@
 										max-width: 205px;
 										position: relative;
 
-										& > div {
+										&>div {
 											.ellipsis;
 
 											&.full-height {
@@ -1147,7 +1120,7 @@
 										border-radius: 20px;
 										background-size: 40px;
 
-										& + .card-left {
+										&+.card-left {
 											max-width: 165px;
 											margin-left: 10px;
 										}
