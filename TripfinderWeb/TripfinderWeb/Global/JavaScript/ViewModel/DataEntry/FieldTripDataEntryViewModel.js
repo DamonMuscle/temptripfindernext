@@ -106,7 +106,10 @@
 
 		ko.computed(function()
 		{
-			this.obEntityDataModel().returnDate(this.obEntityDataModel().departDate());
+			if (this.obEntityDataModel().id() == 0 && this.obEntityDataModel().departDate())
+			{
+				this.obEntityDataModel().returnDate(this.obEntityDataModel().departDate());
+			}
 		}.bind(this));
 
 		this.obDepartTimeDisable = ko.computed(function()
