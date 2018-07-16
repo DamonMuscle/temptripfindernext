@@ -92,7 +92,7 @@
 		) : kendo.template(
 			'# if(hack) {#' +
 			'# if(extend) { #' +
-			'<div class="close-color-picker">×</div>' +
+			'<div class="close-color-picker"></div>' +
 			'<div class="color-picker">' +
 			'<div class="col-xs-24 row">' +
 			'<div class="col-xs-12"><div class="form-group color-selector">' +
