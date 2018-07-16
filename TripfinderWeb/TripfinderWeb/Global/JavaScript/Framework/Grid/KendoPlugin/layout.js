@@ -937,7 +937,9 @@
 		{
 			return;
 		}
-		tf.storageManager.save(this._storageLayoutDataKey, gridLayoutExtendDataModel.name());
+		var layoutName = gridLayoutExtendDataModel.name();
+		ga('send', 'event', 'Action', '	Grid Layout', layoutName);
+		tf.storageManager.save(this._storageLayoutDataKey, layoutName);
 	};
 
 	KendoGridLayoutMenu.prototype.saveLayoutClick = function(viewModel, e)

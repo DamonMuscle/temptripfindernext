@@ -467,6 +467,7 @@
 	SchedulerPage.prototype.showDetailsClick = function(idFromScheduler)
 	{
 		var self = this;
+		ga('send', 'event', 'Area', 'Details');
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
 		self.detailView.onCloseDetailEvent.subscribe(
 			self.closeDetailClick.bind(self)

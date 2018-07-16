@@ -473,6 +473,20 @@
 		{
 			self.closeNavigation();
 		}
+		switch (type)
+		{
+			case "fieldtrips":
+				ga('send', 'event', 'Area', 'Field Trips');
+				break;
+			case "myrequests":
+				ga('send', 'event', 'Area', 'My Submitted Requests');
+				break;
+			case "reports":
+				ga('send', 'event', 'Area', 'Reports');
+				break;
+			default:
+				break;
+		}
 		tf.pageManager.openNewPage(type);
 	};
 

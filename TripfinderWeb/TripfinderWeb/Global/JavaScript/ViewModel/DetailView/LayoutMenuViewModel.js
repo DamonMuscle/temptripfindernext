@@ -99,6 +99,7 @@
 	LayoutMenuViewModel.prototype.editLayoutClick = function(viewModel, e)
 	{
 		var self = this;
+		ga('send', 'event', 'Action', '	Edit Details');
 		self.modifyItemEvent.notify({ id: self.obSelectLayoutID() });
 	};
 

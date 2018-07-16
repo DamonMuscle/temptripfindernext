@@ -937,30 +937,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-				{
-					callback: {
-						message: "Name already exists",
-						callback: function(value, validator, $field)
+			{
+				callback: {
+					message: "Name already exists",
+					callback: function(value, validator, $field)
+					{
+						if (!value)
 						{
-							if (!value)
-							{
-								return true;
-							}
-
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-								paramData: {
-									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-									name: value,
-									dataType: self.gridType
-								}
-							}, { overlay: false }).then(function(response)
-							{
-								var isUnique = response.Items[0];
-								return isUnique;
-							});
+							return true;
 						}
+
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+							paramData: {
+								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+								name: value,
+								dataType: self.gridType
+							}
+						}, { overlay: false }).then(function(response)
+						{
+							var isUnique = response.Items[0];
+							return isUnique;
+						});
 					}
 				}
+			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -4748,6 +4748,7 @@
 
 			printHelper.print($detailView).then(function(result)
 			{
+				ga('send', 'event', 'Action', 'Print Details');
 				resizablePanel.reLayoutPage(oldDetailViewWidth);
 			});
 		});

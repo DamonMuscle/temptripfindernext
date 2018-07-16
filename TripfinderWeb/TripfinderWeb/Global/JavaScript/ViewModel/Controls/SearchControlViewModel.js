@@ -891,6 +891,7 @@
 		self.lastSearchText = text;
 
 		self.obIsLoading(true);
+		ga('send', 'event', 'Action', 'Search', searchText);
 		self.getAllSuggestedResult(searchText, type).then(function(response)
 		{
 			self.updatePendingSearchCondition("", "");

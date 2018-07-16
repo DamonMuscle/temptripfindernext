@@ -804,6 +804,7 @@
 						{
 							if (result)
 							{
+								this.sendGAEvent();
 								return this.save()
 									.then(function()
 									{
@@ -1212,6 +1213,26 @@
 			return item[key];
 		});
 	};
+
+	/**
+	 * Send Google Analytics event.
+	 * @returns {void} 
+	 */
+	BaseDataEntryViewModel.prototype.sendGAEvent = function()
+	{
+		var type = this.type, isNew = this.obEntityDataModel().id() == 0;
+		if (isNew)
+		{
+			switch (type)
+			{
+				case "fieldtrip":
+					ga('send', 'event', 'Action', 'New Trip');
+					break;
+				default:
+					break;
+			}
+		}
+	}
 
 	BaseDataEntryViewModel.prototype.dispose = function()
 	{

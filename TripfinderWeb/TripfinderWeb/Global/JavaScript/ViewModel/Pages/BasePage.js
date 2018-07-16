@@ -57,6 +57,7 @@
 		}
 		else
 		{
+			ga('send', 'event', 'Area', 'Details');
 			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)

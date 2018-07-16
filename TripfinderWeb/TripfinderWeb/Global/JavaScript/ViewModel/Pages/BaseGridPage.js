@@ -242,6 +242,7 @@
 		self.bindEvent(".iconbutton.filter", self.filterMenuClick);
 		self.bindEvent(".iconbutton.addremovecolumn", function(model, e)
 		{
+			ga('send', 'event', 'Action', 'Grid Columns');
 			self.searchGrid.addRemoveColumnClick(model, e);
 		});
 
