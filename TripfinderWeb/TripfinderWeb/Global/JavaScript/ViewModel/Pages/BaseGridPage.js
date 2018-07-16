@@ -27,6 +27,8 @@
 		self.approveButton = false;
 		self.declineButton = false;
 		self.cancelButton = false;
+		self.obReportLists = ko.observable(false);
+		self.obReports = ko.observable(false);
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
@@ -79,6 +81,8 @@
 				}
 			}
 		});
+
+		self.loadReportLists();
 	};
 
 	BaseGridPage.prototype.createGrid = function(option)
@@ -261,12 +265,15 @@
 		{
 			self.bindEvent(".iconbutton.cancel", self.cancelClick);
 		}
+
 		self.bindEvent(".iconbutton.layout", self.layoutIconClick);
 		self.bindEvent(".iconbutton.refresh", function(model, e)
 		{
 			self.searchGrid.refreshClick(model, e);
 		});
 		self.bindEvent(".new", self.addClick);
+
+		self.obReports(tf.authManager.isAuthorizedFor("reports", "read"));
 	};
 
 	BaseGridPage.prototype.layoutIconClick = function(viewModel, e)
@@ -530,6 +537,33 @@
 		tf.pageManager.openNewPage(self.pageType + "Scheduler");
 	};
 
+	BaseGridPage.prototype.loadReportLists = function()
+	{
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"))
+			.then(function(data)
+			{
+				if (data && data.Items && data.Items.length)
+				{
+					this.obReportLists(data.Items);
+				}
+			}.bind(this));
+	};
+
+	BaseGridPage.prototype.viewReportClick = function(viewModel, e)
+	{
+		var self = this;
+		if (!self.obReportLists())
+		{
+			return;
+		}
+
+		var selectedIds = this.searchGrid.getSelectedIds();
+
+		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(viewModel, 'saveas', {
+			selectedRecordId: selectedIds,
+			type: self.type
+		}));
+	};
 	BaseGridPage.prototype.dispose = function()
 	{
 		var self = this;

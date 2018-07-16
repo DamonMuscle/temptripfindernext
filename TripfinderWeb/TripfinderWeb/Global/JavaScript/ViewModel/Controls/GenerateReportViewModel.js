@@ -15,6 +15,9 @@
 		this.obShowGPSEvents = ko.observable(true);
 		this.firstLoad = true;
 
+		this.obActiveDataSources = ko.observableArray();
+
+
 		if (tf.permissions.filtersRead)
 		{
 			this.obSpecifyRecords = ko.observableArray([
@@ -174,7 +177,10 @@
 		{
 			this.oldEntityDataModel_reportName = udReport.RepFileName;
 			this.bindDefaultReportInfo(udReport);
-			this.initSpecificRecord(udReport);
+			if (this.options && this.options.selectedRecordId.length > 0)
+			{
+				this.initSpecificRecord();
+			}
 			var theDatas = Enumerable.From(this.reportDataSourceModels).Where(function(x)
 			{
 				return x.RepFileName.replace('.rpt', '') == this.oldEntityDataModel_reportName.replace('.rpt', '');
@@ -221,11 +227,11 @@
 				}.bind(this));
 		}
 	};
-	GenerateReportViewModel.prototype.initSpecificRecord = function(report)
+	GenerateReportViewModel.prototype.initSpecificRecord = function()
 	{
 		if (this.options && this.options.selectedRecordId)
 		{
-			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), Enumerable.From(TF.Grid.ReportsGridViewModel.dataTypeList).Where("$.id==" + report.BaseDataType).First().gridType, "ids"),
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.datasourceManager.databaseId, this.options.type, "ids"),
 				{
 					data: this.options.selectedRecordId
 				})
@@ -261,23 +267,23 @@
 			validatorFields["filterName"] = {
 				trigger: "blur change",
 				validators:
-				{
-					notEmpty:
 					{
-						message: "required"
+						notEmpty:
+							{
+								message: "required"
+							}
 					}
-				}
 			};
 
 			validatorFields["specificRecords"] = {
 				trigger: "blur change",
 				validators:
-				{
-					notEmpty:
 					{
-						message: " At least one record must be selected"
+						notEmpty:
+							{
+								message: " At least one record must be selected"
+							}
 					}
-				}
 			};
 
 			this._$form.bootstrapValidator(
@@ -491,7 +497,7 @@
 		this.obEntityDataModel().reportTitle(report.DefTitle);
 		this.obEntityDataModel().subTitle(report.DefSubTitle);
 		this.obEntityDataModel().preparer(this.reportUser.OfficeName);
-		if (this.options && this.options.selectedRecordId)
+		if (this.options && this.options.selectedRecordId.length > 0)
 		{
 			this.obSpecifyRecordOption(this.obSpecifyRecords()[2]);
 		}
@@ -670,10 +676,10 @@
 				selectedTitle: 'Selected',
 				mustSelect: true,
 				gridOptions:
-				{
-					forceFitColumns: true,
-					enableColumnReorder: true
-				}
+					{
+						forceFitColumns: true,
+						enableColumnReorder: true
+					}
 			};
 
 		if (type != undefined && type != "")
@@ -808,9 +814,9 @@
 				FileName: report.reportName(),
 				FilterClause: filterClause,
 				IdFilter:
-				{
-					IncludeOnly: includeOnlyIds
-				},
+					{
+						IncludeOnly: includeOnlyIds
+					},
 				Preparer: report.preparer(),
 				Title: report.reportTitle(),
 				SubTitle: report.subTitle(),

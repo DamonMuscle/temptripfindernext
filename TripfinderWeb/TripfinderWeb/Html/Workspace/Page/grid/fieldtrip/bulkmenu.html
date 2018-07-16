@@ -74,6 +74,23 @@
 			<div class="rule"></div>
 		</li>
 		<!-- /ko -->
+		<li class="menu-item" data-bind="visible:gridViewModel.obReports">
+			<div class="menu-icon report">
+			</div>
+			<div class="menu-label">
+				View Report
+			</div>
+			<!-- ko if: gridViewModel.obReportLists() -->
+			<ul class="tf-contextmenu" data-bind="foreach: gridViewModel.obReportLists">
+				<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.viewReportClick.bind($parent.gridViewModel)">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label" data-bind="text:$data.Name">
+					</div>
+				</li>
+			</ul>
+			<!-- /ko -->
+		</li>
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
 			<div class="menu-icon">
 			</div>
