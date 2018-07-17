@@ -857,6 +857,7 @@
 			this.obEntityDataModel().estimatedReturnDateTime(null);
 		}
 		var entity = this.obEntityDataModel().toData();
+		entity.APIIsNew = entity.Id ? false : true;
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
 		if (isTemplate)
@@ -1127,29 +1128,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
-				{
-					message: " must be unique",
-					callback: function(value, validator, $field)
 					{
-						if (value == "" || this.obEntityDataModel().id())
+						message: " must be unique",
+						callback: function(value, validator, $field)
 						{
-							return true;
-						}
-
-						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-							paramData: {
-								name: this.obEntityDataModel().name()
-							}
-						}, {
-								overlay: false
-							})
-							.then(function(apiResponse)
+							if (value == "" || this.obEntityDataModel().id())
 							{
-								return apiResponse.Items[0] == false;
-							})
-					}.bind(this)
-				}
+								return true;
+							}
+
+							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+								paramData: {
+									name: this.obEntityDataModel().name()
+								}
+							}, {
+									overlay: false
+								})
+								.then(function(apiResponse)
+								{
+									return apiResponse.Items[0] == false;
+								})
+						}.bind(this)
+					}
 			}
 		};
 
