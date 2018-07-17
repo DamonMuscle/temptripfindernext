@@ -275,7 +275,10 @@
 		});
 		self.bindEvent(".new", self.addClick);
 
-		self.obReports(tf.authManager.isAuthorizedFor("reports", "read"));
+		if (self.obReports)
+		{
+			self.obReports(tf.authManager.isAuthorizedFor("reports", "read"));
+		}
 	};
 
 	BaseGridPage.prototype.layoutIconClick = function(viewModel, e)
@@ -541,6 +544,13 @@
 
 	BaseGridPage.prototype.loadReportLists = function()
 	{
+		var self = this;
+
+		if (!self.obReportLists)
+		{
+			return;
+		}
+
 		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"))
 			.then(function(data)
 			{
@@ -554,7 +564,7 @@
 	BaseGridPage.prototype.viewReportClick = function(viewModel, e)
 	{
 		var self = this;
-		if (!self.obReportLists())
+		if (!self.obReportLists || !self.obReportLists())
 		{
 			return;
 		}
