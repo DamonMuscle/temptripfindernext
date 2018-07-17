@@ -337,6 +337,7 @@ function getTitleByType(type)
 	var pageTitile = "", pageType = type.toLowerCase();
 	switch (pageType)
 	{
+		case "scheduler":
 		case "fieldtrips":
 			pageTitile = "Field Trips";
 			break;
@@ -354,9 +355,6 @@ function getTitleByType(type)
 			break;
 		case "settings":
 			pageTitile = "Settings";
-			break;
-		case "scheduler":
-			pageTitile = "Field Trips Scheduler";
 			break;
 		default:
 			break;

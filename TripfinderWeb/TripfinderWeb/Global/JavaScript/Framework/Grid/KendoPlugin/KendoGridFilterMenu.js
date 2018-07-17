@@ -9,6 +9,7 @@
 			return TF.Grid.GridHelper.convertToOldGridDefinition(definition);
 		});
 	}
+
 	function KendoGridFilterMenu()
 	{
 		this.inited = false;
@@ -16,6 +17,8 @@
 		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
+		this.obFieldTripStageFilters = ko.observableArray();
+		this.selectedFieldTripStageFilters = ko.observableArray();
 		this.obOpenRelatedFilter = ko.observable({});
 
 		this.obGridFilterDataModelsFromDataBase = ko.computed(function()
@@ -49,7 +52,6 @@
 			}).ToArray();
 		}, this);
 
-
 		this.obGridFilterDataModelsFromRelatedFilter = ko.computed(function()
 		{
 			return Enumerable.From(this.obGridFilterDataModels()).Where(function(c)
@@ -66,7 +68,9 @@
 		this.saveAsNewFilterClick = this.saveAsNewFilterClick.bind(this);
 		this.clearGridFilterClick = this.clearGridFilterClick.bind(this);
 		this.onClearGridFilterClickEvent = new TF.Events.Event();
+		this.onFieldTripStageChanged = new TF.Events.Event();
 		this.gridFilterClick = this.gridFilterClick.bind(this);
+		this.gridFieldTripFilterClick = this.gridFieldTripFilterClick.bind(this);
 		this.quickFilterBarClick = this.quickFilterBarClick.bind(this);
 		this.noApplyFilterNoModified = ko.observable(true);
 		this.obCallOutFilterName = ko.observable(this.options.callOutFilterName);
@@ -94,8 +98,86 @@
 		this.obQuickFilterBarCheckIcon = ko.observable("menu-item-checked");
 
 		this.initReminder();
+		if (this.options.gridType === "fieldtrip")
+		{
+			this.initFieldTripStageFilters();
+		}
 	}
 
+	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
+	{
+		var stageIds = [];
+		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
+		{
+			stageIds = [101, 100, 99, 98, 7, 6, 5, 4, 3, 2, 1];
+		}
+		else if (tf.authManager.isAuthorizedFor("level4Administrator", "read"))
+		{
+			stageIds = [7, 6, 5, 4];
+		}
+		else if (tf.authManager.isAuthorizedFor("level3Administrator", "read"))
+		{
+			stageIds = [5, 4, 3, 2];
+		}
+		else if (tf.authManager.isAuthorizedFor("level2Administrator", "read"))
+		{
+			stageIds = [3, 2, 1];
+		}
+		else if (tf.authManager.isAuthorizedFor("level1Administrator", "read"))
+		{
+			stageIds = [1];
+		}
+		this.selectedFieldTripStageFilters($.extend([], stageIds));
+		this.obFieldTripStageFilters(stageIds);
+	};
+
+	KendoGridFilterMenu.prototype.getFieldTripStageName = function(id)
+	{
+		switch (id)
+		{
+			case (1):
+				return "Level 1 - Request Submitted";
+			case (2):
+				return "Level 2 - Request Declined";
+			case (3):
+				return "Level 2 - Request Approved";
+			case (4):
+				return "Level 3 - Request Declined";
+			case (5):
+				return "Level 3 - Request Approved";
+			case (6):
+				return "Level 4 - Request Declined";
+			case (7):
+				return "Level 4 - Request Approved";
+			case (98):
+				return "Declined by Transportation";
+			case (99):
+				return "Transportation Approved";
+			case (100):
+				return "Canceled - Request Canceled";
+			case (101):
+				return "Completed - Request Completed";
+		}
+	};
+
+	KendoGridFilterMenu.prototype.gridFieldTripFilterClick = function(id, e)
+	{
+		var self = this, $target = $(e.target).closest(".menu-item"), index;
+
+		if ($target.hasClass("menu-item-checked"))
+		{
+			self.selectedFieldTripStageFilters.remove(id);
+		}
+		else
+		{
+			index = self.selectedFieldTripStageFilters.indexOf(id);
+			if (index < 0)
+			{
+				self.selectedFieldTripStageFilters.push(id);
+			}
+		}
+		self.onFieldTripStageChanged.notify();
+	};
 
 	KendoGridFilterMenu.prototype._omitRecordsChange = function()
 	{
@@ -709,7 +791,7 @@
 				gridFilterDataModel ? gridFilterDataModel : null,
 				getCurrentHeaderFilters ? this.findCurrentHeaderFilters() : null,
 				{
-					Columns: convertToOldGridDefinition(this.options.gridDefinition)
+					Columns: convertToOldGridDefinition(this.options.isCalendarView ? tf.fieldTripGridDefinition.gridDefinition() : this.options.gridDefinition)
 				},
 				this.getOmittedRecordsID(gridFilterDataModel, getCurrentOmittedRecords),
 				options,

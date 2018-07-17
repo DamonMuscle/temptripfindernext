@@ -6,9 +6,13 @@
 	{
 		var self = this;
 		self.detailView = null;
+		self.options = {};
+		self.isGridPage = false;
+		self.searchGridInited = ko.observable(false);
 		self.isDetailPanelShown = ko.observable(false);
 		self.gridType = gridType || "fieldtrips";
-		self.pageType = "scheduler";
+		self.pageType = gridType;
+		self.filterData = null;
 
 		TF.Page.BasePage.apply(self, arguments);
 
@@ -22,46 +26,217 @@
 		self.$element = null;
 		self.$kendoscheduler = null;
 		self.$stageOption = null;
+		self.filterClick = self.filterClick.bind(self);
+		self.refreshClick = self.refreshClick.bind(self);
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;
 
-	SchedulerPage.prototype = Object.create(TF.Page.BasePage.prototype);
+	SchedulerPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 
 	SchedulerPage.prototype.init = function(model, element)
 	{
 		var self = this;
 
+		self.options.gridDefinition = {
+			Columns: [{
+				DBName: "FieldTripID",
+				DisplayName: "FieldTripID",
+				FieldName: "ID",
+				Width: "150px"
+			}]
+		};
+		self.options.gridType = "fieldtrip";
+		self.options.url = self.getRequestUrl(self.gridType);
+		self.options.isGridView = false;
+		self.options.isCalendarView = true;
+		self.options.storageKey = "grid.currentlayout." + self.pageType;
+		self.options.summaryFilters = [{
+			Id: -1,
+			Name: "Today",
+			IsValid: true
+		},
+		{
+			Id: -2,
+			Name: "Vehicle Scheduled",
+			IsValid: true
+		},
+		{
+			Id: -3,
+			Name: "Pending Approval",
+			IsValid: true,
+			WhereClause: " FieldTripStageId = 1 or FieldTripStageId = 3 or FieldTripStageId = 5 or FieldTripStageId = 7",
+			GridType: self.type
+		},
+		{
+			Id: -4,
+			Name: "Declined",
+			IsValid: true,
+			WhereClause: "FieldTripStageId = 2 or FieldTripStageId = 4 or FieldTripStageId = 6 or FieldTripStageId = 98",
+			GridType: self.type
+		},
+		{
+			Id: -5,
+			Name: "Total",
+			IsValid: true,
+			WhereClause: "FieldTripStageId != 100",
+			GridType: self.type
+		},
+		{
+			Id: -6,
+			Name: "Transportation Approved",
+			IsValid: true,
+			WhereClause: "FieldTripStageId = 99",
+			GridType: self.type
+		}
+		];
+
+		self.options.summaryFilterFunction = function(selectGridFilterEntityId)
+		{
+			if (selectGridFilterEntityId === -1 || selectGridFilterEntityId === -2)
+			{
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtripdepartingtrips")).then(function(response)
+				{
+					return response.Items[0];
+				});
+			}
+			if (selectGridFilterEntityId === -3 || selectGridFilterEntityId === -4 ||
+				selectGridFilterEntityId === -5 || selectGridFilterEntityId === -6)
+			{
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtrip")).then(function(response)
+				{
+					switch (selectGridFilterEntityId)
+					{
+						case -3:
+							return response.AwaitingApprovalList;
+						case -4:
+							return response.RejectedList;
+						case -5:
+							return response.TotalList;
+						case -6:
+							return response.TransportationApprovedList;
+						default:
+							return null;
+					}
+				});
+			}
+			return Promise.resolve(null);
+		};
+
+		TF.Page.BaseGridPage.prototype.init.call(self, model, element);
+		self.searchGrid.onFilterChanged.subscribe(self.filterChanged.bind(self));
+		self.searchGrid.onFieldTripStageChanged.subscribe(self.fieldTripStageChanged.bind(self));
+		self.searchGrid.onClearGridFilterClickEvent.subscribe(self.filterCleared.bind(self));
 		self.$element = $(element);
 		self.$kendoscheduler = self.$element.find(".kendoscheduler");
 		self.$stageOption = self.$element.find(".stage-option");
 		self.initScheduler();
 	};
 
-	SchedulerPage.prototype.setFilterOpitons = function()
+	SchedulerPage.prototype.filterChanged = function(e, options)
 	{
 		var self = this;
-		self.$stageOption.empty();
-		$.each(self.schedulerResources, function(index, value)
-		{
-			if ($.inArray(value["value"], self.schedulerOptions) === -1)
+		self.filterData = options.data;
+		self.setDataSource();
+	};
+
+	SchedulerPage.prototype.filterCleared = function(e)
+	{
+		var self = this;
+		self.filterData = null;
+		self.setDataSource();
+	};
+
+	SchedulerPage.prototype.fieldTripStageChanged = function(e)
+	{
+		var self = this, checked = self.getAvailableStageId(), scheduler = self.$kendoscheduler.getKendoScheduler(),
+			notContainCurrentDetailId = false,
+			notCheckedIds = [];
+
+		scheduler.dataSource.filter({
+			operator: function(trip)
 			{
-				self.schedulerOptions.push(value["value"]);
-				self.$stageOption.append(
-					'<div class="content"><div class="stage-color" style="background-color:' + value["color"] + '"></div><span class="stage-name">' + value["text"] +
-					': </span><input class="stage-check-box" checked id="' + value["text"] + '"type="checkbox" value="' + value["value"] + '"></div>'
-				);
+				if ($.inArray(trip.stageId, checked) < 0)
+				{
+					notCheckedIds.push(trip.id);
+				}
+				return $.inArray(trip.stageId, checked) >= 0;
 			}
+		});
+
+
+		notCheckedIds.forEach(function(id)
+		{
+			if (id === self.currentDetailId)
+			{
+				notContainCurrentDetailId = true;
+			}
+		});
+
+		if (notContainCurrentDetailId)
+		{
+			self.closeDetailClick(true);
+			self.$kendoscheduler.getKendoScheduler().refresh();
+			self.currentDetailId = -1;
+			self.isDetailPanelShown(false);
+		}
+
+			$(".k-scheduler-content").scrollTop(0);
+			self.getScrollBarPosition();
+	};
+
+	SchedulerPage.prototype.filterClick = function(viewModel, e)
+	{
+		var self = this,
+			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
+			cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
+
+		if (cacheOperatorBeforeHiddenMenu)
+			TF.menuHelper.hiddenMenu();
+
+		if (cacheOperatorBeforeOpenMenu)
+		{
+			tf.pageManager.showContextMenu(e.currentTarge);
+			self.searchGrid.filterMenuClick(e, function()
+			{
+				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
+				if (iconWrap.length > 0)
+				{
+					iconWrap.css("display", "block");
+				}
+			});
+		}
+	};
+
+	SchedulerPage.prototype.refreshClick = function()
+	{
+		this.initScheduler();
+	};
+
+	SchedulerPage.prototype.setDataSource = function()
+	{
+		var self = this;
+		self.getOriginalDataSource(self.gridType).then(function(data)
+		{
+			data.Items.forEach(function(item)
+			{
+				if (!item.EstimatedReturnDateTime)
+				{
+					var date = new Date(item.DepartDateTime);
+					date.setDate(date.getDate() + 1);
+					var month = date.getMonth() + 1;
+					item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+				}
+			});
+
+			var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
+			self.kendoSchedule.setDataSource(dataSource);
 		});
 	};
 
 	SchedulerPage.prototype.getAvailableStageId = function()
 	{
-		var self = this;
-		return $.map(self.$stageOption.find(":checked"), function(checkbox)
-		{
-			return parseInt($(checkbox).val());
-		});
+		return this.searchGrid.selectedFieldTripStageFilters();
 	};
 
 	SchedulerPage.prototype.eventBinding = function()
@@ -69,44 +244,6 @@
 		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler(), eventselector = '.k-event',
 			taskselector = ".k-task", tdselector = '.k-scheduler-agendaview .k-scheduler-content tr td:last-child';
 
-		$(".stage-option :checkbox").change(function(e)
-		{
-			var checked = self.getAvailableStageId(),
-				notContainCurrentDetailId = false,
-				notCheckedIds = [];
-
-			scheduler.dataSource.filter({
-				operator: function(trip)
-				{
-					if ($.inArray(trip.stageId, checked) < 0)
-					{
-						notCheckedIds.push(trip.id);
-					}
-					return $.inArray(trip.stageId, checked) >= 0;
-				}
-			});
-
-
-			notCheckedIds.forEach(function(id)
-			{
-				if (id === self.currentDetailId)
-				{
-					notContainCurrentDetailId = true;
-				}
-			});
-
-			if (notContainCurrentDetailId)
-			{
-				self.closeDetailClick(true);
-				self.$kendoscheduler.getKendoScheduler().refresh();
-				self.currentDetailId = -1;
-				self.isDetailPanelShown(false);
-			}
-
-			$(".k-scheduler-content").scrollTop(0);
-			self.getScrollBarPosition();
-
-		});
 		$(document).on("mousedown.kendoscheduler", function(e)
 		{
 			0 === $(e.target).closest(".k-scheduler-views").length && self.$kendoscheduler.find(".k-state-expanded").removeClass("k-state-expanded"),
@@ -122,7 +259,7 @@
 		var doubleClickBind = function(e, selector)
 		{
 			var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
-				event = scheduler.occurrenceByUid(element.data("kendoUid"));
+				event = self.kendoSchedule.occurrenceByUid(element.data("kendoUid"));
 			self.currentDetailId = event.id;
 			self.showDetailsClick(event.id);
 			self.isDetailPanelShown(true);
@@ -296,14 +433,21 @@
 		}, 50);
 	};
 
-	SchedulerPage.prototype.initScheduler = function($element)
+	SchedulerPage.prototype.initScheduler = function()
 	{
 		var self = this;
 
-		self.$kendoscheduler.empty();
+		self.searchGrid.initFieldTripStageFilters();
+		if (self.kendoSchedule)
+		{
+			$(document).off(".kendoscheduler");
+			self.$kendoscheduler.off(".kendoscheduler");
+			self.kendoSchedule.destroy();
+			self.$kendoscheduler.empty();
+		}
+
 		self.getOriginalDataSource(self.gridType).then(function(data)
 		{
-			//TO DO
 			data.Items.forEach(function(item)
 			{
 				if (!item.EstimatedReturnDateTime)
@@ -314,6 +458,7 @@
 					item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
 				}
 			});
+
 			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
 				date: new Date(),
 				dataSource: self.getSchedulerDataSources(data),
@@ -326,7 +471,6 @@
 				},
 				footer: false
 			}).data("kendoScheduler");
-			self.setFilterOpitons();
 
 			self.eventBinding();
 		});
@@ -363,17 +507,9 @@
 		});
 	};
 
-	SchedulerPage.prototype.getOriginalDataSource = function(type)
+	SchedulerPage.prototype.getRequestUrl = function(type)
 	{
-		var self = this, url, params = {
-			"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
-			"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
-			"filterSet": null,
-			"filterClause": "",
-			"isQuickSearch": false,
-			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
-		};
-
+		var url = null;
 		switch (type)
 		{
 			case "fieldtrips":
@@ -385,12 +521,35 @@
 			default:
 				break;
 		}
-		return tf.ajax.post(url, params);
+		return url;
+	}
+
+	SchedulerPage.prototype.getOriginalDataSource = function(type, filters)
+	{
+		var self = this, url, params = {
+			"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
+			"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
+			"filterSet": null,
+			"filterClause": "",
+			"isQuickSearch": false,
+			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+		};
+
+		if (self.filterData)
+		{
+			params.idFilter = self.filterData.idFilter;
+			params.filterSet = self.filterData.filterSet;
+			params.filterClause = self.filterData.filterClause;
+		}
+
+		url = self.getRequestUrl(type);
+		return tf.ajax.post(url, { data: params });
 	}
 
 	SchedulerPage.prototype.getSchedulerDataSources = function(data)
 	{
 		var self = this;
+		self.schedulerDataSources.length = 0;
 		data.Items.forEach(function(item)
 		{
 			self.schedulerDataSources.push({
@@ -507,6 +666,11 @@
 		if (self.kendoSchedule)
 		{
 			self.kendoSchedule.destroy();
+		}
+		if (self.searchGrid)
+		{
+			self.searchGrid.dispose();
+			self.searchGrid = null;
 		}
 	};
 })();

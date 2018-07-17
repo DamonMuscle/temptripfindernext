@@ -107,6 +107,7 @@
 		self.onRowsChangeCheck = new TF.Events.Event();
 		self.onRowsChanged = new TF.Events.Event();
 		self.onDataBoundEvent = new TF.Events.Event();
+		self.onFilterChanged = new TF.Events.Event();
 		self.onIdsChanged = new TF.Events.Event();
 		self.onCtrlIPress = self.onCtrlIPress.bind(self);
 		self.onCtrlOPress = self.onCtrlOPress.bind(self);
@@ -3185,6 +3186,7 @@
 			self.searchOption = options;
 		}
 
+		self.onFilterChanged.notify(options);
 		return options;
 
 		function processVehicleExternalName(filterItems)
@@ -4536,9 +4538,14 @@
 		this.onRowsChanged.unsubscribeAll();
 		this.onEyeCheckChanged.unsubscribeAll();
 		this.onDataBoundEvent.unsubscribeAll();
+		this.onFilterChanged.unsubscribeAll();
 		if (this.onClearGridFilterClickEvent)
 		{
 			this.onClearGridFilterClickEvent.unsubscribeAll();
+		}
+		if (this.onFieldTripStageChanged)
+		{
+			this.onFieldTripStageChanged.unsubscribeAll();
 		}
 		this._onWindowResize = null;
 		for (var i in this.subscriptions)

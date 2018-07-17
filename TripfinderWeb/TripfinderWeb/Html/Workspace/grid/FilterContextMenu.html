@@ -37,6 +37,7 @@
 			</div>
 		</li>
 		<!--/ko -->
+		<!--ko if: searchGrid.options && searchGrid.options.isGridView -->
 		<li class="menu-item menu-item-quick-filter" data-bind="contextMenuClick:searchGrid.quickFilterBarClick,css:searchGrid.obQuickFilterBarCheckIcon">
 			<div class="menu-icon">
 			</div>
@@ -44,6 +45,7 @@
 				Quick Filter Bar
 			</div>
 		</li>
+		<!--/ko -->
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
@@ -55,7 +57,21 @@
 			</div>
 		</li>
 
+		<!--ko if:searchGrid.options.gridType==="fieldtrip" && searchGrid.options.isCalendarView -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
 
+		<!--ko foreach:searchGrid.obFieldTripStageFilters -->
+		<li class="menu-item" data-bind="contextMenuClick: $parent.searchGrid.gridFieldTripFilterClick.bind($parent.searchGrid),css: {'menu-item-checked': $.inArray($data, $parent.searchGrid.selectedFieldTripStageFilters())>=0}">
+			<div class="menu-icon">
+			</div>
+			<div class="field-trip-color" data-bind="style: { backgroundColor: tf.fieldTripGridDefinition.gridDefinition().stageFormatter($data)}"></div>
+			<div class="menu-label" data-bind="text:$parent.searchGrid.getFieldTripStageName($data)">
+			</div>
+		</li>
+		<!--/ko -->
+		<!--/ko -->
 		<!--ko if:TF.isPhoneDevice -->
 		<!--ko if:
 			(searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate) ||

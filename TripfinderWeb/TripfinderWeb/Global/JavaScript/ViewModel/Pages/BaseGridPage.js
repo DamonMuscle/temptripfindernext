@@ -7,6 +7,7 @@
 		var self = this;
 
 		self.searchGridInited = ko.observable(false);
+		self.isGridPage = true;
 		self.options = {};
 		self.bulkMenu = null;
 		self.requestPauseEvent = new TF.Events.Event();
@@ -16,12 +17,8 @@
 		self.enableRefreshEvent = new TF.Events.Event();
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
-		// self.obShowDetailPanel = ko.observable(false);
-		// self.obShowFieldTripDEPanel = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.kendoGridScroll = null;
-		// self.detailView = null;
-		// self.fieldTripDataEntry = null;
 		self.isGridPage = true;
 
 		self.approveButton = false;
@@ -55,34 +52,37 @@
 		self.initSearchGridCompute();
 		self.bindButtonEvent();
 
-		self.searchGrid.getSelectedIds.subscribe(function()
+		if (self.isGridPage)
 		{
-			self.obIsSelectRow(self.searchGrid.getSelectedIds().length !== 0);
-			self.selectedRecordIds = self.searchGrid.getSelectedIds()
-			if (self.selectedRecordIds[0])
+			self.searchGrid.getSelectedIds.subscribe(function()
 			{
-				if (self.obShowDetailPanel())
+				self.obIsSelectRow(self.searchGrid.getSelectedIds().length !== 0);
+				self.selectedRecordIds = self.searchGrid.getSelectedIds()
+				if (self.selectedRecordIds[0])
 				{
-					self.detailView.showDetailViewById(self.selectedRecordIds[0]);
-				}
-				else if (self.obShowFieldTripDEPanel())
-				{
-					if (self.fieldTripDataEntry)
+					if (self.obShowDetailPanel())
 					{
-						self.fieldTripDataEntry._view.id = self.selectedRecordIds[0];
-						self.fieldTripDataEntry.obMode("Edit");
-						self.fieldTripDataEntry.loadSupplement()
-							.then(self.fieldTripDataEntry.loadRecord);
+						self.detailView.showDetailViewById(self.selectedRecordIds[0]);
 					}
-					else
+					else if (self.obShowFieldTripDEPanel())
 					{
-						self.editClick();
+						if (self.fieldTripDataEntry)
+						{
+							self.fieldTripDataEntry._view.id = self.selectedRecordIds[0];
+							self.fieldTripDataEntry.obMode("Edit");
+							self.fieldTripDataEntry.loadSupplement()
+								.then(self.fieldTripDataEntry.loadRecord);
+						}
+						else
+						{
+							self.editClick();
+						}
 					}
 				}
-			}
-		});
+			});
 
-		self.loadReportLists();
+			self.loadReportLists();
+		}
 	};
 
 	BaseGridPage.prototype.createGrid = function(option)
@@ -93,19 +93,20 @@
 				gridType: self.type,
 				showBulkMenu: true,
 				showLockedColumn: true,
-				showOmittedCount: option.showOmittedCount,
-				showSelectedCount: option.showSelectedCount,
-				gridTypeInPageInfo: option.gridTypeInPageInfo,
+				showOmittedCount: option ? option.showOmittedCount : false,
+				showSelectedCount: option ? option.showSelectedCount : false,
+				gridTypeInPageInfo: option ? option.gridTypeInPageInfo : false,
 				url: pathCombine(tf.api.apiPrefix(), "search", self.type),
-				onDataBound: function(option)
+				isGridView: option ? option.isGridView : true,
+				onDataBound: self.isGridPage ? function(option)
 				{
 					self.onDataBound.bind(self)(option);
-				}
+				} : null
 			};
 
 		self.searchGrid = new TF.Grid.KendoGrid(self.$element.find('.kendo-grid-container'), $.extend(baseOptions, option), new TF.Grid.GridState({
 			gridFilterId: null,
-			filteredIds: option.filteredIds
+			filteredIds: option ? option.filteredIds : null
 		}));
 		self.searchGrid.filterMenuClick = self.searchGrid.filterMenuClick.bind(self);
 
