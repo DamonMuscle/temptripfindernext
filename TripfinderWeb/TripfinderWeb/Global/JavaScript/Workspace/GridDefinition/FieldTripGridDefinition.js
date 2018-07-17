@@ -20,7 +20,7 @@
 				},
 				{
 					FieldName: "PublicId",
-					DisplayName: "ID",
+					DisplayName: "Public ID",
 					Width: '150px',
 					type: "string"
 				},
