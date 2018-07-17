@@ -97,7 +97,6 @@
 				showSelectedCount: option ? option.showSelectedCount : false,
 				gridTypeInPageInfo: option ? option.gridTypeInPageInfo : false,
 				url: pathCombine(tf.api.apiPrefix(), "search", self.type),
-				isGridView: option ? option.isGridView : true,
 				onDataBound: self.isGridPage ? function(option)
 				{
 					self.onDataBound.bind(self)(option);

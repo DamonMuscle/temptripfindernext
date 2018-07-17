@@ -21,6 +21,7 @@
 		var self = this;
 		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
 		self.options.showOmittedCount = false;
+		self.options.isGridView = true;
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
 		self.options.extraFields = ["FieldTripStageId"];
 		self.options.storageKey = "grid.currentlayout." + self.pageType;
