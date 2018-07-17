@@ -570,7 +570,7 @@
 
 		var selectedIds = this.searchGrid.getSelectedIds();
 
-		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(viewModel, 'saveas', {
+		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(viewModel, 'view', {
 			selectedRecordId: selectedIds,
 			type: self.type
 		}));
