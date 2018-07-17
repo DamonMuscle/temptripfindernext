@@ -42,7 +42,7 @@
 			Columns: [{
 				DBName: "FieldTripID",
 				DisplayName: "FieldTripID",
-				FieldName: "ID",
+				FieldName: "Id",
 				Width: "150px"
 			}]
 		};
@@ -181,8 +181,17 @@
 			self.isDetailPanelShown(false);
 		}
 
+		self.resetScrollBar();
+	};
+
+	SchedulerPage.prototype.resetScrollBar = function(viewModel, e)
+	{
+		var self = this;
+		if (self.kendoSchedule.view().name === "agenda")
+		{
 			$(".k-scheduler-content").scrollTop(0);
 			self.getScrollBarPosition();
+		}
 	};
 
 	SchedulerPage.prototype.filterClick = function(viewModel, e)
@@ -231,6 +240,8 @@
 
 			var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
 			self.kendoSchedule.setDataSource(dataSource);
+
+			self.resetScrollBar();
 		});
 	};
 

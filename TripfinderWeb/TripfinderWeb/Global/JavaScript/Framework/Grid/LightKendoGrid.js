@@ -3468,6 +3468,11 @@
 
 	LightKendoGrid.prototype.bindNeedFileds = function(type, fields)
 	{
+		if (this.options.isCalendarView)
+		{
+			return fields;
+		}
+
 		fields = LightKendoGrid.bindNeedFileds(type, fields);
 
 		if (type === 'tripstop')
