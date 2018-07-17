@@ -3468,7 +3468,7 @@
 
 	LightKendoGrid.prototype.bindNeedFileds = function(type, fields)
 	{
-		if (this.options.isCalendarView)
+		if (this.options && this.options.isCalendarView)
 		{
 			return fields;
 		}
