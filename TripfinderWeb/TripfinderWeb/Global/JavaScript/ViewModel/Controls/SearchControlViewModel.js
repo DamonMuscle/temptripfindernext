@@ -360,7 +360,7 @@
 
 		var self = this;
 		self.onSearchButtonClickEvent.notify(e);
-
+		ga('send', 'event', 'Area', 'Search');
 		clearTimeout(self.clearFocusTimeout);
 	};
 
@@ -457,7 +457,7 @@
 			clearTimeout(self.clearFocusTimeout);
 			self.setSearchInputCursor();
 		}
-
+		ga('send', 'event', 'Action', 'Search Columns');
 		menu.show();
 	};
 
@@ -891,7 +891,7 @@
 		self.lastSearchText = text;
 
 		self.obIsLoading(true);
-		ga('send', 'event', 'Action', 'Search', searchText);
+		ga('send', 'event', 'Action', 'Searched', searchText);
 		self.getAllSuggestedResult(searchText, type).then(function(response)
 		{
 			self.updatePendingSearchCondition("", "");
@@ -1234,6 +1234,7 @@
 			$(".navigation-container.mobile").empty();
 			$(".navigation-container").removeClass("mobile");
 		}
+		ga('send', 'event', 'Action', 'Search Results in Grid');
 		self.goToGrid(options);
 		self.updateRecentSearches();
 		self.onNavComplete.notify();
@@ -1245,7 +1246,32 @@
 	 */
 	SearchControlViewModel.prototype.suggestedResultClick = function(model, e)
 	{
-		//TO DO
+		var self = this,
+			dataType = self.obSelectType(),
+			searchText = self.$searchText.val(),
+			options = {
+				fromSearch: true,
+			}
+		ga('send', 'event', 'Action', 'Search Result', model.title);
+		self.currentPage = tf.pageManager.resizablePage.obGridData();
+		self.saveUserSearch(dataType, searchText).then(function()
+		{
+			if (self.currentPage.pageType !== "fieldtrips")
+			{
+				self.goToGrid(options);
+			}
+			if (self.currentPage.detailView && !self.currentPage.detailView.isReadMode())
+			{
+				tf.promiseBootbox.alert("Please close edit mode before viewing detail of search result.");
+				return;
+			}
+			else
+			{
+				self.currentPage.showDetailsClick(model.Id);
+				// self.currentPage.selectRowInGridById(model.Id);
+			}
+			self.updateRecentSearches();
+		});
 	};
 
 	/**
@@ -1261,6 +1287,7 @@
 		self.collapseSearch();
 		tf.pageManager.openNewPage("fieldtrips", options);
 		self.$searchText.blur();
+		self.currentPage = tf.pageManager.resizablePage.obGridData();
 		tf.loadingIndicator.tryHide();
 	};
 
@@ -1621,6 +1648,7 @@
 			});
 
 		self.keepSearchActive = true;
+		ga('send', 'event', 'Area', 'Search Settings');
 		tf.modalManager.showModal(manageModal).then(function(result)
 		{
 			self.keepSearchActive = false;

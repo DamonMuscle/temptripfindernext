@@ -267,23 +267,23 @@
 			validatorFields["filterName"] = {
 				trigger: "blur change",
 				validators:
+				{
+					notEmpty:
 					{
-						notEmpty:
-							{
-								message: "required"
-							}
+						message: "required"
 					}
+				}
 			};
 
 			validatorFields["specificRecords"] = {
 				trigger: "blur change",
 				validators:
+				{
+					notEmpty:
 					{
-						notEmpty:
-							{
-								message: " At least one record must be selected"
-							}
+						message: " At least one record must be selected"
 					}
+				}
 			};
 
 			this._$form.bootstrapValidator(
@@ -676,10 +676,10 @@
 				selectedTitle: 'Selected',
 				mustSelect: true,
 				gridOptions:
-					{
-						forceFitColumns: true,
-						enableColumnReorder: true
-					}
+				{
+					forceFitColumns: true,
+					enableColumnReorder: true
+				}
 			};
 
 		if (type != undefined && type != "")
@@ -814,9 +814,9 @@
 				FileName: report.reportName(),
 				FilterClause: filterClause,
 				IdFilter:
-					{
-						IncludeOnly: includeOnlyIds
-					},
+				{
+					IncludeOnly: includeOnlyIds
+				},
 				Preparer: report.preparer(),
 				Title: report.reportTitle(),
 				SubTitle: report.subTitle(),
@@ -831,11 +831,11 @@
 				})
 				.then(function(apiResponse)
 				{
-					var key = apiResponse.Items[0];
-					var outputTo = report.outputTo().toLowerCase();
+					var key = apiResponse.Items[0], outputTo = report.outputTo().toLowerCase(), reportName = report.reportName();
 					if (outputTo == "view")
 					{
 						var w = window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"));
+						ga('send', 'event', 'Action', 'Report Viewed', reportName + ' Viewed');
 						$(w).on("load", function()
 						{
 							var head = $('<head>');
@@ -849,6 +849,7 @@
 							{
 								postSendEmail: function(sendData)
 								{
+									ga('send', 'event', 'Action', 'Report Run', reportName + ' Emailed');
 									return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefix(), "report", "sendemail"),
 										{
 											data: $.extend(true, {}, sendData, reportData)
@@ -869,6 +870,7 @@
 								{
 									clearInterval(downloadTimer);
 									self._expireCookie("downloadVerify");
+									ga('send', 'event', 'Action', 'Report Saved', reportName + ' Saved');
 									tf.promiseBootbox.alert(
 										report.reportOldName() + " has been successfully generated and saved as a pdf file", "Successfully Completed")
 										.then(function()

@@ -53,6 +53,7 @@
 		else
 		{
 			ans = this.selectedDatabase();
+			ga('send', 'event', 'Action', '	Data Source', ans.DatabaseName);
 		}
 		return Promise.resolve(ans);
 	};

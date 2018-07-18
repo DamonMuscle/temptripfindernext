@@ -41,16 +41,23 @@
 		}
 	};
 
-	BasePage.prototype.showDetailsClick = function()
+	BasePage.prototype.showDetailsClick = function(rowSelectedId)
 	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedId;
-
-		if (!selectedIds || selectedIds.length <= 0)
+		var self = this, selectedId;
+		if (rowSelectedId)
 		{
-			return;
+			selectedId = rowSelectedId;
 		}
+		else
+		{
+			var selectedIds = self.searchGrid.getSelectedIds();
+			if (!selectedIds || selectedIds.length <= 0)
+			{
+				return;
+			}
+			selectedId = selectedIds[0];
 
-		selectedId = selectedIds[0];
+		}
 		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
 			self.detailView.showDetailViewById(selectedId);

@@ -105,7 +105,9 @@
 		{ from: "UserNum3", default: 0 },
 		{ from: "UserNum4", default: 0 },
 		{ from: "FieldTripStageNotes", default: "" },
-		{ from: "IsFieldTripStageNotesChange", default: null }
+		{ from: "IsFieldTripStageNotesChange", default: null },
+		{ from: "IsCreatedFromTemplate", default: false },
+		{ from: "TemplateName", default: "" }
 	];
 
 	namespace.FieldTripDataModel.prototype.createObservable = function(key, value)

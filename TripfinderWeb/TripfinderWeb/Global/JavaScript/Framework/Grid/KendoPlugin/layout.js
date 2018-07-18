@@ -938,7 +938,7 @@
 			return;
 		}
 		var layoutName = gridLayoutExtendDataModel.name();
-		ga('send', 'event', 'Action', '	Grid Layout', layoutName);
+		ga('send', 'event', 'Action', 'Grid Layout', layoutName);
 		tf.storageManager.save(this._storageLayoutDataKey, layoutName);
 	};
 

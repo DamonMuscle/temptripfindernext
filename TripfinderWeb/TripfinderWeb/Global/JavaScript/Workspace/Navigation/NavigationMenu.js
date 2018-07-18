@@ -484,6 +484,8 @@
 			case "reports":
 				ga('send', 'event', 'Area', 'Reports');
 				break;
+			case "settings":
+				ga('send', 'event', 'Area', 'Settings');
 			default:
 				break;
 		}

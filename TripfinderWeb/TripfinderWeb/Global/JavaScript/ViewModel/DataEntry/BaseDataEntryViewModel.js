@@ -726,6 +726,7 @@
 				}
 				fieldTripTemplateEntity["FieldTripName"] = fieldTripEntity.Name;
 				fieldTripTemplateEntity.Name = data;
+				ga('send', 'event', 'Action', 'Template Added');
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this.type + "template"),
 					{
 						data: fieldTripTemplateEntity,
@@ -1220,17 +1221,15 @@
 	 */
 	BaseDataEntryViewModel.prototype.sendGAEvent = function()
 	{
-		var type = this.type, isNew = this.obEntityDataModel().id() == 0;
-		if (isNew)
+		var self = this, type = self.type, isNew = self.obEntityDataModel().id() == 0, isCreatedFromTemplate = self.obEntityDataModel().isCreatedFromTemplate(), templateName = self.obEntityDataModel().templateName();
+		switch (type)
 		{
-			switch (type)
-			{
-				case "fieldtrip":
-					ga('send', 'event', 'Action', 'New Trip');
-					break;
-				default:
-					break;
-			}
+			case "fieldtrip":
+				isNew ? ga('send', 'event', 'Action', 'New Trip') : 0;
+				isCreatedFromTemplate ? ga('send', 'event', 'Action', 'Field Trip Added', templateName) : 0;
+				break;
+			default:
+				break;
 		}
 	}
 

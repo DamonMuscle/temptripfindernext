@@ -10,6 +10,7 @@
 		self.isGridPage = true;
 		self.options = {};
 		self.bulkMenu = null;
+		self.selectedRecordIds = [];
 		self.requestPauseEvent = new TF.Events.Event();
 		self.requestHoldEvent = new TF.Events.Event();
 		self.requestResumeEvent = new TF.Events.Event();
@@ -192,6 +193,22 @@
 		});
 	};
 
+	BaseGridPage.prototype.selectRowInGridById = function(id)
+	{
+		var self = this, curSelectedIds = self.selectedRecordIds;
+
+		if (curSelectedIds.length === 1 && curSelectedIds[0] === id)
+		{
+			return;
+		}
+		else if (curSelectedIds.length > 0)
+		{
+			self.searchGrid.kendoGrid.clearSelection();
+		}
+
+		self.searchGrid.getSelectedIds([id]);
+	};
+
 	BaseGridPage.prototype.initSearchGridCompute = function()
 	{
 		var self = this;
@@ -237,6 +254,7 @@
 		var self = this;
 		self.bindEvent(".iconbutton.summarybar", function(model, e)
 		{
+			ga('send', 'event', 'Area', 'Summary Bar');
 			self.searchGrid.summarybarIconClick(model, e);
 		});
 		self.bindEvent(".iconbutton.filter", self.filterMenuClick);
@@ -515,7 +533,7 @@
 				documentType: "DataEntry",
 				type: "fieldtrip",
 			};
-
+		ga('send', 'event', 'Area', 'Submit New Request');
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel([], view);
 		if (TF.isPhoneDevice)
 		{
@@ -538,6 +556,7 @@
 	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
 	{
 		var self = this;
+		ga('send', 'event', 'Area', 'Field Trip Scheduler');
 		tf.pageManager.openNewPage(self.pageType + "Scheduler");
 	};
 
