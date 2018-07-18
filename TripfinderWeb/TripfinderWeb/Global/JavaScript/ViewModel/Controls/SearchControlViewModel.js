@@ -1256,9 +1256,12 @@
 		self.currentPage = tf.pageManager.resizablePage.obGridData();
 		self.saveUserSearch(dataType, searchText).then(function()
 		{
-			if (self.currentPage.pageType !== "fieldtrips")
+			if (self.currentPage.isSchedulerPage || self.currentPage.pageType !== "fieldtrips")
 			{
-				self.goToGrid(options);
+				tf.loadingIndicator.showImmediately();
+				tf.pageManager.openNewPage("fieldtrips", options);
+				self.currentPage = tf.pageManager.resizablePage.obGridData();
+				tf.loadingIndicator.tryHide();
 			}
 			if (self.currentPage.detailView && !self.currentPage.detailView.isReadMode())
 			{
@@ -1268,7 +1271,7 @@
 			else
 			{
 				self.currentPage.showDetailsClick(model.Id);
-				// self.currentPage.selectRowInGridById(model.Id);
+				self.currentPage.selectRowInGridById(model.Id);
 			}
 			self.updateRecentSearches();
 		});

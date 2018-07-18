@@ -697,15 +697,15 @@
 						closeButton: true,
 						title: "Save As",
 						message: "Select the file format that you would like to save the selected records in." +
-						"<div class='col-xs-24'>" +
-						"<br/><label>Type</label>" +
-						"<div class='save-content'>" +
-						"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
-						"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-						"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-						"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
-						"<div>" +
-						"</div>",
+							"<div class='col-xs-24'>" +
+							"<br/><label>Type</label>" +
+							"<div class='save-content'>" +
+							"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
+							"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
+							"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
+							"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
+							"<div>" +
+							"</div>",
 						buttons:
 						{
 							save:
@@ -1097,7 +1097,7 @@
 		var stickLayoutId;
 		var message;
 
-		if (modifiedStatus.isDeletedLayout)
+		if (modifiedStatus.isDeletedLayout && !self.options.fromSearch)
 		{
 			return self.applyLayout(self._obCurrentGridLayoutExtendedDataModel());
 		}

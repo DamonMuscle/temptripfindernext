@@ -207,6 +207,7 @@
 		}
 
 		self.searchGrid.getSelectedIds([id]);
+		self.searchGrid.isRowSelectedWhenInit = true;
 	};
 
 	BaseGridPage.prototype.initSearchGridCompute = function()

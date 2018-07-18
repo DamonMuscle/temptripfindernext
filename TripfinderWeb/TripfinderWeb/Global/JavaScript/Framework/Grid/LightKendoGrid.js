@@ -82,6 +82,8 @@
 		// Because the geo-search is based on the grid content, so the first search should ignore geo-search filter id list.
 		self.shouldIncludeAdditionFilterIds = false;
 
+		self.isRowSelectedWhenInit = false;
+
 		self._gridType = self.options.gridType;
 		self.pageType = self.options.pageType;
 
@@ -3120,7 +3122,10 @@
 				newIdExcludeAnyFilter = JSON.stringify(options.data.idFilter.ExcludeAny);
 			if ((newIdIncludeOnlyFilter !== self._oldIdIncludeOnlyFilter || newFilterId !== self._oldFilterId || newFilterString !== self._oldFilterString || newSortString !== (self._oldSortString ? self._oldSortString : "[]") || newFields !== self._oldFields))
 			{
-				self.getSelectedIds([]);
+				if (!self.isRowSelectedWhenInit)
+				{
+					self.getSelectedIds([]);
+				}
 				if (self.kendoGrid)
 				{
 					self.kendoGrid.lastClickItemId = 0;
@@ -3596,10 +3601,14 @@
 		return fields;
 	};
 
-	LightKendoGrid.prototype._selectedIdsChange = function()
+	LightKendoGrid.prototype._selectedIdsChange = function(data)
 	{
 		var self = this;
 		var idsHash = {};
+		if (data && data.length == 0)
+		{
+			self.isRowSelectedWhenInit = false;
+		}
 		this._resetPageInfoSelect();
 		if (self.kendoGrid)
 		{
@@ -3646,7 +3655,7 @@
 		var pageInfoList = [];
 		if (this.options.showSelectedCount) 
 		{
-			if (this.options.selectable && this.kendoGrid.select())
+			if (this.options.selectable && this.kendoGrid && this.kendoGrid.select())
 			{
 				pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
 			}
