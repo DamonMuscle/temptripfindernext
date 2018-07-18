@@ -792,3 +792,14 @@ body {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
+
+@media only screen and (max-width: 480px) {
+	.k-webkit .k-scheduler-toolbar li.k-nav-current .k-sm-date-format, .k-ff .k-scheduler-toolbar li.k-nav-current .k-sm-date-format, .k-ie11 .k-scheduler-toolbar li.k-nav-current .k-sm-date-format, .k-safari .k-scheduler-toolbar li.k-nav-current .k-sm-date-format {
+		display: inline;
+	}
+}
+
+.k-mobile .scheduler-wrap {
+	height: calc(~"100% - 134px") !important;
+	margin-right: 3px;
+}
