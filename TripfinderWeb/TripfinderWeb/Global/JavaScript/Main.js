@@ -9,7 +9,7 @@ $(function()
 	tf.startup.start();
 });
 
-createNamespace("TF").productName = "tripfinder";
+createNamespace("TF").productName = "Tripfinder";
 
 var namespace = createNamespace("pb");
 pb.DATA_CHANGE = "datachange";
