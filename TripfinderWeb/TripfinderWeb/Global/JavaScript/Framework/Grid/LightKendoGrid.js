@@ -3877,6 +3877,14 @@
 		self.allSelection();
 	};
 
+	/**
+	 * Both all key press will be doing some thing on ViewFinder.
+	 * @returns {void} 
+	 */
+	LightKendoGrid.prototype.baseKeyPress = function()
+	{
+	};
+
 	LightKendoGrid.prototype._showCannotSupportSelectAllModal = function()
 	{
 	};

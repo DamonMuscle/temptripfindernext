@@ -191,7 +191,25 @@
 				$(items[0]).trigger("mousedown", [e]);
 			}
 		});
+
+		self.searchGrid.baseKeyPress = self.searchGrid.baseKeyPress.createInterceptor(function()
+		{
+			self.hideBlukMenu();
+		});
 	};
+
+	/**
+	 * Hide bluk menu when the hot key was triggered.
+	 * @returns {void} 
+	 */
+	BaseGridPage.prototype.hideBlukMenu = function()
+	{
+		var self = this;
+		if (self.bulkMenu && !self.bulkMenu.disposed)
+		{
+			self.bulkMenu.$container.trigger("contextMenuClose");
+		}
+	}
 
 	BaseGridPage.prototype.selectRowInGridById = function(id)
 	{
