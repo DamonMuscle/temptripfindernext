@@ -23,28 +23,41 @@
 
 		self._mouseover = function()
 		{
+			if (self._timer)
+			{
+				clearTimeout(self._timer);
+			}
 			$(document).unbind("mousemove", self._mouseout);
-			clearTimeout(self._timer);
 		};
 
 		self._mouseout = function()
 		{
-			clearTimeout(self._timer);
+			if (self._timer)
+			{
+				clearTimeout(self._timer);
+			}
 			//NOTE: context menu close
 			self._timer = setTimeout(function()
 			{
 				self.dispose();
-			}, 200);
+			}, 300);
 		};
 
 		var contextMenuClose = function()
 		{
 			self.dispose();
 		};
-
+		if (self._target.prop("className").split(" ").includes('iconbutton'))
+		{
+			self._target.on("mouseover", self._mouseover);
+			self._target.on("mouseout", self._mouseout);
+		}
+		else
+		{
+			$(document).on("mousemove", self._mouseout);
+		}
 		self._$container.on("mouseover", self._mouseover);
 		self._$container.on("mouseout", self._mouseout);
-		$(document).on("mousemove", self._mouseout);
 		self._$container.on("contextMenuClose", contextMenuClose);
 
 		if (this.isElementTarget($target[0]))
