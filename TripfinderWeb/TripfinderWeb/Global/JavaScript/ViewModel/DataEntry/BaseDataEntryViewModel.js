@@ -1222,14 +1222,16 @@
 	BaseDataEntryViewModel.prototype.sendGAEvent = function()
 	{
 		var self = this, type = self.type, isNew = self.obEntityDataModel().id() == 0, isCreatedFromTemplate = self.obEntityDataModel().isCreatedFromTemplate(), templateName = self.obEntityDataModel().templateName();
-		switch (type)
+		if (isNew && isCreatedFromTemplate)
 		{
-			case "fieldtrip":
-				isNew ? ga('send', 'event', 'Action', 'New Trip') : 0;
-				isCreatedFromTemplate ? ga('send', 'event', 'Action', 'Field Trip Added', templateName) : 0;
-				break;
-			default:
-				break;
+			switch (type)
+			{
+				case "fieldtrip":
+					ga('send', 'event', 'Action', 'Field Trip Added', templateName);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
