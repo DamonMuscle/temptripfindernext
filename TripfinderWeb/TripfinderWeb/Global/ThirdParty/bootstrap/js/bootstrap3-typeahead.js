@@ -355,10 +355,6 @@
 				return i[0];
 			});
 
-			// if (this.autoSelect && !activeFound) {
-			// 	items.first().addClass('active');
-			// 	this.$element.data('active', items.first().data('value'));
-			// }
 			if (groupName)
 			{
 				this.$menu.append('<li class="group"><strong>' + groupName + '</strong></li>');

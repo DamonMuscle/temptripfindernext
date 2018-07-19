@@ -1,8 +1,5 @@
 (function()
 {
-	//createNamespace("TF.Grid").KendoGridHackHelper = KendoGridHackHelper;
-
-
 	createNamespace("TF").KendoHackHelper = KendoHackHelper;
 
 	function KendoHackHelper()

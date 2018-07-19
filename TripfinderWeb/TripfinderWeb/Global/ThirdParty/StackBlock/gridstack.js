@@ -620,15 +620,6 @@
 		{
 			node.width = this.width;
 		}
-		// else if (node.width < 1)
-		// {
-		// 	node.width = 1;
-		// }
-
-		// if (node.height < 1)
-		// {
-		// 	node.height = 1;
-		// }
 
 		if (node.x < 0)
 		{
@@ -1001,9 +992,6 @@
 				stop: onStop
 			})
 			.resizable({
-				//start: onStart,
-				//drag: onMove,
-				//stop: onStop
 			});
 	};
 

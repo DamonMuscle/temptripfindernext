@@ -200,7 +200,6 @@
 						{
 							if (isPass)
 							{
-								//$('#open-datasouce-loading').hide();
 								tf.promiseBootbox.dialog({
 									message: databaseName + " loaded successfully.",
 									title: "Data Source Loaded",
