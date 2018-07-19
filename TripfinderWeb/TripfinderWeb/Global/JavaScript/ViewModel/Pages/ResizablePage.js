@@ -250,6 +250,9 @@
 				self.resizeGrid(left);
 			} else
 			{
+				//It seems like a bug of kendo scheduler, refresh once only the layout of scheduler is correct,
+				//the events in it will be messed up, refresh again will solve this issue.
+				$(".kendoscheduler").getKendoScheduler().refresh();
 				$(".kendoscheduler").getKendoScheduler().refresh();
 			}
 		}
