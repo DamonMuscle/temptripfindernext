@@ -225,7 +225,7 @@
 							if (validateResult === "nodatasource")
 							{
 								tf.loadingIndicator.tryHide();
-								return tf.promiseBootbox.alert(invalidateMessage, "No Validate Data Source")
+								return tf.promiseBootbox.alert(invalidateMessage, "No Valid Data Source")
 									.then(function()
 									{
 										tf.storageManager.save("token", "", true);
