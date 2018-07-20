@@ -36,7 +36,7 @@
 
 		self.maxHeight = 0;
 		self.topDelta = 0;
-		self.singleCardHeight = 56;
+		self.singleCardHeight = 61;
 		self.sectionHeight = 38;
 		self.resultHeaderHeight = 25;
 		self.$virtualContainer = null;
@@ -166,6 +166,7 @@
 		}
 		self.$searchResult.on("scroll", function()
 		{
+
 			if (self.currentItems.length > 0 && self.currentItems[0].cards.length > 0)
 			{
 				var scrollHeight = self.$searchResult[0].scrollHeight, height = self.$searchResult.height(), scrollTop =
@@ -690,7 +691,7 @@
 	 */
 	SearchControlViewModel.prototype.setCurrentSearchItem = function()
 	{
-		var self = this, scrollTop, begin, end, itemCountPerPage, cardsCount, newItems = [], marginTop;
+		var self = this, scrollTop, begin, end, itemCountPerPage, cardsCount = self.currentItems[0].cards.length, newItems = [], marginTop;
 		if (self.currentItems.length <= 0)
 		{
 			self.resetVirtualContainer();
