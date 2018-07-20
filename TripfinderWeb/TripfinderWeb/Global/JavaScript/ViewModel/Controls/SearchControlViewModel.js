@@ -53,7 +53,7 @@
 			{ text: "School", value: "school", permission: true },
 			{ text: "Department", value: "department", permission: true },
 			{ text: "Classification", value: "classification", permission: true },
-			{ text: "Billing Classification", value: "billingclassification", permission: true }
+			{ text: "Billing Classification", value: "billclassification", permission: true }
 		];
 		self.allTypes = null;
 		self.updateAllDataTypes();
@@ -69,7 +69,7 @@
 			"school": { title: "School", color: "#ED7D31", field: "SchoolName" },
 			"department": { title: "Department", color: "#1CB09A", field: "Department" },
 			"classification": { title: "Classification", color: "#C36", field: "ClassificationName" },
-			"billingclassification": { title: "Billing Classification", color: "#C39", field: "BillingClass" },
+			"billclassification": { title: "Billing Classification", color: "#C39", field: "BillingClass" },
 		};
 		self.obSuggestedResult = ko.observable([]);
 		self.recentSearches = ["Recent Search 1", "Recent Search 2", "Recent Search 3"];
@@ -691,16 +691,20 @@
 	 */
 	SearchControlViewModel.prototype.setCurrentSearchItem = function()
 	{
-		var self = this, scrollTop, begin, end, itemCountPerPage, cardsCount = self.currentItems[0].cards.length, newItems = [], marginTop;
+		var self = this, scrollTop, begin, end, itemCountPerPage, cardsCount, newItems = [], marginTop;
 		if (self.currentItems.length <= 0)
 		{
 			self.resetVirtualContainer();
 			self.obSuggestedResult([]);
 			return Promise.resolve();
 		}
-		else if (!self.currentItems[0].cards || self.currentItems[0].cards.length <= 0)
+		else
 		{
-			return Promise.resolve();
+			cardsCount = self.currentItems[0].cards.length;
+			if (cardsCount <= 0)
+			{
+				return Promise.resolve();
+			}
 		}
 
 		self.topDelta = self.resultHeaderHeight + self.sectionHeight;
@@ -1012,7 +1016,7 @@
 					return 'Department';
 				case 'classification':
 					return 'Classification';
-				case 'billingclassification':
+				case 'billclassification':
 					return 'Billing Classification';
 			}
 			return '';
