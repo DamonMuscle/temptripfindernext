@@ -114,6 +114,10 @@
 		{
 			self.searchGrid.onDoubleClick.subscribe(function(e, data)
 			{
+				if (self.pageType === "reports")
+				{
+					return;
+				}
 				self.showDetailsClick();
 			});
 		}
@@ -213,6 +217,10 @@
 
 	BaseGridPage.prototype.selectRowInGridById = function(id)
 	{
+		if (TF.isMobileDevice)
+		{
+			return;
+		}
 		var self = this, curSelectedIds = self.selectedRecordIds;
 
 		if (curSelectedIds.length === 1 && curSelectedIds[0] === id)

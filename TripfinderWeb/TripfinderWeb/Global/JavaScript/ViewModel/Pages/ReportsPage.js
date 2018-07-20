@@ -114,11 +114,6 @@
 		this.generateReport(null, "saveas", { gridViewModel: this });
 	};
 
-	ReportsPage.prototype.showDetailsClick = function()
-	{
-		return;
-	};
-
 	ReportsPage.prototype.generateReport = function(udReport, type, gridMenuViewModel)
 	{
 		var self = this;
