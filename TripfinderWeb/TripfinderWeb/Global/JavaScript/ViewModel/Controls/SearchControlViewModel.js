@@ -1067,7 +1067,7 @@
 			PromiseAll.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "bycolumns"), {
 				paramData: {
 					column: "all",
-					text: encodeURIComponent(processedText)
+					text: processedText
 				}
 			}, { overlay: false }));
 			Promise.all(PromiseAll).then(function(result)
@@ -1158,7 +1158,7 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "bycolumns"), {
 			paramData: {
 				column: self.cardStyle[type] ? self.cardStyle[type].field : type,
-				text: encodeURIComponent(value)
+				text: value
 			}
 		}, { overlay: false })
 			.then(function(data)
