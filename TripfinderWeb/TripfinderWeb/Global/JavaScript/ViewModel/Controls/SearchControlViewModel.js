@@ -1183,14 +1183,15 @@
 
 			for (var i = 0; i < entities.SimpleEntities.length; i++)
 			{
-				if (entities.SimpleEntities[i].ColumnsMapping[key] && (type === "all" || type === key))
+				var resultText = (key == "billclassification") ? entities.SimpleEntities[i].ColumnsMapping["billingclassification"] : entities.SimpleEntities[i].ColumnsMapping[key];
+				if (resultText && (type === "all" || type === key))
 				{
 					if (columnResult.cards.length < count)
 					{
 						columnResult.cards.push({
 							Id: entities.SimpleEntities[i].Id,
 							title: entities.SimpleEntities[i].Title,
-							subtitle: entities.SimpleEntities[i].ColumnsMapping[key],
+							subtitle: resultText,
 							type: key,
 							whereQuery: entities.WhereQuery,
 							imageSrc: undefined
