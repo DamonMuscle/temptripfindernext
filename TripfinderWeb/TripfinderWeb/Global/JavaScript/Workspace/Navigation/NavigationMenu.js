@@ -90,6 +90,21 @@
 	};
 
 	/**
+	 * The event handler after page item in the menu is rendered.
+	 * @param {jQuery} $el   
+	 * @param {Object} data 
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.afterPageMenuOptionUIRender = function($el, data)
+	{
+		var self = this;
+		if (data.isOpen)
+		{
+			self.setActiveStateByPageId(data.pageType);
+		}
+	};
+
+	/**
 	 * Bind events.
 	 * @return {void}
 	 */
@@ -158,7 +173,7 @@
 		{
 			if (onHover)
 			{
-				self.updateMenuContent($item.attr("pageType"));
+				self.updateMenuContent($item.attr("pageType"), true);
 
 				if (!$item.hasClass("menu-opened"))
 				{
@@ -444,10 +459,29 @@
 	 * @param {string} type The page type
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.updateMenuContent = function(type)
+	NavigationMenu.prototype.updateMenuContent = function(type, hover)
 	{
 		var self = this, pageList, categoryName,
 			$item = self.$navigationMenu.find(".navigation-item." + type);
+
+		if (!hover)
+		{
+			switch (type)
+			{
+				case "settings":
+					tf.pageManager.loadDataSourceName().then(function()
+					{
+						pageList = tf.pageManager.obAdministrationPagesMenu();
+						self.obSettingPages(pageList);
+						categoryName = pageList.length === 1 ? pageList[0].text : (type.charAt(0).toUpperCase() + type.slice(1));
+						$item.find(".item-label").text(categoryName);
+					});
+					break;
+				default:
+					break;
+			}
+		}
+
 	};
 
 	/**
@@ -460,19 +494,48 @@
 	 */
 	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
 	{
-		var self = this;
+		evt.stopPropagation();
+		var self = this,
+			$item = self.$navigationMenu.find(".navigation-item." + type),
+			$itemMenu = $item.find(".item-menu"),
+			$pageList = $itemMenu.find("li"),
+			alreadyOpened = $item.hasClass("menu-opened");
 
 		//skip the method if user click the link to the same page.
-		if ($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active"))
+		if (($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active")) && type !== "settings")
 		{
 			return;
 		}
-
-		self.setActiveStateByPageType(type);
+		if ($pageList.length === 1 && type === "settings")
+		{
+			tf.showSelectDataSourceModel(tf.pageManager.currentDatabaseName());
+			self.closeOpenedNavigationItemMenu(false);
+			return;
+		}
 		if (TF.isPhoneDevice)
 		{
 			self.closeNavigation();
 		}
+		if ($pageList.length === 0)
+		{
+			if (!self.closeOpenedNavigationItemMenu(false))
+			{
+				self.setActiveStateByPageType(type);
+				tf.pageManager.openNewPage(type);
+			}
+
+		} else if (alreadyOpened)
+		{
+			self.togglePageMenuDisplay($item, false, self.defaultOpenMenuAnimationDuration);
+			$item.addClass("hoverState");
+		} else
+		{
+			if (!self.closeOpenedNavigationItemMenu(false))
+			{
+				self.togglePageMenuDisplay($item, true, self.defaultOpenMenuAnimationDuration);
+			}
+		}
+
 		switch (type)
 		{
 			case "fieldtrips":
@@ -489,7 +552,7 @@
 			default:
 				break;
 		}
-		tf.pageManager.openNewPage(type);
+
 	};
 
 	/**
@@ -644,14 +707,32 @@
 	};
 
 	/**
-	 * Switch the page by id.
-	 * @param {number} pageId The page id.
+	 * When the page button is clicked.
+	 * @param {Object} data 
+	 * @param {Event} evt 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.switchToPageById = function(pageId)
+	NavigationMenu.prototype.openPageButtonClick = function(pageType, data, evt)
 	{
+		evt.stopPropagation();
+
 		var self = this;
-		tf.pageManager.changePage(parseInt(pageId));
+		if (pageType === "dataSource")
+		{
+			tf.showSelectDataSourceModel(tf.pageManager.currentDatabaseName());
+			self.closeOpenedNavigationItemMenu(false);
+			return;
+		}
+
+		if (!($(evt.target).closest(".item-menu li").hasClass("active")))
+		{
+			self.setActiveStateByPageType(pageType);
+			var pList = [self.closeOpenedNavigationItemMenu(false)];
+			Promise.all(pList).then(function()
+			{
+				tf.pageManager.openNewPage(pageType);
+			});
+		}
 	};
 
 	/**
@@ -659,17 +740,16 @@
 	 * @param {number} pageId 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.setActiveStateByPageType = function(pagetype)
+	NavigationMenu.prototype.setActiveStateByPageType = function(type)
 	{
-		var pagetype = pagetype.replace("Scheduler", ""), $categoryItem = $(".navigation-item[pagetype='" + pagetype + "']"),
-			$bottomItem = $(".toolbar-button[pagetype='" + pagetype + "']");
-		$(".navigation-item").removeClass("active");
-		$(".toolbar-button").removeClass("active");
+		var self = this,
+			pageType = type.replace("Scheduler", ""),
+			$pageItem = $(".item-menu li[pageType='" + pageType + "']"),
+			$categoryItem = $pageItem.length > 0 ? $pageItem.closest(".navigation-item") : $(".navigation-item[pageType='" + pageType + "']");
+
+		self.$navigationMenu.find(".navigation-item, .item-menu li").removeClass("active");
+		$pageItem.addClass("active");
 		$categoryItem.addClass("active");
-		if (pagetype !== 'settings')
-		{
-			$bottomItem.addClass("active");
-		}
 	};
 
 	/**

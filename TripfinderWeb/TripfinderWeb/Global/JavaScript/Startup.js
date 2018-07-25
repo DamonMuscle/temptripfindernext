@@ -145,7 +145,7 @@
 			tf.authManager = new TF.AuthManager();
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
-			tf.kendoHackHelper = new TF.KendoHackHelper()
+			tf.kendoHackHelper = new TF.KendoHackHelper();
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
@@ -171,7 +171,6 @@
 					return Promise.all([p1, p2])
 						.then(function()
 						{
-							tf.pageManager = new TF.Page.PageManager();
 							var validateAllDB = function()
 							{
 								return tf.datasourceManager.validateAllDBs()
@@ -300,6 +299,7 @@
 								{
 									tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 									self.changePermissions();
+									tf.pageManager = new TF.Page.PageManager();
 									if (!TF.isPhoneDevice)
 									{
 										tf.pageManager.initNavgationBar();

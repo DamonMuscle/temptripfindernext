@@ -9,9 +9,12 @@
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
 		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
+		self.loadDataSourceName();
 		self.initContextMenuEvent();
 		self.navigationData = null;
 
+		//Pages menu
+		self.obAdministrationPagesMenu = ko.computed(self.administrationPagesMenuComputer.bind(self));
 		self.logOffClick = self.logOffClick.bind(this);
 	}
 
@@ -59,7 +62,7 @@
 				pageData = new TF.Page.ReportsPage();
 				templateName = "workspace/page/basegridpage";
 				break;
-			case "settings":
+			case "settingsConfig":
 				pageData = new TF.Page.SettingsConfigurationPage();
 				templateName = "workspace/admin/settings_configuration";
 				break;
@@ -197,28 +200,6 @@
 		});
 	};
 
-	PageManager.prototype.handlePermissionDenied = function(pageName)
-	{
-		pageName = this.getPageTitleByPageName(pageName);
-		var self = this, desc = "You do not have permissions to view" + (pageName ? " " + pageName : ".");
-		if (!tf.permissions.hasAuthorized)
-		{
-			desc += " You are not authorized for any page.";
-			return tf.promiseBootbox.alert(desc, "Invalid Permissions")
-				.then(function()
-				{
-					self.logout();
-				}.bind(this));
-		}
-		desc += " You will be redirected to your default login screen.";
-		return tf.promiseBootbox.alert(desc, "Invalid Permissions")
-			.then(function()
-			{
-				self.openNewPage("fieldtrips");
-				tf.promiseBootbox.hideAllBox();
-			}.bind(this));
-	};
-
 	/**
 	 * Get the page title by name.
 	 * @param {String} pageName
@@ -233,6 +214,52 @@
 				return "Field Trips";
 			default:
 				return null;
+		}
+	};
+
+	/**
+	 * Gets page menu for administration.
+	 * @returns {array} The array of administration
+	 */
+	PageManager.prototype.administrationPagesMenuComputer = function()
+	{
+		var self = this, maxWidth = 239, width,
+			dataSourceText = "Data Source: " + self.currentDatabaseName(),
+			menu = [], $tempDiv = $("<div>"),
+			css = {
+				fontFamily: "SourceSansPro-Regular",
+				fontSize: "14px",
+				display: "inline"
+			};
+		$("body").append($tempDiv);
+		$tempDiv.text(dataSourceText);
+		$tempDiv.css(css);
+		width = $tempDiv.outerWidth();
+		$tempDiv.remove();
+
+		self.addMenuPage("settingsConfig", menu, "Settings & Configuration", "Settings & Configuration", tf.permissions.obIsAdmin(), false);
+		self.addMenuPage("dataSource", menu, width > maxWidth ? "Data Source" : dataSourceText, "Data Source", !tf.permissions.isSupport, false);
+		return menu;
+	};
+
+	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm)
+	{
+		var self = this, isOpen = false;
+		if (permission)
+		{
+			var page = {
+				"isOpen": isOpen,
+				"pageType": pageType,
+				"text": hasApplicationTerm ? tf.applicationTerm.getApplicationTermPluralByName(name) : name
+			};
+			menu.push(page);
+		}
+		else
+		{
+			if (isOpen)
+			{
+				self.handlePermissionDenied(displayText);
+			}
 		}
 	};
 
