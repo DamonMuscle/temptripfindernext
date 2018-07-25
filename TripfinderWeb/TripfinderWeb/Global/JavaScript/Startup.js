@@ -107,7 +107,7 @@
 								var p1 = tf.storageManager.save("databaseType", datasource.DBType);
 								var p2 = tf.storageManager.save("datasourceId", datasource.Id);
 								var p3 = tf.storageManager.save("databaseName", datasource.DatabaseName);
-								return Promise.all([p1, p2]).then(function()
+								return Promise.all([p1, p2, p3]).then(function()
 								{
 									location.reload();
 									return "loginpage";
@@ -145,7 +145,6 @@
 			tf.authManager = new TF.AuthManager();
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
-			tf.pageManager = new TF.Page.PageManager();
 			tf.kendoHackHelper = new TF.KendoHackHelper()
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
@@ -172,6 +171,7 @@
 					return Promise.all([p1, p2])
 						.then(function()
 						{
+							tf.pageManager = new TF.Page.PageManager();
 							var validateAllDB = function()
 							{
 								return tf.datasourceManager.validateAllDBs()
