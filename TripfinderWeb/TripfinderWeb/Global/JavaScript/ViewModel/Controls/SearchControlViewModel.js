@@ -1175,10 +1175,11 @@
 
 	SearchControlViewModel.prototype.getTypeEntities = function(entities, type, count)
 	{
-		var self = this, result = [], columnResult;
+		var self = this, result = [], columnResult, n = self.allTypes.length - 1;
 
-		for (var key in self.cardStyle)
+		for (; n >= 1; n--)
 		{
+			var key = self.allTypes[n].value;
 			columnResult = { type: key, title: self.cardStyle[key].title, color: self.cardStyle[key].color, whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
 
 			for (var i = 0; i < entities.SimpleEntities.length; i++)
@@ -1358,7 +1359,7 @@
 			selectedDataType = self.findDataTypeByValue(searchRecord.type),
 			searchText = searchRecord.text;
 
-		if (!selectedDataType.permission)
+		if (!selectedDataType)
 		{
 			selectedDataType = self.findDataTypeByValue("all");
 		}
