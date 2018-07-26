@@ -244,7 +244,7 @@
 
 	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm)
 	{
-		var self = this, isOpen = false;
+		var self = this, isOpen = pageType === tf.storageManager.get(TF.productName + ".page");
 		if (permission)
 		{
 			var page = {

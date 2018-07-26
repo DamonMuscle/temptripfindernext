@@ -100,7 +100,7 @@
 		var self = this;
 		if (data.isOpen)
 		{
-			self.setActiveStateByPageId(data.pageType);
+			self.setActiveStateByPageType(data.pageType);
 		}
 	};
 
@@ -481,7 +481,6 @@
 					break;
 			}
 		}
-
 	};
 
 	/**
