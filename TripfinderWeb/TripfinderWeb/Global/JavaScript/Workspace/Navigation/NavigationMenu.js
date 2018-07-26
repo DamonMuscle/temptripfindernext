@@ -173,7 +173,7 @@
 		{
 			if (onHover)
 			{
-				self.updateMenuContent($item.attr("pageType"), true);
+				self.updateMenuContent($item.attr("pageType"));
 
 				if (!$item.hasClass("menu-opened"))
 				{
@@ -459,27 +459,20 @@
 	 * @param {string} type The page type
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.updateMenuContent = function(type, hover)
+	NavigationMenu.prototype.updateMenuContent = function(type)
 	{
 		var self = this, pageList, categoryName,
 			$item = self.$navigationMenu.find(".navigation-item." + type);
-
-		if (!hover)
+		switch (type)
 		{
-			switch (type)
-			{
-				case "settings":
-					tf.pageManager.loadDataSourceName().then(function()
-					{
-						pageList = tf.pageManager.obAdministrationPagesMenu();
-						self.obSettingPages(pageList);
-						categoryName = pageList.length === 1 ? pageList[0].text : (type.charAt(0).toUpperCase() + type.slice(1));
-						$item.find(".item-label").text(categoryName);
-					});
-					break;
-				default:
-					break;
-			}
+			case "settings":
+				pageList = tf.pageManager.obAdministrationPagesMenu();
+				self.obSettingPages(pageList);
+				categoryName = pageList.length === 1 ? pageList[0].text : (type.charAt(0).toUpperCase() + type.slice(1));
+				$item.find(".item-label").text(categoryName);
+				break;
+			default:
+				break;
 		}
 	};
 

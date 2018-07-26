@@ -300,27 +300,7 @@
 									tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 									self.changePermissions();
 									tf.pageManager = new TF.Page.PageManager();
-									if (!TF.isPhoneDevice)
-									{
-										tf.pageManager.initNavgationBar();
-									}
-									tf.pageManager.initResizePanel();
 
-									tf.pageManager.resizablePage.onLoaded.subscribe(function()
-									{
-										tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
-
-										if (window.opener && window.name === "new-detailWindow")
-										{
-											var id = getParameterByName('id'),
-												detailView = new TF.DetailView.DetailViewViewModel(id);
-											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
-										}
-										else
-										{
-											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
-										}
-									});
 									return true;
 								});
 							}
@@ -331,6 +311,35 @@
 							{
 								return tf.pageManager.loadDataSourceName();
 							}
+							return null;
+						}).then(function(value)
+						{
+							if (value !== null)
+							{
+								if (!TF.isPhoneDevice)
+								{
+									tf.pageManager.initNavgationBar();
+								}
+								tf.pageManager.initResizePanel();
+
+								tf.pageManager.resizablePage.onLoaded.subscribe(function()
+								{
+									tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
+
+									if (window.opener && window.name === "new-detailWindow")
+									{
+										var id = getParameterByName('id'),
+											detailView = new TF.DetailView.DetailViewViewModel(id);
+										tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
+									}
+									else
+									{
+										tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
+									}
+								});
+								return true;
+							}
+							return null;
 						});
 				});
 		});
