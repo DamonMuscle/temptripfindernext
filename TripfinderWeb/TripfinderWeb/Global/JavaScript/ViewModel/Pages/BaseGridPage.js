@@ -317,7 +317,6 @@
 		{
 			self.searchGrid.refreshClick(model, e);
 		});
-		self.bindEvent(".new", self.addClick);
 
 		if (self.obReports)
 		{

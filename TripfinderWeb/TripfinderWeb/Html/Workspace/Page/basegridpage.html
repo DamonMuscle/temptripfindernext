@@ -10,9 +10,7 @@
 	<!-- /ko -->
 	<div class="desktop-header">
 		<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
-		<!-- ko if:type === "fieldtrip"-->
-		<div class="new">Submit New Request</div>
-		<!-- /ko -->
+		<div class="new-request" data-bind="click : addClick,visible:type === 'fieldtrip'&&!obShowFieldTripDEPanel()">Submit New Request</div>
 	</div>
 	<div class="grid-icons">
 		<div class="iconrow">
