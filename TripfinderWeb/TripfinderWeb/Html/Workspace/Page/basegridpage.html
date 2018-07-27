@@ -14,12 +14,15 @@
 		<div class="new-request" data-bind="click : addClick,visible:type === 'fieldtrip'&&!obShowFieldTripDEPanel()">Submit New Request</div>
 		<!-- /ko -->
 	</div>
-	<div class="grid-icons">
+	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
 		<div class="iconrow">
 			<!-- ko if: pageType !== "reports"-->
 			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></div>
 			<!-- ko if:schedulerButton-->
 			<div class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></div>
+			<!-- /ko -->
+			<!-- ko if:detailButton-->
+			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
 			<!-- /ko -->
 			<div class="divider" title=""></div>
 			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
@@ -42,11 +45,6 @@
 			<div class="iconbutton mail" title="Send Mail" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<div class="iconbutton file" title="Save As File" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
-			<!-- ko if:detailButton-->
-			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
-			<!-- /ko -->
-			<div class="divider" title=""></div>
-			<div class="iconbutton refresh" title="Refresh"></div>
 		</div>
 		<div class="pull-right grid-staterow-wrap">
 			<div class="grid-staterow">
