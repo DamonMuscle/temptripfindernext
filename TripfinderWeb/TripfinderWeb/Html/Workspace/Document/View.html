@@ -1,0 +1,14 @@
+﻿<div data-bind="uiInit:init" style="height:100%">
+	<table class="file-content">
+		<tr>
+			<td>
+				<!--ko if:obImageUrl -->
+				<img data-bind="attr:{src:obImageUrl}" alt="" class="normal">
+				<!--/ko-->
+				<!--ko if:obPDFUrl -->
+				<iframe width="801" height="720" data-bind="attr:{src:obPDFUrl}"></iframe>
+				<!--/ko-->
+			</td>
+		</tr>
+	</table>
+</div>

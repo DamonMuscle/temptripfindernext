@@ -694,22 +694,25 @@
 			{
 				obEntityDataModel.update(data.Items[0]);
 				this._view.id = obEntityDataModel.id();
-				this._view.tabName = tf.DataEntryHelper.getTabNameByEntityDataModel(this._view.type, obEntityDataModel);
-				tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.tabNames = [this._view.tabName];
+				// this._view.tabName = tf.DataEntryHelper.getTabNameByEntityDataModel(this._view.type, obEntityDataModel);
+				// tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.tabNames = [this._view.tabName];
 				this.onContentChange.notify();
 				if (isNew)
 				{//change the url and sticky
 					this._view.mode = "Edit";
 					this.obMode(this._view.mode);
-					tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.ids = [this._view.id];
-					tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.mode = this._view.mode;
+					// tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.ids = [this._view.id];
+					// tf.documentManagerViewModel.obHashArray()[this._view.document.routeState].DocumentData.data.mode = this._view.mode; if (this.obDocumentGridDataSource().length > 0) tf.documentManagerViewModel.updateUserPreference(this._view.document);
+					// PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
+				} else
+				{
+					PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
+					this.obDocumentGridDataSource()[0].data.DocumentRelationshipEntities.push({ AttachedToType: "fieldtrip", AttachedToId: obEntityDataModel.id() });
 				}
-				tf.documentManagerViewModel.updateUserPreference(this._view.document);
-				PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
 			}.bind(this))
 			.catch(function(response)
 			{
-			}.bind(this))
+			}.bind(this));
 	};
 
 	BaseDataEntryViewModel.prototype.saveTemplate = function()

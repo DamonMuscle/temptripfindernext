@@ -66,6 +66,7 @@
 		{ from: "FieldTripDestinationId", default: null },
 		{ from: "FieldTripContact", default: "" },
 		{ from: "FieldTripInvoice", default: null },
+		{ from: "FieldTripDocuments", default: null },
 		{ from: "FieldTripResourceGroup", default: null },
 		{ from: "FixedCost", default: null },
 		{ from: "GUID", default: "" },

@@ -145,13 +145,11 @@
 				this.title("Documents");
 				this.obTooltipAddNew("Add Documents");
 				this.obCanOperation(true);
-				this.obEditDivider(true);
 				this.obCanEdit(true);
 				this.obCanCopy(false);
-				this.obOnlyLayout(true);
 				this.obAddDivider(true);
 				gridViewModelType = TF.Grid.DocumentMiniGridViewModel;
-				this.obCanOpenNewGrid(true);
+				this.obCanOpenNewGrid(false);
 				break;
 			case 'staff':
 				this.title(tf.applicationTerm.getApplicationTermPluralByName("Staff"));
