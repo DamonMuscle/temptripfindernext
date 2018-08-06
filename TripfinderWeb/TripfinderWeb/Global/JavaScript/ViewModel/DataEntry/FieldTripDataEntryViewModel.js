@@ -372,7 +372,7 @@
 
 			if (selectIndex > -1)
 			{
-				this.obSelectedAccount(self.obAccount.indexOf(selectIndex + 1));
+				this.obSelectedAccount(self.obAccount()[selectIndex + 1]);
 			}
 			else if (!initialize)
 			{
