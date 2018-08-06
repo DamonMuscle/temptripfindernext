@@ -11,6 +11,7 @@
 		this.pageLevelViewModel = new TF.PageLevel.FieldTripDataEntryPageLevelViewModel(this);
 		namespace.BaseDataEntryViewModel.call(this, ids, view);
 
+		this.fieldTripSettings = null;
 		this.initializationFrontdesk = new TF.InitializationFrontdesk(1, this.initialize);
 		this.dataModelType = TF.DataModel.FieldTripDataModel;
 		this.pageType = "fieldtripde";
@@ -26,6 +27,8 @@
 		this.obSchoolDataModels = ko.observableArray();
 		this.obDepartmentDataModels = ko.observableArray();
 		this.obActivityDataModels = ko.observableArray();
+		this.obFieldTripSettings = ko.observableArray();
+		this.fieldTripAccountList = [];
 		this.obClassificationDataModels = ko.observableArray();
 		this.obEquipmentDataModels = ko.observableArray();
 		this.obDestinationDataModels = ko.observableArray();
@@ -54,7 +57,11 @@
 		this.obTemplateName.subscribe(this.templateClick, this);
 
 		this.obSelectedSchool = ko.observable();
-		this.obSelectedSchool.subscribe(this.setSelectValue("school", "obSelectedSchool", function(obj) { return obj ? obj.SchoolCode : ""; }), this);
+		this.obSelectedSchool.subscribe(this.setSelectValue("school", "obSelectedSchool", function(obj)
+		{
+			this.setAccountListBySchool(obj ? obj.SchoolCode : null);
+			return obj ? obj.SchoolCode : "";
+		}.bind(this)), this);
 		this.obCurrentSchoolName = ko.computed(this.setSelectTextComputer("obSchoolDataModels", "school", function(obj) { return obj.SchoolCode; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedDepartment = ko.observable();
@@ -64,6 +71,28 @@
 		this.obSelectedActivity = ko.observable();
 		this.obSelectedActivity.subscribe(this.setSelectValue("fieldTripActivityId", "obSelectedActivity", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obCurrentActivityName = ko.computed(this.setSelectTextComputer("obActivityDataModels", "fieldTripActivityId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
+
+		this.obSelectedAccount = ko.observable();
+		this.obCurrentAccountName = ko.observable("None");
+		this.obSelectedAccount.subscribe(function()
+		{
+			if (this.obSelectedAccount().Id < 0)
+			{
+				this.obCurrentAccountName("None");
+				this.obEntityDataModel().districtDepartmentId(null);
+				this.obEntityDataModel().districtDepartmentName(null);
+				this.obEntityDataModel().fieldTripActivityId(null);
+				this.obEntityDataModel().fieldTripActivityName(null);
+			}
+			else
+			{
+				this.obCurrentAccountName(this.obSelectedAccount().Department.Name + ' / ' + this.obSelectedAccount().FieldTripActivity.Name);
+				this.obEntityDataModel().districtDepartmentId(this.obSelectedAccount().Department.Id);
+				this.obEntityDataModel().districtDepartmentName(this.obSelectedAccount().Department.Name);
+				this.obEntityDataModel().fieldTripActivityId(this.obSelectedAccount().FieldTripActivity.Id);
+				this.obEntityDataModel().fieldTripActivityName(this.obSelectedAccount().FieldTripActivity.Name);
+			}
+		}.bind(this));
 
 		this.obSelectedClassification = ko.observable();
 		this.obSelectedClassification.subscribe(this.setSelectValue("fieldTripClassificationId", "obSelectedClassification", function(obj) { return obj ? obj.Id : 0; }), this);
@@ -103,6 +132,7 @@
 
 		this.obMailCityDataModels = ko.observableArray();
 		this.obMailZipDataModels = ko.observableArray();
+		this.obAccount = ko.observableArray();
 
 		ko.computed(function()
 		{
@@ -254,6 +284,45 @@
 				self.ConvertToJson(fieldtripData.RequiredField);
 				self.obMailCityDataModels(fieldtripData.MailCity);
 				self.obMailZipDataModels(fieldtripData.MailZip);
+
+				$.each(fieldtripData.FieldTripAccount, function(index, account)
+				{
+					if (account.FieldTripActivityId)
+					{
+						$.each(fieldtripData.FieldTripActivity, function(index, activity)
+						{
+							if (account.FieldTripActivityId === activity.Id)
+							{
+								account.FieldTripActivity = activity;
+								return false;
+							}
+						});
+					}
+
+					if (account.DepartmentId)
+					{
+						$.each(fieldtripData.FieldTripDistrictDepartment, function(index, department)
+						{
+							if (account.DepartmentId === department.Id)
+							{
+								account.Department = department;
+								return false;
+							}
+						});
+					}
+
+					if (!account.FieldTripActivity)
+					{
+						account.FieldTripActivity = { Name: "Any", Id: null };
+					}
+					if (!account.Department)
+					{
+						account.Department = { Name: "Any", Id: null };
+					}
+				});
+				self.fieldTripAccountList = fieldtripData.FieldTripAccount;
+				self.setAccountListBySchool(null, true);
+				self.obFieldTripSettings(fieldtripData.FieldTripSettings);
 				return true;
 			});
 	};
@@ -271,7 +340,47 @@
 		});
 		data.unshift({ Name: "None", Id: 0 });
 		self.obTemplateSource(data);
-	}
+	};
+
+	FieldTripDataEntryViewModel.prototype.setAccountListBySchool = function(school, initialize)
+	{
+		var self = this, selectIndex = -1;
+		if (!school)
+		{
+			self.obAccount([{ Id: -1 }]);
+
+			if (!initialize)
+			{
+				self.obCurrentAccountName("None");
+			}
+		}
+		else
+		{
+			self.obAccount.removeAll();
+			$.each(self.fieldTripAccountList, function(index, item)
+			{
+				if (item.School === school)
+				{
+					self.obAccount.push(item);
+					if (self.obCurrentAccountName() === (item.Department ? item.Department.Name : "") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : ""))
+					{
+						selectIndex = index;
+					}
+				}
+			});
+			self.obAccount.unshift({ Id: -1 });
+
+			if (selectIndex > -1)
+			{
+				this.obSelectedAccount(self.obAccount.indexOf(selectIndex + 1));
+			}
+			else if (!initialize)
+			{
+				self.obCurrentAccountName("None");
+			}
+		}
+	};
+
 	FieldTripDataEntryViewModel.prototype.load = function()
 	{
 		this.$form.find("input[name='name']").focus();
@@ -294,6 +403,12 @@
 
 				if (this.obMode() === "Edit")
 				{
+					if (this.obFieldTripSettings().StrictAcctCodes)
+					{
+						this.obCurrentAccountName((this.obEntityDataModel().districtDepartmentName() || "Any") + ' / ' + (this.obEntityDataModel().fieldTripActivityName() || "Any"));
+						this.setAccountListBySchool(this.obEntityDataModel().school());
+					}
+
 					if (this.obEntityDataModel().departDateTime() == "1900-01-01T00:00:00.000" ||
 						this.obEntityDataModel().estimatedReturnDateTime() == "1900-01-01T00:00:00.000" ||
 						this.obEntityDataModel().departDateTime() == null ||
@@ -1169,8 +1284,17 @@
 			message: "must be <= Return Date",
 			callback: function(value, validator)
 			{
+				var field = this.$form.find("#departDate input[name=departDate]");
+				field.data("noName", false);
 				if (value != "")
 				{
+					var message = this.checkDeadline(value);
+					if (message)
+					{
+						field.data("noName", true);
+						return { message: message, valid: false };
+					}
+
 					var returnDate = new moment(this.obEntityDataModel().returnDate());
 					var departDate = new moment(this.obEntityDataModel().departDate());
 					if (!departDate.isValid() || !returnDate.isValid())
@@ -1204,7 +1328,7 @@
 			{
 				if (value != "")
 				{
-					var returnDate = new moment(this.obEntityDataModel().returnDate());
+					var returnDate = new moment(value);
 					var departDate = new moment(this.obEntityDataModel().departDate());
 					if (!departDate.isValid() || !returnDate.isValid())
 					{//not valid value, no need to compare
@@ -1214,6 +1338,7 @@
 					if (returnDate.isSame(departDate, "day"))
 					{
 						this.clearDateTimeAlerts("date");
+						this.$form.find("#departDate input[name=departDate]").trigger("blur");
 						this.$form.find("#departTime input[name=departTime]").trigger("blur");
 						this.$form.find("#returnTime input[name=estimatedReturnTime]").trigger("blur");
 						return true;
@@ -1248,6 +1373,8 @@
 			message: "invalid time",
 			callback: function(value, validator)
 			{
+				var field = this.$form.find("#departTime input[name=departTime]");
+				field.data("noName", false);
 				if (value != "")
 				{
 					var m = new moment(value, 'h:m A', true);
@@ -1260,6 +1387,13 @@
 					if (!this.obEntityDataModel().departDate())
 					{//this might never use, because the date is required when input time
 						return true;
+					}
+
+					var message = this.checkBlockTimes(m);
+					if (message)
+					{
+						field.data("noName", true);
+						return { message: "Depart Time " + message, valid: false };
 					}
 
 					var returnDate = new moment(this.obEntityDataModel().returnDate());
@@ -1315,6 +1449,8 @@
 			message: "invalid time",
 			callback: function(value, validator)
 			{
+				var field = this.$form.find("#returnTime input[name=estimatedReturnTime]");
+				field.data("noName", false);
 				if (value != "")
 				{
 					var m = new moment(value, 'h:m A', true);
@@ -1327,6 +1463,13 @@
 					if (!this.obEntityDataModel().returnDate())
 					{//this might never use, because the date is required when input time
 						return true;
+					}
+
+					var message = this.checkBlockTimes(m);
+					if (message)
+					{
+						field.data("noName", true);
+						return { message: "Return Time " + message, valid: false };
 					}
 
 					var returnDate = new moment(this.obEntityDataModel().returnDate());
@@ -1365,27 +1508,131 @@
 			}.bind(this)
 		};
 		return validatorFields;
-	}
+	};
+
+	FieldTripDataEntryViewModel.prototype.isHoliday = function(date)
+	{
+		var result = false, self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays;
+		$.each(holidays, function(index, holiday)
+		{
+			var holidayM = moment(new Date(holiday));
+			if (holidayM.diff(date.startOf("day"), "days") === 0 && holidayM.diff(date, "months") === 0 && holidayM.diff(date, "years") === 0)
+			{
+				result = true;
+				return false;
+			}
+		});
+		return result;
+	};
+
+	FieldTripDataEntryViewModel.prototype.checkDeadline = function(departDate)
+	{
+		if (!departDate)
+		{
+			return null;
+		}
+
+		var self = this, settings = self.obFieldTripSettings(), nonWorkdays = [6, 0],
+			deadlineDays = settings.ScheduleDaysInAdvance || 0, departDate = new moment(departDate),
+			deadlineDate = new moment(), message;
+
+		while (deadlineDays > 0)
+		{
+			if (nonWorkdays.indexOf(deadlineDate.day()) < 0 && !self.isHoliday(deadlineDate))
+			{
+				deadlineDays--;
+			}
+			deadlineDate = deadlineDate.add(1, 'day');
+		}
+
+		if (deadlineDate.diff(departDate, 'days') > 0)
+		{
+			message = "Depart Date must be on or after " + deadlineDate.format("M/D/YYYY");
+		}
+		else
+		{
+			if (self.isHoliday(departDate))
+			{
+				message = "Depart Date falls on a holiday. " + departDate.format("M/D/YYYY") + ".";
+			}
+		}
+
+		return message;
+	};
+
+	FieldTripDataEntryViewModel.prototype.checkBlockTimes = function(time)
+	{
+		if (!time)
+		{
+			return null;
+		}
+		var self = this, settings = self.obFieldTripSettings(), blockOutTimes = settings.BlockOutTimes,
+			timeM = time.year(2000).month(0).date(1), begin, end, message;
+
+		if (blockOutTimes.length === 0)
+		{
+			return null;
+		}
+
+		$.each(blockOutTimes, function(index, blockOutTime)
+		{
+			begin = moment(blockOutTime.BeginTime).year(2000).month(0).date(1);
+			end = moment(blockOutTime.EndTime).year(2000).month(0).date(1);
+			if ((timeM.isSame(begin) || timeM.isAfter(begin)) && (timeM.isSame(end) || timeM.isBefore(end)))
+			{
+				message = " is invalid because of the blackout period of " + begin.format("hh:mm A") + " and " + end.format("hh:mm A") + ".";
+				return false;
+			}
+		});
+
+		return message;
+	};
 
 	FieldTripDataEntryViewModel.prototype.clearDateTimeAlerts = function(type)
 	{
+		var departDateValidator = this.$form.find("#departDate>small[data-bv-validator=callback]"),
+			returnDateValidator = this.$form.find("#returnDate>small[data-bv-validator=callback]"),
+			departTimeValidator = this.$form.find("#departTime>small[data-bv-validator=callback]"),
+			returnTimeValidator = this.$form.find("#returnTime>small[data-bv-validator=callback]"),
+			skipDepartDate = departDateValidator.text().indexOf("after") >= 0,
+			skipDepartTime = departTimeValidator.text().indexOf("blackout") >= 0,
+			skipReturnTime = returnTimeValidator.text().indexOf("blackout") >= 0;
+
 		switch (type)
 		{
 			case "time":
-				this.$form.find("#departTime>small[data-bv-validator=callback]").hide();
-				this.$form.find("#returnTime>small[data-bv-validator=callback]").hide();
+				if (!skipDepartTime)
+				{
+					departTimeValidator.hide();
+				}
+				if (!skipReturnTime)
+				{
+					returnTimeValidator.hide();
+				}
 				if (this.pageLevelViewModel.activeLostfouseName.indexOf("Time") !== -1) { this.pageLevelViewModel.activeLostfouseName = ""; }
 				break;
 			case "date":
-				this.$form.find("#departDate>small[data-bv-validator=callback]").hide();
-				this.$form.find("#returnDate>small[data-bv-validator=callback]").hide();
+				if (!skipDepartDate)
+				{
+					departDateValidator.hide();
+				}
+				returnDateValidator.hide();
 				if (this.pageLevelViewModel.activeLostfouseName.indexOf("Date") !== -1) { this.pageLevelViewModel.activeLostfouseName = ""; }
 				break;
 			default:
-				this.$form.find("#departDate>small[data-bv-validator=callback]").hide();
-				this.$form.find("#departTime>small[data-bv-validator=callback]").hide();
-				this.$form.find("#returnDate>small[data-bv-validator=callback]").hide();
-				this.$form.find("#returnTime>small[data-bv-validator=callback]").hide();
+				if (!skipDepartDate)
+				{
+					departDateValidator.hide();
+				}
+				if (!skipDepartTime)
+				{
+					departTimeValidator.hide();
+				}
+				returnDateValidator.hide();
+				if (!skipReturnTime)
+				{
+					returnTimeValidator.hide();
+				}
 				this.pageLevelViewModel.activeLostfouseName = "";
 				break;
 		}

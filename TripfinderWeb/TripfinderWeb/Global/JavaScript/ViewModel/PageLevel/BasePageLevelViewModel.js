@@ -319,7 +319,10 @@
 					message = self.getMessage(messages[i]);
 				message = self.getMessageExpand(fielddata, message, error);
 
-				error.name = ($(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $($(fielddata).closest("div.form-group").find("label")[0]).text());
+				if (!$(fielddata).data("noName"))
+				{
+					error.name = ($(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $($(fielddata).closest("div.form-group").find("label")[0]).text());
+				}
 				error.rightMessage = message;
 				error.field = $(fielddata);
 
