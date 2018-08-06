@@ -17,6 +17,7 @@
 		self.obSelectedClientId = ko.observable();
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		TF.Page.BaseGridPage.apply(self, arguments);
+		self.displayPassword = "****fake*password****";
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
@@ -65,6 +66,10 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), { data: { clientId: clientId } })
 			.then(function(data)
 			{
+				if (self.obSelectedClientId() !== "New")
+				{
+					data.Items[0].Smtppassword = self.displayPassword;
+				}
 				self.obEntityDataModel(new TF.DataModel.SettingsConfigurationDataModal(data.Items[0]));
 				self.obIsUpdate(clientId !== "");
 				self.obEntityDataModel().apiIsDirty(false);
@@ -75,6 +80,20 @@
 				}
 			}.bind(this));
 	};
+
+	SettingsConfigurationPage.prototype.resetFakePassword = function()
+	{
+		var self = this, settings = self.obEntityDataModel().clone();
+		if (self.obSelectedClientId() !== "New")
+		{
+			if (settings.smtppassword() === self.displayPassword)
+			{
+				settings.smtppassword("");
+			}
+		}
+
+		return settings;
+	}
 
 	SettingsConfigurationPage.prototype.init = function(viewModel, el)
 	{
@@ -174,7 +193,7 @@
 	{
 		var self = this;
 		tf.modalManager.showModal(
-			new TF.Modal.TestEmailModalViewModel(self.obEntityDataModel())
+			new TF.Modal.TestEmailModalViewModel(self.resetFakePassword())
 		);
 	};
 
@@ -205,7 +224,7 @@
 		var self = this;
 		self.obEntityDataModel().apiIsNew(!self.obIsUpdate());
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
-			data: self.obEntityDataModel().toData()
+			data: self.resetFakePassword().toData()
 		}).then(function(data)
 		{
 			self.pageLevelViewModel.popupSuccessMessage();
