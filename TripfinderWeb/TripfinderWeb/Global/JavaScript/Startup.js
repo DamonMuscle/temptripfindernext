@@ -146,6 +146,7 @@
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
 			tf.kendoHackHelper = new TF.KendoHackHelper();
+			tf.urlParm = self.getURLParm();
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
@@ -198,6 +199,10 @@
 											return "nodatasource";
 										}
 									});
+							}
+							if (tf.urlParm && tf.urlParm.DB)
+							{
+								tf.storageManager.save("datasourceId", tf.urlParm.DB);
 							}
 							currentDatabaseId = tf.storageManager.get("datasourceId");
 							if (!currentDatabaseId || currentDatabaseId < 0)
@@ -316,6 +321,10 @@
 												detailView = new TF.DetailView.DetailViewViewModel(id);
 											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
 										}
+										else if (tf.urlParm && tf.urlParm.editft)
+										{
+											tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.editft] }, true);
+										}
 										else
 										{
 											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
@@ -422,6 +431,20 @@
 					tf.localization.Vehicle = tf.localization.Vehicle.toUpperCase();
 				}
 			}.bind(this));
+	};
+	Startup.prototype.getURLParm = function()
+	{
+		var parm = location.href;
+		var parm_result = new Object;
+		var start = parm.indexOf("?") != -1 ? parm.indexOf("?") + 1 : parm.length;
+		var end = parm.indexOf("#") != -1 ? parm.indexOf("#") : parm.length;
+		parm = parm.substring(start, end);
+		parm_array = parm.split("&");
+		for (var i = 0; i < parm_array.length; i++)
+		{
+			parm_result[parm_array[i].split("=")[0]] = parm_array[i].split("=")[1];
+		}
+		return parm_result;
 	};
 
 	tf.DBNeedToRebuildAlert = function(datasourceName)

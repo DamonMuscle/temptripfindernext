@@ -150,7 +150,7 @@
 			if (result)
 			{
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "statuses"),
-					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Note: noComments ? "" : self.obComments() } })
+					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Note: noComments ? "" : self.obComments(), ProductName: "tripfinder" } })
 					.then(function()
 					{
 						return true;

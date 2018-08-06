@@ -112,11 +112,8 @@ module.exports = function(grunt)
 			individual: {
 				files: [{
 					cwd: 'tripfinderweb',
-					src: ['admin.html',
-						'privatesite.html',
-						'login.html',
-						'index.html',
-						'error.html',
+					src: ['index.html',
+						'jumpto.aspx',
 						'local_settings.js',
 						'Web.config'
 					],
