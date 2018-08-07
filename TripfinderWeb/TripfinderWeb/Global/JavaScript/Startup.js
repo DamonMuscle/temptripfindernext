@@ -146,7 +146,7 @@
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
 			tf.kendoHackHelper = new TF.KendoHackHelper();
-			tf.urlParm = self.getURLParm();
+			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
@@ -321,9 +321,9 @@
 												detailView = new TF.DetailView.DetailViewViewModel(id);
 											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
 										}
-										else if (tf.urlParm && tf.urlParm.editft)
+										else if (tf.urlParm && tf.urlParm.tripid)
 										{
-											tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.editft] }, true);
+											tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
 										}
 										else
 										{
