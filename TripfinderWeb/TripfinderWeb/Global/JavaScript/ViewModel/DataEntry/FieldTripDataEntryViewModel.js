@@ -308,11 +308,11 @@
 
 					if (!account.FieldTripActivity)
 					{
-						account.FieldTripActivity = { Name: "Any", Id: null };
+						account.FieldTripActivity = { Name: "[Any]", Id: null };
 					}
 					if (!account.Department)
 					{
-						account.Department = { Name: "Any", Id: null };
+						account.Department = { Name: "[Any]", Id: null };
 					}
 				});
 				self.fieldTripAccountList = fieldtripData.FieldTripAccount;
@@ -340,7 +340,7 @@
 
 	FieldTripDataEntryViewModel.prototype.setAccountListBySchool = function(school, initialize)
 	{
-		var self = this, selectIndex = -1;
+		var self = this, selectIndex = -1, accountList = [], departActivityNames = [], departActivityName;
 		if (!school)
 		{
 			self.obAccount([{ Id: -1 }]);
@@ -357,14 +357,21 @@
 			{
 				if (item.School === school)
 				{
-					self.obAccount.push(item);
-					if (self.obCurrentAccountName() === (item.Department ? item.Department.Name : "") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : ""))
+					departActivityName = (item.Department ? item.Department.Name : "[Any]") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : "[Any]");
+
+					if (departActivityNames.indexOf(departActivityName) < 0)
 					{
-						selectIndex = index;
+						accountList.push(item);
+						departActivityNames.push(departActivityName);
+						if (self.obCurrentAccountName() === departActivityName)
+						{
+							selectIndex = index;
+						}
 					}
 				}
 			});
-			self.obAccount.unshift({ Id: -1 });
+			accountList.unshift({ Id: -1 });
+			self.obAccount(accountList);
 
 			if (selectIndex > -1)
 			{
