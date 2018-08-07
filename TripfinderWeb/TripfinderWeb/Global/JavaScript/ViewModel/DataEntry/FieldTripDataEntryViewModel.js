@@ -27,7 +27,8 @@
 		this.obSchoolDataModels = ko.observableArray();
 		this.obDepartmentDataModels = ko.observableArray();
 		this.obActivityDataModels = ko.observableArray();
-		this.obFieldTripSettings = ko.observableArray();
+		this.obFieldTripSettings = ko.observable({});
+		this.obStrictDest = ko.observable(false);
 		this.fieldTripAccountList = [];
 		this.obClassificationDataModels = ko.observableArray();
 		this.obEquipmentDataModels = ko.observableArray();
@@ -215,12 +216,6 @@
 
 		this.destinationCss = function() { return this.destinationDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
 
-		this.destinationOnBlur = function(e, m)
-		{
-			var collection = this.getCollection(this.obDestinationDataModels(), 'Name');
-			this.resetEmpty(m, collection, 'destination');
-		}.bind(this);
-
 		this.cityDisable = function() { return this.obEntityDataModel().destinationCity() == ''; };
 
 		this.cityCss = function() { return this.cityDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
@@ -323,6 +318,7 @@
 				self.fieldTripAccountList = fieldtripData.FieldTripAccount;
 				self.setAccountListBySchool(null, true);
 				self.obFieldTripSettings(fieldtripData.FieldTripSettings);
+				self.obStrictDest(fieldtripData.FieldTripSettings.StrictDest);
 				return true;
 			});
 	};
