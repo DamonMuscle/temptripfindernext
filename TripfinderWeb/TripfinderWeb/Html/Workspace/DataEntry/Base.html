@@ -6,8 +6,8 @@
 					<span data-bind="text:obPageTitle"></span>
 				</div>
 				<div class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, visible:obShowNewCopy"></div>
-				<div class="divider"></div>
-				<div class="iconbutton refresh" title="Refresh" data-bind="click:refreshClick"></div>
+				<div class="divider" data-bind="visible:obMode()==='Edit'"></div>
+				<div class="iconbutton refresh" title="Refresh" data-bind="click:refreshClick,visible:obMode()==='Edit'"></div>
 				<span class="alert alert-info alert-small" data-bind="visible:obApiIsDirty">unsaved changes</span>
 				<span class="alert alert-danger alert-small" data-bind="visible:obLockMessage,text:obLockMessage"></span>
 				<span class="alert alert-warning alert-small" data-bind="visible:obModifiedMessage,text:obModifiedMessage"></span>
