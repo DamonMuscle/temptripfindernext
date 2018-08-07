@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').EditDocumentViewModel = EditDocumentViewModel;
 
-	function EditDocumentViewModel(objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId)
+	function EditDocumentViewModel(objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData)
 	{
 		this.UploadedFileChangeEvent = this.UploadedFileChangeEvent.bind(this);
 		this.deleteFileClick = this.deleteFileClick.bind(this);
@@ -18,6 +18,10 @@
 		if (documentId && documentId > 0)
 		{
 			this.obEntityDataModel().id(documentId);
+		}
+		if (documentData)
+		{
+			this.documentData = documentData;
 		}
 		this.currentDocumentClassificationName = ko.computed(this.currentDocumentClassificationNameComputer, this);
 		this.obDisplayFileName = ko.computed(function()
@@ -122,12 +126,7 @@
 
 						var saveEditDocument = function()
 						{
-							return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "document", this.objtype, this.objid, this.obEntityDataModel().id()),
-								{ data: this.obEntityDataModel().toData() })
-								.then(function()
-								{
-									return { pendingChange: { isAssociated: isAssociated, ids: [this.obEntityDataModel().id()], associations: associations }, data: this.obEntityDataModel().toData() };
-								}.bind(this));
+							return { pendingChange: { isAssociated: isAssociated, ids: [this.obEntityDataModel().id()], associations: associations }, data: this.obEntityDataModel().toData() };
 						}.bind(this);
 						if (this.obSelectedAssociations().length <= 0 && this.parentType && this.parentId)
 						{
@@ -160,16 +159,13 @@
 					{
 						var saveAddDocument = function()
 						{
-							// return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "document", this.objtype, this.objid),
-							// 	{ data: this.obEntityDataModel().toData() })
-							// 	.then(function(response)
-							// 	{
-							// flag determines whether to add or remove association
-							this.obEntityDataModel().fileSizeKb(byteLength(this.obEntityDataModel().toData().DocumentEntities[0].FileContent));
 							return { pendingChange: { isAssociated: isAssociated, ids: [], associations: associations }, data: this.obEntityDataModel().toData() };
-							// }.bind(this));
 						}.bind(this);
 
+						if (this.documentData)
+						{
+							return saveAddDocument();
+						}
 						if (this.obEntityDataModel().documentEntities().length == 0)
 						{
 							// may pop up error("At least one file need be uploaded!");
@@ -230,6 +226,26 @@
 							this.obSelectedDocumentClassification(classificationDataModel);
 						}.bind(this));
 				}
+				else if (this.documentData)
+				{
+					var documentEntity = new TF.DataModel.DocumentDataModel().toData();
+					documentEntity.Filename = this.documentData.Filename;
+					documentEntity.DocumentClassificationId = this.documentData.DocumentClassificationId;
+					documentEntity.Description = this.documentData.Description;
+					documentEntity.DocumentEntity = this.documentData.DocumentEntity;
+					documentEntity.APIIsNew = false;
+					documentEntity.APIIsDirty = false;
+					documentEntity.APIToDelete = false;
+					this.obEntityDataModel(new TF.DataModel.DocumentDataModel(documentEntity));
+					this.obEntityDataModel().documentEntity = this.documentData.DocumentEntity;
+					this.obEntityDataModel().DocumentEntities = this.documentData.DocumentEntities;
+					var classificationDataModels = this.obClassificationDataModels();
+					var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
+					{
+						return c.Id === this.obEntityDataModel().documentClassificationId();
+					}.bind(this)).ToArray()[0];
+					this.obSelectedDocumentClassification(classificationDataModel);
+				}
 			}.bind(this));
 
 		var self = this, isValidating = false;
@@ -261,6 +277,10 @@
 						message: "failed to upload: document already exists.",
 						callback: function(value, validator)
 						{
+							if (self.documentData)
+							{
+								return true;
+							}
 							if (!self.obEntityDataModel().documentEntities())
 							{
 								return true;

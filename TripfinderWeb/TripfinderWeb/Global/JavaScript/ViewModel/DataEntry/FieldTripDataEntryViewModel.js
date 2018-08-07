@@ -54,6 +54,7 @@
 		this.obDocumentResourceId = ko.observable(1);
 		this.obDocumentGridDataSource = ko.observableArray();
 		this.obPendingDocumentIdChange = ko.observable(null);
+		this.obClassificationDataModels = ko.observableArray();
 		//drop down list
 		this.obSelectedTemplateSource = ko.observable();
 		this.obTemplateName = ko.observable("None");
@@ -251,22 +252,53 @@
 		{
 			document.dispose();
 		}
-		var filteredIds = [];
+		var filteredIds = [], documentRecources = [];
 		if (this.obMode() === "Edit")
 		{
-			var resources = this.obEntityDataModel().fieldTripDocuments();
-			resources.forEach(function(item)
-			{
-				item.resourceId = this.obDocumentResourceId();
-				item.DocumentEntity.resourceId = this.obDocumentResourceId();
-				this.obDocumentResourceId(item.resourceId + 1);
-				filteredIds.push(item.DocumentEntity.Id);
-			}.bind(this));
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
+				.then(function(data)
+				{
+					var resources = self.obEntityDataModel().fieldTripDocuments();
+					var classificationDataModels = data.Items;
+					if (resources)
+					{
+						resources.forEach(function(item)
+						{
+							var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
+							{
+								return c.Id === item.DocumentEntity.DocumentClassificationId;
+							}.bind(self)).ToArray()[0];
 
-			this.obDocumentGridDataSource(resources);
+							var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
+							var documentData = obDocumentData().toData();
+							documentData.DocumentEntity = item.DocumentEntity;
+							documentData.APIIsDirty = item.APIIsDirty;
+							documentData.APIIsNew = item.APIIsNew;
+							documentData.APIToDelete = item.APIToDelete;
+							documentData.DocumentClassification = classificationDataModel.Name;
+							documentData.Description = item.DocumentEntity.Description;
+							documentData.DocumentClassificationId = item.DocumentEntity.DocumentClassificationId;
+							documentData.DocumentRelationshipEntities = item.DocumentRelationshipEntities;
+							documentData.Id = item.DocumentEntity.Id;
+							documentData.Filename = item.DocumentEntity.Filename;
+							documentData.FileContent = item.DocumentEntity.FileContent;
+							documentData.FileSizeKb = item.DocumentEntity.FileSizeKb;
+							documentData.LastUpdated = item.DocumentEntity.LastUpdated;
+							documentData.LastUpdatedName = item.DocumentEntity.LastUpdatedName;
+							documentData.resourceId = this.obDocumentResourceId();
+							this.obDocumentResourceId(item.resourceId + 1);
+							filteredIds.push(item.DocumentEntity.Id);
+							documentRecources.push(documentData);
+						}.bind(self));
+					}
 
-			var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, this.obEntityDataModel().id(), this.type);
-			this.obDocumentGridViewModel(documentGrid);
+
+					self.obDocumentGridDataSource(documentRecources);
+
+					var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
+					self.obDocumentGridViewModel(documentGrid);
+				});
+
 		}
 		else
 		{
@@ -1201,7 +1233,7 @@
 						obDocument.Filename = result.Filename;
 						obDocument.FileContent = result.FileContent;
 						obDocument.FileSizeKb = result.FileSizeKb;
-						delete obDocument.DocumentEntities;
+						// delete obDocument.DocumentEntities;
 						self.obDocumentGridDataSource().push(obDocument);
 					});
 					var resourceSort = self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
@@ -1216,18 +1248,51 @@
 			}.bind(self));
 	};
 
-	FieldTripDataEntryViewModel.prototype.editDocEvent = function(viewModel, e)
+	FieldTripDataEntryViewModel.prototype.editDocEvent = function(e)
 	{
-		var selectedIds = this.searchGrid.getSelectedIds();
-		if (selectedIds.length > 0)
+		var row = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.select(),
+			self = this;
+		if (row.length > 0)
 		{
-			return tf.modalManager.showModal(
-				new TF.Modal.DocumentModalViewModel({ parentType: "fieldtrip", parentId: this.obEntityDataModel().id(), documentId: selectedIds[0], pendingAssociation: (this.filteredIds.indexOf(selectedIds[0]) !== -1) }))
-				.then(function(result)
+			var data = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
+			// $("body").data("files",data);
+			var option = { parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: data.Id, documentData: data };
+			tf.modalManager.showModal(new TF.Modal.DocumentModalViewModel(option))
+				.then(function(data)
 				{
-					this.obPendingDocumentIdChange(result.pendingChange);
+					var documentData = data.data;
+					if (documentData)
+					{
+						var source = [];
+						this.obDocumentGridDataSource().forEach(function(item)
+						{
+							if (documentData.Id != 0)
+							{
+								if (item.Id == documentData.Id)
+								{
+									var obresult = ko.observable(new TF.DataModel.DocumentDataModel(documentData));
+									var obDocument = obresult().toData();
+									obDocument.DocumentEntity = documentData;
+									source.push(obDocument);
+									return;
+								}
+							}
+							source.push(item);
+						}.bind(this));
+
+						var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+							resourceSource = new kendo.data.DataSource({
+								data: source,
+								sort: resourceSort
+							});
+						this.obDocumentGridDataSource(source);
+						this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+						this.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+					}
 				}.bind(this));
 		}
+
+
 	};
 
 	FieldTripDataEntryViewModel.prototype.deleteDocEvent = function(e)
@@ -1242,12 +1307,12 @@
 			this.obDocumentGridDataSource().forEach(function(item)
 			{
 
-				if (item.DocumentEntity.Id == data.Id)
+				if (item.Id == data.Id)
 				{
 
-					item.Filename = item.DocumentEntity.Filename;
-					item.FileContent = item.DocumentEntity.FileContent;
-					item.FileSizeKb = item.DocumentEntity.FileSizeKb;
+					item.Filename = item.Filename;
+					item.FileContent = item.FileContent;
+					item.FileSizeKb = item.FileSizeKb;
 
 					item.DocumentRelationshipEntities.forEach(function(relationShipItem)
 					{
