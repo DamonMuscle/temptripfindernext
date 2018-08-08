@@ -34,6 +34,23 @@
 						<input type="text" class="form-control" name="name" data-bind="value:obEntityDataModel().name, attr:IsRequired(obRequiredFields()&&obRequiredFields().Name?obRequiredFields().Name.Required:null)"
 						 maxlength="200">
 					</div>
+
+					<div class="form-group">
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().School&&obRequiredFields().School.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('School')"></label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obSchoolDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedSchool}, attr:IsRequired(obRequiredFields()&&obRequiredFields().School?obRequiredFields().School.Required:null)">
+								<!-- ko customInput:{type:"String",value:obCurrentSchoolName,attributes:{name:"school",class:"form-control"},events:{blur:schoolOnBlur}} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- ko if: !obFieldTripSettings().StrictAcctCodes -->
 					<div class="col-xs-12 form-group no-padding-left">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DistrictDepartmentID&&obRequiredFields().DistrictDepartmentID.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Department')">Department</label>
 						<div class="input-group">
@@ -76,6 +93,27 @@
 							</div>
 						</div>
 					</div>
+					<!-- /ko -->
+					<!-- ko if: obFieldTripSettings().StrictAcctCodes -->
+					<div class="col-xs-24 form-group no-padding-right no-padding-left">
+						<label data-bind="css:obRequiredFields()&&((obRequiredFields().FieldTripActivityID&&obRequiredFields().FieldTripActivityID.Required)
+							||(obRequiredFields().DistrictDepartmentID&&obRequiredFields().DistrictDepartmentID.Required))?'requirestar':null">Department/Activity:</label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obAccount,notSort:true,format:function(obj){return obj.Id < 0 ? 'None' : (obj.Department.Name+' / '+obj.FieldTripActivity.Name);},drowDownShow:true,selectedValue:obSelectedAccount},
+								 attr:IsRequired(obRequiredFields()&&((obRequiredFields().FieldTripActivityID&&obRequiredFields().FieldTripActivityID.Required)
+														||(obRequiredFields().DistrictDepartmentID&&obRequiredFields().DistrictDepartmentID.Required)))">
+								<!-- ko customInput:{type:"Select",value:obCurrentAccountName,attributes:{class:"form-control", name:"account"}} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- /ko -->
+
 					<div class="col-xs-12 form-group no-padding-left ">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripClassificationID&&obRequiredFields().FieldTripClassificationID.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
 						<div class="input-group">
@@ -124,20 +162,6 @@
 		<div class="row">
 			<div class="col-xs-24">
 				<div class="col-xs-24 no-padding-left no-padding-right">
-					<div class="form-group">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().School&&obRequiredFields().School.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('School')"></label>
-						<div class="input-group">
-							<div data-bind="typeahead:{source:obSchoolDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedSchool}, attr:IsRequired(obRequiredFields()&&obRequiredFields().School?obRequiredFields().School.Required:null)">
-								<!-- ko customInput:{type:"String",value:obCurrentSchoolName,attributes:{name:"school",class:"form-control"},events:{blur:schoolOnBlur}} -->
-								<!-- /ko -->
-							</div>
-							<div class="input-group-btn">
-								<button type="button" class="btn btn-default btn-sharp">
-									<span class="caret"></span>
-								</button>
-							</div>
-						</div>
-					</div>
 					<div class="form-group">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripContact&&obRequiredFields().FieldTripContact.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Contact')"></label>
 						<input type="text" class="form-control" name="FieldTripContact" data-bind="value:obEntityDataModel().fieldTripContact, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripContact?obRequiredFields().FieldTripContact.Required:null)"
@@ -331,9 +355,10 @@
 					</h4>
 					<div class="form-group">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().Destination&&obRequiredFields().Destination.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Destination')"></label>
+						<!-- ko if: obFieldTripSettings().StrictDest-->
 						<div class="input-group">
-							<div data-bind="typeahead:{source:obDestinationDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDestination}, attr:IsRequired(obRequiredFields()&&obRequiredFields().Destination?obRequiredFields().Destination.Required:null)">
-								<!-- ko customInput:{type:"String",value:obCurrentDestinationName,attributes:{name:"destination",class:"form-control"},events:{blur:destinationOnBlur}} -->
+							<div class="test" data-bind="typeahead:{source:obDestinationDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDestination},attr:IsRequired(obRequiredFields()&&obRequiredFields().Destination?obRequiredFields().Destination.Required:null)">
+								<!-- ko customInput:{type:"Select",value:obCurrentDestinationName,attributes:{name:"destination",class:"form-control"}} -->
 								<!-- /ko -->
 							</div>
 							<div class="input-group-btn">
@@ -349,28 +374,49 @@
 								</button>
 							</div>
 						</div>
-					</div>
-					<div class="form-group">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationStreet&&obRequiredFields().DestinationStreet.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Street')"></label>
-						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationStreet, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationStreet?obRequiredFields().DestinationStreet.Required:null)"
-						 maxlength="200" name="DestinationStreet">
-					</div>
-					<div class="col-xs-12 form-group no-padding-left" style="padding-right:30px;">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationCity&&obRequiredFields().DestinationCity.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('City')"></label>
+						<!--/ko-->
+						<!-- ko if: !obFieldTripSettings().StrictDest-->
 						<div class="input-group">
-							<div data-bind="typeahead:{source:obMailCityDataModels,format:function(obj){return obj.Item;},drowDownShow:true}, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationCity?obRequiredFields().DestinationCity.Required:null)">
-								<!-- ko customInput:{type:"String",value:obEntityDataModel().destinationCity,attributes:{class:"form-control",maxlength:"100",name:'city'},events:{blur:cityOnBlur}} -->
+							<div data-bind="typeahead:{source:obDestinationDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDestination},attr:IsRequired(obRequiredFields()&&obRequiredFields().Destination?obRequiredFields().Destination.Required:null)">
+								<!-- ko customInput:{type:"String",value:obCurrentDestinationName,attributes:{name:"destination",class:"form-control"}} -->
 								<!-- /ko -->
 							</div>
 							<div class="input-group-btn">
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
 								</button>
+								<button data-bind="click:editObjectClick.bind($data,'destination', obEntityDataModel().destination()), visible:obIsAdmin, disable: destinationDisable(), css:destinationCss()"
+								 type="button" class="btn btn-default btn-sharp">
+									<span class="glyphicon glyphicon-pencil"></span>
+								</button>
+								<button data-bind="click:addObjectClick.bind($data,'destination'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
+									<span class="glyphicon glyphicon-plus"></span>
+								</button>
+							</div>
+						</div>
+						<!--/ko-->
+					</div>
+					<div class="form-group">
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationStreet&&obRequiredFields().DestinationStreet.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Street')"></label>
+						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationStreet,enable:!obFieldTripSettings().StrictDest, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationStreet?obRequiredFields().DestinationStreet.Required:null)"
+						 maxlength="200" name="DestinationStreet">
+					</div>
+					<div class="col-xs-12 form-group no-padding-left" style="padding-right:30px;">
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationCity&&obRequiredFields().DestinationCity.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('City')"></label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obMailCityDataModels,format:function(obj){return obj.Item;},drowDownShow:true},attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationCity?obRequiredFields().DestinationCity.Required:null)">
+								<!-- ko customInput:{disable:obStrictDest,type:"String",value:obEntityDataModel().destinationCity,attributes:{class:"form-control",maxlength:"100",name:'city'},events:{blur:cityOnBlur}} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" data-bind="enable:!obFieldTripSettings().StrictDest" class="btn btn-default">
+									<span class="caret"></span>
+								</button>
 								<button data-bind="click:generateFunction(EditDataEntryListItem,'mailcity',obMailCityDataModels, 'destinationCity', obEntityDataModel().destinationCity()), visible:obIsAdmin, disable: cityDisable(), css:cityCss()"
 								 type="button" class="btn btn-default btn-sharp">
 									<span class="glyphicon glyphicon-pencil"></span>
 								</button>
-								<button data-bind="click:generateFunction(addDataEntryListItem,'mailcity',obMailCityDataModels, 'destinationCity'), visible:obIsAdmin"
+								<button data-bind="click:generateFunction(addDataEntryListItem,'mailcity',obMailCityDataModels, 'destinationCity'),enable:!obFieldTripSettings().StrictDest, visible:obIsAdmin"
 								 type="button" class="btn btn-default btn-sharp">
 									<span class="glyphicon glyphicon-plus"></span>
 								</button>
@@ -379,25 +425,25 @@
 					</div>
 					<div class="col-xs-3 form-group" style="padding-left:0">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationState&&obRequiredFields().DestinationState.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('State')"></label>
-						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationState, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationState?obRequiredFields().DestinationState.Required:null)"
+						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationState,enable:!obFieldTripSettings().StrictDest, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationState?obRequiredFields().DestinationState.Required:null)"
 						 maxlength="2" name="DestinationState">
 					</div>
 					<div class="col-xs-9 form-group no-padding-right">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationZip&&obRequiredFields().DestinationZip.Required?'requirestar':null">Zip Code</label>
 						<div class="input-group">
-							<div data-bind="typeahead:{source:obMailZipDataModels,format:function(obj){return obj.Item;},drowDownShow:true}, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationZip?obRequiredFields().DestinationZip.Required:null)">
-								<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().destinationZip,attributes:{class:"form-control",maxlength:"5",name:'zip'},events:{blur:zipCodeOnBlur}} -->
+							<div data-bind="typeahead:{source:obMailZipDataModels,format:function(obj){return obj.Item;},drowDownShow:true},attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationZip?obRequiredFields().DestinationZip.Required:null)">
+								<!-- ko customInput:{disable:obStrictDest,type:"Decimal",value:obEntityDataModel().destinationZip,attributes:{class:"form-control",maxlength:"5",name:'zip'},events:{blur:zipCodeOnBlur}} -->
 								<!-- /ko -->
 							</div>
 							<div class="input-group-btn">
-								<button type="button" class="btn btn-default">
+								<button type="button" data-bind="enable:!obFieldTripSettings().StrictDest" class="btn btn-default">
 									<span class="caret"></span>
 								</button>
 								<button data-bind="click:generateFunction(EditDataEntryListItem,'mailzip',obMailZipDataModels, 'destinationZip', obEntityDataModel().destinationZip()), visible:obIsAdmin, disable: zipCodeDisable(), css:zipCodeCss()"
 								 type="button" class="btn btn-default btn-sharp">
 									<span class="glyphicon glyphicon-pencil"></span>
 								</button>
-								<button data-bind="click:generateFunction(addDataEntryListItem,'mailzip',obMailZipDataModels, 'destinationZip'), visible:obIsAdmin"
+								<button data-bind="click:generateFunction(addDataEntryListItem,'mailzip',obMailZipDataModels,'destinationZip'),enable:!obFieldTripSettings().StrictDest,, visible:obIsAdmin"
 								 type="button" class="btn btn-default btn-sharp">
 									<span class="glyphicon glyphicon-plus"></span>
 								</button>
