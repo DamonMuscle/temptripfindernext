@@ -55,12 +55,23 @@
 
 		if (self.isGridPage)
 		{
+			var canceling = false;
 			self.searchGrid.getSelectedIds.subscribe(function()
 			{
-				self.obIsSelectRow(self.searchGrid.getSelectedIds().length !== 0);
-				self.selectedRecordIds = self.searchGrid.getSelectedIds()
-				if (self.selectedRecordIds[0])
+				if (canceling)
 				{
+					return;
+				}
+				var current = self.searchGrid.getSelectedIds();
+				if (!current[0])
+				{
+					return;
+				}
+
+				var next = function()
+				{
+					self.obIsSelectRow(current.length !== 0);
+					self.selectedRecordIds = current;
 					if (self.obShowDetailPanel())
 					{
 						self.detailView.showDetailViewById(self.selectedRecordIds[0]);
@@ -80,6 +91,45 @@
 						}
 					}
 				}
+
+				if (self.obShowFieldTripDEPanel() && self.fieldTripDataEntry && self.fieldTripDataEntry.obApiIsDirty())
+				{
+					var cancelAction = function()
+					{
+						canceling = true;
+						self.searchGrid.getSelectedIds(self.selectedRecordIds);
+						canceling = false;
+					};
+					tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes first?", backdrop: true, title: "Unsaved Changes", closeButton: true })
+						.then(function(result)
+						{
+							if (result === false)
+							{
+								next();
+							}
+							else if (result === true)
+							{
+								self.fieldTripDataEntry.trySave().then(function(valid)
+								{
+									if (valid)
+									{
+										next();
+										tf.pageManager.resizablePage.refreshLeftGrid();
+										return;
+									}
+									cancelAction();
+								});
+							}
+							else
+							{
+								cancelAction();
+							}
+						});
+
+					return;
+				}
+
+				next();
 			});
 
 			self.loadReportLists();
