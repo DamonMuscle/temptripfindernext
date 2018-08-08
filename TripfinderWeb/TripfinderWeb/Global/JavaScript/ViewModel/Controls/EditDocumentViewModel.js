@@ -215,6 +215,7 @@
 				else if (this.documentData)
 				{
 					var documentEntity = new TF.DataModel.DocumentDataModel().toData();
+					documentEntity.Id = this.documentData.Id;
 					documentEntity.Filename = this.documentData.Filename;
 					documentEntity.DocumentClassificationId = this.documentData.DocumentClassificationId;
 					documentEntity.Description = this.documentData.Description;

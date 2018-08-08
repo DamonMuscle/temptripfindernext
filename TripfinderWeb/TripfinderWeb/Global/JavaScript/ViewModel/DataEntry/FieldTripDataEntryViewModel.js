@@ -55,6 +55,7 @@
 		this.obDocumentGridDataSource = ko.observableArray();
 		this.obPendingDocumentIdChange = ko.observable(null);
 		this.obClassificationDataModels = ko.observableArray();
+		this.tempId = 0;
 		//drop down list
 		this.obSelectedTemplateSource = ko.observable();
 		this.obTemplateName = ko.observable("None");
@@ -936,6 +937,16 @@
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
 		entity.FieldTripDocuments = this.obDocumentGridDataSource();
+		if (entity.FieldTripDocuments.length > 0)
+		{
+			entity.FieldTripDocuments.forEach(function(item)
+			{
+				if (item.Id < 0)
+				{
+					item.Id = 0;
+				}
+			});
+		}
 		if (isTemplate)
 		{
 			entity.APIIsNew = true;
@@ -1243,6 +1254,8 @@
 						obDocument.Filename = result.Filename;
 						obDocument.FileContent = result.FileContent;
 						obDocument.FileSizeKb = byteLength(result.FileContent);
+						obDocument.Id = self.tempId - 1;
+						self.tempId = self.tempId - 1;
 						self.obDocumentGridDataSource().push(obDocument);
 					});
 					var resourceSort = self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
@@ -1310,7 +1323,7 @@
 			var source = [], documentSource = [], relationShipSource = [];
 			this.obDocumentGridDataSource().forEach(function(item)
 			{
-				if (item.Id != 0)
+				if (item.Id > 0)
 				{
 					if (item.Id == data.Id)
 					{
@@ -1331,9 +1344,13 @@
 
 				} else
 				{
-					return;
+					if (item.Id == data.Id)
+					{
+						return;
+					}
+					documentSource.push(item);
+					source.push(item);
 				}
-
 			}.bind(this));
 
 			var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
