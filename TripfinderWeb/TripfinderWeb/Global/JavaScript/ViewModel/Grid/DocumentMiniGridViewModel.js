@@ -14,11 +14,12 @@
 			this.options.kendoGridOption = {
 				pageable: false
 			};
-			this.options.disableQuickFilter = true;
-			this.options.layoutAndFilterOperation = false;
-			this.options.onDataBound = this.onDataBound.bind(this);
 		}
 		this.options.selectable = "row";//mini grid should be single select
+		this.options.disableQuickFilter = true;
+		this.options.layoutAndFilterOperation = false;
+		this.options.onDataBound = this.onDataBound.bind(this);
+		this.hasRightClickEvent = false;
 		this.createGrid(this.options);
 		this.filteredIds = kendoGridState.filteredIds;
 	};

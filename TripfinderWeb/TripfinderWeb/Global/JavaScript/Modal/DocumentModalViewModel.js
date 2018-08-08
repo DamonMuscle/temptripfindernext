@@ -145,7 +145,6 @@
 					this.editDocumentViewModel.setInitAssociations(this.associations);
 				}
 			}
-
 		}
 		this.obPositiveButtonLabel = ko.observable("Attach");
 
