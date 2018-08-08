@@ -604,6 +604,7 @@
 			if (e)
 			{
 				tf.pageManager.resizablePage.refreshLeftGrid();
+				this.obMode('Edit');
 			}
 		}.bind(this));
 	};
