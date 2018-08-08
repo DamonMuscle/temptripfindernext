@@ -408,7 +408,7 @@
 				{
 					if (this.obFieldTripSettings().StrictAcctCodes)
 					{
-						this.obCurrentAccountName((this.obEntityDataModel().districtDepartmentName() || "Any") + ' / ' + (this.obEntityDataModel().fieldTripActivityName() || "Any"));
+						this.obCurrentAccountName((this.obEntityDataModel().districtDepartmentName() || "[Any]") + ' / ' + (this.obEntityDataModel().fieldTripActivityName() || "[Any]"));
 						this.setAccountListBySchool(this.obEntityDataModel().school());
 					}
 
