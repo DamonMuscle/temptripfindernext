@@ -77,20 +77,6 @@
 		this.obEntityDataModel().documentClassificationId(this.obSelectedDocumentClassification() ? this.obSelectedDocumentClassification().Id : 0);
 	};
 
-	function byteLength(str)
-	{
-		// returns the byte length of an utf8 string
-		var bytes = str.length;
-		for (var i = str.length - 1; i >= 0; i--)
-		{
-			var code = str.charCodeAt(i);
-			if (code > 0x7f && code <= 0x7ff) bytes++;
-			else if (code > 0x7ff && code <= 0xffff) bytes += 2;
-			if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
-		}
-		return bytes / 1024;
-	}
-
 	EditDocumentViewModel.prototype.save = function()
 	{
 		return this.pageLevelViewModel.saveValidate()

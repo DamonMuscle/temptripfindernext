@@ -1209,6 +1209,20 @@
 			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 		}
 	};
+
+	function byteLength(str)
+	{
+		var bytes = str.length;
+		for (var i = str.length - 1; i >= 0; i--)
+		{
+			var code = str.charCodeAt(i);
+			if (code > 0x7f && code <= 0x7ff) bytes++;
+			else if (code > 0x7ff && code <= 0xffff) bytes += 2;
+			if (code >= 0xDC00 && code <= 0xDFFF) i--;
+		}
+		return bytes / 1024;
+	}
+
 	FieldTripDataEntryViewModel.prototype.addDocEvent = function(e)
 	{
 		var self = this;
@@ -1228,7 +1242,7 @@
 						obDocument.DocumentEntity = result;
 						obDocument.Filename = result.Filename;
 						obDocument.FileContent = result.FileContent;
-						obDocument.FileSizeKb = result.FileSizeKb;
+						obDocument.FileSizeKb = byteLength(result.FileContent);
 						self.obDocumentGridDataSource().push(obDocument);
 					});
 					var resourceSort = self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),

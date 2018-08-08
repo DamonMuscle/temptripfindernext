@@ -79,36 +79,39 @@
 			{
 				this.title("Edit Document");
 				var type, attachIds = [], promiseAll = [], documentRelationshipEntities = options.documentData.DocumentRelationshipEntities;
-				for (var i = 0; i < documentRelationshipEntities.length; i++)
+				if (documentRelationshipEntities.length > 0)
 				{
-					type = documentRelationshipEntities[i].AttachedToType;
-					attachIds.push(documentRelationshipEntities[i].AttachedToId);
-				}
-				promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: attachIds })
-					.then(function(data)
+					for (var i = 0; i < documentRelationshipEntities.length; i++)
 					{
-						var name, displayType;
-						for (var i in data.Items)
+						type = documentRelationshipEntities[i].AttachedToType;
+						attachIds.push(documentRelationshipEntities[i].AttachedToId);
+					}
+					promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: attachIds })
+						.then(function(data)
 						{
-							name = tf.EntityHelper.getEntityName(this.type, data.Items[i]);
-							displayType = tf.EntityHelper.getEntityType(this.type).display;
-							if (!!name && !!displayType)
+							var name, displayType;
+							for (var i in data.Items)
 							{
-								this.model.associations.push({
-									DisplayName: name,
-									FieldName: name,
-									Id: data.Items[i].Id,
-									Type: displayType,
-									FieldType: this.type
-								});
+								name = tf.EntityHelper.getEntityName(this.type, data.Items[i]);
+								displayType = tf.EntityHelper.getEntityType(this.type).display;
+								if (!!name && !!displayType)
+								{
+									this.model.associations.push({
+										DisplayName: name,
+										FieldName: name,
+										Id: data.Items[i].Id,
+										Type: displayType,
+										FieldType: this.type
+									});
+								}
 							}
-						}
-					}.bind({ model: this, type: type })));
-				Promise.all(promiseAll)
-					.then(function()
-					{
-						this.obSelectedAssociations(this.associations);
-					}.bind(this));
+						}.bind({ model: this, type: type })));
+					Promise.all(promiseAll)
+						.then(function()
+						{
+							this.obSelectedAssociations(this.associations);
+						}.bind(this));
+				}
 			} else
 			{
 				this.title("Add Documents");
