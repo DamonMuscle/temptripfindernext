@@ -8,7 +8,7 @@
 	{
 		this.id;
 		this.type = "document";
-		this.dataViewTemplateName = "workspace/dataview/document/view";
+		this.dataViewTemplateName = "workspace/document/view";
 		this.$element;
 
 		this.obPageTitle = ko.observable();
