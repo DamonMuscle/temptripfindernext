@@ -3,21 +3,6 @@
 		<pre class="titleNotify">You can associate this document with one or more records.  To search for a record, specify the Data Type and then use the Quick Filter to search for the record or records you would like to associate with <span data-bind="text:obDocumentText"></span></pre>
 	</div>
 </div>
-<div class="row">
-	<div class="col-xs-11 form-group">
-		<label>Data Type</label>
-		<div class="input-group">
-			<div data-bind="typeahead:{source:obDataTypeSource,format:function(obj){return obj.text;},drowDownShow:true,notSort:true,selectedValue:obSelectedDataType}">
-				<!-- ko customInput:{type:"Select",value:obSelectedDataTypeText,attributes:{class:"form-control"}} --><!-- /ko -->
-			</div>
-			<div class="input-group-btn">
-				<button type="button" class="btn btn-default btn-sharp">
-					<span class="caret"></span>
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
 <div data-bind="uiInit:$parent.containerLoaded,finish:init">
 	<div class="row list-mover-mover">
 		<div class="col-xs-11">
