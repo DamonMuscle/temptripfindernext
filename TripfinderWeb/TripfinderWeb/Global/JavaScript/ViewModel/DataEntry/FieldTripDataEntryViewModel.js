@@ -944,6 +944,7 @@
 				if (item.Id < 0)
 				{
 					item.Id = 0;
+					item.DocumentEntity.Id = 0;
 				}
 			});
 		}
