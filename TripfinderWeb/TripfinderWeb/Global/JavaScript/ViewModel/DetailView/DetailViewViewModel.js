@@ -1398,8 +1398,16 @@
 				}
 				break;
 			case "fieldtrip":
-				label = self.getDataPointByField(fieldName).defaultValue;
-				label = moment(label).format("YYYY-MM-DD");
+				var field = self.getDataPointByField(fieldName);
+				label = field.defaultValue;
+				if (field.type === "Time")
+				{
+					label = moment("2018-01-01T" + label).format("hh:mm A");
+				}
+				else if (field.type === "Date")
+				{
+					label = moment(label).format("YYYY-MM-DD");
+				}
 				break;
 			case "tripstop":
 				label = self.getDataPointByField(fieldName).defaultValue;
@@ -2218,6 +2226,11 @@
 			return num > 9 ? num : "0" + num;
 		}
 
+		if (content === null || content === undefined)
+		{
+			return "";
+		}
+
 		switch (type)
 		{
 			case "Number":
@@ -2247,7 +2260,7 @@
 				else
 				{
 					var time = moment(content);
-					content = time.isValid() ? time.format("hh:mm A") : moment("2018-01-01T" + content).format("hh:mm A");
+					content = time.isValid() ? time.format("hh:mm A") : moment("2018-01-01T" + content).isValid() ? moment("2018-01-01T" + content).format("hh:mm A") : "";
 				}
 				break;
 			default:
