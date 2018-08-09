@@ -223,12 +223,18 @@
 	{
 		var self = this;
 		self.obEntityDataModel().apiIsNew(!self.obIsUpdate());
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
+		var queryString = "?emptySMTPPassword=" + (this.obSelectedClientId() !== "New" && !this.obEntityDataModel().smtppassword());
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", queryString), {
 			data: self.resetFakePassword().toData()
 		}).then(function(data)
 		{
 			self.pageLevelViewModel.popupSuccessMessage();
 			self.obEntityDataModel().apiIsDirty(false);
+
+			if (this.obSelectedClientId() !== "New")
+			{
+				this.obEntityDataModel().smtppassword(this.displayPassword);
+			}
 
 			if (!self.obIsUpdate())
 			{
