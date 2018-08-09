@@ -428,25 +428,44 @@
 		this.$form.find("input[data-tf-input-type=Email]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
-				trigger: "blur change",
-				validators: {
-					emailAddress: {
-						message: " invalid email"
+			if (validatorFields[name] && validatorFields[name].validators)
+			{
+				validatorFields[name].validators.emailAddress = {
+					message: " invalid email"
+				};
+			}
+			else
+			{
+				validatorFields[name] = {
+					trigger: "blur change",
+					validators: {
+						emailAddress: {
+							message: " invalid email"
+						}
 					}
-				}
-			};
+				};
+			}
 		});
 
 		this.$form.find("input[data-tf-input-type=Phone]").each(function(n, field)
 		{
 			var name = $(field).attr("name");
-			validatorFields[name] = {
-				trigger: "blur change",
-				validators: {
-					phone: {
-						country: tfRegion.toUpperCase(),
-						message: " invalid phone number"
+			if (validatorFields[name] && validatorFields[name].validators)
+			{
+				validatorFields[name].validators.phone = {
+					country: tfRegion.toUpperCase(),
+					message: " invalid phone number"
+				};
+			}
+			else
+			{
+				validatorFields[name] = {
+					trigger: "blur change",
+					validators: {
+						phone: {
+							country: tfRegion.toUpperCase(),
+							message: " invalid phone number"
+						}
 					}
 				}
 			}
