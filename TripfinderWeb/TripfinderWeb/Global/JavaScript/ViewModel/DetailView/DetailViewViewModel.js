@@ -1369,8 +1369,16 @@
 
 			if (subTitleFieldName)
 			{
-				subTitleDataPoint = self.getDataPointByField(subTitleFieldName);
-				subTitleLabel = self.formatDataContent(entity[subTitleFieldName], subTitleDataPoint.type, subTitleDataPoint.format);
+				if (subTitleFieldName === "(none)")
+				{
+					subTitleDataPoint = null;
+					subTitleLabel = "";
+				}
+				else
+				{
+					subTitleDataPoint = self.getDataPointByField(subTitleFieldName);
+					subTitleLabel = self.formatDataContent(entity[subTitleFieldName], subTitleDataPoint.type, subTitleDataPoint.format);
+				}
 			}
 		}
 
@@ -1398,6 +1406,11 @@
 				}
 				break;
 			case "fieldtrip":
+				if (fieldName === "(none)")
+				{
+					label = "";
+					break;
+				}
 				var field = self.getDataPointByField(fieldName);
 				label = field.defaultValue;
 				if (field.type === "Time")
