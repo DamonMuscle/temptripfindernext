@@ -1,0 +1,27 @@
+﻿<div data-bind="uiInit:init" style="height:100%">
+	<table>
+		<tr class="top-tr">
+			<td>
+				<div class="top-buttons">
+					<div class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick"></div>
+					<div class="iconbutton pencil" title="Edit" data-bind="click:editClick"></div>
+					<div class="iconbutton print" title="Print" data-bind="click:printClick"></div>
+					<div class="iconbutton view" title="View" data-bind="click:viewClick"></div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="content">
+					<!--ko if:obImageUrl -->
+					<img data-bind="attr:{src:obImageUrl}" alt="" class="normal">
+					<!--/ko-->
+					<!--ko if:obPDFUrl -->
+					<iframe width="600" height="500" data-bind="attr:{src:obPDFUrl}"></iframe>
+					<!--/ko-->
+					<div class="title" data-bind="text:obPageTitle"></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>

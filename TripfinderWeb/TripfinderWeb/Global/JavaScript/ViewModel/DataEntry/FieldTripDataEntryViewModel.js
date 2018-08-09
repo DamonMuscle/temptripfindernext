@@ -43,6 +43,7 @@
 		this.obDriversGridSource = ko.observableArray(null);
 		this.obBusAideGridSource = ko.observableArray(null);
 		this.obInvoicingGridViewModel = ko.observable(null);
+
 		this.obResourcesGridViewModel = ko.observable(null);
 		this.obInvoiceResourceId = ko.observable(1);
 		this.obInvoiceGridDataSource = ko.observableArray();
@@ -52,6 +53,13 @@
 		this.obNeedSaveAndClose(!TF.isPhoneDevice);
 		this.obResourceId = ko.observable(0);
 
+		//document
+		this.obDocumentGridViewModel = ko.observable(null);
+		this.obDocumentResourceId = ko.observable(1);
+		this.obDocumentGridDataSource = ko.observableArray();
+		this.obPendingDocumentIdChange = ko.observable(null);
+		this.obClassificationDataModels = ko.observableArray();
+		this.tempId = 0;
 		//drop down list
 		this.obSelectedTemplateSource = ko.observable();
 		this.obTemplateName = ko.observable("None");
@@ -261,6 +269,66 @@
 		this.loadSupplement();
 	};
 
+	FieldTripDataEntryViewModel.prototype.loadDocument = function()
+	{
+		var self = this,
+			document = this.obDocumentGridViewModel();
+		if (document !== null && document !== undefined && document.obGridViewModel()
+			&& document.obGridViewModel().searchGrid.kendoGrid.wrapper.data("kendoReorderable"))
+		{
+			document.dispose();
+		}
+		var filteredIds = [], documentRecources = [];
+		if (this.obMode() === "Edit")
+		{
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
+				.then(function(data)
+				{
+					var resources = self.obEntityDataModel().fieldTripDocuments();
+					var classificationDataModels = data.Items;
+					if (resources)
+					{
+						resources.forEach(function(item)
+						{
+							var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
+							{
+								return c.Id === item.DocumentEntity.DocumentClassificationId;
+							}.bind(self)).ToArray()[0];
+
+							var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
+							var documentData = obDocumentData().toData();
+							documentData.DocumentEntity = item.DocumentEntity;
+							documentData.APIIsDirty = item.APIIsDirty;
+							documentData.APIIsNew = item.APIIsNew;
+							documentData.APIToDelete = item.APIToDelete;
+							documentData.DocumentClassification = classificationDataModel.Name;
+							documentData.Description = item.DocumentEntity.Description;
+							documentData.DocumentClassificationId = item.DocumentEntity.DocumentClassificationId;
+							documentData.DocumentRelationshipEntities = item.DocumentRelationshipEntities;
+							documentData.Id = item.DocumentEntity.Id;
+							documentData.Filename = item.DocumentEntity.Filename;
+							documentData.FileContent = item.DocumentEntity.FileContent;
+							documentData.FileSizeKb = item.DocumentEntity.FileSizeKb;
+							documentData.LastUpdated = item.DocumentEntity.LastUpdated;
+							documentData.LastUpdatedName = item.DocumentEntity.LastUpdatedName;
+							documentData.resourceId = this.obDocumentResourceId();
+							this.obDocumentResourceId(item.resourceId + 1);
+							filteredIds.push(item.DocumentEntity.Id);
+							documentRecources.push(documentData);
+						}.bind(self));
+					}
+					self.obDocumentGridDataSource(documentRecources);
+					var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
+					self.obDocumentGridViewModel(documentGrid);
+				});
+		}
+		else
+		{
+			var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, this.obEntityDataModel().id(), "fieldtripEntry");
+			this.obDocumentGridViewModel(documentGrid);
+		}
+	};
+
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
 	{
 		var self = this, fieldtripData;
@@ -442,6 +510,7 @@
 				}
 				this.loadInvoicing();
 				this.loadResources();
+				this.loadDocument();
 
 				this.obEntityDataModel().apiIsDirty(false);
 				//reset the shortCutKeys golbal used
@@ -968,7 +1037,7 @@
 		this.$form.find('.busAides .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.addEvent.bind(this));
 		this.$form.find('.busAides .iconbutton.pencil').off("click").on("click", { gridView: this.obBusAideGridViewModel, modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.busAides .iconbutton.delete').off("click").on("click", { gridView: this.obBusAideGridViewModel, modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.deleteEvent.bind(this));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.getSaveData = function(isTemplate)
 	{
@@ -984,6 +1053,18 @@
 		entity.APIIsNew = entity.Id ? false : true;
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
+		entity.FieldTripDocuments = this.obDocumentGridDataSource();
+		if (entity.FieldTripDocuments.length > 0)
+		{
+			entity.FieldTripDocuments.forEach(function(item)
+			{
+				if (item.Id < 0)
+				{
+					item.Id = 0;
+					item.DocumentEntity.Id = 0;
+				}
+			});
+		}
 		if (isTemplate)
 		{
 			entity.APIIsNew = true;
@@ -994,6 +1075,11 @@
 			item.APIIsNew = true;
 		});
 		entity.FieldTripInvoice.map(function(item)
+		{
+			item.APIIsDirty = true;
+			item.APIIsNew = true;
+		});
+		entity.FieldTripDocuments.map(function(item)
 		{
 			item.APIIsDirty = true;
 			item.APIIsNew = true;
@@ -1149,8 +1235,15 @@
 		this.$form.find('.invoice .iconbutton.pencil').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.editInvoiceEvent.bind(this));
 		this.$form.find('.invoice .iconbutton.delete').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.deleteInvoiceEvent.bind(this));
 		this.obInvoicingGridViewModel().obGridViewModel()._viewfromDBClick = this.editInvoiceEvent.bind(this);
-	}
+	};
 
+	FieldTripDataEntryViewModel.prototype.initializeDocument = function()
+	{
+		this.$form.find('.document .iconbutton.new').off("click").on("click", { modal: TF.Modal.DocumentModalViewModel }, this.addDocEvent.bind(this));
+		this.$form.find('.document .iconbutton.pencil').off("click").on("click", { gridView: this.obDocumentGridViewModel, modal: TF.Modal.DocumentModalViewModel }, this.editDocEvent.bind(this));
+		this.$form.find('.document .iconbutton.delete').off("click").on("click", { gridView: this.obDocumentGridViewModel, modal: TF.Modal.DocumentModalViewModel }, this.deleteDocEvent.bind(this));
+		this.obDocumentGridViewModel().obGridViewModel()._viewfromDBClick = this.editDocEvent.bind(this);
+	};
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
 	{
 		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" };
@@ -1244,7 +1337,151 @@
 			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 		}
+	};
+
+	function byteLength(str)
+	{
+		var bytes = str.length;
+		for (var i = str.length - 1; i >= 0; i--)
+		{
+			var code = str.charCodeAt(i);
+			if (code > 0x7f && code <= 0x7ff) bytes++;
+			else if (code > 0x7ff && code <= 0xffff) bytes += 2;
+			if (code >= 0xDC00 && code <= 0xDFFF) i--;
 	}
+		return bytes / 1024;
+	}
+
+	FieldTripDataEntryViewModel.prototype.addDocEvent = function(e)
+	{
+		var self = this;
+		return tf.modalManager.showModal(new e.data.modal({ parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: null }))
+			.then(function(result)
+			{
+				if (result)
+				{
+					result.resourceId = self.obDocumentResourceId();
+					self.obDocumentResourceId(result.resourceId + 1);
+					var obResults = result.data;
+
+					obResults.DocumentEntities.forEach(function(result)
+					{
+						var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel(obResults));
+						var obDocument = obDocumentData().toData();
+						obDocument.DocumentEntity = result;
+						obDocument.Filename = result.Filename;
+						obDocument.FileContent = result.FileContent;
+						obDocument.FileSizeKb = byteLength(result.FileContent);
+						obDocument.Id = self.tempId - 1;
+						self.tempId = self.tempId - 1;
+						self.obDocumentGridDataSource().push(obDocument);
+					});
+					var resourceSort = self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+						resourceSource = new kendo.data.DataSource({
+							data: self.obDocumentGridDataSource(),
+							sort: resourceSort
+						});
+					self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+					self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+				}
+				self.obPendingDocumentIdChange(result.pendingChange);
+			}.bind(self));
+	};
+
+	FieldTripDataEntryViewModel.prototype.editDocEvent = function(e)
+	{
+		var row = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.select(),
+			self = this;
+		if (row.length > 0)
+		{
+			var data = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
+			var option = { parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: data.Id, documentData: data };
+			tf.modalManager.showModal(new TF.Modal.DocumentModalViewModel(option))
+				.then(function(data)
+				{
+					var documentData = data.data;
+					if (documentData)
+					{
+						var source = [];
+						this.obDocumentGridDataSource().forEach(function(item)
+						{
+							if (documentData.Id != 0)
+							{
+								if (item.Id == documentData.Id)
+								{
+									var obresult = ko.observable(new TF.DataModel.DocumentDataModel(documentData));
+									var obDocument = obresult().toData();
+									obDocument.DocumentEntity = documentData;
+									source.push(obDocument);
+									return;
+								}
+							}
+							source.push(item);
+						}.bind(this));
+						var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+							resourceSource = new kendo.data.DataSource({
+								data: source,
+								sort: resourceSort
+							});
+						this.obDocumentGridDataSource(source);
+						this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+						this.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+					}
+				}.bind(this));
+		}
+	};
+
+	FieldTripDataEntryViewModel.prototype.deleteDocEvent = function(e)
+	{
+		var row = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.select(),
+			self = this;
+		if (row.length)
+		{
+			var data = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
+			var source = [], documentSource = [], relationShipSource = [];
+			this.obDocumentGridDataSource().forEach(function(item)
+			{
+				if (item.Id > 0)
+				{
+					if (item.Id == data.Id)
+					{
+						item.DocumentRelationshipEntities.forEach(function(relationShipItem)
+						{
+							if (relationShipItem.AttachedToId == self.obEntityDataModel().id())
+							{
+								return;
+							}
+							relationShipSource.push(relationShipItem);
+						});
+						item.DocumentRelationshipEntities = relationShipSource;
+						documentSource.push(item);
+						return;
+					}
+					documentSource.push(item);
+					source.push(item.DocumentEntity);
+
+				} else
+				{
+					if (item.Id == data.Id)
+					{
+						return;
+					}
+					documentSource.push(item);
+					source.push(item);
+				}
+			}.bind(this));
+
+			var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+				resourceSource = new kendo.data.DataSource({
+					data: source,
+					sort: resourceSort
+				});
+			self.obDocumentGridDataSource(documentSource);
+			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+			self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+		}
+		// this.obPendingDocumentIdChange({ isAssociated: false, ids: selectedIds, isDeleted: true });
+	};
 
 	FieldTripDataEntryViewModel.prototype.getSpecialValidatorFields = function(validatorFields)
 	{

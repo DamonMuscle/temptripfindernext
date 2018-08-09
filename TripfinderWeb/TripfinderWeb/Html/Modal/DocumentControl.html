@@ -1,0 +1,84 @@
+﻿<div class="row" data-bind="visible:$parent.description">
+	<div class="col-xs-24 description">
+		<pre class="titleNotify"><span data-bind="text:$parent.description"></span></pre>
+	</div>
+</div>
+<div class="document-dataentry" data-bind="uiInit:$parent.containerLoaded,finish:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group" style="margin-bottom:0px">
+				<div class="form-group tf-validate">
+					<label class="requirestar">Files</label>
+					<div class="input-group">
+						<input style="width:100%;height:22px;" id="uploadedFileInput" name="fileName" required class="form-control" data-bind="value:obDisplayFileName, disable:(true)" />
+						<label style="width:64px;border:none;position:absolute;top:0px;right:0px;z-index:3;" for="inputFile" title="Upload file" data-bind="visible:(obEntityDataModel().id()==0 )">
+							<input class="sr-only" type="file" id="inputFile" name="file" multiple="multiple" data-bind="event:{change:UploadedFileChangeEvent}" />
+							<span style="height:22px;width:100%;line-height:22px;border:none;margin-top:-1px" class="btn tf-btn-gray">Browse</span>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group">
+				<div class="form-group tf-validate">
+					<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obClassificationDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDocumentClassification}">
+							<input type="text" required name="documentClassification" class="form-control" data-bind="value:currentDocumentClassificationName" />
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+							<button data-bind="click:$parent.generateFunction($parent.addDocumentClassification,'documentclassification',obClassificationDataModels)" type="button" class="btn btn-default btn-sharp">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<label>Description</label>
+				<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="description" data-bind="value:obEntityDataModel().description" />
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label>Associations</label>
+				<div class="input-group">
+					<div class="form-control" style="height: 130px; padding-left:8px;" data-bind="foreach:$parent.obSelectedAssociations()">
+						<div><span data-bind="text:DisplayName"></span> (<span data-bind="text:Type"></span>) </div>
+					</div>
+					<div class="input-group-btn" style="vertical-align: top;">
+						<button type="button" class="btn btn-default btn-sharp" data-bind="click:$parent.selectedAssociations"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<input type="text" style="height: 0; border: 0; padding: 0;" name="upload" class="form-control notinput-required-message" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24" style="padding-right:37px;">
+			<!-- ko foreach: obEntityDataModel().documentEntities -->
+			<div class="document-file">
+				<span data-bind="text:Filename"></span>
+				<button class="delete-file" data-bind="click:$parent.deleteFileClick">×</button>
+				<div class="progress file-progress" data-bind="attr:{filename:Filename},visible:(FileProgress()!='100%')">
+					<div class="progress-bar" role="progressbar" aria-valuenow="60"
+						 aria-valuemin="0" aria-valuemax="100" data-bind="style:{ width: FileProgress}">
+					</div>
+				</div>
+				<!--ko if:UploadFailed-->
+				<span class="upload-failed">failed to upload: document already exists</span>
+				<!--/ko-->
+				<div style="clear:both;"></div>
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

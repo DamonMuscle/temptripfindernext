@@ -521,8 +521,7 @@
 				<div class="view-form-grid resources small" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeResources.bind($parent)}">
 				</div>
 				<!-- /ko -->
-				<div class="iconbutton popout pull-right icon-cursor" style="position: absolute;top: 25px;right: 15px;" title="Resources"
-					 data-bind="click:viewResourceClick"></div>
+				<div class="iconbutton popout pull-right icon-cursor" style="position: absolute;top: 25px;right: 15px;" title="Resources" data-bind="click:viewResourceClick"></div>
 			</div>
 			<div class="col-xs-24">
 				<div>
@@ -731,6 +730,16 @@
 				</div>
 				<!-- /ko -->
 			</div>
+			<div class="col-xs-24">
+			</div>
+		</div>
+		<div class="row form-group gridController">
+			<div class="col-xs-24">
+				<!--ko with:obDocumentGridViewModel-->
+				<div class="view-form-grid document small" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeDocument.bind($parent)}">
+				</div>
+		<!-- /ko -->
+	</div>
 			<div class="col-xs-24">
 			</div>
 		</div>
