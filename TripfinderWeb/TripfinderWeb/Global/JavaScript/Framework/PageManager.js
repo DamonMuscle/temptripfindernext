@@ -211,7 +211,7 @@
 		switch (pageName)
 		{
 			case "fieldtrip":
-				return "Field Trips";
+				return tf.applicationTerm.getApplicationTermPluralByName("Field Trip");
 			default:
 				return null;
 		}

@@ -140,7 +140,8 @@
 	 */
 	SearchControlViewModel.prototype.initElement = function(element)
 	{
-		var self = this;
+		var self = this, searchBoxPlaceHolder = "Search " + tf.applicationTerm.getApplicationTermPluralByName("Trip") + "...";
+
 		self.$element = $(element);
 		self.$searchBtn = self.$element.find(".search-btn");
 		self.$searchHeader = self.$element.find(".search-header");
@@ -154,10 +155,10 @@
 		self.$virtualContainer = self.$searchResult.find(".virtual-container");
 		self.$virtualContent = self.$searchResult.find(".virtual-content");
 
-		self.searchBoxPlaceHolder("Search Trips...");
+		self.searchBoxPlaceHolder(searchBoxPlaceHolder);
 		tf.pageManager.onCurrentDatabaseNameChanged.subscribe(function()
 		{
-			self.searchBoxPlaceHolder("Search Trips...");
+			self.searchBoxPlaceHolder(searchBoxPlaceHolder);
 		});
 
 		if (TF.isPhoneDevice)

@@ -1,4 +1,4 @@
-(function ()
+(function()
 {
 	createNamespace('TF.Control').EditFieldTripStatusViewModel = EditFieldTripStatusViewModel;
 
@@ -6,7 +6,7 @@
 	{
 		var self = this;
 		self.obComments = ko.observable("");
-		self.placehoder = selectedRecords.length > 1 ? "Add comments to all trips..." : "Add comments here...";
+		self.placehoder = selectedRecords.length > 1 ? "Add comments to all " + tf.applicationTerm.getApplicationTermPluralByName("Trip") + "..." : "Add comments here...";
 		self.$form = null;
 		self.selectedRecords = selectedRecords;
 		self.fieldTripIds = selectedRecords.map(function(item) { return item.Id; });
@@ -76,12 +76,12 @@
 			validatorFields.comments = {
 				trigger: "blur change",
 				validators:
-				{
-					notEmpty:
 					{
-						message: "required"
+						notEmpty:
+							{
+								message: "required"
+							}
 					}
-				}
 			};
 		}
 

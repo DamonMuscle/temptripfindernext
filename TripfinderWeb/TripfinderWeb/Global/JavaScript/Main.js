@@ -387,32 +387,32 @@ function toISOStringWithoutTimeZone(m)
 
 function getTitleByType(type)
 {
-	var pageTitile = "", pageType = type.toLowerCase();
+	var pageTitle = "", pageType = type.toLowerCase();
 	switch (pageType)
 	{
 		case "scheduler":
 		case "fieldtrips":
-			pageTitile = "Field Trips";
+			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Field Trip");
 			break;
 		case "fieldtrip":
-			pageTitile = "Field Trip";
+			pageTitle = tf.applicationTerm.getApplicationTermSingularByName("Field Trip");
 			break;
 		case "myrequests":
-			pageTitile = "My Requests";
+			pageTitle = "My Requests";
 			break;
 		case "reports":
-			pageTitile = "Reports";
+			pageTitle = "Reports";
 			break;
 		case "approvals":
-			pageTitile = "My Pending Approvals";
+			pageTitle = "My Pending Approvals";
 			break;
 		case "settings":
-			pageTitile = "Settings";
+			pageTitle = "Settings";
 			break;
 		default:
 			break;
 	}
-	return pageTitile;
+	return pageTitle;
 }
 
 function addStyle(styleId, content)

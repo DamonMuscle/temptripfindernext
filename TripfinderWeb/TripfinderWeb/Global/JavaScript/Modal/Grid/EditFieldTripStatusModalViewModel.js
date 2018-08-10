@@ -4,21 +4,22 @@
 
 	function EditFieldTripStatusModalViewModel(fieldTripRecords, isApprove, name, isCancel)
 	{
-		var self = this, isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
+		var self = this, isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit"),
+			tripSingular = tf.applicationTerm.getApplicationTermSingularByName("Trip"), tripPlural = tf.applicationTerm.getApplicationTermPluralByName("Trip");
 		TF.Modal.BaseModalViewModel.call(self);
 		self.contentTemplate('modal/editfieldtripstatuscontrol');
 		self.buttonTemplate("modal/positivenegativeother");
 
 		if (fieldTripRecords.length > 1)
 		{
-			self.title((isCancel ? "Cancel " : (isAdmin ? "Change Status of " : (isApprove ? "Approve " : "Decline "))) + fieldTripRecords.length + " Trips");
+			self.title((isCancel ? "Cancel " : (isAdmin ? "Change Status of " : (isApprove ? "Approve " : "Decline "))) + fieldTripRecords.length + " " + tripPlural);
 		}
 		else
 		{
-			self.title((isCancel ? "Cancel Trip " : (isAdmin ? "Change Status of Trip " : (isApprove ? "Approve " : "Decline "))) + "[ " + name + " ]");
+			self.title((isCancel ? "Cancel " + tripSingular + " " : (isAdmin ? "Change Status of " + tripSingular + " " : (isApprove ? "Approve " : "Decline "))) + "[ " + name + " ]");
 		}
 
-		self.obPositiveButtonLabel = ko.observable((isCancel ? "Cancel " : (isAdmin ? "Change " : (isApprove ? "Approve " : "Decline "))) + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " Trip" + (fieldTripRecords.length > 1 ? "s" : ""));
+		self.obPositiveButtonLabel = ko.observable((isCancel ? "Cancel " : (isAdmin ? "Change " : (isApprove ? "Approve " : "Decline "))) + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " " + (fieldTripRecords.length > 1 ? tripPlural : tripSingular));
 		self.obNegativeButtonLabel = ko.observable("Cancel");
 
 		if (isCancel)

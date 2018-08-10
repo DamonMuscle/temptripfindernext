@@ -669,11 +669,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-			{
-				extra: true,
-				mode: "menu row",
-				operators: TF.Grid.LightKendoGrid.DefaultOperator
-			},
+				{
+					extra: true,
+					mode: "menu row",
+					operators: TF.Grid.LightKendoGrid.DefaultOperator
+				},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -4113,13 +4113,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
-								{
-									fields: self.geoFields,
-									IdFilter:
 									{
-										IncludeOnly: self.allIds
+										fields: self.geoFields,
+										IdFilter:
+											{
+												IncludeOnly: self.allIds
+											}
 									}
-								}
 							})
 							.then(function(response)
 							{
@@ -4303,6 +4303,7 @@
 					Where(function(x) { return x.FieldName === column.FieldName }).SingleOrDefault();
 			column = $.extend(column, additionColumn);
 			this.updateGridDefinitionWidth(column);
+			this._updateGridDefinitionDisplayNameFromTerm(column);
 		}
 
 		return gridDefinition;
