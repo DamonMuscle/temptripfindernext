@@ -9,19 +9,6 @@
 		</div>
 	</div>
 	<div class="search-control-row">
-		<div class="type-selector" data-bind="click:openTypesMenuClick">
-			<div class="select-type" data-bind="text:obSelectType().text"></div>
-			<div class="dropdown-btn"></div>
-			<div class="dropdown-menu">
-				<ul>
-					<!--ko foreach: obAllTypes-->
-					<!--ko if:permission -->
-					<li data-bind="text:text, click:$parent.selectTypeClick"></li>
-					<!--/ko -->
-					<!--/ko -->
-				</ul>
-			</div>
-		</div>
 		<div class="search-settings-btn item-icon searchSettings" data-bind="click:openSearchSettingsModal"></div>
 	</div>
 	<div class="search-content" data-bind="css: obHasSearchBeenConducted() ? 'result' :''">
@@ -112,10 +99,10 @@
 					</div>
 					<div class="result-count">
 						<!-- ko if: obAllResultsCount() === obSingleResultCount() -->
-						<pre class="titleNotify"><span data-bind="text:obAllResultsCount"></span> unique results returned</pre>
+						<pre class="titleNotify"><span data-bind="text:obAllResultsCount"></span> results returned</pre>
 						<!-- /ko -->
 						<!-- ko if: obAllResultsCount() !== obSingleResultCount() -->
-						<pre class="titleNotify"><span data-bind="text:obSingleResultCount"></span> of <span data-bind="text:obAllResultsCount"></span> unique results returned; <span class="show-all" data-bind="click: showAllClick">Show All</span></pre>
+						<pre class="titleNotify"><span data-bind="text:obSingleResultCount"></span> of <span data-bind="text:obAllResultsCount"></span> results returned; <span class="show-all" data-bind="click: showAllClick">Show All</span></pre>
 						<!-- /ko -->
 					</div>
 					<!-- /ko -->

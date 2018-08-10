@@ -12,33 +12,10 @@
 
 		.left-panel {
 			float: left;
-			padding-top: 40px;
-			margin-right: 20px;
+			padding-top: 10px;
 
 			&>div {
 				height: 90px;
-			}
-
-			.search-result-num-control {
-				#result-num-per-datatype-slider {
-					height: 100%;
-				}
-			}
-
-			.display-image-control {
-				padding-top: 25px;
-
-				&>div {
-					float: left;
-				}
-
-				.control-checkbox {
-					margin-right: 20px;
-				}
-
-				.control-label label {
-					display: block;
-				}
 			}
 
 			.recent-search-num-control {
@@ -50,7 +27,7 @@
 			.settings-button-control {
 				padding-top: 15px;
 				color: @systemColor;
-				height: 60px;
+				height: 40px;
 
 				span.control-button {
 					font-family: "SourceSansPro-SemiBold";
@@ -65,145 +42,6 @@
 
 				span.count-label {
 					float: right;
-				}
-			}
-		}
-
-		.right-panel {
-			float: left;
-
-			.data-type-list-container {
-				line-height: 32px;
-				box-sizing: border-box;
-				border: 1px solid #e4e4e4;
-
-				.list-header {
-					padding-left: 40px;
-					padding-right: 10px;
-					height: 32px;
-					font-family: "SourceSansPro-SemiBold";
-					color: #fff;
-					background-color: #4a4a4a;
-
-					.header-lable.data-type {
-						float: left;
-					}
-
-					.header-lable.enabled {
-						float: right;
-						width: 50px;
-					}
-				}
-
-				.list-content {
-					font-size: 13px;
-					position: relative;
-					overflow: hidden;
-
-					&.onDrag {
-						.list-item:hover {
-							border-color: #fff;
-
-							.item-drag-icon {
-								background: none !important;
-							}
-						}
-					}
-
-					.list-item-helper,
-					.list-item {
-						position: absolute;
-						height: 32px;
-						width: 323px;
-						border-top: 1px solid #fff;
-						border-bottom: 1px solid #fff;
-						background-color: #fff;
-						cursor: pointer;
-
-						&.list-item {
-							transition: top 250ms ease;
-						}
-
-						&.list-item-helper {
-							z-index: 10;
-							box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
-						}
-
-						&.list-item-helper,
-						&:hover {
-							border-color: #e4e4e4;
-
-							.item-drag-icon {
-								background-image: url(../img/Icons/UpDn.svg);
-								background-repeat: no-repeat;
-								background-position: center center;
-								background-size: 8px;
-							}
-						}
-
-						&.down .item-drag-icon {
-							background-image: url(../img/Icons/Dn.svg);
-						}
-
-						&.list-item:first-child {
-							border-top: none;
-							&:hover .item-drag-icon {
-								background-image: url(../img/Icons/Dn.svg);
-							}
-						}
-
-						&.up .item-drag-icon {
-							background-image: url(../img/Icons/Up.svg);
-						}
-
-						&.list-item:last-child {
-							border-bottom: none;
-							&:hover .item-drag-icon {
-								background-image: url(../img/Icons/Up.svg);
-							}
-						}
-
-						&.onDrag {
-							height: 24px !important;
-							width: 315px;
-							border: 1px dashed #ccc !important;
-							margin: 4px;
-
-							.item-drag-icon,
-							.item-name,
-							.control-checkbox {
-								display: none;
-							}
-						}
-
-						.item-drag-icon {
-							float: left;
-							width: 40px;
-							height: 100%;
-						}
-
-						.item-name {
-							float: left;
-						}
-
-						.control-checkbox {
-							float: right;
-							margin-top: 8px;
-							margin-right: 44px;
-							height: 16px;
-							width: 16px;
-
-							.checkmark {
-								height: 16px;
-								width: 16px;
-
-								&:after {
-									top: 1px;
-									left: 5px;
-								}
-							}
-						}
-					}
 				}
 			}
 		}

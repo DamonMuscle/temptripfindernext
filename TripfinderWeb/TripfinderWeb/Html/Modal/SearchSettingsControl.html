@@ -2,30 +2,6 @@
 	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 	<!-- /ko -->
 	<div class="left-panel">
-		<div class="search-result-num-control">
-			<div class="control-title">
-				<span>Results per Data Type in "All Columns"</span>
-				<span class="count-label" data-bind="text:obResultNumPerDataType"></span>
-			</div>
-			<div class="control-slider">
-				<input type="text" data-provider="slider" data-slider-id="result-num-per-datatype-slider" data-slider-min="1" data-slider-max="10"
-				 data-slider-step="1" data-bind="bootstrapSlider:{value:$data.obResultNumPerDataType}">
-				<label>1</label>
-				<label style="float:right;">10</label>
-			</div>
-		</div>
-		<div class="display-image-control">
-			<div class="control-checkbox">
-				<label class="container">
-					<input type="checkbox" data-bind="checked:obShowImageIcon">
-					<span class="checkmark"></span>
-				</label>
-			</div>
-			<div class="control-label">
-				<label>Show Images in Search Results</label>
-				<label>(when available)</label>
-			</div>
-		</div>
 		<div class="recent-search-num-control">
 			<div class="control-title">
 				<span>Recent Searches Shown</span>
@@ -40,15 +16,6 @@
 		</div>
 		<div class="settings-button-control">
 			<span class="control-button clear-recent-searches" data-bind="click:clearUserSearch">Clear Recent Searches</span>
-		</div>
-	</div>
-	<div class="right-panel">
-		<div class="data-type-list-container">
-			<div class="list-header">
-				<div class="header-lable data-type">Column</div>
-				<div class="header-lable enabled">Enabled</div>
-			</div>
-			<div class="list-content"></div>
 		</div>
 	</div>
 </div>
