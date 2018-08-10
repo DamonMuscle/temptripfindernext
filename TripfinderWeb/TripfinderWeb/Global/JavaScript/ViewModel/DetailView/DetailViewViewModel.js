@@ -937,30 +937,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-			{
-				callback: {
-					message: "Name already exists",
-					callback: function(value, validator, $field)
-					{
-						if (!value)
+				{
+					callback: {
+						message: "Name already exists",
+						callback: function(value, validator, $field)
 						{
-							return true;
-						}
-
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-							paramData: {
-								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-								name: value,
-								dataType: self.gridType
+							if (!value)
+							{
+								return true;
 							}
-						}, { overlay: false }).then(function(response)
-						{
-							var isUnique = response.Items[0];
-							return isUnique;
-						});
+
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+								paramData: {
+									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+									name: value,
+									dataType: self.gridType
+								}
+							}, { overlay: false }).then(function(response)
+							{
+								var isUnique = response.Items[0];
+								return isUnique;
+							});
+						}
 					}
 				}
-			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -2528,6 +2528,26 @@
 			return !c.onlyForFilter;
 		}).Select(function(c)
 		{
+			var displayName,
+				updateString = function(str)
+				{
+					$.each(tf.APPLICATIONTERMDEFAULTVALUES, function(index, defaultTerm)
+					{
+						if (tf.applicationTerm[defaultTerm.Term])
+						{
+							str = str.replace(new RegExp('\\b' + defaultTerm.Singular + '\\b', 'ig'), tf.applicationTerm[defaultTerm.Term].Singular);
+							str = str.replace(new RegExp('\\b' + defaultTerm.Plural + '\\b', 'ig'), tf.applicationTerm[defaultTerm.Term].Plural);
+							str = str.replace(new RegExp('\\b' + defaultTerm.Abbreviation + '\\b', 'ig'), tf.applicationTerm[defaultTerm.Term].Abbreviation);
+						}
+					});
+
+					return str;
+				};
+
+			displayName = c.DisplayName || c.FieldName;
+			displayName = updateString(displayName);
+			c.DisplayName = displayName;
+
 			return $.extend({}, c)
 		}).ToArray();
 	};
