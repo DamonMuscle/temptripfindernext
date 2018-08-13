@@ -629,7 +629,7 @@
 			{ type: "day" },
 			{ type: "week" },
 			{ type: "month", selected: true },
-			{ type: CustomAgenda, title: "ListView" }
+			{ type: CustomAgenda, title: "List" }
 		];
 		return schedulerView;
 	};
