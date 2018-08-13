@@ -4,7 +4,7 @@
 
 	function SchedulerPage(gridType)
 	{
-		var self = this;
+		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;;
 		self.detailView = null;
 		self.options = {};
 		self.isGridPage = false;
@@ -23,11 +23,21 @@
 		self.isSchedulerPage = true;
 		self.kendoSchedule = null;
 		self.currentDetailId = -1;
+		self.fieldTripId = [];
+		self.fieldTripRecord = [];
 		self.$element = null;
 		self.$kendoscheduler = null;
 		self.$stageOption = null;
 		self.filterClick = self.filterClick.bind(self);
 		self.refreshClick = self.refreshClick.bind(self);
+
+		isLevel1User = !self.isAdmin && !authInfo.isAuthorizedFor("level4Administrator", "edit") && !authInfo.isAuthorizedFor("level3Administrator", "edit")
+			&& !authInfo.isAuthorizedFor("level2Administrator", "edit") && authInfo.isAuthorizedFor("level1Requestor", "edit");
+		if (!isLevel1User)
+		{
+			self.approveButton = true;
+			self.declineButton = true;
+		}
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;
@@ -340,7 +350,70 @@
 			}
 		});
 	};
+	SchedulerPage.prototype._openBulkMenu = function()
+	{
+		var self = this;
+		self.$kendoscheduler = self.$element.find(".kendoscheduler");
+		self.$kendoscheduler.delegate(".k-event", "mousedown", function(e, parentE)
+		{
+			var element = e;
+			var $element = $(e.target).is(".k-event") ? $(e.target) : ($(e.target).find(".k-event").length > 0 ? $(e.target).find(".k-event") : $(e.target).closest(".k-event")),
+				event = self.kendoSchedule.occurrenceByUid($element.data("kendoUid"));
+			self.fieldTripId = [];
+			self.fieldTripRecord = [];
+			self.fieldTripId.push(event.id);
+			event.Id = event.id;
+			self.fieldTripRecord.push(event);
+			if (parentE)
+			{
+				element = parentE;
+			}
+			if (element.button === 2)
+			{
+				var $virsualTarget = $("<div></div>").css(
+					{
+						position: "absolute",
+						left: element.clientX,
+						top: element.clientY
+					});
+				$("body").append($virsualTarget);
+				self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid/scheduler/bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
+				tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
+				return false;
+			}
+			return true;
+		});
 
+		self.$kendoscheduler.delegate(".k-scheduler-agendaview .k-scheduler-content tr td:last-child", "mousedown", function(e, parentE)
+		{
+			var element = e;
+			var $element = $(e.target).is(".k-task") ? $(e.target) : ($(e.target).find(".k-task").length > 0 ? $(e.target).find(".k-task") : $(e.target).closest(".k-task")),
+				event = self.kendoSchedule.occurrenceByUid($element.data("kendoUid"));
+			self.fieldTripId = [];
+			self.fieldTripRecord = [];
+			self.fieldTripId.push(event.id);
+			event.Id = event.id;
+			self.fieldTripRecord.push(event);
+			if (parentE)
+			{
+				element = parentE;
+			}
+			if (element.button === 2)
+			{
+				var $virsualTarget = $("<div></div>").css(
+					{
+						position: "absolute",
+						left: element.clientX,
+						top: element.clientY
+					});
+				$("body").append($virsualTarget);
+				self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid/scheduler/bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
+				tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
+				return false;
+			}
+			return true;
+		});
+	};
 	SchedulerPage.prototype.initScrollBar = function(date)
 	{
 		var self = this;
@@ -638,6 +711,11 @@
 	{
 		var self = this;
 		ga('send', 'event', 'Area', 'Details');
+		if (self.fieldTripId.length > 0)
+		{
+			idFromScheduler = self.fieldTripId;
+
+		}
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
 		self.detailView.onCloseDetailEvent.subscribe(
 			self.closeDetailClick.bind(self)

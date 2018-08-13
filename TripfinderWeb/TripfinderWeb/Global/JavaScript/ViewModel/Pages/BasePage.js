@@ -9,6 +9,13 @@
 		self.obShowFieldTripDEPanel = ko.observable(false);
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
+
+		self.approveButton = false;
+		self.declineButton = false;
+		self.cancelButton = false;
+
+		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
 	BasePage.prototype.constructor = BasePage;
@@ -103,6 +110,116 @@
 
 	};
 
+	BasePage.prototype.editClick = function(viewModel, e)
+	{
+		var self = this, view, selectedIds;
+		if (viewModel.gridViewModel.isGridPage)
+		{
+			selectedIds = self.searchGrid.getSelectedIds();
+		} else
+		{
+			selectedIds = viewModel.gridViewModel.fieldTripId;
+		}
+
+		if (selectedIds.length === 0)
+		{
+			return;
+		}
+
+		view = {
+			id: selectedIds[0],
+			documentType: "DataEntry",
+			type: "fieldtrip",
+		};
+		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(selectedIds, view);
+		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		self.obShowFieldTripDEPanel(true);
+	};
+
+	BasePage.prototype.editFieldTripStatus = function(viewModel, isApprove)
+	{
+		var self = this, selectedIds, selectedIds;
+
+		if (viewModel.isGridPage)
+		{
+			selectedIds = self.searchGrid.getSelectedIds();
+			selectedRecords = self.searchGrid.getSelectedRecords();
+		} else
+		{
+			selectedIds = viewModel.gridViewModel.fieldTripId;
+			selectedRecords = viewModel.gridViewModel.fieldTripRecord;
+		}
+
+		var showEditModal = function(name)
+		{
+			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, isApprove, name))
+				.then(function(data)
+				{
+					if (data)
+					{
+						if (viewModel.gridViewModel.isGridPage)
+						{
+							self.searchGrid.refreshClick();
+						} else
+						{
+							if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
+							{
+								self.getOriginalDataSource(self.gridType).then(function(data)
+								{
+									data.Items.forEach(function(item)
+									{
+										if (!item.EstimatedReturnDateTime)
+										{
+											var date = new Date(item.DepartDateTime);
+											date.setDate(date.getDate() + 1);
+											var month = date.getMonth() + 1;
+											item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+										}
+									});
+									var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
+									self.kendoSchedule.setDataSource(dataSource);
+								});
+							}
+						}
+						self.pageLevelViewModel.popupSuccessMessage((isApprove ? "Approved " : "Declined ") + (selectedRecords.length > 1 ? selectedRecords.length : "")
+							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
+					}
+				});
+		};
+
+		if (selectedIds.length === 0)
+		{
+			return;
+		}
+
+		if (selectedIds.length === 1)
+		{
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "getEntityNames"), { data: selectedIds })
+				.then(function(response)
+				{
+					showEditModal(response.Items[0]);
+				});
+		}
+		else
+		{
+			showEditModal();
+		}
+	};
+
+
+	BasePage.prototype.approveClick = function(viewModel, e)
+	{
+		var self = this;
+		self.editFieldTripStatus(viewModel, true);
+	};
+
+
+	BasePage.prototype.declineClick = function(viewModel, e)
+	{
+		var self = this;
+		self.editFieldTripStatus(viewModel, false);
+	};
+
 	//TODO right click menu feature
 	BasePage.prototype.copyToClipboardClick = function()
 	{
@@ -117,5 +234,12 @@
 	//TODO right click menu feature
 	BasePage.prototype.openSelectedClick = function()
 	{
+	};
+
+	BasePage.prototype.dispose = function()
+	{
+		var self = this;
+
+		self.pageLevelViewModel.dispose();
 	};
 })();

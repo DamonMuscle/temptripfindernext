@@ -1,0 +1,42 @@
+﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
+	<ul class="tf-contextmenu grid-menu">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<div class="menu-icon edit">
+			</div>
+			<div class="menu-label">
+				Edit Trip
+			</div>
+		</li>
+		<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!-- ko if:gridViewModel.approveButton-->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:'Approve Trip'">
+				<span class="hotkey"></span>
+			</div>
+		</li>
+		<!-- /ko -->
+		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:'Decline Trip'">
+				<span class="hotkey"></span>
+			</div>
+		</li>
+		<!-- /ko -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!-- /ko -->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetailsClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:'Detail View'"></div>
+		</li>
+	</ul>
+</div>

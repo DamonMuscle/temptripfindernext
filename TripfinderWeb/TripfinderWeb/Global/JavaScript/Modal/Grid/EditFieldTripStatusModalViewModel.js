@@ -63,6 +63,10 @@
 			if (result)
 			{
 				self.positiveClose(result);
+				if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
+				{
+					$(".kendoscheduler").getKendoScheduler().refresh();
+				}
 			}
 		});
 	};

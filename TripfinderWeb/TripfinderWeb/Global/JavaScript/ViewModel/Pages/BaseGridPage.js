@@ -22,18 +22,15 @@
 		self.kendoGridScroll = null;
 		self.isGridPage = true;
 
-		self.approveButton = false;
-		self.declineButton = false;
-		self.cancelButton = false;
 		self.obReportLists = ko.observable(false);
 		self.obReports = ko.observable(false);
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
 
+		//scheduler
+		self.$kendoscheduler = null;
 		TF.Page.BasePage.apply(self, arguments);
-		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
-		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -534,72 +531,6 @@
 		{
 			showEditModal();
 		}
-	};
-
-	BaseGridPage.prototype.editFieldTripStatus = function(isApprove)
-	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = self.searchGrid.getSelectedRecords(), showEditModal = function(name)
-		{
-			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, isApprove, name))
-				.then(function(data)
-				{
-					if (data)
-					{
-						self.searchGrid.refreshClick();
-						self.pageLevelViewModel.popupSuccessMessage((isApprove ? "Approved " : "Declined ") + (selectedRecords.length > 1 ? selectedRecords.length : "")
-							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
-					}
-				});
-		};
-
-		if (selectedIds.length === 0)
-		{
-			return;
-		}
-
-		if (selectedIds.length === 1)
-		{
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "getEntityNames"), { data: selectedIds })
-				.then(function(response)
-				{
-					showEditModal(response.Items[0]);
-				});
-		}
-		else
-		{
-			showEditModal();
-		}
-	};
-
-	BaseGridPage.prototype.approveClick = function(viewModel, e)
-	{
-		var self = this;
-		self.editFieldTripStatus(true);
-	};
-
-	BaseGridPage.prototype.declineClick = function(viewModel, e)
-	{
-		var self = this;
-		self.editFieldTripStatus(false);
-	};
-
-	BaseGridPage.prototype.editClick = function(viewModel, e)
-	{
-		var self = this, view,
-			selectedIds = self.searchGrid.getSelectedIds();
-
-		if (selectedIds.length === 0)
-		{
-			return;
-		}
-		view = {
-			id: selectedIds[0],
-			documentType: "DataEntry",
-			type: "fieldtrip",
-		};
-		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(selectedIds, view);
-		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
-		self.obShowFieldTripDEPanel(true);
 	};
 
 	BaseGridPage.prototype.addClick = function(viewModel, e)
