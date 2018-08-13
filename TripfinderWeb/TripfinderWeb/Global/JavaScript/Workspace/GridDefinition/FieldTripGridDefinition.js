@@ -521,7 +521,7 @@
 					{
 						FieldName: "UserName",
 						Width: '150px',
-						DisplayName: "User Name",
+						DisplayName: "Updated User Name",
 						type: "string"
 					}
 				];
