@@ -407,7 +407,7 @@ function getTitleByType(type)
 			pageTitle = "My Pending Approvals";
 			break;
 		case "settings":
-			pageTitle = "Settings";
+			pageTitle = "SETTINGS";
 			break;
 		default:
 			break;
