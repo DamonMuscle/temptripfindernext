@@ -407,7 +407,7 @@
 								{
 									if (tf.authManager.clientKey !== "support")
 									{
-										return self._loadApplicationTerm();
+										return self._loadApplicationTerm().then(function() { tf.loadingIndicator.tryHide(); });
 									}
 
 									tf.loadingIndicator.tryHide();
