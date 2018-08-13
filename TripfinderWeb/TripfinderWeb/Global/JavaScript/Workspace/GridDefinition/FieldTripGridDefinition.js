@@ -291,55 +291,6 @@
 					hidden: true
 				},
 				{
-					FieldName: "MileageRate",
-					DisplayName: "Mileage Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "FixedCost",
-					DisplayName: "Fixed Costs",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "MinimumCost",
-					DisplayName: "Minimum Costs",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "DriverRate",
-					DisplayName: "Driver Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "DriverOtrate",
-					DisplayName: "Driver OT Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "AideRate",
-					DisplayName: "Aide Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "AideOtrate",
-					DisplayName: "Aide OT Rate",
-					Width: '160px',
-					type: "number",
-					hidden: true
-				},
-				{
 					FieldName: "DepartmentName",
 					DisplayName: "Department",
 					Width: '150px',
@@ -792,14 +743,6 @@
 						type: "number",
 						Precision: 2,
 						format: "{0:0}"
-					},
-					{
-						FieldName: "MileageRate",
-						DisplayName: "Mileage Rate",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
 					},
 					{
 						FieldName: "VehFixedCost",
