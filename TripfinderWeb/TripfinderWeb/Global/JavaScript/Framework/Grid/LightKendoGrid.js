@@ -2515,11 +2515,12 @@
 				}];
 			columns = menuColumns.concat(columns);
 		}
+		var bulkMenuColumnName = "bulk_menu";
 		if (this.options.showLockedColumn)
 		{
 			var menuColumns = [
 				{
-					field: "bulk_menu",
+					field: bulkMenuColumnName,
 					title: "<div></div>",
 					width: '30px',
 					sortable: false,
@@ -2533,6 +2534,34 @@
 			}
 			columns = menuColumns.concat(columns);
 		}
+
+		if (TF.isMobileDevice && this.options.supportMobileMultipleSelect)
+		{
+			var first = columns[0] || {};
+			if (first.field !== bulkMenuColumnName)
+			{
+				first = {
+					field: "multiSelectableCheckbox",
+					title: "<div></div>",
+					width: '30px',
+					sortable: false,
+					filterable: false,
+					locked: true
+				};
+				columns.splice(0, 0, first);
+			}
+
+			first.template = "<input type='checkbox' value='#= Id #' class='multi-selectable'/>";
+			this.getSelectedIds.subscribe(function()
+			{
+				var ids = this.getSelectedIds();
+				this.$container.find("input.multi-selectable[type='checkbox']").each(function()
+				{
+					this.checked = ids.indexOf(+this.value) > -1;
+				});
+			}, this);
+		}
+
 		if (this.options.expandColumns)
 		{
 			columns = columns.concat(this.options.expandColumns);
@@ -4147,11 +4176,28 @@
 		{
 			if (TF.isMobileDevice && this.options.supportMobileMultipleSelect)
 			{
-				if (Array.contain(self.getSelectedIds(), dataItem[self.options.Id]))
-					self.getSelectedIds.remove(function(id) { return id === dataItem[self.options.Id]; });
-				else
-					self.getSelectedIds.push(dataItem[self.options.Id]);
-				return;
+				var currentElement = $(e.target);
+				if (currentElement.attr("type") === "checkbox" && currentElement.hasClass("multi-selectable"))
+				{
+					var currentId = dataItem[self.options.Id],
+						checked = currentElement.prop("checked"),
+						existedIndex = self.getSelectedIds.indexOf(currentId);
+					if (checked)
+					{
+						if (existedIndex === -1)
+						{
+							self.getSelectedIds.push(currentId);
+						}
+					}
+					else
+					{
+						if (existedIndex > -1)
+						{
+							self.getSelectedIds.remove(currentId);
+						}
+					}
+					return;
+				}
 			}
 
 			if (this.options.selectable == "row")

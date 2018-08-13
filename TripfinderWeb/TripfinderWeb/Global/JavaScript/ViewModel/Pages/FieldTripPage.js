@@ -40,6 +40,7 @@
 		self.options.extraFields = ["FieldTripStageId"];
 		self.options.storageKey = "grid.currentlayout." + self.type;
 		self.options.loadUserDefined = false;
+		self.options.supportMobileMultipleSelect = true;
 
 		self.options.summaryFilters = [{
 			Id: -1,
