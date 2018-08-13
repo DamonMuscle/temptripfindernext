@@ -2353,7 +2353,7 @@
 	 */
 	DetailViewViewModel.prototype.getGridRelatedData = function(dataType, dataIdentifier, columns)
 	{
-		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide", "fieldtripinvoice"];
+		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide", "fieldtripinvoice", "fieldtriphistory"];
 		if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
 			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), dataType, "ids", dataIdentifier), { data: [self.entitySelectId] }).then(function(result)
@@ -2566,6 +2566,8 @@
 				return tf.fieldTripGridDefinition.getRelatedGridDefinition("driver").Columns;
 			case "fieldtripaide":
 				return tf.fieldTripGridDefinition.getRelatedGridDefinition("aide").Columns;
+			case "fieldtriphistory":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("history").Columns;
 			case "fieldtripinvoice":
 				return tf.FieldTripInvoiceGridDefinition.gridDefinition().Columns;
 			default:

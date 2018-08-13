@@ -704,21 +704,15 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "568.50"
 				}
 			],
-			"History": [
+			"Grid": [
 				{
-					"field": "FieldTripStageName",
-					"title": "Status",
-					"type": "String",
-					"defaultValue": "Requested: " + today + " 12:00 PM by Fonder, Bryan / Level 4 - Request Approved / Comments: Lorem ipsum dolor sit amet"
+					"field": "FieldTripHistoryGrid",
+					"title": "Field Trip History Grid",
+					"type": "grid",
+					"url": "fieldtriphistory",
+					"subUrl": "fieldtrip",
+					"min-height": "3"
 				},
-				{
-					"field": "HistoryContent",
-					"title": "History",
-					"type": "String",
-					"defaultValue": "Requested: " + today + " 12:00 PM by Fonder, Bryan / Level 4 - Request Approved / Comments: Lorem ipsum dolor sit amet"
-				}
-			],
-			"Resources": [
 				{
 					field: "FieldTripResourceGrid",
 					title: "Field Trip Resource Grid",

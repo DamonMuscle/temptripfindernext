@@ -481,6 +481,7 @@
 			],
 			stageFormatter: function(value)
 			{
+				value = parseInt(value);
 				switch (value)
 				{
 					case 1:
@@ -505,6 +506,37 @@
 					default:
 						return '#FFFF00';
 				}
+			},
+			stageNameFormatter: function(value)
+			{
+				value = parseInt(value);
+				switch (value)
+				{
+					case 1:
+						return "Level 1 - Request Submitted";
+					case 2:
+						return "Level 2 - Request Declined";
+					case 4:
+						return "Level 3 - Request Declined";
+					case 6:
+						return "Level 4 - Request Declined";
+					case 98:
+						return "Declined by Transportation";
+					case 99:
+						return "Transportation Approved";
+					case 3:
+						return "Level 2 - Request Approved";
+					case 5:
+						return "Level 3 - Request Approved";
+					case 7:
+						return "Level 4 - Request Approved";
+					case 100:
+						return "Canceled - Request Canceled";
+					case 101:
+						return "Completed - Request Completed";
+					default:
+						return "";
+				}
 			}
 		};
 	};
@@ -514,6 +546,35 @@
 		var obj = {};
 		switch (type)
 		{
+			case "history":
+				obj.Columns = [
+					{
+						FieldName: "FieldTripStage",
+						Width: '150px',
+						DisplayName: "Trip Stage",
+						type: "string",
+						template: "<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStage)#;float:left'></div><span>#: tf.fieldTripGridDefinition.gridDefinition().stageNameFormatter(data.FieldTripStage)#</span>"
+					},
+					{
+						FieldName: "Note",
+						Width: '150px',
+						DisplayName: "Note",
+						type: "string"
+					},
+					{
+						FieldName: "UpdatedDateTime",
+						Width: '150px',
+						DisplayName: "Updated Date Time",
+						type: "datetime"
+					},
+					{
+						FieldName: "UserName",
+						Width: '150px',
+						DisplayName: "User Name",
+						type: "string"
+					}
+				];
+				break;
 			case "resource":
 				obj.Columns = [
 					{

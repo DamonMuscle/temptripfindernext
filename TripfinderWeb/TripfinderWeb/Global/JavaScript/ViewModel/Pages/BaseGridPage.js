@@ -65,6 +65,7 @@
 				var current = self.searchGrid.getSelectedIds();
 				if (!current[0])
 				{
+					self.obIsSelectRow(false);
 					return;
 				}
 
