@@ -63,7 +63,7 @@
 		</li>
 
 		<!--ko foreach:searchGrid.obFieldTripStageFilters -->
-		<li class="menu-item" data-bind="contextMenuClick: $parent.searchGrid.gridFieldTripFilterClick.bind($parent.searchGrid),css: {'menu-item-checked': $.inArray($data, $parent.searchGrid.selectedFieldTripStageFilters())>=0}">
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick: $parent.searchGrid.gridFieldTripFilterClick.bind($parent.searchGrid),css: {'menu-item-checked': $.inArray($data, $parent.searchGrid.selectedFieldTripStageFilters())>=0}">
 			<div class="menu-icon">
 			</div>
 			<div class="field-trip-color" data-bind="style: { backgroundColor: tf.fieldTripGridDefinition.gridDefinition().stageFormatter($data)}"></div>

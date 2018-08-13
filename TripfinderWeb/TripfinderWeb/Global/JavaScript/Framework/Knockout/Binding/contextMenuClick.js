@@ -11,7 +11,10 @@
 				{
 					valueAccessor().call(this, viewModel, e);
 
-					tf.contextMenuManager.dispose();
+					if (!$element.hasClass("disable-auto-close"))
+					{
+						tf.contextMenuManager.dispose();
+					}
 				}
 			});
 
