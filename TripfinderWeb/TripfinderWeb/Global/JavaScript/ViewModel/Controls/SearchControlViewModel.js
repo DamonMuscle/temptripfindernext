@@ -1163,7 +1163,7 @@
 	SearchControlViewModel.prototype.getTypeEntities = function(entities, type, count)
 	{
 		var self = this, result = [],
-			columnResult = { type: "all", title: "ALL", color: "#70A130", whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
+			columnResult = { type: "all", title: "Field Trips", color: "#70A130", whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
 		for (var i = 0; i < entities.SimpleEntities.length; i++)
 		{
 			columnResult.cards.push({
@@ -1180,43 +1180,6 @@
 		if (columnResult.cards.length > 0)
 		{
 			result.push(columnResult);
-		}
-		return result;
-	}
-
-	SearchControlViewModel.prototype.getTypeEntitiesTEST = function(entities, type, count)
-	{
-		var self = this, result = [], columnResult, n = self.allTypes.length - 1;
-
-		for (; n >= 1; n--)
-		{
-			var key = self.allTypes[n].value;
-			columnResult = { type: key, title: self.cardStyle[key].title, color: self.cardStyle[key].color, whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
-
-			for (var i = 0; i < entities.SimpleEntities.length; i++)
-			{
-				var resultText = (key == "billclassification") ? entities.SimpleEntities[i].ColumnsMapping["billingclassification"] : entities.SimpleEntities[i].ColumnsMapping[key];
-				if (resultText && (type === "all" || type === key))
-				{
-					if (columnResult.cards.length < count)
-					{
-						columnResult.cards.push({
-							Id: entities.SimpleEntities[i].Id,
-							title: entities.SimpleEntities[i].Title,
-							subtitle: resultText,
-							type: key,
-							whereQuery: entities.WhereQuery,
-							imageSrc: undefined
-						});
-					}
-					columnResult.count++;
-					columnResult.ids.push(entities.SimpleEntities[i].Id);
-				}
-			}
-			if (columnResult.cards.length > 0)
-			{
-				result.push(columnResult);
-			}
 		}
 		return result;
 	}
