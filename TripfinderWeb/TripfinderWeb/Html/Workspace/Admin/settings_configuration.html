@@ -61,7 +61,10 @@
 			</div>
 		</div>
 	</div>
-	<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
+	<div class="edit-footer">
+		<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
+		<span class="version" data-bind="text:tf.pageManager.obVersion"></span>
+	</div>
 	<div class="edit-bottombar">
 		<button class="btn tf-btn-black" data-bind="click:saveClick">Save</button>
 		<button type="button" class="btn btn-link btn-black" data-bind="click:cancelClick">

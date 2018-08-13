@@ -8,6 +8,7 @@
 		self.obContextMenuVisible = ko.observable(false);
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
+		self.obVersion = ko.observable("Version 1.0.9999"); // DO NOT CHANGE THIS NUMBER
 		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
 		self.loadDataSourceName();
 		self.initContextMenuEvent();
