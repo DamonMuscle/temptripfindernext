@@ -509,11 +509,12 @@
 		{
 			tf.showSelectDataSourceModel(tf.pageManager.currentDatabaseName());
 			self.closeOpenedNavigationItemMenu(false);
+
+			if (TF.isPhoneDevice)
+			{
+				self.closeNavigation();
+			}
 			return;
-		}
-		if (TF.isPhoneDevice)
-		{
-			self.closeNavigation();
 		}
 		if ($pageList.length === 0)
 		{
@@ -523,6 +524,10 @@
 				tf.pageManager.openNewPage(type);
 			}
 
+			if (TF.isPhoneDevice)
+			{
+				self.closeNavigation();
+			}
 		} else if (alreadyOpened)
 		{
 			self.togglePageMenuDisplay($item, false, self.defaultOpenMenuAnimationDuration);
@@ -720,6 +725,11 @@
 		{
 			tf.showSelectDataSourceModel(tf.pageManager.currentDatabaseName());
 			self.closeOpenedNavigationItemMenu(false);
+
+			if (TF.isPhoneDevice)
+			{
+				self.closeNavigation();
+			}
 			return;
 		}
 
@@ -729,6 +739,10 @@
 			var pList = [self.closeOpenedNavigationItemMenu(false)];
 			Promise.all(pList).then(function()
 			{
+				if (TF.isPhoneDevice)
+				{
+					self.closeNavigation();
+				}
 				tf.pageManager.openNewPage(pageType);
 			});
 		}
@@ -741,6 +755,11 @@
 	 */
 	NavigationMenu.prototype.setActiveStateByPageType = function(type)
 	{
+		if (TF.isPhoneDevice && type === "settingsConfig")
+		{
+			type = "settings";
+		}
+
 		var self = this,
 			pageType = type.replace("Scheduler", ""),
 			$pageItem = $(".item-menu li[pageType='" + pageType + "']"),
