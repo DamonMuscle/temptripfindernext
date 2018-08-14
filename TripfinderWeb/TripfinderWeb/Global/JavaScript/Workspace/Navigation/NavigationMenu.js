@@ -415,7 +415,7 @@
 			$navMenu.css("width", "100%");
 			$navItems.css({ overflow: "hidden", width: "100%" });
 			$(".navigation-container").addClass("mobile");
-			var type = tf.storageManager.get(TF.productName + ".page") || "fieldtrips";
+			var type = tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips";
 			self.setActiveStateByPageType(type);
 			self.obIsExpand(flag);
 		}

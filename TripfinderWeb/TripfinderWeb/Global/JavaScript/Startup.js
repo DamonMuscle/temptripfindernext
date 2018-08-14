@@ -440,7 +440,7 @@
 										}
 										else
 										{
-											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName + ".page") || "fieldtrips", null, true);
+											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
 										}
 									});
 

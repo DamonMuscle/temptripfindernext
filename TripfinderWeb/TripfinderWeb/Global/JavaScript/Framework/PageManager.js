@@ -46,7 +46,7 @@
 		var self = this, permission,
 			pageData, templateName,
 			$content, $leftPage = $("#pageContent .left-page"),
-			storageKey = TF.productName + ".page";
+			storageKey = TF.productName.toLowerCase() + ".page";
 
 		self.resizablePage.clearContent();
 		switch (type)
@@ -245,7 +245,7 @@
 
 	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm)
 	{
-		var self = this, isOpen = pageType === tf.storageManager.get(TF.productName + ".page");
+		var self = this, isOpen = pageType === tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 		if (permission)
 		{
 			var page = {
