@@ -7,9 +7,9 @@
 		var self = this;
 		TF.Modal.BaseModalViewModel.call(self);
 
-		self.sizeCss = "modal-dialog-med";
+		self.sizeCss = "modal-dialog-sm";
 		self.modalClass = "searchSettings-modal";
-		self.modalWidth("702px");
+		self.modalWidth("355px");
 		self.title("Search Settings");
 		self.contentTemplate("Modal/SearchSettingsControl");
 		self.buttonTemplate("modal/positivenegativeother");

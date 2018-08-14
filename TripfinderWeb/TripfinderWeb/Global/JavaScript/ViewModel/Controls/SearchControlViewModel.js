@@ -71,6 +71,7 @@
 			"classification": { title: "Classification", color: "#C36", field: "ClassificationName" },
 			"billclassification": { title: "Billing Classification", color: "#C39", field: "BillingClass" },
 		};
+		self.defaultCardStyle = {}
 		self.obSuggestedResult = ko.observable([]);
 		self.recentSearches = ["Recent Search 1", "Recent Search 2", "Recent Search 3"];
 		self.obRecentSearches = ko.observableArray(self.recentSearches);
@@ -979,7 +980,7 @@
 
 		if (!searchSettings || !searchSettings.hasOwnProperty('ResultPerDataType') || searchSettings.ResultPerDataType == null)
 		{
-			return 3;
+			return 99;
 		}
 
 		return searchSettings.ResultPerDataType;
@@ -1107,22 +1108,7 @@
 				{
 					self.obAllResultsCount(allResultsCount);
 					self.obSingleResultCount(allResultsCount)
-					if (searchResult.length === 1)
-					{
-						self.getSuggestedResultByType(searchResult[0].type, processedText, Number.MAX_SAFE_INTEGER).then(function(result)
-						{
-							Deferred.resolve(createResponseObj(value, type, result ? result : []));
-						});
-					}
-					else
-					{
-						allTypeTexts = self.allTypes.map(function(item) { return item.value; });
-						searchResult = searchResult.sort(function(a, b)
-						{
-							return allTypeTexts.indexOf(a.type) - allTypeTexts.indexOf(b.type);
-						});
-						Deferred.resolve(createResponseObj(value, type, searchResult));
-					}
+					Deferred.resolve(createResponseObj(value, type, searchResult));
 				});
 			});
 		}
@@ -1165,10 +1151,10 @@
 			.then(function(data)
 			{
 				var result = [];
+				self.allResultsCount = data.Items[0].SimpleEntities.length;
 				if (data.Items[0] && data.Items[0].SimpleEntities && data.Items[0].SimpleEntities.length > 0)
 				{
-					self.allResultsCount = data.Items[0].SimpleEntities.length;
-					result = self.getTypeEntities(data.Items[0], type, count);
+					result = self.getTypeEntities(data.Items[0], type, Number.MAX_SAFE_INTEGER);
 				}
 				return result;
 			});
@@ -1176,37 +1162,24 @@
 
 	SearchControlViewModel.prototype.getTypeEntities = function(entities, type, count)
 	{
-		var self = this, result = [], columnResult, n = self.allTypes.length - 1;
-
-		for (; n >= 1; n--)
+		var self = this, result = [],
+			columnResult = { type: "all", title: "Field Trips", color: "#70A130", whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
+		for (var i = 0; i < entities.SimpleEntities.length; i++)
 		{
-			var key = self.allTypes[n].value;
-			columnResult = { type: key, title: self.cardStyle[key].title, color: self.cardStyle[key].color, whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
-
-			for (var i = 0; i < entities.SimpleEntities.length; i++)
-			{
-				var resultText = (key == "billclassification") ? entities.SimpleEntities[i].ColumnsMapping["billingclassification"] : entities.SimpleEntities[i].ColumnsMapping[key];
-				if (resultText && (type === "all" || type === key))
-				{
-					if (columnResult.cards.length < count)
-					{
-						columnResult.cards.push({
-							Id: entities.SimpleEntities[i].Id,
-							title: entities.SimpleEntities[i].Title,
-							subtitle: resultText,
-							type: key,
-							whereQuery: entities.WhereQuery,
-							imageSrc: undefined
-						});
-					}
-					columnResult.count++;
-					columnResult.ids.push(entities.SimpleEntities[i].Id);
-				}
-			}
-			if (columnResult.cards.length > 0)
-			{
-				result.push(columnResult);
-			}
+			columnResult.cards.push({
+				Id: entities.SimpleEntities[i].Id,
+				title: entities.SimpleEntities[i].Title,
+				subtitle: entities.SimpleEntities[i].SubTitle,
+				type: "all",
+				whereQuery: entities.WhereQuery,
+				imageSrc: undefined
+			});
+			columnResult.count++;
+			columnResult.ids.push(entities.SimpleEntities[i].Id);
+		}
+		if (columnResult.cards.length > 0)
+		{
+			result.push(columnResult);
 		}
 		return result;
 	}

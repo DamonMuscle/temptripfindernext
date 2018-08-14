@@ -20,14 +20,10 @@
 		self.userPreferenceKey = "search.configurations";
 		self.availableDataTypes = allDataTypes.filter(function(item) { return item.permission; });
 		self.defaultConfigObject = {
-			ResultPerDataType: 3,
-			ShowImageIcon: true,
 			RecentSearchNumber: 5,
 			DataTypeConfig: self.availableDataTypes
 		};
 
-		self.obResultNumPerDataType = ko.observable();
-		self.obShowImageIcon = ko.observable();
 		self.obRecentSearchNum = ko.observable();
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.onClearRecentSearchEvent = options.onClearRecentSearchEvent;
@@ -60,8 +56,6 @@
 		var self = this, $element = $(element);
 
 		self.$element = $element;
-		self.$listContent = $element.find(".data-type-list-container .list-content");
-
 		self.setConfigurations(false);
 	};
 
@@ -72,28 +66,15 @@
 	SearchSettingsViewModel.prototype.setConfigurations = function(isDefault)
 	{
 		var self = this,
-			resultNumPerDataType = self.defaultConfigObject.ResultPerDataType,
-			showImageIcon = self.defaultConfigObject.ShowImageIcon,
 			recentSearchNum = self.defaultConfigObject.RecentSearchNumber,
-			availableDataTypes = self.defaultConfigObject.DataTypeConfig,
 			savedConfigurations = tf.storageManager.get(self.userPreferenceKey);
 
 		if (!isDefault && savedConfigurations)
 		{
-			resultNumPerDataType = savedConfigurations.ResultPerDataType;
-			showImageIcon = savedConfigurations.ShowImageIcon;
 			recentSearchNum = savedConfigurations.RecentSearchNumber;
-
-			availableDataTypes = self.applySavedDataTypeConfigs(availableDataTypes, savedConfigurations.DataTypeConfig);
 		}
 
-		self.obResultNumPerDataType(resultNumPerDataType);
-		self.obShowImageIcon(showImageIcon);
 		self.obRecentSearchNum(recentSearchNum);
-
-		self.$listContent.find(">div.list-item").draggable("destroy");
-		self.$listContent.empty();
-		self.initDataTypeList(availableDataTypes);
 	};
 
 	/**
@@ -298,20 +279,9 @@
 	{
 		var self = this, $item,
 			configurations = {
-				ResultPerDataType: self.obResultNumPerDataType(),
-				ShowImageIcon: self.obShowImageIcon(),
 				RecentSearchNumber: self.obRecentSearchNum(),
-				DataTypeConfig: []
+				DataTypeConfig: self.availableDataTypes
 			};
-
-		$.each(self.$listContent.find(">div.list-item"), function(index, item)
-		{
-			$item = $(item);
-			configurations.DataTypeConfig.push({
-				name: $item.attr("name"),
-				selected: $item.find("input[type=checkbox]").prop("checked")
-			});
-		});
 
 		return configurations;
 	};
@@ -321,30 +291,12 @@
 	 */
 	SearchSettingsViewModel.prototype.save = function()
 	{
-		var self = this, isValid = false,
-			data = self.exportConfiguration();
+		var self = this, data = self.exportConfiguration();
 
-		$.each(data.DataTypeConfig, function(index, item)
-		{
-			if (item.selected)
-			{
-				isValid = true;
-				return false;
-			}
-		});
+		tf.storageManager.save(self.userPreferenceKey, JSON.stringify(data));
+		self.onSearchSettingsChangedEvent.notify();
 
-		if (isValid)
-		{
-			tf.storageManager.save(self.userPreferenceKey, JSON.stringify(data));
-			self.onSearchSettingsChangedEvent.notify();
-		}
-		else
-		{
-			self.pageLevelViewModel.clearError();
-			self.pageLevelViewModel.popupErrorMessage("Please enable one or more data types.");
-		}
-
-		return isValid;
+		return true;
 	};
 
 	/**
@@ -355,9 +307,7 @@
 	 */
 	SearchSettingsViewModel.prototype.compareTwoConfigurations = function(a, b)
 	{
-		var isEqual = (a.ResultPerDataType === b.ResultPerDataType
-			&& a.ShowImageIcon === b.ShowImageIcon
-			&& a.RecentSearchNumber === b.RecentSearchNumber);
+		var isEqual = (a.RecentSearchNumber === b.RecentSearchNumber);
 
 		if (isEqual)
 		{
@@ -389,6 +339,5 @@
 	{
 		var self = this;
 		self.pageLevelViewModel.dispose();
-		self.$listContent.find(">div.list-item").draggable("destroy");
 	};
 })();
