@@ -669,11 +669,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-				{
-					extra: true,
-					mode: "menu row",
-					operators: TF.Grid.LightKendoGrid.DefaultOperator
-				},
+			{
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -3638,7 +3638,7 @@
 		{
 			self.isRowSelectedWhenInit = false;
 		}
-		this._resetPageInfoSelect();
+
 		if (self.kendoGrid)
 		{
 			var selected = $.map(self.kendoGrid.items(), function(item)
@@ -3664,6 +3664,7 @@
 			idsHash[id] = id;
 		});
 		this.idsHash = idsHash;
+		this._resetPageInfoSelect();
 	};
 
 	LightKendoGrid.prototype._omitIdsChange = function()
@@ -4142,13 +4143,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
+								{
+									fields: self.geoFields,
+									IdFilter:
 									{
-										fields: self.geoFields,
-										IdFilter:
-											{
-												IncludeOnly: self.allIds
-											}
+										IncludeOnly: self.allIds
 									}
+								}
 							})
 							.then(function(response)
 							{
