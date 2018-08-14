@@ -713,6 +713,7 @@
 		ga('send', 'event', 'Area', 'Details');
 		if (self.fieldTripId.length > 0)
 		{
+			self.isDetailPanelShown(true);
 			idFromScheduler = self.fieldTripId;
 		}
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
