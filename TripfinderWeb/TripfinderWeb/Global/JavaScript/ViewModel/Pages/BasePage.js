@@ -157,7 +157,7 @@
 				{
 					if (data)
 					{
-						if (viewModel.gridViewModel.isGridPage)
+						if (viewModel.isGridPage)
 						{
 							self.searchGrid.refreshClick();
 						} else
