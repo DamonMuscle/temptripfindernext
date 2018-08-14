@@ -714,7 +714,6 @@
 		if (self.fieldTripId.length > 0)
 		{
 			idFromScheduler = self.fieldTripId;
-
 		}
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
 		self.detailView.onCloseDetailEvent.subscribe(

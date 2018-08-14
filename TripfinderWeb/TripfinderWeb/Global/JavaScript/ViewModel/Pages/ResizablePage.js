@@ -263,7 +263,7 @@
 	ResizablePage.prototype.resizeGrid = function(left)
 	{
 		var self = this, $grid, lockedHeaderWidth, paddingRight, width, totalWidth = self.$element.outerWidth(),
-			iconRow, wrapRow, iconRowTop, iconRowLeft, $rightGrid;
+			iconRow, wrapRow, iconRowTop, iconRowLeft, $rightGrid, pageHeader, pageTitle, newRequest, newRequestTop, newRequestLeft;
 
 		$grid = self.$leftPage.find(".kendo-grid");
 		$rightGrid = self.$rightPage.find(".kendo-grid");
@@ -283,12 +283,50 @@
 			{
 				iconRow = self.$leftPage.find(".iconrow");
 				wrapRow = self.$leftPage.find(".grid-staterow-wrap");
+				pageHeader = self.$leftPage.find(".desktop-header");
+				pageTitle = self.$leftPage.find(".page-title");
+				newRequest = self.$leftPage.find(".desktop-header .new-request");
+
 				iconRow.css("display", "block");
 				wrapRow.removeClass("pull-left").addClass("pull-right");
 				wrapRow.css("width", "auto");
 				iconRow.css("width", "auto");
 				$(document).off(".iconhover");
 				wrapRow.off(".iconhover");
+				$(document).off(".newRequestHover");
+				pageHeader.off(".newRequestHover");
+
+				pageTitle.css({ "display": "block", "width": "auto" });
+				newRequest.css({ "display": "block", "width": "auto" }).removeClass("pull-left").addClass("pull-right");
+				pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
+
+				if (pageHeader.outerHeight() > 58)
+				{
+					newRequest.hide();
+					pageHeader.on("mousemove.newRequestHover", function()
+					{
+						pageTitle.css({ "display": "none", "width": "100%" });
+						pageHeader.css({ "height": "58px" });
+						newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
+					});
+					$(document).on("mousemove.newRequestHover", function(e)
+					{
+						var pageHeaderTop = pageHeader.offset().top;
+						var pageHeaderLeft = pageHeader.offset().left;
+						if (!(e.pageY > pageHeaderTop && e.pageY < pageHeaderTop + pageHeader.outerHeight()
+							&& e.pageX > pageHeaderLeft && e.pageX < pageHeaderLeft + pageHeader.outerWidth()))
+						{
+							newRequest.css("display", "none");
+							pageTitle.css("display", "block");
+						}
+					});
+				}
+				else
+				{
+					pageTitle.css({ "display": "block", "width": "auto" });
+					newRequest.css({ "display": "block", "width": "auto" });
+				}
+
 				if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
 				{
 					iconRow.css("display", "none");
