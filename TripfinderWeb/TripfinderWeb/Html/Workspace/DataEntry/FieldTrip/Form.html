@@ -62,13 +62,6 @@
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
 								</button>
-								<button data-bind="click:editObjectClick.bind($data,'department', obEntityDataModel().districtDepartmentId()), visible:obIsAdmin, disable: departmentDisable(), css:departmentCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:addObjectClick.bind($data,'department'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
-								</button>
 							</div>
 						</div>
 					</div>
@@ -82,13 +75,6 @@
 							<div class="input-group-btn">
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
-								</button>
-								<button data-bind="click:editObjectClick.bind($data,'activity', obEntityDataModel().fieldTripActivityId()), visible:obIsAdmin, disable: activityDisable(), css:activityCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:addObjectClick.bind($data,'activity'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 							</div>
 						</div>
@@ -125,13 +111,6 @@
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
 								</button>
-								<button data-bind="click:editObjectClick.bind($data,'classification', obEntityDataModel().fieldTripClassificationId()), visible:obIsAdmin, disable: classificationDisable(), css:classificationCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:addObjectClick.bind($data,'classification'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
-								</button>
 							</div>
 						</div>
 					</div>
@@ -145,13 +124,6 @@
 							<div class="input-group-btn">
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
-								</button>
-								<button data-bind="click:editObjectClick.bind($data,'equipment', obEntityDataModel().fieldTripEquipmentId()), visible:obIsAdmin, disable: equipmentDisable(), css:equipmentCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:addObjectClick.bind($data,'equipment'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 							</div>
 						</div>
@@ -365,13 +337,6 @@
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
 								</button>
-								<button data-bind="click:editObjectClick.bind($data,'destination', obEntityDataModel().destination()), visible:obIsAdmin, disable: destinationDisable(), css:destinationCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:addObjectClick.bind($data,'destination'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
-								</button>
 							</div>
 						</div>
 						<!--/ko-->
@@ -384,13 +349,6 @@
 							<div class="input-group-btn">
 								<button type="button" class="btn btn-default">
 									<span class="caret"></span>
-								</button>
-								<button data-bind="click:editObjectClick.bind($data,'destination', obEntityDataModel().destination()), visible:obIsAdmin, disable: destinationDisable(), css:destinationCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:addObjectClick.bind($data,'destination'), visible:obIsAdmin" type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 							</div>
 						</div>
@@ -412,14 +370,6 @@
 								<button type="button" data-bind="enable:!obFieldTripSettings().StrictDest" class="btn btn-default">
 									<span class="caret"></span>
 								</button>
-								<button data-bind="click:generateFunction(EditDataEntryListItem,'mailcity',obMailCityDataModels, 'destinationCity', obEntityDataModel().destinationCity()), visible:obIsAdmin, disable: cityDisable(), css:cityCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:generateFunction(addDataEntryListItem,'mailcity',obMailCityDataModels, 'destinationCity'),enable:!obFieldTripSettings().StrictDest, visible:obIsAdmin"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
-								</button>
 							</div>
 						</div>
 					</div>
@@ -438,14 +388,6 @@
 							<div class="input-group-btn">
 								<button type="button" data-bind="enable:!obFieldTripSettings().StrictDest" class="btn btn-default">
 									<span class="caret"></span>
-								</button>
-								<button data-bind="click:generateFunction(EditDataEntryListItem,'mailzip',obMailZipDataModels, 'destinationZip', obEntityDataModel().destinationZip()), visible:obIsAdmin, disable: zipCodeDisable(), css:zipCodeCss()"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</button>
-								<button data-bind="click:generateFunction(addDataEntryListItem,'mailzip',obMailZipDataModels,'destinationZip'),enable:!obFieldTripSettings().StrictDest,, visible:obIsAdmin"
-								 type="button" class="btn btn-default btn-sharp">
-									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 							</div>
 						</div>

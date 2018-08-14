@@ -731,159 +731,6 @@
 		}
 	}
 
-	FieldTripDataEntryViewModel.prototype.addObjectClick = function(type)
-	{
-		var mvModel,
-			obModelList,
-			obProperty,
-			inputName;
-		switch (type)
-		{
-			case "department":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripdistrictdepartment");
-				obModelList = this.obDepartmentDataModels;
-				obProperty = "districtDepartmentId";
-				inputName = "districtDepartment";
-				break;
-			case "activity":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripactivity");
-				obModelList = this.obActivityDataModels;
-				obProperty = "fieldTripActivityId";
-				inputName = "fieldTripActivity";
-				break;
-			case "classification":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripclassification");
-				obModelList = this.obClassificationDataModels;
-				obProperty = "fieldTripClassificationId";
-				break;
-			case "equipment":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripequipment");
-				obModelList = this.obEquipmentDataModels;
-				obProperty = "fieldTripEquipmentId";
-				break;
-			case "destination":
-				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", undefined, this.obMailCityDataModels());
-				obModelList = this.obDestinationDataModels;
-				obProperty = "destination";
-				inputName = "destination";
-				break;
-			case "billingClassification":
-				mvModel = new TF.Modal.FieldTripBillingClassificationModalViewModel("fieldtripbillingclassification");
-				obModelList = this.obBillingClassificationDataModels;
-				obProperty = "billingClassificationId";
-				break;
-			default:
-				return;
-		}
-		tf.modalManager.showModal(mvModel)
-			.then(function(data)
-			{
-				if (mvModel.newDataList.length > 0)
-				{
-					for (var i in mvModel.newDataList)
-					{
-						obModelList.push(mvModel.newDataList[i]);
-					}
-					this.obEntityDataModel()[obProperty](mvModel.newDataList[i].Id);
-				}
-				if (!data)
-				{
-					return;
-				}
-				obModelList.push(data);
-				this.obEntityDataModel()[obProperty](data.Id);
-				this._fieldsUpdateFromModal(type, data);
-				if (inputName)
-				{
-					this.$form.find('input[name=' + inputName + ']').change();
-				}
-			}.bind(this));
-	}
-
-	FieldTripDataEntryViewModel.prototype.editObjectClick = function(type, id)
-	{
-		if (id == null || id == 0)
-		{//once select None
-			return;
-		}
-		var mvModel,
-			obModelList,
-			obProperty;
-		switch (type)
-		{
-			case "department":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripdistrictdepartment", id);
-				obModelList = this.obDepartmentDataModels;
-				obProperty = "districtDepartmentId";
-				break;
-			case "activity":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripactivity", id);
-				obModelList = this.obActivityDataModels;
-				obProperty = "fieldTripActivityId";
-				break;
-			case "classification":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripclassification", id);
-				obModelList = this.obClassificationDataModels;
-				obProperty = "fieldTripClassificationId";
-				break;
-			case "equipment":
-				mvModel = new TF.Modal.AddTwoFieldsModalViewModel("fieldtripequipment", id);
-				obModelList = this.obEquipmentDataModels;
-				obProperty = "fieldTripEquipmentId";
-				break;
-			case "destination":
-				var items = this.obDestinationDataModels(), destinationId;
-				for (var i = 0; i < items.length; i++)
-				{
-					if (items[i].Name === id)
-					{
-						destinationId = items[i].Id;
-					}
-				}
-
-				mvModel = new TF.Modal.FieldTripDestinationModalViewModel("fieldtripdestination", destinationId, this.obMailCityDataModels());
-				obModelList = this.obDestinationDataModels;
-				obProperty = "destination";
-				break;
-			case "billingClassification":
-				mvModel = new TF.Modal.FieldTripBillingClassificationModalViewModel("fieldtripbillingclassification", id);
-				obModelList = this.obBillingClassificationDataModels;
-				obProperty = "billingClassificationId";
-				break;
-			default:
-				return;
-		}
-		tf.modalManager.showModal(mvModel)
-			.then(function(data)
-			{
-				if (!data)
-				{
-					return;
-				}
-
-				obModelList(
-					obModelList().map(function(item)
-					{
-						if (type === "destination")
-						{
-							if (item.Name == id)
-							{
-								return data;
-							}
-						}
-						else if (item.Id == id)
-						{
-							return data;
-						}
-						return item;
-					})
-				);
-
-				this.obEntityDataModel()[obProperty](type === "destination" ? data.Name : data.Id);
-				this._fieldsUpdateFromModal(type, data);
-			}.bind(this));
-	}
-
 	FieldTripDataEntryViewModel.prototype.addResourceClick = function(type)
 	{
 		tf.modalManager.showModal(new TF.Modal.FieldTripResourceModalViewModel(this.obEntityDataModel().id()))
@@ -1323,29 +1170,29 @@
 			trigger: "blur change",
 			validators: {
 				callback:
-				{
-					message: " must be unique",
-					callback: function(value, validator, $field)
 					{
-						if (value == "" || this.obEntityDataModel().id())
+						message: " must be unique",
+						callback: function(value, validator, $field)
 						{
-							return true;
-						}
-
-						//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
-							paramData: {
-								name: this.obEntityDataModel().name()
-							}
-						}, {
-								overlay: false
-							})
-							.then(function(apiResponse)
+							if (value == "" || this.obEntityDataModel().id())
 							{
-								return apiResponse.Items[0] == false;
-							})
-					}.bind(this)
-				}
+								return true;
+							}
+
+							//There is another trip in the database with the same name as this trip.Please change this trip's name before saving it.
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "uniquenamecheck"), {
+								paramData: {
+									name: this.obEntityDataModel().name()
+								}
+							}, {
+									overlay: false
+								})
+								.then(function(apiResponse)
+								{
+									return apiResponse.Items[0] == false;
+								})
+						}.bind(this)
+					}
 			}
 		};
 
