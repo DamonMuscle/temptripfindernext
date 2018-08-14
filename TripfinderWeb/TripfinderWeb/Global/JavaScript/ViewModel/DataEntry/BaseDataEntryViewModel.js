@@ -622,8 +622,16 @@
 		{
 			if (e)
 			{
-				tf.pageManager.resizablePage.refreshLeftGrid();
-				this.obMode('Edit');
+				if (TF.isMobileDevice)
+				{
+					tf.pageManager.resizablePage.clearLeftOtherContent();
+					tf.pageManager.resizablePage.refreshLeftGrid();
+				}
+				else
+				{
+					tf.pageManager.resizablePage.refreshLeftGrid();
+					this.obMode('Edit');
+				}
 			}
 		}.bind(this));
 	};
