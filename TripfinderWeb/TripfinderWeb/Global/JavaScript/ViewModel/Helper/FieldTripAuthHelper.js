@@ -19,7 +19,7 @@
             "isQuickSearch": false,
             "fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
         },
-        idName = "id",
+        idName = "Id",
         mySubmittedIds,
         getMySubmittedIds = function()
         {
@@ -41,7 +41,7 @@
         {
             if (!item) return false;
             var ids = getMySubmittedIds();
-            return ids.indexOf(item[idName]);
+            return ids.indexOf(item[idName]) > -1;
         };
 
     // action can be "read", "edit", "add"
