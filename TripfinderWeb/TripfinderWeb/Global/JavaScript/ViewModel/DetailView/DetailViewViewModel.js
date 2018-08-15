@@ -937,30 +937,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-				{
-					callback: {
-						message: "Name already exists",
-						callback: function(value, validator, $field)
+			{
+				callback: {
+					message: "Name already exists",
+					callback: function(value, validator, $field)
+					{
+						if (!value)
 						{
-							if (!value)
-							{
-								return true;
-							}
-
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-								paramData: {
-									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-									name: value,
-									dataType: self.gridType
-								}
-							}, { overlay: false }).then(function(response)
-							{
-								var isUnique = response.Items[0];
-								return isUnique;
-							});
+							return true;
 						}
+
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+							paramData: {
+								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+								name: value,
+								dataType: self.gridType
+							}
+						}, { overlay: false }).then(function(response)
+						{
+							var isUnique = response.Items[0];
+							return isUnique;
+						});
 					}
 				}
+			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -3967,7 +3967,7 @@
 					data.Id = 0;
 					data.APIIsNew = true;
 				}
-				tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
 					data: data
 				}).then(function(apiResponse)
 				{
