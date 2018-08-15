@@ -323,7 +323,8 @@
 			.then(function(apiResponse)
 			{
 				apiResponse.Items = [defaultGridLayoutExtendedEntity].concat(apiResponse.Items);
-				var gridLayoutExtendedDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items.slice(1));
+				var validLayoutDataModels = self._filterLayoutsByDefaultColumns(apiResponse.Items.slice(1));
+				var gridLayoutExtendedDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, validLayoutDataModels);
 				this.obGridLayoutExtendedDataModels(gridLayoutExtendedDataModels);
 				this._sortGridLayoutExtendedDataModels();
 				var selectGridLayoutExtendedEntity = null, currentGridLayoutExtendedEntity = null;
@@ -1058,6 +1059,33 @@
 			return left.name().toLowerCase() == right.name().toLowerCase() ? 0 : (left.name().toLowerCase() < right.name().toLowerCase() ? -1 : 1);
 		});
 	};
+	//Return all the layouts that  columns in default colums
+	KendoGridLayoutMenu.prototype._filterLayoutsByDefaultColumns = function(gridLayouts)
+	{
+		var self = this, defaultColumns = self.getDefinitionLayoutColumns().map(function(item) { return item.FieldName }), validGridLayouts = [];
+		gridLayouts.forEach(function(layout)
+		{
+			if (self._validColumns(layout, defaultColumns))
+			{
+				validGridLayouts.push(layout);
+			}
+		})
+		return validGridLayouts;
+	}
+
+	KendoGridLayoutMenu.prototype._validColumns = function(gridLayout, defaultColumns)
+	{
+		var self = this, isValid = false, columns = gridLayout.LayoutColumns;
+		for (i = 0; i < columns.length; i++)
+		{
+			if (defaultColumns.includes(columns[i].FieldName))
+			{
+				isValid = true;
+				break;
+			}
+		}
+		return isValid;
+	}
 	KendoGridLayoutMenu.prototype._gridLayoutExtendedDataModelsChange = function()
 	{
 		var self = this;
