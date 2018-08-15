@@ -138,7 +138,7 @@
 
 	BasePage.prototype.editFieldTripStatus = function(viewModel, isApprove)
 	{
-		var self = this, selectedIds, selectedIds;
+		var self = this, selectedIds, selectedRecords;
 
 		if (viewModel.isGridPage)
 		{
@@ -146,8 +146,16 @@
 			selectedRecords = self.searchGrid.getSelectedRecords();
 		} else
 		{
-			selectedIds = viewModel.gridViewModel.fieldTripId;
-			selectedRecords = viewModel.gridViewModel.fieldTripRecord;
+			if (viewModel.gridViewModel.isGridPage)
+			{
+				selectedIds = self.searchGrid.getSelectedIds();
+				selectedRecords = self.searchGrid.getSelectedRecords();
+			} else
+			{
+				selectedIds = viewModel.gridViewModel.fieldTripId;
+				selectedRecords = viewModel.gridViewModel.fieldTripRecord;
+			}
+
 		}
 
 		var showEditModal = function(name)
