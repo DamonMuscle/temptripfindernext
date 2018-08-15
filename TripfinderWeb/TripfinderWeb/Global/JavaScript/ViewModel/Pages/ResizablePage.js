@@ -296,35 +296,37 @@
 				$(document).off(".newRequestHover");
 				pageHeader.off(".newRequestHover");
 
-				pageTitle.css({ "display": "block", "width": "auto" });
-				newRequest.css({ "display": "block", "width": "auto" }).removeClass("pull-left").addClass("pull-right");
-				pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
-
-				if (pageHeader.outerHeight() > 58)
-				{
-					newRequest.hide();
-					pageHeader.on("mousemove.newRequestHover", function()
-					{
-						pageTitle.css({ "display": "none", "width": "100%" });
-						pageHeader.css({ "height": "58px" });
-						newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
-					});
-					$(document).on("mousemove.newRequestHover", function(e)
-					{
-						var pageHeaderTop = pageHeader.offset().top;
-						var pageHeaderLeft = pageHeader.offset().left;
-						if (!(e.pageY > pageHeaderTop && e.pageY < pageHeaderTop + pageHeader.outerHeight()
-							&& e.pageX > pageHeaderLeft && e.pageX < pageHeaderLeft + pageHeader.outerWidth()))
-						{
-							newRequest.css("display", "none");
-							pageTitle.css("display", "block");
-						}
-					});
-				}
-				else
+				if (!self.obRightData() || self.obRightData().pageType === "detailview")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
-					newRequest.css({ "display": "block", "width": "auto" });
+					newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
+					pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
+					if (pageHeader.outerHeight() > 56)
+					{
+						newRequest.hide();
+						pageHeader.on("mousemove.newRequestHover", function()
+						{
+							pageTitle.css({ "display": "none", "width": "100%" });
+							pageHeader.css({ "height": "56px" });
+							newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
+						});
+						$(document).on("mousemove.newRequestHover", function(e)
+						{
+							var pageHeaderTop = pageHeader.offset().top;
+							var pageHeaderLeft = pageHeader.offset().left;
+							if (!(e.pageY > pageHeaderTop && e.pageY < pageHeaderTop + pageHeader.outerHeight()
+								&& e.pageX > pageHeaderLeft && e.pageX < pageHeaderLeft + pageHeader.outerWidth()))
+							{
+								newRequest.css("display", "none");
+								pageTitle.css("display", "block");
+							}
+						});
+					}
+					else
+					{
+						pageTitle.css({ "display": "block", "width": "auto" });
+						newRequest.css({ "display": "block" });
+					}
 				}
 
 				if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
