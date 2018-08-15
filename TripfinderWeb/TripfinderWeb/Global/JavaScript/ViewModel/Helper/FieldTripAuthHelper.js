@@ -37,7 +37,7 @@
                 });
             return mySubmittedIds;
         },
-        isMySubmitted = function(item)
+        checkIsMySubmitted = function(item)
         {
             if (!item) return false;
             var ids = getMySubmittedIds();
@@ -50,43 +50,51 @@
         if (!item) return false;
         if (tf.authManager.authorizationInfo.isAdmin) return true;
         var stageId = item.FieldTripStageId, stageEnum = TF.FieldTripStageEnum;
-        if (isMySubmitted(item) && stageId !== stageEnum.DeclinedByTransportation
+        var isMySubmitted = checkIsMySubmitted(item) && stageId !== stageEnum.DeclinedByTransportation
             && stageId !== stageEnum.TransportationApproved
             && stageId !== stageEnum.RequestCanceled
-            && stageId !== stageEnum.RequestCompleted)
-        {
-            return true;
-        }
+            && stageId !== stageEnum.RequestCompleted;
 
         var rights = ["add", "edit", "save"],
             securedItems = [];
-        switch (stageId)
+        if (isMySubmitted)
         {
-            case stageEnum.Level1RequestSubmitted:
-                securedItems.push(securedItemDefinition.transportationAdministrator);
-                securedItems.push(securedItemDefinition.level1Requestor);
-                break;
-            case stageEnum.level2ReqeustDeclined:
-            case stageEnum.level2ReqeustApproved:
-                securedItems.push(securedItemDefinition.transportationAdministrator);
-                securedItems.push(securedItemDefinition.level2Administrator);
-                securedItems.push(securedItemDefinition.level3Administrator);
-                break;
-            case stageEnum.level3ReqeustDeclined:
-            case stageEnum.level3ReqeustApproved:
-                securedItems.push(securedItemDefinition.transportationAdministrator);
-                securedItems.push(securedItemDefinition.level3Administrator);
-                securedItems.push(securedItemDefinition.level4Administrator);
-                break;
-            case stageEnum.level4ReqeustDeclined:
-            case stageEnum.level4ReqeustApproved:
-                securedItems.push(securedItemDefinition.transportationAdministrator);
-                securedItems.push(securedItemDefinition.level4Administrator);
-                break;
-            default:
-                securedItems.push(securedItemDefinition.transportationAdministrator);
-                break;
-        };
+            securedItems.push(securedItemDefinition.transportationAdministrator);
+            securedItems.push(securedItemDefinition.level1Requestor);
+            securedItems.push(securedItemDefinition.level2Administrator);
+            securedItems.push(securedItemDefinition.level3Administrator);
+            securedItems.push(securedItemDefinition.level4Administrator);
+        }
+        else
+        {
+            switch (stageId)
+            {
+                case stageEnum.Level1RequestSubmitted:
+                    securedItems.push(securedItemDefinition.transportationAdministrator);
+                    securedItems.push(securedItemDefinition.level1Requestor);
+                    break;
+                case stageEnum.level2ReqeustDeclined:
+                case stageEnum.level2ReqeustApproved:
+                    securedItems.push(securedItemDefinition.transportationAdministrator);
+                    securedItems.push(securedItemDefinition.level2Administrator);
+                    securedItems.push(securedItemDefinition.level3Administrator);
+                    break;
+                case stageEnum.level3ReqeustDeclined:
+                case stageEnum.level3ReqeustApproved:
+                    securedItems.push(securedItemDefinition.transportationAdministrator);
+                    securedItems.push(securedItemDefinition.level3Administrator);
+                    securedItems.push(securedItemDefinition.level4Administrator);
+                    break;
+                case stageEnum.level4ReqeustDeclined:
+                case stageEnum.level4ReqeustApproved:
+                    securedItems.push(securedItemDefinition.transportationAdministrator);
+                    securedItems.push(securedItemDefinition.level4Administrator);
+                    break;
+                default:
+                    securedItems.push(securedItemDefinition.transportationAdministrator);
+                    break;
+            };
+        }
 
         return securedItems.some(function(item)
         {

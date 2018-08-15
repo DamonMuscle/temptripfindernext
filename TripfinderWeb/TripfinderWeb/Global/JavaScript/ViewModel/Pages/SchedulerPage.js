@@ -4,7 +4,8 @@
 
 	function SchedulerPage(gridType)
 	{
-		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;;
+		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;
+		TF.Page.BaseGridPage.apply(self, arguments);
 		self.detailView = null;
 		self.options = {};
 		self.isGridPage = false;
@@ -13,8 +14,6 @@
 		self.gridType = gridType || "fieldtrips";
 		self.pageType = gridType;
 		self.filterData = null;
-
-		TF.Page.BasePage.apply(self, arguments);
 
 		self.schedulerDataSources = [];
 		self.schedulerResources = [];
@@ -350,68 +349,55 @@
 			}
 		});
 	};
+
+	SchedulerPage.prototype.getCurrentFieldTripRecord = function()
+	{
+		return this.fieldTripRecord ? this.fieldTripRecord[0] : null;
+	};
+
+	SchedulerPage.prototype.showMenu = function(e, parentE, selector)
+	{
+		var self = this;
+		var $element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector));
+		var occurrence = self.kendoSchedule.occurrenceByUid($element.data("kendoUid"));
+		self.fieldTripId = [];
+		self.fieldTripRecord = [];
+		self.fieldTripId.push(occurrence.id);
+		occurrence.Id = occurrence.id;
+		self.fieldTripRecord.push(occurrence);
+		self.updateSelectedItemEditable();
+		if (parentE)
+		{
+			event = parentE;
+		}
+		if (event.button === 2)
+		{
+			var $virsualTarget = $("<div></div>").css(
+				{
+					position: "absolute",
+					left: event.clientX,
+					top: event.clientY
+				});
+			$("body").append($virsualTarget);
+			self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid/scheduler/bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
+			tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
+			return false;
+		}
+		return true;
+	};
+
 	SchedulerPage.prototype._openBulkMenu = function()
 	{
 		var self = this;
 		self.$kendoscheduler = self.$element.find(".kendoscheduler");
 		self.$kendoscheduler.delegate(".k-event", "mousedown", function(e, parentE)
 		{
-			var element = e;
-			var $element = $(e.target).is(".k-event") ? $(e.target) : ($(e.target).find(".k-event").length > 0 ? $(e.target).find(".k-event") : $(e.target).closest(".k-event")),
-				event = self.kendoSchedule.occurrenceByUid($element.data("kendoUid"));
-			self.fieldTripId = [];
-			self.fieldTripRecord = [];
-			self.fieldTripId.push(event.id);
-			event.Id = event.id;
-			self.fieldTripRecord.push(event);
-			if (parentE)
-			{
-				element = parentE;
-			}
-			if (element.button === 2)
-			{
-				var $virsualTarget = $("<div></div>").css(
-					{
-						position: "absolute",
-						left: element.clientX,
-						top: element.clientY
-					});
-				$("body").append($virsualTarget);
-				self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid/scheduler/bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
-				tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
-				return false;
-			}
-			return true;
+			return self.showMenu(e, parentE, '.k-event');
 		});
 
 		self.$kendoscheduler.delegate(".k-scheduler-agendaview .k-scheduler-content tr td:last-child", "mousedown", function(e, parentE)
 		{
-			var element = e;
-			var $element = $(e.target).is(".k-task") ? $(e.target) : ($(e.target).find(".k-task").length > 0 ? $(e.target).find(".k-task") : $(e.target).closest(".k-task")),
-				event = self.kendoSchedule.occurrenceByUid($element.data("kendoUid"));
-			self.fieldTripId = [];
-			self.fieldTripRecord = [];
-			self.fieldTripId.push(event.id);
-			event.Id = event.id;
-			self.fieldTripRecord.push(event);
-			if (parentE)
-			{
-				element = parentE;
-			}
-			if (element.button === 2)
-			{
-				var $virsualTarget = $("<div></div>").css(
-					{
-						position: "absolute",
-						left: element.clientX,
-						top: element.clientY
-					});
-				$("body").append($virsualTarget);
-				self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid/scheduler/bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
-				tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
-				return false;
-			}
-			return true;
+			return self.showMenu(e, parentE, '.k-task');
 		});
 	};
 	SchedulerPage.prototype.initScrollBar = function(date)

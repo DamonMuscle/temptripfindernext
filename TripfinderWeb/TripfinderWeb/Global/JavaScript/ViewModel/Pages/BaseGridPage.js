@@ -5,6 +5,7 @@
 	function BaseGridPage()
 	{
 		var self = this;
+		TF.Page.BasePage.apply(self, arguments);
 
 		self.searchGridInited = ko.observable(false);
 		self.isGridPage = true;
@@ -31,7 +32,6 @@
 
 		//scheduler
 		self.$kendoscheduler = null;
-		TF.Page.BasePage.apply(self, arguments);
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -138,6 +138,16 @@
 
 			self.loadReportLists();
 		}
+	};
+
+	BaseGridPage.prototype.updateSelectedItemEditable = function()
+	{
+		this.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditRight(this.getCurrentFieldTripRecord()));
+	};
+
+	BaseGridPage.prototype.getCurrentFieldTripRecord = function()
+	{
+		return this.searchGrid.getSelectedRecords()[0];
 	};
 
 	BaseGridPage.prototype.createGrid = function(option)

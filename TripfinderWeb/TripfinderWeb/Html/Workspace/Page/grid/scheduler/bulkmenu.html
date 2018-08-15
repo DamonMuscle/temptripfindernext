@@ -1,6 +1,6 @@
 ﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
 	<ul class="tf-contextmenu grid-menu">
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
 			<div class="menu-icon edit">
 			</div>
 			<div class="menu-label">
