@@ -143,7 +143,7 @@
 					return new TF.DataModel.DetailScreenLayoutDataModel(item);
 				});
 				self.layoutEntities = entityList;
-				self.obGridCountSummary(entityList.length + " of " + response.TotalRecordCount);
+				self.obGridCountSummary(entityList.length + " of " + entityList.length);
 			}
 		});
 	};
