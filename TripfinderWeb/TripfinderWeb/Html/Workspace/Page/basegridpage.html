@@ -37,7 +37,7 @@
 			<div class="iconbutton approve" title="Approve" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
-			<div class="iconbutton cancel" title="Cancel" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<div class="iconbutton cancel" title="Cancel" data-bind="css:{disabled:!selectedItemEditable()}"></div>
 			<!-- /ko -->
 			<!-- /ko -->
 			<!-- ko if: pageType === "reports"-->

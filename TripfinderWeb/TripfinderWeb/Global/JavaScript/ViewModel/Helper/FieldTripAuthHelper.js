@@ -52,7 +52,6 @@
         var stageId = item.FieldTripStageId, stageEnum = TF.FieldTripStageEnum;
         var isMySubmitted = checkIsMySubmitted(item) && stageId !== stageEnum.DeclinedByTransportation
             && stageId !== stageEnum.TransportationApproved
-            && stageId !== stageEnum.RequestCanceled
             && stageId !== stageEnum.RequestCompleted;
 
         var rights = ["add", "edit", "save"],
