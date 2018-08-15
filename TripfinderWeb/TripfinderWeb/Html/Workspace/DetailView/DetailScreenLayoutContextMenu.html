@@ -5,14 +5,14 @@
 		<li class="menu-item" data-bind="contextMenuClick:newLayoutClick">
 			New
 		</li>
-		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:editLayoutClick, css:{disabled:obSelectLayoutName() === ''}">
+		<li class="menu-item" data-bind="contextMenuClick:editLayoutClick, css:{disabled:obSelectLayoutName() === ''}">
 			Edit
 			<!-- ko if: obSelectLayoutName() !== ""-->
 			(
 			<span data-bind="text:obSelectLayoutName"></span>)
 			<!--/ko -->
 		</li>
-		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:manageLayoutClick">
+		<li class="menu-item" data-bind="contextMenuClick:manageLayoutClick">
 			Manage Layouts
 		</li>
 		<li class="menu-divider">
