@@ -284,7 +284,7 @@
 				iconRow = self.$leftPage.find(".iconrow");
 				wrapRow = self.$leftPage.find(".grid-staterow-wrap");
 				pageHeader = self.$leftPage.find(".desktop-header");
-				pageTitle = self.$leftPage.find(".page-title");
+				pageTitle = self.$leftPage.find(".page-title:not(.detail)");
 				newRequest = self.$leftPage.find(".desktop-header .new-request");
 
 				iconRow.css("display", "block");
