@@ -1163,7 +1163,7 @@
 	SearchControlViewModel.prototype.getTypeEntities = function(entities, type, count)
 	{
 		var self = this, result = [],
-			columnResult = { type: "all", title: "Field Trips", color: "#70A130", whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
+			columnResult = { type: "all", title: tf.applicationTerm.getApplicationTermPluralByName("Field Trip"), color: "#70A130", whereQuery: entities.WhereQuery, cards: [], count: 0, ids: [] };
 		for (var i = 0; i < entities.SimpleEntities.length; i++)
 		{
 			columnResult.cards.push({
