@@ -27,6 +27,7 @@
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
+		self.selectedItemEditable = ko.observable(false);
 
 		//scheduler
 		self.$kendoscheduler = null;
@@ -128,6 +129,11 @@
 				}
 
 				next();
+			});
+
+			self.searchGrid.getSelectedIds.subscribe(function()
+			{
+				self.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditRight(self.searchGrid.getSelectedRecords()[0]));
 			});
 
 			self.loadReportLists();
