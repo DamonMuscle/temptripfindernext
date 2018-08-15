@@ -516,6 +516,11 @@
 		var fltEdit = tf.authManager.isAuthorizedFor("filters", "edit");
 		var fltDelete = tf.authManager.isAuthorizedFor("filters", "delete");
 
+		var docRead = tf.authManager.isAuthorizedFor("documentTab", "read");
+		var docAdd = tf.authManager.isAuthorizedFor("documentTab", "add");
+		var docEdit = tf.authManager.isAuthorizedFor("documentTab", "edit");
+		var docDelete = tf.authManager.isAuthorizedFor("documentTab", "delete");
+
 		var pAdmin = tf.authManager.authorizationInfo.isAdmin;
 
 		if (!tf.permissions)
@@ -526,6 +531,10 @@
 				filtersAdd: fltAdd,
 				filtersEdit: fltEdit,
 				filtersDelete: fltDelete,
+				documentRead: docRead,
+				documentAdd: docAdd,
+				documentEdit: docEdit,
+				documentDelete: docDelete,
 				obIsAdmin: ko.observable(pAdmin),
 				isHost: self.isHost,
 				hasAuthorized: ft
@@ -540,6 +549,12 @@
 			tf.permissions.filtersAdd = fltAdd;
 			tf.permissions.filtersEdit = fltEdit;
 			tf.permissions.filtersDelete = fltDelete;
+
+			tf.permissions.documentRead = docRead;
+			tf.permissions.documentAdd = docAdd;
+			tf.permissions.documentEdit = docEdit;
+			tf.permissions.documentDelete = docDelete;
+
 		}
 	};
 

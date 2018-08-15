@@ -145,6 +145,7 @@
 				this.title("Documents");
 				this.obTooltipAddNew("Add Documents");
 				this.obCanOperation(true);
+				this.obCanAddNew(true);
 				this.obCanEdit(true);
 				this.obCanCopy(false);
 				this.obAddDivider(true);
