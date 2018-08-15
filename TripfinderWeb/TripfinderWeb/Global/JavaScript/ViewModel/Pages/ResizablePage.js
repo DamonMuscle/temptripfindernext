@@ -339,17 +339,21 @@
 						iconRow.css("display", "block");
 						iconRow.css("width", "100%");
 					});
-					$(document).on("mousemove.iconhover", function(e)
+
+					if (!TF.isMobileDevice)
 					{
-						iconRowTop = iconRow.offset().top, iconRowLeft = iconRow.offset().left;
-						if (!(e.pageY > iconRowTop && e.pageY < iconRowTop + iconRow.outerHeight()
-							&& e.pageX > iconRowLeft && e.pageX < iconRowLeft + iconRow.outerWidth()))
+						$(document).on("mousemove.iconhover", function(e)
 						{
-							iconRow.css("display", "none");
-							wrapRow.css("display", "block");
-							wrapRow.css("width", "100%");
-						}
-					});
+							iconRowTop = iconRow.offset().top, iconRowLeft = iconRow.offset().left;
+							if (!(e.pageY > iconRowTop && e.pageY < iconRowTop + iconRow.outerHeight()
+								&& e.pageX > iconRowLeft && e.pageX < iconRowLeft + iconRow.outerWidth()))
+							{
+								iconRow.css("display", "none");
+								wrapRow.css("display", "block");
+								wrapRow.css("width", "100%");
+							}
+						});
+					}
 				}
 				else
 				{

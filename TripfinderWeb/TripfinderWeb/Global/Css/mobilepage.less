@@ -9,10 +9,12 @@ html.k-mobile {
 		min-height: auto;
 	}
 
-	.page-container .main-body .page-container .grid-wrap {
-		width: 100%;
-		float: left;
-		height: calc(~"100% - 146px");
+	@media (max-width: 767px) {
+		.page-container .main-body .page-container .grid-wrap {
+			width: 100%;
+			float: left;
+			height: calc(~"100% - 146px");
+		}
 	}
 
 	.mobile-header {
@@ -55,9 +57,12 @@ html.k-mobile {
 	}
 
 	.page-container {
-		.resizable-page {
-			display: block;
+		@media (max-width: 767px) {
+			.resizable-page {
+				display: block;
+			}
 		}
+
 		.other-page {
 			.main-body {
 				.detail-view-panel {
@@ -67,13 +72,13 @@ html.k-mobile {
 								display: none;
 							}
 						}
+
 						.selector-menu {
 							width: calc(~"100% - 36px");
 						}
 					}
 				}
 			}
-
 		}
 	}
 }
