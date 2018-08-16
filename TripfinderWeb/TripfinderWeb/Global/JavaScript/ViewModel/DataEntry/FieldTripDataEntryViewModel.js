@@ -266,6 +266,7 @@
 	FieldTripDataEntryViewModel.prototype.loadDocument = function()
 	{
 		var self = this,
+			selectedId = self.obEntityDataModel().id(),
 			document = this.obDocumentGridViewModel();
 		if (document !== null && document !== undefined && document.obGridViewModel()
 			&& document.obGridViewModel().searchGrid.kendoGrid.wrapper.data("kendoReorderable"))
@@ -275,51 +276,59 @@
 		var filteredIds = [], documentRecources = [];
 		if (this.obMode() === "Edit")
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
-				.then(function(data)
-				{
-					var resources = self.obEntityDataModel().fieldTripDocuments();
-					var classificationDataModels = data.Items;
-					if (resources)
+			if (TF.FieldTripAuthHelper.checkFieldTripEditRight(selectedId) || tf.permissions.documentRead)
+			{
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
+					.then(function(data)
 					{
-						resources.forEach(function(item)
+						var resources = self.obEntityDataModel().fieldTripDocuments();
+						var classificationDataModels = data.Items;
+						if (resources)
 						{
-							var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
+							resources.forEach(function(item)
 							{
-								return c.Id === item.DocumentEntity.DocumentClassificationId;
-							}.bind(self)).ToArray()[0];
+								var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
+								{
+									return c.Id === item.DocumentEntity.DocumentClassificationId;
+								}.bind(self)).ToArray()[0];
 
-							var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
-							var documentData = obDocumentData().toData();
-							documentData.DocumentEntity = item.DocumentEntity;
-							documentData.APIIsDirty = item.APIIsDirty;
-							documentData.APIIsNew = item.APIIsNew;
-							documentData.APIToDelete = item.APIToDelete;
-							documentData.DocumentClassification = classificationDataModel.Name;
-							documentData.Description = item.DocumentEntity.Description;
-							documentData.DocumentClassificationId = item.DocumentEntity.DocumentClassificationId;
-							documentData.DocumentRelationshipEntities = item.DocumentRelationshipEntities;
-							documentData.Id = item.DocumentEntity.Id;
-							documentData.Filename = item.DocumentEntity.Filename;
-							documentData.FileContent = item.DocumentEntity.FileContent;
-							documentData.FileSizeKb = item.DocumentEntity.FileSizeKb;
-							documentData.LastUpdated = item.DocumentEntity.LastUpdated;
-							documentData.LastUpdatedName = item.DocumentEntity.LastUpdatedName;
-							documentData.resourceId = this.obDocumentResourceId();
-							this.obDocumentResourceId(item.resourceId + 1);
-							filteredIds.push(item.DocumentEntity.Id);
-							documentRecources.push(documentData);
-						}.bind(self));
-					}
-					self.obDocumentGridDataSource(documentRecources);
-					var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
-					self.obDocumentGridViewModel(documentGrid);
-				});
+								var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
+								var documentData = obDocumentData().toData();
+								documentData.DocumentEntity = item.DocumentEntity;
+								documentData.APIIsDirty = item.APIIsDirty;
+								documentData.APIIsNew = item.APIIsNew;
+								documentData.APIToDelete = item.APIToDelete;
+								documentData.DocumentClassification = classificationDataModel.Name;
+								documentData.Description = item.DocumentEntity.Description;
+								documentData.DocumentClassificationId = item.DocumentEntity.DocumentClassificationId;
+								documentData.DocumentRelationshipEntities = item.DocumentRelationshipEntities;
+								documentData.Id = item.DocumentEntity.Id;
+								documentData.Filename = item.DocumentEntity.Filename;
+								documentData.FileContent = item.DocumentEntity.FileContent;
+								documentData.FileSizeKb = item.DocumentEntity.FileSizeKb;
+								documentData.LastUpdated = item.DocumentEntity.LastUpdated;
+								documentData.LastUpdatedName = item.DocumentEntity.LastUpdatedName;
+								documentData.resourceId = this.obDocumentResourceId();
+								this.obDocumentResourceId(item.resourceId + 1);
+								filteredIds.push(item.DocumentEntity.Id);
+								documentRecources.push(documentData);
+							}.bind(self));
+						}
+						self.obDocumentGridDataSource(documentRecources);
+						var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
+						self.obDocumentGridViewModel(documentGrid);
+					});
+			}
+
 		}
 		else
 		{
-			var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, this.obEntityDataModel().id(), "fieldtripEntry");
-			this.obDocumentGridViewModel(documentGrid);
+			if (tf.permissions.documentRead && tf.permissions.documentAdd)
+			{
+				var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, this.obEntityDataModel().id(), "fieldtripEntry");
+				this.obDocumentGridViewModel(documentGrid);
+			}
+
 		}
 	};
 
@@ -920,11 +929,31 @@
 
 	FieldTripDataEntryViewModel.prototype.initializeDocument = function()
 	{
+		var selectId = this.obEntityDataModel().id();
+
+		if (selectId === 0 || !TF.FieldTripAuthHelper.checkFieldTripEditRight(selectId))
+		{
+			if (!tf.permissions.documentAdd)
+			{
+				this.$form.find('.document .iconbutton.new').hide();
+				this.$form.find('.document .iconrow .divider:first').hide();
+			}
+			if (!tf.permissions.documentEdit)
+			{
+				this.$form.find('.document .iconbutton.pencil').hide();
+			}
+			if (!tf.permissions.documentDelete)
+			{
+				this.$form.find('.document .iconbutton.delete').hide();
+			}
+		}
+
 		this.$form.find('.document .iconbutton.new').off("click").on("click", { modal: TF.Modal.DocumentModalViewModel }, this.addDocEvent.bind(this));
 		this.$form.find('.document .iconbutton.pencil').off("click").on("click", { gridView: this.obDocumentGridViewModel, modal: TF.Modal.DocumentModalViewModel }, this.editDocEvent.bind(this));
 		this.$form.find('.document .iconbutton.delete').off("click").on("click", { gridView: this.obDocumentGridViewModel, modal: TF.Modal.DocumentModalViewModel }, this.deleteDocEvent.bind(this));
 		this.obDocumentGridViewModel().obGridViewModel()._viewfromDBClick = this.editDocEvent.bind(this);
 	};
+
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
 	{
 		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" };

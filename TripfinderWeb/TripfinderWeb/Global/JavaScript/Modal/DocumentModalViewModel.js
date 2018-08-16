@@ -22,8 +22,8 @@
 			options.documentData
 		);
 		this.data(this.editDocumentViewModel);
-		this.sizeCss = "modal-dialog-lg";
-		this.description("Browse and select the file you would like to upload, select a Classification, and enter a Description.  Addtionally, you may associate this document with one or more records.");
+		this.sizeCss = "modal-sm";
+		this.description("Browse and select the file you would like to upload, select a Classification, and enter a Description.");
 		this.documentId = this.options.documentId;
 		if (this.documentId && this.documentId > 0)
 		{
