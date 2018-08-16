@@ -296,7 +296,7 @@
 				$(document).off(".newRequestHover");
 				pageHeader.off(".newRequestHover");
 
-				if (!self.obRightData() || self.obRightData().pageType === "detailview")
+				if ((!self.obRightData() || self.obRightData().pageType === "detailview") && self.leftPageType !== "reports")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
 					newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
@@ -327,6 +327,10 @@
 						pageTitle.css({ "display": "block", "width": "auto" });
 						newRequest.css({ "display": "block" });
 					}
+				} else
+				{
+					pageTitle.css({ "display": "block", "width": "auto" });
+					newRequest.css({ "display": "none" });
 				}
 
 				if (self.$leftPage.find(".grid-icons").outerHeight() > 28)
