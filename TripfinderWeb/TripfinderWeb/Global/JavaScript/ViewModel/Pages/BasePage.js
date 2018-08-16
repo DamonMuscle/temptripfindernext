@@ -170,24 +170,31 @@
 							self.searchGrid.refreshClick();
 						} else
 						{
-							if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
+							if (viewModel.gridViewModel.isGridPage)
 							{
-								self.getOriginalDataSource(self.gridType).then(function(data)
+								self.searchGrid.refreshClick();
+							} else
+							{
+								if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
 								{
-									data.Items.forEach(function(item)
+									self.getOriginalDataSource(self.gridType).then(function(data)
 									{
-										if (!item.EstimatedReturnDateTime)
+										data.Items.forEach(function(item)
 										{
-											var date = new Date(item.DepartDateTime);
-											date.setDate(date.getDate() + 1);
-											var month = date.getMonth() + 1;
-											item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
-										}
+											if (!item.EstimatedReturnDateTime)
+											{
+												var date = new Date(item.DepartDateTime);
+												date.setDate(date.getDate() + 1);
+												var month = date.getMonth() + 1;
+												item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+											}
+										});
+										var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
+										self.kendoSchedule.setDataSource(dataSource);
 									});
-									var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
-									self.kendoSchedule.setDataSource(dataSource);
-								});
+								}
 							}
+
 						}
 						self.pageLevelViewModel.popupSuccessMessage((isApprove ? "Approved " : "Declined ") + (selectedRecords.length > 1 ? selectedRecords.length : "")
 							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
