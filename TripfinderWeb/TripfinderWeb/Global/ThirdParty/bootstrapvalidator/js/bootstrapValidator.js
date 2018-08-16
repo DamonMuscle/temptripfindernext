@@ -344,6 +344,7 @@
 							.attr('data-bv-for', field)
 							.attr('data-bv-result', this.STATUS_NOT_VALIDATED)
 							.html(this._getMessage(field, validatorName))
+							.attr("title", this._getMessage(field, validatorName))
 							.appendTo($message);
 					}
 
@@ -1039,6 +1040,7 @@
 			$fields.each(function()
 			{
 				$(this).data('bv.messages').find('.help-block[data-bv-validator="' + validator + '"][data-bv-for="' + field + '"]').html(message);
+				$(this).data('bv.messages').find('.help-block[data-bv-validator="' + validator + '"][data-bv-for="' + field + '"]').attr("title", message);
 			});
 		},
 
