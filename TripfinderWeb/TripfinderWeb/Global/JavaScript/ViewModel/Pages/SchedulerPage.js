@@ -238,12 +238,12 @@
 		{
 			data.Items.forEach(function(item)
 			{
-				if (!item.EstimatedReturnDateTime)
+				if (!item.ReturnTime)
 				{
 					var date = new Date(item.DepartDateTime);
 					date.setDate(date.getDate() + 1);
 					var month = date.getMonth() + 1;
-					item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+					item.ReturnTime = date.getFullYear() + '-' + month + '-' + date.getDate();
 				}
 			});
 
@@ -520,12 +520,12 @@
 		{
 			data.Items.forEach(function(item)
 			{
-				if (!item.EstimatedReturnDateTime)
+				if (!item.ReturnTime)
 				{
 					var date = new Date(item.DepartDateTime);
 					date.setDate(date.getDate() + 1);
 					var month = date.getMonth() + 1;
-					item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+					item.ReturnTime = date.getFullYear() + '-' + month + '-' + date.getDate();
 				}
 			});
 
@@ -627,7 +627,7 @@
 				"StageId": item['FieldTripStageId'],
 				"Title": item['Name'],
 				"Start": item['DepartDateTime'],
-				"End": item['EstimatedReturnDateTime'],
+				"End": item['ReturnTime'],
 				"Descirption": "Test Desciption"
 			});
 		});
