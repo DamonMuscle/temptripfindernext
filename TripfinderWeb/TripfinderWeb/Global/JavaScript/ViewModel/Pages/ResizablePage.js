@@ -188,12 +188,17 @@
 				},
 				stop: function(e, ui)
 				{
+					var currentLeft = ui.position.left;
 					$(e.currentTarget).find(".sliderbar-button").removeClass("slider-tapped");
 
 					if (!hasDragMoved)
 					{
 						self.$dragHandler.css("left", self.minLeftWidth + "px");
 						self.resize(self.minLeftWidth);
+					}
+					else
+					{
+						self.resize(currentLeft);
 					}
 					self.savePageRate();
 				},
@@ -239,16 +244,15 @@
 		var self = this, totalWidth = self.$element.outerWidth();
 
 		self.$leftPage.width(left);
+		self.$rightPage.width(totalWidth - left);
 		if (!self.obShowGrid())
 		{
 			self.$otherPage.width(left);
 		}
 		else
 		{
-			if (self.leftPageType.indexOf("Scheduler") === -1)
-			{
-				self.resizeGrid(left);
-			} else
+			self.resizeGrid(left);
+			if (self.leftPageType.indexOf("Scheduler") >= 0)
 			{
 				//It seems like a bug of kendo scheduler, refresh once only the layout of scheduler is correct,
 				//the events in it will be messed up, refresh again will solve this issue.
@@ -256,7 +260,6 @@
 				$(".kendoscheduler").getKendoScheduler().refresh();
 			}
 		}
-		self.$rightPage.width(totalWidth - left);
 		self.onSizeChanged.notify();
 	};
 
