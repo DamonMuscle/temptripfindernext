@@ -350,9 +350,9 @@
 		});
 	};
 
-	SchedulerPage.prototype.getCurrentFieldTripRecord = function()
+	SchedulerPage.prototype.getCurrentFieldTripRecords = function()
 	{
-		return this.fieldTripRecord ? this.fieldTripRecord[0] : null;
+		return this.fieldTripRecord || [];
 	};
 
 	SchedulerPage.prototype.showMenu = function(e, parentE, selector)
@@ -365,7 +365,7 @@
 		self.fieldTripId.push(occurrence.id);
 		occurrence.Id = occurrence.id;
 		self.fieldTripRecord.push(occurrence);
-		self.updateSelectedItemEditable();
+		self.updateEditableApprovable();
 		if (parentE)
 		{
 			event = parentE;

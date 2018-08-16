@@ -29,9 +29,7 @@
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
 		self.selectedItemEditable = ko.observable(false);
-
-		//scheduler
-		self.$kendoscheduler = null;
+		self.selectedItemsApprovable = ko.observable(false);
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -133,21 +131,23 @@
 
 			self.searchGrid.getSelectedIds.subscribe(function()
 			{
-				self.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditRight(self.searchGrid.getSelectedRecords()[0]));
+				self.updateEditableApprovable();
 			});
 
 			self.loadReportLists();
 		}
 	};
 
-	BaseGridPage.prototype.updateSelectedItemEditable = function()
+	BaseGridPage.prototype.updateEditableApprovable = function()
 	{
-		this.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditRight(this.getCurrentFieldTripRecord()));
+		var records = this.getCurrentFieldTripRecords();
+		this.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditRight(records[0]));
+		this.selectedItemsApprovable(TF.FieldTripAuthHelper.checkFieldTripsApprovable(records));
 	};
 
-	BaseGridPage.prototype.getCurrentFieldTripRecord = function()
+	BaseGridPage.prototype.getCurrentFieldTripRecords = function()
 	{
-		return this.searchGrid.getSelectedRecords()[0];
+		return this.searchGrid.getSelectedRecords();
 	};
 
 	BaseGridPage.prototype.createGrid = function(option)

@@ -31,10 +31,10 @@
 			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
 			<div class="divider" title=""></div>
 			<!-- ko if:!isAdmin && declineButton-->
-			<div class="iconbutton decline" title="Decline" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<div class="iconbutton decline" title="Decline" data-bind="css:{disabled:!selectedItemsApprovable()}"></div>
 			<!-- /ko -->
 			<!-- ko if:approveButton-->
-			<div class="iconbutton approve" title="Approve" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<div class="iconbutton approve" title="Approve" data-bind="css:{disabled:!selectedItemsApprovable()}"></div>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
 			<div class="iconbutton cancel" title="Cancel" data-bind="css:{disabled:!selectedItemEditable()}"></div>

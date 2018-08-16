@@ -12,7 +12,7 @@
 			<div class="rule"></div>
 		</li>
 		<!-- ko if:gridViewModel.approveButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:'Approve Trip'">
@@ -21,7 +21,7 @@
 		</li>
 		<!-- /ko -->
 		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:'Decline Trip'">
