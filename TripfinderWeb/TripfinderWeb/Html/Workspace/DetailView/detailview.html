@@ -3,8 +3,8 @@
 		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
-			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
-			 placeholder="Name Layout..." maxlength="80" />
+			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit" placeholder="Name Layout..." maxlength="80"
+			/>
 			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
 				<div class="iconbutton settings" data-bind="click:openManageLayouts"></div>
 				<div class="iconbutton font-size-slider" data-bind="click:showSlider"></div>
@@ -63,10 +63,12 @@
 								<div class="select-type" data-bind="text:obSelectName"></div>
 								<div class="icon bottom-caret"></div>
 							</li>
+							<!-- ko if:!TF.isPhoneDevice-->
 							<li class="menu-item" data-bind="click:printClick">
 								<div class="select-type">Print</div>
 								<div class="iconbutton print"></div>
 							</li>
+							<!-- /ko -->
 							<li class="menu-item" data-bind="click:TF.isPhoneDevice?closeDetailClick:newWindowClick">
 								<div class="select-type" data-bind="text:TF.isPhoneDevice?'Close this Page':'Open in New Window'"></div>
 								<div class="iconbutton" data-bind="css:TF.isPhoneDevice?'close-detail':'new-window'"></div>
@@ -91,8 +93,7 @@
 		<div class="slider-container" data-bind="css:{hide: !obShowSlider()}">
 			<div class="caret"></div>
 			<label class="minus"></label>
-			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25"
-			 data-bind="bootstrapSlider:{value:obSliderFontRate}">
+			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25" data-bind="bootstrapSlider:{value:obSliderFontRate}">
 			<label class="plus"></label>
 		</div>
 	</div>
