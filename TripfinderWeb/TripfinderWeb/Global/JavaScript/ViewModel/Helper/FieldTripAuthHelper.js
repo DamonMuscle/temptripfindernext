@@ -98,6 +98,6 @@
 
 	self.checkFieldTripsApprovable = function(items)
 	{
-		return items.every(self.checkFieldTripApprovable);
+		return items && items.length && items.every(self.checkFieldTripApprovable);
 	};
 })();
