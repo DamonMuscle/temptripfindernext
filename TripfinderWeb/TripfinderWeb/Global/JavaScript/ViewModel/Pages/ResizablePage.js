@@ -304,7 +304,10 @@
 					pageTitle.css({ "display": "block", "width": "auto" });
 					newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
 					pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
-					self.obRightData().updateDetailViewPanelHeader();
+					if (self.obRightData())
+					{
+						self.obRightData().updateDetailViewPanelHeader();
+					}
 					if (pageHeader.outerHeight() > 56)
 					{
 						newRequest.hide();
