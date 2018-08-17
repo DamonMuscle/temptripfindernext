@@ -701,7 +701,10 @@
 
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
-		var resSearchGrid = this.obResourcesGridViewModel().obGridViewModel().searchGrid;
+		var obGridViewModel = this.obResourcesGridViewModel().obGridViewModel();
+		if (!obGridViewModel) return;
+
+		var resSearchGrid = obGridViewModel.searchGrid;
 		resKendoGrid = resSearchGrid.kendoGrid;
 		if (!resKendoGrid) return;
 
