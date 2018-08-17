@@ -239,6 +239,10 @@
 		var self = this;
 		self.getOriginalDataSource(self.gridType).then(function(data)
 		{
+			data.Items = data.Items.filter(function(item)
+			{
+				return item.DepartDateTime != null;
+			});
 			data.Items.forEach(function(item)
 			{
 				if (!item.ReturnTime)
@@ -580,6 +584,10 @@
 
 		self.getOriginalDataSource(self.gridType).then(function(data)
 		{
+			data.Items = data.Items.filter(function(item)
+			{
+				return item.DepartDateTime != null;
+			});
 			data.Items.forEach(function(item)
 			{
 				if (!item.ReturnTime)
