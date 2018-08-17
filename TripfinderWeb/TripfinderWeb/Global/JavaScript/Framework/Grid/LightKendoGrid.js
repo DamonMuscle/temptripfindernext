@@ -4411,11 +4411,15 @@
 				self.fitContainer();
 			}, 50);
 		};
-		$(window).off("resize.lightKendoGrid").on("resize.lightKendoGrid", self._onWindowResize);
+		$(window).on("resize", self._onWindowResize);
 	};
 
 	LightKendoGrid.prototype.fitContainer = function()
 	{
+		if (!this.kendoGrid)
+		{
+			return;
+		}
 		var self = this, height = self.getGridFullHeight(), pagerHeight = 0,
 			filterRow = self.$container.find(".k-grid-header").find(".k-filter-row");
 

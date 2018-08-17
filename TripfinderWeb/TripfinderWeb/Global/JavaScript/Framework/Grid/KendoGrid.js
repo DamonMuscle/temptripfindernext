@@ -1671,7 +1671,7 @@
 
 	KendoGrid.prototype.dispose = function()
 	{
-		$(window).off("resize.lightKendoGrid");
+		$(window).off("resize", this._onWindowResize);
 		if (this.kendoGrid && this.kendoGrid._draggableInstance)
 		{
 			kendo.ui.DropTarget.destroyGroup(this.kendoGrid._draggableInstance.options.group);

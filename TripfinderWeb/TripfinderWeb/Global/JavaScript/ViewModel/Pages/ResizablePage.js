@@ -47,7 +47,7 @@
 		}
 		self.initDragHandler();
 		self.onLoaded.notify();
-		$(window).off(".resizepage").on("resize.resizepage", self.reLayoutPage.bind(self));
+		$(window).off(".resizepage").on("resize.resizepage", self.reLayoutPage.bind(self, null));
 	};
 
 	ResizablePage.prototype.setLeftPage = function(templateName, data, newGrid, firstLoad)

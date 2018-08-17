@@ -553,8 +553,39 @@
 
 	FieldTripDataEntryViewModel.prototype.dispose = function()
 	{
-		PubSub.unsubscribe(this.dataChangeReceive);
-		return namespace.BaseDataEntryViewModel.prototype.dispose.call(this);
+		var self = this;
+		PubSub.unsubscribe(self.dataChangeReceive);
+		if (self.obInvoicingGridViewModel() && self.obInvoicingGridViewModel().obGridViewModel()
+			&& self.obInvoicingGridViewModel().obGridViewModel().searchGrid)
+		{
+			self.obInvoicingGridViewModel().obGridViewModel().searchGrid.dispose();
+		}
+		if (self.obVehicleGridViewModel() && self.obVehicleGridViewModel().obGridViewModel()
+			&& self.obVehicleGridViewModel().obGridViewModel().searchGrid)
+		{
+			self.obVehicleGridViewModel().obGridViewModel().searchGrid.dispose();
+		}
+		if (self.obDriversGridViewModel() && self.obDriversGridViewModel().obGridViewModel()
+			&& self.obDriversGridViewModel().obGridViewModel().searchGrid)
+		{
+			self.obDriversGridViewModel().obGridViewModel().searchGrid.dispose();
+		}
+		if (self.obBusAideGridViewModel() && self.obBusAideGridViewModel().obGridViewModel()
+			&& self.obBusAideGridViewModel().obGridViewModel().searchGrid)
+		{
+			self.obBusAideGridViewModel().obGridViewModel().searchGrid.dispose();
+		}
+		if (self.obResourcesGridViewModel() && self.obResourcesGridViewModel().obGridViewModel()
+			&& self.obResourcesGridViewModel().obGridViewModel().searchGrid)
+		{
+			self.obResourcesGridViewModel().obGridViewModel().searchGrid.dispose();
+		}
+		if (self.obDocumentGridViewModel() && self.obDocumentGridViewModel().obGridViewModel()
+			&& self.obDocumentGridViewModel().obGridViewModel().searchGrid)
+		{
+			self.obDocumentGridViewModel().obGridViewModel().searchGrid.dispose();
+		}
+		return namespace.BaseDataEntryViewModel.prototype.dispose.call(self);
 	}
 
 	FieldTripDataEntryViewModel.prototype.calculateDateTimeDiff = function(diffType)
