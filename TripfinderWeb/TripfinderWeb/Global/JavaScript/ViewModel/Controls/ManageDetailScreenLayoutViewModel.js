@@ -526,7 +526,7 @@
 		data.Id = 0;
 		data.APIIsNew = true;
 
-		tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
 			data: data
 		}).then(function(response)
 		{
