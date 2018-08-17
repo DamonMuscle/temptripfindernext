@@ -316,40 +316,84 @@
 			clickBind = function(e, selector)
 			{
 				var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
-					uid = element.data("kendoUid"), event = scheduler.occurrenceByUid(uid);
-
-				self.selectEventUid = uid;
-				self.$kendoscheduler.find("[data-kendo-uid=" + uid + "]").each(function(index, item)
-				{
-					if (item == element[0])
+					uid = element.data("kendoUid"), event = scheduler.occurrenceByUid(uid),
+					changeFieldTrip = function()
 					{
-						self.selectEventElementIndexInList = index;
-					}
-				});
+						self.selectEventUid = uid;
+						self.$kendoscheduler.find("[data-kendo-uid=" + uid + "]").each(function(index, item)
+						{
+							if (item == element[0])
+							{
+								self.selectEventElementIndexInList = index;
+							}
+						});
 
-				if (selectedEventElement)
+						if (selectedEventElement)
+						{
+							selectedEventElement.removeClass("selected");
+						}
+
+						selectedEventElement = element;
+						if (self.kendoSchedule.view().name === "agenda")
+						{
+							selectedEventElement = selectedEventElement.closest("td");
+						}
+
+						if (self.obShowDetailPanel())
+						{
+							self.currentDetailId = event.id;
+							self.detailView.showDetailViewById(event.id);
+							scheduler.refresh();
+							self.keepEventSelection();
+						}
+						else if (self.obShowFieldTripDEPanel())
+						{
+							if (self.fieldTripDataEntry)
+							{
+								self.fieldTripDataEntry._view.id = event.id;
+								self.fieldTripDataEntry.obMode("Edit");
+								self.fieldTripDataEntry.loadSupplement()
+									.then(self.fieldTripDataEntry.loadRecord);
+							}
+							else
+							{
+								self.editClick();
+							}
+						}
+
+						selectedEventElement.addClass("selected");
+
+						self.selectEventId = event.id;
+						self.obIsSelectEvent(self.selectEventId != null);
+					};
+
+				if (self.obShowFieldTripDEPanel() && self.fieldTripDataEntry && self.fieldTripDataEntry.obApiIsDirty())
 				{
-					selectedEventElement.removeClass("selected");
+					tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes first?", backdrop: true, title: "Unsaved Changes", closeButton: true })
+						.then(function(result)
+						{
+							if (result === false)
+							{
+								changeFieldTrip();
+							}
+							else if (result === true)
+							{
+								self.fieldTripDataEntry.trySave().then(function(valid)
+								{
+									if (valid)
+									{
+										changeFieldTrip();
+										tf.pageManager.resizablePage.refreshLeftGrid();
+										return;
+									}
+								});
+							}
+						});
 				}
-
-				selectedEventElement = element;
-				if (self.kendoSchedule.view().name === "agenda")
+				else
 				{
-					selectedEventElement = selectedEventElement.closest("td");
+					changeFieldTrip();
 				}
-
-				if (self.obShowDetailPanel())
-				{
-					self.currentDetailId = event.id;
-					self.detailView.showDetailViewById(event.id);
-					scheduler.refresh();
-					self.keepEventSelection();
-				}
-
-				selectedEventElement.addClass("selected");
-
-				self.selectEventId = event.id;
-				self.obIsSelectEvent(self.selectEventId != null);
 			};
 
 		if (TF.isPhoneDevice)
