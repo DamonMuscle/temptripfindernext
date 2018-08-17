@@ -2974,37 +2974,41 @@
 
 		if (self.isReadMode())
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.gridType, self.entity.Id, "documents"))
-				.then(function(response)
-				{
-					var dataSource = new kendo.data.DataSource({
-						schema: {
-							model: {
-								fields: self.getKendoField(columns)
-							}
-						},
-						data: [],
-					});
-					$.each(response.Items, function(index, item)
+			if (tf.permissions.documentRead)
+			{
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.gridType, self.entity.Id, "documents"))
+					.then(function(response)
 					{
-						var fileData = {};
-						fileData.FileName = item.Filename;
-						fileData.Size = item.FileSizeKb;
-						dataSource.options.data.push(fileData);
-					})
-					kendoGrid.setDataSource(dataSource);
+						var dataSource = new kendo.data.DataSource({
+							schema: {
+								model: {
+									fields: self.getKendoField(columns)
+								}
+							},
+							data: [],
+						});
+						$.each(response.Items, function(index, item)
+						{
+							var fileData = {};
+							fileData.FileName = item.Filename;
+							fileData.Size = item.FileSizeKb;
+							dataSource.options.data.push(fileData);
+						})
+						kendoGrid.setDataSource(dataSource);
 
-					$(".document.grid-stack-item-content tbody").on("dblclick", function(e)
-					{
-						var index = $(e.target).closest("tr").index();
-						var databaseType = tf.storageManager.get("databaseType");
-						tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
-							.then(function(keyApiResponse)
-							{
-								window.location = pathCombine(tf.api.apiPrefix(), "document", response.Items[index].Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
-							});
+						$(".document.grid-stack-item-content tbody").on("dblclick", function(e)
+						{
+							var index = $(e.target).closest("tr").index();
+							var databaseType = tf.storageManager.get("databaseType");
+							tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
+								.then(function(keyApiResponse)
+								{
+									window.location = pathCombine(tf.api.apiPrefix(), "document", response.Items[index].Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
+								});
+						});
 					});
-				});
+			}
+
 		} else
 		{
 			var dataSource = new kendo.data.DataSource({
