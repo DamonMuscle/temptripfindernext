@@ -98,10 +98,10 @@
 			tf.pageManager.resizablePage.closeRightPage();
 		} else
 		{
+			self.obShowDetailPanel(false);
 			tf.pageManager.resizablePage.clearLeftOtherContent();
 			self.detailView.dispose();
 			self.detailView = null;
-			self.obShowDetailPanel(false);
 			if ($(".kendoscheduler").length > 0)
 			{
 				$(".kendoscheduler").getKendoScheduler().refresh();
