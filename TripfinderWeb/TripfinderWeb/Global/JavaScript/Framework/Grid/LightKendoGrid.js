@@ -2551,7 +2551,12 @@
 				columns.splice(0, 0, first);
 			}
 
-			first.template = "<input type='checkbox' value='#= Id #' class='multi-selectable'/>";
+			var grid = this;
+			first.template = function(dataItem)
+			{
+				var checked = dataItem ? grid.getSelectedIds().indexOf(dataItem.Id) > -1 : false;
+				return "<input type='checkbox' value='" + dataItem.Id + "' class='multi-selectable'" + (checked ? " checked" : "") + "/>";
+			};
 			this.getSelectedIds.subscribe(function()
 			{
 				var ids = this.getSelectedIds();
