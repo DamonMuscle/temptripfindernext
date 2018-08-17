@@ -304,6 +304,11 @@ String.format = function(format)
 	});
 };
 
+String.prototype.endsWith = function(suffix)
+{
+	return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 String.convertToBoolean = function(value)
 {
 	if (value === 'True')

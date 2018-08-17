@@ -75,7 +75,7 @@
 			x = parseInt(x);
 			y = parseInt(y);
 
-			if (Number.isNaN(w) || Number.isNaN(h) || Number.isNaN(x) || Number.isNaN(y)
+			if (isNaN(w) || isNaN(h) || isNaN(x) || isNaN(y)
 				|| w < 1 || h < 1 || x < 0 || y < 0 || w > colNum)
 			{
 				return false;

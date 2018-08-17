@@ -487,6 +487,10 @@
 		};
 
 		// The filename must have correct extension.
+		if (!selectedFile)
+		{
+			return;
+		}
 		if (selectedFile.name.endsWith(".tfdetaillayout"))
 		{
 			reader.readAsText(selectedFile);
