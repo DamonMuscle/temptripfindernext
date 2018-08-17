@@ -559,7 +559,7 @@
 			};
 		ga('send', 'event', 'Area', 'Submit New Request');
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel([], view);
-		if (TF.isPhoneDevice)
+		if (TF.isMobileDevice)
 		{
 			tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
 		}

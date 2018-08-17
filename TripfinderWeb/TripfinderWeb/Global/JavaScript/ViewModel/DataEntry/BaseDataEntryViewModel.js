@@ -648,7 +648,7 @@
 			{
 				if (e)
 				{
-					if (TF.isPhoneDevice)
+					if (TF.isMobileDevice)
 					{
 						tf.pageManager.resizablePage.clearLeftOtherContent();
 						tf.pageManager.resizablePage.refreshLeftGrid();
@@ -672,7 +672,7 @@
 				{
 					if (result === false)
 					{
-						if (TF.isPhoneDevice) 
+						if (TF.isMobileDevice) 
 						{
 							tf.pageManager.resizablePage.clearLeftOtherContent();
 						}
@@ -688,7 +688,7 @@
 				});
 		} else
 		{
-			if (TF.isPhoneDevice)
+			if (TF.isMobileDevice)
 			{
 				tf.pageManager.resizablePage.clearLeftOtherContent();
 			}

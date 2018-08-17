@@ -3,8 +3,7 @@
 		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
-			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit" placeholder="Name Layout..." maxlength="80"
-			/>
+			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit" placeholder="Name Layout..." maxlength="80" />
 			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
 				<div class="iconbutton settings" data-bind="click:openManageLayouts"></div>
 				<div class="iconbutton font-size-slider" data-bind="click:showSlider"></div>
@@ -51,7 +50,7 @@
 					<div class="icon bottom-caret"></div>
 				</div>
 				<div class="iconbutton print" data-bind="click:printClick"></div>
-				<div class="iconbutton" data-bind="click:TF.isPhoneDevice?closeDetailClick:newWindowClick,css:TF.isPhoneDevice?'close-detail':'new-window'"></div>
+				<div class="iconbutton" data-bind="click:TF.isMobileDevice?closeDetailClick:newWindowClick,css:TF.isMobileDevice?'close-detail':'new-window'"></div>
 			</div>
 			<div class="group-buttons" data-bind="css: {hide :!isReadMode()}">
 				<div class="button-icon" data-bind="click:onHeaderMoreButtonClick"></div>

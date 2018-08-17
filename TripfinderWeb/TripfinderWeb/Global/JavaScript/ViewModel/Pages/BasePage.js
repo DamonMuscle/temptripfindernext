@@ -76,7 +76,7 @@
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
 			);
-			if (TF.isPhoneDevice)
+			if (TF.isMobileDevice)
 			{
 				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
 			}

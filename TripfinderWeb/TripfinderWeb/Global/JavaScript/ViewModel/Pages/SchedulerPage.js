@@ -776,10 +776,12 @@
 			idFromScheduler = self.fieldTripId;
 		}
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
-		self.detailView.onCloseDetailEvent.subscribe(
-			self.closeDetailClick.bind(self)
-		);
-		if (TF.isPhoneDevice)
+		self.detailView.onCloseDetailEvent.subscribe(function()
+		{
+			self.closeDetailClick();
+			self.isDetailPanelShown(false);
+		});
+		if (TF.isMobileDevice)
 		{
 			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
 		}
