@@ -701,6 +701,10 @@
 
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
+		var resSearchGrid = this.obResourcesGridViewModel().obGridViewModel().searchGrid;
+		resKendoGrid = resSearchGrid.kendoGrid;
+		if (!resKendoGrid) return;
+
 		this.obVehicleGridSource([]);
 		this.obDriversGridSource([]);
 		this.obBusAideGridSource([]);
@@ -731,13 +735,13 @@
 			}
 
 		}.bind(this));
-		var resourceSort = this.obResourcesGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+		var resourceSort = resKendoGrid.dataSource.sort(),
 			resourceSource = new kendo.data.DataSource({
 				data: this.obFieldTripResourceGroupData(),
 				sort: resourceSort
 			});
-		this.obResourcesGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-		this.obResourcesGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+		resKendoGrid.setDataSource(resourceSource);
+		resSearchGrid.rebuildGrid(resourceSort);
 
 		var self = this;
 		var updateCore = function(grid)
