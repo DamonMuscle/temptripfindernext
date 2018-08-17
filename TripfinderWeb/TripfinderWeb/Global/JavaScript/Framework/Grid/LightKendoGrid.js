@@ -736,8 +736,11 @@
 				if (self.result)
 				{
 					self.allIds = [];
-					self.$container.children(".k-pager-wrap").find(".pageInfo").html(self.result.FilteredRecordCount + " of " + self.result.TotalRecordCount);
-					self._resetPageInfoSelect();
+					setTimeout(function()
+					{
+						self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + (self.currentTotalCount || self.result.TotalRecordCount));
+						self._resetPageInfoSelect();
+					});
 					self.obFilteredRecordCount(self.result.FilteredRecordCount);
 					self.obTotalRecordCount(self.result.TotalRecordCount);
 					self.getDefaultCheckedRecords(self.result.Items);

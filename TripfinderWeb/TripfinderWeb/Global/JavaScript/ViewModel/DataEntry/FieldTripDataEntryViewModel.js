@@ -1249,6 +1249,18 @@
 		return bytes / 1024;
 	}
 
+	FieldTripDataEntryViewModel.prototype.resetDocumentGridPageInfo = function(count, add)
+	{
+		var self = this, lightKendoGrid = self.obDocumentGridViewModel().obGridViewModel().searchGrid;
+		if (!lightKendoGrid)
+		{
+			return;
+		}
+		lightKendoGrid.currentCount = (lightKendoGrid.currentCount || lightKendoGrid.result.FilteredRecordCount) + (add ? count : - count);
+		lightKendoGrid.currentTotalCount = (lightKendoGrid.currentTotalCount || lightKendoGrid.result.TotalRecordCount) + (add ? count : - count);
+		lightKendoGrid.$container.children(".k-pager-wrap").find(".pageInfo").html(lightKendoGrid.currentCount + " of " + lightKendoGrid.currentTotalCount);
+	};
+
 	FieldTripDataEntryViewModel.prototype.addDocEvent = function(e)
 	{
 		var self = this;
@@ -1280,8 +1292,9 @@
 						});
 					self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 					self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+					self.resetDocumentGridPageInfo(obResults.DocumentEntities.length, true);
 				}
-				self.obPendingDocumentIdChange(result.pendingChange);
+				self.obPendingDocumentIdChange();
 			}.bind(self));
 	};
 
@@ -1376,8 +1389,8 @@
 			self.obDocumentGridDataSource(documentSource);
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+			self.resetDocumentGridPageInfo(1, false);
 		}
-		// this.obPendingDocumentIdChange({ isAssociated: false, ids: selectedIds, isDeleted: true });
 	};
 
 	FieldTripDataEntryViewModel.prototype.getSpecialValidatorFields = function(validatorFields)
