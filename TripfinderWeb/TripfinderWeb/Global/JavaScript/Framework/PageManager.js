@@ -68,9 +68,13 @@
 				templateName = "workspace/admin/settings_configuration";
 				break;
 			case "fieldtripsScheduler":
-			case "myrequestsScheduler":
 				var gridType = type.replace("Scheduler", "");
 				pageData = new TF.Page.SchedulerPage(gridType);
+				templateName = "workspace/page/schedulerpage";
+				break;
+			case "myrequestsScheduler":
+				var gridType = type.replace("Scheduler", "");
+				pageData = new TF.Page.MyRequestSchedulerPage(gridType);
 				templateName = "workspace/page/schedulerpage";
 				break;
 		}

@@ -150,6 +150,11 @@
 		return this.searchGrid.getSelectedRecords();
 	};
 
+	BaseGridPage.prototype.getCurrentFieldTripIds = function()
+	{
+		return this.searchGrid.getSelectedIds();
+	};
+
 	BaseGridPage.prototype.createGrid = function(option)
 	{
 		var self = this, iconRow, statusRow, toolRow, containerWidth,
@@ -516,7 +521,7 @@
 
 	BaseGridPage.prototype.cancelClick = function(viewModel, e)
 	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = self.searchGrid.getSelectedRecords(), showEditModal = function(name)
+		var self = this, selectedIds = self.getCurrentFieldTripIds(), selectedRecords = self.getCurrentFieldTripRecords(), showEditModal = function(name)
 		{
 			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, false, name, true))
 				.then(function(data)

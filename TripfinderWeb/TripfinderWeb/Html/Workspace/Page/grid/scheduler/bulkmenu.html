@@ -29,6 +29,15 @@
 			</div>
 		</li>
 		<!-- /ko -->
+		<!-- ko if:gridViewModel.cancelButton-->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+				<span class="hotkey"></span>
+			</div>
+		</li>
+		<!-- /ko -->
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>

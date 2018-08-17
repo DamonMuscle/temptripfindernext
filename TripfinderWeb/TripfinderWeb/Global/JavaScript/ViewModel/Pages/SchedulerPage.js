@@ -414,6 +414,11 @@
 		return this.fieldTripRecord || [];
 	};
 
+	SchedulerPage.prototype.getCurrentFieldTripIds = function()
+	{
+		return this.fieldTripId || [];
+	};
+
 	SchedulerPage.prototype.showMenu = function(e, parentE, selector)
 	{
 		var self = this;
