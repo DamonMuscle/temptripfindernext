@@ -2353,8 +2353,13 @@
 	 */
 	DetailViewViewModel.prototype.getGridRelatedData = function(dataType, dataIdentifier, columns)
 	{
-		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide", "fieldtripinvoice", "fieldtriphistory"];
-		if (fieldTripResourceTypes.indexOf(dataType) === -1)
+		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide", "fieldtripinvoice"];
+
+		if (dataType === "fieldtriphistory")
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", self.entitySelectId, "fieldtriphistory"));
+		}
+		else if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
 			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), dataType, "ids", dataIdentifier), { data: [self.entitySelectId] }).then(function(result)
 			{
