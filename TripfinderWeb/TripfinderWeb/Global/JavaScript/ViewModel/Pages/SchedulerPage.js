@@ -10,7 +10,6 @@
 		self.options = {};
 		self.isGridPage = false;
 		self.searchGridInited = ko.observable(false);
-		self.isDetailPanelShown = ko.observable(false);
 		self.obIsSelectEvent = ko.observable(false);
 		self.gridType = gridType || "fieldtrips";
 		self.pageType = gridType;
@@ -191,7 +190,7 @@
 			self.closeDetailClick(true);
 			self.$kendoscheduler.getKendoScheduler().refresh();
 			self.currentDetailId = -1;
-			self.isDetailPanelShown(false);
+			self.obShowDetailPanel(false);
 		}
 
 		self.resetScrollBar();
@@ -307,7 +306,6 @@
 				event = self.kendoSchedule.occurrenceByUid(element.data("kendoUid"));
 			self.currentDetailId = event.id;
 			self.showDetailsClick(event.id);
-			self.isDetailPanelShown(true);
 			scheduler.refresh();
 			self.keepEventSelection();
 		},
@@ -336,7 +334,7 @@
 					selectedEventElement = selectedEventElement.closest("td");
 				}
 
-				if (self.isDetailPanelShown())
+				if (self.obShowDetailPanel())
 				{
 					self.currentDetailId = event.id;
 					self.detailView.showDetailViewById(event.id);
@@ -777,15 +775,12 @@
 		ga('send', 'event', 'Area', 'Details');
 		if (self.fieldTripId.length > 0)
 		{
-			self.isDetailPanelShown(true);
 			idFromScheduler = self.fieldTripId;
 		}
 		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
-		self.detailView.onCloseDetailEvent.subscribe(function()
-		{
-			self.closeDetailClick();
-			self.isDetailPanelShown(false);
-		});
+		self.detailView.onCloseDetailEvent.subscribe(
+			self.closeDetailClick.bind(self)
+		);
 		if (TF.isMobileDevice)
 		{
 			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
@@ -795,13 +790,14 @@
 			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
 		}
 
+		self.obShowDetailPanel(true);
 		self.keepEventSelection();
 	};
 
 	SchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
 	{
 		var self = this;
-		self.isDetailPanelShown(true);
+		self.obShowDetailPanel(false);
 		tf.pageManager.openNewPage(self.gridType + "Scheduler");
 	};
 

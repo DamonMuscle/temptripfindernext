@@ -3,9 +3,7 @@
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
 			<div class="menu-icon edit">
 			</div>
-			<div class="menu-label">
-				Edit Trip
-			</div>
+			<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
 		</li>
 		<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
 		<li class="menu-divider">
