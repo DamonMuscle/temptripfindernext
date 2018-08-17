@@ -112,7 +112,7 @@
 
 	BasePage.prototype.editClick = function(viewModel, e)
 	{
-		var self = this, view, selectedIds, gridVM = viewModel ? viewModel.gridViewModel : this;
+		var self = this, view, selectedIds, gridVM = viewModel ? viewModel.gridViewModel : self;
 		if (gridVM.isGridPage)
 		{
 			selectedIds = self.searchGrid.getSelectedIds();

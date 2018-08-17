@@ -735,8 +735,7 @@
 		var obGridViewModel = this.obResourcesGridViewModel().obGridViewModel();
 		if (!obGridViewModel) return;
 
-		var resSearchGrid = obGridViewModel.searchGrid;
-		resKendoGrid = resSearchGrid.kendoGrid;
+		var resSearchGrid = obGridViewModel.searchGrid, resKendoGrid = resSearchGrid.kendoGrid;
 		if (!resKendoGrid) return;
 
 		this.obVehicleGridSource([]);
