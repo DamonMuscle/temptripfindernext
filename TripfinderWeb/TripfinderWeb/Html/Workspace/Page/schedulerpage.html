@@ -13,7 +13,8 @@
 	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
 		<div class="iconrow">
 			<div class="iconbutton gridview" title="Grid View" data-bind="click:navToGridViewClick"></div>
-			<div class="iconbutton kendo-scheduler open" title="Calendar View" data-bind="click:schedulerViewClick"></div>
+			<div class="iconbutton kendo-scheduler" title="Calendar View" data-bind="css:{open:!isDetailPanelShown()},click:schedulerViewClick"></div>
+			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectEvent(),open:isDetailPanelShown()},click:showDetailsClick"></div>
 			<div class="iconbutton filter" title="Filters" data-bind="click:filterClick"></div>
 		</div>
 	</div>

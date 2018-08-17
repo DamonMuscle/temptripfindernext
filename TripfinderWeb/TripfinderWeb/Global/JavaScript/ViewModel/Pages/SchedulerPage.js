@@ -11,9 +11,13 @@
 		self.isGridPage = false;
 		self.searchGridInited = ko.observable(false);
 		self.isDetailPanelShown = ko.observable(false);
+		self.obIsSelectEvent = ko.observable(false);
 		self.gridType = gridType || "fieldtrips";
 		self.pageType = gridType;
 		self.filterData = null;
+		self.selectEventId = null;
+		self.selectEventUid = null;
+		self.selectEventElementIndexInList = null;
 
 		self.schedulerDataSources = [];
 		self.schedulerResources = [];
@@ -259,10 +263,31 @@
 		return this.searchGrid.selectedFieldTripStageFilters();
 	};
 
+	/**
+	 * Keep event selected after scheduler refreshed.
+	 */
+	SchedulerPage.prototype.keepEventSelection = function()
+	{
+		var self = this,
+			selectedEventElement = self.$kendoscheduler.find("[data-kendo-uid=" + self.selectEventUid + "]");
+
+		if (self.selectEventElementIndexInList != null)
+		{
+			selectedEventElement = $(selectedEventElement[self.selectEventElementIndexInList]);
+			if (self.kendoSchedule.view().name === "agenda")
+			{
+				selectedEventElement = selectedEventElement.closest("td");
+			}
+		}
+
+		selectedEventElement.addClass("selected");
+	};
+
 	SchedulerPage.prototype.eventBinding = function()
 	{
 		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler(), eventselector = '.k-event',
-			taskselector = ".k-task", tdselector = '.k-scheduler-agendaview .k-scheduler-content tr td:last-child';
+			taskselector = ".k-task", tdselector = '.k-scheduler-agendaview .k-scheduler-content tr td:last-child',
+			selectedEventElement;
 
 		$(document).on("mousedown.kendoscheduler", function(e)
 		{
@@ -284,17 +309,45 @@
 			self.showDetailsClick(event.id);
 			self.isDetailPanelShown(true);
 			scheduler.refresh();
+			self.keepEventSelection();
 		},
 			clickBind = function(e, selector)
 			{
+				var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
+					uid = element.data("kendoUid"), event = scheduler.occurrenceByUid(uid);
+
+				self.selectEventUid = uid;
+				self.$kendoscheduler.find("[data-kendo-uid=" + uid + "]").each(function(index, item)
+				{
+					if (item == element[0])
+					{
+						self.selectEventElementIndexInList = index;
+					}
+				});
+
+				if (selectedEventElement)
+				{
+					selectedEventElement.removeClass("selected");
+				}
+
+				selectedEventElement = element;
+				if (self.kendoSchedule.view().name === "agenda")
+				{
+					selectedEventElement = selectedEventElement.closest("td");
+				}
+
 				if (self.isDetailPanelShown())
 				{
-					var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
-						event = scheduler.occurrenceByUid(element.data("kendoUid"));
 					self.currentDetailId = event.id;
 					self.detailView.showDetailViewById(event.id);
 					scheduler.refresh();
+					self.keepEventSelection();
 				}
+
+				selectedEventElement.addClass("selected");
+
+				self.selectEventId = event.id;
+				self.obIsSelectEvent(self.selectEventId != null);
 			};
 
 		if (TF.isPhoneDevice)
@@ -331,6 +384,12 @@
 				clickBind(e, taskselector);
 			});
 		}
+
+		self.bindEvent(".iconbutton.details", function(model, e)
+		{
+			self.showDetailsClick();
+		});
+
 		$(document).on("click.kendoscheduler", function(e)
 		{
 			if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
@@ -696,6 +755,20 @@
 	SchedulerPage.prototype.showDetailsClick = function(idFromScheduler)
 	{
 		var self = this;
+
+		// called by detail button click.
+		if (typeof idFromScheduler === "object")
+		{
+			if (self.obIsSelectEvent())
+			{
+				idFromScheduler = self.selectEventId;
+			}
+			else
+			{
+				return;
+			}
+		}
+
 		ga('send', 'event', 'Area', 'Details');
 		if (self.fieldTripId.length > 0)
 		{
@@ -714,6 +787,8 @@
 		{
 			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
 		}
+
+		self.keepEventSelection();
 	};
 
 	SchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
