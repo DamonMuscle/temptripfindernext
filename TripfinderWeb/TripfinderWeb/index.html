@@ -35,6 +35,19 @@
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
 	<link rel="stylesheet" href="Global/Css/tripfinder.css"></link>
 	<!-- endbuild -->
+	<style>
+		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0) {
+			@media {
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content {
+					background-color: #efefef;
+				}
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content input:disabled {
+					color: #202020;
+				}
+			}
+		}
+	</style>
+
 	<!--  Override above variables  in local_settings.js if you want them to be different-->
 	<script>
 		var tfRegion = "US";

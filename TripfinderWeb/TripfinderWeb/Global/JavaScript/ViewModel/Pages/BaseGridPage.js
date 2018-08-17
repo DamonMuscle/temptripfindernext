@@ -48,6 +48,23 @@
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
 		self.bindButtonEvent();
+		tf.pageManager.resizablePage.onSizeChanged.subscribe(function()
+		{
+			if (self.detailView)
+			{
+				if (self.obShowDetailPanel())
+				{
+					self.detailView.manageLayout();
+					self.detailView.updateNameContainer();
+				}
+				else
+				{
+					self.detailView.updateNameContainer();
+				}
+				self.detailView.resizeDetailView();
+				self.detailView.updateDetailViewPanelHeader();
+			}
+		});
 
 		if (self.isGridPage)
 		{
