@@ -309,18 +309,12 @@
 					pageTitle.css({ "display": "block", "width": "auto" });
 					newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
 					pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
-<<<<<<< HEAD
-=======
 
->>>>>>> 4fe6d3b... Ticket: #FT-539
 					if (self.obRightData())
 					{
 						self.obRightData().updateDetailViewPanelHeader();
 					}
-<<<<<<< HEAD
-=======
 
->>>>>>> 4fe6d3b... Ticket: #FT-539
 					if (pageHeader.outerHeight() > 56)
 					{
 						newRequest.hide();

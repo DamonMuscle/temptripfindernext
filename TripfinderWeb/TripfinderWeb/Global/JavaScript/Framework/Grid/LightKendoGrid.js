@@ -4411,11 +4411,8 @@
 				self.fitContainer();
 			}, 50);
 		};
-<<<<<<< HEAD
+
 		$(window).on("resize", self._onWindowResize);
-=======
-		$(window).on("resize.lightKendoGrid", self._onWindowResize);
->>>>>>> 4fe6d3b... Ticket: #FT-539
 	};
 
 	LightKendoGrid.prototype.fitContainer = function()
