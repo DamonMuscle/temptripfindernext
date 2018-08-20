@@ -3,11 +3,16 @@
 }
 
 html,
-body,
+body {
+	height: 100%;
+	float: left;
+	position: relative;
+}
+
 .page-container {
 	height: 100%;
 	float: left;
-	overflow-y: auto;
+	overflow: hidden;
 	-ms-overflow-style: scrollbar;
 	width: calc(~"100% - 60px");
 	position: relative;
@@ -171,6 +176,7 @@ body,
 
 				.kendoscheduler {
 					height: 100%;
+
 					.k-scheduler-content {
 						overflow-x: hidden;
 					}

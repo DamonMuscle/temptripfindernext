@@ -156,7 +156,7 @@
 		{
 			self.$rightPage.width(0);
 			self.$leftPage.width("100%");
-			result = totalWidth;
+			result = $("body").width() - $(".navigation-container").outerWidth() - 2;
 		}
 
 		if (self.leftPageType.indexOf("Scheduler") === -1)

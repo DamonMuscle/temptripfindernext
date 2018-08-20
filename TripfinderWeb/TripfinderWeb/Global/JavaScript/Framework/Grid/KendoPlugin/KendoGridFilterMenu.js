@@ -1073,7 +1073,7 @@
 		{
 			gridLayoutExtendedDataModel.filterId(this.obSelectedGridFilterId());
 		}
-		if (this._obCurrentGridLayoutExtendedDataModel)
+		if (this._obCurrentGridLayoutExtendedDataModel && this._obCurrentGridLayoutExtendedDataModel())
 		{
 			this._obCurrentGridLayoutExtendedDataModel().filterId(this.obSelectedGridFilterId());
 			if (!this._obCurrentGridLayoutExtendedDataModel().filterId())
