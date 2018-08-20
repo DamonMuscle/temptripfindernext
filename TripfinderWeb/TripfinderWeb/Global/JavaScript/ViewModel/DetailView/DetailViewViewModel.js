@@ -4772,7 +4772,7 @@
 	DetailViewViewModel.prototype.newWindowClick = function(data, e)
 	{
 		var self = this;
-		window.open("#/?id=" + data.entitySelectId, "new-detailWindow");
+		window.open("#/?id=" + data.entitySelectId, "new-detailWindow_" + $.now());
 	};
 
 	DetailViewViewModel.prototype.closeDetailClick = function(data, e)
