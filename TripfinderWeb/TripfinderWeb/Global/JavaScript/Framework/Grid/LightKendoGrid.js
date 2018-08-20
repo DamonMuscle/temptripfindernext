@@ -669,11 +669,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-			{
-				extra: true,
-				mode: "menu row",
-				operators: TF.Grid.LightKendoGrid.DefaultOperator
-			},
+				{
+					extra: true,
+					mode: "menu row",
+					operators: TF.Grid.LightKendoGrid.DefaultOperator
+				},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -4151,13 +4151,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
-								{
-									fields: self.geoFields,
-									IdFilter:
 									{
-										IncludeOnly: self.allIds
+										fields: self.geoFields,
+										IdFilter:
+											{
+												IncludeOnly: self.allIds
+											}
 									}
-								}
 							})
 							.then(function(response)
 							{
@@ -4411,7 +4411,11 @@
 				self.fitContainer();
 			}, 50);
 		};
+<<<<<<< HEAD
 		$(window).on("resize", self._onWindowResize);
+=======
+		$(window).on("resize.lightKendoGrid", self._onWindowResize);
+>>>>>>> 4fe6d3b... Ticket: #FT-539
 	};
 
 	LightKendoGrid.prototype.fitContainer = function()
