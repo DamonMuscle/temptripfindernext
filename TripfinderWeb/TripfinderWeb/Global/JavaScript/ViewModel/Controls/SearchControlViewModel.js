@@ -974,18 +974,6 @@
 		}
 	};
 
-	SearchControlViewModel.prototype.getResultCountPerDataType = function()
-	{
-		var self = this, searchSettings = tf.storageManager.get("search.configurations");
-
-		if (!searchSettings || !searchSettings.hasOwnProperty('ResultPerDataType') || searchSettings.ResultPerDataType == null)
-		{
-			return 99;
-		}
-
-		return searchSettings.ResultPerDataType;
-	}
-
 	SearchControlViewModel.prototype.updateAllDataTypes = function()
 	{
 		var self = this, searchSettings = tf.storageManager.get("search.configurations"), getTypeText;
@@ -1062,56 +1050,22 @@
 		{
 			Deferred.resolve(false);
 		}
-		else if (type !== "all")
+		self.getSuggestedResultByType(type, processedText, Number.MAX_SAFE_INTEGER).then(function(result)
 		{
-			var PromiseAll = [], curType;
-			PromiseAll.push(self.getSuggestedResultByType(type, processedText, Number.MAX_SAFE_INTEGER));
-			PromiseAll.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "bycolumns"), {
-				paramData: {
-					column: "all",
-					text: processedText
-				}
-			}, { overlay: false }));
-			Promise.all(PromiseAll).then(function(result)
+			var allResultsCount = self.allResultsCount,
+				searchResult = result;
+			var primise = Promise.resolve();
+			if (searchResult.length === 0)
 			{
-				var singleResult = result[0], allResults = result[1].Items[0];
-
-				var primise = Promise.resolve();
-				if (singleResult.length <= 0)
-				{
-					primise = self.checkAllDBs();
-				}
-				primise.then(function()
-				{
-					self.obAllResultsCount(allResults.SimpleEntities.length);
-					if (singleResult.length > 0)
-					{
-						self.obSingleResultCount(singleResult[0].cards.length);
-					}
-					Deferred.resolve(createResponseObj(value, type, singleResult[0] ? [singleResult[0]] : []));
-				});
-			});
-		}
-		else
-		{
-			var count = self.getResultCountPerDataType();
-			self.getSuggestedResultByType(type, processedText, count).then(function(result)
+				primise = self.checkAllDBs();
+			}
+			primise.then(function()
 			{
-				var allResultsCount = self.allResultsCount,
-					searchResult = result;
-				var primise = Promise.resolve();
-				if (searchResult.length === 0)
-				{
-					primise = self.checkAllDBs();
-				}
-				primise.then(function()
-				{
-					self.obAllResultsCount(allResultsCount);
-					self.obSingleResultCount(allResultsCount)
-					Deferred.resolve(createResponseObj(value, type, searchResult));
-				});
+				self.obAllResultsCount(allResultsCount);
+				self.obSingleResultCount(allResultsCount)
+				Deferred.resolve(createResponseObj(value, type, searchResult));
 			});
-		}
+		});
 
 		return Deferred;
 	};
