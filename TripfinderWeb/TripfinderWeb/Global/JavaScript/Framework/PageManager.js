@@ -41,7 +41,7 @@
 		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
 	};
 
-	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad)
+	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
 	{
 		var self = this, permission,
 			pageData, templateName,
@@ -89,7 +89,10 @@
 				self.navigationData.setActiveStateByPageType(type);
 			}, 100);
 		}
-		tf.storageManager.save(storageKey, type);
+		if (!skipSavePage)
+		{
+			tf.storageManager.save(storageKey, type);
+		}
 
 		if (TF.isPhoneDevice)
 		{

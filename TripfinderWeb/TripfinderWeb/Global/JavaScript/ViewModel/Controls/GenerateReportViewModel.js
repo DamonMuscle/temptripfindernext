@@ -581,11 +581,13 @@
 		if (this.obFilter())
 		{
 			this.obEntityDataModel().filterName(this.obFilter().name());
+			this.obEntityDataModel().filterId(this.obFilter().id());
 			this.obEntityDataModel().filterSpec(this.obFilter().whereClause());
 		}
 		else
 		{
 			this.obEntityDataModel().filterName("");
+			this.obEntityDataModel().filterId(-1);
 			this.obEntityDataModel().filterSpec("");
 		}
 	};
@@ -790,7 +792,7 @@
 		var p = [];
 		if (report.specifyRecordOption() == 2)
 		{
-			var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridFilter", "name", report.filterName()))
+			var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridFilter", "id", report.filterId()))
 				.then(function(data)
 				{
 					if (data)

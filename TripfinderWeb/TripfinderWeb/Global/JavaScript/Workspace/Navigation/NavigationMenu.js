@@ -60,7 +60,7 @@
 		self.initNavigationMenuState();
 		self.initTooltip();
 
-		if (window.opener && window.name === "new-detailWindow")
+		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
 			$(".navigation-container").addClass("hide");
 		}
@@ -500,6 +500,12 @@
 			$pageList = $itemMenu.find("li"),
 			alreadyOpened = $item.hasClass("menu-opened");
 
+		if (evt.ctrlKey && type !== "settings")
+		{
+			window.open("#/?pagetype=" + type, "new-pageWindow_" + $.now());
+			return;
+		}
+
 		//skip the method if user click the link to the same page.
 		if (($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active")) && type !== "settings")
 		{
@@ -556,7 +562,6 @@
 			default:
 				break;
 		}
-
 	};
 
 	/**
@@ -730,21 +735,26 @@
 			{
 				self.closeNavigation();
 			}
-			return;
 		}
-
-		if (!($(evt.target).closest(".item-menu li").hasClass("active")))
+		else if (pageType === "settingsConfig")
 		{
-			self.setActiveStateByPageType(pageType);
-			var pList = [self.closeOpenedNavigationItemMenu(false)];
-			Promise.all(pList).then(function()
+			if (evt.ctrlKey)
 			{
-				if (TF.isPhoneDevice)
+				window.open("#/?pagetype=settingsConfig", "new-pageWindow_" + $.now());
+			}
+			else if (!($(evt.target).closest(".item-menu li").hasClass("active")))
+			{
+				self.setActiveStateByPageType(pageType);
+				var pList = [self.closeOpenedNavigationItemMenu(false)];
+				Promise.all(pList).then(function()
 				{
-					self.closeNavigation();
-				}
-				tf.pageManager.openNewPage(pageType);
-			});
+					if (TF.isPhoneDevice)
+					{
+						self.closeNavigation();
+					}
+					tf.pageManager.openNewPage(pageType);
+				});
+			}
 		}
 	};
 

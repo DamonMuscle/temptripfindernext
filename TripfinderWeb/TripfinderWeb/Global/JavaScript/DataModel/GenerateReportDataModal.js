@@ -22,11 +22,12 @@
 		{ from: "FilterDataSource", default: null },
 		{ from: "SpecifyRecordOption", default: null },
 		{ from: "IncludeInActiveFlag", default: false },
+		{ from: "FilterId", default: "" },
 		{ from: "FilterName", default: "" },
 		{ from: "FilterSpec", default: "" },
 		{ from: "DataSourceId", default: 0 },
 		{ from: "DataSourceName", default: "" },
-        { from: "LastUpdated", default: "1970-01-01T00:00:00" },
+		{ from: "LastUpdated", default: "1970-01-01T00:00:00" },
 		{ from: "LastUpdatedId", default: 0 },
 		{ from: "LastUpdatedName", default: "" },
 		{ from: "LastUpdatedType", default: 0 },
@@ -34,8 +35,8 @@
 		{ from: "OutputTo", default: "" },
 		{ from: "SelectedRecordIds", default: [] },
 		{ from: "ReportParameterRunFor", default: "yesterday" },
-        { from: "ReportParameterTimeFrom", default: "1970-01-01T00:00:00" },
-        { from: "ReportParameterTimeTo", default: "1970-01-01T23:59:59" }
+		{ from: "ReportParameterTimeFrom", default: "1970-01-01T00:00:00" },
+		{ from: "ReportParameterTimeTo", default: "1970-01-01T23:59:59" }
 	];
 
 })();

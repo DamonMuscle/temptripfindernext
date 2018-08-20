@@ -41,7 +41,7 @@
 		self.$rightPage = self.$element.find(".right-page");
 		self.$dragHandler = self.$element.find(".resize-handler");
 
-		if (window.opener && window.name === "new-detailWindow")
+		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
 			self.$dragHandler.hide();
 		}
