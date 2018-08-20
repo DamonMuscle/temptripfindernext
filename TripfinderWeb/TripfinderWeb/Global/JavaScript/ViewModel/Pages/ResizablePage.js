@@ -125,12 +125,7 @@
 		}
 
 		totalWidth = self.$element.outerWidth();
-		leftWidth = width;
-
-		if (width == null || typeof width == "object")
-		{
-			leftWidth = totalWidth * (tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || 0.5);
-		}
+		leftWidth = width ? width : totalWidth * (tf.storageManager.get(self.leftPageSizeKey + self.leftPageType) || 0.5);
 
 		if (!self.obGridData() && !self.obOtherData())
 		{
