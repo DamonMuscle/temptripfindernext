@@ -167,6 +167,11 @@
 		{
 			$(".kendoscheduler").getKendoScheduler().refresh();
 		}
+
+		if (self.obOtherData() && self.obOtherData().pageType === "detailview")
+		{
+			self.obOtherData().manageLayout();
+		}
 	};
 
 	ResizablePage.prototype.initDragHandler = function()
