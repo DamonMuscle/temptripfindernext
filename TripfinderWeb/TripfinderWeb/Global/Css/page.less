@@ -830,8 +830,10 @@ body {
 }
 
 .k-mobile .scheduler-wrap {
-	height: calc(~"100% - 146px") !important;
-	margin-right: 3px;
+	@media (max-width: 767px) {
+		height: calc(~"100% - 146px") !important;
+		margin-right: 3px;
+	}
 }
 
 .detail-view-panel {
