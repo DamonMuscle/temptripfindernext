@@ -480,7 +480,7 @@
 		{
 			event = parentE;
 		}
-		if (event.button === 2)
+		if (typeof (event) != "undefined" && event.button === 2)
 		{
 			var $virsualTarget = $("<div></div>").css(
 				{
