@@ -474,7 +474,7 @@
 		self.fieldTripRecord = [];
 		self.fieldTripId.push(occurrence.id);
 		occurrence.Id = occurrence.id;
-		self.fieldTripRecord.push(occurrence);
+		self.fieldTripRecord.push(occurrence._raw);
 		self.updateEditableApprovable();
 		if (parentE)
 		{
@@ -742,7 +742,8 @@
 				"Title": item['Name'],
 				"Start": item['DepartDateTime'],
 				"End": item['ReturnTime'],
-				"Descirption": "Test Desciption"
+				"Descirption": "Test Desciption",
+				_raw: item
 			});
 		});
 		return {
