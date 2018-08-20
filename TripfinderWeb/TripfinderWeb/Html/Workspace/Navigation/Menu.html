@@ -32,7 +32,7 @@
 			<div class="item-label">Settings</div>
 			<div class="item-menu">
 				<ul data-bind="foreach: { data: obSettingPages, afterRender: afterPageMenuOptionUIRender.bind($data) }">
-					<li data-bind="css:{active:isOpen},attr:{pageType},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
+					<li data-bind="css:{active:isOpen},attr:{pagetype:pageType},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
 					</li>
 				</ul>
 			</div>
