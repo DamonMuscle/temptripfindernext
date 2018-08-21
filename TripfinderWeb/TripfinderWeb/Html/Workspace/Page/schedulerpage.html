@@ -14,7 +14,9 @@
 		<div class="iconrow">
 			<div class="iconbutton gridview" title="Grid View" data-bind="click:navToGridViewClick"></div>
 			<div class="iconbutton kendo-scheduler" title="Calendar View" data-bind="css:{open:!obShowDetailPanel()},click:schedulerViewClick"></div>
+			<!-- ko if:!TF.isPhoneDevice-->
 			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectEvent(),open:obShowDetailPanel()},click:showDetailsClick"></div>
+			<!-- /ko -->
 			<div class="iconbutton filter" title="Filters" data-bind="click:filterClick"></div>
 		</div>
 	</div>
