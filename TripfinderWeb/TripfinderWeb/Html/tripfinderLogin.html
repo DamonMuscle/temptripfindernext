@@ -32,7 +32,7 @@
 									<label for="userName">
 										User Name
 									</label>
-									<input type="text" id="userName" name="userName" class="form-control" placeholder="Username" data-bind="value:obUsername, click:cleanErrorMessage">
+									<input type="text" id="userName" name="userName" class="form-control" placeholder="User Name" data-bind="value:obUsername, click:cleanErrorMessage">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName" data-bv-result="INVALID" data-bind="visible:obUsernameWarning">required</small>
 								</div>
 							</div>
@@ -120,7 +120,7 @@
 					</div>
 				</div>
 				<div class="edit-bottombar">
-					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.resetPasswordClick" style="margin-right:10px;">Reset Password</button>
+					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.resetPasswordClick" style="margin-right:10px;width: 125px">Reset Password</button>
 					<button type="button" class="btn tf-btn-gray" data-bind="click:$parent.cancelClick">Cancel</button>
 				</div>
 			</div>

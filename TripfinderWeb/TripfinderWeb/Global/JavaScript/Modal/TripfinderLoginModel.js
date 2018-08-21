@@ -157,7 +157,7 @@
 			return;
 		}
 		tf.storageManager.save("token", "", true);
-		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "auth", "forgotpassword", "view", userName, "Transfinder"))
+		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "auth", "forgotpassword", "tripfinder", userName, "Transfinder"))
 			.then(function(apiResponse)
 			{
 				this.loginViewModel.obLoginErrorMessage('');
