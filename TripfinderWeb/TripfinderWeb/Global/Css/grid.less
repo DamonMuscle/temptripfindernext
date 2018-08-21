@@ -120,7 +120,8 @@
 }
 
 .iconbutton.gridview {
-	background-image: url('../../global/img/grid/grid.svg');
+	// use png instead of svg to fix bug in Edge.
+	background-image: url('../../global/img/grid/grid.png');
 
 	&.open {
 		background-image: url('../../global/img/grid/grid-active.svg');
