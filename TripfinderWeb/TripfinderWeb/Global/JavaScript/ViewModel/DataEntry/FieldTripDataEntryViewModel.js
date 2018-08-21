@@ -1451,16 +1451,31 @@
 									var obDocument = obresult().toData();
 									obDocument.DocumentEntity = documentData;
 									source.push(obDocument);
-									kendoSource.push(obDocument)
 									return;
 								}
 							}
 							source.push(item);
+						}.bind(this));
+
+						this.obDocumentKendoDataSource().forEach(function(item)
+						{
+							if (documentData.Id != 0)
+							{
+								if (item.Id == documentData.Id)
+								{
+									var obresult = ko.observable(new TF.DataModel.DocumentDataModel(documentData));
+									var obDocument = obresult().toData();
+									obDocument.DocumentEntity = documentData;
+									kendoSource.push(obDocument);
+									return;
+								}
+							}
 							kendoSource.push(item);
 						}.bind(this));
+
 						var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
 							resourceSource = new kendo.data.DataSource({
-								data: source,
+								data: kendoSource,
 								sort: resourceSort
 							});
 						this.obDocumentGridDataSource(source);
