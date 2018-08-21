@@ -41,11 +41,11 @@
 			<!-- /ko -->
 			<!-- /ko -->
 			<!-- ko if: pageType === "reports"-->
-			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
 			<div class="iconbutton mail" title="Send Mail" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<div class="iconbutton file" title="Save As File" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
 			<!-- /ko -->
 		</div>
+		<!-- ko if: pageType !== "reports"-->
 		<div class="pull-right grid-staterow-wrap">
 			<div class="grid-staterow">
 				<div class="grid-staterow-status text-overflow filter">
@@ -70,6 +70,7 @@
 				</div>
 			</div>
 		</div>
+		<!-- /ko -->
 	</div>
 	<div class="grid-wrap">
 		<div class="kendo-grid kendo-grid-container"></div>
