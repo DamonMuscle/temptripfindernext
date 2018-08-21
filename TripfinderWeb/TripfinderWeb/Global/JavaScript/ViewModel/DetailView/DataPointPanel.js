@@ -134,13 +134,10 @@
 				&& !$target.hasClass("filter-text"))
 			{
 				self.isMouseDownInFilterZone = false;
+				self.$filterText.blur();
 				if (self.$filterText.val().trim() === "")
 				{
 					self.$filterBar.removeClass('active');
-				}
-				else
-				{
-					self.$filterBar.blur();
 				}
 			}
 			else
