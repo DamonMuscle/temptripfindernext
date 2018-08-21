@@ -937,30 +937,30 @@
 		validatorFields.name = {
 			trigger: "blur",
 			validators:
-				{
-					callback: {
-						message: "Name already exists",
-						callback: function(value, validator, $field)
+			{
+				callback: {
+					message: "Name already exists",
+					callback: function(value, validator, $field)
+					{
+						if (!value)
 						{
-							if (!value)
-							{
-								return true;
-							}
-
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
-								paramData: {
-									id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
-									name: value,
-									dataType: self.gridType
-								}
-							}, { overlay: false }).then(function(response)
-							{
-								var isUnique = response.Items[0];
-								return isUnique;
-							});
+							return true;
 						}
+
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+							paramData: {
+								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
+								name: value,
+								dataType: self.gridType
+							}
+						}, { overlay: false }).then(function(response)
+						{
+							var isUnique = response.Items[0];
+							return isUnique;
+						});
 					}
 				}
+			}
 		};
 
 		self.$element.bootstrapValidator(
@@ -4513,12 +4513,28 @@
 		if (cacheOperatorBeforeOpenMenu)
 		{
 			var options = {
-				gridType: self.gridType,
-				movingDistance: isFromMoreButton ? 0 : target.outerWidth(),
-				top: isFromMoreButton ? 0 - target.outerHeight() : -24
-			},
-				layoutMenu = new TF.DetailView.LayoutMenuViewModel(options, self);
+				gridType: self.gridType
+			};
 
+			if (isFromMoreButton)
+			{
+				if (TF.isPhoneDevice)
+				{
+					options.top = 0;
+				}
+				else
+				{
+					options.movingDistance = 0;
+					options.top = 0 - target.outerHeight();
+				}
+			}
+			else
+			{
+				options.movingDistance = target.outerWidth();
+				options.top = -24;
+			}
+
+			var layoutMenu = new TF.DetailView.LayoutMenuViewModel(options, self);
 			layoutMenu.loadingFinishEvent.subscribe(function()
 			{
 				var contextmenu = new TF.ContextMenu.TemplateContextMenu(

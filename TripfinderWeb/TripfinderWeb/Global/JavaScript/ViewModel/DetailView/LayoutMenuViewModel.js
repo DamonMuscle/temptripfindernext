@@ -16,7 +16,7 @@
 		self.obSelectLayoutID = ko.observable(tf.storageManager.get(self.stickyName));
 		self.obSelectLayoutName = ko.observable("");
 		self.obLayouts = ko.observableArray([]);
-		self.obMoveDistance = ko.observable("-" + options.movingDistance + "px");
+		self.obMoveDistance = ko.observable(options.movingDistance != null ? "-" + options.movingDistance + "px" : "auto");
 		self.obTop = ko.observable(options.top + "px");
 		self.obNewWindow = ko.observable(true);
 
