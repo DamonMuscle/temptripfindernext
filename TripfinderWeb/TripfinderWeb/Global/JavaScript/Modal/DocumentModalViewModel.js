@@ -19,7 +19,8 @@
 			this.obSelectedAssociations,
 			options.parentType,
 			options.parentId,
-			options.documentData
+			options.documentData,
+			options.documentEntities
 		);
 		this.data(this.editDocumentViewModel);
 		this.sizeCss = "modal-sm";

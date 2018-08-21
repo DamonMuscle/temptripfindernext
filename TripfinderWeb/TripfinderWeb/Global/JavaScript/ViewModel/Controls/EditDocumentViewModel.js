@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').EditDocumentViewModel = EditDocumentViewModel;
 
-	function EditDocumentViewModel(objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData)
+	function EditDocumentViewModel(objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData, documentEntities)
 	{
 		this.UploadedFileChangeEvent = this.UploadedFileChangeEvent.bind(this);
 		this.deleteFileClick = this.deleteFileClick.bind(this);
@@ -22,6 +22,10 @@
 		if (documentData)
 		{
 			this.documentData = documentData;
+		}
+		if (documentEntities)
+		{
+			this.documentEntities = documentEntities;
 		}
 		this.currentDocumentClassificationName = ko.computed(this.currentDocumentClassificationNameComputer, this);
 		this.obDisplayFileName = ko.computed(function()
@@ -331,10 +335,23 @@
 	EditDocumentViewModel.prototype.UploadedFile = function(files)
 	{
 		var self = this;
+		var uploadFail = false;
+
 		if (files && files.length)
 		{
 			for (var i = 0; i < files.length; i++)
 			{
+				if (self.documentEntities.length > 0)
+				{
+					self.documentEntities.forEach(function(documentEntity)
+					{
+						if (documentEntity.Filename === files[i].name)
+						{
+							uploadFail = true;
+							return;
+						}
+					});
+				}
 				tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "document", "unique"), { data: new TF.DataModel.DocumentDataModel({ Filename: files[i].name, Id: 0 }).toData() })
 					.then(function(apiResponse)
 					{
@@ -352,7 +369,7 @@
 						var step = 1024 * 10;
 						var loaded = 0;
 						var total = file.size;
-						var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: !apiResponse.Items[0] };
+						var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail ? uploadFail : !apiResponse.Items[0] };
 						var content = "";
 						reader.fileName = file.name;
 						this.model.obEntityDataModel().documentEntities.push(fileModel);

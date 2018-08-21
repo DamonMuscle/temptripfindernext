@@ -57,8 +57,10 @@
 		this.obDocumentGridViewModel = ko.observable(null);
 		this.obDocumentResourceId = ko.observable(1);
 		this.obDocumentGridDataSource = ko.observableArray();
+		this.obDocumentKendoDataSource = ko.observableArray();
 		this.obPendingDocumentIdChange = ko.observable(null);
 		this.obClassificationDataModels = ko.observableArray();
+		this.obDocumentAdd = false;
 		this.tempId = 0;
 		//drop down list
 		this.obSelectedTemplateSource = ko.observable();
@@ -279,7 +281,7 @@
 		{
 			document.dispose();
 		}
-		var filteredIds = [], documentRecources = [];
+		var filteredIds = [], documentRecources = [], documentFontEndRecources = [];
 		if (this.obMode() === "Edit")
 		{
 			if (TF.FieldTripAuthHelper.checkFieldTripEditRight(selectedId) || tf.permissions.documentRead)
@@ -293,9 +295,13 @@
 						{
 							resources.forEach(function(item)
 							{
+								if (item.DocumentEntity.DocumentClassificationId > 0)
+								{
+									item.DocumentClassificationId = item.DocumentEntity.DocumentClassificationId
+								}
 								var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
 								{
-									return c.Id === item.DocumentEntity.DocumentClassificationId;
+									return c.Id === item.DocumentClassificationId;
 								}.bind(self)).ToArray()[0];
 
 								var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
@@ -318,9 +324,11 @@
 								this.obDocumentResourceId(item.resourceId + 1);
 								filteredIds.push(item.DocumentEntity.Id);
 								documentRecources.push(documentData);
+								documentFontEndRecources.push(documentData);
 							}.bind(self));
 						}
 						self.obDocumentGridDataSource(documentRecources);
+						self.obDocumentKendoDataSource(documentFontEndRecources);
 						var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
 						self.obDocumentGridViewModel(documentGrid);
 					});
@@ -400,6 +408,50 @@
 			});
 	};
 
+	FieldTripDataEntryViewModel.prototype.refreshDocumentMiniGrid = function(AttachedId, isNew)
+	{
+		var self = this;
+		if (self.obDocumentAdd)
+		{
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.type, AttachedId, "documents"))
+				.then(function(data)
+				{
+					var source = [];
+					self.obDocumentGridDataSource().forEach(function(gridData)
+					{
+						data.Items.forEach(function(item, index)
+						{
+							if (gridData.Filename === item.Filename)
+							{
+								gridData.Id = item.Id;
+								gridData.DocumentEntity.Id = item.Id;
+								if (isNew)
+								{
+									var associations = {
+										AttachedToId: AttachedId,
+										AttachedToType: "fieldtrip"
+									};
+									gridData.DocumentRelationshipEntities[0] = associations;
+								}
+							}
+						});
+					});
+					var source = self.obDocumentGridDataSource().filter(function(datasource)
+					{
+						return datasource.DocumentRelationshipEntities.length > 0;
+					});
+					self.obDocumentGridDataSource(source);
+					self.obDocumentAdd = false;
+				});
+		} else
+		{
+			var source = self.obDocumentGridDataSource().filter(function(datasource)
+			{
+				return datasource.DocumentRelationshipEntities.length > 0;
+			});
+			self.obDocumentGridDataSource(source);
+		}
+	};
 	FieldTripDataEntryViewModel.prototype.getTemplate = function(data)
 	{
 		var self = this;
@@ -1297,7 +1349,7 @@
 	FieldTripDataEntryViewModel.prototype.addDocEvent = function(e)
 	{
 		var self = this;
-		return tf.modalManager.showModal(new e.data.modal({ parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: null }))
+		return tf.modalManager.showModal(new e.data.modal({ parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: null, documentData: null, documentEntities: self.obDocumentKendoDataSource() }))
 			.then(function(result)
 			{
 				if (result)
@@ -1317,15 +1369,17 @@
 						obDocument.Id = self.tempId - 1;
 						self.tempId = self.tempId - 1;
 						self.obDocumentGridDataSource().push(obDocument);
+						self.obDocumentKendoDataSource().push(obDocument);
 					});
 					var resourceSort = self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
 						resourceSource = new kendo.data.DataSource({
-							data: self.obDocumentGridDataSource(),
+							data: self.obDocumentKendoDataSource(),
 							sort: resourceSort
 						});
 					self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 					self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 					self.resetDocumentGridPageInfo(obResults.DocumentEntities.length, true);
+					self.obDocumentAdd = true;
 				}
 				self.obPendingDocumentIdChange();
 			}.bind(self));
@@ -1337,15 +1391,24 @@
 			self = this;
 		if (row.length > 0)
 		{
+			var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+				resourceSource = new kendo.data.DataSource({
+					data: self.obDocumentKendoDataSource(),
+					sort: resourceSort
+				});
+			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+			self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+
 			var data = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
-			var option = { parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: data.Id, documentData: data };
+			var option = { parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: data.Id, documentData: data, documentEntities: self.obDocumentKendoDataSource() };
 			tf.modalManager.showModal(new TF.Modal.DocumentModalViewModel(option))
 				.then(function(data)
 				{
 					var documentData = data.data;
 					if (documentData)
 					{
-						var source = [];
+						var source = [],
+							kendoSource = [];
 						this.obDocumentGridDataSource().forEach(function(item)
 						{
 							if (documentData.Id != 0)
@@ -1356,10 +1419,12 @@
 									var obDocument = obresult().toData();
 									obDocument.DocumentEntity = documentData;
 									source.push(obDocument);
+									kendoSource.push(obDocument)
 									return;
 								}
 							}
 							source.push(item);
+							kendoSource.push(item);
 						}.bind(this));
 						var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
 							resourceSource = new kendo.data.DataSource({
@@ -1367,6 +1432,7 @@
 								sort: resourceSort
 							});
 						this.obDocumentGridDataSource(source);
+						this.obDocumentKendoDataSource(kendoSource);
 						this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 						this.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 					}
@@ -1378,10 +1444,41 @@
 	{
 		var row = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.select(),
 			self = this;
+
+		var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+			resourceSource = new kendo.data.DataSource({
+				data: this.obDocumentKendoDataSource(),
+				sort: resourceSort
+			});
+		self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+		self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 		if (row.length)
 		{
 			var data = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
 			var source = [], documentSource = [], relationShipSource = [];
+			this.obDocumentKendoDataSource().forEach(function(item)
+			{
+				if (item.Id > 0)
+				{
+					if (item.Id == data.Id)
+					{
+						return;
+					}
+					item.APIIsNew = item.DocumentEntity.APIIsNew;
+					item.APIIsDirty = item.DocumentEntity.APIIsDirty;
+					item.APIToDelete = item.DocumentEntity.APIToDelete;
+					source.push(item);
+
+				} else
+				{
+					if (item.Id == data.Id)
+					{
+						return;
+					}
+					source.push(item);
+				}
+			}.bind(this));
+
 			this.obDocumentGridDataSource().forEach(function(item)
 			{
 				if (item.Id > 0)
@@ -1401,8 +1498,6 @@
 						return;
 					}
 					documentSource.push(item);
-					source.push(item.DocumentEntity);
-
 				} else
 				{
 					if (item.Id == data.Id)
@@ -1410,16 +1505,16 @@
 						return;
 					}
 					documentSource.push(item);
-					source.push(item);
 				}
 			}.bind(this));
 
-			var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
-				resourceSource = new kendo.data.DataSource({
-					data: source,
-					sort: resourceSort
-				});
+			resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort();
+			resourceSource = new kendo.data.DataSource({
+				data: source,
+				sort: resourceSort
+			});
 			self.obDocumentGridDataSource(documentSource);
+			self.obDocumentKendoDataSource(source);
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 			self.resetDocumentGridPageInfo(1, false);

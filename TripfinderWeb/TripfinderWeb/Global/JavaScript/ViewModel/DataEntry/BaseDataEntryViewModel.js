@@ -710,6 +710,7 @@
 
 	BaseDataEntryViewModel.prototype.save = function()
 	{
+		var self = this;
 		var obEntityDataModel = this.obEntityDataModel();
 		var isNew = obEntityDataModel.id() ? false : true;
 		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.type, isNew ? "" : obEntityDataModel.id()),
@@ -729,6 +730,10 @@
 					this.obMode(this._view.mode);
 				}
 				PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
+				if (self.obDocumentGridViewModel())
+				{
+					self.refreshDocumentMiniGrid(obEntityDataModel.toData().Id, isNew);
+				}
 			}.bind(this))
 			.catch(function(response)
 			{
