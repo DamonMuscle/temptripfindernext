@@ -101,8 +101,7 @@
 					tf.promiseBootbox.alert("The Password for " + userName + " has been successfully Reset.", "Password Successfully Reset")
 						.then(function()
 						{
-							this.obShowLogin(true);
-							$("#password").focus();
+							this.showLogin();
 						}.bind(this));
 				}.bind(this))
 				.catch(function(apiResponse)
@@ -125,12 +124,19 @@
 						{
 							if (!result)
 							{
-								this.obShowLogin(true);
-								$("#password").focus();
+								this.showLogin();
 							}
 						}.bind(this));
 				}.bind(this));
 		}
+	};
+
+	TripfinderLoginModel.prototype.showLogin = function()
+	{
+		this.obShowLogin(true);
+		$("#password").focus();
+		var host = window.location.origin + window.location.pathname;
+		window.history.pushState({}, "Tripfinder", host);
 	};
 
 	TripfinderLoginModel.prototype.cancelClick = function(viewModel, e)
@@ -141,8 +147,7 @@
 			{
 				if (result)
 				{
-					this.obShowLogin(true);
-					$("#password").focus();
+					this.showLogin();
 				}
 			}.bind(this));
 	};
