@@ -245,18 +245,22 @@
 	KendoGrid.prototype.rebuildGrid = function(sortInfo)
 	{
 		return TF.Grid.LightKendoGrid.prototype.rebuildGrid.apply(this, sortInfo)
-			.then(function()
+			.then(function(result)
 			{
-				this.createDragDelete();
-				this.changeSortModel(); //bind the function of change sort model in column mouse down
-				this.resizableBinding();
-				this.lockUnlockColumn();
-				this.initDragHeadEvent();
-				this.initQuickFilterBar();
+				if (result !== false)
+				{
+					this.createDragDelete();
+					this.changeSortModel(); //bind the function of change sort model in column mouse down
+					this.resizableBinding();
+					this.lockUnlockColumn();
+					this.initDragHeadEvent();
+					this.initQuickFilterBar();
 
-				this.createDropDocument();
+					this.createDropDocument();
 
-				return Promise.resolve(true);
+					return true;
+				}
+				return false;
 			}.bind(this));
 	};
 

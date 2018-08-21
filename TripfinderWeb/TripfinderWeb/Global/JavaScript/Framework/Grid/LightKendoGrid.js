@@ -399,10 +399,10 @@
 		})
 			.then(function()
 			{
-				if (!this.kendoGrid)
+				if (!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable"))
 				{
 					tf.loadingIndicator.tryHide();
-					return Promise.reject();
+					return Promise.resolve(false);
 				}
 				this.getSelectedIds([]);
 				this.getSelectedRecords([]);

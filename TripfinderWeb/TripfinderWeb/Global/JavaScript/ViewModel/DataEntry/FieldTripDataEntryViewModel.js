@@ -35,6 +35,9 @@
 		this.obDestinationDataModels = ko.observableArray();
 		this.obBillingClassificationDataModels = ko.observableArray();
 		this.obFieldTripResourceGroupData = ko.observableArray();
+		this.vehicleLoadFinished = false;
+		this.driverLoadFinished = false;
+		this.aideLoadFinished = false;
 
 		this.obVehicleGridViewModel = ko.observable(null);
 		this.obDriversGridViewModel = ko.observable(null);
@@ -66,6 +69,13 @@
 		this.obSelectedTemplateSource = ko.observable();
 		this.obTemplateName = ko.observable("None");
 		this.obTemplateName.subscribe(this.templateClick, this);
+
+		this.obMode.subscribe(function(value)
+		{
+			this.vehicleLoadFinished = false;
+			this.driverLoadFinished = false;
+			this.aideLoadFinished = false;
+		}.bind(this));
 
 		this.obSelectedSchool = ko.observable();
 		this.obSelectedSchool.subscribe(this.setSelectValue("school", "obSelectedSchool", function(obj)
@@ -721,6 +731,9 @@
 			vehicle.dispose();
 		}
 
+		this.vehicleLoadFinished = false;
+		this.driverLoadFinished = false;
+		this.aideLoadFinished = false;
 		if (this.obMode() === "Edit")
 		{
 			var resources = this.obEntityDataModel().fieldTripResourceGroup();
@@ -768,6 +781,7 @@
 				}
 
 			}.bind(this));
+
 			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
 			this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
 			this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
@@ -785,7 +799,9 @@
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
 		var obGridViewModel = this.obResourcesGridViewModel().obGridViewModel();
-		if (!obGridViewModel && !obGridViewModel.searchGrid) return;
+		if (!obGridViewModel || !obGridViewModel.searchGrid || !obGridViewModel.searchGrid.kendoGrid) return;
+
+		console.log(!!obGridViewModel.searchGrid.kendoGrid);
 
 		var resSearchGrid = obGridViewModel.searchGrid, resKendoGrid = resSearchGrid.kendoGrid;
 		if (!resKendoGrid) return;
@@ -850,7 +866,10 @@
 
 			setTimeout(function()
 			{
-				updateCore(grid);
+				if (grid && grid.kendoGrid)
+				{
+					updateCore(grid);
+				}
 			});
 		};
 
@@ -949,6 +968,7 @@
 
 	FieldTripDataEntryViewModel.prototype.initializeVehicle = function(el)
 	{
+		this.vehicleLoadFinished = false;
 		this.$form.find('.vehicle .view-grid-header').text(tf.applicationTerm.getApplicationTermPluralByName("Vehicle"));
 		this.$form.find('.vehicle .iconbutton.mapview').hide();
 		this.$form.find('.vehicle .iconbutton.gridview').hide();
@@ -962,7 +982,11 @@
 		this.$form.find('.vehicle .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceVehicleModalViewModel }, this.addEvent.bind(this));
 		this.$form.find('.vehicle .iconbutton.pencil').off("click").on("click", { gridView: this.obVehicleGridViewModel, modal: TF.Modal.FieldTripResourceVehicleModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.vehicle .iconbutton.delete').off("click").on("click", { gridView: this.obVehicleGridViewModel, modal: TF.Modal.FieldTripResourceVehicleModalViewModel }, this.deleteEvent.bind(this));
-		this.ReloadResources();
+		this.vehicleLoadFinished = true;
+		if (this.vehicleLoadFinished && this.driverLoadFinished && this.aideLoadFinished)
+		{
+			this.ReloadResources();
+		}
 	}
 
 	FieldTripDataEntryViewModel.prototype.initializeDriver = function(el)
@@ -980,7 +1004,11 @@
 		this.$form.find('.drivers .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceDriverModalViewModel }, this.addEvent.bind(this));
 		this.$form.find('.drivers .iconbutton.pencil').off("click").on("click", { gridView: this.obDriversGridViewModel, modal: TF.Modal.FieldTripResourceDriverModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.drivers .iconbutton.delete').off("click").on("click", { gridView: this.obDriversGridViewModel, modal: TF.Modal.FieldTripResourceDriverModalViewModel }, this.deleteEvent.bind(this));
-		this.ReloadResources();
+		this.driverLoadFinished = true;
+		if (this.vehicleLoadFinished && this.driverLoadFinished && this.aideLoadFinished)
+		{
+			this.ReloadResources();
+		}
 	}
 
 	FieldTripDataEntryViewModel.prototype.initializeAide = function(el)
@@ -998,7 +1026,11 @@
 		this.$form.find('.busAides .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.addEvent.bind(this));
 		this.$form.find('.busAides .iconbutton.pencil').off("click").on("click", { gridView: this.obBusAideGridViewModel, modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.busAides .iconbutton.delete').off("click").on("click", { gridView: this.obBusAideGridViewModel, modal: TF.Modal.FieldTripResourceAideModalViewModel }, this.deleteEvent.bind(this));
-		this.ReloadResources();
+		this.aideLoadFinished = true;
+		if (this.vehicleLoadFinished && this.driverLoadFinished && this.aideLoadFinished)
+		{
+			this.ReloadResources();
+		}
 	};
 
 	FieldTripDataEntryViewModel.prototype.getSaveData = function(isTemplate)
