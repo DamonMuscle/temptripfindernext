@@ -500,7 +500,7 @@
 			$pageList = $itemMenu.find("li"),
 			alreadyOpened = $item.hasClass("menu-opened");
 
-		if (evt.ctrlKey && type !== "settings")
+		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
 		{
 			window.open("#/?pagetype=" + type, "new-pageWindow_" + $.now());
 			return;
@@ -738,7 +738,7 @@
 		}
 		else if (pageType === "settingsConfig")
 		{
-			if (evt.ctrlKey)
+			if (evt.ctrlKey || evt.metaKey)
 			{
 				window.open("#/?pagetype=settingsConfig", "new-pageWindow_" + $.now());
 			}
