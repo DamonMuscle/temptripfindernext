@@ -801,8 +801,6 @@
 		var obGridViewModel = this.obResourcesGridViewModel().obGridViewModel();
 		if (!obGridViewModel || !obGridViewModel.searchGrid || !obGridViewModel.searchGrid.kendoGrid) return;
 
-		console.log(!!obGridViewModel.searchGrid.kendoGrid);
-
 		var resSearchGrid = obGridViewModel.searchGrid, resKendoGrid = resSearchGrid.kendoGrid;
 		if (!resKendoGrid) return;
 
