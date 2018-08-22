@@ -22,7 +22,7 @@
 		{
 			var theUserPreferenceItem = Enumerable.From(this.UserPreferenceDataList).Where(function(item)
 			{
-				return item.Key == key;
+				return item.Key.toLowerCase() == key.toLowerCase();
 			}).ToArray();
 			if (theUserPreferenceItem.length > 0)
 			{
