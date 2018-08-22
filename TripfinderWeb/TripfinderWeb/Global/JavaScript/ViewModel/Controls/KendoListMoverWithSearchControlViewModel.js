@@ -520,6 +520,10 @@
 			}.bind(this)
 		};
 		this.initGridOption(options, 'left');
+		if (this.options.disableFilter)
+		{
+			options.kendoGridOption.filterable = false;
+		}
 		this.leftSearchGrid = new TF.Grid.LightKendoGrid(this.availableColGridContainer, options);
 		this.leftSearchGrid.getKendoColumn = this._getLeftColumns;
 		this.leftSearchGrid.onRowsChanged.subscribe(this.onLeftGridChange.bind(this));

@@ -10,7 +10,8 @@
 			availableTitle: "Available",
 			selectedTitle: "Selected",
 			type: "user",
-			filterCheckboxText: "Show Enabled",
+			displayCheckbox: false,
+			disableFilter: true,
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "user");
