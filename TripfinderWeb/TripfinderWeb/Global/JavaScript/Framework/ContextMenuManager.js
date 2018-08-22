@@ -12,7 +12,7 @@
 		var lastContextMenu = null;
 
 
-		this.showMenu = function(target, contextMenu, isGridMenu = true)
+		this.showMenu = function(target, contextMenu, isGridMenu)
 		{
 			this.contextMenu = contextMenu;
 			if (!(contextMenu instanceof TF.ContextMenu.BaseContextMenu))
@@ -23,7 +23,7 @@
 			{
 				lastContextMenu.dispose();
 			}
-			this.isGridMenu = isGridMenu;
+			this.isGridMenu = isGridMenu == null ? true : isGridMenu;
 			lastContextMenu = contextMenu;
 			contextMenu.render($wrapper, target);
 		}
