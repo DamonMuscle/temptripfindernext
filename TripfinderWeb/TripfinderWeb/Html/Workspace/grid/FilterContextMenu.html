@@ -2,7 +2,7 @@
 	<ul class="tf-contextmenu">
 		<li class="menu-divider"></li>
 		<!--ko if:tf.permissions.filtersAdd -->
-		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.createNewFilterClick">
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.createNewFilterClick">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
@@ -20,7 +20,7 @@
 		</li>
 		<!--/ko -->
 		<!--ko if:tf.permissions.filtersAdd -->
-		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.saveAsNewFilterClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 && !searchGrid.obSelectedGridFilterClause()}">
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.saveAsNewFilterClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 && !searchGrid.obSelectedGridFilterClause()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
@@ -29,7 +29,7 @@
 		</li>
 		<!--/ko -->
 		<!--ko if:tf.permissions.filtersEdit || tf.permissions.filtersAdd || tf.permissions.filtersDelete -->
-		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.manageFilterClick">
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.manageFilterClick">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
