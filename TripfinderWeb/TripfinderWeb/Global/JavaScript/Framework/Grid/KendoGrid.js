@@ -792,7 +792,7 @@
 
 		var $container = this.$container;
 		var $lockedContent = $container.find(".k-grid-content-locked");
-		if ($lockedContent &&
+		if (this.options.isGridView && $lockedContent &&
 			this.obSummaryGridVisible && this.obSummaryGridVisible() && this.overlay !== false)
 		{
 			tf.loadingIndicator.showImmediately();
