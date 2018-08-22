@@ -286,7 +286,7 @@
 		var includeIds = this._gridState.filteredIds;
 		var excludeIds = this.getExcludeAnyIds();
 		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), this.obSelectedGridFilterClause(), includeIds, excludeIds);
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", this.options.gridType, "aggregate"), {
+		return tf.promiseAjax.post(pathCombine(this.options.url, "aggregate"), {
 			paramData: { FieldName: fildName, AggregateOperator: operator },
 			data: this.searchOption.data,
 			traditional: true
