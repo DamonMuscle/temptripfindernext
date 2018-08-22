@@ -62,15 +62,15 @@
 								<div class="select-type" data-bind="text:obSelectName"></div>
 								<div class="icon bottom-caret"></div>
 							</li>
-							<!-- ko if:!TF.isPhoneDevice-->
+							<!-- ko if:!TF.isMobileDevice-->
 							<li class="menu-item" data-bind="click:printClick">
 								<div class="select-type">Print</div>
 								<div class="iconbutton print"></div>
 							</li>
 							<!-- /ko -->
-							<li class="menu-item" data-bind="click:TF.isPhoneDevice?closeDetailClick:newWindowClick">
-								<div class="select-type" data-bind="text:TF.isPhoneDevice?'Close this Page':'Open in New Window'"></div>
-								<div class="iconbutton" data-bind="css:TF.isPhoneDevice?'close-detail':'new-window'"></div>
+							<li class="menu-item" data-bind="click:TF.isMobileDevice?closeDetailClick:newWindowClick">
+								<div class="select-type" data-bind="text:TF.isMobileDevice?'Close this Page':'Open in New Window'"></div>
+								<div class="iconbutton" data-bind="css:TF.isMobileDevice?'close-detail':'new-window'"></div>
 							</li>
 						</ul>
 					</div>
