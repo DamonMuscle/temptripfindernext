@@ -3664,7 +3664,11 @@
 			});
 			if (this.kendoGrid.options.selectable)
 			{
-				tf.contextMenuManager.dispose();
+				// only dispose grid own menu.
+				if (tf.contextMenuManager.isGridMenu)
+				{
+					tf.contextMenuManager.dispose();
+				}
 				this.kendoGrid.clearSelection();
 				this.kendoGrid.select(selected);
 			}

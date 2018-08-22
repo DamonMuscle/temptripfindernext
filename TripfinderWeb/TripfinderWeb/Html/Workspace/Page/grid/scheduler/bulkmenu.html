@@ -1,6 +1,6 @@
 ﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
 	<ul class="tf-contextmenu grid-menu">
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()||!gridViewModel.obRightClickOnSelected()}">
 			<div class="menu-icon edit">
 			</div>
 			<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
@@ -10,7 +10,7 @@
 			<div class="rule"></div>
 		</li>
 		<!-- ko if:gridViewModel.approveButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()||!gridViewModel.obRightClickOnSelected()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:'Approve Trip'">
@@ -19,7 +19,7 @@
 		</li>
 		<!-- /ko -->
 		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()||!gridViewModel.obRightClickOnSelected()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:'Decline Trip'">
@@ -28,7 +28,7 @@
 		</li>
 		<!-- /ko -->
 		<!-- ko if:gridViewModel.cancelButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()||!gridViewModel.obRightClickOnSelected()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
@@ -40,7 +40,7 @@
 			<div class="rule"></div>
 		</li>
 		<!-- /ko -->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetailsClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetailsClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected()||!gridViewModel.obRightClickOnSelected()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:'Detail View'"></div>

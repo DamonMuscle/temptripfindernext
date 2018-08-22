@@ -30,6 +30,8 @@
 				KendoFlatColorPickerPrototype = widget.widget.prototype;
 			if (widget.name === 'kendoColorPicker')
 				KendoColorPickerPrototype = widget.widget.prototype;
+			if (widget.name === "kendoScheduler")
+				KendoSchedulerPrototype = widget.widget.prototype;
 		});
 
 		var Const = {
@@ -693,6 +695,23 @@
 				var colorStr = self._getHSV().s < 256 ? self._getHSV().toCss() : self.value();
 				setColorCookie(self.options.cookieName, colorStr, null);
 			}
+		});
+
+		KendoSchedulerPrototype.refresh = KendoSchedulerPrototype.refresh.createSequence(function()
+		{
+			var self = this,
+				selectedEventElement = self.element.find("[data-kendo-uid=" + self.selectEventUid + "]");
+
+			if (self.selectEventElementIndexInList != null)
+			{
+				selectedEventElement = $(selectedEventElement[self.selectEventElementIndexInList]);
+				if (self._selectedViewName === "List")
+				{
+					selectedEventElement = selectedEventElement.closest("td");
+				}
+			}
+
+			selectedEventElement.addClass("selected");
 		});
 
 		KendoColorPickerPrototype._getPopup = KendoColorPickerPrototype._getPopup.createSequence(function()

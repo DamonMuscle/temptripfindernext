@@ -11,6 +11,7 @@
 		self.isGridPage = false;
 		self.searchGridInited = ko.observable(false);
 		self.obIsSelectEvent = ko.observable(false);
+		self.obRightClickOnSelected = ko.observable(false);
 		self.gridType = gridType || "fieldtrips";
 		self.pageType = gridType;
 		self.filterData = null;
@@ -266,31 +267,98 @@
 		return this.searchGrid.selectedFieldTripStageFilters();
 	};
 
-	/**
-	 * Keep event selected after scheduler refreshed.
-	 */
-	SchedulerPage.prototype.keepEventSelection = function()
+	SchedulerPage.prototype.changeSelection = function(element)
 	{
-		var self = this,
-			selectedEventElement = self.$kendoscheduler.find("[data-kendo-uid=" + self.selectEventUid + "]");
-
-		if (self.selectEventElementIndexInList != null)
-		{
-			selectedEventElement = $(selectedEventElement[self.selectEventElementIndexInList]);
-			if (self.kendoSchedule.view().name === "agenda")
+		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler(), selectedEventElement,
+			uid = element.data("kendoUid"), event = scheduler.occurrenceByUid(uid),
+			changeFieldTrip = function()
 			{
-				selectedEventElement = selectedEventElement.closest("td");
-			}
-		}
+				selectedEventElement = self.$kendoscheduler.find("[data-kendo-uid=" + self.selectEventUid + "]");
+				if (self.selectEventElementIndexInList != null)
+				{
+					selectedEventElement = $(selectedEventElement[self.selectEventElementIndexInList]);
+					if (self.kendoSchedule.view().name === "agenda")
+					{
+						selectedEventElement = selectedEventElement.closest("td");
+					}
+				}
+				selectedEventElement.removeClass("selected");
 
-		selectedEventElement.addClass("selected");
+				scheduler.selectEventUid = self.selectEventUid = uid;
+				self.$kendoscheduler.find("[data-kendo-uid=" + uid + "]").each(function(index, item)
+				{
+					if (item == element[0])
+					{
+						scheduler.selectEventElementIndexInList = self.selectEventElementIndexInList = index;
+					}
+				});
+
+				selectedEventElement = element;
+				if (self.kendoSchedule.view().name === "agenda")
+				{
+					selectedEventElement = selectedEventElement.closest("td");
+				}
+
+				if (self.obShowDetailPanel())
+				{
+					self.currentDetailId = event.id;
+					self.detailView.showDetailViewById(event.id);
+					scheduler.refresh();
+				}
+				else if (self.obShowFieldTripDEPanel())
+				{
+					if (self.fieldTripDataEntry)
+					{
+						self.fieldTripDataEntry._view.id = event.id;
+						self.fieldTripDataEntry.obMode("Edit");
+						promise = self.fieldTripDataEntry.loadSupplement()
+							.then(self.fieldTripDataEntry.loadRecord);
+					}
+					else
+					{
+						self.editClick();
+					}
+				}
+
+				selectedEventElement.addClass("selected");
+
+				self.selectEventId = event.id;
+				self.obIsSelectEvent(self.selectEventId != null);
+			};
+
+		if (self.obShowFieldTripDEPanel() && self.fieldTripDataEntry && self.fieldTripDataEntry.obApiIsDirty())
+		{
+			tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes first?", backdrop: true, title: "Unsaved Changes", closeButton: true })
+				.then(function(result)
+				{
+					if (result === false)
+					{
+						changeFieldTrip();
+					}
+					else if (result === true)
+					{
+						self.fieldTripDataEntry.trySave().then(function(valid)
+						{
+							if (valid)
+							{
+								changeFieldTrip();
+								tf.pageManager.resizablePage.refreshLeftGrid();
+								return;
+							}
+						});
+					}
+				});
+		}
+		else
+		{
+			changeFieldTrip();
+		}
 	};
 
 	SchedulerPage.prototype.eventBinding = function()
 	{
 		var self = this, scheduler = self.$kendoscheduler.getKendoScheduler(), eventselector = '.k-event',
-			taskselector = ".k-task", tdselector = '.k-scheduler-agendaview .k-scheduler-content tr td:last-child',
-			selectedEventElement;
+			taskselector = ".k-task", tdselector = '.k-scheduler-agendaview .k-scheduler-content tr td:last-child';
 
 		$(document).on("mousedown.kendoscheduler", function(e)
 		{
@@ -311,89 +379,11 @@
 			self.currentDetailId = event.id;
 			self.showDetailsClick(event.id);
 			scheduler.refresh();
-			self.keepEventSelection();
 		},
 			clickBind = function(e, selector)
 			{
-				var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector)),
-					uid = element.data("kendoUid"), event = scheduler.occurrenceByUid(uid),
-					changeFieldTrip = function()
-					{
-						self.selectEventUid = uid;
-						self.$kendoscheduler.find("[data-kendo-uid=" + uid + "]").each(function(index, item)
-						{
-							if (item == element[0])
-							{
-								self.selectEventElementIndexInList = index;
-							}
-						});
-
-						if (selectedEventElement)
-						{
-							selectedEventElement.removeClass("selected");
-						}
-
-						selectedEventElement = element;
-						if (self.kendoSchedule.view().name === "agenda")
-						{
-							selectedEventElement = selectedEventElement.closest("td");
-						}
-
-						if (self.obShowDetailPanel())
-						{
-							self.currentDetailId = event.id;
-							self.detailView.showDetailViewById(event.id);
-							scheduler.refresh();
-							self.keepEventSelection();
-						}
-						else if (self.obShowFieldTripDEPanel())
-						{
-							if (self.fieldTripDataEntry)
-							{
-								self.fieldTripDataEntry._view.id = event.id;
-								self.fieldTripDataEntry.obMode("Edit");
-								self.fieldTripDataEntry.loadSupplement()
-									.then(self.fieldTripDataEntry.loadRecord);
-							}
-							else
-							{
-								self.editClick();
-							}
-						}
-
-						selectedEventElement.addClass("selected");
-
-						self.selectEventId = event.id;
-						self.obIsSelectEvent(self.selectEventId != null);
-					};
-
-				if (self.obShowFieldTripDEPanel() && self.fieldTripDataEntry && self.fieldTripDataEntry.obApiIsDirty())
-				{
-					tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes first?", backdrop: true, title: "Unsaved Changes", closeButton: true })
-						.then(function(result)
-						{
-							if (result === false)
-							{
-								changeFieldTrip();
-							}
-							else if (result === true)
-							{
-								self.fieldTripDataEntry.trySave().then(function(valid)
-								{
-									if (valid)
-									{
-										changeFieldTrip();
-										tf.pageManager.resizablePage.refreshLeftGrid();
-										return;
-									}
-								});
-							}
-						});
-				}
-				else
-				{
-					changeFieldTrip();
-				}
+				var element = $(e.target).is(selector) ? $(e.target) : ($(e.target).find(selector).length > 0 ? $(e.target).find(selector) : $(e.target).closest(selector));
+				self.changeSelection(element);
 			};
 
 		if (TF.isPhoneDevice)
@@ -482,6 +472,15 @@
 		}
 		if (typeof (event) != "undefined" && event.button === 2)
 		{
+			if (self.kendoSchedule.view().name === "agenda")
+			{
+				self.obRightClickOnSelected($element.closest("td").hasClass("selected"));
+			}
+			else
+			{
+				self.obRightClickOnSelected($element.hasClass("selected"));
+			}
+
 			var $virsualTarget = $("<div></div>").css(
 				{
 					position: "absolute",
@@ -490,7 +489,7 @@
 				});
 			$("body").append($virsualTarget);
 			self.bulkMenu = new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid/scheduler/bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid));
-			tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu);
+			tf.contextMenuManager.showMenu($virsualTarget, self.bulkMenu, false);
 			return false;
 		}
 		return true;
@@ -844,7 +843,6 @@
 		}
 
 		self.obShowDetailPanel(true);
-		self.keepEventSelection();
 	};
 
 	SchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
