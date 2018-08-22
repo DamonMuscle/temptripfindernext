@@ -40,7 +40,7 @@
 					data: ajaxData,
 					success: function(apiResponse)
 					{
-						mySubmittedIds = apiResponse.Items[0];
+						mySubmittedIds = (apiResponse && apiResponse.Items && apiResponse.Items.length) ? apiResponse.Items[0] : [];
 					}
 				});
 			return mySubmittedIds;
