@@ -414,11 +414,7 @@
 		var gridLayoutExtendedEntity = gridLayoutExtendedEntity || self._obSelectedGridLayoutExtendedDataModel();
 		if (self._isLayoutFilterIsNotAvaliable(gridLayoutExtendedEntity))
 		{
-			return tf.promiseBootbox.confirm(
-				{
-					message: "The Filter saved with this Layout is not in the current database.  Only layout changes will be applied.",
-					title: "Confirmation Message"
-				})
+			return tf.promiseBootbox.alert("The Filter saved with this Layout is not in the current database.  Only layout changes will be applied.")
 				.then(function(result)
 				{
 					if (result)
