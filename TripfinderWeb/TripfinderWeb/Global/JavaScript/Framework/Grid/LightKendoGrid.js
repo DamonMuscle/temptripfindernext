@@ -3691,44 +3691,47 @@
 
 	LightKendoGrid.prototype._resetPageInfoSelect = function()
 	{
-		if (!this.options.showOmittedCount && !this.options.showSelectedCount && this.options.gridTypeInPageInfo === "") { return; }
+		var self = this, pageInfoList = [], pageInfo = "", omittedRecordsCount = 0;
+		if (!self.options.showOmittedCount && !self.options.showSelectedCount && self.options.gridTypeInPageInfo === "") { return; }
 
-		var pageInfoList = [];
-		if (this.options.showSelectedCount) 
+		if (self.options.showSelectedCount && self.options.selectable) 
 		{
-			if (this.options.selectable && this.kendoGrid && this.kendoGrid.select())
+			if (!self.isBigGrid && this.kendoGrid && this.kendoGrid.select())
 			{
 				pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
 			}
+			if (self.isBigGrid && self.getSelectedIds().length > 0) 
+			{
+				pageInfoList.push(self.getSelectedIds().length + " selected");
+			}
 		}
 
-		if (this.options.showOmittedCount)
+		if (self.options.showOmittedCount)
 		{
-			var omittedRecordsCount;
-			if (this.obFilteredExcludeAnyIds() != null)
+			if (self.obFilteredExcludeAnyIds() != null)
 			{
-				omittedRecordsCount = this.obFilteredExcludeAnyIds().concat(this.obTempOmitExcludeAnyIds()).length;
+				omittedRecordsCount = self.obFilteredExcludeAnyIds().concat(self.obTempOmitExcludeAnyIds()).length;
 			}
 			else
 			{
-				omittedRecordsCount = this.obTempOmitExcludeAnyIds().length;
+				omittedRecordsCount = self.obTempOmitExcludeAnyIds().length;
 			}
 			if (omittedRecordsCount > 0)
 			{
 				pageInfoList.push((omittedRecordsCount + " omitted"));
 			}
 		}
-		var pageInfo = "";
-		if (this.options.gridTypeInPageInfo)
+
+		if (self.options.gridTypeInPageInfo)
 		{
-			pageInfo = "&nbsp;" + this.options.gridTypeInPageInfo;
+			pageInfo = "&nbsp;" + self.options.gridTypeInPageInfo;
 		}
-		if ((this.options.showSelectedCount || this.options.showOmittedCount) && pageInfoList.length > 0)
+		if ((self.options.showSelectedCount || self.options.showOmittedCount) && pageInfoList.length > 0)
 		{
 			pageInfo = pageInfo + "&nbsp;(" + pageInfoList.join(", ") + ")";
 		}
 
-		this.$container.children(".k-pager-wrap").find(".pageInfoSelect")
+		self.$container.children(".k-pager-wrap").find(".pageInfoSelect")
 			.html(pageInfo);
 	};
 
