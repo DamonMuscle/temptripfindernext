@@ -1,3 +1,13 @@
 .k-event, .k-scheduler-agendaview .k-scheduler-content tr td:last-child{
 	cursor: pointer;
 }
+
+// this selector is from kendo css
+@media only screen and (max-width: 1024px) {
+	.k-webkit .k-scheduler-toolbar > ul.k-scheduler-views,
+	.k-ff .k-scheduler-toolbar > ul.k-scheduler-views,
+	.k-ie11 .k-scheduler-toolbar > ul.k-scheduler-views,
+	.k-safari .k-scheduler-toolbar > ul.k-scheduler-views {
+	  z-index: 999;
+	}
+}
