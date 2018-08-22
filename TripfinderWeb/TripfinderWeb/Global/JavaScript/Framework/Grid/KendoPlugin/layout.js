@@ -626,7 +626,10 @@
 		{
 			return;
 		}
-		tf.storageManager.save(this.options.storageKey, gridLayoutExtendedDataModel.toData(), null, null, false);
+		if (!this.options.isCalendarView)
+		{
+			tf.storageManager.save(this.options.storageKey, gridLayoutExtendedDataModel.toData(), null, null, false);
+		}
 	};
 
 	KendoGridLayoutMenu.prototype.resetLayoutClick = function(viewModel, e)
