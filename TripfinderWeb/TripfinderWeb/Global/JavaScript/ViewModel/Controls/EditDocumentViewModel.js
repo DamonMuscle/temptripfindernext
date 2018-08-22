@@ -202,21 +202,7 @@
 			.then(function(data)
 			{
 				this.obClassificationDataModels(data.Items);
-				if (this.obEntityDataModel().id() > 0)
-				{
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", this.obEntityDataModel().id()))
-						.then(function(data)
-						{
-							this.obEntityDataModel(new TF.DataModel.DocumentDataModel(data.Items[0]));
-							var classificationDataModels = this.obClassificationDataModels();
-							var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
-							{
-								return c.Id === this.obEntityDataModel().documentClassificationId()
-							}.bind(this)).ToArray()[0];
-							this.obSelectedDocumentClassification(classificationDataModel);
-						}.bind(this));
-				}
-				else if (this.documentData)
+				if (this.documentData)
 				{
 					var documentEntity = new TF.DataModel.DocumentDataModel().toData();
 					documentEntity.Id = this.documentData.Id;
@@ -230,6 +216,7 @@
 					this.obEntityDataModel(new TF.DataModel.DocumentDataModel(documentEntity));
 					this.obEntityDataModel().documentEntity = this.documentData.DocumentEntity;
 					this.obEntityDataModel().DocumentEntities = this.documentData.DocumentEntities;
+					this.obEntityDataModel().lastUpdated = this.documentData.LastUpdated;
 					var classificationDataModels = this.obClassificationDataModels();
 					var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
 					{

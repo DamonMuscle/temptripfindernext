@@ -26,128 +26,77 @@
 		this.sizeCss = "modal-sm";
 		this.description("Browse and select the file you would like to upload, select a Classification, and enter a Description.");
 		this.documentId = this.options.documentId;
-		if (this.documentId && this.documentId > 0)
+		if (options.documentData)
 		{
 			this.title("Edit Document");
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "document", "group", "documentrelationship"), { data: [this.documentId] })
-				.then(function(data)
-				{
-					var type, ids = [], promiseAll = [];
-					for (var i in data.Items)
-					{
-						type = "";
-						ids = data.Items[i].map(function(d) { type = d.AttachedToType; return d.AttachedToId; });
-						promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: ids })
-							.then(function(data)
-							{
-								var name, displayType;
-								for (var i in data.Items)
-								{
-									name = tf.EntityHelper.getEntityName(this.type, data.Items[i]);
-									displayType = tf.EntityHelper.getEntityType(this.type).display;
-									if (!!name && !!displayType)
-									{
-										this.model.associations.push({
-											DisplayName: name,
-											FieldName: name,
-											Id: data.Items[i].Id,
-											Type: displayType,
-											FieldType: this.type
-										});
-									}
-								}
-							}.bind({ model: this, type: type })));
-					}
-					Promise.all(promiseAll)
-						.then(function()
-						{
-							if (this.options.parentId === 0 && this.options.pendingAssociation)
-							{
-								this.associations.push({
-									DisplayName: "This Record",
-									Id: 0,
-									Type: tf.EntityHelper.getEntityType(options.parentType).display,
-									FieldType: options.parentType
-								});
-							}
-							this.obSelectedAssociations(this.associations);
-						}.bind(this));
-				}.bind(this));
-		}
-		else
-		{
-			if (options.documentData)
+			var type, attachIds = [], promiseAll = [], documentRelationshipEntities = options.documentData.DocumentRelationshipEntities;
+			if (documentRelationshipEntities.length > 0)
 			{
-				this.title("Edit Document");
-				var type, attachIds = [], promiseAll = [], documentRelationshipEntities = options.documentData.DocumentRelationshipEntities;
-				if (documentRelationshipEntities.length > 0)
+				for (var i = 0; i < documentRelationshipEntities.length; i++)
 				{
-					for (var i = 0; i < documentRelationshipEntities.length; i++)
-					{
-						type = documentRelationshipEntities[i].AttachedToType;
-						attachIds.push(documentRelationshipEntities[i].AttachedToId);
-					}
-					promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: attachIds })
-						.then(function(data)
-						{
-							var name, displayType;
-							for (var i in data.Items)
-							{
-								name = tf.EntityHelper.getEntityName(this.type, data.Items[i]);
-								displayType = tf.EntityHelper.getEntityType(this.type).display;
-								if (!!name && !!displayType)
-								{
-									this.model.associations.push({
-										DisplayName: name,
-										FieldName: name,
-										Id: data.Items[i].Id,
-										Type: displayType,
-										FieldType: this.type
-									});
-								}
-							}
-						}.bind({ model: this, type: type })));
-					Promise.all(promiseAll)
-						.then(function()
-						{
-							this.obSelectedAssociations(this.associations);
-						}.bind(this));
+					type = documentRelationshipEntities[i].AttachedToType;
+					attachIds.push(documentRelationshipEntities[i].AttachedToId);
 				}
-			} else
-			{
-				this.title("Add Documents");
-				if (options.parentId && options.parentId > 0)
-				{
-					this.getParentName(options.parentType, options.parentId)
-						.then(function(data)
+				promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: attachIds })
+					.then(function(data)
+					{
+						var name, displayType;
+						for (var i in data.Items)
 						{
-							var name = tf.EntityHelper.getEntityName(options.parentType, data.Items[0]);
-							var displayType = tf.EntityHelper.getEntityType(options.parentType).display;
+							name = tf.EntityHelper.getEntityName(this.type, data.Items[i]);
+							displayType = tf.EntityHelper.getEntityType(this.type).display;
 							if (!!name && !!displayType)
 							{
-								this.associations.push({
+								this.model.associations.push({
 									DisplayName: name,
 									FieldName: name,
-									Id: options.parentId,
+									Id: data.Items[i].Id,
 									Type: displayType,
-									FieldType: options.parentType
+									FieldType: this.type
 								});
-								this.obSelectedAssociations(this.associations);
-								this.editDocumentViewModel.setInitAssociations(this.associations);
 							}
-						}.bind(this));
-				}
-				else if (options.parentType)
-				{
-					this.associations.push({
-						DisplayName: "This Record",
-						Id: 0,
-						Type: tf.EntityHelper.getEntityType(options.parentType).display,
-						FieldType: options.parentType
-					});
-					this.obSelectedAssociations(this.associations);
-					this.editDocumentViewModel.setInitAssociations(this.associations);
-				}
+						}
+					}.bind({ model: this, type: type })));
+				Promise.all(promiseAll)
+					.then(function()
+					{
+						this.obSelectedAssociations(this.associations);
+					}.bind(this));
+			}
+		} else
+		{
+			this.title("Add Documents");
+			if (options.parentId && options.parentId > 0)
+			{
+				this.getParentName(options.parentType, options.parentId)
+					.then(function(data)
+					{
+						var name = tf.EntityHelper.getEntityName(options.parentType, data.Items[0]);
+						var displayType = tf.EntityHelper.getEntityType(options.parentType).display;
+						if (!!name && !!displayType)
+						{
+							this.associations.push({
+								DisplayName: name,
+								FieldName: name,
+								Id: options.parentId,
+								Type: displayType,
+								FieldType: options.parentType
+							});
+							this.obSelectedAssociations(this.associations);
+							this.editDocumentViewModel.setInitAssociations(this.associations);
+						}
+					}.bind(this));
+			}
+			else if (options.parentType)
+			{
+				this.associations.push({
+					DisplayName: "This Record",
+					Id: 0,
+					Type: tf.EntityHelper.getEntityType(options.parentType).display,
+					FieldType: options.parentType
+				});
+				this.obSelectedAssociations(this.associations);
+				this.editDocumentViewModel.setInitAssociations(this.associations);
 			}
 		}
 		this.obPositiveButtonLabel = ko.observable("Attach");
