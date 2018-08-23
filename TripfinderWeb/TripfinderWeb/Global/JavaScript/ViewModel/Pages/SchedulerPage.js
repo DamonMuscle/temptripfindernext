@@ -470,6 +470,10 @@
 		{
 			event = parentE;
 		}
+		else
+		{
+			event = e;
+		}
 		if (typeof (event) != "undefined" && event.button === 2)
 		{
 			if (self.kendoSchedule.view().name === "agenda")
