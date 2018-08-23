@@ -239,7 +239,6 @@
 			tf.fullScreenHelper = new TF.FullScreenHelper();
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
-			tf.tokenStorageManager = new TF.TokenStorageManager();
 			tf.loadingIndicator = self._createLoadingIndicator();
 			tf.ajax = new TF.Ajax(tf.loadingIndicator, true);
 			tf.promiseAjax = new TF.PromiseAjax(tf.ajax);
@@ -337,7 +336,7 @@
 								return tf.promiseBootbox.alert(invalidateMessage, "No Valid Data Source")
 									.then(function()
 									{
-										tf.tokenStorageManager.save("");
+										tf.storageManager.save("token", "", true);
 										location.reload();
 										return null;
 									});
@@ -381,7 +380,7 @@
 										return Promise.resolve(false);
 									} else
 									{
-										tf.tokenStorageManager.save("");
+										tf.storageManager.save("token", "", true);
 										location.reload();
 										return null;
 									}

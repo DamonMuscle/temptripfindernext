@@ -15,7 +15,7 @@
 		var clientKey = tf.storageManager.get("clientKey", true);
 		var username = tf.storageManager.get("userName", true);
 		var password = tf.storageManager.get("password", true);
-		var token = tf.tokenStorageManager.get();
+		var token = tf.storageManager.get("token", true);
 		var isLoggedin = typeof (tf.storageManager.get("isLoggedin", true)) === 'undefined' ? false : JSON.parse(tf.storageManager.get("isLoggedin", true));
 		this.clientKey = clientKey;
 		this.userName = username;
@@ -30,7 +30,7 @@
 
 	AuthManager.prototype.logOff = function()
 	{
-		tf.tokenStorageManager.save("");
+		tf.storageManager.save("token", "", true);
 		this.logOffWithoutRefresh()
 			.then(function()
 			{
@@ -111,7 +111,7 @@
 			{
 				if (result === false)
 				{
-					tf.tokenStorageManager.save("");
+					tf.storageManager.save("token", "", true);
 					location.reload();
 					return Promise.reject("login failed");
 				}

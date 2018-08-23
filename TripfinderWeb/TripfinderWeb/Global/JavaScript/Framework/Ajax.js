@@ -164,7 +164,7 @@
 			settings.beforeSend = function(xmlHttpRequest, settings)
 			{
 				this._onBeforeSend(xmlHttpRequest, settings, option.overlay, beforeSend)
-				var token = tf.tokenStorageManager.get();
+				var token = tf.storageManager.get("token", true);
 				if (token && tf.authManager.token && tf.authManager.token != token)
 				{
 					token = '';
