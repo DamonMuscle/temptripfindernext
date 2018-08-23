@@ -13,6 +13,7 @@
 		self.schedulerButton = true;
 		self.approveButton = false;
 		self.declineButton = false;
+		self.options._pageType = "myrequests";
 	}
 
 	MyRequestSchedulerPage.prototype.constructor = MyRequestSchedulerPage;

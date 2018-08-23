@@ -5,12 +5,13 @@
 	function MyRequestPage()
 	{
 		var self = this;
+		TF.Page.BaseGridPage.apply(self, arguments);
 		self.type = "fieldtrip";
 		self.pageType = "myrequests";
-		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = true;
 		self.detailButton = true;
 		self.schedulerButton = true;
+		self.options._pageType = "myrequests";
 	}
 
 	MyRequestPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);

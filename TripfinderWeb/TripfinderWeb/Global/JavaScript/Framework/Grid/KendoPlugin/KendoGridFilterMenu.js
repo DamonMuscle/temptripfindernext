@@ -107,7 +107,8 @@
 	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
 	{
 		var stageIds = [];
-		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
+		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read")
+			|| this.options._pageType == "myrequests")
 		{
 			stageIds = [101, 100, 99, 98, 7, 6, 5, 4, 3, 2, 1];
 		}
