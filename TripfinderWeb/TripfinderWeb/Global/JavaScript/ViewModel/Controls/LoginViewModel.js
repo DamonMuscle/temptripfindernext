@@ -81,21 +81,21 @@
 
 	LoginViewModel.prototype.signIn = function()
 	{
-		tf.storageManager.save("token", "", true);
-		return tf.promiseAjax.post(pathCombine(tf.api.server(), $.trim(this.obClientKey()), "auth", "authentication?vendor=Transfinder&prefix=" + tf.storageManager.prefix.split('.')[0] + "&username=" + this.obUsername()),
+		tf.tokenStorageManager.save("");
+		return tf.promiseAjax.post(pathCombine(tf.api.server(), $.trim(this.obClientKey()), "auth", "authentication?vendor=Transfinder&prefix=" + tf.tokenStorageManager.prefix.split('.')[0] + "&username=" + this.obUsername()),
 			{
 				data: '"' + this.obPassword() + '"'
 			},
 			{
 				auth:
-				{
-					noInterupt: true
-				}
+					{
+						noInterupt: true
+					}
 			})
 			.then(function(apiResponse)
 			{
 				var token = apiResponse.Items[0];
-				tf.storageManager.save("token", token, true);
+				tf.tokenStorageManager.save(token);
 				tf.authManager.token = token;
 				return { clientKey: $.trim(this.obClientKey()), username: this.obUsername(), password: this.obPassword() };
 			}.bind(this))
