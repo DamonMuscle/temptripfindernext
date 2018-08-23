@@ -882,7 +882,7 @@
 
 		safeUpdate(this.obVehicleGridViewModel());
 		safeUpdate(this.obDriversGridViewModel());
-		safeUpdate(this.obDriversGridViewModel());
+		safeUpdate(this.obBusAideGridViewModel());
 
 		tf.loadingIndicator.showImmediately();
 	}
