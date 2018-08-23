@@ -829,19 +829,20 @@
 		{
 			idFromScheduler = self.fieldTripId;
 		}
-		self.detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
-		self.detailView.onCloseDetailEvent.subscribe(
+		var detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
+		detailView.onCloseDetailEvent.subscribe(
 			self.closeDetailClick.bind(self)
 		);
 		if (TF.isMobileDevice)
 		{
-			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+			tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView);
 		}
 		else
 		{
-			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+			tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", detailView);
 		}
 
+		self.detailView = detailView;
 		self.obShowDetailPanel(true);
 	};
 
