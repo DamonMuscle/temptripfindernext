@@ -220,11 +220,15 @@
 						.then(function(apiResponse)
 						{
 							var authorizationInfo = new TF.AuthorizationInfo(apiResponse.Items[0]);
-							tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "vendoraccessinfo"))
-								.then(function(response)
+							if (!tf.authManager.clientKey)
+							{
+								tf.authManager.clientKey = this.loginViewModel.obClientKey();
+							}
+							tf.authManager.getPurchasedProducts()
+								.then(function(purchasedProducts)
 								{
 									this.loginViewModel.obLoginErrorMessage('');
-									if (response.Items[0].Products.indexOf("Tripfinder") === -1)
+									if (purchasedProducts.indexOf("Tripfinder") === -1)
 									{
 										this.loginViewModel.obLoginErrorMessage('Tripfinder is not enabled for this Client ID.  Contact us at support@transfinder.com or 888-427-2403 to inquire about enabling this product.');
 										return;

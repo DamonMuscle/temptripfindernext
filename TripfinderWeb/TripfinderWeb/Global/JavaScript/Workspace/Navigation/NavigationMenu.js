@@ -19,10 +19,17 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
+		self.availableApplications = {
+			fleetfinder: "Fleetfinder/admin.html",
+			viewfinder: "Viewfinder"
+		};
+
+		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
 		self.obIsExpand = ko.observable();
 		self.isOnAnimation = false;
 		self.isBeginWithCollapse = false;
+		self.obSupportedApplications = ko.observableArray([]);
 		self.obReportPages = ko.observableArray([]);
 		self.obSettingPages = ko.observableArray([]);
 		self.obDashboardLoRes = ko.observable(false);
@@ -31,6 +38,8 @@
 		self.tooltip = new TF.Helper.TFTooltip();
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
+
+		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
 	}
 
 	/**
@@ -59,6 +68,7 @@
 		self.bindRelatedEvents();
 		self.initNavigationMenuState();
 		self.initTooltip();
+		self.initApplicationSwitcher();
 
 		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
@@ -111,10 +121,10 @@
 	NavigationMenu.prototype.bindRelatedEvents = function()
 	{
 		var self = this,
-			itemList = self.$navigationMenu.find(".navigation-item");
+			menuItems = self.$navigationMenu.find(".navigation-item, .item-logo");
 
-		itemList.on("mouseenter", self.onNavigationItemToggleHoverStatus.bind(self, true));
-		itemList.on("mouseleave", self.onNavigationItemToggleHoverStatus.bind(self, false));
+		menuItems.on("mouseenter", self.onNavigationItemToggleHoverStatus.bind(self, true));
+		menuItems.on("mouseleave", self.onNavigationItemToggleHoverStatus.bind(self, false));
 		tf.shortCutKeys.bind(["esc"], self.closeOpenedNavigationItemMenu.bind(self, false));
 		$(document).on("click.navigation-menu", self.closeOpenedNavigationItemMenu.bind(self, false));
 
@@ -156,7 +166,7 @@
 	{
 		var self = this, hoverWidth,
 			widthBuffer = 1,
-			$item = $(evt.target).closest(".navigation-item");
+			$item = $(evt.target).closest(".navigation-item, .item-logo");
 
 		if (!onHover)
 		{
@@ -206,6 +216,10 @@
 		else if ($openedElement.hasClass("navigation-item"))
 		{
 			return self.togglePageMenuDisplay($openedElement, false, duration);
+		}
+		else if ($openedElement.hasClass("item-logo"))
+		{
+			return self.toggleAppSwitcherMenu(false);
 		}
 	};
 
@@ -290,7 +304,7 @@
 			$navContent = $navMenu.find(".navigation-content"),
 			isQuickSearchActive = self.isQuicKSearchActive(),
 			// If the menu is already opened, do not fade out the label
-			$fadeOutElements = $navMenu.find(".item-icon.logo, .search-header .search-text, .search-header .clear-btn"),
+			$fadeOutElements = $navMenu.find(".item-logo, .search-header .search-text, .search-header .clear-btn"),
 			$moreBtn = $toolbar.find(".more"),
 			$toolbarBtnOthers = $toolbar.find(".others"),
 			$gridMap = $("#pageContent"),
@@ -939,11 +953,123 @@
 	};
 
 	/**
+	 * Initialize application switcher.
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.initApplicationSwitcher = function()
+	{
+		var self = this,
+			promise = tf.authManager.supportedProducts
+				? Promise.resolve()
+				: tf.authManager.getPurchasedProducts();
+
+		self.$logoItem = self.$navigationMenu.find(".navigation-header .item-logo")
+		self.$appSwitcherMenu = self.$navigationMenu.find(".navigation-header .item-menu");
+		promise.then(function()
+		{
+			var applications = [];
+
+			$.each(tf.authManager.supportedProducts, function(_, item)
+			{
+				var productName = item.toLowerCase();
+				if (self.availableApplications.hasOwnProperty(productName))
+				{
+					applications.push(productName);
+				}
+			});
+
+			self.obSupportedApplications(applications);
+
+			self = null;
+		});
+	};
+
+	/**
+	 * Event handler when the logo is clicked.
+	 * @param {Object} data
+	 * @param {Event} event
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.onLogoClick = function(data, event)
+	{
+		var self = this,
+			isMenuOpened = self.$logoItem.hasClass("menu-opened");
+
+		if (!self.closeOpenedNavigationItemMenu() && !isMenuOpened)
+		{
+			self.toggleAppSwitcherMenu(true);
+		}
+	};
+
+	/**
+	 * Toggle application switcher's display status.
+	 * @param {Boolean} flag
+	 * @return {void}
+	 */
+	NavigationMenu.prototype.toggleAppSwitcherMenu = function(flag)
+	{
+		var self = this,
+			animationDuration = 250,
+			lineHeight = 54,
+			promise = $.Deferred();
+
+		if (flag)
+		{
+			self.$logoItem.css("background-color", "#4a4a4a");
+			self.$appSwitcherMenu.css({ height: lineHeight * self.obSupportedApplications().length });
+		}
+		else
+		{
+			self.$logoItem.css("background-color", "#262626");
+			self.$appSwitcherMenu.css({ height: 0 });
+		}
+
+		setTimeout(function()
+		{
+			self.$logoItem.css("background-color", "");
+			self.$logoItem.toggleClass("menu-opened", flag);
+			promise.resolve(true);
+		}, animationDuration);
+
+		return promise;
+	}
+
+	/**
+	 * The click event handler when other product's logo is clicked.
+	 * @param {Boolean} newTab 
+	 * @param {String} data 
+	 * @param {Event} evt 
+	 */
+	NavigationMenu.prototype.onSwitchAppClick = function(newTab, data, evt)
+	{
+		evt.stopPropagation();
+		evt.preventDefault();
+
+		var self = this,
+			routeName = self.availableApplications[data],
+			url = location.origin + "/" + routeName,
+			requireNewTab = (newTab || (self.isMacintosh && evt.metaKey) || (!self.isMacintosh && evt.ctrlKey));
+
+		window.open(url, requireNewTab ? "_blank" : "_self");
+	};
+
+
+	/**
 	 * The dispose function.
 	 * @return {void}
 	 */
 	NavigationMenu.prototype.dispose = function()
 	{
-		$(document).off("click.navigation-menu")
+		var self = this,
+			menuItems = self.$navigationMenu.find(".navigation-item, .item-logo");
+
+		self.$navigationMenu = null;
+		self.$logoItem = null;
+		self.$appSwitcherMenu = null;
+
+		menuItems.off("mouseenter");
+		menuItems.off("mouseleave");
+		tf.shortCutKeys.unbind(["esc"]);
+		$(document).off("click.navigation-menu");
 	};
 })();

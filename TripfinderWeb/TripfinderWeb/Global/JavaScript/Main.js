@@ -107,6 +107,11 @@ function isSafari()
 	return safari;
 }
 
+function isMacintosh()
+{
+	return navigator.platform.indexOf('Mac') > -1;
+}
+
 function isSmallScreen()
 {
 	return window.innerHeight < 621 || window.innerWidth < 621;

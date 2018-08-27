@@ -41,31 +41,91 @@
 		.navigation-header {
 			position: relative;
 			height: 54px;
-			padding-left: 18px;
 			background-color: #333;
+			z-index: 100;
 			overflow: hidden;
 
 			>div {
 				height: 54px;
 			}
 
-			.logo {
+			.item-logo {
 				opacity: 0;
 				background-size: auto auto;
-				width: 88px;
-				cursor: default;
+				width: 0;
+
+				&:hover{
+					cursor: pointer;
+				}
+
+				&.hoverState, &.menu-opened {
+					background-color: @HoverBackgroundColor !important;
+				}
+
+				.logo {
+					margin-left: 18px;
+					height: 100%;
+					background-size: auto auto;
+					width: 88px;
+				}	
+			}
+
+			.item-menu {
+				width:238px;
+				height:0;
+				transition: all 250ms ease;
+				overflow: hidden;
+				background-color: @HoverBackgroundColor;
+				
+				ul {
+					padding: 0;
+
+					li {
+						height: 54px;
+						list-style: none;
+						background-repeat: no-repeat;
+						background-position: 18px center;
+						cursor: pointer;
+
+						&:hover {
+							background-color: rgba(255, 255, 255, 0.1);
+						}
+
+						&[name="viewfinder"] {
+							background-image: url("../img/app-switcher/viewfinderlogo.svg");
+							background-size: 88px 54px;
+						}
+
+						&[name="fleetfinder"] {
+							background-image: url("../img/app-switcher/fleetfinderlogo.png");
+						}
+
+						.item-icon {
+							float: right;
+							width: 16px;
+							height: 16px;
+							margin-top: 19px;
+							margin-right: 19px;
+						}
+					}
+				}
 			}
 
 			.toggle-button {
 				position: absolute;
 				top: 0;
 				right: 0;
+				height: 54px;
+				width: 60px;
+				padding-top: 15px;
+				padding-left: 18px;
 				background-color: #333;
 				border-left: 1px solid #262626;
+				cursor: pointer;
 
 				.left-caret {
-					height: 54px;
-					width: 60px;
+					height: 24px;
+					width: 24px;
 					transform: rotate(180deg);
 					-webkit-transform: rotate(180deg);
 					transition: all 350ms ease;
@@ -228,8 +288,11 @@
 			overflow: visible !important;
 
 			.navigation-header {
-				.logo {
+				overflow: visible;
+				
+				.item-logo {
 					opacity: 1;
+					width: 238px;
 				}
 
 				.left-caret {
@@ -319,7 +382,7 @@
 			cursor: pointer;
 
 			&.logo {
-				background-image: url("../img/navigation-menu/tripfinderlogo.svg");
+				background-image: url("../img/app-switcher/tripfinderlogo.svg");
 			}
 
 			&.left-caret {

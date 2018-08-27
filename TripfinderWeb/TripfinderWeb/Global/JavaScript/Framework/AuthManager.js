@@ -177,6 +177,15 @@
 		this.password = tf.storageManager.get("password", true);
 	};
 
+	AuthManager.prototype.getPurchasedProducts = function()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.clientKey), "vendoraccessinfo"))
+			.then(function(response)
+			{
+				this.supportedProducts = response.Items[0].Products;
+				return this.supportedProducts;
+			}.bind(this));
+	};
 
 	createNamespace("TF").AuthorizationInfo = AuthorizationInfo;
 
@@ -218,5 +227,4 @@
 		}
 		return false;
 	};
-
 })();
