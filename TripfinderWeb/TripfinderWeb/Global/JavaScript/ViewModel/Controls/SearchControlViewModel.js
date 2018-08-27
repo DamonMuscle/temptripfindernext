@@ -471,8 +471,11 @@
 	 */
 	SearchControlViewModel.prototype.clearSearchClick = function(model, e)
 	{
-		this.clearText();
-		e.stopPropagation();
+		if ($(".menu-opened").length === 0)
+		{
+			this.clearText();
+			e.stopPropagation();
+		}
 	};
 
 	/**
