@@ -239,8 +239,7 @@
 				self.$searchTypesMenu.hide();
 			}
 
-			if ($target.closest(".navigation-quick-search.active").length <= 0
-				&& $target.closest(".toggle-button").length <= 0
+			if ($target.closest(".navigation-quick-search.active, .toggle-button, .navigation-header .item-logo").length <= 0
 				&& !$target.hasClass("search-text"))
 			{
 				self.isMouseDownInSearchZone = false;
