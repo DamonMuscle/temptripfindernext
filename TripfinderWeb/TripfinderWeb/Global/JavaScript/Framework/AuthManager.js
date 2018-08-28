@@ -127,10 +127,37 @@
 				})
 					.then(function(apiResponse)
 					{
-						tf.tokenStorageManager.save("isLoggedin", true);
-						this._hasLoggedin = true;
-						this.obIsLogIn(true);
 						this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
+
+						return tf.authManager.getPurchasedProducts()
+							.then(function(purchasedProducts)
+							{
+								if (purchasedProducts.indexOf("Tripfinder") === -1)
+								{
+									return this._loginUseModal(loginViewModal);
+								}
+
+								var ft1 = this.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
+								var ft2 = this.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
+								var ft3 = this.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
+								var ft4 = this.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
+								var ft5 = this.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
+								var ft = ft1 || ft2 || ft3 || ft4 || ft5;
+
+								var flt = this.authorizationInfo.isAuthorizedFor("filters", "read");
+
+								var pfiledtrip = this.authorizationInfo.isAuthorizedFor("filedtrip", "read");
+
+								if (!(ft || pfiledtrip))
+								{
+									return this._loginUseModal(loginViewModal);
+								}
+
+								tf.tokenStorageManager.save("isLoggedin", true);
+								this._hasLoggedin = true;
+								this.obIsLogIn(true);
+							}.bind(this));
+
 					}.bind(this));
 			}.bind(this));
 	};
