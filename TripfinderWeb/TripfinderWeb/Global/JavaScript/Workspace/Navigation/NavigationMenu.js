@@ -1048,9 +1048,10 @@
 		var self = this,
 			routeName = self.availableApplications[data],
 			url = location.origin + "/" + routeName,
-			requireNewTab = (newTab || (self.isMacintosh && evt.metaKey) || (!self.isMacintosh && evt.ctrlKey));
+			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 
 		window.open(url, requireNewTab ? "_blank" : "_self");
+		self.toggleAppSwitcherMenu(false);
 	};
 
 
