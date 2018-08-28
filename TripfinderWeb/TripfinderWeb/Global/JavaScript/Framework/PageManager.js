@@ -159,7 +159,7 @@
 		var rememberMe = tf.storageManager.get("rememberMe", true) || false;
 		if (!rememberMe)
 		{
-			tf.storageManager.save("clientKey", "", true);
+			tf.tokenStorageManager.save("clientKey", "");
 			tf.storageManager.save("userName", "", true);
 			tf.storageManager.save("password", "", true);
 		}

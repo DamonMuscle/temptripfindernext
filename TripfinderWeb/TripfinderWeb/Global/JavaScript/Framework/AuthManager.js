@@ -12,15 +12,15 @@
 		this.logOffTag = false;
 
 		this.obIsLogIn = ko.observable(false);
-		var clientKey = tf.storageManager.get("clientKey", true);
+		var clientKey = tf.tokenStorageManager.get("clientKey", true);
 		var username = tf.storageManager.get("userName", true);
 		var password = tf.storageManager.get("password", true);
-		var token = tf.tokenStorageManager.get();
-		var isLoggedin = typeof (tf.storageManager.get("isLoggedin", true)) === 'undefined' ? false : JSON.parse(tf.storageManager.get("isLoggedin", true));
+		this.token = tf.tokenStorageManager.get("token");
+		var isLoggedin = typeof (tf.tokenStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.tokenStorageManager.get("isLoggedin"));
 		this.clientKey = clientKey;
 		this.userName = username;
 		this.password = password;
-		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(token);
+		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(this.token);
 
 		if (this._hasLoggedin)
 		{
@@ -30,7 +30,7 @@
 
 	AuthManager.prototype.logOff = function()
 	{
-		tf.tokenStorageManager.save("");
+		tf.tokenStorageManager.save("token", "");
 		this.logOffWithoutRefresh()
 			.then(function()
 			{
@@ -47,7 +47,7 @@
 		return this.beforeLogOff.notify()
 			.then(function(results)
 			{
-				tf.storageManager.save("isLoggedin", false, true);
+				tf.tokenStorageManager.save("isLoggedin", false);
 			})
 	};
 
@@ -111,7 +111,7 @@
 			{
 				if (result === false)
 				{
-					tf.tokenStorageManager.save("");
+					tf.tokenStorageManager.save("token", "");
 					location.reload();
 					return Promise.reject("login failed");
 				}
@@ -123,7 +123,7 @@
 				})
 					.then(function(apiResponse)
 					{
-						tf.storageManager.save("isLoggedin", true, true);
+						tf.tokenStorageManager.save("isLoggedin", true);
 						this._hasLoggedin = true;
 						this.obIsLogIn(true);
 						this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
@@ -146,7 +146,7 @@
 				this.clientKey = result.clientKey;
 				this.userName = result.username;
 				this.password = result.password;
-				tf.storageManager.save("clientKey", result.clientKey, true);
+				tf.tokenStorageManager.save("clientKey", result.clientKey);
 				tf.storageManager.save("userName", result.username, true);
 				tf.storageManager.save("password", result.password, true);
 				if (tf.datasourceManager.databaseId)
@@ -172,7 +172,7 @@
 
 	AuthManager.prototype.updateInfo = function()
 	{
-		this.clientKey = tf.storageManager.get("clientKey", true);
+		this.clientKey = tf.tokenStorageManager.get("clientKey");
 		this.userName = tf.storageManager.get("userName", true);
 		this.password = tf.storageManager.get("password", true);
 	};

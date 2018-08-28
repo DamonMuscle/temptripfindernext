@@ -6,14 +6,17 @@
 	function SoftSessionValidator(authManager)
 	{
 		this._monitorSession = this._monitorSession.bind(this);
+		this._monitorTokenChanged = this._monitorTokenChanged.bind(this);
 		this._authManager = authManager;
 	}
 
 	SoftSessionValidator.prototype._monitorInteval = 30000;
+	SoftSessionValidator.prototype._tokenMonitorInteval = 10000;
 
 	SoftSessionValidator.prototype.activate = function()
 	{
 		setTimeout(this._monitorSession, this._monitorInteval);
+		setTimeout(this._monitorTokenChanged, this._tokenMonitorInteval);
 	};
 
 	SoftSessionValidator.prototype._verify = function()
@@ -42,5 +45,21 @@
 				setTimeout(self._monitorSession, self._monitorInteval);
 			}
 		})
+	};
+
+	SoftSessionValidator.prototype._monitorTokenChanged = function()
+	{
+		var self = this;
+		if (tf.tokenStorageManager.get("token") != self._authManager.token)
+		{
+			tf.promiseBootbox.alert("Login session expired")
+				.then(function()
+				{
+					tf.pageManager.logout();
+				});
+			return;
+		}
+
+		setTimeout(self._monitorTokenChanged, self._tokenMonitorInteval);
 	};
 })()

@@ -161,7 +161,7 @@
 			this.loginViewModel.obLoginErrorMessage('A valid Client ID and User Name are required to reset a password.');
 			return;
 		}
-		tf.tokenStorageManager.save("");
+		tf.tokenStorageManager.save("token", "");
 		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "auth", "forgotpassword", "tripfinder", userName, "Transfinder"))
 			.then(function(apiResponse)
 			{
@@ -253,7 +253,7 @@
 									{
 										if (this.loginViewModel.obClientKey() !== "support")
 										{
-											tf.storageManager.save("clientKey", this.loginViewModel.obClientKey(), true);
+											tf.tokenStorageManager.save("clientKey", this.loginViewModel.obClientKey(), true);
 											tf.storageManager.save("userName", this.loginViewModel.obUsername(), true);
 											tf.storageManager.save("password", this.loginViewModel.obPassword(), true);
 

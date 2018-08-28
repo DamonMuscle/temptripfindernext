@@ -337,7 +337,7 @@
 								return tf.promiseBootbox.alert(invalidateMessage, "No Valid Data Source")
 									.then(function()
 									{
-										tf.tokenStorageManager.save("");
+										tf.tokenStorageManager.save("token", "");
 										location.reload();
 										return null;
 									});
@@ -381,7 +381,7 @@
 										return Promise.resolve(false);
 									} else
 									{
-										tf.tokenStorageManager.save("");
+										tf.tokenStorageManager.save("token", "");
 										location.reload();
 										return null;
 									}
