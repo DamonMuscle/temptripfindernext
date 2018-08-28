@@ -19,10 +19,7 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.availableApplications = {
-			fleetfinder: "Fleetfinder/admin.html",
-			viewfinder: "Viewfinder"
-		};
+		self.availableApplications = INSTALLER_CONFIG.ProductUrls;
 
 		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
@@ -972,7 +969,7 @@
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
 				var productName = item.toLowerCase();
-				if (self.availableApplications.hasOwnProperty(productName))
+				if (productName !== "tripfinder" && self.availableApplications.hasOwnProperty(productName))
 				{
 					applications.push(productName);
 				}
