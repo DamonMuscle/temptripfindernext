@@ -259,6 +259,7 @@
 
 											//set clientKey in case to use it when get all preference
 											tf.authManager.clientKey = this.loginViewModel.obClientKey();
+											tf.tokenStorageManager.save("token", tf.authManager.token);
 											this.positiveClose(result);
 
 										} else
