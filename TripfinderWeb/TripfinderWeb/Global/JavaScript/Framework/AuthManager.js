@@ -30,7 +30,11 @@
 
 	AuthManager.prototype.logOff = function()
 	{
-		tf.tokenStorageManager.save("token", "");
+		if (this.token === tf.tokenStorageManager.get("token"))
+		{
+			tf.tokenStorageManager.save("token", "");
+		}
+
 		this.logOffWithoutRefresh()
 			.then(function()
 			{
