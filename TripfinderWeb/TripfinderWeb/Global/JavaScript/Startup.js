@@ -429,19 +429,16 @@
 									{
 										tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
 
-										if (window.opener)
+										if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
 										{
-											if (window.name.indexOf("new-pageWindow") >= 0)
-											{
-												var pageType = getParameterByName("pagetype");
-												tf.pageManager.openNewPage(pageType, null, true, true);
-											}
-											else if (window.name.indexOf("new-detailWindow") >= 0)
-											{
-												var id = getParameterByName('id'),
-													detailView = new TF.DetailView.DetailViewViewModel(id);
-												tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
-											}
+											var pageType = getParameterByName("pagetype");
+											tf.pageManager.openNewPage(pageType, null, true, true);
+										}
+										else if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+										{
+											var id = getParameterByName('id'),
+												detailView = new TF.DetailView.DetailViewViewModel(id);
+											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
 										}
 										else if (tf.urlParm && tf.urlParm.tripid)
 										{
