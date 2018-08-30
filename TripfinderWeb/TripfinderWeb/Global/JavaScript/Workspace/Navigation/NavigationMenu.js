@@ -19,7 +19,11 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.availableApplications = INSTALLER_CONFIG.ProductUrls;
+		self.availableApplications = {
+			viewfinder: "Viewfinder",
+			fleetfinder: "Fleetfinder/admin.html",
+			tripfinder: "Tripfinder"
+		};
 
 		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
@@ -65,7 +69,11 @@
 		self.bindRelatedEvents();
 		self.initNavigationMenuState();
 		self.initTooltip();
-		self.initApplicationSwitcher();
+
+		if (!tf.permissions.isSupport)
+		{
+			self.initApplicationSwitcher();
+		}
 
 		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
@@ -118,7 +126,9 @@
 	NavigationMenu.prototype.bindRelatedEvents = function()
 	{
 		var self = this,
-			menuItems = self.$navigationMenu.find(".navigation-item, .item-logo");
+			menuItems = tf.permissions.isSupport
+				? self.$navigationMenu.find(".navigation-item")
+				: self.$navigationMenu.find(".navigation-item, .item-logo");
 
 		menuItems.on("mouseenter", self.onNavigationItemToggleHoverStatus.bind(self, true));
 		menuItems.on("mouseleave", self.onNavigationItemToggleHoverStatus.bind(self, false));
@@ -989,8 +999,10 @@
 	 */
 	NavigationMenu.prototype.onLogoClick = function(data, event)
 	{
-		var self = this,
-			isMenuOpened = self.$logoItem.hasClass("menu-opened");
+		var self = this;
+		if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
+
+		var isMenuOpened = self.$logoItem.hasClass("menu-opened");
 
 		if (!self.closeOpenedNavigationItemMenu() && !isMenuOpened)
 		{

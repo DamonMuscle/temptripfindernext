@@ -4,6 +4,7 @@
 		<div class="item-logo" data-bind="click:onLogoClick">
 			<div class="item-icon logo"></div>
 		</div>
+		<!-- ko if: !tf.permissions.isSupport -->
 		<div class="item-menu">
 			<ul data-bind="foreach: {data: obSupportedApplications}">
 				<li data-bind="attr:{name:$data},click:$parent.onSwitchAppClick.bind($data, null)">
@@ -11,6 +12,7 @@
 				</li>
 			</ul>
 		</div>
+		<!-- /ko -->
 		<div class="toggle-button" data-bind="click:toggleMenuBtnClick">
 			<div class="item-icon left-caret"></div>
 		</div>
