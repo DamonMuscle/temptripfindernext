@@ -366,11 +366,11 @@
 									buttons: {
 										yes: {
 											label: "Choose Data Source",
-											className: "btn-primary btn-sm btn-primary-black"
+											className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
 										},
 										no: {
 											label: "Cancel",
-											className: "btn-default btn-sm btn-default-link"
+											className: TF.isPhoneDevice ? "btn-no-mobile" : "btn-default btn-sm btn-default-link"
 										}
 									}
 								}).then(function(result)
