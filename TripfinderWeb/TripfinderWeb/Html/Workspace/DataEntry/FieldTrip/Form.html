@@ -452,6 +452,7 @@
 					<strong data-bind="css:obRequiredFields()&&obRequiredFields().DirectionNotes&&obRequiredFields().DirectionNotes.Required?'requirestar':null">Directions</strong>
 				</h4>
 				<div class="col-xs-24 form-group no-padding-left no-padding-right large-textarea">
+					<label style="display:none">Directions</label>
 					<textarea class="form-control verticalResize" style="height: 200px;" data-bind="value:obEntityDataModel().directionNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DirectionNotes?obRequiredFields().DirectionNotes.Required:null)"
 							  maxlength="10000" name="DirectionNotes" />
 				</div>
