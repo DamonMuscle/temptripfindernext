@@ -250,7 +250,10 @@
 	{
 		this._$form = $(el);
 		this.initValidation();
-		this._$form.find("[name=selReportType]").focus();
+		if (!TF.isMobileDevice)
+		{
+			this._$form.find("[name=selReportType]").focus();
+		}
 	};
 
 	GenerateReportViewModel.prototype.initValidation = function()
@@ -893,7 +896,10 @@
 										{
 											if (retry == true)
 											{
-												self._$form.find("[name=selReportType]").focus();
+												if (!TF.isMobileDevice)
+												{
+													self._$form.find("[name=selReportType]").focus();
+												}
 												resolve("retry");
 											}
 											else
