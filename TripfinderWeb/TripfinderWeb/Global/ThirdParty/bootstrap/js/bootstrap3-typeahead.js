@@ -136,13 +136,19 @@
 				})
 				.show();
 
-			if (this.$menu.outerWidth() > pos.width)
+			if (pos.left + this.$menu.outerWidth() > $(window).width())
+			{
+				this.$menu.css({
+					width: $(window).width() - pos.left
+				});
+			}
+			else if (this.$menu.outerWidth() > pos.width)
 			{
 				if (pos.left + this.$menu.outerWidth() > bodyWidth)
 				{
 					this.$menu.css({
 						left: pos.left - this.$menu.outerWidth() + wrap.outerWidth()
-					})
+					});
 				}
 			}
 			this.shown = true;
