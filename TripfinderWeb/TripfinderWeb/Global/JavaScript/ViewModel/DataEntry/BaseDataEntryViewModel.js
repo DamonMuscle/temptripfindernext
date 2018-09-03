@@ -447,14 +447,15 @@
 			}
 		});
 
-		this.$form.find("input[data-tf-input-type=Phone]").each(function(n, field)
+		this.$form.find("input[data-tf-input-type=Phone],input[data-tf-input-type=Fax]").each(function(n, field)
 		{
-			var name = $(field).attr("name");
+			var name = $(field).attr("name"), type = $(field).attr("phonetype") || "phone";
+
 			if (validatorFields[name] && validatorFields[name].validators)
 			{
 				validatorFields[name].validators.phone = {
 					country: tfRegion.toUpperCase(),
-					message: " invalid phone number"
+					message: " invalid " + type + " number"
 				};
 			}
 			else
@@ -464,7 +465,7 @@
 					validators: {
 						phone: {
 							country: tfRegion.toUpperCase(),
-							message: " invalid phone number"
+							message: " invalid " + type + " number"
 						}
 					}
 				}
