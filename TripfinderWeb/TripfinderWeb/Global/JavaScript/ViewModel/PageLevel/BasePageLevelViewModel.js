@@ -382,6 +382,9 @@
 			case "invalid phone number":
 				message = " is not a valid phone number.";
 				break;
+			case "invalid fax number":
+				message = " is not a valid fax number.";
+				break;
 			default:
 				message = " " + message;
 				break;
