@@ -161,7 +161,7 @@
 			this.loginViewModel.obLoginErrorMessage('A valid Client ID and User Name are required to reset a password.');
 			return;
 		}
-		tf.tokenStorageManager.save("token", "");
+		tf.entStorageManager.save("token", "");
 		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "auth", "forgotpassword", "tripfinder", userName, "Transfinder"))
 			.then(function(apiResponse)
 			{
@@ -253,13 +253,13 @@
 									{
 										if (this.loginViewModel.obClientKey() !== "support")
 										{
-											tf.tokenStorageManager.save("clientKey", this.loginViewModel.obClientKey(), true);
-											tf.storageManager.save("userName", this.loginViewModel.obUsername(), true);
-											tf.storageManager.save("password", this.loginViewModel.obPassword(), true);
+											tf.entStorageManager.save("clientKey", this.loginViewModel.obClientKey());
+											tf.entStorageManager.save("userName", this.loginViewModel.obUsername());
+											tf.entStorageManager.save("password", this.loginViewModel.obPassword());
 
 											//set clientKey in case to use it when get all preference
 											tf.authManager.clientKey = this.loginViewModel.obClientKey();
-											tf.tokenStorageManager.save("token", tf.authManager.token);
+											tf.entStorageManager.save("token", tf.authManager.token);
 											this.positiveClose(result);
 
 										} else
@@ -283,6 +283,10 @@
 					if (apiResponse.Message === "Invalid Configurations")
 					{
 						apiResponse.Message = TF.productName + " is not properly configured.  You cannot login.  Contact us at support@transfinder.com or 888-427-2403.";
+					}
+					if (apiResponse.Message === "Client ID not enabled for this product")
+					{
+						apiResponse.Message = "Tripfinder is not enabled for this Client ID.  Contact us at support@transfinder.com or 888-427-2403 to inquire about enabling this product.";
 					}
 					if (apiResponse.StatusCode == 401)
 					{

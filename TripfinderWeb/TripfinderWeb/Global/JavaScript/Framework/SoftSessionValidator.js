@@ -50,7 +50,7 @@
 	SoftSessionValidator.prototype._monitorTokenChanged = function()
 	{
 		var self = this;
-		if (tf.tokenStorageManager.get("token") != self._authManager.token)
+		if (tf.entStorageManager.get("token") != self._authManager.token)
 		{
 			tf.promiseBootbox.alert("Login session expired")
 				.then(function()

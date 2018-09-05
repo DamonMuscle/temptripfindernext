@@ -24,9 +24,9 @@
 		this.obLoginErrorMessageRP = ko.observable('');
 		if (this.obRememberMe())
 		{
-			this.obClientKey = ko.observable(tf.tokenStorageManager.get("clientKey", true) || '');
-			this.obUsername = ko.observable(tf.storageManager.get("userName", true) || '');
-			this.obPassword = ko.observable(tf.storageManager.get("password", true) || '');
+			this.obClientKey = ko.observable(tf.entStorageManager.get("clientKey") || '');
+			this.obUsername = ko.observable(tf.entStorageManager.get("userName") || '');
+			this.obPassword = ko.observable(tf.entStorageManager.get("password") || '');
 		}
 	}
 

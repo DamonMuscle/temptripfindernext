@@ -1,32 +1,32 @@
 ﻿(function()
 {
-	createNamespace("TF").TokenStorageManager = TokenStorageManager;
+	createNamespace("TF").EntStorageManager = EntStorageManager;
 
-	function TokenStorageManager()
+	function EntStorageManager()
 	{
 		this.prefix = "ent.";
 		this.storageManager = new TF.StorageManager("ent");
 	};
 
-	//TokenStorageManager.prototype.save = function(token)
+	//EntStorageManager.prototype.save = function(token)
 	//{
 	//	var self = this;
 	//	self.storageManager.save("token", token, true);
 	//};
 
-	//TokenStorageManager.prototype.get = function()
+	//EntStorageManager.prototype.get = function()
 	//{
 	//	var self = this;
 	//	return self.storageManager.get("token", true);
 	//};
 
-	TokenStorageManager.prototype.save = function(key, value)
+	EntStorageManager.prototype.save = function(key, value)
 	{
 		var self = this;
 		self.storageManager.save(key, value, true);
 	};
 
-	TokenStorageManager.prototype.get = function(key)
+	EntStorageManager.prototype.get = function(key)
 	{
 		var self = this;
 		return self.storageManager.get(key, true);
