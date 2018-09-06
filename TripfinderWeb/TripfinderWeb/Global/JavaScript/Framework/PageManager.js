@@ -161,7 +161,8 @@
 		{
 			tf.entStorageManager.save("clientKey", "");
 			tf.entStorageManager.save("userName", "");
-			tf.entStorageManager.save("password", "");
+			tf.storageManager.save("clientKey", "", true);
+			tf.storageManager.save("userName", "", true);
 		}
 	};
 

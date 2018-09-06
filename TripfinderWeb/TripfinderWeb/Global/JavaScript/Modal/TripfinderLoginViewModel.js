@@ -22,11 +22,13 @@
 		this.obPasswordRP = ko.observable('');
 		this.obVerifyPasswordRP = ko.observable('');
 		this.obLoginErrorMessageRP = ko.observable('');
+		this.obClientKey = ko.observable('');
+		this.obUsername = ko.observable('');
+		this.obPassword = ko.observable('');
 		if (this.obRememberMe())
 		{
-			this.obClientKey = ko.observable(tf.entStorageManager.get("clientKey") || '');
-			this.obUsername = ko.observable(tf.entStorageManager.get("userName") || '');
-			this.obPassword = ko.observable(tf.entStorageManager.get("password") || '');
+			this.obClientKey(tf.storageManager.get("clientKey", true) || '');
+			this.obUsername(tf.storageManager.get("userName", true) || '');
 		}
 	}
 

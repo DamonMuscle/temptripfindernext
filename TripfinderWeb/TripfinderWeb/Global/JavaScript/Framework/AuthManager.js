@@ -12,14 +12,12 @@
 		this.logOffTag = false;
 
 		this.obIsLogIn = ko.observable(false);
-		var clientKey = tf.entStorageManager.get("clientKey");
-		var username = tf.entStorageManager.get("userName");
-		var password = tf.entStorageManager.get("password");
+		var clientKey = tf.storageManager.get("clientKey", true);
+		var username = tf.storageManager.get("userName", true);
 		this.token = tf.entStorageManager.get("token");
 		var isLoggedin = typeof (tf.entStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.entStorageManager.get("isLoggedin"));
 		this.clientKey = clientKey;
 		this.userName = username;
-		this.password = password;
 		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(this.token);
 
 		if (this._hasLoggedin)
@@ -60,55 +58,67 @@
 		var p = null;
 		if (this._hasLoggedin)
 		{
-			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "auth", "authentication", "test"), null, {
-				auth: {
-					noInterupt: true
-				},
-				overlay: false
-			})
-				.then(function()
-				{
-					var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "clientconfig", "timezonetotalminutes"), {}, {
-						auth: {
-							noInterupt: true
-						},
-						overlay: false
-					}).then(function(apiResponse)
+			var cachedClientKey = tf.storageManager.get("clientKey", true),
+				cachedUserName = tf.storageManager.get("userName", true);
+
+			if ((!cachedClientKey || cachedClientKey === tf.entStorageManager.get("clientKey"))
+				&& (!cachedUserName || cachedUserName === tf.entStorageManager.get("userName")))
+			{
+				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "auth", "authentication", "test"), null, {
+					auth: {
+						noInterupt: true
+					},
+					overlay: false
+				})
+					.then(function()
 					{
-						moment().constructor.prototype.currentTimeZoneTime = function()
+						var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "clientconfig", "timezonetotalminutes"), {}, {
+							auth: {
+								noInterupt: true
+							},
+							overlay: false
+						}).then(function(apiResponse)
 						{
-							var now = moment().utcOffset(apiResponse.Items[0]);
-							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
-						};
-						if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== TF.productName))
-						{
-							return tf.datasourceManager.validateAllDBs()
-								.then(function(valResult)
-								{
-									if (!valResult.Items[0].AnyDBPass)
-									{ //all db connection failed
-										var message = "";
-										if (valResult.Items[0].DBlength == 1)
-										{
-											message = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-										} else
-										{
-											message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
+							moment().constructor.prototype.currentTimeZoneTime = function()
+							{
+								var now = moment().utcOffset(apiResponse.Items[0]);
+								return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
+							};
+							if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== TF.productName))
+							{
+								return tf.datasourceManager.validateAllDBs()
+									.then(function(valResult)
+									{
+										if (!valResult.Items[0].AnyDBPass)
+										{ //all db connection failed
+											var message = "";
+											if (valResult.Items[0].DBlength == 1)
+											{
+												message = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
+											} else
+											{
+												message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
+											}
+											return this._loginUseModal(loginViewModal, message);
 										}
-										return this._loginUseModal(loginViewModal, message);
-									}
-								}.bind(this));
-						}
-					}.bind(this));
-					return Promise.all([p1]);
-				}.bind(this))
-				.catch(function()
-				{
-					return Promise.resolve(false);
-				}.bind(this))
+									}.bind(this));
+							}
+						}.bind(this));
+						return Promise.all([p1]);
+					}.bind(this))
+					.catch(function()
+					{
+						return Promise.resolve(false);
+					}.bind(this))
+			}
+			else
+			{
+				p = this._loginUseModal(loginViewModal);
+			}
+
 		} else
 		{
-			p = this._loginUseModal(loginViewModal)
+			p = this._loginUseModal(loginViewModal);
 		}
 		return p
 			.then(function(result)
@@ -179,7 +189,8 @@
 				this.password = result.password;
 				tf.entStorageManager.save("clientKey", result.clientKey);
 				tf.entStorageManager.save("userName", result.username);
-				tf.entStorageManager.save("password", result.password);
+				tf.storageManager.save("clientKey", result.clientKey, true);
+				tf.storageManager.save("userName", result.username, true);
 				if (tf.datasourceManager.databaseId)
 				{
 					//when the datasource is selected, show all the menus
@@ -203,9 +214,8 @@
 
 	AuthManager.prototype.updateInfo = function()
 	{
-		this.clientKey = tf.entStorageManager.get("clientKey");
-		this.userName = tf.entStorageManager.get("userName");
-		this.password = tf.entStorageManager.get("password");
+		this.clientKey = tf.storageManager.get("clientKey", true);
+		this.userName = tf.storageManager.get("userName", true);
 	};
 
 	AuthManager.prototype.getPurchasedProducts = function()
