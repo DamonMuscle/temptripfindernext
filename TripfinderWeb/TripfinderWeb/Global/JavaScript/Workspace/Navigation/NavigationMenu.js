@@ -989,7 +989,7 @@
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
 				var productName = item.toLowerCase();
-				if (productName !== "viewfinder" && self.availableApplications.hasOwnProperty(productName))
+				if (productName !== "tripfinder" && self.availableApplications.hasOwnProperty(productName))
 				{
 					applications.push(productName);
 				}
