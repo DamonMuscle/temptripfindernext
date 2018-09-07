@@ -12,7 +12,7 @@
 		this.logOffTag = false;
 
 		this.obIsLogIn = ko.observable(false);
-		var clientKey = tf.storageManager.get("clientKey", true);
+		var clientKey = tf.storageManager.get("clientKey", true) || tf.entStorageManager.get("clientKey");
 		var username = tf.storageManager.get("userName", true);
 		this.token = tf.entStorageManager.get("token");
 		var isLoggedin = typeof (tf.entStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.entStorageManager.get("isLoggedin"));

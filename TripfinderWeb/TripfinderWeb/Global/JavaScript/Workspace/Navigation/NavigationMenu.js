@@ -66,14 +66,19 @@
 			$nav = self.$container.find(".navigation-menu");
 
 		self.$navigationMenu = $nav;
-		self.bindRelatedEvents();
-		self.initNavigationMenuState();
-		self.initTooltip();
 
-		if (!tf.permissions.isSupport)
+		self.initApplicationSwitcher().then(function(result)
 		{
-			self.initApplicationSwitcher();
-		}
+			self.appSwitcherEnabled = result;
+			if (!result)
+			{
+				$nav.find(".navigation-header .item-logo").addClass("disabled");
+			}
+
+			self.bindRelatedEvents();
+			self.initNavigationMenuState();
+			self.initTooltip();
+		});
 
 		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
@@ -126,9 +131,9 @@
 	NavigationMenu.prototype.bindRelatedEvents = function()
 	{
 		var self = this,
-			menuItems = tf.permissions.isSupport
-				? self.$navigationMenu.find(".navigation-item")
-				: self.$navigationMenu.find(".navigation-item, .item-logo");
+			menuItems = self.appSwitcherEnabled
+				? self.$navigationMenu.find(".navigation-item, .item-logo")
+				: self.$navigationMenu.find(".navigation-item");
 
 		menuItems.on("mouseenter", self.onNavigationItemToggleHoverStatus.bind(self, true));
 		menuItems.on("mouseleave", self.onNavigationItemToggleHoverStatus.bind(self, false));
@@ -965,29 +970,41 @@
 	 */
 	NavigationMenu.prototype.initApplicationSwitcher = function()
 	{
-		var self = this,
-			promise = tf.authManager.supportedProducts
-				? Promise.resolve()
-				: tf.authManager.getPurchasedProducts();
+		var self = this;
+		if (tf.permissions.isSupport)
+		{
+			return Promise.resolve(false);
+		}
+
+		var promise = tf.authManager.supportedProducts
+			? Promise.resolve()
+			: tf.authManager.getPurchasedProducts();
 
 		self.$logoItem = self.$navigationMenu.find(".navigation-header .item-logo")
 		self.$appSwitcherMenu = self.$navigationMenu.find(".navigation-header .item-menu");
-		promise.then(function()
+		return promise.then(function()
 		{
 			var applications = [];
 
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
 				var productName = item.toLowerCase();
-				if (productName !== "tripfinder" && self.availableApplications.hasOwnProperty(productName))
+				if (productName !== "viewfinder" && self.availableApplications.hasOwnProperty(productName))
 				{
 					applications.push(productName);
 				}
 			});
 
+			if (applications.length === 0)
+			{
+				return false;
+			}
+
 			self.obSupportedApplications(applications);
 
 			self = null;
+
+			return true;
 		});
 	};
 

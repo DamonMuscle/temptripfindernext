@@ -58,6 +58,10 @@
 					cursor: pointer;
 				}
 
+				&.disabled, &.disabled .logo {
+					cursor: default;
+				}
+
 				&.hoverState, &.menu-opened {
 					background-color: @HoverBackgroundColor !important;
 				}
@@ -65,8 +69,8 @@
 				.logo {
 					margin-left: 18px;
 					height: 100%;
-					background-size: auto auto;
-					width: 88px;
+					background-size: auto 38px;
+					background-position-x: 0;
 				}	
 			}
 
@@ -85,27 +89,32 @@
 						list-style: none;
 						background-repeat: no-repeat;
 						background-position: 18px center;
+						background-size: auto 38px;
 						cursor: pointer;
 
 						&:hover {
-							background-color: rgba(255, 255, 255, 0.1);
+							background-color: #5c5c5c;
 						}
 
 						&[name="viewfinder"] {
-							background-image: url("../img/app-switcher/viewfinderlogo.svg");
+							background-image: url("../img/app-switcher/viewfinder.svg");
 							background-size: 88px 54px;
 						}
 
 						&[name="fleetfinder"] {
-							background-image: url("../img/app-switcher/fleetfinderlogo.png");
+							background-image: url("../img/app-switcher/fleetfinder.png");
 						}
 
 						.item-icon {
 							float: right;
-							width: 16px;
-							height: 16px;
-							margin-top: 19px;
-							margin-right: 19px;
+							width: 48px;
+							height: 100%;
+							border-left: 1px solid #4a4a4a;
+							background-color: #4a4a4a;
+
+							&:hover {
+								background-color: #5c5c5c;
+							}
 						}
 					}
 				}
@@ -390,7 +399,7 @@
 			}
 
 			&.logo {
-				background-image: url("../img/app-switcher/tripfinderlogo.svg");
+				background-image: url("../img/app-switcher/tripfinder.svg");
 			}
 
 			&.left-caret {
@@ -508,7 +517,7 @@
 							}
 
 							&:hover {
-								background-color: rgba(255, 255, 255, 0.1);
+								background-color: #5c5c5c;
 							}
 						}
 					}
