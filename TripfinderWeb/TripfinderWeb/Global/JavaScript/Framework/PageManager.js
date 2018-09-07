@@ -147,20 +147,23 @@
 		{
 			if (result)
 			{
-				self.logout();
+				self.logout(true);
 			}
 		})
 	};
 
-	PageManager.prototype.logout = function()
+	PageManager.prototype.logout = function(flag)
 	{
 		tf.authManager.logOff();
 		location.reload();
 		var rememberMe = tf.storageManager.get("rememberMe", true) || false;
 		if (!rememberMe)
 		{
-			tf.entStorageManager.save("clientKey", "");
-			tf.entStorageManager.save("userName", "");
+			if (flag)
+			{
+				tf.entStorageManager.save("clientKey", "");
+				tf.entStorageManager.save("userName", "");
+			}
 			tf.storageManager.save("clientKey", "", true);
 			tf.storageManager.save("userName", "", true);
 		}
@@ -282,7 +285,7 @@
 			return tf.promiseBootbox.alert(desc, "Invalid Permissions")
 				.then(function()
 				{
-					self.logout();
+					self.logout(false);
 				}.bind(this));
 		}
 		desc += " You will be redirected to your default login screen.";

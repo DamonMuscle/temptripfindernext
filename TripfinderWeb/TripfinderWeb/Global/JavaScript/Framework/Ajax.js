@@ -45,7 +45,7 @@
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
-						tf.pageManager.logout();
+						tf.pageManager.logout(false);
 					});
 				return;
 			}
@@ -54,7 +54,7 @@
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
-						tf.pageManager.logout();
+						tf.pageManager.logout(false);
 					});
 				return;
 			}
