@@ -167,7 +167,7 @@
 		self.$grid.kendoGrid({
 			dataSource: {
 				data: entities,
-				sort: { field: "Table", dir: "asc" }
+				sort: { field: "Name", dir: "asc" }
 			},
 			height: 300,
 			scrollable: true,

@@ -72,7 +72,7 @@
 					{
 						self.clearLayout();
 					}
-					self.obLayouts(layouts);
+					self.obLayouts(layouts.sort(function(a, b) { return a.name().localeCompare(b.name()) }));
 				}
 				self.loadingFinishEvent.notify();
 			});
