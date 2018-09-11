@@ -1325,27 +1325,33 @@
 		return p;
 	};
 
+	DetailViewViewModel.prototype.updateDetailViewTitleWithDataPoint = function()
+	{
+		var layoutEntity = this.entityDataModel.toData(),
+			gridConfig = this.basicGridConfig[this.gridType],
+			titleFieldName = gridConfig.title,
+			subTitleFieldName = layoutEntity.SubTitle || gridConfig.subTitle,
+			titleLabel = this.getDataPointByField(titleFieldName).defaultValue,
+			subTitleLabel = this.getSubtitleDefaultValueByFieldName(subTitleFieldName),
+			entity = {};
+		entity[titleFieldName] = titleLabel;
+		entity[subTitleFieldName] = subTitleLabel;
+		this.updateDetailViewTitle(entity);
+	};
+
 	/**
- * Update the detail view's title and subTitle.
- * @param {Object} entity 
- */
+	 * Update the detail view's title and subTitle.
+	 * @param {Object} entity 
+	 */
 	DetailViewViewModel.prototype.updateDetailViewTitle = function(entity)
 	{
-		var self = this, subTitleLabel, titleLabel, subTitleDataPoint,
+		var self = this, subTitleLabel = "", titleLabel = "", subTitleDataPoint,
 			gridType = self.gridType,
 			layoutEntity = self.entityDataModel.toData(),
 			gridConfig = self.basicGridConfig[gridType],
-			titleFieldName = gridConfig.title,
 			subTitleFieldName = layoutEntity.SubTitle || gridConfig.subTitle;
-
 		// only read mode has entity.
-		if (!entity)
-		{
-			// default value
-			titleLabel = self.getDataPointByField(titleFieldName).defaultValue;
-			subTitleLabel = self.getSubtitleDefaultValueByFieldName(subTitleFieldName);
-		}
-		else
+		if (entity)
 		{
 			// record value
 			switch (gridType)
@@ -3906,7 +3912,7 @@
 						{
 							self.applyLayoutTemplate(false, data.id, data.isDeleted).then(function()
 							{
-								self.updateDetailViewTitle();
+								self.updateDetailViewTitleWithDataPoint();
 								self.setStackBlocks();
 								self.updateNameContainer();
 							})
@@ -4504,7 +4510,6 @@
 	DetailViewViewModel.prototype.templateMenuClick = function(model, e)
 	{
 		var self = this, target = $(e.currentTarget),
-			$contextMenu = $("#contextmenu-wrapper .tf-contextmenu-wrap"),
 			isFromMoreButton = target.closest(".selector-menu").length <= 0,
 			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
 			cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
@@ -4550,7 +4555,7 @@
 					data = data || {};
 					self.applyLayoutTemplate(false, data.id, data.isDeleted, null, data.name).then(function()
 					{
-						self.updateDetailViewTitle();
+						self.updateDetailViewTitleWithDataPoint();
 						self.setStackBlocks();
 						self.updateNameContainer();
 						if (!data.isDeleted)
