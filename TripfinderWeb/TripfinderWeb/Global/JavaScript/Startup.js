@@ -446,7 +446,14 @@
 										}
 										else
 										{
-											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
+											if (tf.authManager.authorizationInfo.isAdmin)
+											{
+												tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
+											}
+											else
+											{
+												tf.pageManager.openNewPage("myrequests", null, true);
+											}
 										}
 									});
 

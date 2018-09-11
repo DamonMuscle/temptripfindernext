@@ -27,6 +27,7 @@
 	<!-- /ko -->
 	<!-- /ko -->
 	<div class="navigation-content" data-bind="css:tf.permissions.isSupport?'not-contain-quick-search':''">
+		<!-- ko if: tf.authManager.authorizationInfo.isAdmin -->
 		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
 			<div class="item-icon fieldtrips"></div>
 			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
@@ -35,6 +36,17 @@
 			<div class="item-icon myrequests"></div>
 			<div class="item-label">My Submitted Requests</div>
 		</div>
+		<!-- /ko -->
+		<!-- ko if: !tf.authManager.authorizationInfo.isAdmin -->
+		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
+			<div class="item-icon myrequests"></div>
+			<div class="item-label">My Submitted Requests</div>
+		</div>
+		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
+			<div class="item-icon fieldtrips"></div>
+			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
+		</div>
+		<!-- /ko -->
 		<div class="navigation-item reports" pageType="reports" data-bind="click:navigationPageCategoryClick.bind($data, 'reports')">
 			<div class="item-icon reports"></div>
 			<div class="item-label">Reports</div>

@@ -89,7 +89,7 @@
 				self.navigationData.setActiveStateByPageType(type);
 			}, 100);
 		}
-		if (!skipSavePage)
+		if (!skipSavePage && tf.authManager.authorizationInfo.isAdmin)
 		{
 			tf.storageManager.save(storageKey, type);
 		}
