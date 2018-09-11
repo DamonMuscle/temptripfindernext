@@ -2276,6 +2276,9 @@
 					content = time.isValid() ? time.format("hh:mm A") : moment("2018-01-01T" + content).isValid() ? moment("2018-01-01T" + content).format("hh:mm A") : "";
 				}
 				break;
+			case "Date/Time":
+				content = moment(content).format("YYYY-MM-DD hh:mm A")
+				break;
 			default:
 				if (format === "Time")
 				{
