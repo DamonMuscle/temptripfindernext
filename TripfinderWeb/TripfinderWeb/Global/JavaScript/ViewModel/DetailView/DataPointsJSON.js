@@ -519,7 +519,7 @@ var today = (new Date()).toDateString(),
 					"field": "FieldTripContact",
 					"title": "Contact",
 					"type": "String",
-					"defaultValue": "Bryan Fonder"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "PhoneWithExt",
