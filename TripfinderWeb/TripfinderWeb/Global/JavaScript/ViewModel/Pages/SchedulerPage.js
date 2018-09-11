@@ -853,8 +853,11 @@
 	SchedulerPage.prototype.schedulerViewClick = function(viewModel, e)
 	{
 		var self = this;
-		self.obShowDetailPanel(false);
-		tf.pageManager.openNewPage(self.gridType + "Scheduler");
+		if (self.obShowDetailPanel())
+		{
+			self.obShowDetailPanel(false);
+			tf.pageManager.resizablePage.closeRightPage();
+		}
 	};
 
 	SchedulerPage.prototype.navToGridViewClick = function(model, element)

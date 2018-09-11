@@ -240,23 +240,9 @@
 
 		this.cityCss = function() { return this.cityDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
 
-		this.cityOnBlur = function(e, m)
-		{
-			var collection = this.getCollection(this.obMailCityDataModels(), 'Item');
-			this.resetEmpty(m, collection, 'destinationCity');
-
-		}.bind(this);
-
 		this.zipCodeDisable = function() { return this.obEntityDataModel().destinationZip() == ''; };
 
 		this.zipCodeCss = function() { return this.zipCodeDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
-
-		this.zipCodeOnBlur = function(e, m)
-		{
-			var collection = this.getCollection(this.obMailZipDataModels(), 'Item');
-			this.resetEmpty(m, collection, 'destinationZip');
-		}.bind(this);
-
 
 		this.billingClassificationDisable = function() { return this.obCurrentBillingClassificationName() == ''; };
 

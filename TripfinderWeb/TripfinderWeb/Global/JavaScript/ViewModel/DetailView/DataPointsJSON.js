@@ -519,7 +519,7 @@ var today = (new Date()).toDateString(),
 					"field": "FieldTripContact",
 					"title": "Contact",
 					"type": "String",
-					"defaultValue": "Bryan Fonder"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "PhoneWithExt",
@@ -589,7 +589,7 @@ var today = (new Date()).toDateString(),
 				{
 					"field": "DepartDateTime",
 					"title": "Depart Date/Time",
-					"type": "Date",
+					"type": "Date/Time",
 					"defaultValue": today
 				},
 				{
@@ -601,7 +601,7 @@ var today = (new Date()).toDateString(),
 				{
 					"field": "EstimatedReturnDateTime",
 					"title": "Return Date/Time",
-					"type": "Date",
+					"type": "Date/Time",
 					"defaultValue": today
 				},
 				{
