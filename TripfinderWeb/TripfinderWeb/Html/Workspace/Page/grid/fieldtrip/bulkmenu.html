@@ -70,6 +70,23 @@
 			<div class="rule"></div>
 		</li>
 		<!-- /ko -->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
+			<div class="menu-icon email">
+			</div>
+			<div class="menu-label">
+				Email
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendToClick">
+			<div class="menu-icon sendTo">
+			</div>
+			<div class="menu-label">
+				Send To
+			</div>
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
 		<li class="menu-item" data-bind="visible:gridViewModel.obReports">
 			<div class="menu-icon report">
 			</div>

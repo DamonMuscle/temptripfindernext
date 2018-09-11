@@ -30,6 +30,23 @@
 		self.obIsSelectRow = ko.observable(false);
 		self.selectedItemEditable = ko.observable(false);
 		self.selectedItemsApprovable = ko.observable(false);
+		self.sendToClick = self.sendToClick.bind(self);
+		self.sendEmailClick = self.sendEmailClick.bind(self);
+		self.obEmail = ko.computed(function()
+		{
+			if (self.searchGridInited())
+			{
+				var columns = self.searchGrid.currentDisplayColumns();
+				for (var i = 0; i < columns.length; i++)
+				{
+					if (columns[i].field && columns[i].field.toLowerCase().indexOf('email') >= 0)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}, self);
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -153,6 +170,144 @@
 
 			self.loadReportLists();
 		}
+	};
+
+	BaseGridPage.prototype.sendEmailClick = function(viewModel, e)
+	{
+		var option = { clickType: 'Email' };
+		//total 2 attachments, but will be added by manual
+		//the excel file could use: this.searchGrid.exportCurrentGrid();
+		//the kml file should get from google earch: TFExportGoogle SendToGoogle of frm_DataGrid
+		return tf.promiseBootbox.yesNo(
+			{
+				message: "We recommend you send this message as a blind copy (Bcc) email to avoid disclosing email addresses publicly. Send this message as a Bcc?",
+				title: "Confirmation",
+				closeButton: true
+			}).then(function(data)
+			{
+				if (data)
+				{
+					option.placeEmailTo = 'Bcc';
+					if (this.searchGrid.obSelectedGridFilterName() == 'None')
+					{ //no filter
+						return this.setEmailSubject(this.searchGrid.obTotalRecordCount(), option);
+					}
+					else
+					{ //with filter
+						this.searchGrid.getBasicFilterCount().then(function(result)
+						{
+							return this.setEmailSubject(result, option);
+						}.bind(this));
+					}
+				}
+				else if (data == false)
+				{
+					option.placeEmailTo = 'To';
+					if (this.searchGrid.obSelectedGridFilterName() == 'None')
+					{ //no filter
+						return this.setEmailSubject(this.searchGrid.obTotalRecordCount(), option);
+					}
+					else
+					{ //with filter
+						this.searchGrid.getBasicFilterCount().then(function(result)
+						{
+							return this.setEmailSubject(result, option);
+						}.bind(this));
+					}
+				}
+			}.bind(this));
+	};
+
+	BaseGridPage.prototype.sendToClick = function(viewModel, e)
+	{
+		var option = { clickType: 'SendTo' };
+		if (this.searchGrid.obSelectedGridFilterName() == 'None')
+		{ //no filter
+			return this.setEmailSubject(this.searchGrid.obTotalRecordCount(), option);
+		}
+		else
+		{ //with filter
+			return this.searchGrid.getBasicFilterCount().then(function(result)
+			{
+				return this.setEmailSubject(result, option);
+			}.bind(this));
+		}
+	};
+
+	BaseGridPage.prototype.setEmailSubject = function(compareCount, option)
+	{
+		var self = this, selectedIds = self.searchGrid.getSelectedIds(),
+			subject = tf.applicationTerm.getApplicationTermPluralByName(tf.pageManager.typeToTerm(self.type)),
+			filterStr = self.searchGrid.obSelectedGridFilterName() != "None" ? ", Filter: " + self.searchGrid.obSelectedGridFilterName() : "",
+			nowStr = moment().format("MM/DD/YYYY hh:mm A"),
+			recordsStr = "";
+
+		if (selectedIds.length === 0)
+		{
+			if (compareCount == self.searchGrid.obFilteredRecordCount())
+			{
+				recordsStr = "Records: All";
+			}
+			else
+			{
+				recordsStr = "Records: Selected";
+			}
+
+			return TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(self.searchGrid).then(function(data)
+			{
+				selectedIds = data;
+				subject += " (" + recordsStr + filterStr + ") " + nowStr;
+				return self._popupSendEmailOfGridModalViewModel.bind(self)(selectedIds, subject, option);
+			});
+		}
+		else
+		{
+			if (compareCount == selectedIds.length)
+			{
+				recordsStr = "Records: All";
+			}
+			else
+			{
+				recordsStr = "Records: Selected";
+			}
+
+			subject += " (" + recordsStr + filterStr + ") " + nowStr;
+			return self._popupSendEmailOfGridModalViewModel.bind(self)(selectedIds, subject, option);
+		}
+	};
+
+	BaseGridPage.prototype._popupSendEmailOfGridModalViewModel = function(selectedIds, subject, option)
+	{
+		var self = this;
+		var gridLayoutExtendedEntity = self.searchGrid._obCurrentGridLayoutExtendedDataModel().toData();
+		var emailColumns = [];
+		if (option.clickType === 'Email')
+		{
+			for (var i = 0; i < self.searchGrid.currentDisplayColumns().length; i++)
+			{
+				emailColumns.push(self.searchGrid.currentDisplayColumns()[i].field);
+			}
+		}
+		gridLayoutExtendedEntity.LayoutColumns = self.searchGrid._obSelectedColumns();
+		return tf.modalManager.showModal(
+			new TF.Modal.SendEmailOfGridModalViewModel(
+				{
+					subject: subject,
+					term: tf.pageManager.typeToTerm(self.type),
+					type: self.type,
+					layout: gridLayoutExtendedEntity,
+					selectedIds: selectedIds,
+					sortItems: self.searchGrid.searchOption.data.sortItems,
+					modelType: option.clickType,
+					placeEmailTo: option.placeEmailTo,
+					emailColumns: emailColumns,
+					setRequestOption: self.setRequestOption ? self.setRequestOption.bind(self) : undefined,
+				})
+		)
+			.then(function()
+			{
+				return Promise.resolve(true);
+			}.bind(this));
 	};
 
 	BaseGridPage.prototype.updateEditableApprovable = function()

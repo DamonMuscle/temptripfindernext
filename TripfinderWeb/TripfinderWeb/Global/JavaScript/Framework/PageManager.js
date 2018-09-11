@@ -308,4 +308,41 @@
 		];
 		return allDataTypes.filter(function(item) { return item.permission; });
 	};
+
+	/**
+	 * Gets the application term by grid type.
+	 * @param {String} gridType
+	 * @returns {String} The application term related to grid type.
+	 */
+	PageManager.prototype.typeToTerm = function(gridType)
+	{
+		switch (gridType)
+		{
+			case "student":
+				return "Student";
+			case "school":
+				return "School";
+			case "district":
+				return "District";
+			case "contractor":
+				return "Contractor";
+			case "vehicle":
+				return "Vehicle";
+			case "staff":
+				return "Staff";
+			case "altsite":
+				return "Alternate Site";
+			case "trip":
+				return "Trip";
+			case "tripstop":
+				return "Trip Stop";
+			case "fieldtrip":
+				return "Field Trip";
+			case "georegion":
+				return "Geo Region";
+			case "busfinderhistorical":
+				return 'Busfinder Historical';
+		}
+		return "";
+	}
 })();
