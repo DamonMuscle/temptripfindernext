@@ -48,6 +48,11 @@
 		}
 	};
 
+	BasePage.prototype.showDetails = function()
+	{
+		this.showDetailsClick();
+	};
+
 	BasePage.prototype.showDetailsClick = function(rowSelectedId)
 	{
 		var self = this, selectedId;
@@ -63,7 +68,6 @@
 				return;
 			}
 			selectedId = selectedIds[0];
-
 		}
 		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
@@ -221,13 +225,11 @@
 		}
 	};
 
-
 	BasePage.prototype.approveClick = function(viewModel, e)
 	{
 		var self = this;
 		self.editFieldTripStatus(viewModel, true);
 	};
-
 
 	BasePage.prototype.declineClick = function(viewModel, e)
 	{

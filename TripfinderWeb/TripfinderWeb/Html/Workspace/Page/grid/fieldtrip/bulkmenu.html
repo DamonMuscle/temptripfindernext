@@ -5,36 +5,11 @@
 			</div>
 			<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
 		</li>
-		<!--not implemented for now<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
-			<div class="menu-icon copytoclipboard">
-			</div>
-			<div class="menu-label">
-				Copy
-				<span class="hotkey">Ctrl + C</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
-			<div class="menu-icon saveas">
-			</div>
-			<div class="menu-label">
-				Save As
-				<span class="hotkey">Ctrl + S</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
 			<div class="menu-icon">
 			</div>
-			<div class="menu-label">
-				New Grid
-			</div>
-			<ul class="tf-contextmenu">
-				<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
-					<div class="menu-icon">
-					</div>
-					<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trip')"></div>
-				</li>
-			</ul>
-		</li>-->
+			<div class="menu-label" data-bind="text: 'Show Details'"></div>
+		</li>
 		<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
 		<li class="menu-divider">
 			<div class="rule"></div>
@@ -70,6 +45,22 @@
 			<div class="rule"></div>
 		</li>
 		<!-- /ko -->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
+			<div class="menu-icon copytoclipboard">
+			</div>
+			<div class="menu-label">
+				Copy
+				<span class="hotkey">Ctrl + C</span>
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
+			<div class="menu-icon saveas">
+			</div>
+			<div class="menu-label">
+				Save As
+				<span class="hotkey">Ctrl + S</span>
+			</div>
+		</li>
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
 			<div class="menu-icon email">
 			</div>
@@ -84,8 +75,19 @@
 				Send To
 			</div>
 		</li>
-		<li class="menu-divider">
-			<div class="rule"></div>
+		<li class="menu-item" data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				New Grid
+			</div>
+			<ul class="tf-contextmenu">
+				<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trip')"></div>
+				</li>
+			</ul>
 		</li>
 		<li class="menu-item" data-bind="visible:gridViewModel.obReports">
 			<div class="menu-icon report">
@@ -103,6 +105,9 @@
 				</li>
 			</ul>
 			<!-- /ko -->
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
 		</li>
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
 			<div class="menu-icon">
