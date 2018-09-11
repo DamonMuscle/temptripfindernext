@@ -212,6 +212,7 @@
 			{
 				handle: ".drag-handler",
 				placeholder: "ui-sortable-placeholder",
+				scroll: true,
 				stop: function(event, ui)
 				{
 					var ans = {};

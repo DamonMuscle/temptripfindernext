@@ -20,28 +20,30 @@
 		self._$container = $container;
 		self._target = $target;
 
-
-		self._mouseover = function()
+		if (!TF.isPhoneDevice)
 		{
-			if (self._timer)
+			self._mouseover = function()
 			{
-				clearTimeout(self._timer);
-			}
-			$(document).unbind("mousemove", self._mouseout);
-		};
+				if (self._timer)
+				{
+					clearTimeout(self._timer);
+				}
+				$(document).unbind("mousemove", self._mouseout);
+			};
 
-		self._mouseout = function()
-		{
-			if (self._timer)
+			self._mouseout = function()
 			{
-				clearTimeout(self._timer);
-			}
-			//NOTE: context menu close
-			self._timer = setTimeout(function()
-			{
-				self.dispose();
-			}, 300);
-		};
+				if (self._timer)
+				{
+					clearTimeout(self._timer);
+				}
+				//NOTE: context menu close
+				self._timer = setTimeout(function()
+				{
+					self.dispose();
+				}, 300);
+			};
+		}
 
 		var contextMenuClose = function()
 		{
@@ -162,11 +164,33 @@
 			$menuContainer.find(".grid-menu").css('max-height', topx);
 			topx = -topx;
 		}
+
+		var left;
+		if (leftDiff < 0)
+		{
+			left = 0;
+		}
+		else
+		{
+			if (offset.left < Math.abs(-$menuContainer.outerWidth() + $target.outerWidth()))
+			{
+				left = -offset.left;
+				if (screenWidth < $menuContainer.outerWidth())
+				{
+					$menuContainer.width(screenWidth);
+				}
+			}
+			else
+			{
+				left = -$menuContainer.outerWidth() + $target.outerWidth();
+			}
+		}
+
 		$menuContainer.css(
 			{
 				//this messes with submenu, didn't find a solution yet
 				position: "absolute",
-				left: leftDiff < 0 ? 0 : -$menuContainer.outerWidth() + $target.outerWidth(),
+				left: left,
 				top: topx
 			});
 		$menuContainer.show();
