@@ -40,6 +40,7 @@
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
 
+		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
 	}
 
@@ -66,6 +67,7 @@
 			$nav = self.$container.find(".navigation-menu");
 
 		self.$navigationMenu = $nav;
+		self.$navigationHeader = $nav.find(".navigation-header");
 
 		self.initApplicationSwitcher().then(function(result)
 		{
@@ -191,7 +193,7 @@
 		else
 		{ return; }
 
-		if (!self.obIsExpand())
+		if (!self.obIsExpand() && !$item.hasClass("on-animation"))
 		{
 			if (onHover)
 			{
@@ -215,7 +217,7 @@
 	 * @param {boolean} noAnimation
 	 * @return {Deferred}
 	 */
-	NavigationMenu.prototype.closeOpenedNavigationItemMenu = function(noAnimation)
+	NavigationMenu.prototype.closeOpenedNavigationItemMenu = function(noAnimation, isCollapse)
 	{
 		var self = this,
 			duration = noAnimation ? 0 : self.defaultOpenMenuAnimationDuration,
@@ -231,7 +233,7 @@
 		}
 		else if ($openedElement.hasClass("item-logo"))
 		{
-			return self.toggleAppSwitcherMenu(false);
+			return self.toggleAppSwitcherMenu(false, isCollapse);
 		}
 	};
 
@@ -262,7 +264,7 @@
 
 		if (!status)
 		{
-			self.closeOpenedNavigationItemMenu(false);
+			self.closeOpenedNavigationItemMenu(false, true);
 		}
 
 		self.easeToggleNavigationAnimation(status, duration);
@@ -316,7 +318,7 @@
 			$navContent = $navMenu.find(".navigation-content"),
 			isQuickSearchActive = self.isQuicKSearchActive(),
 			// If the menu is already opened, do not fade out the label
-			$fadeOutElements = $navMenu.find(".item-logo, .search-header .search-text, .search-header .clear-btn"),
+			$fadeOutElements = $navMenu.find(".search-header .search-text, .search-header .clear-btn"),
 			$moreBtn = $toolbar.find(".more"),
 			$toolbarBtnOthers = $toolbar.find(".others"),
 			$gridMap = $("#pageContent"),
@@ -408,6 +410,7 @@
 			self.obIsExpand(flag);
 			refreshObj = self.updatePageContentWidth();
 			self.isOnAnimation = true;
+			$navMenu.addClass("on-animation");
 			$gridMap.stop().animate({ width: totalWidth - targetWidth }, {
 				duration: duration, queue: false, step: function()
 				{
@@ -426,6 +429,7 @@
 						refreshObj.function();
 					}
 					self.isOnAnimation = false;
+					$navMenu.removeClass("on-animation");
 					$navMenu.css({ overflow: "", width: "" });
 					$navItems.css({ overflow: "", width: "" });
 					$gridMap.css("width", "calc(100% - " + targetWidth + "px)");
@@ -1014,7 +1018,7 @@
 	 * @param {Event} event
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.onLogoClick = function(data, event)
+	NavigationMenu.prototype.logoItemClick = function(data, event)
 	{
 		var self = this;
 		if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
@@ -1032,29 +1036,51 @@
 	 * @param {Boolean} flag
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.toggleAppSwitcherMenu = function(flag)
+	NavigationMenu.prototype.toggleAppSwitcherMenu = function(flag, isCollapse)
 	{
-		var self = this,
-			animationDuration = 250,
+		var self = this, bkgColor, targetWidth, targetHeight, opacity,
+			animationDuration = 300,
 			lineHeight = 54,
-			promise = $.Deferred();
+			promise = $.Deferred(),
+			$container = self.$navigationHeader.find(".item-logo"),
+			isCollapse = typeof (isCollapse) === "boolean" ? isCollapse : !self.obIsExpand();
 
 		if (flag)
 		{
-			self.$logoItem.css("background-color", "#4a4a4a");
-			self.$appSwitcherMenu.css({ height: lineHeight * self.obSupportedApplications().length });
+			bkgColor = "#4a4a4a";
+			targetHeight = lineHeight * (self.obSupportedApplications().length + 1);
+			targetWidth = 238;
+			opacity = 1;
 		}
 		else
 		{
-			self.$logoItem.css("background-color", "#262626");
-			self.$appSwitcherMenu.css({ height: 0 });
+			bkgColor = "#262626";
+			targetWidth = isCollapse ? 59 : 238;
+			targetHeight = 54;
+			opacity = 0;
+		}
+
+		$container.css({ "height": targetHeight, "background-color": bkgColor, "width": targetWidth });
+		$container.addClass("on-animation");
+		$container.find(".item-menu ul li").css("opacity", opacity);
+
+		if (isCollapse)
+		{
+			$container.find(".logo").css("opacity", opacity);
+			self.$navigationHeader.css({ "width": "238px" });
+			self.$navigationHeader.find(".toggle-button, .app-switcher").css("display", flag ? "none" : "block");
 		}
 
 		setTimeout(function()
 		{
-			self.$logoItem.css("background-color", "");
-			self.$logoItem.toggleClass("menu-opened", flag);
+			$container.removeClass("on-animation");
+			$container.toggleClass("menu-opened", flag);
+			$container.find(".logo").css("opacity", "");
+			$container.css({ "background-color": "", "width": "" });
+			self.$navigationHeader.find(".toggle-button, .app-switcher").css("display", "");
+			self.$navigationHeader.css({ "width": "", "overflow": "" });
 			promise.resolve(true);
+
 		}, animationDuration);
 
 		return promise;

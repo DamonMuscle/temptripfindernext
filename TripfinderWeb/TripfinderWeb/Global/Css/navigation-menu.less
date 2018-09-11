@@ -32,88 +32,167 @@
 		font-size: 18px;
 		background-color: @BackgroundColor;
 		overflow: visible;
-		border-right: 1px solid #262626;
+		border-right: 1px solid @BackgroundColor;
 
 		>div {
 			width: 100%;
 		}
 
+		&:not(.on-animation):not(.expand) {
+			.navigation-header:hover {
+				width: 90px;
+				overflow: visible;
+
+				.item-logo.menu-opened {
+					& + .toggle-button {
+						display: none !important;
+					}
+				}
+
+				.toggle-button {
+					display: block;
+					background-color: @HoverBackgroundColor;
+				}
+			}
+
+			.navigation-header {
+				.item-logo.on-animation + .toggle-button {
+					display: none !important;
+				}
+			}
+		}
+
+		&.on-animation {
+			.navigation-header .toggle-button {
+				background-color: transparent !important;
+			}
+		}
+
 		.navigation-header {
 			position: relative;
 			height: 54px;
-			background-color: #333;
+			padding-right: 60px;
 			z-index: 100;
-			overflow: hidden;
 
 			>div {
 				height: 54px;
 			}
 
-			.item-logo {
-				opacity: 0;
-				background-size: auto auto;
-				width: 0;
+			.item-logo {		
+				width: 59px;
+				background-color: #333;
+				transition: 250ms width ease, 250ms height ease;
+				overflow: hidden;
 
 				&:hover{
 					cursor: pointer;
 				}
 
-				&.disabled, &.disabled .logo {
+				&.disabled {
 					cursor: default;
+
+					.logo, .app-switcher {
+						cursor: default;
+						pointer-events: none;
+					}
 				}
 
 				&.hoverState, &.menu-opened {
 					background-color: @HoverBackgroundColor !important;
 				}
 
+				&.menu-opened {
+					width: 238px;
+					box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+
+					.logo {
+						opacity: 1;
+					}
+
+					.app-switcher {
+						opacity: 0;
+						pointer-events: none;
+					}
+					
+					.item-menu ul li {
+						opacity: 1;
+					}
+				}
+
+				&.on-animation {
+					.logo {
+						width: 220px;
+					}
+				}
+
 				.logo {
+					opacity: 0;
 					margin-left: 18px;
-					height: 100%;
+					height: 54px;
 					background-size: auto 38px;
 					background-position-x: 0;
+					transition: opacity 250ms ease;
 				}	
-			}
-
-			.item-menu {
-				width:238px;
-				height:0;
-				transition: all 250ms ease;
-				overflow: hidden;
-				background-color: @HoverBackgroundColor;
 				
-				ul {
-					padding: 0;
+				.app-switcher {
+					display: block;
+					opacity: 1;
+					position: absolute;
+					top: 0;
+					left: 0;
+					height: 54px;
+					width: 59px;
+					padding-top: 15px;
+					padding-left: 18px;
+					background-color: #333;
+					background-image: url('../Img/app-switcher/app-switcher.svg');
+					transition: opacity 250ms ease;
 
-					li {
-						height: 54px;
-						list-style: none;
-						background-repeat: no-repeat;
-						background-position: 18px center;
-						background-size: auto 38px;
-						cursor: pointer;
+					&:hover {
+						background-color: @HoverBackgroundColor;
+					}
+				}
 
-						&:hover {
-							background-color: #5c5c5c;
-						}
+				.item-menu {
+					width: 100%;
+					background-color: @HoverBackgroundColor;
+					
+					ul {
+						padding: 0;
 
-						&[name="viewfinder"] {
-							background-image: url("../img/app-switcher/viewfinder.svg");
-							background-size: 88px 54px;
-						}
-
-						&[name="fleetfinder"] {
-							background-image: url("../img/app-switcher/fleetfinder.svg");
-						}
-
-						.item-icon {
-							float: right;
-							width: 48px;
-							height: 100%;
-							border-left: 1px solid #4a4a4a;
-							background-color: #4a4a4a;
+						li {
+							height: 54px;
+							list-style: none;
+							background-repeat: no-repeat;
+							background-position: 18px center;
+							background-size: auto 38px;
+							cursor: pointer;
+							opacity: 0;
+							transition: opacity 250ms ease;
 
 							&:hover {
 								background-color: #5c5c5c;
+							}
+
+							&[name="viewfinder"] {
+								background-image: url("../img/app-switcher/viewfinder.svg");
+								background-size: 88px 54px;
+							}
+
+							&[name="fleetfinder"] {
+								background-image: url("../img/app-switcher/fleetfinder.svg");
+							}
+
+							.item-icon {
+								float: right;
+								width: 48px;
+								height: 100%;
+								border-left: 1px solid @HoverBackgroundColor;
+								background-color: @HoverBackgroundColor;
+
+								&:hover {
+									background-color: #5c5c5c;
+								}
 							}
 						}
 					}
@@ -121,15 +200,16 @@
 			}
 
 			.toggle-button {
+				display: none;
 				position: absolute;
 				top: 0;
-				right: 0;
+				right: -1px;
 				height: 54px;
-				width: 60px;
+				width: 30px;
 				padding-top: 15px;
-				padding-left: 18px;
-				background-color: #333;
-				border-left: 1px solid #262626;
+				padding-left: 3px;
+				background-color: transparent;
+				transition: width 250ms ease;
 				cursor: pointer;
 
 				.left-caret {
@@ -137,7 +217,7 @@
 					width: 24px;
 					transform: rotate(180deg);
 					-webkit-transform: rotate(180deg);
-					transition: all 350ms ease;
+					transition: transform, -webkit-transform 350ms ease;
 				}
 
 				&:hover {
@@ -280,7 +360,7 @@
 				.search-header .item-icon.search-btn:hover {
 					&:after {
 						content: '';
-						background-color: #4a4a4a;
+						background-color: @HoverBackgroundColor;
 						border-radius: 30px;
 						position: absolute;
 						width: 32px;
@@ -296,17 +376,41 @@
 			width: 300px;
 			overflow: visible !important;
 
-			.navigation-header {
-				overflow: visible;
-				
+			.navigation-header {			
 				.item-logo {
 					opacity: 1;
 					width: 238px;
+
+					.logo {
+						opacity: 1;
+					}
+
+					.app-switcher {
+						opacity: 0;
+						pointer-events: none;
+					}
 				}
 
-				.left-caret {
-					transform: rotate(0deg);
-					-webkit-transform: rotate(0deg);
+				.toggle-button{
+					display: block;
+					position: absolute;
+					top: 0;
+					right: 0;
+					height: 54px;
+					width: 60px;
+					padding-top: 15px;
+					padding-left: 18px;
+					background-color: #333;
+					border-left: 1px solid @BackgroundColor;
+
+					.left-caret {
+						transform: rotate(0deg);
+						-webkit-transform: rotate(0deg);
+					}
+
+					&:hover {
+						background-color: @HoverBackgroundColor;
+					}
 				}
 			}
 
@@ -314,7 +418,7 @@
 				cursor: default;
 
 				.quick-search-container {
-					border-bottom: 1px solid #4a4a4a;
+					border-bottom: 1px solid @HoverBackgroundColor;
 					margin: 0;
 					padding: 0;
 				}
@@ -633,6 +737,7 @@
 
 .navigation-container {
 	@BackgroundColor: #262626;
+	@HoverBackgroundColor: #4a4a4a;
 
 	.ellipsis {
 		overflow: hidden;
@@ -650,7 +755,7 @@
 			cursor: pointer;
 
 			.quick-search-container {
-				border-bottom: 1px solid #4a4a4a;
+				border-bottom: 1px solid @HoverBackgroundColor;
 				margin: 0 -20px;
 				padding: 0 20px;
 			}
@@ -869,7 +974,7 @@
 					float: left;
 
 					&:hover {
-						background-color: #4a4a4a;
+						background-color: @HoverBackgroundColor;
 					}
 
 					.select-type {
@@ -1252,14 +1357,14 @@
 					background-color: initial;
 
 					&.active {
-						background-color: #4a4a4a;
+						background-color: @HoverBackgroundColor;
 
 						.item-icon {
-							background-color: #4a4a4a;
+							background-color: @HoverBackgroundColor;
 						}
 
 						.item-label {
-							background-color: #4a4a4a;
+							background-color: @HoverBackgroundColor;
 						}
 					}
 				}
@@ -1288,7 +1393,7 @@
 
 						.quick-search-container {
 							margin: 0 60px 0 20px;
-							border-bottom: 1px solid #4a4a4a;
+							border-bottom: 1px solid @HoverBackgroundColor;
 
 							.search-header {
 								height: 47px;
@@ -1362,7 +1467,7 @@
 			background-size: 40% 40%;
 			background-repeat: no-repeat;
 			background-position: center;
-			background-color: #4a4a4a;
+			background-color: @HoverBackgroundColor;
 			position: absolute;
 			right: 0;
 			top: 0;
