@@ -237,15 +237,136 @@
 		self.editFieldTripStatus(viewModel, false);
 	};
 
-	//TODO right click menu feature
-	BasePage.prototype.copyToClipboardClick = function()
+	BasePage.prototype._copySelectedRecords = function(e, selectedIds)
 	{
+		var self = this;
+		var kendoGrid = self.searchGrid;
+		return kendoGrid.getIdsWithCurrentFiltering(true)
+			.then(function(ids)
+			{
+				var gridLayoutExtendedEntity = kendoGrid._obCurrentGridLayoutExtendedDataModel().toData();
+				gridLayoutExtendedEntity.LayoutColumns = kendoGrid._obSelectedColumns();
 
+				var url = pathCombine(tf.api.apiPrefix(), "search", kendoGrid.options.gridType, "export", "copy");
+				var options = {
+					data:
+					{
+						gridLayoutExtendedEntity: gridLayoutExtendedEntity,
+						selectedIds: selectedIds.length > 0 ? selectedIds : ids,
+						sortItems: kendoGrid.searchOption.data.sortItems
+					}
+				};
+				if (kendoGrid.options.gridType === "busfinderhistorical")
+					self.setRequestOption(options);
+
+				var queryPromise = tf.promiseAjax["post"](url, options);
+				return queryPromise
+					.then(function(data)
+					{
+						tf.modalManager.showModal(
+							new TF.Modal.CopyDataModalViewModel(data, function()
+							{
+								$(".tfmodal-container").css('visibility', 'visible');
+								tf.loadingIndicator.tryHide();
+								$("#loadingindicator .subtitle-text").text('Loading');
+							})
+						)
+							.then(function()
+							{
+
+							}.bind(this));
+
+						$(".tfmodal-container").css('visibility', 'hidden');
+						return Promise.resolve(true);
+					}, function(data)
+					{
+						tf.loadingIndicator.tryHide();
+						if (self.copyRetryCount >= 3)
+						{
+							tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
+								.then(function(result)
+								{
+
+								});
+							return;
+						}
+						tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
+							.then(function(result)
+							{
+								if (result)
+								{
+									self.copyRetryCount = self.copyRetryCount + 1;
+									self._copySelectedRecords(e, selectedIds);
+								}
+							});
+					});
+			});
 	};
 
-	//TODO right click menu feature
+	BasePage.prototype.copyToClipboardClick = function(viewModel, e)
+	{
+		var self = this;
+		self.copyRetryCount = 0;
+		var selectedIds = self.searchGrid.getSelectedIds();
+		if (selectedIds.length > 2000)
+		{
+			return self.showConfirmMessage(e, selectedIds);
+		}
+		else if (selectedIds.length === 0)
+		{
+			self.searchGrid.getIdsWithCurrentFiltering().then(function(ids)
+			{
+				if (ids.length > 2000)
+				{
+					return self.showConfirmMessage(e, selectedIds);
+				}
+				else if (ids.length > 0)
+				{
+					self._copySelectedRecords(e, selectedIds);
+				}
+			});
+		}
+		else
+		{
+			self._copySelectedRecords(e, selectedIds);
+		}
+	};
+
+	BasePage.prototype.showConfirmMessage = function(e, selectedIds)
+	{
+		var self = this;
+		return tf.promiseBootbox.yesNo(
+			{
+				message: "You have requested to Copy " + ((self.searchGrid.allIds.length === selectedIds.length || selectedIds.length === 0) ? "All" : selectedIds.length) + " records. This may take a long time to complete. To reduce the amount of time this takes, we recommend reducing the number of grid columns that you have displayed and/or the number of records that you have selected.\n\nAre you sure you would like to copy these records?",
+				backdrop: true,
+				title: "Confirmation Message",
+				closeButton: true
+			})
+			.then(function(result)
+			{
+				if (result == true)
+				{
+					self._copySelectedRecords(e, selectedIds);
+				}
+			});
+	};
+
 	BasePage.prototype.saveAsClick = function()
 	{
+		var self = this, selectedIds = self.searchGrid.getSelectedIds();
+
+		if (selectedIds.length === 0 && this.searchGrid.kendoGrid.dataSource._total > 0)
+		{
+			TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(this.searchGrid).then(function(data)
+			{
+				selectedIds = data;
+				self.searchGrid.exportCurrentGrid(selectedIds);
+			});
+		}
+		else
+		{
+			self.searchGrid.exportCurrentGrid(selectedIds);
+		}
 	};
 
 	//TODO right click menu feature
