@@ -23,8 +23,41 @@
 
 	BasePage.prototype.init = function(model, element)
 	{
-
 	};
+
+	BasePage.prototype.onCtrlSPress = function(e, keyCombination)
+	{
+		e.preventDefault();
+		this.hideBlukMenu();
+		if (this.disableShortCutKey == true)
+		{
+			return;
+		}
+		this.saveAsClick();
+	};
+
+	BasePage.prototype.onCtrlCPress = function(e, keyCombination)
+	{
+		e.preventDefault();
+		this.hideBlukMenu();
+		if (this.disableShortCutKey == true)
+		{
+			return;
+		}
+		this.copyToClipboardClick();
+	};
+
+	/**
+	 * Hide bluk menu when the hot key was triggered.
+	 * @returns {void} 
+	 */
+	BasePage.prototype.hideBlukMenu = function()
+	{
+		if (this.bulkMenu && !this.bulkMenu.disposed)
+		{
+			this.bulkMenu.$container.trigger("contextMenuClose");
+		}
+	}
 
 	BasePage.prototype.clearRelatedRightPage = function(type)
 	{
@@ -280,27 +313,27 @@
 						$(".tfmodal-container").css('visibility', 'hidden');
 						return Promise.resolve(true);
 					}, function(data)
-					{
-						tf.loadingIndicator.tryHide();
-						if (self.copyRetryCount >= 3)
 						{
-							tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
+							tf.loadingIndicator.tryHide();
+							if (self.copyRetryCount >= 3)
+							{
+								tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
+									.then(function(result)
+									{
+
+									});
+								return;
+							}
+							tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
 								.then(function(result)
 								{
-
+									if (result)
+									{
+										self.copyRetryCount = self.copyRetryCount + 1;
+										self._copySelectedRecords(e, selectedIds);
+									}
 								});
-							return;
-						}
-						tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
-							.then(function(result)
-							{
-								if (result)
-								{
-									self.copyRetryCount = self.copyRetryCount + 1;
-									self._copySelectedRecords(e, selectedIds);
-								}
-							});
-					});
+						});
 			});
 	};
 

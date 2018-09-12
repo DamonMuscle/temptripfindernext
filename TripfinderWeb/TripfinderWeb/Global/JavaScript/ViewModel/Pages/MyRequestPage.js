@@ -100,6 +100,17 @@
 			return Promise.resolve(null);
 		};
 	};
+
+	MyRequestPage.prototype.createGrid = function(option)
+	{
+		TF.Page.BaseGridPage.prototype.createGrid.call(this, option);
+		if (this.searchGrid)
+		{
+			this.searchGrid.onCtrlSPress.subscribe(this.onCtrlSPress.bind(this));
+			this.searchGrid.onCtrlCPress.subscribe(this.onCtrlCPress.bind(this));
+		}
+	}
+
 	MyRequestPage.prototype.dispose = function()
 	{
 		var self = this;

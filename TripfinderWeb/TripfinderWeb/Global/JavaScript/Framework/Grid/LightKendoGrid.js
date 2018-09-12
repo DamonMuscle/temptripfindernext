@@ -129,6 +129,11 @@
 			tf.shortCutKeys.bind("ctrl+i", self.onCtrlIPress, self.options.routeState);
 		}
 
+		self.onCtrlCPress = new TF.Events.Event();
+		self.onCtrlSPress = new TF.Events.Event();
+		tf.shortCutKeys.bind("ctrl+c", function(e, keyCombination) { self.onCtrlCPress.notify(keyCombination, e); });
+		tf.shortCutKeys.bind("ctrl+s", function(e, keyCombination) { self.onCtrlSPress.notify(keyCombination, e); });
+
 		self.obFilteredRecordCount = ko.observable(0);
 		self.obTotalRecordCount = ko.observable(0);
 		self.obIsScrollAtBottom = ko.observable(false);
@@ -162,7 +167,6 @@
 		{
 			this.createGrid();
 		}.bind(this));
-
 	};
 
 	LightKendoGrid.prototype._setGridState = function()
@@ -669,11 +673,11 @@
 			},
 			height: self.getGridFullHeight(),
 			filterable:
-				{
-					extra: true,
-					mode: "menu row",
-					operators: TF.Grid.LightKendoGrid.DefaultOperator
-				},
+			{
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			},
 			sortable: {
 				mode: "single",
 				allowUnsort: true
@@ -4161,13 +4165,13 @@
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
 							{
 								data:
+								{
+									fields: self.geoFields,
+									IdFilter:
 									{
-										fields: self.geoFields,
-										IdFilter:
-											{
-												IncludeOnly: self.allIds
-											}
+										IncludeOnly: self.allIds
 									}
+								}
 							})
 							.then(function(response)
 							{
@@ -4626,6 +4630,8 @@
 
 	LightKendoGrid.prototype.dispose = function()
 	{
+		this.onCtrlCPress.unsubscribeAll();
+		this.onCtrlSPress.unsubscribeAll();
 		this.onDoubleClick.unsubscribeAll();
 		this.onRowsChangeCheck.unsubscribeAll();
 		this.onRowsChanged.unsubscribeAll();

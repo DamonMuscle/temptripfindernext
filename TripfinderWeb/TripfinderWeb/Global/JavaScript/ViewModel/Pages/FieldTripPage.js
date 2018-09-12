@@ -114,6 +114,16 @@
 		};
 	};
 
+	FieldTripPage.prototype.createGrid = function(option)
+	{
+		TF.Page.BaseGridPage.prototype.createGrid.call(this, option);
+		if (this.searchGrid)
+		{
+			this.searchGrid.onCtrlSPress.subscribe(this.onCtrlSPress.bind(this));
+			this.searchGrid.onCtrlCPress.subscribe(this.onCtrlCPress.bind(this));
+		}
+	}
+
 	FieldTripPage.prototype.dispose = function()
 	{
 		var self = this;
