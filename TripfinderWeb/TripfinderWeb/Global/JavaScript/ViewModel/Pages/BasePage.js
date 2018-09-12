@@ -16,6 +16,7 @@
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+		self.openSelectedClick = self.openSelectedClick.bind(self);
 	}
 
 	BasePage.prototype.constructor = BasePage;
@@ -369,9 +370,51 @@
 		}
 	};
 
-	//TODO right click menu feature
-	BasePage.prototype.openSelectedClick = function()
+	BasePage.prototype.openSelectedClick = function(viewModel, e)
 	{
+		if (TF.isMobileDevice && window.screen.width < 768)
+		{
+			var selectedIds = this.searchGrid.getSelectedIds();
+			this.newGridWithSelectedRecordsModalViewModel = new TF.Modal.NewGridWithSelectedRecordsModalViewModel(selectedIds, this, this.searchGrid);
+			tf.modalManager.showModal(
+				this.newGridWithSelectedRecordsModalViewModel
+			);
+		}
+		else
+		{
+			this._openSelected(this.type, e);
+		}
+	};
+
+	BasePage.prototype._openSelected = function(gridType, e)
+	{
+		var selectedIds = this.searchGrid.getSelectedIds();
+		//the filter will sticky once open a new grid, so save the sticky information in DB
+		var storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
+		var filterName = $(e.currentTarget).find(".menu-label").text().trim() + ' (Selected Records)';
+		if (selectedIds.length > 0)
+		{
+			Promise.all([
+				TF.Grid.FilterHelper.clearQuickFilter(gridType),
+				tf.storageManager.save("grid.currentlayout." + gridType + ".id", ''),
+				tf.storageManager.save(storageFilterDataKey,
+					{
+						"filteredIds": selectedIds,
+						"filterName": filterName
+					}, true)
+			]).then(function()
+			{
+				window.open("#/?pagetype=" + this.pageType, "new-pageWindow_" + $.now());
+
+			}.bind(this));
+		}
+		else
+		{
+			this.searchGrid.gridAlert.show(
+				{
+					message: "no data selected!"
+				});
+		}
 	};
 
 	BasePage.prototype.dispose = function()
