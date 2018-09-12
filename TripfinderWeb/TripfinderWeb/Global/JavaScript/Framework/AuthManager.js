@@ -234,6 +234,7 @@
 	{
 		var self = this;
 		self.isAdmin = authorizationInfoJson.IsAdmin;
+		self.isFieldTripAdmin = authorizationInfoJson.IsAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
 		self.authorizationTree = authorizationInfoJson.AuthorizationTree;
 
 		self.onUpdateAuthorized = new TF.Events.Event();

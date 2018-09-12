@@ -446,7 +446,7 @@
 										}
 										else
 										{
-											if (tf.authManager.authorizationInfo.isAdmin)
+											if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 											{
 												tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
 											}
