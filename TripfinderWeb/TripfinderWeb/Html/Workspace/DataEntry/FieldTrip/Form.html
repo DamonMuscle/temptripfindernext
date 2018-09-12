@@ -31,7 +31,8 @@
 				<div class="col-xs-24 no-padding-left no-padding-right">
 					<div class="form-group">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().Name&&obRequiredFields().Name.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Field Trip') +' '+ tf.applicationTerm.getApplicationTermSingularByName('Name')"></label>
-						<input type="text" class="form-control" name="name" data-bind="value:obEntityDataModel().name, attr:IsRequired(obRequiredFields()&&obRequiredFields().Name?obRequiredFields().Name.Required:null)" maxlength="200">
+						<input type="text" class="form-control" name="name" data-bind="value:obEntityDataModel().name, attr:IsRequired(obRequiredFields()&&obRequiredFields().Name?obRequiredFields().Name.Required:null)"
+						 maxlength="200">
 					</div>
 
 					<div class="form-group">
@@ -132,10 +133,14 @@
 		</div>
 		<div class="row">
 			<div class="col-xs-24">
+				<h4 class="section-title">
+					<strong>Contact</strong>
+				</h4>
 				<div class="col-xs-24 no-padding-left no-padding-right">
 					<div class="form-group col-xs-24 no-padding-left no-padding-right">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripContact&&obRequiredFields().FieldTripContact.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Contact')"></label>
-						<input type="text" class="form-control" name="FieldTripContact" data-bind="value:obEntityDataModel().fieldTripContact, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripContact?obRequiredFields().FieldTripContact.Required:null)" maxlength="200">
+						<input type="text" class="form-control" name="FieldTripContact" data-bind="value:obEntityDataModel().fieldTripContact, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripContact?obRequiredFields().FieldTripContact.Required:null)"
+						 maxlength="200">
 					</div>
 					<div class="col-xs-12 form-group no-padding-left">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().ContactPhone&&obRequiredFields().ContactPhone.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Phone')"></label>
@@ -161,7 +166,8 @@
 					</div>
 					<div class="form-group col-xs-24 no-padding-right no-padding-left">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().ContactEMail&&obRequiredFields().ContactEMail.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
-						<input type="text" class="form-control" name="ContactEMail" data-tf-input-type="Email" data-bind="value:obEntityDataModel().ContactEMail, attr:IsRequired(obRequiredFields()&&obRequiredFields().ContactEMail?obRequiredFields().ContactEMail.Required:null)" maxlength="100">
+						<input type="text" class="form-control" name="ContactEMail" data-tf-input-type="Email" data-bind="value:obEntityDataModel().ContactEMail, attr:IsRequired(obRequiredFields()&&obRequiredFields().ContactEMail?obRequiredFields().ContactEMail.Required:null)"
+						 maxlength="100">
 					</div>
 				</div>
 			</div>
@@ -260,14 +266,9 @@
 		<div class="row">
 			<div class="col-xs-24 no-padding-left no-padding-right">
 				<div class="col-xs-24">
-					<div class="col-xs-12 no-padding-left">
+					<div class="col-xs-24 no-padding-left no-padding-right">
 						<h4 class="section-title">
 							<strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Departure')"></strong>
-						</h4>
-					</div>
-					<div class="col-xs-12 no-padding-right">
-						<h4 class="section-title">
-							<strong>Return</strong>
 						</h4>
 					</div>
 					<div class="col-xs-12 no-padding-left">
@@ -276,16 +277,16 @@
 							<!-- ko customInput:{type:"Date",value:obEntityDataModel().departDate,attributes:{class:"form-control",name:"departDate"}} -->
 							<!-- /ko -->
 						</div>
-						<div class="form-group" id="departTime">
-							<label data-bind="css:obRequiredFields()&&obRequiredFields().DepartDateTime&&obRequiredFields().DepartDateTime.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Depart Time')"></label>
-							<!-- ko customInput:{type:"Time",value:obEntityDataModel().departTime,attributes:{class:"form-control",name:"departTime"}, disable:obDepartTimeDisable} -->
+						<div class="form-group" id="returnDate">
+							<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedReturnDateTime&&obRequiredFields().EstimatedReturnDateTime.Required?'requirestar':null">Return Date</label>
+							<!-- ko customInput:{type:"Date",value:obEntityDataModel().returnDate,attributes:{class:"form-control",name:"estimatedReturnDate"}} -->
 							<!-- /ko -->
 						</div>
 					</div>
 					<div class="col-xs-12 no-padding-right">
-						<div class="form-group" id="returnDate">
-							<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedReturnDateTime&&obRequiredFields().EstimatedReturnDateTime.Required?'requirestar':null">Return Date</label>
-							<!-- ko customInput:{type:"Date",value:obEntityDataModel().returnDate,attributes:{class:"form-control",name:"estimatedReturnDate"}} -->
+						<div class="form-group" id="departTime">
+							<label data-bind="css:obRequiredFields()&&obRequiredFields().DepartDateTime&&obRequiredFields().DepartDateTime.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Depart Time')"></label>
+							<!-- ko customInput:{type:"Time",value:obEntityDataModel().departTime,attributes:{class:"form-control",name:"departTime"}, disable:obDepartTimeDisable} -->
 							<!-- /ko -->
 						</div>
 						<div class="form-group" id="returnTime">
@@ -310,8 +311,9 @@
 					</div>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right textarea">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DepartureNotes&&obRequiredFields().DepartureNotes.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Departure Notes')"></label>
-						<textarea class="form-control verticalResize" style="height: 79px;" data-bind="value:obEntityDataModel().departureNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DepartureNotes?obRequiredFields().DepartureNotes.Required:null)" maxlength="10000" name="DepartureNotes" />
-						</div>
+						<textarea class="form-control verticalResize" style="height: 79px;" data-bind="value:obEntityDataModel().departureNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DepartureNotes?obRequiredFields().DepartureNotes.Required:null)"
+						 maxlength="10000" name="DepartureNotes" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -353,9 +355,9 @@
 					<div class="form-group col-xs-24 no-padding-left no-padding-right">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationStreet&&obRequiredFields().DestinationStreet.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Street')"></label>
 						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationStreet,enable:!obFieldTripSettings().StrictDest, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationStreet?obRequiredFields().DestinationStreet.Required:null)"
-							   maxlength="200" name="DestinationStreet">
+						 maxlength="200" name="DestinationStreet">
 					</div>
-					<div class="col-xs-12 form-group no-padding-left" style="padding-right:30px;">
+					<div class="form-group col-xs-24 no-padding-left no-padding-right">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationCity&&obRequiredFields().DestinationCity.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('City')"></label>
 						<div class="input-group">
 							<div data-bind="typeahead:{source:obMailCityDataModels,format:function(obj){return obj.Item;},drowDownShow:true},attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationCity?obRequiredFields().DestinationCity.Required:null)">
@@ -369,12 +371,12 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-xs-3 form-group" style="padding-left:0">
+					<div class="col-xs-12 form-group no-padding-left">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationState&&obRequiredFields().DestinationState.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('State')"></label>
 						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationState,enable:!obFieldTripSettings().StrictDest, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationState?obRequiredFields().DestinationState.Required:null)"
-							   maxlength="2" name="DestinationState">
+						 maxlength="2" name="DestinationState">
 					</div>
-					<div class="col-xs-9 form-group no-padding-right">
+					<div class="col-xs-12 form-group no-padding-right">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationZip&&obRequiredFields().DestinationZip.Required?'requirestar':null">Zip Code</label>
 						<div class="input-group">
 							<div data-bind="typeahead:{source:obMailZipDataModels,format:function(obj){return obj.Item;},drowDownShow:true},attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationZip?obRequiredFields().DestinationZip.Required:null)">
@@ -388,47 +390,17 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group col-xs-24 no-padding-left no-padding-right textarea">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationNotes&&obRequiredFields().DestinationNotes.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Destination Notes')"></label>
-						<textarea class="form-control verticalResize" style="height: 79px;" data-bind="value:obEntityDataModel().destinationNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationNotes?obRequiredFields().DestinationNotes.Required:null)"
-								  maxlength="10000" name="DestinationNotes" />
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-xs-24 no-padding-left no-padding-right">
-				<div class="col-xs-24">
-					<h4 class="section-title">
-						<strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Destination Contact')"></strong>
-					</h4>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContact&&obRequiredFields().DestinationContact.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Name')"></label>
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContact&&obRequiredFields().DestinationContact.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Contact')"></label>
 						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationContact, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationContact?obRequiredFields().DestinationContact.Required:null)"
-							   maxlength="200" name="DestinationContact">
+						 maxlength="200" name="DestinationContact">
 					</div>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContactTitle&&obRequiredFields().DestinationContactTitle.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Title')"></label>
 						<input type="text" class="form-control" data-bind="value:obEntityDataModel().destinationContactTitle, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationContactTitle?obRequiredFields().DestinationContactTitle.Required:null)"
-							   maxlength="100" name="DestinationContactTitle">
-					</div>
-					<div class="form-group col-xs-24 no-padding-left no-padding-right">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationEMail&&obRequiredFields().DestinationEMail.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
-						<input type="text" class="form-control" name="DestinationEmail" data-tf-input-type="Email" data-bind="value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationEMail?obRequiredFields().DestinationEMail.Required:null)"
-							   maxlength="100">
+						 maxlength="100" name="DestinationContactTitle">
 					</div>
 					<div class="col-xs-12 form-group no-padding-left">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationFax&&obRequiredFields().DestinationFax.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Fax Number')"></label>
-						<!-- ko if: (obRequiredFields() && obRequiredFields().DestinationFax && obRequiredFields().DestinationFax.Required)-->
-						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",required:"required",maxlength:"30",name:"destinationFax", phonetype:"fax"}} -->
-						<!-- /ko -->
-						<!--/ko-->
-						<!-- ko if: !(obRequiredFields() && obRequiredFields().DestinationFax) || (obRequiredFields() && obRequiredFields().DestinationFax && !obRequiredFields().DestinationFax.Required)-->
-						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",maxlength:"30",name:"destinationFax", phonetype:"fax"}} -->
-						<!-- /ko -->
-						<!--/ko-->
-					</div>
-					<div class="col-xs-12 form-group" style="padding-right:0">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContactPhone&&obRequiredFields().DestinationContactPhone.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Phone')"></label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().DestinationContactPhone && obRequiredFields().DestinationContactPhone.Required)-->
 						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().destinationContactPhone,attributes:{class:"form-control",required:"required",maxlength:"30",name:"destinationContactPhone"}} -->
@@ -439,6 +411,28 @@
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
+					<div class="col-xs-12 form-group no-padding-right">
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationFax&&obRequiredFields().DestinationFax.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Fax Number')"></label>
+						<!-- ko if: (obRequiredFields() && obRequiredFields().DestinationFax && obRequiredFields().DestinationFax.Required)-->
+						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",required:"required",maxlength:"30",name:"destinationFax", phonetype:"fax"}} -->
+						<!-- /ko -->
+						<!--/ko-->
+						<!-- ko if: !(obRequiredFields() && obRequiredFields().DestinationFax) || (obRequiredFields() && obRequiredFields().DestinationFax && !obRequiredFields().DestinationFax.Required)-->
+						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",maxlength:"30",name:"destinationFax", phonetype:"fax"}} -->
+						<!-- /ko -->
+						<!--/ko-->
+					</div>
+
+					<div class="form-group col-xs-24 no-padding-left no-padding-right">
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationEMail&&obRequiredFields().DestinationEMail.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
+						<input type="text" class="form-control" name="DestinationEmail" data-tf-input-type="Email" data-bind="value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationEMail?obRequiredFields().DestinationEMail.Required:null)"
+						 maxlength="100">
+					</div>
+					<div class="form-group col-xs-24 no-padding-left no-padding-right textarea">
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().DestinationNotes&&obRequiredFields().DestinationNotes.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Destination Notes')"></label>
+						<textarea class="form-control verticalResize" style="height: 79px;" data-bind="value:obEntityDataModel().destinationNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationNotes?obRequiredFields().DestinationNotes.Required:null)"
+						 maxlength="10000" name="DestinationNotes" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -448,9 +442,9 @@
 					<strong data-bind="css:obRequiredFields()&&obRequiredFields().DirectionNotes&&obRequiredFields().DirectionNotes.Required?'requirestar':null">Directions</strong>
 				</h4>
 				<div class="col-xs-24 form-group no-padding-left no-padding-right large-textarea">
-					<label style="display:none">Directions</label>
+					<label>Directions</label>
 					<textarea class="form-control verticalResize" style="height: 200px;" data-bind="value:obEntityDataModel().directionNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DirectionNotes?obRequiredFields().DirectionNotes.Required:null)"
-							  maxlength="10000" name="DirectionNotes" />
+					 maxlength="10000" name="DirectionNotes" />
 				</div>
 			</div>
 		</div>
@@ -460,8 +454,7 @@
 				<div class="view-form-grid resources small" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeResources.bind($parent)}">
 				</div>
 				<!-- /ko -->
-				<div class="iconbutton popout pull-right icon-cursor" style="position: absolute;top: 25px;right: 15px;" title="Resources"
-					 data-bind="click:viewResourceClick"></div>
+				<div class="iconbutton popout pull-right icon-cursor" style="position: absolute;top: 25px;right: 15px;" title="Resources" data-bind="click:viewResourceClick"></div>
 			</div>
 			<!--ko if: obMode()==='Edit' -->
 			<div class="col-xs-24">
@@ -490,7 +483,7 @@
 					<div class="col-xs-24">
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().BillingNotes&&obRequiredFields().BillingNotes.Required?'requirestar':null">Billing Notes</label>
 						<textarea class="form-control verticalResize" style="height: 110px;" data-bind="value:obEntityDataModel().billingNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().BillingNotes?obRequiredFields().BillingNotes.Required:null)"
-								  maxlength="10000" name="BillingNotes" />
+						 maxlength="10000" name="BillingNotes" />
 					</div>
 				</div>
 				<div class="form-group">
