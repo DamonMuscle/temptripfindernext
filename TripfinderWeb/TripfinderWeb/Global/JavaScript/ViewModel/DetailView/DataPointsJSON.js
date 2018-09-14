@@ -18,7 +18,7 @@ var today = (new Date()).toDateString(),
 					"field": "Contact",
 					"title": "Contact",
 					"type": "String",
-					"defaultValue": "Tony Civitella"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "ContactTitle",
@@ -199,7 +199,7 @@ var today = (new Date()).toDateString(),
 					"field": "Contact",
 					"title": "Contact",
 					"type": "String",
-					"defaultValue": "Joe Smith"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "ContactTitle",
@@ -350,7 +350,7 @@ var today = (new Date()).toDateString(),
 					"field": "Contact",
 					"title": "Contact",
 					"type": "String",
-					"defaultValue": "Tony Civitella"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "ContactTitle",
@@ -1096,7 +1096,7 @@ var today = (new Date()).toDateString(),
 					"field": "Contact",
 					"title": "Contact",
 					"type": "String",
-					"defaultValue": "Wes Rolnick"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "ContactTitle",
@@ -1340,7 +1340,7 @@ var today = (new Date()).toDateString(),
 					"field": "StaffName",
 					"title": "Name",
 					"type": "String",
-					"defaultValue": "Tracy Chen"
+					"defaultValue": "John Smith"
 				},
 				{
 					"field": "AllStaffTypes",
