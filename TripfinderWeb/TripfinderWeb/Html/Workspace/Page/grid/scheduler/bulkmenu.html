@@ -1,10 +1,12 @@
 ﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
 	<ul class="tf-contextmenu grid-menu">
+		<!-- ko if:gridViewModel.approveButton || gridViewModel.declineButton || gridViewModel.cancelButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()||!gridViewModel.obRightClickOnSelected()}">
 			<div class="menu-icon edit">
 			</div>
 			<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
 		</li>
+		<!-- /ko -->
 		<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
 		<li class="menu-divider">
 			<div class="rule"></div>

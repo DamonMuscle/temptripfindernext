@@ -29,7 +29,9 @@
 			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
 			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
 			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
+			<!-- ko if:(!isAdmin && declineButton) || approveButton || cancelButton-->
 			<div class="divider" title=""></div>
+			<!-- /ko -->
 			<!-- ko if:!isAdmin && declineButton-->
 			<div class="iconbutton decline" title="Decline" data-bind="css:{disabled:!selectedItemsApprovable()}"></div>
 			<!-- /ko -->
@@ -50,8 +52,7 @@
 			<div class="grid-staterow">
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
-					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
-					 style="max-width:150px;"></span>
+					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow" style="max-width:150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>

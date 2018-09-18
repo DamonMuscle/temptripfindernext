@@ -43,16 +43,20 @@
 
 	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
 	{
-		var self = this, permission,
+		var self = this,
 			pageData, templateName,
-			$content, $leftPage = $("#pageContent .left-page"),
 			storageKey = TF.productName.toLowerCase() + ".page";
 
 		self.resizablePage.clearContent();
+		gridOptions = gridOptions || {};
 		switch (type)
 		{
+			case "approvals":
+				pageData = new TF.Page.ApprovalsPage(gridOptions);
+				templateName = "workspace/page/basegridpage";
+				break;
 			case "fieldtrips":
-				pageData = new TF.Page.FieldTripPage(gridOptions);
+				pageData = tf.authManager.authorizationInfo.isFieldTripAdmin ? new TF.Page.FieldTripPage(gridOptions) : new TF.Page.AllFieldTripPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
 			case "myrequests":
@@ -67,9 +71,13 @@
 				pageData = new TF.Page.SettingsConfigurationPage();
 				templateName = "workspace/admin/settings_configuration";
 				break;
+			case "approvalsScheduler":
+				pageData = new TF.Page.ApprovalsSchedulerPage();
+				templateName = "workspace/page/schedulerpage";
+				break;
 			case "fieldtripsScheduler":
 				var gridType = type.replace("Scheduler", "");
-				pageData = new TF.Page.SchedulerPage(gridType);
+				pageData = tf.authManager.authorizationInfo.isFieldTripAdmin ? new TF.Page.SchedulerPage(gridType) : new TF.Page.AllFieldTripSchedulerPage(gridType);
 				templateName = "workspace/page/schedulerpage";
 				break;
 			case "myrequestsScheduler":
@@ -89,7 +97,7 @@
 				self.navigationData.setActiveStateByPageType(type);
 			}, 100);
 		}
-		if (!skipSavePage && tf.authManager.authorizationInfo.isFieldTripAdmin)
+		if (!skipSavePage)
 		{
 			tf.storageManager.save(storageKey, type);
 		}

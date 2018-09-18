@@ -232,13 +232,21 @@
 
 	function AuthorizationInfo(authorizationInfoJson)
 	{
-		var self = this;
-		self.isAdmin = authorizationInfoJson.IsAdmin;
-		self.authorizationTree = authorizationInfoJson.AuthorizationTree;
-		self.isFieldTripAdmin = authorizationInfoJson.IsAdmin || self.isAuthorizedFor("transportationAdministrator", "read");
-
-		self.onUpdateAuthorized = new TF.Events.Event();
+		this.updateAuthorized(authorizationInfoJson);
+		this.onUpdateAuthorized = new TF.Events.Event();
 	}
+
+	AuthorizationInfo.prototype.checkOnlyLevel1 = function()
+	{
+		if (this.isFieldTripAdmin) return false;
+
+		var securedItems = this.authorizationTree.securedItems;
+		return !["level2Administrator", "level3Administrator", "level4Administrator"].some(function(item)
+		{
+			var securedItem = securedItems[item];
+			return securedItem && securedItem.length;
+		});
+	};
 
 	/**
 	 * Update the anthorization info.
@@ -247,11 +255,14 @@
 	 */
 	AuthorizationInfo.prototype.updateAuthorized = function(authorizationInfoJson)
 	{
-		var self = this;
-		self.isAdmin = authorizationInfoJson.IsAdmin;
-		self.authorizationTree = authorizationInfoJson.AuthorizationTree;
-
-		self.onUpdateAuthorized.notify();
+		this.isAdmin = authorizationInfoJson.IsAdmin;
+		this.authorizationTree = authorizationInfoJson.AuthorizationTree;
+		this.isFieldTripAdmin = authorizationInfoJson.IsAdmin || this.isAuthorizedFor("transportationAdministrator", "read");
+		this.onlyLevel1 = this.checkOnlyLevel1();
+		if (this.onUpdateAuthorized)
+		{
+			this.onUpdateAuthorized.notify();
+		}
 	};
 
 	AuthorizationInfo.prototype.isAuthorizedFor = function()

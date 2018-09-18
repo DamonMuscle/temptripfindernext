@@ -81,37 +81,6 @@
 			GridType: self.type
 		}
 		];
-		self.options.summaryFilterFunction = function(selectGridFilterEntityId)
-		{
-			if (selectGridFilterEntityId === -1 || selectGridFilterEntityId === -2)
-			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtripdepartingtrips")).then(function(response)
-				{
-					return response.Items[0];
-				});
-			}
-			if (selectGridFilterEntityId === -3 || selectGridFilterEntityId === -4 ||
-				selectGridFilterEntityId === -5 || selectGridFilterEntityId === -6)
-			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtrip")).then(function(response)
-				{
-					switch (selectGridFilterEntityId)
-					{
-						case -3:
-							return response.AwaitingApprovalList;
-						case -4:
-							return response.RejectedList;
-						case -5:
-							return response.TotalList;
-						case -6:
-							return response.TransportationApprovedList;
-						default:
-							return null;
-					}
-				});
-			}
-			return Promise.resolve(null);
-		};
 	};
 
 	FieldTripPage.prototype.createGrid = function(option)

@@ -577,6 +577,9 @@
 
 		switch (type)
 		{
+			case "approvals":
+				ga('send', 'event', 'Area', 'My Pending Approvals');
+				break;
 			case "fieldtrips":
 				ga('send', 'event', 'Area', 'Field Trips');
 				break;

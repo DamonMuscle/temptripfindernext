@@ -432,29 +432,37 @@
 										if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
 										{
 											var pageType = getParameterByName("pagetype");
-											tf.pageManager.openNewPage(pageType, null, true, true);
+											if (pageType)
+											{
+												tf.pageManager.openNewPage(pageType, null, true, true);
+												return;
+											}
 										}
-										else if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+
+										if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 										{
-											var id = getParameterByName('id'),
-												detailView = new TF.DetailView.DetailViewViewModel(id);
-											tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
+											var id = getParameterByName('id');
+											if (id != null)
+											{
+												var detailView = new TF.DetailView.DetailViewViewModel(id);
+												tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
+												return;
+											}
 										}
-										else if (tf.urlParm && tf.urlParm.tripid)
+
+										if (tf.urlParm && tf.urlParm.tripid)
 										{
 											tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
+											return;
 										}
-										else
+
+										if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 										{
-											if (tf.authManager.authorizationInfo.isFieldTripAdmin)
-											{
-												tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
-											}
-											else
-											{
-												tf.pageManager.openNewPage("myrequests", null, true);
-											}
+											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
+											return;
 										}
+
+										tf.pageManager.openNewPage("myrequests", null, true);
 									});
 
 									return true;

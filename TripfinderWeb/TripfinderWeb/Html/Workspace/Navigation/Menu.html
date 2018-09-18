@@ -42,6 +42,12 @@
 			<div class="item-icon myrequests"></div>
 			<div class="item-label">My Submitted Requests</div>
 		</div>
+		<!-- ko if: !tf.authManager.authorizationInfo.onlyLevel1 -->
+		<div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
+			<div class="item-icon approvals"></div>
+			<div class="item-label">My Pending Approvals</div>
+		</div>
+		<!-- /ko -->
 		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
 			<div class="item-icon fieldtrips"></div>
 			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
