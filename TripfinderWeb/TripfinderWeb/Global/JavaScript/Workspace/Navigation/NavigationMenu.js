@@ -20,9 +20,8 @@
 		self.defaultOpenMenuAnimationDuration = 250;
 
 		self.availableApplications = {
-			viewfinder: "Viewfinder",
-			fleetfinder: "Fleetfinder/admin.html",
-			tripfinder: "Tripfinder"
+			viewfinder: { url: "Viewfinder", permission: true },
+			fleetfinder: { url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
 		};
 
 		self.isMacintosh = isMacintosh();
@@ -993,7 +992,8 @@
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
 				var productName = item.toLowerCase();
-				if (productName !== "tripfinder" && self.availableApplications.hasOwnProperty(productName))
+				if (self.availableApplications.hasOwnProperty(productName)
+					&& self.availableApplications[productName].permission)
 				{
 					applications.push(productName);
 				}
@@ -1098,7 +1098,7 @@
 		evt.preventDefault();
 
 		var self = this,
-			routeName = self.availableApplications[data],
+			routeName = self.availableApplications[data].url,
 			url = location.origin + "/" + routeName,
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 
