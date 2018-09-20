@@ -53,6 +53,11 @@
 				this.reminderLoadingStatus.notify(false);
 			}
 		},
+		hideCompletely: function()
+		{
+			this._counter = 0;
+			this.tryHide();
+		},
 		show: function(progressbar, overlay, delayTime)
 		{
 			this._counter++;

@@ -26,6 +26,8 @@
 
 		_onComplete: function(xmlHttpRequest, status, overlay, externalPointer)
 		{
+			if (tf.authManager.logOffTag) { return; }
+
 			if (overlay == true)
 			{
 				this.loadingIndicator.tryHide();
@@ -40,25 +42,19 @@
 
 		_onError: function(xmlHttpRequest, status, error, externalPointer, auth)
 		{
-			if (!(auth && auth.noInterupt) && error == "Unauthorized")
+			if (tf.authManager.logOffTag) { return; }
+
+			if (!(auth && auth.noInterupt) && (error == "Unauthorized" || (!!xmlHttpRequest.responseText && JSON.parse(xmlHttpRequest.responseText).Message === "Invalid Token")))
 			{
+				tf.loadingIndicator.hideCompletely();
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
 						tf.pageManager.logout(false);
-					});
-				return;
+						tf.authManager.logOffTag = true;
+					}.bind(this));
 			}
-			if (!(auth && auth.noInterupt) && !!xmlHttpRequest.responseText && JSON.parse(xmlHttpRequest.responseText).Message === "Invalid Token")
-			{
-				tf.promiseBootbox.alert("Login session expired")
-					.then(function()
-					{
-						tf.pageManager.logout(false);
-					});
-				return;
-			}
-			if (externalPointer)
+			else if (externalPointer)
 			{
 				externalPointer(xmlHttpRequest.responseJSON, xmlHttpRequest.status);
 			}
@@ -66,6 +62,8 @@
 
 		_onSuccess: function(data, xmlHttpRequest, status, externalPointer)
 		{
+			if (tf.authManager.logOffTag) { return; }
+
 			if (externalPointer)
 			{
 				externalPointer(data);
@@ -164,8 +162,11 @@
 			settings.beforeSend = function(xmlHttpRequest, settings)
 			{
 				this._onBeforeSend(xmlHttpRequest, settings, option.overlay, beforeSend)
-				var token = tf.authManager.token;
-				xmlHttpRequest.setRequestHeader('Token', token);
+
+				if (tf.authManager.token)
+				{
+					xmlHttpRequest.setRequestHeader('Token', tf.authManager.token);
+				}
 			}.bind(this);
 
 			settings.complete = function(xmlHttpRequest, status)
