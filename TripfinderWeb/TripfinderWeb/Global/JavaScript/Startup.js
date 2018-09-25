@@ -358,7 +358,8 @@
 								tf.loadingIndicator.tryHide();
 								// cannot validate the connections string
 								var databaseName = tf.storageManager.get("databaseName"),
-									message = (databaseName && databaseName.length > 0 ? "[" + tf.storageManager.get("databaseName") + "]" : "Current Datasource") + " is not available. " + TF.productName + " cannot be used without a data source. Would you like to choose a different data source?";
+									productName = (TF.productName.charAt(0).toUpperCase() + TF.productName.slice(1)),
+									message = (!!databaseName ? "[" + databaseName + "]" : "Current Data Source") + " is not available. " + productName + " cannot be used without a Data Source. Would you like to choose a different Data Source?";
 								return tf.promiseBootbox.yesNo({
 									message: message,
 									title: "Data Source Not Available",
