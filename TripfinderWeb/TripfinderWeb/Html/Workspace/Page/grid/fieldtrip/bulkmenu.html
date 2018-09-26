@@ -16,7 +16,16 @@
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
-		<!-- ko if:gridViewModel.approveButton-->
+		<!-- ko if:gridViewModel.isAdmin&&gridViewModel.approveButton-->
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
+				<span class="hotkey"></span>
+			</div>
+		</li>
+		<!-- /ko -->
+		<!-- ko if:!gridViewModel.isAdmin&&gridViewModel.approveButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
 			<div class="menu-icon">
 			</div>

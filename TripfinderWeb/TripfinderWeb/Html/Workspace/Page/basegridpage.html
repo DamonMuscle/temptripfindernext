@@ -35,7 +35,10 @@
 			<!-- ko if:!isAdmin && declineButton-->
 			<div class="iconbutton decline" title="Decline" data-bind="css:{disabled:!selectedItemsApprovable()}"></div>
 			<!-- /ko -->
-			<!-- ko if:approveButton-->
+			<!-- ko if:isAdmin &&approveButton-->
+			<div class="iconbutton approve" title="Change Status" data-bind="css:{disabled:!selectedItemsApprovable()}"></div>
+			<!-- /ko -->
+			<!-- ko if:!isAdmin &&approveButton-->
 			<div class="iconbutton approve" title="Approve" data-bind="css:{disabled:!selectedItemsApprovable()}"></div>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
@@ -52,7 +55,8 @@
 			<div class="grid-staterow">
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
-					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow" style="max-width:150px;"></span>
+					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
+					 style="max-width:150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>

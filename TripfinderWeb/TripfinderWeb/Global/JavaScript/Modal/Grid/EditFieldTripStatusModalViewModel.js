@@ -18,8 +18,14 @@
 		{
 			self.title((isCancel ? "Cancel " + tripSingular + " " : (isAdmin ? "Change Status of " + tripSingular + " " : (isApprove ? "Approve " : "Decline "))) + "[ " + name + " ]");
 		}
+		if (isAdmin)
+		{
+			self.obPositiveButtonLabel = ko.observable((isCancel ? ("Cancel " + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " " + (fieldTripRecords.length > 1 ? tripPlural : tripSingular)) : "Change"));
+		} else
+		{
+			self.obPositiveButtonLabel = ko.observable((isCancel ? "Cancel " : ((isApprove ? "Approve " : "Decline "))) + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " " + (fieldTripRecords.length > 1 ? tripPlural : tripSingular));
 
-		self.obPositiveButtonLabel = ko.observable((isCancel ? "Cancel " : (isAdmin ? "Change " : (isApprove ? "Approve " : "Decline "))) + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " " + (fieldTripRecords.length > 1 ? tripPlural : tripSingular));
+		}
 		self.obNegativeButtonLabel = ko.observable("Cancel");
 
 		if (isCancel)
