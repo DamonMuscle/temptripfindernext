@@ -8,7 +8,7 @@
 		</li>
 		<!-- /ko -->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
-			<div class="menu-icon">
+			<div class="menu-icon showdetails">
 			</div>
 			<div class="menu-label" data-bind="text: 'Show Details'"></div>
 		</li>
@@ -16,9 +16,9 @@
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
-		<!-- ko if:gridViewModel.isAdmin&&gridViewModel.approveButton-->
+		<!-- ko if:gridViewModel.isAdmin && gridViewModel.approveButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
-			<div class="menu-icon">
+			<div class="menu-icon approve">
 			</div>
 			<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
 				<span class="hotkey"></span>
@@ -27,7 +27,7 @@
 		<!-- /ko -->
 		<!-- ko if:!gridViewModel.isAdmin&&gridViewModel.approveButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
-			<div class="menu-icon">
+			<div class="menu-icon approve">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Approve ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Approve ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
 				<span class="hotkey"></span>
@@ -36,7 +36,7 @@
 		<!-- /ko -->
 		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
-			<div class="menu-icon">
+			<div class="menu-icon decline">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Decline ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Decline ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
 				<span class="hotkey"></span>
@@ -45,7 +45,7 @@
 		<!-- /ko -->
 		<!-- ko if:gridViewModel.cancelButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
-			<div class="menu-icon">
+			<div class="menu-icon decline">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
 				<span class="hotkey"></span>

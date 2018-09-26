@@ -34,7 +34,8 @@
 	}
 }
 
-.tf-contextmenu .menu-item:not(.disabled):hover, .tf-contextmenu .menu-item:not(.disabled).document-hover {
+.tf-contextmenu .menu-item:not(.disabled):hover,
+.tf-contextmenu .menu-item:not(.disabled).document-hover {
 	background-color: #ddedfb !important;
 }
 
@@ -42,7 +43,8 @@
 	background-color: inherit !important;
 }
 
-.tf-contextmenu .menu-item::before, .tf-contextmenu .menu-item::after {
+.tf-contextmenu .menu-item::before,
+.tf-contextmenu .menu-item::after {
 	content: "";
 	display: block;
 	clear: both;
@@ -144,6 +146,18 @@
 .tf-contextmenu .disabled {
 	color: #B1B1B1;
 	cursor: default;
+}
+
+.tf-contextmenu .menu-item .menu-icon.showdetails {
+	background-image: url('../../global/img/menu/details-white.svg')
+}
+
+.tf-contextmenu .menu-item .menu-icon.approve {
+	background-image: url('../../global/img/menu/approve-white.svg');
+}
+
+.tf-contextmenu .menu-item .menu-icon.decline {
+	background-image: url('../../global/img/menu/decline-white.svg');
 }
 
 .tf-contextmenu .menu-item .menu-icon.copytoclipboard {
@@ -356,7 +370,8 @@
 	.mobile-modal-grid-description {
 		width: 220px;
 
-		a, a:hover {
+		a,
+		a:hover {
 			text-decoration: none;
 		}
 
@@ -394,7 +409,7 @@
 			background-color: white;
 			padding: 8px 15px;
 
-			> div {
+			>div {
 				position: relative;
 			}
 
