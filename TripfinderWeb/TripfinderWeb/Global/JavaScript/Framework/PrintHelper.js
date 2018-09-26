@@ -9,19 +9,32 @@
 		self.updateEndMapEvents = [];
 	};
 
-	PrintHelper.prototype.updatePagedMedia = function()
+	PrintHelper.prototype.updatePagedMedia = function(orientation)
 	{
-		var self = this, $page = $('#default-print');
+		var $page = $('#default-print');
 		if ($page)
 		{
-			self.$pagedMedia = $page;
+			this.$pagedMedia = $page;
 			$page.remove();
+		}
+
+		if (orientation)
+		{
+			var content = '@page { size: ' + orientation.toLowerCase() + '; }'
+			this.$currentMedia = $('<style type="text/css" media="print">' + content + '</style>');
+			$(document.head).append(this.$currentMedia);
 		}
 	};
 
 	PrintHelper.prototype.restorePageMedia = function()
 	{
 		var self = this;
+		if (self.$currentMedia)
+		{
+			self.$currentMedia.remove();
+			self.$currentMedia = null;
+		}
+
 		if (self.$pagedMedia)
 		{
 			$(document.head).append(self.$pagedMedia);
@@ -67,9 +80,7 @@
 
 	PrintHelper.prototype.resetMap = function($detailViewElement)
 	{
-		var self = this, $maps = $detailViewElement.find('.grid-stack-item .map'),
-			map, $item, promiseAll = [];
-
+		var $maps = $detailViewElement.find('.grid-stack-item .map'), $item;
 		$.each($maps, function(i, item)
 		{
 			$item = $(item);
@@ -85,10 +96,10 @@
 		$printElement.find('.hori-line').css({ height: '2px' });
 	};
 
-	PrintHelper.prototype.beforePrint = function($printElement)
+	PrintHelper.prototype.beforePrint = function($printElement, orientation)
 	{
 		var self = this;
-		self.updatePagedMedia();
+		self.updatePagedMedia(orientation);
 		self.processLine($printElement);
 	};
 
@@ -99,7 +110,7 @@
 		self.destroyMapEvents();
 	};
 
-	PrintHelper.prototype.print = function(detailViewElement)
+	PrintHelper.prototype.print = function(detailViewElement, orientation)
 	{
 		var self = this, $detailViewElement = $(detailViewElement),
 			$printElement = $detailViewElement.clone();
@@ -112,11 +123,10 @@
 				// remove virtual scrollbar padding.
 				$printElement.find('.grid-stack-item-content .kendo-grid .k-grid-content,.grid-stack-item-content .kendo-grid .k-grid-header')
 					.css("padding-right", "0px");
-
 				$('body').append($printElement);
 				$printElement.hide();
 
-				self.beforePrint($printElement);
+				self.beforePrint($printElement, orientation);
 				setTimeout(function()
 				{
 					var wnd = window;

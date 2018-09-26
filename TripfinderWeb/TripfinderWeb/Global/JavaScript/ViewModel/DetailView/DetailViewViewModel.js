@@ -4828,7 +4828,7 @@
 			totalWidth = resizablePanel.$element.outerWidth();
 			resizablePanel.resize(totalWidth - pageWidth);
 
-			printHelper.print($detailView).then(function(result)
+			printHelper.print($detailView, printSettingsModal.model.obSelectedOrientation()).then(function(result)
 			{
 				ga('send', 'event', 'Action', 'Print Details');
 				resizablePanel.resize(totalWidth - oldDetailViewWidth);
