@@ -182,7 +182,7 @@ body {
 					}
 				}
 
-				.k-nav-current > .k-link span + span {
+				.k-nav-current>.k-link span+span {
 					max-width: 200px;
 				}
 			}
@@ -248,7 +248,7 @@ body {
 					margin-top: 6px;
 				}
 
-				.slider-bottom-bar > div {
+				.slider-bottom-bar>div {
 					.fontSize(1, 1);
 				}
 			}
@@ -341,7 +341,7 @@ body {
 	position: fixed;
 
 
-	> .overlay {
+	>.overlay {
 		background: rgba(102, 102, 102, 0.8);
 		position: absolute;
 		top: 0;
@@ -399,7 +399,7 @@ body {
 	&.no-overlay {
 		position: initial;
 
-		> .overlay {
+		>.overlay {
 			position: initial;
 		}
 	}
@@ -456,7 +456,7 @@ body {
 		line-height: 30px;
 		font-size: 24px;
 
-		> .title {
+		>.title {
 			background: url("../img/Transfinder-TripfinderText-Only.png") no-repeat center/100%;
 			background-size: 100% 100%;
 			display: block;
@@ -573,7 +573,6 @@ body {
 			height: 28px;
 
 			.disabled {
-				pointer-events: none;
 				opacity: 0.4;
 			}
 
@@ -625,11 +624,11 @@ body {
 	}
 }
 
-.checkbox > label {
+.checkbox>label {
 	line-height: 1.8;
 }
 
-.radio > label {
+.radio>label {
 	line-height: 1.8;
 }
 
@@ -777,9 +776,9 @@ body {
 .k-state-selected,
 .k-state-selected:link,
 .k-state-selected:visited,
-.k-list > .k-state-selected,
-.k-list > .k-state-highlight,
-.k-panel > .k-state-selected,
+.k-list>.k-state-selected,
+.k-list>.k-state-highlight,
+.k-panel>.k-state-selected,
 .k-ghost-splitbar-vertical,
 .k-ghost-splitbar-horizontal,
 .k-draghandle.k-state-selected:hover,
@@ -814,17 +813,17 @@ body {
 	margin-right: 5px;
 }
 
-.k-scheduler-toolbar > ul li:first-child,
-.k-scheduler-toolbar > ul li:first-child .k-link,
-.k-scheduler-toolbar > ul.k-scheduler-views li:first-child + li,
-.k-scheduler-toolbar > ul.k-scheduler-views li:first-child + li .k-link {
+.k-scheduler-toolbar>ul li:first-child,
+.k-scheduler-toolbar>ul li:first-child .k-link,
+.k-scheduler-toolbar>ul.k-scheduler-views li:first-child+li,
+.k-scheduler-toolbar>ul.k-scheduler-views li:first-child+li .k-link {
 	border-radius: 0;
 }
 
 .k-scheduler-toolbar .k-nav-next,
-.k-scheduler-toolbar ul + ul li:last-child,
+.k-scheduler-toolbar ul+ul li:last-child,
 .k-scheduler-toolbar .k-nav-next .k-link,
-.k-scheduler-toolbar ul + ul li:last-child .k-link {
+.k-scheduler-toolbar ul+ul li:last-child .k-link {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
@@ -846,7 +845,8 @@ body {
 }
 
 .detail-view-panel {
-	.k-grid-content, .k-grid-header-wrap {
+	.k-grid-content,
+	.k-grid-header-wrap {
 		width: auto !important;
 	}
 }
