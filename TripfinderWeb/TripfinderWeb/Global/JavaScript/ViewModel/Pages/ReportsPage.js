@@ -22,7 +22,6 @@
 		self.options.gridDefinition = tf.reportGridDefinition.gridDefinition();
 		self.options.showOmittedCount = true;
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip");
-		self.options.storageKey = "grid.currentlayout." + self.pageType;
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";
 	};

@@ -159,8 +159,13 @@
 	KendoGridLayoutMenu.prototype.setStorageLayoutDataKey = function()
 	{
 		this._storageLayoutDataKey = "grid.currentlayout." + ((this.options.kendoGridOption && this.options.kendoGridOption.entityType) ? this.options.kendoGridOption.entityType + "." : "")
-			+ (this.pageType || this._gridType) + ".id";
-	}
+			+ this.getStorageKeyId() + ".id";
+	};
+
+	KendoGridLayoutMenu.prototype.getStorageKeyId = function()
+	{
+		return this.pageType || this._gridType;
+	};
 
 	KendoGridLayoutMenu.prototype._resetAppliedLayoutInitState = function(layoutDataModel)
 	{

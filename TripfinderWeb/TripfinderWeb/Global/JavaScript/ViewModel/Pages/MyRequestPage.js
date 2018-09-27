@@ -11,7 +11,6 @@
 		self.cancelButton = true;
 		self.detailButton = true;
 		self.schedulerButton = true;
-		self.options._pageType = "myrequests";
 	}
 
 	MyRequestPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -25,7 +24,6 @@
 		self.options.isGridView = true;
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
 		self.options.extraFields = ["FieldTripStageId"];
-		self.options.storageKey = "grid.currentlayout." + self.pageType;
 		self.options.loadUserDefined = false;
 		self.options.supportMobileMultipleSelect = true;
 

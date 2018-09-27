@@ -38,7 +38,6 @@
 		self.options.isGridView = true;
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
 		self.options.extraFields = ["FieldTripStageId"];
-		self.options.storageKey = "grid.currentlayout." + self.type;
 		self.options.loadUserDefined = false;
 		self.options.supportMobileMultipleSelect = true;
 

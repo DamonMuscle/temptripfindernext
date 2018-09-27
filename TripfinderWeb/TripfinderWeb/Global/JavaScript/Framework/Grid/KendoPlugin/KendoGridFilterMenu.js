@@ -13,8 +13,8 @@
 	function KendoGridFilterMenu()
 	{
 		this.inited = false;
-		this._storageFilterDataKey = "grid.currentfilter." + (this.pageType || this._gridType) + ".id";
-		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
+		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
+		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this.getStorageKeyId();
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
 		this.obFieldTripStageFilters = ko.observableArray();
@@ -98,17 +98,21 @@
 		this.obQuickFilterBarCheckIcon = ko.observable("menu-item-checked");
 
 		this.initReminder();
-		if (this.options.gridType === "fieldtrip")
+		if (this.pageType === "fieldtrips")
 		{
 			this.initFieldTripStageFilters();
 		}
-	}
+	};
+
+	KendoGridFilterMenu.prototype.getStorageKeyId = function()
+	{
+		return this.pageType || this._gridType;
+	};
 
 	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
 	{
 		var stageIds = [];
-		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read")
-			|| this.options._pageType == "myrequests")
+		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
 		{
 			stageIds = [101, 100, 99, 98, 7, 6, 5, 4, 3, 2, 1];
 		}
@@ -214,7 +218,7 @@
 		{
 			return Promise.resolve();
 		}
-		var gridType = self.options.gridType;
+		var gridType = self.getStorageKeyId();
 		if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 		{
 			gridType = self.options.kendoGridOption.entityType + "." + gridType;
@@ -230,7 +234,7 @@
 		{
 			return Promise.resolve();
 		}
-		var gridType = self.options.gridType;
+		var gridType = self.getStorageKeyId();
 		if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 		{
 			gridType = self.options.kendoGridOption.entityType + "." + gridType;
@@ -240,7 +244,7 @@
 
 	KendoGridFilterMenu.prototype.getQuickFilter = function()
 	{
-		var self = this, gridType = self.options.gridType;
+		var self = this, gridType = self.getStorageKeyId();
 		if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 		{
 			gridType = self.options.kendoGridOption.entityType + "." + gridType;
@@ -788,7 +792,7 @@
 		options.currentObFilters = this.obGridFilterDataModels.slice();
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
-				this.options.gridType, isNew,
+				this.options.pageype, isNew,
 				gridFilterDataModel ? gridFilterDataModel : null,
 				getCurrentHeaderFilters ? this.findCurrentHeaderFilters() : null,
 				{

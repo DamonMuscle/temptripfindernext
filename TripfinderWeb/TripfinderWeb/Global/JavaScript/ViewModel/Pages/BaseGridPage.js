@@ -331,7 +331,8 @@
 	{
 		var self = this, iconRow, statusRow, toolRow, containerWidth,
 			baseOptions = {
-				storageKey: "grid.currentlayout." + self.type,
+				storageKey: "grid.currentlayout." + self.pageType,
+				pageType: self.pageType,
 				gridType: self.type,
 				showBulkMenu: true,
 				showLockedColumn: true,
