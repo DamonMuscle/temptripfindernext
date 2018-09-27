@@ -1,155 +1,157 @@
-﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
-	<ul class="tf-contextmenu grid-menu">
-		<!-- ko if:gridViewModel.approveButton || gridViewModel.declineButton || gridViewModel.cancelButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
-			<div class="menu-icon edit">
-			</div>
-			<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
-		</li>
-		<!-- /ko -->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
-			<div class="menu-icon showdetails">
-			</div>
-			<div class="menu-label" data-bind="text: 'Show Details'"></div>
-		</li>
-		<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
-		<li class="menu-divider">
-			<div class="rule"></div>
-		</li>
-		<!-- ko if:gridViewModel.isAdmin && gridViewModel.approveButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
-			<div class="menu-icon approve">
-			</div>
-			<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
-				<span class="hotkey"></span>
-			</div>
-		</li>
-		<!-- /ko -->
-		<!-- ko if:!gridViewModel.isAdmin&&gridViewModel.approveButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
-			<div class="menu-icon approve">
-			</div>
-			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Approve ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Approve ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-				<span class="hotkey"></span>
-			</div>
-		</li>
-		<!-- /ko -->
-		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
-			<div class="menu-icon decline">
-			</div>
-			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Decline ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Decline ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-				<span class="hotkey"></span>
-			</div>
-		</li>
-		<!-- /ko -->
-		<!-- ko if:gridViewModel.cancelButton-->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
-			<div class="menu-icon decline">
-			</div>
-			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-				<span class="hotkey"></span>
-			</div>
-		</li>
-		<!-- /ko -->
-		<li class="menu-divider">
-			<div class="rule"></div>
-		</li>
-		<!-- /ko -->
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
-			<div class="menu-icon copytoclipboard">
-			</div>
-			<div class="menu-label">
-				Copy
-				<span class="hotkey">Ctrl + C</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
-			<div class="menu-icon saveas">
-			</div>
-			<div class="menu-label">
-				Save As
-				<span class="hotkey">Ctrl + S</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
-			<div class="menu-icon email">
-			</div>
-			<div class="menu-label">
-				Email
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendToClick">
-			<div class="menu-icon sendTo">
-			</div>
-			<div class="menu-label">
-				Send To
-			</div>
-		</li>
-		<li class="menu-item" data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
-			<div class="menu-icon">
-			</div>
-			<div class="menu-label">
-				New Grid
-			</div>
-			<ul class="tf-contextmenu">
-				<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
-					<div class="menu-icon">
-					</div>
-					<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
-				</li>
-			</ul>
-		</li>
-		<li class="menu-item" data-bind="visible:gridViewModel.obReports">
-			<div class="menu-icon report">
-			</div>
-			<div class="menu-label">
-				View Report
-			</div>
-			<!-- ko if: gridViewModel.obReportLists() -->
-			<ul class="tf-contextmenu" data-bind="foreach: gridViewModel.obReportLists">
-				<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.viewReportClick.bind($parent.gridViewModel)">
-					<div class="menu-icon">
-					</div>
-					<div class="menu-label" data-bind="text:$data.Name">
-					</div>
-				</li>
-			</ul>
+﻿<div style="margin:-5px;">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
+		<ul class="tf-contextmenu grid-menu">
+			<!-- ko if:gridViewModel.approveButton || gridViewModel.declineButton || gridViewModel.cancelButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+				<div class="menu-icon edit">
+				</div>
+				<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
+			</li>
 			<!-- /ko -->
-		</li>
-		<li class="menu-divider">
-			<div class="rule"></div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
-			<div class="menu-icon">
-			</div>
-			<div class="menu-label">
-				Select All Records
-				<span class="hotkey">Ctrl + A</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.invertSelection.bind(searchGrid)">
-			<div class="menu-icon">
-			</div>
-			<div class="menu-label">
-				Invert Selected Records
-				<span class="hotkey">Ctrl + I</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.omitSelection.bind(searchGrid)">
-			<div class="menu-icon">
-			</div>
-			<div class="menu-label">
-				Omit Selected Records
-				<span class="hotkey">Ctrl + O</span>
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearSelection.bind(searchGrid)">
-			<div class="menu-icon">
-			</div>
-			<div class="menu-label">
-				Clear All Records
-			</div>
-		</li>
-	</ul>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+				<div class="menu-icon showdetails">
+				</div>
+				<div class="menu-label" data-bind="text: 'Show Details'"></div>
+			</li>
+			<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!-- ko if:gridViewModel.isAdmin && gridViewModel.approveButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+				<div class="menu-icon approve">
+				</div>
+				<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
+					<span class="hotkey"></span>
+				</div>
+			</li>
+			<!-- /ko -->
+			<!-- ko if:!gridViewModel.isAdmin&&gridViewModel.approveButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+				<div class="menu-icon approve">
+				</div>
+				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Approve ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Approve ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+					<span class="hotkey"></span>
+				</div>
+			</li>
+			<!-- /ko -->
+			<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+				<div class="menu-icon decline">
+				</div>
+				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Decline ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Decline ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+					<span class="hotkey"></span>
+				</div>
+			</li>
+			<!-- /ko -->
+			<!-- ko if:gridViewModel.cancelButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+				<div class="menu-icon decline">
+				</div>
+				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+					<span class="hotkey"></span>
+				</div>
+			</li>
+			<!-- /ko -->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!-- /ko -->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
+				<div class="menu-icon copytoclipboard">
+				</div>
+				<div class="menu-label">
+					Copy
+					<span class="hotkey">Ctrl + C</span>
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
+				<div class="menu-icon saveas">
+				</div>
+				<div class="menu-label">
+					Save As
+					<span class="hotkey">Ctrl + S</span>
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
+				<div class="menu-icon email">
+				</div>
+				<div class="menu-label">
+					Email
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendToClick">
+				<div class="menu-icon sendTo">
+				</div>
+				<div class="menu-label">
+					Send To
+				</div>
+			</li>
+			<li class="menu-item" data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					New Grid
+				</div>
+				<ul class="tf-contextmenu">
+					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
+					</li>
+				</ul>
+			</li>
+			<li class="menu-item" data-bind="visible:gridViewModel.obReports">
+				<div class="menu-icon report">
+				</div>
+				<div class="menu-label">
+					View Report
+				</div>
+				<!-- ko if: gridViewModel.obReportLists() -->
+				<ul class="tf-contextmenu" data-bind="foreach: gridViewModel.obReportLists">
+					<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.viewReportClick.bind($parent.gridViewModel)">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text:$data.Name">
+						</div>
+					</li>
+				</ul>
+				<!-- /ko -->
+			</li>
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Select All Records
+					<span class="hotkey">Ctrl + A</span>
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:searchGrid.invertSelection.bind(searchGrid)">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Invert Selected Records
+					<span class="hotkey">Ctrl + I</span>
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:searchGrid.omitSelection.bind(searchGrid)">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Omit Selected Records
+					<span class="hotkey">Ctrl + O</span>
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearSelection.bind(searchGrid)">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Clear All Records
+				</div>
+			</li>
+		</ul>
+	</div>
 </div>
