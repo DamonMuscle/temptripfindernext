@@ -23,6 +23,11 @@
 			{
 				var $target = tf.modalManager.obBaseModalViewModels()[tf.modalManager.obBaseModalViewModels().length - 1].$target;
 				var $modalBody = $target ? $target.find(".modal-body") : undefined;
+				if ($modalBody.closest(".message-center").length > 0)
+				{
+					return;
+					e.preventDefault();
+				}
 				if ($modalBody && $modalBody[0] && !$modalBody[0].contains(e.target) && !$(e.target).closest(".typeahead").length > 0 && focusList.indexOf(e.target.outerHTML) == -1)
 				{
 					//find the first input or textarea in modal which is opened
