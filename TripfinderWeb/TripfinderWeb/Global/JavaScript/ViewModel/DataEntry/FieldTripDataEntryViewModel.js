@@ -941,12 +941,12 @@
 		this.$form.find('.resources .iconbutton.view').hide();
 		this.$form.find('.resources .iconbutton.copytoclipboard').hide();
 		this.$form.find('.resources .iconrow .divider:first').hide();
-		this.$form.find('.resources .iconbutton.pencil').hide();
 
 		this.$form.find('.resources .iconbutton.filter').off("click");
 		this.$form.find('.resources .iconbutton.refresh').off("click");
 
 		this.$form.find('.resources .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceModalViewModel }, this.addEvent.bind(this));
+		this.$form.find('.resources .iconbutton.pencil').off("click").on("click", { gridView: this.obResourcesGridViewModel, modal: TF.Modal.FieldTripResourceModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.resources .iconbutton.delete').off("click").on("click", { gridView: this.obResourcesGridViewModel, modal: TF.Modal.FieldTripResourceModalViewModel }, this.deleteEvent.bind(this));
 	}
 

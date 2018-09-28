@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.contentTemplate('modal/fieldtripResourcecontrol');
 		this.buttonTemplate('modal/positivenegative');
-		this.fieldTripResourceViewModel = new TF.Control.FieldTripResourceViewModel(id);
+		this.fieldTripResourceViewModel = new TF.Control.FieldTripResourceViewModel(source, id);
 		this.data(this.fieldTripResourceViewModel);
 		this.sizeCss = "modal-dialog-lg";
 
@@ -35,10 +35,7 @@
 
 	FieldTripResourceModalViewModel.prototype.negativeClose = function(returnData)
 	{
-		if (this.fieldTripResourceViewModel.obEntityDataModel().apiIsDirty() ||
-			!!this.fieldTripResourceViewModel.obSelectedVehicleText() ||
-			!!this.fieldTripResourceViewModel.obSelectedDriverText() ||
-			!!this.fieldTripResourceViewModel.obSelectedBusAideText())
+		if (this.fieldTripResourceViewModel.obEntityDataModel().apiIsDirty())
 		{
 			return tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes prior to closing?", backdrop: true, title: "Unsaved Changes", closeButton: true })
 				.then(function(result)
