@@ -1792,7 +1792,7 @@
 
 	FieldTripDataEntryViewModel.prototype.isHoliday = function(date)
 	{
-		var result = false, self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays;
+		var result = false, self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays || [];
 		$.each(holidays, function(index, holiday)
 		{
 			var holidayM = moment(new Date(holiday));
@@ -1846,7 +1846,7 @@
 		{
 			return null;
 		}
-		var self = this, settings = self.obFieldTripSettings(), blockOutTimes = settings.BlockOutTimes,
+		var self = this, settings = self.obFieldTripSettings(), blockOutTimes = settings.BlockOutTimes || [],
 			timeM = time.year(2000).month(0).date(1), begin, end, message;
 
 		if (blockOutTimes.length === 0)
