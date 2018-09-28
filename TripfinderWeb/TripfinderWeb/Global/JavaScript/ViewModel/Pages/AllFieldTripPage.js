@@ -7,6 +7,7 @@
 		TF.Page.FieldTripPage.apply(this, arguments);
 		this.declineButton = false;
 		this.approveButton = false;
+		this.isAdminFieldTrip = false;
 	}
 
 	AllFieldTripPage.prototype = Object.create(TF.Page.FieldTripPage.prototype);
