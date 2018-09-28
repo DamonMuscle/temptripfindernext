@@ -1,0 +1,233 @@
+
+.editor-options-wrap {
+	display: flex;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+
+	.option {
+		position: relative;
+		top: -1px;
+		color: white;
+		background-color: #BCBCBC;
+		border: 1px solid #BCBCBC;
+		border-top: none;
+		width: 60px;
+		text-align: center;
+		padding-top: 8px;
+		padding-bottom: 5px;
+		cursor: pointer;
+
+		&.design {
+			border-right: none;
+		}
+
+		&.html {
+			border-left: none;
+		}
+	}
+
+	.selected {
+		position: relative;
+		top: -1px;
+		color: #333333;
+		background-color: #eae8e8;
+		border: 1px solid #D0D0D0;
+		border-top: none;
+		width: 60px;
+		text-align: center;
+		padding-top: 8px;
+		padding-bottom: 5px;
+	}
+}
+
+.html-editor-wrapper {
+	background-image: none, linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0, rgba(255, 255, 255, 0) 100%);
+	background-position: 50% 50%;
+	background-color: #eae8e8;
+	border: 1px solid #C5C5C5;
+	display: none;
+
+	#EnglishHtmlEditor, #SpanishHtmlEditor {
+		padding: 0;
+		margin: 6px 4px 1px 4px;
+		width: calc(~"100% - 10px");
+		height: 236px;
+		border: 1px solid #C5C5C5;
+		resize: vertical !important;
+		outline: none;
+	}
+}
+
+a.k-tool-icon {
+	cursor: pointer;
+}
+
+.k-editor-dialog {
+	.k-dialog-insert {
+		background: #70A130;
+		box-shadow: none;
+		border-color: #70A130;
+
+		&:hover {
+			background: #70A130;
+			box-shadow: none;
+			border-color: #70A130;
+		}
+
+		&:active {
+			background: #70A130;
+			box-shadow: none;
+			border-color: #70A130;
+		}
+
+		&:focus {
+			background: #70A130;
+			box-shadow: none !important;
+			border-color: #70A130;
+		}
+
+		.k-edit-field {
+		}
+	}
+
+	.k-dialog-close {
+		background: #e4e4e4;
+		box-shadow: none;
+		border-color: #e4e4e4;
+
+		&:hover {
+			background: #e4e4e4;
+			box-shadow: none;
+			border-color: #e4e4e4;
+		}
+
+		&:active {
+			background: #e4e4e4;
+			box-shadow: none;
+			border-color: #e4e4e4;
+		}
+
+		&:focus {
+			background: #e4e4e4;
+			box-shadow: none !important;
+			border-color: #e4e4e4;
+		}
+	}
+}
+
+.message-description {
+	color: #999;
+}
+
+body .tfmodal-container .message-center {
+	font-size: 13px;
+}
+
+.k-mobile .message-center-mobile {
+	width: 85%;
+
+	.modal-footer .btn {
+		&.negative, &.other {
+			display: none;
+		}
+
+		&.tf-btn-black {
+			background-color: #70A130;
+			width: 100%;
+		}
+	}
+
+	.content {
+		overflow: auto;
+		max-height: 300px;
+		width: 100%;
+	}
+
+	.language-options {
+		text-align: center;
+		margin-bottom: 15px;
+
+		.divider {
+			display: inline;
+		}
+
+		.option {
+			display: inline;
+
+			&.selected {
+				color: #70A130;
+			}
+		}
+	}
+}
+
+message-center-mobile, .message-center {
+	.negative.btn {
+		display: none;
+	}
+
+	p {
+		margin: 0 0 1em;
+		padding: 0 .2em
+	}
+
+	.k-marker {
+		display: none;
+	}
+
+	.k-paste-container, .Apple-style-span {
+		position: absolute;
+		left: -10000px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden
+	}
+
+	ul, ol {
+		padding-left: 2.5em
+	}
+
+	span {
+		-ms-high-contrast-adjust: none;
+	}
+
+	a {
+		color: #00a
+	}
+
+	code {
+		font-size: 1.23em
+	}
+
+	telerik\3Ascript {
+		display: none;
+	}
+
+	.k-table {
+		table-layout: fixed;
+		width: 100%;
+		border-spacing: 0;
+		margin: 0 0 1em;
+	}
+
+	.k-table td {
+		min-width: 1px;
+		padding: .2em .3em;
+	}
+
+	.k-table, .k-table td {
+		outline: 0;
+		border: 1px dotted #ccc;
+	}
+
+	.k-table p {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.k-mobile .page-container .main-body .setting-configuration .edit-content {
+	height: calc(~"100% - 140px");
+}

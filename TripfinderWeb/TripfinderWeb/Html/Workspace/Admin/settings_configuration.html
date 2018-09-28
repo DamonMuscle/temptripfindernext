@@ -60,11 +60,55 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="col-xs-24">
+			<h4>
+				<strong>Message</strong>
+			</h4>
+			<div class="message-description">Specify the message you would like to display for each language that is published for your site. The message and/or presentation may be adjusted for each language.</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" class="display-once-daily" />Display only once per day per user
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-24 editor-wrapper">
+			<h4>
+				<strong>English</strong>
+			</h4>
+			<div class="text-editor-wrapper">
+				<textarea id="EnglishEditor" rows="10" cols="30"></textarea>
+			</div>
+			<div class="html-editor-wrapper">
+				<textarea id="EnglishHtmlEditor"></textarea>
+			</div>
+			<div class="editor-options-wrap">
+				<div class="option english design" data-bind="click:changePattern">Design</div>
+				<div class="option english html" data-bind="click:changePattern">HTML</div>
+			</div>
+		</div>
+		<div class="col-xs-24 editor-wrapper">
+			<h4>
+				<strong>Spanish</strong>
+			</h4>
+			<div class="text-editor-wrapper">
+				<textarea id="SpanishEditor" rows="10" cols="30"></textarea>
+			</div>
+			<div class="html-editor-wrapper">
+				<textarea id="SpanishHtmlEditor"></textarea>
+			</div>
+			<div class="editor-options-wrap">
+				<div class="option spanish design" data-bind="click:changePattern">Design</div>
+				<div class="option spanish html" data-bind="click:changePattern">HTML</div>
+			</div>
+		</div>
+
+		<div class="edit-footer">
+			<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
+			<span class="version" data-bind="text:tf.pageManager.obVersion"></span>
+		</div>
 	</div>
-	<div class="edit-footer">
-		<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
-		<span class="version" data-bind="text:tf.pageManager.obVersion"></span>
-	</div>
+
 	<div class="edit-bottombar">
 		<button class="btn tf-btn-black" data-bind="click:saveClick">Save</button>
 		<button type="button" class="btn btn-link btn-black" data-bind="click:cancelClick">

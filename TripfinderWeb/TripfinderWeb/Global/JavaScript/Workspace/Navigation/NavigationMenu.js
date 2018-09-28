@@ -33,6 +33,7 @@
 		self.obReportPages = ko.observableArray([]);
 		self.obSettingPages = ko.observableArray([]);
 		self.obDashboardLoRes = ko.observable(false);
+		self.obShowMessageCenter = ko.observable(false);
 
 		self.bindWithKnockout();
 		self.tooltip = new TF.Helper.TFTooltip();
@@ -529,6 +530,16 @@
 			$pageList = $itemMenu.find("li"),
 			alreadyOpened = $item.hasClass("menu-opened");
 
+		if (type === "messages")
+		{
+			if (TF.isPhoneDevice)
+			{
+				self.closeNavigation();
+			}
+			tf.pageManager.showMessageModal();
+			return;
+		}
+
 		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
 		{
 			window.open("#/?pagetype=" + type, "new-pageWindow_" + $.now());
@@ -807,7 +818,10 @@
 			$pageItem = $(".item-menu li[pageType='" + pageType + "']"),
 			$categoryItem = $pageItem.length > 0 ? $pageItem.closest(".navigation-item") : $(".navigation-item[pageType='" + pageType + "']");
 
-		self.$navigationMenu.find(".navigation-item, .item-menu li").removeClass("active");
+		if (self.$navigationMenu)
+		{
+			self.$navigationMenu.find(".navigation-item, .item-menu li").removeClass("active");
+		}
 		$pageItem.addClass("active");
 		$categoryItem.addClass("active");
 	};

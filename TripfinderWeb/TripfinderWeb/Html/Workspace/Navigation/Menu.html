@@ -67,6 +67,10 @@
 				</ul>
 			</div>
 		</div>
+		<div class="navigation-item messages" pageType="messages" data-bind="click:navigationPageCategoryClick.bind($data, 'messages'), visible:obShowMessageCenter">
+			<div class="item-icon messages"></div>
+			<div class="item-label">Messages</div>
+		</div>
 		<div class="navigation-item logout" pageType="logout" data-bind="click:tf.pageManager.logOffClick">
 			<div class="item-icon logout"></div>
 			<div class="item-label">Log Out</div>

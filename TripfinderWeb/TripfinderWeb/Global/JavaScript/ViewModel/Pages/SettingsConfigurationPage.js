@@ -18,6 +18,8 @@
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.displayPassword = "****fake*password****";
+		self.englishEditor = null;
+		self.spanishEditor = null;
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
@@ -78,7 +80,81 @@
 				{
 					$("input[name=clientId]").focus();
 				}
+				self.initEditor();
 			}.bind(this));
+	};
+
+	SettingsConfigurationPage.prototype.initEditor = function()
+	{
+		var self = this;
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage")).then(function(result)
+		{
+			self.englishEditor = $("#EnglishEditor").kendoEditor({
+				resizable: {
+					content: true,
+					toolbar: true
+				}
+			}).data("kendoEditor");
+			self.spanishEditor = $("#SpanishEditor").kendoEditor({
+				resizable: {
+					content: true,
+					toolbar: true
+				}
+			}).data("kendoEditor");
+
+			var $head = $("#EnglishEditor").closest(".edit-content").find("iframe").contents().find("head");
+			$head.append($("<link/>",
+				{ rel: "stylesheet", href: "Global/ThirdParty/bootstrap/css/bootstrap.min.css", type: "text/css" }
+			));
+			$head.append($("<link/>",
+				{ rel: "stylesheet", href: "Global/Css/tripfinder.css", type: "text/css" }
+			));
+
+			if (result.Items && result.Items.length > 0)
+			{
+				self.englishEditor.value(result.Items[0].EnglishMessage);
+				self.spanishEditor.value(result.Items[0].SpanishMessage);
+				$(".display-once-daily").prop("checked", result.Items[0].DisplayOnceDaily);
+			}
+
+			$(".editor-options-wrap .design").addClass("selected");
+			$(".editor-options-wrap .html").removeClass("selected");
+		});
+	};
+
+	SettingsConfigurationPage.prototype.changePattern = function(viewModel, e)
+	{
+		var self = this, $optionBtn = $(e.target).closest(".option"), $container = $optionBtn.closest(".editor-wrapper"),
+			isEnglish = $optionBtn.hasClass("english");
+		$container.find(".option").removeClass("selected");
+		$optionBtn.addClass("selected");
+
+		if ($optionBtn.hasClass("design"))
+		{
+			$container.find(".text-editor-wrapper").show();
+			$container.find(".html-editor-wrapper").hide();
+			if (isEnglish)
+			{
+				self.englishEditor.value($("#EnglishHtmlEditor").val());
+			}
+			else
+			{
+				self.spanishEditor.value($("#SpanishHtmlEditor").val());
+			}
+		}
+		else
+		{
+			$container.find(".html-editor-wrapper").show();
+			$container.find(".text-editor-wrapper").hide();
+			if (isEnglish)
+			{
+				$("#EnglishHtmlEditor").val(self.englishEditor.value());
+			}
+			else
+			{
+				$("#SpanishHtmlEditor").val(self.spanishEditor.value());
+			}
+		}
 	};
 
 	SettingsConfigurationPage.prototype.resetFakePassword = function()
@@ -214,7 +290,28 @@
 				}
 				else
 				{
-					return self.postData();
+					return self.postData().then(function(result)
+					{
+						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "tripfindermessage"), {
+							data: {
+								EnglishMessage: self.englishEditor.value(),
+								SpanishMessage: self.spanishEditor.value(),
+								DisplayOnceDaily: $(".display-once-daily").prop("checked"),
+								APIIsDirty: true
+							}
+						}).then(function()
+						{
+							if (tf.pageManager.navigationData)
+							{
+								tf.pageManager.navigationData.obShowMessageCenter(self.englishEditor.value() !== "" || self.spanishEditor.value() !== "");
+							}
+							if (result)
+							{
+								self.pageLevelViewModel.popupSuccessMessage();
+							}
+							return result;
+						});
+					});
 				}
 			}.bind(this));
 	};
@@ -228,7 +325,6 @@
 			data: self.resetFakePassword().toData()
 		}).then(function(data)
 		{
-			self.pageLevelViewModel.popupSuccessMessage();
 			self.obEntityDataModel().apiIsDirty(false);
 
 			if (this.obSelectedClientId() !== "New")

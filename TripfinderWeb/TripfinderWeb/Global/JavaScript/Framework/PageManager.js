@@ -24,10 +24,21 @@
 		var self = this,
 			$content, $navigationContent = $(".navigation-container");
 		self.navigationData = new TF.NavigationMenu();
-		$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
-		$navigationContent.append($content);
+		self.getMessageSettings().then(function(result)
+		{
+			if (!result.Items || !result.Items.length || result.Items.length <= 0 || (!result.Items[0].EnglishMessage && !result.Items[0].SpanishMessage))
+			{
+				self.navigationData.obShowMessageCenter(false);
+			}
+			else
+			{
+				self.navigationData.obShowMessageCenter(true);
+			}
+			$content = $("<!-- ko template:{ name:'workspace/navigation/menu',data:$data }--><!-- /ko -->");
+			$navigationContent.append($content);
 
-		ko.applyBindings(ko.observable(self.navigationData), $content[0]);
+			ko.applyBindings(ko.observable(self.navigationData), $content[0]);
+		});
 	};
 
 	PageManager.prototype.initResizePanel = function()
@@ -39,6 +50,59 @@
 		$pageContent.append($content);
 
 		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
+	};
+
+	PageManager.prototype.isDateBeforeToday = function(target)
+	{
+		var targetDate = new Date(target);
+		targetDate.setHours(0, 0, 0, 0);
+
+		var todayDate = new Date();
+		todayDate.setHours(0, 0, 0, 0);
+
+		if (todayDate > targetDate)
+			return true;
+
+		return false;
+	};
+
+	PageManager.prototype.getMessageSettings = function()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage"));
+	};
+
+	PageManager.prototype.showMessageModal = function(isInitPage)
+	{
+		var self = this;
+		return self.getMessageSettings().then(function(result)
+		{
+			if (result.Items && result.Items.length > 0)
+			{
+				if (!!result.Items[0].EnglishMessage || !!result.Items[0].SpanishMessage)
+				{
+					var shouldShowModal = true;
+					if (isInitPage && result.Items[0].DisplayOnceDaily)
+					{
+						var lastTime = tf.storageManager.get("lastTimeShowMessageDate");
+						if (lastTime && !self.isDateBeforeToday(lastTime))
+						{
+							shouldShowModal = false;
+							tf.storageManager.save("lastTimeShowMessageDate", new Date());
+						}
+					}
+
+					if (shouldShowModal)
+					{
+						tf.modalManager.showModal(
+							new TF.Modal.MessageModalViewModel(result.Items[0])
+						);
+					}
+					return true;
+				}
+			}
+
+			return false;
+		});
 	};
 
 	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)

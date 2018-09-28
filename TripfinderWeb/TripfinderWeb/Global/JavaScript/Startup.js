@@ -450,6 +450,10 @@
 												return;
 											}
 										}
+										else
+										{
+											tf.pageManager.showMessageModal(true);
+										}
 
 										if (tf.urlParm && tf.urlParm.tripid)
 										{

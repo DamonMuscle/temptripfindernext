@@ -628,7 +628,19 @@
 
 		navigationData = new TF.NavigationMenu();
 
-		ko.applyBindings(ko.observable(navigationData), $content[0]);
+		tf.pageManager.getMessageSettings().then(function(result)
+		{
+			if (!result.Items || !result.Items.length || result.Items.length <= 0 || (!result.Items[0].EnglishMessage && !result.Items[0].SpanishMessage))
+			{
+				navigationData.obShowMessageCenter(false);
+			}
+			else
+			{
+				navigationData.obShowMessageCenter(true);
+			}
+
+			ko.applyBindings(ko.observable(navigationData), $content[0]);
+		});
 	};
 
 	BaseGridPage.prototype.onDataBound = function(option)
