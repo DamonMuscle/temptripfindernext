@@ -853,6 +853,7 @@
 									{
 										this.pageLevelViewModel.popupSuccessMessage();
 										this.onMainDataLoaded.notify(this.obEntityDataModel());
+										return true;
 									}.bind(this));
 							}
 						}.bind(this));
