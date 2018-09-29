@@ -838,12 +838,19 @@
 								return this.save()
 									.then(function()
 									{
+										var fieldTripId = [];
 										this.pageLevelViewModel.popupSuccessMessage();
 										this.onMainDataLoaded.notify(this.obEntityDataModel());
-										return true;
-									}.bind(this))
+										fieldTripId.push(this.obEntityDataModel().id());
+										return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "statuses"),
+											{ data: { Ids: fieldTripId, StatusId: 1, Note: "", ProductName: "tripfinder" } })
+											.then(function()
+											{
+												return true;
+											}.bind(this));
+									}.bind(this));
 							}
-						}.bind(this))
+						}.bind(this));
 				}
 				else
 				{

@@ -13,7 +13,7 @@
 		</li>
 		<!-- ko if:gridViewModel.approveButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()||!gridViewModel.obRightClickOnSelected()}">
-			<div class="menu-icon">
+			<div class="menu-icon approve">
 			</div>
 			<div class="menu-label" data-bind="text:'Approve Trip'">
 				<span class="hotkey"></span>
@@ -22,7 +22,7 @@
 		<!-- /ko -->
 		<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()||!gridViewModel.obRightClickOnSelected()}">
-			<div class="menu-icon">
+			<div class="menu-icon decline">
 			</div>
 			<div class="menu-label" data-bind="text:'Decline Trip'">
 				<span class="hotkey"></span>
@@ -31,7 +31,7 @@
 		<!-- /ko -->
 		<!-- ko if:gridViewModel.cancelButton-->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()||!gridViewModel.obRightClickOnSelected()}">
-			<div class="menu-icon">
+			<div class="menu-icon decline">
 			</div>
 			<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
 				<span class="hotkey"></span>
@@ -43,7 +43,7 @@
 		</li>
 		<!-- /ko -->
 		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetailsClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected()||!gridViewModel.obRightClickOnSelected()}">
-			<div class="menu-icon">
+			<div class="menu-icon showdetails">
 			</div>
 			<div class="menu-label" data-bind="text:'Detail View'"></div>
 		</li>
