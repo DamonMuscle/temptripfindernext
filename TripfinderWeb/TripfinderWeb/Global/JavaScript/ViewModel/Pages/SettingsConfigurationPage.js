@@ -116,6 +116,8 @@
 				self.spanishEditor.value(result.Items[0].SpanishMessage);
 				$(".display-once-daily").prop("checked", result.Items[0].DisplayOnceDaily);
 			}
+			self.englishEditor.refresh();
+			self.spanishEditor.refresh();
 
 			$(".editor-options-wrap .design").addClass("selected");
 			$(".editor-options-wrap .html").removeClass("selected");
