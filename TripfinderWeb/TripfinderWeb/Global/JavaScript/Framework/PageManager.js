@@ -81,16 +81,21 @@
 				if (!!result.Items[0].EnglishMessage || !!result.Items[0].SpanishMessage)
 				{
 					var shouldShowModal = true;
-					if (isInitPage && result.Items[0].DisplayOnceDaily)
+					if (isInitPage)
 					{
-						var lastTime = tf.storageManager.get("lastTimeShowMessageDate");
-						if (lastTime && !self.isDateBeforeToday(lastTime))
+						if (result.Items[0].DisplayOnceDaily)
 						{
-							shouldShowModal = false;
-							tf.storageManager.save("lastTimeShowMessageDate", new Date());
+							var lastTime = tf.storageManager.get("lastTimeShowMessageDate");
+							if (lastTime && !self.isDateBeforeToday(lastTime))
+							{
+								shouldShowModal = false;
+							}
 						}
+						tf.storageManager.save("lastTimeShowMessageDate", new Date());
 					}
-
+					console.log(lastTime);
+					console.log(new Date());
+					console.log(shouldShowModal);
 					if (shouldShowModal)
 					{
 						tf.modalManager.showModal(
