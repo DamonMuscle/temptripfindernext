@@ -59,6 +59,14 @@
 			}
 			topx += 1;
 		}
+		if (isBottom)
+		{
+			topx -= 5;
+		}
+		else
+		{
+			topx += 5;
+		}
 		$menuContainer.css({
 			position: "absolute",
 			left: leftDiff < 0 ? 0 : -$menuContainer.outerWidth() + $target.outerWidth(),

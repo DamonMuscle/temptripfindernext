@@ -1,25 +1,27 @@
-﻿<div class="tf-contextmenu-wrap bulkmenu-wrap">
-	<ul class="tf-contextmenu grid-menu">
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'email')">
-			<div class="menu-icon email">
-			</div>
-			<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Email')">
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'saveas')">
-			<div class=" menu-icon saveas">
-			</div>
-			<div class="menu-label">
-				Export to File
-			</div>
-		</li>
-		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'view')">
-			<div class=" menu-icon report">
-			</div>
-			<div class="menu-label">
-				View Report
-			</div>
-		</li>
-	</ul>
+﻿<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap">
+		<ul class="tf-contextmenu grid-menu">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'email')">
+				<div class="menu-icon email">
+				</div>
+				<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Email')">
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'saveas')">
+				<div class=" menu-icon saveas">
+				</div>
+				<div class="menu-label">
+					Export to File
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'view')">
+				<div class=" menu-icon report">
+				</div>
+				<div class="menu-label">
+					View Report
+				</div>
+			</li>
+		</ul>
+	</div>
 </div>
 
