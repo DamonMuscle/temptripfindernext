@@ -15,7 +15,7 @@
 						<input style="width:100%;height:22px;" id="uploadedFileInput" name="fileName" required class="form-control" data-bind="value:obDisplayFileName, disable:(true)" />
 						<label style="width:64px;border:none;position:absolute;top:0px;right:0px;z-index:3;" for="inputFile" title="Upload file" data-bind="visible:(obEntityDataModel().id()==0 )">
 							<input class="sr-only" type="file" id="inputFile" name="file" multiple="multiple" data-bind="event:{change:UploadedFileChangeEvent}" />
-							<span style="height:22px;width:100%;line-height:22px;border:none;margin-top:-1px" class="btn tf-btn-gray">Browse</span>
+							<span style="height:22px;width:100%;line-height:22px;border:none;margin-top:-3px" class="btn tf-btn-gray">Browse</span>
 						</label>
 					</div>
 				</div>
@@ -40,7 +40,7 @@
 				</div>
 				<label>Description</label>
 				<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="description" data-bind="value:obEntityDataModel().description" />
-			</div>
+				</div>
 		</div>
 	</div>
 	<div class="row">
