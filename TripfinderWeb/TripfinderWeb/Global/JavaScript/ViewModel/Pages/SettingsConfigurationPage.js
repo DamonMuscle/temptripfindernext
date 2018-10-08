@@ -126,7 +126,13 @@
 
 	SettingsConfigurationPage.prototype.changePattern = function(viewModel, e)
 	{
-		var self = this, $optionBtn = $(e.target).closest(".option"), $container = $optionBtn.closest(".editor-wrapper"),
+		var self = this, $optionBtn = $(e.target).closest(".option");
+		if ($optionBtn.hasClass("selected")) 
+		{
+			return;
+		}
+
+		var $container = $optionBtn.closest(".editor-wrapper"),
 			isEnglish = $optionBtn.hasClass("english");
 		$container.find(".option").removeClass("selected");
 		$optionBtn.addClass("selected");
