@@ -792,7 +792,7 @@
 		options.currentObFilters = this.obGridFilterDataModels.slice();
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
-				this.options.pageype, isNew,
+				this.options.gridType, isNew,
 				gridFilterDataModel ? gridFilterDataModel : null,
 				getCurrentHeaderFilters ? this.findCurrentHeaderFilters() : null,
 				{
