@@ -18,7 +18,7 @@
 				<div class="rule"></div>
 			</li>
 			<!-- ko if:gridViewModel.isAdmin && gridViewModel.approveButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon approve">
 				</div>
 				<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
@@ -27,7 +27,7 @@
 			</li>
 			<!-- /ko -->
 			<!-- ko if:!gridViewModel.isAdmin&&gridViewModel.approveButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon approve">
 				</div>
 				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Approve ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Approve ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
@@ -36,7 +36,7 @@
 			</li>
 			<!-- /ko -->
 			<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsApprovable()}">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon decline">
 				</div>
 				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Decline ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Decline ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
@@ -45,7 +45,7 @@
 			</li>
 			<!-- /ko -->
 			<!-- ko if:gridViewModel.cancelButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon decline">
 				</div>
 				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">

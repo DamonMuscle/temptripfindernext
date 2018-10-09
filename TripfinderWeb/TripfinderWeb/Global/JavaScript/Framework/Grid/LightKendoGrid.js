@@ -181,7 +181,11 @@
 
 	LightKendoGrid.prototype.onChange = function(e)
 	{
-		var self = this, records = [],
+		var self = this,
+			records = $.map(self.getSelectedIds(), function(item)
+			{
+				return self.kendoGrid.dataSource.get(item);
+			}),
 			selectedItems = $.map(self.kendoGrid.select(), function(item)
 			{
 				var row = $(item).closest("tr");
@@ -191,7 +195,6 @@
 					!Enumerable.From(records).Any(function(x) { return x[self.options.Id] === dataItem[self.options.Id]; })
 				)
 				{
-					records.push(dataItem);
 					return item;
 				}
 			});
@@ -659,7 +662,8 @@
 				},
 				schema: {
 					model: {
-						fields: self.getKendoField()
+						fields: self.getKendoField(),
+						id: self.getIdName()
 					}
 				},
 				pageSize: 100,
@@ -779,7 +783,8 @@
 				data: this.options.dataSource,
 				schema: {
 					model: {
-						fields: self.getKendoField()
+						fields: self.getKendoField(),
+						id: self.getIdName()
 					}
 				}
 			};
@@ -4652,6 +4657,7 @@
 			this.subscriptions[i].dispose();
 			this.subscriptions[i] = null;
 		}
+		this.subscriptions = [];
 		if (this.kendoGrid)
 		{
 			this.kendoGrid.destroy();

@@ -123,6 +123,13 @@
 			enable: 'opacity-enabled',
 			disable: 'opacity-disabled'
 		};
+
+		this.editable = ko.computed(this.getEditable, this);
+	};
+
+	BaseDataEntryViewModel.prototype.getEditable = function()
+	{
+		return true;
 	};
 
 	BaseDataEntryViewModel.prototype.getSecurities = function()

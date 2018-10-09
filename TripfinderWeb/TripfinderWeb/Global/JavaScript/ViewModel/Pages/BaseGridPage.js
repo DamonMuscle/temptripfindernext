@@ -29,7 +29,7 @@
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
 		self.selectedItemEditable = ko.observable(false);
-		self.selectedItemsApprovable = ko.observable(false);
+		self.selectedItemsEditable = ko.observable(false);
 		self.sendToClick = self.sendToClick.bind(self);
 		self.sendEmailClick = self.sendEmailClick.bind(self);
 		self.obEmail = ko.computed(function()
@@ -165,7 +165,7 @@
 
 			self.searchGrid.getSelectedIds.subscribe(function()
 			{
-				self.updateEditableApprovable();
+				self.updateEditable();
 			});
 
 			self.loadReportLists();
@@ -310,11 +310,11 @@
 			}.bind(this));
 	};
 
-	BaseGridPage.prototype.updateEditableApprovable = function()
+	BaseGridPage.prototype.updateEditable = function()
 	{
 		var records = this.getCurrentFieldTripRecords();
-		this.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditRight(records[0]));
-		this.selectedItemsApprovable(TF.FieldTripAuthHelper.checkFieldTripsApprovable(records));
+		this.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditable(records[0]));
+		this.selectedItemsEditable(TF.FieldTripAuthHelper.checkFieldTripsEditable(records));
 	};
 
 	BaseGridPage.prototype.getCurrentFieldTripRecords = function()

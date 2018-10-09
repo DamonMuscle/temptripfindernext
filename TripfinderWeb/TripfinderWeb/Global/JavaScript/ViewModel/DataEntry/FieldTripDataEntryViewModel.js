@@ -267,10 +267,15 @@
 		this.loadSupplement();
 	};
 
+	FieldTripDataEntryViewModel.prototype.getEditable = function()
+	{
+		if (this.obMode() != "Edit") return true;
+		return TF.FieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
+	};
+
 	FieldTripDataEntryViewModel.prototype.loadDocument = function()
 	{
 		var self = this,
-			selectedId = self.obEntityDataModel().id(),
 			document = this.obDocumentGridViewModel();
 		if (document !== null && document !== undefined && document.obGridViewModel()
 			&& document.obGridViewModel().searchGrid.kendoGrid.wrapper.data("kendoReorderable"))
@@ -280,7 +285,7 @@
 		var filteredIds = [], documentRecources = [], documentFontEndRecources = [];
 		if (this.obMode() === "Edit")
 		{
-			if (TF.FieldTripAuthHelper.checkFieldTripEditRight(selectedId) || tf.permissions.documentRead)
+			if (tf.permissions.documentRead)
 			{
 				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
 					.then(function(data)
@@ -1218,8 +1223,7 @@
 	FieldTripDataEntryViewModel.prototype.initializeDocument = function()
 	{
 		var selectId = this.obEntityDataModel().id();
-
-		if (selectId === 0 || !TF.FieldTripAuthHelper.checkFieldTripEditRight(selectId))
+		if (selectId === 0 || !TF.FieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel()._entityBackup))
 		{
 			if (!tf.permissions.documentAdd)
 			{

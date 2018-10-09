@@ -6,7 +6,6 @@
 	{
 		TF.Page.FieldTripPage.apply(this, arguments);
 		this.pageType = "approvals";
-		this.options._pageType = "approvals";
 	}
 
 	ApprovalsPage.prototype = Object.create(TF.Page.FieldTripPage.prototype);

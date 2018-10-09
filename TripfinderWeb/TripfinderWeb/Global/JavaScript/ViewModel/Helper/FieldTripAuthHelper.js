@@ -33,7 +33,7 @@
 		{
 			if (mySubmittedIds) return mySubmittedIds;
 			var url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted", idName);
-			var p = tf.promiseAjax.post(url,
+			tf.promiseAjax.post(url,
 				{
 					async: false,
 					paramData: { skip: 0, take: 100 },
@@ -51,27 +51,48 @@
 			var ids = getMySubmittedIds();
 			return ids.indexOf(item[idName]) > -1;
 		},
-		editableRights = ["add", "edit", "save"],
+		editableRights = ["add", "edit", "batch", "delete"],
 		stageSecuredItemsMap = {};
 
-	stageSecuredItemsMap[TF.FieldTripStageEnum.level1RequestSubmitted] = [securedItemDefinition.level1Requestor, securedItemDefinition.level2Administrator, securedItemDefinition.transportationAdministrator];
-	stageSecuredItemsMap[TF.FieldTripStageEnum.level2RequestDeclined] = stageSecuredItemsMap[TF.FieldTripStageEnum.level2RequestApproved]
-		= [securedItemDefinition.level2Administrator, securedItemDefinition.level3Administrator, securedItemDefinition.transportationAdministrator];
-	stageSecuredItemsMap[TF.FieldTripStageEnum.level3RequestDeclined] = stageSecuredItemsMap[TF.FieldTripStageEnum.level3RequestApproved]
-		= [securedItemDefinition.level3Administrator, securedItemDefinition.level4Administrator, securedItemDefinition.transportationAdministrator];
-	stageSecuredItemsMap[TF.FieldTripStageEnum.level4RequestDeclined] = stageSecuredItemsMap[TF.FieldTripStageEnum.level4RequestApproved]
-		= [securedItemDefinition.level4Administrator, securedItemDefinition.transportationAdministrator];
+	stageSecuredItemsMap[TF.FieldTripStageEnum.level1RequestSubmitted] =
+		[
+			securedItemDefinition.level1Requestor,
+			securedItemDefinition.level2Administrator,
+			securedItemDefinition.level3Administrator,
+			securedItemDefinition.level4Administrator,
+			securedItemDefinition.transportationAdministrator
+		];
+	stageSecuredItemsMap[TF.FieldTripStageEnum.level2RequestDeclined] = stageSecuredItemsMap[TF.FieldTripStageEnum.level2RequestApproved] =
+		[
+			securedItemDefinition.level2Administrator,
+			securedItemDefinition.level3Administrator,
+			securedItemDefinition.level4Administrator,
+			securedItemDefinition.transportationAdministrator
+		];
+	stageSecuredItemsMap[TF.FieldTripStageEnum.level3RequestDeclined] = stageSecuredItemsMap[TF.FieldTripStageEnum.level3RequestApproved] =
+		[
+			securedItemDefinition.level3Administrator,
+			securedItemDefinition.level4Administrator,
+			securedItemDefinition.transportationAdministrator
+		];
+	stageSecuredItemsMap[TF.FieldTripStageEnum.level4RequestDeclined] = stageSecuredItemsMap[TF.FieldTripStageEnum.level4RequestApproved] =
+		[
+			securedItemDefinition.level4Administrator,
+			securedItemDefinition.transportationAdministrator
+		];
+	stageSecuredItemsMap[TF.FieldTripStageEnum.DeclinedByTransportation]
+		= stageSecuredItemsMap[TF.FieldTripStageEnum.TransportationApproved]
+		= stageSecuredItemsMap[TF.FieldTripStageEnum.RequestCanceled]
+		= stageSecuredItemsMap[TF.FieldTripStageEnum.RequestCompleted]
+		= [
+			securedItemDefinition.transportationAdministrator
+		];
 
-	self.checkFieldTripEditRight = function(item)
+	self.checkFieldTripEditable = function(item)
 	{
-		if (!item) return false;
+		if (!item || item.FieldTripStageId == null) return false;
 		if (tf.authManager.authorizationInfo.isAdmin) return true;
-		var stageId = item.FieldTripStageId,
-			isMySubmitted = checkIsMySubmitted(item) && stageId !== TF.FieldTripStageEnum.DeclinedByTransportation
-				&& stageId !== TF.FieldTripStageEnum.TransportationApproved
-				&& stageId !== TF.FieldTripStageEnum.RequestCompleted;
-
-		var securedItems = isMySubmitted ? allSecuredItems : stageSecuredItemsMap[stageId] || [securedItemDefinition.transportationAdministrator];
+		var securedItems = stageSecuredItemsMap[item.FieldTripStageId] || [];
 		return securedItems.some(function(item)
 		{
 			return editableRights.some(function(right)
@@ -81,23 +102,8 @@
 		});
 	};
 
-
-	self.checkFieldTripApprovable = function(item)
+	self.checkFieldTripsEditable = function(items)
 	{
-		if (!item) return false;
-		if (tf.authManager.authorizationInfo.isAdmin) return true;
-		var securedItems = stageSecuredItemsMap[item.FieldTripStageId] || [securedItemDefinition.transportationAdministrator];
-		return securedItems.some(function(item)
-		{
-			return editableRights.some(function(right)
-			{
-				return tf.authManager.authorizationInfo.isAuthorizedFor(item, right);
-			});
-		});
-	};
-
-	self.checkFieldTripsApprovable = function(items)
-	{
-		return items && items.length && items.every(self.checkFieldTripApprovable);
+		return items && items.length && items.every(self.checkFieldTripEditable);
 	};
 })();

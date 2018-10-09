@@ -6,7 +6,6 @@
 	{
 		TF.Page.SchedulerPage.call(this, "approvals");
 		this.pageType = "approvals";
-		this.options._pageType = "approvals";
 	}
 
 	ApprovalsSchedulerPage.prototype = Object.create(TF.Page.SchedulerPage.prototype);
