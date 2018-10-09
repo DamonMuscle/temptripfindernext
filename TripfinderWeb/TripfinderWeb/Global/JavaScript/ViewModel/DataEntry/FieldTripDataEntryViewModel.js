@@ -1223,7 +1223,7 @@
 	FieldTripDataEntryViewModel.prototype.initializeDocument = function()
 	{
 		var selectId = this.obEntityDataModel().id();
-		if (selectId === 0 || !TF.FieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel()._entityBackup))
+		if (selectId === 0 || TF.FieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel()._entityBackup))
 		{
 			if (!tf.permissions.documentAdd)
 			{
