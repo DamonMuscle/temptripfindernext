@@ -465,7 +465,7 @@
 		self.fieldTripId.push(occurrence.id);
 		occurrence.Id = occurrence.id;
 		self.fieldTripRecord.push(occurrence._raw);
-		self.updateEditableApprovable();
+		self.updateEditable();
 		if (parentE)
 		{
 			event = parentE;

@@ -124,7 +124,7 @@
 			disable: 'opacity-disabled'
 		};
 
-		this.editable = ko.computed(this.getEditable, this);
+		this.editable = ko.pureComputed(this.getEditable, this);
 	};
 
 	BaseDataEntryViewModel.prototype.getEditable = function()
@@ -349,7 +349,7 @@
 
 	BaseDataEntryViewModel.prototype.initialize = function()
 	{
-		this.loadSupplement()
+		return this.loadSupplement()
 			.then(function()
 			{
 				this.$form = $(".form");

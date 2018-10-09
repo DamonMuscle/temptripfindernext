@@ -256,6 +256,20 @@
 
 		this.stageCss = function() { return this.obEntityDataModel().id() ? this.opacityCssSource.enable : this.opacityCssSource.disable; };
 
+		this.editable.subscribe(function()
+		{
+			setTimeout(function()
+			{
+				if (!this.editable())
+				{
+					this.$form.find("input[name='name']").blur();
+				}
+				else
+				{
+					this.$form.find("input[name='name']").focus();
+				}
+			}.bind(this));
+		}.bind(this));
 	};
 
 	FieldTripDataEntryViewModel.prototype = Object.create(namespace.BaseDataEntryViewModel.prototype);
@@ -516,14 +530,10 @@
 
 	FieldTripDataEntryViewModel.prototype.load = function()
 	{
-		this.$form.find("input[name='name']").focus();
-
 		if (this.obIds() == null)
 		{
 			return;
 		}
-
-		var id = this._view.id;
 
 		return namespace.BaseDataEntryViewModel.prototype.load.call(this)
 			.then(function()
@@ -598,7 +608,6 @@
 		return "";
 	}
 
-
 	FieldTripDataEntryViewModel.prototype.validationInitialize = function()
 	{
 		namespace.BaseDataEntryViewModel.prototype.validationInitialize.call(this);
@@ -671,6 +680,21 @@
 		var minutes = Math.floor(diff);
 
 		return day + " days, " + hour + " hours, and " + minutes + " mins";
+	};
+
+	FieldTripDataEntryViewModel.prototype.initialize = function()
+	{
+		return TF.DataEntry.BaseDataEntryViewModel.prototype.initialize.call(this).then(function()
+		{
+			this.$form.off("focus.editable");
+			this.$form.on("focus.editable", "input, button, textarea, select", function(event)
+			{
+				if (!this.editable())
+				{
+					event.target.blur();
+				}
+			}.bind(this));
+		}.bind(this));
 	};
 
 	FieldTripDataEntryViewModel.prototype.templateClick = function()
