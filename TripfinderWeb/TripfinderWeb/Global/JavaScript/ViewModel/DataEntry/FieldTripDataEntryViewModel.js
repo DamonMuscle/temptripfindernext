@@ -255,21 +255,6 @@
 		}.bind(this);
 
 		this.stageCss = function() { return this.obEntityDataModel().id() ? this.opacityCssSource.enable : this.opacityCssSource.disable; };
-
-		this.editable.subscribe(function()
-		{
-			setTimeout(function()
-			{
-				if (!this.editable())
-				{
-					this.$form.find("input[name='name']").blur();
-				}
-				else
-				{
-					this.$form.find("input[name='name']").focus();
-				}
-			}.bind(this));
-		}.bind(this));
 	};
 
 	FieldTripDataEntryViewModel.prototype = Object.create(namespace.BaseDataEntryViewModel.prototype);
@@ -587,6 +572,21 @@
 				this.obEntityDataModel().apiIsDirty(false);
 				//reset the shortCutKeys golbal used
 				tf.shortCutKeys.resetUsingGolbal(5);
+
+				if (!this.editable())
+				{
+					this.$form.find("input[name='name']").blur();
+					this.pageLevelViewModel.obValidationErrorsSpecifed([{
+						message: "You can not make changes to this  field trip.  This is due to security restrictions or the trip's current pending approval status.",
+						field: $(document)
+					}]);
+					this.pageLevelViewModel.obErrorMessageDivIsShow(true);
+				}
+				else
+				{
+					this.$form.find("input[name='name']").focus();
+				}
+
 				return true;
 			}.bind(this)).catch(function(response)
 			{//no need to do anything.
@@ -599,15 +599,6 @@
 		return schoolDataModel.name() + " (" + schoolDataModel.schoolCode() + ")";
 	};
 
-	function convertDateTimeStringToTimeString(time)
-	{
-		if (time)
-		{
-			return moment(time).format("LT");
-		}
-		return "";
-	}
-
 	FieldTripDataEntryViewModel.prototype.validationInitialize = function()
 	{
 		namespace.BaseDataEntryViewModel.prototype.validationInitialize.call(this);
@@ -616,6 +607,10 @@
 	FieldTripDataEntryViewModel.prototype.dispose = function()
 	{
 		var self = this;
+		if (self.$form)
+		{
+			self.$form.off("focus.editable");
+		}
 		PubSub.unsubscribe(self.dataChangeReceive);
 		if (self.obInvoicingGridViewModel() && self.obInvoicingGridViewModel().obGridViewModel()
 			&& self.obInvoicingGridViewModel().obGridViewModel().searchGrid)
@@ -648,7 +643,7 @@
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.dispose();
 		}
 		return namespace.BaseDataEntryViewModel.prototype.dispose.call(self);
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.calculateDateTimeDiff = function(diffType)
 	{
@@ -736,7 +731,7 @@
 				}
 			}.bind(this));
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.loadResources = function()
 	{
@@ -900,7 +895,7 @@
 		safeUpdate(this.obBusAideGridViewModel());
 
 		tf.loadingIndicator.showImmediately();
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.loadInvoicing = function()
 	{
@@ -928,7 +923,7 @@
 			var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
 			this.obInvoicingGridViewModel(invoiceGrid);
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.addResourceClick = function(type)
 	{
@@ -944,7 +939,7 @@
 					this.ReloadResources();
 				}
 			}.bind(this));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.ConvertToJson = function(items)
 	{
@@ -955,12 +950,12 @@
 		}.bind(this));
 
 		this.obRequiredFields(json);
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.IsRequired = function(item)
 	{
 		return item ? { required: "required" } : {};
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.initializeResources = function(el)
 	{
@@ -977,7 +972,7 @@
 		this.$form.find('.resources .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripResourceModalViewModel }, this.addEvent.bind(this));
 		this.$form.find('.resources .iconbutton.pencil').off("click").on("click", { gridView: this.obResourcesGridViewModel, modal: TF.Modal.FieldTripResourceModalViewModel }, this.editEvent.bind(this));
 		this.$form.find('.resources .iconbutton.delete').off("click").on("click", { gridView: this.obResourcesGridViewModel, modal: TF.Modal.FieldTripResourceModalViewModel }, this.deleteEvent.bind(this));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.initializeVehicle = function(el)
 	{
@@ -1000,7 +995,7 @@
 		{
 			this.ReloadResources();
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.initializeDriver = function(el)
 	{
@@ -1022,7 +1017,7 @@
 		{
 			this.ReloadResources();
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.initializeAide = function(el)
 	{
@@ -1092,7 +1087,7 @@
 			item.APIIsNew = true;
 		});
 		return entity;
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.addEvent = function(e)
 	{
@@ -1108,7 +1103,7 @@
 					this.ReloadResources();
 				}
 			}.bind(this));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.editEvent = function(e)
 	{
@@ -1137,7 +1132,7 @@
 					}
 				}.bind(this));
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.deleteEvent = function(e)
 	{
@@ -1159,7 +1154,7 @@
 			this.obFieldTripResourceGroupData(source);
 			this.ReloadResources();
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.applyBillingClick = function(viewModel, e)
 	{
@@ -1184,7 +1179,8 @@
 		}.bind(this));
 
 		this.ReloadResources();
-	}
+	};
+
 	FieldTripDataEntryViewModel.prototype.applyVehicleClick = function(viewModel, e)
 	{
 		this.obFieldTripResourceGroupData().forEach(function(item)
@@ -1195,7 +1191,8 @@
 		}.bind(this));
 
 		this.ReloadResources();
-	}
+	};
+
 	FieldTripDataEntryViewModel.prototype.applyDriverClick = function(viewModel, e)
 	{
 		this.obFieldTripResourceGroupData().forEach(function(item)
@@ -1207,7 +1204,8 @@
 		}.bind(this));
 
 		this.ReloadResources();
-	}
+	};
+
 	FieldTripDataEntryViewModel.prototype.applyAideClick = function(viewModel, e)
 	{
 		this.obFieldTripResourceGroupData().forEach(function(item)
@@ -1219,12 +1217,12 @@
 		}.bind(this));
 
 		this.ReloadResources();
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.viewResourceClick = function(viewModel, e)
 	{
 		tf.modalManager.showModal(new TF.Modal.FieldTripViewResourceModalViewModel(this.obFieldTripResourceGroupData));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.initializeInvoice = function(el)
 	{
@@ -1291,7 +1289,7 @@
 					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 				}
 			}.bind(this));
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e)
 	{
@@ -1335,7 +1333,7 @@
 					}
 				}.bind(this));
 		}
-	}
+	};
 
 	FieldTripDataEntryViewModel.prototype.deleteInvoiceEvent = function(e)
 	{
