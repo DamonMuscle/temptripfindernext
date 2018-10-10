@@ -408,7 +408,7 @@ function getTitleByType(type)
 			pageTitle = tf.applicationTerm.getApplicationTermSingularByName("Field Trip");
 			break;
 		case "myrequests":
-			pageTitle = "My Requests";
+			pageTitle = "My Submitted Requests";
 			break;
 		case "reports":
 			pageTitle = "Reports";
