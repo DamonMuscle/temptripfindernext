@@ -10,4 +10,10 @@
 
 	ApprovalsPage.prototype = Object.create(TF.Page.FieldTripPage.prototype);
 	ApprovalsPage.prototype.constructor = ApprovalsPage;
+
+	ApprovalsPage.prototype.updateOptions = function()
+	{
+		TF.Page.MyRequestPage.prototype.updateOptions.call(this);
+		this.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
+	};
 })();

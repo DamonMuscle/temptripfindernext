@@ -15,5 +15,5 @@
 	ApprovalsSchedulerPage.prototype.getRequestUrl = function()
 	{
 		return pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
-	}
+	};
 })();
