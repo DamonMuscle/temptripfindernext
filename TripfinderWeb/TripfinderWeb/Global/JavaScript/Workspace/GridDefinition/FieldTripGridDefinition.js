@@ -451,7 +451,7 @@
 					case 7:
 						return '#00FFFF';
 					case 100:
-						return '#00FF00';
+						return '#FFFFFF';
 					case 101:
 						return '#0000FF';
 					default:
