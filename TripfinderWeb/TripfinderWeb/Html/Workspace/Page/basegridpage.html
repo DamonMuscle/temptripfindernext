@@ -17,37 +17,37 @@
 	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
 		<div class="iconrow">
 			<!-- ko if: pageType !== "reports"-->
-			<div class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></div>
+			<button class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
 			<!-- ko if:schedulerButton-->
-			<div class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></div>
+			<button class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></button>
 			<!-- /ko -->
 			<!-- ko if:detailButton-->
-			<div class="iconbutton details" title="Detail View" data-bind="css:{disabled:!obIsSelectRow(),open:obShowDetailPanel()}"></div>
+			<button class="iconbutton details" title="Detail View" data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
 			<!-- /ko -->
 			<div class="divider" title=""></div>
-			<div class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></div>
-			<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></div>
-			<div class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></div>
-			<div class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></div>
+			<button class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></button>
+			<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
+			<button class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
+			<button class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
 			<!-- ko if:(!isAdmin && declineButton) || approveButton || cancelButton-->
 			<div class="divider" title=""></div>
 			<!-- /ko -->
 			<!-- ko if:!isAdmin && declineButton-->
-			<div class="iconbutton decline" title="Decline" data-bind="css:{disabled:!selectedItemsEditable()}"></div>
+			<button class="iconbutton decline" title="Decline" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- ko if:isAdmin &&approveButton-->
-			<div class="iconbutton approve" title="Change Status" data-bind="css:{disabled:!selectedItemsEditable()}"></div>
+			<button class="iconbutton approve" title="Change Status" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- ko if:!isAdmin &&approveButton-->
-			<div class="iconbutton approve" title="Approve" data-bind="css:{disabled:!selectedItemsEditable()}"></div>
+			<button class="iconbutton approve" title="Approve" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
-			<div class="iconbutton cancel" title="Cancel" data-bind="css:{disabled:!selectedItemsEditable()}"></div>
+			<button class="iconbutton cancel" title="Cancel" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- /ko -->
 			<!-- ko if: pageType === "reports"-->
-			<div class="iconbutton mail" title="Send Mail" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
-			<div class="iconbutton file" title="Save As File" data-bind="css:obIsSelectRow()?'':'disabled'"></div>
+			<button class="iconbutton mail" title="Send Mail" data-bind="enable:obIsSelectRow"></button>
+			<button class="iconbutton file" title="Save As File" data-bind="enable:obIsSelectRow"></button>
 			<!-- /ko -->
 		</div>
 		<!-- ko if: pageType !== "reports"-->
