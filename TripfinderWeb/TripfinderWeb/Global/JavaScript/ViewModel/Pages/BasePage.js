@@ -13,7 +13,6 @@
 		self.approveButton = false;
 		self.declineButton = false;
 		self.cancelButton = false;
-		self.isAdminFieldTrip = true;
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();

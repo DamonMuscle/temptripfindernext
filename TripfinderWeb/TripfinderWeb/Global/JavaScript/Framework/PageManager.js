@@ -125,7 +125,7 @@
 				templateName = "workspace/page/basegridpage";
 				break;
 			case "fieldtrips":
-				pageData = tf.authManager.authorizationInfo.isFieldTripAdmin ? new TF.Page.FieldTripPage(gridOptions) : new TF.Page.AllFieldTripPage(gridOptions);
+				pageData = new TF.Page.FieldTripPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
 			case "myrequests":
@@ -146,7 +146,7 @@
 				break;
 			case "fieldtripsScheduler":
 				var gridType = type.replace("Scheduler", "");
-				pageData = tf.authManager.authorizationInfo.isFieldTripAdmin ? new TF.Page.SchedulerPage(gridType) : new TF.Page.AllFieldTripSchedulerPage(gridType);
+				pageData = new TF.Page.SchedulerPage(gridType);
 				templateName = "workspace/page/schedulerpage";
 				break;
 			case "myrequestsScheduler":

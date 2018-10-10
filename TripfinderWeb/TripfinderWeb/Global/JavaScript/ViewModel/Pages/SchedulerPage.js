@@ -696,19 +696,7 @@
 
 	SchedulerPage.prototype.getRequestUrl = function(type)
 	{
-		var url = null;
-		switch (type)
-		{
-			case "fieldtrips":
-				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "permission");
-				break;
-			case "myrequests":
-				url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
-				break;
-			default:
-				break;
-		}
-		return url;
+		return pathCombine(tf.api.apiPrefix(), "search", "fieldtrip");
 	}
 
 	SchedulerPage.prototype.getOriginalDataSource = function(type, filters)

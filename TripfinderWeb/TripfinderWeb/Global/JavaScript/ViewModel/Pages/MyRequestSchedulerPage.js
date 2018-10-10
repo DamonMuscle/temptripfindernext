@@ -18,4 +18,9 @@
 	MyRequestSchedulerPage.prototype.constructor = MyRequestSchedulerPage;
 
 	MyRequestSchedulerPage.prototype = Object.create(TF.Page.SchedulerPage.prototype);
+
+	MyRequestSchedulerPage.prototype.getRequestUrl = function(type)
+	{
+		return pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
+	}
 })();
