@@ -537,10 +537,17 @@
 		{
 			self.showDetailsClick();
 		});
+
 		if (self.gridViewClick)
 		{
 			self.bindEvent(".iconbutton.gridview", self.gridViewClick);
 		}
+
+		if (self.changeStatusButton)
+		{
+			self.bindEvent(".iconbutton.approve", self.editFieldTripStatus);
+		}
+
 		if (self.cancelClick)
 		{
 			self.bindEvent(".iconbutton.cancel", self.cancelClick);
