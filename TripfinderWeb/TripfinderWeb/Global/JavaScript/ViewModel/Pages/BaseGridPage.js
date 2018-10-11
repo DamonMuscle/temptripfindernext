@@ -537,14 +537,6 @@
 		{
 			self.showDetailsClick();
 		});
-		if (self.approveClick)
-		{
-			self.bindEvent(".iconbutton.approve", self.approveClick);
-		}
-		if (self.declineClick)
-		{
-			self.bindEvent(".iconbutton.decline", self.declineClick);
-		}
 		if (self.gridViewClick)
 		{
 			self.bindEvent(".iconbutton.gridview", self.gridViewClick);

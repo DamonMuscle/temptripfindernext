@@ -29,17 +29,11 @@
 			<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
 			<button class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
 			<button class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
-			<!-- ko if:(!isAdmin && declineButton) || approveButton || cancelButton-->
+			<!-- ko if: changeStatusButton || cancelButton-->
 			<div class="divider" title=""></div>
 			<!-- /ko -->
-			<!-- ko if:!isAdmin && declineButton-->
-			<button class="iconbutton decline" title="Decline" data-bind="enable:selectedItemsEditable"></button>
-			<!-- /ko -->
-			<!-- ko if:isAdmin &&approveButton-->
+			<!-- ko if: changeStatusButton-->
 			<button class="iconbutton approve" title="Change Status" data-bind="enable:selectedItemsEditable"></button>
-			<!-- /ko -->
-			<!-- ko if:!isAdmin &&approveButton-->
-			<button class="iconbutton approve" title="Approve" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
 			<button class="iconbutton cancel" title="Cancel" data-bind="enable:selectedItemsEditable"></button>

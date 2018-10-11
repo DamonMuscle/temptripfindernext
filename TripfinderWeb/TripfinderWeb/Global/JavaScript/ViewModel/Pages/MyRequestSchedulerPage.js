@@ -11,8 +11,7 @@
 		self.cancelButton = true;
 		self.detailButton = true;
 		self.schedulerButton = true;
-		self.approveButton = false;
-		self.declineButton = false;
+		self.changeStatusButton = false;
 	}
 
 	MyRequestSchedulerPage.prototype.constructor = MyRequestSchedulerPage;

@@ -12,11 +12,11 @@
 	},
 		allSecuredItems =
 			[
-				securedItemDefinition.level1Requestor,
-				securedItemDefinition.level2Administrator,
-				securedItemDefinition.level3Administrator,
-				securedItemDefinition.level4Administrator,
 				securedItemDefinition.transportationAdministrator,
+				securedItemDefinition.level4Administrator,
+				securedItemDefinition.level3Administrator,
+				securedItemDefinition.level2Administrator,
+				securedItemDefinition.level1Requestor,
 			],
 		ajaxData =
 		{
@@ -105,5 +105,83 @@
 	self.checkFieldTripsEditable = function(items)
 	{
 		return items && items.length && items.every(self.checkFieldTripEditable);
+	};
+
+	self.getHighestEditRightSecuredItem = function()
+	{
+		var highest;
+		allSecuredItems.some(function(item)
+		{
+			return editableRights.some(function(right)
+			{
+				if (tf.authManager.authorizationInfo.isAuthorizedFor(item, right))
+				{
+					highest = item;
+					return true;
+				}
+
+				return false;
+			});
+		});
+
+		return highest;
+	};
+
+	self.getAccessableStageIds = function()
+	{
+		var stageEnum = TF.FieldTripStageEnum;
+		if (!Object.values)
+		{
+			Object.values = function(obj)
+			{
+				return Object.keys(obj).map(function(e)
+				{
+					return obj[e];
+				})
+			};
+		}
+
+		if (tf.authManager.authorizationInfo.isAdmin)
+		{
+			return Object.values(stageEnum);
+		}
+
+		var securedItem = self.getHighestEditRightSecuredItem();
+		switch (securedItem)
+		{
+			case securedItemDefinition.transportationAdministrator:
+				return Object.values(stageEnum);
+			case securedItemDefinition.level4Administrator:
+				return [
+					stageEnum.level1RequestSubmitted,
+					stageEnum.level2RequestDeclined,
+					stageEnum.level2RequestApproved,
+					stageEnum.level3RequestDeclined,
+					stageEnum.level3RequestApproved,
+					stageEnum.level4RequestDeclined,
+					stageEnum.level4RequestApproved,
+					stageEnum.RequestCanceled
+				];
+			case securedItemDefinition.level3Administrator:
+				return [
+					stageEnum.level1RequestSubmitted,
+					stageEnum.level2RequestDeclined,
+					stageEnum.level2RequestApproved,
+					stageEnum.level3RequestDeclined,
+					stageEnum.level3RequestApproved,
+					stageEnum.RequestCanceled
+				];
+			case securedItemDefinition.level2Administrator:
+				return [
+					stageEnum.level1RequestSubmitted,
+					stageEnum.level2RequestDeclined,
+					stageEnum.level2RequestApproved,
+					stageEnum.RequestCanceled
+				];
+			case securedItemDefinition.level1Requestor:
+				return [stageEnum.level1RequestSubmitted, stageEnum.RequestCanceled];
+			default:
+				return [];
+		}
 	};
 })();

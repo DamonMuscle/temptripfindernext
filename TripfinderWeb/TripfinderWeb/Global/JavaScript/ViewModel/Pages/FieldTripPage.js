@@ -4,19 +4,12 @@
 
 	function FieldTripPage(gridOptions)
 	{
-		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;
+		var self = this;
 		self.type = "fieldtrip";
 		self.pageType = "fieldtrips";
 		self.gridOptions = gridOptions;
 		TF.Page.BaseGridPage.apply(self, arguments);
-
-		isLevel1User = !self.isAdmin && !authInfo.isAuthorizedFor("level4Administrator", "edit") && !authInfo.isAuthorizedFor("level3Administrator", "edit")
-			&& !authInfo.isAuthorizedFor("level2Administrator", "edit") && authInfo.isAuthorizedFor("level1Requestor", "edit");
-		if (!isLevel1User)
-		{
-			self.approveButton = true;
-			self.declineButton = true;
-		}
+		self.changeStatusButton = true;
 		self.detailButton = true;
 		self.schedulerButton = true;
 	}

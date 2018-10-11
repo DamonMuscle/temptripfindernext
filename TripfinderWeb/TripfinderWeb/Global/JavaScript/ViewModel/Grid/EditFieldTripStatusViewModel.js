@@ -2,7 +2,20 @@
 {
 	createNamespace('TF.Control').EditFieldTripStatusViewModel = EditFieldTripStatusViewModel;
 
-	function EditFieldTripStatusViewModel(selectedRecords, isApprove, isCancel)
+	var allFieldTripStatusMap = {};
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level1RequestSubmitted] = { id: 1, name: "Level 1 - Request Submitted", isApprove: true };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level2RequestDeclined] = { id: 2, name: "Level 2 - Request Declined", isApprove: false };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level2RequestApproved] = { id: 3, name: "Level 2 - Request Approved", isApprove: true };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level3RequestDeclined] = { id: 4, name: "Level 3 - Request Declined", isApprove: false };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level3RequestApproved] = { id: 5, name: "Level 3 - Request Approved", isApprove: true };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level4RequestDeclined] = { id: 6, name: "Level 4 - Request Declined", isApprove: false };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.level4RequestApproved] = { id: 7, name: "Level 4 - Request Approved", isApprove: true };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.DeclinedByTransportation] = { id: 98, name: "Declined by Transportation", isApprove: false };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.TransportationApproved] = { id: 99, name: "Transportation Approved", isApprove: true };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.RequestCanceled] = { id: 100, name: "Canceled - Request Canceled", isApprove: false };
+	allFieldTripStatusMap[TF.FieldTripStageEnum.RequestCompleted] = { id: 101, name: "Completed - Request Completed", isApprove: true };
+
+	function EditFieldTripStatusViewModel(selectedRecords, isCancel)
 	{
 		var self = this;
 		self.obComments = ko.observable("");
@@ -10,23 +23,12 @@
 		self.$form = null;
 		self.selectedRecords = selectedRecords;
 		self.fieldTripIds = selectedRecords.map(function(item) { return item.Id; });
-		self.isApprove = isApprove;
 		self.isCancel = isCancel;
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
-
-		self.fieldTripStatus = [
-			{ id: 1, name: "Level 1 - Request Submitted", isApprove: true },
-			{ id: 2, name: "Level 2 - Request Declined", isApprove: false },
-			{ id: 3, name: "Level 2 - Request Approved", isApprove: true },
-			{ id: 4, name: "Level 3 - Request Declined", isApprove: false },
-			{ id: 5, name: "Level 3 - Request Approved", isApprove: true },
-			{ id: 6, name: "Level 4 - Request Declined", isApprove: false },
-			{ id: 7, name: "Level 4 - Request Approved", isApprove: true },
-			{ id: 98, name: "Declined by Transportation", isApprove: false },
-			{ id: 99, name: "Transportation Approved", isApprove: true },
-			{ id: 100, name: "Canceled - Request Canceled", isApprove: false },
-			{ id: 101, name: "Completed - Request Completed", isApprove: true },
-		];
+		self.fieldTripStatus = $.map(TF.FieldTripAuthHelper.getAccessableStageIds(), function(item)
+		{
+			return allFieldTripStatusMap[item];
+		});
 
 		//drop down list
 		self.obFieldTripStatus = ko.observableArray(self.fieldTripStatus);
@@ -71,17 +73,17 @@
 		var self = this, isValidating = false, validatorFields = {};
 		self.$form = $(el);
 
-		if (!self.isApprove || self.isCancel)
+		if (self.isCancel)
 		{
 			validatorFields.comments = {
 				trigger: "blur change",
 				validators:
+				{
+					notEmpty:
 					{
-						notEmpty:
-							{
-								message: "required"
-							}
+						message: "required"
 					}
+				}
 			};
 		}
 
@@ -105,41 +107,7 @@
 
 	EditFieldTripStatusViewModel.prototype.getStatusId = function()
 	{
-		// status of field trip
-		// id		name
-		// 1		Level 1 - Request Submitted
-		// 2		Level 2 - Request Declined
-		// 3		Level 2 - Request Approved
-		// 4		Level 3 - Request Declined
-		// 5		Level 3 - Request Approved
-		// 6		Level 4 - Request Declined
-		// 7		Level 4 - Request Approved
-		// 98		Declined by Transportation
-		// 99		Transportation Approved
-		// 100	Canceled - Request Canceled
-		// 101	Completed - Request Completed
-		var self = this, statusId = -1, authInfo = tf.authManager.authorizationInfo;
-		if (self.isAdmin)
-		{
-			statusId = self.obSelectedStatusId();
-		}
-		else if (authInfo.isAuthorizedFor("level4Administrator", "edit"))
-		{
-			statusId = self.isApprove ? 7 : 6;
-		}
-		else if (authInfo.isAuthorizedFor("level3Administrator", "edit"))
-		{
-			statusId = self.isApprove ? 5 : 4;
-		}
-		else if (authInfo.isAuthorizedFor("level2Administrator", "edit"))
-		{
-			statusId = self.isApprove ? 3 : 2;
-		}
-		else if (authInfo.isAuthorizedFor("level1Requestor", "edit"))
-		{
-			statusId = 1;
-		}
-		return statusId;
+		return this.obSelectedStatusId();
 	};
 
 	EditFieldTripStatusViewModel.prototype.apply = function(noComments)

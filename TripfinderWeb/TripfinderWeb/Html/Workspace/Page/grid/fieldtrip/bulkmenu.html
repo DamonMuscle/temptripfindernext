@@ -1,7 +1,7 @@
 ﻿<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
 	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
 		<ul class="tf-contextmenu grid-menu">
-			<!-- ko if:gridViewModel.approveButton || gridViewModel.declineButton || gridViewModel.cancelButton-->
+			<!-- ko if:gridViewModel.changeStatusButton || gridViewModel.cancelButton-->
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
 				<div class="menu-icon edit">
 				</div>
@@ -13,33 +13,15 @@
 				</div>
 				<div class="menu-label" data-bind="text: 'Show Details'"></div>
 			</li>
-			<!-- ko if:gridViewModel.approveButton||(!gridViewModel.isAdmin && gridViewModel.declineButton)||gridViewModel.cancelButton-->
+			<!-- ko if:gridViewModel.changeStatusButton||gridViewModel.cancelButton-->
 			<li class="menu-divider">
 				<div class="rule"></div>
 			</li>
-			<!-- ko if:gridViewModel.isAdmin && gridViewModel.approveButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
+			<!-- ko if:gridViewModel.changeStatusButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editFieldTripStatus.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon approve">
 				</div>
 				<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
-					<span class="hotkey"></span>
-				</div>
-			</li>
-			<!-- /ko -->
-			<!-- ko if:!gridViewModel.isAdmin&&gridViewModel.approveButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.approveClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
-				<div class="menu-icon approve">
-				</div>
-				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Approve ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Approve ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-					<span class="hotkey"></span>
-				</div>
-			</li>
-			<!-- /ko -->
-			<!-- ko if:!gridViewModel.isAdmin && gridViewModel.declineButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.declineClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
-				<div class="menu-icon decline">
-				</div>
-				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Decline ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Decline ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
 					<span class="hotkey"></span>
 				</div>
 			</li>

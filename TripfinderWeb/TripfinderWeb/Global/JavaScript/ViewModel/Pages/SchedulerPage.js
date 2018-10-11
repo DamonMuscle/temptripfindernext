@@ -4,7 +4,7 @@
 
 	function SchedulerPage(gridType)
 	{
-		var self = this, isLevel1User, authInfo = tf.authManager.authorizationInfo;
+		var self = this;
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.detailView = null;
 		self.options = {};
@@ -33,14 +33,7 @@
 		self.$stageOption = null;
 		self.filterClick = self.filterClick.bind(self);
 		self.refreshClick = self.refreshClick.bind(self);
-
-		isLevel1User = !self.isAdmin && !authInfo.isAuthorizedFor("level4Administrator", "edit") && !authInfo.isAuthorizedFor("level3Administrator", "edit")
-			&& !authInfo.isAuthorizedFor("level2Administrator", "edit") && authInfo.isAuthorizedFor("level1Requestor", "edit");
-		if (!isLevel1User)
-		{
-			self.approveButton = true;
-			self.declineButton = true;
-		}
+		self.changeStatusButton = true;
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;

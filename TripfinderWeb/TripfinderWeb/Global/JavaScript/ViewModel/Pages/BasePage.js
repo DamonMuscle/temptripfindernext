@@ -10,8 +10,7 @@
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
 
-		self.approveButton = false;
-		self.declineButton = false;
+		self.changeStatusButton = false;
 		self.cancelButton = false;
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
@@ -174,7 +173,7 @@
 		self.obShowFieldTripDEPanel(true);
 	};
 
-	BasePage.prototype.editFieldTripStatus = function(viewModel, isApprove)
+	BasePage.prototype.editFieldTripStatus = function(viewModel)
 	{
 		var self = this, selectedIds, selectedRecords;
 
@@ -193,49 +192,40 @@
 				selectedIds = viewModel.gridViewModel.fieldTripId;
 				selectedRecords = viewModel.gridViewModel.fieldTripRecord;
 			}
-
 		}
 
 		var showEditModal = function(name)
 		{
-			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, isApprove, name))
+			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, name))
 				.then(function(data)
 				{
 					if (data)
 					{
-						if (viewModel.isGridPage)
+						if (viewModel.isGridPage || viewModel.gridViewModel.isGridPage)
 						{
 							self.searchGrid.refreshClick();
-						} else
-						{
-							if (viewModel.gridViewModel.isGridPage)
-							{
-								self.searchGrid.refreshClick();
-							} else
-							{
-								if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
-								{
-									self.getOriginalDataSource(self.gridType).then(function(data)
-									{
-										data.Items.forEach(function(item)
-										{
-											if (!item.EstimatedReturnDateTime)
-											{
-												var date = new Date(item.DepartDateTime);
-												date.setDate(date.getDate() + 1);
-												var month = date.getMonth() + 1;
-												item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
-											}
-										});
-										var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
-										self.kendoSchedule.setDataSource(dataSource);
-									});
-								}
-							}
-
 						}
-						self.pageLevelViewModel.popupSuccessMessage((isApprove ? "Approved " : "Declined ") + (selectedRecords.length > 1 ? selectedRecords.length : "")
-							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
+						else if ($(".kendoscheduler").length > 0 && $(".kendoscheduler").getKendoScheduler())
+						{
+							self.getOriginalDataSource(self.gridType).then(function(data)
+							{
+								data.Items.forEach(function(item)
+								{
+									if (!item.EstimatedReturnDateTime)
+									{
+										var date = new Date(item.DepartDateTime);
+										date.setDate(date.getDate() + 1);
+										var month = date.getMonth() + 1;
+										item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+									}
+								});
+								var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
+								self.kendoSchedule.setDataSource(dataSource);
+							});
+						}
+
+						var msg = (selectedRecords.length > 1 ? selectedRecords.length + " Trips are changed." : "The Trip is changed.");
+						self.pageLevelViewModel.popupSuccessMessage(msg);
 					}
 				});
 		};
@@ -257,18 +247,6 @@
 		{
 			showEditModal();
 		}
-	};
-
-	BasePage.prototype.approveClick = function(viewModel, e)
-	{
-		var self = this;
-		self.editFieldTripStatus(viewModel, true);
-	};
-
-	BasePage.prototype.declineClick = function(viewModel, e)
-	{
-		var self = this;
-		self.editFieldTripStatus(viewModel, false);
 	};
 
 	BasePage.prototype._copySelectedRecords = function(e, selectedIds)
