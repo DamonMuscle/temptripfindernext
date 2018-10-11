@@ -467,7 +467,7 @@
 											return;
 										}
 
-										tf.pageManager.openNewPage("myrequests", null, true);
+										tf.pageManager.openNewPage("fieldtrips", null, true);
 									});
 
 									return true;
