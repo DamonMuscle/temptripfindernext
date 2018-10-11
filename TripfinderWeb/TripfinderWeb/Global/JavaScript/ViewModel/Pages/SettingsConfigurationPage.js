@@ -89,6 +89,7 @@
 		var self = this;
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage")).then(function(result)
 		{
+			$(".editor-wrapper").css("visibility", "visible");
 			self.englishEditor = $("#EnglishEditor").kendoEditor({
 				resizable: {
 					content: true,
