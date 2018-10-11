@@ -102,6 +102,7 @@
 				}
 			}).data("kendoEditor");
 
+			$(".editor-wrapper").find(".k-insertImage").closest(".k-tool").hide();
 			var $head = $("#EnglishEditor").closest(".edit-content").find("iframe").contents().find("head");
 			$head.append($("<link/>",
 				{ rel: "stylesheet", href: "Global/ThirdParty/bootstrap/css/bootstrap.min.css", type: "text/css" }
