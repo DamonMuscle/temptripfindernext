@@ -4,11 +4,11 @@
 
 	var securedItemDefinition =
 	{
-		level1Requestor: "level1Requestor",
-		level2Administrator: "level2Administrator",
-		level3Administrator: "level3Administrator",
-		level4Administrator: "level4Administrator",
 		transportationAdministrator: "transportationAdministrator",
+		level4Administrator: "level4Administrator",
+		level3Administrator: "level3Administrator",
+		level2Administrator: "level2Administrator",
+		level1Requestor: "level1Requestor",
 	},
 		allSecuredItems =
 			[
@@ -125,6 +125,13 @@
 		});
 
 		return highest;
+	};
+
+	self.getResourcesAssginable = function()
+	{
+		if (tf.authManager.authorizationInfo.isAdmin) return true;
+		var highest = self.getHighestEditRightSecuredItem();
+		return highest != null && highest != securedItemDefinition.level1Requestor;
 	};
 
 	self.getAccessableStageIds = function()
