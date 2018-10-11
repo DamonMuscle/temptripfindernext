@@ -303,8 +303,8 @@
 					{
 						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "tripfindermessage"), {
 							data: {
-								EnglishMessage: self.englishEditor.value(),
-								SpanishMessage: self.spanishEditor.value(),
+								EnglishMessage: $(".option.english.design").hasClass("selected") ? self.englishEditor.value() : $("#EnglishHtmlEditor").val(),
+								SpanishMessage: $(".option.spanish.design").hasClass("selected") ? self.spanishEditor.value() : $("#SpanishHtmlEditor").val(),
 								DisplayOnceDaily: $(".display-once-daily").prop("checked"),
 								APIIsDirty: true
 							}
