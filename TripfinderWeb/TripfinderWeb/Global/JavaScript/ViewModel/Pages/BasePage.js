@@ -126,14 +126,14 @@
 		self.obShowDetailPanel(true);
 	};
 
-
 	BasePage.prototype.closeDetailClick = function(isNotMobile)
 	{
 		var self = this;
 		if (isNotMobile === true)
 		{
 			tf.pageManager.resizablePage.closeRightPage();
-		} else
+		}
+		else
 		{
 			self.obShowDetailPanel(false);
 			tf.pageManager.resizablePage.clearLeftOtherContent();
@@ -144,7 +144,6 @@
 				$(".kendoscheduler").getKendoScheduler().refresh();
 			}
 		}
-
 	};
 
 	BasePage.prototype.editClick = function(viewModel, e)
@@ -177,21 +176,15 @@
 	{
 		var self = this, selectedIds, selectedRecords;
 
-		if (viewModel.isGridPage)
+		if (viewModel.isGridPage || viewModel.gridViewModel.isGridPage)
 		{
 			selectedIds = self.searchGrid.getSelectedIds();
 			selectedRecords = self.searchGrid.getSelectedRecords();
-		} else
+		}
+		else
 		{
-			if (viewModel.gridViewModel.isGridPage)
-			{
-				selectedIds = self.searchGrid.getSelectedIds();
-				selectedRecords = self.searchGrid.getSelectedRecords();
-			} else
-			{
-				selectedIds = viewModel.gridViewModel.fieldTripId;
-				selectedRecords = viewModel.gridViewModel.fieldTripRecord;
-			}
+			selectedIds = viewModel.gridViewModel.fieldTripId;
+			selectedRecords = viewModel.gridViewModel.fieldTripRecord;
 		}
 
 		var showEditModal = function(name)
@@ -224,6 +217,7 @@
 							});
 						}
 
+						tf.pageManager.resizablePage.closeRightPage();
 						var msg = (selectedRecords.length > 1 ? selectedRecords.length + " Trips are changed." : "The Trip is changed.");
 						self.pageLevelViewModel.popupSuccessMessage(msg);
 					}

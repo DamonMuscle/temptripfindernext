@@ -700,12 +700,13 @@
 	{
 		var self = this, selectedIds = self.getCurrentFieldTripIds(), selectedRecords = self.getCurrentFieldTripRecords(), showEditModal = function(name)
 		{
-			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, false, name, true))
+			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, name, true))
 				.then(function(data)
 				{
 					if (data)
 					{
 						self.searchGrid.refreshClick();
+						tf.pageManager.resizablePage.closeRightPage();
 						self.pageLevelViewModel.popupSuccessMessage("Canceled " + (selectedRecords.length > 1 ? selectedRecords.length : "")
 							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
 					}
