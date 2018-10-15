@@ -24,7 +24,7 @@
 		var self = this,
 			$content, $navigationContent = $(".navigation-container");
 		self.navigationData = new TF.NavigationMenu();
-		self.getMessageSettings().then(function(result)
+		return self.getMessageSettings().then(function(result)
 		{
 			if (!result.Items || !result.Items.length || result.Items.length <= 0 || (!result.Items[0].EnglishMessage && !result.Items[0].SpanishMessage))
 			{

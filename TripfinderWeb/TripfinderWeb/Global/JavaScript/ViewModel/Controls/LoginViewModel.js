@@ -82,6 +82,7 @@
 	LoginViewModel.prototype.signIn = function()
 	{
 		tf.authManager.token = null;
+		tf.entStorageManager.save("token", null);
 		return tf.promiseAjax.post(pathCombine(tf.api.server(), $.trim(this.obClientKey()), "auth", "authentication?vendor=Transfinder&prefix=" + tf.storageManager.prefix.split('.')[0] + "&username=" + this.obUsername()),
 			{
 				data: '"' + this.obPassword() + '"'

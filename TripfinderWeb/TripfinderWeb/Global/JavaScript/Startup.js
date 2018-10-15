@@ -420,57 +420,65 @@
 									tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 									self.changePermissions();
 									tf.pageManager = new TF.Page.PageManager();
+									var promise;
 									if (!TF.isPhoneDevice)
 									{
-										tf.pageManager.initNavgationBar();
+										promise = tf.pageManager.initNavgationBar();
 									}
-									tf.pageManager.initResizePanel();
-
-									tf.pageManager.resizablePage.onLoaded.subscribe(function()
+									else
 									{
-										tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
+										promise = Promise.resolve();
+									}
 
-										if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
+									return promise.then(function()
+									{
+										tf.pageManager.initResizePanel();
+
+										tf.pageManager.resizablePage.onLoaded.subscribe(function()
 										{
-											var pageType = getParameterByName("pagetype");
-											if (pageType)
+											tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
+
+											if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
 											{
-												tf.pageManager.openNewPage(pageType, null, true, true);
+												var pageType = getParameterByName("pagetype");
+												if (pageType)
+												{
+													tf.pageManager.openNewPage(pageType, null, true, true);
+													return;
+												}
+											}
+
+											if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+											{
+												var id = getParameterByName('id');
+												if (id != null)
+												{
+													var detailView = new TF.DetailView.DetailViewViewModel(id);
+													tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
+													return;
+												}
+											}
+											else
+											{
+												tf.pageManager.showMessageModal(true);
+											}
+
+											if (tf.urlParm && tf.urlParm.tripid)
+											{
+												tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
 												return;
 											}
-										}
 
-										if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
-										{
-											var id = getParameterByName('id');
-											if (id != null)
+											if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 											{
-												var detailView = new TF.DetailView.DetailViewViewModel(id);
-												tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
+												tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
 												return;
 											}
-										}
-										else
-										{
-											tf.pageManager.showMessageModal(true);
-										}
 
-										if (tf.urlParm && tf.urlParm.tripid)
-										{
-											tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
-											return;
-										}
-
-										if (tf.authManager.authorizationInfo.isFieldTripAdmin)
-										{
-											tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
-											return;
-										}
-
-										tf.pageManager.openNewPage("fieldtrips", null, true);
+											tf.pageManager.openNewPage("fieldtrips", null, true);
+										});
+										return true;
 									});
-
-									return true;
 								});
 							}
 							return null;
