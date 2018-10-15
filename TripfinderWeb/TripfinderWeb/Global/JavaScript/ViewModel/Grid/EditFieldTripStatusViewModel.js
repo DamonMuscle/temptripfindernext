@@ -121,6 +121,10 @@
 					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Note: noComments ? "" : self.obComments(), ProductName: "tripfinder" } })
 					.then(function()
 					{
+						self.selectedRecords.forEach(function(item)
+						{
+							item.FieldTripStageId = statusId;
+						});
 						return true;
 					}.bind(this));
 			}

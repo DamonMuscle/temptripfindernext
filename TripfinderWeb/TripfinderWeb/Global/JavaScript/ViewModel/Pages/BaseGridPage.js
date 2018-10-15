@@ -714,8 +714,8 @@
 					{
 						self.searchGrid.refreshClick();
 						tf.pageManager.resizablePage.closeRightPage();
-						self.pageLevelViewModel.popupSuccessMessage("Canceled " + (selectedRecords.length > 1 ? selectedRecords.length : "")
-							+ " Trip" + (selectedRecords.length > 1 ? "s" : "") + (selectedRecords.length === 1 ? " [" + name + "]" : ""));
+						var msg = self.getStatusChangedMessage(selectedRecords);
+						self.pageLevelViewModel.popupSuccessMessage(msg);
 					}
 				});
 		};

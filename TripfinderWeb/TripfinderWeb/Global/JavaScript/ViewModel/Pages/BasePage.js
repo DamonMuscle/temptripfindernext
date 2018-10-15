@@ -218,7 +218,7 @@
 						}
 
 						tf.pageManager.resizablePage.closeRightPage();
-						var msg = (selectedRecords.length > 1 ? selectedRecords.length + " Trips are changed." : "The Trip is changed.");
+						var msg = self.getStatusChangedMessage(selectedRecords);
 						self.pageLevelViewModel.popupSuccessMessage(msg);
 					}
 				});
@@ -241,6 +241,38 @@
 		{
 			showEditModal();
 		}
+	};
+
+	BasePage.prototype.getStatusChangedMessage = function(selectedRecords)
+	{
+		var msg = selectedRecords.length > 1 ? selectedRecords.length + " Trips are " : "The Trip is ",
+			stageId = selectedRecords[0].FieldTripStageId;
+		switch (stageId)
+		{
+			case TF.FieldTripStageEnum.level1RequestSubmitted:
+				msg += "submitted.";
+				break;
+			case TF.FieldTripStageEnum.level2RequestDeclined:
+			case TF.FieldTripStageEnum.level3RequestDeclined:
+			case TF.FieldTripStageEnum.level4RequestDeclined:
+			case TF.FieldTripStageEnum.DeclinedByTransportation:
+				msg += "declined.";
+				break;
+			case TF.FieldTripStageEnum.level2RequestApproved:
+			case TF.FieldTripStageEnum.level3RequestApproved:
+			case TF.FieldTripStageEnum.level4RequestApproved:
+			case TF.FieldTripStageEnum.TransportationApproved:
+				msg += "approved.";
+				break;
+			case TF.FieldTripStageEnum.RequestCanceled:
+				msg += "canceled.";
+				break;
+			case TF.FieldTripStageEnum.RequestCompleted:
+				msg += "completed.";
+				break;
+		}
+
+		return msg;
 	};
 
 	BasePage.prototype._copySelectedRecords = function(e, selectedIds)
