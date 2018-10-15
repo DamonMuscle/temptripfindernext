@@ -220,10 +220,7 @@
 						.then(function(apiResponse)
 						{
 							var authorizationInfo = new TF.AuthorizationInfo(apiResponse.Items[0]);
-							if (!tf.authManager.clientKey)
-							{
-								tf.authManager.clientKey = this.loginViewModel.obClientKey();
-							}
+							tf.authManager.clientKey = this.loginViewModel.obClientKey();
 							tf.authManager.getPurchasedProducts()
 								.then(function(purchasedProducts)
 								{

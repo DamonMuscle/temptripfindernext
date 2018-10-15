@@ -220,7 +220,7 @@
 
 	AuthManager.prototype.getPurchasedProducts = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.clientKey), "vendoraccessinfo"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "vendoraccessinfo"))
 			.then(function(response)
 			{
 				this.supportedProducts = response.Items[0].Products;
