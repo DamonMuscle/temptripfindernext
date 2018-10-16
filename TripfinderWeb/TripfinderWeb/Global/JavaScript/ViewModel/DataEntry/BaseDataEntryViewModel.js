@@ -721,7 +721,6 @@
 		var self = this;
 		var obEntityDataModel = this.obEntityDataModel();
 		var isNew = obEntityDataModel.id() ? false : true;
-		var fieldTripId = [];
 		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.type, isNew ? "" : obEntityDataModel.id()),
 			{
 				data: this.getSaveData(),
@@ -734,21 +733,9 @@
 				this._view.id = obEntityDataModel.id();
 				this.onContentChange.notify();
 				if (isNew)
-				{//change the url and sticky
+				{
 					this._view.mode = "Edit";
 					this.obMode(this._view.mode);
-					fieldTripId.push(this.obEntityDataModel().id());
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "statuses"),
-						{ data: { Ids: fieldTripId, StatusId: this.obEntityDataModel().fieldTripStageId(), Note: "", ProductName: "tripfinder" } })
-						.then(function()
-						{
-							PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
-							if (self.obDocumentGridViewModel())
-							{
-								self.refreshDocumentMiniGrid(obEntityDataModel.toData().Id, isNew);
-							}
-							return true;
-						}.bind(this));
 				}
 				PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
 				if (self.obDocumentGridViewModel())
