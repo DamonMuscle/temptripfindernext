@@ -23,7 +23,7 @@
 			{
 				var $target = tf.modalManager.obBaseModalViewModels()[tf.modalManager.obBaseModalViewModels().length - 1].$target;
 				var $modalBody = $target ? $target.find(".modal-body") : undefined;
-				if ($modalBody.closest(".message-center").length > 0)
+				if ($modalBody && $modalBody.closest(".message-center").length > 0)
 				{
 					return;
 					e.preventDefault();

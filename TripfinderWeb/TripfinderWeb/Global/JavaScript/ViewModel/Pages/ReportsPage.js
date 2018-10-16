@@ -38,6 +38,10 @@
 		{
 			self.saveReportAsFile();
 		});
+		self.bindEvent(".iconbutton.vReport", function(model, e)
+		{
+			self.viewReport();
+		});
 	};
 
 	ReportsPage.prototype._openBulkMenu = function()
@@ -71,6 +75,10 @@
 	ReportsPage.prototype.saveReportAsFile = function()
 	{
 		this.generateReport(null, "saveas", { gridViewModel: this });
+	};
+	ReportsPage.prototype.viewReport = function()
+	{
+		this.generateReport(null, "view", { gridViewModel: this });
 	};
 
 	ReportsPage.prototype.generateReport = function(udReport, type, gridMenuViewModel)

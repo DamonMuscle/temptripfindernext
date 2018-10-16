@@ -40,8 +40,9 @@
 			<!-- /ko -->
 			<!-- /ko -->
 			<!-- ko if: pageType === "reports"-->
-			<button class="iconbutton mail" title="Send Mail" data-bind="enable:obIsSelectRow"></button>
-			<button class="iconbutton file" title="Save As File" data-bind="enable:obIsSelectRow"></button>
+			<button class="iconbutton mail" title="Email" data-bind="enable:obIsSelectRow"></button>
+			<button class="iconbutton file" title="Export to File" data-bind="enable:obIsSelectRow"></button>
+			<button class="iconbutton vReport" title="View Report" data-bind="enable:obIsSelectRow"></button>
 			<!-- /ko -->
 		</div>
 		<!-- ko if: pageType !== "reports"-->
@@ -49,7 +50,8 @@
 			<div class="grid-staterow">
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
-					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow" style="max-width:150px;"></span>
+					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
+					 style="max-width:150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
