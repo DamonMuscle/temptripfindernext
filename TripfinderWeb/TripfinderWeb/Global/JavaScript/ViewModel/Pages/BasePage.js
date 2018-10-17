@@ -204,6 +204,12 @@
 		return msg;
 	};
 
+	BasePage.prototype.showHideColumns = function(viewModel, e)
+	{
+		var self = this;
+		self.searchGrid.addRemoveColumnClick(viewModel, e);
+	};
+
 	BasePage.prototype._copySelectedRecords = function(e, selectedIds)
 	{
 		var self = this;

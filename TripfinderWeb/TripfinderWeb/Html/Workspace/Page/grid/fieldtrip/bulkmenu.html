@@ -13,6 +13,14 @@
 				</div>
 				<div class="menu-label" data-bind="text: 'Detail View'"></div>
 			</li>
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showHideColumns.bind(gridViewModel)">
+				<div class="menu-icon showhidecolumns">
+				</div>
+				<div class="menu-label" data-bind="text: 'Show/Hide Grid Columns'"></div>
+			</li>
 			<!-- ko if:gridViewModel.changeStatusButton||gridViewModel.cancelButton-->
 			<li class="menu-divider">
 				<div class="rule"></div>
