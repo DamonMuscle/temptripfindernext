@@ -556,7 +556,7 @@
 		self.bindEvent(".iconbutton.layout", self.layoutIconClick);
 		self.bindEvent(".iconbutton.refresh", function(model, e)
 		{
-			self.searchGrid.refreshClick(model, e);
+			self.refreshClick();
 		});
 
 		if (self.obReports)
@@ -703,40 +703,40 @@
 		}
 	};
 
-	BaseGridPage.prototype.cancelClick = function(viewModel, e)
+	BaseGridPage.prototype.editFieldTripStatus = function()
 	{
-		var self = this, selectedIds = self.getCurrentFieldTripIds(), selectedRecords = self.getCurrentFieldTripRecords(), showEditModal = function(name)
-		{
-			tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, name, true))
-				.then(function(data)
-				{
-					if (data)
-					{
-						self.searchGrid.refreshClick();
-						tf.pageManager.resizablePage.closeRightPage();
-						var msg = self.getStatusChangedMessage(selectedRecords);
-						self.pageLevelViewModel.popupSuccessMessage(msg);
-					}
-				});
-		};
+		this.editFieldTripStatusCore();
+	};
 
-		if (selectedIds.length === 0)
+	BaseGridPage.prototype.editFieldTripStatusCore = function(cancel)
+	{
+		var selectedRecords = this.getCurrentFieldTripRecords();
+		if (!selectedRecords || !selectedRecords.length)
 		{
 			return;
 		}
 
-		if (selectedIds.length === 1)
-		{
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "getEntityNames"), { data: selectedIds })
-				.then(function(response)
+		tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, cancel))
+			.then(function(data)
+			{
+				if (data)
 				{
-					showEditModal(response.Items[0]);
-				});
-		}
-		else
-		{
-			showEditModal();
-		}
+					this.refreshClick();
+					var msg = this.getStatusChangedMessage(selectedRecords);
+					this.pageLevelViewModel.popupSuccessMessage(msg);
+				}
+			}.bind(this));
+	};
+
+	BaseGridPage.prototype.refreshClick = function()
+	{
+		tf.pageManager.resizablePage.closeRightPage();
+		this.searchGrid.refreshClick();
+	};
+
+	BaseGridPage.prototype.cancelClick = function()
+	{
+		this.editFieldTripStatusCore(true);
 	};
 
 	BaseGridPage.prototype.addClick = function(viewModel, e)
@@ -808,10 +808,10 @@
 			type: self.type
 		}));
 	};
+
 	BaseGridPage.prototype.dispose = function()
 	{
 		var self = this;
-
 		self.$element.find(".grid-icons").off(".swipe");
 		if (self.searchGrid)
 		{

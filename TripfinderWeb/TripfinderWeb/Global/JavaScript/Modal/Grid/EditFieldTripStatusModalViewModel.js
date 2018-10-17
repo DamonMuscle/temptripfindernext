@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Modal').EditFieldTripStatusModalViewModel = EditFieldTripStatusModalViewModel;
 
-	function EditFieldTripStatusModalViewModel(fieldTripRecords, name, isCancel)
+	function EditFieldTripStatusModalViewModel(fieldTripRecords, isCancel)
 	{
 		var self = this,
 			tripSingular = tf.applicationTerm.getApplicationTermSingularByName("Trip"),
@@ -17,6 +17,7 @@
 		}
 		else
 		{
+			var name = fieldTripRecords[0].Name;
 			self.title((isCancel ? "Cancel " + tripSingular + " " : "Change Status of " + tripSingular + " ") + name);
 		}
 

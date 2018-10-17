@@ -19,6 +19,8 @@
 			<button class="iconbutton details" title="Detail View" data-bind="enable:obIsSelectEvent,css:{open:obShowDetailPanel()},click:showDetailsClick"></button>
 			<!-- /ko -->
 			<button class="iconbutton filter" title="Filters" data-bind="click:filterClick"></button>
+			<div class="divider" title=""></div>
+			<button class="iconbutton refresh" title="Refresh" data-bind="click:refreshClick.bind($data)"></button>
 		</div>
 	</div>
 	<div class="scheduler-wrap">

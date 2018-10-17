@@ -143,14 +143,14 @@
 	{
 		var self = this;
 		self.filterData = options.data;
-		self.setDataSource();
+		self.EnsureOrRefreshScheduler();
 	};
 
 	SchedulerPage.prototype.filterCleared = function(e)
 	{
 		var self = this;
 		self.filterData = null;
-		self.setDataSource();
+		self.EnsureOrRefreshScheduler();
 	};
 
 	SchedulerPage.prototype.fieldTripStageChanged = function(e)
@@ -225,34 +225,8 @@
 
 	SchedulerPage.prototype.refreshClick = function()
 	{
-		this.initScheduler();
-	};
-
-	SchedulerPage.prototype.setDataSource = function()
-	{
-		var self = this;
-		self.getOriginalDataSource(self.gridType).then(function(data)
-		{
-			data.Items = data.Items.filter(function(item)
-			{
-				return item.DepartDateTime != null;
-			});
-			data.Items.forEach(function(item)
-			{
-				if (!item.ReturnTime)
-				{
-					var date = new Date(item.DepartDateTime);
-					date.setDate(date.getDate() + 1);
-					var month = date.getMonth() + 1;
-					item.ReturnTime = date.getFullYear() + '-' + month + '-' + date.getDate();
-				}
-			});
-
-			var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
-			self.kendoSchedule.setDataSource(dataSource);
-
-			self.resetScrollBar();
-		});
+		tf.pageManager.resizablePage.closeRightPage();
+		this.EnsureOrRefreshScheduler();
 	};
 
 	SchedulerPage.prototype.getAvailableStageId = function()
@@ -611,23 +585,33 @@
 
 	SchedulerPage.prototype.initScheduler = function()
 	{
-		var self = this;
+		this.searchGrid.initFieldTripStageFilters();
+		this.disposeScheduler();
+		this.EnsureOrRefreshScheduler();
+	};
 
-		self.searchGrid.initFieldTripStageFilters();
-		if (self.kendoSchedule)
+	SchedulerPage.prototype.disposeScheduler = function()
+	{
+		if (this.kendoSchedule)
 		{
 			$(document).off(".kendoscheduler");
-			self.$kendoscheduler.off(".kendoscheduler");
-			self.kendoSchedule.destroy();
-			self.$kendoscheduler.empty();
+			this.$kendoscheduler.off(".kendoscheduler");
+			this.kendoSchedule.destroy();
+			this.$kendoscheduler.empty();
+			this.kendoSchedule = null;
 		}
+	};
 
+	SchedulerPage.prototype.EnsureOrRefreshScheduler = function()
+	{
+		var self = this;
 		self.getOriginalDataSource(self.gridType).then(function(data)
 		{
 			data.Items = data.Items.filter(function(item)
 			{
 				return item.DepartDateTime != null;
 			});
+
 			data.Items.forEach(function(item)
 			{
 				if (!item.ReturnTime)
@@ -637,7 +621,23 @@
 					var month = date.getMonth() + 1;
 					item.ReturnTime = date.getFullYear() + '-' + month + '-' + date.getDate();
 				}
+
+				if (!item.EstimatedReturnDateTime)
+				{
+					var date = new Date(item.DepartDateTime);
+					date.setDate(date.getDate() + 1);
+					var month = date.getMonth() + 1;
+					item.EstimatedReturnDateTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+				}
 			});
+
+			if (self.kendoSchedule)
+			{
+				var dataSource = new kendo.data.SchedulerDataSource(self.getSchedulerDataSources(data));
+				self.kendoSchedule.setDataSource(dataSource);
+				self.resetScrollBar();
+				return;
+			}
 
 			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
 				date: new Date(),
@@ -651,7 +651,6 @@
 				},
 				footer: false
 			}).data("kendoScheduler");
-
 			self.eventBinding();
 		});
 	};
@@ -667,8 +666,8 @@
 				{
 					var today = new Date();
 					self.initScrollBar(today);
-
-				} else
+				}
+				else
 				{
 					var calendarDate = $(".k-scheduler-calendar.k-widget.k-calendar .k-state-selected .k-link").data("kendoValue");
 					if (calendarDate)
@@ -677,7 +676,8 @@
 						selectCalendarDate = (parseInt(calendarDateArray[1]) + 1) + "/" + calendarDateArray[2] + "/" + calendarDateArray[0];
 						selectCalendarDate = new Date(selectCalendarDate);
 						self.initScrollBar(selectCalendarDate);
-					} else
+					}
+					else
 					{
 						var today = new Date();
 						self.initScrollBar(today);
@@ -690,7 +690,7 @@
 	SchedulerPage.prototype.getRequestUrl = function(type)
 	{
 		return pathCombine(tf.api.apiPrefix(), "search", "fieldtrip");
-	}
+	};
 
 	SchedulerPage.prototype.getOriginalDataSource = function(type, filters)
 	{
@@ -712,7 +712,7 @@
 
 		url = self.getRequestUrl(type);
 		return tf.ajax.post(url, { data: params });
-	}
+	};
 
 	SchedulerPage.prototype.getSchedulerDataSources = function(data)
 	{
@@ -849,21 +849,7 @@
 
 	SchedulerPage.prototype.dispose = function()
 	{
-		var self = this;
-
-		$(document).off(".kendoscheduler");
-		if (self.$kendoscheduler)
-		{
-			self.$kendoscheduler.off(".kendoscheduler");
-		}
-		if (self.kendoSchedule)
-		{
-			self.kendoSchedule.destroy();
-		}
-		if (self.searchGrid)
-		{
-			self.searchGrid.dispose();
-			self.searchGrid = null;
-		}
+		this.disposeScheduler();
+		TF.Page.BaseGridPage.prototype.dispose.call(this);
 	};
 })();
