@@ -463,6 +463,7 @@
 
 		self.clearRightContent();
 		self.reLayoutPage();
+		self.$leftPage.focus();
 	};
 
 	ResizablePage.prototype.clearContent = function()

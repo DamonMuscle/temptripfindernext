@@ -130,9 +130,13 @@
 		}
 
 		self.onCtrlCPress = new TF.Events.Event();
+		tf.shortCutKeys.bind("ctrl+c", function(e, keyCombination) { self.onCtrlCPress.notify(keyCombination, e); }, self.options.routeState);
+
 		self.onCtrlSPress = new TF.Events.Event();
-		tf.shortCutKeys.bind("ctrl+c", function(e, keyCombination) { self.onCtrlCPress.notify(keyCombination, e); });
-		tf.shortCutKeys.bind("ctrl+s", function(e, keyCombination) { self.onCtrlSPress.notify(keyCombination, e); });
+		tf.shortCutKeys.bind("ctrl+s", function(e, keyCombination) { self.onCtrlSPress.notify(keyCombination, e); }, self.options.routeState);
+
+		self.onEnterPress = new TF.Events.Event();
+		tf.shortCutKeys.bind("enter", function(e, keyCombination) { self.onEnterPress.notify(keyCombination, e); }, self.options.routeState);
 
 		self.obFilteredRecordCount = ko.observable(0);
 		self.obTotalRecordCount = ko.observable(0);
@@ -4665,6 +4669,7 @@
 	{
 		this.onCtrlCPress.unsubscribeAll();
 		this.onCtrlSPress.unsubscribeAll();
+		this.onEnterPress.unsubscribeAll();
 		this.onDoubleClick.unsubscribeAll();
 		this.onRowsChangeCheck.unsubscribeAll();
 		this.onRowsChanged.unsubscribeAll();

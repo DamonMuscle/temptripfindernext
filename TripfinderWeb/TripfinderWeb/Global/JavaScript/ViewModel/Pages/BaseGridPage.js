@@ -169,6 +169,13 @@
 			});
 
 			self.loadReportLists();
+			tf.pageManager.resizablePage.$leftPage.on("focus.shortcutKeys", function()
+			{
+				tf.shortCutKeys.changeHashKey(self.searchGrid.options.routeState);
+			}).on("blur.shortcutKeys", function()
+			{
+				tf.shortCutKeys.changeHashKey();
+			});
 		}
 	};
 
@@ -396,6 +403,23 @@
 		self._openBulkMenu();
 		self.targetID = ko.observable();
 		self.searchGridInited(true);
+
+		if (!TF.isPhoneDevice && self.searchGrid && self.type == "fieldtrip" && !self.isSchedulerPage)
+		{
+			self.searchGrid.onCtrlSPress.subscribe(self.onCtrlSPress.bind(self));
+			self.searchGrid.onCtrlCPress.subscribe(self.onCtrlCPress.bind(self));
+			self.searchGrid.onEnterPress.subscribe(self.onEnterPress.bind(self));
+		}
+	};
+
+	BaseGridPage.prototype.onEnterPress = function()
+	{
+		if (this.obShowDetailPanel() || this.obShowFieldTripDEPanel())
+		{
+			return;
+		}
+
+		this.showDetailsClick();
 	};
 
 	BaseGridPage.prototype._openBulkMenu = function()
@@ -757,8 +781,7 @@
 
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
 	{
-		var self = this;
-		self.obShowDetailPanel(false);
+		this.obShowDetailPanel(false);
 		tf.pageManager.resizablePage.closeRightPage();
 	};
 
@@ -813,6 +836,8 @@
 			self.searchGrid.dispose();
 			self.searchGrid = null;
 		}
+
+		tf.pageManager.resizablePage.$leftPage.off("focus.shortcutKeys").off("blur.shortcutKeys");
 
 		self.pageLevelViewModel.dispose();
 
