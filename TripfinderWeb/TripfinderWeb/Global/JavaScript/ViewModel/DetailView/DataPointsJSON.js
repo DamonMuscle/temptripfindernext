@@ -583,6 +583,11 @@ var today = (new Date()).toDateString(),
 					"field": "EstimatedCost",
 					"title": "Estimated Cost($)",
 					"type": "Number"
+				},
+				{
+					"field": "Requestor",
+					"title": "Requestor",
+					"type": "String"
 				}
 			],
 			"Destination": [

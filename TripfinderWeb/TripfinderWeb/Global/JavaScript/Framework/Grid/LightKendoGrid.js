@@ -4084,19 +4084,45 @@
 
 		//VIEW-1299 Grid columns do not move with grid header when tabbing through Quick Filter bar
 		var timeoutEvent;
+		self.lastGridScrollLeft = 0;
 		self.$container.find(".k-grid-header-wrap").unbind('scroll.autoScrollOnFocus').bind('scroll.autoScrollOnFocus', function(e)
 		{
 			var gridBody = self.$container.find(".k-virtual-scrollable-wrap");
 			var $target = $(e.target);
-			gridBody.scrollLeft($target.scrollLeft());
+			var maxScrollWidth = $target[0].scrollWidth - $target[0].clientWidth - 1;
+			var scrollLeft = $target.scrollLeft();
+			if (scrollLeft > self.lastGridScrollLeft)
+			{
+				if (scrollLeft - self.lastGridScrollLeft <= 40)
+				{
+					scrollLeft = self.lastGridScrollLeft + 40;
+					if (scrollLeft > maxScrollWidth)
+					{
+						scrollLeft = maxScrollWidth;
+					}
+				}
+			}
+			else if (scrollLeft < self.lastGridScrollLeft)
+			{
+				if (scrollLeft <= 40)	
+				{
+					scrollLeft = 0;
+				}
+				else
+				{
+					scrollLeft = self.lastGridScrollLeft - 40;
+				}
+			}
+			self.lastGridScrollLeft = scrollLeft;
+			gridBody.scrollLeft(scrollLeft);
 			if (self.$summaryContainer)
 			{
-				self.$summaryContainer.find(".k-grid-content").scrollLeft($target.scrollLeft());
+				self.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
 			}
 			clearTimeout(timeoutEvent);
 			timeoutEvent = setTimeout(function()
 			{
-				gridBody.scrollLeft($target.scrollLeft());
+				gridBody.scrollLeft(scrollLeft);
 			}, 50);
 		});
 		//VIEW-1244 Cursor appears outside of inputs
@@ -4504,15 +4530,17 @@
 
 	LightKendoGrid.prototype.bindScrollXMoveSummayBarEvent = function()
 	{
-		if (!isMobileDevice())
-		{
-			return;
-		}
 		var self = this,
 			timeoutEvent,
 			focusTimeoutEvent,
 			focusInput,
 			gridContent = this.$container.find(".k-virtual-scrollable-wrap").length > 0 ? this.$container.find(".k-virtual-scrollable-wrap") : this.$container.find(".k-grid-content");
+
+		if (!isMobileDevice())
+		{
+			return;
+		}
+
 		this.$container.find(".k-grid-content").addClass("overflow-hidden");
 		if (self.$summaryContainer)
 		{
