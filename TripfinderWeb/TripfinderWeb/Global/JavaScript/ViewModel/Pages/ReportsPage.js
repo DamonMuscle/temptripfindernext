@@ -47,23 +47,18 @@
 	ReportsPage.prototype._openBulkMenu = function()
 	{
 		var self = this;
-		self.$element.delegate("table.k-selectable tr", "mousedown", function(e)
+		self.$element.delegate("table.k-selectable tr", "contextmenu", function(e)
 		{
-			if (e.button == 2)
-			{
-				$(e.currentTarget).trigger('click');
-				self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
-				var $virsualTarget = $("<div></div>").css(
-					{
-						position: "absolute",
-						left: e.clientX,
-						top: e.clientY
-					});
-				$("body").append($virsualTarget);
-				tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid", self.type, "bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid)));
-				return false;
-			}
-			return true;
+			$(e.currentTarget).trigger('click');
+			self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
+			var $virsualTarget = $("<div></div>").css(
+				{
+					position: "absolute",
+					left: e.clientX,
+					top: e.clientY
+				});
+			$("body").append($virsualTarget);
+			tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid", self.type, "bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid)));
 		}.bind(this));
 	};
 

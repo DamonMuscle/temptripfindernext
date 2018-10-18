@@ -31,7 +31,7 @@
 				$(document).unbind("mousemove", self._mouseout);
 			};
 
-			$container.on("mouseout", function()
+			self._mouseout = function()
 			{
 				if (self._timer)
 				{
@@ -42,7 +42,7 @@
 				{
 					self.dispose();
 				}, 300);
-			});
+			};
 		}
 
 		var contextMenuClose = function()

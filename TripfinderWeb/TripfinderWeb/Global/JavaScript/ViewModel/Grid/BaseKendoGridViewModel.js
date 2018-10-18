@@ -180,58 +180,53 @@
 		{
 			if (this.hasRightClickEvent)
 			{
-				this.$container.delegate("table.k-selectable tr", "mousedown", function(e, parentE)
+				this.$container.delegate("table.k-selectable tr", "contextmenu", function(e, parentE)
 				{
 					var element = e;
 					if (parentE)
 					{
 						element = parentE;
 					}
-					if (element.button == 2)
-					{
-						this.targetID(this.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
-						var $virsualTarget = $("<div></div>").css(
+					this.targetID(this.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
+					var $virsualTarget = $("<div></div>").css(
+						{
+							position: "absolute",
+							left: element.clientX,
+							top: element.clientY
+						});
+					$("body").append($virsualTarget);
+					var type = this.type;
+					if (this.type == "documentmini")
+						type = "document";
+					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
+						paramData: {
+							clientId: tf.authManager.clientKey
+						}
+					})
+						.then(function(data)
+						{
+							if (!!data.Items[0].EmailAddress)
 							{
-								position: "absolute",
-								left: element.clientX,
-								top: element.clientY
-							});
-						$("body").append($virsualTarget);
-						var type = this.type;
-						if (this.type == "documentmini")
-							type = "document";
-						tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
-							paramData: {
-								clientId: tf.authManager.clientKey
+								this.obEmail = ko.observableArray([]);
+								this.obEmail.push(data.Items[0].EmailAddress);
 							}
-						})
-							.then(function(data)
-							{
-								if (!!data.Items[0].EmailAddress)
+							tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userprofile", "current"))
+								.then(function(response)
 								{
-									this.obEmail = ko.observableArray([]);
-									this.obEmail.push(data.Items[0].EmailAddress);
-								}
-								tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userprofile", "current"))
-									.then(function(response)
+									if (!!response.Items[0].Email)
 									{
-										if (!!response.Items[0].Email)
+										if (!this.obEmail())
 										{
-											if (!this.obEmail())
-											{
-												this.obEmail = ko.observableArray([]);
-											}
-											if (this.obEmail().length <= 0 || this.obEmail()[0] !== response.Items[0].Email)
-											{
-												this.obEmail.push(response.Items[0].Email);
-											}
+											this.obEmail = ko.observableArray([]);
 										}
-										tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("workspace/grid", type, "bulkmenu"), new TF.Grid.GridMenuViewModel(this, this.searchGrid)));
-									}.bind(this));
-							}.bind(this));
-						return false;
-					}
-					return true;
+										if (this.obEmail().length <= 0 || this.obEmail()[0] !== response.Items[0].Email)
+										{
+											this.obEmail.push(response.Items[0].Email);
+										}
+									}
+									tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("workspace/grid", type, "bulkmenu"), new TF.Grid.GridMenuViewModel(this, this.searchGrid)));
+								}.bind(this));
+						}.bind(this));
 				}.bind(this));
 
 				this.$container.delegate(".kendogrid-blank-fullfill .fillItem", "mousedown", function(e)
