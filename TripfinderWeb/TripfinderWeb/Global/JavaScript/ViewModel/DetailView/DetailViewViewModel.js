@@ -41,6 +41,7 @@
 		self.selectItemClick = self.selectItemClick.bind(self);
 		self.saveGroup = self.saveGroup.bind(self);
 		self.cancelGroup = self.cancelGroup.bind(self);
+		self.closeEditMode = self.closeEditMode.bind(self);
 
 		//Data point panel init.
 		self.dataPointGroupHelper = new TF.DetailView.DataPointGroupHelper(self);
@@ -1213,8 +1214,10 @@
 		$(".page-container").css("width", "100%");
 		$(".detail-view-panel.right-panel").css({ display: "block", width: "100%" });
 		$(".buttons .iconbutton.new-window").addClass("hide");
+		$(".buttons .iconbutton.close-detail").addClass("hide");
 		$(".buttons .iconbutton.print").css("margin-left", "20px");
-		$(".group-buttons .iconbutton.new-window").parents("li").hide()
+		$(".group-buttons .iconbutton.new-window").parents("li").hide();
+		$(".group-buttons .iconbutton.close-detail").parents("li").hide();
 		$(".selector-menu").css("margin-left", "36px");
 		$(".sliderbar-button-wrap.ui-draggable").addClass("hide");
 		$(".detail-header.width-enough").find($(".sliderbar-button-wrap.ui-draggable")).addClass("hide");
@@ -4765,8 +4768,14 @@
 				$title = $header.find(".head-text:not(.hide)"),
 				$buttons = $header.find(".buttons");
 
+
 			$header.addClass("width-enough");
 			$buttons.css("width", "auto");
+			if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+			{
+				var $selectorMenu = $header.find(".selector-menu");
+				$selectorMenu.css("width", "calc(100% - 80px)");
+			}
 			$title.css("width", "auto");
 			isWidthEnough = self.$element.outerWidth() - 32 > $title.outerWidth() + $buttons.outerWidth();
 
@@ -4803,6 +4812,17 @@
 	{
 		var self = this;
 		self.onCloseDetailEvent.notify();
+	};
+	/**
+	 * The close edit detail model function.
+	 * @param {Object} data
+	 * @param {Event} e
+	 * @return {void}
+	 */
+	DetailViewViewModel.prototype.closeEditMode = function()
+	{
+		var self = this;
+		self.checkLayoutChange();
 	};
 
 	/**

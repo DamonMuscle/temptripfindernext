@@ -126,10 +126,10 @@
 		self.obShowDetailPanel(true);
 	};
 
-	BasePage.prototype.closeDetailClick = function(isNotMobile)
+	BasePage.prototype.closeDetailClick = function(filter)
 	{
 		var self = this;
-		if (isNotMobile === true)
+		if (filter === true || !TF.isMobileDevice)
 		{
 			tf.pageManager.resizablePage.closeRightPage();
 		}
