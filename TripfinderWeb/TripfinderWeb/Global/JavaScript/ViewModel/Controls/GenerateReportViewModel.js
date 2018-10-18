@@ -17,35 +17,20 @@
 
 		this.obActiveDataSources = ko.observableArray();
 
+		this.obSpecifyRecords = ko.observableArray([
+			{
+				id: 1,
+				name: "All Records"
+			},
+			{
+				id: 2,
+				name: "Filter"
+			},
+			{
+				id: 3,
+				name: "Specific Records"
+			}]);
 
-		if (tf.permissions.filtersRead)
-		{
-			this.obSpecifyRecords = ko.observableArray([
-				{
-					id: 1,
-					name: "All Records"
-				},
-				{
-					id: 2,
-					name: "Filter"
-				},
-				{
-					id: 3,
-					name: "Specific Records"
-				}]);
-		}
-		else
-		{
-			this.obSpecifyRecords = ko.observableArray([
-				{
-					id: 1,
-					name: "All Records"
-				},
-				{
-					id: 3,
-					name: "Specific Records"
-				}]);
-		}
 		this.obOutputTos = ko.observableArray([
 			{
 				id: 0,
@@ -437,12 +422,13 @@
 				label: label,
 				groupName: label
 			}));
-	}
+	};
+
 	GenerateReportViewModel.prototype.load = function()
 	{
 		var promises = [];
 
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "report"))
+		var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"))
 			.then(function(data)
 			{
 				var fieldtripData = data.Items.filter(function(item)
@@ -464,6 +450,7 @@
 
 		return Promise.all(promises);
 	};
+
 	GenerateReportViewModel.prototype.filterDataSourceSelectChange = function()
 	{
 		this.obFilter(this.obFilterDataModels()[0]);
