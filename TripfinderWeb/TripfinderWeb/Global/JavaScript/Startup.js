@@ -471,7 +471,13 @@
 
 											if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 											{
-												tf.pageManager.openNewPage(tf.storageManager.get(TF.productName.toLowerCase() + ".page") || "fieldtrips", null, true);
+												var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
+												if (!pageName || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
+												{
+													pageName = "fieldtrips";
+												}
+
+												tf.pageManager.openNewPage(pageName, null, true);
 												return;
 											}
 
