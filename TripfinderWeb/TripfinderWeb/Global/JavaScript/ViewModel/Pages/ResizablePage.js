@@ -295,7 +295,7 @@
 				pageTitle = self.$leftPage.find(".page-title:not(.detail)");
 				newRequest = self.$leftPage.find(".desktop-header .new-request");
 
-				iconRow.css("display", "block");
+				iconRow.css("display", "flex");
 				wrapRow.removeClass("pull-left").addClass("pull-right");
 				wrapRow.css("width", "auto");
 				iconRow.css("width", "auto");
@@ -354,7 +354,7 @@
 					wrapRow.on("mousemove.iconhover", function()
 					{
 						wrapRow.css("display", "none");
-						iconRow.css("display", "block");
+						iconRow.css("display", "flex");
 						iconRow.css("width", "100%");
 					});
 
@@ -378,7 +378,7 @@
 					wrapRow.css("width", "auto");
 					iconRow.css("width", "auto");
 					wrapRow.css("display", "block");
-					iconRow.css("display", "block");
+					iconRow.css("display", "flex");
 				}
 			}
 		}
