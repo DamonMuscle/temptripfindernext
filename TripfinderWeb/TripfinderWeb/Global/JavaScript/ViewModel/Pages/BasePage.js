@@ -174,32 +174,33 @@
 
 	BasePage.prototype.getStatusChangedMessage = function(selectedRecords)
 	{
-		var msg = selectedRecords.length > 1 ? selectedRecords.length + " Trips are " : "The Trip is ",
+		var msg = "",
 			stageId = selectedRecords[0].FieldTripStageId;
 		switch (stageId)
 		{
 			case TF.FieldTripStageEnum.level1RequestSubmitted:
-				msg += "submitted.";
+				msg += "Submitted ";
 				break;
 			case TF.FieldTripStageEnum.level2RequestDeclined:
 			case TF.FieldTripStageEnum.level3RequestDeclined:
 			case TF.FieldTripStageEnum.level4RequestDeclined:
 			case TF.FieldTripStageEnum.DeclinedByTransportation:
-				msg += "declined.";
+				msg += "Declined ";
 				break;
 			case TF.FieldTripStageEnum.level2RequestApproved:
 			case TF.FieldTripStageEnum.level3RequestApproved:
 			case TF.FieldTripStageEnum.level4RequestApproved:
 			case TF.FieldTripStageEnum.TransportationApproved:
-				msg += "approved.";
+				msg += "Approved ";
 				break;
 			case TF.FieldTripStageEnum.RequestCanceled:
-				msg += "canceled.";
+				msg += "Canceled ";
 				break;
 			case TF.FieldTripStageEnum.RequestCompleted:
-				msg += "completed.";
+				msg += "Completed ";
 				break;
 		}
+		msg += selectedRecords.length > 1 ? (selectedRecords.length + " " + tf.applicationTerm.getApplicationTermPluralByName("Trip")) : selectedRecords[0].Name;
 
 		return msg;
 	};
@@ -252,27 +253,27 @@
 						$(".tfmodal-container").css('visibility', 'hidden');
 						return Promise.resolve(true);
 					}, function(data)
+					{
+						tf.loadingIndicator.tryHide();
+						if (self.copyRetryCount >= 3)
 						{
-							tf.loadingIndicator.tryHide();
-							if (self.copyRetryCount >= 3)
-							{
-								tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
-									.then(function(result)
-									{
-
-									});
-								return;
-							}
-							tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
+							tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
 								.then(function(result)
 								{
-									if (result)
-									{
-										self.copyRetryCount = self.copyRetryCount + 1;
-										self._copySelectedRecords(e, selectedIds);
-									}
+
 								});
-						});
+							return;
+						}
+						tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
+							.then(function(result)
+							{
+								if (result)
+								{
+									self.copyRetryCount = self.copyRetryCount + 1;
+									self._copySelectedRecords(e, selectedIds);
+								}
+							});
+					});
 			});
 	};
 

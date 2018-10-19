@@ -18,7 +18,7 @@
 		else
 		{
 			var name = fieldTripRecords[0].Name;
-			self.title((isCancel ? "Cancel " + tripSingular + " " : "Change Status of " + tripSingular + " ") + name);
+			self.title((isCancel ? "Cancel " + tripSingular + " " : "Change Status of ") + name);
 		}
 
 		self.obPositiveButtonLabel = ko.observable((isCancel ? ("Cancel " + (fieldTripRecords.length > 1 ? fieldTripRecords.length : "") + " " + (fieldTripRecords.length > 1 ? tripPlural : tripSingular)) : "Change"));
