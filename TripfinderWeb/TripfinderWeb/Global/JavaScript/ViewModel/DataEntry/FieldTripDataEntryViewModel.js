@@ -561,10 +561,10 @@
 				}
 				else
 				{
-					this.obEntityDataModel().fieldTripStageId(1);
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
 					this.obEntityDataModel().updateEntityBackup();
 				}
+
 				this.loadInvoicing();
 				this.loadResources();
 				this.loadDocument();
