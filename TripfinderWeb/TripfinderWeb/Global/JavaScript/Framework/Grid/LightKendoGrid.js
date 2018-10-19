@@ -4151,46 +4151,23 @@
 		}
 
 		//VIEW-1299 Grid columns do not move with grid header when tabbing through Quick Filter bar
+		self._increaseHorizontalScrollSpeed();
 		var timeoutEvent;
 		self.lastGridScrollLeft = 0;
 		self.$container.find(".k-grid-header-wrap").unbind('scroll.autoScrollOnFocus').bind('scroll.autoScrollOnFocus', function(e)
 		{
 			var gridBody = self.$container.find(".k-virtual-scrollable-wrap");
 			var $target = $(e.target);
-			var maxScrollWidth = $target[0].scrollWidth - $target[0].clientWidth - 1;
-			var scrollLeft = $target.scrollLeft();
-			if (scrollLeft > self.lastGridScrollLeft)
-			{
-				if (scrollLeft - self.lastGridScrollLeft <= 40)
-				{
-					scrollLeft = self.lastGridScrollLeft + 40;
-					if (scrollLeft > maxScrollWidth)
-					{
-						scrollLeft = maxScrollWidth;
-					}
-				}
-			}
-			else if (scrollLeft < self.lastGridScrollLeft)
-			{
-				if (scrollLeft <= 40)	
-				{
-					scrollLeft = 0;
-				}
-				else
-				{
-					scrollLeft = self.lastGridScrollLeft - 40;
-				}
-			}
-			self.lastGridScrollLeft = scrollLeft;
-			gridBody.scrollLeft(scrollLeft);
+			gridBody.scrollLeft($target.scrollLeft());
+			self.lastGridScrollLeft = $target.scrollLeft();
 			if (self.$summaryContainer)
 			{
-				self.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
+				self.$summaryContainer.find(".k-grid-content").scrollLeft($target.scrollLeft());
 			}
 			clearTimeout(timeoutEvent);
 			timeoutEvent = setTimeout(function()
 			{
-				gridBody.scrollLeft(scrollLeft);
+				gridBody.scrollLeft($target.scrollLeft());
 			}, 50);
 		});
 		//VIEW-1244 Cursor appears outside of inputs
@@ -4288,6 +4265,46 @@
 					}
 				}
 			});
+	};
+
+	LightKendoGrid.prototype._increaseHorizontalScrollSpeed = function()
+	{
+		var self = this;
+		self.lastGridScrollLeft = 0;
+		var gridBody = self.$container.find(".k-virtual-scrollable-wrap");
+		//ENT-482 Scroll faster when using the left and right arrows
+		$(gridBody).keydown(function(e, a, b, c)
+		{
+			if (e.which == 37     // left 
+				|| e.which == 39     // right
+			)
+			{
+				var $target = $(e.currentTarget);
+				var maxScrollWidth = $target[0].scrollWidth - $target[0].clientWidth;
+				var scrollLeft = $target.scrollLeft();
+				if (e.which == 39)
+				{
+					scrollLeft = self.lastGridScrollLeft + 40;
+					if (scrollLeft > maxScrollWidth)
+					{
+						scrollLeft = maxScrollWidth;
+					}
+				}
+				else if (e.which == 37)
+				{
+					if (scrollLeft <= 40)	
+					{
+						scrollLeft = 0;
+					}
+					else
+					{
+						scrollLeft = self.lastGridScrollLeft - 40;
+					}
+				}
+				gridBody.scrollLeft(scrollLeft);
+				self.lastGridScrollLeft = scrollLeft;
+			}
+		});
 	};
 
 	LightKendoGrid.prototype._onGridItemClick = function(dataItem, e)
