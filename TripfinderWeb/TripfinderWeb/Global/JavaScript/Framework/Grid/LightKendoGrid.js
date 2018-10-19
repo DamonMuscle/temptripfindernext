@@ -101,8 +101,9 @@
 		self.obTempOmitExcludeAnyIds = ko.observable([]);
 		self.obTempOmitExcludeAnyIds.subscribe(self._omitIdsChange, self);
 		self.getSelectedIds = ko.observableArray([]);
-		self.getSelectedIds.subscribe(self._selectedIdsChange, self);
 		self.getSelectedRecords = ko.observableArray([]);
+		self.obSelectedIndex = ko.observable(-1);
+		self.getSelectedIds.subscribe(self._selectedIdsChange, self);
 		self._obSortedItems = ko.observableArray([]);
 
 		self.onDoubleClick = new TF.Events.Event();
@@ -137,6 +138,16 @@
 
 		self.onEnterPress = new TF.Events.Event();
 		tf.shortCutKeys.bind("enter", function(e, keyCombination) { self.onEnterPress.notify(keyCombination, e); }, self.options.routeState);
+
+		if (self.options.selectable)
+		{
+			tf.shortCutKeys.bind("up", function() { self.moveSelectedIndex(null, -1); }, self.options.routeState);
+			tf.shortCutKeys.bind("down", function() { self.moveSelectedIndex(null, 1); }, self.options.routeState);
+			tf.shortCutKeys.bind("ctrl+home", function() { self.moveSelectedIndex(0); }, self.options.routeState);
+			tf.shortCutKeys.bind("ctrl+end", function() { self.moveSelectedIndex(self.obFilteredRecordCount()); }, self.options.routeState);
+			tf.shortCutKeys.bind("pageup", function() { self.moveSelectedIndex(null, -16); }, self.options.routeState);
+			tf.shortCutKeys.bind("pagedown", function() { self.moveSelectedIndex(null, 16); }, self.options.routeState);
+		}
 
 		self.obFilteredRecordCount = ko.observable(0);
 		self.obTotalRecordCount = ko.observable(0);
@@ -180,13 +191,13 @@
 			this.rebuildGrid();
 		}
 		this.getSelectedIds([]);
-		this.getSelectedRecords([]);
 	};
 
 	LightKendoGrid.prototype.onChange = function(e)
 	{
 		var self = this,
-			records = $.map(self.getSelectedIds(), function(item)
+			ids = self.getSelectedIds(),
+			records = $.map(ids, function(item)
 			{
 				return self.kendoGrid.dataSource.get(item);
 			}),
@@ -204,8 +215,6 @@
 			});
 
 		self.onRowsChangeCheck.notify(selectedItems);
-
-		self.getSelectedRecords(records);
 		self.onRowsChanged.notify(records);
 		if (self.options.onSelectRowChange)
 		{
@@ -416,7 +425,6 @@
 					return Promise.resolve(false);
 				}
 				this.getSelectedIds([]);
-				this.getSelectedRecords([]);
 				this.overlayShow = true;
 				this.obTempOmitExcludeAnyIds([]);
 				var kendoOptions = this.kendoGrid.getOptions();
@@ -3686,11 +3694,22 @@
 				this.kendoGrid.select(selected);
 			}
 			self._refreshGridBlank();
+
+			var ids = self.getSelectedIds(),
+				records = $.map(ids, function(item)
+				{
+					return self.kendoGrid.dataSource.get(item);
+				});
+
+			self.getSelectedRecords(records);
+			self.obSelectedIndex(ids.length ? self.obAllIds().indexOf(ids[0]) : -1);
 		}
+
 		self.getSelectedIds().forEach(function(id)
 		{
 			idsHash[id] = id;
 		});
+
 		this.idsHash = idsHash;
 		this._resetPageInfoSelect();
 	};
@@ -3891,6 +3910,51 @@
 		{
 			this.getSelectedIds(data);
 		}.bind(this));
+	};
+
+	LightKendoGrid.prototype.moveSelectedIndex = function(target, step)
+	{
+		target = target == null ? this.obSelectedIndex() : target;
+		step = step || 0;
+		this.setSelectedIndex(target + step);
+		this.scrollToSelection();
+	};
+
+	LightKendoGrid.prototype.setSelectedIndex = function(value)
+	{
+		var length = this.obFilteredRecordCount();
+		if (!length) return;
+
+		value = Math.max(Math.min(length - 1, value), 0);
+		var id = this.obAllIds()[value];
+		this.getSelectedIds([id]);
+	};
+
+	LightKendoGrid.prototype.scrollToSelection = function()
+	{
+		var index = this.obSelectedIndex(),
+			itemHeight = this.getItemHeight(),
+			newScrollTop = index * itemHeight,
+			content = this.kendoGrid.content,
+			viewPortHeight = content.find('.k-virtual-scrollable-wrap')[0].clientHeight,
+			vScrollbar = content.find(".k-scrollbar-vertical"),
+			maxScrollTop = (this.obFilteredRecordCount() * itemHeight - viewPortHeight),
+			maxVScrollbarScrollTop = vScrollbar.prop("scrollHeight") - vScrollbar.height(),
+			scrollTopRate = maxVScrollbarScrollTop / maxScrollTop,
+			currentScrollTop = vScrollbar.scrollTop() / scrollTopRate;
+
+		if (newScrollTop == currentScrollTop ||
+			(newScrollTop > currentScrollTop && newScrollTop + itemHeight <= currentScrollTop + viewPortHeight))
+		{
+			return;
+		}
+
+		if (newScrollTop + itemHeight > currentScrollTop + viewPortHeight)
+		{
+			newScrollTop = newScrollTop - viewPortHeight + itemHeight;
+		}
+
+		vScrollbar.scrollTop(newScrollTop * scrollTopRate);
 	};
 
 	LightKendoGrid.prototype.onCtrlIPress = function(e, keyCombination)
@@ -4312,6 +4376,13 @@
 		}
 	};
 
+	LightKendoGrid.prototype.getItemHeight = function()
+	{
+		var $trs = this.$container.find('.k-virtual-scrollable-wrap table tr');
+		if (!$trs.length) return 0;
+		return this._caculateFillItemHeight($trs);
+	};
+
 	LightKendoGrid.prototype._fullfillGridBlank = function()
 	{
 		var self = this;
@@ -4377,16 +4448,13 @@
 
 	LightKendoGrid.prototype._getFillItemColor = function($tr)
 	{
-		var self = this;
 		var $td = $($tr.find('td')[0]);
 		return $td.css('background-color');
 	};
 
 	LightKendoGrid.prototype.clearSelection = function()
 	{
-		//need clear selection manually.
 		this.getSelectedIds([]);
-		this.getSelectedRecords([]);
 	};
 
 	LightKendoGrid.prototype.getDefaultCheckedRecords = function(items)
