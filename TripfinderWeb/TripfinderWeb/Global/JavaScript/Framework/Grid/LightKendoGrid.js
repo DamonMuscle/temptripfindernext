@@ -141,8 +141,11 @@
 
 		if (self.options.selectable)
 		{
+
 			tf.shortCutKeys.bind("up", function() { self.moveSelectedIndex(null, -1); }, self.options.routeState);
 			tf.shortCutKeys.bind("down", function() { self.moveSelectedIndex(null, 1); }, self.options.routeState);
+			tf.shortCutKeys.bind("right", function() { self.horizontalMoveScrollBar(false); }, self.options.routeState);
+			tf.shortCutKeys.bind("left", function() { self.horizontalMoveScrollBar(true); }, self.options.routeState);
 			tf.shortCutKeys.bind("ctrl+home", function() { self.moveSelectedIndex(0); }, self.options.routeState);
 			tf.shortCutKeys.bind("ctrl+end", function() { self.moveSelectedIndex(self.obFilteredRecordCount()); }, self.options.routeState);
 			tf.shortCutKeys.bind("pageup", function() { self.moveSelectedIndex(null, -16); }, self.options.routeState);
@@ -4267,44 +4270,35 @@
 			});
 	};
 
-	LightKendoGrid.prototype._increaseHorizontalScrollSpeed = function()
+	LightKendoGrid.prototype.horizontalMoveScrollBar = function(isLeft)
 	{
-		var self = this;
-		self.lastGridScrollLeft = 0;
-		var gridBody = self.$container.find(".k-virtual-scrollable-wrap");
 		//ENT-482 Scroll faster when using the left and right arrows
-		$(gridBody).keydown(function(e, a, b, c)
+		var self = this;
+		var gridBody = self.$container.find(".k-virtual-scrollable-wrap");
+		var $target = $(gridBody);
+		var maxScrollWidth = $target[0].scrollWidth - $target[0].clientWidth;
+		var scrollLeft = $target.scrollLeft();
+		if (!isLeft)
 		{
-			if (e.which == 37     // left 
-				|| e.which == 39     // right
-			)
+			scrollLeft = self.lastGridScrollLeft + 40;
+			if (scrollLeft > maxScrollWidth)
 			{
-				var $target = $(e.currentTarget);
-				var maxScrollWidth = $target[0].scrollWidth - $target[0].clientWidth;
-				var scrollLeft = $target.scrollLeft();
-				if (e.which == 39)
-				{
-					scrollLeft = self.lastGridScrollLeft + 40;
-					if (scrollLeft > maxScrollWidth)
-					{
-						scrollLeft = maxScrollWidth;
-					}
-				}
-				else if (e.which == 37)
-				{
-					if (scrollLeft <= 40)	
-					{
-						scrollLeft = 0;
-					}
-					else
-					{
-						scrollLeft = self.lastGridScrollLeft - 40;
-					}
-				}
-				gridBody.scrollLeft(scrollLeft);
-				self.lastGridScrollLeft = scrollLeft;
+				scrollLeft = maxScrollWidth;
 			}
-		});
+		}
+		else
+		{
+			if (scrollLeft <= 40)	
+			{
+				scrollLeft = 0;
+			}
+			else
+			{
+				scrollLeft = self.lastGridScrollLeft - 40;
+			}
+		}
+		gridBody.scrollLeft(scrollLeft);
+		self.lastGridScrollLeft = scrollLeft;
 	};
 
 	LightKendoGrid.prototype._onGridItemClick = function(dataItem, e)
