@@ -4808,15 +4808,18 @@
 		window.open("#/?id=" + data.entitySelectId, "new-detailWindow_" + $.now());
 	};
 
+	/**
+	 * The close detail function.
+	 * @return {void}
+	 */
 	DetailViewViewModel.prototype.closeDetailClick = function(data, e)
 	{
 		var self = this;
 		self.onCloseDetailEvent.notify();
 	};
+
 	/**
 	 * The close edit detail model function.
-	 * @param {Object} data
-	 * @param {Event} e
 	 * @return {void}
 	 */
 	DetailViewViewModel.prototype.closeEditMode = function()
