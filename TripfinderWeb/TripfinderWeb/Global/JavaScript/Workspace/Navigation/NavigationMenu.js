@@ -799,6 +799,16 @@
 				});
 			}
 		}
+		else if (pageType === "changePassword")
+		{
+			tf.PasswordChangeModalViewModel(tf.pageManager.currentDatabaseName());
+			self.closeOpenedNavigationItemMenu(false);
+
+			if (TF.isPhoneDevice)
+			{
+				self.closeNavigation();
+			}
+		}
 	};
 
 	/**

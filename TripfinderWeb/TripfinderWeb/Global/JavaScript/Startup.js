@@ -230,6 +230,17 @@
 			}.bind(this));
 	};
 
+	tf.PasswordChangeModalViewModel = function()
+	{
+		return tf.modalManager.showModal(
+			new TF.Modal.PasswordChangeModalViewModel('aaa')
+		)
+			.then(function(datasource)
+			{
+				return Promise.resolve(true);
+			}.bind(this));
+	};
+
 	function Startup() { }
 	Startup.prototype.start = function()
 	{
