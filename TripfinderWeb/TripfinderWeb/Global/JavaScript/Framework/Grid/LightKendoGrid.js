@@ -4154,7 +4154,6 @@
 		}
 
 		//VIEW-1299 Grid columns do not move with grid header when tabbing through Quick Filter bar
-		self._increaseHorizontalScrollSpeed();
 		var timeoutEvent;
 		self.lastGridScrollLeft = 0;
 		self.$container.find(".k-grid-header-wrap").unbind('scroll.autoScrollOnFocus').bind('scroll.autoScrollOnFocus', function(e)
