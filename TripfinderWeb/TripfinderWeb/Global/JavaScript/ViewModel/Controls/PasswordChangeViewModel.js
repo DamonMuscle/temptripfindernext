@@ -19,48 +19,23 @@
 
 	PasswordChangeViewModel.prototype.apply = function()
 	{
-		return this.changeDataSource();
+		var ans;
+		ans = true;
+		return Promise.resolve(ans);
 	};
 
 	PasswordChangeViewModel.prototype.init = function(model, element)
 	{
-		// tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
-		// 	.then(function(apiResponse)
-		// 	{
-		// 		var datasources = Enumerable.From(apiResponse.Items).Where(function(c)
-		// 		{
-		// 			return c.IsSQLServer == true && c.DbfullVersion >= 12000025;
-		// 		}.bind(this)).ToArray();
-		// 		var datasource = Enumerable.From(datasources).Where(function(c)
-		// 		{
-		// 			return c.Id == this.databaseId;
-		// 		}.bind(this)).ToArray()[0];
-		// 		this.datasources(datasources);
-		// 		this.selectedDatabase(datasource);
-		// 		this.obSelectedDatabaseText(datasource ? datasource.DatabaseName : "");
-		// 		setTimeout(function()
-		// 		{
-		// 			$(element).find('select:eq(0)').focus();
-		// 		}, 100);
-		// 	}.bind(this));
 	};
 
-	PasswordChangeViewModel.prototype.changeDataSource = function()
-	{
-		// var ans;
-		// if (this.selectedDatabase() && (this.selectedDatabase().Id == this.databaseId))
-		// {
-		// 	ans = false;
-		// }
-		// else
-		// {
-		// 	ans = this.selectedDatabase();
-		// 	ga('send', 'event', 'Action', '	Data Source', ans.DatabaseName);
-		// }
-		// return Promise.resolve(ans);
-	};
 
 	PasswordChangeViewModel.prototype.cleanErrorMessage = function()
-	{ }
+	{
+		var self = this;
+		self.obCurrentPasswordWarning(false);
+		self.obNewPasswordWarning(false);
+		self.obConfirmNewPasswordWarning(false);
+		self.obChangePasswordErrorMessage(false);
+	}
 
 })();
