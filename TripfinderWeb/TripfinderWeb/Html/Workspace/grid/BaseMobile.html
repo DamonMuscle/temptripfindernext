@@ -30,55 +30,55 @@
 			<div style="clear:both">
 				<!--ko if:!$parent.obCanOperation()-->
 				<!--ko if: $parent.obMapCanOperation()-->
-				<div class="iconbutton gridview" title="Grid View" data-bind="click:gridIconClicked,css:{open:!obShowSplitmap()}"></div>
+				<button class="iconbutton gridview" title="Grid View" data-bind="click:gridIconClicked,css:{open:!obShowSplitmap()}"></button>
 				<!--ko ifnot:type == 'document'-->
-				<div class="iconbutton mapview" title="Map View" data-bind="click:mapIconClicked,css:{open:obShowSplitmap()}"></div>
+				<button class="iconbutton mapview" title="Map View" data-bind="click:mapIconClicked,css:{open:obShowSplitmap()}"></button>
 				<!--/ko-->
 				<!--ko if:type == 'document'-->
-				<div class="iconbutton directory" title="Directory View" data-bind="click:directoryIconClicked,css:{open:obShowSplitmap()}"></div>
+				<button class="iconbutton directory" title="Directory View" data-bind="click:directoryIconClicked,css:{open:obShowSplitmap()}"></button>
 				<!--/ko-->
 				<div class="divider"></div>
 				<!--/ko-->
-				<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
-				<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
-				<div class="divider"></div>
 				<!--ko if: searchGrid.obLayoutFilterOperation()-->
-				<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
-				<!-- /ko -->
+				<button class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></button>
+				<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></button>
 				<div class="divider"></div>
-				<div class="iconbutton view" title="View" data-bind="click:viewClick, css:obIsSelectRow()?'':'disabled'"></div>
+				<button class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></button>
+				<div class="divider"></div>
+				<!-- /ko -->
+				<button class="iconbutton view" title="View" data-bind="click:viewClick, css:obIsSelectRow()?'':'disabled'"></button>
 				<!-- /ko -->
 				<!--ko if:$parent.obOnlyLayout()-->
-				<div class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></div>
-				<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></div>
+				<button class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></button>
+				<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns" data-bind="click:searchGrid.addRemoveColumnClick"></button>
 				<div class="divider"></div>
-				<div class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></div>
+				<button class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></button>
 				<!-- /ko -->
 				<!--ko if:$parent.obEditDivider()-->
 				<div class="divider"></div>
 				<!-- /ko -->
 				<!--ko if:$parent.obCanEdit()-->
-				<div class="iconbutton pencil" title="Edit" data-bind="click:editClick,css:obIsSelectRow()?'':'disabled'"></div>
-				<div class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, css:obIsSelectRow()?'':'disabled'"></div>
+				<button class="iconbutton pencil" title="Edit" data-bind="click:editClick,css:obIsSelectRow()?'':'disabled'"></button>
+				<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, css:obIsSelectRow()?'':'disabled'"></button>
 				<!-- /ko -->
 				<!--ko if:$parent.obCanCopy()-->
 				<div class="divider"></div>
-				<div class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, css:(obIsSelectRow()&&(!!$data.obIsSingleSelect?obIsSingleSelect():true))?'':'disabled'"></div>
+				<button class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, css:(obIsSelectRow()&&(!!$data.obIsSingleSelect?obIsSingleSelect():true))?'':'disabled'"></button>
 				<!-- /ko -->
 				<!--ko if:$parent.obAddDivider()-->
 				<div class="divider"></div>
 				<!-- /ko -->
 				<!--ko if:$parent.obCanAddNew()-->
-				<div class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'}"></div>
+				<button class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'}"></button>
 				<!-- /ko -->
 				<!--ko if:$parent.obPrintDivider()-->
 				<div class="divider"></div>
 				<!-- /ko -->
 				<!--ko if:$parent.obCanPrint && $parent.obCanPrint()-->
-				<div class="iconbutton print" title="Print" data-bind="click:printClick"></div>
+				<button class="iconbutton print" title="Print" data-bind="click:printClick"></button>
 				<!-- /ko -->
 				<!--ko if:$parent.obCanOpenNewGrid()-->
-				<div class="iconbutton newGrid pull-right" style="width:16px; margin-right:-5px;" data-bind="click:newGridClick, attr:{title: $parent.obTooltipOpenNewGrid || 'Open New Grid'}"></div>
+				<button class="iconbutton newGrid pull-right" style="width:16px; margin-right:-5px;" data-bind="click:newGridClick, attr:{title: $parent.obTooltipOpenNewGrid || 'Open New Grid'}"></button>
 				<!-- /ko -->
 			</div>
 			<div style="clear:both">
