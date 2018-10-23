@@ -75,6 +75,7 @@
 							{
 								if (apiResponse.Items[0])
 								{
+									ga('send', 'event', 'Action', 'Password Changed');
 									return this.passwordChangeViewModel.apply()
 										.then(function(result)
 										{

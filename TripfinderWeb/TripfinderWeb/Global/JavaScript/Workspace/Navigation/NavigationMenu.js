@@ -532,6 +532,7 @@
 
 		if (type === "messages")
 		{
+			ga('send', 'event', 'Area', 'Message');
 			if (TF.isPhoneDevice)
 			{
 				self.closeNavigation();
@@ -1129,10 +1130,10 @@
 			url = location.origin + "/" + routeName,
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 
+		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 		window.open(url, requireNewTab ? "_blank" : "_self");
 		self.toggleAppSwitcherMenu(false);
 	};
-
 
 	/**
 	 * The dispose function.

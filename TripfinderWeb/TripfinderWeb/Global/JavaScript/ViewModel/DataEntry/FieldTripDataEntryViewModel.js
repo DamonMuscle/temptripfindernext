@@ -525,6 +525,11 @@
 			return;
 		}
 
+		if (this.obEntityDataModel().id() > 0)
+		{
+			ga('send', 'event', 'Action', 'Edit Trip');
+		}
+
 		return namespace.BaseDataEntryViewModel.prototype.load.call(this)
 			.then(function()
 			{

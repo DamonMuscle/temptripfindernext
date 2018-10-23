@@ -112,7 +112,7 @@
 
 	FieldTripResourcesHelper.prototype.resourcesTotalComputer = function()
 	{
-		var resourcesTotal = 0;
+		var resourcesTotal = 0, fixedCost = this.obEntityDataModel().fixedCost() || 0, minimumCost = this.obEntityDataModel().minimumCost();
 		if (this.obFieldTripResourceGroupData())
 		{
 			for (var i = 0; i < this.obFieldTripResourceGroupData().length; i++)
@@ -121,13 +121,13 @@
 			}
 		}
 
-		if (resourcesTotal + parseFloat(this.obEntityDataModel().fixedCost()) < parseFloat(this.obEntityDataModel().minimumCost()))
+		if (resourcesTotal + fixedCost < minimumCost)
 		{
-			resourcesTotal = parseFloat(this.obEntityDataModel().minimumCost());
+			resourcesTotal = minimumCost;
 		}
 		else
 		{
-			resourcesTotal += parseFloat(this.obEntityDataModel().fixedCost());
+			resourcesTotal += fixedCost;
 		}
 
 		return '$' + this.formatCurrency(resourcesTotal);
