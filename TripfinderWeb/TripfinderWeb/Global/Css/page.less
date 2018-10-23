@@ -130,12 +130,19 @@ body {
 				.scheduler-container {
 					height: 100%;
 
-					div.selected {
-						border-color: black !important;
+					div.k-event{
+						border-color: rgb(213, 213, 213) !important;
+						&.selected {
+							border-color: black !important;
+						}
 					}
 
 					td.selected {
 						border: 1px solid black !important;
+					}
+
+					.k-scheduler-mark{
+						border: 1px solid rgb(213, 213, 213);
 					}
 				}
 
