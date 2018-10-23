@@ -60,7 +60,7 @@
 				}
 			};
 
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "user", userId, "checkpassword"), checkPasswordData)
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "user", "checkpassword"), checkPasswordData)
 				.then(function(apiResponse)
 				{
 					if (apiResponse.Items[0])
