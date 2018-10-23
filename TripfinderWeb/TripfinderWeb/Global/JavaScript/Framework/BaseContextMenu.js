@@ -208,7 +208,10 @@
 		clearTimeout(self._timer);
 		tf.pageManager.obContextMenuVisible(false);
 		self._$container.remove();
-		self._target.removeClass("contextmenu-open");
+		if ($("#contextmenu-wrapper .tf-contextmenu").length <= 0)
+		{
+			self._target.removeClass("contextmenu-open");
+		}
 		$(window).off("resize.contextmenu");
 		$(document).unbind("mousemove", self._mouseout);
 	};
