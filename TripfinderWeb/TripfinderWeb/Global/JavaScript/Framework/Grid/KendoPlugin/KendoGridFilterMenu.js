@@ -98,10 +98,6 @@
 		this.obQuickFilterBarCheckIcon = ko.observable("menu-item-checked");
 
 		this.initReminder();
-		if (this.pageType === "fieldtrips")
-		{
-			this.initFieldTripStageFilters();
-		}
 	};
 
 	KendoGridFilterMenu.prototype.getStorageKeyId = function()
@@ -112,25 +108,31 @@
 	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
 	{
 		var stageIds = [];
-		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
+		if (this.pageType == "myrequests"
+			|| this.pageType == "fieldtrips"
+			|| tf.authManager.authorizationInfo.isAdmin
+			|| tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
 		{
 			stageIds = [101, 100, 99, 98, 7, 6, 5, 4, 3, 2, 1];
 		}
-		else if (tf.authManager.isAuthorizedFor("level4Administrator", "read"))
+		else if (this.pageType == "approvals")
 		{
-			stageIds = [7, 6, 5, 4];
-		}
-		else if (tf.authManager.isAuthorizedFor("level3Administrator", "read"))
-		{
-			stageIds = [5, 4, 3, 2];
-		}
-		else if (tf.authManager.isAuthorizedFor("level2Administrator", "read"))
-		{
-			stageIds = [3, 2, 1];
-		}
-		else if (tf.authManager.isAuthorizedFor("level1Administrator", "read"))
-		{
-			stageIds = [1];
+			if (tf.authManager.isAuthorizedFor("level4Administrator", "read"))
+			{
+				stageIds = [7, 6, 5, 4, 3, 2, 1];
+			}
+			else if (tf.authManager.isAuthorizedFor("level3Administrator", "read"))
+			{
+				stageIds = [5, 4, 3, 2, 1];
+			}
+			else if (tf.authManager.isAuthorizedFor("level2Administrator", "read"))
+			{
+				stageIds = [3, 2, 1];
+			}
+			else if (tf.authManager.isAuthorizedFor("level1Administrator", "read"))
+			{
+				stageIds = [1];
+			}
 		}
 		this.selectedFieldTripStageFilters($.extend([], stageIds));
 		this.obFieldTripStageFilters(stageIds);
