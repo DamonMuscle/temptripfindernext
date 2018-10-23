@@ -3920,6 +3920,12 @@
 		target = target == null ? this.obSelectedIndex() : target;
 		step = step || 0;
 		this.setSelectedIndex(target + step);
+		if (TF.isIE)
+		{
+			setTimeout(this.scrollToSelection.bind(this), 100);
+			return;
+		}
+
 		this.scrollToSelection();
 	};
 

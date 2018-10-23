@@ -133,6 +133,12 @@ createNamespace("TF").isPhoneDevice = isPhoneDevice();
 createNamespace("TF").isPortrait = isPortrait();
 createNamespace("TF").isLandscape = isLandscape();
 
+TF.isIE = (function()
+{
+	var ua = window.navigator.userAgent;
+	return ua.indexOf('MSIE ') > -1 || ua.indexOf('Trident/') > -1;
+})();
+
 function getQueryString(name)
 {
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"),
