@@ -43,6 +43,7 @@
 		self.getClients().then(function()
 		{
 			self.loadClientConfig();
+			self.getFieldTripSettings();
 		}.bind(this));
 	};
 
@@ -59,6 +60,19 @@
 						self.obSelectedClientId(item);
 					}
 				}, this);
+			}.bind(this));
+	};
+
+	SettingsConfigurationPage.prototype.getFieldTripSettings = function()
+	{
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripoptionandsetting", "fromini"))
+			.then(function(result)
+			{
+				if (result.Items && result.Items.length > 0)
+				{
+					$(".show-total-cost").prop("checked", result.Items[0].ShowTripTotalCost);
+				}
 			}.bind(this));
 	};
 
@@ -302,14 +316,26 @@
 				{
 					return self.postData().then(function(result)
 					{
-						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "tripfindermessage"), {
+						var settings = {};
+						settings["SHOWTRIPTOTALCOST"] = $(".show-total-cost").prop("checked");
+						var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "tripfindermessage"), {
 							data: {
 								EnglishMessage: $(".option.english.design").hasClass("selected") ? self.englishEditor.value() : $("#EnglishHtmlEditor").val(),
 								SpanishMessage: $(".option.spanish.design").hasClass("selected") ? self.spanishEditor.value() : $("#SpanishHtmlEditor").val(),
 								DisplayOnceDaily: $(".display-once-daily").prop("checked"),
 								APIIsDirty: true
 							}
-						}).then(function()
+						}).then(function(response)
+						{
+							return response;
+						}),
+							p2 = tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "fieldtripoptionandsetting", "fromini"), {
+								data: JSON.stringify(settings)
+							}).then(function(response)
+							{
+								return response;
+							});
+						return Promise.all([p1, p2]).then(function()
 						{
 							if (tf.pageManager.navigationData)
 							{

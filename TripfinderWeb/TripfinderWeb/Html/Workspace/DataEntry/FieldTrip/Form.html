@@ -153,8 +153,10 @@
 							<!-- /ko -->
 						</div>
 						<div class="form-group" id="returnDate">
-							<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedReturnDateTime&&obRequiredFields().EstimatedReturnDateTime.Required?'requirestar':null">Return
-								Date</label>
+							<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedReturnDateTime&&obRequiredFields().EstimatedReturnDateTime.Required?'requirestar':null">
+								Return
+								Date
+							</label>
 							<!-- ko customInput:{type:"Date",value:obEntityDataModel().returnDate,attributes:{class:"form-control",name:"estimatedReturnDate"}} -->
 							<!-- /ko -->
 						</div>
@@ -395,8 +397,10 @@
 						<!--/ko-->
 					</div>
 					<div class="col-xs-12 form-group no-padding-left">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedMiles&&obRequiredFields().EstimatedMiles.Required?'requirestar':null">Estimated
-							Miles</label>
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedMiles&&obRequiredFields().EstimatedMiles.Required?'requirestar':null">
+							Estimated
+							Miles
+						</label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().EstimatedMiles && obRequiredFields().EstimatedMiles.Required)-->
 						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedMiles,attributes:{class:"form-control",required:"required",maxlength:"5",name:"estimatedMiles"}} -->
 						<!-- /ko -->
@@ -418,8 +422,10 @@
 						<!--/ko-->
 					</div>
 					<div class="col-xs-12 form-group no-padding-left">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedHours&&obRequiredFields().EstimatedHours.Required?'requirestar':null">Estimated
-							Hours</label>
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedHours&&obRequiredFields().EstimatedHours.Required?'requirestar':null">
+							Estimated
+							Hours
+						</label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().EstimatedHours && obRequiredFields().EstimatedHours.Required)-->
 						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedHours,attributes:{class:"form-control",required:"required",maxlength:"5",name:"estimatedHours",}} -->
 						<!-- /ko -->
@@ -429,7 +435,14 @@
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
+					<div class="col-xs-12 form-group no-padding-right" data-bind="visible:obShowTotalCost">
+						<label>
+							Total Cost
+						</label>
+						<div data-bind="text:obResourcesTotalComputer">
 				</div>
+			</div>
+		</div>
 			</div>
 		</div>
 		<div class="row form-group gridController">
@@ -608,8 +621,10 @@
 				</div>
 				<div class="row form-group" style="margin-top:20px">
 					<div class="col-xs-12">
-						<label data-bind="css:obRequiredFields()&&obRequiredFields().AideRate&&obRequiredFields().AideRate.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide') + ' Rate'">Bus
-							Aide Rate</label>
+						<label data-bind="css:obRequiredFields()&&obRequiredFields().AideRate&&obRequiredFields().AideRate.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide') + ' Rate'">
+							Bus
+							Aide Rate
+						</label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().AideRate && obRequiredFields().AideRate.Required)-->
 						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().aideRate,attributes:{class:"form-control",required:"required",maxlength:"10",name:"aideRate"}} -->
 						<!-- /ko -->

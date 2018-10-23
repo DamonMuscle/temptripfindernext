@@ -2,11 +2,11 @@
 {
 	createNamespace('TF.Modal').FieldTripViewResourceModalViewModel = FieldTripViewResourceModalViewModel;
 
-	function FieldTripViewResourceModalViewModel(source)
+	function FieldTripViewResourceModalViewModel(source, obEntity)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.contentTemplate('modal/fieldtripViewResourcecontrol');
-		this.fieldTripViewResourceViewModel = new TF.Control.FieldTripViewResourceViewModel(source);
+		this.fieldTripViewResourceViewModel = new TF.Control.FieldTripViewResourceViewModel(source, obEntity);
 		this.data(this.fieldTripViewResourceViewModel);
 		this.sizeCss = "modal-dialog-lg";
 

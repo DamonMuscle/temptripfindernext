@@ -2,11 +2,11 @@
 {
 	createNamespace('TF.Control').FieldTripViewResourceViewModel = FieldTripViewResourceViewModel;
 
-	function FieldTripViewResourceViewModel(source)
+	function FieldTripViewResourceViewModel(source, obEntity)
 	{
 		this.obResoucesExpand = ko.observable(true);
 		this.obFieldTripResourceGroupData = source;
-
+		this.obEntityDataModel = obEntity;
 
 		$.extend(this, new TF.Helper.FieldTripResourcesHelper());
 

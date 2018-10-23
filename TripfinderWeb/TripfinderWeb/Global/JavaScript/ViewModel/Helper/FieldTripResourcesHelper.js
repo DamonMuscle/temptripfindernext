@@ -120,6 +120,16 @@
 				resourcesTotal = resourcesTotal + this.resourceSubTotalComputer(this.obFieldTripResourceGroupData()[i]);
 			}
 		}
+
+		if (resourcesTotal + parseFloat(this.obEntityDataModel().fixedCost()) < parseFloat(this.obEntityDataModel().minimumCost()))
+		{
+			resourcesTotal = parseFloat(this.obEntityDataModel().minimumCost());
+		}
+		else
+		{
+			resourcesTotal += parseFloat(this.obEntityDataModel().fixedCost());
+		}
+
 		return '$' + this.formatCurrency(resourcesTotal);
 	}
 

@@ -46,6 +46,10 @@
 		this.obDriversGridSource = ko.observableArray(null);
 		this.obBusAideGridSource = ko.observableArray(null);
 		this.obInvoicingGridViewModel = ko.observable(null);
+		this.obTotalCost = ko.observable(0);
+		this.obShowTotalCost = ko.observable(false);
+		$.extend(this, new TF.Helper.FieldTripResourcesHelper());
+		this.obResourcesTotalComputer = ko.computed(this.resourcesTotalComputer, this);
 
 		this.obResourcesGridViewModel = ko.observable(null);
 		this.obInvoiceResourceId = ko.observable(1);
@@ -403,6 +407,7 @@
 				self.fieldTripAccountList = fieldtripData.FieldTripAccount;
 				self.setAccountListBySchool(null, true);
 				self.obFieldTripSettings(fieldtripData.FieldTripSettings);
+				self.obShowTotalCost(fieldtripData.FieldTripSettings.ShowTripTotalCost);
 				self.obStrictDest(fieldtripData.FieldTripSettings.StrictDest);
 				return true;
 			});
@@ -1221,7 +1226,7 @@
 
 	FieldTripDataEntryViewModel.prototype.viewResourceClick = function(viewModel, e)
 	{
-		tf.modalManager.showModal(new TF.Modal.FieldTripViewResourceModalViewModel(this.obFieldTripResourceGroupData));
+		tf.modalManager.showModal(new TF.Modal.FieldTripViewResourceModalViewModel(this.obFieldTripResourceGroupData, this.obEntityDataModel));
 	};
 
 	FieldTripDataEntryViewModel.prototype.initializeInvoice = function(el)
