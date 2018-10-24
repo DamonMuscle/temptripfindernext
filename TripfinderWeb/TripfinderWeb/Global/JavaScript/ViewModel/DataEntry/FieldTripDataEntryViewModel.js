@@ -133,7 +133,13 @@
 			{
 				return obj ? obj.Name : 0;
 			}), this);
-		this.obCurrentDestinationName = ko.computed(this.setSelectTextComputer("obDestinationDataModels", "destination", function(obj) { return obj.Name; }, function(obj) { return obj.Name; }), this);
+		this.obCurrentDestinationName = ko.computed(this.setSelectTextComputer("obDestinationDataModels", "destination", function(obj) 
+		{
+			return obj.Name;
+		}, function(obj) 
+			{
+				return obj.Name;
+			}), this);
 		this.obSelectedDestination.subscribe(function()
 		{
 			this._fieldsUpdateFromModal("destination", this.obSelectedDestination());
@@ -738,6 +744,16 @@
 						this.obEntityDataModel()[dirtyFields[i]](dirtyModel[dirtyFields[i]]());
 					}
 					this.$form.data('bootstrapValidator').resetForm();
+
+					// FT-711 Check destination name is correct or not
+					var destinationNameInHtml = $(".destinationname").find("input").val();
+					if (destinationNameInHtml != 'undefined' && destinationNameInHtml != null)
+					{
+						if (this.obEntityDataModel().destination() !== destinationNameInHtml)
+						{
+							$(".destinationname").find("input").val(this.obEntityDataModel().destination());
+						}
+					}
 				}
 			}.bind(this));
 		}
@@ -1060,6 +1076,16 @@
 		if (!this.obEntityDataModel().returnDate())
 		{
 			this.obEntityDataModel().estimatedReturnDateTime(null);
+		}
+
+		// FT-711 Check destination name is correct or not
+		var destinationNameInHtml = $(".destinationname").find("input").val();
+		if (destinationNameInHtml != 'undefined' && destinationNameInHtml != null)
+		{
+			if (this.obEntityDataModel().destination() !== destinationNameInHtml)
+			{
+				this.obEntityDataModel().destination(destinationNameInHtml);
+			}
 		}
 		var entity = this.obEntityDataModel().toData();
 		entity.APIIsNew = entity.Id ? false : true;
