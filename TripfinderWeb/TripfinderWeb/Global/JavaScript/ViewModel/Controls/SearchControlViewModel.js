@@ -1200,20 +1200,19 @@
 				self.currentPage = tf.pageManager.resizablePage.obGridData();
 				tf.loadingIndicator.tryHide();
 			}
+
 			if (self.currentPage.detailView && !self.currentPage.detailView.isReadMode())
 			{
 				tf.promiseBootbox.alert("Please close edit mode before viewing detail of search result.");
 				return;
 			}
-			else
+
+			self.currentPage.showDetailsClick(model.Id);
+			self.currentPage.selectRowInGridById(model.Id);
+			if (TF.isMobileDevice)
 			{
-				self.currentPage.showDetailsClick(model.Id);
-				self.currentPage.selectRowInGridById(model.Id);
-				if (TF.isMobileDevice)
-				{
-					$(".navigation-container.mobile").empty();
-					$(".navigation-container").removeClass("mobile");
-				}
+				$(".navigation-container.mobile").empty();
+				$(".navigation-container").removeClass("mobile");
 			}
 			self.updateRecentSearches();
 		});

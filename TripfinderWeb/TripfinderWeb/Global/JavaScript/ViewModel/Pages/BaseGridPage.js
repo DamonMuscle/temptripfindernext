@@ -478,23 +478,24 @@
 
 	BaseGridPage.prototype.selectRowInGridById = function(id)
 	{
-		if (TF.isMobileDevice)
+		if (TF.isMobileDevice || !this.searchGrid)
 		{
 			return;
 		}
-		var self = this, curSelectedIds = self.selectedRecordIds;
 
+		var curSelectedIds = this.selectedRecordIds;
 		if (curSelectedIds.length === 1 && curSelectedIds[0] === id)
 		{
 			return;
 		}
-		else if (curSelectedIds.length > 0)
+
+		if (curSelectedIds.length > 0)
 		{
-			self.searchGrid.kendoGrid.clearSelection();
+			this.searchGrid.kendoGrid.clearSelection();
 		}
 
-		self.searchGrid.getSelectedIds([id]);
-		self.searchGrid.isRowSelectedWhenInit = true;
+		this.searchGrid.getSelectedIds([id]);
+		this.searchGrid.isRowSelectedWhenInit = true;
 	};
 
 	BaseGridPage.prototype.initSearchGridCompute = function()
