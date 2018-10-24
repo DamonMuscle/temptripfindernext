@@ -112,7 +112,7 @@
 
 	FieldTripResourcesHelper.prototype.resourcesTotalComputer = function()
 	{
-		var resourcesTotal = 0, fixedCost = this.obEntityDataModel().fixedCost() || 0, minimumCost = this.obEntityDataModel().minimumCost();
+		var resourcesTotal = 0, fixedCost = parseFloat(this.obEntityDataModel().fixedCost() || 0), minimumCost = parseFloat(this.obEntityDataModel().minimumCost() || 0);
 		if (this.obFieldTripResourceGroupData())
 		{
 			for (var i = 0; i < this.obFieldTripResourceGroupData().length; i++)
