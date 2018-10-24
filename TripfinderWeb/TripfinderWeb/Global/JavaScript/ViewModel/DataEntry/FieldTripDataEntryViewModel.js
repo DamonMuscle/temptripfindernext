@@ -1215,6 +1215,7 @@
 		}.bind(this));
 
 		this.ReloadResources();
+		this.obFieldTripResourceGroupData.valueHasMutated();
 	};
 
 	FieldTripDataEntryViewModel.prototype.applyVehicleClick = function(viewModel, e)
@@ -1223,10 +1224,10 @@
 		{
 			item.VehFixedCost = this.obEntityDataModel().vehFixedCost();
 			item.MileageRate = this.obEntityDataModel().mileageRate();
-
 		}.bind(this));
 
 		this.ReloadResources();
+		this.obFieldTripResourceGroupData.valueHasMutated();
 	};
 
 	FieldTripDataEntryViewModel.prototype.applyDriverClick = function(viewModel, e)
@@ -1240,6 +1241,7 @@
 		}.bind(this));
 
 		this.ReloadResources();
+		this.obFieldTripResourceGroupData.valueHasMutated();
 	};
 
 	FieldTripDataEntryViewModel.prototype.applyAideClick = function(viewModel, e)
@@ -1253,6 +1255,7 @@
 		}.bind(this));
 
 		this.ReloadResources();
+		this.obFieldTripResourceGroupData.valueHasMutated();
 	};
 
 	FieldTripDataEntryViewModel.prototype.viewResourceClick = function(viewModel, e)
