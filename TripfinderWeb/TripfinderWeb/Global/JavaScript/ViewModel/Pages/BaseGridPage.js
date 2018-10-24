@@ -399,7 +399,7 @@
 					statusRow.animate({ marginLeft: containerWidth }, 200);
 				}
 			});
-			$(window).on("resize", function()
+			$(window).on("resize.toolbar", function()
 			{
 				iconRow = self.$element.find(".grid-icons");
 				containerWidth = iconRow.outerWidth();
@@ -857,6 +857,7 @@
 		}
 
 		tf.pageManager.resizablePage.$leftPage.off("focus.shortcutKeys").off("blur.shortcutKeys");
+		$(window).off(".toolbar");
 
 		self.pageLevelViewModel.dispose();
 
