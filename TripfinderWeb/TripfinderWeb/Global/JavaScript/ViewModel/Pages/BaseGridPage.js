@@ -387,6 +387,7 @@
 			statusRow.removeClass("pull-right");
 			detectswipe(self.$element.find(".grid-icons"), function(el, d)
 			{
+				containerWidth = iconRow.outerWidth();
 				if (d === "l" && toolRow.css("marginLeft") === "0px")
 				{
 					toolRow.animate({ marginLeft: -containerWidth }, 200);
@@ -396,6 +397,23 @@
 				{
 					toolRow.animate({ marginLeft: 0 }, 200);
 					statusRow.animate({ marginLeft: containerWidth }, 200);
+				}
+			});
+			$(window).on("resize", function()
+			{
+				iconRow = self.$element.find(".grid-icons");
+				containerWidth = iconRow.outerWidth();
+				statusRow = iconRow.find(".grid-staterow-wrap");
+				toolRow = iconRow.find(".iconrow");
+				if (toolRow.css("marginLeft") === "0px")
+				{
+					toolRow.css("marginLeft", "0px");
+					statusRow.css("marginLeft", containerWidth + "px");
+				}
+				else
+				{
+					toolRow.css("marginLeft", -containerWidth + "px");
+					statusRow.css("marginLeft", "0px");
 				}
 			});
 		}
