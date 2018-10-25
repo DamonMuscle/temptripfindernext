@@ -440,7 +440,7 @@
 		{
 			event = e;
 		}
-		if (typeof (event) != "undefined" && event.button === 2)
+		if (typeof (event) != "undefined" && event.button === 2 && !TF.isPhoneDevice)
 		{
 			if (self.kendoSchedule.view().name === "agenda")
 			{

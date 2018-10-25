@@ -46,20 +46,23 @@
 
 	ReportsPage.prototype._openBulkMenu = function()
 	{
-		var self = this;
-		self.$element.delegate("table.k-selectable tr", "contextmenu", function(e)
+		if (!TF.isPhoneDevice)
 		{
-			$(e.currentTarget).trigger('click');
-			self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
-			var $virsualTarget = $("<div></div>").css(
-				{
-					position: "absolute",
-					left: e.clientX,
-					top: e.clientY
-				});
-			$("body").append($virsualTarget);
-			tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid", self.type, "bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid)));
-		}.bind(this));
+			var self = this;
+			self.$element.delegate("table.k-selectable tr", "contextmenu", function(e)
+			{
+				$(e.currentTarget).trigger('click');
+				self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
+				var $virsualTarget = $("<div></div>").css(
+					{
+						position: "absolute",
+						left: e.clientX,
+						top: e.clientY
+					});
+				$("body").append($virsualTarget);
+				tf.contextMenuManager.showMenu($virsualTarget, new TF.ContextMenu.BulkContextMenu(pathCombine("Workspace/Page/grid", self.type, "bulkmenu"), new TF.Grid.GridMenuViewModel(self, self.searchGrid)));
+			}.bind(this));
+		}
 	};
 
 	ReportsPage.prototype.sendReportAsMail = function()
