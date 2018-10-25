@@ -4784,7 +4784,6 @@
 		tf.shortCutKeys.unbind("enter", routeState);
 		tf.shortCutKeys.unbind("ctrl+s", routeState);
 		tf.shortCutKeys.unbind("ctrl+c", routeState);
-		tf.shortCutKeys.unbind("enter", routeState);
 
 		if (this.options.selectable && this.options.selectable.indexOf("multiple") != -1)
 		{
