@@ -141,7 +141,6 @@
 
 		if (self.options.selectable)
 		{
-
 			tf.shortCutKeys.bind("up", function() { self.moveSelectedIndex(null, -1); }, self.options.routeState);
 			tf.shortCutKeys.bind("down", function() { self.moveSelectedIndex(null, 1); }, self.options.routeState);
 			tf.shortCutKeys.bind("right", function() { self.horizontalMoveScrollBar(false); }, self.options.routeState);
@@ -4768,6 +4767,38 @@
 		{
 			this.onFieldTripStageChanged.unsubscribeAll();
 		}
+
+		var routeState = this.options.routeState;
+		if (this.options.selectable)
+		{
+			tf.shortCutKeys.unbind("up", routeState);
+			tf.shortCutKeys.unbind("down", routeState);
+			tf.shortCutKeys.unbind("right", routeState);
+			tf.shortCutKeys.unbind("left", routeState);
+			tf.shortCutKeys.unbind("ctrl+home", routeState);
+			tf.shortCutKeys.unbind("ctrl+end", routeState);
+			tf.shortCutKeys.unbind("pageup", routeState);
+			tf.shortCutKeys.unbind("pagedown", routeState);
+		}
+
+		tf.shortCutKeys.unbind("enter", routeState);
+		tf.shortCutKeys.unbind("ctrl+s", routeState);
+		tf.shortCutKeys.unbind("ctrl+c", routeState);
+		tf.shortCutKeys.unbind("enter", routeState);
+
+		if (this.options.selectable && this.options.selectable.indexOf("multiple") != -1)
+		{
+			tf.shortCutKeys.unbind("ctrl+a", routeState);
+			tf.shortCutKeys.unbind("ctrl+i", routeState);
+		}
+
+		if (this.options.showOmittedCount)
+		{
+			tf.shortCutKeys.unbind("ctrl+o", routeState);
+		}
+
+		tf.shortCutKeys.changeHashKey();
+
 		this._onWindowResize = null;
 		for (var i in this.subscriptions)
 		{

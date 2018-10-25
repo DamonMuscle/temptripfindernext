@@ -83,7 +83,7 @@
 			}
 		});
 
-		if (self.isGridPage)
+		if (self.isGridPage && self.searchGrid)
 		{
 			var canceling = false;
 			self.searchGrid.getSelectedIds.subscribe(function()
