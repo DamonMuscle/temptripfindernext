@@ -252,8 +252,10 @@
 										{
 											tf.entStorageManager.save("clientKey", this.loginViewModel.obClientKey());
 											tf.entStorageManager.save("userName", this.loginViewModel.obUsername());
+											tf.entStorageManager.save("password", this.loginViewModel.obPassword());
 											tf.storageManager.save("clientKey", this.loginViewModel.obClientKey(), true);
 											tf.storageManager.save("userName", this.loginViewModel.obUsername(), true);
+											tf.storageManager.save("password", this.loginViewModel.obPassword(), true);
 
 											//set clientKey in case to use it when get all preference
 											tf.authManager.clientKey = this.loginViewModel.obClientKey();

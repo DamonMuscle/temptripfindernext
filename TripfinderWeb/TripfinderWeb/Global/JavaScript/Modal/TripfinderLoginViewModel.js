@@ -29,6 +29,7 @@
 		{
 			this.obClientKey(tf.storageManager.get("clientKey", true) || '');
 			this.obUsername(tf.storageManager.get("userName", true) || '');
+			this.obPassword(tf.storageManager.get("password", true) || '');
 		}
 	}
 

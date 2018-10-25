@@ -14,10 +14,12 @@
 		this.obIsLogIn = ko.observable(false);
 		var clientKey = tf.storageManager.get("clientKey", true) || tf.entStorageManager.get("clientKey");
 		var username = tf.storageManager.get("userName", true);
+		var password = tf.storageManager.get("password", true);
 		this.token = tf.entStorageManager.get("token");
 		var isLoggedin = typeof (tf.entStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.entStorageManager.get("isLoggedin"));
 		this.clientKey = clientKey;
 		this.userName = username;
+		this.password = password;
 		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(this.token);
 
 		if (this._hasLoggedin)
@@ -189,8 +191,11 @@
 				this.password = result.password;
 				tf.entStorageManager.save("clientKey", result.clientKey);
 				tf.entStorageManager.save("userName", result.username);
+				tf.entStorageManager.save("password", result.password);
 				tf.storageManager.save("clientKey", result.clientKey, true);
 				tf.storageManager.save("userName", result.username, true);
+				tf.storageManager.save("password", result.password, true);
+
 				if (tf.datasourceManager.databaseId)
 				{
 					//when the datasource is selected, show all the menus
@@ -216,6 +221,7 @@
 	{
 		this.clientKey = tf.storageManager.get("clientKey", true);
 		this.userName = tf.storageManager.get("userName", true);
+		this.password = tf.storageManager.get("password", true);
 	};
 
 	AuthManager.prototype.getPurchasedProducts = function()
