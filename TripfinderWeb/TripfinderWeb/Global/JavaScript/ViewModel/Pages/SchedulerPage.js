@@ -20,7 +20,6 @@
 		self.selectEventElementIndexInList = null;
 
 		self.schedulerDataSources = [];
-		self.schedulerResources = [];
 		self.schedulerOptions = [];
 
 		self.isSchedulerPage = true;
@@ -644,7 +643,7 @@
 				dataSource: self.getSchedulerDataSources(data),
 				views: self.getSchedulertView(self.extendDays),
 				editable: false,
-				resources: self.getSchedulerResources(data),
+				resources: self.getSchedulerResources(),
 				navigate: function()
 				{
 					self.getScrollBarPosition();
@@ -748,22 +747,57 @@
 		}
 	};
 
-	SchedulerPage.prototype.getSchedulerResources = function(data)
+	SchedulerPage.prototype.getSchedulerResources = function()
 	{
-		var self = this;
-		data.Items.forEach(function(item)
-		{
-			self.schedulerResources.push({
-				"text": item['FieldTripStageName'],
-				"value": item['FieldTripStageId'],
-				"color": tf.fieldTripGridDefinition.gridDefinition().stageFormatter(item['FieldTripStageId'])
-			});
-		});
 		return [
 			{
 				field: "stageId",
 				title: "Trip Stage",
-				dataSource: self.schedulerResources
+				dataSource: [{
+					"text": "Level 1 - Request Submitted",
+					"value": 1,
+					"color": "#FFFF00"
+				}, {
+					"text": "Level 2 - Request Declined",
+					"value": 2,
+					"color": '#FF0000'
+				}, {
+					"text": "Level 3 - Request Declined",
+					"value": 4,
+					"color": '#FF0000'
+				}, {
+					"text": "Level 4 - Request Declined",
+					"value": 6,
+					"color": '#FF0000'
+				}, {
+					"text": "Declined by Transportation",
+					"value": 98,
+					"color": '#FF0000'
+				}, {
+					"text": "Transportation Approved",
+					"value": 99,
+					"color": '#00FF00'
+				}, {
+					"text": "Level 2 - Request Approved",
+					"value": 3,
+					"color": '#E0A080'
+				}, {
+					"text": "Level 3 - Request Approved",
+					"value": 5,
+					"color": '#FF00FF'
+				}, {
+					"text": "Level 4 - Request Approved",
+					"value": 7,
+					"color": '#00FFFF'
+				}, {
+					"text": "Canceled - Request Canceled",
+					"value": 100,
+					"color": '#FFFFFF'
+				}, {
+					"text": "Completed - Request Completed",
+					"value": 101,
+					"color": '#0000FF'
+				}]
 			}
 		]
 	};
