@@ -1098,7 +1098,7 @@
 	SearchControlViewModel.prototype.getSuggestedResultByType = function(type, value, count)
 	{
 		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "bycolumns"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip"), {
 			paramData: {
 				column: self.cardStyle[type] ? self.cardStyle[type].field : type,
 				text: value
