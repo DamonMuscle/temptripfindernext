@@ -47,6 +47,7 @@
 			}
 			return false;
 		}, self);
+		self.supportAutoScroll = false;
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -687,7 +688,10 @@
 	{
 		var self = this;
 		self.selectedRecordIds = [];
-		self.autoScrollInit();
+		if (self.supportAutoScroll)
+		{
+			self.autoScrollInit();
+		}
 
 		if (option && option.IsCallout)
 		{
