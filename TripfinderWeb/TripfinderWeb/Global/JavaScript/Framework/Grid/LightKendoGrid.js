@@ -372,10 +372,6 @@
 	{
 		this.obTempOmitExcludeAnyIds([]);
 		this.getSelectedIds([]);
-		if (this.kendoGrid)
-		{
-			this.kendoGrid.lastClickItemId = 0;
-		}
 		this.allIds = [];
 	};
 
@@ -384,10 +380,6 @@
 		var self = this;
 		self.overlayShow = true;
 		self.getSelectedIds([]);
-		if (self.kendoGrid)
-		{
-			self.kendoGrid.lastClickItemId = 0;
-		}
 		self.allIds = [];
 		if (self.options.showOverlay)
 		{
@@ -1891,10 +1883,6 @@
 
 		this.overlayShow = true;
 		this.getSelectedIds([]);
-		if (this.kendoGrid)
-		{
-			this.kendoGrid.lastClickItemId = 0;
-		}
 		this.allIds = [];
 		if (this.options.showOverlay)
 		{
@@ -3189,10 +3177,6 @@
 				{
 					self.getSelectedIds([]);
 				}
-				if (self.kendoGrid)
-				{
-					self.kendoGrid.lastClickItemId = 0;
-				}
 				self.allIds = [];
 			}
 			self._oldFilterString = newFilterString;
@@ -4307,88 +4291,79 @@
 
 	LightKendoGrid.prototype._onGridItemClick = function(dataItem, e)
 	{
-		var self = this;
-
-		if (dataItem && $.isNumeric(dataItem[self.options.Id]))
+		var self = this,
+			currentId = dataItem ? dataItem[self.options.Id] : null;
+		if (!$.isNumeric(currentId))
 		{
-			if (TF.isMobileDevice && this.options.supportMobileMultipleSelect)
-			{
-				var currentElement = $(e.target);
-				if (currentElement.attr("type") === "checkbox" && currentElement.hasClass("multi-selectable"))
-				{
-					var currentId = dataItem[self.options.Id],
-						checked = currentElement.prop("checked"),
-						existedIndex = self.getSelectedIds.indexOf(currentId);
-					if (checked)
-					{
-						if (existedIndex === -1)
-						{
-							self.getSelectedIds.push(currentId);
-						}
-					}
-					else
-					{
-						if (existedIndex > -1)
-						{
-							self.getSelectedIds.remove(currentId);
-						}
-					}
-					return;
-				}
-			}
+			self._resetPageInfoSelect();
+			return;
+		}
 
-			if (this.options.selectable == "row")
+		if (TF.isMobileDevice && this.options.supportMobileMultipleSelect)
+		{
+			var currentElement = $(e.target);
+			if (currentElement.attr("type") === "checkbox" && currentElement.hasClass("multi-selectable"))
 			{
-				self.getSelectedIds([dataItem[self.options.Id]]);
+				var checked = currentElement.prop("checked"),
+					existedIndex = self.getSelectedIds.indexOf(currentId);
+				if (checked)
+				{
+					if (existedIndex === -1)
+					{
+						self.getSelectedIds.push(currentId);
+					}
+				}
+				else
+				{
+					if (existedIndex > -1)
+					{
+						self.getSelectedIds.remove(currentId);
+					}
+				}
+				return;
+			}
+		}
+
+		if (this.options.selectable == "row")
+		{
+			self.getSelectedIds([currentId]);
+			return;
+		}
+
+		if (e.ctrlKey && this.kendoGrid.options.selectable != "row")
+		{
+			if (Array.contain(self.getSelectedIds(), currentId))
+			{
+				self.getSelectedIds.remove(function(id) { return id === currentId; });
 				return;
 			}
 
-			if (!e.shiftKey)
+			self.getSelectedIds.push(currentId);
+			return;
+		}
+
+		if (e.shiftKey && this.kendoGrid.options.selectable != "row")
+		{
+			var data = self.obAllIds();
+			if (!data || !data.length) return;
+
+			var selectedIndex = self.obSelectedIndex() == -1 ? 0 : self.obSelectedIndex(),
+				currentIndex = data.indexOf(currentId),
+				newSelectedIds = [data[selectedIndex]];
+			if (selectedIndex > currentIndex)
 			{
-				self.kendoGrid.lastClickItemId = dataItem[self.options.Id];
+				newSelectedIds = newSelectedIds.concat(data.slice(currentIndex, selectedIndex));
+			}
+			else
+			{
+				newSelectedIds = newSelectedIds.concat(data.slice(selectedIndex + 1, currentIndex + 1));
 			}
 
-			if (e.ctrlKey && this.kendoGrid.options.selectable != "row")
-			{
-				if (Array.contain(self.getSelectedIds(), dataItem[self.options.Id]))
-					self.getSelectedIds.remove(function(id) { return id === dataItem[self.options.Id]; });
-				else
-					self.getSelectedIds.push(dataItem[self.options.Id]);
-			}
-			else if (e.shiftKey && this.kendoGrid.options.selectable != "row")
-			{
-				self.getIdsWithCurrentFiltering().then(function(data)
-				{
-					var endIndex = 0,
-						startIndex = 0;
-					for (var i = 0; i < data.length; i++)
-					{
-						if (data[i] === self.kendoGrid.lastClickItemId)
-						{
-							startIndex = i;
-						}
-						if (data[i] === dataItem[self.options.Id])
-						{
-							endIndex = i;
-						}
-					}
-					if (startIndex > endIndex)
-					{
-						var temp = endIndex;
-						endIndex = startIndex;
-						startIndex = temp;
-					}
-					self.getSelectedIds(data.slice(startIndex, endIndex + 1));
-				});
-			} else
-			{
-				self.getSelectedIds([dataItem[self.options.Id]]);
-			}
+			self.getSelectedIds(newSelectedIds);
+			return;
 		}
-		else
-		{
-			self._resetPageInfoSelect();
-		}
+
+		self.getSelectedIds([currentId]);
 	};
 
 	LightKendoGrid.prototype.getItemHeight = function()

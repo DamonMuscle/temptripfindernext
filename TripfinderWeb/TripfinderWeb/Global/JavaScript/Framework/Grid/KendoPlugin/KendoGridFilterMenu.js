@@ -761,7 +761,6 @@
 		this.obTempOmitExcludeAnyIds([]);
 		this.obFilteredExcludeAnyIds([]);
 
-		this.kendoGrid.lastClickItemId = 0;
 		this._gridState.filteredIds = null;
 		this._gridState.filterClause = "";
 
