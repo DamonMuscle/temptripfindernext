@@ -71,12 +71,6 @@
 					type: "string"
 				},
 				{
-					FieldName: "Requestor",
-					DisplayName: "Requestor",
-					Width: '150px',
-					type: "string"
-				},
-				{
 					FieldName: "ContactPhone",
 					DisplayName: "Contact Phone",
 					Width: '150px',
