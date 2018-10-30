@@ -14,7 +14,7 @@
 		self.obNewPasswordWarning = ko.observable();
 		self.obConfirmNewPassword = ko.observable();
 		self.obConfirmNewPasswordWarning = ko.observable();
-		self.obChangePasswordErrorMessage = ko.observable();
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
 	PasswordChangeViewModel.prototype.apply = function()
@@ -35,7 +35,6 @@
 		self.obCurrentPasswordWarning(false);
 		self.obNewPasswordWarning(false);
 		self.obConfirmNewPasswordWarning(false);
-		self.obChangePasswordErrorMessage(false);
 	}
 
 })();

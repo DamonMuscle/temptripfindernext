@@ -26,6 +26,13 @@
 	PasswordChangeModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
 	PasswordChangeModalViewModel.prototype.constructor = PasswordChangeModalViewModel;
 
+	PasswordChangeModalViewModel.prototype.init = function(viewModel, el)
+	{
+		var self = this;
+		self._$form = $(el);
+		self.passwordChangeViewModel.pageLevelViewModel.load(self._$form.data("bootstrapValidator"));
+	};
+
 	PasswordChangeModalViewModel.prototype.positiveClick = function(viewModel, e)
 	{
 		var self = this
@@ -35,20 +42,39 @@
 			self.passwordChangeViewModel.obCurrentPasswordWarning("required");
 			passed = false;
 		}
+		else
+		{
+			self.passwordChangeViewModel.obCurrentPasswordWarning("");
+		}
+
 		if (!self.passwordChangeViewModel.obNewPassword() || self.passwordChangeViewModel.obNewPassword().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().trim().length == 0)
 		{
-			self.passwordChangeViewModel.obNewPasswordWarning(true);
+			self.passwordChangeViewModel.obNewPasswordWarning("required");
 			passed = false;
 		}
+		else if (self.passwordChangeViewModel.obNewPassword() === self.passwordChangeViewModel.obCurrentPassword())
+		{
+			self.passwordChangeViewModel.obNewPasswordWarning("cannot be the same as Current Password");
+			passed = false;
+		}
+		else
+		{
+			self.passwordChangeViewModel.obNewPasswordWarning("");
+		}
+
 		if (!self.passwordChangeViewModel.obConfirmNewPassword() || self.passwordChangeViewModel.obConfirmNewPassword().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().trim().length == 0)
 		{
-			self.passwordChangeViewModel.obConfirmNewPasswordWarning(true);
+			self.passwordChangeViewModel.obConfirmNewPasswordWarning("required");
 			passed = false;
 		}
-		if (self.passwordChangeViewModel.obNewPassword() !== self.passwordChangeViewModel.obConfirmNewPassword())
+		else if (self.passwordChangeViewModel.obNewPassword() !== self.passwordChangeViewModel.obConfirmNewPassword())
 		{
-			self.passwordChangeViewModel.obChangePasswordErrorMessage("Confirm new password not match new password!");
+			self.passwordChangeViewModel.obConfirmNewPasswordWarning("must match New Password");
 			passed = false;
+		}
+		else
+		{
+			self.passwordChangeViewModel.obConfirmNewPasswordWarning("");
 		}
 
 		if (passed)
@@ -76,25 +102,35 @@
 								if (apiResponse.Items[0])
 								{
 									ga('send', 'event', 'Action', 'Password Changed');
+									self.passwordChangeViewModel.pageLevelViewModel.popupSuccessMessage("Password Changed.");
 									return this.passwordChangeViewModel.apply()
 										.then(function(result)
 										{
 											if (result)
 											{
-												this.positiveClose(result);
+												self.positiveClose(result);
 											} else
 											{
-												this.negativeClose();
+												self.negativeClose();
 											}
-										}.bind(this));
+										}.bind(self));
 								}
-							}.bind(this));
+							}.bind(self));
 					}
 					else
 					{
-						self.passwordChangeViewModel.obCurrentPasswordWarning("Current password was wrong!");
+						self.passwordChangeViewModel.obCurrentPasswordWarning("Current Password is incorrect.");
 					}
 				}.bind(this));
 		}
+	};
+
+	/**
+	 * Dispose.
+	 */
+	SearchSettingsViewModel.prototype.dispose = function()
+	{
+		var self = this;
+		self.passwordChangeViewModel.pageLevelViewModel.dispose();
 	};
 })();
