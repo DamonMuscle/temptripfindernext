@@ -827,7 +827,7 @@
 			return;
 		}
 
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"), { paramData: { skip: 0, take: 100000 } })
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"))
 			.then(function(data)
 			{
 				if (data && data.Items && data.Items.length)

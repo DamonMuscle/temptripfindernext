@@ -94,7 +94,7 @@
 					</li>
 				</ul>
 			</li>
-			<li class="menu-item" data-bind="visible:gridViewModel.obReports">
+			<li class="menu-item" data-bind="visible:gridViewModel.obReports() && gridViewModel.obReportLists().length>0">
 				<div class="menu-icon report">
 				</div>
 				<div class="menu-label">
