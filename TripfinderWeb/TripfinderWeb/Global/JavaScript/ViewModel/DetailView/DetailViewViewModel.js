@@ -3877,7 +3877,7 @@
 	{
 		var self = this;
 		return tf.promiseBootbox.yesNo({
-			message: "Do you want to close edit model without saving?",
+			message: "Do you want to close edit mode without saving?",
 			title: "Confirmation"
 		}).then(function(result)
 		{
