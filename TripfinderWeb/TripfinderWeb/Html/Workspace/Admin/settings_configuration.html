@@ -36,15 +36,14 @@
 				</div>
 				<div class="form-group">
 					<label>User Name</label>
-					<input type="text" name="smtpuserName" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtpuserName"
-						   data-tf-input-type="Email" maxlength="256" />
+					<input type="text" name="smtpuserName" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtpuserName" data-tf-input-type="Email"
+					 maxlength="256" />
 				</div>
 				<div class="form-group">
 					<label>Password</label>
 					<!--this password is used to disable chrome auto complete-->
 					<input type="password" name="smtppasswordhidden" class="hidden" autocomplete="off">
-					<input type="password" name="smtppassword" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtppassword"
-						   maxlength="256" />
+					<input type="password" name="smtppassword" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtppassword" maxlength="256" />
 				</div>
 				<div class="checkbox margin-top-20">
 					<label>
@@ -61,8 +60,7 @@
 				</h4>
 				<div class="form-group">
 					<label>Address</label>
-					<input type="text" name="emailAddress" class="form-control" data-bind="value:obEntityDataModel().emailAddress" data-tf-input-type="Email"
-						   maxlength="256" />
+					<input type="text" name="emailAddress" class="form-control" data-bind="value:obEntityDataModel().emailAddress" data-tf-input-type="Email" maxlength="256" />
 				</div>
 				<div class="form-group">
 					<label>Name</label>
@@ -75,7 +73,8 @@
 			<h4>
 				<strong>Message</strong>
 			</h4>
-			<div class="message-description">Specify the message you would like to display for each language that is published for your site. The message and/or presentation may be adjusted for each language.</div>
+			<div class="message-description">Specify the message you would like to display for each language that is published for your site. The message and/or
+				presentation may be adjusted for each language.</div>
 			<div class="checkbox">
 				<label>
 					<input type="checkbox" class="display-once-daily" />Display only once per day per user
@@ -115,6 +114,8 @@
 
 		<div class="edit-footer">
 			<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
+			<a class="release-notes" href="https://www.mytransfinder.com/release/release_notes_tripfinder.asp" title="Release Notes" target="_blank">Release Notes</a>
+			<div class="divider" style="display: inline-block; background-color: #6B6D70; height: 12px; margin: 3px 5px -2px; width: 1px;"></div>
 			<span class="version" data-bind="text:tf.pageManager.obVersion"></span>
 		</div>
 	</div>
