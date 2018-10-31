@@ -36,7 +36,7 @@
 			<button class="iconbutton approve" title="Change Status" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- ko if: cancelButton-->
-			<button class="iconbutton cancel" title="Cancel" data-bind="enable:selectedItemsEditable"></button>
+			<button class="iconbutton cancel" title="Cancel Trip" data-bind="enable:selectedItemsEditable"></button>
 			<!-- /ko -->
 			<!-- /ko -->
 			<!-- ko if: pageType != "reports"-->
@@ -54,7 +54,8 @@
 			<div class="grid-staterow">
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
-					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow" style="max-width:150px;"></span>
+					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
+					 style="max-width:150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
