@@ -43,6 +43,9 @@
 	PasswordChangeViewModel.prototype.dispose = function()
 	{
 		var self = this;
-		self.pageLevelViewModel.dispose();
+		setTimeout(function()
+		{
+			self.pageLevelViewModel.dispose();
+		}, 4000);
 	};
 })();
