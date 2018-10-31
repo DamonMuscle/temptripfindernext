@@ -531,7 +531,7 @@ var today = (new Date()).toDateString(),
 					"field": "ContactEmail",
 					"title": "Email",
 					"type": "String",
-					"defaultValue": "bfonder@transfinder.com"
+					"defaultValue": "name@email.com"
 				},
 				{
 					"field": "FieldTripClassificationName",
@@ -1125,7 +1125,7 @@ var today = (new Date()).toDateString(),
 					"field": "Email",
 					"title": "Email",
 					"type": "String",
-					"defaultValue": "wrolnick@transfinder.com"
+					"defaultValue": "name@email.com"
 				},
 				{
 					"field": "SifimportStudents",
@@ -1508,7 +1508,7 @@ var today = (new Date()).toDateString(),
 					"field": "Email",
 					"title": "Email Address",
 					"type": "String",
-					"defaultValue": "tchen@transfinder.com"
+					"defaultValue": "name@email.com"
 				}
 			],
 			"Requirements": [
