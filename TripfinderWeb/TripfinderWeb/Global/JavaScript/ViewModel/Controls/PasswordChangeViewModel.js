@@ -37,4 +37,12 @@
 		self.obConfirmNewPasswordWarning(false);
 	}
 
+	/**
+	 * Dispose.
+	 */
+	PasswordChangeViewModel.prototype.dispose = function()
+	{
+		var self = this;
+		self.pageLevelViewModel.dispose();
+	};
 })();

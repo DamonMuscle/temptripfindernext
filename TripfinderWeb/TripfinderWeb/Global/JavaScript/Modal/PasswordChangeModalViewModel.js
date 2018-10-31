@@ -128,9 +128,9 @@
 	/**
 	 * Dispose.
 	 */
-	SearchSettingsViewModel.prototype.dispose = function()
+	PasswordChangeModalViewModel.prototype.dispose = function()
 	{
 		var self = this;
-		self.passwordChangeViewModel.pageLevelViewModel.dispose();
+		self.passwordChangeViewModel.dispose();
 	};
 })();
