@@ -949,6 +949,23 @@
 			var invoiceGrid = new TF.Control.GridControlViewModel("fieldtripinvoice", null, this.obEntityDataModel().id(), "fieldtripEntry", null, null, null, this.obInvoiceGridDataSource(), undefined, true);
 			this.obInvoicingGridViewModel(invoiceGrid);
 		}
+
+		var clearInvoiceGrid = function()
+		{
+			var resourceSort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+				resourceSource = new kendo.data.DataSource({
+					data: [],
+					sort: resourceSort
+				});
+			this.obInvoiceGridDataSource([]);
+			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
+			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+		}.bind(this);
+
+		//Changing the School, Department or Activity removes Invoice information.
+		this.obEntityDataModel().school.subscribe(clearInvoiceGrid);
+		this.obEntityDataModel().districtDepartmentId.subscribe(clearInvoiceGrid);
+		this.obEntityDataModel().fieldTripActivityId.subscribe(clearInvoiceGrid);
 	};
 
 	FieldTripDataEntryViewModel.prototype.addResourceClick = function(type)
@@ -1309,7 +1326,7 @@
 
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
 	{
-		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip" };
+		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes, selectAccount: this.obSelectedAccount() };
 		tf.modalManager.showModal(new e.data.modal(option))
 			.then(function(data)
 			{
@@ -1344,7 +1361,7 @@
 			{
 				data.PaymentDate = moment(data.PaymentDate).format("YYYY-MM-DD");
 			}
-			var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", data: data };
+			var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", data: data, strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes, selectAccount: this.obSelectedAccount() };
 			tf.modalManager.showModal(new TF.Modal.FieldTripInvoiceModalViewModel(option))
 				.then(function(data)
 				{

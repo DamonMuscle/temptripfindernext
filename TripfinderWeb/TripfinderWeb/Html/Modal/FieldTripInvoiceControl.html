@@ -4,10 +4,10 @@
 	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
-				<label class="requirestar">Account Name</label>
+				<label>Account Name</label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true}">
-						<!-- ko customInput:{type:"String",value:obSelectedAccountText,attributes:{class:"form-control",name:"name"}} --><!-- /ko -->
+						<!-- ko customInput:{type:option.strictAcctCodes?"Select":"String",value:obSelectedAccountText,attributes:{class:"form-control",name:"name"}} --><!-- /ko -->
 					</div>
 					<div class="input-group-btn">
 						<button type="button" class="btn btn-default btn-sharp">

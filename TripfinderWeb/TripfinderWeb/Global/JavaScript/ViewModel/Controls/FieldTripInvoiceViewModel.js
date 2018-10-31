@@ -48,15 +48,6 @@
 		this.$form = $(el);
 		var validatorFields = {}, isValidating = false, self = this;
 
-		validatorFields.name = {
-			trigger: "blur change",
-			validators: {
-				notEmpty: {
-					message: "required"
-				}
-			}
-		}
-
 		setTimeout(function()
 		{
 			this.$form.bootstrapValidator({
@@ -83,11 +74,29 @@
 
 	FieldTripInvoiceViewModel.prototype.load = function()
 	{
+		var strictAcctCodes = this.option.strictAcctCodes, selectAccount = this.option.selectAccount;
+
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccount"))
 			.then(function(data)
 			{
 				data.Items = sortArray(data.Items, "Name");
-				this.obAccountSource(data.Items);
+				var items = data.Items;
+				if (strictAcctCodes)
+				{
+					items = [];
+					if (selectAccount)
+					{
+						$.each(data.Items, function(index, item)
+						{
+							if (item.DepartmentId === selectAccount.DepartmentId && item.FieldTripActivityId === selectAccount.FieldTripActivityId)
+							{
+								items.push(item);
+							}
+						});
+					}
+				}
+
+				this.obAccountSource(items);
 				if (this.option.data)
 				{
 					this.obEntityDataModel().fieldTripAccountId(this.option.data.FieldTripAccountId);
