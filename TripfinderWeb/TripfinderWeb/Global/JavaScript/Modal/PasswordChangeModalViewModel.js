@@ -31,12 +31,23 @@
 		var self = this;
 		self._$form = $(el);
 		self.passwordChangeViewModel.pageLevelViewModel.load(self._$form.data("bootstrapValidator"));
+
 	};
 
 	PasswordChangeModalViewModel.prototype.positiveClick = function(viewModel, e)
 	{
 		var self = this
 		passed = true;
+
+		// Add starts with function for IE version less than 11
+		if (!String.prototype.startsWith)
+		{
+			String.prototype.startsWith = function(searchString, position)
+			{
+				position = position || 0;
+				return this.indexOf(searchString, position) === position;
+			};
+		}
 		if (!self.passwordChangeViewModel.obCurrentPassword() || self.passwordChangeViewModel.obCurrentPassword().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().startsWith(' '))
 		{
 			self.passwordChangeViewModel.obCurrentPasswordWarning("required");
