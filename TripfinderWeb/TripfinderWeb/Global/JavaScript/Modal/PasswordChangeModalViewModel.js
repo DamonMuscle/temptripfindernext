@@ -37,7 +37,7 @@
 	{
 		var self = this
 		passed = true;
-		if (!self.passwordChangeViewModel.obCurrentPassword() || self.passwordChangeViewModel.obCurrentPassword().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().trim().length == 0)
+		if (!self.passwordChangeViewModel.obCurrentPassword() || self.passwordChangeViewModel.obCurrentPassword().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().startsWith(' '))
 		{
 			self.passwordChangeViewModel.obCurrentPasswordWarning("required");
 			passed = false;
@@ -47,7 +47,7 @@
 			self.passwordChangeViewModel.obCurrentPasswordWarning("");
 		}
 
-		if (!self.passwordChangeViewModel.obNewPassword() || self.passwordChangeViewModel.obNewPassword().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().trim().length == 0)
+		if (!self.passwordChangeViewModel.obNewPassword() || self.passwordChangeViewModel.obNewPassword().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().startsWith(' '))
 		{
 			self.passwordChangeViewModel.obNewPasswordWarning("required");
 			passed = false;
@@ -62,7 +62,7 @@
 			self.passwordChangeViewModel.obNewPasswordWarning("");
 		}
 
-		if (!self.passwordChangeViewModel.obConfirmNewPassword() || self.passwordChangeViewModel.obConfirmNewPassword().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().trim().length == 0)
+		if (!self.passwordChangeViewModel.obConfirmNewPassword() || self.passwordChangeViewModel.obConfirmNewPassword().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().startsWith(' '))
 		{
 			self.passwordChangeViewModel.obConfirmNewPasswordWarning("required");
 			passed = false;
