@@ -799,7 +799,7 @@
 								.then(function(result)
 								{
 									//IF the request from search, do not sticky the filter.
-									if (this.options.fromSearch || this.options.isTemporaryFilter)
+									if (self.options.fromSearch || self.options.isTemporaryFilter)
 									{
 										return self.applyLayoutExtended(gridLayoutExtendDataModel);
 									}
