@@ -365,7 +365,10 @@
 				fieldtripData = data.Items[0];
 				self.getTemplate(fieldtripData.FieldTripTemplate);
 				self.obSchoolDataModels(fieldtripData.School);
-				self.obDepartmentDataModels(fieldtripData.FieldTripDistrictDepartment);
+				self.obDepartmentDataModels($.grep(fieldtripData.FieldTripDistrictDepartment, function(item, index)
+				{
+					return self.hasPermissionForDistrictDepartment(item.Id)
+				}));
 				self.obActivityDataModels(fieldtripData.FieldTripActivity);
 				self.obClassificationDataModels(fieldtripData.FieldTripClassification);
 				self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
@@ -478,6 +481,18 @@
 		self.obTemplateSource(data);
 	};
 
+	FieldTripDataEntryViewModel.prototype.hasPermissionForDistrictDepartment = function(id)
+	{
+		var departmentIdsWithPermission = tf.authManager.authorizationInfo.authorizationTree.districtDepartmentIds;
+
+		if (tf.authManager.authorizationInfo.isFieldTripAdmin)
+		{
+			return true;
+		}
+
+		return departmentIdsWithPermission.indexOf(id) >= 0;
+	};
+
 	FieldTripDataEntryViewModel.prototype.setAccountListBySchool = function(school, initialize)
 	{
 		var self = this, selectIndex = -1, accountList = [], departActivityNames = [], departActivityName;
@@ -495,7 +510,7 @@
 			self.obAccount.removeAll();
 			$.each(self.fieldTripAccountList, function(index, item)
 			{
-				if (item.School === school)
+				if (item.School === school && self.hasPermissionForDistrictDepartment(item.Department))
 				{
 					departActivityName = (item.Department ? item.Department.Name : "[Any]") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : "[Any]");
 
