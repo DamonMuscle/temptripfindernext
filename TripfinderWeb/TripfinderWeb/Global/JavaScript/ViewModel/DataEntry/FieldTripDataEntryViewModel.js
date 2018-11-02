@@ -27,6 +27,7 @@
 		this.obTemplateSource = ko.observableArray();
 		this.obSchoolDataModels = ko.observableArray();
 		this.obDepartmentDataModels = ko.observableArray();
+		this.currentDistrictDepartmentId = null;
 		this.obActivityDataModels = ko.observableArray();
 		this.obFieldTripSettings = ko.observable({});
 		this.obStrictDest = ko.observable(false);
@@ -492,6 +493,11 @@
 			return true;
 		}
 
+		if (this.currentDistrictDepartmentId && id === this.currentDistrictDepartmentId)
+		{
+			return true;
+		}
+
 		return departmentIdsWithPermission.indexOf(id) >= 0;
 	};
 
@@ -512,7 +518,7 @@
 			self.obAccount.removeAll();
 			$.each(self.fieldTripAccountList, function(index, item)
 			{
-				if (item.School === school && self.hasPermissionForDistrictDepartment(item.Department))
+				if (item.School === school && (!item.Department || self.hasPermissionForDistrictDepartment(item.Department.Id)))
 				{
 					departActivityName = (item.Department ? item.Department.Name : "[Any]") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : "[Any]");
 
@@ -576,6 +582,7 @@
 						{
 							if (item.Id === this.obEntityDataModel().districtDepartmentId())
 							{
+								this.currentDistrictDepartmentId = item.Id;
 								this.obDepartmentDataModels.push(item);
 								return false;
 							}
