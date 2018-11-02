@@ -33,6 +33,7 @@
 		self.filterClick = self.filterClick.bind(self);
 		self.refreshClick = self.refreshClick.bind(self);
 		self.changeStatusButton = true;
+		self.copyButton = true;
 	}
 
 	SchedulerPage.prototype.constructor = SchedulerPage;

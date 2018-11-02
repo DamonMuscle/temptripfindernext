@@ -9,6 +9,7 @@
 		self.type = "fieldtrip";
 		self.pageType = "myrequests";
 		self.cancelButton = true;
+		self.copyButton = true;
 		self.detailButton = true;
 		self.schedulerButton = true;
 	}

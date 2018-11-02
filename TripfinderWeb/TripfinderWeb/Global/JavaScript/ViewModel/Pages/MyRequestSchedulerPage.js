@@ -12,6 +12,7 @@
 		self.detailButton = true;
 		self.schedulerButton = true;
 		self.changeStatusButton = false;
+		self.copyButton = true;
 	}
 
 	MyRequestSchedulerPage.prototype.constructor = MyRequestSchedulerPage;

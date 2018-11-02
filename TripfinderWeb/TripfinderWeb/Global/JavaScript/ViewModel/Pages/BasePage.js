@@ -12,6 +12,7 @@
 
 		self.changeStatusButton = false;
 		self.cancelButton = false;
+		self.copyButton = false;
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
@@ -253,27 +254,27 @@
 						$(".tfmodal-container").css('visibility', 'hidden');
 						return Promise.resolve(true);
 					}, function(data)
-					{
-						tf.loadingIndicator.tryHide();
-						if (self.copyRetryCount >= 3)
 						{
-							tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
+							tf.loadingIndicator.tryHide();
+							if (self.copyRetryCount >= 3)
+							{
+								tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
+									.then(function(result)
+									{
+
+									});
+								return;
+							}
+							tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
 								.then(function(result)
 								{
-
+									if (result)
+									{
+										self.copyRetryCount = self.copyRetryCount + 1;
+										self._copySelectedRecords(e, selectedIds);
+									}
 								});
-							return;
-						}
-						tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
-							.then(function(result)
-							{
-								if (result)
-								{
-									self.copyRetryCount = self.copyRetryCount + 1;
-									self._copySelectedRecords(e, selectedIds);
-								}
-							});
-					});
+						});
 			});
 	};
 

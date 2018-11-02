@@ -8,6 +8,13 @@
 				<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
 			</li>
 			<!-- /ko -->
+			<!-- ko if:gridViewModel.copyButton -->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyFieldTrip.bind(gridViewModel),css:{disabled:!gridViewModel.obCanCopyFieldTrip()}">
+				<div class="menu-icon copy">
+				</div>
+				<div class="menu-label" data-bind="text: 'Copy ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
+			</li>
+			<!-- /ko -->
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
 				<div class="menu-icon showdetails">
 				</div>

@@ -28,6 +28,7 @@
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
+		self.obCanCopyFieldTrip = ko.observable(false);
 		self.selectedItemEditable = ko.observable(false);
 		self.selectedItemsEditable = ko.observable(false);
 		self.sendToClick = self.sendToClick.bind(self);
@@ -97,12 +98,14 @@
 				if (!current[0])
 				{
 					self.obIsSelectRow(false);
+					self.obCanCopyFieldTrip(false);
 					return;
 				}
 
 				var next = function()
 				{
 					self.obIsSelectRow(current.length !== 0);
+					self.obCanCopyFieldTrip(current.length === 1);
 					self.selectedRecordIds = current;
 					if (self.obShowDetailPanel())
 					{
@@ -590,6 +593,11 @@
 			self.bindEvent(".iconbutton.approve", self.editFieldTripStatus);
 		}
 
+		if (self.copyButton)
+		{
+			self.bindEvent(".iconbutton.copy", self.copyFieldTrip.bind(self));
+		}
+
 		if (self.cancelClick)
 		{
 			self.bindEvent(".iconbutton.cancel", self.cancelClick);
@@ -751,6 +759,35 @@
 	BaseGridPage.prototype.editFieldTripStatus = function()
 	{
 		this.editFieldTripStatusCore();
+	};
+
+	BaseGridPage.prototype.copyFieldTrip = function()
+	{
+		var self = this, selectedIds;
+		selectedIds = self.searchGrid.getSelectedIds();
+		if (!selectedIds || selectedIds.length <= 0)
+		{
+			return;
+		}
+		selectedIds = selectedIds[0];
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "copyfieldtrip", selectedIds))
+			.then(function(response)
+			{
+				if (response && response.StatusCode === 404)
+				{//change the api side to avoid http error, using response status 404 to identify the nonexistence.
+					return Promise.reject(response);
+				}
+				self.pageLevelViewModel.popupSuccessMessage("Field Trip Copyed!");
+				self.searchGrid.refreshClick();
+				return true;
+			}.bind(self))
+			.catch(function(response)
+			{
+				if (response && response.StatusCode === 404)
+				{
+					return Promise.reject(response);
+				}
+			}.bind(self))
 	};
 
 	BaseGridPage.prototype.editFieldTripStatusCore = function(cancel)
