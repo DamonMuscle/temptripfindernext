@@ -1370,11 +1370,11 @@
 			var data = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
 			if (data.InvoiceDate)
 			{
-				data.InvoiceDate = moment(data.InvoiceDate).format("YYYY-MM-DD");
+				data.InvoiceDate = moment(data.InvoiceDate).format("YYYY-MM-DDTHH:mm:ss.SSS");
 			}
 			if (data.PaymentDate)
 			{
-				data.PaymentDate = moment(data.PaymentDate).format("YYYY-MM-DD");
+				data.PaymentDate = moment(data.PaymentDate).format("YYYY-MM-DDTHH:mm:ss.SSS");
 			}
 			var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", data: data, strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes, selectAccount: this.obSelectedAccount() };
 			tf.modalManager.showModal(new TF.Modal.FieldTripInvoiceModalViewModel(option))
