@@ -29,7 +29,8 @@
 					<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
 					<div class="input-group">
 						<div data-bind="typeahead:{source:obClassificationDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDocumentClassification}">
-							<input type="text" required name="documentClassification" class="form-control" data-bind="value:currentDocumentClassificationName" />
+							<!-- ko customInput:{type:"Select",value:currentDocumentClassificationName,attributes:{name:"documentClassification",class:"form-control",required:"required"}} -->
+							<!-- /ko -->
 						</div>
 						<div class="input-group-btn">
 							<button type="button" class="btn btn-default">
@@ -39,8 +40,8 @@
 					</div>
 				</div>
 				<label>Description</label>
-				<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="description" data-bind="value:obEntityDataModel().description" />
-				</div>
+				<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="description" data-bind="value:obEntityDataModel().description"></textarea>
+			</div>
 		</div>
 	</div>
 	<div class="row">

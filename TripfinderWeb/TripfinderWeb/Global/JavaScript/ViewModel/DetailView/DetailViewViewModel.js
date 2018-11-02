@@ -2,6 +2,15 @@
 {
 	createNamespace("TF.DetailView").DetailViewViewModel = DetailViewViewModel;
 
+	var viewableMimeTypes = [
+		"text/plain",
+		"image/gif",
+		"image/png",
+		"image/jpeg",
+		"image/bmp",
+		"application/pdf"
+	];
+
 	/**
 	 * Constructor
 	 * @returns {void} 
@@ -2947,33 +2956,60 @@
 	DetailViewViewModel.prototype.addDocumentStackBlock = function(item, dataBlockStyles, grid)
 	{
 		var self = this, grid = grid || self.grid,
-			randomClass = item.uniqueClassName || self.generateUniqueClassName(), columns, kendoGrid,
+			randomClass = item.uniqueClassName || self.generateUniqueClassName(), columns, kendoGrid, data,
 			$itemDom = $("<div>\
 							<div class='document grid-stack-item-content' style='background:" + dataBlockStyles.backgroundColor + ";border-color:" + dataBlockStyles.borderColor + "'>\
 								<input class='item-title' type='text' style='color:" + dataBlockStyles.titleColor + "' value='" + (item.customizedTitle || item.title) + "' />\
 								<div class='item-title' style='color:" + dataBlockStyles.titleColor + "'>" + (item.customizedTitle || item.title) + "</div>\
 								<div class='item-content grid' style='color:" + dataBlockStyles.contentColor + "'><div class='kendo-grid'></div>\
 							</div>\
-						</div>").addClass(randomClass);
+						</div>").addClass(randomClass),
+			action = function(e, view)
+			{
+				if (!data) return;
+				var item = data[$(e.target).closest("tr").index()],
+					mimeType = (item.MimeType || "").toLowerCase(),
+					databaseType = tf.storageManager.get("databaseType");
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
+					.then(function(keyApiResponse)
+					{
+						var path = pathCombine(tf.api.apiPrefix(), "document", item.Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
+						if (view && viewableMimeTypes.indexOf(mimeType) > -1)
+						{
+							path += "?view=true";
+						}
+
+						window.open(path);
+					});
+				e.preventDefault();
+			};
+
 		self.updateStackBlockOrignalHeight(randomClass, item.h);
 		self.setStackBlockData($itemDom, item);
 		grid.addWidget($itemDom, item.x, item.y, item.w, item.h, undefined, undefined, undefined, 3);
 
-
-		columns = [{
-			FieldName: "FileName",
-			DisplayName: "File Name",
-			title: "File Name",
-			width: "150px",
-			type: "string"
-		}, {
-
-			FieldName: "Size",
-			DisplayName: "Size(KB)",
-			title: "Size(KB)",
-			width: "150px",
-			type: "string"
-		}];
+		columns = [
+			{
+				width: 24,
+				attributes: { title: "View Document" },
+				command: {
+					className: "icon-document",
+					text: " ",
+					click: function(e) { action(e, true); },
+				}
+			}, {
+				FieldName: "FileName",
+				DisplayName: "File Name",
+				title: "File Name",
+				width: 150,
+				type: "string"
+			}, {
+				FieldName: "Size",
+				DisplayName: "Size(KB)",
+				title: "Size(KB)",
+				width: 150,
+				type: "string"
+			}];
 		$itemDom.data("columns", columns);
 		kendoGrid = $itemDom.find('.kendo-grid').kendoGrid({
 			scrollable: {
@@ -2982,7 +3018,6 @@
 			pageable: false,
 			columns: self.getKendoColumnsExtend(columns)
 		}).data("kendoGrid");
-
 
 		if (self.isReadMode())
 		{
@@ -3005,23 +3040,14 @@
 							fileData.FileName = item.Filename;
 							fileData.Size = item.FileSizeKb;
 							dataSource.options.data.push(fileData);
-						})
-						kendoGrid.setDataSource(dataSource);
-
-						$(".document.grid-stack-item-content tbody").on("dblclick", function(e)
-						{
-							var index = $(e.target).closest("tr").index();
-							var databaseType = tf.storageManager.get("databaseType");
-							tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
-								.then(function(keyApiResponse)
-								{
-									window.location = pathCombine(tf.api.apiPrefix(), "document", response.Items[index].Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
-								});
 						});
+						kendoGrid.setDataSource(dataSource);
+						data = response.Items;
+						$(".document.grid-stack-item-content tbody").on("dblclick", action);
 					});
 			}
-
-		} else
+		}
+		else
 		{
 			var dataSource = new kendo.data.DataSource({
 				schema: {

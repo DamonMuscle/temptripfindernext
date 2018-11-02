@@ -216,7 +216,7 @@
 					this.obEntityDataModel(new TF.DataModel.DocumentDataModel(documentEntity));
 					this.obEntityDataModel().documentEntity = this.documentData.DocumentEntity;
 					this.obEntityDataModel().DocumentEntities = this.documentData.DocumentEntities;
-					this.obEntityDataModel().lastUpdated = this.documentData.LastUpdated;
+					this.obEntityDataModel().lastUpdated = ko.observable(this.documentData.LastUpdated);
 					var classificationDataModels = this.obClassificationDataModels();
 					var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
 					{
