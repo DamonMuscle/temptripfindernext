@@ -14,6 +14,7 @@
 		this.fieldTripSettings = null;
 		this.initializationFrontdesk = new TF.InitializationFrontdesk(1, this.initialize);
 		this.dataModelType = TF.DataModel.FieldTripDataModel;
+		this.fieldTripDistrictDepartments = [];
 		this.pageType = "fieldtripde";
 		this.obTitle(tf.applicationTerm.getApplicationTermSingularByName("Field Trip"));
 		this.obgridTitle("FieldTrip");
@@ -365,7 +366,8 @@
 				fieldtripData = data.Items[0];
 				self.getTemplate(fieldtripData.FieldTripTemplate);
 				self.obSchoolDataModels(fieldtripData.School);
-				self.obDepartmentDataModels($.grep(fieldtripData.FieldTripDistrictDepartment, function(item, index)
+				self.fieldTripDistrictDepartments = fieldtripData.FieldTripDistrictDepartment;
+				self.obDepartmentDataModels($.grep(self.fieldTripDistrictDepartments, function(item, index)
 				{
 					return self.hasPermissionForDistrictDepartment(item.Id)
 				}));
@@ -566,6 +568,18 @@
 					{
 						this.obCurrentAccountName((this.obEntityDataModel().districtDepartmentName() || "[Any]") + ' / ' + (this.obEntityDataModel().fieldTripActivityName() || "[Any]"));
 						this.setAccountListBySchool(this.obEntityDataModel().school());
+					}
+
+					if (this.obEntityDataModel().districtDepartmentId() && !this.hasPermissionForDistrictDepartment(this.obEntityDataModel().districtDepartmentId()))
+					{
+						$.each(this.fieldTripDistrictDepartments, function(index, item)
+						{
+							if (item.Id === this.obEntityDataModel().districtDepartmentId())
+							{
+								this.obDepartmentDataModels.push(item);
+								return false;
+							}
+						}.bind(this));
 					}
 
 					if (this.obEntityDataModel().departDateTime() == "1900-01-01T00:00:00.000" ||
