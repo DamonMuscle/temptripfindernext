@@ -328,66 +328,43 @@
 		{
 			for (var i = 0; i < files.length; i++)
 			{
-				if (self.documentEntities.length > 0)
+				var file = files[i];
+				var reader = new FileReader();
+				self.obEntityDataModel().filename(file.name);
+				var step = 1024 * 10;
+				var loaded = 0;
+				var total = file.size;
+				var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail };
+				var content = "";
+				reader.fileName = file.name;
+				self.obEntityDataModel().documentEntities.push(fileModel);
+				self.$uploadedFile.change();
+
+				reader.onprogress = function(event)
 				{
-					self.documentEntities.forEach(function(documentEntity)
+					loaded += event.loaded;
+					var fileModel = Enumerable.From(self.obEntityDataModel().documentEntities()).Where(function(c)
 					{
-						if (documentEntity.Filename === files[i].name)
-						{
-							uploadFail = true;
-							return;
-						}
-					});
-				}
-				tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "document", "unique"), { data: new TF.DataModel.DocumentDataModel({ Filename: files[i].name, Id: 0 }).toData() })
-					.then(function(apiResponse)
+						return c.Filename === event.target.fileName
+					}).ToArray()[0];
+					if (fileModel)
 					{
-						for (var j = 0; j < this.model.obEntityDataModel().documentEntities().length; j++)
-						{
-							if (this.model.obEntityDataModel().documentEntities()[j].Filename === this.file.name)
-							{
-								return;
-							}
-						}
-
-						var file = this.file;
-						var reader = new FileReader();
-						this.model.obEntityDataModel().filename(file.name);
-						var step = 1024 * 10;
-						var loaded = 0;
-						var total = file.size;
-						var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail ? uploadFail : !apiResponse.Items[0] };
-						var content = "";
-						reader.fileName = file.name;
-						this.model.obEntityDataModel().documentEntities.push(fileModel);
-						self.$uploadedFile.change();
-
-						reader.onprogress = function(event)
-						{
-							loaded += event.loaded;
-							var fileModel = Enumerable.From(this.model.obEntityDataModel().documentEntities()).Where(function(c)
-							{
-								return c.Filename === event.target.fileName
-							}).ToArray()[0];
-							if (fileModel)
-							{
-								fileModel.FileProgress(loaded * 100 / total + "%");
-							}
-						}.bind(this);
-						reader.onload = function(event)
-						{
-							var fileModel = Enumerable.From(this.model.obEntityDataModel().documentEntities()).Where(function(c)
-							{
-								return c.Filename === event.target.fileName
-							}).ToArray()[0];
-							if (fileModel)
-							{
-								fileModel.FileProgress("100%");
-								fileModel.FileContent = event.target.result;
-							}
-						}.bind(this);
-						reader.readAsDataURL(file);
-					}.bind({ model: this, file: files[i] }));
+						fileModel.FileProgress(loaded * 100 / total + "%");
+					}
+				}.bind(this);
+				reader.onload = function(event)
+				{
+					var fileModel = Enumerable.From(self.obEntityDataModel().documentEntities()).Where(function(c)
+					{
+						return c.Filename === event.target.fileName
+					}).ToArray()[0];
+					if (fileModel)
+					{
+						fileModel.FileProgress("100%");
+						fileModel.FileContent = event.target.result;
+					}
+				}.bind(this);
+				reader.readAsDataURL(file);
 			}
 		}
 	}
