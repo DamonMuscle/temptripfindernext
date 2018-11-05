@@ -48,92 +48,86 @@
 				return this.indexOf(searchString, position) === position;
 			};
 		}
-		if (!self.passwordChangeViewModel.obCurrentPassword() || self.passwordChangeViewModel.obCurrentPassword().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obCurrentPassword().toString().startsWith(' '))
-		{
-			self.passwordChangeViewModel.obCurrentPasswordWarning("required");
-			passed = false;
-		}
-		else
-		{
-			self.passwordChangeViewModel.obCurrentPasswordWarning("");
-		}
 
-		if (!self.passwordChangeViewModel.obNewPassword() || self.passwordChangeViewModel.obNewPassword().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().startsWith(' '))
-		{
-			self.passwordChangeViewModel.obNewPasswordWarning("required");
-			passed = false;
-		}
-		else if (self.passwordChangeViewModel.obNewPassword() === self.passwordChangeViewModel.obCurrentPassword())
-		{
-			self.passwordChangeViewModel.obNewPasswordWarning("cannot be the same as Current Password");
-			passed = false;
-		}
-		else
-		{
-			self.passwordChangeViewModel.obNewPasswordWarning("");
-		}
+		var userId = tf.authManager.authorizationInfo.authorizationTree.userId;
+		var checkPasswordData = {
+			data: {
+				Password: self.passwordChangeViewModel.obCurrentPassword()
+			}
+		};
 
-		if (!self.passwordChangeViewModel.obConfirmNewPassword() || self.passwordChangeViewModel.obConfirmNewPassword().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().startsWith(' '))
-		{
-			self.passwordChangeViewModel.obConfirmNewPasswordWarning("required");
-			passed = false;
-		}
-		else if (self.passwordChangeViewModel.obNewPassword() !== self.passwordChangeViewModel.obConfirmNewPassword())
-		{
-			self.passwordChangeViewModel.obConfirmNewPasswordWarning("must match New Password");
-			passed = false;
-		}
-		else
-		{
-			self.passwordChangeViewModel.obConfirmNewPasswordWarning("");
-		}
-
-		if (passed)
-		{
-			var userId = tf.authManager.authorizationInfo.authorizationTree.userId;
-			var checkPasswordData = {
-				data: {
-					Password: self.passwordChangeViewModel.obCurrentPassword()
-				}
-			};
-
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "user", "checkpassword"), checkPasswordData)
-				.then(function(apiResponse)
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "user", "checkpassword"), checkPasswordData)
+			.then(function(apiResponse)
+			{
+				if (apiResponse.Items[0])
 				{
-					if (apiResponse.Items[0])
-					{
-						var changePasswordData = {
-							data: {
-								Password: self.passwordChangeViewModel.obNewPassword()
-							}
-						};
-						tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "user", "ChangePassword"), changePasswordData)
-							.then(function(apiResponse)
+					self.passwordChangeViewModel.obCurrentPasswordWarning("");
+				}
+				else
+				{
+					self.passwordChangeViewModel.obCurrentPasswordWarning("Current Password is incorrect.");
+					passed = false;
+				}
+
+				if (self.passwordChangeViewModel.obNewPassword() === self.passwordChangeViewModel.obCurrentPassword())
+				{
+					self.passwordChangeViewModel.obNewPasswordWarning("cannot be the same as Current Password");
+					passed = false;
+				}
+				else if (!self.passwordChangeViewModel.obNewPassword() || self.passwordChangeViewModel.obNewPassword().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obNewPassword().toString().startsWith(' '))
+				{
+					self.passwordChangeViewModel.obNewPasswordWarning("required");
+					passed = false;
+				}
+				else
+				{
+					self.passwordChangeViewModel.obNewPasswordWarning("");
+				}
+
+				if (!self.passwordChangeViewModel.obConfirmNewPassword() || self.passwordChangeViewModel.obConfirmNewPassword().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().trim().length == 0 || self.passwordChangeViewModel.obConfirmNewPassword().toString().startsWith(' '))
+				{
+					self.passwordChangeViewModel.obConfirmNewPasswordWarning("required");
+					passed = false;
+				}
+				else if (self.passwordChangeViewModel.obNewPassword() !== self.passwordChangeViewModel.obConfirmNewPassword())
+				{
+					self.passwordChangeViewModel.obConfirmNewPasswordWarning("must match New Password");
+					passed = false;
+				}
+				else
+				{
+					self.passwordChangeViewModel.obConfirmNewPasswordWarning("");
+				}
+
+				if (passed)
+				{
+					var changePasswordData = {
+						data: {
+							Password: self.passwordChangeViewModel.obNewPassword()
+						}
+					};
+					tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "user", "ChangePassword"), changePasswordData)
+						.then(function(apiResponse)
+						{
+							if (apiResponse.Items[0])
 							{
-								if (apiResponse.Items[0])
-								{
-									ga('send', 'event', 'Action', 'Password Changed');
-									self.passwordChangeViewModel.pageLevelViewModel.popupSuccessMessage("Password Changed.");
-									return this.passwordChangeViewModel.apply()
-										.then(function(result)
+								ga('send', 'event', 'Action', 'Password Changed');
+								self.passwordChangeViewModel.pageLevelViewModel.popupSuccessMessage("Password Changed.");
+								return this.passwordChangeViewModel.apply()
+									.then(function(result)
+									{
+										if (result)
 										{
-											if (result)
-											{
-												self.positiveClose(result);
-											} else
-											{
-												self.negativeClose();
-											}
-										}.bind(self));
-								}
-							}.bind(self));
-					}
-					else
-					{
-						self.passwordChangeViewModel.obCurrentPasswordWarning("Current Password is incorrect.");
-					}
-				}.bind(this));
-		}
+											self.positiveClose(result);
+										} else
+										{
+											self.negativeClose();
+										}
+									}.bind(self));
+							}
+						}.bind(self));
+				}
+			}.bind(this));
 	};
 
 	/**
