@@ -25,7 +25,7 @@
 		//vertical margin not support cannot set to 0, so set to 1, looks the same.
 		self.PADDING = 1;
 		self.INITINPUTWIDTH = 359;
-		self.EXTRAWIDTH = 220;
+		self.EXTRAWIDTH = 253;
 		self.defaultLayout = {
 			width: 4,
 			items: []

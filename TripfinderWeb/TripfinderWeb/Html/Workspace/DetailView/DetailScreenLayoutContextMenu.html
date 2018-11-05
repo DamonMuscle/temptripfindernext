@@ -31,7 +31,9 @@
 		<!--ko foreach: obLayouts -->
 		<li class="menu-item" data-bind="attr: { title: comments },
 			css:{'menu-item-checked':$data.id()===$parent.obSelectLayoutID()},
-			contextMenuClick:$parent.selectLayoutClick,text:name">
+			contextMenuClick:$parent.selectLayoutClick">
+			<div class="text" data-bind="text:name"></div>
+			<div class="check"></div>
 		</li>
 		<!--/ko -->
 		<li class="menu-divider"></li>

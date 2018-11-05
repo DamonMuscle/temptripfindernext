@@ -1286,7 +1286,7 @@
 				}
 
 				&.close-detail {
-								background-image: url("../../global/img/detail-screen/Close.svg");
+					background-image: url("../../global/img/detail-screen/Close.svg");
 				}
 
 				&.font-size-slider {
@@ -1464,10 +1464,45 @@
 		}
 
 		.menu-item {
-			.dropdown-menu-li-template;
+			list-style-type: none;
+			line-height: 26px;
+			height: 42px;
+			padding: 8px;
+			font-size: 15px;
+			white-space: nowrap;
 
 			&:not(.disabled):hover {
-				background-color: @systemLightColor !important;
+				background-color: rgba(142, 82, 161, 0.15) !important;
+			}
+
+
+			.check {
+				float: right;
+				height: 26px;
+				width: 26px;
+				display: none;
+				background-image: url("../../global/Img/menu/checkmark-black.png");
+				background-position: center;
+				background-size: 12px;
+				background-repeat: no-repeat;
+			}
+
+			.text {
+				float: left;
+				max-width: calc(~"100% - 26px");
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			&.menu-item-checked {
+				.text {
+					font-weight: bold;
+				}
+
+				.check {
+					display: block;
+				}
 			}
 		}
 
