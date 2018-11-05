@@ -25,6 +25,7 @@
 		this.obFocusState = ko.observable(true);
 		this.openNewDocumentClick = this.openNewDocumentClick.bind(this);
 		this.obCanAddNew = ko.observable(true);
+		this.obCanAdd = ko.observable(true);
 		this.obCanOpenNewGrid = ko.observable(false);
 		this.obOnlyLayout = ko.observable(false);
 		this.obAddDivider = ko.observable(false);
@@ -117,6 +118,7 @@
 				this.obCanOperation(true);
 				this.obCanEdit(false);
 				this.obCanCopy(false);
+				this.obCanAdd(true);
 				gridViewModelType = TF.Grid.DocumentGridViewModel;
 				var gridLayoutExtendedDataModel = new TF.DataModel.GridLayoutExtendedDataModel();
 				gridLayoutExtendedDataModel.gridType(this._gridType);
@@ -146,6 +148,7 @@
 				this.obTooltipAddNew("Add Documents");
 				this.obCanOperation(true);
 				this.obCanAddNew(true);
+				this.obCanAdd(true);
 				this.obCanEdit(true);
 				this.obCanCopy(false);
 				this.obAddDivider(true);

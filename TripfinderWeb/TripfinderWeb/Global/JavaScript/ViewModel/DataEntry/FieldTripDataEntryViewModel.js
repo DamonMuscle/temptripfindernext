@@ -303,6 +303,17 @@
 					{
 						var resources = self.obEntityDataModel().fieldTripDocuments();
 						var classificationDataModels = data.Items;
+						if (self.obDocumentGridViewModel() !== null)
+						{
+							if (classificationDataModels != null && classificationDataModels.length > 0)
+							{
+								self.obDocumentGridViewModel().obCanAdd(true);
+							}
+							else
+							{
+								self.obDocumentGridViewModel().obCanAdd(false);
+							}
+						}
 						if (resources)
 						{
 							resources.forEach(function(item)
@@ -335,6 +346,7 @@
 								documentData.LastUpdated = item.DocumentEntity.LastUpdated;
 								documentData.LastUpdatedName = item.DocumentEntity.LastUpdatedName;
 								documentData.resourceId = this.obDocumentResourceId();
+
 								this.obDocumentResourceId(item.resourceId + 1);
 								filteredIds.push(item.DocumentEntity.Id);
 								documentRecources.push(documentData);
@@ -345,6 +357,16 @@
 						self.obDocumentKendoDataSource(documentFontEndRecources);
 						var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
 						self.obDocumentGridViewModel(documentGrid);
+						if (classificationDataModels != null && classificationDataModels.length > 0)
+						{
+							documentGrid.obCanAdd(true);
+							self.obDocumentGridViewModel().obCanAdd(true);
+						}
+						else
+						{
+							documentGrid.obCanAdd(false);
+							self.obDocumentGridViewModel().obCanAdd(false);
+						}
 					});
 			}
 

@@ -66,7 +66,7 @@
 			<div class="divider"></div>
 			<!-- /ko -->
 			<!--ko if:$parent.obCanAddNew()-->
-			<button class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'}"></button>
+			<button class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'},css:$parent.obCanAdd()?'':'disabled'"></button>
 			<!-- /ko -->
 			<!--ko if:$parent.obPrintDivider()-->
 			<div class="divider"></div>
