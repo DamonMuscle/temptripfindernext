@@ -316,6 +316,8 @@
 									return c.Id === item.DocumentClassificationId;
 								}.bind(self)).ToArray()[0];
 
+								if (!classificationDataModel) return;
+
 								var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
 								var documentData = obDocumentData().toData();
 								documentData.DocumentEntity = item.DocumentEntity;
