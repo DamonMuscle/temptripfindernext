@@ -284,10 +284,11 @@
 		{
 			if (this.options.directory != null)
 			{
-				var tr = e.currentTarget.parentElement;
+				var tr = e.currentTarget.parentElement,
+					dataItem = this.kendoGrid.dataItem(tr);
 				setTimeout(function()
 				{
-					this.options.directory.load(this.kendoGrid.dataItem(tr));
+					this.options.directory.load(dataItem);
 				}.bind(this), 300);
 			}
 		}
