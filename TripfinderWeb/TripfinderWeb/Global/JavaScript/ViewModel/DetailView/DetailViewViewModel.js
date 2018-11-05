@@ -812,6 +812,7 @@
 		containers.removeClass("active");
 		containers.eq(width - 1).addClass("active");
 		self.$columnPopup.show();
+		self.$columnPopup.position({ my: 'right+55 top+22', at: 'bottom center', of: e.target });
 	};
 
 	/**
@@ -4639,6 +4640,7 @@
 	{
 		var self = this;
 		self.obShowSlider(true);
+		$('.slider-container').position({ my: 'right+70 top+30', at: 'bottom center', of: e.target });
 		if ($('.detial-view-overlay').length === 0)
 		{
 			var $overlay = $("<div></div>", { class: "detial-view-overlay" });
