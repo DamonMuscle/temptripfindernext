@@ -713,8 +713,8 @@
 				y: parseInt($line.attr("y")),
 				type: $line.hasClass("hori-line") ? "horizontalLine" : "verticalLine"
 			};
-			item.w = $line.attr("width") ? parseInt($line.attr("width")) : undefined;
-			item.h = $line.attr("height") ? parseInt($line.attr("height")) : undefined;
+			item.w = $line.attr("width") ? parseInt($line.attr("width")) : 0;
+			item.h = $line.attr("height") ? parseInt($line.attr("height")) : 0;
 
 			items.push(item);
 

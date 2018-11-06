@@ -3002,13 +3002,13 @@
 				FieldName: "FileName",
 				DisplayName: "File Name",
 				title: "File Name",
-				width: 150,
+				width: "150px",
 				type: "string"
 			}, {
 				FieldName: "Size",
 				DisplayName: "Size(KB)",
 				title: "Size(KB)",
-				width: 150,
+				width: "150px",
 				type: "string"
 			}];
 		$itemDom.data("columns", columns);
@@ -3776,8 +3776,8 @@
 
 		if (previous.items.length !== current.items.length) return false;
 
-		previous.items.sort(function(a, b) { return a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
-		current.items.sort(function(a, b) { return a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
+		previous.items.sort(function(a, b) { return a.x === b.x && a.y === b.y ? a.w - b.w : a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
+		current.items.sort(function(a, b) { return a.x === b.x && a.y === b.y ? a.w - b.w : a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
 
 		for (var i = 0; i < previous.items.length; i++)
 		{
@@ -3838,9 +3838,12 @@
 							return 0;
 						}
 					};
-					if (previousItem[keys[i]].length != currentItem[keys[i]].length) return false;
-					//FieldName will be unique
 					var previousColumns = previousItem[keys[i]], currentColumns = currentItem[keys[i]];
+					previousColumns = $.grep(previousColumns, function(item) { return !!item.FieldName });
+					currentColumns = $.grep(currentColumns, function(item) { return !!item.FieldName });
+
+					if (previousColumns.length != currentColumns.length) return false;
+					//FieldName will be unique
 					previousColumns.sort(sortFun);
 					currentColumns.sort(sortFun);
 					for (var j = 0; j < previousColumns.length; j++)
