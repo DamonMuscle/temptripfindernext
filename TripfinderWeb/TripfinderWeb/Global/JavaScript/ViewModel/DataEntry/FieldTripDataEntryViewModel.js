@@ -375,8 +375,22 @@
 		{
 			if (tf.permissions.documentRead && tf.permissions.documentAdd)
 			{
-				var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, this.obEntityDataModel().id(), "fieldtripEntry");
-				this.obDocumentGridViewModel(documentGrid);
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
+					.then(function(data)
+					{
+						var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
+
+						var classificationDataModels = data.Items;
+						if (classificationDataModels != null && classificationDataModels.length > 0)
+						{
+							documentGrid.obCanAdd(true);
+						}
+						else
+						{
+							documentGrid.obCanAdd(false);
+						}
+						self.obDocumentGridViewModel(documentGrid);
+					});
 			}
 
 		}

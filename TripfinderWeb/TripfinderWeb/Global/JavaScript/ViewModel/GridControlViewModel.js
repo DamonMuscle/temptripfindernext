@@ -118,7 +118,6 @@
 				this.obCanOperation(true);
 				this.obCanEdit(false);
 				this.obCanCopy(false);
-				this.obCanAdd(true);
 				gridViewModelType = TF.Grid.DocumentGridViewModel;
 				var gridLayoutExtendedDataModel = new TF.DataModel.GridLayoutExtendedDataModel();
 				gridLayoutExtendedDataModel.gridType(this._gridType);
@@ -148,7 +147,6 @@
 				this.obTooltipAddNew("Add Documents");
 				this.obCanOperation(true);
 				this.obCanAddNew(true);
-				this.obCanAdd(true);
 				this.obCanEdit(true);
 				this.obCanCopy(false);
 				this.obAddDivider(true);
