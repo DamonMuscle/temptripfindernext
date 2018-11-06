@@ -101,14 +101,17 @@
 				command: [
 					{
 						name: "export",
+						template: '<a class="k-button k-button-icontext k-grid-export" title="Export"><span class=" "></span>export</a>',
 						click: self.exportBtnClick.bind(self)
 					},
 					{
 						name: "edit",
+						template: '<a class="k-button k-button-icontext k-grid-edit" title="Edit"><span class="k-icon k-edit"></span>Edit</a>',
 						click: self.editBtnClick.bind(self)
 					},
 					{
 						name: "delete",
+						template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"><span class=" "></span>delete</a>',
 						click: self.deleteBtnClick.bind(self)
 					}],
 				title: "Action",

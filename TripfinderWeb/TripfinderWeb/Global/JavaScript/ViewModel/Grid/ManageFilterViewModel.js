@@ -41,6 +41,7 @@
 				command: [
 					{
 						name: "edit",
+						template: '<a class="k-button k-button-icontext k-grid-edit" title="Edit"><span class="k-icon k-edit"></span>Edit</a>',
 						click: function(e)
 						{
 							e.preventDefault();
@@ -53,6 +54,7 @@
 						}
 					}, {
 						name: "copyandnew",
+						template: '<a class="k-button k-button-icontext k-grid-copyandnew" title="Copy And New"><span class=" "></span>copyandnew</a>',
 						click: function(e)
 						{
 							e.preventDefault();
@@ -65,6 +67,7 @@
 						}
 					}, {
 						name: "delete",
+						template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"><span class=" "></span>delete</a>',
 						click: function(e)
 						{
 							e.preventDefault();
