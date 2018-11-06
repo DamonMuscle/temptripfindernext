@@ -1537,7 +1537,15 @@
 						obDocument.DocumentEntity = result;
 						obDocument.Filename = result.Filename;
 						obDocument.FileContent = result.FileContent;
-						obDocument.FileSizeKb = byteLength(result.FileContent);
+						if (result.FileContent === null || result.FileContent.length === 0)
+						{
+
+							obDocument.FileSizeKb = 0;
+						}
+						else
+						{
+							obDocument.FileSizeKb = byteLength(result.FileContent);
+						}
 						obDocument.Id = self.tempId - 1;
 						self.tempId = self.tempId - 1;
 						self.obDocumentGridDataSource().push(obDocument);

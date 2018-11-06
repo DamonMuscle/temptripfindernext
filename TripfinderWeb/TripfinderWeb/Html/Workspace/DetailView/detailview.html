@@ -3,14 +3,14 @@
 		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
-			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit" placeholder="Name Layout..."
-			 maxlength="80" />
+			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
+			 placeholder="Name Layout..." maxlength="80" />
 			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
-				<div class="iconbutton settings" data-bind="click:openManageLayouts"></div>
-				<div class="iconbutton font-size-slider" data-bind="click:showSlider"></div>
-				<div class="iconbutton layout" data-bind="click: showColumnPopup"></div>
+				<div class="iconbutton settings" data-bind="click:openManageLayouts" title="Manage Layouts"></div>
+				<div class="iconbutton font-size-slider" data-bind="click:showSlider" title="Font Size"></div>
+				<div class="iconbutton layout" data-bind="click: showColumnPopup" title="Columns"></div>
 				<div class="type-selector save-selector">
-					<div class="iconbutton save" data-bind="click:preSave"></div>
+					<div class="iconbutton save" data-bind="click:preSave" title="Save"></div>
 					<div class="dropdown-menu">
 						<ul>
 							<li data-bind="click:save">Save</li>
@@ -18,7 +18,7 @@
 						</ul>
 					</div>
 				</div>
-				<div class="iconbutton close-detail" data-bind="click:closeEditMode"></div>
+				<div class="iconbutton close-detail" data-bind="click:closeEditMode" title="Close"></div>
 			</div>
 		</div>
 		<div class="detail-header">
@@ -51,11 +51,11 @@
 					<div class="select-type" data-bind="text:obSelectName,afterRender:updateDetailViewPanelHeader"></div>
 					<div class="icon bottom-caret"></div>
 				</div>
-				<div class="iconbutton print" data-bind="click:printClick"></div>
+				<div class="iconbutton print" data-bind="click:printClick" title="Print"></div>
 				<!-- ko if:!TF.isMobileDevice-->
-				<div class="iconbutton new-window" data-bind="click:newWindowClick"></div>
+				<div class="iconbutton new-window" data-bind="click:newWindowClick" title="Open in new Tab"></div>
 				<!-- /ko -->
-				<div class="iconbutton close-detail" data-bind="click:closeDetailClick"></div>
+				<div class="iconbutton close-detail" data-bind="click:closeDetailClick" title="Close"></div>
 			</div>
 			<div class="group-buttons" data-bind="css: {hide :!isReadMode()}">
 				<div class="button-icon" data-bind="click:onHeaderMoreButtonClick"></div>
@@ -101,7 +101,8 @@
 		<div class="slider-container" data-bind="css:{hide: !obShowSlider()}">
 			<div class="caret"></div>
 			<label class="minus"></label>
-			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25" data-bind="bootstrapSlider:{value:obSliderFontRate}">
+			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25"
+			 data-bind="bootstrapSlider:{value:obSliderFontRate}">
 			<label class="plus"></label>
 		</div>
 	</div>
