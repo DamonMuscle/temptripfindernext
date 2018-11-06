@@ -1003,7 +1003,7 @@
 	 */
 	DetailViewViewModel.prototype.applyLayoutTemplate = function(isReadMode, layoutId, isDeleted, entity)
 	{
-		var self = this;
+		var self = this, paramData = {};
 		if (layoutId !== self.entityDataModel.id())
 		{
 			self.destroyControls();
@@ -1018,6 +1018,29 @@
 
 		if (!entity)
 		{
+			if (tf.storageManager.get(self.stickyName) === undefined)
+			{
+				if (self.gridType)
+				{
+					paramData.table = self.gridType;
+				}
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+					paramData: paramData
+				}, { overlay: false }).then(function(response)
+				{
+					if (response && response.Items && response.Items[0])
+					{
+						var layoutEntity;
+						if (response && response.Items && response.Items[0][0])
+						{
+							layoutEntity = response.Items[0][0];
+						}
+
+						self.applyLayoutEntity(layoutEntity, isDeleted);
+					}
+				});
+			}
+
 			if (layoutId && layoutId !== self.entityDataModel.id())
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", layoutId)).then(function(response)
@@ -1037,7 +1060,7 @@
 			}
 		}
 
-		self.applyLayoutEntity(entity, isDeleted)
+		self.applyLayoutEntity(entity, isDeleted);
 
 		return Promise.resolve();
 	};
