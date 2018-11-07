@@ -777,7 +777,7 @@
 				{//change the api side to avoid http error, using response status 404 to identify the nonexistence.
 					return Promise.reject(response);
 				}
-				self.pageLevelViewModel.popupSuccessMessage("Field Trip Copyed!");
+				self.pageLevelViewModel.popupSuccessMessage("Field Trip Copied");
 				self.searchGrid.refreshClick();
 				return true;
 			}.bind(self))
