@@ -778,9 +778,14 @@
 					});
 				}
 
-				var kendoGridTotal = self.kendoGrid && self.kendoGrid.dataSource && self.kendoGrid.dataSource.total();
-				kendoGridTotal = Math.max(self.obFilteredRecordCount(), (kendoGridTotal || 0));
-				self.obFilteredRecordCount(kendoGridTotal);
+				if (!self.result && self.kendoGrid && self.kendoGrid.dataSource && self.kendoGrid.dataSource)
+				{
+					self.obFilteredRecordCount(self.kendoGrid.dataSource.total());
+					self.kendoGrid.dataSource.bind("change", function()
+					{
+						self.obFilteredRecordCount(self.kendoGrid.dataSource.total());
+					});
+				}
 			},
 			filterMenuInit: self.filterMenuInit.bind(self)
 		};
