@@ -12,6 +12,7 @@
 		self.options = options;
 		self.detailView = detailView;
 		self.stickyName = "grid.detailscreenlayoutid." + options.gridType;
+		self.defaultLayoutId = options.defaultLayoutId;
 
 		self.obSelectLayoutID = ko.observable(tf.storageManager.get(self.stickyName));
 		self.obSelectLayoutName = ko.observable("");
@@ -166,7 +167,7 @@
 	LayoutMenuViewModel.prototype.clearLayout = function()
 	{
 		var self = this;
-		self.obSelectLayoutID(null);
+		self.obSelectLayoutID(self.defaultLayoutId);
 		self.obSelectLayoutName("");
 		tf.storageManager.save(self.stickyName, null);
 	};

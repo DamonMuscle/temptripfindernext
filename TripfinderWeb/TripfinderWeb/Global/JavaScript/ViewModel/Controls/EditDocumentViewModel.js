@@ -188,8 +188,8 @@
 						return saveAddDocument();
 					}
 				}
-			}.bind(this))
-	}
+			}.bind(this));
+	};
 
 	EditDocumentViewModel.prototype.setInitAssociations = function(associations)
 	{

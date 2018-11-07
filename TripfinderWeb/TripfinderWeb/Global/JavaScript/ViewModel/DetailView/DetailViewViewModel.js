@@ -92,6 +92,7 @@
 		self.documentclassification = "documentclassification";
 
 		tf.pageManager.resizablePage.onSizeChanged.subscribe(self.manageLayout);
+		self.defaultLayoutId = null;
 	}
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
@@ -1018,7 +1019,9 @@
 
 		if (!entity)
 		{
-			if (tf.storageManager.get(self.stickyName) === undefined)
+			self.defaultLayoutId = null;
+
+			if (!layoutId || self.defaultLayoutId)
 			{
 				if (self.gridType)
 				{
@@ -1028,16 +1031,20 @@
 					paramData: paramData
 				}, { overlay: false }).then(function(response)
 				{
+					var layoutEntity;
 					if (response && response.Items && response.Items[0])
 					{
-						var layoutEntity;
-						if (response && response.Items && response.Items[0][0])
+						var layouts = response.Items[0];
+						layouts.forEach(function(layout)
 						{
-							layoutEntity = response.Items[0][0];
-						}
-
-						self.applyLayoutEntity(layoutEntity, isDeleted);
+							if (layout.Name === "FIELD TRIPS DEFAULT LAYOUT")
+							{
+								layoutEntity = layout;
+								self.defaultLayoutId = layout.Id;
+							}
+						});
 					}
+					self.applyLayoutEntity(layoutEntity, isDeleted);
 				});
 			}
 
@@ -4577,7 +4584,8 @@
 		if (cacheOperatorBeforeOpenMenu)
 		{
 			var options = {
-				gridType: self.gridType
+				gridType: self.gridType,
+				defaultLayoutId: self.defaultLayoutId
 			};
 
 			if (isFromMoreButton)
