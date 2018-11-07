@@ -93,15 +93,12 @@
 						}
 						tf.storageManager.save("lastTimeShowMessageDate", new Date());
 					}
-					console.log(lastTime);
-					console.log(new Date());
-					console.log(shouldShowModal);
+
 					if (shouldShowModal)
 					{
-						tf.modalManager.showModal(
-							new TF.Modal.MessageModalViewModel(result.Items[0])
-						);
+						tf.modalManager.showModal(new TF.Modal.MessageModalViewModel(result.Items[0]));
 					}
+
 					return true;
 				}
 			}
