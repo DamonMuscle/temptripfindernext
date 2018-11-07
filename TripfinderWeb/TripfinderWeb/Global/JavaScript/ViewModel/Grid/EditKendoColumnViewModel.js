@@ -154,10 +154,12 @@
 		this.availableColGridContainer.bind("click", function()
 		{
 			this.focusedGridName = "available";
+			_availableColGrid.element.focus();
 		}.bind(this));
 		this.selectedColGridContainer.bind("click", function()
 		{
 			this.focusedGridName = "selected";
+			_selectedColGrid.element.focus();
 		}.bind(this));
 	};
 
@@ -354,7 +356,7 @@
 		});
 		_availableColGrid = this.availableColGridContainer.data("kendoGrid");
 		_cancelKendoGridSelectedArea(_availableColGrid);
-
+		_availableColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: _availableColGrid });
 		this.initGridScrollBar(this.availableColGridContainer);
 	};
 
@@ -384,7 +386,7 @@
 		});
 		_selectedColGrid = this.selectedColGridContainer.data("kendoGrid");
 		_cancelKendoGridSelectedArea(_selectedColGrid);
-
+		_selectedColGrid.shortcutExtender = new TF.KendoGridNavigator({ grid: _selectedColGrid });
 		this.initGridScrollBar(this.selectedColGridContainer);
 	};
 

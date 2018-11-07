@@ -62,9 +62,12 @@
 		var self = this;
 		self.listFilters = TF.ListFilterHelper.initListFilters();
 		self.$container = $container;
+
+		self.viewPortPageSize = options.viewPortPageSize || 16;
+		delete options.viewPortPageSize;
+
 		self.options = $.extend(true, {}, defaults, options);
 		self.subscriptions = [];
-
 
 		if (!gridState)
 		{
@@ -146,9 +149,9 @@
 			tf.shortCutKeys.bind("right", function() { self.horizontalMoveScrollBar(false); }, self.options.routeState);
 			tf.shortCutKeys.bind("left", function() { self.horizontalMoveScrollBar(true); }, self.options.routeState);
 			tf.shortCutKeys.bind("ctrl+home", function() { self.moveSelectedIndex(0); }, self.options.routeState);
-			tf.shortCutKeys.bind("ctrl+end", function() { self.moveSelectedIndex(self.obFilteredRecordCount()); }, self.options.routeState);
-			tf.shortCutKeys.bind("pageup", function() { self.moveSelectedIndex(null, -16); }, self.options.routeState);
-			tf.shortCutKeys.bind("pagedown", function() { self.moveSelectedIndex(null, 16); }, self.options.routeState);
+			tf.shortCutKeys.bind("ctrl+end", function() { self.moveSelectedIndex(Number.MAX_VALUE); }, self.options.routeState);
+			tf.shortCutKeys.bind("pageup", function() { self.moveSelectedIndex(null, -self.viewPortPageSize); }, self.options.routeState);
+			tf.shortCutKeys.bind("pagedown", function() { self.moveSelectedIndex(null, self.viewPortPageSize); }, self.options.routeState);
 		}
 
 		self.obFilteredRecordCount = ko.observable(0);
@@ -747,7 +750,6 @@
 					}
 				}
 
-
 				if (self.result)
 				{
 					self.allIds = [];
@@ -756,6 +758,7 @@
 						self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + (self.currentTotalCount || self.result.TotalRecordCount));
 						self._resetPageInfoSelect();
 					});
+
 					self.obFilteredRecordCount(self.result.FilteredRecordCount);
 					self.obTotalRecordCount(self.result.TotalRecordCount);
 					self.getDefaultCheckedRecords(self.result.Items);
@@ -774,6 +777,10 @@
 						}
 					});
 				}
+
+				var kendoGridTotal = self.kendoGrid && self.kendoGrid.dataSource && self.kendoGrid.dataSource.total();
+				kendoGridTotal = Math.max(self.obFilteredRecordCount(), (kendoGridTotal || 0));
+				self.obFilteredRecordCount(kendoGridTotal);
 			},
 			filterMenuInit: self.filterMenuInit.bind(self)
 		};
@@ -3689,7 +3696,16 @@
 				});
 
 			self.getSelectedRecords(records);
-			self.obSelectedIndex(ids.length ? self.obAllIds().indexOf(ids[0]) : -1);
+
+			var allIds = self.obAllIds();
+			if (allIds && allIds.length)
+			{
+				self.obSelectedIndex(allIds.indexOf(ids[0]));
+			}
+			else
+			{
+				self.obSelectedIndex(self.kendoGrid.dataSource.indexOf(records[0]));
+			}
 		}
 
 		self.getSelectedIds().forEach(function(id)
@@ -3919,8 +3935,24 @@
 		if (!length) return;
 
 		value = Math.max(Math.min(length - 1, value), 0);
-		var id = this.obAllIds()[value];
-		this.getSelectedIds([id]);
+
+		if (value == -1)
+		{
+			this.getSelectedIds([]);
+			return;
+		}
+
+		var allIds = this.obAllIds(), id;
+		if (allIds && allIds.length)
+		{
+			id = allIds[value];
+		}
+		else
+		{
+			id = this.kendoGrid.dataSource.at(value)[this.options.Id];
+		}
+
+		this.getSelectedIds(id == null ? [] : [id]);
 	};
 
 	LightKendoGrid.prototype.scrollToSelection = function()

@@ -501,6 +501,7 @@
 			height: this.options.height,
 			sort: this.options.sort,
 			reorderable: true,
+			viewPortPageSize: 8,
 			columnReorder: function(e)
 			{
 				var selectedGrid = $(".selectedcolumngrid-container").data("kendoGrid");
@@ -916,6 +917,7 @@
 			showBulkMenu: this.options.showBulkMenu,
 			showLockedColumn: this.options.showLockedColumn,
 			height: this.options.height,
+			viewPortPageSize: 8,
 			columnReorder: function(e)
 			{
 				var availableGrid = $(".availablecolumngrid-container").data("kendoGrid");
