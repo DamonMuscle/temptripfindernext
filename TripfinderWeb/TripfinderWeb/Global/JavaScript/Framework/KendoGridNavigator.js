@@ -4,7 +4,7 @@
 
 	function KendoGridNavigator(options)
 	{
-		TF.ShortcutExtender.call(this, options.grid.element, options.forceFocusable);
+		TF.ShortcutExtender.call(this, options.grid.element, options.forceFocusable != null ? options.forceFocusable : true);
 		this.grid = options.grid;
 		this.keyFieldName = options.keyFieldName || 'kendoUid';
 		this.addShortcuts();
