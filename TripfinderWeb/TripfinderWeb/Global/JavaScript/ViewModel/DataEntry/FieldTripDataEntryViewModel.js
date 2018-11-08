@@ -22,6 +22,10 @@
 		this.obRequiredFields = ko.observable(new TF.DataModel.FieldTripDataModel());
 		this.obEntityDataModel(new TF.DataModel.FieldTripDataModel());
 		this.obDepartureAndReturnDateTime = ko.observable();
+		this.obDepartureDateSaveValue = ko.observable();
+		this.obDepartureTimeSaveValue = ko.observable();
+		this.obReturnDateSaveValue = ko.observable();
+		this.obReturnTimeSaveValue = ko.observable();
 		this.obDuration = ko.observable();
 		this.onAuditType = ko.observable();
 		this.obTemplateSource = ko.observableArray();
@@ -676,7 +680,10 @@
 				{
 					this.$form.find("input[name='name']").focus();
 				}
-
+				this.obDepartureDateSaveValue(this.obEntityDataModel().departDate());
+				this.obDepartureTimeSaveValue(this.obEntityDataModel().departTime());
+				this.obReturnDateSaveValue(this.obEntityDataModel().returnDate());
+				this.obReturnTimeSaveValue(this.obEntityDataModel().returnTime());
 				return true;
 			}.bind(this)).catch(function(response)
 			{//no need to do anything.
@@ -1971,6 +1978,15 @@
 
 	FieldTripDataEntryViewModel.prototype.checkDeadline = function(departDate)
 	{
+		// FT-988 If in edit model, the departure date and return date didn't change, then didn't check the dead line.
+		if (this.obDepartureDateSaveValue().substring(0, 10) === this.obEntityDataModel().departDate().substring(0, 10)
+			&& this.obDepartureTimeSaveValue().substring(11) === this.obEntityDataModel().departTime().substring(11)
+			&& this.obReturnDateSaveValue().substring(0, 10) === this.obEntityDataModel().returnDate().substring(0, 10)
+			&& this.obReturnTimeSaveValue().substring(11) === this.obEntityDataModel().returnTime().substring(11))
+		{
+			return null;
+		}
+
 		if (!departDate)
 		{
 			return null;
