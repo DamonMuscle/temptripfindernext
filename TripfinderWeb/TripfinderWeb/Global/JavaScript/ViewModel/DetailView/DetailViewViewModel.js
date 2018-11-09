@@ -872,7 +872,7 @@
 		self.isReadMode = ko.observable(true);
 		self.isGroupMode = ko.observable(false);
 		self.obName = ko.observable("");
-		self.obSelectName = ko.observable("Layout Name");
+		self.obSelectName = ko.observable("");
 		self.obTitle = ko.observable("");
 		self.obSubTitle = ko.observable("");
 		self.obRecordPicture = ko.observable(null);
@@ -1031,18 +1031,25 @@
 					paramData: paramData
 				}, { overlay: false }).then(function(response)
 				{
-					var layoutEntity;
+					var layoutEntity = {};
 					if (response && response.Items && response.Items[0])
 					{
 						var layouts = response.Items[0];
-						layouts.forEach(function(layout)
+						if (layouts.length > 0)
 						{
-							if (layout.Name === "FIELD TRIPS DEFAULT LAYOUT")
+							layouts.forEach(function(layout)
 							{
-								layoutEntity = layout;
-								self.defaultLayoutId = layout.Id;
-							}
-						});
+								if (layout.Name === "FIELD TRIPS DEFAULT LAYOUT")
+								{
+									layoutEntity = layout;
+									self.defaultLayoutId = layout.Id;
+								}
+							});
+						} else
+						{
+							layoutEntity.Name = "Layout Name";
+						}
+
 					}
 					self.applyLayoutEntity(layoutEntity, isDeleted);
 				});
@@ -1094,7 +1101,7 @@
 			self.obName(self.entityDataModel.name());
 			self.obRecordPicture(defaultPictureSrc ? ("url(" + defaultPictureSrc + ")") : "");
 		}
-		self.obSelectName(layoutEntity ? self.entityDataModel.name() : "Layout Name");
+		self.obSelectName(layoutEntity ? self.entityDataModel.name() : "");
 		self.layoutEntityBeforeEditing = self.entityDataModel.toData();
 	};
 
