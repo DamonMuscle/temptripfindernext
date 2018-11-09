@@ -28,16 +28,16 @@
 
 	FieldTripInvoiceGridViewModel.prototype._viewfromDBClick = function(event, item)
 	{
-		switch (this._gridState.entityType)
-		{
-			case "fieldtrip":
-				break;
-			case "fieldtripEntry":
-				this._viewfromDBClick(event);
-				break;
-			default:
-				break;
-		}
+		// switch (this._gridState.entityType)
+		// {
+		// 	case "fieldtrip":
+		// 		break;
+		// 	case "fieldtripEntry":
+		// 		this._viewfromDBClick(event);
+		// 		break;
+		// 	default:
+		// 		break;
+		// }
 	};
 
 	FieldTripInvoiceGridViewModel.prototype.getFieldTripInvoiceDataModel = function(e)
