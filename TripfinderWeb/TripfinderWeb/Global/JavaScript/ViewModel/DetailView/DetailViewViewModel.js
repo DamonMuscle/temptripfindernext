@@ -2514,7 +2514,7 @@
 		}
 	};
 
-	DetailViewViewModel.prototype.initEmptyDetailGrid = function(kendoGrid, $item, columns, sortFunc, noPermission, type)
+	DetailViewViewModel.prototype.initEmptyDetailGrid = function(kendoGrid, $item, columns, sortFunc, hasPermission, type)
 	{
 		var self = this,
 			dataSource = new kendo.data.DataSource({
@@ -2529,10 +2529,10 @@
 		kendoGrid.setDataSource(dataSource);
 		self.updateGridFooter($item, 0, 0);
 
-		if (noPermission)
+		if (!hasPermission)
 		{
-			$item.find(".custom-grid").addClass("no-permission");
-			$item.find(".k-grid-content").empty().append("<p>You don't have permission to view " + tf.pageManager.getPageTitleByPageName(type) + " data.</p>");
+			$item.find(".grid-stack-item-content").addClass("no-permission");
+			$item.find(".k-grid-content").empty().append("<p>You don't have permission to view " + type + " data.</p>");
 		}
 	};
 
@@ -3050,45 +3050,36 @@
 			columns: self.getKendoColumnsExtend(columns)
 		}).data("kendoGrid");
 
-		if (self.isReadMode())
+		var hasPermission = tf.permissions.documentRead;
+		if (self.isReadMode() && hasPermission)
 		{
-			if (tf.permissions.documentRead)
-			{
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.gridType, self.entity.Id, "documents"))
-					.then(function(response)
-					{
-						var dataSource = new kendo.data.DataSource({
-							schema: {
-								model: {
-									fields: self.getKendoField(columns)
-								}
-							},
-							data: [],
-						});
-						$.each(response.Items, function(index, item)
-						{
-							var fileData = {};
-							fileData.FileName = item.Filename;
-							fileData.Size = item.FileSizeKb;
-							dataSource.options.data.push(fileData);
-						});
-						kendoGrid.setDataSource(dataSource);
-						data = response.Items;
-						$(".document.grid-stack-item-content tbody").on("dblclick", action);
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.gridType, self.entity.Id, "documents"))
+				.then(function(response)
+				{
+					var dataSource = new kendo.data.DataSource({
+						schema: {
+							model: {
+								fields: self.getKendoField(columns)
+							}
+						},
+						data: [],
 					});
-			}
+					$.each(response.Items, function(index, item)
+					{
+						var fileData = {};
+						fileData.FileName = item.Filename;
+						fileData.Size = item.FileSizeKb;
+						dataSource.options.data.push(fileData);
+					});
+					kendoGrid.setDataSource(dataSource);
+					data = response.Items;
+					$(".document.grid-stack-item-content tbody").on("dblclick", action);
+				});
 		}
 		else
 		{
-			var dataSource = new kendo.data.DataSource({
-				schema: {
-					model: {
-						fields: self.getKendoField(columns)
-					}
-				},
-				data: [],
-			});
-			kendoGrid.setDataSource(dataSource);
+			self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, null, hasPermission, "Document");
+
 		}
 	};
 	/**
