@@ -4936,7 +4936,7 @@
 				$div = $item.find("div.item-title-ruler"),
 				$input = $item.find("input.item-title"),
 				content = $input.val().toUpperCase(),
-				width = Math.min($div.text(content).css("display", "inline").outerWidth(), $item.outerWidth() * 2 / 3);
+				width = Math.min($div.text(content).css("display", "inline").outerWidth(), $item.outerWidth() * 2 / 3) + 1;
 
 			$item.attr("title", content);
 			$input.width(width);
