@@ -1019,40 +1019,42 @@
 
 		if (!entity)
 		{
-			self.defaultLayoutId = null;
-
-			if (!layoutId || self.defaultLayoutId)
+			if (self.isReadMode())
 			{
-				if (self.gridType)
+				self.defaultLayoutId = null;
+				if (!layoutId || self.defaultLayoutId)
 				{
-					paramData.table = self.gridType;
-				}
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
-					paramData: paramData
-				}, { overlay: false }).then(function(response)
-				{
-					var layoutEntity = {};
-					if (response && response.Items && response.Items[0])
+					if (self.gridType)
 					{
-						var layouts = response.Items[0];
-						if (layouts.length > 0)
-						{
-							layouts.forEach(function(layout)
-							{
-								if (layout.Name === "FIELD TRIPS DEFAULT LAYOUT")
-								{
-									layoutEntity = layout;
-									self.defaultLayoutId = layout.Id;
-								}
-							});
-						} else
-						{
-							layoutEntity.Name = "Layout Name";
-						}
-
+						paramData.table = self.gridType;
 					}
-					self.applyLayoutEntity(layoutEntity, isDeleted);
-				});
+					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+						paramData: paramData
+					}, { overlay: false }).then(function(response)
+					{
+						var layoutEntity = {};
+						if (response && response.Items && response.Items[0])
+						{
+							var layouts = response.Items[0];
+							if (layouts.length > 0)
+							{
+								layouts.forEach(function(layout)
+								{
+									if (layout.Name === "FIELD TRIPS DEFAULT LAYOUT")
+									{
+										layoutEntity = layout;
+										self.defaultLayoutId = layout.Id;
+									}
+								});
+							} else
+							{
+								layoutEntity.Name = "Layout Name";
+							}
+
+						}
+						self.applyLayoutEntity(layoutEntity, isDeleted);
+					});
+				}
 			}
 
 			if (layoutId && layoutId !== self.entityDataModel.id())
