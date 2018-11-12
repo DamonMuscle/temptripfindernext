@@ -32,6 +32,7 @@
 		};
 		self.startUpdateAfterAddBlock = false;
 		self.stickyName = "grid.detailscreenlayoutid." + self.gridType;
+		self.stickyLayoutName = "grid.detailscreenlayoutname." + self.gridType;
 		self.$columnPopup = null;
 		self.changeColorTimeout = [];
 		self.currentEntityId = -1;
@@ -1061,13 +1062,21 @@
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", layoutId)).then(function(response)
 				{
-					var layoutEntity;
-					if (response && response.Items && response.Items[0])
+					if (response && response.Items && response.Items.length == 1)
 					{
-						layoutEntity = response.Items[0];
+						self.applyLayoutEntity(response.Items[0], isDeleted);
 					}
-
-					self.applyLayoutEntity(layoutEntity, isDeleted);
+					else
+					{
+						var layoutEntities = self.layoutMenu && self.layoutMenu.obLayouts().filter(function(item) { return item.id() === id });
+						var layoutName = layoutEntities && layoutEntities.length == 1 ? layoutEntities[0].name() : tf.storageManager.get(self.stickyLayoutName);
+						tf.promiseBootbox.alert("The Detail Layout (" + layoutName + ") that you had applied has been deleted.  It is no longer available.");
+						self.applyLayoutEntity({});
+						self.obSelectName("Layout Name");
+						self.layoutMenu && self.layoutMenu.resetLayoutClick();
+						tf.storageManager.delete(self.stickyName);
+						tf.storageManager.delete(self.stickyLayoutName);
+					}
 				});
 			}
 			else if (layoutId && layoutId === self.entityDataModel.id())
@@ -1108,10 +1117,10 @@
 	};
 
 	/**
- 	* Open the detail screen panel.
- 	* @param {Array} ids the entity ids, which entities will be displayed
- 	* @returns {void} 
- 	*/
+	  * Open the detail screen panel.
+	  * @param {Array} ids the entity ids, which entities will be displayed
+	  * @returns {void} 
+	  */
 	DetailViewViewModel.prototype.show = function(ids, gridType)
 	{
 		var self = this;
@@ -1126,8 +1135,8 @@
 	};
 
 	/**
- 	* determine whether detail layout is alive
- 	*/
+	  * determine whether detail layout is alive
+	  */
 	DetailViewViewModel.prototype.checkDetailLayout = function()
 	{
 		var self = this;
@@ -1143,12 +1152,13 @@
 				else
 				{
 					var layoutEntities = self.layoutMenu && self.layoutMenu.obLayouts().filter(function(item) { return item.id() === id });
-					var layoutName = layoutEntities && layoutEntities.length == 1 ? layoutEntities[0].name() : tf.storageManager.get("current_detail_layout_name", true);
+					var layoutName = layoutEntities && layoutEntities.length == 1 ? layoutEntities[0].name() : tf.storageManager.get(self.stickyLayoutName);
 					tf.promiseBootbox.alert("The Detail Layout (" + layoutName + ") that you had applied has been deleted.  It is no longer available.");
 					self.applyLayoutEntity({});
 					self.obSelectName("Layout Name");
 					self.layoutMenu && self.layoutMenu.resetLayoutClick();
 					tf.storageManager.delete(self.stickyName);
+					tf.storageManager.delete(self.stickyLayoutName);
 				}
 			});
 		}
@@ -4585,7 +4595,8 @@
 		{
 			var options = {
 				gridType: self.gridType,
-				defaultLayoutId: self.defaultLayoutId
+				defaultLayoutId: self.defaultLayoutId,
+				stickyLayoutName: self.stickyLayoutName
 			};
 
 			if (isFromMoreButton)
@@ -4645,10 +4656,10 @@
 	};
 
 	/**
- * Toggle the Data Point Panel display status.
- * @param {Object} data The data object.
- * @return {void} 
- */
+	* Toggle the Data Point Panel display status.
+	* @param {Object} data The data object.
+	* @return {void} 
+	*/
 	DetailViewViewModel.prototype.toggleDataPointPanel = function(data)
 	{
 		var self = this;

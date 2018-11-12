@@ -12,10 +12,11 @@
 		self.options = options;
 		self.detailView = detailView;
 		self.stickyName = "grid.detailscreenlayoutid." + options.gridType;
+		self.stickyLayoutName = options.stickyLayoutName ? options.stickyLayoutName : "grid.detailscreenlayoutname." + options.gridType;
 		self.defaultLayoutId = options.defaultLayoutId;
 
 		self.obSelectLayoutID = ko.observable(tf.storageManager.get(self.stickyName));
-		self.obSelectLayoutName = ko.observable("");
+		self.obSelectLayoutName = ko.observable(tf.storageManager.get(self.stickyLayoutName));
 		self.obLayouts = ko.observableArray([]);
 		self.obMoveDistance = ko.observable(options.movingDistance != null ? "-" + options.movingDistance + "px" : "auto");
 		self.obTop = ko.observable(options.top + "px");
@@ -170,6 +171,7 @@
 		self.obSelectLayoutID(self.defaultLayoutId);
 		self.obSelectLayoutName("");
 		tf.storageManager.save(self.stickyName, null);
+		tf.storageManager.save(self.stickyLayoutName, null);
 	};
 
 	/**
@@ -203,6 +205,7 @@
 		self.obSelectLayoutID(layout.selectId)
 		self.obSelectLayoutName(layout.selectName);
 		tf.storageManager.save(self.stickyName, layout.selectId);
+		tf.storageManager.save(self.stickyLayoutName, layout.selectName);
 		self.selectItemEvent.notify(self.obSelectLayoutID());
 	};
 
