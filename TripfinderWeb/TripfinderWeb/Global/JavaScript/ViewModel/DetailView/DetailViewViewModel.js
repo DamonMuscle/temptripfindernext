@@ -463,7 +463,6 @@
 	DetailViewViewModel.prototype.saveGroup = function()
 	{
 		this.dataPointGroupHelper.saveGroup();
-		this.dataPointPanel.stopGroup();
 	};
 
 	DetailViewViewModel.prototype.cancelGroup = function()

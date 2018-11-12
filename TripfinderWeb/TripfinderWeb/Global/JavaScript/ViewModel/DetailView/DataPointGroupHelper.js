@@ -40,6 +40,7 @@
 					data: entity
 				}).then(function(result)
 				{
+					self.detailView.dataPointPanel.stopGroup();
 					self.stopGroup();
 					self.detailView.dataPointPanel.refreshData();
 				});
