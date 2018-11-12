@@ -326,7 +326,7 @@
 		$tempDiv.remove();
 
 		self.addMenuPage("settingsConfig", menu, "Settings & Configuration", "Settings & Configuration", tf.permissions.obIsAdmin(), false);
-		self.addMenuPage("dataSource", menu, width > maxWidth ? "Data Source" : dataSourceText, "Data Source", !tf.permissions.isSupport, false);
+		self.addMenuPage("dataSource", menu, dataSourceText, "Data Source", !tf.permissions.isSupport, false);
 		self.addMenuPage("changePassword", menu, "Change Password", "Change Password", true, false);
 		return menu;
 	};
