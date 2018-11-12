@@ -18,11 +18,11 @@
 		<div class="iconrow">
 			<!-- ko if: pageType !== "reports"-->
 			<button class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
-			<!-- ko if:schedulerButton-->
-			<button class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></button>
-			<!-- /ko -->
 			<!-- ko if:detailButton-->
 			<button class="iconbutton details" title="Detail View" data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
+			<!-- /ko -->
+			<!-- ko if:schedulerButton-->
+			<button class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></button>
 			<!-- /ko -->
 			<div class="divider" title=""></div>
 			<button class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></button>
@@ -58,7 +58,7 @@
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
 					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
-					 style="max-width:150px;"></span>
+						  style="max-width:150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
