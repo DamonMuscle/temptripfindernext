@@ -1553,6 +1553,8 @@
 						}
 						else
 						{
+							obDocument.LastUpdated = moment().format("MM/DD/YYYY");
+							obDocument.LastUpdatedName = tf.authManager.authorizationInfo.authorizationTree.username;
 							obDocument.FileSizeKb = byteLength(result.FileContent);
 						}
 						obDocument.Id = self.tempId - 1;

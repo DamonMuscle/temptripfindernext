@@ -208,6 +208,8 @@
 					documentEntity.Id = this.documentData.Id;
 					documentEntity.Filename = this.documentData.Filename;
 					documentEntity.FileSizeKb = this.documentData.FileSizeKb;
+					documentEntity.LastUpdated = moment().format("MM/DD/YYYY");
+					documentEntity.LastUpdatedName = tf.authManager.authorizationInfo.authorizationTree.username;
 					documentEntity.DocumentClassificationId = this.documentData.DocumentClassificationId;
 					documentEntity.Description = this.documentData.Description;
 					documentEntity.DocumentEntity = this.documentData.DocumentEntity;
