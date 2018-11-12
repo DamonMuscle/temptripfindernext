@@ -925,6 +925,7 @@
 				}
 				widget.hide();
 
+				//$(window).off('resize', place);
 				widget.off('click', '[data-action]');
 				widget.off('mousedown', false);
 
@@ -1095,6 +1096,11 @@
 						{
 							$this.find('span').toggleClass(options.icons.time + ' ' + options.icons.date);
 						}
+
+						// NOTE: uncomment if toggled state will be restored in show()
+						//if (component) {
+						//    component.find('span').toggleClass(options.icons.time + ' ' + options.icons.date);
+						//}
 					}
 				},
 
@@ -1233,6 +1239,7 @@
 				update();
 				showMode();
 
+				//$(window).on('resize', place);
 				widget.on('click', '[data-action]', doAction); // this handles clicks on the widget
 				widget.on('mousedown', false);
 
@@ -1243,9 +1250,10 @@
 				widget.show();
 				place();
 
-				if (!input.is(':focus'))// && !TF.isMobileDevice)
+				if (!input.is(':focus') && !TF.isMobileDevice)
 				{
-					input.focus();
+					// only focus first element 'input', otherwise input will be blurred in IE.
+					input.first().focus();
 				}
 
 
@@ -1275,6 +1283,16 @@
 
 			keydown = function(e)
 			{
+				//if (e.keyCode === 27 && widget) { // allow escape to hide picker
+				//    hide();
+				//    return false;
+				//}
+				//if (e.keyCode === 40 && !widget) { // allow down to show picker
+				//    show();
+				//    e.preventDefault();
+				//}
+				//return true;
+
 				var handler = null,
 					index,
 					index2,
@@ -1362,8 +1380,14 @@
 					'keyup': keyup
 				});
 
+				// if (element.is('input')) {
+				//     input.on({
+				//         'focus': show
+				//     });
+				// } else if (component) {
 				component.on('click', toggle);
 				component.on('mousedown', false);
+				// }
 			},
 
 			detachDatePickerElementEvents = function()
@@ -2246,7 +2270,14 @@
 			}
 		}
 
+		// if (element.hasClass('input-group')) {
+		// in case there is more then one 'input-group-addon' Issue #48
+		// if (element.find('.datepickerbutton').size() === 0) {
+		// component = element.find('[class^="input-group-"]');
+		// } else {
 		component = $(element[1]);
+		// }
+		// }
 
 		if (!options.inline && !input.is('input'))
 		{
@@ -2288,12 +2319,15 @@
 
 	$.fn.datetimepicker = function(options)
 	{
+		// return this.each(function () {
 		var $this = $(this);
 		if (!$this.data('DateTimePicker'))
 		{
+			// create a private copy of the defaults object
 			options = $.extend(true, {}, $.fn.datetimepicker.defaults, options);
 			$this.data('DateTimePicker', dateTimePicker($this, options));
 		}
+		// });
 	};
 
 	$.fn.datetimepicker.defaults = {
@@ -2457,7 +2491,10 @@
 			{
 				this.hide();
 			},
-
+			//tab: function (widget) { //this break the flow of the form. disabling for now
+			//    var toggle = widget.find('.picker-switch a[data-action="togglePicker"]');
+			//    if(toggle.length > 0) toggle.click();
+			//},
 			'control space': function(widget)
 			{
 				if (widget.find('.timepicker').is(':visible'))
