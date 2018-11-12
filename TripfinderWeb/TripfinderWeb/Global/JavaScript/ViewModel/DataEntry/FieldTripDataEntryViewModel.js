@@ -1547,6 +1547,8 @@
 						if (result.FileContent === null || result.FileContent.length === 0)
 						{
 
+							obDocument.FileContent = "";
+							obDocument.DocumentEntity.FileContent = "";
 							obDocument.FileSizeKb = 0;
 						}
 						else
