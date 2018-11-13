@@ -94,6 +94,7 @@
 
 		tf.pageManager.resizablePage.onSizeChanged.subscribe(self.manageLayout);
 		self.defaultLayoutId = null;
+		self.defaultLayoutName = null;
 	}
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
@@ -1022,6 +1023,7 @@
 			if (self.isReadMode())
 			{
 				self.defaultLayoutId = null;
+				self.defaultLayoutName = null;
 				if (!layoutId || self.defaultLayoutId)
 				{
 					if (self.gridType)
@@ -1044,6 +1046,7 @@
 									{
 										layoutEntity = layout;
 										self.defaultLayoutId = layout.Id;
+										self.defaultLayoutName = layout.Name;
 									}
 								});
 							} else
@@ -4595,6 +4598,7 @@
 			var options = {
 				gridType: self.gridType,
 				defaultLayoutId: self.defaultLayoutId,
+				defaultLayoutName: self.defaultLayoutName,
 				stickyLayoutName: self.stickyLayoutName
 			};
 

@@ -14,6 +14,8 @@
 		self.stickyName = "grid.detailscreenlayoutid." + options.gridType;
 		self.stickyLayoutName = options.stickyLayoutName ? options.stickyLayoutName : "grid.detailscreenlayoutname." + options.gridType;
 		self.defaultLayoutId = options.defaultLayoutId;
+		self.defaultLayoutName = options.defaultLayoutName;
+
 
 		self.obSelectLayoutID = ko.observable(tf.storageManager.get(self.stickyName));
 		self.obSelectLayoutName = ko.observable(tf.storageManager.get(self.stickyLayoutName));
@@ -169,7 +171,7 @@
 	{
 		var self = this;
 		self.obSelectLayoutID(self.defaultLayoutId);
-		self.obSelectLayoutName("");
+		self.obSelectLayoutName(self.defaultLayoutName);
 		tf.storageManager.save(self.stickyName, null);
 		tf.storageManager.save(self.stickyLayoutName, null);
 	};
@@ -202,7 +204,7 @@
 	LayoutMenuViewModel.prototype.apply = function(layout)
 	{
 		var self = this;
-		self.obSelectLayoutID(layout.selectId)
+		self.obSelectLayoutID(layout.selectId);
 		self.obSelectLayoutName(layout.selectName);
 		tf.storageManager.save(self.stickyName, layout.selectId);
 		tf.storageManager.save(self.stickyLayoutName, layout.selectName);
