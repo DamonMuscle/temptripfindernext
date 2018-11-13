@@ -232,7 +232,7 @@
 
 	AuthorizationInfo.prototype.checkOnlyLevel1 = function()
 	{
-		if (this.isFieldTripAdmin) return false;
+		if (this.isAdmin || this.isFieldTripAdmin) return false;
 
 		var securedItems = this.authorizationTree.securedItems;
 		return !["level2Administrator", "level3Administrator", "level4Administrator"].some(function(item)
@@ -251,7 +251,7 @@
 	{
 		this.isAdmin = authorizationInfoJson.IsAdmin;
 		this.authorizationTree = authorizationInfoJson.AuthorizationTree;
-		this.isFieldTripAdmin = authorizationInfoJson.IsAdmin || this.isAuthorizedFor("transportationAdministrator", "read");
+		this.isFieldTripAdmin = this.isAuthorizedFor("transportationAdministrator", "read");
 		this.onlyLevel1 = this.checkOnlyLevel1();
 		if (this.onUpdateAuthorized)
 		{

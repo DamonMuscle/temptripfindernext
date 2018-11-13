@@ -27,31 +27,21 @@
 	<!-- /ko -->
 	<!-- /ko -->
 	<div class="navigation-content" data-bind="css:tf.permissions.isSupport?'not-contain-quick-search':''">
-		<!-- ko if: tf.authManager.authorizationInfo.isFieldTripAdmin -->
 		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
-			<div class="item-icon fieldtrips"></div>
-			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
+				<div class="item-icon fieldtrips"></div>
+				<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
 		</div>
+		<!-- ko if: !tf.authManager.authorizationInfo.isFieldTripAdmin -->
 		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
 			<div class="item-icon myrequests"></div>
 			<div class="item-label">My Submitted Requests</div>
 		</div>
 		<!-- /ko -->
-		<!-- ko if: !tf.authManager.authorizationInfo.isFieldTripAdmin -->
-		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
-			<div class="item-icon fieldtrips"></div>
-			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
-		</div>
-		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
-			<div class="item-icon myrequests"></div>
-			<div class="item-label">My Submitted Requests</div>
-		</div>
 		<!-- ko if: !tf.authManager.authorizationInfo.onlyLevel1 -->
 		<div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
 			<div class="item-icon approvals"></div>
 			<div class="item-label">My Pending Approvals</div>
 		</div>
-		<!-- /ko -->
 		<!-- /ko -->
 		<!-- ko if: tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read") -->
 		<div class="navigation-item reports" pageType="reports" data-bind="click:navigationPageCategoryClick.bind($data, 'reports')">

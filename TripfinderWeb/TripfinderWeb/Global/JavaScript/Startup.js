@@ -480,7 +480,7 @@
 												return;
 											}
 
-											if (tf.authManager.authorizationInfo.isFieldTripAdmin)
+											if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin)
 											{
 												var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 												if (!pageName || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
