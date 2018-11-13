@@ -1265,10 +1265,11 @@
 
 			toggle = function()
 			{
-				setTimeout(function()
+				if ($(this).parent())
 				{
-					return (widget ? hide() : show());
-				});
+					$(this).parent().find("input").focus();
+				}
+				return (widget ? hide() : show());
 			},
 
 			parseInputDate = function(inputDate)

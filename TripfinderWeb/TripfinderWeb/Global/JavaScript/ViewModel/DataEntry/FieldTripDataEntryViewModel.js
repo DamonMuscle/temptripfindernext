@@ -1766,8 +1766,8 @@
 					if (returnDate.isSame(departDate, "day"))
 					{
 						this.clearDateTimeAlerts("date");
-						this.$form.find("#returnTime input[name=estimatedReturnTime]").trigger("blur");
-						this.$form.find("#departTime input[name=departTime]").trigger("blur");
+						this.$form.find("#returnTime input[name=estimatedReturnTime]").trigger("change");
+						this.$form.find("#departTime input[name=departTime]").trigger("change");
 						return true;
 					}
 					else if (departDate.isAfter(returnDate))
