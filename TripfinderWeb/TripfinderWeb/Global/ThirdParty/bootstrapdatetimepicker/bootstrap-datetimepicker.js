@@ -1265,7 +1265,10 @@
 
 			toggle = function()
 			{
-				return (widget ? hide() : show());
+				setTimeout(function()
+				{
+					return (widget ? hide() : show());
+				});
 			},
 
 			parseInputDate = function(inputDate)
