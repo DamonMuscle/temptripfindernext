@@ -228,6 +228,12 @@
 			this.resetEmpty(m, collection, 'fieldTripActivityId');
 		}.bind(this);
 
+		this.destinationOnBlur = function(e, m)
+		{
+			var collection = this.getCollection(this.obDestinationDataModels(), 'Name');
+			this.resetEmpty(m, collection, 'destination');
+		}.bind(this);
+
 		this.classificationDisable = function() { return this.obCurrentClassificationName() == ''; };
 
 		this.classificationCss = function() { return this.classificationDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
