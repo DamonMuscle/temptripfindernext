@@ -235,7 +235,7 @@
 		if (this.isAdmin || this.isFieldTripAdmin) return false;
 
 		var securedItems = this.authorizationTree.securedItems;
-		return !["level2Administrator", "level3Administrator", "level4Administrator", "transportationAdministrator"].some(function(item)
+		return !["level2Administrator", "level3Administrator", "level4Administrator"].some(function(item)
 		{
 			var securedItem = securedItems[item];
 			return securedItem && securedItem.length;
