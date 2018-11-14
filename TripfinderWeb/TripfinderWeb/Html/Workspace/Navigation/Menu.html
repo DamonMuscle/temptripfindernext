@@ -31,13 +31,13 @@
 				<div class="item-icon fieldtrips"></div>
 				<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
 		</div>
-		<!-- ko if: !tf.authManager.authorizationInfo.isFieldTripAdmin -->
+		<!-- ko if: tf.authManager.authorizationInfo.isAdmin || !tf.authManager.authorizationInfo.isFieldTripAdmin -->
 		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
 			<div class="item-icon myrequests"></div>
 			<div class="item-label">My Submitted Requests</div>
 		</div>
 		<!-- /ko -->
-		<!-- ko if: !tf.authManager.authorizationInfo.onlyLevel1 -->
+		<!-- ko if: !tf.authManager.authorizationInfo.isAdmin && !tf.authManager.authorizationInfo.onlyLevel1 -->
 		<div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
 			<div class="item-icon approvals"></div>
 			<div class="item-label">My Pending Approvals</div>
