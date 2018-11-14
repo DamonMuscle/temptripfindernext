@@ -633,11 +633,11 @@
 				if (TF.isMobileDevice)
 				{
 					tf.pageManager.resizablePage.clearLeftOtherContent();
-					tf.pageManager.resizablePage.refreshLeftGrid();
+					tf.pageManager.resizablePage.refreshLeftGridKeepSelectItems();
 				}
 				else
 				{
-					tf.pageManager.resizablePage.refreshLeftGrid();
+					tf.pageManager.resizablePage.refreshLeftGridKeepSelectItems();
 					this.obMode('Edit');
 				}
 			}
@@ -659,11 +659,11 @@
 					if (TF.isMobileDevice)
 					{
 						tf.pageManager.resizablePage.clearLeftOtherContent();
-						tf.pageManager.resizablePage.refreshLeftGrid();
+						tf.pageManager.resizablePage.refreshLeftGridKeepSelectItems();
 					}
 					else
 					{
-						tf.pageManager.resizablePage.refreshLeftGrid();
+						tf.pageManager.resizablePage.refreshLeftGridKeepSelectItems();
 						tf.pageManager.resizablePage.closeRightPage();
 					}
 				}

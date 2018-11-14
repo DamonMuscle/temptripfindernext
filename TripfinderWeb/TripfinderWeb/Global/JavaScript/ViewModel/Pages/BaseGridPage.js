@@ -149,7 +149,7 @@
 									if (valid)
 									{
 										next();
-										tf.pageManager.resizablePage.refreshLeftGrid();
+										tf.pageManager.resizablePage.refreshLeftGridKeepSelectItems();
 										return;
 									}
 									cancelAction();

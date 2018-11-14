@@ -24,6 +24,8 @@
 		self.leftPageType = "";
 		self.minLeftWidth = 300;
 		self.minRightWidth = 580;
+		self.leftGridSelectItems = [];
+		self.leftGrid = null;
 
 		self.onLoaded = new TF.Events.Event();
 		self.onSizeChanged = new TF.Events.Event();
@@ -114,6 +116,36 @@
 		grid = $grid.data("kendoGrid");
 		grid.dataSource.read();
 	};
+
+	ResizablePage.prototype.refreshLeftGridKeepSelectItems = function()
+	{
+		var self = this, $grid;
+		$grid = self.$leftPage.find(".kendo-grid");
+		self.leftGrid = $grid.data("kendoGrid");
+		var items = self.leftGrid.items();
+		self.leftGridSelectItems = [];
+		items.each(function(idx, row)
+		{
+			var dataItem = self.leftGrid.dataItem(row);
+			if (row !== null && row.className.toString().indexOf('selected') >= 0 && self.leftGridSelectItems.indexOf(dataItem.id) === -1)
+			{
+				self.leftGridSelectItems.push(dataItem.id);
+			}
+		});
+		//$grid.bind("dataBound", self.reLeftGridSelectSavedValue.bind(self));
+		self.obGridData().searchGrid.onGridReadCompleted.subscribe(self.reLeftGridSelectSavedValue.bind(self));
+		self.leftGrid.dataSource.read();
+
+	};
+
+	ResizablePage.prototype.reLeftGridSelectSavedValue = function()
+	{
+		var self = this;
+		if (self.leftGridSelectItems.length > 0)
+		{
+			self.obGridData().searchGrid.getSelectedIds(self.leftGridSelectItems);
+		}
+	}
 
 	ResizablePage.prototype.reLayoutPage = function(width)
 	{

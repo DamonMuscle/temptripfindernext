@@ -115,6 +115,8 @@
 		self.onDataBoundEvent = new TF.Events.Event();
 		self.onFilterChanged = new TF.Events.Event();
 		self.onIdsChanged = new TF.Events.Event();
+		// FT-1029 add event to rebind select items after grid read completed
+		self.onGridReadCompleted = new TF.Events.Event();
 		self.onCtrlIPress = self.onCtrlIPress.bind(self);
 		self.onCtrlOPress = self.onCtrlOPress.bind(self);
 		self.onCtrlAPress = self.onCtrlAPress.bind(self);
@@ -666,6 +668,7 @@
 										self.kendoDataSourceTransportReadCount = 0;
 										self.$customFilterBtn = undefined;
 									}
+
 								});
 						}
 					}
@@ -4162,6 +4165,7 @@
 			var $nomatching = self.$container.find(".no-matching-records");
 			if ($nomatching.length === 0)
 			{
+
 				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
 				$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
 				$parent.find("table").css("display", "none");
@@ -4293,6 +4297,8 @@
 						tf.loadingIndicator.tryHide();
 					}
 				}
+
+				self.onGridReadCompleted.notify();
 			});
 	};
 
@@ -4768,6 +4774,7 @@
 		this.onCtrlSPress.unsubscribeAll();
 		this.onEnterPress.unsubscribeAll();
 		this.onDoubleClick.unsubscribeAll();
+		this.onGridReadCompleted.unsubscribeAll();
 		this.onRowsChangeCheck.unsubscribeAll();
 		this.onRowsChanged.unsubscribeAll();
 		this.onEyeCheckChanged.unsubscribeAll();
