@@ -377,9 +377,9 @@
 							documentGrid.obCanAdd(false);
 							self.obDocumentGridViewModel().obCanAdd(false);
 						}
+						self.obEntityDataModel().updateEntityBackup();
 					});
 			}
-
 		}
 		else
 		{
@@ -1243,6 +1243,7 @@
 					this.obFieldTripResourceGroupData.push(data);
 					this.ReloadResources();
 				}
+				this.checkGridsData();
 			}.bind(this));
 	};
 
@@ -1271,6 +1272,7 @@
 						this.obFieldTripResourceGroupData(source);
 						this.ReloadResources();
 					}
+					this.checkGridsData();
 				}.bind(this));
 		}
 	};
@@ -1294,6 +1296,7 @@
 
 			this.obFieldTripResourceGroupData(source);
 			this.ReloadResources();
+			this.checkGridsData();
 		}
 	};
 
@@ -1432,10 +1435,11 @@
 					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 					this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 				}
+				this.checkGridsData();
 			}.bind(this));
 	};
 
-	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e)
+	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e) 
 	{
 		var row = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.select();
 		if (row.length)
@@ -1475,6 +1479,7 @@
 						this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 						this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 					}
+					this.checkGridsData();
 				}.bind(this));
 		}
 	};
@@ -1504,6 +1509,8 @@
 			this.obInvoiceGridDataSource(source);
 			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+
+			this.checkGridsData();
 		}
 	};
 
@@ -1530,6 +1537,115 @@
 		lightKendoGrid.currentCount = (lightKendoGrid.currentCount || lightKendoGrid.result.FilteredRecordCount) + (add ? count : - count);
 		lightKendoGrid.currentTotalCount = (lightKendoGrid.currentTotalCount || lightKendoGrid.result.TotalRecordCount) + (add ? count : - count);
 		lightKendoGrid.$container.children(".k-pager-wrap").find(".pageInfo").html(lightKendoGrid.currentCount + " of " + lightKendoGrid.currentTotalCount);
+	};
+
+	FieldTripDataEntryViewModel.prototype.isDocumentsSame = function()
+	{
+		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments, docs2 = this.obDocumentGridDataSource();
+		if (!docs1 && !docs2)
+		{
+			return true;
+		}
+
+		if ((!docs1 || !docs2) || docs1.length !== docs2.length)
+		{
+			return false;
+		}
+		docs1 = sortArray(docs1, "FileName");
+		docs2 = sortArray(docs2, "FileName");
+
+		for (var i = 0; i < docs1.length; i++)
+		{
+			if ((docs1[i].Description || "") !== (docs2[i].Description || "") ||
+				docs1[i].DocumentEntity.DocumentClassificationId !== docs2[i].DocumentEntity.DocumentClassificationId ||
+				(docs1[i].FileName || docs1[i].Filename) !== (docs2[i].FileName || docs2[i].Filename) ||
+				(docs1[i].FileSizeKb || docs1[i].DocumentEntity.FileSizeKb) !== (docs2[i].FileSizeKb || docs2[i].DocumentEntity.FileSizeKb))
+			{
+				return false;
+			}
+		}
+		return true;
+	};
+
+	FieldTripDataEntryViewModel.prototype.isInvoicesSame = function()
+	{
+		var invoices1 = this.obEntityDataModel()._entityBackup.FieldTripInvoice, invoices2 = this.obInvoiceGridDataSource();
+		if (!invoices1 && !invoices2)
+		{
+			return true;
+		}
+
+		if ((!invoices1 || !invoices2) || invoices1.length !== invoices2.length)
+		{
+			return false;
+		}
+		invoices1 = sortArray(invoices1, "Id", true);
+		invoices2 = sortArray(invoices2, "Id", true);
+
+		for (var i = 0; i < invoices1.length; i++)
+		{
+			var fields = ["FieldTripAccountId", "Amount", "InvoiceDate", "PaymentDate", "PurchaseOrder"];
+			if (!this.areFieldsSame(invoices1[i], invoices2[i], fields))
+			{
+				return false;
+			}
+		}
+		return true;
+	};
+
+	FieldTripDataEntryViewModel.prototype.areFieldsSame = function(entity1, entity2, fields)
+	{
+		for (var i = 0; i < fields.length; i++)
+		{
+			if (String(entity1[fields[i]]) !== String(entity2[fields[i]]))
+			{
+				return false;
+			}
+		}
+		return true;
+	};
+
+	FieldTripDataEntryViewModel.prototype.isResourcesSame = function()
+	{
+		var resource1 = this.obEntityDataModel()._entityBackup.FieldTripResourceGroup, resource2 = this.obFieldTripResourceGroupData();
+		if (!resource1 && !resource2)
+		{
+			return true;
+		}
+
+		if ((!resource1 || !resource2) || resource1.length !== resource2.length)
+		{
+			return false;
+		}
+		resource1 = Enumerable.From(resource1).OrderBy(c => c.AideId).ThenBy(n => n.DriverId).ThenBy(n => n.VehicleId).ToArray();
+		resource2 = Enumerable.From(resource2).OrderBy(c => c.AideId).ThenBy(n => n.DriverId).ThenBy(n => n.VehicleId).ToArray();
+
+		for (var i = 0; i < resource1.length; i++)
+		{
+			var fields = ["AideFixedCost", "AideHours", "AideId", "AideOthours", "AideOtrate", "AideRate", "Chaperone", "Chaperone2", "Chaperone3", "Chaperone4",
+				"DriverExpMeals", "DriverExpMisc", "DriverExpParking", "DriverExpTolls", "DriverFixedCost", "DriverHours", "DriverId", "DriverOthours", "DriverOtrate", "DriverRate",
+				"Endingodometer", "MileageRate", "Startingodometer", "VehFixedCost", "VehicleId"];
+			if (!this.areFieldsSame(resource1[i], resource2[i], fields))
+			{
+				return false;
+			}
+		}
+		return true;
+	};
+
+	FieldTripDataEntryViewModel.prototype.checkGridsData = function()
+	{
+		var backupEntity = $.extend({}, this.obEntityDataModel()._entityBackup),
+			currentEntity = $.extend({}, this.obEntityDataModel().toData()), otherChanged;
+
+		delete backupEntity.FieldTripDocuments;
+		delete backupEntity.FieldTripInvoice;
+		delete backupEntity.FieldTripResourceGroup;
+		delete currentEntity.FieldTripDocuments;
+		delete currentEntity.FieldTripInvoice;
+		delete currentEntity.FieldTripResourceGroup;
+		otherChanged = !this.obEntityDataModel().equals(backupEntity, currentEntity);
+		this.obEntityDataModel().apiIsDirty(otherChanged || !this.isDocumentsSame() || !this.isInvoicesSame() || !this.isResourcesSame());
 	};
 
 	FieldTripDataEntryViewModel.prototype.addDocEvent = function(e)
@@ -1579,6 +1695,8 @@
 					self.resetDocumentGridPageInfo(obResults.DocumentEntities.length, true);
 					self.obDocumentAdd = true;
 				}
+
+				self.checkGridsData();
 				self.obPendingDocumentIdChange();
 			}.bind(self));
 	};
@@ -1648,6 +1766,7 @@
 						this.obDocumentKendoDataSource(kendoSource);
 						this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 						this.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
+						this.checkGridsData();
 					}
 				}.bind(this));
 		}
@@ -1731,6 +1850,7 @@
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 			self.resetDocumentGridPageInfo(1, false);
+			self.checkGridsData();
 		}
 	};
 
@@ -2244,16 +2364,16 @@
 			case "billingClassification":
 				if (data == null)
 				{
-					this.obEntityDataModel().aideFixedCost("");
-					this.obEntityDataModel().aideOtrate("");
-					this.obEntityDataModel().aideRate("");
-					this.obEntityDataModel().driverFixedCost("");
-					this.obEntityDataModel().driverOtrate("");
-					this.obEntityDataModel().driverRate("");
-					this.obEntityDataModel().fixedCost("");
-					this.obEntityDataModel().mileageRate("");
-					this.obEntityDataModel().minimumCost("");
-					this.obEntityDataModel().vehFixedCost("");
+					this.obEntityDataModel().aideFixedCost(0);
+					this.obEntityDataModel().aideOtrate(0);
+					this.obEntityDataModel().aideRate(0);
+					this.obEntityDataModel().driverFixedCost(0);
+					this.obEntityDataModel().driverOtrate(0);
+					this.obEntityDataModel().driverRate(0);
+					this.obEntityDataModel().fixedCost(0);
+					this.obEntityDataModel().mileageRate(0);
+					this.obEntityDataModel().minimumCost(0);
+					this.obEntityDataModel().vehFixedCost(0);
 				}
 				else
 				{

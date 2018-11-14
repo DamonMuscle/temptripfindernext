@@ -52,15 +52,26 @@ function pathCombine()
 	return output;
 }
 
-function sortArray(array, sortField)
+function sortArray(array, sortField, isNum)
 {
 	return array.sort(function(a, b)
 	{
-		if (a[sortField].toUpperCase() === b[sortField].toUpperCase())
+		if (isNum)
 		{
-			return 0;
+			if (a[sortField] === b[sortField])
+			{
+				return 0;
+			}
+			return a[sortField] > b[sortField] ? 1 : -1;
 		}
-		return a[sortField].toUpperCase() > b[sortField].toUpperCase() ? 1 : -1;
+		else
+		{
+			if (a[sortField].toUpperCase() === b[sortField].toUpperCase())
+			{
+				return 0;
+			}
+			return a[sortField].toUpperCase() > b[sortField].toUpperCase() ? 1 : -1;
+		}
 	});
 }
 
