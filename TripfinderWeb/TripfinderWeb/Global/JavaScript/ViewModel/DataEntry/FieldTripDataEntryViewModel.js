@@ -2031,7 +2031,7 @@
 						}
 
 						//validate passed, clear all messages.
-						this.clearDateTimeAlerts();
+						this.clearDateTimeAlerts("time");
 					}
 					else
 					{//not same day, to compare the real date
@@ -2107,7 +2107,7 @@
 						}
 
 						//validate passed, clear all messages.
-						this.clearDateTimeAlerts();
+						this.clearDateTimeAlerts("time");
 					}
 					else
 					{//not same day, to compare the real date
