@@ -3999,10 +3999,12 @@
 					if (!result.data.isDeleted)
 					{
 						tf.storageManager.save(self.stickyName, result.data.selectId);
+						tf.storageManager.save(self.stickyLayoutName, result.data.selectName);
 					}
 					else
 					{
 						tf.storageManager.delete(self.stickyName);
+						tf.storageManager.delete(self.stickyLayoutName);
 					}
 					var data = result.data;
 					self.onCloseEditMode.notify({
@@ -4073,6 +4075,7 @@
 						{
 							self.showDetailViewById(self.entitySelectId);
 							tf.storageManager.save(self.stickyName, dataItem.Id);
+							tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
 						});
 					}
 				}).catch(function(error)
