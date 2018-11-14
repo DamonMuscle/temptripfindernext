@@ -2353,6 +2353,7 @@
 					this.obEntityDataModel().destinationContactTitle("");
 					this.obEntityDataModel().destinationFax("");
 					this.obEntityDataModel().destinationContactPhone("");
+					this.obEntityDataModel().destinationPhoneExt("");
 				}
 				else
 				{
@@ -2367,6 +2368,7 @@
 					this.obEntityDataModel().destinationContactTitle(data.ContactTitle);
 					this.obEntityDataModel().destinationFax(data.Fax);
 					this.obEntityDataModel().destinationContactPhone(data.Phone);
+					this.obEntityDataModel().destinationPhoneExt(data.PhoneExt);
 				}
 				break;
 			case "billingClassification":
