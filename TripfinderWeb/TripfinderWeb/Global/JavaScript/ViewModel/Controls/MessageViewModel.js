@@ -35,7 +35,7 @@
 		}
 		else
 		{
-			var isEnglish = tf.storageManager.get("messageLanguage") === "english";
+			var isEnglish = tf.storageManager.get("messageLanguage") === "english" || !tf.storageManager.get("messageLanguage");
 			self.modalViewModel.obOtherButtonLabel(isEnglish ? "Español" : "English");
 			self.$element.find(".option").removeClass("selected");
 			self.$element.find(".option" + (isEnglish ? ".english" : ".spanish")).addClass("selected");
