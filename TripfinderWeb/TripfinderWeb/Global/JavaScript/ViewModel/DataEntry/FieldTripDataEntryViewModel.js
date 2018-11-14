@@ -1622,8 +1622,8 @@
 		{
 			return false;
 		}
-		resource1 = Enumerable.From(resource1).OrderBy(c => c.AideId).ThenBy(n => n.DriverId).ThenBy(n => n.VehicleId).ToArray();
-		resource2 = Enumerable.From(resource2).OrderBy(c => c.AideId).ThenBy(n => n.DriverId).ThenBy(n => n.VehicleId).ToArray();
+		resource1 = Enumerable.From(resource1).OrderBy(function(c) { return c.AideId }).ThenBy(function(c) { return c.DriverId }).ThenBy(function(c) { return c.VehicleId }).ToArray();
+		resource2 = Enumerable.From(resource2).OrderBy(function(c) { return c.AideId }).ThenBy(function(c) { return c.DriverId }).ThenBy(function(c) { return c.VehicleId }).ToArray();
 
 		for (var i = 0; i < resource1.length; i++)
 		{
@@ -1864,7 +1864,6 @@
 
 	FieldTripDataEntryViewModel.prototype.getSpecialValidatorFields = function(validatorFields)
 	{
-
 		if (this.obRequiredFields().Name && this.obRequiredFields().Name.Required)
 		{//may name not required(this don't exist in prod, but need test)
 			validatorFields.name.validators.notEmpty = { message: "required" };
@@ -1878,6 +1877,11 @@
 				field.data("noName", false);
 				if (value != "")
 				{
+					if (this.obEntityDataModel().departTime())
+					{
+						this.$form.data("bootstrapValidator").updateStatus('departTime', 'NOT_VALIDATED');
+						this.$form.data("bootstrapValidator").validateField("departTime");
+					}
 					var message = this.checkDeadline(value);
 					if (message)
 					{
@@ -1895,8 +1899,11 @@
 					if (returnDate.isSame(departDate, "day"))
 					{
 						this.clearDateTimeAlerts("date");
-						this.$form.find("#returnTime input[name=estimatedReturnTime]").trigger("change");
-						this.$form.find("#departTime input[name=departTime]").trigger("change");
+						if (this.obEntityDataModel().estimatedReturnDateTime())
+						{
+							this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
+							this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
+						}
 						return true;
 					}
 					else if (departDate.isAfter(returnDate))
@@ -1925,12 +1932,26 @@
 						return true;
 					}
 
+					if (this.obEntityDataModel().estimatedReturnDateTime())
+					{
+						this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
+						this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
+					}
 					if (returnDate.isSame(departDate, "day"))
 					{
 						this.clearDateTimeAlerts("date");
-						this.$form.find("#departDate input[name=departDate]").trigger("blur");
-						this.$form.find("#departTime input[name=departTime]").trigger("blur");
-						this.$form.find("#returnTime input[name=estimatedReturnTime]").trigger("blur");
+
+						if (this.obEntityDataModel().departTime())
+						{
+							this.$form.data("bootstrapValidator").updateStatus('departTime', 'NOT_VALIDATED');
+							this.$form.data("bootstrapValidator").validateField("departTime");
+						}
+
+						if (this.obEntityDataModel().departDate())
+						{
+							this.$form.data("bootstrapValidator").updateStatus('departDate', 'NOT_VALIDATED');
+							this.$form.data("bootstrapValidator").validateField("departDate");
+						}
 						return true;
 					}
 					else if (departDate.isAfter(returnDate))
@@ -1979,7 +2000,7 @@
 						return true;
 					}
 
-					var message = this.checkBlockTimes(m);
+					var message = this.checkBlockTimes(m, this.obEntityDataModel().departDate());
 					if (message)
 					{
 						field.data("noName", true);
@@ -2055,7 +2076,7 @@
 						return true;
 					}
 
-					var message = this.checkBlockTimes(m);
+					var message = this.checkBlockTimes(m, this.obEntityDataModel().returnDate());
 					if (message)
 					{
 						field.data("noName", true);
@@ -2167,9 +2188,10 @@
 		return message;
 	};
 
-	FieldTripDataEntryViewModel.prototype.checkBlockTimes = function(time)
+	FieldTripDataEntryViewModel.prototype.checkBlockTimes = function(time, date)
 	{
-		if (!time)
+		date = moment(date);
+		if (!time || this.isHoliday(date) || date.weekday() === 6 || date.weekday() === 0)
 		{
 			return null;
 		}
