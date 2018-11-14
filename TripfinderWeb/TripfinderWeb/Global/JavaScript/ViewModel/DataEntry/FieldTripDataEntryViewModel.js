@@ -516,6 +516,10 @@
 			});
 			self.obDocumentGridDataSource(source);
 		}
+		self.obDocumentGridDataSource().forEach(function(gridData)
+		{
+			gridData.NeedSave = null;
+		});
 	};
 	FieldTripDataEntryViewModel.prototype.getTemplate = function(data)
 	{
@@ -1197,6 +1201,7 @@
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
 		entity.FieldTripDocuments = this.obDocumentGridDataSource();
+		entity.FieldTripDocuments = entity.FieldTripDocuments.filter(item => item.NeedSave);
 		if (entity.FieldTripDocuments.length > 0)
 		{
 			entity.FieldTripDocuments.forEach(function(item)
@@ -1682,6 +1687,7 @@
 						}
 						obDocument.Id = self.tempId - 1;
 						self.tempId = self.tempId - 1;
+						obDocument.NeedSave = true;
 						self.obDocumentGridDataSource().push(obDocument);
 						self.obDocumentKendoDataSource().push(obDocument);
 					});
@@ -1734,6 +1740,7 @@
 									var obresult = ko.observable(new TF.DataModel.DocumentDataModel(documentData));
 									var obDocument = obresult().toData();
 									obDocument.DocumentEntity = documentData;
+									obDocument.NeedSave = true;
 									source.push(obDocument);
 									return;
 								}
@@ -1826,6 +1833,7 @@
 							relationShipSource.push(relationShipItem);
 						});
 						item.DocumentRelationshipEntities = relationShipSource;
+						item.NeedSave = true;
 						documentSource.push(item);
 						return;
 					}
