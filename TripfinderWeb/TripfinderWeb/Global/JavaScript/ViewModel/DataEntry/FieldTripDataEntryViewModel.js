@@ -1201,7 +1201,10 @@
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoice = this.obInvoiceGridDataSource();
 		entity.FieldTripDocuments = this.obDocumentGridDataSource();
-		entity.FieldTripDocuments = entity.FieldTripDocuments.filter(item => item.NeedSave);
+		entity.FieldTripDocuments = entity.FieldTripDocuments.filter(function(item)
+		{
+			return item.NeedSave;
+		});
 		if (entity.FieldTripDocuments.length > 0)
 		{
 			entity.FieldTripDocuments.forEach(function(item)
