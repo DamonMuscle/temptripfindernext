@@ -1549,13 +1549,9 @@
 
 	FieldTripDataEntryViewModel.prototype.isDocumentsSame = function()
 	{
-		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments, docs2 = this.obDocumentGridDataSource();
-		if (!docs1 && !docs2)
-		{
-			return true;
-		}
+		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments || [], docs2 = this.obDocumentGridDataSource() || [];
 
-		if ((!docs1 || !docs2) || docs1.length !== docs2.length)
+		if (docs1.length !== docs2.length)
 		{
 			return false;
 		}
@@ -1577,13 +1573,9 @@
 
 	FieldTripDataEntryViewModel.prototype.isInvoicesSame = function()
 	{
-		var invoices1 = this.obEntityDataModel()._entityBackup.FieldTripInvoice, invoices2 = this.obInvoiceGridDataSource();
-		if (!invoices1 && !invoices2)
-		{
-			return true;
-		}
+		var invoices1 = this.obEntityDataModel()._entityBackup.FieldTripInvoice || [], invoices2 = this.obInvoiceGridDataSource() || [];
 
-		if ((!invoices1 || !invoices2) || invoices1.length !== invoices2.length)
+		if (invoices1.length !== invoices2.length)
 		{
 			return false;
 		}
@@ -1615,13 +1607,9 @@
 
 	FieldTripDataEntryViewModel.prototype.isResourcesSame = function()
 	{
-		var resource1 = this.obEntityDataModel()._entityBackup.FieldTripResourceGroup, resource2 = this.obFieldTripResourceGroupData();
-		if (!resource1 && !resource2)
-		{
-			return true;
-		}
+		var resource1 = this.obEntityDataModel()._entityBackup.FieldTripResourceGroup || [], resource2 = this.obFieldTripResourceGroupData() || [];
 
-		if ((!resource1 || !resource2) || resource1.length !== resource2.length)
+		if (resource1.length !== resource2.length)
 		{
 			return false;
 		}
