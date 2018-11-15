@@ -1127,12 +1127,24 @@
 
 		var self = this,
 			routeName = self.availableApplications[data].url,
-			url = location.origin + "/" + routeName,
+			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 
-		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
-		window.open(url, requireNewTab ? "_blank" : "_self");
-		self.toggleAppSwitcherMenu(false);
+		Promise.resolve($.ajax({url:myTransfinderURL,
+					            data: { vendorid: "Transfinder", 
+										clientid: tf.authManager.clientKey },
+								dataType: 'json'
+								}))
+		.then(function(res){
+			var prod = res.Products.filter(function(prod)
+						{
+							return prod.Name == routeName
+						}),
+				url = prod[0].Uri + "/" + routeName;
+			ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
+			window.open(url, requireNewTab ? "_blank" : "_self");
+			self.toggleAppSwitcherMenu(false);
+		})
 	};
 
 	/**
