@@ -1042,20 +1042,23 @@
 							var layouts = response.Items[0];
 							if (layouts.length > 0)
 							{
-								layouts.forEach(function(layout)
+								var layout = layouts.filter(function(item)
 								{
-									if (layout.Name === "FIELD TRIPS DEFAULT LAYOUT")
-									{
-										layoutEntity = layout;
-										self.defaultLayoutId = layout.Id;
-										self.defaultLayoutName = layout.Name;
-									}
+									return item.Name === 'FIELD TRIPS DEFAULT LAYOUT';
 								});
+								if (layout.length > 0)
+								{
+									layoutEntity = layout[0];
+									self.defaultLayoutId = layout[0].Id;
+									self.defaultLayoutName = layout[0].Name;
+								} else
+								{
+									layoutEntity.Name = "Layout Name";
+								}
 							} else
 							{
 								layoutEntity.Name = "Layout Name";
 							}
-
 						}
 						self.applyLayoutEntity(layoutEntity, isDeleted);
 					});
@@ -1072,14 +1075,48 @@
 					}
 					else
 					{
+
 						var layoutEntities = self.layoutMenu && self.layoutMenu.obLayouts().filter(function(item) { return item.id() === id });
 						var layoutName = layoutEntities && layoutEntities.length == 1 ? layoutEntities[0].name() : tf.storageManager.get(self.stickyLayoutName);
 						tf.promiseBootbox.alert("The Detail Layout (" + layoutName + ") that you had applied has been deleted.  It is no longer available.");
-						self.applyLayoutEntity({});
-						self.obSelectName("Layout Name");
 						self.layoutMenu && self.layoutMenu.resetLayoutClick();
 						tf.storageManager.delete(self.stickyName);
 						tf.storageManager.delete(self.stickyLayoutName);
+						if (self.gridType)
+						{
+							paramData.table = self.gridType;
+						}
+						tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+							paramData: paramData
+						}, { overlay: false }).then(function(response)
+						{
+							var layoutEntity = {};
+							if (response && response.Items && response.Items[0])
+							{
+								var layouts = response.Items[0];
+								if (layouts.length > 0)
+								{
+									var layout = layouts.filter(function(item)
+									{
+										return item.Name === 'FIELD TRIPS DEFAULT LAYOUT';
+									});
+									if (layout.length > 0)
+									{
+										layoutEntity = layout[0];
+										self.defaultLayoutId = layout[0].Id;
+										self.defaultLayoutName = layout[0].Name;
+									} else
+									{
+										layoutEntity.Name = "Layout Name";
+									}
+								} else
+								{
+									layoutEntity.Name = "Layout Name";
+								}
+							}
+							self.applyLayoutEntity(layoutEntity, isDeleted);
+						});
+
 					}
 				});
 			}
