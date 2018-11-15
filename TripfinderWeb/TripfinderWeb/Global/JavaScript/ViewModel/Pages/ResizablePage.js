@@ -145,6 +145,7 @@
 		{
 			self.obGridData().searchGrid.getSelectedIds(self.leftGridSelectItems);
 		}
+		self.obGridData().searchGrid.onGridReadCompleted.unsubscribeAll();
 	}
 
 	ResizablePage.prototype.reLayoutPage = function(width)
