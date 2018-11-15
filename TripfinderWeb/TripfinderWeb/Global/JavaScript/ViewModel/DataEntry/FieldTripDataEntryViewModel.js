@@ -1902,7 +1902,7 @@
 					if (returnDate.isSame(departDate, "day"))
 					{
 						this.clearDateTimeAlerts("date");
-						if (this.obEntityDataModel().estimatedReturnDateTime())
+						if (this.obEntityDataModel().returnTime())
 						{
 							this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
 							this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
@@ -1935,7 +1935,7 @@
 						return true;
 					}
 
-					if (this.obEntityDataModel().estimatedReturnDateTime())
+					if (this.obEntityDataModel().returnTime())
 					{
 						this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
 						this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
@@ -2036,10 +2036,6 @@
 						//validate passed, clear all messages.
 						this.clearDateTimeAlerts("time");
 					}
-					else
-					{//not same day, to compare the real date
-						this.$form.find("#departDate input[name=departDate]").trigger("blur");
-					}
 				}
 
 				return true;
@@ -2111,10 +2107,6 @@
 
 						//validate passed, clear all messages.
 						this.clearDateTimeAlerts("time");
-					}
-					else
-					{//not same day, to compare the real date
-						this.$form.find("#returnDate input[name=estimatedReturnDate]").trigger("blur");
 					}
 				}
 
