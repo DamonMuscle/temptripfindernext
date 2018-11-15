@@ -1549,14 +1549,20 @@
 
 	FieldTripDataEntryViewModel.prototype.isDocumentsSame = function()
 	{
-		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments || [], docs2 = this.obDocumentGridDataSource() || [];
+		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments || [], docs2 = this.obDocumentKendoDataSource() || [];
 
 		if (docs1.length !== docs2.length)
 		{
 			return false;
 		}
-		docs1 = sortArray(docs1, "FileName");
-		docs2 = sortArray(docs2, "FileName");
+
+		if (docs1.length === 0)
+		{
+			return true;
+		}
+
+		docs1 = sortArray(docs1, docs1[0].hasOwnProperty("Filename") ? "Filename" : "FileName");
+		docs2 = sortArray(docs2, docs2[0].hasOwnProperty("Filename") ? "Filename" : "FileName");
 
 		for (var i = 0; i < docs1.length; i++)
 		{
