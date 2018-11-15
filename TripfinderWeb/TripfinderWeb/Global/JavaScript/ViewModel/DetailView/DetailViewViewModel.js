@@ -95,6 +95,7 @@
 		tf.pageManager.resizablePage.onSizeChanged.subscribe(self.manageLayout);
 		self.defaultLayoutId = null;
 		self.defaultLayoutName = null;
+		self.totalCostContent = null;
 	}
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
@@ -568,6 +569,7 @@
 				self.show(self.optionId, gridType);
 			}
 		});
+		self.detailViewHelper = new TF.DetailView.DetailViewHelper();
 	};
 
 	DetailViewViewModel.prototype.initColumnPopup = function()
@@ -1184,24 +1186,27 @@
 		self.entitySelectId = id;
 		self.updateGridType(gridType).then(function()
 		{
-			self.getRecordEntity(gridType, id).then(function(entity)
+			self.addTotalCostStackBlock(id).then(function()
 			{
-				if (!entity) { return; }
-
-				self.entity = entity;
-				self.obRecordPicture(entity.ImageBase64 ? ("url(data:image/jpeg;base64," + entity.ImageBase64 + ")") : "");
-				self.updateDetailViewTitle(entity);
-
-				// Open detail view in a new tab
-				if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+				self.getRecordEntity(gridType, id).then(function(entity)
 				{
-					self.hideExtraElement();
-				}
+					if (!entity) { return; }
 
-				self.loadCalendarData(id).then(function()
-				{
-					self.setStackBlocks();
-					self.onColumnChangedEvent.notify(self.getCurrentWidth());
+					self.entity = entity;
+					self.obRecordPicture(entity.ImageBase64 ? ("url(data:image/jpeg;base64," + entity.ImageBase64 + ")") : "");
+					self.updateDetailViewTitle(entity);
+
+					// Open detail view in a new tab
+					if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+					{
+						self.hideExtraElement();
+					}
+
+					self.loadCalendarData(id).then(function()
+					{
+						self.setStackBlocks();
+						self.onColumnChangedEvent.notify(self.getCurrentWidth());
+					});
 				});
 			});
 		});
@@ -2194,7 +2199,19 @@
 
 				if (self.isReadMode())
 				{
-					content = self.entity[item.field];
+					if (item.field === "TotalCost")
+					{
+						if (self.totalCostContent)
+						{
+							content = self.totalCostContent;
+						} else
+						{
+							return;
+						}
+					} else
+					{
+						content = self.entity[item.field];
+					}
 
 					if (item.type === "Boolean")
 					{
@@ -2376,6 +2393,50 @@
 		this.gridStackItemOrignalHeight.push({ className: className, height: height });
 	}
 
+	/**
+	 * Add Total Cost block by data.
+	 * @param {String} content 
+	 * @param {Object} item
+	 * @return {void} 
+	 */
+	DetailViewViewModel.prototype.addTotalCostStackBlock = function(id)
+	{
+		var self = this;
+		var layout = self.entityDataModel.layout();
+		layout = !layout ? self.defaultLayout : JSON.parse(layout);
+		items = layout.items;
+
+		if (items && items.length > 0)
+		{
+			var totalCostData = items.filter(function(item) { return item.field === "TotalCost" });
+
+			if (totalCostData.length > 0 && self.isReadMode())
+			{
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata")).then(function(data)
+				{
+					var fieldtripData = data.Items[0];
+					if (fieldtripData.FieldTripSettings.ShowTripTotalCost)
+					{
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "", id)).then(function(response)
+						{
+							var entityDataModel = {},
+								entity = response.Items[0];
+							entityDataModel.FieldTripResourceGroups = entity.FieldTripResourceGroup;
+							entityDataModel.FixedCost = entity.FixedCost;
+							entityDataModel.MinimumCost = entity.MinimumCost;
+							self.totalCostContent = self.detailViewHelper.resourcesTotalComputer(entityDataModel);
+						});
+					} else
+					{
+						return "";
+					}
+				});
+			} else
+			{
+				return Promise.resolve();
+			}
+		}
+	}
 	/**
 	 * Add general block by data.
 	 * @param {String} content 

@@ -588,7 +588,13 @@ var today = (new Date()).toDateString(),
 					"field": "Requestor",
 					"title": "Requestor",
 					"type": "String"
-				}
+				},
+				{
+					"field": "TotalCost",
+					"title": "Total Cost($)",
+					"type": "Number",
+					"defaultValue": "$0.00"
+				},
 			],
 			"Destination": [
 				{

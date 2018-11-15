@@ -157,4 +157,82 @@
 		}
 		return match;
 	};
+
+	DetailViewHelper.prototype.calculatedMileageRateComputer = function(fieldTripResourceDataEntry)
+	{
+		if (fieldTripResourceDataEntry.FieldTripId == 0)
+		{
+			return 0 //FT-296 When add a new field trip the Endingodometer will be disable and the MileageRate will not be calculated.
+		}
+		return (Number(fieldTripResourceDataEntry.Endingodometer) - Number(fieldTripResourceDataEntry.Startingodometer)) * Number(fieldTripResourceDataEntry.MileageRate);
+	};
+
+	DetailViewHelper.prototype.vehicleCostComputer = function(fieldTripResourceDataEntry)
+	{
+		return this.calculatedMileageRateComputer(fieldTripResourceDataEntry) + Number(fieldTripResourceDataEntry.VehFixedCost);
+	};
+
+	DetailViewHelper.prototype.driverCostComputer = function(fieldTripResourceDataEntry)
+	{
+		if (!fieldTripResourceDataEntry || !fieldTripResourceDataEntry.DriverHours)
+		{
+			return 0;
+		}
+		return Number(fieldTripResourceDataEntry.DriverHours) * Number(fieldTripResourceDataEntry.DriverRate) + Number(fieldTripResourceDataEntry.DriverOthours) * Number(fieldTripResourceDataEntry.DriverOtrate) + Number(fieldTripResourceDataEntry.DriverFixedCost);
+	};
+
+	DetailViewHelper.prototype.driverTotalCostComputer = function(fieldTripResourceDataEntry)
+	{
+		return this.driverCostComputer(fieldTripResourceDataEntry) + this.expensesComputer(fieldTripResourceDataEntry);
+	};
+
+	DetailViewHelper.prototype.busAideCostComputer = function(fieldTripResourceDataEntry)
+	{
+		return Number(fieldTripResourceDataEntry.AideHours) * Number(fieldTripResourceDataEntry.AideRate) + Number(fieldTripResourceDataEntry.AideOthours) * Number(fieldTripResourceDataEntry.AideOtrate) + Number(fieldTripResourceDataEntry.AideFixedCost);
+	};
+
+	DetailViewHelper.prototype.resourceSubTotalComputer = function(fieldTripResourceDataEntry)
+	{
+		return this.vehicleCostComputer(fieldTripResourceDataEntry) +
+			this.driverTotalCostComputer(fieldTripResourceDataEntry) +
+			this.busAideCostComputer(fieldTripResourceDataEntry);
+	};
+
+	DetailViewHelper.prototype.expensesComputer = function(fieldTripResourceDataEntry)
+	{
+		return Number(fieldTripResourceDataEntry.DriverExpMeals) + Number(fieldTripResourceDataEntry.DriverExpMisc) + Number(fieldTripResourceDataEntry.DriverExpParking) + Number(fieldTripResourceDataEntry.DriverExpTolls);
+	};
+
+	DetailViewHelper.prototype.resourcesTotalComputer = function(entity)
+	{
+		var resourcesTotal = 0, fixedCost = parseFloat(entity.FixedCost || 0), minimumCost = parseFloat(entity.MinimumCost || 0);
+		if (entity.FieldTripResourceGroups)
+		{
+			for (var i = 0; i < entity.FieldTripResourceGroups.length; i++)
+			{
+				resourcesTotal = resourcesTotal + this.resourceSubTotalComputer(entity.FieldTripResourceGroups[i]);
+			}
+		}
+
+		if (resourcesTotal + fixedCost < minimumCost)
+		{
+			resourcesTotal = minimumCost;
+		}
+		else
+		{
+			resourcesTotal += fixedCost;
+		}
+
+		return '$' + this.formatCurrency(resourcesTotal);
+	};
+
+	DetailViewHelper.prototype.formatCurrency = function(currency)
+	{
+		if (typeof currency !== "number")
+		{
+			currency = Number(currency);
+		}
+		var currency = currency || 0;
+		return currency.toFixed(2);
+	}
 })();
