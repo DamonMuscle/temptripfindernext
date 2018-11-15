@@ -2431,10 +2431,14 @@
 						return "";
 					}
 				});
-			} else
+			}
+			else
 			{
 				return Promise.resolve();
 			}
+		} else
+		{
+			return Promise.resolve();
 		}
 	}
 	/**
