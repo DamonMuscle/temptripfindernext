@@ -13,6 +13,7 @@
 		self.obSelectedOrientation = ko.observable('Portrait');
 		self.obPaperSizes = ko.observable(['Letter', 'Legal', 'A4']);
 		self.obOrientations = ko.observable(['Portrait', 'Landscape']);
+		self.obIsChrome = ko.observable(/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor));
 	};
 
 	PrintSettingsViewModel.prototype.getPageWidth = function()

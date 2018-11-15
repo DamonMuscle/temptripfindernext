@@ -11,12 +11,13 @@
 		var self = this;
 		TF.Modal.BaseModalViewModel.call(self);
 
-		self.sizeCss = "modal-dialog-md";
 		self.title("Print Settings");
 		self.contentTemplate("Modal/PrintSettings");
 		self.buttonTemplate("modal/positivenegative");
 		self.obPositiveButtonLabel("Apply");
 		self.obNegativeButtonLabel("Close");
+		var IsChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+		self.sizeCss = IsChrome ? "modal-dialog-md" : "modal-dialog-sm";
 
 		self.model = new TF.Control.PrintSettingsViewModel();
 		self.data(self.model);

@@ -1,6 +1,6 @@
 <div class="print-settigns">
 	<div class="row">
-		<div class="col-xs-12">
+		<div data-bind="css: { 'col-xs-12': obIsChrome, 'col-xs-24': !obIsChrome()}">
 			<label><strong>Paper Size</strong></label>
 			<div class="input-group vf-custom-input">
 				<div data-bind="typeahead:{source:obPaperSizes,drowDownShow:true,selectedValue:obSelectedPaperSize,notSort:true}">
@@ -15,6 +15,7 @@
 				</div>
 			</div>
 		</div>
+		<!-- ko if:obIsChrome-->
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label><strong>Orientation</strong></label>
@@ -22,5 +23,6 @@
 				<div class="radio"><label><input data-bind="checked:obSelectedOrientation" type="radio" name="Orientation" value="Landscape" />Landscape</label></div>
 			</div>
 		</div>
+		<!-- /ko -->
 	</div>
 </div>
