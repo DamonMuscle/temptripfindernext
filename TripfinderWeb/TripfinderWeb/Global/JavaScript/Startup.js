@@ -480,19 +480,13 @@
 												return;
 											}
 
-											if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin)
+											var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
+											if (!pageName || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
 											{
-												var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
-												if (!pageName || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
-												{
-													pageName = "fieldtrips";
-												}
-
-												tf.pageManager.openNewPage(pageName, null, true);
-												return;
+												pageName = "fieldtrips";
 											}
 
-											tf.pageManager.openNewPage("fieldtrips", null, true);
+											tf.pageManager.openNewPage(pageName, null, true);
 										});
 										return true;
 									});
