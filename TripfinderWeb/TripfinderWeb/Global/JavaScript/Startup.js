@@ -481,7 +481,7 @@
 											}
 
 											var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
-											if (!pageName || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
+											if (!pageName || pageName==="settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
 											{
 												pageName = "fieldtrips";
 											}
