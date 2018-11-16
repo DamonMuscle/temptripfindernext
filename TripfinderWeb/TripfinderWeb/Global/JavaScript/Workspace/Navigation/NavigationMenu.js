@@ -1140,7 +1140,7 @@
 						{
 							return prod.Name == routeName
 						}),
-				url = prod[0].Uri + "/" + routeName;
+				url = prod[0].Uri;
 			ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 			window.open(url, requireNewTab ? "_blank" : "_self");
 			self.toggleAppSwitcherMenu(false);
