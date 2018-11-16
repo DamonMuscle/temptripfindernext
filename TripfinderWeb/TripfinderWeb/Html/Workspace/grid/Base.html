@@ -22,7 +22,8 @@
 			<!--ko if:!$parent.obIsDocument()-->
 			<div class="view-grid-header" data-bind="text:$parent.title"></div>
 			<div class="view-grid-header-count">
-				(<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)
+				(
+				<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)
 			</div>
 			<!-- /ko -->
 			<!--ko if:!$parent.obCanOperation()-->
@@ -43,7 +44,7 @@
 			<button class="iconbutton layout" title="Layouts" data-bind="click:layoutIconClick"></button>
 			<div class="divider"></div>
 			<!-- /ko -->
-			<button class="iconbutton view" title="View" data-bind="click:viewClick, css:obIsSelectRow()?'':'disabled'"></button>
+			<button class="iconbutton view" title="View" data-bind="click:viewClick, enable:obIsSelectRow() "></button>
 			<!-- /ko -->
 			<!--ko if:$parent.obOnlyLayout()-->
 			<button class="iconbutton summarybar" title="Summary Bar" data-bind="click:searchGrid.summarybarIconClick,css:{open:searchGrid.obSummaryGridVisible()}"></button>
@@ -55,18 +56,18 @@
 			<div class="divider"></div>
 			<!-- /ko -->
 			<!--ko if:$parent.obCanEdit()-->
-			<button class="iconbutton pencil" title="Edit" data-bind="click:editClick,css:obIsSelectRow()?'':'disabled'"></button>
-			<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, css:obIsSelectRow()?'':'disabled'"></button>
+			<button class="iconbutton pencil" title="Edit" data-bind="click:editClick,enable:obIsSelectRow() "></button>
+			<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, enable:obIsSelectRow() "></button>
 			<!-- /ko -->
 			<!--ko if:$parent.obCanCopy()-->
 			<div class="divider"></div>
-			<button class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, css:(obIsSelectRow()&&(!!$data.obIsSingleSelect?obIsSingleSelect():true))?'':'disabled'"></button>
+			<button class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, enable:(obIsSelectRow()&&(!!$data.obIsSingleSelect?obIsSingleSelect():true)) "></button>
 			<!-- /ko -->
 			<!--ko if:$parent.obAddDivider()-->
 			<div class="divider"></div>
 			<!-- /ko -->
 			<!--ko if:$parent.obCanAddNew()-->
-			<button class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'},css:$parent.obCanAdd()?'':'disabled'"></button>
+			<button class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'},enable:$parent.obCanAdd()"></button>
 			<!-- /ko -->
 			<!--ko if:$parent.obPrintDivider()-->
 			<div class="divider"></div>
