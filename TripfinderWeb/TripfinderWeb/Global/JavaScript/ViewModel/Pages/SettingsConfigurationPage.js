@@ -20,6 +20,11 @@
 		self.displayPassword = "****fake*password****";
 		self.englishEditor = null;
 		self.spanishEditor = null;
+		self.showTotalCost = false;
+		self.changeTotalCost = false;
+		self.messageStatus = false;
+		self.changeMessageStatus = false;
+		self.editorChanged = false;
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
@@ -72,6 +77,7 @@
 				if (result.Items && result.Items.length > 0)
 				{
 					$(".show-total-cost").prop("checked", result.Items[0].ShowTripTotalCost);
+					self.showTotalCost = result.Items[0].ShowTripTotalCost;
 				}
 			}.bind(this));
 	};
@@ -108,13 +114,21 @@
 				resizable: {
 					content: true,
 					toolbar: true
-				}
+				},
+				change: function()
+				{
+					self.editorChanged = true;
+				},
 			}).data("kendoEditor");
 			self.spanishEditor = $("#SpanishEditor").kendoEditor({
 				resizable: {
 					content: true,
 					toolbar: true
-				}
+				},
+				change: function()
+				{
+					self.editorChanged = true;
+				},
 			}).data("kendoEditor");
 
 			$(".editor-wrapper").find(".k-insertImage").closest(".k-tool").hide();
@@ -131,6 +145,7 @@
 				self.englishEditor.value(result.Items[0].EnglishMessage);
 				self.spanishEditor.value(result.Items[0].SpanishMessage);
 				$(".display-once-daily").prop("checked", result.Items[0].DisplayOnceDaily);
+				self.messageStatus = result.Items[0].DisplayOnceDaily;
 			}
 			self.englishEditor.refresh();
 			self.spanishEditor.refresh();
@@ -344,6 +359,11 @@
 							if (result)
 							{
 								self.pageLevelViewModel.popupSuccessMessage();
+								self.changeTotalCost = false;
+								self.showTotalCost = $(".show-total-cost").prop("checked");
+								self.messageStatus = $(".display-once-daily").prop("checked");
+								self.changeMessageStatus = false;
+								self.editorChanged = false;
 							}
 							return result;
 						});
@@ -388,7 +408,16 @@
 	SettingsConfigurationPage.prototype.cancelClick = function()
 	{
 		var self = this;
-		if (self.obEntityDataModel().apiIsDirty())
+		if ($(".show-total-cost").prop("checked") !== self.showTotalCost)
+		{
+			self.changeTotalCost = true;
+		}
+		if ($(".display-once-daily").prop("checked") !== self.messageStatus)
+		{
+			self.changeMessageStatus = true;
+		}
+
+		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.editorChanged)
 		{
 			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
 				.then(function(result)
