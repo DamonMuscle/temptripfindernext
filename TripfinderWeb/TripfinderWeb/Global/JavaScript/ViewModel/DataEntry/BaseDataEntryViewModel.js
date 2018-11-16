@@ -309,6 +309,7 @@
 		if (this._view && this._view.id)
 		{
 			this._isCopyAndNew = this._view.mode === "Add";
+			tf.loadingIndicator.showImmediately();
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.type, this._view.mode === "Add" ? "newCopy" : "", this._view.id))
 				.then(function(response)
 				{
@@ -320,17 +321,33 @@
 					var item = response.Items[0];
 					this.obEntityDataModel(new this.dataModelType(item));
 
+
+					//check school is in the obSchoolDataModels
+					if (this.obEntityDataModel().school() &&
+						Enumerable.From(this.obSchoolDataModels()).Where(function(s) { return s.SchoolCode === this.obEntityDataModel().school() }.bind(this)).ToArray().length === 0)
+					{
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "detail", this.obEntityDataModel().id()))
+							.then(function(data)
+							{
+								this.obSchoolDataModels([{ SchoolCode: data.Items[0].School, Name: data.Items[0].SchoolName }]);
+								tf.loadingIndicator.tryHide();
+								return true;
+							}.bind(this));
+					}
+
 					this.getUserDefinedDisplayData();
 					this.onMainDataLoaded.notify(item);
 					if (this._view.mode === "Add")
 					{
 						this._view.id = undefined;
 					}
+					tf.loadingIndicator.tryHide();
 					return true;
 				}.bind(this))
 				.catch(function(response)
 				{
 					this.obEntityDataModel(new this.dataModelType());
+					tf.loadingIndicator.tryHide();
 					if (response && response.StatusCode === 404)
 					{
 						this.omitCurrentRecord();
