@@ -165,7 +165,10 @@
 		}
 		if (!skipSavePage)
 		{
-			tf.storageManager.save(storageKey, type);
+			if (type != "settingsConfig")
+			{
+				tf.storageManager.save(storageKey, type);
+			}
 		}
 
 		if (TF.isPhoneDevice)
