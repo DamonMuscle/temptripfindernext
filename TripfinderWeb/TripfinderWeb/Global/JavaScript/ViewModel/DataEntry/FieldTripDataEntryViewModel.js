@@ -620,6 +620,17 @@
 					this.obEntityDataModel().returnTime(null);
 				}
 
+				if (this.obEntityDataModel().departDate())
+				{
+					this.obEntityDataModel().departDate(moment(this.obEntityDataModel().departDate()).format("YYYY-MM-DD") + "T00:00:00.000");
+				}
+
+				if (this.obEntityDataModel().returnDate())
+				{
+					this.obEntityDataModel().returnDate(moment(this.obEntityDataModel().returnDate()).format("YYYY-MM-DD") + "T00:00:00.000");
+				}
+				this.initBillingData();
+
 				if (this.obMode() === "Edit")
 				{
 					if (this.obFieldTripSettings().StrictAcctCodes)
@@ -700,6 +711,20 @@
 			{//no need to do anything.
 
 			}.bind(this));
+	};
+
+	FieldTripDataEntryViewModel.prototype.initBillingData = function()
+	{
+		this.obEntityDataModel().aideFixedCost(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().aideOtrate(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().aideRate(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().driverFixedCost(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().driverOtrate(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().driverRate(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().fixedCost(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().mileageRate(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().minimumCost(this.obEntityDataModel().aideFixedCost() || 0);
+		this.obEntityDataModel().vehFixedCost(this.obEntityDataModel().aideFixedCost() || 0);
 	};
 
 	FieldTripDataEntryViewModel.prototype.feedingSchoolNameFormatter = function(schoolDataModel)
@@ -1550,6 +1575,11 @@
 	FieldTripDataEntryViewModel.prototype.isDocumentsSame = function()
 	{
 		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments || [], docs2 = this.obDocumentKendoDataSource() || [];
+
+		if (!tf.permissions.documentRead && (!docs2 || docs2.length === 0))
+		{
+			docs2 = this.obEntityDataModel().toData().FieldTripDocuments;
+		}
 
 		if (docs1.length !== docs2.length)
 		{

@@ -81,6 +81,7 @@
 	PrintHelper.prototype.resetMap = function($detailViewElement)
 	{
 		var $maps = $detailViewElement.find('.grid-stack-item .map'), $item;
+
 		$.each($maps, function(i, item)
 		{
 			$item = $(item);
