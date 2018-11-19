@@ -326,7 +326,14 @@
 
 			$.each($grid, function(index, container)
 			{
-				$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
+				if ($(container).hasClass("kendo-summarygrid-container"))
+				{
+					$(container).find(".k-auto-scrollable,.k-grid-content").width(width + paddingRight);
+				}
+				else
+				{
+					$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
+				}
 			});
 
 			//update toolbar
