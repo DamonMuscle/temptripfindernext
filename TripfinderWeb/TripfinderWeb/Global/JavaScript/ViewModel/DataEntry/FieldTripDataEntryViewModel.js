@@ -553,6 +553,24 @@
 		return departmentIdsWithPermission.indexOf(id) >= 0;
 	};
 
+	FieldTripDataEntryViewModel.prototype.hasPermissionForVehicle = function()
+	{
+		if (!!tf.authManager.authorizationInfo.authorizationTree.securedItems.vehicle)
+		{
+			return true;
+		}
+		return false;
+	};
+
+	FieldTripDataEntryViewModel.prototype.hasPermissionForStaff = function()
+	{
+		if (!!tf.authManager.authorizationInfo.authorizationTree.securedItems.staff)
+		{
+			return true;
+		}
+		return false;
+	};
+
 	FieldTripDataEntryViewModel.prototype.setAccountListBySchool = function(school, initialize)
 	{
 		var self = this, selectIndex = -1, accountList = [], departActivityNames = [], departActivityName;
@@ -946,6 +964,23 @@
 			this.obVehicleGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "vehicle", null, null, null, this.obVehicleGridSource(), "vehicle", true));
 			this.obDriversGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "driver", null, null, null, this.obDriversGridSource(), "driver", true));
 			this.obBusAideGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "aide", null, null, null, this.obBusAideGridSource(), "aide", true));
+		}
+
+		// FT-1090 Disable add button on vehicle, driver and bus aide grids base on vehicle and staff rights for level 2, 3 and 4 users.
+		if (!!tf.authManager.authorizationInfo.authorizationTree.securedItems.level2Administrator || !!tf.authManager.authorizationInfo.authorizationTree.securedItems.level3Administrator || !!tf.authManager.authorizationInfo.authorizationTree.securedItems.level4Administrator)
+		{
+			if (!this.hasPermissionForVehicle())
+			{
+				this.obVehicleGridViewModel().obCanAdd(false);
+				this.obDriversGridViewModel().obCanAdd(false);
+				this.obBusAideGridViewModel().obCanAdd(false);
+			}
+
+			if (!this.hasPermissionForStaff())
+			{
+				this.obDriversGridViewModel().obCanAdd(false);
+				this.obBusAideGridViewModel().obCanAdd(false);
+			}
 		}
 	};
 
