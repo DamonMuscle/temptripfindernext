@@ -2162,6 +2162,7 @@
 		itemDom.data({
 			field: item.field,
 			defaultValue: item.defaultValue,
+			displayValue: item.displayValue,
 			type: item.type,
 			format: item.format,
 			title: item.title,
@@ -3873,7 +3874,7 @@
 	DetailViewViewModel.prototype.isLayoutEntityChanged = function(entity1, entity2)
 	{
 		return !(entity1.Name === entity2.Name
-			&& entity1.SubTitle === entity2.SubTitle
+			&& (entity1.SubTitle === entity2.SubTitle || (!entity1.SubTitle && !entity2.SubTitle))
 			&& this.deepCompareLayout(entity1.Layout, entity2.Layout))
 	}
 
@@ -3920,8 +3921,8 @@
 
 		if (previous.items.length !== current.items.length) return false;
 
-		previous.items.sort(function(a, b) { return a.x === b.x && a.y === b.y ? a.w - b.w : a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
-		current.items.sort(function(a, b) { return a.x === b.x && a.y === b.y ? a.w - b.w : a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
+		previous.items.sort(function(a, b) { return a.x === b.x && a.y === b.y ? a.w - b.w != 0 ? a.w - b.w : a.h - b.h : a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
+		current.items.sort(function(a, b) { return a.x === b.x && a.y === b.y ? a.w - b.w != 0 ? a.w - b.w : a.h - b.h : a.x - b.x != 0 ? a.x - b.x : a.y - b.y });
 
 		for (var i = 0; i < previous.items.length; i++)
 		{
@@ -4571,6 +4572,7 @@
 					type: $el.data("type") || $el.attr("type"),
 					format: $el.data("format") || $el.attr("format"),
 					defaultValue: $el.data("defaultValue") || $el.attr("defaultValue"),
+					displayValue: $el.data("displayValue") || $el.attr("displayValue"),
 					customizedTitle: $el.data("customizedTitle"),
 					appearance: $el.data('appearance') ? JSON.parse($el.data('appearance')) : null,
 					role: $el.data("role"),
