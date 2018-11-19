@@ -1576,9 +1576,9 @@
 	{
 		var docs1 = this.obEntityDataModel()._entityBackup.FieldTripDocuments || [], docs2 = this.obDocumentKendoDataSource() || [];
 
-		if (!tf.permissions.documentRead && (!docs2 || docs2.length === 0))
+		if (!tf.permissions.documentRead)
 		{
-			docs2 = this.obEntityDataModel().toData().FieldTripDocuments;
+			return true;
 		}
 
 		if (docs1.length !== docs2.length)
