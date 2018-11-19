@@ -281,6 +281,14 @@
 	{
 		var self = this, totalWidth = self.$element.outerWidth();
 
+		if (left < self.minLeftWidth)
+		{
+			left = self.minLeftWidth;
+		}
+		else if (totalWidth - left < self.minRightWidth)
+		{
+			left = totalWidth - self.minRightWidth;
+		}
 		self.$leftPage.width(left);
 		self.$rightPage.width(totalWidth - left);
 		if (!self.obShowGrid())
@@ -290,6 +298,8 @@
 		else
 		{
 			self.resizeGrid(left);
+
+			self.$dragHandler.css("left", left + "px");
 			if (self.leftPageType.indexOf("Scheduler") >= 0)
 			{
 				//It seems like a bug of kendo scheduler, refresh once only the layout of scheduler is correct,
