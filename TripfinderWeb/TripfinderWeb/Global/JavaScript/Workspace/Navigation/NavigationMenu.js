@@ -20,8 +20,8 @@
 		self.defaultOpenMenuAnimationDuration = 250;
 
 		self.availableApplications = {
-			viewfinder: { url: "Viewfinder", permission: true },
-			fleetfinder: { url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
+			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
+			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
 		};
 
 		self.isMacintosh = isMacintosh();
@@ -1126,7 +1126,7 @@
 		evt.preventDefault();
 
 		var self = this,
-			routeName = self.availableApplications[data].url,
+			routeName = self.availableApplications[data].route,
 			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 
@@ -1141,6 +1141,11 @@
 							return prod.Name == routeName
 						}),
 				url = prod[0].Uri;
+
+			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+			{
+				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+			}
 			ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 			window.open(url, requireNewTab ? "_blank" : "_self");
 			self.toggleAppSwitcherMenu(false);
