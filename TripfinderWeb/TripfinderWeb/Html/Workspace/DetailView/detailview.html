@@ -4,7 +4,7 @@
 		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
 			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
-			 placeholder="Name Layout..." maxlength="80" />
+				   placeholder="Name Layout..." maxlength="80" />
 			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
 				<div class="iconbutton settings" data-bind="click:openManageLayouts" title="Manage Layouts"></div>
 				<div class="iconbutton font-size-slider" data-bind="click:showSlider" title="Font Size"></div>
@@ -62,7 +62,7 @@
 				<div class="tf-contextmenu-wrap tf-contextmenu-white">
 					<div class="tf-contextmenu">
 						<ul>
-							<li class="menu-item" style="min-width:200px;max-width: 300px;" data-bind="event:{mouseenter:templateMenuClick,
+							<li class="menu-item iconbutton" style="min-width:200px;max-width: 300px;" data-bind="event:{mouseenter:templateMenuClick,
 				 mouseleave:closeTemplateMenu}">
 								<div class="select-type" data-bind="text:obSelectName"></div>
 								<div class="icon bottom-caret"></div>
@@ -102,7 +102,7 @@
 			<div class="caret"></div>
 			<label class="minus"></label>
 			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25"
-			 data-bind="bootstrapSlider:{value:obSliderFontRate}">
+				   data-bind="bootstrapSlider:{value:obSliderFontRate}">
 			<label class="plus"></label>
 		</div>
 	</div>
