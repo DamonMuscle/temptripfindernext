@@ -223,7 +223,7 @@
 						<div class="input-group">
 							<div data-bind="typeahead:{source:obDestinationDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDestination},attr:IsRequired(obRequiredFields()&&obRequiredFields().Destination?obRequiredFields().Destination.Required:null)"
 							 class="destinationname">
-								<!-- ko customInput:{type:"String",value:obCurrentDestinationName,attributes:{name:"destination",class:"form-control"},events:{blur:destinationOnBlur}} -->
+								<!-- ko customInput:{type:"String",value:obCurrentDestinationName,attributes:{name:"destination",class:"form-control"}} -->
 								<!-- /ko -->
 							</div>
 							<div class="input-group-btn">

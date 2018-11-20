@@ -139,13 +139,10 @@
 			{
 				return obj ? obj.Name : 0;
 			}), this);
-		this.obCurrentDestinationName = ko.computed(this.setSelectTextComputer("obDestinationDataModels", "destination", function(obj) 
+		this.obCurrentDestinationName = ko.computed(function()
 		{
-			return obj.Name;
-		}, function(obj) 
-			{
-				return obj.Name;
-			}), this);
+			return this.obEntityDataModel().destination();
+		}, this);
 		this.obSelectedDestination.subscribe(function()
 		{
 			this._fieldsUpdateFromModal("destination", this.obSelectedDestination());
@@ -226,12 +223,6 @@
 		{
 			var collection = this.getCollection(this.obActivityDataModels(), 'Name');
 			this.resetEmpty(m, collection, 'fieldTripActivityId');
-		}.bind(this);
-
-		this.destinationOnBlur = function(e, m)
-		{
-			var collection = this.getCollection(this.obDestinationDataModels(), 'Name');
-			this.resetEmpty(m, collection, 'destination');
 		}.bind(this);
 
 		this.classificationDisable = function() { return this.obCurrentClassificationName() == ''; };
