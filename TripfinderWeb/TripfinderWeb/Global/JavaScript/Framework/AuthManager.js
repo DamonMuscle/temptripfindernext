@@ -12,7 +12,7 @@
 		this.logOffTag = false;
 
 		this.obIsLogIn = ko.observable(false);
-		var clientKey = tf.storageManager.get("clientKey", true) || tf.entStorageManager.get("clientKey");
+		var clientKey = tf.entStorageManager.get("clientKey", true) || tf.storageManager.get("clientKey");
 		var username = tf.storageManager.get("userName", true);
 		var password = tf.storageManager.get("password", true);
 		this.token = tf.entStorageManager.get("token");
