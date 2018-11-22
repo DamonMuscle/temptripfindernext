@@ -474,10 +474,26 @@
 												tf.pageManager.showMessageModal(true);
 											}
 
-											if (tf.urlParm && tf.urlParm.tripid)
+											if (tf.urlParm)
 											{
-												tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
-												return;
+												if( tf.urlParm.tripid)
+												{
+													tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
+													return;
+												}
+												else if(tf.urlParm.DB)
+												{
+													if(tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.onlyLevel1)
+													{
+														tf.pageManager.openNewPage("fieldtrips",  true);
+														return;
+													}
+													else
+													{
+														tf.pageManager.openNewPage("approvals",  true);
+														return;
+													}
+												}
 											}
 
 											var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
