@@ -2608,7 +2608,8 @@
 			columns: self.getKendoColumnsExtend(columns)
 		}).data("kendoGrid");
 
-		if (self.isReadMode() && self.entitySelectId)
+		var hasPermission = self.checkDataTypePermission(dataItem.url) && columns.length > 0;
+		if (self.isReadMode() && self.entitySelectId && hasPermission)
 		{
 			self.getGridRelatedData(dataItem.url, dataItem.subUrl, columns).then(function(result)
 			{
@@ -2629,12 +2630,36 @@
 			}, function(error)
 				{
 					//  no permission
-					self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, true, dataItem.url);
+					self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, false, dataItem.url);
 				});
 		}
 		else
 		{
-			self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, false, dataItem.url);
+			self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, hasPermission, dataItem.url);
+		}
+	};
+
+
+	/**
+	 * Check the permission for specified grid type.
+	 * @param {String} gridType 
+	 * @return {Boolean}
+	 */
+	DetailViewViewModel.prototype.checkDataTypePermission = function(gridType)
+	{
+		switch (gridType)
+		{
+			case "fieldtripresource":
+			case "fieldtripinvoice":
+			case "fieldtriphistory":
+				return tf.permissions.obFieldTrips();
+			case "fieldtripvehicle":
+				return tf.permissions.obFieldTrips() && tf.permissions.obVehicle();
+			case "fieldtripdriver":
+			case "fieldtripaide":
+				return tf.permissions.obFieldTrips() && tf.permissions.obStaff();
+			default:
+				return false;
 		}
 	};
 

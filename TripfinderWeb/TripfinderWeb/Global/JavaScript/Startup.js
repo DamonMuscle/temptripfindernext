@@ -481,7 +481,7 @@
 											}
 
 											var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
-											if (!pageName || pageName==="settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
+											if (!pageName || pageName === "settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
 											{
 												pageName = "fieldtrips";
 											}
@@ -561,6 +561,9 @@
 		var fltEdit = tf.authManager.isAuthorizedFor("filters", "edit");
 		var fltDelete = tf.authManager.isAuthorizedFor("filters", "delete");
 
+		var p1 = tf.authManager.isAuthorizedFor("staff", "read");
+		var p2 = tf.authManager.isAuthorizedFor("vehicle", "read");
+
 		var docRead = tf.authManager.isAuthorizedFor("documentTab", "read");
 		var docAdd = tf.authManager.isAuthorizedFor("documentTab", "add");
 		var docEdit = tf.authManager.isAuthorizedFor("documentTab", "edit");
@@ -572,6 +575,8 @@
 		{
 			tf.permissions = {
 				obFieldTrips: ko.observable(ft),
+				obStaff: ko.observable(p1),
+				obVehicle: ko.observable(p2),
 				filtersRead: fltRead,
 				filtersAdd: fltAdd,
 				filtersEdit: fltEdit,
