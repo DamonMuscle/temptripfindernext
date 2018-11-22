@@ -9,7 +9,11 @@
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
 		self.obVersion = ko.observable("Version 1.0.9999"); // DO NOT CHANGE THIS NUMBER
+		self.isTryGoAway = true;
+		self.oldPageType = "";
+		self.obPages = ko.observableArray();
 		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
+		self.changedPageEvent = new TF.Events.Event();
 		self.loadDataSourceName();
 		self.initContextMenuEvent();
 		self.navigationData = null;
@@ -109,12 +113,38 @@
 
 	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
 	{
+		var self = this;
+		if (self.isTryGoAway && self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.tryGoAway)
+		{
+			self.obPages()[0].data.tryGoAway(type).then(function(result)
+			{
+				if (result)
+				{
+					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
+				}
+			});
+		}
+		else
+		{
+			self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
+		}
+		self.isTryGoAway = self;
+	};
+
+	PageManager.prototype._openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
+	{
 		var self = this,
 			pageData, templateName,
 			storageKey = TF.productName.toLowerCase() + ".page";
 
 		self.resizablePage.clearContent();
 		gridOptions = gridOptions || {};
+
+		if (self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.dispose)
+		{
+			self.obPages()[0].data.dispose();
+			self.obPages()[0].data = null;
+		}
 		switch (type)
 		{
 			case "approvals":
@@ -154,6 +184,14 @@
 		}
 
 		self.resizablePage.leftPageType = type;
+
+		if (self.oldPageType != type)
+		{
+			self.changedPageEvent.notify(type);
+		}
+
+		self.oldPageType = type;
+
 		self.resizablePage.setLeftPage(templateName, pageData, true, firstLoad);
 
 		if (self.navigationData)
@@ -175,6 +213,12 @@
 		{
 			$(".page-container").css("width", "100%");
 		}
+
+		self.obPages([
+			{
+				contentTemplate: templateName,
+				data: pageData
+			}]);
 	};
 
 	PageManager.prototype.loadDataSourceName = function()

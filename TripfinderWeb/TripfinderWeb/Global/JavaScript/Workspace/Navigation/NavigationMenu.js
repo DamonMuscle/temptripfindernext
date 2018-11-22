@@ -42,6 +42,7 @@
 
 		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
+		tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self));
 	}
 
 	/**
@@ -567,7 +568,7 @@
 		{
 			if (!self.closeOpenedNavigationItemMenu(false))
 			{
-				self.setActiveStateByPageType(type);
+				//self.setActiveStateByPageType(type);
 				tf.pageManager.openNewPage(type);
 			}
 
@@ -812,6 +813,11 @@
 		}
 	};
 
+	NavigationMenu.prototype.setActiveState = function(e, type)
+	{
+		var self = this;
+		self.setActiveStateByPageType(type);
+	}
 	/**
 	 * Set active state by page id.
 	 * @param {number} pageId 
@@ -1130,26 +1136,30 @@
 			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 
-		Promise.resolve($.ajax({url:myTransfinderURL,
-					            data: { vendorid: "Transfinder", 
-										clientid: tf.authManager.clientKey },
-								dataType: 'json'
-								}))
-		.then(function(res){
-			var prod = res.Products.filter(function(prod)
-						{
-							return prod.Name == routeName
-						}),
-				url = prod[0].Uri;
-
-			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+		Promise.resolve($.ajax({
+			url: myTransfinderURL,
+			data: {
+				vendorid: "Transfinder",
+				clientid: tf.authManager.clientKey
+			},
+			dataType: 'json'
+		}))
+			.then(function(res)
 			{
-				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
-			}
-			ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
-			window.open(url, requireNewTab ? "_blank" : "_self");
-			self.toggleAppSwitcherMenu(false);
-		})
+				var prod = res.Products.filter(function(prod)
+				{
+					return prod.Name == routeName
+				}),
+					url = prod[0].Uri;
+
+				if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+				{
+					url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+				}
+				ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
+				window.open(url, requireNewTab ? "_blank" : "_self");
+				self.toggleAppSwitcherMenu(false);
+			})
 	};
 
 	/**
@@ -1170,4 +1180,5 @@
 		tf.shortCutKeys.unbind(["esc"]);
 		$(document).off("click.navigation-menu");
 	};
+
 })();

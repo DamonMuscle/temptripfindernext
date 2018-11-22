@@ -445,6 +445,33 @@
 		}
 	};
 
+	SettingsConfigurationPage.prototype.tryGoAway = function(pageName)
+	{
+		var self = this;
+		if (self.obEntityDataModel().apiIsDirty() && tf.permissions.obIsAdmin())
+		{
+			return tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to opening up " + pageName + "?", "Unsaved Changes")
+				.then(function(result)
+				{
+					if (result)
+					{
+						return Promise.resolve().then(function()
+						{
+							return self.saveClick();
+						}.bind(self));
+					}
+					else
+					{
+						return Promise.resolve(result === false);
+					}
+				}.bind(self));
+		}
+		else
+		{
+			return Promise.resolve(true);
+		}
+	};
+
 	SettingsConfigurationPage.prototype.dispose = function()
 	{
 		var self = this;
