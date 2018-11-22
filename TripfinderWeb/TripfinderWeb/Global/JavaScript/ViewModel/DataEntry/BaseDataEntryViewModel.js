@@ -5,7 +5,6 @@
 	function BaseDataEntryViewModel(ids, view)
 	{
 		this.initialize = this.initialize.bind(this);
-		this.deleteClick = this.deleteClick.bind(this);
 		this.refreshClick = this.refreshClick.bind(this);
 		this.leftPress = this.leftPress.bind(this);
 		this.rightPress = this.rightPress.bind(this);
@@ -65,18 +64,9 @@
 			tf.shortCutKeys.bind("left", this.leftPress, this._view.document.routeState);
 			tf.shortCutKeys.bind("right", this.rightPress, this._view.document.routeState);
 		}
-		this.obUserDefinedColumns = ko.observable($.extend(true, Object, TF.UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_LABELS));
-		this.entityNames = TF.UserDefinedFieldUtil.USER_DEFINED_FIELDS_COLUMN_ENTITY_NAMES;
-		this.obUserDefinedCharacterLeft = ko.observableArray();
-		this.obUserDefinedCharacterRight = ko.observableArray();
-		this.obUserDefinedNumericLeft = ko.observableArray();
-		this.obUserDefinedNumericRight = ko.observableArray();
-		this.obUserDefinedDateFieldsLeft = ko.observableArray();
-		this.obUserDefinedDateFieldsRight = ko.observableArray();
 		this.CharacterTypeID = view.type == "student" ? ["0", "1", "2", "3", "12", "13", "14", "15"] : ["0", "1", "2", "3"];
 		this.NumericTypeID = ["4", "5", "6", "7"];
 		this.dateFieldsTypeID = view.type == "staff" ? ["8", "9", "10", "11", "16", "17", "18", "19"] : ["8", "9", "10", "11"];
-		this.obUserDefinedDisplay = ko.computed(this.userDefinedDisplayComputer, this);
 
 		this.obPageNavName = ko.computed(this._pageNavComputer, this);
 		this.baseDeletion = null;
@@ -216,65 +206,6 @@
 		//--end of securities----------
 	}
 
-	BaseDataEntryViewModel.prototype.getUserDefinedDisplayData = function()
-	{
-		for (var i in this.obUserDefinedColumns())
-		{
-			if (this.CharacterTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[i].Status)
-			{
-				if (this.obUserDefinedCharacterLeft().length == this.obUserDefinedCharacterRight().length)
-				{
-					this.obUserDefinedCharacterLeft.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
-				}
-				else
-				{
-					this.obUserDefinedCharacterRight.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
-				}
-				continue;
-			}
-			if (this.NumericTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[i].Status)
-			{
-				if (this.obUserDefinedNumericLeft().length == this.obUserDefinedNumericRight().length)
-				{
-					this.obUserDefinedNumericLeft.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
-				}
-				else
-				{
-					this.obUserDefinedNumericRight.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
-				}
-				continue;
-			}
-			if (this.dateFieldsTypeID.indexOf(i) != -1 && this.obUserDefinedColumns()[i].Status)
-			{
-				if (this.obUserDefinedDateFieldsLeft().length == this.obUserDefinedDateFieldsRight().length)
-				{
-					this.obUserDefinedDateFieldsLeft.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
-				}
-				else
-				{
-					this.obUserDefinedDateFieldsRight.push({ column: this.obUserDefinedColumns()[i], value: this.getUserDefinedValue(i) });
-				}
-				continue;
-			}
-		}
-	}
-
-	BaseDataEntryViewModel.prototype.getUserDefinedValue = function(num)
-	{
-		var value = ko.observable(this.obEntityDataModel()[this.entityNames[num]]());
-		value.subscribe(function(value)
-		{
-			var self = this.self;
-			self.obEntityDataModel()[self.entityNames[this.num]](value);
-		}.bind({ self: this, num: num }), this);
-		return value;
-	}
-
-	BaseDataEntryViewModel.prototype.userDefinedDisplayComputer = function()
-	{
-		return { Character: this.obUserDefinedCharacterLeft().length > 0, Numeric: this.obUserDefinedNumericLeft().length > 0, DateFields: this.obUserDefinedDateFieldsLeft().length > 0 };
-	}
-
 	BaseDataEntryViewModel.prototype._pageNavComputer = function()
 	{
 		return (this.obCurrentPage() + 1) + ' of ' + this.obIds().length;
@@ -335,7 +266,6 @@
 							}.bind(this));
 					}
 
-					this.getUserDefinedDisplayData();
 					this.onMainDataLoaded.notify(item);
 					if (this._view.mode === "Add")
 					{
@@ -358,7 +288,6 @@
 		else
 		{
 			this.obEntityDataModel(new this.dataModelType());
-			this.getUserDefinedDisplayData();
 			this.onMainDataLoaded.notify();
 			return Promise.resolve();
 		}
@@ -1076,60 +1005,6 @@
 		return fn.bind(this, Array.prototype.slice.call(arguments, 1));
 	}
 
-	BaseDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
-	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type);
-		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
-			.then(function(data)
-			{
-				if (modifyDataEntryListItemModalViewModel.newDataList.length > 0)
-				{
-					for (var i in modifyDataEntryListItemModalViewModel.newDataList)
-					{
-						parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
-					}
-					if (parameters[2])
-					{
-						this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
-					}
-				}
-				if (!data)
-				{
-					return;
-				}
-				data.Text = data.Item;
-				parameters[1].push(data);
-				if (parameters[2])
-				{
-					this.obEntityDataModel()[parameters[2]](data.Item);
-				}
-			}.bind(this));
-	}
-
-	BaseDataEntryViewModel.prototype.EditDataEntryListItem = function(parameters)
-	{
-		var select = $.grep(parameters[1](), function(d) { return d.Item == parameters[3] });
-		if (select.length > 0)
-		{
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], this.type, select[0].Id))
-				.then(function(data)
-				{
-					if (!data)
-					{
-						return;
-					}
-					var index = parameters[1].indexOf(select[0]);
-					parameters[1].splice(index, 1);
-					data.Text = data.Item;
-					parameters[1].push(data);
-					if (parameters[2])
-					{
-						this.obEntityDataModel()[parameters[2]](data.Item);
-					}
-				}.bind(this));
-		}
-	}
-
 	BaseDataEntryViewModel.prototype.addNewEntity = function(parameters, viewModel, e)
 	{
 		var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry, { type: parameters[0], ids: [] });
@@ -1142,22 +1017,6 @@
 		{
 			var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry, { type: parameters[0], ids: [parameters[1]], tabNames: [parameters[2]] });
 			tf.documentManagerViewModel.add(documentData, TF.DocumentManagerViewModel.isOpenNewWindow(e));
-		}
-	};
-
-	BaseDataEntryViewModel.prototype.deleteClick = function(viewModel, e)
-	{
-		if (this._view && this._view.id)
-		{
-			this.baseDeletion.execute([this._view.id])
-				.then(function(deletedIds)
-				{
-					if (deletedIds && deletedIds.length > 0)
-					{
-						this.checkChangeWhenClose = false;
-						this.onRequestClose.notify();
-					}
-				}.bind(this));
 		}
 	};
 

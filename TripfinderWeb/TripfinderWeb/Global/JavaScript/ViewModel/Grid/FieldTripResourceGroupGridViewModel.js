@@ -5,7 +5,6 @@
 	function FieldTripResourceGroupGridViewModel(obDocumentFocusState, element, kendoGridState, gridShowType, defaultGridLayoutExtendedEntity, showBulkMenu, option, view, dataEntryObjects)
 	{
 		TF.Grid.BaseKendoGridViewModel.call(this, obDocumentFocusState, element, kendoGridState, gridShowType, true, false, option, view, dataEntryObjects);
-		this.baseDeletion = new TF.Executor.FieldtripDeletion();
 		this.init();
 
 		switch (kendoGridState.entityType)

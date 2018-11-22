@@ -8,20 +8,15 @@
 		this.omitSelectionClick = this.omitSelectionClick.bind(this);
 		this.allSelectionClick = this.allSelectionClick.bind(this);
 		this.deleteSelectionClick = this.deleteSelectionClick.bind(this);
-		this.globalReplaceClick = this.globalReplaceClick.bind(this);
 		this.exportClick = this.exportClick.bind(this);
 		this.editClick = this.editClick.bind(this);
 		this.viewClick = this.viewClick.bind(this);
 		this.addClick = this.addClick.bind(this);
-		this.gridIconClicked = this.gridIconClicked.bind(this);
-		this.directoryIconClicked = this.directoryIconClicked.bind(this);
-		this.layoutIconClick = this.layoutIconClick.bind(this);
 		this.filterMenuClick = this.filterMenuClick.bind(this);
 		this.showhideFilterClick = this.showhideFilterClick.bind(this);
 		//only used for not implemented function
 		this.showTodoWarningClick = this.showTodoWarningClick.bind(this);
 		this.saveAsClick = this.saveAsClick.bind(this);
-		this.newGridClick = this.newGridClick.bind(this);
 		this.sendEmailClick = this.sendEmailClick.bind(this);
 		this.obReportLists = ko.observableArray();
 		this.viewReportClick = this.viewReportClick.bind(this);
@@ -51,8 +46,6 @@
 		this.onGridStateChange = new TF.Events.Event();
 		this.searchGrid = null;
 		this.splitmap = null;
-		this.obShowSplitmap = ko.observable(false);
-		this.obShowSplitmap.subscribe(this._toggleSplitmapChange, this);
 		this.options = {
 			openBulkMenu: this._openBulkMenu.bind(this),
 			openDetailPopover: this._openDetailPopover.bind(this),
@@ -76,9 +69,6 @@
 
 		//customized:
 		this.obNoRecordSelected = ko.observable(false);
-
-		//directory view
-		this.directoryViewDataModel = null;
 
 		this.$container.find(".bottompart").on("click", function(e)
 		{
@@ -106,7 +96,7 @@
 			var url = option.url ? option.url : (this.type == "documentmini" ? "search/document" : "search/" + this.type);
 
 			var defaultOption = {
-				storageKey: option.storageKey ? option.storageKey : "grid.currentlayout." + (this.type == "attendance" ? "attendancerecords" : this.type),
+				storageKey: option.storageKey ? option.storageKey : "grid.currentlayout." + this.type,
 				gridType: this.type,
 				url: pathCombine(tf.api.apiPrefix(), url),
 				obDocumentFocusState: this._obFocusState,
@@ -115,7 +105,6 @@
 				showLockedColumn: this._showBulkMenu,
 				loadUserDefined: this._loadUserDefined,
 				containerHeight: option.height,
-				directory: this.directoryViewDataModel,
 				onSelectRowChange: function(e)
 				{
 					if (e && e.length > 0)
@@ -285,16 +274,6 @@
 				}.bind(this));
 		},
 
-		layoutIconClick: function(viewModel, e)
-		{
-			this._openlayoutMenu(e.target);
-		},
-
-		_openlayoutMenu: function(offset)
-		{
-			tf.contextMenuManager.showMenu(offset, new TF.ContextMenu.TemplateContextMenu("workspace/grid/layoutcontextmenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid)));
-		},
-
 		filterMenuClick: function(viewModel, e)
 		{
 			this.searchGrid.filterMenuClick(e);
@@ -319,16 +298,6 @@
 				}
 				this.searchGrid.fitContainer();
 			}
-		},
-
-		newGridClick: function(viewModel, e)
-		{
-			var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.Grid,
-				{
-					gridType: this.type,
-					gridState: this._gridState
-				});
-			tf.documentManagerViewModel.add(documentData);
 		}
 	};
 
@@ -498,39 +467,6 @@
 		}
 	};
 
-	BaseKendoGridViewModel.prototype.gridIconClicked = function(viewModel, e)
-	{
-		this.obShowSplitmap(false);
-	}
-
-	BaseKendoGridViewModel.prototype.mapIconClicked = function(viewModel, e)
-	{
-		var isShow = !this.obShowSplitmap();
-		this.obShowSplitmap(isShow);
-	};
-
-	BaseKendoGridViewModel.prototype.directoryIconClicked = function(viewModel, e)
-	{
-		var isShow = !this.obShowSplitmap();
-		this.obShowSplitmap(isShow);
-
-		this.initGridMapWidth(this.$container);
-	};
-
-	BaseKendoGridViewModel.prototype._toggleSplitmapChange = function()
-	{
-		this.searchGrid.setSplitmapMode(this.obShowSplitmap());
-		this.splitmap.fitContainer();
-
-		if (this.obShowSplitmap())
-		{
-			this._loadMap();
-		} else
-		{
-			this._disposeMap();
-		}
-	};
-
 	BaseKendoGridViewModel.prototype._onAdditionalSelectionChange = function(e, args)
 	{
 		this.splitmap.setItems(args);
@@ -539,48 +475,6 @@
 	BaseKendoGridViewModel.prototype._onSelectCountChange = function(e, args)
 	{
 		this.obGridNoSelection(args == 0);
-	};
-
-	BaseKendoGridViewModel.prototype.globalReplaceClick = function(viewModel, e)
-	{
-		var selectedIds = this.searchGrid.getSelectedIds();
-		var self = this;
-		if (selectedIds.length === 0 && self.searchGrid.kendoGrid.dataSource._total > 0) //When no records are selected, All records in the grid will be included
-		{
-			ids = [];
-			this.searchGrid.kendoGrid.dataSource.data().map(function(item)
-			{
-				ids.push(item.Id);
-			});
-			this.searchGrid.getSelectedIds(ids);
-			this._openGlobalReplaceModal.bind(self)(e);
-			this.searchGrid.getSelectedIds([]);
-		}
-		else
-		{
-			this._openGlobalReplaceModal();
-		}
-	};
-
-	BaseKendoGridViewModel.prototype._openGlobalReplaceModal = function()
-	{
-		var selectedIds = this.searchGrid.getSelectedIdsWithWarning();
-		if (selectedIds.length !== 0)
-		{
-			tf.modalManager.showModal(new TF.Modal.GlobalReplaceModalViewModel(this.type, selectedIds))
-				.then(function(result)
-				{
-					if (result === false)
-					{
-						return;
-					}
-					PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), selectedIds);
-				}.bind(this))
-				.catch(function()
-				{
-					console.log(arguments);
-				});
-		}
 	};
 
 	BaseKendoGridViewModel.prototype.invertSelectionClick = function(viewModel, e)
@@ -600,25 +494,10 @@
 
 	BaseKendoGridViewModel.prototype.deleteSelectionClick = function(viewModel, e)
 	{
-		var selectedIds = this.searchGrid.getSelectedIds();
-		if (selectedIds.length == 0)
-		{
-			return;
-		}
-
-		this.deleteSelectedItems(this.searchGrid.getSelectedIds());
 	};
 
 	BaseKendoGridViewModel.prototype.deleteSelectedItems = function(ids)
 	{
-		this.baseDeletion.execute(ids)
-			.then(function(deletedIds)
-			{
-				if (deletedIds && deletedIds.length > 0)
-				{
-					this.searchGrid.clearSelection();
-				}
-			}.bind(this));
 	};
 
 	BaseKendoGridViewModel.prototype.normalizeRecordType = function()
@@ -751,24 +630,6 @@
 
 	BaseKendoGridViewModel.prototype.addClick = function(viewModel, e)
 	{
-	};
-
-	BaseKendoGridViewModel.prototype.newCopyClick = function(viewModel, e)
-	{
-		var selectedIds = this.searchGrid.getSelectedIds();
-		if (selectedIds.length == 0)
-		{
-			return;
-		}
-
-		var selectedRecords = this.searchGrid.getSelectedRecords();
-		var documentData = new TF.Document.DocumentData(TF.Document.DocumentData.DataEntry,
-			{
-				type: this.type,
-				ids: selectedIds,
-				mode: "Add",
-			});
-		tf.documentManagerViewModel.add(documentData, TF.DocumentManagerViewModel.isOpenNewWindow(e));
 	};
 
 	BaseKendoGridViewModel.prototype.mailTo = function(value, data)

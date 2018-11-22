@@ -481,7 +481,7 @@
 					return Promise.resolve();
 				}
 				var selectGridFilterEntityId;
-				if (!self.inited)
+				//if (!self.inited)
 				{
 					if ($.isNumeric(self.options.filterId) && self.options.filterId !== 0)
 					{

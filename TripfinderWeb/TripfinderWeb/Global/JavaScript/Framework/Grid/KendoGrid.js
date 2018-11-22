@@ -144,20 +144,13 @@
 			{
 				if (this.options.entityType)
 				{
-					return Promise.all([
-						this.loadUserDefinedLabel()
-					]).then(function()
-					{
-						this._mergeUserDefinedLabel();
-						return this._setConfiguration();
-					}.bind(this));
+					return this._setConfiguration();
 				} else
 				{
 					return Promise.all([
-						this.loadGridFilter(), this.loadUserDefinedLabel()
+						this.loadGridFilter()
 					]).then(function()
 					{
-						this._mergeUserDefinedLabel();
 						return this._setConfiguration();
 					}.bind(this));
 				}
@@ -226,20 +219,6 @@
 					}.bind(this));
 				}
 			}.bind(this));
-	};
-
-	KendoGrid.prototype.loadUserDefinedLabel = function()
-	{
-		if (this.options.loadUserDefined)
-		{
-			return this.userDefinedFieldUtil.loadUserDefinedLabel();
-		}
-		return Promise.resolve();
-	};
-
-	KendoGrid.prototype._mergeUserDefinedLabel = function()
-	{
-		this._gridDefinition.Columns = this.userDefinedFieldUtil.mergeUserDefinedLabel(this._gridDefinition.Columns);
 	};
 
 	KendoGrid.prototype.rebuildGrid = function(sortInfo)

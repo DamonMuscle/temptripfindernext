@@ -100,8 +100,6 @@
 			}
 		}
 		this.obPositiveButtonLabel = ko.observable("Attach");
-
-		this.selectedAssociations = this.selectedAssociations.bind(this);
 	}
 
 	DocumentModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
@@ -262,18 +260,6 @@
 			});
 		}
 	};
-
-	DocumentModalViewModel.prototype.selectedAssociations = function()
-	{
-		tf.modalManager.showModal(new TF.Modal.ManageAssociationsModalViewModel(this.obSelectedAssociations(), { documentCount: (this.documentId && this.documentId > 0) ? 1 : this.data().obEntityDataModel().documentEntities().length }))
-			.then(function(result)
-			{
-				if (result)
-				{
-					this.obSelectedAssociations(result);
-				}
-			}.bind(this));
-	}
 
 	DocumentModalViewModel.prototype.dispose = function()
 	{

@@ -257,24 +257,10 @@
 			return Enumerable.From(allColumns).Where("$.FieldName=='" + item.FieldName + "'").FirstOrDefault();
 		});
 
-		if (!self.isColumnsWithoutUserDefinedLabel(this.options.type))
-		{
-			var p1 = TF.UserDefinedFieldUtil.prototype.loadUserDefinedLabel(this.options.type).then(function()
-			{
-				return TF.UserDefinedFieldUtil.prototype.mergeUserDefinedLabel(availableColumns);
-			});
-			var p2 = TF.UserDefinedFieldUtil.prototype.loadUserDefinedLabel(this.options.type).then(function()
-			{
-				return TF.UserDefinedFieldUtil.prototype.mergeUserDefinedLabel(selectedColumns);
-			});
-		}
-		else
-		{
-			this.initUserDefinedLabel(availableColumns);
-			this.initUserDefinedLabel(selectedColumns);
-			var p1 = Promise.resolve();
-			var p2 = Promise.resolve();
-		}
+		this.initUserDefinedLabel(availableColumns);
+		this.initUserDefinedLabel(selectedColumns);
+		var p1 = Promise.resolve();
+		var p2 = Promise.resolve();
 
 		Promise.all([p1, p2]).then(function()
 		{

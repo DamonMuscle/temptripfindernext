@@ -49,7 +49,7 @@
 					}).map(function(item)
 					{
 						address.push(
-							new TF.DataModel.ScheduledReportReceiptDataModel(
+							new TF.DataModel.ReportReceiptDataModel(
 								{
 									SelectedUserId: 0,
 									EmailAddress: item
@@ -392,7 +392,7 @@
 							else
 							{
 								newList.push(
-									new TF.DataModel.ScheduledReportReceiptDataModel(
+									new TF.DataModel.ReportReceiptDataModel(
 										{
 											SelectedUserId: 0,
 											EmailAddress: item
@@ -471,7 +471,7 @@
 							else
 							{
 								newList.push(
-									new TF.DataModel.ScheduledReportReceiptDataModel(
+									new TF.DataModel.ReportReceiptDataModel(
 										{
 											SelectedUserId: 0,
 											EmailAddress: item
@@ -550,7 +550,7 @@
 							else
 							{
 								newList.push(
-									new TF.DataModel.ScheduledReportReceiptDataModel(
+									new TF.DataModel.ReportReceiptDataModel(
 										{
 											SelectedUserId: 0,
 											EmailAddress: item
@@ -638,16 +638,16 @@
 
 		var url = pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email");
 		var requestOption =
-		{
-			data:
 			{
-				gridLayoutExtendedEntity: this.option.layout,
-				term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
-				SelectedIds: this.option.selectedIds,
-				sortItems: this.option.sortItems,
-				documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
-			}
-		};
+				data:
+				{
+					gridLayoutExtendedEntity: this.option.layout,
+					term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
+					SelectedIds: this.option.selectedIds,
+					sortItems: this.option.sortItems,
+					documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
+				}
+			};
 
 		if (this.option.type === "busfinderhistorical")
 			self.option.setRequestOption(requestOption);
@@ -779,7 +779,7 @@
 							{
 								name = item.FirstName + " " + item.LastName;
 							}
-							return new TF.DataModel.ScheduledReportReceiptDataModel(
+							return new TF.DataModel.ReportReceiptDataModel(
 								{
 									SelectedUserId: item.Id,
 									EmailAddress: item.Email,
@@ -1171,7 +1171,7 @@
 			return item.obSelected();
 		}).map(function(item)
 		{
-			return new TF.DataModel.ScheduledReportReceiptDataModel(
+			return new TF.DataModel.ReportReceiptDataModel(
 				{
 					SelectedUserId: item.Id,
 					EmailAddress: item.Email,

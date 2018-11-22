@@ -8,7 +8,6 @@
 		this.type = "documentmini";
 		this.baseDeletion = new TF.Executor.DocumentDeletion();
 		this.options.gridDefinition = tf.documentGridDefinition.miniGridDefinition();
-		this.directoryViewDataModel = new TF.Grid.DocumentDirectoryViewModel();
 		if (kendoGridState.entityType == "fieldtripEntry")
 		{
 			this.options.kendoGridOption = {

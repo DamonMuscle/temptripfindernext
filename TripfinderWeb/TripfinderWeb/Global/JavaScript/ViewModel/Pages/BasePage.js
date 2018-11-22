@@ -254,27 +254,27 @@
 						$(".tfmodal-container").css('visibility', 'hidden');
 						return Promise.resolve(true);
 					}, function(data)
+					{
+						tf.loadingIndicator.tryHide();
+						if (self.copyRetryCount >= 3)
 						{
-							tf.loadingIndicator.tryHide();
-							if (self.copyRetryCount >= 3)
-							{
-								tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
-									.then(function(result)
-									{
-
-									});
-								return;
-							}
-							tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
+							tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
 								.then(function(result)
 								{
-									if (result)
-									{
-										self.copyRetryCount = self.copyRetryCount + 1;
-										self._copySelectedRecords(e, selectedIds);
-									}
+
 								});
-						});
+							return;
+						}
+						tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
+							.then(function(result)
+							{
+								if (result)
+								{
+									self.copyRetryCount = self.copyRetryCount + 1;
+									self._copySelectedRecords(e, selectedIds);
+								}
+							});
+					});
 			});
 	};
 
@@ -346,18 +346,7 @@
 
 	BasePage.prototype.openSelectedClick = function(viewModel, e)
 	{
-		if (TF.isMobileDevice && window.screen.width < 768)
-		{
-			var selectedIds = this.searchGrid.getSelectedIds();
-			this.newGridWithSelectedRecordsModalViewModel = new TF.Modal.NewGridWithSelectedRecordsModalViewModel(selectedIds, this, this.searchGrid);
-			tf.modalManager.showModal(
-				this.newGridWithSelectedRecordsModalViewModel
-			);
-		}
-		else
-		{
-			this._openSelected(this.type, e);
-		}
+		this._openSelected(this.pageType, e);
 	};
 
 	BasePage.prototype._openSelected = function(gridType, e)

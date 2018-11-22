@@ -61,7 +61,6 @@
 		this.obInvoiceResourceId = ko.observable(1);
 		this.obInvoiceGridDataSource = ko.observableArray();
 
-		this.baseDeletion = new TF.Executor.FieldtripDeletion();
 		this.obNeedSaveTemplate(true);
 		this.obNeedSaveAndClose(!TF.isPhoneDevice);
 		this.obResourceId = ko.observable(0);
@@ -2344,63 +2343,6 @@
 
 		return (filters[0] && filters[0].Id) ? filters[0].Id : null;
 	};
-
-	FieldTripDataEntryViewModel.prototype.addDataEntryListItem = function(parameters)
-	{
-		var modifyDataEntryListItemModalViewModel = new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination");
-		tf.modalManager.showModal(modifyDataEntryListItemModalViewModel)
-			.then(function(data)
-			{
-				if (modifyDataEntryListItemModalViewModel.newDataList.length > 0)
-				{
-					for (var i in modifyDataEntryListItemModalViewModel.newDataList)
-					{
-						parameters[1].push(modifyDataEntryListItemModalViewModel.newDataList[i]);
-					}
-					if (parameters[2])
-					{
-						this.obEntityDataModel()[parameters[2]](modifyDataEntryListItemModalViewModel.newDataList[i].Item);
-					}
-				}
-				if (!data)
-				{
-					return;
-				}
-				parameters[1].push(data);
-				if (parameters[2])
-				{
-					this.obEntityDataModel()[parameters[2]](data.Item);
-				}
-			}.bind(this));
-	}
-
-	FieldTripDataEntryViewModel.prototype.EditDataEntryListItem = function(parameters)
-	{
-		var select = $.grep(parameters[1](), function(d) { return d.Item == parameters[3] });
-		if (select.length > 0)
-		{
-			if (select[0].Id == 0)
-			{//once select None
-				return;
-			}
-
-			tf.modalManager.showModal(new TF.Modal.ModifyDataEntryListItemModalViewModel(parameters[0], "fieldtripdestination", select[0].Id))
-				.then(function(data)
-				{
-					if (!data)
-					{
-						return;
-					}
-					var index = parameters[1].indexOf(select[0]);
-					parameters[1].splice(index, 1);
-					parameters[1].push(data);
-					if (parameters[2])
-					{
-						this.obEntityDataModel()[parameters[2]](data.Item);
-					}
-				}.bind(this));
-		}
-	}
 
 	FieldTripDataEntryViewModel.prototype._fieldsUpdateFromModal = function(type, data)
 	{

@@ -124,7 +124,6 @@
 		self.onShiftUp = self.onShiftUp.bind(self);
 		self.refreshClick = self.refreshClick.bind(self);
 
-		self.userDefinedFieldUtil = new TF.UserDefinedFieldUtil(self.options.gridType);
 		if (self.options.showOmittedCount)
 		{
 			tf.shortCutKeys.bind("ctrl+o", self.onCtrlOPress, self.options.routeState);
