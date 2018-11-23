@@ -878,6 +878,10 @@
 				}
 			});
 		}
+		else
+		{
+			self.showDetailsClick(false);
+		}
 	};
 
 	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
