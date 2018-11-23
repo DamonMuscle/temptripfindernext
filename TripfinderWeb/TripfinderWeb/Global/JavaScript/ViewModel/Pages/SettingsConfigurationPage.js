@@ -416,7 +416,7 @@
 		{
 			self.changeMessageStatus = true;
 		}
-
+		var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.editorChanged)
 		{
 			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
@@ -428,12 +428,12 @@
 						{
 							if (result)
 							{
-								tf.pageManager.openNewPage("fieldtrips");
+								tf.pageManager.openNewPage(pageName);
 							}
 						});
 					} else if (result === false)
 					{
-						tf.pageManager.openNewPage("fieldtrips");
+						tf.pageManager.openNewPage(pageName);
 					} else
 					{
 						return;
@@ -441,7 +441,7 @@
 				}.bind(this));
 		} else
 		{
-			tf.pageManager.openNewPage("fieldtrips");
+			tf.pageManager.openNewPage(pageName);
 		}
 	};
 
