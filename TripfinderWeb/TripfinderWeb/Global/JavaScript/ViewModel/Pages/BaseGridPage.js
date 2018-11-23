@@ -841,7 +841,7 @@
 		}
 		if (!TF.isMobileDevice)
 		{
-			tf.pagemanager.obFieldTripEditPage(self.fieldTripDataEntry);
+			tf.pageManager.obFieldTripEditPage(self.fieldTripDataEntry);
 		}
 
 		self.obShowFieldTripDEPanel(true);

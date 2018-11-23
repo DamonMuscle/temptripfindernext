@@ -463,12 +463,12 @@
 						{
 							if (result)
 							{
-								tf.pageManager.openNewPage(pageName);
+								tf.pageManager._openNewPage(pageName);
 							}
 						});
 					} else if (result === false)
 					{
-						tf.pageManager.openNewPage(pageName);
+						tf.pageManager._openNewPage(pageName);
 					} else
 					{
 						return;
@@ -476,7 +476,7 @@
 				}.bind(this));
 		} else
 		{
-			tf.pageManager.openNewPage(pageName);
+			tf.pageManager._openNewPage(pageName);
 		}
 	};
 
