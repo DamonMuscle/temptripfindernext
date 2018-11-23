@@ -444,13 +444,13 @@
 		{
 			self.changeMessageStatus = false;
 		}
-		var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 	};
 
 	SettingsConfigurationPage.prototype.cancelClick = function()
 	{
 		var self = this;
 		self.checkDataChanges();
+		var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 
 		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged)
 		{
