@@ -24,7 +24,10 @@
 		self.changeTotalCost = false;
 		self.messageStatus = false;
 		self.changeMessageStatus = false;
-		self.editorChanged = false;
+		self.englishEditorChanged = false;
+		self.spanishEditorChanged = false;
+		self.obPreEnglishMessage = ko.observable();
+		self.obPreSpanishMessage = ko.observable();
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
@@ -117,7 +120,14 @@
 				},
 				change: function()
 				{
-					self.editorChanged = true;
+					if (self.englishEditor.value() !== self.obPreEnglishMessage())
+					{
+						self.englishEditorChanged = true;
+					}
+					else
+					{
+						self.englishEditorChanged = false;
+					}
 				},
 			}).data("kendoEditor");
 			self.spanishEditor = $("#SpanishEditor").kendoEditor({
@@ -127,7 +137,14 @@
 				},
 				change: function()
 				{
-					self.editorChanged = true;
+					if (self.spanishEditor.value() !== self.obPreSpanishMessage())
+					{
+						self.spanishEditorChanged = true;
+					}
+					else
+					{
+						self.spanishEditorChanged = false;
+					}
 				},
 			}).data("kendoEditor");
 
@@ -143,7 +160,9 @@
 			if (result.Items && result.Items.length > 0)
 			{
 				self.englishEditor.value(result.Items[0].EnglishMessage);
+				self.obPreEnglishMessage(result.Items[0].EnglishMessage);
 				self.spanishEditor.value(result.Items[0].SpanishMessage);
+				self.obPreSpanishMessage(result.Items[0].SpanishMessage);
 				$(".display-once-daily").prop("checked", result.Items[0].DisplayOnceDaily);
 				self.messageStatus = result.Items[0].DisplayOnceDaily;
 			}
@@ -363,7 +382,8 @@
 								self.showTotalCost = $(".show-total-cost").prop("checked");
 								self.messageStatus = $(".display-once-daily").prop("checked");
 								self.changeMessageStatus = false;
-								self.editorChanged = false;
+								self.englishEditorChanged = false;
+								self.spanishEditorChanged = false;
 							}
 							return result;
 						});
@@ -405,19 +425,34 @@
 		}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.cancelClick = function()
+	SettingsConfigurationPage.prototype.checkDataChanges = function()
 	{
 		var self = this;
 		if ($(".show-total-cost").prop("checked") !== self.showTotalCost)
 		{
 			self.changeTotalCost = true;
 		}
+		else
+		{
+			self.changeTotalCost = false;
+		}
 		if ($(".display-once-daily").prop("checked") !== self.messageStatus)
 		{
 			self.changeMessageStatus = true;
 		}
+		else
+		{
+			self.changeMessageStatus = false;
+		}
 		var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
-		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.editorChanged)
+	};
+
+	SettingsConfigurationPage.prototype.cancelClick = function()
+	{
+		var self = this;
+		self.checkDataChanges();
+
+		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged)
 		{
 			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
 				.then(function(result)
@@ -448,7 +483,9 @@
 	SettingsConfigurationPage.prototype.tryGoAway = function(pageName)
 	{
 		var self = this;
-		if (self.obEntityDataModel().apiIsDirty() && tf.permissions.obIsAdmin())
+		self.checkDataChanges();
+
+		if ((self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged) && tf.permissions.obIsAdmin())
 		{
 			return tf.promiseBootbox.yesNo("You have unsaved changes. Would you like to save your changes prior to opening up " + pageName + "?", "Unsaved Changes")
 				.then(function(result)
