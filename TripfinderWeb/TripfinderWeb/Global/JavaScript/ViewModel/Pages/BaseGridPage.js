@@ -839,7 +839,11 @@
 		{
 			tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
 		}
-		tf.pagemanager.obFieldTripEditPage(self.fieldTripDataEntry);
+		if (!TF.isMobileDevice)
+		{
+			tf.pagemanager.obFieldTripEditPage(self.fieldTripDataEntry);
+		}
+
 		self.obShowFieldTripDEPanel(true);
 	};
 
