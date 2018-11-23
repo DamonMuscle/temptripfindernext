@@ -27,21 +27,6 @@
 
 	DocumentMiniGridViewModel.prototype.constructor = DocumentMiniGridViewModel;
 
-	DocumentMiniGridViewModel.prototype._viewfromDBClick = function(event, item)
-	{
-		// this.editClick(item, event);
-		// switch (this._gridState.entityType)
-		// {
-		// 	case "fieldtrip":
-		// 		break;
-		// 	case "fieldtripEntry":
-		// 		this._viewfromDBClick(event);
-		// 		break;
-		// 	default:
-		// 		break;
-		// }
-	};
-
 	DocumentMiniGridViewModel.prototype.getDocumentDataModel = function(e)
 	{
 		return this.searchGrid.kendoGrid.dataItem($(e.target).closest("tr"));

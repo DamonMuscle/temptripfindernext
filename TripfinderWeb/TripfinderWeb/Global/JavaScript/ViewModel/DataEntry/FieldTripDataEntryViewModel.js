@@ -1470,7 +1470,6 @@
 		this.$form.find('.document .iconbutton.new').off("click").on("click", { modal: TF.Modal.DocumentModalViewModel }, this.addDocEvent.bind(this));
 		this.$form.find('.document .iconbutton.pencil').off("click").on("click", { gridView: this.obDocumentGridViewModel, modal: TF.Modal.DocumentModalViewModel }, this.editDocEvent.bind(this));
 		this.$form.find('.document .iconbutton.delete').off("click").on("click", { gridView: this.obDocumentGridViewModel, modal: TF.Modal.DocumentModalViewModel }, this.deleteDocEvent.bind(this));
-		this.obDocumentGridViewModel().obGridViewModel()._viewfromDBClick = this.editDocEvent.bind(this);
 	};
 
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
