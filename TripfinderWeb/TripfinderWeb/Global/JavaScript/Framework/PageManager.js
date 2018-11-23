@@ -12,6 +12,7 @@
 		self.isTryGoAway = true;
 		self.oldPageType = "";
 		self.obPages = ko.observableArray();
+		self.obFieldTripEditPage = ko.observable();
 		self.onCurrentDatabaseNameChanged = new TF.Events.Event();
 		self.changedPageEvent = new TF.Events.Event();
 		self.loadDataSourceName();
@@ -120,6 +121,17 @@
 			{
 				if (result)
 				{
+					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
+				}
+			});
+		}
+		else if (self.obFieldTripEditPage() && self.obFieldTripEditPage().obEntityDataModel() && self.obFieldTripEditPage().tryGoAway)
+		{
+			self.obFieldTripEditPage().tryGoAway(type).then(function(result)
+			{
+				if (result)
+				{
+					tf.pageManager.obFieldTripEditPage(null);
 					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
 				}
 			});

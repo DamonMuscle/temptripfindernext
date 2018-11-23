@@ -371,7 +371,7 @@
 				{
 					return;
 				}
-				self.showDetailsClick();
+				self.showDetailsPreClick();
 			});
 		}
 		else if (TF.isPhoneDevice)
@@ -441,7 +441,7 @@
 			return;
 		}
 
-		this.showDetailsClick();
+		this.showDetailsPreClick();
 	};
 
 	BaseGridPage.prototype._openBulkMenu = function()
@@ -580,7 +580,7 @@
 
 		self.bindEvent(".iconbutton.details", function(model, e)
 		{
-			self.showDetailsClick();
+			self.showDetailsPreClick();
 		});
 
 		if (self.gridViewClick)
@@ -839,13 +839,41 @@
 		{
 			tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
 		}
+		tf.pagemanager.obFieldTripEditPage(self.fieldTripDataEntry);
 		self.obShowFieldTripDEPanel(true);
 	};
 
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
 	{
-		this.obShowDetailPanel(false);
-		tf.pageManager.resizablePage.closeRightPage();
+		var self = this;
+		if (tf.pageManager.obFieldTripEditPage() && tf.pageManager.obFieldTripEditPage().obEntityDataModel() && tf.pageManager.obFieldTripEditPage().tryGoAway)
+		{
+			tf.pageManager.obFieldTripEditPage().tryGoAway("", "You have unsaved changes. Would you like to save your changes first?").then(function(result)
+			{
+				if (result)
+				{
+					tf.pageManager.obFieldTripEditPage(null);
+					self.obShowDetailPanel(false);
+					tf.pageManager.resizablePage.closeRightPage();
+				}
+			});
+		}
+	};
+
+	BaseGridPage.prototype.showDetailsPreClick = function(viewModel, e)
+	{
+		var self = this;
+		if (tf.pageManager.obFieldTripEditPage() && tf.pageManager.obFieldTripEditPage().obEntityDataModel() && tf.pageManager.obFieldTripEditPage().tryGoAway)
+		{
+			tf.pageManager.obFieldTripEditPage().tryGoAway("", "You have unsaved changes. Would you like to save your changes first?").then(function(result)
+			{
+				if (result)
+				{
+					tf.pageManager.obFieldTripEditPage(null);
+					self.showDetailsClick(false);
+				}
+			});
+		}
 	};
 
 	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)

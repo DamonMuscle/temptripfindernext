@@ -2409,4 +2409,35 @@
 				break;
 		}
 	}
+
+	FieldTripDataEntryViewModel.prototype.tryGoAway = function(pageName, yesNoStr)
+	{
+		var self = this;
+		if (self.obEntityDataModel().apiIsDirty())
+		{
+			if (!yesNoStr)
+			{
+				yesNoStr = "You have unsaved changes. Would you like to save your changes prior to opening up " + pageName + "?";
+			}
+			return tf.promiseBootbox.yesNo(yesNoStr, "Unsaved Changes")
+				.then(function(result)
+				{
+					if (result)
+					{
+						return Promise.resolve().then(function()
+						{
+							return self.trySave();
+						}.bind(self));
+					}
+					else
+					{
+						return Promise.resolve(result === false);
+					}
+				}.bind(self));
+		}
+		else
+		{
+			return Promise.resolve(true);
+		}
+	};
 })();

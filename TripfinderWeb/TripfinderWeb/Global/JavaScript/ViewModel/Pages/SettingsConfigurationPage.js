@@ -450,7 +450,7 @@
 		var self = this;
 		if (self.obEntityDataModel().apiIsDirty() && tf.permissions.obIsAdmin())
 		{
-			return tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to opening up " + pageName + "?", "Unsaved Changes")
+			return tf.promiseBootbox.yesNo("You have unsaved changes. Would you like to save your changes prior to opening up " + pageName + "?", "Unsaved Changes")
 				.then(function(result)
 				{
 					if (result)

@@ -170,6 +170,7 @@
 		};
 		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel(selectedIds, view);
 		tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+		tf.pageManager.obFieldTripEditPage(self.fieldTripDataEntry);
 		self.obShowFieldTripDEPanel(true);
 	};
 
