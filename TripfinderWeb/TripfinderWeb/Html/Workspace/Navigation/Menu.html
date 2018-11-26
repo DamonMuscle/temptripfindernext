@@ -28,8 +28,8 @@
 	<!-- /ko -->
 	<div class="navigation-content" data-bind="css:tf.permissions.isSupport?'not-contain-quick-search':''">
 		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
-				<div class="item-icon fieldtrips"></div>
-				<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
+			<div class="item-icon fieldtrips"></div>
+			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
 		</div>
 		<!-- ko if: tf.authManager.authorizationInfo.isAdmin || !tf.authManager.authorizationInfo.isFieldTripAdmin -->
 		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
@@ -54,7 +54,7 @@
 			<div class="item-label">Settings</div>
 			<div class="item-menu">
 				<ul data-bind="foreach: { data: obSettingPages, afterRender: afterPageMenuOptionUIRender.bind($data) }">
-					<li data-bind="css:{active:isOpen},attr:{pagetype:pageType},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
+					<li data-bind="css:{active:isOpen},attr:{pagetype:pageType, title: text},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
 					</li>
 				</ul>
 			</div>
