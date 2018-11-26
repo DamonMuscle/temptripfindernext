@@ -713,7 +713,8 @@
 
 	SchedulerPage.prototype.togglePrevNext = function()
 	{	
-		if (typeof this.getSchedulertView().filter(function(e){return e.selected})[0].type === "function")
+		if (this.getSchedulertView().filter(function(e){return e.selected}).length >0 &&
+			typeof this.getSchedulertView().filter(function(e){return e.selected})[0].type === "function")
 		{
 			this.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
 			this.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
