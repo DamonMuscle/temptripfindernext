@@ -690,7 +690,7 @@
 			}
 
 			self.kendoSchedule = self.$kendoscheduler.kendoScheduler({
-				date: new Date(self.getSelectedDate()),
+				date: self.getSelectedDate(),
 				dataSource: self.getSchedulerDataSources(data),
 				views: self.getSchedulertView(self.extendDays),
 				editable: false,
@@ -708,7 +708,15 @@
 
 	SchedulerPage.prototype.getSelectedDate = function()
 	{
-		return tf.storageManager.get(this.options.storageKey + ".schedulerdate");
+		var selectedDate = tf.storageManager.get(this.options.storageKey + ".schedulerdate");
+		if (selectedDate)
+		{
+			return new Date(selectedDate);
+		}
+		else
+		{
+			return new Date();
+		}
 	}
 
 	SchedulerPage.prototype.togglePrevNext = function()
