@@ -2,12 +2,15 @@
 {
 	createNamespace('TF.Control').FieldTripResourceDriverViewModel = FieldTripResourceDriverViewModel;
 
-	function FieldTripResourceDriverViewModel(source, id)
+	function FieldTripResourceDriverViewModel(source, id, resourceGroupDate)
 	{
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripResourceDataModel(source));
 		this.obEntityDataModel().fieldTripId(id);
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();
+		this.resourceGroupDate = resourceGroupDate;
+		this.source = source;
+		this.vehicleIdChanged = false;
 
 		this.obVehTotal = ko.computed(function()
 		{
@@ -38,6 +41,13 @@
 		//drop down list
 		this.obSelectedVehicle = ko.observable();
 		this.obSelectedVehicle.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "vehicleId", "obSelectedVehicle", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedVehicle.subscribe(function(e)
+		{
+			if (!this.vehicleIdChanged && e && source && e.Id !== source.VehicleId)
+			{
+				this.vehicleIdChanged = true;
+			}
+		}.bind(this));
 		this.obSelectedVehicleText = ko.observable(source ? source.VehicleName : undefined);
 
 		this.obSelectedDriver = ko.observable();
@@ -130,19 +140,59 @@
 
 	FieldTripResourceDriverViewModel.prototype.apply = function()
 	{
-		return this.save()
-			.then(function(data)
-			{
-				return data;
-
-			}, function()
-			{
-			});
+		if (!this.checkIfVehicleAssigned())
+		{
+			return tf.promiseBootbox.yesNo({ message: "This Vehicle is already scheduled for this Field Trip. Are you sure you want to assign this resource to this Field Trip?", backdrop: true, title: "Alert", closeButton: true })
+				.then(function(result)
+				{
+					if (result === true)
+					{
+						return this.save()
+							.then(function(data)
+							{
+								return data;
+							}, function()
+							{
+							});
+					}
+					if (result === false)
+					{
+						return false;
+					}
+				}.bind(this))
+		}
+		else
+		{
+			return this.save()
+				.then(function(data)
+				{
+					return data;
+				}, function()
+				{
+				});
+		}
 	};
 
 	FieldTripResourceDriverViewModel.prototype.generateFunction = function(fn)
 	{
 		return fn.bind(this, Array.prototype.slice.call(arguments, 1));
+	}
+
+	FieldTripResourceDriverViewModel.prototype.checkIfVehicleAssigned = function()
+	{
+		if (this.source && !this.vehicleIdChanged)
+		{
+			return true;
+		}
+
+		if (this.resourceGroupDate.filter(function(item){return item.VehicleId == this.obSelectedVehicle().Id}.bind(this)).length > 0)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	FieldTripResourceDriverViewModel.prototype.dispose = function()
