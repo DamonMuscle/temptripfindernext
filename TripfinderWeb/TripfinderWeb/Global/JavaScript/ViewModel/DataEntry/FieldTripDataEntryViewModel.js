@@ -405,10 +405,17 @@
 			{
 				fieldtripData = data.Items[0];
 				self.getTemplate(fieldtripData.FieldTripTemplate);
-				self.obSchoolDataModels(Enumerable.From(fieldtripData.School).Where(function(school)
+				if (tf.authManager.authorizationInfo.isAdmin)
 				{
-					return tf.authManager.authorizationInfo.authorizationTree.schools.indexOf(school.SchoolCode) >= 0;
-				}).ToArray());
+					self.obSchoolDataModels(fieldtripData.School);
+				}
+				else
+				{
+					self.obSchoolDataModels(Enumerable.From(fieldtripData.School).Where(function(school)
+					{
+						return tf.authManager.authorizationInfo.authorizationTree.schools.indexOf(school.SchoolCode) >= 0;
+					}).ToArray());
+				}
 				self.obAllSchoolDataModels(fieldtripData.School);
 				self.fieldTripDistrictDepartments = fieldtripData.FieldTripDistrictDepartment;
 				self.obDepartmentDataModels($.grep(self.fieldTripDistrictDepartments, function(item, index)
