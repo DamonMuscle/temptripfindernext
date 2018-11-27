@@ -2257,6 +2257,13 @@
 					}
 
 					displayNone = content === undefined || content === "" || content === null;
+
+					if (displayNone && item.field === "EstimatedCost")
+					{
+						displayNone = false;
+						content = item.defaultValue;
+					}
+
 					item.minHeight = item.h;
 				}
 				else

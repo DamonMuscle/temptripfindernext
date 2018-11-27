@@ -581,8 +581,10 @@ var today = (new Date()).toDateString(),
 				},
 				{
 					"field": "EstimatedCost",
-					"title": "Estimated Cost($)",
-					"type": "Number"
+					"title": "Estimated Cost",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00"
 				},
 				{
 					"field": "Requestor",
@@ -591,7 +593,7 @@ var today = (new Date()).toDateString(),
 				},
 				{
 					"field": "TotalCost",
-					"title": "Total Cost($)",
+					"title": "Total Cost",
 					"type": "Number",
 					"defaultValue": "$0.00"
 				},
