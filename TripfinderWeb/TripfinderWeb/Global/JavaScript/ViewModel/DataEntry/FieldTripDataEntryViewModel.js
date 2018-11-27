@@ -30,6 +30,7 @@
 		this.onAuditType = ko.observable();
 		this.obTemplateSource = ko.observableArray();
 		this.obSchoolDataModels = ko.observableArray();
+		this.obAllSchoolDataModels = ko.observableArray();
 		this.obDepartmentDataModels = ko.observableArray();
 		this.currentDistrictDepartmentId = null;
 		this.obActivityDataModels = ko.observableArray();
@@ -404,7 +405,11 @@
 			{
 				fieldtripData = data.Items[0];
 				self.getTemplate(fieldtripData.FieldTripTemplate);
-				self.obSchoolDataModels(fieldtripData.School);
+				self.obSchoolDataModels(Enumerable.From(fieldtripData.School).Where(function(school)
+				{
+					return tf.authManager.authorizationInfo.authorizationTree.schools.indexOf(school.SchoolCode) >= 0;
+				}).ToArray());
+				self.obAllSchoolDataModels(fieldtripData.School);
 				self.fieldTripDistrictDepartments = fieldtripData.FieldTripDistrictDepartment;
 				self.obDepartmentDataModels($.grep(self.fieldTripDistrictDepartments, function(item, index)
 				{
