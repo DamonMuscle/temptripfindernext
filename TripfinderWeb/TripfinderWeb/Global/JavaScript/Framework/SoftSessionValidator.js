@@ -21,7 +21,7 @@
 
 	SoftSessionValidator.prototype._verify = function()
 	{
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "token", "verify", "extend")).then(function(response)
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "token", "verify", "extend"), null, { overlay: false }).then(function(response)
 		{
 			return response.Items[0];
 		});
