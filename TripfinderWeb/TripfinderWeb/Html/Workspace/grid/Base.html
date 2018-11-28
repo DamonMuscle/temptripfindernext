@@ -22,8 +22,7 @@
 			<!--ko if:!$parent.obIsDocument()-->
 			<div class="view-grid-header" data-bind="text:$parent.title"></div>
 			<div class="view-grid-header-count">
-				(
-				<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)
+				(<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)
 			</div>
 			<!-- /ko -->
 			<!--ko if:$parent.obCanEdit()-->
