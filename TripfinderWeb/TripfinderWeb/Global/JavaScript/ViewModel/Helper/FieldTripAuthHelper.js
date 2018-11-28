@@ -3,13 +3,13 @@
 	var self = createNamespace("TF").FieldTripAuthHelper = {};
 
 	var securedItemDefinition =
-	{
-		transportationAdministrator: "transportationAdministrator",
-		level4Administrator: "level4Administrator",
-		level3Administrator: "level3Administrator",
-		level2Administrator: "level2Administrator",
-		level1Requestor: "level1Requestor",
-	},
+		{
+			transportationAdministrator: "transportationAdministrator",
+			level4Administrator: "level4Administrator",
+			level3Administrator: "level3Administrator",
+			level2Administrator: "level2Administrator",
+			level1Requestor: "level1Requestor",
+		},
 		allSecuredItems =
 			[
 				securedItemDefinition.transportationAdministrator,
@@ -19,14 +19,14 @@
 				securedItemDefinition.level1Requestor,
 			],
 		ajaxData =
-		{
-			"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
-			"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
-			"filterSet": null,
-			"filterClause": "",
-			"isQuickSearch": false,
-			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
-		},
+			{
+				"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
+				"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
+				"filterSet": null,
+				"filterClause": "",
+				"isQuickSearch": false,
+				"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+			},
 		idName = "Id",
 		mySubmittedIds,
 		getMySubmittedIds = function()
@@ -125,13 +125,6 @@
 		});
 
 		return highest;
-	};
-
-	self.getResourcesAssginable = function()
-	{
-		if (tf.authManager.authorizationInfo.isAdmin) return true;
-		var highest = self.getHighestEditRightSecuredItem();
-		return highest != null && highest != securedItemDefinition.level1Requestor;
 	};
 
 	self.getAccessableStageIds = function()
