@@ -2513,6 +2513,10 @@
 	 */
 	DetailViewViewModel.prototype.addGridStackBlock = function(item, dataBlockStyles, grid)
 	{
+		if ($.grep(dataPointsJSON[this.gridType].Grid, function(grid, index) { return item.field === grid.field }).length <= 0)
+		{
+			return;
+		}
 		var self = this, grid = grid || self.grid, type = item.url.toLowerCase(),
 			randomClass = item.uniqueClassName || self.generateUniqueClassName(),
 			$itemDom = $("<div>\
@@ -2536,7 +2540,7 @@
 	 */
 	DetailViewViewModel.prototype.getGridRelatedData = function(dataType, dataIdentifier, columns)
 	{
-		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide", "fieldtripinvoice"];
+		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripinvoice"];
 
 		if (dataType === "fieldtriphistory")
 		{
@@ -2660,11 +2664,6 @@
 			case "fieldtripinvoice":
 			case "fieldtriphistory":
 				return tf.permissions.obFieldTrips();
-			case "fieldtripvehicle":
-				return tf.permissions.obFieldTrips() && tf.permissions.obVehicle();
-			case "fieldtripdriver":
-			case "fieldtripaide":
-				return tf.permissions.obFieldTrips() && tf.permissions.obStaff();
 			default:
 				return false;
 		}
@@ -2773,12 +2772,6 @@
 				return tf.fieldTripGridDefinition.gridDefinition().Columns;
 			case "fieldtripresource":
 				return tf.fieldTripGridDefinition.getRelatedGridDefinition("resource").Columns;
-			case "fieldtripvehicle":
-				return tf.fieldTripGridDefinition.getRelatedGridDefinition("vehicle").Columns;
-			case "fieldtripdriver":
-				return tf.fieldTripGridDefinition.getRelatedGridDefinition("driver").Columns;
-			case "fieldtripaide":
-				return tf.fieldTripGridDefinition.getRelatedGridDefinition("aide").Columns;
 			case "fieldtriphistory":
 				return tf.fieldTripGridDefinition.getRelatedGridDefinition("history").Columns;
 			case "fieldtripinvoice":

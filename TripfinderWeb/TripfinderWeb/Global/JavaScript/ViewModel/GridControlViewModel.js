@@ -22,6 +22,7 @@
 		this.obCanAdd = ko.observable(true);
 		this.obAddDivider = ko.observable(false);
 		this.obCanEdit = ko.observable(true);
+		this.obEditEnable = ko.observable(true);
 		if (entityType == "exception")
 		{
 			this.obIsHideTitle(true);

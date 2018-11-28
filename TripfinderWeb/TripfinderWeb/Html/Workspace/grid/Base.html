@@ -26,8 +26,8 @@
 			</div>
 			<!-- /ko -->
 			<!--ko if:$parent.obCanEdit()-->
-			<button class="iconbutton pencil" title="Edit" data-bind="click:editClick,enable:obIsSelectRow() "></button>
-			<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, enable:obIsSelectRow() "></button>
+			<button class="iconbutton pencil" title="Edit" data-bind="click:editClick,enable:obIsSelectRow()&&$parent.obEditEnable() "></button>
+			<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, enable:obIsSelectRow()&&$parent.obEditEnable() "></button>
 			<!-- /ko -->
 			<!--ko if:$parent.obAddDivider()-->
 			<div class="divider"></div>

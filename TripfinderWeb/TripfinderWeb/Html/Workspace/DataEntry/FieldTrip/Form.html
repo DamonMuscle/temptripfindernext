@@ -483,13 +483,13 @@
 				<div class="view-form-grid resources small" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeResources.bind($parent)}">
 				</div>
 				<!-- /ko -->
-				<div class="iconbutton popout pull-right icon-cursor" style="position: absolute;top: 25px;right: 15px;" title="Resources"
-					 data-bind="click:viewResourceClick"></div>
+				<button class="iconbutton popout pull-right icon-cursor" title="Resources"
+						data-bind="click:viewResourceClick,enable:tf.authManager.authorizationInfo.isFieldTripAdmin"></button>
 			</div>
 			<div class="col-xs-24">
 				<div>
 					<h4 class="section-title">
-						<strong>Override Rates & Cost</strong>
+						<strong>Billing Override Rates & Cost</strong>
 					</h4>
 				</div>
 				<div class="row form-group">
@@ -522,15 +522,9 @@
 		</div>
 		<div class="row form-group gridController">
 			<div class="col-xs-24">
-				<!--ko with:obVehicleGridViewModel-->
-				<div class="view-form-grid vehicle small" style="height:305px;" data-bind="template: {name: templateName, afterRender: $parent.initializeVehicle.bind($parent)}">
-				</div>
-				<!-- /ko -->
-			</div>
-			<div class="col-xs-24">
 				<div>
 					<h4 class="section-title">
-						<strong>Override Rates & Cost </strong>
+						<strong>Vehicle Override Rates & Cost </strong>
 					</h4>
 				</div>
 				<div class="row form-group" style="margin-top:20px">
@@ -581,15 +575,9 @@
 		</div>
 		<div class="row form-group gridController">
 			<div class="col-xs-24">
-				<!--ko with:obDriversGridViewModel-->
-				<div class="view-form-grid drivers small" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeDriver.bind($parent)}">
-				</div>
-				<!-- /ko -->
-			</div>
-			<div class="col-xs-24">
 				<div>
 					<h4 class="section-title">
-						<strong>Override Rates & Cost </strong>
+						<strong>Driver Override Rates & Cost </strong>
 					</h4>
 				</div>
 				<div class="row form-group" style="margin-top:20px">
@@ -631,15 +619,9 @@
 		</div>
 		<div class="row form-group gridController">
 			<div class="col-xs-24">
-				<!--ko with:obBusAideGridViewModel-->
-				<div class="view-form-grid busAides small" style="height:305px;" data-bind="template: {name:templateName, afterRender:$parent.initializeAide.bind($parent)}">
-				</div>
-				<!-- /ko -->
-			</div>
-			<div class="col-xs-24">
 				<div>
 					<h4 class="section-title">
-						<strong>Override Rates & Cost </strong>
+						<strong>Bus Aide Override Rates & Cost </strong>
 					</h4>
 				</div>
 				<div class="row form-group" style="margin-top:20px">

@@ -672,6 +672,16 @@ body .document-dataentry.page-level-message-container {
 
 	.iconbutton.popout {
 		background-image: url('../../Global/img/grid/Grid-PopOut.png');
+		opacity: 0.8;
+		position: absolute;
+		top: 25px;
+		right: 15px;
+		background-color: white;
+		border-style: none;
+
+		&:disabled {
+			opacity: 0.4;
+		}
 	}
 }
 
@@ -715,7 +725,7 @@ body .document-dataentry.page-level-message-container {
 	height: 57px;
 }
 
-.dataentry-container .form-group.has-error {
+.dataentry-container .form-group.has-error:not(.gridController) {
 	margin-bottom: 5px;
 	height: 55px;
 

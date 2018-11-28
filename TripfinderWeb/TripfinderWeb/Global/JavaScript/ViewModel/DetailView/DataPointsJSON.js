@@ -735,30 +735,6 @@ var today = (new Date()).toDateString(),
 					"min-height": 3
 				},
 				{
-					field: "FieldTripVehicleGrid",
-					title: "Field Trip Vehicle Grid",
-					type: "grid",
-					url: "fieldtripvehicle",
-					subUrl: "fieldtrip",
-					"min-height": 3
-				},
-				{
-					field: "FieldTripDriverGrid",
-					title: "Field Trip Driver Grid",
-					type: "grid",
-					url: "fieldtripdriver",
-					subUrl: "fieldtrip",
-					"min-height": 3
-				},
-				{
-					field: "FieldTripAideGridz",
-					title: "Field Trip Aide Grid",
-					type: "grid",
-					url: "fieldtripaide",
-					subUrl: "fieldtrip",
-					"min-height": 3
-				},
-				{
 					field: "FieldTripInvoiceGrid",
 					title: "Field Trip Invoice Grid",
 					type: "grid",
