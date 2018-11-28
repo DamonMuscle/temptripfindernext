@@ -514,6 +514,7 @@
 		self.clearRightContent();
 		self.reLayoutPage();
 		self.$leftPage.focus();
+		tf.pageManager.obFieldTripEditPage(null);
 	};
 
 	ResizablePage.prototype.clearContent = function()
