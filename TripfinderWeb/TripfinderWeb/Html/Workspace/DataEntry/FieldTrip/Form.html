@@ -486,6 +486,7 @@
 				<button class="iconbutton popout pull-right icon-cursor" title="Resources"
 						data-bind="click:viewResourceClick,enable:tf.authManager.authorizationInfo.isFieldTripAdmin"></button>
 			</div>
+			<!--ko if: tf.authManager.authorizationInfo.isFieldTripAdmin -->
 			<div class="col-xs-24">
 				<div>
 					<h4 class="section-title">
@@ -519,7 +520,10 @@
 					<input type="button" value="Apply" class="btn tf-btn-gray" data-bind="click:applyBillingClick,disable:!obEntityDataModel().billingClassificationId()">
 				</div>
 			</div>
+			<!-- /ko -->
 		</div>
+
+		<!--ko if: tf.authManager.authorizationInfo.isFieldTripAdmin -->
 		<div class="row form-group gridController">
 			<div class="col-xs-24">
 				<div>
@@ -663,6 +667,7 @@
 				</div>
 			</div>
 		</div>
+		<!-- /ko -->
 		<!-- /ko -->
 		<div class="row form-group gridController">
 			<div class="col-xs-24">
