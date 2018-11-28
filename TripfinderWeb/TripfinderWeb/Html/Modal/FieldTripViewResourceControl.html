@@ -29,7 +29,7 @@
 							<span><img data-bind="attr: { alt: $parent.checkPicture('vehicle', $data.VehicleId, $element) }" class="img-circle"></span>
 						</div>
 						<div class="col-xs-20">
-							<label data-bind="text:$data.Vehicle&&$data.Vehicle.BusNum"></label>
+							<label data-bind="text:$parent.getVehicleName($data)"></label>
 							<div>
 								<span class="info">Rate: </span><span class="info" data-bind="text:$parent.formatCurrency($data.MileageRate)"></span><span class="info">/mi</span>
 							</div>
@@ -70,7 +70,7 @@
 							<span><img data-bind="attr: { alt: $parent.checkPicture('staff', $data.DriverId, $element) }" class="img-circle"></span>
 						</div>
 						<div class="col-xs-20">
-							<label data-bind="text:$parent.getUserName($data.Driver)"></label>
+							<label data-bind="text:$parent.getUserName($data,'driver')"></label>
 							<div>
 								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.DriverRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.DriverOtrate)"></span>
 							</div>
@@ -104,7 +104,7 @@
 							<span><img data-bind="attr: { alt: $parent.checkPicture('staff', $data.AideId, $element) }" class="img-circle"></span>
 						</div>
 						<div class="col-xs-20">
-							<label data-bind="text:$parent.getUserName($data.Aide)"></label>
+							<label data-bind="text:$parent.getUserName($data,'staff')"></label>
 							<div>
 								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.AideRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.AideOtrate)"></span>
 							</div>

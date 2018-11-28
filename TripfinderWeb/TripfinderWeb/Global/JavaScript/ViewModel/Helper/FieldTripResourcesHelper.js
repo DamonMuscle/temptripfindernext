@@ -133,15 +133,31 @@
 		return '$' + this.formatCurrency(resourcesTotal);
 	}
 
-	FieldTripResourcesHelper.prototype.getUserName = function(staff)
+	FieldTripResourcesHelper.prototype.getUserName = function(staff, type)
 	{
 		if (staff)
 		{
-			var firstName = staff.FirstName ? staff.FirstName : '';
-			var middleName = staff.MiddleName ? ' ' + staff.MiddleName : '';
-			var lastName = staff.LastName ? ' ' + staff.LastName : '';
+			if (type === 'driver')
+			{
+				return staff.DriverName;
+			}
+			else if (type === 'staff')
+			{
+				return staff.AideName;
+			}
+			return '';
+		}
+		else
+		{
+			return '';
+		}
+	}
 
-			return firstName + middleName + lastName;
+	FieldTripResourcesHelper.prototype.getVehicleName = function(vehicle)
+	{
+		if (vehicle)
+		{
+			return vehicle.VehicleName;
 		}
 		else
 		{
