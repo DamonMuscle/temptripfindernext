@@ -18,9 +18,6 @@
 
 		if (widget.name === 'kendoFilterMenu')
 			KendoFilterMenu = widget.widget.prototype;
-
-		if (widget.name === 'kendoGrid')
-			KendoGridPrototype = widget.widget.prototype;
 	});
 
 	function KendoGridFilterCellHackHelper()
@@ -31,26 +28,6 @@
 	KendoGridFilterCellHackHelper.prototype.init = function()
 	{
 		var hackDomain = this;
-
-		KendoGridPrototype._scrollable = KendoGridPrototype._scrollable.createSequence(function()
-		{
-			var that = this,
-				options = that.options,
-				scrollable = options.scrollable,
-				hasVirtualScroll = scrollable !== true && scrollable.virtual && !that.virtualScrollable,
-				scrollbar = !kendo.support.kineticScrollNeeded || hasVirtualScroll ? kendo.support.scrollbar() : 0;
-
-			if (scrollable.virtual)
-			{
-				that.content.find(">.k-virtual-scrollable-wrap").unbind("scroll.kendoGrid").bind("scroll.kendoGrid", function()
-				{
-					if (that.lockedContent)
-					{
-						that.lockedContent[0].scrollTop = this.scrollTop;
-					}
-				});
-			}
-		});
 
 		KendoFilterCellPrototype._refreshUI = KendoFilterCellPrototype._refreshUI.createInterceptor(function()
 		{
