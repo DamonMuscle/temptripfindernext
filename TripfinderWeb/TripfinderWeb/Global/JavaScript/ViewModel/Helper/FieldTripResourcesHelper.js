@@ -31,7 +31,7 @@
 			}
 			else
 			{
-				imageId = obj.Id;
+				imageId = obj;
 			}
 		} else
 		{
