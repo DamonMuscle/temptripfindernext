@@ -22,19 +22,6 @@
 				field: _DataFiledName,
 				title: "Name"
 			},
-			{
-				field: 'Status',
-				title: 'Show',
-				width: '60px',
-				template: function(e)
-				{
-					//the column is show
-					if (e.Status)
-						return '<div></div>';
-					else //the column is hide
-						return '<div class="grid-icon eye-hide"></div>';
-				}
-			}
 			],
 			height: 400,
 			selectable: TF.isMobileDevice ? "row" : "multiple"
