@@ -483,7 +483,7 @@
 				</div>
 				<!-- /ko -->
 				<button class="iconbutton popout pull-right icon-cursor" title="Resources"
-						data-bind="click:viewResourceClick,enable:tf.authManager.authorizationInfo.isFieldTripAdmin"></button>
+						data-bind="click:viewResourceClick,enable:tf.authManager.authorizationInfo.isFieldTripAdmin&&obFieldTripResourceGroupData().length>0"></button>
 			</div>
 			<!--ko if: tf.authManager.authorizationInfo.isFieldTripAdmin -->
 			<div class="col-xs-24">
