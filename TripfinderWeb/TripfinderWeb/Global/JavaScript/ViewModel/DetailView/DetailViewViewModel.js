@@ -1032,7 +1032,7 @@
 					{
 						paramData.table = self.gridType;
 					}
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+					var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
 						paramData: paramData
 					}, { overlay: false }).then(function(response)
 					{
@@ -1062,6 +1062,7 @@
 						}
 						self.applyLayoutEntity(layoutEntity, isDeleted);
 					});
+					return Promise.all([p1]);
 				}
 			}
 
@@ -1086,7 +1087,7 @@
 						{
 							paramData.table = self.gridType;
 						}
-						tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+						var p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
 							paramData: paramData
 						}, { overlay: false }).then(function(response)
 						{
@@ -1116,7 +1117,7 @@
 							}
 							self.applyLayoutEntity(layoutEntity, isDeleted);
 						});
-
+						return Promise.all([p]);
 					}
 				});
 			}
