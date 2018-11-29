@@ -371,18 +371,6 @@
 			}
 		}, true);
 
-	ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification = $.extend(
-		{}, ListFilterTemplateDataManagementOption,
-		{
-			DisplayFilterTypeName: "Field Trip Billing Classifications",
-			GridType: "FieldTripBillingClassification",
-			filterField: "Name",
-			getUrl: function()
-			{
-				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripBillingClassification");
-			}
-		}, true);
-
 	ListFilterDefinition.ListFilterTemplate.FieldTripClassification = $.extend(
 		{}, ListFilterTemplateDataManagementOption,
 		{
@@ -1143,14 +1131,6 @@
 			FieldName: "ActiveToDate",
 			DisplayName: "Active To",
 			type: "date"
-		}];
-
-	ListFilterDefinition.ColumnSource.FieldTripBillingClassification = [
-		{
-			FieldName: "Name",
-			DisplayName: "Classification",
-			type: "string",
-			isSortItem: true
 		}];
 
 	ListFilterDefinition.ColumnSource.FieldTripClassification = [

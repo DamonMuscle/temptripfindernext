@@ -41,8 +41,6 @@
 		{ from: "EstimatedCost", default: null },
 		{ from: "ShowPublic", default: null },
 		{ from: "PublicNotes", default: "" },
-		{ from: "BillingClassificationId", default: null },
-		{ from: "BillingNotes", default: "" },
 		{ from: "MileageRate", default: null },
 		{ from: "FixedCost", default: null },
 		{ from: "AideFixedCost", default: null },

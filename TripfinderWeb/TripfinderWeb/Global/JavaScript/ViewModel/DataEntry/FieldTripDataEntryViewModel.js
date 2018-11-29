@@ -40,7 +40,6 @@
 		this.obClassificationDataModels = ko.observableArray();
 		this.obEquipmentDataModels = ko.observableArray();
 		this.obDestinationDataModels = ko.observableArray();
-		this.obBillingClassificationDataModels = ko.observableArray();
 		this.obFieldTripResourceGroupData = ko.observableArray();
 
 		this.obInvoicingGridViewModel = ko.observable(null);
@@ -135,15 +134,6 @@
 		this.obSelectedDepartFromSchool = ko.observable();
 		this.obSelectedDepartFromSchool.subscribe(this.setSelectValue("departFromSchool", "obSelectedDepartFromSchool", function(obj) { return obj ? obj.SchoolCode : ""; }), this);
 		this.obCurrentDepartFromSchoolName = ko.computed(this.setSelectTextComputer("obSchoolDataModels", "departFromSchool", function(obj) { return obj.SchoolCode; }, function(obj) { return obj.Name; }), this);
-
-		this.obSelectedBillingClassification = ko.observable();
-		this.obSelectedBillingClassification.subscribe(this.setSelectValue("billingClassificationId", "obSelectedBillingClassification", function(obj) { return obj ? obj.Id : 0; }), this);
-		this.obSelectedBillingClassification.subscribe(function()
-		{
-			this._fieldsUpdateFromModal("billingClassification", this.obSelectedBillingClassification());
-		}, this);
-		this.obCurrentBillingClassificationName = ko.computed(this.setSelectTextComputer("obBillingClassificationDataModels", "billingClassificationId", function(obj) { return obj.Id; },
-			function(obj) { return obj.Name; }), this);
 
 		this.dataChangeReceive = this.dataChangeReceive.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "school"), this.dataChangeReceive);
@@ -240,16 +230,6 @@
 		this.zipCodeDisable = function() { return this.obEntityDataModel().destinationZip() == ''; };
 
 		this.zipCodeCss = function() { return this.zipCodeDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
-
-		this.billingClassificationDisable = function() { return this.obCurrentBillingClassificationName() == ''; };
-
-		this.billingClassificationCss = function() { return this.billingClassificationDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
-
-		this.billingClassificationOnBlur = function(e, m)
-		{
-			var collection = this.getCollection(this.obBillingClassificationDataModels(), 'Name');
-			this.resetEmpty(m, collection, 'billingClassificationId');
-		}.bind(this);
 
 		this.stageCss = function() { return this.obEntityDataModel().id() ? this.opacityCssSource.enable : this.opacityCssSource.disable; };
 	};
@@ -410,7 +390,6 @@
 				self.obClassificationDataModels(fieldtripData.FieldTripClassification);
 				self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
 				self.obDestinationDataModels(fieldtripData.FieldTripDestination);
-				self.obBillingClassificationDataModels(fieldtripData.FieldTripBillingClassification);
 				self.ConvertToJson(fieldtripData.RequiredField);
 				self.obMailCityDataModels(fieldtripData.MailCity);
 				self.obMailZipDataModels(fieldtripData.MailZip);
@@ -615,7 +594,6 @@
 				{
 					this.obEntityDataModel().returnDate(moment(this.obEntityDataModel().returnDate()).format("YYYY-MM-DD") + "T00:00:00.000");
 				}
-				this.initBillingData();
 
 				if (this.obMode() === "Edit")
 				{
@@ -697,20 +675,6 @@
 			{//no need to do anything.
 
 			}.bind(this));
-	};
-
-	FieldTripDataEntryViewModel.prototype.initBillingData = function()
-	{
-		this.obEntityDataModel().aideFixedCost(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().aideOtrate(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().aideRate(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().driverFixedCost(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().driverOtrate(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().driverRate(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().fixedCost(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().mileageRate(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().minimumCost(this.obEntityDataModel().aideFixedCost() || 0);
-		this.obEntityDataModel().vehFixedCost(this.obEntityDataModel().aideFixedCost() || 0);
 	};
 
 	FieldTripDataEntryViewModel.prototype.feedingSchoolNameFormatter = function(schoolDataModel)
@@ -1164,72 +1128,6 @@
 			this.ReloadResources();
 			this.checkGridsData();
 		}
-	};
-
-	FieldTripDataEntryViewModel.prototype.applyBillingClick = function(viewModel, e)
-	{
-		var curBilling = this.obBillingClassificationDataModels().filter(function(item)
-		{
-			return item.Id == this.obEntityDataModel().billingClassificationId();
-		}.bind(this));
-
-		this.obFieldTripResourceGroupData().forEach(function(item)
-		{
-			item.VehFixedCost = curBilling[0].VehFixedCost ? curBilling[0].VehFixedCost : 0;
-			item.MileageRate = curBilling[0].MileageRate ? curBilling[0].MileageRate : 0;
-
-			item.DriverRate = curBilling[0].DriverRate ? curBilling[0].DriverRate : 0;
-			item.DriverFixedCost = curBilling[0].DriverFixedCost ? curBilling[0].DriverFixedCost : 0;
-			item.DriverOtrate = curBilling[0].DriverOtrate ? curBilling[0].DriverOtrate : 0;
-
-			item.AideRate = curBilling[0].AideRate ? curBilling[0].AideRate : 0;
-			item.AideFixedCost = curBilling[0].AideFixedCost ? curBilling[0].AideFixedCost : 0;
-			item.AideOtrate = curBilling[0].AideOtrate ? curBilling[0].AideOtrate : 0;
-
-		}.bind(this));
-
-		this.ReloadResources();
-		this.obFieldTripResourceGroupData.valueHasMutated();
-	};
-
-	FieldTripDataEntryViewModel.prototype.applyVehicleClick = function(viewModel, e)
-	{
-		this.obFieldTripResourceGroupData().forEach(function(item)
-		{
-			item.VehFixedCost = this.obEntityDataModel().vehFixedCost();
-			item.MileageRate = this.obEntityDataModel().mileageRate();
-		}.bind(this));
-
-		this.ReloadResources();
-		this.obFieldTripResourceGroupData.valueHasMutated();
-	};
-
-	FieldTripDataEntryViewModel.prototype.applyDriverClick = function(viewModel, e)
-	{
-		this.obFieldTripResourceGroupData().forEach(function(item)
-		{
-			item.DriverRate = this.obEntityDataModel().driverRate();
-			item.DriverFixedCost = this.obEntityDataModel().driverFixedCost();
-			item.DriverOtrate = this.obEntityDataModel().driverOtrate();
-
-		}.bind(this));
-
-		this.ReloadResources();
-		this.obFieldTripResourceGroupData.valueHasMutated();
-	};
-
-	FieldTripDataEntryViewModel.prototype.applyAideClick = function(viewModel, e)
-	{
-		this.obFieldTripResourceGroupData().forEach(function(item)
-		{
-			item.AideRate = this.obEntityDataModel().aideRate();
-			item.AideFixedCost = this.obEntityDataModel().aideFixedCost();
-			item.AideOtrate = this.obEntityDataModel().aideOtrate();
-
-		}.bind(this));
-
-		this.ReloadResources();
-		this.obFieldTripResourceGroupData.valueHasMutated();
 	};
 
 	FieldTripDataEntryViewModel.prototype.viewResourceClick = function(viewModel, e)
@@ -2185,34 +2083,6 @@
 					this.obEntityDataModel().destinationFax(data.Fax);
 					this.obEntityDataModel().destinationContactPhone(data.Phone);
 					this.obEntityDataModel().destinationPhoneExt(data.PhoneExt);
-				}
-				break;
-			case "billingClassification":
-				if (data == null)
-				{
-					this.obEntityDataModel().aideFixedCost(0);
-					this.obEntityDataModel().aideOtrate(0);
-					this.obEntityDataModel().aideRate(0);
-					this.obEntityDataModel().driverFixedCost(0);
-					this.obEntityDataModel().driverOtrate(0);
-					this.obEntityDataModel().driverRate(0);
-					this.obEntityDataModel().fixedCost(0);
-					this.obEntityDataModel().mileageRate(0);
-					this.obEntityDataModel().minimumCost(0);
-					this.obEntityDataModel().vehFixedCost(0);
-				}
-				else
-				{
-					this.obEntityDataModel().aideFixedCost(data.AideFixedCost);
-					this.obEntityDataModel().aideOtrate(data.AideOTRate);
-					this.obEntityDataModel().aideRate(data.AideRate);
-					this.obEntityDataModel().driverFixedCost(data.DriverFixedCost);
-					this.obEntityDataModel().driverOtrate(data.DriverOTRate);
-					this.obEntityDataModel().driverRate(data.DriverRate);
-					this.obEntityDataModel().fixedCost(data.FixedCost);
-					this.obEntityDataModel().mileageRate(data.MileageRate);
-					this.obEntityDataModel().minimumCost(data.MinimumCost);
-					this.obEntityDataModel().vehFixedCost(data.VehFixedCost);
 				}
 				break;
 		}

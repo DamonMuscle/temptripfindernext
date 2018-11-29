@@ -184,14 +184,6 @@
 					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification
 				},
 				{
-					FieldName: "BillingClass",
-					DisplayName: "Billing Classification",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification
-				},
-				{
 					FieldName: "Ftactivity",
 					DisplayName: "Activity",
 					Width: '150px',
@@ -298,13 +290,6 @@
 					hidden: true,
 					onlyForGrid: true,
 					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDistrictDepartment", "fieldtrip", "DepartmentName")
-				},
-				{
-					FieldName: "BillingNotes",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForFilter: true
 				},
 				{
 					FieldName: "DistrictDepartmentID",
