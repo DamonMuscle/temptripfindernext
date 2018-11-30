@@ -150,10 +150,12 @@
 		});
 	};
 
-	tf.showSelectDataSourceModel = function(databaseName)
+	tf.showSelectDataSourceModel = function(databaseName, disableClose)
 	{
+		var modal = new TF.Modal.DataSourceChangeModalViewModel(databaseName);
+		modal.OutSizeClickEnable = !!disableClose;
 		return tf.modalManager.showModal(
-			new TF.Modal.DataSourceChangeModalViewModel(databaseName)
+			modal
 		)
 			.then(function(datasource)
 			{
@@ -222,7 +224,7 @@
 							if (!databaseName)
 							{
 								tf.datasourceManager.clearDBInfo();
-								return tf.showSelectDataSourceModel();
+								return tf.showSelectDataSourceModel(null, disableClose);
 							}
 						}
 					});
@@ -290,31 +292,24 @@
 						{
 							var validateAllDB = function()
 							{
-								return tf.datasourceManager.validateAllDBs()
-									.then(function(valResult)
+								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource")).then(function(datasourceResult)
+								{
+									if (datasourceResult.Items.length === 1)
 									{
-										if (valResult.Items[0].AnyDBPass)
-										{
-											if (valResult.Items[0].DBlength === 1)
-											{
-												tf.storageManager.save("databaseType", valResult.Items[0].DBType);
-												tf.storageManager.save("datasourceId", valResult.Items[0].DBId);
-												tf.storageManager.save("databaseName", valResult.Items[0].DBName);
-												return tf.datasourceManager.validate();
-											}
-											return false;
-										} else
-										{
-											if (valResult.Items[0].DBlength === 1)
-											{
-												invalidateMessage = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-											} else
-											{
-												invalidateMessage = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-											}
-											return "nodatasource";
-										}
-									});
+										tf.storageManager.save("databaseType", datasourceResult.Items[0].DBType);
+										tf.storageManager.save("datasourceId", datasourceResult.Items[0].Id);
+										tf.storageManager.save("databaseName", datasourceResult.Items[0].DatabaseName);
+										return tf.datasourceManager.validate();
+									}
+									else if (datasourceResult.Items.length === 0)
+									{
+										return "nodatasource";
+									}
+									else
+									{
+										return false;
+									}
+								});
 							}
 							if (tf.urlParm && tf.urlParm.DB)
 							{
@@ -371,6 +366,10 @@
 								var databaseName = tf.storageManager.get("databaseName"),
 									productName = (TF.productName.charAt(0).toUpperCase() + TF.productName.slice(1)),
 									message = (!!databaseName ? "[" + databaseName + "]" : "Current Data Source") + " is not available. " + productName + " cannot be used without a Data Source. Would you like to choose a different Data Source?";
+								if (!databaseName)
+								{
+									return Promise.resolve(false);
+								}
 								return tf.promiseBootbox.yesNo({
 									message: message,
 									title: "Data Source Not Available",
@@ -390,7 +389,7 @@
 									//set db to null and basic settings to null
 									if (result === true)
 									{
-										return Promise.resolve(false);
+										return false;
 									} else
 									{
 										tf.entStorageManager.save("token", "");
@@ -408,7 +407,7 @@
 							} else if (!isPass)
 							{
 								tf.datasourceManager.clearDBInfo();
-								return tf.showSelectDataSourceModel();
+								return tf.showSelectDataSourceModel(null, true);
 							}
 							return true;
 						})
@@ -476,21 +475,21 @@
 
 											if (tf.urlParm)
 											{
-												if( tf.urlParm.tripid)
+												if (tf.urlParm.tripid)
 												{
 													tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
 													return;
 												}
-												else if(tf.urlParm.DB)
+												else if (tf.urlParm.DB)
 												{
-													if(tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.onlyLevel1)
+													if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.onlyLevel1)
 													{
-														tf.pageManager.openNewPage("fieldtrips",  true);
+														tf.pageManager.openNewPage("fieldtrips", true);
 														return;
 													}
 													else
 													{
-														tf.pageManager.openNewPage("approvals",  true);
+														tf.pageManager.openNewPage("approvals", true);
 														return;
 													}
 												}
