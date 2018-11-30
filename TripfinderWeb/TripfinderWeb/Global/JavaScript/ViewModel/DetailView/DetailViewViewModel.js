@@ -96,6 +96,7 @@
 		self.defaultLayoutId = null;
 		self.defaultLayoutName = null;
 		self.totalCostContent = null;
+		self.isTemplateMenuOpened = false;
 	}
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
@@ -4700,9 +4701,12 @@
 
 	DetailViewViewModel.prototype.closeTemplateMenu = function(model, e)
 	{
+		var self = this;
+
 		if ((navigator.userAgent.indexOf('Firefox') >= 0 && $(e.relatedTarget).closest(".detail-screen-contextmenu").length <= 0)
 			|| $(e.toElement).closest(".detail-screen-contextmenu").length <= 0)
 		{
+			self.isTemplateMenuOpened = false;
 			tf.contextMenuManager.dispose();
 		}
 	};
@@ -4726,6 +4730,7 @@
 		}
 		if (cacheOperatorBeforeOpenMenu)
 		{
+			self.isTemplateMenuOpened = true;
 			var options = {
 				gridType: self.gridType,
 				defaultLayoutId: self.defaultLayoutId,
@@ -4781,12 +4786,17 @@
 						self.showDetailViewById(self.entitySelectId);
 					});
 				});
-
-				tf.pageManager.showContextMenu(e.currentTarget);
-				tf.contextMenuManager.showMenu(e.currentTarget, contextmenu);
+				if (self.isTemplateMenuOpened)
+				{
+					tf.pageManager.showContextMenu(e.currentTarget);
+					tf.contextMenuManager.showMenu(e.currentTarget, contextmenu);
+				}
+				else
+				{
+					tf.contextMenuManager.dispose();
+				}
 			});
 		}
-
 	};
 
 	/**
