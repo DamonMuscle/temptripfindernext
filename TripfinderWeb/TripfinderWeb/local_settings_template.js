@@ -1,5 +1,2 @@
-var APIServer = "localhost/RoutefinderApi";
-var ApiUrlForPublic = "localhost";
-
-
-
+var APIServer = "//localhost/RoutefinderApi";
+var TileServer = "//localhost/mapproxy";

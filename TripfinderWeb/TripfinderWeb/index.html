@@ -1,0 +1,506 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Tripfinder</title>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link href="Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
+	<meta name="format-detection" content="telephone=no" />
+
+	<script>
+		(function(i, s, o, g, r, a, m)
+		{
+			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function()
+			{
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date(); a = s.createElement(o),
+				m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+		})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+		ga('create', 'UA-121911769-1', 'auto');
+		ga('send', 'pageview');
+		ga('send', 'event', 'Area', 'Opened');
+	</script>
+
+	<link rel="stylesheet" href="Global/ThirdParty/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datetimepicker.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.common.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.default.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.fiori.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/bootstrapslider/css/bootstrap-slider.min.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/StackBlock/gridstack.css" />
+
+	<!-- build:cssconcat Global/Css/tripfinder.css -->
+	<link rel="stylesheet" href="Global/Css/tripfinder.css" />
+	<!-- endbuild -->
+	<style>
+		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0)
+		{
+			@media
+			{
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content
+				{
+					background-color: #efefef;
+				}
+
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content input:disabled
+				{
+					color: #202020;
+				}
+			}
+		}
+	</style>
+
+	<!--  Override above variables  in local_settings.js if you want them to be different-->
+	<script>
+		var tfRegion = "US";
+	</script>
+	<script src="local_settings.js"></script>
+	<script src="Global/ThirdParty/jquery-1.11.1.min.js"></script>
+	<script src="Global/ThirdParty/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="Global/ThirdParty/moment-with-locales.min.js"></script>
+	<script src="Global/ThirdParty/i18next-1.7.7.min.js"></script>
+	<script src="Global/ThirdParty/knockout/knockout-3.3.0.debug.js"></script>
+	<script src="Global/ThirdParty/knockout/knockout-sortable.min.js"></script>
+	<script src="Global/ThirdParty/knockout/koExternalTemplateEngine_all.js"></script>
+	<script src="Global/ThirdParty/Kendo/kendo.all.min.js"></script>
+	<script src="Global/ThirdParty/promise-1.0.0.min.js"></script>
+	<script src="Global/ThirdParty/bootstrap/js/bootstrap.min.js"></script>
+	<script src="Global/ThirdParty/bootstrapvalidator/js/bootstrapValidator.js"></script>
+	<script src="Global/ThirdParty/phoneformat.js"></script>
+	<script src="Global/ThirdParty/store.min.js"></script>
+	<script src="Global/ThirdParty/linq.min.js"></script>
+	<script src="Global/ThirdParty/bootbox.min.js"></script>
+	<script src="Global/ThirdParty/jquery.cookie.js"></script>
+	<script src="Global/ThirdParty/bootstrap/js/bootstrap3-typeahead.js"></script>
+	<script src="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datepicker.js"></script>
+	<script src="Global/ThirdParty/bootstrapdatetimepicker/bootstrap-datetimepicker.js"></script>
+	<script src="Global/ThirdParty/pubsub.js"></script>
+	<script src="Global/ThirdParty/bootstrapslider/bootstrap-slider.min.js"></script>
+	<script src="Global/ThirdParty/StackBlock/lodash.min.js"></script>
+	<script src="Global/ThirdParty/StackBlock/gridstack.js"></script>
+	<script src="Global/ThirdParty/StackBlock/gridstack.jQueryUI.js"></script>
+	<script src="Global/ThirdParty/jquery.ui.touch-punch.min.js"></script>
+
+	<!-- build:js Global/JavaScript/tripfinder.js -->
+	<script src="Global/JavaScript/Framework/Namespacing.js"></script>
+	<script src="Global/JavaScript/Framework/UserPreferenceManager.js"></script>
+	<script src="Global/JavaScript/Framework/Api.js"></script>
+	<script src="Global/JavaScript/Framework/Ajax.js"></script>
+	<script src="Global/JavaScript/Framework/TFTooltip.js"></script>
+	<script src="Global/JavaScript/Framework/AuthManager.js"></script>
+	<script src="Global/JavaScript/Framework/ContextMenuManager.js"></script>
+	<script src="Global/JavaScript/Framework/DatasourceManager.js"></script>
+	<script src="Global/JavaScript/Framework/LoadingIndicator.js"></script>
+	<script src="Global/JavaScript/Framework/InitializationFrontdesk.js"></script>
+	<script src="Global/JavaScript/Framework/ModalHelper.js"></script>
+	<script src="Global/JavaScript/Framework/ModalManager.js"></script>
+	<script src="Global/JavaScript/Framework/PromiseAjax.js"></script>
+	<script src="Global/JavaScript/Framework/ElementContentHelper.js"></script>
+	<script src="Global/JavaScript/Framework/Events/KeyCode.js"></script>
+	<script src="Global/JavaScript/Framework/Events/EventData.js"></script>
+	<script src="Global/JavaScript/Framework/Events/Event.js"></script>
+	<script src="Global/JavaScript/Framework/Events/PromiseEvent.js"></script>
+	<script src="Global/JavaScript/Framework/ShortCutKeys.js"></script>
+	<script src="Global/JavaScript/Framework/ShortcutExtender.js"></script>
+	<script src="Global/JavaScript/Framework/KendoGridNavigator.js"></script>
+	<script src="Global/JavaScript/Framework/SoftSessionValidator.js"></script>
+	<script src="Global/JavaScript/Framework/StorageManager.js"></script>
+	<script src="Global/JavaScript/Framework/EntStorageManager.js"></script>
+	<script src="Global/JavaScript/Framework/PromiseBootbox.js"></script>
+	<script src="Global/JavaScript/Framework/BaseContextMenu.js"></script>
+	<script src="Global/JavaScript/Framework/TemplateContextMenu.js"></script>
+	<script src="Global/JavaScript/Framework/BulkContextMenu.js"></script>
+	<script src="Global/JavaScript/Framework/PrintHelper.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Knockout.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/contextMenuClick.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/singleClick.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/slideVisible.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/stopBinding.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/uiInit.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/Value.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/customInput.js"></script>
+	<script src="Global/JavaScript/Framework/Knockout/Binding/typeahead.js"></script>
+	<script src="Global/JavaScript/Framework/Input/BaseBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/StringBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DisabledBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/IntegerBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DecimalBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/NumberBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/CurrencyBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DateTimeBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/TimeBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DataListBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/DateBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/BooleanBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/PhoneBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/SelectBox.js"></script>
+	<script src="Global/JavaScript/Framework/Input/ColorBox.js"></script>
+	<script src="Global/JavaScript/Framework/PageManager.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridAlert.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridmenu.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/filter.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/KendoGridFilterMenu.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/layout.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/kendoGridLockbar.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/summary.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/kendoCustomizedTimePicker.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/kendoCustomizedDateTimePicker.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/SearchParameters.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/Sorting.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/Filtering.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoGridHackHelper.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/LightKendoGrid.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoGrid.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/gridAutoScroll.js"></script>
+	<script src="Global/JavaScript/Framework/Helper/DateBoxHelper.js"></script>
+	<script src="Global/JavaScript/Framework/Helper/FullScreenHelper.js"></script>
+	<script src="Global/JavaScript/Framework/Helper/KendoHackHelper.js"></script>
+
+	<script src="Global/JavaScript/Main.js"></script>
+	<script src="Global/JavaScript/Startup.js"></script>
+	<script src="Global/JavaScript/Setting.js"></script>
+
+	<script src="Global/JavaScript/Workspace/GridDefinition/DocumentGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripInvoiceGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/ReportGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/Navigation/NavigationMenu.js"></script>
+
+	<script src="Global/JavaScript/ViewModel/Helper/FieldTripStageEnum.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/KendoListMoverHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/TapHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/FieldTripResourcesHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/DropDownMenuHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/PrintHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/EntityHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/FieldTripAuthHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/BaseControl.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/LoginViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/DataSourceChangeViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/PasswordChangeViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ListFilterDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/KendoListMoverWithSearchControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SearchControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SaveTemplateNameViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ListMoverForListFilterControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SearchSettingsViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/AddOneFieldViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/CopyDataViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/AddTwoFieldsViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripResourceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripViewResourceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/EditDocumentViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/FieldTripInvoiceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ManageDetailScreenLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/GenerateReportViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SendEmailViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SendEmailOfGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ListMoverSelectRecordControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/TestEmailViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/ListMoverSelectRecipientControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SaveDataPointGroupNameViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/PrintSettingsViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/MessageViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointsJSON.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointPanel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointGroupHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/LineBlockHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/LayoutMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlocksMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/ConditionalAppearanceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/EditDataBlockAppearance.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/BaseDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/DocumentDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Executor/Deletion/FieldtripInvoiceDeletion.js"></script>
+	<script src="Global/JavaScript/ViewModel/DataEntry/BaseDataEntryViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DataEntry/FieldTripDataEntryViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DocumentData.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/ResizablePage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/BasePage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/BaseGridPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/FieldTripPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/MyRequestPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/SchedulerPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/MyRequestSchedulerPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/ReportsPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/SettingsConfigurationPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/ApprovalsPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/ApprovalsSchedulerPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/GridControlViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/EditKendoColumnViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageFilterViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageFilterViewMobileModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ManageLayoutViewMobileModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ModifyFilterViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ModifyFilterViewMobileModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/ModifyLayoutViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/EditFieldTripStatusViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/BaseKendoGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/DocumentMiniGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/FieldTripInvoiceGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Grid/FieldTripResourceGroupGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/BasePageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/ListMoverPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/FieldTripDataEntryPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/BaseDataEntryPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/AddTwoFieldsPageViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/EditDocumentPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/EmailPageLevelViewModel.js"></script>
+
+	<script src="Global/JavaScript/Modal/BaseModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/TripfinderLoginModel.js"></script>
+	<script src="Global/JavaScript/Modal/TripfinderLoginViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripViewResourceModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/DatasourceChangeModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/PasswordChangeModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/AddOneFieldModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripResourceModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/DocumentModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/FieldTripInvoiceModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/EditKendoColumnModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/EditKendoColumnModalViewModelForMobile.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/ManageFilterModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/ManageLayoutModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/ModifyFilterModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/ModifyLayoutModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid/EditFieldTripStatusModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/KendoListMoverWithSearchControlModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ListMoverForListFilterControlModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/BootstrapSlider.js"></script>
+	<script src="Global/JavaScript/Modal/SearchSettingsModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/AddTwoFieldsModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ManageDetailScreenLayoutModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ConditionalAppearanceModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/SaveTemplateNameModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/GenerateReportModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/SendEmailModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/SendEmailOfGridModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ListMoverSelectRecordControlModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/TestEmailModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/ListMoverSelectRecipientControlModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/SaveDataPointGroupNameModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/PrintSettingsModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/CopyDataModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/MessageModalViewModel.js"></script>
+
+	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/UserPreferenceDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/GridLayoutExtendedDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/GridFilterDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripDistrictDepartmentDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripClassificationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripActivityDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripEquipmentDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripDestinationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripBillingClassificationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripResourceDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/DocumentDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripInvoiceDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/FieldTripTemplatesDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/DocumentClassificationDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/DetailScreenLayoutDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/GenerateReportDataModal.js"></script>
+	<script src="Global/JavaScript/DataModel/SettingsConfigurationDataModal.js"></script>
+	<script src="Global/JavaScript/DataModel/ReportReceiptDataModel.js"></script>
+
+	<!-- endbuild -->
+</head>
+
+<body>
+	<div class="navigation-container">
+	</div>
+	<div id="pageContent" class="page-container">
+	</div>
+	<div class="tfmodal-container">
+		<!-- ko foreach: obBaseModalViewModels -->
+		<div class="tfmodal modal hide" data-bind="css:{hide:$parent.obBaseModalViewModels().length==0}">
+			<div class="modal-dialog" data-bind="css:sizeCss,style:{width:modalWidth}" style="margin:0;">
+				<div class="modal-content">
+					<!-- ko if: title() -->
+					<div class="modal-header">
+						<button type="button" class="close" aria-hidden="true" data-bind="visible:obCloseButtonVisible,event:{click:closeClick}">&times;</button>
+						<div class="panel-heading" data-bind="text: title"></div>
+					</div>
+					<!-- /ko -->
+					<div class="modal-body" data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
+					</div>
+					<!-- ko if: buttonTemplate() -->
+					<div class="modal-footer">
+						<div data-bind="template:{ name:buttonTemplate }"></div>
+						<div></div>
+					</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<!--/ko-->
+	</div>
+	<div id="loadingindicator">
+		<div class="overlay">
+			<div class="spinner">
+				<div class="spinner-icon-container">
+					<style type='text/css'>
+						@-webkit-keyframes uil-default-anim
+						{
+							0%
+							{
+								opacity: 1;
+							}
+
+							100%
+							{
+								opacity: 0;
+							}
+						}
+
+						@keyframes uil-default-anim
+						{
+							0%
+							{
+								opacity: 1;
+							}
+
+							100%
+							{
+								opacity: 0;
+							}
+						}
+
+						.uil-default-css
+						{
+							position: relative;
+							left: -78px;
+							top: -78px;
+							background: none;
+							width: 200px;
+							height: 200px;
+						}
+
+						.uil-default-css > div:nth-of-type(1)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.35s;
+							animation-delay: -0.35s;
+						}
+
+						.uil-default-css > div:nth-of-type(2)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.29166666666666663s;
+							animation-delay: -0.29166666666666663s;
+						}
+
+						.uil-default-css > div:nth-of-type(3)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.23333333333333334s;
+							animation-delay: -0.23333333333333334s;
+						}
+
+						.uil-default-css > div:nth-of-type(4)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.17500000000000002s;
+							animation-delay: -0.17500000000000002s;
+						}
+
+						.uil-default-css > div:nth-of-type(5)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.11666666666666667s;
+							animation-delay: -0.11666666666666667s;
+						}
+
+						.uil-default-css > div:nth-of-type(6)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -0.05833333333333329s;
+							animation-delay: -0.05833333333333329s;
+						}
+
+						.uil-default-css > div:nth-of-type(7)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: -5.551115123125783e-17s;
+							animation-delay: -5.551115123125783e-17s;
+						}
+
+						.uil-default-css > div:nth-of-type(8)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.05833333333333329s;
+							animation-delay: 0.05833333333333329s;
+						}
+
+						.uil-default-css > div:nth-of-type(9)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.11666666666666664s;
+							animation-delay: 0.11666666666666664s;
+						}
+
+						.uil-default-css > div:nth-of-type(10)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.17500000000000004s;
+							animation-delay: 0.17500000000000004s;
+						}
+
+						.uil-default-css > div:nth-of-type(11)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.2333333333333334s;
+							animation-delay: 0.2333333333333334s;
+						}
+
+						.uil-default-css > div:nth-of-type(12)
+						{
+							-webkit-animation: uil-default-anim .7s linear infinite;
+							animation: uil-default-anim .7s linear infinite;
+							-webkit-animation-delay: 0.29166666666666663s;
+							animation-delay: 0.29166666666666663s;
+						}
+					</style>
+					<div class="uil-default-css" style="transform: scale(0.22);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);"></div>
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);"></div>
+					</div>
+				</div>
+				<div class="subtitle">
+					<div class="subtitle-text" data-bind="text: subtitle"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="contextmenu-wrapper"></div>
+</body>
+
+</html>

@@ -1,0 +1,113 @@
+<div class="navigation-quick-search" data-bind="uiInit:init, css: obIsActive() ? 'focus':''">
+	<div class="quick-search-container">
+		<div class="search-header" data-bind="css: obIsLoading()? 'searching':''">
+			<div class="item-icon quick-search-spinner"></div>
+			<div class="item-icon quick-search search-btn" data-bind="click:onSearchIconClick"></div>
+			<input class="search-text" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: searchBoxPlaceHoderText}"
+			 autocapitalize="off" spellcheck="false" />
+			<div class="item-icon clear-btn quick-search-close" data-bind="click:clearSearchClick"></div>
+		</div>
+	</div>
+	<div class="search-control-row">
+		<div class="search-settings-btn item-icon searchSettings" data-bind="click:openSearchSettingsModal"></div>
+	</div>
+	<div class="search-content" data-bind="css: obHasSearchBeenConducted() ? 'result' :''">
+		<div class="recent-search" data-bind="style: {display: (!obHasSearchBeenConducted() && obRecentSearches().length > 0) ? 'block' : 'none'}">
+			<div class="recent-search-title">RECENT SEARCHES</div>
+			<div class="recent-search-group">
+				<!-- ko foreach: obRecentSearches -->
+				<div class="recent-search-item" data-bind="click: $parent.recentSearchRecordClick.bind($data)">
+					<div class="item-left">
+						<div class="item-name" data-bind="text: $data.text, attr: {title: $data.text}, css: $data.type === 'all' ? 'landscape-full':''"
+						 x-ms-format-detection="none"></div>
+						<!-- ko if:$data.type !== "all" -->
+						<div class="item-type" data-bind="text: $parent.recentSearchSubtitleFormat($data.type), attr: {title: $parent.recentSearchSubtitleFormat($data.type)}"></div>
+						<!-- /ko-->
+					</div>
+					<div class="icon right-caret"></div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+		<div class="no-recent-search" data-bind="style: {display: (!obHasSearchBeenConducted() && obRecentSearches().length === 0) ? 'block' : 'none'}">
+			<div class="no-recent-search-content" data-bind="style: {display: obNotShowRecentSearch() ? 'none' : 'block'}">
+				Start by typing in a search term above. Your recent searches will appear here.
+			</div>
+			<div class="no-recent-search-content" data-bind="style: {display: obNotShowRecentSearch() ? 'block' : 'none'}">
+				Start by typing in a search term above.
+			</div>
+		</div>
+		<div class="search-result" data-bind="style: {display: obHasSearchBeenConducted() ? 'block' : 'none'}">
+			<div class="virtual-container">
+				<div class="virtual-content">
+					<!-- ko if: obSuggestedResult().length === 0 -->
+					<div class="no-result">
+						<div class="result-head">
+							<div class="head-label">Sorry, no results found for&nbsp;</div>
+							<div class="search-text" data-bind="text: obInputTextHint, attr: {title: obInputTextHint}" x-ms-format-detection="none"></div>
+						</div>
+						<div class="no-result-suggestion-lable">Search Suggestions</div>
+						<div class="no-result-suggestion-content">
+							<div>Check your spelling</div>
+							<!-- ko if: obAllResultsCount() !== 0 -->
+							<div>
+								Search
+								<span class="link" data-bind="click: showAllClick">
+									All Columns (
+									<span data-bind="text:obAllResultsCount"></span> results hidden)
+								</span>
+							</div>
+							<!-- /ko -->
+							<!-- ko if: obChangeDataSourceShow -->
+							<div>
+								Change your
+								<span class="link" data-bind="click: openDataSourceModal">Data Source</span>
+							</div>
+							<!-- /ko -->
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- ko if: obSuggestedResult().length > 0 -->
+					<div class="result-content">
+						<div class="result-group">
+							<div class="overlay"></div>
+							<!--ko foreach: obSuggestedResult -->
+							<div class="section" data-bind="event:{mouseover:$parent.mouseOnSection,mouseout:$parent.mouseOnSection},click: $parent.viewInGridClick">
+								<div class="section-title" data-bind="text: title.toUpperCase()"></div>
+								<div class="view-in-grid">
+									<span class="icon right-caret small"></span>
+									<span data-bind="text:count===1?'View&nbsp;'+count+'&nbsp;result in Grid':count>3?'View all&nbsp;'+count+'&nbsp;results in Grid':'View&nbsp;'+count+'&nbsp;results in Grid'"></span>
+								</div>
+							</div>
+							<div class="data-cards">
+								<!--ko foreach:cards -->
+								<div class="card" data-bind="style:{borderColor: $parent.color}, click:$parents[1].suggestedResultClick, attr:{'data-index': Id}">
+									<!--ko if: imageSrc !== undefined && imageSrc !== null -->
+									<div class="photo" data-bind="style:{backgroundImage:imageSrc}"></div>
+									<!--/ko -->
+									<div class="card-left">
+										<div class="card-title" bind-field="title" data-bind="text: title, attr: {title: title}, css: {'full-height': !subtitle, 'no-content': !title}"></div>
+										<div class="card-subtitle" bind-field="subtitle" data-bind="text: subtitle, attr: {title: subtitle}, css:{'no-content': !subtitle, 'full-height': !title}"
+										 x-ms-format-detection="none"></div>
+									</div>
+									<div class="icon right-caret"></div>
+								</div>
+								<!--/ko -->
+							</div>
+							<!--/ko -->
+						</div>
+					</div>
+					<div class="result-count">
+						<!-- ko if: obAllResultsCount() === obSingleResultCount() -->
+						<pre class="titleNotify"><span data-bind="text:obAllResultsCount"></span> results returned</pre>
+						<!-- /ko -->
+						<!-- ko if: obAllResultsCount() !== obSingleResultCount() -->
+						<pre class="titleNotify"><span data-bind="text:obSingleResultCount"></span> of <span data-bind="text:obAllResultsCount"></span> results returned; <span class="show-all" data-bind="click: showAllClick">Show All</span></pre>
+						<!-- /ko -->
+					</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

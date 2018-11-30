@@ -1,0 +1,104 @@
+﻿<div class="view-finder document-dataentry " data-bind="uiInit:$parent.containerLoaded, finish:initModel">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div data-bind="with:obEntityDataModel">
+		<div class="row">
+		<div class="col-xs-24 modal-description" style="margin:-10px 0 25px 0">An email must be sent to at least one recipient (To, Cc, or Bcc). Multiple email addresses can be specified. A comma "," or semi-colon ";" must be used to separate each. Click the Cc or Bcc buttons to add recipients to those fields.</div>
+		</div>
+		<div class="col-xs-24">
+			<div class="row">
+				<div class="col-xs-24">
+					<div class="form-group" style="height:56px;margin-bottom: 0px;">
+						<label class="requirestar"><strong>From</strong></label>
+						<div class="input-group" data-bind="css:{disabled:$parent.obEmails().length<=1}">
+							<div data-bind="typeahead:{source:$parent.obEmails,drowDownShow:true,notSort:true}">
+								<!-- ko customInput:{type:"Select",value:emailAddress,attributes:{class:"form-control"}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn" data-bind="visible:$parent.obEmails().length>1">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-24 ">
+					<div class="form-group" style="height:56px;margin-bottom: 0px;">
+						<label><strong>To</strong></label><label class="inactive" style="margin:0 3px" data-bind="visible:!$parent.obCcEnable()">|</label><label class="inactive" data-bind="click:$parent.CcEnableClick.bind($parent),visible:!$parent.obCcEnable()"><strong>Cc</strong></label><label class="inactive" style="margin:0 3px" data-bind="visible:!$parent.obBccEnable()">|</label><label class="inactive" data-bind="click:$parent.BccEnableClick.bind($parent), visible:!$parent.obBccEnable()"><strong>Bcc</strong></label>
+						<div class="input-group">
+							<input type="text" class="form-control" name="mailToList" data-bind="value:$parent.obEmailToString" />
+							<div class="input-group-btn" style="vertical-align: top;">
+								<button type="button" class="btn btn-default btn-sharp" data-send-type = "To" data-bind="event:{click:$parent.selectRecipientToClick}"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" data-bind="visible:$parent.obCcEnable">
+				<div class="col-xs-24 ">
+					<div class="form-group" style="height:56px;margin-bottom: 0px;">
+						<label><strong>Cc</strong></label>
+						<div class="input-group">
+							<input type="text" class="form-control" name="mailCcList" data-bind="value:$parent.obEmailCcString" />
+							<div class="input-group-btn" style="vertical-align: top;">
+								<button type="button" class="btn btn-default btn-sharp" data-send-type = "Cc" data-bind="event:{click:$parent.selectRecipientToClick}"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" data-bind="visible:$parent.obBccEnable">
+				<div class="col-xs-24 ">
+					<div class="form-group" style="height:56px;margin-bottom: 0px;">
+						<label><strong>Bcc</strong></label>
+						<div class="input-group">
+							<input type="text" class="form-control" name="mailBccList" data-bind="value:$parent.obEmailBccString" />
+							<div class="input-group-btn" style="vertical-align: top;">
+								<button type="button" class="btn btn-default btn-sharp" data-send-type = "Bcc" data-bind="event:{click:$parent.selectRecipientToClick}"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-24 ">
+					<div class="form-group">
+						<label><strong>Subject</strong></label>
+						<input type="text" class="form-control" name="emailSubject" maxlength="255" data-bind="value:emailSubject" />
+					</div>
+				</div>
+				<div class="col-xs-24 ">
+					<div class="form-group">
+						<label><strong>Message</strong></label>
+						<textarea class="form-control notification-message" name="emailMessage" maxlength="2000" data-bind="value:emailMessage" />
+					</div>
+				</div>
+				<div class="col-xs-24">
+					<!-- ko foreach: $parent.documentEntities -->
+					<div class="document-file">
+						<span data-bind="text:Filename"></span>
+						<div style="float:right;">
+							<div style="float:left;">
+								<div class="progress file-progress" data-bind="attr:{filename:Filename},visible:(FileProgress()!='100%' && DownLoadComplete() == false)">
+									<div class="progress-bar" role="progressbar" aria-valuenow="60"
+										 aria-valuemin="0" aria-valuemax="100" data-bind="style:{ width: FileProgress}">
+									</div>
+								</div>
+								<span class="upload-failed" style="margin: 0 13px 0 0;" data-bind="visible:UploadFailed() == true">failed to upload</span>
+							</div>
+							<div style="float:left;">
+							<button class="delete-file" data-bind="click:$parents[1].deleteFileClick, visible:UploadFailed() == false">×</button>
+							<button class="retry delete-file" data-bind="click:$parents[1].retryClick, visible:UploadFailed() == true"></button>
+							</div>
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

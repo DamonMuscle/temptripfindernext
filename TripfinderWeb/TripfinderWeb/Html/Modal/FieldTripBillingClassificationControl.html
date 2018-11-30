@@ -1,0 +1,117 @@
+﻿<div class="document-dataentry" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-24">
+			<h4><strong>General Information</strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group tf-validate" style="height:56px">
+				<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
+				<input type="text" name="name" class="form-control" data-bind="value:obEntityDataModel().name" required maxlength="50" />
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Trip Rates & Cost')"></strong></h4>
+		</div>
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Vehicle Rates & Cost')"></strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Minimum Cost</label>
+				<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().minimumCost,attributes:{class:"form-control",name:"minimumCost"}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Fixed Cost</label>
+				<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().fixedCost,attributes:{class:"form-control",name:"fixedCost"}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Mileage Rate</label>
+				<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().mileageRate,attributes:{class:"form-control",name:"mileageRate"}} --><!-- /ko -->
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="form-group tf-validate">
+				<label>Fixed Cost</label>
+				<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().vehFixedCost,attributes:{class:"form-control",name:"vehFixedCost"}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Driver Rates & Cost')"></strong></h4>
+		</div>
+		<div class="col-xs-12">
+			<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')+' Rates & Cost'"></strong></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().driverRate,attributes:{class:"form-control",name:"driverRate"}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Fixed Cost</label>
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().driverFixedCost,attributes:{class:"form-control",name:"driverFixedCost"}} --><!-- /ko -->
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Overtime Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().driverOTRate,attributes:{class:"form-control",name:"driverOTRate"}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().aideRate,attributes:{class:"form-control",name:"aideRate"}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Fixed Cost</label>
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().aideFixedCost,attributes:{class:"form-control",name:"aideFixedCost"}} --><!-- /ko -->
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group tf-validate">
+						<label>Overtime Rate</label>
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().aideOTRate,attributes:{class:"form-control",name:"aideOTRate"}} --><!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-12">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+

@@ -1,0 +1,129 @@
+<div class="document-grid document-dataentry setting-configuration" data-bind="uiInit:init">
+	<!-- ko if:TF.isPhoneDevice-->
+	<div class="mobile-header">
+		<div class="icon logo"></div>
+		<div class="icon float-right menu" data-bind="click:openNavigationClick"></div>
+		<div class="icon float-right add"></div>
+	</div>
+	<!-- /ko -->
+	<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="edit-content">
+		<div class="row">
+			<div class="col-xs-24">
+				<h4>
+					<strong>System Options</strong>
+				</h4>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" class="show-total-cost" />Show Field Trip Total Cost
+					</label>
+				</div>
+			</div>
+			<div class="col-lg-6 col-xs-24">
+				<h4>
+					<strong>SMTP Server</strong>
+				</h4>
+				<div class="form-group">
+					<label>Host</label>
+					<input type="text" name="smtphost" class="form-control" data-bind="value:obEntityDataModel().smtphost" maxlength="256" />
+				</div>
+				<div class="form-group">
+					<label>Port</label>
+					<!-- ko customInput:{type:"Integer",value:obEntityDataModel().smtpport,attributes:{class:"form-control",name:"smtpport"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="form-group">
+					<label>User Name</label>
+					<input type="text" name="smtpuserName" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtpuserName" data-tf-input-type="Email"
+					 maxlength="256" />
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<!--this password is used to disable chrome auto complete-->
+					<input type="password" name="smtppasswordhidden" class="hidden" autocomplete="off">
+					<input type="password" name="smtppassword" autocomplete="off" class="form-control" data-bind="value:obEntityDataModel().smtppassword" maxlength="256" />
+				</div>
+				<div class="checkbox margin-top-20">
+					<label>
+						<input type="checkbox" name="smtpssl" data-bind="checked:obEntityDataModel().smtpssl"> Use SSL
+					</label>
+				</div>
+				<div class="form-group">
+					<button type="button" class="btn btn-gray btn-xs btn-sharp" data-bind="click:testSentEmailClick">Send Test Email</button>
+				</div>
+			</div>
+			<div class="col-lg-6 col-xs-24">
+				<h4>
+					<strong>From Email</strong>
+				</h4>
+				<div class="form-group">
+					<label>Address</label>
+					<input type="text" name="emailAddress" class="form-control" data-bind="value:obEntityDataModel().emailAddress" data-tf-input-type="Email" maxlength="256" />
+				</div>
+				<div class="form-group">
+					<label>Name</label>
+					<input type="text" name="emailName" class="form-control" data-bind="value:obEntityDataModel().emailName" maxlength="100" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-xs-24">
+			<h4>
+				<strong>Message</strong>
+			</h4>
+			<div class="message-description">Specify the message you would like to display for each language that is published for your site. The message and/or
+				presentation may be adjusted for each language.</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" class="display-once-daily" />Display only once per day per user
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-24 editor-wrapper">
+			<h4>
+				<strong>English</strong>
+			</h4>
+			<div class="text-editor-wrapper">
+				<textarea id="EnglishEditor" rows="10" cols="30"></textarea>
+			</div>
+			<div class="html-editor-wrapper">
+				<textarea id="EnglishHtmlEditor"></textarea>
+			</div>
+			<div class="editor-options-wrap">
+				<div class="option english design" data-bind="click:changePattern">Design</div>
+				<div class="option english html" data-bind="click:changePattern">HTML</div>
+			</div>
+		</div>
+		<div class="col-xs-24 editor-wrapper">
+			<h4>
+				<strong>Spanish</strong>
+			</h4>
+			<div class="text-editor-wrapper">
+				<textarea id="SpanishEditor" rows="10" cols="30"></textarea>
+			</div>
+			<div class="html-editor-wrapper">
+				<textarea id="SpanishHtmlEditor"></textarea>
+			</div>
+			<div class="editor-options-wrap">
+				<div class="option spanish design" data-bind="click:changePattern">Design</div>
+				<div class="option spanish html" data-bind="click:changePattern">HTML</div>
+			</div>
+		</div>
+
+		<div class="edit-footer">
+			<a class="legal-link" data-bind="click:legalLinkClick">Legal</a>
+			<a class="release-notes" href="https://www.mytransfinder.com/release/release_notes_tripfinder.asp" title="Release Notes" target="_blank">Release Notes</a>
+			<div class="divider" style="display: inline-block; background-color: #6B6D70; height: 12px; margin: 3px 5px -2px; width: 1px;"></div>
+			<span class="version" data-bind="text:tf.pageManager.obVersion"></span>
+		</div>
+	</div>
+
+	<div class="edit-bottombar">
+		<button class="btn tf-btn-black" data-bind="click:saveClick">Save</button>
+		<button type="button" class="btn btn-link btn-black" data-bind="click:cancelClick">
+			Close
+		</button>
+	</div>
+</div>

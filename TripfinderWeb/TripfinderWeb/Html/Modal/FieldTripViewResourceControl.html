@@ -1,0 +1,181 @@
+﻿<div class="document-dataentry resource-modal" style="margin: -15px;">
+	<div class="resource-content">
+		<div class="grid grid-header">
+			<div class="pull-right resource-header">
+				<span data-bind="click:resoucesCollapsedClick,style:{fontWeight:(obResoucesExpand()?'normal':'bold')}">Collapsed</span> |
+				<span data-bind="click:resoucesExpandedClick,style:{fontWeight:(obResoucesExpand()?'bold':'normal')}">Expanded</span>
+			</div>
+		</div>
+		<div class="resource-title">
+			<div class="col-xs-8">
+				<h5><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Vehicle')"></strong></h5>
+			</div>
+
+			<div class="col-xs-8">
+				<h5><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Driver')"></strong></h5>
+			</div>
+
+			<div class="col-xs-8">
+				<h5><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')"></strong></h5>
+			</div>
+		</div>
+		<!-- ko if: obResoucesExpand()-->
+		<div class="grid grid-body fieldtrip-dataview-resource" data-bind="foreach: obFieldTripResourceGroupData">
+
+			<div class="row signal-data">
+				<div class="col-xs-8">
+					<div class="row">
+						<div class="col-xs-4">
+							<span><img data-bind="attr: { alt: $parent.checkPicture('vehicle', $data.VehicleId, $element) }" class="img-circle"></span>
+						</div>
+						<div class="col-xs-20">
+							<label data-bind="text:$parent.getVehicleName($data)"></label>
+							<div>
+								<span class="info">Rate: </span><span class="info" data-bind="text:$parent.formatCurrency($data.MileageRate)"></span><span class="info">/mi</span>
+							</div>
+						</div>
+					</div>
+					<hr />
+					<label>Mileage</label>
+					<div class="info">Starting<span class="info pull-right" data-bind="text:$data.Startingodometer"></span></div>
+					<div class="info">Ending<span class="info pull-right" data-bind="text:$data.Endingodometer"></span></div>
+					<hr />
+					<label>Cost</label>
+					<div class="info">Fixed Cost<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.VehFixedCost)"></span></div>
+					<div class="info">Calculated Mileage Rate<span class="info pull-right" data-bind="text:$parent.formatCurrency($parent.calculatedMileageRateComputer($data))"></span></div>
+					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
+					<div class="info text-right" data-bind="text:$parent.formatCurrency($parent.vehicleCostComputer($data))"></div>
+					<div>&nbsp;</div>
+					<div class="well" style="margin:0 -10px;border-radius: inherit;">
+						<label>Sub Total</label>
+						<div class="info">
+							<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Vehicle')"></span>
+							<span class="info pull-right" data-bind="text:$parent.formatCurrency($parent.vehicleCostComputer($data))"></span>
+						</div>
+						<div class="info">
+							<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Driver')"></span>
+							<span class="info pull-right" data-bind="text:$parent.formatCurrency($parent.driverTotalCostComputer($data))"></span>
+						</div>
+						<div class="info">
+							<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')"></span>
+							<span class="info pull-right" data-bind="text:$parent.formatCurrency($parent.busAideCostComputer($data))"></span>
+						</div>
+						<h5 class="text-right"><strong data-bind="text:$parent.formatCurrency($parent.resourceSubTotalComputer($data))"></strong></h5>
+					</div>
+				</div>
+
+				<div class="col-xs-8">
+					<div class="row">
+						<div class="col-xs-4">
+							<span><img data-bind="attr: { alt: $parent.checkPicture('staff', $data.DriverId, $element) }" class="img-circle"></span>
+						</div>
+						<div class="col-xs-20">
+							<label data-bind="text:$parent.getUserName($data,'driver')"></label>
+							<div>
+								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.DriverRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.DriverOtrate)"></span>
+							</div>
+						</div>
+					</div>
+
+					<hr />
+					<label>Hours Worked</label>
+					<div class="info">Regular<span class="info pull-right" data-bind="text:$data.DriverHours"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$data.DriverOthours"></span></div>
+					<hr />
+					<label>Billing</label>
+					<div class="info">Regular<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverHours * $data.DriverRate)"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverOthours * $data.DriverOtrate)"></span></div>
+					<div class="info">Fixed Cost<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverFixedCost)"></span></div>
+					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
+					<div class="info text-right" data-bind="text:$parent.driverCostComputer($data).toFixed(2)"></div>
+					<hr />
+					<label>Expenses</label>
+					<div class="info">Meals<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverExpMeals)"></span></div>
+					<div class="info">Miscellaneous<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverExpMisc)"></span></div>
+					<div class="info">Parking<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverExpParking)"></span></div>
+					<div class="info">Tolls<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverExpTolls)"></span></div>
+					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
+					<div class="info text-right" data-bind="text:$parent.formatCurrency($parent.expensesComputer($data))"></div>
+				</div>
+
+				<div class="col-xs-8">
+					<div class="row">
+						<div class="col-xs-4">
+							<span><img data-bind="attr: { alt: $parent.checkPicture('staff', $data.AideId, $element) }" class="img-circle"></span>
+						</div>
+						<div class="col-xs-20">
+							<label data-bind="text:$parent.getUserName($data,'staff')"></label>
+							<div>
+								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.AideRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.AideOtrate)"></span>
+							</div>
+						</div>
+					</div>
+
+					<hr />
+					<label>Hours Worked</label>
+					<div class="info">Regular<span class="info pull-right" data-bind="text:$data.AideHours"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$data.AideOthours"></span></div>
+					<hr />
+					<label>Billing</label>
+					<div class="info">Regular<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideHours * $data.AideRate)"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideOthours * $data.AideOtrate)"></span></div>
+					<div class="info">Fixed Cost<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideFixedCost)"></span></div>
+					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
+					<div class="info text-right" data-bind="text:$parent.formatCurrency($parent.busAideCostComputer($data))"></div>
+					<hr />
+					<label data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Chaperone')"></label>
+					<div class="info" data-bind="text:$data.Chaperone"></div>
+					<div class="info" data-bind="text:$data.Chaperone2"></div>
+					<div class="info" data-bind="text:$data.Chaperone3"></div>
+					<div class="info" data-bind="text:$data.Chaperone4"></div>
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+		<!-- ko if: !obResoucesExpand()-->
+		<div class="grid-body-with-subtitle fieldtrip-dataview-resource ">
+			<ul data-bind="foreach:obRespurcesExpendData">
+				<li>
+					<div class="row">
+						<div class="col-xs-8">
+							<span><img data-bind="attr: { src: $parent.getVehiclePicture($data.VehicleId) }" alt="" class="img-circle"></span>
+							&nbsp;
+							<label data-bind="text: $data.Vehicle&&$data.Vehicle.BusNum"></label>
+						</div>
+						<div class="col-xs-8">
+							<span><img data-bind="attr: { src: $parent.getStaffPicture($data.Staffs[0].Driver.Id) }" alt="" class="img-circle"></span>
+							&nbsp;
+							<label data-bind="text: $data.Staffs[0].Driver.Name"></label>
+						</div>
+						<div class="col-xs-8">
+							<span><img data-bind="attr: { src: ($data.Staffs[0].BusAide && $data.Staffs[0].BusAide.Id) ? $parent.getStaffPicture($data.Staffs[0].BusAide.Id) : $parent.getStaffPicture(0) }" alt="" class="img-circle"></span>
+							&nbsp;
+							<label data-bind="text: $data.Staffs[0].BusAide ? $data.Staffs[0].BusAide.Name : ''"></label>
+						</div>
+					</div>
+					<!-- ko foreach: {data:Staffs.slice(1), as: 'Staff' } -->
+					<hr style="margin-top:0" class="col-xs-16 col-xs-offset-8" />
+					<div class="row">
+						<div class="col-xs-8 col-xs-offset-8">
+							<span><img data-bind="attr: { src: $parents[1].getStaffPicture(Staff.Driver.Id) }" alt="" class="img-circle"></span>
+							&nbsp;
+							<label data-bind="text: Staff.Driver.Name"></label>
+						</div>
+						<div class="col-xs-8">
+							<span><img data-bind="attr: { src: Staff.BusAide ? $parents[1].getStaffPicture(Staff.BusAide.Id) : $parents[0].getStaffPicture(Staff.BusAide.Id) }" alt="" class="img-circle"></span>
+							&nbsp;
+							<label data-bind="text: Staff.BusAide ? Staff.BusAide.Name : ''"></label>
+						</div>
+					</div>
+					<!-- /ko -->
+				</li>
+			</ul>
+		</div>
+		<!-- /ko -->
+	</div>
+	<div class="grid grid-footer"><h5>Total: <strong data-bind="text:obResourcesTotalComputer"></strong></h5></div>
+</div>
+
+
+
+

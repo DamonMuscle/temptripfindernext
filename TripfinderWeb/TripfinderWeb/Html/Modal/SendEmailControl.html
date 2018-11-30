@@ -1,0 +1,53 @@
+<div class="view-finder document-dataentry " data-bind="uiInit:$parent.containerLoaded, finish:initModel">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div data-bind="with:obEntityDataModel">
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group" style="height:56px;">
+					<label class=""><strong>From</strong></label>
+					<input type="text" readonly="" data-bind="value:emailAddress" name="FromAddress" class="form-control" />
+				</div>
+
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-xs-24 ">
+				<div class="form-group error-left" style="height:56px;">
+					<label class="requirestar"><strong>To</strong></label>
+					<div class="input-group">
+						<input type="text" class="form-control" name="mailToList" data-bind="value:$parent.obEmailToString" />
+						<div class="input-group-btn" style="vertical-align: top;">
+							<button type="button" class="btn btn-default btn-sharp" data-bind="event:{click:$parent.selectRecipientToClick}"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+						</div>
+					</div>
+					<div class="text-right pull-right modal-description">separate email addresses with a semi-colon ";" or comma ","</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24 ">
+				<div class="form-group">
+					<label><strong>Subject</strong></label>
+					<input type="text" class="form-control" name="emailSubject" data-bind="value:emailSubject" />
+				</div>
+			</div>
+			<div class="col-xs-24 ">
+				<div class="form-group">
+					<label><strong>Message</strong></label>
+					<textarea style="height:200px" class="form-control notification-message" name="emailMessage" maxlength="2000" data-bind="value:emailMessage" />
+				</div>
+			</div>
+			<div class="col-xs-24">
+				<!-- ko foreach: $parent.documentEntities -->
+				<div class="document-file">
+					<span data-bind="text:Filename"></span>
+					<button class="delete-file" data-bind="click:$parents[1].deleteFileClick">×</button>
+					<div style="clear:both;"></div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+	</div>
+</div>

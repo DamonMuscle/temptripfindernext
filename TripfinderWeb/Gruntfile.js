@@ -1,17 +1,16 @@
-module.exports = function(grunt) {
+module.exports = function(grunt)
+{
 	require('load-grunt-tasks')(grunt);
 	require('time-grunt')(grunt);
 
 	grunt.initConfig({
-		config: {
-			routefinderSourcePath: '../../RoutefinderWeb'
-		},
 		clean: {
 			main: {
 				files: [{
 					dot: true,
 					src: [
-						'build/{,*/}*'
+						'build/{,*/}*',
+						'!build/local_settings.js'
 					]
 				}]
 			},
@@ -39,102 +38,46 @@ module.exports = function(grunt) {
 		},
 		less: {
 			build: {
-				files: [{
-					expand: true,
-					cwd: 'tripfinderweb/Global/Css',
-					src: [
-						'tripfinder.less',
-						'PublicDashboard.less',
-						'Grid.less',
-						'PublicDashboardCategory.less',
-						'navigation.less',
-						'settings.less',
-						'BootstrapContainers.less',
-						'BootstrapEditing.less',
-						'BootstrapModal.less',
-						'contextmenu.less',
-						'enhance.less',
-						'error.less',
-						'Icons.less',
-						'input.less',
-						'esrimap.less'
-					],
-					dest: 'tripfinderweb/Global/Css',
-					ext: '.css',
-					extDot: 'last'
-				}]
-			},
-			create: {
-				files: [{
-					expand: true,
-					cwd: 'tripfinderweb/Global/Css',
-					src: [
-						'tripfinder.less',
-						'PublicDashboard.less',
-						'Grid.less',
-						'PublicDashboardCategory.less',
-						'navigation.less',
-						'settings.less',
-						'BootstrapContainers.less',
-						'BootstrapEditing.less',
-						'BootstrapModal.less',
-						'contextmenu.less',
-						'enhance.less',
-						'error.less',
-						'Icons.less',
-						'input.less',
-						'esrimap.less'
-					],
-					dest: 'build/Global/Css',
-					ext: '.css',
-					extDot: 'last'
-				}]
+				files: {
+					"build/Global/css/tripfinder.css": "TripfinderWeb/Global/css/tripfinder.less",
+					//Because cssconcat won't look at build folder, so output to here for cssconcat's use
+					"TripfinderWeb/Global/css/tripfinder.css": "TripfinderWeb/Global/css/tripfinder.less"
+				}
 			}
 		},
 
 		sync: {
 			js: {
 				files: [{
-						cwd: 'tripfinderweb/Global/JavaScript',
-						src: [
-							'**/*.*'
-						],
-						dest: 'build/Global/JavaScript',
-						expand: true,
-						filter: 'isFile'
-					},
-					{
-						cwd: 'tripfinderweb/Global/ThirdParty',
-						src: [
-							'**/*.*'
-						],
-						dest: 'build/Global/ThirdParty',
-						expand: true,
-						filter: 'isFile'
-					}
+					cwd: 'tripfinderweb/Global/JavaScript',
+					src: [
+						'**/*.*'
+					],
+					dest: 'build/Global/JavaScript',
+					expand: true,
+					filter: 'isFile'
+				},
+				{
+					cwd: 'tripfinderweb/Global/ThirdParty',
+					src: [
+						'**/*.*'
+					],
+					dest: 'build/Global/ThirdParty',
+					expand: true,
+					filter: 'isFile'
+				}
 				]
 			},
 			jsbuild: {
 				files: [{
-						cwd: 'tripfinderweb/Global/ThirdParty',
-						src: [
-							'**/*.*'
-						],
-						dest: 'build/Global/ThirdParty',
-						expand: true,
-						filter: 'isFile'
-					},
-					{
-						cwd: 'tripfinderweb/Global',
-						src: [
-							'JavaScript/Framework/Map/ClusterLayer.js',
-							'JavaScript/Framework/Map/DirectionalLineSymbol.js'
-						],
-						dest: 'build/Global',
-						expand: true,
-						filter: 'isFile'
-					}
-				]
+					cwd: 'tripfinderweb/Global/ThirdParty',
+					src: [
+						'**/*.*'
+					],
+					dest: 'build/Global/ThirdParty',
+					expand: true,
+					filter: 'isFile'
+				}]
 			},
 			html: {
 				files: [{
@@ -169,11 +112,7 @@ module.exports = function(grunt) {
 			individual: {
 				files: [{
 					cwd: 'tripfinderweb',
-					src: ['admin.html',
-						'privatesite.html',
-						'login.html',
-						'index.html',
-						'error.html',
+					src: ['index.html',
 						'local_settings.js',
 						'Web.config'
 					],
@@ -185,47 +124,19 @@ module.exports = function(grunt) {
 			localization: {
 				files: [{
 					expand: true,
-					cwd: 'tripfinderweb/Resources',
+					cwd: 'tripfinderweb/localization',
 					src: ['**/*.json'],
 					dest: 'build/localization',
 					filter: 'isFile'
 				}]
 			}
-			// routefinderSource:
-			// {
-			// files: [
-			// {
-			// 	cwd: '<%= config.routefinderSourcePath %>/RoutefinderWeb/Global',
-			// 	src: [
-			// 'ThirdParty/ol/OpenLayers.js',
-			// 'JavaScript/Framework/Map/ClusterLayer.js',
-			// 'JavaScript/Framework/Map/DirectionalLineSymbol.js',
-			// 'ThirdParty/bootstrap/css/bootstrap.min.css',
-			// 'ThirdParty/ol/theme/default/style.css',
-			// 'ThirdParty/Kendo/Styles/kendo.common.css',
-			// 'ThirdParty/Kendo/Styles/kendo.default.css',
-			// 'ThirdParty/Kendo/Styles/kendo.fiori.css',
-			// 'ThirdParty/agsjso318/**/*.js',
-			// 'ThirdParty/agsjso318/**/*.css',
-			// '**/*.jpg',
-			// '**/*.png',
-			// '**/*.gif',
-			// '**/*.eot',
-			// '**/*.svg',
-			// '**/*.ttf',
-			// '**/*.woff',
-			// '**/*.woff2'
-			// ],
-			// dest: 'build/Global',
-			// expand: true,
-			// filter: 'isFile'
-			// }]
-			// }
 		},
 		concat: {
 			options: {
-				process: function(src, filepath) {
-					if (filepath.indexOf('.js') > 0) {
+				process: function(src, filepath)
+				{
+					if (filepath.indexOf('.js') > 0)
+					{
 						return src + ';\n';
 					}
 					return src;
@@ -250,9 +161,6 @@ module.exports = function(grunt) {
 					sourceMap: false
 				},
 				files: {
-					'build/Global/JavaScript/tripfinderadmin.js': ['build/Global/JavaScript/tripfinderadmin.js'],
-					'build/Global/JavaScript/tripfinderprivatesite.js': ['build/Global/JavaScript/tripfinderprivatesite.js'],
-					'build/Global/JavaScript/tripfinderLogin.js': ['build/Global/JavaScript/tripfinderLogin.js'],
 					'build/Global/JavaScript/tripfinder.js': ['build/Global/JavaScript/tripfinder.js']
 				}
 			}
@@ -339,25 +247,10 @@ module.exports = function(grunt) {
 					livereload: 35731
 				}
 			}
-			// html_from_routerfinder_plus:
-			// {
-			// 	files: ['<%= config.routefinderSourcePath %>/RoutefinderWeb/Local/Html/**/*.cshtml'],
-			// 	tasks: ['sync:html_from_routerfinder_plus'],
-			// 	options:
-			// 	{
-			// 		livereload: 35731
-			// 	}
-			// }
 		},
 
 		useminPrepare: {
-			html: [
-				'tripfinderweb/admin.html',
-				'tripfinderweb/privatesite.html',
-				'tripfinderweb/login.html',
-				'tripfinderweb/index.html',
-				'tripfinderweb/error.html'
-			],
+			html: 'tripfinderweb/index.html',
 			options: {
 				dest: 'build/',
 				flow: {
@@ -374,22 +267,18 @@ module.exports = function(grunt) {
 			}
 		},
 		usemin: {
-			html: [
-				'build/admin.html',
-				'build/privatesite.html',
-				'build/login.html',
-				'build/index.html',
-				'build/error.html'
-			],
+			html: 'build/index.html',
 			options: {
 				assetsDirs: [
 					'build'
 				],
 				blockReplacements: {
-					jsUglify: function(block) {
+					jsUglify: function(block)
+					{
 						return '<script src="' + block.dest + '"></script>';
 					},
-					cssconcat: function(block) {
+					cssconcat: function(block)
+					{
 						return '<link rel="stylesheet" href="' + block.dest + '">';
 					}
 				}
@@ -404,11 +293,8 @@ module.exports = function(grunt) {
 		'sync:resource',
 		'sync:js',
 		'sync:localization',
-		// 'sync:routefinderSource',
 		'less',
 		'sync:individual',
-		//'uglify:debug',
-		// 'sync:html_from_routerfinder_plus',
 		'sync:html'
 	]);
 
@@ -421,10 +307,6 @@ module.exports = function(grunt) {
 		'less:build',
 		'sync:individual',
 		'sync:html',
-		// 'sync:html_from_routerfinder_plus',
-
-
-		// 'sync:routefinderSource',
 		'useminPrepare',
 		'concat',
 		'uglify:build',
@@ -438,12 +320,8 @@ module.exports = function(grunt) {
 		'sync:resource',
 		'sync:js',
 		'sync:localization',
-		//'sync:routefinderSource',
-		// 'sync:routefinderSourceWithoutMap',
 		'less',
 		'sync:individual',
-		//'uglify:debug',
-		// 'sync:html_from_routerfinder_plus',
 		'sync:html'
 	]);
 };

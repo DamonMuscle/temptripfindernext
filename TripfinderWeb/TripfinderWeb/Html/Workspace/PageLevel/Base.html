@@ -1,0 +1,52 @@
+﻿<div class="document-dataentry page-level-message-container" data-bind="css:obPageLevelCss,uiInit:initialized">
+	<div data-bind="visible:obErrorMessageDivIsShow">
+		<div class="edit-error" data-bind="visible:(obValidationErrors().length + obValidationErrorsSpecifed().length) > 0">
+			<div class="icon-container">
+				<span class="iconbutton error"></span>
+			</div>
+			<!--ko foreach:obValidationErrors-->
+			<div class="error-description hide" data-bind="click :$parent.focusField">
+				<span data-bind="html:leftMessage"></span><span data-bind="html:name"></span><span data-bind="html:rightMessage"></span>
+			</div>
+			<!-- /ko -->
+			<!--ko foreach:obValidationErrorsSpecifed-->
+			<div class="error-description hide" data-bind="click :$parent.focusField">
+				<span data-bind="html:message"></span>
+			</div>
+			<!-- /ko -->
+			<div class="close-button" data-bind="click :closeMessageBox">
+			</div>
+			<div class="navigation-tool" data-bind="visible:(obValidationErrors().length + obValidationErrorsSpecifed().length) > 1">
+				<button type="button" class="left-arrow arrow" data-bind="click: toPreError">
+					<span class="caret"></span>
+				</button>
+				<div class="count-info" data-bind="text:(obCurrentErrorIndex() + 1) + ' of ' + (obValidationErrors().length + obValidationErrorsSpecifed().length)"></div>
+				<button type="button" class="right-arrow arrow" data-bind="click: toNextError">
+					<span class="caret"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="edit-success single-success" style="margin-left:0; margin-right:0; width:auto;" data-bind="visible:obSuccessMessageDivIsShow">
+		<div class="icon-container">
+			<span class="iconbutton success"></span>
+		</div>
+		<div class="success-description" data-bind="html:obSuccessMessage">
+		</div>
+		<div class="close-button" data-bind="click :closeMessageBox"></div>
+	</div>
+
+	<div data-bind="visible:obSuccessMessageSpecifedDivIsShow">
+		<!--ko foreach:obSuccessMessageSpecifed-->
+		<div class="edit-success" style="margin-left:0; margin-right:0; width:auto;">
+			<div class="icon-container">
+				<span class="iconbutton success"></span>
+			</div>
+			<div class="success-description" data-bind="html:message">
+			</div>
+			<div class="close-button" data-bind="click :$parent.closeMessageBox">
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+</div>

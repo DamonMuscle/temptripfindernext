@@ -1,0 +1,22 @@
+﻿<div class="document-dataentry">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row" data-bind="uiInit:init">
+		<div class="col-xs-24">
+			<div class="form-group" style="height:56px">
+				<label class="requirestar" data-bind="text:obName"></label>
+				<input type="text" name="name" class="form-control" data-bind="value:obEntityDataModel().name" required />
+			</div>
+		</div>
+		<div class="col-xs-24" data-bind="visible:obDescriptionVisible">
+			<div class="form-group" style="height:56px">
+				<label data-bind="text:obDescription, css:{requirestar:obDescriptionRequired}"></label>
+				<input type="text" name="description" class="form-control" data-bind="value:obEntityDataModel().description" />
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+

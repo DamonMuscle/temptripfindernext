@@ -1,0 +1,139 @@
+﻿.tf-input {
+	height: 100%;
+	width: 100%;
+}
+
+.tf-input-textbox input {
+	height: calc(~"100% - 2px");
+	margin: 1px;
+	width: calc(~"100% - 2px");
+}
+
+/*.tf-input-datebox input
+{ 
+	height: calc(100% - 2px);
+	width: calc(100% - 2px);
+}
+
+.tf-datebox-container
+{
+	display: inline-block;
+	height: calc(100% - 2px);
+	position: relative;
+	width: calc(100% - 35px);
+}
+
+.tf-datebox-container > input.tf-input-datebox
+{
+	height: 100%;
+	vertical-align: top;
+	width: calc(100% - 20px);
+}
+
+.tf-datebox-container > .tf-icon
+{
+	background-color: silver;
+	cursor: pointer;
+	display: inline-block;
+	height: 16px;
+	margin: 2px;
+	width: 16px;
+}*/
+
+.input-group.tf-datebox > input.form-control {
+	border-right: none;
+}
+
+.input-group-addon.tf-date-picker {
+	background-color: #fff;
+	border-left: none;
+}
+
+.tf-calendar-icon {
+	background-image: url(../img/Icons/calendar.gif);
+	cursor: pointer;
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+}
+
+.tf-popup {
+	position: fixed;
+	display: none;
+	overflow: auto;
+	width: 109px;
+	max-height: 111px;
+	border: 1px solid #c5c5c5;
+	margin-top: 45px;
+	z-index: 1;
+	background-color: #fff;
+	padding: 2px;
+	display: none;
+
+	ul {
+		height: 100%;
+
+		li {
+			display: block;
+			padding: 3px 20px;
+			clear: both;
+			font-weight: normal;
+			line-height: 1.42857143;
+			color: #333;
+			white-space: nowrap;
+			font-size: 12px;
+			min-height: 23px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			cursor: pointer;
+
+			&:hover {
+				color: darkgrey;
+				text-decoration: none;
+				outline: 0;
+				background-color: #DDEDFB;
+			}
+		}
+	}
+}
+.grid-color {
+	border: 1px solid #ccc;
+	padding:8px 4px 6px 8px;
+	height: 80px;
+	overflow: auto;
+	.colorbox {
+		float: left;
+		margin:0 2px 2px 0;
+		width: auto;
+	}
+	.k-colorpicker .k-selected-color {
+		width: 20px;
+		height: 20px;
+	}
+	span.k-widget.k-colorpicker.k-header {
+		width: 20px;
+	}
+
+	.k-picker-wrap.k-state-default {
+		border: none;
+	    width: 20px;
+	    height: 20px;
+	    line-height: 20px;
+	    margin: 0;
+	    padding: 0;
+	}
+
+	.k-picker-wrap .k-select {
+		display: none;
+	}
+
+}
+.k-colorpicker .k-selected-color {
+	border-radius: 0;
+	height: 100%;
+	width: 100%;
+}
+span.k-widget.k-colorpicker.k-header {
+	width: 100%;
+	display: inline-block;
+}

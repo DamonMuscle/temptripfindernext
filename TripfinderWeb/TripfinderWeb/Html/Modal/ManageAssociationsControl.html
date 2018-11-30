@@ -1,0 +1,32 @@
+﻿<div class="row">
+	<div class="col-xs-23 description">
+		<pre class="titleNotify">You can associate this document with one or more records.  To search for a record, specify the Data Type and then use the Quick Filter to search for the record or records you would like to associate with <span data-bind="text:obDocumentText"></span></pre>
+	</div>
+</div>
+<div data-bind="uiInit:$parent.containerLoaded,finish:init">
+	<div class="row list-mover-mover">
+		<div class="col-xs-11">
+			<div class="form-group">
+				<label style="float:left;">Available</label>
+				<div class="iconbutton addremovecolumn" style="float:left;margin-left:5px;" title="Show/Hide Grid Columns" data-bind="click:addRemoveColumnClick"></div>
+			</div>
+			<div>
+				<div data-bind="" class="vertical-size-large kendo-grid-container availablecolumngrid-container kendo-grid">
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-1 vertical-size-large move-button-column">
+			<a data-bind="click:toAllRightClick,css:{disabled:obLeftCount() == 0}" class="btn btn-default btn-sm">&gt;&gt;</a>
+			<a data-bind="click:toRightClick,css:{disabled:!obLeftGridSelected()}" class="btn btn-default btn-sm single">&gt;</a>
+			<a data-bind="click:toLeftClick,css:{disabled:!obRightGridSelected()}" class="btn btn-default btn-sm single">&lt;</a>
+			<a data-bind="click:toAllLeftClick,css:{disabled:obRightCount() == 0}" class="btn btn-default btn-sm">&lt;&lt;</a>
+		</div>
+		<div class="col-xs-11">
+			<div class="form-group">
+				<label>Selected</label>
+				<div data-bind="" class="vertical-size-large vertical-fill kendo-grid-container selectedcolumngrid-container kendo-grid">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

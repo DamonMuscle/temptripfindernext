@@ -1,0 +1,20 @@
+﻿<div data-bind="uiInit:init">
+	<!--ko if:!TF.isPhoneDevice-->
+	<div class="desktop">
+		<div class="content">
+		</div>
+	</div>
+	<!-- /ko -->
+	<!--ko if:TF.isPhoneDevice-->
+	<div class="mobile">
+		<div class="language-options">
+			<div>
+				<div class="english option" data-bind="click:changeOption">ENGLISH</div>
+				<div class="divider">|</div>
+				<div class="spanish option" data-bind="click:changeOption">ESPAÑOL</div>
+			</div>
+		</div>
+		<div class="content"></div>
+	</div>
+	<!-- /ko -->
+</div>

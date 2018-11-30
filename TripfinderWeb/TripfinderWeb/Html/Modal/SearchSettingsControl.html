@@ -1,0 +1,21 @@
+<div class="search-setting-control-container" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="left-panel">
+		<div class="recent-search-num-control">
+			<div class="control-title">
+				<span>Recent Searches Shown</span>
+				<span class="count-label" data-bind="text:obRecentSearchNum"></span>
+			</div>
+			<div class="control-slider">
+				<input type="text" data-provider="slider" data-slider-id="recent-result-number-slider" data-slider-min="0" data-slider-max="10"
+				 data-slider-step="1" data-bind="bootstrapSlider:{value:$data.obRecentSearchNum}">
+				<label>0</label>
+				<label style="float:right;">10</label>
+			</div>
+		</div>
+		<div class="settings-button-control">
+			<span class="control-button clear-recent-searches" data-bind="click:clearUserSearch">Clear Recent Searches</span>
+		</div>
+	</div>
+</div>

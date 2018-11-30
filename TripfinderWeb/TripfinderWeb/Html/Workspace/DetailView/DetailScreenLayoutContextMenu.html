@@ -1,0 +1,41 @@
+<div class="tf-contextmenu-wrap tf-contextmenu-white detail-screen-contextmenu" data-bind="style:{right:obMoveDistance, top:obTop}">
+	<ul class="tf-contextmenu">
+		<!-- ko if: obNewWindow -->
+		<!--ko if :!TF.isMobileDevice-->
+		<li class="menu-item" data-bind="contextMenuClick:newLayoutClick">
+			New
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:editLayoutClick, css:{disabled:obSelectLayoutName() === ''}">
+			Edit
+			<!-- ko if: obSelectLayoutName() !== ""-->
+			(
+			<span data-bind="text:obSelectLayoutName"></span>)
+			<!--/ko -->
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:manageLayoutClick">
+			Manage Layouts
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:resetLayoutClick">
+			Reset
+		</li>
+		<!--ko if: obLayouts().length > 0 -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+		<!--/ko-->
+		<!--/ko -->
+		<!--ko foreach: obLayouts -->
+		<li class="menu-item" data-bind="attr: { title: comments },
+			css:{'menu-item-checked':$data.id()===$parent.obSelectLayoutID()},
+			contextMenuClick:$parent.selectLayoutClick">
+			<div class="text" data-bind="text:name"></div>
+			<div class="check"></div>
+		</li>
+		<!--/ko -->
+		<li class="menu-divider"></li>
+	</ul>
+</div>

@@ -1,0 +1,53 @@
+﻿<div class="doc document-grid" data-bind="uiInit:afterRender">
+	<!--ko if:!obIsHideTitle()-->
+	<div class="toppart gridTop">
+		<!--ko if:obIsDocument-->
+		<div class="edit-title-group" style="line-height: 32px;">
+			<div class="header pull-left" data-bind="text:title">
+			</div>
+			<span>&nbsp;</span>
+		</div>
+		<div class="gridAlert" style="display:none">
+			<button type="button" class="close">
+				&times;
+			</button>
+			<div class="title"></div>
+			<pre class="message titleNotify"></pre>
+		</div>
+		<!-- /ko -->
+		<!--ko with:obGridViewModel-->
+		<div style="height:14px;">
+		</div>
+		<div class="iconrow">
+			<!--ko if:!$parent.obIsDocument()-->
+			<div class="view-grid-header" data-bind="text:$parent.title"></div>
+			<div class="view-grid-header-count">
+				(<span data-bind="text:searchGrid.obFilteredRecordCount()"></span>)
+			</div>
+			<!-- /ko -->
+			<!--ko if:$parent.obCanEdit()-->
+			<button class="iconbutton pencil" title="Edit" data-bind="click:editClick,enable:obIsSelectRow()&&$parent.obEditEnable() "></button>
+			<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick, enable:obIsSelectRow()&&$parent.obEditEnable() "></button>
+			<!-- /ko -->
+			<!--ko if:$parent.obAddDivider()-->
+			<div class="divider"></div>
+			<!-- /ko -->
+			<!--ko if:$parent.obCanAddNew()-->
+			<button class="iconbutton new" data-bind="click:addClick, attr:{title: $parent.obTooltipAddNew || 'New'},enable:$parent.obCanAdd()"></button>
+			<!-- /ko -->
+		</div>
+		<!--/ko-->
+	</div>
+	<!-- /ko -->
+	<!--ko with:obGridViewModel-->
+	<div class="bottompart">
+		<div class="full-height">
+			<div class="kendo-grid kendo-grid-container"></div>
+		</div>
+	</div>
+	<!-- ko if:$data.pageLevelViewModel -->
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<!-- /ko -->
+	<!-- /ko -->
+</div>

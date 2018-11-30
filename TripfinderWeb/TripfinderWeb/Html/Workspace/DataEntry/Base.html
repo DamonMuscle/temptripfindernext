@@ -1,0 +1,33 @@
+﻿<div class="doc document-dataentry" style="height:100%">
+	<div class="clearafter relative z-index-highlight" style="background-color:white" data-bind="css:tf.modalHelper.obZIndexChangeCss">
+		<div class="container row" style="margin-left:0;">
+			<div class="edit-title-group iconrow">
+				<div class="edit-title pull-left" style="margin-left:0;">
+					<span data-bind="text:obPageTitle"></span>
+				</div>
+				<div class="iconbutton copytoclipboard" title="Copy & New" data-bind="click:newCopyClick, visible:obShowNewCopy"></div>
+				<div class="divider" data-bind="visible:obMode()==='Edit'"></div>
+				<div class="iconbutton refresh" title="Refresh" data-bind="click:refreshClick,visible:obMode()==='Edit'"></div>
+				<span class="alert alert-info alert-small" data-bind="visible:obApiIsDirty">unsaved changes</span>
+				<span class="alert alert-danger alert-small" data-bind="visible:obLockMessage,text:obLockMessage"></span>
+				<span class="alert alert-warning alert-small" data-bind="visible:obModifiedMessage,text:obModifiedMessage"></span>
+			</div>
+		</div>
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+	</div>
+	<div class="dataentry-container" data-bind="css:obContentDivHeight">
+		<div class="container" data-bind="template:{name:dataEntryTemplateName,afterRender:initialize}">
+		</div>
+	</div>
+	<div class="edit-bottombar relative z-index-highlight" data-bind="css:tf.modalHelper.obZIndexChangeCss">
+		<div class="container">
+			<div class="row">
+				<button type="submit" class="btn tf-btn-black" data-bind="click:saveClick, enable:editable">Save</button>
+				<button type="submit" class="btn btn-link" data-bind="click:saveAsTemplateClick, visible:obNeedSaveTemplate, enable:editable">Save as Template</button>
+				<button type="submit" class="btn btn-link" data-bind="click:saveAndCloseClick, visible:obNeedSaveAndClose, enable:editable">Save & Close</button>
+				<button type="button" class="btn btn-link" data-bind="click:closeClick" role="close">Close</button>
+			</div>
+		</div>
+	</div>
+</div>

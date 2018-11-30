@@ -1,0 +1,863 @@
+.k-mobile .page-container {
+	overflow-x: hidden;
+}
+
+html,
+body {
+	height: 100%;
+	float: left;
+	position: relative;
+}
+
+.page-container {
+	height: 100%;
+	float: left;
+	overflow: hidden;
+	-ms-overflow-style: scrollbar;
+	width: calc(~"100% - 60px");
+	position: relative;
+
+	.resizable-page {
+		height: 100%;
+		float: left;
+		width: 100%;
+		display: flex;
+
+		.left-page,
+		.right-page {
+			height: 100%;
+			overflow: unset;
+
+			.grid-page,
+			.other-page {
+				height: 100%;
+				width: 100%;
+			}
+		}
+
+		.right-page {
+			margin-left: 3px;
+			overflow: auto;
+		}
+
+		.resize-handler {
+			position: absolute;
+			left: 0;
+			width: 3px;
+			height: 100%;
+			background-color: #4b4b4b;
+			cursor: ew-resize;
+			z-index: 1040;
+
+			.sliderbar-button {
+				position: absolute;
+				left: 0;
+				top: calc(~"50% - 19.5px");
+				width: 44px;
+				height: 39px;
+				background-color: transparent;
+				background: linear-gradient(90deg, #484848, #484848) no-repeat left center / 8px 39px;
+				border-radius: 0;
+				cursor: pointer;
+
+				&.slider-tapped,
+				&:hover {
+					background: repeating-linear-gradient(90deg, #868686, #868686 1px, #4b4b4b 1px, #4b4b4b 4px) no-repeat 16px center / 9px 18px, #4b4b4b !important;
+				}
+			}
+		}
+	}
+
+	.main-body {
+		height: 100%;
+		width: 100%;
+
+		.icon {
+			width: 16px;
+			height: 20px;
+			float: left;
+			margin-right: 5px;
+			cursor: pointer;
+			background-position-y: 2px;
+			background-repeat: no-repeat;
+		}
+
+		.page-container {
+			height: 100%;
+			width: 100%;
+
+			.desktop-header {
+				height: auto;
+				border-bottom: 2px solid #f2f2f2;
+				padding: 0 16px;
+				font-family: "SourceSansPro-SemiBold";
+				font-weight: bold;
+				float: left;
+				width: 100%;
+
+				.page-title {
+					letter-spacing: 3px;
+					font-size: 26px;
+					color: #262626;
+					line-height: 54px;
+					white-space: nowrap;
+					height: 54px;
+					text-transform: uppercase;
+					float: left;
+				}
+
+				.new-request {
+					width: 140px;
+					height: 30px;
+					border: 1px solid @systemColor;
+					border-radius: 5px;
+					font-size: 14px;
+					color: @systemColor;
+					float: right;
+					line-height: 26px;
+					font-weight: 400;
+					text-align: center;
+					margin-top: 14px;
+					cursor: pointer;
+				}
+			}
+
+			.scheduler-wrap {
+				height: calc(~"100% - 90px");
+				margin-left: 3px;
+				float: left;
+
+				.scheduler-container {
+					height: 100%;
+
+					div.k-event{
+						border-color: rgb(213, 213, 213) !important;
+						&.selected {
+							border-color: black !important;
+						}
+					}
+
+					td.selected {
+						border: 1px solid black !important;
+					}
+
+					.k-scheduler-mark{
+						border: 1px solid rgb(213, 213, 213);
+					}
+				}
+
+				.stage-option {
+					width: 100%;
+					position: relative;
+					right: 0;
+					margin-bottom: 10px;
+
+					.content {
+						display: inline-block;
+
+						.stage-color {
+							display: inline-block;
+							height: 15px;
+							width: 15px;
+							margin-right: .2em;
+							border: 1px solid rgb(213, 213, 213);
+							float: left;
+						}
+
+						.stage-name {
+							float: left;
+						}
+
+						.stage-check-box {
+							float: left;
+							margin-top: 2px;
+							margin-left: 4px;
+							margin-right: 20px;
+						}
+					}
+
+					input {
+						margin-right: 20px;
+					}
+				}
+
+				.kendoscheduler {
+					height: 100%;
+
+					.k-scheduler-content {
+						overflow-x: hidden;
+					}
+				}
+
+				.k-nav-current > .k-link span + span {
+					max-width: 200px;
+				}
+			}
+
+			.grid-icons,
+			.scheduler-icon {
+				float: left;
+				width: 100%;
+				padding: 0 16px;
+				border: none !important;
+			}
+
+			.grid-wrap {
+				width: 100%;
+				float: left;
+				height: calc(~"100% - 86px");
+			}
+		}
+
+		.setting-configuration {
+			background-color: #fff;
+			width: 100%;
+			height: 100%;
+
+			.text-label {
+				margin-left: -10px !important;
+			}
+
+			.setting-title {
+				@media (max-width: 400px) {
+					.fontSize(1, 10);
+				}
+
+				color: #884a9c;
+				font-weight: bold;
+				.fontSize(2, 1);
+				line-height: 80px;
+				padding: 0 15px;
+			}
+
+			.edit-content {
+				overflow-y: auto;
+				height: calc(~"100% - 96px");
+
+				.row {
+					margin-left: 0;
+					margin-right: 0;
+				}
+
+				label {
+					.fontSize(1, 1);
+				}
+
+				input[type="checkbox"] {
+					margin-top: 6px;
+				}
+
+				.slider-bottom-bar > div {
+					.fontSize(1, 1);
+				}
+			}
+
+			.edit-footer {
+				float: left;
+				width: 100%;
+				height: 20px;
+				padding-right: 16px;
+				padding-left: 15px;
+				margin-bottom: 22px;
+				margin-top: 20px;
+
+				.version,.divider,.release-notes{
+					float: right
+				}
+				.release-notes {
+					color: @systemColor;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+}
+
+html,
+body {
+	min-height: 640px;
+}
+
+html {
+	height: 100%;
+	width: 100%;
+	font-size: 14px;
+}
+
+body {
+	font-family: "SourceSansPro-Regular", Arial;
+	min-width: 1185px;
+	overflow-x: auto;
+	font-size: 13px;
+	position: relative;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	float: left;
+
+	.tfmodal-container {
+		font-size: 12px;
+	}
+}
+
+@media (min-height: 850px) {
+	.visible-lg-block {
+		display: block !important;
+	}
+
+	.visible-xs-block,
+	.visible-sm-block {
+		display: none !important;
+	}
+}
+
+@media (min-height: 760px) and (max-height: 849px) {
+	.visible-sm-block {
+		display: block !important;
+
+		.visible-xs-block,
+		.visible-lg-block {
+			display: none !important;
+		}
+	}
+}
+
+@media (min-height: 670px) and (max-height: 759px) {
+	.visible-xs-block {
+		display: block !important;
+	}
+
+	.visible-sm-block,
+	.visible-lg-block {
+		display: none !important;
+	}
+}
+
+@media (max-height: 669px) {
+	.visible-xs-block,
+	.visible-sm-block,
+	.visible-lg-block {
+		display: none !important;
+	}
+}
+
+#loadingindicator {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: @view-loadingindicator-z-index;
+	position: fixed;
+
+
+	> .overlay {
+		background: rgba(102, 102, 102, 0.8);
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+
+	.spinner {
+		position: absolute;
+		margin: auto;
+		left: 0;
+		right: 0;
+		top: 40%;
+		overflow: visible;
+		opacity: 0.8;
+		border-radius: 2px;
+		display: flex;
+		width: 148px;
+		height: auto;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+
+		.subtitle {
+			/* the subtitle starts off hidden */
+			/* center the subtitle region.
+		It's max width is 350px */
+			margin-top: -5px;
+			width: 350px;
+		}
+
+		.subtitle-text {
+			/* Text style */
+			color: white;
+			font-size: 18pt;
+			font-weight: regular;
+			/* Center the text, center the div */
+			display: table;
+			margin-left: auto;
+			margin-right: auto;
+			text-align: center;
+		}
+	}
+
+	.spinner-icon {
+		display: flex;
+	}
+
+	.spinner-icon-container {
+		height: 50px;
+		width: 44px;
+	}
+
+	&.no-overlay {
+		position: initial;
+
+		> .overlay {
+			position: initial;
+		}
+	}
+}
+
+.titleNotify {
+	background: none;
+	color: #666666;
+	font-size: 12px;
+	border: 0;
+	padding: 0;
+	word-break: normal;
+	white-space: pre-wrap;
+	font-family: "SourceSansPro-Regular", Arial;
+}
+
+.modal-open .modal1 {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.modal1 {
+	display: none;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: @ent-modal1-z-index;
+	-webkit-overflow-scrolling: touch;
+	outline: 0;
+}
+
+.form-control {
+	height: 22px;
+	padding: 2px 8px;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	-webkit-appearance: none;
+}
+
+.page-header {
+	background-color: #F7F7F7;
+	padding: 5px 10px;
+	margin: 0;
+	position: relative;
+	height: 55px;
+	border-bottom: 1px solid silver;
+
+	h2 {
+		margin: 0;
+		color: #666666;
+		line-height: 30px;
+		font-size: 24px;
+
+		> .title {
+			background: url("../img/Transfinder-TripfinderText-Only.png") no-repeat center/100%;
+			background-size: 100% 100%;
+			display: block;
+			height: 43px;
+			width: 70px;
+			position: absolute;
+		}
+	}
+}
+
+.progressbar {
+	display: none !important;
+}
+
+.infuser-loading {
+	display: none !important;
+}
+
+.tf-contextmenu .menu-item.menu-item-quick-filter .menu-label:not(:last-child)::after {
+	display: none;
+}
+
+.tf-contextmenu .menu-item .menu-label .hotkey {
+	position: absolute;
+	left: 75%;
+	opacity: 0.8;
+	font-size: xx-small;
+}
+
+.k-calendar-button-theme {
+	opacity: 1;
+	color: @systemColor;
+}
+
+.k-animation-container .k-calendar .k-header .k-link.k-nav-fast {
+	font-weight: bold;
+}
+
+.k-animation-container .k-calendar .k-footer .k-nav-today,
+.k-animation-container .k-calendar .k-link.k-nav-fast {
+	opacity: 1;
+	color: @systemColor;
+}
+
+.bootstrap-datetimepicker-widget .timepicker a {
+	opacity: 1;
+	color: @systemColor;
+}
+
+.bootstrap-datetimepicker-widget .timepicker .btn-primary {
+	opacity: 1;
+	background-color: @systemColor;
+	border-color: @systemColor;
+}
+
+.bootstrap-datetimepicker-widget .timepicker .btn-primary:hover {
+	background-color: @systemColor;
+}
+
+.bootstrap-datetimepicker-widget .picker-switch {
+	color: @systemColor;
+}
+
+.bootstrap-datetimepicker-widget a[data-action='togglePicker'] {
+	color: @systemColor;
+}
+
+@iconrow-padding-top: 3px;
+@iconrow-padding-bottom: 3px;
+@inner-height: @iconrow-padding-top+@iconrow-padding-bottom;
+
+.main-body {
+	height: 100%;
+
+	.data-points-panel .page-title,
+	.dashboard-page-title,
+	.setting-configuration .page-title {
+		padding-left: 16px;
+		font-weight: bold;
+		letter-spacing: 3px;
+		font-size: 26px;
+		color: #262626;
+		line-height: 56px;
+		white-space: nowrap;
+		font-family: "SourceSansPro-SemiBold";
+		height: 56px;
+		border-bottom: 2px solid #f2f2f2;
+	}
+
+	.document-grid {
+		height: 100%;
+		background-color: #fff;
+		position: relative;
+
+		.document-dataentry.page-level-message-container {
+			position: fixed;
+			z-index: 20000;
+		}
+
+		.search-grid {
+			height: calc(~"100% - 30px");
+
+			.tf-searchgrid-container {
+				height: calc(~"100% - 18px");
+			}
+		}
+
+		.iconrow {
+			margin: 0;
+			padding-top: @iconrow-padding-top;
+			padding-bottom: @iconrow-padding-bottom;
+			float: left;
+			white-space: nowrap;
+			height: 28px;
+
+			.disabled {
+				pointer-events: auto;
+				opacity: 0.4;
+			}
+
+			.glyphicon {
+				font-size: 17px;
+				padding: 3px 5px;
+			}
+		}
+
+		.infuser-loading {
+			display: none;
+		}
+
+		.gridrow {
+			height: 100%;
+			position: relative;
+			overflow-x: hidden;
+
+			.kendo-grid {
+				border-width: 0;
+
+				&.kendo-summarygrid-container {
+					border-top-width: 2px;
+				}
+			}
+		}
+
+		.splitmap {
+			height: 100%;
+			width: 50%;
+			z-index: 1000;
+			margin-left: 2px;
+			min-width: 580px;
+		}
+	}
+
+	.view-form-grid.small {
+		.document-grid {
+			.iconrow {
+				float: inherit;
+				white-space: inherit;
+				height: inherit;
+			}
+		}
+	}
+
+	.sliderbar-button-wrap {
+		visibility: hidden;
+	}
+}
+
+.checkbox > label {
+	line-height: 1.8;
+}
+
+.radio > label {
+	line-height: 1.8;
+}
+
+.fieldtrip-status {
+	button {
+		&.other.btn-link {
+			float: left !important;
+			margin-left: 0;
+		}
+
+		&.negative {
+			float: right;
+			margin-right: 30px;
+			margin-top: 4px;
+			margin-left: 0;
+		}
+
+		&.positive {
+			float: right;
+		}
+	}
+
+	textarea {
+		margin: 10px 0;
+	}
+
+	small.help-block {
+		margin-bottom: 0;
+		position: absolute;
+		bottom: 20px;
+		top: auto;
+	}
+}
+
+.k-mobile {
+	.kendo-grid.summarybar-showing .k-pager-wrap {
+		bottom: -66px;
+		left: -1px;
+	}
+
+	.kendo-summarygrid-container .k-grid-header {
+		left: -1px;
+	}
+}
+
+.document-grid.page-container {
+	overflow-x: hidden;
+}
+
+.modal-body.saveNewThematic-modal .thematic-name {
+	height: 64px;
+}
+
+.modal-body .thematic-name {
+	margin-bottom: 5px;
+
+	&.has-error {
+		input {
+			border-color: #E71931;
+
+			&.delay-show {
+				border-color: #bcbcbc;
+			}
+		}
+	}
+
+	label {
+		width: 100%;
+		font-weight: bold;
+		color: #333333;
+		font-size: 14px;
+		font-family: "SourceSansPro-SemiBold";
+		padding-top: 3px;
+	}
+
+	input {
+		width: 100%;
+		font-size: 15px;
+		border: none;
+		border-bottom: 1px solid #bcbcbc;
+		outline-color: transparent;
+		color: #333333;
+		padding-bottom: 4px;
+		height: 24px;
+	}
+
+	.help-block {
+		font-family: "SourceSansPro-Italic";
+	}
+
+	small.help-block {
+		font-size: 10px;
+		padding-bottom: 6px;
+		color: #E71931 !important;
+
+		&.always-show {
+			display: block !important;
+		}
+
+		&.always-hide {
+			display: none !important;
+		}
+	}
+}
+
+.help-block {
+	margin-bottom: 0;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.resources .grid-staterow {
+	margin-right: 20px;
+}
+
+.document-dataentry .tf-btn-black {
+	margin-left: 15px;
+}
+
+.setting-configuration #cluster-zoom-level-slider {
+	width: 100%;
+}
+
+.legal-link {
+	display: block;
+	cursor: pointer;
+	font-size: 14px;
+	float: left;
+}
+
+.version {
+	float: right;
+}
+
+.detail-view-panel {
+	height: 100%;
+
+	.detail-view {
+		height: 100%;
+	}
+}
+
+.k-state-selected,
+.k-state-selected:link,
+.k-state-selected:visited,
+.k-list > .k-state-selected,
+.k-list > .k-state-highlight,
+.k-panel > .k-state-selected,
+.k-ghost-splitbar-vertical,
+.k-ghost-splitbar-horizontal,
+.k-draghandle.k-state-selected:hover,
+.k-scheduler .k-scheduler-toolbar .k-state-selected,
+.k-scheduler .k-today.k-state-selected,
+.k-marquee-color {
+	background-color: @systemColor;
+	border-color: @systemColor;
+}
+
+.scheduler-wrap {
+	.k-link {
+		outline: 0;
+		text-decoration: none;
+	}
+
+	.k-nonwork-hour {
+		background-color: #fff;
+
+		&.k-today {
+			background-color: #f8f8f8;
+		}
+	}
+}
+
+.tf-contextmenu .menu-item .field-trip-color {
+	height: 10px;
+	width: 10px;
+	float: left;
+	margin-left: 10px;
+	margin-top: 6px;
+	margin-right: 5px;
+	border: 1px solid rgb(213, 213, 213);
+}
+
+.k-scheduler-toolbar > ul li:first-child,
+.k-scheduler-toolbar > ul li:first-child .k-link,
+.k-scheduler-toolbar > ul.k-scheduler-views li:first-child + li,
+.k-scheduler-toolbar > ul.k-scheduler-views li:first-child + li .k-link {
+	border-radius: 0;
+}
+
+.k-scheduler-toolbar .k-nav-next,
+.k-scheduler-toolbar ul + ul li:last-child,
+.k-scheduler-toolbar .k-nav-next .k-link,
+.k-scheduler-toolbar ul + ul li:last-child .k-link {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+@media only screen and (max-width: 480px) {
+	.k-webkit .k-scheduler-toolbar li.k-nav-current .k-sm-date-format,
+	.k-ff .k-scheduler-toolbar li.k-nav-current .k-sm-date-format,
+	.k-ie11 .k-scheduler-toolbar li.k-nav-current .k-sm-date-format,
+	.k-safari .k-scheduler-toolbar li.k-nav-current .k-sm-date-format {
+		display: inline;
+	}
+}
+
+.k-mobile .scheduler-wrap {
+	@media (max-width: 767px) {
+		height: calc(~"100% - 146px") !important;
+		margin-right: 3px;
+	}
+}
+
+.detail-view-panel {
+	.k-grid-content, .k-grid-header-wrap {
+		width: auto !important;
+	}
+}

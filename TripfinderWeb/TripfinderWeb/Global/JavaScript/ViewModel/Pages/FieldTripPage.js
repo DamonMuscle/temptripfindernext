@@ -1,0 +1,78 @@
+(function()
+{
+	createNamespace("TF.Page").FieldTripPage = FieldTripPage;
+
+	function FieldTripPage(gridOptions)
+	{
+		var self = this;
+		self.type = "fieldtrip";
+		self.pageType = "fieldtrips";
+		self.gridOptions = gridOptions;
+		TF.Page.BaseGridPage.apply(self, arguments);
+		self.changeStatusButton = true;
+		self.copyButton = true;
+		self.detailButton = true;
+		self.schedulerButton = true;
+	}
+
+	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
+	FieldTripPage.prototype.constructor = FieldTripPage;
+
+	FieldTripPage.prototype.updateOptions = function()
+	{
+		var self = this;
+		if (self.gridOptions)
+		{
+			self.options.fromSearch = self.gridOptions.fromSearch;
+			self.options.searchFilter = self.gridOptions.searchFilter;
+			self.options.filteredIds = self.gridOptions.filteredIds;
+		}
+		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
+		self.options.showOmittedCount = true;
+		self.options.isGridView = true;
+		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip");
+		self.options.extraFields = ["FieldTripStageId"];
+		self.options.loadUserDefined = false;
+		self.options.supportMobileMultipleSelect = true;
+
+		self.options.summaryFilters = [{
+			Id: -1,
+			Name: "Today",
+			IsValid: true
+		},
+		{
+			Id: -2,
+			Name: "Vehicle Scheduled",
+			IsValid: true
+		},
+		{
+			Id: -3,
+			Name: "Pending Approval",
+			IsValid: true,
+			WhereClause: " FieldTripStageId = 1 or FieldTripStageId = 3 or FieldTripStageId = 5 or FieldTripStageId = 7",
+			GridType: self.type
+		},
+		{
+			Id: -4,
+			Name: "Declined",
+			IsValid: true,
+			WhereClause: "FieldTripStageId = 2 or FieldTripStageId = 4 or FieldTripStageId = 6 or FieldTripStageId = 98",
+			GridType: self.type
+		},
+		{
+			Id: -5,
+			Name: "Total",
+			IsValid: true,
+			WhereClause: "FieldTripStageId != 100",
+			GridType: self.type
+		},
+		{
+			Id: -6,
+			Name: "Transportation Approved",
+			IsValid: true,
+			WhereClause: "FieldTripStageId = 99",
+			GridType: self.type
+		}
+		];
+	};
+})();

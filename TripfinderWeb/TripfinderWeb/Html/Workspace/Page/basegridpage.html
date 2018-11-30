@@ -1,0 +1,86 @@
+﻿<div data-bind="uiInit:init" class="document-grid page-container">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<!-- ko if:TF.isPhoneDevice-->
+	<div class="mobile-header">
+		<div class="icon logo"></div>
+		<div class="icon float-right menu" data-bind="click:openNavigationClick"></div>
+		<div class="icon float-right add" data-bind="click:addClick"></div>
+	</div>
+	<!-- /ko -->
+	<div class="desktop-header">
+		<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
+		<!-- ko if:!TF.isPhoneDevice-->
+		<div class="new-request" data-bind="click : addClick,visible:type === 'fieldtrip'&&!obShowFieldTripDEPanel()">Submit New Request</div>
+		<!-- /ko -->
+	</div>
+	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
+		<div class="iconrow">
+			<!-- ko if: pageType !== "reports"-->
+			<button class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
+			<!-- ko if:detailButton-->
+			<button class="iconbutton details" title="Detail View" data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
+			<!-- /ko -->
+			<!-- ko if:schedulerButton-->
+			<button class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></button>
+			<!-- /ko -->
+			<div class="divider" title=""></div>
+			<button class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></button>
+			<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
+			<button class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
+			<button class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
+			<!-- ko if: changeStatusButton || cancelButton-->
+			<div class="divider" title=""></div>
+			<!-- /ko -->
+			<!-- ko if: changeStatusButton-->
+			<button class="iconbutton approve" title="Change Status" data-bind="enable:selectedItemsEditable"></button>
+			<!-- /ko -->
+			<!-- ko if: cancelButton-->
+			<button class="iconbutton cancel" title="Cancel Trip" data-bind="enable:selectedItemsEditable"></button>
+			<!-- /ko -->
+			<!-- ko if: copyButton-->
+			<button class="iconbutton copy" title="Copy Trip" data-bind="enable:obCanCopyFieldTrip"></button>
+			<!-- /ko -->
+			<!-- /ko -->
+			<!-- ko if: pageType != "reports"-->
+			<div class="divider" title=""></div>
+			<button class="iconbutton refresh" title="Refresh"></button>
+			<!-- /ko -->
+			<!-- ko if: pageType === "reports"-->
+			<button class="iconbutton mail" title="Email" data-bind="enable:obIsSelectRow"></button>
+			<button class="iconbutton file" title="Export to File" data-bind="enable:obIsSelectRow"></button>
+			<button class="iconbutton vReport" title="View Report" data-bind="enable:obIsSelectRow"></button>
+			<!-- /ko -->
+		</div>
+		<!-- ko if: pageType !== "reports"-->
+		<div class="pull-right grid-staterow-wrap">
+			<div class="grid-staterow">
+				<div class="grid-staterow-status text-overflow filter">
+					<span class="title pull-left">Filter:</span>
+					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
+						  style="max-width:150px;"></span>
+					<!-- ko if:obSelectedGridFilterModifiedMessage -->
+					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
+					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
+					<span data-bind="visible:noApplyFilterNoModified" class="right-parenthesis-no-padding">)</span>
+					<!-- /ko -->
+				</div>
+				<div class="grid-staterow-status text-overflow layout">
+					<span class="comma-split">,&nbsp;</span>
+					<span class="title">Layout:</span>
+					<span data-bind="text:obSelectedGridLayoutName,attr:{'title':obSelectedGridLayoutName}"></span>
+					<!-- ko if:obSelectedGridLayoutModified -->
+					<span class="left-parenthesis-no-padding">(</span>
+					<span class="modified" data-bind="text:obSelectedGridLayoutModified"></span>
+					<span class="right-parenthesis-no-padding">)</span>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+	<div class="grid-wrap">
+		<div class="kendo-grid kendo-grid-container"></div>
+		<div class="kendo-grid kendo-summarygrid-container" data-bind="visible:obSummaryGridVisible()"></div>
+	</div>
+</div>

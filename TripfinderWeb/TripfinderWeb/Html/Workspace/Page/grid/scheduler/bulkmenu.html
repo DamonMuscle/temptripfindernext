@@ -1,0 +1,44 @@
+﻿<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
+		<ul class="tf-contextmenu grid-menu">
+			<!-- ko if:gridViewModel.changeStatusButton || gridViewModel.cancelButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()||!gridViewModel.obRightClickOnSelected()}">
+				<div class="menu-icon edit">
+				</div>
+				<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
+			</li>
+			<!-- /ko -->
+			<!-- ko if:gridViewModel.changeStatusButton||gridViewModel.cancelButton-->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!-- ko if:gridViewModel.changeStatusButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editFieldTripStatus.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()||!gridViewModel.obRightClickOnSelected()}">
+				<div class="menu-icon approve">
+				</div>
+				<div class="menu-label" data-bind="text:'Change Status'">
+					<span class="hotkey"></span>
+				</div>
+			</li>
+			<!-- /ko -->
+			<!-- ko if:gridViewModel.cancelButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()||!gridViewModel.obRightClickOnSelected()}">
+				<div class="menu-icon decline">
+				</div>
+				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+					<span class="hotkey"></span>
+				</div>
+			</li>
+			<!-- /ko -->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<!-- /ko -->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetailsClick.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected()||!gridViewModel.obRightClickOnSelected()}">
+				<div class="menu-icon showdetails">
+				</div>
+				<div class="menu-label" data-bind="text:'Detail View'"></div>
+			</li>
+		</ul>
+	</div>
+</div>

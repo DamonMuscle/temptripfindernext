@@ -1,0 +1,42 @@
+﻿<div class="row">
+	<div class="col-xs-24 description" data-bind="text:description"></div>
+</div>
+<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+<!-- /ko -->
+<div data-bind="uiInit:init">
+	<div class="row list-mover-mover">
+		<div class="col-xs-11">
+			<div class="form-group">
+				<div class="clearfix">
+					<label style="float:left;" class="bold-Label"><span data-bind="text:availableTitle"></span></label>
+					<div class="iconbutton addremovecolumn" style="float:left; margin-left:3px;" title="Show/Hide Grid Columns" data-bind="visible:obshowRemoveColumnButton,click:addRemoveColumnClick"></div>
+					<div class="iconbutton new" style="float:left; margin-left:3px;" title="New" data-bind="visible:obDisplayAddButton,click:onAddClick"></div>
+				</div>
+				<div class="checkbox list-mover-grid-right-label" data-bind="visible:obDisplayCheckbox">
+					<label>
+						<input type="checkbox" data-bind="checked:obShowEnabled,click:onEnableCheckboxClick">
+						<!--ko text:obFilterCheckboxText --><!--/ko-->
+					</label>
+				</div>
+				<div data-bind="" class="vertical-size-large kendo-grid-container availablecolumngrid-container kendo-grid ">
+				</div>
+
+			</div>
+		</div>
+		<div class="col-xs-1 vertical-size-large move-button-column">
+			<a data-bind="click:toAllRightClick,css:{disabled:obLeftCount() == 0}" class="btn btn-default btn-sm">&gt;&gt;</a>
+			<a data-bind="click:toRightClick,css:{disabled:!obLeftGridSelected()}" class="btn btn-default btn-sm single">&gt;</a>
+			<a data-bind="click:toLeftClick,css:{disabled:!obRightGridSelected()||obIsInoperableSelected()}" class="btn btn-default btn-sm single">&lt;</a>
+			<a data-bind="click:toAllLeftClick,css:{disabled:obRightCount() == 0}" class="btn btn-default btn-sm">&lt;&lt;</a>
+		</div>
+		<div class="col-xs-11 without-filter-grid-bottom">
+			<div class="form-group">
+				<label class="bold-Label"><span data-bind="text:selectedTitle"></span></label>
+				<!--<div class="checkbox list-mover-grid-right-label" style="width: 100px;height: 20px">
+				</div>-->
+				<div data-bind="" class="vertical-size-large vertical-fill grid-container selectedcolumngrid-container kendo-grid">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

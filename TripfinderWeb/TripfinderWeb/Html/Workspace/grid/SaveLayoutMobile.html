@@ -1,0 +1,79 @@
+﻿<div data-bind="uiInit:initialize">
+	<div class="view-finder mobile-modal-grid-body hide" data-bind="css:{show:obStatus()==='layout'}">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 close-btn" data-bind="click:$parent.negativeClick.bind($parent)">Cancel</label>
+			<label class="col-xs-16 text-center"><b data-bind="text:isNew === 'new'?'SAVE AS NEW LAYOUT':'EDIT LAYOUT'"></b></label>
+			<label class="col-xs-4 top-right" data-bind="click:$parent.positiveClick.bind($parent)">Save</label>
+		</div>
+		<div class="mobile-modal-content-body" id="saveLayoutContentBody">
+			<div class="mobile-modal-grid-description">
+				<div class="search-group" data-bind="text:$parent.description">
+				</div>
+			</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option form-group'>
+					<label class="requirestar bold">Name</label>
+					<input type="text" data-bind="value: gridLayoutExtendedDataModel.name" name="layoutName" class="form-control text-right" required>
+				</div>
+			</div>
+			<div class="mobile-modal-group-head">
+			</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option' data-bind="click:gotoSelectFilter">
+					<label class="bold">Filter</label>
+					<div class="flex-column">
+						<div class="text-right">
+							<span style="float: right;">&nbsp;></span>
+							<span class="current-filter-name" style=" max-width: 200px;float: right;" data-bind="text:obSelectedGridFilterDataModel().name()"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mobile-modal-group-head">
+				Description
+			</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option form-group one-child'>
+					<textarea style="height:100px;" data-bind="value:gridLayoutExtendedDataModel.description"></textarea>
+				</div>
+			</div>
+			<div class="mobile-modal-group-head">
+			</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option form-group'>
+					<label class="bold">Apply Layout changes on save</label>
+					<label class="switch">
+						<input type="checkbox" data-bind="checked:obApplyOnSave">
+						<div class="slider round">
+							<div class="slider-block"></div>
+						</div>
+					</label>
+				</div>
+			</div>
+			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}">
+			</div>
+		</div>
+	</div>
+	<div class="view-finder mobile-modal-grid-body hide" data-bind="css:{show:obStatus()==='selectfilter'}">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 close-btn" data-bind="click:goToLayout">Cancel</label>
+			<label class="col-xs-16 text-center"><b>SELECT FILTER</b></label>
+			<label class="col-xs-4"></label>
+		</div>
+		<div class="mobile-modal-grid-description">
+			<div class="search-group">
+				<input type="text" placeholder="Search" data-bind="value:obSearchFilter,valueUpdate:'input'">
+				<button class="delete" data-bind="visible:obSearchFilter().length>0,click:emptySearchFilter">x</button>
+			</div>
+		</div>
+		<div class="mobile-modal-content-body has-search">
+			<div class="mobile-modal-grid-select-option-wrap" data-bind="foreach:obFilterDataList">
+				<div class='mobile-modal-grid-select-option' data-bind="click:$parent.selectFilter.bind($parent)">
+					<div class="current-filter-name" data-bind="text:name"></div>
+				</div>
+			</div>
+			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}">
+			</div>
+		</div>
+	</div>
+</div>

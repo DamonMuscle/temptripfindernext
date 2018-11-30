@@ -1,0 +1,108 @@
+<div class="tf-contextmenu-wrap overflowmenu-wrap phone-wrap">
+	<ul class="tf-contextmenu">
+		<li class="menu-divider"></li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.refreshClick">
+			<div class="menu-icon iconbutton refresh">
+			</div>
+			<div class="menu-label">
+				Refresh
+			</div>
+		</li>
+		<li class="menu-divider"><div class="rule"></div></li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.summarybarIconClick">
+			<div class="menu-icon iconbutton summarybarMobile" data-bind="css:{open:searchGrid.obSummaryGridVisible()}">
+			</div>
+			<div class="menu-label">
+				Summary Bar
+				<span class="iconbutton checkmark" data-bind="visible:searchGrid.obSummaryGridVisible()"></span>
+			</div>
+		</li>
+		<li class="menu-divider"><div class="rule"></div></li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.allSelection.bind(searchGrid)">
+			<div class="menu-icon iconbutton select-all">
+			</div>
+			<div class="menu-label">
+				Select All Records
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.invertSelection.bind(searchGrid)">
+			<div class="menu-icon iconbutton invert">
+			</div>
+			<div class="menu-label">
+				Invert Selected Records
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.getSelectedIds().length>0 ? searchGrid.omitSelection.bind(searchGrid) : gridViewModel.unClickAble,css:{disabledToUse:searchGrid.getSelectedIds().length === 0}">
+			<div class="menu-icon iconbutton omit">
+			</div>
+			<div class="menu-label">
+				Omit Selected Records
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearSelection.bind(searchGrid)">
+			<div class="menu-icon iconbutton clear-selection">
+			</div>
+			<div class="menu-label">
+				Clear All Records
+			</div>
+		</li>
+		<li class="menu-divider"><div class="rule"></div></li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
+			<div class="menu-icon iconbutton newCopy">
+			</div>
+			<div class="menu-label">
+				Copy
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:gridViewModel.saveAsClick">
+			<div class="menu-icon iconbutton save">
+			</div>
+			<div class="menu-label">
+				Save As
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:gridViewModel.sendEmailClick, 
+			css:{
+				disabledToUse:!gridViewModel.obEmail(),
+				hidden: ((
+                            gridViewModel.type === 'busfinderhistorical' ||
+                            gridViewModel.type === 'altsite' ||
+                            gridViewModel.type === 'district' ||
+                            gridViewModel.type === 'trip' ||
+                            gridViewModel.type === 'tripstop' ||
+                            gridViewModel.type === 'vehicle'
+                        ) 
+                        && 
+                        !gridViewModel.obEmail())
+				
+			}">
+			<div class="menu-icon iconbutton email">
+			</div>
+			<div class="menu-label">
+				Email
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:gridViewModel.sendToClick">
+			<div class="menu-icon iconbutton sendTo">
+			</div>
+			<div class="menu-label">
+				Send To
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.getSelectedIds().length>0 ? gridViewModel.openSelectedClick : gridViewModel.unClickAble, css:{disabledToUse:searchGrid.getSelectedIds().length === 0}">
+			<div class="menu-icon iconbutton new-grid-with-selected-records">
+			</div>
+			<div class="menu-label">
+				New Grid
+			</div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:gridViewModel.viewReportClick, css:{disabledToUse:!gridViewModel.obReportLists()}">
+			<div class="menu-icon iconbutton viewReport">
+			</div>
+			<div class="menu-label">
+				View Report
+			</div>
+		</li>
+		<li class="menu-divider"></li>
+	</ul>
+</div>

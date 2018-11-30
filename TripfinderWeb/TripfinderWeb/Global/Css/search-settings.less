@@ -1,0 +1,134 @@
+.modal-body.searchSettings-modal {
+	.search-setting-control-container {
+		height: 100%;
+		font-family: "SourceSansPro-Regular";
+		font-size: 14px;
+
+		&>div {
+			float: left;
+			width: 325px;
+			height: 100%;
+		}
+
+		.left-panel {
+			float: left;
+			padding-top: 10px;
+
+			&>div {
+				height: 90px;
+			}
+
+			.recent-search-num-control {
+				#recent-result-number-slider {
+					height: 100%;
+				}
+			}
+
+			.settings-button-control {
+				padding-top: 15px;
+				color: @systemColor;
+				height: 40px;
+
+				span.control-button {
+					font-family: "SourceSansPro-SemiBold";
+					color: @systemColor;
+					cursor: pointer;
+				}
+			}
+
+			.control-title {
+				margin-bottom: 10px;
+				font-family: "SourceSansPro-SemiBold";
+
+				span.count-label {
+					float: right;
+				}
+			}
+		}
+
+		.control-checkbox {
+			display: block;
+			position: relative;
+			height: 18px;
+			width: 18px;
+			cursor: pointer;
+			font-size: 22px;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+
+			&:hover input~.checkmark {
+				background-color: #e4e4e4;
+			}
+
+			input:checked~.checkmark {
+				&:after {
+					display: block;
+				}
+			}
+
+			input {
+				display: none;
+			}
+
+			.checkmark {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 18px;
+				width: 18px;
+				background: #fff;
+				border: 1px solid #999;
+				cursor: pointer;
+
+				&:after {
+					content: "";
+					position: absolute;
+					display: none;
+					left: 5px;
+					top: 2px;
+					width: 5px;
+					height: 10px;
+					border: solid #333;
+					border-width: 0 3px 3px 0;
+					-webkit-transform: rotate(45deg);
+					-ms-transform: rotate(45deg);
+					transform: rotate(45deg);
+				}
+			}
+		}
+
+		.control-slider {
+			.slider {
+				width: 100%;
+
+				.slider-track {
+					height: 2px;
+					margin-top: 0px;
+
+					.slider-selection {
+						background: @systemColor;
+					}
+				}
+
+				.slider-handle.min-slider-handle.round {
+					background: whitesmoke;
+					margin-top: -9px;
+					box-shadow: #666666 0px 0px 12px;
+				}
+
+				.tooltip {
+					display: none;
+				}
+			}
+
+			label {
+				padding-top: 5px;
+				font-size: 10pt;
+				color: gray;
+			}
+		}
+	}
+
+}
