@@ -739,8 +739,7 @@
 			{
 				if ($(".k-state-default.k-header.k-nav-today.k-state-hover").length > 0)
 				{
-					var today = new Date();
-					self.initScrollBar(today);
+					self.initScrollBar(self.getSelectedDate());
 				}
 				else
 				{
@@ -754,8 +753,7 @@
 					}
 					else
 					{
-						var today = new Date();
-						self.initScrollBar(today);
+						self.initScrollBar(self.getSelectedDate());
 					}
 				}
 			}
