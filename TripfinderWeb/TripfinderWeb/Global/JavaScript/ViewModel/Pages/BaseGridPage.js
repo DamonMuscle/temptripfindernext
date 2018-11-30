@@ -862,6 +862,11 @@
 				}
 			});
 		}
+		else
+		{
+			self.obShowDetailPanel(false);
+			tf.pageManager.resizablePage.closeRightPage();
+		}
 	};
 
 	BaseGridPage.prototype.showDetailsPreClick = function(viewModel, e)
