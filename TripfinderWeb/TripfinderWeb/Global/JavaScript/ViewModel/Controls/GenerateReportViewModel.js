@@ -911,7 +911,7 @@
 		{
 			if (this.obEntityDataModel().apiIsDirty())
 			{
-				resolve(tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Unsaved Changes"));
+				resolve(tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Alert"));
 			}
 			else
 			{
