@@ -486,19 +486,38 @@
 			gridData.NeedSave = null;
 		});
 	};
-	FieldTripDataEntryViewModel.prototype.getTemplate = function(data)
+	FieldTripDataEntryViewModel.prototype.getTemplate = function(data, isNew)
 	{
 		var self = this;
-		data = data.sort(function(a, b)
+		if (isNew)
 		{
-			if (a.Name.toUpperCase() === b.Name.toUpperCase())
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate"))
+				.then(function(response)
+				{
+					response.Items = response.Items.sort(function(a, b)
+					{
+						if (a.Name.toUpperCase() === b.Name.toUpperCase())
+						{
+							return 0;
+						}
+						return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
+					});
+					response.Items.unshift({ Name: "None", Id: 0 });
+					this.obTemplateSource(response.Items);
+				}.bind(this));
+		} else
+		{
+			data = data.sort(function(a, b)
 			{
-				return 0;
-			}
-			return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
-		});
-		data.unshift({ Name: "None", Id: 0 });
-		self.obTemplateSource(data);
+				if (a.Name.toUpperCase() === b.Name.toUpperCase())
+				{
+					return 0;
+				}
+				return a.Name.toUpperCase() > b.Name.toUpperCase() ? 1 : -1;
+			});
+			data.unshift({ Name: "None", Id: 0 });
+			self.obTemplateSource(data);
+		}
 	};
 
 	FieldTripDataEntryViewModel.prototype.hasPermissionForDistrictDepartment = function(id)

@@ -717,7 +717,7 @@
 					})
 					.then(function(data)
 					{
-						this.getTemplate();
+						this.getTemplate(data, true);
 					}.bind(this))
 					.catch(function(response)
 					{
