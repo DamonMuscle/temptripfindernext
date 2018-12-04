@@ -2178,6 +2178,40 @@
 		});
 	};
 
+	DetailViewViewModel.prototype.getContentByFieldName = function(fieldName)
+	{
+		var self = this, fieldNames, currentAttributeVal;
+
+		if (!fieldName)
+		{
+			return "";
+		}
+		else if (fieldName.indexOf(".") >= 0)
+		{
+			fieldNames = fieldName.split(".");
+			$.each(fieldNames, function(index, name)
+			{
+				if (currentAttributeVal)
+				{
+					currentAttributeVal = currentAttributeVal[name];
+				}
+				else
+				{
+					currentAttributeVal = self.entity[name];
+				}
+			});
+			return currentAttributeVal;
+		}
+		else if (fieldName === "SchoolNameWithCode" && !self.entity.SchoolName)
+		{
+			return "None";
+		}
+		else
+		{
+			return self.entity[fieldName];
+		}
+	};
+
 	/**
 	 * Add blocks by data source.
 	 * @returns {void}
@@ -2248,7 +2282,7 @@
 						}
 					} else
 					{
-						content = self.entity[item.field];
+						content = self.getContentByFieldName(item.field);
 					}
 
 					if (item.type === "Boolean")
