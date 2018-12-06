@@ -179,7 +179,7 @@
 						<label data-bind="css:obRequiredFields()&&obRequiredFields().DepartFromSchool&&obRequiredFields().DepartFromSchool.Required?'requirestar':null">Departure</label>
 						<div class="input-group">
 							<div data-bind="typeahead:{source:obAllSchoolDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDepartFromSchool}, attr:IsRequired(obRequiredFields()&&obRequiredFields().DepartFromSchool?obRequiredFields().DepartFromSchool.Required:null)">
-								<!-- ko customInput:{type:"String",value:obCurrentDepartFromSchoolName,attributes:{name:"departFromSchool",class:"form-control"}} -->
+								<!-- ko customInput:{type:"Select",value:obCurrentDepartFromSchoolName,attributes:{name:"departFromSchool",class:"form-control"}} -->
 								<!-- /ko -->
 							</div>
 							<div class="input-group-btn">
