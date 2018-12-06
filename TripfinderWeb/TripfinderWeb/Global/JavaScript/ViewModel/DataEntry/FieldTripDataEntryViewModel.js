@@ -568,17 +568,17 @@
 						departActivityNames.push(departActivityName);
 						if (self.obCurrentAccountName() === departActivityName)
 						{
-							selectIndex = index;
+							selectIndex = accountList.length - 1;
 						}
 					}
 				}
 			});
-			// accountList.unshift({ Id: -1 });
+
 			self.obAccount(accountList);
 
 			if (selectIndex > -1)
 			{
-				this.obSelectedAccount(self.obAccount()[selectIndex + 1]);
+				this.obSelectedAccount(self.obAccount()[selectIndex]);
 			}
 			else if (!initialize)
 			{
