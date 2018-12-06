@@ -2202,7 +2202,8 @@
 			});
 			return currentAttributeVal;
 		}
-		else if (fieldName === "SchoolNameWithCode" && !self.entity.SchoolName)
+		else if ((fieldName === "SchoolNameWithCode" && !self.entity.SchoolName) ||
+			(fieldName === "DepartureSchoolNameWithCode" && !self.entity.DepartFromSchool))
 		{
 			return "None";
 		}
