@@ -87,25 +87,29 @@
 		this.obCurrentActivityName = ko.computed(this.setSelectTextComputer("obActivityDataModels", "fieldTripActivityId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedAccount = ko.observable();
-		this.obCurrentAccountName = ko.observable("None");
+		this.obCurrentAccountName = ko.observable("");
 		this.obSelectedAccount.subscribe(function()
 		{
-			if (this.obSelectedAccount().Id < 0)
+			if (this.obSelectedAccount())
 			{
-				this.obCurrentAccountName("None");
-				this.obEntityDataModel().districtDepartmentId(null);
-				this.obEntityDataModel().districtDepartmentName(null);
-				this.obEntityDataModel().fieldTripActivityId(null);
-				this.obEntityDataModel().fieldTripActivityName(null);
+				if (this.obSelectedAccount().Id < 0)
+				{
+					this.obCurrentAccountName("");
+					this.obEntityDataModel().districtDepartmentId(null);
+					this.obEntityDataModel().districtDepartmentName(null);
+					this.obEntityDataModel().fieldTripActivityId(null);
+					this.obEntityDataModel().fieldTripActivityName(null);
+				}
+				else
+				{
+					this.obCurrentAccountName(this.obSelectedAccount().Department.Name + ' / ' + this.obSelectedAccount().FieldTripActivity.Name);
+					this.obEntityDataModel().districtDepartmentId(this.obSelectedAccount().Department.Id);
+					this.obEntityDataModel().districtDepartmentName(this.obSelectedAccount().Department.Name);
+					this.obEntityDataModel().fieldTripActivityId(this.obSelectedAccount().FieldTripActivity.Id);
+					this.obEntityDataModel().fieldTripActivityName(this.obSelectedAccount().FieldTripActivity.Name);
+				}
 			}
-			else
-			{
-				this.obCurrentAccountName(this.obSelectedAccount().Department.Name + ' / ' + this.obSelectedAccount().FieldTripActivity.Name);
-				this.obEntityDataModel().districtDepartmentId(this.obSelectedAccount().Department.Id);
-				this.obEntityDataModel().districtDepartmentName(this.obSelectedAccount().Department.Name);
-				this.obEntityDataModel().fieldTripActivityId(this.obSelectedAccount().FieldTripActivity.Id);
-				this.obEntityDataModel().fieldTripActivityName(this.obSelectedAccount().FieldTripActivity.Name);
-			}
+
 		}.bind(this));
 
 		this.obSelectedClassification = ko.observable();
@@ -546,7 +550,7 @@
 
 			if (!initialize)
 			{
-				self.obCurrentAccountName("None");
+				self.obCurrentAccountName("");
 			}
 		}
 		else
@@ -569,7 +573,7 @@
 					}
 				}
 			});
-			accountList.unshift({ Id: -1 });
+			// accountList.unshift({ Id: -1 });
 			self.obAccount(accountList);
 
 			if (selectIndex > -1)
@@ -578,7 +582,7 @@
 			}
 			else if (!initialize)
 			{
-				self.obCurrentAccountName("None");
+				self.obCurrentAccountName("");
 			}
 		}
 	};
