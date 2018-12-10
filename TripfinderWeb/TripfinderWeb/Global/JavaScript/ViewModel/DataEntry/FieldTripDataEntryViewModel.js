@@ -169,7 +169,10 @@
 			if (collection.indexOf(inputValue) == -1)
 			{
 				$(m.currentTarget).val('');
-				this.obEntityDataModel()[key]('');
+				if (!!inputValue)
+				{
+					this.obEntityDataModel()[key]('');
+				}
 			}
 		}.bind(this);
 
