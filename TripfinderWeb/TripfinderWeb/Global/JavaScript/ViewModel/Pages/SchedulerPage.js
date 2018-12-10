@@ -386,6 +386,7 @@
 			{
 				clickBind(e, taskselector);
 			});
+
 		}
 
 		self.bindEvent(".iconbutton.details", function(model, e)
@@ -395,71 +396,46 @@
 
 		$(document).on("click.kendoscheduler", function(e)
 		{
-			if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
-			{
-				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
-				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
-				if (!TF.isMobileDevice)
-				{
-					self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
-				}
-			} else
-			{
-				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
-				self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
-				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
-			}
-
-			if($(e.target).attr('data-kendo-value'))
-			{
-				var storageKey = self.options.storageKey + ".schedulerdate",
-					storageValue = $(e.target).attr('data-kendo-value'),
-					fisrtPos = storageValue.indexOf("/"),
-					secondPos = storageValue.indexOf("/", fisrtPos + 1),
-					month = parseInt(storageValue.substring(fisrtPos + 1, secondPos)) + 1;
-				storageValue = storageValue.substring(0, fisrtPos + 1) + month.toString() + storageValue.substring(secondPos);
-
-				tf.storageManager.save(storageKey, storageValue);
-			}
-			else if ($(e.target).parents("li").hasClass("k-nav-today"))
-			{
-				var storageKey = self.options.storageKey + ".schedulerdate",
-					storageValue = new Date().toLocaleDateString();
-
-				tf.storageManager.save(storageKey, storageValue);
-			}
-			else if ($(e.target).parents("li").hasClass("k-nav-prev") || $(e.target).parents("li").hasClass("k-nav-next"))
-			{
-				var storageKey = self.options.storageKey + ".schedulerdate",
-					storageValue = $(self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format")[0]).text();
-				switch (self.getSchedulertView().filter(function(e){return e.selected})[0].type)
-				{
-					case "day":
-						storageValue = new Date(storageValue);
-						break;
-					case "week":
-						var pos = storageValue.indexOf(" -");
-						storageValue = storageValue.substring(0, pos);
-						storageValue = new Date(storageValue);
-						break;
-					case "month":
-						storageValue = new Date(storageValue);
-						break;
-				}
-				
-				tf.storageManager.save(storageKey, storageValue.toLocaleDateString());
-			}
-			else if($(e.target).attr('role') && $(e.target).attr('role') === "button")
-			{
-				if($(e.target).text() === "Day" || $(e.target).text() === "Week" || $(e.target).text() === "Month" || $(e.target).text() === "List")
-				{
-					var storageKey = self.options.storageKey + ".schedulerview",
-						storageValue = $(e.target).text();
-
-					tf.storageManager.save(storageKey, storageValue);
-				}
-			}
+			self.resetSchedulerToolbar(e);
 		});
+	};
+
+	SchedulerPage.prototype.resetSchedulerToolbar = function(e)
+	{
+		var self = this;
+		if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
+		{
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
+			if (!TF.isMobileDevice)
+			{
+				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
+			}
+		} else
+		{
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
+		}
+
+	};
+
+	SchedulerPage.prototype.dataBinding = function(e)
+	{
+		var self = this;
+		self.resetSchedulerToolbar(e);
+	};
+
+	SchedulerPage.prototype.kendoScheduleChanged = function(e)
+	{
+		var self = this;
+		var storageDateKey = self.options.storageKey + ".schedulerdate",
+			storageViewKey = self.options.storageKey + ".schedulerview",
+			storageDate = e.date.toLocaleDateString(),
+			storageView = e.view;
+
+		tf.storageManager.save(storageDateKey, storageDate);
+		tf.storageManager.save(storageViewKey, storageView);
 	};
 
 	SchedulerPage.prototype.getCurrentFieldTripRecords = function()
@@ -695,14 +671,19 @@
 				views: self.getSchedulertView(self.extendDays),
 				editable: false,
 				resources: self.getSchedulerResources(),
-				navigate: function()
+				selectable: true,
+				navigate: function(e)
 				{
 					self.getScrollBarPosition();
+					self.kendoScheduleChanged(e);
+				},
+				dataBound: function(e)
+				{
+					self.dataBinding(e);
 				},
 				footer: false
 			}).data("kendoScheduler");
 			self.eventBinding();
-			self.togglePrevNext();
 		});
 	};
 
@@ -716,17 +697,6 @@
 		else
 		{
 			return new Date();
-		}
-	}
-
-	SchedulerPage.prototype.togglePrevNext = function()
-	{	
-		if (this.getSchedulertView().filter(function(e){return e.selected}).length >0 &&
-			typeof this.getSchedulertView().filter(function(e){return e.selected})[0].type === "function")
-		{
-			this.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
-			this.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
-			this.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 		}
 	}
 
@@ -891,13 +861,14 @@
 			}
 
 		});
+
 		var stickyView = tf.storageManager.get(this.options.storageKey + ".schedulerview"),
 			schedulerView = [
-			{ type: "day", selected: stickyView === "Day" },
-			{ type: "week", selected: stickyView === "Week" },
-			{ type: "month", selected: stickyView === "Month" },
-			{ type: CustomAgenda, title: "List", selected: stickyView === "List" }
-		];
+				{ type: "day", selected: stickyView === "day" },
+				{ type: "week", selected: stickyView === "week" },
+				{ type: "month", selected: stickyView === "month" },
+				{ type: CustomAgenda, title: "List", selected: stickyView === "List" }
+			];
 		return schedulerView;
 	};
 
