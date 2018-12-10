@@ -671,7 +671,6 @@
 				views: self.getSchedulertView(self.extendDays),
 				editable: false,
 				resources: self.getSchedulerResources(),
-				selectable: true,
 				navigate: function(e)
 				{
 					self.getScrollBarPosition();
