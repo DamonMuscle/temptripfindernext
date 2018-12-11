@@ -197,6 +197,9 @@
 		{
 			$(".k-scheduler-content").scrollTop(0);
 			self.getScrollBarPosition();
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 		}
 	};
 
@@ -393,17 +396,17 @@
 		{
 			self.showDetailsClick();
 		});
-
-		$(document).on("click.kendoscheduler", function(e)
-		{
-			self.resetSchedulerToolbar(e);
-		});
 	};
 
 	SchedulerPage.prototype.resetSchedulerToolbar = function(e)
 	{
 		var self = this;
-		if ($(e.target).closest(".k-view-listview").length == 0 && $(".k-scheduler-agendaview.k-scheduler-agenda").length == 0)
+		if (e.view == "List")
+		{
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
+			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
+		} else
 		{
 			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
 			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
@@ -411,19 +414,7 @@
 			{
 				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
 			}
-		} else
-		{
-			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
-			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
-			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
 		}
-
-	};
-
-	SchedulerPage.prototype.dataBinding = function(e)
-	{
-		var self = this;
-		self.resetSchedulerToolbar(e);
 	};
 
 	SchedulerPage.prototype.kendoScheduleChanged = function(e)
@@ -675,10 +666,7 @@
 				{
 					self.getScrollBarPosition();
 					self.kendoScheduleChanged(e);
-				},
-				dataBound: function(e)
-				{
-					self.dataBinding(e);
+					self.resetSchedulerToolbar(e);
 				},
 				footer: false
 			}).data("kendoScheduler");

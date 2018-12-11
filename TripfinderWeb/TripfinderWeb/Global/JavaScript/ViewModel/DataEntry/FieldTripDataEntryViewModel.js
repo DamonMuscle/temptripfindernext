@@ -79,11 +79,11 @@
 		this.obCurrentSchoolName = ko.computed(this.setSelectTextComputer("obSchoolDataModels", "school", function(obj) { return obj.SchoolCode; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedDepartment = ko.observable();
-		this.obSelectedDepartment.subscribe(this.setSelectValue("districtDepartmentId", "obSelectedDepartment", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedDepartment.subscribe(this.setSelectValue("districtDepartmentId", "obSelectedDepartment", function(obj) { return obj ? obj.Id : null; }), this);
 		this.obCurrentDepartmentName = ko.computed(this.setSelectTextComputer("obDepartmentDataModels", "districtDepartmentId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedActivity = ko.observable();
-		this.obSelectedActivity.subscribe(this.setSelectValue("fieldTripActivityId", "obSelectedActivity", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedActivity.subscribe(this.setSelectValue("fieldTripActivityId", "obSelectedActivity", function(obj) { return obj ? obj.Id : null; }), this);
 		this.obCurrentActivityName = ko.computed(this.setSelectTextComputer("obActivityDataModels", "fieldTripActivityId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedAccount = ko.observable();
@@ -113,11 +113,11 @@
 		}.bind(this));
 
 		this.obSelectedClassification = ko.observable();
-		this.obSelectedClassification.subscribe(this.setSelectValue("fieldTripClassificationId", "obSelectedClassification", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedClassification.subscribe(this.setSelectValue("fieldTripClassificationId", "obSelectedClassification", function(obj) { return obj ? obj.Id : null; }), this);
 		this.obCurrentClassificationName = ko.computed(this.setSelectTextComputer("obClassificationDataModels", "fieldTripClassificationId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
 
 		this.obSelectedEquipment = ko.observable();
-		this.obSelectedEquipment.subscribe(this.setSelectValue("fieldTripEquipmentId", "obSelectedEquipment", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedEquipment.subscribe(this.setSelectValue("fieldTripEquipmentId", "obSelectedEquipment", function(obj) { return obj ? obj.Id : null; }), this);
 		this.obCurrentEquipmentName = ko.computed(this.setSelectTextComputer("obEquipmentDataModels", "fieldTripEquipmentId", function(obj) { return obj.Id; }, function(obj) { return obj.EquipmentName; }), this);
 
 		this.obSelectedDestination = ko.observable();
