@@ -95,10 +95,13 @@
 				if (this.obSelectedAccount().Id < 0)
 				{
 					this.obCurrentAccountName("");
-					this.obEntityDataModel().districtDepartmentId(null);
-					this.obEntityDataModel().districtDepartmentName(null);
-					this.obEntityDataModel().fieldTripActivityId(null);
-					this.obEntityDataModel().fieldTripActivityName(null);
+					if (this.obSelectedSchool())
+					{
+						this.obEntityDataModel().districtDepartmentId(null);
+						this.obEntityDataModel().districtDepartmentName(null);
+						this.obEntityDataModel().fieldTripActivityId(null);
+						this.obEntityDataModel().fieldTripActivityName(null);
+					}
 				}
 				else
 				{
