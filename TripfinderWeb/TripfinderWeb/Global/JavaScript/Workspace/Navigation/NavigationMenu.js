@@ -1135,7 +1135,10 @@
 			routeName = self.availableApplications[data].route,
 			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
-
+			if(requireNewTab){
+				var redirectWindow = window.open('', '_blank');
+					redirectWindow.blur();
+			}
 		Promise.resolve($.ajax({
 			url: myTransfinderURL,
 			data: {
@@ -1157,7 +1160,13 @@
 					url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
 				}
 				ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
-				window.open(url, requireNewTab ? "_blank" : "_self");
+				if(requireNewTab){
+					redirectWindow.location = url;
+				}
+				else{
+					window.location = url;
+				}
+				
 				self.toggleAppSwitcherMenu(false);
 			})
 	};
