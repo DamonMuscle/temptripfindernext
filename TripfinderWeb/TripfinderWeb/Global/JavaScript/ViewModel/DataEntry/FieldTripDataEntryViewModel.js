@@ -645,6 +645,18 @@
 						}.bind(this));
 					}
 
+					if (this.obEntityDataModel().districtDepartmentId() && !this.obEntityDataModel().districtDepartmentName())
+					{
+						this.obEntityDataModel().districtDepartmentId(null);
+						this.obEntityDataModel().apiIsDirty(false);
+					}
+
+					if (this.obEntityDataModel().fieldTripActivityId() && !this.obEntityDataModel().fieldTripActivityName())
+					{
+						this.obEntityDataModel().fieldTripActivityId(null);
+						this.obEntityDataModel().apiIsDirty(false);
+					}
+
 					if (this.obEntityDataModel().departDateTime() == "1900-01-01T00:00:00.000" ||
 						this.obEntityDataModel().estimatedReturnDateTime() == "1900-01-01T00:00:00.000" ||
 						this.obEntityDataModel().departDateTime() == null ||
