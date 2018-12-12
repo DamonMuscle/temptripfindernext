@@ -23,7 +23,7 @@
 									<label for="firstName">
 										Client ID
 									</label>
-									<input type="text" id="firstName" name="clientId" class="form-control" placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage">
+									<input type="text" id="firstName" name="clientId" class="form-control" placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage" tabindex="1">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId" data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
 								</div>
 							</div>
@@ -32,7 +32,7 @@
 									<label for="userName">
 										User Name
 									</label>
-									<input type="text" id="userName" name="userName" class="form-control" placeholder="User Name" data-bind="value:obUsername, click:cleanErrorMessage">
+									<input type="text" id="userName" name="userName" class="form-control" placeholder="User Name" data-bind="value:obUsername, click:cleanErrorMessage" tabindex="1">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName" data-bv-result="INVALID" data-bind="visible:obUsernameWarning">required</small>
 								</div>
 							</div>
@@ -41,7 +41,7 @@
 									<label for="password">
 										Password
 									</label>
-									<input type="password" id="password" name="password" autocomplete="off" class="form-control" placeholder="Password" data-bind="value:obPassword, click:cleanErrorMessage">
+									<input type="password" id="password" name="password" autocomplete="off" class="form-control" placeholder="Password" data-bind="value:obPassword, click:cleanErrorMessage" tabindex="1">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="password" data-bv-result="INVALID" data-bind="visible:obPasswordWarning" style="float:left">required</small>
 								</div>
 							</div>
@@ -49,12 +49,12 @@
 								<div class="col-sm-12">
 									<div class="checkbox">
 										<label style="padding-left: 20px;">
-											<input style="margin-left: -20px;" type="checkbox" data-bind="checked:obRememberMe" />Remember Me
+											<input style="margin-left: -20px;" type="checkbox" data-bind="checked:obRememberMe" tabindex="1" />Remember Me
 										</label>
 									</div>
 								</div>
 								<div class="col-sm-12">
-									<a class="forget-password pull-right" data-bind="click:$parent.forgotPasswordClick">Forgot Password?</a>
+									<a class="forget-password pull-right" data-bind="click:$parent.forgotPasswordClick" tabindex="2">Forgot Password?</a>
 								</div>
 							</div>
 							<div class="login-error" data-bind="style: {visibility: obLoginErrorMessage? 'visible': 'hidden'}">
@@ -62,7 +62,7 @@
 							</div>
 							<div class="form-group">
 								<div class="col-sm-24">
-									<button type="submit" class="btn btn-login bv-hidden-submit" data-bind="click:$parent.positiveClick">Log In</button>
+									<button type="submit" class="btn btn-login bv-hidden-submit" data-bind="click:$parent.positiveClick" tabindex="1">Log In</button>
 								</div>
 							</div>
 							<div class="form-group">
@@ -97,7 +97,7 @@
 										Password
 									</label>
 									<input type="password" name="passwordRP" autocomplete="off" autofocus="autofocus" id="passwordRP" required class="form-control" placeholder="Password"
-									 data-bind="value:obPasswordRP">
+										   data-bind="value:obPasswordRP">
 								</div>
 							</div>
 							<div class="form-group">
@@ -106,7 +106,7 @@
 										Verify Password
 									</label>
 									<input type="password" name="verifyPasswordRP" id="verifyPasswordRP" autocomplete="off" required class="form-control" placeholder="Verify Password"
-									 data-bind="value:obVerifyPasswordRP">
+										   data-bind="value:obVerifyPasswordRP">
 								</div>
 							</div>
 							<div class="login-error" data-bind="style: {visibility: obLoginErrorMessageRP? 'visible': 'hidden'}">

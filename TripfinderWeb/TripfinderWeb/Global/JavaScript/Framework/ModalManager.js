@@ -103,7 +103,7 @@
 			}
 
 			//these input is not focused when user click tab key in the keyboard
-			var $inputs = $modal.find(".modal-body").find("input:button,input:image,input:file,input.notinput-required-message,button,input[data-tf-input-type='Select']");
+			var $inputs = $modal.find(".modal-body").find("input:button,input:image,input:file,input.notinput-required-message,button:not(.btn-login),input[data-tf-input-type='Select']");
 			$inputs.attr("tabIndex", -1);
 		});
 
