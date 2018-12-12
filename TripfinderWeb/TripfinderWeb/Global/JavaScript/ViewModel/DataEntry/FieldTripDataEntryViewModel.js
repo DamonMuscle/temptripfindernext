@@ -645,13 +645,13 @@
 						}.bind(this));
 					}
 
-					if (this.obEntityDataModel().districtDepartmentId() && !this.obEntityDataModel().districtDepartmentName())
+					if (!this.obEntityDataModel().districtDepartmentName())
 					{
 						this.obEntityDataModel().districtDepartmentId(null);
 						this.obEntityDataModel().apiIsDirty(false);
 					}
 
-					if (this.obEntityDataModel().fieldTripActivityId() && !this.obEntityDataModel().fieldTripActivityName())
+					if (!this.obEntityDataModel().fieldTripActivityName())
 					{
 						this.obEntityDataModel().fieldTripActivityId(null);
 						this.obEntityDataModel().apiIsDirty(false);
