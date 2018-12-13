@@ -1186,21 +1186,24 @@
 		evt.stopPropagation();
 		evt.preventDefault();
 
-		var self = this,
-			routeName = self.availableApplications[data].route,
-			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
-					requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
+		.then(function(apiResponse)
+		{
+			var routeName = self.availableApplications[data].route,
+				myTransfinderURL = apiResponse.Items[0],
+				requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 			var redirectWindow = window.open("", requireNewTab ? "_blank" : "_self");
 			redirectWindow.blur();
 
-				Promise.resolve($.ajax({
-					url: myTransfinderURL,
-					data: {
-						vendorid: "Transfinder",
-						clientid: tf.authManager.clientKey
-					},
-					dataType: 'json'
-				}))
+			Promise.resolve($.ajax({
+				url: myTransfinderURL,
+				data: {
+					vendorid: "Transfinder",
+					clientid: tf.authManager.clientKey
+				},
+				dataType: 'json'
+			}))
 			.then(function(res)
 			{
 				var prod = res.Products.filter(function(prod)
@@ -1244,6 +1247,7 @@
 				ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 				self.toggleAppSwitcherMenu(false);
 			})
+		});
 	};
 
 	/**
