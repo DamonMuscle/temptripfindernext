@@ -347,10 +347,12 @@
 
 	BasePage.prototype.openSelectedClick = function(viewModel, e)
 	{
-		this._openSelected(this.pageType, e);
+		var redirectWindow = window.open('', '_blank');
+			redirectWindow.blur();
+		this._openSelected(this.pageType, e, redirectWindow);
 	};
 
-	BasePage.prototype._openSelected = function(gridType, e)
+	BasePage.prototype._openSelected = function(gridType, e, redirectWindow)
 	{
 		var selectedIds = this.searchGrid.getSelectedIds();
 		//the filter will sticky once open a new grid, so save the sticky information in DB
@@ -368,7 +370,7 @@
 					}, true)
 			]).then(function()
 			{
-				window.open("#/?pagetype=" + this.pageType, "new-pageWindow_" + $.now());
+				redirectWindow.location = "#/?pagetype=" + this.pageType, "new-pageWindow_" + $.now();
 
 			}.bind(this));
 		}
