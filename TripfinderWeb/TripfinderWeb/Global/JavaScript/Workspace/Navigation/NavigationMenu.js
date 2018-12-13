@@ -1141,9 +1141,12 @@
 		evt.stopPropagation();
 		evt.preventDefault();
 
-		var self = this,
-			routeName = self.availableApplications[data].route,
-			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
+		.then(function(apiResponse)
+		{
+			var routeName = self.availableApplications[data].route,
+				myTransfinderURL = apiResponse.Items[0],
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 			if(requireNewTab){
 				var redirectWindow = window.open('', '_blank');
@@ -1179,6 +1182,7 @@
 				
 				self.toggleAppSwitcherMenu(false);
 			})
+		});
 	};
 
 	/**
