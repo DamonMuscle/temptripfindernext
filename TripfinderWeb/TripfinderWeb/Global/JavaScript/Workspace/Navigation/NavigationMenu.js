@@ -1166,11 +1166,37 @@
 				{
 					return prod.Name == routeName
 				}),
+					url;
+
+				if (prod.length > 0 && prod[0].Uri)
+				{
 					url = prod[0].Uri;
 
 				if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
 				{
 					url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+				}
+
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', url, true);
+					xhr.onload = function(e){
+						if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
+						{
+							redirectWindow.location = url;
+						}
+						else
+						{
+							redirectWindow.location.href = routeName + "notexisting.html";
+						}
+					};
+					xhr.onerror = function(e){
+						redirectWindow.location.href = routeName + "notexisting.html";
+					}
+					xhr.send();
+				}
+				else
+				{
+					redirectWindow.location.href = routeName + "notexisting.html";
 				}
 				ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 				if(requireNewTab){

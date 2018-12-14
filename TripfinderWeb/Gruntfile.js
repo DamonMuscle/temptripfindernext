@@ -113,6 +113,9 @@ module.exports = function(grunt)
 				files: [{
 					cwd: 'tripfinderweb',
 					src: ['index.html',
+						'Viewfindernotexisting.html',
+						'Tripfindernotexisting.html',
+						'Fleetfindernotexisting.html',
 						'local_settings.js',
 						'Web.config'
 					],
