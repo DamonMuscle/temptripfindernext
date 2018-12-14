@@ -1005,7 +1005,7 @@
 	 * Initialize application switcher.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.initApplicationSwitcher = function()
+	NavigationMenu.prototype.initApplicationSwitcher = function(needGenerateApplication)
 	{
 		var self = this;
 		if (tf.permissions.isSupport)
@@ -1019,10 +1019,10 @@
 
 		self.$logoItem = self.$navigationMenu.find(".navigation-header .item-logo")
 		self.$appSwitcherMenu = self.$navigationMenu.find(".navigation-header .item-menu");
+
 		return promise.then(function()
 		{
 			var applications = [];
-
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
 				var productName = item.toLowerCase();
@@ -1055,14 +1055,69 @@
 	NavigationMenu.prototype.logoItemClick = function(data, event)
 	{
 		var self = this;
-		if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
+		var supportedProducts = [];
+		var hasURLProducts = [];
 
-		var isMenuOpened = self.$logoItem.hasClass("menu-opened");
+		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(tf.authManager.clientKey), "vendoraccessinfo"))
+			.then(function(response)
+			{
+				supportedProducts = response.Items[0].Products.filter(function(prod)
+				{
+					var productName = prod.toLowerCase();
+					return self.availableApplications.hasOwnProperty(productName) && self.availableApplications[productName].permission;
+				});
 
-		if (!self.closeOpenedNavigationItemMenu() && !isMenuOpened)
-		{
-			self.toggleAppSwitcherMenu(true);
-		}
+				if (supportedProducts.length === 0)
+				{
+					return;
+				}
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
+					.then(function(apiResponse)
+					{
+						var myTransfinderURL = apiResponse.Items[0];
+
+						Promise.resolve($.ajax({
+							url: myTransfinderURL,
+							data: {
+								vendorid: "Transfinder",
+								clientid: tf.authManager.clientKey
+							},
+							dataType: 'json'
+						}))
+							.then(function(res)
+							{
+								hasURLProducts = res.Products.filter(function(prod)
+								{
+									return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
+								});
+								if (hasURLProducts.length === 0)
+								{
+									return;
+								}
+								self.obSupportedApplications(hasURLProducts.map(function(item)
+								{
+									return item.Name.toLowerCase();
+								}));
+
+								if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
+
+								self.appSwitcherEnabled = self.obSupportedApplications().length !== 0;
+								if (!self.appSwitcherEnabled)
+								{
+									$nav.find(".navigation-header .item-logo").addClass("disabled");
+								}
+
+								var isMenuOpened = self.$logoItem.hasClass("menu-opened");
+
+								if (!self.closeOpenedNavigationItemMenu() && !isMenuOpened)
+								{
+									self.toggleAppSwitcherMenu(true);
+								}
+
+							})
+					});
+
+			}.bind(self));
 	};
 
 	/**
