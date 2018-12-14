@@ -149,6 +149,9 @@
     <Content Include="Global\Img\menu\Save-White.png" />
     <Content Include="Global\Img\menu\tripfinderlogo.svg" />
     <Content Include="Global\Img\Transfinder-TripfinderText-Only.png" />
+    <Content Include="Global\Img\Transfinder-Fleetfinder-final.png" />
+    <Content Include="Global\Img\Transfinder-Tripfinder-final.png" />
+    <Content Include="Global\Img\Transfinder-Viewfinder-final.png" />
     <Content Include="Global\JavaScript\DataModel\BaseDataModel.js" />
     <Content Include="Global\JavaScript\DataModel\GridFilterDataModel.js" />
     <Content Include="Global\JavaScript\DataModel\GridLayoutExtendedDataModel.js" />
