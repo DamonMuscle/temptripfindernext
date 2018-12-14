@@ -1189,23 +1189,23 @@
 		var self = this,
 			routeName = self.availableApplications[data].route,
 			myTransfinderURL = "http://mytransfinder.com/$xcom/getvendoraccessinfov3.asp",
-			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
+					requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 			var redirectWindow = window.open("", requireNewTab ? "_blank" : "_self");
 			redirectWindow.blur();
 
-		Promise.resolve($.ajax({
-			url: myTransfinderURL,
-			data: {
-				vendorid: "Transfinder",
-				clientid: tf.authManager.clientKey
-			},
-			dataType: 'json'
-		}))
+				Promise.resolve($.ajax({
+					url: myTransfinderURL,
+					data: {
+						vendorid: "Transfinder",
+						clientid: tf.authManager.clientKey
+					},
+					dataType: 'json'
+				}))
 			.then(function(res)
 			{
 				var prod = res.Products.filter(function(prod)
 				{
-					return prod.Name == routeName
+							return prod.Name.toLowerCase() == routeName.toLowerCase()
 				}),
 					url;
 
@@ -1213,14 +1213,15 @@
 				{
 					url = prod[0].Uri;
 
-				if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
-				{
-					url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
-				}
+							if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+							{
+								url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+							}
 
 					var xhr = new XMLHttpRequest();
 					xhr.open('GET', url, true);
-					xhr.onload = function(e){
+							xhr.onload = function(e)
+							{
 						if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
 						{
 							redirectWindow.location = url;
@@ -1230,7 +1231,8 @@
 							redirectWindow.location.href = routeName + "notexisting.html";
 						}
 					};
-					xhr.onerror = function(e){
+							xhr.onerror = function(e)
+							{
 						redirectWindow.location.href = routeName + "notexisting.html";
 					}
 					xhr.send();
