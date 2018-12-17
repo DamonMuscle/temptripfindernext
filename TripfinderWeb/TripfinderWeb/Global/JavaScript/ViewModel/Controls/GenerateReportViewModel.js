@@ -774,7 +774,10 @@
 		var self = this;
 		var filterClause = null;
 		var includeOnlyIds = null;
-
+		if(report.outputTo().toLowerCase() == "view"){
+					var redirectWindow = window.open('', '_blank');
+					redirectWindow.blur();
+				}
 		if ((!report.includeInActiveFlag()) && report.selectedRecordType == "student")
 		{
 			filterClause = " [InActive] = 0 ";
@@ -826,12 +829,13 @@
 					var key = apiResponse.Items[0], outputTo = report.outputTo().toLowerCase(), reportName = report.reportName();
 					if (outputTo == "view")
 					{
-						var w = window.open(pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"));
+						
+						redirectWindow.location = pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/");
 						ga('send', 'event', 'Action', 'Report Viewed', reportName + ' Viewed');
-						$(w).on("load", function()
+						$(redirectWindow).on("load", function()
 						{
 							var head = $('<head>');
-							$(w.document).find('html').append(head);
+							$(redirectWindow.document).find('html').append(head);
 							head.append($('<title>Tripfinder</title> <link href="' + window.location.href + 'Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">'));
 						});
 					}

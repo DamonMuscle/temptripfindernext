@@ -524,6 +524,11 @@
 	 */
 	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
 	{
+		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
+		{
+			var redirectWindow = window.open('', '_blank');
+					redirectWindow.blur();
+		}
 		evt.stopPropagation();
 		var self = this,
 			$item = self.$navigationMenu.find(".navigation-item." + type),
@@ -544,7 +549,7 @@
 
 		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
 		{
-			window.open("#/?pagetype=" + type, "new-pageWindow_" + $.now());
+			redirectWindow.location = "#/?pagetype=" + type, "new-pageWindow_" + $.now();
 			return;
 		}
 
@@ -768,6 +773,11 @@
 	 */
 	NavigationMenu.prototype.openPageButtonClick = function(pageType, data, evt)
 	{
+		if (evt.ctrlKey || evt.metaKey)
+			{
+				var redirectWindow = window.open('', '_blank');
+					redirectWindow.blur();
+			}
 		evt.stopPropagation();
 
 		var self = this;
@@ -785,7 +795,7 @@
 		{
 			if (evt.ctrlKey || evt.metaKey)
 			{
-				window.open("#/?pagetype=settingsConfig", "new-pageWindow_" + $.now());
+				redirectWindow.location = "#/?pagetype=settingsConfig", "new-pageWindow_" + $.now();
 			}
 			else if (!($(evt.target).closest(".item-menu li").hasClass("active")))
 			{
@@ -1193,9 +1203,10 @@
 			var routeName = self.availableApplications[data].route,
 				myTransfinderURL = apiResponse.Items[0],
 				requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
-			var redirectWindow = window.open("", requireNewTab ? "_blank" : "_self");
-			redirectWindow.blur();
-
+			if(requireNewTab){
+				var redirectWindow = window.open('', '_blank');
+					redirectWindow.blur();
+			}
 			Promise.resolve($.ajax({
 				url: myTransfinderURL,
 				data: {
@@ -1245,6 +1256,13 @@
 					redirectWindow.location.href = routeName + "notexisting.html";
 				}
 				ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
+				if(requireNewTab){
+					redirectWindow.location = url;
+				}
+				else{
+					window.location = url;
+				}
+				
 				self.toggleAppSwitcherMenu(false);
 			})
 		});
