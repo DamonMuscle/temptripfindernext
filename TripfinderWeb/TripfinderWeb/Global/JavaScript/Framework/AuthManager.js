@@ -21,6 +21,7 @@
 		this.userName = username;
 		this.password = password;
 		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(this.token);
+		this.supportedProducts = [];
 
 		if (this._hasLoggedin)
 		{
@@ -214,11 +215,12 @@
 
 	AuthManager.prototype.getPurchasedProducts = function()
 	{
+		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "vendoraccessinfo"))
 			.then(function(response)
 			{
-				this.supportedProducts = response.Items[0].Products;
-				return this.supportedProducts;
+				self.supportedProducts = response.Items[0].Products;
+				return self.supportedProducts;
 			}.bind(this));
 	};
 

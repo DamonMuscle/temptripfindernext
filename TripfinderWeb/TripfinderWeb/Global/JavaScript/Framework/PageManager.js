@@ -18,10 +18,64 @@
 		self.loadDataSourceName();
 		self.initContextMenuEvent();
 		self.navigationData = null;
+		self.applicationSwitcherList = [];
+		self.applicationURLMappingList = [];
 
 		//Pages menu
 		self.obAdministrationPagesMenu = ko.computed(self.administrationPagesMenuComputer.bind(self));
 		self.logOffClick = self.logOffClick.bind(this);
+
+		//Initial parameters
+		self.availableApplications = {
+			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
+			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
+		};
+		self.initApplicationSwitcher();
+	}
+
+	PageManager.prototype.initApplicationSwitcher = function()
+	{
+		var self = this, supportedProducts = tf.authManager.supportedProducts;
+
+		if (supportedProducts.length > 0)
+		{
+			supportedProducts = tf.authManager.supportedProducts.filter(function(prod)
+			{
+				var productName = prod.toLowerCase();
+				return self.availableApplications.hasOwnProperty(productName) && self.availableApplications[productName].permission;
+			});
+
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
+				.then(function(apiResponse)
+				{
+					var myTransfinderURL = apiResponse.Items[0];
+
+					Promise.resolve($.ajax({
+						url: myTransfinderURL,
+						data: {
+							vendorid: "Transfinder",
+							clientid: tf.authManager.clientKey
+						},
+						dataType: 'json'
+					}))
+						.then(function(res)
+						{
+							hasURLProducts = res.Products.filter(function(prod)
+							{
+								return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
+							});
+							if (hasURLProducts.length === 0)
+							{
+								return;
+							}
+							self.applicationURLMappingList = hasURLProducts;
+							self.applicationSwitcherList = hasURLProducts.map(function(item)
+							{
+								return item.Name.toLowerCase();
+							});
+						})
+				});
+		}
 	}
 
 	PageManager.prototype.initNavgationBar = function()
@@ -434,9 +488,9 @@
 	};
 
 	/**
- * Get all data types that current user has permission to access.
- * @return {Array}
- */
+	* Get all data types that current user has permission to access.
+	* @return {Array}
+	*/
 	PageManager.prototype.getAvailableDataTypes = function()
 	{
 		var allDataTypes = [

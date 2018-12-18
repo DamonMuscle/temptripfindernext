@@ -19,10 +19,7 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.availableApplications = {
-			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
-			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
-		};
+		self.availableApplications = tf.pageManager.availableApplications;
 
 		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
@@ -1065,50 +1062,8 @@
 	NavigationMenu.prototype.logoItemClick = function(data, event)
 	{
 		var self = this;
-		var supportedProducts = [];
-		var hasURLProducts = [];
-
-		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(tf.authManager.clientKey), "vendoraccessinfo"))
-			.then(function(response)
-			{
-				supportedProducts = response.Items[0].Products.filter(function(prod)
-				{
-					var productName = prod.toLowerCase();
-					return self.availableApplications.hasOwnProperty(productName) && self.availableApplications[productName].permission;
-				});
-
-				if (supportedProducts.length === 0)
-				{
-					return;
-				}
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
-					.then(function(apiResponse)
-					{
-						var myTransfinderURL = apiResponse.Items[0];
-
-						Promise.resolve($.ajax({
-							url: myTransfinderURL,
-							data: {
-								vendorid: "Transfinder",
-								clientid: tf.authManager.clientKey
-							},
-							dataType: 'json'
-						}))
-							.then(function(res)
-							{
-								hasURLProducts = res.Products.filter(function(prod)
-								{
-									return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
-								});
-								if (hasURLProducts.length === 0)
-								{
-									return;
-								}
-								self.obSupportedApplications(hasURLProducts.map(function(item)
-								{
-									return item.Name.toLowerCase();
-								}));
-
+		event.stopPropagation();
+		self.obSupportedApplications(tf.pageManager.applicationSwitcherList);
 								if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
 
 								self.appSwitcherEnabled = self.obSupportedApplications().length !== 0;
@@ -1123,11 +1078,6 @@
 								{
 									self.toggleAppSwitcherMenu(true);
 								}
-
-							})
-					});
-
-			}.bind(self));
 	};
 
 	/**
@@ -1193,32 +1143,18 @@
 	 */
 	NavigationMenu.prototype.onSwitchAppClick = function(newTab, data, evt)
 	{
+		var self = this;
 		evt.stopPropagation();
 		evt.preventDefault();
 
-		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
-		.then(function(apiResponse)
-		{
-			var routeName = self.availableApplications[data].route,
-				myTransfinderURL = apiResponse.Items[0],
-				requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
+		var routeName = self.availableApplications[data].route,
+			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 			if(requireNewTab){
 				var redirectWindow = window.open('', '_blank');
 					redirectWindow.blur();
 			}
-			Promise.resolve($.ajax({
-				url: myTransfinderURL,
-				data: {
-					vendorid: "Transfinder",
-					clientid: tf.authManager.clientKey
-				},
-				dataType: 'json'
-			}))
-			.then(function(res)
-			{
-				var prod = res.Products.filter(function(prod)
-				{
+		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)
+		{
 							return prod.Name.toLowerCase() == routeName.toLowerCase()
 				}),
 					url;
@@ -1264,8 +1200,7 @@
 				}
 				
 				self.toggleAppSwitcherMenu(false);
-			})
-		});
+
 	};
 
 	/**
