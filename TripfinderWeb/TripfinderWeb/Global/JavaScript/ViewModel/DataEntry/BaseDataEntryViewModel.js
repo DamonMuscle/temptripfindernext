@@ -670,6 +670,7 @@
 		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.type, isNew ? "" : obEntityDataModel.id()),
 			{
 				data: this.getSaveData(),
+				paramData: { productName: "tripfinder" },
 				//async:true will generate an non user interaction, which will make window.open opens a Popup
 				async: false
 			})
