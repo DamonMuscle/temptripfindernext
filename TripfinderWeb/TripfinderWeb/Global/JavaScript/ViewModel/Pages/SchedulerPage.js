@@ -422,10 +422,13 @@
 		var self = this;
 		var storageDateKey = self.options.storageKey + ".schedulerdate",
 			storageViewKey = self.options.storageKey + ".schedulerview",
-			storageDate = e.date.toLocaleDateString(),
+			date = e.date,
 			storageView = e.view;
 
-		tf.storageManager.save(storageDateKey, storageDate);
+		if (date instanceof Date && !isNaN(date))
+		{
+			tf.storageManager.save(storageDateKey, date.toLocaleDateString());
+		}
 		tf.storageManager.save(storageViewKey, storageView);
 	};
 
