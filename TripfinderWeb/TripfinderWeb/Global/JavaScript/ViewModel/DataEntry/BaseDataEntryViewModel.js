@@ -700,6 +700,7 @@
 		var title = tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template",
 			fieldTripEntity = this.getSaveData(true),
 			fieldTripTemplateEntity = fieldTripEntity;
+		fieldTripEntity.Notes = fieldTripEntity.Comments;
 		tf.modalManager.showModal(new TF.Modal.AddOneFieldModalViewModel(title, this.type + "template", "Name", new TF.DataModel.FieldTripTemplatesDataModel()))
 			.then(function(data)
 			{

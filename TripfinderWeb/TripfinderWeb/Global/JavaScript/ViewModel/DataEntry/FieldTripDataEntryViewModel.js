@@ -810,6 +810,7 @@
 				if (item.Id == this.obSelectedTemplateSource().Id)
 				{
 					item.FieldTripStageId = 1;
+					item.Comments = item.Notes;
 					var dataModel = new TF.DataModel.FieldTripDataModel(item);
 					var dirtyModel = new TF.DataModel.FieldTripDataModel();
 					var templateDataModel = new TF.DataModel.FieldTripTemplatesDataModel(item);
