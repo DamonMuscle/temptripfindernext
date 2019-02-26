@@ -53,16 +53,36 @@
 			{
 				this.vehicleIdChanged = true;
 			}
+			if (e)
+			{
+				this.obEntityDataModel().mileageRate(e.Cost);
+			}
 		}.bind(this));
 		this.obSelectedVehicleText = ko.observable(source ? source.VehicleName : undefined);
 		this.obSelectedDriverVehicleDisable = ko.observable(true);
 
 		this.obSelectedDriver = ko.observable();
 		this.obSelectedDriver.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "driverId", "obSelectedDriver", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedDriver.subscribe(function(e)
+		{
+			if (e)
+			{
+				this.obEntityDataModel().driverRate(e.Rate);
+				this.obEntityDataModel().driverOtrate(e.Otrate);
+			}
+		}.bind(this));
 		this.obSelectedDriverText = ko.observable(source ? source.DriverName : undefined);
 
 		this.obSelectedBusAide = ko.observable();
 		this.obSelectedBusAide.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "aideId", "obSelectedBusAide", function(obj) { return obj ? obj.Id : 0; }), this);
+		this.obSelectedBusAide.subscribe(function(e)
+		{
+			if (e)
+			{
+				this.obEntityDataModel().aideRate(e.Rate);
+				this.obEntityDataModel().aideOtrate(e.Otrate);
+			}
+		}.bind(this));
 		this.obSelectedBusAideText = ko.observable(source ? source.AideName : undefined);
 		this.obEntityDataModel().apiIsDirty(false);
 		this.obEntityDataModel()._entityBackup = JSON.parse(JSON.stringify(this.obEntityDataModel().toData()));
@@ -201,7 +221,7 @@
 			return true;
 		}
 
-		if (this.resourceGroupDate.filter(function(item){return item.VehicleId == this.obSelectedVehicle().Id}.bind(this)).length > 0)
+		if (this.resourceGroupDate.filter(function(item) { return item.VehicleId == this.obSelectedVehicle().Id }.bind(this)).length > 0)
 		{
 			return false;
 		}
