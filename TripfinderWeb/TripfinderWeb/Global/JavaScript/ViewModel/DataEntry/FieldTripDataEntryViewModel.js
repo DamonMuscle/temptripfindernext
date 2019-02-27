@@ -1222,7 +1222,13 @@
 
 	FieldTripDataEntryViewModel.prototype.addInvoiceEvent = function(e)
 	{
-		var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes, selectAccount: this.obSelectedAccount() };
+		var option = {
+			entityId: this.obEntityDataModel().id(),
+			entityType: "fieldtrip",
+			strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
+			selectAccount: this.obSelectedAccount(),
+			selectedSchool: this.obEntityDataModel().school()
+		};
 		tf.modalManager.showModal(new e.data.modal(option))
 			.then(function(data)
 			{

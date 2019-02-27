@@ -74,7 +74,8 @@
 
 	FieldTripInvoiceViewModel.prototype.load = function()
 	{
-		var strictAcctCodes = this.option.strictAcctCodes, selectAccount = this.option.selectAccount;
+		var strictAcctCodes = this.option.strictAcctCodes, selectAccount = this.option.selectAccount,
+			selectedSchool = this.option.selectedSchool;
 
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccount"))
 			.then(function(data)
@@ -88,7 +89,9 @@
 					{
 						$.each(data.Items, function(index, item)
 						{
-							if (item.DepartmentId === selectAccount.DepartmentId && item.FieldTripActivityId === selectAccount.FieldTripActivityId)
+							if ((item.DepartmentId === selectAccount.DepartmentId || selectAccount.Department.Name === "[Any]")
+								&& (item.FieldTripActivityId === selectAccount.FieldTripActivityId || selectAccount.FieldTripActivity.Name === "[Any]")
+								&& item.School === selectedSchool)
 							{
 								items.push(item);
 							}
