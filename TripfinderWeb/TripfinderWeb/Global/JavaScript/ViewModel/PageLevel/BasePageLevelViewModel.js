@@ -483,7 +483,14 @@
 	{
 		if (viewModel.field)
 		{
-			$(viewModel.field).focus();
+			if ($(viewModel.field).prop("tagName") === "DIV")
+			{
+				$(viewModel.field)[0].scrollIntoView();
+			}
+			else
+			{
+				$(viewModel.field).focus();
+			}
 		}
 	};
 

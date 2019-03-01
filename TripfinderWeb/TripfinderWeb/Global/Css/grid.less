@@ -66,7 +66,7 @@
 			opacity: 0.4;
 		}
 
-		&.contextmenu-open{
+		&.contextmenu-open {
 			background-color: #4b4b4b;
 			opacity: 1;
 		}
@@ -215,9 +215,11 @@
 .iconbutton.file {
 	background-image: url('../../global/img/grid/save.svg');
 }
+
 .iconbutton.vReport {
 	background-image: url('../../global/img/grid/reports-black.svg');
 }
+
 .grid-contextmenu-open(@image-url) {
 	margin-right: 0;
 	width: 23px;
@@ -1197,6 +1199,13 @@
 					display: flex;
 					justify-content: space-between;
 					text-decoration: none;
+
+					&.required:after {
+						content: "*";
+						color: red;
+						margin-left: 3px;
+						margin-top: 3px;
+					}
 				}
 			}
 		}

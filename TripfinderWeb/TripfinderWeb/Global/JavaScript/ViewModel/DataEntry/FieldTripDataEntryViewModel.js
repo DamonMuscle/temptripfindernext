@@ -1193,6 +1193,14 @@
 		this.$form.find('.invoice .iconbutton.pencil').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.editInvoiceEvent.bind(this));
 		this.$form.find('.invoice .iconbutton.delete').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.deleteInvoiceEvent.bind(this));
 		this.obInvoicingGridViewModel().obGridViewModel()._viewfromDBClick = this.editInvoiceEvent.bind(this);
+		if (this.obRequiredFields() && this.obRequiredFields().FieldTripAccountID && this.obRequiredFields().FieldTripAccountID.Required &&
+			this.obInvoicingGridViewModel().obGridViewModel() && this.obInvoicingGridViewModel().obGridViewModel().searchGrid)
+		{
+			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.onDataBoundEvent.subscribe(function()
+			{
+				$(el).find("th[data-kendo-field='AccountName'] .k-link").addClass("required");
+			});
+		}
 	};
 
 	FieldTripDataEntryViewModel.prototype.initializeDocument = function()
