@@ -5,6 +5,7 @@
 	function FieldTripInvoiceViewModel(option)
 	{
 		this.option = option;
+		this.requiredFields = option.requiredFields;
 		this.obEntityType = ko.observable(option.entityType);
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripInvoiceDataModel(option.data));
 
@@ -48,6 +49,18 @@
 		this.$form = $(el);
 		var validatorFields = {}, isValidating = false, self = this;
 
+		if (this.requiredFields.FieldTripAccountID && this.requiredFields.FieldTripAccountID.Required)
+		{
+			validatorFields.account = {
+				trigger: "blur change",
+				validators: {
+					notEmpty: {
+						message: "required"
+					}
+				}
+			}
+		}
+
 		setTimeout(function()
 		{
 			this.$form.bootstrapValidator({
@@ -68,7 +81,7 @@
 			this.pageLevelViewModel.load(this.$form.data("bootstrapValidator"));
 		}.bind(this));
 
-		this.$form.find("select[name=name]").focus();
+		this.$form.find("select[name=account]").focus();
 		this.load();
 	};
 
@@ -107,6 +120,11 @@
 			}.bind(this));
 	};
 
+	FieldTripInvoiceViewModel.prototype.IsRequired = function(item)
+	{
+		return item ? { required: "required" } : {};
+	};
+
 	FieldTripInvoiceViewModel.prototype.apply = function()
 	{
 		return this.save()
@@ -115,8 +133,8 @@
 				return data;
 				this.dispose();
 			}, function()
-			{
-			});
+				{
+				});
 	};
 
 	FieldTripInvoiceViewModel.prototype.dispose = function()

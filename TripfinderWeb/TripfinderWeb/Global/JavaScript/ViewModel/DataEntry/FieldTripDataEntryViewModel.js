@@ -1227,7 +1227,8 @@
 			entityType: "fieldtrip",
 			strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
 			selectAccount: this.obSelectedAccount(),
-			selectedSchool: this.obEntityDataModel().school()
+			selectedSchool: this.obEntityDataModel().school(),
+			requiredFields: this.obRequiredFields()
 		};
 		tf.modalManager.showModal(new e.data.modal(option))
 			.then(function(data)
@@ -1264,7 +1265,16 @@
 			{
 				data.PaymentDate = moment(data.PaymentDate).format("YYYY-MM-DDTHH:mm:ss.SSS");
 			}
-			var option = { entityId: this.obEntityDataModel().id(), entityType: "fieldtrip", data: data, strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes, selectAccount: this.obSelectedAccount() };
+
+			var option = {
+				entityId: this.obEntityDataModel().id(),
+				entityType: "fieldtrip", data: data,
+				strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
+				selectAccount: this.obSelectedAccount(),
+				selectedSchool: this.obEntityDataModel().school(),
+				requiredFields: this.obRequiredFields()
+			};
+
 			tf.modalManager.showModal(new TF.Modal.FieldTripInvoiceModalViewModel(option))
 				.then(function(data)
 				{
