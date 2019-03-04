@@ -638,16 +638,16 @@
 
 		var url = pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email");
 		var requestOption =
+		{
+			data:
 			{
-				data:
-				{
-					gridLayoutExtendedEntity: this.option.layout,
-					term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
-					SelectedIds: this.option.selectedIds,
-					sortItems: this.option.sortItems,
-					documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
-				}
-			};
+				gridLayoutExtendedEntity: this.option.layout,
+				term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
+				SelectedIds: this.option.selectedIds,
+				sortItems: this.option.sortItems,
+				documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
+			}
+		};
 
 		if (this.option.type === "busfinderhistorical")
 			self.option.setRequestOption(requestOption);
@@ -681,9 +681,9 @@
 							item.UploadFailed(false);
 							if (item.Filename === tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".KML")
 							{
-								if (obj.kml)
+								if (obj.Kml)
 								{
-									item.Guid(obj.kml.Guid);
+									item.Guid(obj.Kml.Guid);
 								}
 							}
 							else
