@@ -833,6 +833,31 @@
 					this.obEntityDataModel(dataModel);
 					this.obEntityDataModel().name(templateDataModel.fieldTripName());
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
+					if (this.obFieldTripSettings().StrictAcctCodes)
+					{
+						this.setAccountListBySchool(this.obEntityDataModel().school());
+
+						var departmentName, activityName;
+						$.each(this.obDepartmentDataModels(), function(index, item)
+						{
+							if (item.Id === this.obEntityDataModel().districtDepartmentId())
+							{
+								departmentName = item.Name;
+								return false;
+							}
+						}.bind(this));
+						$.each(this.obActivityDataModels(), function(index, item)
+						{
+							if (item.Id === this.obEntityDataModel().fieldTripActivityId())
+							{
+								activityName = item.Name;
+								return false;
+							}
+						}.bind(this));
+
+						this.obCurrentAccountName((departmentName || "[Any]") + ' / ' + (activityName || "[Any]"));
+						this.setAccountListBySchool(this.obEntityDataModel().school());
+					}
 					for (var i in dirtyFields)
 					{
 						this.obEntityDataModel()[dirtyFields[i]](dirtyModel[dirtyFields[i]]());
