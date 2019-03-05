@@ -1981,16 +1981,7 @@
 		// FT-988 If in edit model, the departure date and return date didn't change, then didn't check the dead line.
 		if (((this.obDepartureDateSaveValue() == null && this.obEntityDataModel().departDate() == null) ||
 			(this.obDepartureDateSaveValue() !== null && this.obEntityDataModel().departDate() != null &&
-				this.obDepartureDateSaveValue().substring(0, 10) === this.obEntityDataModel().departDate().substring(0, 10))) &&
-			((this.obDepartureTimeSaveValue() == null && this.obEntityDataModel().departTime() == null) ||
-				(this.obDepartureTimeSaveValue() !== null && this.obEntityDataModel().departTime() != null &&
-					this.obDepartureTimeSaveValue().substring(11) === this.obEntityDataModel().departTime().substring(11))) &&
-			((this.obReturnDateSaveValue() == null && this.obEntityDataModel().returnDate() == null) ||
-				(this.obReturnDateSaveValue() !== null && this.obEntityDataModel().returnDate() != null &&
-					this.obReturnDateSaveValue().substring(0, 10) === this.obEntityDataModel().returnDate().substring(0, 10))) &&
-			((this.obReturnTimeSaveValue() == null && this.obEntityDataModel().returnTime() == null) ||
-				(this.obReturnTimeSaveValue() !== null && this.obEntityDataModel().returnTime() != null &&
-					this.obReturnTimeSaveValue().substring(11) === this.obEntityDataModel().returnTime().substring(11))))
+				this.obDepartureDateSaveValue().substring(0, 10) === this.obEntityDataModel().departDate().substring(0, 10))))
 		{
 			return null;
 		}
