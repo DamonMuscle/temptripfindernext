@@ -393,7 +393,7 @@
 
 		if (self.kendoGrid && self.kendoGrid.dataSource)
 		{
-			self.kendoGrid.dataSource.read();
+			self.kendoGrid.refresh();
 		}
 		if (self.options.showOverlay)
 		{
