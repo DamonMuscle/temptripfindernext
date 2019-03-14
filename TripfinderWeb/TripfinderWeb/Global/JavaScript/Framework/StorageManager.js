@@ -11,13 +11,14 @@
 	{
 		var oldKey = key;
 		key = this.prefix + key;
+		
 		if (isSession)
 		{
 			return Promise.resolve(sessionStorage.setItem(key, data));
 		}
 		else if (isLocal)
 		{
-			return Promise.resolve(store.set(key, data));
+			return Promise.resolve(setCookie(key, data));
 		}
 		else
 		{
@@ -43,12 +44,12 @@
 		}
 		key = this.prefix + key;
 		if (isSession)
-		{
+		{			
 			return sessionStorage.getItem(key);
 		}
 		else if (isLocal)
-		{
-			return store.get(key);
+		{			
+			return getCookie(key);
 		}
 		else
 		{
@@ -71,7 +72,7 @@
 		}
 		else if (isLocal)
 		{
-			store.remove(key);
+			expireCookie(key);
 		}
 		else
 		{
@@ -87,7 +88,7 @@
 		}
 		else if (isLocal)
 		{
-			store.remove(relatedKey);
+			expireCookie(relatedKey);
 		}
 		else
 		{
@@ -146,6 +147,39 @@
 	{
 		return tf.datasourceManager.databaseId + ".grid." + gridType + ".map.thematic";
 	};
+
+	function expireCookie(name)
+	{ 
+		document.cookie = name + "=;Expires="+ new Date() +";path=/;domain=."+domain;
+	}
+
+	function setCookie(name, data, expire)
+	{
+		if(expire == null)
+		{
+			expire = new Date(new Date().setFullYear(new Date().getFullYear() + 10));
+		}
+		var parts = location.hostname.split('.');
+		var domain = parts.slice(-2).join('.');
+		document.cookie = name + "=" + JSON.stringify(data) +";Expires="+ expire +";path=/;domain=."+domain;
+		return true;	 
+	}
+
+	function getCookie(name)
+	{
+		var nameEQ = name + "=";
+		var value = null;
+		var ca = document.cookie.split(';');
+		for(var i=0;i < ca.length;i++) {
+			var c = ca[i];
+			while (c.charAt(0)==' ') c = c.substring(1,c.length);
+			if (c.indexOf(nameEQ) == 0){
+				value = c.substring(nameEQ.length,c.length);
+					value = JSON.parse(value);			
+			}
+		}	
+		return value;
+	}
 
 	function equals(entity, backup)
 	{
