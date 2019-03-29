@@ -18,7 +18,14 @@
 		}
 		else if (isLocal)
 		{
+			if(key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" )
+			{
 			return Promise.resolve(setCookie(key, data));
+			}
+			else
+			{
+				return Promise.resolve(store.set(key, data));
+			}
 		}
 		else
 		{
@@ -48,8 +55,16 @@
 			return sessionStorage.getItem(key);
 		}
 		else if (isLocal)
-		{			
-			return getCookie(key);
+		{
+			
+			if(key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" )
+			{
+				return getCookie(key);
+			}
+			else
+			{
+				return store.get(key);
+			}						
 		}
 		else
 		{
@@ -72,7 +87,15 @@
 		}
 		else if (isLocal)
 		{
-			expireCookie(key);
+			if(key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" )
+			{
+				expireCookie(key);
+			}
+			else
+			{
+				store.remove(key);
+			}
+		
 		}
 		else
 		{
@@ -88,7 +111,14 @@
 		}
 		else if (isLocal)
 		{
-			expireCookie(relatedKey);
+			if(key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" )
+			{
+				expireCookie(relatedKey);
+			}
+			else
+			{
+				store.remove(relatedKey);
+			}
 		}
 		else
 		{
