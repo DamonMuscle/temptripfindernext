@@ -829,15 +829,28 @@
 					var key = apiResponse.Items[0], outputTo = report.outputTo().toLowerCase(), reportName = report.reportName();
 					if (outputTo == "view")
 					{
-						
-						redirectWindow.location = pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/");
-						ga('send', 'event', 'Action', 'Report Viewed', reportName + ' Viewed');
+						var req = new XMLHttpRequest();
+  						req.open("GET", pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"), true);
+  						req.responseType = "blob";
+  						req.onload = function (event) {
+						redirectWindow.document.tile = "Transfinder";
+						var blob = req.response;
+						redirectWindow.location=window.URL.createObjectURL(blob)										
+						};
+						  req.send();						  
+						  req.onreadystatechange = function() {
+							
+							if (this.readyState == 4 && this.status != 200) {			
+								redirectWindow.close();								
+							}				
+						};
 						$(redirectWindow).on("load", function()
 						{
 							var head = $('<head>');
 							$(redirectWindow.document).find('html').append(head);
 							head.append($('<title>Tripfinder</title> <link href="' + window.location.href + 'Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">'));
 						});
+						ga('send', 'event', 'Action', 'Report Viewed', reportName + ' Viewed');
 					}
 					else if (outputTo == "email")
 					{
