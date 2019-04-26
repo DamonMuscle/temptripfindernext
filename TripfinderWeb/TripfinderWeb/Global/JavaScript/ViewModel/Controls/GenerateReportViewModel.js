@@ -833,7 +833,7 @@
   						req.open("GET", pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/"), true);
   						req.responseType = "blob";
   						req.onload = function (event) {
-						redirectWindow.document.tile = "Transfinder";
+						redirectWindow.document.title = "Tripfinder";
 						var blob = req.response;
 						redirectWindow.location=window.URL.createObjectURL(blob)										
 						};
