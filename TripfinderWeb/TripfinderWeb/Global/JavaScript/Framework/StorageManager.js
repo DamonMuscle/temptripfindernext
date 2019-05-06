@@ -11,14 +11,14 @@
 	{
 		var oldKey = key;
 		key = this.prefix + key;
-		
 		if (isSession)
 		{
 			return Promise.resolve(sessionStorage.setItem(key, data));
 		}
 		else if (isLocal)
 		{
-			if(key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" )
+			
+			if((key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" ) && CheckDomain(GetDomain()))
 			{
 			return Promise.resolve(setCookie(key, data));
 			}
@@ -45,6 +45,8 @@
 
 	StorageManager.prototype.get = function(key, isLocal, isSession)
 	{
+		
+		
 		if (!key)
 		{
 			return null;
@@ -56,8 +58,7 @@
 		}
 		else if (isLocal)
 		{
-			
-			if(key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" )
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain(GetDomain()))
 			{
 				return getCookie(key);
 			}
@@ -87,7 +88,8 @@
 		}
 		else if (isLocal)
 		{
-			if(key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" )
+			
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain(GetDomain()))
 			{
 				expireCookie(key);
 			}
@@ -111,7 +113,7 @@
 		}
 		else if (isLocal)
 		{
-			if(key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" )
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin") && CheckDomain(GetDomain()))
 			{
 				expireCookie(relatedKey);
 			}
@@ -183,14 +185,23 @@
 		document.cookie = name + "=;Expires="+ new Date() +";path=/;domain=."+domain;
 	}
 
+	function CheckDomain(domain) {
+		var re = new RegExp(/^((?:(?:(?:\w[\.\-\+]?)*)\w)+)((?:(?:(?:\w[\.\-\+]?){0,62})\w)+)\.(\w{2,6})$/);
+		var domain = GetDomain();
+		return domain.match(re);
+	} 
+	function GetDomain() {
+		var parts = location.hostname.split('.');
+		return parts.slice(-2).join('.');
+	} 
+
 	function setCookie(name, data, expire)
 	{
+		var domain = GetDomain();
 		if(expire == null)
 		{
 			expire = new Date(new Date().setFullYear(new Date().getFullYear() + 10));
 		}
-		var parts = location.hostname.split('.');
-		var domain = parts.slice(-2).join('.');
 		document.cookie = name + "=" + JSON.stringify(data) +";Expires="+ expire +";path=/;domain=."+domain;
 		return true;	 
 	}
