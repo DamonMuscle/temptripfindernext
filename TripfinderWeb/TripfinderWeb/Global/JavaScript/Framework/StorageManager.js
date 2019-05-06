@@ -182,7 +182,7 @@
 
 	function expireCookie(name)
 	{ 
-		document.cookie = name + "=;Expires="+ new Date() +";path=/;domain=."+domain;
+		document.cookie = name + "=;Expires="+ new Date() +";path=/;domain=."+ GetDomain();
 	}
 
 	function CheckDomain(domain) {
