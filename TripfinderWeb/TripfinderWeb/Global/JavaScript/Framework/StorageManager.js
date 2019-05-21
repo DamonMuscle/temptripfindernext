@@ -18,7 +18,7 @@
 		else if (isLocal)
 		{
 			
-			if((key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" ) && CheckDomain(GetDomain()))
+			if((key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" ) && CheckDomain())
 			{
 			return Promise.resolve(setCookie(key, data));
 			}
@@ -58,7 +58,7 @@
 		}
 		else if (isLocal)
 		{
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain(GetDomain()))
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain())
 			{
 				return getCookie(key);
 			}
@@ -89,7 +89,7 @@
 		else if (isLocal)
 		{
 			
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain(GetDomain()))
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain())
 			{
 				expireCookie(key);
 			}
@@ -113,7 +113,7 @@
 		}
 		else if (isLocal)
 		{
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin") && CheckDomain(GetDomain()))
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin") && CheckDomain())
 			{
 				expireCookie(relatedKey);
 			}
@@ -185,10 +185,9 @@
 		document.cookie = name + "=;Expires="+ new Date() +";path=/;domain=."+ GetDomain();
 	}
 
-	function CheckDomain(domain) {
-		var re = new RegExp(/^((?:(?:(?:\w[\.\-\+]?)*)\w)+)((?:(?:(?:\w[\.\-\+]?){0,62})\w)+)\.(\w{2,6})$/);
+	function CheckDomain() {
 		var domain = GetDomain();
-		return domain.match(re);
+		return psl.isValid(domain);
 	} 
 	function GetDomain() {
 		var parts = location.hostname.split('.');

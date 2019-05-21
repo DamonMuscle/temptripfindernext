@@ -381,6 +381,7 @@
     <Content Include="Global\ThirdParty\linq.min.js" />
     <Content Include="Global\ThirdParty\moment-with-locales.min.js" />
     <Content Include="Global\ThirdParty\pubsub.js" />
+    <Content Include="Global\ThirdParty\psl.js" />
     <Content Include="Global\ThirdParty\store.min.js" />
     <Content Include="Html\Modal\DataSourceChangeControl.html" />
     <Content Include="Html\Modal\KendoListMoverWithSearchControl.html" />
