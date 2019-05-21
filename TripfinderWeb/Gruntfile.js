@@ -201,6 +201,7 @@ module.exports = function(grunt)
 					"ko": false,
 					"moment": false,
 					"Enumerable": false,
+					"psl" : false,
 					"PubSub": false,
 					"kendo": false,
 					"google": false,
