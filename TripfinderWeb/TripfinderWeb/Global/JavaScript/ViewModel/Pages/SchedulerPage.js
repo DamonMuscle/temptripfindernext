@@ -756,7 +756,7 @@
 			self.schedulerDataSources.push({
 				"Id": item['Id'],
 				"StageId": item['FieldTripStageId'],
-				"Title": item['Name'],
+				"Title": item["PublicId"] + ' ' + item['Name'],
 				"Start": item['DepartDateTime'],
 				"End": item['ReturnTime'],
 				"Descirption": "Test Desciption",
