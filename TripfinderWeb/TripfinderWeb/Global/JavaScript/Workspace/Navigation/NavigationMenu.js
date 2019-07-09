@@ -1155,43 +1155,43 @@
 			}
 		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)
 		{
-							return prod.Name.toLowerCase() == routeName.toLowerCase()
-				}),
-					url;
+			return prod.Name.toLowerCase() == routeName.toLowerCase()
+		}),
+			url;
 
-				if (prod.length > 0 && prod[0].Uri)
+		if (prod.length > 0 && prod[0].Uri)
+		{
+			url = prod[0].Uri;
+
+			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+			{
+				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.onload = function(e)
+			{
+				if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
 				{
-					url = prod[0].Uri;
-
-							if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
-							{
-								url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
-							}
-
-					var xhr = new XMLHttpRequest();
-					xhr.open('GET', url, true);
-							xhr.onload = function(e)
-							{
-						if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
-						{
-							redirectWindow.location = url;
-						}
-						else
-						{
-							redirectWindow.location.href = routeName + "notexisting.html";
-						}
-					};
-							xhr.onerror = function(e)
-							{
-						redirectWindow.location.href = routeName + "notexisting.html";
-					}
-					xhr.send();
+					redirectWindow.location = url;
 				}
 				else
 				{
 					redirectWindow.location.href = routeName + "notexisting.html";
 				}
-				ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
+			};
+			xhr.onerror = function(e)
+			{
+				redirectWindow.location.href = routeName + "notexisting.html";
+			}
+			xhr.send();
+		}
+		else
+		{
+			redirectWindow.location.href = routeName + "notexisting.html";
+		}
+		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 				if(requireNewTab){
 					redirectWindow.location = url;
 				}
@@ -1199,7 +1199,7 @@
 					window.location = url;
 				}
 				
-				self.toggleAppSwitcherMenu(false);
+		self.toggleAppSwitcherMenu(false);
 
 	};
 
