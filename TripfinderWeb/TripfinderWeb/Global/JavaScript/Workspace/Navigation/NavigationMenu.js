@@ -1064,20 +1064,20 @@
 		var self = this;
 		event.stopPropagation();
 		self.obSupportedApplications(tf.pageManager.applicationSwitcherList);
-								if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
+		if (tf.permissions.isSupport || self.obSupportedApplications().length === 0) { return; }
 
-								self.appSwitcherEnabled = self.obSupportedApplications().length !== 0;
-								if (!self.appSwitcherEnabled)
-								{
-									$nav.find(".navigation-header .item-logo").addClass("disabled");
-								}
+		self.appSwitcherEnabled = self.obSupportedApplications().length !== 0;
+		if (!self.appSwitcherEnabled)
+		{
+			$nav.find(".navigation-header .item-logo").addClass("disabled");
+		}
 
-								var isMenuOpened = self.$logoItem.hasClass("menu-opened");
+		var isMenuOpened = self.$logoItem.hasClass("menu-opened");
 
-								if (!self.closeOpenedNavigationItemMenu() && !isMenuOpened)
-								{
-									self.toggleAppSwitcherMenu(true);
-								}
+		if (!self.closeOpenedNavigationItemMenu() && !isMenuOpened)
+		{
+			self.toggleAppSwitcherMenu(true);
+		}
 	};
 
 	/**
