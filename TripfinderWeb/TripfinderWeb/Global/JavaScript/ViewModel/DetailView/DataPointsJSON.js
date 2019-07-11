@@ -486,6 +486,12 @@ var today = (new Date()).toDateString(),
 		"fieldtrip": {
 			"Main": [
 				{
+					"field": "PublicId",
+					"title": "Public ID",
+					"type": "String",
+					"defaultValue": "00100"
+				},
+				{
 					"field": "Name",
 					"title": "Name",
 					"type": "String",
