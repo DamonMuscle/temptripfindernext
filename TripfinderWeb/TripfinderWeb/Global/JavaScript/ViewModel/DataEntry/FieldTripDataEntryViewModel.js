@@ -1129,7 +1129,8 @@
 
 	FieldTripDataEntryViewModel.prototype.addEvent = function(e)
 	{
-		tf.modalManager.showModal(new e.data.modal(null, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData()))
+		tf.modalManager.showModal(new e.data.modal(null, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData(),
+			this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null))
 			.then(function(data)
 			{
 				if (data)
@@ -1150,7 +1151,8 @@
 		if (row.length)
 		{
 			var data = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
-			tf.modalManager.showModal(new e.data.modal(data, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData()))
+			tf.modalManager.showModal(new e.data.modal(data, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData(),
+				this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null))
 				.then(function(data)
 				{
 					if (data)

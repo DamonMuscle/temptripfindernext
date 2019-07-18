@@ -35,6 +35,7 @@
 		{ from: "DestinationCity", default: function() { return tf.setting.userProfile.Mailcity; } },
 		{ from: "DestinationState", default: function() { return tf.setting.userProfile.MailState; } },
 		{ from: "DestinationZip", default: function() { return tf.setting.userProfile.Mailzip; } },
+		{ from: "FieldTripBillingClassification", default: null },
 		{ from: "DestinationNotes", default: "" },
 		{ from: "DestinationContactTitle", default: "" },
 		{ from: "DestinationContact", default: "" },

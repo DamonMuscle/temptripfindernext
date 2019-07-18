@@ -2,17 +2,20 @@
 {
 	createNamespace('TF.Control').FieldTripResourceViewModel = FieldTripResourceViewModel;
 
-	function FieldTripResourceViewModel(source, id, resourceGroupDate)
+	function FieldTripResourceViewModel(source, id, resourceGroupDate, obFieldTrip)
 	{
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripResourceDataModel(source));
 		this.obEntityDataModel().fieldTripId(id);
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();
 		this.obBusaideSource = ko.observableArray();
+		this.obFieldTrip = obFieldTrip && obFieldTrip.toData();
 		this.obEditTieldTrip = ko.observable(id == 0 ? false : true);
 		this.resourceGroupDate = resourceGroupDate;
 		this.source = source;
 		this.vehicleIdChanged = false;
+		this.driverIdChanged = false;
+		this.aideIdChanged = false;
 
 		this.obVehTotal = ko.computed(function()
 		{
@@ -46,43 +49,69 @@
 
 		//drop down list
 		this.obSelectedVehicle = ko.observable();
-		this.obSelectedVehicle.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "vehicleId", "obSelectedVehicle", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedVehicle.subscribe(function(e)
 		{
 			if (!this.vehicleIdChanged && e && source && e.Id !== source.VehicleId)
 			{
 				this.vehicleIdChanged = true;
 			}
-			if (e)
+			if (e && this.obEntityDataModel().vehicleId() != e.Id)
 			{
-				this.obEntityDataModel().mileageRate(e.Cost);
+				if(this.obFieldTrip)
+				{
+					this.obEntityDataModel().mileageRate(this.obFieldTrip.MileageRate || e.Cost);
+					this.obEntityDataModel().vehFixedCost(this.obFieldTrip.FixedCost);
+				}
+				else
+				{
+					this.obEntityDataModel().mileageRate(e.Cost);
+				}
 			}
 		}.bind(this));
+		this.obSelectedVehicle.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "vehicleId", "obSelectedVehicle", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedVehicleText = ko.observable(source ? source.VehicleName : undefined);
 		this.obSelectedDriverVehicleDisable = ko.observable(true);
 
 		this.obSelectedDriver = ko.observable();
-		this.obSelectedDriver.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "driverId", "obSelectedDriver", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedDriver.subscribe(function(e)
 		{
-			if (e)
+			if (e && this.obEntityDataModel().driverId() != e.Id)
 			{
-				this.obEntityDataModel().driverRate(e.Rate);
-				this.obEntityDataModel().driverOtrate(e.Otrate);
+				if(this.obFieldTrip)
+				{
+					this.obEntityDataModel().driverRate(this.obFieldTrip.DriverRate || e.Rate);
+					this.obEntityDataModel().driverOtrate(this.obFieldTrip.DriverOtrate || e.Otrate);
+					this.obEntityDataModel().driverFixedCost(this.obFieldTrip.DriverFixedCost);
+				}
+				else
+				{
+					this.obEntityDataModel().driverRate(e.Rate);
+					this.obEntityDataModel().driverOtrate(e.Otrate);
+				}
 			}
 		}.bind(this));
+		this.obSelectedDriver.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "driverId", "obSelectedDriver", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedDriverText = ko.observable(source ? source.DriverName : undefined);
 
 		this.obSelectedBusAide = ko.observable();
-		this.obSelectedBusAide.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "aideId", "obSelectedBusAide", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedBusAide.subscribe(function(e)
 		{
-			if (e)
+			if (e && this.obEntityDataModel().aideId() != e.Id)
 			{
-				this.obEntityDataModel().aideRate(e.Rate);
-				this.obEntityDataModel().aideOtrate(e.Otrate);
+				if(this.obFieldTrip)
+				{
+					this.obEntityDataModel().aideRate(this.obFieldTrip.AideRate || e.Rate);
+					this.obEntityDataModel().aideOtrate(this.obFieldTrip.AideOtrate || e.Otrate);
+					this.obEntityDataModel().aideFixedCost(this.obFieldTrip.AideFixedCost);
+				}
+				else
+				{
+					this.obEntityDataModel().aideRate(e.Rate);
+					this.obEntityDataModel().aideOtrate(e.Otrate);
+				}
 			}
 		}.bind(this));
+		this.obSelectedBusAide.subscribe(TF.Helper.DropDownMenuHelper.setSelectValue(this, "aideId", "obSelectedBusAide", function(obj) { return obj ? obj.Id : 0; }), this);
 		this.obSelectedBusAideText = ko.observable(source ? source.AideName : undefined);
 		this.obEntityDataModel().apiIsDirty(false);
 		this.obEntityDataModel()._entityBackup = JSON.parse(JSON.stringify(this.obEntityDataModel().toData()));

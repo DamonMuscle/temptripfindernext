@@ -2,12 +2,12 @@
 {
 	createNamespace('TF.Modal').FieldTripResourceModalViewModel = FieldTripResourceModalViewModel;
 
-	function FieldTripResourceModalViewModel(source, id, resourceGroupDate)
+	function FieldTripResourceModalViewModel(source, id, resourceGroupDate, obFieldTrip)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.contentTemplate('modal/fieldtripResourcecontrol');
 		this.buttonTemplate('modal/positivenegative');
-		this.fieldTripResourceViewModel = new TF.Control.FieldTripResourceViewModel(source, id, resourceGroupDate);
+		this.fieldTripResourceViewModel = new TF.Control.FieldTripResourceViewModel(source, id, resourceGroupDate, obFieldTrip);
 		this.data(this.fieldTripResourceViewModel);
 		this.sizeCss = "modal-dialog-lg";
 
