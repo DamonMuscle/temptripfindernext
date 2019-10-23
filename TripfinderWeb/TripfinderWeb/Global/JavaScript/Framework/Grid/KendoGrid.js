@@ -346,7 +346,7 @@
 				//All visible columns to the left of this column are locked. Removing this column will unlock those columns. Are you sure you want to remove this column?
 				return tf.promiseBootbox.confirm(
 					{
-						message: "Are you sure to remove the column?",
+						message: "Are you sure you want to remove this column?",
 						title: "Remove Confirmation"
 					})
 					.then(function(result)
