@@ -477,7 +477,12 @@
 											{
 												if (tf.urlParm.tripid)
 												{
-													tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid], isTemporaryFilter: true }, true);
+													var pageOptions = {	// FT-1231 - setup some special flags for open a certain trip record on-demand
+														filteredIds: [tf.urlParm.tripid],
+														isTemporaryFilter: true,
+														showRecordDetails: true
+													};
+													tf.pageManager.openNewPage("fieldtrips", pageOptions, true);
 													return;
 												}
 												else if (tf.urlParm.DB)

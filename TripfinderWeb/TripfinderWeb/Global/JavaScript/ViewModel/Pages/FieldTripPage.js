@@ -23,7 +23,8 @@
 		var self = this;
 		if (self.gridOptions)
 		{
-			self.options.isTemporaryFilter = self.gridOptions.isTemporaryFilter;
+			self.options.isTemporaryFilter = self.gridOptions.isTemporaryFilter;	// FT-1231 - Transfer the flag for open specific record (on-demand) from startup options to Trip grid view
+			self.options.showRecordDetails = self.gridOptions.showRecordDetails;	// FT-1231 - Transfer the flag for show details (on-demand) from startup options to Trip grid view
 			self.options.fromSearch = self.gridOptions.fromSearch;
 			self.options.searchFilter = self.gridOptions.searchFilter;
 			self.options.filteredIds = self.gridOptions.filteredIds;
@@ -106,5 +107,33 @@
 			}
 			return Promise.resolve(null);
 		};
+	};
+
+	FieldTripPage.prototype.createGrid = function(option)
+	{
+		var self = this,
+			shouldShowDetails = self.options.showRecordDetails;
+
+		TF.Page.BaseGridPage.prototype.createGrid.call(self, option);
+
+		if (shouldShowDetails)
+		{
+			self.openTripRecordDetailsOnInitialLoad();
+		}
+	};
+
+	FieldTripPage.prototype.openTripRecordDetailsOnInitialLoad = function()
+	{
+		var self = this,
+			recordIdToOpen = self.options.filteredIds[0];
+
+		// Setup a databound callback for searchgrid to open the specific FieldTrip record (only for on-demand page access with specified tripid in url)
+		var initialDataBoundCallback = function()
+		{
+			self.searchGrid.onDataBoundEvent.unsubscribe(initialDataBoundCallback);
+			self.showDetailsClick(recordIdToOpen);
+			tf.pageManager.resizablePage.reLayoutPage(100);	// maximize the right panel (detailview)
+		};
+		self.searchGrid.onDataBoundEvent.subscribe(initialDataBoundCallback);
 	};
 })();
