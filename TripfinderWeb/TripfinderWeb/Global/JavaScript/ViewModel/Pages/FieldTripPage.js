@@ -23,6 +23,7 @@
 		var self = this;
 		if (self.gridOptions)
 		{
+			self.options.isTemporaryFilter = self.gridOptions.isTemporaryFilter;
 			self.options.fromSearch = self.gridOptions.fromSearch;
 			self.options.searchFilter = self.gridOptions.searchFilter;
 			self.options.filteredIds = self.gridOptions.filteredIds;

@@ -477,7 +477,7 @@
 											{
 												if (tf.urlParm.tripid)
 												{
-													tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid] }, true);
+													tf.pageManager.openNewPage("fieldtrips", { filteredIds: [tf.urlParm.tripid], isTemporaryFilter: true }, true);
 													return;
 												}
 												else if (tf.urlParm.DB)
