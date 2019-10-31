@@ -37,7 +37,7 @@
 			<div class="item-label">My Submitted Requests</div>
 		</div>
 		<!-- /ko -->
-		<!-- ko if: !tf.authManager.authorizationInfo.isAdmin && !tf.authManager.authorizationInfo.onlyLevel1 -->
+		<!-- ko if: tf.authManager.authorizationInfo.isAdmin && !tf.authManager.authorizationInfo.onlyLevel1 -->
 		<div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
 			<div class="item-icon approvals"></div>
 			<div class="item-label">My Pending Approvals</div>
