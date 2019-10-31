@@ -348,7 +348,7 @@
 	BasePage.prototype.openSelectedClick = function(viewModel, e)
 	{
 		var redirectWindow = window.open('', '_blank');
-			redirectWindow.blur();
+		redirectWindow.blur();
 		this._openSelected(this.pageType, e, redirectWindow);
 	};
 
@@ -370,7 +370,7 @@
 					}, true)
 			]).then(function()
 			{
-				redirectWindow.location = "#/?pagetype=" + this.pageType, "new-pageWindow_" + $.now();
+				redirectWindow.location = "#/?pagetype=" + this.pageType, redirectWindow.name = "new-pageWindow_" + $.now();
 
 			}.bind(this));
 		}

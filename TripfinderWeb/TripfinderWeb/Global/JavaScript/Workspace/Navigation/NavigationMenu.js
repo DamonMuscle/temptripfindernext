@@ -524,7 +524,7 @@
 		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
 		{
 			var redirectWindow = window.open('', '_blank');
-					redirectWindow.blur();
+			redirectWindow.blur();
 		}
 		evt.stopPropagation();
 		var self = this,
@@ -771,10 +771,10 @@
 	NavigationMenu.prototype.openPageButtonClick = function(pageType, data, evt)
 	{
 		if (evt.ctrlKey || evt.metaKey)
-			{
-				var redirectWindow = window.open('', '_blank');
-					redirectWindow.blur();
-			}
+		{
+			var redirectWindow = window.open('', '_blank');
+			redirectWindow.blur();
+		}
 		evt.stopPropagation();
 
 		var self = this;
@@ -792,7 +792,7 @@
 		{
 			if (evt.ctrlKey || evt.metaKey)
 			{
-				redirectWindow.location = "#/?pagetype=settingsConfig", "new-pageWindow_" + $.now();
+				redirectWindow.location = "#/?pagetype=settingsConfig", redirectWindow.name = "new-pageWindow_" + $.now();
 			}
 			else if (!($(evt.target).closest(".item-menu li").hasClass("active")))
 			{
@@ -1149,10 +1149,11 @@
 
 		var routeName = self.availableApplications[data].route,
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
-			if(requireNewTab){
-				var redirectWindow = window.open('', '_blank');
-					redirectWindow.blur();
-			}
+		if (requireNewTab)
+		{
+			var redirectWindow = window.open('', '_blank');
+			redirectWindow.blur();
+		}
 		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)
 		{
 			return prod.Name.toLowerCase() == routeName.toLowerCase()
@@ -1192,13 +1193,15 @@
 			redirectWindow.location.href = routeName + "notexisting.html";
 		}
 		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
-				if(requireNewTab){
-					redirectWindow.location = url;
-				}
-				else{
-					window.location = url;
-				}
-				
+		if (requireNewTab)
+		{
+			redirectWindow.location = url;
+		}
+		else
+		{
+			window.location = url;
+		}
+
 		self.toggleAppSwitcherMenu(false);
 
 	};
