@@ -27,8 +27,8 @@
 
 		//Initial parameters
 		self.availableApplications = {
-			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
-			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
+			viewfinder: {route: "Viewfinder", url: "Viewfinder", permission: true},
+			fleetfinder: {route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin()}
 		};
 		self.initApplicationSwitcher();
 	}
@@ -311,7 +311,7 @@
 		tf.promiseBootbox.confirm({
 			buttons: TF.isPhoneDevice ? {
 				OK: {
-					label: "Logout",
+					label: "Log out",
 					className: "btn-yes-mobile"
 				},
 				Cancel: {
@@ -320,7 +320,7 @@
 				}
 			} : {
 					OK: {
-						label: "Logout",
+						label: "Log out",
 						className: "btn-primary btn-sm btn-primary-black"
 					},
 					Cancel: {
@@ -328,8 +328,8 @@
 						className: "btn-default btn-sm btn-default-link"
 					}
 				},
-			title: "Logout",
-			message: "Are you sure you want to logout?"
+			title: "Log out",
+			message: "Are you sure you want to log out?"
 		}).then(function(result)
 		{
 			if (result)
@@ -494,9 +494,9 @@
 	PageManager.prototype.getAvailableDataTypes = function()
 	{
 		var allDataTypes = [
-			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
+			{name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips()}
 		];
-		return allDataTypes.filter(function(item) { return item.permission; });
+		return allDataTypes.filter(function(item) {return item.permission;});
 	};
 
 	/**
