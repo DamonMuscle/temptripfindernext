@@ -27,8 +27,8 @@
 
 		//Initial parameters
 		self.availableApplications = {
-			viewfinder: {route: "Viewfinder", url: "Viewfinder", permission: true},
-			fleetfinder: {route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin()}
+			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
+			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() }
 		};
 		self.initApplicationSwitcher();
 	}
@@ -328,7 +328,7 @@
 						className: "btn-default btn-sm btn-default-link"
 					}
 				},
-			title: "Log out",
+			title: "Log Out",
 			message: "Are you sure you want to log out?"
 		}).then(function(result)
 		{
@@ -494,9 +494,9 @@
 	PageManager.prototype.getAvailableDataTypes = function()
 	{
 		var allDataTypes = [
-			{name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips()}
+			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
 		];
-		return allDataTypes.filter(function(item) {return item.permission;});
+		return allDataTypes.filter(function(item) { return item.permission; });
 	};
 
 	/**
