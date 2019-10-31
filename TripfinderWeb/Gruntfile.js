@@ -90,6 +90,17 @@ module.exports = function(grunt)
 					filter: 'isFile'
 				}]
 			},
+			serverpages: {
+				files: [{
+					cwd: 'tripfinderweb/ServerPages',
+					src: [
+						'**/*.*'
+					],
+					dest: 'build',
+					expand: true,
+					filter: 'isFile'
+				}]
+			},
 			resource: {
 				files: [{
 					cwd: 'tripfinderweb/Global',
@@ -250,6 +261,10 @@ module.exports = function(grunt)
 				options: {
 					livereload: 35731
 				}
+			},
+			serverpages:{
+				files: ['tripfinderweb/ServerPages/*.aspx', 'tripfinderweb/Web.config'],
+				tasks: ['sync:serverpages', 'sync:individual'],
 			}
 		},
 
@@ -299,7 +314,8 @@ module.exports = function(grunt)
 		'sync:localization',
 		'less',
 		'sync:individual',
-		'sync:html'
+		'sync:html',
+		'sync:serverpages'
 	]);
 
 
@@ -311,6 +327,7 @@ module.exports = function(grunt)
 		'less:build',
 		'sync:individual',
 		'sync:html',
+		'sync:serverpages',
 		'useminPrepare',
 		'concat',
 		'uglify:build',
@@ -326,6 +343,7 @@ module.exports = function(grunt)
 		'sync:localization',
 		'less',
 		'sync:individual',
-		'sync:html'
+		'sync:html',
+		'sync:serverpages'
 	]);
 };
