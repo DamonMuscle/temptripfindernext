@@ -378,6 +378,13 @@
 			.then(function(data)
 			{
 				fieldtripData = data.Items[0];
+				if (fieldtripData && Array.isArray(fieldtripData.School))	// FT-1227, filter out empty school records
+				{
+					fieldtripData.School = fieldtripData.School.filter(function(sch)
+					{
+						return sch.Name && sch.SchoolCode;
+					});
+				}
 				self.getTemplate(fieldtripData.FieldTripTemplate);
 				if (tf.authManager.authorizationInfo.isAdmin)
 				{
