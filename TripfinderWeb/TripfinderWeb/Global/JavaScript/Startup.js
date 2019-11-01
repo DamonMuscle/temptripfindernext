@@ -215,7 +215,8 @@
 								var p3 = tf.storageManager.save("databaseName", datasource.DatabaseName);
 								return Promise.all([p1, p2, p3]).then(function()
 								{
-									location.reload();
+									tf.reloadPageWithoutDatabaseId();
+
 									return "loginpage";
 								});
 							}
@@ -241,6 +242,14 @@
 			{
 				return Promise.resolve(true);
 			}.bind(this));
+	};
+
+	tf.reloadPageWithoutDatabaseId = function()
+	{
+		var tripId = (tf.urlParm && tf.urlParm.tripid) ? tf.urlParm.tripid : null,
+			newLocation = window.location.pathname + tripId ? ("?tripid=" + tripId) : "";
+
+		window.location.href = newLocation;
 	};
 
 	function Startup() { }
@@ -294,60 +303,46 @@
 							{
 								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource")).then(function(datasourceResult)
 								{
-									if (datasourceResult.Items.length === 1)
+									var selectedDatabaseId = tf.storageManager.get("datasourceId"),
+										availableDataSources = (datasourceResult && Array.isArray(datasourceResult.Items)) ? datasourceResult.Items : [];
+
+									var matchedDataSource = availableDataSources.filter(function(ds)
 									{
-										tf.storageManager.save("databaseType", datasourceResult.Items[0].DBType);
-										tf.storageManager.save("datasourceId", datasourceResult.Items[0].Id);
-										tf.storageManager.save("databaseName", datasourceResult.Items[0].DatabaseName);
+										return ds && ds.Id === selectedDatabaseId;
+									})[0];
+
+									if (matchedDataSource)
+									{
+										tf.storageManager.save("databaseType", matchedDataSource.DBType);
+										tf.storageManager.save("datasourceId", matchedDataSource.Id);
+										tf.storageManager.save("databaseName", matchedDataSource.DatabaseName);
 										return tf.datasourceManager.validate();
-									}
-									else if (datasourceResult.Items.length === 0)
-									{
-										return "nodatasource";
 									}
 									else
 									{
-										return false;
+										if (availableDataSources.length === 0)
+										{
+											return "NO_AVAILABLE_DATASOURCE";
+										}
+										else
+										{
+											return "NO_MATCHED_DATASOURCE";
+										}
 									}
 								});
 							}
-							if (tf.urlParm && tf.urlParm.DB)
+
+							var databaseIdFromUrl = (tf.urlParm && Number.isInteger(parseInt(tf.urlParm.DB))) ? parseInt(tf.urlParm.DB) : null;
+							if (databaseIdFromUrl > 0)
 							{
-								tf.storageManager.save("datasourceId", tf.urlParm.DB);
+								tf.storageManager.save("datasourceId", databaseIdFromUrl);
 							}
-							currentDatabaseId = tf.storageManager.get("datasourceId");
-							if (!currentDatabaseId || currentDatabaseId < 0)
-							{
-								return validateAllDB();
-							}
-							if (currentDatabaseId)
-							{
-								return tf.datasourceManager.validate().then(function(result)
-								{
-									if (result === false)
-									{
-										return validateAllDB();
-									}
-									return result;
-								});
-							} else
-							{
-								return validateAllDB();
-							}
+
+							return validateAllDB();
 						})
 						.then(function(validateResult)
 						{
-							if (validateResult === "nodatasource")
-							{
-								tf.loadingIndicator.tryHide();
-								return tf.promiseBootbox.alert(invalidateMessage, "No Valid Data Source")
-									.then(function()
-									{
-										tf.entStorageManager.save("token", "");
-										location.reload();
-										return null;
-									});
-							} else if (validateResult)
+							if (validateResult === true)
 							{
 								return tf.datasourceManager.verifyDataBaseNeedToRebuild(tf.datasourceManager.databaseId, tf.datasourceManager.databaseType)
 									.then(function(noRebuild)
@@ -359,20 +354,30 @@
 										}
 										return Promise.resolve(true);
 									});
-							} else
+							}
+							else if (validateResult === "NO_AVAILABLE_DATASOURCE")
+							{
+								tf.loadingIndicator.tryHide();
+								return tf.promiseBootbox.alert("There is no Data Source available for the current user!", "No Data Source Available")
+									.then(function()
+									{
+										tf.entStorageManager.save("token", "");
+										tf.reloadPageWithoutDatabaseId();
+
+										return null;
+									});
+							}
+							else if (validateResult === "NO_MATCHED_DATASOURCE")
 							{
 								tf.loadingIndicator.tryHide();
 								// cannot validate the connections string
-								var databaseName = tf.storageManager.get("databaseName"),
+								var selectedDatabaseId = tf.storageManager.get("datasourceId"),
 									productName = (TF.productName.charAt(0).toUpperCase() + TF.productName.slice(1)),
-									message = (!!databaseName ? "[" + databaseName + "]" : "Current Data Source") + " is not available. " + productName + " cannot be used without a Data Source. Would you like to choose a different Data Source?";
-								if (!databaseName)
-								{
-									return Promise.resolve(false);
-								}
+									message = String.format("The selected DataSource (Id: {0}) is not available. {1} cannot be used without a Data Source. Would you like to choose a different Data Source?", selectedDatabaseId, productName);
+
 								return tf.promiseBootbox.yesNo({
 									message: message,
-									title: "Data Source Not Available",
+									title: "No Data Source Selected",
 									className: null,
 									buttons: {
 										yes: {
@@ -393,10 +398,16 @@
 									} else
 									{
 										tf.entStorageManager.save("token", "");
-										location.reload();
+										tf.reloadPageWithoutDatabaseId();
+
 										return null;
 									}
 								});
+							}
+							else
+							{
+								console.log("[Warning] Unexpected DataSource Validation Result!");
+								return null;
 							}
 						})
 						.then(function(isPass)
