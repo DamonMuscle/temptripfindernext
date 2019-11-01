@@ -97,6 +97,8 @@
 		self.defaultLayoutName = null;
 		self.totalCostContent = null;
 		self.isTemplateMenuOpened = false;
+
+		self._disposed = false;
 	}
 
 	DetailViewViewModel.prototype.constructor = DetailViewViewModel;
@@ -1213,6 +1215,8 @@
 	DetailViewViewModel.prototype.showDetailViewById = function(id, gridType)
 	{
 		var self = this, gridType = gridType || self.gridType;
+
+		if (self._disposed) return;
 
 		if (!self.isReadMode())
 		{
@@ -2674,10 +2678,10 @@
 				}
 				self.updateGridFooter($itemDom, result.Items.length, result.TotalRecordCount);
 			}, function(error)
-				{
-					//  no permission
-					self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, false, dataItem.url);
-				});
+			{
+				//  no permission
+				self.initEmptyDetailGrid(kendoGrid, $itemDom, columns, dataItem.sort, false, dataItem.url);
+			});
 		}
 		else
 		{
@@ -5195,5 +5199,7 @@
 		}
 		self.$columnPopup.find(".column-container").off(".changeColumn");
 		self.$columnPopup.remove();
+
+		self._disposed = true;
 	};
 }());
