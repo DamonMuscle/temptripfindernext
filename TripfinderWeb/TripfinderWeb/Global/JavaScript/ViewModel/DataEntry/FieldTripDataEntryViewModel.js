@@ -373,18 +373,39 @@
 
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
 	{
-		var self = this, fieldtripData;
+		var self = this, fieldtripData,
+			filterEmptyRecordsByFields = function(items, fields)
+			{
+				if (Array.isArray(items))
+				{
+					return items.filter(function(item)
+					{
+						for (var fi = 0; fi < fields.length; ++fi)
+						{
+							if (!$.trim(item[fields[fi]])) return false;
+						}
+						return true;
+					});
+				}
+
+				return [];
+			};
+
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata"))
 			.then(function(data)
 			{
-				fieldtripData = data.Items[0];
-				if (fieldtripData && Array.isArray(fieldtripData.School))	// FT-1227, filter out empty school records
-				{
-					fieldtripData.School = fieldtripData.School.filter(function(sch)
-					{
-						return sch.Name && sch.SchoolCode;
-					});
-				}
+				var fieldtripData = data.Items[0];
+				fieldtripData.School = filterEmptyRecordsByFields(fieldtripData.School, ["Name", "SchoolCode"]);
+				fieldtripData.FieldTripDistrictDepartment = filterEmptyRecordsByFields(fieldtripData.FieldTripDistrictDepartment, ["Name"]);
+				fieldtripData.FieldTripActivity = filterEmptyRecordsByFields(fieldtripData.FieldTripActivity, ["Name"]);
+				fieldtripData.FieldTripClassification = filterEmptyRecordsByFields(fieldtripData.FieldTripClassification, ["Name"]);
+				fieldtripData.FieldTripEquipment = filterEmptyRecordsByFields(fieldtripData.FieldTripEquipment, ["EquipmentName"]);
+				fieldtripData.FieldTripDestination = filterEmptyRecordsByFields(fieldtripData.FieldTripDestination, ["Name"]);
+
+				return fieldtripData;
+			})
+			.then(function(fieldtripData)
+			{
 				self.getTemplate(fieldtripData.FieldTripTemplate);
 				if (tf.authManager.authorizationInfo.isAdmin)
 				{
