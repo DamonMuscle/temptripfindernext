@@ -395,6 +395,7 @@
 			.then(function(data)
 			{
 				var fieldtripData = data.Items[0];
+				fieldtripData.FieldTripTemplate = filterEmptyRecordsByFields(fieldtripData.FieldTripTemplate, ["Name"]);
 				fieldtripData.School = filterEmptyRecordsByFields(fieldtripData.School, ["Name", "SchoolCode"]);
 				fieldtripData.FieldTripDistrictDepartment = filterEmptyRecordsByFields(fieldtripData.FieldTripDistrictDepartment, ["Name"]);
 				fieldtripData.FieldTripActivity = filterEmptyRecordsByFields(fieldtripData.FieldTripActivity, ["Name"]);
