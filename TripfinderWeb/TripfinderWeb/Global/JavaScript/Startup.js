@@ -247,7 +247,7 @@
 	tf.reloadPageWithoutDatabaseId = function()
 	{
 		var tripId = (tf.urlParm && tf.urlParm.tripid) ? tf.urlParm.tripid : null,
-			newLocation = window.location.pathname + tripId ? ("?tripid=" + tripId) : "";
+			newLocation = window.location.pathname + (tripId ? "?tripid=" + tripId : "");
 
 		window.location.href = newLocation;
 	};
