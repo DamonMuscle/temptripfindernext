@@ -131,7 +131,15 @@
 		var initialDataBoundCallback = function()
 		{
 			self.searchGrid.onDataBoundEvent.unsubscribe(initialDataBoundCallback);
-			self.showDetailsClick(recordIdToOpen);
+
+			var recordIdInGrid = self.searchGrid.allIds.filter(function(id)
+			{
+				return id == recordIdToOpen;
+			})[0];
+
+			if (!recordIdInGrid) return;
+
+			self.showDetailsClick(recordIdInGrid);
 			tf.pageManager.resizablePage.reLayoutPage(100);	// maximize the right panel (detailview)
 		};
 		self.searchGrid.onDataBoundEvent.subscribe(initialDataBoundCallback);
