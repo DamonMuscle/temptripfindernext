@@ -17,6 +17,21 @@
 		this.isChangingSource = false;
 	}
 
+	// Provide a dedicated method for retrieving all valid datasources (for current authInfo context)
+	DatasourceManager.prototype.getAllValidDBs = function()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
+			.then(function(response)
+			{
+				var dataSources = response && Array.isArray(response.Items) ? response.Items : [];
+
+				return dataSources.filter(function(ds)
+				{
+					return ds.IsSQLServer == true && ds.DbfullVersion >= 12000025;	// Copied from previous code (is this hard-code checking still necessary or correct, shall we remove it? )
+				});
+			});
+	};
+
 	DatasourceManager.prototype.validate = function()
 	{
 		var self = this;
@@ -32,12 +47,11 @@
 			{
 				if (result)
 				{
-					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
-						.then(function(apiResponse)
+					return self.getAllValidDBs()
+						.then(function(dataSources)
 						{
-							var datasources = apiResponse.Items;
-							var datasource = Enumerable.From(datasources).Where(function(c) { return c.Id == databaseId }).ToArray()[0];
-							if (!datasource || datasource.IsSQLServer == false /*|| datasource.DbfullVersion != 13000004*/)
+							var datasource = dataSources.filter(function(c) { return c.Id == databaseId; })[0];
+							if (!datasource)
 							{
 								return false;
 							}

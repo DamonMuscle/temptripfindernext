@@ -22,13 +22,9 @@
 
 	DataSourceChangeViewModel.prototype.init = function(model, element)
 	{
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
-			.then(function(apiResponse)
+		tf.datasourceManager.getAllValidDBs()
+			.then(function(datasources)
 			{
-				var datasources = Enumerable.From(apiResponse.Items).Where(function(c)
-				{
-					return c.IsSQLServer == true && c.DbfullVersion >= 12000025;
-				}.bind(this)).ToArray();
 				var datasource = Enumerable.From(datasources).Where(function(c)
 				{
 					return c.Id == this.databaseId;

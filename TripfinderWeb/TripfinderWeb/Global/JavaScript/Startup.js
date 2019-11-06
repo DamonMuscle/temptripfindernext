@@ -308,46 +308,36 @@
 					return Promise.all([p1, p2])
 						.then(function()
 						{
-							var validateAllDB = function()
+							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
+								updateDataSourcePromise = Promise.resolve(true);
+
+							if (dbIdSuppliedInUrl)
 							{
-								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource")).then(function(datasourceResult)
+								var databaseIdFromUrl = Number.isInteger(parseInt(tf.urlParm.DB)) ? parseInt(tf.urlParm.DB) : -1;
+								if (databaseIdFromUrl === 0) databaseIdFromUrl = -1;
+								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
+							}
+
+							return updateDataSourcePromise
+								.then(function()
 								{
-									var selectedDatabaseId = tf.storageManager.get("datasourceId"),
-										availableDataSources = (datasourceResult && Array.isArray(datasourceResult.Items)) ? datasourceResult.Items : [];
-
-									var matchedDataSource = availableDataSources.filter(function(ds)
+									return tf.datasourceManager.validate();
+								})
+								.then(function(isValid)
+								{
+									if (isValid === true)
 									{
-										return ds && ds.Id === selectedDatabaseId;
-									})[0];
+										tf.storageManager.save("databaseType", tf.datasourceManager.databaseType);
+										tf.storageManager.save("datasourceId", tf.datasourceManager.databaseId);
+										tf.storageManager.save("databaseName", tf.datasourceManager.databaseName);
 
-									if (matchedDataSource)
-									{
-										tf.storageManager.save("databaseType", matchedDataSource.DBType);
-										tf.storageManager.save("datasourceId", matchedDataSource.Id);
-										tf.storageManager.save("databaseName", matchedDataSource.DatabaseName);
-										return tf.datasourceManager.validate();
+										return true;
 									}
 									else
 									{
-										if (availableDataSources.length === 0)
-										{
-											return "NO_AVAILABLE_DATASOURCE";
-										}
-										else
-										{
-											return "NO_MATCHED_DATASOURCE";
-										}
+										return false;
 									}
 								});
-							}
-
-							var databaseIdFromUrl = (tf.urlParm && Number.isInteger(parseInt(tf.urlParm.DB))) ? parseInt(tf.urlParm.DB) : null;
-							if (databaseIdFromUrl > 0)
-							{
-								tf.storageManager.save("datasourceId", databaseIdFromUrl);
-							}
-
-							return validateAllDB();
 						})
 						.then(function(validateResult)
 						{
@@ -364,60 +354,66 @@
 										return Promise.resolve(true);
 									});
 							}
-							else if (validateResult === "NO_AVAILABLE_DATASOURCE")
-							{
-								tf.loadingIndicator.tryHide();
-								return tf.promiseBootbox.alert("There is no Data Source available for the current user!", "No Data Source Available")
-									.then(function()
-									{
-										tf.entStorageManager.save("token", "");
-										tf.reloadPageWithDatabaseId(null);
-
-										return null;
-									});
-							}
-							else if (validateResult === "NO_MATCHED_DATASOURCE")
-							{
-								tf.loadingIndicator.tryHide();
-								// cannot validate the connections string
-								var selectedDatabaseId = tf.storageManager.get("datasourceId"),
-									productName = (TF.productName.charAt(0).toUpperCase() + TF.productName.slice(1)),
-									message = String.format("The selected DataSource (Id: {0}) is not available. {1} cannot be used without a Data Source. Would you like to choose a different Data Source?", selectedDatabaseId, productName);
-
-								return tf.promiseBootbox.yesNo({
-									message: message,
-									title: "No Data Source Selected",
-									className: null,
-									buttons: {
-										yes: {
-											label: "Choose Data Source",
-											className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
-										},
-										no: {
-											label: "Cancel",
-											className: TF.isPhoneDevice ? "btn-no-mobile" : "btn-default btn-sm btn-default-link"
-										}
-									}
-								}).then(function(result)
-								{
-									//set db to null and basic settings to null
-									if (result === true)
-									{
-										return false;
-									} else
-									{
-										tf.entStorageManager.save("token", "");
-										tf.reloadPageWithDatabaseId(null);
-
-										return null;
-									}
-								});
-							}
 							else
 							{
-								console.log("[Warning] Unexpected DataSource Validation Result!");
-								return null;
-							}
+								tf.loadingIndicator.tryHide();
+								return tf.datasourceManager.getAllValidDBs()
+									.then(function(dataSources)
+									{
+										if (dataSources && dataSources.length > 0)
+										{
+											var selectedDatabaseId = tf.storageManager.get("datasourceId"),
+												productName = (TF.productName.charAt(0).toUpperCase() + TF.productName.slice(1)),
+												message = "The Data Source requested is no longer available. Please select an active Data Source or contact Administrator for help.";
+
+											return tf.promiseBootbox.alert(message, "Data Source Not Available")
+												.then(function()
+												{
+													return false;
+												});
+										}
+										else
+										{
+											return tf.promiseBootbox.alert("There is no Data Source available for the current user!", "No Data Source Available")
+												.then(function()
+												{
+													tf.entStorageManager.save("token", "");
+													tf.reloadPageWithDatabaseId(null);
+
+													return null;
+												});
+										}
+									});
+
+								// return tf.promiseBootbox.yesNo({
+								// 	message: message,
+								// 	title: "No Data Source Selected",
+								// 	className: null,
+								// 	buttons: {
+								// 		yes: {
+								// 			label: "Choose Data Source",
+								// 			className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
+								// 		},
+								// 		no: {
+								// 			label: "Cancel",
+								// 			className: TF.isPhoneDevice ? "btn-no-mobile" : "btn-default btn-sm btn-default-link"
+								// 		}
+								// 	}
+								// }).then(function(result)
+								// {
+								// 	//set db to null and basic settings to null
+								// 	if (result === true)
+								// 	{
+								// 		return false;
+								// 	} else
+								// 	{
+								// 		tf.entStorageManager.save("token", "");
+								// 		tf.reloadPageWithDatabaseId(null);
+
+								// 		return null;
+								// 	}
+								// });
+							};
 						})
 						.then(function(isPass)
 						{
