@@ -215,7 +215,7 @@
 								var p3 = tf.storageManager.save("databaseName", datasource.DatabaseName);
 								return Promise.all([p1, p2, p3]).then(function()
 								{
-									tf.reloadPageWithoutDatabaseId();
+									tf.reloadPageWithDatabaseId(datasource.Id);
 
 									return "loginpage";
 								});
@@ -244,10 +244,19 @@
 			}.bind(this));
 	};
 
-	tf.reloadPageWithoutDatabaseId = function()
+	tf.reloadPageWithDatabaseId = function(databaseId)
 	{
-		var tripId = (tf.urlParm && tf.urlParm.tripid) ? tf.urlParm.tripid : null,
-			newLocation = window.location.pathname + (tripId ? "?tripid=" + tripId : "");
+		var queryParameters = Object.getOwnPropertyNames(tf.urlParm)
+			.filter(function(name)
+			{
+				return !databaseId ? name !== "DB" : true;
+			})
+			.map(function(name)
+			{
+				var paramValue = name === "DB" ? databaseId : tf.urlParm[name];
+				return String.format("{0}={1}", name, paramValue);
+			}),
+			newLocation = window.location.pathname + "?" + queryParameters.join("&");
 
 		window.location.href = newLocation;
 	};
@@ -362,7 +371,7 @@
 									.then(function()
 									{
 										tf.entStorageManager.save("token", "");
-										tf.reloadPageWithoutDatabaseId();
+										tf.reloadPageWithDatabaseId(null);
 
 										return null;
 									});
@@ -398,7 +407,7 @@
 									} else
 									{
 										tf.entStorageManager.save("token", "");
-										tf.reloadPageWithoutDatabaseId();
+										tf.reloadPageWithDatabaseId(null);
 
 										return null;
 									}
