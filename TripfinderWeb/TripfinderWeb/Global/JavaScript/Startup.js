@@ -318,10 +318,21 @@
 
 							if (dbIdSuppliedInUrl)
 							{
-								var databaseIdFromUrl = Number.isInteger(parseInt(tf.urlParm.DB)) ? parseInt(tf.urlParm.DB) : -1;
-								if (databaseIdFromUrl === 0) databaseIdFromUrl = -1;
+								var dbIdInUrlValue = parseInt(tf.urlParm.DB),
+									databaseIdFromUrl = (Number.isInteger(dbIdInUrlValue) && dbIdInUrlValue) ? dbIdInUrlValue : -1;
+
 								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
 							}
+							else if (!tf.datasourceManager.databaseId)
+							{
+								updateDataSourcePromise = tf.datasourceManager.getAllValidDBs()
+									.then(function(dataSources)
+									{
+										var candidateDB = dataSources.length > 0 ? dataSources[0] : {};
+
+										return tf.storageManager.save("datasourceId", candidateDB.Id);
+									});
+							};
 
 							return updateDataSourcePromise
 								.then(function()
