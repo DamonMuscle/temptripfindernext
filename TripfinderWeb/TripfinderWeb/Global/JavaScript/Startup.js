@@ -246,17 +246,22 @@
 
 	tf.reloadPageWithDatabaseId = function(databaseId)
 	{
-		var queryParameters = Object.getOwnPropertyNames(tf.urlParm)
-			.filter(function(name)
-			{
-				return !databaseId ? name !== "DB" : true;
-			})
-			.map(function(name)
-			{
-				var paramValue = name === "DB" ? databaseId : tf.urlParm[name];
-				return String.format("{0}={1}", name, paramValue);
-			}),
-			newLocation = window.location.pathname + "?" + queryParameters.join("&");
+		var newLocation = window.location.pathname,
+			queryParameters = Object.getOwnPropertyNames(tf.urlParm)
+				.filter(function(name)
+				{
+					return !databaseId ? (name && name !== "DB") : true;
+				})
+				.map(function(name)
+				{
+					var paramValue = name === "DB" ? databaseId : tf.urlParm[name];
+					return String.format("{0}={1}", name, paramValue);
+				});
+
+		if (queryParameters.length > 0)
+		{
+			newLocation += ("?" + queryParameters.join("&"));
+		}
 
 		window.location.href = newLocation;
 	};
