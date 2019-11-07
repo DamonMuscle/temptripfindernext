@@ -378,26 +378,35 @@
 									{
 										if (dataSources && dataSources.length > 0)
 										{
-											var selectedDatabaseId = tf.storageManager.get("datasourceId"),
-												productName = (TF.productName.charAt(0).toUpperCase() + TF.productName.slice(1)),
-												message = "The Data Source requested is no longer available. Please select an active Data Source or contact Administrator for help.";
+											var message = "The Data Source requested is no longer available. Please select an active Data Source or contact Administrator for help.";
 
-											return tf.promiseBootbox.alert(message, "Data Source Not Available")
-												.then(function()
-												{
-													return false;
-												});
+											return tf.promiseBootbox.alert({
+												message: message,
+												title: "No Data Source Selected",
+												className: null,
+												buttons: {
+													yes: {
+														label: "Choose Data Source",
+														className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
+													}
+												}
+											}).then(function()
+											{
+												return false;
+											});
 										}
 										else
 										{
-											return tf.promiseBootbox.alert("There is no Data Source available for the current user!", "No Data Source Available")
-												.then(function()
-												{
-													tf.entStorageManager.save("token", "");
-													tf.reloadPageWithDatabaseId(null);
+											return tf.promiseBootbox.alert({
+												message: "There is no Data Source available for the current user!",
+												title: "No Data Source Selected"
+											}).then(function()
+											{
+												tf.entStorageManager.save("token", "");
+												tf.reloadPageWithDatabaseId(null);
 
-													return null;
-												});
+												return null;
+											});
 										}
 									});
 
