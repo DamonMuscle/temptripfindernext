@@ -303,6 +303,8 @@
 			this.currentDatabaseName("");
 			this.onCurrentDatabaseNameChanged.notify();
 		}
+
+		return Promise.resolve();
 	};
 
 	PageManager.prototype.logOffClick = function()
