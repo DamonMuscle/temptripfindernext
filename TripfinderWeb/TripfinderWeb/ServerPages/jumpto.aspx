@@ -2,10 +2,15 @@
 <script runat="server">
     protected void Page_Load(object sender, EventArgs e)
 	{
-		string tripId = Request.QueryString["editft"];
 		string dbId = Request.QueryString["DB"];
+		string tripId = Request.QueryString["editft"];
+		string urlPath = this.ResolveUrl(string.Format("~/?DB={0}", dbId));
 
-		string urlPath = this.ResolveUrl(string.Format("~/?tripid={0}&DB={1}", tripId, dbId));
+		if (tripId != null)
+		{
+			urlPath += string.Format("&tripid={0}", tripId);
+		}
+
 		Response.RedirectPermanent(urlPath);
 	}
 </script>

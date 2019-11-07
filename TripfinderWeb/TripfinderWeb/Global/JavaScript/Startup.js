@@ -505,12 +505,12 @@
 												{
 													if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.onlyLevel1)
 													{
-														tf.pageManager.openNewPage("fieldtrips", true);
+														tf.pageManager.openNewPage("fieldtrips", null, true);
 														return;
 													}
 													else
 													{
-														tf.pageManager.openNewPage("approvals", true);
+														tf.pageManager.openNewPage("approvals", null, true);
 														return;
 													}
 												}
