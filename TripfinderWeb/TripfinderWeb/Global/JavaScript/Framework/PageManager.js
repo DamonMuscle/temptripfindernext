@@ -60,19 +60,19 @@
 					}))
 						.then(function(res)
 						{
-							hasURLProducts = res.Products.filter(function(prod)
+							hasURLProducts = res ? res.Products.filter(function(prod)
 							{
 								return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
-							});
-							if (hasURLProducts.length === 0)
+							}) : [];
+
+							if (hasURLProducts.length > 0)
 							{
-								return;
+								self.applicationURLMappingList = hasURLProducts;
+								self.applicationSwitcherList = hasURLProducts.map(function(item)
+								{
+									return item.Name.toLowerCase();
+								});
 							}
-							self.applicationURLMappingList = hasURLProducts;
-							self.applicationSwitcherList = hasURLProducts.map(function(item)
-							{
-								return item.Name.toLowerCase();
-							});
 						})
 				});
 		}
