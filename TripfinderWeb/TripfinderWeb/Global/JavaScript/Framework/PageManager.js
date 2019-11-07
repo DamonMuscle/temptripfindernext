@@ -311,7 +311,7 @@
 		tf.promiseBootbox.confirm({
 			buttons: TF.isPhoneDevice ? {
 				OK: {
-					label: "Log out",
+					label: "Log Out",
 					className: "btn-yes-mobile"
 				},
 				Cancel: {
@@ -320,7 +320,7 @@
 				}
 			} : {
 					OK: {
-						label: "Log out",
+						label: "Log Out",
 						className: "btn-primary btn-sm btn-primary-black"
 					},
 					Cancel: {
