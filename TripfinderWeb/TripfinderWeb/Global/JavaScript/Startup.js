@@ -323,7 +323,7 @@
 
 								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
 							}
-							else if (!tf.datasourceManager.databaseId)
+							else if (!tf.storageManager.get("datasourceId"))
 							{
 								updateDataSourcePromise = tf.datasourceManager.getAllValidDBs()
 									.then(function(dataSources)
