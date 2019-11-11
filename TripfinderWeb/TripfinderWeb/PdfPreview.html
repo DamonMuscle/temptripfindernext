@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Tripfinder</title>
+	<script>
+		function loadPreview()
+		{
+			if (window.URLSearchParams)
+			{
+				var searchParams = (new URL(window.location.href)).searchParams;
+				var webPrefix = searchParams.get('web');
+				var reportPath = searchParams.get('report');
+				var link = document.createElement('link');
+				link.href = webPrefix + '/Global/img/Transfinder-TripfinderText-Only.png';
+				link.rel = 'shortcut icon';
+				link.type = 'image/png';
+				document.head.appendChild(link);
+
+				document.getElementsByTagName('iframe')[0].src = reportPath;
+			} else
+			{
+				urlParam = function(name)
+				{
+					var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+					if (results == null)
+					{
+						return null;
+					}
+					else
+					{
+						return decodeURI(results[1]) || 0;
+					}
+				}
+				var reportPath = urlParam('report');
+				// IE does not supprt preview PDF, so download instead
+				window.location = reportPath;
+			}
+		}; 
+	</script>
+</head>
+
+<body style="height: 100%; width: 100%; overflow: hidden; margin:0px; background-color: rgb(82, 86, 89);"
+	onload="loadPreview()">
+	<iframe style="position:absolute; left: 0; top: 0;" width="100%" height="100%">
+</body>
+
+</html>

@@ -128,7 +128,8 @@ module.exports = function(grunt)
 						'Tripfindernotexisting.html',
 						'Fleetfindernotexisting.html',
 						'local_settings.js',
-						'Web.config'
+						'Web.config',
+						'PdfPreview.html'
 					],
 					dest: 'build',
 					expand: true,
@@ -212,7 +213,7 @@ module.exports = function(grunt)
 					"ko": false,
 					"moment": false,
 					"Enumerable": false,
-					"psl" : false,
+					"psl": false,
 					"PubSub": false,
 					"kendo": false,
 					"google": false,
@@ -262,7 +263,7 @@ module.exports = function(grunt)
 					livereload: 35731
 				}
 			},
-			serverpages:{
+			serverpages: {
 				files: ['tripfinderweb/ServerPages/*.aspx', 'tripfinderweb/Web.config'],
 				tasks: ['sync:serverpages', 'sync:individual'],
 			}
