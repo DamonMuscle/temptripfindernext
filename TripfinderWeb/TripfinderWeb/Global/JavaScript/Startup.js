@@ -378,7 +378,7 @@
 									{
 										if (dataSources && dataSources.length > 0)
 										{
-											var message = "The Data Source requested is no longer available. Please select an active Data Source or contact Administrator for help.";
+											var message = "The Data Source requested is no longer available. Please select an active Data Source or contact your Tripfinder Administrator.";
 
 											return tf.promiseBootbox.alert({
 												message: message,
@@ -398,7 +398,7 @@
 										else
 										{
 											return tf.promiseBootbox.alert({
-												message: "There is no Data Source available for the current user!",
+												message: "There is no active Data Source available.",
 												title: "No Data Source Selected"
 											}).then(function()
 											{
