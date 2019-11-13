@@ -771,9 +771,15 @@
 
 	GenerateReportViewModel.prototype.getReport = function(report)
 	{
-		var self = this;
-		var filterClause = null;
-		var includeOnlyIds = null;
+		var self = this,
+			filterClause = null,
+			includeOnlyIds = null,
+			outputTo = report.outputTo().toLowerCase();
+		if (outputTo == "view")
+		{
+			var redirectWindow = window.open('', '_blank');
+			redirectWindow.blur();
+		}
 		if ((!report.includeInActiveFlag()) && report.selectedRecordType == "student")
 		{
 			filterClause = " [InActive] = 0 ";
@@ -822,15 +828,11 @@
 				})
 				.then(function(apiResponse)
 				{
-					var key = apiResponse.Items[0], outputTo = report.outputTo().toLowerCase(), reportName = report.reportName();
+					var key = apiResponse.Items[0], reportName = report.reportName();
 					if (outputTo == "view")
 					{
 						var pdfUrl = pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/");
-						var redirectWindow = window.open(
-							window.location.pathname + 'PdfPreview.html?web='
-							+ window.location.pathname + '&report=' + pdfUrl,
-							'_blank');
-						redirectWindow.blur();
+						redirectWindow.location = window.location.pathname + 'PdfPreview.html?web=' + window.location.pathname + '&report=' + pdfUrl;
 						ga('send', 'event', 'Action', 'Report Viewed', reportName + ' Viewed');
 					}
 					else if (outputTo == "email")
