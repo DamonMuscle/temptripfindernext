@@ -93,14 +93,19 @@
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccount"))
 			.then(function(data)
 			{
-				data.Items = sortArray(data.Items, "Name");
-				var items = data.Items;
+				var accountItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
+				{
+					return !!$.trim(item.Name);
+				}) : [];
+
+				accountItems = sortArray(accountItems, "Name");
+				var items = accountItems;
 				if (strictAcctCodes)
 				{
 					items = [];
 					if (selectAccount)
 					{
-						$.each(data.Items, function(index, item)
+						$.each(accountItems, function(index, item)
 						{
 							if ((item.DepartmentId === selectAccount.DepartmentId || selectAccount.Department.Name === "[Any]")
 								&& (item.FieldTripActivityId === selectAccount.FieldTripActivityId || selectAccount.FieldTripActivity.Name === "[Any]")
@@ -133,8 +138,8 @@
 				return data;
 				this.dispose();
 			}, function()
-				{
-				});
+			{
+			});
 	};
 
 	FieldTripInvoiceViewModel.prototype.dispose = function()

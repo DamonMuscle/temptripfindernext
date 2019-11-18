@@ -57,7 +57,7 @@
 			}
 			if (e && this.obEntityDataModel().vehicleId() != e.Id)
 			{
-				if(this.obFieldTrip)
+				if (this.obFieldTrip)
 				{
 					this.obEntityDataModel().mileageRate(this.obFieldTrip.MileageRate || e.Cost);
 					this.obEntityDataModel().vehFixedCost(this.obFieldTrip.FixedCost);
@@ -77,7 +77,7 @@
 		{
 			if (e && this.obEntityDataModel().driverId() != e.Id)
 			{
-				if(this.obFieldTrip)
+				if (this.obFieldTrip)
 				{
 					this.obEntityDataModel().driverRate(this.obFieldTrip.DriverRate || e.Rate);
 					this.obEntityDataModel().driverOtrate(this.obFieldTrip.DriverOtrate || e.Otrate);
@@ -98,7 +98,7 @@
 		{
 			if (e && this.obEntityDataModel().aideId() != e.Id)
 			{
-				if(this.obFieldTrip)
+				if (this.obFieldTrip)
 				{
 					this.obEntityDataModel().aideRate(this.obFieldTrip.AideRate || e.Rate);
 					this.obEntityDataModel().aideOtrate(this.obFieldTrip.AideOtrate || e.Otrate);
@@ -182,25 +182,37 @@
 		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicle"))
 			.then(function(data)
 			{
-				data.Items = sortArray(data.Items, "BusNum");
-				this.obVehicleSource(data.Items);
+				var vehicleItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
+				{
+					return !!$.trim(item.BusNum);
+				}) : [];
+				vehicleItems = sortArray(vehicleItems, "BusNum");
+				this.obVehicleSource(vehicleItems);
 			}.bind(this));
 
 		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff", "allstaff", 2))
 			.then(function(data)
 			{
-				data.Items = sortArray(data.Items, "FullName");
-				this.obDriverSource(data.Items);
+				var driverItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
+				{
+					return !!$.trim(item.FullName);
+				}) : [];
+				driverItems = sortArray(driverItems, "FullName");
+				this.obDriverSource(driverItems);
 			}.bind(this));
 
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff", "allstaff", 1))
+		var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff", "allstaff", 1))
 			.then(function(data)
 			{
-				data.Items = sortArray(data.Items, "FullName");
-				this.obBusaideSource(data.Items);
+				var busaideItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
+				{
+					return !!$.trim(item.FullName);
+				}) : [];
+				busaideItems = sortArray(busaideItems, "FullName");
+				this.obBusaideSource(busaideItems);
 			}.bind(this));
 
-		return Promise.all([p0, p1]);
+		return Promise.all([p0, p1, p2]);
 	};
 
 	FieldTripResourceViewModel.prototype.apply = function()

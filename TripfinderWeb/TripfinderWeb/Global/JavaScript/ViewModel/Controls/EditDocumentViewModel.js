@@ -201,7 +201,11 @@
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
 			.then(function(data)
 			{
-				this.obClassificationDataModels(data.Items);
+				var docClsItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
+				{
+					return !!$.trim(item.Name);
+				}) : [];
+				this.obClassificationDataModels(docClsItems);
 				if (this.documentData)
 				{
 					var documentEntity = new TF.DataModel.DocumentDataModel().toData();
