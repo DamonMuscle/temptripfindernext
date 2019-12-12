@@ -1164,43 +1164,58 @@
 		{
 			url = prod[0].Uri;
 
-			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+			var promise = null;
+			if (routeName.toLowerCase() === "stopfinder")
 			{
-				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+				routeName = "StopfinderAdmin";
+				promise = tf.promiseAjax.post(pathCombine(tf.api.server("v1.08"), tf.authManager.clientKey, "auth/authentication/sso/stopfinder"))
+					.then(function(response)
+					{
+						var token = response.token;
+						var refreshToken = response.refreshToken;
+						tf.entStorageManager.save("stopfinderToken", token);
+						tf.entStorageManager.save("refreshToken", refreshToken);
+						return true;
+					}.bind(this));
+			}
+			else
+			{
+				if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
+				{
+					url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
+				}
+				promise = Promise.resolve();
 			}
 
-			var xhr = new XMLHttpRequest();
-			xhr.open('GET', url, true);
-			xhr.onload = function(e)
+			promise.then(function()
 			{
-				if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url, true);
+				xhr.onload = function(e)
 				{
-					redirectWindow.location = url;
-				}
-				else
+					if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
+					{
+						requireNewTab ? redirectWindow.location = url : window.location = url;
+					}
+					else
+					{
+						requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
+							window.location.href = routeName + "notexisting.html";
+					}
+				};
+				xhr.onerror = function(e)
 				{
-					redirectWindow.location.href = routeName + "notexisting.html";
+					requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
+						window.location.href = routeName + "notexisting.html";
 				}
-			};
-			xhr.onerror = function(e)
-			{
-				redirectWindow.location.href = routeName + "notexisting.html";
-			}
-			xhr.send();
+				xhr.send();
+			});
 		}
 		else
 		{
 			redirectWindow.location.href = routeName + "notexisting.html";
 		}
 		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
-		if (requireNewTab)
-		{
-			redirectWindow.location = url;
-		}
-		else
-		{
-			window.location = url;
-		}
 
 		self.toggleAppSwitcherMenu(false);
 

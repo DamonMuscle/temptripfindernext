@@ -127,6 +127,7 @@ module.exports = function(grunt)
 						'Viewfindernotexisting.html',
 						'Tripfindernotexisting.html',
 						'Fleetfindernotexisting.html',
+						'Stopfindernotexisting.html',
 						'local_settings.js',
 						'Web.config',
 						'PdfPreview.html'
