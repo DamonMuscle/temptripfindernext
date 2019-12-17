@@ -2,14 +2,85 @@
 <html lang="en">
 
 <head>
+  <title></title>
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <link rel="stylesheet" href="Global/Css/tripfinder.css" />
   <style type="text/css">
+    html {
+      height: 100%;
+      width: 100%;
+      font-size: 14px;
+    }
+
     body {
       overflow: hidden;
+      font-family: "SourceSansPro-Regular", Arial;
+      min-width: 1185px;
+      overflow-x: auto;
+      font-size: 13px;
+      position: relative;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      float: left;
+    }
+
+    #loadingindicator {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30000;
+      position: fixed;
+    }
+
+    #loadingindicator>.overlay {
+      background: rgba(102, 102, 102, 0.8);
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    #loadingindicator .spinner {
+      position: absolute;
+      margin: auto;
+      left: 0;
+      right: 0;
+      top: 40%;
+      overflow: visible;
+      opacity: 0.8;
+      border-radius: 2px;
+      display: flex;
+      width: 148px;
+      height: auto;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #loadingindicator .spinner-icon-container {
+      height: 50px;
+      width: 44px;
+    }
+
+    #loadingindicator .spinner .subtitle {
+      margin-top: -5px;
+      width: 350px;
+    }
+
+    #loadingindicator .spinner .subtitle-text {
+      color: white;
+      font-size: 18pt;
+      font-weight: regular;
+      display: table;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
     }
 
     @-webkit-keyframes uil-default-anim {

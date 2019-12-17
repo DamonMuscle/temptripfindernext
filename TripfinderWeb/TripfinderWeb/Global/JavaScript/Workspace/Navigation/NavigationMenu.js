@@ -1161,7 +1161,10 @@
 				link.type = "image/x-icon";
 				link.rel = "shortcut icon";
 				link.href = "Global/img/app-switcher/" + routeName + ".ico";
-				head.appendChild(link);
+				if (head)
+				{
+					head.appendChild(link);
+				}
 				redirectWindow.document.title = routeName;
 			});
 			redirectWindow.blur();
