@@ -1165,9 +1165,8 @@
 			url = prod[0].Uri;
 
 			var promise = null;
-			if (routeName.toLowerCase() === "stopfinder")
+			if (routeName.toLowerCase() === "stopfinderadmin")
 			{
-				routeName = "StopfinderAdmin";
 				promise = tf.promiseAjax.post(pathCombine(tf.api.server("v1.08"), tf.authManager.clientKey, "auth/authentication/sso/stopfinder"))
 					.then(function(response)
 					{

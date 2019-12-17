@@ -29,7 +29,7 @@
 		self.availableApplications = {
 			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
 			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() },
-			stopfinder: { route: "Stopfinder", url: "StopfinderAdmin", permission: tf.permissions.obIsAdmin() }
+			stopfinderadmin: { route: "StopfinderAdmin", url: "StopfinderAdmin", permission: tf.permissions.obIsAdmin() }
 		};
 		self.initApplicationSwitcher();
 	}
