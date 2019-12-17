@@ -1152,6 +1152,18 @@
 		if (requireNewTab)
 		{
 			var redirectWindow = window.open('', '_blank');
+			redirectWindow.location.href = "loading.html";
+			setTimeout(function()
+			{
+				var doc = redirectWindow.document;
+				var head = doc.head;
+				var link = doc.createElement("link");
+				link.type = "image/x-icon";
+				link.rel = "shortcut icon";
+				link.href = "Global/img/app-switcher/" + routeName + ".ico";
+				head.appendChild(link);
+				redirectWindow.document.title = routeName;
+			});
 			redirectWindow.blur();
 		}
 		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)

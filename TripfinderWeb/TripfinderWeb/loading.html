@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="Global/Css/tripfinder.css" />
+  <style type="text/css">
+    body {
+      overflow: hidden;
+    }
+
+    @-webkit-keyframes uil-default-anim {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes uil-default-anim {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .uil-default-css {
+      position: relative;
+      left: -78px;
+      top: -78px;
+      background: none;
+      width: 200px;
+      height: 200px;
+      transform: scale(0.22);
+    }
+
+    .uil-default-css>div:nth-of-type(1) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -0.35s;
+      animation-delay: -0.35s;
+    }
+
+    .uil-default-css>div:nth-of-type(2) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -0.29166666666666663s;
+      animation-delay: -0.29166666666666663s;
+    }
+
+    .uil-default-css>div:nth-of-type(3) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -0.23333333333333334s;
+      animation-delay: -0.23333333333333334s;
+    }
+
+    .uil-default-css>div:nth-of-type(4) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -0.17500000000000002s;
+      animation-delay: -0.17500000000000002s;
+    }
+
+    .uil-default-css>div:nth-of-type(5) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -0.11666666666666667s;
+      animation-delay: -0.11666666666666667s;
+    }
+
+    .uil-default-css>div:nth-of-type(6) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -0.05833333333333329s;
+      animation-delay: -0.05833333333333329s;
+    }
+
+    .uil-default-css>div:nth-of-type(7) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: -5.551115123125783s;
+      animation-delay: -5.551115123125783s;
+    }
+
+    .uil-default-css>div:nth-of-type(8) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: 0.05833333333333329s;
+      animation-delay: 0.05833333333333329s;
+    }
+
+    .uil-default-css>div:nth-of-type(9) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: 0.11666666666666664s;
+      animation-delay: 0.11666666666666664s;
+    }
+
+    .uil-default-css>div:nth-of-type(10) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: 0.17500000000000004s;
+      animation-delay: 0.17500000000000004s;
+    }
+
+    .uil-default-css>div:nth-of-type(11) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: 0.2333333333333334s;
+      animation-delay: 0.2333333333333334s;
+    }
+
+    .uil-default-css>div:nth-of-type(12) {
+      -webkit-animation: uil-default-anim .7s linear infinite;
+      animation: uil-default-anim .7s linear infinite;
+      -webkit-animation-delay: 0.29166666666666663s;
+      animation-delay: 0.29166666666666663s;
+    }
+
+    .spinner-chunk {
+      background: rgb(255, 255, 255);
+      border-radius: 8px;
+      left: 93px;
+      top: 80px;
+      width: 16px;
+      height: 40px;
+      position: absolute;
+    }
+
+    .spinner-state-0 {
+      transform: rotate(0deg) translate(0px, -58px);
+      -webkit-transform: rotate(0deg) translate(0, -58px);
+    }
+
+    .spinner-state-1 {
+      transform: rotate(30deg) translate(0px, -58px);
+      -webkit-transform: rotate(30deg) translate(0, -58px);
+    }
+
+    .spinner-state-2 {
+      transform: rotate(60deg) translate(0px, -58px);
+      -webkit-transform: rotate(60deg) translate(0, -58px);
+    }
+
+    .spinner-state-3 {
+      transform: rotate(90deg) translate(0px, -58px);
+      -webkit-transform: rotate(90deg) translate(0, -58px);
+    }
+
+    .spinner-state-4 {
+      transform: rotate(120deg) translate(0px, -58px);
+      -webkit-transform: rotate(120deg) translate(0, -58px);
+    }
+
+    .spinner-state-5 {
+      transform: rotate(150deg) translate(0px, -58px);
+      -webkit-transform: rotate(150deg) translate(0, -58px);
+    }
+
+    .spinner-state-6 {
+      transform: rotate(180deg) translate(0px, -58px);
+      -webkit-transform: rotate(180deg) translate(0, -58px);
+    }
+
+    .spinner-state-7 {
+      transform: rotate(210deg) translate(0px, -58px);
+      -webkit-transform: rotate(210deg) translate(0, -58px);
+    }
+
+    .spinner-state-8 {
+      transform: rotate(240deg) translate(0px, -58px);
+      -webkit-transform: rotate(240deg) translate(0, -58px);
+    }
+
+    .spinner-state-9 {
+      transform: rotate(270deg) translate(0px, -58px);
+      -webkit-transform: rotate(270deg) translate(0, -58px);
+    }
+
+    .spinner-state-10 {
+      transform: rotate(300deg) translate(0px, -58px);
+      -webkit-transform: rotate(300deg) translate(0, -58px);
+    }
+
+    .spinner-state-11 {
+      transform: rotate(330deg) translate(0px, -58px);
+      -webkit-transform: rotate(330deg) translate(0, -58px);
+    }
+  </style>
+</head>
+
+<body class="tfmodal-login">
+  <div id="loadingindicator">
+    <div class="overlay">
+      <div class="spinner">
+        <div class="spinner-icon-container">
+          <div class="uil-default-css">
+            <div class="spinner-thing spinner-chunk spinner-state-0"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-1"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-2"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-3"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-4"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-5"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-6"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-7"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-8"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-9"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-10"></div>
+            <div class="spinner-thing spinner-chunk spinner-state-11"></div>
+          </div>
+        </div>
+        <div class="subtitle">
+          <div class="subtitle-text">Loading</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
