@@ -18,7 +18,7 @@
 		else if (isLocal)
 		{
 			
-			if((key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" ) && CheckDomain())
+			if((key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" || "ent.stopfinderToken") && CheckDomain())
 			{
 			return Promise.resolve(setCookie(key, data));
 			}
@@ -58,7 +58,7 @@
 		}
 		else if (isLocal)
 		{
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain())
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" || "ent.stopfinderToken") && CheckDomain())
 			{
 				return getCookie(key);
 			}
@@ -89,7 +89,7 @@
 		else if (isLocal)
 		{
 			
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" ) && CheckDomain())
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" || "ent.stopfinderToken") && CheckDomain())
 			{
 				expireCookie(key);
 			}
@@ -113,7 +113,7 @@
 		}
 		else if (isLocal)
 		{
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin") && CheckDomain())
+			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" || "ent.stopfinderToken") && CheckDomain())
 			{
 				expireCookie(relatedKey);
 			}
