@@ -1227,7 +1227,8 @@
 		}
 		else
 		{
-			redirectWindow.location.href = routeName + "notexisting.html";
+			requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
+				window.location.href = routeName + "notexisting.html";
 		}
 		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 
