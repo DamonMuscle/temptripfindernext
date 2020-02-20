@@ -1223,7 +1223,11 @@
 						window.location.href = routeName + "notexisting.html";
 				}
 				xhr.send();
-			});
+			}).catch(function()
+      {
+        requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
+          window.location.href = routeName + "notexisting.html";
+      });
 		}
 		else
 		{
