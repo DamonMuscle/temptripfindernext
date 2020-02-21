@@ -6,6 +6,7 @@
 	function FieldTripInvoiceModalViewModel(option)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
+		this.obPositiveButtonLabel("Apply");
 		this.contentTemplate('modal/fieldtripInvoicecontrol');
 		this.buttonTemplate('modal/positivenegative');
 		this.fieldTripInvoiceViewModel = new TF.Control.FieldTripInvoiceViewModel(option);
