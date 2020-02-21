@@ -10,3 +10,5 @@
 /TripfinderWeb/TripfinderWeb/local_settings.js
 /TripfinderWeb/TripfinderWeb/Global/Css/*.css
 /TripfinderWeb/TripfinderWeb/Global/Css/*.map
+.history
+.DS_Store
