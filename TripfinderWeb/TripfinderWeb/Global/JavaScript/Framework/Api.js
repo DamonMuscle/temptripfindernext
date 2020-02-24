@@ -10,6 +10,8 @@
 
 	API.prototype.apiPrefix = function(version)
 	{
+		// TODO-V2
+		this.datasourceManager.databaseId = 7;
 		return pathCombine(this.server(version), this.authManager.clientKey, this.datasourceManager.databaseId);
 	};
 
@@ -30,6 +32,6 @@
 			server = APIServer;
 		}
 
-		return server + (version ? "/" + version : "/v1");
+		return server + (version ? "/" + version : "/v2");
 	};
 })();

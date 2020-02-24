@@ -169,7 +169,7 @@
 		{
 			gridName = this.options.kendoGridOption.entityType + "." + gridName;
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefault", "getgriddefaults", gridName))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefaults?gridName=" + gridName))
 			.then(function(apiResponse)
 			{
 				var columns;
@@ -950,7 +950,7 @@
 		var unsyncedDBLayout = null;
 		var self = this;
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout", self.options.gridType))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + self.options.gridType))
 			.then(function(apiResponse)
 			{
 				var gridLayoutExtendedDataModels =

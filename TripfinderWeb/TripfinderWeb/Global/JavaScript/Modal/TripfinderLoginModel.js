@@ -204,7 +204,7 @@
 			{
 				if (result)
 				{
-					tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "auth", "authorization"), {
+					tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "authinfos"), {
 						error: function(message, status)
 						{
 							if (message)

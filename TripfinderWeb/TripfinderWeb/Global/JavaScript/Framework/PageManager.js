@@ -31,7 +31,9 @@
 			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() },
 			stopfinderadmin: { route: "StopfinderAdmin", url: "StopfinderAdmin", permission: tf.permissions.obIsAdmin() }
 		};
-		self.initApplicationSwitcher();
+
+		// TODO-V2
+		// self.initApplicationSwitcher();
 	}
 
 	PageManager.prototype.initApplicationSwitcher = function()
@@ -128,7 +130,8 @@
 
 	PageManager.prototype.getMessageSettings = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage"));
+		// return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage"));
+		return Promise.resolve([]);
 	};
 
 	PageManager.prototype.showMessageModal = function(isInitPage)

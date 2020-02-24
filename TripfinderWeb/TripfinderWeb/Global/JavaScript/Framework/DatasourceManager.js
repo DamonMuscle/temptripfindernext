@@ -20,7 +20,7 @@
 	// Provide a dedicated method for retrieving all valid datasources (for current authInfo context)
 	DatasourceManager.prototype.getAllValidDBs = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases"))
 			.then(function(response)
 			{
 				var dataSources = response && Array.isArray(response.Items) ? response.Items : [];

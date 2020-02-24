@@ -469,9 +469,17 @@
 	KendoGridFilterMenu.prototype._loadGridFilter = function(autoSetSummaryFliter)
 	{
 		var self = this;
-		var filterUrl = "gridfilter";
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), filterUrl, self.options.gridType))
-			.then(function(apiResponse)
+		var filterUrl = "gridfilters";
+		if (tf.isViewfinder)
+		{
+			filterUrl = "gridfilters/skipReadReminderData/";
+		}
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
+				paramData: {
+					"@filter": String.format("(eq(dbid, {0})|isnull(dbid,))&eq(datatypeId,{1})", tf.datasourceManager.databaseId, self.options.gridType),
+					"@relationships": "OmittedRecord,Reminder"
+				}
+			}).then(function(apiResponse)
 			{
 				var gridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, apiResponse.Items);
 				//IF the request from search, do not use the sticky fliter.
