@@ -81,11 +81,21 @@
 
 	LoginViewModel.prototype.signIn = function()
 	{
-		tf.authManager.token = null;
-		tf.entStorageManager.save("token", null);
-		return tf.promiseAjax.post(pathCombine(tf.api.server(), $.trim(this.obClientKey()), "auth", "authentication?vendor=Transfinder&prefix=" + tf.storageManager.prefix.split('.')[0] + "&username=" + this.obUsername()),
+		var prefix, clientKey = $.trim(this.obClientKey()), userName = $.trim(this.obUsername()), password = this.obPassword();
+		if (tf.tokenStorageManager)
+		{
+			prefix = tf.tokenStorageManager.prefix;
+		}
+		else
+		{
+			tf.storageManager.save("token", "", true);
+			prefix = tf.storageManager.prefix;
+		}
+
+		prefix = prefix.split('.')[0];
+		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos?vendor=Transfinder&prefix=" + prefix + "&username=" + userName),
 			{
-				data: '"' + this.obPassword() + '"'
+				data: '"' + password + '"'
 			},
 			{
 				auth:
@@ -95,11 +105,16 @@
 			})
 			.then(function(apiResponse)
 			{
+				tf.storageManager.delete("datasourceId", true, true);
 				var token = apiResponse.Items[0];
+				if (!tf.tokenStorageManager)
+				{
+					tf.storageManager.save("token", token, true);
+				}
+
 				tf.authManager.token = token;
-				tf.entStorageManager.save("token", token);
-				return { clientKey: $.trim(this.obClientKey()), username: this.obUsername(), password: this.obPassword() };
-			}.bind(this))
+				return { clientKey: clientKey, username: userName, password: this.obPassword() };
+			}.bind(this));
 	};
 
 	LoginViewModel.prototype._trimClientKey = function()

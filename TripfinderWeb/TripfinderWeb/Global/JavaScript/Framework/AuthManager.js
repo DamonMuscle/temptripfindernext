@@ -61,15 +61,19 @@
 		var p = null;
 		if (this._hasLoggedin)
 		{
-			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "auth", "authentication", "test"), null, {
-				auth: {
-					noInterupt: true
-				},
-				overlay: false
-			})
-				.then(function()
+			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
+						paramData: {
+							isValid: true
+						}
+					}, {
+					auth:
+					{
+						noInterupt: true
+					},
+					overlay: false
+				}).then(function()
 				{
-					var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "clientconfig", "timezonetotalminutes"), {}, {
+					var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "timezonetotalminutes"), {}, {
 						auth: {
 							noInterupt: true
 						},
@@ -87,15 +91,9 @@
 								.then(function(valResult)
 								{
 									if (!valResult.Items[0].AnyDBPass)
-									{ //all db connection failed
-										var message = "";
-										if (valResult.Items[0].DBlength == 1)
-										{
-											message = valResult.Items[0].DBName + " could not load.  There is only one data source.  Try again later.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-										} else
-										{
-											message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-										}
+									{
+										//all db connection failed
+										var message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
 										return this._loginUseModal(loginViewModal, message);
 									}
 								}.bind(this));
@@ -120,7 +118,7 @@
 				location.reload();
 				return Promise.reject("login failed");
 			}
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "auth", "authorization"), null, {
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), null, {
 				overlay: false,
 				auth: {
 					noInterupt: true

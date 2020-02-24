@@ -324,7 +324,7 @@
 		{
 			typeName = this.options.kendoGridOption.entityType + "." + this.options.gridType;
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout", typeName))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + typeName))
 			.then(function(apiResponse)
 			{
 				apiResponse.Items = [defaultGridLayoutExtendedEntity].concat(apiResponse.Items);

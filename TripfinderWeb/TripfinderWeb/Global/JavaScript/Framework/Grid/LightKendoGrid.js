@@ -610,7 +610,8 @@
 								{
 									self.setFilterIconByKendoDSFilter.bind(self)();
 
-									tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
+									// TODO-V2
+									tf.ajax.post(self.getApiRequestURL(self.options.url + "s"), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
 										.then(function()
 										{
 											//the count of request callback in the process of change filter
@@ -4270,7 +4271,8 @@
 					}
 					else if (self.geoFields && self.geoFields.length > 0)
 					{
-						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType),
+						//TODO-V2
+						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType + "s"),
 							{
 								data:
 								{

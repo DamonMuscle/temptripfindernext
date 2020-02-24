@@ -9,7 +9,7 @@
 
 	UserPreferenceManager.prototype.getAllKey = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userpreference"), { paramData: { prefix: tf.storageManager.prefix } })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userpreferences"), { paramData: { "@filter": "contains(key," + tf.storageManager.prefix + ")" } })
 			.then(function(apiResponse)
 			{
 				this.UserPreferenceDataList = apiResponse.Items;
@@ -111,9 +111,9 @@
 			data = JSON.stringify(data);
 		}
 		this.setUserPreferenceValue(key, data);
-		return tf.promiseAjax.post(pathCombine(apiPrefix, "userpreference"),
+		return tf.promiseAjax.post(pathCombine(apiPrefix, "userpreferences"),
 			{
-				data: new TF.DataModel.UserPreferenceDataModel({ Key: key, Value: data }).toData(),
+				data: [new TF.DataModel.UserPreferenceDataModel({ Key: key, Value: data }).toData()],
 				async: async
 			}, { overlay: false });
 	};
@@ -127,7 +127,7 @@
 	{
 		var apiPrefix = tf.api.apiPrefixWithoutDatabase();
 		this.removeUserPreferenceValue(key);
-		tf.promiseAjax.delete(pathCombine(apiPrefix, "userpreference", key), null, { overlay: false })
+		tf.promiseAjax.delete(pathCombine(apiPrefix, "userpreferences?key=" + key), null, { overlay: false })
 			.then(function(apiResponse)
 			{
 			});
@@ -137,7 +137,7 @@
 	{
 		var apiPrefix = tf.api.apiPrefixWithoutDatabase();
 		this.removeRelatedUserPreferenceValue(relatedKey);
-		tf.promiseAjax.delete(pathCombine(apiPrefix, "userpreference/deleteRelated", relatedKey), null, { overlay: false })
+		tf.promiseAjax.delete(pathCombine(apiPrefix, "userpreferences?@filter=contains(key," + relatedKey + ")"), null, { overlay: false })
 			.then(function(apiResponse)
 			{
 			});

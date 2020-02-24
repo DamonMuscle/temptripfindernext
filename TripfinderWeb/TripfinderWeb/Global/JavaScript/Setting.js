@@ -12,13 +12,13 @@
 
 	Setting.prototype.getRoutingConfig = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userprofile"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userprofiles"))
 			.then(function(data)
 			{
 				if (data.Items[0])
 				{
-
 					this.userProfile = data.Items[0];
+					this.userProfile.DefaultTimeSpan = moment(this.userProfile.DefaultTime).format("HH:mm:ss");
 					this.userProfile.RoutingProfile = data.Items[0].RoutingProfile ||
 						{};
 					this.userProfile.District = this.userProfile.District || "";

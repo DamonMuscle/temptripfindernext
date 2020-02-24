@@ -289,10 +289,11 @@
 			tf.kendoHackHelper = new TF.KendoHackHelper();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
-				.then(function()
-				{
-					return sessionValidator.activate();
-				})
+				// TODO-V2
+				// .then(function()
+				// {
+				// 	return sessionValidator.activate();
+				// })
 				.then(function()
 				{
 					tf.setting = new TF.Setting();
@@ -474,7 +475,10 @@
 									var promise;
 									if (!TF.isPhoneDevice)
 									{
+										
 										promise = tf.pageManager.initNavgationBar();
+										// TODO-V2
+										promise = Promise.resolve();
 									}
 									else
 									{
@@ -511,7 +515,8 @@
 											}
 											else
 											{
-												tf.pageManager.showMessageModal(true);
+												// TODO-V2
+												// tf.pageManager.showMessageModal(true);
 											}
 
 											if (tf.urlParm)
@@ -567,7 +572,7 @@
 
 	Startup.prototype._loadApplicationTerm = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "applicationterm", "getall"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applicationterms"))
 			.then(function(response)
 			{
 				if (response.Items && response.Items.length > 0)
@@ -694,7 +699,7 @@
 			Vehicle: 'MPG',
 			PostalCodeLength: 5
 		};
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "localization"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "localizations"))
 			.then(function(response)
 			{
 				if (response.Items && response.Items.length > 0)
