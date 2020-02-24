@@ -325,10 +325,11 @@
       width: 100%;
       position: relative;
       overflow: hidden;
+      background-color: #333;
 
       &.onAnimation,
       &.menu-opened {
-        width: 300px;
+        width: 200px;
         padding-left: 42px;
         padding-right: 14px;
         box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
@@ -352,10 +353,22 @@
         width: 54px;
         position: absolute;
 
+        &:hover {
+          background-color: @HoverBackgroundColor;
+        }
+
+        &.logout {
+          left: 42px;
+        }
+
+        &.datasource {
+          left: 123px;
+        }
+
         &.more {
-          display: none;
+          display: block;
           left: 0;
-          opacity: 0;
+          opacity: 1;
           width: 60px;
           z-index: 2;
         }
@@ -565,9 +578,14 @@
         background-image: url("../img/navigation-menu/icon-Reports.svg");
       }
 
+      &.datasource {
+        background-image: url("../img/navigation-menu/data_source.svg");
+      }
+
       &.more {
         text-align: center;
         display: none;
+        background-image: url("../img/navigation-menu/icon-ellipsis.svg");
 
         .count-down-number {
           margin-top: 16px;
