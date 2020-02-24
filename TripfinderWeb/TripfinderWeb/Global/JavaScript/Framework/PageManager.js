@@ -130,6 +130,7 @@
 
 	PageManager.prototype.getMessageSettings = function()
 	{
+		// TODO-V2
 		// return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage"));
 		return Promise.resolve([]);
 	};

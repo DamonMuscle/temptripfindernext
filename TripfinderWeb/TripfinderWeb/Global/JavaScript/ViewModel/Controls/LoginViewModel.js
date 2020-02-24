@@ -93,8 +93,6 @@
 		}
 
 		prefix = prefix.split('.')[0];
-		// if (clientKey != "support") password = "0x" + SHA256(password).toUpperCase();
-
 		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos?vendor=Transfinder&prefix=" + prefix + "&username=" + userName),
 			{
 				data: '"' + password + '"'
@@ -117,17 +115,6 @@
 				tf.authManager.token = token;
 				return { clientKey: clientKey, username: userName, password: this.obPassword() };
 			}.bind(this));
-		//.catch(function(apiResponse)
-		//{
-		//	return apiResponse;
-		//	//switch (apiResponse.StatusCode)
-		//	//{
-		//	//	//API is not returning 404 when client id is wrong at this moment
-		//	//	//case 404:
-		//	//	//break;
-		//	//	case 401:
-		//	//}
-		//})
 	};
 
 	LoginViewModel.prototype._trimClientKey = function()
