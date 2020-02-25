@@ -1,75 +1,80 @@
 <div class="navigation-menu animate" data-bind="uiInit:init,css:{expand:obIsExpand}">
-	<!-- ko if:!TF.isPhoneDevice-->
-	<div class="navigation-header">
-		<div class="item-logo" data-bind="click:logoItemClick">
-			<div class="item-icon logo"></div>
-			<div class="item-icon app-switcher"></div>
-			<!-- ko if: !tf.permissions.isSupport -->
-			<div class="item-menu">
-				<ul data-bind="foreach: {data: obSupportedApplications}">
-					<li data-bind="attr:{name:$data},click:$parent.onSwitchAppClick.bind($data, null)" style="opacity:0;">
-						<div class="item-icon small newTab" data-bind="click:$parent.onSwitchAppClick.bind($data, true)"></div>
-					</li>
-				</ul>
-			</div>
-			<!-- /ko -->
-		</div>
-		<div class="toggle-button" data-bind="click:toggleMenuBtnClick">
-			<div class="item-icon left-caret"></div>
-		</div>
-	</div>
-	<!-- /ko -->
-	<!-- ko if:TF.isPhoneDevice-->
-	<div class="navigation-closeBtn " data-bind="click:closeNavigation"></div>
-	<!-- /ko -->
-	<!-- ko if: !tf.permissions.isSupport -->
-	<!-- ko template :{ name : "workspace/controls/searchcontrol",data:searchControlTemplate }-->
-	<!-- /ko -->
-	<!-- /ko -->
-	<div class="navigation-content" data-bind="css:tf.permissions.isSupport?'not-contain-quick-search':''">
-		<div class="navigation-item fieldtrips" pageType="fieldtrips" data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
-			<div class="item-icon fieldtrips"></div>
-			<div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
-		</div>
-		<div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
-			<div class="item-icon myrequests"></div>
-			<div class="item-label">My Submitted Requests</div>
-		</div>
-		<!-- ko if: !tf.authManager.authorizationInfo.onlyLevel1 -->
-		<div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
-			<div class="item-icon approvals"></div>
-			<div class="item-label">My Pending Approvals</div>
-		</div>
-		<!-- /ko -->
-		<!-- ko if: tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read") -->
-		<div class="navigation-item reports" pageType="reports" data-bind="click:navigationPageCategoryClick.bind($data, 'reports')">
-			<div class="item-icon reports"></div>
-			<div class="item-label">Reports</div>
-		</div>
-		<!-- /ko -->
-		<div class="navigation-item settings" pageType="settings" data-bind="click:navigationPageCategoryClick.bind($data, 'settings')">
-			<div class="item-icon settings"></div>
-			<div class="item-label">Settings</div>
-			<div class="item-menu">
-				<ul data-bind="foreach: { data: obSettingPages, afterRender: afterPageMenuOptionUIRender.bind($data) }">
-					<li data-bind="css:{active:isOpen},attr:{pagetype:pageType, title: text},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
-					</li>
-				</ul>
-			</div>
-		</div>
-		<div class="navigation-item messages" pageType="messages" data-bind="click:navigationPageCategoryClick.bind($data, 'messages'), visible:obShowMessageCenter">
-			<div class="item-icon messages"></div>
-			<div class="item-label">Messages</div>
-		</div>
-		<div class="navigation-item logout" pageType="logout" data-bind="click:tf.pageManager.logOffClick">
-			<div class="item-icon logout"></div>
-			<div class="item-label">Log Out</div>
-		</div>
-	</div>
-	<div class="navigation-toolbar">
-		<div class="toolbar-button item-icon more"></div>
-		<div class="toolbar-button others"></div>
-	</div>
+  <!-- ko if:!TF.isPhoneDevice-->
+  <div class="navigation-header">
+    <div class="item-logo" data-bind="click:logoItemClick">
+      <div class="item-icon logo"></div>
+      <div class="item-icon app-switcher"></div>
+      <!-- ko if: !tf.permissions.isSupport -->
+      <div class="item-menu">
+        <ul data-bind="foreach: {data: obSupportedApplications}">
+          <li data-bind="attr:{name:$data},click:$parent.onSwitchAppClick.bind($data, null)" style="opacity:0;">
+            <div class="item-icon small newTab" data-bind="click:$parent.onSwitchAppClick.bind($data, true)"></div>
+          </li>
+        </ul>
+      </div>
+      <!-- /ko -->
+    </div>
+    <div class="toggle-button" data-bind="click:toggleMenuBtnClick">
+      <div class="item-icon left-caret"></div>
+    </div>
+  </div>
+  <!-- /ko -->
+  <!-- ko if:TF.isPhoneDevice-->
+  <div class="navigation-closeBtn " data-bind="click:closeNavigation"></div>
+  <!-- /ko -->
+  <!-- ko if: !tf.permissions.isSupport -->
+  <!-- ko template :{ name : "workspace/controls/searchcontrol",data:searchControlTemplate }-->
+  <!-- /ko -->
+  <!-- /ko -->
+  <div class="navigation-content" data-bind="css:tf.permissions.isSupport?'not-contain-quick-search':''">
+    <div class="navigation-item fieldtrips" pageType="fieldtrips"
+      data-bind="click:navigationPageCategoryClick.bind($data, 'fieldtrips')">
+      <div class="item-icon fieldtrips"></div>
+      <div class="item-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')"></div>
+    </div>
+    <div class="navigation-item myrequests" pageType="myrequests"
+      data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
+      <div class="item-icon myrequests"></div>
+      <div class="item-label">My Submitted Requests</div>
+    </div>
+    <!-- ko if: !tf.authManager.authorizationInfo.onlyLevel1 -->
+    <div class="navigation-item approvals" pageType="approvals"
+      data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
+      <div class="item-icon approvals"></div>
+      <div class="item-label">My Pending Approvals</div>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read") -->
+    <div class="navigation-item reports" pageType="reports"
+      data-bind="click:navigationPageCategoryClick.bind($data, 'reports')">
+      <div class="item-icon reports"></div>
+      <div class="item-label">Reports</div>
+    </div>
+    <!-- /ko -->
+    <div class="navigation-item settings" pageType="settings"
+      data-bind="click:navigationPageCategoryClick.bind($data, 'settings')">
+      <div class="item-icon settings"></div>
+      <div class="item-label">Settings</div>
+      <div class="item-menu">
+        <ul data-bind="foreach: { data: obSettingPages, afterRender: afterPageMenuOptionUIRender.bind($data) }">
+          <li
+            data-bind="css:{active:isOpen},attr:{pagetype:pageType, title: text},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navigation-item messages" pageType="messages"
+      data-bind="click:navigationPageCategoryClick.bind($data, 'messages'), visible:obShowMessageCenter">
+      <div class="item-icon messages"></div>
+      <div class="item-label">Messages</div>
+    </div>
+  </div>
+  <div class="navigation-toolbar">
+    <div class="toolbar-button item-icon more" data-bind="click:showMoreButtonClick">
+    </div>
+    <div class="toolbar-button item-icon logout" data-bind="click:tf.pageManager.logOffClick"></div>
+    <div class="toolbar-button item-icon datasource" data-bind="click:openDataSourceButtonClick"></div>
+  </div>
 </div>
 <!-- Do not delete this or the css style until another solution is applied. The time loading font-face would cause wrong size calculation, add this to preload the font-face  -->
 <div class="font-face-preload SSP-Bold">.</div>
