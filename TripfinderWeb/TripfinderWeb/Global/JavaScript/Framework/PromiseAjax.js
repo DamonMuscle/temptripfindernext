@@ -68,4 +68,9 @@
 	{
 		return this.generic("delete", url, settings, option);
 	};
+
+	PromiseAjax.prototype.patch = function(url, settings, option)
+	{
+		return this.generic("patch", url, settings, option);
+	};
 })()

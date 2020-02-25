@@ -1098,7 +1098,7 @@
 	SearchControlViewModel.prototype.getSuggestedResultByType = function(type, value, count)
 	{
 		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrips", "bycolumns"), {
 			paramData: {
 				column: self.cardStyle[type] ? self.cardStyle[type].field : type,
 				text: value
@@ -1315,13 +1315,34 @@
 			dataTypeValue = dataType.value,
 			searchText = searchText.trim();
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "save"), {
-			paramData: {
-				dataType: dataTypeValue,
-				searchText: searchText,
-				productInfo: TF.productName
+		var Id = [];
+		self.searchRecordList.forEach(function(item)
+		{
+			if (item.searchText === searchText)
+			{
+				Id.push(item.userSearchId);
 			}
-		}, { overlay: false });
+		});
+
+		if (Id.length > 0)
+		{
+			return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords", Id[0]), {
+				data: [{ "op": "replace", "path": "/SearchText", "value": searchText }]
+			}, { overlay: false });
+		}
+		else
+		{
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords"),
+				{
+					data: [{
+						DataType: 4,
+						SearchText: searchText,
+						ApplicationID: 5,
+						DBID: 7
+					}],
+					async: true
+				}, { overlay: false });
+		}
 	};
 
 	/**
@@ -1332,9 +1353,9 @@
 	{
 		var self = this;
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "SearchRecord", "searchByCurrentUser"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords"), {
 			paramData: {
-				productInfo: TF.productName
+				applicationID: 5
 			}
 		}, { overlay: false })
 			.then(function(response)
@@ -1342,7 +1363,7 @@
 				if (!response) { return; }
 
 				var results = self.userSearchEntitiesFormation(response.Items);
-
+				self.searchRecordList = response.Items.map(function(item) { return { searchText: item.SearchText, userSearchId: item.UserSearchID }; });
 				return Promise.resolve(results);
 			});
 	};
