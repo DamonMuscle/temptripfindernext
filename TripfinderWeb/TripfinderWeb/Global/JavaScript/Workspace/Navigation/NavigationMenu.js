@@ -252,7 +252,6 @@
     }
 
     self.easeToggleNavigationAnimation(status, duration);
-    //self.toggleMoreIcon(status);
 
     if (!tf.permissions.isSupport)
     {
@@ -301,14 +300,11 @@
       // If the menu is already opened, do not fade out the label
       $fadeOutElements = $navMenu.find(".search-header .search-text, .search-header .clear-btn"),
       $moreBtn = $toolbar.find(".more"),
-      // $toolbarBtnOthers = $toolbar.find(".others"),
       $gridMap = $("#pageContent"),
       totalWidth = $(document).width(),
       isToolbarOpened = $toolbar.hasClass("menu-opened"),
       removeInlineOpacityFunc = function() {
-        // after animation, remove these inline css styles, use inline class instead.
-        // $moreBtn.css({ opacity: "0", display: "none" });
-        // $toolbarBtnOthers.css({ opacity: "", display: "" });
+
         $fadeOutElements.css("opacity", "");
         $navItems.css("opacity", "");
       };
@@ -330,7 +326,6 @@
 
       $fadeOutElements.css("opacity", 0);
       // No animation for toolbar if it is already opened.
-      // $toolbarBtnOthers.css("opacity", isToolbarOpened ? 1 : 0);
       // This used css "transition".
       $caret.css("transform", "rotate(0deg)");
       // If the quick search is active, the icons should be hidden.
@@ -342,9 +337,7 @@
         duration: fadeDuration, queue: false, done: function() {
           $navContent.css("display", "");
           $quickSearch.css("height", "");
-          // $toolbarBtnOthers.css("display", "block");
           $fadeOutElements.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false });
-          // $toolbarBtnOthers.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
 
           if (isQuickSearchActive && self.searchControlTemplate)
           {
@@ -363,7 +356,6 @@
         $navItems.css("opacity", 0);
       }
 
-      //$moreBtn.css("opacity", 0);
       $caret.css("transform", "rotate(180deg)");
       $fadeOutElements.css("opacity", 0).stop().animate({ opacity: 0 }, { duration: fadeDuration, queue: false });
       $moreBtn.css("opacity", 0).stop().animate({ opacity: 1 }, {
@@ -372,7 +364,6 @@
           {
             $navItems.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false });
           }
-          //$moreBtn.css("display", "none");
           $moreBtn.stop().animate({ opacity: 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
         }
       });
@@ -541,7 +532,6 @@
     {
       if (!self.closeOpenedNavigationItemMenu(false))
       {
-        //self.setActiveStateByPageType(type);
         tf.pageManager.openNewPage(type);
       }
 
