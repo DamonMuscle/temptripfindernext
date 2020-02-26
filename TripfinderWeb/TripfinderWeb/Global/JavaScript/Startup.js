@@ -154,9 +154,7 @@
 	{
 		var modal = new TF.Modal.DataSourceChangeModalViewModel(databaseName);
 		modal.OutSizeClickEnable = !!disableClose;
-		return tf.modalManager.showModal(
-			modal
-		)
+		return tf.modalManager.showModal(modal)
 			.then(function(datasource)
 			{
 				if (!datasource)
@@ -168,26 +166,24 @@
 					return Promise.resolve(true);
 				}
 
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), datasource.Id, "datasource", "test", datasource.DBType))
-					.then(function()
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications?dbid=" + datasource.DBID))
+					.then(function(result)
 					{
-						//connection passed
-						var notValidDatabaseName = datasource.DatabaseName;
-						return tf.datasourceManager.verifyDataBaseNeedToRebuild(datasource.Id, datasource.DBType)
-							.then(function(isValidate)
-							{
-								if (!isValidate)
-								{
-									return tf.DBNeedToRebuildAlert(notValidDatabaseName);
-								}
-								return Promise.resolve(true);
-							});
+						if (result && result.Items && result.Items[0] && result.Items[0].AnyDatabasePass)
+						{
+							tf.loadingIndicator.tryHide();
+							return Promise.resolve(true);
+						}
+						else
+						{
+							Promise.reject();
+						}
 					})
 					.catch(function()
 					{
 						// failed to connection
 						return tf.promiseBootbox.dialog({
-							message: datasource.DatabaseName + " could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative (support@transfinder.com or 888-427-2403).",
+							message: databaseName + " could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative (support@transfinder.com or 888-427-2403).",
 							title: "Could Not Load",
 							closeButton: true,
 							buttons: {
@@ -208,14 +204,13 @@
 						if (isPass)
 						{
 							//verify datasource is change
-							if (datasource && datasource.Id)
+							if (datasource && datasource.DBID)
 							{
-								var p1 = tf.storageManager.save("databaseType", datasource.DBType);
-								var p2 = tf.storageManager.save("datasourceId", datasource.Id);
-								var p3 = tf.storageManager.save("databaseName", datasource.DatabaseName);
-								return Promise.all([p1, p2, p3]).then(function()
+								var p1 = tf.storageManager.save("datasourceId", datasource.DBID);
+								var p2 = tf.storageManager.save("databaseName", databaseName);
+								return Promise.all([p1, p2]).then(function()
 								{
-									tf.reloadPageWithDatabaseId(datasource.Id);
+									tf.reloadPageWithDatabaseId(datasource.DBID);
 
 									return "loginpage";
 								});
@@ -229,7 +224,6 @@
 							}
 						}
 					});
-
 			}.bind(this));
 	};
 
@@ -331,7 +325,7 @@
 									{
 										var candidateDB = dataSources.length > 0 ? dataSources[0] : {};
 
-										return tf.storageManager.save("datasourceId", candidateDB.Id);
+										return tf.storageManager.save("datasourceId", candidateDB.DBID);
 									});
 							};
 
@@ -360,16 +354,7 @@
 						{
 							if (validateResult === true)
 							{
-								return tf.datasourceManager.verifyDataBaseNeedToRebuild(tf.datasourceManager.databaseId, tf.datasourceManager.databaseType)
-									.then(function(noRebuild)
-									{
-										if (!noRebuild)
-										{
-											tf.loadingIndicator.tryHide();
-											return tf.DBNeedToRebuildAlert(tf.datasourceManager.databaseName);
-										}
-										return Promise.resolve(true);
-									});
+								return Promise.resolve(true);
 							}
 							else
 							{
@@ -410,35 +395,6 @@
 											});
 										}
 									});
-
-								// return tf.promiseBootbox.yesNo({
-								// 	message: message,
-								// 	title: "No Data Source Selected",
-								// 	className: null,
-								// 	buttons: {
-								// 		yes: {
-								// 			label: "Choose Data Source",
-								// 			className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
-								// 		},
-								// 		no: {
-								// 			label: "Cancel",
-								// 			className: TF.isPhoneDevice ? "btn-no-mobile" : "btn-default btn-sm btn-default-link"
-								// 		}
-								// 	}
-								// }).then(function(result)
-								// {
-								// 	//set db to null and basic settings to null
-								// 	if (result === true)
-								// 	{
-								// 		return false;
-								// 	} else
-								// 	{
-								// 		tf.entStorageManager.save("token", "");
-								// 		tf.reloadPageWithDatabaseId(null);
-
-								// 		return null;
-								// 	}
-								// });
 							};
 						})
 						.then(function(isPass)
@@ -477,8 +433,6 @@
 									{
 										
 										promise = tf.pageManager.initNavgationBar();
-										// TODO-V2
-										promise = Promise.resolve();
 									}
 									else
 									{
@@ -515,8 +469,7 @@
 											}
 											else
 											{
-												// TODO-V2
-												// tf.pageManager.showMessageModal(true);
+												tf.pageManager.showMessageModal(true);
 											}
 
 											if (tf.urlParm)
@@ -723,14 +676,5 @@
 			parm_result[parm_array[i].split("=")[0]] = parm_array[i].split("=")[1];
 		}
 		return parm_result;
-	};
-
-	tf.DBNeedToRebuildAlert = function(datasourceName)
-	{
-		return tf.promiseBootbox.alert("This Data Source (" + datasourceName + ") needs to be rebuilt before it can be opened in " + TF.productName + ". To rebuild this Data Source, open it in Routefinder Pro.", "Alert")
-			.then(function()
-			{
-				return Promise.resolve(false);
-			});
 	};
 })();

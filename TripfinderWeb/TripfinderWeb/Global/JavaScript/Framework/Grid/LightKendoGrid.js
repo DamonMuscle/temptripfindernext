@@ -4272,7 +4272,7 @@
 					}
 					else if (self.geoFields && self.geoFields.length > 0)
 					{
-						//TODO-V2
+						// TODO-V2
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType + "s"),
 							{
 								data:

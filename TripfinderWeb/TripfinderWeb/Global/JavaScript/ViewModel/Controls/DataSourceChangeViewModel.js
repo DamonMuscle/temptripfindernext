@@ -27,11 +27,11 @@
 			{
 				var datasource = Enumerable.From(datasources).Where(function(c)
 				{
-					return c.Id == this.databaseId;
+					return c.DBID == this.databaseId;
 				}.bind(this)).ToArray()[0];
 				this.datasources(datasources);
 				this.selectedDatabase(datasource);
-				this.obSelectedDatabaseText(datasource ? datasource.DatabaseName : "");
+				this.obSelectedDatabaseText(datasource ? datasource.Name : "");
 				setTimeout(function()
 				{
 					$(element).find('select:eq(0)').focus();
@@ -42,14 +42,14 @@
 	DataSourceChangeViewModel.prototype.changeDataSource = function()
 	{
 		var ans;
-		if (this.selectedDatabase() && (this.selectedDatabase().Id == this.databaseId))
+		if (this.selectedDatabase() && (this.selectedDatabase().DBID == this.databaseId))
 		{
 			ans = false;
 		}
 		else
 		{
 			ans = this.selectedDatabase();
-			ga('send', 'event', 'Action', '	Data Source', ans.DatabaseName);
+			ga('send', 'event', 'Action', '	Data Source', ans.Name);
 		}
 		return Promise.resolve(ans);
 	};
