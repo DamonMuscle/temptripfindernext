@@ -110,7 +110,7 @@
 	SettingsConfigurationPage.prototype.initEditor = function()
 	{
 		var self = this;
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tripfindermessage")).then(function(result)
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages")).then(function(result)
 		{
 			$(".editor-wrapper").css("visibility", "visible");
 			self.englishEditor = $("#EnglishEditor").kendoEditor({
@@ -352,12 +352,11 @@
 					{
 						var settings = {};
 						settings["SHOWTRIPTOTALCOST"] = $(".show-total-cost").prop("checked");
-						var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "tripfindermessage"), {
+						var p1 = tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages"), {
 							data: {
 								EnglishMessage: $(".option.english.design").hasClass("selected") ? self.englishEditor.value() : $("#EnglishHtmlEditor").val(),
 								SpanishMessage: $(".option.spanish.design").hasClass("selected") ? self.spanishEditor.value() : $("#SpanishHtmlEditor").val(),
-								DisplayOnceDaily: $(".display-once-daily").prop("checked"),
-								APIIsDirty: true
+								DisplayOnceDaily: $(".display-once-daily").prop("checked")
 							}
 						}).then(function(response)
 						{
