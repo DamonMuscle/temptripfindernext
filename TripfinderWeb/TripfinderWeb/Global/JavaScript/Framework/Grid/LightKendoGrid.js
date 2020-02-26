@@ -44,6 +44,7 @@
 		{
 			this.geoData = [];
 		}
+		this.filterClass = '.k-i-filter';
 		this.initParameter($container, options, gridState);
 		this.loadAndCreateGrid();
 	}
@@ -995,7 +996,7 @@
 			var field = columns[i].field;
 			currentFilters.map(function(currentFilter)
 			{
-				var $filterBtn = $item.parent().find('.k-filter');
+				var $filterBtn = $item.parent().find(self.filterClass);
 				if (currentFilter.field === field && currentFilter.operator === 'list')
 				{
 					self.removeFilterBtnIcon($filterBtn);
@@ -2247,7 +2248,7 @@
 
 			var onDropDownListChange = function(e)
 			{
-				$(item).prev().find(".k-filter").attr("class", "k-icon k-filter " + self.filterNames[this.text()]);
+				$(item).prev().find(self.filterClass).attr("class", "k-icon k-i-filter " + self.filterNames[this.text()]);
 				var $filterCell = $(item).parent().parent().parent();
 				var $filterCellInner = $filterCell.find('> span');
 
@@ -2346,7 +2347,7 @@
 						self.visibleCustomFilterBtn($item, idx);
 					}
 
-					var $filterBtn = $item.next().children(".k-filter");
+					var $filterBtn = $item.next().children(self.filterClass);
 					self.removeFilterBtnIcon.bind(self)($filterBtn);
 					$filterBtn.addClass(self.filterNames[key]);
 				}
