@@ -294,10 +294,10 @@
 	{
 		if (this.datasourceId)
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), this.datasourceId))
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases", this.datasourceId))
 				.then(function(apiResponse)
 				{
-					this.currentDatabaseName(apiResponse.Items[0].DatabaseName);
+					this.currentDatabaseName(apiResponse.Items[0].Name);
 					this.onCurrentDatabaseNameChanged.notify();
 				}.bind(this));
 		}
