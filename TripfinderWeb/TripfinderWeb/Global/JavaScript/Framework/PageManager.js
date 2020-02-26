@@ -1,7 +1,9 @@
-(function() {
+(function()
+{
 	createNamespace("TF.Page").PageManager = PageManager;
 
-	function PageManager() {
+	function PageManager()
+	{
 		var self = this;
 		self.obContextMenuVisible = ko.observable(false);
 		self.datasourceId = tf.storageManager.get("datasourceId");
@@ -34,18 +36,21 @@
 		// self.initApplicationSwitcher();
 	}
 
-	PageManager.prototype.initApplicationSwitcher = function() {
+	PageManager.prototype.initApplicationSwitcher = function()
+	{
 		var self = this, supportedProducts = tf.authManager.supportedProducts;
 
 		if (supportedProducts.length > 0)
 		{
-			supportedProducts = tf.authManager.supportedProducts.filter(function(prod) {
+			supportedProducts = tf.authManager.supportedProducts.filter(function(prod)
+			{
 				var productName = prod.toLowerCase();
 				return self.availableApplications.hasOwnProperty(productName) && self.availableApplications[productName].permission;
 			});
 
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
-				.then(function(apiResponse) {
+				.then(function(apiResponse)
+				{
 					var myTransfinderURL = apiResponse.Items[0];
 
 					Promise.resolve($.ajax({
@@ -56,15 +61,18 @@
 						},
 						dataType: 'json'
 					}))
-						.then(function(res) {
-							hasURLProducts = res ? res.Products.filter(function(prod) {
+						.then(function(res)
+						{
+							hasURLProducts = res ? res.Products.filter(function(prod)
+							{
 								return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
 							}) : [];
 
 							if (hasURLProducts.length > 0)
 							{
 								self.applicationURLMappingList = hasURLProducts;
-								self.applicationSwitcherList = hasURLProducts.map(function(item) {
+								self.applicationSwitcherList = hasURLProducts.map(function(item)
+								{
 									return item.Name.toLowerCase();
 								});
 							}
@@ -73,11 +81,13 @@
 		}
 	}
 
-	PageManager.prototype.initNavgationBar = function() {
+	PageManager.prototype.initNavgationBar = function()
+	{
 		var self = this,
 			$content, $navigationContent = $(".navigation-container");
 		self.navigationData = new TF.NavigationMenu();
-		return self.getMessageSettings().then(function(result) {
+		return self.getMessageSettings().then(function(result)
+		{
 			if (!result.Items || !result.Items.length || result.Items.length <= 0 || (!result.Items[0].EnglishMessage && !result.Items[0].SpanishMessage))
 			{
 				self.navigationData.obShowMessageCenter(false);
@@ -93,7 +103,8 @@
 		});
 	};
 
-	PageManager.prototype.initResizePanel = function() {
+	PageManager.prototype.initResizePanel = function()
+	{
 		var self = this,
 			$content, $pageContent = $("#pageContent");
 		self.resizablePage = new TF.Page.ResizablePage();
@@ -103,7 +114,8 @@
 		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
 	};
 
-	PageManager.prototype.isDateBeforeToday = function(target) {
+	PageManager.prototype.isDateBeforeToday = function(target)
+	{
 		var targetDate = new Date(target);
 		targetDate.setHours(0, 0, 0, 0);
 
@@ -116,13 +128,16 @@
 		return false;
 	};
 
-	PageManager.prototype.getMessageSettings = function() {
+	PageManager.prototype.getMessageSettings = function()
+	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages"));
 	};
 
-	PageManager.prototype.showMessageModal = function(isInitPage) {
+	PageManager.prototype.showMessageModal = function(isInitPage)
+	{
 		var self = this;
-		return self.getMessageSettings().then(function(result) {
+		return self.getMessageSettings().then(function(result)
+		{
 			if (result.Items && result.Items.length > 0)
 			{
 				if (!!result.Items[0].EnglishMessage || !!result.Items[0].SpanishMessage)
@@ -154,11 +169,13 @@
 		});
 	};
 
-	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage) {
+	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
+	{
 		var self = this;
 		if (self.isTryGoAway && self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.tryGoAway)
 		{
-			self.obPages()[0].data.tryGoAway(type).then(function(result) {
+			self.obPages()[0].data.tryGoAway(type).then(function(result)
+			{
 				if (result)
 				{
 					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
@@ -167,7 +184,8 @@
 		}
 		else if (self.obFieldTripEditPage() && self.obFieldTripEditPage().obEntityDataModel() && self.obFieldTripEditPage().tryGoAway)
 		{
-			self.obFieldTripEditPage().tryGoAway(type).then(function(result) {
+			self.obFieldTripEditPage().tryGoAway(type).then(function(result)
+			{
 				if (result)
 				{
 					tf.pageManager.obFieldTripEditPage(null);
@@ -182,7 +200,8 @@
 		self.isTryGoAway = self;
 	};
 
-	PageManager.prototype._openNewPage = function(type, gridOptions, firstLoad, skipSavePage) {
+	PageManager.prototype._openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
+	{
 		var self = this,
 			pageData, templateName,
 			storageKey = TF.productName.toLowerCase() + ".page";
@@ -246,7 +265,8 @@
 
 		if (self.navigationData)
 		{
-			setTimeout(function() {
+			setTimeout(function()
+			{
 				self.navigationData.setActiveStateByPageType(type);
 			}, 100);
 		}
@@ -270,11 +290,13 @@
 			}]);
 	};
 
-	PageManager.prototype.loadDataSourceName = function() {
+	PageManager.prototype.loadDataSourceName = function()
+	{
 		if (this.datasourceId)
 		{
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), this.datasourceId))
-				.then(function(apiResponse) {
+				.then(function(apiResponse)
+				{
 					this.currentDatabaseName(apiResponse.Items[0].DatabaseName);
 					this.onCurrentDatabaseNameChanged.notify();
 				}.bind(this));
@@ -288,7 +310,8 @@
 		return Promise.resolve();
 	};
 
-	PageManager.prototype.logOffClick = function() {
+	PageManager.prototype.logOffClick = function()
+	{
 		var self = this;
 		tf.promiseBootbox.confirm({
 			buttons: TF.isPhoneDevice ? {
@@ -312,7 +335,8 @@
 				},
 			title: "Log Out",
 			message: "Are you sure you want to log out?"
-		}).then(function(result) {
+		}).then(function(result)
+		{
 			if (result)
 			{
 				self.logout(true);
@@ -320,7 +344,8 @@
 		})
 	};
 
-	PageManager.prototype.logout = function(flag) {
+	PageManager.prototype.logout = function(flag)
+	{
 		tf.authManager.logOff();
 		location.reload();
 		var rememberMe = tf.storageManager.get("rememberMe", true) || false;
@@ -338,14 +363,18 @@
 		}
 	};
 
-	PageManager.prototype.showContextMenu = function(model, event) {
-		setTimeout((function() {
+	PageManager.prototype.showContextMenu = function(model, event)
+	{
+		setTimeout((function()
+		{
 			this.obContextMenuVisible(true);
 		}).bind(this), 0);
 	};
 
-	PageManager.prototype.initContextMenuEvent = function() {
-		var clickHideContextMenu = (function(evt) {
+	PageManager.prototype.initContextMenuEvent = function()
+	{
+		var clickHideContextMenu = (function(evt)
+		{
 			var $target = $(evt.target);
 			if ((($target.closest(".tf-contextmenu-wrap").length === 0 && !$target.hasClass("tf-contextmenu-wrap")) ||
 				$target.hasClass("contextmenu-overlay")) && (!$target.hasClass("mobile") || $target.hasClass("addremovecolumn")))
@@ -358,13 +387,15 @@
 		// when the context menu is open, listen for clicks outside of
 		// the menu. When the click occurs, remove the listener and
 		// close the context menu.
-		this.obContextMenuVisible.subscribe(function(newValue) {
+		this.obContextMenuVisible.subscribe(function(newValue)
+		{
 			var event = TF.isMobileDevice ? "touchstart" : "click";
 			if (newValue)
 			{
 				$(window).off(event + '.contextmenu');
 				//use timeout to prevent close contextmenu on ipad , after open on touchstart this close event will occur immeditatly
-				setTimeout(function() {
+				setTimeout(function()
+				{
 					$(window).on(event + '.contextmenu', clickHideContextMenu);
 				}, 100);
 			}
@@ -380,7 +411,8 @@
 	 * @param {String} pageName
 	 * @return {String} 
 	 */
-	PageManager.prototype.getPageTitleByPageName = function(pageName) {
+	PageManager.prototype.getPageTitleByPageName = function(pageName)
+	{
 		var self = this;
 		switch (pageName)
 		{
@@ -395,7 +427,8 @@
 	 * Gets page menu for administration.
 	 * @returns {array} The array of administration
 	 */
-	PageManager.prototype.administrationPagesMenuComputer = function() {
+	PageManager.prototype.administrationPagesMenuComputer = function()
+	{
 		var self = this,
 			menu = [];
 
@@ -405,7 +438,8 @@
 		return menu;
 	};
 
-	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm) {
+	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm)
+	{
 		var self = this, isOpen = pageType === tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 		if (permission)
 		{
@@ -425,20 +459,23 @@
 		}
 	};
 
-	PageManager.prototype.handlePermissionDenied = function(pageName) {
+	PageManager.prototype.handlePermissionDenied = function(pageName)
+	{
 		pageName = this.getPageTitleByPageName(pageName);
 		var self = this, desc = "You do not have permissions to view" + (pageName ? " " + pageName : ".");
 		if (!tf.permissions.hasAuthorized)
 		{
 			desc += " You are not authorized for any page.";
 			return tf.promiseBootbox.alert(desc, "Invalid Permissions")
-				.then(function() {
+				.then(function()
+				{
 					self.logout(false);
 				}.bind(this));
 		}
 		desc += " You will be redirected to your default login screen.";
 		return tf.promiseBootbox.alert(desc, "Invalid Permissions")
-			.then(function() {
+			.then(function()
+			{
 				self.openNewPage("fieldtrips");
 				tf.promiseBootbox.hideAllBox();
 			}.bind(this));
@@ -448,7 +485,8 @@
 	* Get all data types that current user has permission to access.
 	* @return {Array}
 	*/
-	PageManager.prototype.getAvailableDataTypes = function() {
+	PageManager.prototype.getAvailableDataTypes = function()
+	{
 		var allDataTypes = [
 			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
 		];
@@ -460,7 +498,8 @@
 	 * @param {String} gridType
 	 * @returns {String} The application term related to grid type.
 	 */
-	PageManager.prototype.typeToTerm = function(gridType) {
+	PageManager.prototype.typeToTerm = function(gridType)
+	{
 		switch (gridType)
 		{
 			case "student":

@@ -1,7 +1,9 @@
-(function() {
+(function()
+{
 	createNamespace("TF.Page").SettingsConfigurationPage = SettingsConfigurationPage;
 
-	function SettingsConfigurationPage() {
+	function SettingsConfigurationPage()
+	{
 		var self = this;
 		self.type = "settings";
 		self.pageType = "settings";
@@ -31,29 +33,36 @@
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
 	SettingsConfigurationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 
-	SettingsConfigurationPage.prototype.authValidation = function() {
+	SettingsConfigurationPage.prototype.authValidation = function()
+	{
 		if (!tf.permissions.obIsAdmin())
 		{
-			return tf.pageManager.handlePermissionDenied("Settings").then(function() {
+			return tf.pageManager.handlePermissionDenied("Settings").then(function()
+			{
 				return Promise.resolve(false);
 			});
 		}
 		return Promise.resolve(true);
 	};
 
-	SettingsConfigurationPage.prototype.load = function() {
+	SettingsConfigurationPage.prototype.load = function()
+	{
 		var self = this;
-		self.getClients().then(function() {
+		self.getClients().then(function()
+		{
 			self.loadClientConfig();
 			self.getFieldTripSettings();
 		}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.getClients = function() {
+	SettingsConfigurationPage.prototype.getClients = function()
+	{
 		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "getClientIds"))
-			.then(function(result) {
-				result.Items.forEach(function(item) {
+			.then(function(result)
+			{
+				result.Items.forEach(function(item)
+				{
 					if (item.toLowerCase() === tf.authManager.clientKey.toLowerCase())
 					{
 						self.obSelectedClientId(item);
@@ -62,10 +71,12 @@
 			}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.getFieldTripSettings = function() {
+	SettingsConfigurationPage.prototype.getFieldTripSettings = function()
+	{
 		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripoptionandsetting", "fromini"))
-			.then(function(result) {
+			.then(function(result)
+			{
 				if (result.Items && result.Items.length > 0)
 				{
 					$(".show-total-cost").prop("checked", result.Items[0].ShowTripTotalCost);
@@ -74,10 +85,12 @@
 			}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.loadClientConfig = function() {
+	SettingsConfigurationPage.prototype.loadClientConfig = function()
+	{
 		var self = this, clientId = self.obSelectedClientId() !== "New" ? self.obSelectedClientId() : "";
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), { data: { clientId: clientId } })
-			.then(function(data) {
+			.then(function(data)
+			{
 				if (self.obSelectedClientId() !== "New")
 				{
 					data.Items[0].Smtppassword = self.displayPassword;
@@ -94,16 +107,19 @@
 			}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.initEditor = function() {
+	SettingsConfigurationPage.prototype.initEditor = function()
+	{
 		var self = this;
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages")).then(function(result) {
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages")).then(function(result)
+		{
 			$(".editor-wrapper").css("visibility", "visible");
 			self.englishEditor = $("#EnglishEditor").kendoEditor({
 				resizable: {
 					content: true,
 					toolbar: true
 				},
-				change: function() {
+				change: function()
+				{
 					if (self.englishEditor.value() !== self.obPreEnglishMessage())
 					{
 						self.englishEditorChanged = true;
@@ -119,7 +135,8 @@
 					content: true,
 					toolbar: true
 				},
-				change: function() {
+				change: function()
+				{
 					if (self.spanishEditor.value() !== self.obPreSpanishMessage())
 					{
 						self.spanishEditorChanged = true;
@@ -157,7 +174,8 @@
 		});
 	};
 
-	SettingsConfigurationPage.prototype.changePattern = function(viewModel, e) {
+	SettingsConfigurationPage.prototype.changePattern = function(viewModel, e)
+	{
 		var self = this, $optionBtn = $(e.target).closest(".option");
 		if ($optionBtn.hasClass("selected")) 
 		{
@@ -197,7 +215,8 @@
 		}
 	};
 
-	SettingsConfigurationPage.prototype.resetFakePassword = function() {
+	SettingsConfigurationPage.prototype.resetFakePassword = function()
+	{
 		var self = this, settings = self.obEntityDataModel().clone();
 		if (self.obSelectedClientId() !== "New")
 		{
@@ -210,9 +229,11 @@
 		return settings;
 	}
 
-	SettingsConfigurationPage.prototype.init = function(viewModel, el) {
+	SettingsConfigurationPage.prototype.init = function(viewModel, el)
+	{
 		var self = this;
-		self.authValidation().then(function(response) {
+		self.authValidation().then(function(response)
+		{
 			if (response)
 			{
 				self._$form = $(el);
@@ -229,11 +250,15 @@
 		}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.setValidation = function() {
-		setTimeout(function() {
-			var validatorFields = {}, isValidating = false, self = this, updateErrors = function($field, errorInfo) {
+	SettingsConfigurationPage.prototype.setValidation = function()
+	{
+		setTimeout(function()
+		{
+			var validatorFields = {}, isValidating = false, self = this, updateErrors = function($field, errorInfo)
+			{
 				var errors = [];
-				$.each(self.pageLevelViewModel.obValidationErrors(), function(index, item) {
+				$.each(self.pageLevelViewModel.obValidationErrors(), function(index, item)
+				{
 					if ($field[0] === item.field[0])
 					{
 						if (item.rightMessage.indexOf(errorInfo) >= 0)
@@ -253,7 +278,8 @@
 					callback:
 					{
 						message: "invalid email",
-						callback: function(value, validator, $field) {
+						callback: function(value, validator, $field)
+						{
 							if (!value)
 							{
 								updateErrors($field, "email");
@@ -280,13 +306,15 @@
 				live: 'enabled',
 				message: 'This value is not valid',
 				fields: validatorFields
-			}).on('success.field.bv', function(e, data) {
+			}).on('success.field.bv', function(e, data)
+			{
 				var $parent = data.element.closest('.form-group');
 				$parent.removeClass('has-success');
 				if (!isValidating)
 				{
 					isValidating = true;
-					self.pageLevelViewModel.saveValidate(data.element).then(function() {
+					self.pageLevelViewModel.saveValidate(data.element).then(function()
+					{
 						isValidating = false;
 					});
 				}
@@ -295,28 +323,33 @@
 		}.bind(this), 0);
 	};
 
-	SettingsConfigurationPage.prototype.testSentEmailClick = function() {
+	SettingsConfigurationPage.prototype.testSentEmailClick = function()
+	{
 		var self = this;
 		tf.modalManager.showModal(
 			new TF.Modal.TestEmailModalViewModel(self.resetFakePassword())
 		);
 	};
 
-	SettingsConfigurationPage.prototype.legalLinkClick = function() {
+	SettingsConfigurationPage.prototype.legalLinkClick = function()
+	{
 		window.open("Workspace/LegalPage.html");
 	};
 
-	SettingsConfigurationPage.prototype.saveClick = function() {
+	SettingsConfigurationPage.prototype.saveClick = function()
+	{
 		var self = this;
 		return self.pageLevelViewModel.saveValidate()
-			.then(function(valid) {
+			.then(function(valid)
+			{
 				if (!valid)
 				{
 					return false;
 				}
 				else
 				{
-					return self.postData().then(function(result) {
+					return self.postData().then(function(result)
+					{
 						var settings = {};
 						settings["SHOWTRIPTOTALCOST"] = $(".show-total-cost").prop("checked");
 						var p1 = tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages"), {
@@ -325,15 +358,18 @@
 								SpanishMessage: $(".option.spanish.design").hasClass("selected") ? self.spanishEditor.value() : $("#SpanishHtmlEditor").val(),
 								DisplayOnceDaily: $(".display-once-daily").prop("checked")
 							}
-						}).then(function(response) {
+						}).then(function(response)
+						{
 							return response;
 						}),
 							p2 = tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "fieldtripoptionandsetting", "fromini"), {
 								data: JSON.stringify(settings)
-							}).then(function(response) {
+							}).then(function(response)
+							{
 								return response;
 							});
-						return Promise.all([p1, p2]).then(function() {
+						return Promise.all([p1, p2]).then(function()
+						{
 							if (tf.pageManager.navigationData)
 							{
 								tf.pageManager.navigationData.obShowMessageCenter(self.englishEditor.value() !== "" || self.spanishEditor.value() !== "");
@@ -355,13 +391,15 @@
 			}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.postData = function() {
+	SettingsConfigurationPage.prototype.postData = function()
+	{
 		var self = this;
 		self.obEntityDataModel().apiIsNew(!self.obIsUpdate());
 		var queryString = "?emptySMTPPassword=" + (this.obSelectedClientId() !== "New" && !this.obEntityDataModel().smtppassword());
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", queryString), {
 			data: self.resetFakePassword().toData()
-		}).then(function(data) {
+		}).then(function(data)
+		{
 			self.obEntityDataModel().apiIsDirty(false);
 
 			if (this.obSelectedClientId() !== "New")
@@ -371,20 +409,23 @@
 
 			if (!self.obIsUpdate())
 			{
-				self.getClients().then(function() {
+				self.getClients().then(function()
+				{
 					self.obSelectedClientId(self.obEntityDataModel().clientId());
 				}.bind(this));
 				self.obIsUpdate(true);
 			}
 			return true;
-		}.bind(this), function(data) {
+		}.bind(this), function(data)
+		{
 			self.obErrorMessageDivIsShow(true);
 			self.obErrorMessage(data.ExceptionMessage);
 			return false;
 		}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.checkDataChanges = function() {
+	SettingsConfigurationPage.prototype.checkDataChanges = function()
+	{
 		var self = this;
 		if ($(".show-total-cost").prop("checked") !== self.showTotalCost)
 		{
@@ -404,7 +445,8 @@
 		}
 	};
 
-	SettingsConfigurationPage.prototype.cancelClick = function() {
+	SettingsConfigurationPage.prototype.cancelClick = function()
+	{
 		var self = this;
 		self.checkDataChanges();
 		var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
@@ -412,10 +454,12 @@
 		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged)
 		{
 			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
-				.then(function(result) {
+				.then(function(result)
+				{
 					if (result === true)
 					{
-						self.saveClick().then(function(result) {
+						self.saveClick().then(function(result)
+						{
 							if (result)
 							{
 								tf.pageManager._openNewPage(pageName);
@@ -435,17 +479,20 @@
 		}
 	};
 
-	SettingsConfigurationPage.prototype.tryGoAway = function(pageName) {
+	SettingsConfigurationPage.prototype.tryGoAway = function(pageName)
+	{
 		var self = this;
 		self.checkDataChanges();
 
 		if ((self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged) && tf.permissions.obIsAdmin())
 		{
 			return tf.promiseBootbox.yesNo("You have unsaved changes. Would you like to save your changes prior to opening up " + pageName + "?", "Unsaved Changes")
-				.then(function(result) {
+				.then(function(result)
+				{
 					if (result)
 					{
-						return Promise.resolve().then(function() {
+						return Promise.resolve().then(function()
+						{
 							return self.saveClick();
 						}.bind(self));
 					}
@@ -461,7 +508,8 @@
 		}
 	};
 
-	SettingsConfigurationPage.prototype.dispose = function() {
+	SettingsConfigurationPage.prototype.dispose = function()
+	{
 		var self = this;
 		self.pageLevelViewModel.dispose();
 	};
