@@ -81,6 +81,15 @@
 					<span class="hotkey">Ctrl + S</span>
 				</div>
 			</li>
+			<!-- ko if:gridViewModel.massUpdateButton-->
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.massUpdateClick">
+				<div class="menu-icon saveas">
+				</div>
+				<div class="menu-label">
+					Mass Update
+				</div>
+			</li>
+			<!-- /ko -->
 			<li class="menu-item"
 				data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
 				<div class="menu-icon email">
