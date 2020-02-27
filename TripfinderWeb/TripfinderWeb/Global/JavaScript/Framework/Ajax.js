@@ -132,6 +132,19 @@
 			return ajaxRequest;
 		},
 
+		patch: function(url, settings, option)
+		{
+			var settings = this._applyDefaults(url, settings, option);
+			this._handleData(settings);
+			settings.type = "PATCH";
+			var ajaxRequest = $.ajax(settings);
+			if (this.cacheAjaxRequestsArray)
+			{
+				this.ajaxRequests[this.ajaxRequests.length] = ajaxRequest;
+			}
+			return ajaxRequest;
+		},
+
 		_applyDefaults: function(url, externalSettings, option)
 		{
 			option = $.extend({ overlay: true, auth: null, authorization: true }, option);
