@@ -1,1 +1,1 @@
-grunt default
+grunt debug
