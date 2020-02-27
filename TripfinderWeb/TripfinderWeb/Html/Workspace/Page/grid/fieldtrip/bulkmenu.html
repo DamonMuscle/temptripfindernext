@@ -2,20 +2,25 @@
 	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
 		<ul class="tf-contextmenu grid-menu">
 			<!-- ko if:gridViewModel.changeStatusButton || gridViewModel.cancelButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
+			<li class="menu-item"
+				data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
 				<div class="menu-icon edit">
 				</div>
-				<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
+				<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+				</div>
 			</li>
 			<!-- /ko -->
 			<!-- ko if:gridViewModel.copyButton -->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyFieldTrip.bind(gridViewModel),css:{disabled:!gridViewModel.obCanCopyFieldTrip()}">
+			<li class="menu-item"
+				data-bind="contextMenuClick:gridViewModel.copyFieldTrip.bind(gridViewModel),css:{disabled:!gridViewModel.obCanCopyFieldTrip()}">
 				<div class="menu-icon copy">
 				</div>
-				<div class="menu-label" data-bind="text: 'Copy ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')"></div>
+				<div class="menu-label" data-bind="text: 'Copy ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+				</div>
 			</li>
 			<!-- /ko -->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<li class="menu-item"
+				data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
 				<div class="menu-icon showdetails">
 				</div>
 				<div class="menu-label">
@@ -36,7 +41,8 @@
 				<div class="rule"></div>
 			</li>
 			<!-- ko if:gridViewModel.changeStatusButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editFieldTripStatus.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
+			<li class="menu-item"
+				data-bind="contextMenuClick:gridViewModel.editFieldTripStatus.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon approve">
 				</div>
 				<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
@@ -45,10 +51,12 @@
 			</li>
 			<!-- /ko -->
 			<!-- ko if:gridViewModel.cancelButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
+			<li class="menu-item"
+				data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
 				<div class="menu-icon decline">
 				</div>
-				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+				<div class="menu-label"
+					data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
 					<span class="hotkey"></span>
 				</div>
 			</li>
@@ -73,7 +81,8 @@
 					<span class="hotkey">Ctrl + S</span>
 				</div>
 			</li>
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
+			<li class="menu-item"
+				data-bind="contextMenuClick:gridViewModel.sendEmailClick, css:{disabled:!gridViewModel.obEmail()}">
 				<div class="menu-icon email">
 				</div>
 				<div class="menu-label">
@@ -87,7 +96,8 @@
 					Send To
 				</div>
 			</li>
-			<li class="menu-item" data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
+			<li class="menu-item"
+				data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
 				<div class="menu-icon">
 				</div>
 				<div class="menu-label">
@@ -97,7 +107,8 @@
 					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
 						<div class="menu-icon">
 						</div>
-						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
+						<div class="menu-label"
+							data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
 					</li>
 				</ul>
 			</li>
@@ -109,7 +120,8 @@
 				</div>
 				<!-- ko if: gridViewModel.obReportLists() -->
 				<ul class="tf-contextmenu" data-bind="foreach: gridViewModel.obReportLists">
-					<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.viewReportClick.bind($parent.gridViewModel)">
+					<li class="menu-item"
+						data-bind="contextMenuClick:$parent.gridViewModel.viewReportClick.bind($parent.gridViewModel)">
 						<div class="menu-icon">
 						</div>
 						<div class="menu-label" data-bind="text:$data.Name">
