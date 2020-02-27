@@ -643,6 +643,7 @@
 						}
 						else
 						{
+							// TODO-V2
 							tf.ajax.post(self.getApiRequestURL(self.options.url + "s"), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
 								.then(function()
 								{
@@ -1339,6 +1340,7 @@
 		{
 			return Promise.resolve(this.allIds.slice(0));
 		}
+		// TODO-V2
 		return tf.promiseAjax.post(pathCombine(this.getApiRequestURL(this.options.url + "s"), "id"), {
 			paramData: this.searchOption.paramData,
 			data: this.searchOption.data
@@ -2693,7 +2695,8 @@
 											}
 											else
 											{
-												tf.ajax["post"](this.getApiRequestURL(this.options.url + "s" + ""), this.getApiRequestOption(kendoOption), { overlay: false });
+												// TODO-V2
+												tf.ajax["post"](this.getApiRequestURL(this.options.url + "s"), this.getApiRequestOption(kendoOption), { overlay: false });
 											}
 										}.bind(this)
 									}
@@ -4081,6 +4084,7 @@
 	{
 		var self = this;
 
+		// TODO-V2
 		var filterIdUrl = pathCombine(self.getApiRequestURL(self.options.url + "s"), "id");
 		tf.ajax.ajaxRequests.forEach(function(ajaxRequest)
 		{

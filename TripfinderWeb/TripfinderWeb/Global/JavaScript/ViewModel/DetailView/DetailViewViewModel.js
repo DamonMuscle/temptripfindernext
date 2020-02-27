@@ -1267,10 +1267,12 @@
 		}
 		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
 		{
+			// TODO-V2
 			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "s", 'detail', layoutId);
 		}
 		else
 		{
+			// TODO-V2
 			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "s", layoutId);
 		}
 
