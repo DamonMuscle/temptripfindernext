@@ -18,7 +18,7 @@
 	function DetailViewViewModel(optionId)
 	{
 		var self = this;
-		self.gridType = "fieldtrip";
+		self.gridType = "fieldtrips";
 		self.pageType = "detailview";
 		self.optionId = optionId ? optionId : null;
 		self.UNITHEIGHT = 58;
@@ -1035,7 +1035,7 @@
 					{
 						paramData.table = self.gridType;
 					}
-					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 						paramData: paramData
 					}, { overlay: false }).then(function(response)
 					{
@@ -1267,11 +1267,11 @@
 		}
 		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
 		{
-			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, 'detail', layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "s", 'detail', layoutId);
 		}
 		else
 		{
-			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "s", layoutId);
 		}
 
 		return tf.promiseAjax.get(requestUrl).then(function(response)

@@ -423,7 +423,7 @@
 		self.groups.length = 0;
 		self.allColumns.length = 0;
 		self.pageTitle(getTitleByType(self.gridType).toUpperCase());
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroup"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
 			paramData: { table: self.gridType }
 		}).then(function(response)
 		{
