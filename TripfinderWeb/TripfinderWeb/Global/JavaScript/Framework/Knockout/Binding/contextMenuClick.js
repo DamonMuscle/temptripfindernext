@@ -9,7 +9,8 @@
 			{
 				if (!($element.hasClass("disabled") || $element.hasClass("disabledToUse")))
 				{
-					valueAccessor().call(this, viewModel, e);
+					// TODO
+					//valueAccessor().call(this, viewModel, e);
 
 					if (!$element.hasClass("disable-auto-close"))
 					{
