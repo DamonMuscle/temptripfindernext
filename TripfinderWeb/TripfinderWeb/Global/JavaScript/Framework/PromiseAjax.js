@@ -40,7 +40,10 @@
 					{
 						return;
 					}
-					reject(arg.responseJSON);
+					reject({
+						Message: TF.getErrorMessage(arg.responseJSON),
+						StatusCode: arg.status
+					});
 				})
 
 		}))
