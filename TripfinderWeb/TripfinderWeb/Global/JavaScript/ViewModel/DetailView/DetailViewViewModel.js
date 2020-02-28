@@ -1267,13 +1267,11 @@
 		}
 		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
 		{
-			// TODO-V2
-			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "s", 'detail', layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType), 'detail', layoutId);
 		}
 		else
 		{
-			// TODO-V2
-			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "s", layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType), layoutId);
 		}
 
 		return tf.promiseAjax.get(requestUrl).then(function(response)
