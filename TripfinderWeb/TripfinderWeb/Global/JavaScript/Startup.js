@@ -290,6 +290,10 @@
 				// })
 				.then(function()
 				{
+					return tf.DataTypeHelper.init();
+				})
+				.then(function()
+				{
 					tf.setting = new TF.Setting();
 					return tf.setting.getRoutingConfig();
 				})

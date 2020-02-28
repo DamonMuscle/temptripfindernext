@@ -611,8 +611,7 @@
 								{
 									self.setFilterIconByKendoDSFilter.bind(self)();
 
-									// TODO-V2
-									tf.ajax.post(self.getApiRequestURL(self.options.url + "s"), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
+									tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
 										.then(function()
 										{
 											//the count of request callback in the process of change filter
@@ -643,8 +642,7 @@
 						}
 						else
 						{
-							// TODO-V2
-							tf.ajax.post(self.getApiRequestURL(self.options.url + "s"), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
+							tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
 								.then(function()
 								{
 									//the count of request callback in the process of change filter
@@ -1340,8 +1338,8 @@
 		{
 			return Promise.resolve(this.allIds.slice(0));
 		}
-		// TODO-V2
-		return tf.promiseAjax.post(pathCombine(this.getApiRequestURL(this.options.url + "s"), "id"), {
+
+		return tf.promiseAjax.post(pathCombine(this.getApiRequestURL(this.options.url), "id"), {
 			paramData: this.searchOption.paramData,
 			data: this.searchOption.data
 		}, { isCopyRequest: isCopyRequest ? true : false })
@@ -2695,8 +2693,7 @@
 											}
 											else
 											{
-												// TODO-V2
-												tf.ajax["post"](this.getApiRequestURL(this.options.url + "s"), this.getApiRequestOption(kendoOption), { overlay: false });
+												tf.ajax["post"](this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption), { overlay: false });
 											}
 										}.bind(this)
 									}
@@ -4084,8 +4081,7 @@
 	{
 		var self = this;
 
-		// TODO-V2
-		var filterIdUrl = pathCombine(self.getApiRequestURL(self.options.url + "s"), "id");
+		var filterIdUrl = pathCombine(self.getApiRequestURL(self.options.url), "id");
 		tf.ajax.ajaxRequests.forEach(function(ajaxRequest)
 		{
 			if (ajaxRequest &&
@@ -4276,8 +4272,7 @@
 					}
 					else if (self.geoFields && self.geoFields.length > 0)
 					{
-						// TODO-V2
-						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", self._gridType + "s"),
+						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(self._gridType)),
 							{
 								data:
 								{

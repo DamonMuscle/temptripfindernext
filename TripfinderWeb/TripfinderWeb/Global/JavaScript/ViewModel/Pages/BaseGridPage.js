@@ -350,7 +350,7 @@
 				showOmittedCount: option ? option.showOmittedCount : false,
 				showSelectedCount: option ? option.showSelectedCount : false,
 				gridTypeInPageInfo: option ? option.gridTypeInPageInfo : false,
-				url: pathCombine(tf.api.apiPrefix(), "search", self.type),
+				url: pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(self.type)),
 				onDataBound: self.isGridPage ? function(option)
 				{
 					self.onDataBound.bind(self)(option);

@@ -33,7 +33,7 @@
 		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
 		self.options.showOmittedCount = true;
 		self.options.isGridView = true;
-		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip");
+		self.options.url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldtrip"));
 		self.options.extraFields = ["FieldTripStageId"];
 		self.options.loadUserDefined = false;
 		self.options.supportMobileMultipleSelect = true;
