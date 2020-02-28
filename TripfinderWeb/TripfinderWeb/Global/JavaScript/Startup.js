@@ -297,7 +297,7 @@
 				{
 					tf.loadingIndicator.showImmediately();
 					var p1 = tf.userPreferenceManager.getAllKey();
-					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "timezonetotalminutes")).then(function(apiResponse)
+					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "timezonetotalminutes")).then(function(apiResponse)
 					{
 						moment().constructor.prototype.currentTimeZoneTime = function()
 						{
@@ -305,7 +305,15 @@
 							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 						};
 					});
-					return Promise.all([p1, p2])
+					var p3 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applications"), {
+						paramData: {
+							"Name": TF.productName
+						}
+					}).then(function(apiResponse){
+						TF.productID = apiResponse.Items[0].ID;
+					});
+
+					return Promise.all([p1, p2, p3])
 						.then(function()
 						{
 							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
@@ -512,7 +520,8 @@
 								});
 							}
 							return null;
-						}).then(function(value)
+						})
+						.then(function(value)
 						{
 							if (value !== null)
 							{
