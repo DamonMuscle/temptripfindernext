@@ -9,8 +9,11 @@
 			{
 				if (!($element.hasClass("disabled") || $element.hasClass("disabledToUse")))
 				{
-					// TODO
-					//valueAccessor().call(this, viewModel, e);
+					// TODO, Disable the function for RCM of the grid for now
+					if (!$element.parent().hasClass("grid-menu"))
+					{
+						valueAccessor().call(this, viewModel, e);
+					}
 
 					if (!$element.hasClass("disable-auto-close"))
 					{
