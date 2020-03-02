@@ -33,7 +33,8 @@
 		showOmittedCount: true,
 		gridTypeInPageInfo: "",
 		routeState: "",
-		removeTabIndex: false
+		removeTabIndex: false,
+		paramData: {}
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate'];
 
@@ -3041,8 +3042,10 @@
 
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
-		var self = this,
-			includeOnlyIds = self.getIncludeOnlyIds(),
+		var self = this;
+		self.options.paramData.take = kendoOptions.data.take ? kendoOptions.data.take : 100;
+		self.options.paramData.skip = kendoOptions.data.skip ? kendoOptions.data.skip : 0;	
+		var	includeOnlyIds = self.getIncludeOnlyIds(),
 			excludeAnyIds = self.getExcludeAnyIds(),
 			sortItems = kendoOptions.data.sort ? kendoOptions.data.sort.map(function(item)
 			{
@@ -3056,10 +3059,7 @@
 				};
 			}) : [],
 			options = {
-				paramData: {
-					take: kendoOptions.data.take ? kendoOptions.data.take : 100,
-					skip: kendoOptions.data.skip ? kendoOptions.data.skip : 0
-				},
+				paramData: self.options.paramData,
 				data: {
 					sortItems: sortItems,
 					idFilter: (includeOnlyIds || excludeAnyIds) ? {
