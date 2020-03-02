@@ -21,6 +21,6 @@
 
 	MyRequestSchedulerPage.prototype.getRequestUrl = function(type)
 	{
-		return pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted");
+		return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldtrip") + "?filterType=submitted");
 	}
 })();

@@ -32,11 +32,11 @@
 		getMySubmittedIds = function()
 		{
 			if (mySubmittedIds) return mySubmittedIds;
-			var url = pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "submitted", idName);
+			var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldtrip"), idName);
 			tf.promiseAjax.post(url,
 				{
 					async: false,
-					paramData: { skip: 0, take: 100 },
+					paramData: { "filterType": "submitted", skip: 0, take: 100 },
 					data: ajaxData,
 					success: function(apiResponse)
 					{
