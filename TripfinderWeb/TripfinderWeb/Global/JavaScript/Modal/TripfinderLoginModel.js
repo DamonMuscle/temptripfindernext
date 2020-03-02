@@ -30,7 +30,12 @@
 		this.signature = signature;
 		if (signature && clientid)
 		{
-			tf.promiseAjax.post(pathCombine(tf.api.server(), clientid, "auth", "validateurl?signature=" + signature))
+			var signatureData = {
+				paramData: {
+					signature: signature
+				}
+			};
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), signatureData)
 				.then(function(apiResponse)
 				{
 					this.obShowLogin(false);
@@ -93,9 +98,11 @@
 		}
 		if (this.signature)
 		{
-			tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "auth", "resetpassword?signature=" + this.signature), {
-				data: "'" + passwordRP + "'"
-			})
+			var resetPasswordData = {
+				paramData: { signature: this.signature },
+				data: passwordRP
+			};
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), resetPasswordData)
 				.then(function(apiResponse)
 				{
 					tf.promiseBootbox.alert("The Password for " + userName + " has been successfully Reset.", "Password Successfully Reset")
@@ -162,7 +169,14 @@
 			return;
 		}
 		tf.entStorageManager.save("token", "");
-		tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "auth", "forgotpassword", "tripfinder", userName, "Transfinder"))
+		var forgetPasswordData = {
+			paramData: {
+				product: "Tripfinder",
+				username: tf.authManager.userName,
+				vendor: "Transfinder"
+			}
+		};
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), forgetPasswordData)
 			.then(function(apiResponse)
 			{
 				this.loginViewModel.obLoginErrorMessage('');
@@ -213,10 +227,10 @@
 							}
 						}.bind(this)
 					}, {
-							auth: {
-								noInterupt: true
-							}
-						})
+						auth: {
+							noInterupt: true
+						}
+					})
 						.then(function(apiResponse)
 						{
 							var authorizationInfo = new TF.AuthorizationInfo(apiResponse.Items[0]);
