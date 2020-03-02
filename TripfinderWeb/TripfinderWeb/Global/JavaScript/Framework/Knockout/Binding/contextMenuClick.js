@@ -10,7 +10,10 @@
 				if (!($element.hasClass("disabled") || $element.hasClass("disabledToUse")))
 				{
 					// TODO
-					//valueAccessor().call(this, viewModel, e);
+					if (!$element.parent().hasClass("grid-menu"))
+					{
+						valueAccessor().call(this, viewModel, e);
+					}
 
 					if (!$element.hasClass("disable-auto-close"))
 					{
