@@ -417,7 +417,7 @@
 
 	DataPointPanel.prototype.updateDataPoints = function()
 	{
-		var self = this, dataPoints = dataPointsJSON, category = "fieldtrip", dataPointGroup, result,
+		var self = this, dataPoints = dataPointsJSON, category = "fieldtrips", dataPointGroup, result,
 			dataPointsForCurrentPage = dataPoints[category], subCategories = Object.keys(dataPointsForCurrentPage);
 
 		self.groups.length = 0;
@@ -427,7 +427,7 @@
 			paramData: { table: self.gridType }
 		}).then(function(response)
 		{
-			result = response.Items[0];
+			result = response.Items;
 			if (result && result.length > 0)
 			{
 				$.each(result, function(index, group)

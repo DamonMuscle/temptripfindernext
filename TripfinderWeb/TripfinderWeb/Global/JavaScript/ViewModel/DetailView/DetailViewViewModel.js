@@ -81,7 +81,7 @@
 			contentColor: "#000000"
 		};
 		self.basicGridConfig = {
-			fieldtrip: { title: "Name", subTitle: "DepartDateTime" }
+			fieldtrips: { title: "Name", subTitle: "DepartDateTime" }
 		};
 		//Image
 		self.oberrormessage = ko.observable(null);
@@ -965,15 +965,14 @@
 							return true;
 						}
 
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: {
-								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
 								name: value,
-								dataType: self.gridType
+								dataTypeId: 4
 							}
 						}, { overlay: false }).then(function(response)
 						{
-							var isUnique = response.Items[0];
+							var isUnique = response.Items;
 							return isUnique;
 						});
 					}
@@ -1033,16 +1032,17 @@
 				{
 					if (self.gridType)
 					{
-						paramData.table = self.gridType;
+						//TODO-v2
+						paramData.DataTypeId = 4;
 					}
 					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 						paramData: paramData
 					}, { overlay: false }).then(function(response)
 					{
 						var layoutEntity = {};
-						if (response && response.Items && response.Items[0])
+						if (response && response.Items)
 						{
-							var layouts = response.Items[0];
+							var layouts = response.Items;
 							if (layouts.length > 0)
 							{
 								var layout = layouts.filter(function(item)
@@ -1070,7 +1070,7 @@
 
 			if (layoutId && layoutId !== self.entityDataModel.id())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", layoutId)).then(function(response)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens", layoutId)).then(function(response)
 				{
 					if (response && response.Items && response.Items.length == 1)
 					{
@@ -1087,16 +1087,17 @@
 						tf.storageManager.delete(self.stickyLayoutName);
 						if (self.gridType)
 						{
-							paramData.table = self.gridType;
+							//TODO-v2
+							paramData.DataTypeId = 4;
 						}
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: paramData
 						}, { overlay: false }).then(function(response)
 						{
 							var layoutEntity = {};
-							if (response && response.Items && response.Items[0])
+							if (response && response.Items)
 							{
-								var layouts = response.Items[0];
+								var layouts = response.Items;
 								if (layouts.length > 0)
 								{
 									var layout = layouts.filter(function(item)
@@ -1186,7 +1187,7 @@
 		var id = tf.storageManager.get(self.stickyName);
 		if (!!id)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", id)).then(function(response)
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens", id)).then(function(response)
 			{
 				if (response && response.Items && response.Items.length == 1)
 				{
@@ -1265,14 +1266,17 @@
 		{
 			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, layoutId, "detail", "?startDate=" + (new Date()).toISOString() + "&include=tripstop+driver+busaide+school+vehicle+tripstop.student");
 		}
-		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
+		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrips", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
 		{
-			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType), 'detail', layoutId);
+			// TODO-V2
+			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "?Id=" + layoutId + "&@relationships=all");
 		}
 		else
 		{
-			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType), layoutId);
+			// TODO-V2
+			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, layoutId);
 		}
+
 
 		return tf.promiseAjax.get(requestUrl).then(function(response)
 		{
@@ -2496,12 +2500,12 @@
 
 			if (totalCostData.length > 0 && self.isReadMode())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripConfigs")).then(function(data)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips", "predata")).then(function(data)
 				{
 					var fieldtripData = data.Items[0];
 					if (fieldtripData.FieldTripSettings.ShowTripTotalCost)
 					{
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "", id)).then(function(response)
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips", "", id)).then(function(response)
 						{
 							var entityDataModel = {},
 								entity = response.Items[0];
@@ -2583,7 +2587,7 @@
 
 		if (dataType === "fieldtriphistory")
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", self.entitySelectId, "fieldtriphistory"));
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriphistories?fieldtripid=" + self.entitySelectId));
 		}
 		else if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
@@ -2608,7 +2612,7 @@
 		}
 		else
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", self.entitySelectId, "fieldtripresource", dataType));
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripresourcegroups?fieldtripid =" + self.entitySelectId + "&@relationships=Vehicle,Driver,Aide&@fields=VehicleName,DriverName,AideName"));
 		}
 	};
 
@@ -3189,10 +3193,13 @@
 				var item = data[$(e.target).closest("tr").index()],
 					mimeType = (item.MimeType || "").toLowerCase(),
 					databaseType = tf.storageManager.get("databaseType");
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
+				tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "DocumentFiles"),
+					{
+						paramData: { documentId: item.Id }
+					})
 					.then(function(keyApiResponse)
 					{
-						var path = pathCombine(tf.api.apiPrefix(), "document", item.Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
+						var path = pathCombine(tf.api.apiPrefix(), "DocumentFiles?hashKey=" + keyApiResponse.Items[0]);
 						if (view && viewableMimeTypes.indexOf(mimeType) > -1)
 						{
 							path += "?view=true";
@@ -3241,7 +3248,7 @@
 		var hasPermission = tf.permissions.documentRead;
 		if (self.isReadMode() && hasPermission)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.gridType, self.entity.Id, "documents"))
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documents? attachedToTypeID = " + 4 + " & attachedToID=" + self.entity.Id + "&@excluded=FileContent"))
 				.then(function(response)
 				{
 					var dataSource = new kendo.data.DataSource({
@@ -3255,8 +3262,8 @@
 					$.each(response.Items, function(index, item)
 					{
 						var fileData = {};
-						fileData.FileName = item.Filename;
-						fileData.Size = item.FileSizeKb;
+						fileData.FileName = item.FileName;
+						fileData.Size = item.FileSizeKB;
 						dataSource.options.data.push(fileData);
 					});
 					kendoGrid.setDataSource(dataSource);
@@ -4229,8 +4236,9 @@
 					data.Id = 0;
 					data.APIIsNew = true;
 				}
-				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
-					data: data
+				data.DataTypeId = 4;
+				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
+					data: [data]
 				}).then(function(apiResponse)
 				{
 					if (apiResponse && apiResponse.Items && apiResponse.Items[0])
@@ -4336,7 +4344,7 @@
 		self.entityDataModel.name(self.obName());
 		self.entityDataModel.subTitle(self.obSubTitle());
 		self.entityDataModel.layout(layout ? layout : self.serializeLayout());
-		self.entityDataModel.table(self.gridType);
+		self.entityDataModel.dataType(self.gridType);
 	};
 
 	DetailViewViewModel.prototype.mergeHiddenBlockLayoutInfo = function(sectionHeaderInfo, layoutObj, isToggleSectionHeader)

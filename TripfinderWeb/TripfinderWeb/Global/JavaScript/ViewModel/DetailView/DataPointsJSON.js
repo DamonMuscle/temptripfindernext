@@ -483,7 +483,7 @@ var today = (new Date()).toDateString(),
 				}
 			]
 		},
-		"fieldtrip": {
+		"fieldtrips": {
 			"Main": [
 				{
 					"field": "PublicId",

@@ -13,9 +13,9 @@
 	namespace.DetailScreenLayoutDataModel.prototype.mapping = [
 		{ from: "Id", default: 0 },
 		{ from: "Name", default: "" },
-		{ from: "Table", default: "" },
 		{ from: "Layout", default: '{"width":4,"sliderFontRate":0.5,"items":[]}' },
 		{ from: "Comments", default: "" },
-		{ from: "SubTitle", default: "" }
+		{ from: "SubTitle", default: "" },
+		{ from: "DataType", default: "" }
 	];
 })();

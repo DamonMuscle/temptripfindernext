@@ -51,16 +51,17 @@
 		}
 		if (self.options.gridType)
 		{
-			paramData.table = self.options.gridType;
+			// TODO-v2
+			paramData.dataTypeId = 4;
 		}
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			paramData: paramData
 		},
 			{ overlay: false }).then(function(response)
 			{
-				if (response && response.Items && response.Items[0])
+				if (response && response.Items)
 				{
-					var layouts = response.Items[0].map(function(item)
+					var layouts = response.Items.map(function(item)
 					{
 						if (self.obSelectLayoutID() === item.Id)
 						{
