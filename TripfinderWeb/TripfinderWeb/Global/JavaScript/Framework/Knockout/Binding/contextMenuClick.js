@@ -9,7 +9,7 @@
 			{
 				if (!($element.hasClass("disabled") || $element.hasClass("disabledToUse")))
 				{
-					// TODO, prohibit click of RCM, allow click of menu on grid
+					// TODO, Disable the function for RCM of the grid for now
 					if (!$element.parent().hasClass("grid-menu"))
 					{
 						valueAccessor().call(this, viewModel, e);
