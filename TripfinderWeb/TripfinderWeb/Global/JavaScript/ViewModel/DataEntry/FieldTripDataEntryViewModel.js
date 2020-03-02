@@ -350,7 +350,7 @@
 		{
 			if (tf.permissions.documentRead && tf.permissions.documentAdd)
 			{
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
+				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentClassifications"))
 					.then(function(data)
 					{
 						var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
@@ -391,90 +391,102 @@
 				return [];
 			};
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata"))
-			.then(function(data)
+		var promises = [tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripTemplates")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "Schools")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DistrictDepartments")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripActivities")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripClassifications")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripEquipments")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripDestinations")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripConfigs")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RequiredFields")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingCities")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingPostalCodes")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripAccounts"))];
+		return Promise.all(promises).then(function(result)
+		{
+			var fieldtripData = {};
+			fieldtripData.FieldTripTemplate = filterEmptyRecordsByFields(result[0].Items, ["Name"]);
+			fieldtripData.School = filterEmptyRecordsByFields(result[1].Items, ["Name", "SchoolCode"]);
+			fieldtripData.FieldTripDistrictDepartment = filterEmptyRecordsByFields(result[2].Items, ["Name"]);
+			fieldtripData.FieldTripActivity = filterEmptyRecordsByFields(result[3].Items, ["Name"]);
+			fieldtripData.FieldTripClassification = filterEmptyRecordsByFields(result[4].Items, ["Name"]);
+			fieldtripData.FieldTripEquipment = filterEmptyRecordsByFields(result[5].Items, ["EquipmentName"]);
+			fieldtripData.FieldTripDestination = filterEmptyRecordsByFields(result[6].Items, ["Name"]);
+			fieldtripData.FieldTripConfigs = result[7].Items;
+			fieldtripData.RequiredField = result[8].Items.filter(function(item) { return item.DataTypeID === 4 });
+			fieldtripData.MailCity = result[9].Items;
+			fieldtripData.MailZip = result[10].Items;
+			fieldtripData.FieldTripAccount = result[11].Items;
+
+			self.getTemplate(fieldtripData.FieldTripTemplate);
+			if (tf.authManager.authorizationInfo.isAdmin)
 			{
-				var fieldtripData = data.Items[0];
-				fieldtripData.FieldTripTemplate = filterEmptyRecordsByFields(fieldtripData.FieldTripTemplate, ["Name"]);
-				fieldtripData.School = filterEmptyRecordsByFields(fieldtripData.School, ["Name", "SchoolCode"]);
-				fieldtripData.FieldTripDistrictDepartment = filterEmptyRecordsByFields(fieldtripData.FieldTripDistrictDepartment, ["Name"]);
-				fieldtripData.FieldTripActivity = filterEmptyRecordsByFields(fieldtripData.FieldTripActivity, ["Name"]);
-				fieldtripData.FieldTripClassification = filterEmptyRecordsByFields(fieldtripData.FieldTripClassification, ["Name"]);
-				fieldtripData.FieldTripEquipment = filterEmptyRecordsByFields(fieldtripData.FieldTripEquipment, ["EquipmentName"]);
-				fieldtripData.FieldTripDestination = filterEmptyRecordsByFields(fieldtripData.FieldTripDestination, ["Name"]);
-
-				return fieldtripData;
-			})
-			.then(function(fieldtripData)
+				self.obSchoolDataModels(fieldtripData.School);
+			}
+			else
 			{
-				self.getTemplate(fieldtripData.FieldTripTemplate);
-				if (tf.authManager.authorizationInfo.isAdmin)
+				self.obSchoolDataModels(Enumerable.From(fieldtripData.School).Where(function(school)
 				{
-					self.obSchoolDataModels(fieldtripData.School);
-				}
-				else
-				{
-					self.obSchoolDataModels(Enumerable.From(fieldtripData.School).Where(function(school)
-					{
-						return tf.authManager.authorizationInfo.authorizationTree.schools.indexOf(school.SchoolCode) >= 0;
-					}).ToArray());
-				}
-				self.obAllSchoolDataModels(fieldtripData.School);
-				self.fieldTripDistrictDepartments = fieldtripData.FieldTripDistrictDepartment;
-				self.obDepartmentDataModels($.grep(self.fieldTripDistrictDepartments, function(item, index)
-				{
-					return self.hasPermissionForDistrictDepartment(item.Id)
-				}));
-				self.obActivityDataModels(fieldtripData.FieldTripActivity);
-				self.obClassificationDataModels(fieldtripData.FieldTripClassification);
-				self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
-				self.obDestinationDataModels(fieldtripData.FieldTripDestination);
-				self.ConvertToJson(fieldtripData.RequiredField);
-				self.obMailCityDataModels(fieldtripData.MailCity);
-				self.obMailZipDataModels(fieldtripData.MailZip);
+					return tf.authManager.authorizationInfo.authorizationTree.schools.indexOf(school.SchoolCode) >= 0;
+				}).ToArray());
+			}
+			self.obAllSchoolDataModels(fieldtripData.School);
+			self.fieldTripDistrictDepartments = fieldtripData.FieldTripDistrictDepartment;
+			self.obDepartmentDataModels($.grep(self.fieldTripDistrictDepartments, function(item, index)
+			{
+				return self.hasPermissionForDistrictDepartment(item.Id)
+			}));
+			self.obActivityDataModels(fieldtripData.FieldTripActivity);
+			self.obClassificationDataModels(fieldtripData.FieldTripClassification);
+			self.obEquipmentDataModels(fieldtripData.FieldTripEquipment);
+			self.obDestinationDataModels(fieldtripData.FieldTripDestination);
+			self.ConvertToJson(fieldtripData.RequiredField);
+			self.obMailCityDataModels(fieldtripData.MailCity);
+			self.obMailZipDataModels(fieldtripData.MailZip);
 
-				$.each(fieldtripData.FieldTripAccount, function(index, account)
+			$.each(fieldtripData.FieldTripAccount, function(index, account)
+			{
+				if (account.FieldTripActivityId)
 				{
-					if (account.FieldTripActivityId)
+					$.each(fieldtripData.FieldTripActivity, function(index, activity)
 					{
-						$.each(fieldtripData.FieldTripActivity, function(index, activity)
+						if (account.FieldTripActivityId === activity.Id)
 						{
-							if (account.FieldTripActivityId === activity.Id)
-							{
-								account.FieldTripActivity = activity;
-								return false;
-							}
-						});
-					}
+							account.FieldTripActivity = activity;
+							return false;
+						}
+					});
+				}
 
-					if (account.DepartmentId)
+				if (account.DepartmentId)
+				{
+					$.each(fieldtripData.FieldTripDistrictDepartment, function(index, department)
 					{
-						$.each(fieldtripData.FieldTripDistrictDepartment, function(index, department)
+						if (account.DepartmentId === department.Id)
 						{
-							if (account.DepartmentId === department.Id)
-							{
-								account.Department = department;
-								return false;
-							}
-						});
-					}
+							account.Department = department;
+							return false;
+						}
+					});
+				}
 
-					if (!account.FieldTripActivity)
-					{
-						account.FieldTripActivity = { Name: "[Any]", Id: null };
-					}
-					if (!account.Department)
-					{
-						account.Department = { Name: "[Any]", Id: null };
-					}
-				});
-				self.fieldTripAccountList = fieldtripData.FieldTripAccount;
-				self.setAccountListBySchool(null, true);
-				self.obFieldTripSettings(fieldtripData.FieldTripSettings);
-				self.obShowTotalCost(fieldtripData.FieldTripSettings.ShowTripTotalCost);
-				self.obStrictDest(fieldtripData.FieldTripSettings.StrictDest);
-				return true;
+				if (!account.FieldTripActivity)
+				{
+					account.FieldTripActivity = { Name: "[Any]", Id: null };
+				}
+				if (!account.Department)
+				{
+					account.Department = { Name: "[Any]", Id: null };
+				}
 			});
+			self.fieldTripAccountList = fieldtripData.FieldTripAccount;
+			self.setAccountListBySchool(null, true);
+			self.obFieldTripSettings(fieldtripData.FieldTripConfigs);
+			self.obShowTotalCost(fieldtripData.FieldTripConfigs.ShowTripTotalCost);
+			self.obStrictDest(fieldtripData.FieldTripConfigs.StrictDest);
+			return true;
+		});
 	};
 
 	FieldTripDataEntryViewModel.prototype.refreshDocumentMiniGrid = function(AttachedId, isNew)

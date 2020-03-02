@@ -2496,7 +2496,7 @@
 
 			if (totalCostData.length > 0 && self.isReadMode())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "predata")).then(function(data)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripConfigs")).then(function(data)
 				{
 					var fieldtripData = data.Items[0];
 					if (fieldtripData.FieldTripSettings.ShowTripTotalCost)

@@ -93,7 +93,7 @@
 		{
 			this.initExtraSettings();
 
-			var url = option.url ? option.url : (this.type == "documentmini" ? "search/document" : "search/" + this.type);
+			var url = option.url ? option.url : (this.type == "documentmini" ? "search/documents" : "search/" + this.type);
 
 			var defaultOption = {
 				storageKey: option.storageKey ? option.storageKey : "grid.currentlayout." + this.type,
