@@ -372,3 +372,72 @@ div.form-control {
 .k-input {
 	color: #555;
 }
+
+.k-edit-form-container .k-edit-buttons{
+	text-align: left;
+	.k-dialog-ok,
+	.k-dialog-insert,
+	.k-dialog-ok:hover,
+	.k-dialog-insert:hover{
+		outline: none;
+		color: #ffffff;
+		padding: 3px 12px;
+    height: 26px;
+    background-color: #70A130;
+    border-color: #70A130;
+	}
+	
+	.k-dialog-ok:hover,
+	.k-dialog-insert:hover{
+		opacity: 0.9;
+	}
+
+	.k-dialog-close,
+	.k-dialog-close:hover
+	.k-dialog-close:active{
+		color: #333;
+		border-color: #f2f2f2 !important;
+		background: #f2f2f2 !important;
+	}
+}
+
+#k-table-wizard-tabs{
+	.k-tabstrip-items .k-state-active{
+		border-bottom: 0;
+	}
+	
+	#k-cell-properties,
+	#k-table-properties{
+		.k-edit-field {
+			.k-selected-color {
+				width: 24px;
+				height: 20px;
+		
+				.k-icon{
+					font-size: 1.5em;
+					margin-top: -5px;
+					margin-left: 2px;
+				}
+			}
+		}
+	}
+}
+
+.k-window .k-edit-buttons{
+	background: #f2f2f2;
+}
+.k-window-titlebar{
+	&.k-header{
+		background: #000;
+		color: #fff;
+	}
+	.k-window-action{
+		opacity: 1;
+	}
+}
+
+.k-editor-dialog .k-edit-field .k-numerictextbox{
+	.k-numeric-wrap.k-state-default {
+		height: 24px;
+	}
+}
