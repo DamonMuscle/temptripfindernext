@@ -126,7 +126,7 @@
 						},
 						message: "The Password for " + userName + " was not able to be Reset. You can try again or cancel and try later."
 					},
-						"Unabel to Reset Password")
+						"Unable to Reset Password")
 						.then(function(result)
 						{
 							if (!result)
