@@ -114,7 +114,7 @@
 				if (passed)
 				{
 					var changePasswordData = {
-						data: self.passwordChangeViewModel.obNewPassword()
+						data: '"' + self.passwordChangeViewModel.obNewPassword() + '"'
 					};
 					tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), changePasswordData)
 						.then(function(apiResponse)
