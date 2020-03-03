@@ -12,24 +12,18 @@
 
 	namespace.SettingsConfigurationDataModal.prototype.mapping = [
 		{ from: "ClientId", default: "" },
-		{ from: "Smtphost", default: "" },
-		{ from: "Smtpport", default: 0 },
-		{ from: "SmtpuserName", default: "" },
-		{ from: "Smtppassword", default: "" },
-		{ from: "Smtpssl", default: false },
+		{ from: "SMTPHost", default: "" },
+		{ from: "SMTPPort", default: 0 },
+		{ from: "SMTPUserName", default: "" },
+		{ from: "SMTPPassword", default: "" },
+		{ from: "SMTPSSL", default: false },
 		{ from: "EmailAddress", default: "" },
 		{ from: "EmailName", default: "" },
 		{ from: "MailToList", default: [] },
 		{ from: "MailCcList", default: [] },
 		{ from: "MailBccList", default: [] },
 		{ from: "EmailSubject", default: "" },
-		{ from: "EmailMessage", default: "" },
-		{ from: "TransfinderDataFolder", default: "" },
-		{ from: "InstallationLocation", default: "" },
-		{ from: "DatabaseServer", default: "" },
-		{ from: "DatabaseName", default: "" },
-		{ from: "DatabaseLoginId", default: "" },
-		{ from: "DatabasePassword", default: "" },
+		{ from: "EmailMessage", default: "" }
 	];
 
 })();

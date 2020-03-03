@@ -13,7 +13,6 @@
 		self.obValidationErrors = ko.observableArray([]);
 		self.testSentEmailClick = self.testSentEmailClick.bind(self);
 		self.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
-		self.obIsUpdate = ko.observable(true);
 		self.obSelectedClientId = ko.observable();
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		TF.Page.BaseGridPage.apply(self, arguments);
@@ -48,33 +47,15 @@
 	SettingsConfigurationPage.prototype.load = function()
 	{
 		var self = this;
-		self.getClients().then(function()
-		{
-			self.loadClientConfig();
-			self.getFieldTripSettings();
-		}.bind(this));
+		self.obSelectedClientId(tf.authManager.clientKey);
+		self.loadClientConfig();
+		self.getFieldTripConfigs();
 	};
 
-	SettingsConfigurationPage.prototype.getClients = function()
+	SettingsConfigurationPage.prototype.getFieldTripConfigs = function()
 	{
 		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "getClientIds"))
-			.then(function(result)
-			{
-				result.Items.forEach(function(item)
-				{
-					if (item.toLowerCase() === tf.authManager.clientKey.toLowerCase())
-					{
-						self.obSelectedClientId(item);
-					}
-				}, this);
-			}.bind(this));
-	};
-
-	SettingsConfigurationPage.prototype.getFieldTripSettings = function()
-	{
-		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripoptionandsetting", "fromini"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "fieldTripconfigs"))
 			.then(function(result)
 			{
 				if (result.Items && result.Items.length > 0)
@@ -87,22 +68,14 @@
 
 	SettingsConfigurationPage.prototype.loadClientConfig = function()
 	{
-		var self = this, clientId = self.obSelectedClientId() !== "New" ? self.obSelectedClientId() : "";
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), { data: { clientId: clientId } })
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), { data: { clientId: self.obSelectedClientId() } })
 			.then(function(data)
 			{
-				if (self.obSelectedClientId() !== "New")
-				{
-					data.Items[0].Smtppassword = self.displayPassword;
-				}
+				data.Items[0].SMTPPassword = self.displayPassword;
 				self.obEntityDataModel(new TF.DataModel.SettingsConfigurationDataModal(data.Items[0]));
-				self.obIsUpdate(clientId !== "");
 				self.obEntityDataModel().apiIsDirty(false);
 				self.setValidation();
-				if (!self.obIsUpdate())
-				{
-					$("input[name=clientId]").focus();
-				}
 				self.initEditor();
 			}.bind(this));
 	};
@@ -218,14 +191,10 @@
 	SettingsConfigurationPage.prototype.resetFakePassword = function()
 	{
 		var self = this, settings = self.obEntityDataModel().clone();
-		if (self.obSelectedClientId() !== "New")
+		if (settings.sMTPPassword() === self.displayPassword)
 		{
-			if (settings.smtppassword() === self.displayPassword)
-			{
-				settings.smtppassword("");
-			}
+			settings.sMTPPassword("");
 		}
-
 		return settings;
 	}
 
@@ -348,10 +317,9 @@
 				}
 				else
 				{
-					return self.postData().then(function(result)
+					return self.patchClientConfig().then(function(result)
 					{
-						var settings = {};
-						settings["SHOWTRIPTOTALCOST"] = $(".show-total-cost").prop("checked");
+						var ShowTripTotalCost = $(".show-total-cost").prop("checked");
 						var p1 = tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages"), {
 							data: {
 								EnglishMessage: $(".option.english.design").hasClass("selected") ? self.englishEditor.value() : $("#EnglishHtmlEditor").val(),
@@ -362,8 +330,8 @@
 						{
 							return response;
 						}),
-							p2 = tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "fieldtripoptionandsetting", "fromini"), {
-								data: JSON.stringify(settings)
+						p2 = tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "fieldTripconfigs"), {
+								data: [{ "op": "replace", "path": "/ShowTripTotalCost", "value": ShowTripTotalCost }]
 							}).then(function(response)
 							{
 								return response;
@@ -391,30 +359,26 @@
 			}.bind(this));
 	};
 
-	SettingsConfigurationPage.prototype.postData = function()
+	SettingsConfigurationPage.prototype.patchClientConfig = function()
 	{
-		var self = this;
-		self.obEntityDataModel().apiIsNew(!self.obIsUpdate());
-		var queryString = "?emptySMTPPassword=" + (this.obSelectedClientId() !== "New" && !this.obEntityDataModel().smtppassword());
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", queryString), {
-			data: self.resetFakePassword().toData()
-		}).then(function(data)
+		var self = this, data = self.resetFakePassword().toData();
+		var submitData = [
+			{ "op": "replace", "path": "/SMTPHost", "value": data.SMTPHost },
+			{ "op": "replace", "path": "/SMTPPort", "value": data.SMTPPort },
+			{ "op": "replace", "path": "/SMTPUserName", "value": data.SMTPUserName },
+			{ "op": "replace", "path": "/SMTPSSL", "value": !!data.SMTPSSL },
+			{ "op": "replace", "path": "/EmailAddress", "value": data.EmailAddress },
+			{ "op": "replace", "path": "/EmailName", "value": data.EmailName },
+		];
+		if(data.SMTPPassword) {
+			submitData.push({ "op": "replace", "path": "/SMTPPassword", "value": data.SMTPPassword });
+		}
+		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), {
+			data: submitData
+		}, { overlay: false }).then(function(data)
 		{
 			self.obEntityDataModel().apiIsDirty(false);
-
-			if (this.obSelectedClientId() !== "New")
-			{
-				this.obEntityDataModel().smtppassword(this.displayPassword);
-			}
-
-			if (!self.obIsUpdate())
-			{
-				self.getClients().then(function()
-				{
-					self.obSelectedClientId(self.obEntityDataModel().clientId());
-				}.bind(this));
-				self.obIsUpdate(true);
-			}
+			this.obEntityDataModel().sMTPPassword(this.displayPassword);
 			return true;
 		}.bind(this), function(data)
 		{
