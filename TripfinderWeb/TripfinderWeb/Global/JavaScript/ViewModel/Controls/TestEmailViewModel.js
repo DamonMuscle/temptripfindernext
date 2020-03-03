@@ -315,23 +315,19 @@
 		{
 			return item.emailAddress();
 		}));
-		return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "testemail"),
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails"),
 			{
 				data: this.obEntityDataModel().toData()
 			}).then(function(data)
 			{
-				if (data.Items[0] !== "")
-				{
-					tf.promiseBootbox.alert("A test email could not be sent.", "Unable to Send Test Email");
-				} else
-				{
-					return tf.promiseBootbox.alert("An email has been successfully sent. Verify that the " + this.obEmailToString() + (this.obEmailToList().length == 1 ? " has" : " have") + " received this email.", "Test Email Successfully Sent")
+				return tf.promiseBootbox.alert("An email has been successfully sent. Verify that the " + this.obEmailToString() + (this.obEmailToList().length == 1 ? " has" : " have") + " received this email.", "Test Email Successfully Sent")
 						.then(function()
 						{
 							return true;
 						}.bind(this));
-				}
-			}.bind(this));
+			}.bind(this), function(e) {
+				return tf.promiseBootbox.alert("A test email could not be sent.", "Unable to Send Test Email");
+			});
 	};
 
 	TestEmailViewModel.prototype.close = function()
