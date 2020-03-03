@@ -69,13 +69,13 @@
 
 		if (auth)
 		{
-			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource", "test"),
+			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications"),
 				{},
 				auth);
 		}
 		else
 		{
-			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datasource", "test"), null, { overlay: false });
+			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications"), null, { overlay: false });
 		}
 		return p
 			.then(function(result)

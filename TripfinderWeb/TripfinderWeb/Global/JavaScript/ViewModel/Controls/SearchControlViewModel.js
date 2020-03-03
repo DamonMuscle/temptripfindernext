@@ -1081,7 +1081,7 @@
 		var self = this;
 		return tf.datasourceManager.validateAllDBs().then(function(result)
 		{
-			if (result && result.Items && result.Items[0] && result.Items[0].AnyDBPass && result.Items[0].DBlength > 1)
+			if (result && result.Items && result.Items[0] && result.Items[0].AnyDatabasePass && result.Items[0].Count > 1)
 			{
 				self.obChangeDataSourceShow(true);
 			}

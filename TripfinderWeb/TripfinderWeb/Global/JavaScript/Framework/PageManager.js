@@ -32,8 +32,7 @@
 			stopfinderadmin: { route: "StopfinderAdmin", url: "StopfinderAdmin", permission: tf.permissions.obIsAdmin() }
 		};
 
-		// TODO-V2
-		// self.initApplicationSwitcher();
+		self.initApplicationSwitcher();
 	}
 
 	PageManager.prototype.initApplicationSwitcher = function()
@@ -48,36 +47,49 @@
 				return self.availableApplications.hasOwnProperty(productName) && self.availableApplications[productName].permission;
 			});
 
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "tfsysinfo", "mytransfinder"))
-				.then(function(apiResponse)
-				{
-					var myTransfinderURL = apiResponse.Items[0];
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"), {
+				paramData: {
+					ids: "VENDORVALIDATIONSERVER,VENDORACCESSINFOPATH"
+				}
+			}).then(function(apiResponse)
+			{
+				var path = apiResponse.Items[0].InfoID === "VENDORACCESSINFOPATH" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue,
+				 	server = apiResponse.Items[0].InfoID === "VENDORVALIDATIONSERVER" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue;
+				if(server[server.length - 1] == "/") {
+					server = server.slice(0, server.length - 1);
+				}
 
-					Promise.resolve($.ajax({
-						url: myTransfinderURL,
-						data: {
-							vendorid: "Transfinder",
-							clientid: tf.authManager.clientKey
-						},
-						dataType: 'json'
-					}))
-						.then(function(res)
+				if(path[0] == "/") {
+					path = path.slice(1, path.length)
+				}
+
+				var myTransfinderURL = server + "/" + path;
+
+				Promise.resolve($.ajax({
+					url: myTransfinderURL,
+					data: {
+						vendorid: "Transfinder",
+						clientid: tf.authManager.clientKey
+					},
+					dataType: 'json'
+				}))
+					.then(function(res)
+					{
+						hasURLProducts = res ? res.Products.filter(function(prod)
 						{
-							hasURLProducts = res ? res.Products.filter(function(prod)
-							{
-								return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
-							}) : [];
+							return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
+						}) : [];
 
-							if (hasURLProducts.length > 0)
+						if (hasURLProducts.length > 0)
+						{
+							self.applicationURLMappingList = hasURLProducts;
+							self.applicationSwitcherList = hasURLProducts.map(function(item)
 							{
-								self.applicationURLMappingList = hasURLProducts;
-								self.applicationSwitcherList = hasURLProducts.map(function(item)
-								{
-									return item.Name.toLowerCase();
-								});
-							}
-						})
-				});
+								return item.Name.toLowerCase();
+							});
+						}
+					})
+			});
 		}
 	}
 
