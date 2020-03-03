@@ -2680,7 +2680,7 @@
 					});
 					kendoGrid.setDataSource(dataSource);
 				}
-				self.updateGridFooter($itemDom, result.Items.length, result.TotalRecordCount);
+				self.updateGridFooter($itemDom, result.Items.length);
 			}, function(error)
 			{
 				//  no permission
@@ -2725,7 +2725,7 @@
 				sort: sortFunc
 			});
 		kendoGrid.setDataSource(dataSource);
-		self.updateGridFooter($item, 0, 0);
+		self.updateGridFooter($item, 0);
 
 		if (!hasPermission)
 		{
@@ -2762,17 +2762,18 @@
 		grid.addWidget($itemDom, item.x, item.y, item.w, item.h, undefined, undefined, undefined, minHeight);
 	};
 
-	DetailViewViewModel.prototype.updateGridFooter = function($grid, filterCount, totalCount)
+	DetailViewViewModel.prototype.updateGridFooter = function($grid, filterCount)
 	{
 		var pageFooter = $grid.find(".k-pager-wrap"),
-			footerInfo = pageFooter.find(".count-info");
+			footerInfo = pageFooter.find(".count-info"),
+			record = filterCount === 1 ? " Record" : " Records";
 		if (footerInfo.length > 0)
 		{
-			footerInfo.html(filterCount + " of " + totalCount);
+			footerInfo.html(filterCount + record);
 		}
 		else
 		{
-			pageFooter.append($("<div class='count-info'>" + filterCount + " of " + totalCount + "</div>"));
+			pageFooter.append($("<div class='count-info'>" + filterCount + record + "</div>"));
 		}
 	}
 
@@ -2865,7 +2866,7 @@
 		if (kendoGrid)
 		{
 			kendoGrid.setOptions({ "columns": self.getKendoColumnsExtend(editColumnViewModel.selectedColumns) });
-			self.updateGridFooter($grid, 0, 0);
+			self.updateGridFooter($grid, 0);
 		}
 	}
 
