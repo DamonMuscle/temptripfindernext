@@ -416,7 +416,7 @@
 		var self = this;
 		switch (pageName)
 		{
-			case "fieldtrips":
+			case "fieldtrip":
 				return tf.applicationTerm.getApplicationTermPluralByName("Field Trip");
 			default:
 				return null;
@@ -488,7 +488,7 @@
 	PageManager.prototype.getAvailableDataTypes = function()
 	{
 		var allDataTypes = [
-			{ name: "fieldtrips", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
+			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
 		];
 		return allDataTypes.filter(function(item) { return item.permission; });
 	};

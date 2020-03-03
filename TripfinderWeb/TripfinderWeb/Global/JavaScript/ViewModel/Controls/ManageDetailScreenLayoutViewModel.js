@@ -134,7 +134,7 @@
 		if (gridType && gridType !== "all")
 		{
 			//TODO-v2
-			paramData.DataTypeId = 4;
+			paramData.DataTypeId = tf.DataTypeHelper.getId(gridType);
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			paramData: paramData
@@ -144,7 +144,7 @@
 			{
 				var entityList = response.Items.map(function(item)
 				{
-					item.DataType = 'fieldtrips';
+					item.DataType = 'fieldtrip';
 					return new TF.DataModel.DetailScreenLayoutDataModel(item);
 				});
 				self.layoutEntities = entityList;
@@ -453,7 +453,7 @@
 				entity = JSON.parse(jsonStr);
 				entity.Layout = JSON.parse(entity.Layout);
 				//TODO-v2
-				layoutType = entity.Table + "s";
+				layoutType = entity.Table;
 
 				// Check if the grid type is valid.
 				if (!tf.pageManager.getPageTitleByPageName(layoutType))
@@ -535,7 +535,7 @@
 		data.Id = 0;
 		data.APIIsNew = true;
 		//TODO-v2
-		data.DataTypeId = 4;
+		data.DataTypeId = tf.DataTypeHelper.getId(entity.Table);
 
 		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			data: [data]

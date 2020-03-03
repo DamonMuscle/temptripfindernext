@@ -18,7 +18,7 @@
 	function DetailViewViewModel(optionId)
 	{
 		var self = this;
-		self.gridType = "fieldtrips";
+		self.gridType = "fieldtrip";
 		self.pageType = "detailview";
 		self.optionId = optionId ? optionId : null;
 		self.UNITHEIGHT = 58;
@@ -81,7 +81,7 @@
 			contentColor: "#000000"
 		};
 		self.basicGridConfig = {
-			fieldtrips: { title: "Name", subTitle: "DepartDateTime" }
+			fieldtrip: { title: "Name", subTitle: "DepartDateTime" }
 		};
 		//Image
 		self.oberrormessage = ko.observable(null);
@@ -968,11 +968,11 @@
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: {
 								name: value,
-								dataTypeId: 4
+								dataTypeId: tf.DataTypeHelper.getId(self.gridType)
 							}
 						}, { overlay: false }).then(function(response)
 						{
-							var isUnique = response.Items;
+							var isUnique = !response.Items.length;
 							return isUnique;
 						});
 					}
@@ -1033,7 +1033,7 @@
 					if (self.gridType)
 					{
 						//TODO-v2
-						paramData.DataTypeId = 4;
+						paramData.DataTypeId = tf.DataTypeHelper.getId(self.gridType);
 					}
 					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 						paramData: paramData
@@ -1088,7 +1088,7 @@
 						if (self.gridType)
 						{
 							//TODO-v2
-							paramData.DataTypeId = 4;
+							paramData.DataTypeId = tf.DataTypeHelper.getId(self.gridType);
 						}
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: paramData
@@ -1266,15 +1266,13 @@
 		{
 			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, layoutId, "detail", "?startDate=" + (new Date()).toISOString() + "&include=tripstop+driver+busaide+school+vehicle+tripstop.student");
 		}
-		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrips", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
+		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
 		{
-			// TODO-V2
-			requestUrl = pathCombine(tf.api.apiPrefix(), gridType + "?Id=" + layoutId + "&@relationships=all");
+			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType) + "?Id=" + layoutId + "&@relationships=all");
 		}
 		else
 		{
-			// TODO-V2
-			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), gritf.DataTypeHelper.getEndpoint(gridType), layoutId);
 		}
 
 
@@ -2500,12 +2498,12 @@
 
 			if (totalCostData.length > 0 && self.isReadMode())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips", "predata")).then(function(data)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.gridType), "predata")).then(function(data)
 				{
 					var fieldtripData = data.Items[0];
 					if (fieldtripData.FieldTripSettings.ShowTripTotalCost)
 					{
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips", "", id)).then(function(response)
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.gridType), "", id)).then(function(response)
 						{
 							var entityDataModel = {},
 								entity = response.Items[0];
@@ -4236,7 +4234,6 @@
 					data.Id = 0;
 					data.APIIsNew = true;
 				}
-				data.DataTypeId = 4;
 				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 					data: [data]
 				}).then(function(apiResponse)
@@ -4344,7 +4341,7 @@
 		self.entityDataModel.name(self.obName());
 		self.entityDataModel.subTitle(self.obSubTitle());
 		self.entityDataModel.layout(layout ? layout : self.serializeLayout());
-		self.entityDataModel.dataType(self.gridType);
+		self.entityDataModel.dataTypeId(tf.DataTypeHelper.getId(self.gridType));
 	};
 
 	DetailViewViewModel.prototype.mergeHiddenBlockLayoutInfo = function(sectionHeaderInfo, layoutObj, isToggleSectionHeader)

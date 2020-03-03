@@ -52,7 +52,7 @@
 		if (self.options.gridType)
 		{
 			// TODO-v2
-			paramData.dataTypeId = 4;
+			paramData.dataTypeId = tf.DataTypeHelper.getId(self.options.gridType);
 		}
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			paramData: paramData

@@ -1337,7 +1337,7 @@
 					data: [{
 						DataType: 4,
 						SearchText: searchText,
-						ApplicationID: 5,
+						ApplicationID: TF.productID,
 						DBID: 7
 					}],
 					async: true
@@ -1355,7 +1355,7 @@
 
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords"), {
 			paramData: {
-				applicationID: 5
+				applicationID: TF.productID
 			}
 		}, { overlay: false })
 			.then(function(response)

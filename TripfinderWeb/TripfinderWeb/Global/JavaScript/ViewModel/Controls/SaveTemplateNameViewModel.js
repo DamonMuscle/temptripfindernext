@@ -58,7 +58,7 @@
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: {
 								name: value,
-								dataTypeId: 4
+								dataTypeId: tf.DataTypeHelper.getId("fieldtrip")
 							}
 						}, { overlay: false }).then(function(response)
 						{

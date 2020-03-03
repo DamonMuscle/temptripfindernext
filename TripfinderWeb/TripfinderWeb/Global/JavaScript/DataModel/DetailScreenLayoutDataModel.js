@@ -16,6 +16,7 @@
 		{ from: "Layout", default: '{"width":4,"sliderFontRate":0.5,"items":[]}' },
 		{ from: "Comments", default: "" },
 		{ from: "SubTitle", default: "" },
-		{ from: "DataType", default: "" }
+		{ from: "DataType", default: "" },
+		{ from: "DataTypeId", default: 0 }
 	];
 })();
