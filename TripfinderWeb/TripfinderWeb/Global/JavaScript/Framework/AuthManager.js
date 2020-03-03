@@ -90,7 +90,7 @@
 							return tf.datasourceManager.validateAllDBs()
 								.then(function(valResult)
 								{
-									if (!valResult.Items[0].AnyDBPass)
+									if (!valResult.Items[0].AnyDatabasePass)
 									{
 										//all db connection failed
 										var message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";

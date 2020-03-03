@@ -283,11 +283,10 @@
 			tf.kendoHackHelper = new TF.KendoHackHelper();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
-				// TODO-V2
-				// .then(function()
-				// {
-				// 	return sessionValidator.activate();
-				// })
+				.then(function()
+				{
+					return sessionValidator.activate();
+				})
 				.then(function()
 				{
 					return tf.DataTypeHelper.init();
