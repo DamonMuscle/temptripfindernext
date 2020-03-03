@@ -964,6 +964,10 @@
 						{
 							return true;
 						}
+						if (!self.entityDataModel.apiIsNew() && !self.isSaveAsNew)
+						{
+							return true;
+						}
 
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: {
@@ -1032,7 +1036,6 @@
 				{
 					if (self.gridType)
 					{
-						//TODO-v2
 						paramData.DataTypeId = tf.DataTypeHelper.getId(self.gridType);
 					}
 					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
@@ -1087,7 +1090,6 @@
 						tf.storageManager.delete(self.stickyLayoutName);
 						if (self.gridType)
 						{
-							//TODO-v2
 							paramData.DataTypeId = tf.DataTypeHelper.getId(self.gridType);
 						}
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
@@ -1140,7 +1142,7 @@
 	DetailViewViewModel.prototype.applyLayoutEntity = function(layoutEntity, isDeleted)
 	{
 		var self = this, gridType = self.gridType;
-		if (layoutEntity && !layoutEntity.SubTitle && gridType === layoutEntity.Table)
+		if (layoutEntity && !layoutEntity.SubTitle && gridType === (layoutEntity.Table || layoutEntity.DataType))
 		{
 			layoutEntity.SubTitle = self.basicGridConfig[gridType].subTitle;
 		}
@@ -2498,16 +2500,16 @@
 
 			if (totalCostData.length > 0 && self.isReadMode())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.gridType), "predata")).then(function(data)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "fieldTripConfigs")).then(function(data)
 				{
 					var fieldtripData = data.Items[0];
-					if (fieldtripData.FieldTripSettings.ShowTripTotalCost)
+					if (fieldtripData.ShowTripTotalCost)
 					{
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.gridType), "", id)).then(function(response)
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.gridType) + "?Id=" + id + "&@relationships=FieldTripResourceGroup")).then(function(response)
 						{
 							var entityDataModel = {},
 								entity = response.Items[0];
-							entityDataModel.FieldTripResourceGroups = entity.FieldTripResourceGroup;
+							entityDataModel.FieldTripResourceGroups = entity.FieldTripResourceGroups;
 							entityDataModel.FixedCost = entity.FixedCost;
 							entityDataModel.MinimumCost = entity.MinimumCost;
 							self.totalCostContent = self.detailViewHelper.resourcesTotalComputer(entityDataModel);
@@ -4234,26 +4236,52 @@
 					data.Id = 0;
 					data.APIIsNew = true;
 				}
-				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
-					data: [data]
-				}).then(function(apiResponse)
+				if (data.APIIsNew)
 				{
-					if (apiResponse && apiResponse.Items && apiResponse.Items[0])
+					tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
+						data: [data]
+					}).then(function(apiResponse)
 					{
-						var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
-						dataItem.APIIsNew = false;
-						self.dataPointPanel.closeClick();
-						self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
+						if (apiResponse && apiResponse.Items && apiResponse.Items[0])
 						{
-							self.showDetailViewById(self.entitySelectId);
-							tf.storageManager.save(self.stickyName, dataItem.Id);
-							tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
-						});
-					}
-				}).catch(function(error)
+							var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
+							dataItem.APIIsNew = false;
+							self.dataPointPanel.closeClick();
+							self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
+							{
+								self.showDetailViewById(self.entitySelectId);
+								tf.storageManager.save(self.stickyName, dataItem.Id);
+								tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
+							});
+						}
+					}).catch(function(error)
+					{
+						throw new Error('error occurred.');
+					});
+				} else
 				{
-					throw new Error('error occurred.');
-				});
+					tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens", data.Id), {
+						data: data
+					}).then(function(apiResponse)
+					{
+						if (apiResponse && apiResponse.Items && apiResponse.Items[0])
+						{
+							var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
+							dataItem.APIIsNew = false;
+							self.dataPointPanel.closeClick();
+							self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
+							{
+								self.showDetailViewById(self.entitySelectId);
+								tf.storageManager.save(self.stickyName, dataItem.Id);
+								tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
+							});
+						}
+					}).catch(function(error)
+					{
+						throw new Error('error occurred.');
+					});
+				}
+
 			};
 
 		if (menu)

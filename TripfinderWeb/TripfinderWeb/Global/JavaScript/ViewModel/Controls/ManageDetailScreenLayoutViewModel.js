@@ -133,7 +133,6 @@
 		var self = this, paramData = {};
 		if (gridType && gridType !== "all")
 		{
-			//TODO-v2
 			paramData.DataTypeId = tf.DataTypeHelper.getId(gridType);
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
@@ -370,7 +369,7 @@
 			data: [entityId]
 		}).then(function(apiResponse)
 		{
-			if (apiResponse.Items)
+			if (apiResponse)
 			{
 				if (self.selectedIdOnPanel === entityId)
 				{
@@ -452,8 +451,7 @@
 				// Check if json string is valid json.
 				entity = JSON.parse(jsonStr);
 				entity.Layout = JSON.parse(entity.Layout);
-				//TODO-v2
-				layoutType = entity.Table;
+				layoutType = entity.Table || entity.DataType;
 
 				// Check if the grid type is valid.
 				if (!tf.pageManager.getPageTitleByPageName(layoutType))
@@ -534,8 +532,7 @@
 		data.Layout = JSON.stringify(entity.Layout);
 		data.Id = 0;
 		data.APIIsNew = true;
-		//TODO-v2
-		data.DataTypeId = tf.DataTypeHelper.getId(entity.Table);
+		data.DataTypeId = tf.DataTypeHelper.getId(entity.Table || entity.DataType);
 
 		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			data: [data]

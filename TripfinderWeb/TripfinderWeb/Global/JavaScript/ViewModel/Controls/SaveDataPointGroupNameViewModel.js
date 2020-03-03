@@ -58,7 +58,7 @@
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
 							paramData: {
 								name: value,
-								dataTypeId: tf.DataTypeHelper.getId(self.entity.Table)
+								dataTypeId: tf.DataTypeHelper.getId(self.entity.Table || self.entity.DataType)
 							}
 						}, { overlay: false }).then(function(response)
 						{
