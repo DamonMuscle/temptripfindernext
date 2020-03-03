@@ -18,7 +18,7 @@
 	function DetailViewViewModel(optionId)
 	{
 		var self = this;
-		self.gridType = "fieldtrips";
+		self.gridType = "fieldtrip";
 		self.pageType = "detailview";
 		self.optionId = optionId ? optionId : null;
 		self.UNITHEIGHT = 58;
@@ -964,16 +964,19 @@
 						{
 							return true;
 						}
+						if (!self.entityDataModel.apiIsNew() && !self.isSaveAsNew)
+						{
+							return true;
+						}
 
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: {
-								id: self.isSaveAsNew ? 0 : (self.entityDataModel.id() || 0),
 								name: value,
-								dataType: self.gridType
+								dataTypeId: tf.DataTypeHelper.getId(self.gridType)
 							}
 						}, { overlay: false }).then(function(response)
 						{
-							var isUnique = response.Items[0];
+							var isUnique = !response.Items.length;
 							return isUnique;
 						});
 					}
@@ -1033,16 +1036,16 @@
 				{
 					if (self.gridType)
 					{
-						paramData.table = self.gridType;
+						paramData.DataTypeId = tf.DataTypeHelper.getId(self.gridType);
 					}
 					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 						paramData: paramData
 					}, { overlay: false }).then(function(response)
 					{
 						var layoutEntity = {};
-						if (response && response.Items && response.Items[0])
+						if (response && response.Items)
 						{
-							var layouts = response.Items[0];
+							var layouts = response.Items;
 							if (layouts.length > 0)
 							{
 								var layout = layouts.filter(function(item)
@@ -1070,7 +1073,7 @@
 
 			if (layoutId && layoutId !== self.entityDataModel.id())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", layoutId)).then(function(response)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens", layoutId)).then(function(response)
 				{
 					if (response && response.Items && response.Items.length == 1)
 					{
@@ -1087,16 +1090,16 @@
 						tf.storageManager.delete(self.stickyLayoutName);
 						if (self.gridType)
 						{
-							paramData.table = self.gridType;
+							paramData.DataTypeId = tf.DataTypeHelper.getId(self.gridType);
 						}
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: paramData
 						}, { overlay: false }).then(function(response)
 						{
 							var layoutEntity = {};
-							if (response && response.Items && response.Items[0])
+							if (response && response.Items)
 							{
-								var layouts = response.Items[0];
+								var layouts = response.Items;
 								if (layouts.length > 0)
 								{
 									var layout = layouts.filter(function(item)
@@ -1139,7 +1142,7 @@
 	DetailViewViewModel.prototype.applyLayoutEntity = function(layoutEntity, isDeleted)
 	{
 		var self = this, gridType = self.gridType;
-		if (layoutEntity && !layoutEntity.SubTitle && gridType === layoutEntity.Table)
+		if (layoutEntity && !layoutEntity.SubTitle && gridType === (layoutEntity.Table || layoutEntity.DataType))
 		{
 			layoutEntity.SubTitle = self.basicGridConfig[gridType].subTitle;
 		}
@@ -1186,7 +1189,7 @@
 		var id = tf.storageManager.get(self.stickyName);
 		if (!!id)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", id)).then(function(response)
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens", id)).then(function(response)
 			{
 				if (response && response.Items && response.Items.length == 1)
 				{
@@ -1267,12 +1270,13 @@
 		}
 		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
 		{
-			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType), 'detail', layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType) + "?Id=" + layoutId + "&@relationships=all");
 		}
 		else
 		{
-			requestUrl = pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(gridType), layoutId);
+			requestUrl = pathCombine(tf.api.apiPrefix(), gritf.DataTypeHelper.getEndpoint(gridType), layoutId);
 		}
+
 
 		return tf.promiseAjax.get(requestUrl).then(function(response)
 		{
@@ -2496,16 +2500,16 @@
 
 			if (totalCostData.length > 0 && self.isReadMode())
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripConfigs")).then(function(data)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "fieldTripConfigs")).then(function(data)
 				{
 					var fieldtripData = data.Items[0];
-					if (fieldtripData.FieldTripSettings.ShowTripTotalCost)
+					if (fieldtripData.ShowTripTotalCost)
 					{
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "", id)).then(function(response)
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.gridType) + "?Id=" + id + "&@relationships=FieldTripResourceGroup")).then(function(response)
 						{
 							var entityDataModel = {},
 								entity = response.Items[0];
-							entityDataModel.FieldTripResourceGroups = entity.FieldTripResourceGroup;
+							entityDataModel.FieldTripResourceGroups = entity.FieldTripResourceGroups;
 							entityDataModel.FixedCost = entity.FixedCost;
 							entityDataModel.MinimumCost = entity.MinimumCost;
 							self.totalCostContent = self.detailViewHelper.resourcesTotalComputer(entityDataModel);
@@ -2583,7 +2587,7 @@
 
 		if (dataType === "fieldtriphistory")
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", self.entitySelectId, "fieldtriphistory"));
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriphistories?fieldtripid=" + self.entitySelectId));
 		}
 		else if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
@@ -2608,7 +2612,7 @@
 		}
 		else
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", self.entitySelectId, "fieldtripresource", dataType));
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripresourcegroups?fieldtripid =" + self.entitySelectId + "&@relationships=Vehicle,Driver,Aide&@fields=VehicleName,DriverName,AideName"));
 		}
 	};
 
@@ -3189,10 +3193,13 @@
 				var item = data[$(e.target).closest("tr").index()],
 					mimeType = (item.MimeType || "").toLowerCase(),
 					databaseType = tf.storageManager.get("databaseType");
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
+				tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "DocumentFiles"),
+					{
+						paramData: { documentId: item.Id }
+					})
 					.then(function(keyApiResponse)
 					{
-						var path = pathCombine(tf.api.apiPrefix(), "document", item.Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
+						var path = pathCombine(tf.api.apiPrefix(), "DocumentFiles?hashKey=" + keyApiResponse.Items[0]);
 						if (view && viewableMimeTypes.indexOf(mimeType) > -1)
 						{
 							path += "?view=true";
@@ -3241,7 +3248,7 @@
 		var hasPermission = tf.permissions.documentRead;
 		if (self.isReadMode() && hasPermission)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", self.gridType, self.entity.Id, "documents"))
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documents? attachedToTypeID = " + 4 + " & attachedToID=" + self.entity.Id + "&@excluded=FileContent"))
 				.then(function(response)
 				{
 					var dataSource = new kendo.data.DataSource({
@@ -3255,8 +3262,8 @@
 					$.each(response.Items, function(index, item)
 					{
 						var fileData = {};
-						fileData.FileName = item.Filename;
-						fileData.Size = item.FileSizeKb;
+						fileData.FileName = item.FileName;
+						fileData.Size = item.FileSizeKB;
 						dataSource.options.data.push(fileData);
 					});
 					kendoGrid.setDataSource(dataSource);
@@ -4229,26 +4236,52 @@
 					data.Id = 0;
 					data.APIIsNew = true;
 				}
-				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
-					data: data
-				}).then(function(apiResponse)
+				if (data.APIIsNew)
 				{
-					if (apiResponse && apiResponse.Items && apiResponse.Items[0])
+					tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
+						data: [data]
+					}).then(function(apiResponse)
 					{
-						var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
-						dataItem.APIIsNew = false;
-						self.dataPointPanel.closeClick();
-						self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
+						if (apiResponse && apiResponse.Items && apiResponse.Items[0])
 						{
-							self.showDetailViewById(self.entitySelectId);
-							tf.storageManager.save(self.stickyName, dataItem.Id);
-							tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
-						});
-					}
-				}).catch(function(error)
+							var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
+							dataItem.APIIsNew = false;
+							self.dataPointPanel.closeClick();
+							self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
+							{
+								self.showDetailViewById(self.entitySelectId);
+								tf.storageManager.save(self.stickyName, dataItem.Id);
+								tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
+							});
+						}
+					}).catch(function(error)
+					{
+						throw new Error('error occurred.');
+					});
+				} else
 				{
-					throw new Error('error occurred.');
-				});
+					tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens", data.Id), {
+						data: data
+					}).then(function(apiResponse)
+					{
+						if (apiResponse && apiResponse.Items && apiResponse.Items[0])
+						{
+							var dataItem = apiResponse.Items[0], layout = JSON.parse(dataItem.Layout);
+							dataItem.APIIsNew = false;
+							self.dataPointPanel.closeClick();
+							self.applyLayoutTemplate(true, dataItem.Id, null, dataItem).then(function()
+							{
+								self.showDetailViewById(self.entitySelectId);
+								tf.storageManager.save(self.stickyName, dataItem.Id);
+								tf.storageManager.save(self.stickyLayoutName, dataItem.Name);
+							});
+						}
+					}).catch(function(error)
+					{
+						throw new Error('error occurred.');
+					});
+				}
+
 			};
 
 		if (menu)
@@ -4336,7 +4369,7 @@
 		self.entityDataModel.name(self.obName());
 		self.entityDataModel.subTitle(self.obSubTitle());
 		self.entityDataModel.layout(layout ? layout : self.serializeLayout());
-		self.entityDataModel.table(self.gridType);
+		self.entityDataModel.dataTypeId(tf.DataTypeHelper.getId(self.gridType));
 	};
 
 	DetailViewViewModel.prototype.mergeHiddenBlockLayoutInfo = function(sectionHeaderInfo, layoutObj, isToggleSectionHeader)

@@ -313,24 +313,15 @@
 				view.currentGroup(null);
 				if (ans && view && view.currentGroupId >= 0)
 				{
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroup", view.currentGroupId)).then(function(response)
+					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups", view.currentGroupId)).then(function(response)
 					{
 						if (response.Items && response.Items.length && response.Items.length > 0)
 						{
 							var group = response.Items[0], items = JSON.parse(group.DataPoints), images = [];
 							images = $.grep(items, function(item) { return item.type === "image" });
 						}
-						if (images.length > 0)
-						{
-							tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "image", "delete", self.gridType),
-								{
-									data: $.map(images, function(image)
-									{
-										return image.imageId;
-									})
-								});
-						}
-						return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroup"),
+
+						return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"),
 							{
 								data: [view.currentGroupId]
 							})
@@ -427,13 +418,13 @@
 			paramData: { table: self.gridType }
 		}).then(function(response)
 		{
-			result = response.Items[0];
+			result = response.Items;
 			if (result && result.length > 0)
 			{
 				$.each(result, function(index, group)
 				{
 					dataPointGroup = {};
-					dataPointGroup.id = group.Id;
+					dataPointGroup.id = group.ID;
 					dataPointGroup.title = group.Name;
 					dataPointGroup.type = "group";
 					dataPointGroup.items = JSON.parse(group.DataPoints);

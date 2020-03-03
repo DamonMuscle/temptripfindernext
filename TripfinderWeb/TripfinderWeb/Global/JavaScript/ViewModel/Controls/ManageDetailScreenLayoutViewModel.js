@@ -94,7 +94,7 @@
 				width: "160px",
 				template: function(dataItem)
 				{
-					return tf.pageManager.getPageTitleByPageName(dataItem.Table);
+					return tf.pageManager.getPageTitleByPageName(dataItem.DataType);
 				}
 			},
 			{
@@ -133,16 +133,17 @@
 		var self = this, paramData = {};
 		if (gridType && gridType !== "all")
 		{
-			paramData.table = gridType;
+			paramData.DataTypeId = tf.DataTypeHelper.getId(gridType);
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			paramData: paramData
 		}).then(function(response)
 		{
-			if (response && response.Items && response.Items[0])
+			if (response && response.Items)
 			{
-				var entityList = response.Items[0].map(function(item)
+				var entityList = response.Items.map(function(item)
 				{
+					item.DataType = 'fieldtrip';
 					return new TF.DataModel.DetailScreenLayoutDataModel(item);
 				});
 				self.layoutEntities = entityList;
@@ -197,7 +198,7 @@
 			self.$footer.find(".btn.positive").prop("disabled", false);
 			self.selectedRowId = dataRow.Id;
 			self.selectedRowName = dataRow.Name;
-			self.selectedRowType = dataRow.Table;
+			self.selectedRowType = dataRow.DataType;
 		}
 		else
 		{
@@ -226,7 +227,7 @@
 			$row.dblclick(function()
 			{
 				self.pageLevelViewModel.clearError();
-				if (self.gridType !== item.Table)
+				if (self.gridType !== item.DataType)
 				{
 					self.pageLevelViewModel.popupErrorMessage(self.userMessages["WRONG_LAYOUT_TYPE"]);
 				}
@@ -288,7 +289,7 @@
 		var self = this, entity = self.getEntityDataModelForEvent(e),
 			id = entity.id();
 
-		window.location = pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "download", id);
+		window.location = pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreenfiles", id);
 	};
 
 	/**
@@ -303,7 +304,7 @@
 		var self = this,
 			entity = self.getEntityDataModelForEvent(e);
 
-		if (self.gridType === entity.table())
+		if (self.gridType === entity.dataType())
 		{
 			self.onEditToPanel.notify({
 				id: entity.id()
@@ -364,11 +365,11 @@
 	ManageDetailScreenLayoutViewModel.prototype.deleteLayoutById = function(entityId, layout)
 	{
 		var self = this;
-		tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
+		tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			data: [entityId]
 		}).then(function(apiResponse)
 		{
-			if (apiResponse.Items[0])
+			if (apiResponse)
 			{
 				if (self.selectedIdOnPanel === entityId)
 				{
@@ -450,7 +451,7 @@
 				// Check if json string is valid json.
 				entity = JSON.parse(jsonStr);
 				entity.Layout = JSON.parse(entity.Layout);
-				layoutType = entity.Table;
+				layoutType = entity.Table || entity.DataType;
 
 				// Check if the grid type is valid.
 				if (!tf.pageManager.getPageTitleByPageName(layoutType))
@@ -528,13 +529,13 @@
 		var data = saveCopy.toData();
 		data.Name = entity.Name;
 		data.SubTitle = entity.SubTitle;
-		data.Table = entity.Table;
 		data.Layout = JSON.stringify(entity.Layout);
 		data.Id = 0;
 		data.APIIsNew = true;
+		data.DataTypeId = tf.DataTypeHelper.getId(entity.Table || entity.DataType);
 
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen"), {
-			data: data
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
+			data: [data]
 		}).then(function(response)
 		{
 			self.refreshGrid();

@@ -35,9 +35,10 @@
 				entity.Id = 0;
 				entity.APIIsNew = true;
 				entity.Name = name;
+				entity.DataTypeId = tf.DataTypeHelper.getId("fieldtrip")
 
-				tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroup"), {
-					data: entity
+				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
+					data: [entity]
 				}).then(function(result)
 				{
 					self.detailView.dataPointPanel.stopGroup();

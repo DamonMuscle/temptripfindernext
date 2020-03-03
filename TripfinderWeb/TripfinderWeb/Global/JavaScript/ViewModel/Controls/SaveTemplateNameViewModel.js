@@ -55,15 +55,14 @@
 						$field.css("border-color", borderColor);
 						$callbackElement.addClass(className);
 
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreen", "unique"), {
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 							paramData: {
-								id: self.entity.id() || 0,
 								name: value,
-								dataType: self.entity.table()
+								dataTypeId: tf.DataTypeHelper.getId("fieldtrip")
 							}
 						}, { overlay: false }).then(function(response)
 						{
-							var isDuplicated = response.Items[0];
+							var isDuplicated = response.Items;
 							$field.css("border-color", "");
 							$callbackElement.removeClass(className);
 							validatorPersistence.name = !isDuplicated;
