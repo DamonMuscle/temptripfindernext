@@ -100,7 +100,7 @@
 		{
 			var resetPasswordData = {
 				paramData: { signature: this.signature },
-				data: passwordRP
+				data: '"' + passwordRP + '"'
 			};
 			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), resetPasswordData)
 				.then(function(apiResponse)
