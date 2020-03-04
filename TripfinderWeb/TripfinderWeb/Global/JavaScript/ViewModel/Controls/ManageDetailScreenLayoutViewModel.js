@@ -451,7 +451,8 @@
 				// Check if json string is valid json.
 				entity = JSON.parse(jsonStr);
 				entity.Layout = JSON.parse(entity.Layout);
-				layoutType = entity.Table || entity.DataType;
+				layoutType = (entity.Table || entity.DataType).split(' ').join('').toLowerCase();
+				entity.Table = layoutType;
 
 				// Check if the grid type is valid.
 				if (!tf.pageManager.getPageTitleByPageName(layoutType))
@@ -532,7 +533,7 @@
 		data.Layout = JSON.stringify(entity.Layout);
 		data.Id = 0;
 		data.APIIsNew = true;
-		data.DataTypeId = tf.DataTypeHelper.getId(entity.Table || entity.DataType);
+		data.DataTypeId = tf.DataTypeHelper.getId(entity.Table);
 
 		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			data: [data]
