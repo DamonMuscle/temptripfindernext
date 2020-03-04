@@ -2,9 +2,10 @@
 {
 	createNamespace("TF").UserPreferenceManager = UserPreferenceManager;
 
-	function UserPreferenceManager()
+	function UserPreferenceManager ()
 	{
 		this.UserPreferenceDataList = [];
+		this.userPreferenceSavingKey = {};
 	}
 
 	UserPreferenceManager.prototype.getAllKey = function()
@@ -13,7 +14,22 @@
 			.then(function(apiResponse)
 			{
 				this.UserPreferenceDataList = apiResponse.Items;
+				this.updateLocalStorage();
 			}.bind(this));
+	};
+
+	UserPreferenceManager.prototype.updateLocalStorage = function()
+	{
+		if (this.UserPreferenceDataList)
+		{
+			this.UserPreferenceDataList.forEach(function(item)
+			{
+				if (store.get(item.Key))
+				{
+					store.set(item.Key, item.Value);
+				}
+			});
+		}
 	};
 
 	UserPreferenceManager.prototype.getUserPreferenceValue = function(key, defaultValue)
@@ -105,17 +121,26 @@
 			async = true;
 		}
 
-		var apiPrefix = tf.api.apiPrefixWithoutDatabase();
+		var self = this, apiPrefix = tf.api.apiPrefixWithoutDatabase();
 		if (typeof data == 'object' && data != null)
 		{
 			data = JSON.stringify(data);
 		}
 		this.setUserPreferenceValue(key, data);
+		if (this.userPreferenceSavingKey[key])
+		{
+			return Promise.resolve();
+		}
+		this.userPreferenceSavingKey[key] = true;
 		return tf.promiseAjax.post(pathCombine(apiPrefix, "userpreferences"),
 			{
 				data: [new TF.DataModel.UserPreferenceDataModel({ Key: key, Value: data }).toData()],
 				async: async
-			}, { overlay: false });
+			}, { overlay: false }).then(function(response)
+			{
+				self.userPreferenceSavingKey[key] = false;
+				return response;
+			});
 	};
 
 	UserPreferenceManager.prototype.get = function(key, defaultValue)

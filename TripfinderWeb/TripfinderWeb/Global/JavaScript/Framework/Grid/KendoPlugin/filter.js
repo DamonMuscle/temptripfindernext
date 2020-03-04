@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Grid").FilterHelper = FilterHelper;
 
-	function FilterHelper()
+	function FilterHelper ()
 	{ }
 
 	FilterHelper.isFilterMenuOpen = function($element)
@@ -17,12 +17,14 @@
 			return Promise.resolve(
 				{});
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'gridFilter/id', filterId))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), 'gridfilters'),
+			{
+				paramData: { id: filterId }
+			})
 			.then(function(apiResponse)
 			{
-				var selectedFilterEntity = apiResponse;
-				if (selectedFilterEntity)
-					return Promise.resolve(selectedFilterEntity);
+				if (apiResponse && apiResponse.Items && apiResponse.Items.length === 1)
+					return Promise.resolve(apiResponse.Items[0]);
 				else
 					return Promise.resolve(null);
 			});
@@ -62,7 +64,7 @@
 		return leftFilterWhereClause === rightFilterWhereClause;
 	};
 
-	FilterHelper.getGridDefinitionByType = function functionName(gridType)
+	FilterHelper.getGridDefinitionByType = function functionName (gridType)
 	{
 		var result = null;
 		switch (gridType)

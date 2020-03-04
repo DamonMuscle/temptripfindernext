@@ -4,7 +4,7 @@
 
 	ManageFilterViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ManageFilterViewModel.prototype.constructor = ManageFilterViewModel;
-	function ManageFilterViewModel(obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, positiveClose, reminderHide)
+	function ManageFilterViewModel (obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, positiveClose, reminderHide)
 	{
 		this.fnSaveAndEditGridFilter = fnSaveAndEditGridFilter;
 		this.fnApplyGridFilter = fnApplyGridFilter;
@@ -186,7 +186,7 @@
 
 	ManageFilterViewModel.prototype._dbConfirmDeleteAction = function(gridFilterDataModel)
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout/filter", gridFilterDataModel.id()))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?filterId=" + gridFilterDataModel.id()))
 			.then(function(apiResponse)
 			{
 				var displayMessage = '';
@@ -208,7 +208,7 @@
 		if (result)
 		{
 			var filterId = gridFilterDataModel.id();
-			tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "gridfilter", filterId))
+			tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId))
 				.then(function(apiResponse)
 				{
 					var _storageFilterDataKey = "grid.currentfilter." + gridFilterDataModel.gridType() + ".id";
@@ -216,7 +216,7 @@
 					if (currentStickFilterId === filterId)
 						tf.storageManager.save(_storageFilterDataKey, '');
 
-					if (apiResponse.Items[0])
+					if (apiResponse > 0)
 					{
 						self.obGridFilterDataModels.remove(gridFilterDataModel);
 					}

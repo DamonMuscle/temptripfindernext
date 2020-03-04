@@ -53,9 +53,9 @@
 	BootstrapValidator.prototype = {
 		constructor: BootstrapValidator,
 
-        /**
-         * Init form
-         */
+    /**
+     * Init form
+     */
 		_init: function()
 		{
 			var that = this,
@@ -171,12 +171,12 @@
 			}
 		},
 
-        /**
-         * Parse the validator options from HTML attributes
-         *
-         * @param {jQuery} $field The field element
-         * @returns {Object}
-         */
+    /**
+     * Parse the validator options from HTML attributes
+     *
+     * @param {jQuery} $field The field element
+     * @returns {Object}
+     */
 		_parseOptions: function($field)
 		{
 			var field = $field.attr('name') || $field.attr('data-bv-field'),
@@ -248,11 +248,11 @@
 			}
 		},
 
-        /**
-         * Init field
-         *
-         * @param {String|jQuery} field The field name or field element
-         */
+    /**
+     * Init field
+     *
+     * @param {String|jQuery} field The field name or field element
+     */
 		_initField: function(field)
 		{
 			var fields = $([]);
@@ -465,13 +465,13 @@
 			});
 		},
 
-        /**
-         * Get the error message for given field and validator
-         *
-         * @param {String} field The field name
-         * @param {String} validatorName The validator name
-         * @returns {String}
-         */
+    /**
+     * Get the error message for given field and validator
+     *
+     * @param {String} field The field name
+     * @param {String} validatorName The validator name
+     * @returns {String}
+     */
 		_getMessage: function(field, validatorName)
 		{
 			if (!this.options.fields[field] || !$.fn.bootstrapValidator.validators[validatorName]
@@ -494,13 +494,13 @@
 			}
 		},
 
-        /**
-         * Get the element to place the error messages
-         *
-         * @param {jQuery} $field The field element
-         * @param {String} group
-         * @returns {jQuery}
-         */
+    /**
+     * Get the element to place the error messages
+     *
+     * @param {jQuery} $field The field element
+     * @param {String} group
+     * @returns {jQuery}
+     */
 		_getMessageContainer: function($field, group)
 		{
 			var $parent = $field.parent();
@@ -528,9 +528,9 @@
 			return this._getMessageContainer($parent, group);
 		},
 
-        /**
-         * Called when all validations are completed
-         */
+    /**
+     * Called when all validations are completed
+     */
 		_triggerFormSuccessEvent: function()
 		{
 			var notFinished = false;
@@ -581,13 +581,13 @@
 			// }
 		},
 
-        /**
-         * Check if the field is excluded.
-         * Returning true means that the field will not be validated
-         *
-         * @param {jQuery} $field The field element
-         * @returns {Boolean}
-         */
+    /**
+     * Check if the field is excluded.
+     * Returning true means that the field will not be validated
+     *
+     * @param {jQuery} $field The field element
+     * @returns {Boolean}
+     */
 		_isExcluded: function($field)
 		{
 			var excludedAttr = $field.attr('data-bv-excluded'),
@@ -632,12 +632,12 @@
 			}
 		},
 
-        /**
-         * Check if the number of characters of field value exceed the threshold or not
-         *
-         * @param {jQuery} $field The field element
-         * @returns {Boolean}
-         */
+    /**
+     * Check if the number of characters of field value exceed the threshold or not
+     *
+     * @param {jQuery} $field The field element
+     * @returns {Boolean}
+     */
 		_exceedThreshold: function($field)
 		{
 			var field = $field.attr('data-bv-field'),
@@ -654,12 +654,12 @@
 		// Events
 		// ---
 
-        /**
-         * The default handler of error.form.bv event.
-         * It will be called when there is a invalid field
-         *
-         * @param {jQuery.Event} e The jQuery event object
-         */
+    /**
+     * The default handler of error.form.bv event.
+     * It will be called when there is a invalid field
+     *
+     * @param {jQuery.Event} e The jQuery event object
+     */
 		_onError: function(e)
 		{
 			if (e.isDefaultPrevented())
@@ -714,12 +714,12 @@
 			}
 		},
 
-        /**
-         * The default handler of success.form.bv event.
-         * It will be called when all the fields are valid
-         *
-         * @param {jQuery.Event} e The jQuery event object
-         */
+    /**
+     * The default handler of success.form.bv event.
+     * It will be called when all the fields are valid
+     *
+     * @param {jQuery.Event} e The jQuery event object
+     */
 		_onSuccess: function(e)
 		{
 			if (e.isDefaultPrevented())
@@ -731,12 +731,12 @@
 			this.disableSubmitButtons(true).defaultSubmit();
 		},
 
-        /**
-         * Called after validating a field element
-         *
-         * @param {jQuery} $field The field element
-         * @param {String} [validatorName] The validator name
-         */
+    /**
+     * Called after validating a field element
+     *
+     * @param {jQuery} $field The field element
+     * @param {String} [validatorName] The validator name
+     */
 		_onFieldValidated: function($field, validatorName)
 		{
 			var field = $field.attr('data-bv-field'),
@@ -807,12 +807,12 @@
 		// Public methods
 		// ---
 
-        /**
-         * Retrieve the field elements by given name
-         *
-         * @param {String} field The field name
-         * @returns {null|jQuery[]}
-         */
+    /**
+     * Retrieve the field elements by given name
+     *
+     * @param {String} field The field name
+     * @returns {null|jQuery[]}
+     */
 		getFieldElements: function(field)
 		{
 			if (!this._cacheFields[field])
@@ -825,12 +825,12 @@
 			return this._cacheFields[field];
 		},
 
-        /**
-         * Disable/enable submit buttons
-         *
-         * @param {Boolean} disabled Can be true or false
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Disable/enable submit buttons
+     *
+     * @param {Boolean} disabled Can be true or false
+     * @returns {BootstrapValidator}
+     */
 		disableSubmitButtons: function(disabled)
 		{
 			if (!disabled)
@@ -845,11 +845,11 @@
 			return this;
 		},
 
-        /**
-         * Validate the form
-         *
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Validate the form
+     *
+     * @returns {BootstrapValidator}
+     */
 		validate: function()
 		{
 			if (!this.options.fields)
@@ -882,12 +882,12 @@
 			return p;
 		},
 
-        /**
-         * Validate given field
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Validate given field
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @returns {BootstrapValidator}
+     */
 		validateField: function(field)
 		{
 			var fields = $([]);
@@ -985,7 +985,15 @@
 								var validField = updateAll ? field : $field;
 								if (validField && validField.attr('data-bv-field'))
 								{
-									this.updateStatus(validField, result ? this.STATUS_VALID : this.STATUS_INVALID, validatorName);
+									if ('object' === typeof result && result.valid !== undefined && result.message !== undefined)
+									{
+										this.updateMessage(updateAll ? field : $field, validatorName, result.message);
+										this.updateStatus(updateAll ? field : $field, result.valid ? this.STATUS_VALID : this.STATUS_INVALID, validatorName);
+									}
+									else
+									{
+										this.updateStatus(validField, result ? this.STATUS_VALID : this.STATUS_INVALID, validatorName);
+									}
 									that._triggerFormSuccessEvent();
 									if (that._submitIfValid === true)
 									{
@@ -1013,14 +1021,14 @@
 			return this;
 		},
 
-        /**
-         * Update the error message
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @param {String} validator The validator name
-         * @param {String} message The message
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Update the error message
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @param {String} validator The validator name
+     * @param {String} message The message
+     * @returns {BootstrapValidator}
+     */
 		updateMessage: function(field, validator, message)
 		{
 			var $fields = $([]);
@@ -1044,14 +1052,14 @@
 			});
 		},
 
-        /**
-         * Update all validating results of field
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @param {String} status The status. Can be 'NOT_VALIDATED', 'VALIDATING', 'INVALID' or 'VALID'
-         * @param {String} [validatorName] The validator name. If null, the method updates validity result for all validators
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Update all validating results of field
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @param {String} status The status. Can be 'NOT_VALIDATED', 'VALIDATING', 'INVALID' or 'VALID'
+     * @param {String} [validatorName] The validator name. If null, the method updates validity result for all validators
+     * @returns {BootstrapValidator}
+     */
 		updateStatus: function(field, status, validatorName)
 		{
 			var fields = $([]);
@@ -1230,11 +1238,11 @@
 			return this;
 		},
 
-        /**
-         * Check the form validity
-         *
-         * @returns {Boolean}
-         */
+    /**
+     * Check the form validity
+     *
+     * @returns {Boolean}
+     */
 		isValid: function()
 		{
 			for (var field in this.options.fields)
@@ -1248,12 +1256,12 @@
 			return true;
 		},
 
-        /**
-         * Check if the field is valid or not
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @returns {Boolean}
-         */
+    /**
+     * Check if the field is valid or not
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @returns {Boolean}
+     */
 		isValidField: function(field)
 		{
 			var fields = $([]);
@@ -1303,13 +1311,13 @@
 			return true;
 		},
 
-        /**
-         * Check if all fields inside a given container are valid.
-         * It's useful when working with a wizard-like such as tab, collapse
-         *
-         * @param {String|jQuery} container The container selector or element
-         * @returns {Boolean}
-         */
+    /**
+     * Check if all fields inside a given container are valid.
+     * It's useful when working with a wizard-like such as tab, collapse
+     *
+     * @param {String|jQuery} container The container selector or element
+     * @returns {Boolean}
+     */
 		isValidContainer: function(container)
 		{
 			var that = this,
@@ -1352,10 +1360,10 @@
 			return true;
 		},
 
-        /**
-         * Submit the form using default submission.
-         * It also does not perform any validations when submitting the form
-         */
+    /**
+     * Submit the form using default submission.
+     * It also does not perform any validations when submitting the form
+     */
 		defaultSubmit: function()
 		{
 			if (this.$submitButton)
@@ -1377,35 +1385,35 @@
 		// Useful APIs which aren't used internally
 		// ---
 
-        /**
-         * Get the list of invalid fields
-         *
-         * @returns {jQuery[]}
-         */
+    /**
+     * Get the list of invalid fields
+     *
+     * @returns {jQuery[]}
+     */
 		getInvalidFields: function()
 		{
 			return this.$invalidFields;
 		},
 
-        /**
-         * Returns the clicked submit button
-         *
-         * @returns {jQuery}
-         */
+    /**
+     * Returns the clicked submit button
+     *
+     * @returns {jQuery}
+     */
 		getSubmitButton: function()
 		{
 			return this.$submitButton;
 		},
 
-        /**
-         * Get the error messages
-         *
-         * @param {String|jQuery} [field] The field name or field element
-         * If the field is not defined, the method returns all error messages of all fields
-         * @param {String} [validator] The name of validator
-         * If the validator is not defined, the method returns error messages of all validators
-         * @returns {String[]}
-         */
+    /**
+     * Get the error messages
+     *
+     * @param {String|jQuery} [field] The field name or field element
+     * If the field is not defined, the method returns all error messages of all fields
+     * @param {String} [validator] The name of validator
+     * If the validator is not defined, the method returns error messages of all validators
+     * @returns {String[]}
+     */
 		getMessages: function(field, validator)
 		{
 			var that = this,
@@ -1450,14 +1458,14 @@
 			return messages;
 		},
 
-        /**
-         * Get the field options
-         *
-         * @param {String|jQuery} [field] The field name or field element. If it is not set, the method returns the form options
-         * @param {String} [validator] The name of validator. It null, the method returns form options
-         * @param {String} [option] The option name
-         * @return {String|Object}
-         */
+    /**
+     * Get the field options
+     *
+     * @param {String|jQuery} [field] The field name or field element. If it is not set, the method returns the form options
+     * @param {String} [validator] The name of validator. It null, the method returns form options
+     * @param {String} [option] The option name
+     * @return {String|Object}
+     */
 		getOptions: function(field, validator, option)
 		{
 			if (!field)
@@ -1486,15 +1494,15 @@
 			return option ? options.validators[validator][option] : options.validators[validator];
 		},
 
-        /**
-         * Update the option of a specific validator
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @param {String} validator The validator name
-         * @param {String} option The option name
-         * @param {String} value The value to set
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Update the option of a specific validator
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @param {String} validator The validator name
+     * @param {String} option The option name
+     * @param {String} value The value to set
+     * @returns {BootstrapValidator}
+     */
 		updateOption: function(field, validator, option, value)
 		{
 			if ('object' === typeof field)
@@ -1510,13 +1518,13 @@
 			return this;
 		},
 
-        /**
-         * Add a new field
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @param {Object} [options] The validator rules
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Add a new field
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @param {Object} [options] The validator rules
+     * @returns {BootstrapValidator}
+     */
 		addField: function(field, options)
 		{
 			var fields = $([]);
@@ -1567,12 +1575,12 @@
 			return this;
 		},
 
-        /**
-         * Remove a given field
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Remove a given field
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @returns {BootstrapValidator}
+     */
 		removeField: function(field)
 		{
 			var fields = $([]);
@@ -1628,13 +1636,13 @@
 			return this;
 		},
 
-        /**
-         * Reset given field
-         *
-         * @param {String|jQuery} field The field name or field element
-         * @param {Boolean} [resetValue] If true, the method resets field value to empty or remove checked/selected attribute (for radio/checkbox)
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Reset given field
+     *
+     * @param {String|jQuery} field The field name or field element
+     * @param {Boolean} [resetValue] If true, the method resets field value to empty or remove checked/selected attribute (for radio/checkbox)
+     * @returns {BootstrapValidator}
+     */
 		resetField: function(field, resetValue)
 		{
 			var $fields = $([]);
@@ -1675,12 +1683,12 @@
 			return this;
 		},
 
-        /**
-         * Reset the form
-         *
-         * @param {Boolean} [resetValue] If true, the method resets field value to empty or remove checked/selected attribute (for radio/checkbox)
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Reset the form
+     *
+     * @param {Boolean} [resetValue] If true, the method resets field value to empty or remove checked/selected attribute (for radio/checkbox)
+     * @returns {BootstrapValidator}
+     */
 		resetForm: function(resetValue)
 		{
 			for (var field in this.options.fields)
@@ -1697,13 +1705,13 @@
 			return this;
 		},
 
-        /**
-         * Revalidate given field
-         * It's used when you need to revalidate the field which its value is updated by other plugin
-         *
-         * @param {String|jQuery} field The field name of field element
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Revalidate given field
+     * It's used when you need to revalidate the field which its value is updated by other plugin
+     *
+     * @param {String|jQuery} field The field name of field element
+     * @returns {BootstrapValidator}
+     */
 		revalidateField: function(field)
 		{
 			this.updateStatus(field, this.STATUS_NOT_VALIDATED)
@@ -1712,14 +1720,14 @@
 			return this;
 		},
 
-        /**
-         * Enable/Disable all validators to given field
-         *
-         * @param {String} field The field name
-         * @param {Boolean} enabled Enable/Disable field validators
-         * @param {String} [validatorName] The validator name. If null, all validators will be enabled/disabled
-         * @returns {BootstrapValidator}
-         */
+    /**
+     * Enable/Disable all validators to given field
+     *
+     * @param {String} field The field name
+     * @param {Boolean} enabled Enable/Disable field validators
+     * @param {String} [validatorName] The validator name. If null, all validators will be enabled/disabled
+     * @returns {BootstrapValidator}
+     */
 		enableFieldValidators: function(field, enabled, validatorName)
 		{
 			var validators = this.options.fields[field].validators;
@@ -1745,26 +1753,26 @@
 			return this;
 		},
 
-        /**
-         * Some validators have option which its value is dynamic.
-         * For example, the zipCode validator has the country option which might be changed dynamically by a select element.
-         *
-         * @param {jQuery|String} field The field name or element
-         * @param {String|Function} option The option which can be determined by:
-         * - a string
-         * - name of field which defines the value
-         * - name of function which returns the value
-         * - a function returns the value
-         *
-         * The callback function has the format of
-         *      callback: function(value, validator, $field) {
-         *          // value is the value of field
-         *          // validator is the BootstrapValidator instance
-         *          // $field is the field element
-         *      }
-         *
-         * @returns {String}
-         */
+    /**
+     * Some validators have option which its value is dynamic.
+     * For example, the zipCode validator has the country option which might be changed dynamically by a select element.
+     *
+     * @param {jQuery|String} field The field name or element
+     * @param {String|Function} option The option which can be determined by:
+     * - a string
+     * - name of field which defines the value
+     * - name of function which returns the value
+     * - a function returns the value
+     *
+     * The callback function has the format of
+     *      callback: function(value, validator, $field) {
+     *          // value is the value of field
+     *          // validator is the BootstrapValidator instance
+     *          // $field is the field element
+     *      }
+     *
+     * @returns {String}
+     */
 		getDynamicOption: function(field, option)
 		{
 			var $field = ('string' === typeof field) ? this.getFieldElements(field) : field,
@@ -1794,10 +1802,10 @@
 			return null;
 		},
 
-        /**
-         * Destroy the plugin
-         * It will remove all error messages, feedback icons and turn off the events
-         */
+    /**
+     * Destroy the plugin
+     * It will remove all error messages, feedback icons and turn off the events
+     */
 		destroy: function()
 		{
 			var field, fields, $field, validator, $icon, container, group;
@@ -2005,15 +2013,15 @@
 
 	// Helper methods, which can be used in validator class
 	$.fn.bootstrapValidator.helpers = {
-        /**
-         * Execute a callback function
-         *
-         * @param {String|Function} functionName Can be
-         * - name of global function
-         * - name of namespace function (such as A.B.C)
-         * - a function
-         * @param {Array} args The callback arguments
-         */
+    /**
+     * Execute a callback function
+     *
+     * @param {String|Function} functionName Can be
+     * - name of global function
+     * - name of namespace function (such as A.B.C)
+     * - a function
+     * @param {Array} args The callback arguments
+     */
 		call: function(functionName, args)
 		{
 			if ('function' === typeof functionName)
@@ -2037,15 +2045,15 @@
 			}
 		},
 
-        /**
-         * Format a string
-         * It's used to format the error message
-         * format('The field must between %s and %s', [10, 20]) = 'The field must between 10 and 20'
-         *
-         * @param {String} message
-         * @param {Array} parameters
-         * @returns {String}
-         */
+    /**
+     * Format a string
+     * It's used to format the error message
+     * format('The field must between %s and %s', [10, 20]) = 'The field must between 10 and 20'
+     *
+     * @param {String} message
+     * @param {Array} parameters
+     * @returns {String}
+     */
 		format: function(message, parameters)
 		{
 			if (!$.isArray(parameters))
@@ -2061,15 +2069,15 @@
 			return message;
 		},
 
-        /**
-         * Validate a date
-         *
-         * @param {Number} year The full year in 4 digits
-         * @param {Number} month The month number
-         * @param {Number} day The day number
-         * @param {Boolean} [notInFuture] If true, the date must not be in the future
-         * @returns {Boolean}
-         */
+    /**
+     * Validate a date
+     *
+     * @param {Number} year The full year in 4 digits
+     * @param {Number} month The month number
+     * @param {Number} day The day number
+     * @param {Boolean} [notInFuture] If true, the date must not be in the future
+     * @returns {Boolean}
+     */
 		date: function(year, month, day, notInFuture)
 		{
 			if (isNaN(year) || isNaN(month) || isNaN(day))
@@ -2116,14 +2124,14 @@
 			return true;
 		},
 
-        /**
-         * Implement Luhn validation algorithm
-         * Credit to https://gist.github.com/ShirtlessKirk/2134376
-         *
-         * @see http://en.wikipedia.org/wiki/Luhn
-         * @param {String} value
-         * @returns {Boolean}
-         */
+    /**
+     * Implement Luhn validation algorithm
+     * Credit to https://gist.github.com/ShirtlessKirk/2134376
+     *
+     * @see http://en.wikipedia.org/wiki/Luhn
+     * @param {String} value
+     * @returns {Boolean}
+     */
 		luhn: function(value)
 		{
 			var length = value.length,
@@ -2140,12 +2148,12 @@
 			return (sum % 10 === 0 && sum > 0);
 		},
 
-        /**
-         * Implement modulus 11, 10 (ISO 7064) algorithm
-         *
-         * @param {String} value
-         * @returns {Boolean}
-         */
+    /**
+     * Implement modulus 11, 10 (ISO 7064) algorithm
+     *
+     * @param {String} value
+     * @returns {Boolean}
+     */
 		mod11And10: function(value)
 		{
 			var check = 5,
@@ -2157,16 +2165,16 @@
 			return (check === 1);
 		},
 
-        /**
-         * Implements Mod 37, 36 (ISO 7064) algorithm
-         * Usages:
-         * mod37And36('A12425GABC1234002M')
-         * mod37And36('002006673085', '0123456789')
-         *
-         * @param {String} value
-         * @param {String} [alphabet]
-         * @returns {Boolean}
-         */
+    /**
+     * Implements Mod 37, 36 (ISO 7064) algorithm
+     * Usages:
+     * mod37And36('A12425GABC1234002M')
+     * mod37And36('002006673085', '0123456789')
+     *
+     * @param {String} value
+     * @param {String} [alphabet]
+     * @returns {Boolean}
+     */
 		mod37And36: function(value, alphabet)
 		{
 			alphabet = alphabet || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -2188,15 +2196,15 @@
 	});
 
 	$.fn.bootstrapValidator.validators.base64 = {
-        /**
-         * Return true if the input value is a base 64 encoded string.
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is a base 64 encoded string.
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2237,25 +2245,25 @@
 			return false;
 		},
 
-        /**
-         * Return true if the input value is between (strictly or not) two given numbers
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - min
-         * - max
-         *
-         * The min, max keys define the number which the field value compares to. min, max can be
-         *      - A number
-         *      - Name of field which its value defines the number
-         *      - Name of callback function that returns the number
-         *      - A callback function that returns the number
-         *
-         * - inclusive [optional]: Can be true or false. Default is true
-         * - message: The invalid message
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if the input value is between (strictly or not) two given numbers
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - min
+     * - max
+     *
+     * The min, max keys define the number which the field value compares to. min, max can be
+     *      - A number
+     *      - Name of field which its value defines the number
+     *      - Name of callback function that returns the number
+     *      - A callback function that returns the number
+     *
+     * - inclusive [optional]: Can be true or false. Default is true
+     * - message: The invalid message
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2295,21 +2303,21 @@
 			callback: 'callback'
 		},
 
-        /**
-         * Return result from the callback method
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - callback: The callback method that passes 2 parameters:
-         *      callback: function(fieldValue, validator, $field) {
-         *          // fieldValue is the value of field
-         *          // validator is instance of BootstrapValidator
-         *          // $field is the field element
-         *      }
-         * - message: The invalid message
-         * @returns {Boolean|Deferred}
-         */
+    /**
+     * Return result from the callback method
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - callback: The callback method that passes 2 parameters:
+     *      callback: function(fieldValue, validator, $field) {
+     *          // fieldValue is the value of field
+     *          // validator is instance of BootstrapValidator
+     *          // $field is the field element
+     *      }
+     * - message: The invalid message
+     * @returns {Boolean|Deferred}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2346,25 +2354,25 @@
 			max: 'max'
 		},
 
-        /**
-         * Check if the number of checked boxes are less or more than a given number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consists of following keys:
-         * - min
-         * - max
-         *
-         * At least one of two keys is required
-         * The min, max keys define the number which the field value compares to. min, max can be
-         *      - A number
-         *      - Name of field which its value defines the number
-         *      - Name of callback function that returns the number
-         *      - A callback function that returns the number
-         *
-         * - message: The invalid message
-         * @returns {Object}
-         */
+    /**
+     * Check if the number of checked boxes are less or more than a given number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consists of following keys:
+     * - min
+     * - max
+     *
+     * At least one of two keys is required
+     * The min, max keys define the number which the field value compares to. min, max can be
+     *      - A number
+     *      - Name of field which its value defines the number
+     *      - Name of callback function that returns the number
+     *      - A callback function that returns the number
+     *
+     * - message: The invalid message
+     * @returns {Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var numChoices = $field.is('select')
@@ -2409,16 +2417,16 @@
 	});
 
 	$.fn.bootstrapValidator.validators.creditCard = {
-        /**
-         * Return true if the input value is valid credit card number
-         * Based on https://gist.github.com/DiegoSalazar/4075533
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} [options] Can consist of the following key:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is valid credit card number
+     * Based on https://gist.github.com/DiegoSalazar/4075533
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} [options] Can consist of the following key:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2519,19 +2527,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.cusip = {
-        /**
-         * Validate a CUSIP
-         * Examples:
-         * - Valid: 037833100, 931142103, 14149YAR8, 126650BG6
-         * - Invalid: 31430F200, 022615AC2
-         *
-         * @see http://en.wikipedia.org/wiki/CUSIP
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} [options] Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate a CUSIP
+     * Examples:
+     * - Valid: 037833100, 931142103, 14149YAR8, 126650BG6
+     * - Invalid: 31430F200, 022615AC2
+     *
+     * @see http://en.wikipedia.org/wiki/CUSIP
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} [options] Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2587,16 +2595,16 @@
 			ccfield: 'creditCardField'
 		},
 
-        /**
-         * Return true if the input value is a valid CVV number.
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - creditCardField: The credit card number field. It can be null
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is a valid CVV number.
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - creditCardField: The credit card number field. It can be null
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2712,24 +2720,24 @@
 			separator: 'separator'
 		},
 
-        /**
-         * Return true if the input value is valid date
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * - separator: Use to separate the date, month, and year.
-         * By default, it is /
-         * - format: The date format. Default is MM/DD/YYYY
-         * The format can be:
-         *
-         * i) date: Consist of DD, MM, YYYY parts which are separated by the separator option
-         * ii) date and time:
-         * The time can consist of h, m, s parts which are separated by :
-         * ii) date, time and A (indicating AM or PM)
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is valid date
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * - separator: Use to separate the date, month, and year.
+     * By default, it is /
+     * - format: The date format. Default is MM/DD/YYYY
+     * The format can be:
+     *
+     * i) date: Consist of DD, MM, YYYY parts which are separated by the separator option
+     * ii) date and time:
+     * The time can consist of h, m, s parts which are separated by :
+     * ii) date, time and A (indicating AM or PM)
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2863,16 +2871,16 @@
 			field: 'field'
 		},
 
-        /**
-         * Return true if the input value is different with given field's value
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consists of the following key:
-         * - field: The name of field that will be used to compare with current one
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is different with given field's value
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consists of the following key:
+     * - field: The name of field that will be used to compare with current one
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2905,14 +2913,14 @@
 	});
 
 	$.fn.bootstrapValidator.validators.digits = {
-        /**
-         * Return true if the input value contains digits only
-         *
-         * @param {BootstrapValidator} validator Validate plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} [options]
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value contains digits only
+     *
+     * @param {BootstrapValidator} validator Validate plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} [options]
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2932,19 +2940,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.ean = {
-        /**
-         * Validate EAN (International Article Number)
-         * Examples:
-         * - Valid: 73513537, 9780471117094, 4006381333931
-         * - Invalid: 73513536
-         *
-         * @see http://en.wikipedia.org/wiki/European_Article_Number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate EAN (International Article Number)
+     * Examples:
+     * - Valid: 73513537, 9780471117094, 4006381333931
+     * - Invalid: 73513536
+     *
+     * @see http://en.wikipedia.org/wiki/European_Article_Number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -2982,14 +2990,14 @@
 			return ('email' === $field.attr('type'));
 		},
 
-        /**
-         * Return true if and only if the input value is a valid email address
-         *
-         * @param {BootstrapValidator} validator Validate plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} [options]
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if and only if the input value is a valid email address
+     *
+     * @param {BootstrapValidator} validator Validate plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} [options]
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3019,18 +3027,18 @@
 			type: 'type'
 		},
 
-        /**
-         * Validate upload file. Use HTML 5 API if the browser supports
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - extension: The allowed extensions, separated by a comma
-         * - maxSize: The maximum size in bytes
-         * - message: The invalid message
-         * - type: The allowed MIME type, separated by a comma
-         * @returns {Boolean}
-         */
+    /**
+     * Validate upload file. Use HTML 5 API if the browser supports
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - extension: The allowed extensions, separated by a comma
+     * - maxSize: The maximum size in bytes
+     * - message: The invalid message
+     * - type: The allowed MIME type, separated by a comma
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3112,22 +3120,22 @@
 			return false;
 		},
 
-        /**
-         * Return true if the input value is greater than or equals to given number
-         *
-         * @param {BootstrapValidator} validator Validate plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - value: Define the number to compare with. It can be
-         *      - A number
-         *      - Name of field which its value defines the number
-         *      - Name of callback function that returns the number
-         *      - A callback function that returns the number
-         *
-         * - inclusive [optional]: Can be true or false. Default is true
-         * - message: The invalid message
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if the input value is greater than or equals to given number
+     *
+     * @param {BootstrapValidator} validator Validate plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - value: Define the number to compare with. It can be
+     *      - A number
+     *      - Name of field which its value defines the number
+     *      - Name of callback function that returns the number
+     *      - A callback function that returns the number
+     *
+     * - inclusive [optional]: Can be true or false. Default is true
+     * - message: The invalid message
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3161,19 +3169,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.grid = {
-        /**
-         * Validate GRId (Global Release Identifier)
-         * Examples:
-         * - Valid: A12425GABC1234002M, A1-2425G-ABC1234002-M, A1 2425G ABC1234002 M, Grid:A1-2425G-ABC1234002-M
-         * - Invalid: A1-2425G-ABC1234002-Q
-         *
-         * @see http://en.wikipedia.org/wiki/Global_Release_Identifier
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate GRId (Global Release Identifier)
+     * Examples:
+     * - Valid: A12425GABC1234002M, A1-2425G-ABC1234002-M, A1 2425G ABC1234002 M, Grid:A1-2425G-ABC1234002-M
+     * - Invalid: A1-2425G-ABC1234002-Q
+     *
+     * @see http://en.wikipedia.org/wiki/Global_Release_Identifier
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3203,15 +3211,15 @@
 	});
 
 	$.fn.bootstrapValidator.validators.hex = {
-        /**
-         * Return true if and only if the input value is a valid hexadecimal number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if and only if the input value is a valid hexadecimal number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3236,15 +3244,15 @@
 			return ('color' === $field.attr('type'));
 		},
 
-        /**
-         * Return true if the input value is a valid hex color
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is a valid hex color
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3435,22 +3443,22 @@
 			VG: 'VG[0-9]{2}[A-Z]{4}[0-9]{16}'                                   // Virgin Islands, British
 		},
 
-        /**
-         * Validate an International Bank Account Number (IBAN)
-         * To test it, take the sample IBAN from
-         * http://www.nordea.com/Our+services/International+products+and+services/Cash+Management/IBAN+countries/908462.html
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * - country: The ISO 3166-1 country code. It can be
-         *      - A country code
-         *      - Name of field which its value defines the country code
-         *      - Name of callback function that returns the country code
-         *      - A callback function that returns the country code
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Validate an International Bank Account Number (IBAN)
+     * To test it, take the sample IBAN from
+     * http://www.nordea.com/Our+services/International+products+and+services/Cash+Management/IBAN+countries/908462.html
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * - country: The ISO 3166-1 country code. It can be
+     *      - A country code
+     *      - Name of field which its value defines the country code
+     *      - Name of callback function that returns the country code
+     *      - A callback function that returns the country code
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3558,21 +3566,21 @@
 			'RO', 'RS', 'SE', 'SI', 'SK', 'SM', 'ZA'
 		],
 
-        /**
-         * Validate identification number in different countries
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - country: The ISO 3166-1 country code. It can be
-         *      - One of country code defined in COUNTRY_CODES
-         *      - Name of field which its value defines the country code
-         *      - Name of callback function that returns the country code
-         *      - A callback function that returns the country code
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Validate identification number in different countries
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - country: The ISO 3166-1 country code. It can be
+     *      - One of country code defined in COUNTRY_CODES
+     *      - Name of field which its value defines the country code
+     *      - Name of callback function that returns the country code
+     *      - A callback function that returns the country code
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -3605,19 +3613,19 @@
 				};
 		},
 
-        /**
-         * Validate Unique Master Citizen Number which uses in
-         * - Bosnia and Herzegovina (country code: BA)
-         * - Macedonia (MK)
-         * - Montenegro (ME)
-         * - Serbia (RS)
-         * - Slovenia (SI)
-         *
-         * @see http://en.wikipedia.org/wiki/Unique_Master_Citizen_Number
-         * @param {String} value The ID
-         * @param {String} countryCode The ISO country code, can be BA, MK, ME, RS, SI
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Unique Master Citizen Number which uses in
+     * - Bosnia and Herzegovina (country code: BA)
+     * - Macedonia (MK)
+     * - Montenegro (ME)
+     * - Serbia (RS)
+     * - Slovenia (SI)
+     *
+     * @see http://en.wikipedia.org/wiki/Unique_Master_Citizen_Number
+     * @param {String} value The ID
+     * @param {String} countryCode The ISO country code, can be BA, MK, ME, RS, SI
+     * @returns {Boolean}
+     */
 		_validateJMBG: function(value, countryCode)
 		{
 			if (!/^\d{13}$/.test(value))
@@ -3697,24 +3705,24 @@
 			return this._validateJMBG(value, 'RS');
 		},
 
-        /**
-         * Examples: 0101006500006
-         */
+    /**
+     * Examples: 0101006500006
+     */
 		_si: function(value)
 		{
 			return this._validateJMBG(value, 'SI');
 		},
 
-        /**
-         * Validate Bulgarian national identification number (EGN)
-         * Examples:
-         * - Valid: 7523169263, 8032056031, 803205 603 1, 8001010008, 7501020018, 7552010005, 7542011030
-         * - Invalid: 8019010008
-         *
-         * @see http://en.wikipedia.org/wiki/Uniform_civil_number
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Bulgarian national identification number (EGN)
+     * Examples:
+     * - Valid: 7523169263, 8032056031, 803205 603 1, 8001010008, 7501020018, 7552010005, 7542011030
+     * - Invalid: 8019010008
+     *
+     * @see http://en.wikipedia.org/wiki/Uniform_civil_number
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_bg: function(value)
 		{
 			if (!/^\d{10}$/.test(value) && !/^\d{6}\s\d{3}\s\d{1}$/.test(value))
@@ -3751,16 +3759,16 @@
 			return (sum + '' === value.substr(9, 1));
 		},
 
-        /**
-         * Validate Brazilian national identification number (CPF)
-         * Examples:
-         * - Valid: 39053344705, 390.533.447-05, 111.444.777-35
-         * - Invalid: 231.002.999-00
-         *
-         * @see http://en.wikipedia.org/wiki/Cadastro_de_Pessoas_F%C3%ADsicas
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Brazilian national identification number (CPF)
+     * Examples:
+     * - Valid: 39053344705, 390.533.447-05, 111.444.777-35
+     * - Invalid: 231.002.999-00
+     *
+     * @see http://en.wikipedia.org/wiki/Cadastro_de_Pessoas_F%C3%ADsicas
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_br: function(value)
 		{
 			if (/^1{11}|2{11}|3{11}|4{11}|5{11}|6{11}|7{11}|8{11}|9{11}|0{11}$/.test(value))
@@ -3802,16 +3810,16 @@
 			return (d2 + '' === value.charAt(10));
 		},
 
-        /**
-         * Validate Swiss Social Security Number (AHV-Nr/No AVS)
-         * Examples:
-         * - Valid: 756.1234.5678.95, 7561234567895
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number#Switzerland
-         * @see http://www.bsv.admin.ch/themen/ahv/00011/02185/index.html?lang=de
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Swiss Social Security Number (AHV-Nr/No AVS)
+     * Examples:
+     * - Valid: 756.1234.5678.95, 7561234567895
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number#Switzerland
+     * @see http://www.bsv.admin.ch/themen/ahv/00011/02185/index.html?lang=de
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_ch: function(value)
 		{
 			if (!/^756[\.]{0,1}[0-9]{4}[\.]{0,1}[0-9]{4}[\.]{0,1}[0-9]{2}$/.test(value))
@@ -3830,16 +3838,16 @@
 			return (sum + '' === value.charAt(length - 1));
 		},
 
-        /**
-         * Validate Chilean national identification number (RUN/RUT)
-         * Examples:
-         * - Valid: 76086428-5, 22060449-7, 12531909-2
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number#Chile
-         * @see https://palena.sii.cl/cvc/dte/ee_empresas_emisoras.html for samples
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Chilean national identification number (RUN/RUT)
+     * Examples:
+     * - Valid: 76086428-5, 22060449-7, 12531909-2
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number#Chile
+     * @see https://palena.sii.cl/cvc/dte/ee_empresas_emisoras.html for samples
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_cl: function(value)
 		{
 			if (!/^\d{7,8}[-]{0,1}[0-9K]$/i.test(value))
@@ -3868,15 +3876,15 @@
 			return sum + '' === value.charAt(8).toUpperCase();
 		},
 
-        /**
-         * Validate Czech national identification number (RC)
-         * Examples:
-         * - Valid: 7103192745, 991231123
-         * - Invalid: 1103492745, 590312123
-         *
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Czech national identification number (RC)
+     * Examples:
+     * - Valid: 7103192745, 991231123
+     * - Invalid: 1103492745, 590312123
+     *
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_cz: function(value)
 		{
 			if (!/^\d{9,10}$/.test(value))
@@ -3920,16 +3928,16 @@
 			return true;
 		},
 
-        /**
-         * Validate Danish Personal Identification number (CPR)
-         * Examples:
-         * - Valid: 2110625629, 211062-5629
-         * - Invalid: 511062-5629
-         *
-         * @see https://en.wikipedia.org/wiki/Personal_identification_number_(Denmark)
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Danish Personal Identification number (CPR)
+     * Examples:
+     * - Valid: 2110625629, 211062-5629
+     * - Invalid: 511062-5629
+     *
+     * @see https://en.wikipedia.org/wiki/Personal_identification_number_(Denmark)
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_dk: function(value)
 		{
 			if (!/^[0-9]{6}[-]{0,1}[0-9]{4}$/.test(value))
@@ -3958,33 +3966,33 @@
 			return $.fn.bootstrapValidator.helpers.date(year, month, day);
 		},
 
-        /**
-         * Validate Estonian Personal Identification Code (isikukood)
-         * Examples:
-         * - Valid: 37605030299
-         *
-         * @see http://et.wikipedia.org/wiki/Isikukood
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Estonian Personal Identification Code (isikukood)
+     * Examples:
+     * - Valid: 37605030299
+     *
+     * @see http://et.wikipedia.org/wiki/Isikukood
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_ee: function(value)
 		{
 			// Use the same format as Lithuanian Personal Code
 			return this._lt(value);
 		},
 
-        /**
-         * Validate Spanish personal identity code (DNI)
-         * Support i) DNI (for Spanish citizens) and ii) NIE (for foreign people)
-         *
-         * Examples:
-         * - Valid: i) 54362315K, 54362315-K; ii) X2482300W, X-2482300W, X-2482300-W
-         * - Invalid: i) 54362315Z; ii) X-2482300A
-         *
-         * @see https://en.wikipedia.org/wiki/National_identification_number#Spain
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Spanish personal identity code (DNI)
+     * Support i) DNI (for Spanish citizens) and ii) NIE (for foreign people)
+     *
+     * Examples:
+     * - Valid: i) 54362315K, 54362315-K; ii) X2482300W, X-2482300W, X-2482300-W
+     * - Invalid: i) 54362315Z; ii) X-2482300A
+     *
+     * @see https://en.wikipedia.org/wiki/National_identification_number#Spain
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_es: function(value)
 		{
 			if (!/^[0-9A-Z]{8}[-]{0,1}[0-9A-Z]$/.test(value)                    // DNI
@@ -4006,15 +4014,15 @@
 			return (check === value.substr(8, 1));
 		},
 
-        /**
-         * Validate Finnish Personal Identity Code (HETU)
-         * Examples:
-         * - Valid: 311280-888Y, 131052-308T
-         * - Invalid: 131052-308U, 310252-308Y
-         *
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Finnish Personal Identity Code (HETU)
+     * Examples:
+     * - Valid: 311280-888Y, 131052-308T
+     * - Invalid: 131052-308U, 310252-308Y
+     *
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_fi: function(value)
 		{
 			if (!/^[0-9]{6}[-+A][0-9]{3}[0-9ABCDEFHJKLMNPRSTUVWXY]$/.test(value))
@@ -4046,15 +4054,15 @@
 			return '0123456789ABCDEFHJKLMNPRSTUVWXY'.charAt(n % 31) === value.charAt(10);
 		},
 
-        /**
-         * Validate Croatian personal identification number (OIB)
-         * Examples:
-         * - Valid: 33392005961
-         * - Invalid: 33392005962
-         *
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Croatian personal identification number (OIB)
+     * Examples:
+     * - Valid: 33392005961
+     * - Invalid: 33392005962
+     *
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_hr: function(value)
 		{
 			if (!/^[0-9]{11}$/.test(value))
@@ -4064,16 +4072,16 @@
 			return $.fn.bootstrapValidator.helpers.mod11And10(value);
 		},
 
-        /**
-         * Validate Irish Personal Public Service Number (PPS)
-         * Examples:
-         * - Valid: 6433435F, 6433435FT, 6433435FW, 6433435OA, 6433435IH, 1234567TW, 1234567FA
-         * - Invalid: 6433435E, 6433435VH
-         *
-         * @see https://en.wikipedia.org/wiki/Personal_Public_Service_Number
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Irish Personal Public Service Number (PPS)
+     * Examples:
+     * - Valid: 6433435F, 6433435FT, 6433435FW, 6433435OA, 6433435IH, 1234567TW, 1234567FA
+     * - Invalid: 6433435E, 6433435VH
+     *
+     * @see https://en.wikipedia.org/wiki/Personal_Public_Service_Number
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_ie: function(value)
 		{
 			if (!/^\d{7}[A-W][AHWTX]?$/.test(value))
@@ -4109,15 +4117,15 @@
 			}
 		},
 
-        /**
-         * Validate Iceland national identification number (Kennitala)
-         * Examples:
-         * - Valid: 120174-3399, 1201743399, 0902862349
-         *
-         * @see http://en.wikipedia.org/wiki/Kennitala
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Iceland national identification number (Kennitala)
+     * Examples:
+     * - Valid: 120174-3399, 1201743399, 0902862349
+     *
+     * @see http://en.wikipedia.org/wiki/Kennitala
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_is: function(value)
 		{
 			if (!/^[0-9]{6}[-]{0,1}[0-9]{4}$/.test(value))
@@ -4146,17 +4154,17 @@
 			return (sum + '' === value.charAt(8));
 		},
 
-        /**
-         * Validate Lithuanian Personal Code (Asmens kodas)
-         * Examples:
-         * - Valid: 38703181745
-         * - Invalid: 38703181746, 78703181745, 38703421745
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number#Lithuania
-         * @see http://www.adomas.org/midi2007/pcode.html
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Lithuanian Personal Code (Asmens kodas)
+     * Examples:
+     * - Valid: 38703181745
+     * - Invalid: 38703181746, 78703181745, 38703421745
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number#Lithuania
+     * @see http://www.adomas.org/midi2007/pcode.html
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_lt: function(value)
 		{
 			if (!/^[0-9]{11}$/.test(value))
@@ -4202,16 +4210,16 @@
 			return (sum + '' === value.charAt(10));
 		},
 
-        /**
-         * Validate Latvian Personal Code (Personas kods)
-         * Examples:
-         * - Valid: 161175-19997, 16117519997
-         * - Invalid: 161375-19997
-         *
-         * @see http://laacz.lv/2006/11/25/pk-parbaudes-algoritms/
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Latvian Personal Code (Personas kods)
+     * Examples:
+     * - Valid: 161175-19997, 16117519997
+     * - Invalid: 161375-19997
+     *
+     * @see http://laacz.lv/2006/11/25/pk-parbaudes-algoritms/
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_lv: function(value)
 		{
 			if (!/^[0-9]{6}[-]{0,1}[0-9]{5}$/.test(value))
@@ -4241,16 +4249,16 @@
 			return (sum + '' === value.charAt(10));
 		},
 
-        /**
-         * Validate Dutch national identification number (BSN)
-         * Examples:
-         * - Valid: 111222333, 941331490, 9413.31.490
-         * - Invalid: 111252333
-         *
-         * @see https://nl.wikipedia.org/wiki/Burgerservicenummer
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Dutch national identification number (BSN)
+     * Examples:
+     * - Valid: 111222333, 941331490, 9413.31.490
+     * - Invalid: 111252333
+     *
+     * @see https://nl.wikipedia.org/wiki/Burgerservicenummer
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_nl: function(value)
 		{
 			while (value.length < 9)
@@ -4280,16 +4288,16 @@
 			return (sum + '' === value.charAt(length - 1));
 		},
 
-        /**
-         * Validate Romanian numerical personal code (CNP)
-         * Examples:
-         * - Valid: 1630615123457, 1800101221144
-         * - Invalid: 8800101221144, 1632215123457, 1630615123458
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number#Romania
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Romanian numerical personal code (CNP)
+     * Examples:
+     * - Valid: 1630615123457, 1800101221144
+     * - Invalid: 8800101221144, 1632215123457, 1630615123458
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number#Romania
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_ro: function(value)
 		{
 			if (!/^[0-9]{13}$/.test(value))
@@ -4344,16 +4352,16 @@
 			return (sum + '' === value.charAt(length - 1));
 		},
 
-        /**
-         * Validate Swedish personal identity number (personnummer)
-         * Examples:
-         * - Valid: 8112289874, 811228-9874, 811228+9874
-         * - Invalid: 811228-9873
-         *
-         * @see http://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Swedish personal identity number (personnummer)
+     * Examples:
+     * - Valid: 8112289874, 811228-9874, 811228+9874
+     * - Invalid: 811228-9873
+     *
+     * @see http://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_se: function(value)
 		{
 			if (!/^[0-9]{10}$/.test(value) && !/^[0-9]{6}[-|+][0-9]{4}$/.test(value))
@@ -4374,43 +4382,43 @@
 			return $.fn.bootstrapValidator.helpers.luhn(value);
 		},
 
-        /**
-         * Validate Slovak national identifier number (RC)
-         * Examples:
-         * - Valid: 7103192745, 991231123
-         * - Invalid: 7103192746, 1103492745
-         *
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Slovak national identifier number (RC)
+     * Examples:
+     * - Valid: 7103192745, 991231123
+     * - Invalid: 7103192746, 1103492745
+     *
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_sk: function(value)
 		{
 			// Slovakia uses the same format as Czech Republic
 			return this._cz(value);
 		},
 
-        /**
-         * Validate San Marino citizen number
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number#San_Marino
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate San Marino citizen number
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number#San_Marino
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_sm: function(value)
 		{
 			return /^\d{5}$/.test(value);
 		},
 
-        /**
-         * Validate South African ID
-         * Example:
-         * - Valid: 8001015009087
-         * - Invalid: 8001015009287, 8001015009086
-         *
-         * @see http://en.wikipedia.org/wiki/National_identification_number#South_Africa
-         * @param {String} value The ID
-         * @returns {Boolean}
-         */
+    /**
+     * Validate South African ID
+     * Example:
+     * - Valid: 8001015009087
+     * - Invalid: 8001015009287, 8001015009086
+     *
+     * @see http://en.wikipedia.org/wiki/National_identification_number#South_Africa
+     * @param {String} value The ID
+     * @returns {Boolean}
+     */
 		_za: function(value)
 		{
 			if (!/^[0-9]{10}[0|1][8|9][0-9]$/.test(value))
@@ -4445,15 +4453,15 @@
 			field: 'field'
 		},
 
-        /**
-         * Check if input value equals to value of particular one
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consists of the following key:
-         * - field: The name of field that will be used to compare with current one
-         * @returns {Boolean}
-         */
+    /**
+     * Check if input value equals to value of particular one
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consists of the following key:
+     * - field: The name of field that will be used to compare with current one
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4486,19 +4494,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.imei = {
-        /**
-         * Validate IMEI (International Mobile Station Equipment Identity)
-         * Examples:
-         * - Valid: 35-209900-176148-1, 35-209900-176148-23, 3568680000414120, 490154203237518
-         * - Invalid: 490154203237517
-         *
-         * @see http://en.wikipedia.org/wiki/International_Mobile_Station_Equipment_Identity
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate IMEI (International Mobile Station Equipment Identity)
+     * Examples:
+     * - Valid: 35-209900-176148-1, 35-209900-176148-23, 3568680000414120, 490154203237518
+     * - Invalid: 490154203237517
+     *
+     * @see http://en.wikipedia.org/wiki/International_Mobile_Station_Equipment_Identity
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4534,19 +4542,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.imo = {
-        /**
-         * Validate IMO (International Maritime Organization)
-         * Examples:
-         * - Valid: IMO 8814275, IMO 9176187
-         * - Invalid: IMO 8814274
-         *
-         * @see http://en.wikipedia.org/wiki/IMO_Number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate IMO (International Maritime Organization)
+     * Examples:
+     * - Valid: IMO 8814275, IMO 9176187
+     * - Invalid: IMO 8814274
+     *
+     * @see http://en.wikipedia.org/wiki/IMO_Number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4589,15 +4597,15 @@
 			return ('number' === $field.attr('type')) && ($field.attr('step') === undefined || $field.attr('step') % 1 === 0);
 		},
 
-        /**
-         * Return true if the input value is an integer
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following key:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is an integer
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following key:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			if (this.enableByHtml5($field) && $field.get(0).validity && $field.get(0).validity.badInput === true)
@@ -4629,17 +4637,17 @@
 			ipv6: 'ipv6'
 		},
 
-        /**
-         * Return true if the input value is a IP address.
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - ipv4: Enable IPv4 validator, default to true
-         * - ipv6: Enable IPv6 validator, default to true
-         * - message: The invalid message
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if the input value is a IP address.
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - ipv4: Enable IPv4 validator, default to true
+     * - ipv6: Enable IPv6 validator, default to true
+     * - message: The invalid message
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4687,23 +4695,23 @@
 	});
 
 	$.fn.bootstrapValidator.validators.isbn = {
-        /**
-         * Return true if the input value is a valid ISBN 10 or ISBN 13 number
-         * Examples:
-         * - Valid:
-         * ISBN 10: 99921-58-10-7, 9971-5-0210-0, 960-425-059-0, 80-902734-1-6, 85-359-0277-5, 1-84356-028-3, 0-684-84328-5, 0-8044-2957-X, 0-85131-041-9, 0-943396-04-2, 0-9752298-0-X
-         * ISBN 13: 978-0-306-40615-7
-         * - Invalid:
-         * ISBN 10: 99921-58-10-6
-         * ISBN 13: 978-0-306-40615-6
-         *
-         * @see http://en.wikipedia.org/wiki/International_Standard_Book_Number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} [options] Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is a valid ISBN 10 or ISBN 13 number
+     * Examples:
+     * - Valid:
+     * ISBN 10: 99921-58-10-7, 9971-5-0210-0, 960-425-059-0, 80-902734-1-6, 85-359-0277-5, 1-84356-028-3, 0-684-84328-5, 0-8044-2957-X, 0-85131-041-9, 0-943396-04-2, 0-9752298-0-X
+     * ISBN 13: 978-0-306-40615-7
+     * - Invalid:
+     * ISBN 10: 99921-58-10-6
+     * ISBN 13: 978-0-306-40615-6
+     *
+     * @see http://en.wikipedia.org/wiki/International_Standard_Book_Number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} [options] Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4787,19 +4795,19 @@
 		// See http://isin.net/country-codes/
 		COUNTRY_CODES: 'AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW',
 
-        /**
-         * Validate an ISIN (International Securities Identification Number)
-         * Examples:
-         * - Valid: US0378331005, AU0000XVGZA3, GB0002634946
-         * - Invalid: US0378331004, AA0000XVGZA3
-         *
-         * @see http://en.wikipedia.org/wiki/International_Securities_Identifying_Number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate an ISIN (International Securities Identification Number)
+     * Examples:
+     * - Valid: US0378331005, AU0000XVGZA3, GB0002634946
+     * - Invalid: US0378331004, AA0000XVGZA3
+     *
+     * @see http://en.wikipedia.org/wiki/International_Securities_Identifying_Number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4849,19 +4857,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.ismn = {
-        /**
-         * Validate ISMN (International Standard Music Number)
-         * Examples:
-         * - Valid: M230671187, 979-0-0601-1561-5, 979 0 3452 4680 5, 9790060115615
-         * - Invalid: 9790060115614
-         *
-         * @see http://en.wikipedia.org/wiki/International_Standard_Music_Number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate ISMN (International Standard Music Number)
+     * Examples:
+     * - Valid: M230671187, 979-0-0601-1561-5, 979 0 3452 4680 5, 9790060115615
+     * - Invalid: 9790060115614
+     *
+     * @see http://en.wikipedia.org/wiki/International_Standard_Music_Number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4914,19 +4922,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.issn = {
-        /**
-         * Validate ISSN (International Standard Serial Number)
-         * Examples:
-         * - Valid: 0378-5955, 0024-9319, 0032-1478
-         * - Invalid: 0032-147X
-         *
-         * @see http://en.wikipedia.org/wiki/International_Standard_Serial_Number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate ISSN (International Standard Serial Number)
+     * Examples:
+     * - Valid: 0378-5955, 0024-9319, 0032-1478
+     * - Invalid: 0032-147X
+     *
+     * @see http://en.wikipedia.org/wiki/International_Standard_Serial_Number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -4987,22 +4995,22 @@
 			return false;
 		},
 
-        /**
-         * Return true if the input value is less than or equal to given number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - value: The number used to compare to. It can be
-         *      - A number
-         *      - Name of field which its value defines the number
-         *      - Name of callback function that returns the number
-         *      - A callback function that returns the number
-         *
-         * - inclusive [optional]: Can be true or false. Default is true
-         * - message: The invalid message
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if the input value is less than or equal to given number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - value: The number used to compare to. It can be
+     *      - A number
+     *      - Name of field which its value defines the number
+     *      - Name of callback function that returns the number
+     *      - A callback function that returns the number
+     *
+     * - inclusive [optional]: Can be true or false. Default is true
+     * - message: The invalid message
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5036,15 +5044,15 @@
 	});
 
 	$.fn.bootstrapValidator.validators.mac = {
-        /**
-         * Return true if the input value is a MAC address.
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is a MAC address.
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5064,19 +5072,19 @@
 	});
 
 	$.fn.bootstrapValidator.validators.meid = {
-        /**
-         * Validate MEID (Mobile Equipment Identifier)
-         * Examples:
-         * - Valid: 293608736500703710, 29360-87365-0070-3710, AF0123450ABCDE, AF-012345-0ABCDE
-         * - Invalid: 2936087365007037101
-         *
-         * @see http://en.wikipedia.org/wiki/Mobile_equipment_identifier
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate MEID (Mobile Equipment Identifier)
+     * Examples:
+     * - Valid: 293608736500703710, 29360-87365-0070-3710, AF0123450ABCDE, AF-012345-0ABCDE
+     * - Invalid: 2936087365007037101
+     *
+     * @see http://en.wikipedia.org/wiki/Mobile_equipment_identifier
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5160,14 +5168,14 @@
 			return ('required' === required || 'true' === required);
 		},
 
-        /**
-         * Check if input value is empty or not
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options
-         * @returns {Boolean}
-         */
+    /**
+     * Check if input value is empty or not
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var type = $field.attr('type');
@@ -5200,16 +5208,16 @@
 			return ('number' === $field.attr('type')) && ($field.attr('step') !== undefined) && ($field.attr('step') % 1 !== 0);
 		},
 
-        /**
-         * Validate decimal number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - separator: The decimal separator. Can be "." (default), ","
-         * @returns {Boolean}
-         */
+    /**
+     * Validate decimal number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - separator: The decimal separator. Can be "." (default), ","
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			if (this.enableByHtml5($field) && $field.get(0).validity && $field.get(0).validity.badInput === true)
@@ -5259,22 +5267,22 @@
 		// The supported countries
 		COUNTRY_CODES: ['CN', 'BR', 'ES', 'FR', 'GB', 'MA', 'PK', 'US'],
 
-        /**
-         * Return true if the input value contains a valid phone number for the country
-         * selected in the options
-         *
-         * @param {BootstrapValidator} validator Validate plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - country: The ISO-3166 country code. It can be
-         *      - A country code
-         *      - Name of field which its value defines the country code
-         *      - Name of callback function that returns the country code
-         *      - A callback function that returns the country code
-         *
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if the input value contains a valid phone number for the country
+     * selected in the options
+     *
+     * @param {BootstrapValidator} validator Validate plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - country: The ISO-3166 country code. It can be
+     *      - A country code
+     *      - Name of field which its value defines the country code
+     *      - Name of callback function that returns the country code
+     *      - A callback function that returns the country code
+     *
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5388,15 +5396,15 @@
 			return false;
 		},
 
-        /**
-         * Check if the element value matches given regular expression
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consists of the following key:
-         * - regexp: The regular expression you need to check
-         * @returns {Boolean}
-         */
+    /**
+     * Check if the element value matches given regular expression
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consists of the following key:
+     * - regexp: The regular expression you need to check
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5424,23 +5432,23 @@
 			url: 'url'
 		},
 
-        /**
-         * Request a remote server to check the input value
-         *
-         * @param {BootstrapValidator} validator Plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - url {String|Function}
-         * - type {String} [optional] Can be GET or POST (default)
-         * - data {Object|Function} [optional]: By default, it will take the value
-         *  {
-         *      <fieldName>: <fieldValue>
-         *  }
-         * - name {String} [optional]: Override the field name for the request.
-         * - message: The invalid message
-         * - headers: Additional headers
-         * @returns {Boolean|Deferred}
-         */
+    /**
+     * Request a remote server to check the input value
+     *
+     * @param {BootstrapValidator} validator Plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - url {String|Function}
+     * - type {String} [optional] Can be GET or POST (default)
+     * - data {Object|Function} [optional]: By default, it will take the value
+     *  {
+     *      <fieldName>: <fieldValue>
+     *  }
+     * - name {String} [optional]: Override the field name for the request.
+     * - message: The invalid message
+     * - headers: Additional headers
+     * @returns {Boolean|Deferred}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5498,18 +5506,18 @@
 	});
 
 	$.fn.bootstrapValidator.validators.rtn = {
-        /**
-         * Validate a RTN (Routing transit number)
-         * Examples:
-         * - Valid: 021200025, 789456124
-         *
-         * @see http://en.wikipedia.org/wiki/Routing_transit_number
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate a RTN (Routing transit number)
+     * Examples:
+     * - Valid: 021200025, 789456124
+     *
+     * @see http://en.wikipedia.org/wiki/Routing_transit_number
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5541,18 +5549,18 @@
 	});
 
 	$.fn.bootstrapValidator.validators.sedol = {
-        /**
-         * Validate a SEDOL (Stock Exchange Daily Official List)
-         * Examples:
-         * - Valid: 0263494, B0WNLY7
-         *
-         * @see http://en.wikipedia.org/wiki/SEDOL
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate a SEDOL (Stock Exchange Daily Official List)
+     * Examples:
+     * - Valid: 0263494, B0WNLY7
+     *
+     * @see http://en.wikipedia.org/wiki/SEDOL
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5618,15 +5626,15 @@
 	});
 
 	$.fn.bootstrapValidator.validators.siret = {
-        /**
-         * Check if a string is a siret number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Check if a string is a siret number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5668,17 +5676,17 @@
 			step: 'step'
 		},
 
-        /**
-         * Return true if the input value is valid step one
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Can consist of the following keys:
-         * - baseValue: The base value
-         * - step: The step
-         * - message: The invalid message
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if the input value is valid step one
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Can consist of the following keys:
+     * - baseValue: The base value
+     * - step: The step
+     * - message: The invalid message
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5741,16 +5749,16 @@
 			'case': 'case'
 		},
 
-        /**
-         * Check if a string is a lower or upper case one
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - case: Can be 'lower' (default) or 'upper'
-         * @returns {Object}
-         */
+    /**
+     * Check if a string is a lower or upper case one
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - case: Can be 'lower' (default) or 'upper'
+     * @returns {Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5796,24 +5804,24 @@
 			return false;
 		},
 
-        /**
-         * Check if the length of element value is less or more than given number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consists of following keys:
-         * - min
-         * - max
-         * At least one of two keys is required
-         * The min, max keys define the number which the field value compares to. min, max can be
-         *      - A number
-         *      - Name of field which its value defines the number
-         *      - Name of callback function that returns the number
-         *      - A callback function that returns the number
-         *
-         * - message: The invalid message
-         * @returns {Object}
-         */
+    /**
+     * Check if the length of element value is less or more than given number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consists of following keys:
+     * - min
+     * - max
+     * At least one of two keys is required
+     * The min, max keys define the number which the field value compares to. min, max can be
+     *      - A number
+     *      - Name of field which its value defines the number
+     *      - Name of callback function that returns the number
+     *      - A callback function that returns the number
+     *
+     * - message: The invalid message
+     * @returns {Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5872,16 +5880,16 @@
 			return ('url' === $field.attr('type'));
 		},
 
-        /**
-         * Return true if the input value is a valid URL
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options
-         * - message: The error message
-         * - allowLocal: Allow the private and local network IP. Default to false
-         * @returns {Boolean}
-         */
+    /**
+     * Return true if the input value is a valid URL
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options
+     * - message: The error message
+     * - allowLocal: Allow the private and local network IP. Default to false
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -5976,17 +5984,17 @@
 			version: 'version'
 		},
 
-        /**
-         * Return true if and only if the input value is a valid UUID string
-         *
-         * @see http://en.wikipedia.org/wiki/Universally_unique_identifier
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - version: Can be 3, 4, 5, null
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if and only if the input value is a valid UUID string
+     *
+     * @see http://en.wikipedia.org/wiki/Universally_unique_identifier
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - version: Can be 3, 4, 5, null
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -6070,20 +6078,20 @@
 			'IE', 'IS', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'NO', 'PL', 'PT', 'RO', 'RU', 'RS', 'SE', 'SK', 'SI', 'ZA'
 		],
 
-        /**
-         * Validate an European VAT number
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - country: The ISO 3166-1 country code. It can be
-         *      - One of country code defined in COUNTRY_CODES
-         *      - Name of field which its value defines the country code
-         *      - Name of callback function that returns the country code
-         *      - A callback function that returns the country code
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Validate an European VAT number
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - country: The ISO 3166-1 country code. It can be
+     *      - One of country code defined in COUNTRY_CODES
+     *      - Name of field which its value defines the country code
+     *      - Name of callback function that returns the country code
+     *      - A callback function that returns the country code
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -6121,15 +6129,15 @@
 
 		// VAT validators
 
-        /**
-         * Validate Austrian VAT number
-         * Example:
-         * - Valid: ATU13585627
-         * - Invalid: ATU13585626
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Austrian VAT number
+     * Example:
+     * - Valid: ATU13585627
+     * - Invalid: ATU13585626
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_at: function(value)
 		{
 			if (!/^ATU[0-9]{8}$/.test(value))
@@ -6161,15 +6169,15 @@
 			return (sum + '' === value.substr(7, 1));
 		},
 
-        /**
-         * Validate Belgian VAT number
-         * Example:
-         * - Valid: BE0428759497
-         * - Invalid: BE431150351
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Belgian VAT number
+     * Example:
+     * - Valid: BE0428759497
+     * - Invalid: BE431150351
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_be: function(value)
 		{
 			if (!/^BE[0]{0,1}[0-9]{9}$/.test(value))
@@ -6192,18 +6200,18 @@
 			return (sum % 97 === 0);
 		},
 
-        /**
-         * Validate Bulgarian VAT number
-         * Example:
-         * - Valid: BG175074752,
-         * BG7523169263, BG8032056031,
-         * BG7542011030,
-         * BG7111042925
-         * - Invalid: BG175074753, BG7552A10004, BG7111042922
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Bulgarian VAT number
+     * Example:
+     * - Valid: BG175074752,
+     * BG7523169263, BG8032056031,
+     * BG7542011030,
+     * BG7111042925
+     * - Invalid: BG175074753, BG7552A10004, BG7111042922
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_bg: function(value)
 		{
 			if (!/^BG[0-9]{9,10}$/.test(value))
@@ -6305,12 +6313,12 @@
 			return false;
 		},
 
-        /**
-         * Validate Brazilian VAT number (CNPJ)
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Brazilian VAT number (CNPJ)
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_br: function(value)
 		{
 			if (value === '')
@@ -6371,12 +6379,12 @@
 			return (result === parseInt(digits.charAt(1), 10));
 		},
 
-        /**
-         * Validate Swiss VAT number
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Swiss VAT number
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_ch: function(value)
 		{
 			if (!/^CHE[0-9]{9}(MWST)?$/.test(value))
@@ -6405,15 +6413,15 @@
 			return (sum + '' === value.substr(8, 1));
 		},
 
-        /**
-         * Validate Cypriot VAT number
-         * Examples:
-         * - Valid: CY10259033P
-         * - Invalid: CY10259033Z
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Cypriot VAT number
+     * Examples:
+     * - Valid: CY10259033P
+     * - Invalid: CY10259033Z
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_cy: function(value)
 		{
 			if (!/^CY[0-5|9]{1}[0-9]{7}[A-Z]{1}$/.test(value))
@@ -6449,20 +6457,20 @@
 			return (sum + '' === value.substr(8, 1));
 		},
 
-        /**
-         * Validate Czech Republic VAT number
-         * Can be:
-         * i) Legal entities (8 digit numbers)
-         * ii) Individuals with a RC (the 9 or 10 digit Czech birth number)
-         * iii) Individuals without a RC (9 digit numbers beginning with 6)
-         *
-         * Examples:
-         * - Valid: i) CZ25123891; ii) CZ7103192745, CZ991231123; iii) CZ640903926
-         * - Invalid: i) CZ25123890; ii) CZ1103492745, CZ590312123
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Czech Republic VAT number
+     * Can be:
+     * i) Legal entities (8 digit numbers)
+     * ii) Individuals with a RC (the 9 or 10 digit Czech birth number)
+     * iii) Individuals without a RC (9 digit numbers beginning with 6)
+     *
+     * Examples:
+     * - Valid: i) CZ25123891; ii) CZ7103192745, CZ991231123; iii) CZ640903926
+     * - Invalid: i) CZ25123890; ii) CZ1103492745, CZ590312123
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_cz: function(value)
 		{
 			if (!/^CZ[0-9]{8,10}$/.test(value))
@@ -6560,15 +6568,15 @@
 			return false;
 		},
 
-        /**
-         * Validate German VAT number
-         * Examples:
-         * - Valid: DE136695976
-         * - Invalid: DE136695978
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate German VAT number
+     * Examples:
+     * - Valid: DE136695976
+     * - Invalid: DE136695978
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_de: function(value)
 		{
 			if (!/^DE[0-9]{9}$/.test(value))
@@ -6580,15 +6588,15 @@
 			return $.fn.bootstrapValidator.helpers.mod11And10(value);
 		},
 
-        /**
-         * Validate Danish VAT number
-         * Example:
-         * - Valid: DK13585628
-         * - Invalid: DK13585627
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Danish VAT number
+     * Example:
+     * - Valid: DK13585628
+     * - Invalid: DK13585627
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_dk: function(value)
 		{
 			if (!/^DK[0-9]{8}$/.test(value))
@@ -6607,15 +6615,15 @@
 			return (sum % 11 === 0);
 		},
 
-        /**
-         * Validate Estonian VAT number
-         * Examples:
-         * - Valid: EE100931558, EE100594102
-         * - Invalid: EE100594103
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Estonian VAT number
+     * Examples:
+     * - Valid: EE100931558, EE100594102
+     * - Invalid: EE100594103
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_ee: function(value)
 		{
 			if (!/^EE[0-9]{9}$/.test(value))
@@ -6635,20 +6643,20 @@
 			return (sum % 10 === 0);
 		},
 
-        /**
-         * Validate Spanish VAT number (NIF - Número de Identificación Fiscal)
-         * Can be:
-         * i) DNI (Documento nacional de identidad), for Spaniards
-         * ii) NIE (Número de Identificación de Extranjeros), for foreigners
-         * iii) CIF (Certificado de Identificación Fiscal), for legal entities and others
-         *
-         * Examples:
-         * - Valid: i) ES54362315K; ii) ESX2482300W, ESX5253868R; iii) ESM1234567L, ESJ99216582, ESB58378431, ESB64717838
-         * - Invalid: i) ES54362315Z; ii) ESX2482300A; iii) ESJ99216583
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Spanish VAT number (NIF - Número de Identificación Fiscal)
+     * Can be:
+     * i) DNI (Documento nacional de identidad), for Spaniards
+     * ii) NIE (Número de Identificación de Extranjeros), for foreigners
+     * iii) CIF (Certificado de Identificación Fiscal), for legal entities and others
+     *
+     * Examples:
+     * - Valid: i) ES54362315K; ii) ESX2482300W, ESX5253868R; iii) ESM1234567L, ESJ99216582, ESB58378431, ESB64717838
+     * - Invalid: i) ES54362315Z; ii) ESX2482300A; iii) ESJ99216583
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_es: function(value)
 		{
 			if (!/^ES[0-9A-Z][0-9]{7}[0-9A-Z]$/.test(value))
@@ -6716,15 +6724,15 @@
 			}
 		},
 
-        /**
-         * Validate Finnish VAT number
-         * Examples:
-         * - Valid: FI20774740
-         * - Invalid: FI20774741
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Finnish VAT number
+     * Examples:
+     * - Valid: FI20774740
+     * - Invalid: FI20774741
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_fi: function(value)
 		{
 			if (!/^FI[0-9]{8}$/.test(value))
@@ -6744,17 +6752,17 @@
 			return (sum % 11 === 0);
 		},
 
-        /**
-         * Validate French VAT number (TVA - taxe sur la valeur ajoutée)
-         * It's constructed by a SIREN number, prefixed by two characters.
-         *
-         * Examples:
-         * - Valid: FR40303265045, FR23334175221, FRK7399859412, FR4Z123456782
-         * - Invalid: FR84323140391
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate French VAT number (TVA - taxe sur la valeur ajoutée)
+     * It's constructed by a SIREN number, prefixed by two characters.
+     *
+     * Examples:
+     * - Valid: FR40303265045, FR23334175221, FRK7399859412, FR4Z123456782
+     * - Invalid: FR84323140391
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_fr: function(value)
 		{
 			if (!/^FR[0-9A-Z]{2}[0-9]{9}$/.test(value))
@@ -6790,15 +6798,15 @@
 			}
 		},
 
-        /**
-         * Validate United Kingdom VAT number
-         * Example:
-         * - Valid: GB980780684
-         * - Invalid: GB802311781
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate United Kingdom VAT number
+     * Example:
+     * - Valid: GB980780684
+     * - Invalid: GB802311781
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_gb: function(value)
 		{
 			if (!/^GB[0-9]{9}$/.test(value)             /* Standard */
@@ -6847,15 +6855,15 @@
 			return true;
 		},
 
-        /**
-         * Validate Greek VAT number
-         * Examples:
-         * - Valid: GR023456780, EL094259216
-         * - Invalid: EL123456781
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Greek VAT number
+     * Examples:
+     * - Valid: GR023456780, EL094259216
+     * - Invalid: EL123456781
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_gr: function(value)
 		{
 			if (!/^GR[0-9]{9}$/.test(value))
@@ -6892,15 +6900,15 @@
 			return this._gr(value);
 		},
 
-        /**
-         * Validate Hungarian VAT number
-         * Examples:
-         * - Valid: HU12892312
-         * - Invalid: HU12892313
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Hungarian VAT number
+     * Examples:
+     * - Valid: HU12892312
+     * - Invalid: HU12892313
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_hu: function(value)
 		{
 			if (!/^HU[0-9]{8}$/.test(value))
@@ -6920,15 +6928,15 @@
 			return (sum % 10 === 0);
 		},
 
-        /**
-         * Validate Croatian VAT number
-         * Examples:
-         * - Valid: HR33392005961
-         * - Invalid: HR33392005962
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Croatian VAT number
+     * Examples:
+     * - Valid: HR33392005961
+     * - Invalid: HR33392005962
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_hr: function(value)
 		{
 			if (!/^HR[0-9]{11}$/.test(value))
@@ -6940,15 +6948,15 @@
 			return $.fn.bootstrapValidator.helpers.mod11And10(value);
 		},
 
-        /**
-         * Validate Irish VAT number
-         * Examples:
-         * - Valid: IE6433435F, IE6433435OA, IE8D79739I
-         * - Invalid: IE8D79738J
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Irish VAT number
+     * Examples:
+     * - Valid: IE6433435F, IE6433435OA, IE8D79739I
+     * - Invalid: IE8D79738J
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_ie: function(value)
 		{
 			if (!/^IE[0-9]{1}[0-9A-Z\*\+]{1}[0-9]{5}[A-Z]{1,2}$/.test(value))
@@ -6987,33 +6995,33 @@
 			return true;
 		},
 
-        /**
-         * Validate Icelandic VAT (VSK) number
-         * Examples:
-         * - Valid: 12345, 123456
-         * - Invalid: 1234567
-         *
-         * @params {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Icelandic VAT (VSK) number
+     * Examples:
+     * - Valid: 12345, 123456
+     * - Invalid: 1234567
+     *
+     * @params {String} value VAT number
+     * @returns {Boolean}
+     */
 		_is: function(value)
 		{
 			return /^IS\d{5,6}$/.test(value);
 		},
 
-        /**
-         * Validate Italian VAT number, which consists of 11 digits.
-         * - First 7 digits are a company identifier
-         * - Next 3 are the province of residence
-         * - The last one is a check digit
-         *
-         * Examples:
-         * - Valid: IT00743110157
-         * - Invalid: IT00743110158
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Italian VAT number, which consists of 11 digits.
+     * - First 7 digits are a company identifier
+     * - Next 3 are the province of residence
+     * - The last one is a check digit
+     *
+     * Examples:
+     * - Valid: IT00743110157
+     * - Invalid: IT00743110158
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_it: function(value)
 		{
 			if (!/^IT[0-9]{11}$/.test(value))
@@ -7036,19 +7044,19 @@
 			return $.fn.bootstrapValidator.helpers.luhn(value);
 		},
 
-        /**
-         * Validate Lithuanian VAT number
-         * It can be:
-         * - 9 digits, for legal entities
-         * - 12 digits, for temporarily registered taxpayers
-         *
-         * Examples:
-         * - Valid: LT119511515, LT100001919017, LT100004801610
-         * - Invalid: LT100001919018
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Lithuanian VAT number
+     * It can be:
+     * - 9 digits, for legal entities
+     * - 12 digits, for temporarily registered taxpayers
+     *
+     * Examples:
+     * - Valid: LT119511515, LT100001919017, LT100004801610
+     * - Invalid: LT100001919018
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_lt: function(value)
 		{
 			if (!/^LT([0-9]{7}1[0-9]{1}|[0-9]{10}1[0-9]{1})$/.test(value))
@@ -7077,15 +7085,15 @@
 			return (check + '' === value.charAt(length - 1));
 		},
 
-        /**
-         * Validate Luxembourg VAT number
-         * Examples:
-         * - Valid: LU15027442
-         * - Invalid: LU15027443
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Luxembourg VAT number
+     * Examples:
+     * - Valid: LU15027442
+     * - Invalid: LU15027443
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_lu: function(value)
 		{
 			if (!/^LU[0-9]{8}$/.test(value))
@@ -7097,15 +7105,15 @@
 			return ((parseInt(value.substr(0, 6), 10) % 89) + '' === value.substr(6, 2));
 		},
 
-        /**
-         * Validate Latvian VAT number
-         * Examples:
-         * - Valid: LV40003521600, LV16117519997
-         * - Invalid: LV40003521601, LV16137519997
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Latvian VAT number
+     * Examples:
+     * - Valid: LV40003521600, LV16117519997
+     * - Invalid: LV40003521601, LV16137519997
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_lv: function(value)
 		{
 			if (!/^LV[0-9]{11}$/.test(value))
@@ -7155,15 +7163,15 @@
 			}
 		},
 
-        /**
-         * Validate Maltese VAT number
-         * Examples:
-         * - Valid: MT11679112
-         * - Invalid: MT11679113
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Maltese VAT number
+     * Examples:
+     * - Valid: MT11679112
+     * - Invalid: MT11679113
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_mt: function(value)
 		{
 			if (!/^MT[0-9]{8}$/.test(value))
@@ -7183,15 +7191,15 @@
 			return (sum % 37 === 0);
 		},
 
-        /**
-         * Validate Dutch VAT number
-         * Examples:
-         * - Valid: NL004495445B01
-         * - Invalid: NL123456789B90
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Dutch VAT number
+     * Examples:
+     * - Valid: NL004495445B01
+     * - Invalid: NL123456789B90
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_nl: function(value)
 		{
 			if (!/^NL[0-9]{9}B[0-9]{2}$/.test(value))
@@ -7214,13 +7222,13 @@
 			return (sum + '' === value.substr(8, 1));
 		},
 
-        /**
-         * Validate Norwegian VAT number
-         *
-         * @see http://www.brreg.no/english/coordination/number.html
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Norwegian VAT number
+     *
+     * @see http://www.brreg.no/english/coordination/number.html
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_no: function(value)
 		{
 			if (!/^NO[0-9]{9}$/.test(value))
@@ -7243,15 +7251,15 @@
 			return (sum + '' === value.substr(8, 1));
 		},
 
-        /**
-         * Validate Polish VAT number
-         * Examples:
-         * - Valid: PL8567346215
-         * - Invalid: PL8567346216
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Polish VAT number
+     * Examples:
+     * - Valid: PL8567346215
+     * - Invalid: PL8567346216
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_pl: function(value)
 		{
 			if (!/^PL[0-9]{10}$/.test(value))
@@ -7271,15 +7279,15 @@
 			return (sum % 11 === 0);
 		},
 
-        /**
-         * Validate Portuguese VAT number
-         * Examples:
-         * - Valid: PT501964843
-         * - Invalid: PT501964842
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Portuguese VAT number
+     * Examples:
+     * - Valid: PT501964843
+     * - Invalid: PT501964842
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_pt: function(value)
 		{
 			if (!/^PT[0-9]{9}$/.test(value))
@@ -7303,15 +7311,15 @@
 			return (sum + '' === value.substr(8, 1));
 		},
 
-        /**
-         * Validate Romanian VAT number
-         * Examples:
-         * - Valid: RO18547290
-         * - Invalid: RO18547291
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Romanian VAT number
+     * Examples:
+     * - Valid: RO18547290
+     * - Invalid: RO18547291
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_ro: function(value)
 		{
 			if (!/^RO[1-9][0-9]{1,9}$/.test(value))
@@ -7332,12 +7340,12 @@
 			return (sum + '' === value.substr(length - 1, 1));
 		},
 
-        /**
-         * Validate Russian VAT number (Taxpayer Identification Number - INN)
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Russian VAT number (Taxpayer Identification Number - INN)
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_ru: function(value)
 		{
 			if (!/^RU([0-9]{9}|[0-9]{12})$/.test(value))
@@ -7391,12 +7399,12 @@
 			return false;
 		},
 
-        /**
-         * Validate Serbian VAT number
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Serbian VAT number
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_rs: function(value)
 		{
 			if (!/^RS[0-9]{9}$/.test(value))
@@ -7420,15 +7428,15 @@
 			return ((sum + parseInt(value.substr(8, 1), 10)) % 10 === 1);
 		},
 
-        /**
-         * Validate Swedish VAT number
-         * Examples:
-         * - Valid: SE123456789701
-         * - Invalid: SE123456789101
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Swedish VAT number
+     * Examples:
+     * - Valid: SE123456789701
+     * - Invalid: SE123456789101
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_se: function(value)
 		{
 			if (!/^SE[0-9]{10}01$/.test(value))
@@ -7440,15 +7448,15 @@
 			return $.fn.bootstrapValidator.helpers.luhn(value);
 		},
 
-        /**
-         * Validate Slovenian VAT number
-         * Examples:
-         * - Valid: SI50223054
-         * - Invalid: SI50223055
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Slovenian VAT number
+     * Examples:
+     * - Valid: SI50223054
+     * - Invalid: SI50223055
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_si: function(value)
 		{
 			if (!/^SI[0-9]{8}$/.test(value))
@@ -7472,15 +7480,15 @@
 			return (sum + '' === value.substr(7, 1));
 		},
 
-        /**
-         * Validate Slovak VAT number
-         * Examples:
-         * - Valid: SK2022749619
-         * - Invalid: SK2022749618
-         *
-         * @param {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate Slovak VAT number
+     * Examples:
+     * - Valid: SK2022749619
+     * - Invalid: SK2022749618
+     *
+     * @param {String} value VAT number
+     * @returns {Boolean}
+     */
 		_sk: function(value)
 		{
 			if (!/^SK[1-9][0-9][(2-4)|(6-9)][0-9]{7}$/.test(value))
@@ -7491,15 +7499,15 @@
 			return (parseInt(value.substr(2), 10) % 11 === 0);
 		},
 
-        /**
-         * Validate South African VAT number
-         * Examples:
-         * - Valid: 4012345678
-         * - Invalid: 40123456789, 3012345678
-         *
-         * @params {String} value VAT number
-         * @returns {Boolean}
-         */
+    /**
+     * Validate South African VAT number
+     * Examples:
+     * - Valid: 4012345678
+     * - Invalid: 40123456789, 3012345678
+     *
+     * @params {String} value VAT number
+     * @returns {Boolean}
+     */
 		_za: function(value)
 		{
 			return /^ZA4\d{9}$/.test(value);
@@ -7513,15 +7521,15 @@
 	});
 
 	$.fn.bootstrapValidator.validators.vin = {
-        /**
-         * Validate an US VIN (Vehicle Identification Number)
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * @returns {Boolean}
-         */
+    /**
+     * Validate an US VIN (Vehicle Identification Number)
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * @returns {Boolean}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -7589,29 +7597,29 @@
 
 		COUNTRY_CODES: ['BR', 'CA', 'DK', 'GB', 'IT', 'MA', 'NL', 'SE', 'SG', 'US'],
 
-        /**
-         * Return true if and only if the input value is a valid country zip code
-         *
-         * @param {BootstrapValidator} validator The validator plugin instance
-         * @param {jQuery} $field Field element
-         * @param {Object} options Consist of key:
-         * - message: The invalid message
-         * - country: The country
-         *
-         * The country can be defined by:
-         * - An ISO 3166 country code
-         * - Name of field which its value defines the country code
-         * - Name of callback function that returns the country code
-         * - A callback function that returns the country code
-         *
-         * callback: function(value, validator, $field) {
-         *      // value is the value of field
-         *      // validator is the BootstrapValidator instance
-         *      // $field is jQuery element representing the field
-         * }
-         *
-         * @returns {Boolean|Object}
-         */
+    /**
+     * Return true if and only if the input value is a valid country zip code
+     *
+     * @param {BootstrapValidator} validator The validator plugin instance
+     * @param {jQuery} $field Field element
+     * @param {Object} options Consist of key:
+     * - message: The invalid message
+     * - country: The country
+     *
+     * The country can be defined by:
+     * - An ISO 3166 country code
+     * - Name of field which its value defines the country code
+     * - Name of callback function that returns the country code
+     * - A callback function that returns the country code
+     *
+     * callback: function(value, validator, $field) {
+     *      // value is the value of field
+     *      // validator is the BootstrapValidator instance
+     *      // $field is jQuery element representing the field
+     * }
+     *
+     * @returns {Boolean|Object}
+     */
 		validate: function(validator, $field, options)
 		{
 			var value = $field.val();
@@ -7688,17 +7696,17 @@
 			};
 		},
 
-        /**
-         * Validate United Kingdom postcode
-         * Examples:
-         * - Standard: EC1A 1BB, W1A 1HQ, M1 1AA, B33 8TH, CR2 6XH, DN55 1PT
-         * - Special cases:
-         * AI-2640, ASCN 1ZZ, GIR 0AA
-         *
-         * @see http://en.wikipedia.org/wiki/Postcodes_in_the_United_Kingdom
-         * @param {String} value The postcode
-         * @returns {Boolean}
-         */
+    /**
+     * Validate United Kingdom postcode
+     * Examples:
+     * - Standard: EC1A 1BB, W1A 1HQ, M1 1AA, B33 8TH, CR2 6XH, DN55 1PT
+     * - Special cases:
+     * AI-2640, ASCN 1ZZ, GIR 0AA
+     *
+     * @see http://en.wikipedia.org/wiki/Postcodes_in_the_United_Kingdom
+     * @param {String} value The postcode
+     * @returns {Boolean}
+     */
 		_gb: function(value)
 		{
 			var firstChar = '[ABCDEFGHIJKLMNOPRSTUWYZ]',     // Does not accept QVX

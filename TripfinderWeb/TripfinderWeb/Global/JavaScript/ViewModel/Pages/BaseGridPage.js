@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Page").BaseGridPage = BaseGridPage;
 
-	function BaseGridPage()
+	function BaseGridPage ()
 	{
 		var self = this;
 		TF.Page.BasePage.apply(self, arguments);
@@ -763,14 +763,28 @@
 
 	BaseGridPage.prototype.copyFieldTrip = function()
 	{
-		var self = this, selectedIds;
-		selectedIds = self.searchGrid.getSelectedIds();
+		var self = this, selectedId, selectedName,
+			selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = self.searchGrid.getSelectedRecords();
+		if (!selectedRecords || selectedRecords.length <= 0)
+		{
+			return;
+		}
 		if (!selectedIds || selectedIds.length <= 0)
 		{
 			return;
 		}
-		selectedIds = selectedIds[0];
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "copyfieldtrip", selectedIds))
+		selectedId = selectedIds[0];
+		selectedName = selectedRecords[0].Name;
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "FieldTrips"), {
+			paramData: {
+				copyFromId: selectedId,
+				fieldTripName: TF.Helper.NewCopyNameHelper.generateNewCopyName(selectedName,
+					self.searchGrid.kendoGrid.dataSource._data.map(function(d)
+					{
+						return d.Name;
+					}))
+			}
+		})
 			.then(function(response)
 			{
 				if (response && response.StatusCode === 404)

@@ -5,7 +5,7 @@
 	ModifyLayoutViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ModifyLayoutViewModel.prototype.constructor = ModifyLayoutViewModel;
 
-	function ModifyLayoutViewModel(gridType, isNew, gridLayoutExtendedDataModel, obGridFilterDataModels, obSelectedGridFilterId)
+	function ModifyLayoutViewModel (gridType, isNew, gridLayoutExtendedDataModel, obGridFilterDataModels, obSelectedGridFilterId)
 	{
 		this.isNew = isNew;
 		gridLayoutExtendedDataModel = gridLayoutExtendedDataModel.clone();
@@ -13,6 +13,7 @@
 		if (isNew === "new")
 		{
 			gridLayoutExtendedDataModel.id(0);
+			gridLayoutExtendedDataModel.dataTypeId(tf.DataTypeHelper.getId(gridType));
 			gridLayoutExtendedDataModel.gridType(gridType);
 			gridLayoutExtendedDataModel.apiIsNew(true);
 			gridLayoutExtendedDataModel.apiIsDirty(true);
@@ -71,12 +72,36 @@
 	{
 		if (this.gridLayoutExtendedDataModel.apiIsDirty())
 		{
-			return tf.promiseAjax[this.isNew === "new" ? "post" : 'put'](pathCombine(tf.api.apiPrefix(), "gridlayout"), {
-				data: this.gridLayoutExtendedDataModel.toData()
-			})
+			var requestData = {
+				DataTypeID: this.gridLayoutExtendedDataModel.dataTypeId(),
+				Name: this.gridLayoutExtendedDataModel.name(),
+				FilterID: this.gridLayoutExtendedDataModel.filterId() || null,
+				FilterName: this.gridLayoutExtendedDataModel.filterName() || "",
+				ShowSummaryBar: this.gridLayoutExtendedDataModel.showSummaryBar() || null,
+				Description: this.gridLayoutExtendedDataModel.description(),
+				LayoutColumns: JSON.stringify(this.gridLayoutExtendedDataModel.layoutColumns())
+			};
+			if (this.isNew !== "new")
+			{
+				requestData.ID = this.gridLayoutExtendedDataModel.id()
+			}
+			return (
+				this.isNew === "new" ?
+					tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts"), { data: [requestData] }) :
+					tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", requestData.ID), { data: requestData })
+			)
 				.then(function(apiResponse)
 				{
-					this.gridLayoutExtendedDataModel.update(apiResponse.Items[0]);
+					this.gridLayoutExtendedDataModel.dataTypeId(apiResponse.Items[0].DataTypeId);
+					this.gridLayoutExtendedDataModel.name(apiResponse.Items[0].Name);
+					this.gridLayoutExtendedDataModel.filterId(apiResponse.Items[0].FilterID);
+					this.gridLayoutExtendedDataModel.filterName(apiResponse.Items[0].FilterName);
+					this.gridLayoutExtendedDataModel.showSummaryBar(apiResponse.Items[0].ShowSummaryBar);
+					this.gridLayoutExtendedDataModel.description(apiResponse.Items[0].Description);
+					this.gridLayoutExtendedDataModel.layoutColumns(JSON.parse(apiResponse.Items[0].LayoutColumns));
+					this.gridLayoutExtendedDataModel.id(apiResponse.Items[0].Id);
+					this.gridLayoutExtendedDataModel.apiIsDirty(false);
+
 					return this.gridLayoutExtendedDataModel;
 				}.bind(this))
 				.catch(function(apiResponse)
@@ -205,19 +230,27 @@
 										{
 											updateErrors($field, "required");
 										}
-										return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "gridlayout", "unique"), {
-											data: this.gridLayoutExtendedDataModel.toData()
-										}, { overlay: false })
-											.then(function(apiResponse)
+										return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts"), {
+											paramData: {
+												name: this.gridLayoutExtendedDataModel.name()
+											}
+										}, { overlay: false }).then(function(apiResponse)
+										{
+											if (!apiResponse.Items[0] && this.obStatus() === 'selectfilter')
 											{
-												if (!apiResponse.Items[0] && this.obStatus() === 'selectfilter')
-												{
-													$field.parent().find("[data-bv-validator=callback]").css("display", "block");
-													$field.parent().find("[data-bv-validator=callback]").attr("data-bv-result", "INVALID");
-													$field.parent().addClass("has-error");
-												}
-												return apiResponse.Items[0];
-											}.bind(this))
+												$field.parent().find("[data-bv-validator=callback]").css("display", "block");
+												$field.parent().find("[data-bv-validator=callback]").attr("data-bv-result", "INVALID");
+												$field.parent().addClass("has-error");
+											}
+											if (apiResponse.Items.length === 0) return true;
+
+											if (this.gridLayoutExtendedDataModel.id() === 0 || apiResponse.Items[0].Id !== this.gridLayoutExtendedDataModel.id())
+											{
+												return false;
+											}
+
+											return true;
+										}.bind(this))
 									}.bind(this)
 								}
 							}

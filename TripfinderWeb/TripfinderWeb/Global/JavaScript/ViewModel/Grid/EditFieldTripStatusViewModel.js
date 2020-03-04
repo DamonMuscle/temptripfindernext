@@ -15,7 +15,7 @@
 	allFieldTripStatusMap[TF.FieldTripStageEnum.RequestCanceled] = { id: 100, name: "Canceled - Request Canceled", isApprove: false };
 	allFieldTripStatusMap[TF.FieldTripStageEnum.RequestCompleted] = { id: 101, name: "Completed - Request Completed", isApprove: true };
 
-	function EditFieldTripStatusViewModel(selectedRecords, isCancel)
+	function EditFieldTripStatusViewModel (selectedRecords, isCancel)
 	{
 		var self = this;
 		self.obComments = ko.observable("");
@@ -112,27 +112,29 @@
 
 	EditFieldTripStatusViewModel.prototype.apply = function(noComments)
 	{
-		var self = this, cancelStatus = 100, statusId = self.isCancel ? cancelStatus : self.getStatusId();
-		return self.pageLevelViewModel.saveValidate().then(function(result)
+		var self = this, statusId = self.getStatusId(), note = noComments ? "" : self.obComments();
+		self.selectedRecords.forEach(function(item)
 		{
-			if (result)
-			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtrip", "statuses"),
-					{ data: { Ids: self.fieldTripIds, StatusId: statusId, Note: noComments ? "" : self.obComments(), ProductName: "tripfinder" } })
-					.then(function()
-					{
-						self.selectedRecords.forEach(function(item)
-						{
-							item.FieldTripStageId = statusId;
-						});
-						return true;
-					}.bind(this));
-			}
-			else
-			{
-				return false;
-			}
+			item.FieldTripStageId = statusId;
+			item.FieldTripStageNotes = note;
+			// I have no idea what is this field for. 
+			// but if don't set it to true, API will 
+			// not add new records into FieldTripHistory when stage not change.
+			item.IsFieldTripStageNotesChange = true;
 		});
+
+		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "FieldTrips"),
+			{
+				data: self.selectedRecords
+			})
+			.then(function()
+			{
+				self.selectedRecords.forEach(function(item)
+				{
+					item.FieldTripStageId = statusId;
+				});
+				return true;
+			});
 	};
 
 	EditFieldTripStatusViewModel.prototype.applyWithoutComments = function()

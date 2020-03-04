@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Modal.Grid").ModifyLayoutModalViewModel = ModifyLayoutModalViewModel;
 
-	function ModifyLayoutModalViewModel(gridType, isNew, gridLayoutExtendDataModel, obGridFilterDataModels, obSelectedGridFilterId)
+	function ModifyLayoutModalViewModel (gridType, isNew, gridLayoutExtendDataModel, obGridFilterDataModels, obSelectedGridFilterId)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.optionType = isNew;

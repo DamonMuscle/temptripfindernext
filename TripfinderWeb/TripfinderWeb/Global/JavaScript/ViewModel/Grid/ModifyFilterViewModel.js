@@ -5,7 +5,7 @@
 	ModifyFilterViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ModifyFilterViewModel.prototype.constructor = ModifyFilterViewModel;
 
-	function ModifyFilterViewModel(gridType, isNew, gridFilterDataModel, headerFilters, gridDefinition, omittedRecordIds, options, searchFilter)
+	function ModifyFilterViewModel (gridType, isNew, gridFilterDataModel, headerFilters, gridDefinition, omittedRecordIds, options, searchFilter)
 	{
 		this.isNew = isNew;
 		this.gridType = gridType;
@@ -66,7 +66,7 @@
 		{
 			var searchData = new TF.SearchParameters(null, null, null, headerFilters, null, null, null);
 
-			var url = pathCombine(tf.api.apiPrefix(), "search", gridType, "RawFilterClause");
+			var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(gridType), "RawFilterClause");
 			if (gridType === 'busfinderHistorical')
 			{
 				searchData.data.filterSet.filterSets = [
@@ -141,7 +141,7 @@
 		this.obSelectedField = ko.observable();
 		this.obSelectedFieldText = ko.observable();
 		this.obSelectedFieldText.subscribe(this.selectFieldClick.bind(this));
-		this.getOmittedRecordsName(omittedRecordIds, gridType);
+		this.getOmittedRecordsName(omittedRecordIds, this.gridFilterDataModel.id());
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		this.initReminder();
 
@@ -161,24 +161,33 @@
 		this.obVisableOmitCnt(initVisableOmitCnt);
 	};
 
-	ModifyFilterViewModel.prototype.getOmittedRecordsName = function(omittedRecordIds, gridType)
+	ModifyFilterViewModel.prototype.getOmittedRecordsName = function(omittedRecordIds, gridFilterId)
 	{
 		if (omittedRecordIds == null)
 		{
 			return null;
 		}
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "omittedRecord", "ids"),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "omittedrecords"),
 			{
-				data:
+				paramData:
 				{
-					ids: omittedRecordIds,
-					tableType: gridType
+					databaseId: tf.datasourceManager.databaseId,
+					omittedRecordIDs: omittedRecordIds.join(","),
+					filterId: gridFilterId
 				}
 			})
 			.then(function(apiResponse)
 			{
 				var result = apiResponse.Items.sort(function(a, b)
 				{
+					if (!a.Name)
+					{
+						return -1;
+					}
+					if (!b.Name)
+					{
+						return 1;
+					}
 					var nameA = a.Name.toUpperCase(); // ignore upper and lowercase
 					var nameB = b.Name.toUpperCase(); // ignore upper and lowercase
 					if (nameA < nameB)
@@ -192,6 +201,10 @@
 
 					// names must be equal
 					return 0;
+				});
+				result.forEach(function(item)
+				{
+					item.DBID = tf.datasourceManager.databaseId;
 				});
 				this.obOmitRecords(result);
 
@@ -252,56 +265,20 @@
 			this.pageLevelViewModel.obSuccessMessage();
 			this.pageLevelViewModel.obSuccessMessageDivIsShow(false);
 
-			if (response.StatusCode !== 200 || response === false)
-			{
-				var containsSqlStatementError = false;
-				$.each(this.pageLevelViewModel.obValidationErrors(), function(index, item)
-				{
-					if (item.field.attr('name') === 'sqlStatement' && !item.isClosed)
-					{
-						containsSqlStatementError = true;
-						return false;
-					}
-				});
-				if (!containsSqlStatementError)
-				{
-					this.pageLevelViewModel.obErrorMessageDivIsShow(true);
-					this.pageLevelViewModel.obValidationErrorsSpecifed([
-						{
-							field: this._$form.find("textarea[name='sqlStatement']"),
-							message: response === false ? "Filter Statement is required" : "Filter Statement syntax is invalid"
-						}]);
-				}
-
-				// due the following code will reset focus on sql statement textArea
-				// so when filter name input box is activeElement and click verify button, textArea will get focus, 
-				// the following code is used to fix this issue.
-				var _activeElement = document.activeElement;
-				var $textArea = this._$form.find("textarea[name='sqlStatement']")
-				$textArea.css('color', 'transparent');
-				$textArea.css('text-shadow', '0 0 0 #555');
-
-				setTimeout(function()
-				{
-					$textArea.css('color', '#555');
-					$textArea.css('text-shadow', '');
-					$(_activeElement).focus()
-				}, 0);
-				$textArea.closest('.form-group').find(".help-block").display();
-				return false;
-			}
-			else
-			{
-				var msg = "The syntax of the statement is correct.";
-				this.pageLevelViewModel.popupSuccessMessage(msg);
-				$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").hide();
-			}
+			var msg = "The syntax of the statement is correct.";
+			this.pageLevelViewModel.popupSuccessMessage(msg);
+			$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").hide();
 		}.bind(this))
 			.catch(function()
 			{
 				tf.loadingIndicator.tryHide();
 				var $field = $("textarea[name='sqlStatement']");
 				this.pageLevelViewModel.obErrorMessageDivIsShow(true);
+				this.pageLevelViewModel.obValidationErrorsSpecifed([
+					{
+						field: this._$form.find("textarea[name='sqlStatement']"),
+						message: "Filter Statement syntax is invalid"
+					}]);
 				var validator = $.trim(this.gridFilterDataModel.whereClause()) === '' ? 'notEmpty' : 'callback';
 				this._$form.find('[data-bv-validator = "' + validator + '"][data-bv-for="sqlStatement"]').show().closest(".form-group").addClass("has-error");
 				$field.focus();
@@ -326,7 +303,7 @@
 		if (this.gridType === 'busfinderhistorical')
 			url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause");
 		else
-			url = pathCombine(tf.api.apiPrefix(), "search", this._gridType);
+			url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType));
 
 		return tf.promiseAjax.post(url,
 			{
@@ -394,7 +371,7 @@
 				if (this.gridType === 'busfinderhistorical')
 					url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause");
 				else
-					url = pathCombine(tf.api.apiPrefix(), "search", this._gridType);
+					url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType));
 
 				tf.ajax.post(url,
 					{
@@ -448,7 +425,7 @@
 	{
 		return this.saveReminder().then(function(reminder)
 		{
-			function setReminder(gridFilterDataModel)
+			function setReminder (gridFilterDataModel)
 			{
 				if (reminder && reminder.Id)
 				{
@@ -461,9 +438,13 @@
 			{
 				setReminder(this.gridFilterDataModel);
 				this.gridFilterDataModel.omittedRecord(this.obOmitRecords());
-				return tf.promiseAjax[this.isNew === "new" ? "post" : "put"](pathCombine(tf.api.apiPrefix(), "gridfilter"),
+				var data = this.gridFilterDataModel.toData();
+				data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause()) ? tf.datasourceManager.databaseId : null;
+				data.DataTypeID = tf.DataTypeHelper.getId(data.GridType);
+				return tf.promiseAjax[this.isNew === "new" ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 					{
-						data: this.gridFilterDataModel.toData()
+						paramData: { "@relationships": "OmittedRecord" },
+						data: [data]
 					})
 					.then(function(apiResponse)
 					{
@@ -627,9 +608,15 @@
 									self.updateErrors($field, "required");
 								}
 
-								return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "gridfilter", "unique"),
+								var data = this.gridFilterDataModel.toData();
+								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 									{
-										data: this.gridFilterDataModel.toData(),
+										paramData: {
+											"@filter": String.format("eq(datatypeId,{1})&eq(name,{2})",
+												tf.datasourceManager.databaseId, data.DataTypeID, data.Name),
+											"@fields": "DBID,Name"
+										},
+										data: data,
 										async: false
 									},
 									{
@@ -637,7 +624,20 @@
 									})
 									.then(function(apiResponse)
 									{
-										return apiResponse.Items[0];
+										if (apiResponse.Items.length === 0 ||
+											(!self.isNew &&
+												apiResponse.Items[0].Name === data.Name))
+										{
+											return true;
+										}
+
+										var existFilter = apiResponse.Items[0];
+										if (existFilter.DBID != null && existFilter.DBID != tf.datasourceManager.databaseId)
+										{
+											return { valid: false, message: "Filter already exists in other data source." };
+										}
+
+										return { valid: false, message: "Filter already exists current data source." };
 									});
 							}.bind(this)
 						}
@@ -707,12 +707,12 @@
 
 			this._$form
 				.bootstrapValidator(
-				{
-					excluded: [':hidden', ':not(:visible)'],
-					live: 'enabled',
-					message: 'This value is not valid',
-					fields: fields
-				})
+					{
+						excluded: [':hidden', ':not(:visible)'],
+						live: 'enabled',
+						message: 'This value is not valid',
+						fields: fields
+					})
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		}.bind(this), 0);
 	};
@@ -833,70 +833,6 @@
 				SharedWithList: []
 			}));
 		this.selectedUser = [];
-		this.obReminderEnable.subscribe(function()
-		{
-			var validator = this._$form.data("bootstrapValidator");
-			if (this.obReminderEnable())
-			{
-				validator.addField("reminderName",
-					{
-						trigger: "blur",
-						validators:
-						{
-							notEmpty:
-							{
-								message: "required"
-							},
-							callback:
-							{
-								message: " must be unique",
-								callback: function(value, validator, $field)
-								{
-
-									if (!value)
-									{
-										this.updateErrors($field, "unique");
-										return true;
-									}
-									else
-									{
-										this.updateErrors($field, "required");
-									}
-
-									return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "reminder", "unique"),
-										{
-											data:
-											{
-												Name: value,
-												Id: 0
-											}
-										},
-										{
-											overlay: false
-										})
-										.then(function(apiResponse)
-										{
-											return apiResponse.Items[0];
-										});
-								}.bind(this)
-							}
-						}
-					});
-			}
-			else
-			{
-				this._$form.find("[name=reminderName]").nextAll(".help-block").hide();
-				validator.removeField("reminderName");
-				var pageLevelError = this.pageLevelViewModel.obValidationErrors().filter(function(item)
-				{
-					return item.name === "Reminder Name";
-				});
-				if (pageLevelError && pageLevelError.length > 0)
-				{
-					this.pageLevelViewModel.obValidationErrors.remove(pageLevelError[0]);
-				}
-			}
-		}, this);
 	};
 
 	ModifyFilterViewModel.prototype.reminderSelectUser = function()
