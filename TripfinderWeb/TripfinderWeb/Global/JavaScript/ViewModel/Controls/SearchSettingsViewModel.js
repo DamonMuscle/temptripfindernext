@@ -37,13 +37,13 @@
 	SearchSettingsViewModel.prototype.clearUserSearch = function()
 	{
 		var self = this;
-		tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "SearchRecord"), {
-			data: JSON.stringify(TF.productName)
-		}).then(function()
-		{
-			self.onClearRecentSearchEvent.notify();
-			self.pageLevelViewModel.popupSuccessMessage("Recent Searches successfully cleared.");
-		});
+		var databaseId = tf.storageManager.get("datasourceId");
+		tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords?dbid=" + databaseId + "&ApplicationID=" + TF.productID))
+			.then(function()
+			{
+				self.onClearRecentSearchEvent.notify();
+				self.pageLevelViewModel.popupSuccessMessage("Recent Searches successfully cleared.");
+			});
 	};
 
 	/**
