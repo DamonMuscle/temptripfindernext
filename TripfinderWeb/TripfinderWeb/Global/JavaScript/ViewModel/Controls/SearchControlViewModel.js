@@ -1335,10 +1335,10 @@
 			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords"),
 				{
 					data: [{
-						DataType: 4,
+						DataType: tf.DataTypeHelper.getId("fieldtrip"),
 						SearchText: searchText,
 						ApplicationID: TF.productID,
-						DBID: 7
+						DBID: tf.storageManager.get("datasourceId")
 					}],
 					async: true
 				}, { overlay: false });

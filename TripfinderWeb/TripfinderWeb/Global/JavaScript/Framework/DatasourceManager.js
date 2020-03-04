@@ -66,16 +66,16 @@
 	{
 		var self = this,
 			p;
-
+		var databaseId = tf.storageManager.get("datasourceId");
 		if (auth)
 		{
-			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications"),
+			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications?dbid=" + databaseId),
 				{},
 				auth);
 		}
 		else
 		{
-			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications"), null, { overlay: false });
+			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications?dbid=" + databaseId), null, { overlay: false });
 		}
 		return p
 			.then(function(result)
