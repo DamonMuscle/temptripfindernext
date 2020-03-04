@@ -23,7 +23,7 @@
 			})
 			.then(function(apiResponse)
 			{
-				if (apiResponse && apiResponse.Items && apiResponse.Items.length == 1)
+				if (apiResponse && apiResponse.Items && apiResponse.Items.length === 1)
 					return Promise.resolve(apiResponse.Items[0]);
 				else
 					return Promise.resolve(null);

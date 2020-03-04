@@ -81,7 +81,7 @@
 				Description: this.gridLayoutExtendedDataModel.description(),
 				LayoutColumns: JSON.stringify(this.gridLayoutExtendedDataModel.layoutColumns())
 			};
-			if (this.isNew != "new")
+			if (this.isNew !== "new")
 			{
 				requestData.ID = this.gridLayoutExtendedDataModel.id()
 			}
@@ -102,7 +102,6 @@
 					this.gridLayoutExtendedDataModel.id(apiResponse.Items[0].Id);
 					this.gridLayoutExtendedDataModel.apiIsDirty(false);
 
-					// this.gridLayoutExtendedDataModel.update(apiResponse.Items[0]);
 					return this.gridLayoutExtendedDataModel;
 				}.bind(this))
 				.catch(function(apiResponse)
@@ -245,7 +244,7 @@
 											}
 											if (apiResponse.Items.length === 0) return true;
 
-											if (this.gridLayoutExtendedDataModel.id() === 0 || apiResponse.Items[0].Id != this.gridLayoutExtendedDataModel.id())
+											if (this.gridLayoutExtendedDataModel.id() === 0 || apiResponse.Items[0].Id !== this.gridLayoutExtendedDataModel.id())
 											{
 												return false;
 											}
