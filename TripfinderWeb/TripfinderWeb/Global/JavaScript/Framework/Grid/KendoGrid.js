@@ -6,7 +6,7 @@
 		layoutAndFilterOperation: true
 	};
 
-	function addPlugin()
+	function addPlugin ()
 	{
 		var base, sub = arguments[0];
 		for (var i = 1; i < arguments.length; i++)
@@ -19,7 +19,7 @@
 		}
 	}
 
-	function KendoGrid($container, options, gridState)
+	function KendoGrid ($container, options, gridState)
 	{
 		var self = this;
 		this.isFromRelated = ko.observable(false);
@@ -578,7 +578,7 @@
 	{
 		var self = this;
 
-		function changeColumn(editColumnViewModel)
+		function changeColumn (editColumnViewModel)
 		{
 			self._obSelectedColumns(editColumnViewModel.selectedColumns);
 			self._availableColumns = editColumnViewModel.availableColumns;
@@ -681,15 +681,15 @@
 						closeButton: true,
 						title: "Save As",
 						message: "Select the file format that you would like to save the selected records in." +
-						"<div class='col-xs-24'>" +
-						"<br/><label>Type</label>" +
-						"<div class='save-content'>" +
-						"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
-						"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-						"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-						"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
-						"<div>" +
-						"</div>",
+							"<div class='col-xs-24'>" +
+							"<br/><label>Type</label>" +
+							"<div class='save-content'>" +
+							"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
+							"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
+							"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
+							"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
+							"<div>" +
+							"</div>",
 						buttons:
 						{
 							save:
@@ -954,7 +954,7 @@
 			.then(function(apiResponse)
 			{
 				var gridLayoutExtendedDataModels =
-					TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items.slice(1));
+					TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items);
 
 				// updated layout except applied
 				var stickLayoutId = stickGridConfig.stickLayoutModel ? stickGridConfig.stickLayoutModel.id() : null;
@@ -997,7 +997,8 @@
 				modifiedStatus.isDeletedLayout = true;
 			else
 			{
-				var stickBackUpLayoutColumns = stickGridConfig.stickLayoutModel._entityBackup.LayoutColumns;
+				var formatedGridFilter = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, stickGridConfig.stickLayoutModel._entityBackup);
+				var stickBackUpLayoutColumns = formatedGridFilter.layoutColumns;
 				var stickBackUpLayoutName = stickGridConfig.stickLayoutModel._entityBackup.Name;
 				var stickBackUpLayoutShowSummaryBar = stickGridConfig.stickLayoutModel._entityBackup.ShowSummaryBar;
 				modifiedStatus.isUpdatedLayout = (!TF.Grid.LayoutHelper.compareLayoutColumns(stickBackUpLayoutColumns, unsyncedDBLayout.layoutColumns()) ||
@@ -1688,36 +1689,61 @@
 (function()
 {
 	createNamespace("TF.Grid").GridHelper =
+	{
+		convertToOldGridDefinition: function(definition)
 		{
-			convertToOldGridDefinition: function(definition)
+			return {
+				TypeCode: (
+					definition.DBType ?
+						definition.DBType.replace(/\b(\w)|\s(\w)/g, function(m)
+						{
+							return m.toUpperCase();
+						}) :
+						definition.type.replace(/\b(\w)|\s(\w)/g, function(m)
+						{
+							return m.toUpperCase();
+						})
+				),
+				AllowSorting: definition.sortable,
+				AllowFiltering: definition.filterable,
+				FieldName: (definition.field ? definition.field : definition.FieldName),
+				DisplayName: definition.title ? definition.title : (definition.DisplayName ? definition.DisplayName : definition.FieldName),
+				PersistenceName: definition.DBName ? definition.DBName : (definition.field ? definition.field : definition.FieldName)
+			};
+		},
+		_getDataSourceSpecificFields: function(gridType)
+		{
+			switch (gridType)
 			{
-				return {
-					TypeCode: (
-						definition.DBType ?
-							definition.DBType.replace(/\b(\w)|\s(\w)/g, function(m)
-							{
-								return m.toUpperCase();
-							}) :
-							definition.type.replace(/\b(\w)|\s(\w)/g, function(m)
-							{
-								return m.toUpperCase();
-							})
-					),
-					AllowSorting: definition.sortable,
-					AllowFiltering: definition.filterable,
-					FieldName: (definition.field ? definition.field : definition.FieldName),
-					DisplayName: definition.title ? definition.title : (definition.DisplayName ? definition.DisplayName : definition.FieldName),
-					PersistenceName: definition.DBName ? definition.DBName : (definition.field ? definition.field : definition.FieldName)
-				};
-			},
-			_convertToOldGridDefinition: function(gridDefinition)
+				case "fieldtrip":
+					return ["DistrictDepartmentID", "FieldTripActivityID", "FieldTripAccountID", "FieldTripClassificationID", "FieldTripDestinationID", "FieldTripEquipmentID", "FieldTripID", "FieldTripStageID"];
+			}
+		},
+		checkFilterContainsDataBaseSpecificFields: function(gridType, whereClause)
+		{
+			var self = this, dbSpecificFields = self._getDataSourceSpecificFields(gridType);
+
+			if (!dbSpecificFields) return false;
+
+			if (!whereClause || whereClause.length == 0)
 			{
-				var self = this;
-				return gridDefinition.gridDefinition().Columns.map(function(definition)
-				{
-					return self.convertToOldGridDefinition(definition);
-				});
-			},
-			_grid: null
-		};
+				return false;
+			}
+
+			whereClause = whereClause.toLowerCase();
+			return dbSpecificFields.some(function(field)
+			{
+				return new RegExp("\\b" + field.toLowerCase() + "\\b", "g").test(whereClause);
+			});
+		},
+		_convertToOldGridDefinition: function(gridDefinition)
+		{
+			var self = this;
+			return gridDefinition.gridDefinition().Columns.map(function(definition)
+			{
+				return self.convertToOldGridDefinition(definition);
+			});
+		},
+		_grid: null
+	};
 })();

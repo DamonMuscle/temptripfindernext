@@ -263,6 +263,7 @@
     <Content Include="Global\JavaScript\ViewModel\Grid\ModifyFilterViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Grid\ModifyLayoutViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Helper\KendoListMoverHelper.js" />
+    <Content Include="Global\JavaScript\ViewModel\Helper\NewCopyNameHelper.js" />
     <Content Include="Global\JavaScript\ViewModel\PageLevel\BasePageLevelViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\PageLevel\ListMoverPageLevelViewModel.js" />
     <Content Include="Global\JavaScript\ViewModel\Pages\BaseGridPage.js" />

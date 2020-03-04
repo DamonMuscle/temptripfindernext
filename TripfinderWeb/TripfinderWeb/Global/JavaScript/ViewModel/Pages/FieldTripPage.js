@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Page").FieldTripPage = FieldTripPage;
 
-	function FieldTripPage(gridOptions)
+	function FieldTripPage (gridOptions)
 	{
 		var self = this;
 		self.type = "fieldtrip";
@@ -89,7 +89,7 @@
 			if (selectGridFilterEntityId == -3 || selectGridFilterEntityId == -4 ||
 				selectGridFilterEntityId == -5 || selectGridFilterEntityId == -6)
 			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtrip")).then(function(response)
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtrips")).then(function(response)
 				{
 					switch (selectGridFilterEntityId)
 					{

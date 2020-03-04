@@ -15,7 +15,7 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function DetailViewViewModel(optionId)
+	function DetailViewViewModel (optionId)
 	{
 		var self = this;
 		self.gridType = "fieldtrip";
@@ -81,7 +81,7 @@
 			contentColor: "#000000"
 		};
 		self.basicGridConfig = {
-			fieldtrip: { title: "Name", subTitle: "DepartDateTime" }
+			fieldtrips: { title: "Name", subTitle: "DepartDateTime" }
 		};
 		//Image
 		self.oberrormessage = ko.observable(null);
@@ -2409,7 +2409,7 @@
 	 */
 	DetailViewViewModel.prototype.formatDataContent = function(content, type, format)
 	{
-		function formatNumber(num)
+		function formatNumber (num)
 		{
 			return num > 9 ? num : "0" + num;
 		}
@@ -3045,7 +3045,7 @@
 			scheduleItemDom = "", eventsDom = "",
 			allEvents = [];
 
-		function getShortClassName()
+		function getShortClassName ()
 		{
 			return ($calendarItem.hasClass("fill-four") ||
 				$calendarItem.hasClass("fill-three") ||
@@ -3844,7 +3844,7 @@
 		var $calendar = $calendarGroup.find(".calendar"),
 			$events = $calendarGroup.find(".schedule");
 
-		function resetClass(className)
+		function resetClass (className)
 		{
 			$calendarGroup.removeClass("fill-one");
 			$calendarGroup.removeClass("fill-two");
@@ -3853,7 +3853,7 @@
 			$calendarGroup.addClass(className);
 		};
 
-		function updateEvents(className)
+		function updateEvents (className)
 		{
 			if (!className || $calendarGroup.hasClass(className))
 			{

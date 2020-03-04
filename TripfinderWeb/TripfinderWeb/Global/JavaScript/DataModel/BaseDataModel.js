@@ -4,7 +4,7 @@
 	namespace.BaseDataModel = BaseDataModel;
 
 
-	function BaseDataModel(entity)
+	function BaseDataModel (entity)
 	{
 		this._modified = ko.observableArray();
 		this._entityBackup = null;
@@ -44,7 +44,7 @@
 		}
 		this._calledToDataModel = true;
 		var index, index2;
-		var value, fromKey, toKey, subDataModelType, fromMapping, afterChange, observable, arr;
+		var value, fromKey, toKey, subDataModelType, fromMapping, afterChange, observable, arr, format, notNull, defaultValue;
 		var mapping = this.getMapping();
 		if (!mapping || !mapping.length)
 		{
@@ -58,9 +58,17 @@
 			afterChange = mapping[index].afterChange;
 			value = entity[fromKey];
 			toKey = mapping[index].to;
+			format = mapping[index].format;
+			notNull = mapping[index].notNull;
 			if (!toKey)
 			{
 				toKey = fromKey.substring(0, 1).toLowerCase() + fromKey.substring(1, fromKey.length)
+			}
+
+			if (notNull && value == null)
+			{
+				defaultValue = mapping[index].default;
+				value = (defaultValue === undefined) ? null : defaultValue;
 			}
 
 			if (!fromMapping)
@@ -98,6 +106,10 @@
 			else
 			{
 				this[toKey] = this.createObservable(toKey, fromMapping(value));
+			}
+			if (format && typeof format === "function")
+			{
+				this[toKey](format(value));
 			}
 			if (afterChange)
 			{

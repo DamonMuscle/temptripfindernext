@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Grid").ManageLayoutViewModel = ManageLayoutViewModel;
 
-	function ManageLayoutViewModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, positiveClose)
+	function ManageLayoutViewModel (obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, positiveClose)
 	{
 		this.obGridLayoutExtendedDataModels = obGridLayoutExtendedDataModels;
 		this.obGridFilterDataModels = obGridFilterDataModels;
@@ -133,10 +133,10 @@
 				if (result)
 				{
 					var self = this;
-					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "gridlayout", gridLayoutExtendedDataModel.id()))
+					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", gridLayoutExtendedDataModel.id()))
 						.then(function(apiResponse)
 						{
-							if (apiResponse.Items[0])
+							if (apiResponse)
 							{
 								self.obGridLayoutExtendedDataModels.remove(gridLayoutExtendedDataModel);
 							}
@@ -150,7 +150,7 @@
 {
 	createNamespace("TF.Grid.Layout").LayoutExtenstion = LayoutExtenstion;
 
-	function LayoutExtenstion()
+	function LayoutExtenstion ()
 	{ }
 
 	LayoutExtenstion.prototype.getDataExportImg = function(value)

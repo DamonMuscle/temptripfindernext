@@ -30,7 +30,7 @@
 		}
 	};
 
-	function cancelCloseMenuEvent($element)
+	function cancelCloseMenuEvent ($element)
 	{
 		return !TF.Grid.FilterHelper.isFilterMenuOpen($element);
 	}

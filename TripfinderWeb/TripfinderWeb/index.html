@@ -6,7 +6,8 @@
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link href="Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
 	<meta name="format-detection" content="telephone=no" />
 
 	<script>
@@ -36,17 +37,13 @@
 	<link rel="stylesheet" href="Global/Css/tripfinder.css" />
 	<!-- endbuild -->
 	<style>
-		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0)
-		{
-			@media
-			{
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content
-				{
+		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0) {
+			@media {
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content {
 					background-color: #efefef;
 				}
 
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content input:disabled
-				{
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content input:disabled {
 					color: #202020;
 				}
 			}
@@ -173,6 +170,7 @@
 
 	<script src="Global/JavaScript/ViewModel/Helper/FieldTripStageEnum.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/KendoListMoverHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/NewCopyNameHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/TapHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/FieldTripResourcesHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/DropDownMenuHelper.js"></script>
@@ -328,11 +326,13 @@
 				<div class="modal-content">
 					<!-- ko if: title() -->
 					<div class="modal-header">
-						<button type="button" class="close" aria-hidden="true" data-bind="visible:obCloseButtonVisible,event:{click:closeClick}">&times;</button>
+						<button type="button" class="close" aria-hidden="true"
+							data-bind="visible:obCloseButtonVisible,event:{click:closeClick}">&times;</button>
 						<div class="panel-heading" data-bind="text: title"></div>
 					</div>
 					<!-- /ko -->
-					<div class="modal-body" data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
+					<div class="modal-body"
+						data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
 					</div>
 					<!-- ko if: buttonTemplate() -->
 					<div class="modal-footer">
@@ -350,34 +350,27 @@
 			<div class="spinner">
 				<div class="spinner-icon-container">
 					<style type='text/css'>
-						@-webkit-keyframes uil-default-anim
-						{
-							0%
-							{
+						@-webkit-keyframes uil-default-anim {
+							0% {
 								opacity: 1;
 							}
 
-							100%
-							{
+							100% {
 								opacity: 0;
 							}
 						}
 
-						@keyframes uil-default-anim
-						{
-							0%
-							{
+						@keyframes uil-default-anim {
+							0% {
 								opacity: 1;
 							}
 
-							100%
-							{
+							100% {
 								opacity: 0;
 							}
 						}
 
-						.uil-default-css
-						{
+						.uil-default-css {
 							position: relative;
 							left: -78px;
 							top: -78px;
@@ -386,96 +379,84 @@
 							height: 200px;
 						}
 
-						.uil-default-css > div:nth-of-type(1)
-						{
+						.uil-default-css>div:nth-of-type(1) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.35s;
 							animation-delay: -0.35s;
 						}
 
-						.uil-default-css > div:nth-of-type(2)
-						{
+						.uil-default-css>div:nth-of-type(2) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.29166666666666663s;
 							animation-delay: -0.29166666666666663s;
 						}
 
-						.uil-default-css > div:nth-of-type(3)
-						{
+						.uil-default-css>div:nth-of-type(3) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.23333333333333334s;
 							animation-delay: -0.23333333333333334s;
 						}
 
-						.uil-default-css > div:nth-of-type(4)
-						{
+						.uil-default-css>div:nth-of-type(4) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.17500000000000002s;
 							animation-delay: -0.17500000000000002s;
 						}
 
-						.uil-default-css > div:nth-of-type(5)
-						{
+						.uil-default-css>div:nth-of-type(5) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.11666666666666667s;
 							animation-delay: -0.11666666666666667s;
 						}
 
-						.uil-default-css > div:nth-of-type(6)
-						{
+						.uil-default-css>div:nth-of-type(6) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.05833333333333329s;
 							animation-delay: -0.05833333333333329s;
 						}
 
-						.uil-default-css > div:nth-of-type(7)
-						{
+						.uil-default-css>div:nth-of-type(7) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -5.551115123125783e-17s;
 							animation-delay: -5.551115123125783e-17s;
 						}
 
-						.uil-default-css > div:nth-of-type(8)
-						{
+						.uil-default-css>div:nth-of-type(8) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.05833333333333329s;
 							animation-delay: 0.05833333333333329s;
 						}
 
-						.uil-default-css > div:nth-of-type(9)
-						{
+						.uil-default-css>div:nth-of-type(9) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.11666666666666664s;
 							animation-delay: 0.11666666666666664s;
 						}
 
-						.uil-default-css > div:nth-of-type(10)
-						{
+						.uil-default-css>div:nth-of-type(10) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.17500000000000004s;
 							animation-delay: 0.17500000000000004s;
 						}
 
-						.uil-default-css > div:nth-of-type(11)
-						{
+						.uil-default-css>div:nth-of-type(11) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.2333333333333334s;
 							animation-delay: 0.2333333333333334s;
 						}
 
-						.uil-default-css > div:nth-of-type(12)
-						{
+						.uil-default-css>div:nth-of-type(12) {
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.29166666666666663s;
@@ -483,18 +464,42 @@
 						}
 					</style>
 					<div class="uil-default-css" style="transform: scale(0.22);">
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);"></div>
-						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);"></div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);">
+						</div>
+						<div
+							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);">
+						</div>
 					</div>
 				</div>
 				<div class="subtitle">

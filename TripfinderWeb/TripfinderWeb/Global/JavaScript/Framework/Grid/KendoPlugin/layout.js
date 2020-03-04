@@ -2,9 +2,9 @@
 {
 	createNamespace("TF.Grid").LayoutHelper = LayoutHelper;
 
-	function LayoutHelper()
+	function LayoutHelper ()
 	{ }
-	LayoutHelper.compareLayoutColumns = function functionName(leftColumns, rightColumns)
+	LayoutHelper.compareLayoutColumns = function functionName (leftColumns, rightColumns)
 	{
 		var isEqual = true;
 
@@ -103,7 +103,7 @@
 
 	createNamespace("TF.Grid").KendoGridLayoutMenu = KendoGridLayoutMenu;
 
-	function KendoGridLayoutMenu()
+	function KendoGridLayoutMenu ()
 	{
 		this.setStorageLayoutDataKey();
 		this._obCurrentGridLayoutExtendedDataModel = ko.observable(null);
@@ -324,12 +324,12 @@
 		{
 			typeName = this.options.kendoGridOption.entityType + "." + this.options.gridType;
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + typeName))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + tf.DataTypeHelper.getId(this.options.gridType)))
 			.then(function(apiResponse)
 			{
 				apiResponse.Items = [defaultGridLayoutExtendedEntity].concat(apiResponse.Items);
-				var validLayoutDataModels = self._filterLayoutsByDefaultColumns(apiResponse.Items.slice(1));
-				var gridLayoutExtendedDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, validLayoutDataModels);
+				var validLayoutDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items.slice(1));
+				var gridLayoutExtendedDataModels = self._filterLayoutsByDefaultColumns(validLayoutDataModels);
 				this.obGridLayoutExtendedDataModels(gridLayoutExtendedDataModels);
 				this._sortGridLayoutExtendedDataModels();
 				var selectGridLayoutExtendedEntity = null, currentGridLayoutExtendedEntity = null;
@@ -447,7 +447,7 @@
 		if (selectGridLayoutExtendedEntityId && selectGridLayoutExtendedEntityId !== '')
 		{
 			var selectGridLayoutExtendedEntity;
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout", this.options.gridType))
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + tf.DataTypeHelper.getId(this.options.gridType)))
 				.then(function(apiResponse)
 				{
 					selectGridLayoutExtendedEntity = Enumerable.From(apiResponse.Items).Where(function(c)
@@ -834,16 +834,10 @@
 
 	KendoGridLayoutMenu.prototype._getLayoutRelatedFilterId = function(layoutId)
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout/id", layoutId))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", layoutId))
 			.then(function(apiResponse)
 			{
-				var getLayoutExtended = apiResponse;
-
-				var relatedFilterId;
-				if (getLayoutExtended)
-					relatedFilterId = getLayoutExtended.FilterId;
-
-				return Promise.resolve(relatedFilterId);
+				return Promise.resolve(apiResponse && apiResponse.Items && apiResponse.Items[0] ? apiResponse.Items[0].FilterId : undefined);
 			});
 	};
 
@@ -967,9 +961,18 @@
 	{
 		this._resetAppliedLayoutInitState(this._obSelectedGridLayoutExtendedDataModel());
 		this._updateGridLayoutExtendedDataModels(this._obSelectedGridLayoutExtendedDataModel());
-		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "gridlayout"),
+		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", this._obSelectedGridLayoutExtendedDataModel().id()),
 			{
-				data: this._obSelectedGridLayoutExtendedDataModel().toData()
+				data: {
+					ID: this._obSelectedGridLayoutExtendedDataModel().id(),
+					DataTypeID: tf.DataTypeHelper.getId(this.options.gridType),
+					Name: this._obSelectedGridLayoutExtendedDataModel().name(),
+					FilterID: this._obSelectedGridLayoutExtendedDataModel().filterId(),
+					FilterName: this._obSelectedGridLayoutExtendedDataModel().filterName(),
+					ShowSummaryBar: this._obSelectedGridLayoutExtendedDataModel().showSummaryBar(),
+					Description: this._obSelectedGridLayoutExtendedDataModel().description(),
+					LayoutColumns: JSON.stringify(this._obSelectedGridLayoutExtendedDataModel().layoutColumns())
+				}
 			});
 	};
 
@@ -1079,7 +1082,7 @@
 
 	KendoGridLayoutMenu.prototype._validColumns = function(gridLayout, defaultColumns)
 	{
-		var self = this, isValid = false, columns = gridLayout.LayoutColumns;
+		var self = this, isValid = false, columns = gridLayout.layoutColumns();
 		for (i = 0; i < columns.length; i++)
 		{
 			if (defaultColumns.includes(columns[i].FieldName))

@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Page").SchedulerPage = SchedulerPage;
 
-	function SchedulerPage(gridType)
+	function SchedulerPage (gridType)
 	{
 		var self = this;
 		TF.Page.BaseGridPage.apply(self, arguments);
@@ -722,7 +722,7 @@
 
 	SchedulerPage.prototype.getRequestUrl = function(type)
 	{
-		return pathCombine(tf.api.apiPrefix(), "search", "fieldtrip");
+		return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldtrip"));
 	};
 
 	SchedulerPage.prototype.getOriginalDataSource = function(type, filters)

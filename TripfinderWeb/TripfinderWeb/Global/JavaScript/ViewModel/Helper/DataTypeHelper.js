@@ -30,9 +30,9 @@
 			isMajorType: false,
 			hasDBID: true
 		}
-    };
-    
-	function DataTypeHelper()
+	};
+
+	function DataTypeHelper ()
 	{
 
 	};
@@ -74,14 +74,14 @@
 			});
 	};
 
-    /**
-	 * Get the best matched object with type.
-	 * Currently, many places are using different names for data type, this function is to give a little bit flexibility.
-	 * However, this is only a temporary solution. Should be removed once we have data type names standardised.
-	 * 
-	 * @param {string} str2
-	 * @return {object}
-	 */
+	/**
+ * Get the best matched object with type.
+ * Currently, many places are using different names for data type, this function is to give a little bit flexibility.
+ * However, this is only a temporary solution. Should be removed once we have data type names standardised.
+ * 
+ * @param {string} str2
+ * @return {object}
+ */
 	DataTypeHelper.prototype._getObjectByType = function(type)
 	{
 		var self = this, match = null, type = (type || "").toLowerCase();
@@ -110,15 +110,15 @@
 		}
 
 		return match;
-    };
-    
-    /**
-	 * Define how fuzzy is the matching. 
-	 *
-	 * @param {string} str1
-	 * @param {string} str2
-	 * @returns {boolean}
-	 */
+	};
+
+	/**
+ * Define how fuzzy is the matching. 
+ *
+ * @param {string} str1
+ * @param {string} str2
+ * @returns {boolean}
+ */
 	DataTypeHelper.prototype._fuzzyMatch = function(str1, str2)
 	{
 		return str1 === str2;
@@ -135,7 +135,7 @@
 		var obj = this._getObjectByType(type);
 		return obj ? obj.endpoint : type;
 	};
-	
+
 	/**
 	 * Get  id in a request.
 	 *
@@ -146,6 +146,48 @@
 	{
 		var obj = this._getObjectByType(type);
 		return obj ? obj.id : 0;
+	};
+
+
+	DataTypeHelper.prototype.getNameById = function(id)
+	{
+		var types = _DATA_TYPES.filter(function(type) { return type.id === id; });
+		if (types.length === 1)
+		{
+			return types[0].name;
+		}
+		return null;
+	};
+
+	DataTypeHelper.prototype.getIdByName = function(name)
+	{
+		var types = _DATA_TYPES.filter(function(type) { return type.name === name });
+		if (types.length === 1)
+		{
+			return types[0].id;
+		}
+
+		return null;
+	};
+
+	DataTypeHelper.prototype.getNameByType = function(type)
+	{
+		var obj = this._getObjectByType(type);
+		return obj ? obj.name : "";
+	};
+
+	/**
+	 * for new exported files due to table field changed of backend.
+	 */
+	DataTypeHelper.prototype.getNamebyLowerCaseName = function(name)
+	{
+		if (!name) return;
+
+		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function(item) { return (item.name || "").toLowerCase() == name.toLowerCase(); });
+
+		if (matched.length != 1) return;
+
+		return matched[0].name;
 	};
 
 	tf.DataTypeHelper = new TF.DataTypeHelper();

@@ -5,7 +5,7 @@
 	ManageFilterViewMobileModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ManageFilterViewMobileModel.prototype.constructor = ManageFilterViewMobileModel;
 
-	function ManageFilterViewMobileModel(obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, obSelectedGridFilterName, negativeClick)
+	function ManageFilterViewMobileModel (obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, obSelectedGridFilterName, negativeClick)
 	{
 		this.fnSaveAndEditGridFilter = fnSaveAndEditGridFilter;
 		this.fnApplyGridFilter = fnApplyGridFilter;
@@ -28,57 +28,57 @@
 				if (item instanceof HTMLElement && $(item).hasClass("mobile-modal-grid-select-option") && parseInt($(item).attr('filter-id')) > 0)
 				{
 					new TF.TapHelper(item,
-					{
-						swipingLeft: function(evt)
 						{
-							var $element = $(evt.target).closest(".mobile-modal-grid-select-option"),
-								swipedItem;
-							$.each($(item).parent().find(".mobile-modal-grid-select-option"), function(index, option)
+							swipingLeft: function(evt)
 							{
-								if ($(option).css("marginLeft") === left)
+								var $element = $(evt.target).closest(".mobile-modal-grid-select-option"),
+									swipedItem;
+								$.each($(item).parent().find(".mobile-modal-grid-select-option"), function(index, option)
 								{
-									swipedItem = $(option);
-									return false;
+									if ($(option).css("marginLeft") === left)
+									{
+										swipedItem = $(option);
+										return false;
+									}
+								});
+								if ($element.is(':animated') || $element.css("marginLeft") === left || (swipedItem && swipedItem.is(':animated')))
+									return;
+								if (swipedItem)
+								{
+									swipedItem.stop().animate(
+										{
+											marginLeft: "15px",
+											marginRight: "0"
+										}, 200);
 								}
-							});
-							if ($element.is(':animated') || $element.css("marginLeft") === left || (swipedItem && swipedItem.is(':animated')))
-								return;
-							if (swipedItem)
+								$element.stop().animate(
+									{
+										marginLeft: left,
+										marginRight: right
+									}, 200);
+							},
+							swipingRight: function(evt)
 							{
-								swipedItem.stop().animate(
+								var $element = $(evt.target).closest(".mobile-modal-grid-select-option");
+								if ($element.is(':animated') || $element.css("marginLeft") !== left)
+									return;
+								$element.stop().animate(
+									{
+										marginLeft: "15px",
+										marginRight: "0"
+									}, 200);
+							},
+							touchOver: function(evt)
+							{
+								if (this.isTouching)
 								{
-									marginLeft: "15px",
-									marginRight: "0"
-								}, 200);
-							}
-							$element.stop().animate(
-							{
-								marginLeft: left,
-								marginRight: right
-							}, 200);
-						},
-						swipingRight: function(evt)
-						{
-							var $element = $(evt.target).closest(".mobile-modal-grid-select-option");
-							if ($element.is(':animated') || $element.css("marginLeft") !== left)
-								return;
-							$element.stop().animate(
-							{
-								marginLeft: "15px",
-								marginRight: "0"
-							}, 200);
-						},
-						touchOver: function(evt)
-						{
-							if (this.isTouching)
-							{
-								setTimeout(function()
-								{
-									this.isTouching = false;
-								}.bind(this), 200);
-							}
-						}.bind(this)
-					});
+									setTimeout(function()
+									{
+										this.isTouching = false;
+									}.bind(this), 200);
+								}
+							}.bind(this)
+						});
 				}
 			});
 		});
@@ -90,10 +90,10 @@
 		if ($element.length > 0 && $element.css("marginLeft") === ('-' + this.operationWith + 'px') && !$element.is(':animated'))
 		{
 			$element.stop().animate(
-			{
-				marginLeft: "15px",
-				marginRight: "0"
-			}, 200);
+				{
+					marginLeft: "15px",
+					marginRight: "0"
+				}, 200);
 		}
 		else if (filter.isValid())
 		{
@@ -126,40 +126,40 @@
 				var displayMessage = apiResponse.length ? 'This Filter is associated with one or more Layouts. Deleting it will remove it from those Layouts. Are you sure you want to delete?' : 'Are you sure you want to delete this Filter?';
 
 				return tf.promiseBootbox.yesNo(
-				{
-					message: displayMessage,
-					buttons:
 					{
-						yes:
+						message: displayMessage,
+						buttons:
 						{
-							label: "Delete",
-							className: "btn-delete-mobile"
-						},
-						no:
-						{
-							label: "Cancel",
-							className: "btn-cancel-mobile"
-						}
-					}
-				}, "Delete Confirmation").then(function(result)
-				{
-					if (result)
-					{
-						tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "gridfilter", filterId))
-							.then(function(response)
+							yes:
 							{
-								var _storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
-								var currentStickFilterId = tf.storageManager.get(_storageFilterDataKey);
-								if (currentStickFilterId === filterId)
-									tf.storageManager.save(_storageFilterDataKey, '');
-
-								if (response.Items[0])
+								label: "Delete",
+								className: "btn-delete-mobile"
+							},
+							no:
+							{
+								label: "Cancel",
+								className: "btn-cancel-mobile"
+							}
+						}
+					}, "Delete Confirmation").then(function(result)
+					{
+						if (result)
+						{
+							tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId))
+								.then(function(response)
 								{
-									this.obGridFilterDataModels.remove(filter);
-								}
-							}.bind(this));
-					}
-				}.bind(this));
+									var _storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
+									var currentStickFilterId = tf.storageManager.get(_storageFilterDataKey);
+									if (currentStickFilterId === filterId)
+										tf.storageManager.save(_storageFilterDataKey, '');
+
+									if (response.Items[0])
+									{
+										this.obGridFilterDataModels.remove(filter);
+									}
+								}.bind(this));
+						}
+					}.bind(this));
 			}.bind(this));
 	};
 
@@ -183,8 +183,8 @@
 		}
 
 		this.fnSaveAndEditGridFilter("new", null, false, false,
-		{
-			title: "New Filter"
-		});
+			{
+				title: "New Filter"
+			});
 	};
 })();
