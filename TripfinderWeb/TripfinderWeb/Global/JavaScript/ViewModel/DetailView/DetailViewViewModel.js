@@ -81,7 +81,7 @@
 			contentColor: "#000000"
 		};
 		self.basicGridConfig = {
-			fieldtrips: { title: "Name", subTitle: "DepartDateTime" }
+			fieldtrip: { title: "Name", subTitle: "DepartDateTime" }
 		};
 		//Image
 		self.oberrormessage = ko.observable(null);
@@ -3203,7 +3203,7 @@
 						var path = pathCombine(tf.api.apiPrefix(), "DocumentFiles?hashKey=" + keyApiResponse.Items[0]);
 						if (view && viewableMimeTypes.indexOf(mimeType) > -1)
 						{
-							path += "?view=true";
+							path += "&view=true";
 						}
 
 						window.open(path);
