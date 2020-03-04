@@ -722,15 +722,26 @@
 			$.each(barriers, function(index, item)
 			{
 				var content = item.find(".grid-stack-item-content"), originColor, isLine = content.length <= 0;
+				var $content = $(content[0]);
 				if (!isLine)
 				{
-					originColor = content.css("borderColor");
+					content.css("borderColor", $content.attr('data-gs-borderColor') ? $content.attr('data-gs-borderColor') : content.css("borderColor"));
+					if (!$content.attr('data-gs-borderColor'))
+					{
+						$content.attr('data-gs-borderColor', content.css("borderColor"));
+					}
+					//originColor = content.css("borderColor");
 					content.removeClass("animation");
 					content.css("borderColor", "#ff0000");
 				}
 				else
 				{
-					originColor = item.css("backgroundColor");
+					content.css("borderColor", $content.attr('data-gs-backgroundColor') ? $content.attr('data-gs-backgroundColor') : content.css("backgroundColor"));
+					if (!$content.attr('data-gs-backgroundColor'))
+					{
+						$content.attr('data-gs-backgroundColor', content.css("backgroundColor"));
+					}
+					//originColor = item.css("backgroundColor");
 					item.css("backgroundColor", "#ff0000");
 				}
 
@@ -739,7 +750,7 @@
 					if (!isLine)
 					{
 						content.addClass("animation");
-						content.css("borderColor", originColor);
+						content.css("borderColor", $content.attr('data-gs-borderColor'));
 						//animation just for border color changing.
 						setTimeout(function()
 						{
@@ -748,7 +759,7 @@
 					}
 					else
 					{
-						item.css("backgroundColor", originColor);
+						item.css("backgroundColor", $content.attr('data-gs-backgroundColor'));
 					}
 				}, 5000));
 			});
@@ -2409,7 +2420,7 @@
 	 */
 	DetailViewViewModel.prototype.formatDataContent = function(content, type, format)
 	{
-		function formatNumber (num)
+		function formatNumber(num)
 		{
 			return num > 9 ? num : "0" + num;
 		}
@@ -3045,7 +3056,7 @@
 			scheduleItemDom = "", eventsDom = "",
 			allEvents = [];
 
-		function getShortClassName ()
+		function getShortClassName()
 		{
 			return ($calendarItem.hasClass("fill-four") ||
 				$calendarItem.hasClass("fill-three") ||
@@ -3844,7 +3855,7 @@
 		var $calendar = $calendarGroup.find(".calendar"),
 			$events = $calendarGroup.find(".schedule");
 
-		function resetClass (className)
+		function resetClass(className)
 		{
 			$calendarGroup.removeClass("fill-one");
 			$calendarGroup.removeClass("fill-two");
@@ -3853,7 +3864,7 @@
 			$calendarGroup.addClass(className);
 		};
 
-		function updateEvents (className)
+		function updateEvents(className)
 		{
 			if (!className || $calendarGroup.hasClass(className))
 			{
