@@ -99,33 +99,42 @@
 
 		self.options.summaryFilterFunction = function(selectGridFilterEntityId)
 		{
-			if (selectGridFilterEntityId === -1 || selectGridFilterEntityId === -2)
+			var paramData = null;
+			switch (selectGridFilterEntityId)
 			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtripdepartingtrips")).then(function(response)
-				{
-					return response.Items[0];
-				});
-			}
-			if (selectGridFilterEntityId === -3 || selectGridFilterEntityId === -4 ||
-				selectGridFilterEntityId === -5 || selectGridFilterEntityId === -6)
-			{
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "statistics", "fieldtrip")).then(function(response)
-				{
-					switch (selectGridFilterEntityId)
-					{
-						case -3:
-							return response.AwaitingApprovalList;
-						case -4:
-							return response.RejectedList;
-						case -5:
-							return response.TotalList;
-						case -6:
-							return response.TransportationApprovedList;
-						default:
-							return null;
+				case -1:
+				case -2:
+					var today = new Date(), tomorrow = new Date();
+					tomorrow.setTime(tomorrow.getTime()+ 24 * 60 * 60 * 1000);
+					var today_str = today.getFullYear()+"-" + (today.getMonth() + 1) + "-" + today.getDate(),
+					tomorrow_str = tomorrow.getFullYear()+"-" + (tomorrow.getMonth() + 1) + "-" + tomorrow.getDate();
+					paramData = { 
+						"@filter": "eq(FieldTripStageId,99)&lt(DepartDateTime," + tomorrow_str + ")&ge(EstimatedReturnDateTime," + today_str + ")", 
+						"@fields": "Id" 
 					}
+						break;
+				case -3:
+					paramData = { "@filter": "in(FieldTripStageId,1,3,5,7)", "@fields": "Id" }
+					break;
+				case -4:
+					paramData = { "@filter": "in(FieldTripStageId,2,4,6,8)", "@fields": "Id" }
+					break;
+				case -5:
+					paramData = { "@filter": "noteq(FieldTripStageId,100)", "@fields": "Id" }
+					break;
+				case -6:
+					paramData = { "@filter": "eq(FieldTripStageId,99)", "@fields": "Id" }
+					break;
+			}
+
+			if (paramData)
+			{
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtrip")), { paramData: paramData}).then(function(response)
+				{
+					return response.Items.map(r=> r.Id);
 				});
 			}
+
 			return Promise.resolve(null);
 		};
 
