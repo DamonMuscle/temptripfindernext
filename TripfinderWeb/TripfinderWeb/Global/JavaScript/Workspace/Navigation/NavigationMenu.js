@@ -820,6 +820,7 @@
 
 	NavigationMenu.prototype.openDataSourceButtonClick = function()
 	{
+		var self = this;
 		tf.showSelectDataSourceModel(tf.pageManager.currentDatabaseName());
 		self.closeOpenedNavigationItemMenu(false);
 
