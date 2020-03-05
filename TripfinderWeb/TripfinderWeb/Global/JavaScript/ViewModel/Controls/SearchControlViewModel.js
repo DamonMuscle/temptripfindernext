@@ -1355,7 +1355,9 @@
 
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userSearchRecords"), {
 			paramData: {
-				applicationID: TF.productID
+				applicationID: TF.productID,
+				dbID: tf.storageManager.get("datasourceId"),
+				"@sort": "CreatedOn|desc"
 			}
 		}, { overlay: false })
 			.then(function(response)
