@@ -481,8 +481,8 @@
 			}
 		}).then(function(apiResponse)
 		{
-			// Update the "OmittedRecord" to "OmittedRecords" on the "GridFilterDataModel"
-			// Because the api filed name is "OmittedRecords"
+			// Update the API filed name "OmittedRecords" to "OmittedRecord"
+			// Because "GridFilterDataModel" defined name is "OmittedRecord"
 			apiResponse.Items.forEach(function(item){
 				item['OmittedRecord'] = item['OmittedRecords'];
 			})
