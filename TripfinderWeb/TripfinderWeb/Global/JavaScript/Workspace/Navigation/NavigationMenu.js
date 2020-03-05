@@ -350,7 +350,7 @@
 			// If the quick search is active, the icons should be hidden.
 			$navContent.css("display", "block");
 			$quickSearch.css("height", 54);
-			$navItems.css({ opacity: 1 }).stop().animate({ opacity: isQuickSearchActive ? 0 : 1 }, { duration: fadeDuration, queue: false });
+			$navItems.css({ opacity: 1 }).stop().animate({ opacity: isQuickSearchActive ? 0 : 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
 			$spinner.css("left", "2px");
 			$moreBtn.css("opacity", 0).stop().animate({ opacity: 0 }, {
 				duration: fadeDuration, queue: false, done: function()
