@@ -481,6 +481,11 @@
 			}
 		}).then(function(apiResponse)
 		{
+			// Update the API filed name "OmittedRecords" to "OmittedRecord"
+			// Because "GridFilterDataModel" defined name is "OmittedRecord"
+			apiResponse.Items.forEach(function(item){
+				item['OmittedRecord'] = item['OmittedRecords'];
+			})
 			var gridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, apiResponse.Items);
 			//IF the request from search, do not use the sticky fliter.
 			if (self.options.fromSearch || self.options.isTemporaryFilter)
