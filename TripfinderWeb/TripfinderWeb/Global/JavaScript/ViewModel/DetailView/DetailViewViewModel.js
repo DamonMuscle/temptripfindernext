@@ -690,7 +690,7 @@
 				appearance = $item.data("appearance");
 				if ($item.find(".grid-stack-item-content").length > 0)
 				{
-					$item.find(".grid-stack-item-content").css("borderColor", JSON.parse(appearance).borderColor);
+					$item.find(".grid-stack-item-content").css("borderColor", JSON.parse(appearance).borderColor ? JSON.parse(appearance).borderColor : "transparent");
 				}
 				else
 				{
@@ -723,25 +723,14 @@
 			{
 				var content = item.find(".grid-stack-item-content"), originColor, isLine = content.length <= 0;
 				var $content = $(content[0]);
+				var appearance = $content.parent().data("appearance");
 				if (!isLine)
 				{
-					content.css("borderColor", $content.attr('data-gs-borderColor') ? $content.attr('data-gs-borderColor') : content.css("borderColor"));
-					if (!$content.attr('data-gs-borderColor'))
-					{
-						$content.attr('data-gs-borderColor', content.css("borderColor"));
-					}
-					//originColor = content.css("borderColor");
 					content.removeClass("animation");
 					content.css("borderColor", "#ff0000");
 				}
 				else
 				{
-					content.css("borderColor", $content.attr('data-gs-backgroundColor') ? $content.attr('data-gs-backgroundColor') : content.css("backgroundColor"));
-					if (!$content.attr('data-gs-backgroundColor'))
-					{
-						$content.attr('data-gs-backgroundColor', content.css("backgroundColor"));
-					}
-					//originColor = item.css("backgroundColor");
 					item.css("backgroundColor", "#ff0000");
 				}
 
@@ -750,7 +739,7 @@
 					if (!isLine)
 					{
 						content.addClass("animation");
-						content.css("borderColor", $content.attr('data-gs-borderColor'));
+						content.css("borderColor", JSON.parse(appearance).borderColor ? JSON.parse(appearance).borderColor : "transparent");
 						//animation just for border color changing.
 						setTimeout(function()
 						{
@@ -759,7 +748,7 @@
 					}
 					else
 					{
-						item.css("backgroundColor", $content.attr('data-gs-backgroundColor'));
+						item.css("backgroundColor", JSON.parse(appearance).backgroundColor ? JSON.parse(appearance).backgroundColor : "transparent");
 					}
 				}, 5000));
 			});
