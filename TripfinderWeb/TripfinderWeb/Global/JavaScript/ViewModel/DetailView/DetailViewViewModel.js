@@ -690,7 +690,7 @@
 				appearance = $item.data("appearance");
 				if ($item.find(".grid-stack-item-content").length > 0)
 				{
-					$item.find(".grid-stack-item-content").css("borderColor", JSON.parse(appearance).borderColor);
+					$item.find(".grid-stack-item-content").css("borderColor", JSON.parse(appearance).borderColor ? JSON.parse(appearance).borderColor : "transparent");
 				}
 				else
 				{
@@ -722,15 +722,15 @@
 			$.each(barriers, function(index, item)
 			{
 				var content = item.find(".grid-stack-item-content"), originColor, isLine = content.length <= 0;
+				var $content = $(content[0]);
+				var appearance = $content.parent().data("appearance");
 				if (!isLine)
 				{
-					originColor = content.css("borderColor");
 					content.removeClass("animation");
 					content.css("borderColor", "#ff0000");
 				}
 				else
 				{
-					originColor = item.css("backgroundColor");
 					item.css("backgroundColor", "#ff0000");
 				}
 
@@ -739,7 +739,7 @@
 					if (!isLine)
 					{
 						content.addClass("animation");
-						content.css("borderColor", originColor);
+						content.css("borderColor", JSON.parse(appearance).borderColor ? JSON.parse(appearance).borderColor : "transparent");
 						//animation just for border color changing.
 						setTimeout(function()
 						{
@@ -748,7 +748,7 @@
 					}
 					else
 					{
-						item.css("backgroundColor", originColor);
+						item.css("backgroundColor", JSON.parse(appearance).backgroundColor ? JSON.parse(appearance).backgroundColor : "transparent");
 					}
 				}, 5000));
 			});
@@ -2409,7 +2409,7 @@
 	 */
 	DetailViewViewModel.prototype.formatDataContent = function(content, type, format)
 	{
-		function formatNumber (num)
+		function formatNumber(num)
 		{
 			return num > 9 ? num : "0" + num;
 		}
@@ -3045,7 +3045,7 @@
 			scheduleItemDom = "", eventsDom = "",
 			allEvents = [];
 
-		function getShortClassName ()
+		function getShortClassName()
 		{
 			return ($calendarItem.hasClass("fill-four") ||
 				$calendarItem.hasClass("fill-three") ||
@@ -3844,7 +3844,7 @@
 		var $calendar = $calendarGroup.find(".calendar"),
 			$events = $calendarGroup.find(".schedule");
 
-		function resetClass (className)
+		function resetClass(className)
 		{
 			$calendarGroup.removeClass("fill-one");
 			$calendarGroup.removeClass("fill-two");
@@ -3853,7 +3853,7 @@
 			$calendarGroup.addClass(className);
 		};
 
-		function updateEvents (className)
+		function updateEvents(className)
 		{
 			if (!className || $calendarGroup.hasClass(className))
 			{
