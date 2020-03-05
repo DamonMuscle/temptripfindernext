@@ -125,7 +125,7 @@
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtrip")), { paramData: paramData}).then(function(response)
 				{
-					return response.Items.map(r=> r.Id);
+					return response.Items.map(function(r){ return r.Id });
 				});
 			}
 
