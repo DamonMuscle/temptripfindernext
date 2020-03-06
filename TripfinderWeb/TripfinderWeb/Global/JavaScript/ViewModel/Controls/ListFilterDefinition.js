@@ -2,7 +2,7 @@
 {
 	createNamespace('TF').ListFilterDefinition = ListFilterDefinition;
 
-	function ListFilterDefinition()
+	function ListFilterDefinition ()
 	{ }
 	ListFilterDefinition.ListFilterTemplate = {};
 
@@ -53,11 +53,11 @@
 
 				// add filter item for ticket view-1399
 				requestOptions.data.filterSet = requestOptions.data.filterSet ||
-					{
-						FilterItems: [],
-						FilterSets: [],
-						LogicalOperator: "and"
-					};
+				{
+					FilterItems: [],
+					FilterSets: [],
+					LogicalOperator: "and"
+				};
 				filterItem = {
 					FieldName: "Gpsid",
 					Operator: "IsNotNull",
@@ -153,7 +153,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "fieldTrip");
+				return pathCombine(tf.api.apiPrefix(), "search", "fieldTrips");
 			}
 		}, true);
 
@@ -195,7 +195,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "school");
+				return pathCombine(tf.api.apiPrefix(), "search", "schools");
 			}
 		}, true);
 
@@ -213,11 +213,11 @@
 			setLeftGridRequestOption: function(requestOptions)
 			{
 				requestOptions.data.filterSet = requestOptions.data.filterSet ||
-					{
-						FilterItems: [],
-						FilterSets: [],
-						LogicalOperator: "and"
-					};
+				{
+					FilterItems: [],
+					FilterSets: [],
+					LogicalOperator: "and"
+				};
 				filterItem = {
 					FieldName: "Tschl",
 					Operator: "EqualTo",
@@ -355,7 +355,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripActivity");
+				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripActivities");
 			}
 		}, true);
 
@@ -721,7 +721,7 @@
 				requestMethod: "post",
 				getUrl: function()
 				{
-					return pathCombine(tf.api.apiPrefix(), "search", gridType, "aggregate") + "?" + $.param(
+					return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(gridType), "aggregate") + "?" + $.param(
 						{
 							FieldName: fieldName,
 							AggregateOperator: "Distinct"

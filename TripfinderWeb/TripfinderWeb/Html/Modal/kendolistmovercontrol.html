@@ -1,0 +1,41 @@
+<div class="row" data-bind="visible:$parent.description">
+	<div class="col-xs-24 description" data-bind="text:$parent.description"></div>
+</div>
+<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+<!-- /ko -->
+<div data-bind="uiInit:$parent.containerLoaded,finish:init">
+	<div class="row list-mover-mover edit-kendo-columns">
+		<div class="col-xs-11">
+			<div class="form-group">
+				<div class="list-mover-iconrow-wrapper">
+					<label>Available</label>
+					<div class="iconrow">
+						<div class="iconbutton refresh no-other-icon" title="Refresh" data-bind="click:refreshClick"></div>
+					</div>
+				</div>
+				<div data-bind="" class="vertical-size-large grid-container availablecolumngrid-container kendo-grid">
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-1 vertical-size-large move-button-column">
+			<a data-bind="click:toAllRightClick,css:{disabled:obavailableColumns().length == 0}"
+				class="btn btn-default btn-sm">&gt;&gt;</a>
+			<a data-bind="click:toRightClick,css:{disabled:!obLeftGridSelected()}"
+				class="btn btn-default btn-sm single">&gt;</a>
+			<a data-bind="click:toLeftClick,css:{disabled:!obRightGridSelected()}"
+				class="btn btn-default btn-sm single">&lt;</a>
+			<a data-bind="click:toAllLeftClick,css:{disabled:obselectedColumns().length == 0}"
+				class="btn btn-default btn-sm">&lt;&lt;</a>
+		</div>
+		<div class="col-xs-11">
+			<div class="form-group">
+				<div class="list-mover-iconrow-wrapper">
+					<label>Selected</label>
+				</div>
+				<div data-bind=""
+					class="vertical-size-large vertical-fill grid-container selectedcolumngrid-container kendo-grid">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
