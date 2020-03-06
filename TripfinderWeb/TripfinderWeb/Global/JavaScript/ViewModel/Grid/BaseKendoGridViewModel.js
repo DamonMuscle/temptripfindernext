@@ -187,11 +187,7 @@
 					var type = this.type;
 					if (this.type == "documentmini")
 						type = "document";
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"), {
-						paramData: {
-							clientId: tf.authManager.clientKey
-						}
-					})
+					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"))
 						.then(function(data)
 						{
 							if (!!data.Items[0].EmailAddress)

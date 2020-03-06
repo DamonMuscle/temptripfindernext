@@ -627,6 +627,7 @@
 			filterField: "GeoCounty",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "mapdata", "mapsetandzipcode");
 			},
 			modifySource: function(source)

@@ -349,7 +349,7 @@
 				{
 					promisePost = function()
 					{
-						return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "gridemail"),
+						return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails?onlyMessage=true"),
 							{
 								data: sendData
 							});
@@ -396,13 +396,7 @@
 		{
 			return Promise.resolve(self.clientConfig.Smtphost && self.clientConfig.Smtpport)
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"),
-			{
-				paramData:
-				{
-					clientId: tf.authManager.clientKey
-				}
-			})
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), null)
 			.then(function(data)
 			{
 				if (data.Items && data.Items.length > 0)

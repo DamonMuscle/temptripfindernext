@@ -5,6 +5,7 @@
 	var _DATA_TYPE_ATTRIBUTES = {
 		fieldtrip: {
 			endpoint: "fieldtrips",
+			exportEndpoint: "FieldTripExportFiles",
 			name: "Field Trip",
 			idParamName: "fieldTripId",
 			gridDefinition: "fieldTripGridDefinition",
@@ -137,7 +138,7 @@
 	};
 
 	/**
-	 * Get  id in a request.
+	 * Get id in a request.
 	 *
 	 * @param {string} type
 	 * @returns
@@ -146,6 +147,18 @@
 	{
 		var obj = this._getObjectByType(type);
 		return obj ? obj.id : 0;
+	};
+
+	/**
+	 * Get export endpoint node text for data type.
+	 *
+	 * @param {string} type
+	 * @returns
+	 */
+	DataTypeHelper.prototype.getExportEndpoint = function(type)
+	{
+		var obj = this._getObjectByType(type);
+		return obj ? obj.exportEndpoint : type;
 	};
 
 
