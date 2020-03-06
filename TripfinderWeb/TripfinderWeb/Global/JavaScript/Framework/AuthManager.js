@@ -200,6 +200,7 @@
 
 	AuthManager.prototype.authorizationUrl = function()
 	{
+		// TODO-V2, need to research
 		Array.prototype.unshift.call(arguments, tf.api.apiPrefix());
 		return pathCombine.apply(null, arguments);
 	};

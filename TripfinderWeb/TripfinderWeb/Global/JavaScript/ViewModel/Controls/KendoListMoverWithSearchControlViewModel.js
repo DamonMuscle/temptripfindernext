@@ -27,11 +27,12 @@
 			}
 			if (gridType === "student")
 			{
+				// TODO-V2, need to research
 				return pathCombine(prefix, "search", "student", "basic");
 			}
 			else
 			{
-				return pathCombine(prefix, "search", gridType);
+				return pathCombine(prefix, "search", tf.DataTypeHelper.getId(gridType));
 			}
 		},
 		getParamData: function(searchData)
@@ -804,7 +805,7 @@
 	{
 		if (this.options.dataSource)
 		{
-			return pathCombine(tf.api.apiPrefixWithoutDatabase(), this.options.dataSource, 'search', this.options.type);
+			return pathCombine(tf.api.apiPrefixWithoutDatabase(), this.options.dataSource, "search", tf.DataTypeHelper.getId(this.options.type));
 		}
 		return url;
 	};

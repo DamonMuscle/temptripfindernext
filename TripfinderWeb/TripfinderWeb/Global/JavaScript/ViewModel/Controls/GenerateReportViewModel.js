@@ -216,6 +216,7 @@
 	{
 		if (this.options && this.options.selectedRecordId)
 		{
+			// TODO-V2, need to research
 			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.datasourceManager.databaseId, this.options.type, "ids"),
 				{
 					data: this.options.selectedRecordId
@@ -439,6 +440,7 @@
 			}.bind(this));
 		promises.push(p1);
 
+		// TODO-V2, need to research
 		var p4 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "reportuser"))
 			.then(function(data)
 			{

@@ -213,13 +213,7 @@
 			return Promise.resolve();
 		}
 		option.emailAddress = [];
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"),
-			{
-				paramData:
-				{
-					clientId: tf.authManager.clientKey
-				}
-			}, { overlay: false })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), null, { overlay: false })
 			.then(function(data)
 			{
 				if (!!data.Items[0].EmailAddress)
@@ -1020,7 +1014,7 @@
 				{
 					sendData.attachments = this._convertDocumentEntitiesToJSON(this.documentEntities());
 				}
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig", "gridemail"),
+				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails?onlyMessage=true"),
 					{
 						data: sendData
 					}).then(function(data)
@@ -1059,13 +1053,7 @@
 
 	SendEmailOfGridViewModel.prototype.checkConfigure = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfig"),
-			{
-				paramData:
-				{
-					clientId: tf.authManager.clientKey
-				}
-			}, { overlay: false })
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), null, { overlay: false })
 			.then(function(data)
 			{
 				if (data.Items && data.Items.length > 0)
@@ -1198,7 +1186,7 @@
 	{
 		if (this.obRecipientList().length === 0 && TF.isPhoneDevice)
 		{
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "user"), {}, { overlay: false }).then(function(apiResponse)
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "users"), {}, { overlay: false }).then(function(apiResponse)
 			{
 				apiResponse.Items = Enumerable.From(apiResponse.Items).Where("$.Email!=''").OrderBy("$.Email").ToArray();
 				apiResponse.Items.forEach(function(item)

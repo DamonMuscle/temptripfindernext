@@ -184,7 +184,7 @@
 					}).ToArray();
 					if (!this.options.kendoGridOption.entityType)
 					{ //minigrid will ignore the grid default table values
-						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefault"),
+						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefaults"),
 							{
 								data:
 								{
@@ -648,14 +648,14 @@
 	{
 		var self = this;
 
-		var url = pathCombine(tf.api.apiPrefix(), "search", this.options.gridType == "vehicle" ? "fleet" : this.options.gridType, "export");
+		var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getExportEndpoint(this.options.gridType));
 		this.getIdsWithCurrentFiltering()
 			.then(function(ids)
 			{
 				var gridLayoutExtendedEntity = self._obCurrentGridLayoutExtendedDataModel().toData();
 				gridLayoutExtendedEntity.LayoutColumns = self._obSelectedColumns();
 
-				var getDataUrl = url + '/getkey';
+				var getDataUrl = url;
 				var getDataOption = {
 					paramData:
 					{
@@ -700,7 +700,7 @@
 								{
 									var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
 									var databaseType = tf.datasourceManager.databaseType;
-									var fileUrl = pathCombine(url, keyApiResponse.Items[0], "databaseType", databaseType, fileFormat);
+									var fileUrl = url + "?key=" + keyApiResponse.Items[0] + "&fileFormat=" + fileFormat;
 									if (TF.isMobileDevice)
 									{
 										window.open(fileUrl);

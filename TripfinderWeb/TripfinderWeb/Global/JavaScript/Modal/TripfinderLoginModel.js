@@ -171,9 +171,9 @@
 		tf.entStorageManager.save("token", "");
 		var forgetPasswordData = {
 			paramData: {
-				product: "Tripfinder",
+				product: TF.productName,
 				username: tf.authManager.userName,
-				vendor: "Transfinder"
+				vendor: TF.vendor
 			}
 		};
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), forgetPasswordData)

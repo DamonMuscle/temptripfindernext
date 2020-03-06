@@ -2696,6 +2696,7 @@
 											}
 											else if (this._gridType === "busfinderhistorical")
 											{
+												// TODO-V2, need to remove
 												var url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/getFilterValue");
 
 												var options = this.getApiRequestOption(kendoOption);

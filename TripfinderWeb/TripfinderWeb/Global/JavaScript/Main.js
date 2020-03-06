@@ -11,6 +11,8 @@ $(function()
 
 createNamespace("TF").productName = "Tripfinder";
 
+createNamespace("TF").vendor = "Transfinder";
+
 var namespace = createNamespace("pb");
 pb.DATA_CHANGE = "datachange";
 pb.ADD = "add";

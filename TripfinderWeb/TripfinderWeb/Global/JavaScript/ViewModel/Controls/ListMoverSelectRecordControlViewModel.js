@@ -10,7 +10,7 @@
 			{
 				prefix = pathCombine(tf.api.apiPrefixWithoutDatabase(), options.dataSource);
 			}
-			return pathCombine(prefix, "search", gridType);
+			return pathCombine(prefix, "search",  tf.DataTypeHelper.getId(gridType));
 		};
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 		this.pageLevelViewModel = new TF.PageLevel.ListMoverPageLevelViewModel(this);
