@@ -804,6 +804,7 @@
 	{
 		options = options || {};
 		options.currentObFilters = this.obGridFilterDataModels.slice();
+		gridFilterDataModel.gridType(this.options.gridType);
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
 				this.options.gridType, isNew,
