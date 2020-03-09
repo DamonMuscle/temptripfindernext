@@ -1,0 +1,41 @@
+﻿<div>
+	<div class="view-finder mobile-modal-grid-body">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 close-btn" data-bind="click:$parent.negativeClick.bind($parent)">Close</label>
+			<label class="col-xs-16 text-center"><b>MANAGE LAYOUTS</b></label>
+			<label class="col-xs-4"></label>
+		</div>
+		<div class="mobile-modal-grid-description">
+			<div class="search-group">
+				Layouts may be applied, edited, or deleted. Select a layout to apply it to the grid.
+			</div>
+		</div>
+		<div class="mobile-modal-content-body has-layout manage-layout">
+			<div class="mobile-modal-grid-select-option-wrap" data-bind="foreach:{ data: obGridLayoutExtendedDataModels(), afterRender: loaded.bind($data) }">
+				<div class='mobile-modal-grid-select-option swipe' data-bind="click:$parent.selectLayout.bind($parent),css:{'checked':$data.name()==$parent.obSelectedGridLayoutName()}">
+					<div class="col-xs-18 title">
+						<div data-bind="text:name"></div>
+						<div class="filter-name" data-bind="text:'FILTER: ' + (!!filterName()?filterName():'None')"></div>
+					</div>
+					<div class="col-xs-4 status" style="padding-right:15px;padding-left:0">
+						<div class="checked-icon">
+						</div>
+					</div>
+					<div class="operation Layout-operation">
+						<div class="delete-icon" data-bind="click:$parent.deleteGridLayout.bind($parent)">
+							<div class="icon"></div>
+							<div class="title">DELETE</div>
+						</div>
+						<div class="edit-icon" data-bind="click:$parent.editGridLayout.bind($parent)">
+							<div class="icon"></div>
+							<div class="title">EDIT</div>
+						</div>
+					</div>
+				</div>
+				<div class="mobile-modal-grid-select-divider"></div>
+			</div>
+			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}">
+			</div>
+		</div>
+	</div>
+</div>

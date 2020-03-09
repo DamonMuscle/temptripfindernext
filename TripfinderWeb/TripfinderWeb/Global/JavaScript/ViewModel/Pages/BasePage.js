@@ -224,15 +224,10 @@
 				var gridLayoutExtendedEntity = kendoGrid._obCurrentGridLayoutExtendedDataModel().toData();
 				gridLayoutExtendedEntity.LayoutColumns = kendoGrid._obSelectedColumns();
 
-				var url = pathCombine(tf.api.apiPrefix(), "search", kendoGrid.options.gridType, "export", "copy");
-				var options = {
-					data:
-					{
-						gridLayoutExtendedEntity: gridLayoutExtendedEntity,
-						selectedIds: selectedIds.length > 0 ? selectedIds : ids,
-						sortItems: kendoGrid.searchOption.data.sortItems
-					}
-				};
+				var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(kendoGrid.options.gridType));
+
+				var options = Object.assign({}, kendoGrid.searchOption.data);
+				options.idFilter.IncludeOnly = selectedIds;
 				if (kendoGrid.options.gridType === "busfinderhistorical")
 					self.setRequestOption(options);
 

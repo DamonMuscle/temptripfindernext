@@ -9,11 +9,7 @@
 			{
 				if (!($element.hasClass("disabled") || $element.hasClass("disabledToUse")))
 				{
-					// TODO, Disable the function for RCM of the grid for now
-					if (!$element.parent().hasClass("grid-menu"))
-					{
-						valueAccessor().call(this, viewModel, e);
-					}
+					valueAccessor().call(this, viewModel, e);
 
 					if (!$element.hasClass("disable-auto-close"))
 					{
@@ -30,7 +26,7 @@
 		}
 	};
 
-	function cancelCloseMenuEvent ($element)
+	function cancelCloseMenuEvent($element)
 	{
 		return !TF.Grid.FilterHelper.isFilterMenuOpen($element);
 	}
