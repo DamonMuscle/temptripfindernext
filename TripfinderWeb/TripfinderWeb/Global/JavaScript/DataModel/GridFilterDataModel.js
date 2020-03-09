@@ -21,7 +21,7 @@
 		{ from: "WhereClause", default: "" },
 		{ from: "IsValid", default: 1 },
 		{ from: "Type", default: 1 },
-		{ from: "OmittedRecord", default: [] },
+		{ from: "OmittedRecords", default: [] },
 		{ from: "Reminders", default: [] },
 		{ from: "ReminderName", default: 0 },
 		{ from: "ReminderId", default: 0 },

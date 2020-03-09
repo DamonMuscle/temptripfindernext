@@ -437,7 +437,7 @@
 			if (this.gridFilterDataModel.apiIsDirty())
 			{
 				setReminder(this.gridFilterDataModel);
-				this.gridFilterDataModel.omittedRecord(this.obOmitRecords());
+				this.gridFilterDataModel.omittedRecords(this.obOmitRecords());
 				var data = this.gridFilterDataModel.toData();
 				data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause()) ? tf.datasourceManager.databaseId : null;
 				data.DataTypeID = tf.DataTypeHelper.getId(data.GridType);
