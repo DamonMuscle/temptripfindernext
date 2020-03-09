@@ -189,11 +189,11 @@
 	KendoGridFilterMenu.prototype._omitRecordsChange = function()
 	{
 		var omittedRecords = [];
-		if (this.obSelectedGridFilterDataModel() && this.obSelectedGridFilterDataModel().omittedRecord())
+		if (this.obSelectedGridFilterDataModel() && this.obSelectedGridFilterDataModel().omittedRecords())
 		{
-			for (var i = 0; i < this.obSelectedGridFilterDataModel().omittedRecord().length; i++)
+			for (var i = 0; i < this.obSelectedGridFilterDataModel().omittedRecords().length; i++)
 			{
-				omittedRecords.push(this.obSelectedGridFilterDataModel().omittedRecord()[i].OmittedRecordId);
+				omittedRecords.push(this.obSelectedGridFilterDataModel().omittedRecords()[i].OmittedRecordId);
 			}
 			this._gridState.filteredExcludeAnyIds = omittedRecords;
 			this.obFilteredExcludeAnyIds(this._gridState.filteredExcludeAnyIds);
@@ -481,11 +481,6 @@
 			}
 		}).then(function(apiResponse)
 		{
-			// Update the API filed name "OmittedRecords" to "OmittedRecord"
-			// Because "GridFilterDataModel" defined name is "OmittedRecord"
-			apiResponse.Items.forEach(function(item){
-				item['OmittedRecord'] = item['OmittedRecords'];
-			})
 			var gridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, apiResponse.Items);
 			//IF the request from search, do not use the sticky fliter.
 			if (self.options.fromSearch || self.options.isTemporaryFilter)
@@ -804,7 +799,7 @@
 	{
 		options = options || {};
 		options.currentObFilters = this.obGridFilterDataModels.slice();
-		gridFilterDataModel.gridType(this.options.gridType);
+		gridFilterDataModel && gridFilterDataModel.gridType(this.options.gridType);
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
 				this.options.gridType, isNew,
@@ -858,7 +853,7 @@
 			{
 				return;
 			}
-			currentOmittedRecords = gridFilterDataModel.omittedRecord();
+			currentOmittedRecords = gridFilterDataModel.omittedRecords();
 			for (var i = 0; i < currentOmittedRecords.length; i++)
 			{
 				currentOmittedRecordIDs.push(currentOmittedRecords[i].OmittedRecordId);
@@ -880,7 +875,7 @@
 					FilterId: filterID,
 					OmittedRecordId: this.obTempOmitExcludeAnyIds()[i]
 				}
-				this.obSelectedGridFilterDataModel().omittedRecord().push(tempOmittedRecords);
+				this.obSelectedGridFilterDataModel().omittedRecords().push(tempOmittedRecords);
 			}
 		}
 		if (!searchData.data.filterSet && this.obTempOmitExcludeAnyIds().length === 0)
@@ -1288,9 +1283,9 @@
 		var take = 1;
 		var omitIds = null;
 		var filterSet = (this._gridState && this._gridState.filterSet) ? this._gridState.filterSet : null;
-		if (this.obSelectedGridFilterDataModel() && this.obSelectedGridFilterDataModel().omittedRecord())
+		if (this.obSelectedGridFilterDataModel() && this.obSelectedGridFilterDataModel().omittedRecords())
 		{
-			omitIds = this.obSelectedGridFilterDataModel().omittedRecord().map(function(o)
+			omitIds = this.obSelectedGridFilterDataModel().omittedRecords().map(function(o)
 			{
 				return o.OmittedRecordId;
 			});
