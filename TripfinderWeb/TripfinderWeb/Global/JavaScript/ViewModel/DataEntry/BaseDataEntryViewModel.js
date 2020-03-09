@@ -241,7 +241,12 @@
 		{
 			this._isCopyAndNew = this._view.mode === "Add";
 			tf.loadingIndicator.showImmediately();
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.type, this._view.mode === "Add" ? "newCopy" : "", this._view.id))
+			var getData = {
+				paramData: {
+					Id: this._view.id
+				}
+			};
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)), getData)
 				.then(function(response)
 				{
 					if (response && response.StatusCode === 404)
@@ -305,7 +310,7 @@
 
 	BaseDataEntryViewModel.prototype.loadSupplement = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userdefinedlabel", this.type))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userdefinedlabels" + "id=", tf.datatypehelper.getid(this.type)))
 			.then(function(data)
 			{
 				var userDefinedColumns = this.obUserDefinedColumns();
