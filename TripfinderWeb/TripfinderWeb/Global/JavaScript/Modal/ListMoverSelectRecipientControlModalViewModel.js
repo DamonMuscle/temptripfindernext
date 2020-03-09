@@ -14,7 +14,7 @@
 			disableFilter: true,
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "user");
+				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "users");
 			},
 			filterSetField: "AccountEnabled"
 		};

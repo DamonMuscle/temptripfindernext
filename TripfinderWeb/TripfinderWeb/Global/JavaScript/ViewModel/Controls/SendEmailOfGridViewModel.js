@@ -33,26 +33,27 @@
 		// this.associatedAddress = ko.observable("");
 		if (option.placeEmailTo)
 		{
-			tf.promiseAjax["post"](pathCombine(tf.api.apiPrefix(), this.option.type, "getEmails"),
+			tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.option.type)),
 				{
-					data:
+					paramData:
 					{
-						selectedIds: this.option.selectedIds,
-						emailColumns: this.option.emailColumns
+						Id: this.option.selectedIds,
+						"@relationships": "Contact, DestinationContact",
+						"@fields": "ContactEmail, DestinationContactEmail"
 					}
 				}, { overlay: false }).then(function(result)
 				{
 					var address = [];
 					result.Items.filter(function(item)
 					{
-						return item !== '';
+						return item.ContactEmail !== '' && item.ContactEmail !== null;
 					}).map(function(item)
 					{
 						address.push(
 							new TF.DataModel.ReportReceiptDataModel(
 								{
 									SelectedUserId: 0,
-									EmailAddress: item
+									EmailAddress: item.ContactEmail
 								})
 						)
 					});
@@ -222,7 +223,7 @@
 				}
 			}.bind(this)).then(function()
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userprofile", "current"), {}, { overlay: false })
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userprofiles?dbid=" + tf.datasourceManager.databaseId + "&@relationships=all"), {}, { overlay: false })
 					.then(function(response)
 					{
 						if (!!response.Items[0].Email)
@@ -1014,7 +1015,7 @@
 				{
 					sendData.attachments = this._convertDocumentEntitiesToJSON(this.documentEntities());
 				}
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails?onlyMessage=true"),
+				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails?onlyMessage=true"),
 					{
 						data: sendData
 					}).then(function(data)
@@ -1058,7 +1059,7 @@
 			{
 				if (data.Items && data.Items.length > 0)
 				{
-					if (data.Items[0].Smtphost && data.Items[0].Smtpport)
+					if (data.Items[0].SMTPHost && data.Items[0].SMTPPort)
 					{
 						return true;
 					}
