@@ -384,7 +384,7 @@
 					})
 					.then(function(response)
 					{
-						if (response.StatusCode != 200)
+						if (!response)
 						{
 							validSqlStatement = false;
 						}
