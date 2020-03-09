@@ -371,6 +371,15 @@
 		}
 	};
 
+	FieldTripDataEntryViewModel.prototype.filterSchoolByPermission = function(schools)
+	{
+		var schoolsWithPermission = tf.authManager.authorizationInfo.authorizationTree.schools;
+		return $.grep(schools, function(school)
+		{
+			return schoolsWithPermission.indexOf(school.SchoolCode) >= 0;
+		});
+	};
+
 	FieldTripDataEntryViewModel.prototype.loadSupplement = function()
 	{
 		var self = this, fieldtripData,
@@ -407,13 +416,13 @@
 		{
 			var fieldtripData = {};
 			fieldtripData.FieldTripTemplate = filterEmptyRecordsByFields(result[0].Items, ["Name"]);
-			fieldtripData.School = filterEmptyRecordsByFields(result[1].Items, ["Name", "SchoolCode"]);
+			fieldtripData.School = self.filterSchoolByPermission(filterEmptyRecordsByFields(result[1].Items, ["Name", "SchoolCode"]));
 			fieldtripData.FieldTripDistrictDepartment = filterEmptyRecordsByFields(result[2].Items, ["Name"]);
 			fieldtripData.FieldTripActivity = filterEmptyRecordsByFields(result[3].Items, ["Name"]);
 			fieldtripData.FieldTripClassification = filterEmptyRecordsByFields(result[4].Items, ["Name"]);
 			fieldtripData.FieldTripEquipment = filterEmptyRecordsByFields(result[5].Items, ["EquipmentName"]);
 			fieldtripData.FieldTripDestination = filterEmptyRecordsByFields(result[6].Items, ["Name"]);
-			fieldtripData.FieldTripConfigs = result[7].Items;
+			fieldtripData.FieldTripConfigs = result[7].Items && result[7].Items.length > 0 ? result[7].Items[0] : {};
 			fieldtripData.RequiredField = result[8].Items.filter(function(item) { return item.DataTypeID === 4 });
 			fieldtripData.MailCity = result[9].Items;
 			fieldtripData.MailZip = result[10].Items;
