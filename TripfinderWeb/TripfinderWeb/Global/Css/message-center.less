@@ -1,0 +1,43 @@
+.modal-dialog {
+
+    &.modal-center {
+        &.message-center {
+            @media (min-width: 768px) {
+                width: 660px;
+            }
+
+            .modal-header {
+                border-bottom: none;
+
+                .panel-heading {
+                    border-bottom: none;
+                }
+            }
+
+            .modal-body {
+                min-height: 94px;
+                max-height: 380px !important;
+
+                .content {
+                    font-size: 12px;
+                }
+            }
+
+            .modal-footer {
+                padding-top: 10px;
+
+                .btn {
+                    &.positive {
+                        background-color: @systemColor;
+                        min-width: 90px;
+                        height: 25px;
+                        font-size: 14px;
+                        border: none;
+                    }
+                }
+            }
+        }
+    }
+
+
+}
