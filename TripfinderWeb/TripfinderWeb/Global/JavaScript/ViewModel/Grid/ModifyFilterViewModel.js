@@ -609,6 +609,7 @@
 								}
 
 								var data = this.gridFilterDataModel.toData();
+								data.DataTypeID = tf.DataTypeHelper.getId(data.GridType);
 								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 									{
 										paramData: {
@@ -625,7 +626,7 @@
 									.then(function(apiResponse)
 									{
 										if (apiResponse.Items.length === 0 ||
-											(!self.isNew &&
+											(self.isNew === 'edit' &&
 												apiResponse.Items[0].Name === data.Name))
 										{
 											return true;
