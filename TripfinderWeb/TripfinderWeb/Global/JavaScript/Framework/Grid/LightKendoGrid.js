@@ -3694,9 +3694,18 @@
 				var row = $(item).closest("tr");
 				var dataItem = self.kendoGrid.dataItem(row);
 				var selectedId = Enumerable.From(self.getSelectedIds());
+				var selectItemEle = self.$container.find('table tr[data-kendo-uid=' + dataItem.uid + ']');
 				if (dataItem && $.isNumeric(dataItem[self.options.Id]) && selectedId.Contains(dataItem[self.options.Id]))
 				{
+					// use setTimeout ensures that other events can't change it again
+					setTimeout(function() {
+						selectItemEle.addClass('k-state-selected');
+					})
 					return item;
+					} else {
+					setTimeout(function() {
+							selectItemEle.removeClass('k-state-selected');
+					})
 				}
 			});
 			if (this.kendoGrid.options.selectable)
