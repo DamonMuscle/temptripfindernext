@@ -434,6 +434,7 @@
 					gridFilterDataModel.reminderUserId(reminder.UserId);
 				}
 			}
+			var oldIsValidValue = this.gridFilterDataModel.isValid();
 			this.gridFilterDataModel.isValid(true);
 			if (this.gridFilterDataModel.apiIsDirty())
 			{
@@ -454,6 +455,7 @@
 					}.bind(this))
 					.catch(function(apiResponse)
 					{
+						this.gridFilterDataModel.isValid(oldIsValidValue);
 						this.obErrorMessageDivIsShow(true);
 						this.obValidationErrors([
 							{
