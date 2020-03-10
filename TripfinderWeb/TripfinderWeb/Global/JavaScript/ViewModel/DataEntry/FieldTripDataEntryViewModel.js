@@ -426,6 +426,13 @@
 			fieldtripData.FieldTripDestination = filterEmptyRecordsByFields(result[6].Items, ["Name"]);
 			fieldtripData.FieldTripConfigs = result[7].Items && result[7].Items.length > 0 ? result[7].Items[0] : {};
 			fieldtripData.RequiredField = result[8].Items.filter(function(item) { return item.DataTypeID === 4 });
+			$.each(fieldtripData.RequiredField, function(index, item)
+			{
+				if (item.SystemRequired)
+				{
+					item.Required = true;
+				}
+			});
 			fieldtripData.MailCity = result[9].Items;
 			fieldtripData.MailZip = result[10].Items;
 			fieldtripData.FieldTripAccount = result[11].Items;
