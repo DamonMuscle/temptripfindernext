@@ -411,7 +411,9 @@
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RequiredFields")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingCities")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingPostalCodes")),
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripAccounts"))];
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripAccounts")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripHolidays")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripBlockOuts"))];
 		return Promise.all(promises).then(function(result)
 		{
 			var fieldtripData = {};
@@ -427,6 +429,14 @@
 			fieldtripData.MailCity = result[9].Items;
 			fieldtripData.MailZip = result[10].Items;
 			fieldtripData.FieldTripAccount = result[11].Items;
+			fieldtripData.FieldTripConfigs.Holidays = result[12].Items.map(function(item) { return item.Holiday; });
+			fieldtripData.FieldTripConfigs.BlockOutTimes = result[13].Items.map(function(item)
+			{
+				return {
+					BeginTime: item.From,
+					EndTime: item.To
+				};
+			});
 
 			self.getTemplate(fieldtripData.FieldTripTemplate);
 			if (tf.authManager.authorizationInfo.isAdmin)
@@ -2088,8 +2098,8 @@
 
 		$.each(blockOutTimes, function(index, blockOutTime)
 		{
-			begin = moment(blockOutTime.BeginTime).year(2000).month(0).date(1);
-			end = moment(blockOutTime.EndTime).year(2000).month(0).date(1);
+			begin = moment("2000-1-1 " + blockOutTime.BeginTime);
+			end = moment("2000-1-1 " + blockOutTime.EndTime);
 			if ((timeM.isSame(begin) || timeM.isAfter(begin)) && (timeM.isSame(end) || timeM.isBefore(end)))
 			{
 				message = " is invalid because of the blackout period of " + begin.format("hh:mm A") + " and " + end.format("hh:mm A") + ".";
