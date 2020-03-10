@@ -1020,7 +1020,7 @@
 						data: sendData
 					}).then(function(data)
 					{
-						if (data.Items[0] !== "")
+						if (data)
 						{
 							tf.promiseBootbox.okRetry(
 								{
