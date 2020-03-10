@@ -12,6 +12,15 @@
 	ListMoverSelectRecipientControlViewModel.prototype.columnSources = {
 		user: [
 			{
+				FieldName: "Id",
+				DisplayName: "ID",
+				DBName: "ID",
+				Width: '150px',
+				type: "integer",
+				hidden: true,
+				onlyForFilter: true
+			},
+			{
 				FieldName: "LoginID",
 				DisplayName: "Login",
 				Width: "100px",

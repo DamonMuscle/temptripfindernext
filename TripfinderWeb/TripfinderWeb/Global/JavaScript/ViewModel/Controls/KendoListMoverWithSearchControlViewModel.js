@@ -547,7 +547,6 @@
 			});
 		requestOption.data.idFilter = {};
 		requestOption.data.fields = self.columns.map(col => col.FieldName);
-		requestOption.data.fields.push("Id");
 
 		// options = {
 		// 	paramData: self.options.paramData,
