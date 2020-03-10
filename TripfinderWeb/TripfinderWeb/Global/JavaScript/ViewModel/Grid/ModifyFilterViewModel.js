@@ -434,12 +434,13 @@
 					gridFilterDataModel.reminderUserId(reminder.UserId);
 				}
 			}
+			var oldIsValidValue = this.gridFilterDataModel.isValid();
+			this.gridFilterDataModel.isValid(true);
 			if (this.gridFilterDataModel.apiIsDirty())
 			{
 				setReminder(this.gridFilterDataModel);
 				this.gridFilterDataModel.omittedRecords(this.obOmitRecords());
 				var data = this.gridFilterDataModel.toData();
-				data.IsValid = true;
 				data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause()) ? tf.datasourceManager.databaseId : null;
 				data.DataTypeID = tf.DataTypeHelper.getId(data.GridType);
 				return tf.promiseAjax[this.isNew === "new" ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
@@ -454,6 +455,7 @@
 					}.bind(this))
 					.catch(function(apiResponse)
 					{
+						this.gridFilterDataModel.isValid(oldIsValidValue);
 						this.obErrorMessageDivIsShow(true);
 						this.obValidationErrors([
 							{
@@ -464,7 +466,6 @@
 			}
 			else
 			{
-				this.gridFilterDataModel.isValid(true);
 				setReminder(this.gridFilterDataModel);
 				return Promise.resolve(this.gridFilterDataModel);
 			}
