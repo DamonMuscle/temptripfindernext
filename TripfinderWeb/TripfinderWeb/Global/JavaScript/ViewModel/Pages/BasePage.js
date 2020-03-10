@@ -226,7 +226,7 @@
 
 				var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(kendoGrid.options.gridType));
 
-				var options = Object.assign({}, kendoGrid.searchOption);
+				var options = JSON.parse(JSON.stringify(kendoGrid.searchOption));
 				options.data.idFilter.IncludeOnly = selectedIds;
 				if (kendoGrid.options.gridType === "busfinderhistorical")
 					self.setRequestOption(options);

@@ -611,20 +611,20 @@
 					});
 				}
 			});
-		return setInterval(function()
-		{
-			tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "getProgress"), {}, { overlay: false })
-				.then(function(response)
-				{
-					if (response.Items.length > 0)
-					{
-						self.documentEntities().map(function(item)
-						{
-							item.FileProgress(response.Items[0] + '%');
-						});
-					}
-				});
-		}, 3000);
+		// return setInterval(function()
+		// {
+		// 	tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "getProgress"), {}, { overlay: false })
+		// 		.then(function(response)
+		// 		{
+		// 			if (response.Items.length > 0)
+		// 			{
+		// 				self.documentEntities().map(function(item)
+		// 				{
+		// 					item.FileProgress(response.Items[0] + '%');
+		// 				});
+		// 			}
+		// 		});
+		// }, 3000);
 	};
 
 	SendEmailOfGridViewModel.prototype.LoadAttachments = function()
@@ -1015,7 +1015,7 @@
 				{
 					sendData.attachments = this._convertDocumentEntitiesToJSON(this.documentEntities());
 				}
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails?onlyMessage=true"),
+				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails"),
 					{
 						data: sendData
 					}).then(function(data)
@@ -1054,13 +1054,19 @@
 
 	SendEmailOfGridViewModel.prototype.checkConfigure = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), null, { overlay: false })
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), { data: { clientId: tf.authManager.clientKey } }, { overlay: false })
 			.then(function(data)
 			{
 				if (data.Items && data.Items.length > 0)
 				{
 					if (data.Items[0].SMTPHost && data.Items[0].SMTPPort)
 					{
+						self.obEntityDataModel().sMTPHost(data.Items[0].SMTPHost);
+						self.obEntityDataModel().sMTPPort(data.Items[0].SMTPPort);
+						self.obEntityDataModel().sMTPUserName(data.Items[0].SMTPUserName);
+						self.obEntityDataModel().emailName(data.Items[0].EmailName);
+						self.obEntityDataModel().sMTPSSL(data.Items[0].SMTPSSL);
 						return true;
 					}
 				}

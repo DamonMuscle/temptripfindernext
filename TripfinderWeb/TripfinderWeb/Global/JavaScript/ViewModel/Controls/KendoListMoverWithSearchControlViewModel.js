@@ -352,10 +352,10 @@
 			this.availableColGridContainer = this.$form.find(".availablecolumngrid-container");
 			this.selectedColGridContainer = this.$form.find(".selectedcolumngrid-container");
 			var stickyColumns = this.getCurrentSelectedColumns(this.options.type);
-			if (stickyColumns)
-			{
-				this.columns = stickyColumns;
-			}
+			// if (stickyColumns)
+			// {
+			// 	this.columns = stickyColumns;
+			// }
 			this.columns.map(function(item)
 			{
 				if (item.FieldName == "RawImage")
@@ -546,6 +546,21 @@
 				paramData: {}
 			});
 		requestOption.data.idFilter = {};
+		requestOption.data.fields = self.columns.map(col => col.FieldName);
+		requestOption.data.fields.push("Id");
+
+		// options = {
+		// 	paramData: self.options.paramData,
+		// 	data: {
+		// 		sortItems: sortItems,
+		// 		idFilter: (includeOnlyIds || excludeAnyIds) ? {
+		// 			IncludeOnly: includeOnlyIds,
+		// 			ExcludeAny: excludeAnyIds
+		// 		} : null,
+		// 		filterSet: (self._gridState && self._gridState.filterSet) ? self._gridState.filterSet : null,
+		// 		filterClause: ""
+		// 	}
+		// }
 
 
 		self._addSortItemIntoRequest(requestOption);
@@ -835,22 +850,22 @@
 		if (this.options && this.options.gridOptions && this.options.gridOptions.filter && !this.obShowEnabledCopmuter())
 		{
 			requestOptions.data.filterSet = requestOptions.data.filterSet ||
-				{
-					FilterItems: [],
-					FilterSets: [],
-					LogicalOperator: "and"
-				};
+			{
+				FilterItems: [],
+				FilterSets: [],
+				LogicalOperator: "and"
+			};
 			requestOptions.data.filterSet.FilterItems.push(this.options.gridOptions.filter);
 		}
 
 		if (this.options && this.options.filterSetField && this.obShowEnabledCopmuter())
 		{
 			requestOptions.data.filterSet = requestOptions.data.filterSet ||
-				{
-					FilterItems: [],
-					FilterSets: [],
-					LogicalOperator: "and"
-				};
+			{
+				FilterItems: [],
+				FilterSets: [],
+				LogicalOperator: "and"
+			};
 			if (this.options.filterSetField === "InProgress")
 			{
 				requestOptions.data.filterSet.FilterItems.push(
