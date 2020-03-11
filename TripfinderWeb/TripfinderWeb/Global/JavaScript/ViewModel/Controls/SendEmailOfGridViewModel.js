@@ -1014,43 +1014,43 @@
 				}));
 
 				var sendData = this.obEntityDataModel().toData();
+				var emailData = {};
 				if (this.option.modelType === 'SendTo')
 				{
 					sendData.attachments = this._convertDocumentEntitiesToJSON(this.documentEntities());
+					emailData.paramData = {
+						databaseId: tf.datasourceManager.databaseId,
+						dataTypeId: tf.DataTypeHelper.getIdByName(tf.DataTypeHelper.getNameByType(this.option.type))
+					}
 				}
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails"),
+				emailData.data = sendData;
+
+				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails"), emailData).then(function(data)
+				{
+					if (data)
 					{
-						data: sendData,
-						paramData: {
-							databaseId: tf.datasourceManager.databaseId,
-							dataTypeId: tf.DataTypeHelper.getIdByName(tf.DataTypeHelper.getNameByType(this.option.type))
-						}
-					}).then(function(data)
+						tf.promiseBootbox.okRetry(
+							{
+								message: "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfnder.com or 888-427-2403",
+								title: "Unable to Send " + (!!this.option.selectedIds ? "" : "Test ") + "Email"
+							})
+							.then(function(confirm)
+							{
+								if (!confirm)
+								{
+									return this.save();
+								}
+							}.bind(this));
+					}
+					else
 					{
-						if (data)
-						{
-							tf.promiseBootbox.okRetry(
-								{
-									message: "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfnder.com or 888-427-2403",
-									title: "Unable to Send " + (!!this.option.selectedIds ? "" : "Test ") + "Email"
-								})
-								.then(function(confirm)
-								{
-									if (!confirm)
-									{
-										return this.save();
-									}
-								}.bind(this));
-						}
-						else
-						{
-							return tf.promiseBootbox.alert("An email has been successfully sent.", "Email Successfully Sent")
-								.then(function()
-								{
-									return true;
-								}.bind(this));
-						}
-					}.bind(this));
+						return tf.promiseBootbox.alert("An email has been successfully sent.", "Email Successfully Sent")
+							.then(function()
+							{
+								return true;
+							}.bind(this));
+					}
+				}.bind(this));
 			}
 			else
 			{
