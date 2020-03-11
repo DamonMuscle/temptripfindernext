@@ -262,7 +262,14 @@
 					if (this.obEntityDataModel().school() &&
 						Enumerable.From(this.obSchoolDataModels()).Where(function(s) { return s.SchoolCode === this.obEntityDataModel().school() }.bind(this)).ToArray().length === 0)
 					{
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrip", "detail", this.obEntityDataModel().id()))
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)),
+							{
+								paramData:
+								{
+									Id: this.obEntityDataModel().id(),
+									"@relationships": "School"
+								}
+							})
 							.then(function(data)
 							{
 								this.obSchoolDataModels([{ SchoolCode: data.Items[0].School, Name: data.Items[0].SchoolName }]);

@@ -121,19 +121,17 @@
 			}
 
 			statusId = self.isCancel ? cancelStatus : self.getStatusId(), note = noComments ? "" : self.obComments();
+			var patchData = [];
 			self.selectedRecords.forEach(function(item)
 			{
-				item.FieldTripStageId = statusId;
-				item.FieldTripStageNotes = note;
-				// I have no idea what is this field for. 
-				// but if don't set it to true, API will 
-				// not add new records into FieldTripHistory when stage not change.
-				item.IsFieldTripStageNotesChange = true;
+				patchData.push({ "id": item.Id, "op": "replace", "path": "/FieldTripStageId", "value": statusId });
+				patchData.push({ "id": item.Id, "op": "replace", "path": "/FieldTripStageNotes", "value": note });
+				//patchData.push({ "id": item.Id, "op": "replace", "path": "/IsFieldTripStageNotesChange", "value": true });
 			});
 
-			return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "FieldTrips"),
+			return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), "FieldTrips"),
 				{
-					data: self.selectedRecords
+					data: patchData
 				})
 				.then(function()
 				{
