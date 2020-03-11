@@ -565,7 +565,7 @@
 				paramData: {}
 			});
 		requestOption.data.idFilter = {};
-		requestOption.data.fields = self.columns.map(col => col.FieldName);
+		requestOption.data.fields = self.columns.map(function(col) { return col.FieldName; });
 
 		self._addSortItemIntoRequest(requestOption);
 
