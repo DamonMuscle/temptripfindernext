@@ -356,7 +356,7 @@
 			{
 				this.columns = stickyColumns;
 			}
-			if (this.options.type == "user")
+			if (this.options.type.toLowerCase() == "user" && !this.columns.find(a => a.FieldName.toLowerCase() == "id"))
 			{
 				this.columns.push({
 					FieldName: "Id",
