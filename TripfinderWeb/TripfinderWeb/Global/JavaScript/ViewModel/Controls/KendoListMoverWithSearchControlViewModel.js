@@ -356,17 +356,24 @@
 			{
 				this.columns = stickyColumns;
 			}
-			if (this.options.type.toLowerCase() == "user" && !this.columns.find(a => a.FieldName.toLowerCase() == "id"))
+			if (this.options.type.toLowerCase() == "user")
 			{
-				this.columns.push({
-					FieldName: "Id",
-					DisplayName: "ID",
-					DBName: "ID",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
+				var idColumn = this.columns.filter(function(col)
+				{
+					return col.FieldName.toLowerCase() == "id"
 				});
+				if (!idColumn || idColumn.length == 0)
+				{
+					this.columns.push({
+						"FieldName": "Id",
+						"DisplayName": "ID",
+						"DBName": "ID",
+						"Width": '150px',
+						"type": "integer",
+						"hidden": true,
+						"onlyForFilter": true
+					});
+				}
 			}
 			this.columns.map(function(item)
 			{
