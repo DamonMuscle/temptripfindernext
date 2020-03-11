@@ -351,11 +351,6 @@
 			this.$form = $(el);
 			this.availableColGridContainer = this.$form.find(".availablecolumngrid-container");
 			this.selectedColGridContainer = this.$form.find(".selectedcolumngrid-container");
-			var stickyColumns = this.getCurrentSelectedColumns(this.options.type);
-			// if (stickyColumns)
-			// {
-			// 	this.columns = stickyColumns;
-			// }
 			this.columns.map(function(item)
 			{
 				if (item.FieldName == "RawImage")
