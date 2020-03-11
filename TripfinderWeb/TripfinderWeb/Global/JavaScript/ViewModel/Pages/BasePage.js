@@ -378,6 +378,7 @@
 			Promise.all([
 				TF.Grid.FilterHelper.clearQuickFilter(gridType),
 				tf.storageManager.save("grid.currentlayout." + gridType + ".id", ''),
+				tf.storageManager.save("grid.openNewGrid."+ gridType, "1", true),
 				tf.storageManager.save(storageFilterDataKey,
 					{
 						"filteredIds": selectedIds,
