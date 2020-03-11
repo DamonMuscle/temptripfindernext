@@ -226,8 +226,8 @@
 
 				var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(kendoGrid.options.gridType));
 
-				var options = Object.assign({}, kendoGrid.searchOption.data);
-				options.idFilter.IncludeOnly = selectedIds;
+				var options = JSON.parse(JSON.stringify(kendoGrid.searchOption));
+				options.data.idFilter.IncludeOnly = selectedIds;
 				if (kendoGrid.options.gridType === "busfinderhistorical")
 					self.setRequestOption(options);
 
@@ -235,8 +235,10 @@
 				return queryPromise
 					.then(function(data)
 					{
+						var strRecords = getStringOfRecords(data.Items, gridLayoutExtendedEntity.LayoutColumns);
+
 						tf.modalManager.showModal(
-							new TF.Modal.CopyDataModalViewModel(data, function()
+							new TF.Modal.CopyDataModalViewModel(strRecords, function()
 							{
 								$(".tfmodal-container").css('visibility', 'visible');
 								tf.loadingIndicator.tryHide();
@@ -304,6 +306,22 @@
 		}
 	};
 
+	function getStringOfRecords(records, columns)
+	{
+		var strRecords = "";
+		for (var i = 0; i < records.length; i++)
+		{
+			var strRecord = "", theRecord = records[i];
+			for (var j = 0; j < columns.length; j++)
+			{
+				var columnValue = theRecord[columns[j].FieldName]
+				strRecord += (columnValue == null ? "" : columnValue) + "\t";
+			}
+			strRecords += strRecord + "\n";
+		}
+		return strRecords;
+	}
+
 	BasePage.prototype.showConfirmMessage = function(e, selectedIds)
 	{
 		var self = this;
@@ -356,6 +374,7 @@
 		var filterName = $(e.currentTarget).find(".menu-label").text().trim() + ' (Selected Records)';
 		if (selectedIds.length > 0)
 		{
+			// TODO-temp
 			Promise.all([
 				TF.Grid.FilterHelper.clearQuickFilter(gridType),
 				tf.storageManager.save("grid.currentlayout." + gridType + ".id", ''),
@@ -363,7 +382,7 @@
 					{
 						"filteredIds": selectedIds,
 						"filterName": filterName
-					}, true)
+					})
 			]).then(function()
 			{
 				redirectWindow.location = "#/?pagetype=" + this.pageType, redirectWindow.name = "new-pageWindow_" + $.now();

@@ -312,7 +312,8 @@
 						paramData: {
 							"Name": TF.productName
 						}
-					}).then(function(apiResponse){
+					}).then(function(apiResponse)
+					{
 						TF.productID = apiResponse.Items[0].ID;
 					});
 
@@ -442,7 +443,7 @@
 									var promise;
 									if (!TF.isPhoneDevice)
 									{
-										
+
 										promise = tf.pageManager.initNavgationBar();
 									}
 									else

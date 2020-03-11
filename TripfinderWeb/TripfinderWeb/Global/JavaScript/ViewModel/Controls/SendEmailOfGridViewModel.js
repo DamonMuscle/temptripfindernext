@@ -33,26 +33,27 @@
 		// this.associatedAddress = ko.observable("");
 		if (option.placeEmailTo)
 		{
-			tf.promiseAjax["post"](pathCombine(tf.api.apiPrefix(), this.option.type, "getEmails"),
+			tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.option.type)),
 				{
-					data:
+					paramData:
 					{
-						selectedIds: this.option.selectedIds,
-						emailColumns: this.option.emailColumns
+						Id: this.option.selectedIds,
+						"@relationships": "Contact, DestinationContact",
+						"@fields": "ContactEmail, DestinationContactEmail"
 					}
 				}, { overlay: false }).then(function(result)
 				{
 					var address = [];
 					result.Items.filter(function(item)
 					{
-						return item !== '';
+						return item.ContactEmail !== '' && item.ContactEmail !== null;
 					}).map(function(item)
 					{
 						address.push(
 							new TF.DataModel.ReportReceiptDataModel(
 								{
 									SelectedUserId: 0,
-									EmailAddress: item
+									EmailAddress: item.ContactEmail
 								})
 						)
 					});
@@ -222,7 +223,7 @@
 				}
 			}.bind(this)).then(function()
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userprofile", "current"), {}, { overlay: false })
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userprofiles?dbid=" + tf.datasourceManager.databaseId + "&@relationships=all"), {}, { overlay: false })
 					.then(function(response)
 					{
 						if (!!response.Items[0].Email)
@@ -610,36 +611,39 @@
 					});
 				}
 			});
-		return setInterval(function()
-		{
-			tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "getProgress"), {}, { overlay: false })
-				.then(function(response)
-				{
-					if (response.Items.length > 0)
-					{
-						self.documentEntities().map(function(item)
-						{
-							item.FileProgress(response.Items[0] + '%');
-						});
-					}
-				});
-		}, 3000);
+		// return setInterval(function()
+		// {
+		// 	tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "getProgress"), {}, { overlay: false })
+		// 		.then(function(response)
+		// 		{
+		// 			if (response.Items.length > 0)
+		// 			{
+		// 				self.documentEntities().map(function(item)
+		// 				{
+		// 					item.FileProgress(response.Items[0] + '%');
+		// 				});
+		// 			}
+		// 		});
+		// }, 3000);
 	};
 
 	SendEmailOfGridViewModel.prototype.LoadAttachments = function()
 	{
 		var self = this;
 
-		var url = pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email");
+		var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getExportEndpoint(this.option.type));
 		var requestOption =
 		{
+			paramData:
+			{
+				fileFormat: 'xls'
+			},
 			data:
 			{
-				gridLayoutExtendedEntity: this.option.layout,
+				"gridLayoutExtendedEntity": this.option.layout,
 				term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
-				SelectedIds: this.option.selectedIds,
-				sortItems: this.option.sortItems,
-				documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
+				"selectedIds": this.option.selectedIds,
+				"sortItems": this.option.sortItems,
 			}
 		};
 
@@ -680,12 +684,13 @@
 									item.Guid(obj.Kml.Guid);
 								}
 							}
-							else
+							else if (obj.Document)
 							{
-								if (obj.Document)
-								{
-									item.Guid(obj.Document.Guid);
-								}
+								item.Guid(obj.Document.Guid);
+							}
+							else if (obj)
+							{
+								item.Guid(obj);
 							}
 						}.bind(this));
 					}
@@ -750,7 +755,7 @@
 			return item.selectedUserId();
 		});
 		var searchData = new TF.SearchParameters(null, null, null, null, null, ids, null);
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "user"),
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "users"),
 			{
 				data: searchData.data
 			})
@@ -1014,12 +1019,16 @@
 				{
 					sendData.attachments = this._convertDocumentEntitiesToJSON(this.documentEntities());
 				}
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails?onlyMessage=true"),
+				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails"),
 					{
-						data: sendData
+						data: sendData,
+						paramData: {
+							databaseId: tf.datasourceManager.databaseId,
+							dataTypeId: tf.DataTypeHelper.getIdByName(tf.DataTypeHelper.getNameByType(this.option.type))
+						}
 					}).then(function(data)
 					{
-						if (data.Items[0] !== "")
+						if (data)
 						{
 							tf.promiseBootbox.okRetry(
 								{
@@ -1053,13 +1062,19 @@
 
 	SendEmailOfGridViewModel.prototype.checkConfigure = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), null, { overlay: false })
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), { data: { clientId: tf.authManager.clientKey } }, { overlay: false })
 			.then(function(data)
 			{
 				if (data.Items && data.Items.length > 0)
 				{
-					if (data.Items[0].Smtphost && data.Items[0].Smtpport)
+					if (data.Items[0].SMTPHost && data.Items[0].SMTPPort)
 					{
+						self.obEntityDataModel().sMTPHost(data.Items[0].SMTPHost);
+						self.obEntityDataModel().sMTPPort(data.Items[0].SMTPPort);
+						self.obEntityDataModel().sMTPUserName(data.Items[0].SMTPUserName);
+						self.obEntityDataModel().emailName(data.Items[0].EmailName);
+						self.obEntityDataModel().sMTPSSL(data.Items[0].SMTPSSL);
 						return true;
 					}
 				}

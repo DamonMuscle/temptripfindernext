@@ -356,6 +356,18 @@
 			{
 				this.columns = stickyColumns;
 			}
+			if (this.options.type.toLowerCase() == "user" && !this.columns.find(a => a.FieldName.toLowerCase() == "id"))
+			{
+				this.columns.push({
+					FieldName: "Id",
+					DisplayName: "ID",
+					DBName: "ID",
+					Width: '150px',
+					type: "integer",
+					hidden: true,
+					onlyForFilter: true
+				});
+			}
 			this.columns.map(function(item)
 			{
 				if (item.FieldName == "RawImage")
@@ -546,7 +558,7 @@
 				paramData: {}
 			});
 		requestOption.data.idFilter = {};
-
+		requestOption.data.fields = self.columns.map(col => col.FieldName);
 
 		self._addSortItemIntoRequest(requestOption);
 
@@ -835,22 +847,22 @@
 		if (this.options && this.options.gridOptions && this.options.gridOptions.filter && !this.obShowEnabledCopmuter())
 		{
 			requestOptions.data.filterSet = requestOptions.data.filterSet ||
-				{
-					FilterItems: [],
-					FilterSets: [],
-					LogicalOperator: "and"
-				};
+			{
+				FilterItems: [],
+				FilterSets: [],
+				LogicalOperator: "and"
+			};
 			requestOptions.data.filterSet.FilterItems.push(this.options.gridOptions.filter);
 		}
 
 		if (this.options && this.options.filterSetField && this.obShowEnabledCopmuter())
 		{
 			requestOptions.data.filterSet = requestOptions.data.filterSet ||
-				{
-					FilterItems: [],
-					FilterSets: [],
-					LogicalOperator: "and"
-				};
+			{
+				FilterItems: [],
+				FilterSets: [],
+				LogicalOperator: "and"
+			};
 			if (this.options.filterSetField === "InProgress")
 			{
 				requestOptions.data.filterSet.FilterItems.push(
