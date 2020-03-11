@@ -22,6 +22,7 @@
 			editCurrentDefinitionColumns: true,
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "gpsEventType");
 			}
 		}, true);
@@ -35,14 +36,15 @@
 			editCurrentDefinitionColumns: true,
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "vehicle");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
 			},
 			setLeftGridRequestURL: function(obShowEnabled, type)
 			{
+				// TODO-V2, need to research
 				if (obShowEnabled)
 					return pathCombine(tf.api.apiPrefix(), "search", "onroadvehicle");
 				else
-					return pathCombine(tf.api.apiPrefix(), "search", "vehicle");
+					return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
 			},
 			setLeftGridRequestOption: function(requestOptions, obShowEnabled)
 			{
@@ -79,7 +81,8 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "altsite");
+				// TODO-V2, need to remove
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("altsite"));
 			}
 		}, true);
 
@@ -91,7 +94,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "contractor");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("contractor"));
 			}
 		}, true);
 
@@ -103,7 +106,8 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "district");
+				// TODO-V2, need to remove
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("district"));
 			}
 		}, true);
 
@@ -129,7 +133,8 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "georegion");
+				// TODO-V2, need to remove
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("georegion"));
 			}
 		}, true);
 
@@ -141,7 +146,8 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "trip");
+				// TODO-V2, need to remove
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("trip"));
 			}
 		}, true);
 
@@ -153,7 +159,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "fieldTrips");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldTrip"));
 			}
 		}, true);
 
@@ -165,7 +171,8 @@
 			filterField: "Item",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "tripAlias");
+				// TODO-V2, need to remove
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("tripAlias"));
 			}
 		}, true);
 
@@ -177,7 +184,8 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "tripStop");
+				// TODO-V2, need to remove
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("tripStop"));
 			}
 		}, true);
 
@@ -195,7 +203,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "schools");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("school"));
 			}
 		}, true);
 
@@ -243,7 +251,7 @@
 			},
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "staff");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("staff"));
 			}
 		}, true);
 
@@ -271,7 +279,7 @@
 			DisplayFilterTypeName: "Staff",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "staff/bystafftypeid");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("staff") + "?staffType=Driver");
 			},
 			setLeftGridRequestOption: function(requestOptions)
 			{
@@ -301,7 +309,7 @@
 			DisplayFilterTypeName: "Staff",//"Bus Aides",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "staff/bystafftypeid");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("staff") + "?staffType=Bus Aide");
 			},
 			setLeftGridRequestOption: function(requestOptions)
 			{
@@ -325,7 +333,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "student");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("student"));
 			}
 		}, true);
 
@@ -337,7 +345,7 @@
 			filterField: "BusNum",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "vehicle");
+				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
 			}
 		}, true);
 
@@ -367,7 +375,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripaccount");
+				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripaccounts");
 			}
 		}, true);
 
@@ -379,7 +387,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripclassification");
+				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripclassifications");
 			}
 		}, true);
 
@@ -391,7 +399,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripDistrictDepartment");
+				return pathCombine(tf.api.apiPrefix(), "search", "DistrictDepartments");
 			}
 		}, true);
 
@@ -403,7 +411,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripDestination");
+				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripDestinations");
 			}
 		}, true);
 
@@ -415,7 +423,7 @@
 			filterField: "EquipmentName",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripEquipment");
+				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripEquipments");
 			}
 		}, true);
 
@@ -427,7 +435,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripTemplate");
+				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripTemplates");
 			}
 		}, true);
 
@@ -439,6 +447,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleBodyType");
 			}
 		}, true);
@@ -451,6 +460,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleBrakeType");
 			}
 		}, true);
@@ -463,6 +473,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleCategory");
 			}
 		}, true);
@@ -475,6 +486,7 @@
 			filterField: "Code",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "vehicleequipment");
 			}
 		}, true);
@@ -487,6 +499,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleFuelType");
 			}
 		}, true);
@@ -499,6 +512,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleMake");
 			}
 		}, true);
@@ -511,6 +525,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleMakeOfBody");
 			}
 		}, true);
@@ -523,6 +538,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleModel");
 			}
 		}, true);
@@ -535,7 +551,7 @@
 			filterField: "Code",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "disabilitycode");
+				return pathCombine(tf.api.apiPrefix(), "search", "disabilitycodes");
 			}
 		}, true);
 
@@ -547,7 +563,7 @@
 			filterField: "Code",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "ethniccode");
+				return pathCombine(tf.api.apiPrefix(), "search", "ethniccodes");
 			}
 		}, true);
 
@@ -559,7 +575,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "documentClassification");
+				return pathCombine(tf.api.apiPrefix(), "search", "documentClassifications");
 			}
 		}, true);
 
@@ -571,6 +587,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "dataListsNEZ");
 			}
 		}, true);
@@ -583,6 +600,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "tripAlias");
 			}
 		}, true);
@@ -595,6 +613,7 @@
 			filterField: "Name",
 			getUrl: function()
 			{
+				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "georegiontype");
 			}
 		}, true);
@@ -607,7 +626,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "search", "city");
+				return pathCombine(tf.api.apiPrefix(), "search", "cities");
 			}
 		}, true);
 
@@ -659,7 +678,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "mailingcity");
+				return pathCombine(tf.api.apiPrefix(), "mailingcities");
 			}
 		}, true);
 
@@ -671,7 +690,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "mailingcity");
+				return pathCombine(tf.api.apiPrefix(), "mailingcities");
 			}
 		}, true);
 
@@ -691,7 +710,7 @@
 				requestMethod: "post",
 				getUrl: function()
 				{
-					return pathCombine(tf.api.apiPrefix(), "search", gridType, "aggregate") + "?" + $.param(
+					return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(gridType), "aggregate") + "?" + $.param(
 						{
 							FieldName: fieldName,
 							AggregateOperator: "Distinct"
@@ -1136,7 +1155,7 @@
 
 	ListFilterDefinition.ColumnSource.FieldTripClassification = [
 		{
-			FieldName: "Name",
+			FieldName: "Code",
 			DisplayName: "Code",
 			Width: "160px",
 			type: "string",
