@@ -548,20 +548,6 @@
 		requestOption.data.idFilter = {};
 		requestOption.data.fields = self.columns.map(col => col.FieldName);
 
-		// options = {
-		// 	paramData: self.options.paramData,
-		// 	data: {
-		// 		sortItems: sortItems,
-		// 		idFilter: (includeOnlyIds || excludeAnyIds) ? {
-		// 			IncludeOnly: includeOnlyIds,
-		// 			ExcludeAny: excludeAnyIds
-		// 		} : null,
-		// 		filterSet: (self._gridState && self._gridState.filterSet) ? self._gridState.filterSet : null,
-		// 		filterClause: ""
-		// 	}
-		// }
-
-
 		self._addSortItemIntoRequest(requestOption);
 
 		return tf.ajax.post(this.setLeftGridRequestURL(this.options.getUrl(this.options.type, this.options)), requestOption).then(function(response)

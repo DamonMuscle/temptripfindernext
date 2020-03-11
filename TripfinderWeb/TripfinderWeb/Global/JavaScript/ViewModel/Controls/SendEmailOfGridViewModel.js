@@ -631,16 +631,19 @@
 	{
 		var self = this;
 
-		var url = pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email");
+		var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getExportEndpoint(this.option.type));
 		var requestOption =
 		{
+			paramData:
+			{
+				fileFormat: 'xls'
+			},
 			data:
 			{
-				gridLayoutExtendedEntity: this.option.layout,
+				"gridLayoutExtendedEntity": this.option.layout,
 				term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
-				SelectedIds: this.option.selectedIds,
-				sortItems: this.option.sortItems,
-				documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
+				"selectedIds": this.option.selectedIds,
+				"sortItems": this.option.sortItems,
 			}
 		};
 
@@ -681,12 +684,13 @@
 									item.Guid(obj.Kml.Guid);
 								}
 							}
-							else
+							else if (obj.Document)
 							{
-								if (obj.Document)
-								{
-									item.Guid(obj.Document.Guid);
-								}
+								item.Guid(obj.Document.Guid);
+							}
+							else if (obj)
+							{
+								item.Guid(obj);
 							}
 						}.bind(this));
 					}
@@ -1017,7 +1021,11 @@
 				}
 				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails"),
 					{
-						data: sendData
+						data: sendData,
+						paramData: {
+							databaseId: tf.datasourceManager.databaseId,
+							dataTypeId: tf.DataTypeHelper.getIdByName(tf.DataTypeHelper.getNameByType(this.option.type))
+						}
 					}).then(function(data)
 					{
 						if (data)
