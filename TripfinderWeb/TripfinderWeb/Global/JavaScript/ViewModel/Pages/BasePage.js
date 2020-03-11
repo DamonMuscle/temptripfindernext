@@ -374,6 +374,7 @@
 		var filterName = $(e.currentTarget).find(".menu-label").text().trim() + ' (Selected Records)';
 		if (selectedIds.length > 0)
 		{
+			// TODO-temp
 			Promise.all([
 				TF.Grid.FilterHelper.clearQuickFilter(gridType),
 				tf.storageManager.save("grid.currentlayout." + gridType + ".id", ''),
@@ -381,7 +382,7 @@
 					{
 						"filteredIds": selectedIds,
 						"filterName": filterName
-					}, true)
+					})
 			]).then(function()
 			{
 				redirectWindow.location = "#/?pagetype=" + this.pageType, redirectWindow.name = "new-pageWindow_" + $.now();

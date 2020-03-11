@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Grid").KendoGridFilterMenu = KendoGridFilterMenu;
 
-	function convertToOldGridDefinition (gridDefinition)
+	function convertToOldGridDefinition(gridDefinition)
 	{
 		return gridDefinition.Columns.map(function(definition)
 		{
@@ -10,7 +10,7 @@
 		});
 	}
 
-	function KendoGridFilterMenu ()
+	function KendoGridFilterMenu()
 	{
 		this.inited = false;
 		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
@@ -503,7 +503,8 @@
 					{
 						tf.storageManager.save(self._storageFilterDataKey, selectGridFilterEntityId);
 					}
-					tf.storageManager.delete(self._storageFilterDataKey, true);
+					// TODO-temp
+					tf.storageManager.delete(self._storageFilterDataKey, false);
 				} else
 				{
 					selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
@@ -983,7 +984,7 @@
 		return this.loadGridFilter(false).then(function()
 		{
 			var self = this;
-			function refresh ()
+			function refresh()
 			{
 				var filter = {};
 				self.initStatusBeforeRefresh();
