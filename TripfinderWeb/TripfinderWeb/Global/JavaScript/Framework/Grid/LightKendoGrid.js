@@ -4277,6 +4277,7 @@
 				{
 					if (self._gridType === "trip")
 					{
+						// TODO-V2, need to remove
 						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "trip", "batch", "mini", "?include=tripstop"),
 							{
 								data: {
@@ -4760,6 +4761,7 @@
 	LightKendoGrid.prototype._staffGridDraggable = function()
 	{//RW-997 once staff grid and the record without type dirver and bus aide, then no drag.
 		var self = this;
+		// TODO-V2, need to remove
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "metastafftype"))
 			.then(function(staffTypes)
 			{

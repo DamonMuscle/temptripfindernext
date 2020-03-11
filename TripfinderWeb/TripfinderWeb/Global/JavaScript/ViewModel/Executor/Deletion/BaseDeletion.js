@@ -93,6 +93,7 @@
 
 	BaseDeletion.prototype.getEntityStatus = function()
 	{
+		// TODO-V2, need to remove
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.type, 'entitystatus') + '?' + $.param({ ids: this.ids }));
 	};
 
@@ -262,7 +263,7 @@
 		{
 			requestData = this.getDeletionData();
 		}
-		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), this.type), {
+		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)), {
 			data: requestData
 		})
 		.then(function()
@@ -299,6 +300,7 @@
 
 	BaseDeletion.prototype.getDataPermission = function(ids, associatedDataType, curType)
 	{
+		// TODO-V2, need to remove
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), associatedDataType, "ids", curType), {
 			data: ids
 		}).then(function(response)
@@ -315,6 +317,7 @@
 
 	BaseDeletion.prototype.getDataStatus = function(ids, associatedDataType, curType)
 	{
+		// TODO-V2, need to remove
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), associatedDataType, "ids", curType), {
 			data: ids
 		}).then(function(response)
@@ -325,6 +328,8 @@
 				{// this should change api side error sooner
 					return;
 				}
+
+				// TODO-V2, need to remove
 				if (associatedDataType == "attendance")
 					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), associatedDataType, 'postentitystatus'), {
 						data: response.Items[0]

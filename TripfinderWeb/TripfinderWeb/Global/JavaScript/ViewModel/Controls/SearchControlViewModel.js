@@ -1098,7 +1098,7 @@
 	SearchControlViewModel.prototype.getSuggestedResultByType = function(type, value, count)
 	{
 		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrips", "bycolumns"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldtrip"), "bycolumns"), {
 			paramData: {
 				column: self.cardStyle[type] ? self.cardStyle[type].field : type,
 				text: value
@@ -1145,7 +1145,7 @@
 		var self = this;
 		var queryString = "?text=" + encodeURIComponent(value);
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", "fieldtrip", "simple", "ids", queryString)).then(function(Ids)
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldtrip"), "simple", "ids", queryString)).then(function(Ids)
 		{
 			return Ids.length;
 		});

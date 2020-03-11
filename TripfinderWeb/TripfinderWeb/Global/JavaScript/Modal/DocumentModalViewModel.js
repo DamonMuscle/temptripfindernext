@@ -37,6 +37,8 @@
 					type = documentRelationshipEntities[i].AttachedToType;
 					attachIds.push(documentRelationshipEntities[i].AttachedToId);
 				}
+
+				// TODO-V2, need to research
 				promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: attachIds })
 					.then(function(data)
 					{
