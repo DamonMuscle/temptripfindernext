@@ -16,20 +16,19 @@
 	DocumentDeletion.prototype.getAssociatedData = function(ids)
 	{
 		var associatedDatas = [];
-		var p0 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "document", "group", "documentrelationship"), {
-			data: ids
+		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "documentRelationships"), {
+			paramData: {
+				"@filter": "eq(DBID," + tf.datasourceManager.databaseId + ")&in(AttachedToID," + ids.toString() + ")&eq(AttachedToType," + tf.DataTypeHelper.getId("fieldtrip") + ")"
+			}
 		}).then(function(response)
 		{
-			response.Items.forEach(function(items)
+			if (response.Items.length > 0)
 			{
-				if (items.length > 0)
-				{
-					associatedDatas.push({
-						type: items[0].AttachedToType,
-						items: items
-					});
-				}
-			});
+				associatedDatas.push({
+					type: response.Items[0].AttachedToType,
+					items: response.Items
+				});
+			}
 		});
 		return Promise.all([p0]).then(function()
 		{

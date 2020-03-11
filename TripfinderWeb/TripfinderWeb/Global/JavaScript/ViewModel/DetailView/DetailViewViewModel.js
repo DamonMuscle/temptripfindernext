@@ -1266,6 +1266,7 @@
 		var requestUrl;
 		if (gridType === "trip")
 		{
+			// TODO-V2, need to remove
 			requestUrl = pathCombine(tf.api.apiPrefix(), gridType, layoutId, "detail", "?startDate=" + (new Date()).toISOString() + "&include=tripstop+driver+busaide+school+vehicle+tripstop.student");
 		}
 		else if (["altsite", "georegion", "student", "vehicle", "staff", "fieldtrip", "school", "contractor", "district", "tripstop"].indexOf(gridType) > -1)
@@ -1421,15 +1422,19 @@
 		switch (self.gridType)
 		{
 			case "district":
+				// TODO-V2, need to remove
 				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), { paramData: { keys: Id, gridType: self.gridType } }).then(callback);
 				break;
 			case "school":
+				// TODO-V2, need to remove
 				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "school", Id)).then(function(response)
 				{
+					// TODO-V2, need to remove
 					return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "calendarevents"), { paramData: { keys: response.Items[0].SchoolCode, gridType: self.gridType } }).then(callback);
 				});
 				break;
 			case "trip":
+				// TODO-V2, need to remove
 				p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "attendance", "tripId", self.entity.Id, "attendances")).then(callback);
 				break;
 			default:
@@ -2591,14 +2596,19 @@
 		}
 		else if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
-			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), dataType, "ids", dataIdentifier), { data: [self.entitySelectId] }).then(function(result)
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(dataType)), { 
+				paramData: {
+					"@fields": "Id",
+					"fieldtripid": self.entitySelectId
+				}
+			}).then(function(result)
 			{
-				var ids = result.Items[0], newColumns = $.map(columns, function(column) { return column.FieldName; });
+				var ids = result.Items, newColumns = $.map(columns, function(column) { return column.FieldName; });
 				if (newColumns.indexOf("Id") === -1)
 				{
 					newColumns.push("Id");
 				}
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", dataType), {
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(dataType)), {
 					paramData: { take: 100000, skip: 0 },
 					data: {
 						fields: newColumns,
@@ -2612,7 +2622,7 @@
 		}
 		else
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripresourcegroups?fieldtripid =" + self.entitySelectId + "&@relationships=Vehicle,Driver,Aide&@fields=VehicleName,DriverName,AideName"));
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresourcegroup") + "?fieldtripid =" + self.entitySelectId + "&@relationships=Vehicle,Driver,Aide&@fields=VehicleName,DriverName,AideName"));
 		}
 	};
 
@@ -3249,7 +3259,7 @@
 		var hasPermission = tf.permissions.documentRead;
 		if (self.isReadMode() && hasPermission)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documents? attachedToTypeID = " + 4 + " & attachedToID=" + self.entity.Id + "&@excluded=FileContent"))
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documents?attachedToTypeID = " + 4 + " & attachedToID=" + self.entity.Id + "&@excluded=FileContent"))
 				.then(function(response)
 				{
 					var dataSource = new kendo.data.DataSource({
@@ -3355,14 +3365,17 @@
 
 			if (self.isReadMode())
 			{
+				// TODO-V2, need to remove
 				var pList = [],
 					p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), self.gridType, self.entity.Id));
 				pList.push(p0);
+				// TODO-V2, need to remove
 				var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "trip", "tripbystudentIds"),
 					{
 						data: [self.entity.Id]
 					}).catch(function() { return null });
 				pList.push(p1);
+				// TODO-V2, need to remove
 				var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "studentexception", self.entity.Id, "studentExceptions"));
 				pList.push(p2);
 				Promise.all(pList).then(function(data)
@@ -3403,8 +3416,10 @@
 			if (self.isReadMode())
 			{
 				var pList = [];
+				// TODO-V2, need to remove
 				var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), self.gridType, self.entity.Id, "trip"));
 				pList.push(p0);
+				// TODO-V2, need to remove
 				var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "schedresource", self.entity.Id, self.gridType), {
 					paramData: {
 						startTime: "1899-12-30T00:00:00+08:00",

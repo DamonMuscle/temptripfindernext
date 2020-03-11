@@ -200,6 +200,7 @@
 		var type = this.obReport().type || this.obEntityDataModel().selectedRecordType();
 		if (type && type != "other" && type != "unknown" && type != "custom" && type != "busfinder")
 		{
+			// TODO-V2, need to research
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridfilter", this.getRealType()))
 				.then(function(data)
 				{
@@ -429,6 +430,7 @@
 	{
 		var promises = [];
 
+		// TODO-V2, need to research
 		var p1 = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"))
 			.then(function(data)
 			{
@@ -696,6 +698,7 @@
 						var validator = this._$form.data("bootstrapValidator");
 						if (type == "student")
 						{//student need paging, because it is too big.
+							// TODO-V2, need to research
 							tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "student", "ids"), {
 								data: selectedRecord
 							}).then(function(data)
@@ -789,6 +792,7 @@
 		var p = [];
 		if (report.specifyRecordOption() == 2)
 		{
+			// TODO-V2, need to research
 			var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridFilter", "id", report.filterId()))
 				.then(function(data)
 				{
@@ -824,6 +828,8 @@
 				TimeFrom: report.reportParameterTimeFrom(),
 				TimeTo: report.reportParameterTimeTo()
 			};
+
+			// TODO-V2, need to research
 			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "run", report.reportName(), "getKey"),
 				{
 					data: reportData
@@ -833,6 +839,7 @@
 					var key = apiResponse.Items[0], reportName = report.reportName();
 					if (outputTo == "view")
 					{
+						// TODO-V2, need to research
 						var pdfUrl = pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "view", tf.storageManager.get("databaseType"), "/");
 						redirectWindow.location = window.location.pathname + 'PdfPreview.html?web=' + window.location.pathname + '&report=' + pdfUrl;
 						ga('send', 'event', 'Action', 'Report Viewed', reportName + ' Viewed');
@@ -844,6 +851,7 @@
 								postSendEmail: function(sendData)
 								{
 									ga('send', 'event', 'Action', 'Report Run', reportName + ' Emailed');
+									// TODO-V2, need to research
 									return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefix(), "report", "sendemail"),
 										{
 											data: $.extend(true, {}, sendData, reportData)
@@ -900,6 +908,8 @@
 								}
 								attempts--;
 							}, 1000);
+
+							// TODO-V2, need to research
 							window.location = pathCombine(tf.api.apiPrefix(), "report", report.reportName(), key, "saveas", tf.storageManager.get("databaseType"));
 						});
 					}

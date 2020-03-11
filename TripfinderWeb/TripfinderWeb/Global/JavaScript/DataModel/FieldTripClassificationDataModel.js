@@ -13,7 +13,7 @@
 
 	namespace.FieldTripClassificationDataModel.prototype.mapping = [
 		{ from: "Id", default: 0 },
-		{ from: "Name", default: "" },
+		{ from: "Code", default: "" },
 		{ from: "Description", default: "" }
 	];
 })();

@@ -90,7 +90,7 @@
 		var strictAcctCodes = this.option.strictAcctCodes, selectAccount = this.option.selectAccount,
 			selectedSchool = this.option.selectedSchool;
 
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccount"))
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"))
 			.then(function(data)
 			{
 				var accountItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
