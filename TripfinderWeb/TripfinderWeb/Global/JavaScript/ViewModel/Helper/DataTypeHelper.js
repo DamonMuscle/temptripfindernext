@@ -30,6 +30,11 @@
 			endpoint: "fieldtriphistories",
 			isMajorType: false,
 			hasDBID: true
+		},
+		school: {
+			endpoint: "schools",
+			isMajorType: false,
+			hasDBID: true
 		}
 	};
 

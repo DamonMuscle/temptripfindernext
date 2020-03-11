@@ -1,7 +1,7 @@
 ﻿(function()
 {
 	createNamespace('TF.Control').ListMoverSelectRecordControlViewModel = ListMoverSelectRecordControlViewModel;
-	function ListMoverSelectRecordControlViewModel(selectedData, options)
+	function ListMoverSelectRecordControlViewModel (selectedData, options)
 	{
 		options.getUrl = function(gridType, options)
 		{
@@ -10,7 +10,7 @@
 			{
 				prefix = pathCombine(tf.api.apiPrefixWithoutDatabase(), options.dataSource);
 			}
-			return pathCombine(prefix, "search",  tf.DataTypeHelper.getId(gridType));
+			return pathCombine(prefix, "search", tf.dataTypeHelper.getEndpoint(gridType));
 		};
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 		this.pageLevelViewModel = new TF.PageLevel.ListMoverPageLevelViewModel(this);
@@ -250,7 +250,7 @@
 		this.pageLevelViewModel.dispose();
 	}
 
-	function isArraySame(oldData, newData)
+	function isArraySame (oldData, newData)
 	{
 		if (newData.length != oldData.length)
 		{
