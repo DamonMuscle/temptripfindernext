@@ -2,7 +2,7 @@
 {
 	createNamespace('TF').ListFilterDefinition = ListFilterDefinition;
 
-	function ListFilterDefinition ()
+	function ListFilterDefinition()
 	{ }
 	ListFilterDefinition.ListFilterTemplate = {};
 
@@ -906,7 +906,7 @@
 			sortIdx: 1,
 			template: function(dataItem)
 			{
-				return moment(dataItem.DepartDateTime).format("MM/DD/YYYY");
+				return moment(dataItem.DepartDate).format("MM/DD/YYYY");
 			}
 		},
 		{
@@ -918,7 +918,7 @@
 			sortIdx: 2,
 			template: function(dataItem)
 			{
-				return moment(dataItem.DepartDateTime).format("hh:mm A");
+				return moment(dataItem.DepartTime).format("hh:mm A");
 			}
 		},
 		{
@@ -950,7 +950,7 @@
 			type: "date",
 			template: function(dataItem)
 			{
-				return moment(dataItem.EstimatedReturnDateTime).format("MM/DD/YYYY");
+				return moment(dataItem.ReturnDate).format("MM/DD/YYYY");
 			}
 		},
 		{
@@ -960,7 +960,7 @@
 			type: "time",
 			template: function(dataItem)
 			{
-				return moment(dataItem.EstimatedReturnDateTime).format("hh:mm A");
+				return moment(dataItem.ReturnTime).format("hh:mm A");
 			}
 		}];
 
