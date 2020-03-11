@@ -351,6 +351,23 @@
 			this.$form = $(el);
 			this.availableColGridContainer = this.$form.find(".availablecolumngrid-container");
 			this.selectedColGridContainer = this.$form.find(".selectedcolumngrid-container");
+			var stickyColumns = this.getCurrentSelectedColumns(this.options.type);
+			if (stickyColumns)
+			{
+				this.columns = stickyColumns;
+			}
+			if (this.options.type == "user")
+			{
+				this.columns.push({
+					FieldName: "Id",
+					DisplayName: "ID",
+					DBName: "ID",
+					Width: '150px',
+					type: "integer",
+					hidden: true,
+					onlyForFilter: true
+				});
+			}
 			this.columns.map(function(item)
 			{
 				if (item.FieldName == "RawImage")
