@@ -37,9 +37,8 @@
 				{
 					paramData:
 					{
-						Id: this.option.selectedIds,
-						"@relationships": "Contact, DestinationContact",
-						"@fields": "ContactEmail, DestinationContactEmail"
+						"@filter": "in(id,"+this.option.selectedIds.toString()+")",
+						"@fields":"ContactEmail,DestinationContactEmail"
 					}
 				}, { overlay: false }).then(function(result)
 				{
