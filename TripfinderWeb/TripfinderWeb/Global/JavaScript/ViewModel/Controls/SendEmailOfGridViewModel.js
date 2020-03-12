@@ -38,22 +38,27 @@
 					paramData:
 					{
 						"@filter": "in(id,"+this.option.selectedIds.toString()+")",
-						"@fields":"ContactEmail,DestinationContactEmail"
+						"@fields":"ContactEmail,DestinationEmail"
 					}
 				}, { overlay: false }).then(function(result)
 				{
 					var address = [];
 					result.Items.filter(function(item)
 					{
-						return item.ContactEmail !== '' && item.ContactEmail !== null;
+						return !!item.ContactEmail || !!item.DestinationEmail;
 					}).map(function(item)
 					{
 						address.push(
 							new TF.DataModel.ReportReceiptDataModel(
+							{
+								SelectedUserId: 0,
+								EmailAddress: item.ContactEmail
+							}),
+							new TF.DataModel.ReportReceiptDataModel(
 								{
 									SelectedUserId: 0,
-									EmailAddress: item.ContactEmail
-								})
+									EmailAddress: item.DestinationEmail
+							})
 						)
 					});
 					if (option.placeEmailTo == 'Bcc')
