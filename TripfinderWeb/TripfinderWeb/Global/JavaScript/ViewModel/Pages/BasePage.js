@@ -203,7 +203,7 @@
 				msg += "Completed ";
 				break;
 		}
-		msg += selectedRecords.length > 1 ? (selectedRecords.length + " " + tf.applicationTerm.getApplicationTermPluralByName("Trip")) : selectedRecords[0].Name;
+		msg += selectedRecords.length > 1 ? (selectedRecords.length + " " + tf.applicationTerm.getApplicationTermPluralByName("Trips")) : selectedRecords[0].Name;
 
 		return msg;
 	};
