@@ -42,24 +42,24 @@
 					}
 				}, { overlay: false }).then(function(result)
 				{
-					var address = [];
+					var address = [], addressList = [];
 					result.Items.filter(function(item)
 					{
 						return !!item.ContactEmail || !!item.DestinationEmail;
+					}).map(function(item)
+					{
+						addressList.push(item.ContactEmail, item.DestinationEmail);
+					});
+					addressList.filter(function(item, index, arr) {
+						return arr.indexOf(item, 0) === index && !!item;
 					}).map(function(item)
 					{
 						address.push(
 							new TF.DataModel.ReportReceiptDataModel(
 							{
 								SelectedUserId: 0,
-								EmailAddress: item.ContactEmail
-							}),
-							new TF.DataModel.ReportReceiptDataModel(
-								{
-									SelectedUserId: 0,
-									EmailAddress: item.DestinationEmail
-							})
-						)
+								EmailAddress: item
+							}));
 					});
 					if (option.placeEmailTo == 'Bcc')
 					{
