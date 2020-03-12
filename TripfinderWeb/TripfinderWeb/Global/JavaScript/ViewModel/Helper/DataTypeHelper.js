@@ -14,7 +14,7 @@
 			hasDBID: true,
 			enableDetailView: true
 		},
-		fieldtripresource: {
+		fieldtripresourcegroup: {
 			endpoint: "fieldtripresourcegroups",
 			idParamName: "fieldtripresourcegroupId",
 			includes: ["fieldtripvehicle", "fieldtripdriver", "fieldtripaide"],
@@ -38,7 +38,7 @@
 		}
 	};
 
-	function DataTypeHelper ()
+	function DataTypeHelper()
 	{
 
 	};
