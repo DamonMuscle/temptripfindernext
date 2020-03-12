@@ -538,6 +538,11 @@
 
 	Startup.prototype._loadApplicationTerm = function()
 	{
+		tf.APPLICATIONTERMDEFAULTVALUES.map(function(item)
+		{
+			tf.applicationTerm[item.Term] = item;
+		});
+
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applicationterms"))
 			.then(function(response)
 			{
