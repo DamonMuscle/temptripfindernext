@@ -1,7 +1,7 @@
 ﻿(function()
 {
 	createNamespace("TF.GridDefinition").DocumentGridDefinition = DocumentGridDefinition;
-	function DocumentGridDefinition()
+	function DocumentGridDefinition ()
 	{
 
 	}
@@ -174,12 +174,17 @@
 					FieldName: "Filename",
 					DisplayName: "File Name",
 					Width: '190px',
-					type: "string"
+					type: "string",
+					template: function(data)
+					{
+						return data.FileName;
+					}
 				},
 				{
 					FieldName: "Description",
 					Width: '150px',
-					type: "string"
+					type: "string",
+					isSortItem: true
 				},
 				{
 					FieldName: "DocumentClassification",
@@ -187,7 +192,11 @@
 					Width: '140px',
 					type: "string",
 					onlyForGrid: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.GeneralDataListsDocumentClassification
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.GeneralDataListsDocumentClassification,
+					template: function(data)
+					{
+						return data.DocumentClassificationName;
+					}
 				},
 				{
 					FieldName: "AttachedCount",
@@ -199,19 +208,31 @@
 					FieldName: "FileSizeKb",
 					DisplayName: "Size (KB)",
 					Width: '150px',
-					type: "number"
+					type: "number",
+					template: function(data)
+					{
+						return data.FileSizeKB;
+					}
 				},
 				{
 					FieldName: "LastUpdated",
 					DisplayName: "Last Updated",
 					Width: '150px',
-					type: "date"
+					type: "date",
+					template: function(data)
+					{
+						return data.LastUpdatedID;
+					}
 				},
 				{
 					FieldName: "LastUpdatedName",
 					DisplayName: "Last Updated By",
 					Width: '150px',
-					type: "string"
+					type: "string",
+					template: function(data)
+					{
+						return data.LastUpdatedID;
+					}
 				}
 			],
 			fileTypeFormatter: function(value)

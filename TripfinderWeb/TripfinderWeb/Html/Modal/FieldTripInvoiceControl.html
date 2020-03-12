@@ -4,11 +4,15 @@
 	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
-				<label data-bind="css:requiredFields&&requiredFields.FieldTripAccountID&&requiredFields.FieldTripAccountID.Required?'requirestar':null">Account Name</label>
+				<label
+					data-bind="css:requiredFields&&requiredFields.FieldTripAccountID&&requiredFields.FieldTripAccountID.Required?'requirestar':null">Account
+					Name</label>
 				<div class="input-group">
-					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true},
+					<div
+						data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true},
 						 attr:IsRequired(requiredFields&&requiredFields.FieldTripAccountID?requiredFields.FieldTripAccountID.Required:null)">
-						<!-- ko customInput:{type:option.strictAcctCodes?"Select":"String",value:obSelectedAccountText,attributes:{class:"form-control",name:"account"}} --><!-- /ko -->
+						<!-- ko customInput:{type:option.strictAcctCodes?"Select":"String",value:obSelectedAccountText,attributes:{class:"form-control",name:"account"}} -->
+						<!-- /ko -->
 					</div>
 					<div class="input-group-btn">
 						<button type="button" class="btn btn-default btn-sharp">
@@ -67,7 +71,3 @@
 	</div>
 	<!--/ko-->
 </div>
-
-
-
-

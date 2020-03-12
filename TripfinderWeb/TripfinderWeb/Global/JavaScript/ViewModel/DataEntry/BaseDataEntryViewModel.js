@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.DataEntry").BaseDataEntryViewModel = BaseDataEntryViewModel;
 
-	function BaseDataEntryViewModel(ids, view)
+	function BaseDataEntryViewModel (ids, view)
 	{
 		this.initialize = this.initialize.bind(this);
 		this.refreshClick = this.refreshClick.bind(this);
@@ -57,6 +57,10 @@
 		if (!this.pageLevelViewModel)
 		{
 			this.pageLevelViewModel = new TF.PageLevel.BaseDataEntryPageLevelViewModel();
+		}
+		if (!this.uploadDocumentHelper)
+		{
+			this.uploadDocumentHelper = new TF.UploadDocumentHelper();
 		}
 		this.obContentDivHeight = ko.computed(this.showMessageComputer, this);
 		if (this._view.document)
@@ -243,7 +247,8 @@
 			tf.loadingIndicator.showImmediately();
 			var getData = {
 				paramData: {
-					Id: this._view.id
+					Id: this._view.id,
+					"@relationships": "all",
 				}
 			};
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)), getData)
@@ -679,10 +684,13 @@
 		var self = this;
 		var obEntityDataModel = this.obEntityDataModel();
 		var isNew = obEntityDataModel.id() ? false : true;
-		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), this.type, isNew ? "" : obEntityDataModel.id()),
+		var paramDatas = this.type === 'fieldtrip' ? {
+			'@relationships': "FieldTripResourceGroup,FieldTripInvoice,DocumentRelationship"
+		} : {};
+		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), isNew ? tf.DataTypeHelper.getEndpoint(this.type) : tf.DataTypeHelper.getEndpoint(this.type)),
 			{
-				data: this.getSaveData(),
-				paramData: { productName: "tripfinder" },
+				paramData: paramDatas,
+				data: [this.getSaveData()],
 				//async:true will generate an non user interaction, which will make window.open opens a Popup
 				async: false
 			})
@@ -791,6 +799,7 @@
 
 	BaseDataEntryViewModel.prototype.trySave = function()
 	{
+		var self = this;
 		return this.pageLevelViewModel.saveValidate()
 			.then(function(result)
 			{
@@ -802,13 +811,17 @@
 							if (result)
 							{
 								this.sendGAEvent();
-								return this.save()
-									.then(function()
-									{
-										this.pageLevelViewModel.popupSuccessMessage();
-										this.onMainDataLoaded.notify(this.obEntityDataModel());
-										return true;
-									}.bind(this));
+								return this.uploadDocuments().then(function(result)
+								{
+									self.generateDocumentRelationships(result.Items);
+									return this.save()
+										.then(function()
+										{
+											this.pageLevelViewModel.popupSuccessMessage();
+											this.onMainDataLoaded.notify(this.obEntityDataModel());
+											return true;
+										}.bind(this));
+								}.bind(this));
 							}
 						}.bind(this));
 				}
@@ -896,16 +909,35 @@
 		if (this._view && this._view.id)
 		{
 			var lastUpdated = this.obEntityDataModel().lastUpdated();
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.type, "updatestatus"), {
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)), {
 				paramData: {
 					id: this._view.id,
-					compareTime: lastUpdated ? lastUpdated : moment(new Date()).format()
+					"@fields": "LastUpdate,Id"
 				}
 			},
 				{ overlay: false })
 				.then(function(response)
 				{
-					this.obUpdateStatus(response.Items[0]);
+					if (response.Items && response.Items.length > 0)
+					{
+						var compareTime = lastUpdated ? new Date(lastUpdated) : new Date();
+						var lastUpdatedOnServer = response.Items[0].lastUpdated ? new Date(response.Items[0].lastUpdated) : compareTime;
+						if (compareTime !== lastUpdatedOnServer)
+						{
+							var defaultStatus = { "Id": this._view.id, "LastUpdated": null, "Status": "Modified", "User": null };
+							this.obUpdateStatus(defaultStatus);
+						}
+						else
+						{
+							var defaultStatus = { "Id": 0, "LastUpdated": null, "Status": "Unchanged", "User": null };
+							this.obUpdateStatus(defaultStatus);
+						}
+					}
+					else
+					{
+						var defaultStatus = { "Id": 0, "LastUpdated": null, "Status": "Unchanged", "User": null };
+						this.obUpdateStatus(defaultStatus);
+					}
 					return true;
 				}.bind(this))
 		}
@@ -1159,7 +1191,74 @@
 					break;
 			}
 		}
-	}
+	};
+
+	BaseDataEntryViewModel.prototype.uploadDocuments = function()
+	{
+		var self = this, promiseAll = [], fieldTripDocuments = this.obDocumentGridDataSource();
+		fieldTripDocuments = fieldTripDocuments.filter(function(item)
+		{
+			return item.NeedSave;
+		});
+		if (fieldTripDocuments && fieldTripDocuments.length > 0)
+		{
+			fieldTripDocuments.forEach(function(document)
+			{
+				var uploadHelper = new TF.UploadDocumentHelper();
+				promiseAll.push(uploadHelper.UploadDocument(document));
+			});
+
+			return Promise.all(promiseAll).then(
+				function(result)
+				{
+					return self.saveDocumentEntities(result);
+				}
+			);
+		}
+		else
+		{
+			return Promise.resolve([]);
+		}
+	};
+
+	BaseDataEntryViewModel.prototype.saveDocumentEntities = function(documentEntities)
+	{
+		var self = this, newDocumentList = [];
+		documentEntities.forEach(function(document)
+		{
+			var newDocument = new TF.DataModel.DocumentDataModel(document);
+			newDocument = newDocument.toData();
+			if (newDocument.Id < 0)
+			{
+				newDocument.Id = 0
+			}
+			newDocument.Name = self.getFileOnlyName(newDocument.Filename);
+			newDocument.MimeType = newDocument.DocumentEntities[0].documentEntity.type;
+			newDocument.DocumentEntities = [];
+			newDocument.DocumentRelationshipEntities = [];
+			newDocument.FileContent = null;
+			newDocument.DocumentEntity = null;
+			newDocument.UserDefinedFields = [];
+			newDocument.DocumentRelationships = [];
+			newDocumentList.push(newDocument);
+		});
+
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
+			data: newDocumentList
+		});
+	};
+
+	BaseDataEntryViewModel.prototype.getFileOnlyName = function(fullName)
+	{
+		var pattern = /\.{1}[a-z]{1,}$/;
+		if (pattern.exec(fullName) !== null)
+		{
+			return (fullName.slice(0, pattern.exec(fullName).index));
+		} else
+		{
+			return fullName;
+		}
+	};
 
 	BaseDataEntryViewModel.prototype.dispose = function()
 	{

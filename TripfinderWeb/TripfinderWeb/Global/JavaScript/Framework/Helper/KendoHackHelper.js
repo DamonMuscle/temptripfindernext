@@ -2,7 +2,7 @@
 {
 	createNamespace("TF").KendoHackHelper = KendoHackHelper;
 
-	function KendoHackHelper()
+	function KendoHackHelper ()
 	{
 		var KendoMobile = kendo.mobile;
 		var BaseKendoMobileViewEngineAppend = KendoMobile.ViewEngine.prototype.append;
@@ -618,7 +618,7 @@
 			}
 		});
 
-		function changeOpacity(length, maxLength, $previous, $next)
+		function changeOpacity (length, maxLength, $previous, $next)
 		{
 			if (length <= 0 || maxLength <= 0)
 			{
@@ -638,7 +638,7 @@
 			}
 		};
 
-		function setColorCookie(cookieName, activeColor, colorArray)
+		function setColorCookie (cookieName, activeColor, colorArray)
 		{
 			var colorCookie = {};
 			if ($.cookie(cookieName))
@@ -656,7 +656,7 @@
 			$.cookie(cookieName, JSON.stringify(colorCookie));
 		};
 
-		function handleRecentPaletteColors(colors)
+		function handleRecentPaletteColors (colors)
 		{
 			colors = colors.map(function(color)
 			{
@@ -792,7 +792,7 @@
 
 		kendo.ui.TreeView.prototype.append = function(nodeData, parentNode, success, expand)
 		{
-			function subGroup(node)
+			function subGroup (node)
 			{
 				var result = node.children(".k-animation-container");
 
@@ -815,7 +815,7 @@
 			{
 				var inserted;
 
-				function add()
+				function add ()
 				{
 					if (parentNode && expand)
 					{
@@ -843,7 +843,7 @@
 			function()
 			{
 				var result = [];
-				function getAllById(data, id, fn)
+				function getAllById (data, id, fn)
 				{
 					for (var i = 0; i < data.length; i++)
 					{
@@ -854,7 +854,7 @@
 						getAllById(data[i].children._data, id, fn);
 					}
 				}
-				function getFirstById(data, id, fn)
+				function getFirstById (data, id, fn)
 				{
 					var node = null;
 					for (var i = 0; i < data.length; i++)
@@ -884,5 +884,64 @@
 					}
 				}
 			}()) : null;
+	}
+
+	kendo.ui.Upload.prototype.selectFiles = function(files)
+	{
+		var that = this;
+		var droppedFiles = files;
+		var guidfiles = assignGuidToFiles(getAllFileInfo(droppedFiles), that._isAsyncNonBatch());
+
+		if (droppedFiles.length > 0 && !that.wrapper.hasClass("k-state-disabled"))
+		{
+			if (!that.multiple && guidfiles.length > 1)
+			{
+				guidfiles.splice(1, guidfiles.length - 1);
+			}
+
+			var prevented = that.trigger("select", { files: guidfiles });
+			if (!prevented)
+			{
+				that._module.onSelect({ target: $(".k-dropzone", that.wrapper) }, guidfiles);
+			}
+		}
+	};
+
+	function getFileExtension (fileName)
+	{
+		var matches = fileName.match(/\.([^\.]+)$/);
+		return matches ? matches[0] : "";
+	}
+
+	function getFileInfo (rawFile)
+	{
+		// Older Firefox versions (before 3.6) use fileName and fileSize
+		var fileName = rawFile.name || rawFile.fileName;
+		return {
+			name: kendo.htmlEncode(fileName),
+			extension: getFileExtension(fileName),
+			size: rawFile.size || rawFile.fileSize,
+			rawFile: rawFile
+		};
+	}
+
+	function getAllFileInfo (rawFiles)
+	{
+		return $.map(rawFiles, function(file)
+		{
+			return getFileInfo(file);
+		});
+	}
+
+	function assignGuidToFiles (files, unique)
+	{
+		var uid = kendo.guid();
+
+		return $.map(files, function(file)
+		{
+			file.uid = unique ? kendo.guid() : uid;
+
+			return file;
+		});
 	}
 })();
