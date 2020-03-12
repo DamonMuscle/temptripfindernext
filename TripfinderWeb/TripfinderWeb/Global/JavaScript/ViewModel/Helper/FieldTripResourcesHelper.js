@@ -52,6 +52,7 @@
 
 	FieldTripResourcesHelper.prototype.getImage = function(imageType, imageId, placeholderImage)
 	{
+		// TODO-V2, need to research
 		var path = pathCombine(tf.api.apiPrefix(), "image", imageType, imageId);
 		if (placeholderImage)
 		{
