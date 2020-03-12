@@ -3098,8 +3098,11 @@
 						}).Distinct("x=>x." + autoCompleteSelectedColumn).OrderBy("$." + autoCompleteSelectedColumn).ToArray();
 					}
 
-					//verify ajax by filter control or real ajax request
-					result.TotalRecordCount = self.searchOption.data.filterSet ? self.obTotalRecordCount() : result.TotalRecordCount;
+					if (self.searchOption)
+					{
+						//verify ajax by filter control or real ajax request
+						result.TotalRecordCount = self.searchOption.data.filterSet ? self.obTotalRecordCount() : result.TotalRecordCount;
+					}
 					self.result = result;
 					kendoOptions.success({
 						d: {
@@ -3698,13 +3701,16 @@
 				if (dataItem && $.isNumeric(dataItem[self.options.Id]) && selectedId.Contains(dataItem[self.options.Id]))
 				{
 					// use setTimeout ensures that other events can't change it again
-					setTimeout(function() {
+					setTimeout(function()
+					{
 						selectItemEle.addClass('k-state-selected');
 					})
 					return item;
-					} else {
-					setTimeout(function() {
-							selectItemEle.removeClass('k-state-selected');
+				} else
+				{
+					setTimeout(function()
+					{
+						selectItemEle.removeClass('k-state-selected');
 					})
 				}
 			});
