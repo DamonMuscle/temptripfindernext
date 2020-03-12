@@ -775,7 +775,7 @@
 		}
 		selectedId = selectedIds[0];
 		selectedName = selectedRecords[0].Name;
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "FieldTrips"), {
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("FieldTrip")), {
 			paramData: {
 				copyFromId: selectedId,
 				fieldTripName: TF.Helper.NewCopyNameHelper.generateNewCopyName(selectedName,

@@ -21,6 +21,7 @@
 		var self = this;
 		self.options.gridDefinition = tf.reportGridDefinition.gridDefinition();
 		self.options.showOmittedCount = true;
+		// TODO-V2, need to research
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip");
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";

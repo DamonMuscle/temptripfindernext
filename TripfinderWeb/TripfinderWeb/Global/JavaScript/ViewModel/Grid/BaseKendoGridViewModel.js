@@ -195,7 +195,7 @@
 								this.obEmail = ko.observableArray([]);
 								this.obEmail.push(data.Items[0].EmailAddress);
 							}
-							tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "userprofile", "current"))
+							tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userprofiles"))
 								.then(function(response)
 								{
 									if (!!response.Items[0].Email)
@@ -239,10 +239,10 @@
 			if (this.type == "document")
 			{
 				var databaseType = tf.storageManager.get("databaseType");
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "document", "getKey"))
+				tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "DocumentFiles?documentId=" + record.Id))
 					.then(function(keyApiResponse)
 					{
-						window.location = pathCombine(tf.api.apiPrefix(), "document", record.Id, "download", "databaseType", databaseType, "key", keyApiResponse.Items[0]);
+						window.location = pathCombine(tf.api.apiPrefix(), "DocumentFiles?hashKey=" +  keyApiResponse.Items[0]);
 					});
 			}
 			else

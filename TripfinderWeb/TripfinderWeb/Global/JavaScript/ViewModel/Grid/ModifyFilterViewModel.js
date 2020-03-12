@@ -301,7 +301,7 @@
 
 		var url = null;
 		if (this.gridType === 'busfinderhistorical')
-			url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause");
+			url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause"); // TODO-V2, need to remove
 		else
 			url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType));
 
@@ -369,7 +369,7 @@
 
 				var url = null;
 				if (this.gridType === 'busfinderhistorical')
-					url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause");
+					url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause"); // TODO-V2, need to remove
 				else
 					url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType));
 
