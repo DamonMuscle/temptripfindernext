@@ -14,7 +14,6 @@
 	{
 		this.inited = false;
 		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
-		this._storageOpenNewGridKey = "grid.openNewGrid."+ this.getStorageKeyId();
 		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this.getStorageKeyId();
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
@@ -497,13 +496,7 @@
 					selectGridFilterEntityId = self.options.filterId;
 				} else
 				{
-					if (tf.storageManager.get(self._storageOpenNewGridKey, true)) {
-						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
-						tf.storageManager.save(self._storageFilterDataKey, "");
-						tf.storageManager.delete(self._storageOpenNewGridKey, true)
-					} else {
-						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
-					}
+					selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
 				}
 
 				if (selectGridFilterEntityId && selectGridFilterEntityId.filteredIds)
