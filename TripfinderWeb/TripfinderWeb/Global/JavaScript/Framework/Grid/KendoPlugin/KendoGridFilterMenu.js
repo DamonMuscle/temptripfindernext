@@ -885,7 +885,7 @@
 					return true;
 				}.bind(this));
 		}
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(this.options.gridType), "RawFilterClause"),
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this.options.gridType), "RawFilterClause"),
 			{
 				data: searchData.data.filterSet
 			}).then(function(apiResponse)
@@ -1292,7 +1292,7 @@
 		var searchData = new TF.SearchParameters(skip, take, null, filterSet, filterClause, this._gridState.filteredIds, omitIds);
 		searchData.data.fields = ['Id'];
 		searchData.paramData.getCount = true;
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(this._gridType)),
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType)),
 			{
 				paramData: searchData.paramData,
 				data: searchData.data
