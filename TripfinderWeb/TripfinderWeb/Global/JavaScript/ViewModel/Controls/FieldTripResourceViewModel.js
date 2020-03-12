@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').FieldTripResourceViewModel = FieldTripResourceViewModel;
 
-	function FieldTripResourceViewModel(source, id, resourceGroupDate, obFieldTrip)
+	function FieldTripResourceViewModel (source, id, resourceGroupDate, obFieldTrip)
 	{
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripResourceDataModel(source));
 		this.obEntityDataModel().fieldTripId(id);
@@ -59,12 +59,12 @@
 			{
 				if (this.obFieldTrip)
 				{
-					this.obEntityDataModel().mileageRate(this.obFieldTrip.MileageRate || e.Cost);
-					this.obEntityDataModel().vehFixedCost(this.obFieldTrip.FixedCost);
+					this.obEntityDataModel().mileageRate(this.obFieldTrip.MileageRate || e.Cost ? this.obFieldTrip.MileageRate || e.Cost : 0);
+					this.obEntityDataModel().vehFixedCost(this.obFieldTrip.FixedCost ? this.obFieldTrip.FixedCost : 0);
 				}
 				else
 				{
-					this.obEntityDataModel().mileageRate(e.Cost);
+					this.obEntityDataModel().mileageRate(e.Cost ? e.Cost : 0);
 				}
 			}
 		}.bind(this));
@@ -79,14 +79,14 @@
 			{
 				if (this.obFieldTrip)
 				{
-					this.obEntityDataModel().driverRate(this.obFieldTrip.DriverRate || e.Rate);
-					this.obEntityDataModel().driverOtrate(this.obFieldTrip.DriverOtrate || e.Otrate);
-					this.obEntityDataModel().driverFixedCost(this.obFieldTrip.DriverFixedCost);
+					this.obEntityDataModel().driverRate(this.obFieldTrip.DriverRate || e.Rate ? this.obFieldTrip.DriverRate || e.Rate : 0);
+					this.obEntityDataModel().driverOtrate(this.obFieldTrip.DriverOtrate || e.Otrate ? this.obFieldTrip.DriverOtrate || e.Otrate : 0);
+					this.obEntityDataModel().driverFixedCost(this.obFieldTrip.DriverFixedCost ? this.obFieldTrip.DriverFixedCost : 0);
 				}
 				else
 				{
-					this.obEntityDataModel().driverRate(e.Rate);
-					this.obEntityDataModel().driverOtrate(e.Otrate);
+					this.obEntityDataModel().driverRate(e.Rate ? e.Rate : 0);
+					this.obEntityDataModel().driverOtrate(e.Otrate ? e.Otrate : 0);
 				}
 			}
 		}.bind(this));
@@ -100,14 +100,14 @@
 			{
 				if (this.obFieldTrip)
 				{
-					this.obEntityDataModel().aideRate(this.obFieldTrip.AideRate || e.Rate);
-					this.obEntityDataModel().aideOtrate(this.obFieldTrip.AideOtrate || e.Otrate);
-					this.obEntityDataModel().aideFixedCost(this.obFieldTrip.AideFixedCost);
+					this.obEntityDataModel().aideRate(this.obFieldTrip.AideRate || e.Rate ? this.obFieldTrip.AideRate || e.Rate : 0);
+					this.obEntityDataModel().aideOtrate(this.obFieldTrip.AideOtrate || e.Otrate ? this.obFieldTrip.AideOtrate || e.Otrate : 0);
+					this.obEntityDataModel().aideFixedCost(this.obFieldTrip.AideFixedCost ? this.obFieldTrip.AideFixedCost : 0);
 				}
 				else
 				{
-					this.obEntityDataModel().aideRate(e.Rate);
-					this.obEntityDataModel().aideOtrate(e.Otrate);
+					this.obEntityDataModel().aideRate(e.Rate ? e.Rate : 0);
+					this.obEntityDataModel().aideOtrate(e.Otrate ? e.Otrate : 0);
 				}
 			}
 		}.bind(this));
@@ -179,7 +179,7 @@
 
 	FieldTripResourceViewModel.prototype.load = function()
 	{
-		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "vehicles"))
+		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("vehicle")))
 			.then(function(data)
 			{
 				var vehicleItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
@@ -190,7 +190,7 @@
 				this.obVehicleSource(vehicleItems);
 			}.bind(this));
 
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"), { paramData: { staffType: "Driver" }})
+		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?staffTypeId=2"))
 			.then(function(data)
 			{
 				var driverItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
@@ -201,7 +201,7 @@
 				this.obDriverSource(driverItems);
 			}.bind(this));
 
-		var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"), { paramData: { staffType: "Bus Aide" }})
+		var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?staffTypeId=1"))
 			.then(function(data)
 			{
 				var busaideItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)

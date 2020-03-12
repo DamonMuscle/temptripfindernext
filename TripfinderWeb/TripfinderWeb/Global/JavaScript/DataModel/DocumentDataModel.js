@@ -21,10 +21,14 @@
 		{ from: "DocumentClassification", default: "" },
 		{ from: "DocumentClassificationId", default: 0 },
 		{ from: "Description", default: "" },
-		{ from: "LastUpdated", default: null },
+		{ from: "LastUpdated", default: "1970-01-01T00:00:00" },
 		{ from: "LastUpdatedId", default: 0 },
 		{ from: "LastUpdatedName", default: "" },
-		{ from: "LastUpdatedType", default: 0 }
+		{ from: "LastUpdatedType", default: 0 },
+		{ from: "Name", default: "" },
+		{ from: "TempFileName", default: "" },
+		{ from: "UserDefinedFields", default: [] },
+		{ from: "DocumentRelationships", default: [] }
 	];
 
 })();

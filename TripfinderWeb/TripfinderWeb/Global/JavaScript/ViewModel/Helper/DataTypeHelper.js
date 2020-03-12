@@ -31,6 +31,36 @@
 			isMajorType: false,
 			hasDBID: true
 		},
+		fieldtripaccount: {
+			endpoint: "fieldtripaccounts",
+			isMajorType: false,
+			hasDBID: true
+		},
+		fieldtriptemplate: {
+			endpoint: "fieldtriptemplates",
+			isMajorType: false,
+			hasDBID: true
+		},
+		vehicle: {
+			endpoint: "vehicles",
+			isMajorType: false,
+			hasDBID: true
+		},
+		documentclassification: {
+			endpoint: "documentclassifications",
+			isMajorType: false,
+			hasDBID: true
+		},
+		documentrelationship: {
+			endpoint: "documentrelationships",
+			isMajorType: false,
+			hasDBID: true
+		},
+		document: {
+			endpoint: "documents",
+			isMajorType: false,
+			hasDBID: true
+		},
 		school: {
 			endpoint: "schools",
 			isMajorType: false,
@@ -38,7 +68,7 @@
 		}
 	};
 
-	function DataTypeHelper()
+	function DataTypeHelper ()
 	{
 
 	};

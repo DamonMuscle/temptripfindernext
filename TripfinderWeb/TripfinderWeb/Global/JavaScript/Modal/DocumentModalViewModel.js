@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Modal').DocumentModalViewModel = DocumentModalViewModel;
 
-	function DocumentModalViewModel(options)
+	function DocumentModalViewModel (options)
 	{
 		this.options = options;
 		//documentId, files, objtype, objid
@@ -29,7 +29,7 @@
 		if (options.documentData)
 		{
 			this.title("Edit Document");
-			var type, attachIds = [], promiseAll = [], documentRelationshipEntities = options.documentData.DocumentRelationshipEntities;
+			var type, attachIds = [], promiseAll = [], documentRelationshipEntities = options.documentData.DocumentRelationshipEntities ? options.documentData.DocumentRelationshipEntities : [];
 			if (documentRelationshipEntities.length > 0)
 			{
 				for (var i = 0; i < documentRelationshipEntities.length; i++)

@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').FieldTripInvoiceViewModel = FieldTripInvoiceViewModel;
 
-	function FieldTripInvoiceViewModel(option)
+	function FieldTripInvoiceViewModel (option)
 	{
 		this.option = option;
 		this.requiredFields = option.requiredFields;
@@ -90,15 +90,15 @@
 		var strictAcctCodes = this.option.strictAcctCodes, selectAccount = this.option.selectAccount,
 			selectedSchool = this.option.selectedSchool;
 
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"))
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripaccount")))
 			.then(function(data)
 			{
 				var accountItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
 				{
-					return !!$.trim(item.Name);
+					return !!$.trim(item.Code);
 				}) : [];
 
-				accountItems = sortArray(accountItems, "Name");
+				accountItems = sortArray(accountItems, "Code");
 				var items = accountItems;
 				if (strictAcctCodes)
 				{

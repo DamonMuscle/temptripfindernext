@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').EditDocumentViewModel = EditDocumentViewModel;
 
-	function EditDocumentViewModel(objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData, documentEntities)
+	function EditDocumentViewModel (objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData, documentEntities)
 	{
 		this.UploadedFileChangeEvent = this.UploadedFileChangeEvent.bind(this);
 		this.deleteFileClick = this.deleteFileClick.bind(this);
@@ -128,7 +128,7 @@
 								{
 									if (result === true)
 									{
-										return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "document"), {
+										return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
 											data: [this.obEntityDataModel().id()]
 										})
 											.then(function()
@@ -198,7 +198,7 @@
 
 	EditDocumentViewModel.prototype.init = function(viewModel, el)
 	{
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "documentclassification"))
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getEndpoint("documentclassification")))
 			.then(function(data)
 			{
 				var docClsItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
@@ -212,7 +212,7 @@
 					documentEntity.Id = this.documentData.Id;
 					documentEntity.Filename = this.documentData.Filename;
 					documentEntity.FileSizeKb = this.documentData.FileSizeKb;
-					documentEntity.LastUpdated = moment().format("MM/DD/YYYY");
+					documentEntity.LastUpdated = new Date();
 					documentEntity.LastUpdatedName = tf.authManager.authorizationInfo.authorizationTree.username;
 					documentEntity.DocumentClassificationId = this.documentData.DocumentClassificationId;
 					documentEntity.Description = this.documentData.Description;
@@ -341,7 +341,7 @@
 				var step = 1024 * 10;
 				var loaded = 0;
 				var total = file.size;
-				var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail };
+				var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail, documentEntity: file };
 				var content = "";
 				reader.fileName = file.name;
 				self.obEntityDataModel().documentEntities.push(fileModel);

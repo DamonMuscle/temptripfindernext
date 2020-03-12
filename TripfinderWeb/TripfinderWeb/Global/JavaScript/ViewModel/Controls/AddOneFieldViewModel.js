@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').AddOneFieldViewModel = AddOneFieldViewModel;
 
-	function AddOneFieldViewModel(type, fieldName, data)
+	function AddOneFieldViewModel (type, fieldName, data)
 	{
 		this.obFieldName = ko.observable(fieldName);
 		this.fieldName = fieldName.toLowerCase();
@@ -72,7 +72,7 @@
 								return true;
 							}
 
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriptemplate", "uniquenamecheck"),
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtriptemplate")),
 								{
 									paramData: {
 										name: this.obEntityDataModel()[this.fieldName]()
