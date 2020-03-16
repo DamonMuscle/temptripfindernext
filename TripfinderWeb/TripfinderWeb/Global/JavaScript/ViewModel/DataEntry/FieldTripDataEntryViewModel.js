@@ -1270,6 +1270,32 @@
 			item.APIIsDirty = true;
 			item.APIIsNew = true;
 		});
+
+		if (!entity.FieldTripStageId && (!this.obEntityDataModel().id() || this.obEntityDataModel().id() <= 0))
+		{
+			var currentHighestEditRight = TF.FieldTripAuthHelper.getHighestEditRightSecuredItem();
+			switch (currentHighestEditRight)
+			{
+				case "level1Requestor":
+					entity.FieldTripStageId = 1;
+					break;
+				case "level2Administrator":
+					entity.FieldTripStageId = 3;
+					break;
+				case "level3Administrator":
+					entity.FieldTripStageId = 5;
+					break;
+				case "level4Administrator":
+					entity.FieldTripStageId = 7;
+					break;
+				case "transportationAdministrator":
+					entity.FieldTripStageId = 99;
+					break;
+				default:
+					entity.FieldTripStageId = 0;
+					break;
+			}
+		}
 		return entity;
 	};
 
