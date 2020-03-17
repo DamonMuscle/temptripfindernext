@@ -6,7 +6,7 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function ManageDetailScreenLayoutViewModel(gridType, selectId, alwaysApply)
+	function ManageDetailScreenLayoutViewModel (gridType, selectId, alwaysApply)
 	{
 		var self = this, selectedDataType,
 			availableDataTypes = tf.pageManager.getAvailableDataTypes();
@@ -491,7 +491,7 @@
 			fileInput.value = null;
 		};
 
-		// The filename must have correct extension.
+		// The fileName must have correct extension.
 		if (!selectedFile)
 		{
 			return;

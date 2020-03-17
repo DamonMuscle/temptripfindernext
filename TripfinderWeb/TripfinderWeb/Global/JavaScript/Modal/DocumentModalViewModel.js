@@ -110,7 +110,13 @@
 
 	DocumentModalViewModel.prototype.getParentName = function(type, id)
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), type, id));
+		var getData = {
+			paramData: {
+				Id: id,
+				"@relationships": "all",
+			}
+		};
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(type)), getData);
 	}
 
 
@@ -187,7 +193,7 @@
 					return;
 				}
 				parameters[1].push(data);
-				this.editDocumentViewModel.obEntityDataModel().documentClassificationId(data.Id);
+				this.editDocumentViewModel.obEntityDataModel().documentClassificationID(data.Id);
 			}.bind(this));
 	}
 

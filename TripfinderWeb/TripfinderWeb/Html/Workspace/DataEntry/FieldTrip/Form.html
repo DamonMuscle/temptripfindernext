@@ -534,7 +534,7 @@
 				<label
 					data-bind="css:obRequiredFields()&&obRequiredFields().Notes&&obRequiredFields().Notes.Required?'requirestar':null">Notes</label>
 				<textarea class="form-control verticalResize" style="height: 200px;"
-					data-bind="value:obEntityDataModel().comments, attr:IsRequired(obRequiredFields()&&obRequiredFields().Notes?obRequiredFields().Notes.Required:null)"
+					data-bind="value:obEntityDataModel().notes, attr:IsRequired(obRequiredFields()&&obRequiredFields().Notes?obRequiredFields().Notes.Required:null)"
 					maxlength="10000" name="Comments"></textarea>
 			</div>
 		</div>

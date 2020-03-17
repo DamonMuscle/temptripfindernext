@@ -720,7 +720,7 @@
 		var title = tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Template",
 			fieldTripEntity = this.getSaveData(true),
 			fieldTripTemplateEntity = fieldTripEntity;
-		fieldTripEntity.Notes = fieldTripEntity.Comments;
+		fieldTripEntity.Notes = fieldTripEntity.Notes;
 		tf.modalManager.showModal(new TF.Modal.AddOneFieldModalViewModel(title, this.type + "template", "Name", new TF.DataModel.FieldTripTemplatesDataModel()))
 			.then(function(data)
 			{
@@ -814,13 +814,16 @@
 								return this.uploadDocuments().then(function(result)
 								{
 									self.generateDocumentRelationships(result.Items);
-									return this.save()
-										.then(function()
-										{
-											this.pageLevelViewModel.popupSuccessMessage();
-											this.onMainDataLoaded.notify(this.obEntityDataModel());
-											return true;
-										}.bind(this));
+									return this.updateDocuments().then(function(result)
+									{
+										return this.save()
+											.then(function()
+											{
+												this.pageLevelViewModel.popupSuccessMessage();
+												this.onMainDataLoaded.notify(this.obEntityDataModel());
+												return true;
+											}.bind(this));
+									}.bind(this));
 								}.bind(this));
 							}
 						}.bind(this));
@@ -1198,7 +1201,7 @@
 		var self = this, promiseAll = [], fieldTripDocuments = this.obDocumentGridDataSource();
 		fieldTripDocuments = fieldTripDocuments.filter(function(item)
 		{
-			return item.NeedSave;
+			return item.NeedSave && item.Id <= 0;
 		});
 		if (fieldTripDocuments && fieldTripDocuments.length > 0)
 		{
@@ -1221,6 +1224,34 @@
 		}
 	};
 
+	BaseDataEntryViewModel.prototype.updateDocuments = function()
+	{
+		var self = this;
+		var fieldTripDocuments = self.obDocumentGridDataSource();
+		fieldTripDocuments = fieldTripDocuments.filter(function(item)
+		{
+			return item.NeedSave && item.Id > 0;
+		});
+		if (fieldTripDocuments && fieldTripDocuments.length > 0)
+		{
+			var patchData = [];
+			fieldTripDocuments.forEach(function(item)
+			{
+				patchData.push({ "id": item.Id, "op": "replace", "path": "/DocumentClassificationID", "value": item.DocumentClassificationID });
+				patchData.push({ "id": item.Id, "op": "replace", "path": "/Description", "value": item.Description });
+			});
+
+			return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")),
+				{
+					data: patchData
+				})
+		}
+		else
+		{
+			return Promise.resolve([]);
+		}
+	};
+
 	BaseDataEntryViewModel.prototype.saveDocumentEntities = function(documentEntities)
 	{
 		var self = this, newDocumentList = [];
@@ -1232,7 +1263,7 @@
 			{
 				newDocument.Id = 0
 			}
-			newDocument.Name = self.getFileOnlyName(newDocument.Filename);
+			newDocument.Name = self.getFileOnlyName(newDocument.FileName);
 			newDocument.MimeType = newDocument.DocumentEntities[0].documentEntity.type;
 			newDocument.DocumentEntities = [];
 			newDocument.DocumentRelationshipEntities = [];

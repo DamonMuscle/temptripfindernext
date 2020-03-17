@@ -18,7 +18,7 @@
 		{ from: "AideFixedCost", default: null },
 		{ from: "AideRate", default: null },
 		{ from: "AideOtrate", default: null },
-		{ from: "Comments", default: "" },
+		{ from: "Notes", default: "" },
 		{ from: "ContactPhone", default: "" },
 		{ from: "ContactPhoneExt", default: "" },
 		{ from: "ContactEmail", default: "" },

@@ -18,7 +18,7 @@
 			this._createNew();
 			this._entityBackup = JSON.parse(JSON.stringify(this.toData()));
 		}
-		this.equalIgnoreFields = ["APIIsDirty", "APIIsNew", "APIToDelete", "LastUpdated", "LastUpdated", "LastUpdatedId", "LastUpdatedType", "LastUpdatedName", "TotalStopTimeManualChanged"];
+		this.equalIgnoreFields = ["APIIsDirty", "APIIsNew", "APIToDelete", "LastUpdated", "LastUpdated", "LastUpdatedId", "LastUpdatedID", "LastUpdatedType", "LastUpdatedName", "TotalStopTimeManualChanged"];
 	};
 
 	BaseDataModel.DataType = {};

@@ -117,12 +117,34 @@
 		}.bind(this));
 
 		this.obSelectedClassification = ko.observable();
-		this.obSelectedClassification.subscribe(this.setSelectValue("fieldTripClassificationId", "obSelectedClassification", function(obj) { return obj ? obj.Id : null; }), this);
-		this.obCurrentClassificationName = ko.computed(this.setSelectTextComputer("obClassificationDataModels", "fieldTripClassificationId", function(obj) { return obj.Id; }, function(obj) { return obj.Name; }), this);
+		this.obSelectedClassification.subscribe(this.setSelectValue("fieldTripClassificationId", "obSelectedClassification",
+			function(obj)
+			{
+				return obj ? obj.Id : null;
+			}), this);
+		this.obCurrentClassificationName = ko.computed(this.setSelectTextComputer("obClassificationDataModels", "fieldTripClassificationId",
+			function(obj)
+			{
+				return obj.Id;
+			}, function(obj)
+		{
+			return obj.Name;
+		}), this);
 
 		this.obSelectedEquipment = ko.observable();
-		this.obSelectedEquipment.subscribe(this.setSelectValue("fieldTripEquipmentId", "obSelectedEquipment", function(obj) { return obj ? obj.Id : null; }), this);
-		this.obCurrentEquipmentName = ko.computed(this.setSelectTextComputer("obEquipmentDataModels", "fieldTripEquipmentId", function(obj) { return obj.Id; }, function(obj) { return obj.EquipmentName; }), this);
+		this.obSelectedEquipment.subscribe(this.setSelectValue("fieldTripEquipmentId", "obSelectedEquipment",
+			function(obj)
+			{
+				return obj ? obj.Id : null;
+			}), this);
+		this.obCurrentEquipmentName = ko.computed(this.setSelectTextComputer("obEquipmentDataModels", "fieldTripEquipmentId",
+			function(obj)
+			{
+				return obj.Id;
+			}, function(obj)
+		{
+			return obj.EquipmentName;
+		}), this);
 
 		this.obSelectedDestination = ko.observable();
 		this.obSelectedDestination.subscribe(
@@ -210,13 +232,16 @@
 			this.resetEmpty(m, collection, 'fieldTripActivityId');
 		}.bind(this);
 
-		this.classificationDisable = function() { return this.obCurrentClassificationName() == ''; };
+		this.classificationDisable = function()
+		{
+			return this.obCurrentClassificationName() == '';
+		};
 
 		this.classificationCss = function() { return this.classificationDisable() ? this.opacityCssSource.disable : this.opacityCssSource.enable; };
 
 		this.classificationOnBlur = function(e, m)
 		{
-			var collection = this.getCollection(this.obClassificationDataModels(), 'Name');
+			var collection = this.getCollection(this.obClassificationDataModels(), 'Code');
 			this.resetEmpty(m, collection, 'fieldTripClassificationId');
 		}.bind(this);
 
@@ -300,11 +325,11 @@
 								{
 									if (item.DocumentClassificationID > 0)
 									{
-										item.DocumentClassificationId = item.DocumentClassificationID
+										item.DocumentClassificationID = item.DocumentClassificationID
 									}
 									var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
 									{
-										return c.Id === item.DocumentClassificationId;
+										return c.Id === item.DocumentClassificationID;
 									}.bind(self)).ToArray()[0];
 
 									if (!classificationDataModel) return;
@@ -312,20 +337,20 @@
 									var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel());
 									var documentData = obDocumentData().toData();
 									documentData.DocumentEntity = item.DocumentEntity;
-									documentData.APIIsDirty = item.APIIsDirty;
-									documentData.APIIsNew = item.APIIsNew;
-									documentData.APIToDelete = item.APIToDelete;
-									documentData.DocumentClassification = classificationDataModel.Name;
+									documentData.APIIsDirty = item.APIIsDirty ? item.APIIsDirty : false;
+									documentData.APIIsNew = item.APIIsNew ? item.APIIsNew : false;
+									documentData.APIToDelete = item.APIToDelete ? item.APIToDelete : false;
+									documentData.DocumentClassificationName = classificationDataModel.Name;
 									documentData.Description = item.Description;
-									documentData.DocumentClassificationId = item.DocumentClassificationID;
+									documentData.DocumentClassificationID = item.DocumentClassificationID;
 									documentData.DocumentRelationshipEntities = item.DocumentRelationshipEntities;
 									documentData.Id = item.Id;
-									documentData.Filename = item.FileName;
+									documentData.FileName = item.FileName;
 									documentData.FileContent = item.FileContent;
-									documentData.FileSizeKb = item.FileSizeKB;
+									documentData.FileSizeKB = item.FileSizeKB;
 									documentData.LastUpdated = item.LastUpdated;
-									documentData.LastUpdatedId = item.LastUpdatedId;
-									documentData.LastUpdatedName = item.LastUpdatedID;
+									documentData.LastUpdatedID = item.LastUpdatedID;
+									documentData.LastUpdatedName = item.LastUpdatedName;
 									documentData.LastUpdatedType = item.LastUpdatedType;
 									documentData.MimeType = item.MimeType;
 									documentData.Name = item.Name
@@ -400,7 +425,7 @@
 		var paramData = {
 			AttachedToID: self.obEntityDataModel().id(),
 			AttachedToTypeID: tf.DataTypeHelper.getId(self.type),
-			"@relationships": "DocumentRelationship"
+			"@relationships": "DocumentRelationships,FieldTrip,LastUpdatedName"
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
 			paramData: paramData
@@ -566,7 +591,7 @@
 					{
 						data.Items.forEach(function(item, index)
 						{
-							if (gridData.Filename === item.Filename)
+							if (gridData.FileName === item.FileName)
 							{
 								gridData.Id = item.Id;
 								gridData.DocumentEntity.Id = item.Id;
@@ -1053,7 +1078,7 @@
 	{
 		var self = this;
 		var fieldTripID = this.obEntityDataModel().id();
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresource")), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresourcegroup")), {
 			paramData: {
 				"@relationships": "Vehicle,Driver,Aide",
 				"@filter": "eq(FieldTripId," + fieldTripID + ")"
@@ -1586,15 +1611,15 @@
 			return true;
 		}
 
-		docs1 = sortArray(docs1, docs1[0].hasOwnProperty("Filename") ? "Filename" : "FileName");
-		docs2 = sortArray(docs2, docs2[0].hasOwnProperty("Filename") ? "Filename" : "FileName");
+		docs1 = sortArray(docs1, docs1[0].hasOwnProperty("FileName") ? "FileName" : "Filename");
+		docs2 = sortArray(docs2, docs2[0].hasOwnProperty("FileName") ? "FileName" : "Filename");
 
 		for (var i = 0; i < docs1.length; i++)
 		{
 			if ((docs1[i].Description || "") !== (docs2[i].Description || "") ||
-				docs1[i].DocumentClassificationId !== docs2[i].DocumentClassificationId ||
+				docs1[i].DocumentClassificationID !== docs2[i].DocumentClassificationID ||
 				(docs1[i].FileName || docs1[i].Filename) !== (docs2[i].FileName || docs2[i].Filename) ||
-				docs1[i].FileSizeKb !== docs2[i].FileSizeKb)
+				docs1[i].FileSizeKB !== docs2[i].FileSizeKB)
 			{
 				return false;
 			}
@@ -1692,21 +1717,23 @@
 						var obDocumentData = ko.observable(new TF.DataModel.DocumentDataModel(obResults));
 						var obDocument = obDocumentData().toData();
 						obDocument.DocumentEntity = result;
-						obDocument.Filename = result.Filename;
+						obDocument.FileName = result.FileName;
 						obDocument.FileContent = result.FileContent;
+
 						if (result.FileContent === null || result.FileContent.length === 0)
 						{
 
 							obDocument.FileContent = "";
 							obDocument.DocumentEntity.FileContent = "";
-							obDocument.FileSizeKb = 0;
+							obDocument.FileSizeKB = 0;
 						}
 						else
 						{
 							obDocument.LastUpdated = new Date();
 							obDocument.LastUpdatedName = tf.authManager.authorizationInfo.authorizationTree.username;
-							obDocument.FileSizeKb = byteLength(result.FileContent);
+							obDocument.FileSizeKB = byteLength(result.FileContent);
 						}
+						obDocument.FieldTripRelationshipCount = 0;
 						obDocument.Id = self.tempId - 1;
 						self.tempId = self.tempId - 1;
 						obDocument.NeedSave = true;
@@ -1735,14 +1762,6 @@
 			self = this;
 		if (row.length > 0)
 		{
-			var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
-				resourceSource = new kendo.data.DataSource({
-					data: self.obDocumentKendoDataSource(),
-					sort: resourceSort
-				});
-			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-			self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
-
 			var data = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
 			var option = { parentType: "fieldtrip", parentId: self.obEntityDataModel().id(), documentId: data.Id, documentData: data, documentEntities: self.obDocumentKendoDataSource() };
 			tf.modalManager.showModal(new TF.Modal.DocumentModalViewModel(option))
@@ -1806,13 +1825,6 @@
 		var row = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.select(),
 			self = this;
 
-		var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
-			resourceSource = new kendo.data.DataSource({
-				data: this.obDocumentKendoDataSource(),
-				sort: resourceSort
-			});
-		self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
-		self.obDocumentGridViewModel().obGridViewModel().searchGrid.rebuildGrid(resourceSort);
 		if (row.length)
 		{
 			var data = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
@@ -1825,9 +1837,9 @@
 					{
 						return;
 					}
-					item.APIIsNew = item.APIIsNew ? item.APIIsNew : true;
-					item.APIIsDirty = item.APIIsDirty ? item.APIIsDirty : true;
-					item.APIToDelete = item.APIToDelete ? item.APIToDelete : true;
+					item.APIIsNew = item.APIIsNew ? item.APIIsNew : false;
+					item.APIIsDirty = item.APIIsDirty ? item.APIIsDirty : false;
+					item.APIToDelete = item.APIToDelete ? item.APIToDelete : false;
 					source.push(item);
 
 				} else
@@ -1844,28 +1856,13 @@
 			{
 				if (item.Id > 0)
 				{
-					if (item.Id == data.Id)
+					if (item.Id !== data.Id)
 					{
-						if (item.DocumentRelationshipEntities && item.DocumentRelationshipEntities.length > 0)
-						{
-							item.DocumentRelationshipEntities.forEach(function(relationShipItem)
-							{
-								if (relationShipItem.AttachedToId == self.obEntityDataModel().id())
-								{
-									return;
-								}
-								relationShipSource.push(relationShipItem);
-							});
-						}
-						item.DocumentRelationshipEntities = relationShipSource;
-						item.NeedSave = true;
 						documentSource.push(item);
-						return;
 					}
-					documentSource.push(item);
 				} else
 				{
-					if (item.Id == data.Id)
+					if (item.Id === data.Id)
 					{
 						return;
 					}
@@ -1873,11 +1870,11 @@
 				}
 			}.bind(this));
 
-			resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort();
-			resourceSource = new kendo.data.DataSource({
-				data: source,
-				sort: resourceSort
-			});
+			var resourceSort = this.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
+				resourceSource = new kendo.data.DataSource({
+					data: source,
+					sort: resourceSort
+				});
 			self.obDocumentGridDataSource(documentSource);
 			self.obDocumentKendoDataSource(source);
 			self.obDocumentGridViewModel().obGridViewModel().searchGrid.kendoGrid.setDataSource(resourceSource);
@@ -2357,7 +2354,7 @@
 			fieldTripId = self.obEntityDataModel().id();
 		var noChangeDocuments = documents.filter(function(item)
 		{
-			return !item.NeedSave;
+			return !item.NeedSave || item.Id > 0;
 		});
 		if (noChangeDocuments && noChangeDocuments.length > 0)
 		{
