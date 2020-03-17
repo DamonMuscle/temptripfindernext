@@ -425,7 +425,7 @@
 		var paramData = {
 			AttachedToID: self.obEntityDataModel().id(),
 			AttachedToTypeID: tf.DataTypeHelper.getId(self.type),
-			"@relationships": "DocumentRelationships,FieldTrip,LastUpdated"
+			"@relationships": "DocumentRelationships,FieldTrip,LastUpdatedName"
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
 			paramData: paramData
