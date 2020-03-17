@@ -19,13 +19,13 @@
 					template: "<span class='glyphicon #:tf.documentGridDefinition.gridDefinition().fileTypeFormatter(MimeType)#'></span>"
 				},
 				{
-					FieldName: "Filename",
+					FieldName: "FileName",
 					DisplayName: "File Name",
 					Width: '190px',
 					type: "string"
 				},
 				{
-					FieldName: "FileSizeKb",
+					FieldName: "FileSizeKB",
 					DisplayName: "Size (KB)",
 					Width: '150px',
 					type: "number"
@@ -36,7 +36,7 @@
 					type: "string"
 				},
 				{
-					FieldName: "DocumentClassification",
+					FieldName: "DocumentClassificationName",
 					DisplayName: "Classification",
 					Width: '140px',
 					type: "string",
@@ -171,7 +171,7 @@
 		return {
 			Columns: [
 				{
-					FieldName: "Filename",
+					FieldName: "FileName",
 					DisplayName: "File Name",
 					Width: '190px',
 					type: "string",
@@ -187,52 +187,36 @@
 					isSortItem: true
 				},
 				{
-					FieldName: "DocumentClassification",
+					FieldName: "DocumentClassificationName",
 					DisplayName: "Classification",
 					Width: '140px',
 					type: "string",
 					onlyForGrid: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.GeneralDataListsDocumentClassification,
-					template: function(data)
-					{
-						return data.DocumentClassificationName;
-					}
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.GeneralDataListsDocumentClassification
 				},
 				{
-					FieldName: "AttachedCount",
+					FieldName: "FieldTripRelationshipCount",
 					DisplayName: "Attached",
 					Width: '150px',
 					type: "integer"
 				},
 				{
-					FieldName: "FileSizeKb",
+					FieldName: "FileSizeKB",
 					DisplayName: "Size (KB)",
 					Width: '150px',
-					type: "number",
-					template: function(data)
-					{
-						return data.FileSizeKB;
-					}
+					type: "number"
 				},
 				{
 					FieldName: "LastUpdated",
 					DisplayName: "Last Updated",
 					Width: '150px',
-					type: "date",
-					template: function(data)
-					{
-						return data.LastUpdatedID;
-					}
+					type: "date"
 				},
 				{
 					FieldName: "LastUpdatedName",
 					DisplayName: "Last Updated By",
 					Width: '150px',
-					type: "string",
-					template: function(data)
-					{
-						return data.LastUpdatedID;
-					}
+					type: "string"
 				}
 			],
 			fileTypeFormatter: function(value)

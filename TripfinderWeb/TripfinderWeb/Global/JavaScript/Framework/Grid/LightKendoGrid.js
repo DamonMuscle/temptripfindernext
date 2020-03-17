@@ -38,7 +38,7 @@
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate'];
 
-	function LightKendoGrid($container, options, gridState, geoFields)
+	function LightKendoGrid ($container, options, gridState, geoFields)
 	{
 		this.geoFields = geoFields;
 		if (geoFields)
@@ -50,7 +50,7 @@
 		this.loadAndCreateGrid();
 	}
 
-	LightKendoGrid.prototype._excludeOnlyForFilterColumns = function functionName(gridDefintion)
+	LightKendoGrid.prototype._excludeOnlyForFilterColumns = function functionName (gridDefintion)
 	{
 		gridDefintion.Columns = gridDefintion.Columns.filter(function(column)
 		{
@@ -277,7 +277,7 @@
 		}.bind(this));
 	};
 
-	function onProcessHotLink(e)
+	function onProcessHotLink (e)
 	{
 		if (e.altKey)
 		{
@@ -300,12 +300,12 @@
 		}
 	}
 
-	function onKendoGridTDClickEvent(e)
+	function onKendoGridTDClickEvent (e)
 	{
 		onProcessHotLink.call(this, e);
 	}
 
-	function onKendoGridTRClickEvent(e, self)
+	function onKendoGridTRClickEvent (e, self)
 	{
 		self._refreshGridBlank();
 		var dataItem = self.kendoGrid.dataItem(this);
@@ -316,7 +316,7 @@
 		}
 	}
 
-	function isHotLink(e)
+	function isHotLink (e)
 	{
 		return (e.altKey && TF.LightKendoGridHelper.isHotLinkNode($(e.target))) ||
 			(TF.isMobileDevice && TF.LightKendoGridHelper.isHotLinkNode($(e.target)))
@@ -592,7 +592,7 @@
 						{
 							self.hasSendRequst = true;
 
-							function initListFilterPromise()
+							function initListFilterPromise ()
 							{
 								if (self.getQuickFilter && Object.keys(self.getQuickFilter().data).length !== 0)
 								{
@@ -1057,7 +1057,7 @@
 			});
 			var findResult = tmp[0];
 
-			function convertCustomFilter(rootFilter, kendoFilterCellDomainField)
+			function convertCustomFilter (rootFilter, kendoFilterCellDomainField)
 			{
 				var needCovert2CustomFilters = rootFilter.filters.filter(function(filter)
 				{
@@ -1097,7 +1097,7 @@
 				rootFilter.filters.push(newCustomFilterSet);
 			}
 
-			function setFilterVauleForEmptyNotEmptyType(filterSet)
+			function setFilterVauleForEmptyNotEmptyType (filterSet)
 			{
 				if (!filterSet)
 					return filterSet;
@@ -1152,7 +1152,7 @@
 		}
 	};
 
-	function isTypeSetDisplayInSequence(columnType)
+	function isTypeSetDisplayInSequence (columnType)
 	{
 		return columnType === 'time' ||
 			columnType === 'date' ||
@@ -1279,7 +1279,7 @@
 		return displayFilterCell;
 	};
 
-	function isNotEmptyCustomFilterItem(customFilterItem)
+	function isNotEmptyCustomFilterItem (customFilterItem)
 	{
 		return customFilterItem && (
 			customFilterItem.value === 0 || // fix issue of apply filter is number 0;
@@ -1429,7 +1429,7 @@
 					buttons.trigger("click");
 				}
 
-				function forceClearListFilter()
+				function forceClearListFilter ()
 				{
 					self.listFilters = {};
 					self.obHeaderFilters([]);
@@ -1644,7 +1644,7 @@
 					return promiseAjaxRequest.then(function(response)
 					{
 
-						function getItem(item)
+						function getItem (item)
 						{
 							if (listFilterTemplate.filterField)
 							{
@@ -2378,12 +2378,12 @@
 				kendoDropDownList.bind('open', function()
 				{
 					var self = this;
-					function highLightCustomFilterItem()
+					function highLightCustomFilterItem ()
 					{
 						var kendoDropDownList = this;
 						var field = kendoDropDownList.element.parent().parent().parent().data('kendoField');
 
-						function isCustomFilterByFiledName(field)
+						function isCustomFilterByFiledName (field)
 						{
 							var self = this;
 							var rootFilter = self.kendoGrid.dataSource.filter();
@@ -3274,7 +3274,7 @@
 		self.onFilterChanged.notify(options);
 		return options;
 
-		function processVehicleExternalName(filterItems)
+		function processVehicleExternalName (filterItems)
 		{
 			filterItems = filterItems.map(function(item)
 			{
@@ -3297,7 +3297,7 @@
 		}
 	};
 
-	function removeEmptyFilterItems(options)
+	function removeEmptyFilterItems (options)
 	{
 		if (options && options.data &&
 			options.data.filterSet && options.data.filterSet.FilterItems)
@@ -3673,9 +3673,9 @@
 		}
 		if (type === 'document')
 		{
-			if (!Enumerable.From(fields).Contains('Filename'))
+			if (!Enumerable.From(fields).Contains('FileName'))
 			{
-				fields = fields.concat(['Filename']);
+				fields = fields.concat(['FileName']);
 			}
 		}
 		return fields;

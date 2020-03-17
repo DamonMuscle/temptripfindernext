@@ -1,7 +1,7 @@
 ﻿(function()
 {
 	createNamespace("TF.GridDefinition").FieldTripGridDefinition = FieldTripGridDefinition;
-	function FieldTripGridDefinition()
+	function FieldTripGridDefinition ()
 	{
 	}
 

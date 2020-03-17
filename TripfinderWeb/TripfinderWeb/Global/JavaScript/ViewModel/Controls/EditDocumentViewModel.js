@@ -32,14 +32,14 @@
 		{
 			if (!this.obEntityDataModel().apiIsNew())
 			{
-				return this.obEntityDataModel().filename();
+				return this.obEntityDataModel().fileName();
 			}
 			else
 			{
 				var documentEntities = this.obEntityDataModel().documentEntities();
 				if (documentEntities.length == 1)
 				{
-					return documentEntities[0].Filename;
+					return documentEntities[0].FileName;
 				}
 				else if (documentEntities.length > 0)
 				{
@@ -63,13 +63,13 @@
 		var classificationDataModels = this.obClassificationDataModels();
 		var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
 		{
-			return c.Id === this.obEntityDataModel().documentClassificationId()
+			return c.Id === this.obEntityDataModel().documentClassificationID()
 		}.bind(this)).ToArray()[0];
 		setTimeout(function()
 		{
 			if (this.$form && classificationDataModel && !!classificationDataModel.Name)
 			{
-				this.$form.find("input[name='documentClassification']").change();
+				this.$form.find("input[name='documentClassificationName']").change();
 			}
 		}.bind(this));
 		return classificationDataModel ? classificationDataModel.Name : "";
@@ -77,8 +77,8 @@
 
 	EditDocumentViewModel.prototype.setDocumentClassification = function()
 	{
-		this.obEntityDataModel().documentClassification(this.obSelectedDocumentClassification() ? this.obSelectedDocumentClassification().Name : "");
-		this.obEntityDataModel().documentClassificationId(this.obSelectedDocumentClassification() ? this.obSelectedDocumentClassification().Id : 0);
+		this.obEntityDataModel().documentClassificationName(this.obSelectedDocumentClassification() ? this.obSelectedDocumentClassification().Name : "");
+		this.obEntityDataModel().documentClassificationID(this.obSelectedDocumentClassification() ? this.obSelectedDocumentClassification().Id : 0);
 	};
 
 	EditDocumentViewModel.prototype.save = function()
@@ -118,31 +118,7 @@
 						{
 							return { pendingChange: { isAssociated: isAssociated, ids: [this.obEntityDataModel().id()], associations: associations }, data: this.obEntityDataModel().toData() };
 						}.bind(this);
-						if (this.obSelectedAssociations().length <= 0 && this.parentType && this.parentId)
-						{
-							return tf.promiseBootbox.yesNo({
-								message: "There are no other records associated with this file. Would you like to delete this file from the Document Center?",
-								backdrop: true, title: "Confirmation Message", closeButton: true
-							})
-								.then(function(result)
-								{
-									if (result === true)
-									{
-										return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
-											data: [this.obEntityDataModel().id()]
-										})
-											.then(function()
-											{
-												return { pendingChange: { isAssociated: false, ids: [this.obEntityDataModel().id()], isDeleted: true }, data: this.obEntityDataModel().toData() };
-												//return true;
-											}.bind(this));
-									}
-									if (result === false)
-									{
-										return saveEditDocument();
-									}
-								}.bind(this));
-						}
+
 						return saveEditDocument();
 					}
 					else
@@ -210,26 +186,27 @@
 				{
 					var documentEntity = new TF.DataModel.DocumentDataModel().toData();
 					documentEntity.Id = this.documentData.Id;
-					documentEntity.Filename = this.documentData.Filename;
-					documentEntity.FileSizeKb = this.documentData.FileSizeKb;
+					documentEntity.FileName = this.documentData.FileName;
+					documentEntity.FileSizeKB = this.documentData.FileSizeKB;
 					documentEntity.LastUpdated = new Date();
 					documentEntity.LastUpdatedName = tf.authManager.authorizationInfo.authorizationTree.username;
-					documentEntity.DocumentClassificationId = this.documentData.DocumentClassificationId;
+					documentEntity.DocumentClassificationID = this.documentData.DocumentClassificationID;
 					documentEntity.Description = this.documentData.Description;
 					documentEntity.DocumentEntity = this.documentData.DocumentEntity;
 					documentEntity.APIIsNew = false;
 					documentEntity.APIIsDirty = false;
 					documentEntity.APIToDelete = false;
 					this.obEntityDataModel(new TF.DataModel.DocumentDataModel(documentEntity));
-					this.obEntityDataModel().documentEntity = this.documentData.DocumentEntity;
+					// this.obEntityDataModel().documentEntity = this.documentData.DocumentEntity;
 					this.obEntityDataModel().DocumentEntities = this.documentData.DocumentEntities;
 					this.obEntityDataModel().lastUpdated = ko.observable(this.documentData.LastUpdated);
 					var classificationDataModels = this.obClassificationDataModels();
 					var classificationDataModel = Enumerable.From(classificationDataModels).Where(function(c)
 					{
-						return c.Id === this.obEntityDataModel().documentClassificationId();
+						return c.Id === this.obEntityDataModel().documentClassificationID();
 					}.bind(this)).ToArray()[0];
 					this.obSelectedDocumentClassification(classificationDataModel);
+					this.obEntityDataModel().apiIsDirty(false);
 				}
 			}.bind(this));
 
@@ -239,7 +216,7 @@
 		this.$uploadedFile = this.$form.find('#uploadedFileInput');
 		this.$uploadedFileInput = this.$form.find('input[type=file]');
 		var validatorFields = {
-			documentClassification: {
+			documentClassificationName: {
 				trigger: "blur change",
 				validators: {
 					notEmpty: {
@@ -274,7 +251,7 @@
 							{
 								if (item.UploadFailed)
 								{
-									self.pageLevelViewModel.failedDocumentNames.push(item.Filename);
+									self.pageLevelViewModel.failedDocumentNames.push(item.FileName);
 									return true;
 								}
 							}));
@@ -315,7 +292,7 @@
 	{
 		this.obEntityDataModel().documentEntities.remove(function(item)
 		{
-			return item.Filename == fileModel.Filename;
+			return item.FileName == fileModel.FileName;
 		});
 		$("input#inputFile").val("");
 	}
@@ -337,11 +314,11 @@
 			{
 				var file = files[i];
 				var reader = new FileReader();
-				self.obEntityDataModel().filename(file.name);
+				self.obEntityDataModel().fileName(file.name);
 				var step = 1024 * 10;
 				var loaded = 0;
 				var total = file.size;
-				var fileModel = { Filename: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail, documentEntity: file };
+				var fileModel = { FileName: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail, documentEntity: file };
 				var content = "";
 				reader.fileName = file.name;
 				self.obEntityDataModel().documentEntities.push(fileModel);
@@ -352,7 +329,7 @@
 					loaded += event.loaded;
 					var fileModel = Enumerable.From(self.obEntityDataModel().documentEntities()).Where(function(c)
 					{
-						return c.Filename === event.target.fileName
+						return c.FileName === event.target.fileName
 					}).ToArray()[0];
 					if (fileModel)
 					{
@@ -363,7 +340,7 @@
 				{
 					var fileModel = Enumerable.From(self.obEntityDataModel().documentEntities()).Where(function(c)
 					{
-						return c.Filename === event.target.fileName
+						return c.FileName === event.target.fileName
 					}).ToArray()[0];
 					if (fileModel)
 					{
