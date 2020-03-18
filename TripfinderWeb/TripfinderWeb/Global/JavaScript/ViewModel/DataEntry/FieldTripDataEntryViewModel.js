@@ -1296,7 +1296,7 @@
 			item.APIIsNew = true;
 		});
 
-		if (!entity.FieldTripStageId && (!this.obEntityDataModel().id() || this.obEntityDataModel().id() <= 0))
+		if (!this.obEntityDataModel().id() || this.obEntityDataModel().id() <= 0)
 		{
 			var currentHighestEditRight = TF.FieldTripAuthHelper.getHighestEditRightSecuredItem();
 			switch (currentHighestEditRight)
