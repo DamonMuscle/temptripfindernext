@@ -731,9 +731,9 @@
 				fieldTripTemplateEntity["FieldTripName"] = fieldTripEntity.Name;
 				fieldTripTemplateEntity.Name = data;
 				ga('send', 'event', 'Action', 'Template Added');
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this.type + "template"),
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type + "template")),
 					{
-						data: fieldTripTemplateEntity,
+						data: [fieldTripTemplateEntity],
 						//async:true will generate an non user interaction, which will make window.open opens a Popup
 						async: false
 					})
