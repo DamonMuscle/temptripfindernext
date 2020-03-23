@@ -409,7 +409,7 @@
 
 	BasePage.prototype._globalReplaceConfirm = function(recordIds)
 	{
-		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to global replace {0} {1}? These changes are permanent.', recordIds.length, recordIds.length == 1 ? 'record' : 'records'), "Confirmation Message");
+		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to global replace {0} {1}? These changes are permanent.', recordIds.length, recordIds.length === 1 ? 'record' : 'records'), "Confirmation Message");
 	};
 
 	BasePage.prototype._globalReplace = function(recordIds, field, newValue, relationshipKey)

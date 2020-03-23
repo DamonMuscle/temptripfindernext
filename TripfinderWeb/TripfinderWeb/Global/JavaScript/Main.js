@@ -148,15 +148,15 @@ createNamespace("TF").isLandscape = isLandscape();
 
 createNamespace("TF").getSingularOrPluralTitle = function(title, count)
 {
-	if (title.toLowerCase() == "water")
+	if (title.toLowerCase() === "water")
 	{
 		return title;
 	}
-	if (title[title.length - 1] == "s")
+	if (title[title.length - 1] === "s")
 	{
 		title = Array.prototype.slice.call(title, 0, title.length - 1).join("");
 	}
-	if (count != 1)
+	if (count !== 1)
 	{
 		title = title + "s";
 	}
@@ -210,10 +210,10 @@ Array.sortBy = function(arr, fieldName, desc)
 	var sort = function(a, b)
 	{
 		var aField = a[fieldName], bField = b[fieldName];
-		if (aField == null && bField == null) return 0;
+		if (aField === null && bField === null) return 0;
 
-		if (aField == null) return -1;
-		if (bField == null) return 1;
+		if (aField === null) return -1;
+		if (bField === null) return 1;
 
 		if (aField === bField) return 0;
 		if (aField.toUpperCase)

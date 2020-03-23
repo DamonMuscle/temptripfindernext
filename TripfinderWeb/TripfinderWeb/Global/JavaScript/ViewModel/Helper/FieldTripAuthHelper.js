@@ -92,7 +92,7 @@
 	{
 		return $.grep(items, function(item, index)
 		{
-			if (!item || item.FieldTripStageId == null) return false;
+			if (!item || item.FieldTripStageId === null) return false;
 			if (tf.authManager.authorizationInfo.isAdmin) return true;
 			var securedItems = stageSecuredItemsMap[item.FieldTripStageId] || [];
 			return securedItems.some(function(item)
