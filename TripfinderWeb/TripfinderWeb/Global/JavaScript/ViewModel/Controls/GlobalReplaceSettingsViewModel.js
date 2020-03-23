@@ -95,25 +95,36 @@
 			if (field === "DepartDateTime")
 			{
 				validatorFields.DateTime.validators.callback = {
-					message: "must be <= Return Date",
 					callback: function(value, validator)
 					{
 						if (value != "")
 						{
-							var message = this.checkDeadline(value);
-							if (message)
+							var message1 = this.checkDeadline(value);
+							var m = new moment(value, 'h:m A', true);
+							var message2 = this.checkBlockTimes(m);
+							if (message1)
 							{
-								return { message: message, valid: false };
+								return { message: message2 ? (message1 + "\n" + ("Depart Time " + message2)) : message1, valid: false };
 							}
 							else
 							{
-								var m = new moment(value, 'h:m A', true);
-								message = this.checkBlockTimes(m);
-								if (message)
-								{
-									return { message: "Depart Time " + message, valid: false };
-								}
+								return message2 ? { message: "Depart Time " + message2, valid: false } : true;
 							}
+						}
+						return true;
+					}.bind(this)
+				};
+			}
+			else if (field === "EstimatedReturnDateTime")
+			{
+				validatorFields.DateTime.validators.callback = {
+					callback: function(value, validator)
+					{
+						if (value != "")
+						{
+							var m = new moment(value, 'h:m A', true);
+							var message = this.checkBlockTimes(m);
+							return message ? { message: "Return Time " + message, valid: false } : true;
 						}
 						return true;
 					}.bind(this)
