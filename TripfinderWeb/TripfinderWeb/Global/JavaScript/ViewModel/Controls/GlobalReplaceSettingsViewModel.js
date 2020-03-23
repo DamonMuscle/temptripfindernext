@@ -97,7 +97,7 @@
 				validatorFields.DateTime.validators.callback = {
 					callback: function(value, validator)
 					{
-						if (value != "")
+						if (value !== "")
 						{
 							var message1 = this.checkDeadline(value);
 							var m = new moment(value, 'h:m A', true);
@@ -120,7 +120,7 @@
 				validatorFields.DateTime.validators.callback = {
 					callback: function(value, validator)
 					{
-						if (value != "")
+						if (value !== "")
 						{
 							var m = new moment(value, 'h:m A', true);
 							var message = this.checkBlockTimes(m);
