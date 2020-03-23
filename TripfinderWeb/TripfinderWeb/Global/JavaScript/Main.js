@@ -146,6 +146,23 @@ createNamespace("TF").isPhoneDevice = isPhoneDevice();
 createNamespace("TF").isPortrait = isPortrait();
 createNamespace("TF").isLandscape = isLandscape();
 
+createNamespace("TF").getSingularOrPluralTitle = function(title, count)
+{
+	if (title.toLowerCase() == "water")
+	{
+		return title;
+	}
+	if (title[title.length - 1] == "s")
+	{
+		title = Array.prototype.slice.call(title, 0, title.length - 1).join("");
+	}
+	if (count != 1)
+	{
+		title = title + "s";
+	}
+	return title;
+};
+
 TF.isIE = (function()
 {
 	var ua = window.navigator.userAgent;
@@ -185,6 +202,37 @@ Array.extend = function(arr1, arr2)
 Array.contain = function(arr, item)
 {
 	return arr.indexOf(item) != -1;
+};
+
+Array.sortBy = function(arr, fieldName, desc)
+{
+	var factor = desc ? -1 : 1;
+	var sort = function(a, b)
+	{
+		var aField = a[fieldName], bField = b[fieldName];
+		if (aField == null && bField == null) return 0;
+
+		if (aField == null) return -1;
+		if (bField == null) return 1;
+
+		if (aField === bField) return 0;
+		if (aField.toUpperCase)
+		{
+			var aFieldUpper = aField.toUpperCase(), bFieldUpper = bField.toUpperCase();
+			if (aFieldUpper === bFieldUpper)
+			{
+				return aField > bField ? 1 : -1;
+			}
+			return aFieldUpper > bFieldUpper ? 1 : -1;
+		}
+
+		return aField > bField ? 1 : -1;
+	};
+
+	return arr.sort(function(a, b)
+	{
+		return sort(a, b) * factor;
+	});
 };
 
 Array.equals = function(arr1, arr2)
@@ -658,5 +706,17 @@ Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 		return fn.apply(scope || this, arguments);
 	});
 };
+
+(function($)
+{
+	$.fn.bootstrapValidator.validators.phoneinplus = {
+		validate: function(validator, $field, options)
+		{
+			var value = $field.val();
+
+			return value === "" ? true : isValidNumber(value, options.country || 'US');
+		}
+	}
+}(window.jQuery));
 
 tf.isTripfinder = true;

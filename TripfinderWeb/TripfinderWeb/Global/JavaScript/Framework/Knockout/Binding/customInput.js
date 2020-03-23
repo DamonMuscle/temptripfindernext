@@ -6,55 +6,40 @@
 		{
 			case "Disabled":
 				return new TF.Input.DisabledBox(initialValue, attributes, disable, events);
-				break;
 			case "Boolean":
 				return new TF.Input.BooleanBox(initialValue, attributes, disable, events);
-				break;
 			case "String":
 				return new TF.Input.StringBox(initialValue, attributes, disable, undefined, undefined, events);
-				break;
 			case "Email":
 				return new TF.Input.EmailBox(initialValue, attributes, disable, events);
-				break;
 			case "ZipCode":
 				return new TF.Input.ZipCodeBox(initialValue, attributes, disable, events);
-				break;
 			case "Url":
 				return new TF.Input.UrlBox(initialValue, attributes, disable, events);
-				break;
 			case "DateTime":
 				return new TF.Input.DateTimeBox(initialValue, attributes, disable, nowrap, events, element);
-				break;
 			case "Date":
 				return new TF.Input.DateBox(initialValue, attributes, disable, nowrap, events);
-				break;
 			case "Time":
 				return new TF.Input.TimeBox(initialValue, attributes, disable, nowrap, events, element);
-				break;
 			case "Integer":
 				return new TF.Input.IntegerBox(initialValue, attributes, disable, events);
-				break;
 			case "Decimal":
 				return new TF.Input.DecimalBox(initialValue, attributes, disable, events);
-				break;
 			case "Number":
 				return new TF.Input.NumberBox(initialValue, attributes, disable, events);
-				break;
 			case "Currency":
 				return new TF.Input.CurrencyBox(initialValue, attributes, disable, events);
-				break;
 			case "Phone":
 				return new TF.Input.PhoneBox(initialValue, attributes, disable, events);
-				break;
 			case "Color":
 				return new TF.Input.ColorBox(initialValue, attributes, disable, nowrap, events);
-				break;
 			case "DataList":
 				return new TF.Input.DataListBox(initialValue, attributes, disable, nowrap, events);
-				break;
+			case "PhoneExt":
+				return new TF.Input.PhoneExtBox(initialValue, attributes, disable, events);
 			case "Select":
 				return new TF.Input.SelectBox(initialValue, attributes, disable, events);
-				break;
 		}
 	}
 

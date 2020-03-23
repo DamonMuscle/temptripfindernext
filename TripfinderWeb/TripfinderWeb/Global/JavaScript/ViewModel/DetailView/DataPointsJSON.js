@@ -495,7 +495,11 @@ var today = (new Date()).toDateString(),
 					"field": "Name",
 					"title": "Name",
 					"type": "String",
-					"defaultValue": "Music Department Trip"
+					"defaultValue": "Music Department Trip",
+					"editType": {
+						"format": "String",
+						"maxLength": 200
+					}
 				},
 				{
 					"field": "SchoolNameWithCode",
@@ -528,10 +532,16 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "John Smith"
 				},
 				{
-					"field": "PhoneWithExt",
-					"title": "Phone/Ext",
+					"field": "ContactPhone",
+					"title": "Phone",
 					"type": "String",
-					"defaultValue": "(800) 373-3609 x01"
+					"defaultValue": "(800) 373-3609"
+				},
+				{
+					"field": "ContactPhoneExt",
+					"title": "Ext",
+					"type": "String",
+					"defaultValue": "x0000"
 				},
 				{
 					"field": "ContactEmail",
@@ -666,10 +676,16 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "Professor"
 				},
 				{
-					"field": "DestinationPhoneWithExt",
-					"title": "Destination Phone/Ext",
+					"field": "DestinationPhoneExt",
+					"title": "Destination Ext",
 					"type": "String",
-					"defaultValue": "(800) 373-3609 x01"
+					"defaultValue": "x0000"
+				},
+				{
+					"field": "DestinationContactPhone",
+					"title": "Destination Phone",
+					"type": "String",
+					"defaultValue": "(800) 373-3609"
 				},
 				{
 					"field": "DestinationFax",

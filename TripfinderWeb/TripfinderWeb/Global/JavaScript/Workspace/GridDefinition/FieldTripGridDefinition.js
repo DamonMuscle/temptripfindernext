@@ -1,7 +1,7 @@
 ﻿(function()
 {
 	createNamespace("TF.GridDefinition").FieldTripGridDefinition = FieldTripGridDefinition;
-	function FieldTripGridDefinition ()
+	function FieldTripGridDefinition()
 	{
 	}
 
@@ -21,6 +21,12 @@
 				{
 					FieldName: "PublicId",
 					DisplayName: "Public ID",
+					Width: '150px',
+					type: "string"
+				},
+				{
+					FieldName: "BillingNotes",
+					DisplayName: "Billing Notes",
 					Width: '150px',
 					type: "string"
 				},

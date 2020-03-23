@@ -3,13 +3,13 @@
 	var self = createNamespace("TF").FieldTripAuthHelper = {};
 
 	var securedItemDefinition =
-		{
-			transportationAdministrator: "transportationAdministrator",
-			level4Administrator: "level4Administrator",
-			level3Administrator: "level3Administrator",
-			level2Administrator: "level2Administrator",
-			level1Requestor: "level1Requestor",
-		},
+	{
+		transportationAdministrator: "transportationAdministrator",
+		level4Administrator: "level4Administrator",
+		level3Administrator: "level3Administrator",
+		level2Administrator: "level2Administrator",
+		level1Requestor: "level1Requestor",
+	},
 		allSecuredItems =
 			[
 				securedItemDefinition.transportationAdministrator,
@@ -19,14 +19,14 @@
 				securedItemDefinition.level1Requestor,
 			],
 		ajaxData =
-			{
-				"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
-				"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
-				"filterSet": null,
-				"filterClause": "",
-				"isQuickSearch": false,
-				"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
-			},
+		{
+			"sortItems": [{ "Name": "PublicId" }, { "Name": "Id", "isAscending": "asc" }],
+			"idFilter": { "IncludeOnly": null, "ExcludeAny": [] },
+			"filterSet": null,
+			"filterClause": "",
+			"isQuickSearch": false,
+			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+		},
 		idName = "Id",
 		mySubmittedIds,
 		getMySubmittedIds = function()
@@ -87,6 +87,23 @@
 		= [
 			securedItemDefinition.transportationAdministrator
 		];
+
+	self.getEditableFieldTrips = function(items)
+	{
+		return $.grep(items, function(item, index)
+		{
+			if (!item || item.FieldTripStageId == null) return false;
+			if (tf.authManager.authorizationInfo.isAdmin) return true;
+			var securedItems = stageSecuredItemsMap[item.FieldTripStageId] || [];
+			return securedItems.some(function(item)
+			{
+				return editableRights.some(function(right)
+				{
+					return tf.authManager.authorizationInfo.isAuthorizedFor(item, right);
+				});
+			});
+		});
+	};
 
 	self.checkFieldTripEditable = function(item)
 	{

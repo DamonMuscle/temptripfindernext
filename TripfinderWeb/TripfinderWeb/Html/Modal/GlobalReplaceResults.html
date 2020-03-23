@@ -1,0 +1,11 @@
+<div>
+	<div>Mass Update Results - for <span data-bind="text:recordsCount"></span> total record<span data-bind="text:recordsCount != 1 ? 's':''"></span> in this set.</div>
+	<ul>
+		<li data-bind="text:successMessage,style:{'cursor':  obSuccessIds().length ? 'pointer' : 'default' },click: obSuccessIds().length ?
+			function(i,e){openResultsInNewGrid(obSuccessIds(),e)} : undefined">
+		</li>
+		<li data-bind="text:failedMessage,style:{'cursor':  obFailedIds().length ? 'pointer' : 'default' },click: obFailedIds().length ?
+			function(i,e){openResultsInNewGrid(obFailedIds(),e)} : undefined">
+		</li>
+	</ul>
+</div>
