@@ -9,6 +9,9 @@
 		this.dataList = attributes.dataList;
 		this.obDataList = ko.observable();
 		this.obSelectedData = ko.observable();
+		this.editable = attributes.editable;
+		this.maxlength = attributes.maxlength;
+		this.isInt = attributes.integer;
 
 		namespace.StringBox.call(this, initialValue, attributes, disable);
 	};
@@ -23,7 +26,7 @@
 	{
 		var content = '<div class="input-group">';
 		content += '<div data-bind="typeahead:{source:obDataList,format:function(obj){return obj.text},drowDownShow:true,notSort:true,selectedValue:obSelectedData},disabled:disable">'
-		content += '<input type="text" class="form-control" name=' + this.type + ' data-tf-input-type=' + this.type + ' data-bind="value:obRawValue,disable:disable,style:{cursor:disable()?\'\':\'pointer\',backgroundColor:disable()?\'\':\'#fff\'}" readonly />';
+		content += '<input type="text" class="form-control" maxlength=' + this.maxlength + ' name=' + this.type + ' data-tf-input-type=' + this.type + ' data-bind="value:obRawValue,disable:disable,style:{cursor:disable()?\'\':\'pointer\',backgroundColor:disable()?\'\':\'#fff\'}" readonly />';
 		content += '</div>';
 		content += '<div class="input-group-btn">';
 		content += '<button type="button" class="btn btn-default btn-sharp" data-bind="disabled:disable">';
@@ -33,7 +36,6 @@
 		content += '</div>';
 
 		this.$element = $(content);
-
 		this.$element.find("input").on("click", function(e)
 		{
 			if (!this.disable())
@@ -46,6 +48,25 @@
 	{
 		this.obDataList(this.dataList);
 		ko.applyBindings(this, this.$element[0]);
+		var input = this.$element.find("input");
+
+		if (this.editable)
+		{
+			input.css("cursor", "text");
+			input.prop("readonly", false);
+		}
+		if (this.isInt)
+		{
+			input.on("keypress keyup blur", function(event)
+			{
+				var key = event.which || event.keyCode || 0;
+				if ((key < 48 || key > 57) && (key !== 45 || ($(this).val().indexOf('-') !== -1 ? this.selectionStart > 0 || this.selectionEnd === 0 : false) || this.selectionStart > 0) && TF.Input.BaseBox.notSpecialKey(event))
+				{
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			});
+		}
 	}
 
 })();
