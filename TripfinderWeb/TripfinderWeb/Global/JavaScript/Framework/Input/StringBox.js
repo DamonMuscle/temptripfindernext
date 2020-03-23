@@ -36,7 +36,7 @@
 			this.eventObject[i] = this.events[i];
 			events += i + ":eventObject." + i + ",";
 		}
-		var $input = $('<input type="text" ' + required + 'class="form-control" data-tf-input-type=' + this.type + ' data-bind="value:obRawValue, disable:disable,css:{disabled:disable},event:{keypress:keypress,keyup:keyup,' + events + '}" />');
+		var $input = $('<input type="text" ' + required + 'class="form-control" data-tf-input-type=' + this.type + ' autocomplete="new-password" data-bind="value:obRawValue, disable:disable,css:{disabled:disable},event:{keypress:keypress,keyup:keyup,' + events + '}" />');
 		this.$input = $input;
 		var $element = $input;
 		this.applyAttribute($element, this.attributes);

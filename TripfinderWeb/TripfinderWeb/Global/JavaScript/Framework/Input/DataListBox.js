@@ -26,7 +26,7 @@
 	{
 		var content = '<div class="input-group">';
 		content += '<div data-bind="typeahead:{source:obDataList,format:function(obj){return obj.text},drowDownShow:true,notSort:true,selectedValue:obSelectedData},disabled:disable">'
-		content += '<input type="text" class="form-control" maxlength=' + this.maxlength + ' name=' + this.type + ' data-tf-input-type=' + this.type + ' data-bind="value:obRawValue,disable:disable,style:{cursor:disable()?\'\':\'pointer\',backgroundColor:disable()?\'\':\'#fff\'}" readonly />';
+		content += '<input type="text" class="form-control" maxlength=' + this.maxlength + ' name=' + this.type + ' data-tf-input-type=' + this.type + ' autocomplete="new-password" data-bind="value:obRawValue,disable:disable,style:{cursor:disable()?\'\':\'pointer\',backgroundColor:disable()?\'\':\'#fff\'}" readonly />';
 		content += '</div>';
 		content += '<div class="input-group-btn">';
 		content += '<button type="button" class="btn btn-default btn-sharp" data-bind="disabled:disable">';
