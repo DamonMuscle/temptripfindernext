@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Page").BaseGridPage = BaseGridPage;
 
-	function BaseGridPage ()
+	function BaseGridPage()
 	{
 		var self = this;
 		TF.Page.BasePage.apply(self, arguments);
@@ -27,6 +27,7 @@
 		self.obReports = ko.observable(false);
 		self.copyToClipboardClick = this.copyToClipboardClick.bind(self);
 		self.saveAsClick = this.saveAsClick.bind(self);
+		self.massUpdateClick = this.massUpdateClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
 		self.obCanCopyFieldTrip = ko.observable(false);
 		self.selectedItemEditable = ko.observable(false);

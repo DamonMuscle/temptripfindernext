@@ -341,6 +341,129 @@
 			});
 	};
 
+	BasePage.prototype.massUpdateClick = function()
+	{
+		var self = this, selectedIds = self.searchGrid.getSelectedIds(), gridType = self.searchGrid._gridType;
+		return tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceSettingsModalViewModel(selectedIds.length, gridType)).then(function(result)
+		{
+			if (!result)
+			{
+				return;
+			}
+
+			var recordIds = [], field, newValue, relationshipKey;
+			if (result.specifyRecords == "selected")
+			{
+				recordIds = selectedIds;
+			}
+			else
+			{
+				recordIds = self.searchGrid.obAllIds();
+			}
+
+			field = result.field;
+			newValue = result.newValue;
+			relationshipKey = result.relationshipKey;
+			if (result.replaceType == "Standard")
+			{
+				return self._globalReplaceConfirm(recordIds).then(function(yesOrNo)
+				{
+					if (yesOrNo)
+					{
+						self._globalReplace(recordIds, field, newValue, relationshipKey);
+					}
+				});
+			}
+
+			if (result.extended == 0 || result.extended == 1)
+			{
+				return tf.promiseBootbox.yesNo("This change may remove selected students from all their Trips. Do you wish to continue?", "Confirmation Message").then(function(yesOrNo)
+				{
+					if (yesOrNo)
+					{
+						var promise = null;
+						if (result.extended == 0)
+						{
+							// Remove all additional requirements
+							promise = tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
+								paramData: {
+									"@filter": "in(StudentId," + recordIds.join(",") + ")&eq(Type,1)",
+									dbid: tf.datasourceManager.databaseId
+								}
+							});
+						}
+
+						if (promise)
+						{
+							promise.then(function()
+							{
+								self.searchGrid.refresh();
+								tf.promiseBootbox.alert("Global Replace success");
+							});
+						}
+					}
+				});
+			}
+		});
+	};
+
+	BasePage.prototype._globalReplaceConfirm = function(recordIds)
+	{
+		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to global replace {0} {1}? These changes are permanent.', recordIds.length, recordIds.length === 1 ? 'record' : 'records'), "Confirmation Message");
+	};
+
+	BasePage.prototype._globalReplace = function(recordIds, field, newValue, relationshipKey)
+	{
+		var self = this, data = [], paramData = {
+			"@updateResult": true
+		};
+
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search/fieldtrips"), {
+			paramData: { take: 100000, skip: 0 },
+			data: {
+				fields: ["Id", "FieldTripStageId"],
+				filterClause: "",
+				filterSet: null,
+				idFilter: { IncludeOnly: recordIds, ExcludeAny: [] },
+				sortItems: [{ Name: "Id", isAscending: "asc", Direction: "Ascending" }]
+			}
+		}).then(function(result)
+		{
+			var editableFieldtrips = TF.FieldTripAuthHelper.getEditableFieldTrips(result.Items);
+
+			var ids = editableFieldtrips.map(function(item) { return item.Id });
+			var failedIds = $.grep(recordIds, function(id) { return ids.indexOf(id) < 0 });
+
+			ids.forEach(function(id)
+			{
+				if (relationshipKey)
+				{
+					data.push({ "Id": id, "op": "relationship", "path": "/" + field, "value": typeof newValue == "string" ? newValue : JSON.stringify(newValue) });
+				}
+				else
+				{
+					data.push({ "Id": id, "op": "replace", "path": "/" + field, "value": newValue.toString() });
+				}
+			});
+			if (relationshipKey)
+			{
+				paramData["@relationships"] = relationshipKey;
+			}
+			return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), "fieldtrips"), {
+				paramData: paramData,
+				data: data,
+			}).then(function(result)
+			{
+				if (result && result.Items && result.Items[0])
+				{
+					self.searchGrid.refresh();
+					result.Items[0].FailedIds = result.Items[0].FailedIds.concat(failedIds);
+					tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceResultsModalViewModel(result.Items[0], self.searchGrid._gridType));
+				}
+			});
+		});
+	};
+
 	BasePage.prototype.saveAsClick = function()
 	{
 		var self = this, selectedIds = self.searchGrid.getSelectedIds();
