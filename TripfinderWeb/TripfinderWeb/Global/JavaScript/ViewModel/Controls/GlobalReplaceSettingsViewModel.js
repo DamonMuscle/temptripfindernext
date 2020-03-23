@@ -35,6 +35,8 @@
 		self.obSelectedField.subscribe(function()
 		{
 			var selectedField = self.obSelectedField();
+			self.editable(selectedField && selectedField.editType && selectedField.editType.allowInput);
+			self.isInt(false);
 			if (selectedField && selectedField.field != self.lastSelectedField)
 			{
 				self.lastSelectedField = selectedField.field;
@@ -66,6 +68,8 @@
 			}
 		});
 		self.obSelectDataList = ko.observableArray();
+		self.editable = ko.observable(false);
+		self.isInt = ko.observable(false);
 		self.obTitle = ko.observable("");
 		self.obMaxLength = ko.observable("50");
 		self.obFieldSources = ko.observableArray([]);
@@ -91,16 +95,16 @@
 		var self = this, validatorFields = null;
 		if ("String" === type || "DataList" === type || "Phone" === type || "Email" === type || "Date" === type || "Time" === type || "Zip" === type || "Number" === type || "DateTime" === type)
 		{
-			validatorFields = self.generateValidatorFields(type, format)
+			validatorFields = self.generateValidatorFields(type, format, field);
 			if (field === "DepartDateTime")
 			{
 				validatorFields.DateTime.validators.callback = {
 					callback: function(value, validator)
 					{
-						if (value !== "")
+						if (value !== "" && moment(value, 'MM/DD/YYYY hh:mm A').isValid())
 						{
 							var message1 = this.checkDeadline(value);
-							var m = new moment(value, 'h:m A', true);
+							var m = new moment(value);
 							var message2 = this.checkBlockTimes(m);
 							if (message1)
 							{
@@ -218,7 +222,7 @@
 		return message;
 	};
 
-	GlobalReplaceSettingsViewModel.prototype.generateValidatorFields = function(type, format)
+	GlobalReplaceSettingsViewModel.prototype.generateValidatorFields = function(type, format, field)
 	{
 		var self = this, result = {}, validators;
 		switch (type)
@@ -251,7 +255,7 @@
 				validators = {
 					date: {
 						format: 'MM/DD/YYYY hh:mm A',
-						message: 'The input is not a valid datetime(MM/DD/YYYY hh:mm A)'
+						message: 'The input is not a valid datetime(MM/DD/YYYY hh:mm A)\n'
 					}
 				};
 				break;
@@ -293,7 +297,18 @@
 				};
 				break;
 			case "DataList":
-				validators = {};
+				if (field === "DestinationZip")
+				{
+					validators = {
+						integer: {
+							message: 'The input is not a valid zip'
+						}
+					};
+				}
+				else
+				{
+					validators = {};
+				}
 				break;
 			default:
 				return null;
@@ -339,7 +354,7 @@
 				{
 					item.unshift({ text: "(none)", value: "" })
 				}
-				return Promise.resolve({ type: type, item: item });
+				return Promise.resolve({ type: type, item: item, field: selectedField.field });
 			})
 		}
 
@@ -467,7 +482,7 @@
 				}
 			});
 		}
-		else if (self.obSelectType() != "DataList")
+		else if (self.obSelectType() != "DataList" || (self.obSelectedField().editType.allowInput && self.obSelectedField().editType.allowInput()))
 		{
 			if (self.obSelectType() == "Time")
 			{
@@ -791,10 +806,11 @@
 					"title": "Destination",
 					"type": "String",
 					"editType": {
-						"format": self.fieldtripConfigs && self.fieldtripConfigs['StrictDest'] ? "DropDown" : "String",
+						"format": "DropDown",
 						"maxLength": 200,
 						"getSource": function()
 						{
+							var strictDest = self.fieldtripConfigs && self.fieldtripConfigs['StrictDest'];
 							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripDestinations")).then(function(result)
 							{
 								return result.Items.map(function(item)
@@ -808,11 +824,7 @@
 						"textField": "Name",
 						"valueField": "Name",
 						"entityKey": "Destination",
-						"allowInput": function()
-						{
-							var strictDest = self.fieldtripConfigs && self.fieldtripConfigs['StrictDest'];
-							return !strictDest;
-						},
+						"allowInput": !self.fieldtripConfigs || !self.fieldtripConfigs['StrictDest'],
 					}
 				},
 				{
@@ -829,8 +841,21 @@
 					"title": "Destination City",
 					"type": "String",
 					"editType": {
-						"format": "String",
-						"maxLength": 100
+						"format": "DropDown",
+						"maxLength": 100,
+						"getSource": function()
+						{
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingCities")).then(function(result)
+							{
+								return result.Items.map(function(item)
+								{
+									item['text'] = item['Name'];
+									item['value'] = item['Name'];
+									return item;
+								});
+							});
+						},
+						allowInput: true,
 					}
 				},
 				{
@@ -847,8 +872,22 @@
 					"title": "Destination Zip",
 					"type": "Zip",
 					"editType": {
-						"format": "Integer",
-						"maxLength": 5
+						"format": "DropDown",
+						"maxLength": 5,
+						"getSource": function()
+						{
+							self.isInt(true);
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingPostalCodes")).then(function(result)
+							{
+								return result.Items.map(function(item)
+								{
+									item['text'] = item['Postal'];
+									item['value'] = item['Postal'];
+									return item;
+								});
+							});
+						},
+						allowInput: true,
 					}
 				},
 				{
