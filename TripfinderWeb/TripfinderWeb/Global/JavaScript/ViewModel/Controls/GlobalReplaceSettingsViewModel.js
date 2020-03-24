@@ -487,7 +487,7 @@
 				}
 			});
 		}
-		else if (self.obSelectType() != "DataList" || (self.obSelectedField().editType.allowInput && self.obSelectedField().editType.allowInput()))
+		else if (self.obSelectType() != "DataList" || self.obSelectedField().editType.allowInput)
 		{
 			if (self.obSelectType() == "Time")
 			{
