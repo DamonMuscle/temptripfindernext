@@ -131,7 +131,7 @@
 					{
 						if (value !== "" && checkBlock())
 						{
-							var m = new moment(value, 'h:m A', true);
+							var m = new moment(value);
 							var message = this.checkBlockTimes(m);
 							return message ? { message: "Return Time " + message, valid: false } : true;
 						}
