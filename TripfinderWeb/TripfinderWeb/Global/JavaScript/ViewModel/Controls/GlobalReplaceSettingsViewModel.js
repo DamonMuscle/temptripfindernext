@@ -96,12 +96,17 @@
 		if ("String" === type || "DataList" === type || "Phone" === type || "Email" === type || "Date" === type || "Time" === type || "Zip" === type || "Number" === type || "DateTime" === type)
 		{
 			validatorFields = self.generateValidatorFields(type, format, field);
+			var checkBlock = function()
+			{
+				var block = $.grep($(".form-group .help-block"), function(item) { return $(item).html().indexOf("The input is not a valid datetime") >= 0; });
+				return !(block.length > 0 && $(block).is(":visible"));
+			};
 			if (field === "DepartDateTime")
 			{
 				validatorFields.DateTime.validators.callback = {
 					callback: function(value, validator)
 					{
-						if (value !== "" && moment(value, 'MM/DD/YYYY hh:mm A').isValid())
+						if (value !== "" && checkBlock())
 						{
 							var message1 = this.checkDeadline(value);
 							var m = new moment(value);
@@ -124,7 +129,7 @@
 				validatorFields.DateTime.validators.callback = {
 					callback: function(value, validator)
 					{
-						if (value !== "")
+						if (value !== "" && checkBlock())
 						{
 							var m = new moment(value, 'h:m A', true);
 							var message = this.checkBlockTimes(m);
