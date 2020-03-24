@@ -412,16 +412,53 @@
 		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to global replace {0} {1}? These changes are permanent.', recordIds.length, recordIds.length === 1 ? 'record' : 'records'), "Confirmation Message");
 	};
 
+	BasePage.prototype.dateCheck = function(fieldtrips, field, newValue)
+	{
+		var result = $.grep(fieldtrips, function(trip)
+		{
+			if ("DepartDateTime" === field)
+			{
+				if (!trip.EstimatedReturnDateTime)
+				{
+					return true;
+				}
+				return moment(newValue) <= moment(trip.EstimatedReturnDateTime);
+			}
+			else if ("EstimatedReturnDateTime" === field)
+			{
+				if (!trip.DepartDateTime)
+				{
+					return true;
+				}
+				return moment(newValue) >= moment(trip.DepartDateTime);
+			}
+			else
+			{
+				return true;
+			}
+		});
+		return result.map(function(item) { return item.Id });
+	};
+
 	BasePage.prototype._globalReplace = function(recordIds, field, newValue, relationshipKey)
 	{
 		var self = this, data = [], paramData = {
 			"@updateResult": true
-		};
+		}, fields = ["Id", "FieldTripStageId"];
+
+		if ("DepartDateTime" === field)
+		{
+			fields.push("EstimatedReturnDateTime");
+		}
+		else if ("EstimatedReturnDateTime" === field)
+		{
+			fields.push("DepartDateTime");
+		}
 
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search/fieldtrips"), {
 			paramData: { take: 100000, skip: 0 },
 			data: {
-				fields: ["Id", "FieldTripStageId"],
+				fields: fields,
 				filterClause: "",
 				filterSet: null,
 				idFilter: { IncludeOnly: recordIds, ExcludeAny: [] },
@@ -434,7 +471,10 @@
 			var ids = editableFieldtrips.map(function(item) { return item.Id });
 			var failedIds = $.grep(recordIds, function(id) { return ids.indexOf(id) < 0 });
 
-			ids.forEach(function(id)
+			var validDateIds = self.dateCheck(editableFieldtrips, field, newValue);
+			var invalidDateIds = $.grep(ids, function(id) { return validDateIds.indexOf(id) < 0 });
+
+			validDateIds.forEach(function(id)
 			{
 				if (relationshipKey)
 				{
@@ -458,6 +498,7 @@
 				{
 					self.searchGrid.refresh();
 					result.Items[0].FailedIds = result.Items[0].FailedIds.concat(failedIds);
+					result.Items[0].InvalidDateIds = invalidDateIds;
 					tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceResultsModalViewModel(result.Items[0], self.searchGrid._gridType));
 				}
 			});

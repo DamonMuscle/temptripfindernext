@@ -10,9 +10,15 @@
 		self.resultsInfo = resultsInfo;
 		self.successIds = self.resultsInfo.SuccessIds;
 		self.failedIds = self.resultsInfo.FailedIds;
-		self.recordsCount = self.successIds.length + self.failedIds.length;
+		self.invalidDateIds = self.resultsInfo.InvalidDateIds;
+		self.recordsCount = self.successIds.length + self.failedIds.length + self.invalidDateIds.length;
 		self.successMessage = self.successIds.length.toString() + " record" + (self.successIds.length != 1 ? "s were " : " was ") + "successfully replaced.";
 		self.failedMessage = self.failedIds.length.toString() + " record" + (self.failedIds.length != 1 ? "s " : " ") + "couldn't be replaced due to permission control.";
+		self.invalidDateMessage = "";
+		if (self.invalidDateIds.length > 0)
+		{
+			self.invalidDateMessage = self.invalidDateIds.length.toString() + " record" + (self.invalidDateIds.length != 1 ? "s " : " ") + "couldn't be replaced because return date time must be great than or equal to depart date time.";
+		}
 		self.obSuccessIds = ko.observableArray(self.successIds);
 		self.obFailedIds = ko.observableArray(self.failedIds);
 	}
