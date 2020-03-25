@@ -17,7 +17,7 @@
 		self.invalidDateMessage = "";
 		if (self.invalidDateIds.length > 0)
 		{
-			self.invalidDateMessage = self.invalidDateIds.length.toString() + " record" + (self.invalidDateIds.length !== 1 ? "s " : " ") + "couldn't be replaced because return date time must be great than or equal to depart date time.";
+			self.invalidDateMessage = self.invalidDateIds.length.toString() + " record" + (self.invalidDateIds.length !== 1 ? "s " : " ") + "couldn't be replaced because return date time must be greater than or equal to depart date time.";
 		}
 		self.obSuccessIds = ko.observableArray(self.successIds);
 		self.obFailedIds = ko.observableArray(self.failedIds);
