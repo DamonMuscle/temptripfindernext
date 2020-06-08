@@ -1156,6 +1156,7 @@
 		evt.preventDefault();
 
 		var routeName = self.availableApplications[data].route,
+			routeTitle = self.availableApplications[data].title,
 			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
 		if (requireNewTab)
 		{
@@ -1215,7 +1216,7 @@
 				xhr.open('GET', url, true);
 				xhr.onload = function(e)
 				{
-					if (this.response.indexOf('<title>' + routeName + '</title>') > 0)
+					if (this.response.indexOf('<title>' + routeTitle + '</title>') > 0)
 					{
 						requireNewTab ? redirectWindow.location = url : window.location = url;
 					}

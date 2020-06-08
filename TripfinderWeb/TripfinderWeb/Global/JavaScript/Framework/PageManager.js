@@ -27,13 +27,33 @@
 
 		//Initial parameters
 		self.availableApplications = {
-			viewfinder: { route: "Viewfinder", url: "Viewfinder", permission: true },
-			fleetfinder: { route: "Fleetfinder", url: "Fleetfinder/admin.html", permission: tf.permissions.obIsAdmin() },
-			stopfinderadmin: { route: "StopfinderAdmin", url: "StopfinderAdmin", permission: tf.permissions.obIsAdmin() }
+			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
+			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
+			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" }
 		};
 
 		self.initApplicationSwitcher();
 	}
+
+    function transformAppName(name)
+    {
+        switch (name)
+        {
+            case "tfaweb":
+                return 'tfadmin';
+            case "rfweb":
+                return 'routefinderplus';
+            case "ffweb":
+                return 'fleetfinder';
+            case "tfweb":
+                return 'tripfinder'
+            case "vfweb":
+                return 'viewfinder';
+            default:
+                return null;
+        }
+
+    }
 
 	PageManager.prototype.initApplicationSwitcher = function()
 	{
@@ -44,8 +64,21 @@
 			supportedProducts = tf.authManager.supportedProducts.filter(function(prod)
 			{
 				var productName = prod.toLowerCase();
-				return self.availableApplications.hasOwnProperty(productName) && self.availableApplications[productName].permission;
+				return self.availableApplications.hasOwnProperty(productName);
 			});
+			                
+			if (tf.authManager.authorizationInfo.isAdmin)
+			{
+				if (!supportedProducts.includes("tfadmin"))
+				{
+					supportedProducts.push("tfadmin");
+				}
+			} else
+			{
+				var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(app => transformAppName(app));
+				supportedProducts = supportedProducts.filter(app => accessApps.includes(app));
+			}
+
 
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"), {
 				paramData: {
