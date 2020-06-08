@@ -75,8 +75,12 @@
 				}
 			} else
 			{
-				var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(app => transformAppName(app));
-				supportedProducts = supportedProducts.filter(app => accessApps.includes(app));
+				var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app) {
+					return transformAppName(app)
+				});
+				supportedProducts = supportedProducts.filter(function(app) {
+					return accessApps.includes(app)
+				});
 			}
 
 
