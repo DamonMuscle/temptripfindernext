@@ -128,6 +128,8 @@ module.exports = function(grunt)
 						'Tripfindernotexisting.html',
 						'Fleetfindernotexisting.html',
 						'Stopfinderadminnotexisting.html',
+						'Tfadminnotexisting.html',
+						'Routefinderplusnotexisting.html',
 						'loading.html',
 						'local_settings.js',
 						'Web.config',
