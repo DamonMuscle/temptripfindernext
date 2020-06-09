@@ -65,7 +65,9 @@
 			{
 				var productName = prod.toLowerCase();
 				return self.availableApplications.hasOwnProperty(productName);
-			}).map(v => v.toLowerCase());
+			}).map(function(v) {
+				return v.toLowerCase();
+			});
 			                
 			if (tf.authManager.authorizationInfo.isAdmin)
 			{
