@@ -116,7 +116,7 @@
 					{
 						hasURLProducts = res ? res.Products.filter(function(prod)
 						{
-							return !!prod.Uri && supportedProducts.indexOf(prod.Name) != -1;
+							return !!prod.Uri && supportedProducts.indexOf(prod.Name.toLowerCase()) != -1;
 						}) : [];
 
 						if (hasURLProducts.length > 0)
