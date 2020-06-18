@@ -789,8 +789,8 @@
 		var self = this, layout, width = 4;
 		if (self.entityDataModel && self.entityDataModel.layout)
 		{
-			layout = self.entityDataModel.layout();
-			width = !layout ? self.defaultLayout.width : JSON.parse(layout).width;
+			var layout = self.getLayout();
+			width = layout.width;
 		}
 		return width;
 	}
@@ -2236,6 +2236,7 @@
 			layout = layout || self.entityDataModel.layout(),
 			container = self.$element.find(".right-container");
 		layout = !layout ? self.defaultLayout : JSON.parse(layout);
+		layout = self.processLayout(layout);
 		items = layout.items;
 		self.gridStackItemOrignalHeight = [];
 		self.heighteningBlockIdentifierGroups = [];
@@ -2398,6 +2399,68 @@
 		setTimeout(function() { container.find('.hori-line,.verti-line').removeClass('disable-animation') }, 250);
 	};
 
+	DetailViewViewModel.prototype.getLayout = function() {
+		var layout = this.entityDataModel.layout();
+		layout = !layout ? this.defaultLayout : JSON.parse(layout);
+		layout = this.processLayout(layout);
+		return layout;
+	}
+	
+	DetailViewViewModel.prototype.processLayout = function(layout) {
+		var dataPoints = {}, 
+			dps = dataPointsJSON.fieldtrip,
+			newLayoutItems = [];
+		
+		for (var key in dps)
+		{
+			dps[key].forEach(function(dp) {
+				dataPoints[dp.field] = dp;
+			});
+		}
+		var offsetY = 0;
+		layout.items.forEach(function(item) {
+			item.y += offsetY;
+			if(item.field) {
+				var dataPoint = dataPoints[item.field];
+				$.extend(item, dataPoint);
+				newLayoutItems.push(item);
+			} else if (item.type === 'tab') {
+				//tab is not supported, so move items in tab out of the tab element.
+				var ds = item.dataSource,
+					h = item.h,
+					x = item.x,
+					tabsTotalH = 0;
+					y = item.y;
+
+				ds.forEach(function(tab) {
+					var realH = 0,
+						len = tab.items.length;
+					tab.items.forEach(function(tabItem, i) {
+						if(tabItem.y > realH) {
+							realH++;
+						}
+						tabItem.y = y + tabsTotalH + realH;
+						
+						if(tabItem.field) {
+							var dataPoint = dataPoints[tabItem.field];
+							$.extend(tabItem, dataPoint);
+						}
+						newLayoutItems.push(tabItem);
+						if(i === len - 1) {
+							realH++;
+						}
+					});
+					tabsTotalH += realH;
+				});
+				offsetY += (tabsTotalH - h);
+			} else {
+				newLayoutItems.push(item);
+			}
+		});
+		layout.items = newLayoutItems;
+		return layout;
+	}
+
 	/**
 	 * generate unique class name for data block
 	 */
@@ -2495,8 +2558,7 @@
 	DetailViewViewModel.prototype.addTotalCostStackBlock = function(id)
 	{
 		var self = this;
-		var layout = self.entityDataModel.layout();
-		layout = !layout ? self.defaultLayout : JSON.parse(layout);
+		var layout = self.getLayout();
 		items = layout.items;
 
 		if (items && items.length > 0)
@@ -2582,17 +2644,45 @@
 	};
 
 	/**
+	 * Ensure all required fields for document entity type is included in the fields collection
+	 * @param {Array} fields 
+	 */
+	function ensureRequiredDocumentFields(fields)
+	{
+		var requiredDocumentFields = ['Name', 'FileName', 'MimeType'];
+		$.each(requiredDocumentFields, function(_, field)
+		{
+			if (fields.indexOf(field) < 0) fields.push(field);
+		});
+	}
+
+	/**
 	 * 
 	 * @param {String} dataType 
 	 * @param {String} dataIdentifier
 	 */
 	DetailViewViewModel.prototype.getGridRelatedData = function(dataType, dataIdentifier, columns)
 	{
-		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripinvoice"];
+		/**
+		 * 
+			case "fieldtripvehicle":
+			case "document":
+			case "fieldtripdriver":
+			case "fieldtripaide":
+		 */
+
+		var self = this, fieldTripResourceTypes = ["fieldtripresource", "fieldtripinvoice", "fieldtripvehicle", "fieldtripdriver", "fieldtripaide"];
+		var columnFields = columns.map(function(column)
+		{
+			return column.FieldName;
+		})
 
 		if (dataType === "fieldtriphistory")
 		{
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtriphistories?fieldtripid=" + self.entitySelectId));
+		} else if (dataType === "document") {
+			ensureRequiredDocumentFields(columnFields);
+			return self.detailViewHelper._getDocumentGridRecords(columnFields, self.gridType, self.recordId);
 		}
 		else if (fieldTripResourceTypes.indexOf(dataType) === -1)
 		{
@@ -2622,7 +2712,32 @@
 		}
 		else
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresourcegroup") + "?fieldtripid =" + self.entitySelectId + "&@relationships=Vehicle,Driver,Aide&@fields=VehicleName,DriverName,AideName"));
+			var paramData = {},
+				endPoint = tf.DataTypeHelper.getEndpoint(dataType);
+			paramData["@filter"] = "eq(FieldTripId," + self.entitySelectId + ")";
+			
+			switch (dataType)
+			{
+				case "fieldtripvehicle":
+					paramData["@relationships"] = "Vehicle";
+					break;
+				case "fieldtripdriver":
+					paramData["@relationships"] = "Driver";
+					break;
+				case "fieldtripaide":
+					paramData["@relationships"] = "Aide";
+					break;
+				case "fieldtripresource":
+					paramData["@relationships"] = "Vehicle,Driver,Aide";
+					break;
+				case "fieldtripinvoice":
+					paramData["@relationships"] = "FieldTripAccount";
+					break;
+			}
+			
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresourcegroup")), {
+				paramData: paramData
+			});
 		}
 	};
 
@@ -2642,7 +2757,17 @@
 
 		if (dataItem.columns && dataItem.columns.length > 0)
 		{
-			columns = dataItem.columns;
+			if(dataItem.columns[0].FieldName) {
+				columns = dataItem.columns;
+			} else {
+				columns = Enumerable.From(self.getDefinitionLayoutColumns(self.getGridDefinitionByType(gridType))).Where(function(c)
+				{
+					return dataItem.columns.indexOf(c.FieldName) > -1;
+				}).Select(function(c)
+				{
+					return $.extend({}, c);
+				}).ToArray();
+			}
 		}
 		else
 		{
@@ -2716,6 +2841,10 @@
 			case "fieldtripresource":
 			case "fieldtripinvoice":
 			case "fieldtriphistory":
+			case "fieldtripvehicle":
+			case "document":
+			case "fieldtripdriver":
+			case "fieldtripaide":
 				return tf.permissions.obFieldTrips();
 			default:
 				return false;
@@ -2830,6 +2959,14 @@
 				return tf.fieldTripGridDefinition.getRelatedGridDefinition("history").Columns;
 			case "fieldtripinvoice":
 				return tf.FieldTripInvoiceGridDefinition.gridDefinition().Columns;
+			case "fieldtripvehicle":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("vehicle").Columns;
+			case "document":
+				return  tf.documentGridDefinition.gridDefinition().Columns;
+			case "fieldtripdriver":
+				return tf.fieldTripGridDefinition.getRelatedGridDefinition("driver").Columns;
+			case "fieldtripaide":
+				return  tf.fieldTripGridDefinition.getRelatedGridDefinition("aide").Columns;
 			default:
 				return;
 		}
