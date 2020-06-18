@@ -132,6 +132,46 @@
 
 		return isValid;
 	};
+	
+	DetailViewHelper.prototype._getDocumentGridRecords = function(columnFields, gridType, recordId)
+	{
+		var excludeFields = ['FileContent'];
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "documentrelationships"), {
+			paramData: {
+				"DBID": tf.datasourceManager.databaseId,
+				"AttachedToID": recordId || 0,
+				"AttachedToType": tf.DataTypeHelper.getId(gridType),
+				"@fields": "DocumentID"
+			}
+		}).then(function(idResponse)
+		{
+			var includeIds = idResponse.Items.map(function(item)
+			{
+				return item.DocumentID;
+			});
+
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "documents"), {
+				data: {
+					fields: columnFields.filter(function(name)
+					{
+						return excludeFields.indexOf(name) === -1;
+					}),
+					filterClause: "",
+					filterSet: null,
+					idFilter: {
+						IncludeOnly: includeIds,
+						ExcludeAny: []
+					},
+					sortItems: [{
+						Name: "Id",
+						isAscending: "asc",
+						Direction: "Ascending"
+					}]
+				}
+			});
+		});
+	};
 
 	/**
 	 * Get the matched data point object.
