@@ -536,28 +536,6 @@
 						Width: '150px',
 						DisplayName: "Driver",
 						type: "string"
-					}
-				];
-				break;
-				
-				obj.Columns = [
-					{
-						FieldName: "VehicleName",
-						Width: '150px',
-						DisplayName: "Vehicle",
-						type: "string"
-					},
-					{
-						FieldName: "AideName",
-						Width: '150px',
-						DisplayName: "Bus Aide",
-						type: "string"
-					},
-					{
-						FieldName: "DriverName",
-						Width: '150px',
-						DisplayName: "Driver",
-						type: "string"
 					},
 					{
 						FieldName: "TotalCost",
@@ -567,6 +545,7 @@
 					}
 				];
 				break;
+				
 			case "driver":
 				obj.Columns = [
 					{
