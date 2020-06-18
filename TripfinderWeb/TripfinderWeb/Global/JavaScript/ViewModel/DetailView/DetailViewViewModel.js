@@ -789,7 +789,7 @@
 		var self = this, layout, width = 4;
 		if (self.entityDataModel && self.entityDataModel.layout)
 		{
-			var layout = self.getLayout();
+			layout = self.getLayout();
 			width = layout.width;
 		}
 		return width;
