@@ -56,10 +56,10 @@
 					<!-- ko if: !obFieldTripSettings().StrictAcctCodes -->
 					<div class="col-xs-24 form-group no-padding-left no-padding-right">
 						<label
-							data-bind="css:obRequiredFields()&&obRequiredFields().DistrictDepartmentID&&obRequiredFields().DistrictDepartmentID.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Department')">Department</label>
+							data-bind="css:obRequiredFields()&&obRequiredFields().DistrictDepartmentId&&obRequiredFields().DistrictDepartmentId.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Department')">Department</label>
 						<div class="input-group">
 							<div
-								data-bind="typeahead:{source:obDepartmentDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDepartment}, attr:IsRequired(obRequiredFields()&&obRequiredFields().DistrictDepartmentID?obRequiredFields().DistrictDepartmentID.Required:null)">
+								data-bind="typeahead:{source:obDepartmentDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedDepartment}, attr:IsRequired(obRequiredFields()&&obRequiredFields().DistrictDepartmentId?obRequiredFields().DistrictDepartmentId.Required:null)">
 								<!-- ko customInput:{type:"Select",value:obCurrentDepartmentName,attributes:{name:"districtDepartment",class:"form-control"},events:{blur:departmentOnBlur}} -->
 								<!-- /ko -->
 							</div>
@@ -72,10 +72,10 @@
 					</div>
 					<div class="col-xs-24 form-group no-padding-left no-padding-right">
 						<label
-							data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripActivityID&&obRequiredFields().FieldTripActivityID.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Activity')"></label>
+							data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripActivityId&&obRequiredFields().FieldTripActivityId.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Activity')"></label>
 						<div class="input-group">
 							<div
-								data-bind="typeahead:{source:obActivityDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedActivity}, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripActivityID?obRequiredFields().FieldTripActivityID.Required:null)">
+								data-bind="typeahead:{source:obActivityDataModels,format:function(obj){return obj.Name;},drowDownShow:true,selectedValue:obSelectedActivity}, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripActivityId?obRequiredFields().FieldTripActivityId.Required:null)">
 								<!-- ko customInput:{type:"Select",value:obCurrentActivityName,attributes:{name:"fieldTripActivity",class:"form-control"},events:{blur:activityOnBlur}} -->
 								<!-- /ko -->
 							</div>
@@ -90,12 +90,12 @@
 					<!-- ko if: obFieldTripSettings().StrictAcctCodes -->
 					<div class="col-xs-24 form-group no-padding-right no-padding-left">
 						<label
-							data-bind="css:obRequiredFields()&&((obRequiredFields().FieldTripActivityID&&obRequiredFields().FieldTripActivityID.Required)
-							||(obRequiredFields().DistrictDepartmentID&&obRequiredFields().DistrictDepartmentID.Required))?'requirestar':null">Department/Activity:</label>
+							data-bind="css:obRequiredFields()&&((obRequiredFields().FieldTripActivityId&&obRequiredFields().FieldTripActivityId.Required)
+							||(obRequiredFields().DistrictDepartmentId&&obRequiredFields().DistrictDepartmentId.Required))?'requirestar':null">Department/Activity:</label>
 						<div class="input-group">
 							<div data-bind="typeahead:{source:obAccount,notSort:true,format:function(obj){return obj.Id < 0 ? '' : (obj.Department.Name+' / '+obj.FieldTripActivity.Name);},drowDownShow:true,selectedValue:obSelectedAccount},
-								 attr:IsRequired(obRequiredFields()&&((obRequiredFields().FieldTripActivityID&&obRequiredFields().FieldTripActivityID.Required)
-														||(obRequiredFields().DistrictDepartmentID&&obRequiredFields().DistrictDepartmentID.Required)))">
+								 attr:IsRequired(obRequiredFields()&&((obRequiredFields().FieldTripActivityId&&obRequiredFields().FieldTripActivityId.Required)
+														||(obRequiredFields().DistrictDepartmentId&&obRequiredFields().DistrictDepartmentId.Required)))">
 								<!-- ko customInput:{type:"Select",value:obCurrentAccountName,attributes:{class:"form-control", name:"account"}} -->
 								<!-- /ko -->
 							</div>
@@ -150,9 +150,9 @@
 					</div>
 					<div class="form-group col-xs-24 no-padding-right no-padding-left">
 						<label
-							data-bind="css:obRequiredFields()&&obRequiredFields().ContactEMail&&obRequiredFields().ContactEMail.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
-						<input type="text" class="form-control" name="ContactEMail" data-tf-input-type="Email"
-							data-bind="value:obEntityDataModel().contactEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().ContactEMail?obRequiredFields().ContactEMail.Required:null)"
+							data-bind="css:obRequiredFields()&&obRequiredFields().ContactEmail&&obRequiredFields().ContactEmail.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
+						<input type="text" class="form-control" name="ContactEmail" data-tf-input-type="Email"
+							data-bind="value:obEntityDataModel().ContactEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().ContactEmail?obRequiredFields().ContactEmail.Required:null)"
 							maxlength="100" />
 					</div>
 				</div>
@@ -364,9 +364,9 @@
 
 					<div class="col-xs-12 form-group no-padding-right">
 						<label
-							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationEMail&&obRequiredFields().DestinationEMail.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
+							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationEmail&&obRequiredFields().DestinationEmail.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
 						<input type="text" class="form-control" name="DestinationEmail" data-tf-input-type="Email"
-							data-bind="value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationEMail?obRequiredFields().DestinationEMail.Required:null)"
+							data-bind="value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationEmail?obRequiredFields().DestinationEmail.Required:null)"
 							maxlength="100" />
 					</div>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right textarea">
@@ -382,11 +382,10 @@
 		<div class="row">
 			<div class="col-xs-24">
 				<h4 class="section-title">
-					<strong
-						data-bind="css:obRequiredFields()&&obRequiredFields().DirectionNotes&&obRequiredFields().DirectionNotes.Required?'requirestar':null">Directions</strong>
+					<strong>Directions</strong>
 				</h4>
 				<div class="col-xs-24 form-group no-padding-left no-padding-right large-textarea">
-					<label>Directions</label>
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().DirectionNotes&&obRequiredFields().DirectionNotes.Required?'requirestar':null">Directions</label>
 					<textarea class="form-control verticalResize" style="height: 200px;"
 						data-bind="value:obEntityDataModel().directionNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DirectionNotes?obRequiredFields().DirectionNotes.Required:null)"
 						maxlength="10000" name="DirectionNotes"></textarea>
@@ -401,10 +400,10 @@
 					</h4>
 					<div class="col-xs-24 form-group no-padding-right no-padding-left">
 						<label
-							data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripEquipmentID&&obRequiredFields().FieldTripEquipmentID.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Equipment')"></label>
+							data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripEquipmentIds&&obRequiredFields().FieldTripEquipmentIds.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Equipment')"></label>
 						<div class="input-group">
 							<div
-								data-bind="typeahead:{source:obEquipmentDataModels,format:function(obj){return obj.EquipmentName;},drowDownShow:true,selectedValue:obSelectedEquipment}, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripEquipmentID?obRequiredFields().FieldTripEquipmentID.Required:null)">
+								data-bind="typeahead:{source:obEquipmentDataModels,format:function(obj){return obj.EquipmentName;},drowDownShow:true,selectedValue:obSelectedEquipment}, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripEquipmentIds?obRequiredFields().FieldTripEquipmentIds.Required:null)">
 								<!-- ko customInput:{type:"Select",value:obCurrentEquipmentName,attributes:{name:"fieldTripEquipment",class:"form-control"},events:{blur:equipmentOnBlur}} -->
 								<!-- /ko -->
 							</div>
@@ -417,10 +416,10 @@
 					</div>
 					<div class="col-xs-24 form-group no-padding-right no-padding-left ">
 						<label
-							data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripClassificationID&&obRequiredFields().FieldTripClassificationID.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
+							data-bind="css:obRequiredFields()&&obRequiredFields().FieldTripClassificationId&&obRequiredFields().FieldTripClassificationId.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Classification')"></label>
 						<div class="input-group">
 							<div
-								data-bind="typeahead:{source:obClassificationDataModels,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedClassification}, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripClassificationID?obRequiredFields().FieldTripClassificationID.Required:null)">
+								data-bind="typeahead:{source:obClassificationDataModels,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedClassification}, attr:IsRequired(obRequiredFields()&&obRequiredFields().FieldTripClassificationId?obRequiredFields().FieldTripClassificationId.Required:null)">
 								<!-- ko customInput:{type:"Select",value:obCurrentClassificationName,attributes:{name:"fieldTripClassification",class:"form-control"},events:{blur:classificationOnBlur}} -->
 								<!-- /ko -->
 							</div>
@@ -530,7 +529,7 @@
 				</div>
 			</div>
 
-			<div class="form-group col-xs-24 textarea">
+			<div class="form-group col-xs-24 textarea large-textarea">
 				<label
 					data-bind="css:obRequiredFields()&&obRequiredFields().Notes&&obRequiredFields().Notes.Required?'requirestar':null">Notes</label>
 				<textarea class="form-control verticalResize" style="height: 200px;"
