@@ -643,25 +643,6 @@
 
 			data.Items.forEach(function(item)
 			{
-				if (!item.ReturnTime)
-				{
-					var date = new Date(item.DepartDateTime);
-					date.setDate(date.getDate() + 1);
-					var month = date.getMonth() + 1;
-					item.ReturnTime = date.getFullYear() + '-' + month + '-' + date.getDate();
-				}
-				else
-				{
-					if (moment(item.ReturnDate).isValid())
-					{
-						var returnDate = moment(item.ReturnDate).format("YYYY-MM-DD") + "T" + item.ReturnTime;
-						if (moment(returnDate).isValid())
-						{
-							item.ReturnTime = returnDate;
-						}
-					}
-				}
-
 				if (!item.EstimatedReturnDateTime)
 				{
 					var date = new Date(item.DepartDateTime);
@@ -753,7 +734,7 @@
 			"filterSet": null,
 			"filterClause": "",
 			"isQuickSearch": false,
-			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "ReturnTime", "Id", "FieldTripStageId", "DepartDateTime"]
+			"fields": ["PublicId", "FieldTripStageName", "Name", "ReturnDate", "DepartDate", "DepartTime", "EstimatedReturnDateTime", "Id", "FieldTripStageId", "DepartDateTime"]
 		};
 
 		if (self.filterData)
@@ -778,7 +759,7 @@
 				"StageId": item['FieldTripStageId'],
 				"Title": item["PublicId"] + ' ' + item['Name'],
 				"Start": item['DepartDateTime'],
-				"End": item['ReturnTime'],
+				"End": item['EstimatedReturnDateTime'],
 				"Descirption": "Test Desciption",
 				_raw: item
 			});
