@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Page").SchedulerPage = SchedulerPage;
 
-	function SchedulerPage (gridType)
+	function SchedulerPage(gridType)
 	{
 		var self = this;
 		TF.Page.BaseGridPage.apply(self, arguments);
@@ -105,14 +105,14 @@
 				case -1:
 				case -2:
 					var today = new Date(), tomorrow = new Date();
-					tomorrow.setTime(tomorrow.getTime()+ 24 * 60 * 60 * 1000);
-					var today_str = today.getFullYear()+"-" + (today.getMonth() + 1) + "-" + today.getDate(),
-					tomorrow_str = tomorrow.getFullYear()+"-" + (tomorrow.getMonth() + 1) + "-" + tomorrow.getDate();
-					paramData = { 
-						"@filter": "eq(FieldTripStageId,99)&lt(DepartDateTime," + tomorrow_str + ")&ge(EstimatedReturnDateTime," + today_str + ")", 
-						"@fields": "Id" 
+					tomorrow.setTime(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+					var today_str = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(),
+						tomorrow_str = tomorrow.getFullYear() + "-" + (tomorrow.getMonth() + 1) + "-" + tomorrow.getDate();
+					paramData = {
+						"@filter": "eq(FieldTripStageId,99)&lt(DepartDateTime," + tomorrow_str + ")&ge(EstimatedReturnDateTime," + today_str + ")",
+						"@fields": "Id"
 					}
-						break;
+					break;
 				case -3:
 					paramData = { "@filter": "in(FieldTripStageId,1,3,5,7)", "@fields": "Id" }
 					break;
@@ -129,9 +129,9 @@
 
 			if (paramData)
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtrip")), { paramData: paramData}).then(function(response)
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtrip")), { paramData: paramData }).then(function(response)
 				{
-					return response.Items.map(function(r){ return r.Id });
+					return response.Items.map(function(r) { return r.Id });
 				});
 			}
 
@@ -649,6 +649,17 @@
 					date.setDate(date.getDate() + 1);
 					var month = date.getMonth() + 1;
 					item.ReturnTime = date.getFullYear() + '-' + month + '-' + date.getDate();
+				}
+				else
+				{
+					if (moment(item.ReturnDate).isValid())
+					{
+						var returnDate = moment(item.ReturnDate).format("YYYY-MM-DD") + "T" + item.ReturnTime;
+						if (moment(returnDate).isValid())
+						{
+							item.ReturnTime = returnDate;
+						}
+					}
 				}
 
 				if (!item.EstimatedReturnDateTime)
