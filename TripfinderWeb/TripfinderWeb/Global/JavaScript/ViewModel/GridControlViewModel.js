@@ -61,6 +61,7 @@
 				gridViewModelType = TF.Grid.FieldTripInvoiceGridViewModel;
 				this._showBulkMenu = true;
 				option.entityType = this._entityType;
+				option.selectable = "row";
 
 				if (this.dataSource)
 				{//field trip edit form

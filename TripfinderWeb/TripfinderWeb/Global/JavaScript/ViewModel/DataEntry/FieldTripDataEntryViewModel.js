@@ -1288,6 +1288,7 @@
 		});
 		entity.FieldTripInvoices.map(function(item)
 		{
+			item.Id = item.isNew ? 0 : item.Id; //If item is new, the field Id must be 0
 			item.APIIsDirty = true;
 			item.APIIsNew = true;
 		});
@@ -1473,6 +1474,9 @@
 					data.resourceId = this.obInvoiceResourceId();
 					this.obInvoiceResourceId(data.resourceId + 1);
 
+					// data.Id = this.obInvoiceGridDataSource().length > 0 ? Math.max(...this.obInvoiceGridDataSource().map(function(item) { return item })) + 1 : 0;
+					data.isNew = true;
+					data.Id = -data.resourceId;
 					this.obInvoiceGridDataSource.push(data);
 					var resourceSort = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.dataSource.sort(),
 						resourceSource = new kendo.data.DataSource({
