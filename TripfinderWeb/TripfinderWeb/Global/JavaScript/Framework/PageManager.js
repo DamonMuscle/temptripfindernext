@@ -83,6 +83,11 @@
 				supportedProducts = supportedProducts.filter(function(app) {
 					return accessApps.includes(app)
 				});
+				
+				if(!accessApps.includes(TF.productName.toLowerCase())) {
+					tf.entStorageManager.save("token", "");
+					location.reload();
+				}
 			}
 
 
