@@ -1474,7 +1474,6 @@
 					data.resourceId = this.obInvoiceResourceId();
 					this.obInvoiceResourceId(data.resourceId + 1);
 
-					// data.Id = this.obInvoiceGridDataSource().length > 0 ? Math.max(...this.obInvoiceGridDataSource().map(function(item) { return item })) + 1 : 0;
 					data.isNew = true;
 					data.Id = -data.resourceId;
 					this.obInvoiceGridDataSource.push(data);
