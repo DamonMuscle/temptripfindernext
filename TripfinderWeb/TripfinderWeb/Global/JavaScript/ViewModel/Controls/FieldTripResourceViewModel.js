@@ -2,9 +2,13 @@
 {
 	createNamespace('TF.Control').FieldTripResourceViewModel = FieldTripResourceViewModel;
 
-	function FieldTripResourceViewModel (source, id, resourceGroupDate, obFieldTrip)
+	function FieldTripResourceViewModel (source, id, resourceGroupDate, obFieldTrip, options)
 	{
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripResourceDataModel(source));
+
+		options = options || {};
+		this.obRequiredFields = options.obRequiredFields || ko.observable();
+
 		this.obEntityDataModel().fieldTripId(id);
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();
@@ -253,7 +257,7 @@
 	FieldTripResourceViewModel.prototype.generateFunction = function(fn)
 	{
 		return fn.bind(this, Array.prototype.slice.call(arguments, 1));
-	}
+	};
 
 	FieldTripResourceViewModel.prototype.checkIfVehicleAssigned = function()
 	{
@@ -270,7 +274,12 @@
 		{
 			return true;
 		}
-	}
+	};
+
+	FieldTripResourceViewModel.prototype.IsRequired = function(item)
+	{
+		return item ? { required: "required" } : {};
+	};
 
 	FieldTripResourceViewModel.prototype.dispose = function()
 	{

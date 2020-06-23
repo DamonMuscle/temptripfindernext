@@ -29,14 +29,14 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Mileage Rate</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().mileageRate" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().MileageRate&&obRequiredFields().MileageRate.Required?'requirestar':null">Mileage Rate</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().mileageRate, attr:IsRequired(obRequiredFields()&&obRequiredFields().MileageRate?obRequiredFields().MileageRate.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Fixed Cost</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().vehFixedCost" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().VehFixedCost&&obRequiredFields().VehFixedCost.Required?'requirestar':null">Fixed Cost</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().vehFixedCost, attr:IsRequired(obRequiredFields()&&obRequiredFields().VehFixedCost?obRequiredFields().VehFixedCost.Required:null)" maxlength="200" />
 			</div>
 		</div>
 	</div>
@@ -111,8 +111,8 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Rate</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().driverRate" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().DriverRate&&obRequiredFields().DriverRate.Required?'requirestar':null">Rate</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().driverRate, attr:IsRequired(obRequiredFields()&&obRequiredFields().DriverRate?obRequiredFields().DriverRate.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
@@ -137,8 +137,8 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>OT Rate</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().driverOtrate" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().DriverOtrate&&obRequiredFields().DriverOtrate.Required?'requirestar':null">OT Rate</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().driverOtrate, attr:IsRequired(obRequiredFields()&&obRequiredFields().DriverOtrate?obRequiredFields().DriverOtrate.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
@@ -157,8 +157,8 @@
 	<div class="row">
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Fixed Cost</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().driverFixedCost" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().DriverFixedCost&&obRequiredFields().DriverFixedCost.Required?'requirestar':null">Fixed Cost</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().driverFixedCost, attr:IsRequired(obRequiredFields()&&obRequiredFields().DriverFixedCost?obRequiredFields().DriverFixedCost.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
@@ -224,8 +224,8 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Rate</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().aideRate" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().AideRate&&obRequiredFields().AideRate.Required?'requirestar':null">Rate</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().aideRate, attr:IsRequired(obRequiredFields()&&obRequiredFields().AideRate?obRequiredFields().AideRate.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
@@ -250,8 +250,8 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>OT Rate</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().aideOtrate" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().AideOtrate&&obRequiredFields().AideOtrate.Required?'requirestar':null">OT Rate</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().aideOtrate, attr:IsRequired(obRequiredFields()&&obRequiredFields().AideOtrate?obRequiredFields().AideOtrate.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
@@ -270,8 +270,8 @@
 	<div class="row">
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Fixed Cost</label>
-				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().aideFixedCost" maxlength="200" />
+				<label data-bind="css:obRequiredFields()&&obRequiredFields().AideFixedCost&&obRequiredFields().AideFixedCost.Required?'requirestar':null">Fixed Cost</label>
+				<input type="text" name="contact" class="form-control" data-bind="value:obEntityDataModel().aideFixedCost, attr:IsRequired(obRequiredFields()&&obRequiredFields().AideFixedCost?obRequiredFields().AideFixedCost.Required:null)" maxlength="200" />
 			</div>
 		</div>
 		<div class="col-xs-6">
