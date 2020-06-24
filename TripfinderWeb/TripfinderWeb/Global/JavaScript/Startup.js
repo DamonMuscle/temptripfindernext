@@ -266,6 +266,7 @@
 		var self = this;
 		self.libraryInitialization().then(function()
 		{
+			tf.dataFormatHelper = new TF.DataFormatHelper();
 			tf.fullScreenHelper = new TF.FullScreenHelper();
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
