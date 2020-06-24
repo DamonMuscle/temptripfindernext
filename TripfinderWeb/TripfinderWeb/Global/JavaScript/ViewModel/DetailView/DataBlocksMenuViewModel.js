@@ -4,46 +4,69 @@
 
 	function DataBlocksMenuViewModel(options, detailView)
 	{
-		var self = this;
+		var self = this, itemData,
+			$item = $(options.target).closest('.grid-stack-item');
+
 		self.target = options.target;
+		self.event = options.event;
 		self.detailView = detailView;
 		self.defaultColors = options.defaultColors;
-		self.title = $(self.target).parents('.grid-stack-item').data("title");
-		self.field = $(self.target).parents('.grid-stack-item').data("field");
-		self.type = $(self.target).parents('.grid-stack-item').data("type") || $(self.target).closest(".hori-line, .verti-line").attr("type") || "";
-		if (self.type === "section-header")
+
+		var isLine = !!$(self.target).closest(".hori-line, .verti-line").length;
+		itemData = isLine ? {} : $item.data();
+		self.title = itemData.title;
+		self.field = itemData.field;
+		self.type = !isLine ? itemData.type : ($(self.target).closest(".hori-line, .verti-line").attr("type") || "");
+
+		switch (self.type)
 		{
-			self.title = "Section Header";
+			case "section-header":
+				self.title = "Section Header";
+				break;
+			case "spacer":
+				self.title = "Spacer";
+				break;
+			case "horizontalLine":
+				self.title = "Horizontal Line";
+				break;
+			case "verticalLine":
+				self.title = "Vertical Line";
+				break;
+			case "tab":
+				self.title = "Tab";
+				break;
+			default:
+				break;
 		}
-		else if (self.type === "spacer")
-		{
-			self.title = "Spacer";
-		}
-		else if (self.type === "horizontalLine")
-		{
-			self.title = "Horizontal Line";
-		}
-		else if (self.type === "verticalLine")
-		{
-			self.title = "Vertical Line";
-		}
+
 		self.gridType = options.gridType;
-		var isEditAppearanceEnable = ["map", "boolean", "calendar", "horizontalline", "verticalline"].indexOf(self.type.toLowerCase()) == -1;
+		var isEditAppearanceEnable = !["map", "attach", "boolean", "calendar", "horizontalline", "verticalline", "tab"].includes(self.type.toLowerCase()),
+			isConditionalAppearanceEnable = ["number", "string", "date", "time", "geodistance"].includes(self.type.toLowerCase());
+		if (itemData.UDFId)
+		{
+			var udfItem = self.detailView.recordEntity.UserDefinedFields.find(function(udf) { return udf.Id == itemData.UDFId; });
+			if (!self.detailView.userDefinedFieldHelper.isShowInCurrentDataSource(udfItem))
+			{
+				isEditAppearanceEnable = false;
+				isConditionalAppearanceEnable = false;
+			}
+		}
+
 		if (isEditAppearanceEnable)
 		{
-			self.appearance = JSON.parse($(self.target).parents('.grid-stack-item').data("appearance"));
-			self.customizedTitle = $(self.target).parents('.grid-stack-item').data("customizedTitle");
+			self.appearance = $item.data("appearance") ? JSON.parse($item.data("appearance")) : {};
+			self.customizedTitle = $item.data("customizedTitle");
 		}
-		var isConditionalAppearanceEnable = ["number", "string", "date", "time"].indexOf(self.type.toLowerCase()) > -1;
+
 		var blocks = options.blocks.reduce(function(prev, current)
 		{
 			return prev.concat(current.columns().filter(function(column)
 			{
-				return !(column.title === self.title);
+				return column.title !== self.title && !column.unavailable;
 			}))
 		}, []);
 
-		blocks = blocks.sort(function(a, b)
+		blocks.sort(function(a, b)
 		{
 			if (a.title.toUpperCase() === b.title.toUpperCase())
 			{
@@ -57,6 +80,7 @@
 		self.deleteDataBlockEvent = options.deleteDataBlockEvent;
 		self.groupDataBlockEvent = options.groupDataBlockEvent;
 		self.toggleResizableEvent = options.toggleResizableEvent;
+		self.isGroupChild = options.isGroupChild;
 		self.changeDataPoint = self.changeDataPoint.bind(self);
 		self.deleteDataPoint = self.deleteDataPoint.bind(self);
 		self.groupDataPoint = self.groupDataPoint.bind(self);
@@ -67,7 +91,9 @@
 		self.obDefaultTitle = ko.observable(self.title);
 		self.obEditAppearanceEnable = ko.observable(isEditAppearanceEnable);
 		self.obConditionalAppearanceEnable = ko.observable(isConditionalAppearanceEnable);
-		self.obNeedShown = ko.observable(true);
+		self.obNeedShown = ko.observable(options.needRCM);
+		self.editDataBlockAppearance = null;
+		self.closeEditDataBlockAppearanceEvent = new TF.Events.Event();
 	}
 
 	DataBlocksMenuViewModel.prototype.init = function()
@@ -75,19 +101,63 @@
 
 	};
 
+	DataBlocksMenuViewModel.prototype.getAllDataBlocks = function()
+	{
+		var self = this, allDataBlocks = [];
+		self.detailView.rootGridStack.dataBlocks.forEach(function(dataBlock)
+		{
+			if (dataBlock instanceof TF.DetailView.DataBlockComponent.TabStripBlock)
+			{
+				dataBlock.nestedGridStacks.forEach(function(gridStack)
+				{
+					allDataBlocks = allDataBlocks.concat(gridStack.dataBlocks);
+				});
+			}
+
+			allDataBlocks.push(dataBlock);
+		});
+
+		return allDataBlocks;
+	};
+
 	DataBlocksMenuViewModel.prototype.changeColumns = function(viewModel, e)
 	{
-		var self = this, gridBlock = $(self.target).closest(".grid-stack-item"), columns = gridBlock.data("columns"), availableColumns = [], defaultColumns, allColumns,
-			isExisted = false;
+		var self = this,
+			gridBlock = $(self.target).closest(".grid-stack-item"),
+			availableColumns = [],
+			defaultColumns,
+			isExisted = false,
+			targetBlock = self.getAllDataBlocks().filter(function(dataBlock)
+			{
+				if (!dataBlock.uniqueClassName) return;
 
-		allColumns = self.detailView.getDefinitionLayoutColumns(self.detailView.getGridDefinitionByType(gridBlock.data("url")));
+				return gridBlock.hasClass(dataBlock.uniqueClassName);
+			})[0];
+
+		if (gridBlock.hasClass("multiple-grid"))
+		{
+			var subGridIndex = 0;
+			targetBlock.grids.forEach(function(grid, i)
+			{
+				var rect = grid.$el[0].getBoundingClientRect();
+				if (self.event.clientY >= rect.top && self.event.clientY <= rect.bottom)
+				{
+					subGridIndex = i;
+				}
+			});
+
+			targetBlock = targetBlock.grids[subGridIndex];
+			gridBlock = gridBlock.find(".custom-grid").eq(subGridIndex);
+		}
+
+		var columns = gridBlock.data("columns");
+		var allColumns = targetBlock.getGridColumnsByType(gridBlock.data("url") || targetBlock.options.url);
 		defaultColumns = Enumerable.From(allColumns).Where(function(c)
 		{
-			return !c.hidden;
+			return !c.hidden && c.OriginalName === undefined;
 		}).Select(function(c)
 		{
-			return $.extend(
-				{}, c)
+			return $.extend({}, c);
 		}).ToArray();
 
 		if (columns.length > 0)
@@ -117,7 +187,8 @@
 			new TF.Modal.Grid.EditKendoColumnModalViewModel(
 				availableColumns,
 				columns,
-				defaultColumns
+				defaultColumns,
+				true
 			)
 		).then(function(editColumnViewModel)
 		{
@@ -156,14 +227,14 @@
 	{
 		var self = this, $item = $(self.target).closest(".grid-stack-item"),
 			dataObj = $item.data("conditionalAppearance");
-		tf.modalManager.showModal(new TF.Modal.ConditionalAppearanceModalViewModel({
+		tf.modalManager.showModal(new TF.DetailView.ConditionalAppearanceModalViewModel({
 			gridType: self.gridType,
 			field: self.field,
 			dataObj: dataObj,
 			defaultColors: self.defaultColors
 		})).then(function(result)
 		{
-			if (result && result.length > 0)
+			if (result && result.length >= 0)
 			{
 				$item.data("conditionalAppearance", result);
 			}
@@ -231,5 +302,10 @@
 		var self = this;
 		self.target = null;
 		self.blocks = null;
+		if (self.editDataBlockAppearance !== null)
+		{
+			self.editDataBlockAppearance.dispose();
+			self.editDataBlockAppearance = null;
+		}
 	};
 })();

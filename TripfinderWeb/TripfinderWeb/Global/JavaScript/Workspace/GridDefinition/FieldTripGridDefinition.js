@@ -20,22 +20,22 @@
 				},
 				{
 					FieldName: "PublicId",
-					DisplayName: "Public ID",
+					DisplayName: "ID",
 					Width: '150px',
 					type: "string"
 				},
 				{
-					FieldName: "BillingNotes",
-					DisplayName: "Billing Notes",
+					FieldName: "TotalAmount",
+					DisplayName: "Total Amount",
 					Width: '150px',
-					type: "string"
+					type: "number"
 				},
 				{
 					FieldName: "FieldTripStageName",
-					DisplayName: "Status",
+					DisplayName: "Trip Stage",
 					Width: '250px',
 					type: "string",
-					template: "<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#:FieldTripStageName||''#</span>"
+					template: "<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#:FieldTripStageName#</span>"
 				},
 				{
 					FieldName: "Name",
@@ -69,6 +69,12 @@
 					DisplayName: "Return Date",
 					Width: '160px',
 					type: "date",
+					//onlyForGrid: true
+					//,
+					// template: function(dataItem)
+					// {
+					// 	return moment(dataItem.EstimatedReturnDateTime).format("MM/DD/YYYY");
+					// }
 				},
 				{
 					FieldName: "FieldTripContact",
@@ -80,7 +86,11 @@
 					FieldName: "ContactPhone",
 					DisplayName: "Contact Phone",
 					Width: '150px',
-					type: "string"
+					type: "string",
+					template: function(item)
+					{
+						return tf.dataFormatHelper.phoneFormatter(item.ContactPhone) || '';
+					}
 				},
 				{
 					FieldName: "ContactPhoneExt",
@@ -119,13 +129,23 @@
 					FieldName: "DestinationContactPhone",
 					DisplayName: "Destination Contact Phone",
 					Width: '190px',
-					type: "string"
+					type: "string",
+					template: function(item)
+					{
+						return tf.dataFormatHelper.phoneFormatter(item.DestinationContactPhone) || '';
+					}
 				},
 				{
 					FieldName: "DepartDate",
 					DisplayName: "Departure Date",
 					Width: '160px',
-					type: "date"
+					type: "date",
+					//onlyForGrid: true
+					//,
+					// template: function(dataItem)
+					// {
+					// 	return moment(dataItem.DepartDateTime).format("MM/DD/YYYY");
+					// }
 				},
 				{
 					FieldName: "NumberOfStudents",
@@ -173,13 +193,25 @@
 					FieldName: "DepartTime",
 					DisplayName: "Departure Time",
 					Width: '160px',
-					type: "time"
+					type: "time",
+					//onlyForGrid: true
+					//,
+					// template: function(dataItem)
+					// {
+					// 	return moment(dataItem.DepartDateTime).format("hh:mm A");
+					// }
 				},
 				{
 					FieldName: "ReturnTime",
 					DisplayName: "Return Time",
 					Width: '160px',
-					type: "time"
+					type: "time",
+					//onlyForGrid: true
+					//,
+					// template: function(dataItem)
+					// {
+					// 	return moment(dataItem.EstimatedReturnDateTime).format("hh:mm A");
+					// }
 				},
 				{
 					FieldName: "ClassificationName",
@@ -187,7 +219,15 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripClassification","fieldtrip","ClassificationName")
+				},
+				{
+					FieldName: "BillingClass",
+					DisplayName: "Billing Classification",
+					Width: '150px',
+					type: "string",
+					hidden: true,
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripBillingClassification","fieldtrip","BillingClass")
 				},
 				{
 					FieldName: "Ftactivity",
@@ -195,7 +235,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripActivity","fieldtrip","Ftactivity")
 				},
 				{
 					FieldName: "Ftequipment",
@@ -203,7 +243,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripEquipment","fieldtrip","Ftequipment")
 				},
 
 				{
@@ -289,6 +329,55 @@
 					hidden: true
 				},
 				{
+					FieldName: "MileageRate",
+					DisplayName: "Mileage Rate",
+					Width: '150px',
+					type: "number",
+					hidden: true
+				},
+				{
+					FieldName: "FixedCost",
+					DisplayName: "Fixed Costs",
+					Width: '150px',
+					type: "number",
+					hidden: true
+				},
+				{
+					FieldName: "MinimumCost",
+					DisplayName: "Minimum Costs",
+					Width: '150px',
+					type: "number",
+					hidden: true
+				},
+				{
+					FieldName: "DriverRate",
+					DisplayName: "Driver Rate",
+					Width: '150px',
+					type: "number",
+					hidden: true
+				},
+				{
+					FieldName: "DriverOtrate",
+					DisplayName: "Driver OT Rate",
+					Width: '150px',
+					type: "number",
+					hidden: true
+				},
+				{
+					FieldName: "AideRate",
+					DisplayName: "Aide Rate",
+					Width: '150px',
+					type: "number",
+					hidden: true
+				},
+				{
+					FieldName: "AideOtrate",
+					DisplayName: "Aide OT Rate",
+					Width: '160px',
+					type: "number",
+					hidden: true
+				},
+				{
 					FieldName: "DepartmentName",
 					DisplayName: "Department",
 					Width: '150px',
@@ -296,6 +385,13 @@
 					hidden: true,
 					onlyForGrid: true,
 					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDistrictDepartment", "fieldtrip", "DepartmentName")
+				},
+				{
+					FieldName: "BillingNotes",
+					Width: '150px',
+					type: "string",
+					hidden: true,
+					onlyForFilter: true
 				},
 				{
 					FieldName: "DistrictDepartmentID",
@@ -334,13 +430,6 @@
 				},
 				{
 					FieldName: "FieldTripDestinationId",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "FieldTripEquipmentId",
 					Width: '150px',
 					type: "integer",
 					hidden: true,
@@ -420,7 +509,8 @@
 					hidden: true,
 					onlyForFilter: true
 				}
-			],
+			].concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("fieldtrip")),
+			InvisibleUDFColumns: tf.UDFDefinition.getInvisibleUDFs("fieldtrip"),
 			stageFormatter: function(value)
 			{
 				value = parseInt(value);
@@ -442,7 +532,7 @@
 					case 7:
 						return '#00FFFF';
 					case 100:
-						return '#FFFFFF';
+						return '#964B00';
 					case 101:
 						return '#0000FF';
 					default:
@@ -482,6 +572,7 @@
 			}
 		};
 	};
+
 
 	FieldTripGridDefinition.prototype.getRelatedGridDefinition = function(type)
 	{
@@ -545,7 +636,6 @@
 					}
 				];
 				break;
-				
 			case "driver":
 				obj.Columns = [
 					{

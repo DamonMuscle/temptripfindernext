@@ -325,8 +325,8 @@
 	BaseGridPage.prototype.updateEditable = function()
 	{
 		var records = this.getCurrentFieldTripRecords();
-		this.selectedItemEditable(TF.FieldTripAuthHelper.checkFieldTripEditable(records[0]));
-		this.selectedItemsEditable(TF.FieldTripAuthHelper.checkFieldTripsEditable(records));
+		this.selectedItemEditable(tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(records[0]));
+		this.selectedItemsEditable(tf.helpers.fieldTripAuthHelper.checkFieldTripsEditable(records));
 	};
 
 	BaseGridPage.prototype.getCurrentFieldTripRecords = function()

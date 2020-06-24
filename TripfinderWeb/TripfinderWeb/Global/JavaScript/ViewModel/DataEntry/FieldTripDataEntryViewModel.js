@@ -4,7 +4,7 @@
 
 	namespace.FieldTripDataEntryViewModel = FieldTripDataEntryViewModel;
 
-	function FieldTripDataEntryViewModel (ids, view)
+	function FieldTripDataEntryViewModel(ids, view)
 	{
 		$.extend(this, new TF.Helper.FieldTripResourcesHelper());
 
@@ -282,7 +282,7 @@
 	FieldTripDataEntryViewModel.prototype.getEditable = function()
 	{
 		if (this.obMode() != "Edit") return true;
-		return TF.FieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
+		return tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
 	};
 
 	FieldTripDataEntryViewModel.prototype.loadDocument = function()
@@ -583,7 +583,7 @@
 		var self = this;
 		if (self.obDocumentAdd)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("document"), self.type, AttachedId, "documents"))
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document"), self.type, AttachedId, "documents"))
 				.then(function(data)
 				{
 					var source = [];
@@ -631,7 +631,7 @@
 		var self = this;
 		if (isNew)
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("fieldtriptemplate")))
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.tf.dataTypeHelper.getEndpoint("fieldtriptemplate")))
 				.then(function(response)
 				{
 					response.Items = response.Items.sort(function(a, b)
@@ -1300,7 +1300,7 @@
 
 		if (!this.obEntityDataModel().id() || this.obEntityDataModel().id() <= 0)
 		{
-			var currentHighestEditRight = TF.FieldTripAuthHelper.getHighestEditRightSecuredItem();
+			var currentHighestEditRight = tf.helpers.fieldTripAuthHelper.getHighestEditRightSecuredItem();
 			switch (currentHighestEditRight)
 			{
 				case "level1Requestor":
@@ -1434,7 +1434,7 @@
 	FieldTripDataEntryViewModel.prototype.initializeDocument = function()
 	{
 		var selectId = this.obEntityDataModel().id();
-		if (selectId === 0 || TF.FieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel()._entityBackup))
+		if (selectId === 0 || tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel()._entityBackup))
 		{
 			if (!tf.permissions.documentAdd)
 			{
@@ -1573,7 +1573,7 @@
 		}
 	};
 
-	function byteLength (str)
+	function byteLength(str)
 	{
 		var bytes = str.length;
 		for (var i = str.length - 1; i >= 0; i--)

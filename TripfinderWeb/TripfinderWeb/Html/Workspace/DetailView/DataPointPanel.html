@@ -6,8 +6,8 @@
 		<div class="content">
 			<div class="data-point-wrapper">
 				<div class="filter-bar">
-					<input class="filter-text" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: obFilterPlaceHoderText}" autocapitalize="off"
-					 spellcheck="false" />
+					<input class="filter-text" maxlength="50" autocomplete="off" autocorrect="off" data-bind="attr: {placeholder: obFilterPlaceHolderText}" autocapitalize="off"
+								 spellcheck="false" />
 					<div class="item-icon clear-btn quick-search-close" data-bind="click:clearFilterClick"></div>
 				</div>
 				<div class="left data-point-container" data-bind="foreach:{data:obColumns,afterRender:initDataPoint}">
@@ -17,12 +17,30 @@
 						</div>
 						<div class="sub-content">
 							<!-- ko foreach: columns -->
-							<span data-bind="event:{mousedown:$parents[1].onDataGroupMouseDown},attr:{field:$data['field'],positiveLabel:$data['positiveLabel'],negativeLabel:$data['negativeLabel'],displayValue:$data['displayValue']||'None',defaultValue:$data['defaultValue']||'None',title:$data['title'],format:$data['format'],
-							  type:$data['type'],url:$data['url'],subUrl:$data['subUrl'],minHeight:$parents[1].getMinHeight($data),minWidth:$parents[1].getMinWidth($data)}"
-							 class="data-point-item">
+							<!-- ko if: !$data.unavailable -->
+							<span data-bind="event:{mousedown:$parents[1].onDataGroupMouseDown},
+											attr:{
+												field:$data['field'],
+												positiveLabel:$data['positiveLabel'],
+												negativeLabel:$data['negativeLabel'],
+												displayValue:$data['displayValue']||'None',
+												defaultValue:$data['defaultValue']||'None',
+												title:$data['title'],
+												format:$data['format'],
+												type:$data['type'],
+												url:$data['url'],
+												subUrl:$data['subUrl'],
+												UDFId:$data.UDFId,
+												minHeight:$parents[1].getMinHeight($data),
+												minWidth:$parents[1].getMinWidth($data)
+											},
+											css:{'with-tabblock': $data['hasTabBlock'], 'required': $data['isRequired']}"
+										class="data-point-item">
+								<i class="asterisk">*</i>
 								<span class="title" data-bind="text:title"></span>
 								<span class="folder" data-bind="click:$parents[1].openGroupMenu"></span>
 							</span>
+							<!-- /ko -->
 							<!-- /ko -->
 						</div>
 					</div>
@@ -35,6 +53,7 @@
 				<div class="vertical-line" type="vertical-line"></div>
 				<div class="spacer data-point-item" type="spacer"></div>
 				<div class="image data-point-item" type="image" minHeight=2></div>
+				<div class="tab data-point-item" type="tab" minHeight=2 data-bind="attr:{minWidth:obGridWidth}"></div>
 			</div>
 		</div>
 		<div class="preload">

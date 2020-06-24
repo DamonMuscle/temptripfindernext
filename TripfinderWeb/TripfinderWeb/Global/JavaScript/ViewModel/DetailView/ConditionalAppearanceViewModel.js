@@ -1,6 +1,6 @@
 (function()
 {
-	createNamespace("TF.Control").ConditionalAppearanceViewModel = ConditionalAppearanceViewModel;
+	createNamespace("TF.DetailView").ConditionalAppearanceViewModel = ConditionalAppearanceViewModel;
 
 	function ConditionalAppearanceViewModel(options)
 	{
@@ -51,6 +51,8 @@
 				{ text: "False", name: false }
 			]
 		};
+
+		self.availableOperators.geodistance = self.availableOperators.number;
 
 		self.gridType = options.gridType;
 		self.field = options.field;
@@ -765,15 +767,15 @@
 	 */
 	ConditionalAppearanceViewModel.prototype.getDataPoints = function()
 	{
-		var self = this, categorys, key, dataPoints = [],
+		var self = this, categories, key, dataPoints = [],
 			dataPointObj = dataPointsJSON[self.gridType],
-			currentAvailableTypes = ["boolean", "string", "number", "date", "time"];
+			currentAvailableTypes = ["boolean", "string", "number", "date", "time", "geodistance"];
 		if (dataPointObj)
 		{
-			categorys = Object.keys(dataPointObj);
-			for (var i = 0, len = categorys.length; i < len; i++)
+			categories = Object.keys(dataPointObj);
+			for (var i = 0, len = categories.length; i < len; i++)
 			{
-				key = categorys[i];
+				key = categories[i];
 				dataPoints = dataPoints.concat(dataPointObj[key].filter(
 					function(item)
 					{
@@ -809,7 +811,7 @@
 				content = displayTarget && ["active", "yes", "true"].indexOf(displayTarget.defaultValue.toLowerCase()) > -1;
 				previewContent = "<div>\
 									<div class='grid-stack-item-content boolean-stack-item " + (content ? "true-item" : "false-item") + "' style='background:" + mergedCondition.backgroundColor + ";border-color:" + mergedCondition.borderColor + "'>\
-										<div class='item-text' style='text-transform: capitalize;color:" + mergedCondition.contentColor + "'>" + content + "</div>\
+										<div class='item-content' style='text-transform: capitalize;color:" + mergedCondition.contentColor + "'>" + content + "</div>\
 									</div>\
 								</div>";
 				break;

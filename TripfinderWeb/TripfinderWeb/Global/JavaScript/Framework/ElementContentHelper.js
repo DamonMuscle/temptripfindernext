@@ -17,20 +17,20 @@
 	 * @param {type} maxWidth The maximum width of the element.
 	 * @returns {void} 
 	 */
-	ElementContentHelper.prototype.reduceFontSizeUntil = function($elementList, maxFontSize, minFontSize, maxWidth)
+	ElementContentHelper.prototype.reduceFontSizeUntil = function($elementList, maxFontSize, minFontSize, maxWidth, widthReduce)
 	{
 		var self = this;
 
 		$.each($elementList, function(index, item)
 		{
-			$el = $(item);
+			var $el = $(item);
 
 			// Set style so the width will auto-adjust.
 			$el.css(self.autofitWidthCss);
 			$el.css("font-size", maxFontSize);
 
-			var fontSize = maxFontSize;
-			while ($el.outerWidth() >= maxWidth && fontSize-- > minFontSize)
+			var fontSize = maxFontSize, outerWidth = $el.outerWidth() - (widthReduce || 0);
+			while (outerWidth >= maxWidth && fontSize-- > minFontSize)
 			{
 				$el.css("font-size", fontSize)
 			}
@@ -171,8 +171,8 @@
 			newMin = newRange[0],
 			newMax = newRange[1],
 			executeFlag = false,
+			tmpMin, tmpMax,
 			idx, rangeTmp, originMin, originMax;
-
 
 		for (idx = 0; idx < rangeList.length; idx++)
 		{
@@ -205,9 +205,9 @@
 	{
 		var idx, leftIdx, rightIdx, rangeTmp,
 			result = content;
-		sortedList = rangeList.sort(function(a, b) { return (a[0] - b[0] >= 0) ? 1 : -1; });
+		var sortedList = rangeList.sort(function(a, b) { return (a[0] - b[0] >= 0) ? 1 : -1; });
 
-		for (var idx = sortedList.length - 1; idx >= 0; idx--)
+		for (idx = sortedList.length - 1; idx >= 0; idx--)
 		{
 			rangeTmp = sortedList[idx];
 			leftIdx = rangeTmp[0];
@@ -263,7 +263,7 @@
 			// Check if the target text exceeds the width limit.
 			var content = $el.html(),
 				targetMatch = content.match(targetRegex),
-				targetContent, targetTailIndex;
+				targetContent, targetTailIndex, isTargetAtHead, isTargetAtTail, isKeywordAtHead;
 
 			if (!targetMatch) { return true; }
 

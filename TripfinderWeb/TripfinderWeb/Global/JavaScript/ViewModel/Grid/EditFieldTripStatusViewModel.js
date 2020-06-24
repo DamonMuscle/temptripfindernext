@@ -25,7 +25,7 @@
 		self.fieldTripIds = selectedRecords.map(function(item) { return item.Id; });
 		self.isCancel = isCancel;
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
-		self.fieldTripStatus = $.map(TF.FieldTripAuthHelper.getAccessableStageIds(), function(item)
+		self.fieldTripStatus = $.map(tf.helpers.fieldTripAuthHelper.getAccessableStageIds(), function(item)
 		{
 			return allFieldTripStatusMap[item];
 		});
