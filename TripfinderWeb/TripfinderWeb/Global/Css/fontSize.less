@@ -1,0 +1,15 @@
+@basefontsize: 13px;
+
+html, body {
+	.fontSize(1, 1);
+}
+
+.fontSize(@times, @increasement)
+{
+	font-size: @times*@basefontsize + @increasement;
+}
+
+.fontSize(@times, @increasement, @flag)
+{
+	font-size: @times*@basefontsize + @increasement !important;
+}

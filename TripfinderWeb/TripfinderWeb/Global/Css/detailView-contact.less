@@ -1,0 +1,93 @@
+.custom-detail-view {
+	.grid-stack {
+		.grid-stack-item {
+			.help-block {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		}
+	}
+}
+
+.manage-record-association {
+	position: relative;
+
+	.form-group {
+		height: 55px;
+		margin-bottom: 10px;
+
+		&.notes {
+			height: auto;
+			margin-bottom: 15px;
+		}
+	}
+
+	textarea {
+		display: block;
+		width: 100%;
+
+		&:hover,
+		&:focus {
+			outline-width: 0;
+		}
+	}
+
+	.tab-switch {
+		width: 100%;
+		text-align: center;
+		padding: 10px;
+		background-color: #FFFFFF;
+		font-size: 0;
+
+		&>span {
+			border: 1px solid #000000;
+			color: #000000;
+			width: 150px;
+			display: inline-block;
+			height: 30px;
+			line-height: 30px;
+			font-size: 13px;
+			cursor: pointer;
+
+			&.selected {
+				background-color: #000000;
+				color: #FFFFFF;
+			}
+
+			&:first-child {
+				border-top-left-radius: 5px;
+				border-bottom-left-radius: 5px;
+			}
+
+			&:last-child {
+				border-top-right-radius: 5px;
+				border-bottom-right-radius: 5px;
+			}
+		}
+	}
+
+	.tab-content-container {
+		overflow-y: hidden;
+		height: 100%;
+	}
+
+	.associate-kendo-list-mover-with-search-control-grid {
+		height: 100%;
+		overflow: hidden;
+
+		.list-mover-mover {
+			.kendo-grid tr td {
+				color: #333;
+			}
+
+			.vertical-size-large.move-button-column {
+				height: 428px;
+			}
+		}
+	}
+}
+
+
+.quick-add .grid-stack-container.container-fluid {
+	height: 100%;
+}
