@@ -495,6 +495,7 @@
 		if (self.obGridData())
 		{
 			self.obShowGrid(true);
+			self.obGridData().searchGrid.fitContainer();
 			self.resize(self.$leftPage.width());
 		}
 	};
