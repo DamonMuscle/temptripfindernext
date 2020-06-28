@@ -631,7 +631,7 @@
 		var self = this;
 		if (isNew)
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.tf.dataTypeHelper.getEndpoint("fieldtriptemplate")))
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("fieldtriptemplate")))
 				.then(function(response)
 				{
 					response.Items = response.Items.sort(function(a, b)
