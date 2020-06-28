@@ -1,0 +1,19 @@
+<div class="manage-record-association">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }--><!-- /ko -->
+	<div class="tab-switch">
+		<span class="searchexisting" data-bind="css:{selected:obSelectedTabIndex()===TAB_ENUMS.SEARCH_EXISTING},click:switchTab.bind($data, TAB_ENUMS.SEARCH_EXISTING)">Search Existing</span>
+		<span class="addnew" data-bind="css:{selected:obSelectedTabIndex()===TAB_ENUMS.QUICK_ADD},click:switchTab.bind($data, TAB_ENUMS.QUICK_ADD)">Add New</span>
+	</div>
+	<div class="tab-content-container">
+		<!-- ko if: obSelectedTabIndex()===TAB_ENUMS.SEARCH_EXISTING || obInitializedTabs.indexOf(TAB_ENUMS.SEARCH_EXISTING) > -1 -->
+		<!-- ko with: searchExistingViewModel -->
+		<div class="" data-bind="template:template,visible:$parent.obSelectedTabIndex()===$parent.TAB_ENUMS.SEARCH_EXISTING"></div>
+		<!-- /ko -->
+		<!-- /ko -->
+		<!-- ko if: obSelectedTabIndex()===TAB_ENUMS.QUICK_ADD || obInitializedTabs.indexOf(TAB_ENUMS.QUICK_ADD) > -1-->
+		<!-- ko with: quickAddViewModel -->
+		<div class="" data-bind="template:template,visible:$parent.obSelectedTabIndex()===$parent.TAB_ENUMS.QUICK_ADD"></div>
+		<!-- /ko -->
+		<!-- /ko -->
+	</div>
+</div>

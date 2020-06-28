@@ -1,0 +1,50 @@
+<div class="fieldtrip-invoice" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-12 form-group tf-validate">
+				<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Account Name')"></label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedAccountName,attributes:{class:"form-control",name:"accountName",placeholder:"None"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		
+		<div class="col-xs-12 form-group">
+			<label>Amount</label>
+			<div>
+				<!-- ko customInput:{type:'Decimal',value:obAmount,attributes:{class:'form-control',name:'amount'},events:{keyup:onChange, change:onChange}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 form-group">
+			<label>Purchase Order</label>
+			<input type="text" class="form-control" data-bind="value:obPurchaseOrder"/>
+		</div>
+
+		<div class="col-xs-12 form-group">
+			<label>Invoice Date</label>
+			<div>
+				<!-- ko customInput:{type:'Date',value:obInvoiceDate,attributes:{class:'form-control',name:'invoicedate'}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 form-group">
+			<label>Payment Date</label>
+			<div>
+				<!-- ko customInput:{type:'Date',value:obPaymentDate,attributes:{class:'form-control',name:'paymentdate'}} --><!-- /ko -->
+			</div>
+		</div>
+	</div>
+</div>

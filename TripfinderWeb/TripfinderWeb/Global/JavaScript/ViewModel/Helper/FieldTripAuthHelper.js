@@ -106,6 +106,22 @@
 		return permittedLevels.indexOf(stageId) >= 0;
 	};
 
+	FieldTripAuthHelper.prototype.getHighestEditRightSecuredItem = function () {
+		var highest;
+		allSecuredItems.some(function (item) {
+			return editableRights.some(function (right) {
+				if (tf.authManager.authorizationInfo.isAuthorizedFor(item, right)) {
+					highest = item;
+					return true;
+				}
+
+				return false;
+			});
+		});
+
+		return highest;
+	};
+
 	FieldTripAuthHelper.prototype.checkFieldTripEditable = function(item)
 	{
 		if (!item || item.FieldTripStageId == null) return false;
