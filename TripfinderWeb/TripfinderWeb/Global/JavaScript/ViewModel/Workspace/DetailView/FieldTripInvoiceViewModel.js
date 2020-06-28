@@ -1,0 +1,151 @@
+(function()
+{
+	createNamespace("TF.DetailView").FieldTripInvoiceViewModel = FieldTripInvoiceViewModel;
+
+	function FieldTripInvoiceViewModel(options)
+	{
+		var self = this,
+			invoice = options.invoice || {},
+			availableAccounts = options.accounts || [],
+			defaultAccount = availableAccounts.find(function(item) { return item.Id === invoice.FieldTripAccountId; });
+
+		self.invoice = invoice;
+		self.isNew = options.isNew;
+		self.newEntityDataSource = options.newEntityDataSource;
+		self.originalItem = options.originalItem;
+
+		self.obAccountSource = ko.observableArray(availableAccounts);
+		self.obSelectedAccount = ko.observable(defaultAccount);
+		self.obSelectedAccountName = ko.observable(defaultAccount ? defaultAccount.Code : null);
+
+		self.obAmount = ko.observable([null, undefined, ""].includes(invoice.Amount) ? "" : tf.dataFormatHelper.currencyFormatter(invoice.Amount));
+		self.obPurchaseOrder = ko.observable(invoice.PurchaseOrder);
+
+		if (invoice.InvoiceDate && typeof invoice.InvoiceDate === "object")
+		{
+			invoice.InvoiceDate = invoice.InvoiceDate.toLocaleString("en-US");
+		}
+
+		if (invoice.PaymentDate && typeof invoice.PaymentDate === "object")
+		{
+			invoice.PaymentDate = invoice.PaymentDate.toLocaleString("en-US");
+		}
+
+		self.obInvoiceDate = ko.observable(invoice.InvoiceDate);
+		self.obPaymentDate = ko.observable(invoice.PaymentDate);
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+	}
+
+	FieldTripInvoiceViewModel.prototype.init = function(viewModel, el)
+	{
+		var self = this;
+		self.$element = $(el);
+
+		setTimeout(function()
+		{
+			self.initValidator();
+		})
+	};
+
+	FieldTripInvoiceViewModel.prototype.initValidator = function()
+	{
+		var self = this,
+			validatorFields = {
+				accountName: {
+					trigger: "blur change",
+					validators: {
+						callback: {
+							message: " is required",
+							callback: function()
+							{
+								var selectedAccount = self.obSelectedAccount();
+								return !!(selectedAccount && selectedAccount.Id > 0);
+							}
+						},
+					}
+				}
+			};
+
+		self.validator = self.$element.bootstrapValidator({
+			excluded: [".data-bv-excluded"],
+			fields: validatorFields,
+			live: 'disabled'
+		}).data("bootstrapValidator");
+
+		self.pageLevelViewModel.load(self.validator);
+	};
+
+	FieldTripInvoiceViewModel.prototype.onChange = function(decimalBox, evt)
+	{
+		evt.target.value = tf.dataFormatHelper.currencyFormatter(evt.target.value);
+	};
+
+	FieldTripInvoiceViewModel.prototype.apply = function()
+	{
+		var self = this;
+
+		return self.pageLevelViewModel.saveValidate()
+			.then(function(valid)
+			{
+				if (!valid) return;
+
+				var selectAccount = self.obSelectedAccount(),
+					updatedInvoice = $.extend({}, self.invoice, {
+						Amount: self.obAmount(),
+						PurchaseOrder: self.obPurchaseOrder(),
+						InvoiceDate: self.obInvoiceDate(),
+						PaymentDate: self.obPaymentDate(),
+						DBID: tf.datasourceManager.databaseId,
+						FieldTripAccountId: selectAccount.Id,
+						AccountName: selectAccount.Code
+					});
+
+				// Manipulate mini grid data source when it is on a new field trip 
+				if (self.newEntityDataSource)
+				{
+					var fieldtripInvoiceData = (new TF.DataModel.FieldTripInvoiceDataModel(updatedInvoice)).toData();
+
+					if (self.isNew)
+					{
+						self.newEntityDataSource.push(fieldtripInvoiceData);
+					}
+					else
+					{
+						var index = self.newEntityDataSource
+							.findIndex(function(item)
+							{
+								return item._guid == self.originalItem._guid;
+							});
+
+						self.newEntityDataSource[index] = fieldtripInvoiceData;
+					}
+
+					return fieldtripInvoiceData;
+				}
+
+				if (self.isNew)
+				{
+					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoices"), {
+						paramData: { "@relationships": "FieldTripAccount" },
+						data: [updatedInvoice]
+					});
+				}
+				else
+				{
+					return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "fieldtripinvoices"),
+						{
+							paramData: {
+								Id: self.invoice.Id,
+								DBID: tf.datasourceManager.databaseId
+							},
+							data: [updatedInvoice]
+						});
+				}
+			});
+	};
+
+	FieldTripInvoiceViewModel.prototype.dispose = function()
+	{
+		this.pageLevelViewModel.dispose();
+	};
+})();

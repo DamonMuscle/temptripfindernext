@@ -12,17 +12,15 @@
 		self.options = options;
 		self.detailView = detailView;
 		self.stickyName = "grid.detailscreenlayoutid." + options.gridType;
-		self.stickyLayoutName = options.stickyLayoutName ? options.stickyLayoutName : "grid.detailscreenlayoutname." + options.gridType;
-		self.defaultLayoutId = options.defaultLayoutId;
-		self.defaultLayoutName = options.defaultLayoutName;
 
-
-		self.obSelectLayoutID = ko.observable(tf.storageManager.get(self.stickyName));
-		self.obSelectLayoutName = ko.observable(tf.storageManager.get(self.stickyLayoutName));
+		self.obSelectLayoutID = ko.observable(detailView.entityDataModel.id());
+		self.obSelectLayoutName = ko.observable(detailView.entityDataModel.name());
 		self.obLayouts = ko.observableArray([]);
 		self.obMoveDistance = ko.observable(options.movingDistance != null ? "-" + options.movingDistance + "px" : "auto");
 		self.obTop = ko.observable(options.top + "px");
 		self.obNewWindow = ko.observable(true);
+
+		self.detailViewHelper = tf.helpers.detailViewHelper;
 
 		//Events
 		self.newLayoutClick = self.newLayoutClick.bind(self);
@@ -34,6 +32,8 @@
 		self.loadingFinishEvent = new TF.Events.Event();
 		self.modifyItemEvent = new TF.Events.Event();
 		self.selectItemEvent = new TF.Events.Event();
+		//RW-11733
+		self.syncItemDataEvent = new TF.Events.Event();
 
 		self.load();
 	}
@@ -44,27 +44,34 @@
 	 */
 	LayoutMenuViewModel.prototype.load = function()
 	{
-		var self = this, paramData = {};
+		var self = this,
+			paramData = {
+				"@fields": "Id,Name,Comments,DataTypeId"
+			};
 		if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 		{
 			self.obNewWindow(false);
 		}
 		if (self.options.gridType)
 		{
-			paramData.dataTypeId = tf.DataTypeHelper.getId(self.options.gridType);
+			paramData.dataTypeId = tf.dataTypeHelper.getId(self.options.gridType);
 		}
+
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
 			paramData: paramData
-		},
-			{ overlay: false }).then(function(response)
+		}, { overlay: false })
+			.then(function(response)
 			{
 				if (response && response.Items)
 				{
 					var layouts = response.Items.map(function(item)
 					{
+						item.Name = item.Name.trim();
+						item = self.detailViewHelper.formatLayoutTemplate(item)
 						if (self.obSelectLayoutID() === item.Id)
 						{
 							self.obSelectLayoutName(item.Name);
+							self.syncItemDataEvent.notify(item);
 						}
 						if (!item.Comments)
 						{
@@ -72,11 +79,15 @@
 						}
 						return new TF.DataModel.DetailScreenLayoutDataModel(item);
 					});
+
 					if (!self.obSelectLayoutName())
 					{
 						self.clearLayout();
 					}
-					self.obLayouts(layouts.sort(function(a, b) { return a.name().localeCompare(b.name()) }));
+					self.obLayouts(layouts.sort(function(a, b)
+					{
+						return a.name().localeCompare(b.name())
+					}));
 				}
 				self.loadingFinishEvent.notify();
 			});
@@ -91,7 +102,9 @@
 	LayoutMenuViewModel.prototype.newLayoutClick = function(viewModel, e)
 	{
 		var self = this;
-		self.modifyItemEvent.notify();
+		self.modifyItemEvent.notify({
+			isNew: true
+		});
 	};
 
 	/**
@@ -103,8 +116,10 @@
 	LayoutMenuViewModel.prototype.editLayoutClick = function(viewModel, e)
 	{
 		var self = this;
-		ga('send', 'event', 'Action', 'Edit Details');
-		self.modifyItemEvent.notify({ id: self.obSelectLayoutID() });
+		// ga('send', 'event', 'Action', 'Edit Details');
+		self.modifyItemEvent.notify({
+			id: self.obSelectLayoutID()
+		});
 	};
 
 	/**
@@ -116,7 +131,7 @@
 	LayoutMenuViewModel.prototype.manageLayoutClick = function(viewModel, e)
 	{
 		var self = this,
-			manageModal = new TF.Modal.ManageDetailScreenLayoutModalViewModel(self.options.gridType, self.obSelectLayoutID());
+			manageModal = new TF.DetailView.ManageDetailScreenLayoutModalViewModel(self.options.gridType, self.obSelectLayoutID());
 		self.delayDispose = true;
 		tf.modalManager.showModal(manageModal).then(function(result)
 		{
@@ -127,32 +142,58 @@
 					if (result.isOpenTemp)
 					{
 						self.modifyItemEvent.notify(result.data);
-					}
-					else
+					} else
 					{
 						self.apply(result.data);
 					}
-				}
-				else
+				} else
 				{
 					if (result.isOpenTemp)
 					{
 						self.modifyItemEvent.notify(result.data);
 					}
-					else
+					if (!result.data.selectId)
 					{
-						self.resetLayoutClick();
+						self.obLayouts(result.data.layoutTemplates.sort(function(a, b)
+						{
+							return a.name().localeCompare(b.name())
+						}));
 					}
+					self.resetLayout(result.data.selectId);
 				}
 			}
 			self.dispose();
 			self.delayDispose = false;
 		});
 	};
+	/**
+	 * Reset layout.
+	 * @param {object} viewModel The viewModel of this modal.  
+	 * @param {event} e The click event.
+	 * @returns {void} 
+	 */
+	LayoutMenuViewModel.prototype.resetLayout = function(layoutId)
+	{
+		var self = this, defaultLayoutTemplates = [];
 
+		self.clearLayout();
+		if (layoutId)
+		{
+			self.selectItemEvent.notify(layoutId);
+		}
+		else
+		{
+			defaultTemplateName = self.getDefaultTemplateName(self.options.gridType),
+				defaultLayoutTemplates = self.obLayouts().filter(function(item)
+				{
+					return item.name() === defaultTemplateName;
+				});
+			self.selectItemEvent.notify(defaultLayoutTemplates.length > 0 ? defaultLayoutTemplates[0].id() : self.obLayouts()[0] ? self.obLayouts()[0].id() : undefined);
+		}
+	};
 	/**
 	 * The event of reset layout icon click.
-	 * @param {object} viewModel The viewModel of this modal.
+	 * @param {object} viewModel The viewModel of this modal.  Removed in RW-12840
 	 * @param {event} e The click event.
 	 * @returns {void} 
 	 */
@@ -163,6 +204,11 @@
 		self.selectItemEvent.notify();
 	};
 
+	LayoutMenuViewModel.prototype.getDefaultTemplateName = function(gridType)
+	{
+		return String.format("{0} default layout", tf.applicationTerm.getApplicationTermPluralByName(tf.dataTypeHelper.getFormalDataTypeName(gridType))).toUpperCase();
+	};
+
 	/**
 	 * Clear select layout
 	 * @returns {void} 
@@ -170,10 +216,9 @@
 	LayoutMenuViewModel.prototype.clearLayout = function()
 	{
 		var self = this;
-		self.obSelectLayoutID(self.defaultLayoutId);
-		self.obSelectLayoutName(self.defaultLayoutName);
+		self.obSelectLayoutID(null);
+		self.obSelectLayoutName("");
 		tf.storageManager.save(self.stickyName, null);
-		tf.storageManager.save(self.stickyLayoutName, null);
 	};
 
 	/**
@@ -187,13 +232,15 @@
 		var self = this,
 			selectId = viewModel.id(),
 			selectName = viewModel.name();
-		if (selectId === self.obSelectLayoutID())
-		{
-		}
-		else
-		{
-			self.apply({ selectId: selectId, selectName: selectName });
-		}
+
+		//RW-11733 should always get the newest layout
+		/* 		if (selectId !== self.obSelectLayoutID())
+				{ */
+		self.apply({
+			selectId: selectId,
+			selectName: selectName
+		});
+		//}
 	};
 
 	/**
@@ -204,17 +251,16 @@
 	LayoutMenuViewModel.prototype.apply = function(layout)
 	{
 		var self = this;
-		self.obSelectLayoutID(layout.selectId);
+		self.obSelectLayoutID(layout.selectId)
 		self.obSelectLayoutName(layout.selectName);
 		tf.storageManager.save(self.stickyName, layout.selectId);
-		tf.storageManager.save(self.stickyLayoutName, layout.selectName);
 		self.selectItemEvent.notify(self.obSelectLayoutID());
 	};
 
 	/**
- 	* The dispose function.
- 	* @returns {void} 
- 	*/
+	 * The dispose function.
+	 * @returns {void} 
+	 */
 	LayoutMenuViewModel.prototype.dispose = function()
 	{
 		var self = this;
@@ -223,6 +269,21 @@
 			self.loadingFinishEvent.unsubscribeAll();
 			self.modifyItemEvent.unsubscribeAll();
 			self.selectItemEvent.unsubscribeAll();
+			self.syncItemDataEvent.unsubscribeAll();
+		}
+
+		if (self.options.dispose)
+		{
+			self.options.dispose();
+		}
+	};
+
+	LayoutMenuViewModel.prototype.afterRender = function()
+	{
+		var self = this;
+		if (self.options.afterRender)
+		{
+			self.options.afterRender();
 		}
 	};
 })();

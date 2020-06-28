@@ -1,0 +1,54 @@
+.data-editor-save-confirmation-modal {
+	.container {
+		width: 100%;
+
+		.list {
+			display: flex;
+			flex-direction: column;
+			max-height: 500px;
+			overflow-y: auto;
+
+			.item {
+				display: flex;
+				flex-direction: row;
+				padding: 10px;
+
+				&:hover {
+					background-color: #f2f2f2;
+
+					.revert-button {
+						visibility: visible;
+					}
+				}
+
+				.field {
+					width: 200px;
+					padding-right: 10px;
+					font-weight: bold;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				.message {
+					flex: 1;
+				}
+
+				.revert-button {
+					visibility: hidden;
+					height: 16px;
+					width: 16px;
+					background-image: url('../img/detail-screen/Undo-Black.png');
+					background-size: 16px 16px;
+					background-position: center center;
+					align-self: flex-start;
+					cursor: pointer;
+				}
+			}
+		}
+
+		.empty-placeholder span {
+			color: gray;
+		}
+	}
+}

@@ -322,9 +322,9 @@
 		if (self.obIsValueRequired())
 		{
 			validators["notEmpty"] =
-			{
-				message: 'required'
-			};
+				{
+					message: 'required'
+				};
 		}
 		result[type] = { trigger: "blur change", validators: validators };
 		return result;
@@ -531,7 +531,7 @@
 				TypeId: field.UDFTypeId,
 				Id: field.UDFId,
 				RecordValue: newValue,
-				DataTypeId: tf.dataTypeHelper.getId(self.gridType),
+				DataTypeId: tf.DataTypeHelper.getId(self.gridType),
 				SelectPickListOptionIDs: selectPickListOptionIDs
 			}];
 		}

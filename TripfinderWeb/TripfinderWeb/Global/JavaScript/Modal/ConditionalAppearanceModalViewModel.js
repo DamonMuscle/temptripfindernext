@@ -1,6 +1,6 @@
 (function()
 {
-	createNamespace("TF.Modal").ConditionalAppearanceModalViewModel = ConditionalAppearanceModalViewModel;
+	createNamespace("TF.DetailView").ConditionalAppearanceModalViewModel = ConditionalAppearanceModalViewModel;
 
 	function ConditionalAppearanceModalViewModel(options)
 	{
@@ -11,7 +11,7 @@
 		self.sizeCss = "modal-dialog-condition";
 		self.modalClass = "conditionalAppearance-modal";
 
-		self.conditionalAppearanceViewModel = new TF.Control.ConditionalAppearanceViewModel(options);
+		self.conditionalAppearanceViewModel = new TF.DetailView.ConditionalAppearanceViewModel(options);
 		self.data(self.conditionalAppearanceViewModel);
 
 		ko.computed(function()

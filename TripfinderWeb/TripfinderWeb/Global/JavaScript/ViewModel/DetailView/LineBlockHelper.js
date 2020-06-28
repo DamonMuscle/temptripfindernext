@@ -2,15 +2,18 @@
 {
 	createNamespace("TF.DetailView").LineBlockHelper = LineBlockHelper;
 
-	function LineBlockHelper(detailView)
+	function LineBlockHelper(gridstack)
 	{
 		var self = this;
-		self.detailView = detailView;
+		self.gridstack = gridstack;
+		self.detailView = gridstack.detailView;
+		self.$container = gridstack.$wrapper;
 	};
 
 	LineBlockHelper.prototype.setStatic = function(isStatic)
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), $lines = $gridStack.find(".verti-line, .hori-line");
+		var self = this,
+			$lines = self.$container.find(">.verti-line, >.hori-line");
 		if ($lines.length > 0)
 		{
 			isStatic ? $lines.addClass("disable") : $lines.removeClass("disable");
@@ -19,22 +22,21 @@
 
 	LineBlockHelper.prototype.addLineContainers = function()
 	{
-		var self = this, width = self.detailView.getCurrentWidth(), node, maxY = -1, $bottomContainer,
-			$gridStack = self.detailView.$element.find(".grid-stack"),
-			items = $gridStack.find(">.grid-stack-item:visible"),
-			lineContainer = "<div class='line-container'></div>", $lineContainer, lastContainer = [];
+		var self = this, width = self.gridstack.getCurrentWidth(),
+			$gridStack = self.$container,
+			lineContainer = "<div class='line-container'></div>";
 
-		$gridStack.find(".line-container").remove();
+		$gridStack.find(">.line-container").remove();
 		for (var i = 0; i < width; i++)
 		{
-			$lineContainer = $(lineContainer);
-			$lineContainer.addClass("bottom");
-			$lineContainer.css({ width: 100 / width + "%", left: i === 0 ? 0 : (100 / width * i + "%"), top: -4 });
-			$lineContainer.attr({ x: i, y: 0 });
+			var $lineContainer = $(lineContainer);
+			$lineContainer.addClass("bottom")
+				.css({ width: 100 / width + "%", left: i === 0 ? 0 : (100 / width * i + "%"), top: -4 })
+				.attr({ x: i, y: 0 });
 			$gridStack.prepend($lineContainer);
 		}
 
-		$.each($gridStack.find(".line-container"), function(index, container)
+		$.each($gridStack.find(">.line-container"), function(index, container)
 		{
 			var accept = "";
 			if (!$(container).hasClass("no-hori"))
@@ -54,6 +56,8 @@
 				tolerance: "pointer",
 				drop: function(e, ui)
 				{
+					if (self.detailView.getActiveGridStack().$wrapper[0] != $gridStack[0]) return;
+
 					var placeholder = $gridStack.find(".placeholder-line");
 					if (placeholder.hasClass("horizontal"))
 					{
@@ -68,8 +72,8 @@
 					{
 						ui.draggable.remove();
 					}
-					$(".right-container .line-container").removeClass("drag-line");
-					$gridStack.find(".hori-line, .verti-line").removeClass("disable-animation");
+					self.$container.find(">.line-container").removeClass("drag-line");
+					$gridStack.find(">.hori-line, >.verti-line").removeClass("disable-animation");
 				},
 				out: function(e, ui)
 				{
@@ -84,12 +88,16 @@
 	//Temporary
 	LineBlockHelper.prototype.vLineDraggingIn = function($vline, $helper)
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), unitHeight = self.detailView.UNITHEIGHT + 1, height, left,
-			unitWidth = $(".line-container").outerWidth(), x, y, placeholder, gridWidth = self.detailView.getCurrentWidth(),
-			offset = $gridStack.offset(), marginLeft = 2, top = $vline.offset().top - offset.top, left = $vline.offset().left - offset.left + marginLeft,
+		var self = this,
+			$gridStack = self.$container,
+			unitHeight = self.gridstack.getCellHeight() + 1, height,
+			unitWidth = self.$container.find(">.line-container").outerWidth(), x, y, placeholder,
+			gridWidth = self.gridstack.getCurrentWidth(),
+			offset = $gridStack.offset(), marginLeft = 2, top = $vline.offset().top - offset.top,
+			left = $vline.offset().left - offset.left + marginLeft,
 			showPlaceholder = left >= 0 && top >= 0;
 
-		$gridStack.find(".placeholder-line").remove();
+		$gridStack.find(">.placeholder-line").remove();
 
 		if ($helper)
 		{
@@ -114,15 +122,14 @@
 			x = Math.floor(x);
 		}
 
-		height = $vline.attr("height") || 1;
-		height = parseInt(height);
+		height = parseInt($vline.attr("height") || 1);
 		left = x === 0 ? 0 : (100 / gridWidth * x + "%")
 
 		if (showPlaceholder)
 		{
 			placeholder = $("<div class='placeholder-line vertical' x='" + x + "' y='" + y + "' height='" + height + "'></div>");
 			placeholder.css({
-				top: (y * self.detailView.UNITHEIGHT + (y - 1)) + "px",
+				top: (y * self.gridstack.getCellHeight() + (y - 1)) + "px",
 				left: left,
 				height: (height * unitHeight) + "px"
 			});
@@ -141,12 +148,17 @@
 
 	LineBlockHelper.prototype.hLineDraggingIn = function($hline, $helper)
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), unitHeight = self.detailView.UNITHEIGHT + 1, width,
-			unitWidth = $(".line-container").outerWidth(), x, y, placeholder, gridWidth = self.detailView.getCurrentWidth(),
-			offset = $gridStack.offset(), top = $hline.offset().top - offset.top, left = $hline.offset().left - offset.left,
+		var self = this,
+			$gridStack = self.$container,
+			unitHeight = self.gridstack.getCellHeight() + 1, width,
+			unitWidth = self.$container.find(">.line-container").outerWidth(), x, y, placeholder,
+			gridWidth = self.gridstack.getCurrentWidth(),
+			offset = $gridStack.offset(),
+			top = $hline.offset().top - offset.top,
+			left = $hline.offset().left - offset.left,
 			showPlaceholder = left >= 0 && top >= 0;
 
-		$gridStack.find(".placeholder-line").remove();
+		$gridStack.find(">.placeholder-line").remove();
 
 		if ($helper)
 		{
@@ -162,8 +174,7 @@
 
 		y = parseInt(top / unitHeight);
 		x = parseInt(left / unitWidth + 0.01);
-		width = $hline.attr("width") || 1;
-		width = parseInt(width);
+		width = parseInt($hline.attr("width") || 1);
 		y = self.getClosestPosition(x, y, width);
 		y = self.checkLineYPosition(x, y, width);
 
@@ -171,7 +182,7 @@
 		{
 			placeholder = $("<div class='placeholder-line horizontal' x='" + x + "' y='" + y + "' width='" + width + "'></div>");
 			placeholder.css({
-				top: (y * self.detailView.UNITHEIGHT + (y - 1) - 2) + "px",
+				top: (y * self.gridstack.getCellHeight() + (y - 1) - 2) + "px",
 				left: x === 0 ? 0 : (100 / gridWidth * x + "%"),
 				width: 100 / gridWidth * width + "%"
 			});
@@ -182,26 +193,26 @@
 
 	LineBlockHelper.prototype.refresh = function()
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack");
-		$gridStack.data('gridstack').lineBlockManager.packNodes();
+		var self = this;
+		self.gridstack.grid.lineBlockManager.packNodes();
 	};
 
 	LineBlockHelper.prototype.fixCollisions = function()
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack");
-		$gridStack.data('gridstack').lineBlockManager.fixCollisions();
+		var self = this;
+		self.gridstack.grid.lineBlockManager.fixCollisions();
 	};
 
 	LineBlockHelper.prototype.moveNode = function(node, x, y, width, height)
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack");
-		$gridStack.data('gridstack').grid.moveNode(node, x, y, width, height);
+		var self = this;
+		self.gridstack.grid.grid.moveNode(node, x, y, width, height);
 	};
 
 	LineBlockHelper.prototype.getClosestPosition = function(x, y, width)
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), bottomNodes = [],
-			$hLine, bottomNode, gridWidth = self.detailView.getCurrentWidth(), stackItems = $gridStack.find(".grid-stack-item"),
+		var self = this, $gridStack = self.$container,
+			stackItems = $gridStack.find(">.grid-stack-item"),
 			itemX, itemY, itemHeight, itemWidth, maxY = 0;
 
 		$.each(stackItems, function(index, item)
@@ -233,8 +244,8 @@
 	 */
 	LineBlockHelper.prototype.checkLineYPosition = function(x, y, width, height)
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"),
-			stackItems = $gridStack.find(".grid-stack-item"),
+		var self = this, $gridStack = self.$container,
+			stackItems = $gridStack.find(">.grid-stack-item"),
 			itemX, itemY, itemHeight, itemWidth, height = height || 0, cutBlocks;
 
 		while (y > 0)
@@ -273,8 +284,8 @@
 
 	LineBlockHelper.prototype.addVertiLine = function(x, y, h)
 	{
-		var self = this, width, height, $gridStack = self.detailView.$element.find(".grid-stack"),
-			gridWidth = self.detailView.getCurrentWidth(), $line, actualUnitWidth;
+		var self = this, $gridStack = self.$container,
+			gridWidth = self.gridstack.getCurrentWidth(), $line;
 
 		y = parseInt(y);
 		x = parseInt(x);
@@ -282,8 +293,8 @@
 		$line = $("<div class='verti-line'></div>");
 		$line.css({
 			left: x === 0 ? 0 : (100 / gridWidth * x + "%"),
-			top: (y * self.detailView.UNITHEIGHT + (y - 1)) + "px",
-			height: (h * (self.detailView.UNITHEIGHT + 1)) + "px",
+			top: (y * self.gridstack.getCellHeight() + (y - 1)) + "px",
+			height: (h * (self.gridstack.getCellHeight() + 1)) + "px",
 			width: "1px"
 		});
 		$gridStack.append($line);
@@ -297,8 +308,7 @@
 			helper: function(e)
 			{
 				var $helper = $(e.target).clone(), height = $(e.target).height();
-				$helper.addClass("disable-animation");
-				$helper.css({
+				$helper.addClass("disable-animation").css({
 					width: '1px',
 					height: height
 				});
@@ -318,7 +328,7 @@
 			start: function()
 			{
 				$line.addClass('dragging');
-				$(".right-container .line-container").addClass("drag-line");
+				self.$container.find(">.line-container").addClass("drag-line");
 				$line.addClass("disable-animation");
 			},
 			stop: function(e, ui)
@@ -331,20 +341,20 @@
 				else
 				{
 					var x = parseInt($line.attr('x')), y = parseInt($line.attr('y')),
-						gridWidth = self.detailView.getCurrentWidth();
+						gridWidth = self.gridstack.getCurrentWidth();
 
 					$line.css({
 						left: x === 0 ? 0 : (100 / gridWidth * x + "%"),
-						top: (y * self.detailView.UNITHEIGHT + (y - 1)) + "px"
+						top: (y * self.gridstack.getCellHeight() + (y - 1)) + "px"
 					});
 				}
-				$(".right-container .line-container").removeClass("drag-line");
+				self.$container.find(">.line-container").removeClass("drag-line");
 				$line.removeClass("disable-animation");
 			}
 		});
 		$line.attr({ x: x, y: y, height: h, type: "verticalLine" });
 
-		actualUnitHeight = (self.detailView.UNITHEIGHT + 1);
+		actualUnitHeight = (self.gridstack.getCellHeight() + 1);
 
 		$line.resizable({
 			autoHide: true,
@@ -352,22 +362,22 @@
 			handles: 'n, s',
 			resize: function(e, ui)
 			{
-				var $currentLine = ui.element, placeholderHeight, lineContainer, currentY,
-					axis = $(ui.element).data('ui-resizable').axis, origX = parseInt($currentLine.attr("x")), currentX,
+				var $currentLine = ui.element, placeholderHeight, currentY,
+					axis = $(ui.element).data('ui-resizable').axis, origX = parseInt($currentLine.attr("x")),
 					origHeight = parseInt($currentLine.attr("height")), origY = parseInt($currentLine.attr("y")),
 					placeholderLine = $("<div class='placeholder-line vertical'></div>"), currentHeight;
 
-				currentHeight = parseInt($currentLine.attr("resizingHeight") || origHeight) * (self.detailView.UNITHEIGHT + 1);
+				currentHeight = parseInt($currentLine.attr("resizingHeight") || origHeight) * (self.gridstack.getCellHeight() + 1);
 
 				if ($currentLine.height() > currentHeight &&
 					!self.canResizeVertiLine(parseInt($currentLine.attr("resizingY") || origY), origX, parseInt($currentLine.attr("resizingHeight") || origHeight), axis === "s"))
 				{
-					$currentLine.css("top", parseInt($currentLine.attr("resizingY") || origY) * self.detailView.UNITHEIGHT + (parseInt($currentLine.attr("resizingY") || origY) - 1));
+					$currentLine.css("top", parseInt($currentLine.attr("resizingY") || origY) * self.gridstack.getCellHeight() + (parseInt($currentLine.attr("resizingY") || origY) - 1));
 					$currentLine.height(currentHeight);
 					return;
 				}
 
-				gridWidth = self.detailView.getCurrentWidth();
+				gridWidth = self.gridstack.getCurrentWidth();
 				$gridStack.find(".placeholder-line").remove();
 				switch (axis)
 				{
@@ -380,7 +390,7 @@
 						}
 						placeholderLine.css({
 							left: origX === 0 ? 0 : (100 / gridWidth * origX + "%"),
-							height: (placeholderHeight * (self.detailView.UNITHEIGHT + 1)) + "px",
+							height: (placeholderHeight * (self.gridstack.getCellHeight() + 1)) + "px",
 							top: $currentLine.css("top")
 						});
 						placeholderLine.attr({
@@ -402,8 +412,8 @@
 						currentY = origY - placeholderHeight + origHeight;
 						placeholderLine.css({
 							left: origX === 0 ? 0 : (100 / gridWidth * origX + "%"),
-							height: (placeholderHeight * (self.detailView.UNITHEIGHT + 1)) + "px",
-							top: (currentY * self.detailView.UNITHEIGHT + (currentY - 1)) + "px"
+							height: (placeholderHeight * (self.gridstack.getCellHeight() + 1)) + "px",
+							top: (currentY * self.gridstack.getCellHeight() + (currentY - 1)) + "px"
 						});
 						placeholderLine.attr({
 							x: origX,
@@ -426,7 +436,7 @@
 
 				if (placeholder.length !== 0)
 				{
-					$currentLine.css("top", y * self.detailView.UNITHEIGHT + (y - 1)).height(height * (self.detailView.UNITHEIGHT + 1))
+					$currentLine.css("top", y * self.gridstack.getCellHeight() + (y - 1)).height(height * (self.gridstack.getCellHeight() + 1))
 						.attr("height", height).attr("y", y);
 				}
 
@@ -441,8 +451,8 @@
 
 	LineBlockHelper.prototype.addHoriLine = function(x, y, w)
 	{
-		var self = this, width, height, $gridStack = self.detailView.$element.find(".grid-stack"),
-			gridWidth = self.detailView.getCurrentWidth(), $line, actualUnitWidth;
+		var self = this, $gridStack = self.$container,
+			gridWidth = self.gridstack.getCurrentWidth(), $line, actualUnitWidth;
 
 		y = parseInt(y);
 		x = parseInt(x);
@@ -450,7 +460,7 @@
 		$line = $("<div class='hori-line'></div>");
 		$line.css({
 			left: x === 0 ? 0 : (100 / gridWidth * x + "%"),
-			top: (y * self.detailView.UNITHEIGHT + (y - 1) - 2) + "px",
+			top: (y * self.gridstack.getCellHeight() + (y - 1) - 2) + "px",
 			height: "1px",
 			width: 100 / gridWidth * w + "%"
 		});
@@ -484,7 +494,7 @@
 			start: function()
 			{
 				$line.addClass('dragging');
-				$(".right-container .line-container").addClass("drag-line");
+				self.$container.find(".right-container .line-container").addClass("drag-line");
 				$line.addClass("disable-animation");
 			},
 			stop: function(e, ui)
@@ -497,20 +507,20 @@
 				else
 				{
 					var x = parseInt($line.attr('x')), y = parseInt($line.attr('y')),
-						gridWidth = self.detailView.getCurrentWidth();
+						gridWidth = self.gridstack.getCurrentWidth();
 
 					$line.css({
 						left: x === 0 ? 0 : (100 / gridWidth * x + "%"),
-						top: (y * self.detailView.UNITHEIGHT + (y - 1) - 2) + "px"
+						top: (y * self.gridstack.getCellHeight() + (y - 1) - 2) + "px"
 					});
 				}
-				$(".right-container .line-container").removeClass("drag-line");
+				self.$container.find(".right-container .line-container").removeClass("drag-line");
 				$line.removeClass("disable-animation");
 			}
 		});
 		$line.attr({ x: x, y: y, width: w, type: "horizontalLine" });
 
-		actualUnitWidth = $(".line-container").outerWidth();
+		actualUnitWidth = self.$container.find(".line-container").outerWidth();
 		$line.resizable({
 			autoHide: true,
 			minWidth: actualUnitWidth,
@@ -522,7 +532,7 @@
 					origWidth = parseInt($currentLine.attr("width")), origY = parseInt($currentLine.attr("y")),
 					placeholderLine = $("<div class='placeholder-line horizontal'></div>");
 
-				actualUnitWidth = $(".line-container").outerWidth();
+				actualUnitWidth = self.$container.find(".line-container").outerWidth();
 
 				if ($currentLine.width() > actualUnitWidth * (parseInt($currentLine.attr("resizingWidth")) || origWidth) &&
 					!self.canResizeHoriLine(parseInt($currentLine.attr("resizingX") || origX), origY, parseInt($currentLine.attr("resizingWidth")) || origWidth, axis === "e"))
@@ -532,7 +542,7 @@
 					return;
 				}
 
-				gridWidth = self.detailView.getCurrentWidth();
+				gridWidth = self.gridstack.getCurrentWidth();
 				$gridStack.find(".placeholder-line").remove();
 				switch (axis)
 				{
@@ -593,7 +603,7 @@
 				{
 					$currentLine.css({
 						left: x === 0 ? 0 : (100 / gridWidth * x + "%"),
-						top: (y * self.detailView.UNITHEIGHT + (y - 1) - 2) + "px"
+						top: (y * self.gridstack.getCellHeight() + (y - 1) - 2) + "px"
 					}).width(100 / gridWidth * width + "%")
 						.attr("width", width).attr("x", x).attr("y", y);
 				}
@@ -609,8 +619,8 @@
 
 	LineBlockHelper.prototype.canResizeHoriLine = function(x, y, width, toRight)
 	{
-		var self = this, xEdge = toRight ? (x + width) : x, yEdge = y, $gridStack = self.detailView.$element.find(".grid-stack"),
-			items = $gridStack.find(">.grid-stack-item:visible"), node, result = true, gridWidth = self.detailView.getCurrentWidth();
+		var self = this, xEdge = toRight ? (x + width) : x, yEdge = y, $gridStack = self.$container,
+			items = $gridStack.find(">.grid-stack-item:visible"), node, result = true, gridWidth = self.gridstack.getCurrentWidth();
 
 		if ((x + width === gridWidth && toRight) || (x === 0 && !toRight))
 		{
@@ -647,7 +657,7 @@
 
 	LineBlockHelper.prototype.canResizeVertiLine = function(y, x, height, toBottom)
 	{
-		var self = this, yEdge = toBottom ? (y + height) : y, xEdge = x, $gridStack = self.detailView.$element.find(".grid-stack"),
+		var self = this, yEdge = toBottom ? (y + height) : y, xEdge = x, $gridStack = self.$container,
 			items = $gridStack.find(">.grid-stack-item:visible"), node, result = true;
 
 		if (!toBottom)
@@ -672,7 +682,8 @@
 
 	LineBlockHelper.prototype.getVerticalLines = function()
 	{
-		var self = this, $gridStack = self.detailView.$element.find(".grid-stack"), $lines = $gridStack.find(".verti-line"),
+		var self = this,
+			$lines = self.$container.find(">.verti-line"),
 			lineNodes = [];
 
 		$lines.each(function(index, item)
@@ -698,28 +709,23 @@
 		{
 			$line.attr({
 				height: height
-			}).height(height * (self.detailView.UNITHEIGHT + 1));
+			}).height(height * (self.gridstack.getCellHeight() + 1));
 		}
 	};
 
 	LineBlockHelper.prototype.serializeLines = function($lines)
 	{
-		var self = this, items = [], $line;
-		$.each($lines, function(index, line)
+		return Array.from($lines).map(function(line)
 		{
-			$line = $(line);
-			item = {
+			var $line = $(line);
+			return {
 				x: parseInt($line.attr("x")),
 				y: parseInt($line.attr("y")),
+				w: $line.attr("width") ? parseInt($line.attr("width")) : 0,
+				h: $line.attr("height") ? parseInt($line.attr("height")) : 0,
 				type: $line.hasClass("hori-line") ? "horizontalLine" : "verticalLine"
 			};
-			item.w = $line.attr("width") ? parseInt($line.attr("width")) : 0;
-			item.h = $line.attr("height") ? parseInt($line.attr("height")) : 0;
-
-			items.push(item);
-
 		});
-		return items;
 	};
 
 	LineBlockHelper.prototype.dispose = function()

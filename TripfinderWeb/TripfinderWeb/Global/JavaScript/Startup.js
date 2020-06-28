@@ -266,6 +266,7 @@
 		var self = this;
 		self.libraryInitialization().then(function()
 		{
+			tf.dataFormatHelper = new TF.DataFormatHelper();
 			tf.fullScreenHelper = new TF.FullScreenHelper();
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
@@ -281,7 +282,18 @@
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
 			tf.kendoHackHelper = new TF.KendoHackHelper();
+			tf.docFilePreviewHelper = new TF.Control.DocumentFilePreviewViewModel($("body"));
+			tf.helpers = {
+				detailViewHelper: new TF.DetailView.DetailViewHelper(),
+				kendoGridHelper: new TF.Helper.KendoGridHelper(),
+				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
+			};
+			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();
+
+			//tf.dataTypeHelper = new TF..DataTypeHelper();
+			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
+
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
@@ -289,12 +301,22 @@
 				})
 				.then(function()
 				{
+					tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
+					tf.dataTypeHelper = tf.DataTypeHelper;
 					return tf.DataTypeHelper.init();
+					//return tf.DataTypeHelper.init();
 				})
 				.then(function()
 				{
 					tf.setting = new TF.Setting();
 					return tf.setting.getRoutingConfig();
+				}).then(function()
+				{
+					tf.UDFDefinition = new TF.GridDefinition.UDFDefinition();
+					return tf.UDFDefinition.init();
+				}).then(function()
+				{
+					tf.helpers.detailViewHelper.init();
 				})
 				.then(function()
 				{
@@ -474,7 +496,8 @@
 												var id = getParameterByName('id');
 												if (id != null)
 												{
-													var detailView = new TF.DetailView.DetailViewViewModel(id);
+													//var detailView = new TF.DetailView.DetailViewViewModel(id);
+													var detailView = new TF.DetailView.DetailViewViewModel(id, null, true, {});
 													tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
 													return;
 												}

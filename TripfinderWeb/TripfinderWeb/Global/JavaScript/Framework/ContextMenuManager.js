@@ -11,8 +11,7 @@
 
 		var lastContextMenu = null;
 
-
-		this.showMenu = function(target, contextMenu, isGridMenu)
+		this.showMenu = function(target, contextMenu)
 		{
 			this.contextMenu = contextMenu;
 			if (!(contextMenu instanceof TF.ContextMenu.BaseContextMenu))
@@ -23,10 +22,24 @@
 			{
 				lastContextMenu.dispose();
 			}
-			this.isGridMenu = isGridMenu == null ? true : isGridMenu;
 			lastContextMenu = contextMenu;
 			contextMenu.render($wrapper, target);
-		}
+		};
+
+		this.isVisibleMenu = function(menuTemplateSelector)
+		{
+			if (!menuTemplateSelector)
+			{
+				return false;
+			}
+			
+			return (
+				this.contextMenu && 
+				this.contextMenu.$container &&
+				this.contextMenu.$container.find(menuTemplateSelector) &&
+				this.contextMenu.$container.find(menuTemplateSelector).is(":visible")
+			);
+		};
 
 		this.refresh = function()
 		{

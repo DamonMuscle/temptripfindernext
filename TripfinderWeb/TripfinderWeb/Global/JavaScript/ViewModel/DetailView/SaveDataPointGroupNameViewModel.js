@@ -1,6 +1,6 @@
 ﻿(function()
 {
-	createNamespace("TF.Control").SaveDataPointGroupNameViewModel = SaveDataPointGroupNameViewModel;
+	createNamespace("TF.DetailView").SaveDataPointGroupNameViewModel = SaveDataPointGroupNameViewModel;
 
 	function SaveDataPointGroupNameViewModel(entity)
 	{
@@ -55,20 +55,23 @@
 						$field.css("border-color", borderColor);
 						$callbackElement.addClass(className);
 
-						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
-							paramData: {
-								name: value,
-								dataTypeId: tf.DataTypeHelper.getId(self.entity.Table || self.entity.DataType)
-							}
-						}, { overlay: false }).then(function(response)
-						{
-							var isDuplicated = !response.Items.length;
-							$field.css("border-color", "");
-							$callbackElement.removeClass(className);
-							validatorPersistence.name = !isDuplicated;
-							$field.removeClass("delay-show");
-							return isDuplicated;
-						});
+						return Promise.resolve(true);
+						//todo: add name check when API done.
+						//return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroup", "unique"), {
+						//	paramData: {
+						//		id: self.entity.Id || 0,
+						//		name: value,
+						//		dataType: self.entity.Table
+						//	}
+						//}, { overlay: false }).then(function(response)
+						//{
+						//	var isDuplicated = response.Items[0];
+						//	$field.css("border-color", "");
+						//	$callbackElement.removeClass(className);
+						//	validatorPersistence.name = !isDuplicated;
+						//	$field.removeClass("delay-show");
+						//	return isDuplicated;
+						//});
 					}
 				}
 			}

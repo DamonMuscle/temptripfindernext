@@ -1,12 +1,12 @@
 (function()
 {
-	createNamespace("TF.Modal").ManageDetailScreenLayoutModalViewModel = ManageDetailScreenLayoutModalViewModel;
+	createNamespace("TF.DetailView").ManageDetailScreenLayoutModalViewModel = ManageDetailScreenLayoutModalViewModel;
 
 	/**
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function ManageDetailScreenLayoutModalViewModel(gridType, selectId, alwaysApply)
+	function ManageDetailScreenLayoutModalViewModel(gridType, selectId, disableApply)
 	{
 		var self = this;
 		TF.Modal.BaseModalViewModel.call(self);
@@ -19,7 +19,7 @@
 		self.obNegativeButtonLabel("Close");
 		self.obOtherButtonLabel("Import Layout");
 
-		self.manageLayoutViewModel = new TF.Control.ManageDetailScreenLayoutViewModel(gridType, selectId, alwaysApply);
+		self.manageLayoutViewModel = new TF.DetailView.ManageDetailScreenLayoutViewModel(gridType, selectId, disableApply);
 		self.applyToPanel = self.applyToPanel.bind(self);
 		self.editToPanel = self.editToPanel.bind(self);
 		self.manageLayoutViewModel.onApplyToPanel.subscribe(self.applyToPanel);
@@ -76,7 +76,7 @@
 		self.hide();
 		if (self.manageLayoutViewModel.isDeleted)
 		{
-			self.resolve({ isOpenTemp: false, data: { isDeleted: true } });
+			self.resolve({ isOpenTemp: false, data: { isDeleted: true, layoutTemplates: self.manageLayoutViewModel.layoutEntities } });
 		}
 		else
 		{

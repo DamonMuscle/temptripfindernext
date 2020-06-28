@@ -1,0 +1,49 @@
+<div class="tf-contextmenu-wrap optionmenu-wrap layoutmenu-wrap phone-wrap">
+	<ul class="tf-contextmenu">
+		<li class="menu-divider"></li>
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:editTabName">
+				Edit Tab Name
+			</div>
+		</li>
+		<li class="menu-item" data-bind="css: {hide :isSingleTab()}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:remove">
+				Remove Tab
+			</div>
+		</li>
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:addBefore">
+				Add Before
+			</div>
+		</li>
+		<li class="menu-item">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:addAfter">
+				Add After
+			</div>
+		</li>
+		<li class="menu-item" data-bind="disabled:!canMoveLeft(), css: {disabled:!canMoveLeft()}" >
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:moveLeft">
+				Move Left
+			</div>
+		</li>
+		<li class="menu-item" data-bind="disabled:!canMoveRight(), css: {disabled:!canMoveRight()}" >
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:moveRight">
+				Move Right
+			</div>
+		</li>
+		<li class="menu-divider"></li>
+		
+	</ul>
+</div>

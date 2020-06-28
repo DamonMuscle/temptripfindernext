@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.DataEntry").BaseDataEntryViewModel = BaseDataEntryViewModel;
 
-	function BaseDataEntryViewModel (ids, view)
+	function BaseDataEntryViewModel(ids, view)
 	{
 		this.initialize = this.initialize.bind(this);
 		this.refreshClick = this.refreshClick.bind(this);
@@ -60,7 +60,7 @@
 		}
 		if (!this.uploadDocumentHelper)
 		{
-			this.uploadDocumentHelper = new TF.UploadDocumentHelper();
+			this.uploadDocumentHelper = new TF.DetailView.UploadDocumentHelper();
 		}
 		this.obContentDivHeight = ko.computed(this.showMessageComputer, this);
 		if (this._view.document)
@@ -1207,7 +1207,7 @@
 		{
 			fieldTripDocuments.forEach(function(document)
 			{
-				var uploadHelper = new TF.UploadDocumentHelper();
+				var uploadHelper = new TF.DetailView.UploadDocumentHelper();
 				promiseAll.push(uploadHelper.UploadDocument(document));
 			});
 

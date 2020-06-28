@@ -2,6 +2,21 @@
 {
 	createNamespace("TF").AuthManager = AuthManager;
 
+	var securedItemDataMap = {
+		altsite: "alternateSite",
+		georegion: "georegion",
+		student: "student",
+		vehicle: "vehicle",
+		staff: "staff",
+		school: "school",
+		contractor: "contractor",
+		district: "district",
+		tripstop: "trip", //tripstop secured item is same with trip
+		trip: "trip",
+		contact: "contact",
+		document: "documentCenter"
+	}
+
 	function AuthManager()
 	{
 		this.clientKey = null;
@@ -56,51 +71,61 @@
 			})
 	};
 
+	AuthManager.prototype.isAuthorizedForDataType = function(dataType, right)
+	{
+		if (dataType == "fieldtrip")
+		{
+			return tf.helpers.fieldTripAuthHelper.isAuthorizedFor(right);
+		}
+
+		return this.authorizationInfo.isAuthorizedFor.call(this.authorizationInfo, securedItemDataMap[dataType], right);
+	};
+
 	AuthManager.prototype.auth = function(loginViewModal)
 	{
 		var p = null;
 		if (this._hasLoggedin)
 		{
 			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
-						paramData: {
-							isValid: true
-						}
-					}, {
-					auth:
-					{
+				paramData: {
+					isValid: true
+				}
+			}, {
+				auth:
+				{
+					noInterupt: true
+				},
+				overlay: false
+			}).then(function()
+			{
+				var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "timezonetotalminutes"), {}, {
+					auth: {
 						noInterupt: true
 					},
 					overlay: false
-				}).then(function()
+				}).then(function(apiResponse)
 				{
-					var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "timezonetotalminutes"), {}, {
-						auth: {
-							noInterupt: true
-						},
-						overlay: false
-					}).then(function(apiResponse)
+					moment().constructor.prototype.currentTimeZoneTime = function()
 					{
-						moment().constructor.prototype.currentTimeZoneTime = function()
-						{
-							var now = moment().utcOffset(apiResponse.Items[0]);
-							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
-						};
-						if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== TF.productName))
-						{
-							return tf.datasourceManager.validateAllDBs()
-								.then(function(valResult)
+						var now = moment().utcOffset(apiResponse.Items[0]);
+						return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
+					};
+					if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== TF.productName))
+					{
+						return tf.datasourceManager.validateAllDBs()
+							.then(function(valResult)
+							{
+								if (!valResult.Items[0].AnyDatabasePass)
 								{
-									if (!valResult.Items[0].AnyDatabasePass)
-									{
-										//all db connection failed
-										var message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-										return this._loginUseModal(loginViewModal, message);
-									}
-								}.bind(this));
-						}
-					}.bind(this));
-					return Promise.all([p1]);
-				}.bind(this))
+									//all db connection failed
+									var message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
+									return this._loginUseModal(loginViewModal, message);
+								}
+							}.bind(this));
+					}
+				}.bind(this));
+				return Promise.all([p1]);
+			}.bind(this))
 				.catch(function()
 				{
 					return Promise.resolve(false);

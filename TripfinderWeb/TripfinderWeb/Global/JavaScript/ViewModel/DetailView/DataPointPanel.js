@@ -11,10 +11,10 @@
 		var self = this;
 		self.detailView = detailView;
 		self.gridType = self.detailView.gridType;
+		self.dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType);
 		self.groups = [];
 		self.gridOpt = null;
-		self.isElementWithinRightPanel = null;
-		self.rightPanelOpt = null;
+		self.isElementWithinRightPanel = false;
 		self.$filterText = null;
 		self.$filterBar = null;
 		self.deferFilterTimeout = null;
@@ -29,19 +29,20 @@
 		self.currentGroupId = -1;
 
 		self.tooltip = new TF.Helper.TFTooltip();
+		self.userDefinedFieldHelper = new TF.DetailView.UserDefinedFieldHelper();
+
 		//Events
 		self.closeClick = self.closeClick.bind(self);
 		self.initDataPoint = self.initDataPoint.bind(self);
 		self.onDataGroupMouseDown = self.onDataGroupMouseDown.bind(self);
 		self.openGroupMenu = self.openGroupMenu.bind(self);
 		self.deleteGroup = self.deleteGroup.bind(self);
-		self.closeEditMode = self.closeEditMode.bind(self);
 		self.clearFilterClick = self.clearFilterClick.bind(self);
 		self.onCloseDataPointPanelEvent = new TF.Events.Event();
 		self.detailView.onColumnChangedEvent.subscribe(self.detailViewColumnChanged.bind(self));
 		self.updateDataPoints();
 
-		self.obFilterPlaceHoderText = ko.observable("Filter Data Blocks...");
+		self.obFilterPlaceHolderText = ko.observable("Filter Data Blocks...");
 	}
 
 	/**
@@ -57,7 +58,7 @@
 		self.$preload = self.$element.find(".preload");
 		self.$filterBar = self.$element.find(".filter-bar");
 		self.$filterText = self.$element.find(".filter-text");
-		self.gridOpt = $(".detail-view-panel .right-container>.grid-stack").data("gridstack").opts;
+		self.gridOpt = self.detailView.$element.find(".right-container>.grid-stack").data("gridstack").opts;
 		self.obGridWidth(self.gridOpt.width);
 
 		self.initToolTip();
@@ -74,7 +75,10 @@
 	{
 		var self = this;
 
-		if (!!self.$calendar) { return; }
+		if (!!self.$calendar)
+		{
+			return;
+		}
 
 		var calendarTypes = ["district", "school", "trip"];
 		if (calendarTypes.indexOf(self.gridType) > -1)
@@ -94,26 +98,27 @@
 	DataPointPanel.prototype.initToolTip = function()
 	{
 		var self = this;
-		$('.data-points-panel .non-date-element-container > div').each(function(index, element)
+		self.$element.closest('.data-points-panel').find('.non-date-element-container > div').each(function(index, element)
 		{
-			var options = { placement: "left" };
+			var options = {
+				placement: "left"
+			};
 			if ($(element).hasClass('image'))
 			{
 				options.title = "Image";
-			}
-			else if ($(element).hasClass("spacer"))
+			} else if ($(element).hasClass("spacer"))
 			{
 				options.title = "Spacer";
-			}
-			else if ($(element).hasClass("vertical-line"))
+			} else if ($(element).hasClass("vertical-line"))
 			{
 				options.title = "Vertical Line";
-			}
-			else if ($(element).hasClass("horizontal-line"))
+			} else if ($(element).hasClass("horizontal-line"))
 			{
 				options.title = "Horizontal Line";
-			}
-			else
+			} else if ($(element).hasClass("tab"))
+			{
+				options.title = "Tab";
+			} else
 			{
 				options.title = "Section Header";
 			}
@@ -122,6 +127,7 @@
 		});
 	}
 
+	//#region Data Point Filter
 
 	DataPointPanel.prototype.initFilterText = function()
 	{
@@ -130,8 +136,8 @@
 		{
 			var $target = $(e.target);
 
-			if ($target.closest(".filter-bar.active").length <= 0
-				&& !$target.hasClass("filter-text"))
+			if ($target.closest(".filter-bar.active").length <= 0 &&
+				!$target.hasClass("filter-text"))
 			{
 				self.isMouseDownInFilterZone = false;
 				self.$filterText.blur();
@@ -139,8 +145,7 @@
 				{
 					self.$filterBar.removeClass('active');
 				}
-			}
-			else
+			} else
 			{
 				self.isMouseDownInFilterZone = true;
 			}
@@ -196,22 +201,13 @@
 	DataPointPanel.prototype.inputFilterText = function()
 	{
 		var self = this,
-			text = self.$filterText.val(),
-			exp = /[^0-9a-zA-Z ]/g,
-			css = "", fontSize;
-
-		if (exp.test(text))
-		{
-			text = text.replace(exp, "")
-			self.$filterText.val(text);
-		}
+			text = self.$filterText.val();
 
 		if (self.deferFilterTimeout)
 		{
 			clearTimeout(self.deferFilterTimeout);
 		}
 
-		text = text.trim();
 		self.deferFilterTimeout = setTimeout(function()
 		{
 			self.filter(text);
@@ -244,13 +240,12 @@
 					title: item.title,
 					columns: ko.observableArray(item.columns())
 				})
-			}
-			else
+			} else
 			{
 				var matchedItems = item.columns().reduce(function(commonAccumulator, dataPoint)
 				{
-					if (dataPoint.title.toUpperCase().indexOf(text) > -1
-						|| (item.title === "Groups" ? isGroupItemMatched(dataPoint) : false))
+					if (dataPoint.title.toUpperCase().indexOf(text) > -1 ||
+						(item.title === "Groups" ? isGroupItemMatched(dataPoint) : false))
 					{
 						commonAccumulator.push(dataPoint);
 					}
@@ -260,7 +255,10 @@
 
 				if (matchedItems.length > 0)
 				{
-					accumulator.push({ title: item.title, columns: ko.observableArray(matchedItems) });
+					accumulator.push({
+						title: item.title,
+						columns: ko.observableArray(matchedItems)
+					});
 				}
 			}
 			return accumulator;
@@ -279,7 +277,8 @@
 	 */
 	DataPointPanel.prototype.clearText = function()
 	{
-		var self = this, currentText = self.$filterText.val().trim();
+		var self = this,
+			currentText = self.$filterText.val().trim();
 		if (currentText === "")
 		{
 			self.$filterBar.removeClass('active');
@@ -294,6 +293,8 @@
 		}
 	};
 
+	//#endregion
+
 	DataPointPanel.prototype.startGroup = function()
 	{
 		this.$element.addClass("group-mode");
@@ -306,38 +307,20 @@
 
 	DataPointPanel.prototype.deleteGroup = function(view, e)
 	{
-		var self = this;
-		return tf.promiseBootbox.yesNo("Are you sure you would like to delete this group?", "Confirmation Message")
-			.then(function(ans)
+		return tf.promiseBootbox.yesNo("Are you sure you would like to delete this group?", "Confirmation Message").then(function(ans)
+		{
+			view.currentGroup(null);
+			if (ans && view && view.currentGroupId >= 0)
 			{
-				view.currentGroup(null);
-				if (ans && view && view.currentGroupId >= 0)
+				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
+					data: [view.currentGroupId]
+				}).then(function()
 				{
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups", view.currentGroupId)).then(function(response)
-					{
-						if (response.Items && response.Items.length && response.Items.length > 0)
-						{
-							var group = response.Items[0], items = JSON.parse(group.DataPoints), images = [];
-							images = $.grep(items, function(item) { return item.type === "image" });
-						}
-
-						return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"),
-							{
-								data: [view.currentGroupId]
-							})
-							.then(function()
-							{
-								view.refreshData();
-							}.bind(this));
-					});
-				}
-			}.bind(this));
+					view.refreshData();
+				});
+			}
+		});
 	}
-
-	DataPointPanel.prototype.closeEditMode = function(view, e)
-	{
-		this.detailView.onCloseEditMode.notify();
-	};
 
 	DataPointPanel.prototype.onDataGroupMouseDown = function(group, e)
 	{
@@ -351,8 +334,10 @@
 
 	DataPointPanel.prototype.openGroupMenu = function(group, e)
 	{
-		var self = this, $target = $(e.target), $container, $arrow, $menu, left, groupItems, moveToLeftOffset = 0,
-			detailViewWidth = self.detailView.getCurrentWidth();
+		var self = this,
+			$target = $(e.target),
+			$container, $arrow, $menu, left, groupItems, moveToLeftOffset = 0,
+			detailViewWidth = self.detailView.getActiveGridStack().getCurrentWidth();
 		if (!group || group.type !== "group")
 		{
 			return;
@@ -376,7 +361,7 @@
 			$container = self.$element.find(".group-context-menu-container");
 			$menu = self.$element.find(".group-context-menu");
 			left = $arrow.offset().left - $(".navigation-container").outerWidth() - $container.outerWidth() / 2 + 6;
-			moveToLeftOffset = left + $container.outerWidth() - $(".data-points-panel").outerWidth();
+			moveToLeftOffset = left + $container.outerWidth() - self.$element.closest(".data-points-panel").outerWidth();
 			if (moveToLeftOffset > 0)
 			{
 				left -= moveToLeftOffset;
@@ -403,63 +388,113 @@
 
 	DataPointPanel.prototype.getGroupMenuTitle = function(data)
 	{
-		return data['title'] || (data['type'] === 'spacer' ? 'Spacer' : data['type'] === 'section-header' ? 'Section Header' : data['type'] === 'image' ? 'Image' : '');
+		if (data['title']) return data['title'];
+
+		switch (data['type'])
+		{
+			case 'spacer':
+				return 'Spacer';
+			case 'section-header':
+				return 'Section Header';
+			case 'image':
+				return 'Image';
+			case 'tab':
+				return 'Tab';
+		}
+
+		return '';
 	};
 
 	DataPointPanel.prototype.updateDataPoints = function()
 	{
-		var self = this, dataPoints = dataPointsJSON, category = "fieldtrip", dataPointGroup, result,
-			dataPointsForCurrentPage = dataPoints[category], subCategories = Object.keys(dataPointsForCurrentPage);
+		var self = this,
+			dataPointGroup,
+			requiredFields = tf.helpers.detailViewHelper.getRequiredFields(self.gridType),
+			dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType),
+			dataTypeId = tf.dataTypeHelper.getId(self.gridType),
+			dataPointsForCurrentPage = dataPointsJSON[self.gridType];
 
-		self.groups.length = 0;
-		self.allColumns.length = 0;
-		self.pageTitle(getTitleByType(self.gridType).toUpperCase());
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
-			paramData: { table: self.gridType }
-		}).then(function(response)
-		{
-			result = response.Items;
-			if (result && result.length > 0)
+		self.pageTitle(tf.applicationTerm.getApplicationTermPluralByName(dataTypeName).toUpperCase());
+
+		return Promise.all([
+			self.userDefinedFieldHelper.get(self.gridType),
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
+				paramData: {
+					DataTypeId: dataTypeId
+				}
+			})]).then(function(values)
 			{
-				$.each(result, function(index, group)
+				var udfResult = values[0];
+
+				self.groups.length = 0;
+				self.allColumns.length = 0;
+
+				if (udfResult)
 				{
-					dataPointGroup = {};
-					dataPointGroup.id = group.ID;
-					dataPointGroup.title = group.Name;
-					dataPointGroup.type = "group";
-					dataPointGroup.items = JSON.parse(group.DataPoints);
-					self.groups.push(dataPointGroup);
-				});
-				self.allColumns.push({ title: "Groups", columns: ko.observableArray(self.groups) });
-			}
+					dataPointsForCurrentPage["User Defined"] = udfResult.filter(function(i)
+					{
+						return !!i;
+					});
+				}
 
-			for (var key in subCategories)
-			{
-				var columns = dataPointsForCurrentPage[subCategories[key]];
-				self.allColumns.push({ title: subCategories[key], columns: ko.observableArray(columns) });
-			}
-			self.obColumns(self.allColumns);
-			self.obAllColumns(self.allColumns);
-			self.detailViewColumnChanged();
-		});
+				Object.keys(dataPointsForCurrentPage).forEach(function(key)
+				{
+					self.allColumns.push({
+						title: key,
+						columns: ko.observableArray(dataPointsForCurrentPage[key].map(column =>
+						{
+							var c = { ...column };
+							if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
+							{
+								c.isRequired = true;
+							}
+							return c;
+						}))
+					})
+				});
+
+				var result = values[1].Items;
+				if (result && result.length > 0)
+				{
+					$.each(result, function(_, group)
+					{
+						dataPointGroup = {};
+						dataPointGroup.id = group.ID;
+						dataPointGroup.title = group.Name;
+						dataPointGroup.type = "group";
+						dataPointGroup.items = (JSON.parse(group.DataPoints) || []).map(function(i)
+						{
+							return tf.helpers.detailViewHelper.decompressDataBlockDescriptor(i, self.gridType);
+						});
+						dataPointGroup.hasTabBlock = dataPointGroup.items.some(function(value)
+						{
+							return value.type == "tab";
+						});
+						self.groups.push(dataPointGroup);
+					});
+					self.allColumns.unshift({
+						title: "Groups",
+						columns: ko.observableArray(self.groups)
+					});
+				}
+
+				self.obColumns(self.allColumns);
+				self.obAllColumns(self.allColumns);
+				self.detailViewColumnChanged();
+			});
 	};
 
 	DataPointPanel.prototype.getMinHeight = function($data)
 	{
-		var self = this, minY = Number.MAX_VALUE, maxY = 0;
+		var minY = Number.MAX_VALUE,
+			maxY = 0;
 
 		if ($data.type === "group")
 		{
 			$.each($data.items, function(index, item)
 			{
-				if (minY > item.y)
-				{
-					minY = item.y;
-				}
-				if (maxY < item.y + item.h)
-				{
-					maxY = item.y + item.h;
-				}
+				minY = Math.min(minY, item.y);
+				maxY = Math.max(maxY, item.y + item.h);
 			});
 			return maxY - minY;
 		}
@@ -471,7 +506,9 @@
 
 	DataPointPanel.prototype.getMinWidth = function($data)
 	{
-		var self = this, minX = Number.MAX_VALUE, maxX = 0, width = self.detailView.getCurrentWidth();
+		var self = this,
+			minX = Number.MAX_VALUE,
+			maxX = 0;
 
 		if ($data.type === "group")
 		{
@@ -490,25 +527,7 @@
 		}
 		else if ($data.type === "Schedule")
 		{
-			var minWidth;
-			switch (width)
-			{
-				case 1:
-					minWidth = 1;
-					break;
-				case 2:
-					minWidth = 2;
-					break;
-				case 3:
-					minWidth = 2;
-					break;
-				case 4:
-					minWidth = 3;
-					break;
-				default:
-					break;
-			}
-			return minWidth;
+			return self.getScheduleMinWidth();
 		}
 		else
 		{
@@ -516,25 +535,49 @@
 		}
 	};
 
-	DataPointPanel.prototype.detailViewColumnChanged = function()
+	DataPointPanel.prototype.getScheduleMinWidth = function()
 	{
-		var self = this, groups, groupData, width;
+		var containerWidth = this.detailView.getActiveGridStack().getCurrentWidth();
+		switch (containerWidth)
+		{
+			case 2:
+			case 3:
+				return 2;
+			case 4:
+				return 3;
+			default:
+				return 1;
+		}
+	};
+
+	DataPointPanel.prototype.detailViewColumnChanged = function(e, width)
+	{
+		var self = this,
+			block, blocks;
 		if (!self.$element)
 		{
 			return;
 		}
-
-		groups = self.$element.find(".group .data-point-item");
-		width = self.detailView.getCurrentWidth();
-		if (groups.length > 0)
+		width ? width : width = self.detailView.rootGridStack.getCurrentWidth();
+		blocks = self.$element.find(".category .data-point-item");
+		if (blocks.length > 0)
 		{
-			groups.removeClass("disable");
-			$.each(groups, function(index, group)
+			blocks.removeClass("disable");
+			$.each(blocks, function(index, item)
 			{
-				groupData = ko.dataFor(group);
-				if (width < self.getMinWidth(groupData))
+				var $item = $(item);
+				block = ko.dataFor(item);
+				$item.attr('title', block.title);
+				if (self.$element.find('.tab-enabled').length > 0 && block.hasTabBlock)
 				{
-					$(group).addClass("disable");
+					$item.addClass("disable");
+					$item.attr('title', 'Data group with tab(s) cannot be dragged into a tab.');
+					return;
+				}
+				if (width < self.getMinWidth(block))
+				{
+					$item.attr('title', 'Not enough width for ' + block.title)
+					$item.addClass("disable");
 				}
 			});
 		}
@@ -542,17 +585,23 @@
 
 	DataPointPanel.prototype.getDragHtmlForGroup = function($target, isGroupItem)
 	{
-		var self = this, group = ko.dataFor($target[0]), singleCellHeight = 58, padding = 8, width, height, items,
-			$grid = $(".grid-stack"), gridstack = $grid.data("gridstack"), blockWidth = ($grid.outerWidth() / gridstack.grid.width) - 8, container, grid,
-			$itemDom;
+		var self = this,
+			group = ko.dataFor($target[0]),
+			singleCellHeight = 58,
+			padding = 8,
+			width, height, items,
+			$grid = self.detailView.$element.find(".grid-stack"),
+			gridstack = $grid.data("gridstack"),
+			blockWidth = ($grid.outerWidth() / gridstack.grid.width) - 8,
+			container, grid,
+			lightGridStack = self.detailView.getActiveGridStack();
 
 		if (isGroupItem)
 		{
 			items = [group];
 			width = group.w;
 			height = group.h;
-		}
-		else
+		} else
 		{
 			items = group.items;
 			width = self.getMinWidth(group);
@@ -567,48 +616,12 @@
 		grid.setGridWidth(width);
 		$.each(items, function(index, item)
 		{
-			var dataBlockStyles = self.detailView.getDataBlockStyles(item),
-				content = item.defaultValue;
-			switch (item.type)
-			{
-				case "image":
-					var $container = self.detailView.addImageStackBlock(item, grid), $dom = $container.find("img");
-					if (item.image !== undefined)
-					{
-						setTimeout(function()
-						{
-							$dom.attr("src", item.image.fileData || item.image);
-							$dom.css("opacity", "1");
-						});
-					}
-					else
-					{
-						$dom.attr("src", "global/Img/detail-screen/image_24x24-pos.svg");
-					}
-					break;
-				case "Calendar":
-					self.detailView.addCalendarStackBlock(item, dataBlockStyles, grid);
-					break;
-				case "Boolean":
-					self.detailView.addBooleanStackBlock(content, item, dataBlockStyles, grid);
-					break;
-				case "grid":
-					self.detailView.addGridStackBlock(item, dataBlockStyles, grid);
-					break;
-				case "File":
-					self.detailView.addDocumentStackBlock(item, dataBlockStyles, grid);
-					break;
-				case "Schedule":
-					self.detailView.addScheduleStackBlock(item, dataBlockStyles, grid);
-					break;
-				case "RecordPicture":
-					self.detailView.addRecordPictureStackBlock(content, item, dataBlockStyles, grid);
-					break;
-				default:
-					content = self.detailView.formatDataContent(item.defaultValue, item.type);
-					self.detailView.addGeneralStackBlock(content, item, dataBlockStyles, grid);
-					break;
-			}
+			var content = item.defaultValue,
+				block = lightGridStack.generateDataBlock(item, content),
+				options = block.options;
+			grid.addWidget(block.$el,
+				options.x, options.y, options.w, options.h,
+				options.autoPosition, options.minWidth, options.maxWidth, options.minHeight, options.maxHeight);
 		});
 		grid.setStatic(true);
 		return container;
@@ -620,14 +633,17 @@
 	 */
 	DataPointPanel.prototype.initNonDataElements = function()
 	{
-		var self = this, $grid = $(".grid-stack"), gridstack = $grid.data("gridstack"), $el,
+		var self = this,
 			$nonDataElements = self.$element.find(".right > .data-point-item:not(.ui-draggable)");
 
 		$nonDataElements.draggable({
 			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false,
-			cursorAt: { top: 0, left: 0 },
+			cursorAt: {
+				top: 0,
+				left: 0
+			},
 			helper: self.nonDataElementDraggableHelper.bind(self),
 			drag: self.onNonDataElementDragging.bind(self),
 			start: self.onNonDataElementDragStart.bind(self),
@@ -642,27 +658,18 @@
 	 */
 	DataPointPanel.prototype.nonDataElementDraggableHelper = function(evt)
 	{
-		var self = this, borderWidth = 2, margin = 8,
+		var self = this,
+			borderWidth = 2,
 			$target = $(evt.target),
 			typeName = $target.attr("type"),
 			cssStyles = self.getNonDataElementStyles(typeName),
 			width = cssStyles.width + borderWidth,
 			height = cssStyles.height + borderWidth;
 
-		if (typeName === "vertical-line" || typeName === "horizontal-line")
-		{
-			var $gridStack = $(".detail-view-panel .grid-stack"),
-				indicatorWidth = cssStyles.width ? cssStyles.width + margin : 0,
-				indicatorHeight = cssStyles.height ? cssStyles.height + margin : 0,
-				indicatorHtml = "<div class=\"element-indicator " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + indicatorWidth + "px;height:" + indicatorHeight + "px;\"></div>";
-
-			$gridStack.append($(indicatorHtml));
-		}
-
-		return "<div class=\"element-overlay " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + width + "px;height:" + height + "px;\">"
-			+ "<div class=\"in hide\" style=\"width:" + width + "px;height:" + height + "px;\"></div>"
-			+ "<div class=\"out\"></div>"
-			+ "</div>";
+		return "<div class=\"element-overlay " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + width + "px;height:" + height + "px;\">\
+					<div class=\"in hide\" style=\"width:" + width + "px;height:" + height + "px;\"></div>\
+					<div class=\"out\"></div>\
+				</div>";
 	};
 
 	/**
@@ -672,41 +679,32 @@
 	 */
 	DataPointPanel.prototype.onNonDataElementDragStart = function(evt)
 	{
-		var self = this, data = { x: -1, y: -1, width: 0, height: 0 },
-			elementType = evt.target.getAttribute("type"),
+		var self = this,
+			data = {
+				x: -1,
+				y: -1,
+				width: 0,
+				height: 0
+			},
 			$indicator = $(".element-indicator"),
-			$rightPanel = $(".detail-view-panel"),
-			$gridStack = $rightPanel.find(".right-container>.grid-stack"),
-			gridOpt = $gridStack.data("gridstack").opts,
-			cellWidth = $gridStack.outerWidth() / gridOpt.width,
-			cellHeight = gridOpt.cellHeight;
-
-		if (elementType === "vertical-line")
-		{
-			data.height = 1;
-		}
-		else if (elementType === "horizontal-line")
-		{
-			data.width = 1;
-		}
+			gridstack = self.detailView.getActiveGridStack(),
+			gridOpt = gridstack.getOptions();
 
 		self.obGridWidth(gridOpt.width);
 		$indicator.data("_gridstack_node", data);
 		self.gridOpt = {
-			cellWidth: cellWidth,
-			cellHeight: cellHeight,
+			cellWidth: gridstack.$wrapper.outerWidth() / gridOpt.width,
+			cellHeight: gridOpt.cellHeight,
 			horizontalMargin: gridOpt.horizontalMargin || 0,
 			verticalMargin: gridOpt.verticalMargin || 0,
-			stackList: $rightPanel.find(".grid-stack-item:not(.mock-item)"),
-			boundingRect: $gridStack[0].getBoundingClientRect(),
+			stackList: gridstack.$wrapper.find(".grid-stack-item:not(.mock-item)"),
+			boundingRect: gridstack.$wrapper[0].getBoundingClientRect(),
 			indicator: $indicator
 		};
-		self.rightPanelOpt = {
-			boundingRect: $rightPanel[0].getBoundingClientRect()
-		};
+
 		self.isElementWithinRightPanel = false;
 
-		$rightPanel.addClass("on-dragging");
+		self.detailView.$element.closest(".detail-view-panel").addClass("on-dragging");
 	};
 
 	/**
@@ -718,44 +716,27 @@
 	{
 		var self = this,
 			elementType = evt.target.getAttribute("type"),
-			$rightPanel = $(".detail-view-panel"),
-			$gridStack = $rightPanel.find(".grid-stack");
+			gridstack = self.detailView.getActiveGridStack();
 
 		if (elementType === 'image')
 		{
-			if (self.isMouseWithinContainer(evt.clientX, evt.clientY, $(".detail-view-panel")[0].getBoundingClientRect()))
+			if (self.isMouseWithinContainer(evt.clientX, evt.clientY, gridstack.$wrapper[0].getBoundingClientRect()))
 			{
-				var $inputEle = self.detailView.$gridStack.find("input[newimage=true][type=file]");
-				$inputEle.trigger('click');
+				setTimeout(function()
+				{
+					var $inputEle = _.last(gridstack.dataBlocks).$el.find("input[type=file]");
+					$inputEle.trigger('click');
+				}, 50);
 			}
-		}
-
-		if (elementType === "vertical-line" || elementType === "horizontal-line")
-		{
-			if (self.isElementWithinRightPanel)
-			{
-				self.gridOpt.indicator.removeClass("element-indicator");
-				self.gridOpt.indicator.addClass("non-data-element");
-				self.gridOpt.indicator.detach().appendTo($gridStack);
-
-				self.detailView.onNewElementAdded();
-			}
-			else
-			{
-				self.gridOpt.indicator.remove();
-			}
-			self.gridOpt.indicator = null;
-		}
-		else if (elementType === "spacer" && self.$element.find(".non-date-element-container > .spacer").length === 0)
+		} else if (elementType === "spacer" && self.$element.find(".non-date-element-container > .spacer").length === 0)
 		{
 			self.$element.find(".non-date-element-container > .vertical-line").insertAfter($("<div class=\"spacer data-point-item\" type=\"spacer\"></div>"));
-		}
-		else if (elementType === "section-header" && self.$element.find(".non-date-element-container > .section-header").length === 0)
+		} else if (elementType === "section-header" && self.$element.find(".non-date-element-container > .section-header").length === 0)
 		{
 			self.$element.find(".non-date-element-container > .horizontal-line").insertBefore($("<div class=\"section-header data-point-item\" type=\"section-header\" data-bind=\"attr:{minWidth:obGridWidth}\"></div>"));
 		}
 
-		$rightPanel.removeClass("on-dragging");
+		self.detailView.$element.closest(".detail-view-panel").removeClass("on-dragging");
 		self.gridOpt.indicator = null;
 	};
 
@@ -766,9 +747,10 @@
 	 */
 	DataPointPanel.prototype.onNonDataElementDragging = function(evt)
 	{
-		var self = this, position,
+		var self = this,
+			position,
 			$el = $(".element-overlay"),
-			rightPanelBoundingRect = $(".detail-view-panel")[0].getBoundingClientRect(),
+			rightPanelBoundingRect = self.detailView.$element.closest(".detail-view-panel")[0].getBoundingClientRect(),
 			isWithinRightPanel = self.isMouseWithinContainer(evt.clientX, evt.clientY, rightPanelBoundingRect);
 
 		if (isWithinRightPanel)
@@ -778,8 +760,7 @@
 			{
 				self.switchNonDataElementDisplay($el, true);
 			}
-		}
-		else if (self.isElementWithinRightPanel)
+		} else if (self.isElementWithinRightPanel)
 		{
 			self.switchNonDataElementDisplay($el, false);
 		}
@@ -798,14 +779,16 @@
 		var self = this;
 		if (position && Array.isArray(position))
 		{
-			$.extend(self.gridOpt.indicator.data("_gridstack_node"), { x: position[1], y: position[0] });
+			$.extend(self.gridOpt.indicator.data("_gridstack_node"), {
+				x: position[1],
+				y: position[0]
+			});
 			self.gridOpt.indicator.css({
 				display: "block",
 				top: position[0] * self.gridOpt.cellHeight,
 				left: position[1] * self.gridOpt.cellWidth
 			});
-		}
-		else
+		} else
 		{
 			self.gridOpt.indicator.css("display", "none");
 		}
@@ -818,10 +801,11 @@
 	 */
 	DataPointPanel.prototype.calculateNonDataElementPosition = function($el)
 	{
-		var self = this, centerPt, x, y,
+		var self = this,
 			type = $el.attr("type"),
 			gridStackBoundingRect = self.gridOpt.boundingRect,
-			height = $el.outerHeight(), width = $el.outerWidth(),
+			height = $el.outerHeight(),
+			width = $el.outerWidth(),
 			unitHeight = self.gridOpt.cellHeight,
 			unitWidth = self.gridOpt.cellWidth,
 			top = $el.offset().top - gridStackBoundingRect.top,
@@ -836,12 +820,10 @@
 			if (firstMidTop > 0)
 			{
 				firstMidTop -= 1;
-			}
-			else if (type === "vertical-line" && firstMidLeft > 0)
+			} else if (type === "vertical-line" && firstMidLeft > 0)
 			{
 				firstMidLeft -= 1;
-			}
-			else
+			} else
 			{
 				break;
 			}
@@ -860,7 +842,9 @@
 	 */
 	DataPointPanel.prototype.checkPositionAvailability = function(top, left, height, width)
 	{
-		var self = this, availability = true, hasSupport = false;
+		var self = this,
+			availability = true,
+			hasSupport = false;
 
 		$.each(self.gridOpt.stackList, function(index, item)
 		{
@@ -870,15 +854,15 @@
 				stackBottom = stackTop + stackData.height,
 				stackRight = stackLeft + stackData.width;
 
-			if ((height === 0 && top > stackTop && top < stackBottom && left < stackRight && left + width > stackLeft)
-				|| (width === 0 && left > stackLeft && left < stackRight && top < stackBottom && top + height > stackTop))
+			if ((height === 0 && top > stackTop && top < stackBottom && left < stackRight && left + width > stackLeft) ||
+				(width === 0 && left > stackLeft && left < stackRight && top < stackBottom && top + height > stackTop))
 			{
 				availability = false;
 				return false;
 			}
 
-			if (!hasSupport && ((height === 0 && ((top === stackTop || top === stackBottom) && left < stackRight && left + width > stackLeft))
-				|| (width === 0 && ((left === stackLeft || left === stackRight) && top < stackBottom && top + height > stackTop))))
+			if (!hasSupport && ((height === 0 && ((top === stackTop || top === stackBottom) && left < stackRight && left + width > stackLeft)) ||
+				(width === 0 && ((left === stackLeft || left === stackRight) && top < stackBottom && top + height > stackTop))))
 			{
 				hasSupport = true;
 			}
@@ -895,8 +879,8 @@
 	 */
 	DataPointPanel.prototype.switchNonDataElementDisplay = function($el, flag)
 	{
-		var self = this, cssStyles, duration = 250,
-			type = $el.attr("entityType"),
+		var self = this,
+			duration = 250,
 			$in = $el.find(".in"),
 			$out = $el.find(".out"),
 			inOffset = self.getOffset($in, $out),
@@ -905,8 +889,7 @@
 		if (flag)
 		{
 			self.animate($in, $out, inOffset, outOffset, duration);
-		}
-		else
+		} else
 		{
 			self.animate($out, $in, outOffset, inOffset, duration);
 		}
@@ -919,12 +902,12 @@
 	 */
 	DataPointPanel.prototype.getNonDataElementStyles = function(type)
 	{
-		var self = this, width, height, horizontalMargin = 8,
-			$stackGrid = $(".right-container > .grid-stack"),
-			containerWidth = $stackGrid.outerWidth(),
-			stackData = $stackGrid.data('gridstack'),
-			unitWidth = containerWidth / stackData.opts.width - horizontalMargin,
-			unitHeight = stackData.opts.cellHeight - horizontalMargin;
+		var self = this,
+			width, height, horizontalMargin = 8,
+			gridstack = self.detailView.getActiveGridStack(),
+			containerWidth = gridstack.$wrapper.outerWidth(),
+			unitWidth = containerWidth / gridstack.getCurrentWidth() - horizontalMargin,
+			unitHeight = gridstack.getCellHeight() - horizontalMargin;
 
 		switch (type)
 		{
@@ -948,11 +931,18 @@
 				width = unitWidth;
 				height = unitHeight * 2;
 				break;
+			case "tab":
+				width = containerWidth - horizontalMargin;
+				height = unitHeight * 2;
+				break;
 			default:
 				break;
 		}
 
-		return { width: width, height: height };
+		return {
+			width: width,
+			height: height
+		};
 	};
 
 	/** 
@@ -973,36 +963,45 @@
 
 	DataPointPanel.prototype.initLines = function()
 	{
-		var self = this, HLine = self.$element.find(".right .horizontal-line"), VLine = self.$element.find(".right .vertical-line");
+		var self = this,
+			HLine = self.$element.find(".right .horizontal-line"),
+			VLine = self.$element.find(".right .vertical-line");
+
 		HLine.draggable({
 			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false,
-			cursorAt: { top: 0, left: 0 },
+			cursorAt: {
+				top: 0,
+				left: 0
+			},
 			helper: function(e)
 			{
-				var borderWidth = 2, margin = 8,
+				var borderWidth = 2,
 					$target = $(e.target),
 					typeName = $target.attr("type"),
 					cssStyles = self.getNonDataElementStyles(typeName),
 					width = cssStyles.width + borderWidth,
 					height = cssStyles.height + borderWidth;
 
-				return "<div class=\"element-overlay " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + width + "px;height:" + height + "px;\">"
-					+ "<div class=\"out\"></div>"
-					+ "</div>";
+				return "<div class=\"element-overlay " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + width + "px;height:" + height + "px;\">\
+							<div class=\"out\"></div>\
+						</div>";
 			},
 			drag: function(e, ui)
 			{
-				self.detailView.lineBlockHelper.hLineDraggingIn(ui.helper);
+				var lineBlockHelper = self.detailView.getActiveGridStack().lineBlockHelper;
+				lineBlockHelper.hLineDraggingIn(ui.helper);
 			},
 			start: function()
 			{
-				$(".right-container .line-container").addClass("drag-line");
+				var gridstack = self.detailView.getActiveGridStack();
+				gridstack.$wrapper.find(">.line-container").addClass("drag-line");
 			},
 			stop: function()
 			{
-				$(".right-container .line-container").removeClass("drag-line");
+				var gridstack = self.detailView.getActiveGridStack();
+				gridstack.$wrapper.find(">.line-container").removeClass("drag-line");
 			}
 		});
 
@@ -1010,31 +1009,37 @@
 			containment: "#pageContent",
 			appendTo: "body",
 			scroll: false,
-			cursorAt: { top: 0, left: 0 },
+			cursorAt: {
+				top: 0,
+				left: 0
+			},
 			helper: function(e)
 			{
-				var borderWidth = 2, margin = 8,
+				var borderWidth = 2,
 					$target = $(e.target),
 					typeName = $target.attr("type"),
 					cssStyles = self.getNonDataElementStyles(typeName),
 					width = cssStyles.width + borderWidth,
 					height = cssStyles.height + borderWidth;
 
-				return "<div class=\"element-overlay " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + width + "px;height:" + height + "px;\">"
-					+ "<div class=\"out\"></div>"
-					+ "</div>";
+				return "<div class=\"element-overlay " + typeName + "\" type=\"" + typeName + "\" style=\"width:" + width + "px;height:" + height + "px;\">\
+							<div class=\"out\"></div>\
+						</div>";
 			},
 			drag: function(e, ui)
 			{
-				self.detailView.lineBlockHelper.vLineDraggingIn(ui.helper);
+				var lineBlockHelper = self.detailView.getActiveGridStack().lineBlockHelper;
+				lineBlockHelper.vLineDraggingIn(ui.helper);
 			},
 			start: function()
 			{
-				$(".right-container .line-container").addClass("drag-line");
+				var gridstack = self.detailView.getActiveGridStack();
+				gridstack.$wrapper.find(">.line-container").addClass("drag-line");
 			},
 			stop: function()
 			{
-				$(".right-container .line-container").removeClass("drag-line");
+				var gridstack = self.detailView.getActiveGridStack();
+				gridstack.$wrapper.find(">.line-container").removeClass("drag-line");
 			}
 		});
 	}
@@ -1045,22 +1050,25 @@
 	 */
 	DataPointPanel.prototype.initDataPoint = function(view, data, dataPoints)
 	{
-		var self = this, format, defaultValue,
+		var self = this,
 			outOffset, inOffset, flag, duration = 250,
-			$grid = $(".grid-stack"),
-			gridstack = $grid.data("gridstack"),
 			dataPointItems = dataPoints || self.$element.find(".left .data-point-item:not(.disable)");
 
 		dataPointItems.draggable({
 			cancel: ".disable",
-			start: function(e, ui)
-			{
-				var target = $(e.target);
-			},
+			start: function(e, ui) { },
 			helper: function(e)
 			{
-				var $target = $(e.target).closest(".data-point-item"), blockWidth = ($grid.outerWidth() / gridstack.grid.width) - 8, containerWidth,
-					groupHtml, isGroupItem = $target.attr("isgroupitem"), isGroup = $target.attr("type") === "group", helper;
+				var gridstack = self.detailView.getActiveGridStack(),
+					$target = $(e.target).closest(".data-point-item"),
+					$targetCopy = $target.clone(),
+					blockWidth = (gridstack.$wrapper.outerWidth() / gridstack.getCurrentWidth()) - 8,
+					isGroupItem = $target.attr("isgroupitem"),
+					isGroup = $target.attr("type") === "group",
+					containerWidth, helper, groupHtml;
+
+				$targetCopy.find("i.asterisk").remove();
+
 				outOffset = null;
 				inOffset = null;
 				flag = "out";
@@ -1068,23 +1076,35 @@
 				{
 					groupHtml = self.getDragHtmlForGroup($target, isGroupItem);
 				}
-				if ($target.attr("minwidth"))
+
+				var fieldName = $target.attr("field");
+				if (fieldName === "Schedule")
+				{
+					blockWidth = self.getScheduleMinWidth() * blockWidth;
+				}
+				else if ($target.attr("minwidth"))
 				{
 					blockWidth = $target.attr("minwidth") * blockWidth;
 				}
+
 				containerWidth = Math.max($target.outerWidth(), isGroup ? groupHtml.width() - 4 : isGroupItem ? groupHtml.width() + 6 : blockWidth);
-				helper = $("<div class='data-point' style='width:" + containerWidth + "px;'>" +
-					"<div class='out' style='width:" + $target.outerWidth() + "px'>" +
-					"<div class='grid-stack-item-title'>" + $target.text().toUpperCase() + "</div>" +
-					"</div></div>");
+				helper = $("<div class='data-point' style='width:" + containerWidth + "px;'>\
+								<div class='out' style='width:" + $target.outerWidth() + "px'>\
+									<div class='grid-stack-item-title'>" + $targetCopy.text().toUpperCase() + "</div>\
+								</div>\
+							</div>");
 				helper.append((isGroup || isGroupItem) ? groupHtml :
-					$("<div class='in " + self.getDragStyle($target) + " hide " + ($target.attr("type") === "grid" ? "grid" : "") + "' style='width:" + blockWidth + "px'>" + self.getDragInHtml($target) + "</div>"));
+					$("<div class='in " + self.getDragStyle($target) + " hide " + (["grid", "treeList", "multipleGrid"].indexOf($target.attr("type")) >= 0 ? "grid" : "") + "' style='width:" + blockWidth + "px'>" + self.getDragInHtml($targetCopy) + "</div>"));
 				return helper[0];
 			},
 			drag: function(e, ui)
 			{
-				var $in = ui.helper.find(".in"), $out = ui.helper.find(".out"), $item = $(e.target).closest(".data-point-item"),
-					rectDetail = $(".detail-view-panel")[0].getBoundingClientRect(), padding = 8, isGroupItem = $item.attr("isgroupitem"), isGroup = $item.attr("type") === "group",
+				var $in = ui.helper.find(".in"),
+					$out = ui.helper.find(".out"),
+					$item = $(e.target).closest(".data-point-item"),
+					rectDetail = self.detailView.$element.closest(".detail-view-panel")[0].getBoundingClientRect(),
+					isGroupItem = $item.attr("isgroupitem"),
+					isGroup = $item.attr("type") === "group",
 					minHeight;
 
 				if (!isGroup && !isGroupItem)
@@ -1105,8 +1125,7 @@
 						self.animate($in, $out, inOffset, outOffset, duration);
 						flag = "in";
 					}
-				}
-				else if (flag === "in")
+				} else if (flag === "in")
 				{
 					self.animate($out, $in, outOffset, inOffset, duration);
 					flag = "out";
@@ -1114,7 +1133,8 @@
 			},
 			stop: function(e, ui)
 			{
-				var grid = ui.helper.find(".in.grid-stack"), gridstack;
+				var grid = ui.helper.find(".in.grid-stack"),
+					gridstack;
 				if (grid.length > 0)
 				{
 					gridstack = grid.data("gridstack");
@@ -1129,6 +1149,7 @@
 			appendTo: "body",
 			scroll: false
 		});
+		self.detailViewColumnChanged();
 		self.initLines();
 	}
 
@@ -1157,7 +1178,9 @@
 	{
 		$show.children().hide();
 		$hide.animate(showOffset, {
-			duration: duration, queue: false, done: function()
+			duration: duration,
+			queue: false,
+			done: function()
 			{
 				$show.removeClass("hide");
 				$hide.addClass("hide");
@@ -1208,7 +1231,9 @@
 	 */
 	DataPointPanel.prototype.getOffset = function($show, $hide, minHeight)
 	{
-		var offset, height, singleBlockHeight = 58, gap = 1, padding = 8;
+		var offset, height, singleBlockHeight = 58,
+			gap = 1,
+			padding = 8;
 		if ($show.hasClass("hide"))
 		{
 			if (minHeight)
@@ -1217,13 +1242,18 @@
 			}
 			$show.removeClass("hide");
 			$hide.addClass("hide");
-			offset = { width: $show.outerWidth(), height: height || $show.outerHeight() };
+			offset = {
+				width: $show.outerWidth(),
+				height: height || $show.outerHeight()
+			};
 			$hide.removeClass("hide");
 			$show.addClass("hide");
-		}
-		else
+		} else
 		{
-			offset = { width: $show.outerWidth(), height: $show.outerHeight() };
+			offset = {
+				width: $show.outerWidth(),
+				height: $show.outerHeight()
+			};
 		}
 		return offset;
 	};
@@ -1235,27 +1265,43 @@
 	 */
 	DataPointPanel.prototype.getDragInHtml = function($target)
 	{
-		var self = this, format, defaultValue, html = "";
-		switch ($target.attr("type"))
+		var self = this,
+			format, defaultValue, html = "",
+			type = $target.attr("type");
+
+		switch (type)
 		{
 			case "Calendar":
 				html = self.$calendar.html();
 				break;
 			case "Boolean":
-				html = "<div class='item-text'>" + $target.attr("displayValue") + "</div>";
+				html = `<div class='item-content'>${$target.attr("displayValue")}</div>`;
 				break;
+			case "treeList":
+			case "multipleGrid":
 			case "grid":
-				html = "<div class='grid-stack-item-title'>" + $target.text().toUpperCase() + "</div>" +
-					"<div class='grid-stack-item-content'></div>";
+				html = `<div class='grid-stack-item-title'>${$target.text().toUpperCase()}</div>
+						<div class='grid-stack-item-content'></div>`;
 				break;
 			case "RecordPicture":
 				html = "<div class='record-image'></div>";
 				break;
+			case "address":
+				var field = $target.attr("field"),
+					data = self.getDataPointByField(field),
+					contentHtml = tf.helpers.detailViewHelper.renderSpecialDefaultContent(data.defaultValue, type);
+				html = `<div class='grid-stack-item-title'>${$target.text().toUpperCase()}</div>
+						<div class='grid-stack-item-content address-stack-item'>
+							<div class='item-content address-content temp-edit'>
+								<div class='address-content'>${contentHtml.html()}</div>
+							</div>\
+						</div>`;
+				break;
 			default:
 				format = $target.attr("format");
-				defaultValue = $target.attr("defaultvalue");
+				defaultValue = $target.attr("defaultValue");
 
-				if ($target.attr("type") === "Date")
+				if (type === "Date")
 				{
 					defaultValue = moment(defaultValue).format("YYYY-MM-DD");
 				}
@@ -1264,8 +1310,7 @@
 					var start = new Date();
 					start.setHours(0, 0, defaultValue, 0);
 					defaultValue = moment(start).format("HH:mm:ss");
-				}
-				else if (format === "Money")
+				} else if (format === "Money")
 				{
 					defaultValue = "$" + parseFloat(defaultValue).toFixed(2);
 				}
@@ -1286,13 +1331,44 @@
 		self.onCloseDataPointPanelEvent.notify();
 	};
 
+	DataPointPanel.prototype.getDataPointByField = function(fieldName, dataPointType)
+	{
+		var self = this, dataPoint,
+			dataPointType = dataPointType || "DEFAULT";
+
+		switch (dataPointType)
+		{
+			case "DEFAULT":
+				for (var key in self.allColumns)
+				{
+					var columnList = self.allColumns[key].columns();
+					$.each(columnList, (_, column) =>
+					{
+						if (column.field === fieldName)
+						{
+							dataPoint = column;
+							return false;
+						}
+					});
+
+					if (dataPoint) { break; }
+				}
+				break;
+			default:
+				break;
+		}
+
+		return dataPoint;
+	};
+
 	/**
 	 * The dispose function.
 	 * @returns {void} 
 	 */
 	DataPointPanel.prototype.dispose = function()
 	{
-		var self = this, kendoCalendar;
+		var self = this,
+			kendoCalendar;
 		self.onCloseDataPointPanelEvent.unsubscribeAll();
 		if (self.$calendar)
 		{

@@ -111,7 +111,9 @@
 		else
 		{
 			ga('send', 'event', 'Area', 'Details');
-			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
+			//self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
+			//self.detailView = new TF.DetailView.DetailViewViewModel(self.options.ids, self.type, self.routeState, self.pageLevelViewModel, true, null);
+			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, false, {});
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
 			);
@@ -466,7 +468,7 @@
 			}
 		}).then(function(result)
 		{
-			var editableFieldtrips = TF.FieldTripAuthHelper.getEditableFieldTrips(result.Items);
+			var editableFieldtrips = tf.helpers.fieldTripAuthHelper.getEditableFieldTrips(result.Items);
 
 			var ids = editableFieldtrips.map(function(item) { return item.Id });
 			var failedIds = $.grep(recordIds, function(id) { return ids.indexOf(id) < 0 });

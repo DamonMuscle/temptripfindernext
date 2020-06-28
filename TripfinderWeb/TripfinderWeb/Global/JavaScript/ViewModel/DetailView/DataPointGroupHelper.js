@@ -12,7 +12,7 @@
 
 	DataPointGroupHelper.prototype.startGroup = function($block)
 	{
-		var self = this, blockData = $block.data(), closeBlocks = [];
+		var self = this, closeBlocks = [];
 		self.bindEvents();
 		self.detailView.isGroupMode(true);
 		self.detailView.grid.setStatic(true);
@@ -28,23 +28,31 @@
 	{
 		var self = this, entity = self.getDataPointGroupData();
 
-		tf.modalManager.showModal(new TF.Modal.SaveDataPointGroupNameModalViewModel(entity)).then(function(name)
+		tf.modalManager.showModal(new TF.DetailView.SaveDataPointGroupNameModalViewModel(entity)).then(function(name)
 		{
 			if (name !== false)
 			{
 				entity.Id = 0;
-				entity.APIIsNew = true;
 				entity.Name = name;
-				entity.DataTypeId = tf.DataTypeHelper.getId("fieldtrip")
-
 				tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
 					data: [entity]
 				}).then(function(result)
 				{
-					self.detailView.dataPointPanel.stopGroup();
 					self.stopGroup();
 					self.detailView.dataPointPanel.refreshData();
 				});
+
+				//entity.Id = 0;
+				//entity.APIIsNew = true;
+				//entity.Name = name;
+
+				//tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroup"), {
+				//	data: entity
+				//}).then(function(result)
+				//{
+				//	self.stopGroup();
+				//	self.detailView.dataPointPanel.refreshData();
+				//});
 			}
 		});
 	};
@@ -63,58 +71,40 @@
 
 	DataPointGroupHelper.prototype.getDataPointGroupData = function()
 	{
-		var self = this, items = [], appearance, node, data, minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, index = 0, image;
-		$.each(self.selectBlocks, function(index, block)
-		{
-			data = $(block).data();
-			node = data['_gridstack_node'];
-			if (minX > node.x)
+		var self = this,
+			items = [],
+			nodes = Array.from(self.selectBlocks).map(function(block)
 			{
-				minX = node.x;
-			}
-			if (minY > node.y)
-			{
-				minY = node.y;
-			}
-		});
+				return $(block).data()._gridstack_node;
+			}),
+			minX = Math.min.apply(null, nodes.map(function(n) { return n.x; })),
+			minY = Math.min.apply(null, nodes.map(function(n) { return n.y; }));
 
-		items = $.map(self.selectBlocks, function(el)
+		items = $.map(self.selectBlocks, function(el, index)
 		{
-			el = $(el);
-			data = el.data();
-			appearance = data['appearance'];
-			node = data['_gridstack_node'];
+			var data = $(el).data(),
+				node = data["_gridstack_node"],
+				obj = $.extend(true, data, {
+					id: index,
+					x: node.x - minX,
+					y: node.y - minY,
+					w: node.width,
+					h: node.height,
+					image: data.filePostData ? data.filePostData.fileData : null,
+					uniqueClassName: null
+				});
 
-			var obj = {
-				id: index++,
-				x: node.x - minX,
-				y: node.y - minY,
-				w: node.width,
-				h: node.height,
-				field: data["field"],
-				title: data["title"],
-				type: data["type"],
-				format: data["format"],
-				defaultValue: data["defaultValue"],
-				customizedTitle: data["customizedTitle"],
-				appearance: appearance ? JSON.parse(appearance) : null,
-				role: data["role"],
-				conditionalAppearance: data["conditionalAppearance"],
-				image: data.filePostData ? data.filePostData.fileData : undefined,
-				url: data["url"],
-				subUrl: data["subUrl"],
-				columns: data["columns"],
-				sort: data["sort"],
-				thematicId: data["thematicId"],
-				thematicName: data["thematicName"],
-				isLegendOpen: data["isLegendOpen"],
-				legendNameChecked: data["legendNameChecked"],
-				legendDescriptionChecked: data["legendDescriptionChecked"]
-			};
+			var udfId = Number(data["UDFId"]);
+			if (udfId > 0)
+			{
+				obj.UDFId = udfId;
+				var udf = tf.UDFDefinition.getUDFById(Number(data["UDFId"]));
+				obj.UDFGUid = udf && udf.UDFGuid;
+			}
 
 			if (data.type === "Map")
 			{
-				var mapRole = el.find(".map").attr("role"),
+				var mapRole = $(el).find(".map").attr("role"),
 					detailMap = self.detailView.allMaps[mapRole].map, thematicId, thematicName, isLegendOpen, legendNameChecked, legendDescriptionChecked;
 				if (detailMap)
 				{
@@ -139,13 +129,39 @@
 				}
 			}
 
-			return obj;
+			if (data.type === "tab")
+			{
+				var uniqueClassName = tf.helpers.detailViewHelper.getDomUniqueClassName(el),
+					tabBlock = self.detailView.getActiveGridStack().dataBlocks.find(function(b)
+					{
+						return b.uniqueClassName == uniqueClassName;
+					});
+
+				if (tabBlock && tabBlock.nestedGridStacks)
+				{
+					var tabNames = tabBlock.tabStrip.dataSource.data().toJSON(),
+						dataSources = tabBlock.nestedGridStacks.map(function(nestedGridStack, tabIndex)
+						{
+							return {
+								items: nestedGridStack.serializeLayout().items,
+								Name: tabNames[tabIndex].Name
+							};
+						});
+
+					$.extend(obj, {
+						dataSource: dataSources,
+						defaultIndex: tabBlock.tabStrip.element.find(".k-content.k-state-active").index() - 1
+					});
+				}
+			}
+
+			return tf.helpers.detailViewHelper.compressDataBlockDescriptor(obj);
 		});
+
 		return {
 			Id: 0,
-			CreatedBy: 0,
 			Name: "",
-			Table: self.detailView.gridType,
+			DataTypeId: tf.dataTypeHelper.getId(self.detailView.gridType),
 			DataPoints: JSON.stringify(items),
 			Comments: ""
 		};
@@ -153,13 +169,17 @@
 
 	DataPointGroupHelper.prototype.unbindEvents = function()
 	{
-		var self = this, items = self.detailView.$element.find(".right-container .grid-stack > .grid-stack-item:visible:not(.mock-item)");
+		var self = this;
+		if (!self.detailView || !self.detailView.$element) return;
+		var items = self.detailView.$element.find(".right-container .grid-stack > .grid-stack-item:visible:not(.mock-item,.tab-strip-stack-item .grid-stack-item)");
 		items.off(".group");
 	};
 
 	DataPointGroupHelper.prototype.bindEvents = function()
 	{
-		var self = this, items = self.detailView.$element.find(".right-container .grid-stack > .grid-stack-item:visible:not(.mock-item)");
+		var self = this;
+		if (!self.detailView || !self.detailView.$element) return;
+		var items = self.detailView.$element.find(".right-container .grid-stack > .grid-stack-item:visible:not(.mock-item,.tab-strip-stack-item .grid-stack-item)");
 		items.on("click.group", self.toggleDataPoint.bind(self));
 	};
 
@@ -261,7 +281,7 @@
 
 	DataPointGroupHelper.prototype.setGroupBorder = function()
 	{
-		var self = this, blockData, mockBlocks = [], $block, $container = self.detailView.$element.find(".right-container .grid-stack"), coincideBorders = [];
+		var self = this, blockData, mockBlocks = [], $block, $container = self.detailView.$element.find(".right-container .grid-stack:not(.grid-stack-nested)"), coincideBorders = [];
 		self.detailView.$element.find(".mock-item.grid-stack-item").remove();
 		if (self.selectBlocks.length === 0)
 		{
@@ -376,7 +396,7 @@
 
 	DataPointGroupHelper.prototype.getCloseDataPoints = function(blockDom)
 	{
-		var self = this, items = self.detailView.$element.find(".right-container .grid-stack > .grid-stack-item:visible:not(.mock-item)"),
+		var self = this, items = self.detailView.$element.find(".right-container .grid-stack > .grid-stack-item:visible:not(.mock-item,.tab-strip-stack-item .grid-stack-item)"),
 			node, closeBlocks = [], block, insertCloseBlocks = function(blockData)
 			{
 				$.each(items, function(index, item)

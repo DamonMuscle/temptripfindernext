@@ -4,7 +4,7 @@
 		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
 			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
-				   placeholder="Name Layout..." maxlength="80" />
+						 placeholder="Name Layout..." maxlength="80" />
 			<div class="buttons" data-bind="css:{disabled:isGroupMode()}">
 				<div class="iconbutton settings" data-bind="click:openManageLayouts" title="Manage Layouts"></div>
 				<div class="iconbutton font-size-slider" data-bind="click:showSlider" title="Font Size"></div>
@@ -88,7 +88,7 @@
 		</div>
 		<div class="preload">
 		</div>
-		<div class="right-container container-fluid" data-bind="css:{edit: !isReadMode(), 'group-mode': isGroupMode}">
+		<div class="right-container grid-stack-container container-fluid" data-bind="css:{edit: !isReadMode(), 'group-mode': isGroupMode}">
 			<div class="grid-stack">
 			</div>
 		</div>
@@ -102,7 +102,7 @@
 			<div class="caret"></div>
 			<label class="minus"></label>
 			<input type="text" data-provider="slider" data-slider-id="font-size-slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.25"
-				   data-bind="bootstrapSlider:{value:obSliderFontRate}">
+						 data-bind="bootstrapSlider:{value:obSliderFontRate}">
 			<label class="plus"></label>
 		</div>
 	</div>

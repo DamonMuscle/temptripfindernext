@@ -1,6 +1,6 @@
 ﻿(function()
 {
-	createNamespace("TF.Modal").SaveDataPointGroupNameModalViewModel = SaveDataPointGroupNameModalViewModel;
+	createNamespace("TF.DetailView").SaveDataPointGroupNameModalViewModel = SaveDataPointGroupNameModalViewModel;
 
 	function SaveDataPointGroupNameModalViewModel(entity)
 	{
@@ -10,10 +10,10 @@
 		self.sizeCss = "modal-dialog-sm";
 		self.modalClass = "saveNewThematic-modal";
 		self.title("Save Data Point Group");
-		self.contentTemplate("modal/SaveDataPointGroupName");
+		self.contentTemplate("Workspace/detailview/SaveDataPointGroupName");
 		self.buttonTemplate("modal/positivenegative");
 
-		self.saveDataPointGroupNameViewModel = new TF.Control.SaveDataPointGroupNameViewModel(entity);
+		self.saveDataPointGroupNameViewModel = new TF.DetailView.SaveDataPointGroupNameViewModel(entity);
 		self.data(self.saveDataPointGroupNameViewModel);
 
 		self.inheritChildrenShortCutKey = false;

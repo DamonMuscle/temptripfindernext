@@ -1,0 +1,72 @@
+.grid-stack>.grid-stack-item>.grid-stack-item-content {
+	.item-content {
+		&.grid {
+			height: calc(~"100% - 30px") !important;
+		}
+
+		.kendo-grid {
+			border: 1px solid #eee;
+			height: calc(~"100% - 2px");
+			position: relative;
+
+			table {
+				width: 100%;
+			}
+
+			.k-pager-info {
+				display: none;
+			}
+
+			.count-info {
+				float: left;
+			}
+
+			.invoice-total-amount{
+				position: absolute;
+				display: inline-block;
+				bottom: 4px;
+				right: 10px;
+			}
+		}
+	}
+	.item-title{
+			.badge-right{
+				float: right;
+			}
+		}
+}
+.data-point.ui-draggable-dragging {
+	.grid-stack-item-content {
+		.item-content {
+			&.grid {
+				height: calc(~"100% - 13px") !important;
+			}
+
+			.kendo-grid {
+				border: 1px solid #eee;
+				height: calc(~"100% - 2px");
+
+				table {
+					width: 100%;
+				}
+
+				.k-pager-info {
+					display: none;
+				}
+
+				.count-info {
+					float: left;
+				}
+			}
+		}
+		.item-title{
+			.badge-right{
+				float: right;
+			}
+		}
+	}
+
+	.in.grid {
+		background-color: #f2f2f2;
+	}
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 16">
+	<style>.a{fill:#777777;}</style>
+	<title>calendar</title>
+	<g id="Layer_2" data-name="Layer 2" class="a">
+		<g id="Layer_1-2" data-name="Layer 1">
+			<path d="M13,2H12V0H10V2H5V0H3V2H2A2,2,0,0,0,0,4V14a2,2,0,0,0,2,2H13a2,2,0,0,0,2-2V4A2,2,0,0,0,13,2Zm1,12a1,1,0,0,1-1,1H2a1,1,0,0,1-1-1V6H14Z"/>
+			<rect x="3" y="9" width="1" height="1"/>
+			<rect x="5" y="9" width="1" height="1"/>
+			<rect x="7" y="9" width="1" height="1"/>
+			<rect x="9" y="9" width="1" height="1"/>
+			<rect x="11" y="9" width="1" height="1"/>
+			<rect x="7" y="7" width="1" height="1"/>
+			<rect x="9" y="7" width="1" height="1"/>
+			<rect x="11" y="7" width="1" height="1"/>
+			<rect x="3" y="11" width="1" height="1"/>
+			<rect x="5" y="11" width="1" height="1"/>
+			<rect x="7" y="11" width="1" height="1"/>
+			<rect x="9" y="11" width="1" height="1"/>
+			<rect x="11" y="11" width="1" height="1"/>
+			<rect x="3" y="13" width="1" height="1"/>
+			<rect x="5" y="13" width="1" height="1"/>
+			<rect x="7" y="13" width="1" height="1"/>
+			<rect x="9" y="13" width="1" height="1"/>
+		</g>
+	</g>
+</svg>

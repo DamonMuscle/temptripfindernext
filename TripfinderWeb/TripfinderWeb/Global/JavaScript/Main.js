@@ -37,6 +37,18 @@ function topicCombine()
 	return null;
 }
 
+function isNullObj(obj)
+{
+	if (obj === null || obj === undefined)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 function pathCombine()
 {
 	var output = arguments[0];

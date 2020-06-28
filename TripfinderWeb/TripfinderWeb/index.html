@@ -7,7 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link href="Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">
 	<meta name="viewport"
-		content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
+				content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
 	<meta name="format-detection" content="telephone=no" />
 
 	<script>
@@ -32,18 +32,21 @@
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.fiori.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrapslider/css/bootstrap-slider.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/StackBlock/gridstack.css" />
-
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
 	<link rel="stylesheet" href="Global/Css/tripfinder.css" />
 	<!-- endbuild -->
 	<style>
-		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0) {
-			@media {
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content {
+		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0)
+		{
+			@media
+			{
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content
+				{
 					background-color: #efefef;
 				}
 
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content input:disabled {
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content input:disabled
+				{
 					color: #202020;
 				}
 			}
@@ -179,6 +182,7 @@
 	<script src="Global/JavaScript/ViewModel/Helper/PrintHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/EntityHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/FieldTripAuthHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/DataFormatHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/DataTypeHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/UploadDocumentHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/UploadHelper.js"></script>
@@ -199,7 +203,6 @@
 	<script src="Global/JavaScript/ViewModel/Controls/FieldTripViewResourceViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/EditDocumentViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/FieldTripInvoiceViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Controls/ManageDetailScreenLayoutViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/GenerateReportViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/KendoListMoverControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/SendEmailViewModel.js"></script>
@@ -207,19 +210,13 @@
 	<script src="Global/JavaScript/ViewModel/Controls/ListMoverSelectRecordControlViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/TestEmailViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/ListMoverSelectRecipientControlViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/Controls/SaveDataPointGroupNameViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/PrintSettingsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/MessageViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/GlobalReplaceSettingsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/GlobalReplaceResultsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointsJSON.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointPanel.js"></script>
-	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/DetailView/DataPointGroupHelper.js"></script>
-	<script src="Global/JavaScript/ViewModel/DetailView/LineBlockHelper.js"></script>
-	<script src="Global/JavaScript/ViewModel/DetailView/LayoutMenuViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/DetailView/DataBlocksMenuViewModel.js"></script>
-	<script src="Global/JavaScript/ViewModel/DetailView/ConditionalAppearanceViewModel.js"></script>
+
 	<script src="Global/JavaScript/ViewModel/DetailView/EditDataBlockAppearance.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Executor/Deletion/BaseDeletion.js"></script>
@@ -295,7 +292,6 @@
 	<script src="Global/JavaScript/Modal/ListMoverSelectRecordControlModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/TestEmailModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/ListMoverSelectRecipientControlModalViewModel.js"></script>
-	<script src="Global/JavaScript/Modal/SaveDataPointGroupNameModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/PrintSettingsModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/CopyDataModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/MessageModalViewModel.js"></script>
@@ -321,6 +317,118 @@
 	<script src="Global/JavaScript/DataModel/SettingsConfigurationDataModal.js"></script>
 	<script src="Global/JavaScript/DataModel/ReportReceiptDataModel.js"></script>
 
+	<script src="Global/JavaScript/Workspace/GridDefinition/UDFDefinition.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/KendoGridHelper.js"></script>
+
+
+	<script src="Global/JavaScript/Workspace/SessionItem.js"></script>
+	<script src="Global/JavaScript/Framework/Graphic/RectCollisionDetector.js"></script>
+	<script src="Global/JavaScript/Framework/Graphic/RectUtility.js"></script>
+
+	<!-- TODO-V2 -->
+	<script src="Global/JavaScript/ViewModel/DetailView/UserDefinedFieldHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/BaseCustomGridStackViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/AutomationHelper.js"></script>
+
+	<script src="Global/JavaScript/ViewModel/DetailView/LineBlockHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataPointGroupHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/LayoutMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlocksMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/ConditionalAppearanceViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/Helper/QueryFeatureHelper.js"></script>
+	<script src="Global/JavaScript/Workspace/BaseDocumentViewModel.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/FieldTripConfigsDocumentViewModel.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripClassificationGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripActivityGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripEquipmentGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripBillingClassificationGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripAccountGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripDistrictDepartmentGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripDestinationGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripTemplatesGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripBlockOutTimesGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripHolidaysGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripGridConfigs.js"></script>
+	<script src="Global/Javascript/Workspace/FieldTripConfigs/FieldTripConfigsDataHelper.js"></script>
+
+	<script src="Global/JavaScript/ViewModel/DetailView/LightGridStack.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/DocumentPreview/DocumentFilePreviewViewModel.js">
+	</script>
+
+	<script src="Global/JavaScript/ViewModel/DetailView/FieldEditor/EditorHelper/FieldEditorHelper.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/FieldEditor/EditorHelper/FieldtripFieldEditorHelper.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/Validators/BaseValidatorGenerator.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/Validators/FieldTripValidatorGenerator.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/Validators/CustomizeValidators.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/BaseDataBlock.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/EditableFieldGroupBlock.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/TabStripBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/GeneralBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/BooleanBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/AddressBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/GeoDistanceBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/MapBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/CalendarBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/AttachBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/ImageBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/SectionHeaderBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/SpacerBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/UnavailableUDFBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/RecordPictureBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/ScheduleBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/GridBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/MultipleGridBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/TreeListBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationModalViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/AssociateRecordsModalViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/ManageDetailScreenLayoutViewModel.js">
+	</script>
+
+	<script src="Global/JavaScript/ViewModel/DetailView/SaveDataPointGroupNameModalViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/SaveDataPointGroupNameViewModel.js">
+	</script>
+	<script src="Global/JavaScript/Modal/SimpleInputModal/SingleInputModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/SimpleInput/SingleInputViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripResourceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripResourceModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripInvoiceModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripInvoiceViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/SearchExistingRecordWrapper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/GridStackQuickAddWrapper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddViewModel.js"></script>
 	<!-- endbuild -->
 </head>
 
@@ -337,12 +445,12 @@
 					<!-- ko if: title() -->
 					<div class="modal-header">
 						<button type="button" class="close" aria-hidden="true"
-							data-bind="visible:obCloseButtonVisible,event:{click:closeClick}"></button>
+										data-bind="visible:obCloseButtonVisible,event:{click:closeClick}"></button>
 						<div class="panel-heading" data-bind="text: title"></div>
 					</div>
 					<!-- /ko -->
 					<div class="modal-body"
-						data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
+							 data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
 					</div>
 					<!-- ko if: buttonTemplate() -->
 					<div class="modal-footer">
@@ -360,27 +468,34 @@
 			<div class="spinner">
 				<div class="spinner-icon-container">
 					<style type='text/css'>
-						@-webkit-keyframes uil-default-anim {
-							0% {
+						@-webkit-keyframes uil-default-anim
+						{
+							0%
+							{
 								opacity: 1;
 							}
 
-							100% {
+							100%
+							{
 								opacity: 0;
 							}
 						}
 
-						@keyframes uil-default-anim {
-							0% {
+						@keyframes uil-default-anim
+						{
+							0%
+							{
 								opacity: 1;
 							}
 
-							100% {
+							100%
+							{
 								opacity: 0;
 							}
 						}
 
-						.uil-default-css {
+						.uil-default-css
+						{
 							position: relative;
 							left: -78px;
 							top: -78px;
@@ -389,84 +504,96 @@
 							height: 200px;
 						}
 
-						.uil-default-css>div:nth-of-type(1) {
+						.uil-default-css > div:nth-of-type(1)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.35s;
 							animation-delay: -0.35s;
 						}
 
-						.uil-default-css>div:nth-of-type(2) {
+						.uil-default-css > div:nth-of-type(2)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.29166666666666663s;
 							animation-delay: -0.29166666666666663s;
 						}
 
-						.uil-default-css>div:nth-of-type(3) {
+						.uil-default-css > div:nth-of-type(3)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.23333333333333334s;
 							animation-delay: -0.23333333333333334s;
 						}
 
-						.uil-default-css>div:nth-of-type(4) {
+						.uil-default-css > div:nth-of-type(4)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.17500000000000002s;
 							animation-delay: -0.17500000000000002s;
 						}
 
-						.uil-default-css>div:nth-of-type(5) {
+						.uil-default-css > div:nth-of-type(5)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.11666666666666667s;
 							animation-delay: -0.11666666666666667s;
 						}
 
-						.uil-default-css>div:nth-of-type(6) {
+						.uil-default-css > div:nth-of-type(6)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -0.05833333333333329s;
 							animation-delay: -0.05833333333333329s;
 						}
 
-						.uil-default-css>div:nth-of-type(7) {
+						.uil-default-css > div:nth-of-type(7)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: -5.551115123125783e-17s;
 							animation-delay: -5.551115123125783e-17s;
 						}
 
-						.uil-default-css>div:nth-of-type(8) {
+						.uil-default-css > div:nth-of-type(8)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.05833333333333329s;
 							animation-delay: 0.05833333333333329s;
 						}
 
-						.uil-default-css>div:nth-of-type(9) {
+						.uil-default-css > div:nth-of-type(9)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.11666666666666664s;
 							animation-delay: 0.11666666666666664s;
 						}
 
-						.uil-default-css>div:nth-of-type(10) {
+						.uil-default-css > div:nth-of-type(10)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.17500000000000004s;
 							animation-delay: 0.17500000000000004s;
 						}
 
-						.uil-default-css>div:nth-of-type(11) {
+						.uil-default-css > div:nth-of-type(11)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.2333333333333334s;
 							animation-delay: 0.2333333333333334s;
 						}
 
-						.uil-default-css>div:nth-of-type(12) {
+						.uil-default-css > div:nth-of-type(12)
+						{
 							-webkit-animation: uil-default-anim .7s linear infinite;
 							animation: uil-default-anim .7s linear infinite;
 							-webkit-animation-delay: 0.29166666666666663s;
@@ -474,41 +601,29 @@
 						}
 					</style>
 					<div class="uil-default-css" style="transform: scale(0.22);">
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);">
 						</div>
 					</div>
 				</div>
