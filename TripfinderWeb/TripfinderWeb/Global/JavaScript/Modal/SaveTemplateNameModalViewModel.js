@@ -10,7 +10,7 @@
 		self.sizeCss = "modal-dialog-sm";
 		self.modalClass = "saveNewThematic-modal";
 		self.title("Save Layout");
-		self.contentTemplate("modal/SaveDetailName");
+		self.contentTemplate("workspace/detailview/SaveDetailName");
 		self.buttonTemplate("modal/positivenegative");
 
 		self.SaveTemplateNameViewModel = new TF.Control.SaveTemplateNameViewModel(entity);
