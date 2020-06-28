@@ -113,7 +113,7 @@
 			ga('send', 'event', 'Area', 'Details');
 			//self.detailView = new TF.DetailView.DetailViewViewModel(selectedId);
 			//self.detailView = new TF.DetailView.DetailViewViewModel(self.options.ids, self.type, self.routeState, self.pageLevelViewModel, true, null);
-			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, true, {});
+			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, false, {});
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
 			);

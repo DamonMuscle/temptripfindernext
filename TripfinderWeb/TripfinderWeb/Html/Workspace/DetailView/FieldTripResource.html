@@ -1,0 +1,337 @@
+<div class="fieldtrip-resource-panel" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div>
+		<div class="row">
+			<div class="col-xs-12">
+				<h2><strong>Vehicle</strong></h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group tf-validate">
+					<label class="requirestar">Vehicle</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obVehicles,format:function(obj){return obj.BusNum;},drowDownShow:true,selectedValue:obSelectedVehicle}">
+							<!-- ko customInput:{type:"Select",value:obSelectedVehicleText,attributes:{class:"form-control",name:"vehicle"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div>
+					<label>Odometer</label>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Start</label>
+					<!-- ko customInput:{type:"Decimal",value:obOdometerStart,attributes:{class:"form-control",name:"odometerstart", maxlength:"50"}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Ending</label>
+					<!-- ko customInput:{type:"Decimal",value:obOdometerEnding,attributes:{class:"form-control",name:"odometerending", maxlength:"50"}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Total Miles</label>
+					<input readonly type="text" name="difference" class="form-control" data-bind="value:obOdometerDifference()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Mileage Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obMileageRate,attributes:{class:"form-control",name:"mileagerate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Fixed Cost</label>
+					<!-- ko customInput:{type:"Decimal",value:obVehicleFixedCost,attributes:{class:"form-control",name:"fixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Total Vehicle Cost</label>
+					<input readonly type="text" name="vehicletotal" class="form-control" data-bind="value:obVehicleTotal()" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div style="border-style: solid; border-color: #ccc; border-width: 1px 0px;">
+		<div class="row">
+			<div class="col-xs-12">
+			<h2 ><strong>Driver</strong></h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group tf-validate">
+					<label>Driver</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obDrivers,format:function(obj){return obj.FullName;},drowDownShow:true,selectedValue:obSelectedDriver}">
+							<!-- ko customInput:{type:"Select",value:obSelectedDriverText,attributes:{class:"form-control",name:"driver",placeholder:"None"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div>
+					<label>Billing</label>					
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Hours</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingHours,attributes:{class:"form-control",name:"driverbillinghours", maxlength:"50"}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingRate,attributes:{class:"form-control",name:"driverbillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Cost</label>
+					<input readonly type="text" name="driverbillingcost" class="form-control" data-bind="value:obDriverBillingCost()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>OT Hours</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTHours,attributes:{class:"form-control",name:"driverbillingothours", maxlength:"50"}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>OT Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTRate,attributes:{class:"form-control",name:"driverbillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Cost</label>
+					<input readonly type="text" name="driverbillingotcost" class="form-control" data-bind="value:obDriverBillingOTCost()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Fixed Cost</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingFixedCost,attributes:{class:"form-control",name:"driverbillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div>
+					<label>Expenses</label>					
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Parking</label>
+					<!-- ko customInput:{type:"Decimal",value:obExpensesParking,attributes:{class:"form-control",name:"expensesparking", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Tolls</label>
+					<!-- ko customInput:{type:"Decimal",value:obExpensesTolls,attributes:{class:"form-control",name:"expensestolls", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Meals</label>
+					<!-- ko customInput:{type:"Decimal",value:obExpensesMeals,attributes:{class:"form-control",name:"expensesmeals", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Misc</label>
+					<!-- ko customInput:{type:"Decimal",value:obExpensesMisc,attributes:{class:"form-control",name:"expensesmisc", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Cost</label>
+					<input readonly type="text" name="expensescost" class="form-control" data-bind="value:obExpensesCost()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Total Driver Cost</label>
+					<input readonly type="text" name="drivertotal" class="form-control" data-bind="value:obDriverTotal()" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="row">
+			<div class="col-xs-12">
+			<h2 ><strong>Aide</strong></h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group tf-validate">
+					<label>Aide</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obAides,format:function(obj){return obj.FullName;},drowDownShow:true,selectedValue:obSelectedAide}">
+							<!-- ko customInput:{type:"Select",value:obSelectedAideText,attributes:{class:"form-control",name:"aide",placeholder:"None"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div>
+					<label>Billing</label>					
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Hours</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingHours,attributes:{class:"form-control",name:"aidebillinghours", maxlength:"50"}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingRate,attributes:{class:"form-control",name:"aidebillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Cost</label>
+					<input readonly type="text" name="aidebillingcost" class="form-control" data-bind="value:obAideBillingCost()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>OT Hours</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTHours,attributes:{class:"form-control",name:"aidebillingothours", maxlength:"50"}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>OT Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTRate,attributes:{class:"form-control",name:"aidebillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Cost</label>
+					<input readonly type="text" name="aidebillingotcost" class="form-control" data-bind="value:obAideBillingOTCost()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group tf-validate">
+					<label>Fixed Cost</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingFixedCost,attributes:{class:"form-control",name:"aidebillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Total Aide Cost</label>
+					<input readonly type="text" name="aidetotal" class="form-control" data-bind="value:obAideTotal()" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group">
+					<label>Chaperone (1)</label>
+					<input type="text" maxlength="200" name="chaperone1" class="form-control" data-bind="value:obChaperone1" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group">
+					<label>Chaperone (2)</label>
+					<input type="text" maxlength="200" name="chaperone2" class="form-control" data-bind="value:obChaperone2" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group">
+					<label>Chaperone (3)</label>
+					<input type="text" maxlength="200" name="chaperone3" class="form-control" data-bind="value:obChaperone3" />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-24">
+				<div class="form-group">
+					<label>Chaperone (4)</label>
+					<input type="text" maxlength="200" name="chaperone4" class="form-control" data-bind="value:obChaperone4" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="total-cost-container">
+		<div class="row">
+			<div class="col-xs-8">
+				<div class="form-group">
+					<label>Total Cost</label>
+					<input readonly type="text" name="totalcost" class="form-control" data-bind="value:obTotalCost()" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
