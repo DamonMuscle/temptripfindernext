@@ -149,9 +149,24 @@
 					}
 
 					self.downloadMiniGridDocumentFile(e);
+				},
+				delete: function(e)
+				{
+					if ($(e.currentTarget).hasClass("disable"))
+					{
+						return;
+					}
+
+					self.removeAssociationToDocument(e);
 				}
 			}
 		};
+
+		self.kendoGridActions.documentrelationships = {
+			delete: self.removeDocumentAssociation.bind(self)
+		};
+		self.kendoGridActions.document.delete = self.removeAssociationToDocument.bind(self);
+
 		if (!isReadOnly)
 		{
 			self.kendoGridActions.contact = {
@@ -160,11 +175,7 @@
 			};
 			self.kendoGridActions.contactrelationships = {
 				delete: self.removeContactAssociation.bind(self)
-			};
-			self.kendoGridActions.documentrelationships = {
-				delete: self.removeDocumentAssociation.bind(self)
-			};
-			self.kendoGridActions.document.delete = self.removeAssociationToDocument.bind(self);
+			};		
 		}
 
 		// set on demand action
