@@ -109,6 +109,11 @@
 			hasDBID: true,
 			enableDetailView: true
 		},
+		fieldtriptemplate: {
+			endpoint: "fieldtriptemplates",
+			isMajorType: false,
+			hasDBID: true
+		},
 		school: {
 			endpoint: "schools",
 			name: "School",
