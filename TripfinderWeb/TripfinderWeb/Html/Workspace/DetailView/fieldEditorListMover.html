@@ -1,0 +1,22 @@
+<div class="list-mover-field-editor" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-11">
+			<div class="form-group">
+				<label class="bold-Label">Available</label>
+				<div class="kendo-grid left-grid grid-container"></div>
+			</div>
+		</div>
+		<div class="col-xs-2 move-button-column">
+			<a data-bind="click:toAllRightClick, css:{disabled: !obLeftRemaining()}" class="btn btn-default btn-sm">&gt;&gt;</a>
+			<a data-bind="click:toRightClick, css:{disabled: !obLeftSelected()}" class="btn btn-default btn-sm to-right">&gt;</a>
+			<a data-bind="click:toLeftClick, css:{disabled: !obRightSelected()}" class="btn btn-default btn-sm to-left">&lt;</a>
+			<a data-bind="click:toAllLeftClick, css:{disabled: !obRightRemaining()}" class="btn btn-default btn-sm to-all-left">&lt;&lt;</a>
+		</div>
+		<div class="col-xs-11">
+			<div class="form-group">
+				<label class="bold-Label">Selected</label>
+				<div class="kendo-grid right-grid grid-container"></div>
+			</div>
+		</div>
+	</div>
+</div>

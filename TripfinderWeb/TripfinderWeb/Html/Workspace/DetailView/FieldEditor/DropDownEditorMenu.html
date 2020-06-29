@@ -1,0 +1,9 @@
+<div class="dropdown-editor-menu" style="margin:-5px;" data-bind="uiInit:init">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
+		<ul class="tf-contextmenu" data-bind="foreach: obSource">
+			<li class="menu-item" data-bind="contextMenuClick: $parent.menuClick, css:{'menu-item-checked':$data.checked, 'title':$data.isTitle}">
+				<div class="menu-label" data-bind="text:$data.text"></div>
+			</li>
+		</ul>
+	</div>
+</div>
