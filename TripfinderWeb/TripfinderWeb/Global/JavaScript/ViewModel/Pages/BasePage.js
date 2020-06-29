@@ -133,22 +133,29 @@
 
 	BasePage.prototype.closeDetailClick = function(filter)
 	{
-		var self = this;
-		if (filter === true || !TF.isMobileDevice)
-		{
-			tf.pageManager.resizablePage.closeRightPage();
-		}
-		else
-		{
-			self.obShowDetailPanel(false);
-			tf.pageManager.resizablePage.clearLeftOtherContent();
-			self.detailView.dispose();
-			self.detailView = null;
-			if ($(".kendoscheduler").length > 0)
-			{
-				$(".kendoscheduler").getKendoScheduler().refresh();
-			}
-		}
+		var self = this,
+		isReadRecordMode = self.detailView.isReadMode(),
+		exitEditing = isReadRecordMode
+			? self.detailView.exitEditing()
+				: self.detailView.checkLayoutChangeAndClose();
+
+		return Promise.resolve(exitEditing)
+			.then(function (result) {
+				if (result) {
+					if (filter === true || !TF.isMobileDevice) {
+						tf.pageManager.resizablePage.closeRightPage();
+					}
+					else {
+						self.obShowDetailPanel(false);
+						tf.pageManager.resizablePage.clearLeftOtherContent();
+						self.detailView.dispose();
+						self.detailView = null;
+						if ($(".kendoscheduler").length > 0) {
+							$(".kendoscheduler").getKendoScheduler().refresh();
+						}
+					}
+				}
+			});
 	};
 
 	/**
