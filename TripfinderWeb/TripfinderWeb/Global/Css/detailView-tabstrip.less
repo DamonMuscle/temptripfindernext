@@ -98,10 +98,10 @@
                             background-color: #f4f4f4;
                             margin-right: 0;
                             padding: 10px 0px;
-                            flex-shrink: 0;
-                            width: auto;
+                            width: 100%;
                             border-right: 1px solid #9f9f9f;
                             white-space: nowrap;
+                            min-width: min-content;
 
                             span.remove-item {
                                 visibility: hidden;
@@ -176,6 +176,7 @@
 
                         ul.k-tabstrip-items {
                             li.k-item {
+                                flex-shrink: 0;
                                 width: auto;
                             }
                         }
