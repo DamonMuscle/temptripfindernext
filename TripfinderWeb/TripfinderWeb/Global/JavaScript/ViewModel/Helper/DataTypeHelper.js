@@ -587,6 +587,10 @@
 		return this.getAvailableDataTypes()
 			.filter(function(dataType)
 			{
+				return dataType.key === "fieldtrip";
+			})
+			.filter(function(dataType)
+			{
 				return tf.authManager.isAuthorizedForDataType(dataType.key, "read") && excludeDataTypes.indexOf(dataType.key) < 0;
 			});
 	};

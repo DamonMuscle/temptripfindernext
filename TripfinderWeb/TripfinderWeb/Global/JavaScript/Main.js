@@ -732,3 +732,26 @@ Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 }(window.jQuery));
 
 tf.isTripfinder = true;
+
+createNamespace("TF").fixGeometryErrorInKendo = function(data)
+{
+	if (toString.call(data) == "[object Array]")
+	{
+		data.forEach(function(c)
+		{
+			TF.fixGeometryErrorInKendo(c);
+		});
+	}
+	for (var key in data)
+	{
+		var type = toString.call(data[key]);
+		if (key == "geometry" || (data[key] && data[key].spatialReference))
+		{
+			data[key].getTime = true;
+		}
+		else if (type == "[object Object]" || type == "[object Array]")
+		{
+			TF.fixGeometryErrorInKendo(data[key]);
+		}
+	}
+};
