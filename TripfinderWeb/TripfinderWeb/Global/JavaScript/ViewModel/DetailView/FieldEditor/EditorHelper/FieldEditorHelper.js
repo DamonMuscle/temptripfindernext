@@ -342,11 +342,18 @@
 	{
 		var self = this;
 		$(document).off(self.eventNameSpace);
-		$(self._detailView.$element.find(".right-container")).off(self.eventNameSpace);
-
-		if (self._detailView.onResizePage)
+		if (self._detailView)
 		{
-			self._detailView.onResizePage.unsubscribeAll();
+			var $rightContainer = self._detailView.$element.find(".right-container");
+			if ($rightContainer.length)
+			{
+				$($rightContainer).off(self.eventNameSpace);
+			}
+
+			if (self._detailView.onResizePage)
+			{
+				self._detailView.onResizePage.unsubscribeAll();
+			}
 		}
 	};
 
