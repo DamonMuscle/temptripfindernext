@@ -1996,6 +1996,7 @@
 	DetailViewViewModel.prototype.closeDetailClick = function(data, e)
 	{
 		var self = this;
+		self.pageLevelViewModel.clearError();
 		self.onCloseDetailEvent.notify();
 	};
 
