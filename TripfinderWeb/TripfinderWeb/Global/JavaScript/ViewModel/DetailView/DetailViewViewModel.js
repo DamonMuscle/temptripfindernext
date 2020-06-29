@@ -1939,18 +1939,24 @@
 		{
 			if (response)
 			{
-				self.applyLayoutTemplate({ isReadMode: true, layoutId: self.getEffectiveDetailLayoutId() })
-					.then(function()
-					{
-						self.skipValidation = !self.recordId;
-						self.updateDetailViewTitle();
-						self.showDetailViewById(self.recordId);
-					});
-
-				self.closeFieldEditor();
+				self.refresh();
 			}
 		});
 	};
+
+	DetailViewViewModel.prototype.refresh = function()
+	{
+		var self = this;
+		self.applyLayoutTemplate({ isReadMode: true, layoutId: self.getEffectiveDetailLayoutId() })
+		.then(function()
+		{
+			self.skipValidation = !self.recordId;
+			self.updateDetailViewTitle();
+			self.showDetailViewById(self.recordId);
+		});
+
+		self.closeFieldEditor();
+	}
 
 	DetailViewViewModel.prototype.saveEntityClick = function()
 	{
