@@ -57,6 +57,7 @@
 				<!-- ko if:!TF.isMobileDevice-->
 				<div class="iconbutton new-window" data-bind="click:newWindowClick" title="Open in new Tab"></div>
 				<!-- /ko -->
+				<div class="iconbutton save" data-bind="click:saveEntityClick, css: {disabled:!obEditing()}" title="Save"></div>
 				<div class="iconbutton close-detail" data-bind="click:closeDetailClick" title="Close"></div>
 			</div>
 			<div class="group-buttons" data-bind="css: {hide :!isReadMode()}">
@@ -79,6 +80,10 @@
 								<div class="iconbutton" data-bind="css:'new-window'"></div>
 							</li>
 							<!-- /ko -->
+							<li class="menu-item" data-bind="click:saveEntityClick, css:{disabled:!obEditing()}">
+								<div class="select-type" data-bind="text:'Save'"></div>
+								<div class="iconbutton save" data-bind="css:{disabled:!obEditing()}"></div>
+							</li>
 							<li class="menu-item" data-bind="click:closeDetailClick">
 								<div class="select-type" data-bind="text:'Close this Page'"></div>
 								<div class="iconbutton" data-bind="css:'close-detail'"></div>

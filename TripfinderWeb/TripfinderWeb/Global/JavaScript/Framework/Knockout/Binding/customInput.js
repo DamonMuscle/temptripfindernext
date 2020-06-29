@@ -24,6 +24,8 @@
 				return new TF.Input.TimeBox(initialValue, attributes, disable, nowrap, events, element);
 			case "Integer":
 				return new TF.Input.IntegerBox(initialValue, attributes, disable, events);
+			case "NaturalNumber":
+				return new TF.Input.NaturalNumberBox(initialValue, attributes, disable, events);
 			case "Decimal":
 				return new TF.Input.DecimalBox(initialValue, attributes, disable, events);
 			case "Number":
