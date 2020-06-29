@@ -1,7 +1,5 @@
 <div class="detail-view-panel right-panel">
 	<div class="detail-view" data-bind="uiInit:init">
-		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
-		<!-- /ko -->
 		<div class="template-info form-group" data-bind="css: {hide :isReadMode()}">
 			<input class="name" name="name" data-bind="value:obName,event:{blur:updateNameContainer,focus:inputFocused}" title="Click to Edit"
 						 placeholder="Name Layout..." maxlength="80" />

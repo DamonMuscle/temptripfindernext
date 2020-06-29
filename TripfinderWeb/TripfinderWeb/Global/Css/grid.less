@@ -3473,3 +3473,32 @@ form.k-filter-menu {
 .html-editor-wrapper{
 	padding: 0 0 0 2px;
 }
+
+input.quick-add-layout-radio {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	border-radius: 50%;
+	width: 16px !important;
+	height: 16px !important;
+	margin: 0 !important;
+	border: 1px solid #333333;
+	transition: 0.2s all linear;
+	outline: none;
+	position: relative !important;
+	background-color: #DDDDDD;
+	top: 3px;
+}
+
+input.quick-add-layout-radio:checked::after {
+	content: '';
+	width: 12px;
+	height: 12px;
+	background: #000000;
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	border-radius: 100%;
+	-webkit-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+}
