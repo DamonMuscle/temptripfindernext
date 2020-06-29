@@ -1,0 +1,48 @@
+<div class="associate-records" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="grid-type">
+				<span data-bind="text:obSelected().label"></span>
+				<span class="icon bottom-caret"></span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="row list-mover-mover">
+				<div class="col-xs-11">
+					<div class="form-group">
+						<div class="list-mover-iconrow-wrapper">
+							<label class="bold-Label">
+								<span data-bind="text:availableTitle"></span>
+							</label>
+							<div class="iconrow">
+								<div class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"
+									 data-bind="visible:obshowRemoveColumnButton,click:addRemoveColumnClick,css:{disabled:modalViewModel.obDisableControl()}">
+								</div>
+								<div class="divider" data-bind="visible:obshowRemoveColumnButton()"></div>
+								<div class="iconbutton refresh" title="Refresh" data-bind="click:refreshClick,css:{disabled:modalViewModel.obDisableControl()}"></div>
+							</div>
+						</div>
+						<div class="vertical-size-large kendo-grid-container availablecolumngrid-container kendo-grid left-grid"></div>
+					</div>
+				</div>
+				<div class="col-xs-1 vertical-size-large move-button-column">
+					<a data-bind="click:toAllRightClick,css:{disabled:modalViewModel.obDisableControl()||obLeftCount()==0}" class="btn btn-default btn-sm">&gt;&gt;</a>
+					<a data-bind="click:toRightClick,css:{disabled:modalViewModel.obDisableControl()||!obLeftGridSelected()}" class="btn btn-default btn-sm single">&gt;</a>
+					<a data-bind="click:toLeftClick,css:{disabled:!obRightGridSelected()}" class="btn btn-default btn-sm single">&lt;</a>
+					<a data-bind="click:toAllLeftClick,css:{disabled:obRightCount()==0}" class="btn btn-default btn-sm">&lt;&lt;</a>
+				</div>
+				<div class="col-xs-11 without-filter-grid-bottom">
+					<div class="form-group">
+						<div class="list-mover-iconrow-wrapper">
+							<label class="bold-Label"><span data-bind="text:selectedTitle"></span></label>
+						</div>
+						<div class="vertical-size-large vertical-fill grid-container selectedcolumngrid-container kendo-grid right-grid"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
