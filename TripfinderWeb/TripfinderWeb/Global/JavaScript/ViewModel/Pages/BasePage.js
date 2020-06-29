@@ -117,6 +117,7 @@
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
 			);
+			self.detailView.onEditRecordSuccess.subscribe(self.onEditRecordSuccessHandler.bind(self));
 			if (TF.isMobileDevice)
 			{
 				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
@@ -148,6 +149,19 @@
 				$(".kendoscheduler").getKendoScheduler().refresh();
 			}
 		}
+	};
+
+	/**
+	 * Handler when a record is successfully modified.
+	 *
+	 * @param {Event} e
+	 * @param {Number} recordId
+	 */
+	BasePage.prototype.onEditRecordSuccessHandler = function(e, recordEntity)
+	{
+		var self = this;
+		self.searchGrid.refreshClick();
+		self.detailView.refresh();
 	};
 
 	BasePage.prototype.editClick = function(viewModel, e)
