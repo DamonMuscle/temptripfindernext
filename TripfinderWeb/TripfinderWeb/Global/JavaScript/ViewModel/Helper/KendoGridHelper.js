@@ -64,7 +64,7 @@
 			// refresh background color
 			var $container = kendoGridElement.find(".k-grid-content"),
 				$onDemandContainer = $container.find(".on-demand-container");
-			if(onDemandContainer.length)
+			if($onDemandContainer.length)
 			{	
 				$onDemandContainer.css({
 					background: $onDemandContainer.data("tr").children("td").css("background-color")
