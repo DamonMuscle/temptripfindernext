@@ -13,7 +13,7 @@
 
 		TF.Modal.BaseModalViewModel.call(self);
 
-		self.sizeCss = "modal-dialog-xl";
+		self.sizeCss = TF.isMobileDevice ? "modal-dialog-lg-mobile" : "modal-dialog-xl";
 		self.modalClass = 'quick-add enable-tab';
 		self.data(viewModel);
 		self.title(title);
@@ -34,11 +34,10 @@
 		var self = this;
 		self.data().save().then(function(result)
 		{
-			if (result) 
+			if (result)
 			{
 				self.positiveClose(result);
-			}
-			else if (result !== false)
+			} else if (result !== false)
 			{
 				self.negativeClose();
 			}

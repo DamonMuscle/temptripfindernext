@@ -11,7 +11,7 @@
 
 		TF.Modal.BaseModalViewModel.call(self);
 
-		self.sizeCss = "modal-dialog-xl";
+		self.sizeCss = TF.isMobileDevice ? "modal-dialog-lg-mobile" : "modal-dialog-xl";
 		self.modalClass = 'quick-add enable-tab';
 		self.buttonTemplate("modal/positivenegative");
 		self.contentTemplate("Workspace/detailview/ManageAssociation/ManageRecordAssociation");
@@ -32,11 +32,10 @@
 		var self = this;
 		self.data().save().then(function(result)
 		{
-			if (result) 
+			if (result)
 			{
 				self.positiveClose(result);
-			}
-			else if (result !== false)
+			} else if (result !== false)
 			{
 				self.negativeClose();
 			}
