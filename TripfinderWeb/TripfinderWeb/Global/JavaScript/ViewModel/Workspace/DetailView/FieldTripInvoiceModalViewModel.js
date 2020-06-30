@@ -32,5 +32,8 @@
 
 	FieldTripInvoiceModalViewModel.prototype.dispose = function()
 	{
+		if (TF.isMobileDevice) {
+			$(".k-calendar-container.k-popup").closest(".k-animation-container:visible").hide();
+		}		
 	};
 })();
