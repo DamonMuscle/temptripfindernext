@@ -374,7 +374,8 @@
 			dialog.attr("class").indexOf("modal-fullscreen") === -1)
 		{
 			// initialize of max-height css is in ModalManager.prototype.modalAdd
-			dialog.find('.modal-body').css("max-height", window.innerHeight - 240);
+			// keep the size same in ModalManager.prototype.modalAdd
+			dialog.find('.modal-body').css("max-height", window.innerHeight - 28 - 41 - 46 - 5);
 		}
 	}
 
