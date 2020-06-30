@@ -375,7 +375,9 @@
 		{
 			// initialize of max-height css is in ModalManager.prototype.modalAdd
 			// keep the size same in ModalManager.prototype.modalAdd
-			dialog.find('.modal-body').css("max-height", window.innerHeight - 28 - 41 - 46 - 5);
+			window.setTimeout(function () {
+				dialog.find('.modal-body').css("max-height", window.innerHeight - 28 - 41 - 46 - 5);
+			}, 0);
 		}
 	}
 
