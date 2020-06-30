@@ -11,7 +11,7 @@
 
         TF.Modal.BaseModalViewModel.call(self);
 
-        self.sizeCss = TF.isMobileDevice ? "modal-dialog-lgmobile" : "modal-dialog-xl";
+        self.sizeCss = TF.isMobileDevice ? "modal-dialog-lg-mobile" : "modal-dialog-xl";
         self.modalClass = 'quick-add enable-tab';
         self.data(viewModel);
         self.title(title);
