@@ -219,12 +219,6 @@
 			var $target = $(e.target),
 				groupButtons = self.$element.find(".group-buttons");
 
-			var isFromMoreButton = $target.closest(".selector-menu").length <= 0;
-			if (isFromMoreButton && TF.isMobileDevice)
-			{
-				return;
-			}
-
 			if (groupButtons.length > 0 && groupButtons.hasClass("open") && $target.closest(".group-buttons").length <= 0)
 			{
 				groupButtons.removeClass("open");
