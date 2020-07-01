@@ -6,7 +6,7 @@
 		layoutAndFilterOperation: true
 	};
 
-	function addPlugin ()
+	function addPlugin()
 	{
 		var base, sub = arguments[0];
 		for (var i = 1; i < arguments.length; i++)
@@ -19,7 +19,7 @@
 		}
 	}
 
-	function KendoGrid ($container, options, gridState)
+	function KendoGrid($container, options, gridState)
 	{
 		var self = this;
 		this.isFromRelated = ko.observable(false);
@@ -578,7 +578,7 @@
 	{
 		var self = this;
 
-		function changeColumn (editColumnViewModel)
+		function changeColumn(editColumnViewModel)
 		{
 			self._obSelectedColumns(editColumnViewModel.selectedColumns);
 			self._availableColumns = editColumnViewModel.availableColumns;
@@ -997,8 +997,8 @@
 				modifiedStatus.isDeletedLayout = true;
 			else
 			{
-				var formatedGridFilter = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, stickGridConfig.stickLayoutModel._entityBackup);
-				var stickBackUpLayoutColumns = formatedGridFilter.layoutColumns;
+				var formatedGridLayout = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, stickGridConfig.stickLayoutModel._entityBackup);
+				var stickBackUpLayoutColumns = formatedGridLayout.layoutColumns();
 				var stickBackUpLayoutName = stickGridConfig.stickLayoutModel._entityBackup.Name;
 				var stickBackUpLayoutShowSummaryBar = stickGridConfig.stickLayoutModel._entityBackup.ShowSummaryBar;
 				modifiedStatus.isUpdatedLayout = (!TF.Grid.LayoutHelper.compareLayoutColumns(stickBackUpLayoutColumns, unsyncedDBLayout.layoutColumns()) ||
