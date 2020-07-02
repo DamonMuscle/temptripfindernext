@@ -1205,10 +1205,11 @@
 		});
 		if (fieldTripDocuments && fieldTripDocuments.length > 0)
 		{
-			var uploadHelper = new TF.UploadDocumentHelper();
+			var uploadHelper = new TF.DetailView.UploadDocumentHelper(null, true);
+			uploadHelper.initHidden();
 			fieldTripDocuments.forEach(function(document)
 			{
-				promiseAll.push(uploadHelper.UploadDocument(document));
+				promiseAll.push(uploadHelper.uploadDocument(document));
 			});
 
 			return Promise.all(promiseAll).then(

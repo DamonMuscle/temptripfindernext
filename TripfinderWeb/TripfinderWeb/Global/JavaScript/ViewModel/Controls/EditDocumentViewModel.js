@@ -2,10 +2,16 @@
 {
 	createNamespace('TF.Control').EditDocumentViewModel = EditDocumentViewModel;
 
-	function EditDocumentViewModel (objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData, documentEntities)
+	function EditDocumentViewModel(objtype, objid, documentId, files, obSelectedAssociations, parentType, parentId, documentData, documentEntities)
 	{
 		this.UploadedFileChangeEvent = this.UploadedFileChangeEvent.bind(this);
 		this.deleteFileClick = this.deleteFileClick.bind(this);
+
+		this.options = {
+			maxFileByteSize: TF.DetailView.UploadDocumentHelper.maxFileByteSize,
+			acceptFileExtensions: TF.DetailView.UploadDocumentHelper.acceptFileExtensions,
+			acceptMimeType: TF.DetailView.UploadDocumentHelper.acceptMimeType
+		};
 
 		this.objtype = objtype;
 		this.objid = objid;
@@ -300,13 +306,17 @@
 	EditDocumentViewModel.prototype.UploadedFileChangeEvent = function(viewModel, e)
 	{
 		var files = e.target.files;
-		this.UploadedFile(files);
+		var isFileValid = this.UploadedFile(files);
+		if (!isFileValid)
+		{
+			e.target.value = '';
+		}
 	};
 
 	EditDocumentViewModel.prototype.UploadedFile = function(files)
 	{
 		var self = this;
-		var uploadFail = false;
+		var uploadFail = false, isFileValid = true;
 
 		if (files && files.length)
 		{
@@ -318,6 +328,19 @@
 				var step = 1024 * 10;
 				var loaded = 0;
 				var total = file.size;
+				if (!TF.UploadHelper.ValidateAttachFileExtensionInner(file.name, self.options))
+				{
+					tf.promiseBootbox.alert("Invalid file format.");
+					isFileValid = false;
+					break;
+				}
+				if (!TF.UploadHelper.ValidateAttachFileSizeInner(total, self.options))
+				{
+					var maxFileMBSize = parseInt(self.options.maxFileByteSize / 1024 / 1024);
+					tf.promiseBootbox.alert("File size must be less than " + maxFileMBSize + " MB.");
+					isFileValid = false;
+					break;
+				}
 				var fileModel = { FileName: file.name, FileProgress: ko.observable("0%"), UploadFailed: uploadFail, documentEntity: file };
 				var content = "";
 				reader.fileName = file.name;
@@ -351,7 +374,9 @@
 				reader.readAsDataURL(file);
 			}
 		}
-	}
+
+		return isFileValid;
+	};
 
 	EditDocumentViewModel.prototype.apply = function()
 	{
