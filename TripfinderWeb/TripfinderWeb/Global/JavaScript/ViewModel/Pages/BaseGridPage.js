@@ -89,8 +89,11 @@
 		if (self.isGridPage && self.searchGrid)
 		{
 			var canceling = false;
+
 			self.searchGrid.getSelectedIds.subscribe(function()
 			{
+				self.updateEditable();
+
 				if (canceling)
 				{
 					return;
@@ -110,7 +113,8 @@
 					self.selectedRecordIds = current;
 					if (self.obShowDetailPanel())
 					{
-						self.detailView.showDetailViewById(self.selectedRecordIds[0]);
+						var isReadOnly = !self.selectedItemEditable();
+						self.detailView.showDetailViewById(self.selectedRecordIds[0], null, null, isReadOnly);
 					}
 					else if (self.obShowFieldTripDEPanel())
 					{
@@ -166,11 +170,6 @@
 				}
 
 				next();
-			});
-
-			self.searchGrid.getSelectedIds.subscribe(function()
-			{
-				self.updateEditable();
 			});
 
 			self.loadReportLists();
