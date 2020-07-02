@@ -83,7 +83,8 @@
 	{
 		if (tf.authManager.authorizationInfo.isAdmin) return true;
 
-		var securedItem = this.getHighestRightsSecuredItem([right]),
+		var rights = Array.isArray(right) ? right : [right];
+		var securedItem = this.getHighestRightsSecuredItem(rights),
 			permittedLevels = this._getPermittedLevels(securedItem);
 
 		if (stageId != null)
