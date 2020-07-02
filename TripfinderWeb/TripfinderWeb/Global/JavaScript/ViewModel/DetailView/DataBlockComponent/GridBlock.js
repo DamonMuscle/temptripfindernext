@@ -16,7 +16,7 @@
 			btnLabel: "Associate"
 		},
 		"DocumentAssociationGrid": {
-			checkPermission: function() { return tf.authManager.isAuthorizedFor("DocumentTab", "edit"); },
+			checkPermission: function() { return tf.authManager.isAuthorizedFor("documentTab", "edit"); },
 			btnClass: "add-association",
 			btnLabel: "Associate"
 		},
@@ -41,12 +41,18 @@
 			btnLabel: "Add"
 		},
 		"FieldTripResourceGrid": {
-			checkPermission: function() { return tf.authManager.isAuthorizedFor("fieldtrip", ["add", "edit"]); },
+			checkPermission: function() { 
+				var hasFieldTripPermission = tf.authManager.isAuthorizedForDataType("fieldtrip", ["add", "edit"]);
+				var hasStaffPermission = tf.authManager.isAuthorizedFor("staff", ["add", "edit"]);
+				var hasVehiclePermission = tf.authManager.isAuthorizedFor("vehicle", ["add", "edit"]);
+
+				return hasFieldTripPermission && hasStaffPermission && hasVehiclePermission;
+			},
 			btnClass: "add-fieldtrip-resource",
 			btnLabel: "Add"
 		},
 		"FieldTripInvoiceGrid": {
-			checkPermission: function() { return tf.authManager.isAuthorizedFor("fieldtrip", ["add", "edit"]); },
+			checkPermission: function() { return tf.authManager.isAuthorizedForDataType("fieldtrip", ["add", "edit"]); },
 			btnClass: "add-fieldtrip-invoice",
 			btnLabel: "Add"
 		}

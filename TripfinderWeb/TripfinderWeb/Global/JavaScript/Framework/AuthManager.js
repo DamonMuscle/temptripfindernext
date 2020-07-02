@@ -295,9 +295,25 @@
 		var securedItems = this.authorizationTree.securedItems;
 		var section0 = arguments[0];
 		var section1 = arguments[1];
-		if (securedItems[section0] && Array.contain(securedItems[section0], section1))
+
+		if (securedItems[section0])
 		{
-			return true;
+			if (!Array.isArray(section1))
+			{
+				return Array.contain(securedItems[section0], section1);
+			}
+
+			var ownedAllRights = true;
+			section1.forEach(function(right) 
+			{
+				if (!Array.contain(securedItems[section0], right))
+				{
+					ownedAllRights = false;
+					return false;
+				}
+			});
+
+			return ownedAllRights;
 		}
 		return false;
 	};
