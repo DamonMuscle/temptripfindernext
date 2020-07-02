@@ -8,7 +8,7 @@
 		this.databaseName = "";
 		this.databaseType = "";
 		this.loginSource = null;
-		this.datasourceChanged = new TF.Events.Event();
+		//this.datasourceChanged = new TF.Events.Event();
 		this.onDatabaseIdSet = new TF.Events.Event();
 	}
 
@@ -152,12 +152,6 @@
 		this.setDataBaseId(parseInt(tf.storageManager.get("datasourceId", true, true) || tf.storageManager.get("datasourceId")));
 		this.databaseName = tf.storageManager.get("databaseName", true) || tf.storageManager.get("databaseName");
 		this.databaseType = tf.storageManager.get("databaseType");
-		this.onDatasourceChanged({ name: this.databaseName, id: id });
-	};
-
-	DatasourceManager.prototype.onDatasourceChanged = function(db)
-	{
-		this.datasourceChanged.notify(db);
 	};
 
 })();
