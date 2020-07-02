@@ -382,6 +382,14 @@
 									{
 										return false;
 									}
+								}).then(function()
+								{
+									return tf.datasourceManager.getDataSources();
+								})
+								.then(function()
+								{
+									tf.datasourceManager.setDatabaseInfo();
+									return true;
 								});
 						})
 						.then(function(validateResult)
