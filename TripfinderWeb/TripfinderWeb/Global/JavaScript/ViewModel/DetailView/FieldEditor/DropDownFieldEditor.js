@@ -183,6 +183,14 @@
 
 			self._createDropDown(self.dropDownSource, selectedValue);
 		});
+	
+		if (TF.isMobileDevice && $(".grid-stack-container").length) {
+			$(".grid-stack-container").on('touchmove' + self._eventNamespace, function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			});
+		}
+
 	};
 
 	DropDownFieldEditor.prototype._createDropDown = function(source, selectedValue)
@@ -407,6 +415,9 @@
 		if (this._contextMenu)
 		{
 			this._contextMenu.$menuContainer.trigger("contextMenuClose");
+			if (TF.isMobileDevice && $(".grid-stack-container").length) {
+				$(".grid-stack-container").off('touchmove' + this._eventNamespace);
+			}
 		}
 	};
 
@@ -498,5 +509,8 @@
 		$(window).off(this._eventNamespace);
 		$(document).off(this._eventNamespace);
 		this._$parent.off(this._eventNamespace);
+		if (TF.isMobileDevice) {
+			$(".grid-stack-container").off('touchmove' + this._eventNamespace);
+		}		
 	};
 })();
