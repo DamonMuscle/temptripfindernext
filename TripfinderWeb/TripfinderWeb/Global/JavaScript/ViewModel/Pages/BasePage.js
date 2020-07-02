@@ -152,6 +152,10 @@
 						if ($(".kendoscheduler").length > 0) {
 							$(".kendoscheduler").getKendoScheduler().refresh();
 						}
+						if(self.isDetailViewEdited) {
+							self.isDetailViewEdited = false;
+							self.searchGrid.refreshClick();
+						}
 					}
 				}
 			});
@@ -166,7 +170,11 @@
 	BasePage.prototype.onEditRecordSuccessHandler = function(e, recordEntity)
 	{
 		var self = this;
-		self.searchGrid.refreshClick();
+		if(TF.isMobileDevice) {
+			self.isDetailViewEdited = true;
+		} else {
+			self.searchGrid.refreshClick();
+		}
 		self.detailView.refresh();
 	};
 
