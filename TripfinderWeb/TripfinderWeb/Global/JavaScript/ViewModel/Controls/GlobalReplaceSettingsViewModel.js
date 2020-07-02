@@ -997,7 +997,7 @@
 	{
 		var self = this,
 			categories, key,
-			dataPointObj = dataPointsJSON[self.gridType] || {},
+			dataPointObj = dataPointObj = self.getAllFields(),
 			fieldSources = [],
 			requiredFields,
 			filter = function(item)
