@@ -2,15 +2,19 @@
 {
 	createNamespace("TF.DetailView").UploadDocumentHelper = UploadDocumentHelper;
 
-	function UploadDocumentHelper(detailView)
+	function UploadDocumentHelper(detailView, noselected)
 	{
 		var self = this;
-		self.uploadHelper = new TF.UploadHelper({
+		var options = {
 			maxFileByteSize: UploadDocumentHelper.maxFileByteSize,
 			acceptFileExtensions: UploadDocumentHelper.acceptFileExtensions,
-			acceptMimeType: UploadDocumentHelper.acceptMimeType,
-			onFileSelected: self.onFileSelected.bind(self)
-		});
+			acceptMimeType: UploadDocumentHelper.acceptMimeType
+		}
+		if (noselected === undefined)
+		{
+			options.onFileSelected = self.onFileSelected.bind(self);
+		}
+		self.uploadHelper = new TF.UploadHelper(options);
 		self.uploader = null;
 		self.detailView = detailView;
 		self.$fileSelector = null;
@@ -154,6 +158,19 @@
 			}
 		});
 	};
+
+	UploadDocumentHelper.prototype.initHidden = function()
+	{
+		var self = this;
+		if (self.$fileSelector !== null)
+		{
+			return;
+		}
+		var $fileSelector = self.uploadHelper.createFileSelector("document-file-selector");
+		self.$fileSelector = $fileSelector;
+		self.uploadHelper.init($fileSelector);
+	};
+
 	UploadDocumentHelper.prototype._validateDocumentAttach = function()
 	{
 		var self = this, task = Promise.resolve(true);
@@ -228,6 +245,23 @@
 	UploadDocumentHelper.prototype.getFileStream = function()
 	{
 		return this.uploadHelper.getFileStream();
+	};
+
+	UploadDocumentHelper.prototype.selectFile = function(file)
+	{
+		var self = this;
+		self.uploadHelper.selectFile(file);
+	};
+
+	UploadDocumentHelper.prototype.uploadDocument = function(documentEntity)
+	{
+		var self = this;
+		self.selectFile(documentEntity.DocumentEntity.documentEntity);
+		return self.uploadHelper.upload().then(function(result)
+		{
+			documentEntity.TempFileName = result;
+			return documentEntity;
+		});
 	};
 
 	UploadDocumentHelper.prototype.dispose = function()

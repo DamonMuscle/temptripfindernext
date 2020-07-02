@@ -583,7 +583,14 @@
 		var self = this;
 		if (self.obDocumentAdd)
 		{
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document"), self.type, AttachedId, "documents"))
+			var paramData = {
+				databaseId: tf.storageManager.get("datasourceId"),
+				attachedToTypeID: tf.DataTypeHelper.getId(self.type),
+				attachedToID: AttachedId
+			}
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
+				paramData: paramData
+			})
 				.then(function(data)
 				{
 					var source = [];
@@ -594,6 +601,7 @@
 							if (gridData.FileName === item.FileName)
 							{
 								gridData.Id = item.Id;
+								gridData.DocumentEntity = item;
 								gridData.DocumentEntity.Id = item.Id;
 								if (isNew)
 								{
@@ -608,7 +616,7 @@
 					});
 					var source = self.obDocumentGridDataSource().filter(function(datasource)
 					{
-						return datasource.DocumentRelationshipEntities.length > 0;
+						return datasource.DocumentRelationshipEntities && datasource.DocumentRelationshipEntities.length > 0;
 					});
 					self.obDocumentGridDataSource(source);
 					self.obDocumentAdd = false;
@@ -1078,7 +1086,7 @@
 	{
 		var self = this;
 		var fieldTripID = this.obEntityDataModel().id();
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresourcegroup")), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtripresource")), {
 			paramData: {
 				"@relationships": "Vehicle,Driver,Aide",
 				"@filter": "eq(FieldTripId," + fieldTripID + ")"
@@ -1179,7 +1187,7 @@
 
 	FieldTripDataEntryViewModel.prototype.addResourceClick = function(type)
 	{
-		var options = {obRequiredFields: this.obRequiredFields};
+		var options = { obRequiredFields: this.obRequiredFields };
 		tf.modalManager.showModal(new TF.Modal.FieldTripResourceModalViewModel(this.obEntityDataModel().id(), null, null, null, options))
 			.then(function(data)
 			{
@@ -1351,7 +1359,7 @@
 		if (row.length)
 		{
 			var data = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
-			var options = {obRequiredFields: this.obRequiredFields};
+			var options = { obRequiredFields: this.obRequiredFields };
 			tf.modalManager.showModal(new e.data.modal(data, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData(),
 				this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null, options))
 				.then(function(data)

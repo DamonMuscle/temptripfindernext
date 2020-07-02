@@ -2,7 +2,7 @@
 {
 	createNamespace("TF").UploadHelper = UploadHelper;
 
-	function UploadHelper (options)
+	function UploadHelper(options)
 	{
 		var self = this;
 		self.options = options || {};
@@ -46,14 +46,8 @@
 
 	UploadHelper.prototype._validateAttachFileExtension = function(fileName)
 	{
-		var self = this,
-			index = fileName.lastIndexOf('.'),
-			extension = fileName.substr(index, fileName.length - index).toLowerCase(), result;
-
-		if (index > 0 && self.options.acceptFileExtensions.includes(extension))
-		{
-			result = true;
-		}
+		var self = this;
+		var result = TF.UploadHelper.ValidateAttachFileExtensionInner(fileName, self.options);
 
 		if (!result)
 		{
@@ -66,11 +60,12 @@
 
 	UploadHelper.prototype._validateAttachFileSize = function(size)
 	{
-		var result = size < this.options.maxFileByteSize;
+		var self = this,
+			result = TF.UploadHelper.ValidateAttachFileSizeInner(size, self.options);
 
 		if (!result)
 		{
-			var maxFileMBSize = parseInt(this.options.maxFileByteSize / 1024 / 1024);
+			var maxFileMBSize = parseInt(self.options.maxFileByteSize / 1024 / 1024);
 			tf.promiseBootbox.alert("File size must be less than " + maxFileMBSize + " MB.");
 		}
 
@@ -80,6 +75,24 @@
 	UploadHelper.prototype.validateFile = function(fileName, fileSize)
 	{
 		return this._validateAttachFileExtension(fileName) && this._validateAttachFileSize(fileSize);
+	};
+
+	UploadHelper.ValidateAttachFileExtensionInner = function(fileName, options)
+	{
+		var index = fileName.lastIndexOf('.'),
+			extension = fileName.substr(index, fileName.length - index).toLowerCase(), result;
+
+		if (index > 0 && options.acceptFileExtensions.includes(extension))
+		{
+			result = true;
+		}
+
+		return result;
+	};
+
+	UploadHelper.ValidateAttachFileSizeInner = function(size, options)
+	{
+		return size < options.maxFileByteSize;
 	};
 
 	UploadHelper.prototype.onSelect = function(e)

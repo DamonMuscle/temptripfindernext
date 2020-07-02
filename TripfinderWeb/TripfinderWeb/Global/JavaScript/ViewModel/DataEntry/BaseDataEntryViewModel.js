@@ -915,7 +915,7 @@
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)), {
 				paramData: {
 					id: this._view.id,
-					"@fields": "LastUpdate,Id"
+					"@fields": "LastUpdated,Id"
 				}
 			},
 				{ overlay: false })
@@ -1205,10 +1205,11 @@
 		});
 		if (fieldTripDocuments && fieldTripDocuments.length > 0)
 		{
+			var uploadHelper = new TF.DetailView.UploadDocumentHelper(null, true);
+			uploadHelper.initHidden();
 			fieldTripDocuments.forEach(function(document)
 			{
-				var uploadHelper = new TF.DetailView.UploadDocumentHelper();
-				promiseAll.push(uploadHelper.UploadDocument(document));
+				promiseAll.push(uploadHelper.uploadDocument(document));
 			});
 
 			return Promise.all(promiseAll).then(
