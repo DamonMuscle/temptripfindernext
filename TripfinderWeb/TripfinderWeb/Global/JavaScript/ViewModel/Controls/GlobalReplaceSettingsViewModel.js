@@ -322,9 +322,9 @@
 		if (self.obIsValueRequired())
 		{
 			validators["notEmpty"] =
-				{
-					message: 'required'
-				};
+			{
+				message: 'required'
+			};
 		}
 		result[type] = { trigger: "blur change", validators: validators };
 		return result;
@@ -997,7 +997,7 @@
 	{
 		var self = this,
 			categories, key,
-			dataPointObj = self.getAllFields(),
+			dataPointObj = dataPointsJSON[self.gridType] || {},
 			fieldSources = [],
 			requiredFields,
 			filter = function(item)
@@ -1053,8 +1053,18 @@
 				if (key == "User Defined") continue;
 				fieldSources = fieldSources.concat(dataPointObj[key].filter(filter));
 			}
-			fieldSources = Array.sortBy(fieldSources, "title");
-			return fieldSources;
+
+			return tf.UDFDefinition.udfHelper.get(self.gridType).then(function(items)
+			{
+				var definition = tf.UDFDefinition.collection.find(function(d) { return d.gridType == self.gridType; }) || {},
+					allFeilds = definition.userDefinedFields || [],
+					validFields = allFeilds.filter(function(f) { return f.UDFDataSources.some(function(d) { return d.DBID === tf.datasourceManager.databaseId }) }).map(function(f) { return f.OriginalName });
+				items = (items || []).filter(function(i) { return validFields.indexOf(i.field) > -1 });
+				fieldSources = fieldSources.concat(items.filter(filter));
+
+				fieldSources = Array.sortBy(fieldSources, "title");
+				return fieldSources;
+			});
 		});
 	};
 })();
