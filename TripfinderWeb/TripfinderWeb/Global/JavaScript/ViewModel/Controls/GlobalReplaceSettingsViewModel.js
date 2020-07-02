@@ -997,7 +997,7 @@
 	{
 		var self = this,
 			categories, key,
-			dataPointObj = dataPointObj = self.getAllFields(),
+			dataPointObj = self.getAllFields(),
 			fieldSources = [],
 			requiredFields,
 			filter = function(item)
