@@ -977,6 +977,130 @@
 						"format": "Note",
 						"maxLength": 200
 					}
+				},
+				{
+					"field": "BillingClassificationName",
+					"title": "Billing Classfication",
+					"type": "String",
+					"defaultValue": "BC Code",
+					"editType": {
+						"format": "DropDown",
+						"getSource": function()
+						{
+							return tf.fieldTripConfigsDataHelper.getAllConfigRecordsByType('bc').then(function(result)
+							{
+								return result.map(function(item)
+								{
+									return _.extend(item, {
+										'text': item["Classification"],
+										'value': item["Id"]
+									});
+								});
+							});
+						},
+						"allowNullValue": true,
+						"entityKey": "BillingClassificationId",
+						"relationshipKey": "FieldTripResourceGroup"
+					}
+				},
+				{
+					"field": "MileageRate",
+					"title": "Rate/mi",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "AideFixedCost",
+					"title": "Aide Fixed Cost",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "DriverFixedCost",
+					"title": "Driver Fixed Cost",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "VehFixedCost",
+					"title": "Vehicle Fixed Cost",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "DriverRate",
+					"title": "Driver Rate",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "DriverOtrate",
+					"title": "Driver OTRate",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "AideRate",
+					"title": "Bus Aide Rate",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "AideOtrate",
+					"title": "Aide OTRate",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
+				},
+				{
+					"field": "FixedCost",
+					"title": "Fixed Cost",
+					"type": "Number",
+					"format": "Money",
+					"defaultValue": "0.00",
+					"editType": {
+						"format": "Money",
+						"maxLength": 8
+					}
 				}
 			],
 			"Miscellaneous": [
@@ -987,6 +1111,42 @@
 					"editType": {
 						"format": "Note",
 						"maxLength": 2000
+					}
+				},
+				{
+					"field": "PublicNotes",
+					"title": "Public Notes",
+					"type": "Note",
+					"defaultValue": "Lorem ipsum dolor sit amet.",
+					"editType": {
+						"format": "Note",
+						"maxLength": 2000
+					}
+				},
+				{
+					"field": "FieldTripEquipmentName",
+					"title": "Equipments",
+					"type": "String",
+					"defaultValue": "",
+					"editType": {
+						"format": "ListMover",
+						"getSource": function()
+						{
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripEquipments"))
+								.then(function(result)
+								{
+									return result.Items.map(function(item)
+									{
+										return {
+											'text': item["EquipmentName"],
+											'value': item["Id"]
+										};
+									});
+								});
+						},
+						"allowNullValue": true,
+						"entityKey": "FieldTripEquipmentIds",
+						"relationshipKey": "FieldTripEquipment"
 					}
 				}
 			]
