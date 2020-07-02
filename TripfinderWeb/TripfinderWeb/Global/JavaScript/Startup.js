@@ -360,7 +360,15 @@
 										var candidateDB = dataSources.length > 0 ? dataSources[0] : {};
 
 										return tf.storageManager.save("datasourceId", candidateDB.DBID);
-									});
+									}).then(function()
+									{
+										return tf.datasourceManager.getDataSources();
+									})
+									.then(function()
+									{
+										tf.datasourceManager.setDatabaseInfo();
+										return true;
+								    });
 							};
 
 							return updateDataSourcePromise
@@ -382,6 +390,14 @@
 									{
 										return false;
 									}
+								}).then(function()
+								{
+									return tf.datasourceManager.getDataSources();
+								})
+								.then(function()
+								{
+									tf.datasourceManager.setDatabaseInfo();
+									return true;
 								});
 						})
 						.then(function(validateResult)

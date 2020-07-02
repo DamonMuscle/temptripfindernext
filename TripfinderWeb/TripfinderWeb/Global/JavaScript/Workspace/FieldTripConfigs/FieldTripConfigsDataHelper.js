@@ -15,7 +15,7 @@
 		// Add an event for notify/subscribe FieldTrip NextTripID changed 
 		self.nextTripIDChangedEvent = new TF.Events.Event();
 
-		//tf.datasourceManager.onDatabaseIdSet.subscribe(self.onDatabaseIdSet.bind(self));
+		tf.datasourceManager.onDatabaseIdSet.subscribe(self.onDatabaseIdSet.bind(self));
 	}
 
 	FieldTripConfigsDataHelper.prototype.constructor = FieldTripConfigsDataHelper;
