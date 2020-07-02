@@ -188,6 +188,7 @@
 			$(".grid-stack-container").on('touchmove' + self._eventNamespace, function (e) {
 				e.preventDefault();
 				e.stopPropagation();
+				return false;
 			});
 		}
 
