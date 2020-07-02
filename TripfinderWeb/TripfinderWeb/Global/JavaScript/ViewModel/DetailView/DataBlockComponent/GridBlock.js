@@ -1806,7 +1806,8 @@
 
 	GridBlock.prototype.editFieldTripResource = function(grid, e)
 	{
-		if (this.isReadOnly())
+		if (this.isReadOnly() || 
+			!gridConfigsMap["FieldTripResourceGrid"].checkPermission())
 		{
 			return;
 		}
