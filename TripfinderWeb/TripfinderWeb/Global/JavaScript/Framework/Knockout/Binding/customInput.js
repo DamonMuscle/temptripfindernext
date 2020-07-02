@@ -42,6 +42,10 @@
 				return new TF.Input.PhoneExtBox(initialValue, attributes, disable, events);
 			case "Select":
 				return new TF.Input.SelectBox(initialValue, attributes, disable, events);
+			case "PhoneExt":
+				return new TF.Input.PhoneExtBox(initialValue, attributes, disable, events);
+			case "ListMover":
+				return new TF.Input.ListMoverBox(initialValue, attributes, disable, nowrap, events);
 		}
 	}
 
@@ -72,6 +76,10 @@
 				ko.virtualElements.insertAfter(element, $element[i]);
 			}
 			input.afterRender();
+			if (input.events && input.events.lineAutoFit)
+			{
+				input.events.lineAutoFit(input);
+			}
 			if (!ko.isComputed(bindingValue.value))
 			{
 				input.onValueChange.subscribe(function(e, value)
