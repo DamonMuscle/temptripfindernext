@@ -42,11 +42,7 @@
 		},
 		"FieldTripResourceGrid": {
 			checkPermission: function() { 
-				var hasFieldTripPermission = tf.authManager.isAuthorizedForDataType("fieldtrip", ["add", "edit"]);
-				var hasStaffPermission = tf.authManager.isAuthorizedFor("staff", ["add", "edit"]);
-				var hasVehiclePermission = tf.authManager.isAuthorizedFor("vehicle", ["add", "edit"]);
-
-				return hasFieldTripPermission && hasStaffPermission && hasVehiclePermission;
+				return tf.authManager.authorizationInfo.isAdmin;
 			},
 			btnClass: "add-fieldtrip-resource",
 			btnLabel: "Add"
