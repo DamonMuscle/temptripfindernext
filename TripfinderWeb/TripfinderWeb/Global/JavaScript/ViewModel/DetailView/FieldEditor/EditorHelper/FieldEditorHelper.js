@@ -2181,7 +2181,6 @@
 				return values.every(function(item)
 				{
 					return item.isValid();
-					//return moment(item).isValid();
 				});
 			default:
 				return values.every(function(item)
