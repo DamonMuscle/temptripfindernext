@@ -1,19 +1,19 @@
 (function()
 {
 	createNamespace("TF").FieldTripStageEnum =
-		{
-			level1RequestSubmitted: 1,
-			level2RequestDeclined: 2,
-			level2RequestApproved: 3,
-			level3RequestDeclined: 4,
-			level3RequestApproved: 5,
-			level4RequestDeclined: 6,
-			level4RequestApproved: 7,
-			DeclinedByTransportation: 98,
-			TransportationApproved: 99,
-			RequestCanceled: 100,
-			RequestCompleted: 101,
-		};
+	{
+		level1RequestSubmitted: 1,
+		level2RequestDeclined: 2,
+		level2RequestApproved: 3,
+		level3RequestDeclined: 4,
+		level3RequestApproved: 5,
+		level4RequestDeclined: 6,
+		level4RequestApproved: 7,
+		DeclinedByTransportation: 98,
+		TransportationApproved: 99,
+		RequestCanceled: 100,
+		RequestCompleted: 101,
+	};
 })();
 
 (function()
@@ -107,11 +107,15 @@
 		return permittedLevels.indexOf(stageId) >= 0;
 	};
 
-	FieldTripAuthHelper.prototype.getHighestEditRightSecuredItem = function () {
+	FieldTripAuthHelper.prototype.getHighestEditRightSecuredItem = function()
+	{
 		var highest;
-		allSecuredItems.some(function (item) {
-			return editableRights.some(function (right) {
-				if (tf.authManager.authorizationInfo.isAuthorizedFor(item, right)) {
+		allSecuredItems.some(function(item)
+		{
+			return editableRights.some(function(right)
+			{
+				if (tf.authManager.authorizationInfo.isAuthorizedFor(item, right))
+				{
 					highest = item;
 					return true;
 				}
@@ -164,6 +168,23 @@
 		var securedItem = this.getHighestRightsSecuredItem();
 
 		return this._getPermittedLevels(securedItem);
+	};
+
+	FieldTripAuthHelper.prototype.getEditableFieldTrips = function(items)
+	{
+		return $.grep(items, function(item, index)
+		{
+			if (!item || item.FieldTripStageId === null) return false;
+			if (tf.authManager.authorizationInfo.isAdmin) return true;
+			var securedItems = stageSecuredItemsMap[item.FieldTripStageId] || [];
+			return securedItems.some(function(item)
+			{
+				return editableRights.some(function(right)
+				{
+					return tf.authManager.authorizationInfo.isAuthorizedFor(item, right);
+				});
+			});
+		});
 	};
 
 	FieldTripAuthHelper.prototype.getHighestRightsSecuredItem = function(rights)
