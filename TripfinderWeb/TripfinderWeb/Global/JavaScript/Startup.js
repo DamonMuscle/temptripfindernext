@@ -469,6 +469,8 @@
 								{
 									tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
 									self.changePermissions();
+									tf.fieldTripConfigsDataHelper.CacheConfigs();
+
 									tf.pageManager = new TF.Page.PageManager();
 									var promise;
 									if (!TF.isPhoneDevice)
