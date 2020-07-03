@@ -1020,10 +1020,6 @@
 	FieldTripDataEntryViewModel.prototype.loadResources = function()
 	{
 		var self = this;
-		var ownedFieldTripPermission = tf.authManager.isAuthorizedForDataType("fieldtrip", ["add", "edit"]);
-		var ownedStaffPermission = tf.authManager.isAuthorizedFor("staff", ["add", "edit"]);
-		var ownedVehiclePermission = tf.authManager.isAuthorizedFor("vehicle", ["add", "edit"]);
-		var ownedResourcePermission = ownedFieldTripPermission && ownedStaffPermission && ownedVehiclePermission;
 
 		if (this.obMode() === "Edit")
 		{
@@ -1072,8 +1068,8 @@
 				this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
 				if (!tf.authManager.authorizationInfo.isFieldTripAdmin)
 				{
-					this.obResourcesGridViewModel().obEditEnable(ownedResourcePermission);
-					this.obResourcesGridViewModel().obCanAdd(ownedResourcePermission);
+					this.obResourcesGridViewModel().obEditEnable(false);
+					this.obResourcesGridViewModel().obCanAdd(false);
 				}
 			}.bind(this));
 		}
@@ -1082,8 +1078,8 @@
 			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
 			if (!tf.authManager.authorizationInfo.isFieldTripAdmin)
 			{
-				this.obResourcesGridViewModel().obEditEnable(ownedResourcePermission);
-				this.obResourcesGridViewModel().obCanAdd(ownedResourcePermission);
+				this.obResourcesGridViewModel().obEditEnable(false);
+				this.obResourcesGridViewModel().obCanAdd(false);
 			}
 		}
 	};
