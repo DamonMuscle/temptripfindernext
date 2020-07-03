@@ -402,6 +402,10 @@
 			$el = $(el),
 			tfModal = $el.closest('.tfmodal'),
 			dialog = $el.closest('.modal-dialog');
+		if(TF.isMobileDevice && !dialog.hasClass("modal-dialog-lg-mobile"))
+		{
+			dialog.addClass("modal-dialog-lg-mobile");
+		}
 		if (dialog.attr("class").indexOf("modal-fullscreen") === -1)
 		{
 			dialog.find('.modal-body').css("max-height", window.innerHeight - 28 - 41 - 46 - 5);
