@@ -7,7 +7,7 @@
 		entity: null,
 		messages: []
 	};
-	var FIELD_WITH_WIDGET = ["ListMover", "DropDown", "GroupDropDown", "BooleanDropDown"];
+	var FIELD_WITH_WIDGET = ["ListMover", "DropDown", "GroupDropDown", "BooleanDropDown", "ComboBox"];
 	var CUSTOM_TAB_INDEX_ATTR = "customized-tabindex";
 	var FIELD_ELEMENT_CLASS = {
 		REGULAR: {
@@ -35,6 +35,7 @@
 		self.UDF_KEY = "UserDefinedFields";
 		self.VALIDATE_ERROR_CLASS = "validateError";
 	};
+
 
 	FieldEditorHelper.prototype.constructor = FieldEditorHelper;
 
@@ -342,18 +343,11 @@
 	{
 		var self = this;
 		$(document).off(self.eventNameSpace);
-		if (self._detailView)
-		{
-			var $rightContainer = self._detailView.$element.find(".right-container");
-			if ($rightContainer.length)
-			{
-				$($rightContainer).off(self.eventNameSpace);
-			}
+		$(self._detailView.$element.find(".right-container")).off(self.eventNameSpace);
 
-			if (self._detailView.onResizePage)
-			{
-				self._detailView.onResizePage.unsubscribeAll();
-			}
+		if (self._detailView.onResizePage)
+		{
+			self._detailView.onResizePage.unsubscribeAll();
 		}
 	};
 
@@ -448,6 +442,7 @@
 			case "BooleanDropDown":
 				self._updateBoolFieldsContent($currentElement);
 				break;
+			case "ComboBox":
 			case "DropDown":
 			case "GroupDropDown":
 				self._updateGeneralFieldsContent(fieldName, text, initParams);
@@ -506,14 +501,14 @@
 			}) : Promise.resolve(false);
 	};
 
-	FieldEditorHelper.prototype.editStart = function($target, event, showWidget)
+	FieldEditorHelper.prototype.editStart = function($target, $element, event, showWidget)
 	{
 		var self = this, detailView = self._detailView;
 
 		if (!detailView.isReadMode() || self.disabled) return;
 
-		var $dataElement = self.getFieldContainerElement($target),
-			$content = self.getFieldContentElement($target),
+		var $dataElement = self.getFieldContainerElement($element),
+			$content = self.getFieldContentElement($element),
 			data = $dataElement.data(),
 			options = $.extend({
 				recordEntity: detailView.recordEntity,
@@ -527,27 +522,28 @@
 
 
 		options.defaultValue = (options.recordEntity === null) ?
-			self.getNewRecordDefaultValue($target.parent(), data) : self.getDefaultValue(data, options.recordEntity);
+			self.getNewRecordDefaultValue($element.parent(), data) : self.getDefaultValue(data, options.recordEntity);
 
-		if (options.format === "DropDown" && typeof (options.allowInput) === "function" && options.allowInput())
-		{
-			options.format = "ComboBox";
-		}
-
-		$content.css({
-			border: 'none',
-			outline: 'none'
-		});
-
-		var show = FIELD_WITH_WIDGET.includes(options.format);
-		if (show && event === 'click')
+		if (FIELD_WITH_WIDGET.includes(options.format) && event === 'click')
 		{
 			options.showWidget = true;
+
+			const { allowInput } = options;
+
+			if (options.format === "DropDown"
+				&& ((typeof allowInput === "function" && allowInput())
+					|| (typeof allowInput === "boolean" && allowInput)))
+			{
+				options.format = "ComboBox";
+				options.showWidget = $target.hasClass("editor-icon");
+			}
 		}
+
+		$content.css({ border: 'none', outline: 'none' });
 
 		self._editor = self._createEditor(options.format);
 		options.editFieldList = self.editFieldList;
-		self._editor.editStart($target, options);
+		self._editor.editStart($element, options);
 	};
 
 	/**
@@ -670,6 +666,7 @@
 						self.editFieldList["AllStaffTypes"] = { value: result.recordValue };
 					}
 					break;
+				case "ComboBox":
 				case "DropDown":
 				case "GroupDropDown":
 					obj.value = result.selectPickListOptionIDs[0];
@@ -1007,6 +1004,10 @@
 			uniqueCheckErrors = self._checkCodeMustBeUnique(recordEntity, uniqueObjects).filter(function(uniqueError)
 			{
 				return customErrorFieldMap[uniqueError.fieldName] === undefined;
+			}),
+			crossValidateErrors = self._checkCodeMustBeUnique(recordEntity, uniqueObjects).filter(function(uniqueError)
+			{
+				return customErrorFieldMap[uniqueError.fieldName] === undefined;
 			});
 
 		return self.validateEntityByType(recordEntity, dataType, isCreateRecord)
@@ -1214,94 +1215,105 @@
 	 */
 	FieldEditorHelper.prototype._doSave = function(gridType, recordEntity, saveResponse, isNew)
 	{
-		var self = this, url,
-			relationships = self.getEditFieldRelationshipsStr(),
-			endpoint = tf.dataTypeHelper.getEndpoint(gridType);
+		const self = this, prepareTask = self.prepareEntityBeforeSave(recordEntity);
 
-		// Include UDF in relationship if needed.
-		if (recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") < 0)
-		{
-			relationships += (!relationships ? "UDF" : ",UDF");
-		}
-		if (gridType === "fieldtrip")
-		{
-			relationships += (!relationships ? "all" : ",all");
-		}
-
-		// Add relationships in request url.
-		if (!!relationships)
-		{
-			endpoint += String.format("?@relationships={0}", relationships);
-		}
-
-		// Generate requests url and parameters.
-		if (gridType === "contact")
-		{
-			url = pathCombine(tf.api.apiPrefixWithoutDatabase(), endpoint);
-			recordEntity.DataTypeID = tf.dataTypeHelper.getId(gridType);
-		}
-		else
-		{
-			if (gridType === "document" && recordEntity.DocumentRelationships === undefined)
+		return Promise.resolve(prepareTask)
+			.then(() =>
 			{
-				recordEntity.DocumentRelationships = [];
-			}
+				let url,
+					relationships = self.getEditFieldRelationshipsStr(),
+					endpoint = tf.dataTypeHelper.getEndpoint(gridType);
 
-			url = pathCombine(tf.api.apiPrefix(), endpoint);
-		}
-
-		tf.loadingIndicator.show();
-		return self.automation(gridType, recordEntity).then(function()
-		{
-			// Send request
-			return tf.promiseAjax[isNew ? "post" : "put"](url, {
-				data: [self.handleData(recordEntity)],
-				handleData: function(key, value)
+				// Include UDF in relationship if needed.
+				if (recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") < 0)
 				{
-					// Shape is geometry, shouldn't pass to server.
-					return (key === "Shape") ? null : value;
+					relationships += (!relationships ? "UDF" : ",UDF");
 				}
-			}).then(function(response)
-			{
-				// Confirm with Ted: comment these codes because the logic is incorrect and causes errors, we will touch them later.
-				//return self.findSchedule(gridType, recordEntity).then(function()
-				//{
-				tf.loadingIndicator.tryHide();
-
-				var savedEntity = response.Items[0];
-
-				if (isNew) return savedEntity;
-
-				return self.unassignedCrossStudent(gridType, savedEntity).then(function()
+				if (gridType === "fieldtrip")
 				{
-					self.entityModified = true;
-					self.refresh();
+					relationships += (!relationships ? "all" : ",all");
+				}
 
-					// Save successfully.
-					return savedEntity;
+				if (gridType === "trip" && recordEntity.Id == 0)
+				{
+					relationships += (!relationships ? "TripStop" : ",TripStop");
+				}
+
+				// Add relationships in request url.
+				if (!!relationships)
+				{
+					endpoint += String.format("?@relationships={0}", relationships);
+				}
+
+				// Generate requests url and parameters.
+				if (gridType === "contact")
+				{
+					url = pathCombine(tf.api.apiPrefixWithoutDatabase(), endpoint);
+					recordEntity.DataTypeID = tf.dataTypeHelper.getId(gridType);
+				}
+				else
+				{
+					if (gridType === "document" && recordEntity.DocumentRelationships === undefined)
+					{
+						recordEntity.DocumentRelationships = [];
+					}
+
+					url = pathCombine(tf.api.apiPrefix(), endpoint);
+				}
+
+				tf.loadingIndicator.show();
+				return self.automation(gridType, recordEntity).then(function()
+				{
+					// Send request
+					return tf.promiseAjax[isNew ? "post" : "put"](url, {
+						data: [self.handleData(recordEntity)],
+						handleData: function(key, value)
+						{
+							// Shape is geometry, shouldn't pass to server.
+							return (key === "Shape") ? null : value;
+						}
+					}).then(function(response)
+					{
+						// Confirm with Ted: comment these codes because the logic is incorrect and causes errors, we will touch them later.
+						//return self.findSchedule(gridType, recordEntity).then(function()
+						//{
+						tf.loadingIndicator.tryHide();
+
+						var savedEntity = response.Items[0];
+
+						if (isNew) return savedEntity;
+
+						return self.unassignedCrossStudent(gridType, savedEntity).then(function()
+						{
+							self.entityModified = true;
+							self.refresh();
+
+							// Save successfully.
+							return savedEntity;
+						});
+						//});
+					}).catch(function(response)
+					{
+						// Save api request failed.
+						tf.loadingIndicator.tryHide();
+						return ('API Error: ' + response.Message);
+					});
+				}).then(function(saveResult)
+				{
+					if (typeof saveResult === "string")
+					{
+						saveResponse.success = false;
+						saveResponse.messages = [saveResult];
+					}
+					else
+					{
+						saveResponse.success = true;
+						saveResponse.entity = saveResult;
+					}
+
+					return saveResponse;
 				});
-				//});
-			}).catch(function(response)
-			{
-				// Save api request failed.
-				tf.loadingIndicator.tryHide();
-				return ('API Error: ' + response.Message);
 			});
-		}).then(function(saveResult)
-		{
-			if (typeof saveResult === "string")
-			{
-				saveResponse.success = false;
-				saveResponse.messages = [saveResult];
-			}
-			else
-			{
-				saveResponse.success = true;
-				saveResponse.entity = saveResult;
-			}
-
-			return saveResponse;
-		});
 	};
 
 	FieldEditorHelper.prototype.unassignedCrossStudent = function(gridType, entity)
@@ -1504,7 +1516,7 @@
 		Promise.resolve(promise).then(function()
 		{
 			var $nextEditElement = self.getBlockEditElement($nextBlock);
-			self.editStart($nextEditElement, "tab", false);
+			self.editStart(null, $nextEditElement, "tab", false);
 		});
 	};
 
@@ -1638,12 +1650,11 @@
 			],
 			selectorStr = editableElementSelectors.join(",");
 
-		$(document).on(eventName)
-
 		$(document).on(eventName, selectorStr,
-			function(e)
+			e =>
 			{
-				var fieldElement, contentElement, showWidget = false,
+				var fieldElement, contentElement,
+					showWidget = false,
 					$curTarget = $(e.currentTarget),
 					isMulti = $curTarget.hasClass(FIELD_ELEMENT_CLASS.GROUP.CONTAINER);
 
@@ -1659,13 +1670,14 @@
 					showWidget = fieldElement.find(".item-content").hasClass("editor-icon");
 				}
 
-				self.initFieldEditor(fieldElement, contentElement, 'click', showWidget);
+				self.initFieldEditor(e.target, fieldElement, contentElement, 'click', showWidget);
 			});
 	};
 
-	FieldEditorHelper.prototype.initFieldEditor = function(fieldElement, contentElement, eventType, showWidget)
+	FieldEditorHelper.prototype.initFieldEditor = function(targetElement, fieldElement, contentElement, eventType, showWidget)
 	{
 		var self = this,
+			$target = $(targetElement),
 			$field = $(fieldElement),
 			$content = $(contentElement),
 			activeDetailViewElement = self._detailView.$element[0],
@@ -1675,7 +1687,7 @@
 		// field element is on active detail view and does not have editor initialized.
 		if (isOnActivePanel && isNotInit)
 		{
-			self.editStart($content, eventType, showWidget);
+			self.editStart($target, $content, eventType, showWidget);
 
 			if (eventType === "validate")
 			{
@@ -1798,18 +1810,21 @@
 						return obj.Id === item.Id
 					})[0];
 
-					if (!!field)
+					if (field)
 					{
 						if (item.AlternateKey)
 						{
 							field[item.AlternateKey] = item[item.AlternateKey];
 						}
+
 						if (field.Type == "Phone Number")
 						{
 							field['RecordValue'] = item.RecordValue.replace(/\D/g, '');
 						}
 						else
+						{
 							field['RecordValue'] = item.RecordValue;
+						}
 					}
 				});
 			}
@@ -1940,6 +1955,28 @@
 		return errorMessages;
 	};
 
+	FieldEditorHelper.prototype._crossCheck = function(recordEntity, uniqueObjects)
+	{
+		var errorMessages = [],
+			uniqueFields = uniqueObjects ? Object.keys(uniqueObjects) : [];
+
+		if (Array.isArray(uniqueFields) && uniqueFields.length > 0)
+		{
+			uniqueFields.map(function(field)
+			{
+				var obj = uniqueObjects[field],
+					value = recordEntity[field];
+
+				if (obj.values.includes(value))
+				{
+					errorMessages.push({ fieldName: field, message: obj.title + " must be unique." });
+				}
+			});
+		}
+
+		return errorMessages;
+	};
+
 	/**
 	 * TODO: remove this function
 	 */
@@ -1961,13 +1998,13 @@
 
 	FieldEditorHelper.prototype.DateTime2TimeConvertor = function(datetime)
 	{
-		if(!datetime)
+		if (!datetime)
 		{
 			return datetime;
 		}
 
 		var time = moment(datetime).format("HH:mm:ss");
-		if(time === "Invalid date")
+		if (time === "Invalid date")
 		{
 			time = datetime;
 		}
@@ -2040,8 +2077,8 @@
 		var relatedDataBlockSetting = tf.helpers.detailViewHelper.getDataPointByIdentifierAndGrid(map.relatedField, self.dataType);
 		var value = self.getValueFromRelatedField(relatedDataBlockSetting, map);
 
-		leftValue = transformToComparable(self.DateTime2TimeConvertor(fieldValue), map.option);
-		rightvalue = transformToComparable(self.DateTime2TimeConvertor(value), map.option);
+		leftValue = transformToComparable(fieldValue, map.option);
+		rightvalue = transformToComparable(value, map.option);
 		var valArray = [leftValue, rightvalue];
 
 		if (!checkValuesValidity(valArray, map.option))
@@ -2095,6 +2132,11 @@
 			return self.getDefaultValue(dataBlockSetting, recordEntity);
 		}
 	}
+
+	FieldEditorHelper.prototype.prepareEntityBeforeSave = function(entity)
+	{
+		// Override
+	};
 
 	FieldEditorHelper.prototype.dispose = function()
 	{
