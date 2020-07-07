@@ -55,14 +55,14 @@
 		<div class="row">
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Mileage Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obMileageRate,attributes:{class:"form-control",name:"mileagerate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields() && obRequiredFields().MileageRate ? 'requirestar' : null">Mileage Rate</label>
+					<!-- ko customInput:{type:"Decimal",value: obMileageRate,attributes:{ required: obRequiredFields()&&obRequiredFields().MileageRate?true:false,class:"form-control",name:"mileagerate",maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Fixed Cost</label>
-					<!-- ko customInput:{type:"Decimal",value:obVehicleFixedCost,attributes:{class:"form-control",name:"fixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().VehFixedCost?'requirestar':null">Fixed Cost</label>
+					<!-- ko customInput:{type:"Decimal",value:obVehicleFixedCost,attributes:{ required: obRequiredFields() && obRequiredFields().VehFixedCost?true:false,class:"form-control",name:"fixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 		</div>
@@ -115,8 +115,8 @@
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingRate,attributes:{class:"form-control",name:"driverbillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().DriverRate?'requirestar':null">Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingRate,attributes:{ required: obRequiredFields() && obRequiredFields().DriverRate?true:false,class:"form-control",name:"driverbillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -135,8 +135,8 @@
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>OT Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTRate,attributes:{class:"form-control",name:"driverbillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().DriverOtrate?'requirestar':null">OT Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTRate,attributes:{ required: obRequiredFields() && obRequiredFields().DriverOtrate?true:false,class:"form-control",name:"driverbillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -149,8 +149,8 @@
 		<div class="row">
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Fixed Cost</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingFixedCost,attributes:{class:"form-control",name:"driverbillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().DriverFixedCost?'requirestar':null">Fixed Cost</label>
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingFixedCost,attributes:{ required: obRequiredFields() && obRequiredFields().DriverFixedCost?true:false,class:"form-control",name:"driverbillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 		</div>
@@ -244,8 +244,8 @@
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingRate,attributes:{class:"form-control",name:"aidebillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().AideRate?'requirestar':null">Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingRate,attributes:{ required: obRequiredFields() && obRequiredFields().AideRate?true:false,class:"form-control",name:"aidebillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -264,8 +264,8 @@
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>OT Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTRate,attributes:{class:"form-control",name:"aidebillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().AideOtrate?'requirestar':null">OT Rate</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTRate,attributes:{ required: obRequiredFields() && obRequiredFields().AideOtrate?true:false,class:"form-control",name:"aidebillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -278,8 +278,8 @@
 		<div class="row">
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Fixed Cost</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingFixedCost,attributes:{class:"form-control",name:"aidebillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<label data-bind="css:obRequiredFields()&&obRequiredFields().AideFixedCost?'requirestar':null">Fixed Cost</label>
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingFixedCost,attributes:{ required: obRequiredFields() && obRequiredFields().AideFixedCost?true:false,class:"form-control",name:"aidebillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
 				</div>
 			</div>
 		</div>

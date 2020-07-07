@@ -59,7 +59,7 @@
 		additional: 1
 	};
 
-	function GridBlock(options, detailView)
+	function GridBlock(options, detailView, config = {})
 	{
 		var self = this;
 
@@ -70,6 +70,7 @@
 		self.pubSubSubscriptions = [];
 
 		self.options = options;
+		self.config = config;
 		self.gridBlockType = options.field;
 		self.extraGridConfigs = self.getExtraGridConfigurations(options.field, detailView._getLayoutObjInCache().width);
 		self.$detailView = detailView.$element;
@@ -1822,7 +1823,8 @@
 				isNew: isNew,
 				entity: fieldtripResource,
 				fieldtrip: self.recordEntity,
-				BillingClassification: self.detailView.fieldEditorHelper.getFieldValue("BillingClassification")
+				BillingClassification: self.detailView.fieldEditorHelper.getFieldValue("BillingClassification"),
+				requiredFields: self.config.requiredFields
 			};
 
 		if (!self.recordEntity)
@@ -1839,7 +1841,7 @@
 					return;
 				}
 				var newRes = self.detailView.fieldEditorHelper.getFieldValue("FieldTripResourceGroups") || [];
-				var editedRes = newRes.filter(function(r) { return r.Id === result.Id });
+				var editedRes = newRes.filter(function(r) { return r.Id === result.Id; });
 				if (editedRes.length == 0)
 				{
 					newRes.push(result);
@@ -1850,7 +1852,7 @@
 				self.fieldEditorHelper.editFieldList["FieldTripResourceGroups"] = {
 					value: newRes,
 					blockName: "FieldTripResourceGroups"
-				}
+				};
 
 				if (!self.recordEntity) self.detailView.obEditing(true);
 				self.fieldEditorHelper.recalculateFieldTripCosts();
