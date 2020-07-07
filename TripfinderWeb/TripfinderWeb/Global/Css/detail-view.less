@@ -1199,6 +1199,9 @@
         .sub-title {
           color: #777777;
           .fontSize(1, 1);
+		  text-overflow: ellipsis;
+		  overflow: hidden;
+		  white-space: nowrap;
         }
 
         .type-selector {
@@ -1296,7 +1299,7 @@
         float: left;
         .fontSize(1, 2);
         position: relative;
-        z-index: 3;
+        z-index: 9;
 
         .dropdown-menu {
           .dropdown-menu-template;
