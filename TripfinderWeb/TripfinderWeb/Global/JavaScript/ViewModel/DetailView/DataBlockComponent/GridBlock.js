@@ -41,8 +41,9 @@
 			btnLabel: "Add"
 		},
 		"FieldTripResourceGrid": {
-			checkPermission: function() { 
-				return tf.authManager.authorizationInfo.isAdmin;
+			checkPermission: function()
+			{
+				return tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin;
 			},
 			btnClass: "add-fieldtrip-resource",
 			btnLabel: "Add"
@@ -177,7 +178,7 @@
 			};
 			self.kendoGridActions.contactrelationships = {
 				delete: self.removeContactAssociation.bind(self)
-			};		
+			};
 		}
 
 		// set on demand action
@@ -1505,54 +1506,20 @@
 					"DBID": tf.datasourceManager.databaseId
 				};
 				return TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId(dataItem.idField, dataItem.tripType, self.recordId)
-				.then(function(result)
-				{
-					if (columnFields.indexOf("Id") === -1)
-					{
-						columnFields.push("Id");
-					}
-
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
-						data: {
-							fields: columnFields,
-							filterClause: "",
-							filterSet: null,
-							idFilter: {
-								IncludeOnly: result.length > 0 ? result : [-1],
-								ExcludeAny: []
-							},
-							sortItems: [{
-								Name: "Id",
-								isAscending: "asc",
-								Direction: "Ascending"
-							}]
-						}
-					});
-				});
-			case "AllTripStopGrid":
-				var p1 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("PUStopId", "am", self.recordId),
-					p2 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "pm", self.recordId),
-					p3 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("PUStopId", "amtransfer", self.recordId),
-					p4 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "pmtransfer", self.recordId),
-					p5 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "shuttle", self.recordId);
-					return Promise.all([p1,p2,p3,p4,p5]).then(function(response)
+					.then(function(result)
 					{
 						if (columnFields.indexOf("Id") === -1)
 						{
 							columnFields.push("Id");
 						}
 
-						var includeIds = [];
-						response.forEach(result => {
-							includeIds = includeIds.concat(result);
-						});
 						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
 							data: {
 								fields: columnFields,
 								filterClause: "",
 								filterSet: null,
 								idFilter: {
-									IncludeOnly: includeIds.length > 0 ? includeIds : [-1],
+									IncludeOnly: result.length > 0 ? result : [-1],
 									ExcludeAny: []
 								},
 								sortItems: [{
@@ -1563,6 +1530,41 @@
 							}
 						});
 					});
+			case "AllTripStopGrid":
+				var p1 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("PUStopId", "am", self.recordId),
+					p2 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "pm", self.recordId),
+					p3 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("PUStopId", "amtransfer", self.recordId),
+					p4 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "pmtransfer", self.recordId),
+					p5 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "shuttle", self.recordId);
+				return Promise.all([p1, p2, p3, p4, p5]).then(function(response)
+				{
+					if (columnFields.indexOf("Id") === -1)
+					{
+						columnFields.push("Id");
+					}
+
+					var includeIds = [];
+					response.forEach(result =>
+					{
+						includeIds = includeIds.concat(result);
+					});
+					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
+						data: {
+							fields: columnFields,
+							filterClause: "",
+							filterSet: null,
+							idFilter: {
+								IncludeOnly: includeIds.length > 0 ? includeIds : [-1],
+								ExcludeAny: []
+							},
+							sortItems: [{
+								Name: "Id",
+								isAscending: "asc",
+								Direction: "Ascending"
+							}]
+						}
+					});
+				});
 			default:
 				paramData = {};
 				urlNode = tf.dataTypeHelper.getEndpoint(dataItem.url);
@@ -1802,7 +1804,7 @@
 
 	GridBlock.prototype.editFieldTripResource = function(grid, e)
 	{
-		if (this.isReadOnly() || 
+		if (this.isReadOnly() ||
 			!gridConfigsMap["FieldTripResourceGrid"].checkPermission())
 		{
 			return;
