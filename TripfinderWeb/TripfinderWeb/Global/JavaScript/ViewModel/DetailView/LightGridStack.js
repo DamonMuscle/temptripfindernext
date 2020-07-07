@@ -220,7 +220,7 @@
 				// add validator for required fields
 				self.appendValidatorForRequiredField(requiredFields, item);
 
-				self._addDataBlocks(item, {requiredFields: requiredFields});
+				self._addDataBlocks(item);
 			});
 		}
 
@@ -722,7 +722,7 @@
 		}
 	};
 
-	LightGridStack.prototype.generateDataBlock = function(item, options)
+	LightGridStack.prototype.generateDataBlock = function(item)
 	{
 		var self = this,
 			dataBlockStyles = self.getDataBlockStyles(item),
@@ -751,7 +751,7 @@
 			case "Calendar":
 				return new TF.DetailView.DataBlockComponent.CalendarBlock(item, self.detailView, self.$wrapper);
 			case "grid":
-				return new TF.DetailView.DataBlockComponent.GridBlock(item, self.detailView, options);
+				return new TF.DetailView.DataBlockComponent.GridBlock(item, self.detailView);
 			case "RecordPicture":
 				return new TF.DetailView.DataBlockComponent.RecordPictureBlock(self.getRawDataBlockValue(item), item, dataBlockStyles, self.$wrapper, self.detailView);
 			case "Schedule":
@@ -785,7 +785,7 @@
 		}
 	};
 
-	LightGridStack.prototype._addDataBlocks = function(item, options)
+	LightGridStack.prototype._addDataBlocks = function(item)
 	{
 		var self = this;
 
@@ -798,7 +798,7 @@
 				self.lineBlockHelper.addVertiLine(item.x, item.y, item.h);
 				break;
 			default:
-				self.addBlock(self.generateDataBlock(item, options));
+				self.addBlock(self.generateDataBlock(item));
 				break;
 		}
 

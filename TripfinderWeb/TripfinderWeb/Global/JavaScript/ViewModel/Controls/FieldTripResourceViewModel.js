@@ -2,13 +2,9 @@
 {
 	createNamespace('TF.Control').FieldTripResourceViewModel = FieldTripResourceViewModel;
 
-	function FieldTripResourceViewModel (source, id, resourceGroupDate, obFieldTrip, options)
+	function FieldTripResourceViewModel (source, id, resourceGroupDate, obFieldTrip)
 	{
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripResourceDataModel(source));
-
-		options = options || {};
-		this.obRequiredFields = options.obRequiredFields || ko.observable();
-
 		this.obEntityDataModel().fieldTripId(id);
 		this.obVehicleSource = ko.observableArray();
 		this.obDriverSource = ko.observableArray();

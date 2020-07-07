@@ -1189,8 +1189,7 @@
 
 	FieldTripDataEntryViewModel.prototype.addResourceClick = function(type)
 	{
-		var options = { obRequiredFields: this.obRequiredFields };
-		tf.modalManager.showModal(new TF.Modal.FieldTripResourceModalViewModel(this.obEntityDataModel().id(), null, null, null, options))
+		tf.modalManager.showModal(new TF.Modal.FieldTripResourceModalViewModel(this.obEntityDataModel().id()))
 			.then(function(data)
 			{
 				if (data)
@@ -1338,9 +1337,8 @@
 
 	FieldTripDataEntryViewModel.prototype.addEvent = function(e)
 	{
-		var options = { obRequiredFields: this.obRequiredFields };
 		tf.modalManager.showModal(new e.data.modal(null, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData(),
-			this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null, options))
+			this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null))
 			.then(function(data)
 			{
 				if (data)
@@ -1361,9 +1359,8 @@
 		if (row.length)
 		{
 			var data = e.data.gridView().obGridViewModel().searchGrid.kendoGrid.dataItem(row);
-			var options = { obRequiredFields: this.obRequiredFields };
 			tf.modalManager.showModal(new e.data.modal(data, this.obEntityDataModel().id(), this.obFieldTripResourceGroupData(),
-				this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null, options))
+				this.obEntityDataModel().id() > 0 ? this.obEntityDataModel() : null))
 				.then(function(data)
 				{
 					if (data)

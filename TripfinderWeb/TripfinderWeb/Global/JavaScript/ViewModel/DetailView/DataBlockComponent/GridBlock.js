@@ -59,7 +59,7 @@
 		additional: 1
 	};
 
-	function GridBlock(options, detailView, config = {})
+	function GridBlock(options, detailView)
 	{
 		var self = this;
 
@@ -70,7 +70,6 @@
 		self.pubSubSubscriptions = [];
 
 		self.options = options;
-		self.config = config;
 		self.gridBlockType = options.field;
 		self.extraGridConfigs = self.getExtraGridConfigurations(options.field, detailView._getLayoutObjInCache().width);
 		self.$detailView = detailView.$element;
@@ -1823,8 +1822,7 @@
 				isNew: isNew,
 				entity: fieldtripResource,
 				fieldtrip: self.recordEntity,
-				BillingClassification: self.detailView.fieldEditorHelper.getFieldValue("BillingClassification"),
-				requiredFields: self.config.requiredFields
+				BillingClassification: self.detailView.fieldEditorHelper.getFieldValue("BillingClassification")
 			};
 
 		if (!self.recordEntity)

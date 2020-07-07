@@ -44,16 +44,11 @@
 		return null;
 	};
 
-	function FieldTripResourceViewModel(options = {})
+	function FieldTripResourceViewModel(options)
 	{
 		var self = this;
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.options = options;
-		
-		let requiredFields = self.options.requiredFields || [], tmp = {};
-		requiredFields.forEach(r => { tmp[r] = true; });
-		self.obRequiredFields = ko.observable(tmp);
-
 		self.isSelectedVehicleChanged = false;
 		self.isSelectedDriverChanged = false;
 		self.isSelectedAideChanged = false;
