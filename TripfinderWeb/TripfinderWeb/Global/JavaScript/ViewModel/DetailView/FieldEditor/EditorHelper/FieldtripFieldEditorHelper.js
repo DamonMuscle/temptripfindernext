@@ -11,6 +11,27 @@
 	{
 		var self = this;
 		TF.DetailView.FieldEditor.FieldEditorHelper.call(self, detailView);
+		self.fieldRelatedMap = {
+			DepartDateTime: {
+				comparator: 'LessThan',
+				relatedField: 'EstimatedReturnDateTime',
+				option: {
+					type: 'dateTime',
+					message: 'Depart Date/Time should be earlier than Return Date/Time',
+					format: 'MM/DD/YYYY hh:mm A'
+				}
+
+			},
+			EstimatedReturnDateTime: {
+				comparator: 'GreaterThan',
+				relatedField: 'DepartDateTime',
+				option: {
+					type: 'dateTime',
+					message: 'Return Date/Time should be later than Depart Date/Time',
+					format: 'MM/DD/YYYY hh:mm A'
+				}
+			}
+		};
 	}
 
 	var FIELD_VALUE_PROP = {
@@ -68,28 +89,6 @@
 		]
 	};
 
-	var fieldRelatedMap = {
-		DepartDateTime: {
-			comparator: 'LessThan',
-			relatedField: 'EstimatedReturnDateTime',
-			option: {
-				type: 'dateTime',
-				message: 'Depart Date/Time should be earlier than Return Date/Time',
-				format: 'MM/DD/YYYY hh:mm A'
-			}
-
-		},
-		EstimatedReturnDateTime: {
-			comparator: 'GreaterThan',
-			relatedField: 'DepartDateTime',
-			option: {
-				type: 'dateTime',
-				message: 'Return Date/Time should be later than Depart Date/Time',
-				format: 'MM/DD/YYYY hh:mm A'
-			}
-		}
-	}
-
 	FieldtripFieldEditorHelper.prototype = Object.create(TF.DetailView.FieldEditor.FieldEditorHelper.prototype);
 	FieldtripFieldEditorHelper.prototype.constructor = FieldtripFieldEditorHelper;
 
@@ -102,7 +101,7 @@
 
 		if (editor.bootstrapValidator == null || editor.bootstrapValidator.isValid())
 		{
-			self.validateRelatedFields(result, fieldRelatedMap);
+			self.validateRelatedFields(result, self.fieldRelatedMap);
 		}
 	}
 
@@ -378,6 +377,32 @@
 		return String.format("{0}/{1}", departmentName, activityName);
 	};
 
+	FieldtripFieldEditorHelper.prototype.getBlockoutSettings = function()
+	{
+		var self = this;
+		if (!self.fieldTripConfigs)
+		{
+			var promises = [tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripHolidays")),
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripBlockOuts"))];
+
+			return Promise.all(promises).then(function(result)
+			{
+				var fieldTripConfigs = {};
+				fieldTripConfigs.Holidays = result[0].Items.map(function(item) { return item.Holiday; });
+				fieldTripConfigs.BlockOutTimes = result[1].Items.map(function(item)
+				{
+					return {
+						BeginTime: item.From,
+						EndTime: item.To
+					};
+				});
+				self.fieldTripConfigs = fieldTripConfigs;
+				return true;
+			});
+		}
+		return Promise.resolve(true);
+	};
+
 	FieldtripFieldEditorHelper.prototype.getFieldValue = function(field, getLabel)
 	{
 		var self = this;
@@ -394,9 +419,46 @@
 		}
 	}
 
+	FieldtripFieldEditorHelper.prototype.validateBlockout = function(result)
+	{
+		var self = this;
+
+		if (self._detailView.rootGridStack && self._detailView.rootGridStack.dataBlocks)
+		{
+			var checkFields = Object.keys(self.fieldRelatedMap);
+			var blocks = self._detailView.rootGridStack.dataBlocks.filter(function(d) { return d.options && checkFields.includes(d.options.field) })
+			if (blocks && blocks.length > 0)
+			{
+				return Promise.resolve(self.getBlockoutSettings().then(function()
+				{
+					blocks.forEach(function(d, index)
+					{
+						if (d.options.field != result.fieldName)
+						{
+							return;
+						}
+						var date = moment(result.recordValue).format("YYYY-MM-DD");
+						var error = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(moment(result.recordValue), date, self.fieldTripConfigs.BlockOutTimes);
+						if (error)
+						{
+							self._detailView.$element.find('div.grid-stack-item-content[data-block-field-name=' + d.options.field + ']').addClass(self.VALIDATE_ERROR_CLASS);
+							self.editFieldList[result.fieldName] = {
+								errorMessages: [
+									error
+								],
+								title: error,
+								errorValue: result.recordValue
+							}
+						}
+					});
+				}));
+			}
+		}
+	}
+
 	FieldtripFieldEditorHelper.prototype.validateEntityByType = function(entity)
 	{
-		var self = this,
+		var self = this, resultList = [],
 			isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 
 		if (isStrictAccountCodeOn)
@@ -478,6 +540,50 @@
 				return item.FieldTripAccountId === acc.Id;
 			});
 		});
+	};
+
+	FieldtripFieldEditorHelper.checkBlockTimes = function(time, date, blockOutTimes)
+	{
+		date = moment(date);
+		if (!time || this.isHoliday(date) || date.weekday() === 6 || date.weekday() === 0)
+		{
+			return null;
+		}
+		var self = this, blockOutTimes = blockOutTimes || [],
+			timeM = time.year(2000).month(0).date(1), begin, end, message;
+
+		if (blockOutTimes.length === 0)
+		{
+			return null;
+		}
+
+		$.each(blockOutTimes, function(index, blockOutTime)
+		{
+			begin = moment("2000-1-1 " + blockOutTime.BeginTime);
+			end = moment("2000-1-1 " + blockOutTime.EndTime);
+			if ((timeM.isSame(begin) || timeM.isAfter(begin)) && (timeM.isSame(end) || timeM.isBefore(end)))
+			{
+				message = time.format('hh:mm A') + " is invalid because of the blockout period of " + begin.format("hh:mm A") + " and " + end.format("hh:mm A") + ".";
+				return false;
+			}
+		});
+
+		return message;
+	};
+
+	FieldtripFieldEditorHelper.isHoliday = function(date, holidays)
+	{
+		var result = false, self = this, holidays = holidays || [];
+		$.each(holidays, function(index, holiday)
+		{
+			var holidayM = moment(new Date(holiday));
+			if (holidayM.diff(date.startOf("day"), "days") === 0 && holidayM.diff(date, "months") === 0 && holidayM.diff(date, "years") === 0)
+			{
+				result = true;
+				return false;
+			}
+		});
+		return result;
 	};
 
 	/**

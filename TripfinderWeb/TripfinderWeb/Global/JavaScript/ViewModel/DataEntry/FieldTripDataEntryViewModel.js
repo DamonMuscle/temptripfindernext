@@ -2016,6 +2016,8 @@
 			}
 		}
 
+		var settings = this.obFieldTripSettings(), blockOutTimes = settings.BlockOutTimes || [];
+
 		validatorFields.departTime.validators.callback = {
 			message: "invalid time",
 			callback: function(value, validator)
@@ -2036,7 +2038,7 @@
 						return true;
 					}
 
-					var message = this.checkBlockTimes(m, this.obEntityDataModel().departDate());
+					var message = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(m, this.obEntityDataModel().departDate(), blockOutTimes);
 					if (message)
 					{
 						field.data("noName", true);
@@ -2108,7 +2110,7 @@
 						return true;
 					}
 
-					var message = this.checkBlockTimes(m, this.obEntityDataModel().returnDate());
+					var message = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(m, this.obEntityDataModel().returnDate(), blockOutTimes);
 					if (message)
 					{
 						field.data("noName", true);
@@ -2149,21 +2151,6 @@
 		return validatorFields;
 	};
 
-	FieldTripDataEntryViewModel.prototype.isHoliday = function(date)
-	{
-		var result = false, self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays || [];
-		$.each(holidays, function(index, holiday)
-		{
-			var holidayM = moment(new Date(holiday));
-			if (holidayM.diff(date.startOf("day"), "days") === 0 && holidayM.diff(date, "months") === 0 && holidayM.diff(date, "years") === 0)
-			{
-				result = true;
-				return false;
-			}
-		});
-		return result;
-	};
-
 	FieldTripDataEntryViewModel.prototype.checkDeadline = function(departDate)
 	{
 		// FT-988 If in edit model, the departure date and return date didn't change, then didn't check the dead line.
@@ -2179,13 +2166,13 @@
 			return null;
 		}
 
-		var self = this, settings = self.obFieldTripSettings(), nonWorkdays = [6, 0],
+		var self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays || [], nonWorkdays = [6, 0],
 			deadlineDays = settings.ScheduleDaysInAdvance || 0, departDate = new moment(departDate),
 			deadlineDate = new moment(), message;
 
 		while (deadlineDays > 0)
 		{
-			if (nonWorkdays.indexOf(deadlineDate.day()) < 0 && !self.isHoliday(deadlineDate))
+			if (nonWorkdays.indexOf(deadlineDate.day()) < 0 && !TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(deadlineDate, holidays))
 			{
 				deadlineDays--;
 			}
@@ -2198,40 +2185,11 @@
 		}
 		else
 		{
-			if (self.isHoliday(departDate))
+			if (TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(departDate, holidays))
 			{
 				message = "Depart Date falls on a holiday. " + departDate.format("M/D/YYYY") + ".";
 			}
 		}
-
-		return message;
-	};
-
-	FieldTripDataEntryViewModel.prototype.checkBlockTimes = function(time, date)
-	{
-		date = moment(date);
-		if (!time || this.isHoliday(date) || date.weekday() === 6 || date.weekday() === 0)
-		{
-			return null;
-		}
-		var self = this, settings = self.obFieldTripSettings(), blockOutTimes = settings.BlockOutTimes || [],
-			timeM = time.year(2000).month(0).date(1), begin, end, message;
-
-		if (blockOutTimes.length === 0)
-		{
-			return null;
-		}
-
-		$.each(blockOutTimes, function(index, blockOutTime)
-		{
-			begin = moment("2000-1-1 " + blockOutTime.BeginTime);
-			end = moment("2000-1-1 " + blockOutTime.EndTime);
-			if ((timeM.isSame(begin) || timeM.isAfter(begin)) && (timeM.isSame(end) || timeM.isBefore(end)))
-			{
-				message = " is invalid because of the blackout period of " + begin.format("hh:mm A") + " and " + end.format("hh:mm A") + ".";
-				return false;
-			}
-		});
 
 		return message;
 	};
