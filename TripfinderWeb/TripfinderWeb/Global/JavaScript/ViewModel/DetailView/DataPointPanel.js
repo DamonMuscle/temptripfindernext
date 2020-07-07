@@ -493,6 +493,10 @@
 		{
 			$.each($data.items, function(index, item)
 			{
+				if (item.type === 'section-header')
+				{
+					item.h = 1;
+				}
 				minY = Math.min(minY, item.y);
 				maxY = Math.max(maxY, item.y + item.h);
 			});
@@ -512,8 +516,14 @@
 
 		if ($data.type === "group")
 		{
+			let gridstack = self.detailView.$element.find(".grid-stack").data("gridstack");
 			$.each($data.items, function(index, item)
 			{
+				if (item.type === 'section-header')
+				{
+					item.x = 0;
+					item.w = gridstack.grid.width;
+				}
 				if (minX > item.x)
 				{
 					minX = item.x;
