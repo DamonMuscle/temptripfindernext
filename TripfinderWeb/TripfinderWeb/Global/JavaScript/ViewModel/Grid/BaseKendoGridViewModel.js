@@ -236,14 +236,9 @@
 				return;
 			}
 
-			if (this.type == "document")
+			if (this.type == "document" || this.type == "documentmini")
 			{
-				var databaseType = tf.storageManager.get("databaseType");
-				tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "DocumentFiles?documentId=" + record.Id))
-					.then(function(keyApiResponse)
-					{
-						window.location = pathCombine(tf.api.apiPrefix(), "DocumentFiles?hashKey=" +  keyApiResponse.Items[0]);
-					});
+				// Do Nothing
 			}
 			else
 			{
