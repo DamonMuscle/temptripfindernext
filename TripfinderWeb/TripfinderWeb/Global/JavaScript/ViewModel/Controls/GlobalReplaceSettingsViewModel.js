@@ -543,7 +543,7 @@
 	{
 		var departmentIdsWithPermission = tf.authManager.authorizationInfo.authorizationTree.districtDepartmentIds;
 
-		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin)
+		if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 		{
 			return true;
 		}
@@ -617,7 +617,7 @@
 								return $.grep(districtdepartments, function(item, index)
 								{
 									var departmentIdsWithPermission = tf.authManager.authorizationInfo.authorizationTree.districtDepartmentIds;
-									if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin)
+									if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 									{
 										return true;
 									}
@@ -631,6 +631,7 @@
 							});
 						},
 						"allowNullValue": true,
+						"allowEdit": function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'] },
 						"entityKey": "DistrictDepartmentId"
 					}
 				},
@@ -654,6 +655,7 @@
 							});
 						},
 						"allowNullValue": true,
+						"allowEdit": function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'] },
 						"entityKey": "FieldTripActivityId"
 					}
 				},
@@ -1162,7 +1164,7 @@
 			requiredFields,
 			filter = function(item)
 			{
-				if (item.editType)
+				if (item.editType && (!item.editType.allowEdit || item.editType.allowEdit()))
 				{
 					var fieldName = item.editType.entityKey || item.field;
 					if (requiredFields.indexOf(fieldName) > -1)

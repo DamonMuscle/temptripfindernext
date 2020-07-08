@@ -43,7 +43,7 @@
 		"FieldTripResourceGrid": {
 			checkPermission: function()
 			{
-				return tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin;
+				return tf.authManager.authorizationInfo.isFieldTripAdmin;
 			},
 			btnClass: "add-fieldtrip-resource",
 			btnLabel: "Add"
