@@ -847,7 +847,8 @@
 
 		self.entityDataModel = new TF.DataModel.DetailScreenLayoutDataModel(layoutTemplate);
 
-		self.obSubTitle(layoutTemplate && layoutTemplate.SubTitle || self.basicGridConfig[gridType].subTitle)
+		//self.obSubTitle(layoutTemplate && layoutTemplate.SubTitle || self.basicGridConfig[gridType].subTitle)
+		self.obSubTitle(self.detailViewHelper.tryConvertUDFSubTitle(layoutTemplate && layoutTemplate.SubTitle || self.basicGridConfig[gridType].subTitle));
 		if (!layoutTemplate)
 		{
 			self.entityDataModel.subTitle(self.basicGridConfig[gridType].subTitle);
@@ -1095,7 +1096,8 @@
 			gridType = self.gridType,
 			layoutTemplate = self.entityDataModel.toData(),
 			gridConfig = self.basicGridConfig[gridType] || {},
-			subTitleFieldName = layoutTemplate.SubTitle || gridConfig.subTitle;
+			// subTitleFieldName = layoutTemplate.SubTitle || gridConfig.subTitle;
+			subTitleFieldName = self.detailViewHelper.tryConvertUDFSubTitle(layoutTemplate.SubTitle || gridConfig.subTitle);
 		// only read mode has entity.
 		if (entity)
 		{
@@ -1123,14 +1125,17 @@
 									subtitleValue = udf.defaultValue;
 									return false;
 								}
-								else if (udf.DisplayName === subTitleFieldName)
+								// else if (udf.DisplayName === subTitleFieldName)
+								else if (udf.Id === subTitleFieldName)
 								{
 									subtitleValue = udf.RecordValue;
 									return false;
 								}
 							});
+							subTitleLabel = self.detailViewHelper.formatDataContent(subtitleValue, subTitleDataPoint.type, subTitleDataPoint.format, subTitleDataPoint);
+						} else {
+							subTitleLabel = self.detailViewHelper.formatDataContent(subtitleValue, subTitleDataPoint.type, subTitleDataPoint.format);
 						}
-						subTitleLabel = self.detailViewHelper.formatDataContent(subtitleValue, subTitleDataPoint.type, subTitleDataPoint.format);
 					}
 				}
 			}
