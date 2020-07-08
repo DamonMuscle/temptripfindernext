@@ -673,7 +673,7 @@
 	{
 		var departmentIdsWithPermission = tf.authManager.authorizationInfo.authorizationTree.districtDepartmentIds;
 
-		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isFieldTripAdmin)
+		if (tf.authManager.authorizationInfo.isFieldTripAdmin)
 		{
 			return true;
 		}
