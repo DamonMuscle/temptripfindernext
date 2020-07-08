@@ -1572,7 +1572,7 @@
 	{
 		var self = this,
 			menu = $(e.currentTarget).parents('.type-selector').find(".dropdown-menu"),
-			selectedField = model.field;
+			selectedField = model.UDFId == null ? model.field : model.UDFId;
 
 		if (!!selectedField)
 		{
