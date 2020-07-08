@@ -287,9 +287,14 @@
 
 	FieldTripDataEntryViewModel.prototype.loadDocument = function()
 	{
-		var self = this,
-			document = this.obDocumentGridViewModel();
-		var ownedDocumentAddPermission = tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]);
+		let self = this,
+			document = this.obDocumentGridViewModel(),
+			ownedDocumentReadPermission = tf.authManager.isAuthorizedForDataType("document", ["read"]) &&
+				tf.authManager.isAuthorizedForDataType("documentTab", ["read"]),
+			ownedDocumentAddPermission = tf.authManager.isAuthorizedForDataType("document", ["add"]) &&
+				tf.authManager.isAuthorizedForDataType("documentTab", ["add"]),
+			ownedDocumentEditPermission = tf.authManager.isAuthorizedForDataType("document", ["edit"]) &&
+				tf.authManager.isAuthorizedForDataType("documentTab", ["edit"]);
 
 		if (document !== null && document !== undefined && document.obGridViewModel()
 			&& document.obGridViewModel().searchGrid.kendoGrid.wrapper.data("kendoReorderable"))
@@ -302,7 +307,7 @@
 			self.getDocumentEntities().then(function(result)
 			{
 				self.obEntityDataModel().fieldTripDocuments(result.Items);
-				if (tf.permissions.documentRead)
+				if (ownedDocumentReadPermission)
 				{
 					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getEndpoint("documentclassification")))
 						.then(function(data)
@@ -311,14 +316,7 @@
 							var classificationDataModels = data.Items;
 							if (self.obDocumentGridViewModel() !== null)
 							{
-								if (classificationDataModels != null && classificationDataModels.length > 0)
-								{
-									self.obDocumentGridViewModel().obCanAdd(ownedDocumentAddPermission);
-								}
-								else
-								{
-									self.obDocumentGridViewModel().obCanAdd(false);
-								}
+								setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
 							}
 							if (resources)
 							{
@@ -365,18 +363,9 @@
 							}
 							self.obDocumentGridDataSource(documentRecources);
 							self.obDocumentKendoDataSource(documentFontEndRecources);
-							var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
+							let documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
 							self.obDocumentGridViewModel(documentGrid);
-							if (classificationDataModels != null && classificationDataModels.length > 0)
-							{
-								documentGrid.obCanAdd(ownedDocumentAddPermission);
-								self.obDocumentGridViewModel().obCanAdd(ownedDocumentAddPermission);
-							}
-							else
-							{
-								documentGrid.obCanAdd(false);
-								self.obDocumentGridViewModel().obCanAdd(false);
-							}
+							setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
 							self.obEntityDataModel().updateEntityBackup();
 						});
 				}
@@ -384,27 +373,37 @@
 		}
 		else
 		{
-			if (tf.permissions.documentRead && tf.permissions.documentAdd)
+			if (ownedDocumentReadPermission && ownedDocumentAddPermission)
 			{
 				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getEndpoint("documentclassification")))
 					.then(function(data)
 					{
-						var documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
-
 						var classificationDataModels = data.Items;
-						if (classificationDataModels != null && classificationDataModels.length > 0)
-						{
-							documentGrid.obCanAdd(ownedDocumentAddPermission);
-						}
-						else
-						{
-							documentGrid.obCanAdd(ownedDocumentAddPermission);
-						}
+						let documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
 						self.obDocumentGridViewModel(documentGrid);
+						setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
 					});
 			}
-
 		}
+
+
+		let setDocumentGridButtons = (obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission) => {
+
+			if (classificationDataModels != null && classificationDataModels.length > 0)
+			{
+				obDocumentGridViewModel().obCanAdd(ownedDocumentAddPermission);
+				obDocumentGridViewModel().obCanAddNew(ownedDocumentAddPermission);
+				obDocumentGridViewModel().obCanEdit(ownedDocumentEditPermission);
+				obDocumentGridViewModel().obAddDivider(ownedDocumentAddPermission && ownedDocumentAddPermission);
+			}
+			else
+			{
+				obDocumentGridViewModel().obCanAdd(false);
+				obDocumentGridViewModel().obCanAddNew(false);
+				obDocumentGridViewModel().obCanEdit(false);
+				obDocumentGridViewModel().obAddDivider(false);
+			}
+		};
 	};
 
 	FieldTripDataEntryViewModel.prototype.getDocumentIDs = function()

@@ -14,7 +14,8 @@
 		tripstop: "trip", //tripstop secured item is same with trip
 		trip: "trip",
 		contact: "contact",
-		document: "documentCenter"
+		document: "documentCenter",
+		documentTab: "documentTab"
 	}
 
 	function AuthManager()
