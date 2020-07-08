@@ -907,6 +907,21 @@
 		}
 		return weekDay;
 	};
+	
+	DetailViewHelper.prototype.tryConvertUDFSubTitle = function(subtitleField)
+	{
+
+		let templateSubtitle = subtitleField;
+		if (templateSubtitle && templateSubtitle.length > 0)
+		{
+			if (!isNaN(Number(templateSubtitle)))
+			{
+				templateSubtitle = Number(templateSubtitle);
+			}
+		}
+		return templateSubtitle;
+	}
+
 
 	/**
 	 * Process the data content.
