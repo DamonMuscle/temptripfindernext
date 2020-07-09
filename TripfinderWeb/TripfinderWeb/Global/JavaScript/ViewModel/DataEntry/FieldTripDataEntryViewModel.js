@@ -2110,13 +2110,6 @@
 						return true;
 					}
 
-					var message = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(m, this.obEntityDataModel().returnDate(), blockOutTimes);
-					if (message)
-					{
-						field.data("noName", true);
-						return { message: "Return Time " + message, valid: false };
-					}
-
 					var returnDate = new moment(this.obEntityDataModel().returnDate());
 					var departDate = new moment(this.obEntityDataModel().departDate());
 					if (!departDate.isValid() || !returnDate.isValid())

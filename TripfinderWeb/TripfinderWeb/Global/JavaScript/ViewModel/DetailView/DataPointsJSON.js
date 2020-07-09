@@ -1238,7 +1238,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "440 State Street",
 					"editType": {
 						"format": "String",
-						"maxLength": 200
+						"maxLength": 200,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1248,7 +1249,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "Schenectady",
 					"editType": {
 						"format": "String",
-						"maxLength": 100
+						"maxLength": 100,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1258,7 +1260,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "NY",
 					"editType": {
 						"format": "String",
-						"maxLength": 2
+						"maxLength": 2,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1268,7 +1271,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "12305",
 					"editType": {
 						"format": "String",
-						"maxLength": 20
+						"maxLength": 20,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -4811,24 +4815,27 @@ function getAvailableSites(studentId)
 function fetchGeoCities()
 {
 	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
-		.then(function(result) { 
-			return result.Items.map(function(item) { return { text: item.Name, value: item.Name }; }) 
+		.then(function(result)
+		{
+			return result.Items.map(function(item) { return { text: item.Name, value: item.Name }; })
 		});
 };
 
 function fetchGeoZipCodes()
 {
 	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "arcgis", "postalcodes?@fields=Name"))
-		.then(function(result) { 
-			return result.Items.map(function(item) { return { "text": item.Name, "value": item.Name }; }) 
+		.then(function(result)
+		{
+			return result.Items.map(function(item) { return { "text": item.Name, "value": item.Name }; })
 		});
 };
 
 function fetchMailingZipCodes()
 {
 	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingpostalcodes?@fields=Id,Postal"))
-		.then(function(result) { 
-			return result.Items.map(function(item) { return { text: item.Postal, value: item.Id }; }) 
+		.then(function(result)
+		{
+			return result.Items.map(function(item) { return { text: item.Postal, value: item.Id }; })
 		});
 };
 
@@ -4836,8 +4843,9 @@ function fetchMailingZipCodes()
 function fetchMailingCities()
 {
 	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
-		.then(function(result) { 
-			return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; }) 
+		.then(function(result)
+		{
+			return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; })
 		});
 };
 

@@ -13,12 +13,14 @@
 		]);
 
 		self.obReplaceType = ko.observable("Standard");
-		self.obStandardDisable = ko.observable(false);
+		self.obStandardInputGroupDisable = ko.observable(false);
+		self.obStandardValueInputBoxDisable = ko.observable(false);
 		self.obExtendedsDisable = ko.observable(true);
 		self.obReplaceTypeDisable = ko.observable(gridType != "student");
 		self.obReplaceType.subscribe(function()
 		{
-			self.obStandardDisable(self.obReplaceType() == "Extended");
+			self.obStandardInputGroupDisable(self.obReplaceType() == "Extended");
+			self.obStandardValueInputBoxDisable(self.obReplaceType() == "Extended");
 			self.obExtendedsDisable(self.obReplaceType() == "Standard" || self.obReplaceTypeDisable());
 		});
 
@@ -35,7 +37,16 @@
 		self.obSelectedField.subscribe(function()
 		{
 			var selectedField = self.obSelectedField();
-			self.editable(selectedField && selectedField.editType && selectedField.editType.allowInput);
+
+			if (selectedField && selectedField.editType && selectedField.editType.allowInputValue !== undefined)
+			{
+				self.editable(typeof selectedField.editType.allowInputValue == "function" ? selectedField.editType.allowInputValue() : selectedField.editType.allowInputValue);
+			}
+			else
+			{
+				self.editable(true);
+			}
+
 			self.isInt(false);
 			if (selectedField && selectedField.field != self.lastSelectedField)
 			{
@@ -68,7 +79,7 @@
 			}
 		});
 		self.obSelectDataList = ko.observableArray();
-		self.editable = ko.observable(false);
+		self.editable = ko.observable(true);
 		self.isInt = ko.observable(false);
 		self.obTitle = ko.observable("");
 		self.obMaxLength = ko.observable("50");
@@ -831,7 +842,14 @@
 						"textField": "Name",
 						"valueField": "Name",
 						"entityKey": "Destination",
-						"allowInput": !self.fieldtripConfigs || !self.fieldtripConfigs['StrictDest'],
+						"allowInput": function()
+						{
+							return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'];
+						},
+						allowInputValue: function()
+						{
+							return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'];
+						}
 					}
 				},
 				{
@@ -840,7 +858,12 @@
 					"type": "String",
 					"editType": {
 						"format": "String",
-						"maxLength": 200
+						"maxLength": 200,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] },
+						allowInputValue: function()
+						{
+							return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'];
+						}
 					}
 				},
 				{
@@ -852,17 +875,24 @@
 						"maxLength": 100,
 						"getSource": function()
 						{
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingCities")).then(function(result)
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldtripDestinations")).then(function(result)
 							{
-								return result.Items.map(function(item)
+								return result.Items.filter(function(item)
 								{
-									item['text'] = item['Name'];
-									item['value'] = item['Name'];
+									return item.City;
+								}).map(function(item)
+								{
+									item['text'] = item['City'];
+									item['value'] = item['City'];
 									return item;
 								});
 							});
 						},
-						allowInput: true,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] },
+						allowInputValue: function()
+						{
+							return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'];
+						}
 					}
 				},
 				{
@@ -876,25 +906,32 @@
 				},
 				{
 					"field": "DestinationZip",
-					"title": "Destination Zip",
+					"title": "Destination Postal Code",
 					"type": "Zip",
 					"editType": {
 						"format": "DropDown",
-						"maxLength": 5,
+						"maxLength": 100,
 						"getSource": function()
 						{
 							self.isInt(true);
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingPostalCodes")).then(function(result)
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldtripDestinations")).then(function(result)
 							{
-								return result.Items.map(function(item)
+								return result.Items.filter(function(item)
 								{
-									item['text'] = item['Postal'];
-									item['value'] = item['Postal'];
+									return item.Zip;
+								}).map(function(item)
+								{
+									item['text'] = item['Zip'];
+									item['value'] = item['Zip'];
 									return item;
 								});
 							});
 						},
-						allowInput: true,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] },
+						allowInputValue: function()
+						{
+							return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'];
+						}
 					}
 				},
 				{
