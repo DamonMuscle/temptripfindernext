@@ -901,7 +901,8 @@
 					"type": "String",
 					"editType": {
 						"format": "String",
-						"maxLength": 2
+						"maxLength": 2,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] },
 					}
 				},
 				{
