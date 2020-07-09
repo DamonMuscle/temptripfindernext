@@ -1,6 +1,6 @@
 ﻿(function()
 {
-	function createInputByType(type, initialValue, attributes, nowrap, disable, events, element)
+	function createInputByType(type, initialValue, attributes, nowrap, disable, events, element, allBindings)
 	{
 		switch (type)
 		{
@@ -19,7 +19,9 @@
 			case "DateTime":
 				return new TF.Input.DateTimeBox(initialValue, attributes, disable, nowrap, events, element);
 			case "Date":
-				return new TF.Input.DateBox(initialValue, attributes, disable, nowrap, events);
+				return new TF.Input.DateBox(initialValue, attributes, disable, nowrap, events, element, allBindings);
+			case "ExtendedDate":
+				return new TF.Input.ExtendedDateBox(initialValue, attributes, disable, nowrap, events, element, allBindings);
 			case "Time":
 				return new TF.Input.TimeBox(initialValue, attributes, disable, nowrap, events, element);
 			case "Integer":
@@ -61,13 +63,13 @@
 			var input;
 			if (bindingValue.type != undefined)
 			{
-				input = createInputByType(ko.unwrap(bindingValue.type), bindingValue.value(), bindingValue.attributes, bindingValue.nowrap, bindingValue.disable, bindingValue.events, element);
+				input = createInputByType(ko.unwrap(bindingValue.type), bindingValue.value(), bindingValue.attributes, bindingValue.nowrap, bindingValue.disable, bindingValue.events, element, allBindings);
 			}
 			else
 			{
 				var type = ko.unwrap(bindingValue.attributes).type;
 				delete bindingValue.attributes().type;
-				input = createInputByType(type, bindingValue.value(), ko.unwrap(bindingValue.attributes), bindingValue.nowrap, bindingValue.disable, bindingValue.events, element);
+				input = createInputByType(type, bindingValue.value(), ko.unwrap(bindingValue.attributes), bindingValue.nowrap, bindingValue.disable, bindingValue.events, element, allBindings);
 			}
 			ko.utils.domData.set(element, "input", input);
 			var $element = input.getElement();
@@ -146,7 +148,7 @@
 					input.bindingValueChange.dispose();
 				}
 				input.dispose();
-				input = createInputByType(type, "", attributes, bindingValue.errorClassName, bindingValue.disable, bindingValue.events, element);
+				input = createInputByType(type, "", attributes, bindingValue.errorClassName, bindingValue.disable, bindingValue.events, element, allBindings);
 				ko.utils.domData.set(element, "input", input);
 				ko.virtualElements.emptyNode(element);
 				var $element = input.getElement();
@@ -175,11 +177,30 @@
 					});
 				}
 			}
+			if (input.events && input.events.lineAutoFit)
+			{
+				input.events.lineAutoFit(input);
+			}
+
+			var symbols = bindingValue.symbols;
+			if (symbols)
+			{
+				var text = bindingValue.value();
+				input.$element.addClass('typeahead-symbol-text');
+				input.$element.parent().find('.typeahead-input-symbol').remove();
+				input.$element.after('<div class="typeahead-input-symbol ' + symbols[text] + '"></div>');
+			}
+
+			var styles = bindingValue.styles;
+			if (styles)
+			{
+				var text = bindingValue.value();
+				input.$element.addClass('typeahead-symbol-text');
+				input.$element.parent().find('.typeahead-input-symbol').remove();
+				input.$element.after('<div class="typeahead-input-symbol ' + styles[text] + '"></div>');
+			}
 		}
 	};
 
 	ko.virtualElements.allowedBindings.customInput = true;
-
-
 })();
-

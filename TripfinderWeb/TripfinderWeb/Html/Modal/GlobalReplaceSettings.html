@@ -5,12 +5,12 @@
 			<div class="input-group vf-custom-input">
 				<div
 					data-bind="typeahead:{source:obFieldSources,format:function(obj){return obj.title;},drowDownShow:true,selectedValue:obSelectedField,notSort:true}">
-					<!-- ko customInput:{type:"Select",disable:obStandardDisable, attributes:{class: "enableHotkey form-control"}, value:obSelectedFieldTitle} -->
+					<!-- ko customInput:{type:"Select",disable:obStandardInputGroupDisable, attributes:{class: "enableHotkey form-control"}, value:obSelectedFieldTitle} -->
 					<!-- /ko -->
 				</div>
 				<div class="bottom-border"></div>
 				<div class="input-group-btn">
-					<button type="button" class="btn btn-default" data-bind="disable:obStandardDisable">
+					<button type="button" class="btn btn-default" data-bind="disable:obStandardInputGroupDisable">
 						<span class="caret"></span>
 					</button>
 				</div>
@@ -19,7 +19,7 @@
 		<div class="col-xs-12 mass-update-value">
 			<div class="form-group">
 				<label data-bind="css: { requirestar: obIsValueRequired() }">New Value</label>
-				<!-- ko customInput:{type:obSelectType(),disable:obStandardDisable,attributes:{class: "enableHotkey form-control",name:obSelectType(),dataList:obSelectDataList(),editable: editable(), integer: isInt(),title:obTitle(),maxlength:obMaxLength()},value:obNewValue,disable:false} -->
+				<!-- ko customInput:{type:obSelectType(),disable:obStandardInputGroupDisable,attributes:{class: "enableHotkey form-control",name:obSelectType(),dataList:obSelectDataList(),editable: editable(), integer: isInt(),title:obTitle(),maxlength:obMaxLength()},value:obNewValue} -->
 				<!-- /ko -->
 			</div>
 		</div>

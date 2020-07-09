@@ -1005,30 +1005,55 @@
 			{
 				return customErrorFieldMap[uniqueError.fieldName] === undefined;
 			}),
-			crossValidateErrors = self._checkCodeMustBeUnique(recordEntity, uniqueObjects).filter(function(uniqueError)
+			specialErrors = [], specialValidate = Promise.resolve(specialErrors);
+		// special step for fieldtrip to check blockoutitmes
+		if (dataType === "fieldtrip")
+		{
+			if (self._detailView.rootGridStack && self._detailView.rootGridStack.dataBlocks)
 			{
-				return customErrorFieldMap[uniqueError.fieldName] === undefined;
-			});
-
-		return self.validateEntityByType(recordEntity, dataType, isCreateRecord)
-			.then(function(validationMessages)
-			{
-				var validationMessages = validationMessages || [],
-					groups = _.groupBy([].concat(customInputErrors, missingFieldErrors, uniqueCheckErrors, validationMessages), "fieldName"),
-					keys = Object.keys(groups),
-					errorMessages = _.uniq(keys.reduce(function(acc, key)
+				var checkFields = Object.keys(self.fieldRelatedMap);
+				var blocks = self._detailView.rootGridStack.dataBlocks.filter(function(d) { return d.options && checkFields.includes(d.options.field) })
+				if (blocks && blocks.length > 0)
+				{
+					specialValidate = Promise.resolve(self.getBlockoutSettings().then(function()
 					{
-						return acc.concat(groups[key].map(function(item)
+						blocks.forEach(function(d, index)
 						{
-							return item.message;
-						}));
-					}, []));
+							var date = moment(recordEntity[d.options.field]).format("YYYY-MM-DD");
+							var error = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(moment(recordEntity[d.options.field]), date, self.fieldTripConfigs.BlockOutTimes);
+							if (error)
+							{
+								specialErrors.push({ fieldName: d.options.field, message: error });
+							}
+						});
+						return specialErrors;
+					}));
+				}
+			}
+		}
 
-				// make sure validation error classes have been added;
-				self.toggleValidationErrorToFieldsByName(keys, true);
+		return specialValidate.then(function()
+		{
+			return self.validateEntityByType(recordEntity, dataType, isCreateRecord)
+				.then(function(validationMessages)
+				{
+					var validationMessages = validationMessages || [],
+						groups = _.groupBy([].concat(customInputErrors, missingFieldErrors, uniqueCheckErrors, specialErrors, validationMessages), "fieldName"),
+						keys = Object.keys(groups),
+						errorMessages = _.uniq(keys.reduce(function(acc, key)
+						{
+							return acc.concat(groups[key].map(function(item)
+							{
+								return item.message;
+							}));
+						}, []));
 
-				return errorMessages;
-			});
+					// make sure validation error classes have been added;
+					self.toggleValidationErrorToFieldsByName(keys, true);
+
+					return errorMessages;
+				});
+		})
 	};
 
 	FieldEditorHelper.prototype.toggleValidationErrorToFieldsByName = function(fieldNames, display)
@@ -1955,28 +1980,6 @@
 		return errorMessages;
 	};
 
-	FieldEditorHelper.prototype._crossCheck = function(recordEntity, uniqueObjects)
-	{
-		var errorMessages = [],
-			uniqueFields = uniqueObjects ? Object.keys(uniqueObjects) : [];
-
-		if (Array.isArray(uniqueFields) && uniqueFields.length > 0)
-		{
-			uniqueFields.map(function(field)
-			{
-				var obj = uniqueObjects[field],
-					value = recordEntity[field];
-
-				if (obj.values.includes(value))
-				{
-					errorMessages.push({ fieldName: field, message: obj.title + " must be unique." });
-				}
-			});
-		}
-
-		return errorMessages;
-	};
-
 	/**
 	 * TODO: remove this function
 	 */
@@ -2084,6 +2087,15 @@
 		if (!checkValuesValidity(valArray, map.option))
 		{
 			return;
+		}
+
+		if (self.dataType == "fieldtrip" && self.validateBlockout && ["DepartDateTime", "EstimatedReturnDateTime"].includes(result.fieldName))
+		{
+			var oneResult = { fieldName: result.fieldName, recordValue: fieldValue },
+				theOtherField = result.fieldName == "DepartDateTime" ? "EstimatedReturnDateTime" : "DepartDateTime",
+				theOtherResult = { fieldName: theOtherField, recordValue: value };
+			self.validateBlockout(oneResult);
+			self.validateBlockout(theOtherResult);
 		}
 
 		if (!tf.helpers.detailViewHelper.compareTwoValues(valArray, map.comparator))
