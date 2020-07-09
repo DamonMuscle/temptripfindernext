@@ -304,11 +304,11 @@
 		var filteredIds = [], documentRecources = [], documentFontEndRecources = [];
 		if (this.obMode() === "Edit")
 		{
-			self.getDocumentEntities().then(function(result)
+			if (ownedDocumentReadPermission)
 			{
-				self.obEntityDataModel().fieldTripDocuments(result.Items);
-				if (ownedDocumentReadPermission)
+				self.getDocumentEntities().then(function(result)
 				{
+					self.obEntityDataModel().fieldTripDocuments(result.Items);
 					tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getEndpoint("documentclassification")))
 						.then(function(data)
 						{
@@ -368,8 +368,9 @@
 							setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
 							self.obEntityDataModel().updateEntityBackup();
 						});
-				}
-			}.bind(this));
+
+				}.bind(this));
+			}
 		}
 		else
 		{
@@ -387,7 +388,8 @@
 		}
 
 
-		let setDocumentGridButtons = (obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission) => {
+		let setDocumentGridButtons = (obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission) =>
+		{
 
 			if (classificationDataModels != null && classificationDataModels.length > 0)
 			{
@@ -429,6 +431,13 @@
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
 			paramData: paramData
+		}).catch(function(error)
+		{
+			return tf.promiseBootbox.alert(error.Message)
+				.then(function()
+				{
+					return Promise.resolve({ Items: [] });
+				});
 		});
 	};
 
