@@ -289,8 +289,7 @@
 	{
 		let self = this,
 			document = this.obDocumentGridViewModel(),
-			ownedDocumentReadPermission = tf.authManager.isAuthorizedForDataType("document", ["read"]) &&
-				tf.authManager.isAuthorizedForDataType("documentTab", ["read"]),
+			ownedDocumentReadPermission = tf.authManager.isAuthorizedForDataType("document", ["read"]),
 			ownedDocumentAddPermission = tf.authManager.isAuthorizedForDataType("document", ["add"]) &&
 				tf.authManager.isAuthorizedForDataType("documentTab", ["add"]),
 			ownedDocumentEditPermission = tf.authManager.isAuthorizedForDataType("document", ["edit"]) &&

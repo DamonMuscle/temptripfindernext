@@ -21,7 +21,10 @@
 			btnLabel: "Associate"
 		},
 		"DocumentGrid": {
-			checkPermission: function() { return tf.authManager.isAuthorizedForDataType("document", "add"); },
+			checkPermission: function() { 
+				return tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]) && 
+					tf.authManager.isAuthorizedForDataType("documentTab", ["add", "edit"]);
+			 },
 			btnClass: "add-document",
 			btnLabel: "Associate"
 		},
@@ -1202,22 +1205,25 @@
 			case "document":
 			case "contactrelationships":
 			case "documentrelationships":
-				command = [{
+				command = [];
+				command.push({
 					name: "view",
 					template: '<a class="k-button k-button-icontext k-grid-view" title="View"></a>',
 					click: actions.view
-				},
-				{
+				});
+				command.push({
 					name: "download",
 					template: '<a class="k-button k-button-icontext k-grid-download" title="Download"><span></span>Download</a>',
 					click: actions.download
-				},
+				});
+				if (tf.authManager.isAuthorizedForDataType("documentTab", ["delete"]))
 				{
-					name: "delete",
-					template: '<a class="k-button k-button-icontext k-grid-delete delete-relationship" title="Disassociate"></a>',
-					click: actions.delete
+					command.push({
+						name: "delete",
+						template: '<a class="k-button k-button-icontext k-grid-delete delete-relationship" title="Disassociate"></a>',
+						click: actions.delete
+					});
 				}
-				];
 				break;
 			default:
 				break;
@@ -1693,15 +1699,27 @@
 	 */
 	GridBlock.prototype._bindMiniGridEvent = function(miniGridType, $grid)
 	{
-		// This function firing multiple times on kendoGrid dataBound / dataBinding event.
-		var self = this;
-		if (miniGridType === GridBlock.MINI_GRID_TYPE.CONTACT ||
-			miniGridType === GridBlock.MINI_GRID_TYPE.DOCUMENT)
-		{
+		let self = this;
+		let bindDBClickEvent = () => {
 			$grid.off("dblclick").on("dblclick", ".k-grid-content table tr", function(e)
 			{
 				self.editMiniGridRecord(miniGridType, e);
 			});
+		};
+
+		// This function firing multiple times on kendoGrid dataBound / dataBinding event.
+		switch (miniGridType) {
+			case GridBlock.MINI_GRID_TYPE.CONTACT:
+				bindDBClickEvent();
+				break;
+			case GridBlock.MINI_GRID_TYPE.DOCUMENT:
+				if (tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]) && 
+					tf.authManager.isAuthorizedForDataType("documentTab", ["add", "edit"])) {
+					bindDBClickEvent();
+				}
+				break;
+			default:
+				break;
 		}
 	};
 
