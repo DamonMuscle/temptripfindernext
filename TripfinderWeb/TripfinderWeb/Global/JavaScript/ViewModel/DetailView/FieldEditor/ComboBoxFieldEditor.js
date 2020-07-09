@@ -2,13 +2,14 @@
 {
 	createNamespace("TF.DetailView.FieldEditor").ComboBoxFieldEditor = ComboBoxFieldEditor;
 
+	const DEFAULT_NULL_AVATAR = "None";
+	const DEFAULT_NULL_VALUE = -999; //means DBNull
+
 	/***
 	 * option{
 	 * format: ComboBox,
 	 * getsource:the obj of result should be {text,value} 
 	 * entityKey:the field of record entity
-	 * textField:the text field of entity. Required
-	 * valueField:the actual value of entity when item selected. Default is textField.
 	 * }
 	 * 
 	*/
@@ -16,6 +17,7 @@
 	{
 		var self = this;
 		TF.DetailView.FieldEditor.InputFieldEditor.call(self, type);
+
 		self.comboBox = null;
 	}
 
@@ -27,25 +29,43 @@
 	{
 		var self = this,
 			$content = self.getContentElement();
+
 		$content.hide();
-		var selectedValue = self.options.defaultValue;
 
 		self.initElement($content)
-			.then(function()
+			.then(() =>
 			{
-				self.comboBox.text(selectedValue);
-				self.comboBox.bind("change", function(e)
+				const initialValue = self.getFieldValue();
+				if (initialValue > 0)
+				{
+					const dataItems = self.comboBox.dataSource.data();
+					for (let i = 0; i < dataItems.length; i++)
+					{
+						if (dataItems[i].value === initialValue)
+						{
+							self.comboBox.select(i);
+							break;
+						}
+					}
+				}
+				else 
+				{
+					const customValue = self.getCustomFieldText();
+					self.comboBox.input.val(customValue);
+				}
+
+				self.comboBox.bind("change", (e) =>
 				{
 					self.onValueChanged();
 				});
 				self.comboBox.focus();
+
 				if (self.options.showWidget)
 				{
 					self.comboBox.open();
 				}
-				self._$parent.find("div.editor-icon").css({
-					'display': 'None'
-				});
+
+				self._$parent.find("div.editor-icon").css("display", 'none');
 			});
 	};
 
@@ -65,8 +85,8 @@
 			{
 				self.editStop();
 			}
-			/* 			e.stopImmediatePropagation();
-						e.stopPropagation(); */
+			// e.stopImmediatePropagation();
+			// e.stopPropagation();
 		});
 
 		TF.DetailView.FieldEditor.InputFieldEditor.prototype.bindEvents.call(self);
@@ -88,13 +108,8 @@
 	{
 		TF.DetailView.FieldEditor.InputFieldEditor.prototype.hide.call(this);
 		var self = this;
-		self._$parent.find('.comboBoxContainer')
-			.css({
-				display: 'none'
-			});
-		self._$parent.find("div.editor-icon").css({
-			'display': 'block'
-		});
+		self._$parent.find('.comboBoxContainer').css("display", "none");
+		self._$parent.find("div.editor-icon").css("display", "");
 		self.getContentElement().show();
 	}
 
@@ -105,39 +120,50 @@
 		{
 			var container = $('<div id="comboBoxInputContainer" class="comboBoxContainer"></div>'),
 				$input = $('<input id="comboBoxInput" class="comboBoxInput"/>');
-			$input.css({
-				'height': $content.css('height')
-			});
+
+			$input.css("height", $content.css('height'));
 
 			container.append($input);
 			self._$parent.append(container);
 
 			self._$element = container;
 
-			return self.options['getSource']()
-				.then(function(res)
+			const { getSource, allowNullValue, nullAvatar } = self.options;
+
+			return getSource()
+				.then((source) =>
 				{
-					$input.kendoComboBox(
-						{
-							dataTextField: self.options.textField,
-							dataValueField: self.options.valueField,
-							dataSource: _sortByAlphaOrderWithTitles(res),
-							filter: "startswith",
-							autoWidth: false,
-							highlightFirst: false,
-							template: '<div class="comboBoxItem"> #: ' + self.options.textField + ' #</div>'
+					source = _sortByAlphaOrderWithTitles(source);
+
+					if (allowNullValue)
+					{
+						source.unshift({
+							text: nullAvatar || DEFAULT_NULL_AVATAR,
+							value: DEFAULT_NULL_VALUE
 						});
+					}
+
+					$input.kendoComboBox({
+						dataTextField: 'text',
+						dataValueField: 'value',
+						dataSource: source,
+						filter: "startswith",
+						autoWidth: false,
+						highlightFirst: false,
+						template: `<div class="comboBoxItem" title="#: text #"> #: text #</div>`,
+					});
+
 					container.find("span.k-dropdown-wrap").addClass("comboBox-dropdown-wrap");
 					container.find("span.k-select").addClass("comboBox-select-wrap");
-					container.find("span.k-icon.k-i-arrow-s").addClass('comboBox-arrow-warp');
+					container.find("span.k-icon.k-i-arrow-s").addClass("comboBox-arrow-warp");
 
 					self.comboBox = $input.data("kendoComboBox");
-					self.comboBox.ul.addClass('custom_comboxUl');
-					self.comboBox.bind('open', function()
+					self.comboBox.ul.addClass("custom_comboxUl");
+					self.comboBox.bind("open", () =>
 					{
-						var container = self._$parent.find('#comboBoxInputContainer');
-						var itemOffset = container.offset().top;
-						var comboxHeight = container.height();
+						var $element = self._$parent.find('#comboBoxInputContainer');
+						var itemOffset = $element.offset().top;
+						var comboxHeight = $element.height();
 						var windowHeight = $(window).height();
 						var bottomRestHeight = windowHeight - itemOffset - comboxHeight;
 						self.comboBox.setOptions({ height: Math.max(bottomRestHeight, itemOffset) });
@@ -146,12 +172,11 @@
 		}
 		else
 		{
-			pre_container.css({
-				display: 'block'
-			});
+			pre_container.css("display", "block");
 			self.comboBox = pre_container.find('#comboBoxInput').data("kendoComboBox");
-			return Promise.resolve();
 		}
+
+		return Promise.resolve();
 	}
 
 	ComboBoxFieldEditor.prototype.closeWidget = function()
@@ -183,16 +208,36 @@
 
 	ComboBoxFieldEditor.prototype._applyComboBoxValue = function()
 	{
-		if (this.comboBox == null)
+		const self = this;
+		if (!self.comboBox)
 		{
-			this.apply(this.options.defaultValue);
+			self.apply(self.options.defaultValue);
 		}
-		if (this.comboBox.selectedIndex === -1)
+		else if (self.comboBox.selectedIndex === -1)
 		{
-			return this.apply(this.comboBox.text());
-		} else
+			const text = self.comboBox.text();
+			const dataItems = self.comboBox.dataSource.data();
+			const match = dataItems.find(o => o.text === text);
+
+			if (!match)
+			{
+				self.apply(null, text);
+				return;
+			}
+			else
+			{
+				self.apply(match.value, match.text);
+			}
+		}
+
+		const selectedValue = +self.comboBox.value();
+		if (selectedValue === DEFAULT_NULL_VALUE)
 		{
-			return this.apply(this.comboBox.value(), this.comboBox.text());
+			self.apply(null, "");
+		}
+		else
+		{
+			self.apply(selectedValue, self.comboBox.text());
 		}
 	}
 
@@ -208,8 +253,32 @@
 		var self = this,
 			result = TF.DetailView.FieldEditor.InputFieldEditor.prototype._getAppliedResult.call(self, data, value, text);
 
+		result.selectPickListOptionIDs = (value === null || value === undefined) ? [] : [value];
 		result.selectedItem = this.comboBox.dataItem();
 		return result;
+	};
+
+	ComboBoxFieldEditor.prototype.getFieldValue = function()
+	{
+		const { recordEntity, editFieldList, entityKey } = this.options;
+		let value = null;
+
+		if (editFieldList[entityKey])
+		{
+			value = editFieldList[entityKey].value;
+		}
+		else if (recordEntity)
+		{
+			value = recordEntity[entityKey];
+		}
+
+		return +value || DEFAULT_NULL_VALUE;
+	};
+
+	ComboBoxFieldEditor.prototype.getCustomFieldText = function()
+	{
+		const { editFieldList, entityKey } = this.options;
+		return editFieldList[entityKey] ? editFieldList[entityKey].textValue : "";
 	};
 
 	ComboBoxFieldEditor.prototype.dispose = function()
