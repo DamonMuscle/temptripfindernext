@@ -10,7 +10,7 @@
 		self.gridOptions = gridOptions;
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.changeStatusButton = true;
-		self.massUpdateButton = false;
+		self.massUpdateButton = true;
 		self.copyButton = true;
 		self.detailButton = true;
 		self.schedulerButton = true;
