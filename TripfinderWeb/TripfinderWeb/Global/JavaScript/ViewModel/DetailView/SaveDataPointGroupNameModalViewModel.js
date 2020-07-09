@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.DetailView").SaveDataPointGroupNameModalViewModel = SaveDataPointGroupNameModalViewModel;
 
-	function SaveDataPointGroupNameModalViewModel(entity)
+	function SaveDataPointGroupNameModalViewModel(entity, groups)
 	{
 		var self = this;
 
@@ -13,7 +13,7 @@
 		self.contentTemplate("Workspace/detailview/SaveDataPointGroupName");
 		self.buttonTemplate("modal/positivenegative");
 
-		self.saveDataPointGroupNameViewModel = new TF.DetailView.SaveDataPointGroupNameViewModel(entity);
+		self.saveDataPointGroupNameViewModel = new TF.DetailView.SaveDataPointGroupNameViewModel(entity, groups);
 		self.data(self.saveDataPointGroupNameViewModel);
 
 		self.inheritChildrenShortCutKey = false;

@@ -2,11 +2,15 @@
 {
 	createNamespace("TF.DetailView").SaveDataPointGroupNameViewModel = SaveDataPointGroupNameViewModel;
 
-	function SaveDataPointGroupNameViewModel(entity)
+	function SaveDataPointGroupNameViewModel(entity, groups)
 	{
 		var self = this;
 		self.entity = entity;
 		self.name = ko.observable(self.entity.Name);
+		self.groups = groups;
+		self.groupNames = self.groups.map(function (g) {
+			return g.title;
+		});
 
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	};
@@ -46,6 +50,9 @@
 						if (!value)
 						{
 							return true;
+						}
+						if (self.groupNames.indexOf(value) > 0) {
+							return false;
 						}
 						$field.addClass("delay-show");
 						var $callbackElement = $field.parent().find("[data-bv-validator=callback]"),

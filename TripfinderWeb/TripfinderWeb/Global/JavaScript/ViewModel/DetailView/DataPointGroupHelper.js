@@ -26,9 +26,10 @@
 
 	DataPointGroupHelper.prototype.saveGroup = function()
 	{
-		var self = this, entity = self.getDataPointGroupData();
+		var self = this, entity = self.getDataPointGroupData(),
+			groups = self.detailView.dataPointPanel.groups;
 
-		tf.modalManager.showModal(new TF.DetailView.SaveDataPointGroupNameModalViewModel(entity)).then(function(name)
+		tf.modalManager.showModal(new TF.DetailView.SaveDataPointGroupNameModalViewModel(entity, groups)).then(function(name)
 		{
 			if (name !== false)
 			{
