@@ -752,7 +752,9 @@ var today = (new Date()).toDateString(),
 							});
 						},
 						"allowNullValue": true,
-						"entityKey": "DocumentClassificationID"
+						"entityKey": "DocumentClassificationID",
+						"acceptableValueReg": /^[1-9]+\d?$/
+
 					}
 				},
 				{
