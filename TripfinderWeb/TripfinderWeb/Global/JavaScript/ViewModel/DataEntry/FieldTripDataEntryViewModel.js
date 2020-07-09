@@ -431,13 +431,6 @@
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
 			paramData: paramData
-		}).catch(function(error)
-		{
-			return tf.promiseBootbox.alert(error.Message)
-				.then(function()
-				{
-					return Promise.resolve({ Items: [] });
-				});
 		});
 	};
 
