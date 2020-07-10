@@ -49,8 +49,6 @@
 		this.$form = $(el);
 		var validatorFields = {}, isValidating = false, self = this;
 
-		if (this.requiredFields.FieldTripAccountID && this.requiredFields.FieldTripAccountID.Required)
-		{
 			validatorFields.account = {
 				trigger: "blur change",
 				validators: {
@@ -59,7 +57,6 @@
 					}
 				}
 			}
-		}
 
 		setTimeout(function()
 		{
