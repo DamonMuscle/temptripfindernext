@@ -55,18 +55,19 @@
 		{
 			file = files[0];
 
-			reader.onload = function(event)
-			{
-				$(this).data("filePostData", { fileName: file.name, fileData: event.target.result });
-				self.$el.data("filePostData", { fileName: file.name, fileData: event.target.result });
-			}.bind(e.target);
-			reader.readAsDataURL(file);
 			if (file.size >= 1024 * 1024 * 2)
 			{
 				tf.promiseBootbox.alert("Size too large (<2MB)", "Alert");
 			}
 			else
 			{
+				reader.onload = function(event)
+				{
+					$(this).data("filePostData", { fileName: file.name, fileData: event.target.result });
+					self.$el.data("filePostData", { fileName: file.name, fileData: event.target.result });
+				}.bind(e.target);
+				reader.readAsDataURL(file);
+				
 				var blobUrl = url.createObjectURL(file);
 				this.$uploadedPhoto.attr('src', blobUrl);
 				this.$uploadedPhoto.css('opacity', '1');
