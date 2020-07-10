@@ -1628,7 +1628,7 @@ var today = (new Date()).toDateString(),
 				},
 				{
 					"field": "FieldTripEquipmentName",
-					"title": "Equipments",
+					"title": "Equipment",
 					"type": "String",
 					"defaultValue": "",
 					"editType": {
