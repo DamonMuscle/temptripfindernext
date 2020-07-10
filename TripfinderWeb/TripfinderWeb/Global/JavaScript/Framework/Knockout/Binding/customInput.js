@@ -30,6 +30,7 @@
 				return new TF.Input.NaturalNumberBox(initialValue, attributes, disable, events);
 			case "Decimal":
 				return new TF.Input.DecimalBox(initialValue, attributes, disable, events);
+			case "Money":
 			case "Number":
 				return new TF.Input.NumberBox(initialValue, attributes, disable, events);
 			case "Currency":
