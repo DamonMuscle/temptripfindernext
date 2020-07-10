@@ -10,7 +10,6 @@
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
 
-		self.massUpdateButton = false;
 		self.changeStatusButton = false;
 		self.cancelButton = false;
 		self.copyButton = false;
