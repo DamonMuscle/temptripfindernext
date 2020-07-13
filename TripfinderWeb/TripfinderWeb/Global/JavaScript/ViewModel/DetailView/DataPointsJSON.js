@@ -1282,7 +1282,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "Cornelia C. Contralto II",
 					"editType": {
 						"format": "String",
-						"maxLength": 200
+						"maxLength": 200,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1292,7 +1293,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "Professor",
 					"editType": {
 						"format": "String",
-						"maxLength": 100
+						"maxLength": 100,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1302,7 +1304,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "x0000",
 					"editType": {
 						"format": "PhoneExt",
-						"maxLength": 5
+						"maxLength": 5,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1312,7 +1315,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "(800) 373-3609",
 					"editType": {
 						"format": "Phone",
-						"maxLength": 30
+						"maxLength": 30,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1322,7 +1326,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "(800) 373-3609",
 					"editType": {
 						"format": "Fax",
-						"maxLength": 30
+						"maxLength": 30,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1332,7 +1337,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "ccontralto@soundmuseum.net",
 					"editType": {
 						"format": "Email",
-						"maxLength": 100
+						"maxLength": 100,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
@@ -1342,7 +1348,8 @@ var today = (new Date()).toDateString(),
 					"defaultValue": "Lorem ipsum dolor sit amet.",
 					"editType": {
 						"format": "Note",
-						"maxLength": 2000
+						"maxLength": 2000,
+						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
 				{
