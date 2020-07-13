@@ -2091,11 +2091,8 @@
 
 		if (self.dataType == "fieldtrip" && self.validateBlockout && ["DepartDateTime", "EstimatedReturnDateTime"].includes(result.fieldName))
 		{
-			var oneResult = { fieldName: result.fieldName, recordValue: fieldValue },
-				theOtherField = result.fieldName == "DepartDateTime" ? "EstimatedReturnDateTime" : "DepartDateTime",
-				theOtherResult = { fieldName: theOtherField, recordValue: value };
-			self.validateBlockout(oneResult);
-			self.validateBlockout(theOtherResult);
+			var departDateTimeValue = result.fieldName == "DepartDateTime" ? fieldValue : value;
+			self.validateBlockout({ fieldName: "DepartDateTime", recordValue: departDateTimeValue });
 		}
 
 		if (!tf.helpers.detailViewHelper.compareTwoValues(valArray, map.comparator))
