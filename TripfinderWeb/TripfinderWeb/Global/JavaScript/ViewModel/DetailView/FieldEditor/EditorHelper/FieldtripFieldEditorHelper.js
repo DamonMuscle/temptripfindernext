@@ -425,7 +425,7 @@
 
 		if (self._detailView.rootGridStack && self._detailView.rootGridStack.dataBlocks)
 		{
-			var checkFields = Object.keys(self.fieldRelatedMap);
+			var checkFields = ["DepartDateTime"];
 			var blocks = self._detailView.rootGridStack.dataBlocks.filter(function(d) { return d.options && checkFields.includes(d.options.field) })
 			if (blocks && blocks.length > 0)
 			{
@@ -439,7 +439,7 @@
 						}
 						var date = moment(result.recordValue).format("YYYY-MM-DD");
 						var error = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(moment(result.recordValue), date, self.fieldTripConfigs.BlockOutTimes);
-						if (error)
+						if (error && !tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
 						{
 							self._detailView.$element.find('div.grid-stack-item-content[data-block-field-name=' + d.options.field + ']').addClass(self.VALIDATE_ERROR_CLASS);
 							self.editFieldList[result.fieldName] = {
