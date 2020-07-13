@@ -230,7 +230,7 @@
 			}
 		}
 
-		const selectedValue = +self.comboBox.value();
+		const selectedValue = self.comboBox.value();
 		if (selectedValue === DEFAULT_NULL_VALUE)
 		{
 			self.apply(null, "");

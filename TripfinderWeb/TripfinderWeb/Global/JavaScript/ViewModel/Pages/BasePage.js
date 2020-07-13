@@ -10,7 +10,6 @@
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
 
-		self.massUpdateButton = false;
 		self.changeStatusButton = false;
 		self.cancelButton = false;
 		self.copyButton = false;
@@ -133,26 +132,32 @@
 	BasePage.prototype.closeDetailClick = function(filter)
 	{
 		var self = this,
-		isReadRecordMode = self.detailView.isReadMode(),
-		exitEditing = isReadRecordMode
-			? self.detailView.exitEditing()
+			isReadRecordMode = self.detailView.isReadMode(),
+			exitEditing = isReadRecordMode
+				? self.detailView.exitEditing()
 				: self.detailView.checkLayoutChangeAndClose();
 
 		return Promise.resolve(exitEditing)
-			.then(function (result) {
-				if (result) {
-					if (filter === true || !TF.isMobileDevice) {
+			.then(function(result)
+			{
+				if (result)
+				{
+					if (filter === true || !TF.isMobileDevice)
+					{
 						tf.pageManager.resizablePage.closeRightPage();
 					}
-					else {
+					else
+					{
 						self.obShowDetailPanel(false);
 						tf.pageManager.resizablePage.clearLeftOtherContent();
 						self.detailView.dispose();
 						self.detailView = null;
-						if ($(".kendoscheduler").length > 0) {
+						if ($(".kendoscheduler").length > 0)
+						{
 							$(".kendoscheduler").getKendoScheduler().refresh();
 						}
-						if(self.isDetailViewEdited) {
+						if (self.isDetailViewEdited)
+						{
 							self.isDetailViewEdited = false;
 							self.searchGrid.refreshClick();
 						}
@@ -170,9 +175,11 @@
 	BasePage.prototype.onEditRecordSuccessHandler = function(e, recordEntity)
 	{
 		var self = this;
-		if(TF.isMobileDevice) {
+		if (TF.isMobileDevice)
+		{
 			self.isDetailViewEdited = true;
-		} else {
+		} else
+		{
 			self.searchGrid.refreshClick();
 		}
 		self.detailView.refresh();
@@ -371,77 +378,6 @@
 			});
 	};
 
-	BasePage.prototype.massUpdateClick = function()
-	{
-		var self = this, selectedIds = self.searchGrid.getSelectedIds(), gridType = self.searchGrid._gridType;
-		return tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceSettingsModalViewModel(selectedIds.length, gridType)).then(function(result)
-		{
-			if (!result)
-			{
-				return;
-			}
-
-			var recordIds = [], field, newValue, relationshipKey;
-			if (result.specifyRecords == "selected")
-			{
-				recordIds = selectedIds;
-			}
-			else
-			{
-				recordIds = self.searchGrid.obAllIds();
-			}
-
-			field = result.field;
-			newValue = result.newValue;
-			relationshipKey = result.relationshipKey;
-			if (result.replaceType == "Standard")
-			{
-				return self._globalReplaceConfirm(recordIds).then(function(yesOrNo)
-				{
-					if (yesOrNo)
-					{
-						self._globalReplace(recordIds, field, newValue, relationshipKey);
-					}
-				});
-			}
-
-			if (result.extended == 0 || result.extended == 1)
-			{
-				return tf.promiseBootbox.yesNo("This change may remove selected students from all their Trips. Do you wish to continue?", "Confirmation Message").then(function(yesOrNo)
-				{
-					if (yesOrNo)
-					{
-						var promise = null;
-						if (result.extended == 0)
-						{
-							// Remove all additional requirements
-							promise = tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
-								paramData: {
-									"@filter": "in(StudentId," + recordIds.join(",") + ")&eq(Type,1)",
-									dbid: tf.datasourceManager.databaseId
-								}
-							});
-						}
-
-						if (promise)
-						{
-							promise.then(function()
-							{
-								self.searchGrid.refresh();
-								tf.promiseBootbox.alert("Global Replace success");
-							});
-						}
-					}
-				});
-			}
-		});
-	};
-
-	BasePage.prototype._globalReplaceConfirm = function(recordIds)
-	{
-		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to global replace {0} {1}? These changes are permanent.', recordIds.length, recordIds.length === 1 ? 'record' : 'records'), "Confirmation Message");
-	};
-
 	BasePage.prototype.dateCheck = function(fieldtrips, field, newValue)
 	{
 		var result = $.grep(fieldtrips, function(trip)
@@ -468,71 +404,6 @@
 			}
 		});
 		return result.map(function(item) { return item.Id });
-	};
-
-	BasePage.prototype._globalReplace = function(recordIds, field, newValue, relationshipKey)
-	{
-		var self = this, data = [], paramData = {
-			"@updateResult": true
-		}, fields = ["Id", "FieldTripStageId"];
-
-		if ("DepartDateTime" === field)
-		{
-			fields.push("EstimatedReturnDateTime");
-		}
-		else if ("EstimatedReturnDateTime" === field)
-		{
-			fields.push("DepartDateTime");
-		}
-
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search/fieldtrips"), {
-			paramData: { take: 100000, skip: 0 },
-			data: {
-				fields: fields,
-				filterClause: "",
-				filterSet: null,
-				idFilter: { IncludeOnly: recordIds, ExcludeAny: [] },
-				sortItems: [{ Name: "Id", isAscending: "asc", Direction: "Ascending" }]
-			}
-		}).then(function(result)
-		{
-			var editableFieldtrips = tf.helpers.fieldTripAuthHelper.getEditableFieldTrips(result.Items);
-
-			var ids = editableFieldtrips.map(function(item) { return item.Id });
-			var failedIds = $.grep(recordIds, function(id) { return ids.indexOf(id) < 0 });
-
-			var validDateIds = self.dateCheck(editableFieldtrips, field, newValue);
-			var invalidDateIds = $.grep(ids, function(id) { return validDateIds.indexOf(id) < 0 });
-
-			validDateIds.forEach(function(id)
-			{
-				if (relationshipKey)
-				{
-					data.push({ "Id": id, "op": "relationship", "path": "/" + field, "value": typeof newValue == "string" ? newValue : JSON.stringify(newValue) });
-				}
-				else
-				{
-					data.push({ "Id": id, "op": "replace", "path": "/" + field, "value": newValue.toString() });
-				}
-			});
-			if (relationshipKey)
-			{
-				paramData["@relationships"] = relationshipKey;
-			}
-			return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), "fieldtrips"), {
-				paramData: paramData,
-				data: data,
-			}).then(function(result)
-			{
-				if (result && result.Items && result.Items[0])
-				{
-					self.searchGrid.refresh();
-					result.Items[0].FailedIds = result.Items[0].FailedIds.concat(failedIds);
-					result.Items[0].InvalidDateIds = invalidDateIds;
-					tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceResultsModalViewModel(result.Items[0], self.searchGrid._gridType));
-				}
-			});
-		});
 	};
 
 	BasePage.prototype.saveAsClick = function()
