@@ -2060,10 +2060,10 @@
 						end.year(2010);
 						end.dayOfYear(1);
 
-						if (m.isValid() && end.isValid() && m.isAfter(end))
+						if (m.isValid() && end.isValid() && m.diff(end) >= 0)
 						{//return time need greate than depart time
 							this.pageLevelViewModel.activeLostfouseName = "departTime";
-							return { message: 'must be <= return Time', valid: false };
+							return { message: 'must be < return Time', valid: false };
 						}
 
 						//validate passed, clear all messages.
@@ -2125,10 +2125,10 @@
 						end.year(2010);
 						end.dayOfYear(1);
 
-						if (m.isValid() && end.isValid() && m.isAfter(end))
+						if (m.isValid() && end.isValid() && m.diff(end)>= 0)
 						{//return time need greate than depart time
 							this.pageLevelViewModel.activeLostfouseName = "returnTime";
-							return { message: 'must be >= Depart Time', valid: false };
+							return { message: 'must be > Depart Time', valid: false };
 						}
 
 						//validate passed, clear all messages.
