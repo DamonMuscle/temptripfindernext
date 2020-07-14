@@ -103,7 +103,7 @@
 
 				if (mmtObj.startOf("day") < mmtLeftBound)
 				{
-					return { valid: false, message: String.format("Depart Date must be on or after {0}", mmtObj.format("M/D/YYYY")) };
+					return { valid: false, message: String.format("Depart Date must be on or after {0}", mmtLeftBound.format("M/D/YYYY")) };
 				}
 
 				return { valid: true, message: "" };
