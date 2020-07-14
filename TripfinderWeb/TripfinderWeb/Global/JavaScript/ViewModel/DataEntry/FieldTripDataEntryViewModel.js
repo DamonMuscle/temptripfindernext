@@ -1903,6 +1903,10 @@
 			validatorFields.name.validators.notEmpty = { message: "required" };
 		}
 
+		if (tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
+		{
+			return;
+		}
 		validatorFields.departDate.validators.callback = {
 			message: "must be <= Return Date",
 			callback: function(value, validator)
