@@ -312,14 +312,14 @@
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContact&&obRequiredFields().DestinationContact.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Contact')"></label>
 						<input type="text" class="form-control"
-							data-bind="enable:!obStrictDest, value:obEntityDataModel().destinationContact, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationContact?obRequiredFields().DestinationContact.Required:null)"
+							data-bind="enable:!obFieldTripSettings().StrictDest, value:obEntityDataModel().destinationContact, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationContact?obRequiredFields().DestinationContact.Required:null)"
 							maxlength="200" name="DestinationContact" />
 					</div>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right">
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContactTitle&&obRequiredFields().DestinationContactTitle.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Title')"></label>
 						<input type="text" class="form-control"
-							data-bind="enable:!obStrictDest, value:obEntityDataModel().destinationContactTitle, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationContactTitle?obRequiredFields().DestinationContactTitle.Required:null)"
+							data-bind="enable:!obFieldTripSettings().StrictDest, value:obEntityDataModel().destinationContactTitle, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationContactTitle?obRequiredFields().DestinationContactTitle.Required:null)"
 							maxlength="100" name="DestinationContactTitle" />
 					</div>
 					<div class="col-xs-12 form-group no-padding-left">
@@ -363,14 +363,14 @@
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationEmail&&obRequiredFields().DestinationEmail.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
 						<input type="text" class="form-control" name="DestinationEmail" data-tf-input-type="Email"
-							data-bind="enable:!obStrictDest,value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationEmail?obRequiredFields().DestinationEmail.Required:null)"
+							data-bind="enable:!obFieldTripSettings().StrictDest,value:obEntityDataModel().destinationEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationEmail?obRequiredFields().DestinationEmail.Required:null)"
 							maxlength="100" />
 					</div>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right textarea">
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationNotes&&obRequiredFields().DestinationNotes.Required?'requirestar':null">Notes</label>
 						<textarea class="form-control verticalResize" style="height: 79px;"
-							data-bind="enable:!obStrictDest,value:obEntityDataModel().destinationNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationNotes?obRequiredFields().DestinationNotes.Required:null)"
+							data-bind="enable:!obFieldTripSettings().StrictDest,value:obEntityDataModel().destinationNotes, attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationNotes?obRequiredFields().DestinationNotes.Required:null)"
 							maxlength="10000" name="DestinationNotes"></textarea>
 					</div>
 				</div>
