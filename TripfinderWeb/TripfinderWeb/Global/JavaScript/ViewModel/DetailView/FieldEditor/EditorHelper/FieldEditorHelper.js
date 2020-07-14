@@ -1004,56 +1004,27 @@
 			uniqueCheckErrors = self._checkCodeMustBeUnique(recordEntity, uniqueObjects).filter(function(uniqueError)
 			{
 				return customErrorFieldMap[uniqueError.fieldName] === undefined;
-			}),
-			specialErrors = [], specialValidate = Promise.resolve(specialErrors);
-		// special step for fieldtrip to check blockoutitmes
-		if (dataType === "fieldtrip")
-		{
-			if (self._detailView.rootGridStack && self._detailView.rootGridStack.dataBlocks)
+			});
+
+		return self.validateEntityByType(recordEntity, dataType, isCreateRecord)
+			.then(function(validationMessages)
 			{
-				var checkFields = ["DepartDateTime"];
-				var blocks = self._detailView.rootGridStack.dataBlocks.filter(function(d) { return d.options && checkFields.includes(d.options.field) })
-				if (blocks && blocks.length > 0)
-				{
-					specialValidate = Promise.resolve(self.getBlockoutSettings().then(function()
+				var validationMessages = validationMessages || [],
+					groups = _.groupBy([].concat(customInputErrors, missingFieldErrors, uniqueCheckErrors, validationMessages), "fieldName"),
+					keys = Object.keys(groups),
+					errorMessages = _.uniq(keys.reduce(function(acc, key)
 					{
-						blocks.forEach(function(d, index)
+						return acc.concat(groups[key].map(function(item)
 						{
-							var date = moment(recordEntity[d.options.field]).format("YYYY-MM-DD");
-							var error = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(moment(recordEntity[d.options.field]), date, self.fieldTripConfigs.BlockOutTimes);
-							if (error && !tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
-							{
-								specialErrors.push({ fieldName: d.options.field, message: error });
-							}
-						});
-						return specialErrors;
-					}));
-				}
-			}
-		}
+							return item.message;
+						}));
+					}, []));
 
-		return specialValidate.then(function()
-		{
-			return self.validateEntityByType(recordEntity, dataType, isCreateRecord)
-				.then(function(validationMessages)
-				{
-					var validationMessages = validationMessages || [],
-						groups = _.groupBy([].concat(customInputErrors, missingFieldErrors, uniqueCheckErrors, specialErrors, validationMessages), "fieldName"),
-						keys = Object.keys(groups),
-						errorMessages = _.uniq(keys.reduce(function(acc, key)
-						{
-							return acc.concat(groups[key].map(function(item)
-							{
-								return item.message;
-							}));
-						}, []));
+				// make sure validation error classes have been added;
+				self.toggleValidationErrorToFieldsByName(keys, true);
 
-					// make sure validation error classes have been added;
-					self.toggleValidationErrorToFieldsByName(keys, true);
-
-					return errorMessages;
-				});
-		})
+				return errorMessages;
+			});
 	};
 
 	FieldEditorHelper.prototype.toggleValidationErrorToFieldsByName = function(fieldNames, display)
