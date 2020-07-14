@@ -116,16 +116,16 @@
 		return tf.fieldTripConfigsDataHelper.getBlockTimes()
 			.then(function(blockTimes)
 			{
-				var dateString = mmtObj.format("YYYY-MM-DD"),
+				var dateString = mmtObj.format("YYYY-MM-DD"), startTime = moment.invalid(), endTime = moment.invalid(),
 					valid = blockTimes.every(function(blockTime)
 					{
-						var startTime = moment(dateString + " " + blockTime.From),
-							endTime = moment(dateString + " " + blockTime.To);
+						startTime = moment(dateString + " " + blockTime.From);
+						endTime = moment(dateString + " " + blockTime.To);
 
 						return !mmtObj.isBetween(startTime, endTime);
 					});
 
-				return { valid: valid, message: "Departure time shouldn't be in block time." };
+				return { valid: valid, message: mmtObj.format('hh:mm A') + " is invalid because of the blockout period of " + startTime.format("hh:mm A") + " and " + endTime.format("hh:mm A") + "." };
 			});
 	};
 })();
