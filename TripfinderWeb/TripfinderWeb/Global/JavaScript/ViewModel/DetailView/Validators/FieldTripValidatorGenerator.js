@@ -103,7 +103,7 @@
 
 				if (mmtObj.startOf("day") < mmtLeftBound)
 				{
-					return { valid: false, message: String.format(" must schedule {0} school days in advance", daysInAdvance) };
+					return { valid: false, message: String.format("Depart Date must be on or after {0}", mmtObj.format("M/D/YYYY")) };
 				}
 
 				return { valid: true, message: "" };
