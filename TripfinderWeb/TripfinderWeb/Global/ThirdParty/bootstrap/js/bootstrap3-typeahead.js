@@ -80,6 +80,10 @@
 		this.afterSelect = this.options.afterSelect;
 		this.showEmpty = this.options.showEmpty ? this.options.showEmpty : false;
 		this.addItem = false;
+		this.$entryContainer = this.$element.closest("div.modal-body,div.dataentry-container");
+		this.func_disableModalBodyScroll = function (e) {
+			e.preventDefault();
+		};
 	};
 
 	Typeahead.prototype = {
@@ -155,7 +159,7 @@
 
 			this._toggleScroll(false);
 			this._toggleScroll(true);
-
+			this.$entryContainer.on("mousewheel touchmove",this.func_disableModalBodyScroll);
 			return this;
 		},
 
@@ -181,6 +185,7 @@
 			this.shown = false;
 
 			this._toggleScroll(false);
+			this.$entryContainer.off("mousewheel touchmove",this.func_disableModalBodyScroll);
 			return this;
 		},
 
