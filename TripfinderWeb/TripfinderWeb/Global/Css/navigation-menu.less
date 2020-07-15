@@ -250,11 +250,16 @@
 
       .navigation-item {
         position: relative;
-        height: 50px;
-        margin-bottom: 4px;
+        height: 54px;
+        margin-bottom: 8px;
         background-color: @BackgroundColor;
         cursor: pointer;
         overflow: hidden;
+
+        @media (max-height: 500px){
+          height: 50px;
+          margin-bottom: 4px;
+        }
 
         &.active {
           background-color: @systemColor;
