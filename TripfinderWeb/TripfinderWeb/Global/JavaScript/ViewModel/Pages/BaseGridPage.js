@@ -382,7 +382,7 @@
 			statusRow.width("auto");
 			toolRow.width("auto");
 			statusRow.css("marginLeft", "0px");
-			toolRow.css("marginLeft", "0px");
+			toolRow.css("marginLeft", "-10px");
 			statusRow.addClass("pull-right");
 			statusRow.css("marginLeft", containerWidth + "px");
 			statusRow.width("100%");

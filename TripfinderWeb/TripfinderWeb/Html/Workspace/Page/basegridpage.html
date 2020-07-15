@@ -8,18 +8,21 @@
 		<div class="icon float-right add" data-bind="click:addClick"></div>
 	</div>
 	<!-- /ko -->
-	<div class="desktop-header">
+	<div class="desktop-header" data-bind="css:{'is-phone-device':TF.isPhoneDevice}">
 		<div class="page-title" data-bind="text:getTitleByType(pageType)"></div>
 		<!-- ko if:!TF.isPhoneDevice-->
-		<div class="new-request" data-bind="click : addClick,visible:type === 'fieldtrip'&&!obShowFieldTripDEPanel()">Submit New Request</div>
+		<div class="new-request" data-bind="click : addClick,visible:type === 'fieldtrip'&&!obShowFieldTripDEPanel()">Submit
+			New Request</div>
 		<!-- /ko -->
 	</div>
 	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
 		<div class="iconrow">
 			<!-- ko if: pageType !== "reports"-->
-			<button class="iconbutton gridview" title="Grid View" data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
+			<button class="iconbutton gridview" title="Grid View"
+				data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
 			<!-- ko if:detailButton-->
-			<button class="iconbutton details" title="Detail View" data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
+			<button class="iconbutton details" title="Detail View"
+				data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
 			<!-- /ko -->
 			<!-- ko if:schedulerButton-->
 			<button class="iconbutton kendo-scheduler" title="Calendar View" data-bind="click:schedulerViewClick"></button>
@@ -27,8 +30,10 @@
 			<div class="divider" title=""></div>
 			<button class="iconbutton summarybar" title="Summary Bar" data-bind="css:{open:obSummaryGridVisible()}"></button>
 			<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
-			<button class="iconbutton layout" title="Layouts" data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
-			<button class="iconbutton filter" title="Filters" data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
+			<button class="iconbutton layout" title="Layouts"
+				data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
+			<button class="iconbutton filter" title="Filters"
+				data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
 			<!-- ko if: changeStatusButton || cancelButton-->
 			<div class="divider" title=""></div>
 			<!-- /ko -->
@@ -57,8 +62,9 @@
 			<div class="grid-staterow">
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
-					<span data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}" class="filtername-ellipsis text-overflow"
-								style="max-width:150px;"></span>
+					<span
+						data-bind="text:obSelectedGridFilterName,visible:noApplyFilterNoModified,attr:{'title':obSelectedGridFilterName}"
+						class="filtername-ellipsis text-overflow" style="max-width:150px;"></span>
 					<!-- ko if:obSelectedGridFilterModifiedMessage -->
 					<span data-bind="visible:noApplyFilterNoModified" class="left-parenthesis-no-padding">(</span>
 					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
