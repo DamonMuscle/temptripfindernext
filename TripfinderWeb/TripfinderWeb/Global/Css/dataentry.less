@@ -531,7 +531,12 @@ body .document-dataentry.page-level-message-container {
 }
 
 .alert-small {
-	padding: 5px;
+	padding: 5px 10px;
+
+	@media (max-width:330px)
+	{
+		padding: 5px;
+	}
 }
 
 .document-dataentry .input-group-btn > button,
