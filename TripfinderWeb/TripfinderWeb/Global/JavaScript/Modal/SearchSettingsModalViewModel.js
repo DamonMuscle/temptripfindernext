@@ -9,7 +9,6 @@
 
 		self.sizeCss = "modal-dialog-sm";
 		self.modalClass = "searchSettings-modal";
-		self.modalWidth("355px");
 		self.title("Search Settings");
 		self.contentTemplate("Modal/SearchSettingsControl");
 		self.buttonTemplate("modal/positivenegativeother");
