@@ -208,7 +208,12 @@ button * {
 }
 
 .tfmodal .modal-footer button {
-  min-width: 50px;
+  min-width: 100px;
+
+  @media (max-width: 330px)
+  {
+    min-width: 50px;
+  }
 }
 
 .tfmodal .modal-footer button.bootbox-button {
