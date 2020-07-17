@@ -443,7 +443,7 @@
 						title: key,
 						columns: ko.observableArray(dataPointsForCurrentPage[key].map(column =>
 						{
-							var c = { ...column };
+							let c = JSON.parse(JSON.stringify(column));
 							if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
 							{
 								c.isRequired = true;
