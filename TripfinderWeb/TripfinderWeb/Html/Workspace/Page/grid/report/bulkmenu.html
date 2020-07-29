@@ -1,4 +1,4 @@
-﻿<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
+﻿<!-- <div style="margin:-5px;padding-top:5px;padding-bottom:5px">
 	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
 		<ul class="tf-contextmenu grid-menu">
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.generateReport.bind(gridViewModel.gridViewModel,null,'email')">
@@ -24,4 +24,30 @@
 		</ul>
 	</div>
 </div>
+ -->
+<div style="margin:-5px;">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
+		<ul class="tf-contextmenu grid-menu">
 
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.runSelectedReportClick.bind(gridViewModel)">
+				<div class="menu-icon runreport">
+				</div>
+				<div class="menu-label">
+					Run
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.searchGrid.addRemoveColumnClick">
+				<div class="menu-icon showhidecolumns">
+				</div>
+				<div class="menu-label" data-bind="text: 'Show/Hide Grid Columns'"></div>
+			</li>
+			<!-- <li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendToClick">
+				<div class="menu-icon sendTo">
+				</div>
+				<div class="menu-label">
+					Send To
+				</div>
+			</li> -->
+		</ul>
+	</div>
+</div>

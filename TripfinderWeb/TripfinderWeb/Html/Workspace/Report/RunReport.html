@@ -1,0 +1,344 @@
+<div data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="tabstrip-runreport">
+		<ul>
+			<li class="k-state-active">
+				Filters
+			</li>
+			<li>
+				Parameters
+			</li>
+			<!-- ko if: obMapAvailiable -->
+			<li>
+				Maps
+			</li>
+			<!-- /ko -->
+		</ul>
+		<div class="clearfix filters-tab" style="display:none">
+			<div class="row">
+				<div class="col-xs-23 ">
+					<h4><strong>Output Type</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-23 description">
+					You may preview your report or download it in a number of different formats.
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-11 ">
+					<div class="form-group">
+						<div class="input-group">
+							<div
+								data-bind="typeahead:{source:obOutputTypeOptions,format:function(obj){return obj.text;},drowDownShow:true,notSort:true,selectedValue:obSelectedOutputType,isSelect:true}">
+								<!-- ko customInput:{type:"Select",value:obSelectedOutputTypeText,attributes:{class:"form-control", name:"outputType"}} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-23 ">
+					<h4><strong>Filter Records</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-23 description">
+					You may filter the records that are used for this report by using a Filter or by selecting specific
+					records. Unless a Filter or Specific Records are selected, all
+					records will be used for the report.
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-11 ">
+					<div class="form-group">
+						<label class="requirestar"><strong>Data Source</strong></label>
+						<div id="filterDataSource" class="input-group">
+							<div
+								data-bind="typeahead:{source:obDataSourceOptions,format:function(obj){return obj.name;},drowDownShow:true,notSort:true,selectedValue:obSelectedDataSource}">
+								<!-- ko customInput:{type:"Select",value:obSelectedDataSourceText,attributes:{class:"form-control", name:"dataSource"}} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-11 ">
+					<div class="form-group">
+						<label class="requirestar"><strong>Specify Records</strong></label>
+						<div class="input-group">
+							<div
+								data-bind="typeahead:{source:obAllRecordMethods,format:function(obj){return obj.text;},drowDownShow:true,notSort:true,selectedValue:obSelectedRecordMethod}">
+								<!-- ko customInput:{type:"Select",value:obSelectedRecordMethodText,attributes:{class:"form-control", name:"specifyrecord"}} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-11 ">
+					<div class="form-group" style="height:40px;">
+						<label class="bold-Label filter-name">Filter Name</label>
+						<div class="input-group">
+							<div
+								data-bind="typeahead:{source:obAvailableFilters,format:function(obj){return obj.isValid?obj.name:'[disable]'+obj.name;},drowDownShow:true,notSort:true,selectedValue:obSelectedFilter}">
+								<!-- ko customInput:{type:"Select",value:obSelectedFilterText,attributes:{class:"form-control", name:"filterName"}, disable:obFilterDisabled} -->
+								<!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default btn-sharp"
+									data-bind="disable:obFilterDisabled">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="bold-Label">Statement</label>
+						<div class="input-group">
+							<textarea class="form-control" style="height:103px;"
+								data-bind="value:obSelectedFilterWhereClause" disabled></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-11">
+					<div class="form-group" style="height:180px;">
+						<label class="bold-Label specific-records">Specific Records</label>
+						<div class="input-group">
+							<div class="form-control" style="height:162px;"
+								data-bind="foreach:obSpecifiedRecords().map(specificRecordFormatter),attr:{disabled:obSpecifiedRecordsDisabled}">
+								<div data-bind="text:$data"></div>
+							</div>
+							<div class="input-group-btn" style="vertical-align:top;">
+								<button type="button" class="btn btn-default btn-sharp"
+									data-bind="event:{click:selectRecordClick},disable:obSpecifiedRecordsDisabled">
+									<span class="glyphicon glyphicon-option-horizontal"></span>
+								</button>
+							</div>
+						</div>
+						<input type="text" name="specificRecords" class="form-control notinput-required-message"
+							style="height:0;padding:0;border:none;"
+							data-bind="value:obSpecificRecordStringForValidation" required />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="clearfix parameters-tab" style="display:none">
+			<div class="row">
+				<div class="col-xs-23 ">
+					<h4><strong>Parameters</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-23 description">
+					Here you can configure the parameters of this given report
+				</div>
+			</div>
+			<!-- ko foreach: obReportParameterItems -->
+			<div class="row">
+				<div class="col-xs-12 form-group">
+					<label data-bind="attr: { 'class': requiredCssClass}">
+						<strong><span data-bind="text:displayName"></span></strong>
+					</label>
+					<div class="input-group">
+						<!-- ko template :{ name : "workspace/Report/Control/ReportParameterItem",data:$data } -->
+						<!-- /ko -->
+					</div>
+				</div>
+			</div>
+			<!-- /ko -->
+		</div>
+		<!-- ko if: obMapAvailiable -->
+		<div class="clearfix tripmap-tab" style="display:none">
+			<div class="row">
+				<div class="col-xs-23 ">
+					<h4><strong>Maps</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-23 description">
+					Here you can configure the maps of this given report
+				</div>
+			</div>
+			<!-- ko if:obIsTripMapUsed-->
+			<div class="row">
+				<div class="col-xs-23">
+					<h4>Trip Map</h4>
+				</div>
+				<div class="col-xs-23">
+					<div class="col-xs-12 form-group">
+						<label>
+							<strong><span>Base Map</span></strong>
+						</label>
+						<div class="form-group">
+							<div class="input-group">
+								<div
+									data-bind="typeahead:{source:obBasemaps,format:function(obj){return obj.title;},drowDownShow:true,notSort:true,selectedValue:obSelectedTripBaseMap,isSelect:true}">
+									<!-- ko customInput:{type:"Select",value:obSelectedTripBaseMapText,attributes:{class:"form-control", name:"basemap"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-23">
+					<div class="col-xs-12 form-group">
+						<label>
+							<strong><span>Other Settings</span></strong>
+						</label>
+						<div class="form-group ">
+							<div class="checkbox">
+								<input type="checkbox" id="checkPath" data-bind="checked:obShowPath" />
+								<label for="checkPath">Show Path</label>
+							</div>
+							<div class="checkbox">
+								<input type="checkbox" id="checkStop" data-bind="checked:obShowStop" />
+								<label for="checkStop">Show Stop</label>
+							</div>
+							<!-- ko if:obShowStop() -->
+							<div style="padding-left: 15px;">
+								<div class="checkbox">
+									<input type="checkbox" id="checkAS" data-bind="checked:obShowAssignedStudents" />
+									<label for="checkAS">Show Assigned Students</label>
+								</div>
+								<div class="checkbox">
+									<input type="checkbox" id="Boundary" data-bind="checked:obShowBoundary" />
+									<label for="Boundary">Show Boundary</label>
+								</div>
+							</div>
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--/ko-->
+			<!-- ko if:obIsStudentMapUsed-->
+			<div class="row">
+				<div class="col-xs-23">
+					<h4>Student Map</h4>
+				</div>
+				<div class="col-xs-23">
+					<div class="col-xs-12 form-group">
+						<label>
+							<strong><span>Base Map</span></strong>
+						</label>
+						<div class="form-group">
+							<div class="input-group">
+								<div
+									data-bind="typeahead:{source:obBasemaps,format:function(obj){return obj.title;},drowDownShow:true,notSort:true,selectedValue:obSelectedStudentBaseMap,isSelect:true}">
+									<!-- ko customInput:{type:"Select",value:obSelectedStudentBaseMapText,attributes:{class:"form-control", name:"basemap"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-23">
+					<div class="col-xs-12 form-group">
+						<label>
+							<strong><span>Other Settings</span></strong>
+						</label>
+						<div class="form-group ">
+							<!-- ko if:obIsStudentMapUsed -->
+							<div class="checkbox">
+								<input type="checkbox" id="checkHome" data-bind="checked:obShowHome" />
+								<label for="checkHome">Show Home</label>
+							</div>
+							<div class="checkbox">
+								<input type="checkbox" id="checkAlternateSite"
+									data-bind="checked:obShowAlternateSite" />
+								<label for="checkAlternateSite">Show Alternate Site</label>
+							</div>
+							<div class="checkbox">
+								<input type="checkbox" id="checkSchoolLocation"
+									data-bind="checked:obShowSchoolLocation" />
+								<label for="checkSchoolLocation">Show School Location</label>
+							</div>
+							<div class="checkbox">
+								<input type="checkbox" id="checkAllStopLocations"
+									data-bind="checked:obShowAllStopLocations" />
+								<label for="checkAllStopLocations">Show All Stop Locations</label>
+							</div>
+							<div class="checkbox">
+								<input type="checkbox" id="checkHomeToSchoolPath"
+									data-bind="checked:obShowHomeToSchoolPath" />
+								<label for="checkHomeToSchoolPath">Show Home To School Path</label>
+							</div>
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--/ko-->
+			<!-- ko if:obIsTripStopMapUsed-->
+			<div class="row">
+				<div class="col-xs-23">
+					<h4>TripStop Map</h4>
+				</div>
+				<div class="col-xs-23">
+					<div class="col-xs-12 form-group">
+						<label>
+							<strong><span>Base Map</span></strong>
+						</label>
+						<div class="form-group">
+							<div class="input-group">
+								<div
+									data-bind="typeahead:{source:obBasemaps,format:function(obj){return obj.title;},drowDownShow:true,notSort:true,selectedValue:obSelectedTripStopBaseMap,isSelect:true}">
+									<!-- ko customInput:{type:"Select",value:obSelectedTripStopBaseMapText,attributes:{class:"form-control", name:"basemap"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-23">
+					<div class="col-xs-12 form-group">
+						<label>
+							<strong><span>Other Settings</span></strong>
+						</label>
+						<div class="form-group ">
+							<!-- TO-DO -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--/ko-->
+		</div>
+		<!-- /ko -->
+	</div>
+
+</div>

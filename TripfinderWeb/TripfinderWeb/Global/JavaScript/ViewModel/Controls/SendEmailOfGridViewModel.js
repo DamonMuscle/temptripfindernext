@@ -37,8 +37,8 @@
 				{
 					paramData:
 					{
-						"@filter": "in(id,"+this.option.selectedIds.toString()+")",
-						"@fields":"ContactEmail,DestinationEmail"
+						"@filter": "in(id," + this.option.selectedIds.toString() + ")",
+						"@fields": "ContactEmail,DestinationEmail"
 					}
 				}, { overlay: false }).then(function(result)
 				{
@@ -50,16 +50,17 @@
 					{
 						addressList.push(item.ContactEmail, item.DestinationEmail);
 					});
-					addressList.filter(function(item, index, arr) {
+					addressList.filter(function(item, index, arr)
+					{
 						return arr.indexOf(item, 0) === index && !!item;
 					}).map(function(item)
 					{
 						address.push(
 							new TF.DataModel.ReportReceiptDataModel(
-							{
-								SelectedUserId: 0,
-								EmailAddress: item
-							}));
+								{
+									SelectedUserId: 0,
+									EmailAddress: item
+								}));
 					});
 					if (option.placeEmailTo == 'Bcc')
 					{
@@ -174,31 +175,45 @@
 
 	SendEmailOfGridViewModel.prototype.initAttachments = function()
 	{
+		// this.documentEntities.push(
+		// 	{
+		// 		Filename: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + (this.option.modelType === 'SendTo' ? '.csv' : '.xls'),
+		// 		Guid: ko.observable(''),
+		// 		DatabaseId: tf.datasourceManager.databaseId,
+		// 		FileProgress: ko.observable("0%"),
+		// 		DownLoadComplete: ko.observable(false),
+		// 		UploadFailed: ko.observable(false)
+		// 	});
+		// if (this.option.type == 'altsite' ||
+		// 	this.option.type == 'student' ||
+		// 	this.option.type == 'school' ||
+		// 	this.option.type == 'tripstop' ||
+		// 	this.option.type == 'trip')
+		// {
+		// 	this.documentEntities.push(
+		// 		{
+		// 			Filename: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".KML",
+		// 			Guid: ko.observable(''),
+		// 			DatabaseId: tf.datasourceManager.databaseId,
+		// 			FileProgress: ko.observable("0%"),
+		// 			DownLoadComplete: ko.observable(false),
+		// 			UploadFailed: ko.observable(false)
+		// 		});
+		// }
 		this.documentEntities.push(
 			{
-				Filename: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + (this.option.modelType === 'SendTo' ? '.csv' : '.xls'),
-				Guid: ko.observable(''),
+				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".csv",
 				DatabaseId: tf.datasourceManager.databaseId,
-				FileProgress: ko.observable("0%"),
-				DownLoadComplete: ko.observable(false),
+				DownLoadComplete: ko.observable(true),
 				UploadFailed: ko.observable(false)
 			});
-		if (this.option.type == 'altsite' ||
-			this.option.type == 'student' ||
-			this.option.type == 'school' ||
-			this.option.type == 'tripstop' ||
-			this.option.type == 'trip')
-		{
-			this.documentEntities.push(
-				{
-					Filename: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".KML",
-					Guid: ko.observable(''),
-					DatabaseId: tf.datasourceManager.databaseId,
-					FileProgress: ko.observable("0%"),
-					DownLoadComplete: ko.observable(false),
-					UploadFailed: ko.observable(false)
-				});
-		}
+		this.documentEntities.push(
+			{
+				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".xls",
+				DatabaseId: tf.datasourceManager.databaseId,
+				DownLoadComplete: ko.observable(true),
+				UploadFailed: ko.observable(false)
+			});
 	};
 
 	SendEmailOfGridViewModel.prototype.setEmailSubject = function()
@@ -589,16 +604,18 @@
 		this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		this.obEntityDataModel().apiIsDirty(false);
 		this.loadRecipientsForMobile();
-		if (this.option.modelType === 'SendTo')
-		{
-			this.LoadAttachments();
-			this.intervalID = this.GetProgress();
-			this.setTimeoutID = setTimeout(function()
-			{
-				clearInterval(self.intervalID);
-				tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "resetProgress"), {}, { overlay: false });
-			}, 120000);
-		}
+
+		this.obdisabledSend(false)
+		// if (this.option.modelType === 'SendTo')
+		// {
+		// 	this.LoadAttachments();
+		// 	this.intervalID = this.GetProgress();
+		// 	this.setTimeoutID = setTimeout(function()
+		// 	{
+		// 		clearInterval(self.intervalID);
+		// 		tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "resetProgress"), {}, { overlay: false });
+		// 	}, 120000);
+		// }
 	};
 
 	SendEmailOfGridViewModel.prototype.GetProgress = function()
@@ -999,63 +1016,87 @@
 
 	SendEmailOfGridViewModel.prototype.save = function()
 	{
-		return this.checkConfigure().then(function(result)
+		var self = this,
+			isSendToMode = self.option.modelType === "SendTo",
+			paramData;
+
+		if (isSendToMode)
+		{
+			paramData = {
+				databaseId: tf.datasourceManager.databaseId
+			};
+		}
+		else
+		{
+			paramData = {
+				databaseId: tf.datasourceManager.databaseId,
+				dataTypeId: tf.dataTypeHelper.getId(self.option.type)
+			};
+		}
+		return self.checkConfigure().then(function(result)
 		{
 			if (result)
 			{
-				this.obEntityDataModel().mailToList(this.obEmailToList().map(function(item)
-				{
-					return item.emailAddress();
-				}));
+				// this.obEntityDataModel().mailToList(this.obEmailToList().map(function(item)
+				// {
+				// 	return item.emailAddress();
+				// }));
 
-				this.obEntityDataModel().mailCcList(this.obEmailCcList().map(function(item)
-				{
-					return item.emailAddress();
-				}));
+				// this.obEntityDataModel().mailCcList(this.obEmailCcList().map(function(item)
+				// {
+				// 	return item.emailAddress();
+				// }));
 
-				this.obEntityDataModel().mailBccList(this.obEmailBccList().map(function(item)
-				{
-					return item.emailAddress();
-				}));
+				// this.obEntityDataModel().mailBccList(this.obEmailBccList().map(function(item)
+				// {
+				// 	return item.emailAddress();
+				// }));
 
-				var sendData = this.obEntityDataModel().toData();
-				var emailData = {};
-				if (this.option.modelType === 'SendTo')
+				var sendData = self.clientConfig;//this.obEntityDataModel().toData();
+				//var emailData = {};
+				function handleEmail(emails)
 				{
-					sendData.attachments = this._convertDocumentEntitiesToJSON(this.documentEntities());
-					emailData.paramData = {
-						databaseId: tf.datasourceManager.databaseId,
-						dataTypeId: tf.DataTypeHelper.getIdByName(tf.DataTypeHelper.getNameByType(this.option.type))
-					}
-				}
-				emailData.data = sendData;
-
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "Emails"), emailData).then(function(data)
-				{
-					if (data)
+					return _.uniq(emails.map(function(i)
 					{
-						tf.promiseBootbox.okRetry(
+						return (i.emailAddress() || "").trim().toLowerCase();
+					}).filter(Boolean));
+				}
+				sendData.MailToList = handleEmail(self.obEmailToList());
+				sendData.MailCcList = handleEmail(self.obEmailCcList());
+				sendData.MailBccList = handleEmail(self.obEmailBccList());
+				sendData.EmailMessage = self.obEntityDataModel().emailMessage();
+				sendData.EmailSubject = self.obEntityDataModel().emailSubject();
+				sendData.Attachments = [];
+				sendData.EmailAddress = self.obEntityDataModel().emailAddress();
+
+				if (isSendToMode)
+				{
+					var attachOptions = self.getOptionsForGeneratingAttachments();
+					sendData.DataTypeId = attachOptions.dataTypeId;
+					sendData.FileFormats = attachOptions.fileFormats;
+					sendData.GridLayoutAndSelectedId = attachOptions.data;
+				}
+				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails"),
+					{
+						paramData: paramData,
+						data: sendData
+					}).then(function()
+					{
+						return true;
+					}).catch(function()
+					{
+						return tf.promiseBootbox.okRetry(
 							{
 								message: "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfnder.com or 888-427-2403",
-								title: "Unable to Send " + (!!this.option.selectedIds ? "" : "Test ") + "Email"
-							})
-							.then(function(confirm)
+								title: "Unable to Send " + (!!self.option.selectedIds ? "" : "Test ") + "Email"
+							}).then(function(confirm)
 							{
 								if (!confirm)
 								{
-									return this.save();
+									return self.save();
 								}
-							}.bind(this));
-					}
-					else
-					{
-						return tf.promiseBootbox.alert("An email has been successfully sent.", "Email Successfully Sent")
-							.then(function()
-							{
-								return true;
-							}.bind(this));
-					}
-				}.bind(this));
+							});
+					});
 			}
 			else
 			{
@@ -1074,17 +1115,52 @@
 				{
 					if (data.Items[0].SMTPHost && data.Items[0].SMTPPort)
 					{
-						self.obEntityDataModel().sMTPHost(data.Items[0].SMTPHost);
-						self.obEntityDataModel().sMTPPort(data.Items[0].SMTPPort);
-						self.obEntityDataModel().sMTPUserName(data.Items[0].SMTPUserName);
-						self.obEntityDataModel().emailName(data.Items[0].EmailName);
-						self.obEntityDataModel().sMTPSSL(data.Items[0].SMTPSSL);
+						// self.obEntityDataModel().sMTPHost(data.Items[0].SMTPHost);
+						// self.obEntityDataModel().sMTPPort(data.Items[0].SMTPPort);
+						// self.obEntityDataModel().sMTPUserName(data.Items[0].SMTPUserName);
+						// self.obEntityDataModel().emailName(data.Items[0].EmailName);
+						// self.obEntityDataModel().sMTPSSL(data.Items[0].SMTPSSL);
+						self.clientConfig = data.Items[0];
 						return true;
 					}
 				}
 				return false;
 			});
 	};
+
+	SendEmailOfGridViewModel.prototype.getOptionsForGeneratingAttachments = function()
+	{
+		var self = this,
+			fileFormats = self.documentEntities().map(function(entity)
+			{
+				var fileNameParts = entity.FileName.split(".");
+				return fileNameParts[fileNameParts.length - 1];
+			}),
+			requestOption =
+			{
+				databaseId: tf.datasourceManager.databaseId,
+				dataTypeId: tf.dataTypeHelper.getId(self.option.type),
+				fileFormats: fileFormats,
+				data:
+				{
+					DocumentType: fileFormats[0],
+					FilterSet: {},
+					GridLayoutExtendedEntity: self.option.layout,
+					SelectedIds: self.option.selectedIds,
+					SortItems: self.option.sortItems,
+					Term: tf.applicationTerm.getApplicationTermPluralByName(self.option.term)
+				}
+			};
+
+		requestOption.data.GridLayoutExtendedEntity.GridType = self.option.type;	// Set GridType property which is checked by GridExporter
+
+		if (self.option.type === "busfinderhistorical")
+		{
+			self.option.setRequestOption(requestOption);
+		}
+
+		return requestOption;
+	}
 
 	SendEmailOfGridViewModel.prototype.close = function()
 	{

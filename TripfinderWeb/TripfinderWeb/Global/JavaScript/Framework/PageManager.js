@@ -35,25 +35,25 @@
 		self.initApplicationSwitcher();
 	}
 
-    function transformAppName(name)
-    {
-        switch (name)
-        {
-            case "tfaweb":
-                return 'tfadmin';
-            case "rfweb":
-                return 'routefinderplus';
-            case "ffweb":
-                return 'fleetfinder';
-            case "tfweb":
-                return 'tripfinder'
-            case "vfweb":
-                return 'viewfinder';
-            default:
-                return null;
-        }
+	function transformAppName(name)
+	{
+		switch (name)
+		{
+			case "tfaweb":
+				return 'tfadmin';
+			case "rfweb":
+				return 'routefinderplus';
+			case "ffweb":
+				return 'fleetfinder';
+			case "tfweb":
+				return 'tripfinder'
+			case "vfweb":
+				return 'viewfinder';
+			default:
+				return null;
+		}
 
-    }
+	}
 
 	PageManager.prototype.initApplicationSwitcher = function()
 	{
@@ -65,10 +65,11 @@
 			{
 				var productName = prod.toLowerCase();
 				return self.availableApplications.hasOwnProperty(productName);
-			}).map(function(v) {
+			}).map(function(v)
+			{
 				return v.toLowerCase();
 			});
-			                
+
 			if (tf.authManager.authorizationInfo.isAdmin)
 			{
 				if (!supportedProducts.includes("tfadmin"))
@@ -77,14 +78,17 @@
 				}
 			} else
 			{
-				var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app) {
+				var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app)
+				{
 					return transformAppName(app)
 				});
-				supportedProducts = supportedProducts.filter(function(app) {
+				supportedProducts = supportedProducts.filter(function(app)
+				{
 					return accessApps.includes(app)
 				});
-				
-				if(!accessApps.includes(TF.productName.toLowerCase())) {
+
+				if (!accessApps.includes(TF.productName.toLowerCase()))
+				{
 					tf.entStorageManager.save("token", "");
 					location.reload();
 				}
@@ -98,12 +102,14 @@
 			}).then(function(apiResponse)
 			{
 				var path = apiResponse.Items[0].InfoID === "VENDORACCESSINFOPATH" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue,
-				 	server = apiResponse.Items[0].InfoID === "VENDORVALIDATIONSERVER" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue;
-				if(server[server.length - 1] == "/") {
+					server = apiResponse.Items[0].InfoID === "VENDORVALIDATIONSERVER" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue;
+				if (server[server.length - 1] == "/")
+				{
 					server = server.slice(0, server.length - 1);
 				}
 
-				if(path[0] == "/") {
+				if (path[0] == "/")
+				{
 					path = path.slice(1, path.length)
 				}
 
@@ -582,6 +588,8 @@
 				return "Geo Region";
 			case "busfinderhistorical":
 				return 'Busfinder Historical';
+			case "report":
+				return "Report"
 		}
 		return "";
 	}

@@ -66,7 +66,8 @@
 		{ "Id": 60, "Term": "Title", "Singular": "Title", "Plural": "Titles", "Abbreviation": null },
 		{ "Id": 61, "Term": "User Defined Field", "Singular": "User Defined Field", "Plural": "User Defined Fields", "Abbreviation": null },
 		{ "Id": 62, "Term": "Wheel Chair", "Singular": "Wheel Chair", "Plural": "Wheel Chairs", "Abbreviation": "WC" },
-		{ "Id": 63, "Term": "Work Phone", "Singular": "Work Phone", "Plural": "Work Phones", "Abbreviation": null }
+		{ "Id": 63, "Term": "Work Phone", "Singular": "Work Phone", "Plural": "Work Phones", "Abbreviation": null },
+		{ "Id": 64, "Term": "Report", "Singular": "Report", "Plural": "Reports", "Abbreviation": null },
 	];
 
 	tf.applicationTerm.getApplicationTermByName = function(term, type)
@@ -305,6 +306,15 @@
 					tf.dataTypeHelper = tf.DataTypeHelper;
 					return tf.DataTypeHelper.init();
 					//return tf.DataTypeHelper.init();
+				})
+				.then(function()
+				{
+					return self.loadExagoBIServerUrl()
+						.then(function()
+						{
+							tf.exagoBIHelper = new TF.Helper.ExagoBIHelper();
+							tf.exagoBIHelper.initClientReportContext();
+						})
 				})
 				.then(function()
 				{
@@ -727,5 +737,18 @@
 			parm_result[parm_array[i].split("=")[0]] = parm_array[i].split("=")[1];
 		}
 		return parm_result;
+	};
+	Startup.prototype.loadExagoBIServerUrl = function()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"), {
+			paramData: { InfoID: 'ExagoBIServerUrl' }
+		}, { overlay: false })
+			.then(function(response)
+			{
+				if (response.Items && response.Items.length > 0)
+				{
+					window.ExagoBIServerUrl = response.Items[0].InfoValue;
+				}
+			});
 	};
 })();

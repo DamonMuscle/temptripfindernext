@@ -17,11 +17,72 @@
 					type: "string"
 				},
 				{
-					FieldName: "Comments",
+					FieldName: "Description",
 					DisplayName: "Description",
-					Width: '400px',
+					Width: '300px',
 					type: "string"
-				}
+				},
+				{
+					FieldName: "DataTypeName",
+					DisplayName: "Data Type",
+					Width: '300px',
+					type: "string"
+				},
+				{
+					FieldName: "DataSchemaDisplayName",
+					DisplayName: "Data Schema",
+					Width: '250px',
+					type: "string"
+				},
+				{
+					FieldName: "CreatedOn",
+					DisplayName: "Created On",
+					Width: '150px',
+					type: "datetime",
+					template: function(item)
+					{
+						if (item.CreatedOn == null) return '';
+
+						item.CreatedOn.setMinutes(item.CreatedOn.getMinutes() + tf.timezonetotalminutes);
+						return kendo.format("{0:MM/dd/yyyy hh:mm tt}", item.CreatedOn);
+					}
+				},
+				{
+					FieldName: "CreatedByName",
+					DisplayName: "Created By",
+					Width: '150px',
+					type: "string"
+				},
+				{
+					FieldName: "Type",
+					DisplayName: "Report Type",
+					Width: '150px',
+					type: "string"
+				},
+				{
+					FieldName: "IsFavorite",
+					DisplayName: "Favorite",
+					Width: '150px',
+					type: "bool",
+					template: function(item)
+					{
+						if (item.IsFavorite)
+							return "<div class='icon-inner favorite-report'></div>";
+						else
+							return "<div class='icon-inner'></div>";
+					}
+				},
+				// ,
+				// {
+				// 	FieldName: "IsSystem",
+				// 	DisplayName: "User/System",
+				// 	Width: '100px',
+				// 	type: "boolean",
+				// 	template: function(data)
+				// 	{
+				// 		return (data.IsSystem === true || data.IsSystem === "true") ? "System" : "User";
+				// 	}
+				// }
 			]
 		}
 	};

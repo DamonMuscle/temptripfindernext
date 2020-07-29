@@ -1,0 +1,22 @@
+<div class="parameter-item-editor" style="display:flex" data-bind="uiInit:init">
+	<!-- ko if: dataType === "Text" -->
+	<!-- ko customInput:{type:"String",value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"1",autocomplete:'off'}} -->
+	<!-- /ko -->
+	<!-- /ko -->
+	<!-- ko if: dataType === "Number" -->
+	<!-- ko customInput:{type:"Number",value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
+	<!-- /ko -->
+	<!-- /ko -->
+	<!-- ko if: dataType === "Boolean" -->
+	<!-- ko customInput:{type:"Boolean",value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
+	<!-- /ko -->
+	<!-- /ko -->
+	<!-- ko if: dataType === "Date" -->
+	<!-- ko customInput:{type:"ExtendedDate",buttons:buttons,value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
+	<!-- /ko -->
+	<!-- /ko -->
+	<!-- ko if: dataType === "Time" -->
+	<!-- ko customInput:{type:"Time",value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
+	<!-- /ko -->
+	<!-- /ko -->
+</div>

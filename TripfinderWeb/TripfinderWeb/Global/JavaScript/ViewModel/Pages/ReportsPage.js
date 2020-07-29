@@ -5,7 +5,7 @@
 	function ReportsPage()
 	{
 		var self = this;
-		self.type = "reports";
+		self.type = "report";
 		self.pageType = "reports";
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = false;
@@ -22,7 +22,7 @@
 		self.options.gridDefinition = tf.reportGridDefinition.gridDefinition();
 		self.options.showOmittedCount = true;
 		// TODO-V2, need to research
-		self.options.url = pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip");
+		self.options.url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "ExagoReports");
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";
 	};
@@ -35,14 +35,42 @@
 		{
 			self.sendReportAsMail();
 		});
-		self.bindEvent(".iconbutton.file", function(model, e)
+		// self.bindEvent(".iconbutton.file", function(model, e)
+		// {
+		// 	self.saveReportAsFile();
+		// });
+		// self.bindEvent(".iconbutton.vReport", function(model, e)
+		// {
+		// 	self.viewReport();
+		// });
+		self.bindEvent(".iconbutton.runreport", function(model, e)
 		{
-			self.saveReportAsFile();
+			self.runSelectedReportClick();
 		});
-		self.bindEvent(".iconbutton.vReport", function(model, e)
-		{
-			self.viewReport();
-		});
+	};
+	ReportsPage.prototype.runSelectedReportClick = function(vm, e)
+	{
+		var self = this,
+			selectedId = self.searchGrid.getSelectedIds()[0];
+
+		tf.exagoReportDataHelper.fetchReportWithMetadata(selectedId)
+			.then(function(entity)
+			{
+				if (!entity) 
+				{
+					throw "Failed to load report with Filters and Parameters information."
+				}
+
+				return tf.modalManager.showModal(new TF.Modal.Report.ExagoBIRunReportModalViewModel(
+					{
+						editOnly: false,
+						entity: entity
+					}
+				));
+			}).catch(function(err)
+			{
+				tf.promiseBootbox.alert(err);
+			});
 	};
 
 	ReportsPage.prototype._openBulkMenu = function()

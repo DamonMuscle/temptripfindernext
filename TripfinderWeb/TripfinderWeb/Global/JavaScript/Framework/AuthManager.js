@@ -106,6 +106,7 @@
 					overlay: false
 				}).then(function(apiResponse)
 				{
+					if (apiResponse && apiResponse.Items && apiResponse.Items[0]) tf.timezonetotalminutes = apiResponse.Items[0];
 					moment().constructor.prototype.currentTimeZoneTime = function()
 					{
 						var now = moment().utcOffset(apiResponse.Items[0]);
@@ -153,7 +154,7 @@
 				.then(function(apiResponse)
 				{
 					this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
-
+					tf.userEntity = apiResponse.Items[0].UserEntity;
 					return tf.authManager.getPurchasedProducts()
 						.then(function(purchasedProducts)
 						{
