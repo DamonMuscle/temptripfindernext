@@ -33,6 +33,7 @@
 		self.selectedItemsEditable = ko.observable(false);
 		self.sendToClick = self.sendToClick.bind(self);
 		self.sendEmailClick = self.sendEmailClick.bind(self);
+		self.viewReportClick = self.viewReportClick.bind(self);
 		self.obEmail = ko.computed(function()
 		{
 			if (self.searchGridInited())
@@ -912,36 +913,75 @@
 	BaseGridPage.prototype.loadReportLists = function()
 	{
 		var self = this;
-
-		if (!self.obReportLists)
-		{
-			return;
-		}
-
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "reports", "fieldtrip"))
-			.then(function(data)
-			{
-				if (data && data.Items && data.Items.length)
-				{
-					this.obReportLists(data.Items);
+		let getReporsPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "exagoreports"), {
+			paramData: {
+				dataTypeId: tf.dataTypeHelper.getId(self.type),
+				"@filter": "eq(IsDashboard,false)"
+			}
+		}),
+			getReportFavoritePromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userreportfavorites"), {
+				paramData: {
+					"@filter": `eq(UserID,${tf.authManager.authorizationInfo.authorizationTree.userId})`
 				}
-			}.bind(this));
+			});
+
+		Promise.all([getReporsPromise, getReportFavoritePromise]).then(([getReportsResponse, getReportFavoriteResponse]) =>
+		{
+			let favoriteReportIds = getReportFavoriteResponse.Items.map(item => item.ReportID);
+			getReportsResponse.Items.forEach(report =>
+			{
+				report.IsFavorite = favoriteReportIds.includes(report.Id);
+			});
+
+			let reportList = Array.sortBy(getReportsResponse.Items.filter(item => item.IsFavorite), "Name").concat(Array.sortBy(getReportsResponse.Items.filter(item => !item.IsFavorite), "Name"));
+			self.obReportLists(reportList);
+		});
 	};
 
-	BaseGridPage.prototype.viewReportClick = function(viewModel, e)
+
+	BaseGridPage.prototype.viewReportClick = function(reportViewModel, e)
 	{
 		var self = this;
-		if (!self.obReportLists || !self.obReportLists())
+		var selectedIds = self.searchGrid.getSelectedIds();
+		if (selectedIds.length === 0)
 		{
-			return;
+			self.searchGrid.getIdsWithCurrentFiltering()
+				.then(function(data)
+				{
+					selectedIds = data;
+					self.openReportConfigure(reportViewModel, selectedIds);
+				}.bind(self));
 		}
+		else
+		{
+			self.openReportConfigure(reportViewModel, selectedIds);
+		}
+	};
 
-		var selectedIds = this.searchGrid.getSelectedIds();
+	BaseGridPage.prototype.openReportConfigure = function(reportViewModel, ids)
+	{
+		var reportId = reportViewModel.Id;
 
-		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(viewModel, 'view', {
-			selectedRecordId: selectedIds,
-			type: self.type
-		}));
+		tf.exagoReportDataHelper.fetchReportWithMetadata(reportId)
+			.then(function(entity)
+			{
+				if (!entity) return;
+
+				return tf.modalManager.showModal(new TF.Modal.Report.ExagoBIRunReportModalViewModel(
+					{
+						editOnly: false,
+						entity: entity,
+						explicitRecordIds: ids
+					}
+				));
+			})
+			.then(function(execResult)
+			{
+				if (execResult && execResult.externalReportViewerUrl)
+				{
+					window.open(execResult.externalReportViewerUrl, "_blank");
+				}
+			});
 	};
 
 	BaseGridPage.prototype.dispose = function()

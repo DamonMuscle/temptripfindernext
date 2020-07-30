@@ -1,40 +1,44 @@
 (function()
 {
-	createNamespace("TF.Modal.Report").SpecificRecordsModalViewModel = SpecificRecordsModalViewModel;
+	createNamespace("TF.Control.Report").SpecificRecordsViewModel = SpecificRecordsViewModel;
 
-	var DEFAULT_OPTION = {
-		'type': 'record',
+	function SpecificRecordsViewModel(option)
+	{
+		var self = this;
+
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+
+		// search existing list mover.
+		self.searchExistingViewModel = new TF.DetailView.SearchExistingRecordWrapper({
+			selectedData: option.selectedData,
+			dataType: option.dataType,
+			defaultColumns: option.defaultColumns,
+			pageLevelViewModel: self.pageLevelViewModel,
+			dataSource: option.dataSourceId
+		});
 	};
 
-	function SpecificRecordsModalViewModel(option)
+	/**
+	 * Save the object.
+	 *
+	 * @returns {void}
+	 */
+	SpecificRecordsViewModel.prototype.save = function()
 	{
-		var self = this,
-			dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(option.dataType),
-			modalTitle = String.format("Select Records ({0})", dataTypeName);
 
-		TF.Modal.BaseModalViewModel.call(self);
-
-		self.title(modalTitle);
-		self.sizeCss = TF.isMobileDevice ? "modal-lg is-mobile-device" : "modal-lg";
-		self.contentTemplate("workspace/report/SpecificRecords");
-		self.buttonTemplate("modal/positivenegative");
-
-		option = $.extend({}, DEFAULT_OPTION, option);
-		self.viewModel = new TF.Control.Report.SpecificRecordsViewModel(option);
-		self.data(self.viewModel);
 	};
 
-	SpecificRecordsModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
-	SpecificRecordsModalViewModel.prototype.constructor = SpecificRecordsModalViewModel;
-
-	SpecificRecordsModalViewModel.prototype.positiveClick = function()
+	/**
+	 * Dispose
+	 * 
+	 * @return {void}
+	 */
+	SpecificRecordsViewModel.prototype.dispose = function()
 	{
-		var selectedIds = this.viewModel.searchExistingViewModel.obSelectedData();
-		this.positiveClose(selectedIds);
-	};
-
-	SpecificRecordsModalViewModel.prototype.dispose = function()
-	{
-		this.viewModel.dispose();
+		var self = this;
+		self.pageLevelViewModel.dispose();
+		self.searchExistingViewModel.dispose();
+		self.pageLevelViewModel = null;
+		self.searchExistingViewModel = null;
 	};
 })();

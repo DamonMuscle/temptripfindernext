@@ -26,7 +26,8 @@
 					FieldName: "DataTypeName",
 					DisplayName: "Data Type",
 					Width: '300px',
-					type: "string"
+					type: "string",
+					AllowFiltering: false
 				},
 				{
 					FieldName: "DataSchemaDisplayName",
@@ -58,7 +59,8 @@
 					DisplayName: "Report Type",
 					Width: '150px',
 					type: "string"
-				},
+				}
+				,
 				{
 					FieldName: "IsFavorite",
 					DisplayName: "Favorite",

@@ -22,9 +22,32 @@
 		self.options.gridDefinition = tf.reportGridDefinition.gridDefinition();
 		self.options.showOmittedCount = true;
 		// TODO-V2, need to research
-		self.options.url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "ExagoReports");
+		//self.options.url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "ExagoReports?dataTypeId=7");
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";
+		var staticFilter = new TF.FilterItem("DataTypeName", "EqualTo", "Field Trip");
+		self.options.setRequestOption = function(options)
+		{
+			if (options.data.filterSet && options.data.filterSet.FilterItems)
+			{
+				options.data.filterSet.FilterItems.push(staticFilter);
+			}
+			else
+			{
+				options.data.filterSet = {
+					FilterItems: [staticFilter],
+					FilterSets: []
+				}
+			}
+			//options.paramData.filterSet = [staticFilter];
+			return options
+
+		}
+		self.options.setRequestURL = function()
+		{
+			return tf.api.apiPrefixWithoutDatabase() + "/search/ExagoReports";
+		};
+
 	};
 
 	ReportsPage.prototype.bindButtonEvent = function()

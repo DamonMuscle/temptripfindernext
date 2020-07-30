@@ -1,0 +1,305 @@
+@import "fontsize";
+@ThemeColor: #D74B3C;
+
+.tabstrip-reportlayout {
+	padding: 0px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	font-family: "SourceSansPro-Regular";
+
+	.reportlayout-doc {
+		padding: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.reportlayout-doc {
+		
+		.preload{
+			position: absolute;
+			top: 0;
+			left: 297px;
+			height: 100%;
+			width:3px;
+			background-color: #4b4b4b;
+			z-index:5;
+		}
+		.reportlayout-header {
+			// border-bottom: 1px solid #C4C4C4;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+
+			.head-left {
+				width: 300px;
+				border-right:3px solid #4b4b4b ;
+				border-bottom:1px solid #d7d7d7 ;
+				height: 66px;
+				line-height: 56px;
+				font-size: 27px;
+				padding-left: 16px;
+				font-family: 'SourceSansPro-SemiBold';
+				font-weight: bold;
+				color: #262626;
+			}
+
+			.header-title {
+				flex: 1;
+				margin-bottom: 15px;
+				margin-left: 20px;
+
+				input.name {
+					font-family: "SourceSansPro-SemiBold";
+					font-size: 25px;
+					border: 1px solid transparent;
+					text-overflow: ellipsis;
+					box-sizing: content-box;
+					min-width: 610px;
+
+					&:hover,
+					&:focus {
+						border-color: #bcbcbc;
+					}
+
+					&:focus {
+						//min-width: 359px;
+						text-overflow: unset;
+					}
+				}
+			}
+
+			.header-control {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+
+				.selector-menu {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					border-radius: 9px;
+					height: 24px;
+					line-height: 24px;
+					width: auto;
+					padding: 0 8px;
+					margin: 0;
+					cursor: pointer;
+
+					&:hover {
+						background-color: #f2f2f2;
+					}
+
+					.select-type {
+						font-size: 15px;
+					}
+
+					.icon.bottom-caret {
+						margin: 10px 0 10px 8px;
+						width: 8px;
+						height: 4px;
+
+						&:before {
+							border-top-color: #777777;
+						}
+
+						&:after {
+							border-top-color: #fff;
+						}
+					}
+				}
+
+				.control-buttons {
+					display: flex;
+
+					.button-icon {
+						background-position: center center;
+						background-size: 24px 24px;
+						background-repeat: no-repeat;
+						width: 24px;
+						height: 24px;
+						margin-left: 24px;
+						cursor: pointer;
+
+						&.disabled {
+							background-color: #fff;
+							pointer-events: none;
+							opacity: 0.4;
+						}
+
+						&.run {
+							background-image: url("../../global/img/grid/runnow.png");
+						}
+
+						&.edit {
+							background-image: url("../../global/img/grid/editor_pencil_2.png");
+						}
+
+						&.save {
+							background-image: url("../../global/img/detail-screen/save.svg");
+						}
+
+						&.settings {
+							background-image: url("../../global/img/detail-screen/settings.svg");
+						}
+
+						&.close-detail {
+							background-image: url("../../global/img/detail-screen/Close.svg");
+						}
+
+						&.font-size-slider {
+							background-image: url("../../global/img/detail-screen/font_size_24x24-pos.svg");
+						}
+
+						&.fullscreen {
+							background-image: url('../img/navigation-menu/icon-fullscreen-black.svg');
+						}
+					}
+
+
+
+
+				}
+			}
+		}
+
+		.reportlayout-content {
+			position: absolute;
+			left: 0;
+			top: 65px;
+			right: 0;
+			bottom: 38px;
+
+			.designer-frame {
+				width: 100%;
+				height: 100%;
+			}
+
+			.exago-frame {
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
+
+
+}
+
+.tabstrip-runreport {
+
+	input[type=text] {
+		height: 22px;
+	}
+
+	&.k-tabstrip {
+		-webkit-box-shadow: none;
+    	box-shadow: none;
+		background: none transparent;
+		border-width: 0;
+
+		.k-tabstrip-items{
+			border-width: 0;
+		}
+
+		.k-content{
+			border-width: 1px;
+		}
+	}
+
+	&.k-tabstrip:focus {
+    	-webkit-box-shadow: none;
+    	box-shadow: none;
+	}
+
+	.row {
+		margin-left: -15px;
+		margin-right: 0;
+	}
+
+	.filters-tab {
+		min-height: 400px;
+	}
+
+	.parameters-tab {
+		min-height: 400px;
+		
+        .row .form-group {
+            @media (max-width: 768px) {
+                margin-bottom: 30px;
+            }
+        }
+		
+		.parameter-item-editor {
+			height: 27px;
+			
+			@media (max-width: 768px) {
+				flex-wrap: wrap;
+			}
+			
+			.k-datepicker .k-picker-wrap {
+				height: 27px;
+				
+				input[type=text] {
+					height: 25px;
+				}
+			}
+
+			.button-group {
+			
+				display: flex;
+				
+				@media (max-width: 768px) {
+					padding-top: 10px;
+				}
+				.selected {
+					// background-color: #444444;
+					// color: #fff;
+					color: rgb(46, 46, 46);
+				}
+
+				button {
+					span {
+						white-space: nowrap;
+					}
+				}
+			}
+		}
+	}
+	.tripmap-tab{
+		min-height: 400px;
+	}
+
+
+}
+
+.specify-records-modal {
+	.kendo-grid {
+		table tr td {
+			position: relative;
+			color: #333;
+
+			>input[type=checkbox] {
+				margin: 0;
+				top: 10px;
+				left: 10px;
+			}
+			
+		}
+	}
+}
+.modal-dialog{
+ .modal-content {
+	 input[type=checkbox] 
+	 {
+		 margin: 4px 0 0 0;
+	 }
+	 .input-group{
+		.btn-sharp{
+			box-sizing: border-box;
+		}
+	 }
+	}
+}

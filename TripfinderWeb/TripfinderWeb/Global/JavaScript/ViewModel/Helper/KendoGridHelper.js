@@ -64,8 +64,8 @@
 			// refresh background color
 			var $container = kendoGridElement.find(".k-grid-content"),
 				$onDemandContainer = $container.find(".on-demand-container");
-			if($onDemandContainer.length)
-			{	
+			if ($onDemandContainer.length)
+			{
 				$onDemandContainer.css({
 					background: $onDemandContainer.data("tr").children("td").css("background-color")
 				});
@@ -696,5 +696,49 @@
 		});
 		return columns;
 	};
+
+	/**
+	 * Get default sorting columns
+	 *
+	 * @param {string} gridType
+	 * @param {string} defaultField
+	 * @returns
+	 */
+	KendoGridHelper.prototype.getDefaultSortItems = function(gridType, defaultField)
+	{
+		var sortFields = [defaultField];
+		switch (gridType)
+		{
+			case "altsite":
+			case "contractor":
+			case "district":
+			case "document":
+			case "report":
+			case "georegion":
+			case "school":
+			case "trip":
+			case "report":
+			case "tripstop":
+				sortFields = ["Name"];
+				break;
+			case "contact":
+			case "staff":
+			case "student":
+				sortFields = ["LastName", "FirstName"];
+				break;
+			case "fieldtrip":
+				sortFields = ["PublicId"];
+				break;
+			case "vehicle":
+				sortFields = ["BusNum"];
+				break;
+		}
+
+		return sortFields.map(field => ({
+			Name: field,
+			isAscending: "asc",
+			Direction: "Ascending"
+		}));
+	}
 
 })();

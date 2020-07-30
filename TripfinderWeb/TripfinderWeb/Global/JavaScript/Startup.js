@@ -747,7 +747,7 @@
 			{
 				if (response.Items && response.Items.length > 0)
 				{
-					window.ExagoBIServerUrl = response.Items[0].InfoValue;
+					window.ExagoBIServerUrl = "http://localhost"//response.Items[0].InfoValue;
 				}
 			});
 	};

@@ -84,6 +84,7 @@
 
 		// These two variables are for geo-search or any other outer source to affect grid filter ids.
 		self.additionalFilterIds = null;
+		self.obClassicFilterSet = ko.observable(null);
 		// Because the geo-search is based on the grid content, so the first search should ignore geo-search filter id list.
 		self.shouldIncludeAdditionFilterIds = false;
 
@@ -3054,16 +3055,13 @@
 
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
-		var self = this;
-		self.options.paramData.take = kendoOptions.data.take ? kendoOptions.data.take : 100;
-		self.options.paramData.skip = kendoOptions.data.skip ? kendoOptions.data.skip : 0;
-		self.options.paramData.getCount = self.options.getCount == false ? false : true;
-		var includeOnlyIds = self.getIncludeOnlyIds(),
+		var self = this,
+			includeOnlyIds = self.getIncludeOnlyIds(),
 			excludeAnyIds = self.getExcludeAnyIds(),
 			sortItems = kendoOptions.data.sort ? kendoOptions.data.sort.map(function(item)
 			{
 				return {
-					Name: item.field,
+					Name: tf.UDFDefinition.getOriginalName(item.field),
 					isAscending: function()
 					{
 						return item.dir === "asc";
@@ -3072,7 +3070,11 @@
 				};
 			}) : [],
 			options = {
-				paramData: self.options.paramData,
+				paramData: {
+					take: kendoOptions.data.take ? kendoOptions.data.take : 100,
+					skip: kendoOptions.data.skip ? kendoOptions.data.skip : 0,
+					getCount: self.options.getCount == false ? false : true
+				},
 				data: {
 					sortItems: sortItems,
 					idFilter: (includeOnlyIds || excludeAnyIds) ? {
@@ -3084,6 +3086,11 @@
 				},
 				success: function(result)
 				{
+					if (self.checkFilteredResponse(result))
+					{
+						return;
+					}
+
 					var autoCompleteSelectedColumn = kendoOptions.data.autoCompleteSelectedColumn;
 					result.Items = LightKendoGrid.normalizeResultItem(result.Items, self._gridType, self.options);
 					if (kendoOptions.data.isFromAutoComplete && autoCompleteSelectedColumn)
@@ -3098,11 +3105,25 @@
 						}).Distinct("x=>x." + autoCompleteSelectedColumn).OrderBy("$." + autoCompleteSelectedColumn).ToArray();
 					}
 
-					if (self.searchOption)
+					if (result.Items && result.Items instanceof Array)
 					{
-						//verify ajax by filter control or real ajax request
-						result.TotalRecordCount = self.searchOption.data.filterSet ? self.obTotalRecordCount() : result.TotalRecordCount;
+						var currentColumns = [].concat(self._obSelectedColumns()).concat(self.getKendoColumn()),
+							udfs = _.uniqBy(currentColumns.filter(function(c)
+							{
+								return !!c.OriginalName;
+							}), "UDFId");
+						result.Items = result.Items.map(function(item)
+						{
+							udfs.forEach(function(udf)
+							{
+								item[udf.FieldName] = item[udf.OriginalName];
+							});
+
+							return item;
+						});
 					}
+
+					//verify ajax by filter control or real ajax request
 					self.result = result;
 					kendoOptions.success({
 						d: {
@@ -3110,6 +3131,7 @@
 							results: result.Items
 						}
 					});
+					// self.$container.find(".k-loading-mask").remove();
 				},
 				error: function(result)
 				{
@@ -3126,6 +3148,10 @@
 				traditional: true
 			};
 
+		if (self.obClassicFilterSet())
+		{
+			options.data.filterSet = self.obClassicFilterSet();
+		}
 		if (self._gridState && self._gridState.filterClause)
 		{
 			options.data.filterClause = self._gridState.filterClause;
@@ -3147,32 +3173,35 @@
 		}
 		self.overlay = true;
 		var fields = Enumerable.From(self._obSelectedColumns() && self._obSelectedColumns().length > 0 ? self._obSelectedColumns() : self._gridDefinition.Columns).Where(function(c) { return !c.hidden; }).Select(function(c) { return c.FieldName }).ToArray();
+
+		fields = (fields || []).map(function(field)
+		{
+			return tf.UDFDefinition.getOriginalName(field);
+		});
+
 		if (self.isBigGrid && self.options.loadAllFields === false)
 		{
-			options.data.sortItems = options.data.sortItems.concat([{
-				Name: self.options.Id,
-				isAscending: "asc",
-				Direction: "Ascending"
-			}]);
+			options.data.sortItems = options.data.sortItems.concat(tf.helpers.kendoGridHelper.getDefaultSortItems(self._gridType, self.options.Id));
 			if (!Enumerable.From(fields).Contains(self.options.Id))
 			{
 				fields = fields.concat([self.options.Id]);
-			}
-			if (self.options.extraFields && self.options.extraFields.length > 0)
-			{
-				fields = fields.concat(self.options.extraFields);
 			}
 			fields = self.bindNeedFileds(self._gridType, fields);
 			options.data.fields = fields;
 		}
 
-		if (!!self.options.sort)
+		if (self.options.sort)
 		{
 			options.data.sortItems = options.data.sortItems.concat([self.options.sort]);
 		}
+
+		(options.data.sortItems || []).forEach(function(item)
+		{
+			item.Name = tf.UDFDefinition.getOriginalName(item.Name);
+		});
 		if (kendoOptions.data.filter)
 		{
-			options.data.filterSet = self.convertKendo2RequestFilterSet.bind(self)(options.data.filterSet, kendoOptions.data.filter);
+			options.data.filterSet = self.convertKendo2RequestFilterSet(options.data.filterSet, kendoOptions.data.filter);
 		}
 		//verify ajax by filter control or real ajax request
 		if (kendoOptions.data.isFromAutoComplete !== true)
@@ -3206,12 +3235,13 @@
 				newIdExcludeAnyFilter = JSON.stringify(options.data.idFilter.ExcludeAny);
 			if ((newIdIncludeOnlyFilter !== self._oldIdIncludeOnlyFilter || newFilterId !== self._oldFilterId || newFilterString !== self._oldFilterString || newSortString !== (self._oldSortString ? self._oldSortString : "[]") || newFields !== self._oldFields))
 			{
-				if (!self.isRowSelectedWhenInit)
-				{
-					self.getSelectedIds([]);
-				}
+				self.getSelectedIds([]);
 				self.allIds = [];
 			}
+			// else if (newIdExcludeAnyFilter == this._oldIdExcludeAnyFilter && this.overlayShow !== true)  // comment this block for fix issue of apply busfinder/gps events reduce count filter, overlay not display
+			// {
+			// 	this.overlay = false;
+			// }
 			self._oldFilterString = newFilterString;
 			self._oldSortString = newSortString;
 			self._oldFilterId = newFilterId;
@@ -3222,9 +3252,13 @@
 
 		if (kendoOptions.data.filter || self._gridState.filterSet)
 		{
+			//options.data.filterSet = self.convertKendo2RequestFilterSet.bind(self)(options.data.filterSet, kendoOptions.data.filter);
+
 			if (self.isEmptyFilterSet(options.data.filterSet))
 			{
 				delete options.data.filterSet;
+				// this.obHeaderFilters();
+				// this.obHeaderFilterSets();
 			}
 			else if (kendoOptions.data.isFromAutoComplete !== true)
 			{
@@ -3262,17 +3296,38 @@
 		if (options.data.filterSet && self.isEmptyFilterSet(options.data.filterSet))
 			delete options.data.filterSet;
 
-		if (options.data.filterSet &&
-			options.data.filterSet.FilterItems)
-			options.data.filterSet.FilterItems = processVehicleExternalName(options.data.filterSet.FilterItems);
+		if (options.data.filterSet && options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0)
+		{
+			updateFilterItemsUDFFilterName(options.data.filterSet);
+		}
+
+		if (options.data.filterSet && options.data.filterSet.FilterSets && options.data.filterSet.FilterSets.length > 0)
+		{
+			var filterSets = options.data.filterSet.FilterSets;
+			filterSets.forEach(function(filterSet)
+			{
+				updateFilterItemsUDFFilterName(filterSet);
+			});
+		}
 
 		if (kendoOptions.data.isFromAutoComplete !== true)
 		{
 			self.searchOption = options;
 		}
 
-		self.onFilterChanged.notify(options);
 		return options;
+
+		function updateFilterItemsUDFFilterName(filterSet)
+		{
+			filterSet.FilterItems = processVehicleExternalName(filterSet.FilterItems);
+			filterSet.FilterItems = (filterSet.FilterItems || []).map(function(item)
+			{
+				item.FieldName = tf.UDFDefinition.getOriginalName(item.FieldName);
+				return item;
+			});
+
+			self.setBooleanNotSpecifiedFilterItem(filterSet.FilterItems);
+		}
 
 		function processVehicleExternalName(filterItems)
 		{
@@ -3296,6 +3351,60 @@
 			return filterItems;
 		}
 	};
+
+	LightKendoGrid.prototype.checkFilteredResponse = function(response)
+	{
+		if ([400, 412].includes(response.StatusCode) && tf.dataTypeHelper.getNameByType(this.options.gridType))
+		{
+			var self = this,
+				filterId = self.obSelectedGridFilterId(),
+				message = filterId ? String.format("The applied filter \"{0}\" is invalid.", self.obSelectedGridFilterName()) : "The applied quick filter is invalid.";
+			return tf.promiseBootbox.alert(message).then(function()
+			{
+				self.clearGridFilterClick().then(function()
+				{
+					if (filterId && response.Message != "Invisible UDF")
+					{
+						// use response.Message to distinguish deleted udf and invisible udf.
+						tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId), {
+							data: [{ "op": "replace", "path": "/IsValid", "value": false }]
+						}).then(function()
+						{
+							var filters = self.obGridFilterDataModels().filter(function(filter)
+							{
+								return filter.id() == filterId;
+							});
+
+							if (filters && filters.length == 1)
+							{
+								filters[0].isValid(false);
+							}
+						})
+					}
+				});
+			});
+		}
+	};
+
+	LightKendoGrid.prototype.setBooleanNotSpecifiedFilterItem = function(filterItems)
+	{
+		var self = this;
+		filterItems.forEach(function(filterItem)
+		{
+			var filterBooleanColumns = self.kendoGrid.columns.filter(function(col)
+			{
+				var colFieldName = tf.UDFDefinition.getOriginalName(col.field);
+				return col.type === "boolean" && colFieldName === filterItem.FieldName;
+			});
+
+			if (filterBooleanColumns.length > 0 && filterItem.Value === "null")
+			{
+				filterItem.Operator = "IsNull";
+				filterItem.Value = "";
+			}
+		});
+	};
+
 
 	function removeEmptyFilterItems(options)
 	{
@@ -4283,22 +4392,25 @@
 				{
 					if (self._gridType === "trip")
 					{
-						// TODO-V2, need to remove
-						tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "trip", "batch", "mini", "?include=tripstop"),
-							{
-								data: {
-									ids: self.allIds,
-									now: toISOStringWithoutTimeZone(moment().currentTimeZoneTime()),
-									date: toISOStringWithoutTimeZone(moment().currentTimeZoneTime())
-								}
-							})
-							.then(function(response)
-							{
-								self.geoData = response;
-								self.onIdsChanged.notify();
-								self.onDataBoundEvent.notify();
-								tf.loadingIndicator.tryHide();
-							}.bind(this));
+						// // TODO-V2, need to remove
+						// tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "trip", "batch", "mini", "?include=tripstop"),
+						// 	{
+						// 		data: {
+						// 			ids: self.allIds,
+						// 			now: toISOStringWithoutTimeZone(moment().currentTimeZoneTime()),
+						// 			date: toISOStringWithoutTimeZone(moment().currentTimeZoneTime())
+						// 		}
+						// 	})
+						// 	.then(function(response)
+						// 	{
+						// 		self.geoData = response;
+						// 		self.onIdsChanged.notify();
+						// 		self.onDataBoundEvent.notify();
+						// 		tf.loadingIndicator.tryHide();
+						// 	}.bind(this));
+						self.onIdsChanged.notify();
+						self.onDataBoundEvent.notify();
+						tf.loadingIndicator.tryHide();
 					}
 					else if (self.geoFields && self.geoFields.length > 0)
 					{

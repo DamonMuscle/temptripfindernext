@@ -18,7 +18,7 @@
 		this.showTodoWarningClick = this.showTodoWarningClick.bind(this);
 		this.saveAsClick = this.saveAsClick.bind(this);
 		this.sendEmailClick = this.sendEmailClick.bind(this);
-		this.obReportLists = ko.observableArray();
+		this.obReportList = ko.observableArray();
 		this.viewReportClick = this.viewReportClick.bind(this);
 		this.copyToClipboardClick = this.copyToClipboardClick.bind(this);
 		this.obReports = ko.observable(tf.authManager.isAuthorizedFor("reports", "read"));
@@ -86,6 +86,8 @@
 
 		//The property of check if this grid is mini grid.
 		this.isBigGrid = true;
+
+		tf.exagoBIHelper.reportListUpdated.subscribe(self.loadReportLists.bind(self));
 	}
 
 	BaseKendoGridViewModel.prototype = {
@@ -163,7 +165,10 @@
 				}
 				return false;
 			}.bind(this));
+
+			this.loadReportLists();
 		},
+
 
 		_openBulkMenu: function()
 		{
@@ -717,6 +722,7 @@
 	BaseKendoGridViewModel.prototype.dispose = function()
 	{
 		this.searchGrid.dispose();
+		tf.exagoBIHelper.reportListUpdated.unsubscribe(this.loadReportLists);
 	};
 
 	// Map View
@@ -911,6 +917,34 @@
 		//used to show the page level
 		hintElements.data("documentViewModel", this);
 		return hintElements;
+	};
+
+	BaseKendoGridViewModel.prototype.loadReportLists = function()
+	{
+		var self = this;
+		let getReporsPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "exagoreports"), {
+			paramData: {
+				dataTypeId: tf.dataTypeHelper.getId(self.type),
+				"@filter": "eq(IsDashboard,false)"
+			}
+		}),
+			getReportFavoritePromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userreportfavorites"), {
+				paramData: {
+					"@filter": `eq(UserID,${tf.authManager.authorizationInfo.authorizationTree.userId})`
+				}
+			});
+
+		Promise.all([getReporsPromise, getReportFavoritePromise]).then(([getReportsResponse, getReportFavoriteResponse]) =>
+		{
+			let favoriteReportIds = getReportFavoriteResponse.Items.map(item => item.ReportID);
+			getReportsResponse.Items.forEach(report =>
+			{
+				report.IsFavorite = favoriteReportIds.includes(report.Id);
+			});
+
+			let reportList = Array.sortBy(getReportsResponse.Items.filter(item => item.IsFavorite), "Name").concat(Array.sortBy(getReportsResponse.Items.filter(item => !item.IsFavorite), "Name"));
+			self.obReportList(reportList);
+		});
 	};
 
 })();
