@@ -35,7 +35,7 @@
 					signature: signature
 				}
 			};
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), signatureData)
+			tf.promiseAjax.get(pathCombine(tf.api.server(), clientid, "authinfos"), signatureData)
 				.then(function(apiResponse)
 				{
 					this.obShowLogin(false);
@@ -102,7 +102,7 @@
 				paramData: { signature: this.signature },
 				data: '"' + passwordRP + '"'
 			};
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), resetPasswordData)
+			tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "passwords"), resetPasswordData)
 				.then(function(apiResponse)
 				{
 					tf.promiseBootbox.alert("The Password for " + userName + " has been successfully Reset.", "Password Successfully Reset")
@@ -172,11 +172,11 @@
 		var forgetPasswordData = {
 			paramData: {
 				product: TF.productName,
-				username: tf.authManager.userName,
+				username: userName,
 				vendor: TF.vendor
 			}
 		};
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "passwords"), forgetPasswordData)
+		tf.promiseAjax.get(pathCombine(tf.api.server(), clientKey, "passwords"), forgetPasswordData)
 			.then(function(apiResponse)
 			{
 				this.loginViewModel.obLoginErrorMessage('');
