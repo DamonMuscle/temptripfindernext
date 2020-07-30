@@ -87,7 +87,7 @@
 		//The property of check if this grid is mini grid.
 		this.isBigGrid = true;
 
-		tf.exagoBIHelper.reportListUpdated.subscribe(self.loadReportLists.bind(self));
+		tf.exagoBIHelper.reportListUpdated.subscribe(this.loadReportLists.bind(self));
 	}
 
 	BaseKendoGridViewModel.prototype = {
