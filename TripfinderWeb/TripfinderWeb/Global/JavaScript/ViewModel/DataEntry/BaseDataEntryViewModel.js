@@ -685,9 +685,9 @@
 		var obEntityDataModel = this.obEntityDataModel();
 		var isNew = obEntityDataModel.id() ? false : true;
 		var paramDatas = this.type === 'fieldtrip' ? {
-			'@relationships': "FieldTripResourceGroup,FieldTripInvoice,DocumentRelationship"
+			'@relationships': "FieldTripResourceGroup,FieldTripInvoice,DocumentRelationship,FieldTripEquipment"
 		} : {};
-		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), isNew ? tf.DataTypeHelper.getEndpoint(this.type) : tf.DataTypeHelper.getEndpoint(this.type)),
+		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)),
 			{
 				paramData: paramDatas,
 				data: [this.getSaveData()],

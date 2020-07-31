@@ -52,6 +52,7 @@
 		{ from: "AideRate", default: null },
 		{ from: "AideOtrate", default: null },
 		{ from: "PurchaseOrder", default: "" },
+		{ from: "FieldTripEquipmentIds", default: null },
 		{ from: "FieldTripEquipmentId", default: null },
 		{ from: "FieldTripDestinationId", default: null },
 		{ from: "FieldTripContact", default: "" },

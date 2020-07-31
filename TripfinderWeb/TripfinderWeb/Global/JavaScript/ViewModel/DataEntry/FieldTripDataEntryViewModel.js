@@ -126,25 +126,27 @@
 			function(obj)
 			{
 				return obj.Id;
-			}, function(obj)
-		{
-			return obj.Name;
-		}), this);
+			},
+			function(obj)
+			{
+				return obj.Code;
+			}), this);
 
 		this.obSelectedEquipment = ko.observable();
-		this.obSelectedEquipment.subscribe(this.setSelectValue("fieldTripEquipmentId", "obSelectedEquipment",
-			function(obj)
-			{
-				return obj ? obj.Id : null;
-			}), this);
-		this.obCurrentEquipmentName = ko.computed(this.setSelectTextComputer("obEquipmentDataModels", "fieldTripEquipmentId",
-			function(obj)
-			{
-				return obj.Id;
-			}, function(obj)
+		/// Currently Tripfinder only has a dropdown for equipment.
+		this.obCurrentEquipmentName = ko.computed(() =>
 		{
-			return obj.EquipmentName;
-		}), this);
+			let equipmentName = "";
+			let equipmentIds = this.obEntityDataModel().fieldTripEquipmentIds();
+
+			if (Array.isArray(equipmentIds) && equipmentIds.length > 0)
+			{
+				const selectedEquipment = this.obEquipmentDataModels().find(item => item.Id === equipmentIds[0]);
+				equipmentName = selectedEquipment ? selectedEquipment.EquipmentName : "";
+			}
+
+			return equipmentName;
+		}, this);
 
 		this.obSelectedDestination = ko.observable();
 		this.obSelectedDestination.subscribe(
@@ -1285,6 +1287,11 @@
 		entity.FieldTripInvoices = this.obInvoiceGridDataSource();
 		entity.DocumentRelationships = this.obDocumentRelationshipSource();
 
+		if (this.obSelectedEquipment() && this.obSelectedEquipment().Id)
+		{
+			entity.FieldTripEquipmentIds = [this.obSelectedEquipment().Id];
+		}
+
 		if (isTemplate)
 		{
 			entity.APIIsNew = true;
@@ -2129,7 +2136,7 @@
 						end.year(2010);
 						end.dayOfYear(1);
 
-						if (m.isValid() && end.isValid() && m.diff(end)>= 0)
+						if (m.isValid() && end.isValid() && m.diff(end) >= 0)
 						{//return time need greate than depart time
 							this.pageLevelViewModel.activeLostfouseName = "returnTime";
 							return { message: 'must be > Depart Time', valid: false };

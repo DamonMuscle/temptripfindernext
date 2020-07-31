@@ -59,6 +59,7 @@
 		{ from: "FieldTripActivityId", default: null },
 		{ from: "FieldTripActivityName", default: "" },
 		{ from: "FieldTripAccountId", default: null },
+		{ from: "FieldTripEquipmentIds", default: null },
 		{ from: "FieldTripEquipmentId", default: null },
 		{ from: "FieldTripEquipmentName", default: "" },
 		{ from: "FieldTripDestinationId", default: null },

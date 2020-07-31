@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').FieldTripInvoiceViewModel = FieldTripInvoiceViewModel;
 
-	function FieldTripInvoiceViewModel (option)
+	function FieldTripInvoiceViewModel(option)
 	{
 		this.option = option;
 		this.requiredFields = option.requiredFields;
@@ -49,14 +49,14 @@
 		this.$form = $(el);
 		var validatorFields = {}, isValidating = false, self = this;
 
-			validatorFields.account = {
-				trigger: "blur change",
-				validators: {
-					notEmpty: {
-						message: "required"
-					}
+		validatorFields.account = {
+			trigger: "blur change",
+			validators: {
+				notEmpty: {
+					message: "required"
 				}
 			}
+		}
 
 		setTimeout(function()
 		{
