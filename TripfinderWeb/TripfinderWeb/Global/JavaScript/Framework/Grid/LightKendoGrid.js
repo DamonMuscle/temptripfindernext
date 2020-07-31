@@ -3779,6 +3779,10 @@
 			{
 				fields = fields.concat(['DepartDateTime']);
 			}
+			if (!Enumerable.From(fields).Contains('FieldTripStageId'))
+			{
+				fields = fields.concat(['FieldTripStageId']);
+			}
 		}
 		if (type === 'document')
 		{
