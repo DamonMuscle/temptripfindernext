@@ -80,10 +80,6 @@
 		this.afterSelect = this.options.afterSelect;
 		this.showEmpty = this.options.showEmpty ? this.options.showEmpty : false;
 		this.addItem = false;
-		this.$entryContainer = this.$element.closest("div.modal-body,div.dataentry-container");
-		this.func_disableModalBodyScroll = function (e) {
-			e.preventDefault();
-		};
 	};
 
 	Typeahead.prototype = {
@@ -121,6 +117,12 @@
 
 		show: function()
 		{
+			var $modalBody = this.$element.closest(".modal-body");
+			if ($modalBody.length)
+			{
+				$modalBody.bind('mousewheel touchmove', lockScroll);
+			}
+
 			var wrap = this.$element.closest(".input-group").length > 0 ? this.$element.closest(".input-group") : this.$element;
 			var bodyWidth = $('body').width();
 			var pos = $.extend({}, this.$element.offset(), {
@@ -140,26 +142,20 @@
 				})
 				.show();
 
-			if (pos.left + this.$menu.outerWidth() > $(window).width())
-			{
-				this.$menu.css({
-					width: $(window).width() - pos.left
-				});
-			}
-			else if (this.$menu.outerWidth() > pos.width)
+			if (this.$menu.outerWidth() > pos.width)
 			{
 				if (pos.left + this.$menu.outerWidth() > bodyWidth)
 				{
 					this.$menu.css({
 						left: pos.left - this.$menu.outerWidth() + wrap.outerWidth()
-					});
+					})
 				}
 			}
 			this.shown = true;
 
 			this._toggleScroll(false);
 			this._toggleScroll(true);
-			this.$entryContainer.on("mousewheel touchmove",this.func_disableModalBodyScroll);
+
 			return this;
 		},
 
@@ -170,22 +166,30 @@
 				'width': 'auto',
 				'max-height': 200000
 			});
-			var menuWidth = this.$menu.outerWidth() + (this.$menu.height() > 200 ? 20 : 0);
-			this.$menu.css('max-height', 200);
-			if (menuWidth > parentWidth)
+			this.$menu.css('max-height', 210);
+			if (!TF.isPhoneDevice)
 			{
-				return menuWidth - parentWidth > 200 ? (parentWidth + 200) : menuWidth;
+				var menuWidth = this.$menu.outerWidth() + (this.$menu.height() > 200 ? 20 : 0);
+				if (menuWidth > parentWidth)
+				{
+					return menuWidth - parentWidth > 200 ? (parentWidth + 200) : menuWidth;
+				}
 			}
 			return parentWidth;
 		},
 
 		hide: function()
 		{
+			var $modalBody = this.$element.closest(".modal-body");
+			if ($modalBody.length)
+			{
+				$modalBody.unbind('mousewheel touchmove', lockScroll);
+			}
+
 			this.$menu.hide();
 			this.shown = false;
 
 			this._toggleScroll(false);
-			this.$entryContainer.off("mousewheel touchmove",this.func_disableModalBodyScroll);
 			return this;
 		},
 
@@ -301,7 +305,7 @@
 				, caseInsensitive = []
 				, item;
 
-			while ((item = items.shift()))
+			while ((item = items.shift()) != null)
 			{
 				var it = this.displayText(item);
 				if (!it.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item);
@@ -366,6 +370,10 @@
 				return i[0];
 			});
 
+			// if (this.autoSelect && !activeFound) {
+			// 	items.first().addClass('active');
+			// 	this.$element.data('active', items.first().data('value'));
+			// }
 			if (groupName)
 			{
 				this.$menu.append('<li class="group"><strong>' + groupName + '</strong></li>');
@@ -720,4 +728,8 @@
 		$this.typeahead($this.data());
 	});
 
+	function lockScroll(e)
+	{
+		e.preventDefault();
+	}
 }));
