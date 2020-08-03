@@ -126,6 +126,7 @@
 					tf.loadingIndicator.tryHide();
 					if (!viewerPageUrl) return false;	// Abort execution
 
+					viewerPageUrl = viewerPageUrl + "&from=Tripfinder"
 					execResult.externalReportViewerUrl = viewerPageUrl;
 
 					return execResult;
