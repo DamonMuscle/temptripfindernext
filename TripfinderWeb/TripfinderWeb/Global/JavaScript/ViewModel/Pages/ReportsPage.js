@@ -25,6 +25,7 @@
 		//self.options.url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "ExagoReports?dataTypeId=7");
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";
+		self.options.getCount = false;
 		var staticFilter = new TF.FilterItem("DataTypeName", "EqualTo", "Field Trip");
 		self.options.setRequestOption = function(options)
 		{

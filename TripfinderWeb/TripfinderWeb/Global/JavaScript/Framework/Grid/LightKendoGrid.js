@@ -760,7 +760,7 @@
 					self.allIds = [];
 					setTimeout(function()
 					{
-						self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + (self.currentTotalCount || self.result.TotalRecordCount));
+						self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + (self.currentTotalCount || self.result.TotalRecordCount || self.result.FilteredRecordCount));
 						self._resetPageInfoSelect();
 					});
 
