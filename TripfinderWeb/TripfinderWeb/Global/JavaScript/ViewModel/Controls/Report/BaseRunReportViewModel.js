@@ -570,9 +570,20 @@
 			}
 		}).then(function(res)
 		{
+			var summryFilter = {};
+			switch (dataType)
+			{
+				case "fieldtrip":
+					summryFilter = {
+						filters: tf.fieldTripGridDefinition.getSummaryFilters(),
+						function: tf.fieldTripGridDefinition.getSummaryFunction()
+					}
+					break;
+				default:
+			}
 			if (!res || !Array.isArray(res.Items)) return;
 
-			return res.Items.filter(function(filter)
+			var normalFilters = res.Items.filter(function(filter)
 			{
 				return filter && filter.IsValid === true;
 			}).map(function(filter)
@@ -584,6 +595,22 @@
 					isValid: filter.IsValid
 				};
 			});
+			var sumFilters = [];
+			if (summryFilter.filters)
+			{
+				sumFilters = summryFilter.filters.map(filter =>
+				{
+					return {
+						name: filter.Name,
+						whereClause: filter.WhereClause,
+						id: filter.Id,
+						isValid: filter.IsValid,
+						summaryFunc: summryFilter.function
+					};
+				})
+			}
+			return normalFilters.concat(sumFilters);
+
 		});
 	};
 
@@ -762,20 +789,36 @@
 
 		if (useFilter)
 		{
-			return tf.exagoReportDataHelper.getRecordIdsByFilterClause(
-				dataSourceId,
-				dataSchema,
-				self.obSelectedFilterWhereClause()
-			).then(function(idsFromFilter)
+			// summaryFilter
+			if (self.obSelectedFilter().summaryFunc)
 			{
-				if (Array.isArray(idsFromFilter) && idsFromFilter.length > 0)
+				return self.obSelectedFilter().summaryFunc().then(res =>
 				{
-					reportItem.SpecificRecordIds = idsFromFilter;
-					return Promise.resolve(reportItem);
-				}
+					if (Array.isArray(res) && res.length > 0)
+					{
+						reportItem.SpecificRecordIds = res;
+						return Promise.resolve(reportItem);
+					}
+					return Promise.resolve(null);
+				})
+			}
+			else
+			{
+				return tf.exagoReportDataHelper.getRecordIdsByFilterClause(
+					dataSourceId,
+					dataSchema,
+					self.obSelectedFilterWhereClause()
+				).then(function(idsFromFilter)
+				{
+					if (Array.isArray(idsFromFilter) && idsFromFilter.length > 0)
+					{
+						reportItem.SpecificRecordIds = idsFromFilter;
+						return Promise.resolve(reportItem);
+					}
 
-				return Promise.resolve(null);
-			});
+					return Promise.resolve(null);
+				});
+			}
 		}
 		else if (useSpecifiedRecords)
 		{
