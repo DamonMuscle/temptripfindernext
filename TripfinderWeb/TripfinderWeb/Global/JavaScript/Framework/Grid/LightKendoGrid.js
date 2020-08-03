@@ -760,8 +760,23 @@
 					self.allIds = [];
 					setTimeout(function()
 					{
-						self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + (self.currentTotalCount || self.result.TotalRecordCount || self.result.FilteredRecordCount));
-						self._resetPageInfoSelect();
+						if ((self._gridType == 'report'))
+						{
+							var option = {
+								data: self.searchOption.data
+							}
+							_.remove(option.data.filterSet.FilterItems, e => e.FieldName != "DataTypeName")
+							tf.ajax["post"](self.getApiRequestURL() + '/id?take=100&skip=0&getCount=true', option).then(res =>
+							{
+								self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + res.TotalRecordCount);
+								self._resetPageInfoSelect();
+							})
+						}
+						else
+						{
+							self.$container.children(".k-pager-wrap").find(".pageInfo").html((self.currentCount || self.result.FilteredRecordCount) + " of " + (self.currentTotalCount || self.result.TotalRecordCount || self.result.FilteredRecordCount));
+							self._resetPageInfoSelect();
+						}
 					});
 
 					self.obFilteredRecordCount(self.result.FilteredRecordCount);
