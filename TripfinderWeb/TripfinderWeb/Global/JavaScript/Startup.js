@@ -334,6 +334,7 @@
 					var p1 = tf.userPreferenceManager.getAllKey();
 					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "timezonetotalminutes")).then(function(apiResponse)
 					{
+						if (apiResponse && apiResponse.Items && apiResponse.Items[0]) tf.timezonetotalminutes = apiResponse.Items[0];
 						moment().constructor.prototype.currentTimeZoneTime = function()
 						{
 							var now = moment().utcOffset(apiResponse.Items[0]);
@@ -747,7 +748,7 @@
 			{
 				if (response.Items && response.Items.length > 0)
 				{
-					window.ExagoBIServerUrl = "http://localhost"//response.Items[0].InfoValue;
+					window.ExagoBIServerUrl = response.Items[0].InfoValue;
 				}
 			});
 	};
