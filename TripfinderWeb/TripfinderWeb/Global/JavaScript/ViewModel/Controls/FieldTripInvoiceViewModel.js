@@ -9,6 +9,12 @@
 		this.obEntityType = ko.observable(option.entityType);
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripInvoiceDataModel(option.data));
 
+		// required fields
+		this.obIsAccountNameRequired = ko.observable(true);
+		this.obIsPurchaseOrderRequired = ko.observable(false);
+		this.obIsInvoiceDateRequired = ko.observable(false);
+		this.obIsPaymentDateRequired = ko.observable(false);
+
 		this.obAccountSource = ko.observableArray();
 
 		this.pageLevelViewModel = new TF.PageLevel.BaseDataEntryPageLevelViewModel();
@@ -44,19 +50,49 @@
 			}.bind(this));
 	}
 
+	/**
+	 * Adjust modal to apply required fields setting.
+	 *
+	 * @param {Array} validatorFields
+	 */
+	FieldTripInvoiceViewModel.prototype.applyRequiredFieldSetting = function(validatorFields)
+	{
+		const { InvoiceDate, PaymentDate, PurchaseOrder } = this.requiredFields;
+		const requiredValidator = {
+			trigger: "blur change",
+			validators: { notEmpty: { message: "required" } }
+		};
+
+		// currently account is always required.
+		this.obIsAccountNameRequired(true);
+		validatorFields.account = $.extend(true, {}, requiredValidator);
+
+
+		if (InvoiceDate && InvoiceDate.Required)
+		{
+			this.obIsInvoiceDateRequired(true);
+			validatorFields.invoiceDate = $.extend(true, {}, requiredValidator);
+		}
+
+		if (PaymentDate && PaymentDate.Required)
+		{
+			this.obIsPaymentDateRequired(true);
+			validatorFields.paymentDate = $.extend(true, {}, requiredValidator);
+		}
+
+		if (PurchaseOrder && PurchaseOrder.Required)
+		{
+			this.obIsPurchaseOrderRequired(true);
+			validatorFields.purchaseOrder = $.extend(true, {}, requiredValidator);
+		}
+	};
+
 	FieldTripInvoiceViewModel.prototype.init = function(viewModel, el)
 	{
 		this.$form = $(el);
 		var validatorFields = {}, isValidating = false, self = this;
 
-		validatorFields.account = {
-			trigger: "blur change",
-			validators: {
-				notEmpty: {
-					message: "required"
-				}
-			}
-		}
+		this.applyRequiredFieldSetting(validatorFields);
 
 		setTimeout(function()
 		{

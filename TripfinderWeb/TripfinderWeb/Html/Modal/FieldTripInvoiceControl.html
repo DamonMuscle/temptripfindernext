@@ -4,8 +4,7 @@
 	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
-				<label class ="requirestar">Account
-					Name</label>
+				<label class="requirestar">Account Name</label>
 				<div class="input-group">
 					<div
 						data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true},
@@ -37,22 +36,23 @@
 		</div>
 		<div class="col-xs-12">
 			<div class="form-group">
-				<label>PO</label>
-				<input type="text" class="form-control" data-bind="value:obEntityDataModel().purchaseOrder" maxlength="50">
+				<label data-bind="css:{'requirestar':obIsPurchaseOrderRequired}">PO</label>
+				<input name="purchaseOrder" type="text" class="form-control"
+					data-bind="value:obEntityDataModel().purchaseOrder" maxlength="50">
 			</div>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="form-group">
-				<label>Invoice Date</label>
+				<label data-bind="css:{'requirestar':obIsInvoiceDateRequired}">Invoice Date</label>
 				<!-- ko customInput:{type:"Date",value:obEntityDataModel().invoiceDate,attributes:{class:"form-control",name:"invoiceDate"}} -->
 				<!-- /ko -->
 			</div>
 		</div>
 		<div class="col-xs-12">
 			<div class="form-group">
-				<label>Payment Date</label>
+				<label data-bind="css:{'requirestar':obIsPaymentDateRequired}">Payment Date</label>
 				<!-- ko customInput:{type:"Date",value:obEntityDataModel().paymentDate,attributes:{class:"form-control",name:"paymentDate"}} -->
 				<!-- /ko -->
 			</div>

@@ -20,6 +20,7 @@
 		this.obgridTitle("FieldTrip");
 		this.dataEntryTemplateName = "workspace/dataentry/fieldtrip/form";
 		this.obRequiredFields = ko.observable(new TF.DataModel.FieldTripDataModel());
+		this.obIsInvoiceRequired = ko.observable(false);
 		this.obEntityDataModel(new TF.DataModel.FieldTripDataModel());
 		this.obDepartureAndReturnDateTime = ko.observable();
 		this.obDepartureDateSaveValue = ko.observable();
@@ -843,7 +844,7 @@
 				{
 					this.$form.find("input[name='name']").blur();
 					this.pageLevelViewModel.obValidationErrorsSpecifed([{
-						message: "You can not make changes to this  field trip.  This is due to security restrictions or the trip's current pending approval status.",
+						message: "You can not make changes to this field trip.  This is due to security restrictions or the trip's current pending approval status.",
 						field: $(document)
 					}]);
 					this.pageLevelViewModel.obErrorMessageDivIsShow(true);
@@ -1073,15 +1074,15 @@
 				}.bind(this));
 
 				this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-				this.obResourcesGridViewModel().obEditEnable(false);
-				this.obResourcesGridViewModel().obCanAdd(false);
+				this.obResourcesGridViewModel().obEditEnable(true);
+				this.obResourcesGridViewModel().obCanAdd(true);
 			}.bind(this));
 		}
 		else
 		{
 			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-			this.obResourcesGridViewModel().obEditEnable(false);
-			this.obResourcesGridViewModel().obCanAdd(false);
+			this.obResourcesGridViewModel().obEditEnable(true);
+			this.obResourcesGridViewModel().obCanAdd(true);
 		}
 	};
 
@@ -1420,24 +1421,47 @@
 
 	FieldTripDataEntryViewModel.prototype.initializeInvoice = function(el)
 	{
-		this.$form.find('.invoice .view-grid-header').text("Invoice Information");
-		this.$form.find('.invoice .iconbutton.mapview').hide();
-		this.$form.find('.invoice .iconbutton.gridview').hide();
-		this.$form.find('.invoice .iconbutton.view').hide();
-		this.$form.find('.invoice .iconbutton.copytoclipboard').hide();
-		this.$form.find('.invoice .iconrow .divider:first').hide();
+		let $invoice = this.$form.find(".invoice.view-form-grid");
 
-		this.$form.find('.invoice .iconbutton.filter').off("click");
-		this.$form.find('.invoice .iconbutton.refresh').off("click");
+		$invoice.find(".view-grid-header").text("Invoice Information");
+		$invoice.find('.iconbutton.mapview').hide();
+		$invoice.find('.iconbutton.gridview').hide();
+		$invoice.find('.iconbutton.view').hide();
+		$invoice.find('.iconbutton.copytoclipboard').hide();
+		$invoice.find('.iconrow .divider:first').hide();
 
-		this.$form.find('.invoice .iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.addInvoiceEvent.bind(this));
-		this.$form.find('.invoice .iconbutton.pencil').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.editInvoiceEvent.bind(this));
-		this.$form.find('.invoice .iconbutton.delete').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.deleteInvoiceEvent.bind(this));
-		this.obInvoicingGridViewModel().obGridViewModel()._viewfromDBClick = this.editInvoiceEvent.bind(this);
-		if (this.obRequiredFields() && this.obRequiredFields().FieldTripAccountID && this.obRequiredFields().FieldTripAccountID.Required &&
-			this.obInvoicingGridViewModel().obGridViewModel() && this.obInvoicingGridViewModel().obGridViewModel().searchGrid)
+		$invoice.find('.iconbutton.filter').off("click");
+		$invoice.find('.iconbutton.refresh').off("click");
+
+		$invoice.find('.iconbutton.new').off("click").on("click", { modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.addInvoiceEvent.bind(this));
+		$invoice.find('.iconbutton.pencil').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.editInvoiceEvent.bind(this));
+		$invoice.find('.iconbutton.delete').off("click").on("click", { gridView: this.obInvoicingGridViewModel, modal: TF.Modal.FieldTripInvoiceModalViewModel }, this.deleteInvoiceEvent.bind(this));
+
+		let invoiceGridViewModel = this.obInvoicingGridViewModel().obGridViewModel();
+		let requiredFields = this.obRequiredFields();
+
+		invoiceGridViewModel._viewfromDBClick = this.editInvoiceEvent.bind(this);
+
+
+		if (requiredFields)
 		{
-			this.obInvoicingGridViewModel().obGridViewModel().searchGrid.onDataBoundEvent.subscribe(function()
+			const { FieldTripAccountId, InvoiceDate, PaymentDate, PurchaseOrder } = requiredFields;
+
+			if ((FieldTripAccountId && FieldTripAccountId.Required)
+				|| (InvoiceDate && InvoiceDate.Required)
+				|| (PaymentDate && PaymentDate.Required)
+				|| (PurchaseOrder && PurchaseOrder.Required))
+			{
+				//$invoice.addClass("required");
+				this.obIsInvoiceRequired(true);
+			}
+		}
+
+		// Not sure whether this is useful
+		if (requiredFields && requiredFields.FieldTripAccountId && requiredFields.FieldTripAccountId.Required &&
+			invoiceGridViewModel && invoiceGridViewModel.searchGrid)
+		{
+			invoiceGridViewModel.searchGrid.onDataBoundEvent.subscribe(function()
 			{
 				$(el).find("th[data-kendo-field='AccountName'] .k-link").addClass("required");
 			});
@@ -1905,251 +1929,256 @@
 
 	FieldTripDataEntryViewModel.prototype.getSpecialValidatorFields = function(validatorFields)
 	{
-		if (this.obRequiredFields().Name && this.obRequiredFields().Name.Required)
-		{//may name not required(this don't exist in prod, but need test)
-			validatorFields.name.validators.notEmpty = { message: "required" };
-		}
+		var settings = this.obFieldTripSettings(),
+			blockOutTimes = settings.BlockOutTimes || [],
+			requiredFields = this.obRequiredFields(),
+			notEmptyValidator = { message: "required" };
 
-		if (tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
+		const isAdmin = tf.helpers.fieldTripAuthHelper.isFieldTripAdmin();
+
+		// Name is a required field
+		validatorFields.name.validators.notEmpty = $.extend({}, notEmptyValidator);
+
+		// Check required field settings
+		const { DepartDateTime, EstimatedReturnDateTime } = requiredFields;
+
+		if (DepartDateTime && DepartDateTime.Required)
 		{
-			return;
+			validatorFields.departDate.validators.notEmpty = $.extend({}, notEmptyValidator);
+			validatorFields.departTime.validators.notEmpty = $.extend({}, notEmptyValidator);
 		}
-		validatorFields.departDate.validators.callback = {
-			message: "must be <= Return Date",
-			callback: function(value, validator)
-			{
-				var field = this.$form.find("#departDate input[name=departDate]");
-				field.data("noName", false);
-				if (value != "")
+		else
+		{
+			delete validatorFields.departDate.validators.notEmpty;
+			delete validatorFields.departTime.validators.notEmpty;
+		}
+
+
+		if (EstimatedReturnDateTime && EstimatedReturnDateTime.Required)
+		{
+			validatorFields.estimatedReturnDate.validators.notEmpty = $.extend({}, notEmptyValidator);
+			validatorFields.estimatedReturnTime.validators.notEmpty = $.extend({}, notEmptyValidator);
+		}
+		else
+		{
+			delete validatorFields.estimatedReturnDate.validators.notEmpty;
+			delete validatorFields.estimatedReturnTime.validators.notEmpty;
+		}
+
+
+		if (!isAdmin)
+		{
+			validatorFields.departDate.validators.callback = {
+				message: "must be <= Return Date",
+				callback: function(value, validator)
 				{
-					if (this.obEntityDataModel().departTime())
+					var field = this.$form.find("#departDate input[name=departDate]");
+					field.data("noName", false);
+					if (value != "")
 					{
-						this.$form.data("bootstrapValidator").updateStatus('departTime', 'NOT_VALIDATED');
-						this.$form.data("bootstrapValidator").validateField("departTime");
-					}
-					var message = this.checkDeadline(value);
-					if (message)
-					{
-						field.data("noName", true);
-						return { message: message, valid: false };
-					}
-
-					var returnDate = new moment(this.obEntityDataModel().returnDate());
-					var departDate = new moment(this.obEntityDataModel().departDate());
-					if (!departDate.isValid() || !returnDate.isValid())
-					{//not valid value, no need to compare
-						return true;
-					}
-
-					if (returnDate.isSame(departDate, "day"))
-					{
-						this.clearDateTimeAlerts("date");
-						if (this.obEntityDataModel().returnTime())
-						{
-							this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
-							this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
-						}
-						return true;
-					}
-					else if (departDate.isAfter(returnDate))
-					{//return time need greate than depart time
-						this.clearDateTimeAlerts("time");
-						this.pageLevelViewModel.activeLostfouseName = "departDate";
-						return { message: 'must be <= return Date', valid: false };
-					}
-					//validate passed, clear all messages.
-					this.clearDateTimeAlerts();
-				}
-				return true;
-			}.bind(this)
-		};
-
-		validatorFields.estimatedReturnDate.validators.callback = {
-			message: "invalid time",
-			callback: function(value, validator)
-			{
-				if (value != "")
-				{
-					var returnDate = new moment(value);
-					var departDate = new moment(this.obEntityDataModel().departDate());
-					if (!departDate.isValid() || !returnDate.isValid())
-					{//not valid value, no need to compare
-						return true;
-					}
-
-					if (this.obEntityDataModel().returnTime())
-					{
-						this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
-						this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
-					}
-					if (returnDate.isSame(departDate, "day"))
-					{
-						this.clearDateTimeAlerts("date");
-
 						if (this.obEntityDataModel().departTime())
 						{
 							this.$form.data("bootstrapValidator").updateStatus('departTime', 'NOT_VALIDATED');
 							this.$form.data("bootstrapValidator").validateField("departTime");
 						}
-
-						if (this.obEntityDataModel().departDate())
+						var message = this.checkDeadline(value);
+						if (message)
 						{
-							this.$form.data("bootstrapValidator").updateStatus('departDate', 'NOT_VALIDATED');
-							this.$form.data("bootstrapValidator").validateField("departDate");
+							field.data("noName", true);
+							return { message: message, valid: false };
 						}
-						return true;
-					}
-					else if (departDate.isAfter(returnDate))
-					{//return time need greate than depart time
-						this.clearDateTimeAlerts("time");
-						this.pageLevelViewModel.activeLostfouseName = "returnDate";
-						return { message: 'must be >= Depart Date', valid: false };
-					}
 
-					//validate passed, clear all messages.
-					this.clearDateTimeAlerts();
-				}
-				return true;
-			}.bind(this)
-		};
+						var returnDate = new moment(this.obEntityDataModel().returnDate());
+						var departDate = new moment(this.obEntityDataModel().departDate());
+						if (!departDate.isValid() || !returnDate.isValid())
+						{//not valid value, no need to compare
+							return true;
+						}
 
-		if (this.obRequiredFields().DepartDateTime)
-		{
-			if (this.obRequiredFields().DepartDateTime.Required)
-			{
-				validatorFields.departDate.validators.notEmpty = { message: "required" };
-			}
-			else
-			{
-				delete validatorFields.departTime.validators.notEmpty;
-			}
-		}
-
-		var settings = this.obFieldTripSettings(), blockOutTimes = settings.BlockOutTimes || [];
-
-		validatorFields.departTime.validators.callback = {
-			message: "invalid time",
-			callback: function(value, validator)
-			{
-				var field = this.$form.find("#departTime input[name=departTime]");
-				field.data("noName", false);
-				if (value != "")
-				{
-					var m = new moment(value, 'h:m A', true);
-
-					if (!m.isValid())
-					{
-						return { message: "invalid time", valid: false };
-					}
-
-					if (!this.obEntityDataModel().departDate())
-					{//this might never use, because the date is required when input time
-						return true;
-					}
-
-					var message = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(m, this.obEntityDataModel().departDate(), blockOutTimes);
-					if (message)
-					{
-						field.data("noName", true);
-						return { message: "Depart Time " + message, valid: false };
-					}
-
-					var returnDate = new moment(this.obEntityDataModel().returnDate());
-					var departDate = new moment(this.obEntityDataModel().departDate());
-					if (!departDate.isValid() || !returnDate.isValid())
-					{//not valid value, no need to compare
-						return true;
-					}
-
-					if (returnDate.isSame(departDate, "day"))
-					{
-						var m = new moment(this.obEntityDataModel().departTime());
-						m.year(2010);
-						m.dayOfYear(1);
-
-						var end = new moment(this.obEntityDataModel().returnTime());
-						end.year(2010);
-						end.dayOfYear(1);
-
-						if (m.isValid() && end.isValid() && m.diff(end) >= 0)
+						if (returnDate.isSame(departDate, "day"))
+						{
+							this.clearDateTimeAlerts("date");
+							if (this.obEntityDataModel().returnTime())
+							{
+								this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
+								this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
+							}
+							return true;
+						}
+						else if (departDate.isAfter(returnDate))
 						{//return time need greate than depart time
-							this.pageLevelViewModel.activeLostfouseName = "departTime";
-							return { message: 'must be < return Time', valid: false };
+							this.clearDateTimeAlerts("time");
+							this.pageLevelViewModel.activeLostfouseName = "departDate";
+							return { message: 'must be <= return Date', valid: false };
+						}
+						//validate passed, clear all messages.
+						this.clearDateTimeAlerts();
+					}
+					return true;
+				}.bind(this)
+			};
+
+			validatorFields.estimatedReturnDate.validators.callback = {
+				message: "invalid time",
+				callback: function(value, validator)
+				{
+					if (value != "")
+					{
+						var returnDate = new moment(value);
+						var departDate = new moment(this.obEntityDataModel().departDate());
+						if (!departDate.isValid() || !returnDate.isValid())
+						{//not valid value, no need to compare
+							return true;
+						}
+
+						if (this.obEntityDataModel().returnTime())
+						{
+							this.$form.data("bootstrapValidator").updateStatus('estimatedReturnTime', 'NOT_VALIDATED');
+							this.$form.data("bootstrapValidator").validateField("estimatedReturnTime");
+						}
+						if (returnDate.isSame(departDate, "day"))
+						{
+							this.clearDateTimeAlerts("date");
+
+							if (this.obEntityDataModel().departTime())
+							{
+								this.$form.data("bootstrapValidator").updateStatus('departTime', 'NOT_VALIDATED');
+								this.$form.data("bootstrapValidator").validateField("departTime");
+							}
+
+							if (this.obEntityDataModel().departDate())
+							{
+								this.$form.data("bootstrapValidator").updateStatus('departDate', 'NOT_VALIDATED');
+								this.$form.data("bootstrapValidator").validateField("departDate");
+							}
+							return true;
+						}
+						else if (departDate.isAfter(returnDate))
+						{//return time need greate than depart time
+							this.clearDateTimeAlerts("time");
+							this.pageLevelViewModel.activeLostfouseName = "returnDate";
+							return { message: 'must be >= Depart Date', valid: false };
 						}
 
 						//validate passed, clear all messages.
-						this.clearDateTimeAlerts("time");
+						this.clearDateTimeAlerts();
 					}
-				}
+					return true;
+				}.bind(this)
+			};
 
-				return true;
-			}.bind(this)
-		};
-
-		if (this.obRequiredFields().EstimatedReturnDateTime)
-		{
-			//no need to check EstimatedReturnTime because it is not required.
-			if (this.obRequiredFields().EstimatedReturnDateTime.Required)
-			{
-				validatorFields.estimatedReturnDate.validators.notEmpty = { message: "required" };
-			}
-			else
-			{
-				delete validatorFields.estimatedReturnTime.validators.notEmpty;
-			}
-		}
-
-		validatorFields.estimatedReturnTime.validators.callback = {
-			message: "invalid time",
-			callback: function(value, validator)
-			{
-				var field = this.$form.find("#returnTime input[name=estimatedReturnTime]");
-				field.data("noName", false);
-				if (value != "")
+			validatorFields.departTime.validators.callback = {
+				message: "invalid time",
+				callback: function(value, validator)
 				{
-					var m = new moment(value, 'h:m A', true);
-
-					if (!m.isValid())
+					var field = this.$form.find("#departTime input[name=departTime]");
+					field.data("noName", false);
+					if (value != "")
 					{
-						return { message: "invalid time", valid: false };
-					}
+						var m = new moment(value, 'h:m A', true);
 
-					if (!this.obEntityDataModel().returnDate())
-					{//this might never use, because the date is required when input time
-						return true;
-					}
-
-					var returnDate = new moment(this.obEntityDataModel().returnDate());
-					var departDate = new moment(this.obEntityDataModel().departDate());
-					if (!departDate.isValid() || !returnDate.isValid())
-					{//not valid value, no need to compare
-						return true;
-					}
-
-					if (returnDate.isSame(departDate, "day"))
-					{
-						var m = new moment(this.obEntityDataModel().departTime());
-						m.year(2010);
-						m.dayOfYear(1);
-
-						var end = new moment(this.obEntityDataModel().returnTime());
-						end.year(2010);
-						end.dayOfYear(1);
-
-						if (m.isValid() && end.isValid() && m.diff(end) >= 0)
-						{//return time need greate than depart time
-							this.pageLevelViewModel.activeLostfouseName = "returnTime";
-							return { message: 'must be > Depart Time', valid: false };
+						if (!m.isValid())
+						{
+							return { message: "invalid time", valid: false };
 						}
 
-						//validate passed, clear all messages.
-						this.clearDateTimeAlerts("time");
-					}
-				}
+						if (!this.obEntityDataModel().departDate())
+						{//this might never use, because the date is required when input time
+							return true;
+						}
 
-				return true;
-			}.bind(this)
-		};
+						var message = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(m, this.obEntityDataModel().departDate(), blockOutTimes);
+						if (message)
+						{
+							field.data("noName", true);
+							return { message: "Depart Time " + message, valid: false };
+						}
+
+						var returnDate = new moment(this.obEntityDataModel().returnDate());
+						var departDate = new moment(this.obEntityDataModel().departDate());
+						if (!departDate.isValid() || !returnDate.isValid())
+						{//not valid value, no need to compare
+							return true;
+						}
+
+						if (returnDate.isSame(departDate, "day"))
+						{
+							var m = new moment(this.obEntityDataModel().departTime());
+							m.year(2010);
+							m.dayOfYear(1);
+
+							var end = new moment(this.obEntityDataModel().returnTime());
+							end.year(2010);
+							end.dayOfYear(1);
+
+							if (m.isValid() && end.isValid() && m.diff(end) >= 0)
+							{//return time need greate than depart time
+								this.pageLevelViewModel.activeLostfouseName = "departTime";
+								return { message: 'must be < return Time', valid: false };
+							}
+
+							//validate passed, clear all messages.
+							this.clearDateTimeAlerts("time");
+						}
+					}
+
+					return true;
+				}.bind(this)
+			};
+
+			validatorFields.estimatedReturnTime.validators.callback = {
+				message: "invalid time",
+				callback: function(value, validator)
+				{
+					var field = this.$form.find("#returnTime input[name=estimatedReturnTime]");
+					field.data("noName", false);
+					if (value != "")
+					{
+						var m = new moment(value, 'h:m A', true);
+
+						if (!m.isValid())
+						{
+							return { message: "invalid time", valid: false };
+						}
+
+						if (!this.obEntityDataModel().returnDate())
+						{//this might never use, because the date is required when input time
+							return true;
+						}
+
+						var returnDate = new moment(this.obEntityDataModel().returnDate());
+						var departDate = new moment(this.obEntityDataModel().departDate());
+						if (!departDate.isValid() || !returnDate.isValid())
+						{//not valid value, no need to compare
+							return true;
+						}
+
+						if (returnDate.isSame(departDate, "day"))
+						{
+							var m = new moment(this.obEntityDataModel().departTime());
+							m.year(2010);
+							m.dayOfYear(1);
+
+							var end = new moment(this.obEntityDataModel().returnTime());
+							end.year(2010);
+							end.dayOfYear(1);
+
+							if (m.isValid() && end.isValid() && m.diff(end) >= 0)
+							{//return time need greate than depart time
+								this.pageLevelViewModel.activeLostfouseName = "returnTime";
+								return { message: 'must be > Depart Time', valid: false };
+							}
+
+							//validate passed, clear all messages.
+							this.clearDateTimeAlerts("time");
+						}
+					}
+
+					return true;
+				}.bind(this)
+			};
+		}
+
 		return validatorFields;
 	};
 

@@ -35,7 +35,7 @@ a.link {
 	right: 5px;
 }
 
-.dataentry-paginator > div {
+.dataentry-paginator>div {
 	float: left;
 	display: block;
 	margin-left: 10px;
@@ -452,7 +452,7 @@ body .document-dataentry.page-level-message-container {
 	font-size: 28px;
 	margin: 0 6px 0 4px;
 
-	@media (max-width: 330px){
+	@media (max-width: 330px) {
 		font-size: 22px;
 	}
 }
@@ -514,9 +514,8 @@ body .document-dataentry.page-level-message-container {
 	border-color: #444444;
 	outline: none !important;
 
-	&.btn-save{
-		@media (max-width: 330px)
-		{
+	&.btn-save {
+		@media (max-width: 330px) {
 			width: 68px;
 		}
 	}
@@ -525,7 +524,7 @@ body .document-dataentry.page-level-message-container {
 .document-dataentry .tf-btn-black:hover,
 .document-dataentry .tf-btn-black:focus,
 .document-dataentry .tf-btn-black:active,
-.document-dataentry .open > .dropdown-toggle.tf-btn-black {
+.document-dataentry .open>.dropdown-toggle.tf-btn-black {
 	color: #ffffff;
 	background-color: #444444;
 	border-color: #333333;
@@ -544,13 +543,12 @@ body .document-dataentry.page-level-message-container {
 .alert-small {
 	padding: 5px 10px;
 
-	@media (max-width:330px)
-	{
+	@media (max-width:330px) {
 		padding: 5px;
 	}
 }
 
-.document-dataentry .input-group-btn > button,
+.document-dataentry .input-group-btn>button,
 .icon-gray-button {
 	padding-right: 6px;
 	padding-left: 6px;
@@ -569,7 +567,7 @@ body .document-dataentry.page-level-message-container {
 	}
 }
 
-.input-group.colorbox > input {
+.input-group.colorbox>input {
 	position: absolute;
 	opacity: 0;
 	z-index: -1;
@@ -648,6 +646,12 @@ body .document-dataentry.page-level-message-container {
 .document-dataentry .fieldtriptemplate {
 	.view-form-grid {
 		position: relative;
+
+		&.required .view-grid-header::after {
+			content: "*";
+			color: red;
+			margin-left: 3px;
+		}
 	}
 
 	h4.gridLevel {
@@ -726,7 +730,7 @@ body .document-dataentry.page-level-message-container {
 		display: none;
 	}
 
-	input[type=checkbox]:checked + label:after {
+	input[type=checkbox]:checked+label:after {
 		content: '\2714';
 	}
 }
@@ -823,7 +827,12 @@ body .document-dataentry.page-level-message-container {
 }
 
 .fieldtrip.disabled {
-	button, input, textarea, .iconbutton, [role="button"] {
+
+	button,
+	input,
+	textarea,
+	.iconbutton,
+	[role="button"] {
 		pointer-events: none;
 		opacity: 0.5;
 	}

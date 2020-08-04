@@ -69,13 +69,18 @@
 			}
 		}
 
-		if (self.fieldTripDE.obRequiredFields() && self.fieldTripDE.obRequiredFields().FieldTripAccountID && self.fieldTripDE.obRequiredFields().FieldTripAccountID.Required &&
-			self.fieldTripDE.obInvoicingGridViewModel().obGridViewModel() && self.fieldTripDE.obInvoicingGridViewModel().obGridViewModel().searchGrid)
+		// if (self.fieldTripDE.obRequiredFields() && self.fieldTripDE.obRequiredFields().FieldTripAccountID && self.fieldTripDE.obRequiredFields().FieldTripAccountID.Required &&
+		// 	self.fieldTripDE.obInvoicingGridViewModel().obGridViewModel() && self.fieldTripDE.obInvoicingGridViewModel().obGridViewModel().searchGrid)
+		// {
+		// 	if (self.fieldTripDE.obInvoiceGridDataSource().length === 0)
+		// 	{
+		// 		validationErrors.push({ message: "Account is required.", field: $form.find(".gridController.invoice-grid") });
+		// 	}
+		// }
+
+		if (self.fieldTripDE.obIsInvoiceRequired && self.fieldTripDE.obInvoiceGridDataSource().length === 0)
 		{
-			if (self.fieldTripDE.obInvoiceGridDataSource().length === 0)
-			{
-				validationErrors.push({ message: "Account is required.", field: $form.find(".gridController.invoice-grid") });
-			}
+			validationErrors.push({ message: "Invoice Information is required.", field: $form.find(".gridController.invoice-grid") });
 		}
 
 		return validationErrors;
