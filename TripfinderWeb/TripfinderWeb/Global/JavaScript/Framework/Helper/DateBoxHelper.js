@@ -2,32 +2,48 @@
 {
 	createNamespace("TF").DateBoxHelper = DateBoxHelper;
 
-	function DateBoxHelper(datePicker, dateBox)
+	function DateBoxHelper(datePicker, dateBox, isStartOrEnd)
 	{
 		this.datePicker = datePicker;
 		datePicker.element.on("keypress", this.keypress.bind(this));
 		datePicker.element.on("blur", this.dateChange.bind(this));
 		this.trigger = null;
 		this.dateBox = dateBox;
+		this.isStartOrEnd = isStartOrEnd
 	}
 
-	DateBoxHelper.prototype.dateChange = function(e)
+	DateBoxHelper.prototype.dateChange = function(e,isAll)
 	{
 		var strValue = this.datePicker.element.val();
-		if (strValue == "")
-		{
-			if (this.dateBox)
-			{
-				this.dateBox.value('');
-			}
-			return;
-		}
 		var dateTime = moment(this.convertToDateFormat(strValue));
 		if (dateTime.isValid())
 		{
 			if (this.dateBox)
 			{
-				this.dateBox.value(toISOStringWithoutTimeZone(dateTime));
+				var dateTimeStr = toISOStringWithoutTimeZone(dateTime)
+
+				if(this.isStartOrEnd )
+				{
+					var rawValue =  this.dateBox.value()
+					if(isAll  == "All")
+					{
+						rawValue.StartDate = dateTimeStr
+						rawValue.EndDate = dateTimeStr
+					}
+					else if(this.isStartOrEnd  == "StartDate")
+					{
+						rawValue.StartDate = dateTimeStr
+					}
+					else if(this.isStartOrEnd  == "EndDate")
+					{
+						rawValue.EndDate = dateTimeStr
+					}
+					this.dateBox.value(rawValue)
+				}
+				else
+				{
+					this.dateBox.value(dateTimeStr);
+				}
 			}
 			else
 			{
@@ -38,6 +54,35 @@
 			{
 				this.trigger();
 			}
+		}
+		else
+		{
+			if (this.dateBox)
+			{
+				if(this.isStartOrEnd )
+				{
+					var rawValue =  this.dateBox.value()
+					if(isAll == "All")
+					{
+						rawValue.StartDate = ''
+						rawValue.EndDate = '01/01/1900'
+					}
+					else if(this.isStartOrEnd  == "StartDate")
+					{
+						rawValue.StartDate = ''
+					}
+					else if(this.isStartOrEnd  == "EndDate")
+					{
+						rawValue.EndDate = ''
+					}
+					this.dateBox.value(rawValue)
+				}
+				else
+				{
+					this.dateBox.value('');
+				}
+			}
+			return;
 		}
 	};
 

@@ -47,7 +47,7 @@
 		}
 	];
 
-	var DATA_TYPES_REQUIRE_DATE_PARAMETERS = ["Alternate Site", "School", "Staff", "Student", "Trip", "Vehicle"];
+	var DATA_TYPES_REQUIRE_DATE_PARAMETERS = ["Alternate Site", "School", "Staff", "Student", "Trip", "Vehicle","Field Trip"];
 
 	function ExagoReportDataHelper()
 	{

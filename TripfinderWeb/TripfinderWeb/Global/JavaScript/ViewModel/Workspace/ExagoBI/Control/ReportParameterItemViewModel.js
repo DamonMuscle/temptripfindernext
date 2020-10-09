@@ -54,6 +54,11 @@
 			case "Date":
 				initialValue = self.originalValue !== undefined ? self.originalValue : "[Today]";
 				break;
+			case "DateRange":
+				var time = new Date()
+				var today =  toISOStringWithoutTimeZone(moment(time.toLocaleDateString()))
+				initialValue = self.originalValue !== undefined ? self.originalValue : {StartDate:"[Today]", EndDate:"[Today]",SelectedItem:"Today",DateNum:"1"};
+				break;
 			case "Time":
 			case "Boolean":
 			case "Number":
@@ -74,6 +79,64 @@
 		var validatorForValue;
 		switch (self.dataType)
 		{
+			case "DateRange":
+				var validatorForStart = {
+					trigger: "blur change",
+					validators: {}
+				};
+				if (self.required)
+				{
+					validatorForStart.validators["callback"] = 
+					{
+						callback: function(value, validator, $field) {
+
+							var dateStartText = $("#dateRangeStart").val()
+							var dateEndText =  $("#dateRangeEnd").val()
+							var dateStart = moment( $("#dateRangeStart").val())
+							var dateEnd = moment($("#dateRangeEnd").val())
+							if(dateStartText =="" || dateEndText =="")
+							{
+								return {
+									valid: false,
+                                    message: 'Date value is required'
+								}
+							}
+
+							if(dateStart.isValid() && dateEnd.isValid() && dateStart > dateEnd)
+							{
+								return {
+									valid: false,
+                                    message: 'End Date should be later than Start Date'
+								}
+							}
+							return true;
+						}
+					};
+				}
+				self.validatorFields["StartDate"] = validatorForStart;
+				var validatorForEnd = {
+					trigger: "blur change",
+					validators: {}
+				};
+				if (self.required)
+				{
+					//validatorForEnd.validators["notEmpty"] = null;
+
+					validatorForEnd.validators["callback"] =
+					{
+						callback: function(value, validator, $field) {
+
+							validator.revalidateField('StartDate')
+							return true;
+						}
+					};
+				}
+				self.validatorFields["EndDate"] = validatorForEnd;
+				validatorForValue = {
+					trigger: "blur change",
+					validators: {}
+				};
+				break;
 			case "Date":
 			case "Time":
 			case "Boolean":
@@ -104,11 +167,36 @@
 	{
 		var self = this;
 
-		return {
-			Name: self.name,
-			DataType: self.dataType,
-			Value: self.obCurrentValue()
-		};
+		if(self.dataType == "DateRange")
+		{
+			return [
+				{
+					Name: "StartDate",
+					DataType: "Date",
+					Value: self.obCurrentValue().StartDate
+				},{
+					Name: "EndDate",
+					DataType: "Date",
+					Value: self.obCurrentValue().EndDate
+				},{
+					Name: "SelectedItem",
+					DataType: "SaveOnly",
+					Value: self.obCurrentValue().SelectedItem
+				},{
+					Name: "DateNum",
+					DataType: "SaveOnly",
+					Value: self.obCurrentValue().DateNum
+				}
+			];
+		}
+		else
+		{
+			return {
+				Name: self.name,
+				DataType: self.dataType,
+				Value: self.obCurrentValue()
+			};
+		}
 	};
 
 	ReportParameterItemViewModel.prototype.dispose = function()

@@ -15,6 +15,10 @@
 	<!-- ko customInput:{type:"ExtendedDate",buttons:buttons,value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
 	<!-- /ko -->
 	<!-- /ko -->
+	<!-- ko if: dataType === "DateRange" -->
+	<!-- ko customInput:{type:"DateRange",value:obCurrentValue} -->
+	<!-- /ko -->
+	<!-- /ko -->
 	<!-- ko if: dataType === "Time" -->
 	<!-- ko customInput:{type:"Time",value:obCurrentValue,attributes:{class:"form-control",name:name,maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
 	<!-- /ko -->

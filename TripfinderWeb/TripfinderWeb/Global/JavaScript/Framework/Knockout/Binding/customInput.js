@@ -22,6 +22,8 @@
 				return new TF.Input.DateBox(initialValue, attributes, disable, nowrap, events, element, allBindings);
 			case "ExtendedDate":
 				return new TF.Input.ExtendedDateBox(initialValue, attributes, disable, nowrap, events, element, allBindings);
+			case "DateRange":
+				return new TF.Input.DateRangeBox(initialValue, attributes, disable, nowrap, events, element, allBindings);
 			case "Time":
 				return new TF.Input.TimeBox(initialValue, attributes, disable, nowrap, events, element);
 			case "Integer":

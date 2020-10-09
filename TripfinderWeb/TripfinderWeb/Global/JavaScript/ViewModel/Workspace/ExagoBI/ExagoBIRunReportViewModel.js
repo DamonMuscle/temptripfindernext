@@ -2,6 +2,8 @@
 {
 	createNamespace('TF.Control.Report').ExagoBIRunReportViewModel = ExagoBIRunReportViewModel;
 
+	var PARAMETER_MAP_ITEMKEY = "PARAMETER_MAP_ITEMKEY";
+
 	function ExagoBIRunReportViewModel(option)
 	{
 		var self = this;
@@ -38,8 +40,7 @@
 	ExagoBIRunReportViewModel.prototype.run = function()
 	{
 		var self = this,
-			outputType = self.obSelectedOutputType(),
-			newWindow = window.open("", "_blank");
+			outputType = self.obSelectedOutputType()
 
 		return self.pageLevelViewModel.saveValidate()
 			.then(function(isValid)
@@ -59,11 +60,10 @@
 			{
 				if (execResult && execResult.externalReportViewerUrl)
 				{
+					var newWindow = window.open("", "_blank");
 					newWindow.location = execResult.externalReportViewerUrl;
-				} else
-				{
-					newWindow.close();
-				}
+				} 
+				return false;
 			});
 	};
 
@@ -139,6 +139,68 @@
 				});
 			})
 	}
+
+	ExagoBIRunReportViewModel.prototype.generateParameterItemViewModels = function()
+	{
+		var self = this,
+			parameterList = self.entity.parameterList,
+			execInfo = self.entity.execInfo,
+			parameterMap = !!execInfo[PARAMETER_MAP_ITEMKEY] ? execInfo[PARAMETER_MAP_ITEMKEY] : {},
+			parameterVMs = []
+
+
+		if (Array.isArray(parameterList))
+		{
+
+			var hasStart = false, hasEnd = false
+
+			parameterList.forEach(function(p)
+			{
+				if (p.Name == "StartDate")
+				{
+					hasStart = true;
+				}
+				if (p.Name == "EndDate")
+				{
+					hasEnd = true;
+				}
+			});
+
+			if (hasStart && hasEnd)
+			{
+				var pDateRange = {
+					DataType: "DateRange",
+					DisplayName: "Date Range",
+					ExagoDataType: "string",
+					Name: "DateRange",
+					Required: true,
+					Value: {}
+				}
+
+				pDateRange.Value.StartDate = parameterMap['StartDate'] ? parameterMap['StartDate'].Value : '[Today]'
+				pDateRange.Value.EndDate = parameterMap['EndDate'] ? parameterMap['EndDate'].Value : '[Today]'
+				pDateRange.Value.DateNum = parameterMap['DateNum'] ? parameterMap['DateNum'].Value : '1'
+				pDateRange.Value.SelectedItem = parameterMap['SelectedItem'] ? parameterMap['SelectedItem'].Value : 'Today'
+
+				parameterVMs.push(new TF.Control.ReportParameterItemViewModel(pDateRange))
+			}
+
+			parameterList.forEach(function(p)
+			{
+				if (!(hasStart && hasEnd && (p.Name == "StartDate" || p.Name == "EndDate")))
+				{
+					var dataEntry = parameterMap[p.Name];
+					if (!!dataEntry && dataEntry.DataType === p.DataType) // Populat parameter value from previously saved data
+					{
+						p.Value = dataEntry.Value;
+					}
+					parameterVMs.push(new TF.Control.ReportParameterItemViewModel(p));
+				}
+			});
+		}
+
+		self.obReportParameterItems = ko.observableArray(parameterVMs);
+	};
 
 	ExagoBIRunReportViewModel.prototype.runAsFile = function()
 	{
