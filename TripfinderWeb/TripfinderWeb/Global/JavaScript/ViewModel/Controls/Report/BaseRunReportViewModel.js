@@ -414,7 +414,12 @@
 		{
 			parameterItems.forEach(function(p)
 			{
-				validatorFields[p.name] = p.validatorFields[p.name];
+				for (var validField in p.validatorFields)
+				{
+					if (p.validatorFields.hasOwnProperty(validField))
+						validatorFields[validField] = p.validatorFields[validField]
+				}
+				//validatorFields[p.name] = p.validatorFields[p.name];
 			});
 		}
 
@@ -945,7 +950,18 @@
 		{
 			parameterItems.forEach(function(p)
 			{
-				parameterMap[p.name] = p.toDataEntry();
+				var rawParam = p.toDataEntry();
+				if (Array.isArray(rawParam))
+				{
+					rawParam.forEach(function(rp)
+					{
+						parameterMap[rp.Name] = rp
+					})
+				}
+				else
+				{
+					parameterMap[p.name] = rawParam;
+				}
 			});
 		}
 		execInfo[PARAMETER_MAP_ITEMKEY] = parameterMap;
