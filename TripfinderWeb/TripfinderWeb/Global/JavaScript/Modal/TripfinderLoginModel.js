@@ -219,6 +219,9 @@
 				if (result)
 				{
 					tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "authinfos"), {
+						paramData: {
+							prefix : 'tfweb'
+						},
 						error: function(message, status)
 						{
 							if (message)

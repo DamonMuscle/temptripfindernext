@@ -84,6 +84,9 @@
 
 	AuthManager.prototype.auth = function(loginViewModal)
 	{
+		var prefix = tf.storageManager.prefix;
+		prefix = prefix.split('.')[0];
+		
 		var p = null;
 		if (this._hasLoggedin)
 		{
@@ -145,12 +148,16 @@
 				location.reload();
 				return Promise.reject("login failed");
 			}
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), null, {
-				overlay: false,
-				auth: {
-					noInterupt: true
-				}
-			})
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
+					paramData: {
+						prefix: 'tfweb'
+					}
+				}, {
+					overlay: false,
+					auth: {
+						noInterupt: true
+					}
+				})
 				.then(function(apiResponse)
 				{
 					this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
@@ -184,7 +191,13 @@
 							this.obIsLogIn(true);
 						}.bind(this));
 
+				}.bind(this)).catch(function(apiResponse) { 
+					if (apiResponse.StatusCode == 401)
+					{
+						return this._loginUseModal(loginViewModal,"Have no permission to this product");
+					}
 				}.bind(this));
+
 		}.bind(this));
 	};
 
