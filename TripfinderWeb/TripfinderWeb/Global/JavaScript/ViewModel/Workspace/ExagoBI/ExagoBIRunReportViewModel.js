@@ -64,7 +64,13 @@
 					newWindow.location = execResult.externalReportViewerUrl;
 					return true;
 				}
-				else return false;
+				
+				if (execResult && execResult.FileName)
+				{
+					return true;
+				}
+
+				return false;
 			})
 	};
 
@@ -261,6 +267,8 @@
 
 				var execResultData = result.Data;
 				tf.docFilePreviewHelper.initDownloadOnBrowser(execResultData.FileName, execResultData.MimeType, execResultData.Base64FileContent);
+
+				return execResultData;
 			})
 			.catch(function()
 			{
