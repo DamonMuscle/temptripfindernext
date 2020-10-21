@@ -40,7 +40,7 @@
 	ExagoBIRunReportViewModel.prototype.run = function()
 	{
 		var self = this,
-			outputType = self.obSelectedOutputType()
+			outputType = self.obSelectedOutputType();
 
 		return self.pageLevelViewModel.saveValidate()
 			.then(function(isValid)
@@ -62,9 +62,10 @@
 				{
 					var newWindow = window.open("", "_blank");
 					newWindow.location = execResult.externalReportViewerUrl;
-				} 
-				return false;
-			});
+					return true;
+				}
+				else return false;
+			})
 	};
 
 	ExagoBIRunReportViewModel.prototype.runWithExternalViewer = function()
