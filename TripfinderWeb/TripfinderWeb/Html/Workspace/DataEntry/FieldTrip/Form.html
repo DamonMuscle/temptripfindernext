@@ -152,7 +152,7 @@
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().ContactEmail&&obRequiredFields().ContactEmail.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Email')"></label>
 						<input type="text" class="form-control" name="ContactEmail" data-tf-input-type="Email"
-							data-bind="value:obEntityDataModel().ContactEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().ContactEmail?obRequiredFields().ContactEmail.Required:null)"
+							data-bind="value:obEntityDataModel().contactEmail, attr:IsRequired(obRequiredFields()&&obRequiredFields().ContactEmail?obRequiredFields().ContactEmail.Required:null)"
 							maxlength="100" />
 					</div>
 				</div>
