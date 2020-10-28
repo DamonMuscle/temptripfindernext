@@ -70,7 +70,7 @@
 				return v.toLowerCase();
 			});
 
-			if (tf.authManager.authorizationInfo.isAdmin)
+			if (tf.authManager.authorizationInfo.authorizationTree.userId == -999 && tf.authManager.authorizationInfo.isAdmin)
 			{
 				if (!supportedProducts.includes("tfadmin"))
 				{
