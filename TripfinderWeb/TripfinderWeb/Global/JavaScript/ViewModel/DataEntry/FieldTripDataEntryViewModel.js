@@ -2378,6 +2378,41 @@
 		this.obDocumentRelationshipSource(documentRelationshipList);
 	};
 
+	function getTitleByName(pageName)
+	{
+		var pageTitle = "", pageType = pageName.toLowerCase();
+		switch (pageType)
+		{
+			case "approvals":
+				pageTitle = "My Pending Approvals";
+				break;
+			case "approvalsScheduler":
+				pageTitle = "My Pending Approvals Calendar";
+				break;
+			case "fieldtrips":
+				pageTitle = "Field Trips";
+				break;
+			case "fieldtripScheduler":
+				pageTitle = "Field Trips Calendar";
+				break;
+			case "myrequests":
+				pageTitle = "My Submitted Requests";
+				break;
+			case "myrequestsScheduler":
+				pageTitle = "My Submitted Requests Calendar";
+				break;
+			case "reports":
+				pageTitle = "Reports";
+				break;
+			case "settingsConfig":
+				ageTitle = "Settings";
+				break;
+			default:
+				break;
+		}
+		return pageTitle;
+	}
+
 	FieldTripDataEntryViewModel.prototype.tryGoAway = function(pageName, yesNoStr)
 	{
 		var self = this;
@@ -2385,7 +2420,7 @@
 		{
 			if (!yesNoStr)
 			{
-				yesNoStr = "You have unsaved changes. Would you like to save your changes prior to opening up " + pageName + "?";
+				yesNoStr = "You have unsaved changes. Would you like to save your changes prior to opening up " + getTitleByName(pageName) + "?";
 			}
 			return tf.promiseBootbox.yesNo(yesNoStr, "Unsaved Changes")
 				.then(function(result)
