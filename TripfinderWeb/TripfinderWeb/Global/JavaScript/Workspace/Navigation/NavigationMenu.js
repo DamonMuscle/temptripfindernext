@@ -6,7 +6,7 @@
 	{
 		var self = this;
 		self.$navigationMenu = null;
-		if (!tf.permissions.isSupport)
+		if (tf.permissions && !tf.permissions.isSupport)
 		{
 			self.searchControlTemplate = new TF.Control.SearchControlViewModel();
 		}
@@ -20,7 +20,7 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.availableApplications = tf.pageManager.availableApplications;
+		self.availableApplications = tf.pageManager?tf.pageManager.availableApplications:"";
 
 		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
@@ -40,7 +40,7 @@
 
 		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
-		tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self));
+		tf.pageManager?tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self)):"";
 	}
 
 	/**

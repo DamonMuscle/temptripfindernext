@@ -4,9 +4,12 @@
 
 	function Ajax(loadingIndicator, cacheAjaxRequestsArray)
 	{
+		var self = this;
 		this.loadingIndicator = loadingIndicator;
 		this.ajaxRequests = [];
 		this.cacheAjaxRequestsArray = !!cacheAjaxRequestsArray;
+		self.navigationMenu = new TF.NavigationMenu();
+		tf.loadingIndicator.hideCompletely();
 	}
 
 	Ajax.prototype = {
@@ -53,6 +56,12 @@
 						tf.pageManager.logout(false);
 						tf.authManager.logOffTag = true;
 					}.bind(this));
+			}
+			else if(xmlHttpRequest.responseJSON.Message == "unauthorized to access this datasource")
+			{
+				self = this;
+				tf.loadingIndicator.hideCompletely();
+				self.navigationMenu.openDataSourceButtonClick();
 			}
 			else if (externalPointer)
 			{
