@@ -3893,7 +3893,6 @@ fieldset[disabled] .form-control:focus {
 }
 .iconbutton.summarybar.open {
   background-image: url('../../global/img/grid/SummaryBarOpen.svg');
-  background-size: 21px;
 }
 .iconbutton.details {
   background-image: url('../../global/img/grid/details.svg');
