@@ -10,7 +10,7 @@
 			closeButton: false
 		})
 		self._obCounter = ko.observable(0);
-
+		self._dialogJustShown = null;
 		self.obIsShowing = ko.pureComputed(function()
 		{
 			return self._obCounter() != 0;
@@ -173,7 +173,9 @@
 			{
 				arg.animate = false;
 				arg.backdrop = "static";
+				self._dialogJustShown = true;
 				bootbox.dialog(arg);
+				setTimeout(() => self._dialogJustShown = false, 500);
 
 				if (layerLevel) //fix VIEW-1369
 				{
@@ -484,6 +486,7 @@
 
 	PromiseBootbox.prototype.modalEvent = function(tfModal)
 	{
+		var self = this;
 		var count = this._obCounter();
 		tf.modalHelper.pushBootbox(tfModal);
 		var event = TF.isMobileDevice ? 'touchstart' : 'click';
@@ -495,7 +498,11 @@
 		{
 			e.preventDefault();
 			e.stopPropagation();
-			bootbox.hideAll();
+
+			if (!self._dialogJustShown)
+			{
+				bootbox.hideAll();
+			}
 		}).on('hidden.bs.modal', function(e)
 		{
 			tf.shortCutKeys.removeChildKey("PromiseBootbox" + count, true);

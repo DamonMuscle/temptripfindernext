@@ -55,6 +55,14 @@
 
 	}
 
+	PageManager.prototype.showConfirmation = function(message)
+	{
+		return tf.promiseBootbox.yesNo({
+			message: message,
+			title: "Confirmation Message"
+		});
+	};
+
 	PageManager.prototype.initApplicationSwitcher = function()
 	{
 		var self = this, supportedProducts = tf.authManager.supportedProducts;
@@ -288,6 +296,18 @@
 					tf.pageManager.obFieldTripEditPage(null);
 					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
 				}
+			});
+		}
+		else if(self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.detailView && self.obPages()[0].data.detailView.obEditing())
+		{
+			self.showConfirmation("Do you want to close " + getTitleByType(self.obPages()[0].data.type) + " detail view without saving?")
+			.then(function(result)
+			{
+				if (result)
+				{
+					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
+				}
+				return;
 			});
 		}
 		else
