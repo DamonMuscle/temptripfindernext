@@ -918,6 +918,7 @@
 					if (result)
 					{
 						self.changeDetailViewByID(recordId, gridType);
+						self.refreshEditStatus();
 					}
 					return;
 				});
