@@ -264,6 +264,12 @@
 	function Startup() { }
 	Startup.prototype.start = function()
 	{
+		if(TF.isIE)
+		{
+			window.location.href = 'ie.html';
+			return;
+		}
+
 		var self = this;
 		self.libraryInitialization().then(function()
 		{
