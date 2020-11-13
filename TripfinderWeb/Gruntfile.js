@@ -133,7 +133,8 @@ module.exports = function(grunt)
 						'loading.html',
 						'local_settings.js',
 						'Web.config',
-						'PdfPreview.html'
+						'PdfPreview.html',
+						'ie.html'
 					],
 					dest: 'build',
 					expand: true,
@@ -274,7 +275,9 @@ module.exports = function(grunt)
 		},
 
 		useminPrepare: {
-			html: 'tripfinderweb/index.html',
+			html: ['tripfinderweb/index.html',
+				   'tripfinderweb/ie.html'
+				  ],
 			options: {
 				dest: 'build/',
 				flow: {
