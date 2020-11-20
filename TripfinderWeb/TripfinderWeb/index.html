@@ -48,7 +48,24 @@
 			}
 		}
 	</style>
+	<script>
+		function isIE()
+		{			
+			var ua = window.navigator.userAgent;
+			var matches = /Edg\/(\d{2})/g.exec();
+			var isEdge = false;
+			if(matches && matches.length==2)
+			{
+				isEdge = parseInt(matches[1]) < 79;
+			}
+			return ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1 || isEdge;
+		}
 
+		if(isIE())
+		{
+			window.location.href = 'ie.html';
+		}
+	</script>
 	<!--  Override above variables  in local_settings.js if you want them to be different-->
 	<script>
 		var tfRegion = "US";
