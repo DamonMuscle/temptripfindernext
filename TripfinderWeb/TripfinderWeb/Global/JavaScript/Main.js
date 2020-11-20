@@ -178,7 +178,7 @@ createNamespace("TF").getSingularOrPluralTitle = function(title, count)
 TF.isIE = (function()
 {
 	var ua = window.navigator.userAgent;
-	var matches = /Edg\/(\d{2})/g.exec();
+	var matches = /Edg\/(\d{2})/g.exec(ua);
 	var isEdge = false;
 	if(matches && matches.length==2)
 	{
