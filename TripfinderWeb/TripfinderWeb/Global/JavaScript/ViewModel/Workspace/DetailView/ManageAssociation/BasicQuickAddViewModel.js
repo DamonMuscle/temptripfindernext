@@ -8,10 +8,13 @@
 		{
 			var self = this;
 			self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
-			self.quickAddViewModel = new TF.DetailView.GridStackQuickAddWrapper(
+			self.quickAddViewModel = options.isUDFGroup ? new TF.DetailView.UDGridGridStackQuickAddWrapper(
 				$.extend({}, options, {
 					pageLevelViewModel: self.pageLevelViewModel
-				}));
+				})) : new TF.DetailView.GridStackQuickAddWrapper(
+					$.extend({}, options, {
+						pageLevelViewModel: self.pageLevelViewModel
+					}));
 		};
 
 		BasicQuickAddViewModel.prototype.save = function()

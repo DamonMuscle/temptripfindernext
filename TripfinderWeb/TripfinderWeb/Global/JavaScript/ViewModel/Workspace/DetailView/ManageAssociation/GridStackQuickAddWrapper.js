@@ -5,6 +5,7 @@
 	function GridStackQuickAddWrapper(options)
 	{
 		var self = this;
+		self.options = options;
 		self.dataType = options.dataType;
 		self.recordId = options.recordId;
 		self.recordEntity = options.recordEntity;
@@ -108,6 +109,14 @@
 			&& self.customDetailView.uploadDocumentHelper)
 		{
 			self.customDetailView.uploadDocumentHelper.addFile(self.attachedFile);
+		}
+
+		if (Array.isArray(self.options.readonlyBlockFields))
+		{
+			self.options.readonlyBlockFields.forEach(blockField =>
+			{
+				self.customDetailView.toggleBlockReadOnly(true, r => r.options.field == blockField);
+			});
 		}
 	};
 

@@ -21,6 +21,7 @@ var today = (new Date()).toDateString(),
 					"displayValue": "Public",
 					"positiveLabel": "Public",
 					"negativeLabel": "Private",
+					"format": "Public",
 					"editType": {
 						"format": "BooleanDropDown"
 					}
@@ -212,6 +213,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "StudentGrid",
@@ -383,6 +385,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "ContactAssociationGrid",
@@ -524,6 +527,7 @@ var today = (new Date()).toDateString(),
 			// 	}
 			// ],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "ContactGrid",
@@ -681,6 +685,7 @@ var today = (new Date()).toDateString(),
 				// }
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "ContactGrid",
@@ -841,6 +846,7 @@ var today = (new Date()).toDateString(),
 				"defaultValue": 16
 			}],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Attach": [
 				{
 					"field": "AttachDocument",
@@ -1569,6 +1575,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "FieldTripHistoryGrid",
@@ -1875,6 +1882,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "TripGrid",
@@ -2289,6 +2297,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "StudentGrid",
@@ -2806,6 +2815,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "ContactGrid",
@@ -3373,6 +3383,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "AltsiteGrid",
@@ -3944,6 +3955,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "AideGrid",
@@ -4158,6 +4170,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "SchoolGrid",
@@ -4769,6 +4782,7 @@ var today = (new Date()).toDateString(),
 				}
 			],
 			"User Defined": [],
+			"User Defined Group": [],
 			"Grid": [
 				{
 					"field": "TripGrid",

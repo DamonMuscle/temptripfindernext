@@ -12,6 +12,18 @@
 		this.delayChange = delayChange;
 		this._dateTimePicker = null;
 		this.$parent = $(element);
+		if (attributes)
+		{
+			if (attributes.format)
+			{
+				this.formatString = attributes.format;
+			}
+
+			this.minDate = attributes.min;
+			this.maxDate = attributes.max;
+			this.disableWeekend = attributes.disableWeekend;
+			this.inputEnable = attributes.inputEnable;
+		}
 		this.initialize.call(this);
 
 		this.height = 289;
@@ -27,8 +39,38 @@
 
 	DateTimeBox.prototype.pickerIconClass = "k-i-calendar";
 
+	DateTimeBox.prototype.convertToDateFormat = function(strValue)
+	{
+		if (strValue.indexOf(".") > 0)
+		{
+			if (strValue.trim().split(".").length == 3)
+			{
+				strValue = strValue.replace(/\./g, "-");
+			}
+			else
+			{
+				return strValue;
+			}
+		}
+		if (strValue.indexOf("-") > 0)
+		{
+			var strArr = strValue.trim().split("-");
+			if (strArr.length == 3)
+			{
+				if (strArr[0].length == 4)
+				{
+					return strArr[1] + "/" + strArr[2] + "/" + strArr[0];
+				}
+				return strArr[1] + "/" + strArr[0] + "/" + strArr[2];
+			}
+			return strValue;
+		}
+		return strValue;
+	};
+
 	DateTimeBox.prototype.initialize = function()
 	{
+		var self = this;
 		this.onClearRequest.subscribe(function(e)
 		{
 			this._dateTimePicker.date(null);
@@ -47,7 +89,7 @@
 		}, this);
 		var $input = $('<input ' + this.type + ' type="text" class="form-control datepickerinput" data-tf-input-type="' + this.type + '" data-bind="disable:disable, css:{disabled:disable},event: {blur: updateValue,keypress:keypress}" />');
 		this.applyAttribute($input, this.attributes);
-		var $button = $('<div class="input-group-addon glyphicon datepickerbutton" role="button"><span unselectable="on" class="k-icon ' + this.pickerIconClass + '">select</span></div>');
+		var $button = $('<div class="input-group-addon glyphicon datepickerbutton"><span unselectable="on" class="k-icon ' + this.pickerIconClass + '">select</span></div>');
 		if (this.attributes)
 		{
 			this.applyAttribute($button, this.attributes.picker);
@@ -64,10 +106,16 @@
 
 		if (this.$parent.closest(".document-dataentry").length > 0)
 		{
+			var parentContainer = $('<div style="position:relative;"></div>');
+			this.$parent.parent().append(parentContainer);
 			$element.datetimepicker(
 				{
+					widgetParent: parentContainer,
 					useCurrent: false,
 					keepInvalid: true,
+					minDate: this.minDate,
+					maxDate: this.maxDate,
+					daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
 					widgetPositioning:
 					{
 						horizontal: 'left'
@@ -87,6 +135,9 @@
 					widgetParent: "body",
 					useCurrent: false,
 					keepInvalid: true,
+					minDate: this.minDate,
+					maxDate: this.maxDate,
+					daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
 					widgetPositioning:
 					{
 						horizontal: 'left'
@@ -111,19 +162,42 @@
 			clearTimeout(delayTimeOut);
 			delayTimeOut = setTimeout(function()
 			{
-				var value = this.value(),
-					dateTime = this._dateTimePicker.date();
-				if (dateTime && value !== toISOStringWithoutTimeZone(dateTime))
+				if (!event.date) return;
+				if (!event.oldDate)
 				{
-					this.updateValue(this, event);
+					this.value(toISOStringWithoutTimeZone(event.date));
+					return;
+				}
+				var oldDate = moment(event.oldDate),
+					newDate = moment(event.date);
+				//RW-13267 check whether the date changed is result from time changed
+				if (this.type == 'DateTime' && oldDate.date() !== newDate.date())	
+				{
+					var diff = newDate.diff(oldDate, 'minutes');
+
+					if (diff == 1 || diff == -1 || diff == 60 || diff == -60)
+					{
+						newDate.subtract(diff > 0 ? 1 : -1, 'days');
+					}
+				}
+				if (!newDate.isSame(oldDate, 'minutes'))
+				{
+					this.value(toISOStringWithoutTimeZone(newDate));
 				}
 			}.bind(this), this.delayChange ? 500 : 0);
 		}.bind(this));
 		$element.on('dp.show', function(e)
 		{
-			var widget = $("body>.bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last"),
+			var widgetParent = $(this._dateTimePicker.widgetParent());
+			var $modalBody = widgetParent.closest(".modal-body");
+			if (TF.isMobileDevice && $modalBody.length)
+			{
+				$modalBody.bind('mousewheel touchmove', lockScroll);
+			}
+
+			var widget = widgetParent.find(".bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last"),
 				widgetWidth = widget.width(),
-				bodyWidth = $("body").width();
+				bodyWidth = widgetParent.width();
 			if (TF.isPhoneDevice)
 			{
 				var overlay = $("body>.bootstrap-datetimepicker-overlay");
@@ -144,72 +218,97 @@
 
 						widget.css(
 							{
-								top: this.$element.outerHeight(),
+								top: this.$element.outerHeight(), //+ this.$element.offset().top - modal.offset().top,
 								bottom: 'auto',
-								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2
+								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2 //$button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2 - modal.offset().left
 							});
 					}
 					else
 					{
-						var top = this.$element.outerHeight(), left, right;
+						var top = this.$element.outerHeight(),
+							left = $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2,
+							widgetOffsetRight;
 						if (($button.offset().top + $button.outerHeight() + this.height + 67) > document.body.offsetHeight)
 						{
 							top = -this.height;
 						}
-						if (document.body.offsetWidth - $button[0].getBoundingClientRect().right > widget.outerWidth() / 2)
-						{
-							left = $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2;
-							right = 'auto';
-						}
-						else
-						{
-							left = 'auto';
-							right = widget.outerWidth() - widget.innerWidth();
-						}
 						widget.css(
 							{
 								top: top,
-								left: left,
-								right: right,
-								bottom: 'auto'
+								left: left
 							});
+
+						widgetOffsetRight = widget.offset().left + widget.outerWidth();
+						if (widgetOffsetRight > document.body.offsetWidth)
+						{
+							left -= widgetOffsetRight - document.body.offsetWidth + 5;
+							widget.css(
+								{
+									left: left
+								});
+						}
 					}
+					//widget.height(this.height - 10);
 				}
 			}
 			else if (widget && widget.offset())
 			{
-				widget.css('left', $button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2);
-				if (widget.offset().left > bodyWidth - widgetWidth)
+				var preWightOffset = widget.offset();
+				var wightOffsetLeft = $button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2;
+
+				var wightCss = {}, modal;
+				if (TF.isMobileDevice)
 				{
-					widget.css('left', bodyWidth - widgetWidth - 10);
+					modal = this.$element.closest(".modal-dialog");
+					if (modal.length > 0)
+					{
+						bodyWidth = modal.width();
+					}
+					if (modal && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
+					{
+						wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
+					}
+					else if (modal && wightOffsetLeft < modal.offset().left + 5)
+					{
+						wightCss['left'] = modal.offset().left;
+					} else
+					{
+						wightCss['left'] = wightOffsetLeft;
+					}
 				}
-				else if (widget.offset().left < 5)
+				else
 				{
-					widget.css('left', 10);
+					if (wightOffsetLeft > bodyWidth - widgetWidth && bodyWidth > widgetWidth)
+					{
+						wightCss['left'] = bodyWidth - widgetWidth - 10;
+					}
+					else if (wightOffsetLeft < 5)
+					{
+						wightCss['left'] = 10;
+					} else
+					{
+						wightCss['left'] = wightOffsetLeft;
+					}
+
+				}
+				var top = 0, currentTargetOffset = $(e.currentTarget).offset();
+
+				if (preWightOffset.top <= 0)
+				{
+					top = currentTargetOffset.top - widget.outerHeight();
+				}
+				else if (preWightOffset.top !== currentTargetOffset.top + $(e.currentTarget).height())
+				{
+					top = currentTargetOffset.top + $(e.currentTarget).height();
+					if (top + widget.outerHeight() > widgetParent.height() && widgetParent.height() > 0)
+					{
+						top = currentTargetOffset.top - widget.outerHeight();
+					}
 				}
 
-				if (widget.offset().top <= 0)
-				{
-					var top = $(e.currentTarget).offset().top - widget.outerHeight();
-					widget.css(
-						{
-							top: top,
-							bottom: "auto"
-						});
-				}
-				else if (widget.offset().top !== $(e.currentTarget).offset().top + $(e.currentTarget).height())
-				{
-					var top = $(e.currentTarget).offset().top + $(e.currentTarget).height();
-					if (top + widget.outerHeight() > $("body").height())
-					{
-						top = $(e.currentTarget).offset().top - widget.outerHeight();
-					}
-					widget.css(
-						{
-							top: top,
-							bottom: "auto"
-						});
-				}
+				wightCss['top'] = top;
+				wightCss['bottom'] = "auto";
+				widget.css(wightCss);
 			}
 			this._toggleScroll(false);
 			this._toggleScroll(true);
@@ -221,45 +320,24 @@
 					{
 						var windowHeight = $(window).height();
 						var offset = this.$element.offset();
-						var overlay = $("body>.bootstrap-datetimepicker-overlay");
-						if (overlay.length == 0)
+						if (offset.top + widget.height() * 1.5 >= $(window).height() + $(window).scrollTop() &&
+							widget.height() + this.$element.outerHeight() < offset.top)
 						{
-							var top;
-							if (document.body.offsetHeight - $button[0].getBoundingClientRect().bottom > 160)
-							{
-								top = $button.outerHeight();
-							}
-							else
-							{
-								top = -widget.outerHeight();
-							}
+							//top
 							widget.css(
 								{
-									top: top,
-									bottom: 'auto'
+									top: 'auto',
+									bottom: windowHeight - this.$element.offset().top
 								});
 						}
 						else
 						{
-							if (offset.top + widget.height() * 1.5 >= $(window).height() + $(window).scrollTop() &&
-								widget.height() + this.$element.outerHeight() < offset.top)
-							{
-								//top
-								widget.css(
-									{
-										top: 'auto',
-										bottom: windowHeight - this.$element.offset().top
-									});
-							}
-							else
-							{
-								//bottom
-								widget.css(
-									{
-										top: 'auto',
-										bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
-									});
-							}
+							//bottom
+							widget.css(
+								{
+									top: 'auto',
+									bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
+								});
 						}
 					}.bind(this), 100);
 				}
@@ -273,12 +351,37 @@
 			}
 
 		}.bind(this));
-
 		$element.on('dp.hide', function()
 		{
+			var widgetParent = $(this._dateTimePicker.widgetParent());
+			var $modalBody = widgetParent.closest(".modal-body");
+			if (TF.isMobileDevice && $modalBody.length)
+			{
+				$modalBody.unbind('mousewheel touchmove', lockScroll);
+			}
+
 			this._toggleScroll(false);
 			$(window).off("resize.dateTime");
 		}.bind(this));
+
+		var reg = this.getInvalidCharacterRegex();
+		$element.on("input", function()
+		{
+			var text = $(this).val();
+			if (self.inputEnable && text.indexOf('@') === 0)
+			{
+				$(this).val(text);
+			}
+			else
+			{
+				$(this).val(text.replace(reg, ""));
+			}
+		});
+	};
+
+	DateTimeBox.prototype.getInvalidCharacterRegex = function()
+	{
+		return /[^0-9A-Za-z|\/|\:| ]/g;
 	};
 
 	DateTimeBox.prototype.keypress = function(viewModel, e)
@@ -290,15 +393,21 @@
 				$(viewModel.$element[0]).blur();
 			}.bind(this), 0);
 		}
-		return true;
+		else
+			return true;
 	};
 
 	DateTimeBox.prototype.updateValue = function(self, e)
 	{
 		var text = e ? e.currentTarget.value : '';
+		if (this.inputEnable && text.indexOf('@') === 0)
+		{
+			return true;
+		}
+
 		var timePatten = /^([01]?[0-9]):[0-5]?[0-9]$/;
 
-		var dateTime = this._dateTimePicker.date();
+		var dateTime = this.type == "Time" ? this._dateTimePicker.date() : moment(this.convertToDateFormat(text));
 		if (!dateTime)
 		{
 			this.value(null);
@@ -401,6 +510,11 @@
 		ko.removeNode(this.$element[0]);
 		namespace.BaseBox.prototype.dispose.call(this);
 	};
+
+	function lockScroll(e)
+	{
+		e.preventDefault();
+	}
 })();
 
 (function()

@@ -4,12 +4,19 @@
 
 	function BasicQuickAddModalViewModel(options)
 	{
-		var self = this,
+		let self = this,
 			dataType = options.dataType,
 			modeName = !options.recordId ? "Add" : "Edit",
 			typeName = tf.dataTypeHelper.getFormalDataTypeName(dataType),
-			title = String.format("{0} {1}", modeName, typeName),
-			viewModel = new TF.DetailView.BasicQuickAddViewModel(options);
+			title = String.format("{0} {1}", modeName, typeName);
+
+		if (options.isUDFGroup)
+		{
+			modeName = !options.recordEntity ? "Add" : "Edit";
+			title = String.format("{0} {1} Entry", modeName, options.udGrid.Name);
+		}
+
+		let viewModel = new TF.DetailView.BasicQuickAddViewModel(options);
 
 		TF.Modal.BaseModalViewModel.call(self);
 

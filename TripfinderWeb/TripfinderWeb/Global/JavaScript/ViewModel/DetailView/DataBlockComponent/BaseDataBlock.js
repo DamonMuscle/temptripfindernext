@@ -5,6 +5,7 @@
 	function BaseDataBlock(detailView)
 	{
 		this.detailView = detailView;
+		this.isBlockReadOnly = ko.observable(false);
 	}
 
 	BaseDataBlock.prototype.isReadOnly = function()

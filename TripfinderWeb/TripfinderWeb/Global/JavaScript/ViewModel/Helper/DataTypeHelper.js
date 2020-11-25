@@ -900,6 +900,8 @@
 				return "DocumentAssociationGrid";
 			case "studentschedule":
 				return "StudentScheduleGrid";
+			case "UDGrid":
+				return "UDGridId";
 			default:
 				console.error("Association type is not correct or supported.");
 		}
