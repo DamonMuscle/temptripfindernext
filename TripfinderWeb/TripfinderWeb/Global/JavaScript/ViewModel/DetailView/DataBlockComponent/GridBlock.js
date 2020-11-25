@@ -657,6 +657,11 @@
 
 		return kendoGrids;
 	};
+	
+	function isAssociationChanged(selectedData, response)
+	{
+		return response.isNewRecordCreated || !_.isEqual(selectedData.map(d => d.Id), response.selectedIds);
+	}
 
 	GridBlock.prototype.manageRecordAssociation = function(associationType)
 	{

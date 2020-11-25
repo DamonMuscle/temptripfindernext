@@ -1591,7 +1591,7 @@
 	{
 		var self = this,
 			updateSource = null,
-			gridName = tf.DataTypeHelper.getGridNameByDataType(dataType),
+			gridName = tf.dataTypeHelper.getGridNameByDataType(dataType),
 			grids = self.getAllGridsAndColumns($detailView, gridName)["grids"];
 
 		$.each(grids, function(_, item)
@@ -1609,7 +1609,7 @@
 			}
 
 			kendoGrid.dataSource.data(updateSource);
-			tf.helpers.kendoGridHelper.updateGridFooter($item, updateSource.length, total);
+			tf.helpers.kendoGridHelper.updateGridFooter($item, updateSource.length, total || updateSource.length);
 		});
 	};
 
