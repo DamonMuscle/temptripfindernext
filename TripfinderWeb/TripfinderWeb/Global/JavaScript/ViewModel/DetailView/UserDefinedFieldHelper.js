@@ -48,9 +48,16 @@
 
 	UserDefinedFieldHelper.prototype.isShowInCurrentDataSource = function(udf)
 	{
-		if (!udf || !udf.UDFDataSources) return false;
+		if (!udf) return false;
 
-		return udf.UDFDataSources.map(function(dataSource)
+		if (udf.SystemDefined)
+		{
+			return true;
+		}
+
+		var dataSources = udf.Type == "Group" ? udf.UDGridDataSources : udf.UDFDataSources;
+
+		return dataSources.map(function(dataSource)
 		{
 			return dataSource.DBID;
 		}).includes(tf.datasourceManager.databaseId);

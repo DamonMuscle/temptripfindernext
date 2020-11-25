@@ -88,7 +88,7 @@
 	FieldEditorHelper.prototype.getDefaultValue = function(data, recordEntity)
 	{
 		var self = this;
-		return data.UDFId ?
+		return data && data.UDFId ?
 			self._getUDFDefaultValue(data, recordEntity) :
 			self._getNonUDFDefaultValue(data, recordEntity);
 	};
@@ -135,7 +135,7 @@
 	{
 		var self = this,
 			editFieldList = self.editFieldList,
-			fieldName = data.editType.entityKey || data.field,
+			fieldName = data.UDGridField ? data.UDGridField.Guid : (data.editType.entityKey || data.field),
 			defaultValue = recordEntity[fieldName],
 			isModified = Object.keys(editFieldList).some(function(item)
 			{
@@ -452,6 +452,7 @@
 				self._updateGeneralFieldsContent(fieldName, value, initParams);
 				break;
 			case "DateTime":
+			case "GroupDateTime":
 				value = (value === null || value === '') ? '' : moment(value).format('MM/DD/YYYY hh:mm A');
 				self._updateGeneralFieldsContent(fieldName, value, initParams);
 				break;
@@ -518,10 +519,11 @@
 				UDFId: data.UDFId,
 				nullAvatar: data.nullAvatar,
 				showWidget: showWidget,
+				UDGridField: data.UDGridField,
 			}, data.editType);
 
 
-		options.defaultValue = (options.recordEntity === null) ?
+		options.defaultValue = (options.recordEntity == null) ?
 			self.getNewRecordDefaultValue($element.parent(), data) : self.getDefaultValue(data, options.recordEntity);
 
 		if (FIELD_WITH_WIDGET.includes(options.format) && event === 'click')
@@ -659,7 +661,12 @@
 					obj.value = result.selectPickListOptionIDs;
 					if (result.blockName === "Schools")
 					{
-						self.editFieldList["Schools"] = { value: result.recordValue.split(', ').join('!') + '!' };
+						self.editFieldList["Schools"] = {
+							value: result.recordValue.split(',')
+								.map(s => s && s.trim())
+								.filter(s => s)
+								.join('!')
+						};
 					}
 					else if (result.blockName === "AllStaffTypes")
 					{
@@ -862,36 +869,39 @@
 			}
 		}
 
-		paramsUrl = String.format("{0}?{1}={2}&confirmData={3}", endPoint, idParamName, self._detailView.recordId, JSON.stringify(modifiedFields));
+		paramsUrl = String.format("{0}?{1}={2}", endPoint, idParamName, self._detailView.recordId);
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), paramsUrl))
-			.then(function(response)
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), paramsUrl), {
+			paramData: {
+				confirmData: JSON.stringify(modifiedFields)
+			}
+		}).then(function(response)
+		{
+			if (!response || !response.Items || !response.Items[0]) return false;
+
+			var confirmMsgs = response.Items[0], msgStack = [];
+			for (key in confirmMsgs)
 			{
-				if (!response || !response.Items || !response.Items[0]) return false;
-
-				var confirmMsgs = response.Items[0], msgStack = [];
-				for (key in confirmMsgs)
+				if (!!confirmMsgs[key])
 				{
-					if (!!confirmMsgs[key])
-					{
-						msgStack.push({
-							field: key,
-							name: self.editFieldList[key].blockName,
-							title: self.editFieldList[key].title,
-							message: confirmMsgs[key]
-						});
-					}
+					msgStack.push({
+						field: key,
+						name: self.editFieldList[key].blockName,
+						title: self.editFieldList[key].title,
+						message: confirmMsgs[key]
+					});
 				}
+			}
 
-				return msgStack.length === 0 ?
-					true : tf.modalManager.showModal(
-						new TF.DetailView.DataEditorSaveConfirmationModalViewModel({
-							includeAll: msgStack.length >= count,
-							messages: msgStack,
-							revertFunc: self.revertChange.bind(self)
-						})
-					);
-			});
+			return msgStack.length === 0 ?
+				true : tf.modalManager.showModal(
+					new TF.DetailView.DataEditorSaveConfirmationModalViewModel({
+						includeAll: msgStack.length >= count,
+						messages: msgStack,
+						revertFunc: self.revertChange.bind(self)
+					})
+				);
+		});
 	};
 
 	/**
@@ -975,6 +985,45 @@
 		});
 	};
 
+	FieldEditorHelper.prototype.verifyRelationship = function()
+	{
+		var data = this.editFieldList["CalendarEventOperations"];
+		if (data)
+		{
+			return TF.DetailView.DataBlockComponent.CalendarBlock.verify(data.value).then(result =>
+			{
+				if (result.valid)
+				{
+					if (result.overrideIds)
+					{
+						data.paramData = { overrideCalendarEventIds: result.overrideIds };
+					}
+					else
+					{
+						delete data.paramData;
+					}
+
+					return [];
+				}
+
+				if (result.cancel)
+				{
+					delete this.editFieldList["CalendarEventOperations"];
+					return [];
+				}
+
+				if (result.messages && result.messages.length)
+				{
+					return result.messages;
+				}
+
+				return [];
+			});
+		}
+
+		return Promise.resolve([]);
+	};
+
 	/**
 	 * Conduct a full validation on 
 	 *
@@ -1022,6 +1071,11 @@
 
 				// make sure validation error classes have been added;
 				self.toggleValidationErrorToFieldsByName(keys, true);
+
+				if (!errorMessages.length && !isCreateRecord)
+				{
+					return self.verifyRelationship().then(msgs => msgs || []);
+				}
 
 				return errorMessages;
 			});
@@ -1099,7 +1153,7 @@
 			{
 				uniqueObjects[key].values = uniqueObjects[key].values.filter(function(value)
 				{
-					return value !== recordEntity[key];
+					return value !== recordEntity[key] && value;
 				});
 			}
 
@@ -1120,6 +1174,7 @@
 					// check if there is no update
 					else if (editFieldNames.length === 0 && !shouldUploadFile)
 					{
+						self._detailView.obEditing(false);
 						return null;
 					}
 
@@ -1211,34 +1266,42 @@
 	 */
 	FieldEditorHelper.prototype._doSave = function(gridType, recordEntity, saveResponse, isNew)
 	{
-		const self = this, prepareTask = self.prepareEntityBeforeSave(recordEntity);
+		const self = this, prepareTask = self.prepareEntityBeforeSave(recordEntity, isNew);
 
 		return Promise.resolve(prepareTask)
-			.then(() =>
+			.then(result =>
 			{
+				if (result == false)
+				{
+					saveResponse.entity = recordEntity;
+					saveResponse.cancel = true;
+					return saveResponse;
+				}
+
 				let url,
-					relationships = self.getEditFieldRelationshipsStr(),
+					relationships = self.getEditFieldRelationships(),
 					endpoint = tf.dataTypeHelper.getEndpoint(gridType);
 
 				// Include UDF in relationship if needed.
-				if (recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") < 0)
+				if (recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") === -1)
 				{
-					relationships += (!relationships ? "UDF" : ",UDF");
-				}
-				if (gridType === "fieldtrip")
-				{
-					relationships += (!relationships ? "all" : ",all");
+					relationships.push("UDF");
 				}
 
-				if (gridType === "trip" && recordEntity.Id == 0)
+				if (gridType === "fieldtrip" && relationships.indexOf("all") === -1)
 				{
-					relationships += (!relationships ? "TripStop" : ",TripStop");
+					relationships.push("all");
+				}
+
+				if (gridType === "trip" && recordEntity.Id == 0 && relationships.indexOf("TripStop") === -1)
+				{
+					relationships.push("TripStop");
 				}
 
 				// Add relationships in request url.
-				if (!!relationships)
+				if (relationships.length > 0)
 				{
-					endpoint += String.format("?@relationships={0}", relationships);
+					endpoint += String.format("?@relationships={0}", [...relationships].join(","));
 				}
 
 				// Generate requests url and parameters.
@@ -1257,58 +1320,80 @@
 					url = pathCombine(tf.api.apiPrefix(), endpoint);
 				}
 
-				tf.loadingIndicator.show();
-				return self.automation(gridType, recordEntity).then(function()
-				{
-					// Send request
-					return tf.promiseAjax[isNew ? "post" : "put"](url, {
-						data: [self.handleData(recordEntity)],
-						handleData: function(key, value)
+				return self.automation(gridType, recordEntity)
+					.then(function()
+					{
+						return self.getDefaultParamData()
+							.then(paramData =>
+							{
+								$.each(self.editFieldList, (k, v) =>
+								{
+									if (v.paramData)
+									{
+										paramData = paramData || {};
+										$.extend(paramData, v.paramData);
+									}
+								});
+
+								// Send request
+								return tf.promiseAjax[isNew ? "post" : "put"](url, {
+									data: [self.handleData(recordEntity)],
+									handleData: function(key, value)
+									{
+										// Shape is geometry, shouldn't pass to server.
+										return (key === "Shape") ? null : value;
+									},
+									paramData: paramData
+								}).then(function(response)
+								{
+									// Confirm with Ted: comment these codes because the logic is incorrect and causes errors, we will touch them later.
+									//return self.findSchedule(gridType, recordEntity).then(function()
+									//{
+									tf.loadingIndicator.tryHide();
+
+									var savedEntity = response.Items[0];
+
+									if (isNew) return savedEntity;
+
+									return self.unassignedCrossStudent(gridType, savedEntity).then(function()
+									{
+										self.entityModified = true;
+										self.refresh();
+
+										// Save successfully.
+										return savedEntity;
+									});
+									//});
+								})
+									.catch(function(response)
+									{
+										// Save api request failed.
+										tf.loadingIndicator.tryHide();
+										var error = 'API Error: ' + response.Message;
+										if (response.StatusCode == 404)
+										{
+											error += "\r\nSuggest you refreshing the view to fetch the latest data.";
+										}
+
+										return error;
+									});
+							})
+
+					}).then(function(saveResult)
+					{
+						if (typeof saveResult === "string")
 						{
-							// Shape is geometry, shouldn't pass to server.
-							return (key === "Shape") ? null : value;
+							saveResponse.success = false;
+							saveResponse.messages = [saveResult];
 						}
-					}).then(function(response)
-					{
-						// Confirm with Ted: comment these codes because the logic is incorrect and causes errors, we will touch them later.
-						//return self.findSchedule(gridType, recordEntity).then(function()
-						//{
-						tf.loadingIndicator.tryHide();
-
-						var savedEntity = response.Items[0];
-
-						if (isNew) return savedEntity;
-
-						return self.unassignedCrossStudent(gridType, savedEntity).then(function()
+						else
 						{
-							self.entityModified = true;
-							self.refresh();
+							saveResponse.success = true;
+							saveResponse.entity = saveResult;
+						}
 
-							// Save successfully.
-							return savedEntity;
-						});
-						//});
-					}).catch(function(response)
-					{
-						// Save api request failed.
-						tf.loadingIndicator.tryHide();
-						return ('API Error: ' + response.Message);
+						return saveResponse;
 					});
-				}).then(function(saveResult)
-				{
-					if (typeof saveResult === "string")
-					{
-						saveResponse.success = false;
-						saveResponse.messages = [saveResult];
-					}
-					else
-					{
-						saveResponse.success = true;
-						saveResponse.entity = saveResult;
-					}
-
-					return saveResponse;
-				});
 			});
 	};
 
@@ -1850,24 +1935,25 @@
 	/**
 	 * Get relevant "relationships" that have been updated.
 	 *
-	 * @return {string}
+	 * @return {Array}
 	 */
-	FieldEditorHelper.prototype.getEditFieldRelationshipsStr = function()
+	FieldEditorHelper.prototype.getEditFieldRelationships = function()
 	{
 		var self = this, relationships = [];
 		Object.keys(self.editFieldList).map(function(key)
 		{
+			let relationshipKey = self.editFieldList[key].relationshipKey;
 			if (key === self.UDF_KEY)
 			{
 				relationships.push('UDF');
 			}
-			else if (!!self.editFieldList[key].relationshipKey)
+			else if (!!relationshipKey && !relationships.includes(relationshipKey))
 			{
-				relationships.push(self.editFieldList[key].relationshipKey);
+				relationships.push(relationshipKey);
 			}
 		});
 
-		return relationships.join(',');
+		return relationships;
 	};
 
 	FieldEditorHelper.prototype.isEntityValueEmpty = function(recordEntity, fieldName)
@@ -1881,8 +1967,14 @@
 		return acceptableValueReg ? !acceptableValueReg.test(value) : (value === undefined ||
 			value === null ||
 			(typeof value === "string" && value.trim().length === 0) ||
-			(Array.isArray(value) && value.length === 0));
+			(Array.isArray(value) && value.length === 0) ||
+			($.isNumeric(value) && value === 0));
 	};
+
+	FieldEditorHelper.prototype.getRequiredFields = function(dataType)
+	{
+		return tf.helpers.detailViewHelper.getRequiredFields(dataType);
+	}
 
 	/**
 	 * Check if all fields that cannot be null have been filled with value.
@@ -1894,7 +1986,7 @@
 	{
 		var self = this,
 			errorMessages = [],
-			requiredFields = tf.helpers.detailViewHelper.getRequiredFields(dataType);
+			requiredFields = self.getRequiredFields(dataType);
 
 		if (Array.isArray(requiredFields))
 		{
@@ -1941,7 +2033,7 @@
 				var obj = uniqueObjects[field],
 					value = recordEntity[field];
 
-				if (obj.values.includes(value))
+				if (value && obj.values.includes(value))
 				{
 					errorMessages.push({ fieldName: field, message: obj.title + " must be unique." });
 				}
@@ -2027,7 +2119,7 @@
 			blockName: field
 		};
 
-		self._updateGeneralFieldsContent(field, text, { updateAll: true });
+		self._updateGeneralFieldsContent(field, value, { updateAll: true });
 	}
 	FieldEditorHelper.prototype.isFieldValid = function(fieldName)
 	{
@@ -2060,15 +2152,13 @@
 			return;
 		}
 
-		if (self.dataType == "fieldtrip" && self.validateBlockout && ["DepartDateTime", "EstimatedReturnDateTime"].includes(result.fieldName))
-		{
-			var departDateTimeValue = result.fieldName == "DepartDateTime" ? fieldValue : value;
-			self.validateBlockout({ fieldName: "DepartDateTime", recordValue: departDateTimeValue });
-		}
-
+		var relatedDataBlock = self._detailView.$element.find(`div.grid-stack-item-content[data-block-field-name=${map.relatedField}]`);
+		if (relatedDataBlock.length === 0) relatedDataBlock = self._detailView.$element.find('div.grid-stack-item-content').find(`[data-block-field-name=${map.relatedField}]`);
+		var filedBlock = self._detailView.$element.find(`div.grid-stack-item-content[data-block-field-name=${fieldName}]`);
+		if (filedBlock.length === 0) filedBlock = self._detailView.$element.find('div.grid-stack-item-content').find(`[data-block-field-name=${fieldName}]`);
 		if (!tf.helpers.detailViewHelper.compareTwoValues(valArray, map.comparator))
 		{
-			self._detailView.$element.find('div.grid-stack-item-content[data-block-field-name=' + fieldName + ']').addClass(self.VALIDATE_ERROR_CLASS);
+			relatedDataBlock.addClass(self.VALIDATE_ERROR_CLASS);
 			self.editFieldList[fieldName] = {
 				errorMessages: [
 					map.option.message
@@ -2078,14 +2168,15 @@
 			}
 			return;
 		}
-		self._detailView.$element.find('div.grid-stack-item-content[data-block-field-name=' + fieldName + ']').removeClass(self.VALIDATE_ERROR_CLASS);
+		relatedDataBlock.removeClass(self.VALIDATE_ERROR_CLASS);
+		filedBlock.removeClass(self.VALIDATE_ERROR_CLASS);
 
-		var relatedDataBlock = self._detailView.$element.find('div.grid-stack-item-content[data-block-field-name=' + map.relatedField + ']');
 		if (relatedDataBlock.length === 0)
 		{
 			return;
 		}
 		relatedDataBlock.removeClass(self.VALIDATE_ERROR_CLASS);
+		filedBlock.removeClass(self.VALIDATE_ERROR_CLASS);
 		self.editFieldList[map.relatedField] = {
 			blockName: map.relatedField,
 			errorMessages: null,
@@ -2113,9 +2204,27 @@
 		}
 	}
 
-	FieldEditorHelper.prototype.prepareEntityBeforeSave = function(entity)
+	FieldEditorHelper.prototype.prepareEntityBeforeSave = function(entity, isNew)
 	{
 		// Override
+		return true;
+	};
+
+	FieldEditorHelper.prototype.isValueChanged = function(fieldName, format)
+	{
+		const newValue = this.editFieldList[fieldName];
+		if (newValue)
+		{
+			const entity = this._detailView.recordEntity;
+			return entity && !tf.dataFormatHelper.checkIfIdentical(newValue.value, entity[fieldName]);
+		}
+
+		return false;
+	};
+
+	FieldEditorHelper.prototype.getDefaultParamData = function()
+	{
+		return Promise.resolve({});
 	};
 
 	FieldEditorHelper.prototype.dispose = function()

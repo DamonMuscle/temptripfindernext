@@ -46,6 +46,7 @@
 			baseRecordType: self.baseRecordType,
 			baseRecordEntity: self.baseRecordEntity,
 			layoutEntity: self.layoutEntity,
+			readonlyBlockFields: options.readonlyBlockFields,
 			pageLevelViewModel: self.pageLevelViewModel
 		};
 

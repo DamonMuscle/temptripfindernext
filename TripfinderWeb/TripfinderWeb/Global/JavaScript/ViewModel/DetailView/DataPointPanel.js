@@ -10,6 +10,8 @@
 	{
 		var self = this;
 		self.detailView = detailView;
+		self.eventNameSpace = `.datapoint_${Math.random().toString(36).substring(7)}_${Date.now()}`;
+		self.timerHandles = [];
 		self.gridType = self.detailView.gridType;
 		self.dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType);
 		self.groups = [];
@@ -132,7 +134,7 @@
 	DataPointPanel.prototype.initFilterText = function()
 	{
 		var self = this;
-		$("body").on("mousedown", function(e)
+		$("body").on(`mousedown${self.eventNameSpace}`, function(e)
 		{
 			var $target = $(e.target);
 
@@ -151,17 +153,17 @@
 			}
 		});
 
-		$("body").on("mouseup", function(e)
+		$("body").on(`mouseup${self.eventNameSpace}`, function(e)
 		{
 			self.isMouseDownInFilterZone = false;
 		});
 
-		self.$filterText.on("focus", function(e)
+		self.$filterText.on(`focus${self.eventNameSpace}`, function(e)
 		{
 			self.$filterBar.addClass('active');
 		});
 
-		self.$filterText.on("blur", function(evt)
+		self.$filterText.on(`blur${self.eventNameSpace}`, function(evt)
 		{
 			if (!self.isMouseDownInFilterZone && !self.loseFocusOnWindow)
 			{
@@ -171,11 +173,13 @@
 					self.$filterText.blur();
 					self.loseFocusOnWindow = false;
 				}, 200);
+				
+				self.timerHandles.push(self.clearFocusTimeout);
 			}
 			evt.stopPropagation();
 		});
-		self.$filterText.on("keydown", self.inputKeyDown.bind(self));
-		self.$filterText.on("input", self.inputFilterText.bind(self));
+		self.$filterText.on(`keydown${self.eventNameSpace}`, self.inputKeyDown.bind(self));
+		self.$filterText.on(`input${self.eventNameSpace}`, self.inputFilterText.bind(self));
 	};
 
 	DataPointPanel.prototype.inputKeyDown = function(e)
@@ -212,6 +216,7 @@
 		{
 			self.filter(text);
 		}, 500);
+		self.timerHandles.push(self.deferFilterTimeout);
 	}
 
 	DataPointPanel.prototype.filter = function(text)
@@ -355,7 +360,7 @@
 			items: ko.observableArray(groupItems)
 		});
 
-		setTimeout(function()
+		self.timerHandles.push(setTimeout(function()
 		{
 			$arrow = $target.closest(".data-point-item").find(".folder");
 			$container = self.$element.find(".group-context-menu-container");
@@ -383,7 +388,7 @@
 					self.currentGroup(null);
 				}
 			});
-		})
+		}));
 	};
 
 	DataPointPanel.prototype.getGroupMenuTitle = function(data)
@@ -422,66 +427,99 @@
 				paramData: {
 					DataTypeId: dataTypeId
 				}
-			})]).then(function(values)
+			}),
+			tf.udgHelper.getUDGridsByDataType(self.gridType)
+		]).then(function(values)
+		{
+			var udfResult = values[0];
+
+			self.groups.length = 0;
+			self.allColumns.length = 0;
+
+			if (udfResult)
 			{
-				var udfResult = values[0];
-
-				self.groups.length = 0;
-				self.allColumns.length = 0;
-
-				if (udfResult)
+				var userdefinedpoints = []
+				var drtrspoints = []
+				udfResult.forEach(function(i)
 				{
-					dataPointsForCurrentPage["User Defined"] = udfResult.filter(function(i)
+					if (!!i)
 					{
-						return !!i;
-					});
-				}
 
-				Object.keys(dataPointsForCurrentPage).forEach(function(key)
-				{
-					self.allColumns.push({
-						title: key,
-						columns: ko.observableArray(dataPointsForCurrentPage[key].map(column =>
+						if ((i.AttributeFlag & 1) == 1) //if it contains DRTRS enum id
 						{
-							let c = JSON.parse(JSON.stringify(column));
-							if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
-							{
-								c.isRequired = true;
-							}
-							return c;
-						}))
-					})
-				});
+							drtrspoints.push(i);
+						}
+						else
+						{
+							userdefinedpoints.push(i)
+						}
+					}
+				})
 
-				var result = values[1].Items;
-				if (result && result.length > 0)
+				if (drtrspoints.length > 0)
 				{
-					$.each(result, function(_, group)
+					dataPointsForCurrentPage["State Report Fields"] = drtrspoints
+				}
+				else
+				{
+					delete dataPointsForCurrentPage["State Report Fields"]
+				}
+				if (userdefinedpoints.length > 0)
+				{
+					dataPointsForCurrentPage["User Defined"] = userdefinedpoints
+				}
+			}
+
+			if (values[2])
+			{
+				tf.udgHelper.updateDataPoint(self.gridType, values[2]);
+			}
+
+			Object.keys(dataPointsForCurrentPage).forEach(function(key)
+			{
+				self.allColumns.push({
+					title: key,
+					columns: ko.observableArray(dataPointsForCurrentPage[key].map(column =>
 					{
-						dataPointGroup = {};
-						dataPointGroup.id = group.ID;
-						dataPointGroup.title = group.Name;
-						dataPointGroup.type = "group";
-						dataPointGroup.items = (JSON.parse(group.DataPoints) || []).map(function(i)
+						var c = { ...column };
+						if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
 						{
-							return tf.helpers.detailViewHelper.decompressDataBlockDescriptor(i, self.gridType);
-						});
-						dataPointGroup.hasTabBlock = dataPointGroup.items.some(function(value)
-						{
-							return value.type == "tab";
-						});
-						self.groups.push(dataPointGroup);
-					});
-					self.allColumns.unshift({
-						title: "Groups",
-						columns: ko.observableArray(self.groups)
-					});
-				}
-
-				self.obColumns(self.allColumns);
-				self.obAllColumns(self.allColumns);
-				self.detailViewColumnChanged();
+							c.isRequired = true;
+						}
+						return c;
+					}))
+				})
 			});
+
+			var result = values[1].Items;
+			if (result && result.length > 0)
+			{
+				$.each(result, function(_, group)
+				{
+					dataPointGroup = {};
+					dataPointGroup.id = group.ID;
+					dataPointGroup.title = group.Name;
+					dataPointGroup.type = "group";
+					dataPointGroup.items = (JSON.parse(group.DataPoints) || []).map(function(i)
+					{
+						return tf.helpers.detailViewHelper.decompressDataBlockDescriptor(i, self.gridType);
+					});
+					dataPointGroup.hasTabBlock = dataPointGroup.items.some(function(value)
+					{
+						return value.type == "tab";
+					});
+					self.groups.push(dataPointGroup);
+				});
+				self.allColumns.unshift({
+					title: "Groups",
+					columns: ko.observableArray(self.groups)
+				});
+			}
+
+			self.obColumns(self.allColumns);
+			self.obAllColumns(self.allColumns);
+			self.detailViewColumnChanged();
+		});
 	};
 
 	DataPointPanel.prototype.getMinHeight = function($data)
@@ -512,36 +550,34 @@
 	{
 		var self = this,
 			minX = Number.MAX_VALUE,
-			maxX = 0;
+			maxX = 0,
+			type = $data.type;
 
-		if ($data.type === "group")
+		switch (type)
 		{
-			let gridstack = self.detailView.$element.find(".grid-stack").data("gridstack");
-			$.each($data.items, function(index, item)
-			{
-				if (item.type === 'section-header')
+			case "group":
+				let gridstack = self.detailView.$element.find(".grid-stack").data("gridstack");
+				$.each($data.items, function(index, item)
 				{
-					item.x = 0;
-					item.w = gridstack.grid.width;
-				}
-				if (minX > item.x)
-				{
-					minX = item.x;
-				}
-				if (maxX < item.x + item.w)
-				{
-					maxX = item.x + item.w;
-				}
-			});
-			return maxX - minX;
-		}
-		else if ($data.type === "Schedule")
-		{
-			return self.getScheduleMinWidth();
-		}
-		else
-		{
-			return $data["min-width"];
+					if (item.type === 'section-header')
+					{
+						item.x = 0;
+						item.w = gridstack.grid.width;
+					}
+					if (minX > item.x)
+					{
+						minX = item.x;
+					}
+					if (maxX < item.x + item.w)
+					{
+						maxX = item.x + item.w;
+					}
+				});
+				return maxX - minX;
+			case "Schedule":
+				return self.getScheduleMinWidth();
+			default:
+				return $data["min-width"];
 		}
 	};
 
@@ -564,7 +600,7 @@
 	{
 		var self = this,
 			block, blocks;
-		if (!self.$element)
+		if (!self.$element || self.$element.is(":hidden"))
 		{
 			return;
 		}
@@ -732,11 +768,11 @@
 		{
 			if (self.isMouseWithinContainer(evt.clientX, evt.clientY, gridstack.$wrapper[0].getBoundingClientRect()))
 			{
-				setTimeout(function()
+				self.timerHandles.push(setTimeout(function()
 				{
 					var $inputEle = _.last(gridstack.dataBlocks).$el.find("input[type=file]");
 					$inputEle.trigger('click');
-				}, 50);
+				}, 50));
 			}
 		} else if (elementType === "spacer" && self.$element.find(".non-date-element-container > .spacer").length === 0)
 		{
@@ -899,7 +935,8 @@
 		if (flag)
 		{
 			self.animate($in, $out, inOffset, outOffset, duration);
-		} else
+		} 
+		else
 		{
 			self.animate($out, $in, outOffset, inOffset, duration);
 		}
@@ -1289,6 +1326,7 @@
 				break;
 			case "treeList":
 			case "multipleGrid":
+			case "UDGrid":
 			case "grid":
 				html = `<div class='grid-stack-item-title'>${$target.text().toUpperCase()}</div>
 						<div class='grid-stack-item-content'></div>`;
@@ -1373,6 +1411,7 @@
 
 	/**
 	 * The dispose function.
+	 * datapoint and detail view are in pair, so dispose data point when detail view disposed.
 	 * @returns {void} 
 	 */
 	DataPointPanel.prototype.dispose = function()

@@ -163,6 +163,19 @@
 			self.obIsFetchingData(false);
 			if (self.obStopped()) return;
 
+			dropDownSource = dropDownSource.map(item =>
+				{
+					if (!(item instanceof Object))
+					{
+						return {
+							text: item,
+							value: item
+						};
+					}
+	
+					return item;
+				});	
+
 			self.dropDownSource = self._sortByAlphaOrderWithTitles(dropDownSource);
 
 			var allowNullValue = options ? options.allowNullValue : false;

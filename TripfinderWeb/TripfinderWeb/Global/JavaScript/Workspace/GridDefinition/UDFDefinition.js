@@ -31,6 +31,22 @@
 		});
 	};
 
+	UDFDefinition.prototype.RetrieveUDFGroup = function(gridType)
+	{
+		let self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
+			paramData: {
+				datatypeid: tf.dataTypeHelper.getId(gridType),
+				"@Relationships": "UDGridFields,UDGridDataSources"
+			}
+		}).then(function(result)
+		{
+			self._update(gridType, result.Items.map(function(m){m.Id = m.ID; m.Type = "Group"; m.DisplayName = m.Name; return m}));
+
+			return result;
+		});
+	};
+
 	UDFDefinition.prototype.getInvisibleUDFs = function(gridType)
 	{
 		var self = this,
@@ -113,7 +129,9 @@
 	UDFDefinition.prototype.format = function(item, gridType)
 	{
 		var self = this,
-			associatedDBIDs = Array.isArray(item.UDFDataSources) ? item.UDFDataSources : [],
+			associatedDBIDs = item.Type === "Group" ? 
+			(Array.isArray(item.UDGridDataSource) ? item.UDGridDataSource : []): 
+			(Array.isArray(item.UDFDataSources) ? item.UDFDataSources : []),
 			fieldName = item.Guid,
 			columnDefinition = {
 				UDFDataSources: associatedDBIDs,

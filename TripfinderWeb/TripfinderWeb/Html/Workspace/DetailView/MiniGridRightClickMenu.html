@@ -1,0 +1,52 @@
+<div style="margin:-5px;">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
+		<ul class="tf-contextmenu grid-menu">
+			<li class="menu-item" data-bind="contextMenuClick:editClicked">
+				<div class="menu-icon edit"></div>
+				<div class="menu-label">Edit</div>
+			</li>
+			<li class="menu-item" data-bind="if:miniGridType!='UDGrid',contextMenuClick:viewClicked">
+				<div class="menu-icon view"></div>
+				<div class="menu-label">View</div>
+			</li>
+			<li class="menu-item" data-bind="if:miniGridType!='UDGrid',contextMenuClick:disassociateClicked">
+				<div class="menu-icon disassociate"></div>
+				<div class="menu-label">Disassociate</div>
+			</li>
+			<li class="menu-item" data-bind="if:miniGridType=='UDGrid',contextMenuClick:disassociateClicked">
+				<div class="menu-icon delete-white "></div>
+				<div class="menu-label">Delete</div>
+			</li>
+
+			<li class="menu-item" data-bind="if:miniGridType =='contact'">
+				<div class="menu-icon"></div>
+				<div class="menu-label">Set Relationship As</div>
+				<ul class="tf-contextmenu grid-menu" data-bind="foreach:obContactTypes">
+
+					<li class="menu-item" data-bind="contextMenuClick: $parent.setContactRelationship">
+						<div class="menu-icon"></div>
+						<div class="menu-label" data-bind="text: Type"></div>
+					</li>
+				</ul>
+			</li>
+
+			<li class="menu-item" data-bind="if:detailviewType =='student'">
+				<div class="menu-icon"></div>
+				<div class="menu-label">Set As </div>
+				<ul class="tf-contextmenu grid-menu">
+
+					<li class="menu-item" data-bind="if:detailviewType =='student',contextMenuClick:setPrimaryContact">
+						<div class="menu-icon" data-bind="css:{'checked':IsPrimaryChecked}"></div>
+						<div class="menu-label">Primary</div>
+					</li>
+					<li class="menu-item" data-bind="if:detailviewType =='student',contextMenuClick:setStopfinderContact">
+						<div class="menu-icon" data-bind="css:{'checked':IsStopfinderChecked}"></div>
+						<div class="menu-label">Stopfinder</div>
+					</li>
+				</ul>
+			</li>
+			
+			
+		</ul>
+	</div>
+</div>
