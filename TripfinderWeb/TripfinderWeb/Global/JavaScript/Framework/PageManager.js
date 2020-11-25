@@ -29,7 +29,8 @@
 		self.availableApplications = {
 			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
 			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
-			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" }
+			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
+			stopfinderadmin: {route: "StopfinderAdmin", title: "StopfinderAdmin", url: "StopfinderAdmin"}
 		};
 
 		self.initApplicationSwitcher();
@@ -49,6 +50,8 @@
 				return 'tripfinder'
 			case "vfweb":
 				return 'viewfinder';
+			case "ent":
+				return 'stopfinderadmin';
 			default:
 				return null;
 		}
