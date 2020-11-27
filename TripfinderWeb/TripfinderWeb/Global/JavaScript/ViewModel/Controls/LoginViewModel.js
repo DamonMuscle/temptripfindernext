@@ -107,10 +107,11 @@
 			{
 				tf.storageManager.delete("datasourceId", true, true);
 				var token = apiResponse.Items[0];
-				if (!tf.tokenStorageManager)
-				{
-					tf.storageManager.save("token", token, true);
-				}
+				// if (!tf.tokenStorageManager)
+				// {
+				// 	tf.storageManager.save("token", token, true);
+				// }
+				tf.entStorageManager.save("token", token, true);
 
 				tf.authManager.token = token;
 				return { clientKey: clientKey, username: userName, password: this.obPassword() };
