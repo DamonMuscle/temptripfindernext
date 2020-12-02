@@ -6,7 +6,7 @@
 	{
 		var self = this;
 		self.$navigationMenu = null;
-		if (!tf.permissions.isSupport)
+		if (tf.permissions && !tf.permissions.isSupport)
 		{
 			self.searchControlTemplate = new TF.Control.SearchControlViewModel();
 		}
@@ -20,7 +20,7 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.availableApplications = tf.pageManager.availableApplications;
+		self.availableApplications = tf.pageManager?tf.pageManager.availableApplications:"";
 
 		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
@@ -40,7 +40,7 @@
 
 		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
-		tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self));
+		tf.pageManager?tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self)):"";
 	}
 
 	/**
@@ -1189,26 +1189,11 @@
 			url = prod[0].Uri;
 
 			var promise = null;
-			if (routeName.toLowerCase() === "stopfinderadmin")
+			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
 			{
-				promise = tf.promiseAjax.post(pathCombine(tf.api.server("v1.08"), tf.authManager.clientKey, "auth/authentication/sso/stopfinder"))
-					.then(function(response)
-					{
-						var token = response.token;
-						var refreshToken = response.refreshToken;
-						tf.entStorageManager.save("stopfinderToken", token);
-						tf.entStorageManager.save("refreshToken", refreshToken);
-						return true;
-					}.bind(this));
+				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
 			}
-			else
-			{
-				if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
-				{
-					url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
-				}
-				promise = Promise.resolve();
-			}
+			promise = Promise.resolve();
 
 			promise.then(function()
 			{

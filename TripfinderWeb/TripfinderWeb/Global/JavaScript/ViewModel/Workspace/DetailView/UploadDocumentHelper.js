@@ -18,6 +18,8 @@
 		self.uploader = null;
 		self.detailView = detailView;
 		self.$fileSelector = null;
+
+		self.fileDrop = new TF.Events.Event();
 	};
 
 	UploadDocumentHelper.maxFileByteSize = 50 * 1024 * 1024; // 50MB
@@ -153,8 +155,12 @@
 				self.addFile(file);
 			} else
 			{
-				tf.helpers.detailViewHelper.addEditRecordInQuickAddModal(self.detailView.$element, "document", self.detailView.gridType, self.detailView.recordEntity,
-					null, self.detailView.pageLevelViewModel, self.detailView.isCreateGridNewRecord, file);
+				self.onFileDrop(file);
+				if (self.detailView.udGrid == null)
+				{
+					tf.helpers.detailViewHelper.addEditRecordInQuickAddModal(self.detailView.$element, "document", self.detailView.gridType, self.detailView.recordEntity,
+						null, self.detailView.pageLevelViewModel, self.detailView.isCreateGridNewRecord, file);
+				}
 			}
 		});
 	};
@@ -247,6 +253,11 @@
 		return this.uploadHelper.getFileStream();
 	};
 
+	UploadDocumentHelper.prototype.onFileDrop = function(file)
+	{
+		this.fileDrop.notify(file);
+	};
+
 	UploadDocumentHelper.prototype.selectFile = function(file)
 	{
 		var self = this;
@@ -268,6 +279,8 @@
 	{
 		var self = this,
 			$element = self.detailView.$element;
+
+		self.fileDrop.unsubscribeAll();
 
 		$(document).off("dragenter" + self.detailView.eventNameSpace);
 

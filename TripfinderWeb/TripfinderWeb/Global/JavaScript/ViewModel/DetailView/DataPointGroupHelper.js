@@ -103,6 +103,11 @@
 				obj.UDFGUid = udf && udf.UDFGuid;
 			}
 
+			if (data.type === "UDGrid")
+			{
+				obj.UDGridId = Number($(el).attr('UDGridId'))
+			}
+
 			if (data.type === "Map")
 			{
 				var mapRole = $(el).find(".map").attr("role"),

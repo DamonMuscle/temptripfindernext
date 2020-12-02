@@ -657,6 +657,11 @@
 
 		return kendoGrids;
 	};
+	
+	function isAssociationChanged(selectedData, response)
+	{
+		return response.isNewRecordCreated || !_.isEqual(selectedData.map(d => d.Id), response.selectedIds);
+	}
 
 	GridBlock.prototype.manageRecordAssociation = function(associationType)
 	{
@@ -684,22 +689,108 @@
 			tf.modalManager.showModal(new TF.DetailView.ManageRecordAssociationModalViewModel(options))
 				.then(function(response)
 				{
-					if (response)
+					if (response && isAssociationChanged(selectedData, response))
 					{
-						self.detailView.pageLevelViewModel.popupSuccessMessage("The updates have been saved successfully.");
-
 						var selectedIds = response.selectedIds;
-						if (Array.isArray(selectedIds))
+						var confirmPromise = new Promise(res => res(true));
+						if (!Array.isArray(selectedIds))
 						{
-							var getCount = tf.helpers.detailViewHelper.getMiniGridTotalCount(associationType, self.gridType, self.recordId);
-							if (getCount !== null)
+							return;
+						}
+
+						let updatePromises = [];
+						if (self.gridBlockType == "DocumentGrid")
+						{
+							var deletedDocument = _.differenceWith(selectedData.map(d => d.Id), selectedIds);
+							if (deletedDocument.length > 0)
 							{
-								getCount.then(function(totalCount)
+								let dataTypeId = tf.dataTypeHelper.getId(self.gridType);
+								let getDocumentUDGridCountPromise;
+								if (self.isCreateGridNewRecord)
 								{
-									tf.helpers.detailViewHelper.updateAllGridsDataSourceByIds(associationType, selectedIds, totalCount, self.$detailView);
-									self.updateAssociationEditList(associationType, selectedIds);
-								});
+									let affectedDocument = [];
+									if (self.fieldEditorHelper.editFieldList.UDGrids != null)
+									{
+										self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
+										{
+											udGrid.UDGridRecordsValues.forEach(udGridRecord =>
+											{
+												udGridRecord.DocumentUDGridRecords.forEach(documentUDGridRecord =>
+												{
+													if (deletedDocument.includes(documentUDGridRecord.DocumentID))
+													{
+														affectedDocument.push(documentUDGridRecord);
+													}
+												});
+											});
+										});
+									}
+									getDocumentUDGridCountPromise = Promise.resolve(_.groupBy(affectedDocument, "DocumentID"));
+								}
+								else
+								{
+									getDocumentUDGridCountPromise = tf.udgHelper.getAffectedDocumentUDGridCount(self.recordId, dataTypeId, deletedDocument.join());
+								}
+
+								confirmPromise = getDocumentUDGridCountPromise.then(affceted =>
+								{
+									if (_.keys(affceted).length == null || _.keys(affceted).length == 0)
+									{
+										return true;
+									}
+
+									return tf.promiseBootbox.yesNo("This operation will also remove the associations between document and UDF Groups. Are you sure you want to apply these changes?", CONFIRMATION_TITLE).then(choice =>
+									{
+										if (!choice)
+										{
+											return false;
+										}
+
+										if (self.isCreateGridNewRecord)
+										{
+											self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
+											{
+												udGrid.UDGridRecordsValues.forEach(udGridRecord =>
+												{
+													_.remove(udGridRecord.DocumentUDGridRecords, documentUDGridRecord => deletedDocument.includes(documentUDGridRecord.DocumentID));
+												});
+											});
+
+											updatePromises.push(Promise.resolve(true));
+										}
+										else
+										{
+											updatePromises.push(tf.udgHelper.updateAssociateDocuments(self.recordId, dataTypeId, deletedDocument));
+										}
+
+										return true;
+									});
+								})
 							}
+						}
+						if (!self.isReadOnly())
+						{
+							confirmPromise.then(res =>
+							{
+								if (res)
+								{
+									updatePromises.push(self.updateAssociationEditList(associationType, selectedIds));
+									Promise.all(updatePromises).then(function(res)
+									{
+										if (self.gridBlockType == "ContactGrid")
+										{
+											self.updateAllContactGridsDataSource(tf.dataTypeHelper.getNameByType(self.gridType), "ContactGrid");
+										}
+										if (res && res[1])
+										{
+											PubSub.publish("udgrid", {});
+										}
+										self.detailView.pageLevelViewModel.popupSuccessMessage("The updates have been saved successfully.");
+										tf.helpers.detailViewHelper.updateAllGridsDataSourceByIds(associationType, selectedIds, selectedIds.length, self.$detailView);
+									});
+								}
+								else return;
+							})
 						}
 					}
 				});
@@ -736,6 +827,8 @@
 			self.fieldEditorHelper.editFieldList[fieldName] = editStash;
 
 			self.obEditing(true);
+			
+			return Promise.resolve(true);
 		}
 		else
 		{
@@ -787,7 +880,10 @@
 			documentId = documentEntity.Id,
 			gridName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType).toLowerCase();
 
-		tf.promiseBootbox.yesNo("Are you sure you want to disassociate this " + gridName + " from \"" + documentEntity.Name + "\"?", CONFIRMATION_TITLE)
+			var WarningMessage = "Are you sure you want to disassociate this " + gridName + " from \"" + documentEntity.Name + "\"?"
+			if (self.gridBlockType = "DocumentGrid")
+				WarningMessage = `Disassociate this ${ gridName } from ${ documentEntity.Name } will also remove associations between document and UDF Groups. Are you sure you want to apply these changes?`
+			tf.promiseBootbox.yesNo(WarningMessage, CONFIRMATION_TITLE)
 			.then(function(res)
 			{
 				if (!res) return;
@@ -807,28 +903,44 @@
 					}));
 				}
 
-				Promise.all(tasks).then(function(response)
-				{
-					var totalCount = response[0];
-
-					tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "document", [documentId], totalCount);
-
-					// Remove this contact in stack.
-					if (self.fieldEditorHelper.editFieldList &&
-						self.fieldEditorHelper.editFieldList.DocumentRelationships &&
-						Array.isArray(self.fieldEditorHelper.editFieldList.DocumentRelationships.value) &&
-						self.fieldEditorHelper.editFieldList.DocumentRelationships.value.length > 0)
+				Promise.all(tasks).then(res =>
 					{
-						self.fieldEditorHelper.editFieldList.DocumentRelationships.value =
-							self.fieldEditorHelper.editFieldList.DocumentRelationships.value.filter(function(item)
+						if (self.isCreateGridNewRecord)
+						{
+							self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
 							{
-								return item.DocumentID !== documentId;
+								udGrid.UDGridRecordsValues.forEach(udGridRecord =>
+								{
+									_.remove(udGridRecord.DocumentUDGridRecords, documentUDGridRecord => documentId == documentUDGridRecord.DocumentID);
+								});
 							});
-					}
-
-					self.detailView.pageLevelViewModel.clearError();
-					self.detailView.pageLevelViewModel.popupSuccessMessage('The association has been removed.');
-				});
+	
+							return Promise.resolve(true);
+						}
+	
+						return tf.udgHelper.updateAssociateDocuments(self.recordId, tf.dataTypeHelper.getId(self.gridType), [documentId])
+					}).then
+						(function(response)
+						{
+							tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "document", [documentId]);
+							PubSub.publish("udgrid", {});
+	
+							// Remove this contact in stack.
+							if (self.fieldEditorHelper.editFieldList &&
+								self.fieldEditorHelper.editFieldList.DocumentRelationships &&
+								Array.isArray(self.fieldEditorHelper.editFieldList.DocumentRelationships.value) &&
+								self.fieldEditorHelper.editFieldList.DocumentRelationships.value.length > 0)
+							{
+								self.fieldEditorHelper.editFieldList.DocumentRelationships.value =
+									self.fieldEditorHelper.editFieldList.DocumentRelationships.value.filter(function(item)
+									{
+										return item.DocumentID !== documentId;
+									});
+							}
+	
+							self.detailView.pageLevelViewModel.clearError();
+							self.detailView.pageLevelViewModel.popupSuccessMessage('The association has been removed.');
+						});
 			});
 	};
 

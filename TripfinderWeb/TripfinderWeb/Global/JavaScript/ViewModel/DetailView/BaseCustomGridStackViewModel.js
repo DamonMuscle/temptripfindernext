@@ -5,6 +5,7 @@
 	function BaseCustomGridStackViewModel(recordId)
 	{
 		var self = this;
+		self.eventNameSpace = `.detailview_${ Math.random().toString(36).substring(7) }_${ Date.now() }`;
 		/* 
 			For Add new button in grid or quick add in mini grid,
 			we will skip validation for the first time.
@@ -1111,7 +1112,23 @@
 		{
 			self.rootGridStack.dispose();
 		}
+
+		$(window).off(`resize${ self.eventNameSpace }`);
 	};
+
+	BaseCustomGridStackViewModel.prototype.toggleBlockReadOnly = function(isReadonly, involvedBlocks)
+	{
+		let self = this;
+		let dataBlocks = self.rootGridStack.dataBlocks;
+		if (involvedBlocks)
+		{
+			dataBlocks = dataBlocks.filter(involvedBlocks);
+		}
+		dataBlocks.forEach(d =>
+		{
+			d.isBlockReadOnly(isReadonly);
+		})
+	}
 
 	BaseCustomGridStackViewModel.MapManagers = {}
 

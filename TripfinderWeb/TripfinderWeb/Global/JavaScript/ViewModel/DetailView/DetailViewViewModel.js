@@ -906,25 +906,47 @@
 				self.startReadMode();
 			}
 
-			self.recordId = recordId;
-			self.stopCreateNewMode();
-			promiseTask = self.updateGridType(gridType).then(function()
+			if(!self.obEditing())
 			{
-				return self.getRecordEntity(gridType, recordId).then(function(recordEntity)
+				self.changeDetailViewByID(recordId, gridType);
+			}
+			else
+			{
+			    self.showConfirmation("Do you want to close " + getTitleByType(self.gridType) + " detail view without saving?")
+				.then(function(result)
 				{
-					if (!recordEntity) { return; }
-
-					self.recordEntity = recordEntity;
-
-					var recordPic = recordEntity.RecordPicture;
-					self.obRecordPicture(recordPic && recordPic !== 'None' ? 'url(data:' + recordPic.MimeType + ';base64,' + recordPic.FileContent : "");
-					self.updateDetailViewTitle(recordEntity);
-					self.openDetailViewInNewTab();
-
-					return self.loadCalendarData(recordId);
+					if (result)
+					{
+						self.changeDetailViewByID(recordId, gridType);
+						self.refreshEditStatus();
+					}
+					return;
 				});
-			});
+			}
 		}
+	};
+
+	DetailViewViewModel.prototype.changeDetailViewByID = function(recordId, gridType)
+	{
+		var self = this;
+		self.recordId = recordId;
+		self.stopCreateNewMode();
+		promiseTask = self.updateGridType(gridType).then(function()
+		{
+			return self.getRecordEntity(gridType, recordId).then(function(recordEntity)
+			{
+				if (!recordEntity) { return; }
+
+				self.recordEntity = recordEntity;
+
+				var recordPic = recordEntity.RecordPicture;
+				self.obRecordPicture(recordPic && recordPic !== 'None' ? 'url(data:' + recordPic.MimeType + ';base64,' + recordPic.FileContent : "");
+				self.updateDetailViewTitle(recordEntity);
+				self.openDetailViewInNewTab();
+
+				return self.loadCalendarData(recordId);
+			});
+		});
 
 		return promiseTask.then(function()
 		{
@@ -935,7 +957,7 @@
 
 			self.highlightRequiredFieldByAsterisk();
 		});
-	};
+	}
 
 	/**
 	 * Start read mode in detail view.
@@ -1914,8 +1936,39 @@
 	 */
 	DetailViewViewModel.prototype.newWindowClick = function(data, e)
 	{
-		//var self = this;
-		window.open("#/?id=" + data.recordId, "new-detailWindow_" + $.now());
+		if (e.button === 0)
+		{
+			if (TF.productName === "routefinder")
+			{
+				this._openNewBrowserTab(data);
+			} else
+			{
+				//  view-4542,this is only used in ViewfinderWeb
+				window.open('#/' + tf.pageManager.getPageId(this.gridType) + "?" + "ids= " + data.recordId, "new-detailWindow_" + $.now());
+			}
+			// e.ctrlKey ? this._openNewBrowserTab(data) : this._openNewApplicationTab(data);
+		}
+	};
+
+	DetailViewViewModel.prototype._openNewBrowserTab = function(data)
+	{
+		var gridType = this.gridType, gridState = new TF.Grid.GridState();
+		gridState.filteredIds = [data.recordId];
+		tf.documentManagerViewModel.add(new TF.Document.DocumentData(TF.Document.DocumentData.Grid,
+			{
+				gridType: gridType,
+				gridState: gridState,
+				record: data.recordEntity
+			}, this.routeState), true, false, "new-detailWindow_" + $.now());
+
+		//console.log('DetailViewViewModel.prototype._openNewBrowserTab');
+		//this.exitEditing().then(function(result)
+		//{
+		//	if (result)
+		//	{
+		//		window.open("#/?id=" + data.recordId, "new-detailWindow_" + $.now());
+		//	}
+		//});
 	};
 
 	DetailViewViewModel.prototype._openNewApplicationTab = function(data, e)

@@ -7,6 +7,8 @@
 		this.loadingIndicator = loadingIndicator;
 		this.ajaxRequests = [];
 		this.cacheAjaxRequestsArray = !!cacheAjaxRequestsArray;
+		this.alerting = false;
+		this.requestCount = 0;
 	}
 
 	Ajax.prototype = {
@@ -18,43 +20,49 @@
 				this.loadingIndicator.setSubtitle(settings.loadingSubtitle);
 				this.loadingIndicator.show();
 			}
+
 			if (externalPointer)
 			{
-				externalPointer();
+				externalPointer(xmlHttpRequest, settings);
 			}
 		},
 
 		_onComplete: function(xmlHttpRequest, status, overlay, externalPointer)
 		{
-			if (tf.authManager.logOffTag) { return; }
-
 			if (overlay == true)
 			{
 				this.loadingIndicator.tryHide();
 			}
 			if (externalPointer)
 			{
-				expternalPointer();
+				externalPointer();
 			}
-
 			this._clearAjax(xmlHttpRequest);
 		},
 
 		_onError: function(xmlHttpRequest, status, error, externalPointer, auth)
 		{
-			if (tf.authManager.logOffTag) { return; }
-
-			if (!(auth && auth.noInterupt) && (error == "Unauthorized" || (!!xmlHttpRequest.responseText && JSON.parse(xmlHttpRequest.responseText).Message === "Invalid Token")))
+			var self = this;
+			var jsonObj = {};
+			try
 			{
-				tf.loadingIndicator.hideCompletely();
+				jsonObj = JSON.parse(xmlHttpRequest.responseText);
+			}
+			catch (error) { }
+
+			if (!self.alerting && !(auth && auth.noInterupt) && (error == "Unauthorized" || TF.getErrorMessage(jsonObj) === "Invalid Token"))
+			{
+				self.alerting = true;
 				tf.promiseBootbox.alert("Login session expired")
 					.then(function()
 					{
-						tf.pageManager.logout(false);
 						tf.authManager.logOffTag = true;
-					}.bind(this));
+						tf.entStorageManager.save("token", "", true);
+						location.reload();
+					});
 			}
-			else if (externalPointer)
+
+			if (externalPointer)
 			{
 				externalPointer(xmlHttpRequest.responseJSON, xmlHttpRequest.status);
 			}
@@ -62,11 +70,9 @@
 
 		_onSuccess: function(data, xmlHttpRequest, status, externalPointer)
 		{
-			if (tf.authManager.logOffTag) { return; }
-
 			if (externalPointer)
 			{
-				externalPointer(data);
+				externalPointer(data, xmlHttpRequest);
 			}
 		},
 
@@ -158,7 +164,6 @@
 				loadingSubtitle: "Loading"
 			};
 
-
 			if (externalSettings)
 			{
 				// Preserve any function pointers set by external code.
@@ -175,10 +180,15 @@
 			settings.beforeSend = function(xmlHttpRequest, settings)
 			{
 				this._onBeforeSend(xmlHttpRequest, settings, option.overlay, beforeSend)
-
-				if (tf.authManager.token)
+				var token = tf.entStorageManager.get("token", true);
+				xmlHttpRequest.setRequestHeader('Token', token);
+				xmlHttpRequest.setRequestHeader('UserDate', moment().format("YYYY-MM-DDTHH:mm:ss.SSS"));
+				if (settings.headers)
 				{
-					xmlHttpRequest.setRequestHeader('Token', tf.authManager.token);
+					for (var key in settings.headers)
+					{
+						xmlHttpRequest.setRequestHeader(key, settings.headers[key]);
+					}
 				}
 			}.bind(this);
 
@@ -204,7 +214,7 @@
 		{
 			if (!(typeof settings.data == 'string' || settings.data instanceof String))
 			{
-				settings.data = JSON.stringify(settings.data);
+				settings.data = JSON.stringify(settings.data, settings.handleData);
 			}
 			if (settings.paramData && jQuery.param(settings.paramData))
 			{

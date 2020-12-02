@@ -532,6 +532,22 @@
 
 		if (!self.detailView.isReadMode()) { return item.defaultValue; };
 
+		if (item.UDGridFieldId != null)
+		{
+			let value = self.detailView.isCreateGridNewRecord ? self.detailView.defaultRecordEntity[item.Guid] : self.detailView.recordEntity[item.Guid];
+			if (item.FieldOptions.TypeName == "List")
+			{
+				if (!item.FieldOptions.PickListMultiSelect)
+				{
+					return value;
+				}
+
+				return value.join(", ");
+			}
+
+			return value;
+		}
+
 		if (!item.UDFId)
 		{
 			if (Object.keys(editFieldList).includes(item.field))
@@ -751,6 +767,10 @@
 			case "Calendar":
 				return new TF.DetailView.DataBlockComponent.CalendarBlock(item, self.detailView, self.$wrapper);
 			case "grid":
+				if (self.detailView.udGrid)
+				{
+					return new TF.DetailView.DataBlockComponent.UDGridRecordGridBlock($.extend(item, { gridConfigs: self.detailView.generateDocumentGridConfigs(item) }), self.detailView);
+				}
 				return new TF.DetailView.DataBlockComponent.GridBlock(item, self.detailView);
 			case "RecordPicture":
 				return new TF.DetailView.DataBlockComponent.RecordPictureBlock(self.getRawDataBlockValue(item), item, dataBlockStyles, self.$wrapper, self.detailView);
@@ -773,6 +793,8 @@
 				return new TF.DetailView.DataBlockComponent.MultipleGridBlock(item, self.detailView);
 			case "treeList":
 				return new TF.DetailView.DataBlockComponent.TreeListBlock(item, self.detailView);
+			case "UDGrid":
+				return new TF.DetailView.DataBlockComponent.UDGridBlock(item, self.detailView);
 			default:
 				var content = self.getRawDataBlockValue(item),
 					nullAvatar = item.nullAvatar || NULL_AVATAR;

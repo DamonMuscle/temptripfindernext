@@ -29,7 +29,8 @@
 		self.availableApplications = {
 			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
 			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
-			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" }
+			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
+			stopfinderadmin: {route: "StopfinderAdmin", title: "StopfinderAdmin", url: "StopfinderAdmin"}
 		};
 
 		self.initApplicationSwitcher();
@@ -49,11 +50,21 @@
 				return 'tripfinder'
 			case "vfweb":
 				return 'viewfinder';
+			case "ent":
+				return 'stopfinderadmin';
 			default:
 				return null;
 		}
 
 	}
+
+	PageManager.prototype.showConfirmation = function(message)
+	{
+		return tf.promiseBootbox.yesNo({
+			message: message,
+			title: "Confirmation Message"
+		});
+	};
 
 	PageManager.prototype.initApplicationSwitcher = function()
 	{
@@ -70,7 +81,7 @@
 				return v.toLowerCase();
 			});
 
-			if (tf.authManager.authorizationInfo.isAdmin)
+			if (tf.authManager.authorizationInfo.authorizationTree.userId == -999 && tf.authManager.authorizationInfo.isAdmin)
 			{
 				if (!supportedProducts.includes("tfadmin"))
 				{
@@ -231,12 +242,47 @@
 		});
 	};
 
+	function getTitleByName(pageName)
+	{
+		var pageTitle = "", pageType = pageName.toLowerCase();
+		switch (pageType)
+		{
+			case "approvals":
+				pageTitle = "My Pending Approvals";
+				break;
+			case "approvalsScheduler":
+				pageTitle = "My Pending Approvals Calendar";
+				break;
+			case "fieldtrips":
+				pageTitle = "Field Trips";
+				break;
+			case "fieldtripScheduler":
+				pageTitle = "Field Trips Calendar";
+				break;
+			case "myrequests":
+				pageTitle = "My Submitted Requests";
+				break;
+			case "myrequestsScheduler":
+				pageTitle = "My Submitted Requests Calendar";
+				break;
+			case "reports":
+				pageTitle = "Reports";
+				break;
+			case "settingsConfig":
+				ageTitle = "Settings";
+				break;
+			default:
+				break;
+		}
+		return pageTitle;
+	}
+
 	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
 	{
 		var self = this;
 		if (self.isTryGoAway && self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.tryGoAway)
 		{
-			self.obPages()[0].data.tryGoAway(type).then(function(result)
+			self.obPages()[0].data.tryGoAway(getTitleByName(type)).then(function(result)
 			{
 				if (result)
 				{
@@ -246,13 +292,25 @@
 		}
 		else if (self.obFieldTripEditPage() && self.obFieldTripEditPage().obEntityDataModel() && self.obFieldTripEditPage().tryGoAway)
 		{
-			self.obFieldTripEditPage().tryGoAway(type).then(function(result)
+			self.obFieldTripEditPage().tryGoAway(getTitleByName(type)).then(function(result)
 			{
 				if (result)
 				{
 					tf.pageManager.obFieldTripEditPage(null);
 					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
 				}
+			});
+		}
+		else if(self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.detailView && self.obPages()[0].data.detailView.obEditing())
+		{
+			self.showConfirmation("Do you want to close " + getTitleByType(self.obPages()[0].data.type) + " detail view without saving?")
+			.then(function(result)
+			{
+				if (result)
+				{
+					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
+				}
+				return;
 			});
 		}
 		else

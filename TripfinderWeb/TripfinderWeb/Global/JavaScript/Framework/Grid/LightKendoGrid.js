@@ -52,10 +52,7 @@
 
 	LightKendoGrid.prototype._excludeOnlyForFilterColumns = function functionName(gridDefintion)
 	{
-		gridDefintion.Columns = gridDefintion.Columns.filter(function(column)
-		{
-			return !column.onlyForFilter;
-		});
+		gridDefintion.Columns = gridDefintion.Columns.filter((column) => !column.onlyForFilter);
 		return gridDefintion;
 	};
 
@@ -308,12 +305,18 @@
 
 	function onKendoGridTRClickEvent(e, self)
 	{
-		self._refreshGridBlank();
-		var dataItem = self.kendoGrid.dataItem(this);
-
-		if (!isHotLink(e))
+		// click on toggle detail button, avoid select event.
+		var $row = $(e.currentTarget);
+		if ($(e.target).closest(".k-hierarchy-cell", $row).length === 0
+			&& !$row.hasClass("k-detail-row"))
 		{
-			self._onGridItemClick(dataItem, e);
+			self._refreshGridBlank();
+
+			if (!isHotLink(e))
+			{
+				const dataItem = self.kendoGrid.dataItem(this);
+				self._onGridItemClick(dataItem, e);
+			}
 		}
 	}
 
@@ -4245,6 +4248,11 @@
 				ajaxRequest.requestUrl.indexOf(filterIdUrl) >= 0)
 			{
 				ajaxRequest.abort();
+				// ajaxRequest.error(function(){
+				// 		arguments[0].status = 200;
+				// 		arguments[1] = 200;
+				// 		arguments[2] = undefined;
+				// 	});
 			}
 
 		});
@@ -4255,6 +4263,7 @@
 			},
 			function()
 			{
+				// catch exception thrown by reject.
 			}
 		);
 	}
@@ -4933,6 +4942,7 @@
 
 	LightKendoGrid.prototype.dispose = function()
 	{
+		this.$container.off('click');
 		this.onCtrlCPress.unsubscribeAll();
 		this.onCtrlSPress.unsubscribeAll();
 		this.onEnterPress.unsubscribeAll();

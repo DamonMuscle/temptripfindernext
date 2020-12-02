@@ -178,7 +178,13 @@ createNamespace("TF").getSingularOrPluralTitle = function(title, count)
 TF.isIE = (function()
 {
 	var ua = window.navigator.userAgent;
-	return ua.indexOf('MSIE ') > -1 || ua.indexOf('Trident/') > -1;
+	var matches = /Edg\/(\d{2})/g.exec(ua);
+	var isEdge = false;
+	if(matches && matches.length==2)
+	{
+		isEdge = parseInt(matches[1]) < 79;
+	}
+	return ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1 || isEdge;
 })();
 
 function getQueryString(name)

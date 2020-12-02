@@ -48,7 +48,35 @@
 			}
 		}
 	</style>
+	<script>
+		var broswerInfo = getBrowserInfo();
+		function getBrowserInfo()
+		{
+			var Sys = {}, s, ua = navigator.userAgent.toLowerCase();
+			(s = ua.match(/edge\/([\d.]+)/)) ? Sys.edge = s[1] :
+				(s = ua.match(/edg\/([\d.]+)/)) ? Sys.edge = s[1] :
+					(s = ua.match(/rv:([\d.]+)\) like gecko/)) ? Sys.ie = s[1] :
+						(s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+							(s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+								(s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+									(s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+										(s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
 
+			if (Sys.edge) return { broswer: "Edge", version: Sys.edge };
+			if (Sys.ie) return { broswer: "IE", version: Sys.ie };
+			if (Sys.firefox) return { broswer: "Firefox", version: Sys.firefox };
+			if (Sys.chrome) return { broswer: "Chrome", version: Sys.chrome };
+			if (Sys.opera) return { broswer: "Opera", version: Sys.opera };
+			if (Sys.safari) return { broswer: "Safari", version: Sys.safari };
+
+			return { broswer: "", version: "0" };
+		}
+
+		if(broswerInfo.broswer === "IE"||(broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79))
+		{
+			window.location.href = 'ie.html';
+		}
+	</script>
 	<!--  Override above variables  in local_settings.js if you want them to be different-->
 	<script>
 		var tfRegion = "US";
@@ -333,6 +361,7 @@
 
 	<!-- TODO-V2 -->
 	<script src="Global/JavaScript/ViewModel/DetailView/UserDefinedFieldHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/UserDefinedGridHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/BaseCustomGridStackViewModel.js">
 	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewViewModel.js"></script>
@@ -445,9 +474,13 @@
 	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/GridBlock.js">
 	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/UDGridRecordGridBlock.js">
+	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/MultipleGridBlock.js">
 	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/TreeListBlock.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/UDGridBlock.js">
 	</script>
 	<script
 		src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationModalViewModel.js">
@@ -464,6 +497,13 @@
 	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/SaveDataPointGroupNameViewModel.js">
 	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/UDGridEditor/UDGridEditorModalViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/UDGridEditor/UDGridEditorViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/UDGridDetailViewViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/MiniGridRightClickMenu.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/Report/BaseRunReportViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/Report/CreateReportViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Controls/Report/SpecificRecordsModalViewModel.js"></script>
@@ -483,8 +523,11 @@
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripInvoiceModalViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripInvoiceViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/AssociateRecordsViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/DetailView/MiniGridRightClickMenu.js"></script>
 	<script
 		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/SearchExistingRecordWrapper.js"></script>
+	<script
+		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/UDGridGridStackQuickAddWrapper.js"></script>
 	<script
 		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationModalViewModel.js"></script>
 	<script

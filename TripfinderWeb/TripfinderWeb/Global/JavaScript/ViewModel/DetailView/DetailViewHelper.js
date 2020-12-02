@@ -219,6 +219,7 @@
 					return "";
 				}
 				return itemObj;
+			case "UDGrid":
 			case "grid":
 				if (isNaN(h) || isNaN(x) || isNaN(y) || isNaN(w))
 				{
@@ -356,6 +357,7 @@
 					return false;
 				}
 				break;
+			case "UDGrid":
 			case "grid":
 				if (isNaN(h) || isNaN(x) || isNaN(y) || isNaN(w))
 				{
@@ -404,6 +406,38 @@
 			{
 				return !udfDataPoints.includes(p);
 			}),
+			matched = (typeof identifier === "number" ? udfDataPoints : generalPoints).filter(function(p)
+			{
+				return p[key] === identifier || (includeEntityKey && p.editType && p.editType.entityKey === identifier);
+			});
+
+		if (matched.length === 1)
+		{
+			return $.extend(true, {}, matched[0]);
+		}
+		else if (matched.length === 0)
+		{
+			console.warn(String.format("No data point for UDF id {0} found. Maybe deleted in data point json or UDF", identifier));
+		}
+		else
+		{
+			console.warn(String.format("Data point for UDF id {0} has duplicated items in data point json and UDF", identifier));
+			return $.extend(true, {}, matched[0]);
+		}
+	};
+
+	DetailViewHelper.prototype.getUDGridDataPoint = function(identifier, gridType)
+	{
+		var key = typeof identifier === "number" ? "UDFId" : "field",
+			udfDataPoints = dataPointsJSON[gridType]["User Defined"] || [],
+			DRTRSDataPoints = dataPointsJSON[gridType]["State Report Fields"] || [],
+			udfDataPoints = udfDataPoints.concat(DRTRSDataPoints),
+			card = (dataPointsJSON[gridType]["Primary Information"] || []).filter(e => e.field === 'Card'),
+			cardPoints = card && card[0] ? card[0].innerFields : [];
+		var generalPoints = [..._.flatMap(dataPointsJSON[gridType]), ...cardPoints].filter(function(p)
+		{
+			return !udfDataPoints.includes(p) || p.field == 'UDGrid';
+		}),
 			matched = (typeof identifier === "number" ? udfDataPoints : generalPoints).filter(function(p)
 			{
 				return p[key] === identifier || (includeEntityKey && p.editType && p.editType.entityKey === identifier);
@@ -552,6 +586,8 @@
 					delete descriptor.image.fileName;
 				}
 				break;
+			case "UDGrid":
+				descriptor.UDGridId = layoutItem.UDGridId;
 			case "grid":
 				descriptor.sort = layoutItem.sort;
 				descriptor.columns = layoutItem.columns;
@@ -648,6 +684,10 @@
 						UDFGuid: udf && udf.UDFGuid
 					}
 				}
+				else if (descriptor.type == 'UDGrid')
+				{
+					return column.FieldName;	// For UDGrid, FieldName is Guid (which should be unique and unchanged during lifetime in DB)
+				}
 
 				return column.FieldName;
 			});
@@ -699,12 +739,38 @@
 
 	DetailViewHelper.prototype.decompressDataBlockDescriptor = function(descriptor, gridType)
 	{
-		if (!descriptor || (!descriptor.field && !descriptor.UDFId))
+		if (!descriptor || (!descriptor.field && !descriptor.UDFId && !descriptor.UDGridFieldId && !descriptor.UDGridId))
 		{
 			return descriptor;
 		}
 
-		var originalDataPoint = this.getDataPointByIdentifierAndGrid(descriptor.UDFId || descriptor.field, gridType);
+		let originalDataPoint = null;
+
+		if (descriptor.UDGridID != null)
+		{
+			if (descriptor.UDGridFieldId == null)
+			{
+				originalDataPoint = $.extend({}, descriptor, {
+					columns: ["Name", "FileName", "Description", "Action"],
+					field: "DocumentGrid",
+					title: "Documents Grid",
+					type: "grid",
+					url: "document",
+				});
+			}
+			else
+			{
+				originalDataPoint = tf.udgHelper.getDataPointByIdentifierAndGrid(descriptor.UDGridFieldId, descriptor.UDGridID, gridType);
+			}
+		}
+		else if (descriptor.UDGridId)
+		{
+			originalDataPoint = tf.udgHelper.getDataPointByUDGridId(descriptor.UDGridId, gridType);
+		}
+		else
+		{
+			originalDataPoint = this.getDataPointByIdentifierAndGrid(descriptor.UDFId || descriptor.field, gridType);
+		}
 
 		if (!originalDataPoint)
 		{
@@ -959,16 +1025,21 @@
 				content = String(content).replace(" ", "&nbsp;").replace(/\n/g, '</br>');
 				break;
 			default:
-				if (format === "Time")
+				switch (format)
 				{
-					var start = new Date();
-					start.setHours(0, 0, content, 0);
-					content = moment(start).format("HH:mm:ss");
-				}
-				// this should be handled in "Number" type, not sure if this should still be here
-				else if (format === "Money")
-				{
-					content = "$" + parseFloat(content).toFixed(2);
+					case "Time":
+						var start = new Date();
+						start.setHours(0, 0, content, 0);
+						content = moment(start).format("HH:mm:ss");
+						break;
+					case "Money":
+						content = "$" + parseFloat(content).toFixed(2);
+						break;
+					case "Public":
+						content = content ? "Public" : "Private";
+					default:
+						break;
+
 				}
 				break;
 		}
@@ -1051,10 +1122,10 @@
 				content = cleanPhone;
 			} else if (cleanPhone.length >= 3 && cleanPhone.length <= 6)
 			{
-				content = `(${groups[1]}) ${groups[2]}`;
+				content = `(${ groups[1] }) ${ groups[2] }`;
 			} else if (cleanPhone.length >= 6 && cleanPhone.length <= 10)
 			{
-				content = `(${groups[1]}) ${groups[2]}-${groups[3]}`;
+				content = `(${ groups[1] }) ${ groups[2] }-${ groups[3] }`;
 			}
 		}
 		return content;
@@ -1198,7 +1269,7 @@
 	 */
 	DetailViewHelper.prototype.setStackBlockData = function($itemDom, item, role)
 	{
-		$itemDom.data({
+		let data = {
 			field: item.field,
 			defaultValue: item.defaultValue,
 			type: item.type,
@@ -1215,8 +1286,19 @@
 			subUrl: item.subUrl,
 			uniqueClassName: item.uniqueClassName,
 			positiveLabel: item.positiveLabel,
-			negativeLabel: item.negativeLabel
-		});
+			negativeLabel: item.negativeLabel,
+		};
+
+		if (item.UDGridFieldId != null)
+		{
+			data.UDGridField = {
+				UDGridFieldId: item.UDGridFieldId,
+				Guid: item.Guid,
+				FieldOptions: item.FieldOptions,
+			};
+		}
+
+		$itemDom.data(data);
 	};
 
 	/**
@@ -1307,17 +1389,17 @@
 				const isSingle = missingFields.length === 1;
 				const suffix = isSingle ? "" : "s";
 				const link = isSingle ? "is" : "are";
-				const fieldLabels = missingFields.map(field => `"${field.title}"`).join(", ");
+				const fieldLabels = missingFields.map(field => `"${ field.dataPointTitle }"`).join(", ");
 
-				blameMessage = `required field${suffix} ${fieldLabels} ${link} missing`;
+				blameMessage = `required field${ suffix } ${ fieldLabels } ${ link } missing`;
 			}
 		}
 
 		if (blameMessage)
 		{
-			const dataTypeName = tf.DataTypeHelper.getFormalDataTypeName(dataType);
+			const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(dataType);
 
-			errorMessage = `Cannot create a new ${dataTypeName} with current layout, because ${blameMessage}!`;
+			errorMessage = `Cannot create a new ${ dataTypeName } with current layout, because ${ blameMessage }!`;
 		}
 
 		return errorMessage;
@@ -1332,13 +1414,13 @@
 	DetailViewHelper.prototype.getQuickAddLayoutByType = function(type)
 	{
 		let self = this, getLayoutPromise = null, errMsg = "";
-		const storageKey = `grid.detailscreenlayoutid.${type}.quickadd`;
+		const storageKey = `grid.detailscreenlayoutid.${ type }.quickadd`;
 		const quickAddLayoutId = tf.storageManager.get(storageKey);
 
 		if (quickAddLayoutId)
 		{
 			getLayoutPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"),
-				{ paramData: { "@filter": `eq(Id,${quickAddLayoutId})` } })
+				{ paramData: { "@filter": `eq(Id,${ quickAddLayoutId })` } })
 				.then(res => res && res.Items[0]);
 		}
 
@@ -1347,8 +1429,8 @@
 			{
 				if (!layout)
 				{
-					const typeName = tf.DataTypeHelper.getFormalDataTypeName(type);
-					errMsg = `No quick-add layout available for ${typeName}, please select one first!`;
+					const typeName = tf.dataTypeHelper.getFormalDataTypeName(type);
+					errMsg = `No quick-add layout available for ${ typeName }, please select one first!`;
 					return tf.promiseBootbox.alert(errMsg)
 						.then(() =>
 						{
@@ -1509,7 +1591,7 @@
 	{
 		var self = this,
 			updateSource = null,
-			gridName = tf.DataTypeHelper.getGridNameByDataType(dataType),
+			gridName = tf.dataTypeHelper.getGridNameByDataType(dataType),
 			grids = self.getAllGridsAndColumns($detailView, gridName)["grids"];
 
 		$.each(grids, function(_, item)
@@ -1527,7 +1609,7 @@
 			}
 
 			kendoGrid.dataSource.data(updateSource);
-			tf.helpers.kendoGridHelper.updateGridFooter($item, updateSource.length, total);
+			tf.helpers.kendoGridHelper.updateGridFooter($item, updateSource.length, total || updateSource.length);
 		});
 	};
 
@@ -1642,7 +1724,7 @@
 						}
 					}
 					$item.data("kendoGrid").dataSource.data(preData);
-					tf.helpers.kendoGridHelper.updateGridFooter($item, preData.length, total);
+					tf.helpers.kendoGridHelper.updateGridFooter($item, preData.length, total != null ? total : preData.length);
 				});
 			});
 	};
@@ -1771,7 +1853,7 @@
 			var paramData = {
 				DataTypeID: dataTypeId,
 				RecordID: mainRecordId,
-				DBID: tf.datasourceManager.databaseId
+				databaseId: tf.datasourceManager.databaseId
 			};
 
 			tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getAssociationEndpoint(associateRecordType)), {
