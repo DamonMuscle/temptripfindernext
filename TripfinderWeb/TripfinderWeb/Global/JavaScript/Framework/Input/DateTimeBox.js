@@ -19,8 +19,8 @@
 				this.formatString = attributes.format;
 			}
 
-			this.minDate = attributes.min;
-			this.maxDate = attributes.max;
+			this.minDate = attributes.minDate;
+			this.maxDate = attributes.maxDate;
 			this.disableWeekend = attributes.disableWeekend;
 			this.inputEnable = attributes.inputEnable;
 		}

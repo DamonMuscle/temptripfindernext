@@ -10,8 +10,8 @@
 	{
 		var attr = $.extend(
 			{
-				min: DEFAULT_MIN_DATE,
-				max: DEFAULT_MAX_DATE,
+				minDate: DEFAULT_MIN_DATE,
+				maxDate: DEFAULT_MAX_DATE,
 			},
 			attributes,
 			{
