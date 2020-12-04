@@ -81,30 +81,20 @@
 				return v.toLowerCase();
 			});
 
-			if (tf.authManager.authorizationInfo.authorizationTree.userId == -999 && tf.authManager.authorizationInfo.isAdmin)
+			var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app)
 			{
-				if (!supportedProducts.includes("tfadmin"))
-				{
-					supportedProducts.push("tfadmin");
-				}
-			} else
+				return transformAppName(app)
+			});
+			supportedProducts = supportedProducts.filter(function(app)
 			{
-				var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app)
-				{
-					return transformAppName(app)
-				});
-				supportedProducts = supportedProducts.filter(function(app)
-				{
-					return accessApps.includes(app)
-				});
+				return accessApps.includes(app)
+			});
 
-				if (!accessApps.includes(TF.productName.toLowerCase()))
-				{
-					tf.entStorageManager.save("token", "");
-					location.reload();
-				}
+			if (!accessApps.includes(TF.productName.toLowerCase()))
+			{
+				tf.entStorageManager.save("token", "");
+				location.reload();
 			}
-
 
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"), {
 				paramData: {
