@@ -53,6 +53,7 @@
 		this.obInvoiceResourceId = ko.observable(1);
 		this.obInvoiceGridDataSource = ko.observableArray();
 
+		this.obNeedSave(true);
 		this.obNeedSaveTemplate(true);
 		this.obNeedSaveAndClose(!TF.isPhoneDevice);
 		this.obResourceId = ko.observable(0);
@@ -774,6 +775,10 @@
 						this.setAccountListBySchool(this.obEntityDataModel().school());
 					}
 
+					var hasEditRights = tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
+					this.obNeedSave(hasEditRights);
+					this.obNeedSaveTemplate(hasEditRights);
+					this.obNeedSaveAndClose(hasEditRights && !TF.isPhoneDevice);
 					if (this.obEntityDataModel().districtDepartmentId() && !this.hasPermissionForDistrictDepartment(this.obEntityDataModel().districtDepartmentId()))
 					{
 						$.each(this.fieldTripDistrictDepartments, function(index, item)
@@ -1316,7 +1321,7 @@
 
 		if (!this.obEntityDataModel().id() || this.obEntityDataModel().id() <= 0)
 		{
-			var currentHighestEditRight = tf.helpers.fieldTripAuthHelper.getHighestEditRightSecuredItem();
+			var currentHighestEditRight = tf.helpers.fieldTripAuthHelper.getHighestAddRightSecuredItem();
 			switch (currentHighestEditRight)
 			{
 				case "level1Requestor":

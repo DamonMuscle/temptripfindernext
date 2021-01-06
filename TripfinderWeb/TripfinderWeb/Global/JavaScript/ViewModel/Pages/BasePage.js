@@ -7,6 +7,7 @@
 		var self = this;
 		self.obShowDetailPanel = ko.observable(false);
 		self.obShowFieldTripDEPanel = ko.observable(false);
+		self.obNewRequest = ko.observable(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable());
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
 
@@ -71,12 +72,18 @@
 				break;
 			case "fieldtripde":
 				self.fieldTripDataEntry = null;
-				self.obShowFieldTripDEPanel(false);
+				if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+				{
+					self.obShowFieldTripDEPanel(false);
+				}
 				break;
 			default:
 				self.detailView = null;
 				self.fieldTripDataEntry = null;
-				self.obShowFieldTripDEPanel(false);
+				if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+				{
+					self.obShowFieldTripDEPanel(false);
+				}
 				self.obShowDetailPanel(false);
 				break;
 		}

@@ -12,6 +12,7 @@
 		this._updateEntityStatusMessage = this._updateEntityStatusMessage.bind(this);
 		this.newCopyClick = this.newCopyClick.bind(this);
 
+		this.obNeedSave = ko.observable(false);
 		this.obNeedSaveTemplate = ko.observable(false);
 		this.obNeedSaveAndClose = ko.observable(true);
 
@@ -702,7 +703,11 @@
 				if (isNew)
 				{
 					this._view.mode = "Edit";
+					var hasEditRights = tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
 					this.obMode(this._view.mode);
+					this.obNeedSave(hasEditRights);
+					this.obNeedSaveTemplate(hasEditRights);
+					this.obNeedSaveAndClose(hasEditRights);
 				}
 				PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
 				if (self.obDocumentGridViewModel())
