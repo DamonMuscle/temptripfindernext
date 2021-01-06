@@ -73,6 +73,35 @@
 			securedItemDefinition.transportationAdministrator
 		];
 
+	FieldTripAuthHelper.prototype.getFieldTripStageSecuredItems = function(id)
+	{
+		switch (id)
+		{
+			case (1):
+				return "level1Requestor";
+			case (2):
+				return "level2Administrator";
+			case (3):
+				return "level2Administrator";
+			case (4):
+				return "level3Administrator";
+			case (5):
+				return "level3Administrator";
+			case (6):
+				return "level4Administrator";
+			case (7):
+				return "level4Administrator";
+			case (98):
+				return "transportationAdministrator";
+			case (99):
+				return "transportationAdministrator";
+			case (100):
+				return "Canceled - Request Canceled";
+			case (101):
+				return "Completed - Request Completed";
+		}
+	};
+
 	function FieldTripAuthHelper()
 	{
 	}
@@ -127,23 +156,54 @@
 		return highest;
 	};
 
+	FieldTripAuthHelper.prototype.getHighestAddRightSecuredItem = function()
+	{
+		var highest;
+		allSecuredItems.some(function(item)
+		{
+			if (tf.authManager.authorizationInfo.isAuthorizedFor(item, "add"))
+			{
+				highest = item;
+				return true;
+			}
+
+			return false;
+		});
+
+		return highest;
+	};
+
 	FieldTripAuthHelper.prototype.checkFieldTripEditable = function(item)
 	{
 		if (!item || item.FieldTripStageId == null) return false;
 		if (tf.authManager.authorizationInfo.isAdmin) return true;
-		var securedItems = stageSecuredItemsMap[item.FieldTripStageId] || [];
-		return securedItems.some(function(item)
+		var securedItem = this.getFieldTripStageSecuredItems(item.FieldTripStageId) ;
+		return tf.authManager.authorizationInfo.isAuthorizedFor(securedItem,"edit");
+	};
+
+	FieldTripAuthHelper.prototype.checkFieldTripAddable = function()
+	{
+		if (!tf.authManager.authorizationInfo) return false;
+		if (tf.authManager.authorizationInfo.isAdmin) return true;
+		var hasAddRight = false;
+		var securedItems = tf.authManager.authorizationInfo.authorizationTree.securedItems||[] ;
+		for(var item in securedItems)
 		{
-			return editableRights.some(function(right)
+			if(allSecuredItems.indexOf(item) != -1)
 			{
-				return tf.authManager.authorizationInfo.isAuthorizedFor(item, right);
-			});
-		});
+				hasAddRight =  tf.authManager.authorizationInfo.isAuthorizedFor(item,"add");
+				if(hasAddRight)
+				{
+					return hasAddRight;
+				}
+			}
+		}
+		return hasAddRight;
 	};
 
 	FieldTripAuthHelper.prototype.checkFieldTripsEditable = function(items)
 	{
-		return items && items.length && items.every(this.checkFieldTripEditable);
+		return items && items.length && items.every(this.checkFieldTripEditable, this);
 	};
 
 	FieldTripAuthHelper.prototype.getAccessableStageIds = function()

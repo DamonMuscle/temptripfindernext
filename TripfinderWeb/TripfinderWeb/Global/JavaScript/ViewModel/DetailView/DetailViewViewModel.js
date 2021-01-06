@@ -939,6 +939,7 @@
 
 				self.recordEntity = recordEntity;
 
+				self.obIsReadOnly(!tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(self.recordEntity));
 				var recordPic = recordEntity.RecordPicture;
 				self.obRecordPicture(recordPic && recordPic !== 'None' ? 'url(data:' + recordPic.MimeType + ';base64,' + recordPic.FileContent : "");
 				self.updateDetailViewTitle(recordEntity);

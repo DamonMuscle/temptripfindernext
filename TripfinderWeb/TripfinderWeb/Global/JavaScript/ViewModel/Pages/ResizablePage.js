@@ -357,7 +357,10 @@
 				if ((!self.obRightData() || self.obRightData().pageType === "detailview") && self.leftPageType !== "reports")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
-					newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
+					if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+					{
+						newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
+					}
 					pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
 
 					if (self.obRightData())
@@ -372,7 +375,10 @@
 						{
 							pageTitle.css({ "display": "none", "width": "100%" });
 							pageHeader.css({ "height": "56px" });
-							newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
+							if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+							{
+								newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
+							}
 						});
 						$(document).on("mousemove.newRequestHover", function(e)
 						{
@@ -389,7 +395,10 @@
 					else
 					{
 						pageTitle.css({ "display": "block", "width": "auto" });
-						newRequest.css({ "display": "block" });
+						if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+						{
+							newRequest.css({ "display": "block" });
+						}
 					}
 				} else
 				{
