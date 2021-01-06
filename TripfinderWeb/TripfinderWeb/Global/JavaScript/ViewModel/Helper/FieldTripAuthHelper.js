@@ -73,7 +73,7 @@
 			securedItemDefinition.transportationAdministrator
 		];
 
-		FieldTripAuthHelper.prototype.getFieldTripStageSecuredItems = function(id)
+	FieldTripAuthHelper.prototype.getFieldTripStageSecuredItems = function(id)
 	{
 		switch (id)
 		{
