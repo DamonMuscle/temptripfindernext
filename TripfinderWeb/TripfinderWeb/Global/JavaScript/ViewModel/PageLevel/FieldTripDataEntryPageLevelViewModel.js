@@ -78,7 +78,7 @@
 		// 	}
 		// }
 
-		if (self.fieldTripDE.obIsInvoiceRequired && self.fieldTripDE.obInvoiceGridDataSource().length === 0)
+		if (self.fieldTripDE.obIsInvoiceRequired() && self.fieldTripDE.obInvoiceGridDataSource().length === 0)
 		{
 			validationErrors.push({ message: "Invoice Information is required.", field: $form.find(".gridController.invoice-grid") });
 		}
