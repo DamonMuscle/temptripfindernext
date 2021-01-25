@@ -78,7 +78,7 @@
 		switch (id)
 		{
 			case (1):
-				return "level1Requestor";
+				return allSecuredItems;
 			case (2):
 				return "level2Administrator";
 			case (3):
@@ -177,8 +177,22 @@
 	{
 		if (!item || item.FieldTripStageId == null) return false;
 		if (tf.authManager.authorizationInfo.isAdmin) return true;
-		var securedItem = this.getFieldTripStageSecuredItems(item.FieldTripStageId) ;
-		return tf.authManager.authorizationInfo.isAuthorizedFor(securedItem,"edit");
+		let securedItem = this.getFieldTripStageSecuredItems(item.FieldTripStageId);
+		if (Array.isArray(securedItem))
+		{
+			let flag = false;
+			for (let i in securedItem)
+			{
+				flag = tf.authManager.authorizationInfo.isAuthorizedFor(securedItem[i],"edit");
+				if (flag) break;
+			}
+
+			return flag;
+		}
+		else
+		{
+			return tf.authManager.authorizationInfo.isAuthorizedFor(securedItem,"edit");
+		}
 	};
 
 	FieldTripAuthHelper.prototype.checkFieldTripAddable = function()
