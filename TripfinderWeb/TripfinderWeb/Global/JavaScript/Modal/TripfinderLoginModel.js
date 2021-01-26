@@ -311,7 +311,7 @@
 						this.loginViewModel.obLoginErrorMessage(message);
 					} else
 					{
-						this.loginViewModel.obLoginErrorMessage('Error connecting to API.');
+						this.loginViewModel.obLoginErrorMessage(apiResponse.Message);
 					}
 				}
 			}.bind(this));

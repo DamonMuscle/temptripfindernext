@@ -356,6 +356,20 @@
 							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
 								updateDataSourcePromise = Promise.resolve(true);
 
+							var openDb = function()
+							{
+								// Temporary changes to skip data source selection RW-4351
+								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases")).then(function(response)
+								{
+									if (response.Items.length >= 1)
+									{
+										var item = response.Items[0];
+										item.Icon = "iconbutton current datasource-icon";
+										return tf.datasourceManager.choose(item, true);
+									}
+								});
+							};
+
 							if (dbIdSuppliedInUrl)
 							{
 								var dbIdInUrlValue = parseInt(tf.urlParm.DB),
@@ -363,6 +377,12 @@
 
 								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
 							}
+							else if (!tf.datasourceManager.databaseId || !Enumerable.From(tf.datasourceManager.datasources).Any(function(c) { return c.DBID == tf.datasourceManager.databaseId }))
+							{
+								tf.datasourceManager.clearDBInfo();
+								return openDb();
+							}
+
 							else if (!tf.storageManager.get("datasourceId"))
 							{
 								updateDataSourcePromise = tf.datasourceManager.getAllValidDBs()

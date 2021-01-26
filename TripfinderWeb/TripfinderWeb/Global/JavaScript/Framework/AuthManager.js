@@ -84,11 +84,12 @@
 
 	AuthManager.prototype.auth = function(loginViewModal)
 	{
+		let self = this; 
 		var prefix = tf.storageManager.prefix;
 		prefix = prefix.split('.')[0];
 		
 		var p = null;
-		if (this._hasLoggedin)
+		if (self._hasLoggedin)
 		{
 			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 				paramData: {
@@ -102,7 +103,7 @@
 				overlay: false
 			}).then(function()
 			{
-				var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), this.clientKey, "timezonetotalminutes"), {}, {
+				var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), self.clientKey, "timezonetotalminutes"), {}, {
 					auth: {
 						noInterupt: true
 					},
@@ -115,7 +116,7 @@
 						var now = moment().utcOffset(apiResponse.Items[0]);
 						return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 					};
-					if (this.clientKey !== "support" && (!loginViewModal || !loginViewModal.type || loginViewModal.type !== TF.productName))
+					if (self.clientKey !== "support")
 					{
 						return tf.datasourceManager.validateAllDBs()
 							.then(function(valResult)
@@ -123,22 +124,21 @@
 								if (!valResult.Items[0].AnyDatabasePass)
 								{
 									//all db connection failed
-									var message = "None of your Data Sources can be loaded.  If you continue to experience issues, contact your Transfinder Project Manager or your Support Representative (support@transfinder.com or 888-427-2403).";
-									return this._loginUseModal(loginViewModal, message);
+									return self._loginUseModal(loginViewModal, valResult.Items[0].ErrorMessage);
 								}
-							}.bind(this));
+							});
 					}
-				}.bind(this));
+				});
 				return Promise.all([p1]);
-			}.bind(this))
+			})
 				.catch(function()
 				{
 					return Promise.resolve(false);
-				}.bind(this))
+				})
 
 		} else
 		{
-			p = this._loginUseModal(loginViewModal);
+			p = self._loginUseModal(loginViewModal);
 		}
 		return p.then(function(result)
 		{
@@ -160,45 +160,45 @@
 				})
 				.then(function(apiResponse)
 				{
-					this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
+					self.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
 					tf.userEntity = apiResponse.Items[0].UserEntity;
 					return tf.authManager.getPurchasedProducts()
 						.then(function(purchasedProducts)
 						{
 							if (purchasedProducts.indexOf("Tripfinder") === -1)
 							{
-								return this._loginUseModal(loginViewModal);
+								return self._loginUseModal(loginViewModal);
 							}
 
-							var ft1 = this.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
-							var ft2 = this.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
-							var ft3 = this.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
-							var ft4 = this.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
-							var ft5 = this.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
+							var ft1 = self.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
+							var ft2 = self.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
+							var ft3 = self.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
+							var ft4 = self.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
+							var ft5 = self.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
 							var ft = ft1 || ft2 || ft3 || ft4 || ft5;
 
-							var flt = this.authorizationInfo.isAuthorizedFor("filters", "read");
+							var flt = self.authorizationInfo.isAuthorizedFor("filters", "read");
 
-							var pfiledtrip = this.authorizationInfo.isAuthorizedFor("filedtrip", "read");
+							var pfiledtrip = self.authorizationInfo.isAuthorizedFor("filedtrip", "read");
 
 							if (!(ft || pfiledtrip))
 							{
-								return this._loginUseModal(loginViewModal);
+								return self._loginUseModal(loginViewModal);
 							}
 
 							tf.entStorageManager.save("isLoggedin", true);
-							this._hasLoggedin = true;
-							this.obIsLogIn(true);
-						}.bind(this));
+							self._hasLoggedin = true;
+							self.obIsLogIn(true);
+						});
 
-				}.bind(this)).catch(function(apiResponse) { 
+				}).catch(function(apiResponse) { 
 					if (apiResponse.StatusCode == 401)
 					{
-						return this._loginUseModal(loginViewModal,"Have no permission to this product");
+						return self._loginUseModal(loginViewModal,"Have no permission to this product");
 					}
-				}.bind(this));
+				});
 
-		}.bind(this));
+		});
 	};
 
 	AuthManager.prototype._loginUseModal = function(loginViewModal, message)
