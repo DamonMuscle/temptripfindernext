@@ -148,6 +148,16 @@
 	{
 		var self = this,
 			outputTypes = tf.exagoReportDataHelper.getAllOutputTypes(),
+			dataSources = tf.datasourceManager.datasources.map(function(item)
+			{
+				var obj = {
+					name: item.Name,
+					id: item.DBID,
+					version: item.DBVersion
+				};
+
+				return obj;
+			}),
 			specifyRecordMethods = tf.exagoReportDataHelper.getAllSpecifyRecordMethods();
 
 		// fields for storing current settings (for comparison in observable to trigger change event)
@@ -168,16 +178,7 @@
 			return !!self.obSelectedOutputType() ? self.obSelectedOutputType().text : "";
 		});
 
-		self.obDataSourceOptions = ko.observableArray();
-		tf.datasourceManager.getAllValidDBs().then((dataSources)=>{
-			self.obDataSourceOptions(
-				dataSources.map((item)=>({
-					name: item.Name,
-					id: item.DBID,
-					version: item.DBVersion
-				})
-			));
-		});
+		self.obDataSourceOptions = ko.observableArray(dataSources);
 		self.obSelectedDataSource = ko.observable(null);
 		self.obSelectedDataSourceText = ko.pureComputed(function()
 		{
