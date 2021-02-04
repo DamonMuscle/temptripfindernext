@@ -22,7 +22,7 @@
 
 	DataSourceChangeViewModel.prototype.init = function(model, element)
 	{
-		tf.datasourceManager.getAllValidDBs()
+		tf.datasourceManager.getAllDataSources()
 			.then(function(datasources)
 			{
 				var datasource = Enumerable.From(datasources).Where(function(c)

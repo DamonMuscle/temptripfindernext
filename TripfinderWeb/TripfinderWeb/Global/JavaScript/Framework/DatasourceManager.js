@@ -17,13 +17,14 @@
 	}
 
 	// Provide a dedicated method for retrieving all valid datasources (for current authInfo context)
-	DatasourceManager.prototype.getAllValidDBs = function()
+	DatasourceManager.prototype.getAllDataSources = function()
 	{
+		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases"))
 			.then(function(response)
 			{
-				var dataSources = response && Array.isArray(response.Items) ? response.Items : [];
-				return dataSources;
+				self.datasources = response && Array.isArray(response.Items) ? response.Items : [];
+				return self.datasources;
 			});
 	};
 
@@ -35,8 +36,9 @@
 		if (!databaseId)
 		{
 			self.navbarDisplay(false);
-			return Promise.resolve(true);//no datasource, but still could login.
+			return Promise.resolve(false);//no datasource, but still could login.
 		}
+
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications?dbid=" + databaseId))
 			.then(function(result)
 			{
@@ -222,16 +224,6 @@
 			$item.css("display", state ? "block" : "none");
 		}
 	}
-
-	DatasourceManager.prototype.getDataSources = function()
-	{
-		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases"))
-			.then(function(apiResponse)
-			{
-				self.datasources = apiResponse.Items;
-			});
-	};
 
 	DatasourceManager.prototype.setDatabaseInfo = function()
 	{
