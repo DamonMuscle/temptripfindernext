@@ -385,7 +385,7 @@
 
 							else if (!tf.storageManager.get("datasourceId"))
 							{
-								updateDataSourcePromise = tf.datasourceManager.getAllValidDBs()
+								updateDataSourcePromise = tf.datasourceManager.getAllDataSources()
 									.then(function(dataSources)
 									{
 										var candidateDB = dataSources.length > 0 ? dataSources[0] : {};
@@ -415,7 +415,7 @@
 									}
 								}).then(function()
 								{
-									return tf.datasourceManager.getAllValidDBs();
+									return tf.datasourceManager.getAllDataSources();
 								})
 								.then(function()
 								{
@@ -432,7 +432,7 @@
 							else
 							{
 								tf.loadingIndicator.tryHide();
-								return tf.datasourceManager.getAllValidDBs()
+								return tf.datasourceManager.getAllDataSources()
 									.then(function(dataSources)
 									{
 										if (dataSources && dataSources.length > 0)
