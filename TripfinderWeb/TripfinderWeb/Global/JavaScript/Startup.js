@@ -377,12 +377,6 @@
 
 								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
 							}
-							else if (!tf.datasourceManager.databaseId || !Enumerable.From(tf.datasourceManager.datasources).Any(function(c) { return c.DBID == tf.datasourceManager.databaseId }))
-							{
-								tf.datasourceManager.clearDBInfo();
-								return openDb();
-							}
-
 							else if (!tf.storageManager.get("datasourceId"))
 							{
 								updateDataSourcePromise = tf.datasourceManager.getAllDataSources()
@@ -406,27 +400,20 @@
 										tf.storageManager.save("databaseType", tf.datasourceManager.databaseType);
 										tf.storageManager.save("datasourceId", tf.datasourceManager.databaseId);
 										tf.storageManager.save("databaseName", tf.datasourceManager.databaseName);
-
 										return true;
 									}
 									else
 									{
 										return false;
 									}
-								}).then(function()
-								{
-									return tf.datasourceManager.getAllDataSources();
-								})
-								.then(function()
-								{
-									tf.datasourceManager.setDatabaseInfo();
-									return true;
 								});
 						})
 						.then(function(validateResult)
 						{
 							if (validateResult === true)
 							{
+								tf.datasourceManager.getAllDataSources();
+								tf.datasourceManager.setDatabaseInfo();
 								return Promise.resolve(true);
 							}
 							else
@@ -437,8 +424,17 @@
 									{
 										if (dataSources && dataSources.length > 0)
 										{
-											var message = "The Data Source requested is no longer available. Please select an active Data Source or contact your Tripfinder Administrator.";
-
+											return tf.promiseBootbox.alert({
+												message: "The Data Source requested is no longer available.Please select an active Data Source.",
+												title: "No Data Source Selected"
+											}).then(function()
+											{
+												return false;
+											});
+										}
+										else
+										{
+											var message = "There is no active Data Source available.Please contact your Tripfinder Administrator.";
 											return tf.promiseBootbox.alert({
 												message: message,
 												title: "No Data Source Selected",
@@ -451,19 +447,8 @@
 												}
 											}).then(function()
 											{
-												return false;
-											});
-										}
-										else
-										{
-											return tf.promiseBootbox.alert({
-												message: "There is no active Data Source available.",
-												title: "No Data Source Selected"
-											}).then(function()
-											{
 												tf.entStorageManager.save("token", "");
 												tf.reloadPageWithDatabaseId(null);
-
 												return null;
 											});
 										}
