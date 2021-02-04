@@ -415,7 +415,7 @@
 									}
 								}).then(function()
 								{
-									return tf.datasourceManager.getDataSources();
+									return tf.datasourceManager.getAllValidDBs();
 								})
 								.then(function()
 								{
