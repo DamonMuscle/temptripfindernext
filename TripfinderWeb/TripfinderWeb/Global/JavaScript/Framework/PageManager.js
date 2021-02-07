@@ -8,6 +8,9 @@
 		self.obContextMenuVisible = ko.observable(false);
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
+		self.currentDatabaseName.subscribe(v => {
+			$('title').html(`Tripfinder - ${v}`);
+		});
 		self.obVersion = ko.observable("Version 1.0.9999"); // DO NOT CHANGE THIS NUMBER
 		self.isTryGoAway = true;
 		self.oldPageType = "";
