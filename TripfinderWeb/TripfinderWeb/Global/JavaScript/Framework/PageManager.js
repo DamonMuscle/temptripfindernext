@@ -38,6 +38,7 @@
 			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
 			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
 			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
+			formfinder: {route: "Formfinder", title: "Formfinder", url: "Formfinder"},
 			stopfinderadmin: {route: "StopfinderAdmin", title: "StopfinderAdmin", url: "StopfinderAdmin"}
 		};
 
@@ -55,7 +56,9 @@
 			case "ffweb":
 				return 'fleetfinder';
 			case "tfweb":
-				return 'tripfinder'
+				return 'tripfinder';
+			case "formweb":
+				return 'formfinder';
 			case "vfweb":
 				return 'viewfinder';
 			case "ent":
