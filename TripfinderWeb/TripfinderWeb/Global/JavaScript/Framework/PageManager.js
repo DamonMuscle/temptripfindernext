@@ -9,7 +9,12 @@
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
 		self.currentDatabaseName.subscribe(function(v) {
-			$('title').html('Tripfinder - '+ v);
+			if(!v){
+				$('title').html('Tripfinder');
+			}else{
+				$('title').html('Tripfinder - '+ v);
+			}
+			
 		});
 		self.obVersion = ko.observable("Version 1.0.9999"); // DO NOT CHANGE THIS NUMBER
 		self.isTryGoAway = true;
