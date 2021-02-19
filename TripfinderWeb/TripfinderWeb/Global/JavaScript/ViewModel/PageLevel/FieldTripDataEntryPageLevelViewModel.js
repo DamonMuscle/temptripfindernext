@@ -2,7 +2,9 @@
 {
 	var namespace = createNamespace('TF.PageLevel');
 	namespace.FieldTripDataEntryPageLevelViewModel = FieldTripDataEntryPageLevelViewModel;
-
+	var ERROR_MESSAGE = {
+		STRICT_ACCOUNT_DEPT_ACTIVITY: "Strict account code is on, no account matches selected school and dept/activity.",
+	};
 	function FieldTripDataEntryPageLevelViewModel(fieldTripDE)
 	{
 		var self = this;
@@ -88,9 +90,14 @@
 
 	FieldTripDataEntryPageLevelViewModel.prototype.getValidationErrors = function(valid)
 	{
-		var baseValidationErrors = namespace.BasePageLevelViewModel.prototype.getValidationErrors.call(this);
-
+		var self=this,baseValidationErrors = namespace.BasePageLevelViewModel.prototype.getValidationErrors.call(this),
+		isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 		var validationErrors = [];
+		if (isStrictAccountCodeOn)
+		{
+			var strictAccountCodeErrors = self.getStrictAccountCodeErrors();
+			validationErrors = validationErrors.concat(strictAccountCodeErrors);
+		}
 		baseValidationErrors.forEach(function(error)
 		{
 			if (error.rightMessage.indexOf("must be greater than or equal to") >= 0 || error.rightMessage.indexOf("must be less than or equal to") >= 0)
@@ -103,5 +110,71 @@
 		return validationErrors;
 	};
 
+	FieldTripDataEntryPageLevelViewModel.prototype.getStrictAccountCodeErrors =  function()
+	{
+		var self = this, entity=self.fieldTripDE.obEntityDataModel();
+		var res=self.fetchMatchedAccounts(entity.districtDepartmentId(), entity.fieldTripActivityId(), entity.school());
+		var resultList = [],account = res[0];
+		if (!account)
+		{
+			resultList.push({ name: "DeptActivity", rightMessage: ERROR_MESSAGE.STRICT_ACCOUNT_DEPT_ACTIVITY,leftMessage: "", field: null});
+		}
+		else 
+		{
+			var isValid  = self.checkFieldTripInvoices(account, entity.fieldTripInvoices());
+			if (!isValid)
+			{
+				var errorMsg = `Strict account code is on, please remove any existing invoice that is not using account ${account.Code}.`;
+				resultList.push({ name: "FieldTripInvoiceGrid", rightMessage: errorMsg,leftMessage: "", field: null });
+			}
+		}
+		return resultList;
+	}
+
+	FieldTripDataEntryPageLevelViewModel.prototype.fetchMatchedAccounts = function(departmentId, activityId, schoolCode)
+	{
+		var self = this,
+			isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
+		if (isStrictAccountCodeOn && !schoolCode)
+		{
+			return [];
+		}
+
+		var departmentFilter = departmentId ? String.format("eq(DepartmentId,{0})", departmentId) : "isnull(DepartmentId,)",
+			activityFilter = activityId ? String.format("eq(FieldTripActivityId,{0})", activityId) : "isnull(FieldTripActivityId,)",
+			schoolFilter = String.format("eq(School,{0})", schoolCode),
+			filter = String.format("eq(DBID,{0})&{1}&{2}&{3}",
+				tf.datasourceManager.databaseId,
+				departmentFilter,
+				activityFilter,
+				schoolFilter
+			);
+		var accountsResponse= tf.ajax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"),
+			{
+				paramData: {
+					"@fields": "Id,Code",
+					"@filter": filter,
+					"@relationships": "Department,Activity"
+				}
+			});
+		if (accountsResponse&&accountsResponse.Items)
+		{
+			return accountsResponse.Items;
+		}
+		else
+		{
+			return [];
+		}
+	};
+
+	FieldTripDataEntryPageLevelViewModel.prototype.checkFieldTripInvoices = function(account, invoices)
+	{
+		var fetchAccount = account ? account:
+			this.fetchMatchedAccounts()[0];
+			return fetchAccount && (invoices || []).every(function(item)
+			{
+				return item.FieldTripAccountId === acc.Id;
+			});
+	};
 })();
 
