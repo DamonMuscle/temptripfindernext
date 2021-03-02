@@ -36,6 +36,7 @@
 		self.eventNameSpace = ".lightgridstack" + Math.random().toString(36).substring(7);
 		self.init(el, options.gridstackOptions);
 		self.initEvents();
+		self.currentBlockUniqueClassName = '';
 	}
 
 	/**
@@ -82,9 +83,43 @@
 	LightGridStack.prototype.initEvents = function()
 	{
 		var self = this;
+		
+		function updateBlocks(data)
+		{
+			let highlightBlocks = self.detailView.dataPointPanel.highlightBlocks();
+			highlightBlocks.forEach(block =>
+			{
+				data.items.forEach(item =>
+				{
+					if (item.ownedBy)
+					{
+						if (item.type === 'tab')
+						{
+							item.dataSource.forEach(data =>
+							{
+								data.items.forEach(el =>
+								{
+									if (el.uniqueClassName === block.uniqueClassName)
+									{
+										block.ownedBy = item.ownedBy;
+									}
+								})
+							})
+						} else if (item.uniqueClassName === block.uniqueClassName)
+						{
+							block.ownedBy = item.ownedBy;
+						} 
+					}
+				})
+			});
+			self.detailView.dataPointPanel.highlightBlocks(highlightBlocks);
+		}
 		self.toggleSectionHeaderEvent.subscribe(function(e, v)
 		{
-			self.addStackBlocks(self.serializeLayout(v));
+			self.removeBlockField = [];
+			let data = self.serializeLayout(v);
+			updateBlocks(data);
+			self.addStackBlocks(data);
 
 			self.detailView.highlightRequiredFieldByAsterisk();
 
@@ -115,9 +150,17 @@
 		self.$wrapper.on("removed", function(e)
 		{
 			var $removingBlock = $(".data-point.dragging-helper.removing .dragging-helper-wrapper").find(">.grid-stack-item");
-			if ($removingBlock.length == 0) return;
+			if ($removingBlock.length == 0){
+				self.updateHighlightBlocks(null, self.removeBlockField);
+				return;
+			} 
 
 			var className = self.detailViewHelper.getDomUniqueClassName($removingBlock);
+
+			let removeBlock = $removingBlock.hasClass('section-header-stack-item') && $removingBlock.find('.caret.up').length === 0 ?
+			[] : self.dataBlocks.filter(block => block.uniqueClassName === className);
+			let removeField = arr => arr.reduce((acc, item) => acc.concat(item.nestedGridStacks ? removeField(item.nestedGridStacks) : (item.dataBlocks || item)), []);
+			self.updateHighlightBlocks(null, removeField(removeBlock));
 
 			self.dataBlocks = self.dataBlocks.filter(function(block)
 			{
@@ -323,6 +366,7 @@
 			height: options.h
 		});
 		options.uniqueClassName = block.uniqueClassName;
+		self.currentBlockUniqueClassName = block.uniqueClassName;
 		self.detailViewHelper.setStackBlockData(block.$el, options);
 		self.dataBlocks.push(block);
 
@@ -905,6 +949,7 @@
 				config = [config];
 			}
 
+			let addBlockFields = [];
 			config.forEach(function(item)
 			{
 				item = self.detailViewHelper.decompressDataBlockDescriptor(item, self.detailView.gridType);
@@ -913,14 +958,66 @@
 
 				self._addDataBlocks(item);
 				self.updateDataBlocks(self.$wrapper.find("." + item.uniqueClassName));
+				if (item.field)
+				{
+					item.uniqueClassName = self.currentBlockUniqueClassName;
+					addBlockFields.push(item);
+				}
 			});
 
+			self.updateHighlightBlocks(addBlockFields, null);
 			self.startUpdateAfterAddBlock = false;
 			self.detailViewHelper.updateSectionHeaderTextInputWidth(undefined, self.$wrapper);
 
 			self.triggerTabContentChange();
 		}
 	};
+
+	LightGridStack.prototype.updateHighlightBlocks = function(addFields, removeField)
+	{
+		if (!!addFields)
+		{
+			this.detailView.dataPointPanel.highlightBlocks(this.detailView.dataPointPanel.highlightBlocks().concat(addFields));
+		}
+
+		if (!!removeField)
+		{
+			let blocks = this.detailView.dataPointPanel.highlightBlocks();
+			if (Array.isArray(removeField))
+			{
+				removeField.forEach(item =>
+				{
+					let type = item.type || item.options.type;
+					let isSectionHeader = type === 'section-header';
+					if (isSectionHeader)
+					{
+						blocks = blocks.filter(e => !(e.ownedBy === item.uniqueClassName));
+					} else
+					{
+						let i = blocks.findIndex(e => e.uniqueClassName === item.uniqueClassName
+							|| e.ownedBy === item.uniqueClassName);
+						if (i > -1)
+						{
+							blocks.splice(i, 1);
+						}
+					}
+				});
+			} else
+			{
+				let uniqueClassName = removeField.uniqueClassName || removeField.options.uniqueClassName;
+				let i = blocks.findIndex(item => item.uniqueClassName === uniqueClassName);
+				if (removeField.options && removeField.options.type === 'section-header')
+				{
+					blocks = blocks.filter(item => !(item.ownedBy === removeField.uniqueClassName));
+				} else if (i > -1)
+				{
+					blocks.splice(i, 1);
+				}
+			}
+			this.detailView.dataPointPanel.highlightBlocks(blocks);
+		}
+		this.detailView.dataPointPanel.updateColumns();
+	}
 
 	/**
 	 * for nested grid stack only.
@@ -1544,6 +1641,26 @@
 	LightGridStack.prototype.onDataBlockDragStop = function(e, helper)
 	{
 		this.updateDragHandlerStatus();
+		if ($(e.target).hasClass('tab-strip-stack-item'))
+		{
+			let $blocks = $(e.target).find('[class^="grid-unique-"]');
+			if ($blocks.length === 0)
+			{
+				$blocks = $(e.target).find('.section-header-stack-item');
+			}
+			this.removeBlockField = [];
+			$blocks.each((index, item) =>
+			{
+				this.removeBlockField.push($(item).data());
+			})
+		} else if ($(e.target).hasClass('section-header-stack-item'))
+		{
+			this.removeBlockField = $(e.target).find('.caret.up').length === 0 ? [] : this.detailView.dataPointPanel.highlightBlocks().filter(el => $(e.target).hasClass(el.ownedBy));
+		}
+		else
+		{
+			this.removeBlockField = $(`.${this.detailViewHelper.getDomUniqueClassName($(e.target).context)}`).data();
+		}
 	};
 
 	LightGridStack.prototype.onDataBlockDragStart = function(e, helper)
@@ -1688,6 +1805,8 @@
 				return !isLine && block.uniqueClassName == self.detailViewHelper.getDomUniqueClassName($item)
 			});
 
+		this.removeBlockField = block.nestedGridStacks ? block.nestedGridStacks.reduce((acc, item) => acc.concat(item.dataBlocks), []) : $item.hasClass('section-header-stack-item') && $target.find('.caret.up').length === 0 ? [] : block;
+		
 		if (block instanceof TF.DetailView.DataBlockComponent.TabStripBlock)
 		{
 			block.disableTabStatus();
@@ -1784,6 +1903,8 @@
 		}
 
 		self.addStackBlocks(self.serializeLayout());
+		self.detailView.dataPointPanel.updateHighlightBlocks(self.serializeLayout().items);
+		self.detailView.dataPointPanel.updateColumns();
 		self.triggerTabContentChange();
 	};
 

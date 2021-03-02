@@ -35,11 +35,16 @@
 												minHeight:$parents[1].getMinHeight($data),
 												minWidth:$parents[1].getMinWidth($data)
 											},
-											css:{'with-tabblock': $data['hasTabBlock'], 'required': $data['isRequired']}"
+											css:{'with-tabblock': $data['hasTabBlock'], 'required': $data['isRequired'], 'block-highlight': $data['hasHighlight']}"
 										class="data-point-item">
 								<i class="asterisk">*</i>
 								<span class="title" data-bind="text:title"></span>
 								<span class="folder" data-bind="click:$parents[1].openGroupMenu"></span>
+								<!-- ko if: $data['multiCount'] > 1 -->
+								<span class="count-notice">
+									<span data-bind="text:$data.multiCount"></span>
+								</span>
+								<!-- /ko -->
 							</span>
 							<!-- /ko -->
 							<!-- /ko -->

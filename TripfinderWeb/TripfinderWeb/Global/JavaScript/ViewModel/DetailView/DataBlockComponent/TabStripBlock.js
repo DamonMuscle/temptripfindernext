@@ -378,6 +378,7 @@
 							tabStrip.select(index < 1 ? 0 : index - 1);
 						}
 
+						self.detailView.dataPointPanel.removeTab(self.nestedGridStacks[index].dataBlocks);
 						self.nestedGridStacks[index].dispose();
 						self.nestedGridStacks.splice(index, 1);
 						tabStrip._scrollable();

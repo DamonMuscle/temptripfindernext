@@ -1430,7 +1430,7 @@
 					el.data('_gridstack_node', node);
 					el.data('_gridstack_node_orig', origNode);
 
-					el.on('drag', onDrag);
+					el.off('drag').on('drag', onDrag);
 				})
 				.on(self.container, 'dropout', function(event, ui)
 				{

@@ -1791,6 +1791,7 @@
 						}
 					}, 50);
 				}
+				self.dataPointPanel.updateDataPoints(self._getLayoutObjInCache().items);
 			});
 	};
 

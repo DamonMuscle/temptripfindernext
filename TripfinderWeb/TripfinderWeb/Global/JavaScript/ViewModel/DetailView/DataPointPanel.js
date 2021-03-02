@@ -45,6 +45,7 @@
 		self.updateDataPoints();
 
 		self.obFilterPlaceHolderText = ko.observable("Filter Data Blocks...");
+		self.highlightBlocks = ko.observableArray([]);
 	}
 
 	/**
@@ -410,7 +411,7 @@
 		return '';
 	};
 
-	DataPointPanel.prototype.updateDataPoints = function()
+	DataPointPanel.prototype.updateDataPoints = function(blocks)
 	{
 		var self = this,
 			dataPointGroup,
@@ -420,6 +421,7 @@
 			dataPointsForCurrentPage = dataPointsJSON[self.gridType];
 
 		self.pageTitle(tf.applicationTerm.getApplicationTermPluralByName(dataTypeName).toUpperCase());
+		self.updateHighlightBlocks(blocks);
 
 		return Promise.all([
 			self.userDefinedFieldHelper.get(self.gridType),
@@ -485,6 +487,19 @@
 						if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
 						{
 							c.isRequired = true;
+						}
+						let existBlocks = c.field === 'UDGridId' ?
+							self.highlightBlocks().filter(el => el.UDGridId === c.UDGridId) :
+							c.UDFId ? self.highlightBlocks().filter(el => el.UDFId === c.UDFId) :
+							self.highlightBlocks().filter(el => el.field === c.field);
+						if (existBlocks.length > 0)
+						{
+							c.hasHighlight = true;
+							c.multiCount = existBlocks.length;
+						} else
+						{
+							c.hasHighlight = false;
+							c.multiCount = 0;
 						}
 						return c;
 					}))
@@ -1408,6 +1423,132 @@
 
 		return dataPoint;
 	};
+
+	DataPointPanel.prototype.updateColumns = function()
+	{
+		if (!this.$element) return;
+		let blocks = this.$element.find('.data-point-container .data-point-item');
+		if (blocks.length === 0) return;
+
+		blocks.each((index, element) =>
+		{
+			let $e = $(element);
+			let $o = $e.find(".count-notice");
+			let existBlocks = this.highlightBlocks().filter(el =>
+			{
+				let UDFGridId = $e.attr('UDGridId');
+				let UDFId = $e.attr('UDFId');
+				if (!!UDFGridId && !!el.UDGridId)
+				{
+					return el.UDGridId === parseInt(UDFGridId);
+				}
+				if (!!UDFId && !!el.UDFId)
+				{
+					return el.UDFId === parseInt(UDFId);
+				}
+				return el.field === $e.attr('field');
+			});
+			let length = existBlocks.length;
+			if (length > 1)
+			{
+				if (!$e.hasClass('block-highlight'))
+				{
+					$e.addClass('block-highlight');
+				}
+				if ($o.length === 0)
+				{
+					$e.append(`<span class="count-notice">
+						<span>${length}</span>
+					</span>`);
+				} else
+				{
+					$o.find("> span").html(length);
+				}
+				$o.show();
+			} else if (length === 1)
+			{
+				$e.addClass("block-highlight");
+				$o.hide();
+			} else
+			{
+				$e.removeClass("block-highlight");
+				$e.find('.count-notice').remove();
+			}
+
+			// special case for manage layout
+			$('.block-highlight').each((index, ele) =>
+			{
+				let $ele = $(ele);
+				if ($ele.attr('title') === $e.attr('title'))
+				{
+					if (length === 0)
+					{
+						$ele.removeClass("block-highlight");
+						$ele.find('.count-notice').remove();
+					} else if (length === 1)
+					{
+						if (!$ele.hasClass('block-highlight'))
+						{
+							$ele.addClass('block-highlight');
+						}
+						$ele.find('.count-notice').remove();
+					} else if (length > 1)
+					{
+						if (!$ele.hasClass('block-highlight'))
+						{
+							$ele.addClass('block-highlight');
+						}
+						$ele.find('.count-notice > span').html(length);
+					}
+				}
+			})
+		});
+	}
+
+
+	DataPointPanel.prototype.updateHighlightBlocks = function(blocks)
+	{
+		if (!blocks) return;
+
+		let arr = [];
+		blocks.forEach(block =>
+		{
+			if (block.type === 'tab')
+			{
+				let list = block.dataSource.reduce((acc, item) => acc.concat(item.items), []);
+				list.forEach(item =>
+				{
+					if (block.ownedBy)
+					{
+						item.ownedBy = block.ownedBy;
+					}
+					arr.push(item);
+				});
+			} else
+			{
+				arr.push(block);
+			}
+		});
+		this.highlightBlocks(arr);
+		this.updateColumns();
+	}
+
+	DataPointPanel.prototype.removeTab = function(removeBlocks)
+	{
+		let blocks = this.highlightBlocks();
+		removeBlocks.forEach(block =>
+		{
+			if (block instanceof TF.DetailView.DataBlockComponent.SectionHeaderBlock)
+			{
+				blocks = blocks.filter(e => e.ownedBy !== block.options.uniqueClassName);
+			} else
+			{
+				blocks.splice(blocks.findIndex(e => e.uniqueClassName === block.options.uniqueClassName), 1);
+			}
+		});
+		this.highlightBlocks(blocks);
+		this.updateColumns();
+	}
 
 	/**
 	 * The dispose function.
