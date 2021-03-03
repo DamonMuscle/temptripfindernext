@@ -99,13 +99,13 @@
 							{
 								data.items.forEach(el =>
 								{
-									if (el.uniqueClassName === block.uniqueClassName)
+									if (el.uniqueClassName === block.uniqueClassName || (el.field === 'Map' && el.field === block.field))
 									{
 										block.ownedBy = item.ownedBy;
 									}
 								})
 							})
-						} else if (item.uniqueClassName === block.uniqueClassName)
+						} else if (item.uniqueClassName === block.uniqueClassName || (item.field === 'Map' && item.field === block.field))
 						{
 							block.ownedBy = item.ownedBy;
 						} 
@@ -151,17 +151,10 @@
 		{
 			var $removingBlock = $(".data-point.dragging-helper.removing .dragging-helper-wrapper").find(">.grid-stack-item");
 			if ($removingBlock.length == 0){
-				self.updateHighlightBlocks(null, self.removeBlockField);
 				return;
 			} 
 
 			var className = self.detailViewHelper.getDomUniqueClassName($removingBlock);
-
-			let removeBlock = $removingBlock.hasClass('section-header-stack-item') && $removingBlock.find('.caret.up').length === 0 ?
-			[] : self.dataBlocks.filter(block => block.uniqueClassName === className);
-			let removeField = arr => arr.reduce((acc, item) => acc.concat(item.nestedGridStacks ? removeField(item.nestedGridStacks) : (item.dataBlocks || item)), []);
-			self.updateHighlightBlocks(null, removeField(removeBlock));
-
 			self.dataBlocks = self.dataBlocks.filter(function(block)
 			{
 				return block.uniqueClassName !== className;
@@ -989,13 +982,15 @@
 				{
 					let type = item.type || item.options.type;
 					let isSectionHeader = type === 'section-header';
+					let field = item.field || (item.options && item.options.field || (e.field === 'Map' && e.field === field));
 					if (isSectionHeader)
 					{
 						blocks = blocks.filter(e => !(e.ownedBy === item.uniqueClassName));
 					} else
 					{
 						let i = blocks.findIndex(e => e.uniqueClassName === item.uniqueClassName
-							|| e.ownedBy === item.uniqueClassName);
+							|| e.ownedBy === item.uniqueClassName
+							|| (e.field === 'Map' && e.field === field));
 						if (i > -1)
 						{
 							blocks.splice(i, 1);
@@ -1005,10 +1000,11 @@
 			} else
 			{
 				let uniqueClassName = removeField.uniqueClassName || removeField.options.uniqueClassName;
-				let i = blocks.findIndex(item => item.uniqueClassName === uniqueClassName);
+				let field = removeField.field || (removeField.options && removeField.options.field);
+				let i = blocks.findIndex(item => item.uniqueClassName === uniqueClassName || (item.field === 'Map' && item.field === field));
 				if (removeField.options && removeField.options.type === 'section-header')
 				{
-					blocks = blocks.filter(item => !(item.ownedBy === removeField.uniqueClassName));
+					blocks = blocks.filter(item => !(item.ownedBy === removeField.uniqueClassName || (item.field === 'Map' && item.field === field)));
 				} else if (i > -1)
 				{
 					blocks.splice(i, 1);
@@ -1641,26 +1637,31 @@
 	LightGridStack.prototype.onDataBlockDragStop = function(e, helper)
 	{
 		this.updateDragHandlerStatus();
-		if ($(e.target).hasClass('tab-strip-stack-item'))
+		let $target = $(e.target);
+		if (!$target.hasClass('removing')) return;
+
+		if ($target.hasClass('tab-strip-stack-item'))
 		{
-			let $blocks = $(e.target).find('[class^="grid-unique-"]');
+			let $blocks = $target.find('[class^="grid-unique-"]');
 			if ($blocks.length === 0)
 			{
-				$blocks = $(e.target).find('.section-header-stack-item');
+				$blocks = $target.find('.section-header-stack-item');
 			}
 			this.removeBlockField = [];
 			$blocks.each((index, item) =>
 			{
 				this.removeBlockField.push($(item).data());
 			})
-		} else if ($(e.target).hasClass('section-header-stack-item'))
+		} else if ($target.hasClass('section-header-stack-item'))
 		{
-			this.removeBlockField = $(e.target).find('.caret.up').length === 0 ? [] : this.detailView.dataPointPanel.highlightBlocks().filter(el => $(e.target).hasClass(el.ownedBy));
+			this.removeBlockField = $target.find('.caret.up').length === 0 ? [] : this.detailView.dataPointPanel.highlightBlocks().filter(el => $target.hasClass(el.ownedBy));
 		}
 		else
 		{
-			this.removeBlockField = $(`.${this.detailViewHelper.getDomUniqueClassName($(e.target).context)}`).data();
+			this.removeBlockField = $(`.${this.detailViewHelper.getDomUniqueClassName($target)}`).data();
 		}
+
+		this.updateHighlightBlocks(null, this.removeBlockField)
 	};
 
 	LightGridStack.prototype.onDataBlockDragStart = function(e, helper)
@@ -1806,7 +1807,7 @@
 			});
 
 		this.removeBlockField = block.nestedGridStacks ? block.nestedGridStacks.reduce((acc, item) => acc.concat(item.dataBlocks), []) : $item.hasClass('section-header-stack-item') && $target.find('.caret.up').length === 0 ? [] : block;
-		
+		this.updateHighlightBlocks(null, this.removeBlockField);
 		if (block instanceof TF.DetailView.DataBlockComponent.TabStripBlock)
 		{
 			block.disableTabStatus();
