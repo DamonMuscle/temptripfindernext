@@ -1638,7 +1638,7 @@
 	{
 		this.updateDragHandlerStatus();
 		let $target = $(e.target);
-		if (!$target.hasClass('removing')) return;
+		if (!$target.hasClass('grid-stack-item-removing')) return;
 
 		if ($target.hasClass('tab-strip-stack-item'))
 		{
