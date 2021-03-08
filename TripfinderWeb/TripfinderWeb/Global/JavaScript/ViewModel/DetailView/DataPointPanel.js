@@ -235,6 +235,7 @@
 		if (text.length === 0)
 		{
 			self.obColumns(self.allColumns);
+			this.updateColumns();
 			return;
 		}
 
@@ -269,6 +270,7 @@
 			}
 			return accumulator;
 		}, []));
+		this.updateColumns();
 	}
 
 	DataPointPanel.prototype.clearFilterClick = function(model, e)
@@ -297,6 +299,7 @@
 			self.$filterText.focus();
 			clearTimeout(self.clearFocusTimeout);
 		}
+		this.updateColumns();
 	};
 
 	//#endregion
@@ -1020,7 +1023,7 @@
 		{
 			self.initCalendar();
 		}
-		return self.updateDataPoints();
+		return self.updateDataPoints(JSON.parse(self.detailView.serializeLayout()).items);
 	};
 
 	DataPointPanel.prototype.initLines = function()
@@ -1446,7 +1449,7 @@
 				{
 					return el.UDFId === parseInt(UDFId);
 				}
-				return el.field === $e.attr('field');
+				return !!el.field && el.field === $e.attr('field');
 			});
 			let length = existBlocks.length;
 			if (length > 1)

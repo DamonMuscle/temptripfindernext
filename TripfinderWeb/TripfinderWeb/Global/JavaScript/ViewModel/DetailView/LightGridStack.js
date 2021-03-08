@@ -1135,7 +1135,7 @@
 				else
 				{
 					//no class name means new added block
-					var uniqueClassName = $el.data("uniqueClassName") || self.detailViewHelper.generateUniqueClassName();
+					var uniqueClassName = $el.data("uniqueClassName") || self.detailViewHelper.getDomUniqueClassName($el) || self.detailViewHelper.generateUniqueClassName();
 					layoutItem.uniqueClassName = uniqueClassName;
 					layoutItem.isHidden = self.isDataBlockHidden(uniqueClassName);
 					layoutItem.isCollapsed = self.isCollapsedSectionHeader(uniqueClassName);
@@ -1197,10 +1197,10 @@
 			itemType = elData["type"] || $el.attr("type"),
 			existingGroups = self.getExistingDataPointGroups(),
 			baseData = {
-				x: node.x,
-				y: node.y,
-				w: node.width,
-				h: node.height,
+				x: node && node.x,
+				y: node && node.y,
+				w: node && node.width,
+				h: node && node.height,
 				field: elData["field"] || $el.attr("field"),
 				title: elData["title"] || $el.attr("title"),
 				UDFId: elData["UDFId"] || $el.attr("UDFId"),
@@ -1658,7 +1658,9 @@
 		}
 		else
 		{
-			this.removeBlockField = $(`.${this.detailViewHelper.getDomUniqueClassName($target)}`).data();
+			let className = this.detailViewHelper.getDomUniqueClassName($target);
+			this.removeBlockField = $(`.${className}`).data();
+			this.removeBlockField.uniqueClassName = this.removeBlockField.uniqueClassName || className;
 		}
 
 		this.updateHighlightBlocks(null, this.removeBlockField)
