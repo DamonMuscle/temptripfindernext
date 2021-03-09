@@ -99,13 +99,13 @@
 							{
 								data.items.forEach(el =>
 								{
-									if (el.uniqueClassName === block.uniqueClassName || (el.field === 'Map' && el.field === block.field))
+									if (el.uniqueClassName === block.uniqueClassName || (el.field === 'Map' && el.uniqueClassName.includes(block.uniqueClassName)))
 									{
 										block.ownedBy = item.ownedBy;
 									}
 								})
 							})
-						} else if (item.uniqueClassName === block.uniqueClassName || (item.field === 'Map' && item.field === block.field))
+						} else if (item.uniqueClassName === block.uniqueClassName || (item.field === 'Map' && item.uniqueClassName.includes(block.uniqueClassName)))
 						{
 							block.ownedBy = item.ownedBy;
 						} 
@@ -982,15 +982,17 @@
 				{
 					let type = item.type || item.options.type;
 					let isSectionHeader = type === 'section-header';
-					let field = item.field || (item.options && item.options.field || (e.field === 'Map' && e.field === field));
+					let field = item.field || (item.options && item.options.field);
 					if (isSectionHeader)
 					{
-						blocks = blocks.filter(e => !(e.ownedBy === item.uniqueClassName));
+						blocks = blocks.filter(e => !(e.ownedBy === item.uniqueClassName  
+							|| (e.field === 'Map' && item.uniqueClassName.includes(e.ownedBy))));
 					} else
 					{
 						let i = blocks.findIndex(e => e.uniqueClassName === item.uniqueClassName
 							|| e.ownedBy === item.uniqueClassName
-							|| (e.field === 'Map' && e.field === field));
+							|| (e.field === 'Map'  && item.uniqueClassName.includes(e.ownedBy))
+							|| (e.field === 'Map' && item.uniqueClassName.includes(e.uniqueClassName)));
 						if (i > -1)
 						{
 							blocks.splice(i, 1);
@@ -1001,10 +1003,10 @@
 			{
 				let uniqueClassName = removeField.uniqueClassName || removeField.options.uniqueClassName;
 				let field = removeField.field || (removeField.options && removeField.options.field);
-				let i = blocks.findIndex(item => item.uniqueClassName === uniqueClassName || (item.field === 'Map' && item.field === field));
+				let i = blocks.findIndex(item => item.uniqueClassName === uniqueClassName || (item.field === 'Map' && uniqueClassName.includes(item.uniqueClassName)));
 				if (removeField.options && removeField.options.type === 'section-header')
 				{
-					blocks = blocks.filter(item => !(item.ownedBy === removeField.uniqueClassName || (item.field === 'Map' && item.field === field)));
+					blocks = blocks.filter(item => !(item.ownedBy === removeField.uniqueClassName || (item.field === 'Map' && uniqueClassName.includes(item.uniqueClassName))));
 				} else if (i > -1)
 				{
 					blocks.splice(i, 1);
@@ -1204,6 +1206,7 @@
 				field: elData["field"] || $el.attr("field"),
 				title: elData["title"] || $el.attr("title"),
 				UDFId: elData["UDFId"] || $el.attr("UDFId"),
+				UDGridId: Number(elData["UDGridId"] || $el.attr("UDGridId")),
 				type: itemType,
 				format: elData["format"] || $el.attr("format"),
 				defaultValue: elData["defaultValue"] || $el.attr("defaultValue"),
