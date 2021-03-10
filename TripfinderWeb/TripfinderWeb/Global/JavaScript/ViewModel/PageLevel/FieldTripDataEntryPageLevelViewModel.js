@@ -133,8 +133,7 @@
 
 	FieldTripDataEntryPageLevelViewModel.prototype.fetchMatchedAccounts = function(departmentId, activityId, schoolCode)
 	{
-		var self = this,
-			isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
+		var isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 		if (isStrictAccountCodeOn && !schoolCode)
 		{
 			return [];
@@ -149,22 +148,22 @@
 				activityFilter,
 				schoolFilter
 			);
-		var accountsResponse= tf.ajax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"),
+		var result = [];
+		tf.ajax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"),
+		{
+			paramData: {
+				"@fields": "Id,Code",
+				"@filter": filter,
+				"@relationships": "Department,Activity"
+			},
+			async: false
+		}).then(response => {
+			if(response && response.Items)
 			{
-				paramData: {
-					"@fields": "Id,Code",
-					"@filter": filter,
-					"@relationships": "Department,Activity"
-				}
-			});
-		if (accountsResponse&&accountsResponse.Items)
-		{
-			return accountsResponse.Items;
-		}
-		else
-		{
-			return [];
-		}
+				result = response.Items;
+			}
+		});
+		return result;
 	};
 
 	FieldTripDataEntryPageLevelViewModel.prototype.checkFieldTripInvoices = function(account, invoices)
