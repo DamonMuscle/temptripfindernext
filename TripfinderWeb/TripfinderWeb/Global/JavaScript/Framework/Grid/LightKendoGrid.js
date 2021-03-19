@@ -3073,6 +3073,14 @@
 
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
+		let paramData={
+			take: kendoOptions.data.take ? kendoOptions.data.take : 100,
+			skip: kendoOptions.data.skip ? kendoOptions.data.skip : 0,
+			getCount: this.options.getCount == false ? false : true
+		}
+		if(Object.keys(this.options.paramData).length>0){
+			Object.assign(paramData,this.options.paramData)
+		}
 		var self = this,
 			includeOnlyIds = self.getIncludeOnlyIds(),
 			excludeAnyIds = self.getExcludeAnyIds(),
@@ -3088,11 +3096,7 @@
 				};
 			}) : [],
 			options = {
-				paramData: {
-					take: kendoOptions.data.take ? kendoOptions.data.take : 100,
-					skip: kendoOptions.data.skip ? kendoOptions.data.skip : 0,
-					getCount: self.options.getCount == false ? false : true
-				},
+				paramData: paramData,
 				data: {
 					sortItems: sortItems,
 					idFilter: (includeOnlyIds || excludeAnyIds) ? {
