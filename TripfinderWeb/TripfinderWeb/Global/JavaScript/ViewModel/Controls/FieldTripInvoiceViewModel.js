@@ -10,7 +10,7 @@
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripInvoiceDataModel(option.data));
 
 		// required fields
-		this.obIsAccountNameRequired = ko.observable(true);
+		this.obIsAccountNameRequired = ko.observable(false);
 		this.obIsPurchaseOrderRequired = ko.observable(false);
 		this.obIsInvoiceDateRequired = ko.observable(false);
 		this.obIsPaymentDateRequired = ko.observable(false);
@@ -57,16 +57,16 @@
 	 */
 	FieldTripInvoiceViewModel.prototype.applyRequiredFieldSetting = function(validatorFields)
 	{
-		const { InvoiceDate, PaymentDate, PurchaseOrder } = this.requiredFields;
+		const { AccountName, InvoiceDate, PaymentDate, PurchaseOrder } = this.requiredFields;
 		const requiredValidator = {
 			trigger: "blur change",
 			validators: { notEmpty: { message: "required" } }
 		};
 
-		// currently account is always required.
-		this.obIsAccountNameRequired(true);
-		validatorFields.account = $.extend(true, {}, requiredValidator);
-
+		if (AccountName && AccountName.Required){
+			this.obIsAccountNameRequired(true);
+			validatorFields.account = $.extend(true, {}, requiredValidator);
+		}
 
 		if (InvoiceDate && InvoiceDate.Required)
 		{

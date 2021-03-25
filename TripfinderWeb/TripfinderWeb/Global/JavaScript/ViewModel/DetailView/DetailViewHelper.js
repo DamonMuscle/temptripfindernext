@@ -113,20 +113,17 @@
 				{
 					response.Items.forEach(function(item)
 					{
-						var typeKey = tf.DataTypeHelper.getKeyById(item.DataTypeID);
-						if (!self.requiredFields[typeKey])
-						{
-							self.requiredFields[typeKey] = [];
-						}
+						var typeKey = tf.DataTypeHelper.getKeyById(item.DataTypeID),
+							dataPoint = self.getDataPointByIdentifierAndGrid(item.FieldName, typeKey, true);
 
-						var dataPoint = self.getDataPointByIdentifierAndGrid(item.FieldName, typeKey, true);
+						self.requiredFields[typeKey] = self.requiredFields[typeKey] || [];
 
-						self.requiredFields[typeKey].push(
-							{
-								name: item.FieldName,
-								title: item.Label,
-								field: dataPoint && dataPoint.field
-							});
+						self.requiredFields[typeKey].push({
+							name: item.FieldName,
+							title: item.Label,
+							field: dataPoint && dataPoint.field || item.FieldName,
+							dataPointTitle: dataPoint && dataPoint.title || item.Label,
+						});
 					});
 				});
 		});

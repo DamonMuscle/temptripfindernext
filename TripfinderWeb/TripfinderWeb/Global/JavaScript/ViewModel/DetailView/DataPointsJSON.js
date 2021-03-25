@@ -1562,16 +1562,6 @@ var today = (new Date()).toDateString(),
 					"type": "Number",
 					"format": "Money",
 					"defaultValue": "0.00"
-				},
-				{
-					"field": "PurchaseOrder",
-					"title": "Purchase Order",
-					"type": "String",
-					"defaultValue": "",
-					"editType": {
-						"format": "String",
-						"maxLength": 50
-					}
 				}
 			],
 			"User Defined": [],
