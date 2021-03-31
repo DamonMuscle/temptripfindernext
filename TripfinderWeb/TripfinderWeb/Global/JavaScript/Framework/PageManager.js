@@ -149,6 +149,9 @@
 							{
 								return item.Name.toLowerCase();
 							});
+							self.applicationSwitcherList = self.applicationSwitcherList.sort(function (a, b) {
+								return self.availableApplications[a].title.localeCompare(self.availableApplications[b].title);
+							});
 						}
 					})
 			});
