@@ -332,14 +332,12 @@
 				{
 					tf.loadingIndicator.showImmediately();
 					var p1 = tf.userPreferenceManager.getAllKey();
-					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "timezonetotalminutes")).then(function(apiResponse)
+					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "timezonetotalminutes")).then(function(timeZoneResponse)
 					{
-						if (apiResponse && apiResponse.Items && apiResponse.Items[0]) tf.timezonetotalminutes = apiResponse.Items[0];
-						moment().constructor.prototype.currentTimeZoneTime = function()
+						if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
 						{
-							var now = moment().utcOffset(apiResponse.Items[0]);
-							return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
-						};
+							tf.timezonetotalminutes = timeZoneResponse.Items[0];
+						}
 					});
 					var p3 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applications"), {
 						paramData: {
@@ -353,6 +351,12 @@
 					return Promise.all([p1, p2, p3])
 						.then(function()
 						{
+							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub']);
+							TF.SignalRHelper.bindEvent('TimeZoneHub', 'update', function update(result)
+							{
+								tf.timezonetotalminutes = result;
+							});
+
 							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
 								updateDataSourcePromise = Promise.resolve(true);
 

@@ -103,38 +103,24 @@
 				overlay: false
 			}).then(function()
 			{
-				var p1 = tf.promiseAjax.get(pathCombine(tf.api.server(), self.clientKey, "timezonetotalminutes"), {}, {
-					auth: {
-						noInterupt: true
-					},
-					overlay: false
-				}).then(function(apiResponse)
+				if (self.clientKey !== "support")
 				{
-					if (apiResponse && apiResponse.Items && apiResponse.Items[0]) tf.timezonetotalminutes = apiResponse.Items[0];
-					moment().constructor.prototype.currentTimeZoneTime = function()
-					{
-						var now = moment().utcOffset(apiResponse.Items[0]);
-						return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
-					};
-					if (self.clientKey !== "support")
-					{
-						return tf.datasourceManager.validateAllDBs()
-							.then(function(valResult)
+					return tf.datasourceManager.validateAllDBs()
+						.then(function(valResult)
+						{
+							if (!valResult.Items[0].AnyDatabasePass)
 							{
-								if (!valResult.Items[0].AnyDatabasePass)
-								{
-									//all db connection failed
-									return self._loginUseModal(loginViewModal, valResult.Items[0].ErrorMessage);
-								}
-							});
-					}
-				});
-				return Promise.all([p1]);
+								//all db connection failed
+								return self._loginUseModal(loginViewModal, valResult.Items[0].ErrorMessage);
+							}
+						});
+				}
+				return Promise.resolve(true);
 			})
-				.catch(function()
-				{
-					return Promise.resolve(false);
-				})
+			.catch(function()
+			{
+				return Promise.resolve(false);
+			})
 
 		} else
 		{

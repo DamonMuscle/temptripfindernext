@@ -690,7 +690,11 @@
 						FieldName: "TheDateTime",
 						Width: '150px',
 						DisplayName: "Updated Date Time",
-						type: "datetime"
+						type: "datetime",
+						template: function(dataItem)
+						{
+							return moment(dataItem["TheDateTime"]).currentTimeZoneTimeFormat("MM/DD/YYYY hh:mm A");
+						}
 					},
 					{
 						FieldName: "UserName",

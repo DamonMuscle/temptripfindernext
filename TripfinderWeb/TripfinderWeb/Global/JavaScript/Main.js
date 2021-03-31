@@ -761,3 +761,14 @@ createNamespace("TF").fixGeometryErrorInKendo = function(data)
 		}
 	}
 };
+
+moment().constructor.prototype.currentTimeZoneTime = function()
+{
+	var now = this.utcOffset(tf.timezonetotalminutes);
+	return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
+};
+
+moment().constructor.prototype.currentTimeZoneTimeFormat = function(format)
+{
+	return this.utcOffset(tf.timezonetotalminutes).format(format ?? "");
+};
