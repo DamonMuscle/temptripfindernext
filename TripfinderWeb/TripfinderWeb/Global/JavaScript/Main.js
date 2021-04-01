@@ -770,5 +770,5 @@ moment().constructor.prototype.currentTimeZoneTime = function()
 
 moment().constructor.prototype.currentTimeZoneTimeFormat = function(format)
 {
-	return this.utcOffset(tf.timezonetotalminutes).format(format ?? "");
+	return this.utcOffset(tf.timezonetotalminutes).format(format || "");
 };
