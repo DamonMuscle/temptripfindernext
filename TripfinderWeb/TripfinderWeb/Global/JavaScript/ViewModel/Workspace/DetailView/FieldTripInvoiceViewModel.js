@@ -14,6 +14,9 @@
 		self.newEntityDataSource = options.newEntityDataSource;
 		self.originalItem = options.originalItem;
 
+		const requiredFields = tf.helpers.detailViewHelper.getRequiredFields("fieldtrip");
+		self.obIsAccountNameRequired = ko.observable(!!requiredFields.find(x => x.name === "AccountName"));
+		self.obIsPurchaseOrderRequired = ko.observable(!!requiredFields.find(x => x.name === "PurchaseOrder"));
 		self.obAccountSource = ko.observableArray(availableAccounts);
 		self.obSelectedAccount = ko.observable(defaultAccount);
 		self.obSelectedAccountName = ko.observable(defaultAccount ? defaultAccount.Code : null);
@@ -51,20 +54,53 @@
 	{
 		var self = this,
 			validatorFields = {
-				accountName: {
-					trigger: "blur change",
-					validators: {
-						callback: {
-							message: " is required",
-							callback: function()
-							{
-								var selectedAccount = self.obSelectedAccount();
-								return !!(selectedAccount && selectedAccount.Id > 0);
-							}
-						},
-					}
-				}
 			};
+
+		if (self.obIsAccountNameRequired())
+		{
+			validatorFields.accountName = {
+				trigger: "blur change",
+				validators: {
+					callback: {
+						message: " is required",
+						callback: function()
+						{
+							var selectedAccount = self.obSelectedAccount();
+							return !!(selectedAccount && selectedAccount.Id > 0);
+						}
+					},
+				}
+			}
+		}
+
+		if (self.obIsAccountNameRequired())
+		{
+			validatorFields.accountName = {
+				trigger: "blur change",
+				validators: {
+					callback: {
+						message: " is required",
+						callback: function()
+						{
+							var selectedAccount = self.obSelectedAccount();
+							return !!(selectedAccount && selectedAccount.Id > 0);
+						}
+					},
+				}
+			}
+		}
+
+		if (self.obIsPurchaseOrderRequired())
+		{
+			validatorFields.purchaseOrder = {
+				trigger: "blur change",
+				validators: {
+					notEmpty: {
+						message: 'required'
+					},
+				}
+			}
+		}
 
 		self.validator = self.$element.bootstrapValidator({
 			excluded: [".data-bv-excluded"],
@@ -96,8 +132,8 @@
 						InvoiceDate: self.obInvoiceDate(),
 						PaymentDate: self.obPaymentDate(),
 						DBID: tf.datasourceManager.databaseId,
-						FieldTripAccountId: selectAccount.Id,
-						AccountName: selectAccount.Code
+						FieldTripAccountId: selectAccount && selectAccount.Id,
+						AccountName: selectAccount && selectAccount.Code
 					});
 
 				// Manipulate mini grid data source when it is on a new field trip 

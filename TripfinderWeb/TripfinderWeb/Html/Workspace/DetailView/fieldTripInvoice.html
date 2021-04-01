@@ -3,7 +3,7 @@
 	<!-- /ko -->
 	<div class="row">
 		<div class="col-xs-12 form-group tf-validate">
-				<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Account Name')"></label>
+				<label data-bind="css:{'requirestar':obIsAccountNameRequired}, text: tf.applicationTerm.getApplicationTermSingularByName('Account Name')"></label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true}">
 						<!-- ko customInput:{type:"Select",value:obSelectedAccountName,attributes:{class:"form-control",name:"accountName",placeholder:"None"}} -->
@@ -27,8 +27,8 @@
 
 	<div class="row">
 		<div class="col-xs-12 form-group">
-			<label>Purchase Order</label>
-			<input type="text" class="form-control" data-bind="value:obPurchaseOrder"/>
+			<label data-bind="css:{'requirestar':obIsPurchaseOrderRequired}">Purchase Order</label>
+			<input type="text" class="form-control" name="purchaseOrder" data-bind="value:obPurchaseOrder"/>
 		</div>
 
 		<div class="col-xs-12 form-group">
