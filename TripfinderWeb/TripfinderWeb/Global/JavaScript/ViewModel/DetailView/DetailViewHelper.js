@@ -875,7 +875,7 @@
 	DetailViewHelper.prototype.validateRequiredFields = function(layoutObj, gridType)
 	{
 		var self = this,
-			requiredFields = self.getRequiredFields(gridType),
+			requiredFields = self.getRequiredFields(gridType).filter(({ field }) => !(gridType === "fieldtrip" && ["AccountName", "PurchaseOrder"].includes(field))),
 			dataPointsField = self._getDataPointsField(gridType),
 			missingFields = [],
 			layoutFields = [],
