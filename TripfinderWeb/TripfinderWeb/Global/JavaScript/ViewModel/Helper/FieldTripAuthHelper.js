@@ -77,28 +77,12 @@
 	{
 		switch (id)
 		{
-			case (1):
-				return allSecuredItems;
-			case (2):
-				return "level2Administrator";
-			case (3):
-				return "level2Administrator";
-			case (4):
-				return "level3Administrator";
-			case (5):
-				return "level3Administrator";
-			case (6):
-				return "level4Administrator";
-			case (7):
-				return "level4Administrator";
-			case (98):
-				return "transportationAdministrator";
-			case (99):
-				return "transportationAdministrator";
 			case (100):
 				return "Canceled - Request Canceled";
 			case (101):
 				return "Completed - Request Completed";
+			default:
+				return stageSecuredItemsMap[id] || [];
 		}
 	};
 
@@ -183,7 +167,7 @@
 			let flag = false;
 			for (let i in securedItem)
 			{
-				flag = tf.authManager.authorizationInfo.isAuthorizedFor(securedItem[i],"edit");
+				flag = tf.authManager.authorizationInfo.isAuthorizedFor(securedItem[i], "edit");
 				if (flag) break;
 			}
 
@@ -191,7 +175,7 @@
 		}
 		else
 		{
-			return tf.authManager.authorizationInfo.isAuthorizedFor(securedItem,"edit");
+			return tf.authManager.authorizationInfo.isAuthorizedFor(securedItem, "edit");
 		}
 	};
 
@@ -200,13 +184,13 @@
 		if (!tf.authManager.authorizationInfo) return false;
 		if (tf.authManager.authorizationInfo.isAdmin) return true;
 		var hasAddRight = false;
-		var securedItems = tf.authManager.authorizationInfo.authorizationTree.securedItems||[] ;
-		for(var item in securedItems)
+		var securedItems = tf.authManager.authorizationInfo.authorizationTree.securedItems || [];
+		for (var item in securedItems)
 		{
-			if(allSecuredItems.indexOf(item) != -1)
+			if (allSecuredItems.indexOf(item) != -1)
 			{
-				hasAddRight =  tf.authManager.authorizationInfo.isAuthorizedFor(item,"add");
-				if(hasAddRight)
+				hasAddRight = tf.authManager.authorizationInfo.isAuthorizedFor(item, "add");
+				if (hasAddRight)
 				{
 					return hasAddRight;
 				}
