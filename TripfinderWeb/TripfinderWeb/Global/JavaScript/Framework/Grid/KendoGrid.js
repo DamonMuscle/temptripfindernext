@@ -646,10 +646,10 @@
 
 	KendoGrid.prototype.exportCurrentGrid = function(selectedIds)
 	{
-		var self = this;
+		var self = this,
+			url = pathCombine(tf.api.apiPrefix(), "search", `${tf.DataTypeHelper.getFormalDataTypeName(this.options.gridType).replace(" ", "")}ExportFiles`);
 
-		var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getExportEndpoint(this.options.gridType));
-		this.getIdsWithCurrentFiltering()
+		self.getIdsWithCurrentFiltering()
 			.then(function(ids)
 			{
 				var gridLayoutExtendedEntity = self._obCurrentGridLayoutExtendedDataModel().toData();
@@ -665,7 +665,7 @@
 					{
 						"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
 						"selectedIds": selectedIds ? selectedIds : ids,
-						"sortItems": this.searchOption.data.sortItems
+						"sortItems": self.searchOption.data.sortItems
 					}
 				};
 
@@ -673,7 +673,7 @@
 					self.options.setRequestOption(getDataOption);
 
 				return tf.promiseAjax.post(getDataUrl, getDataOption);
-			}.bind(this))
+			})
 			.then(function(keyApiResponse)
 			{
 				tf.promiseBootbox.dialog(
@@ -699,7 +699,6 @@
 								callback: function()
 								{
 									var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
-									var databaseType = tf.datasourceManager.databaseType;
 									var fileUrl = url + "?key=" + keyApiResponse.Items[0] + "&fileFormat=" + fileFormat;
 									if (TF.isMobileDevice)
 									{
@@ -717,11 +716,7 @@
 								className: "btn btn-link btn-sm"
 							}
 						}
-					})
-					.then(function(operation)
-					{
-
-					}.bind(this));
+					});
 			});
 	};
 
