@@ -16,6 +16,7 @@
 		this.obIsPaymentDateRequired = ko.observable(false);
 
 		this.obAccountSource = ko.observableArray();
+		this.isStrictAcctCodes = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 
 		this.pageLevelViewModel = new TF.PageLevel.BaseDataEntryPageLevelViewModel();
 
@@ -43,9 +44,25 @@
 			{
 				if (result)
 				{
+					var accountName = this.obSelectedAccountText();
+					var selectedAccount = this.obAccountSource().find(({Code})=>Code === accountName);
 					var entity = this.obEntityDataModel().toData();
-					entity.AccountName = this.obSelectedAccountText();
-					return entity;
+					var p = Promise.resolve();
+					if(!selectedAccount) {
+						p = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"), {
+							data: [{
+								Code: accountName,
+							}]
+						}).then(function({Items}){
+							const [{Id}] = Items;
+							entity.FieldTripAccountId = Id;
+						});
+					}
+
+					return p.then(function(){
+						entity.AccountName = accountName;
+						return entity;
+					});
 				}
 			}.bind(this));
 	}

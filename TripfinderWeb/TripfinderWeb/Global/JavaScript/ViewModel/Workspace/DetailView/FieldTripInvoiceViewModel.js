@@ -13,6 +13,7 @@
 		self.isNew = options.isNew;
 		self.newEntityDataSource = options.newEntityDataSource;
 		self.originalItem = options.originalItem;
+		self.isStrictAcctCodes = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 
 		const requiredFields = tf.helpers.detailViewHelper.getRequiredFields("fieldtrip");
 		self.obIsAccountNameRequired = ko.observable(!!requiredFields.find(x => x.name === "AccountName"));
@@ -34,8 +35,8 @@
 			invoice.PaymentDate = invoice.PaymentDate.toLocaleString("en-US");
 		}
 
-		self.obInvoiceDate = ko.observable(invoice.InvoiceDate);
-		self.obPaymentDate = ko.observable(invoice.PaymentDate);
+		self.obInvoiceDate = ko.observable(invoice.InvoiceDate || null);
+		self.obPaymentDate = ko.observable(invoice.PaymentDate || null);
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
@@ -53,8 +54,7 @@
 	FieldTripInvoiceViewModel.prototype.initValidator = function()
 	{
 		var self = this,
-			validatorFields = {
-			};
+			validatorFields = {};
 
 		if (self.obIsAccountNameRequired())
 		{
@@ -65,25 +65,7 @@
 						message: " is required",
 						callback: function()
 						{
-							var selectedAccount = self.obSelectedAccount();
-							return !!(selectedAccount && selectedAccount.Id > 0);
-						}
-					},
-				}
-			}
-		}
-
-		if (self.obIsAccountNameRequired())
-		{
-			validatorFields.accountName = {
-				trigger: "blur change",
-				validators: {
-					callback: {
-						message: " is required",
-						callback: function()
-						{
-							var selectedAccount = self.obSelectedAccount();
-							return !!(selectedAccount && selectedAccount.Id > 0);
+							return !!self.obSelectedAccountName();
 						}
 					},
 				}
@@ -125,58 +107,71 @@
 			{
 				if (!valid) return;
 
-				var selectAccount = self.obSelectedAccount(),
+				var selectAccountName = (self.obSelectedAccountName() || "").trim(),
+					selectAccount = self.obAccountSource().find(({ Code }) => Code === selectAccountName),
 					updatedInvoice = $.extend({}, self.invoice, {
 						Amount: self.obAmount(),
 						PurchaseOrder: self.obPurchaseOrder(),
 						InvoiceDate: self.obInvoiceDate(),
 						PaymentDate: self.obPaymentDate(),
 						DBID: tf.datasourceManager.databaseId,
-						FieldTripAccountId: selectAccount && selectAccount.Id,
-						AccountName: selectAccount && selectAccount.Code
+						AccountName: selectAccountName
 					});
 
-				// Manipulate mini grid data source when it is on a new field trip 
-				if (self.newEntityDataSource)
+				return (!!selectAccount ? Promise.resolve(selectAccount.Id) : p = tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"), {
+					data: [{
+						Code: selectAccountName,
+					}]
+				}).then(({ Items }) =>
 				{
-					var fieldtripInvoiceData = (new TF.DataModel.FieldTripInvoiceDataModel(updatedInvoice)).toData();
+					const [account] = Items;
+					return account.Id;
+				})).then(accountId =>
+				{
+					updatedInvoice.FieldTripAccountId = accountId;
+
+					// Manipulate mini grid data source when it is on a new field trip 
+					if (self.newEntityDataSource)
+					{
+						var fieldtripInvoiceData = (new TF.DataModel.FieldTripInvoiceDataModel(updatedInvoice)).toData();
+
+						if (self.isNew)
+						{
+							self.newEntityDataSource.push(fieldtripInvoiceData);
+						}
+						else
+						{
+							var index = self.newEntityDataSource
+								.findIndex(function(item)
+								{
+									return item._guid == self.originalItem._guid;
+								});
+
+							self.newEntityDataSource[index] = fieldtripInvoiceData;
+						}
+
+						return fieldtripInvoiceData;
+					}
 
 					if (self.isNew)
 					{
-						self.newEntityDataSource.push(fieldtripInvoiceData);
+						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoices"), {
+							paramData: { "@relationships": "FieldTripAccount" },
+							data: [updatedInvoice]
+						});
 					}
 					else
 					{
-						var index = self.newEntityDataSource
-							.findIndex(function(item)
+						return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "fieldtripinvoices"),
 							{
-								return item._guid == self.originalItem._guid;
+								paramData: {
+									Id: self.invoice.Id,
+									DBID: tf.datasourceManager.databaseId
+								},
+								data: [updatedInvoice]
 							});
-
-						self.newEntityDataSource[index] = fieldtripInvoiceData;
 					}
-
-					return fieldtripInvoiceData;
-				}
-
-				if (self.isNew)
-				{
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoices"), {
-						paramData: { "@relationships": "FieldTripAccount" },
-						data: [updatedInvoice]
-					});
-				}
-				else
-				{
-					return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "fieldtripinvoices"),
-						{
-							paramData: {
-								Id: self.invoice.Id,
-								DBID: tf.datasourceManager.databaseId
-							},
-							data: [updatedInvoice]
-						});
-				}
+				});
 			});
 	};
 

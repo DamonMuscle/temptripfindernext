@@ -6,7 +6,13 @@
 				<label data-bind="css:{'requirestar':obIsAccountNameRequired}, text: tf.applicationTerm.getApplicationTermSingularByName('Account Name')"></label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true}">
-						<!-- ko customInput:{type:"Select",value:obSelectedAccountName,attributes:{class:"form-control",name:"accountName",placeholder:"None"}} -->
+						<!-- ko if: isStrictAcctCodes -->
+							<!-- ko customInput:{type:"Select",value:obSelectedAccountName,attributes:{class:"form-control",name:"accountName",placeholder:"None"}} -->
+							<!-- /ko -->
+						<!-- /ko -->
+						<!-- ko ifnot: isStrictAcctCodes -->
+							<!-- ko customInput:{type:"String",value:obSelectedAccountName,attributes:{class:"form-control",name:"accountName",placeholder:"None"}} -->
+							<!-- /ko -->
 						<!-- /ko -->
 					</div>
 					<div class="input-group-btn">

@@ -9,7 +9,13 @@
 					<div
 						data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true},
 						 attr:IsRequired(requiredFields&&requiredFields.FieldTripAccountID?requiredFields.FieldTripAccountID.Required:null)">
-						<!-- ko customInput:{type:"Select",value:obSelectedAccountText,attributes:{class:"form-control",name:"account"}} -->
+						<!-- ko if: isStrictAcctCodes -->
+							<!-- ko customInput:{type:"Select",value:obSelectedAccountText,attributes:{class:"form-control",name:"account"}} -->
+							<!-- /ko -->
+						<!-- /ko -->
+						<!-- ko ifnot: isStrictAcctCodes -->
+							<!-- ko customInput:{type:"String",value:obSelectedAccountText,attributes:{class:"form-control",name:"account"}} -->
+							<!-- /ko -->
 						<!-- /ko -->
 					</div>
 					<div class="input-group-btn">
