@@ -29,6 +29,7 @@
 				{
 					return c.DBID == this.databaseId;
 				}.bind(this)).ToArray()[0];
+				datasources = datasources.sort((l, r) => { return l.Name.toLowerCase() < r.Name.toLowerCase() ? -1 : 1; });
 				this.datasources(datasources);
 				this.selectedDatabase(datasource);
 				this.obSelectedDatabaseText(datasource ? datasource.Name : "");
