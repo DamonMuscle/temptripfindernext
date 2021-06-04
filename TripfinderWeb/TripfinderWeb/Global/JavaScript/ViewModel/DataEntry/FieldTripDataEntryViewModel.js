@@ -176,20 +176,15 @@
 		this.obMailZipDataModels = ko.observableArray();
 		this.obAccount = ko.observableArray();
 
-		ko.computed(function()
-		{
-			if (this.obEntityDataModel().id() == 0 && this.obEntityDataModel().departDate())
-			{
-				this.obEntityDataModel().returnDate(this.obEntityDataModel().departDate());
-			}
-		}.bind(this));
-
 		this.obDepartTimeDisable = ko.computed(function()
 		{
 			return !(this.obEntityDataModel().departDate());
 		}.bind(this));
 		this.obReturnTimeDisable = ko.computed(function()
 		{
+			if (!this.obEntityDataModel().returnDate()) {
+				this.obEntityDataModel().returnTime(null)
+			}
 			return !(this.obEntityDataModel().returnDate());
 		}.bind(this));
 
@@ -1263,19 +1258,14 @@
 		}
 		if (!this.obEntityDataModel().returnDate() || !this.obEntityDataModel().returnTime())
 		{
+			this.obEntityDataModel().returnDate(null);
+			this.obEntityDataModel().returnTime(null);
 			this.obEntityDataModel().estimatedReturnDateTime(null);
 		}
 		else
 		{
-			if (!this.obEntityDataModel().returnTime())
-			{
-				this.obEntityDataModel().estimatedReturnDateTime(this.obEntityDataModel().returnDate());
-			}
-			else
-			{
-				var dateTimeValue = this.obEntityDataModel().returnDate().split("T")[0] + "T" + this.obEntityDataModel().returnTime().split("T")[1];
-				this.obEntityDataModel().estimatedReturnDateTime(dateTimeValue);
-			}
+			var dateTimeValue = this.obEntityDataModel().returnDate().split("T")[0] + "T" + this.obEntityDataModel().returnTime().split("T")[1];
+			this.obEntityDataModel().estimatedReturnDateTime(dateTimeValue);
 		}
 
 		// FT-711 Check destination name is correct or not
