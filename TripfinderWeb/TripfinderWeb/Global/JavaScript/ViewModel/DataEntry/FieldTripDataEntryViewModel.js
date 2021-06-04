@@ -1261,7 +1261,7 @@
 				this.obEntityDataModel().departDateTime(dateTimeValue);
 			}
 		}
-		if (!this.obEntityDataModel().returnDate())
+		if (!this.obEntityDataModel().returnDate() || !this.obEntityDataModel().returnTime())
 		{
 			this.obEntityDataModel().estimatedReturnDateTime(null);
 		}
