@@ -44,6 +44,11 @@
 		endDateInput = $form.find("input[name='estimatedReturnDate']");
 		departTimeInput = $form.find("input[name='departTime']");
 		endTimeInput = $form.find("input[name='estimatedReturnTime']");
+		
+		if (self.fieldTripDE.obEntityDataModel().departDate() && !self.fieldTripDE.obEntityDataModel().returnTime()) {
+			message = 'Return time must required';
+			validationErrors.push({ message: message, field: endTimeInput });
+		}
 
 		if (!isSameDay && isDateAfter)
 		{
