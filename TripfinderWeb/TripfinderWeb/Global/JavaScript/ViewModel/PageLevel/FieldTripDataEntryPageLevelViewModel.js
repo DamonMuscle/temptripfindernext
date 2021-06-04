@@ -28,6 +28,7 @@
 			departDate = new moment(self.fieldTripDE.obEntityDataModel().departDate()),
 			start = new moment(self.fieldTripDE.obEntityDataModel().departTime()),
 			end = new moment(self.fieldTripDE.obEntityDataModel().returnTime()),
+			isEndUndefined = self.fieldTripDE.obEntityDataModel().returnTime() == undefined,
 			isSameDay = returnDate.isSame(departDate, "day"),
 			isDateAfter = departDate.isAfter(returnDate),
 			isTimeAfter = false, $form = self.fieldTripDE.$form,
@@ -38,7 +39,7 @@
 
 		end.year(2010);
 		end.dayOfYear(1);
-		isTimeAfter = start.isValid() && end.isValid() && start.isAfter(end);
+		isTimeAfter = !isEndUndefined && start.isValid() && end.isValid() && start.isAfter(end);
 		departDateInput = $form.find("input[name='departDate']");
 		endDateInput = $form.find("input[name='estimatedReturnDate']");
 		departTimeInput = $form.find("input[name='departTime']");
