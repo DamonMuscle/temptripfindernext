@@ -739,6 +739,67 @@
 			isAscending: "asc",
 			Direction: "Ascending"
 		}));
-	}
+	};
+
+	KendoGridHelper.getStringOfRecords = function(records, columns)
+	{
+		var strRecords = "", strRecord = "";
+		for (var i = 0; i < columns.length; i++)
+		{
+			strRecord += columns[i].DisplayName + "\t";
+		}
+		strRecords += strRecord + "\n";
+		for (i = 0; i < records.length; i++)
+		{
+			strRecord = "";
+			var theRecord = records[i];
+			for (var j = 0; j < columns.length; j++)
+			{
+
+				let column = columns[j];
+				var columnValue = theRecord[column.FieldName];
+				// For UDF
+				if (columnValue == null)
+				{
+					columnValue = theRecord[column.DisplayName];
+				}
+				columnValue = formatData(column, columnValue);
+				strRecord += (columnValue == null ? "" : columnValue) + "\t";
+			}
+			strRecords += strRecord + "\n";
+		}
+		return strRecords;
+
+		function formatData(column, value)
+		{
+			if (column.formatCopyValue)
+			{
+				return column.formatCopyValue(value);
+			}
+
+			if (column.type === "date" || column.type === "time" || column.type === "datetime")
+			{
+				var momentValue = moment(value);
+				var validDateValue = value;
+				if (column.type === "time")
+				{
+					validDateValue = moment().format("YYYY-MM-DD") + " " + value;
+					momentValue = moment(validDateValue);
+				}
+
+				if (new Date(validDateValue) != 'Invalid Date' && momentValue.isValid() === true && validDateValue !== 0)
+				{
+					value = momentValue.toDate();
+					return kendo.format(column.format, value);
+				}
+				else
+				{
+					return "";
+				}
+			}
+
+			return value;
+		}
+	};
 
 })();

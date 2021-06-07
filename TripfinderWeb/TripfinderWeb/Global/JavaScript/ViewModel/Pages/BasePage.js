@@ -258,130 +258,39 @@
 		self.searchGrid.addRemoveColumnClick(viewModel, e);
 	};
 
-	BasePage.prototype._copySelectedRecords = function(e, selectedIds)
-	{
-		var self = this;
-		var kendoGrid = self.searchGrid;
-		return kendoGrid.getIdsWithCurrentFiltering(true)
-			.then(function(ids)
-			{
-				var gridLayoutExtendedEntity = kendoGrid._obCurrentGridLayoutExtendedDataModel().toData();
-				gridLayoutExtendedEntity.LayoutColumns = kendoGrid._obSelectedColumns();
-
-				var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(kendoGrid.options.gridType));
-
-				var options = JSON.parse(JSON.stringify(kendoGrid.searchOption));
-				options.data.idFilter.IncludeOnly = selectedIds;
-				if (kendoGrid.options.gridType === "busfinderhistorical")
-					self.setRequestOption(options);
-
-				var queryPromise = tf.promiseAjax["post"](url, options);
-				return queryPromise
-					.then(function(data)
-					{
-						var strRecords = getStringOfRecords(data.Items, gridLayoutExtendedEntity.LayoutColumns);
-
-						tf.modalManager.showModal(
-							new TF.Modal.CopyDataModalViewModel(strRecords, function()
-							{
-								$(".tfmodal-container").css('visibility', 'visible');
-								tf.loadingIndicator.tryHide();
-								$("#loadingindicator .subtitle-text").text('Loading');
-							})
-						)
-							.then(function()
-							{
-
-							}.bind(this));
-
-						$(".tfmodal-container").css('visibility', 'hidden');
-						return Promise.resolve(true);
-					}, function(data)
-					{
-						tf.loadingIndicator.tryHide();
-						if (self.copyRetryCount >= 3)
-						{
-							tf.promiseBootbox.alert("Data cannot be copied.", "Alert")
-								.then(function(result)
-								{
-
-								});
-							return;
-						}
-						tf.promiseBootbox.yesNo("Data cannot be retrieved. Would you like to retry?", "Confirmation Message")
-							.then(function(result)
-							{
-								if (result)
-								{
-									self.copyRetryCount = self.copyRetryCount + 1;
-									self._copySelectedRecords(e, selectedIds);
-								}
-							});
-					});
-			});
-	};
-
 	BasePage.prototype.copyToClipboardClick = function(viewModel, e)
 	{
-		var self = this;
-		self.copyRetryCount = 0;
-		var selectedIds = self.searchGrid.getSelectedIds();
-		if (selectedIds.length > 2000)
-		{
-			return self.showConfirmMessage(e, selectedIds);
-		}
-		else if (selectedIds.length === 0)
-		{
-			self.searchGrid.getIdsWithCurrentFiltering().then(function(ids)
-			{
-				if (ids.length > 2000)
-				{
-					return self.showConfirmMessage(e, selectedIds);
-				}
-				else if (ids.length > 0)
-				{
-					self._copySelectedRecords(e, selectedIds);
-				}
-			});
-		}
-		else
-		{
-			self._copySelectedRecords(e, selectedIds);
-		}
-	};
+		var self = this, selectedIds = this.searchGrid.getSelectedIds();
 
-	function getStringOfRecords(records, columns)
-	{
-		var strRecords = "";
-		for (var i = 0; i < records.length; i++)
+		if (selectedIds.length === 0)
 		{
-			var strRecord = "", theRecord = records[i];
-			for (var j = 0; j < columns.length; j++)
-			{
-				var columnValue = theRecord[columns[j].FieldName]
-				strRecord += (columnValue == null ? "" : columnValue) + "\t";
-			}
-			strRecords += strRecord + "\n";
+			return Promise.resolve();
 		}
-		return strRecords;
-	}
-
-	BasePage.prototype.showConfirmMessage = function(e, selectedIds)
-	{
-		var self = this;
-		return tf.promiseBootbox.yesNo(
+		return self.searchGrid.getSelectedRecordsFromServer()
+			.then(function(response)
 			{
-				message: "You have requested to Copy " + ((self.searchGrid.allIds.length === selectedIds.length || selectedIds.length === 0) ? "All" : selectedIds.length) + " records. This may take a long time to complete. To reduce the amount of time this takes, we recommend reducing the number of grid columns that you have displayed and/or the number of records that you have selected.\n\nAre you sure you would like to copy these records?",
-				backdrop: true,
-				title: "Confirmation Message",
-				closeButton: true
-			})
-			.then(function(result)
-			{
-				if (result == true)
+				return tf.promiseBootbox.confirm({
+					message: "Data has been retrieved. Would you like to copy this to your clipboard?",
+					title: "Confirmation",
+					buttons: {
+						OK: {
+							label: "Yes"
+						},
+						Cancel: {
+							label: "No"
+						}
+					}
+				}).then(function(result)
 				{
-					self._copySelectedRecords(e, selectedIds);
-				}
+					if (!result) return;
+
+					var el = document.createElement('textarea');
+					el.value = TF.Helper.KendoGridHelper.getStringOfRecords(response.Items, self.searchGrid._obSelectedColumns());
+					document.body.appendChild(el);
+					el.select();
+					document.execCommand('copy');
+					document.body.removeChild(el);
+				});
 			});
 	};
 
