@@ -193,7 +193,9 @@
 		{
 			for (var i = 0; i < this.obSelectedGridFilterDataModel().omittedRecords().length; i++)
 			{
-				omittedRecords.push(this.obSelectedGridFilterDataModel().omittedRecords()[i].OmittedRecordId);
+				var omittedRecord = this.obSelectedGridFilterDataModel().omittedRecords()[i];
+				var omittedRecordId = omittedRecord.OmittedRecordId || omittedRecord.OmittedRecordID;
+				omittedRecordId && omittedRecords.push(omittedRecordId);
 			}
 			this._gridState.filteredExcludeAnyIds = omittedRecords;
 			this.obFilteredExcludeAnyIds(this._gridState.filteredExcludeAnyIds);
@@ -862,10 +864,17 @@
 			for (var i = 0; i < this.obTempOmitExcludeAnyIds().length; i++)
 			{
 				var tempOmittedRecords = {
-					FilterId: filterID,
-					OmittedRecordId: this.obTempOmitExcludeAnyIds()[i]
+					Id: this.obTempOmitExcludeAnyIds()[i],
+					FilterId: filterID > 0 ? filterID : 0,
+					DBID: tf.datasourceManager.databaseId,
+					OmittedRecordId: this.obTempOmitExcludeAnyIds()[i],
+					Name: "",
 				}
-				this.obSelectedGridFilterDataModel().omittedRecords().push(tempOmittedRecords);
+				if (this.obSelectedGridFilterDataModel().omittedRecords()) {
+					this.obSelectedGridFilterDataModel().omittedRecords().push(tempOmittedRecords);
+				} else{
+					this.obSelectedGridFilterDataModel().omittedRecords([tempOmittedRecords]);
+				}
 			}
 		}
 		if (!searchData.data.filterSet && this.obTempOmitExcludeAnyIds().length === 0)
@@ -874,16 +883,44 @@
 		}
 		else if (!searchData.data.filterSet && this.obTempOmitExcludeAnyIds().length > 0) //only change omitted records
 		{
-			return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", data.Id),
+			var filterData = this.obSelectedGridFilterDataModel().toData();
+			var data = [{
+				APIIsDirty: true,
+				APIIsNew: true,
+				Id: filterData.Id > 0 ?  filterData.Id : 0,
+				DBID: tf.datasourceManager.databaseId,
+				DataTypeID: tf.DataTypeHelper.getId(this.options.gridType),
+				GridType: this.options.gridType,
+				IsValid: filterData.IsValid,
+				Name: filterData.Name,
+				OmittedRecords: filterData.OmittedRecords,
+				WhereClause: filterData.WhereClause,
+			}];
+
+			var path = pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters");
+			var ajaxData = {
+				paramData: { "@relationships": "OmittedRecord" },
+				data: data,
+			};
+
+			var updateExcludeAnyIds = function (that) {
+				that.obFilteredExcludeAnyIds((that.obFilteredExcludeAnyIds() || []).concat(that.obTempOmitExcludeAnyIds()));
+				that.obTempOmitExcludeAnyIds([]);
+			};
+
+			if (filterData.Id <= 0) {
+				return tf.promiseAjax.post(path, ajaxData).then(function()
 				{
-					paramData: { "@relationships": "OmittedRecord" },
-					data: this.obSelectedGridFilterDataModel().toData()
-				}).then(function()
-				{
-					this.obFilteredExcludeAnyIds(this.obFilteredExcludeAnyIds().concat(this.obTempOmitExcludeAnyIds()));
-					this.obTempOmitExcludeAnyIds([]);
+					updateExcludeAnyIds(this);
 					return true;
 				}.bind(this));
+			}
+
+			return tf.promiseAjax.put(path, ajaxData).then(function()
+			{
+				updateExcludeAnyIds(this);
+				return true;
+			}.bind(this));
 		}
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this.options.gridType), "RawFilterClause"),
 			{
