@@ -17,7 +17,10 @@
 			}
 		}).then(function(result)
 		{
-			return self._getUserDefinedFields(result.Items);
+			return tf.UDFDefinition.init().then(function()
+			{
+				return self._getUserDefinedFields(result.Items);
+			});
 		}).catch(function(error)
 		{
 			console.error(error);

@@ -11,6 +11,7 @@
 	UDFDefinition.prototype.init = function()
 	{
 		var self = this;
+		self.collection = [];
 		return self._fetchAll();
 	};
 
