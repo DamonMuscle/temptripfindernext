@@ -4944,6 +4944,30 @@
 			});
 	};
 
+	LightKendoGrid.prototype.getSelectedRecordsFromServer = function()
+	{
+		var self = this, options = {
+			paramData: { getCount: false, databaseId: tf.datasourceManager.databaseId },
+			data: {
+				fields: self._obSelectedColumns().map(function(column) { return column.FieldName }),
+				filterClause: "",
+				filterSet: null,
+				idFilter: {
+					ExcludeAny: [],
+					IncludeOnly: self.getSelectedIds()
+				},
+				sortItems: self.searchOption.data.sortItems
+			}
+		};
+
+		if (self.options.setRequestOption)
+		{
+			self.options.setRequestOption(options);
+		}
+
+		return tf.ajax.post(self.getApiRequestURL(self.options.url), options);
+	};
+
 	LightKendoGrid.prototype.dispose = function()
 	{
 		this.$container.off('click');
