@@ -63,7 +63,7 @@
 		}
 
 		self.$element.find(".left-grid").kendoGrid({
-			dataSource: availableSource,
+			dataSource: { data: availableSource },
 			columns: [
 				{
 					title: self.options.title,
@@ -86,7 +86,7 @@
 		});
 
 		self.$element.find(".right-grid").kendoGrid({
-			dataSource: selectedSource,
+			dataSource: { data: selectedSource },
 			columns: [
 				{
 					title: self.options.title,

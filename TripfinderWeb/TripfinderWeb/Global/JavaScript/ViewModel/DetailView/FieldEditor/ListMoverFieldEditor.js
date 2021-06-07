@@ -48,6 +48,8 @@
 				return !currentSelectedItems.includes(item.value);
 			});
 
+			options.selectedSource = self._setGridFields(options.selectedSource);
+			options.availableSource = self._setGridFields(options.availableSource);
 			options.onCloseListMover = self.onCloseListMover;
 
 			if (options.getFixedData)
@@ -178,4 +180,23 @@
 
 		return result;
 	};
+
+	ListMoverFieldEditor.prototype._setGridFields = function(source) {
+		if (source.every(function(item) {
+			return item instanceof Object;
+		})) {
+			return source;
+		}
+
+		var gridFieldName = 'text';
+		var value = 1;
+		this.allItems = source.map(function(item)
+		{
+			var obj = {};
+			obj[gridFieldName] = item;
+			obj.value = value++;
+			return obj;
+		});
+		return this.allItems;
+	}
 })();
