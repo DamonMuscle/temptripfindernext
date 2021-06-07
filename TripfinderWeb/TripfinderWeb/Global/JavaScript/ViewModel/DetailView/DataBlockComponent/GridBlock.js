@@ -2117,7 +2117,7 @@
 			{
 				return {
 					dataItems: result.Items,
-					totalCount: result.TotalRecordCount,
+					totalCount: result.Items.length,
 					pageSize: 50
 				};
 			}, function(error)
