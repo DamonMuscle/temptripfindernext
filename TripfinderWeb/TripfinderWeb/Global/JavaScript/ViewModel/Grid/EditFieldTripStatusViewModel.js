@@ -122,7 +122,8 @@
 
 			statusId = self.getStatusId(), note = noComments ? "" : self.obComments();
 
-			if ((statusId === 100 || statusId === 98) && (!note || note.trim() === "" )) {
+			let canceledAndDeclined = [2,4,6,98,100];
+			if (canceledAndDeclined.includes(statusId) && (!note || note.trim() === "" )) {
 				return tf.promiseBootbox.alert("A comment must be added before the trip is canceled/declined", "Alert")
 				.then(function()
 				{
