@@ -732,7 +732,7 @@ Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 		{
 			var value = $field.val();
 
-			return value === "" ? true : isValidNumber(value, options.country || 'US');
+			return value === "" ? true : !!value.match(/^\D*\d{3}\D*\d{3}\D*\d{4}$/);
 		}
 	}
 }(window.jQuery));
