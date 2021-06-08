@@ -141,7 +141,7 @@
 		this.obSelectedField = ko.observable();
 		this.obSelectedFieldText = ko.observable();
 		this.obSelectedFieldText.subscribe(this.selectFieldClick.bind(this));
-		this.getOmittedRecordsName(omittedRecordIds, this.gridFilterDataModel.dataTypeID());
+		this.getOmittedRecordsName(omittedRecordIds, tf.DataTypeHelper.getId(this.gridType));
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		this.initReminder();
 
@@ -780,7 +780,7 @@
 			var currentOmitRecords = [];
 			for (var i = 0; i < this.obOmitRecords().length; i++)
 			{
-				if (this.obOmitRecords()[i].OmittedRecordId != viewModel.OmittedRecordId)
+				if (this.obOmitRecords()[i].OmittedRecordID != viewModel.OmittedRecordID)
 				{
 					currentOmitRecords.push(this.obOmitRecords()[i]);
 				}
