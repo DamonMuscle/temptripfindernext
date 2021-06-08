@@ -868,7 +868,6 @@
 					FilterId: filterID > 0 ? filterID : 0,
 					DBID: tf.datasourceManager.databaseId,
 					OmittedRecordId: this.obTempOmitExcludeAnyIds()[i],
-					Name: "",
 				}
 				if (this.obSelectedGridFilterDataModel().omittedRecords()) {
 					this.obSelectedGridFilterDataModel().omittedRecords().push(tempOmittedRecords);
