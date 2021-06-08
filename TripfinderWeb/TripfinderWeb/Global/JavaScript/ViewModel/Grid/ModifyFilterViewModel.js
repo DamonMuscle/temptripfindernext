@@ -141,7 +141,7 @@
 		this.obSelectedField = ko.observable();
 		this.obSelectedFieldText = ko.observable();
 		this.obSelectedFieldText.subscribe(this.selectFieldClick.bind(this));
-		this.getOmittedRecordsName(omittedRecordIds, this.gridFilterDataModel.id());
+		this.getOmittedRecordsName(omittedRecordIds, this.gridFilterDataModel.dataTypeID());
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		this.initReminder();
 
@@ -161,19 +161,19 @@
 		this.obVisableOmitCnt(initVisableOmitCnt);
 	};
 
-	ModifyFilterViewModel.prototype.getOmittedRecordsName = function(omittedRecordIds, gridFilterId)
+	ModifyFilterViewModel.prototype.getOmittedRecordsName = function(omittedRecordIds, dataTypeId)
 	{
 		if (omittedRecordIds == null)
 		{
 			return null;
 		}
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "omittedrecords"),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "omittedrecordnames"),
 			{
 				paramData:
 				{
 					databaseId: tf.datasourceManager.databaseId,
 					omittedRecordIDs: omittedRecordIds.join(","),
-					filterId: gridFilterId
+					dataTypeId: dataTypeId
 				}
 			})
 			.then(function(apiResponse)
