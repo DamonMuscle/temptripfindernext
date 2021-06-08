@@ -892,7 +892,7 @@
 				DataTypeID: tf.DataTypeHelper.getId(this.options.gridType),
 				GridType: this.options.gridType,
 				IsValid: filterData.IsValid,
-				Name: filterData.Name,
+				Name: filterData.Id > 0 ?  filterData.Name : filterData.Name + "_" + new Date().getTime(),
 				OmittedRecords: filterData.OmittedRecords,
 				WhereClause: filterData.WhereClause,
 			}];
