@@ -971,8 +971,12 @@
 		return self._syncFilterAndNotifyStatusUpdated(gridFilterDataModel.id())
 			.then(function(filterExisted)
 			{
-				if (filterExisted)
+				if (filterExisted) {
+					if (currentFilterId < 0) {
+						return true;
+					}
 					return self.saveCurrentFilter();
+				}
 				else
 					return false;
 			})
