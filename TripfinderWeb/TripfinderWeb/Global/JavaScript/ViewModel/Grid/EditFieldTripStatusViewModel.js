@@ -120,15 +120,19 @@
 				return false;
 			}
 
-			statusId = self.getStatusId(), note = noComments ? "" : self.obComments();
+			statusId = self.getStatusId(), note = self.obComments();
 
-			let canceledAndDeclined = [2,4,6,98,100];
-			if (canceledAndDeclined.includes(statusId) && (!note || note.trim() === "" )) {
+			let canceledAndDeclined = [2, 4, 6, 98, 100];
+			if (canceledAndDeclined.includes(statusId) && (!note || note.trim() === "" ) && !noComments) {
 				return tf.promiseBootbox.alert("A comment must be added before the trip is canceled/declined", "Alert")
 				.then(function()
 				{
 					return false;
 				});
+			}
+
+			if (noComments) {
+				note = "";
 			}
 
 			var patchData = [];
