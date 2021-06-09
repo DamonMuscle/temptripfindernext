@@ -249,7 +249,17 @@
 					tf.contextMenuManager.showMenu($virsualTarget,
 						new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/MiniGridRightClickMenu",
 							new TF.DetailView.MiniGridRightClickMenu(targetBlock, miniGridType, $target)));
-					break;
+                    break;
+                case "UDGrid":
+                    var targetBlock = self.rootGridStack.dataBlocks.filter(function (dataBlock) {
+                        if (!dataBlock.uniqueClassName) return;
+
+                        return $(e.currentTarget.closest(".grid-stack-item")).hasClass(dataBlock.uniqueClassName);
+                    })[0];
+                    tf.contextMenuManager.showMenu($virsualTarget,
+                        new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/UDGridRightClickMenu",
+                            new TF.DetailView.UDGridRightClickMenu(targetBlock, miniGridType)));
+                    break;
 				default:
 					break;
 			}

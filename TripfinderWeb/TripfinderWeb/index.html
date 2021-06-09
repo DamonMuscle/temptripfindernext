@@ -7,14 +7,12 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link href="Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">
 	<meta name="viewport"
-		content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
+		  content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
 	<meta name="format-detection" content="telephone=no" />
 
 	<script>
-		(function(i, s, o, g, r, a, m)
-		{
-			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function()
-			{
+		(function (i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
 				(i[r].q = i[r].q || []).push(arguments)
 			}, i[r].l = 1 * new Date(); a = s.createElement(o),
 				m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
@@ -38,20 +36,19 @@
 	<style>
 		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0) {
 			@media {
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content {
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content {
 					background-color: #efefef;
 				}
 
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content input:disabled {
-					color: #202020;
-				}
+					.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content input:disabled {
+						color: #202020;
+					}
 			}
 		}
 	</style>
 	<script>
 		var broswerInfo = getBrowserInfo();
-		function getBrowserInfo()
-		{
+		function getBrowserInfo() {
 			var Sys = {}, s, ua = navigator.userAgent.toLowerCase();
 			(s = ua.match(/edge\/([\d.]+)/)) ? Sys.edge = s[1] :
 				(s = ua.match(/edg\/([\d.]+)/)) ? Sys.edge = s[1] :
@@ -72,8 +69,7 @@
 			return { broswer: "", version: "0" };
 		}
 
-		if(broswerInfo.broswer === "IE"||(broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79))
-		{
+		if (broswerInfo.broswer === "IE" || (broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79)) {
 			window.location.href = 'ie.html';
 		}
 	</script>
@@ -144,6 +140,7 @@
 	<script src="Global/JavaScript/Framework/TemplateContextMenu.js"></script>
 	<script src="Global/JavaScript/Framework/BulkContextMenu.js"></script>
 	<script src="Global/JavaScript/Framework/PrintHelper.js"></script>
+	<script src="Global/JavaScript/Framework/tfdispose.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Knockout.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/contextMenuClick.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/singleClick.js"></script>
@@ -361,7 +358,26 @@
 	<script src="Global/JavaScript/Framework/Graphic/RectCollisionDetector.js"></script>
 	<script src="Global/JavaScript/Framework/Graphic/RectUtility.js"></script>
 
+	<script src="Global/JavaScript/ViewModel/Helper/UploadDocumentHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/BaseQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/BooleanQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/DateQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/DateTimeQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/ListQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/MemoQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/NumberQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/PhoneQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/RatingQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/SignatureBlock.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/TextQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/TimeQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/CurrencyQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/SystemFieldQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/AttachBlock.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Form.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Rating.js"></script>
 	<!-- TODO-V2 -->
+	<script src="Global/JavaScript/ViewModel/DetailView/UDGridRightClickMenu.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/UserDefinedFieldHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/UserDefinedGridHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/BaseCustomGridStackViewModel.js">
@@ -378,26 +394,16 @@
 	<script src="Global/JavaScript/ViewModel/Helper/QueryFeatureHelper.js"></script>
 	<script src="Global/JavaScript/Workspace/BaseDocumentViewModel.js"></script>
 	<script src="Global/JavaScript/Workspace/FieldTripConfigs/FieldTripConfigsDocumentViewModel.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripClassificationGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripActivityGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripEquipmentGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripBillingClassificationGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripAccountGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripDistrictDepartmentGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripDestinationGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripTemplatesGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripBlockOutTimesGridDefinition.js"></script>
-	<script
-		src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripHolidaysGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripClassificationGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripActivityGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripEquipmentGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripBillingClassificationGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripAccountGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripDistrictDepartmentGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripDestinationGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripTemplatesGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripBlockOutTimesGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripHolidaysGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/FieldTripConfigs/GridDefinition/FieldTripGridConfigs.js"></script>
 	<script src="Global/Javascript/Workspace/FieldTripConfigs/FieldTripConfigsDataHelper.js"></script>
 
@@ -484,12 +490,10 @@
 	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataBlockComponent/UDGridBlock.js">
 	</script>
-	<script
-		src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationModalViewModel.js">
-		</script>
-	<script
-		src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationViewModel.js">
-		</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationModalViewModel.js">
+	</script>
+	<script src="Global/JavaScript/ViewModel/DetailView/DataEditorSaveConfirmation/DataEditorSaveConfirmationViewModel.js">
+	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/AssociateRecordsModalViewModel.js">
 	</script>
 	<script src="Global/JavaScript/ViewModel/DetailView/ManageDetailScreenLayoutViewModel.js">
@@ -526,18 +530,12 @@
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/FieldTripInvoiceViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/AssociateRecordsViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/MiniGridRightClickMenu.js"></script>
-	<script
-		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/SearchExistingRecordWrapper.js"></script>
-	<script
-		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/UDGridGridStackQuickAddWrapper.js"></script>
-	<script
-		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationModalViewModel.js"></script>
-	<script
-		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationViewModel.js"></script>
-	<script
-		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/GridStackQuickAddWrapper.js"></script>
-	<script
-		src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/SearchExistingRecordWrapper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/UDGridGridStackQuickAddWrapper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationModalViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/ManageRecordAssociationViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/GridStackQuickAddWrapper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddModalViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/SwitchGridMenuViewModel.js"></script>
 	<!-- endbuild -->

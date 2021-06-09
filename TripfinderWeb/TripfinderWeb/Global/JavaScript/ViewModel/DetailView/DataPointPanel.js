@@ -483,7 +483,7 @@
 			Object.keys(dataPointsForCurrentPage).forEach(function(key)
 			{
 				self.allColumns.push({
-					title: key,
+                    title: self.formatSectionLabel(key),
 					columns: ko.observableArray(dataPointsForCurrentPage[key].map(column =>
 					{
 						var c = { ...column };
@@ -1551,7 +1551,17 @@
 		});
 		this.highlightBlocks(blocks);
 		this.updateColumns();
-	}
+    }
+
+    DataPointPanel.prototype.formatSectionLabel = function (title) {
+        title = title || "";
+        if (title.toUpperCase() !== "USER DEFINED GROUP") {
+            return title;
+        }
+        else {
+            return "User Defined Forms";
+        }
+    }
 
 	/**
 	 * The dispose function.
