@@ -127,11 +127,11 @@
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().ContactPhone&&obRequiredFields().ContactPhone.Required?'requirestar':null, text: tf.applicationTerm.getApplicationTermSingularByName('Phone')"></label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().ContactPhone && obRequiredFields().ContactPhone.Required)-->
-						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().contactPhone,attributes:{class:"form-control",name:"contactphone",required:"required",maxlength:"30"}} -->
+						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().contactPhone,attributes:{class:"form-control",name:"contactphone",required:"required",maxlength:"14"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 						<!-- ko if: !(obRequiredFields() && obRequiredFields().ContactPhone) || (obRequiredFields() && obRequiredFields().ContactPhone && !obRequiredFields().ContactPhone.Required)-->
-						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().contactPhone,attributes:{class:"form-control",maxlength:"30"}} -->
+						<!-- ko customInput:{type:"Phone",value:obEntityDataModel().contactPhone,attributes:{class:"form-control",maxlength:"14"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
@@ -329,11 +329,11 @@
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationContactPhone&&obRequiredFields().DestinationContactPhone.Required?'requirestar':null,text: tf.applicationTerm.getApplicationTermSingularByName('Phone')"></label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().DestinationContactPhone && obRequiredFields().DestinationContactPhone.Required)-->
-						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationContactPhone,attributes:{class:"form-control",required:"required",maxlength:"30",name:"destinationContactPhone"}} -->
+						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationContactPhone,attributes:{class:"form-control",required:"required",maxlength:"14",name:"destinationContactPhone"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 						<!-- ko if: !(obRequiredFields() && obRequiredFields().DestinationContactPhone) || (obRequiredFields() && obRequiredFields().DestinationContactPhone && !obRequiredFields().DestinationContactPhone.Required)-->
-						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationContactPhone,attributes:{class:"form-control",maxlength:"30",name:"destinationContactPhone"}} -->
+						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationContactPhone,attributes:{class:"form-control",maxlength:"14",name:"destinationContactPhone"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
@@ -356,11 +356,11 @@
 						<label
 							data-bind="css:obRequiredFields()&&obRequiredFields().DestinationFax&&obRequiredFields().DestinationFax.Required?'requirestar':null">Fax</label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().DestinationFax && obRequiredFields().DestinationFax.Required)-->
-						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",required:"required",maxlength:"30",name:"destinationFax", phonetype:"fax"}} -->
+						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",required:"required",maxlength:"14",name:"destinationFax", phonetype:"fax"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 						<!-- ko if: !(obRequiredFields() && obRequiredFields().DestinationFax) || (obRequiredFields() && obRequiredFields().DestinationFax && !obRequiredFields().DestinationFax.Required)-->
-						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",maxlength:"30",name:"destinationFax", phonetype:"fax"}} -->
+						<!-- ko customInput:{disable:obStrictDest,type:"Phone",value:obEntityDataModel().destinationFax,attributes:{class:"form-control",maxlength:"14",name:"destinationFax", phonetype:"fax"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
