@@ -11,7 +11,8 @@
 			if (event.which != 37 && event.which != 39)
 			{
 				$input = $(e.target);
-				var rawValue = formatLocal(tfRegion, $input.val());
+				var val = $input.val().replace(/\D/g, '');
+				var rawValue = this.formatPhone(val);
 				$input.val(rawValue);
 				this.obRawValue(rawValue);
 			}
@@ -31,7 +32,25 @@
 
 	PhoneBox.prototype.valueChange = function(value)
 	{
-		value = formatLocal(tfRegion, value);
+		value = this.formatPhone(value);
 		namespace.StringBox.prototype.valueChange.call(this, value);
+	};
+
+	PhoneBox.prototype.formatPhone = function(phone) {
+		if (!phone) return "";
+		var output = (phone || "").replace(/\D/g, '');
+		if (output.length <= 3) return output;
+		output = output.substring(0, 10);
+    if (output.length <= 3)
+    {
+      output = output.replace(/^(\d{0,3})/, '($1)');
+    } else if (output.length <= 6)
+    {
+      output = output.replace(/^(\d{0,3})(\d{0,3})/, '($1) $2');
+    } else
+    {
+      output = output.replace(/^(\d{0,3})(\d{0,3})(.*)/, '($1) $2-$3');
+    }
+		return output;
 	};
 })();
