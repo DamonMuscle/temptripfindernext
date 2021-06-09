@@ -109,7 +109,7 @@
 				var next = function()
 				{
 					self.obIsSelectRow(current.length !== 0);
-					self.obCanCopyFieldTrip(current.length === 1);
+					self.obCanCopyFieldTrip(current.length === 1 && self.obNewRequest());
 					self.selectedRecordIds = current;
 					if (self.obShowDetailPanel())
 					{
