@@ -335,7 +335,7 @@
 			{
 				return value;
 			}
-			if ((column.type === "date" || column.type === "time"))
+			if (column.type === "date")
 			{
 				if (new Date(value) != 'Invalid Date' && moment(value).isValid() === true && value !== 0)
 				{
@@ -346,6 +346,10 @@
 				{
 					return "";
 				}
+			}
+			if (column.type === "time")
+			{
+				return kendo.format(column.format, value);
 			}
 			if (operator == 'Average' || ((operator == 'Sum' || operator == 'Min' || operator == 'Max') && column.type == 'number'))
 			{
