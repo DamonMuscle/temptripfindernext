@@ -6,7 +6,7 @@
 	function DecimalBox(initialValue, attributes, disable, events)
 	{
 		var self = this;
-		var existingRetainPrecision = Object.keys(attributes).some(function(i) { return i === "retainPrecision"; });
+		var existingRetainPrecision = attributes && Object.keys(attributes).some(function(i) { return i === "retainPrecision"; });
 		if (existingRetainPrecision)
 		{
 			delete attributes.retainPrecision;
