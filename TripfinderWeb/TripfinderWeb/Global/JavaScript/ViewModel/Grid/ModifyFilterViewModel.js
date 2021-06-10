@@ -292,31 +292,24 @@
 		{
 			return Promise.resolve(false);
 		}
-		var skip = 0;
-		var take = 5;
-		var searchData = new TF.SearchParameters(skip, take, self.sorts, self.filters, this.gridFilterDataModel.whereClause(), null, null);
-		searchData.data.fields = TF.Grid.LightKendoGrid.prototype.bindNeedFileds(this._gridType, ['Id']);
-		searchData.paramData.getCount = getCount ? true : false;
-		searchData.data.isQuickSearch = this.gridFilterDataModel.isForQuickSearch();
 
 		var url = null;
 		if (this.gridType === 'busfinderhistorical')
 			url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause"); // TODO-V2, need to remove
 		else
-			url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType));
+			url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType), "rawfilterclause");
 
 		return tf.promiseAjax.post(url,
 			{
-				paramData: searchData.paramData,
-				data: searchData.data,
-				async: false
+				paramData: { verify: true },
+				data: JSON.stringify(this.gridFilterDataModel.whereClause()),
 			},
 			{
 				overlay: false
 			})
 			.then(function(response)
 			{
-				return response;
+				return !!response.Items[0];
 			})
 			.catch(function()
 			{
@@ -669,7 +662,7 @@
 								{
 									return this.verify().then(function(response)
 									{
-										if (response.StatusCode === 400)
+										if (!response)
 										{
 											setTimeout(function()
 											{ //put data source name into message.
@@ -800,19 +793,17 @@
 		{
 			case "Disabled":
 				return "";
-				break;
 			case "Boolean":
 				return (value == "True" ? 1 : 0).toString();
-				break;
 			case "String":
 			case "DateTime":
 			case "Date":
 			case "Time":
 				return "'" + value + "'";
-				break;
+			case "Number":
 			case "Integer":
 			case "Decimal":
-				return value;
+				return Number(value);
 		}
 	};
 })();
