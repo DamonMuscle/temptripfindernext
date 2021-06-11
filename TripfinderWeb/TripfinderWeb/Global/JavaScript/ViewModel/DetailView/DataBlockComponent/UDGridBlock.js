@@ -131,8 +131,8 @@
         $itemTitleDiv.append($($itemTitleText));
         $itemTitleDiv.append($($btn));
         $itemTitleDiv.css({
-            "margin-bottom": "15px",
-            "top": "15px",
+            "margin-bottom": "30px",
+            "top": "30px",
             "position": "relative"
         });
         $gridStackItem.attr("mini-grid-type", "UDGrid")
