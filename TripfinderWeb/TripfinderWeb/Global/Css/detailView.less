@@ -1371,19 +1371,19 @@
 
 
 // .quick-add {
-// 	.allow-file-upload {
-// 		.upload-file-container {
-// 			width: 50%;
-// 			position: fixed;
-// 			height: 76%;
-// 			top: 12%;
-// 			left: 25%;
-// 			display: none;
-// 			z-index: 99999;
-// 			border: #FB9823 dashed 2px;
-// 			overflow: hidden;
-// 		}
-// 	}
+//     .allow-file-upload {
+//         .upload-file-container {
+//             width: 50%;
+//             position: fixed;
+//             height: 76%;
+//             top: 12%;
+//             left: 25%;
+//             display: none;
+//             z-index: 99999;
+//             border: #FB9823 dashed 2px;
+//             overflow: hidden;
+//         }
+//     }
 // }
 
 .allow-file-upload {
@@ -1432,7 +1432,7 @@
 }
 
 .general-switch-grid-menu.tf-contextmenu-white ul .menu-item .text {
-	max-width: 100%;
+    max-width: 100%;
 }
 
 .tf-contextmenu-white {
@@ -1762,6 +1762,23 @@
                     .item-content {
                         outline: none;
                     }
+
+                    .group-datetime{
+                        position: relative;
+                        .editor-icon{
+                            display: none !important;
+                        }
+                        &:hover,&.focus{
+                            .editor-icon{
+                                display: block !important;
+                            }
+                        }
+                        &.editing{
+                            .editable-field-value{
+                                display: none;
+                            }
+                        }
+                    }
                 }
 
                 small.help-block {
@@ -1829,14 +1846,14 @@
         user-select: none;
     }
     // &.grid-stack-animate {
-    // 	&,
-    // 	.grid-stack-item {
-    // 		-webkit-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
-    // 		-moz-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
-    // 		-ms-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
-    // 		-o-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
-    // 		transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
-    // 	}
+    //     &,
+    //     .grid-stack-item {
+    //         -webkit-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
+    //         -moz-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
+    //         -ms-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
+    //         -o-transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
+    //         transition: left 0.25s, top 0.25s, height 0.25s, width 0.25s;
+    //     }
     // }
     &.grid-stack-4 {
         > .grid-stack-item[data-gs-width="4"] {
@@ -3364,13 +3381,13 @@
                 pointer-events: none;
                 cursor: disabled;
             }
-			
-			@media (max-width: 355px) {
-				&.add-association {
-					padding: 5px;
-					top: -15px;
-				}
-			}
+            
+            @media (max-width: 355px) {
+                &.add-association {
+                    padding: 5px;
+                    top: -15px;
+                }
+            }
         }
 				.udgrid-btn {
 					top: -30px;
@@ -3645,27 +3662,27 @@
                             }
 
                             &.block-highlight{
-								background-color: #dfe1e6;
-								.count-notice
-								{
-									position: absolute;
-									right: -5px;
-									top:-5px;
-									width: 15px;
-									height: 15px;
-									line-height: 11px;
-									text-align: center;
-									border-radius: 50%;
-									background-color: red;
-									color: white;
-									z-index: 1;
+                                background-color: #dfe1e6;
+                                .count-notice
+                                {
+                                    position: absolute;
+                                    right: -5px;
+                                    top:-5px;
+                                    width: 15px;
+                                    height: 15px;
+                                    line-height: 11px;
+                                    text-align: center;
+                                    border-radius: 50%;
+                                    background-color: red;
+                                    color: white;
+                                    z-index: 1;
 
-									>span
-									{
-										font-size: 11px;
-									}
-								}
-							}
+                                    >span
+                                    {
+                                        font-size: 11px;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

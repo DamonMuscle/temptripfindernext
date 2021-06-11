@@ -36,6 +36,7 @@
 		this.baseRecordEntity = baseRecordEntity;
 		this.recordEntity = recordEntity;
 		this._documents = null;
+		this.obIsReadOnly(udGrid.isReadOnly || false);
 	}
 
 	UDGridDetailViewViewModel.prototype = Object.create(TF.DetailView.BaseCustomGridStackViewModel.prototype);
@@ -462,15 +463,19 @@
 
 				this.downloadMiniGridDocumentFile(getGridDataItem(e).Id);
 			}
-		},
-		{
-			name: "delete",
-			template: '<a class="k-button k-button-icontext k-grid-delete delete-relationship" title="Disassociate"></a>',
-			click: e =>
-			{
-				this.removeAssociationToDocument(getGridDataItem(e).Id);
-			}
 		}];
+
+		if (!this.obIsReadOnly())
+		{
+			command.push({
+				name: "delete",
+				template: '<a class="k-button k-button-icontext k-grid-delete delete-relationship" title="Disassociate"></a>',
+				click: e =>
+				{
+					this.removeAssociationToDocument(getGridDataItem(e).Id);
+				}
+			});
+		}
 
 		// add min width to avoid title "Action" being cut.
 		var minWidth = 45,
