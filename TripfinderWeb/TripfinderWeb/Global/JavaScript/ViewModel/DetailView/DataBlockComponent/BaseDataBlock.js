@@ -10,6 +10,10 @@
 
 	BaseDataBlock.prototype.isReadOnly = function()
 	{
+		if (this.isBlockReadOnly())
+		{
+			return true;
+		}
 		if (this.detailView == null)
 		{
 			return true;
