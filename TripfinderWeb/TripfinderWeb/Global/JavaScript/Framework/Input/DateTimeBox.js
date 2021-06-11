@@ -255,20 +255,24 @@
 			{
 				var preWightOffset = widget.offset();
 				var wightOffsetLeft = $button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2;
-
 				var wightCss = {}, modal;
 				if (TF.isMobileDevice)
 				{
+					if (widget.width() + wightOffsetLeft > window.outerWidth) {
+						wightOffsetLeft = window.outerWidth - (widget.width() + 25);
+					}
+
 					modal = this.$element.closest(".modal-dialog");
 					if (modal.length > 0)
 					{
 						bodyWidth = modal.width();
 					}
-					if (modal && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
+
+					if (modal && modal.length > 0 && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
 					{
 						wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
 					}
-					else if (modal && wightOffsetLeft < modal.offset().left + 5)
+					else if (modal && modal.length > 0 && wightOffsetLeft < modal.offset().left + 5)
 					{
 						wightCss['left'] = modal.offset().left;
 					} else
@@ -312,7 +316,7 @@
 			}
 			this._toggleScroll(false);
 			this._toggleScroll(true);
-			if (TF.isPhoneDevice) //VIEW-1252 Date Control is not visible when focus is still set to input
+			if (TF.isPhoneDevice && modal.length > 0) //VIEW-1252 Date Control is not visible when focus is still set to input
 			{
 				if (widget.closest(".modal-dialog").length == 0)
 				{
