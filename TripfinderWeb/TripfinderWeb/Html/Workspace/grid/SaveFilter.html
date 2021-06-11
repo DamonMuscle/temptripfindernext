@@ -22,8 +22,7 @@
 			<div class="form-group">
 				<label class="bold-Label">Field</label>
 				<div class="input-group">
-					<div
-						data-bind="typeahead:{source:obGridDefinitionColumns,format:function(obj){return obj.DisplayName == ' '?' ':obj.DisplayName+' ('+obj.PersistenceName+')';},drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
+					<div data-bind="typeahead:{source:obGridDefinitionColumns,format:function(obj){return obj.DisplayName == ' '?' ':obj.DisplayName+' ('+obj.PersistenceName+')';},drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
 						<!-- ko customInput:{type:"Select",value:obSelectedFieldText,attributes:{class:"form-control"}} -->
 						<!-- /ko -->
 					</div>
@@ -52,13 +51,42 @@
 			</div>
 		</div>
 		<div class="col-xs-6">
-			<div class="form-group" data-bind="event:{keypress:valueKeypress}">
+			<!-- ko if: obValueFieldType() == "Select" -->
+			<div class="form-group" data-bind="event:{keydown:valueKeypress}">
+				<label class="bold-Label">Value</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:ListMoverOptions,format:function(item){return item.PickList;},drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
+						<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control unBindHotKey"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<!-- /ko -->
+
+			<!-- ko if: obValueFieldType() == "Boolean" -->
+			<div class="form-group" data-bind="event:{keydown:valueKeypress}">
 				<label class="bold-Label">Value</label>
 				<div>
-					<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField"} -->
+					<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control unBindHotKey",trueDisplayName:obTrueDisplayName,falseDisplayName:obFalseDisplayName},events:{selectedDataChanged:booleanSelectedDataChanged}} -->
 					<!-- /ko -->
 				</div>
 			</div>
+			<!-- /ko -->
+
+			<!-- ko if: obValueFieldType() != "Select"&&obValueFieldType() != "Boolean" -->
+			<div class="form-group" data-bind="event:{keydown:valueKeypress}">
+				<label class="bold-Label">Value</label>
+				<div>
+					<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control unBindHotKey"}} -->
+					<!-- /ko -->
+				</div>
+			</div>
+			<!-- /ko -->
 		</div>
 		<div class="col-xs-4">
 			<div class="form-group">

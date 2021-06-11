@@ -916,48 +916,25 @@
 				self.startReadMode();
 			}
 
-			if(!self.obEditing())
+			self.recordId = recordId;
+			self.stopCreateNewMode();
+			promiseTask = self.updateGridType(gridType).then(function()
 			{
-				self.changeDetailViewByID(recordId, gridType);
-			}
-			else
-			{
-			    self.showConfirmation("Do you want to close " + getTitleByType(self.gridType) + " detail view without saving?")
-				.then(function(result)
+				return self.getRecordEntity(gridType, recordId).then(function(recordEntity)
 				{
-					if (result)
-					{
-						self.changeDetailViewByID(recordId, gridType);
-						self.refreshEditStatus();
-					}
-					return;
+					if (!recordEntity) { return; }
+
+					self.recordEntity = recordEntity;
+
+					var recordPic = recordEntity.RecordPicture;
+					self.obRecordPicture(recordPic && recordPic !== 'None' ? 'url(data:' + recordPic.MimeType + ';base64,' + recordPic.FileContent : "");
+					self.updateDetailViewTitle(recordEntity);
+					self.openDetailViewInNewTab();
+
+					return self.loadCalendarData(recordId, recordEntity);
 				});
-			}
-		}
-	};
-
-	DetailViewViewModel.prototype.changeDetailViewByID = function(recordId, gridType)
-	{
-		var self = this;
-		self.recordId = recordId;
-		self.stopCreateNewMode();
-		promiseTask = self.updateGridType(gridType).then(function()
-		{
-			return self.getRecordEntity(gridType, recordId).then(function(recordEntity)
-			{
-				if (!recordEntity) { return; }
-
-				self.recordEntity = recordEntity;
-
-				self.obIsReadOnly(!tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(self.recordEntity));
-				var recordPic = recordEntity.RecordPicture;
-				self.obRecordPicture(recordPic && recordPic !== 'None' ? 'url(data:' + recordPic.MimeType + ';base64,' + recordPic.FileContent : "");
-				self.updateDetailViewTitle(recordEntity);
-				self.openDetailViewInNewTab();
-
-				return self.loadCalendarData(recordId);
 			});
-		});
+		}
 
 		return promiseTask.then(function()
 		{
@@ -968,7 +945,7 @@
 
 			self.highlightRequiredFieldByAsterisk();
 		});
-	}
+	};
 
 	/**
 	 * Start read mode in detail view.
@@ -2115,7 +2092,7 @@
 		{
 			return Promise.resolve(true);
 		}
-		//Close errror toast if exsit.
+		//Close error toast if exist.
 		self.pageLevelViewModel.clearError();
 
 		if (self.isCreateGridNewRecord)

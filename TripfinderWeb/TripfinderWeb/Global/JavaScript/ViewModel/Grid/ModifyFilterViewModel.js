@@ -7,18 +7,19 @@
 
 	function ModifyFilterViewModel (gridType, isNew, gridFilterDataModel, headerFilters, gridDefinition, omittedRecordIds, options, searchFilter)
 	{
-		this.isNew = isNew;
+		this.isNew = typeof (isNew) == 'string' ? isNew === "new" : isNew;
 		this.gridType = gridType;
 
 		if (!gridFilterDataModel)
 		{
 			gridFilterDataModel = new TF.DataModel.GridFilterDataModel();
-			gridFilterDataModel.gridType(gridType);
+			gridFilterDataModel.dataTypeID(tf.dataTypeHelper.getId(gridType));
 		}
 		else
 		{
+			this.originalGridFilterDataModel = gridFilterDataModel;
 			gridFilterDataModel = gridFilterDataModel.clone();
-			if (isNew === "new")
+			if (this.isNew)
 			{
 				gridFilterDataModel.id(0);
 				gridFilterDataModel.apiIsNew(true);
@@ -46,15 +47,41 @@
 		this.selectLogicalOperatorOpen = false;
 		this._gridType = gridType;
 		this.obOmitRecords = ko.observableArray([]);
+		this.ListMoverOptions = ko.observableArray([]);
 		this.options = options;
 		this.showApplyFilter = options && options.showApplyFilter == false ? false : true;
-
-		this.obValueFieldValue.subscribe(function()
+		this.obTrueDisplayName = ko.observable(null);
+		this.obFalseDisplayName = ko.observable(null);
+		this.booleanSelectedDataChanged = new TF.Events.Event();
+		this.booleanSelectedData = null;
+		this.booleanSelectedDataChanged.subscribe((_, value) =>
 		{
-			if (this.obValueFieldValue() !== "")
+			this.booleanSelectedData = value;
+		});
+
+		this.obValueFieldValue.subscribe(function(newFiledValue)
+		{
+			if (newFiledValue)
 			{
-				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
+				switch (this.obValueFieldType())
+				{
+					case "Boolean":
+						this.insertFragmentToCurrentCursorPostion(this.valueToSQL("Boolean", this.booleanSelectedData.value));
+						break;
+					case "Select":
+						this.insertFragmentToCurrentCursorPostion(this.valueToSQL("String", newFiledValue));
+						break;
+					default:
+						break;
 			}
+			}
+
+		}.bind(this));
+
+		this.obValueFieldType.subscribe(function()
+		{
+			this.obValueFieldValue("");
+			this.ListMoverOptions([]);
 		}.bind(this));
 
 		this.obErrorMessageDivIsShow = ko.observable(false);
@@ -64,57 +91,20 @@
 
 		if (headerFilters)
 		{
+			(headerFilters.FilterItems || []).forEach(function(item)
+			{
+				item.FieldName = tf.UDFDefinition.getOriginalName(item.FieldName);
+			});
+
 			var searchData = new TF.SearchParameters(null, null, null, headerFilters, null, null, null);
 
-			var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(gridType), "RawFilterClause");
-			if (gridType === 'busfinderHistorical')
+			var url = pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(gridType), "RawFilterClause");
+			if (gridType === 'gpsevent')
 			{
-				searchData.data.filterSet.filterSets = [
-					{
-						LogicalOperator: "And",
-						FilterItems: [
-							{
-								FieldName: "EventDate",
-								Operator: "GreaterThanOrEqualTo",
-								TypeHint: "Date",
-								Value: moment().format('M/DD/YYYY') || ''
-							},
-							{
-								FieldName: "EventDate",
-								Operator: "LessThanOrEqualTo",
-								TypeHint: "Date",
-								Value: moment().format('M/DD/YYYY') || ''
+				url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", tf.dataTypeHelper.getEndpoint(gridType) + "/rawfilterclause?databaseId=0");
 							}
-						],
-						FilterSets: []
-					},
-					{
-						LogicalOperator: "And",
-						FilterItems: [
-							{
-								FieldName: "Time",
-								Operator: "GreaterThanOrEqualTo",
-								TypeHint: "Time",
-								Value: startTime || moment('2010-01-01T00:00:00')
-							},
-							{
-								FieldName: "Time",
-								Operator: "LessThanOrEqualTo",
-								TypeHint: "Time",
-								Value: endTime || moment('2010-01-01T23:59:00')
-							}
-						],
-						FilterSets: []
-					}
-				];
-			}
 
-			var requestOption = {
-				data: searchData.data.filterSet
-			}
-
-
-			tf.promiseAjax.post(url, requestOption)
+			tf.promiseAjax.post(url, { data: searchData.data.filterSet })
 				.then(function(apiResponse)
 				{
 					this.gridFilterDataModel.whereClause((this.gridFilterDataModel.whereClause() ? this.gridFilterDataModel.whereClause() + " AND " : "") + apiResponse.Items[0]);
@@ -141,7 +131,7 @@
 		this.obSelectedField = ko.observable();
 		this.obSelectedFieldText = ko.observable();
 		this.obSelectedFieldText.subscribe(this.selectFieldClick.bind(this));
-		this.getOmittedRecordsName(omittedRecordIds, tf.DataTypeHelper.getId(this.gridType));
+		this.getOmittedRecordsName(omittedRecordIds, gridType);
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		this.initReminder();
 
@@ -152,6 +142,8 @@
 			var visableOmitArray = this.obOmitRecords.slice(0, this.obVisableOmitCnt());
 			return visableOmitArray;
 		}, this);
+
+		this.valueKeypress = this.valueKeypress.bind(this);
 	}
 
 	ModifyFilterViewModel.prototype.loadMoreOmitedRecordClick = function()
@@ -161,19 +153,20 @@
 		this.obVisableOmitCnt(initVisableOmitCnt);
 	};
 
-	ModifyFilterViewModel.prototype.getOmittedRecordsName = function(omittedRecordIds, dataTypeId)
+	ModifyFilterViewModel.prototype.getOmittedRecordsName = function(omittedRecordIds, gridType)
 	{
-		if (omittedRecordIds == null)
+		if (omittedRecordIds == null || omittedRecordIds.length === 0)
 		{
 			return null;
 		}
+
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "omittedrecordnames"),
 			{
 				paramData:
 				{
 					databaseId: tf.datasourceManager.databaseId,
 					omittedRecordIDs: omittedRecordIds.join(","),
-					dataTypeId: dataTypeId
+					dataTypeId: tf.dataTypeHelper.getId(gridType)
 				}
 			})
 			.then(function(apiResponse)
@@ -222,10 +215,7 @@
 		tmpColumns = this._excludePersistenceNameIsNullColumns(tmpColumns);
 		tmpColumns = this._sortColumns(tmpColumns);
 
-		tmpColumns.unshift(
-			{
-				DisplayName: " "
-			})
+		tmpColumns.unshift({ DisplayName: " " });
 
 		return tmpColumns;
 	};
@@ -254,7 +244,7 @@
 
 		tf.loadingIndicator.setSubtitle('Verifying Syntax');
 		tf.loadingIndicator.show();
-		this.verify().then(function(response)
+		this.verify().then(function()
 		{
 			tf.loadingIndicator.tryHide();
 
@@ -268,8 +258,7 @@
 			var msg = "The syntax of the statement is correct.";
 			this.pageLevelViewModel.popupSuccessMessage(msg);
 			$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").hide();
-		}.bind(this))
-			.catch(function()
+		}.bind(this), function()
 			{
 				tf.loadingIndicator.tryHide();
 				var $field = $("textarea[name='sqlStatement']");
@@ -288,33 +277,64 @@
 
 	ModifyFilterViewModel.prototype.verify = function(getCount)
 	{
-		if ($.trim(this.gridFilterDataModel.whereClause()) === '')
+		var self = this,
+			skip = 0,
+			take = 5,
+			whereClause = self.gridFilterDataModel.whereClause();
+
+		if ($.trim(whereClause) === '')
 		{
 			return Promise.resolve(false);
 		}
 
-		var url = null;
-		if (this.gridType === 'busfinderhistorical')
-			url = pathCombine(tf.api.apiPrefix(), "search/gpsevents/verifyFilterWhereClause"); // TODO-V2, need to remove
-		else
-			url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType), "rawfilterclause");
+		this.obGridDefinitionColumns().forEach(c =>
+		{
+			whereClause = whereClause.replace(new RegExp("\\b" + c.PersistenceName + "\\b", "gi"), c.PersistenceName)
+		})
+		self.gridFilterDataModel.whereClause(whereClause);
 
-		return tf.promiseAjax.post(url,
+		var searchData = new TF.SearchParameters(skip, take, self.sorts, self.filters, self.gridFilterDataModel.whereClause(), null, null);
+		searchData.data.fields = TF.Grid.LightKendoGrid.prototype.bindNeedFileds(self._gridType, ['Id']);
+		searchData.paramData.getCount = !!getCount;
+		searchData.data.isQuickSearch = self.gridFilterDataModel.isForQuickSearch();
+
+		var url = null;
+		if (self.gridType != 'gpsevent')
+		{
+			url = pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(self._gridType) + "/rawfilterclause?verify=true");
+		}
+		else
+		{
+			url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", tf.dataTypeHelper.getEndpoint(self._gridType) + "/rawfilterclause?verify=true&databaseId=0");
+		}
+
+		var promiseParam = {
+			data: JSON.stringify(searchData.data.filterClause),
+		};
+		return tf.promiseAjax.post(url, promiseParam, {
+			overlay: false
+		}).then(function(response)
+		{
+			return !!response.Items[0];
+		}, function()
+		{
+			return false;
+		}).then(function(result)
+		{
+			if (self.gridFilterDataModel.id() && self.originalGridFilterDataModel
+				&& self.gridFilterDataModel.whereClause().trim() === (self.originalGridFilterDataModel.whereClause() || "").trim())
 			{
-				paramData: { verify: true },
-				data: JSON.stringify(this.gridFilterDataModel.whereClause()),
-			},
-			{
-				overlay: false
-			})
-			.then(function(response)
-			{
-				return !!response.Items[0];
-			})
-			.catch(function()
-			{
-				throw false;
-			});
+				tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", self.gridFilterDataModel.id()), {
+					data: [{ "op": "replace", "path": "/IsValid", "value": result }]
+				}).then(function()
+				{
+					self.originalGridFilterDataModel.isValid(result);
+				});
+			}
+
+			if (result) return true;
+			else throw false;
+		});
 	};
 
 	ModifyFilterViewModel.prototype.save = function()
@@ -427,28 +447,45 @@
 					gridFilterDataModel.reminderUserId(reminder.UserId);
 				}
 			}
-			var oldIsValidValue = this.gridFilterDataModel.isValid();
-			this.gridFilterDataModel.isValid(true);
-			if (this.gridFilterDataModel.apiIsDirty())
-			{
+
 				setReminder(this.gridFilterDataModel);
 				this.gridFilterDataModel.omittedRecords(this.obOmitRecords());
 				var data = this.gridFilterDataModel.toData();
 				data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause()) ? tf.datasourceManager.databaseId : null;
-				data.DataTypeID = tf.DataTypeHelper.getId(data.GridType);
-				return tf.promiseAjax[this.isNew === "new" ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
+			data.isValid = true;
+			return tf.promiseAjax[this.isNew ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 					{
 						paramData: { "@relationships": "OmittedRecord" },
 						data: [data]
-					})
-					.then(function(apiResponse)
+				}).then(function(apiResponse)
 					{
 						this.gridFilterDataModel.update(apiResponse.Items[0]);
-						return this.gridFilterDataModel;
-					}.bind(this))
-					.catch(function(apiResponse)
+					if (this.originalGridFilterDataModel && !this.isNew)
 					{
-						this.gridFilterDataModel.isValid(oldIsValidValue);
+						// change school boundary filter
+						var changeInfo = { from: this.originalGridFilterDataModel.toData(), to: this.gridFilterDataModel.toData() };
+						tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), "redistricts"), {
+							paramData: {
+								"@filter": "eq(FilterName," + changeInfo.from.Name + ")"
+							},
+							data: [
+								{ "op": "replace", "path": "/FilterName", "value": changeInfo.to.Name },
+								{ "op": "replace", "path": "/FilterSpec", "value": changeInfo.to.WhereClause }
+							]
+						}).then(function(res)
+						{
+							if (res.Items.length > 0)
+							{
+								PubSub.publish("boundary-set-change");
+							}
+						});
+
+						this.originalGridFilterDataModel.update(apiResponse.Items[0]);
+					}
+
+						return this.gridFilterDataModel;
+				}.bind(this)).catch(function(apiResponse)
+					{
 						this.obErrorMessageDivIsShow(true);
 						this.obValidationErrors([
 							{
@@ -456,12 +493,6 @@
 							}]);
 						throw apiResponse;
 					});
-			}
-			else
-			{
-				setReminder(this.gridFilterDataModel);
-				return Promise.resolve(this.gridFilterDataModel);
-			}
 		}.bind(this));
 	};
 
@@ -474,7 +505,23 @@
 			return;
 		}
 		this.insertFragmentToCurrentCursorPostion("[" + columnDefinition.PersistenceName + "]");
+
+		if (columnDefinition.TypeCode === "Boolean")
+		{
+			if (columnDefinition.UDFId != null)
+			{
+				let udf = tf.UDFDefinition.get(this.gridType).userDefinedFields.find(udf => udf.UDFId == columnDefinition.UDFId);
+				this.obTrueDisplayName(udf.TrueDisplayName);
+				this.obFalseDisplayName(udf.FalseDisplayName);
+			}
+		}
+
 		this.obValueFieldType(columnDefinition.TypeCode);
+
+		if (columnDefinition.TypeCode === "Select")
+		{
+			this.ListMoverOptions(columnDefinition.UDFPickListOptions);
+		}
 	};
 
 	ModifyFilterViewModel.prototype.selectOperatorClick = function(viewModel, e)
@@ -500,7 +547,7 @@
 		if (e.keyCode == 13)
 		{
 			var baseBox = ko.dataFor(e.target);
-			var value = baseBox.value();
+			var value = baseBox.$element.val();
 			this.insertFragmentToCurrentCursorPostion(this.valueToSQL(baseBox.getType(), value));
 			return false;
 		}
@@ -573,8 +620,7 @@
 	{
 		setTimeout(function()
 		{
-			var isValidating = false,
-				self = this;
+			var self = this;
 
 			if (!(TF.isSafari && TF.isMobileDevice && !TF.isPhoneDevice))
 				this._$form.find(':text:eq(0)').focus();
@@ -605,13 +651,12 @@
 								}
 
 								var data = this.gridFilterDataModel.toData();
-								data.DataTypeID = tf.DataTypeHelper.getId(data.GridType);
 								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 									{
 										paramData: {
 											"@filter": String.format("eq(datatypeId,{1})&eq(name,{2})",
 												tf.datasourceManager.databaseId, data.DataTypeID, data.Name),
-											"@fields": "DBID,Name"
+											"@fields": "Id,DBID,Name"
 										},
 										data: data,
 										async: false
@@ -621,20 +666,18 @@
 									})
 									.then(function(apiResponse)
 									{
-										if (apiResponse.Items.length === 0 ||
-											(self.isNew === 'edit' &&
-												apiResponse.Items[0].Name === data.Name))
+										var existFilter = apiResponse.Items[0];
+										if (!existFilter || (!self.isNew && existFilter.Name === data.Name && existFilter.Id == data.Id))
 										{
 											return true;
 										}
 
-										var existFilter = apiResponse.Items[0];
 										if (existFilter.DBID != null && existFilter.DBID != tf.datasourceManager.databaseId)
 										{
-											return { valid: false, message: "Filter already exists in other data source." };
+											return { valid: false, message: "already exists in other data source." };
 										}
 
-										return { valid: false, message: "Filter already exists current data source." };
+										return { valid: false, message: "already exists in current data source." };
 									});
 							}.bind(this)
 						}
@@ -702,14 +745,12 @@
 				}
 			};
 
-			this._$form
-				.bootstrapValidator(
-					{
+			this._$form.bootstrapValidator({
 						excluded: [':hidden', ':not(:visible)'],
 						live: 'enabled',
 						message: 'This value is not valid',
 						fields: fields
-					})
+			});
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		}.bind(this), 0);
 	};
@@ -736,14 +777,13 @@
 		{
 			$(viewModel.field).focus();
 		}
-
 	};
 
 	ModifyFilterViewModel.prototype.cancel = function()
 	{
 		return new Promise(function(resolve, reject)
 		{
-			if (this.gridFilterDataModel.apiIsDirty() || (this.obReminderEnable() && this.obReminderDataModel().apiIsDirty()))
+			if (this.gridFilterDataModel.apiIsDirty())
 			{
 				resolve(tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes"));
 			}
@@ -794,7 +834,7 @@
 			case "Disabled":
 				return "";
 			case "Boolean":
-				return (value == "True" ? 1 : 0).toString();
+				return (value ? 1 : 0).toString();
 			case "String":
 			case "DateTime":
 			case "Date":
@@ -807,7 +847,6 @@
 		}
 	};
 })();
-
 
 (function()
 {

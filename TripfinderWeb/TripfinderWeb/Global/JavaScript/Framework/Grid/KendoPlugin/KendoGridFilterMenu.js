@@ -13,12 +13,11 @@
 	function KendoGridFilterMenu()
 	{
 		this.inited = false;
-		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
-		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this.getStorageKeyId();
+		this._storageFilterDataKey = "grid.currentfilter." + this._gridType + ".id";
+		this._storageGeoRegionTypeIdKey = "grid.currentGeoRegionType." + this._gridType + ".id";
+		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
-		this.obFieldTripStageFilters = ko.observableArray();
-		this.selectedFieldTripStageFilters = ko.observableArray();
 		this.obOpenRelatedFilter = ko.observable({});
 
 		this.obGridFilterDataModelsFromDataBase = ko.computed(function()
@@ -60,7 +59,11 @@
 			}).ToArray();
 		}, this);
 
-		this.obSelectedGridFilterId = ko.observable(this._gridState.gridFilterId);
+		this.obSelectedGridFilterId = ko.observable();
+		if (this._gridState && typeof this._gridState.gridFilterId == "number")
+		{
+			this.obSelectedGridFilterId(this._gridState.gridFilterId);
+		}
 		this.subscriptions.push(this.obSelectedGridFilterId.subscribe(this._selectedGridFilterIdChange, this));
 		this.saveFilterClick = this.saveFilterClick.bind(this);
 		this.manageFilterClick = this.manageFilterClick.bind(this);
@@ -68,9 +71,8 @@
 		this.saveAsNewFilterClick = this.saveAsNewFilterClick.bind(this);
 		this.clearGridFilterClick = this.clearGridFilterClick.bind(this);
 		this.onClearGridFilterClickEvent = new TF.Events.Event();
-		this.onFieldTripStageChanged = new TF.Events.Event();
+		this.onRefreshPanelEvent = new TF.Events.Event();
 		this.gridFilterClick = this.gridFilterClick.bind(this);
-		this.gridFieldTripFilterClick = this.gridFieldTripFilterClick.bind(this);
 		this.quickFilterBarClick = this.quickFilterBarClick.bind(this);
 		this.noApplyFilterNoModified = ko.observable(true);
 		this.obCallOutFilterName = ko.observable(this.options.callOutFilterName);
@@ -80,6 +82,24 @@
 		this.obSelectedGridFilterClause = ko.computed(this._selectedGridFilterWhereClauseComputer, this);
 		this.obSelectedGridFilterType = ko.computed(this._selectedGridFilterTypeComputer, this);
 		this.obSelectedGridFilterName = ko.computed(this._selectedGridFilterNameComputer, this);
+
+		this.obSelectedStaticFilterName = ko.computed(function()
+		{
+			if (this.obSelectedGridFilterDataModel())
+			{
+				return this.obSelectedGridFilterDataModel().isStatic() ? this.obSelectedGridFilterDataModel().whereClause() : "";
+			}
+			return null;
+		}, this);
+		this.obIsSystemFilter = ko.computed(function()
+		{
+			if (this.obSelectedGridFilterDataModel())
+			{
+				return this.obSelectedGridFilterDataModel().isSystem() ? true : false;
+			}
+			return false;
+		}, this);
+
 		this.subscriptions.push(this.obHeaderFilters.subscribe(this._currentFilterChange, this));
 		this.subscriptions.push(this.obHeaderFilterSets.subscribe(this._currentFilterChange, this));
 
@@ -98,93 +118,7 @@
 		this.obQuickFilterBarCheckIcon = ko.observable("menu-item-checked");
 
 		this.initReminder();
-	};
-
-	KendoGridFilterMenu.prototype.getStorageKeyId = function()
-	{
-		return this.pageType || this._gridType;
-	};
-
-	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
-	{
-		var stageIds = [];
-		if (this.pageType == "myrequests"
-			|| this.pageType == "fieldtrips"
-			|| tf.authManager.authorizationInfo.isAdmin
-			|| tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
-		{
-			stageIds = [101, 100, 99, 98, 7, 6, 5, 4, 3, 2, 1];
-		}
-		else if (this.pageType == "approvals")
-		{
-			if (tf.authManager.isAuthorizedFor("level4Administrator", "read"))
-			{
-				stageIds = [7, 6, 5, 4, 3, 2, 1];
-			}
-			else if (tf.authManager.isAuthorizedFor("level3Administrator", "read"))
-			{
-				stageIds = [5, 4, 3, 2, 1];
-			}
-			else if (tf.authManager.isAuthorizedFor("level2Administrator", "read"))
-			{
-				stageIds = [3, 2, 1];
-			}
-			else if (tf.authManager.isAuthorizedFor("level1Administrator", "read"))
-			{
-				stageIds = [1];
-			}
-		}
-		this.selectedFieldTripStageFilters($.extend([], stageIds));
-		this.obFieldTripStageFilters(stageIds);
-	};
-
-	KendoGridFilterMenu.prototype.getFieldTripStageName = function(id)
-	{
-		switch (id)
-		{
-			case (1):
-				return "Level 1 - Request Submitted";
-			case (2):
-				return "Level 2 - Request Declined";
-			case (3):
-				return "Level 2 - Request Approved";
-			case (4):
-				return "Level 3 - Request Declined";
-			case (5):
-				return "Level 3 - Request Approved";
-			case (6):
-				return "Level 4 - Request Declined";
-			case (7):
-				return "Level 4 - Request Approved";
-			case (98):
-				return "Declined by Transportation";
-			case (99):
-				return "Transportation Approved";
-			case (100):
-				return "Canceled - Request Canceled";
-			case (101):
-				return "Completed - Request Completed";
-		}
-	};
-
-	KendoGridFilterMenu.prototype.gridFieldTripFilterClick = function(id, e)
-	{
-		var self = this, $target = $(e.target).closest(".menu-item"), index;
-
-		if ($target.hasClass("menu-item-checked"))
-		{
-			self.selectedFieldTripStageFilters.remove(id);
-		}
-		else
-		{
-			index = self.selectedFieldTripStageFilters.indexOf(id);
-			if (index < 0)
-			{
-				self.selectedFieldTripStageFilters.push(id);
-			}
-		}
-		self.onFieldTripStageChanged.notify();
-	};
+	}
 
 	KendoGridFilterMenu.prototype._omitRecordsChange = function()
 	{
@@ -193,9 +127,7 @@
 		{
 			for (var i = 0; i < this.obSelectedGridFilterDataModel().omittedRecords().length; i++)
 			{
-				var omittedRecord = this.obSelectedGridFilterDataModel().omittedRecords()[i];
-				var omittedRecordId = omittedRecord.OmittedRecordId || omittedRecord.OmittedRecordID;
-				omittedRecordId && omittedRecords.push(omittedRecordId);
+				omittedRecords.push(this.obSelectedGridFilterDataModel().omittedRecords()[i].OmittedRecordID);
 			}
 			this._gridState.filteredExcludeAnyIds = omittedRecords;
 			this.obFilteredExcludeAnyIds(this._gridState.filteredExcludeAnyIds);
@@ -217,12 +149,12 @@
 	KendoGridFilterMenu.prototype.saveQuickFilter = function(quickFilters)
 	{
 		var self = this;
-		//IF the request from search, do not sticky quick fliter.
+		//IF the request from search, do not sticky quick filter.
 		if (self.options.fromSearch || self.options.isTemporaryFilter)
 		{
 			return Promise.resolve();
 		}
-		var gridType = self.getStorageKeyId();
+		var gridType = self.options.gridType;
 		if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 		{
 			gridType = self.options.kendoGridOption.entityType + "." + gridType;
@@ -233,12 +165,12 @@
 	KendoGridFilterMenu.prototype.clearQuickFilter = function()
 	{
 		var self = this;
-		//IF the request from search, do not sticky quick fliter.
+		//IF the request from search, do not sticky quick filter.
 		if (self.options.fromSearch || self.options.isTemporaryFilter)
 		{
 			return Promise.resolve();
 		}
-		var gridType = self.getStorageKeyId();
+		var gridType = self.options.gridType;
 		if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 		{
 			gridType = self.options.kendoGridOption.entityType + "." + gridType;
@@ -248,13 +180,14 @@
 
 	KendoGridFilterMenu.prototype.getQuickFilter = function()
 	{
-		var self = this, gridType = self.getStorageKeyId();
+		var self = this, gridType = self.options.gridType;
 		if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 		{
 			gridType = self.options.kendoGridOption.entityType + "." + gridType;
 		}
-		//IF the request from search, do not use the sticky quick fliter.
-		if (self.options.fromSearch || self.options.isTemporaryFilter)
+		//IF the request from search or from a Dashboard Widget Grid, do not use the sticky quick filter.
+		if (self.options.fromSearch || self.options.isTemporaryFilter
+			|| (self.options.customGridType && self.options.customGridType.toLowerCase() === "dashboardwidget"))
 		{
 			return new TF.SearchParameters(null, null, null, null, null, null, null);
 		}
@@ -278,12 +211,17 @@
 		var self = this;
 		if (self._quickFilterBarIsEnabled())
 		{
-			var display = self._getStroageDisplayQuickFilterBarSetting();
+			if (self.options.displayQuickFilterBar != null)
+			{
+				self._setQuickFilterBarStatus(self.options.displayQuickFilterBar);
+				return;
+			}
+			var display = self._getStorageDisplayQuickFilterBarSetting();
 			self._setQuickFilterBarStatus(display);
 		}
 	};
 
-	KendoGridFilterMenu.prototype._getStroageDisplayQuickFilterBarSetting = function()
+	KendoGridFilterMenu.prototype._getStorageDisplayQuickFilterBarSetting = function()
 	{
 		var display = tf.storageManager.get(this._storageDisplayQuickFilterBarKey);
 		if (display === undefined) display = true;
@@ -305,7 +243,7 @@
 
 	KendoGridFilterMenu.prototype._setQuickFilterBarStatus = function(display)
 	{
-		var filterRow = this.$container.find(".k-grid-header").find(".k-filter-row");
+		var filterRow = this.$container.children(".k-grid-header").find(".k-filter-row");
 		if (display)
 		{
 			filterRow.css("display", "");
@@ -319,6 +257,7 @@
 			this.obQuickFilterBarCheckIcon("");
 		}
 		this.fitContainer();
+		this.lightKendoGridDetail && this.lightKendoGridDetail.changeQuickFilterBarStatus(display);
 	};
 
 	KendoGridFilterMenu.prototype._selectedGridFilterModifiedComputer = function()
@@ -472,125 +411,206 @@
 	{
 		var self = this;
 		var filterUrl = "gridfilters";
-		if (tf.isViewfinder)
-		{
-			filterUrl = "gridfilters/skipReadReminderData/";
-		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
+		var gridfiltersPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
 			paramData: {
-				"@filter": String.format("(eq(dbid, {0})|isnull(dbid,))&eq(datatypeId,{1})", tf.datasourceManager.databaseId, tf.DataTypeHelper.getId(self.options.gridType)),
+				"@filter": String.format("(eq(dbid, {0})|isnull(dbid,))&eq(datatypeId,{1})", tf.datasourceManager.databaseId, tf.dataTypeHelper.getId(self.options.gridType)),
 				"@relationships": "OmittedRecord,Reminder"
+			}
+		}).then(apiResponse => apiResponse.Items);
+		let dataTypeId = tf.dataTypeHelper.getId(self._gridType);
+		var staticfiltersPromise = Number.isInteger(dataTypeId) ? tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "staticfilters"), {
+			paramData: {
+				dataTypeId: dataTypeId
 			}
 		}).then(function(apiResponse)
 		{
-			var gridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, apiResponse.Items);
-			//IF the request from search, do not use the sticky fliter.
-			if (self.options.fromSearch || self.options.isTemporaryFilter)
+			var items = apiResponse.Items;
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'reminders'), {
+				paramData: {
+					"@filter": String.format("(in(StaticFilterName,{0}))", items.join(','))
+				}
+			}).then(apiResponse =>
 			{
-				self.obGridFilterDataModels(gridFilterDataModels);
-				return Promise.resolve();
-			}
-			var selectGridFilterEntityId;
-			//if (!self.inited)
+				return items.map((item, index) =>
+				{
+					return {
+						Id: -(index + 1),
+						IsValid: true,
+						DataTypeID: dataTypeId,
+						Name: item,
+						WhereClause: item,
+						Reminders: apiResponse.Items.filter(r => r.StaticFilterName === item),
+						IsStatic: true
+					}
+				})
+			});
+		}) : Promise.resolve([]);
+		return Promise.all([gridfiltersPromise, staticfiltersPromise])
+			.then(Items =>
 			{
-				if ($.isNumeric(self.options.filterId) && self.options.filterId !== 0)
+				var gridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, Items.flat());
+				gridFilterDataModels.forEach(function(gridFilter)
 				{
-					selectGridFilterEntityId = self.options.filterId;
-				} else
+					if (gridFilter.reminders().length > 0)
+					{
+						gridFilter.reminderId(gridFilter.reminders()[0].Id);
+						gridFilter.reminderUserId(gridFilter.reminders()[0].UserID);
+					}
+				});
+				if (self.options.staticFilterName)
 				{
-					selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
+					let staticFilters = Items[1].filter(i => i.Name === self.options.staticFilterName);
+					if (staticFilters.length > 0)
+					{
+						self.options.filterId = staticFilters[0].Id;
+					}
 				}
 
-				if (selectGridFilterEntityId && selectGridFilterEntityId.filteredIds)
+				//IF the request from search, do not use the sticky filter.
+				if (self.options.fromSearch || self.options.isTemporaryFilter)
 				{
-					self.relatedFilterEntity = selectGridFilterEntityId;
-				} else
-				{
-					self.relatedFilterEntity = undefined;
+					self.obGridFilterDataModels(gridFilterDataModels);
+					return Promise.resolve();
 				}
-
-				if (getQueryString("filterId"))
-				{
-					selectGridFilterEntityId = parseInt(getQueryString("filterId"));
-				}
-			}
-
-			// for the specific filters in the summary page of the tripfinderweb
-			if (self.options.summaryFilters && self.options.summaryFilters.length > 0)
-			{
-				var summaryGridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, self.options.summaryFilters);
-				gridFilterDataModels = gridFilterDataModels.concat(summaryGridFilterDataModels);
-				self.obGridFilterDataModels(gridFilterDataModels);
-				self._sortGridFilterDataModels();
+				var selectGridFilterEntityId;
 				if (!self.inited)
 				{
-					if (!selectGridFilterEntityId && self.options.defaultFilter)
+					if (self.options && self.options.changeStorageKey)
 					{
-						selectGridFilterEntityId = self.options.defaultFilter;
+						self._storageFilterDataKey = self.options.changeStorageKey(self._storageFilterDataKey);
 					}
-					if (self.options.summaryFilterFunction && selectGridFilterEntityId && selectGridFilterEntityId < 0 && selectGridFilterEntityId != -9000 && autoSetSummaryFliter !== false)
+					if ($.isNumeric(self.options.filterId) && self.options.filterId !== 0)
 					{
-						self.obSelectedGridFilterId(selectGridFilterEntityId);
-						return self.options.summaryFilterFunction(selectGridFilterEntityId)
-							.then(function(filteredIds)
+						selectGridFilterEntityId = self.options.filterId;
+					}
+					else if (tf.storageManager.get(self._storageFilterDataKey, true))
+					{
+						//open new grid in viewfinder is use local storage
+						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey, true);
+						if (!TF.isPhoneDevice)
+						{
+							tf.storageManager.save(self._storageFilterDataKey, selectGridFilterEntityId);
+						}
+						tf.storageManager.delete(self._storageFilterDataKey, true);
+					}
+					else if (self.options.gridLayout)
+					{
+						// dashboard grid.
+						selectGridFilterEntityId = self.options.gridLayout.FilterId;
+					} else if (tf.girdFilterFromNewWindow && tf.girdFilterFromNewWindow.gridType == self._gridType)
+					{
+						selectGridFilterEntityId = tf.girdFilterFromNewWindow;
+						delete tf.girdFilterFromNewWindow;
+					}
+					else
+					{
+						if (tf.isViewfinder)
+						{
+							if (tf.userPreferenceManager.getUserSetting("shouldRetainGridFilter"))
 							{
-								if ($.isArray(filteredIds))
-								{
-									self._gridState.filteredIds = self.mergeFilterIds(filteredIds);
-								}
-								else if (typeof (filteredIds) === "string")
-								{
-									self._gridState.filterClause = filteredIds;
-								}
-							});
+								selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
+							} else
+							{
+								var temporaryFilterIdKey = "grid.temporaryfilter." + self._gridType + ".id";
+								selectGridFilterEntityId = parseInt(tf.storageManager.get(temporaryFilterIdKey, true, true)) || null;
+								tf.storageManager.delete(temporaryFilterIdKey, true, true);
+							}
+						} else
+						{
+							selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
+						}
 					}
-				}
-			}
-			else
-			{
-				self.obGridFilterDataModels(gridFilterDataModels);
-			}
 
-			if (self.relatedFilterEntity && self.relatedFilterEntity.filteredIds)
-			{	//used to get new grid filter both route finder and view finder
-				if (self._gridState)
-				{
-					self._gridState.filteredIds = self.relatedFilterEntity.filteredIds;
-				}
-				self.options.fromMenu = self.relatedFilterEntity.filterName;
-
-				self.isFromRelated(true);
-				var relatedFilter = [{
-					Name: self.relatedFilterEntity.filterName,
-					Id: -9000,
-					Type: 'relatedFilter',
-					IsValid: true
-				}];
-				var relatedFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, relatedFilter);
-				self.obGridFilterDataModels(gridFilterDataModels.concat(relatedFilterDataModels));
-				if (!self.inited)
-				{
-					if (!self.obSelectedGridFilterId())
+					if (selectGridFilterEntityId && selectGridFilterEntityId.filteredIds)
 					{
-						self.obSelectedGridFilterId(relatedFilter[0].Id);
+						self.relatedFilterEntity = selectGridFilterEntityId;
 					} else
 					{
-						self.isFromRelated(false);
+						self.relatedFilterEntity = undefined;
+					}
+
+					if (getQueryString("filterId"))
+					{
+						selectGridFilterEntityId = parseInt(getQueryString("filterId"));
 					}
 				}
-			}
 
-			if (selectGridFilterEntityId && selectGridFilterEntityId > 0)
-			{
-				self.obSelectedGridFilterId(selectGridFilterEntityId);
-			}
-			self.inited = true;
-			if (self._obCurrentGridLayoutExtendedDataModel && self._obCurrentGridLayoutExtendedDataModel())
-			{
-				return Promise.resolve();
-			}
-			return self.syncFilter();
-		});
+				// for the specific filters in the summary page of the viewfinderweb
+				if (self.options.summaryFilters && self.options.summaryFilters.length > 0)
+				{
+					var summaryGridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, self.options.summaryFilters);
+					gridFilterDataModels = gridFilterDataModels.concat(summaryGridFilterDataModels);
+					self.obGridFilterDataModels(gridFilterDataModels);
+					self._sortGridFilterDataModels();
+					if (!self.inited)
+					{
+						if (!selectGridFilterEntityId && self.options.defaultFilter)
+						{
+							selectGridFilterEntityId = self.options.defaultFilter;
+						}
+						if (self.options.summaryFilterFunction && selectGridFilterEntityId && selectGridFilterEntityId < 0 && selectGridFilterEntityId != -9000 && autoSetSummaryFliter !== false)
+						{
+							self.obSelectedGridFilterId(selectGridFilterEntityId);
+							return self.options.summaryFilterFunction(selectGridFilterEntityId)
+								.then(function(filteredIds)
+								{
+									if ($.isArray(filteredIds))
+									{
+										self._gridState.filteredIds = self.mergeFilterIds(filteredIds);
+									}
+									else if (typeof (filteredIds) === "string")
+									{
+										self._gridState.filterClause = filteredIds;
+									}
+								});
+						}
+					}
+				}
+				else
+				{
+					self.obGridFilterDataModels(gridFilterDataModels);
+				}
+
+				if (self.relatedFilterEntity && self.relatedFilterEntity.filteredIds)
+				{	//used to get new grid filter both route finder and view finder
+					if (self._gridState)
+					{
+						self._gridState.filteredIds = self.relatedFilterEntity.filteredIds;
+					}
+					self.options.fromMenu = self.relatedFilterEntity.filterName;
+
+					self.isFromRelated(true);
+					var relatedFilter = [{
+						Name: self.relatedFilterEntity.filterName,
+						Id: -9000,
+						Type: 'relatedFilter',
+						IsValid: true
+					}];
+					var relatedFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, relatedFilter);
+					self.obGridFilterDataModels(gridFilterDataModels.concat(relatedFilterDataModels));
+					if (!self.inited)
+					{
+						if (!self.obSelectedGridFilterId())
+						{
+							self.obSelectedGridFilterId(relatedFilter[0].Id);
+						} else
+						{
+							self.isFromRelated(false);
+						}
+					}
+				}
+
+				if (selectGridFilterEntityId && typeof selectGridFilterEntityId == "number")
+				{
+					self.obSelectedGridFilterId(selectGridFilterEntityId);
+				}
+				self.inited = true;
+				if (self._obCurrentGridLayoutExtendedDataModel && self._obCurrentGridLayoutExtendedDataModel())
+				{
+					return Promise.resolve();
+				}
+				return self.syncFilter();
+			});
 	};
 
 	KendoGridFilterMenu.prototype.syncFilter = function(filterId)
@@ -650,7 +670,7 @@
 	KendoGridFilterMenu.prototype._deleteStickFilter = function(filterId)
 	{
 		var self = this;
-		//IF the request from search, do not sticky fliter.
+		//IF the request from search, do not sticky filter.
 		if (self.options.fromSearch || self.options.isTemporaryFilter)
 		{
 			return Promise.resolve(true);
@@ -695,7 +715,12 @@
 		}
 		else
 		{
-			return self.saveFilter().then(self.clearKendoGridQuickFilter.bind(self));
+			return self.saveFilter().then(function(result)
+			{
+				if (!result) return;
+
+				self.clearKendoGridQuickFilter();
+			});
 		}
 	};
 
@@ -740,34 +765,70 @@
 	KendoGridFilterMenu.prototype.clearGridFilterClick = function()
 	{
 		var self = this;
-		this.obCallOutFilterName(null);
-		this.options.callOutFilterName = null;
-		this.options.searchFilter = null;
-		this.obSelectedGridFilterId(null);
-		//IF the request from search, do not sticky fliter.
+		if (self.lightKendoGridDetail)
+		{
+			self.lightKendoGridDetail.refresh();
+		}
+
+		self.clearFilter();
+		self.clearKendoGridQuickFilter();
+		self.onClearGridFilterClickEvent.notify();
+		self.onClearFilter.notify();
+		if (TF.isMobileDevice && tf.isViewfinder)
+		{
+			return self.rebuildGrid().then(function()
+			{
+				self.onRefreshPanelEvent.notify();
+			});
+		}
+		else
+		{
+			return self.rebuildGrid();
+		}
+	};
+
+	KendoGridFilterMenu.prototype.clearFilter = function()
+	{
+		var self = this;
+		self.obCallOutFilterName(null);
+		self.options.callOutFilterName = null;
+		self.options.searchFilter = null;
+		self.obSelectedGridFilterId(null);
+		if (self.options && self.options.changeStorageKey)
+		{
+			self._storageFilterDataKey = self.options.changeStorageKey(self._storageFilterDataKey);
+		}
+		//IF the request from search, do not sticky filter.
 		if (!self.options.fromSearch && !self.options.isTemporaryFilter)
 		{
-			tf.storageManager.save(this._storageFilterDataKey, null);
+			tf.storageManager.save(self._storageFilterDataKey, null);
+			tf.storageManager.save(tf.storageManager.gridCurrentQuickFilter(self.options.gridType), new TF.SearchParameters(null, null, null, null, null, null, null));
 		}
-		if (this.isFromRelated())
+		self.obClassicFilterSet(null);
+		tf.storageManager.save(tf.storageManager.gridCurrentClassicSearchFilter(self.options.gridType), null);
+		if (self.isFromRelated())
 		{ //if is from related, the id not change, so need refresh it
-			this._selectedGridFilterIdChange();
+			self._selectedGridFilterIdChange();
 		}
 
 		//need change the is from related once clear filter, don't change the position
-		this.isFromRelated(false);
+		self.isFromRelated(false);
 
-		this.getSelectedIds([]);
-		this.obTempOmitExcludeAnyIds([]);
-		this.obFilteredExcludeAnyIds([]);
+		self.getSelectedIds([]);
+		self.obTempOmitExcludeAnyIds([]);
+		self.obFilteredExcludeAnyIds([]);
 
-		this._gridState.filteredIds = null;
-		this._gridState.filterClause = "";
+		self.shouldIncludeAdditionFilterIds = false;
+		if (self.additionalFilterIds)
+		{
+			// If there is change to be reverted, show the loading indicator.
+			self.additionalFilterIds = null;
+			self.shouldIncludeAdditionFilterIds = false;
+		}
 
-		this.clearKendoGridQuickFilter();
-		this.rebuildGrid();
-
-		this.onClearGridFilterClickEvent.notify();
+		self._gridState.filteredIds = null;
+		self._gridState.filterClause = "";
+		self._filteredIds = null;
 	};
 
 	KendoGridFilterMenu.prototype.gridFilterClick = function(viewModel, event)
@@ -784,6 +845,10 @@
 		else
 		{
 			this.applyGridFilter(viewModel);
+			if (TF.isPhoneDevice && tf.isViewfinder)
+			{
+				this.onRefreshPanelEvent.notify();
+			}
 		}
 	};
 
@@ -791,14 +856,13 @@
 	{
 		options = options || {};
 		options.currentObFilters = this.obGridFilterDataModels.slice();
-		gridFilterDataModel && gridFilterDataModel.gridType(this.options.gridType);
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
 				this.options.gridType, isNew,
 				gridFilterDataModel ? gridFilterDataModel : null,
 				getCurrentHeaderFilters ? this.findCurrentHeaderFilters() : null,
 				{
-					Columns: convertToOldGridDefinition(this.options.isCalendarView ? tf.fieldTripGridDefinition.gridDefinition() : this.options.gridDefinition)
+					Columns: convertToOldGridDefinition(this.options.gridDefinition)
 				},
 				this.getOmittedRecordsID(gridFilterDataModel, getCurrentOmittedRecords),
 				options,
@@ -845,12 +909,15 @@
 			{
 				return;
 			}
-			currentOmittedRecords = gridFilterDataModel.omittedRecords();
-			for (var i = 0; i < currentOmittedRecords.length; i++)
+
+			if (gridFilterDataModel.omittedRecords())
 			{
-				currentOmittedRecordIDs.push(currentOmittedRecords[i].OmittedRecordId);
+				return currentOmittedRecordIDs.concat(gridFilterDataModel.omittedRecords().map(function(record) { return record.OmittedRecordID }));
 			}
-			return currentOmittedRecordIDs;
+			else
+			{
+				return currentOmittedRecordIDs;
+			}
 		}
 	};
 
@@ -860,68 +927,61 @@
 		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), null, null, null);
 		if (this.obTempOmitExcludeAnyIds().length > 0)
 		{
+			if (this.obSelectedGridFilterDataModel().dBID() == null)
+			{
+				tf.promiseBootbox.alert("The filter cannot be saved as a cross data source filter because it references specific records.  You can save it as a new data source specific filter.");
+				return Promise.resolve(false);
+			}
 			var filterID = this.obSelectedGridFilterDataModel().id();
 			for (var i = 0; i < this.obTempOmitExcludeAnyIds().length; i++)
 			{
 				var tempOmittedRecords = {
-					Id: this.obTempOmitExcludeAnyIds()[i],
-					FilterId: filterID > 0 ? filterID : 0,
-					DBID: tf.datasourceManager.databaseId,
-					OmittedRecordId: this.obTempOmitExcludeAnyIds()[i],
+					FilterID: filterID,
+					OmittedRecordID: this.obTempOmitExcludeAnyIds()[i],
+					DBID: tf.datasourceManager.databaseId
 				}
-				if (this.obSelectedGridFilterDataModel().omittedRecords()) {
-					this.obSelectedGridFilterDataModel().omittedRecords().push(tempOmittedRecords);
-				} else{
-					this.obSelectedGridFilterDataModel().omittedRecords([tempOmittedRecords]);
-				}
+				this.obSelectedGridFilterDataModel().omittedRecords().push(tempOmittedRecords);
 			}
 		}
 		if (!searchData.data.filterSet && this.obTempOmitExcludeAnyIds().length === 0)
 		{
-			return Promise.resolve(false);
+			var data = this.obSelectedGridFilterDataModel().toData(), oldDBID = data.DBID;
+			data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.options.gridType, this.obSelectedGridFilterDataModel().whereClause()) ? tf.datasourceManager.databaseId : null;
+
+			if (oldDBID == data.DBID) return Promise.resolve(false);
+
+			return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", data.Id),
+				{
+					data: data
+				}).then(function()
+				{
+					this.obSelectedGridFilterDataModel().update(data);
+					return true;
+				}.bind(this));
 		}
 		else if (!searchData.data.filterSet && this.obTempOmitExcludeAnyIds().length > 0) //only change omitted records
 		{
-			var filterData = this.obSelectedGridFilterDataModel().toData();
-			var data = [{
-				APIIsDirty: true,
-				APIIsNew: true,
-				Id: filterData.Id > 0 ?  filterData.Id : 0,
-				DBID: tf.datasourceManager.databaseId,
-				DataTypeID: tf.DataTypeHelper.getId(this.options.gridType),
-				GridType: this.options.gridType,
-				IsValid: filterData.IsValid,
-				Name: filterData.Id > 0 ?  filterData.Name : filterData.Name + "_" + new Date().getTime(),
-				OmittedRecords: filterData.OmittedRecords,
-				WhereClause: filterData.WhereClause,
-			}];
-
-			var path = pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters");
-			var ajaxData = {
-				paramData: { "@relationships": "OmittedRecord" },
-				data: data,
-			};
-
-			var updateExcludeAnyIds = function (that) {
-				that.obFilteredExcludeAnyIds((that.obFilteredExcludeAnyIds() || []).concat(that.obTempOmitExcludeAnyIds()));
-				that.obTempOmitExcludeAnyIds([]);
-			};
-
-			if (filterData.Id <= 0) {
-				return tf.promiseAjax.post(path, ajaxData).then(function()
+			var data = this.obSelectedGridFilterDataModel().toData();
+			return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", data.Id),
 				{
-					updateExcludeAnyIds(this);
+					paramData: { "@relationships": "OmittedRecord" },
+					data: data
+				}).then(function(apiResponse)
+				{
+					this.obFilteredExcludeAnyIds(this.obFilteredExcludeAnyIds().concat(this.obTempOmitExcludeAnyIds()));
+					this.obTempOmitExcludeAnyIds([]);
+					this.obSelectedGridFilterDataModel().omittedRecords([]);
+					if (apiResponse.Items.length > 0 && apiResponse.Items[0].OmittedRecords)
+					{
+						apiResponse.Items[0].OmittedRecords.forEach(function(omittedRecord)
+						{
+							this.obSelectedGridFilterDataModel().omittedRecords().push(omittedRecord);
+						}.bind(this));
+					}
 					return true;
 				}.bind(this));
-			}
-
-			return tf.promiseAjax.put(path, ajaxData).then(function()
-			{
-				updateExcludeAnyIds(this);
-				return true;
-			}.bind(this));
 		}
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this.options.gridType), "RawFilterClause"),
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(this.options.gridType), "RawFilterClause"),
 			{
 				data: searchData.data.filterSet
 			}).then(function(apiResponse)
@@ -930,10 +990,10 @@
 			}.bind(this)).then(function()
 			{
 				var data = this.obSelectedGridFilterDataModel().toData();
-				data.DBID = TF.Grid.Helper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause()) ? tf.datasourceManager.databaseId : null;
+				data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.options.gridType, this.obSelectedGridFilterDataModel().whereClause()) ? tf.datasourceManager.databaseId : null;
 				return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", data.Id),
 					{
-						data: this.obSelectedGridFilterDataModel().toData()
+						data: data
 					});
 			}.bind(this)).then(function()
 			{
@@ -967,16 +1027,11 @@
 			self.obHeaderFilters([]);
 		}
 
-
 		return self._syncFilterAndNotifyStatusUpdated(gridFilterDataModel.id())
 			.then(function(filterExisted)
 			{
-				if (filterExisted) {
-					if (currentFilterId < 0) {
-						return true;
-					}
+				if (filterExisted)
 					return self.saveCurrentFilter();
-				}
 				else
 					return false;
 			})
@@ -1116,12 +1171,13 @@
 	KendoGridFilterMenu.prototype._selectedGridFilterIdChange = function()
 	{
 		var self = this;
+		self.obClassicFilterSet(null);
 		var gridLayoutExtendedDataModel = this._obSelectedGridLayoutExtendedDataModel && this._obSelectedGridLayoutExtendedDataModel();
 		if (gridLayoutExtendedDataModel)
 		{
 			gridLayoutExtendedDataModel.filterId(this.obSelectedGridFilterId());
 		}
-		if (this._obCurrentGridLayoutExtendedDataModel && this._obCurrentGridLayoutExtendedDataModel())
+		if (this._obCurrentGridLayoutExtendedDataModel)
 		{
 			this._obCurrentGridLayoutExtendedDataModel().filterId(this.obSelectedGridFilterId());
 			if (!this._obCurrentGridLayoutExtendedDataModel().filterId())
@@ -1135,18 +1191,22 @@
 			this._gridState.filteredIds = this._filteredIds;
 		}
 
-		//IF the request from search, do not sticky fliter.
+		//IF the request from search, do not sticky filter.
 		if (self.options.fromSearch || self.options.isTemporaryFilter)
 		{
 			return;
 		}
 
+		if (self.options && self.options.changeStorageKey)
+		{
+			self._storageFilterDataKey = self.options.changeStorageKey(self._storageFilterDataKey);
+		}
 		var currentFilter = Enumerable.From(this.obGridFilterDataModels()).Where("$.id()==" + this.obSelectedGridFilterId()).FirstOrDefault();
 		if (!currentFilter)
 		{
 			tf.storageManager.save(this._storageFilterDataKey, null);
 		}
-		else if (currentFilter.type() !== "relatedFilter")
+		else if (currentFilter.type() !== "relatedFilter" && (!this.options.customGridType || this.options.customGridType.toLowerCase() != "dashboardwidget"))
 		{
 			tf.storageManager.save(this._storageFilterDataKey, this.obSelectedGridFilterId());
 		}
@@ -1229,20 +1289,15 @@
 		{
 			case "string":
 				return rawValue.substring(1, rawValue.length - 1).replace(/%/g, "");
-				break;
 			case "boolean":
 				return rawValue == "true"
-				break;
 			case "integer":
 				return parseInt(rawValue);
-				break;
 			case "number":
 				return parseFloat(rawValue);
-				break;
 			case "date":
 			case "time":
 				return rawValue.substring(1, rawValue.length - 1).replace(/%/g, "");
-				break;
 			case "image": //there is no image type after tranfer
 				break;
 		}
@@ -1306,9 +1361,6 @@
 
 	KendoGridFilterMenu.prototype.getBasicFilterCount = function()
 	{
-		//issues:
-		//1. There is a parameter "time" in trip search, but find it useless, so ignore it here.
-
 		var skip = 0;
 		var take = 1;
 		var omitIds = null;
@@ -1317,7 +1369,7 @@
 		{
 			omitIds = this.obSelectedGridFilterDataModel().omittedRecords().map(function(o)
 			{
-				return o.OmittedRecordId;
+				return o.OmittedRecordID;
 			});
 		}
 		var filterClause = " 1=1";
@@ -1332,7 +1384,7 @@
 		var searchData = new TF.SearchParameters(skip, take, null, filterSet, filterClause, this._gridState.filteredIds, omitIds);
 		searchData.data.fields = ['Id'];
 		searchData.paramData.getCount = true;
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(this._gridType)),
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(this._gridType)),
 			{
 				paramData: searchData.paramData,
 				data: searchData.data
@@ -1348,7 +1400,7 @@
 	};
 
 })();
-//Reminder
+
 (function()
 {
 	var KendoGridFilterMenu = TF.Grid.KendoGridFilterMenu;
@@ -1365,14 +1417,9 @@
 			return 0;
 		}, this);
 
-		this.reminderMenuVisible = ko.computed(function()
+		this.reminderMenuEnable = ko.computed(function()
 		{
-			var isMyReminder = true;
-			if (this.obSelectedGridFilterDataModel() && this.obSelectedGridFilterDataModel().reminderId() > 0 && (!Enumerable.From(TF.ReminderHelper ? TF.ReminderHelper.allMyReminders : []).Any("$.Id==" + this.obSelectedGridFilterDataModel().reminderId())))
-			{
-				isMyReminder = false;
-			}
-			return this.obSelectedGridFilterId() > 0 && isMyReminder && !this.options.reminderOptionHide;
+			return (this.obSelectedGridFilterId() > 0 || !!this.obSelectedStaticFilterName()) && !this.options.reminderOptionHide;
 		}, this);
 		this.loadGridFilter = this.loadGridFilter.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "reminder"), this.loadGridFilter);
