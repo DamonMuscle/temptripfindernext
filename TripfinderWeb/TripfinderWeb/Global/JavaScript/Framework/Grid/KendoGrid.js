@@ -1687,24 +1687,34 @@
 	{
 		convertToOldGridDefinition: function(definition)
 		{
-			return {
-				TypeCode: (
-					definition.DBType ?
-						definition.DBType.replace(/\b(\w)|\s(\w)/g, function(m)
-						{
-							return m.toUpperCase();
-						}) :
-						definition.type.replace(/\b(\w)|\s(\w)/g, function(m)
-						{
-							return m.toUpperCase();
-						})
-				),
+			var def = {
+				TypeCode: (definition.DBType || definition.type).replace(/datetime/i, "DateTime")
+					.replace(/\b(\w)|\s(\w)/g, function(m)
+					{
+						return m.toUpperCase();
+					}),
 				AllowSorting: definition.sortable,
 				AllowFiltering: definition.filterable,
 				FieldName: (definition.field ? definition.field : definition.FieldName),
 				DisplayName: definition.title ? definition.title : (definition.DisplayName ? definition.DisplayName : definition.FieldName),
-				PersistenceName: definition.DBName ? definition.DBName : (definition.field ? definition.field : definition.FieldName)
+				PersistenceName: definition.DBName || definition.field || (definition.UDFId ? definition.OriginalName : definition.FieldName),
 			};
+
+			if (definition.UDFId)
+			{
+				def.UDFId = definition.UDFId;
+			}
+			if (definition.UDFPickListOptions)
+			{
+				def.UDFPickListOptions = definition.UDFPickListOptions;
+			}
+
+			if (definition.DBIDs)
+			{
+				def.DBIDs = definition.DBIDs;
+			}
+
+			return def;
 		},
 		_getDataSourceSpecificFields: function(gridType)
 		{
@@ -1739,6 +1749,27 @@
 				return self.convertToOldGridDefinition(definition);
 			});
 		},
-		_grid: null
+		_grid: null,
+		get GridInfo()
+		{
+			var self = this;
+			if (this._grid)
+			{
+				return this._grid;
+			}
+			this._grid = [{
+					gridType: "fieldtrip",
+					tableName: "fieldtrip",
+					authName: "fieldtrip",
+					type: "baseGrid",
+					plural: tf.applicationTerm.getApplicationTermPluralByName('Field Trip'),
+					singular: tf.applicationTerm.getApplicationTermSingularByName('Field Trip'),
+					get apiGridDefinition()
+					{
+						return self._convertToOldGridDefinition(tf.fieldTripGridDefinition);
+					}
+				}];
+			return this._grid;
+		}
 	};
 })();
