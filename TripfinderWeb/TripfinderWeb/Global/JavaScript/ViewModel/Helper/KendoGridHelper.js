@@ -800,6 +800,25 @@
 
 			return value;
 		}
-	};
+    };
+    KendoGridHelper.getListOfRecords = function (records, columns) {
+        var data = [[]];
+        for (var i = 0; i < columns.length; i++) {
+            data[0].push(columns[i].DisplayName);
+        }
+        for (i = 0; i < records.length; i++) {
+            var theRecord = records[i];
+            var record = [];
+            for (var j = 0; j < columns.length; j++) {
+                var value = theRecord[columns[j].FieldName];
+                if ($.isArray(value)) {
+                    value = value.length == 0 ? "" : value.toString();
+                }
+                record.push(value);
+            }
+            data.push(record);
+        }
+        return data;
+    };
 
 })();

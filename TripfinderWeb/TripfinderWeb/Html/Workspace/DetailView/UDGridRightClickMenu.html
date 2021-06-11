@@ -1,0 +1,78 @@
+<div style="margin:-5px;">
+	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
+		<ul class="tf-contextmenu grid-menu">
+			<li class="menu-item" data-bind="contextMenuClick:copyToClipboardClick,css:{disabled:!obIsAnyRowSelected()}">
+				<div class=" menu-icon copytoclipboard">
+				</div>
+				<div class="menu-label">
+					Copy
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:saveAsClick,css:{disabled:!obIsAnyRowSelected()}">
+				<div class=" menu-icon saveas">
+				</div>
+				<div class="menu-label">
+					Save As
+				</div>
+			</li>
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:allSelectionClick">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Select All Records
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:invertSelectionClick">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Invert Selected Records
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:omitSelectionClick">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Omit Selected Records
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:clearSelectionClick">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Clear All Records
+				</div>
+			</li>
+			<li class="menu-item" data-bind="contextMenuClick:clearFilterClick">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Clear Filter
+				</div>
+			</li>
+			<!-- ko if: detailviewType =='student' -->
+			<li class="menu-divider">
+				<div class="rule"></div>
+			</li>
+			<li class="menu-item">
+				<div class="menu-icon"></div>
+				<div class="menu-label">Set As </div>
+				<ul class="tf-contextmenu grid-menu">
+					<li class="menu-item" data-bind="contextMenuClick:setPrimaryContact">
+						<div class="menu-icon" data-bind="css:{'checked':IsPrimaryChecked}"></div>
+						<div class="menu-label">Primary</div>
+					</li>
+					<li class="menu-item" data-bind="contextMenuClick:setStopfinderContact">
+						<div class="menu-icon" data-bind="css:{'checked':IsStopfinderChecked}"></div>
+						<div class="menu-label">Stopfinder</div>
+					</li>
+				</ul>
+			</li>
+			<!-- /ko -->
+
+		</ul>
+	</div>
+</div>

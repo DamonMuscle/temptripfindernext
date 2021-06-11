@@ -152,6 +152,43 @@ function isLandscape()
 	return isMobileDevice() && window.innerWidth > window.innerHeight;
 }
 
+function isIpad() {
+    const ua = window.navigator.userAgent;
+    if (ua.indexOf('iPad') > -1) {
+        return true;
+    }
+
+    if (ua.indexOf('Macintosh') > -1) {
+        try {
+            document.createEvent("TouchEvent");
+            return true;
+        } catch (e) { }
+    }
+
+    return false;
+}
+
+function getLocation() {
+    return new Promise(res => {
+        let pos = {
+            latitude: null,
+            longitude: null
+        };
+        if (!navigator.geolocation) {
+            res(pos);
+        } else {
+            navigator.geolocation.getCurrentPosition(position => {
+                pos.latitude = position.coords.latitude;
+                pos.longitude = position.coords.longitude;
+                res(pos);
+            }, () => {
+                res(pos)
+            });
+        }
+    });
+}
+
+createNamespace("TF").getLocation = getLocation;
 createNamespace("TF").isMobileDevice = isMobileDevice();
 createNamespace("TF").isSafari = isSafari();
 createNamespace("TF").isPhoneDevice = isPhoneDevice();
