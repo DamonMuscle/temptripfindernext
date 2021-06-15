@@ -773,7 +773,6 @@
 		self.clearFilter();
 		self.clearKendoGridQuickFilter();
 		self.onClearGridFilterClickEvent.notify();
-		self.onClearFilter.notify();
 		if (TF.isMobileDevice && tf.isViewfinder)
 		{
 			return self.rebuildGrid().then(function()

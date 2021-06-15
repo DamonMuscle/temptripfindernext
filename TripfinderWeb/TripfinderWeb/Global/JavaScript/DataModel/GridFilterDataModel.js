@@ -26,6 +26,8 @@
 		{ from: "ReminderName", default: 0 },
 		{ from: "ReminderId", default: 0 },
 		{ from: "ReminderUserId", default: 0 },
-		{ from: "DBID", default: null }
+		{ from: "DBID", default: null },
+		{ from: "IsStatic", default: null },
+		{ from: "IsSystem", default: 0 }
 	];
 })();
