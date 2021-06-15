@@ -115,6 +115,7 @@
 		self.onDataBoundEvent = new TF.Events.Event();
 		self.onFilterChanged = new TF.Events.Event();
 		self.onIdsChanged = new TF.Events.Event();
+		self.onClearFilter = new TF.Events.Event();
 		// FT-1029 add event to rebind select items after grid read completed
 		self.onGridReadCompleted = new TF.Events.Event();
 		self.onCtrlIPress = self.onCtrlIPress.bind(self);
@@ -1451,6 +1452,7 @@
 				function forceClearListFilter()
 				{
 					self.listFilters = {};
+					self.onClearFilter.notify();
 					self.obHeaderFilters([]);
 					self.getSelectedIds([]);
 					self.obTempOmitExcludeAnyIds([]);
@@ -4981,6 +4983,7 @@
 		this.onEyeCheckChanged.unsubscribeAll();
 		this.onDataBoundEvent.unsubscribeAll();
 		this.onFilterChanged.unsubscribeAll();
+		this.onClearFilter.unsubscribeAll();
 		if (this.onClearGridFilterClickEvent)
 		{
 			this.onClearGridFilterClickEvent.unsubscribeAll();

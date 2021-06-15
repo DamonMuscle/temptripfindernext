@@ -150,6 +150,11 @@
 		return "grid.currentquickfilter." + gridType;
 	};
 
+	StorageManager.prototype.gridCurrentClassicSearchFilter = function(gridType)
+	{
+		return "grid.currentclassicsearchfilter." + gridType;
+	};
+
 	StorageManager.prototype.gridInViewCurrentLayout = function(gridType)
 	{
 		return "grid.view.currentlayout." + gridType;
