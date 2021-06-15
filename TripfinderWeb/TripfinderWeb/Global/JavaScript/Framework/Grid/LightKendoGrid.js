@@ -1946,7 +1946,6 @@
 	LightKendoGrid.prototype.customFilterBtnClick = function(e)
 	{
 		var self = this;
-
 		self.visibleCustomFilterBtnByClick(e);
 	};
 
@@ -2191,13 +2190,13 @@
 					var customCssSelectorStr = cssSelectorStr + ':not(".has-custom-filter-btn-click")';
 					var $containers = $listContainer.find(customCssSelectorStr).filter(function() { return $(this).text() === key; });
 
-					$containers.on('click', self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
+					$containers.off('click touchend').on('click touchend', self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
 					break;
 				case "List":
 					var listCssSelectorStr = cssSelectorStr + ':not(".has-list-filter-btn-click")';
 					var $containers = $listContainer.find(listCssSelectorStr).filter(function() { return $(this).text() === key; });
 
-					$containers.on('click', self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
+					$containers.off('click touchend').on('click touchend', self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
 					break;
 				case "Empty":
 				case "Not Empty":
@@ -2210,7 +2209,7 @@
 							$listContainersNeedBindClick.push($listContainers[i]);
 						}
 					}
-					$($listContainersNeedBindClick).on('click',
+					$($listContainersNeedBindClick).off('click touchend').on('click touchend',
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
@@ -2245,7 +2244,7 @@
 						});
 					break;
 				default:
-					$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key }).on("click",
+					$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key }).off('click touchend').on("click touchend",
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input");
@@ -2299,7 +2298,7 @@
 			var dropdownlist = $(item).data("kendoDropDownList");
 			dropdownlist.bind('change', onDropDownListChange);
 
-			$(item).parent().next().on("click", function(e)
+			$(item).parent().next().off('click touchend').on("click touchend", function(e)
 			{
 				var input = $(e.currentTarget).parent().find("input");
 				if (input.data("isempty"))
