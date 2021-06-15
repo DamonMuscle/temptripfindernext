@@ -656,13 +656,21 @@
 		var defaultColumnWidth = "80px";
 		var columns = currentColumns.map(function(definition)
 		{
-			var column = definition;
+            var column = definition;
+            var widthOfPerChar = 7;
 			column.field = definition.FieldName;
 			column.title = definition.DisplayName;
 			if (!column.width)
 				column.width = definition.Width || defaultColumnWidth;
 			else
-				definition.Width = column.width;
+                definition.Width = column.width;
+
+            if (column.lockWidth !== true) {
+                column.width = `${Math.max(
+                    (column.title || "").trim().length * widthOfPerChar,
+                    Number.isNaN(parseInt(column.width)) ? parseInt(defaultColumnWidth) : parseInt(column.width)
+                )}px`;
+            }
 			if (definition.filterable == null)
 			{
 				column.filterable = {
