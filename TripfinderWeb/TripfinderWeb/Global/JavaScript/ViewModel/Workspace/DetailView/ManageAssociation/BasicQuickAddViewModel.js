@@ -36,6 +36,8 @@
 							self.pageLevelViewModel.clearError();
 							result.messages.map(self.pageLevelViewModel.popupErrorMessage.bind(self.pageLevelViewModel));
 							return false;
+						} else {
+							return false;
 						}
 					}
 				});
