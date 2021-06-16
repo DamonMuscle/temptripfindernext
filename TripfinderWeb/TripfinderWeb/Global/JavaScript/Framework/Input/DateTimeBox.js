@@ -22,6 +22,7 @@
 			this.minDate = attributes.minDate;
 			this.maxDate = attributes.maxDate;
 			this.disableWeekend = attributes.disableWeekend;
+			this.ignoreReadonly = attributes.ignoreReadonly;
 			this.inputEnable = attributes.inputEnable;
 		}
 		this.initialize.call(this);
@@ -135,6 +136,7 @@
 					widgetParent: "body",
 					useCurrent: false,
 					keepInvalid: true,
+					gnoreReadonly: this.ignoreReadonly,
 					minDate: this.minDate,
 					maxDate: this.maxDate,
 					daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
@@ -313,6 +315,17 @@
 				wightCss['top'] = top;
 				wightCss['bottom'] = "auto";
 				widget.css(wightCss);
+
+				//for form
+				if ($(e.currentTarget).closest(".form-container").length > 0) {
+					let timeEle = $(e.currentTarget).closest(".input-group.time-question").find("input.form-control"),
+					rect = timeEle[0].getBoundingClientRect();
+					if (rect.bottom + widget.outerHeight(true) < document.body.clientHeight) {
+						widget.css({ top: `${rect.bottom}px`, right: "auto", bottom: "auto", left: `${rect.left}px` })
+					} else {
+						widget.css({ top: "auto", right: "auto", bottom: `${document.body.offsetHeight - rect.top}px`, left: `${rect.left}px` })
+					}
+				}
 			}
 			this._toggleScroll(false);
 			this._toggleScroll(true);

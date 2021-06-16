@@ -449,6 +449,9 @@
 
 			$.each($rightGrid, function(index, container)
 			{
+				if ($(container).closest(".custom-grid").attr("mini-grid-type") === "UDGrid") {
+					return;
+			}
 				$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
 			});
 		}
