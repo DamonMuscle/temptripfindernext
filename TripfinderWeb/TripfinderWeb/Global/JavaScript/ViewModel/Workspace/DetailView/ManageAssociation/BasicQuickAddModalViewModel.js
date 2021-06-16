@@ -74,10 +74,17 @@
 	 * React when the negative button is clicked.
 	 * @return {void}
 	 */
-	BasicQuickAddModalViewModel.prototype.negativeClick = function()
-	{
-		this.negativeClose(false);
-	};
+    BasicQuickAddModalViewModel.prototype.negativeClick = function () {
+        var self = this;
+        if (self.data().cancel && self.data().quickAddViewModel && self.data().quickAddViewModel.cancel) {
+            self.data().cancel().then(preventCancel => {
+                !preventCancel && self.negativeClose();
+            });
+        }
+        else {
+            this.negativeClose();
+        }
+    };
 
 	/**
 	 * Dispose

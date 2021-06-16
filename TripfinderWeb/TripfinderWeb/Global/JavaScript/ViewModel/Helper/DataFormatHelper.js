@@ -31,7 +31,14 @@
 
 		// needs to keep value as text for "-" and "."
 		return +value > MAX_NUMBER ? MAX_NUMBER : value;
+		};
+
+	DataFormatHelper.prototype.isValidPhoneNumber = function (value) {
+		var digitsValue = value.replace(/\D/g, '');
+		var isValid = (digitsValue.length === 10) && (/^(?:(1\-?)|(\+1 ?))?\(?(\d{3})[\)\-\.]?(\d{3})[\-\.]?(\d{4})$/).test(digitsValue);
+		return isValid;
 	};
+
 	DataFormatHelper.prototype.phoneFormatter = function(value)
 	{
 		if (isNullObj(value))

@@ -41,6 +41,11 @@
 						}
 					}
 				});
+			};
+
+		BasicQuickAddViewModel.prototype.cancel = function () {
+			const self = this;
+			return self.quickAddViewModel.cancel()
 		};
 
 		/**
