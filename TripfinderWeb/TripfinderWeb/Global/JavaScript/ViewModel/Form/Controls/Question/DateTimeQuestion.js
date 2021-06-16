@@ -157,19 +157,4 @@
 			});
 		}, timeInteval);
 	};
-
-	DateTimeQuestion.prototype.adjustTimePopupPosition = function($senderElement, $timerElement)
-	{
-
-		let rect = $senderElement.first()[0].getBoundingClientRect();
-		if (rect.bottom + $timerElement.outerHeight(true) < document.body.clientHeight)
-		{
-			$timerElement.css({ top: `${rect.bottom}px`, right: "auto", bottom: "auto", left: `${rect.left}px` })
-
-		}
-		else
-		{
-			$timerElement.css({ top: "auto", right: "auto", bottom: `${document.body.offsetHeight - $senderElement.first()[0].getBoundingClientRect().top}px`, left: `${rect.left}px` })
-		}
-	}
 })();

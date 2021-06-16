@@ -15,7 +15,7 @@
 		/*
 		{type:'Time',value:obDefaultValue,attributes:{class:'form-control',tabindex:'4'}}
 		*/
-		let timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, tabindex: '4', adjustPopupPosition: this.adjustPopupPosition }, undefined, undefined, $('<div></div>'));
+		let timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, tabindex: '4' }, undefined, undefined, undefined, $('<div></div>'));
 		timebox.value(null);
 		timebox.onValueChange.subscribe((ev, newvalue) =>
 		{
