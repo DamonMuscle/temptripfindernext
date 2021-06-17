@@ -18,6 +18,8 @@
 		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
+		this.obFieldTripStageFilters = ko.observableArray();
+		this.selectedFieldTripStageFilters = ko.observableArray();
 		this.obOpenRelatedFilter = ko.observable({});
 
 		this.obGridFilterDataModelsFromDataBase = ko.computed(function()
@@ -72,6 +74,7 @@
 		this.clearGridFilterClick = this.clearGridFilterClick.bind(this);
 		this.onClearGridFilterClickEvent = new TF.Events.Event();
 		this.onRefreshPanelEvent = new TF.Events.Event();
+		this.onFieldTripStageChanged = new TF.Events.Event();
 		this.gridFilterClick = this.gridFilterClick.bind(this);
 		this.quickFilterBarClick = this.quickFilterBarClick.bind(this);
 		this.noApplyFilterNoModified = ko.observable(true);
@@ -119,6 +122,33 @@
 
 		this.initReminder();
 	}
+
+	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
+	{
+		var stageIds = [];
+		if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.isAuthorizedFor("transportationAdministrator", "read"))
+		{
+			stageIds = [101, 100, 99, 98, 7, 6, 5, 4, 3, 2, 1];
+		}
+		else if (tf.authManager.isAuthorizedFor("level4Administrator", "read"))
+		{
+			stageIds = [7, 6, 5, 4];
+		}
+		else if (tf.authManager.isAuthorizedFor("level3Administrator", "read"))
+		{
+			stageIds = [5, 4, 3, 2];
+		}
+		else if (tf.authManager.isAuthorizedFor("level2Administrator", "read"))
+		{
+			stageIds = [3, 2, 1];
+		}
+		else if (tf.authManager.isAuthorizedFor("level1Administrator", "read"))
+		{
+			stageIds = [1];
+		}
+		this.selectedFieldTripStageFilters($.extend([], stageIds));
+		this.obFieldTripStageFilters(stageIds);
+	};
 
 	KendoGridFilterMenu.prototype._omitRecordsChange = function()
 	{
