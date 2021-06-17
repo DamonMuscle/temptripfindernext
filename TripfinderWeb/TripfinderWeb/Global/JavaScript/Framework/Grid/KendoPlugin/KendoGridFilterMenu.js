@@ -121,7 +121,59 @@
 		this.obQuickFilterBarCheckIcon = ko.observable("menu-item-checked");
 
 		this.initReminder();
+		if (this.options.gridType === "fieldtrip")
+		{
+			this.initFieldTripStageFilters();
+		}
 	}
+
+	KendoGridFilterMenu.prototype.getFieldTripStageName = function(id)
+	{
+		switch (id)
+		{
+			case (1):
+				return "Level 1 - Request Submitted";
+			case (2):
+				return "Level 2 - Request Declined";
+			case (3):
+				return "Level 2 - Request Approved";
+			case (4):
+				return "Level 3 - Request Declined";
+			case (5):
+				return "Level 3 - Request Approved";
+			case (6):
+				return "Level 4 - Request Declined";
+			case (7):
+				return "Level 4 - Request Approved";
+			case (98):
+				return "Declined by Transportation";
+			case (99):
+				return "Transportation Approved";
+			case (100):
+				return "Canceled - Request Canceled";
+			case (101):
+				return "Completed - Request Completed";
+		}
+	};
+
+	KendoGridFilterMenu.prototype.gridFieldTripFilterClick = function(id, e)
+	{
+		var self = this, $target = $(e.target).closest(".menu-item"), index;
+
+		if ($target.hasClass("menu-item-checked"))
+		{
+			self.selectedFieldTripStageFilters.remove(id);
+		}
+		else
+		{
+			index = self.selectedFieldTripStageFilters.indexOf(id);
+			if (index < 0)
+			{
+				self.selectedFieldTripStageFilters.push(id);
+			}
+		}
+		self.onFieldTripStageChanged.notify();
+	};
 
 	KendoGridFilterMenu.prototype.initFieldTripStageFilters = function()
 	{
