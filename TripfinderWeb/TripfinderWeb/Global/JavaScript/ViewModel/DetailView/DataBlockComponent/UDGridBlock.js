@@ -164,7 +164,7 @@
         if (tf.udgHelper.isDocumentIncluded(self.options)) {
             originColumns.push(self._documentColumn);
         }
-        return originColumns.concat(self._getActionColumns(isSignatureEnabled));
+        return originColumns.concat(self._getActionColumns(isSignatureEnabled, self.isReadOnly()));
     };
 
     UDGridBlock.prototype.initEvents = function () {
