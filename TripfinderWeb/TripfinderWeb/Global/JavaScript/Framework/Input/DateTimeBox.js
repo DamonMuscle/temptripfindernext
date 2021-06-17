@@ -136,7 +136,7 @@
 					widgetParent: "body",
 					useCurrent: false,
 					keepInvalid: true,
-					gnoreReadonly: this.ignoreReadonly,
+					ignoreReadonly: this.ignoreReadonly,
 					minDate: this.minDate,
 					maxDate: this.maxDate,
 					daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
