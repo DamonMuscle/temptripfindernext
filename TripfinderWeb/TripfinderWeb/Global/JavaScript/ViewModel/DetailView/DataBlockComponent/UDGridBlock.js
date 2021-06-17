@@ -100,8 +100,8 @@
             return true;
         }
         //detailview's readonly doesn't affect form(udgrid).
-        //return this.detailView.obIsReadOnly();
-        return false;
+        return this.detailView.obIsReadOnly();
+        //return false;
     }
 
     UDGridBlock.prototype.initElement = function (options) {
