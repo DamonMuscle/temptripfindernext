@@ -1437,17 +1437,18 @@
 
 		invoiceGridViewModel._viewfromDBClick = this.editInvoiceEvent.bind(this);
 
-
+		
 		if (requiredFields)
 		{
-			const { FieldTripAccountId, InvoiceDate, PaymentDate, PurchaseOrder } = requiredFields;
+			const { AccountName, FieldTripAccountId, InvoiceDate, PaymentDate, PurchaseOrder } = requiredFields;
 
 			if ((FieldTripAccountId && FieldTripAccountId.Required)
+				|| (AccountName && AccountName.Required)
 				|| (InvoiceDate && InvoiceDate.Required)
 				|| (PaymentDate && PaymentDate.Required)
 				|| (PurchaseOrder && PurchaseOrder.Required))
 			{
-				//$invoice.addClass("required");
+				$invoice.addClass("required");
 				this.obIsInvoiceRequired(true);
 			}
 		}
