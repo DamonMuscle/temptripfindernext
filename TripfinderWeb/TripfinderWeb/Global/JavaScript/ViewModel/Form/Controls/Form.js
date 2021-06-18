@@ -367,7 +367,10 @@
 		 * greater than 0 means insufficient height for subtitle(form description), 
 		 * need show "shore more" icon for arrow down to present full height content
 		 */
-		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+        let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+        if (isMobileDevice()) {
+            offsetHeight += 10;
+        }
 		if (offsetHeight > 0)
 		{
 			$element.find(".form-subtitle").css("display", "-webkit-box");

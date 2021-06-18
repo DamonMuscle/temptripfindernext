@@ -1268,15 +1268,22 @@
 				.form-subtitle
 				{
 					font-size: 14px;
+					line-clamp: 2;
+					-webkit-line-clamp: 2;
+				}
+
+				.showmore
+				{
+					bottom: 2px;
 				}
 			}
-	
+
 			.form-body
 			{
 				position: absolute;
 				top: 150px;
 				left: 0;
-				bottom: 60px;
+				//bottom: 60px;
 				right: 0;
 				height: initial !important;
 
@@ -1284,14 +1291,97 @@
 				{
 					padding: 20px;
 				}
-	
+
 				.form-question-container
 				{
 					padding: 20px;
-					.question-content {
+
+					.question-content
+					{
 						input:not([type="checkbox"]):not([type="radio"]),
-						textarea {
+						textarea
+						{
 							-webkit-appearance: none;
+						}
+					}
+				}
+
+				.e-sign
+				{
+					.e-sign-container
+					{
+						padding: 0 20px;
+
+						.e-sign-element
+						{
+							.question-title
+							{
+								.e-sign-close-button
+								{
+								}
+							}
+
+							.e-sign-content
+							{
+								canvas
+								{
+								}
+
+								.e-sign-cover-layer
+								{
+									.place-holder
+									{
+										display: block;
+									}
+								}
+							}
+
+							.e-sign-action-bar
+							{
+							}
+						}
+
+						&.full-page
+						{
+							.e-sign-element
+							{
+								margin: 0;
+								padding: 0;
+								position: absolute;
+								left: 0;
+								right: 0;
+								top: 0;
+								bottom: 0;
+								height: 100%;
+
+								.question-title
+								{
+
+									.e-sign-close-button
+									{
+									}
+								}
+
+								.e-sign-content
+								{
+
+									canvas
+									{
+									}
+
+									.e-sign-cover-layer
+									{
+									}
+								}
+
+								.e-sign-action-bar
+								{
+
+									.k-button
+									{
+									}
+								}
+							}
 						}
 					}
 				}
@@ -1310,7 +1400,7 @@
 					.form-button
 					{
 						width: 100px;
-	
+
 						&.btn-close
 						{
 							right: 0;
