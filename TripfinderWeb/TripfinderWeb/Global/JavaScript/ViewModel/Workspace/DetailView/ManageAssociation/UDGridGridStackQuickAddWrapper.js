@@ -95,7 +95,8 @@
             self.form.assginEntityRecord(self.baseRecordEntity);
             self.$element.find(".custom-detail-view").empty().append(self.form.element);
             //set form min-height to adapt page view size,  30(modal padding)
-            self.form.element.find(".form").css("min-height", parseInt(self.$element.parents(".modal-body").css("max-height")) - 30 + "px");
+            if (!TF.isMobileDevice)
+                self.form.element.find(".form").css("min-height", parseInt(self.$element.parents(".modal-body").css("max-height")) - 30 + "px");
 
             //restore attchments
             if (self.recordEntity) {
