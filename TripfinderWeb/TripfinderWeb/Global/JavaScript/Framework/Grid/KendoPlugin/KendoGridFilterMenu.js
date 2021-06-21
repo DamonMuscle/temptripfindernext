@@ -13,8 +13,8 @@
 	function KendoGridFilterMenu()
 	{
 		this.inited = false;
-		this._storageFilterDataKey = "grid.currentfilter." + this._gridType + ".id";
-		this._storageGeoRegionTypeIdKey = "grid.currentGeoRegionType." + this._gridType + ".id";
+		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
+		this._storageGeoRegionTypeIdKey = "grid.currentGeoRegionType." + this.getStorageKeyId() + ".id";
 		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
