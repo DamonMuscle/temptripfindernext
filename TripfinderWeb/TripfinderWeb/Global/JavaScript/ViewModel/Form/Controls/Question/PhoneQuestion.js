@@ -12,44 +12,40 @@
 
 	PhoneQuestion.prototype.initQuestionContent = function()
 	{
-		let formatValue = !!this.field.readonly ? tf.dataFormatHelper.phoneFormatter(this.field.value) : this.field.value;
-		const phonebox = new TF.Input.PhoneBox(formatValue || "", { readonly: !!this.field.readonly, maxlength: 14, placeholder: "Enter your phone number" });
-		this.phonebox = phonebox;
-		phonebox.onValueChange.subscribe((ev, newvalue) =>
-		{
-			this.value = newvalue;
-		});
+	let defVal = this.field.DefaultValue;
 
-		if (this.field.value) 
-		{
-			this.value = this.field.value;
+	let input = $(`<input class="phone-question question" type="tel" placeholder="Enter your phone number"/>`);
+	this.maskedInput = input.kendoMaskedTextBox({
+	    mask: '0000000000',
+	    change: () => {
+		if (this.maskedInput.element[0].value.length > 10) {
+		    return;
 		}
-
-		phonebox.getElement().addClass("telphone-question");
-		return phonebox.getElement();
+		this.value = this.maskedInput.value();
+		if (this.value.length === 10) {
+		    this.maskedInput.element[0].value = "(" + this.value.substr(0, 3) + ")" + this.value.substr(3, 3) + "-" + this.value.substring(6);
+		}
+	    }
+	}).data('kendoMaskedTextBox');
+	input.keyup(ev => {
+	    this.value = ev.target.value.replace(/_/g, '');
+	})
+	return this.maskedInput.wrapper;
 	}
 
 	PhoneQuestion.prototype.getValidateResult = function()
 	{
-		if(this.phonebox.getElement().is(':focus'))
-		{
-			//do not validate when input is focused to prevent from validating error when typing.
-			return '';
-		}
-		let result = '';
-		if (this.field.Required && !this.value)
-		{
-			result = 'Answer is required.';
-		}
-		if (this.value && ((typeof this.value !== "string") || (this.value.indexOf("_") >= 0) || !tf.dataFormatHelper.isValidPhoneNumber(this.value)))
-		{
-			if (result)
-			{
-				result += ";";
-			}
-			result += "Invalid phone number.";
-		}
+	let result = '';
+	if (this.field.Required && !this.value) {
+	    result = 'Answer is required.';
+	}
+	if (this.value && ((typeof this.value !== "string") || (this.value.indexOf("_") >= 0))) {
+	    if (result) {
+		result += ";";
+	    }
+	    result += "Invalid phone number.";
+	}
 
-		return result;
+	return result;
 	};
 })();
