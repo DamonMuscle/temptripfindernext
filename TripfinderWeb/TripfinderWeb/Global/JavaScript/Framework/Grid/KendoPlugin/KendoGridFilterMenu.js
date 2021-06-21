@@ -13,8 +13,8 @@
 	function KendoGridFilterMenu()
 	{
 		this.inited = false;
-		this._storageFilterDataKey = "grid.currentfilter." + this._gridType + ".id";
-		this._storageGeoRegionTypeIdKey = "grid.currentGeoRegionType." + this._gridType + ".id";
+		this._storageFilterDataKey = "grid.currentfilter." + this.getStorageKeyId() + ".id";
+		this._storageGeoRegionTypeIdKey = "grid.currentGeoRegionType." + this.getStorageKeyId() + ".id";
 		this._storageDisplayQuickFilterBarKey = "grid.displayQuickFilterBar." + this._gridType;
 		this.obHeaderFilters = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray();
@@ -555,66 +555,63 @@
 					return Promise.resolve();
 				}
 				var selectGridFilterEntityId;
-				if (!self.inited)
+				if (self.options && self.options.changeStorageKey)
 				{
-					if (self.options && self.options.changeStorageKey)
+					self._storageFilterDataKey = self.options.changeStorageKey(self._storageFilterDataKey);
+				}
+				if ($.isNumeric(self.options.filterId) && self.options.filterId !== 0)
+				{
+					selectGridFilterEntityId = self.options.filterId;
+				}
+				else if (tf.storageManager.get(self._storageFilterDataKey, true))
+				{
+					//open new grid in viewfinder is use local storage
+					selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey, true);
+					if (!TF.isPhoneDevice)
 					{
-						self._storageFilterDataKey = self.options.changeStorageKey(self._storageFilterDataKey);
+						tf.storageManager.save(self._storageFilterDataKey, selectGridFilterEntityId);
 					}
-					if ($.isNumeric(self.options.filterId) && self.options.filterId !== 0)
+					tf.storageManager.delete(self._storageFilterDataKey, true);
+				}
+				else if (self.options.gridLayout)
+				{
+					// dashboard grid.
+					selectGridFilterEntityId = self.options.gridLayout.FilterId;
+				} else if (tf.girdFilterFromNewWindow && tf.girdFilterFromNewWindow.gridType == self._gridType)
+				{
+					selectGridFilterEntityId = tf.girdFilterFromNewWindow;
+					delete tf.girdFilterFromNewWindow;
+				}
+				else
+				{
+					if (tf.isViewfinder)
 					{
-						selectGridFilterEntityId = self.options.filterId;
-					}
-					else if (tf.storageManager.get(self._storageFilterDataKey, true))
-					{
-						//open new grid in viewfinder is use local storage
-						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey, true);
-						if (!TF.isPhoneDevice)
-						{
-							tf.storageManager.save(self._storageFilterDataKey, selectGridFilterEntityId);
-						}
-						tf.storageManager.delete(self._storageFilterDataKey, true);
-					}
-					else if (self.options.gridLayout)
-					{
-						// dashboard grid.
-						selectGridFilterEntityId = self.options.gridLayout.FilterId;
-					} else if (tf.girdFilterFromNewWindow && tf.girdFilterFromNewWindow.gridType == self._gridType)
-					{
-						selectGridFilterEntityId = tf.girdFilterFromNewWindow;
-						delete tf.girdFilterFromNewWindow;
-					}
-					else
-					{
-						if (tf.isViewfinder)
-						{
-							if (tf.userPreferenceManager.getUserSetting("shouldRetainGridFilter"))
-							{
-								selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
-							} else
-							{
-								var temporaryFilterIdKey = "grid.temporaryfilter." + self._gridType + ".id";
-								selectGridFilterEntityId = parseInt(tf.storageManager.get(temporaryFilterIdKey, true, true)) || null;
-								tf.storageManager.delete(temporaryFilterIdKey, true, true);
-							}
-						} else
+						if (tf.userPreferenceManager.getUserSetting("shouldRetainGridFilter"))
 						{
 							selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
+						} else
+						{
+							var temporaryFilterIdKey = "grid.temporaryfilter." + self._gridType + ".id";
+							selectGridFilterEntityId = parseInt(tf.storageManager.get(temporaryFilterIdKey, true, true)) || null;
+							tf.storageManager.delete(temporaryFilterIdKey, true, true);
 						}
-					}
-
-					if (selectGridFilterEntityId && selectGridFilterEntityId.filteredIds)
-					{
-						self.relatedFilterEntity = selectGridFilterEntityId;
 					} else
 					{
-						self.relatedFilterEntity = undefined;
+						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
 					}
+				}
 
-					if (getQueryString("filterId"))
-					{
-						selectGridFilterEntityId = parseInt(getQueryString("filterId"));
-					}
+				if (selectGridFilterEntityId && selectGridFilterEntityId.filteredIds)
+				{
+					self.relatedFilterEntity = selectGridFilterEntityId;
+				} else
+				{
+					self.relatedFilterEntity = undefined;
+				}
+
+				if (getQueryString("filterId"))
+				{
+					selectGridFilterEntityId = parseInt(getQueryString("filterId"));
 				}
 
 				// for the specific filters in the summary page of the viewfinderweb
@@ -1111,10 +1108,14 @@
 		return self._syncFilterAndNotifyStatusUpdated(gridFilterDataModel.id())
 			.then(function(filterExisted)
 			{
-				if (filterExisted)
+				if (filterExisted) {
+					if (currentFilterId < 0) {
+						return true;
+					}
 					return self.saveCurrentFilter();
-				else
+				} else {
 					return false;
+				}
 			})
 			.then(function(ans)
 			{
