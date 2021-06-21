@@ -1233,6 +1233,7 @@
 
 		switch (itemType)
 		{
+			case "UDGrid":
 			case "grid":
 				var $grid = $el.find(".kendo-grid");
 				if ($grid.length > 0)
