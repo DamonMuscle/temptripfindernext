@@ -37,6 +37,7 @@
 		paramData: {}
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report'];
+	var customClickAndTouchEvent = "click.LightKendoGrid touchend.LightKendoGrid";
 
 	function LightKendoGrid($container, options, gridState, geoFields)
 	{
@@ -2190,13 +2191,13 @@
 					var customCssSelectorStr = cssSelectorStr + ':not(".has-custom-filter-btn-click")';
 					var $containers = $listContainer.find(customCssSelectorStr).filter(function() { return $(this).text() === key; });
 
-					$containers.off('click touchend').on('click touchend', self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
+					$containers.off(customClickAndTouchEvent).on(customClickAndTouchEvent, self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
 					break;
 				case "List":
 					var listCssSelectorStr = cssSelectorStr + ':not(".has-list-filter-btn-click")';
 					var $containers = $listContainer.find(listCssSelectorStr).filter(function() { return $(this).text() === key; });
 
-					$containers.off('click touchend').on('click touchend', self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
+					$containers.off(customClickAndTouchEvent).on(customClickAndTouchEvent, self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
 					break;
 				case "Empty":
 				case "Not Empty":
@@ -2209,7 +2210,7 @@
 							$listContainersNeedBindClick.push($listContainers[i]);
 						}
 					}
-					$($listContainersNeedBindClick).off('click touchend').on('click touchend',
+					$($listContainersNeedBindClick).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
@@ -2244,7 +2245,7 @@
 						});
 					break;
 				default:
-					$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key }).off('click touchend').on("click touchend",
+					$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key }).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input");
@@ -2298,7 +2299,7 @@
 			var dropdownlist = $(item).data("kendoDropDownList");
 			dropdownlist.bind('change', onDropDownListChange);
 
-			$(item).parent().next().off('click touchend').on("click touchend", function(e)
+			$(item).parent().next().off(customClickAndTouchEvent).on(customClickAndTouchEvent, function(e)
 			{
 				var input = $(e.currentTarget).parent().find("input");
 				if (input.data("isempty"))
