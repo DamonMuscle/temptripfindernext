@@ -94,6 +94,9 @@
             self.form = new TF.Control.Form.Form(self.dataType, formOption);
             self.form.assginEntityRecord(self.baseRecordEntity);
             self.$element.find(".custom-detail-view").empty().append(self.form.element);
+            if (TF.isMobileDevice) {
+                self.$element.closest(".modal-body").css("overflow-y", "hidden");
+            }
             //set form min-height to adapt page view size,  30(modal padding)
             if (!TF.isMobileDevice)
                 self.form.element.find(".form").css("min-height", parseInt(self.$element.parents(".modal-body").css("max-height")) - 30 + "px");

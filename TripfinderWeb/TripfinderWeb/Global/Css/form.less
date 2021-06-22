@@ -1556,5 +1556,101 @@
 	border-color: @editableTextColor;
 }
 
+.e-sign-element.full-page
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 99999;
+	background-color: white;
+
+	.question-title
+	{
+		padding: 5px 0 5px 10px;
+		background-color: #333;
+		color: white;
+		height: 35px;
+		line-height: 25px;
+
+		.title
+		{
+			display: none;
+		}
+
+		.modal-title
+		{
+			display: inline;
+			padding: 0;
+		}
+
+		.e-sign-close-button
+		{
+			display: block;
+			position: absolute;
+			border: 0;
+			width: 16px;
+			height: 16px;
+			top: 7px;
+			right: 7px;
+			background-image: url("../../global/img/detail-screen/Close-White.svg");
+			background-color: transparent;
+			background-size: 16px 16px;
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+	}
+
+	.e-sign-cover-layer
+	{
+		display: none;
+	}
+
+	&.invalid
+	{
+		border: 0;
+	}
+
+	.invalid-message
+	{
+		display: none;
+	}
+
+	.e-sign-action-bar
+	{
+		display: block;
+		padding: 5px 0;
+		background-color: #f2f2f2;
+		border-top: 1px solid #c4c4c4;
+
+		.k-button
+		{
+			color: #fff;
+			background-color: #333;
+			border-color: #444;
+			margin-left: 10px;
+			background-image: none;
+
+			&:active
+			{
+				-webkit-box-shadow: unset;
+				box-shadow: unset;
+			}
+
+			&:focus
+			{
+				box-shadow: unset;
+			}
+
+			&:focus:active:not(.k-state-disabled):not([disabled])
+			{
+				background-color: @buttonColor;
+				border-color: @buttonColor;
+			}
+		}
+	}
+}
+
 @import "rating";
 @import "form-attach";

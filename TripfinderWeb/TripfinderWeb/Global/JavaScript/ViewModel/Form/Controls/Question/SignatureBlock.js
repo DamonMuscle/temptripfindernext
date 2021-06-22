@@ -11,7 +11,8 @@
 			Guid: 'signature'
 		};
 		this.isFullPage = false;
-		this.field.readonly = !!field.readonly;
+        this.field.readonly = !!field.readonly;
+        this.elemenContainer = undefined;
 		if (this.field.readonly)
 		{
 			this.elem.addClass('disabled');
@@ -171,11 +172,14 @@
 
 	SignatureBlock.prototype.enterFullPage = function()
 	{
-		this.isFullPage = true;
+        this.isFullPage = true;
+        this.elemenContainer = this.elem.parent();
 		this.elem.parent().addClass('full-page');
 		if (TF.isMobileDevice)
-		{
-			this.resizeCanvas('100%', ($(window).outerHeight() - 90) + 'px');
+        {
+            this.elem.addClass('full-page');
+            $("body").append(this.elem);
+            this.resizeCanvas('100%', ($(window).outerHeight() - 80) + 'px');
 		}
 		else
 		{
@@ -186,8 +190,14 @@
 
 	SignatureBlock.prototype.exitFullPage = function()
 	{
-		this.isFullPage = false;
-		this.elem.parent().removeClass('full-page');
+        this.isFullPage = false;
+        this.elem.removeClass('full-page');
+       
+        if (this.elemenContainer) {
+            this.elemenContainer.removeClass('full-page');
+            //$("body").remove(this.elem);
+            this.elemenContainer.append(this.elem);
+        }
 		this.resizeCanvas('200px', '50px');
 	}
 
