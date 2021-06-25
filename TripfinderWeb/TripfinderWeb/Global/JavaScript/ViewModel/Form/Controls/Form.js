@@ -65,8 +65,8 @@
 
 	Form.prototype.closeForm = function()
 	{
-        this.elem.trigger('formClose');
-        $(window).off("orientationchange.formMobile");
+		this.elem.trigger('formClose');
+		$(window).off("orientationchange.formMobile");
 	}
 
 	Form.prototype.validateLocationRequired = function()
@@ -253,23 +253,25 @@
 
 		this.createQuestions(elem);
 		this._processElement(elem);
-        if (TF.isMobileDevice) {
-            $(window).off("orientationchange.formMobile")
-                .on("orientationchange.formMobile", () => {
-                    setTimeout(() => {
-                        let dialog = elem.closest('.modal-dialog');
-                        if (dialog.length > 0) {
-                            dialog.find('.modal-body').css("max-height", $(window).height() - 46);
-                                let formBody = elem.find(".form-body");
-                                if (screen.availWidth > screen.availHeight) {
-                                    formBody.css("padding-bottom", "120px");
-                                } else {
-                                    formBody.css("padding-bottom", "180px");
-                            }
-                        }
-                    },200);
-                });
-        }
+		if (TF.isMobileDevice) {
+			$(window).off("orientationchange.formMobile")
+				.on("orientationchange.formMobile", () => {
+					setTimeout(() => {
+						this.checkHeaderWrapped();
+						this.resetFormHeader(elem);
+						let dialog = elem.closest('.modal-dialog');
+						if (dialog.length > 0) {
+							dialog.find('.modal-body').css("max-height", $(window).height() - 46);
+								let formBody = elem.find(".form-body");
+								if (screen.availWidth > screen.availHeight) {
+									formBody.css("padding-bottom", "140px");
+								} else {
+									formBody.css("padding-bottom", "180px");
+							}
+						}
+					},200);
+			});
+		}
 
 		return elem;
 	}
@@ -372,6 +374,49 @@
 
 	}
 
+	Form.prototype.resetFormHeader = function ($element) {
+		//Recalcultaing height in case of orientation change
+		$element.find(".form-subtitle").css("display", "block");
+
+		let subtitleHeight = $element.find(".form-subtitle").outerHeight(),
+			headerInnerHeight = $element.find(".form-header").height(),
+			headerOuterHeight = $element.find(".form-header").outerHeight(),
+			titleHeight = $element.find(".form-title").outerHeight(),
+			headerTop = $element.find('.form-header').position().top,
+			offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+
+		if (isMobileDevice()) {
+			offsetHeight += 10;
+		}
+
+		if (!$element.find(".showmore").hasClass("rotate")) {
+			$element.find(".showmore").addClass("rotate");
+			$element.find(".form-header").outerHeight(headerOuterHeight + offsetHeight);
+			$element.find(".form-subtitle").css("display", "block");
+			$element.find(".form-body").css("top", headerOuterHeight + offsetHeight + headerTop);
+		}
+		else {
+			$element.find(".showmore").removeClass("rotate");
+			$element.find(".form-header").css("height", "");
+			$element.find(".form-subtitle").css("display", "");
+			$element.find(".form-body").css("top", "");
+		}
+	}
+
+	Form.prototype.checkHeaderWrapped = function () {
+		let $element = this.element,
+			titleEle = $element.find(".form-title"),
+			titleHeight = $element.find(".form-title").outerHeight();
+
+		titleEle.css('white-space', 'nowrap');
+		let height = titleEle.outerHeight();
+		titleEle.css('white-space', 'normal');
+		if (height < titleHeight) {
+			//add mini-class to subtitle
+			$element.find('.form-subtitle').addClass('form-subtitle-mini');
+		}
+	}
+
 	Form.prototype.attachActionOnFormHeader = function($element)
 	{
 		// make subtitle display block to calculate full height
@@ -384,10 +429,10 @@
 		 * greater than 0 means insufficient height for subtitle(form description), 
 		 * need show "shore more" icon for arrow down to present full height content
 		 */
-        let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
-        if (isMobileDevice()) {
-            offsetHeight += 10;
-        }
+		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+		if (isMobileDevice()) {
+			offsetHeight += 10;
+		}
 		if (offsetHeight > 0)
 		{
 			$element.find(".form-subtitle").css("display", "-webkit-box");

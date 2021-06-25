@@ -102,7 +102,7 @@
                 dialog.addClass("modal-fullscreen form");
                 dialog.find('.modal-body').css("max-height", $(window).height() - 46);
                    if (screen.availWidth > screen.availHeight) {
-                        self.$element.find(".form-body").css("padding-bottom", "120px");
+                        self.$element.find(".form-body").css("padding-bottom", "140px");
                     } else {
                         self.$element.find(".form-body").css("padding-bottom", "180px");
                     }
