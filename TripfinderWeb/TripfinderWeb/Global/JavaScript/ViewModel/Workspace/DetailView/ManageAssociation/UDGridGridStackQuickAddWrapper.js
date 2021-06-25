@@ -97,13 +97,15 @@
             if (TF.isMobileDevice) {
                 self.$element.closest(".modal-body").css("overflow-y", "hidden");
             }
-            if (TF.isPhoneDevice) {
+            if (TF.isMobileDevice) {
                 let dialog = self.$element.closest('.modal-dialog');
                 dialog.addClass("modal-fullscreen form");
                 dialog.find('.modal-body').css("max-height", $(window).height() - 46);
-                if (TF.isSafari) {
-                    self.$element.find(".form-body").css("bottom", "60px");
-                }
+                   if (screen.availWidth > screen.availHeight) {
+                        self.$element.find(".form-body").css("padding-bottom", "120px");
+                    } else {
+                        self.$element.find(".form-body").css("padding-bottom", "180px");
+                    }
             }
             //set form min-height to adapt page view size,  30(modal padding)
             if (!TF.isMobileDevice)

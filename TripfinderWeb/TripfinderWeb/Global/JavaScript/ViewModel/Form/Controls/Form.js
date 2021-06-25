@@ -65,7 +65,8 @@
 
 	Form.prototype.closeForm = function()
 	{
-		this.elem.trigger('formClose');
+        this.elem.trigger('formClose');
+        $(window).off("orientationchange.formMobile");
 	}
 
 	Form.prototype.validateLocationRequired = function()
@@ -252,7 +253,23 @@
 
 		this.createQuestions(elem);
 		this._processElement(elem);
-
+        if (TF.isMobileDevice) {
+            $(window).off("orientationchange.formMobile")
+                .on("orientationchange.formMobile", () => {
+                    setTimeout(() => {
+                        let dialog = elem.closest('.modal-dialog');
+                        if (dialog.length > 0) {
+                            dialog.find('.modal-body').css("max-height", $(window).height() - 46);
+                                let formBody = elem.find(".form-body");
+                                if (screen.availWidth > screen.availHeight) {
+                                    formBody.css("padding-bottom", "120px");
+                                } else {
+                                    formBody.css("padding-bottom", "180px");
+                            }
+                        }
+                    },200);
+                });
+        }
 
 		return elem;
 	}
