@@ -465,11 +465,16 @@
         };
 
         var defaultGridOptions = {
-            selectable: "multiple",
             dataBound: function () {
                 self._bindMiniGridEvent(self.$el.find(".kendo-grid"));
             }
         };
+		
+		if(!TF.isMobileDevice)
+		{
+			defaultGridOptions.selectable = "multiple";
+		}
+
         var options = {
             columns: columns,
             dataSource: getDataSource,
