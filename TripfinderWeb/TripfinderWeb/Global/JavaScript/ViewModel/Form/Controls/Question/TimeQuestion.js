@@ -52,6 +52,12 @@
 		return timeEle;
 	}
 
+	TimeQuestion.prototype.initEvents = function () {
+		if (!TF.isMobileDevice) {
+			this.bindValidateValueEvents();
+		}
+	}
+
 	TimeQuestion.prototype.adjustPopupPosition = function($senderElement, $timerElement) 
 	{
 

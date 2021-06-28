@@ -269,7 +269,7 @@
 									formBody.css("padding-bottom", "180px");
 							}
 						}
-					},200);
+					}, 400);
 			});
 		}
 

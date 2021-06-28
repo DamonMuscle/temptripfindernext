@@ -64,7 +64,7 @@
 
 		// time 
 		let timeContainer = $("<div></div>");
-		let timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, tabindex: '4', adjustPopupPosition: this.adjustTimePopupPosition }, undefined, undefined, $('<div></div>'));
+		let timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, tabindex: '4' }, undefined, undefined, $('<div></div>'));
 		let timeboxEle = timebox.getElement();
 		timebox.value(null);
 
@@ -93,6 +93,15 @@
 			this.validateInternal();
 		});
 
+		timebox.$element.on('dp.show', (sender) => {
+			if (TF.isMobileDevice) {
+				timebox._dateTimePicker.widgetPositioning({ horizontal: 'right' });
+				var widgetParent = $(timebox._dateTimePicker.widgetParent());
+				var widget = widgetParent.find(".bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last");
+				this.adjustTimePopupPosition($(sender.target), widget);
+			}
+		});
+
 		timeboxEle.addClass("time-question");
 		if (this.field.value)
 		{
@@ -110,6 +119,12 @@
 		timeContainer.append(timeboxEle);
 		dtContainer.append(timeContainer);
 		return dtContainer;
+	}
+
+	DateTimeQuestion.prototype.initEvents = function () {
+		if (!TF.isMobileDevice) {
+			this.bindValidateValueEvents();
+		}
 	}
 
 	DateTimeQuestion.prototype.getValidateResult = function()
@@ -157,4 +172,29 @@
 			});
 		}, timeInteval);
 	};
+
+	DateTimeQuestion.prototype.adjustTimePopupPosition = function ($senderElement, $timerElement) {
+		let adjustFun = function () {
+			let rect = $senderElement.parent()[0].getBoundingClientRect();
+			if (rect.bottom + $timerElement.outerHeight(true) < document.body.clientHeight) {
+				$timerElement.css({ top: `${rect.bottom}px`, right: "auto", bottom: "auto" })
+				if (rect.left + $timerElement.outerWidth(true) > document.body.clientWidth) {
+					var rightPos = document.body.clientWidth - rect.right;
+					$timerElement.css({ left: "auto", right: `${rightPos}px` });
+				}
+					
+			}
+			else {
+				$timerElement.css({ top: "auto", right: "auto", bottom: `${document.body.offsetHeight - $senderElement.first()[0].getBoundingClientRect().top}px` })
+			};
+		}
+
+		if (TF.isMobileDevice && TF.isIOS && TF.getIOSVersion[0] === 11) {
+			setTimeout(function () {
+				adjustFun();
+			}, 200);
+		} else {
+			adjustFun();
+		}
+	}
 })();
