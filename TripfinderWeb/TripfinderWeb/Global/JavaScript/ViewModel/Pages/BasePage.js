@@ -109,6 +109,7 @@
 				return;
 			}
 			selectedId = selectedIds[0];
+			selectedIds.length > 1 && self.searchGrid.getSelectedIds([selectedId]);
 		}
 		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
@@ -207,6 +208,8 @@
 		{
 			return;
 		}
+
+		selectedIds.length > 1 && self.searchGrid.getSelectedIds([selectedIds[0]]);
 
 		view = {
 			id: selectedIds[0],
