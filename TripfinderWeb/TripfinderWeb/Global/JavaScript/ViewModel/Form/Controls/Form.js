@@ -266,7 +266,7 @@
 								if (screen.availWidth > screen.availHeight) {
 									formBody.css("padding-bottom", "140px");
 								} else {
-									formBody.css("padding-bottom", "180px");
+									self.$element.find(".form-body").css("padding-bottom", TF.isAndroid ? "240px" : "200px");
 							}
 						}
 					}, 400);

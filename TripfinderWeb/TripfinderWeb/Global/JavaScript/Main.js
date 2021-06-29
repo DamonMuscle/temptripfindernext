@@ -188,12 +188,17 @@ function getLocation() {
     });
 }
 
+function isAndroid() {
+	return /(android)/i.test(navigator.userAgent);
+}
+
 createNamespace("TF").getLocation = getLocation;
 createNamespace("TF").isMobileDevice = isMobileDevice();
 createNamespace("TF").isSafari = isSafari();
 createNamespace("TF").isPhoneDevice = isPhoneDevice();
 createNamespace("TF").isPortrait = isPortrait();
 createNamespace("TF").isLandscape = isLandscape();
+createNamespace("TF").isAndroid = isAndroid();
 
 createNamespace("TF").getSingularOrPluralTitle = function(title, count)
 {
