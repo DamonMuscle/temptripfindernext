@@ -101,10 +101,11 @@
                 let dialog = self.$element.closest('.modal-dialog');
                 dialog.addClass("modal-fullscreen form");
                 dialog.find('.modal-body').css("max-height", $(window).height() - 46);
+
                    if (screen.availWidth > screen.availHeight) {
                         self.$element.find(".form-body").css("padding-bottom", "140px");
                     } else {
-                        self.$element.find(".form-body").css("padding-bottom", "180px");
+                       self.$element.find(".form-body").css("padding-bottom", TF.isAndroid? "240px": "200px");
                     }
             }
             //set form min-height to adapt page view size,  30(modal padding)
