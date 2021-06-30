@@ -82,19 +82,23 @@
 							swipingUp: function(e)
 							{
 								e.stopPropagation();
-								var target = e.currentTarget;
+								var target = e.currentTarget, isForm = $(target).find(".form-body").length > 0;
 								if (target && target.scrollHeight - target.scrollTop <= target.clientHeight)
 								{
-									e.preventDefault();
+									if (e.cancelable && !TF.isSafari && !isForm) {
+										e.preventDefault();
+									}
 								}
 							},
 							swipingDown: function(e)
 							{
 								e.stopPropagation();
-								var target = e.currentTarget;
+								var target = e.currentTarget, isForm = $(target).find(".form-body").length > 0;
 								if (target && target.scrollTop <= 0)
 								{
-									e.preventDefault();
+									if (e.cancelable && !TF.isSafari && !isForm) {
+										e.preventDefault();
+									}
 								}
 							}
 						});
