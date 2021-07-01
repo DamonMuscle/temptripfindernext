@@ -262,12 +262,8 @@
 						let dialog = elem.closest('.modal-dialog');
 						if (dialog.length > 0) {
 							dialog.find('.modal-body').css("max-height", $(window).height() - 46);
-								let formBody = elem.find(".form-body");
-								if (screen.availWidth > screen.availHeight) {
-									formBody.css("padding-bottom", "140px");
-								} else {
-									self.$element.find(".form-body").css("padding-bottom", "240px");
-							}
+							let bodyHeight = dialog.find('.modal-body').height();
+							elem.closest(".grid-stack-container").css("min-height", bodyHeight + "px");
 						}
 					}, 400);
 			});
