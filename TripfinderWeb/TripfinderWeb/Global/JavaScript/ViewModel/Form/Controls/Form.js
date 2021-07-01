@@ -265,7 +265,7 @@
 							let bodyHeight = dialog.find('.modal-body').height();
 							elem.closest(".grid-stack-container").css("min-height", bodyHeight + "px");
 						}
-					}, 400);
+					}, 600);
 			});
 		}
 
