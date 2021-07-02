@@ -30,7 +30,6 @@
 		this.obEmails = ko.observableArray(option.emailAddress);
 		this.obCcEnable = ko.observable(false);
 		this.obBccEnable = ko.observable(false);
-		// this.associatedAddress = ko.observable("");
 		if (option.placeEmailTo)
 		{
 			tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.option.type)),
@@ -76,14 +75,7 @@
 
 		this.initFromEmailSource(option).then(function()
 		{
-			// if (option.emailAddress.indexOf(tf.storageManager.get("fromEmailAddress")) >= 0)
-			// {
-			// 	this.obEntityDataModel().emailAddress(tf.storageManager.get("fromEmailAddress"));
-			// }
-			// else
-			// {
 			this.obEntityDataModel().emailAddress(option.emailAddress[0]);
-			// }
 		}.bind(this));
 		this.obEntityDataModel().emailAddress.subscribe(function()
 		{
@@ -175,34 +167,10 @@
 
 	SendEmailOfGridViewModel.prototype.initAttachments = function()
 	{
-		// this.documentEntities.push(
-		// 	{
-		// 		Filename: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + (this.option.modelType === 'SendTo' ? '.csv' : '.xls'),
-		// 		Guid: ko.observable(''),
-		// 		DatabaseId: tf.datasourceManager.databaseId,
-		// 		FileProgress: ko.observable("0%"),
-		// 		DownLoadComplete: ko.observable(false),
-		// 		UploadFailed: ko.observable(false)
-		// 	});
-		// if (this.option.type == 'altsite' ||
-		// 	this.option.type == 'student' ||
-		// 	this.option.type == 'school' ||
-		// 	this.option.type == 'tripstop' ||
-		// 	this.option.type == 'trip')
-		// {
-		// 	this.documentEntities.push(
-		// 		{
-		// 			Filename: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".KML",
-		// 			Guid: ko.observable(''),
-		// 			DatabaseId: tf.datasourceManager.databaseId,
-		// 			FileProgress: ko.observable("0%"),
-		// 			DownLoadComplete: ko.observable(false),
-		// 			UploadFailed: ko.observable(false)
-		// 		});
-		// }
 		this.documentEntities.push(
 			{
 				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".csv",
+				Guid: ko.observable(''),
 				DatabaseId: tf.datasourceManager.databaseId,
 				DownLoadComplete: ko.observable(true),
 				UploadFailed: ko.observable(false)
@@ -210,6 +178,7 @@
 		this.documentEntities.push(
 			{
 				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".xls",
+				Guid: ko.observable(''),
 				DatabaseId: tf.datasourceManager.databaseId,
 				DownLoadComplete: ko.observable(true),
 				UploadFailed: ko.observable(false)
@@ -359,12 +328,6 @@
 						{
 							return true;
 						}
-						// if (!value)
-						// {
-						// 	updateErrors($field, "email");
-						// 	return true;
-						// }
-						// else
 						if (value)
 						{
 							updateErrors($field, "required");
@@ -438,12 +401,6 @@
 						{
 							return true;
 						}
-						// if (!value)
-						// {
-						// 	updateErrors($field, "email");
-						// 	return true;
-						// }
-						// else
 						if (value)
 						{
 							updateErrors($field, "required");
@@ -517,12 +474,6 @@
 						{
 							return true;
 						}
-						// if (!value)
-						// {
-						// 	updateErrors($field, "email");
-						// 	return true;
-						// }
-						// else
 						if (value)
 						{
 							updateErrors($field, "required");
@@ -606,16 +557,6 @@
 		this.loadRecipientsForMobile();
 
 		this.obdisabledSend(false)
-		// if (this.option.modelType === 'SendTo')
-		// {
-		// 	this.LoadAttachments();
-		// 	this.intervalID = this.GetProgress();
-		// 	this.setTimeoutID = setTimeout(function()
-		// 	{
-		// 		clearInterval(self.intervalID);
-		// 		tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "resetProgress"), {}, { overlay: false });
-		// 	}, 120000);
-		// }
 	};
 
 	SendEmailOfGridViewModel.prototype.GetProgress = function()
@@ -632,20 +573,6 @@
 					});
 				}
 			});
-		// return setInterval(function()
-		// {
-		// 	tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "getProgress"), {}, { overlay: false })
-		// 		.then(function(response)
-		// 		{
-		// 			if (response.Items.length > 0)
-		// 			{
-		// 				self.documentEntities().map(function(item)
-		// 				{
-		// 					item.FileProgress(response.Items[0] + '%');
-		// 				});
-		// 			}
-		// 		});
-		// }, 3000);
 	};
 
 	SendEmailOfGridViewModel.prototype.LoadAttachments = function()
@@ -1037,23 +964,7 @@
 		{
 			if (result)
 			{
-				// this.obEntityDataModel().mailToList(this.obEmailToList().map(function(item)
-				// {
-				// 	return item.emailAddress();
-				// }));
-
-				// this.obEntityDataModel().mailCcList(this.obEmailCcList().map(function(item)
-				// {
-				// 	return item.emailAddress();
-				// }));
-
-				// this.obEntityDataModel().mailBccList(this.obEmailBccList().map(function(item)
-				// {
-				// 	return item.emailAddress();
-				// }));
-
-				var sendData = self.clientConfig;//this.obEntityDataModel().toData();
-				//var emailData = {};
+				var sendData = self.clientConfig;
 				function handleEmail(emails)
 				{
 					return _.uniq(emails.map(function(i)
@@ -1115,11 +1026,6 @@
 				{
 					if (data.Items[0].SMTPHost && data.Items[0].SMTPPort)
 					{
-						// self.obEntityDataModel().sMTPHost(data.Items[0].SMTPHost);
-						// self.obEntityDataModel().sMTPPort(data.Items[0].SMTPPort);
-						// self.obEntityDataModel().sMTPUserName(data.Items[0].SMTPUserName);
-						// self.obEntityDataModel().emailName(data.Items[0].EmailName);
-						// self.obEntityDataModel().sMTPSSL(data.Items[0].SMTPSSL);
 						self.clientConfig = data.Items[0];
 						return true;
 					}
@@ -1359,7 +1265,6 @@
 							});
 					}
 				});
-				// self.obRecipientList(self.obRecipientList());
 				emailIsValid();
 			}
 		}
@@ -1447,7 +1352,6 @@
 		{
 			return Promise.resolve(true);
 		}
-		//this._$form.data("bootstrapValidator").destroy();
 	};
 
 })();
