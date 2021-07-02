@@ -142,6 +142,10 @@
 
 		$(window).resize(function(e)
 		{
+			// form is full screen; so ignore it
+			if (TF.isMobileDevice && self._$modalContainer.find(".form-container").length > 0)
+				return; 
+
 			setTimeout(function()
 			{
 				self.obBaseModalViewModels().map(function(modal)
