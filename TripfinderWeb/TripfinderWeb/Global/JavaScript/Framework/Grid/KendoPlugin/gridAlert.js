@@ -20,6 +20,12 @@
 	{
 		this.alertOption = alertOptions;
 		this.$alert = $alert;
+		if (TF.isPhoneDevice)
+		{
+			defaults.position = { x: '50%', y: 73 };
+			defaults.width = '98%';
+			defaults.styleTransform = 'translateX(-50%)';
+		}
 	}
 
 	GridAlertViewModel.prototype.show = function(options)
@@ -52,7 +58,10 @@
 			opacity: 1
 		});
 
-
+		if (this.options.styleTransform)
+		{
+			this.$alert.css("transform", this.options.styleTransform);
+		}
 
 		var $closeBtn = this.$alert.find(".close")
 		$closeBtn.on("click", function(e)
