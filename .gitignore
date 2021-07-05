@@ -1,4 +1,5 @@
 .vs/
+.vscode/
 /TripfinderWeb/TripfinderWeb/.vs/
 /TripfinderWeb/TripfinderWeb/TripfinderWeb.csproj.user
 /TripfinderWeb/*.suo
