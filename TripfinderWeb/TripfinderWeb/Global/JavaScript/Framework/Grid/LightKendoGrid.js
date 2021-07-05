@@ -644,6 +644,18 @@
 												self.kendoDataSourceTransportReadCount = 0;
 												self.$customFilterBtn = undefined;
 											}
+										}).fail(function(ex)
+										{
+											if (self.overlay && self.options.showOverlay)
+											{
+												tf.loadingIndicator.tryHide();
+											}
+
+											self.gridAlert.show({
+												alert: "Danger",
+												title: "Error",
+												message: ex.responseJSON.Message
+											});
 										});
 								});
 						}
@@ -676,6 +688,18 @@
 										self.$customFilterBtn = undefined;
 									}
 
+								}).fail(function(ex)
+								{
+									if (self.overlay && self.options.showOverlay)
+									{
+										tf.loadingIndicator.tryHide();
+									}
+
+									self.gridAlert.show({
+										alert: "Danger",
+										title: "Error",
+										message: ex.responseJSON.Message
+									})
 								});
 						}
 					}
@@ -3075,13 +3099,14 @@
 
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
-		let paramData={
+		let paramData = {
 			take: kendoOptions.data.take ? kendoOptions.data.take : 100,
 			skip: kendoOptions.data.skip ? kendoOptions.data.skip : 0,
 			getCount: this.options.getCount == false ? false : true
 		}
-		if(Object.keys(this.options.paramData).length>0){
-			Object.assign(paramData,this.options.paramData)
+		if (Object.keys(this.options.paramData).length > 0)
+		{
+			Object.assign(paramData, this.options.paramData)
 		}
 		var self = this,
 			includeOnlyIds = self.getIncludeOnlyIds(),
