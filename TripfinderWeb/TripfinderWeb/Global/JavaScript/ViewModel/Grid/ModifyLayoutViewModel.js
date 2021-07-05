@@ -5,7 +5,7 @@
 	ModifyLayoutViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ModifyLayoutViewModel.prototype.constructor = ModifyLayoutViewModel;
 
-	function ModifyLayoutViewModel (gridType, isNew, gridLayoutExtendedDataModel, obGridFilterDataModels, obSelectedGridFilterId)
+	function ModifyLayoutViewModel(gridType, isNew, gridLayoutExtendedDataModel, obGridFilterDataModels, obSelectedGridFilterId)
 	{
 		this.isNew = isNew;
 		gridLayoutExtendedDataModel = gridLayoutExtendedDataModel.clone();
@@ -120,7 +120,7 @@
 	ModifyLayoutViewModel.prototype.selectedGridFilterDataModelChange = function()
 	{
 		this.gridLayoutExtendedDataModel.filterId(this.obSelectedGridFilterDataModel() ? this.obSelectedGridFilterDataModel().id() : null);
-		this.gridLayoutExtendedDataModel.filterName(this.obSelectedGridFilterDataModel() ? this.obSelectedGridFilterDataModel().name() : null)
+		this.gridLayoutExtendedDataModel.filterName(this.obSelectedGridFilterDataModel() ? this.obSelectedGridFilterDataModel().name() : null);
 	};
 
 	ModifyLayoutViewModel.prototype.gotoSelectFilter = function(viewModel, el)
@@ -270,6 +270,14 @@
 	};
 	ModifyLayoutViewModel.prototype.apply = function(viewModel, e)
 	{
+		if (!this.obSelectedGridFilterDataModel().isValid())
+		{
+			return tf.promiseBootbox.alert("Filter is invalid. It cannot be saved.", 'Warning', 40000).then(function()
+			{
+				return false;
+			}.bind(this));
+		}
+
 		return this.save()
 			.then(function(savedGridLayoutExtendedDataModel)
 			{

@@ -15,6 +15,13 @@
 			Submit New Request</div>
 		<!-- /ko -->
 	</div>
+	<div class="gridAlert" style="display:none">
+		<button type="button" class="close">
+			&times;
+		</button>
+		<div class="title"></div>
+		<pre class="message titleNotify"></pre>
+	</div>
 	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
 		<div class="iconrow">
 			<!-- ko if: pageType !== "reports"-->
