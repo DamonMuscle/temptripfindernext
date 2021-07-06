@@ -94,7 +94,7 @@
 				{
 					this.gridLayoutExtendedDataModel.dataTypeId(apiResponse.Items[0].DataTypeId);
 					this.gridLayoutExtendedDataModel.name(apiResponse.Items[0].Name);
-					this.gridLayoutExtendedDataModel.filterId(apiResponse.Items[0].FilterID);
+					this.gridLayoutExtendedDataModel.filterId(apiResponse.Items[0].FilterId);
 					this.gridLayoutExtendedDataModel.filterName(apiResponse.Items[0].FilterName);
 					this.gridLayoutExtendedDataModel.showSummaryBar(apiResponse.Items[0].ShowSummaryBar);
 					this.gridLayoutExtendedDataModel.description(apiResponse.Items[0].Description);
