@@ -1034,7 +1034,7 @@
 				}
 				else
 				{
-					this.obGridLayoutExtendedDataModels.push(savedGridLayoutExtendedDataModel);
+					this.obGridLayoutExtendedDataModels.push(new TF.DataModel.GridLayoutExtendedDataModel(savedGridLayoutExtendedDataModel.toData()));
 				}
 				if (result.applyOnSave)
 				{
@@ -1066,7 +1066,7 @@
 			return left.name().toLowerCase() == right.name().toLowerCase() ? 0 : (left.name().toLowerCase() < right.name().toLowerCase() ? -1 : 1);
 		});
 	};
-	//Return all the layouts that  columns in default colums
+	//Return all the layouts that  columns in default columns
 	KendoGridLayoutMenu.prototype._filterLayoutsByDefaultColumns = function(gridLayouts)
 	{
 		var self = this, defaultColumns = self.getDefinitionLayoutColumns().map(function(item) { return item.FieldName }), validGridLayouts = [];
