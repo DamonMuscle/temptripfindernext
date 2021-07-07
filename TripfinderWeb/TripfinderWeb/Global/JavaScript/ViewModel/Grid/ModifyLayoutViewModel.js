@@ -31,7 +31,7 @@
 		this.gridLayoutExtendedDataModel = gridLayoutExtendedDataModel;
 		this.obFilterDataList = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray(obGridFilterDataModels().concat());
-		this.obGridFilterDataModels().unshift({ id: ko.observable(null), name: ko.observable("Do Not Include") });
+		this.obGridFilterDataModels().unshift({ id: ko.observable(null), name: ko.observable("Do Not Include"), isValid: ko.observable(true) });
 		var selectedGridFilterDataModel = Enumerable.From(this.obGridFilterDataModels()).Where(function(c) { return c.id() == displayFilter }).ToArray()[0];
 		this.obSelectedGridFilterDataModel = ko.observable(selectedGridFilterDataModel);
 		this.obApplyOnSave = ko.observable(false);
