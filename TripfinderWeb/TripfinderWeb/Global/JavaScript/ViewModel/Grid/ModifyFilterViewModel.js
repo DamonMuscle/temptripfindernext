@@ -61,21 +61,17 @@
 
 		this.obValueFieldValue.subscribe(function(newFiledValue)
 		{
-			if (newFiledValue)
-			{
-				switch (this.obValueFieldType())
-				{
-					case "Boolean":
-						this.insertFragmentToCurrentCursorPostion(this.valueToSQL("Boolean", this.booleanSelectedData.value));
-						break;
-					case "Select":
-						this.insertFragmentToCurrentCursorPostion(this.valueToSQL("String", newFiledValue));
-						break;
-					default:
-						break;
-			}
-			}
+			let isDateTimeControlOpened = function()
+      {
+        return (this.obValueFieldType() && (this.obValueFieldType().toLowerCase() === "datetime" || this.obValueFieldType().toLowerCase() === "time")) &&
+            $(".k-calendar-container.k-state-border-up").length &&
+            $(".k-calendar-container.k-state-border-up").css('display') != 'none';
+      }.bind(this);
 
+			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
+      {
+				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
+			}
 		}.bind(this));
 
 		this.obValueFieldType.subscribe(function()
