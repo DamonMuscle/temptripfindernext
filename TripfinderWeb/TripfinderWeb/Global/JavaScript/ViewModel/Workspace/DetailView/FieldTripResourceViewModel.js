@@ -183,7 +183,14 @@
 			var start = getFloatOrNull(self.obOdometerStart()), ending = getFloatOrNull(self.obOdometerEnding());
 			if (start == null || ending == null) return null;
 
-			return ending - start;
+			var v = (ending - start).toFixed(2);
+
+			if (v.endsWith("0"))
+			{
+				v = v.substring(0, v.length - 1);
+			}
+
+			return v;
 		});
 		self.obMileageRate = ko.observable(isNew ? null : entity.MileageRate);
 		self.obVehicleFixedCost = ko.observable(isNew ? null : entity.VehFixedCost);
