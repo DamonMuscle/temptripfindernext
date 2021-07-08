@@ -44,6 +44,21 @@
 		return null;
 	};
 
+	/**
+	 * float calculation would cause error number, so it need to be fixed by decimal
+	 */
+	function fixFloat(value, decimal = 2)
+	{
+		var v = value.toFixed(decimal);
+
+		if (v.endsWith("0"))
+		{
+			v = v.substring(0, v.length - 1);
+		}
+
+		return v;
+	}
+
 	function FieldTripResourceViewModel(options)
 	{
 		var self = this;
@@ -183,14 +198,7 @@
 			var start = getFloatOrNull(self.obOdometerStart()), ending = getFloatOrNull(self.obOdometerEnding());
 			if (start == null || ending == null) return null;
 
-			var v = (ending - start).toFixed(2);
-
-			if (v.endsWith("0"))
-			{
-				v = v.substring(0, v.length - 1);
-			}
-
-			return v;
+			return fixFloat(ending - start);
 		});
 		self.obMileageRate = ko.observable(isNew ? null : entity.MileageRate);
 		self.obVehicleFixedCost = ko.observable(isNew ? null : entity.VehFixedCost);
@@ -203,14 +211,14 @@
 
 			if (difference != null && milerate != null)
 			{
-				mileCost = difference * milerate;
+				mileCost = fixFloat(difference * milerate);
 			}
 
 			total = nullableFloatSum([mileCost, fixedCost]);
 
 			if (total != null)
 			{
-				return tf.dataFormatHelper.currencyFormatter(total);
+				return tf.dataFormatHelper.currencyFormatter(fixFloat(total));
 			}
 
 			return null;
@@ -235,7 +243,7 @@
 			var hour = getFloatOrNull(self.obDriverBillingHours()), rate = getFloatOrNull(self.obDriverBillingRate());
 			if (hour == null || rate == null) return null;
 
-			return tf.dataFormatHelper.currencyFormatter(hour * rate);
+			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
 		self.obDriverBillingOTHours = ko.observable(isNew ? null : entity.DriverOTHours);
 		self.obDriverBillingOTRate = ko.observable(isNew ? null : entity.DriverOTRate);
@@ -244,7 +252,7 @@
 			var hour = getFloatOrNull(self.obDriverBillingOTHours()), rate = getFloatOrNull(self.obDriverBillingOTRate());
 			if (hour == null || rate == null) return null;
 
-			return tf.dataFormatHelper.currencyFormatter(hour * rate);
+			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
 		self.obDriverBillingFixedCost = ko.observable(isNew ? null : entity.DriverFixedCost);
 		self.obExpensesParking = ko.observable(isNew ? null : entity.DriverExpParking);
@@ -257,7 +265,7 @@
 
 			if (total != null)
 			{
-				return tf.dataFormatHelper.currencyFormatter(total);
+				return tf.dataFormatHelper.currencyFormatter(fixFloat(total));
 			}
 
 			return null;
@@ -268,7 +276,7 @@
 
 			if (total != null)
 			{
-				return tf.dataFormatHelper.currencyFormatter(total);
+				return tf.dataFormatHelper.currencyFormatter(fixFloat(total));
 			}
 
 			return null;
@@ -293,7 +301,7 @@
 			var hour = getFloatOrNull(self.obAideBillingHours()), rate = getFloatOrNull(self.obAideBillingRate());
 			if (hour == null || rate == null) return null;
 
-			return tf.dataFormatHelper.currencyFormatter(hour * rate);
+			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
 		self.obAideBillingOTHours = ko.observable(isNew ? null : entity.AideOTHours);
 		self.obAideBillingOTRate = ko.observable(isNew ? null : entity.AideOTRate);
@@ -302,7 +310,7 @@
 			var hour = getFloatOrNull(self.obAideBillingOTHours()), rate = getFloatOrNull(self.obAideBillingOTRate());
 			if (hour == null || rate == null) return null;
 
-			return tf.dataFormatHelper.currencyFormatter(hour * rate);
+			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
 		self.obAideBillingFixedCost = ko.observable(isNew ? null : entity.AideFixedCost);
 		self.obAideTotal = ko.computed(function()
@@ -311,7 +319,7 @@
 
 			if (total != null)
 			{
-				return tf.dataFormatHelper.currencyFormatter(total);
+				return tf.dataFormatHelper.currencyFormatter(fixFloat(total));
 			}
 
 			return null;
