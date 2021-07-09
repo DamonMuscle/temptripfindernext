@@ -52,8 +52,8 @@
 					"<div class='save-content'>" +
 					"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
 					"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-					"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-					"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
+					"<br/><input id='xlsradio' type='radio' name='type' value='xlsx' />" +
+					"<label for='xlsradio'>Excel 2007 Workbook (.xlsx)</label>" +
 					"<div>" +
 					"</div>",
 				buttons:
@@ -64,7 +64,7 @@
 						className: "btn tf-btn-black btn-sm",
 						callback: function()
 						{
-							var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
+							var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xlsx';
 							var getDataUrl = pathCombine(tf.api.apiPrefixWithoutDatabase(), "DataExportFiles");
 							var getDataOption = {
 								paramData:
