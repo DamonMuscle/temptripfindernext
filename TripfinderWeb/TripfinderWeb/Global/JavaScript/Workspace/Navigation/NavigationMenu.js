@@ -1187,6 +1187,17 @@
 		if (prod.length > 0 && prod[0].Uri)
 		{
 			url = prod[0].Uri;
+			
+			// must remove the stopfinder token when app switch, keep the routerfinder token is new
+			if (prod[0] && (prod[0].Name || '').toLowerCase() === "stopfinder admin") {
+				var sfStoreTokenKey = "sfaweb.token", sfEntTokenKey = "ent.stopfinderToken";
+				store.remove(sfStoreTokenKey);
+				store.remove(sfEntTokenKey);
+				sessionStorage.removeItem(sfStoreTokenKey);
+				sessionStorage.removeItem(sfEntTokenKey);
+				document.cookie = sfStoreTokenKey + "=;Expires=" + new Date() + ";path=/;domain=." + GetDomain();
+				document.cookie = sfEntTokenKey + "=;Expires=" + new Date() + ";path=/;domain=." + GetDomain();
+			}
 
 			var promise = null;
 			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
