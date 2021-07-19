@@ -2,8 +2,8 @@
 {
 	createNamespace("TF.Grid").LightKendoGrid = LightKendoGrid;
 	var defaults = {
-		gridDefinition: { Columns: [] },
-		additionGridDefinition: { Columns: [] },
+		gridDefinition: {Columns: []},
+		additionGridDefinition: {Columns: []},
 		setRequestOption: null,
 		setRequestURL: null,
 		kendoGridOption: {
@@ -71,7 +71,7 @@
 
 		if (!gridState)
 		{
-			gridState = { gridFilterId: null, filteredIds: null, filteredExcludeAnyIds: null, filterClause: null };
+			gridState = {gridFilterId: null, filteredIds: null, filteredExcludeAnyIds: null, filterClause: null};
 		}
 		self.obSelectedGridFilterClause = ko.observable("");
 		self.obHeaderFilters = ko.observableArray([]);
@@ -137,24 +137,24 @@
 		}
 
 		self.onCtrlCPress = new TF.Events.Event();
-		tf.shortCutKeys.bind("ctrl+c", function(e, keyCombination) { self.onCtrlCPress.notify(keyCombination, e); }, self.options.routeState);
+		tf.shortCutKeys.bind("ctrl+c", function(e, keyCombination) {self.onCtrlCPress.notify(keyCombination, e);}, self.options.routeState);
 
 		self.onCtrlSPress = new TF.Events.Event();
-		tf.shortCutKeys.bind("ctrl+s", function(e, keyCombination) { self.onCtrlSPress.notify(keyCombination, e); }, self.options.routeState);
+		tf.shortCutKeys.bind("ctrl+s", function(e, keyCombination) {self.onCtrlSPress.notify(keyCombination, e);}, self.options.routeState);
 
 		self.onEnterPress = new TF.Events.Event();
-		tf.shortCutKeys.bind("enter", function(e, keyCombination) { self.onEnterPress.notify(keyCombination, e); }, self.options.routeState);
+		tf.shortCutKeys.bind("enter", function(e, keyCombination) {self.onEnterPress.notify(keyCombination, e);}, self.options.routeState);
 
 		if (self.options.selectable)
 		{
-			tf.shortCutKeys.bind("up", function() { self.moveSelectedIndex(null, -1); }, self.options.routeState);
-			tf.shortCutKeys.bind("down", function() { self.moveSelectedIndex(null, 1); }, self.options.routeState);
-			tf.shortCutKeys.bind("right", function() { self.horizontalMoveScrollBar(false); }, self.options.routeState);
-			tf.shortCutKeys.bind("left", function() { self.horizontalMoveScrollBar(true); }, self.options.routeState);
-			tf.shortCutKeys.bind("ctrl+home", function() { self.moveSelectedIndex(0); }, self.options.routeState);
-			tf.shortCutKeys.bind("ctrl+end", function() { self.moveSelectedIndex(Number.MAX_VALUE); }, self.options.routeState);
-			tf.shortCutKeys.bind("pageup", function() { self.moveSelectedIndex(null, -self.viewPortPageSize); }, self.options.routeState);
-			tf.shortCutKeys.bind("pagedown", function() { self.moveSelectedIndex(null, self.viewPortPageSize); }, self.options.routeState);
+			tf.shortCutKeys.bind("up", function() {self.moveSelectedIndex(null, -1);}, self.options.routeState);
+			tf.shortCutKeys.bind("down", function() {self.moveSelectedIndex(null, 1);}, self.options.routeState);
+			tf.shortCutKeys.bind("right", function() {self.horizontalMoveScrollBar(false);}, self.options.routeState);
+			tf.shortCutKeys.bind("left", function() {self.horizontalMoveScrollBar(true);}, self.options.routeState);
+			tf.shortCutKeys.bind("ctrl+home", function() {self.moveSelectedIndex(0);}, self.options.routeState);
+			tf.shortCutKeys.bind("ctrl+end", function() {self.moveSelectedIndex(Number.MAX_VALUE);}, self.options.routeState);
+			tf.shortCutKeys.bind("pageup", function() {self.moveSelectedIndex(null, -self.viewPortPageSize);}, self.options.routeState);
+			tf.shortCutKeys.bind("pagedown", function() {self.moveSelectedIndex(null, self.viewPortPageSize);}, self.options.routeState);
 		}
 
 		self.obFilteredRecordCount = ko.observable(0);
@@ -215,7 +215,7 @@
 				var dataItem = self.kendoGrid.dataItem(row);
 				if (dataItem &&
 					$.isNumeric(dataItem[self.options.Id]) &&
-					!Enumerable.From(records).Any(function(x) { return x[self.options.Id] === dataItem[self.options.Id]; })
+					!Enumerable.From(records).Any(function(x) {return x[self.options.Id] === dataItem[self.options.Id];})
 				)
 				{
 					return item;
@@ -337,7 +337,7 @@
 			var self = this;
 			var callRevert = self._onTouchStart(e);
 			if (callRevert)
-				setTimeout(function() { self._revertLinkToText(e); }, 10 * 1000);
+				setTimeout(function() {self._revertLinkToText(e);}, 10 * 1000);
 		}.bind(this));
 
 		this.$container.delegate("table tr td", "touchend touchmove", function(e)
@@ -538,10 +538,10 @@
 	};
 
 	LightKendoGrid.DefaultOperator = {
-		string: { custom: 'Custom' },
-		number: { custom: 'Custom' },
-		date: { custom: 'Custom' },
-		enums: { custom: 'Custom' }
+		string: {custom: 'Custom'},
+		number: {custom: 'Custom'},
+		date: {custom: 'Custom'},
+		enums: {custom: 'Custom'}
 	};
 	LightKendoGrid.DefaultOperator = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.DefaultOperator);
 
@@ -618,7 +618,7 @@
 								{
 									self.setFilterIconByKendoDSFilter.bind(self)();
 
-									tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
+									tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), {overlay: self.overlay && self.options.showOverlay})
 										.then(function()
 										{
 											//the count of request callback in the process of change filter
@@ -661,7 +661,7 @@
 						}
 						else
 						{
-							tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
+							tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), {overlay: self.overlay && self.options.showOverlay})
 								.then(function()
 								{
 									//the count of request callback in the process of change filter
@@ -992,7 +992,7 @@
 
 			if (currentFilter.length)
 			{
-				var col = kendoGridDomain.kendoGrid.columns.filter(function(col) { return col.FieldName === field; });
+				var col = kendoGridDomain.kendoGrid.columns.filter(function(col) {return col.FieldName === field;});
 				var tmpType = col[0].type;
 				var inputCellText = currentFilter[0].filters[0].value;
 				inputCellText = TF.FilterHelper.formatFilterCellInputValue(inputCellText, tmpType);
@@ -1033,7 +1033,7 @@
 	{
 		var self = this;
 		var currentFilters = self.kendoGrid.dataSource.filter() ? self.kendoGrid.dataSource.filter().filters : [];
-		var columns = self.kendoGrid.columns.filter(function(column) { return column.filterable !== false; });
+		var columns = self.kendoGrid.columns.filter(function(column) {return column.filterable !== false;});
 
 		this.$container.find(".k-filtercell .k-dropdown-wrap .k-input").each(function(i, item)
 		{
@@ -1169,7 +1169,7 @@
 			findResult = setFilterVauleForEmptyNotEmptyType(findResult);
 		}
 
-		var currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
+		var currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) {return column.FieldName === kendoFilterCellDomainField;});
 		var columnType = currentlyColumn[0].type;
 
 		var displayVal;
@@ -1234,7 +1234,7 @@
 			var findResult = tmp[0];
 		}
 
-		var currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
+		var currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) {return column.FieldName === kendoFilterCellDomainField;});
 		var columnType = currentlyColumn[0].type;
 		if (findResult)
 		{
@@ -1378,7 +1378,7 @@
 			{
 				data = datasource.data();
 			}
-			return Promise.resolve(data.map(function(item) { return item.Id; }));
+			return Promise.resolve(data.map(function(item) {return item.Id;}));
 		}
 		if (this.allIds && this.allIds.length > 0)
 		{
@@ -1388,7 +1388,7 @@
 		return tf.promiseAjax.post(pathCombine(this.getApiRequestURL(this.options.url), "id"), {
 			paramData: this.searchOption.paramData,
 			data: this.searchOption.data
-		}, { isCopyRequest: isCopyRequest ? true : false })
+		}, {isCopyRequest: isCopyRequest ? true : false})
 			.then(function(apiResponse)
 			{
 				this.allIds = apiResponse.Items;
@@ -1530,7 +1530,7 @@
 		{
 			var $dropDownList = $(item);
 			if (self._isFilterDropDownListPopup($dropDownList))
-				self.filterDropDownListTimer = setTimeout(function() { self._hideFilterDropDownList($dropDownList, e); }, 500);
+				self.filterDropDownListTimer = setTimeout(function() {self._hideFilterDropDownList($dropDownList, e);}, 500);
 		});
 	};
 
@@ -1539,12 +1539,12 @@
 		var self = this;
 
 		var $filterBtn = $("span.k-widget.k-dropdown.k-header.k-dropdown-operator");
-		$filterBtn.on("mouseover", function(e) { self._clearFilterDropDownListTimer(); });
-		$filterBtn.on("mouseleave", function(e) { self._clearFilterDropDownListTimer(); self._setFilterDropDownListTimer(e); });
+		$filterBtn.on("mouseover", function(e) {self._clearFilterDropDownListTimer();});
+		$filterBtn.on("mouseleave", function(e) {self._clearFilterDropDownListTimer(); self._setFilterDropDownListTimer(e);});
 
 		var $filterListContainer = $(".k-list-container");
-		$filterListContainer.on("mouseover", function(e) { self._clearFilterDropDownListTimer(); });
-		$filterListContainer.on("mouseleave", function(e) { self._clearFilterDropDownListTimer(); self._setFilterDropDownListTimer(e); });
+		$filterListContainer.on("mouseover", function(e) {self._clearFilterDropDownListTimer();});
+		$filterListContainer.on("mouseleave", function(e) {self._clearFilterDropDownListTimer(); self._setFilterDropDownListTimer(e);});
 	};
 
 	LightKendoGrid.prototype._findDDLInput = function(e)
@@ -1612,7 +1612,7 @@
 
 		if (kendoFilters)
 		{
-			for (var i = 0; i < kendoFilters.filters.length; i++)
+			for (var i = 0;i < kendoFilters.filters.length;i++)
 			{
 				if (kendoFilters.filters[i].field !== fieldName)
 					filters.push(kendoFilters.filters[i]);
@@ -1630,7 +1630,7 @@
 		{
 			filters.push(listFilter);
 		}
-		self.kendoGrid.dataSource.filter({ logic: 'and', filters: filters });
+		self.kendoGrid.dataSource.filter({logic: 'and', filters: filters});
 	};
 
 	LightKendoGrid.prototype.bindListFilterBtnEventByClick = function(e)
@@ -1653,7 +1653,7 @@
 	LightKendoGrid.prototype.bindListFilterBtnEventCommon = function(fieldName, $listBtn)
 	{
 		var self = this;
-		var selectedColumns = self._gridDefinition.Columns.filter(function(column) { return column.FieldName === fieldName; });
+		var selectedColumns = self._gridDefinition.Columns.filter(function(column) {return column.FieldName === fieldName;});
 		if (!selectedColumns ||
 			selectedColumns.length === 0 ||
 			!selectedColumns[0].ListFilterTemplate)
@@ -1788,7 +1788,7 @@
 		var $filterCellsAll;
 		if (wrappers)
 		{
-			var visableWrappers = wrappers.filter(function() { return $(this).css('visibility') != 'hidden' && $(this).css('display') != 'none' });
+			var visableWrappers = wrappers.filter(function() {return $(this).css('visibility') != 'hidden' && $(this).css('display') != 'none'});
 			$filterCellsAll = visableWrappers.find('.k-filtercell');
 		}
 		else
@@ -1830,7 +1830,7 @@
 		if (fieldNames.length === 0)
 			return options;
 
-		options.data.filterSet = options.data.filterSet || { FilterSets: [], LogicalOperator: "and" };
+		options.data.filterSet = options.data.filterSet || {FilterSets: [], LogicalOperator: "and"};
 		options.data.filterSet.FilterItems = options.data.filterSet.FilterItems || [];
 
 		fieldNames.map(function(fieldName)
@@ -1984,14 +1984,14 @@
 	LightKendoGrid.prototype.setEmptyCustomFilterCommon = function(fieldName)
 	{
 		var self = this;
-		var currentlyColumn = self.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === fieldName; });
+		var currentlyColumn = self.options.gridDefinition.Columns.filter(function(column) {return column.FieldName === fieldName;});
 		var columnType = currentlyColumn[0].type;
 
 		var rootFilters = self.kendoGrid.dataSource.filter();
 		var filters = [];
 		if (rootFilters)
 		{
-			for (var i = 0; i < rootFilters.filters.length; i++)
+			for (var i = 0;i < rootFilters.filters.length;i++)
 			{
 				var tmpFilter = rootFilters.filters[i];
 				if (
@@ -2022,7 +2022,7 @@
 
 		filters.push(emptyCustomFilter);
 
-		self.kendoGrid.dataSource.filter({ logic: 'and', filters: filters });
+		self.kendoGrid.dataSource.filter({logic: 'and', filters: filters});
 		self.obHeaderFilterSets.remove(function(filterSet)
 		{
 			return filterSet.FilterItems[0].FieldName === fieldName;
@@ -2206,28 +2206,28 @@
 		{
 			var cssSelectorStr = 'li:contains("' + key + '")';
 
-			$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key; })
+			$listContainer.find(cssSelectorStr).filter(function() {return $(this).text() === key;})
 				.addClass('filter').addClass(this.filterNames[key]);
 
 			switch (key)
 			{
 				case "Custom":
 					var customCssSelectorStr = cssSelectorStr + ':not(".has-custom-filter-btn-click")';
-					var $containers = $listContainer.find(customCssSelectorStr).filter(function() { return $(this).text() === key; });
+					var $containers = $listContainer.find(customCssSelectorStr).filter(function() {return $(this).text() === key;});
 
 					$containers.off(customClickAndTouchEvent).on(customClickAndTouchEvent, self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
 					break;
 				case "List":
 					var listCssSelectorStr = cssSelectorStr + ':not(".has-list-filter-btn-click")';
-					var $containers = $listContainer.find(listCssSelectorStr).filter(function() { return $(this).text() === key; });
+					var $containers = $listContainer.find(listCssSelectorStr).filter(function() {return $(this).text() === key;});
 
 					$containers.off(customClickAndTouchEvent).on(customClickAndTouchEvent, self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
 					break;
 				case "Empty":
 				case "Not Empty":
-					var $listContainers = $listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key; });
+					var $listContainers = $listContainer.find(cssSelectorStr).filter(function() {return $(this).text() === key;});
 					var $listContainersNeedBindClick = [];
-					for (var i = 0; i < $listContainers.length; i++)
+					for (var i = 0;i < $listContainers.length;i++)
 					{
 						if ($._data($listContainers[i], "events") == undefined || $._data($listContainers[i], "events").click == undefined)
 						{
@@ -2240,12 +2240,12 @@
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
 								fieldName = input.closest("[data-kendo-field]").attr("data-kendo-field"),
 								operator = $(e.currentTarget).hasClass('isempty') ? 'isempty' : 'isnotempty',
-								filter = { field: fieldName, operator: operator, value: '' },
+								filter = {field: fieldName, operator: operator, value: ''},
 								kendoFilters = self.kendoGrid.dataSource.filter(),
 								filters = [];
 							if (kendoFilters)
 							{
-								for (var i = 0; i < kendoFilters.filters.length; i++)
+								for (var i = 0;i < kendoFilters.filters.length;i++)
 								{
 									if (kendoFilters.filters[i].field !== fieldName)
 									{
@@ -2269,7 +2269,7 @@
 						});
 					break;
 				default:
-					$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key }).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
+					$listContainer.find(cssSelectorStr).filter(function() {return $(this).text() === key}).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input");
@@ -2350,11 +2350,11 @@
 			var fieldName = $item.closest('span[data-kendo-field]').attr('data-kendo-field');
 			if (filter && filter.filters)
 			{
-				for (var i = 0; i < filter.filters.length; i++)
+				for (var i = 0;i < filter.filters.length;i++)
 				{
 					if (filter.filters[i].filters && filter.filters[i].filters.length > 0)
 					{
-						for (var j = 0; j < filter.filters[i].filters.length; j++)
+						for (var j = 0;j < filter.filters[i].filters.length;j++)
 						{
 							if (filter.filters[i].filters[j].FieldName == fieldName)
 							{
@@ -2466,8 +2466,8 @@
 					var $listContainer = self.popup.element,
 						$listParent = self.popup.element.find('.k-list').parent();
 
-					$listContainer.css({ "height": "", "display": "block" });
-					$listParent.find('.k-list').parent().css({ "height": "" });
+					$listContainer.css({"height": "", "display": "block"});
+					$listParent.find('.k-list').parent().css({"height": ""});
 					$listContainer.find("div, ul, li").css("box-sizing", "content-box");
 
 					var orgHeight = $listParent[0].scrollHeight;
@@ -2652,7 +2652,7 @@
 			columns = columns.concat(this.options.expandColumns);
 		}
 
-		var supportListFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.ListFilterTemplate; });
+		var supportListFilterColumns = this._gridDefinition.Columns.filter(function(column) {return column.ListFilterTemplate;});
 		columns.map(function(column)
 		{
 			var needProcess = supportListFilterColumns.filter(function(sc)
@@ -2708,7 +2708,7 @@
 											if (Enumerable.From(bigGridTypes).Contains(this._gridType))
 											{
 												var options = this.getApiRequestOption(kendoOption);
-												options.paramData = { FieldName: column.field, AggregateOperator: 'Distinct100' };
+												options.paramData = {FieldName: column.field, AggregateOperator: 'Distinct100'};
 												options.success = function(result)
 												{
 													result.Items = LightKendoGrid.normalizeResultItem(result.Items, this._gridType, this.options);
@@ -2737,7 +2737,7 @@
 													url = this.options.setRequestURL(url);
 												}
 
-												tf.ajax["post"](pathCombine(url, "aggregate"), options, { overlay: false });
+												tf.ajax["post"](pathCombine(url, "aggregate"), options, {overlay: false});
 											}
 											else if (this._gridType === "busfinderhistorical")
 											{
@@ -2747,11 +2747,11 @@
 												var options = this.getApiRequestOption(kendoOption);
 												options.data.fields = [column.field];
 
-												tf.ajax["post"](url, options, { overlay: false });
+												tf.ajax["post"](url, options, {overlay: false});
 											}
 											else
 											{
-												tf.ajax["post"](this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption), { overlay: false });
+												tf.ajax["post"](this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption), {overlay: false});
 											}
 										}.bind(this)
 									}
@@ -2791,7 +2791,7 @@
 						operator: "eq",
 						template: function(args)
 						{
-							args.element.kendoNumericTextBox({ format: "n0" });
+							args.element.kendoNumericTextBox({format: "n0"});
 							$(args.element[0]).on("keypress", function(event, e)
 							{
 								if (event.which == 46)
@@ -2903,9 +2903,9 @@
 							args.element.kendoDropDownList({
 								dataSource: new kendo.data.DataSource({
 									data: [
-										{ someField: "", valueField: "" },
-										{ someField: "True", valueField: "true" },
-										{ someField: "False", valueField: "false" }
+										{someField: "", valueField: ""},
+										{someField: "True", valueField: "true"},
+										{someField: "False", valueField: "false"}
 									]
 								}),
 								dataTextField: "someField",
@@ -3003,34 +3003,34 @@
 		switch (fieldName)
 		{
 			case "Ampmschedule":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("14"), valueField: "14" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("15"), valueField: "15" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("16"), valueField: "16" });
+				dataSource.push({someField: "", valueField: ""});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("14"), valueField: "14"});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("15"), valueField: "15"});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmschedule("16"), valueField: "16"});
 				break;
 			case "Ampmtransportation":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("10"), valueField: "10" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("11"), valueField: "11" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("12"), valueField: "12" });
+				dataSource.push({someField: "", valueField: ""});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("10"), valueField: "10"});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("11"), valueField: "11"});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Ampmtransportation("12"), valueField: "12"});
 				break;
 			case "RidershipStatus":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("37"), valueField: "37" });
-				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("39"), valueField: "39" });
+				dataSource.push({someField: "", valueField: ""});
+				dataSource.push({someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("37"), valueField: "37"});
+				dataSource.push({someField: tf.tripGridDefinition.gridDefinition().getIconUrl_RidershipStatus("39"), valueField: "39"});
 				break;
 			case "PolicyDeviation":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_PolicyDeviation("37"), valueField: "37" });
+				dataSource.push({someField: "", valueField: ""});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_PolicyDeviation("37"), valueField: "37"});
 				break;
 			case "Notes":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Notes("5"), valueField: "5" });
+				dataSource.push({someField: "", valueField: ""});
+				dataSource.push({someField: tf.studentGridDefinition.gridDefinition().getIconUrl_Notes("5"), valueField: "5"});
 				break;
 			case "IsLocked":
-				dataSource.push({ someField: "", valueField: "" });
-				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked("6"), valueField: "6" });
-				dataSource.push({ someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked(""), valueField: "neq" });
+				dataSource.push({someField: "", valueField: ""});
+				dataSource.push({someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked("6"), valueField: "6"});
+				dataSource.push({someField: tf.tripGridDefinition.gridDefinition().getIconUrl_IsLocked(""), valueField: "neq"});
 				break;
 		}
 		return dataSource;
@@ -3165,7 +3165,13 @@
 						{
 							udfs.forEach(function(udf)
 							{
-								item[udf.FieldName] = item[udf.OriginalName];
+								if (udf.UDFType === 'phone number')
+								{
+									item[udf.FieldName] = tf.dataFormatHelper.phoneFormatter(item[udf.OriginalName]);
+								} else
+								{
+									item[udf.FieldName] = item[udf.OriginalName];
+								}
 							});
 
 							return item;
@@ -3221,7 +3227,7 @@
 			options.paramData = {};
 		}
 		self.overlay = true;
-		var fields = Enumerable.From(self._obSelectedColumns() && self._obSelectedColumns().length > 0 ? self._obSelectedColumns() : self._gridDefinition.Columns).Where(function(c) { return !c.hidden; }).Select(function(c) { return c.FieldName }).ToArray();
+		var fields = Enumerable.From(self._obSelectedColumns() && self._obSelectedColumns().length > 0 ? self._obSelectedColumns() : self._gridDefinition.Columns).Where(function(c) {return !c.hidden;}).Select(function(c) {return c.FieldName}).ToArray();
 
 		fields = (fields || []).map(function(field)
 		{
@@ -3416,7 +3422,7 @@
 					{
 						// use response.Message to distinguish deleted udf and invisible udf.
 						tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId), {
-							data: [{ "op": "replace", "path": "/IsValid", "value": false }]
+							data: [{"op": "replace", "path": "/IsValid", "value": false}]
 						}).then(function()
 						{
 							var filters = self.obGridFilterDataModels().filter(function(filter)
@@ -3524,7 +3530,7 @@
 				}
 			});
 
-			var menuFilters = kendofilterFilters.filter(function(kendofilterFilter) { return kendofilterFilter.isMenuFilter; });
+			var menuFilters = kendofilterFilters.filter(function(kendofilterFilter) {return kendofilterFilter.isMenuFilter;});
 			if (menuFilters.length > 0)
 			{
 				menuFilters.map(function(menuFilter)
@@ -3548,7 +3554,7 @@
 				});
 			}
 
-			var itemFilters = kendofilterFilters.filter(function(kendofilterFilter) { return !kendofilterFilter.isMenuFilter; });
+			var itemFilters = kendofilterFilters.filter(function(kendofilterFilter) {return !kendofilterFilter.isMenuFilter;});
 			if (itemFilters.length)
 			{
 				itemFilters.forEach(function(itemFilter)
@@ -3930,13 +3936,13 @@
 	LightKendoGrid.prototype._resetPageInfoSelect = function()
 	{
 		var self = this, pageInfoList = [], pageInfo = "", omittedRecordsCount = 0;
-		if (!self.options.showOmittedCount && !self.options.showSelectedCount && self.options.gridTypeInPageInfo === "") { return; }
+		if (!self.options.showOmittedCount && !self.options.showSelectedCount && self.options.gridTypeInPageInfo === "") {return;}
 
 		if (self.options.showSelectedCount && self.options.selectable) 
 		{
 			if (!self.isBigGrid && this.kendoGrid && this.kendoGrid.select())
 			{
-				pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) { return $(item).closest(".k-grid-content-locked").length === 0 }).length + " selected");
+				pageInfoList.push($.grep(this.kendoGrid.select(), function(item, index) {return $(item).closest(".k-grid-content-locked").length === 0}).length + " selected");
 			}
 			if (self.isBigGrid && self.getSelectedIds().length > 0) 
 			{
@@ -4005,7 +4011,7 @@
 
 	LightKendoGrid.prototype.getGridState = function()
 	{
-		return new TF.Grid.GridState({ gridFilterId: this.obSelectedGridFilterId(), filteredIds: this._filteredIds, filteredExcludeAnyIds: this.obFilteredExcludeAnyIds() });
+		return new TF.Grid.GridState({gridFilterId: this.obSelectedGridFilterId(), filteredIds: this._filteredIds, filteredExcludeAnyIds: this.obFilteredExcludeAnyIds()});
 	};
 
 	/**
@@ -4242,13 +4248,13 @@
 	{
 		if (this.kendoGrid.options.sortable.mode != "multiple")
 		{
-			this.kendoGrid.setOptions({ sortable: { mode: "multiple" } });
+			this.kendoGrid.setOptions({sortable: {mode: "multiple"}});
 		}
 	};
 
 	LightKendoGrid.prototype.onShiftUp = function(e, keyCombination)
 	{
-		this.kendoGrid.setOptions({ sortable: { mode: "single" } });
+		this.kendoGrid.setOptions({sortable: {mode: "single"}});
 	};
 
 	LightKendoGrid.prototype.beforeSendFirstRequest = function()
@@ -4580,7 +4586,7 @@
 		{
 			if (Array.contain(self.getSelectedIds(), currentId))
 			{
-				self.getSelectedIds.remove(function(id) { return id === currentId; });
+				self.getSelectedIds.remove(function(id) {return id === currentId;});
 				return;
 			}
 
@@ -4704,11 +4710,11 @@
 
 	LightKendoGrid.prototype.extendAdditionGridDefinition = function(gridDefinition, additionGridDefinition)
 	{
-		for (var i = 0; i < gridDefinition.Columns.length; i++)
+		for (var i = 0;i < gridDefinition.Columns.length;i++)
 		{
 			var column = gridDefinition.Columns[i],
 				additionColumn = Enumerable.From(additionGridDefinition.Columns).
-					Where(function(x) { return x.FieldName === column.FieldName }).SingleOrDefault();
+					Where(function(x) {return x.FieldName === column.FieldName}).SingleOrDefault();
 			column = $.extend(column, additionColumn);
 			this.updateGridDefinitionWidth(column);
 			this._updateGridDefinitionDisplayNameFromTerm(column);
@@ -4727,7 +4733,7 @@
 
 		var temp = column.DisplayName;
 
-		for (var i = 0; i < tf.APPLICATIONTERMDEFAULTVALUES.length; i++)
+		for (var i = 0;i < tf.APPLICATIONTERMDEFAULTVALUES.length;i++)
 		{
 			var key = tf.APPLICATIONTERMDEFAULTVALUES[i];
 
@@ -4974,9 +4980,9 @@
 	LightKendoGrid.prototype.getSelectedRecordsFromServer = function()
 	{
 		var self = this, options = {
-			paramData: { getCount: false, databaseId: tf.datasourceManager.databaseId },
+			paramData: {getCount: false, databaseId: tf.datasourceManager.databaseId},
 			data: {
-				fields: self._obSelectedColumns().map(function(column) { return column.FieldName }),
+				fields: self._obSelectedColumns().map(function(column) {return column.FieldName}),
 				filterClause: "",
 				filterSet: null,
 				idFilter: {
@@ -5153,12 +5159,12 @@
 
 (function()
 {
-	FilterHelper = function() { };
+	FilterHelper = function() {};
 	createNamespace("TF").FilterHelper = FilterHelper;
 
 	FilterHelper.getSortColumns = function(columns)
 	{
-		return columns.filter(function(column) { return column.isSortItem; });
+		return columns.filter(function(column) {return column.isSortItem;});
 	}
 
 	FilterHelper.setSortItems = function(requestOptions, sortColumns)
@@ -5178,7 +5184,7 @@
 			});
 
 			if (item.length === 0)
-				sortItems.push({ Name: sortColumnName, Direction: "Ascending", isAscending: true });
+				sortItems.push({Name: sortColumnName, Direction: "Ascending", isAscending: true});
 		});
 
 		requestOptions.data.sortItems = sortItems;
@@ -5267,7 +5273,7 @@
 
 (function()
 {
-	CustomFilterHelper = function() { };
+	CustomFilterHelper = function() {};
 	createNamespace("TF").CustomFilterHelper = CustomFilterHelper;
 
 	CustomFilterHelper.removeEmptyFilterItems = function(filterItems)
@@ -5275,7 +5281,7 @@
 		if (!filterItems || !filterItems.length)
 			return filterItems;
 
-		for (var i = filterItems.length - 1; i >= 0; i--)
+		for (var i = filterItems.length - 1;i >= 0;i--)
 		{
 			var filterItem = filterItems[i];
 			if (TF.CustomFilterHelper.isEmptyFilterItemOfTimeTypeColumn(filterItem) ||
@@ -5364,7 +5370,7 @@
 
 (function()
 {
-	ListFilterHelper = function() { };
+	ListFilterHelper = function() {};
 	createNamespace("TF").ListFilterHelper = ListFilterHelper;
 
 	ListFilterHelper.initListFilters = function()
@@ -5425,8 +5431,8 @@
 		var filterField = option.filterField;
 		var selectedData = option.selectedData;
 
-		var selectedItems = selectedData.map(function(item) { return item[filterField]; });
-		var selectedIds = selectedData.map(function(item) { return item.Id; });
+		var selectedItems = selectedData.map(function(item) {return item[filterField];});
+		var selectedIds = selectedData.map(function(item) {return item.Id;});
 		return ListFilterHelper.buildDsListFilterItem(
 			fieldName,
 			selectedItems.join(','),
@@ -5447,7 +5453,7 @@
 			if (filterItem.Operator === 'In')
 			{
 				var field = filterItem.FieldName;
-				var column = columns.filter(function(column) { return column.FieldName === field; });
+				var column = columns.filter(function(column) {return column.FieldName === field;});
 				TF.ListFilterHelper.initListFilterItem(cachedListFilters, column[0].ListFilterTemplate, filterItem, field);
 			}
 		});
@@ -5482,7 +5488,7 @@
 			var requestOption = {
 				data: {
 					FilterClause: "",
-					IdFilter: { IncludeOnly: selectedIds }
+					IdFilter: {IncludeOnly: selectedIds}
 				}
 			}
 
@@ -5499,10 +5505,10 @@
 				{
 					var selectedItems = response.Items || [];
 					selectedItems = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField);
-					selectedItems.sort(function(a, b) { return a.FilterItem.localeCompare(b.FilterItem); });
+					selectedItems.sort(function(a, b) {return a.FilterItem.localeCompare(b.FilterItem);});
 					cachedListFilters[field].selectedItems = selectedItems;
 					var tmp = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField)
-					cachedListFilters[field].selectedFilterItems = tmp.map(function(item) { return item.FilterItem; });;
+					cachedListFilters[field].selectedFilterItems = tmp.map(function(item) {return item.FilterItem;});;
 				});
 		}
 		else if (listFilterTemplate.listFilterType === 'MapData' && selectedIds.length > 0)
@@ -5523,7 +5529,7 @@
 					}
 					cachedListFilters[field].selectedItems = selectedItems;
 					var tmp = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField)
-					cachedListFilters[field].selectedFilterItems = tmp.map(function(item) { return item.FilterItem; });;
+					cachedListFilters[field].selectedFilterItems = tmp.map(function(item) {return item.FilterItem;});;
 				});
 		}
 	};
@@ -5554,7 +5560,7 @@
 
 		var selectedIds = cachedListFilters[fieldName].ids || [];
 
-		var selectedFilterItems = listFilterTemplate.AllItems.filter(function(item, idx) { return selectedIds.indexOf(idx) >= 0; });
+		var selectedFilterItems = listFilterTemplate.AllItems.filter(function(item, idx) {return selectedIds.indexOf(idx) >= 0;});
 		return selectedFilterItems;
 	}
 
@@ -5573,10 +5579,10 @@
 		}
 		else if (selectedItems.length > 0)
 		{
-			selectedFilterItems = selectedItems.map(function(item) { return item.FilterItem || item; });
+			selectedFilterItems = selectedItems.map(function(item) {return item.FilterItem || item;});
 			cachedListFilters[fieldName].selectedFilterItems = selectedFilterItems;
 			cachedListFilters[fieldName].selectedItems = selectedItems;
-			cachedListFilters[fieldName].ids = selectedItems.map(function(item) { return item.Id });
+			cachedListFilters[fieldName].ids = selectedItems.map(function(item) {return item.Id});
 		}
 		else if (selectedItems.length === 0)
 		{
@@ -5623,7 +5629,7 @@
 
 (function()
 {
-	LightKendoGridHelper = function() { };
+	LightKendoGridHelper = function() {};
 	createNamespace("TF").LightKendoGridHelper = LightKendoGridHelper;
 
 	LightKendoGridHelper._cancelKendoGridSelectedArea = function(kendoGrid)

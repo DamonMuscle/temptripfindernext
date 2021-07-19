@@ -379,6 +379,7 @@
                             column.template = function (item) {
                                 let value = item[col];
                                 if (isNullObj(value)) return '';
+																value = tf.dataFormatHelper.phoneFormatter(value);
                                 return value;
                             };
                             break;
