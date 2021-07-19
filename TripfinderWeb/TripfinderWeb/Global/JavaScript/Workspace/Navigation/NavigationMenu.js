@@ -1188,13 +1188,30 @@
 		{
 			url = prod[0].Uri;
 
+			// must remove the stopfinder token when app switch, keep the routerfinder token is new
+			var prodName = prod[0] && (prod[0].Name || '').toLowerCase();
+			if (prodName.indexOf("stopfinder admin") !== -1  || prodName.indexOf("stopfinderadmin") !== -1) {
+				var sfStoreTokenKey = "sfaweb.token", sfEntTokenKey = "ent.stopfinderToken";
+				var _getDomain = function()
+				{
+					var parts = location.hostname.split('.');
+					return parts.slice(-2).join('.');
+				}
+				store.remove(sfStoreTokenKey);
+				store.remove(sfEntTokenKey);
+				sessionStorage.removeItem(sfStoreTokenKey);
+				sessionStorage.removeItem(sfEntTokenKey);
+				document.cookie = sfStoreTokenKey + "=;Expires=" + new Date() + ";path=/;domain=." + _getDomain();
+				document.cookie = sfEntTokenKey + "=;Expires=" + new Date() + ";path=/;domain=." + _getDomain();
+			}
+
 			var promise = null;
 			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
 			{
 				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
 			}
 			promise = Promise.resolve();
-
+			
 			promise.then(function()
 			{
 				var xhr = new XMLHttpRequest();
