@@ -424,9 +424,12 @@
 
 			if (validatorFields[name] && validatorFields[name].validators)
 			{
-				validatorFields[name].validators.phone = {
-					country: tfRegion.toUpperCase(),
-					message: " invalid " + type + " number"
+				validatorFields[name].validators.callback = {
+					message: " invalid " + type + " number",
+					callback: function(value)
+						{
+							return value === '' || tf.dataFormatHelper.isValidPhoneNumber(value);
+						}
 				};
 			}
 			else
@@ -434,9 +437,12 @@
 				validatorFields[name] = {
 					trigger: "blur change",
 					validators: {
-						phone: {
-							country: tfRegion.toUpperCase(),
-							message: " invalid " + type + " number"
+						callback: {
+							message: " invalid " + type + " number",
+							callback: function(value)
+								{
+									return value === '' || tf.dataFormatHelper.isValidPhoneNumber(value);
+								}
 						}
 					}
 				}

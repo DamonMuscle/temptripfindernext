@@ -1112,18 +1112,7 @@
 
 		if (format === "Phone")
 		{
-			let cleanPhone = content.replace(/\D/g, ''),
-				groups = cleanPhone.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
-			if (cleanPhone.length < 3)
-			{
-				content = cleanPhone;
-			} else if (cleanPhone.length >= 3 && cleanPhone.length <= 6)
-			{
-				content = `(${ groups[1] }) ${ groups[2] }`;
-			} else if (cleanPhone.length >= 6 && cleanPhone.length <= 10)
-			{
-				content = `(${ groups[1] }) ${ groups[2] }-${ groups[3] }`;
-			}
+			content = tf.dataFormatHelper.phoneFormatter(content);
 		}
 		return content;
 	}

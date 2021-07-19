@@ -774,7 +774,7 @@ Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 		{
 			var value = $field.val();
 
-			return value === "" ? true : !!value.match(/^\D*\d{3}\D*\d{3}\D*\d{4}$/);
+			return value === "" ? true : tf.dataFormatHelper.isValidPhoneNumber(value);
 		}
 	}
 }(window.jQuery));

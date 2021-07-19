@@ -105,7 +105,13 @@
 				let udgRecord = {};
 				this.questions.forEach(q =>
 				{
-					udgRecord[q.field.Guid] = q.value;
+					if(q.field.questionType === 'Phone')
+					{
+						udgRecord[q.field.Guid] = tf.dataFormatHelper.getPurePhoneNumber(q.value);
+					}else
+					{
+					    udgRecord[q.field.Guid] = q.value;
+					}
 				});
 				tf.loadingIndicator.showImmediately();
 				return new Promise(resolve =>

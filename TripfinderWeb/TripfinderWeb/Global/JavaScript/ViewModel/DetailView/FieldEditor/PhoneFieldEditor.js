@@ -15,7 +15,7 @@
 	PhoneFieldEditor.prototype._initElement = function()
 	{
 		var self = this,
-			$input = $("<div class='custom-field-input phone'><!-- ko customInput:{type:'Phone',value:obValue,attributes:{class:'form-control',maxlength:'14'}} --><!-- /ko --></div>");
+			$input = $("<div class='custom-field-input phone'><!-- ko customInput:{type:'Phone',value:obValue,attributes:{class:'form-control',maxlength:'18'}} --><!-- /ko --></div>");
 		ko.applyBindings(ko.observable(self), $input[0]);
 
 		self._$element = $input;

@@ -38,19 +38,8 @@
 
 	PhoneBox.prototype.formatPhone = function(phone) {
 		if (!phone) return "";
-		var output = (phone || "").replace(/\D/g, '');
-		if (output.length <= 3) return output;
-		output = output.substring(0, 10);
-    if (output.length <= 3)
-    {
-      output = output.replace(/^(\d{0,3})/, '($1)');
-    } else if (output.length <= 6)
-    {
-      output = output.replace(/^(\d{0,3})(\d{0,3})/, '($1) $2');
-    } else
-    {
-      output = output.replace(/^(\d{0,3})(\d{0,3})(.*)/, '($1) $2-$3');
-    }
+		var output = tf.dataFormatHelper.phoneFormatter(phone);
+
 		return output;
 	};
 })();
