@@ -30,7 +30,7 @@
 
 	Object.defineProperty(Form.prototype, 'element',
 		{
-			get() { return this.elem; },
+			get() {return this.elem;},
 			enumerable: false,
 			configurable: false
 		});
@@ -105,12 +105,12 @@
 				let udgRecord = {};
 				this.questions.forEach(q =>
 				{
-					if(q.field.questionType === 'Phone')
+					if (q.field.questionType === 'Phone')
 					{
-						udgRecord[q.field.Guid] = tf.dataFormatHelper.getPurePhoneNumber(q.value);
-					}else
+						udgRecord[q.field.Guid] = q.value === null ? '' : tf.dataFormatHelper.getPurePhoneNumber(q.value);
+					} else
 					{
-					    udgRecord[q.field.Guid] = q.value;
+						udgRecord[q.field.Guid] = q.value;
 					}
 				});
 				tf.loadingIndicator.showImmediately();
@@ -129,7 +129,7 @@
 								Name: _.Name,
 								MimeType: _.MimeType,
 								DocumentClassificationID: 8, //general
-								DocumentRelationships: [{ AttachedToID: this.obRecordID(), AttachedToType: tf.dataTypeHelper.getId(this.dataType), DBID: tf.datasourceManager.databaseId }]
+								DocumentRelationships: [{AttachedToID: this.obRecordID(), AttachedToType: tf.dataTypeHelper.getId(this.dataType), DBID: tf.datasourceManager.databaseId}]
 							};
 						});
 						tf.udgHelper.uploadAttachments(attachments).then(res =>
@@ -272,7 +272,7 @@
 							elem.closest(".grid-stack-container").css("min-height", bodyHeight + "px");
 						}
 					}, 600);
-			});
+				});
 		}
 
 		return elem;
@@ -315,8 +315,8 @@
 					if (udfs === undefined && udfUniqueIds.length > 0)
 					{
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
-							{ paramData: { "@Relationships": "UDFDataSources", "@fields": "DisplayName,Guid,UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
-							{ overlay: false })
+							{paramData: {"@Relationships": "UDFDataSources", "@fields": "DisplayName,Guid,UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})`}},
+							{overlay: false})
 							.then(data =>
 							{
 								if (data.FilteredRecordCount > 0)
@@ -465,7 +465,7 @@
 		{
 			this.uploadDocumentHelper = new TF.Form.UploadDocumentHelper(this);
 			this.elem.find(".attachment-container").removeClass("hide");
-			this.attachBlock = new TF.Control.Form.AttachBlock({ readonly: this.options.attachBlockReadonly }, this);
+			this.attachBlock = new TF.Control.Form.AttachBlock({readonly: this.options.attachBlockReadonly}, this);
 			this.elem.find(".attachment-container").append(this.attachBlock.$el);
 		}
 	}
@@ -500,10 +500,10 @@
 			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(requestDataType)),
 				{
 					data: {
-						"fields": targetColumns, "idFilter": { "IncludeOnly": [recordId] }
+						"fields": targetColumns, "idFilter": {"IncludeOnly": [recordId]}
 					}
 				},
-				{ overlay: false })
+				{overlay: false})
 				.then(data =>
 				{
 					if (data.FilteredRecordCount === 1)

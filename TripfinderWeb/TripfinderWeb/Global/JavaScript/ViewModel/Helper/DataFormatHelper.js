@@ -59,6 +59,11 @@
 		return longPhoneNumberMatched;
 	};
 
+	DataFormatHelper.prototype.getPurePhoneNumber = function(value)
+	{
+		return cleanPhone = value.replace(/\D/g, '');
+	}
+
 	DataFormatHelper.prototype.phoneFormatter = function(value)
 	{
 		if (isNullObj(value))
