@@ -847,7 +847,6 @@
 	{
 		var setting = {
 			TripMap: {
-				Enable: false,
 				Ids: null,
 				BaseMap: null,
 				Enable: false,
