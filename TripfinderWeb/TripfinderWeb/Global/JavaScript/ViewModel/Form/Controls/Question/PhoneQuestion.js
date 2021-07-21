@@ -38,6 +38,7 @@
 			this.value = ev.target.value.replace(/_/g, '');
 		});
 		input.val(tf.dataFormatHelper.phoneFormatter(this.field.value));
+		this.value = this.field.value;
 		return this.maskedInput.wrapper;
 	}
 
