@@ -38,14 +38,14 @@
 			this.value = ev.target.value.replace(/_/g, '');
 		});
 		input.val(tf.dataFormatHelper.phoneFormatter(this.field.value));
-		this.value = this.field.value;
+		this._value = this.field.value;
 		return this.maskedInput.wrapper;
 	}
 
 	PhoneQuestion.prototype.getValidateResult = function()
 	{
 		let result = '';
-		if (this.field.Required && !this.value)
+		if (this.field.Required && !this._value)
 		{
 			result = 'Answer is required.';
 		}
