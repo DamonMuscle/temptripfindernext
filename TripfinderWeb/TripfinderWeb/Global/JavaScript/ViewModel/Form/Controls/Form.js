@@ -107,7 +107,7 @@
 				{
 					if (q.field.questionType === 'Phone')
 					{
-						udgRecord[q.field.Guid] = !q.value ? '' : tf.dataFormatHelper.getPurePhoneNumber(q.value);
+						udgRecord[q.field.Guid] = !q.value ? '' : tf.dataFormatHelper.getStandardPhoneNumberValue(q.value);
 					} else
 					{
 						udgRecord[q.field.Guid] = q.value;
