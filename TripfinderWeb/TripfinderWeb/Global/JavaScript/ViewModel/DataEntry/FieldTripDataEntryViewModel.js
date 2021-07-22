@@ -1282,6 +1282,18 @@
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoices = this.obInvoiceGridDataSource();
 		entity.DocumentRelationships = this.obDocumentRelationshipSource();
+		if(entity.ContactPhone && tf.dataFormatHelper.isValidPhoneNumber(entity.ContactPhone))
+		{
+			entity.ContactPhone = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.ContactPhone);
+		}
+		if(entity.DestinationContactPhone && tf.dataFormatHelper.isValidPhoneNumber(entity.DestinationContactPhone))
+		{
+			entity.DestinationContactPhone = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.DestinationContactPhone);
+		}
+		if(entity.DestinationFax && tf.dataFormatHelper.isValidPhoneNumber(entity.DestinationFax))
+		{
+			entity.DestinationFax = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.DestinationFax);
+		}
 
 		if (this.obSelectedEquipment() && this.obSelectedEquipment().Id)
 		{

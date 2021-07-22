@@ -8,7 +8,8 @@
 		mode: /^\D*(?:1|01|001)?\D*(\d{3})\D*(\d{3})\D*(\d{4})\D*$/,
 		display: "001-(${groups[1]})${groups[2]}-${groups[3]}",
 		value: "001${groups[1]}${groups[2]}${groups[3]}",
-		region: "USA,Canada"}];
+		region: "USA,Canada"
+	}];
 
 	function DataFormatHelper()
 	{
@@ -37,11 +38,44 @@
 
 		// needs to keep value as text for "-" and "."
 		return +value > MAX_NUMBER ? MAX_NUMBER : value;
-		};
+	};
 
-	DataFormatHelper.prototype.isValidPhoneNumber = function (value) {
+	DataFormatHelper.prototype.getStandardPhoneNumberValue = function(value)
+	{
+		if (isNullObj(value))
+		{
+			return value;
+		}
+		let content = value.toString(),
+			cleanPhone = content.replace(/\D/g, '');
+		if(cleanPhone.length === 10)
+		{
+			return cleanPhone;
+		}
+		var phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
+		let longPhoneNumberMatched = false;
+		for (let pattern of phoneNumberWithCountryCodePatterns)
+		{
+			groups = cleanPhone.match(pattern.mode);
+			if (groups)
+			{
+				content = eval("`" + pattern.value + "`");
+				longPhoneNumberMatched = true;
+				break;
+			}
+		}
+		if (!longPhoneNumberMatched)
+		{
+			content = cleanPhone;
+		}
+
+		return content;
+	}
+
+	DataFormatHelper.prototype.isValidPhoneNumber = function(value)
+	{
 		var digitsValue = value.replace(/\D/g, '');
-		if(digitsValue.length < 10)
+		if (digitsValue.length < 10)
 		{
 			return false;
 		}
@@ -82,7 +116,7 @@
 		} else if (cleanPhone.length >= 6 && cleanPhone.length <= 10)
 		{
 			content = `(${groups[1]}) ${groups[2]}-${groups[3]}`;
-		}else 
+		} else 
 		{
 			var phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
 			let longPhoneNumberMatched = false;
