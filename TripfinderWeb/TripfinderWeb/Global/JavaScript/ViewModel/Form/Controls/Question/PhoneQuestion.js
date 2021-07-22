@@ -27,9 +27,13 @@
 				if (this.value.length === 10)
 				{
 					this.maskedInput.element[0].value = "(" + this.value.substr(0, 3) + ")" + this.value.substr(3, 3) + "-" + this.value.substring(6);
-				} else if (this.value.length > 10)
+				}
+				else if (this.value.length > 10)
 				{
-					this.maskedInput.element[0].value = "001-(" + this.value.substr(-10, 3) + ")" + this.value.substr(-7, 3) + "-" + this.value.substr(-4, 4);
+					if (tf.dataFormatHelper.isValidPhoneNumber(this.value))
+					{
+						this.maskedInput.element[0].value = tf.dataFormatHelper.phoneFormatter(this.value);
+					}
 				}
 			}
 		}).data('kendoMaskedTextBox');
