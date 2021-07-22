@@ -38,7 +38,7 @@
 			this.value = ev.target.value.replace(/_/g, '');
 		});
 		input.val(tf.dataFormatHelper.phoneFormatter(this.field.value));
-		this.value = this.field.value;
+		this._value = this.field.value;//this._value: different from this.value, will not trigger validation
 		return this.maskedInput.wrapper;
 	}
 
