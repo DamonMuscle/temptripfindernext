@@ -28,6 +28,21 @@
 			});
 	};
 
+	DatasourceManager.prototype.getAllAuthedDataSources = function()
+	{
+		var self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases"),{
+			paramData:{
+				authedOnly:true
+			}
+		})
+			.then(function(response)
+			{
+				self.datasources = response && Array.isArray(response.Items) ? response.Items : [];
+				return self.datasources;
+			});
+	};
+
 	DatasourceManager.prototype.validate = function()
 	{
 		var self = this;
