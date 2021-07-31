@@ -101,11 +101,11 @@
 			value = null;
 		if (data.UDFId)
 		{
-			var udf = userDefinedFields.filter(function(item) { return item.field === data.field; })[0],
+			var udf = userDefinedFields.filter(function(item) {return item.field === data.field;})[0],
 				id = udf.UDFId;
 			if (editingUserDefinedFields && editingUserDefinedFields.length > 0)
 			{
-				var edited = editingUserDefinedFields.filter(function(field) { return field.Id === id; });
+				var edited = editingUserDefinedFields.filter(function(field) {return field.Id === id;});
 				value = (edited.length === 1) ? edited[0].RecordValue : self._getUDFValue(udf);
 			}
 			else
@@ -128,7 +128,7 @@
 	 */
 	FieldEditorHelper.prototype._getUDFValue = function(field)
 	{
-		return (field.UDFType === "List") ? field.value.map(function(item) { return item.value; }) : field.value;
+		return (field.UDFType === "List") ? field.value.map(function(item) {return item.value;}) : field.value;
 	};
 
 	FieldEditorHelper.prototype._getNonUDFDefaultValue = function(data, recordEntity)
@@ -154,13 +154,13 @@
 			defaultValue = null,
 			match = !Array.isArray(editFieldList.UserDefinedFields) ? null
 				: editFieldList.UserDefinedFields
-					.filter(function(item) { return item.Name === fieldName; })[0];
+					.filter(function(item) {return item.Name === fieldName;})[0];
 
 		if (!match)
 		{
 			match = !Array.isArray(recordEntity.UserDefinedFields) ? null
 				: recordEntity.UserDefinedFields
-					.filter(function(item) { return item.DisplayName === fieldName; })[0];
+					.filter(function(item) {return item.DisplayName === fieldName;})[0];
 		}
 
 		if (match)
@@ -530,7 +530,7 @@
 		{
 			options.showWidget = true;
 
-			const { allowInput } = options;
+			const {allowInput} = options;
 
 			if (options.format === "DropDown"
 				&& ((typeof allowInput === "function" && allowInput())
@@ -541,7 +541,7 @@
 			}
 		}
 
-		$content.css({ border: 'none', outline: 'none' });
+		$content.css({border: 'none', outline: 'none'});
 
 		self._editor = self._createEditor(options.format);
 		options.editFieldList = self.editFieldList;
@@ -618,7 +618,7 @@
 
 		var udfDefinition = self._detailView.recordEntity
 			&& self._detailView.recordEntity.UserDefinedFields
-			&& self._detailView.recordEntity.UserDefinedFields.find(function(item) { return item.DisplayName === result.fieldName; });
+			&& self._detailView.recordEntity.UserDefinedFields.find(function(item) {return item.DisplayName === result.fieldName;});
 
 		if (udfDefinition)
 		{
@@ -654,7 +654,7 @@
 			obj.blockName = result.blockName;
 			obj.type = type;
 			obj.relationshipKey = result.relationshipKey;
-			if (onChange) { onChange.notify({ result: result }); }
+			if (onChange) {onChange.notify({result: result});}
 			switch (type)
 			{
 				case "ListMover":
@@ -670,7 +670,7 @@
 					}
 					else if (result.blockName === "AllStaffTypes")
 					{
-						self.editFieldList["AllStaffTypes"] = { value: result.recordValue };
+						self.editFieldList["AllStaffTypes"] = {value: result.recordValue};
 					}
 					break;
 				case "ComboBox":
@@ -943,11 +943,11 @@
 						{
 							var key = "TempFileName";
 
-							self.editFieldList[key] = { value: "" };
+							self.editFieldList[key] = {value: ""};
 
 							task = uploadHelper.upload().then(function(tempFileName)
 							{
-								self.editFieldList[key] = { value: tempFileName };
+								self.editFieldList[key] = {value: tempFileName};
 								recordEntity[key] = tempFileName;
 
 								return true;
@@ -970,7 +970,7 @@
 						}
 						else
 						{
-							var errors = prepareTaskResults.filter(function(i) { return typeof i === "string"; });
+							var errors = prepareTaskResults.filter(function(i) {return typeof i === "string";});
 							if (errors.length > 0)
 							{
 								saveResponse.success = false;
@@ -996,7 +996,7 @@
 				{
 					if (result.overrideIds)
 					{
-						data.paramData = { overrideCalendarEventIds: result.overrideIds };
+						data.paramData = {overrideCalendarEventIds: result.overrideIds};
 					}
 					else
 					{
@@ -1104,12 +1104,12 @@
 			recordEntity.UserDefinedFields = [];
 		}
 
-		changedUdfNames = recordEntity.UserDefinedFields.map(function(udf) { return udf.Name; });
+		changedUdfNames = recordEntity.UserDefinedFields.map(function(udf) {return udf.Name;});
 
 		self._detailView._userDefinedFields.forEach(function(udf)
 		{
 			if (changedUdfNames.indexOf(udf.field) >= 0) return;
-			var udfEdited = self.editFieldList.UserDefinedFields && self.editFieldList.UserDefinedFields.some(function(editUdf) { return editUdf.Id === udf.UDFId; });
+			var udfEdited = self.editFieldList.UserDefinedFields && self.editFieldList.UserDefinedFields.some(function(editUdf) {return editUdf.Id === udf.UDFId;});
 			if (udf.value == null && !udfEdited) return;
 
 			field = {
@@ -1124,8 +1124,8 @@
 			if (udf.UDFType === "List")
 			{
 				field.AlternateKey = "SelectPickListOptionIDs";
-				field.SelectPickListOptionIDs = udf.value.map(function(v) { return v.value; });
-				field.RecordValue = udf.value.map(function(v) { return v.text; }).join(", ");
+				field.SelectPickListOptionIDs = udf.value.map(function(v) {return v.value;});
+				field.RecordValue = udf.value.map(function(v) {return v.text;}).join(", ");
 			}
 
 			recordEntity.UserDefinedFields.push(field);
@@ -1208,7 +1208,7 @@
 									{
 										var fileKey = "FileName", tempFilekey = "TempFileName";
 										recordEntity[tempFilekey] = tempFileName;
-										self.editFieldList[tempFilekey] = { value: tempFileName };
+										self.editFieldList[tempFilekey] = {value: tempFileName};
 										editFieldNames.push(tempFilekey);
 										if (self.editFieldList[fileKey] && self.editFieldList[fileKey].value.length === 0)
 										{
@@ -1239,7 +1239,7 @@
 								}
 								else
 								{
-									var errors = prepareTaskResults.filter(function(i) { return typeof i === "string"; });
+									var errors = prepareTaskResults.filter(function(i) {return typeof i === "string";});
 									if (errors.length > 0)
 									{
 										saveResponse.success = false;
@@ -1284,14 +1284,14 @@
 
 				// Include UDF in relationship if needed.
 				if (recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") === -1)
-				{
-					relationships.push("UDF");
-				}
+					{
+						relationships.push("UDF");
+					}
 
 				if (gridType === "fieldtrip" && relationships.indexOf("all") === -1)
-				{
-					relationships.push("all");
-				}
+					{
+						relationships.push("all");
+					}
 
 				if (gridType === "trip" && recordEntity.Id == 0 && relationships.indexOf("TripStop") === -1)
 				{
@@ -1402,18 +1402,18 @@
 		function setParameters(student, trip)
 		{
 			var tripStop = {
-				boundary: { geometry: TF.Control.FindScheduleForStudentViewModel.prototype.getBoundaryGeometry(student.StopBoundary.Geometry.WellKnownText) },
-				geometry: tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(tf.map.ArcGIS.Point(student.StopXcoord, student.StopYcoord, tf.map.ArcGIS.SpatialReference({ "wkid": 4326 }))),
+				boundary: {geometry: TF.Control.FindScheduleForStudentViewModel.prototype.getBoundaryGeometry(student.StopBoundary.Geometry.WellKnownText)},
+				geometry: tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(tf.map.ArcGIS.Point(student.StopXcoord, student.StopYcoord, tf.map.ArcGIS.SpatialReference({"wkid": 4326}))),
 				VehicleCurbApproach: student.VehicleCurbApproach, Sequence: student.Sequence, ProhibitCrosser: student.StopProhibitCrosser
 			};
 			var sequence = student.Sequence - 2;
 			if (sequence >= 0)
 			{
-				var preTripStop = { Path: TF.Control.FindScheduleForStudentViewModel.prototype.getBoundaryGeometry(student.PrevStopPath.Geometry.WellKnownText) };
+				var preTripStop = {Path: TF.Control.FindScheduleForStudentViewModel.prototype.getBoundaryGeometry(student.PrevStopPath.Geometry.WellKnownText)};
 				trip.TripStops[sequence] = preTripStop;
 			}
-			var student = { ProhibitCross: student.ProhibitCross, geometry: tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(new tf.map.ArcGIS.Point(student.StudentXcoord, student.StudentYcoord, tf.map.ArcGIS.SpatialReference({ "wkid": 4326 }))) };
-			return { tripStop: tripStop, trip: trip, student: student };
+			var student = {ProhibitCross: student.ProhibitCross, geometry: tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(new tf.map.ArcGIS.Point(student.StudentXcoord, student.StudentYcoord, tf.map.ArcGIS.SpatialReference({"wkid": 4326})))};
+			return {tripStop: tripStop, trip: trip, student: student};
 		}
 		var self = this, promiseList = [], originalEntity;
 		if (gridType == 'altsite')
@@ -1651,7 +1651,7 @@
 		var $editorIcon = $element.find(".editor-icon"), editorClass = null;
 		if ($editorIcon.length === 0)
 		{
-			$editorIcon = $("<div />", { class: 'editor-icon' }).appendTo($element);
+			$editorIcon = $("<div />", {class: 'editor-icon'}).appendTo($element);
 			switch (format)
 			{
 				case "ListMover":
@@ -1921,10 +1921,15 @@
 	 */
 	FieldEditorHelper.prototype.getFieldRawValue = function(editField)
 	{
-		switch (editField.blockName)
+		switch (editField.type)
 		{
 			case "Phone":
 			case "Fax":
+				return editField.value ? editField.value.replace(/\D/g, '') : editField.value;
+		}
+
+		switch (editField.blockName)
+		{
 			case "Mobile":
 				return editField.value.replace(/\D/g, '');
 			default: return editField.value;
@@ -1997,23 +2002,23 @@
 				{
 					if (tf.helpers.detailViewHelper.checkFieldEditability(dataType, item.key) && self.isEntityValueEmpty(recordEntity, item.key))
 					{
-						errorMessages.push({ fieldName: item.name, message: item.title + " is required." });
+						errorMessages.push({fieldName: item.name, message: item.title + " is required."});
 					}
 				}
 				else if (item.udfId)
 				{
-					var udfField = recordEntity.UserDefinedFields.filter(function(udf) { return udf.Id === item.udfId });
+					var udfField = recordEntity.UserDefinedFields.filter(function(udf) {return udf.Id === item.udfId});
 					if ((udfField.length > 0 && (udfField[0].RecordValue == null || udfField[0].RecordValue.length === 0))
 						|| udfField.length == 0)
 					{
-						errorMessages.push({ fieldName: item.name, message: item.title + " is required." });
+						errorMessages.push({fieldName: item.name, message: item.title + " is required."});
 					}
 				}
 				else if (item.field && item.name && tf.helpers.detailViewHelper.checkFieldEditability(dataType, item.field)
 					&& (!self._detailView.allowEdit || self._detailView.allowEdit(item.field))
 					&& self.isEntityValueEmpty(recordEntity, item.field))
 				{
-					errorMessages.push({ fieldName: item.field, message: item.title + " is required." });
+					errorMessages.push({fieldName: item.field, message: item.title + " is required."});
 				}
 			});
 		}
@@ -2035,7 +2040,7 @@
 
 				if (value && obj.values.includes(value))
 				{
-					errorMessages.push({ fieldName: field, message: obj.title + " must be unique." });
+					errorMessages.push({fieldName: field, message: obj.title + " must be unique."});
 				}
 			});
 		}
@@ -2119,7 +2124,7 @@
 			blockName: field
 		};
 
-		self._updateGeneralFieldsContent(field, value, { updateAll: true });
+		self._updateGeneralFieldsContent(field, value, {updateAll: true});
 	}
 	FieldEditorHelper.prototype.isFieldValid = function(fieldName)
 	{

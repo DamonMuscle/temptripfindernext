@@ -1110,7 +1110,7 @@
 			content = content.replace('\n', '');
 		}
 
-		if (format === "Phone")
+		if (["Phone","Fax"].includes(format))
 		{
 			content = tf.dataFormatHelper.phoneFormatter(content);
 		}

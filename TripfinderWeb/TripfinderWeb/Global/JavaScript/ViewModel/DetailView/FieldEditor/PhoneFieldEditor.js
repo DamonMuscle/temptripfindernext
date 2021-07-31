@@ -52,7 +52,7 @@
 	function FaxFieldEditor()
 	{
 		var self = this;
-		TF.DetailView.FieldEditor.PhoneFieldEditor.call(self);
+		TF.DetailView.FieldEditor.PhoneFieldEditor.apply(self, arguments);
 	};
 
 	FaxFieldEditor.prototype = Object.create(TF.DetailView.FieldEditor.PhoneFieldEditor.prototype);

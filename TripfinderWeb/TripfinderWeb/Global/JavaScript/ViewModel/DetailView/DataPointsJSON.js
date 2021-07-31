@@ -1030,6 +1030,7 @@ var today = (new Date()).toDateString(),
 					"title": "Phone",
 					"type": "String",
 					"defaultValue": "(800) 373-3609",
+					"format": "Phone",
 					"editType": {
 						"format": "Phone",
 						"maxLength": 30
@@ -1319,6 +1320,7 @@ var today = (new Date()).toDateString(),
 					"title": "Destination Phone",
 					"type": "String",
 					"defaultValue": "(800) 373-3609",
+					"format": "Phone",
 					"editType": {
 						"format": "Phone",
 						"maxLength": 30,
@@ -1330,6 +1332,7 @@ var today = (new Date()).toDateString(),
 					"title": "Destination Fax",
 					"type": "String",
 					"defaultValue": "(800) 373-3609",
+					"format": "Fax",
 					"editType": {
 						"format": "Fax",
 						"maxLength": 30,
