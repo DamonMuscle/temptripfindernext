@@ -310,7 +310,8 @@
                             FieldName: col,
                             DisplayName: originFieldMapping[col],
                             width: 165,
-                            lockWidth: true
+                            lockWidth: true,
+                            originalUdfField: udgField
                         };
 
                     switch (udgField.FieldOptions.TypeName) {
