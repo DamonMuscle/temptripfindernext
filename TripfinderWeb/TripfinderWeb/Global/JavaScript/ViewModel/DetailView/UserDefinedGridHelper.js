@@ -45,8 +45,9 @@
         };
     };
 
-    UserDefinedGridHelper.handleItemForSaveAs = function (dataItem) {
+    UserDefinedGridHelper.handleItemForSaveAs = function (dataItem, columns) {
         dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem);
+        dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
         return dataItem;
     };
 
@@ -61,6 +62,21 @@
         }
         dataItem["signature"] = !!dataItem["signature"];
         return dataItem;
+    };
+
+    UserDefinedGridHelper.handleItemForPhoneType = function(dataItem, columns) {
+        if(columns && columns.length) {
+            columns.forEach(col => {
+                if(col.originalUdfField && col.originalUdfField.questionType === 'Phone') {
+                    let item = dataItem[col.FieldName];
+                    if(item) {
+                        item = tf.dataFormatHelper.phoneFormatter(item);
+                    }
+                    dataItem[col.FieldName] = item;
+                 }
+             });
+         }
+         return dataItem;
     };
 
     UserDefinedGridHelper.formatContent = function (questionContent) {

@@ -41,7 +41,8 @@
 	{
 		let operationType = "saveAs";
 		var title = this.gridBlock.options.title;
-		let items = TF.Helper.KendoGridHelper.getListOfRecords(this.getSelectedItems(operationType), this.getColumns());
+		let columns = this.getColumns();
+		let items = TF.Helper.KendoGridHelper.getListOfRecords(this.getSelectedItems(operationType, columns), columns);
 		tf.promiseBootbox.dialog(
 			{
 				closeButton: true,
@@ -134,7 +135,7 @@
 		this.gridBlock.grid.clearSelection();
 	};
 
-	UDGridRightClickMenu.prototype.getSelectedItems = function(operationType)
+	UDGridRightClickMenu.prototype.getSelectedItems = function(operationType, columns)
 	{
 		let items = [];
 		operationType = operationType || "";
@@ -143,7 +144,7 @@
 			let dataItem = JSON.parse(JSON.stringify(this.gridBlock.grid.dataItem(item)));
 			switch (operationType) {
 				case "saveAs":
-					dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForSaveAs(dataItem);
+					dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForSaveAs(dataItem, columns);
 					break;
 				case "copy":
 					dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForCopy(dataItem);
