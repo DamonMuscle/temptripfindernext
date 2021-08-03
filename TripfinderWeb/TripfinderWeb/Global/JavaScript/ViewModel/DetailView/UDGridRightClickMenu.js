@@ -30,7 +30,8 @@
 	{
 		let operationType = "copy";
 		var el = document.createElement('textarea');
-		el.value = TF.Helper.KendoGridHelper.getStringOfRecords(this.getSelectedItems(operationType), this.getColumns());
+		let columns = this.getColumns();
+		el.value = TF.Helper.KendoGridHelper.getStringOfRecords(this.getSelectedItems(operationType, columns), columns);
 		document.body.appendChild(el);
 		el.select();
 		document.execCommand('copy');
@@ -147,7 +148,7 @@
 					dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForSaveAs(dataItem, columns);
 					break;
 				case "copy":
-					dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForCopy(dataItem);
+					dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForCopy(dataItem, columns);
 					break;
 				default:
 					// Do Nothing

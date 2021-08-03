@@ -51,8 +51,9 @@
         return dataItem;
     };
 
-    UserDefinedGridHelper.handleItemForCopy = function (dataItem) {
+    UserDefinedGridHelper.handleItemForCopy = function (dataItem, columns) {
         dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem);
+        dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
         return dataItem;
     };
 

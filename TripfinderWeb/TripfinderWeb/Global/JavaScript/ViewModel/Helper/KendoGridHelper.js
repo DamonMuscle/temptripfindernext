@@ -806,6 +806,11 @@
 				}
 			}
 
+			if (column.UDFType === 'phone number' || column.FieldName.endsWith("Phone") || column.FieldName.endsWith("Fax"))
+			{
+				return tf.dataFormatHelper.phoneFormatter(value);
+			}
+
 			return value;
 		}
     };
