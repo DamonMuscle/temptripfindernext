@@ -183,7 +183,8 @@
                 DisplayName: TF.DetailView.UserDefinedGridHelper.formatContent(col.title),
                 Width: '150px',
                 Index: col.Index,
-                type: 'string'
+                type: 'string',
+                questionType: col.questionType
             };
             switch (col.type) {
                 case "Date/Time":

@@ -806,7 +806,9 @@
 				}
 			}
 
-			if (column.UDFType === 'phone number' || column.FieldName.endsWith("Phone") || column.FieldName.endsWith("Fax"))
+			if (column.questionType === 'Phone' || column.UDFType === 'phone number' 
+					|| ((!column.questionType && !column.UDFType) 
+						&& (column.FieldName.endsWith("Phone") || column.FieldName.endsWith("Fax"))))
 			{
 				return tf.dataFormatHelper.phoneFormatter(value);
 			}
