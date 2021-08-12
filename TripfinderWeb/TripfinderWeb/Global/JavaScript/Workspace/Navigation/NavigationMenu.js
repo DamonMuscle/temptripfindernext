@@ -1149,35 +1149,32 @@
 	 * @param {String} data 
 	 * @param {Event} evt 
 	 */
-	NavigationMenu.prototype.onSwitchAppClick = function(newTab, data, evt)
+	NavigationMenu.prototype.onSwitchAppClick = function(data, evt)
 	{
 		var self = this;
 		evt.stopPropagation();
 		evt.preventDefault();
 
 		var routeName = self.availableApplications[data].route,
-			routeTitle = self.availableApplications[data].title,
-			requireNewTab = (newTab || (self.isMacintosh ? evt.metaKey : evt.ctrlKey));
-		if (requireNewTab)
+			routeTitle = self.availableApplications[data].title;
+		var redirectWindow = window.open('', '_blank');
+		redirectWindow.location.href = "loading.html";
+		setTimeout(function()
 		{
-			var redirectWindow = window.open('', '_blank');
-			redirectWindow.location.href = "loading.html";
-			setTimeout(function()
+			var doc = redirectWindow.document;
+			var head = doc.head;
+			var link = doc.createElement("link");
+			link.type = "image/x-icon";
+			link.rel = "shortcut icon";
+			link.href = "Global/img/app-switcher/" + routeName + ".ico";
+			if (head)
 			{
-				var doc = redirectWindow.document;
-				var head = doc.head;
-				var link = doc.createElement("link");
-				link.type = "image/x-icon";
-				link.rel = "shortcut icon";
-				link.href = "Global/img/app-switcher/" + routeName + ".ico";
-				if (head)
-				{
-					head.appendChild(link);
-				}
-				redirectWindow.document.title = routeName;
-			});
-			redirectWindow.blur();
-		}
+				head.appendChild(link);
+			}
+			redirectWindow.document.title = routeName;
+		});
+		redirectWindow.blur();
+		
 		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)
 		{
 			return prod.Name.toLowerCase() == routeName.toLowerCase()
@@ -1220,30 +1217,26 @@
 				{
 					if (this.response.indexOf('<title>' + routeTitle + '</title>') > 0)
 					{
-						requireNewTab ? redirectWindow.location = url : window.location = url;
+						redirectWindow.location = url;
 					}
 					else
 					{
-						requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
-							window.location.href = routeName + "notexisting.html";
+						redirectWindow.location.href = routeName + "notexisting.html";
 					}
 				};
 				xhr.onerror = function(e)
 				{
-					requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
-						window.location.href = routeName + "notexisting.html";
+					redirectWindow.location.href = routeName + "notexisting.html";
 				}
 				xhr.send();
 			}).catch(function()
 			{
-				requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
-					window.location.href = routeName + "notexisting.html";
+				redirectWindow.location.href = routeName + "notexisting.html";
 			});
 		}
 		else
 		{
-			requireNewTab ? redirectWindow.location.href = routeName + "notexisting.html" :
-				window.location.href = routeName + "notexisting.html";
+			redirectWindow.location.href = routeName + "notexisting.html";
 		}
 		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
 

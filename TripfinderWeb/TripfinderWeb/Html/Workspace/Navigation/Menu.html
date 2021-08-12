@@ -7,8 +7,8 @@
       <!-- ko if: !tf.permissions.isSupport -->
       <div class="item-menu">
         <ul data-bind="foreach: {data: obSupportedApplications}">
-          <li data-bind="attr:{name:$data},click:$parent.onSwitchAppClick.bind($data, null)" style="opacity:0;">
-            <div class="item-icon small newTab" data-bind="click:$parent.onSwitchAppClick.bind($data, true)"></div>
+          <li data-bind="attr:{name:$data},click:$parent.onSwitchAppClick.bind($data)" style="opacity:0;">
+            <div class="item-icon small newTab"></div>
           </li>
         </ul>
       </div>
