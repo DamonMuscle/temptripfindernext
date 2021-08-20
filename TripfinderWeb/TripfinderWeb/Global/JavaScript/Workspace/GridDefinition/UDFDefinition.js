@@ -62,7 +62,7 @@
 	UDFDefinition.prototype._fetchAll = function()
 	{
 		var self = this,
-			tasks = tf.DataTypeHelper.getAvailableDataTypes().map(function(obj)
+			tasks = tf.DataTypeHelper.getAvailableDataTypes().filter(x=> x.key === "fieldtrip").map(function(obj)
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"), {
 					paramData: {
