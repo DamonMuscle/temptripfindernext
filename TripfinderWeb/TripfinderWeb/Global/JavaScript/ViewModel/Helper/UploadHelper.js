@@ -29,7 +29,7 @@
 		self.uploader = $input.kendoUpload({
 			multiple: false,
 			async: {
-				saveUrl: pathCombine(tf.api.server(), "actions", "files", "upload", "document"),
+				saveUrl: pathCombine(tf.api.server(), "actions", "files", "upload", "document?clientKey=" + tf.authManager.clientKey),
 				withCredentials: false,
 				autoUpload: false
 			},
