@@ -178,7 +178,7 @@
 			this.fetchMatchedAccounts()[0];
 			return fetchAccount && (invoices || []).every(function(item)
 			{
-				return item.FieldTripAccountId === acc.Id;
+				return item.FieldTripAccountId === fetchAccount.Id;
 			});
 	};
 })();
