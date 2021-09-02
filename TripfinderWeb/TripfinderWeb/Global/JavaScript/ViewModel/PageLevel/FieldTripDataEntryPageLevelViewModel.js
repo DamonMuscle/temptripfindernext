@@ -127,7 +127,7 @@
 		}
 		else 
 		{
-			var isValid  = self.checkFieldTripInvoices(account, entity.fieldTripInvoices());
+			var isValid  = self.checkFieldTripInvoices(account, self.fieldTripDE.obInvoiceGridDataSource());
 			if (!isValid)
 			{
 				var errorMsg = `Strict account code is on, please remove any existing invoice that is not using account ${account.Code}.`;
