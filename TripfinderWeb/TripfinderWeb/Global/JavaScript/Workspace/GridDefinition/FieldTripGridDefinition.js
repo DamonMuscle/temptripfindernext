@@ -483,11 +483,13 @@
 				},
 				{
 					FieldName: "LastUpdated",
-					DisplayName: "Last Updated Date",
+					DisplayName: "Last Updated On",
 					Width: '150px',
-					type: "date",
-					hidden: true,
-					onlyForFilter: true
+					type: "datetime",
+					template: function(dataItem)
+					{
+						return moment(dataItem["LastUpdated"].toString("YYYY-MM-DD HH:mm:ss") + "Z").currentTimeZoneTimeFormat("MM/DD/YYYY hh:mm A");
+					}
 				},
 				{
 					FieldName: "LastUpdatedId",
@@ -501,9 +503,7 @@
 					FieldName: "LastUpdatedName",
 					DisplayName: "Last Updated By",
 					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForFilter: true
+					type: "string"
 				},
 				{
 					FieldName: "LastUpdatedType",
