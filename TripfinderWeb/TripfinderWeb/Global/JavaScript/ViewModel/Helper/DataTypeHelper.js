@@ -1,5 +1,4 @@
-(function()
-{
+(function () {
 	createNamespace("TF.Helper").DataTypeHelper = DataTypeHelper;
 
 	var _DATA_TYPE_ATTRIBUTES = {
@@ -109,11 +108,6 @@
 			hasDBID: true,
 			enableDetailView: true
 		},
-		fieldtriptemplate: {
-			endpoint: "fieldtriptemplates",
-			isMajorType: false,
-			hasDBID: true
-		},
 		school: {
 			endpoint: "schools",
 			name: "School",
@@ -164,20 +158,22 @@
 			hasDBID: true,
 			enableDetailView: true
 		},
-		// gpsevent: {
-		// 	endpoint: "vehicleevents",
-		// 	idParamName: 'Id',
-		// 	name: "GPS Event",
-		// 	gridDefinition: "gpsEventGridDefinition",//"GPSEventsGridDefinition",
-		// 	isMajorType: true,
-		// 	hasDBID: false
-		// },
+		gpsevent: {
+			endpoint: "vehicleevents",
+			idParamName: 'Id',
+			name: "GPS Event",
+			gridDefinition: "gpsEventGridDefinition",//"GPSEventsGridDefinition",
+			isMajorType: true,
+			hasDBID: false,
+			enableUDF: false
+		},
 		contact: {
 			endpoint: "contacts",
 			name: "Contact",
 			idParamName: "contactID",
 			gridDefinition: "contactGridDefinition",
 			isMajorType: true,
+			entityUpdateConfirmBlackList: ["RecordPicture"],
 			hasDBID: false,
 			enableDetailView: true
 		},
@@ -322,14 +318,36 @@
 			endpoint: "mailingstates",
 			name: "Mailing State",
 			hasDBID: true,
+		},
+		form: {
+			endpoint: "formResults",
+			idParamName: 'ID',
+			name: "Forms",
+			gridDefinition: "formGridDefinition",
+			isMajorType: true,
+			hasDBID: true,
+			enableUDF: false
+		},
+		dashboards: {
+			endpoint: "dashboards",
+			name: 'Dashboard',
+			idParamName: 'ID',
+			gridDefinition: "customizedDashboardGridDefinition",
+			isMajorType: false,
+			hasDBID: false,
+			enableDetailView: false
+		},
+		other: {
+			name: "Other"
 		}
 	};
 
 	var _DATA_TYPES = [];
 	var _RPT_DATA_SCHEMAs = []; // Store ReportDataSchema list
 
-	function DataTypeHelper()
-	{
+	const _noObjectIdDataTypes = ["contact", "scheduledreport", "dashboards"];
+
+	function DataTypeHelper() {
 
 	};
 
@@ -338,37 +356,32 @@
 	 *
 	 * @returns
 	 */
-	DataTypeHelper.prototype.init = function()
-	{
+	DataTypeHelper.prototype.init = function () {
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), 'datatypes'))
-			.then(function(response)
-			{
-				if (response && Array.isArray(response.Items))
-				{
+			.then(function (response) {
+				if (response && Array.isArray(response.Items)) {
 					var nameIdTable = {};
-					response.Items.forEach(function(item)
-					{
-						if (item.Type)
-						{
-							nameIdTable[item.Type.toLowerCase()] = item.ID;
+					response.Items.forEach(function (item) {
+						if (item.Type) {
+							if (item.Type.toLowerCase() === "dashboard") {
+								nameIdTable["dashboards"] = item.ID;
+							} else {
+								nameIdTable[item.Type.toLowerCase()] = item.ID;
+							}
 						}
 					});
 
-					Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function(key)
-					{
+					Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function (key) {
 						var attr = _DATA_TYPE_ATTRIBUTES[key];
-						if (attr.name)
-						{
-							attr.id = nameIdTable[attr.name.toLowerCase()];
+						if (attr.name) {
+							attr.id = attr.name.toLowerCase() === "dashboard" ? nameIdTable["dashboards"] : nameIdTable[attr.name.toLowerCase()];
 						}
 					});
 				}
 
-				for (var key in _DATA_TYPE_ATTRIBUTES)
-				{
+				for (var key in _DATA_TYPE_ATTRIBUTES) {
 					var obj = _DATA_TYPE_ATTRIBUTES[key];
-					if (obj.name && obj.isMajorType)
-					{
+					if ((obj.name && obj.isMajorType) || obj.name === "Dashboard" || obj.name === "Other") {
 						_DATA_TYPES.push({
 							key: key,
 							name: obj.name,
@@ -380,24 +393,19 @@
 				_DATA_TYPES = Array.sortBy(_DATA_TYPES, "name");
 
 			})
-			.then(function()  // Initialize ReportDataSchema list
+			.then(function ()  // Initialize ReportDataSchema list
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "ReportDataSchemas"))
-					.then(function(response)
-					{
-						if (response && response.Items && response.Items.length)
-						{
+					.then(function (response) {
+						if (response && response.Items && response.Items.length) {
 							var dataTypeIdMap = {};
-							_DATA_TYPES.forEach(function(dataType)
-							{
+							_DATA_TYPES.forEach(function (dataType) {
 								dataTypeIdMap[dataType.id] = dataType.name;
 							});
 
-							response.Items.filter(function(dataSchema)
-							{
+							response.Items.filter(function (dataSchema) {
 								return dataSchema && dataSchema.Enabled === true;
-							}).forEach(function(dataSchema)
-							{
+							}).forEach(function (dataSchema) {
 								_RPT_DATA_SCHEMAs.push({
 									Id: dataSchema.ID,
 									Name: dataSchema.DisplayName,
@@ -408,8 +416,7 @@
 							});
 						}
 					})
-					.catch(function(err)
-					{
+					.catch(function (err) {
 						console.log("Error when initializing ReportDataSchema list.");
 						_RPT_DATA_SCHEMAs.length = 0;
 					});
@@ -424,28 +431,22 @@
 	 * @param {string} str2
 	 * @return {object}
 	 */
-	DataTypeHelper.prototype._getObjectByType = function(type)
-	{
+	DataTypeHelper.prototype._getObjectByType = function (type) {
 		var self = this, match = null, type = (type || "").toLowerCase();
-		if (_DATA_TYPE_ATTRIBUTES.hasOwnProperty(type))
-		{
+		if (_DATA_TYPE_ATTRIBUTES.hasOwnProperty(type)) {
 			match = _DATA_TYPE_ATTRIBUTES[type];
 		}
-		else
-		{
+		else {
 			var key, temp;
-			for (key in _DATA_TYPE_ATTRIBUTES)
-			{
+			for (key in _DATA_TYPE_ATTRIBUTES) {
 				temp = _DATA_TYPE_ATTRIBUTES[key];
-				if (self._fuzzyMatch(key, type))
-				{
+				if (self._fuzzyMatch(key, type)) {
 					match = temp;
 					break;
 				}
 
 				// matched in includes list has lower priority, so it would not break the loop
-				if (temp.includes && temp.includes.filter(function(value) { return self._fuzzyMatch(value, type) }).length > 0)
-				{
+				if (temp.includes && temp.includes.filter(function (value) { return self._fuzzyMatch(value, type) }).length > 0) {
 					match = temp
 				}
 			}
@@ -461,8 +462,7 @@
 	 * @param {string} str2
 	 * @returns {boolean}
 	 */
-	DataTypeHelper.prototype._fuzzyMatch = function(str1, str2)
-	{
+	DataTypeHelper.prototype._fuzzyMatch = function (str1, str2) {
 		return str1 === str2;
 		//return Math.abs(str2.length - str1.length) < 3 && (str1.indexOf(str2) > -1 || str2.indexOf(str1) > -1);
 	};
@@ -473,11 +473,9 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getEndpoint = function(type)
-	{
+	DataTypeHelper.prototype.getEndpoint = function (type) {
 		var obj = null;
-		switch (type)
-		{
+		switch (type) {
 			case "aide":
 			case "driver":
 				type = "staff";
@@ -501,8 +499,7 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getFormalDataTypeName = function(type)
-	{
+	DataTypeHelper.prototype.getFormalDataTypeName = function (type) {
 		var obj = this._getObjectByType(type);
 		return obj ? obj.name : type;
 	};
@@ -513,8 +510,7 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getIdParamName = function(type)
-	{
+	DataTypeHelper.prototype.getIdParamName = function (type) {
 		var obj = this._getObjectByType(type);
 		return obj ? obj.idParamName : type;
 	};
@@ -525,8 +521,7 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getIdsParamName = function(type)
-	{
+	DataTypeHelper.prototype.getIdsParamName = function (type) {
 		var obj = this._getObjectByType(type);
 		return (obj ? obj.idParamName : type) + "s";
 	};
@@ -537,67 +532,77 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getEntityUpdateConfirmBlackList = function(type)
-	{
+	DataTypeHelper.prototype.getEntityUpdateConfirmBlackList = function (type) {
 		var obj = this._getObjectByType(type);
 		return obj ? obj.entityUpdateConfirmBlackList : [];
 	};
 
-	/**
-	 * Get available data type objects.
-	 *
-	 * @returns
-	 */
-	DataTypeHelper.prototype.getAvailableDataTypes = function()
-	{
+	DataTypeHelper.getValidDataTypes = function (isValidDataTypeFun) {
 		var collection = [];
-		for (var key in _DATA_TYPE_ATTRIBUTES)
-		{
+		for (var key in _DATA_TYPE_ATTRIBUTES) {
 			var obj = _DATA_TYPE_ATTRIBUTES[key];
-			if (obj.name && obj.isMajorType && !obj.isTemporary)
-			{
+			if (isValidDataTypeFun(obj, key)) {
 				collection.push({
 					key: key,
 					name: obj.name,
 					label: tf.applicationTerm.getApplicationTermPluralByName(obj.name),
 					id: obj.id,
 					authorization: obj.authorization,
-					enableDetailView: obj.enableDetailView
+					enableDetailView: obj.enableDetailView,
+					enableUDF: obj.enableUDF !== false
 				});
 			}
 		}
 
 		collection = Array.sortBy(collection, "name")
 		return collection;
+	}
+
+	/**
+	 * Get available data type objects.
+	 *
+	 * @returns
+	 */
+	DataTypeHelper.prototype.getAvailableDataTypes = function () {
+		function isAvailableDataTypeFun(dataTypeAttribute) {
+			return dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary
+		}
+
+		return TF.Helper.DataTypeHelper.getValidDataTypes(isAvailableDataTypeFun);
 	};
 
-	DataTypeHelper.prototype.getAvailableDocumentAssociationGridDataTypes = function()
-	{
-		return this.getAvailableAssociationGridDataTypes(["document", "gpsevent"]);
+	/**
+	 * Get UDF available data type objects.
+	 *
+	 * @returns
+	 */
+	DataTypeHelper.prototype.getUDFAvailableDataTypes = function () {
+		function isUDFAvailableDataTypeFun(dataTypeAttribute, dataTypeKey) {
+			return (dataTypeKey === "report") ||
+				(dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary);
+		}
+
+		return TF.Helper.DataTypeHelper.getValidDataTypes(isUDFAvailableDataTypeFun);
 	};
 
-	DataTypeHelper.prototype.getAvailableContactAssociationGridDataTypes = function()
-	{
+	DataTypeHelper.prototype.getAvailableDocumentAssociationGridDataTypes = function () {
+		return this.getAvailableAssociationGridDataTypes(["document", "gpsevent", "form"]);
+	};
+
+	DataTypeHelper.prototype.getAvailableContactAssociationGridDataTypes = function () {
 		// document doesn't have contact.
-		return this.getAvailableAssociationGridDataTypes(["contact", "document", "gpsevent"]);
+		return this.getAvailableAssociationGridDataTypes(["contact", "document", "gpsevent", "form"]);
 	};
 
-	DataTypeHelper.prototype.getAvailableAssociationGridDataTypes = function(excludeDataTypes)
-	{
+	DataTypeHelper.prototype.getAvailableAssociationGridDataTypes = function (excludeDataTypes) {
 		return this.getAvailableDataTypes()
-			.filter(function(dataType)
-			{
-				return dataType.key === "fieldtrip";
-			})
-			.filter(function(dataType)
-			{
+			.filter(function (dataType) {
 				return tf.authManager.isAuthorizedForDataType(dataType.key, "read") && excludeDataTypes.indexOf(dataType.key) < 0;
 			});
 	};
 
-	DataTypeHelper.prototype.getAvailableDataTypesForUDFManagement = function()
-	{
-		var dataTypesForUDFAdmin = this.getAvailableDataTypes(),
+	DataTypeHelper.prototype.getAvailableDataTypesForUDFManagement = function () {
+		var dataTypesForUDFAdmin = this.getAvailableDataTypes().filter(x => x.enableUDF),
 			reportDataTypeKey = "report",
 			reportDataType = $.extend({}, _DATA_TYPE_ATTRIBUTES[reportDataTypeKey]);
 
@@ -613,35 +618,27 @@
 		return dataTypesForUDFAdmin;
 	};
 
-	DataTypeHelper.prototype.getKeyById = function(id)
-	{
-		var types = _DATA_TYPES.filter(function(type) { return type.id === id; });
-		if (types.length === 1)
-		{
+	DataTypeHelper.prototype.getKeyById = function (id) {
+		var types = _DATA_TYPES.filter(function (type) { return type.id === id; });
+		if (types.length === 1) {
 			return types[0].key;
 		}
 		return null;
 	};
 
-	DataTypeHelper.prototype.getNameById = function(id)
-	{
-		var types = _DATA_TYPES.filter(function(type) { return type.id === id; });
-		if (types.length === 1)
-		{
+	DataTypeHelper.prototype.getNameById = function (id) {
+		var types = _DATA_TYPES.filter(function (type) { return type.id === id; });
+		if (types.length === 1) {
 			return types[0].name;
 		}
 		return null;
 	};
 
-	DataTypeHelper.prototype.getIdByName = function(name)
-	{
-		var types = _DATA_TYPES.filter(function(type) { return type.name === name });
-		if (types.length === 1)
-		{
-			return types[0].id;
-		}
-
-		return null;
+	DataTypeHelper.prototype.getIdByName = function (name) {
+		var matched = _DATA_TYPES.find(function (type) {
+			return (type.name || "").toLowerCase() === (name || "").toLowerCase();
+		});
+		return matched && matched.id || null;
 	};
 
 	/**
@@ -650,14 +647,12 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getId = function(type)
-	{
+	DataTypeHelper.prototype.getId = function (type) {
 		var obj = this._getObjectByType(type);
-		return obj ? obj.id : 0;
+		return obj && obj.id !== undefined ? obj.id : 0;
 	};
 
-	DataTypeHelper.prototype.getNameByType = function(type)
-	{
+	DataTypeHelper.prototype.getNameByType = function (type) {
 		var obj = this._getObjectByType(type);
 		return obj ? obj.name : "";
 	};
@@ -665,23 +660,20 @@
 	/**
 	 * for new exported files due to table field changed of backend.
 	 */
-	DataTypeHelper.prototype.getNamebyLowerCaseName = function(name)
-	{
+	DataTypeHelper.prototype.getNamebyLowerCaseName = function (name) {
 		if (!name) return;
 
-		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function(item) { return (item.name || "").toLowerCase() == name.toLowerCase(); });
+		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(item => (item.name || "").toLowerCase() == name.toLowerCase());
 
 		if (matched.length != 1) return;
 
 		return matched[0].name;
 	};
 
-	DataTypeHelper.prototype.getEndpointByName = function(name)
-	{
+	DataTypeHelper.prototype.getEndpointByName = function (name) {
 		if (!name) return;
 
-		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function(item)
-		{
+		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function (item) {
 			return (item.name || "").toLowerCase() === name.toLowerCase();
 		});
 
@@ -689,11 +681,9 @@
 		return matched[0].endpoint;
 	};
 
-	DataTypeHelper.prototype.getDataModelByGridType = function(gridType)
-	{
+	DataTypeHelper.prototype.getDataModelByGridType = function (gridType) {
 		var dataModel = null;
-		switch (gridType)
-		{
+		switch (gridType) {
 			case "altsite":
 				dataModel = new TF.DataModel.AltsiteDataModel();
 				break;
@@ -737,6 +727,9 @@
 			case "report":
 				dataModel = new TF.DataModel.ReportDataModel();
 				break;
+			case "dashboard":
+				dataModel = new TF.DataModel.CustomizedDashboardDataModel();
+				break;
 		}
 
 		return dataModel;
@@ -748,12 +741,10 @@
 	 * @param {String} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getGridDefinition = function(type)
-	{
+	DataTypeHelper.prototype.getGridDefinition = function (type) {
 		var obj = this._getObjectByType(type);
 
-		if (obj && obj.gridDefinition)
-		{
+		if (obj && obj.gridDefinition) {
 			return tf[obj.gridDefinition].gridDefinition();
 		}
 
@@ -765,12 +756,10 @@
 	 *
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getAssociationTotalCount = function(type)
-	{
+	DataTypeHelper.prototype.getAssociationTotalCount = function (type) {
 		var self = this, dataTypes = [];
 
-		switch (type)
-		{
+		switch (type) {
 			case "document":
 				dataTypes = self.getAvailableDocumentAssociationGridDataTypes();
 				break;
@@ -780,16 +769,17 @@
 		}
 
 		var promises = self.getAllRequestUrls(dataTypes)
-			.map(function(url)
-			{
-				return tf.promiseAjax.get(url)
+			.map(function (url) {
+				return tf.promiseAjax.get(url).then(response => {
+					return response;
+				}, error => {
+					return { Items: [] };
+				});
 			});
 
-		return Promise.all(promises).then(function(responses)
-		{
+		return Promise.all(promises).then(function (responses) {
 			var totalCount = 0;
-			for (var i = 0, count = responses.length; i < count; i++)
-			{
+			for (var i = 0, count = responses.length; i < count; i++) {
 				var response = responses[i];
 				totalCount += response.Items.length;
 			}
@@ -798,20 +788,12 @@
 		});
 	};
 
-	DataTypeHelper.prototype.deleteRecordByIds = function(dataType, ids)
-	{
-		var obj = this._getObjectByType(dataType),
+	DataTypeHelper.prototype.deleteRecordByIds = function (dataType, ids) {
+		let obj = this._getObjectByType(dataType),
 			prefix = obj.hasDBID ? tf.api.apiPrefix() : tf.api.apiPrefixWithoutDatabase(),
-			baseUrl = pathCombine(prefix, obj.endpoint);
+			baseUrl = pathCombine(prefix, obj.endpoint),
+			primaryKeyField = _noObjectIdDataTypes.includes(dataType.toLowerCase()) ? "Id" : "ObjectId";
 
-		let primaryKeyField;
-		if (dataType == 'contact')
-		{
-			primaryKeyField = 'Id';
-		} else
-		{
-			primaryKeyField = 'ObjectId';
-		}
 		return Promise.all(
 			tf.urlHelper.chunk(ids, 500).map(idsChunk =>
 				tf.promiseAjax.get(baseUrl, {
@@ -823,7 +805,7 @@
 			))
 			.then(resArr => resArr.reduce((pre, cur) => pre.concat(cur), []))
 			.then(ids => tf.promiseAjax.delete(baseUrl, { data: ids }));
-	}
+	};
 
 	/**
 	 * Get all contact associations required in parameter.
@@ -831,14 +813,11 @@
 	 * @param {Array} dataTypes
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getAllRequestUrls = function(dataTypes)
-	{
-		return dataTypes.map(function(item)
-		{
-			var endpoint = tf.DataTypeHelper.getEndpoint(item.key);
+	DataTypeHelper.prototype.getAllRequestUrls = function (dataTypes) {
+		return dataTypes.map(function (item) {
+			var endpoint = tf.dataTypeHelper.getEndpoint(item.key);
 			var selectColumns = "?@fields=Id";
-			if (item.key === "contact" || item.key === "recordcontact")
-			{
+			if (item.key === "contact" || item.key === "recordcontact") {
 				selectColumns = "?@fields=Id&DBID=" + tf.api.datasourceManager.databaseId;
 				return pathCombine(tf.api.apiPrefixWithoutDatabase(), endpoint) + selectColumns;
 			}
@@ -846,12 +825,10 @@
 		});
 	};
 
-	DataTypeHelper.prototype.createAssociationEntity = function(recordType, recordId, associationType, associationId)
-	{
+	DataTypeHelper.prototype.createAssociationEntity = function (recordType, recordId, associationType, associationId) {
 		var databaseId = tf.datasourceManager.databaseId,
-			dataTypeId = tf.DataTypeHelper.getId(recordType);
-		switch (associationType)
-		{
+			dataTypeId = tf.dataTypeHelper.getId(recordType);
+		switch (associationType) {
 			case "document":
 				return {
 					DocumentRelationshipID: 0,
@@ -865,7 +842,6 @@
 					DataTypeID: dataTypeId,
 					DBID: databaseId,
 					ContactID: associationId,
-					ContactTypeID: 1,
 					RecordID: recordId
 				};
 			default:
@@ -873,10 +849,8 @@
 		}
 	};
 
-	DataTypeHelper.prototype.getAssociationEndpoint = function(type)
-	{
-		switch (type)
-		{
+	DataTypeHelper.prototype.getAssociationEndpoint = function (type) {
+		switch (type) {
 			case "document":
 				return "DocumentRelationships";
 			case "contact":
@@ -886,10 +860,8 @@
 		}
 	};
 
-	DataTypeHelper.prototype.getGridNameByDataType = function(type)
-	{
-		switch (type)
-		{
+	DataTypeHelper.prototype.getGridNameByDataType = function (type) {
+		switch (type) {
 			case "document":
 				return "DocumentGrid";
 			case "contact":
@@ -907,30 +879,29 @@
 		}
 	};
 
-	DataTypeHelper.prototype.getRecordByIdsAndColumns = function(dataType, ids, columns, dbid)
-	{
-		var endpoint = this.getEndpoint(dataType);
-		return tf.promiseAjax.post(pathCombine(dbid == null ? tf.api.apiPrefix() : tf.api.apiPrefixWithoutDatabase() + "/" + dbid, "search", endpoint), {
+	DataTypeHelper.prototype.getRecordByIdsAndColumns = function (dbid, dataType, ids, columns, sortFields) {
+		const generateSortItem = name => ({ Name: name, isAscending: "asc", Direction: "Ascending" });
+		const prefix = dbid == null ? tf.api.apiPrefix() : `${tf.api.apiPrefixWithoutDatabase()}/${dbid}`;
+		const endpoint = this.getEndpoint(dataType);
+
+		sortFields = (Array.isArray(sortFields) && sortFields.length > 0) ? sortFields : ["Id"];
+
+		return tf.promiseAjax.post(pathCombine(prefix, "search", endpoint), {
 			data: {
 				fields: columns,
 				filterClause: "",
 				filterSet: null,
 				idFilter: { IncludeOnly: ids, ExcludeAny: [] },
-				sortItems: [{ Name: "Id", isAscending: "asc", Direction: "Ascending" }]
+				sortItems: sortFields.map(generateSortItem)
 			}
-		}).then(function(response)
-		{
-			return response.Items;
-		});
+		}).then((response) => response.Items);
 	};
 
-	DataTypeHelper.prototype.getSingleRecordByIdAndColumns = function(dataType, id, columns)
-	{
+	DataTypeHelper.prototype.getSingleRecordByIdAndColumns = function (dataType, id, columns) {
 		var endpoint = this.getEndpoint(dataType),
 			mainUrl = tf.api.apiPrefix();
 
-		if (dataType == "contact")
-		{
+		if (dataType == "contact") {
 			mainUrl = tf.api.apiPrefixWithoutDatabase();
 		}
 		return tf.promiseAjax.get(pathCombine(mainUrl, endpoint), {
@@ -938,8 +909,7 @@
 				Id: id,
 				"@fields": columns
 			}
-		}).then(function(response)
-		{
+		}).then(function (response) {
 			return response.Items;
 		});
 	};
@@ -951,26 +921,21 @@
 	 * @param {string} dataType
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getDefaultColumnsByDataType = function(dataType)
-	{
+	DataTypeHelper.prototype.getDefaultColumnsByDataType = function (dataType) {
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefaults?gridName=" + dataType))
-			.then(function(apiResponse)
-			{
+			.then(function (apiResponse) {
 				var columns = apiResponse.Items[0].Columns.split(",");
 
-				return tf.DataTypeHelper.getGridDefinition(dataType).Columns.filter(function(defColumn)
-				{
+				return tf.dataTypeHelper.getGridDefinition(dataType).Columns.filter(function (defColumn) {
 					return columns.indexOf(defColumn.FieldName) >= 0;
 				});
-			}.bind(this)).catch(function() { });
+			}.bind(this)).catch(function () { });
 	};
 
-	DataTypeHelper.prototype.getBasicColumnsByDataType = function(gridType)
-	{
+	DataTypeHelper.prototype.getBasicColumnsByDataType = function (gridType) {
 		var columns = [];
 
-		switch (gridType)
-		{
+		switch (gridType) {
 			case "altsite":
 			case "document":
 			case "contractor":
@@ -980,78 +945,73 @@
 			case "georegion":
 			case "school":
 			case "trip":
-				columns = [
-					{
-						FieldName: "Name",
-						DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Name'),
-						Width: "150px",
-						type: "string",
-						isSortItem: true
-					}];
+				columns = [{
+					FieldName: "Name",
+					DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Name'),
+					Width: "150px",
+					type: "string",
+					isSortItem: true
+				}];
 				break;
 			case "contact":
 			case "staff":
-				columns = [
-					{
-						DBName: "first_name",
-						FieldName: "FirstName",
-						DisplayName: tf.applicationTerm.getApplicationTermSingularByName('First Name'),
-						Width: "150px",
-						type: "string",
-						isSortItem: true
-					}, {
-						DBName: "last_name",
-						FieldName: "LastName",
-						DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Last Name'),
-						Width: "150px",
-						type: "string",
-						isSortItem: true
-					}];
+				columns = [{
+					DBName: "first_name",
+					FieldName: "FirstName",
+					DisplayName: tf.applicationTerm.getApplicationTermSingularByName('First Name'),
+					Width: "150px",
+					type: "string",
+					isSortItem: true
+				}, {
+					DBName: "last_name",
+					FieldName: "LastName",
+					DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Last Name'),
+					Width: "150px",
+					type: "string",
+					isSortItem: true
+				}];
 				break;
 			case "student":
-				columns = [
-					{
-						DBName: "first_name",
-						FieldName: "FirstName",
-						DisplayName: tf.applicationTerm.getApplicationTermSingularByName('First Name'),
-						Width: "150px",
-						type: "string",
-						isSortItem: true
-					}, {
-						FieldName: "Mi",
-						DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Middle Initial'),
-						Width: "150px",
-						type: "string",
-						isSortItem: true
-					}, {
-						DBName: "last_name",
-						FieldName: "LastName",
-						DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Last Name'),
-						Width: "150px",
-						type: "string",
-						isSortItem: true
-					}];
+				columns = [{
+					DBName: "first_name",
+					FieldName: "FirstName",
+					DisplayName: tf.applicationTerm.getApplicationTermSingularByName('First Name'),
+					Width: "150px",
+					type: "string",
+					isSortItem: true
+				}, {
+					FieldName: "Mi",
+					DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Middle Initial'),
+					Width: "150px",
+					type: "string",
+					isSortItem: true
+				}, {
+					DBName: "last_name",
+					FieldName: "LastName",
+					DisplayName: tf.applicationTerm.getApplicationTermSingularByName('Last Name'),
+					Width: "150px",
+					type: "string",
+					isSortItem: true
+				}];
 				break;
 			case "tripstop":
-				columns = [
-					{
-						FieldName: "Street",
-						DisplayName: "Street",
-						Width: '330px',
-						type: "string",
-						isSortItem: true
-					}];
+				columns = [{
+					FieldName: "Street",
+					DisplayName: "Street",
+					Width: '330px',
+					type: "string",
+					isSortItem: true
+				}];
 				break;
 			case "vehicle":
-				columns = [
-					{
-						FieldName: "BusNum",
-						DisplayName: "Vehicle",
-						DBName: "Bus_Num",
-						Width: '150px',
-						type: "string",
-						isSortItem: true
-					}];
+				columns = [{
+					FieldName: "BusNum",
+					DisplayName: "Vehicle",
+					DBName: "Bus_Num",
+					Width: '150px',
+					type: "string",
+					isSortItem: true
+				}];
 				break;
 			default:
 				break;
@@ -1060,13 +1020,10 @@
 		return columns;
 	};
 
-	DataTypeHelper.prototype.getEntityName = function(dataType, entity)
-	{
+	DataTypeHelper.prototype.getEntityName = function (dataType, entity) {
 		var name = '';
-		if (entity)
-		{
-			switch (dataType)
-			{
+		if (entity) {
+			switch (dataType) {
 				case "staff":
 				case "student":
 				case "contact":
@@ -1089,43 +1046,36 @@
 		return name;
 	};
 
-	DataTypeHelper.prototype.getAllReportDataSchemas = function()
-	{
+	DataTypeHelper.prototype.getAllReportDataSchemas = function () {
 		return _RPT_DATA_SCHEMAs;
 	};
 
-	DataTypeHelper.prototype.getReportDataSchemaById = function(schemaId)
-	{
-		var schemas = _RPT_DATA_SCHEMAs.filter(function(schema) { return schema.Id === schemaId; });
-		if (schemas.length === 1)
-		{
+	DataTypeHelper.prototype.getReportDataSchemaById = function (schemaId) {
+		var schemas = _RPT_DATA_SCHEMAs.filter(function (schema) { return schema.Id === schemaId; });
+		if (schemas.length === 1) {
 			return schemas[0];
 		}
 
 		return null;
 	};
 
-	DataTypeHelper.prototype.getReportDataSchemaByName = function(dataTypeName, schemaName)
-	{
-		var schemas = _RPT_DATA_SCHEMAs.filter(function(schema) { return schema.DataTypeName === dataTypeName && schema.Name === schemaName; });
-		if (schemas.length === 1)
-		{
+	DataTypeHelper.prototype.getReportDataSchemaByName = function (dataTypeName, schemaName) {
+		var schemas = _RPT_DATA_SCHEMAs.filter(function (schema) { return schema.DataTypeName === dataTypeName && schema.Name === schemaName; });
+		if (schemas.length === 1) {
 			return schemas[0];
 		}
 
 		return null;
 	};
 
-	DataTypeHelper.prototype.getApiPrefix = function(dataType, dbid)
-	{
+	DataTypeHelper.prototype.getApiPrefix = function (dataType, dbid) {
 		var obj = this._getObjectByType(dataType),
 			prefix = obj.hasDBID ? tf.api.apiPrefix(null, dbid) : tf.api.apiPrefixWithoutDatabase();
 
 		return pathCombine(prefix, obj.endpoint);
 	};
 
-	DataTypeHelper.prototype.getSearchApiPrefix = function(dataTypeName, dbid)
-	{
+	DataTypeHelper.prototype.getSearchApiPrefix = function (dataTypeName, dbid) {
 		var dataTypeId = this.getIdByName(dataTypeName),
 			dataTypeKey = this.getKeyById(dataTypeId),
 			obj = this._getObjectByType(dataTypeKey),
@@ -1133,25 +1083,22 @@
 
 		return pathCombine(prefix, "search", obj.endpoint);
 	};
-	DataTypeHelper.prototype.getExportFileEndpoint = function(dataType)
-	{
+
+	DataTypeHelper.prototype.getExportFileEndpoint = function (dataType) {
 		if (!dataType) return "";
 		var dataType = this._getObjectByType(dataType);
 		if (!dataType || !dataType.id) return "";
 		var dataTypeKey = this.getKeyById(dataType.id);
-		if (dataTypeKey == 'altsite')
-		{
+		if (dataTypeKey == 'altsite') {
 			dataTypeKey = "alternatesite"
 		}
 
 		return pathCombine("search", dataTypeKey + 'exportfiles');
 	};
 
-	DataTypeHelper.prototype.saveTripCalendarRecords = function(trips)
-	{
+	DataTypeHelper.prototype.saveTripCalendarRecords = function (trips) {
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "TripCalendarRecords"), {
-			data: trips.map(trip =>
-			{
+			data: trips.map(trip => {
 				return {
 					DBID: tf.datasourceManager.databaseId,
 					StartDate: trip.StartDate == null ? moment().format("YYYY-MM-DDT00:00:00") : trip.StartDate,
@@ -1163,8 +1110,8 @@
 					Friday: trip.Friday,
 					Saturday: trip.Saturday,
 					Sunday: trip.Sunday,
-					StartTime: moment(new Date(trip.StartTime)).locale("en-us").format("HH:mm:ss"),
-					EndTime: moment(new Date(trip.FinishTime)).locale("en-us").format("HH:mm:ss"),
+					StartTime: convertToMoment(trip.StartTime).locale("en-us").format("HH:mm:ss"),
+					EndTime: convertToMoment(trip.FinishTime).locale("en-us").format("HH:mm:ss"),
 					DriverId: trip.DriverId,
 					VehicleId: trip.VehicleId,
 					AideId: trip.AideId,
@@ -1172,5 +1119,37 @@
 				};
 			})
 		});
+	};
+
+	DataTypeHelper.prototype.getFormDataType = function (dataType) {
+		switch ((dataType || '').toLowerCase()) {
+			case 'altsite':
+			case 'alternatesite':
+				return "Alternate Site";
+			case 'contact':
+				return "Contact";
+			case 'contractor':
+				return "Contractor";
+			case 'district':
+				return "District";
+			case 'fieldtrip':
+				return "Field Trip";
+			case 'vehicle':
+				return "Vehicle";
+			case 'school':
+				return "School";
+			case 'trip':
+				return "Trip";
+			case 'georegion':
+				return "Geo Region";
+			case 'student':
+				return "Student";
+			case 'staff':
+				return "Staff";
+			case 'tripstop':
+				return "Trip Stop";
+		}
+
+		return '';
 	};
 })();
