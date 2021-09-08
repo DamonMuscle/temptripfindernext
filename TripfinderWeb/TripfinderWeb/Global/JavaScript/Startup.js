@@ -294,7 +294,7 @@
 			//tf.dataTypeHelper = new TF..DataTypeHelper();
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
-
+			TF.getLocation(); //request permission
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
