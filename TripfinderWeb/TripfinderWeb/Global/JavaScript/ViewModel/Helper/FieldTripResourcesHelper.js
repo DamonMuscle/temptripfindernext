@@ -18,52 +18,33 @@
 		return currency.toFixed(2);
 	}
 
-	FieldTripResourcesHelper.prototype.checkPicture = function(imageType, obj, element)
+	FieldTripResourcesHelper.prototype.checkPicture = function(typeName, obj, element)
 	{
-		var imageId = 0;
-		var placeholderImage = "person";
-		if (obj)
-		{
-			if (imageType == "vehicle")
+		var imageId = obj || 0;
+		this.getImage(typeName, imageId)
+			.then(function(result)
 			{
-				imageId = obj;
-				placeholderImage = "vehicle";
-			}
-			else
-			{
-				imageId = obj;
-			}
-		} else
-		{
-			if (imageType == "vehicle")
-			{
-				placeholderImage = "vehicle";
-			}
-		}
-		this.getImage(imageType, imageId, placeholderImage)
-			.then(function(image)
-			{
-				$(element).attr("src", 'data:image/jpeg;base64,' + image);
-
+				if (result && result.Items && result.Items[0] && result.Items[0].FileContent)
+				{
+					var src = "url(data:image/jpeg;base64," + result.Items[0].FileContent + ")";
+					$(element).attr("src", src);
+				}
 			}.bind(this));
-
 		return "";
 	}
 
-	FieldTripResourcesHelper.prototype.getImage = function(imageType, imageId, placeholderImage)
+	FieldTripResourcesHelper.prototype.getImage = function(typeName, imageId)
 	{
-		// TODO-V2, need to research
-		var path = pathCombine(tf.api.apiPrefix(), "image", imageType, imageId);
-		if (placeholderImage)
-		{
-			path += '?' + $.param({ placeholderImage: placeholderImage });
-		}
-
-		return tf.promiseAjax.get(path)
-			.then(function(response)
-			{
-				return response;
-			});
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "recordpictures"), {
+			paramData: {
+				DBID: tf.datasourceManager.databaseId,
+				DataTypeID: tf.dataTypeHelper.getIdByName(typeName),
+				RecordID: imageId,
+				"@fields": "FileContent"
+			}
+		}).then(function(response) {
+			return response;
+		});
 	}
 
 	FieldTripResourcesHelper.prototype.calculatedMileageRateComputer = function(fieldTripResourceDataEntry)
