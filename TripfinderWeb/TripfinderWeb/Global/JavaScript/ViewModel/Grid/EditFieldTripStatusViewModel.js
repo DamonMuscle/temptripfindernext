@@ -107,7 +107,8 @@
 
 	EditFieldTripStatusViewModel.prototype.getStatusId = function()
 	{
-		return this.obSelectedStatusId();
+		const CANCEL_STATUS = 100;
+		return this.isCancel ? CANCEL_STATUS : this.obSelectedStatusId();
 	};
 
 	EditFieldTripStatusViewModel.prototype.apply = function(noComments)
