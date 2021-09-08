@@ -31,7 +31,7 @@ module.exports = function(grunt)
 						'!build/Global',
 						'!build/Global/ThirdParty/**',
 						'build/Global/ThirdParty/*',
-						'!build/Global/ThirdParty/agsjso318'
+						'!build/Global/ThirdParty/4.18'
 					]
 				}]
 			}

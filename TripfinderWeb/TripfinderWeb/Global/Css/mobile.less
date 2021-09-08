@@ -1,0 +1,93 @@
+/*
+    Media Query Sizes
+    default --------------------------------------
+    (min-width: 481px)    Android phones, portrait
+    (min-width: 641px)    portrait tablets, portrait iPad, e-readers, landscape 800x480 phones
+    (min-width: 961px)    tablet, landscape iPad, lo-res laptops ands desktops
+    (min-width: 1025px)   big landscape tablets, laptops, and desktops
+    (min-width: 1281px)   hi-res laptops and desktops
+
+    iPhone ---------------------------------------
+    (min-width: 320px)    iPhone 5/SE, portrait 320 x 568
+    (min-width: 375px)    iPhone 6/7/8, portrait 375 x 667; iPhoneX, portrait 375 x 812
+    (min-width: 414px)    iPhone 6/7/8 plus, portrait 414 x 736
+    (min-width: 768px)    iPad, portrait 768 x 1024
+    (min-width: 1024px)   iPad pro, portrait 1024 x 1399
+*/
+
+@screen: "only screen";
+@landscape: ~"(orientation: landscape)";
+@portrait: ~"(orientation: portrait)";
+
+@small-phone-size:        320px;
+@small-phone-break:       321px;
+@phone-size:              480px;
+@phone-break:             481px;
+@phone-landscape-size:    812px;
+@tablet-portrait-size:    640px;
+@tablet-portrait-break:   641px;
+@tablet-landscape-size:   768px;
+@tablet-landscape-break:  769px;
+@wide-screen-size:        1199px;
+@wide-screen-break:       1200px;
+
+// Reference
+@tiny-break:              @small-phone-size;
+@small-down:              @small-phone-break;
+@small-only:              @phone-size;
+@small-break:             @phone-break;
+@medium-only:             @tablet-landscape-size;
+@medium-break:            @tablet-landscape-break;
+@large-up:                @wide-screen-size;
+@xlarge-only:             @wide-screen-break;
+
+// Only max-width < 321
+@tiny-phone-up:         ~"(max-width: @{tiny-break})";
+// Range from 320 to 480
+@smartphone-range:      ~"(min-width: @{small-down}) and (max-width: @{small-only})";
+// Only max-width: 481
+@smartphone-up:         ~"(max-width: @{small-break})";
+// Orientation as Landscape, max-width < 812
+@smartphone-landscape:  ~"@{landscape} and (max-width: @{phone-landscape-size})";
+// Range from 480 to 768
+@tablet-range:          ~"(min-width: @{small-only}) and (max-width: @{medium-only})";
+// Only max-width: 769
+@tablet-up:             ~"(max-width: @{medium-break})";
+// Only max-width < 1199
+@desktop-up:            ~"(max-width: @{large-up})";
+// Only min-width > 1200
+@wide-screen:           ~"(min-width: @{xlarge-only})";
+
+// TO-DO: Extend landscape cases
+
+/*  Example in Less and CSS
+    ****************************************
+    You can sue this media query in anywhere whenever you imported this file in source map.
+    This media query can be used under id Selector, class selector and attribute selector.
+    ****************************************
+
+    .page-container {
+      ... ...
+
+      // where we wanna to define responsive behavior for different resolutions
+      @media @small {
+        // write what you want
+      }
+    }
+
+    Convert to CSS:
+    @media only screen and (max-width: 481px) {
+      .page-container {
+        // this is what you want
+      }
+    }
+
+*/
+@tiny:                ~"@{screen} and @{tiny-phone-up}";
+@small:               ~"@{screen} and @{smartphone-up}";
+@small-landscape:     ~"@{screen} and @{smartphone-landscape}";
+@small-range:         ~"@{screen} and @{smartphone-range}";
+@medium:              ~"@{screen} and @{tablet-up}";
+@medium-range:        ~"@{screen} and @{tablet-range}";
+@large:               ~"@{screen} and @{desktop-up}";
+@wide:                ~"@{screen} and @{wide-screen}";
