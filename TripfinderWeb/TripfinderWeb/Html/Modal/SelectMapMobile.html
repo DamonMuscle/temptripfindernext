@@ -1,0 +1,16 @@
+﻿<div data-bind="uiInit:initialize">
+	<div class="view-finder mobile-modal-grid-body" style="background-color:white;">
+		<div class="mobile-modal-grid-head" data-bind="style:{background:headingBackgroundColor()}">
+			<div style=" width:100%;justify-content:space-between;display:flex;">
+				<label class="close-btn"
+					data-bind="click:$parent.negativeClick.bind($parent),style:{color:headingFontColor()}">Cancel</label>
+				<label class="text-center" style="font-size:16px;" data-bind="style:{color:headingFontColor()}">SELECT
+					MAP</label>
+				<div style="width:39px;"></div>
+			</div>
+		</div>
+		<div class="mobile-modal-content-body" id="selectMapContentBody" style="padding: 10px 5px;">
+			<div id="mobileBasemapGallery"></div>
+		</div>
+	</div>
+</div>
