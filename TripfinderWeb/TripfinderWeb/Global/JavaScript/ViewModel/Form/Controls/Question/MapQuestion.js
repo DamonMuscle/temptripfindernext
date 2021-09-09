@@ -374,5 +374,7 @@
 		self.mapViewModel && self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.dispose();
 		self.mapViewModel = null;
 		window.removeEventListener("orientationchange", hideMapTool);
+		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
+		self.onBasemapToolClickToken = null;
 	}
 }()
