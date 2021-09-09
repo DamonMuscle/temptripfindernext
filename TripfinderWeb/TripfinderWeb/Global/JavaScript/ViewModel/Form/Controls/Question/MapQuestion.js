@@ -362,6 +362,7 @@
 		if (!this.field.readonly && Array.isArray(shapeData) && shapeData.length &&
 			this.mapViewModel && this.mapViewModel.RoutingMapTool && this.mapViewModel.RoutingMapTool.$mapToolContainer)
 		{
+			this.mapViewModel.RoutingMapTool.zoomToLayersExtent();
 			this.mapViewModel.RoutingMapTool.$mapToolBar.find('.trash').removeClass('disable');
 		}
 	}
