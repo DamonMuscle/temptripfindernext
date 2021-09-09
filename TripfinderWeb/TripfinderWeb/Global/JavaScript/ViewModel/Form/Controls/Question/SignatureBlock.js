@@ -147,9 +147,10 @@
 
 	SignatureBlock.prototype.enterFullPage = function () {
 		this.isFullPage = true;
+		this.elem.closest("div.form-body").css("overflow-y", "initial");
 		this.elem.addClass('full-page');
 		if (TF.isMobileDevice) {
-			this.resizeCanvas('100%', ($(window).outerHeight() - 90) + 'px');
+			this.resizeCanvas('100%', ($(window).outerHeight() - 80) + 'px');
 		}
 		else {
 			this.resizeCanvas('100%', '300px');
