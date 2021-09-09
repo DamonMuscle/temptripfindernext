@@ -611,6 +611,8 @@
 	BaseMapTool.prototype.dispose = function()
 	{
 		$(window).unbind("resize", this.onWindowResize);
+		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
+		self.onBasemapToolClickToken = null;
 	};
 
 })();
