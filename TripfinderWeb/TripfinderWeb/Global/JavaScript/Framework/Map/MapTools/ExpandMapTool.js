@@ -128,7 +128,7 @@
 
 	ExpandMapTool.moveMobileFullScreenBaseMapAhead = function($offMapTool)
 	{
-		if (TF.isMobileDevice &&
+		if (TF.isPhoneDevice &&
 			$offMapTool.closest('.map-item.map-page').zIndex() === FullScreenMapZIndex * -1)
 		{
 			$offMapTool.closest('.map-item.map-page').zIndex(FullScreenMapZIndex);
@@ -137,7 +137,7 @@
 
 	ExpandMapTool.moveMobileFullScreenBaseMapBehind = function($offMapTool)
 	{
-		if (TF.isMobileDevice &&
+		if (TF.isPhoneDevice &&
 			$offMapTool.closest('.map-item.map-page').zIndex() === FullScreenMapZIndex)
 		{
 			$offMapTool.closest('.map-item.map-page').zIndex(FullScreenMapZIndex * -1);
