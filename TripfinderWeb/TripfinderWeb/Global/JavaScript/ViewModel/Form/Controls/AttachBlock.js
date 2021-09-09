@@ -183,6 +183,9 @@
 		let self = this;
 		// filter duplicated file 
 		var filterFiles = files.filter((file) => {
+			if (TF.isMobileDevice && file.name === 'image.jpg')
+				return true;
+			else
 			return self.attachedDocumentsName.indexOf(file.name) === -1;
 		});
 
@@ -200,6 +203,11 @@
 		self.attachedDocumentsName = [];
 		self.attachedDocuments.forEach((file) => {
 			let isvalid = self.uploadDocumentHelper.validateFile(file.name, file.size);
+			let fileName = file.name;
+			if (TF.isMobileDevice && fileName === 'image.jpg') {
+				self.photoNameTimeStamp = Date.now();
+				fileName = 'image' + self.photoNameTimeStamp + '.jpg';
+			}
 			let fileElem = $(`<div class='content-wrapper' title='${file.name}'>
 										<div class='file-container'>
 											<div class='file-icon'></div>
@@ -250,6 +258,11 @@
 		let self = this, skipSize = self.formDocuments.length;
 		let translate2Base64PromiseArr = []
 		rawFiles.forEach((rawFile, i) => {
+			let fileName = rawFile.name;
+			if (TF.isMobileDevice && fileName === 'image.jpg') {
+				fileName = 'image' + Date.now().toString() + '.jpg';
+			}
+			self.attachedDocumentsName.push(fileName);
 			translate2Base64PromiseArr.push(
 				self.uploadDocumentHelper.getFileStream(rawFile)
 					.then(function (fileStream) {
