@@ -974,6 +974,7 @@
 			spatialReference: {
 				wkid: 102100
 			},
+			zoom: options.zoomLevel,
 			popup: {
 				autoOpenEnabled: false,
 				autoCloseEnabled: false,
@@ -994,9 +995,13 @@
 				minZoom: mapMinZoom
 			}
 		});
-		if (options.center)
+		if (options && options.center)
 		{
 			view.center = options.center;
+		}
+
+		if (view.zoom < 0)
+		{
 			view.scale = 5000;
 		}
 
