@@ -262,7 +262,7 @@
 	}
 
 	Form.prototype.checkModifyPermission = function (type) {
-		return tf.authManager.isAuthorizedFor(type, ["edit"]);
+		return tf.authManager.isAuthorizedForDataType(type, ["edit"]);
 	};
 
 	Form.prototype.initElement = function () {
