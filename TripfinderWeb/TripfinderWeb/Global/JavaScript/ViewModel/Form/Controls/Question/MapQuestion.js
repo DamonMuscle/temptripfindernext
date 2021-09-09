@@ -357,6 +357,11 @@
 				this.value = true; //triger value calculate
 			});
 
+			if (Array.isArray(shapeData) && shapeData.length)
+			{
+				this._mapView.scale = 5000;
+			}
+
 			// currently, we only have one graphic on mape in same time, make the graphic in center of map
 			if (this.locationMarkerLayer.graphics.length > 0 && this._mapView)
 			{
@@ -369,7 +374,6 @@
 		if (!this.field.readonly && Array.isArray(shapeData) && shapeData.length &&
 			this.mapViewModel && this.mapViewModel.RoutingMapTool && this.mapViewModel.RoutingMapTool.$mapToolContainer)
 		{
-			this.mapViewModel.RoutingMapTool.zoomToLayersExtent();
 			this.mapViewModel.RoutingMapTool.$mapToolBar.find('.trash').removeClass('disable');
 		}
 	}
