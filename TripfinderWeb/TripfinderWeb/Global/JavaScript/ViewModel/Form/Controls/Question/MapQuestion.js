@@ -312,20 +312,27 @@
 	MapQuestion.prototype.subscribeMapToolClickEvent = function()
 	{
 		var self = this;
+		if (self.removeUselessBaseMapItemTimeout)
+		{
+			clearTimeout(self.removeUselessBaseMapItemTimeout);
+		}
+
 		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
 		self.onBasemapToolClickToken = PubSub.subscribe("MapToolClicked", (_, item) => 
 		{
 			if (item.title !== "Basemap") return;
 			if (item.isActive === true || TF.isPhoneDevice)
 			{
-				// hide "My Maps (Vector Tile)", "Live Traffic Data" in basemap.
-				var $gallery = TF.isPhoneDevice ? $(".mobile-modal-content-body").find(".esri-basemap-gallery") : $(".map-page.doc.esri-view").find(".esri-basemap-gallery"),
-					liList = $gallery.find("li").toArray(),
-					hideItems = liList.filter(item => $.inArray(item.innerText.trim(), ["My Maps (Vector Tile)", "Live Traffic Data"]) >= 0);
-				hideItems.forEach(li => 
-				{
-					$(li).hide();
-				});
+				self.removeUselessBaseMapItemTimeout = setTimeout(() => {
+					// hide "My Maps (Vector Tile)", "Live Traffic Data" in basemap.
+					var $gallery = TF.isPhoneDevice ? $(".mobile-modal-content-body").find(".esri-basemap-gallery") : $(".map-page.doc.esri-view").find(".esri-basemap-gallery"),
+						liList = $gallery.find("li").toArray(),
+						hideItems = liList.filter(item => $.inArray(item.innerText.trim(), ["My Maps (Vector Tile)", "Live Traffic Data"]) >= 0);
+					hideItems.forEach(li => 
+					{
+						$(li).hide();
+					});
+				}, 50);
 			}
 		});
 	}
