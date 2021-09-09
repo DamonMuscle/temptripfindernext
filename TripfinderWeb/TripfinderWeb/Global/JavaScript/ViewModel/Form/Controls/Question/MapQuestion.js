@@ -302,9 +302,32 @@
 				}
 				callback();
 			});
+
+			self.subscribeMapToolClickEvent();
 		});
 
 		window.addEventListener("orientationchange", hideMapTool.bind(this));
+	}
+
+	MapQuestion.prototype.subscribeMapToolClickEvent = function()
+	{
+		var self = this;
+		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
+		self.onBasemapToolClickToken = PubSub.subscribe("MapToolClicked", (_, item) => 
+		{
+			if (item.title !== "Basemap") return;
+			if (item.isActive === true)
+			{
+				// hide "My Maps (Vector Tile)", "Live Traffic Data" in basemap.
+				var $gallery = $(".map-page.doc.esri-view").find(".esri-basemap-gallery"),
+					liList = $gallery.find("li").toArray(),
+					hideItems = liList.filter(item => $.inArray(item.innerText.trim(), ["My Maps (Vector Tile)", "Live Traffic Data"]) >= 0);
+				hideItems.forEach(li => 
+				{
+					$(li).hide();
+				});
+			}
+		});
 	}
 
 	function hideMapTool()

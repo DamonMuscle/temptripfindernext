@@ -337,6 +337,7 @@
 		if (item.isActive)
 		{
 			this.hideSubMenu();
+			PubSub.publish("MapToolClicked", item);
 			return;
 		}
 		if ($(e.target).text() !== '' && $(e.target).closest('div').siblings(`.${$(e.target).text().toLowerCase()}`).hasClass('disable'))
@@ -354,6 +355,7 @@
 		this.onBuildSubMenuItems(item);
 		this.BuildSubMenuItems(item);
 		this.SubMenuClick(item);
+		PubSub.publish("MapToolClicked", item);
 	};
 
 	BaseMapTool.prototype.SubMenuClick = function(item)
