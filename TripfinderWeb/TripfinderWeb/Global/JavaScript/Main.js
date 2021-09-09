@@ -192,6 +192,33 @@ function isAndroid() {
 	return /(android)/i.test(navigator.userAgent);
 }
 
+function getLocation() {
+	return new Promise(res => {
+		let pos = {
+			latitude: null,
+			longitude: null,
+			errorCode: 0
+		};
+		if (!navigator.geolocation) {
+			res(pos);
+		} else {
+			navigator.geolocation.getCurrentPosition(position => {
+				pos.latitude = position.coords.latitude;
+				pos.longitude = position.coords.longitude;
+				res(pos);
+			}, err => {
+				pos.errorCode = err.code;
+				res(pos);
+			},
+				{
+					enableHighAccuracy: true,
+					timeout: 5000,
+					maximumAge: 0
+				});
+		}
+	});
+}
+
 createNamespace("TF").getLocation = getLocation;
 createNamespace("TF").isMobileDevice = isMobileDevice();
 createNamespace("TF").isSafari = isSafari();

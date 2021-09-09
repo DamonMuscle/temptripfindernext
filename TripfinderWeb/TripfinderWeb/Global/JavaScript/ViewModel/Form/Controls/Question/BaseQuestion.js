@@ -144,4 +144,8 @@
 		return true;
 	}
 
+	BaseQuestion.prototype.dispose = function () {
+		/* it should override dispose method in specific question if needed */
+	}
+
 })();

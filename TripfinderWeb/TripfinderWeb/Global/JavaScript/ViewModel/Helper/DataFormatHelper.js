@@ -93,9 +93,12 @@
 		return longPhoneNumberMatched;
 	};
 
-	DataFormatHelper.prototype.getPurePhoneNumber = function(value)
-	{
-		return cleanPhone = value.replace(/\D/g, '');
+	DataFormatHelper.prototype.getPurePhoneNumber = function (value) {
+		if (!value) {
+			return null;
+		}
+
+		return value.replace(/\D/g, '');
 	}
 
 	DataFormatHelper.prototype.phoneFormatter = function(value)

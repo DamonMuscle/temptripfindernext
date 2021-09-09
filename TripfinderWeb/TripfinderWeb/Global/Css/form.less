@@ -515,14 +515,20 @@
 					display: -webkit-box;
 					line-clamp: 3;
 					-webkit-line-clamp: 3;
-					-moz-box-orient: vertical;
+					--moz-box-orient: vertical;
 					-webkit-box-orient: vertical;
 					transition: height 300ms display 300ms;
+
+					&.form-subtitle-mini {
+						line-clamp: 2;
+						-webkit-line-clamp: 2;
+					}
 				}
 
 				.showmore
 				{
 					position: absolute;
+					bottom: 2px;
 					font-size: 14px;
 					left: 50%;
 					transform: translateX(-50%);
@@ -596,7 +602,7 @@
 
 				.form-entity-container
 				{
-					padding: 30px;
+					padding: 30px 30px 40px 30px;
 					border-bottom: 2px solid #f2f2f2;
 
 					.form-entity-title
@@ -604,36 +610,95 @@
 						padding: 10px;
 					}
 
-					.form-entity-input {
-						border: 1px solid @editableTextBorderColor;
-						width: 190px;
-						background-color: #fff;
-						padding: 0px 5px;
+					.form-entity-input
+					{
+						border: 0;
+						width: 252px;
+						padding-right: 20px;
 						height: 28px;
-						&.k-state-focused {
+
+						&.k-state-focused
+						{
 							box-shadow: none;
+						}
+
+						.current-filter-label
+						{
+							position: absolute;
+							display: none;
+							width: 190px;
+
+							.filter-label
+							{
+								position: absolute;
+								padding-top: 10px;
+								font-family: "SourceSansPro-Regular", Arial;
+
+								.filter-type-label
+								{
+									font-family: "SourceSansPro-SemiBold";
+								}
+							}
+
+							.k-clear-value
+							{
+								right: -55px;
+								top: 10px;
+								cursor: pointer;
+								position: absolute;
+							}
+						}
+
+						&.filter-input
+						{
+							padding-right: 40px;
+								.k-clear-value:not(.k-icon) {
+									right: 20px; 
+									top: 12px;
+								}
+							.k-icon.tf-filter
+							{
+								display: inline-block;
+								background-image: url("../../Global/Img/Icons/icon-Adjust.svg");
+								background-color: transparent;
+								background-size: 16px 16px;
+								width: 16px;
+								height: 16px;
+								background-repeat: no-repeat;
+								background-position: center;
+								position: absolute;
+								cursor: pointer;
+								top: 5px;
+								right: 5px;
+
+								&.filter-applied
+								{
+									background-image: url("../../Global/Img/Icons/icon-Adjust-Selected.svg");
+								}
+							}
 						}
 					}
 
 					.form-entity-input.k-input {
-						padding-left: 20px;
+						   border: 1px solid #c5c5c5;
+							padding-left: 20px;
 					}
 
 					.k-clear-value {
-						right: -38px;
+						//right: -38px;
 						outline-color: transparent;
+						display: none;
 					}
 
 					.k-icon.k-i-search {
-						//left: 20px;
-						top: 50%;
-						margin: -8px 0 0;
-						position: absolute;
+						left: 5px;
+						 top: 50%;
+						 margin: -8px 0 0;
+						 position: absolute;
 					}
 				}
 
-				.form-question-container,
-				.e-sign-container
+				.form-question-container
 				{
 					padding: 20px 30px;
 
@@ -678,8 +743,23 @@
 						}
 					}
 
+					.form-question,
+					.e-sign-wrapper {
+						&.invalid
+						{
+							border: 1px solid red;
+
+							.invalid-message
+							{
+								color: red;
+								display: inline;
+							}
+						}
+					}
+
 					.form-question
 					{
+						position:relative;
 						padding: 5px;
 						margin: 5px;
 						padding-bottom: 10px;
@@ -690,6 +770,11 @@
 						.question-title
 						{
 							padding-bottom: 10px;
+							.title-close-warn-msg
+							{
+								color: red;
+								padding-left: 4px;
+							}
 
 							.invalid-message
 							{
@@ -710,26 +795,49 @@
 							display: none;
 						}
 
-						&.invalid
-						{
-							border: 1px solid red;
-
-							.invalid-message
-							{
-								color: red;
-								display: inline;
-							}
-						}
-
 						.question-content
 						{
+							@clearXColor: black;
 							position: relative;
+
+							.date-question {
+								background-color: white;
+								span.k-picker-wrap{
+									display: flex;
+									align-items: center;
+								}
+
+								.clear-x{
+									visibility: visible;
+									color: @clearXColor;
+									margin-left: -21px;
+									font-size: 22px;
+									font-family: 'SourceSansPro-Regular', Arial;
+									line-height: 1;
+								}
+
+								.empty.clear-x {
+									visibility: hidden;
+								}
+							}
+
+							input[time] + span.clear-x{
+								margin-left: -14px;
+								color: @clearXColor;
+								position: relative;
+								z-index: 22;
+								visibility: visible;
+								font-size: 21px;
+								font-family: 'SourceSansPro-Regular', Arial;
+
+								&.empty{
+									visibility: hidden;
+								}
+							}
+
 							.datetime-question-container {
 								display: flex;
-								.date-question {
-									padding-right:10px;
-									background-color: white;
-								}
+
 								.input-group {
 									padding-left:10px;
 								}
@@ -918,6 +1026,40 @@
 
 							}
 
+							.map-question
+							{
+								width: 100%;
+								position: relative;
+								height: 400px;
+
+								ul.esri-basemap-gallery__item-container > li
+								{
+									&:last-child,&:nth-last-child(2)
+									{
+										display: none;
+									}
+								}
+
+								div.map-question-zoom-cover
+								{ 
+									background-color: rgba(0,0,0,0.45);
+									text-align: center;
+
+									&>p.map-question-zoom-cover-tip
+									{
+										font-size: 22px;
+										color: white;
+										font-family: "SourceSansPro-SemiBold",Arial,sans-serif;
+										position: relative;
+										margin: 0;
+										top: 50%;
+										-webkit-transform: translateY(-50%);
+										-ms-transform: translateY(-50%);
+										transform: translateY(-50%);
+									}
+								}					
+							}
+
 							.slider.slider-horizontal
 							{
 								width: 100%;
@@ -1009,191 +1151,205 @@
 											}
 									}
 								}
+								
+								.clear-x
+								{
+									display: none;
+								}
 							}
 						}
 					}
 				}
 
-				.e-sign
+				.e-sign-wrapper
 				{
-					height: 100px;
-
-					.e-sign-container
+					.e-sign-element
 					{
-						padding: 10px 30px 20px;
-						.e-sign-element
+						background-color: white;
+
+						&.disabled
 						{
-							background-color: white;
-
-							&.disabled
+							.e-sign-content canvas,
+							.e-sign-cover-layer
 							{
-								.e-sign-content canvas,
-								.e-sign-cover-layer
-								{
-									cursor: default !important;
-								}
+								cursor: default !important;
 							}
+						}
 
-							.question-title
+						.question-title
+						{
+							.title
 							{
-								.title
-								{
-									display: inline;
-								}
-								.modal-title
-								{
-									display: none;
-								}
-								.e-sign-close-button
-								{
-									display: none;
-								}
+								display: inline;
 							}
-
-							.e-sign-content
+							.modal-title
 							{
-								border: 2px dashed lightgrey;
-								border-radius: 5px;
-
-								canvas
-								{
-									cursor: pointer;
-								}
-
-								.e-sign-cover-layer
-								{
-									position: absolute;
-									top: 0;
-									width: 100%;
-									height: 50px;
-									cursor: pointer;
-									background-color: transparent;
-									
-									.place-holder
-									{
-										margin-top: 12px;
-									}
-								}
+								display: none;
 							}
-
-							.e-sign-action-bar
+							.e-sign-close-button
 							{
 								display: none;
 							}
 						}
 
-						&.full-page
+						.e-sign-content
 						{
-							position: fixed;
-							left: 0;
-							right: 0;
-							top: 0;
-							bottom: 0;
-							z-index: 99;
-							background-color: rgba(0,0,0,0.5);
-							padding: 0;
+							border: 2px dashed lightgrey;
+							border-radius: 5px;
 
-							.e-sign-element
+							canvas
 							{
-								margin: 0;
-								padding: 0;
+								cursor: pointer;
+							}
+
+							.e-sign-cover-layer
+							{
 								position: absolute;
-								left: calc(~"50% - 340px");
-								right: calc(~"50% - 400px");
-								top: 50%;
-								margin-top: -190px;
-								height: 380px;
-
-								.question-title
+								top: 0;
+								width: 100%;
+								height: 50px;
+								cursor: pointer;
+								background-color: transparent;
+								
+								.place-holder
 								{
-									padding: 5px 0 5px 10px; 
-									background-color: #333;
-									color: white;
-									height: 35px;
-									line-height: 25px;
-
-									.title
-									{
-										display: none;
-									}
-									.modal-title
-									{
-										display: inline;
-										padding: 0;
-									}
-
-									.e-sign-close-button
-									{
-										display: block;
-										position: absolute;
-										border: 0;
-										width: 16px;
-										height: 16px;
-										top: 7px;
-										right: 7px;
-										background-image:url("../../global/img/detail-screen/Close-White.svg");
-										background-color: transparent;
-										background-size: 16px 16px;
-										background-repeat: no-repeat;
-										background-position: center;
-									}
+									margin-top: 12px;
 								}
+							}
+						}
 
-								.e-sign-content
-								{
-									border: 0;
-									margin: 1px;
+						.e-sign-action-bar
+						{
+							display: none;
+						}
+					}
 
-									canvas
-									{
-										border: 0;
-									}
+					&.full-page.invalid {
+						border: none;
+					}
 
-									.e-sign-cover-layer
-									{
-										display: none;
-									}
-								}
+					&.full-page
+					{
+						position: fixed;
+						height: initial;
+						left: 0;
+						right: 0;
+						top: 0;
+						bottom: 0;
+						z-index: 12040;
+						background-color: rgba(0,0,0,0.5);
+						padding: 0;
 
-								.e-sign-action-bar
-								{
-									display: block;
-									padding: 5px 0;
-									background-color: #f2f2f2;
-									border-top: 1px solid #c4c4c4;
+						.e-sign-element
+						{
+							margin: 0;
+							padding: 0;
+							position: absolute;
+							left: calc(~"50% - 340px");
+							right: calc(~"50% - 400px");
+							top: 50%;
+							margin-top: -190px;
+							height: 380px;
 
-									.k-button
-									{
-										color: #fff;
-										background-color: #333;
-										border-color: #444;
-										margin-left: 10px;
-										background-image: none;
-										&:active {
-										-webkit-box-shadow: unset;
-										box-shadow: unset;
-										}
-					
-										&:focus {
-										box-shadow: unset;
-										}
-					
-										&:focus:active:not(.k-state-disabled):not([disabled]) {
-										background-color: @buttonColor;
-											border-color: @buttonColor;
-										}
-									}
-								}
+							.question-title
+							{
+								padding: 5px 0 5px 10px; 
+								background-color: #333;
+								color: white;
+								height: 35px;
+								line-height: 25px;
 
-								&.invalid
-								{
-									border: 0;
-								}
-
-								.invalid-message
+								.title
 								{
 									display: none;
 								}
+								.modal-title
+								{
+									display: inline;
+									padding: 0;
+								}
+
+								.e-sign-close-button
+								{
+									display: block;
+									position: absolute;
+									border: 0;
+									width: 16px;
+									height: 16px;
+									top: 7px;
+									right: 7px;
+									background-image:url("../../global/img/detail-screen/Close-White.svg");
+									background-color: transparent;
+									background-size: 16px 16px;
+									background-repeat: no-repeat;
+									background-position: center;
+								}
+							}
+
+							.e-sign-content
+							{
+								border: 0;
+								margin: 1px;
+
+								canvas
+								{
+									border: 0;
+								}
+
+								.e-sign-cover-layer
+								{
+									display: none;
+								}
+							}
+
+							.e-sign-action-bar
+							{
+								display: block;
+								padding: 5px 0;
+								background-color: #f2f2f2;
+								border-top: 1px solid #c4c4c4;
+
+								.k-button
+								{
+									color: #fff;
+									background-color: #333;
+									border-color: #444;
+									margin-left: 10px;
+									background-image: none;
+									&:active {
+									-webkit-box-shadow: unset;
+									box-shadow: unset;
+									}
+				
+									&:focus {
+									box-shadow: unset;
+									}
+				
+									&:focus:active:not(.k-state-disabled):not([disabled]) {
+									background-color: @buttonColor;
+										border-color: @buttonColor;
+									}
+								}
+							}
+
+							&.invalid
+							{
+								border: 0;
+							}
+
+							.invalid-message
+							{
+								display: none;
+							}
+							}
+					}
+
+					&.disabled {
+						.e-sign-element .e-sign-content .e-sign-cover-layer
+						{
+							cursor:default;
+							.place-holder {
+								display: none;
 							}
 						}
 					}
@@ -1253,135 +1409,45 @@
 		.form
 		{
 			padding: 0;
-
+	
 			.form-header
 			{
 				height: 150px;
 				padding: 5px 20px;
-
+	
 				.form-title
 				{
 					padding: 5px 0;
 					font-size: 24px;
 				}
-
+	
 				.form-subtitle
 				{
 					font-size: 14px;
-					line-clamp: 2;
-					-webkit-line-clamp: 2;
-				}
-
-				.showmore
-				{
-					bottom: 2px;
 				}
 			}
-
+	
 			.form-body
 			{
 				position: absolute;
 				top: 150px;
 				left: 0;
+				//bottom: 60px;
 				right: 0;
 				height: initial !important;
-				//height: 100% !important;
 
 				.form-entity-container
 				{
 					padding: 20px;
 				}
-
+	
 				.form-question-container
 				{
 					padding: 20px;
-
-					.question-content
-					{
+					.question-content {
 						input:not([type="checkbox"]):not([type="radio"]),
-						textarea
-						{
+						textarea {
 							-webkit-appearance: none;
-						}
-					}
-				}
-
-				.e-sign
-				{
-					.e-sign-container
-					{
-						padding: 0 20px;
-
-						.e-sign-element
-						{
-							.question-title
-							{
-								.e-sign-close-button
-								{
-								}
-							}
-
-							.e-sign-content
-							{
-								canvas
-								{
-								}
-
-								.e-sign-cover-layer
-								{
-									.place-holder
-									{
-										display: block;
-									}
-								}
-							}
-
-							.e-sign-action-bar
-							{
-							}
-						}
-
-						&.full-page
-						{
-							.e-sign-element
-							{
-								margin: 0;
-								padding: 0;
-								position: absolute;
-								left: 0;
-								right: 0;
-								top: 0;
-								bottom: 0;
-								height: 100%;
-
-								.question-title
-								{
-
-									.e-sign-close-button
-									{
-									}
-								}
-
-								.e-sign-content
-								{
-
-									canvas
-									{
-									}
-
-									.e-sign-cover-layer
-									{
-									}
-								}
-
-								.e-sign-action-bar
-								{
-
-									.k-button
-									{
-									}
-								}
-							}
 						}
 					}
 				}
@@ -1400,7 +1466,7 @@
 					.form-button
 					{
 						width: 100px;
-
+	
 						&.btn-close
 						{
 							right: 0;
@@ -1413,14 +1479,8 @@
 	}
 }
 
-.form .container-fluid.grid-stack-container
-{
-	min-height: calc(~"100vh - 56px - 28px"); // 640px - 56px -28px
-}
-
 @media (min-width:768px)
 {
-
 	.k-mobile .form-container
 	{
 		//left: 60px;
@@ -1429,12 +1489,10 @@
 			.form
 			{
 				padding: 0;
-
 				.form-header
 				{
-					height: 120px;
+					height: 100px;
 				}
-
 				.form-body
 				{
 					top: 120px;
@@ -1561,6 +1619,19 @@
 	border-color: @editableTextColor;
 }
 
+.form-record-tooltip.tf-tooltip.tooltip
+{
+	.tooltip-inner
+	{
+		max-width: 100%;
+		background-color: white;
+		color: #262626;
+		border-radius: 5px;
+		padding: 15px 10px;
+		cursor: pointer;
+	}
+}
+
 .e-sign-element.full-page
 {
 	position: absolute;
@@ -1659,3 +1730,55 @@
 
 @import "rating";
 @import "form-attach";
+
+.tfmodal.modal.is-form-on-mobile {
+	.modal-dialog {
+		.modal-content {
+			.modal-body {
+				.form-container {
+					.form-layer {
+						background-color: transparent !important;
+
+						.form {
+
+							.form-body {
+								.attach-document-block {
+									opacity: .2;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.form-record-selector-list.k-list-container
+{
+	.k-list-scroller
+	{
+		ul li
+		{
+			&.k-state-selected
+			{
+				background-color: white;
+			}
+
+			&.k-state-hover
+			{
+				background-color: #eaeaea;
+			}
+		}
+	}
+}
+
+.line-clamp-2 {
+	line-clamp: 2 !important;
+	-webkit-line-clamp: 2 !important;
+}
+
+.line-clamp-3 {
+	line-clamp: 3 !important;
+	-webkit-line-clamp: 3 !important;
+}

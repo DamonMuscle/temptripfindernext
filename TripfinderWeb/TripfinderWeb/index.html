@@ -28,6 +28,7 @@
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.common.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.default.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.fiori.min.css" />
+	<link rel="stylesheet" href="Global/ThirdParty/4.18/esri/css/main.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrapslider/css/bootstrap-slider.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/StackBlock/gridstack.css" />
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
@@ -71,6 +72,14 @@
 
 		if (broswerInfo.broswer === "IE" || (broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79)) {
 			window.location.href = 'ie.html';
+		}
+		window.dojoConfig = {
+			sync: true,
+			parseOnLoad: false,
+			baseUrl: "./Global/ThirdParty/4.18/dojo",
+			has: {
+				"esri-native-promise": true
+			}
 		}
 	</script>
 	<!--  Override above variables  in local_settings.js if you want them to be different-->
@@ -121,6 +130,7 @@
 	<script src="Global/JavaScript/Framework/DatasourceManager.js"></script>
 	<script src="Global/JavaScript/Framework/LoadingIndicator.js"></script>
 	<script src="Global/JavaScript/Framework/InitializationFrontdesk.js"></script>
+	<script src="Global/JavaScript/Framework/DocumentEvent.js"></script>
 	<script src="Global/JavaScript/Framework/ModalHelper.js"></script>
 	<script src="Global/JavaScript/Framework/ModalManager.js"></script>
 	<script src="Global/JavaScript/Framework/PromiseAjax.js"></script>
@@ -192,6 +202,36 @@
 	<script src="Global/JavaScript/Framework/Helper/DateBoxHelper.js"></script>
 	<script src="Global/JavaScript/Framework/Helper/FullScreenHelper.js"></script>
 	<script src="Global/JavaScript/Framework/Helper/KendoHackHelper.js"></script>
+
+	<!-- Esri Map-->
+	<!-- <script src="Global/JavaScript/Framework/Map/Symbolization.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/EsriMapUtility.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapLineStyle.js"></script> -->
+	<script src="Global/JavaScript/Framework/Map/BaseMap.js"></script>
+	<!-- <script src="Global/JavaScript/Framework/Map/BaseMapData.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/Search.js"></script> -->
+	<script src="Global/JavaScript/Framework/Map/Symbol.js"></script>
+	<script src="Global/JavaScript/Framework/Map/MapTools/BaseMapTool.js"></script>
+	<script src="Global/JavaScript/Framework/Map/MapTools/ManuallyPinTool.js"></script>
+	<script src="Global/JavaScript/Framework/Map/MapTools/HomeLocationPinTool.js"></script>
+	<!-- <script src="Global/JavaScript/Framework/Map/EsriMapCustomizedDrawTool.js"></script> -->
+	<script src="Global/JavaScript/ViewModel/Helper/AdjustValueSymbolHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/RoutingMap/RoutingMapPanel/EsriTool.js"></script>
+	<script src="Global/JavaScript/Framework/Helper/MapHelper.js"></script>
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/DrawGeoregionBoundaryTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/GeoFinderTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/PlaybackTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/GeoSearchTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/HomeToSchoolPathTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/MeasurementTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/RoutingMapMeasureTool.js"></script> -->
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/MapMeasureHelper.js"></script> -->
+	<script src="Global/JavaScript/Framework/Map/MapTools/ExpandMapTool.js"></script>
+	<!-- <script src="Global/JavaScript/Framework/Map/MapTools/TrafficMap.js"></script> -->
+	<script src="Global/JavaScript/Framework/Map/MapTools/FormMapTool.js"></script>
+	<script src="Global/JavaScript/Framework/Map/MapTools/RoutingMapTool.js"></script>
+	<script src='Global/JavaScript/Framework/Map/Thematic/thematicSymbols.js'></script>
+	<script src='Global/JavaScript/ViewModel/Workspace/ContextMenu.js'></script>
 
 	<script src="Global/JavaScript/Main.js"></script>
 	<script src="Global/JavaScript/Startup.js"></script>
@@ -374,8 +414,11 @@
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/TextQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/TimeQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/CurrencyQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/MapQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/SystemFieldQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/AttachBlock.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/FormRecordSelector.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/FormRecordWithFilterSelector.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Form.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Rating.js"></script>
 	<!-- TODO-V2 -->
@@ -541,6 +584,7 @@
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/SwitchGridMenuViewModel.js"></script>
 	<!-- endbuild -->
+	<script src="Global/ThirdParty/4.18/dojo/dojo.js" data-dojo-config="async: true"></script>
 </head>
 
 <body>

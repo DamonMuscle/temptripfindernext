@@ -343,7 +343,9 @@
 	{
 		var self = this;
 		$(document).off(self.eventNameSpace);
-		$(self._detailView.$element.find(".right-container")).off(self.eventNameSpace);
+		if (self._detailView) {
+			$(self._detailView.$element.find(".right-container")).off(self.eventNameSpace);
+		}		
 
 		if (self._detailView.onResizePage)
 		{

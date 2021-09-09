@@ -275,6 +275,7 @@
 			tf.loadingIndicator = self._createLoadingIndicator();
 			tf.ajax = new TF.Ajax(tf.loadingIndicator, true);
 			tf.promiseAjax = new TF.PromiseAjax(tf.ajax);
+			tf.documentEvent = new TF.DocumentEvent();
 			tf.modalManager = new TF.Modal.ModalManager();
 			tf.modalHelper = new TF.ModalHelper();
 			tf.datasourceManager = new TF.DatasourceManager();
@@ -294,7 +295,7 @@
 			//tf.dataTypeHelper = new TF..DataTypeHelper();
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
-
+			TF.getLocation(); //request permission
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
@@ -348,7 +349,16 @@
 						TF.productID = apiResponse.Items[0].ID;
 					});
 
-					return Promise.all([p1, p2, p3])
+					let array = location.pathname.split("/").filter(r => r);
+					// get extra js location
+					var extrasLocation = location.origin.concat(
+						array.length === 1 ? "/" + array[0] : "",
+						"/Global/JavaScript/Framework/Map");
+
+					window.tf.map = new TF.Map.BaseMap();
+					var p4 = window.tf.map.usingArcGIS(extrasLocation);
+
+					return Promise.all([p1, p2, p3, p4])
 						.then(function()
 						{
 							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub']);
