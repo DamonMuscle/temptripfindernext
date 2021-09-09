@@ -81,10 +81,11 @@
 			$ele.closest(".e-sign-wrapper").removeClass('invalid');
 			!this.field.readonly && this.enterFullPage();
 		});
-		this.elem.on('click', '.e-sign-close-button', e => {
+		let questionContent = this.elem.find(".form-question");
+		questionContent.on('click', '.e-sign-close-button', e => {
 			this.exitFullPage();
 		});
-		this.elem.on('click', '.k-button', e => {
+		questionContent.on('click', '.k-button', e => {
 			let $ele = $(e.target);
 			if ($ele.hasClass('e-sign-clear-button')) {
 				this.signaturePad.clear();
@@ -130,8 +131,10 @@
 		this.togglePlaceHolder();
 	}
 
-	SignatureBlock.prototype.togglePlaceHolder = function (value) {
-		let elem = this.elem.find('.e-sign-cover-layer .place-holder');
+	SignatureBlock.prototype.togglePlaceHolder = function (value)
+	{
+		let elemContainer = this.signatureQuestion ? this.signatureQuestion : this.elem;
+		let elem = elemContainer.find('.e-sign-cover-layer .place-holder');
 		if (elem.length > 0) {
 			if (this.value == null) {
 				elem.show();
@@ -147,20 +150,32 @@
 
 	SignatureBlock.prototype.enterFullPage = function () {
 		this.isFullPage = true;
-		this.elem.closest("div.form-body").css("overflow-y", "initial");
-		this.elem.addClass('full-page');
 		if (TF.isMobileDevice) {
+			this.signatureQuestion = this.elem.find(".form-question");
+			this.signatureQuestion.addClass('full-page');
+			$("body").append(this.signatureQuestion);
 			this.resizeCanvas('100%', ($(window).outerHeight() - 80) + 'px');
 		}
 		else {
+			this.elem.closest("div.form-body").css("overflow-y", "initial");
+			this.elem.addClass('full-page');
 			this.resizeCanvas('100%', '300px');
 		}
 		this.toggleSaveButton();
 	}
 
-	SignatureBlock.prototype.exitFullPage = function () {
-		this.isFullPage = false;
-		this.elem.removeClass('full-page');
+	SignatureBlock.prototype.exitFullPage = function ()
+	{
+		let self = this;
+		self.isFullPage = false;
+		if (TF.isMobileDevice) {
+			if (self.signatureQuestion) {
+				self.signatureQuestion.removeClass('full-page');
+				this.elem.append(self.signatureQuestion);
+			}
+		} else {
+			this.elem.removeClass('full-page');
+		}
 		this.resizeCanvas('200px', '50px');
 	}
 
