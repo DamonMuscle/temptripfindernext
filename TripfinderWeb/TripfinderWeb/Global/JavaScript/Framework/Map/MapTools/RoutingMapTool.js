@@ -640,6 +640,7 @@
 
 				self.$mapToolContainer.find(".tool-icon").addClass("active");
 				self.$toolkitButton.addClass("active");
+				TF.Map.ExpandMapTool.moveMobileFullScreenBaseMapBehind(self.$offMapTool);
 
 				if (_.isEmpty(self.baseMapModel)) self.baseMapModel = new TF.Modal.SelectMapModalViewModel(self);
 

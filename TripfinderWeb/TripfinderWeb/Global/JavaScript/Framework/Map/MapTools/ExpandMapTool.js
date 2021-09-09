@@ -2,6 +2,8 @@
 {
 	createNamespace("TF.Map").ExpandMapTool = ExpandMapTool;
 
+	const FullScreenMapZIndex = 23990;
+
 	var STATUS = {
 		expand: 0,
 		restore: 1
@@ -90,7 +92,7 @@
 			left: 0,
 			right: 0,
 			bottom: 0,
-			'z-index': this.containerIsBody ? 23990 : 500,
+			'z-index': this.containerIsBody ? FullScreenMapZIndex : 500,
 			'background-color': 'white'
 		});
 	};
@@ -123,4 +125,22 @@
 		this.expandContainer = null;
 		tfdispose(this);
 	};
+
+	ExpandMapTool.moveMobileFullScreenBaseMapAhead = function($offMapTool)
+	{
+		if (TF.isMobileDevice &&
+			$offMapTool.closest('.map-item.map-page').zIndex() === FullScreenMapZIndex * -1)
+		{
+			$offMapTool.closest('.map-item.map-page').zIndex(FullScreenMapZIndex);
+		}
+	}
+
+	ExpandMapTool.moveMobileFullScreenBaseMapBehind = function($offMapTool)
+	{
+		if (TF.isMobileDevice &&
+			$offMapTool.closest('.map-item.map-page').zIndex() === FullScreenMapZIndex)
+		{
+			$offMapTool.closest('.map-item.map-page').zIndex(FullScreenMapZIndex * -1);
+		}
+	}
 })();
