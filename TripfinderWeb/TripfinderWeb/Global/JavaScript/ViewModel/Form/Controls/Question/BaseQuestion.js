@@ -79,6 +79,7 @@
 		this.elem = $(`<div class="form-question">
 			<div class="question-title">
 				${field.Name}
+				<span class="title-close-warn-msg"></span>
 			</div>
 			<div class="question-content ${!!field.readonly ? "readonly" : ""}"></div>
 			<span class="invalid-message"></span>
