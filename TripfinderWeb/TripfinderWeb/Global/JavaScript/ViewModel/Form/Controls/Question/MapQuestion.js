@@ -107,6 +107,7 @@
 			geoFinderAvailable: false,
 			GoogleStreet: false,
 			center: [self.field.FieldOptions.HomeLocation.Longitude, self.field.FieldOptions.HomeLocation.Latitude],
+			zoomLevel: self.field.FieldOptions.HomeLocation.ZoomLevel,
 			baseMapId: self.field.FieldOptions.HomeLocation.BaseMap,
 			expand: {
 				enable: true,
