@@ -232,6 +232,7 @@
 					{
 						const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
 						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
+						const mapToolIsActive = self.element.find(".off-map-tool").hasClass("active");
 						// return when map is drawing.
 						if (locationMarkerTool && locationMarkerTool.isDrawing === true) {
 							evt.preventDefault();
@@ -239,7 +240,7 @@
 							return;
 						}
 
-						if (touches.length <= 1 && self._map.expandMapTool.status) {
+						if (touches.length <= 1 && self._map.expandMapTool.status && !mapToolIsActive) {
 							$mobileZoomCover.show();
 						}
 
