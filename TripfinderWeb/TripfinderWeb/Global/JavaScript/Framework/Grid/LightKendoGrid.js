@@ -2708,7 +2708,7 @@
 											if (Enumerable.From(bigGridTypes).Contains(this._gridType))
 											{
 												var options = this.getApiRequestOption(kendoOption);
-												options.paramData = {FieldName: column.field, AggregateOperator: 'Distinct100'};
+												options.paramData = { FieldName: tf.UDFDefinition.getOriginalName(column.field), AggregateOperator: 'Distinct100'};
 												options.success = function(result)
 												{
 													result.Items = LightKendoGrid.normalizeResultItem(result.Items, this._gridType, this.options);

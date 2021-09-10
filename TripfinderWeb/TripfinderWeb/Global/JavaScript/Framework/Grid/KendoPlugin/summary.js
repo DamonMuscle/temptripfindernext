@@ -287,7 +287,7 @@
 		var excludeIds = this.getExcludeAnyIds();
 		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), this.obSelectedGridFilterClause(), includeIds, excludeIds);
 		return tf.promiseAjax.post(pathCombine(this.options.url, "aggregate"), {
-			paramData: $.extend(true, { FieldName: fildName, AggregateOperator: operator }, this.options.paramData || {}),
+			paramData: $.extend(true, { FieldName: tf.UDFDefinition.getOriginalName(fildName), AggregateOperator: operator }, this.options.paramData || {}),
 			data: this.searchOption.data,
 			traditional: true
 		}, { overlay: true });
