@@ -2064,6 +2064,7 @@
 				if (grid)
 				{
 					grid.refresh();
+					TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(grid, grid.dataSource.data());
 				}
 			})
 		}
