@@ -1403,8 +1403,9 @@
 	
 			.form-header
 			{
-				height: 90px;
+				height: auto;
 				padding: 5px 20px;
+				position:initial !important;
 	
 				.form-title
 				{
@@ -1415,13 +1416,15 @@
 				.form-subtitle
 				{
 					font-size: 14px;
+					line-clamp: unset !important;
+					-webkit-line-clamp: unset;
 				}
 			}
 	
 			.form-body
 			{
 				position: absolute;
-				top: 90px;
+				top: 0px;
 				left: 0;
 				//bottom: 60px;
 				right: 0;
@@ -1560,11 +1563,11 @@
 				padding: 0;
 				.form-header
 				{
-					height: 90px;
+					height: auto;
 				}
 				.form-body
 				{
-					top: 90px;
+					top: 0px;
 					//height: initial !important;
 				}
 			}
@@ -1804,6 +1807,7 @@
 	.modal-dialog {
 		.modal-content {
 			.modal-body {
+				padding:0px;
 				.form-container {
 					.form-layer {
 						background-color: transparent !important;
@@ -1811,6 +1815,9 @@
 						.form {
 
 							.form-body {
+								.form-header {
+								padding-top:20px;
+								}
 								.attach-document-block {
 									//opacity: .2;
 								}
