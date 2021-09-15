@@ -618,7 +618,7 @@
 	Form.prototype.resetFormSubTitleClamp = function($element, toRotate)
 	{
 		let rotateBtnHeight = 20;
-		let lineHeight = 20;
+		let lineHeight = 22;
 
 		let $formSubtitle = $element.find(".form-subtitle");
 		let displayText = $formSubtitle.css("display");
