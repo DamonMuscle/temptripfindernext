@@ -357,6 +357,33 @@
 			</div>
 		</div>`);
 
+		if (TF.isMobileDevice) {
+			elem = $(`<div class="form-container hide">
+			<div class="form-layer" style="background-color:${this.convertHex(color, 0.2)}">
+				<div class="form">
+				<div class="form-body">	
+					<div class="form-header" style="background-color:${color}">
+						<div class="form-title">${this.options.Name || ''}</div>
+						<div class="form-subtitle">${this.options.Description || ''}</div>
+					</div>
+					
+						<div class="form-entity-container">
+							<span class="form-entity-title">${dateType}: </span>
+							<input class="form-entity-input" name="form-entity-input" placeholder="${searchHint}"></input>
+						</div>
+						<div class="form-question-container">
+							<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+						</div>
+						<div class="e-sign">
+							<div class="e-sign-container">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>`);
+		}
+
 		/* hack default kendo behavor */
 		const kendoNumericWidget = kendo.widgets.find(_ => _.name === "kendoNumericTextBox");
 		if (kendoNumericWidget)
@@ -396,7 +423,7 @@
 								let toRotate = self.resetFormHeader(elem, keepRotate);
 								setTimeout(function()
 								{
-									self.resetFormSubTitleClamp(elem, toRotate);
+									//self.resetFormSubTitleClamp(elem, toRotate);
 								}, 200);
 							}, 100);
 						}
@@ -528,23 +555,21 @@
 		 * need show "shore more" icon for arrow down to present full height content
 		 */
 		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
-		if (TF.isMobileDevice)
-		{
-			offsetHeight += 10;
-		}
-
 		let self = this;
 		self.checkHeaderWrapped($element);
 		const isRotated = $element.find(".showmore").hasClass("rotate");
-		setTimeout(function()
-		{
-			self.resetFormSubTitleClamp($element, isRotated);
-		}, 200);
-		if (offsetHeight > 0)
-		{
-			$element.find(".form-subtitle").css("display", "-webkit-box");
-			this.elem.find(".showmore").show().on("click", ev =>
+		if (!TF.isMobileDevice) {
+			setTimeout(function ()
 			{
+				self.resetFormSubTitleClamp($element, isRotated);
+		}, 200);
+		}
+
+		if (offsetHeight > 0) {
+			if (!TF.isMobileDevice) {
+				$element.find(".form-subtitle").css("display", "-webkit-box");
+			}
+			this.elem.find(".showmore").show().on("click", ev => {
 				let toRotate = this.resetFormHeader($element);
 				setTimeout(function()
 				{
