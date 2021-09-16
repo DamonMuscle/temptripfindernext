@@ -418,12 +418,13 @@
 
 							setTimeout(function()
 							{
-								self.checkHeaderWrapped(elem);
+								//self.checkHeaderWrapped(elem);
 								let keepRotate = true;
 								let toRotate = self.resetFormHeader(elem, keepRotate);
 								setTimeout(function()
 								{
 									//self.resetFormSubTitleClamp(elem, toRotate);
+									window.scroll(0, 1);
 								}, 200);
 							}, 100);
 						}
@@ -556,13 +557,13 @@
 		 */
 		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
 		let self = this;
-		self.checkHeaderWrapped($element);
-		const isRotated = $element.find(".showmore").hasClass("rotate");
 		if (!TF.isMobileDevice) {
+			self.checkHeaderWrapped($element);
+			const isRotated = $element.find(".showmore").hasClass("rotate");
 			setTimeout(function ()
 			{
 				self.resetFormSubTitleClamp($element, isRotated);
-		}, 200);
+			}, 200);
 		}
 
 		if (offsetHeight > 0) {
