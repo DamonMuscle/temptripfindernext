@@ -60,9 +60,10 @@
 			// if switch to the stopfinder, must refresh the _authManager token
 			if (self._authManager.updateToken) {
 				self._authManager.token = tf.entStorageManager.get("token");
-				return;
+				if(!tf.entStorageManager.get("stopfinderToken")) return;
 			}
-			self._authManager.updateToken = false;
+			if (self._authManager.updateToken) return;
+			setTimeout(() => { self._authManager.updateToken = false;})
 			
 			tf.promiseBootbox.alert("Login session expired")
 				.then(function()
