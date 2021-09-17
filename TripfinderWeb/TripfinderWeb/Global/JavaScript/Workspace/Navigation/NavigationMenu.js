@@ -1200,6 +1200,8 @@
 				sessionStorage.removeItem(sfEntTokenKey);
 				document.cookie = sfStoreTokenKey + "=;Expires=" + new Date() + ";path=/;domain=." + _getDomain();
 				document.cookie = sfEntTokenKey + "=;Expires=" + new Date() + ";path=/;domain=." + _getDomain();
+
+				tf.authManager.updateToken = true;
 			}
 
 			var promise = null;
