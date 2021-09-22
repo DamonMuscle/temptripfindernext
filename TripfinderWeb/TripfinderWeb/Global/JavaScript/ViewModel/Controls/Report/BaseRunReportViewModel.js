@@ -544,7 +544,6 @@
 			return;
 		}
 
-
 		var dataType = self.dataType,
 			columns = tf.dataTypeHelper.getBasicColumnsByDataType(dataType)
 				.map(function(item)
@@ -552,7 +551,7 @@
 					return item.FieldName;
 				});
 
-		tf.dataTypeHelper.getRecordByIdsAndColumns(dataType, ids, columns, self.obSelectedDataSource().id)
+		tf.dataTypeHelper.getRecordByIdsAndColumns(self.obSelectedDataSource().id, dataType, ids, columns)
 			.then(function(selectedRecords)
 			{
 				self.obSpecifiedRecords(selectedRecords);
