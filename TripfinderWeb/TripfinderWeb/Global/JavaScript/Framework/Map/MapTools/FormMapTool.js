@@ -1,5 +1,5 @@
 /* Home button: click Home button to reset geometry to make home location in center of map */
-!function ()
+!function()
 {
 	createNamespace("TF.Form.Map").HomeTool = HomeTool;
 
@@ -10,7 +10,7 @@
 		self.map = self.routingMapTool.routingMapDocumentViewModel._map;
 		self.homeCoordinates = self.routingMapTool.routingMapDocumentViewModel.homeCoordinates;
 
-		HomeTool.prototype.jumpToHome = function () 
+		HomeTool.prototype.jumpToHome = function() 
 		{
 			let self = this;
 			self.map.mapView.scale = 8000;
@@ -20,7 +20,7 @@
 }()
 
 /* Location marker */
-!function ()
+!function()
 {
 	createNamespace("TF.Form.Map").LocationMarkerTool = LocationMarkerTool;
 	function LocationMarkerTool(routingMapTool)
@@ -38,12 +38,13 @@
 		self.tmpGraphic = null;
 		self.isOrientationChange = false;
 		self.rawScreenPoints = [];
-		if (TF.isMobileDevice) {
+		if (TF.isMobileDevice)
+		{
 			self.bindMapEvents(); // for mobile drawing marker
 		}
 	}
 
-	LocationMarkerTool.prototype.bindMapEvents = function ()
+	LocationMarkerTool.prototype.bindMapEvents = function()
 	{
 		let self = this;
 		self.selectedGraphic = null;
@@ -52,23 +53,27 @@
 
 		self._mapView.on('drag', e =>
 		{
-			if (!self.isDrawing) {
+			if (!self.isDrawing)
+			{
 				return;
 			}
-			if (e.action === 'start') {
+			if (e.action === 'start')
+			{
 				// for save the screen point first time
 				self.updateSelectedGraphic();
 			}
 		})
 
-		self._mapView.watch("extent", function (e)
+		self._mapView.watch("extent", function(e)
 		{
-			if (!self.isDrawing) {
+			if (!self.isDrawing)
+			{
 				return;
 			}
 
 			// OrientationChange: do not transform point; need to update selectedGraphic
-			if (self.isOrientationChange && self.isDrawing) {
+			if (self.isOrientationChange && self.isDrawing)
+			{
 				self.selectedGraphic = null;
 				self.rawScreenPoints = [];
 				self.isOrientationChange = false;
@@ -78,16 +83,20 @@
 			self.updateSelectedGraphic();
 
 			// transform the screen point to map point
-			if (self.selectedGraphic && self.map && self.map.mapView.extent) {
+			if (self.selectedGraphic && self.map && self.map.mapView.extent)
+			{
 				self.layer.graphics.remove(self.selectedGraphic);
-				if (self.tmpGraphic) {
+				if (self.tmpGraphic)
+				{
 					self.layer.graphics.remove(self.tmpGraphic);
 					self.tmpGraphic = null;
 				}
 				self.tmpGraphic = self.selectedGraphic.clone();
-				if (self.currentLocationMaker === "Pin") {
+				if (self.currentLocationMaker === "Pin")
+				{
 					self.translatePin(self.rawScreenPoints, self._mapView.center, self.tmpGraphic.geometry);
-				} else {
+				} else
+				{
 					self.translatePolygon(self.rawScreenPoints, self._mapView.center, self.tmpGraphic.geometry);
 				}
 				self.layer.graphics.add(self.tmpGraphic);
@@ -103,34 +112,41 @@
 			});
 	}
 
-	LocationMarkerTool.prototype.updateSelectedGraphic = function (forceUpdated)
+	LocationMarkerTool.prototype.updateSelectedGraphic = function(forceUpdated)
 	{
 		let self = this;
-		if (!self.selectedGraphic || forceUpdated) {
+		if (!self.selectedGraphic || forceUpdated)
+		{
 			// get the initial graphics
 			self.selectedGraphic = self.layer.graphics._items[0];
-			if (!self.selectedGraphic) {
+			if (!self.selectedGraphic)
+			{
 				return;
 			}
-			if (self.selectedGraphic && self.selectedGraphic.geometry.spatialReference.isWGS84) {
+			if (self.selectedGraphic && self.selectedGraphic.geometry.spatialReference.isWGS84)
+			{
 				self.selectedGraphic.geometry = webMercatorUtils.geographicToWebMercator(self.selectedGraphic.geometry);
 			}
 
 			// get raw screen point 
 			self.rawScreenPoints = [];
 			let mapPoint = null;
-			if (self.currentLocationMaker === "Pin") {
+			if (self.currentLocationMaker === "Pin")
+			{
 				mapPoint = {
 					x: self.selectedGraphic.geometry.x,
 					y: self.selectedGraphic.geometry.y,
 					spatialReference: self.selectedGraphic.geometry.spatialReference
 				};
 				self.rawScreenPoints.push(self._mapView.toScreen(mapPoint));
-			} else {
-				if (self.selectedGraphic && self.selectedGraphic.geometry) {
+			} else
+			{
+				if (self.selectedGraphic && self.selectedGraphic.geometry)
+				{
 					self.selectedGraphic.geometry.rings.forEach(ring =>
 					{
-						if (Array.isArray(ring[0])) {
+						if (Array.isArray(ring[0]))
+						{
 							ring.forEach(coord =>
 							{
 								mapPoint = {
@@ -140,7 +156,8 @@
 								};
 								self.rawScreenPoints.push(self._mapView.toScreen(mapPoint));
 							});
-						} else {
+						} else
+						{
 							mapPoint = {
 								x: ring[0],
 								y: ring[1],
@@ -155,7 +172,7 @@
 		}
 	}
 
-	LocationMarkerTool.prototype.translatePin = function (rawScreenPoints, currPoint, polygon)
+	LocationMarkerTool.prototype.translatePin = function(rawScreenPoints, currPoint, polygon)
 	{
 		let self = this;
 		let mapPoint = self._mapView.toMap({ x: rawScreenPoints[0].x, y: rawScreenPoints[0].y });
@@ -163,13 +180,14 @@
 		polygon.y = mapPoint.y;
 	}
 
-	LocationMarkerTool.prototype.translatePolygon = function (rawScreenPoints, currPoint, polygon)
+	LocationMarkerTool.prototype.translatePolygon = function(rawScreenPoints, currPoint, polygon)
 	{
 		let self = this;
 		let mapPoint = null;
 		polygon.rings.forEach(ring =>
 		{
-			if (Array.isArray(ring[0])) {
+			if (Array.isArray(ring[0]))
+			{
 				let index = 0;
 				ring.forEach(coord =>
 				{
@@ -178,7 +196,8 @@
 					coord[1] = mapPoint.y;
 					index++;
 				});
-			} else {
+			} else
+			{
 				mapPoint = self._mapView.toMap({ x: rawScreenPoints[index].x, y: rawScreenPoints[index].y });
 				ring[0] = mapPoint.x;
 				ring[1] = mapPoint.y;
@@ -186,17 +205,19 @@
 		});
 	}
 
-	LocationMarkerTool.prototype.drawMarker = function (locationMarker)
+	LocationMarkerTool.prototype.drawMarker = function(locationMarker)
 	{
 		let self = this;
 		// add save button for mobile 
-		if (TF.isMobileDevice) {
+		if (TF.isMobileDevice)
+		{
 			let mapContainer = self.routingMapTool.$container;
 			self.selectedGraphic = null;
 			self.tmpGraphic = null;
 			self.isDrawing = true;
 			self.currentLocationMaker = locationMarker;
-			if (self.sketchVM) {
+			if (self.sketchVM)
+			{
 				self.sketchVM.updateOnGraphicClick = true;
 				self.sketchVM.defaultUpdateOptions.toggleToolOnClick = true;
 			}
@@ -204,11 +225,12 @@
 			let saveBtn = $("<div class='confirm-location-mark exit'>Exit</div>");
 			mapContainer.append(saveBtn);
 			saveBtn.hide();
-			saveBtn.on("click", function (e)
+			saveBtn.on("click", function(e)
 			{
 				// todo check layer has graphic or not
 				self.routingMapTool.$container.find(".expand-button").click();
-				if (self.sketchVM) {
+				if (self.sketchVM)
+				{
 					self.sketchVM.updateOnGraphicClick = false;
 					self.sketchVM.defaultUpdateOptions.toggleToolOnClick = false;
 				}
@@ -221,12 +243,15 @@
 		//Clears all the graphics on layers since it may impact other graphic(pin/rectangle/polygon/circle) 
 		self.layer.removeAll();
 
-		switch (locationMarker) {
+		switch (locationMarker)
+		{
 			case "Pin":
-				if (self.sketchVM) {
+				if (self.sketchVM)
+				{
 					self.sketchVM.cancel();
 				}
-				if (!self.pinActive) {
+				if (!self.pinActive)
+				{
 					self.pinActive = true;
 					self.cursorToPin();
 					self.bindPinClickEvent();
@@ -244,7 +269,7 @@
 		locationMarkerSelected(self.routingMapTool.$container, locationMarker);
 	}
 
-	LocationMarkerTool.prototype.endingDrawMarker = function ()
+	LocationMarkerTool.prototype.endingDrawMarker = function()
 	{
 		let self = this;
 		let saveBtn = self.routingMapTool.$container.find(".confirm-location-mark");
@@ -253,23 +278,25 @@
 		self.rawScreenPoints = null;
 		self.isDrawing = false;
 		self.currentLocationMaker = null;
-		if (self.sketchVM) {
+		if (self.sketchVM)
+		{
 			self.sketchVM.updateOnGraphicClick = false;
 			self.sketchVM.defaultUpdateOptions.toggleToolOnClick = false;
 			self.sketchVM.cancel();
 		}
-		if (saveBtn.length > 0) {
+		if (saveBtn.length > 0)
+		{
 			saveBtn.remove();
 		}
 	}
 
-	LocationMarkerTool.prototype.cursorToPin = function ()
+	LocationMarkerTool.prototype.cursorToPin = function()
 	{
 		TF.Helper.MapHelper.setMapCursor(this.map, "pin");
 		this.map.mapView.pining = true;
 	};
 
-	LocationMarkerTool.prototype.bindPinClickEvent = function ()
+	LocationMarkerTool.prototype.bindPinClickEvent = function()
 	{
 		var self = this;
 		self.mapClickEvent && self.mapClickEvent.remove();
@@ -279,7 +306,8 @@
 			self.layer.removeAll();
 			let pinIconOption = self.routingMapTool.routingMapDocumentViewModel.pinIconOption;
 			let borderColor = null, borderSize = null;
-			if (pinIconOption.isWithBorder) {
+			if (pinIconOption.isWithBorder)
+			{
 				borderColor = pinIconOption.borderColor || "#000000";
 				borderSize = pinIconOption.borderSize || "1";
 			}
@@ -302,24 +330,25 @@
 		});
 	};
 
-	LocationMarkerTool.prototype.bindPinEscEvent = function ()
+	LocationMarkerTool.prototype.bindPinEscEvent = function()
 	{
 		var self = this;
-		tf.documentEvent.bind("keydown.pin", self.routeState, function (e)
+		tf.documentEvent.bind("keydown.pin", self.routeState, function(e)
 		{
-			if (e.key == "Escape") {
+			if (e.key == "Escape")
+			{
 				self.stopPin();
 			}
 		});
 	};
 
-	LocationMarkerTool.prototype.cursorToDefault = function ()
+	LocationMarkerTool.prototype.cursorToDefault = function()
 	{
 		TF.Helper.MapHelper.setMapCursor(this.map, "default");
 		this.map.mapView.pining = false;
 	};
 
-	LocationMarkerTool.prototype.stopPin = function ()
+	LocationMarkerTool.prototype.stopPin = function()
 	{
 		this.cursorToDefault();
 		tf.documentEvent.unbind("keydown.pin", this.routeState);
@@ -331,13 +360,15 @@
 		locationMarkerUnSelected(this.routingMapTool.$container);
 	};
 
-	LocationMarkerTool.prototype.drawShape = function (type)
+	LocationMarkerTool.prototype.drawShape = function(type)
 	{
 		let self = this;
-		if (!self.sketchVM) {
+		if (!self.sketchVM)
+		{
 			intializeShapeDraw.bind(this)(type);
 		}
-		switch (type) {
+		switch (type)
+		{
 			case "Circle":
 				self.sketchVM.create("circle");
 				break;
@@ -353,27 +384,33 @@
 		}
 	}
 
-	LocationMarkerTool.prototype.getSVGMarkSymbol = function (setting)
+	LocationMarkerTool.prototype.getSVGMarkSymbol = function(setting)
 	{
 		var self = this, symbolNumber = setting.Symbol ? setting.Symbol : setting.symbol, pathString = self.getOriginSVGSymbolString(symbolNumber);
-		if (symbolNumber === "-1") {
+		if (symbolNumber === "-1")
+		{
 			return self.symbolHelper.pathSymbol(pathString, "transparent", "0", false);
 		}
-		else {
+		else
+		{
 			return self.symbolHelper.pathSymbol(pathString, setting.Color ? setting.Color : setting.color, setting.Size ? setting.Size : setting.size,
 				setting.IsWithBorder ? setting.IsWithBorder : setting.borderishow, setting.BorderColor ? setting.BorderColor : setting.bordercolor, setting.BorderWidth ? setting.BorderWidth : setting.bordersize);
 		}
 	};
 
-	LocationMarkerTool.prototype.getOriginSVGSymbolString = function (symbolnumber)
+	LocationMarkerTool.prototype.getOriginSVGSymbolString = function(symbolnumber)
 	{
 		var self = this, pathString = "", i = thematicSymbolPath.length - 1;
-		if (symbolnumber === "-1") {
+		if (symbolnumber === "-1")
+		{
 			pathString = thematicSymbolPath[0].pathString;
 		}
-		else {
-			for (; i >= 0; i--) {
-				if (thematicSymbolPath[i].id === Number(symbolnumber)) {
+		else
+		{
+			for (; i >= 0; i--)
+			{
+				if (thematicSymbolPath[i].id === Number(symbolnumber))
+				{
 					pathString = thematicSymbolPath[i].pathString;
 				}
 			}
@@ -382,10 +419,11 @@
 		return pathString;
 	};
 
-	LocationMarkerTool.prototype.enableTrashBtn = function ()
+	LocationMarkerTool.prototype.enableTrashBtn = function()
 	{
 		var self = this;
-		if (self.routingMapTool.$mapToolBar) {
+		if (self.routingMapTool.$mapToolBar)
+		{
 			self.routingMapTool.$mapToolBar.find('.trash').removeClass('disable');
 		}
 	}
@@ -411,16 +449,18 @@
 				}
 			}
 		});
+		self.sketchVM && (self.sketchVM.vertexSymbol.size = 0);
 
 		// for updating the screen point
-		self.sketchVM.on("update", function ()
+		self.sketchVM.on("update", function()
 		{
 			self.checkGraphicUpdate();
 		});
 
-		self.onCreateHandler = self.sketchVM.on("create", function (e)
+		self.onCreateHandler = self.sketchVM.on("create", function(e)
 		{
-			if (e.state == "complete") {
+			if (e.state == "complete")
+			{
 				self.routingMapTool.routingMapDocumentViewModel.shapeDrawn && self.routingMapTool.routingMapDocumentViewModel.shapeDrawn();
 				//pouplate shape geometry as map question answer 
 				self.enableTrashBtn();
@@ -428,20 +468,21 @@
 
 				locationMarkerUnSelected(self.routingMapTool.$container)
 			}
-			else if (e.state == "cancel") {
+			else if (e.state == "cancel")
+			{
 				/*prevent cancel from SketchTool if required */
 				locationMarkerUnSelected(self.routingMapTool.$container);
 			}
 		});
 	}
 
-	LocationMarkerTool.prototype.checkGraphicUpdate = function ()
+	LocationMarkerTool.prototype.checkGraphicUpdate = function()
 	{
 		let self = this;
 		self.updateSelectedGraphic(true);
 	}
 
-	LocationMarkerTool.prototype.dispose = function ()
+	LocationMarkerTool.prototype.dispose = function()
 	{
 		this.stopPin();
 		this.routingMapTool = null;
@@ -452,14 +493,16 @@
 
 	function locationMarkerSelected($mapContainer, locationMarker)
 	{
-		if (!$mapContainer || !$mapContainer.length || !locationMarker) {
+		if (!$mapContainer || !$mapContainer.length || !locationMarker)
+		{
 			return;
 		}
 
 		locationMarkerUnSelected($mapContainer);
 
 		let iconSelector = '';
-		switch (locationMarker.toLocaleLowerCase()) {
+		switch (locationMarker.toLocaleLowerCase())
+		{
 			case 'pin':
 				iconSelector = '.toolbar-item-pin';
 				break;
@@ -479,14 +522,16 @@
 				break;
 		}
 
-		if (iconSelector) {
+		if (iconSelector)
+		{
 			$mapContainer.find(iconSelector).addClass('toolbar-item-selected');
 		}
 	}
 
 	function locationMarkerUnSelected($mapContainer)
 	{
-		if (!$mapContainer || !$mapContainer.length) {
+		if (!$mapContainer || !$mapContainer.length)
+		{
 			return;
 		}
 
@@ -496,7 +541,7 @@
 
 
 /* Trush: delete shape*/
-!function ()
+!function()
 {
 	createNamespace("TF.Form.Map").DeleteShapeTool = DeleteShapeTool;
 	function DeleteShapeTool(routingMapTool)
@@ -506,15 +551,17 @@
 		self.map = self.routingMapTool.routingMapDocumentViewModel._map;
 		self.layer = self.map.findLayerById("locationMarker");
 
-		DeleteShapeTool.prototype.removeShape = function ()
+		DeleteShapeTool.prototype.removeShape = function()
 		{
 			this.layer.removeAll();
 			self.routingMapTool.routingMapDocumentViewModel.shapeDrawn && self.routingMapTool.routingMapDocumentViewModel.shapeDrawn();
-			if (TF.isMobileDevice && self.routingMapTool && self.routingMapTool.locationMarkerTool) {
+			if (TF.isMobileDevice && self.routingMapTool && self.routingMapTool.locationMarkerTool)
+			{
 				self.routingMapTool.locationMarkerTool.endingDrawMarker();
 			}
 
-			if (self.routingMapTool.$mapToolBar) {
+			if (self.routingMapTool.$mapToolBar)
+			{
 				self.routingMapTool.$mapToolBar.find('.trash').addClass('disable');
 			}
 		}
@@ -522,7 +569,7 @@
 }()
 
 /* My location:  draw icon on map to show current location*/
-!function ()
+!function()
 {
 	createNamespace("TF.Form.Map").MyLocationTool = MyLocationTool;
 	function MyLocationTool(routingMapTool)
@@ -532,29 +579,34 @@
 		self.map = self.routingMapTool.routingMapDocumentViewModel._map;
 	}
 
-	MyLocationTool.prototype.drawMyLocation = function ()
+	MyLocationTool.prototype.drawMyLocation = function()
 	{
 		const self = this;
 		var locationPromise;
-		if (tf.isFromWayfinder) {
+		if (tf.isFromWayfinder)
+		{
 			locationPromise = TF.getWayfinderLocation;
 		}
-		else {
+		else
+		{
 			locationPromise = TF.getLocation;
 		}
 		locationPromise().then(coord =>
 		{
-			if (coord.longitude && coord.latitude) {
+			if (coord.longitude && coord.latitude)
+			{
 				return coord;
 			}
-			else {
+			else
+			{
 				return Promise.reject();
 			}
 		})
 			.then(coord =>
 			{
 				var layer = self.map.findLayerById("myLocation");
-				if (!layer) {
+				if (!layer)
+				{
 					layer = new tf.map.ArcGIS.GraphicsLayer({ id: "myLocation" });
 					self.map.add(layer);
 				}
@@ -564,7 +616,8 @@
 				let myLocationPoint = new tf.map.ArcGIS.Point({ x: coord.longitude, y: coord.latitude });
 				let fillColor = '#000000';
 				const darkBasemaps = ['satellite', 'dark-gray-vector', 'hybrid', 'dark-gray', 'national-geographic'];
-				if (darkBasemaps.indexOf(self.map.basemap) != -1) {
+				if (darkBasemaps.indexOf(self.map.basemap) != -1)
+				{
 					fillColor = '#007dea';
 				}
 				const coordGeometry = tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(myLocationPoint);
