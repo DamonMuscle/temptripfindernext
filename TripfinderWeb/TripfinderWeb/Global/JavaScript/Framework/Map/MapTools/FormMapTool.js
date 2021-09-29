@@ -216,11 +216,6 @@
 			self.tmpGraphic = null;
 			self.isDrawing = true;
 			self.currentLocationMaker = locationMarker;
-			if (self.sketchVM)
-			{
-				self.sketchVM.updateOnGraphicClick = true;
-				self.sketchVM.defaultUpdateOptions.toggleToolOnClick = true;
-			}
 
 			let saveBtn = $("<div class='confirm-location-mark exit'>Exit</div>");
 			mapContainer.append(saveBtn);
@@ -229,11 +224,6 @@
 			{
 				// todo check layer has graphic or not
 				self.routingMapTool.$container.find(".expand-button").click();
-				if (self.sketchVM)
-				{
-					self.sketchVM.updateOnGraphicClick = false;
-					self.sketchVM.defaultUpdateOptions.toggleToolOnClick = false;
-				}
 				self.isDrawing = false;
 				self.currentLocationMaker = null;
 				saveBtn.remove();
@@ -280,8 +270,6 @@
 		self.currentLocationMaker = null;
 		if (self.sketchVM)
 		{
-			self.sketchVM.updateOnGraphicClick = false;
-			self.sketchVM.defaultUpdateOptions.toggleToolOnClick = false;
 			self.sketchVM.cancel();
 		}
 		if (saveBtn.length > 0)
@@ -434,12 +422,7 @@
 		self.sketchVM = new tf.map.ArcGIS.SketchViewModel({
 			view: self.map.mapView,
 			layer: self.layer,
-			updateOnGraphicClick: TF.isMobileDevice && self.isDrawing,
-			//updateOnGraphicClick: false,
-			defaultUpdateOptions: { // set the default options for the update operations
-				toggleToolOnClick: TF.isMobileDevice && self.isDrawing // only reshape operation will be enabled
-				//toggleToolOnClick:false,
-			},
+			updateOnGraphicClick: false,
 			polygonSymbol: { //shape style
 				type: "simple-fill",
 				color: [18, 89, 208, 0.3],
