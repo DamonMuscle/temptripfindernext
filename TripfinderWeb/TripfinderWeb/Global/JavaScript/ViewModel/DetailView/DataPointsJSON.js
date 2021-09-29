@@ -1277,8 +1277,7 @@ var today = (new Date()).toDateString(),
 					"type": "String",
 					"defaultValue": "12305",
 					"editType": {
-						"format": "String",
-						"maxLength": 20,
+						"format": "ZipCode",
 						allowEdit: function() { return !tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictDest'] }
 					}
 				},
