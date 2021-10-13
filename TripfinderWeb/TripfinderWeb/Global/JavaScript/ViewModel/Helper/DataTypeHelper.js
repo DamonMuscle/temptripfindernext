@@ -214,6 +214,11 @@
 			isMajorType: false,
 			hasDBID: true
 		},
+		fieldtriptemplate: {
+			endpoint: "fieldtriptemplates",
+			isMajorType: false,
+			hasDBID: true
+		},
 		fieldtriphistory: {
 			endpoint: "fieldtriphistories",
 			isMajorType: false,
