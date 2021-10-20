@@ -918,6 +918,10 @@
 							background-position: center;
 							background-size: 10px 10px;
 							opacity: 0.5;
+							background-repeat: no-repeat;
+							&::before{
+								content: none;
+							}
 						}
 					}
 				}
@@ -1390,14 +1394,5 @@
 		.grid-stack>.grid-stack-item {
 			z-index: inherit !important;
 		}
-	}
-}
-
-
-.menu.context-menu > ul > li > .text > span.k-i-arrow-e, 
-.menu.withsub-menu > ul > li > .text > span.k-i-arrow-e{
-	background-repeat: no-repeat;
-	&::before{
-		content: none;
 	}
 }

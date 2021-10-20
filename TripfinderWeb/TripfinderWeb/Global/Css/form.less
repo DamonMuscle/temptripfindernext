@@ -178,7 +178,7 @@
 						img
 						{
 							height: 100px;
-						};
+						}
 					}
 
 					.k-card-body
@@ -374,7 +374,7 @@
 					img
 					{
 						height: 60px;
-					};
+					}
 				}
 				
 				.k-card-favorite-btn
@@ -842,6 +842,11 @@
 								{
 									padding-left: 8px;
 								}
+								height: 28px;
+								&:hover, &:active, &:focus{
+									outline: 0;
+								    border-width: 1px;	
+								}
 							}
 							.number-question,
 							.date-question {
@@ -892,10 +897,6 @@
 								&:hover, &:focus {
 									border-color: @editableTextColor;
 								}
-							}
-							
-							.currency-question input[type=number] {
-								padding-left:16px !important;
 							}
 
 							.number-question,
@@ -963,8 +964,8 @@
 								}
 								input[type=number]
 								{
+									padding-left:16px !important;
 									height: 28px;
-									padding-left:15px;
 									border: 1px solid #c5c5c5;
 									-moz-appearance:textfield;
 									&::-webkit-inner-spin-button, ::-webkit-outer-spin-button
@@ -975,15 +976,6 @@
 										border-width: 1px;
 										outline: none;
 									}
-								}
-							}
-
-							.systemfield-question
-							{
-								height: 28px;
-								&:hover, &:active, &:focus{
-									outline: 0;
-								    border-width: 1px;	
 								}
 							}
 
