@@ -176,6 +176,8 @@
 
 			.list-container {
 				max-height: calc(~"100vh - 243px");
+				float: left;
+				padding: 0 0 0 0;
 			}
 
 			&.in {
@@ -198,11 +200,6 @@
 				}
 			}
 
-			.list-container {
-				float: left;
-				padding: 0 0 0 0;
-			}
-
 			.resize-handle {
 				border-right: 10px solid transparent;
 				left: -1px;
@@ -222,6 +219,8 @@
 
 			.list-container {
 				max-height: calc(~"100vh - 243px");
+				float: left;
+				padding: 0 0 0 0;
 			}
 
 			&.in {
@@ -244,11 +243,6 @@
 					display: block;
 					background-image: url('../img/Routing Map//left-arrow-white.png');
 				}
-			}
-
-			.list-container {
-				float: left;
-				padding: 0 0 0 0;
 			}
 
 			.resize-handle {
@@ -1563,6 +1557,12 @@
 			padding-right: 0;
 			border-bottom: 1px solid #DADAD1;
 
+			.trip-text-info {
+				height: 50px;
+				float: left;
+				width: ~'calc(100% - 24px)';
+			}
+
 			&.no-bottom-border {
 				border-bottom: none;
 				padding-right: 0;
@@ -1743,14 +1743,6 @@
 						}
 					}
 				}
-			}
-		}
-
-		.context {
-			.trip-text-info {
-				height: 50px;
-				float: left;
-				width: ~'calc(100% - 24px)';
 			}
 		}
 
@@ -2086,47 +2078,6 @@
 		border-bottom: 2px solid #dedede;
 
 		.controls {
-			.icon {
-				border: 0px;
-
-				&:disabled {
-					cursor: default;
-				}
-			}
-		}
-
-		.glyphicon {
-			font-size: 20px;
-		}
-
-		.time-slider-container {
-			width: 100%;
-		}
-
-		.time-slider-container .slider {
-			width: 100%;
-		}
-
-		/*
-	 customer slider to black line
-	*/
-		.slider.slider-horizontal .slider-track {
-			height: 3px;
-		}
-
-		.slider.slider-horizontal .slider-handle {
-			margin-top: -8px;
-			background-color: @font-color;
-			background-image: linear-gradient(to bottom, rgb(117, 117, 117) 0, @font-color 100%);
-		}
-
-		.slider-selection,
-		.slider-track-high {
-			background: #797979;
-			box-shadow: 0 0 2px #797979;
-		}
-
-		.controls {
 			margin-top: 5px;
 			display: flex;
 			justify-content: space-between;
@@ -2172,7 +2123,14 @@
 				cursor: pointer;
 			}
 
+			.print-setting-group.active {
+				.glyphicon {
+					color: white;
+				}
+			}
+
 			.icon {
+				border: 0px;
 				width: 40px;
 				height: 30px;
 				cursor: pointer;
@@ -2182,13 +2140,42 @@
 					margin-top: 3px;
 					margin-right: 3px;
 				}
-			}
 
-			.print-setting-group.active {
-				.glyphicon {
-					color: white;
+				&:disabled {
+					cursor: default;
 				}
 			}
+		}
+
+		.glyphicon {
+			font-size: 20px;
+		}
+
+		.time-slider-container {
+			width: 100%;
+		}
+
+		.time-slider-container .slider {
+			width: 100%;
+		}
+
+		/*
+	 customer slider to black line
+	*/
+		.slider.slider-horizontal .slider-track {
+			height: 3px;
+		}
+
+		.slider.slider-horizontal .slider-handle {
+			margin-top: -8px;
+			background-color: @font-color;
+			background-image: linear-gradient(to bottom, rgb(117, 117, 117) 0, @font-color 100%);
+		}
+
+		.slider-selection,
+		.slider-track-high {
+			background: #797979;
+			box-shadow: 0 0 2px #797979;
 		}
 	}
 
@@ -2562,6 +2549,8 @@
 
 	.form-group.underlined-blue {
 		font-size: 13px;
+		background-color: #fff;
+		border-bottom: 1px solid #d8d8d8;
 
 		.form-control {
 			font-size: 13px;
@@ -2617,11 +2606,6 @@
 				}
 			}
 		}
-	}
-
-	.form-group.underlined-blue {
-		background-color: #fff;
-		border-bottom: 1px solid #d8d8d8;
 	}
 
 	.form-group.underlined-green {
@@ -3109,12 +3093,6 @@
 		height: 20px; //width: 30px;
 		width: 100%;
 		pointer-events: none; // background-color: white;
-	}
-
-	.typeahead-input-symbol.dash,
-	.typeahead-input-symbol.dashdot,
-	.typeahead-input-symbol.solid {
-		// background-size: auto;
 		background-position: 10px 2px;
 	}
 
@@ -3143,7 +3121,10 @@
 
 	.typeahead.conditional-dropdown>li {
 		&.disabled-event {
-			#setConditionalEventTypeA(#FF3333)
+			#setConditionalEventTypeA(#FF3333);
+			>a {
+				color: #FF3333;
+			}
 		}
 
 		#setConditionalEventTypeA(#007DEA)
@@ -3177,14 +3158,6 @@
 		color: #007DEA;
 		font-size: 13px;
 		font-weight: bold;
-	}
-
-	.typeahead.conditional-dropdown>li {
-		&.disabled-event {
-			>a {
-				color: #FF3333;
-			}
-		}
 	}
 
 	.menu-style {

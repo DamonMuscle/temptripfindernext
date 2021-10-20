@@ -51,10 +51,6 @@ html {
 	padding: 5.5px;
 }
 
-.map-page {
-	height: 100%;
-}
-
 .grey-border {
 	border: 1px solid #cccccc;
 }
@@ -136,13 +132,7 @@ html {
 						display: none;
 					}
 				}
-			}
 
-			&.hide {
-				display: none;
-			}
-
-			>ul {
 				&::before {
 					content: '';
 					display: block;
@@ -155,6 +145,10 @@ html {
 				&::after {
 					height: 30px;
 				}
+			}
+
+			&.hide {
+				display: none;
 			}
 
 			ul.measure-unit-item {
@@ -852,7 +846,6 @@ html {
 			overflow: visible;
 			opacity: .8;
 			border-radius: 2px;
-			display: flex;
 			width: 148px;
 			height: auto;
 			justify-content: center;
@@ -1256,11 +1249,11 @@ html {
 
 	.grid {
 		.grid-header {
-			padding: 6px 7px;
 			width: 100%;
 			height: 33px;
 			background: #4B4B4B;
 			color: #cccccc;
+			padding: 0 7px;
 		}
 
 		.grid-content {
@@ -1432,20 +1425,11 @@ html {
 	height: initial;
 }
 
-.list-mover .grid .grid-header {
-	padding: 0 7px;
-}
-
 .forgot-psw-btn {
 	/* for case of coved by required warning of password input*/
 	position: absolute;
 	right: 15px;
 	z-index: 1;
-}
-
-.edit-bottombar.reset-password-panel-bottom {
-	position: initial;
-	border-radius: 0 0 4px 4px;
 }
 
 .svg-icon {
@@ -1506,6 +1490,7 @@ html {
 }
 
 .edit-bottombar.reset-password-panel-bottom {
+	position: initial;
 	border-radius: 0;
 
 	.tf-btn-gray,
