@@ -14,13 +14,12 @@
 
 	AdjustValueSymbolHelper.getOriginSVGSymbolString = function(symbolnumber)
 	{
-		var self = this, symbolString = "", pathString = "", viewBox;
+		var symbolString = "", pathString = "", viewBox;
 		if (symbolnumber === "-1")
 		{
 			pathString = thematicSymbolPath[0].pathString;
-			symbolString = "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xml:space='preserve'" +
-				" viewboxstring='" + thematicSymbolPath[0].viewBox + "'>" +
-				pathString + "</svg>";
+			symbolString = `<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xml:space='preserve'
+			 viewboxstring='${thematicSymbolPath[0].viewBox}'>${pathString}</svg>`;
 		}
 		else
 		{
@@ -32,9 +31,8 @@
 					viewBox = thematicSymbolPath[i].viewBox;
 				}
 			}
-			symbolString = "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xml:space='preserve'" +
-				" viewboxstring='" + viewBox + "'>" +
-				pathString + "</svg>";
+			symbolString = `<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' 
+			xml:space='preserve' viewboxstring='${viewBox}'>${pathString}</svg>`;
 
 		}
 		return symbolString;
@@ -47,7 +45,7 @@
 	 * @param {string} symbolsize the size of the symbol.
 	 * @param {string} bordercolor the color of the symbol's border.
 	 * @param {string} bordersize the size of the symbol's border.
-	 * @param {string} maxdisplaySize the max of size to shown on the html.
+	 * @param {number}} maxdisplaySize the max of size to shown on the html.
 	 * @returns {string} the string of symbol html
 	 */
 	AdjustValueSymbolHelper.getSVGSymbolString = function(symbolnumber, symbolcolor, symbolsize, bordercolor, bordersize, maxdisplaySize)
@@ -56,7 +54,6 @@
 			symbolString = self.getOriginSVGSymbolString(symbolnumber),
 			$symbol = $(symbolString);
 
-		// $symbol.find("path").attr({ "vector-effect": "non-scaling-stroke" });
 		if (maxdisplaySize)
 		{
 			maxdisplaySize = maxdisplaySize - 1;
@@ -147,10 +144,6 @@
 		{
 			var width = viewBox[2] * rate + strokeSize,
 				height = viewBox[3] * rate + strokeSize;
-			// $symbol.css({
-			// 	"width": width,
-			// 	"height": height
-			// });
 			$symbol.attr({ width: width, height: height });
 		}
 		if (scale)
@@ -160,7 +153,7 @@
 			offset.y *= scale;
 		}
 
-		$symbol.find("path").attr({ "transform": "matrix(" + rate + ",0,0," + rate + "," + offset.x + "," + offset.y + ")" });
+		$symbol.find("path").attr({ "transform": `matrix(${rate},0,0,${rate},${offset.x},${offset.y})` });
 
 		if (bordersize)
 		{

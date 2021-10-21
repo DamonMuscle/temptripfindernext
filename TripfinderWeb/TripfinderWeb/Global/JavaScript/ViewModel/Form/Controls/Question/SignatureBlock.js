@@ -1,19 +1,22 @@
 
-(function () {
+(function()
+{
 	createNamespace("TF.Control.Form").SignatureBlockQuestion = SignatureBlock;
 
-	function SignatureBlock(field) {
+	function SignatureBlock(field)
+	{
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
 		this.field = field;
 		this.isFullPage = false;
 		this.field.readonly = !!field.readonly;
-		if (this.field.readonly) {
+		if (this.field.readonly)
+		{
 			this.elem.addClass('disabled');
 		}
-		if (field.value) {
+		if (field.value)
+		{
 			this.field.value = field.value;
 			this.value = field.value;
-			// this.togglePlaceHolder();
 		}
 	}
 
@@ -23,7 +26,8 @@
 
 	Object.defineProperty(SignatureBlock.prototype, 'value', {
 		get() { return this._value; },
-		set(val) {
+		set(val)
+		{
 			this._value = val;
 			this.togglePlaceHolder(this._value);
 		},
@@ -31,7 +35,8 @@
 		configurable: false
 	});
 
-	SignatureBlock.prototype.initElement = function () {
+	SignatureBlock.prototype.initElement = function()
+	{
 		const field = this.field;
 		this.elem = $(`
 			<div class="e-sign-wrapper">
@@ -61,14 +66,17 @@
 			</div>
 		`);
 
-		let $canvas = this.elem.find(`#${field.Guid}`);
-		if ($canvas.length > 0) {
-			let canvas = $canvas[0];
-			setTimeout(() => {
+		const $canvas = this.elem.find(`#${field.Guid}`);
+		if ($canvas.length > 0)
+		{
+			const canvas = $canvas[0];
+			setTimeout(() =>
+			{
 				this.canvas = canvas;
 				this.exitFullPage();
 				this.signaturePad = new SignaturePad(canvas, {
-					onEnd: () => {
+					onEnd: () =>
+					{
 						this.toggleSaveButton();
 					},
 					minWidth: 2.5,
@@ -76,87 +84,109 @@
 				});
 			}, 0);
 		}
-		this.elem.on('click', '.e-sign-cover-layer', e => {
-			let $ele = $(e.target);
+		this.elem.on('click', '.e-sign-cover-layer', e =>
+		{
+			const $ele = $(e.target);
 			$ele.closest(".e-sign-wrapper").removeClass('invalid');
 			!this.field.readonly && this.enterFullPage();
 		});
-		let questionContent = this.elem.find(".form-question");
-		questionContent.on('click', '.e-sign-close-button', e => {
+		const questionContent = this.elem.find(".form-question");
+		questionContent.on('click', '.e-sign-close-button', e =>
+		{
 			this.exitFullPage();
 		});
-		questionContent.on('click', '.k-button', e => {
-			let $ele = $(e.target);
-			if ($ele.hasClass('e-sign-clear-button')) {
+		questionContent.on('click', '.k-button', e =>
+		{
+			const $ele = $(e.target);
+			if ($ele.hasClass('e-sign-clear-button'))
+			{
 				this.signaturePad.clear();
 				this.value = null;
 				this.toggleSaveButton();
 			}
-			else if ($ele.hasClass('e-sign-undo-button')) {
+			else if ($ele.hasClass('e-sign-undo-button'))
+			{
 				var data = this.signaturePad.toData();
-				if (data) {
+				if (data)
+				{
 					data.pop(); // remove the last dot or line
 					this.signaturePad.fromData(data);
 					this.toggleSaveButton();
 				}
 			}
-			else if ($ele.hasClass('e-sign-save-button')) {
-				if (this.signaturePad.isEmpty()) {
+			else if ($ele.hasClass('e-sign-save-button'))
+			{
+				if (this.signaturePad.isEmpty())
+				{
 					this.value = null;
 				}
-				else {
+				else
+				{
 					this.value = this.signaturePad.toDataURL();
 				}
 				this.exitFullPage();
 			}
 		});
 
-		setTimeout(() => {
-			if (this.field && this.field.value) {
+		setTimeout(() =>
+		{
+			if (this.field && this.field.value)
+			{
 				this.signaturePad.fromDataURL(this.field.value);
 			}
 		}, 300);
 
 		$(window).off("orientationchange.signatureIsMobileDevice")
-			.on("orientationchange.signatureIsMobileDevice", () => {
-				setTimeout(() => {
-					if (TF.isMobileDevice && this.isFullPage) {
-						this.resizeCanvas('100%', ($(window).outerHeight() - 90) + 'px', true);
+			.on("orientationchange.signatureIsMobileDevice", () =>
+			{
+				setTimeout(() =>
+				{
+					if (TF.isMobileDevice && this.isFullPage)
+					{
+						this.resizeCanvas('100%', `${$(window).outerHeight() - 90}px`, true);
 					}
 				}, 300);
 			});
 	}
 
-	SignatureBlock.prototype.valueChanged = function () {
+	SignatureBlock.prototype.valueChanged = function()
+	{
 		this.togglePlaceHolder();
 	}
 
-	SignatureBlock.prototype.togglePlaceHolder = function (value)
+	SignatureBlock.prototype.togglePlaceHolder = function(value)
 	{
-		let elemContainer = this.signatureQuestion ? this.signatureQuestion : this.elem;
-		let elem = elemContainer.find('.e-sign-cover-layer .place-holder');
-		if (elem.length > 0) {
-			if (this.value == null) {
+		const elemContainer = this.signatureQuestion ? this.signatureQuestion : this.elem;
+		const elem = elemContainer.find('.e-sign-cover-layer .place-holder');
+		if (elem.length > 0)
+		{
+			if (this.value == null)
+			{
 				elem.show();
 			}
-			else {
+			else
+			{
 				elem.hide();
 			}
-			if (value != null) {
+			if (value != null)
+			{
 				elem.hide();
 			}
 		}
 	}
 
-	SignatureBlock.prototype.enterFullPage = function () {
+	SignatureBlock.prototype.enterFullPage = function()
+	{
 		this.isFullPage = true;
-		if (TF.isMobileDevice) {
+		if (TF.isMobileDevice)
+		{
 			this.signatureQuestion = this.elem.find(".form-question");
 			this.signatureQuestion.addClass('full-page');
 			$("body").append(this.signatureQuestion);
-			this.resizeCanvas('100%', ($(window).outerHeight() - 80) + 'px');
+			this.resizeCanvas('100%', `${$(window).outerHeight() - 80}px`);
 		}
-		else {
+		else
+		{
 			this.elem.closest("div.form-body").css("overflow-y", "initial");
 			this.elem.addClass('full-page');
 			this.resizeCanvas('100%', '300px');
@@ -164,36 +194,44 @@
 		this.toggleSaveButton();
 	}
 
-	SignatureBlock.prototype.exitFullPage = function ()
+	SignatureBlock.prototype.exitFullPage = function()
 	{
-		let self = this;
+		const self = this;
 		self.isFullPage = false;
-		if (TF.isMobileDevice) {
-			if (self.signatureQuestion) {
+		if (TF.isMobileDevice)
+		{
+			if (self.signatureQuestion)
+			{
 				self.signatureQuestion.removeClass('full-page');
 				this.elem.append(self.signatureQuestion);
 			}
-		} else {
+		} else
+		{
 			this.elem.removeClass('full-page');
 		}
 		this.resizeCanvas('200px', '50px');
 	}
 
-	SignatureBlock.prototype.toggleSaveButton = function () {
-		let saveButton = this.element.find('.e-sign-save-button');
-		if (this.signaturePad.isEmpty()) {
+	SignatureBlock.prototype.toggleSaveButton = function()
+	{
+		const saveButton = this.element.find('.e-sign-save-button');
+		if (this.signaturePad.isEmpty())
+		{
 			saveButton.prop('disabled', true);
 		}
-		else {
+		else
+		{
 			saveButton.prop('disabled', false);
 		}
 	}
 
-	SignatureBlock.prototype.resizeCanvas = function (width, height, keepCurrent) {
-		let canvas = this.canvas,
-			val = null;
+	SignatureBlock.prototype.resizeCanvas = function(width, height, keepCurrent)
+	{
+		const canvas = this.canvas;
+		let val = null;
 
-		if (keepCurrent && this.signaturePad && !this.signaturePad.isEmpty()) {
+		if (keepCurrent && this.signaturePad && !this.signaturePad.isEmpty())
+		{
 			val = this.signaturePad.toDataURL();
 		}
 		canvas.style.width = width;
@@ -203,20 +241,25 @@
 		canvas.width = canvas.offsetWidth * ratio;
 		canvas.height = canvas.offsetHeight * ratio;
 		canvas.getContext("2d").scale(ratio, ratio);
-		if (this.signaturePad != null) {
+		if (this.signaturePad != null)
+		{
 			this.signaturePad.clear();
-			if (keepCurrent && val) {
+			if (keepCurrent && val)
+			{
 				this.signaturePad.fromDataURL(val);
 			}
-			else if (this.value != null) {
+			else if (this.value != null)
+			{
 				this.signaturePad.fromDataURL(this.value);
 			}
 		}
 	}
 
-	SignatureBlock.prototype.getValidateResult = function () {
+	SignatureBlock.prototype.getValidateResult = function()
+	{
 		let result = '';
-		if (this.isRequired && (this.value == null || this.value == '')) {
+		if (this.isRequired && (this.value == null || this.value === ''))
+		{
 			result = 'Signature is required.';
 		}
 		return result;

@@ -1,4 +1,6 @@
-(function () {
+(function()
+{
+	const MSG_TYPE_NOT_SUPPORT = "Association type is not correct or supported.";
 	createNamespace("TF.Helper").DataTypeHelper = DataTypeHelper;
 
 	var _DATA_TYPE_ATTRIBUTES = {
@@ -348,45 +350,57 @@
 	};
 
 	var _DATA_TYPES = [];
-	var _RPT_DATA_SCHEMAs = []; // Store ReportDataSchema list
+	var _RPT_DATA_SCHEMAS = []; // Store ReportDataSchema list
 
 	const _noObjectIdDataTypes = ["contact", "scheduledreport", "dashboards"];
 
-	function DataTypeHelper() {
-
-	};
+	function DataTypeHelper()
+	{
+		//constructor
+	}
 
 	/**
 	 * Get data type id from DB and init _DATA_TYPES.
 	 *
 	 * @returns
 	 */
-	DataTypeHelper.prototype.init = function () {
+	DataTypeHelper.prototype.init = function()
+	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), 'datatypes'))
-			.then(function (response) {
-				if (response && Array.isArray(response.Items)) {
+			.then(function(response)
+			{
+				if (response && Array.isArray(response.Items))
+				{
 					var nameIdTable = {};
-					response.Items.forEach(function (item) {
-						if (item.Type) {
-							if (item.Type.toLowerCase() === "dashboard") {
+					response.Items.forEach(function(item)
+					{
+						if (item.Type)
+						{
+							if (item.Type.toLowerCase() === "dashboard")
+							{
 								nameIdTable["dashboards"] = item.ID;
-							} else {
+							} else
+							{
 								nameIdTable[item.Type.toLowerCase()] = item.ID;
 							}
 						}
 					});
 
-					Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function (key) {
-						var attr = _DATA_TYPE_ATTRIBUTES[key];
-						if (attr.name) {
+					Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function(attrKey)
+					{
+						var attr = _DATA_TYPE_ATTRIBUTES[attrKey];
+						if (attr.name)
+						{
 							attr.id = attr.name.toLowerCase() === "dashboard" ? nameIdTable["dashboards"] : nameIdTable[attr.name.toLowerCase()];
 						}
 					});
 				}
 
-				for (var key in _DATA_TYPE_ATTRIBUTES) {
+				for (var key in _DATA_TYPE_ATTRIBUTES)
+				{
 					var obj = _DATA_TYPE_ATTRIBUTES[key];
-					if ((obj.name && obj.isMajorType) || obj.name === "Dashboard" || obj.name === "Other") {
+					if ((obj.name && obj.isMajorType) || obj.name === "Dashboard" || obj.name === "Other")
+					{
 						_DATA_TYPES.push({
 							key: key,
 							name: obj.name,
@@ -398,20 +412,25 @@
 				_DATA_TYPES = Array.sortBy(_DATA_TYPES, "name");
 
 			})
-			.then(function ()  // Initialize ReportDataSchema list
+			.then(function()  // Initialize ReportDataSchema list
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "ReportDataSchemas"))
-					.then(function (response) {
-						if (response && response.Items && response.Items.length) {
+					.then(function(response)
+					{
+						if (response && response.Items && response.Items.length)
+						{
 							var dataTypeIdMap = {};
-							_DATA_TYPES.forEach(function (dataType) {
+							_DATA_TYPES.forEach(function(dataType)
+							{
 								dataTypeIdMap[dataType.id] = dataType.name;
 							});
 
-							response.Items.filter(function (dataSchema) {
+							response.Items.filter(function(dataSchema)
+							{
 								return dataSchema && dataSchema.Enabled === true;
-							}).forEach(function (dataSchema) {
-								_RPT_DATA_SCHEMAs.push({
+							}).forEach(function(dataSchema)
+							{
+								_RPT_DATA_SCHEMAS.push({
 									Id: dataSchema.ID,
 									Name: dataSchema.DisplayName,
 									DataTypeId: dataSchema.DataTypeId,
@@ -421,9 +440,10 @@
 							});
 						}
 					})
-					.catch(function (err) {
+					.catch(function(err)
+					{
 						console.log("Error when initializing ReportDataSchema list.");
-						_RPT_DATA_SCHEMAs.length = 0;
+						_RPT_DATA_SCHEMAS.length = 0;
 					});
 			});
 	};
@@ -432,26 +452,33 @@
 	 * Get the best matched object with type.
 	 * Currently, many places are using different names for data type, this function is to give a little bit flexibility.
 	 * However, this is only a temporary solution. Should be removed once we have data type names standardised.
-	 * 
 	 * @param {string} str2
 	 * @return {object}
 	 */
-	DataTypeHelper.prototype._getObjectByType = function (type) {
-		var self = this, match = null, type = (type || "").toLowerCase();
-		if (_DATA_TYPE_ATTRIBUTES.hasOwnProperty(type)) {
+	DataTypeHelper.prototype._getObjectByType = function(type)
+	{
+		var self = this, match = null;
+		type = (type || "").toLowerCase();
+		if (_DATA_TYPE_ATTRIBUTES.hasOwnProperty(type))
+		{
 			match = _DATA_TYPE_ATTRIBUTES[type];
 		}
-		else {
+		else
+		{
 			var key, temp;
-			for (key in _DATA_TYPE_ATTRIBUTES) {
+			for (key in _DATA_TYPE_ATTRIBUTES)
+			{
 				temp = _DATA_TYPE_ATTRIBUTES[key];
-				if (self._fuzzyMatch(key, type)) {
+				if (self._fuzzyMatch(key, type))
+				{
 					match = temp;
 					break;
 				}
 
 				// matched in includes list has lower priority, so it would not break the loop
-				if (temp.includes && temp.includes.filter(function (value) { return self._fuzzyMatch(value, type) }).length > 0) {
+				if (temp.includes && temp.includes.filter(
+					function(value) { return self._fuzzyMatch(value, type) }).length > 0)
+				{
 					match = temp
 				}
 			}
@@ -461,16 +488,16 @@
 	};
 
 	/**
-	 * Define how fuzzy is the matching. 
+	 * Define how fuzzy is the matching.
 	 *
 	 * @param {string} str1
 	 * @param {string} str2
 	 * @returns {boolean}
 	 */
-	DataTypeHelper.prototype._fuzzyMatch = function (str1, str2) {
+	DataTypeHelper.prototype._fuzzyMatch = function(str1, str2)
+	{
 		return str1 === str2;
-		//return Math.abs(str2.length - str1.length) < 3 && (str1.indexOf(str2) > -1 || str2.indexOf(str1) > -1);
-	};
+	}
 
 	/**
 	 * Get endpoint node text for data type.
@@ -478,9 +505,11 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getEndpoint = function (type) {
+	DataTypeHelper.prototype.getEndpoint = function(type)
+	{
 		var obj = null;
-		switch (type) {
+		switch (type)
+		{
 			case "aide":
 			case "driver":
 				type = "staff";
@@ -504,7 +533,8 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getFormalDataTypeName = function (type) {
+	DataTypeHelper.prototype.getFormalDataTypeName = function(type)
+	{
 		var obj = this._getObjectByType(type);
 		return obj ? obj.name : type;
 	};
@@ -515,7 +545,8 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getIdParamName = function (type) {
+	DataTypeHelper.prototype.getIdParamName = function(type)
+	{
 		var obj = this._getObjectByType(type);
 		return obj ? obj.idParamName : type;
 	};
@@ -526,7 +557,8 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getIdsParamName = function (type) {
+	DataTypeHelper.prototype.getIdsParamName = function(type)
+	{
 		var obj = this._getObjectByType(type);
 		return (obj ? obj.idParamName : type) + "s";
 	};
@@ -537,16 +569,20 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getEntityUpdateConfirmBlackList = function (type) {
+	DataTypeHelper.prototype.getEntityUpdateConfirmBlackList = function(type)
+	{
 		var obj = this._getObjectByType(type);
 		return obj ? obj.entityUpdateConfirmBlackList : [];
 	};
 
-	DataTypeHelper.getValidDataTypes = function (isValidDataTypeFun) {
+	DataTypeHelper.getValidDataTypes = function(isValidDataTypeFun)
+	{
 		var collection = [];
-		for (var key in _DATA_TYPE_ATTRIBUTES) {
+		for (var key in _DATA_TYPE_ATTRIBUTES)
+		{
 			var obj = _DATA_TYPE_ATTRIBUTES[key];
-			if (isValidDataTypeFun(obj, key)) {
+			if (isValidDataTypeFun(obj, key))
+			{
 				collection.push({
 					key: key,
 					name: obj.name,
@@ -568,8 +604,10 @@
 	 *
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getAvailableDataTypes = function () {
-		function isAvailableDataTypeFun(dataTypeAttribute) {
+	DataTypeHelper.prototype.getAvailableDataTypes = function()
+	{
+		function isAvailableDataTypeFun(dataTypeAttribute)
+		{
 			return dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary
 		}
 
@@ -581,8 +619,10 @@
 	 *
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getUDFAvailableDataTypes = function () {
-		function isUDFAvailableDataTypeFun(dataTypeAttribute, dataTypeKey) {
+	DataTypeHelper.prototype.getUDFAvailableDataTypes = function()
+	{
+		function isUDFAvailableDataTypeFun(dataTypeAttribute, dataTypeKey)
+		{
 			return (dataTypeKey === "report") ||
 				(dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary);
 		}
@@ -590,23 +630,28 @@
 		return TF.Helper.DataTypeHelper.getValidDataTypes(isUDFAvailableDataTypeFun);
 	};
 
-	DataTypeHelper.prototype.getAvailableDocumentAssociationGridDataTypes = function () {
+	DataTypeHelper.prototype.getAvailableDocumentAssociationGridDataTypes = function()
+	{
 		return this.getAvailableAssociationGridDataTypes(["document", "gpsevent", "form"]);
 	};
 
-	DataTypeHelper.prototype.getAvailableContactAssociationGridDataTypes = function () {
+	DataTypeHelper.prototype.getAvailableContactAssociationGridDataTypes = function()
+	{
 		// document doesn't have contact.
 		return this.getAvailableAssociationGridDataTypes(["contact", "document", "gpsevent", "form"]);
 	};
 
-	DataTypeHelper.prototype.getAvailableAssociationGridDataTypes = function (excludeDataTypes) {
+	DataTypeHelper.prototype.getAvailableAssociationGridDataTypes = function(excludeDataTypes)
+	{
 		return this.getAvailableDataTypes()
-			.filter(function (dataType) {
+			.filter(function(dataType)
+			{
 				return tf.authManager.isAuthorizedForDataType(dataType.key, "read") && excludeDataTypes.indexOf(dataType.key) < 0;
 			});
 	};
 
-	DataTypeHelper.prototype.getAvailableDataTypesForUDFManagement = function () {
+	DataTypeHelper.prototype.getAvailableDataTypesForUDFManagement = function()
+	{
 		var dataTypesForUDFAdmin = this.getAvailableDataTypes().filter(x => x.enableUDF),
 			reportDataTypeKey = "report",
 			reportDataType = $.extend({}, _DATA_TYPE_ATTRIBUTES[reportDataTypeKey]);
@@ -623,24 +668,36 @@
 		return dataTypesForUDFAdmin;
 	};
 
-	DataTypeHelper.prototype.getKeyById = function (id) {
-		var types = _DATA_TYPES.filter(function (type) { return type.id === id; });
-		if (types.length === 1) {
+	DataTypeHelper.prototype.getKeyById = function(id)
+	{
+		var types = _DATA_TYPES.filter(function(type)
+		{
+			return type.id === id;
+		});
+		if (types.length === 1)
+		{
 			return types[0].key;
 		}
 		return null;
 	};
 
-	DataTypeHelper.prototype.getNameById = function (id) {
-		var types = _DATA_TYPES.filter(function (type) { return type.id === id; });
-		if (types.length === 1) {
+	DataTypeHelper.prototype.getNameById = function(id)
+	{
+		var types = _DATA_TYPES.filter(function(type)
+		{
+			return type.id === id;
+		});
+		if (types.length === 1)
+		{
 			return types[0].name;
 		}
 		return null;
 	};
 
-	DataTypeHelper.prototype.getIdByName = function (name) {
-		var matched = _DATA_TYPES.find(function (type) {
+	DataTypeHelper.prototype.getIdByName = function(name)
+	{
+		var matched = _DATA_TYPES.find(function(type)
+		{
 			return (type.name || "").toLowerCase() === (name || "").toLowerCase();
 		});
 		return matched && matched.id || null;
@@ -652,12 +709,14 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getId = function (type) {
+	DataTypeHelper.prototype.getId = function(type)
+	{
 		var obj = this._getObjectByType(type);
 		return obj && obj.id !== undefined ? obj.id : 0;
 	};
 
-	DataTypeHelper.prototype.getNameByType = function (type) {
+	DataTypeHelper.prototype.getNameByType = function(type)
+	{
 		var obj = this._getObjectByType(type);
 		return obj ? obj.name : "";
 	};
@@ -665,30 +724,43 @@
 	/**
 	 * for new exported files due to table field changed of backend.
 	 */
-	DataTypeHelper.prototype.getNamebyLowerCaseName = function (name) {
-		if (!name) return;
-
-		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(item => (item.name || "").toLowerCase() == name.toLowerCase());
-
-		if (matched.length != 1) return;
-
+	DataTypeHelper.prototype.getNamebyLowerCaseName = function(name)
+	{
+		if (!name)
+		{
+			return '';
+		}
+		const matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(item => (item.name || "").toLowerCase() === name.toLowerCase());
+		if (matched.length !== 1)
+		{
+			return '';
+		}
 		return matched[0].name;
 	};
 
-	DataTypeHelper.prototype.getEndpointByName = function (name) {
-		if (!name) return;
-
-		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function (item) {
+	DataTypeHelper.prototype.getEndpointByName = function(name)
+	{
+		if (!name)
+		{
+			return '';
+		}
+		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function(item)
+		{
 			return (item.name || "").toLowerCase() === name.toLowerCase();
 		});
 
-		if (matched.length !== 1) return;
+		if (matched.length !== 1)
+		{
+			return '';
+		}
 		return matched[0].endpoint;
 	};
 
-	DataTypeHelper.prototype.getDataModelByGridType = function (gridType) {
+	DataTypeHelper.prototype.getDataModelByGridType = function(gridType)
+	{
 		var dataModel = null;
-		switch (gridType) {
+		switch (gridType)
+		{
 			case "altsite":
 				dataModel = new TF.DataModel.AltsiteDataModel();
 				break;
@@ -746,10 +818,12 @@
 	 * @param {String} type
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getGridDefinition = function (type) {
+	DataTypeHelper.prototype.getGridDefinition = function(type)
+	{
 		var obj = this._getObjectByType(type);
 
-		if (obj && obj.gridDefinition) {
+		if (obj && obj.gridDefinition)
+		{
 			return tf[obj.gridDefinition].gridDefinition();
 		}
 
@@ -761,10 +835,12 @@
 	 *
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getAssociationTotalCount = function (type) {
+	DataTypeHelper.prototype.getAssociationTotalCount = function(type)
+	{
 		var self = this, dataTypes = [];
 
-		switch (type) {
+		switch (type)
+		{
 			case "document":
 				dataTypes = self.getAvailableDocumentAssociationGridDataTypes();
 				break;
@@ -774,17 +850,22 @@
 		}
 
 		var promises = self.getAllRequestUrls(dataTypes)
-			.map(function (url) {
-				return tf.promiseAjax.get(url).then(response => {
+			.map(function(url)
+			{
+				return tf.promiseAjax.get(url).then(response =>
+				{
 					return response;
-				}, error => {
+				}, error =>
+				{
 					return { Items: [] };
 				});
 			});
 
-		return Promise.all(promises).then(function (responses) {
+		return Promise.all(promises).then(function(responses)
+		{
 			var totalCount = 0;
-			for (var i = 0, count = responses.length; i < count; i++) {
+			for (var i = 0, count = responses.length; i < count; i++)
+			{
 				var response = responses[i];
 				totalCount += response.Items.length;
 			}
@@ -793,8 +874,9 @@
 		});
 	};
 
-	DataTypeHelper.prototype.deleteRecordByIds = function (dataType, ids) {
-		let obj = this._getObjectByType(dataType),
+	DataTypeHelper.prototype.deleteRecordByIds = function(dataType, ids)
+	{
+		const obj = this._getObjectByType(dataType),
 			prefix = obj.hasDBID ? tf.api.apiPrefix() : tf.api.apiPrefixWithoutDatabase(),
 			baseUrl = pathCombine(prefix, obj.endpoint),
 			primaryKeyField = _noObjectIdDataTypes.includes(dataType.toLowerCase()) ? "Id" : "ObjectId";
@@ -809,7 +891,7 @@
 				}).then(res => res.Items.map(item => item[primaryKeyField]) || [])
 			))
 			.then(resArr => resArr.reduce((pre, cur) => pre.concat(cur), []))
-			.then(ids => tf.promiseAjax.delete(baseUrl, { data: ids }));
+			.then(_ids => tf.promiseAjax.delete(baseUrl, { data: _ids }));
 	};
 
 	/**
@@ -818,11 +900,14 @@
 	 * @param {Array} dataTypes
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getAllRequestUrls = function (dataTypes) {
-		return dataTypes.map(function (item) {
+	DataTypeHelper.prototype.getAllRequestUrls = function(dataTypes)
+	{
+		return dataTypes.map(function(item)
+		{
 			var endpoint = tf.dataTypeHelper.getEndpoint(item.key);
 			var selectColumns = "?@fields=Id";
-			if (item.key === "contact" || item.key === "recordcontact") {
+			if (item.key === "contact" || item.key === "recordcontact")
+			{
 				selectColumns = "?@fields=Id&DBID=" + tf.api.datasourceManager.databaseId;
 				return pathCombine(tf.api.apiPrefixWithoutDatabase(), endpoint) + selectColumns;
 			}
@@ -830,10 +915,12 @@
 		});
 	};
 
-	DataTypeHelper.prototype.createAssociationEntity = function (recordType, recordId, associationType, associationId) {
+	DataTypeHelper.prototype.createAssociationEntity = function(recordType, recordId, associationType, associationId)
+	{
 		var databaseId = tf.datasourceManager.databaseId,
 			dataTypeId = tf.dataTypeHelper.getId(recordType);
-		switch (associationType) {
+		switch (associationType)
+		{
 			case "document":
 				return {
 					DocumentRelationshipID: 0,
@@ -850,23 +937,29 @@
 					RecordID: recordId
 				};
 			default:
-				console.error("Association type is not correct or supported.");
+				console.error(MSG_TYPE_NOT_SUPPORT);
+				return {};
 		}
 	};
 
-	DataTypeHelper.prototype.getAssociationEndpoint = function (type) {
-		switch (type) {
+	DataTypeHelper.prototype.getAssociationEndpoint = function(type)
+	{
+		switch (type)
+		{
 			case "document":
 				return "DocumentRelationships";
 			case "contact":
 				return "RecordContacts";
 			default:
-				console.error("Association type is not correct or supported.");
+				console.error(MSG_TYPE_NOT_SUPPORT);
+				return "";
 		}
 	};
 
-	DataTypeHelper.prototype.getGridNameByDataType = function (type) {
-		switch (type) {
+	DataTypeHelper.prototype.getGridNameByDataType = function(type)
+	{
+		switch (type)
+		{
 			case "document":
 				return "DocumentGrid";
 			case "contact":
@@ -880,11 +973,13 @@
 			case "UDGrid":
 				return "UDGridId";
 			default:
-				console.error("Association type is not correct or supported.");
+				console.error(MSG_TYPE_NOT_SUPPORT);
+				return "";
 		}
 	};
 
-	DataTypeHelper.prototype.getRecordByIdsAndColumns = function (dbid, dataType, ids, columns, sortFields) {
+	DataTypeHelper.prototype.getRecordByIdsAndColumns = function(dbid, dataType, ids, columns, sortFields)
+	{
 		const generateSortItem = name => ({ Name: name, isAscending: "asc", Direction: "Ascending" });
 		const prefix = dbid == null ? tf.api.apiPrefix() : `${tf.api.apiPrefixWithoutDatabase()}/${dbid}`;
 		const endpoint = this.getEndpoint(dataType);
@@ -902,11 +997,13 @@
 		}).then((response) => response.Items);
 	};
 
-	DataTypeHelper.prototype.getSingleRecordByIdAndColumns = function (dataType, id, columns) {
+	DataTypeHelper.prototype.getSingleRecordByIdAndColumns = function(dataType, id, columns)
+	{
 		var endpoint = this.getEndpoint(dataType),
 			mainUrl = tf.api.apiPrefix();
 
-		if (dataType == "contact") {
+		if (dataType === "contact")
+		{
 			mainUrl = tf.api.apiPrefixWithoutDatabase();
 		}
 		return tf.promiseAjax.get(pathCombine(mainUrl, endpoint), {
@@ -914,33 +1011,39 @@
 				Id: id,
 				"@fields": columns
 			}
-		}).then(function (response) {
+		}).then(function(response)
+		{
 			return response.Items;
 		});
 	};
 
 
 	/**
-	 * Get default columns to be displayed on grid for specified data type. 
+	 * Get default columns to be displayed on grid for specified data type.
 	 *
 	 * @param {string} dataType
 	 * @returns
 	 */
-	DataTypeHelper.prototype.getDefaultColumnsByDataType = function (dataType) {
+	DataTypeHelper.prototype.getDefaultColumnsByDataType = function(dataType)
+	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "griddefaults?gridName=" + dataType))
-			.then(function (apiResponse) {
+			.then(function(apiResponse)
+			{
 				var columns = apiResponse.Items[0].Columns.split(",");
 
-				return tf.dataTypeHelper.getGridDefinition(dataType).Columns.filter(function (defColumn) {
+				return tf.dataTypeHelper.getGridDefinition(dataType).Columns.filter(function(defColumn)
+				{
 					return columns.indexOf(defColumn.FieldName) >= 0;
 				});
-			}.bind(this)).catch(function () { });
+			}.bind(this));
 	};
 
-	DataTypeHelper.prototype.getBasicColumnsByDataType = function (gridType) {
+	DataTypeHelper.prototype.getBasicColumnsByDataType = function(gridType)
+	{
 		var columns = [];
 
-		switch (gridType) {
+		switch (gridType)
+		{
 			case "altsite":
 			case "document":
 			case "contractor":
@@ -1025,16 +1128,19 @@
 		return columns;
 	};
 
-	DataTypeHelper.prototype.getEntityName = function (dataType, entity) {
+	DataTypeHelper.prototype.getEntityName = function(dataType, entity)
+	{
 		var name = '';
-		if (entity) {
-			switch (dataType) {
+		if (entity)
+		{
+			switch (dataType)
+			{
 				case "staff":
 				case "student":
 				case "contact":
 					var firstName = entity.FirstName || '',
 						lastName = entity.LastName || '';
-					name = (firstName + " " + lastName).trim();
+					name = (`${firstName} ${lastName}`).trim();
 					break;
 				case "tripstop":
 					name = entity.Street;
@@ -1051,36 +1157,49 @@
 		return name;
 	};
 
-	DataTypeHelper.prototype.getAllReportDataSchemas = function () {
-		return _RPT_DATA_SCHEMAs;
+	DataTypeHelper.prototype.getAllReportDataSchemas = function()
+	{
+		return _RPT_DATA_SCHEMAS;
 	};
 
-	DataTypeHelper.prototype.getReportDataSchemaById = function (schemaId) {
-		var schemas = _RPT_DATA_SCHEMAs.filter(function (schema) { return schema.Id === schemaId; });
-		if (schemas.length === 1) {
+	DataTypeHelper.prototype.getReportDataSchemaById = function(schemaId)
+	{
+		var schemas = _RPT_DATA_SCHEMAS.filter(function(schema)
+		{
+			return schema.Id === schemaId;
+		});
+		if (schemas.length === 1)
+		{
 			return schemas[0];
 		}
 
 		return null;
 	};
 
-	DataTypeHelper.prototype.getReportDataSchemaByName = function (dataTypeName, schemaName) {
-		var schemas = _RPT_DATA_SCHEMAs.filter(function (schema) { return schema.DataTypeName === dataTypeName && schema.Name === schemaName; });
-		if (schemas.length === 1) {
+	DataTypeHelper.prototype.getReportDataSchemaByName = function(dataTypeName, schemaName)
+	{
+		var schemas = _RPT_DATA_SCHEMAS.filter(function(schema)
+		{
+			return schema.DataTypeName === dataTypeName && schema.Name === schemaName;
+		});
+		if (schemas.length === 1)
+		{
 			return schemas[0];
 		}
 
 		return null;
 	};
 
-	DataTypeHelper.prototype.getApiPrefix = function (dataType, dbid) {
+	DataTypeHelper.prototype.getApiPrefix = function(dataType, dbid)
+	{
 		var obj = this._getObjectByType(dataType),
 			prefix = obj.hasDBID ? tf.api.apiPrefix(null, dbid) : tf.api.apiPrefixWithoutDatabase();
 
 		return pathCombine(prefix, obj.endpoint);
 	};
 
-	DataTypeHelper.prototype.getSearchApiPrefix = function (dataTypeName, dbid) {
+	DataTypeHelper.prototype.getSearchApiPrefix = function(dataTypeName, dbid)
+	{
 		var dataTypeId = this.getIdByName(dataTypeName),
 			dataTypeKey = this.getKeyById(dataTypeId),
 			obj = this._getObjectByType(dataTypeKey),
@@ -1089,21 +1208,31 @@
 		return pathCombine(prefix, "search", obj.endpoint);
 	};
 
-	DataTypeHelper.prototype.getExportFileEndpoint = function (dataType) {
-		if (!dataType) return "";
-		var dataType = this._getObjectByType(dataType);
-		if (!dataType || !dataType.id) return "";
+	DataTypeHelper.prototype.getExportFileEndpoint = function(dataType)
+	{
+		if (!dataType)
+		{
+			return "";
+		}
+		dataType = this._getObjectByType(dataType);
+		if (!dataType || !dataType.id)
+		{
+			return "";
+		}
 		var dataTypeKey = this.getKeyById(dataType.id);
-		if (dataTypeKey == 'altsite') {
+		if (dataTypeKey === 'altsite')
+		{
 			dataTypeKey = "alternatesite"
 		}
 
 		return pathCombine("search", dataTypeKey + 'exportfiles');
 	};
 
-	DataTypeHelper.prototype.saveTripCalendarRecords = function (trips) {
+	DataTypeHelper.prototype.saveTripCalendarRecords = function(trips)
+	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "TripCalendarRecords"), {
-			data: trips.map(trip => {
+			data: trips.map(trip =>
+			{
 				return {
 					DBID: tf.datasourceManager.databaseId,
 					StartDate: trip.StartDate == null ? moment().format("YYYY-MM-DDT00:00:00") : trip.StartDate,
@@ -1126,8 +1255,10 @@
 		});
 	};
 
-	DataTypeHelper.prototype.getFormDataType = function (dataType) {
-		switch ((dataType || '').toLowerCase()) {
+	DataTypeHelper.prototype.getFormDataType = function(dataType)
+	{
+		switch ((dataType || '').toLowerCase())
+		{
 			case 'altsite':
 			case 'alternatesite':
 				return "Alternate Site";
