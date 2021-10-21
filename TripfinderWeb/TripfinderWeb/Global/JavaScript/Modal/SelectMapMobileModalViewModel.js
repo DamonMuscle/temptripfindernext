@@ -46,7 +46,7 @@
 			if (self._base)
 			{
 				var $mapToolLabel = self._base.$offMapTool.find('.map-tool-label-fix');
-				if ($mapToolLabel && $mapToolLabel.length) 
+				if ($mapToolLabel && $mapToolLabel.length)
 				{
 					$mapToolLabel.css('display', 'block');
 				}
