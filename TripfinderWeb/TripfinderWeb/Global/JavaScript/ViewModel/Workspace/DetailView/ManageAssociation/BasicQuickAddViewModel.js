@@ -1,8 +1,11 @@
-(function () {
-	(function () {
+(function()
+{
+	(function()
+	{
 		createNamespace("TF.DetailView").BasicQuickAddViewModel = BasicQuickAddViewModel;
 
-		function BasicQuickAddViewModel(options) {
+		function BasicQuickAddViewModel(options)
+		{
 			var self = this;
 			self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 			self.quickAddViewModel = options.isUDFGroup ? new TF.DetailView.UDGridGridStackQuickAddWrapper(
@@ -12,26 +15,34 @@
 					$.extend({}, options, {
 						pageLevelViewModel: self.pageLevelViewModel
 					}));
-		};
+		}
 
-		BasicQuickAddViewModel.prototype.save = function () {
+		BasicQuickAddViewModel.prototype.save = function()
+		{
 			var self = this;
 			return self.quickAddViewModel.save()
-				.then(function (result) {
-					if (result) {
-						if (result.success) {
+				.then(function(result)
+				{
+					if (result)
+					{
+						if (result.success)
+						{
 							self.pageLevelViewModel.clearError();
 							self.pageLevelViewModel.popupSuccessMessage("The record has been successfully created.");
 							return result;
 						}
-						else {
+						else
+						{
 							return false;
 						}
 					}
+
+					return undefined;
 				});
 		};
 
-		BasicQuickAddViewModel.prototype.cancel = function () {
+		BasicQuickAddViewModel.prototype.cancel = function()
+		{
 			const self = this;
 			return self.quickAddViewModel.cancel()
 		};
@@ -39,16 +50,19 @@
 
 		/**
 		 * Dispose
-		 * 
+		 *
 		 * @return {void}
 		 */
-		BasicQuickAddViewModel.prototype.dispose = function () {
+		BasicQuickAddViewModel.prototype.dispose = function()
+		{
 			var self = this;
-			if (self.quickAddViewModel) {
+			if (self.quickAddViewModel)
+			{
 				self.quickAddViewModel.dispose();
 			}
 
-			if (self.pageLevelViewModel) {
+			if (self.pageLevelViewModel)
+			{
 				self.pageLevelViewModel.dispose();
 			}
 		};
