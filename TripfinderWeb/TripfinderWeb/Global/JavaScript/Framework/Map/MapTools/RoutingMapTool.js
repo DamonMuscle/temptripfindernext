@@ -31,7 +31,6 @@
 			onLegendStatusChanged: null,
 			obTrips: null
 		}, options);
-		//self.options.trafficMapAvailable = self.options.trafficMapAvailable && tf.authManager.hasTraffic();
 		self.options.trafficMapAvailable = false;
 		self.routingMapDocumentViewModel = routingMapDocumentViewModel;
 		self.$container = routingMapDocumentViewModel.element;
@@ -47,8 +46,6 @@
 		);
 		self.onCandidatesStudentsChangeEvent = self.onCandidatesStudentsChangeEvent.bind(self);
 		self.highlightChangedEvent = self.highlightChangedEvent.bind(self);
-		// self.geoFinderTool = new TF.Map.GeoFinderTool(self);
-		//if (routingMapDocumentViewModel.type == "georegion") self.drawGeoregionBoundaryTool = new TF.Map.DrawGeoregionBoundaryTool(self);
 		self.baseMapTools = null;
 	}
 
@@ -58,7 +55,6 @@
 	RoutingMapTool.prototype.init = function ()
 	{
 		TF.Map.BaseMapTool.prototype.init.call(this);
-		// this.initThematicsTool();
 	};
 
 	RoutingMapTool.prototype.startSketch = function (toolName)
@@ -66,30 +62,34 @@
 		var previousToolName = this._currentToolName;
 		this._currentToolName = toolName;
 
-		if (this.routingMapDocumentViewModel.gridMapPopup && this.routingMapDocumentViewModel.disableMouseEvent) {
-			this.routingMapDocumentViewModel.disableMouseEvent();
-		}
-
-		if (toolName != "measurementTool" && previousToolName == "measurementTool") {
+		if (toolName !== "measurementTool" && previousToolName === "measurementTool") {
 			this.measurementTool && this.measurementTool.deactivate();
 		}
-		if (toolName != "geoSearchTool" && previousToolName == "geoSearchTool") {
+		if (toolName !== "geoSearchTool" && previousToolName === "geoSearchTool") {
 			this.geoSearchTool && this.geoSearchTool.cancelGeoSearchChanges();
 		}
-		if (toolName != "geoFinderTool" && previousToolName == "geoFinderTool") {
+		if (toolName !== "geoFinderTool" && previousToolName === "geoFinderTool") {
 			this.geoFinderTool && this.geoFinderTool.endGeoFinder();
 		}
-		if (toolName != "manuallyPinTool" && previousToolName == "manuallyPinTool") {
+		if (toolName !== "manuallyPinTool" && previousToolName === "manuallyPinTool") {
 			this.manuallyPinTool && this.manuallyPinTool.stopPin();
 		}
-		if (toolName != "drawGeoregionBoundaryTool" && previousToolName == "drawGeoregionBoundaryTool") {
+		if (toolName !== "drawGeoregionBoundaryTool" && previousToolName === "drawGeoregionBoundaryTool") {
 			this.drawGeoregionBoundaryTool && this.drawGeoregionBoundaryTool.stopDraw();
 		}
 	};
 
+	RoutingMapTool.prototype.disableMouseEvent = function(toolName)
+	{
+		if (this.routingMapDocumentViewModel.gridMapPopup && this.routingMapDocumentViewModel.disableMouseEvent)
+		{
+			this.routingMapDocumentViewModel.disableMouseEvent();
+		}
+	}
+
 	RoutingMapTool.prototype.stopSketch = function (toolName)
 	{
-		if (toolName == this._currentToolName) {
+		if (toolName === this._currentToolName) {
 			if (this.routingMapDocumentViewModel.gridMapPopup) {
 				this.routingMapDocumentViewModel.enableMouseEvent();
 			}
@@ -98,9 +98,12 @@
 
 	RoutingMapTool.prototype.GetLocationMarkerToolbarItems = function ()
 	{
-		if (!this.options.locationMarkerList) return;
+		if (!this.options.locationMarkerList)
+		{
+			return;
+		}
 		if (this.options.locationMarkerAvailable) {
-			let toolbarItems = [];
+			const toolbarItems = [];
 
 			if (this.options.trashAvailable) {
 				let trashIcon = 'trash';
@@ -116,7 +119,7 @@
 				}));
 			}
 
-			let locationMarkerToolItems = this.options.locationMarkerList.map(marker => new TF.RoutingMap.MenuItem({
+			const locationMarkerToolItems = this.options.locationMarkerList.map(marker => new TF.RoutingMap.MenuItem({
 				toggleStatus: ko.observable(false),
 				header: marker,
 				closable: true,
@@ -159,15 +162,27 @@
 
 		var children = this.options.buildPalettes().sort(function (a, b)
 		{
-			if (a.header > b.header) return 1;
-			else if (a.header == b.header) return 0;
-			else return -1;
+			if (a.header > b.header)
+			{
+				return 1;
+			}
+			else if (a.header === b.header)
+			{
+				return 0;
+			}
+			else
+			{
+				return -1;
+			}
 		});
 		if (children.length > 0) {
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Palettes',
 				icon: 'palettes',
-				click: function () { },
+				click: function ()
+				{
+					// This is intentional
+				},
 				children: children
 			}));
 		}
@@ -203,11 +218,34 @@
 			}));
 		}
 
-		if (this.options.geoFinderAvailable) {
+		self.GetPartialMenuItems();
+
+		if (this.options.myLocationAvailable) {
+			let iconClass = 'location-arrow';
+			if (this.options.disableMyLocationBtn) {
+				iconClass += " disable";
+			}
+			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+				header: 'My Location',
+				icon: iconClass,
+				closable: true,
+				click: () => this.myLocationClick()
+			}));
+		}
+	};
+
+	RoutingMapTool.prototype.GetPartialMenuItems = function()
+	{
+		const self = this;
+		if (this.options.geoFinderAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Geofinder',
 				icon: 'geofinder',
-				click: function () { },
+				click: function()
+				{
+					// This is intentional
+				},
 				children: [
 					new TF.RoutingMap.MenuItem({
 						toggleStatus: ko.observable(false),
@@ -234,7 +272,8 @@
 			}));
 		}
 
-		if (this.options.geoSearchAvailable) {
+		if (this.options.geoSearchAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Geo Search',
 				icon: 'geosearch',
@@ -243,7 +282,8 @@
 			}));
 		}
 
-		if (this.options.homeToSchoolPathAvailable) {
+		if (this.options.homeToSchoolPathAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Home to School Path',
 				icon: 'studentWalk',
@@ -252,7 +292,8 @@
 			}));
 		}
 
-		if (this.options.clearGeoSearchAvailable) {
+		if (this.options.clearGeoSearchAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Clear Shapes',
 				icon: 'clear-geosearch',
@@ -261,7 +302,8 @@
 			}));
 		}
 
-		if (this.options.measurementAvailable) {
+		if (this.options.measurementAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Measurement',
 				icon: 'measurement',
@@ -270,7 +312,8 @@
 			}));
 		}
 
-		if (this.options.playbackAvailable) {
+		if (this.options.playbackAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Playback',
 				icon: 'playback',
@@ -279,7 +322,8 @@
 			}));
 		}
 
-		if (this.options.printAvailable) {
+		if (this.options.printAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Print',
 				icon: 'print',
@@ -288,25 +332,13 @@
 			}));
 		}
 
-		if (this.options.homeAvailable) {
+		if (this.options.homeAvailable)
+		{
 			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
 				header: 'Home',
 				icon: 'home',
 				closable: true,
 				click: () => this.homeClick()
-			}));
-		}
-
-		if (this.options.myLocationAvailable) {
-			let iconClass = 'location-arrow';
-			if (this.options.disableMyLocationBtn) {
-				iconClass += " disable";
-			}
-			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
-				header: 'My Location',
-				icon: iconClass,
-				closable: true,
-				click: () => this.myLocationClick()
 			}));
 		}
 	};
@@ -371,24 +403,25 @@
 				var measurementPanel = this.measurementTool.$infoPanel.find(".active.measurement-panel"),
 					measurementPanelMargin = 5,
 					measurementPanelWidth = measurementPanel.width(),
-					measurementPanelHeight = measurementPanel.height();
-				measurementPanelCopy = $(`<div id='measurementInfoPanel' class='measurement-info-panel active'><div class='measurement-panel-container'>${measurementPanel[0].outerHTML}</div></div>`)
+					measurementPanelHeight = measurementPanel.height(),
+					mpoHTML = measurementPanel[0].outerHTML,
+					leftPX = (width - measurementPanelWidth - measurementPanelMargin),
+					topPX = (height - measurementPanelHeight - measurementPanelMargin);
+				measurementPanelCopy = $(`<div id='measurementInfoPanel' class='measurement-info-panel active'><div class='measurement-panel-container'>${mpoHTML}</div></div>`)
 					.addClass("printable")
 					.width(measurementPanelWidth)
 					.height(measurementPanelHeight)
 					.css({
 						position: "absolute",
-						left: (width - measurementPanelWidth - measurementPanelMargin) + "px",
-						top: (height - measurementPanelHeight - measurementPanelMargin) + "px"
+						left: leftPX + "px",
+						top: topPX + "px"
 					});
 				$(document.body).append(measurementPanelCopy);
 				measurementPanelCopy.find(".location-track").remove();
 			}
 		}).catch(() =>
 		{
-			if (endPrint) {
-				endPrint();
-			}
+			self.executeMethod(endPrint);
 		});
 	};
 
@@ -442,37 +475,59 @@
 		allStudents = allStudents ? allStudents : [];
 		highlightedStudents = highlightedStudents ? highlightedStudents : [];
 		if (self.thematicTool) {
-			allStudents = allStudents.length > 0 ? allStudents.filter(function (item) 
+			allStudents = allStudents.length > 0 ? allStudents.filter(function (item)
 			{
-				if (item.geometry) return item.geometry;
-				if (item.XCoord) return item.XCoord;
-				if (item.Xcoord) return item.Xcoord;
+				return self.filterStudent(item);
 			}) : allStudents;
 			self.thematicTool.grid.result = { TotalRecordCount: allStudents.length };
 			self.thematicTool.grid.allIds = allStudents.map(function (s)
 			{
-				if (s.entityId && (self.thematicTool.grid._gridType == "district" || self.thematicTool.grid._gridType == "trip")) {
-					return s.entityId;
-				}
-				else if (s.id) {
-					return s.id;
-				}
-				else if (s.Id) {
-					return s.Id;
-				}
-
+				return self.mapStudent(s);
 			});
 			self.thematicTool.grid.allData = allStudents;
-			self.thematicTool.grid.highLightedData = highlightedStudents.length > 0 ? highlightedStudents.filter(function (item) 
+			self.thematicTool.grid.highLightedData = highlightedStudents.length > 0 ? highlightedStudents.filter(function (item)
 			{
-				if (item.geometry) return item.geometry;
-				if (item.XCoord) return item.XCoord;
-				if (item.Xcoord) return item.Xcoord;
+				return self.filterStudent(item);
 			}) : highlightedStudents;
 			if (self.thematicTool.thematicInfo != null) {
 				self.thematicTool.thematicMenu.refreshThematic();
 			}
 		}
+	};
+
+	RoutingMapTool.prototype.mapStudent = function(s)
+	{
+		const self = this;
+		if (s.entityId && (self.thematicTool.grid._gridType === "district" || self.thematicTool.grid._gridType === "trip"))
+		{
+			return s.entityId;
+		}
+		else if (s.id)
+		{
+			return s.id;
+		}
+		else if (s.Id)
+		{
+			return s.Id;
+		}
+		return undefined;
+	};
+
+	RoutingMapTool.prototype.filterStudent = function(item)
+	{
+		if (item.geometry)
+		{
+			return item.geometry;
+		}
+		if (item.XCoord)
+		{
+			return item.XCoord;
+		}
+		if (item.Xcoord)
+		{
+			return item.Xcoord;
+		}
+		return undefined;
 	};
 
 	/**
@@ -484,11 +539,13 @@
 		var self = this;
 		self.thematicsToolTimer = setTimeout(function ()
 		{
-			var grid = { _gridType: self.options.mapToolOptions != undefined ? self.options.mapToolOptions.gridType : 'student', result: { TotalRecordCount: 0 }, allIds: [], allData: [], highLightedData: [], dataType: 'unassignedStudents', isMapCanvas: self.options.mapToolOptions == undefined };
+			var grid = { _gridType: self.options.mapToolOptions !== undefined ? self.options.mapToolOptions.gridType : 'student',
+			result: { TotalRecordCount: 0 }, allIds: [], allData: [], highLightedData: [], dataType: 'unassignedStudents', isMapCanvas: self.options.mapToolOptions === undefined };
 			var document;
 			if (self.routingMapDocumentViewModel.gridMultiDocumentViewModel) {
 				document = self.routingMapDocumentViewModel.gridMultiDocumentViewModel;
-			} else if (self.routingMapDocumentViewModel.routeState && !(tf && tf.isViewfinder)) {
+			}
+			else if (self.routingMapDocumentViewModel.routeState && !(tf && tf.isViewfinder)) {
 				document = tf.documentManagerViewModel._findDocument(self.routingMapDocumentViewModel.routeState);
 			}
 			if (document && document.gridViewModel) {
@@ -511,17 +568,25 @@
 				self.options.thematicLayerId,
 				self.options.mapToolOptions);
 
-			self.$thematicTool = self.$offMapTool.find('.thematic-menu');
-			self.thematicTool.thematicMenu.onMenuOptionClick.subscribe(self.onThematicMenuOptionClick.bind(self));
-
-			if (self.options.onThematicChanged) {
-				self.thematicTool.thematicMenu.onThematicChanged.subscribe(self.options.onThematicChanged);
-			}
-
-			if (self.options.onLegendStatusChanged) {
-				self.thematicTool.thematicMenu.onLegendStatusChanged.subscribe(self.options.onLegendStatusChanged);
-			}
+			self.initThematicMenu();
 		});
+	};
+
+	RoutingMapTool.prototype.initThematicMenu = function()
+	{
+		const self = this;
+		self.$thematicTool = self.$offMapTool.find('.thematic-menu');
+		self.thematicTool.thematicMenu.onMenuOptionClick.subscribe(self.onThematicMenuOptionClick.bind(self));
+
+		if (self.options.onThematicChanged)
+		{
+			self.thematicTool.thematicMenu.onThematicChanged.subscribe(self.options.onThematicChanged);
+		}
+
+		if (self.options.onLegendStatusChanged)
+		{
+			self.thematicTool.thematicMenu.onLegendStatusChanged.subscribe(self.options.onLegendStatusChanged);
+		}
 	};
 
 	RoutingMapTool.prototype.onThematicMenuOptionClick = function ()
@@ -550,7 +615,10 @@
 		return new TF.RoutingMap.MenuItem({
 			header: 'Draw GeoRegion Boundary',
 			icon: 'geosearch',
-			click: function () { },
+			click: function ()
+			{
+				// This is intentional
+			},
 			children: [
 				new TF.RoutingMap.MenuItem({
 					toggleStatus: ko.observable(false),
@@ -605,7 +673,7 @@
 		if (!self.drawGeoregionBoundaryTool) {
 			self.drawGeoregionBoundaryTool = new TF.Map.DrawGeoregionBoundaryTool(self);
 		}
-		if (self.routingMapDocumentViewModel._map.findLayerById("georegionPointLayer").graphics.items.length == 0) {
+		if (self.routingMapDocumentViewModel._map.findLayerById("georegionPointLayer").graphics.items.length === 0) {
 			tf.promiseBootbox.alert("Please manually pin a geo region locaton first!");
 			return;
 		}
@@ -642,7 +710,10 @@
 				self.$toolkitButton.addClass("active");
 				TF.Map.ExpandMapTool.moveMobileFullScreenBaseMapBehind(self.$offMapTool);
 
-				if (_.isEmpty(self.baseMapModel)) self.baseMapModel = new TF.Modal.SelectMapModalViewModel(self);
+				if (_.isEmpty(self.baseMapModel))
+				{
+					self.baseMapModel = new TF.Modal.SelectMapModalViewModel(self);
+				}
 
 				tf.modalManager.showModal(self.baseMapModel);
 			} else {
@@ -705,7 +776,6 @@
 	RoutingMapTool.prototype.initBaseMapTool = function (externalId)
 	{
 		//this.options.mapToolOptions.urlWithoutPrefix = true when viewfinder
-		var imageJsonUrlPrefix = this.options && this.options.mapToolOptions && this.options.mapToolOptions.urlWithoutPrefix ? "./" : "../../";
 		var self = this;
 		var basemapSelectedClass = "esri-basemap-gallery__item--selected";
 		var id = externalId || "basemap-menu-" + self.getRouteState();
@@ -718,8 +788,9 @@
 			if (baseMap.id === "my-maps" && self.options.myMapAvailable === false) {
 				return;
 			}
-			var $li = $('<li class="esri-basemap-gallery__item" role="menuitem" tabindex="0" ><img  alt = "" class= "esri-basemap-gallery__item-thumbnail" src="' + baseMap.thumbnail + '" ><div class="esri-basemap-gallery__item-title">' + baseMap.title + '</div></li>');
-			if (self.routingMapDocumentViewModel._map.basemap.id == baseMap.id) {
+			var $li = $(`<li class="esri-basemap-gallery__item" role="menuitem" tabindex="0" ><img  alt = "" class= "esri-basemap-gallery__item-thumbnail" src="${baseMap.thumbnail}" >
+			<div class="esri-basemap-gallery__item-title">${baseMap.title}</div></li>`);
+			if (self.routingMapDocumentViewModel._map.basemap.id === baseMap.id) {
 				$li.addClass(basemapSelectedClass);
 			}
 			$ul.append($li);
@@ -729,42 +800,10 @@
 					tf.userPreferenceManager.save(self.options.baseMapSaveKey, baseMap.id);
 				}
 				$(self.routingMapDocumentViewModel._map.mapView.container).css("background-color", "white");
-				if (baseMap.id == "my-maps") {
-					var layersViewModel;
-					if (self.routingMapDocumentViewModel.mapLayersPaletteViewModel) {
-						layersViewModel = self.routingMapDocumentViewModel.mapLayersPaletteViewModel;
-						layersViewModel.show();
-					} else {
-						layersViewModel = new TF.RoutingMap.MapLayersPaletteViewModel(self.routingMapDocumentViewModel, false, self.getRouteState());
-						self.routingMapDocumentViewModel.onMapLoad.notify();
-						setTimeout(() =>
-						{
-							layersViewModel.show();
-						}, 20);
-					}
-				}
-				else {
-					if (self.routingMapDocumentViewModel._map.basemap.id == "my-maps" && self.routingMapDocumentViewModel.parcelPaletteViewModel) {
-						//hide parcel point layer if change basemap. 
-						self.routingMapDocumentViewModel.parcelPaletteViewModel.minusShowCount();
-						if (self.routingMapDocumentViewModel.parcelPaletteViewModel.showCount == 0) { self.routingMapDocumentViewModel.parcelPaletteViewModel.close() }
-					}
-
-					if (typeof baseMap.getBasemap === "function") {
-						self.routingMapDocumentViewModel._map.basemap = baseMap.getBasemap(imageJsonUrlPrefix);
-					} else {
-						self.routingMapDocumentViewModel._map.basemap = baseMap.id;
-					}
-				}
-
+				self.initPartialBaseMapTool(baseMap);
 				self.toolkitBtnClick();
 				self.hideSubMenu();
-				if (TF.isPhoneDevice) {
-					self.baseMapModel && self.baseMapModel.positiveClick();
-					self.$offMapTool.css({
-						'display': 'block'
-					});
-				}
+				self.blockOffMapTool();
 			});
 		});
 		this.initTrafficMap($ul);
@@ -780,8 +819,74 @@
 		return $basemapGallery;
 	};
 
+	RoutingMapTool.prototype.blockOffMapTool = function()
+	{
+		const self = this;
+		if (TF.isPhoneDevice)
+		{
+			self.baseMapModel && self.baseMapModel.positiveClick();
+			self.$offMapTool.css({
+				'display': 'block'
+			});
+		}
+	};
+
+	RoutingMapTool.prototype.initPartialBaseMapTool = function(baseMap)
+	{
+		const self = this;
+
+		if (baseMap.id === "my-maps")
+		{
+			var layersViewModel;
+			if (self.routingMapDocumentViewModel.mapLayersPaletteViewModel)
+			{
+				layersViewModel = self.routingMapDocumentViewModel.mapLayersPaletteViewModel;
+				layersViewModel.show();
+			}
+			else
+			{
+				layersViewModel = new TF.RoutingMap.MapLayersPaletteViewModel(self.routingMapDocumentViewModel, false, self.getRouteState());
+				self.routingMapDocumentViewModel.onMapLoad.notify();
+				setTimeout(() =>
+				{
+					layersViewModel.show();
+				}, 20);
+			}
+		}
+		else
+		{
+			if (self.routingMapDocumentViewModel._map.basemap.id === "my-maps" && self.routingMapDocumentViewModel.parcelPaletteViewModel)
+			{
+				//hide parcel point layer if change basemap.
+				self.routingMapDocumentViewModel.parcelPaletteViewModel.minusShowCount();
+				if (self.routingMapDocumentViewModel.parcelPaletteViewModel.showCount === 0)
+				{
+					self.routingMapDocumentViewModel.parcelPaletteViewModel.close();
+				}
+			}
+
+			self.executeGetBasemap(baseMap);
+		}
+	};
+
+	RoutingMapTool.prototype.executeGetBasemap = function(baseMap)
+	{
+		const self = this;
+		var imageJsonUrlPrefix = this.options && this.options.mapToolOptions && this.options.mapToolOptions.urlWithoutPrefix ? "./" : "../../";
+
+		if (typeof baseMap.getBasemap === "function")
+		{
+			self.routingMapDocumentViewModel._map.basemap = baseMap.getBasemap(imageJsonUrlPrefix);
+		}
+		else
+		{
+			self.routingMapDocumentViewModel._map.basemap = baseMap.id;
+		}
+	};
+
 	RoutingMapTool.prototype.initTrafficMap = function ($ul)
 	{
+		const self = this;
 		if (this.options.trafficMapAvailable) {
 			if (!this.trafficMapCheckbox) {
 				this.trafficMapCheckbox = $(`<li>
@@ -820,26 +925,12 @@
 							this.trafficTimer = setInterval(() =>
 							{
 								currentSecond = currentSecond - 1;
-								if (currentSecond < 0) {
-									currentSecond = totalSecond;
-								}
+								currentSecond = self.handleCurrentSecond(currentSecond, totalSecond);
 								drawCurrentStatus();
 							}, 1000);
-
-							function drawCurrentStatus()
-							{
-								trafficMapCheckbox.find(".time").text(currentSecond);
-								var rotate = -360 / totalSecond * currentSecond + 360;
-								trafficMapCheckbox.find(".spinner").css("transform", "rotate(" + rotate + "deg)");
-								if (currentSecond < totalSecond / 2) {
-									trafficMapCheckbox.find(".mask").hide();
-									trafficMapCheckbox.find(".filler").show();
-								} else {
-									trafficMapCheckbox.find(".mask").show();
-									trafficMapCheckbox.find(".filler").hide();
-								}
-							}
-						} else {
+							self.drawCurrentStatus(trafficMapCheckbox, currentSecond, totalSecond);
+						}
+						else {
 							this.trafficMapCheckbox.find(".spinner-circle-wrapper").css("visibility", "hidden");
 							clearInterval(this.trafficTimer);
 						}
@@ -853,13 +944,40 @@
 		}
 	};
 
-	RoutingMapTool.prototype.getRouteState = function ()
+	RoutingMapTool.prototype.drawCurrentStatus = function(trafficMapCheckbox, currentSecond, totalSecond)
 	{
-		return this.routingMapDocumentViewModel.routeState || (tf.documentManagerViewModel && tf.documentManagerViewModel.obCurrentDocument && tf.documentManagerViewModel.obCurrentDocument().routeState) || "";
+		trafficMapCheckbox.find(".time").text(currentSecond);
+		var rotate = -360 / totalSecond * currentSecond + 360;
+		trafficMapCheckbox.find(".spinner").css("transform", `rotate(${rotate}deg)`);
+		if (currentSecond < totalSecond / 2)
+		{
+			trafficMapCheckbox.find(".mask").hide();
+			trafficMapCheckbox.find(".filler").show();
+		} else
+		{
+			trafficMapCheckbox.find(".mask").show();
+			trafficMapCheckbox.find(".filler").hide();
+		}
+	};
+
+	RoutingMapTool.prototype.handleCurrentSecond = function(currentSecond, totalSecond)
+	{
+		if (currentSecond < 0)
+		{
+			return totalSecond;
+		}
+		return currentSecond;
+	};
+
+	RoutingMapTool.prototype.getRouteState = function()
+	{
+		const rsValue = (tf.documentManagerViewModel && tf.documentManagerViewModel.obCurrentDocument && tf.documentManagerViewModel.obCurrentDocument().routeState);
+		return this.routingMapDocumentViewModel.routeState || rsValue || "";
 	};
 
 	RoutingMapTool.prototype.zoomToLayersExtent = function ()
 	{
+		const self = this;
 		var map = this.routingMapDocumentViewModel._map;
 
 		if (this.routingMapDocumentViewModel._mapPoints != null) {
@@ -868,7 +986,7 @@
 		}
 
 
-		// if does not have too much layer, zoom to all graphics 
+		// if does not have too much layer, zoom to all graphics
 		if (map.allLayers.length < 15) {
 			var promises = [];
 			var query = new tf.map.ArcGIS.Query();
@@ -879,7 +997,7 @@
 			{
 				if (layer.graphics) {
 					promises.push(Promise.resolve(layer.graphics.items));
-				} else if (layer.type == "feature") {
+				} else if (layer.type === "feature") {
 					promises.push(layer.queryFeatures(query).then(function (featureSet)
 					{
 						return featureSet.features;
@@ -890,24 +1008,32 @@
 			Promise.all(promises).then(function (data)
 			{
 				var allGraphics = _.flatten(data);
-				if (allGraphics.length > 0) {
-					var finalGraphics = (tf && tf.isViewfinder) ? [] : allGraphics;
-					if (tf && tf.isViewfinder) {
-						allGraphics.forEach(function (item)
-						{
-							if (item.geometry.longitude && item.geometry.latitude) {
-								finalGraphics.push({
-									geometry: TF.xyToGeometry(item.geometry.longitude, item.geometry.latitude),
-									id: item.Id
-								});
-							}
-						});
-					}
-					TF.RoutingMap.EsriTool.centerMultipleItem(map, finalGraphics);
-				}
+				self.handleAllGraphics(allGraphics, map);
 			});
 		} else {
 			map.mapView.extent = TF.createDefaultMapExtent();
+		}
+	};
+
+	RoutingMapTool.prototype.handleAllGraphics = function(allGraphics, map)
+	{
+		if (allGraphics.length > 0)
+		{
+			var finalGraphics = (tf && tf.isViewfinder) ? [] : allGraphics;
+			if (tf && tf.isViewfinder)
+			{
+				allGraphics.forEach(function(item)
+				{
+					if (item.geometry.longitude && item.geometry.latitude)
+					{
+						finalGraphics.push({
+							geometry: TF.xyToGeometry(item.geometry.longitude, item.geometry.latitude),
+							id: item.Id
+						});
+					}
+				});
+			}
+			TF.RoutingMap.EsriTool.centerMultipleItem(map, finalGraphics);
 		}
 	};
 
@@ -989,7 +1115,7 @@
 		this.homeToSchoolPathTool.toggleDisplay();
 	};
 
-	// only for form, move to sperate file in free time 
+	// only for form, move to sperate file in free time
 	RoutingMapTool.prototype.homeClick = function ()
 	{
 		if (!this.homeTool) {
@@ -1007,7 +1133,7 @@
 		this.myLocationTool.drawMyLocation();
 	}
 
-	// only for form, move to sperate file in free time 
+	// only for form, move to sperate file in free time
 	RoutingMapTool.prototype.locationMarkerClick = function (locatonMarker)
 	{
 		if (!this.locationMarkerTool) {
@@ -1016,10 +1142,10 @@
 		this.locationMarkerTool.drawMarker(locatonMarker);
 	}
 
-	// only for form, move to sperate file in free time 
+	// only for form, move to sperate file in free time
 	RoutingMapTool.prototype.trashClick = function ()
 	{
-		let $trashButton = this.$mapToolBar.find("li.trash");
+		const $trashButton = this.$mapToolBar.find("li.trash");
 		if (($trashButton.length > 0) && $trashButton.hasClass("disable")) {
 			return;
 		}
@@ -1041,6 +1167,14 @@
 		this.geoFinderTool && this.geoFinderTool.dispose();
 		this.playbackTool && this.playbackTool.dispose();
 		this.locationMarkerTool && this.locationMarkerTool.dispose();
+	};
+
+	RoutingMapTool.prototype.executeMethod = function(method)
+	{
+		if(method)
+		{
+			method();
+		}
 	};
 
 })();
