@@ -42,6 +42,7 @@
 	];
 	function FieldTripGridDefinition()
 	{
+		// constructor
 	}
 
 	FieldTripGridDefinition.prototype.gridDefinition = function()
@@ -74,7 +75,8 @@
 					DisplayName: "Trip Stage",
 					Width: '250px',
 					type: "string",
-					template: "<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#:FieldTripStageName#</span>"
+					template: `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);
+					background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#:FieldTripStageName#</span>`
 				},
 				{
 					FieldName: "Name",
@@ -258,7 +260,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripClassification","fieldtrip","ClassificationName")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification
 				},
 				{
 					FieldName: "BillingClass",
@@ -266,7 +268,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripBillingClassification","fieldtrip","BillingClass")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification
 				},
 				{
 					FieldName: "Ftactivity",
@@ -274,7 +276,8 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripActivity","fieldtrip","Ftactivity")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity
+
 				},
 				{
 					FieldName: "Ftequipment",
@@ -282,7 +285,7 @@
 					Width: '150px',
 					type: "string",
 					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment //TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripEquipment","fieldtrip","Ftequipment")
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment
 				},
 
 				{
@@ -610,7 +613,7 @@
 
 	FieldTripGridDefinition.prototype.getSummaryFilters = function(subGridType)
 	{
-		if (subGridType && subGridType == "approvals")
+		if (subGridType && subGridType === "approvals")
 		{
 			return _.filter(filters, e => [-1, -2, -5].indexOf(e.Id) >= 0)
 		}
@@ -620,7 +623,10 @@
 	{
 		return function(selectGridFilterEntityId)
 		{
-			if (!selectGridFilterEntityId) selectGridFilterEntityId = this.id
+			if (!selectGridFilterEntityId)
+			{
+				selectGridFilterEntityId = this.id;
+			}
 			var paramData = null;
 			switch (selectGridFilterEntityId)
 			{
@@ -628,10 +634,10 @@
 				case -2:
 					var today = new Date(), tomorrow = new Date();
 					tomorrow.setTime(tomorrow.getTime() + 24 * 60 * 60 * 1000);
-					var today_str = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(),
-						tomorrow_str = tomorrow.getFullYear() + "-" + (tomorrow.getMonth() + 1) + "-" + tomorrow.getDate();
+					var todayStr = `${today.getFullYear()}-${(today.getMonth() + 1)}-${today.getDate()}`,
+						tomorrowStr = `${tomorrow.getFullYear()}-${(tomorrow.getMonth() + 1)}-${tomorrow.getDate()}`;
 					paramData = {
-						"@filter": "eq(FieldTripStageId,99)&lt(DepartDateTime," + tomorrow_str + ")&ge(EstimatedReturnDateTime," + today_str + ")",
+						"@filter": `eq(FieldTripStageId,99)&lt(DepartDateTime,${tomorrowStr})&ge(EstimatedReturnDateTime,${todayStr})`,
 						"@fields": "Id"
 					}
 					break;
@@ -653,7 +659,10 @@
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("fieldtrip")), { paramData: paramData }).then(function(response)
 				{
-					return response.Items.map(function(r) { return r.Id });
+					return response.Items.map(function(r)
+					{
+						return r.Id
+					});
 				});
 			}
 
@@ -674,7 +683,9 @@
 						Width: '150px',
 						DisplayName: "Status",
 						type: "string",
-						template: "<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#: tf.fieldTripGridDefinition.gridDefinition().stageNameFormatter(data.FieldTripStageId)#</span>"
+						template: `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);
+						background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div>
+						<span>#: tf.fieldTripGridDefinition.gridDefinition().stageNameFormatter(data.FieldTripStageId)#</span>`
 					},
 					{
 						FieldName: "Notes",
