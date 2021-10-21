@@ -38,12 +38,12 @@
 		}
 		for (var i = 0; i < this.eventMap[eventName].length; i++)
 		{
-			if (this.eventMap[eventName][i].routeState == routeState)
+			if (this.eventMap[eventName][i].routeState === routeState)
 			{
 				this.eventMap[eventName].splice(i, 1);
 			}
 		}
-		if (this.eventMap[eventName].length == 0)
+		if (this.eventMap[eventName].length === 0)
 		{
 			this.getBindEventTarget().unbind(eventName);
 			delete this.eventMap[eventName];
@@ -59,7 +59,7 @@
 		}
 		this.eventMap[eventName] && this.eventMap[eventName].forEach(function(item)
 		{
-			if (item.routeState == currentRouteState || (tf && tf.isViewfinder))
+			if (item.routeState === currentRouteState || (tf && tf.isViewfinder))
 			{
 				item.func(evt);
 			}

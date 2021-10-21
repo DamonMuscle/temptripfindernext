@@ -29,7 +29,7 @@
 	ExpandMapTool.prototype._init = function()
 	{
 		var expandToolClass = TF.isMobileDevice ? 'map-expand-button is-mobile-device' : 'map-expand-button';
-		this.button = $("<div title='expand' class='expand-button " + expandToolClass + "'></div>");
+		this.button = $(`<div title='expand' class='expand-button ${expandToolClass}'></div>`);
 		this.button.on("click", this._toggleClick.bind(this));
 		$(this.map.mapView.container).append(this.button);
 	};
@@ -37,7 +37,7 @@
 	ExpandMapTool.prototype._toggleClick = function()
 	{
 		var self = this;
-		if (this.status == STATUS.restore)
+		if (this.status === STATUS.restore)
 		{
 			if (TF.isMobileDevice)
 			{
@@ -128,19 +128,21 @@
 
 	ExpandMapTool.moveMobileFullScreenBaseMapAhead = function($offMapTool)
 	{
+		const mapItem = '.map-item.map-page';
 		if (TF.isPhoneDevice &&
-			$offMapTool.closest('.map-item.map-page').zIndex() === FullScreenMapZIndex * -1)
+			$offMapTool.closest(mapItem).zIndex() === FullScreenMapZIndex * -1)
 		{
-			$offMapTool.closest('.map-item.map-page').zIndex(FullScreenMapZIndex);
+			$offMapTool.closest(mapItem).zIndex(FullScreenMapZIndex);
 		}
 	}
 
 	ExpandMapTool.moveMobileFullScreenBaseMapBehind = function($offMapTool)
 	{
+		const mapItem = '.map-item.map-page';
 		if (TF.isPhoneDevice &&
-			$offMapTool.closest('.map-item.map-page').zIndex() === FullScreenMapZIndex)
+			$offMapTool.closest(mapItem).zIndex() === FullScreenMapZIndex)
 		{
-			$offMapTool.closest('.map-item.map-page').zIndex(FullScreenMapZIndex * -1);
+			$offMapTool.closest(mapItem).zIndex(FullScreenMapZIndex * -1);
 		}
 	}
 })();
