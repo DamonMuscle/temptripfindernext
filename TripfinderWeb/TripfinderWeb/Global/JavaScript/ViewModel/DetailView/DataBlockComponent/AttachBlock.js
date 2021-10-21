@@ -6,7 +6,7 @@
 	function AttachBlock(options, detailView)
 	{
 		var self = this;
-
+		self.strAttachDocumentStack = ".attach-document-stack"
 		TF.DetailView.DataBlockComponent.BaseDataBlock.call(self, detailView);
 
 		self.options = options;
@@ -23,10 +23,9 @@
 
 		self.refresh = self.refresh.bind(self);
 
-		self.$el = $("<div>\
-						<div class='grid-stack-item-content attach-document-stack'>\
+		self.$el = $(`<div><div class='grid-stack-item-content attach-document-stack'>\
 								<div class='item-content add-document-data-point'>\
-                                    <div class='place-holder" + (self.isReadOnly() ? " disabled" : "") + "'>Drop file to add document, or <span class='browse-file'>browse</span></div>\
+                  <div class='place-holder${self.isReadOnly() ? " disabled" : ""}'>Drop file to add document, or <span class='browse-file'>browse</span></div>\
 									<div class='content-wrapper'>\
 										<div class='file-container'>\
 											<div class='file-icon'></div>\
@@ -39,7 +38,7 @@
 									</div>\
 								</div>\
 							</div>\
-						</div>").addClass(self.uniqueClassName);
+						</div>`).addClass(self.uniqueClassName);
 
 		if (!self.isReadOnly())
 		{
@@ -52,7 +51,7 @@
 		{
 			if (self.entity && self.entity.FileName)
 			{
-				self._updateDocumentBlock(self.entity, self.$el.find(".attach-document-stack"));
+				self._updateDocumentBlock(self.entity, self.$el.find(self.strAttachDocumentStack));
 			}
 		}
 		else if ($uploadFileContainer.length > 0)
@@ -76,7 +75,10 @@
 	{
 		var self = this;
 
-		if (!self.uploadDocumentHelper) return;
+		if (!self.uploadDocumentHelper)
+		{
+			return null;
+		}
 
 		var uploadFiles = self.uploadDocumentHelper.getFiles();
 
@@ -87,15 +89,18 @@
 			return self.uploadDocumentHelper.getFileStream()
 				.then(function(fileStream)
 				{
-					if (fileStream)
+					if (!fileStream)
 					{
-						var fileStreamSplit = fileStream.split(",");
-						return {
-							FileName: rawFile.name,
-							MimeType: rawFile.type,
-							FileContent: fileStreamSplit.length == 2 ? _.last(fileStream.split(",")) : ""
-						};
+						return null;
 					}
+
+					var fileStreamSplit = fileStream.split(",");
+
+					return {
+						FileName: rawFile.name,
+						MimeType: rawFile.type,
+						FileContent: fileStreamSplit.length === 2 ? _.last(fileStream.split(",")) : ""
+					};
 				});
 		}
 
@@ -105,8 +110,9 @@
 	AttachBlock.prototype._updateDocumentBlock = function(entity, $item)
 	{
 		var self = this,
-			entity = entity || self.entity,
 			isDocFilePreviewable = tf.docFilePreviewHelper.isFilePreviewable(entity.MimeType);
+		entity = entity || self.entity;
+
 		/**
 		 * Not the true content, but the filename.
 		 * true content means FileContent field is not empty
@@ -135,14 +141,14 @@
 			$form = $uploadFileContainer.find('form');
 
 		$form.off('drag dragstart dragend dragover dragenter dragleave drop');
-		$(document).off('dragover' + self.detailView.eventNameSpace + ' dragenter' + self.detailView.eventNameSpace
-			+ ' dragleave' + self.detailView.eventNameSpace + ' dragend' + self.detailView.eventNameSpace + ' drop' + self.detailView.eventNameSpace);
+		$(document).off(`dragover${self.detailView.eventNameSpace} dragenter${self.detailView.eventNameSpace}
+		 dragleave${self.detailView.eventNameSpace} dragend${self.detailView.eventNameSpace} drop${self.detailView.eventNameSpace}`);
 	};
 
 	AttachBlock.prototype.resetAttachDocumentStackItem = function()
 	{
-		var self = this,
-			$item = self.$el.find('.attach-document-stack');
+		var self = this;
+		var $item = self.$el.find(self.strAttachDocumentStack);
 
 		$item.removeClass("with-content");
 		self.detailView.updateDetailView();
@@ -159,7 +165,10 @@
 		var self = this,
 			$fileSelector = self.$detailViewRoot.find('#document-file-selector');
 
-		if (!self.isReadMode()) return;
+		if (!self.isReadMode())
+		{
+			return;
+		}
 
 		e.stopPropagation();
 		$fileSelector.trigger('click');
@@ -174,7 +183,10 @@
 		{
 			self.getAdaptiveFileStream().then(function(document)
 			{
-				if (!document) return;
+				if (!document)
+				{
+					return;
+				}
 
 				self.showDocumentPreview(document);
 			});
@@ -205,6 +217,12 @@
 			});
 		});
 
+		self.attachFileChangedEvent.subscribe(self.refresh);
+	};
+
+	AttachBlock.prototype.onClickTrashCan = function()
+	{
+		const self = this;
 		self.$el.on('click', '.trash-can', function(e)
 		{
 			e.stopPropagation();
@@ -225,14 +243,11 @@
 						}
 
 						self.attachFileChangedEvent.notify({ isEmpty: true });
-						// self.grid.manageLayout();
 						self.fieldEditorHelper.editFieldList[fileNameEditKey] = { value: "" };
 					}
 				});
 		});
-
-		self.attachFileChangedEvent.subscribe(self.refresh);
-	};
+	}
 
 	AttachBlock.prototype.refresh = function(e, data)
 	{
@@ -255,7 +270,7 @@
 				FileName: file.name,
 				MimeType: file.type,
 			};
-		self._updateDocumentBlock(docEntity, self.$el.find('.attach-document-stack'));
+		self._updateDocumentBlock(docEntity, self.$el.find(self.strAttachDocumentStack));
 		self.detailView.updateDetailView(file);
 		self.obEditing(true);
 	};
@@ -268,7 +283,12 @@
 			return self.fieldEditorHelper.editFieldList["Name"] == null || self.fieldEditorHelper.editFieldList["Name"].value.length === 0;
 		}
 
-		if (self.fieldEditorHelper.editFieldList["Name"] != null && self.fieldEditorHelper.editFieldList["Name"].value == null) return true;
+		if (self.fieldEditorHelper.editFieldList["Name"] != null && self.fieldEditorHelper.editFieldList["Name"].value == null)
+		{
+			return true;
+		}
+
+		return null;
 	};
 
 	AttachBlock.prototype.dispose = function()
