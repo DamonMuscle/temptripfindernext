@@ -728,12 +728,12 @@
 	{
 		if (!name)
 		{
-			return '';
+			return undefined;
 		}
 		const matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(item => (item.name || "").toLowerCase() === name.toLowerCase());
 		if (matched.length !== 1)
 		{
-			return '';
+			return undefined;
 		}
 		return matched[0].name;
 	};
@@ -742,7 +742,7 @@
 	{
 		if (!name)
 		{
-			return '';
+			return undefined;
 		}
 		var matched = _.flatMap(_DATA_TYPE_ATTRIBUTES).filter(function(item)
 		{
@@ -751,7 +751,7 @@
 
 		if (matched.length !== 1)
 		{
-			return '';
+			return undefined;
 		}
 		return matched[0].endpoint;
 	};
@@ -938,7 +938,7 @@
 				};
 			default:
 				console.error(MSG_TYPE_NOT_SUPPORT);
-				return {};
+				return undefined;
 		}
 	};
 
@@ -952,7 +952,7 @@
 				return "RecordContacts";
 			default:
 				console.error(MSG_TYPE_NOT_SUPPORT);
-				return "";
+				return undefined;
 		}
 	};
 
@@ -974,7 +974,7 @@
 				return "UDGridId";
 			default:
 				console.error(MSG_TYPE_NOT_SUPPORT);
-				return "";
+				return undefined;
 		}
 	};
 
@@ -1212,12 +1212,12 @@
 	{
 		if (!dataType)
 		{
-			return "";
+			return undefined;
 		}
 		dataType = this._getObjectByType(dataType);
 		if (!dataType || !dataType.id)
 		{
-			return "";
+			return undefined;
 		}
 		var dataTypeKey = this.getKeyById(dataType.id);
 		if (dataTypeKey === 'altsite')
