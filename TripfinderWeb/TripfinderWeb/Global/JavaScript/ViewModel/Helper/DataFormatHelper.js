@@ -13,13 +13,15 @@
 
 	function DataFormatHelper()
 	{
-
+		//constructor palceholder
 	}
 
 	DataFormatHelper.prototype.currencyFormatter = function(value)
 	{
-		if (!value) return 0;
-
+		if (!value)
+		{
+			return 0;
+		}
 		var floatValue = parseFloat(value),
 			decimalPrecision = 2,
 			index = value.toString().indexOf('.');
@@ -46,20 +48,19 @@
 		{
 			return value;
 		}
-		let content = value.toString(),
-			cleanPhone = content.replace(/\D/g, '');
-		if(cleanPhone.length === 10)
+		let content = value.toString();
+		const cleanPhone = content.replace(/\D/g, '');
+		if (cleanPhone.length === 10)
 		{
 			return cleanPhone;
 		}
 		var phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
 		let longPhoneNumberMatched = false;
-		for (let pattern of phoneNumberWithCountryCodePatterns)
+		for (const pattern of phoneNumberWithCountryCodePatterns)
 		{
-			groups = cleanPhone.match(pattern.mode);
-			if (groups)
+			if (cleanPhone.match(pattern.mode))
 			{
-				content = eval("`" + pattern.value + "`");
+				content = eval(`\`${pattern.value}\``);
 				longPhoneNumberMatched = true;
 				break;
 			}
@@ -79,11 +80,11 @@
 		{
 			return false;
 		}
-		let phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
+		const phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
 		let longPhoneNumberMatched = false;
-		for (let pattern of phoneNumberWithCountryCodePatterns)
+		for (const pattern of phoneNumberWithCountryCodePatterns)
 		{
-			let matched = pattern.mode.test(digitsValue);
+			const matched = pattern.mode.test(digitsValue);
 			if (matched)
 			{
 				longPhoneNumberMatched = true;
@@ -93,8 +94,10 @@
 		return longPhoneNumberMatched;
 	};
 
-	DataFormatHelper.prototype.getPurePhoneNumber = function (value) {
-		if (!value) {
+	DataFormatHelper.prototype.getPurePhoneNumber = function(value)
+	{
+		if (!value)
+		{
 			return null;
 		}
 
@@ -108,27 +111,30 @@
 			return value;
 		}
 		let content = value.toString(),
-			cleanPhone = content.replace(/\D/g, ''),
 			groups = cleanPhone.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+		const cleanPhone = content.replace(/\D/g, '');
 		if (cleanPhone.length < 3)
 		{
 			content = cleanPhone;
-		} else if (cleanPhone.length >= 3 && cleanPhone.length <= 6)
+		}
+		else if (cleanPhone.length >= 3 && cleanPhone.length <= 6)
 		{
 			content = `(${groups[1]}) ${groups[2]}`;
-		} else if (cleanPhone.length >= 6 && cleanPhone.length <= 10)
+		}
+		else if (cleanPhone.length >= 6 && cleanPhone.length <= 10)
 		{
 			content = `(${groups[1]}) ${groups[2]}-${groups[3]}`;
-		} else 
+		}
+		else
 		{
 			var phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
 			let longPhoneNumberMatched = false;
-			for (let pattern of phoneNumberWithCountryCodePatterns)
+			for (const pattern of phoneNumberWithCountryCodePatterns)
 			{
 				groups = cleanPhone.match(pattern.mode);
 				if (groups)
 				{
-					content = eval("`" + pattern.display + "`");
+					content = eval(`\`${pattern.display}\``);
 					longPhoneNumberMatched = true;
 					break;
 				}
@@ -138,7 +144,6 @@
 				content = content.substr(0, 16);
 			}
 		}
-
 		return content;
 	}
 })();
