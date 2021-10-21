@@ -55,16 +55,23 @@
 	SoftSessionValidator.prototype._monitorTokenChanged = function()
 	{
 		var self = this;
-		if (tf.entStorageManager.get("token") != self._authManager.token)
+		if (tf.entStorageManager.get("token") !== self._authManager.token)
 		{
 			// if switch to the stopfinder, must refresh the _authManager token
-			if (self._authManager.updateToken) {
+			if (self._authManager.updateToken)
+			{
 				self._authManager.token = tf.entStorageManager.get("token");
-				if(!tf.entStorageManager.get("stopfinderToken")) return;
-				setTimeout(() => { self._authManager.updateToken = false;});
+				if (!tf.entStorageManager.get("stopfinderToken"))
+				{
+					return;
+				}
+				setTimeout(() =>
+				{
+					self._authManager.updateToken = false;
+				});
 				return;
 			}
-			
+
 			tf.promiseBootbox.alert("Login session expired")
 				.then(function()
 				{

@@ -1,6 +1,8 @@
 ﻿(function()
 {
 	createNamespace("TF.Grid").KendoGridSummaryGrid = KendoGridSummaryGrid;
+	const CLASS_NAME_KGRID_CONTENT = ".k-grid-content";
+	const CSS_WDITH30 = "width:30px";
 
 	function KendoGridSummaryGrid()
 	{
@@ -26,7 +28,7 @@
 		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
 		if (self.summaryKendoGrid)
 		{
-			scrollLeft = self.$summaryContainer.find(".k-grid-content").scrollLeft();
+			scrollLeft = self.$summaryContainer.find(CLASS_NAME_KGRID_CONTENT).scrollLeft();
 			self.summaryKendoGrid.destroy();
 			self.$summaryContainer.empty();
 		}
@@ -61,13 +63,13 @@
 		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
 		self.initSummaryGridDataSource();
 		self.reRenderSummaryGrid();
-		self.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
+		self.$summaryContainer.find(CLASS_NAME_KGRID_CONTENT).scrollLeft(scrollLeft);
 	};
 
 	KendoGridSummaryGrid.prototype.createSummaryFilterClearAll = function()
 	{
 		var tr = this.$summaryContainer.find("div.k-grid-header-locked").find("tr.k-filter-row");
-		if (tr != undefined)
+		if (tr !== undefined)
 		{
 			var td = tr.children("th:first");
 			td.text("");
@@ -78,7 +80,7 @@
 			div.click(function()
 			{
 				var buttons = that.$summaryContainer.find("tr.k-filter-row").find("button.k-button");
-				if (buttons != undefined)
+				if (buttons !== undefined)
 				{
 					buttons.trigger("click");
 				}
@@ -104,15 +106,14 @@
 	{
 		var self = this;
 		var timeoutEvent = null;
-		this.$summaryContainer.find(".k-grid-content").off("scroll.summarybar").on("scroll.summarybar", function(e)
+		this.$summaryContainer.find(CLASS_NAME_KGRID_CONTENT).off("scroll.summarybar").on("scroll.summarybar", function(e)
 		{
 			var $target = $(e.target),
-				grid = self.$container.find(".k-virtual-scrollable-wrap").length > 0 ? self.$container.find(".k-virtual-scrollable-wrap") : self.$container.find(".k-grid-content");
+				grid = self.$container.find(".k-virtual-scrollable-wrap").length > 0 ? self.$container.find(".k-virtual-scrollable-wrap") : self.$container.find(CLASS_NAME_KGRID_CONTENT);
 			grid.scrollLeft($target.scrollLeft());
 			clearTimeout(timeoutEvent);
 			timeoutEvent = setTimeout(function()
 			{
-				var $target = $(e.target);
 				grid.scrollLeft($target.scrollLeft());
 			}, 50);
 		});
@@ -135,12 +136,12 @@
 	{
 		if (this.summaryKendoGrid)
 		{
-			var scrollLeft = this.$summaryContainer.find(".k-grid-content").scrollLeft();
+			var scrollLeft = this.$summaryContainer.find(CLASS_NAME_KGRID_CONTENT).scrollLeft();
 			var kendoOptions = this.summaryKendoGrid.getOptions();
 			kendoOptions.columns = this.getSummaryColumns();
 			this.summaryKendoGrid.setOptions(kendoOptions);
 			this.reRenderSummaryGrid();
-			this.$summaryContainer.find(".k-grid-content").scrollLeft(scrollLeft);
+			this.$summaryContainer.find(CLASS_NAME_KGRID_CONTENT).scrollLeft(scrollLeft);
 			this.lockSummaryFirstColumn();
 		}
 	};
@@ -148,14 +149,14 @@
 	KendoGridSummaryGrid.prototype.lockSummaryFirstColumn = function() //lock the first column
 	{
 		var theadTable = this.kendoGrid.lockedHeader.find("table");
-		if (this.isColumnLocked && theadTable.children("thead").children("tr").filter(":first").find("th").eq(this.resizeIdx).data("kendoField") == "bulk_menu")
+		if (this.isColumnLocked && theadTable.children("thead").children("tr").filter(":first").find("th").eq(this.resizeIdx).data("kendoField") === "bulk_menu")
 		{
 			var summaryHeaderTable = this.summaryKendoGrid.lockedHeader.find("table");
 			var summaryBodyTable = this.summaryKendoGrid.lockedTable;
 			if (summaryHeaderTable.parent().find("col").length === 1)
 			{
-				summaryHeaderTable.attr("style", "width:30px");
-				summaryBodyTable.attr("style", "width:30px");
+				summaryHeaderTable.attr("style", CSS_WDITH30);
+				summaryBodyTable.attr("style", CSS_WDITH30);
 			}
 			else//if the lock area has more than one column,keep the width of lock area donnot change
 			{
@@ -165,11 +166,11 @@
 					var colItem = summaryHeaderTable.parent().find("col")[i];
 					width += parseInt(colItem.style.width.substring(0, colItem.style.width.length - 2));
 				}
-				summaryHeaderTable.attr("style", "width:" + width + "px");
-				summaryBodyTable.attr("style", "width:" + width + "px");
+				summaryHeaderTable.attr("style", `width:${width}px`);
+				summaryBodyTable.attr("style", `width:${width}px`);
 			}
-			summaryHeaderTable.parent().find("col").eq(this.resizeIdx).attr("style", "width:30px");
-			summaryBodyTable.parent().find("col").eq(this.resizeIdx).attr("style", "width:30px");
+			summaryHeaderTable.parent().find("col").eq(this.resizeIdx).attr("style", CSS_WDITH30);
+			summaryBodyTable.parent().find("col").eq(this.resizeIdx).attr("style", CSS_WDITH30);
 		}
 	};
 
@@ -217,7 +218,6 @@
 		var fields = {};
 		this._gridDefinition.Columns.forEach(function(definition)
 		{
-			var field = {};
 			field.type = "string";
 			fields[definition.FieldName] = field;
 		});
@@ -286,6 +286,7 @@
 		var includeIds = this._gridState.filteredIds;
 		var excludeIds = this.getExcludeAnyIds();
 		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), this.obSelectedGridFilterClause(), includeIds, excludeIds);
+		console.log(`SearchParameters intialized success! ${!!searchData}`);
 		return tf.promiseAjax.post(pathCombine(this.options.url, "aggregate"), {
 			paramData: $.extend(true, { FieldName: tf.UDFDefinition.getOriginalName(fildName), AggregateOperator: operator }, this.options.paramData || {}),
 			data: this.searchOption.data,
@@ -331,13 +332,13 @@
 		var value = $.isArray(item) ? item[0] : item;
 		if (column && column.format)
 		{
-			if (operator == 'Count' || operator == 'DistinctCount')
+			if (operator === 'Count' || operator === 'DistinctCount')
 			{
 				return value;
 			}
 			if (column.type === "date")
 			{
-				if (new Date(value) != 'Invalid Date' && moment(value).isValid() === true && value !== 0)
+				if (new Date(value) !== 'Invalid Date' && moment(value).isValid() === true && value !== 0)
 				{
 					value = moment(value).toDate();
 					return kendo.format(column.format, value);
@@ -351,7 +352,7 @@
 			{
 				return kendo.format(column.format, value);
 			}
-			if (operator == 'Average' || ((operator == 'Sum' || operator == 'Min' || operator == 'Max') && column.type == 'number'))
+			if (operator === 'Average' || ((operator === 'Sum' || operator === 'Min' || operator === 'Max') && column.type === 'number'))
 			{
 				return kendo.format("{0:n2}", value);
 			}

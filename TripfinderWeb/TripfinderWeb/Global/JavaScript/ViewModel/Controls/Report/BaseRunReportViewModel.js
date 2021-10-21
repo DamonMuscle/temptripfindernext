@@ -4,7 +4,7 @@
 
 	var DBID_ITEMKEY = "DBID_ITEMKEY";
 	var RECORD_METHOD_ITEMKEY = "RECORD_METHOD_ITEMKEY";
-	var FILTER_NAME_ITEMKEY = "FILTER_NAME_ITEMKEY";
+	var FILTER_NAME_ITEMKEY = "33FILTER_NAME_ITEMKEY";
 	var RECORD_IDS_ITEMKEY = "RECORD_IDS_ITEMKEY";
 	var PARAMETER_MAP_ITEMKEY = "PARAMETER_MAP_ITEMKEY";
 	var MAP_SETTINGS_ITEMKEY = "MAP_SETTINGS"
@@ -15,9 +15,13 @@
 		id: 0,
 		isValid: true
 	};
+	const CLASS_NAME_FORM_GROUP = ".form-group";
 	function parseRecordIdsFromString(str)
 	{
-		if (!str || typeof (str) !== "string") return [];
+		if (!str || typeof (str) !== "string")
+		{
+			return [];
+		}
 
 		return str.split(",").filter(function(field)
 		{
@@ -30,12 +34,15 @@
 
 	function convertRecordsToString(records)
 	{
-		if (!Array.isArray(records)) return "";
+		if (!Array.isArray(records))
+		{
+			return "";
+		}
 
 		var idList = records.filter(function(r)
 		{
 			return !!r && (!!r.Id || !!r.id || !!r.ID);
-		}).map(function(r) 
+		}).map(function(r)
 		{
 			return r.Id || r.id || r.ID;
 		});
@@ -62,7 +69,7 @@
 		self.IsFirstLoading = true;
 
 
-		self.fromSchedule = ko.observable(option['fromSchedule'] && option['fromSchedule'] == true);
+		self.fromSchedule = ko.observable(option['fromSchedule'] && option['fromSchedule'] === true);
 		self.generateMapSettingProperties();
 		self.generateFilterSettingProperties();	// Prepare observables and properties for fitler settings
 		self.generateParameterItemViewModels();	// Generate ViewModels for each report parameters
@@ -150,19 +157,17 @@
 			outputTypes = tf.exagoReportDataHelper.getAllOutputTypes(),
 			dataSources = tf.datasourceManager.datasources.map(function(item)
 			{
-				var obj = {
+				return {
 					name: item.Name,
 					id: item.DBID,
 					version: item.DBVersion
 				};
-
-				return obj;
 			}),
 			specifyRecordMethods = tf.exagoReportDataHelper.getAllSpecifyRecordMethods();
 
 		// fields for storing current settings (for comparison in observable to trigger change event)
 		self.currentDataSourceId = null;
-		self.currentRecordMethodName = null; //defaultSpecifyRecordMethod.name;
+		self.currentRecordMethodName = null;
 		self.currentFilterName = null;
 
 		// Observable items for syncing between UI and ViewModel
@@ -221,7 +226,14 @@
 		// if specify method is set to be "specific records", the selection should not be empty.
 		self.obSpecificRecordStringForValidation = ko.computed(function()
 		{
-			return self.obSpecifiedRecordsDisabled() ? "1" : (self.obSpecifiedRecords().length > 0 ? "1" : "");
+			if (self.obSpecifiedRecordsDisabled())
+			{
+				return "1";
+			}
+			else
+			{
+				return (self.obSpecifiedRecords().length > 0 ? "1" : "");
+			}
 		});
 		self.specificRecordFormatter = self.specificRecordFormatter.bind(self);
 
@@ -332,7 +344,6 @@
 
 		var restoreRecordMethod = function()
 		{
-			//console.log("[###]Here we try to restore record method");
 			self.obSelectedRecordMethod(defaultRecordMethod);
 
 			self.afterDataSourceChangedEvent.unsubscribe(restoreRecordMethod);	// remove the callback since we only need to restore once at begining
@@ -340,10 +351,12 @@
 
 		var restoreFilterOrSpecifiedRecords = function()
 		{
-			//console.log("[###]Here we try to restore Filter or SpecifiedRecords");
 			if (!self.obFilterDisabled())
 			{
-				var matchedFilter = self.obAvailableFilters().filter(function(f) { return f.name === defaultFilterName; })[0];
+				var matchedFilter = self.obAvailableFilters().filter(function(f)
+				{
+					return f.name === defaultFilterName;
+				})[0];
 				if (!!matchedFilter)
 				{
 					self.obSelectedFilter(matchedFilter);
@@ -417,9 +430,10 @@
 				for (var validField in p.validatorFields)
 				{
 					if (p.validatorFields.hasOwnProperty(validField))
+					{
 						validatorFields[validField] = p.validatorFields[validField]
+					}
 				}
-				//validatorFields[p.name] = p.validatorFields[p.name];
 			});
 		}
 
@@ -430,7 +444,7 @@
 			fields: validatorFields
 		}).on('success.field.bv', function(e, data)
 		{
-			var $parent = data.element.closest('.form-group');
+			var $parent = data.element.closest(CLASS_NAME_FORM_GROUP);
 			$parent.removeClass('has-success');
 			if (!isValidating)
 			{
@@ -451,8 +465,10 @@
 			oldDataSourceId = self.currentDataSourceId,
 			newDataSourceId = !!newDataSource ? newDataSource.id : null;
 
-		if (oldDataSourceId === newDataSourceId) return;
-
+		if (oldDataSourceId === newDataSourceId)
+		{
+			return;
+		}
 		self.currentDataSourceId = newDataSourceId;
 
 		// Prerequisite works before initizlie filter settings(UI) for a new selected datasource
@@ -460,7 +476,6 @@
 		{
 			setTimeout(function()
 			{
-				// console.log("here we clean up filter and records on changed datasource: " + self.currentDataSourceId);
 				var defaultFilter = self.obAvailableFilters()[0];
 				self.obSelectedFilter(defaultFilter);
 				self.obSpecifiedRecords([]);
@@ -477,12 +492,15 @@
 			oldMethodName = self.currentRecordMethodName,
 			newMethodName = !!newRecordMethod ? newRecordMethod.name : null;
 
-		if (oldMethodName === newMethodName) return;
+		if (oldMethodName === newMethodName)
+		{
+			return;
+		}
 
 		self.currentRecordMethodName = newMethodName;
 
 		// Delay execution to next tick to so that other observables like obFilterDisabled, obSpecifiedRecordsDisabled can be updated first
-		setTimeout(function()	
+		setTimeout(function()
 		{
 			if (self.obFilterDisabled())	// Need to reset filter to default(empty) when disabled
 			{
@@ -507,7 +525,10 @@
 			oldFilterName = self.currentFilterName,
 			newFilterName = !!newFilter ? newFilter.name : null;
 
-		if (oldFilterName === newFilterName) return;
+		if (oldFilterName === newFilterName)
+		{
+			return;
+		}
 
 		self.currentFilterName = newFilterName;
 	};
@@ -538,7 +559,7 @@
 	BaseRunReportViewModel.prototype.loadSpecificRecords = function(ids)
 	{
 		var self = this;
-		if (!Array.isArray(ids) || ids.length === 0) 
+		if (!Array.isArray(ids) || ids.length === 0)
 		{
 			self.obSpecifiedRecords([]);
 			return;
@@ -575,17 +596,17 @@
 		}).then(function(res)
 		{
 			var summryFilter = {};
-			switch (dataType)
+			if (dataType === "fieldtrip")
 			{
-				case "fieldtrip":
-					summryFilter = {
-						filters: tf.fieldTripGridDefinition.getSummaryFilters(),
-						function: tf.fieldTripGridDefinition.getSummaryFunction()
-					}
-					break;
-				default:
+				summryFilter = {
+					filters: tf.fieldTripGridDefinition.getSummaryFilters(),
+					function: tf.fieldTripGridDefinition.getSummaryFunction()
+				}
 			}
-			if (!res || !Array.isArray(res.Items)) return;
+			if (!res || !Array.isArray(res.Items))
+			{
+				return undefined;
+			}
 
 			var normalFilters = res.Items.filter(function(filter)
 			{
@@ -683,7 +704,7 @@
 			if (self.element && self.element.data("bootstrapValidator"))
 			{
 				self.element.data("bootstrapValidator").removeField("filterName");
-				self.element.find(".filter-name").closest('.form-group').find(".help-block").remove();
+				self.element.find(".filter-name").closest(CLASS_NAME_FORM_GROUP).find(".help-block").remove();
 				self.pageLevelViewModel.obValidationErrors.remove(function(data)
 				{
 					return data.name === "Filter Name";
@@ -731,12 +752,12 @@
 		if (execInfo["MAP_SETTINGS"])
 		{
 			var param = _.cloneDeep(execInfo["MAP_SETTINGS"]);
-			if (self.schema.DataTypeName == "Trip")
+			if (self.schema.DataTypeName === "Trip")
 			{
 
 				param.TripMap.Ids = recordIds ? recordIds.join(",") : null;
 			}
-			else if (self.schema.DataTypeName == "Student")
+			else if (self.schema.DataTypeName === "Student")
 			{
 				param.StudentMap.Ids = recordIds ? recordIds.join(",") : null;
 			}
@@ -760,19 +781,17 @@
 			mmtCreatedDateOfClient = moment.utc(reportEntity.CreatedOn).utcOffset(tf.timezonetotalminutes),
 			userLastName = !tf.userEntity.LastName ? "" : tf.userEntity.LastName,
 			userFirstName = !tf.userEntity.FirstName ? "" : tf.userEntity.FirstName,
-			userFullName = (!userLastName || !userFirstName) ? String.format("{0}{1}", userLastName, userFirstName) : String.format("{0}, {1}", userLastName, userFirstName),
-			tfVarsDict = {};
-
+			userFullName = (!userLastName || !userFirstName) ? String.format("{0}{1}", userLastName, userFirstName) : String.format("{0}, {1}", userLastName, userFirstName);
 
 		// Populate context TFVariables
-		// "createdDate", "runDate", "runTime", "runBy", "datasource"   
-		tfVarsDict.createdDate = mmtCreatedDateOfClient.format("YYYY-MM-DD");
-		tfVarsDict.runDate = mmtNowOfClient.format("YYYY-MM-DD");
-		tfVarsDict.runTime = mmtNowOfClient.format("HH:mm:ss");
-		tfVarsDict.runBy = userFullName;
-		tfVarsDict.datasource = dataSourceText;
-
-		return Promise.resolve(tfVarsDict);
+		// "createdDate", "runDate", "runTime", "runBy", "datasource"
+		return Promise.resolve({
+			createdDate: mmtCreatedDateOfClient.format("YYYY-MM-DD"),
+			runDate: mmtNowOfClient.format("YYYY-MM-DD"),
+			runTime: mmtNowOfClient.format("HH:mm:ss"),
+			runBy: userFullName,
+			datasource: dataSourceText
+		});
 	};
 
 	BaseRunReportViewModel.prototype.createReportItemForExecution = function()
@@ -783,13 +802,14 @@
 			reportEntity = self.entity,
 			useFilter = !self.obFilterDisabled(),
 			useSpecifiedRecords = !self.obSpecifiedRecordsDisabled(),
-			execInfo = self.getCurrentExecutionInfo(),
-			reportItem = {};
+			execInfo = self.getCurrentExecutionInfo();
 
-		reportItem.Name = reportEntity.Name;
-		reportItem.ParameterMap = execInfo[PARAMETER_MAP_ITEMKEY];
-		reportItem.MapSettings = execInfo[MAP_SETTINGS_ITEMKEY]
-		reportItem.SpecificRecordIds = null;
+		const reportItem = {
+			Name: reportEntity.Name,
+			ParameterMap: execInfo[PARAMETER_MAP_ITEMKEY],
+			MapSettings: execInfo[MAP_SETTINGS_ITEMKEY],
+			SpecificRecordIds: null
+		}
 
 		if (useFilter)
 		{
@@ -889,7 +909,7 @@
 
 		if (self.obMapAvailiable())
 		{
-			let mapSettings = self.initMapSettings();
+			const mapSettings = self.initMapSettings();
 			// {
 			// 	"BaseMap": self.obSelectedBaseMap()
 			// };
@@ -1001,7 +1021,7 @@
 			}
 			setTimeout(function()
 			{ //put data source name into message.
-				var $helpBlock = $("#filterDataSource").closest('.form-group').find(".help-block");
+				var $helpBlock = $("#filterDataSource").closest(CLASS_NAME_FORM_GROUP).find(".help-block");
 				$helpBlock.text(" required");
 				$helpBlock.attr("title", "");
 			});
