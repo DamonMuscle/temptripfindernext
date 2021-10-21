@@ -1,13 +1,13 @@
+const NAMESPACE_TFCONTROLE = "TF.Control";
+const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 (function()
 {
-
-	createNamespace("TF.Control").FormRecordWithFilterSelector = FormRecordWithFilterSelector;
-
+	createNamespace(NAMESPACE_TFCONTROLE).FormRecordWithFilterSelector = FormRecordWithFilterSelector;
 	function FormRecordWithFilterSelector(elem, options)
 	{
 		this.tooltip = new TF.Helper.TFTooltip();
-		this.canClearFilter = options.canClearFilter,
-			this.isFilterApplied = false;
+		this.canClearFilter = options.canClearFilter;
+		this.isFilterApplied = false;
 		this.isFilterDisabled = false;
 		TF.Control.FormRecordSelector.apply(this, arguments);
 	}
@@ -16,15 +16,14 @@
 
 	FormRecordWithFilterSelector.prototype.getPlaceHolder = function()
 	{
-		return 'My ' + tf.dataTypeHelper.getFormDataType(this.options.dataType) + "s";
+		return `My ${tf.dataTypeHelper.getFormDataType(this.options.dataType)}s`;
 	}
 
 	FormRecordWithFilterSelector.prototype.init = function()
 	{
 		this.elem.addClass('filter-input');
 		TF.Control.FormRecordSelector.prototype.init.apply(this, arguments)
-
-		let ele = this.autoComplete.wrapper,
+		const ele = this.autoComplete.wrapper,
 			pHolder = this.getPlaceHolder();
 
 		ele.append(`<span class="k-icon tf-filter" data-toggle="modal"></span>
@@ -37,7 +36,7 @@
 				<div class="modal" id="myModal" tabindex="-1" role="dialog">
 				</div>`);
 
-		let tfFilter = ele.find('.k-icon.tf-filter'),
+		const tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			modalEle = ele.find('#myModal'),
 			clearFilterEle = ele.find('.current-filter-label .k-clear-value');
 
@@ -65,7 +64,7 @@
 		modalEle.on('show.bs.modal', e =>
 		{
 			tfFilter.tooltip('show');
-			$('.form-record-tooltip .tooltip-inner').on('click', e =>
+			$('.form-record-tooltip .tooltip-inner').on('click', () =>
 			{
 				this.toggleFilterApply(true);
 				modalEle.modal('hide');
@@ -80,8 +79,8 @@
 
 	FormRecordWithFilterSelector.prototype.toggleFilterApply = function(applyFilter)
 	{
-		let ele = this.autoComplete.wrapper,
-			tfFilter = ele.find('.k-icon.tf-filter'),
+		const ele = this.autoComplete.wrapper,
+			tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			filterLabel = ele.find('.current-filter-label');
 
 		if (applyFilter)
@@ -102,8 +101,8 @@
 
 	FormRecordWithFilterSelector.prototype.toggleFilterEnable = function(enableFilter)
 	{
-		let ele = this.autoComplete.wrapper,
-			tfFilter = ele.find('.k-icon.tf-filter'),
+		const ele = this.autoComplete.wrapper,
+			tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			clearFilterEle = ele.find('.current-filter-label .k-clear-value');
 
 		if (enableFilter)
@@ -124,7 +123,7 @@
 	{
 		if (this.isFilterApplied)
 		{
-			let staffInfo = tf.staffInfo,
+			const staffInfo = tf.staffInfo,
 				filterItem = {
 					FieldName: '',
 					IsListFilter: true,
@@ -136,7 +135,7 @@
 				filterItems = [],
 				filterSet = new TF.FilterSet('Or', filterItems);
 
-			let opts = {
+			const opts = {
 				paramData: {
 					getCount: true
 				},
@@ -174,7 +173,7 @@
 
 	FormRecordWithFilterSelector.prototype.parseFilterSetToQueryStrings = function(options)
 	{
-		let queryStringArr = [],
+		const queryStringArr = [],
 			data = options.data,
 			sortItems = data.sortItems,
 			fields = data.fields,
@@ -203,7 +202,7 @@
 		if (sortItems && sortItems.length > 0)
 		{
 			let queryString = '@sort=';
-			let items = sortItems.map(item =>
+			const items = sortItems.map(item =>
 			{
 				return `${item.Name}|${item.Direction === 'Ascending' ? 'asc' : 'desc'}`;
 			});
@@ -214,7 +213,7 @@
 		if (filterItems && filterItems.length > 0)
 		{
 			let queryString = '@filter=';
-			let items = filterItems.map(item =>
+			const items = filterItems.map(item =>
 			{
 				//Contains => contains. there're issues if operator is eq or others.
 				return `${item.Operator.toLowerCase()}(${item.FieldName},${item.Value})`;
@@ -225,14 +224,14 @@
 		if (filterSets && filterSets.length > 0)
 		{
 			let queryString = '@filter= ';
-			let items = filterSets.map(set =>
+			const items = filterSets.map(set =>
 			{
-				let setItems = set.FilterItems.map(item =>
+				const setItems = set.FilterItems.map(item =>
 				{
 					//Contains => contains. there're issues if operator is eq or others.
 					return `${item.Operator.toLowerCase()}(${item.FieldName},${item.Value})`;
 				})
-				let key = set.LogicalOperator === 'And' ? '&' : '|'
+				const key = set.LogicalOperator === 'And' ? '&' : '|'
 				return `(${setItems.join(key)})`;
 			});
 			queryString += items.join(operatorKey);
@@ -243,8 +242,8 @@
 
 	FormRecordWithFilterSelector.prototype.dispose = function()
 	{
-		let ele = this.autoComplete.wrapper,
-			tfFilter = ele.find('.k-icon.tf-filter'),
+		const ele = this.autoComplete.wrapper,
+			tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			modalEle = ele.find('#myModal');
 
 		tfFilter.off('click');
@@ -258,7 +257,7 @@
 (function()
 {
 
-	createNamespace("TF.Control").FormStaffRecordSelector = FormStaffRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormStaffRecordSelector = FormStaffRecordSelector;
 
 	function FormStaffRecordSelector(elem, options)
 	{
@@ -277,10 +276,10 @@
 	{
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
 
-		let staffInfo = tf.staffInfo;
+		const staffInfo = tf.staffInfo;
 		if (staffInfo.staffID && staffInfo.staffID.length === 1)
 		{
-			let config = TF.Form.formConfig[this.options.dataType],
+			const config = TF.Form.formConfig[this.options.dataType],
 				item = config.formatItem(staffInfo.items[0]);
 
 			this.toggleFilterApply(true);
@@ -292,7 +291,6 @@
 		{
 			this.toggleFilterApply(true);
 		}
-		// this.toggleFilterApply(true);
 	}
 
 	FormStaffRecordSelector.prototype.validateData = function(data, options)
@@ -303,7 +301,7 @@
 			return;
 		}
 
-		let config = TF.Form.formConfig[this.options.dataType],
+		const config = TF.Form.formConfig[this.options.dataType],
 			staffInfo = tf.staffInfo;
 
 		if (data.Items)
@@ -336,7 +334,7 @@
 (function()
 {
 
-	createNamespace("TF.Control").FormTripRecordSelector = FormTripRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormTripRecordSelector = FormTripRecordSelector;
 
 	function FormTripRecordSelector(elem, options)
 	{
@@ -354,15 +352,15 @@
 
 	FormTripRecordSelector.prototype.fetchData = function(opts, options)
 	{
-		let newOpts = JSON.parse(JSON.stringify(opts));
+		const newOpts = JSON.parse(JSON.stringify(opts));
 		if (this.isFilterApplied)
 		{
-			let staffInfo = tf.staffInfo,
+			const staffInfo = tf.staffInfo,
 				filterItems = newOpts.data && newOpts.data.filterSet && newOpts.data.filterSet.FilterItems;
 
 			if (filterItems != null && Array.isArray(filterItems))
 			{
-				let filterItem = {
+				const filterItem = {
 					FieldName: '',
 					IsListFilter: true,
 					Operator: 'In',
@@ -393,7 +391,7 @@
 (function()
 {
 
-	createNamespace("TF.Control").FormVehicleRecordSelector = FormVehicleRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormVehicleRecordSelector = FormVehicleRecordSelector;
 
 	function FormVehicleRecordSelector(elem, options)
 	{
@@ -405,7 +403,6 @@
 	FormVehicleRecordSelector.prototype.init = function()
 	{
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
-
 		this.toggleFilterApply(true);
 	}
 
@@ -417,14 +414,14 @@
 			{
 				if (res && res.length > 0)
 				{
-					let queryStrings = this.parseFilterSetToQueryStrings(opts);
+					const queryStrings = this.parseFilterSetToQueryStrings(opts);
 
 					queryStrings.push(`tripIds=${res.map(r => r.Id).join(',')}`);
 
 					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint(this.options.dataType), '?' + queryStrings.join('&')))
-						.then(res =>
+						.then(dataRes =>
 						{
-							this.validateData(res, options);
+							this.validateData(dataRes, options);
 						});
 				}
 				else
@@ -448,8 +445,7 @@
 
 (function()
 {
-
-	createNamespace("TF.Control").FormStudentRecordSelector = FormStudentRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormStudentRecordSelector = FormStudentRecordSelector;
 
 	function FormStudentRecordSelector(elem, options)
 	{
@@ -461,7 +457,6 @@
 	FormStudentRecordSelector.prototype.init = function()
 	{
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
-
 		this.toggleFilterApply(true);
 	}
 
@@ -473,14 +468,14 @@
 			{
 				if (res && res.length > 0)
 				{
-					let queryStrings = this.parseFilterSetToQueryStrings(opts);
+					const queryStrings = this.parseFilterSetToQueryStrings(opts);
 
 					queryStrings.push(`tripIds=${res.map(r => r.Id).join(',')}`);
 
 					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint(this.options.dataType), '?' + queryStrings.join('&')))
-						.then(res =>
+						.then(dataRes =>
 						{
-							this.validateData(res, options);
+							this.validateData(dataRes, options);
 						});
 				}
 				else
@@ -504,7 +499,7 @@
 (function()
 {
 
-	createNamespace("TF.Control").FormFieldtripRecordSelector = FormFieldtripRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormFieldtripRecordSelector = FormFieldtripRecordSelector;
 
 	function FormFieldtripRecordSelector(elem, options)
 	{
@@ -516,7 +511,6 @@
 	FormFieldtripRecordSelector.prototype.init = function()
 	{
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
-
 		this.toggleFilterApply(true);
 	}
 
@@ -533,8 +527,8 @@
 				skip = opts.paramData.skip || skip;
 			}
 
-			let params = [`take=${take}`, `skip=${skip}`, `getCount=true`, `filterType=submitted`]
-			let url = pathCombine(tf.api.apiPrefix(), 'search', 'fieldtrips?' + params.join('&'));
+			const params = [`take=${take}`, `skip=${skip}`, `getCount=true`, `filterType=submitted`]
+			const url = pathCombine(tf.api.apiPrefix(), 'search', 'fieldtrips?' + params.join('&'));
 			tf.promiseAjax.post(url, opts, { overlay: false })
 				.then(res =>
 				{

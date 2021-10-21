@@ -1,5 +1,12 @@
 (function()
 {
+	const EVENT_ORIENTATION_CHANGE_MOBILE = "orientationchange.formMobile";
+	const QUESTION_TYPE_SYSTEM_FIELD = "System Field";
+	const CLASS_NAME_FORM_SUBTITLE = ".form-subtitle";
+	const CLASS_NAME_FORM_HEADER = ".form-header";
+	const CLASS_NAME_FORM_TITLE = ".form-title";
+	const CLASS_NAME_LINE_CLAMP2 = "line-clamp-2";
+	const CLASS_NAME_LINE_CLAMP3 = "line-clamp-3";
 	createNamespace("TF.Control.Form").Form = Form;
 	function Form(dataType, options)
 	{
@@ -45,7 +52,7 @@
 	{
 		this.elem.on('click', '.form-close', () =>
 		{
-			let hasValue = this.questions.some(question => question.hasValue()),
+			const hasValue = this.questions.some(question => question.hasValue()),
 				hasAttachments = this.attachBlock && this.attachBlock.formDocuments.length > 0;
 			if (hasValue || hasAttachments)
 			{
@@ -72,7 +79,7 @@
 	Form.prototype.closeForm = function()
 	{
 		this.elem.trigger('formClose');
-		$(window).off("orientationchange.formMobile");
+		$(window).off(EVENT_ORIENTATION_CHANGE_MOBILE);
 	}
 
 	Form.prototype.validateLocationRequired = function()
@@ -96,8 +103,8 @@
 	{
 		if (this.obRecordID() == null)
 		{
-			let aStr = this.dataType === 'altsite' ? 'an' : 'a';
-			let dateType = tf.dataTypeHelper.getFormDataType(this.dataType);
+			const aStr = this.dataType === 'altsite' ? 'an' : 'a';
+			const dateType = tf.dataTypeHelper.getFormDataType(this.dataType);
 			return tf.promiseBootbox.alert({
 				message: `Please select ${aStr} ${dateType} first.`,
 				title: `No ${dateType} Selected`
@@ -107,9 +114,9 @@
 			});
 		}
 		return Promise.all([...this.questions.map(q => q.validate()), this.validateLocationRequired()])
-			.then(res =>
+			.then(() =>
 			{
-				let udgRecord = {};
+				const udgRecord = {};
 				this.questions.filter(q => q.field.questionType !== 'Map').forEach(q =>
 				{
 					//filter out attachment since multi-documents saved in sperate table
@@ -137,7 +144,7 @@
 					const attachmentQuestions = this.questions.filter(q => q.field.questionType === 'AttachBlock' && q.value);
 					if (attachmentQuestions.length > 0)
 					{
-						let promises = attachmentQuestions.map(q =>
+						const promises = attachmentQuestions.map(q =>
 						{
 							const attachments = q.value.map(_ =>
 							{
@@ -189,13 +196,13 @@
 					});
 
 
-					return TF.getLocation().then(res =>
+					return TF.getLocation().then(locationRes =>
 					{
-						if (this.options.isLocationRequired && res.errorCode !== 0)
+						if (this.options.isLocationRequired && locationRes.errorCode !== 0)
 						{
 							tf.loadingIndicator.tryHide();
 							let errorTipMessage = "Unknown error of getting geolocation";
-							switch (res.errorCode)
+							switch (locationRes.errorCode)
 							{
 								case GeolocationPositionError.PERMISSION_DENIED:
 									errorTipMessage = "Location services must be turned on in order to submit this form.";
@@ -215,8 +222,8 @@
 						}
 						else
 						{
-							udgRecord.latitude = res.latitude;
-							udgRecord.longitude = res.longitude;
+							udgRecord.latitude = locationRes.latitude;
+							udgRecord.longitude = locationRes.longitude;
 							return Promise.resolve();
 						}
 					}).then(() =>
@@ -237,7 +244,7 @@
 				{
 					if (this.saved)
 					{
-						this.saved().then(res =>
+						this.saved().then(() =>
 						{
 							tf.loadingIndicator.tryHide();
 							this.closeForm();
@@ -279,9 +286,8 @@
 
 	Form.prototype.initRecordSelector = function()
 	{
-		let autoCompleteElem = this.elem.find(".form-entity-input"),
-			type = this.dataType,
-			selector = 'FormRecordSelector';
+		const autoCompleteElem = this.elem.find(".form-entity-input");
+		let type = this.dataType, selector = 'FormRecordSelector';
 
 		type = type[0].toUpperCase() + type.substring(1);
 		/**
@@ -302,7 +308,6 @@
 			valueChanged: val =>
 			{
 				this.obRecordID(val);
-				//this.options.RecordID = val;
 			}
 		});
 		autoCompleteElem.css("width", '');
@@ -312,7 +317,7 @@
 		}
 		autoCompleteElem.keydown(function(event)
 		{
-			if (event.keyCode == 13)
+			if (event.keyCode === 13)
 			{
 				event.stopPropagation()
 			}
@@ -326,9 +331,9 @@
 
 	Form.prototype.initElement = function()
 	{
-		let color = this.options.color,
+		const color = this.options.color,
 			dateType = tf.dataTypeHelper.getFormDataType(this.dataType),
-			searchHint = dateType === "Staff" ? "Search " + dateType : "Search " + dateType + "s";
+			searchHint = dateType === "Staff" ? "Search " + dateType : `Search ${dateType}s`;
 
 		let elem = $(`<div class="form-container hide">
 			<div class="form-layer" style="background-color:${this.convertHex(color, 0.2)}">
@@ -337,7 +342,9 @@
 						<div class="form-title">${this.options.Name || ''}</div>
 						<div class="form-subtitle">${this.options.Description || ''}</div>
 						<div class="showmore">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="14"><path fill="currentColor" d="M0 7.33l2.829-2.83 9.175 9.339 9.167-9.339 2.829 2.83-11.996 12.17z"></path></svg>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="14">
+								<path fill="currentColor" d="M0 7.33l2.829-2.83 9.175 9.339 9.167-9.339 2.829 2.83-11.996 12.17z"></path>
+							</svg>
 						</div>
 					</div>
 					<div class="form-body">	
@@ -357,7 +364,8 @@
 			</div>
 		</div>`);
 
-		if (TF.isMobileDevice) {
+		if (TF.isMobileDevice)
+		{
 			elem = $(`<div class="form-container hide">
 			<div class="form-layer" style="background-color:${this.convertHex(color, 0.2)}">
 				<div class="form">
@@ -395,35 +403,34 @@
 		this.createQuestions(elem);
 		this._processElement(elem);
 
-		let self = this;
+		const self = this;
 		if (TF.isMobileDevice)
 		{
-			$(window).off("orientationchange.formMobile")
-				.on("orientationchange.formMobile", () =>
+			$(window).off(EVENT_ORIENTATION_CHANGE_MOBILE)
+				.on(EVENT_ORIENTATION_CHANGE_MOBILE, () =>
 				{
 					setTimeout(function()
 					{
 
-						let dialog = elem.closest('.modal-dialog');
+						const classNameModalBody = ".modal-body";
+						const cssNameMinHeight = "min-height";
+						const dialog = elem.closest('.modal-dialog');
 						if (dialog.length > 0)
 						{
-							dialog.find('.modal-body').css("max-height", $(window).height() - 46);
-							let bodyHeight = dialog.find('.modal-body').height();
-							// elem.closest(".basic-quick-add").css("max-height", bodyHeight + "px");
-							elem.closest(".grid-stack-container").css("min-height", bodyHeight + "px");
+							dialog.find(classNameModalBody).css(cssNameMinHeight, $(window).height() - 46);
+							const bodyHeight = dialog.find(classNameModalBody).height();
+							elem.closest(".grid-stack-container").css(cssNameMinHeight, bodyHeight + "px");
 
-							let bodyHeightWithoutPadding = dialog.find('.modal-body').height();
-							elem.closest(".basic-quick-add").css("min-height", bodyHeightWithoutPadding + "px");
-							elem.find(".form").css("min-height", bodyHeightWithoutPadding + "px");
+							const bodyHeightWithoutPadding = dialog.find(classNameModalBody).height();
+							elem.closest(".basic-quick-add").css(cssNameMinHeight, bodyHeightWithoutPadding + "px");
+							elem.find(".form").css(cssNameMinHeight, bodyHeightWithoutPadding + "px");
 
 							setTimeout(function()
 							{
-								//self.checkHeaderWrapped(elem);
-								let keepRotate = true;
-								let toRotate = self.resetFormHeader(elem, keepRotate);
+								const keepRotate = true;
+								self.resetFormHeader(elem, keepRotate);
 								setTimeout(function()
 								{
-									//self.resetFormSubTitleClamp(elem, toRotate);
 									window.scroll(0, 1);
 								}, 200);
 							}, 100);
@@ -438,7 +445,7 @@
 	/* assign type record, invoked by UDGridGridStackQuickAddWrapper.prototype._updateQuickAddDetailView */
 	Form.prototype.assginEntityRecord = function(record)
 	{
-		let id = record && (record.RecordID || record.Id); // recordID contains value when form opened on form grid
+		const id = record && (record.RecordID || record.Id); // recordID contains value when form opened on form grid
 		if (!!id)
 		{
 			this.obRecordID(id);
@@ -455,13 +462,13 @@
 
 	Form.prototype._processElement = function(element)
 	{
-		let anchors = element.find('.question-title a');
+		const anchors = element.find('.question-title a');
 		if (anchors.length > 0)
 		{
 			$.each(anchors, (idx, a) =>
 			{
-				let $a = $(a);
-				if ($a.attr('target') != '_blank')
+				const $a = $(a);
+				if ($a.attr('target') !== '_blank')
 				{
 					$a.attr('target', '_blank');
 				}
@@ -473,7 +480,7 @@
 	{
 		const getUDFOptionPromise = () =>
 		{
-			const systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === "System Field");
+			const systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
 
 			if (this.udfOptionPromise === undefined)
 			{
@@ -483,7 +490,13 @@
 					if (udfs === undefined && udfUniqueIds.length > 0)
 					{
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
-							{ paramData: { "@Relationships": "UDFDataSources", "@fields": "DisplayName,Guid,UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
+							{
+								paramData: {
+									"@Relationships": "UDFDataSources",
+									"@fields": "DisplayName,Guid,UDFDataSources",
+									"@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})`
+								}
+							},
 							{ overlay: false })
 							.then(data =>
 							{
@@ -492,6 +505,7 @@
 									this.udfs = data.Items;
 									return this.udfs;
 								}
+								return [];
 							});
 					}
 					else
@@ -506,7 +520,9 @@
 
 		return new Promise((resolve) =>
 		{
-			const systemFieldUDFQuestions = this.questions.filter(q => q.field.FieldOptions && q.field.FieldOptions.TypeName === "System Field" && q.field.FieldOptions.IsUDFSystemField);
+			const systemFieldUDFQuestions = this.questions.filter(q => q.field.FieldOptions
+				&& q.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD
+				&& q.field.FieldOptions.IsUDFSystemField);
 			if (systemFieldUDFQuestions.length === 0)
 			{
 				resolve();
@@ -547,31 +563,35 @@
 	Form.prototype.attachActionOnFormHeader = function($element)
 	{
 		// make subtitle display block to calculate full height
-		$element.find(".form-subtitle").css("display", "block");
-		let subtitleHeight = $element.find(".form-subtitle").outerHeight(),
-			headerInnerHeight = $element.find(".form-header").height(),
-			titleHeight = $element.find(".form-title").outerHeight();
+		$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
+		const subtitleHeight = $element.find(CLASS_NAME_FORM_SUBTITLE).outerHeight(),
+			headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
+			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
 		/*
-		 * greater than 0 means insufficient height for subtitle(form description), 
+		 * greater than 0 means insufficient height for subtitle(form description),
 		 * need show "shore more" icon for arrow down to present full height content
 		 */
-		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
-		let self = this;
-		if (!TF.isMobileDevice) {
+		const offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+		const self = this;
+		if (!TF.isMobileDevice)
+		{
 			self.checkHeaderWrapped($element);
 			const isRotated = $element.find(".showmore").hasClass("rotate");
-			setTimeout(function ()
+			setTimeout(function()
 			{
 				self.resetFormSubTitleClamp($element, isRotated);
 			}, 200);
 		}
 
-		if (offsetHeight > 0) {
-			if (!TF.isMobileDevice) {
-				$element.find(".form-subtitle").css("display", "-webkit-box");
+		if (offsetHeight > 0)
+		{
+			if (!TF.isMobileDevice)
+			{
+				$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "-webkit-box");
 			}
-			this.elem.find(".showmore").show().on("click", ev => {
-				let toRotate = this.resetFormHeader($element);
+			this.elem.find(".showmore").show().on("click", ev =>
+			{
+				const toRotate = this.resetFormHeader($element);
 				setTimeout(function()
 				{
 					self.resetFormSubTitleClamp($element, toRotate);
@@ -582,32 +602,32 @@
 
 	Form.prototype.checkHeaderWrapped = function($element)
 	{
-		let titleEle = $element.find(".form-title"),
-			titleHeight = $element.find(".form-title").outerHeight();
+		const titleEle = $element.find(CLASS_NAME_FORM_TITLE),
+			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
 
 		titleEle.css('white-space', 'nowrap');
-		let height = titleEle.outerHeight();
+		const height = titleEle.outerHeight();
 		titleEle.css('white-space', 'normal');
 
-		$element.find('.form-subtitle').removeClass('line-clamp-2');
+		$element.find(CLASS_NAME_FORM_SUBTITLE).removeClass(CLASS_NAME_LINE_CLAMP2);
 		if (height < titleHeight)
 		{
 			//add mini-class to subtitle
-			$element.find('.form-subtitle').addClass('line-clamp-2');
+			$element.find(CLASS_NAME_FORM_SUBTITLE).addClass(CLASS_NAME_LINE_CLAMP2);
 		}
 	}
 
 	Form.prototype.resetFormHeader = function($element, keepRotate)
 	{
 		//Recalcultaing height in case of orientation change
-		$element.find(".form-subtitle").css("display", "block");
+		$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
 
-		let subtitleHeight = $element.find(".form-subtitle").outerHeight(),
-			headerInnerHeight = $element.find(".form-header").height(),
-			headerOuterHeight = $element.find(".form-header").outerHeight(),
-			titleHeight = $element.find(".form-title").outerHeight(),
-			headerTop = $element.find('.form-header').position().top,
-			offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+		const subtitleHeight = $element.find(CLASS_NAME_FORM_SUBTITLE).outerHeight(),
+			headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
+			headerOuterHeight = $element.find(CLASS_NAME_FORM_HEADER).outerHeight(),
+			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight(),
+			headerTop = $element.find(CLASS_NAME_FORM_HEADER).position().top;
+		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
 
 		if (isMobileDevice())
 		{
@@ -622,9 +642,9 @@
 			{
 				$element.find(".showmore").addClass("rotate");
 			}
-			let formHeaderHeight = headerOuterHeight + offsetHeight;
-			$element.find(".form-header").outerHeight(formHeaderHeight);
-			$element.find(".form-subtitle").css("display", "block");
+			const formHeaderHeight = headerOuterHeight + offsetHeight;
+			$element.find(CLASS_NAME_FORM_HEADER).outerHeight(formHeaderHeight);
+			$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
 			$element.find(".form-body").css("top", formHeaderHeight + headerTop - 15);
 		}
 		else
@@ -633,8 +653,8 @@
 			{
 				$element.find(".showmore").removeClass("rotate");
 			}
-			$element.find(".form-header").css("height", "");
-			$element.find(".form-subtitle").css("display", "");
+			$element.find(CLASS_NAME_FORM_HEADER).css("height", "");
+			$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "");
 			$element.find(".form-body").css("top", "");
 		}
 
@@ -643,19 +663,18 @@
 
 	Form.prototype.resetFormSubTitleClamp = function($element, toRotate)
 	{
-		let rotateBtnHeight = 20;
-		let lineHeight = 22;
+		const rotateBtnHeight = 20;
+		const lineHeight = 22;
 
-		let $formSubtitle = $element.find(".form-subtitle");
-		let displayText = $formSubtitle.css("display");
+		const $formSubtitle = $element.find(CLASS_NAME_FORM_SUBTITLE);
+		const displayText = $formSubtitle.css("display");
 		$formSubtitle.css("display", "block");
-		let formSubtitleHeight = $formSubtitle.height();
-
-		let isLineClampDisabled = formSubtitleHeight <= lineHeight;
+		const formSubtitleHeight = $formSubtitle.height();
+		const isLineClampDisabled = formSubtitleHeight <= lineHeight;
 
 		if (isLineClampDisabled)
 		{
-			$formSubtitle.removeClass('line-clamp-2').removeClass('line-clamp-3');
+			$formSubtitle.removeClass(CLASS_NAME_LINE_CLAMP2).removeClass(CLASS_NAME_LINE_CLAMP3);
 			$element.find(".showmore").addClass("rotate");
 			$element.find(".showmore").hide();
 			return;
@@ -664,21 +683,21 @@
 		$formSubtitle.css("display", displayText);
 		$element.find(".showmore").show();
 
-		let headerInnerHeight = $element.find(".form-header").height(),
-			titleHeight = $element.find(".form-title").outerHeight();
+		const headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
+			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
 
-		let lineClampValue = Math.floor((headerInnerHeight - titleHeight - rotateBtnHeight) / lineHeight);
-		$formSubtitle.removeClass('line-clamp-2').removeClass('line-clamp-3').addClass('line-clamp-' + lineClampValue);
+		const lineClampValue = Math.floor((headerInnerHeight - titleHeight - rotateBtnHeight) / lineHeight);
+		$formSubtitle.removeClass(CLASS_NAME_LINE_CLAMP2).removeClass(CLASS_NAME_LINE_CLAMP3).addClass('line-clamp-' + lineClampValue);
 	}
 
 	Form.prototype.toggleSystemFieldValue = function(recordId)
 	{
 		this.initUDFSystemFieldStatePromise && this.initUDFSystemFieldStatePromise.then(() =>
 		{
-			let systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === "System Field");
-			let targetColumns = systemFieldQuestions.map(el => el.field.editType.targetField);
+			const systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
+			const targetColumns = systemFieldQuestions.map(el => el.field.editType.targetField);
 
-			if (targetColumns.length == 0)
+			if (targetColumns.length === 0)
 			{
 				return;
 			}
@@ -722,13 +741,13 @@
 	{
 		if (docs.length > 0 && docRelationships.length > 0)
 		{
-			let attachmentsOfQuestions = _.groupBy(docRelationships, "UDGridField");
+			const attachmentsOfQuestions = _.groupBy(docRelationships, "UDGridField");
 			this.questions.filter(q => q.field.type === 'AttachBlock').forEach(q =>
 			{
 				const docRelations = attachmentsOfQuestions[q.field.Guid];
 				if (docRelations)
 				{
-					const docsOfAttachment = docs.filter(d => docRelations.some(dr => dr.DocumentID == d.Id));
+					const docsOfAttachment = docs.filter(d => docRelations.some(dr => dr.DocumentID === d.Id));
 					q.restore(docsOfAttachment);
 				}
 			});
@@ -737,7 +756,7 @@
 
 	Form.prototype.drawMapShapes = function(mapRecords)
 	{
-		if (mapRecords.length == 0)
+		if (mapRecords.length === 0)
 		{
 			return;
 		}
@@ -760,17 +779,20 @@
 
 	Form.prototype.createQuestions = function(element)
 	{
-		let fields = this.options.UDGridFields.sort((a, b) => a.Index - b.Index),
+		const fields = this.options.UDGridFields.sort((a, b) => a.Index - b.Index),
 			questionContainer = element.find('.form-question-container');
 
-		if (fields.length == 0)
+		if (fields.length === 0)
 		{
 			return;
 		}
 		fields.forEach(field =>
 		{
-			if (!field) return;
-			let questionControl = new TF.Control.Form[field.questionType + 'Question'](field, this.options.DataTypeId, this.onFormElementInit);
+			if (!field)
+			{
+				return;
+			}
+			const questionControl = new TF.Control.Form[field.questionType + 'Question'](field, this.options.DataTypeId, this.onFormElementInit);
 			this.questions.push(questionControl);
 			questionContainer.append(questionControl.element);
 		});
@@ -780,16 +802,15 @@
 	Form.prototype.convertHex = function(hex, opacity)
 	{
 		hex = hex.replace('#', '');
-		r = parseInt(hex.substring(0, 2), 16);
-		g = parseInt(hex.substring(2, 4), 16);
-		b = parseInt(hex.substring(4, 6), 16);
-		result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')';
-		return result;
+		const r = parseInt(hex.substring(0, 2), 16),
+			g = parseInt(hex.substring(2, 4), 16),
+			b = parseInt(hex.substring(4, 6), 16);
+		return `rgba(${r},${g},${b},${opacity})`;
 	}
 
 	Form.prototype.resetSubmitButtonsAndWarningMessage = function(element)
 	{
-		let onlyContainsSystemFields = (element.find(".form-question:visible").length === 0) && (element.find(".systemfield-question").length > 0);
+		const onlyContainsSystemFields = (element.find(".form-question:visible").length === 0) && (element.find(".systemfield-question").length > 0);
 		if (onlyContainsSystemFields)
 		{
 			element.find(".system-field-invalid").removeClass("hide");
@@ -797,14 +818,14 @@
 
 		if (onlyContainsSystemFields)
 		{
-			let $modal = element.closest(".modal-dialog")
-			let $positiveBtn = $modal.find(".btn.positive");
+			const $modal = element.closest(".modal-dialog")
+			const $positiveBtn = $modal.find(".btn.positive");
 			if ($positiveBtn && $positiveBtn.length)
 			{
 				$positiveBtn.remove();
 			}
 
-			let $negativeBtn = $modal.find(".btn.negative");
+			const $negativeBtn = $modal.find(".btn.negative");
 			if ($negativeBtn && $negativeBtn.length)
 			{
 				$negativeBtn.removeClass("btn-link").addClass("tf-btn-black");
@@ -815,8 +836,8 @@
 
 	Form.prototype.fetchFilterData = function()
 	{
-		let config = TF.Form.formConfig[this.dataType];
-		let opts = {
+		const config = TF.Form.formConfig[this.dataType];
+		const opts = {
 			paramData: {
 				take: 10,
 				//skip: 0,
@@ -836,10 +857,8 @@
 			{ overlay: false })
 			.then(data =>
 			{
-				let text = config.formatItem(data.Items[0]).text;
+				const text = config.formatItem(data.Items[0]).text;
 				this.recordSelector.elem.val(text);
-			}).catch(ex =>
-			{
 			});
 	}
 
@@ -852,7 +871,6 @@
 		this.elem.off('click');
 		this.elem.remove();
 		["from_kendo-control", "form_timepicker", "form_rating"].forEach(el => document.getElementById(el) && document.getElementById(el).remove());
-
 		const kendoNumericWidget = kendo.widgets.find(_ => _.name === "kendoNumericTextBox");
 		if (kendoNumericWidget && this._kendoNumericTextBox_keypress)
 		{

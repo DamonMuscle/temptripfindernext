@@ -56,16 +56,13 @@
 
 	MapQuestion.prototype.initQuestionContent = function()
 	{
-		let self = this;
-		let $el = $(`<div class='map-question question'>
+		return $(`<div class='map-question question'>
 					<div class='map-item map-page doc'>
 						<div class='map' style='max-height: 2000px; height: 100%; width: 100%; background: #e1e1e1'>
 						</div>
 					</div>
 				</div>
 				<div class="cordinate" style="text-align:left;color:#8e7878;"></div>`);
-		//ko.applyBindings({ mapManager: mapManager }, $elem[0]);
-		return $el;
 	}
 
 	MapQuestion.prototype.initEvents = function()
@@ -76,7 +73,7 @@
 	MapQuestion.prototype.getValidateResult = function()
 	{
 		let result = '';
-		if (this.isRequired && (this.value.length == 0))
+		if (this.isRequired && (this.value.length === 0))
 		{
 			result = 'Answer is required.';
 		}
@@ -131,9 +128,9 @@
 		{
 			if (TF.isMobileDevice)
 			{
-				let mobileLocationMarkerList = [];
+				const mobileLocationMarkerList = [];
 				let removed = false;
-				for (let marker of options.locationMarkerList)
+				for (const marker of options.locationMarkerList)
 				{
 					if (["Polygon", "Rectangle", "Draw", "Circle"].includes(marker))
 					{
@@ -155,7 +152,8 @@
 			}
 		}
 
-		let borderColor = null, borderSize = null, pinOption = self.field.FieldOptions.PinOption;
+		let borderColor = null, borderSize = null;
+		const pinOption = self.field.FieldOptions.PinOption;
 		if (self.field.FieldOptions.PinOption.ShowBorder)
 		{
 			borderColor = pinOption.BorderColor || "#000000";
@@ -173,8 +171,7 @@
 			}
 		);
 
-		let routeState = Math.random().toString(36).substring(7);
-
+		const routeState = Math.random().toString(36).substring(7);
 		self.mapViewModel = {
 			element: self.elem.find(".map-item.map-page"),
 			homeCoordinates: [self.field.FieldOptions.HomeLocation.Longitude, self.field.FieldOptions.HomeLocation.Latitude],
@@ -187,45 +184,52 @@
 		options.disableTrashBtn = true;
 		TF.getLocation().then(coord =>
 		{
-			if (!coord.latitude && !coord.longitude) {
+			if (!coord.latitude && !coord.longitude)
+			{
 				options.disableMyLocationBtn = true;
 			}
 			var map = TF.Helper.MapHelper.createMap($el, self.mapViewModel, options);
 			self._map = map;
 			self._mapView = map.mapView;
 
-			const coverDom = $(`<div class="map-question-zoom-cover" style="display:none;z-index: 25000; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 1;"></div>`);
-			if (!TF.isMobileDevice) {
+			const coverDom = $(`<div class="map-question-zoom-cover" 
+				style="display:none;z-index: 25000; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 1;"></div>`);
+			if (!TF.isMobileDevice)
+			{
 				self._mapView.navigation.browserTouchPanEnabled = true;
-				let $zoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip">Use ctrl + scroll to zoom the map</p>`);
-				$zoomCover.on("keydown mousewheel", function (evt)
+				const $zoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip">Use ctrl + scroll to zoom the map</p>`);
+				$zoomCover.on("keydown mousewheel", function(evt)
 				{
-					if (evt && evt.ctrlKey && self._map.expandMapTool.status) {
+					if (evt && evt.ctrlKey && self._map.expandMapTool.status)
+					{
 						evt.preventDefault();
 						evt.stopPropagation();
 						$zoomCover.hide();
 						// keep the event propagation when overlay not hide
-						if (!self.canvas) {
+						if (!self.canvas)
+						{
 							self.canvas = $(map.mapView.root).find("canvas")[0];
 						}
-						let originalEvent = evt.originalEvent;
-						let newEvt = new originalEvent.constructor(originalEvent.type, originalEvent);
+						const originalEvent = evt.originalEvent;
+						const newEvt = new originalEvent.constructor(originalEvent.type, originalEvent);
 						self.canvas.dispatchEvent(newEvt);
 					}
 				});
 				$(self._mapView.root).after($zoomCover);
-				self._mapView.on("mouse-wheel", function (evt)
+				self._mapView.on("mouse-wheel", function(evt)
 				{
-					if (evt && evt.native && !evt.native.ctrlKey && self._map.expandMapTool.status) {
+					if (evt && evt.native && !evt.native.ctrlKey && self._map.expandMapTool.status)
+					{
 						evt.preventDefault();
 						evt.stopPropagation();
 						$zoomCover.fadeIn(500).fadeOut(2000);
 					}
 				});
 			}
-			else {
+			else
+			{
 				self._mapView.navigation.browserTouchPanEnabled = false;
-				let $mobileZoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip" style="font-size:16px">Use two fingers to move the map</p>`);
+				const $mobileZoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip" style="font-size:16px">Use two fingers to move the map</p>`);
 				$(self._mapView.root).after($mobileZoomCover);
 				$el.off("touchmove.checkFingers")
 					.on("touchmove.checkFingers", (evt) =>
@@ -234,36 +238,41 @@
 						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
 						const mapToolIsActive = self.element.find(".off-map-tool").hasClass("active");
 						// return when map is drawing.
-						if (locationMarkerTool && locationMarkerTool.isDrawing === true) {
+						if (locationMarkerTool && locationMarkerTool.isDrawing === true)
+						{
 							evt.preventDefault();
 							evt.stopPropagation();
 							return;
 						}
 
-						if (touches.length <= 1 && self._map.expandMapTool.status && !mapToolIsActive) {
+						if (touches.length <= 1 && self._map.expandMapTool.status && !mapToolIsActive)
+						{
 							$mobileZoomCover.show();
 						}
 
-						if (touches.length > 1 && self._map.expandMapTool.status) {
+						if (touches.length > 1 && self._map.expandMapTool.status)
+						{
 							$mobileZoomCover.hide();
 						}
 					});
 
 				$el.off("touchstart.checkFingers")
-					.on("touchstart.checkFingers", (evt) => 
+					.on("touchstart.checkFingers", (evt) =>
 					{
 						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
-						if (locationMarkerTool && locationMarkerTool.isDrawing === true) {
+						if (locationMarkerTool && locationMarkerTool.isDrawing === true)
+						{
 							const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
 							TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "none");
 						}
 					});
 
 				$el.off("touchend.checkFingers")
-					.on("touchend.checkFingers", (evt) => 
+					.on("touchend.checkFingers", (evt) =>
 					{
 						const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
-						if (touches.length <= 1 && self._map.expandMapTool.status) {
+						if (touches.length <= 1 && self._map.expandMapTool.status)
+						{
 							$mobileZoomCover.hide();
 						}
 
@@ -271,7 +280,7 @@
 						TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "auto");
 					});
 
-				self._mapView.on(["pointer-up", "pointer-leave"], function (e)
+				self._mapView.on(["pointer-up", "pointer-leave"], function(e)
 				{
 					$mobileZoomCover.hide();
 				});
@@ -283,22 +292,25 @@
 			// to enable map tools on map view
 			self.mapViewModel.RoutingMapTool.toolkitBtnClickEventEnable = true;
 			// Adjust map tool whether adopt with landscape(not enough height to show tools by vertical)
-			self.mapViewModel.RoutingMapTool.toolkitBtnClickEvent.subscribe(function (e, callback)
+			self.mapViewModel.RoutingMapTool.toolkitBtnClickEvent.subscribe(function(e, callback)
 			{
 				var $offMapTool = self.mapViewModel.RoutingMapTool.$offMapTool;
 				$offMapTool.css("z-index", 24000);
 
-				if (!$offMapTool.hasClass("active")) {
+				if (!$offMapTool.hasClass("active"))
+				{
 					var $mapMaskElement = $("body"),
 						$mapToolBtn = $offMapTool.find(".map-tool-btn"),
 						$mapToolLabel = $offMapTool.find(".map-tool-label"),
 						activeMapToolHeight = $mapToolBtn.position().top + $mapToolBtn.height() + $mapToolLabel.height();
-					if ($mapMaskElement.height() - $offMapTool.offset().top < activeMapToolHeight) {
+					if ($mapMaskElement.height() - $offMapTool.offset().top < activeMapToolHeight)
+					{
 						self.mapViewModel.RoutingMapTool.isLandscape = true;
 						self.mapViewModel.RoutingMapTool.landscape();
 					}
 				}
-				else {
+				else
+				{
 					$offMapTool.css("z-index", 12000);
 				}
 				callback();
@@ -319,17 +331,21 @@
 		}
 
 		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
-		self.onBasemapToolClickToken = PubSub.subscribe("MapToolClicked", (_, item) => 
+		self.onBasemapToolClickToken = PubSub.subscribe("MapToolClicked", (_, item) =>
 		{
-			if (item.title !== "Basemap") return;
+			if (item.title !== "Basemap")
+			{
+				return;
+			}
 			if (item.isActive === true || TF.isPhoneDevice)
 			{
-				self.removeUselessBaseMapItemTimeout = setTimeout(() => {
+				self.removeUselessBaseMapItemTimeout = setTimeout(() =>
+				{
 					// hide "My Maps (Vector Tile)", "Live Traffic Data" in basemap.
 					var $gallery = TF.isPhoneDevice ? $(".mobile-modal-content-body").find(".esri-basemap-gallery") : $(".map-page.doc.esri-view").find(".esri-basemap-gallery"),
 						liList = $gallery.find("li").toArray(),
-						hideItems = liList.filter(item => $.inArray(item.innerText.trim(), ["My Maps (Vector Tile)", "Live Traffic Data"]) >= 0);
-					hideItems.forEach(li => 
+						hideItems = liList.filter(liItem => $.inArray(liItem.innerText.trim(), ["My Maps (Vector Tile)", "Live Traffic Data"]) >= 0);
+					hideItems.forEach(li =>
 					{
 						$(li).hide();
 					});
@@ -340,7 +356,8 @@
 
 	function hideMapTool()
 	{
-		if (this.mapViewModel && this.mapViewModel.RoutingMapTool) {
+		if (this.mapViewModel && this.mapViewModel.RoutingMapTool)
+		{
 			this.mapViewModel.RoutingMapTool.$mapToolContainer && this.mapViewModel.RoutingMapTool.$mapToolContainer.removeClass("landscape");
 			this.mapViewModel.RoutingMapTool.isLandscape = false;
 			this.mapViewModel.RoutingMapTool.toggleMapToolDisplayStatus(false);
@@ -381,7 +398,7 @@
 
 	MapQuestion.prototype.dispose = function()
 	{
-		let self = this;
+		const self = this;
 		self._map = null;
 		self._mapView = null;
 		self.mapViewModel && self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.dispose();

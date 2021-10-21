@@ -43,7 +43,7 @@
 
 	BaseQuestion.prototype.valueChanged = function()
 	{
-
+		console.log("base value changed invoked")
 	}
 
 	BaseQuestion.prototype.initEvents = function()
@@ -53,7 +53,7 @@
 
 	BaseQuestion.prototype.bindValidateValueEvents = function()
 	{
-		let inputs = this.getValidateInputs();
+		const inputs = this.getValidateInputs();
 		inputs.blur(() =>
 		{
 			this.validateInternal();
@@ -68,13 +68,13 @@
 
 	BaseQuestion.prototype.hasValue = function()
 	{
-		return this.value != null && this.value != '';
+		return this.value != null && this.value !== '';
 	}
 
 
 	BaseQuestion.prototype.initElement = function()
 	{
-		let self = this, field = this.field;
+		const self = this, field = this.field;
 
 		this.elem = $(`<div class="form-question">
 			<div class="question-title">
@@ -107,7 +107,7 @@
 
 	BaseQuestion.prototype.validate = function()
 	{
-		let validResult = this.validateInternal();
+		const validResult = this.validateInternal();
 		if (validResult === true)
 		{
 			return Promise.resolve(true);
@@ -135,17 +135,18 @@
 		{
 			return true;
 		}
-		let result = this.getValidateResult();
+		const result = this.getValidateResult();
 		if (result.length > 0)
 		{
 			this.element.addClass('invalid');
 			this.element.find('.invalid-message').html(result);
-			return result;
+			return !!result;
 		}
 		return true;
 	}
 
-	BaseQuestion.prototype.dispose = function () {
+	BaseQuestion.prototype.dispose = function()
+	{
 		/* it should override dispose method in specific question if needed */
 	}
 
