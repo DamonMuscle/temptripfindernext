@@ -5,6 +5,10 @@
 	function AttachBlock() {
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
 		var self = this;
+		self.StrBrowseFile = '.browse-file';
+		self.StrDisableUpload = 'disable-upload';
+		self.StrDocumentFileSelector = '#document-file-selector';
+		self.StrContentWrapper = '.content-wrapper';
 		self.attachedDocuments = [];
 		self.attachedDocumentsName = [];
 		self.formDocuments = [];
@@ -37,8 +41,8 @@
 	});
 
 	AttachBlock.prototype.initQuestionContent = function () {
-		let self = this;
-		let $attachmentContent = $(`<div class= 'attachment-question attachment-container' >
+		const self = this;
+		const $attachmentContent = $(`<div class= 'attachment-question attachment-container' >
 								<div class='item-content attach-document-block'>
                                     <div class='place-holder'>Drop files to add documents, or <span class='browse-file'>browse</span></div>
 									<input type='file' id='document-file-selector' multiple='multiple' style='display:none' accept='*.*' />
@@ -49,20 +53,21 @@
 							</div >
 						</div>`);
 		if (self.field.readonly) {
-			$attachmentContent.find(".browse-file").addClass("disable-upload");
+			$attachmentContent.find(self.StrBrowseFile).addClass(self.StrDisableUpload);
 		}
 		return $attachmentContent;
 	}
 
 	AttachBlock.prototype.uploadedFilesChangeEvent = function (e) {
-		let self = this, files = e.target.files;
+		const self = this, files = e.target.files;
 		if (files.length > 0) {
 			self.uploadedFiles(files);
 		}
 	};
 
 	AttachBlock.prototype.uploadedFiles = function (files) {
-		let self = this, validateFiles = [], filesNumber = self.attachedDocumentsName.length;
+		const self = this, validateFiles = [];
+		let filesNumber = self.attachedDocumentsName.length;
 		if (filesNumber === 5) {
 			return;
 		}
@@ -81,7 +86,10 @@
 	AttachBlock.prototype.getAdaptiveFileStream = function (index) {
 		var self = this;
 
-		if (!self.uploadDocumentHelper) return;
+		if (!self.uploadDocumentHelper)
+		{
+			return null;
+		}
 
 		var uploadFiles = self.attachedDocuments;
 
@@ -104,9 +112,10 @@
 							return {
 								FileName: rawFile.name,
 								MimeType: rawFile.type,
-								FileContent: fileStreamSplit.length == 2 ? _.last(fileStream.split(",")) : ""
+								FileContent: fileStreamSplit.length === 2 ? _.last(fileStream.split(",")) : ""
 							};
 						}
+						return null;
 					});
 
 			}
@@ -122,7 +131,7 @@
 	AttachBlock.prototype.browseAttachFile = function (e) {
 		var self = this,
 			$fileSelector = self.elem.find('#document-file-selector');
-		if (self.elem.find(".browse-file").hasClass("disable-upload")) {
+		if (self.elem.find(self.StrBrowseFile).hasClass(self.StrDisableUpload)) {
 			return;
 		}
 
@@ -133,21 +142,24 @@
 	AttachBlock.prototype.initEvents = function () {
 		var self = this;
 
-		self.elem.on("click", ".browse-file", self.browseAttachFile.bind(self));
-		self.elem.on("change", "#document-file-selector", self.uploadedFilesChangeEvent.bind(self));
+		self.elem.on("click", self.StrBrowseFile, self.browseAttachFile.bind(self));
+		self.elem.on("change", self.StrDocumentFileSelector, self.uploadedFilesChangeEvent.bind(self));
 		self.elem.on('click', ".preview", function (e) {
-			let conentWrapper = $(e.currentTarget).closest(".content-wrapper"),
-				index = self.elem.find('.content-wrapper').index(conentWrapper);
+			const conentWrapper = $(e.currentTarget).closest(self.StrContentWrapper),
+				index = self.elem.find(self.StrContentWrapper).index(conentWrapper);
 			self.getAdaptiveFileStream(index).then(function (document) {
-				if (!document) return;
+				if (!document)
+				{
+					return;
+				}
 
 				self.showDocumentPreview(document);
 			});
 		});
 
 		self.elem.on("click", ".download", function (e) {
-			let conentWrapper = $(e.currentTarget).closest(".content-wrapper"),
-				index = self.elem.find('.content-wrapper').index(conentWrapper);
+			const conentWrapper = $(e.currentTarget).closest(self.StrContentWrapper),
+				index = self.elem.find(self.StrContentWrapper).index(conentWrapper);
 			self.getAdaptiveFileStream(index).then(function (document) {
 				var helper = tf.docFilePreviewHelper;
 				if (document && document.FileContent) {
@@ -157,8 +169,8 @@
 		});
 
 		self.elem.on('click', '.trash-can', function (e) {
-			let conentWrapper = $(e.currentTarget).closest(".content-wrapper"),
-				index = self.elem.find('.content-wrapper').index(conentWrapper);
+			const conentWrapper = $(e.currentTarget).closest(self.StrContentWrapper),
+				index = self.elem.find(self.StrContentWrapper).index(conentWrapper);
 			e.stopPropagation();
 
 			var currentAttachedFileName = self.attachedDocumentsName[index],
@@ -172,7 +184,7 @@
 							self.attachedDocumentsName.splice(index, 1);
 							self.formDocuments.splice(index, 1);
 							self.refresh();
-							self.elem.find("#document-file-selector").val("");
+							self.elem.find(self.StrDocumentFileSelector).val("");
 						}
 					}
 				});
@@ -180,16 +192,23 @@
 	};
 
 	AttachBlock.prototype.updateAttachedDocuments = function (files) {
-		let self = this;
-		// filter duplicated file 
+		const self = this;
+		// filter duplicated file
 		var filterFiles = files.filter((file) => {
 			if (TF.isMobileDevice && file.name === 'image.jpg')
+			{
 				return true;
+			}
 			else
-			return self.attachedDocumentsName.indexOf(file.name) === -1;
+			{
+				return self.attachedDocumentsName.indexOf(file.name) === -1;
+			}
 		});
 
-		if (filterFiles.length === 0) return;
+		if (filterFiles.length === 0)
+		{
+			return;
+		}
 
 		self.attachedDocuments = self.attachedDocuments.concat(filterFiles);
 		//update form documents
@@ -197,18 +216,17 @@
 	};
 
 	AttachBlock.prototype.refresh = function () {
-		let self = this, trashFlag = TF.isMobileDevice ? " &times;" : "";
-		//self.elem.find(".document-list").empty();
-		self.elem.find(".content-wrapper").remove();
+		const self = this, trashFlag = TF.isMobileDevice ? " &times;" : "";
+		self.elem.find(self.StrContentWrapper).remove();
 		self.attachedDocumentsName = [];
 		self.attachedDocuments.forEach((file) => {
-			let isvalid = self.uploadDocumentHelper.validateFile(file.name, file.size);
-			let fileName = file.name;
+			const isvalid = self.uploadDocumentHelper.validateFile(file.name, file.size);
+			const fileName = file.name;
+			const trashFlagStr = self.field.readonly ? "" : `<span class='trash-can'>${trashFlag}</span>`;
 			if (TF.isMobileDevice && fileName === 'image.jpg') {
 				self.photoNameTimeStamp = Date.now();
-				fileName = 'image' + self.photoNameTimeStamp + '.jpg';
 			}
-			let fileElem = $(`<div class='content-wrapper' title='${file.name}'>
+			const fileElem = $(`<div class='content-wrapper' title='${file.name}'>
 										<div class='file-container'>
 											<div class='file-icon'></div>
 											<div class='file-name'>${file.name}</div>
@@ -217,12 +235,15 @@
 											<a class='preview invisible'>Preview</a>
 											<a class='download'>Download</a>
 											<span class='file-warning'>&#9888;</span>
-											${self.field.readonly ? "" : `<span class='trash-can'>${trashFlag}</span>`}
+											${trashFlagStr}
 										</div>
 									</div>`),
 
 				isDocFilePreviewable = tf.docFilePreviewHelper.isFilePreviewable(file.type);
-			if (!isvalid) fileElem.addClass("invalid-file");
+			if (!isvalid)
+			{
+				fileElem.addClass("invalid-file");
+			}
 			self.attachedDocumentsName.push(file.name);
 			if (!isDocFilePreviewable) {
 				fileElem.find(".preview").addClass("invisible");
@@ -233,66 +254,48 @@
 			self.elem.find(".document-list").append(fileElem);
 		});
 
-		if (self.elem.find('.invalid-file').length > 0) {
-			self.elem.find('.invalid-message').html("Some files do not match the supported size or formats.");
-			self.elem.find('.attach-document-block').addClass("has-invalid");
-		} else {
-			self.elem.find('.invalid-message').html("");
-			self.elem.find('.attach-document-block').removeClass("has-invalid");
-		}
-
 		if (self.attachedDocumentsName.length === 5) {
-			self.elem.find(".browse-file").addClass("disable-upload");
+			self.elem.find(self.StrBrowseFile).addClass(self.StrDisableUpload);
 			self.elem.find(".title-close-warn-msg").html("5 file maximum reached");
 		} else {
-			self.elem.find(".browse-file").removeClass("disable-upload");
+			self.elem.find(self.StrBrowseFile).removeClass(self.StrDisableUpload);
 			self.elem.find(".title-close-warn-msg").html("");
 		}
 		if (self.field.readonly) {
-			self.elem.find(".browse-file").addClass("disable-upload");
+			self.elem.find(self.StrBrowseFile).addClass(self.StrDisableUpload);
 		}
 		self.value = self.formDocuments;
 	}
 
+	AttachBlock.prototype.handleInvalidFileElem = function()
+	{
+		const self = this;
+		if (self.elem.find('.invalid-file').length > 0)
+		{
+			self.elem.find('.invalid-message').html("Some files do not match the supported size or formats.");
+			self.elem.find('.attach-document-block').addClass("has-invalid");
+		} else
+		{
+			self.elem.find('.invalid-message').html("");
+			self.elem.find('.attach-document-block').removeClass("has-invalid");
+		}
+	}
+
 	AttachBlock.prototype.updateFormDocuments = function (rawFiles) {
-		let self = this, skipSize = self.formDocuments.length;
-		let translate2Base64PromiseArr = []
+		const self = this;
+		const translate2Base64PromiseArr = [];
 		rawFiles.forEach((rawFile, i) => {
 			let fileName = rawFile.name;
 			if (TF.isMobileDevice && fileName === 'image.jpg') {
-				fileName = 'image' + Date.now().toString() + '.jpg';
+				fileName = `image${Date.now().toString()}.jpg`;
 			}
 			self.attachedDocumentsName.push(fileName);
 			translate2Base64PromiseArr.push(
 				self.uploadDocumentHelper.getFileStream(rawFile)
 					.then(function (fileStream) {
-						if (fileStream) {
-							if (TF.isMobileDevice && rawFile.name === 'image.jpg') {
-								self.photoNameTimeStamp = Date.now();
-								let fileStreamSplit = fileStream.split(",");
-								let fileName = self.attachedDocumentsName[i + skipSize];
-								document = {
-									DBID: tf.datasourceManager.databaseId,
-									Name: fileName.substr(0, fileName.lastIndexOf(".")),
-									FileName: fileName,
-									FileSizeKB: rawFile.size / 1000,
-									MimeType: rawFile.type,
-									FileContentBase64: fileStreamSplit.length == 2 ? _.last(fileStream.split(",")) : ""
-								};
-								self.formDocuments.push(document);
-							} else {
-								var fileStreamSplit = fileStream.split(","),
-									document = {
-										DBID: tf.datasourceManager.databaseId,
-										Name: rawFile.name.substr(0, rawFile.name.lastIndexOf(".")),
-										FileName: rawFile.name,
-										FileSizeKB: rawFile.size / 1000,
-										MimeType: rawFile.type,
-										FileContentBase64: fileStreamSplit.length == 2 ? _.last(fileStream.split(",")) : ""
-									};
-								self.formDocuments.push(document);
-							}
-
+						if (fileStream)
+						{
+							self.updateFormDocumentsFileStream(fileStream, fileName, rawFile, i);
 						}
 						else {
 							self.formDocuments.push({});
@@ -300,6 +303,36 @@
 					}));
 		})
 		return Promise.all(translate2Base64PromiseArr);
+	}
+
+	AttachBlock.prototype.updateFormDocumentsFileStream = function(fileStream, fileName, rawFile, index)
+	{
+		const self = this, fileStreamSplit = fileStream.split(","), skipSize = self.formDocuments.length;
+		if (TF.isMobileDevice && rawFile.name === 'image.jpg')
+		{
+			self.photoNameTimeStamp = Date.now();
+			fileName = self.attachedDocumentsName[index + skipSize];
+			document = {
+				DBID: tf.datasourceManager.databaseId,
+				Name: fileName.substr(0, fileName.lastIndexOf(".")),
+				FileName: fileName,
+				FileSizeKB: rawFile.size / 1000,
+				MimeType: rawFile.type,
+				FileContentBase64: fileStreamSplit.length === 2 ? _.last(fileStream.split(",")) : ""
+			};
+			self.formDocuments.push(document);
+		} else
+		{
+			document = {
+				DBID: tf.datasourceManager.databaseId,
+				Name: rawFile.name.substr(0, rawFile.name.lastIndexOf(".")),
+				FileName: rawFile.name,
+				FileSizeKB: rawFile.size / 1000,
+				MimeType: rawFile.type,
+				FileContentBase64: fileStreamSplit.length === 2 ? _.last(fileStream.split(",")) : ""
+			};
+			self.formDocuments.push(document);
+		}
 	}
 
 	AttachBlock.prototype.restore = function (docs) {
@@ -348,8 +381,6 @@
 		self.attachedDocuments = [];
 		self.attachedDocumentsName = [];
 		self.formDocuments = [];
-		// self.uploadDocumentHelper.dispose();
-		// self._unbindDragAndDropFileEvent();
 		self.elem.off('click');
 	};
 })();

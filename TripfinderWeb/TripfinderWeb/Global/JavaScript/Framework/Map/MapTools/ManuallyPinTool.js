@@ -44,34 +44,25 @@
 		update("X" + coordName, geoGraphic.x);
 		update("Y" + coordName, geoGraphic.y);
 		update("GeoConfidence", TF.Grid.GeocodeTool.getGeoConfidence("ManuallyPin"));
-		if (this.detailView) this.detailView.obEditing(true);
+		if (this.detailView)
+		{
+			this.detailView.obEditing(true);
+		}
 
 		clearTimeout(this.getGeoStreetInfoTimeout);
 		this.getGeoStreetInfoTimeout = setTimeout(function(reverseKey)
 		{
 			TF.locationToAddress(geometry).then(function(result)
 			{
-				if (!result || reverseKey != self.reverseKey)
+				if (!result || reverseKey !== self.reverseKey)
 				{
 					return;
 				}
-				var gridType = self.type == "geocodeInteractive" ? "student" : self.type;
-				if (result.Street)
-				{
-					update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType("street", gridType), result.Street);
-				}
-				if (result.City)
-				{
-					update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType("city", gridType), result.City);
-				}
-				if (result.Postal)
-				{
-					update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType("zip", gridType), result.Postal);
-				}
-				if (result.Region)
-				{
-					update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType("state", gridType), result.Region);
-				}
+				var gridType = self.type === "geocodeInteractive" ? "student" : self.type;
+				self.updateResult(gridType, "street", result.Street);
+				self.updateResult(gridType, "city", result.City);
+				self.updateResult(gridType, "zip", result.Postal);
+				self.updateResult(gridType, "state", result.Region);
 			});
 		}(this.reverseKey), 20);
 
@@ -88,6 +79,15 @@
 		}
 	};
 
+
+	ManuallyPinTool.prototype.updateResult = function(gridType, resultType, resultValue)
+	{
+		if (resultValue)
+		{
+			update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType(resultType, gridType), resultValue);
+		}
+	}
+
 	ManuallyPinTool.prototype.bindClickEvent = function()
 	{
 		var self = this;
@@ -102,7 +102,10 @@
 					title: "Confirmation Message"
 				}).then((res) =>
 				{
-					if (!res) return;
+					if (!res)
+					{
+						return;
+					}
 
 					self.proceedPinEvent(event);
 				});
@@ -128,7 +131,7 @@
 		var self = this;
 		tf.documentEvent.bind("keydown.pin", self.routeState, function(e)
 		{
-			if (e.key == "Escape")
+			if (e.key === "Escape")
 			{
 				self.stopPin();
 			}
@@ -151,17 +154,17 @@
 	ManuallyPinTool.prototype.findGraphic = function()
 	{
 		var self = this;
-		if (this.type == "school")
+		if (this.type === "school")
 		{
 			self.layer = self.map.findLayerById("schoolLayer");
 		}
-		if (this.type == "georegion")
+		if (this.type === "georegion")
 		{
 			self.layer = self.map.findLayerById("georegionPointLayer");
 		}
 		return Enumerable.From(self.layer.graphics.items).FirstOrDefault(null, function(c)
 		{
-			return c.attributes.type == self.type;
+			return c.attributes.type === self.type;
 		});
 	};
 
@@ -211,7 +214,7 @@
 	ManuallyPinTool.prototype.modifyGeocodeInteractiveResult = function(geometry)
 	{
 		var self = this;
-		if (self.type == "geocodeInteractive")
+		if (self.type === "geocodeInteractive")
 		{
 			TF.locationToAddress(geometry).then(function(result)
 			{
@@ -225,14 +228,14 @@
 	ManuallyPinTool.prototype.modifyGeoregionBoundaryGraphic = function(point)
 	{
 		var self = this;
-		if (self.type == "georegion")
+		if (self.type === "georegion")
 		{
 			var georegionTypeId = self.detailView.getGeoRegionTypeId();
 
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "georegiontypes?Id=" + georegionTypeId)).then(function(response)
 			{
 				var georegionType = response.Items[0];
-				if (georegionType && georegionType.Boundary == "User Defined")
+				if (georegionType && georegionType.Boundary === "User Defined")
 				{
 					var georegionBoundaryGraphic = self.map.findLayerById("georegionPolygonLayer").graphics.items[0];
 					if (georegionBoundaryGraphic && georegionBoundaryGraphic.geometry)

@@ -41,7 +41,7 @@
 		update(geoGraphic.x, geoGraphic.y);
 		function update(x, y)
 		{
-			let homeLocation = self.routingMapTool.routingMapDocumentViewModel.homeLocation;			
+			const homeLocation = self.routingMapTool.routingMapDocumentViewModel.homeLocation;
 			homeLocation["Longitude"] = x;
 			homeLocation["Latitude"] = y;
 		}
@@ -69,7 +69,7 @@
 		var self = this;
 		tf.documentEvent.bind("keydown.homepin", self.routeState, function(e)
 		{
-			if (e.key == "Escape")
+			if (e.key === "Escape")
 			{
 				self.stopPin();
 			}
