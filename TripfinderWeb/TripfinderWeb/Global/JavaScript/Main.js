@@ -39,14 +39,7 @@ function topicCombine()
 
 function isNullObj(obj)
 {
-	if (obj === null || obj === undefined)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return obj === null || obj === undefined;
 }
 
 function pathCombine()
@@ -91,12 +84,22 @@ function sortArray(array, sortField, isNum)
 
 function getParameterByName(name, url)
 {
-	if (!url) url = window.location.href;
+	if (!url)
+	{
+		url = window.location.href;
+	}
+
 	name = name.replace(/[\[\]]/g, "\\$&");
 	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
 		results = regex.exec(url);
-	if (!results) return null;
-	if (!results[2]) return '';
+	if (!results)
+	{
+		return null;
+	}
+	if (!results[2])
+	{
+		return '';
+	}
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
@@ -128,7 +131,10 @@ function isSafari()
 {
 	var chrome = navigator.userAgent.indexOf('CriOS') > -1 || navigator.userAgent.indexOf('Chrome') > -1;
 	var safari = navigator.userAgent.indexOf("Safari") > -1;
-	if ((chrome) && (safari)) safari = false;
+	if ((chrome) && (safari))
+	{
+		safari = false;
+	}
 	return safari;
 }
 
@@ -152,64 +158,57 @@ function isLandscape()
 	return isMobileDevice() && window.innerWidth > window.innerHeight;
 }
 
-function isIpad() {
-    const ua = window.navigator.userAgent;
-    if (ua.indexOf('iPad') > -1) {
-        return true;
-    }
+function isIpad()
+{
+	const ua = window.navigator.userAgent;
+	if (ua.indexOf('iPad') > -1)
+	{
+		return true;
+	}
 
-    if (ua.indexOf('Macintosh') > -1) {
-        try {
-            document.createEvent("TouchEvent");
-            return true;
-        } catch (e) { }
-    }
+	if (ua.indexOf('Macintosh') > -1)
+	{
+		try
+		{
+			document.createEvent("TouchEvent");
+			return true;
+		} catch (e) { }
+	}
 
-    return false;
+	return false;
 }
 
-function getLocation() {
-    return new Promise(res => {
-        let pos = {
-            latitude: null,
-            longitude: null
-        };
-        if (!navigator.geolocation) {
-            res(pos);
-        } else {
-            navigator.geolocation.getCurrentPosition(position => {
-                pos.latitude = position.coords.latitude;
-                pos.longitude = position.coords.longitude;
-                res(pos);
-            }, () => {
-                res(pos)
-            });
-        }
-    });
-}
-
-function isAndroid() {
+function isAndroid()
+{
 	return /(android)/i.test(navigator.userAgent);
 }
 
-function getLocation() {
-	return new Promise(res => {
-		let pos = {
+function getLocation()
+{
+	return new Promise(res =>
+	{
+		const pos = {
 			latitude: null,
 			longitude: null,
 			errorCode: 0
 		};
-		if (!navigator.geolocation) {
+		if (!navigator.geolocation)
+		{
 			res(pos);
-		} else {
-			navigator.geolocation.getCurrentPosition(position => {
-				pos.latitude = position.coords.latitude;
-				pos.longitude = position.coords.longitude;
-				res(pos);
-			}, err => {
-				pos.errorCode = err.code;
-				res(pos);
-			},
+		} else
+		{
+			navigator.geolocation.getCurrentPosition(
+				position =>
+				{
+					pos.latitude = position.coords.latitude;
+					pos.longitude = position.coords.longitude;
+					res(pos);
+				},
+				err =>
+				{
+					pos.errorCode = err.code;
+					res(pos);
+				},
 				{
 					enableHighAccuracy: true,
 					timeout: 5000,
@@ -249,7 +248,7 @@ TF.isIE = (function()
 	var ua = window.navigator.userAgent;
 	var matches = /Edg\/(\d{2})/g.exec(ua);
 	var isEdge = false;
-	if(matches && matches.length==2)
+	if (matches && matches.length == 2)
 	{
 		isEdge = parseInt(matches[1]) < 79;
 	}
@@ -268,7 +267,9 @@ function getQueryString(name)
 Array.remove = function(array, item)
 {
 	while ((index = array.indexOf(item)) > -1)
+	{
 		array.splice(index, 1);
+	}
 };
 
 Array.extend = function(arr1, arr2)
@@ -297,12 +298,26 @@ Array.sortBy = function(arr, fieldName, desc)
 	var sort = function(a, b)
 	{
 		var aField = a[fieldName], bField = b[fieldName];
-		if (aField === null && bField === null) return 0;
+		if (aField === null && bField === null)
+		{
+			return 0;
+		}
 
-		if (aField === null) return -1;
-		if (bField === null) return 1;
+		if (aField === null)
+		{
+			return -1;
+		}
 
-		if (aField === bField) return 0;
+		if (bField === null)
+		{
+			return 1;
+		}
+
+		if (aField === bField)
+		{
+			return 0;
+		}
+
 		if (aField.toUpperCase)
 		{
 			var aFieldUpper = aField.toUpperCase(), bFieldUpper = bField.toUpperCase();
@@ -328,11 +343,15 @@ Array.equals = function(arr1, arr2)
 	arr2 = arr2.sort();
 	// if the other array is a falsy value, return
 	if (!arr2)
+	{
 		return false;
+	}
 
 	// compare lengths - can save a lot of time
-	if (arr1.length != arr2.length)
+	if (arr1.length !== arr2.length)
+	{
 		return false;
+	}
 
 	for (var i = 0, l = arr1.length; i < l; i++)
 	{
@@ -341,7 +360,9 @@ Array.equals = function(arr1, arr2)
 		{
 			// recurse into the nested arrays
 			if (!arr1[i].equals(arr2[i]))
+			{
 				return false;
+			}
 		} else if (arr1[i] != arr2[i])
 		{
 			// Warning - two different object instances will never be equal: {x:20} != {x:20}
@@ -471,11 +492,17 @@ String.prototype.endsWith = function(suffix)
 String.convertToBoolean = function(value)
 {
 	if (value === 'True')
+	{
 		return true;
+	}
 	else if (value === 'False')
+	{
 		return false;
+	}
 	else
+	{
 		return value;
+	}
 };
 
 function removeEmptyProperties(obj)
@@ -519,24 +546,44 @@ function detectswipe(ele, func)
 	end = function(e)
 	{
 		//horizontal detection
-		if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX)) && ((swipe_det.eY < swipe_det.sY + max_y) && (swipe_det.sY > swipe_det.eY - max_y) && (swipe_det.eX > 0))))
+		if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX))
+			&& ((swipe_det.eY < swipe_det.sY + max_y) && (swipe_det.sY > swipe_det.eY - max_y) && (swipe_det.eX > 0))))
 		{
-			if (swipe_det.eX > swipe_det.sX) direc = "r";
-			else direc = "l";
+			if (swipe_det.eX > swipe_det.sX)
+			{
+				direc = "r";
+			}
+			else
+			{
+				direc = "l";
+			}
 		}
 		//vertical detection
-		else if ((((swipe_det.eY - min_y > swipe_det.sY) || (swipe_det.eY + min_y < swipe_det.sY)) && ((swipe_det.eX < swipe_det.sX + max_x) && (swipe_det.sX > swipe_det.eX - max_x) && (swipe_det.eY > 0))))
+		else if ((((swipe_det.eY - min_y > swipe_det.sY) || (swipe_det.eY + min_y < swipe_det.sY))
+			&& ((swipe_det.eX < swipe_det.sX + max_x) && (swipe_det.sX > swipe_det.eX - max_x) && (swipe_det.eY > 0))))
 		{
-			if (swipe_det.eY > swipe_det.sY) direc = "d";
-			else direc = "u";
+			if (swipe_det.eY > swipe_det.sY)
+			{
+				direc = "d";
+			}
+			else
+			{
+				direc = "u";
+			}
 		}
 
 		if (direc != "")
 		{
-			if (typeof func == 'function') func(ele, direc);
+			if (typeof func == 'function')
+			{
+				func(ele, direc);
+			}
 		}
 		direc = "";
-		swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+		swipe_det.sX = 0;
+		swipe_det.sY = 0;
+		swipe_det.eX = 0;
+		swipe_det.eY = 0;
 	};
 	ele.off(".swipe");
 	ele.on('touchstart.swipe', start);
@@ -608,8 +655,7 @@ function compareTimeColumn(a, b)
 	var timeA = moment(moment(a).utc().format("1900/01/01 HH:mm:ss"));
 	var timeB = moment(moment(b).utc().format("1900/01/01 HH:mm:ss"));
 
-	var ret = timeA.isAfter(timeB) ? 1 : -1;
-	return ret;
+	return timeA.isAfter(timeB) ? 1 : -1;
 }
 
 function compareTimeColumn2(a, b)
@@ -617,8 +663,7 @@ function compareTimeColumn2(a, b)
 	var timeA = moment(moment(a).format("1900/01/01 HH:mm:ss"));
 	var timeB = moment(moment(b).format("1900/01/01 HH:mm:ss"));
 
-	var ret = timeA.isAfter(timeB) ? 1 : -1;
-	return ret;
+	return timeA.isAfter(timeB) ? 1 : -1;
 }
 
 createNamespace("tf").colorSource = ["#FF0000", "#3333FF", "#FF6700", "#FF00FF", "#00FFFF", "#73D952", "#7F7FD0", "#AA0000", "#0000A2", "#CC5200", "#E10087", "#00CCCC", "#006600", "#FFCC00", "#D47F7F", "#FFFF00", "#E5A87F", "#F07FC3", "#7FE5E5", "#7FB27F", "#FFE57F"];
@@ -658,7 +703,7 @@ function booleanToCheckboxFormatter(value)
 
 	function Color()
 	{
-
+		return null;
 	}
 
 	Color.toHTMLColorFromLongColor = function(longColor)
@@ -691,7 +736,7 @@ function booleanToCheckboxFormatter(value)
 {
 	createNamespace("TF").menuHelper = menuHelper;
 
-	function menuHelper() { }
+	function menuHelper() { return null; }
 
 	menuHelper.hiddenMenu = function()
 	{
@@ -708,7 +753,9 @@ function booleanToCheckboxFormatter(value)
 	menuHelper.isOtherMenuOpened = function(e)
 	{
 		if (TF.menuHelper.isCurrentMenuOpened(e))
+		{
 			return false;
+		}
 
 		return $('.contextmenu-open').hasClass('mobile');
 	};
@@ -775,7 +822,10 @@ Function.prototype.createCallback = function()
 
 Function.prototype.interceptBefore = function(object, methodName, fn, scope)
 {
-	var method = object[methodName] || function() { };
+	var method = object[methodName] || function()
+	{
+		return null;
+	};
 	return (object[methodName] = function()
 	{
 		var ret = fn.apply(scope || this, arguments);
@@ -786,7 +836,10 @@ Function.prototype.interceptBefore = function(object, methodName, fn, scope)
 
 Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 {
-	var method = object[methodName] || function() { };
+	var method = object[methodName] || function()
+	{
+		return null;
+	};
 	return (object[methodName] = function()
 	{
 		method.apply(this, arguments);

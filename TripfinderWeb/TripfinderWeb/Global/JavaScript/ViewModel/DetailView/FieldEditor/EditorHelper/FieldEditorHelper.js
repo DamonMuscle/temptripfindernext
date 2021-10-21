@@ -1,5 +1,8 @@
 (function()
 {
+	const ITEM_CONTENT_SELECTOR = ".item-content";
+	const PARENT_GRID_ATTRIBUTE = "parent-grid";
+	const EDITOR_ICON_CLASS_NAME = "editor-icon";
 	createNamespace("TF.DetailView.FieldEditor").FieldEditorHelper = FieldEditorHelper;
 
 	var RESPONSE_TEMPLATE = {
@@ -34,7 +37,7 @@
 
 		self.UDF_KEY = "UserDefinedFields";
 		self.VALIDATE_ERROR_CLASS = "validateError";
-	};
+	}
 
 
 	FieldEditorHelper.prototype.constructor = FieldEditorHelper;
@@ -101,11 +104,17 @@
 			value = null;
 		if (data.UDFId)
 		{
-			var udf = userDefinedFields.filter(function(item) { return item.field === data.field; })[0],
+			var udf = userDefinedFields.filter(function(item)
+			{
+				return item.field === data.field;
+			})[0],
 				id = udf.UDFId;
 			if (editingUserDefinedFields && editingUserDefinedFields.length > 0)
 			{
-				var edited = editingUserDefinedFields.filter(function(field) { return field.Id === id; });
+				var edited = editingUserDefinedFields.filter(function(field)
+				{
+					return field.Id === id;
+				});
 				value = (edited.length === 1) ? edited[0].RecordValue : self._getUDFValue(udf);
 			}
 			else
@@ -115,7 +124,7 @@
 		}
 		else
 		{
-			var text = $parent.find('.item-content').text().trim();
+			var text = $parent.find(ITEM_CONTENT_SELECTOR).text().trim();
 			value = (text === 'None') ? null : text;
 		}
 
@@ -128,7 +137,10 @@
 	 */
 	FieldEditorHelper.prototype._getUDFValue = function(field)
 	{
-		return (field.UDFType === "List") ? field.value.map(function(item) { return item.value; }) : field.value;
+		return (field.UDFType === "List") ? field.value.map(function(item)
+		{
+			return item.value;
+		}) : field.value;
 	};
 
 	FieldEditorHelper.prototype._getNonUDFDefaultValue = function(data, recordEntity)
@@ -178,7 +190,10 @@
 					precision = match.NumberPrecision,
 					pointIndex = strValue.indexOf(".");
 
-				if (isNaN(value)) return null;
+				if (isNaN(value))
+				{
+					return null;
+				}
 
 				if (precision &&
 					precision > 0 &&
@@ -244,14 +259,14 @@
 					$.each($editFields, (_, field) =>
 					{
 						$(field).attr(CUSTOM_TAB_INDEX_ATTR, tabIndex);
-						$(field).attr("parent-grid", id);
+						$(field).attr(PARENT_GRID_ATTRIBUTE, id);
 						tabIndex++;
 					});
 				}
 				else
 				{
 					item.$dom.attr(CUSTOM_TAB_INDEX_ATTR, tabIndex);
-					item.$dom.attr("parent-grid", id);
+					item.$dom.attr(PARENT_GRID_ATTRIBUTE, id);
 					tabIndex++;
 				}
 			});
@@ -267,13 +282,18 @@
 			tabItemSelector = `[${CUSTOM_TAB_INDEX_ATTR}][parent-grid=${parentId}]`,
 			$container = self._getFieldEditorContainer(),
 			editableBlockCount = $container.find(tabItemSelector).length;
-		//if no seleced editable ele, start from top stackgrid. 
 
 		currentIndex = Number(currentIndex);
 
-		if (editableBlockCount == 0) return;
+		if (editableBlockCount === 0)
+		{
+			return;
+		}
 
-		if (editableBlockCount == 1 && currentIndex == 0) return;
+		if (editableBlockCount === 1 && currentIndex === 0)
+		{
+			return;
+		}
 
 		if (self.isNaN(currentIndex))
 		{
@@ -281,11 +301,11 @@
 		}
 		else if (isForward)
 		{
-			nextIndex = currentIndex == editableBlockCount - 1 ? 0 : currentIndex + 1;
+			nextIndex = currentIndex === editableBlockCount - 1 ? 0 : currentIndex + 1;
 		}
 		else
 		{
-			nextIndex = currentIndex == 0 ? editableBlockCount - 1 : currentIndex - 1;
+			nextIndex = currentIndex === 0 ? editableBlockCount - 1 : currentIndex - 1;
 		}
 
 		//if there is  not a next, back to the top.
@@ -305,7 +325,7 @@
 			$container = self._getFieldEditorContainer(),
 			$editingField = $container.find(".editing");
 
-		return self.getFieldContainerElement($editingField);;
+		return self.getFieldContainerElement($editingField);
 	};
 
 	/**
@@ -355,17 +375,23 @@
 
 	FieldEditorHelper.prototype._updateBoolFieldsContent = function($currentElement)
 	{
-		var text = $currentElement.find(".item-content").text(),
+		var text = $currentElement.find(ITEM_CONTENT_SELECTOR).text(),
 			value = $currentElement.hasClass("true-item"),
 			$item;
 
 		this._detailView.$element.find(".grid-stack-item-content.boolean-stack-item").each(function(_, item)
 		{
-			if ($currentElement[0] === item) return;
-			if ($currentElement.parent().data().field !== $(item).parent().data().field) return;
+			if ($currentElement[0] === item)
+			{
+				return;
+			}
+			if ($currentElement.parent().data().field !== $(item).parent().data().field)
+			{
+				return;
+			}
 
 			$item = $(item);
-			$item.find(".item-content").text(text);
+			$item.find(ITEM_CONTENT_SELECTOR).text(text);
 
 			value ? $item.removeClass('false-item').addClass('true-item') :
 				$item.removeClass('true-item').addClass('false-item');
@@ -390,9 +416,11 @@
 			_.each(_.uniqBy(rsGroups, field.badgeFiled), function(rs)
 			{
 				if (rs[field.badgeFiled])
+				{
 					count++
+				}
 			})
-			badgeContent = ("(" + count + ")")
+			badgeContent = (`(${count})`);
 		}
 		$($parent).find('span').text(badgeContent);
 	};
@@ -400,8 +428,8 @@
 	FieldEditorHelper.prototype._updateGeneralFieldsContent = function(fieldName, value, additionalParamter)
 	{
 		var self = this,
-			$fields = self._detailView.$element.find(`[data-block-field-name='${fieldName}']`),
-			value = (value === '' || value === null) ? 'None' : value;
+			$fields = self._detailView.$element.find(`[data-block-field-name='${fieldName}']`);
+		value = (value === '' || value === null) ? 'None' : value;
 
 		if (!(additionalParamter && additionalParamter.updateAll) && $fields.length < 2)
 		{
@@ -459,13 +487,13 @@
 				self._updateGeneralFieldsContent(fieldName, value, initParams);
 				break;
 			case "Time":
-				value = (value === null || value === '') ? '' : moment("1899-12-30 " + value).format("hh:mm A");;
+				value = (value === null || value === '') ? '' : moment("1899-12-30 " + value).format("hh:mm A");
 				self._updateGeneralFieldsContent(fieldName, value, initParams);
 				break;
 			case "Money":
 			case "Number":
-				var decimalPlaces = self._editor.getCurrentPrecisionValue(),
-					value = parseFloat(value).toFixed(decimalPlaces);
+				var decimalPlaces = self._editor.getCurrentPrecisionValue();
+				value = parseFloat(value).toFixed(decimalPlaces);
 
 				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format);
 				initParams.updateAll = true;
@@ -508,7 +536,10 @@
 	{
 		var self = this, detailView = self._detailView;
 
-		if (!detailView.isReadMode() || self.disabled) return;
+		if (!detailView.isReadMode() || self.disabled)
+		{
+			return;
+		}
 
 		var $dataElement = self.getFieldContainerElement($element),
 			$content = self.getFieldContentElement($element),
@@ -539,7 +570,7 @@
 					|| (typeof allowInput === "boolean" && allowInput)))
 			{
 				options.format = "ComboBox";
-				options.showWidget = $target.hasClass("editor-icon");
+				options.showWidget = $target.hasClass(EDITOR_ICON_CLASS_NAME);
 			}
 		}
 
@@ -596,7 +627,10 @@
 	{
 		var self = this;
 
-		if (!self._detailView) return;
+		if (!self._detailView)
+		{
+			return;
+		}
 
 		result.UDFId ? self._onUDFEditorApplied(result) : self._onNonUDFEditorApplied(result);
 
@@ -656,7 +690,10 @@
 			obj.blockName = result.blockName;
 			obj.type = type;
 			obj.relationshipKey = result.relationshipKey;
-			if (onChange) { onChange.notify({ result: result }); }
+			if (onChange)
+			{
+				onChange.notify({ result: result });
+			}
 			switch (type)
 			{
 				case "ListMover":
@@ -703,7 +740,10 @@
 	FieldEditorHelper.prototype.closeEditor = function()
 	{
 		var self = this;
-		if (self._editor === null || !self._editor.closeWidget) return;
+		if (self._editor === null || !self._editor.closeWidget)
+		{
+			return;
+		}
 		self._editor.closeWidget();
 	};
 
@@ -713,7 +753,10 @@
 		self._detailView.$element.find(".editable").each(function(_, element)
 		{
 			var config = $(element).closest(".grid-stack-item").data();
-			if (!config || !config.editType) return;
+			if (!config || !config.editType)
+			{
+				return;
+			}
 
 			self.renderIcons($(element), config.editType.format);
 		});
@@ -735,7 +778,6 @@
 		{
 			self.relayout();
 			self.markTabIndex();
-			//self.checkApiField();
 		}
 	};
 
@@ -787,7 +829,7 @@
 		{
 			var item = self.editFieldList[key];
 
-			if (key == self.UDF_KEY)
+			if (key === self.UDF_KEY)
 			{
 				return acc.concat(item.reduce(function(r, udf)
 				{
@@ -879,7 +921,10 @@
 			}
 		}).then(function(response)
 		{
-			if (!response || !response.Items || !response.Items[0]) return false;
+			if (!response || !response.Items || !response.Items[0])
+			{
+				return false;
+			}
 
 			var confirmMsgs = response.Items[0], msgStack = [];
 			for (key in confirmMsgs)
@@ -972,7 +1017,10 @@
 						}
 						else
 						{
-							var errors = prepareTaskResults.filter(function(i) { return typeof i === "string"; });
+							var errors = prepareTaskResults.filter(function(i)
+							{
+								return typeof i === "string";
+							});
 							if (errors.length > 0)
 							{
 								saveResponse.success = false;
@@ -1027,7 +1075,7 @@
 	};
 
 	/**
-	 * Conduct a full validation on 
+	 * Conduct a full validation on
 	 *
 	 * @param {String} gridType
 	 * @param {Object} recordEntity
@@ -1060,8 +1108,8 @@
 		return self.validateEntityByType(recordEntity, dataType, isCreateRecord)
 			.then(function(validationMessages)
 			{
-				var validationMessages = validationMessages || [],
-					groups = _.groupBy([].concat(customInputErrors, missingFieldErrors, uniqueCheckErrors, validationMessages), "fieldName"),
+				validationMessages = validationMessages || [];
+				var groups = _.groupBy([].concat(customInputErrors, missingFieldErrors, uniqueCheckErrors, validationMessages), "fieldName"),
 					keys = Object.keys(groups),
 					errorMessages = _.uniq(keys.reduce(function(acc, key)
 					{
@@ -1106,13 +1154,25 @@
 			recordEntity.UserDefinedFields = [];
 		}
 
-		changedUdfNames = recordEntity.UserDefinedFields.map(function(udf) { return udf.Name; });
+		changedUdfNames = recordEntity.UserDefinedFields.map(function(udf)
+		{
+			return udf.Name;
+		});
 
 		self._detailView._userDefinedFields.forEach(function(udf)
 		{
-			if (changedUdfNames.indexOf(udf.field) >= 0) return;
-			var udfEdited = self.editFieldList.UserDefinedFields && self.editFieldList.UserDefinedFields.some(function(editUdf) { return editUdf.Id === udf.UDFId; });
-			if (udf.value == null && !udfEdited) return;
+			if (changedUdfNames.indexOf(udf.field) >= 0)
+			{
+				return;
+			}
+			var udfEdited = self.editFieldList.UserDefinedFields && self.editFieldList.UserDefinedFields.some(function(editUdf)
+			{
+				return editUdf.Id === udf.UDFId;
+			});
+			if (udf.value == null && !udfEdited)
+			{
+				return;
+			}
 
 			field = {
 				Id: udf.UDFId,
@@ -1126,8 +1186,14 @@
 			if (udf.UDFType === "List")
 			{
 				field.AlternateKey = "SelectPickListOptionIDs";
-				field.SelectPickListOptionIDs = udf.value.map(function(v) { return v.value; });
-				field.RecordValue = udf.value.map(function(v) { return v.text; }).join(", ");
+				field.SelectPickListOptionIDs = udf.value.map(function(v)
+				{
+					return v.value;
+				});
+				field.RecordValue = udf.value.map(function(v)
+				{
+					return v.text;
+				}).join(", ");
 			}
 
 			recordEntity.UserDefinedFields.push(field);
@@ -1191,7 +1257,7 @@
 
 								// after checking confirmations, no update left in edit list.
 								return null;
-							};
+							}
 
 							// Place this after the above logic is because if all changes have been reverted, the save button should return to be grey.
 							if (!confirmationMessages)
@@ -1241,7 +1307,10 @@
 								}
 								else
 								{
-									var errors = prepareTaskResults.filter(function(i) { return typeof i === "string"; });
+									var errors = prepareTaskResults.filter(function(i)
+									{
+										return typeof i === "string";
+									});
 									if (errors.length > 0)
 									{
 										saveResponse.success = false;
@@ -1260,7 +1329,7 @@
 
 	/**
 	 * Conduct the save/create operation.
-	 * 
+	 *
 	 * @param {String} gridType
 	 * @param {Object} recordEntity
 	 * @param {Boolean} isNew
@@ -1273,15 +1342,15 @@
 		return Promise.resolve(prepareTask)
 			.then(result =>
 			{
-				if (result == false)
+				if (!result)
 				{
 					saveResponse.entity = recordEntity;
 					saveResponse.cancel = true;
 					return saveResponse;
 				}
 
+				const relationships = self.getEditFieldRelationships();
 				let url,
-					relationships = self.getEditFieldRelationships(),
 					endpoint = tf.dataTypeHelper.getEndpoint(gridType);
 
 				// Include UDF in relationship if needed.
@@ -1355,7 +1424,10 @@
 
 									var savedEntity = response.Items[0];
 
-									if (isNew) return savedEntity;
+									if (isNew)
+									{
+										return savedEntity;
+									}
 
 									return self.unassignedCrossStudent(gridType, savedEntity).then(function()
 									{
@@ -1372,7 +1444,7 @@
 										// Save api request failed.
 										tf.loadingIndicator.tryHide();
 										var error = 'API Error: ' + response.Message;
-										if (response.StatusCode == 404)
+										if (response.StatusCode === 404)
 										{
 											error += "\r\nSuggest you refreshing the view to fetch the latest data.";
 										}
@@ -1414,11 +1486,17 @@
 				var preTripStop = { Path: TF.Control.FindScheduleForStudentViewModel.prototype.getBoundaryGeometry(student.PrevStopPath.Geometry.WellKnownText) };
 				trip.TripStops[sequence] = preTripStop;
 			}
-			var student = { ProhibitCross: student.ProhibitCross, geometry: tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(new tf.map.ArcGIS.Point(student.StudentXcoord, student.StudentYcoord, tf.map.ArcGIS.SpatialReference({ "wkid": 4326 }))) };
+			student = {
+				ProhibitCross: student.ProhibitCross,
+				geometry: tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(
+					new tf.map.ArcGIS.Point(student.StudentXcoord,
+						student.StudentYcoord, tf.map.ArcGIS.SpatialReference({ "wkid": 4326 }))
+				)
+			};
 			return { tripStop: tripStop, trip: trip, student: student };
 		}
 		var self = this, promiseList = [], originalEntity;
-		if (gridType == 'altsite')
+		if (gridType === 'altsite')
 		{
 			originalEntity = self._detailView.recordEntity;
 			if (entity.Xcoord == originalEntity.Xcoord)
@@ -1488,7 +1566,7 @@
 		var data = [];
 		students.map(function(student)
 		{
-			if (student.type == 'PU')
+			if (student.type === 'PU')
 			{
 				data = data.concat([{
 					"Id": student.Id, "op": "replace", "path": "/Dly_Pu_CrossToStop", "value": student.Dly_Pu_CrossToStop
@@ -1536,7 +1614,7 @@
 				self.automationSetting = setting;
 				return TF.AutomationHelper.autoGeoCode(recordEntity, self._detailView.recordEntity, gridType, setting).then(function()
 				{
-					if (gridType == "student")
+					if (gridType === "student")
 					{
 						if (!recordEntity.Xcoord || !recordEntity.SchoolCode)
 						{
@@ -1555,7 +1633,7 @@
 		var self = this,
 			setting = self.automationSetting,
 			originalEntity = self._detailView.recordEntity;
-		if (gridType == "student" && setting.findScheduleforStudent && recordEntity.Xcoord != originalEntity.Xcoord)
+		if (gridType === "student" && setting.findScheduleforStudent && recordEntity.Xcoord != originalEntity.Xcoord)
 		{
 			return TF.AutomationHelper.findSchedule([recordEntity.Id], setting.useStopPool, setting.selectedStopPoolCategoryId, setting.createDoorToDoor);
 		}
@@ -1574,10 +1652,13 @@
 		var self = this, promise,
 			$currentBlock = self.getEditingFieldElement(),
 			customizedTabIndex = $currentBlock.attr(CUSTOM_TAB_INDEX_ATTR),
-			parentGrid = $currentBlock.attr('parent-grid'),
+			parentGrid = $currentBlock.attr(PARENT_GRID_ATTRIBUTE),
 			$nextBlock = self.getNextEditableBlock(customizedTabIndex, parentGrid, isForward);
 
-		if (!$nextBlock) return;
+		if (!$nextBlock)
+		{
+			return;
+		}
 
 		self.scrollToNextBlock($nextBlock);
 
@@ -1653,7 +1734,7 @@
 		var $editorIcon = $element.find(".editor-icon"), editorClass = null;
 		if ($editorIcon.length === 0)
 		{
-			$editorIcon = $("<div />", { class: 'editor-icon' }).appendTo($element);
+			$editorIcon = $("<div />", { class: EDITOR_ICON_CLASS_NAME }).appendTo($element);
 			switch (format)
 			{
 				case "ListMover":
@@ -1677,22 +1758,21 @@
 		}
 
 		var iconTop = 0, iconHeight = $editorIcon.outerHeight();
-		switch (format)
+		if (format === "BooleanDropDown")
 		{
-			case "BooleanDropDown":
-				iconTop = ($element.outerHeight() - iconHeight) / 2;
-				break;
-			default:
-				var $content = $element.find(".item-content"), contentHidden = $content.is(":hidden");
-				if (!contentHidden)
-				{
-					iconTop = $content.offset().top - $element.offset().top + 2;
-				}
-				else
-				{
-					iconTop = null;
-				}
-				break;
+			iconTop = ($element.outerHeight() - iconHeight) / 2;
+		}
+		else
+		{
+			var $content = $element.find(ITEM_CONTENT_SELECTOR), contentHidden = $content.is(":hidden");
+			if (!contentHidden)
+			{
+				iconTop = $content.offset().top - $element.offset().top + 2;
+			}
+			else
+			{
+				iconTop = null;
+			}
 		}
 
 		if (iconTop != null)
@@ -1714,7 +1794,6 @@
 			if (e.button !== 0)
 			{
 				e.preventDefault();
-				return;
 			}
 		});
 	};
@@ -1750,7 +1829,7 @@
 				{
 					fieldElement = $curTarget.closest(".grid-stack-item");
 					contentElement = fieldElement.find(".grid-stack-item-content");
-					showWidget = fieldElement.find(".item-content").hasClass("editor-icon");
+					showWidget = fieldElement.find(ITEM_CONTENT_SELECTOR).hasClass(EDITOR_ICON_CLASS_NAME);
 				}
 
 				self.initFieldEditor(e.target, fieldElement, contentElement, 'click', showWidget);
@@ -1803,12 +1882,10 @@
 				detailView.isReadMode() &&
 				!self.checkIfDetailViewCoveredByAnotherModal())
 			{
-				if (keyCode == $.ui.keyCode.TAB)
+				if (keyCode === $.ui.keyCode.TAB)
 				{
 					e.preventDefault();
 					e.stopPropagation();
-
-					// if ($(".modal .list-mover-field-editor").is(":visible")) return;
 
 					//tab -> move forward
 					//shift + tab -> move back
@@ -1842,6 +1919,8 @@
 						hasHigherModal = true;
 						return false;
 					}
+
+					return true;
 				});
 
 				return hasHigherModal;
@@ -1900,7 +1979,7 @@
 							field[item.AlternateKey] = item[item.AlternateKey];
 						}
 
-						if (field.Type == "Phone Number")
+						if (field.Type === "Phone Number")
 						{
 							field['RecordValue'] = item.RecordValue.replace(/\D/g, '');
 						}
@@ -1930,12 +2009,13 @@
 				return editField.value ? editField.value.replace(/\D/g, '') : editField.value;
 		}
 
-		switch (editField.blockName)
+		if (editField.blockName === "Mobile")
 		{
-			case "Mobile":
-				return editField.value.replace(/\D/g, '');
-			default: return editField.value;
-			//add other cases to return raw values if requeired
+			return editField.value.replace(/\D/g, '');
+		}
+		else
+		{
+			return editField.value;
 		}
 	}
 
@@ -1949,7 +2029,7 @@
 		var self = this, relationships = [];
 		Object.keys(self.editFieldList).map(function(key)
 		{
-			let relationshipKey = self.editFieldList[key].relationshipKey;
+			const relationshipKey = self.editFieldList[key].relationshipKey;
 			if (key === self.UDF_KEY)
 			{
 				relationships.push('UDF');
@@ -2009,9 +2089,12 @@
 				}
 				else if (item.udfId)
 				{
-					var udfField = recordEntity.UserDefinedFields.filter(function(udf) { return udf.Id === item.udfId });
+					var udfField = recordEntity.UserDefinedFields.filter(function(udf)
+					{
+						return udf.Id === item.udfId;
+					});
 					if ((udfField.length > 0 && (udfField[0].RecordValue == null || udfField[0].RecordValue.length === 0))
-						|| udfField.length == 0)
+						|| udfField.length === 0)
 					{
 						errorMessages.push({ fieldName: item.name, message: item.title + " is required." });
 					}
@@ -2055,16 +2138,16 @@
 	 */
 	FieldEditorHelper.prototype.handleData = function(entity)
 	{
-		if (this.dataType === "contact") return entity;
-		var handled = $.extend(true, {}, entity);
-		switch (this.dataType)
+		if (this.dataType === "contact")
 		{
-			case "trip":
-				handled.StartTime = handled.StartTime == null ? null : this.Time2DateTimeConvertor(handled.StartTime);
-				handled.FinishTime = handled.FinishTime == null ? null : this.Time2DateTimeConvertor(handled.FinishTime);
-				break;
-			default:
-				break;
+			return entity;
+		}
+
+		var handled = $.extend(true, {}, entity);
+		if (this.dataType === "trip")
+		{
+			handled.StartTime = handled.StartTime == null ? null : this.Time2DateTimeConvertor(handled.StartTime);
+			handled.FinishTime = handled.FinishTime == null ? null : this.Time2DateTimeConvertor(handled.FinishTime);
 		}
 		return handled;
 	}
@@ -2150,8 +2233,8 @@
 		var relatedDataBlockSetting = tf.helpers.detailViewHelper.getDataPointByIdentifierAndGrid(map.relatedField, self.dataType);
 		var value = self.getValueFromRelatedField(relatedDataBlockSetting, map);
 
-		leftValue = transformToComparable(fieldValue, map.option);
-		rightvalue = transformToComparable(value, map.option);
+		const leftValue = transformToComparable(fieldValue, map.option);
+		const rightvalue = transformToComparable(value, map.option);
 		var valArray = [leftValue, rightvalue];
 
 		if (!checkValuesValidity(valArray, map.option))
@@ -2160,9 +2243,15 @@
 		}
 
 		var relatedDataBlock = self._detailView.$element.find(`div.grid-stack-item-content[data-block-field-name=${map.relatedField}]`);
-		if (relatedDataBlock.length === 0) relatedDataBlock = self._detailView.$element.find('div.grid-stack-item-content').find(`[data-block-field-name=${map.relatedField}]`);
+		if (relatedDataBlock.length === 0)
+		{
+			relatedDataBlock = self._detailView.$element.find('div.grid-stack-item-content').find(`[data-block-field-name=${map.relatedField}]`);
+		}
 		var filedBlock = self._detailView.$element.find(`div.grid-stack-item-content[data-block-field-name=${fieldName}]`);
-		if (filedBlock.length === 0) filedBlock = self._detailView.$element.find('div.grid-stack-item-content').find(`[data-block-field-name=${fieldName}]`);
+		if (filedBlock.length === 0)
+		{
+			filedBlock = self._detailView.$element.find('div.grid-stack-item-content').find(`[data-block-field-name=${fieldName}]`);
+		}
 		if (!tf.helpers.detailViewHelper.compareTwoValues(valArray, map.comparator))
 		{
 			relatedDataBlock.addClass(self.VALIDATE_ERROR_CLASS);

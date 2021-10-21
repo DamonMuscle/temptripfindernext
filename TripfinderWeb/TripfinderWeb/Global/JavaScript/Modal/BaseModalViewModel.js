@@ -1,7 +1,9 @@
-﻿(function () {
+﻿(function()
+{
 	createNamespace("TF.Modal").BaseModalViewModel = BaseModalViewModel;
 
-	function BaseModalViewModel() {
+	function BaseModalViewModel()
+	{
 		var self = this;
 		self.positiveClick = self.positiveClick.bind(self);
 		self.positiveClose = self.positiveClose.bind(self);
@@ -9,7 +11,11 @@
 
 		self.resolve = null;
 		self.reject = null;
-		self._promise = new Promise(function (resolve, reject) { self.resolve = resolve; self.reject = reject; });
+		self._promise = new Promise(function(resolve, reject)
+		{
+			self.resolve = resolve;
+			self.reject = reject;
+		});
 		self.data = ko.observable();
 		self.sizeCss = '';
 		self.modalClass = '';
@@ -61,34 +67,41 @@
 		self.cancelPromptTitle = "Unsaved Changes";
 	}
 
-	BaseModalViewModel.prototype.otherClick = function (viewModel, e) {
-
+	BaseModalViewModel.prototype.otherClick = function(viewModel, e)
+	{
+		return null;
 	};
 
-	BaseModalViewModel.prototype.positiveClick = function (viewModel, e) {
+	BaseModalViewModel.prototype.positiveClick = function(viewModel, e)
+	{
 		this.positiveClose();
 	};
 
-	BaseModalViewModel.prototype.positiveClose = function (returnData) {
+	BaseModalViewModel.prototype.positiveClose = function(returnData)
+	{
 		const resolve = this.resolve;
 		this.hide();// hide modal dialog will lead to viewmodel dispose
 
 		resolve(returnData ? returnData : this.data());
 	};
 
-	BaseModalViewModel.prototype.negativeClick = function (viewModel, e) {
+	BaseModalViewModel.prototype.negativeClick = function(viewModel, e)
+	{
 		this.negativeClose();
 	};
 
-	BaseModalViewModel.prototype.negativeClose = function (returnData) {
+	BaseModalViewModel.prototype.negativeClose = function(returnData)
+	{
 		var promise = this.cancelPrompt ? tf.promiseBootbox.yesNo(
 			{
 				message: this.cancelPromptMessage,
 				closeButton: true
 			}, this.cancelPromptTitle) : Promise.resolve(true);
 
-		promise.then(function (value) {
-			if (value) {
+		promise.then(function(value)
+		{
+			if (value)
+			{
 				const resolve = this.resolve;
 				this.hide();// hide modal dialog will lead to viewmodel dispose
 
@@ -97,47 +110,59 @@
 		}.bind(this));
 	};
 
-	BaseModalViewModel.prototype.saveAndNewClick = function (returnData) {
-
+	BaseModalViewModel.prototype.saveAndNewClick = function(returnData)
+	{
+		return null;
 	};
 
-	BaseModalViewModel.prototype.closeClick = function (viewModel, e) {
+	BaseModalViewModel.prototype.closeClick = function(viewModel, e)
+	{
 		e.stopPropagation();
 		this.negativeClick(viewModel, e);
 	};
 
-	BaseModalViewModel.prototype.prevClick = function (viewModel, e) {
+	BaseModalViewModel.prototype.prevClick = function(viewModel, e)
+	{
 		e.stopPropagation();
 	}
 
-	BaseModalViewModel.prototype.nextClick = function (viewModel, e) {
+	BaseModalViewModel.prototype.nextClick = function(viewModel, e)
+	{
 		e.stopPropagation();
 	};
 
-	BaseModalViewModel.prototype.hide = function () {
+	BaseModalViewModel.prototype.hide = function()
+	{
 		tf.modalManager.hideModal(this);
 	};
 
-	BaseModalViewModel.prototype.getPromise = function () {
+	BaseModalViewModel.prototype.getPromise = function()
+	{
 		return this._promise;
 	};
 
-	BaseModalViewModel.prototype.dispose = function () {
+	BaseModalViewModel.prototype.dispose = function()
+	{
 		var data = this.data();
-		if (data && data != this && typeof data.dispose === "function") {
+		if (data && data !== this && typeof data.dispose === "function")
+		{
 			data.dispose();
 		}
 	};
 
-	BaseModalViewModel.prototype.afterRender = function () {
+	BaseModalViewModel.prototype.afterRender = function()
+	{
 		var data = this.data();
-		if (data && data.afterRender) {
+		if (data && data.afterRender)
+		{
 			data.afterRender();
 		}
 	};
 
-	BaseModalViewModel.prototype.processTabKey = function (ev, element) {
-		if (ev.key !== 'Tab') {
+	BaseModalViewModel.prototype.processTabKey = function(ev, element)
+	{
+		if (ev.key !== 'Tab')
+		{
 			return;
 		}
 
@@ -145,50 +170,65 @@
 			target = ev.target,
 			focusables = $(element).find(":focusable"),
 			found, goto, first;
-		for (var i = previous ? focusables.length - 1 : 0; previous ? i > -1 : i < focusables.length; previous ? i-- : i++) {
+		for (var i = previous ? focusables.length - 1 : 0; previous ? i > -1 : i < focusables.length; previous ? i-- : i++)
+		{
 			var focusable = $(focusables[i]);
-			if (focusable.closest('.disabled-element').length) {
+			if (focusable.closest('.disabled-element').length)
+			{
 				continue;
 			}
 
-			if (!first) {
+			if (!first)
+			{
 				first = focusable;
 			}
 
-			if (found) {
+			if (found)
+			{
 				goto = focusable;
 				break;
 			}
 
-			if (target == focusable[0]) {
+			if (target === focusable[0])
+			{
 				found = true;
 			}
 		}
 
-		if (!found) {
+		if (!found)
+		{
 			return;
 		}
 
-		if (!goto) {
+		if (!goto)
+		{
 			goto = first;
 		}
 
-		if (goto) {
+		if (goto)
+		{
 			goto.focus();
 			ev.preventDefault();
 		}
 	};
 
-	BaseModalViewModel.prototype.initModal = function (viewModel, element) {
-		if (this.controlTabKey) {
+	BaseModalViewModel.prototype.initModal = function(viewModel, element)
+	{
+		if (this.controlTabKey)
+		{
 			$(element).on("keydown", ev => this.processTabKey(ev, element));
 		}
 	};
 
-	BaseModalViewModel.prototype.unresolve = function () {
+	BaseModalViewModel.prototype.unresolve = function()
+	{
 		var self = this;
 		self.resolve = null;
 		self.reject = null;
-		self._promise = new Promise(function (resolve, reject) { self.resolve = resolve; self.reject = reject; });
+		self._promise = new Promise(function(resolve, reject)
+		{
+			self.resolve = resolve;
+			self.reject = reject;
+		});
 	};
 })();

@@ -1,16 +1,24 @@
-(function () {
+(function()
+{
+	const USER_DEFINED_GROUP = "User Defined Group";
+	const PRAMATER_KEY_RELATIONSHIP = "@relationships";
 	createNamespace("TF.DetailView").UserDefinedGridHelper = UserDefinedGridHelper;
 
-	function UserDefinedGridHelper() {
+	function UserDefinedGridHelper()
+	{
+		return;
 	}
 
 	UserDefinedGridHelper.prototype.constructor = UserDefinedGridHelper;
 
-	UserDefinedGridHelper.getUpdatedInfoColumns = function () {
-		function utc2Local(value) {
-			let dt = moment(value);
+	UserDefinedGridHelper.getUpdatedInfoColumns = function()
+	{
+		function utc2Local(value)
+		{
+			const dt = moment(value);
 			let tmpStr = "";
-			if (tf.localTimeZone) {
+			if (tf.localTimeZone)
+			{
 				dt.add(tf.localTimeZone.hoursDiff, "hours");
 			}
 			tmpStr = dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
@@ -29,7 +37,8 @@
 		];
 	};
 
-	UserDefinedGridHelper.getGeoInfoColumns = function () {
+	UserDefinedGridHelper.getGeoInfoColumns = function()
+	{
 		return [
 			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "100px" },
 			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "100px" }
@@ -37,22 +46,26 @@
 	};
 
 
-	UserDefinedGridHelper.isUpdatedInfoColumn = function (fieldName) {
+	UserDefinedGridHelper.isUpdatedInfoColumn = function(fieldName)
+	{
 		const updatedInfoFieldNames = TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().map(i => i.FieldName);
 		return updatedInfoFieldNames.indexOf(fieldName) >= 0;
 	};
 
-	UserDefinedGridHelper.isGeoInfoColumn = function (fieldName) {
+	UserDefinedGridHelper.isGeoInfoColumn = function(fieldName)
+	{
 		const geoInfoFieldNames = TF.DetailView.UserDefinedGridHelper.getGeoInfoColumns().map(i => i.FieldName);
 		return geoInfoFieldNames.indexOf(fieldName) >= 0;
 	};
 
-	UserDefinedGridHelper.getSignatureColumn = function () {
+	UserDefinedGridHelper.getSignatureColumn = function()
+	{
 		return {
 			DisplayName: "Signature",
 			FieldName: "signature",
 			Width: "70px",
-			template: function (dataItem) {
+			template: function(dataItem)
+			{
 				return `<div class='signature-checkbox-container'>
 										<input type='checkbox' disabled class='signature-checkbox' ${dataItem && dataItem.signature ? 'checked' : ''}/>
 									</div>`;
@@ -60,43 +73,56 @@
 		};
 	};
 
-	UserDefinedGridHelper.handleItemForSaveAs = function (dataItem, columns, signatureFields) {
+	function handleDetailViewItem(dataItem, columns, signatureFields)
+	{
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
 		return dataItem;
+	}
+
+	UserDefinedGridHelper.handleItemForSaveAs = function(dataItem, columns, signatureFields)
+	{
+		return handleDetailViewItem(dataItem, columns, signatureFields);
+	}
+
+	UserDefinedGridHelper.handleItemForCopy = function(dataItem, columns, signatureFields)
+	{
+		return handleDetailViewItem(dataItem, columns, signatureFields);
 	};
 
-	UserDefinedGridHelper.handleItemForCopy = function (dataItem, columns, signatureFields) {
-		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
-		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
-		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
-		return dataItem;
-	};
-
-	UserDefinedGridHelper.handleItemForBooleanType = function (dataItem, columns) {
-		if (columns && columns.length) {
-			columns.forEach(col => {
-				if (col.originalUdfField && col.originalUdfField.type === 'Boolean') {
+	UserDefinedGridHelper.handleItemForBooleanType = function(dataItem, columns)
+	{
+		if (columns && columns.length)
+		{
+			columns.forEach(col =>
+			{
+				if (col.originalUdfField && col.originalUdfField.type === 'Boolean')
+				{
 					var item = dataItem[col.FieldName],
 						posLabel = col.originalUdfField.positiveLabel,
 						negLabel = col.originalUdfField.negativeLabel;
 
 					posLabel = (posLabel == null || posLabel == '') ? true : posLabel;
 					negLabel = (negLabel == null || negLabel == '') ? false : negLabel;
-					dataItem[col.FieldName] = item == true ? posLabel : negLabel;
+					dataItem[col.FieldName] = item ? posLabel : negLabel;
 				}
 			});
 		}
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.handleItemForPhoneType = function (dataItem, columns) {
-		if (columns && columns.length) {
-			columns.forEach(col => {
-				if (col.originalUdfField && col.originalUdfField.questionType === 'Phone') {
+	UserDefinedGridHelper.handleItemForPhoneType = function(dataItem, columns)
+	{
+		if (columns && columns.length)
+		{
+			columns.forEach(col =>
+			{
+				if (col.originalUdfField && col.originalUdfField.questionType === 'Phone')
+				{
 					let item = dataItem[col.FieldName];
-					if (item) {
+					if (item)
+					{
 						item = tf.dataFormatHelper.phoneFormatter(item);
 					}
 					dataItem[col.FieldName] = item;
@@ -106,19 +132,24 @@
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.convertSignatureColumnToBoolean = function (dataItem, signatureFields) {
-		if (!dataItem) {
+	UserDefinedGridHelper.convertSignatureColumnToBoolean = function(dataItem, signatureFields)
+	{
+		if (!dataItem)
+		{
 			return dataItem;
 		}
 
-		signatureFields.forEach(f => {
+		signatureFields.forEach(f =>
+		{
 			dataItem[f] = !!dataItem[f];
 		});
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.formatContent = function (questionContent) {
-		if (!questionContent) {
+	UserDefinedGridHelper.formatContent = function(questionContent)
+	{
+		if (!questionContent)
+		{
 			return questionContent;
 		}
 		var wrapper = $("<div/>").html(questionContent),
@@ -127,19 +158,22 @@
 		return wrapper.text();
 	};
 
-	UserDefinedGridHelper.prototype.getAllValidUDGrids = function () {
-		let self = this;
+	UserDefinedGridHelper.prototype.getAllValidUDGrids = function()
+	{
+		const self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
 			{
 				paramData: {
-					"@relationships": "UDGridDataSources"
+					PRAMATER_KEY_RELATIONSHIP: "UDGridDataSources"
 				}
 			},
 			{ overlay: false }
-		).then(resp => {
-			if (resp && Array.isArray(resp.Items)) {
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
 				// filter UDGrids current datasource availiable
-				resp.Items = _.filter(resp.Items, item => item.UDGridDataSources.some(ds => ds.DBID == tf.datasourceManager.databaseId));
+				resp.Items = _.filter(resp.Items, item => item.UDGridDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId));
 				resp.Items = self.filterAssignedForms(resp.Items);
 				return resp.Items;
 			}
@@ -148,34 +182,41 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.filterAssignedForms = function (rawForms) {
-		let isAdmin = tf.authManager.authorizationInfo.isAdmin;
-		if (isAdmin || !Array.isArray(rawForms)) {
+	UserDefinedGridHelper.prototype.filterAssignedForms = function(rawForms)
+	{
+		const isAdmin = tf.authManager.authorizationInfo.isAdmin;
+		if (isAdmin || !Array.isArray(rawForms))
+		{
 			return rawForms;
 		}
 
-		let forms = tf.authManager.authorizationInfo.authorizationTree.forms;
-		return rawForms.filter(function (item) {
+		const forms = tf.authManager.authorizationInfo.authorizationTree.forms;
+		return rawForms.filter(function(item)
+		{
 			return forms.indexOf(item.ID) > -1;
 		});
 	}
 
-	UserDefinedGridHelper.prototype.getUDGridsByDataTypeId = function (dataTypeId) {
+	UserDefinedGridHelper.prototype.getUDGridsByDataTypeId = function(dataTypeId)
+	{
 		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
 			{
 				paramData: {
 					"DataTypeId": dataTypeId,
-					"@relationships": "UDGridFields,UDGridDataSources"
+					PRAMATER_KEY_RELATIONSHIP: "UDGridFields,UDGridDataSources"
 				}
 			},
 			{ overlay: false }
-		).then(resp => {
-			if (resp && Array.isArray(resp.Items)) {
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
 				// filter UDGrids current datasource availiable
-				resp.Items = _.filter(resp.Items, item => item.UDGridDataSources.some(ds => ds.DBID == tf.datasourceManager.databaseId));
+				resp.Items = _.filter(resp.Items, item => item.UDGridDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId));
 				resp.Items = self.filterAssignedForms(resp.Items);
-				resp.Items.forEach(item => {
+				resp.Items.forEach(item =>
+				{
 					item.UDGridFields = this._updateUserDefinedGridFields(item.UDGridFields);
 				});
 
@@ -186,20 +227,24 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.getUDGridById = function (id) {
+	UserDefinedGridHelper.prototype.getUDGridById = function(id)
+	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
 			{
 				paramData: {
 					"Id": id,
-					"@relationships": "UDGridFields,UDGridDataSources"
+					PRAMATER_KEY_RELATIONSHIP: "UDGridFields,UDGridDataSources"
 				}
 			},
 			{ overlay: false }
-		).then(resp => {
-			if (resp && Array.isArray(resp.Items)) {
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
 				// filter UDGrids current datasource availiable
-				resp.Items = _.filter(resp.Items, item => item.UDGridDataSources.some(ds => ds.DBID == tf.datasourceManager.databaseId));
-				resp.Items.forEach(item => {
+				resp.Items = _.filter(resp.Items, item => item.UDGridDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId));
+				resp.Items.forEach(item =>
+				{
 					item.UDGridFields = this._updateUserDefinedGridFields(item.UDGridFields);
 				});
 
@@ -210,15 +255,21 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.getUDGridColumns = function (res) {
+	UserDefinedGridHelper.prototype.getUDGridColumns = function(res)
+	{
 		let columns = [];
 		let specialColumns = [];
-		let sortFields = res[0].UDGridFields.sort(function (a, b) {
+		const sortFields = res[0].UDGridFields.sort(function(a, b)
+		{
 			return a.Index - b.Index;
 		});
-		sortFields.forEach(col => {
-			if (col.type === 'SystemField') return;
-			column = {
+		sortFields.forEach(col =>
+		{
+			if (col.type === 'SystemField')
+			{
+				return;
+			}
+			const column = {
 				FieldName: col.Guid,
 				//DisplayName: originFieldMapping[col],
 				DisplayName: TF.DetailView.UserDefinedGridHelper.formatContent(col.title),
@@ -228,113 +279,137 @@
 				QuestionTypeId: col.editType.TypeId,
 				questionType: col.questionType
 			};
-			switch (col.type) {
+			switch (col.type)
+			{
 				case "Date/Time":
-					column.type = "datetime",
-						column.template = function (item) {
-							let value = item[col.Guid];
-							if (value === "") {
-								return "";
-							}
-							let dt = moment(value);
-							return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
-						};
+					column.type = "datetime";
+					column.template = function(item)
+					{
+						const value = item[col.Guid];
+						if (value === "")
+						{
+							return "";
+						}
+						const dt = moment(value);
+						return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
+					};
 					break;
 				case "Date":
-					column.type = "date",
-						column.template = function (item) {
-							let value = item[col.Guid];
-							if (value === "") {
-								return "";
-							}
-							let date = moment(value);
-							return date.isValid() ? moment(value).format("MM/DD/YYYY") : "";
-						};
+					column.type = "date";
+					column.template = function(item)
+					{
+						const value = item[col.Guid];
+						if (value === "")
+						{
+							return "";
+						}
+						const date = moment(value);
+						return date.isValid() ? moment(value).format("MM/DD/YYYY") : "";
+					};
 					break;
 				case "Time":
-					column.type = "time",
-						column.template = function (item) {
-							let value = item[col.Guid];
-							if (value === "") {
-								return "";
-							}
-							let time = moment(value);
-							if (time.isValid()) {
-								return time.format("hh:mm A");
-							}
-							time = moment("1900-1-1 " + value);
-							return time.isValid() ? time.format("hh:mm A") : "";
-						};
+					column.type = "time";
+					column.template = function(item)
+					{
+						const value = item[col.Guid];
+						if (value === "")
+						{
+							return "";
+						}
+						let time = moment(value);
+						if (time.isValid())
+						{
+							return time.format("hh:mm A");
+						}
+						time = moment("1900-1-1 " + value);
+						return time.isValid() ? time.format("hh:mm A") : "";
+					};
 					break;
 				case "List":
-					column.template = function (item) {
-						let value = item[col.Guid];
-						if (value instanceof Array) {
+					column.template = function(item)
+					{
+						const value = item[col.Guid];
+						if (value instanceof Array)
+						{
 							return value.join(", ");
 						}
 						return isNullObj(value) ? "" : value;
 					};
 					break;
 				case "Boolean":
-					column.type = "boolean",
-						column.template = function (item) {
-							let value = item[col.Guid];
-							if (isNullObj(value)) return '';
-							return value == 'true' ? col.positiveLabel : col.negativeLabel || value;
-						};
+					column.type = "boolean";
+					column.template = function(item)
+					{
+						const value = item[col.Guid];
+						if (isNullObj(value))
+						{
+							return '';
+						}
+						return value == 'true' ? col.positiveLabel : col.negativeLabel || value;
+					};
 					break;
 				case "SignatureBlock":
 					column.type = "boolean";
-					column.template = function (item) {
-						let checked = (item[col.Guid] === 'true');
+					column.template = function(item)
+					{
+						const checked = (item[col.Guid] === 'true');
 						return `<div class='signature-checkbox-container'>
 										<input type='checkbox' disabled class='signature-checkbox' ${checked ? 'checked' : ''}/>
 									</div>`;
 					};
 					break;
 				case "Number":
-					column.type = "number",
-						column.template = function (item) {
-							let value = item[col.Guid];
-							if (value == null || value == "") return "";
+					column.type = "number";
+					column.template = function(item)
+					{
+						let value = item[col.Guid];
+						if (value == null || value == "")
+						{
+							return "";
+						}
 
-							let precision = col.FieldOptions.NumberPrecision;
-							if (isNaN(Number(value))) {
-								value = 0;
-							}
-							return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
+						const precision = col.FieldOptions.NumberPrecision;
+						if (isNaN(Number(value)))
+						{
+							value = 0;
+						}
+						return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
 
-						};
+					};
 					break;
 				case "Phone Number":
-					column.template = function (item) {
-						let value = item[col.Guid];
-						if (isNullObj(value)) return '';
-						value = tf.dataFormatHelper.phoneFormatter(value);
-						return value;
-					};
+					column.template = phoneTypeFieldTemplateFun;
 					break;
 				case "AttachBlock":
 					column.type = "integer";
 					break;
 				case "Map":
-					let xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
+					const xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
 					specialColumns = xyCoordColumns;
 					break;
 			}
 
-			if ((col.questionType === "Phone") && (column.template === undefined)) {
-				column.template = function (item) {
-					let value = item[col.Guid];
-					if (isNullObj(value)) return '';
-					value = tf.dataFormatHelper.phoneFormatter(value);
-					return value;
-				};
+			function phoneTypeFieldTemplateFun(item)
+			{
+				let value = item[col.Guid];
+				if (isNullObj(value))
+				{
+					return '';
+				}
+				value = tf.dataFormatHelper.phoneFormatter(value);
+				return value;
 			}
 
-			if (col.questionType === "List") {
-				let pickUpList = [];
-				col.FieldOptions.UDFPickListOptions.forEach(plo => {
+			if ((col.questionType === "Phone") && (column.template === undefined))
+			{
+				column.template = phoneTypeFieldTemplateFun;
+			}
+
+			if (col.questionType === "List")
+			{
+				const pickUpList = [];
+				col.FieldOptions.UDFPickListOptions.forEach(plo =>
+				{
 					pickUpList.push(plo.PickList);
 				});
 				column.ListFilterTemplate = {
@@ -347,11 +422,13 @@
 				}
 			}
 
-			if (specialColumns.length) {
+			if (specialColumns.length)
+			{
 				columns = columns.concat(specialColumns);
 				specialColumns = [];
 			}
-			else {
+			else
+			{
 				columns.push(column);
 			}
 		});
@@ -359,46 +436,57 @@
 		return columns;
 	};
 
-	UserDefinedGridHelper.prototype.getUDGridsByDataType = function (dataType) {
-		let dataTypeId = tf.dataTypeHelper.getId(dataType);
+	UserDefinedGridHelper.prototype.getUDGridsByDataType = function(dataType)
+	{
+		const dataTypeId = tf.dataTypeHelper.getId(dataType);
 		return this.getUDGridsByDataTypeId(dataTypeId);
 	};
 
-	UserDefinedGridHelper.prototype.getNameToGuidMappingOfGridFields = function (udGrid) {
-		let gridFields = Array.isArray(udGrid.UDGridFields) ? _.sortBy(udGrid.UDGridFields, 'Index') : [],
+	UserDefinedGridHelper.prototype.getNameToGuidMappingOfGridFields = function(udGrid)
+	{
+		const gridFields = Array.isArray(udGrid.UDGridFields) ? _.sortBy(udGrid.UDGridFields, 'Index') : [],
 			nameToGuidDict = {};
 
-		gridFields.forEach(gf => {
+		gridFields.forEach(gf =>
+		{
 			nameToGuidDict[gf.Name] = gf.Guid;
 		});
 		return nameToGuidDict;
 	};
 
-	UserDefinedGridHelper.prototype.getGuidToNameMappingOfGridFields = function (udGrid, excludeSystemField, excludeSignedFields) {
-		let gridFields = Array.isArray(udGrid.UDGridFields) ? _.sortBy(udGrid.UDGridFields, 'Index') : [],
+	UserDefinedGridHelper.prototype.getGuidToNameMappingOfGridFields = function(udGrid, excludeSystemField, excludeSignedFields)
+	{
+		const gridFields = Array.isArray(udGrid.UDGridFields) ? _.sortBy(udGrid.UDGridFields, 'Index') : [],
 			guidToNameDict = {};
 
-		gridFields.forEach(gf => {
-			if (excludeSystemField && gf.type === 'SystemField') {
+		gridFields.forEach(gf =>
+		{
+			if (excludeSystemField && gf.type === 'SystemField')
+			{
 				return;
 			}
 			var formatedUDGridFields = TF.DetailView.UserDefinedGridHelper.formatContent(gf.Name);
 			guidToNameDict[gf.Guid] = formatedUDGridFields;
 		});
 
-		if (!excludeSignedFields) {
+		if (!excludeSignedFields)
+		{
 			guidToNameDict.signedFieldList = TF.DetailView.UserDefinedGridHelper.signedFieldListField;
 		}
 
 		return guidToNameDict;
 	};
 
-	UserDefinedGridHelper.prototype.isDocumentIncluded = function (udGrid) {
-		if (udGrid.GridOptions) {
-			try {
-				let gridOption = JSON.parse(udGrid.GridOptions);
+	UserDefinedGridHelper.prototype.isDocumentIncluded = function(udGrid)
+	{
+		if (udGrid.GridOptions)
+		{
+			try
+			{
+				const gridOption = JSON.parse(udGrid.GridOptions);
 				return gridOption.IsEnableDocument;
-			} catch (error) {
+			} catch (error)
+			{
 				return false;
 			}
 		}
@@ -406,17 +494,24 @@
 	};
 
 
-	UserDefinedGridHelper.prototype.getEditableBasedOnSignedPolicy = function (udGrid) {
+	UserDefinedGridHelper.prototype.getEditableBasedOnSignedPolicy = function(udGrid)
+	{
 		console.log("Todo: getEditableBasedOnSignedPolicy -> Get Result Based on Workflow Setting")
 		return true;
 	};
 
-	UserDefinedGridHelper.prototype.getIsReadOnlyBasedOnSignedPolicy = function (selectedRecord, udgridFields) {
-		const signatureFileds = udgridFields.filter(u => { return u.Type === 15 }).map(u => u.Guid);
+	UserDefinedGridHelper.prototype.getIsReadOnlyBasedOnSignedPolicy = function(selectedRecord, udgridFields)
+	{
+		const signatureFileds = udgridFields.filter(u =>
+		{
+			return u.Type === 15;
+		}).map(u => u.Guid);
 		let isReadOnly = false;
-		signatureFileds.forEach(f => {
+		signatureFileds.forEach(f =>
+		{
 			if (selectedRecord[f] === "true" ||
-				(selectedRecord[f] && selectedRecord[f].includes("data:image"))) {
+				(selectedRecord[f] && selectedRecord[f].includes("data:image")))
+			{
 				isReadOnly = true;
 				return true;
 			}
@@ -425,7 +520,8 @@
 		return isReadOnly;
 	};
 
-	UserDefinedGridHelper.prototype.updateAssociateDocuments = function (entityId, dataTypId, documentIds) {
+	UserDefinedGridHelper.prototype.updateAssociateDocuments = function(entityId, dataTypId, documentIds)
+	{
 		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
 			{
 				paramData: {
@@ -437,7 +533,8 @@
 			})
 	}
 
-	UserDefinedGridHelper.prototype.getAffectedDocumentUDGridCount = function (entityId, dataTypeId, documentIds) {
+	UserDefinedGridHelper.prototype.getAffectedDocumentUDGridCount = function(entityId, dataTypeId, documentIds)
+	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
 			{
 				paramData: {
@@ -447,20 +544,23 @@
 					documentIds: documentIds
 				}
 			})
-			.then(res => {
+			.then(res =>
+			{
 				return _.groupBy(res.Items, "DocumentID");
 			})
-			.catch(err => {
+			.catch(err =>
+			{
 				return null;
 			})
 	}
 
-	UserDefinedGridHelper.prototype.getUDGridRecordsOfEntity = function (udGrid, dataTypeId, entityId) {
-		let self = this,
+	UserDefinedGridHelper.prototype.getUDGridRecordsOfEntity = function(udGrid, dataTypeId, entityId)
+	{
+		const self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid);
 
-		let relationships = "User,DocumentUDGridRecords,MapToBoolUDGridRecords";
+		const relationships = "User,DocumentUDGridRecords,MapToBoolUDGridRecords";
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
 				paramData: {
@@ -468,66 +568,80 @@
 					RecordDataType: dataTypeId,
 					RecordID: entityId,
 					UDGridID: udGridId,
-					"@relationships": relationships
+					PRAMATER_KEY_RELATIONSHIP: relationships
 				}
 			},
 			{ overlay: false }
-		).then(resp => {
-			if (resp && Array.isArray(resp.Items)) {
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
 				return resp.Items;
 			}
 
 			return [];
-		}).then(rawRecords => {
-			return rawRecords.map(rr => {
+		}).then(rawRecords =>
+		{
+			return rawRecords.map(rr =>
+			{
 				return self.getFormRecord(guidToNameDict, rr);
 			});
 		});
 	};
 
-	UserDefinedGridHelper.prototype.getFormRecord = function (formQuestionGuidToNameDict, rawFormRecord) {
+	UserDefinedGridHelper.prototype.getFormRecord = function(formQuestionGuidToNameDict, rawFormRecord)
+	{
 		let convertedRecord = null;
-		if (!!rawFormRecord && !!rawFormRecord.RecordValue) {
-			let recordValueObj = JSON.parse(rawFormRecord.RecordValue);
+		if (!!rawFormRecord && !!rawFormRecord.RecordValue)
+		{
+			const recordValueObj = JSON.parse(rawFormRecord.RecordValue);
 			convertedRecord = {};
 			convertedRecord.Id = rawFormRecord.ID;
-			for (let fguid in formQuestionGuidToNameDict) {
-				if (rawFormRecord.DocumentUDGridRecords && rawFormRecord.DocumentUDGridRecords.some(dr => dr.UDGridField === fguid)) {
+			for (const fguid in formQuestionGuidToNameDict)
+			{
+				if (rawFormRecord.DocumentUDGridRecords && rawFormRecord.DocumentUDGridRecords.some(dr => dr.UDGridField === fguid))
+				{
 					convertedRecord[fguid] = rawFormRecord.DocumentUDGridRecords.filter(dr => dr.UDGridField === fguid).length;
 				}
-				else if (rawFormRecord.MapUDGridRecords && rawFormRecord.MapUDGridRecords.some(dr => dr.UDGridField === fguid)) {
-					let mapData = rawFormRecord.MapUDGridRecords.filter(dr => dr.UDGridField === fguid);
-					let data = mapData && mapData.length && mapData[0];
+				else if (rawFormRecord.MapUDGridRecords && rawFormRecord.MapUDGridRecords.some(dr => dr.UDGridField === fguid))
+				{
+					const mapData = rawFormRecord.MapUDGridRecords.filter(dr => dr.UDGridField === fguid);
+					const data = mapData && mapData.length && mapData[0];
 
-					convertedRecord[fguid] = data.ShapeData == "true";
-					let xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fguid);
+					convertedRecord[fguid] = data.ShapeData === "true";
+					const xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fguid);
 					convertedRecord[xCoordFieldName] = data.XCoord;
-					let yCoordFieldName = TF.DetailView.UserDefinedGridHelper.getYCoordFieldName(fguid);
+					const yCoordFieldName = TF.DetailView.UserDefinedGridHelper.getYCoordFieldName(fguid);
 					convertedRecord[yCoordFieldName] = data.YCoord;
 				}
-				else if (fguid in recordValueObj) {
+				else if (fguid in recordValueObj)
+				{
 					convertedRecord[fguid] = recordValueObj[fguid];
 				}
-				else {
+				else
+				{
 					convertedRecord[fguid] = null;
 				}
 			}
-			if (recordValueObj["latitude"] && recordValueObj["longitude"]) {
+			if (recordValueObj["latitude"] && recordValueObj["longitude"])
+			{
 				convertedRecord["latitude"] = recordValueObj["latitude"];
 				convertedRecord["longitude"] = recordValueObj["longitude"];
 			}
 		}
 
 		//Created By / Last Updated By / Last Updated On
-		TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().forEach(c => {
+		TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().forEach(c =>
+		{
 			convertedRecord[c.FieldName] = rawFormRecord[c.FieldName] || "";
 		});
 
 		return convertedRecord;
 	};
 
-	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = function (udGrid, dataTypeId, entityId, record) {
-		let self = this,
+	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record)
+	{
+		const self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
 			rawRecord = {
@@ -539,9 +653,12 @@
 			},
 			recordValueObj = {};
 
-		if (!!record) {
-			for (let fguid in guidToNameDict) {
-				if (fguid in record) {
+		if (!!record)
+		{
+			for (const fguid in guidToNameDict)
+			{
+				if (fguid in record)
+				{
 					recordValueObj[fguid] = record[fguid];
 				}
 			}
@@ -550,75 +667,91 @@
 		}
 
 		rawRecord.RecordValue = JSON.stringify(recordValueObj);
-		let paramData = {};
-		if (record.DocumentUDGridRecords) {
+		const paramData = {};
+		if (record.DocumentUDGridRecords)
+		{
 			rawRecord.DocumentUDGridRecords = record.DocumentUDGridRecords;
-			if (paramData["@relationships"]) {
-				paramData["@relationships"] += ",";
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
+			{
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "DocumentUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "DocumentUDGridRecords";
 		}
 
-		if (record.MapUDGridRecords) {
+		if (record.MapUDGridRecords)
+		{
 			rawRecord.MapUDGridRecords = record.MapUDGridRecords;
 
-			if (Array.isArray(rawRecord.MapUDGridRecords)) {
-				rawRecord.MapUDGridRecords.forEach(r => {
+			if (Array.isArray(rawRecord.MapUDGridRecords))
+			{
+				rawRecord.MapUDGridRecords.forEach(r =>
+				{
 					TF.DetailView.UserDefinedGridHelper.prepareMapData(r);
 				});
 			}
 
-			if (paramData["@relationships"]) {
-				paramData["@relationships"] += ",";
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
+			{
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "MapUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "MapUDGridRecords";
 		}
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
 				paramData: paramData,
 				data: [rawRecord]
 			}, { overlay: false }
-		).then(resp => {
-			let addedRawRecord = resp.Items[0];
+		).then(resp =>
+		{
+			const addedRawRecord = resp.Items[0];
 			record.Id = addedRawRecord.ID;
 			return record;
 		});
 	};
 
-	UserDefinedGridHelper.prototype.uploadAttachments = function (attachements) {
+	UserDefinedGridHelper.prototype.uploadAttachments = function(attachements)
+	{
 
 		const attachementsOfNew = attachements.filter(a => !a.Id);
 		const attachementsOfModify = attachements.filter(a => a.Id);
 
-		const newPromise = Promise.resolve(attachementsOfNew.length).then(len => {
-			if (len === 0) {
+		const newPromise = Promise.resolve(attachementsOfNew.length).then(len =>
+		{
+			if (len === 0)
+			{
 				return Promise.resolve([]);
 			}
-			else {
+			else
+			{
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "documents", "?ignore_blob=true"),
 					{
-						paramData: { "@relationships": "DocumentRelationship" },
+						paramData: { PRAMATER_KEY_RELATIONSHIP: "DocumentRelationship" },
 						data: attachementsOfNew
 					}, { overlay: false }
-				).then(res => {
+				).then(res =>
+				{
 					return Promise.resolve(res.Items);
 				})
 			}
 		});
 
-		const modifyPromise = Promise.resolve(attachementsOfModify.length).then(len => {
-			if (len === 0) {
+		const modifyPromise = Promise.resolve(attachementsOfModify.length).then(len =>
+		{
+			if (len === 0)
+			{
 				return Promise.resolve([]);
 			}
-			else {
+			else
+			{
 				return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "documents", "?ignore_blob=true"),
 					{
-						paramData: { "@relationships": "DocumentRelationship" },
+						paramData: { PRAMATER_KEY_RELATIONSHIP: "DocumentRelationship" },
 						data: attachementsOfModify
 					}, { overlay: false }
-				).then(res => {
+				).then(res =>
+				{
 					return Promise.resolve(res.Items);
 				})
 			}
@@ -627,8 +760,9 @@
 		return Promise.all([newPromise, modifyPromise]).then(res => Promise.resolve(res[0].concat(res[1])));
 	};
 
-	UserDefinedGridHelper.prototype.updateUDGridRecordOfEntity = function (udGrid, record) {
-		let self = this,
+	UserDefinedGridHelper.prototype.updateUDGridRecordOfEntity = function(udGrid, record)
+	{
+		const self = this,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
 			patchItem = {
 				Op: "replace",
@@ -637,15 +771,20 @@
 			},
 			recordValueObj = {};
 
-		if (!record || !record.Id) {
+		if (!record || !record.Id)
+		{
 			return Promise.resolve(null)
 		}
 
-		for (let fguid in guidToNameDict) {
-			if (fguid in record) {
-				if (udGrid.UDGridFields.filter(x => x.format === "Phone").map(x => x.Guid).includes(fguid)) {
+		for (let fguid in guidToNameDict)
+		{
+			if (fguid in record)
+			{
+				if (udGrid.UDGridFields.filter(x => x.format === "Phone").map(x => x.Guid).includes(fguid))
+				{
 					recordValueObj[fguid] = tf.dataFormatHelper.getPurePhoneNumber(record[fguid]);
-				} else {
+				} else
+				{
 					recordValueObj[fguid] = record[fguid];
 				}
 			}
@@ -653,24 +792,29 @@
 		recordValueObj["latitude"] = record["latitude"];
 		recordValueObj["longitude"] = record["longitude"];
 		patchItem.Value = JSON.stringify(recordValueObj);
-		let patchData = [patchItem], paramData = { "@filter": `eq(ID,${record.Id})` };
-		if (record.DocumentUDGridRecords) {
+		const patchData = [patchItem], paramData = { "@filter": `eq(ID,${record.Id})` };
+		if (record.DocumentUDGridRecords)
+		{
 			patchData.push({
 				Id: record.Id,
 				op: "relationship",
 				path: "/DocumentUDGridRecords",
 				value: JSON.stringify(record.DocumentUDGridRecords),
 			});
-			if (paramData["@relationships"]) {
-				paramData["@relationships"] += ",";
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
+			{
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "DocumentUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "DocumentUDGridRecords";
 		}
 
-		if (record.MapUDGridRecords) {
-			if (Array.isArray(record.MapUDGridRecords)) {
-				record.MapUDGridRecords.forEach(r => {
+		if (record.MapUDGridRecords)
+		{
+			if (Array.isArray(record.MapUDGridRecords))
+			{
+				record.MapUDGridRecords.forEach(r =>
+				{
 					TF.DetailView.UserDefinedGridHelper.prepareMapData(r);
 				});
 			}
@@ -681,11 +825,12 @@
 				path: "/MapUDGridRecords",
 				value: JSON.stringify(record.MapUDGridRecords),
 			});
-			if (paramData["@relationships"]) {
-				paramData["@relationships"] += ",";
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
+			{
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "MapUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "MapUDGridRecords";
 		}
 
 		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
@@ -693,35 +838,44 @@
 				paramData: paramData,
 				data: patchData
 			}, { overlay: false }
-		).then(resp => {
+		).then(resp =>
+		{
 			return record;
 		});
 	};
 
-	UserDefinedGridHelper.prototype.deleteUDGridRecordOfEntity = function (recordId) {
+	UserDefinedGridHelper.prototype.deleteUDGridRecordOfEntity = function(recordId)
+	{
 		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
 				paramData: {
 					"@filter": `eq(ID,${recordId})`
 				}
 			}, { overlay: false }
-		).then(resp => {
+		).then(resp =>
+		{
 			return resp;
 		});
 	};
 
-	UserDefinedGridHelper.prototype._updateUserDefinedGridFields = function (items) {
-		if (items.length === 0) return [];
+	UserDefinedGridHelper.prototype._updateUserDefinedGridFields = function(items)
+	{
+		if (items.length === 0)
+		{
+			return [];
+		}
 
-		var today = (new Date()).toDateString(), self = this;
+		var today = (new Date()).toDateString();
 
-		return items.map(function (item) {
+		return items.map(function(item)
+		{
 			var editType,
 				result,
 				fieldOptions = typeof item.FieldOptions === "string" ? JSON.parse(item.FieldOptions) : item.FieldOptions,
 				type = item.TypeName || item.FieldOptions.TypeName || item.FieldOptions.Type;
 
-			switch (type) {
+			switch (type)
+			{
 				case 'Text':
 					editType = {
 						"format": "String",
@@ -766,15 +920,14 @@
 						"editType": editType,
 						"questionType": type
 					};
-					if (precision != null) {
+					if (precision != null)
+					{
 						var format = 0;
 						format = format.toFixed(parseInt(precision)).toString();
 						result["format"] = format;
 					}
 					break;
 				case 'Currency':
-					var precision = fieldOptions.NumberPrecision,
-						nullPrecision = (precision === 0 || precision === null);
 					editType = {
 						"format": "Number",
 						"maxIntegerLength": fieldOptions.MaxLength || 10,
@@ -872,13 +1025,17 @@
 					};
 					break;
 				case 'List':
-					var defaultItems = fieldOptions.UDFPickListOptions.filter(function (item) {
+					var defaultItems = fieldOptions.UDFPickListOptions.filter(function(item)
+					{
 						return item.IsDefaultItem;
-					}).map(function (item) {
+					}).map(function(item)
+					{
 						return item.PickList;
 					}),
-						getSource = function () {
-							return fieldOptions.UDFPickListOptions.map(function (item) {
+						getSource = function()
+						{
+							return fieldOptions.UDFPickListOptions.map(function(item)
+							{
 								return item.PickList;
 							});
 						};
@@ -891,14 +1048,15 @@
 						"editType": fieldOptions.PickListMultiSelect ?
 							{
 								"format": "ListMover",
-								"getSource": function () {
+								"getSource": function()
+								{
 									return Promise.resolve(getSource());
 								},
 								"allowNullValue": true,
 								"entityKey": ""
 							} : {
 								"format": "DropDown",
-								"getSource": function () { return Promise.resolve(getSource()); },
+								"getSource": function() { return Promise.resolve(getSource()); },
 								"allowNullValue": true,
 								"entityKey": ""
 							},
@@ -907,10 +1065,12 @@
 					break;
 				case 'Rating Scale':
 					var ratingItems = Array.from({ length: fieldOptions.Scale }, (_, i) => i + 1);
-					var defaultItems = ratingItems.filter(function (item) {
+					var ratingScaleDefaultItems = ratingItems.filter(function()
+					{
 						return 1;
 					});
-					var getSource = function () {
+					getSource = function()
+					{
 						return ratingItems;
 					};
 					result = {
@@ -918,10 +1078,10 @@
 						"title": item.Name,
 						"type": "String",
 						"defaultValue": "Rating Value",
-						"startScale": defaultItems[0],
+						"startScale": ratingScaleDefaultItems[0],
 						"editType": {
 							"format": "DropDown",
-							"getSource": function () { return Promise.resolve(getSource()); },
+							"getSource": function() { return Promise.resolve(getSource()); },
 							"allowNullValue": true,
 							"entityKey": ""
 						},
@@ -970,7 +1130,8 @@
 					break;
 			}
 
-			if (result) {
+			if (result)
+			{
 				result.UDGridFieldId = item.ID;
 				result.UDGridID = item.UDGridID;
 				result.editType["TypeId"] = item.Type;
@@ -986,27 +1147,31 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.updateDataPoint = function (gridType, udGrids) {
-		dataPointsJSON[gridType]["User Defined Group"] = udGrids.map(item => {
+	UserDefinedGridHelper.prototype.updateDataPoint = function(gridType, udGrids)
+	{
+		dataPointsJSON[gridType][USER_DEFINED_GROUP] = udGrids.map(item =>
+		{
 			return _.extend(item, {
 				"field": "UDGridId",
 				"title": item.Name,
 				"UDGridId": item.ID,
 				"type": "UDGrid",
-				"defaultValue": "User Defined Group",
+				"defaultValue": USER_DEFINED_GROUP,
 				"min-height": 3,
 				"min-width": 2
 			})
 		})
 	};
 
-	UserDefinedGridHelper.prototype.generateQuickAddLayout = function (udGridId, gridType, dataPoint) {
-		let udGridDataPoint = dataPointsJSON[gridType]["User Defined Group"].find(udGrid => udGrid.ID == udGridId);
-		if (!udGridDataPoint) {
+	UserDefinedGridHelper.prototype.generateQuickAddLayout = function(udGridId, gridType, dataPoint)
+	{
+		let udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].find(udGrid => udGrid.ID == udGridId);
+		if (!udGridDataPoint)
+		{
 			udGridDataPoint = dataPoint
 		}
 
-		let layout = {
+		const layout = {
 			width: 1,
 			items: [],
 			sliderFontRate: 0.5,
@@ -1014,14 +1179,17 @@
 		}, sortedFields = [...Array.sortBy(udGridDataPoint.UDGridFields, "Index")],
 			gridOptions = udGridDataPoint.GridOptions == null ? {} : JSON.parse(udGridDataPoint.GridOptions);
 
-		if (gridOptions.IsEnableDocument && gridOptions.DocumentFieldIndex >= 0) {
+		if (gridOptions.IsEnableDocument && gridOptions.DocumentFieldIndex >= 0)
+		{
 			sortedFields.splice(gridOptions.DocumentFieldIndex, 0, "document");
 		}
 
 		let positionY = 0, layoutItem = null;
-		for (let i = 0; i < sortedFields.length; i++) {
-			let field = sortedFields[i];
-			if (field == "document") {
+		for (let i = 0; i < sortedFields.length; i++)
+		{
+			const field = sortedFields[i];
+			if (field === "document")
+			{
 				layoutItem = {
 					x: 0,
 					y: positionY,
@@ -1030,12 +1198,14 @@
 					type: "grid",
 					field: "DocumentGrid",
 					UDGridID: udGridDataPoint.ID,
-					getDataSource: () => {
+					getDataSource: () =>
+					{
 						return [];
 					},
 				};
 			}
-			else {
+			else
+			{
 				layoutItem = {
 					x: 0,
 					y: positionY,
@@ -1054,9 +1224,10 @@
 		return layout;
 	};
 
-	UserDefinedGridHelper.prototype.addEditUDFGroupRecordInQuickAddModal = function (udGrid, gridType, baseRecordEntity, udgRecord, dataPoint) {
-		let layout = tf.udgHelper.generateQuickAddLayout(udGrid.ID, gridType, dataPoint);
-		let options = {
+	UserDefinedGridHelper.prototype.addEditUDFGroupRecordInQuickAddModal = function(udGrid, gridType, baseRecordEntity, udgRecord, dataPoint)
+	{
+		const layout = tf.udgHelper.generateQuickAddLayout(udGrid.ID, gridType, dataPoint);
+		const options = {
 			dataType: gridType,
 			recordEntity: udgRecord,
 			baseRecordEntity: baseRecordEntity,
@@ -1072,24 +1243,27 @@
 		return tf.modalManager.showModal(modalVm);
 	};
 
-	UserDefinedGridHelper.prototype.getDataPointByIdentifierAndGrid = function (udGridFieldId, udGridId, gridType) {
-		let udGridDataPoint = dataPointsJSON[gridType]["User Defined Group"].filter(udGrid => udGrid.ID == udGridId)[0];
-		let udGridFieldDataPoint = udGridDataPoint.UDGridFields.filter(udGridField => udGridField.UDGridFieldId == udGridFieldId);
+	UserDefinedGridHelper.prototype.getDataPointByIdentifierAndGrid = function(udGridFieldId, udGridId, gridType)
+	{
+		const udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID == udGridId)[0];
+		const udGridFieldDataPoint = udGridDataPoint.UDGridFields.filter(udGridField => udGridField.UDGridFieldId == udGridFieldId);
 
 		return $.extend(true, {}, udGridFieldDataPoint[0]);
 	};
 
-	UserDefinedGridHelper.prototype.getDataPointByUDGridId = function (udGridId, gridType) {
-		let udGridDataPoint = dataPointsJSON[gridType]["User Defined Group"].filter(udGrid => udGrid.ID == udGridId)[0];
-		return udGridDataPoint;
+	UserDefinedGridHelper.prototype.getDataPointByUDGridId = function(udGridId, gridType)
+	{
+		return dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID == udGridId)[0];
 	};
 
-	UserDefinedGridHelper.prototype.getDocumentGridRecords = function (columnFields, documentIds) {
+	UserDefinedGridHelper.prototype.getDocumentGridRecords = function(columnFields, documentIds)
+	{
 		var excludeFields = ['FileContent'];
 
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "documents"), {
 			data: {
-				fields: columnFields.filter(function (name) {
+				fields: columnFields.filter(function(name)
+				{
 					return excludeFields.indexOf(name) === -1;
 				}),
 				filterClause: "",
@@ -1107,25 +1281,32 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.tryRemoveBaseRecordDocumentRelationships = function (baseRecordId, dataTypeId, documentIds) {
+	UserDefinedGridHelper.prototype.tryRemoveBaseRecordDocumentRelationships = function(baseRecordId, dataTypeId, documentIds)
+	{
 		return tf.udgHelper.getAffectedDocumentUDGridCount(baseRecordId, dataTypeId, documentIds.join())
-			.then(res => {
-				if (!res) {
+			.then(res =>
+			{
+				if (!res)
+				{
 					return;
 				}
 
-				let nonExsitedDocs = documentIds.filter(d => !res[d]);
-				if (nonExsitedDocs && nonExsitedDocs.length > 0) {
-					let msg = nonExsitedDocs.length == 1 ?
+				const nonExsitedDocs = documentIds.filter(d => !res[d]);
+				if (nonExsitedDocs && nonExsitedDocs.length > 0)
+				{
+					const msg = nonExsitedDocs.length === 1 ?
 						`The last association between UDF groups and document has been removed. Do you want to disassociate the document from current ${self.gridType} record? ` :
 						`The last associations between UDF groups and documents have been removed. Do you want to disassociate these documents from current ${self.gridType} record? `;
 					return tf.promiseBootbox.yesNo(msg, "Confirmation Message")
-						.then(ch => {
-							if (!ch) {
+						.then(ch =>
+						{
+							if (!ch)
+							{
 								return;
 							}
 
-							return Promise.all(nonExsitedDocs.map(item => {
+							return Promise.all(nonExsitedDocs.map(item =>
+							{
 								return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "documentRelationships"), {
 									paramData: {
 										DBID: tf.datasourceManager.databaseId,
@@ -1134,7 +1315,8 @@
 										AttachedToType: dataTypeId
 									}
 								});
-							})).then(() => {
+							})).then(() =>
+							{
 								return nonExsitedDocs;
 							});
 						})
@@ -1142,71 +1324,94 @@
 			})
 	};
 
-	UserDefinedGridHelper.prototype.bindCounterBoxEvent = function ($inputEl, maxlength, $counterEl, preventEnterKey, getLength) {
-		$inputEl.keyup(ev => {
-			if (TF.isMobileDevice || isIpad()) {
+	UserDefinedGridHelper.prototype.bindCounterBoxEvent = function($inputEl, maxlength, $counterEl, preventEnterKey, getLength)
+	{
+		$inputEl.keyup(ev =>
+		{
+			if (TF.isMobileDevice || isIpad())
+			{
 				ev.target.style.height = 'auto';
 				ev.target.style.height = ev.target.scrollHeight + 'px';
 			}
-		}).on('keyup focusin cut paste', ev => {
-			if (typeof getLength === "function") {
+		}).on('keyup focusin cut paste', ev =>
+		{
+			if (typeof getLength === "function")
+			{
 				$counterEl.html(`${getLength(ev.target)}/${maxlength}`);
 			}
-			else {
+			else
+			{
 				$counterEl.html(`${ev.target.value.length}/${maxlength}`);
 			}
-		}).focus(ev => {
-			if (typeof getLength === "function") {
+		}).focus(ev =>
+		{
+			if (typeof getLength === "function")
+			{
 				$counterEl.html(`${getLength(ev.target)}/${maxlength}`);
 			}
-			else {
+			else
+			{
 				$counterEl.html(`${ev.target.value.length}/${maxlength}`);
 			}
 			$counterEl.show();
-		}).blur(() => {
+		}).blur(() =>
+		{
 			$counterEl.hide();
-		}).keypress(ev => {
-			if (ev.keyCode == 13 && !!preventEnterKey) {
+		}).keypress(ev =>
+		{
+			if (ev.keyCode == 13 && !!preventEnterKey)
+			{
 				ev.preventDefault();
 			}
 		});
 	}
 
-	UserDefinedGridHelper.saveUserdefinedfield = function (udfEntity) {
+	UserDefinedGridHelper.saveUserdefinedfield = function(udfEntity)
+	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
-			paramData: { "@Relationships": "UDGridFields" },
+			paramData: { PRAMATER_KEY_RELATIONSHIP: "UDGridFields" },
 			data: [udfEntity]
 		});
 	}
 
-	UserDefinedGridHelper.removeIdentityInfo = function (udfEntity) {
+	UserDefinedGridHelper.removeIdentityInfo = function(udfEntity)
+	{
 		resetFields(udfEntity, ["ID", "Id", "Guid"]);
 
-		if (udfEntity.UDGridDataSources && udfEntity.UDGridDataSources.length) {
-			udfEntity.UDGridDataSources.forEach(udgridDataSource => {
+		if (udfEntity.UDGridDataSources && udfEntity.UDGridDataSources.length)
+		{
+			udfEntity.UDGridDataSources.forEach(udgridDataSource =>
+			{
 				resetFields(udgridDataSource, ["UDGridID", "UDGrid", "ID"]);
 			});
 		}
 
-		if (udfEntity.UDGridFields && udfEntity.UDGridFields.length) {
-			udfEntity.UDGridFields.forEach(udgridField => {
+		if (udfEntity.UDGridFields && udfEntity.UDGridFields.length)
+		{
+			udfEntity.UDGridFields.forEach(udgridField =>
+			{
 				resetFields(udgridField, ["UDGridID", "UDGrid", "Guid", "ID"]);
 			});
 		}
 
-		function resetFields(entity, toResetFields) {
-			let fields = Object.keys(entity);
-			fields.forEach((f) => {
-				if (toResetFields.includes(f)) {
+		function resetFields(entity, toResetFields)
+		{
+			const fields = Object.keys(entity);
+			fields.forEach((f) =>
+			{
+				if (toResetFields.includes(f))
+				{
 					entity[f] = null;
 					delete entity[f];
-				};
+				}
 			});
 		}
 	}
 
-	UserDefinedGridHelper.formatHtmlContent = function (questionContent) {
-		if (!questionContent) {
+	UserDefinedGridHelper.formatHtmlContent = function(questionContent)
+	{
+		if (!questionContent)
+		{
 			return questionContent;
 		}
 		var wrapper = $("<div/>").html(questionContent),
@@ -1215,66 +1420,82 @@
 		return wrapper.text();
 	}
 
-	UserDefinedGridHelper.getPureFieldName = function (fieldName) {
+	UserDefinedGridHelper.getPureFieldName = function(fieldName)
+	{
 		return fieldName.substring(0, fieldName.length - 7);
 	}
 
-	UserDefinedGridHelper.getXCoordFieldName = function (fieldName) {
+	UserDefinedGridHelper.getXCoordFieldName = function(fieldName)
+	{
 		return `${fieldName}_XCoord`;
 	}
 
-	UserDefinedGridHelper.getYCoordFieldName = function (fieldName) {
+	UserDefinedGridHelper.getYCoordFieldName = function(fieldName)
+	{
 		return `${fieldName}_YCoord`;
 	}
 
-	UserDefinedGridHelper.getXCoordDisplayName = function (displayName) {
+	UserDefinedGridHelper.getXCoordDisplayName = function(displayName)
+	{
 		return `${displayName} X Coord`;
 	}
 
-	UserDefinedGridHelper.getYCoordDisplayName = function (displayName) {
+	UserDefinedGridHelper.getYCoordDisplayName = function(displayName)
+	{
 		return `${displayName} Y Coord`;
 	}
 
-	UserDefinedGridHelper.isXCoordField = function (fieldName) {
+	UserDefinedGridHelper.isXCoordField = function(fieldName)
+	{
 		return fieldName.includes("_XCoord");
 	}
 
-	UserDefinedGridHelper.isYCoordField = function (fieldName) {
+	UserDefinedGridHelper.isYCoordField = function(fieldName)
+	{
 		return fieldName.includes("_YCoord");
 	}
 
-	UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns = function (column) {
+	UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns = function(column)
+	{
 		$.extend(column, {
 			type: "number",
 			Precision: 6,
 			format: "{0:0.000000}"
 		});
 
-		let specialColumns = [];
+		const specialColumns = [];
 		let fieldName = column.FieldName;
-		let displayName = column.DisplayName;
+		const displayName = column.DisplayName;
 
-		let xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fieldName);
-		let xCoordColumn = $.extend({}, column, {
+		const xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fieldName);
+		const xCoordColumn = $.extend({}, column, {
 			FieldName: xCoordFieldName,
 			DisplayName: TF.DetailView.UserDefinedGridHelper.getXCoordDisplayName(displayName),
-			template: function (item) {
+			template: function(item)
+			{
 				let fieldName = xCoordFieldName;
-				let value = item[fieldName];
-				if (value == 0 || !value) return "";
+				const value = item[fieldName];
+				if (value == 0 || !value)
+				{
+					return "";
+				}
 				return value.toFixed(6);
 			}
 		});
 		specialColumns.push(xCoordColumn);
 
-		let yCoordFieldName = TF.DetailView.UserDefinedGridHelper.getYCoordFieldName(fieldName);
-		let yCoordColumn = $.extend({}, column, {
+		const yCoordFieldName = TF.DetailView.UserDefinedGridHelper.getYCoordFieldName(fieldName);
+		const yCoordColumn = $.extend({}, column, {
 			FieldName: yCoordFieldName,
 			DisplayName: TF.DetailView.UserDefinedGridHelper.getYCoordDisplayName(displayName),
-			template: function (item) {
+			template: function(item)
+			{
 				let fieldName = yCoordFieldName;
-				let value = item[fieldName];
-				if (value == 0 || !value) return "";
+				const value = item[fieldName];
+				if (value == 0 || !value)
+				{
+					return "";
+				}
 				return value.toFixed(6);
 			}
 		});
@@ -1283,20 +1504,23 @@
 		return specialColumns;
 	}
 
-	UserDefinedGridHelper.prepareMapData = function (record) {
-		if (!record || !record.ShapeData) {
+	UserDefinedGridHelper.prepareMapData = function(record)
+	{
+		if (!record || !record.ShapeData)
+		{
 			return record;
 		}
 
 		record.XCoord = null;
 		record.YCoord = null;
 
-		let rawData = JSON.parse(record.ShapeData);
+		const rawData = JSON.parse(record.ShapeData);
 		if (rawData &&
 			rawData.length &&
 			rawData[0].geometry &&
-			rawData[0].geometry.x && rawData[0].geometry.y) {
-			let lngLat = tf.map.ArcGIS.webMercatorUtils.xyToLngLat(rawData[0].geometry.x, rawData[0].geometry.y);
+			rawData[0].geometry.x && rawData[0].geometry.y)
+		{
+			const lngLat = tf.map.ArcGIS.webMercatorUtils.xyToLngLat(rawData[0].geometry.x, rawData[0].geometry.y);
 			record.XCoord = lngLat[0].toFixed(6);
 			record.YCoord = lngLat[1].toFixed(6);
 		}
