@@ -42,7 +42,7 @@
 
 	FormRecordSelector.prototype.init = function()
 	{
-		let self = this, autoCompleteElem = this.elem,
+		const self = this, autoCompleteElem = this.elem,
 			type = this.options.dataType;
 
 		this.autoComplete = autoCompleteElem.kendoAutoComplete({
@@ -53,7 +53,7 @@
 
 				if (e.dataItem)
 				{
-					let recordValue = e.dataItem.value;
+					const recordValue = e.dataItem.value;
 					this.value = recordValue;
 				}
 				else
@@ -71,7 +71,7 @@
 					this.value = null;
 				} */
 			},
-			noDataTemplate: () => 
+			noDataTemplate: () =>
 			{
 				if (this.noRightFetchingData)
 				{
@@ -87,13 +87,12 @@
 				transport: {
 					read: options =>
 					{
-						let value = (this.autoComplete.value() || '').trim(),
+						const value = (this.autoComplete.value() || '').trim(),
 							config = TF.Form.formConfig[type],
 							sortItems = config.sortItems,
 							generatedItems = config.generateFilterItems(config.filterItems, value),
 							filterItems = generatedItems.filterItems,
-							filterSets = generatedItems.filterSets,
-							filterSet;
+							filterSets = generatedItems.filterSets;
 
 
 						if (autoCompleteElem.data("enter_key_press") !== true)
@@ -125,9 +124,8 @@
 							return;
 						}
 
-						filterSet = new TF.FilterSet(generatedItems.logicOperator, filterItems, filterSets);
-
-						let opts = {
+						const filterSet = new TF.FilterSet(generatedItems.logicOperator, filterItems, filterSets);
+						const opts = {
 							paramData: {
 								take: 10,
 								skip: 0,
@@ -158,7 +156,7 @@
 			{
 				return;
 			}
-			if (autoCompleteElem.val() != "")
+			if (autoCompleteElem.val() !== "")
 			{
 				autoCompleteElem.focus();
 				autoCompleteElem.data("enter_key_press", true);
@@ -175,13 +173,13 @@
 
 		autoCompleteElem.click((ev) =>
 		{
-			if (autoCompleteElem.val().length >= 2 || (autoCompleteElem.data("enter_key_press") === true && autoCompleteElem.val().length != 0))
+			if (autoCompleteElem.val().length >= 2 || (autoCompleteElem.data("enter_key_press") === true && autoCompleteElem.val().length !== 0))
 			{
 				this.autoComplete.popup.open();
 			}
 		}).keypress(event =>
 		{
-			if (event.which == 13 && autoCompleteElem.val() != "")
+			if (event.which === 13 && autoCompleteElem.val() !== "")
 			{
 				autoCompleteElem.data("enter_key_press", true);
 				this.autoComplete.search(autoCompleteElem.val());
@@ -211,7 +209,7 @@
 				{
 					this.noRightFetchingData = true;
 				}
-				let simEmptyData = {
+				const simEmptyData = {
 					FilteredRecordCount: 0,
 					Items: [],
 					TotalRecordCount: 0
@@ -222,8 +220,7 @@
 
 	FormRecordSelector.prototype.validateData = function(data, options)
 	{
-		let config = TF.Form.formConfig[this.options.dataType];
-
+		const config = TF.Form.formConfig[this.options.dataType];
 		if (data.Items)
 		{
 			//data.Items.length && data.Items.length > 0
@@ -237,10 +234,4 @@
 			options.error(data);
 		}
 	}
-
-	FormRecordSelector.prototype.dispose = function()
-	{
-
-	}
-
 })();
