@@ -17,7 +17,7 @@
 	/**
 	* Initialize events for the toolbar.
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype._initEvents = function()
 	{
@@ -29,7 +29,7 @@
 
 	/**
 	* The method to bind handler for specified event.
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype.on = function(identifier, fn)
 	{
@@ -46,7 +46,7 @@
 	/**
 	* Initialize the toolbar including elements, events and styles.
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype.initToolbar = function()
 	{
@@ -58,18 +58,19 @@
 	/**
 	* Initialize the elements for the toolbar.
 	*
-	* @return {None} 
+	* @return {None}
 
 	*/
 	EsriMapToolbar.prototype._initElements = function()
 	{
-		this._toolbarTop = $("<div></div>", { class: "esri-map-toolbar-top" });
-		this._toolButton = $("<div></div>", { class: "tool-button" });
+		const divStr = "<div></div>";
+		this._toolbarTop = $(divStr, { class: "esri-map-toolbar-top" });
+		this._toolButton = $(divStr, { class: "tool-button" });
 
-		this._baseMapSwitch = $("<div></div>", { class: "basemap-switch" });
+		this._baseMapSwitch = $(divStr, { class: "basemap-switch" });
 
-		this._streetMapBtn = $("<div></div>", { class: "toolbar-btn white switch-btn applied", text: "Map" });
-		this._satelliteMapBtn = $("<div></div>", { class: "toolbar-btn white switch-btn", text: "Satellite" });
+		this._streetMapBtn = $(divStr, { class: "toolbar-btn white switch-btn applied", text: "Map" });
+		this._satelliteMapBtn = $(divStr, { class: "toolbar-btn white switch-btn", text: "Satellite" });
 
 		this._streetMapBtn.bind("click", this._streetMapBtnClick.bind(this));
 		this._satelliteMapBtn.bind("click", this._satelliteMapBtnClick.bind(this));
@@ -84,7 +85,7 @@
 	/**
 	* Update the style for the toolbar, including default Esri zoom buttons.
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype.updateToolbar = function()
 	{
@@ -104,13 +105,13 @@
 		if ($zoomBtn)
 		{
 			$zoomBtn.css({ top: "71px" });
-		};
+		}
 	};
 
 	/**
 	* The handler for StreetMap button.
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype._streetMapBtnClick = function(e)
 	{
@@ -125,7 +126,7 @@
 	/**
 	* The handler for SatelliteMap button.
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype._satelliteMapBtnClick = function(e)
 	{
@@ -141,7 +142,7 @@
 	/**
 	* The method to clear all bound events.
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype._clearEvents = function()
 	{
@@ -156,7 +157,7 @@
 	/**
 	* Dispose
 	*
-	* @return {None} 
+	* @return {None}
 	*/
 	EsriMapToolbar.prototype.dispose = function()
 	{

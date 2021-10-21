@@ -2,6 +2,11 @@
 {
 	createNamespace("TF.Map").BaseMapTool = BaseMapTool;
 
+	const DIVSTRING = "<div></div>";
+	const TOOLICON =".tool-icon";
+	const MAPTOOLLABELFIX = ".map-tool-label-fix";
+	const FONTWEIGHT = "font-weight";
+
 	function BaseMapTool($container, options)
 	{
 		var self = this;
@@ -13,8 +18,10 @@
 		self.isLandscape = options.isLandscape;
 
 		options.mapToolOptions = options.mapToolOptions || {};
-		self.afterMapToolActive = options.mapToolOptions.afterMapToolActive || function() { };
-		self.afterMapToolInactive = options.mapToolOptions.afterMapToolInactive || function() { };
+		self.afterMapToolActive = options.mapToolOptions.afterMapToolActive ||
+			function () { return null; };
+		self.afterMapToolInactive = options.mapToolOptions.afterMapToolInactive ||
+			function () { return null; };
 
 		self.toolkitBtnClickEventEnable = false;
 		self.toolkitBtnClickEvent = new TF.Events.Event();
@@ -57,13 +64,21 @@
 		}
 	};
 
-	BaseMapTool.prototype.GetMenuItems = function() { };
+	BaseMapTool.prototype.GetMenuItems = function() {
+		return null;
+	};
 
-	BaseMapTool.prototype.GetLocationMarkerToolbarItems = function() { };
+	BaseMapTool.prototype.GetLocationMarkerToolbarItems = function() {
+		return null;
+	};
 
 	BaseMapTool.prototype.BuildLocationMarkerToolbar = function(items)
 	{
-		if (!items) return;
+		if (!items)
+		{
+			return;
+		}
+
 		var self = this,
 			$mapToolBar = $("<ul></ul>", { class: "map-tool-bar" });
 		if (TF.isMobileDevice)
@@ -78,9 +93,9 @@
 
 		self.$mapToolBar = $mapToolBar;
 
-		for (let item of items)
+		for (const item of items)
 		{
-			let $newToolbarItem = $("<li></li>", { class: "map-tool-bar-item", title: item.title });
+			const $newToolbarItem = $("<li></li>", { class: "map-tool-bar-item", title: item.title });
 			$newToolbarItem.addClass("toolbar-item-" + item.title.toLowerCase());
 			if (item.icon)
 			{
@@ -96,13 +111,13 @@
 	BaseMapTool.prototype.BuildFirstLevelMenuItems = function(items)
 	{
 		var self = this,
-			$mapTool = $("<div></div>", { class: "on-map-tool" }),
-			$offMapTool = $("<div></div>", { class: "off-map-tool tool-menu" }),
-			$toolkitButton = $("<div></div>", { class: "map-tool-btn tool-icon animate" }),
-			$maskBackground = $("<div></div>", { class: "map-tool-background animate" }),
-			$mapToolContainer = $("<div></div>", { class: "map-tool-container" }),
-			$mapToolLabel = $("<div></div>", { class: "map-tool-label map-tool-label-fix animate" }),
-			$appliedGeoSearchIcon = $("<div></div>", { class: "map-applied-geo-search tool-icon animate" });
+			$mapTool = $(DIVSTRING, { class: "on-map-tool" }),
+			$offMapTool = $(DIVSTRING, { class: "off-map-tool tool-menu" }),
+			$toolkitButton = $(DIVSTRING, { class: "map-tool-btn tool-icon animate" }),
+			$maskBackground = $(DIVSTRING, { class: "map-tool-background animate" }),
+			$mapToolContainer = $(DIVSTRING, { class: "map-tool-container" }),
+			$mapToolLabel = $(DIVSTRING, { class: "map-tool-label map-tool-label-fix animate" }),
+			$appliedGeoSearchIcon = $(DIVSTRING, { class: "map-applied-geo-search tool-icon animate" });
 
 		$toolkitButton.click(self.toolkitBtnClick.bind(self));
 		$maskBackground.click(self.toolkitBtnClick.bind(self));
@@ -124,8 +139,6 @@
 
 		self.$container.append($mapTool);
 		self.$container.append($offMapTool);
-
-		// $maskBackground.on("mousedown.close-maptool-menu", self.closeOpenedMenu.bind(self));
 
 		self.$mapTool = $mapTool;
 		self.$offMapTool = $offMapTool;
@@ -151,7 +164,7 @@
 	 */
 	BaseMapTool.prototype.addTool = function(name, label, clickFunc, item, Sequence)
 	{
-		var self = this, sequence = Sequence ? Sequence : self.$mapToolContainer.find(".tool-icon").length + 1,
+		var self = this, sequence = Sequence ? Sequence : self.$mapToolContainer.find(TOOLICON).length + 1,
 			$toolBtn = $("<div></div>", { class: "tool-icon animate", title: label }),
 			$label = $("<label></label>", { text: label });
 
@@ -178,13 +191,13 @@
 
 	BaseMapTool.prototype.insertTool = function(name, label, clickFunc, item, insertAtSequence)
 	{
-		var self = this, count = self.$mapToolContainer.find(".tool-icon").length;
+		var self = this, count = self.$mapToolContainer.find(TOOLICON).length;
 		for (var i = 0; i < count; i++)
 		{
 			if (i >= insertAtSequence - 1)
 			{
-				$(self.$mapToolContainer.children()[i + 1]).removeClass("sequence-" + (i + 1));
-				$(self.$mapToolContainer.children()[i + 1]).addClass("sequence-" + (i + 2));
+				$(self.$mapToolContainer.children()[i + 1]).removeClass(`sequence-${(i + 1)}`);
+				$(self.$mapToolContainer.children()[i + 1]).addClass(`sequence-${(i + 2)}`);
 			}
 
 		}
@@ -193,7 +206,7 @@
 
 	BaseMapTool.prototype.removeTool = function(sequence)
 	{
-		var self = this, count = self.$mapToolContainer.find(".tool-icon").length;
+		var self = this, count = self.$mapToolContainer.find(TOOLICON).length;
 		for (var i = 1; i <= count; i++)
 		{
 			if ($(self.$mapToolContainer.children()[i]).hasClass("sequence-" + sequence))
@@ -202,7 +215,7 @@
 			}
 			if (i >= sequence)
 			{
-				$(self.$mapToolContainer.children()[i]).removeClass("sequence-" + (i + 1));
+				$(self.$mapToolContainer.children()[i]).removeClass(`sequence-${(i + 1)}`);
 				$(self.$mapToolContainer.children()[i]).addClass("sequence-" + i);
 			}
 		}
@@ -225,7 +238,7 @@
 			// append to doc to avoid overflow hidden when map is too small in detail view
 			// use setTimeout to enable animation
 			var docContainer = self.$mapTool.closest(".doc");
-			if (docContainer.length == 0)
+			if (docContainer.length === 0)
 			{
 				docContainer = $("body").find(".tabstrip-userdefinedfields").closest(".doc");
 			}
@@ -242,7 +255,7 @@
 			});
 			setTimeout(function()
 			{
-				self.$offMapTool.find('.map-tool-label-fix').css('display', 'block');
+				self.$offMapTool.find(MAPTOOLLABELFIX).css('display', 'block');
 				self.$offMapTool.addClass("active");
 				self.afterMapToolActive();
 			});
@@ -262,7 +275,7 @@
 				self.unLandscape();
 			});
 		}
-		self.$mapToolContainer.find('.tool-icon').each((index, item) =>
+		self.$mapToolContainer.find(TOOLICON).each((index, item) =>
 		{
 			if ($(item).hasClass('disable') && self.$mapToolLabel.find('label'))
 			{
@@ -349,9 +362,11 @@
 		{
 			e.stopPropagation();
 		}
-		this.rootMenuItem.children.map(function(child) { child.isActive = false; });
+		this.rootMenuItem.children.map(function(child)
+		 {
+			 child.isActive = false;
+		 });
 		item.isActive = true;
-		// var subMenuItems = item.children;
 		this.onBuildSubMenuItems(item);
 		this.BuildSubMenuItems(item);
 		this.SubMenuClick(item);
@@ -360,8 +375,8 @@
 
 	BaseMapTool.prototype.SubMenuClick = function(item)
 	{
-		this.$offMapTool.find(".tool-icon").addClass('deactive-icon');
-		this.$offMapTool.find('.map-tool-label-fix').css('display', 'none');
+		this.$offMapTool.find(TOOLICON).addClass('deactive-icon');
+		this.$offMapTool.find(MAPTOOLLABELFIX).css('display', 'none');
 		item.target.addClass('active');
 	};
 
@@ -369,13 +384,22 @@
 	{
 		var self = this;
 		var items = menuItem.children;
-		if (!items || items.length == 0) return;
+		if (!items || items.length === 0)
+		{
+			return;
+		}
 
 		// build sub menu
 		items.map(function(item)
 		{
-			if (item.onclick) item.onclick = item.config.click.createInterceptor(self.clickFirstSubMenu.bind(self)).bind(self, item);
-			else item.onclick = self.clickFirstSubMenu.bind(self, item);
+			if (item.onclick)
+			{
+				item.onclick = item.config.click.createInterceptor(self.clickFirstSubMenu.bind(self)).bind(self, item);
+			}
+			else
+			{
+				item.onclick = self.clickFirstSubMenu.bind(self, item);
+			}
 
 			item.toggleStatus.subscribe(function(value)
 			{
@@ -403,15 +427,15 @@
 	{
 		var checkDiv = menuItem.html.find('.check');
 		var textDiv = menuItem.html.find('.text');
-		if (toggleStatus) 
+		if (toggleStatus)
 		{
 			checkDiv.css('display', 'block');
-			textDiv.css('font-weight', 'bold');
+			textDiv.css(FONTWEIGHT, 'bold');
 		}
 		else
 		{
 			checkDiv.css('display', 'none');
-			textDiv.css('font-weight', 'normal');
+			textDiv.css(FONTWEIGHT, 'normal');
 		}
 	};
 
@@ -419,7 +443,7 @@
 	{
 		var self = this;
 		var mapTools = self.$offMapTool.find('.routing-sub-item');
-		if (mapTools && mapTools.length > 0) 
+		if (mapTools && mapTools.length > 0)
 		{
 			self.$offMapTool.find('.caret').remove();
 			mapTools.map(function(index, mapTool)
@@ -433,11 +457,11 @@
 					$(mapTool).remove();
 				}
 			});
-			self.$offMapTool.find('.map-tool-label-fix').css('display', 'block');
+			self.$offMapTool.find(MAPTOOLLABELFIX).css('display', 'block');
 			self.$offMapTool.addClass("active");
 		}
 
-		self.$offMapTool.find('.tool-icon').removeClass('deactive-icon').removeClass('active');
+		self.$offMapTool.find(TOOLICON).removeClass('deactive-icon').removeClass('active');
 		self.rootMenuItem.children.some(function(child)
 		{
 			child.isActive = false;
@@ -465,23 +489,23 @@
 			}
 			var listItem = $('<li></li>');
 			var textDiv = $(
-				'<div class="text">' +
-				'<span class="menu-item-title ' + (child.isDisable ? "disable" : "") + '" title="' + child.header + '" >' + child.header + '</span>' +
-				'</div>'
+				`<div class="text">
+				<span class="menu-item-title ${child.isDisable ? "disable" : ""}" title="${child.header}" >${child.header}</span>
+				</div>`
 			);
 
 			var checkDiv = $('<div class="check"></div>');
-			if (child.isToggled) 
+			if (child.isToggled)
 			{
-				if (child.toggleStatus()) 
+				if (child.toggleStatus())
 				{
 					checkDiv.css('display', 'block');
-					textDiv.css('font-weight', 'bold');
+					textDiv.css(FONTWEIGHT, 'bold');
 				}
 				else
 				{
 					checkDiv.css('display', 'none');
-					textDiv.css('font-weight', 'normal');
+					textDiv.css(FONTWEIGHT, 'normal');
 				}
 			}
 			listItem.append(textDiv);
@@ -494,23 +518,7 @@
 				listItem.append(arrowItem);
 			}
 			child.html = listItem;
-			// listItem.on('mouseover', menuItemMouseOver.bind(this, child));
-			// listItem.on('mouseleave', menuItemMouseLeave.bind(this, child));
 			outterUl.append(listItem);
-
-			// var returnDiv = this.showMenuInternal(menuItem.children[i]);
-			// child.childMenuHtml = returnDiv;
-			// textDiv.append(returnDiv);
-			// listItem.on('click', null, Object.create(child), child.onclick.createInterceptor(function(e)
-			// {
-			// 	var menuItem = e.data;
-			// 	var result = self.onClickEvent.call(self, menuItem, e);
-			// 	if (menuItem.config.click)
-			// 	{
-			// 		self.removeContextMenu.call(self);
-			// 	}
-			// 	return result;
-			// }));
 		}
 		return outterDiv;
 	};
@@ -565,10 +573,7 @@
 
 	BaseMapTool.prototype.setContextMenuPosition = function(event, contextMenu)
 	{
-		var mousePosition = {};
-		var menuPosition = {};
-		var menuDimension = {};
-
+		var mousePosition = {},menuPosition = {}, menuDimension = {};
 		menuDimension.x = contextMenu.outerWidth();
 		menuDimension.y = contextMenu.outerHeight();
 		mousePosition.x = event.pageX;
@@ -601,11 +606,12 @@
 
 	BaseMapTool.prototype.menuItemMouseOver = function(menuItem, e)
 	{
-
+		return null;
 	};
 
 	BaseMapTool.prototype.menuItemMouseLeave = function(menuItem, e)
 	{
+		return null;
 	};
 
 	BaseMapTool.prototype.dispose = function()
