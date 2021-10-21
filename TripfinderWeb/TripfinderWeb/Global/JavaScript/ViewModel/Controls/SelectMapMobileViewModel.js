@@ -39,5 +39,6 @@
 
 	SelectMapMobileViewModel.prototype.dispose = function()
 	{
+		return null;
 	};
 })();
