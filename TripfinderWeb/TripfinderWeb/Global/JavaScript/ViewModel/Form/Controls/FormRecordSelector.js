@@ -234,4 +234,9 @@
 			options.error(data);
 		}
 	}
+
+	FormRecordSelector.prototype.dispose = function()
+	{
+		console.log("FormRecordSelector.dispose invoked")
+	}
 })();
