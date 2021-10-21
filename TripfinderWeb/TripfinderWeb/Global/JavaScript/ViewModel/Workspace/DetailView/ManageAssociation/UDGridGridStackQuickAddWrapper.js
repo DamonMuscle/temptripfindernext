@@ -1,7 +1,11 @@
-(function () {
+(function()
+{
+	const MODAL_BODY_SELECTOR = '.modal-body';
+
 	createNamespace("TF.DetailView").UDGridGridStackQuickAddWrapper = UDGridGridStackQuickAddWrapper;
 
-	function UDGridGridStackQuickAddWrapper(options) {
+	function UDGridGridStackQuickAddWrapper(options)
+	{
 		var self = this;
 		self.dataType = options.dataType;
 		self.recordId = options.recordId;
@@ -17,16 +21,17 @@
 		self.template = "Workspace/detailview/ManageAssociation/QuickAddDetailView";
 
 		self.$element = null;
-	};
+	}
 
 	/**
 	 * Initialization
 	 * @return {void}
 	 */
-	UDGridGridStackQuickAddWrapper.prototype.init = function (data, element) {
+	UDGridGridStackQuickAddWrapper.prototype.init = function(data, element)
+	{
 		var self = this;
 		self.$element = $(element);
-		self.$scrollBody = self.$element.closest('.modal-body');
+		self.$scrollBody = self.$element.closest(MODAL_BODY_SELECTOR);
 
 		self.initCustomDetailView();
 	};
@@ -36,7 +41,8 @@
 	 *
 	 * @returns {void}
 	 */
-	UDGridGridStackQuickAddWrapper.prototype.initCustomDetailView = function () {
+	UDGridGridStackQuickAddWrapper.prototype.initCustomDetailView = function()
+	{
 		var self = this;
 		self.customDetailView = new TF.DetailView.UDGridDetailViewViewModel(self.udGrid, self.baseRecordEntity, self.recordEntity);
 		self.customDetailView.init({
@@ -47,7 +53,8 @@
 			udGrid: self.udGrid,
 		});
 
-		self.customDetailView.onEditRecordSuccess.subscribe(function (e, entity) {
+		self.customDetailView.onEditRecordSuccess.subscribe(function(e, entity)
+		{
 			self.recordEntity = entity;
 			self.recordId = entity ? entity.Id : 0;
 		});
@@ -55,12 +62,15 @@
 		self._updateQuickAddDetailView();
 	};
 
-	UDGridGridStackQuickAddWrapper.prototype._updateQuickAddDetailView = function () {
+	UDGridGridStackQuickAddWrapper.prototype._updateQuickAddDetailView = function()
+	{
 		var self = this;
-		self._getRecordEntity().then(function () {
-			let formOption = self.udGrid;
+		self._getRecordEntity().then(function()
+		{
+			const formOption = self.udGrid;
 			let gridOptions = {};
-			if (formOption.GridOptions) {
+			if (formOption.GridOptions)
+			{
 				gridOptions = JSON.parse(formOption.GridOptions);
 				formOption.isLocationRequired = !!gridOptions.IsLocationRequired;
 				formOption.color = gridOptions.BackgroundColor || '#2686b8';
@@ -71,57 +81,62 @@
 			formOption.isSigned = null;
 			formOption.latitude = null;
 			formOption.longitude = null;
-			if (self.recordEntity) {
+			if (self.recordEntity)
+			{
 				formOption.udGridRecordId = self.recordEntity.Id;
-				formOption.UDGridFields.forEach(field => {
+				formOption.UDGridFields.forEach(field =>
+				{
 					let value = self.recordEntity[field.Guid];
-					if (field.questionType === "Phone") {
+					if (field.questionType === "Phone")
+					{
 						value = tf.dataFormatHelper.phoneFormatter(value);
 					}
 					field.value = value;
 				});
 
-				let isSigned = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(self.recordEntity, formOption.UDGridFields);
-				let readOnly = formOption.isReadOnly || isSigned;
+				const isSigned = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(self.recordEntity, formOption.UDGridFields);
+				const readOnly = formOption.isReadOnly || isSigned;
 				formOption.isSigned = isSigned;
 				formOption.latitude = self.recordEntity.latitude;
 				formOption.longitude = self.recordEntity.longitude;
-				if (readOnly) {
+				if (readOnly)
+				{
 					formOption.UDGridFields.forEach(field => field.readonly = true);
 				}
 
 			}
 			self.form = new TF.Control.Form.Form(self.dataType, formOption);
-			if (self.baseRecordEntity) {
+			if (self.baseRecordEntity)
+			{
 				self.form.assginEntityRecord(self.baseRecordEntity);
 			}
 			self.$element.find(".custom-detail-view").empty().append(self.form.element);
 			//set form min-height to adapt page view size,  30(modal padding)
-			self.form.element.find(".form").css("min-height", parseInt(self.$element.parents(".modal-body").css("max-height")) - 30 + "px");
+			const MINI_HEIGHT_PROPERTY = "min-height";
+			self.form.element.find(".form").css(MINI_HEIGHT_PROPERTY, `${parseInt(self.$element.parents(MODAL_BODY_SELECTOR).css("max-height")) - 30}px`);
 
-			// if (!TF.isMobileDevice)
-			// 	self.form.element.find(".form").css("min-height", parseInt(self.$element.parents(".modal-body").css("max-height")) - 30 + "px");
-
-			if (TF.isMobileDevice) {
-				let dialog2 = self.$element.closest('.tfmodal.modal');
+			if (TF.isMobileDevice)
+			{
+				const dialog2 = self.$element.closest('.tfmodal.modal');
 				dialog2.addClass("is-form-on-mobile");
 
-				let dialog = self.$element.closest('.modal-dialog');
+				const dialog = self.$element.closest('.modal-dialog');
 				dialog.addClass("modal-fullscreen");
-				dialog.find('.modal-body').css("max-height", $(window).height() - 46);
+				dialog.find(MODAL_BODY_SELECTOR).css("max-height", $(window).height() - 46);
 
-				let bodyHeight = dialog.find('.modal-body').height();
-				self.$element.closest(".grid-stack-container").css("min-height", bodyHeight + "px");
+				const bodyHeight = dialog.find(MODAL_BODY_SELECTOR).height();
+				self.$element.closest(".grid-stack-container").css(MINI_HEIGHT_PROPERTY, bodyHeight + "px");
 
-				let bodyHeightWithoutPadding = dialog.find('.modal-body').height();
-				self.$element.closest(".basic-quick-add").css("min-height", bodyHeightWithoutPadding + "px");
-				self.$element.find(".form").css("min-height", bodyHeightWithoutPadding + "px");
+				const bodyHeightWithoutPadding = dialog.find(MODAL_BODY_SELECTOR).height();
+				self.$element.closest(".basic-quick-add").css(MINI_HEIGHT_PROPERTY, bodyHeightWithoutPadding + "px");
+				self.$element.find(".form").css(MINI_HEIGHT_PROPERTY, bodyHeightWithoutPadding + "px");
 
 				self.$element.find(".form-body").css("bottom", "0");
 			}
 
 			//restore attchments
-			if (self.recordEntity) {
+			if (self.recordEntity)
+			{
 				let docuemntRelationships = [];
 				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
 					{
@@ -129,8 +144,10 @@
 							DBID: tf.datasourceManager.databaseId,
 							UDGridRecordID: self.recordEntity.Id
 						}
-					}).then(res => {
-						if (res.Items && res.Items.length > 0) {
+					}).then(res =>
+					{
+						if (res.Items && res.Items.length > 0)
+						{
 							docuemntRelationships = res.Items;
 							const documentIds = res.Items.map(item => item.DocumentID);
 							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.datasourceManager.databaseId, "Documents"),
@@ -142,10 +159,12 @@
 									}
 								});
 						}
-						else {
+						else
+						{
 							return { Items: [] };
 						}
-					}).then(res => {
+					}).then(res =>
+					{
 						self.form.restoreAttachment(res.Items || [], docuemntRelationships);
 					});
 
@@ -155,20 +174,25 @@
 							DBID: tf.datasourceManager.databaseId,
 							UDGridRecordID: self.recordEntity.Id
 						}
-					}).then(res => {
+					}).then(res =>
+					{
 						self.form.drawMapShapes(res.Items || []);
 					});
 			}
 
-			self.form.element.on('formClose', () => {
+			self.form.element.on('formClose', () =>
+			{
 				self.form.dispose();
 				self.form = null;
 			});
-			self.form.saved = () => {
-				if (self.formSaved) {
+			self.form.saved = () =>
+			{
+				if (self.formSaved)
+				{
 					return self.formSaved();
 				}
-				else {
+				else
+				{
 					return Promise.resolve(true);
 				}
 			}
@@ -181,16 +205,20 @@
 	 *
 	 * @returns {void}
 	 */
-	UDGridGridStackQuickAddWrapper.prototype.save = function () {
+	UDGridGridStackQuickAddWrapper.prototype.save = function()
+	{
 		var self = this;
 
 		return self.form.saveForm()
-			.then(function (result) {
-				if (result == null) {
+			.then(function(result)
+			{
+				if (result == null)
+				{
 					result = { success: false };
 				}
 
-				if (result.success == null) {
+				if (result.success == null)
+				{
 					result.success = true;
 				}
 
@@ -201,19 +229,24 @@
 	/*
 	 * Handle modal Cancel button callback, to check whether form has uncommited data while click Cancel
 	 */
-	UDGridGridStackQuickAddWrapper.prototype.cancel = function () {
+	UDGridGridStackQuickAddWrapper.prototype.cancel = function()
+	{
 		var self = this;
 		if (self.form.questions.some(question => question.field.type !== "SystemField" && question.dirty)
-			|| (self.form.attachBlock && self.form.attachBlock.dirty)) {
+			|| (self.form.attachBlock && self.form.attachBlock.dirty))
+		{
 			return tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Unsaved Changes")
-				.then(result => {
-					if (result) {
+				.then(result =>
+				{
+					if (result)
+					{
 						self.form.closeForm();
 					}
 					return !result;
 				});
 		}
-		else {
+		else
+		{
 			self.form.closeForm();
 			return Promise.resolve(false);
 		}
@@ -221,13 +254,15 @@
 
 	/**
 	 * If has recordId but no record entity, request to get the entity.
-	 * 
+	 *
 	 */
-	UDGridGridStackQuickAddWrapper.prototype._getRecordEntity = function () {
+	UDGridGridStackQuickAddWrapper.prototype._getRecordEntity = function()
+	{
 		var self = this,
 			deferred = (self.recordEntity || !self.recordId) ? Promise.resolve(true) :
 				self.customDetailView.getRecordEntity(self.dataType, self.recordId)
-					.then(function (entity) {
+					.then(function(entity)
+					{
 						self.recordEntity = entity;
 					});
 
@@ -236,13 +271,15 @@
 
 	/**
 	 * Dispose
-	 * 
+	 *
 	 * @return {void}
 	 */
-	UDGridGridStackQuickAddWrapper.prototype.dispose = function () {
+	UDGridGridStackQuickAddWrapper.prototype.dispose = function()
+	{
 		var self = this;
 
-		if (self.customDetailView) {
+		if (self.customDetailView)
+		{
 			self.customDetailView.dispose();
 		}
 

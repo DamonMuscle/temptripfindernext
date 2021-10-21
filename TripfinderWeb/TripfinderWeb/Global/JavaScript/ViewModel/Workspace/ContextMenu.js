@@ -5,7 +5,7 @@
 
 	function createRootItem()
 	{
-		var root = new MenuItem(
+		return new MenuItem(
 			{
 				header: 'root',
 				icon: null,
@@ -14,7 +14,6 @@
 				disable: false
 			}
 		);
-		return root;
 	}
 
 	function MenuItem(config)
@@ -26,7 +25,10 @@
 		this.isToggled = config.isToggled;
 		this.toggleStatus = config.toggleStatus;
 		this.children = config.children ? config.children : [];
-		this.onclick = config.click ? config.click : function() { };
+		this.onclick = config.click ? config.click : function()
+		{
+			return;
+		};
 		this.config = config;
 		this.html = null;
 		this.isDevider = !!config.isDevider;
@@ -65,7 +67,10 @@
 
 		clearAllTimeOut(menuItem);
 
-		if (menuItem.children.length == 0) return;
+		if (menuItem.children.length === 0)
+		{
+			return;
+		}
 		var ulRect = menuItem.html.children('.text').closest('li')[0].getBoundingClientRect();
 		var left = ulRect.right;
 		if (left + menuItem.childMenuHtml.outerWidth() > $(window).width())
@@ -88,7 +93,10 @@
 
 	function menuItemMouseLeave(menuItem, e)
 	{
-		menuItem.timer = setTimeout(function() { menuItem.childMenuHtml.hide(); }, 500);
+		menuItem.timer = setTimeout(function()
+		{
+			menuItem.childMenuHtml.hide();
+		}, 500);
 	}
 
 	MenuItem.prototype.addChild = function(menuItem)
@@ -179,7 +187,10 @@
 		});
 	};
 
-	ContextMenu.prototype.onClickEvent = function() { };
+	ContextMenu.prototype.onClickEvent = function()
+	{
+		return;
+	};
 
 	ContextMenu.prototype.setChildren = function(children)
 	{
@@ -244,9 +255,9 @@
 			{
 				listItem.on('click', null, child, child.onclick.createInterceptor(function(e)
 				{
-					var menuItem = e.data;
-					var result = self.onClickEvent.call(self, menuItem, e);
-					if (menuItem.config.click)
+					var menuItemData = e.data;
+					var result = self.onClickEvent.call(self, menuItemData, e);
+					if (menuItemData.config.click)
 					{
 						self.removeContextMenu.call(self);
 					}
@@ -310,10 +321,11 @@
 	{
 		var mousePosition = {};
 		var menuPosition = {};
-		var menuDimension = {};
+		var menuDimension = {
+			x: contextMenu.outerWidth(),
+			y: contextMenu.outerHeight()
+		};
 
-		menuDimension.x = contextMenu.outerWidth();
-		menuDimension.y = contextMenu.outerHeight();
 		mousePosition.x = event.clientX;
 		mousePosition.y = event.clientY;
 
@@ -339,7 +351,7 @@
 			{
 				menuPosition.y = 0;
 			}
-			else 
+			else
 			{
 				menuPosition.y = $(window).height() - menuDimension.y - bottomHeight;
 			}
@@ -360,7 +372,7 @@
 
 	ContextMenu.prototype.clearContextMenu = function(e)
 	{
-		if ($(e.target).closest(".menu.context-menu.right-click-menu").length == 0)
+		if ($(e.target).closest(".menu.context-menu.right-click-menu").length === 0)
 		{
 			this.removeContextMenu();
 		}
