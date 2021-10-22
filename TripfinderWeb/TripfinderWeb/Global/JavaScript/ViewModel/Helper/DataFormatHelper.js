@@ -110,9 +110,9 @@
 		{
 			return value;
 		}
-		let content = value.toString(),
-			groups = cleanPhone.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+		let content = value.toString();
 		const cleanPhone = content.replace(/\D/g, '');
+		let groups = cleanPhone.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
 		if (cleanPhone.length < 3)
 		{
 			content = cleanPhone;
