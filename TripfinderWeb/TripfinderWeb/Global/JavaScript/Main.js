@@ -736,7 +736,10 @@ function booleanToCheckboxFormatter(value)
 {
 	createNamespace("TF").menuHelper = menuHelper;
 
-	function menuHelper() { return null; }
+	function menuHelper()
+	{
+		return null;
+	}
 
 	menuHelper.hiddenMenu = function()
 	{

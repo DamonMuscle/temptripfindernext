@@ -166,11 +166,12 @@
 			return;
 		}
 
+		const self = this;
 		var previous = ev.shiftKey,
 			target = ev.target,
 			focusables = $(element).find(":focusable"),
 			found, goto, first;
-		for (var i = previous ? focusables.length - 1 : 0; previous ? i > -1 : i < focusables.length; previous ? i-- : i++)
+		for (var i = previous ? focusables.length - 1 : 0; previous ? i > -1 : i < focusables.length; i = self.getNextIndex(previous, i))
 		{
 			var focusable = $(focusables[i]);
 			if (focusable.closest('.disabled-element').length)
@@ -178,10 +179,7 @@
 				continue;
 			}
 
-			if (!first)
-			{
-				first = focusable;
-			}
+			first = self.checkFirstFocusable(first, focusable);
 
 			if (found)
 			{
@@ -211,6 +209,31 @@
 			ev.preventDefault();
 		}
 	};
+
+	BaseModalViewModel.prototype.getNextIndex = function(previous, i)
+	{
+		if (previous)
+		{
+			return i + 1;
+		}
+		else
+		{
+			return i - 1;
+		}
+	};
+
+	BaseModalViewModel.prototype.checkFirstFocusable = function(first, focusable)
+	{
+		if (!first)
+		{
+			return focusable;
+		}
+		else
+		{
+			return first;
+		}
+	};
+
 
 	BaseModalViewModel.prototype.initModal = function(viewModel, element)
 	{

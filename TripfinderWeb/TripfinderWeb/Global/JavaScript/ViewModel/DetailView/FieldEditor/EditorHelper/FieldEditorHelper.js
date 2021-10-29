@@ -1633,7 +1633,7 @@
 		var self = this,
 			setting = self.automationSetting,
 			originalEntity = self._detailView.recordEntity;
-		if (gridType === "student" && setting.findScheduleforStudent && recordEntity.Xcoord != originalEntity.Xcoord)
+		if (gridType === "student" && setting.findScheduleforStudent && recordEntity.Xcoord !== originalEntity.Xcoord)
 		{
 			return TF.AutomationHelper.findSchedule([recordEntity.Id], setting.useStopPool, setting.selectedStopPoolCategoryId, setting.createDoorToDoor);
 		}
