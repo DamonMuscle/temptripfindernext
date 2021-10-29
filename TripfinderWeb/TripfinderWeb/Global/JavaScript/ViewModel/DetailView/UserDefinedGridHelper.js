@@ -164,7 +164,7 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
 			{
 				paramData: {
-					PRAMATER_KEY_RELATIONSHIP: "UDGridDataSources"
+					[PRAMATER_KEY_RELATIONSHIP]: "UDGridDataSources"
 				}
 			},
 			{ overlay: false }
@@ -204,7 +204,7 @@
 			{
 				paramData: {
 					"DataTypeId": dataTypeId,
-					PRAMATER_KEY_RELATIONSHIP: "UDGridFields,UDGridDataSources"
+					[PRAMATER_KEY_RELATIONSHIP]: "UDGridFields,UDGridDataSources"
 				}
 			},
 			{ overlay: false }
@@ -233,7 +233,7 @@
 			{
 				paramData: {
 					"Id": id,
-					PRAMATER_KEY_RELATIONSHIP: "UDGridFields,UDGridDataSources"
+					[PRAMATER_KEY_RELATIONSHIP]: "UDGridFields,UDGridDataSources"
 				}
 			},
 			{ overlay: false }
@@ -568,7 +568,7 @@
 					RecordDataType: dataTypeId,
 					RecordID: entityId,
 					UDGridID: udGridId,
-					PRAMATER_KEY_RELATIONSHIP: relationships
+					[PRAMATER_KEY_RELATIONSHIP]: relationships
 				}
 			},
 			{ overlay: false }
@@ -727,7 +727,7 @@
 			{
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "documents", "?ignore_blob=true"),
 					{
-						paramData: { PRAMATER_KEY_RELATIONSHIP: "DocumentRelationship" },
+						paramData: { [PRAMATER_KEY_RELATIONSHIP]: "DocumentRelationship" },
 						data: attachementsOfNew
 					}, { overlay: false }
 				).then(res =>
@@ -747,7 +747,7 @@
 			{
 				return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "documents", "?ignore_blob=true"),
 					{
-						paramData: { PRAMATER_KEY_RELATIONSHIP: "DocumentRelationship" },
+						paramData: { [PRAMATER_KEY_RELATIONSHIP]: "DocumentRelationship" },
 						data: attachementsOfModify
 					}, { overlay: false }
 				).then(res =>
@@ -1369,7 +1369,7 @@
 	UserDefinedGridHelper.saveUserdefinedfield = function(udfEntity)
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
-			paramData: { PRAMATER_KEY_RELATIONSHIP: "UDGridFields" },
+			paramData: { [PRAMATER_KEY_RELATIONSHIP]: "UDGridFields" },
 			data: [udfEntity]
 		});
 	}
