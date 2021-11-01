@@ -686,6 +686,7 @@
 
 	UDGridBlock.prototype.deleteRecord = function(e)
 	{
+		const self = this;
 		tf.promiseBootbox.yesNo("Are you sure you want to delete this record?", "Detele Confirmation")
 			.then(res =>
 			{
@@ -700,7 +701,7 @@
 
 				if (this.detailView.isCreateGridNewRecord)
 				{
-					_removeUnSavedRecord(UDGRecord);
+					self._removeUnSavedRecord(UDGRecord);
 				}
 
 				tf.udgHelper.deleteUDGridRecordOfEntity(UDGRecord.Id).then(result =>
@@ -733,7 +734,7 @@
 			});
 	}
 
-	function _removeUnSavedRecord(UDGRecord)
+	UDGridBlock.prototype._removeUnSavedRecord = function(UDGRecord)
 	{
 		const udGrids = this.detailView.fieldEditorHelper.editFieldList["UDGrids"],
 			currentEditUDGrid = udGrids.filter(udGrid => udGrid.ID === this.options.ID),
