@@ -35,11 +35,10 @@
 		configurable: false
 	});
 
-	SignatureBlock.prototype.initElement = function()
+	SignatureBlock.prototype._getESignContainer = function(field)
 	{
-		const field = this.field;
-		this.elem = $(`
-			<div class="e-sign-wrapper">
+		return $(`
+		<div class="e-sign-wrapper">
 				<div class="form-question e-sign-element">
 					<div class="question-title">
 						<div class="title">
@@ -65,36 +64,28 @@
 				</div>
 			</div>
 		`);
+	}
 
-		const $canvas = this.elem.find(`#${field.Guid}`);
-		if ($canvas.length > 0)
-		{
-			const canvas = $canvas[0];
-			setTimeout(() =>
-			{
-				this.canvas = canvas;
-				this.exitFullPage();
-				this.signaturePad = new SignaturePad(canvas, {
-					onEnd: () =>
-					{
-						this.toggleSaveButton();
-					},
-					minWidth: 2.5,
-					maxWidth: 5
-				});
-			}, 0);
-		}
-		this.elem.on('click', '.e-sign-cover-layer', e =>
+	SignatureBlock.prototype.initElement = function()
+	{
+		const field = this.field;
+		const elem = this._getESignContainer(field);
+
+		this._initSignaturePad(elem);
+
+		elem.on('click', '.e-sign-cover-layer', e =>
 		{
 			const $ele = $(e.target);
 			$ele.closest(".e-sign-wrapper").removeClass('invalid');
 			!this.field.readonly && this.enterFullPage();
 		});
-		const questionContent = this.elem.find(".form-question");
+
+		const questionContent = elem.find(".form-question");
 		questionContent.on('click', '.e-sign-close-button', e =>
 		{
 			this.exitFullPage();
 		});
+
 		questionContent.on('click', '.k-button', e =>
 		{
 			const $ele = $(e.target);
@@ -136,6 +127,35 @@
 			}
 		}, 300);
 
+		this._bindResizeCanvasEvent();
+
+		this.elem = elem;
+	}
+
+	SignatureBlock.prototype._initSignaturePad = function(elem)
+	{
+		const $canvas = elem.find(`#${field.Guid}`);
+		if ($canvas.length > 0)
+		{
+			const canvas = $canvas[0];
+			setTimeout(() =>
+			{
+				this.canvas = canvas;
+				this.exitFullPage();
+				this.signaturePad = new SignaturePad(canvas, {
+					onEnd: () =>
+					{
+						this.toggleSaveButton();
+					},
+					minWidth: 2.5,
+					maxWidth: 5
+				});
+			}, 0);
+		}
+	}
+
+	SignatureBlock.prototype._bindResizeCanvasEvent = function()
+	{
 		$(window).off("orientationchange.signatureIsMobileDevice")
 			.on("orientationchange.signatureIsMobileDevice", () =>
 			{

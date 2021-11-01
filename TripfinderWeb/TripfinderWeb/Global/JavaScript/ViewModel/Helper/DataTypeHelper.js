@@ -367,79 +367,11 @@
 	DataTypeHelper.prototype.init = function()
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), 'datatypes'))
-			.then(function(response)
-			{
-				if (response && Array.isArray(response.Items))
-				{
-					var nameIdTable = {};
-					response.Items.forEach(function(item)
-					{
-						if (item.Type)
-						{
-							if (item.Type.toLowerCase() === "dashboard")
-							{
-								nameIdTable["dashboards"] = item.ID;
-							} else
-							{
-								nameIdTable[item.Type.toLowerCase()] = item.ID;
-							}
-						}
-					});
-
-					Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function(attrKey)
-					{
-						var attr = _DATA_TYPE_ATTRIBUTES[attrKey];
-						if (attr.name)
-						{
-							attr.id = attr.name.toLowerCase() === "dashboard" ? nameIdTable["dashboards"] : nameIdTable[attr.name.toLowerCase()];
-						}
-					});
-				}
-
-				for (var key in _DATA_TYPE_ATTRIBUTES)
-				{
-					var obj = _DATA_TYPE_ATTRIBUTES[key];
-					if ((obj.name && obj.isMajorType) || obj.name === "Dashboard" || obj.name === "Other")
-					{
-						_DATA_TYPES.push({
-							key: key,
-							name: obj.name,
-							id: obj.id
-						});
-					}
-				}
-
-				_DATA_TYPES = Array.sortBy(_DATA_TYPES, "name");
-
-			})
+			.then(_formatDataTypeData)
 			.then(function()  // Initialize ReportDataSchema list
 			{
 				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "ReportDataSchemas"))
-					.then(function(response)
-					{
-						if (response && response.Items && response.Items.length)
-						{
-							var dataTypeIdMap = {};
-							_DATA_TYPES.forEach(function(dataType)
-							{
-								dataTypeIdMap[dataType.id] = dataType.name;
-							});
-
-							response.Items.filter(function(dataSchema)
-							{
-								return dataSchema && dataSchema.Enabled === true;
-							}).forEach(function(dataSchema)
-							{
-								_RPT_DATA_SCHEMAS.push({
-									Id: dataSchema.ID,
-									Name: dataSchema.DisplayName,
-									DataTypeId: dataSchema.DataTypeId,
-									DataTypeName: dataTypeIdMap[dataSchema.DataTypeId],
-									SchemaInfo: dataSchema.DataSchema,
-								});
-							});
-						}
-					})
+					.then(_formatReportSchemaData)
 					.catch(function(err)
 					{
 						console.log("Error when initializing ReportDataSchema list.");
@@ -447,6 +379,82 @@
 					});
 			});
 	};
+
+	function _formatDataTypeData(response)
+	{
+		if (response && Array.isArray(response.Items))
+		{
+			var nameIdTable = {};
+
+			response.Items.forEach(function(item) // NOSONAR
+			{
+				if (!item.Type)
+				{
+					return true;
+				}
+
+				const dataTypeKey = _getDataTypeKey(item.Type)
+				nameIdTable[dataTypeKey] = item.ID;
+			});
+
+			Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function(attrKey)
+			{
+				var attr = _DATA_TYPE_ATTRIBUTES[attrKey];
+				if (attr.name)
+				{
+					const dataTypeKey = _getDataTypeKey(attr.name);
+					attr.id = nameIdTable[dataTypeKey];
+				}
+			});
+		}
+
+		for (var key in _DATA_TYPE_ATTRIBUTES)
+		{
+			var obj = _DATA_TYPE_ATTRIBUTES[key];
+			const isSpecialDataType = (obj.name && obj.isMajorType) || obj.name === "Dashboard" || obj.name === "Other";
+			if (isSpecialDataType)
+			{
+				_DATA_TYPES.push({
+					key: key,
+					name: obj.name,
+					id: obj.id
+				});
+			}
+		}
+
+		_DATA_TYPES = Array.sortBy(_DATA_TYPES, "name");
+	}
+
+	function _getDataTypeKey(dataTypeName)
+	{
+		return dataTypeName.toLowerCase() === "dashboard" ? "dashboards" : dataTypeName.toLowerCase();
+	}
+
+	function _formatReportSchemaData(response)
+	{
+		if (response && response.Items && response.Items.length)
+		{
+			var dataTypeIdMap = {};
+			_DATA_TYPES.forEach(function(dataType)
+			{
+				dataTypeIdMap[dataType.id] = dataType.name;
+			});
+
+			response.Items.filter(function(dataSchema)
+			{
+				return dataSchema && dataSchema.Enabled === true;
+			}).forEach(function(dataSchema)
+			{
+				_RPT_DATA_SCHEMAS.push({
+					Id: dataSchema.ID,
+					Name: dataSchema.DisplayName,
+					DataTypeId: dataSchema.DataTypeId,
+					DataTypeName: dataTypeIdMap[dataSchema.DataTypeId],
+					SchemaInfo: dataSchema.DataSchema,
+				});
+			});
+		}
+	}
 
 	/**
 	 * Get the best matched object with type.

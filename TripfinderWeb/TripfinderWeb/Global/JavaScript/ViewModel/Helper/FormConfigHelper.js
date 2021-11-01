@@ -240,7 +240,7 @@
 		}
 	};
 
-	var scoolsFormatter = function(value)
+	var _schoolsFormatter = function(value)
 	{
 		if (!value)
 		{
@@ -272,83 +272,152 @@
 		{
 			case "Date":
 			case "date":
-				return value ? moment(value).format("MM/DD/YYYY") : "";
+				return _formatDataSysField(value);
 			case "Time":
 			case "time":
-				return value ? moment("2018-01-01T" + value).format("h:mm A") : "";
+				return _formatTimeSysField(value);
 			case "Date/Time":
-				return value ? moment(value).format("MM/DD/YYYY h:mm A") : "";
+				return _formatDateTimeSysField(value);
 			case "Coord":
-				return (value === null || value === '') ? "" : value.toFixed(6);
+				return _formatCoordSysField(value);
 			case "Number":
-				return value ? value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "";
+				return _formatNumberSysField(value);
 			case "number":
-				return value !== null && value !== "" ? getCommaSeparatedTwoDecimalsNumber(value) : "";
+				return _formatnumberSysField(value);
 			case TYPE_PHONE_NUMBER:
-				return tf.dataFormatHelper.phoneFormatter(value);
+				return _formatPhoneNumberSysField(value);
 			case "FieldTripStage":
-				if (value !== null && value !== "")
-				{
-					$(el[0]).attr("style", `height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:${stageFormatter(value)};float:left`);
-				} else
-				{
-					$(el[0]).removeAttr("style");
-				}
-				$(el[1]).text(value);
-				return value;
+				return _formatFieldTripStageSysField(value);
 			case "HasObject":
-				const boolVal = value === "33";
-				el.prop('checked', boolVal);
-				return boolVal;
+				return _formatHasObjectSysField(value)
 			case "Checkbox":
-				el.prop('checked', value);
-				return value;
+				return _formatCheckboxSysField(value);
 			case "Geo":
-				clearEmptyImagePlacehold(el);
-				if (value !== "")
-				{
-					el.addClass("icon-inner icon-geocoded");
-				}
-				else
-				{
-					el.removeClass();
-					appendEmptyImagePlacehold(el);
-
-				}
-				return value;
+				return _formatGeoSysField(value);
 			case "PolicyDeviation":
-				clearEmptyImagePlacehold(el);
-				if (value === '37')
-				{
-					el.addClass('grid-icon grid-icon-reddot');
-				}
-				else
-				{
-					el.removeClass();
-					appendEmptyImagePlacehold(el);
-				}
-				return value;
+				return _formatPolicyDeviationSysField(value);
 			case "SchoolsType":
-				return scoolsFormatter(value);
+				return _schoolsFormatter(value);
 			case "RidershipStatus":
-				clearEmptyImagePlacehold(el);
-				if (value === '37')
-				{
-					el.addClass('grid-icon grid-icon-reddot');
-				} else if (value === '39')
-				{
-					el.addClass('grid-icon grid-icon-yellowdot');
-				} else
-				{
-					el.removeClass();
-					appendEmptyImagePlacehold(el);
-				}
-				return value;
+				return _formatRidershipStatusSysField(value);
 			case "string":
-				return value ? value.replace(/<br\/>/g, ', ') : "";
+				return _formatStringSysField(value);
 			default:
 				return value;
 		}
+	}
+
+	function _formatDataSysField(value)
+	{
+		return value ? moment(value).format("MM/DD/YYYY") : "";
+	}
+
+	function _formatTimeSysField(value)
+	{
+		return value ? moment("2018-01-01T" + value).format("h:mm A") : "";
+	}
+
+	function _formatDateTimeSysField(value)
+	{
+		return value ? moment(value).format("MM/DD/YYYY h:mm A") : "";
+	}
+	function _formatCoordSysField(value)
+	{
+		return (value === null || value === '') ? "" : value.toFixed(6);
+	}
+
+	function _formatNumberSysField(value)
+	{
+		return value ? value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "";
+	}
+
+	function _formatnumberSysField(value)
+	{
+		return value !== null && value !== "" ? getCommaSeparatedTwoDecimalsNumber(value) : "";
+	}
+
+	function _formatPhoneNumberSysField(value)
+	{
+		return tf.dataFormatHelper.phoneFormatter(value);
+	}
+
+	function _formatFieldTripStageSysField(value)
+	{
+		if (value !== null && value !== "")
+		{
+			$(el[0]).attr("style", `height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:${stageFormatter(value)};float:left`);
+		} else
+		{
+			$(el[0]).removeAttr("style");
+		}
+		$(el[1]).text(value);
+		return value;
+	}
+
+	function _formatHasObjectSysField(value)
+	{
+		const boolVal = value === "33";
+		el.prop('checked', boolVal);
+		return boolVal;
+	}
+
+	function _formatCheckboxSysField(value)
+	{
+		el.prop('checked', value);
+		return value;
+	}
+
+	function _formatGeoSysField(value)
+	{
+		clearEmptyImagePlacehold(el);
+		if (value !== "")
+		{
+			el.addClass("icon-inner icon-geocoded");
+		}
+		else
+		{
+			el.removeClass();
+			appendEmptyImagePlacehold(el);
+
+		}
+		return value;
+	}
+
+	function _formatPolicyDeviationSysField(value)
+	{
+		clearEmptyImagePlacehold(el);
+		if (value === '37')
+		{
+			el.addClass('grid-icon grid-icon-reddot');
+		}
+		else
+		{
+			el.removeClass();
+			appendEmptyImagePlacehold(el);
+		}
+		return value;
+	}
+
+	function _formatRidershipStatusSysField(value)
+	{
+		clearEmptyImagePlacehold(el);
+		if (value === '37')
+		{
+			el.addClass('grid-icon grid-icon-reddot');
+		} else if (value === '39')
+		{
+			el.addClass('grid-icon grid-icon-yellowdot');
+		} else
+		{
+			el.removeClass();
+			appendEmptyImagePlacehold(el);
+		}
+		return value;
+	}
+
+	function _formatStringSysField(value)
+	{
+		return value ? value.replace(/<br\/>/g, ', ') : "";
 	}
 })();
 
