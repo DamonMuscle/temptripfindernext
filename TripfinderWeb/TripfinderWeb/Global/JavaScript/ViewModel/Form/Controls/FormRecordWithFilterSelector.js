@@ -177,9 +177,6 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			data = options.data,
 			sortItems = data.sortItems,
 			fields = data.fields,
-			filterItems = data.filterSet.FilterItems,
-			filterSets = data.filterSet.FilterSets,
-			operatorKey = data.filterSet.LogicalOperator === 'And' ? '&' : '|',
 			param = options.paramData;
 
 		if (param)
@@ -210,6 +207,16 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			queryStringArr.push(queryString);
 
 		}
+		return queryStringArr.concat(this.buildQueryStringPart2(options));
+	}
+
+	FormRecordWithFilterSelector.prototype.buildQueryStringPart2 = function(options)
+	{
+		const queryStringArr = [],
+			data = options.data,
+			filterItems = data.filterSet.FilterItems,
+			filterSets = data.filterSet.FilterSets,
+			operatorKey = data.filterSet.LogicalOperator === 'And' ? '&' : '|';
 		if (filterItems && filterItems.length > 0)
 		{
 			let queryString = '@filter=';
@@ -237,6 +244,7 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			queryString += items.join(operatorKey);
 			queryStringArr.push(queryString);
 		}
+
 		return queryStringArr;
 	}
 
@@ -387,26 +395,18 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 })();
 
 
-
 (function()
 {
-
-	createNamespace(NAMESPACE_TFCONTROLE).FormVehicleRecordSelector = FormVehicleRecordSelector;
-
-	function FormVehicleRecordSelector(elem, options)
+	createNamespace(NAMESPACE_TFCONTROLE).FormVehicleAndStudentRecordSelectorBase = FormVehicleAndStudentRecordSelectorBase;
+	function FormVehicleAndStudentRecordSelectorBase(elem, options)
 	{
 		TF.Control.FormRecordWithFilterSelector.apply(this, arguments);
 	}
-	FormVehicleRecordSelector.prototype = Object.create(TF.Control.FormRecordWithFilterSelector.prototype);
-	FormVehicleRecordSelector.prototype.constructor = FormVehicleRecordSelector;
 
-	FormVehicleRecordSelector.prototype.init = function()
-	{
-		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
-		this.toggleFilterApply(true);
-	}
+	FormVehicleAndStudentRecordSelectorBase.prototype = Object.create(TF.Control.FormRecordWithFilterSelector.prototype);
+	FormVehicleAndStudentRecordSelectorBase.prototype.constructor = FormVehicleAndStudentRecordSelectorBase;
 
-	FormVehicleRecordSelector.prototype.fetchData = function(opts, options)
+	FormVehicleAndStudentRecordSelectorBase.prototype.fetchData = function(opts, options)
 	{
 		if (this.isFilterApplied)
 		{
@@ -438,7 +438,25 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			TF.Control.FormRecordWithFilterSelector.prototype.fetchData.apply(this, [opts, options]);
 		}
 	}
+})();
 
+
+(function()
+{
+	createNamespace(NAMESPACE_TFCONTROLE).FormVehicleRecordSelector = FormVehicleRecordSelector;
+
+	function FormVehicleRecordSelector(elem, options)
+	{
+		TF.Control.FormVehicleAndStudentRecordSelectorBase.apply(this, arguments);
+	}
+	FormVehicleRecordSelector.prototype = Object.create(TF.Control.FormVehicleAndStudentRecordSelectorBase.prototype);
+	FormVehicleRecordSelector.prototype.constructor = FormVehicleRecordSelector;
+
+	FormVehicleRecordSelector.prototype.init = function()
+	{
+		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
+		this.toggleFilterApply(true);
+	}
 })();
 
 
@@ -449,9 +467,9 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 
 	function FormStudentRecordSelector(elem, options)
 	{
-		TF.Control.FormRecordWithFilterSelector.apply(this, arguments);
+		TF.Control.FormVehicleAndStudentRecordSelectorBase.apply(this, arguments);
 	}
-	FormStudentRecordSelector.prototype = Object.create(TF.Control.FormRecordWithFilterSelector.prototype);
+	FormStudentRecordSelector.prototype = Object.create(TF.Control.FormVehicleAndStudentRecordSelectorBase.prototype);
 	FormStudentRecordSelector.prototype.constructor = FormStudentRecordSelector;
 
 	FormStudentRecordSelector.prototype.init = function()
@@ -459,40 +477,6 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
 		this.toggleFilterApply(true);
 	}
-
-	FormStudentRecordSelector.prototype.fetchData = function(opts, options)
-	{
-		if (this.isFilterApplied)
-		{
-			this.fetchMyTripIDs().then(res =>
-			{
-				if (res && res.length > 0)
-				{
-					const queryStrings = this.parseFilterSetToQueryStrings(opts);
-
-					queryStrings.push(`tripIds=${res.map(r => r.Id).join(',')}`);
-
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint(this.options.dataType), '?' + queryStrings.join('&')))
-						.then(dataRes =>
-						{
-							this.validateData(dataRes, options);
-						});
-				}
-				else
-				{
-					this.validateData({ Items: [] }, options);
-				}
-			}).catch(rej =>
-			{
-				this.validateData({ Items: [] }, options);
-			});
-		}
-		else
-		{
-			TF.Control.FormRecordWithFilterSelector.prototype.fetchData.apply(this, [opts, options]);
-		}
-	}
-
 })();
 
 
