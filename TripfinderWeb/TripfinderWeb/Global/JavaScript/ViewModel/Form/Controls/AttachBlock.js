@@ -1,14 +1,17 @@
-(function () {
+
+(function()
+{
 	var CONFIRMATION_TITLE = "Confirmation Message";
 	createNamespace("TF.Control.Form").AttachBlockQuestion = AttachBlock;
 
-	function AttachBlock() {
-		TF.Control.Form.BaseQuestion.apply(this, arguments);
+	function AttachBlock()
+	{
 		var self = this;
 		self.StrBrowseFile = '.browse-file';
 		self.StrDisableUpload = 'disable-upload';
 		self.StrDocumentFileSelector = '#document-file-selector';
 		self.StrContentWrapper = '.content-wrapper';
+		TF.Control.Form.BaseQuestion.apply(this, arguments);
 		self.attachedDocuments = [];
 		self.attachedDocumentsName = [];
 		self.formDocuments = [];
@@ -21,26 +24,33 @@
 	AttachBlock.prototype.constructor = AttachBlock;
 
 	Object.defineProperty(AttachBlock.prototype, 'dirty', {
-		get() {
-			if (this.initialFormDocuments) {
-				if (this.initialFormDocuments.length !== this.formDocuments.length) {
+		get()
+		{
+			if (this.initialFormDocuments)
+			{
+				if (this.initialFormDocuments.length !== this.formDocuments.length)
+				{
 					return true;
 				}
-				else {
-					return this.formDocuments.some((doc, index) => {
+				else
+				{
+					return this.formDocuments.some((doc, index) =>
+					{
 						return doc.Name !== this.initialFormDocuments[index].Name
 							|| doc.FileSizeKB !== this.initialFormDocuments[index].FileSizeKB
 							|| doc.MimeType !== this.initialFormDocuments[index].MimeType;
 					})
 				}
 			}
-			else {
+			else
+			{
 				return this.formDocuments.length > 0;
 			}
 		}
 	});
 
-	AttachBlock.prototype.initQuestionContent = function () {
+	AttachBlock.prototype.initQuestionContent = function()
+	{
 		const self = this;
 		const $attachmentContent = $(`<div class= 'attachment-question attachment-container' >
 								<div class='item-content attach-document-block'>
@@ -52,28 +62,35 @@
 								</div>
 							</div >
 						</div>`);
-		if (self.field.readonly) {
+		if (self.field.readonly)
+		{
 			$attachmentContent.find(self.StrBrowseFile).addClass(self.StrDisableUpload);
 		}
 		return $attachmentContent;
 	}
 
-	AttachBlock.prototype.uploadedFilesChangeEvent = function (e) {
+	AttachBlock.prototype.uploadedFilesChangeEvent = function(e)
+	{
 		const self = this, files = e.target.files;
-		if (files.length > 0) {
+		if (files.length > 0)
+		{
 			self.uploadedFiles(files);
 		}
-	};
+	}
 
-	AttachBlock.prototype.uploadedFiles = function (files) {
+	AttachBlock.prototype.uploadedFiles = function(files)
+	{
 		const self = this, validateFiles = [];
 		let filesNumber = self.attachedDocumentsName.length;
-		if (filesNumber === 5) {
+		if (filesNumber === 5)
+		{
 			return;
 		}
 		// max number of files is 5
-		_.each(files, (file) => {
-			if (filesNumber < 5) {
+		_.each(files, (file) =>
+		{
+			if (filesNumber < 5)
+			{
 				validateFiles.push(file);
 				filesNumber++;
 			}
@@ -83,7 +100,8 @@
 		self.updateAttachedDocuments(validateFiles);
 	}
 
-	AttachBlock.prototype.getAdaptiveFileStream = function (index) {
+	AttachBlock.prototype.getAdaptiveFileStream = function(index)
+	{
 		var self = this;
 
 		if (!self.uploadDocumentHelper)
@@ -93,21 +111,26 @@
 
 		var uploadFiles = self.attachedDocuments;
 
-		if (Array.isArray(uploadFiles) && uploadFiles.length > 0) {
+		if (Array.isArray(uploadFiles) && uploadFiles.length > 0)
+		{
 			var rawFile = uploadFiles[index];
 
-			if (self.formDocuments[index]) {
+			if (self.formDocuments[index])
+			{
 				return Promise.resolve({
 					FileName: self.formDocuments[index].Name,
 					MimeType: self.formDocuments[index].MimeType,
 					FileContent: self.formDocuments[index].FileContentBase64
 				});
 			}
-			else {
+			else
+			{
 
 				return self.uploadDocumentHelper.getFileStream(rawFile)
-					.then(function (fileStream) {
-						if (fileStream) {
+					.then(function(fileStream)
+					{
+						if (fileStream)
+						{
 							var fileStreamSplit = fileStream.split(",");
 							return {
 								FileName: rawFile.name,
@@ -124,14 +147,17 @@
 		return Promise.resolve(false);
 	};
 
-	AttachBlock.prototype.showDocumentPreview = function (document) {
+	AttachBlock.prototype.showDocumentPreview = function(document)
+	{
 		tf.docFilePreviewHelper.show(document);
 	};
 
-	AttachBlock.prototype.browseAttachFile = function (e) {
+	AttachBlock.prototype.browseAttachFile = function(e)
+	{
 		var self = this,
 			$fileSelector = self.elem.find('#document-file-selector');
-		if (self.elem.find(self.StrBrowseFile).hasClass(self.StrDisableUpload)) {
+		if (self.elem.find(self.StrBrowseFile).hasClass(self.StrDisableUpload))
+		{
 			return;
 		}
 
@@ -139,15 +165,18 @@
 		$fileSelector.trigger('click');
 	};
 
-	AttachBlock.prototype.initEvents = function () {
+	AttachBlock.prototype.initEvents = function()
+	{
 		var self = this;
 
 		self.elem.on("click", self.StrBrowseFile, self.browseAttachFile.bind(self));
 		self.elem.on("change", self.StrDocumentFileSelector, self.uploadedFilesChangeEvent.bind(self));
-		self.elem.on('click', ".preview", function (e) {
+		self.elem.on('click', ".preview", function(e)
+		{
 			const conentWrapper = $(e.currentTarget).closest(self.StrContentWrapper),
 				index = self.elem.find(self.StrContentWrapper).index(conentWrapper);
-			self.getAdaptiveFileStream(index).then(function (document) {
+			self.getAdaptiveFileStream(index).then(function(document)
+			{
 				if (!document)
 				{
 					return;
@@ -157,18 +186,22 @@
 			});
 		});
 
-		self.elem.on("click", ".download", function (e) {
+		self.elem.on("click", ".download", function(e)
+		{
 			const conentWrapper = $(e.currentTarget).closest(self.StrContentWrapper),
 				index = self.elem.find(self.StrContentWrapper).index(conentWrapper);
-			self.getAdaptiveFileStream(index).then(function (document) {
+			self.getAdaptiveFileStream(index).then(function(document)
+			{
 				var helper = tf.docFilePreviewHelper;
-				if (document && document.FileContent) {
+				if (document && document.FileContent)
+				{
 					helper.initDownloadOnBrowser(document.FileName, document.MimeType, document.FileContent);
 				}
 			});
 		});
 
-		self.elem.on('click', '.trash-can', function (e) {
+		self.elem.on('click', '.trash-can', function(e)
+		{
 			const conentWrapper = $(e.currentTarget).closest(self.StrContentWrapper),
 				index = self.elem.find(self.StrContentWrapper).index(conentWrapper);
 			e.stopPropagation();
@@ -177,9 +210,12 @@
 				confirmMsg = String.format("Are you sure you want to remove the attached file \"{0}\"?", currentAttachedFileName);
 
 			tf.promiseBootbox.yesNo(confirmMsg, CONFIRMATION_TITLE)
-				.then(function (result) {
-					if (result) {
-						if (self.uploadDocumentHelper) {
+				.then(function(result)
+				{
+					if (result)
+					{
+						if (self.uploadDocumentHelper)
+						{
 							self.attachedDocuments.splice(index, 1);
 							self.attachedDocumentsName.splice(index, 1);
 							self.formDocuments.splice(index, 1);
@@ -191,10 +227,12 @@
 		});
 	};
 
-	AttachBlock.prototype.updateAttachedDocuments = function (files) {
+	AttachBlock.prototype.updateAttachedDocuments = function(files)
+	{
 		const self = this;
 		// filter duplicated file
-		var filterFiles = files.filter((file) => {
+		var filterFiles = files.filter((file) =>
+		{
 			if (TF.isMobileDevice && file.name === 'image.jpg')
 			{
 				return true;
@@ -215,15 +253,18 @@
 		self.updateFormDocuments(filterFiles).then(() => self.refresh());
 	};
 
-	AttachBlock.prototype.refresh = function () {
+	AttachBlock.prototype.refresh = function()
+	{
 		const self = this, trashFlag = TF.isMobileDevice ? " &times;" : "";
 		self.elem.find(self.StrContentWrapper).remove();
 		self.attachedDocumentsName = [];
-		self.attachedDocuments.forEach((file) => {
+		self.attachedDocuments.forEach((file) =>
+		{
 			const isvalid = self.uploadDocumentHelper.validateFile(file.name, file.size);
 			const fileName = file.name;
 			const trashFlagStr = self.field.readonly ? "" : `<span class='trash-can'>${trashFlag}</span>`;
-			if (TF.isMobileDevice && fileName === 'image.jpg') {
+			if (TF.isMobileDevice && fileName === 'image.jpg')
+			{
 				self.photoNameTimeStamp = Date.now();
 			}
 			const fileElem = $(`<div class='content-wrapper' title='${file.name}'>
@@ -245,23 +286,28 @@
 				fileElem.addClass("invalid-file");
 			}
 			self.attachedDocumentsName.push(file.name);
-			if (!isDocFilePreviewable) {
+			if (!isDocFilePreviewable)
+			{
 				fileElem.find(".preview").addClass("invisible");
 			}
-			else {
+			else
+			{
 				fileElem.find(".preview").removeClass("invisible");
 			}
 			self.elem.find(".document-list").append(fileElem);
 		});
 
-		if (self.attachedDocumentsName.length === 5) {
+		if (self.attachedDocumentsName.length === 5)
+		{
 			self.elem.find(self.StrBrowseFile).addClass(self.StrDisableUpload);
 			self.elem.find(".title-close-warn-msg").html("5 file maximum reached");
-		} else {
+		} else
+		{
 			self.elem.find(self.StrBrowseFile).removeClass(self.StrDisableUpload);
 			self.elem.find(".title-close-warn-msg").html("");
 		}
-		if (self.field.readonly) {
+		if (self.field.readonly)
+		{
 			self.elem.find(self.StrBrowseFile).addClass(self.StrDisableUpload);
 		}
 		self.value = self.formDocuments;
@@ -281,23 +327,28 @@
 		}
 	}
 
-	AttachBlock.prototype.updateFormDocuments = function (rawFiles) {
+	AttachBlock.prototype.updateFormDocuments = function(rawFiles)
+	{
 		const self = this;
 		const translate2Base64PromiseArr = [];
-		rawFiles.forEach((rawFile, i) => {
+		rawFiles.forEach((rawFile, i) =>
+		{
 			let fileName = rawFile.name;
-			if (TF.isMobileDevice && fileName === 'image.jpg') {
+			if (TF.isMobileDevice && fileName === 'image.jpg')
+			{
 				fileName = `image${Date.now().toString()}.jpg`;
 			}
 			self.attachedDocumentsName.push(fileName);
 			translate2Base64PromiseArr.push(
 				self.uploadDocumentHelper.getFileStream(rawFile)
-					.then(function (fileStream) {
+					.then(function(fileStream)
+					{
 						if (fileStream)
 						{
 							self.updateFormDocumentsFileStream(fileStream, fileName, rawFile, i);
 						}
-						else {
+						else
+						{
 							self.formDocuments.push({});
 						}
 					}));
@@ -312,7 +363,7 @@
 		{
 			self.photoNameTimeStamp = Date.now();
 			fileName = self.attachedDocumentsName[index + skipSize];
-			document = {
+			const doc = {
 				DBID: tf.datasourceManager.databaseId,
 				Name: fileName.substr(0, fileName.lastIndexOf(".")),
 				FileName: fileName,
@@ -320,10 +371,11 @@
 				MimeType: rawFile.type,
 				FileContentBase64: fileStreamSplit.length === 2 ? _.last(fileStream.split(",")) : ""
 			};
-			self.formDocuments.push(document);
-		} else
+			self.formDocuments.push(doc);
+		}
+		else
 		{
-			document = {
+			const doc = {
 				DBID: tf.datasourceManager.databaseId,
 				Name: rawFile.name.substr(0, rawFile.name.lastIndexOf(".")),
 				FileName: rawFile.name,
@@ -331,13 +383,15 @@
 				MimeType: rawFile.type,
 				FileContentBase64: fileStreamSplit.length === 2 ? _.last(fileStream.split(",")) : ""
 			};
-			self.formDocuments.push(document);
+			self.formDocuments.push(doc);
 		}
 	}
 
-	AttachBlock.prototype.restore = function (docs) {
+	AttachBlock.prototype.restore = function(docs)
+	{
 		const self = this;
-		docs.forEach(doc => {
+		docs.forEach(doc =>
+		{
 			self.attachedDocuments.push({ documentId: doc.Id, name: doc.FileName, size: doc.FileSizeKB * 1000, type: doc.MimeType });
 			self.formDocuments.push({
 				documentId: doc.Id,
@@ -354,29 +408,35 @@
 		self.initialFormDocuments = self.formDocuments.map(d => d); //clone
 	}
 
-	AttachBlock.prototype.getValidateResult = function () {
+	AttachBlock.prototype.getValidateResult = function()
+	{
 		let result = '';
-		if (this.isRequired && (this.value == null || this.value.length === 0)) {
+		if (this.isRequired && (this.value == null || this.value.length === 0))
+		{
 			result = 'Answer is required.';
 		}
 
-		if (this.elem.find(".document-list .content-wrapper.invalid-file").length >= 1) {
+		if (this.elem.find(".document-list .content-wrapper.invalid-file").length >= 1)
+		{
 			result = 'Some files do not match the supported size or formats.';
 		}
 
 		return result;
 	}
 
-	AttachBlock.prototype.hasValue = function () {
+	AttachBlock.prototype.hasValue = function()
+	{
 		return this.value != null && this.value.length >= 1;
 	}
 
-	AttachBlock.prototype._unbindDragAndDropFileEvent = function () {
+	AttachBlock.prototype._unbindDragAndDropFileEvent = function()
+	{
 		$(document).off('dragover.form' + ' dragenter.form'
 			+ ' dragleave.form' + ' dragend.form' + ' drop.form');
 	};
 
-	AttachBlock.prototype.dispose = function () {
+	AttachBlock.prototype.dispose = function()
+	{
 		var self = this;
 		self.attachedDocuments = [];
 		self.attachedDocumentsName = [];

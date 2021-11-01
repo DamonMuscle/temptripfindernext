@@ -99,6 +99,139 @@
 		});
 	}
 
+	Form.prototype.wrapQuestionAnswer = function()
+	{
+		const udgRecord = {};
+		this.questions.filter(q => q.field.questionType !== 'Map').forEach(q =>
+		{
+			//filter out attachment since multi-documents saved in sperate table
+			if (q.constructor.name !== 'AttachBlock')
+			{
+				udgRecord[q.field.Guid] = q.value;
+
+				// format phone
+				if (q.field.questionType === 'Phone')
+				{
+					udgRecord[q.field.Guid] = tf.dataFormatHelper.getStandardPhoneNumberValue(q.value);
+				}
+			}
+
+			if (q instanceof TF.Control.Form.SignatureBlockQuestion && q.value)
+			{
+				udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] = udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] || [];
+				udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField].push(q.field.Guid);
+			}
+		});
+
+		return udgRecord;
+	}
+
+	Form.prototype.tryObtainLocation = function()
+	{
+		return TF.getLocation().then(locationRes =>
+		{
+			if (this.options.isLocationRequired && locationRes.errorCode !== 0)
+			{
+				tf.loadingIndicator.tryHide();
+				let errorTipMessage = "Unknown error of getting geolocation";
+				switch (locationRes.errorCode)
+				{
+					case GeolocationPositionError.PERMISSION_DENIED:
+						errorTipMessage = "Location services must be turned on in order to submit this form.";
+						break;
+					case GeolocationPositionError.POSITION_UNAVAILABLE:
+						errorTipMessage = "Location services must be enabled in order to submit this form.";
+						break;
+					case GeolocationPositionError.TIMEOUT:
+						errorTipMessage = "Location getting timed out, please try to submit this form again.";
+						break;
+				}
+				tf.promiseBootbox.alert({
+					message: errorTipMessage,
+					title: 'Location Service Not Available'
+				});
+				return Promise.reject();
+			}
+			else
+			{
+				return Promise.resolve({
+					latitude: locationRes.latitude,
+					longitude: locationRes.longitude
+				});
+			}
+		}, rej =>
+		{
+			if (rej === 'location access denied')
+			{
+				tf.promiseBootbox.alert({
+					message: `Location services must be enabled in order to submit this form.`,
+					title: 'Location Service Not Available'
+				})
+			}
+		});
+	}
+
+	Form.prototype.tranlateAnswer = function(udgRecord)
+	{
+		return Promise.resolve().then(() =>
+		{
+			// attachment associated
+			const attachmentQuestions = this.questions.filter(q => q.field.questionType === 'AttachBlock' && q.value);
+			if (attachmentQuestions.length > 0)
+			{
+				const promises = attachmentQuestions.map(q =>
+				{
+					const attachments = q.value.map(_ =>
+					{
+						return {
+							Id: _.documentId,
+							FileContent: _.FileContentBase64,
+							FileName: _.FileName,
+							FileSizeKB: _.FileSizeKB,
+							LastUpdated: (new Date()).toISOString(),
+							Name: _.Name,
+							MimeType: _.MimeType,
+							DocumentClassificationID: 8, //general
+							DocumentRelationships: [{ AttachedToID: this.obRecordID(), AttachedToType: tf.dataTypeHelper.getId(this.dataType), DBID: tf.datasourceManager.databaseId }]
+						};
+					});
+					return tf.udgHelper.uploadAttachments(attachments).then(res =>
+					{
+						return { questionid: q.field.Guid, attachments: res }
+					});
+				})
+				return Promise.all(promises);
+			}
+			else
+			{
+				return Promise.resolve([]);
+			}
+		}).then(docs =>
+		{
+			udgRecord.DocumentUDGridRecords = [];
+			if (docs.length > 0)
+			{
+				udgRecord.DocumentUDGridRecords = docs.flatMap(qa => qa.attachments.map(a =>
+				{
+					return {
+						DBID: tf.datasourceManager.databaseId,
+						UDGridField: qa.questionid,
+						DocumentID: a.Id
+					};
+				}));
+			}
+
+			udgRecord.MapUDGridRecords = this.questions.filter(q => q.field.questionType === 'Map').map(q =>
+			{
+				return {
+					DBID: tf.datasourceManager.databaseId,
+					UDGridField: q.field.Guid,
+					ShapeData: JSON.stringify(q.value)
+				};
+			});
+		});
+	}
+
 	Form.prototype.saveForm = function()
 	{
 		if (this.obRecordID() == null)
@@ -113,121 +246,17 @@
 				return null;
 			});
 		}
-		return Promise.all([...this.questions.map(q => q.validate()), this.validateLocationRequired()])
-			.then(() =>
+		return Promise.all([...this.questions.map(q => q.validate()), this.validateLocationRequired()]).then(() =>
+		{
+			const udgRecord = this.wrapQuestionAnswer();
+			tf.loadingIndicator.showImmediately();
+			return this.tranlateAnswer(udgRecord).then(() =>
 			{
-				const udgRecord = {};
-				this.questions.filter(q => q.field.questionType !== 'Map').forEach(q =>
-				{
-					//filter out attachment since multi-documents saved in sperate table
-					if (q.constructor.name !== 'AttachBlock')
+				return Promise.resolve(this.tryObtainLocation())
+					.then(coord =>
 					{
-						udgRecord[q.field.Guid] = q.value;
-
-						// format phone
-						if (q.field.questionType === 'Phone')
-						{
-							udgRecord[q.field.Guid] = tf.dataFormatHelper.getStandardPhoneNumberValue(q.value);
-						}
-					}
-
-					if (q instanceof TF.Control.Form.SignatureBlockQuestion && q.value)
-					{
-						udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] = udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] || [];
-						udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField].push(q.field.Guid);
-					}
-				});
-				tf.loadingIndicator.showImmediately();
-				return new Promise(resolve =>
-				{
-					// attachment associated
-					const attachmentQuestions = this.questions.filter(q => q.field.questionType === 'AttachBlock' && q.value);
-					if (attachmentQuestions.length > 0)
-					{
-						const promises = attachmentQuestions.map(q =>
-						{
-							const attachments = q.value.map(_ =>
-							{
-								return {
-									Id: _.documentId,
-									FileContent: _.FileContentBase64,
-									FileName: _.FileName,
-									FileSizeKB: _.FileSizeKB,
-									LastUpdated: (new Date()).toISOString(),
-									Name: _.Name,
-									MimeType: _.MimeType,
-									DocumentClassificationID: 8, //general
-									DocumentRelationships: [{ AttachedToID: this.obRecordID(), AttachedToType: tf.dataTypeHelper.getId(this.dataType), DBID: tf.datasourceManager.databaseId }]
-								};
-							});
-							return tf.udgHelper.uploadAttachments(attachments).then(res =>
-							{
-								return { questionid: q.field.Guid, attachments: res }
-							});
-						})
-						Promise.all(promises).then(res => resolve(res));
-					}
-					else
-					{
-						resolve([]);
-					}
-				}).then(res =>
-				{
-					udgRecord.DocumentUDGridRecords = [];
-					if (res.length > 0)
-					{
-						udgRecord.DocumentUDGridRecords = res.flatMap(qa => qa.attachments.map(a =>
-						{
-							return {
-								DBID: tf.datasourceManager.databaseId,
-								UDGridField: qa.questionid,
-								DocumentID: a.Id
-							};
-						}));
-					}
-
-					udgRecord.MapUDGridRecords = this.questions.filter(q => q.field.questionType === 'Map').map(q =>
-					{
-						return {
-							DBID: tf.datasourceManager.databaseId,
-							UDGridField: q.field.Guid,
-							ShapeData: JSON.stringify(q.value)
-						};
-					});
-
-
-					return TF.getLocation().then(locationRes =>
-					{
-						if (this.options.isLocationRequired && locationRes.errorCode !== 0)
-						{
-							tf.loadingIndicator.tryHide();
-							let errorTipMessage = "Unknown error of getting geolocation";
-							switch (locationRes.errorCode)
-							{
-								case GeolocationPositionError.PERMISSION_DENIED:
-									errorTipMessage = "Location services must be turned on in order to submit this form.";
-									break;
-								case GeolocationPositionError.POSITION_UNAVAILABLE:
-									errorTipMessage = "Location services must be enabled in order to submit this form.";
-									break;
-								case GeolocationPositionError.TIMEOUT:
-									errorTipMessage = "Location getting timed out, please try to submit this form again.";
-									break;
-							}
-							tf.promiseBootbox.alert({
-								message: errorTipMessage,
-								title: 'Location Service Not Available'
-							});
-							return Promise.reject();
-						}
-						else
-						{
-							udgRecord.latitude = locationRes.latitude;
-							udgRecord.longitude = locationRes.longitude;
-							return Promise.resolve();
-						}
-					}).then(() =>
-					{
+						udgRecord.latitude = coord.latitude;
+						udgRecord.longitude = coord.longitude;
 						// save new record
 						if (!this.options.udGridRecordId)
 						{
@@ -240,36 +269,27 @@
 							return tf.udgHelper.updateUDGridRecordOfEntity(this.options, udgRecord);
 						}
 					});
-				}).then(res =>
+			}).then(res =>
+			{
+				if (this.saved)
 				{
-					if (this.saved)
-					{
-						this.saved().then(() =>
-						{
-							tf.loadingIndicator.tryHide();
-							this.closeForm();
-						})
-					}
-					else
+					this.saved().then(() =>
 					{
 						tf.loadingIndicator.tryHide();
 						this.closeForm();
-					}
-					return res;
-				}).catch(err =>
-				{
-					tf.loadingIndicator.tryHide();
-				});
-			}, rej =>
-			{
-				if (rej === 'location access denied')
-				{
-					tf.promiseBootbox.alert({
-						message: `Location services must be enabled in order to submit this form.`,
-						title: 'Location Service Not Available'
 					})
 				}
+				else
+				{
+					tf.loadingIndicator.tryHide();
+					this.closeForm();
+				}
+				return res;
+			}).catch(err =>
+			{
+				tf.loadingIndicator.tryHide();
 			});
+		});
 	}
 
 	Form.prototype.onChange = function(e)
@@ -476,9 +496,9 @@
 		}
 	}
 
-	Form.prototype.initUDFSystemFieldState = function()
+	Form.prototype.getUDFDefinationOfSystemFieldQuestion = function()
 	{
-		const getUDFOptionPromise = () =>
+		return Promise.resolve().then(() =>
 		{
 			const systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
 
@@ -516,8 +536,36 @@
 			}
 
 			return this.udfOptionPromise;
-		};
+		});
+	}
 
+	Form.prototype.hideSystemFieldQuestionNoMatchedDb = function(question, udfs)
+	{
+		let existsDbMatchedUDF = false;
+		// re assign targetField with udf display name
+		udfs && udfs.forEach(udf =>
+		{
+			if (udf.Guid === question.field.FieldOptions.DefaultText && udf.UDFDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId))
+			{
+				existsDbMatchedUDF = true;
+			}
+
+			if (question.field.FieldOptions.IsUDFSystemField && question.field.editType.targetField === udf.Guid)
+			{
+				question.field.editType.targetField = udf.DisplayName.trim();
+			}
+		})
+
+		// hide question if current database does not exists in udf database source list
+		if (!existsDbMatchedUDF)
+		{
+			question.elem.hide();
+		}
+	}
+
+	Form.prototype.initUDFSystemFieldState = function()
+	{
+		const getUDFOptionPromise = this.getUDFDefinationOfSystemFieldQuestion();
 		return new Promise((resolve) =>
 		{
 			const systemFieldUDFQuestions = this.questions.filter(q => q.field.FieldOptions
@@ -528,34 +576,15 @@
 				resolve();
 			}
 
-			systemFieldUDFQuestions.forEach(q =>
+			const promiseArr = systemFieldUDFQuestions.map(q =>
 			{
-				getUDFOptionPromise().then(udfs =>
+				return getUDFOptionPromise().then(udfs =>
 				{
-					let existsDbMatchedUDF = false;
-					// re assign targetField with udf display name
-					udfs && udfs.forEach(udf =>
-					{
-						if (udf.Guid === q.field.FieldOptions.DefaultText && udf.UDFDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId))
-						{
-							existsDbMatchedUDF = true;
-						}
-
-						if (q.field.FieldOptions.IsUDFSystemField && q.field.editType.targetField === udf.Guid)
-						{
-							q.field.editType.targetField = udf.DisplayName.trim();
-						}
-					})
-
-					// hide question if current database does not exists in udf database source list
-					if (!existsDbMatchedUDF)
-					{
-						q.elem.hide();
-					}
-
-					resolve();
+					this.hideSystemFieldQuestionNoMatchedDb(q, udfs);
 				});
 			});
+
+			Promise.all(promiseArr).then(() => resolve());
 		});
 
 	}
