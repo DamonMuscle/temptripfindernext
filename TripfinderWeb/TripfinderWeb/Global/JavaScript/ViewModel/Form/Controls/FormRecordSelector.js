@@ -42,7 +42,7 @@
 
 	FormRecordSelector.prototype.init = function()
 	{
-		const self = this, autoCompleteElem = this.elem,
+		const autoCompleteElem = this.elem,
 			type = this.options.dataType;
 
 		this.autoComplete = autoCompleteElem.kendoAutoComplete({
@@ -87,60 +87,7 @@
 				transport: {
 					read: options =>
 					{
-						const value = (this.autoComplete.value() || '').trim(),
-							config = TF.Form.formConfig[type],
-							sortItems = config.sortItems,
-							generatedItems = config.generateFilterItems(config.filterItems, value),
-							filterItems = generatedItems.filterItems,
-							filterSets = generatedItems.filterSets;
-
-
-						if (autoCompleteElem.data("enter_key_press") !== true)
-						{
-							if (value.length < 2)
-							{
-								if (this.autoComplete.dataItems().length === 0)
-								{
-									options.error();
-								}
-								else
-								{
-									options.success([]);
-								}
-								this.autoComplete.popup.close();
-								return;
-							}
-							else
-							{
-								autoCompleteElem.removeData("enter_key_press");
-							}
-						}
-
-						if (value.length === 0)
-						{
-							options.error();
-							this.autoComplete.popup.close();
-							autoCompleteElem.removeData("enter_key_press");
-							return;
-						}
-
-						const filterSet = new TF.FilterSet(generatedItems.logicOperator, filterItems, filterSets);
-						const opts = {
-							paramData: {
-								take: 10,
-								skip: 0,
-								getCount: true
-							},
-							data: {
-								fields: config.fields,
-								sortItems: sortItems,
-								idFilter: null,
-								filterSet: filterSet,
-								isQuickSearch: false,
-								filterClause: ""
-							}
-						};
-						this.fetchData(opts, options);
+						this.kendoAutoCompleteReadData(options)
 					}
 				}
 			}
@@ -148,8 +95,19 @@
 
 		this.autoComplete.list.addClass('form-record-selector-list');
 		autoCompleteElem.closest(".k-widget")
-			.prepend('<span class="k-icon k-i-search"></span>')
+			.prepend('<span class="k-icon k-i-search"></span>');
 
+		this.intializeEvent(autoCompleteElem);
+		// focus the autocomplete
+		setTimeout(() =>
+		{
+			autoCompleteElem.focus();
+		}, 200);
+	}
+
+	FormRecordSelector.prototype.intializeEvent = function(autoCompleteElem)
+	{
+		const self = this;
 		autoCompleteElem.closest(".k-widget").find(".k-i-search").click(function()
 		{
 			if (autoCompleteElem.attr("disabled") === "disabled")
@@ -167,7 +125,6 @@
 		setTimeout(() =>
 		{
 			this.autoComplete.popup.element.width(autoCompleteElem.outerWidth(true) - 2);
-			// todo
 			this.autoComplete.noData.css({ minHeight: "initial", display: "initial", textTransform: "initial", wordBreak: "break-all" });
 		});
 
@@ -186,12 +143,64 @@
 				event.preventDefault();
 			}
 		});
+	}
 
-		// focus the autocomplete
-		setTimeout(() =>
+	FormRecordSelector.prototype.kendoAutoCompleteReadData = function(options)
+	{
+		const value = (this.autoComplete.value() || '').trim(),
+			config = TF.Form.formConfig[type],
+			sortItems = config.sortItems,
+			generatedItems = config.generateFilterItems(config.filterItems, value),
+			filterItems = generatedItems.filterItems,
+			filterSets = generatedItems.filterSets;
+
+
+		if (autoCompleteElem.data("enter_key_press") !== true)
 		{
-			autoCompleteElem.focus();
-		}, 200);
+			if (value.length < 2)
+			{
+				if (this.autoComplete.dataItems().length === 0)
+				{
+					options.error();
+				}
+				else
+				{
+					options.success([]);
+				}
+				this.autoComplete.popup.close();
+				return;
+			}
+			else
+			{
+				autoCompleteElem.removeData("enter_key_press");
+			}
+		}
+
+		if (value.length === 0)
+		{
+			options.error();
+			this.autoComplete.popup.close();
+			autoCompleteElem.removeData("enter_key_press");
+			return;
+		}
+
+		const filterSet = new TF.FilterSet(generatedItems.logicOperator, filterItems, filterSets);
+		const opts = {
+			paramData: {
+				take: 10,
+				skip: 0,
+				getCount: true
+			},
+			data: {
+				fields: config.fields,
+				sortItems: sortItems,
+				idFilter: null,
+				filterSet: filterSet,
+				isQuickSearch: false,
+				filterClause: ""
+			}
+		};
+		this.fetchData(opts, options);
 	}
 
 	FormRecordSelector.prototype.fetchData = function(opts, options)
