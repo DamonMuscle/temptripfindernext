@@ -330,35 +330,37 @@
 	KendoGridSummaryGrid.prototype.getFormatedValue = function(column, item, operator)
 	{
 		var value = $.isArray(item) ? item[0] : item;
-		if (column && column.format)
+		if (!column || !column.format)
 		{
-			if (operator === 'Count' || operator === 'DistinctCount')
+			return value;
+		}
+
+		if (operator === 'Count' || operator === 'DistinctCount')
+		{
+			return value;
+		}
+		if (column.type === "date")
+		{
+			if (new Date(value) !== 'Invalid Date' && moment(value).isValid() === true && value !== 0)
 			{
-				return value;
-			}
-			if (column.type === "date")
-			{
-				if (new Date(value) !== 'Invalid Date' && moment(value).isValid() === true && value !== 0)
-				{
-					value = moment(value).toDate();
-					return kendo.format(column.format, value);
-				}
-				else
-				{
-					return "";
-				}
-			}
-			if (column.type === "time")
-			{
+				value = moment(value).toDate();
 				return kendo.format(column.format, value);
 			}
-			if (operator === 'Average' || ((operator === 'Sum' || operator === 'Min' || operator === 'Max') && column.type === 'number'))
+			else
 			{
-				return kendo.format("{0:n2}", value);
+				return "";
 			}
+		}
+		if (column.type === "time")
+		{
 			return kendo.format(column.format, value);
 		}
-		return value;
+		if (operator === 'Average' || ((operator === 'Sum' || operator === 'Min' || operator === 'Max') && column.type === 'number'))
+		{
+			return kendo.format("{0:n2}", value);
+		}
+
+		return kendo.format(column.format, value);
 	};
 
 
