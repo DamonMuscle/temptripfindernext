@@ -228,30 +228,7 @@
 
 				if (self.detailView.isCreateGridNewRecord)
 				{
-					if (!self.detailView.fieldEditorHelper.editFieldList.UDGrids)
-					{
-						self.detailView.fieldEditorHelper.editFieldList.UDGrids = [];
-					}
-
-					let udGrid = self.options;
-					const editUdGrid = self.detailView.fieldEditorHelper.editFieldList.UDGrids.filter(item => item.ID === udGrid.ID);
-					if (editUdGrid.length === 0)
-					{
-						self.detailView.fieldEditorHelper.editFieldList.UDGrids.push(udGrid);
-					}
-					else
-					{
-						udGrid = editUdGrid[0];
-					}
-
-					if (!udGrid.UDGridRecordsValues)
-					{
-						udGrid.UDGridRecordsValues = [];
-					}
-					result.Id = udGrid.UDGridRecordsValues.length + 1;// fake ID
-					udGrid.UDGridRecordsValues.push(result);
-					self.obEditing(true);
-					self.detailView.pageLevelViewModel.popupSuccessMessage('Record has been added successfully.');
+					self.initEventsWhenIsCreateGridNewRecord(result);
 				}
 				else
 				{
@@ -267,6 +244,36 @@
 			});
 		});
 	}
+
+
+	UDGridBlock.prototype.initEventsWhenIsCreateGridNewRecord = function(result)
+	{
+		const self = this;
+		if (!self.detailView.fieldEditorHelper.editFieldList.UDGrids)
+		{
+			self.detailView.fieldEditorHelper.editFieldList.UDGrids = [];
+		}
+
+		let udGrid = self.options;
+		const editUdGrid = self.detailView.fieldEditorHelper.editFieldList.UDGrids.filter(item => item.ID === udGrid.ID);
+		if (editUdGrid.length === 0)
+		{
+			self.detailView.fieldEditorHelper.editFieldList.UDGrids.push(udGrid);
+		}
+		else
+		{
+			udGrid = editUdGrid[0];
+		}
+
+		if (!udGrid.UDGridRecordsValues)
+		{
+			udGrid.UDGridRecordsValues = [];
+		}
+		result.Id = udGrid.UDGridRecordsValues.length + 1;// fake ID
+		udGrid.UDGridRecordsValues.push(result);
+		self.obEditing(true);
+		self.detailView.pageLevelViewModel.popupSuccessMessage('Record has been added successfully.');
+	};
 
 	UDGridBlock.prototype.updateDocumentGrid = function(newDocumentIds, removedDocumentIds)
 	{
