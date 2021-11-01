@@ -80,9 +80,139 @@
 		return result;
 	}
 
+	MapQuestion.prototype.intializeLocationMakerOptions = function(options)
+	{
+		//Pin default if not specified.
+		if (options.locationMarkerList.length === 0)
+		{
+			let shape = "Polygon";
+			if (TF.isMobileDevice)
+			{
+				shape = "Draw";
+			}
+			options.locationMarkerList.push(shape);
+		}
+		else
+		{
+			if (TF.isMobileDevice)
+			{
+				options.locationMarkerList = ["Draw"];
+			}
+		}
+	}
+
+	MapQuestion.prototype.intializeMapCovers = function($el)
+	{
+		const self = this;
+		const coverDom = $(`<div class="map-question-zoom-cover" 
+				style="display:none;z-index: 25000; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 1;"></div>`);
+		if (!TF.isMobileDevice)
+		{
+			self._mapView.navigation.browserTouchPanEnabled = true;
+			const $zoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip">Use ctrl + scroll to zoom the map</p>`);
+			$zoomCover.on("keydown mousewheel", function(evt)
+			{
+				if (evt && evt.ctrlKey && self._map.expandMapTool.status)
+				{
+					evt.preventDefault();
+					evt.stopPropagation();
+					$zoomCover.hide();
+					// keep the event propagation when overlay not hide
+					if (!self.canvas)
+					{
+						self.canvas = $(map.mapView.root).find("canvas")[0];
+					}
+					const originalEvent = evt.originalEvent;
+					const newEvt = new originalEvent.constructor(originalEvent.type, originalEvent);
+					self.canvas.dispatchEvent(newEvt);
+				}
+			});
+			$(self._mapView.root).after($zoomCover);
+			self._mapView.on("mouse-wheel", function(evt)
+			{
+				if (evt && evt.native && !evt.native.ctrlKey && self._map.expandMapTool.status)
+				{
+					evt.preventDefault();
+					evt.stopPropagation();
+					$zoomCover.fadeIn(500).fadeOut(2000);
+				}
+			});
+		}
+		else
+		{
+			self.intializeMapCoversMobileEvents(coverDom, $el);
+		}
+	}
+
+	MapQuestion.prototype.mapCoversMobileOnTouchmove = function($el, $mobileZoomCover)
+	{
+		const self = this;
+		$el.off("touchmove.checkFingers")
+			.on("touchmove.checkFingers", (evt) =>
+			{
+				const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
+				const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
+				const mapToolIsActive = self.element.find(".off-map-tool").hasClass("active");
+				// return when map is drawing.
+				if (locationMarkerTool && locationMarkerTool.isDrawing === true)
+				{
+					evt.preventDefault();
+					evt.stopPropagation();
+					return;
+				}
+
+				if (touches.length <= 1 && self._map.expandMapTool.status && !mapToolIsActive)
+				{
+					$mobileZoomCover.show();
+				}
+
+				if (touches.length > 1 && self._map.expandMapTool.status)
+				{
+					$mobileZoomCover.hide();
+				}
+			});
+	}
+
+	MapQuestion.prototype.intializeMapCoversMobileEvents = function(coverDom, $el)
+	{
+		const self = this;
+		self._mapView.navigation.browserTouchPanEnabled = false;
+		const $mobileZoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip" style="font-size:16px">Use two fingers to move the map</p>`);
+		$(self._mapView.root).after($mobileZoomCover);
+
+		self.mapCoversMobileOnTouchmove($el, $mobileZoomCover);
+		$el.off("touchstart.checkFingers")
+			.on("touchstart.checkFingers", (evt) =>
+			{
+				const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
+				if (locationMarkerTool && locationMarkerTool.isDrawing === true)
+				{
+					const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
+					TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "none");
+				}
+			});
+
+		$el.off("touchend.checkFingers")
+			.on("touchend.checkFingers", (evt) =>
+			{
+				const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
+				if (touches.length <= 1 && self._map.expandMapTool.status)
+				{
+					$mobileZoomCover.hide();
+				}
+
+				const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
+				TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "auto");
+			});
+
+		self._mapView.on(["pointer-up", "pointer-leave"], function(e)
+		{
+			$mobileZoomCover.hide();
+		});
+	}
+
 	MapQuestion.prototype.createMap = function($el)
 	{
-
 		var self = this;
 		var options = {
 			thematicLayerId: self.studentLayerId,
@@ -111,46 +241,8 @@
 				container: $(document.body)
 			}
 		};
+		self.intializeLocationMakerOptions(options);
 
-		//Pin default if not specified.
-		if (options.locationMarkerList.length === 0)
-		{
-			if (TF.isMobileDevice)
-			{
-				options.locationMarkerList.push("Draw");
-			}
-			else
-			{
-				options.locationMarkerList.push("Polygon");
-			}
-		}
-		else
-		{
-			if (TF.isMobileDevice)
-			{
-				const mobileLocationMarkerList = [];
-				let removed = false;
-				for (const marker of options.locationMarkerList)
-				{
-					if (["Polygon", "Rectangle", "Draw", "Circle"].includes(marker))
-					{
-						if (!removed)
-						{
-							removed = true;
-						}
-					}
-					else
-					{
-						mobileLocationMarkerList.push(marker);
-					}
-				}
-				if (removed)
-				{
-					mobileLocationMarkerList.push("Draw");
-				}
-				options.locationMarkerList = mobileLocationMarkerList;
-			}
-		}
 
 		let borderColor = null, borderSize = null;
 		const pinOption = self.field.FieldOptions.PinOption;
@@ -192,100 +284,7 @@
 			self._map = map;
 			self._mapView = map.mapView;
 
-			const coverDom = $(`<div class="map-question-zoom-cover" 
-				style="display:none;z-index: 25000; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 1;"></div>`);
-			if (!TF.isMobileDevice)
-			{
-				self._mapView.navigation.browserTouchPanEnabled = true;
-				const $zoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip">Use ctrl + scroll to zoom the map</p>`);
-				$zoomCover.on("keydown mousewheel", function(evt)
-				{
-					if (evt && evt.ctrlKey && self._map.expandMapTool.status)
-					{
-						evt.preventDefault();
-						evt.stopPropagation();
-						$zoomCover.hide();
-						// keep the event propagation when overlay not hide
-						if (!self.canvas)
-						{
-							self.canvas = $(map.mapView.root).find("canvas")[0];
-						}
-						const originalEvent = evt.originalEvent;
-						const newEvt = new originalEvent.constructor(originalEvent.type, originalEvent);
-						self.canvas.dispatchEvent(newEvt);
-					}
-				});
-				$(self._mapView.root).after($zoomCover);
-				self._mapView.on("mouse-wheel", function(evt)
-				{
-					if (evt && evt.native && !evt.native.ctrlKey && self._map.expandMapTool.status)
-					{
-						evt.preventDefault();
-						evt.stopPropagation();
-						$zoomCover.fadeIn(500).fadeOut(2000);
-					}
-				});
-			}
-			else
-			{
-				self._mapView.navigation.browserTouchPanEnabled = false;
-				const $mobileZoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip" style="font-size:16px">Use two fingers to move the map</p>`);
-				$(self._mapView.root).after($mobileZoomCover);
-				$el.off("touchmove.checkFingers")
-					.on("touchmove.checkFingers", (evt) =>
-					{
-						const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
-						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
-						const mapToolIsActive = self.element.find(".off-map-tool").hasClass("active");
-						// return when map is drawing.
-						if (locationMarkerTool && locationMarkerTool.isDrawing === true)
-						{
-							evt.preventDefault();
-							evt.stopPropagation();
-							return;
-						}
-
-						if (touches.length <= 1 && self._map.expandMapTool.status && !mapToolIsActive)
-						{
-							$mobileZoomCover.show();
-						}
-
-						if (touches.length > 1 && self._map.expandMapTool.status)
-						{
-							$mobileZoomCover.hide();
-						}
-					});
-
-				$el.off("touchstart.checkFingers")
-					.on("touchstart.checkFingers", (evt) =>
-					{
-						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
-						if (locationMarkerTool && locationMarkerTool.isDrawing === true)
-						{
-							const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
-							TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "none");
-						}
-					});
-
-				$el.off("touchend.checkFingers")
-					.on("touchend.checkFingers", (evt) =>
-					{
-						const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
-						if (touches.length <= 1 && self._map.expandMapTool.status)
-						{
-							$mobileZoomCover.hide();
-						}
-
-						const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
-						TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "auto");
-					});
-
-				self._mapView.on(["pointer-up", "pointer-leave"], function(e)
-				{
-					$mobileZoomCover.hide();
-				});
-			}
-
+			self.intializeMapCovers($el);
 			//location marker layer: create graphics on layer when click triggered on map
 			self.locationMarkerLayer = new tf.map.ArcGIS.GraphicsLayer({ id: "locationMarker" });
 			map.add(self.locationMarkerLayer);

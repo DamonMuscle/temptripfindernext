@@ -244,29 +244,35 @@
 				var arrowItem = $('<span class="k-icon k-i-arrow-e"></span>');
 				textDiv.append(arrowItem);
 			}
-			listItem.on('mouseover', menuItemMouseOver.bind(this, child));
-			listItem.on('mouseleave', menuItemMouseLeave.bind(this, child));
-			outterUl.append(listItem);
-
-			var returnDiv = this.showMenuInternal(menuItem.children[i]);
-			child.childMenuHtml = returnDiv;
-			textDiv.append(returnDiv);
-			if (!child.isDisable)
-			{
-				listItem.on('click', null, child, child.onclick.createInterceptor(function(e)
-				{
-					var menuItemData = e.data;
-					var result = self.onClickEvent.call(self, menuItemData, e);
-					if (menuItemData.config.click)
-					{
-						self.removeContextMenu.call(self);
-					}
-					return result;
-				}));
-			}
+			self.initMenuInternalEvent(child, listItem, textDiv, outterUl);
 		}
 		return outterDiv;
 	};
+
+	ContextMenu.prototype.initMenuInternalEvent = function(child, listItem, textDiv, outterUl)
+	{
+		const self = this;
+		listItem.on('mouseover', menuItemMouseOver.bind(self, child));
+		listItem.on('mouseleave', menuItemMouseLeave.bind(self, child));
+		outterUl.append(listItem);
+
+		var returnDiv = self.showMenuInternal(menuItem.children[i]);
+		child.childMenuHtml = returnDiv;
+		textDiv.append(returnDiv);
+		if (!child.isDisable)
+		{
+			listItem.on('click', null, child, child.onclick.createInterceptor(function(e)
+			{
+				var menuItemData = e.data;
+				var result = self.onClickEvent.call(self, menuItemData, e);
+				if (menuItemData.config.click)
+				{
+					self.removeContextMenu.call(self);
+				}
+				return result;
+			}));
+		}
+	}
 
 	ContextMenu.prototype.addArrowForOverFlowScroll = function(rootDiv)
 	{

@@ -59,7 +59,12 @@
 			}
 			$dragoverMask.css("z-index", "99999");
 		});
+		self.initDragEventPart2($dragoverMask, $uploadFileContainer);
+	};
 
+	UploadDocumentHelper.prototype.initDragEventPart2 = function($dragoverMask, $uploadFileContainer)
+	{
+		const self = this;
 		$dragoverMask.on("dragenter.form", function(e)
 		{
 			if (self.isInvalid())
@@ -117,7 +122,7 @@
 				self.addDocuments(files);
 			}
 		});
-	};
+	}
 
 	UploadDocumentHelper.prototype.addDocuments = function(files)
 	{

@@ -67,44 +67,7 @@
 		var self = this;
 		self._getRecordEntity().then(function()
 		{
-			const formOption = self.udGrid;
-			let gridOptions = {};
-			if (formOption.GridOptions)
-			{
-				gridOptions = JSON.parse(formOption.GridOptions);
-				formOption.isLocationRequired = !!gridOptions.IsLocationRequired;
-				formOption.color = gridOptions.BackgroundColor || '#2686b8';
-				formOption.canClearFilter = !gridOptions.IsMyRecordsFilterRequired;
-			}
-			formOption.UDGridFields = tf.udgHelper._updateUserDefinedGridFields(formOption.UDGridFields);
-			formOption.udGridRecordId = undefined;
-			formOption.isSigned = null;
-			formOption.latitude = null;
-			formOption.longitude = null;
-			if (self.recordEntity)
-			{
-				formOption.udGridRecordId = self.recordEntity.Id;
-				formOption.UDGridFields.forEach(field =>
-				{
-					let value = self.recordEntity[field.Guid];
-					if (field.questionType === "Phone")
-					{
-						value = tf.dataFormatHelper.phoneFormatter(value);
-					}
-					field.value = value;
-				});
-
-				const isSigned = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(self.recordEntity, formOption.UDGridFields);
-				const readOnly = formOption.isReadOnly || isSigned;
-				formOption.isSigned = isSigned;
-				formOption.latitude = self.recordEntity.latitude;
-				formOption.longitude = self.recordEntity.longitude;
-				if (readOnly)
-				{
-					formOption.UDGridFields.forEach(field => field.readonly = true);
-				}
-
-			}
+			const formOption = self.initFormOptions();
 			self.form = new TF.Control.Form.Form(self.dataType, formOption);
 			if (self.baseRecordEntity)
 			{
@@ -135,50 +98,7 @@
 			}
 
 			//restore attchments
-			if (self.recordEntity)
-			{
-				let docuemntRelationships = [];
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
-					{
-						paramData: {
-							DBID: tf.datasourceManager.databaseId,
-							UDGridRecordID: self.recordEntity.Id
-						}
-					}).then(res =>
-					{
-						if (res.Items && res.Items.length > 0)
-						{
-							docuemntRelationships = res.Items;
-							const documentIds = res.Items.map(item => item.DocumentID);
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.datasourceManager.databaseId, "Documents"),
-								{
-									paramData: {
-										DBID: tf.datasourceManager.databaseId,
-										"@filter": `in(Id, ${documentIds.join(",")})`,
-										"@fields": "Id,Name,FileName,FileSizeKB,MimeType,FileContentBase64",
-									}
-								});
-						}
-						else
-						{
-							return { Items: [] };
-						}
-					}).then(res =>
-					{
-						self.form.restoreAttachment(res.Items || [], docuemntRelationships);
-					});
-
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "MapUDGridRecords"),
-					{
-						paramData: {
-							DBID: tf.datasourceManager.databaseId,
-							UDGridRecordID: self.recordEntity.Id
-						}
-					}).then(res =>
-					{
-						self.form.drawMapShapes(res.Items || []);
-					});
-			}
+			self.restoreAttachment();
 
 			self.form.element.on('formClose', () =>
 			{
@@ -199,6 +119,99 @@
 			self.form.element.removeClass('hide');
 		});
 	};
+
+	UDGridGridStackQuickAddWrapper.prototype.initFormOptions = function()
+	{
+		const self = this;
+		const formOption = self.udGrid;
+		let gridOptions = {};
+		if (formOption.GridOptions)
+		{
+			gridOptions = JSON.parse(formOption.GridOptions);
+			formOption.isLocationRequired = !!gridOptions.IsLocationRequired;
+			formOption.color = gridOptions.BackgroundColor || '#2686b8';
+			formOption.canClearFilter = !gridOptions.IsMyRecordsFilterRequired;
+		}
+		formOption.UDGridFields = tf.udgHelper._updateUserDefinedGridFields(formOption.UDGridFields);
+		formOption.udGridRecordId = undefined;
+		formOption.isSigned = null;
+		formOption.latitude = null;
+		formOption.longitude = null;
+		if (self.recordEntity)
+		{
+			formOption.udGridRecordId = self.recordEntity.Id;
+			formOption.UDGridFields.forEach(field =>
+			{
+				let value = self.recordEntity[field.Guid];
+				if (field.questionType === "Phone")
+				{
+					value = tf.dataFormatHelper.phoneFormatter(value);
+				}
+				field.value = value;
+			});
+
+			const isSigned = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(self.recordEntity, formOption.UDGridFields);
+			const readOnly = formOption.isReadOnly || isSigned;
+			formOption.isSigned = isSigned;
+			formOption.latitude = self.recordEntity.latitude;
+			formOption.longitude = self.recordEntity.longitude;
+			if (readOnly)
+			{
+				formOption.UDGridFields.forEach(field => field.readonly = true);
+			}
+		}
+		return formOption;
+	}
+
+	UDGridGridStackQuickAddWrapper.prototype.restoreAttachment = function()
+	{
+		const self = this;
+		//restore attchments
+		if (self.recordEntity)
+		{
+			let docuemntRelationships = [];
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
+				{
+					paramData: {
+						DBID: tf.datasourceManager.databaseId,
+						UDGridRecordID: self.recordEntity.Id
+					}
+				}).then(res =>
+				{
+					if (res.Items && res.Items.length > 0)
+					{
+						docuemntRelationships = res.Items;
+						const documentIds = res.Items.map(item => item.DocumentID);
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.datasourceManager.databaseId, "Documents"),
+							{
+								paramData: {
+									DBID: tf.datasourceManager.databaseId,
+									"@filter": `in(Id, ${documentIds.join(",")})`,
+									"@fields": "Id,Name,FileName,FileSizeKB,MimeType,FileContentBase64",
+								}
+							});
+					}
+					else
+					{
+						return { Items: [] };
+					}
+				}).then(res =>
+				{
+					self.form.restoreAttachment(res.Items || [], docuemntRelationships);
+				});
+
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "MapUDGridRecords"),
+				{
+					paramData: {
+						DBID: tf.datasourceManager.databaseId,
+						UDGridRecordID: self.recordEntity.Id
+					}
+				}).then(res =>
+				{
+					self.form.drawMapShapes(res.Items || []);
+				});
+		}
+	}
 
 	/**
 	 * Save the object.
