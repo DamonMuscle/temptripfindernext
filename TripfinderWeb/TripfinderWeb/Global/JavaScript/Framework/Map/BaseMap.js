@@ -20,7 +20,7 @@
 	BaseMap.prototype.usingArcGIS = function(extrasLocation)
 	{
 		var self = this;
-		var promise = new Promise(function(resolve, reject)
+		return new Promise(function(resolve, reject)
 		{
 			require({
 				packages: [{
@@ -283,7 +283,6 @@
 				resolve();
 			}.bind(self));
 		});
-		return promise;
 	};
 
 	/**
@@ -291,19 +290,19 @@
 	*/
 	BaseMap.prototype._hackSearch = function(Search)
 	{
-		Search.prototype.search = function(a)
+		Search.prototype.search = function(param)
 		{
 			var b = this;
 			this.activeMenu = "none";
 			this._cancelSuggest();
-			return this.viewModel.search(a).catch(function(a)
+			return this.viewModel.search(param).catch(function(ex)
 			{
 				b.activeMenu = "none";
-				return a
-			}).then(function(a)
+				return ex
+			}).then(function(ret)
 			{
-				b.activeMenu = a.numResults ? "none" : "warning";
-				return a
+				b.activeMenu = ret.numResults ? "none" : "warning";
+				return ret
 			})
 		}
 	}
@@ -432,7 +431,8 @@
 	{
 		document.addEventListener("touchmove", function(event)
 		{
-			if (event.scale !== 1) {
+			if (event.scale !== 1)
+			{
 				event.preventDefault();
 			}
 		}, false);

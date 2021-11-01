@@ -219,32 +219,32 @@
 			$btn = self.$el.find(GRID_TOP_RIGHT_BUTTON_SELECTOR);
 		$btn.on("click", () =>
 		{
-			tf.udgHelper.addEditUDFGroupRecordInQuickAddModal(self.options, self.gridType, self.detailView.recordEntity).then((result) =>
-			{
-				if (!result)
+			tf.udgHelper.addEditUDFGroupRecordInQuickAddModal(self.options, self.gridType, self.detailView.recordEntity)
+				.then((result) =>
 				{
-					return;
-				}
+					if (!result)
+					{
+						return;
+					}
 
-				if (self.detailView.isCreateGridNewRecord)
-				{
-					self.initEventsWhenIsCreateGridNewRecord(result);
-				}
-				else
-				{
-					self.detailView.pageLevelViewModel.popupSuccessMessage('Updates have been saved successfully.');
-				}
+					if (self.detailView.isCreateGridNewRecord)
+					{
+						self.initEventsWhenIsCreateGridNewRecord(result);
+					}
+					else
+					{
+						self.detailView.pageLevelViewModel.popupSuccessMessage('Updates have been saved successfully.');
+					}
 
-				if (result.DocumentUDGridRecords)
-				{
-					self.updateDocumentGrid(result.DocumentUDGridRecords.map(document => document.DocumentID), []);
-				}
+					if (result.DocumentUDGridRecords)
+					{
+						self.updateDocumentGrid(result.DocumentUDGridRecords.map(document => document.DocumentID), []);
+					}
 
-				PubSub.publish("udgrid", {});
-			});
+					PubSub.publish("udgrid", {});
+				});
 		});
 	}
-
 
 	UDGridBlock.prototype.initEventsWhenIsCreateGridNewRecord = function(result)
 	{
@@ -491,7 +491,7 @@
 							column.template = function(item)
 							{
 								let value = item[col];
-								if (value == null || value == "")
+								if (value == null || value === "")
 								{
 									return "";
 								}
@@ -686,62 +686,72 @@
 
 	UDGridBlock.prototype.deleteRecord = function(e)
 	{
-		tf.promiseBootbox.yesNo("Are you sure you want to delete this record?", "Detele Confirmation").then(res =>
-		{
-			if (!res)
+		const self = this;
+		tf.promiseBootbox.yesNo("Are you sure you want to delete this record?", "Detele Confirmation")
+			.then(res =>
 			{
-				return;
-			}
-
-			const $tr = $(e.target).closest("tr"),
-				kendoGrid = $tr.closest(KENDO_GRID_SELECTOR).data("kendoGrid"),
-				UDGRecord = kendoGrid.dataItem($tr[0]);
-			if (this.detailView.isCreateGridNewRecord)
-			{
-				const udGrids = this.detailView.fieldEditorHelper.editFieldList["UDGrids"],
-					currentEditUDGrid = udGrids.filter(udGrid => udGrid.ID === this.options.ID),
-					udGridRecords = currentEditUDGrid[0].UDGridRecordsValues;
-
-				const index = udGridRecords.findIndex(item => item.Id === UDGRecord.Id);
-				udGridRecords.splice(index, 1);
-
-				this.detailView.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "UDGrid", [UDGRecord.Id]);
-				PubSub.publish("udgrid");
-				if (UDGRecord.DocumentUDGridRecords && UDGRecord.DocumentUDGridRecords.length > 0)
+				if (!res)
 				{
-					const relatedDocs = UDGRecord.DocumentUDGridRecords.map(item => item.DocumentID);
-					return tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "document", relatedDocs);
+					return undefined;
 				}
 
-				return;
-			}
+				const $tr = $(e.target).closest("tr"),
+					kendoGrid = $tr.closest(KENDO_GRID_SELECTOR).data("kendoGrid"),
+					UDGRecord = kendoGrid.dataItem($tr[0]);
 
-			tf.udgHelper.deleteUDGridRecordOfEntity(UDGRecord.Id).then(result =>
-			{
-				if (result)
+				if (this.detailView.isCreateGridNewRecord)
 				{
-					this.detailView.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "UDGrid", [UDGRecord.Id]);
-					this.detailView.pageLevelViewModel.popupSuccessMessage('Record has been deleted successfully.');
-					PubSub.publish("udgrid");
-					if (UDGRecord.DocumentUDGridRecords && UDGRecord.DocumentUDGridRecords.length > 0)
+					self._removeUnSavedRecord(UDGRecord);
+				}
+
+				tf.udgHelper.deleteUDGridRecordOfEntity(UDGRecord.Id).then(result =>
+				{
+					if (result)
 					{
-						const relatedDocs = UDGRecord.DocumentUDGridRecords.map(item => item.DocumentID);
-						tf.udgHelper.tryRemoveBaseRecordDocumentRelationships(this.recordId, this.options.DataTypeId, relatedDocs)
-							.then(pureResult =>
-							{
-								return tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "document", pureResult);
-							});
+						this.detailView.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "UDGrid", [UDGRecord.Id]);
+						this.detailView.pageLevelViewModel.popupSuccessMessage('Record has been deleted successfully.');
+						PubSub.publish("udgrid");
+						if (UDGRecord.DocumentUDGridRecords && UDGRecord.DocumentUDGridRecords.length > 0)
+						{
+							const relatedDocs = UDGRecord.DocumentUDGridRecords.map(item => item.DocumentID);
+							tf.udgHelper.tryRemoveBaseRecordDocumentRelationships(this.recordId, this.options.DataTypeId, relatedDocs)
+								.then(pureResult =>
+								{
+									return tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "document", pureResult);
+								});
+						}
 					}
-				}
-				else
+					else
+					{
+						tf.promiseBootbox.alert("Delete failed.")
+					}
+				}).catch(error =>
 				{
 					tf.promiseBootbox.alert("Delete failed.")
-				}
-			}).catch(error =>
-			{
-				tf.promiseBootbox.alert("Delete failed.")
-			})
-		})
+				});
+
+				return undefined;
+			});
+	}
+
+	UDGridBlock.prototype._removeUnSavedRecord = function(UDGRecord)
+	{
+		const udGrids = this.detailView.fieldEditorHelper.editFieldList["UDGrids"],
+			currentEditUDGrid = udGrids.filter(udGrid => udGrid.ID === this.options.ID),
+			udGridRecords = currentEditUDGrid[0].UDGridRecordsValues;
+
+		const index = udGridRecords.findIndex(item => item.Id === UDGRecord.Id);
+		udGridRecords.splice(index, 1);
+
+		this.detailView.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "UDGrid", [UDGRecord.Id]);
+		PubSub.publish("udgrid");
+		if (UDGRecord.DocumentUDGridRecords && UDGRecord.DocumentUDGridRecords.length > 0)
+		{
+			const relatedDocs = UDGRecord.DocumentUDGridRecords.map(item => item.DocumentID);
+			return tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(this.$detailView, "document", relatedDocs);
+		}
+
+		return undefined;
 	}
 
 	UDGridBlock.prototype.editClickEvent = function(e)
@@ -840,36 +850,44 @@
 		}
 
 		const $rows = kendoGrid.element.find("tr");
-		if ($rows && $rows.length)
+		if (!$rows || !$rows.length)
 		{
-			dataItems.forEach(function(dataItem, idx)
-			{
-				if ($rows.length >= idx + 1)
-				{
-					const $editBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-edit');
-					const $viewBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-view');
-
-					const udfFields = kendoGrid.options.columns.filter(c => c.udfType === "SignatureBlock").map(d =>
-					{
-						return { Type: 15, Guid: d.FieldName };
-					});
-					const isReadOnly = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(dataItem, udfFields);
-					if (isReadOnly)
-					{
-						if ($editBtn && $editBtn.length)
-						{
-							$editBtn.hide();
-						}
-					}
-					else
-					{
-						if ($viewBtn && $viewBtn.length)
-						{
-							$viewBtn.hide();
-						}
-					}
-				}
-			});
+			return;
 		}
+
+		dataItems.forEach(function(dataItem, idx)
+		{
+			if ($rows.length >= idx + 1)
+			{
+				_SetEditAndReadBtn(dataItem, idx, $rows)
+			}
+
+		});
 	};
+
+	function _SetEditAndReadBtn(dataItem, idx, $rows)
+	{
+		const $editBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-edit');
+		const $viewBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-view');
+
+		const udfFields = kendoGrid.options.columns.filter(c => c.udfType === "SignatureBlock").map(d =>
+		{
+			return { Type: 15, Guid: d.FieldName };
+		});
+		const isReadOnly = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(dataItem, udfFields);
+		if (isReadOnly)
+		{
+			if ($editBtn && $editBtn.length)
+			{
+				$editBtn.hide();
+			}
+		}
+		else
+		{
+			if ($viewBtn && $viewBtn.length)
+			{
+				$viewBtn.hide();
+			}
+		}
+	}
 })()

@@ -122,9 +122,9 @@
 				{
 					if (tf.applicationTerm[defaultTerm.Term])
 					{
-						str = str.replace(new RegExp('\\b' + defaultTerm.Singular + '\\b', 'ig'), tf.applicationTerm[defaultTerm.Term].Singular);
-						str = str.replace(new RegExp('\\b' + defaultTerm.Plural + '\\b', 'ig'), tf.applicationTerm[defaultTerm.Term].Plural);
-						str = str.replace(new RegExp('\\b' + defaultTerm.Abbreviation + '\\b', 'ig'), tf.applicationTerm[defaultTerm.Term].Abbreviation);
+						str = str.replace(new RegExp(`\\b${defaultTerm.Singular}\\b`, 'ig'), tf.applicationTerm[defaultTerm.Term].Singular);
+						str = str.replace(new RegExp(`\\b${defaultTerm.Plural}\\b`, 'ig'), tf.applicationTerm[defaultTerm.Term].Plural);
+						str = str.replace(new RegExp(`\\b${defaultTerm.Abbreviation}\\b`, 'ig'), tf.applicationTerm[defaultTerm.Term].Abbreviation);
 					}
 				});
 
@@ -184,7 +184,9 @@
 					{
 						// failed to connection
 						return tf.promiseBootbox.dialog({
-							message: databaseName + " could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative (support@transfinder.com or 888-427-2403).",
+							message: `${databaseName} could not load.&nbsp;&nbsp;Try again later.&nbsp;&nbsp;`
+								+ "If you continue to experience issues, please contact your Transfinder Project Manager or Support Representative "
+								+ "(support@transfinder.com or 888-427-2403).",
 							title: "Could Not Load",
 							closeButton: true,
 							buttons: {
@@ -261,7 +263,11 @@
 		window.location.href = newLocation;
 	};
 
-	function Startup() { }
+	function Startup()
+	{
+		// This is intentional
+	}
+
 	Startup.prototype.start = function()
 	{
 		var self = this;
@@ -306,7 +312,6 @@
 					tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
 					tf.dataTypeHelper = tf.DataTypeHelper;
 					return tf.DataTypeHelper.init();
-					//return tf.DataTypeHelper.init();
 				})
 				.then(function()
 				{
@@ -349,7 +354,7 @@
 						TF.productID = apiResponse.Items[0].ID;
 					});
 
-					let array = location.pathname.split("/").filter(r => r);
+					const array = location.pathname.split("/").filter(r => r);
 					// get extra js location
 					var extrasLocation = location.origin.concat(
 						array.length === 1 ? "/" + array[0] : "",
@@ -370,20 +375,6 @@
 							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
 								updateDataSourcePromise = Promise.resolve(true);
 
-							var openDb = function()
-							{
-								// Temporary changes to skip data source selection RW-4351
-								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases")).then(function(response)
-								{
-									if (response.Items.length >= 1)
-									{
-										var item = response.Items[0];
-										item.Icon = "iconbutton current datasource-icon";
-										return tf.datasourceManager.choose(item, true);
-									}
-								});
-							};
-
 							if (dbIdSuppliedInUrl)
 							{
 								var dbIdInUrlValue = parseInt(tf.urlParm.DB),
@@ -400,7 +391,7 @@
 
 										return tf.storageManager.save("datasourceId", candidateDB.DBID);
 									});
-							};
+							}
 
 							return updateDataSourcePromise
 								.then(function()
@@ -467,7 +458,7 @@
 											});
 										}
 									});
-							};
+							}
 						})
 						.then(function(isPass)
 						{
@@ -590,10 +581,12 @@
 						})
 						.then(function(value)
 						{
-							if (value !== null)
+							if (!value)
 							{
-								return tf.pageManager.loadDataSourceName();
+								return;
 							}
+
+							return tf.pageManager.loadDataSourceName();
 						});
 				});
 		});
@@ -611,9 +604,9 @@
 			{
 				if (response.Items && response.Items.length > 0)
 				{
-					// TODO: From Cait's mail, "For Production apps, we only need to worry about LanguageID=1 for now. 
-					// When this additional functionality is complete and Plus is released and then 
-					// we will have to look up the language through the localSettings table and 
+					// TODO: From Cait's mail, "For Production apps, we only need to worry about LanguageID=1 for now.
+					// When this additional functionality is complete and Plus is released and then
+					// we will have to look up the language through the localSettings table and
 					// look up app terms per that language ID.But, for now, just worry about LanguageID = 1."
 					// But in local database, there is no LanguageID=1. Use min language id here.
 					var minLanguageId = Number.MAX_VALUE;
@@ -747,16 +740,16 @@
 	Startup.prototype.getURLParm = function()
 	{
 		var parm = location.href;
-		var parm_result = new Object;
+		var parmResult = new Object;
 		var start = parm.indexOf("?") != -1 ? parm.indexOf("?") + 1 : parm.length;
 		var end = parm.indexOf("#") != -1 ? parm.indexOf("#") : parm.length;
 		parm = parm.substring(start, end);
-		parm_array = parm.split("&");
-		for (var i = 0; i < parm_array.length; i++)
+		var parmArray = parm.split("&");
+		for (var i = 0; i < parmArray.length; i++)
 		{
-			parm_result[parm_array[i].split("=")[0]] = parm_array[i].split("=")[1];
+			parmResult[parmArray[i].split("=")[0]] = parmArray[i].split("=")[1];
 		}
-		return parm_result;
+		return parmResult;
 	};
 	Startup.prototype.loadExagoBIServerUrl = function()
 	{

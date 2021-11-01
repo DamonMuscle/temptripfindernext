@@ -3,7 +3,7 @@
 	createNamespace("TF.Map").BaseMapTool = BaseMapTool;
 
 	const DIVSTRING = "<div></div>";
-	const TOOLICON =".tool-icon";
+	const TOOLICON = ".tool-icon";
 	const MAPTOOLLABELFIX = ".map-tool-label-fix";
 	const FONTWEIGHT = "font-weight";
 
@@ -19,9 +19,15 @@
 
 		options.mapToolOptions = options.mapToolOptions || {};
 		self.afterMapToolActive = options.mapToolOptions.afterMapToolActive ||
-			function () { return null; };
+			function()
+			{
+				// This is intentional
+			};
 		self.afterMapToolInactive = options.mapToolOptions.afterMapToolInactive ||
-			function () { return null; };
+			function()
+			{
+				// This is intentional
+			};
 
 		self.toolkitBtnClickEventEnable = false;
 		self.toolkitBtnClickEvent = new TF.Events.Event();
@@ -64,12 +70,14 @@
 		}
 	};
 
-	BaseMapTool.prototype.GetMenuItems = function() {
-		return null;
+	BaseMapTool.prototype.GetMenuItems = function()
+	{
+		// This is intentional
 	};
 
-	BaseMapTool.prototype.GetLocationMarkerToolbarItems = function() {
-		return null;
+	BaseMapTool.prototype.GetLocationMarkerToolbarItems = function()
+	{
+		// This is intentional
 	};
 
 	BaseMapTool.prototype.BuildLocationMarkerToolbar = function(items)
@@ -84,11 +92,11 @@
 		if (TF.isMobileDevice)
 		{
 			$mapToolBar.addClass("is-mobile");
-			$mapToolBar.css({right:'70px',top:'24px'});
+			$mapToolBar.css({ right: '70px', top: '24px' });
 		}
 		else
 		{
-			$mapToolBar.css({right:'80px',top:'24px'});
+			$mapToolBar.css({ right: '80px', top: '24px' });
 		}
 
 		self.$mapToolBar = $mapToolBar;
@@ -363,9 +371,9 @@
 			e.stopPropagation();
 		}
 		this.rootMenuItem.children.map(function(child)
-		 {
-			 child.isActive = false;
-		 });
+		{
+			child.isActive = false;
+		});
 		item.isActive = true;
 		this.onBuildSubMenuItems(item);
 		this.BuildSubMenuItems(item);
@@ -573,7 +581,7 @@
 
 	BaseMapTool.prototype.setContextMenuPosition = function(event, contextMenu)
 	{
-		var mousePosition = {},menuPosition = {}, menuDimension = {};
+		var mousePosition = {}, menuPosition = {}, menuDimension = {};
 		menuDimension.x = contextMenu.outerWidth();
 		menuDimension.y = contextMenu.outerHeight();
 		mousePosition.x = event.pageX;
@@ -606,12 +614,12 @@
 
 	BaseMapTool.prototype.menuItemMouseOver = function(menuItem, e)
 	{
-		return null;
+		// This is intentional
 	};
 
 	BaseMapTool.prototype.menuItemMouseLeave = function(menuItem, e)
 	{
-		return null;
+		// This is intentional
 	};
 
 	BaseMapTool.prototype.dispose = function()

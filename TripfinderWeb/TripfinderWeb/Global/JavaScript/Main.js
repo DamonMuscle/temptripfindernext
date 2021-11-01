@@ -94,7 +94,7 @@ function getParameterByName(name, url)
 		results = regex.exec(url);
 	if (!results)
 	{
-		return null;
+		return;
 	}
 	if (!results[2])
 	{
@@ -266,9 +266,11 @@ function getQueryString(name)
 
 Array.remove = function(array, item)
 {
-	while ((index = array.indexOf(item)) > -1)
+	let index = array.indexOf(item);
+	while ((index) > -1)
 	{
 		array.splice(index, 1);
+		index = array.indexOf(item);
 	}
 };
 
@@ -703,7 +705,7 @@ function booleanToCheckboxFormatter(value)
 
 	function Color()
 	{
-		return null;
+		// This is intentional
 	}
 
 	Color.toHTMLColorFromLongColor = function(longColor)
@@ -738,7 +740,7 @@ function booleanToCheckboxFormatter(value)
 
 	function menuHelper()
 	{
-		return null;
+		// This is intentional
 	}
 
 	menuHelper.hiddenMenu = function()
@@ -827,7 +829,7 @@ Function.prototype.interceptBefore = function(object, methodName, fn, scope)
 {
 	var method = object[methodName] || function()
 	{
-		return null;
+		// This is intentional
 	};
 	return (object[methodName] = function()
 	{
@@ -841,7 +843,7 @@ Function.prototype.interceptAfter = function(object, methodName, fn, scope)
 {
 	var method = object[methodName] || function()
 	{
-		return null;
+		// This is intentional
 	};
 	return (object[methodName] = function()
 	{
