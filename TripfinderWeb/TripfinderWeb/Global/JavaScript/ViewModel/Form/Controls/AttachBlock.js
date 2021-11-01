@@ -1,4 +1,3 @@
-
 (function()
 {
 	var CONFIRMATION_TITLE = "Confirmation Message";
