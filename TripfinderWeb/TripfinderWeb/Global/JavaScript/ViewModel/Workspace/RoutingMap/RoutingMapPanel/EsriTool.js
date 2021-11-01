@@ -418,30 +418,9 @@
 		var needToRevert = false;
 		graphics.forEach(function(graphic)
 		{
-			if (self._pointLayer)
+			if (self.transofrmSingleGraphic(graphic))
 			{
-				var heartId = self.getBoundaryHeartId(graphic);
-				const centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
-				if (!self._arcgis.geometryEngine.intersects(graphic.geometry, centroid.geometry))
-				{
-					var nearestPoint = self._arcgis.geometryEngine.nearestCoordinate(graphic.geometry, centroid.geometry).coordinate;
-					var parcelWithFinger = self._createFinger(nearestPoint, centroid.geometry, graphic);
-					graphic.geometry = parcelWithFinger;
-				}
-				if (centroid)
-				{
-					graphic.geometry = self._cutResultHandler(graphic.geometry, centroid.geometry);
-				}
-			}
-			if (!self._allowOverlap)
-			{
-				if (!self.overlapCheck(centroid || graphic))
-				{
-					needToRevert = true;
-				} else
-				{
-					graphic.geometry = self.removeOverlapBoundary(graphic, centroid).geometry;
-				}
+				needToRevert = true;
 			}
 		});
 		if (needToRevert)
@@ -456,6 +435,102 @@
 			self.updateDataModel(graphics);
 		}
 	};
+
+	EsriTool.prototype.transofrmSingleGraphic = function(graphic)
+	{
+		const self = this;
+		let needToRevert = false;
+		if (self._pointLayer)
+		{
+			var heartId = self.getBoundaryHeartId(graphic);
+			const centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
+			if (!self._arcgis.geometryEngine.intersects(graphic.geometry, centroid.geometry))
+			{
+				var nearestPoint = self._arcgis.geometryEngine.nearestCoordinate(graphic.geometry, centroid.geometry).coordinate;
+				var parcelWithFinger = self._createFinger(nearestPoint, centroid.geometry, graphic);
+				graphic.geometry = parcelWithFinger;
+			}
+			if (centroid)
+			{
+				graphic.geometry = self._cutResultHandler(graphic.geometry, centroid.geometry);
+			}
+		}
+		if (!self._allowOverlap)
+		{
+			if (!self.overlapCheck(centroid || graphic))
+			{
+				needToRevert = true;
+			}
+			else
+			{
+				graphic.geometry = self.removeOverlapBoundary(graphic, centroid).geometry;
+			}
+		}
+		return needToRevert;
+	}
+
+
+	function setStreetName(grap)
+	{
+		var promise;
+		if (grap.attributes.junctionStreets)
+		{
+			promise = Promise.resolve(self.stopTool.getStreetAddressByJunctionStreets(grap.attributes.junctionStreets));
+		} else
+		{
+			promise = self.stopTool.reverseGeocodeStop(grap.geometry).then(function(result)
+			{
+				if (result)
+				{
+					return result ? result : "Unnamed";
+				}
+				return undefined;
+			});
+		}
+
+		return promise.then(function(name)
+		{
+			if (name)
+			{
+				grap.attributes.dataModel.Street = name;
+			}
+		});
+	}
+
+	function revertToOrigin()
+	{
+		graphic.geometry = self._oldTripStopGraphic.geometry;
+		self.updateDataModel([graphic]);
+	}
+
+	EsriTool.prototype.polygonMoveCallback = function(graphic)
+	{
+		const self = this;
+		var parcel = self._findGraphicInLayerById(self._polygonLayer, boundaryId);
+		parcel.symbol = self._oldBoundarySymbol;
+
+		if (self.removeOverlapCheck(graphic))
+		{
+			setStreetName(graphic).then(() =>
+			{
+				if (!self._arcgis.geometryEngine.intersects(parcel.geometry, graphic.geometry))
+				{
+					var nearestPointGeometry = self._arcgis.geometryEngine.nearestCoordinate(parcel.geometry, graphic.geometry).coordinate;
+					var parcelWithFinger = self._createFinger(nearestPointGeometry, graphic.geometry, parcel);
+					parcel.geometry = parcelWithFinger;
+				}
+				graphic.attributes.dataModel.City = TF.RoutingMap.GeocodeHelper.getCityName(graphic.attributes.dataModel.geometry);
+				self.updateDataModel([graphic]);
+			});
+		}
+		else
+		{
+			self.overlapDialogTransform().then(function()
+			{
+				revertToOrigin();
+			});
+		}
+	}
 
 	EsriTool.prototype.movePointCallback = function(graphics)
 	{
@@ -478,67 +553,13 @@
 
 			if (self._polygonLayer && boundaryId)
 			{
-				var parcel = self._findGraphicInLayerById(self._polygonLayer, boundaryId);
-				parcel.symbol = self._oldBoundarySymbol;
-
-				if (self.removeOverlapCheck(graphic))
-				{
-					setStreetName(graphic).then(() =>
-					{
-						if (!self._arcgis.geometryEngine.intersects(parcel.geometry, graphic.geometry))
-						{
-							var nearestPointGeometry = self._arcgis.geometryEngine.nearestCoordinate(parcel.geometry, graphic.geometry).coordinate;
-							var parcelWithFinger = self._createFinger(nearestPointGeometry, graphic.geometry, parcel);
-							parcel.geometry = parcelWithFinger;
-						}
-						graphic.attributes.dataModel.City = TF.RoutingMap.GeocodeHelper.getCityName(graphic.attributes.dataModel.geometry);
-						self.updateDataModel([graphic]);
-					});
-				} else
-				{
-					self.overlapDialogTransform().then(function()
-					{
-						revertToOrigin();
-					});
-				}
-			} else
-			{
-				self.updateDataModel([graphic]);
+				self.polygonMoveCallback(graphic);
 			}
-
-			function revertToOrigin()
+			else
 			{
-				graphic.geometry = self._oldTripStopGraphic.geometry;
 				self.updateDataModel([graphic]);
 			}
 		});
-
-		function setStreetName(grap)
-		{
-			var promise;
-			if (grap.attributes.junctionStreets)
-			{
-				promise = Promise.resolve(self.stopTool.getStreetAddressByJunctionStreets(grap.attributes.junctionStreets));
-			} else
-			{
-				promise = self.stopTool.reverseGeocodeStop(grap.geometry).then(function(result)
-				{
-					if (result)
-					{
-						return result ? result : "Unnamed";
-					}
-					return undefined;
-				});
-			}
-
-			return promise.then(function(name)
-			{
-				if (name)
-				{
-					grap.attributes.dataModel.Street = name;
-				}
-			});
-		}
 	};
 
 	EsriTool.prototype.getSnappedTripStop = function(tripStop)
@@ -563,6 +584,38 @@
 
 	};
 
+	EsriTool.prototype.forceStopToJunctionResolveStop = function(nearbyJunction, tripStop)
+	{
+		const self = this;
+		if (nearbyJunction && nearbyJunction.point)
+		{
+			if (result && result.distance <= self.snapOffsetDistance)
+			{
+				if (!tripStop.attributes)
+				{
+					tripStop.attributes = {};
+				}
+				tripStop.attributes.junctionStreets = nearbyJunction.streets;
+				tripStop.geometry = nearbyJunction.point;
+				return Promise.resolve(tripStop);
+			}
+			var polyline = new tf.map.ArcGIS.Polyline({
+				paths: [[tripStop.geometry.x, tripStop.geometry.y], [nearbyJunction.point.x, nearbyJunction.point.y]],
+				spatialReference: { wkid: 102100 }
+			});
+			if (tf.map.ArcGIS.geometryEngine.geodesicLength(polyline, "meters") <= self.snapInsetDistance)
+			{
+				if (!tripStop.attributes)
+				{
+					tripStop.attributes = {};
+				}
+				tripStop.attributes.junctionStreets = nearbyJunction.streets;
+				tripStop.geometry = nearbyJunction.point;
+				return Promise.resolve(tripStop);
+			}
+		}
+		return Promise.resolve(tripStop);
+	}
 	//snap point to junction if within 5 meter to street and 5 meters to junction
 	EsriTool.prototype.forceStopToJunction = function(tripStop)
 	{
@@ -576,34 +629,7 @@
 			var promise = self.viewModel._viewModal.getNearestJunctionPointInBuffer(tripStop.geometry, self.pointToJunctionDistance);
 			return promise.then(function(nearbyJunction)
 			{
-				if (nearbyJunction && nearbyJunction.point)
-				{
-					if (result && result.distance <= self.snapOffsetDistance)
-					{
-						if (!tripStop.attributes)
-						{
-							tripStop.attributes = {};
-						}
-						tripStop.attributes.junctionStreets = nearbyJunction.streets;
-						tripStop.geometry = nearbyJunction.point;
-						return Promise.resolve(tripStop);
-					}
-					var polyline = new tf.map.ArcGIS.Polyline({
-						paths: [[tripStop.geometry.x, tripStop.geometry.y], [nearbyJunction.point.x, nearbyJunction.point.y]],
-						spatialReference: { wkid: 102100 }
-					});
-					if (tf.map.ArcGIS.geometryEngine.geodesicLength(polyline, "meters") <= self.snapInsetDistance)
-					{
-						if (!tripStop.attributes)
-						{
-							tripStop.attributes = {};
-						}
-						tripStop.attributes.junctionStreets = nearbyJunction.streets;
-						tripStop.geometry = nearbyJunction.point;
-						return Promise.resolve(tripStop);
-					}
-				}
-				return Promise.resolve(tripStop);
+				return self.forceStopToJunctionResolveStop(nearbyJunction, tripStop);
 			});
 		});
 	};
@@ -762,6 +788,34 @@
 		return false;
 	};
 
+	EsriTool.prototype.intersectGeometry = function(g, graphic)
+	{
+		const self = this;
+		let intersectGeometry = null;
+		if (g.attributes && g.attributes.dataModel)
+		{
+			if (g.geometry.type === "polygon")
+			{
+				if (graphic.attributes.dataModel.id !== g.attributes.dataModel.id && self._isIntersect(graphic, g))
+				{
+					intersectGeometry = self._arcgis.geometryEngine.simplify(graphic.geometry);
+				}
+			}
+			else if (g.geometry.type === "point")
+			{
+				if (graphic.attributes.dataModel.id !== g.attributes.dataModel.boundary.id && self._isIntersect(graphic, g))
+				{
+					intersectGeometry = self._arcgis.geometryEngine.simplify(graphic.geometry);
+				}
+			}
+		}
+		elseif(self._isIntersect(graphic, g))
+		{
+			intersectGeometry = self._arcgis.geometryEngine.simplify(graphic.geometry)
+		}
+		return intersectGeometry;
+	}
+
 	EsriTool.prototype._intersectWithCurrentPolygons = function(g)
 	{
 		var self = this,
@@ -770,30 +824,11 @@
 
 		graphics.map(function(graphic)
 		{
-			if (g.attributes && g.attributes.dataModel)
+			const intersestGeometry = self.intersectGeometry(g, graphic);
+			if (intersestGeometry)
 			{
-				if (g.geometry.type === "polygon")
-				{
-					if (graphic.attributes.dataModel.id !== g.attributes.dataModel.id && self._isIntersect(graphic, g))
-					{
-						intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
-					}
-				} else if (g.geometry.type === "point")
-				{
-					if (graphic.attributes.dataModel.id !== g.attributes.dataModel.boundary.id && self._isIntersect(graphic, g))
-					{
-						intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
-					}
-				}
+				intersectGeometries.push(intersestGeometry);
 			}
-			else
-			{
-				if (self._isIntersect(graphic, g))
-				{
-					intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
-				}
-			}
-
 		});
 		if (intersectGeometries.length > 0)
 		{
@@ -1090,45 +1125,51 @@
 		cutResult = tf.map.ArcGIS.geometryEngine.simplify(cutResult);
 		if (cutResult.rings.length > 1 && centroid)
 		{
-			var polygonWithCentroid = self._findRingwithPoint(cutResult.rings, centroid);
 
-			var removedids = [], remove = [], keep = [];
-			cutResult.rings.map(function(ring, index)
-			{
-				var polygon = new self._arcgis.Polygon({
-					type: "polygon",
-					rings: [ring],
-					spatialReference: self._map.mapView.spatialReference
-				});
-				if (!self._arcgis.geometryEngine.contains(polygonWithCentroid, polygon))
-				{
-					removedids.push(index);
-					remove.push(polygon);
-				}
-				else
-				{
-					keep.push(polygon);
-				}
-			});
-			for (var i = removedids.length - 1; i >= 0; i--)
-			{
-				var isremove = true;
-				for (var j = 0; j < keep.length; j++)
-				{
-					if (self._arcgis.geometryEngine.contains(keep[j], remove[i]))
-					{
-						isremove = false;
-						break;
-					}
-				}
-				if (isremove)
-				{
-					cutResult.removeRing(removedids[i]);
-				}
-			}
+			self._cutResult(cutResult, centroid);
 		}
 		return cutResult;
 	};
+
+	EsriTool.prototype._cutResult = function(cutResult, centroid)
+	{
+		const self = this;
+		var polygonWithCentroid = self._findRingwithPoint(cutResult.rings, centroid);
+		var removedids = [], remove = [], keep = [];
+		cutResult.rings.map(function(ring, index)
+		{
+			var polygon = new self._arcgis.Polygon({
+				type: "polygon",
+				rings: [ring],
+				spatialReference: self._map.mapView.spatialReference
+			});
+			if (!self._arcgis.geometryEngine.contains(polygonWithCentroid, polygon))
+			{
+				removedids.push(index);
+				remove.push(polygon);
+			}
+			else
+			{
+				keep.push(polygon);
+			}
+		});
+		for (var i = removedids.length - 1; i >= 0; i--)
+		{
+			var isremove = true;
+			for (var j = 0; j < keep.length; j++)
+			{
+				if (self._arcgis.geometryEngine.contains(keep[j], remove[i]))
+				{
+					isremove = false;
+					break;
+				}
+			}
+			if (isremove)
+			{
+				cutResult.removeRing(removedids[i]);
+			}
+		}
+	}
 
 	EsriTool.prototype._findRingwithPoint = function(rings, centroid)
 	{
@@ -1245,45 +1286,13 @@
 		{
 			if (item && item.type)
 			{
-				var geometryExtent = item.extent;
-				if (!geometryExtent)
+				const bufferRegion = self._calculateExtendBufferInTurn(item, buffer);
+				if (bufferRegion)
 				{
-					if (!item.x || !item.y)
-					{
-						return;
-					}
-					geometryExtent = new tf.map.ArcGIS.Extent({
-						xmin: item.x - buffer,
-						ymin: item.y - buffer,
-						xmax: item.x + buffer,
-						ymax: item.y + buffer,
-						spatialReference: map.mapView.spatialReference
-					});
-				}
-				if (!xmax)
-				{
-					xmax = geometryExtent.xmax;
-					xmin = geometryExtent.xmin;
-					ymax = geometryExtent.ymax;
-					ymin = geometryExtent.ymin;
-				} else
-				{
-					if (geometryExtent.xmax > xmax)
-					{
-						xmax = geometryExtent.xmax;
-					}
-					if (geometryExtent.ymax > ymax)
-					{
-						ymax = geometryExtent.ymax;
-					}
-					if (geometryExtent.xmin < xmin)
-					{
-						xmin = geometryExtent.xmin;
-					}
-					if (geometryExtent.ymin < ymin)
-					{
-						ymin = geometryExtent.ymin;
-					}
+					xmin = bufferRegion.xmin;
+					ymin = bufferRegion.ymin;
+					xmax = bufferRegion.xmax;
+					ymax = bufferRegion.ymax;
 				}
 			}
 		});
@@ -1295,6 +1304,54 @@
 			spatialReference: map.mapView.spatialReference
 		});
 	};
+
+	EsriTool._calculateExtendBufferInTurn = function(item, buffer)
+	{
+		var xmax, xmin, ymax, ymin;
+		var geometryExtent = item.extent;
+		if (!geometryExtent)
+		{
+			if (!item.x || !item.y)
+			{
+				return null;
+			}
+			geometryExtent = new tf.map.ArcGIS.Extent({
+				xmin: item.x - buffer,
+				ymin: item.y - buffer,
+				xmax: item.x + buffer,
+				ymax: item.y + buffer,
+				spatialReference: map.mapView.spatialReference
+			});
+		}
+		if (!xmax)
+		{
+			xmax = geometryExtent.xmax;
+			xmin = geometryExtent.xmin;
+			ymax = geometryExtent.ymax;
+			ymin = geometryExtent.ymin;
+		}
+		else
+		{
+			if (geometryExtent.xmax > xmax)
+			{
+				xmax = geometryExtent.xmax;
+			}
+			if (geometryExtent.ymax > ymax)
+			{
+				ymax = geometryExtent.ymax;
+			}
+			if (geometryExtent.xmin < xmin)
+			{
+				xmin = geometryExtent.xmin;
+			}
+			if (geometryExtent.ymin < ymin)
+			{
+				ymin = geometryExtent.ymin;
+			}
+		}
+
+		return { xmax, xmin, ymax, ymin }
+	}
 
 	EsriTool.centerSingleItem = function(map, item)
 	{
@@ -1360,37 +1417,42 @@
 		return this._warningDialogBox("Remove Overlapping Boundaries is set as true,stop cannot be moved here!");
 	};
 
+	EsriTool.prototype.prepareUpdatePolygonData = function(data)
+	{
+		const self = this;
+		return data.forEach(function(d)
+		{
+			if (self._polygonLayer)
+			{
+				var polygonGraphic = self._findGraphicInLayerById(self._polygonLayer, d.id);
+				if (polygonGraphic)
+				{
+					polygonGraphic.geometry = TF.cloneGeometry(d.geometry);
+				}
+			}
+			if (self._pointLayer)
+			{
+				var pointGraphic = self._findGraphicInLayerById(self._pointLayer, d.id);
+				if (pointGraphic)
+				{
+					pointGraphic.geometry = TF.cloneGeometry(d.geometry);
+				}
+			}
+		});
+	}
 	EsriTool.prototype.revert = function(data, type)
 	{
 		var self = this;
 		if (type === "update")
 		{
-			data.forEach(function(d)
-			{
-				if (self._polygonLayer)
-				{
-					var polygonGraphic = self._findGraphicInLayerById(self._polygonLayer, d.id);
-					if (polygonGraphic)
-					{
-						polygonGraphic.geometry = TF.cloneGeometry(d.geometry);
-					}
-				}
-				if (self._pointLayer)
-				{
-					var pointGraphic = self._findGraphicInLayerById(self._pointLayer, d.id);
-					if (pointGraphic)
-					{
-						pointGraphic.geometry = TF.cloneGeometry(d.geometry);
-					}
-				}
-
-			})
+			self.prepareUpdatePolygonData(data);
 			self.dataModel.update(data, true);
 		}
 		else if (type === "create")
 		{
 			self.dataModel.delete(data);
-		} else if (type === "delete")
+		}
+		else if (type === "delete")
 		{
 			data.forEach(function(d)
 			{

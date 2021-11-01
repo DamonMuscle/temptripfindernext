@@ -43,7 +43,7 @@
 
 	BaseQuestion.prototype.valueChanged = function()
 	{
-		console.log("base value changed invoked")
+		//placeholder
 	}
 
 	BaseQuestion.prototype.initEvents = function()

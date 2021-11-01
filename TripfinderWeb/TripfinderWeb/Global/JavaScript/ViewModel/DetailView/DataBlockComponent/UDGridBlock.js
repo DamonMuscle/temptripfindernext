@@ -859,13 +859,13 @@
 		{
 			if ($rows.length >= idx + 1)
 			{
-				_SetEditAndReadBtn(dataItem, idx, $rows)
+				_SetEditAndReadBtn(kendoGrid, dataItem, idx, $rows)
 			}
 
 		});
 	};
 
-	function _SetEditAndReadBtn(dataItem, idx, $rows)
+	function _SetEditAndReadBtn(kendoGrid, dataItem, idx, $rows)
 	{
 		const $editBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-edit');
 		const $viewBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-view');
