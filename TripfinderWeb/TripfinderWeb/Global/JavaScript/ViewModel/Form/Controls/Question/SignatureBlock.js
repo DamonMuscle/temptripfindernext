@@ -234,7 +234,13 @@
 
 	SignatureBlock.prototype.toggleSaveButton = function()
 	{
-		const saveButton = this.element.find('.e-sign-save-button');
+		let $sigContainerEle = this.element;
+		if (TF.isMobileDevice && this.signatureQuestion)
+		{
+			$sigContainerEle = this.signatureQuestion;
+		}
+		const saveButton = $sigContainerEle.find('.e-sign-save-button');
+
 		if (this.signaturePad.isEmpty())
 		{
 			saveButton.prop('disabled', true);
