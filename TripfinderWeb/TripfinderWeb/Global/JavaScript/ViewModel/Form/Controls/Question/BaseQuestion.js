@@ -140,7 +140,7 @@
 		{
 			this.element.addClass('invalid');
 			this.element.find('.invalid-message').html(result);
-			return !!result;
+			return false;
 		}
 		return true;
 	}

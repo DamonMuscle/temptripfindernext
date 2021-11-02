@@ -13,11 +13,12 @@
 	TextQuestion.prototype.initQuestionContent = function()
 	{
 
-		let input = $(`<textarea class="text-question question" type="text" rows="1" maxlength="${this.field.editType.maxLength}" placeholder="Enter your answer" /><small style="position: absolute;top: -17px;right: 0px;display:none">${(this.field.value || "").length}/${this.field.editType.maxLength}</small>`);
+		const input = $(`<textarea class="text-question question" type="text" rows="1" maxlength="${this.field.editType.maxLength}" placeholder="Enter your answer" />
+		<small style="position: absolute;top: -17px;right: 0px;display:none">${(this.field.value || "").length}/${this.field.editType.maxLength}</small>`);
 		$(input[0]).on('change', ev =>
 		{
 			this.value = ev.target.value;
-		}).keypress(ev => 
+		}).keypress(ev =>
 		{
 			if (ev.keyCode === 13)
 			{
@@ -47,13 +48,13 @@
 			});
 		}
 
-		if (this.field.value) 
+		if (this.field.value)
 		{
 			this.value = this.field.value;
 			input.val(this.field.value)
 		}
 
-		if (this.field.readonly) 
+		if (this.field.readonly)
 		{
 			input.attr("readonly", "readonly")
 		}
