@@ -1,34 +1,35 @@
 (function()
 {
 	createNamespace('TF').ListMoverForListFilterHelper = ListMoverForListFilterHelper;
-	function ListMoverForListFilterHelper() { }
+	function ListMoverForListFilterHelper()
+	{
+		// This is intentional
+	}
+
 	ListMoverForListFilterHelper.processSelectedData = function(selectedData, filterField)
 	{
-		if (selectedData)
+		if (!selectedData || !Array.isArray(selectedData))
 		{
-			if (Array.isArray(selectedData))
-			{
-				selectedData = selectedData.map(function(item)
-				{
-					if (typeof filterField === 'string')
-					{
-						if (!filterField)
-						{
-							item = $.trim(item);
-						}
-						var tmp = filterField ? item[filterField] : item;
-						item.FilterItem = typeof tmp === 'string' ? $.trim(tmp) : tmp;
-					}
-					else if (typeof filterField === 'function')
-					{
-						item.FilterItem = filterField(item);
-					}
-					return item;
-				});
-			}
+			return selectedData;
 		}
 
-		return selectedData;
+		return selectedData.map(function(item)
+		{
+			if (typeof filterField === 'string')
+			{
+				if (!filterField)
+				{
+					item = $.trim(item);
+				}
+				var tmp = filterField ? item[filterField] : item;
+				item.FilterItem = typeof tmp === 'string' ? $.trim(tmp) : tmp;
+			}
+			else if (typeof filterField === 'function')
+			{
+				item.FilterItem = filterField(item);
+			}
+			return item;
+		});
 	};
 })();
 
@@ -40,13 +41,14 @@
 	{
 		tf.modalManager.useShortCutKey = true;
 		var title = options.FullDisplayFilterTypeName || "Filter " + options.DisplayFilterTypeName;
+		const showRemoveColumnButton = options.GridType !== "School";
 		var defaultOption = {
 			title: title,
-			description: "Select the " + options.DisplayFilterTypeName + " that you would like to view.",
+			description: `Select the ${options.DisplayFilterTypeName} that you would like to view.`,
 			availableTitle: "Available",
 			selectedTitle: "Selected",
 			displayCheckbox: false,
-			showRemoveColumnButton: true,
+			showRemoveColumnButton: showRemoveColumnButton,
 			type: options.GridType
 		};
 
@@ -69,7 +71,10 @@
 		self.ListMoverForListFilterControlViewModel.apply().then(function(result)
 		{
 			result = TF.ListMoverForListFilterHelper.processSelectedData(result, self.filterField);
-			result.sort(function(a, b) { return a.FilterItem.localeCompare(b.FilterItem); });
+			result.sort(function(a, b)
+			{
+				return a.FilterItem.localeCompare(b.FilterItem);
+			});
 			self.positiveClose(result);
 		});
 	};
