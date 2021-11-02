@@ -5,7 +5,7 @@
 	function PhoneBox() {
 		namespace.IntegerBox.apply(this, arguments);
 		this.getElement().on("keyup", function (e) {
-			if (event.which != 37 && event.which != 39) {
+			if (event.which !== 37 && event.which !== 39) {
 				var $input = $(e.target);
 				var inputSourceValue = $input.val();
 				if (e.keyCode === 8 && inputSourceValue.endsWith(")")) {
