@@ -587,7 +587,7 @@
 
 			const promiseArr = systemFieldUDFQuestions.map(q =>
 			{
-				return getUDFOptionPromise().then(udfs =>
+				return getUDFOptionPromise.then(udfs =>
 				{
 					this.hideSystemFieldQuestionNoMatchedDb(q, udfs);
 				});
