@@ -6,6 +6,7 @@
 
 	function FieldTripResourcesHelper()
 	{
+		// This is intentional
 	}
 
 	FieldTripResourcesHelper.prototype.formatCurrency = function(currency)
@@ -14,7 +15,7 @@
 		{
 			currency = Number(currency);
 		}
-		var currency = currency || 0;
+		currency = currency || 0;
 		return currency.toFixed(2);
 	}
 
@@ -26,7 +27,7 @@
 			{
 				if (result && result.Items && result.Items[0] && result.Items[0].FileContent)
 				{
-					var src = "url(data:image/jpeg;base64," + result.Items[0].FileContent + ")";
+					var src = `url(data:image/jpeg;base64,${result.Items[0].FileContent})`;
 					$(element).attr("src", src);
 				}
 			}.bind(this));
@@ -42,7 +43,8 @@
 				RecordID: imageId,
 				"@fields": "FileContent"
 			}
-		}).then(function(response) {
+		}).then(function(response)
+		{
 			return response;
 		});
 	}
@@ -67,7 +69,9 @@
 		{
 			return 0;
 		}
-		return Number(fieldTripResourceDataEntry.DriverHours) * Number(fieldTripResourceDataEntry.DriverRate) + Number(fieldTripResourceDataEntry.DriverOthours) * Number(fieldTripResourceDataEntry.DriverOtrate) + Number(fieldTripResourceDataEntry.DriverFixedCost);
+		return Number(fieldTripResourceDataEntry.DriverHours) * Number(fieldTripResourceDataEntry.DriverRate) +
+			Number(fieldTripResourceDataEntry.DriverOthours) * Number(fieldTripResourceDataEntry.DriverOtrate) +
+			Number(fieldTripResourceDataEntry.DriverFixedCost);
 	}
 
 	FieldTripResourcesHelper.prototype.driverTotalCostComputer = function(fieldTripResourceDataEntry)
@@ -77,7 +81,9 @@
 
 	FieldTripResourcesHelper.prototype.busAideCostComputer = function(fieldTripResourceDataEntry)
 	{
-		return Number(fieldTripResourceDataEntry.AideHours) * Number(fieldTripResourceDataEntry.AideRate) + Number(fieldTripResourceDataEntry.AideOthours) * Number(fieldTripResourceDataEntry.AideOtrate) + Number(fieldTripResourceDataEntry.AideFixedCost);
+		return Number(fieldTripResourceDataEntry.AideHours) * Number(fieldTripResourceDataEntry.AideRate) +
+			Number(fieldTripResourceDataEntry.AideOthours) * Number(fieldTripResourceDataEntry.AideOtrate) +
+			Number(fieldTripResourceDataEntry.AideFixedCost);
 	}
 
 	FieldTripResourcesHelper.prototype.resourceSubTotalComputer = function(fieldTripResourceDataEntry)
@@ -89,7 +95,9 @@
 
 	FieldTripResourcesHelper.prototype.expensesComputer = function(fieldTripResourceDataEntry)
 	{
-		return Number(fieldTripResourceDataEntry.DriverExpMeals) + Number(fieldTripResourceDataEntry.DriverExpMisc) + Number(fieldTripResourceDataEntry.DriverExpParking) + Number(fieldTripResourceDataEntry.DriverExpTolls);
+		return Number(fieldTripResourceDataEntry.DriverExpMeals) +
+			Number(fieldTripResourceDataEntry.DriverExpMisc) + Number(fieldTripResourceDataEntry.DriverExpParking) +
+			Number(fieldTripResourceDataEntry.DriverExpTolls);
 	}
 
 	FieldTripResourcesHelper.prototype.resourcesTotalComputer = function()
