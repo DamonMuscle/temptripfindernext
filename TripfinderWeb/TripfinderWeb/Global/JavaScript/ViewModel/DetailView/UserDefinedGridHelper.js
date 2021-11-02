@@ -951,7 +951,7 @@
 					result = _updateZipCodeUDGField(item);
 					break;
 				case 'Date':
-					result = _updateDateUDGField(item, type);
+					result = _updateDateUDGField(item);
 					break;
 				case 'Date/Time':
 					result = _updateDateTimeUDGField(item)
@@ -1105,7 +1105,7 @@
 			"questionType": "ZipCode"
 		};
 	}
-	function _updateDateUDGField(item, type)
+	function _updateDateUDGField(item)
 	{
 		var today = (new Date()).toDateString();
 		const editType = {

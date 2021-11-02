@@ -218,7 +218,9 @@
 		var fields = {};
 		this._gridDefinition.Columns.forEach(function(definition)
 		{
-			field.type = "string";
+			const field = {
+				type: "string"
+			};
 			fields[definition.FieldName] = field;
 		});
 		return fields;
