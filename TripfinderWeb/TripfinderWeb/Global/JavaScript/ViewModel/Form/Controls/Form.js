@@ -159,15 +159,6 @@
 					longitude: locationRes.longitude
 				});
 			}
-		}, rej =>
-		{
-			if (rej === 'location access denied')
-			{
-				tf.promiseBootbox.alert({
-					message: `Location services must be enabled in order to submit this form.`,
-					title: 'Location Service Not Available'
-				})
-			}
 		});
 	}
 
@@ -246,50 +237,68 @@
 				return null;
 			});
 		}
-		return Promise.all([...this.questions.map(q => q.validate()), this.validateLocationRequired()]).then(() =>
-		{
-			const udgRecord = this.wrapQuestionAnswer();
-			tf.loadingIndicator.showImmediately();
-			return this.tranlateAnswer(udgRecord).then(() =>
+		return Promise.all([...this.questions.map(q => q.validate())])
+			.then(() =>
 			{
-				return Promise.resolve(this.tryObtainLocation())
-					.then(coord =>
-					{
-						udgRecord.latitude = coord.latitude;
-						udgRecord.longitude = coord.longitude;
-						// save new record
-						if (!this.options.udGridRecordId)
-						{
-							return tf.udgHelper.addUDGridRecordOfEntity(this.options, tf.dataTypeHelper.getId(this.dataType), this.obRecordID(), udgRecord);
-						}
-						// update exsiting record
-						else
-						{
-							udgRecord.Id = this.options.udGridRecordId;
-							return tf.udgHelper.updateUDGridRecordOfEntity(this.options, udgRecord);
-						}
-					});
-			}).then(res =>
-			{
-				if (this.saved)
+				return this.validateLocationRequired().then(resolve =>
 				{
-					this.saved().then(() =>
+					return Promise.resolve();
+				}, rej =>
+				{
+					if (rej === 'location access denied')
+					{
+						tf.promiseBootbox.alert({
+							message: `Location services must be enabled in order to submit this form.`,
+							title: 'Location Service Not Available'
+						})
+					}
+					return Promise.reject();
+				})
+			})
+			.then(() =>
+			{
+				const udgRecord = this.wrapQuestionAnswer();
+				tf.loadingIndicator.showImmediately();
+				return this.tranlateAnswer(udgRecord).then(() =>
+				{
+					return Promise.resolve(this.tryObtainLocation())
+						.then(coord =>
+						{
+							udgRecord.latitude = coord.latitude;
+							udgRecord.longitude = coord.longitude;
+							// save new record
+							if (!this.options.udGridRecordId)
+							{
+								return tf.udgHelper.addUDGridRecordOfEntity(this.options, tf.dataTypeHelper.getId(this.dataType), this.obRecordID(), udgRecord);
+							}
+							// update exsiting record
+							else
+							{
+								udgRecord.Id = this.options.udGridRecordId;
+								return tf.udgHelper.updateUDGridRecordOfEntity(this.options, udgRecord);
+							}
+						});
+				}).then(res =>
+				{
+					if (this.saved)
+					{
+						this.saved().then(() =>
+						{
+							tf.loadingIndicator.tryHide();
+							this.closeForm();
+						})
+					}
+					else
 					{
 						tf.loadingIndicator.tryHide();
 						this.closeForm();
-					})
-				}
-				else
+					}
+					return res;
+				}).catch(err =>
 				{
 					tf.loadingIndicator.tryHide();
-					this.closeForm();
-				}
-				return res;
-			}).catch(err =>
-			{
-				tf.loadingIndicator.tryHide();
+				});
 			});
-		});
 	}
 
 	Form.prototype.onChange = function(e)
