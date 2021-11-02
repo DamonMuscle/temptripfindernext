@@ -630,54 +630,49 @@
 	UserDefinedGridHelper.prototype.getFormRecord = function(formQuestionGuidToNameDict, rawFormRecord)
 	{
 		let convertedRecord = null;
+		if (!!rawFormRecord && !!rawFormRecord.RecordValue)
+		{
+			const recordValueObj = JSON.parse(rawFormRecord.RecordValue);
+			convertedRecord = {};
+			convertedRecord.Id = rawFormRecord.ID;
+			for (const fguid in formQuestionGuidToNameDict)
+			{
+				if (rawFormRecord.DocumentUDGridRecords && rawFormRecord.DocumentUDGridRecords.some(dr => dr.UDGridField === fguid))
+				{
+					convertedRecord[fguid] = rawFormRecord.DocumentUDGridRecords.filter(dr => dr.UDGridField === fguid).length;
+				}
+				else if (rawFormRecord.MapUDGridRecords && rawFormRecord.MapUDGridRecords.some(dr => dr.UDGridField === fguid))
+				{
+					const mapData = rawFormRecord.MapUDGridRecords.filter(dr => dr.UDGridField === fguid);
+					const data = mapData && mapData.length && mapData[0];
 
-		// Handle Special Columns: Created By / Last Updated By / Last Updated On
+					convertedRecord[fguid] = data.ShapeData === "true";
+					const xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fguid);
+					convertedRecord[xCoordFieldName] = data.XCoord;
+					const yCoordFieldName = TF.DetailView.UserDefinedGridHelper.getYCoordFieldName(fguid);
+					convertedRecord[yCoordFieldName] = data.YCoord;
+				}
+				else if (fguid in recordValueObj)
+				{
+					convertedRecord[fguid] = recordValueObj[fguid];
+				}
+				else
+				{
+					convertedRecord[fguid] = null;
+				}
+			}
+			if (recordValueObj["latitude"] && recordValueObj["longitude"])
+			{
+				convertedRecord["latitude"] = recordValueObj["latitude"];
+				convertedRecord["longitude"] = recordValueObj["longitude"];
+			}
+		}
+
+		//Created By / Last Updated By / Last Updated On
 		TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().forEach(c =>
 		{
 			convertedRecord[c.FieldName] = rawFormRecord[c.FieldName] || "";
 		});
-
-		// Handle Stand Columns
-		if (!rawFormRecord || !rawFormRecord.RecordValue)
-		{
-			return convertedRecord;
-		}
-
-		const recordValueObj = JSON.parse(rawFormRecord.RecordValue);
-		convertedRecord = {};
-		convertedRecord.Id = rawFormRecord.ID;
-		for (const fguid in formQuestionGuidToNameDict)
-		{
-			if (rawFormRecord.DocumentUDGridRecords && rawFormRecord.DocumentUDGridRecords.some(dr => dr.UDGridField === fguid))
-			{
-				convertedRecord[fguid] = rawFormRecord.DocumentUDGridRecords.filter(dr => dr.UDGridField === fguid).length;
-			}
-			else if (rawFormRecord.MapUDGridRecords && rawFormRecord.MapUDGridRecords.some(dr => dr.UDGridField === fguid))
-			{
-				const mapData = rawFormRecord.MapUDGridRecords.filter(dr => dr.UDGridField === fguid);
-				const data = mapData && mapData.length && mapData[0];
-
-				convertedRecord[fguid] = data.ShapeData === "true";
-				const xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fguid);
-				convertedRecord[xCoordFieldName] = data.XCoord;
-				const yCoordFieldName = TF.DetailView.UserDefinedGridHelper.getYCoordFieldName(fguid);
-				convertedRecord[yCoordFieldName] = data.YCoord;
-			}
-			else if (fguid in recordValueObj)
-			{
-				convertedRecord[fguid] = recordValueObj[fguid];
-			}
-			else
-			{
-				convertedRecord[fguid] = null;
-			}
-		}
-
-		if (recordValueObj["latitude"] && recordValueObj["longitude"])
-		{
-			convertedRecord["latitude"] = recordValueObj["latitude"];
-			convertedRecord["longitude"] = recordValueObj["longitude"];
-		}
 
 		return convertedRecord;
 	};
@@ -1077,7 +1072,7 @@
 			"title": item.Name,
 			"type": "Currency",
 			"editType": editType,
-			"questionType": "Currenty"
+			"questionType": "Currency"
 		};
 	}
 	function _updatePhoneNumberUDGField(item)
