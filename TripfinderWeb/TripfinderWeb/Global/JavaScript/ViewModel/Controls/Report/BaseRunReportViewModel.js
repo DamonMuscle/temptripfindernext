@@ -114,6 +114,17 @@
 		self.obBasemaps = ko.observableArray(baseMaps);
 
 		// Trip Map Configurations
+		self._setTripMapConfiguration(mapSettings, baseMaps);
+
+		// Student Map Configurations
+		self._setStudentMapConfiguration(mapSettings, baseMaps);
+
+		// Trip Stop Map Configurations
+		self._setTripStopMapConfiguration(mapSettings, baseMaps);
+	}
+
+	BaseRunReportViewModel.prototype._setTripMapConfiguration = function(mapSettings, baseMaps)
+	{
 		self.obSelectedTripBaseMap = ko.observable(mapSettings.TripMap.BaseMap ? mapSettings.TripMap.BaseMap : baseMaps[0])
 		self.obSelectedTripBaseMapText = ko.pureComputed(function()
 		{
@@ -131,8 +142,10 @@
 				self.obShowBoundary = ko.observable(false);
 			}
 		});
+	}
 
-		// Student Map Configurations
+	BaseRunReportViewModel.prototype._setStudentMapConfiguration = function(mapSettings, baseMaps)
+	{
 		self.obSelectedStudentBaseMap = ko.observable(mapSettings.StudentMap.BaseMap ? mapSettings.StudentMap.BaseMap : baseMaps[0])
 		self.obSelectedStudentBaseMapText = ko.pureComputed(function()
 		{
@@ -143,14 +156,17 @@
 		self.obShowSchoolLocation = ko.observable(Boolean(mapSettings.StudentMap.ShowSchoolLocation));
 		self.obShowAllStopLocations = ko.observable(Boolean(mapSettings.StudentMap.ShowAllStopLocations));
 		self.obShowHomeToSchoolPath = ko.observable(Boolean(mapSettings.StudentMap.ShowHomeToSchoolPath));
+	}
 
-		// Trip Stop Map Configurations
+	BaseRunReportViewModel.prototype._setTripStopMapConfiguration = function(mapSettings, baseMaps)
+	{
 		self.obSelectedTripStopBaseMap = ko.observable(mapSettings.TripStopMap.BaseMap ? mapSettings.TripStopMap.BaseMap : baseMaps[0])
 		self.obSelectedTripStopBaseMapText = ko.pureComputed(function()
 		{
 			return !!self.obSelectedTripStopBaseMap() ? self.obSelectedTripStopBaseMap().title : "";
 		});
 	}
+
 	BaseRunReportViewModel.prototype.generateFilterSettingProperties = function()
 	{
 		var self = this,
@@ -226,14 +242,7 @@
 		// if specify method is set to be "specific records", the selection should not be empty.
 		self.obSpecificRecordStringForValidation = ko.computed(function()
 		{
-			if (self.obSpecifiedRecordsDisabled())
-			{
-				return "1";
-			}
-			else
-			{
-				return (self.obSpecifiedRecords().length > 0 ? "1" : "");
-			}
+			return (self.obSpecifiedRecordsDisabled() || self.obSpecifiedRecords().length > 0) ? "1" : "";
 		});
 		self.specificRecordFormatter = self.specificRecordFormatter.bind(self);
 
@@ -797,8 +806,6 @@
 	BaseRunReportViewModel.prototype.createReportItemForExecution = function()
 	{
 		var self = this,
-			dataSourceId = self.obSelectedDataSource().id,
-			dataSchema = self.schema,
 			reportEntity = self.entity,
 			useFilter = !self.obFilterDisabled(),
 			useSpecifiedRecords = !self.obSpecifiedRecordsDisabled(),
@@ -814,35 +821,8 @@
 		if (useFilter)
 		{
 			// summaryFilter
-			if (self.obSelectedFilter().summaryFunc)
-			{
-				return self.obSelectedFilter().summaryFunc().then(res =>
-				{
-					if (Array.isArray(res) && res.length > 0)
-					{
-						reportItem.SpecificRecordIds = res;
-						return Promise.resolve(reportItem);
-					}
-					return Promise.resolve(null);
-				})
-			}
-			else
-			{
-				return tf.exagoReportDataHelper.getRecordIdsByFilterClause(
-					dataSourceId,
-					dataSchema,
-					self.obSelectedFilterWhereClause()
-				).then(function(idsFromFilter)
-				{
-					if (Array.isArray(idsFromFilter) && idsFromFilter.length > 0)
-					{
-						reportItem.SpecificRecordIds = idsFromFilter;
-						return Promise.resolve(reportItem);
-					}
+			return self.initReportSummaryFilter();
 
-					return Promise.resolve(null);
-				});
-			}
 		}
 		else if (useSpecifiedRecords)
 		{
@@ -862,6 +842,44 @@
 			return Promise.resolve(reportItem);
 		}
 	};
+
+	BaseRunReportViewModel.prototype.initReportSummaryFilter = function()
+	{
+		const self = this;
+		var dataSourceId = self.obSelectedDataSource().id,
+			dataSchema = self.schema;
+
+		if (self.obSelectedFilter().summaryFunc)
+		{
+			return self.obSelectedFilter().summaryFunc().then(res =>
+			{
+				if (Array.isArray(res) && res.length > 0)
+				{
+					reportItem.SpecificRecordIds = res;
+					return Promise.resolve(reportItem);
+				}
+				return Promise.resolve(null);
+			})
+		}
+		else
+		{
+			return tf.exagoReportDataHelper.getRecordIdsByFilterClause(
+				dataSourceId,
+				dataSchema,
+				self.obSelectedFilterWhereClause()
+			).then(function(idsFromFilter)
+			{
+				if (Array.isArray(idsFromFilter) && idsFromFilter.length > 0)
+				{
+					reportItem.SpecificRecordIds = idsFromFilter;
+					return Promise.resolve(reportItem);
+				}
+
+				return Promise.resolve(null);
+			});
+		}
+	}
+
 	BaseRunReportViewModel.prototype.initMapSettings = function(TripMap, StudentMap, TripStopMap)
 	{
 		var setting = {
@@ -907,48 +925,28 @@
 		execInfo[DBID_ITEMKEY] = selectedDataSourceId;
 		execInfo[RECORD_METHOD_ITEMKEY] = selectedRecordMethodName;
 
+		execInfo[MAP_SETTINGS_ITEMKEY] = null;
 		if (self.obMapAvailiable())
 		{
 			const mapSettings = self.initMapSettings();
-			// {
-			// 	"BaseMap": self.obSelectedBaseMap()
-			// };
 
 			if (self.obIsTripMapUsed())
 			{
-				mapSettings.TripMap.Enable = true;
-				mapSettings.TripMap.BaseMap = self.obSelectedTripBaseMap();
-				mapSettings.TripMap.ShowPath = self.obShowPath();
-				mapSettings.TripMap.ShowStop = self.obShowStop();
-				mapSettings.TripMap.ShowAssignedStudents = self.obShowStop() && self.obShowAssignedStudents();
-				mapSettings.TripMap.ShowBoundary = self.obShowStop() && self.obShowBoundary();
+				self._initTripMapSetting(mapSettings);
 			}
 
 			if (self.obIsStudentMapUsed())
 			{
-				mapSettings.StudentMap.Enable = true;
-				mapSettings.StudentMap.BaseMap = self.obSelectedStudentBaseMap();
-				mapSettings.StudentMap.ShowHome = self.obShowHome();
-				mapSettings.StudentMap.ShowAlternateSites = self.obShowAlternateSite();
-				mapSettings.StudentMap.ShowSchoolLocation = self.obShowSchoolLocation();
-				mapSettings.StudentMap.ShowAllStopLocations = self.obShowAllStopLocations();
-				mapSettings.StudentMap.ShowHomeToSchoolPath = self.obShowHomeToSchoolPath();
+				self._initStudentMapSetting(mapSettings);
 			}
 
 			if (self.obIsTripStopMapUsed())
 			{
-				mapSettings.TripStopMap.Enable = true;
-				mapSettings.TripStopMap.BaseMap = self.obSelectedTripBaseMap();
-				// TO-DO
+				self._initTripStopMapSetting(mapSettings);
 			}
 
 			execInfo[MAP_SETTINGS_ITEMKEY] = mapSettings;
 		}
-		else
-		{
-			execInfo[MAP_SETTINGS_ITEMKEY] = null;
-		}
-
 
 		execInfo[OUTPUT_TYPE_KEY] = self.obSelectedOutputType().type;
 
@@ -986,6 +984,36 @@
 
 		return execInfo;
 	};
+
+	BaseRunReportViewModel.prototype._initTripMapSetting = function(mapSettings)
+	{
+		const self = this;
+		mapSettings.TripMap.Enable = true;
+		mapSettings.TripMap.BaseMap = self.obSelectedTripBaseMap();
+		mapSettings.TripMap.ShowPath = self.obShowPath();
+		mapSettings.TripMap.ShowStop = self.obShowStop();
+		mapSettings.TripMap.ShowAssignedStudents = self.obShowStop() && self.obShowAssignedStudents();
+		mapSettings.TripMap.ShowBoundary = self.obShowStop() && self.obShowBoundary();
+	}
+
+	BaseRunReportViewModel.prototype._initStudentMapSetting = function(mapSettings)
+	{
+		const self = this;
+		mapSettings.StudentMap.Enable = true;
+		mapSettings.StudentMap.BaseMap = self.obSelectedStudentBaseMap();
+		mapSettings.StudentMap.ShowHome = self.obShowHome();
+		mapSettings.StudentMap.ShowAlternateSites = self.obShowAlternateSite();
+		mapSettings.StudentMap.ShowSchoolLocation = self.obShowSchoolLocation();
+		mapSettings.StudentMap.ShowAllStopLocations = self.obShowAllStopLocations();
+		mapSettings.StudentMap.ShowHomeToSchoolPath = self.obShowHomeToSchoolPath();
+	}
+
+	BaseRunReportViewModel.prototype._initTripStopMapSetting = function(mapSettings)
+	{
+		const self = this;
+		mapSettings.TripStopMap.Enable = true;
+		mapSettings.TripStopMap.BaseMap = self.obSelectedTripBaseMap();
+	}
 
 	BaseRunReportViewModel.prototype.saveFilterAndParameters = function()
 	{
