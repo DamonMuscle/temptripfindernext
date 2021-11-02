@@ -551,6 +551,8 @@
 				isReadOnly = true;
 				return true;
 			}
+
+			return undefined;
 		});
 
 		return isReadOnly;
@@ -711,12 +713,12 @@
 		const paramData = {};
 		if (record.DocumentUDGridRecords)
 		{
-			_setNewDocumentUdGridRecordParam(rawRecord, paramData);
+			_setNewDocumentUdGridRecordParam(rawRecord, record, paramData);
 		}
 
 		if (record.MapUDGridRecords)
 		{
-			_setNewMapUdGridRecordParam(rawRecord, paramData);
+			_setNewMapUdGridRecordParam(rawRecord, record, paramData);
 		}
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
@@ -954,7 +956,7 @@
 					result = _updateZipCodeUDGField(item);
 					break;
 				case 'Date':
-					result = _updateDateUDGField(item);
+					result = _updateDateUDGField(item, type);
 					break;
 				case 'Date/Time':
 					result = _updateDateTimeUDGField(item)
@@ -1108,7 +1110,7 @@
 			"questionType": "ZipCode"
 		};
 	}
-	function _updateDateUDGField(item)
+	function _updateDateUDGField(item, type)
 	{
 		var today = (new Date()).toDateString();
 		const editType = {
