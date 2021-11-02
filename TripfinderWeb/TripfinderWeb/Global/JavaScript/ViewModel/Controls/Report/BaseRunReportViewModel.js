@@ -125,6 +125,7 @@
 
 	BaseRunReportViewModel.prototype._setTripMapConfiguration = function(mapSettings, baseMaps)
 	{
+		const self = this;
 		self.obSelectedTripBaseMap = ko.observable(mapSettings.TripMap.BaseMap ? mapSettings.TripMap.BaseMap : baseMaps[0])
 		self.obSelectedTripBaseMapText = ko.pureComputed(function()
 		{
@@ -146,6 +147,7 @@
 
 	BaseRunReportViewModel.prototype._setStudentMapConfiguration = function(mapSettings, baseMaps)
 	{
+		const self = this;
 		self.obSelectedStudentBaseMap = ko.observable(mapSettings.StudentMap.BaseMap ? mapSettings.StudentMap.BaseMap : baseMaps[0])
 		self.obSelectedStudentBaseMapText = ko.pureComputed(function()
 		{
@@ -160,6 +162,7 @@
 
 	BaseRunReportViewModel.prototype._setTripStopMapConfiguration = function(mapSettings, baseMaps)
 	{
+		const self = this;
 		self.obSelectedTripStopBaseMap = ko.observable(mapSettings.TripStopMap.BaseMap ? mapSettings.TripStopMap.BaseMap : baseMaps[0])
 		self.obSelectedTripStopBaseMapText = ko.pureComputed(function()
 		{
