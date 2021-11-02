@@ -1076,7 +1076,7 @@
 
 	EsriTool.prototype._setOpacity = function(color, opacity)
 	{
-		return color.concat([opacity / 255]);//TODO  Using V4 parm to set opacity.
+		return color.concat([opacity / 255]);
 	};
 
 	EsriTool.prototype._isIntersect = function(graphic1, graphic2)

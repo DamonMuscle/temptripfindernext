@@ -936,10 +936,10 @@
 			switch (type)
 			{
 				case 'Text':
-					result = _updateTextUDGField(fieldOptions);
+					result = _updateTextUDGField(fieldOptions, item);
 					break;
 				case 'Memo':
-					result = _updateMemoUDGField(fieldOptions);
+					result = _updateMemoUDGField(fieldOptions, item);
 					break;
 				case 'Number':
 					result = _updateNumberUDGField(fieldOptions, item);
@@ -1120,7 +1120,7 @@
 			"type": "Date",
 			"defaultValue": today,
 			"editType": editType,
-			"questionType": type
+			"questionType": "Date"
 		};
 	}
 	function _updateDateTimeUDGField(item)
