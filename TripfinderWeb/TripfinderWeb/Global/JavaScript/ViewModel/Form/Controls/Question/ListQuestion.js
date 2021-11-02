@@ -25,13 +25,12 @@
 
 	ListQuestion.prototype.hasValue = function()
 	{
-		return !(this.value == null || this.value == '' || (Array.isArray(this.value) && this.value.length == 0));
+		return !(this.value == null || this.value === '' || (Array.isArray(this.value) && this.value.length === 0));
 	}
 
 	ListQuestion.prototype.initQuestionContent = function()
 	{
-		let field = this.field,
-			defVal = field.DefaultValue,
+		const field = this.field,
 			filedOptions = field.FieldOptions,
 			isMultiple = filedOptions.PickListMultiSelect,
 			isAddOtherOption = filedOptions.PickListAddOtherOption,
@@ -51,7 +50,7 @@
 			}
 		}
 		htmlStr += '</div>';
-		let options = $(htmlStr);
+		const options = $(htmlStr);
 
 		if (isMultiple)
 		{
@@ -64,13 +63,13 @@
 
 		options.find('.list-question-option input').on('change', ev =>
 		{
-			let checkedOptions = options.find(".list-question-option input:checked");
+			const checkedOptions = options.find(".list-question-option input:checked");
 			let val = '';
 			if (isMultiple)
 			{
 				val = [];
 			}
-			else 
+			else
 			{
 				val = '';
 			}
@@ -87,7 +86,7 @@
 
 			$.each(checkedOptions, (idx, option) =>
 			{
-				let v = $(option).val();
+				const v = $(option).val();
 
 				if (isMultiple)
 				{
@@ -108,13 +107,13 @@
 		{
 			$(ev.target).parents("div.list-question-option").find('input[type="radio"],input[type="checkbox"]').val(ev.target.value);
 			options.find('.list-question-option input').trigger("change");
-		}).keypress(ev => 
+		}).keypress(ev =>
 		{
 			if (ev.keyCode === 13)
 			{
 				ev.preventDefault();
 			}
-		}).keyup(ev => 
+		}).keyup(ev =>
 		{
 			if (TF.isMobileDevice || isIpad())
 			{
@@ -134,20 +133,21 @@
 		});
 
 
-		if (this.field.value) 
+		const isMutipleSelect = this.field.value instanceof Array;
+		if ((isMutipleSelect && this.field.value.lenght > 0) || (!isMutipleSelect && this.field.value))
 		{
 			this.value = this.field.value;
 			//this.datePicker.value(this.field.value)  PickListAddOtherOption
-			if (!!this.field.FieldOptions.PickListMultiSelect) 
+			if (!!this.field.FieldOptions.PickListMultiSelect)
 			{
 				const bindValue = _v =>
 				{
 					const $item = options.find(`input[type=checkbox][value="${_v}"]`);
-					if ($item.length > 0) 
+					if ($item.length > 0)
 					{
 						$item.prop("checked", true);
 					}
-					else 
+					else
 					{
 						options.find("input[type=checkbox][data-other=1]").prop("checked", true);
 						options.find("textarea").removeAttr("disabled").val(_v);
@@ -160,7 +160,7 @@
 						bindValue(_v);
 					});
 				}
-				else 
+				else
 				{
 					bindValue(this.field.value);
 				}
@@ -169,7 +169,7 @@
 			{
 				const normalItem = options.find(`input[type=radio][value="${this.field.value}"]`);
 				//cannot found means need fill into other textbox.
-				if (normalItem.length == 0)
+				if (normalItem.length === 0)
 				{
 					options.find("textarea").removeAttr("disabled").val(this.field.value);
 					options.find("input[type=radio][data-other]").prop("checked", true);
@@ -181,7 +181,7 @@
 			}
 		}
 
-		if (this.field.readonly) 
+		if (this.field.readonly)
 		{
 			options.find("input").attr("disabled", "disabled");
 			options.find("textarea").attr("disabled", "disabled");
@@ -203,7 +203,7 @@
 
 	ListQuestion.prototype.generateOption = function(isMultiple, idx, option, guid)
 	{
-		let type = isMultiple ? 'checkbox' : 'radio';
+		const type = isMultiple ? 'checkbox' : 'radio';
 
 		return `
 			<div class="list-question-option">
@@ -216,7 +216,7 @@
 
 	ListQuestion.prototype.generateOtherOption = function(isMultiple, idx, guid)
 	{
-		let type = isMultiple ? 'checkbox' : 'radio';
+		const type = isMultiple ? 'checkbox' : 'radio';
 
 		return `
 			<div class="list-question-option">
@@ -224,7 +224,10 @@
 					<input type="${type}" id="${guid}_${idx}" name="${guid}" value="" data-other="1"/>
 					Other
 				</label>
-				<div style="position:relative;padding-left: 16px;"><textarea class="text-question question" maxlength="50" rows="1" for="${guid}_${idx}" class="disabled" disabled></textarea><small style="position: absolute;top: -17px;right: 0px;display:none">0/50</small></div>
+				<div style="position:relative;padding-left: 16px;">
+					<textarea class="text-question question" maxlength="50" rows="1" for="${guid}_${idx}" class="disabled" disabled></textarea>
+					<small style="position: absolute;top: -17px;right: 0px;display:none">0/50</small>
+				</div>
 			</div>`;
 	}
 

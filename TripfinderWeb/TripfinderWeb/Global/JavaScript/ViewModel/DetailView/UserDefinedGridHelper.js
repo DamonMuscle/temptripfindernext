@@ -596,7 +596,7 @@
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid);
 
-		const relationships = "User,DocumentUDGridRecords,MapToBoolUDGridRecords";
+		const relationships = "User,DocumentUDGridRecords,MapUDGridRecords";
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
 				paramData: {
