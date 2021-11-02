@@ -26,7 +26,7 @@
 				this.value = this.maskedInput.value().replaceAll("_", "");
 				if (this.value.length === 10)
 				{
-					this.maskedInput.element[0].value = "(" + this.value.substr(0, 3) + ")" + this.value.substr(3, 3) + "-" + this.value.substring(6);
+					this.maskedInput.element[0].value = `(${this.value.substr(0, 3)})${this.value.substr(3, 3)}-${this.value.substring(6)}`;
 				}
 				else if (this.value.length > 10)
 				{
