@@ -345,7 +345,7 @@
 						{
 							return '';
 						}
-						return value == 'true' ? col.positiveLabel : col.negativeLabel || value;
+						return value === 'true' ? col.positiveLabel : col.negativeLabel || value;
 					};
 					break;
 				case "SignatureBlock":
@@ -776,7 +776,7 @@
 			return Promise.resolve(null)
 		}
 
-		for (let fguid in guidToNameDict)
+		for (const fguid in guidToNameDict)
 		{
 			if (fguid in record)
 			{
@@ -1025,21 +1025,20 @@
 					};
 					break;
 				case 'List':
-					var defaultItems = fieldOptions.UDFPickListOptions.filter(function(item)
+					fieldOptions.UDFPickListOptions.filter(function(data)
 					{
-						return item.IsDefaultItem;
-					}).map(function(item)
+						return data.IsDefaultItem;
+					}).map(function(data)
 					{
-						return item.PickList;
-					}),
-						getSource = function()
+						return data.PickList;
+					});
+					const listGetSource = function()
+					{
+						return fieldOptions.UDFPickListOptions.map(function(data)
 						{
-							return fieldOptions.UDFPickListOptions.map(function(item)
-							{
-								return item.PickList;
-							});
-						};
-
+							return data.PickList;
+						});
+					};
 					result = {
 						"field": item.Name,
 						"title": item.Name,
@@ -1050,13 +1049,13 @@
 								"format": "ListMover",
 								"getSource": function()
 								{
-									return Promise.resolve(getSource());
+									return Promise.resolve(listGetSource());
 								},
 								"allowNullValue": true,
 								"entityKey": ""
 							} : {
 								"format": "DropDown",
-								"getSource": function() { return Promise.resolve(getSource()); },
+								"getSource": function() { return Promise.resolve(listGetSource()); },
 								"allowNullValue": true,
 								"entityKey": ""
 							},
@@ -1069,7 +1068,7 @@
 					{
 						return 1;
 					});
-					getSource = function()
+					const ratingScaleGetSource = function()
 					{
 						return ratingItems;
 					};
@@ -1081,7 +1080,7 @@
 						"startScale": ratingScaleDefaultItems[0],
 						"editType": {
 							"format": "DropDown",
-							"getSource": function() { return Promise.resolve(getSource()); },
+							"getSource": function() { return Promise.resolve(ratingScaleGetSource()); },
 							"allowNullValue": true,
 							"entityKey": ""
 						},
@@ -1165,7 +1164,7 @@
 
 	UserDefinedGridHelper.prototype.generateQuickAddLayout = function(udGridId, gridType, dataPoint)
 	{
-		let udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].find(udGrid => udGrid.ID == udGridId);
+		let udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].find(udGrid => udGrid.ID === udGridId);
 		if (!udGridDataPoint)
 		{
 			udGridDataPoint = dataPoint
@@ -1245,15 +1244,15 @@
 
 	UserDefinedGridHelper.prototype.getDataPointByIdentifierAndGrid = function(udGridFieldId, udGridId, gridType)
 	{
-		const udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID == udGridId)[0];
-		const udGridFieldDataPoint = udGridDataPoint.UDGridFields.filter(udGridField => udGridField.UDGridFieldId == udGridFieldId);
+		const udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID === udGridId)[0];
+		const udGridFieldDataPoint = udGridDataPoint.UDGridFields.filter(udGridField => udGridField.UDGridFieldId === udGridFieldId);
 
 		return $.extend(true, {}, udGridFieldDataPoint[0]);
 	};
 
 	UserDefinedGridHelper.prototype.getDataPointByUDGridId = function(udGridId, gridType)
 	{
-		return dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID == udGridId)[0];
+		return dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID === udGridId)[0];
 	};
 
 	UserDefinedGridHelper.prototype.getDocumentGridRecords = function(columnFields, documentIds)
@@ -1288,7 +1287,7 @@
 			{
 				if (!res)
 				{
-					return;
+					return undefined;
 				}
 
 				const nonExsitedDocs = documentIds.filter(d => !res[d]);
@@ -1302,7 +1301,7 @@
 						{
 							if (!ch)
 							{
-								return;
+								return undefined;
 							}
 
 							return Promise.all(nonExsitedDocs.map(item =>
@@ -1321,6 +1320,8 @@
 							});
 						})
 				}
+
+				return undefined;
 			})
 	};
 
@@ -1408,18 +1409,6 @@
 		}
 	}
 
-	UserDefinedGridHelper.formatHtmlContent = function(questionContent)
-	{
-		if (!questionContent)
-		{
-			return questionContent;
-		}
-		var wrapper = $("<div/>").html(questionContent),
-			tables = wrapper.find("table");
-		tables.remove();
-		return wrapper.text();
-	}
-
 	UserDefinedGridHelper.getPureFieldName = function(fieldName)
 	{
 		return fieldName.substring(0, fieldName.length - 7);
@@ -1464,7 +1453,7 @@
 		});
 
 		const specialColumns = [];
-		let fieldName = column.FieldName;
+		const fieldName = column.FieldName;
 		const displayName = column.DisplayName;
 
 		const xCoordFieldName = TF.DetailView.UserDefinedGridHelper.getXCoordFieldName(fieldName);
@@ -1473,9 +1462,8 @@
 			DisplayName: TF.DetailView.UserDefinedGridHelper.getXCoordDisplayName(displayName),
 			template: function(item)
 			{
-				let fieldName = xCoordFieldName;
-				const value = item[fieldName];
-				if (value == 0 || !value)
+				const value = item[xCoordFieldName];
+				if (!value)
 				{
 					return "";
 				}
@@ -1490,9 +1478,8 @@
 			DisplayName: TF.DetailView.UserDefinedGridHelper.getYCoordDisplayName(displayName),
 			template: function(item)
 			{
-				let fieldName = yCoordFieldName;
-				const value = item[fieldName];
-				if (value == 0 || !value)
+				const value = item[yCoordFieldName];
+				if (!value)
 				{
 					return "";
 				}
