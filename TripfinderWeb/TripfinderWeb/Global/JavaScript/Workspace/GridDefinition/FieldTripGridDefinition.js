@@ -40,6 +40,7 @@
 		GridType: self.type
 	}
 	];
+	const TEXT_FIXED_COST = "Fixed Cost";
 	function FieldTripGridDefinition()
 	{
 		// constructor
@@ -109,13 +110,7 @@
 					FieldName: "ReturnDate",
 					DisplayName: "Return Date",
 					Width: '160px',
-					type: "date",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.EstimatedReturnDateTime).format("MM/DD/YYYY");
-					// }
+					type: "date"
 				},
 				{
 					FieldName: "FieldTripContact",
@@ -180,374 +175,11 @@
 					FieldName: "DepartDate",
 					DisplayName: "Departure Date",
 					Width: '160px',
-					type: "date",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.DepartDateTime).format("MM/DD/YYYY");
-					// }
-				},
-				{
-					FieldName: "NumberOfStudents",
-					DisplayName: "# Students",
-					Width: '150px',
-					type: "integer"
-				},
-				{
-					FieldName: "NumberOfAdults",
-					DisplayName: "# Adults",
-					Width: '150px',
-					type: "integer"
-				},
-				{
-					FieldName: "NumberOfVehicles",
-					DisplayName: "# Vehicles",
-					Width: '150px',
-					type: "integer"
-				},
-				{
-					FieldName: "NumberOfWheelChairs",
-					DisplayName: "# Wheelchairs",
-					Width: '150px',
-					type: "integer"
-				},
-				{
-					FieldName: "EstimatedMiles",
-					DisplayName: "Estimated " + tf.localization.UnitsOfMeasure,
-					Width: '150px',
-					type: "number"
-				},
-				{
-					FieldName: "EstimatedHours",
-					DisplayName: "Estimated Hours",
-					Width: '150px',
-					type: "number"
-				},
-				{
-					FieldName: "EstimatedCost",
-					DisplayName: "Estimated Cost",
-					Width: '150px',
-					type: "number"
-				},
-				{
-					FieldName: "DepartTime",
-					DisplayName: "Departure Time",
-					Width: '160px',
-					type: "time",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.DepartDateTime).format("hh:mm A");
-					// }
-				},
-				{
-					FieldName: "ReturnTime",
-					DisplayName: "Return Time",
-					Width: '160px',
-					type: "time",
-					//onlyForGrid: true
-					//,
-					// template: function(dataItem)
-					// {
-					// 	return moment(dataItem.EstimatedReturnDateTime).format("hh:mm A");
-					// }
-				},
-				{
-					FieldName: "ClassificationName",
-					DisplayName: "Classification",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification
-				},
-				{
-					FieldName: "BillingClass",
-					DisplayName: "Billing Classification",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification
-				},
-				{
-					FieldName: "Ftactivity",
-					DisplayName: "Activity",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity
-
-				},
-				{
-					FieldName: "Ftequipment",
-					DisplayName: "Equipment",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment
-				},
-
-				{
-					FieldName: "DestinationStreet",
-					DisplayName: "Destination Street",
-					Width: '130px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationCity",
-					DisplayName: "Destination City",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoCity", "fieldtrip", "DestinationCity")
-				},
-				{
-					FieldName: "DestinationState",
-					DisplayName: "Destination " + tf.localization.AreaName,
-					Width: '130px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationZip",
-					DisplayName: "Destination " + tf.localization.Postal,
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoZipCode2", "fieldtrip", "DestinationZip")
-				},
-				{
-					FieldName: "DirectionNotes",
-					DisplayName: "Directions",
-					Width: '150px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationNotes",
-					DisplayName: "Destination Notes",
-					Width: '180px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationContactTitle",
-					DisplayName: "Destination Contact Title",
-					Width: '180px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationPhoneExt",
-					DisplayName: "Destination Phone Ext.",
-					Width: '160px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationFax",
-					DisplayName: "Destination Fax",
-					Width: '150px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "DestinationEmail",
-					DisplayName: "Destination Email",
-					Width: '170px',
-					type: "string",
-					attributes: {
-						"class": "k-link"
-					},
-					hidden: true
-				},
-				{
-					FieldName: "DepartureNotes",
-					DisplayName: "Departure Notes",
-					Width: '150px',
-					type: "string",
-					hidden: true
-				},
-				{
-					FieldName: "MileageRate",
-					DisplayName: "Mileage Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "FixedCost",
-					DisplayName: "Fixed Costs",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "MinimumCost",
-					DisplayName: "Minimum Costs",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "DriverRate",
-					DisplayName: "Driver Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "DriverOtrate",
-					DisplayName: "Driver OT Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "AideRate",
-					DisplayName: "Aide Rate",
-					Width: '150px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "AideOtrate",
-					DisplayName: "Aide OT Rate",
-					Width: '160px',
-					type: "number",
-					hidden: true
-				},
-				{
-					FieldName: "DepartmentName",
-					DisplayName: "Department",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForGrid: true,
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDistrictDepartment", "fieldtrip", "DepartmentName")
-				},
-				{
-					FieldName: "BillingNotes",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "DistrictDepartmentID",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "DriverFixedCost",
-					Width: '150px',
-					type: "number",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "FieldTripAccountId",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "FieldTripActivityId",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "FieldTripClassificatoinId",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "FieldTripDestinationId",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "GUID",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "LastUpdated",
-					DisplayName: "Last Updated Date",
-					Width: '150px',
 					type: "date"
-				},
-				{
-					FieldName: "LastUpdatedId",
-					DisplayName: "Last Updated Id",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "LastUpdatedName",
-					DisplayName: "Last Updated By",
-					Width: '150px',
-					type: "string"
-				},
-				{
-					FieldName: "LastUpdatedType",
-					DisplayName: "Last Updated Type",
-					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "PaymentDate",
-					Width: '150px',
-					type: "date",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "PublicNotes",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "PurchaseOrder",
-					Width: '150px',
-					type: "string",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "ShowPublic",
-					Width: '150px',
-					type: "boolean",
-					hidden: true,
-					onlyForFilter: true
-				},
-				{
-					FieldName: "VehFixedCost",
-					Width: '150px',
-					type: "number",
-					hidden: true,
-					onlyForFilter: true
 				}
-			].concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("fieldtrip")),
+			].concat(this.getGridColumnsDefinationPart2())
+				.concat(this.getGridColumnsDefinationPart3())
+				.concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("fieldtrip")),
 			InvisibleUDFColumns: tf.UDFDefinition.getInvisibleUDFs("fieldtrip"),
 			stageFormatter: function(value)
 			{
@@ -610,6 +242,361 @@
 			}
 		};
 	};
+
+	FieldTripGridDefinition.prototype.getGridColumnsDefinationPart2 = function()
+	{
+		return [{
+			FieldName: "NumberOfStudents",
+			DisplayName: "# Students",
+			Width: '150px',
+			type: "integer"
+		},
+		{
+			FieldName: "NumberOfAdults",
+			DisplayName: "# Adults",
+			Width: '150px',
+			type: "integer"
+		},
+		{
+			FieldName: "NumberOfVehicles",
+			DisplayName: "# Vehicles",
+			Width: '150px',
+			type: "integer"
+		},
+		{
+			FieldName: "NumberOfWheelChairs",
+			DisplayName: "# Wheelchairs",
+			Width: '150px',
+			type: "integer"
+		},
+		{
+			FieldName: "EstimatedMiles",
+			DisplayName: "Estimated " + tf.localization.UnitsOfMeasure,
+			Width: '150px',
+			type: "number"
+		},
+		{
+			FieldName: "EstimatedHours",
+			DisplayName: "Estimated Hours",
+			Width: '150px',
+			type: "number"
+		},
+		{
+			FieldName: "EstimatedCost",
+			DisplayName: "Estimated Cost",
+			Width: '150px',
+			type: "number"
+		},
+		{
+			FieldName: "DepartTime",
+			DisplayName: "Departure Time",
+			Width: '160px',
+			type: "time"
+		},
+		{
+			FieldName: "ReturnTime",
+			DisplayName: "Return Time",
+			Width: '160px',
+			type: "time"
+		},
+		{
+			FieldName: "ClassificationName",
+			DisplayName: "Classification",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripClassification
+		},
+		{
+			FieldName: "BillingClass",
+			DisplayName: "Billing Classification",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification
+		},
+		{
+			FieldName: "Ftactivity",
+			DisplayName: "Activity",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripActivity
+
+		},
+		{
+			FieldName: "Ftequipment",
+			DisplayName: "Equipment",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripEquipment
+		},
+
+		{
+			FieldName: "DestinationStreet",
+			DisplayName: "Destination Street",
+			Width: '130px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationCity",
+			DisplayName: "Destination City",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoCity", "fieldtrip", "DestinationCity")
+		},
+		{
+			FieldName: "DestinationState",
+			DisplayName: "Destination " + tf.localization.AreaName,
+			Width: '130px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationZip",
+			DisplayName: "Destination " + tf.localization.Postal,
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoZipCode2", "fieldtrip", "DestinationZip")
+		},
+		{
+			FieldName: "DirectionNotes",
+			DisplayName: "Directions",
+			Width: '150px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationNotes",
+			DisplayName: "Destination Notes",
+			Width: '180px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationContactTitle",
+			DisplayName: "Destination Contact Title",
+			Width: '180px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationPhoneExt",
+			DisplayName: "Destination Phone Ext.",
+			Width: '160px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationFax",
+			DisplayName: "Destination Fax",
+			Width: '150px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "DestinationEmail",
+			DisplayName: "Destination Email",
+			Width: '170px',
+			type: "string",
+			attributes: {
+				"class": "k-link"
+			},
+			hidden: true
+		},
+		{
+			FieldName: "DepartureNotes",
+			DisplayName: "Departure Notes",
+			Width: '150px',
+			type: "string",
+			hidden: true
+		},
+		{
+			FieldName: "MileageRate",
+			DisplayName: "Mileage Rate",
+			Width: '150px',
+			type: "number",
+			hidden: true
+		},
+		{
+			FieldName: "FixedCost",
+			DisplayName: "Fixed Costs",
+			Width: '150px',
+			type: "number",
+			hidden: true
+		},
+		{
+			FieldName: "MinimumCost",
+			DisplayName: "Minimum Costs",
+			Width: '150px',
+			type: "number",
+			hidden: true
+		}];
+	}
+
+	FieldTripGridDefinition.prototype.getGridColumnsDefinationPart3 = function()
+	{
+		return [{
+			FieldName: "DriverRate",
+			DisplayName: "Driver Rate",
+			Width: '150px',
+			type: "number",
+			hidden: true
+		},
+		{
+			FieldName: "DriverOtrate",
+			DisplayName: "Driver OT Rate",
+			Width: '150px',
+			type: "number",
+			hidden: true
+		},
+		{
+			FieldName: "AideRate",
+			DisplayName: "Aide Rate",
+			Width: '150px',
+			type: "number",
+			hidden: true
+		},
+		{
+			FieldName: "AideOtrate",
+			DisplayName: "Aide OT Rate",
+			Width: '160px',
+			type: "number",
+			hidden: true
+		},
+		{
+			FieldName: "DepartmentName",
+			DisplayName: "Department",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			onlyForGrid: true,
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDistrictDepartment", "fieldtrip", "DepartmentName")
+		},
+		{
+			FieldName: "BillingNotes",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "DistrictDepartmentID",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "DriverFixedCost",
+			Width: '150px',
+			type: "number",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "FieldTripAccountId",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "FieldTripActivityId",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "FieldTripClassificatoinId",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "FieldTripDestinationId",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "GUID",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "LastUpdated",
+			DisplayName: "Last Updated Date",
+			Width: '150px',
+			type: "date"
+		},
+		{
+			FieldName: "LastUpdatedId",
+			DisplayName: "Last Updated Id",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "LastUpdatedName",
+			DisplayName: "Last Updated By",
+			Width: '150px',
+			type: "string"
+		},
+		{
+			FieldName: "LastUpdatedType",
+			DisplayName: "Last Updated Type",
+			Width: '150px',
+			type: "integer",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "PaymentDate",
+			Width: '150px',
+			type: "date",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "PublicNotes",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "PurchaseOrder",
+			Width: '150px',
+			type: "string",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "ShowPublic",
+			Width: '150px',
+			type: "boolean",
+			hidden: true,
+			onlyForFilter: true
+		},
+		{
+			FieldName: "VehFixedCost",
+			Width: '150px',
+			type: "number",
+			hidden: true,
+			onlyForFilter: true
+		}]
+	}
 
 	FieldTripGridDefinition.prototype.getSummaryFilters = function(subGridType)
 	{
@@ -677,289 +664,19 @@
 		switch (type)
 		{
 			case "history":
-				obj.Columns = [
-					{
-						FieldName: "FieldTripStageId",
-						Width: '150px',
-						DisplayName: "Status",
-						type: "string",
-						template: `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);
-						background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div>
-						<span>#: tf.fieldTripGridDefinition.gridDefinition().stageNameFormatter(data.FieldTripStageId)#</span>`
-					},
-					{
-						FieldName: "Notes",
-						Width: '150px',
-						DisplayName: "Notes",
-						type: "string"
-					},
-					{
-						FieldName: "TheDateTime",
-						Width: '150px',
-						DisplayName: "Updated Date Time",
-						type: "datetime",
-						template: function(dataItem)
-						{
-							return moment(dataItem["TheDateTime"].toString("YYYY-MM-DD HH:mm:ss") + "Z").currentTimeZoneTimeFormat("MM/DD/YYYY hh:mm A");
-						}
-					},
-					{
-						FieldName: "UserName",
-						Width: '150px',
-						DisplayName: "Updated User Name",
-						type: "string"
-					}
-				];
+				obj.Columns = this._getHistoryDefinations();
 				break;
 			case "resource":
-				obj.Columns = [
-					{
-						FieldName: "VehicleName",
-						Width: '150px',
-						DisplayName: "Vehicle",
-						type: "string"
-					},
-					{
-						FieldName: "AideName",
-						Width: '150px',
-						DisplayName: "Bus Aide",
-						type: "string"
-					},
-					{
-						FieldName: "DriverName",
-						Width: '150px',
-						DisplayName: "Driver",
-						type: "string"
-					},
-					{
-						FieldName: "TotalCost",
-						Width: '150px',
-						DisplayName: "Total Cost",
-						type: "number"
-					}
-				];
+				obj.Columns = this._getResourceDefinations();
 				break;
 			case "driver":
-				obj.Columns = [
-					{
-						FieldName: "DriverName",
-						DisplayName: "Driver",
-						Width: '150px',
-						type: "string"
-					},
-					{
-						FieldName: "DriverHours",
-						DisplayName: "Hours",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0}"
-					},
-					{
-						FieldName: "DriverRate",
-						DisplayName: "Rate",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverOTHours",
-						DisplayName: "OT Hours",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0}"
-					},
-					{
-						FieldName: "DriverOTRate",
-						DisplayName: "OT Rate",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverFixedCost",
-						DisplayName: "Fixed Cost",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverExpParking",
-						DisplayName: "Parking Expense",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverExpTolls",
-						DisplayName: "Tolls Expense",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverExpMeals",
-						DisplayName: "Meals Expense",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverExpMisc",
-						DisplayName: "Misc Expense",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "DriverTotalCost",
-						DisplayName: "Total",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					}
-				];
+				obj.Columns = this._getDriverDefinations();
 				break;
 			case "aide":
-				obj.Columns = [
-					{
-						FieldName: "AideName",
-						DisplayName: "Bus Aide",
-						Width: '150px',
-						type: "string"
-					},
-					{
-						FieldName: "AideHours",
-						DisplayName: "Hours",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0}"
-					},
-					{
-						FieldName: "AideRate",
-						DisplayName: "Rate",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "AideOTHours",
-						DisplayName: "OT Hours",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0}"
-					},
-					{
-						FieldName: "AideOTRate",
-						DisplayName: "OT Rate",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "AideFixedCost",
-						DisplayName: "Fixed Cost",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "AideTotalCost",
-						DisplayName: "Total",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "Chaperone",
-						DisplayName: "Chaperone 1",
-						Width: '150px',
-						type: "string"
-					},
-					{
-						FieldName: "Chaperone2",
-						DisplayName: "Chaperone 2",
-						Width: '150px',
-						type: "string"
-					},
-					{
-						FieldName: "Chaperone3",
-						DisplayName: "Chaperone 3",
-						Width: '150px',
-						type: "string"
-					},
-					{
-						FieldName: "Chaperone4",
-						DisplayName: "Chaperone 4",
-						Width: '150px',
-						type: "string"
-					}
-				];
+				obj.Columns = this._getAideDefinations();
 				break;
 			case "vehicle":
-				obj.Columns = [
-					{
-						FieldName: "VehicleName",
-						DisplayName: "Vehicle",
-						Width: '150px',
-						type: "string"
-					},
-					{
-						FieldName: "StartingOdometer",
-						DisplayName: "Odometer Start",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0}"
-					},
-					{
-						FieldName: "EndingOdometer",
-						DisplayName: "Odometer End",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0}"
-					},
-					{
-						FieldName: "MileageRate",
-						DisplayName: "Mileage Rate",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "VehFixedCost",
-						DisplayName: "Fixed Cost",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					},
-					{
-						FieldName: "VehicleTotalCost",
-						DisplayName: "Total",
-						Width: '150px',
-						type: "number",
-						Precision: 2,
-						format: "{0:0.00}"
-					}
-				];
+				obj.Columns = this._getVehicleDefinations();
 				break;
 			default:
 				return null;
@@ -967,6 +684,301 @@
 
 		return obj;
 	};
+
+	FieldTripGridDefinition.prototype._getHistoryDefinations = function()
+	{
+		return [
+			{
+				FieldName: "FieldTripStageId",
+				Width: '150px',
+				DisplayName: "Status",
+				type: "string",
+				template: `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);
+						background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div>
+						<span>#: tf.fieldTripGridDefinition.gridDefinition().stageNameFormatter(data.FieldTripStageId)#</span>`
+			},
+			{
+				FieldName: "Notes",
+				Width: '150px',
+				DisplayName: "Notes",
+				type: "string"
+			},
+			{
+				FieldName: "TheDateTime",
+				Width: '150px',
+				DisplayName: "Updated Date Time",
+				type: "datetime",
+				template: function(dataItem)
+				{
+					return moment(dataItem["TheDateTime"].toString("YYYY-MM-DD HH:mm:ss") + "Z").currentTimeZoneTimeFormat("MM/DD/YYYY hh:mm A");
+				}
+			},
+			{
+				FieldName: "UserName",
+				Width: '150px',
+				DisplayName: "Updated User Name",
+				type: "string"
+			}
+		];
+	}
+
+	FieldTripGridDefinition.prototype._getResourceDefinations = function()
+	{
+		return [
+			{
+				FieldName: "VehicleName",
+				Width: '150px',
+				DisplayName: "Vehicle",
+				type: "string"
+			},
+			{
+				FieldName: "AideName",
+				Width: '150px',
+				DisplayName: "Bus Aide",
+				type: "string"
+			},
+			{
+				FieldName: "DriverName",
+				Width: '150px',
+				DisplayName: "Driver",
+				type: "string"
+			},
+			{
+				FieldName: "TotalCost",
+				Width: '150px',
+				DisplayName: "Total Cost",
+				type: "number"
+			}
+		];
+	}
+
+	FieldTripGridDefinition.prototype._getDriverDefinations = function()
+	{
+		return [
+			{
+				FieldName: "DriverName",
+				DisplayName: "Driver",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "DriverHours",
+				DisplayName: "Hours",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0}"
+			},
+			{
+				FieldName: "DriverRate",
+				DisplayName: "Rate",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverOTHours",
+				DisplayName: "OT Hours",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0}"
+			},
+			{
+				FieldName: "DriverOTRate",
+				DisplayName: "OT Rate",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverFixedCost",
+				DisplayName: TEXT_FIXED_COST,
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverExpParking",
+				DisplayName: "Parking Expense",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverExpTolls",
+				DisplayName: "Tolls Expense",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverExpMeals",
+				DisplayName: "Meals Expense",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverExpMisc",
+				DisplayName: "Misc Expense",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "DriverTotalCost",
+				DisplayName: "Total",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			}
+		];
+	}
+
+	FieldTripGridDefinition.prototype._getAideDefinations = function()
+	{
+		return [
+			{
+				FieldName: "AideName",
+				DisplayName: "Bus Aide",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "AideHours",
+				DisplayName: "Hours",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0}"
+			},
+			{
+				FieldName: "AideRate",
+				DisplayName: "Rate",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "AideOTHours",
+				DisplayName: "OT Hours",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0}"
+			},
+			{
+				FieldName: "AideOTRate",
+				DisplayName: "OT Rate",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "AideFixedCost",
+				DisplayName: TEXT_FIXED_COST,
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "AideTotalCost",
+				DisplayName: "Total",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "Chaperone",
+				DisplayName: "Chaperone 1",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "Chaperone2",
+				DisplayName: "Chaperone 2",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "Chaperone3",
+				DisplayName: "Chaperone 3",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "Chaperone4",
+				DisplayName: "Chaperone 4",
+				Width: '150px',
+				type: "string"
+			}
+		];
+	}
+
+	FieldTripGridDefinition.prototype._getVehicleDefinations = function()
+	{
+		return [
+			{
+				FieldName: "VehicleName",
+				DisplayName: "Vehicle",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "StartingOdometer",
+				DisplayName: "Odometer Start",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0}"
+			},
+			{
+				FieldName: "EndingOdometer",
+				DisplayName: "Odometer End",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0}"
+			},
+			{
+				FieldName: "MileageRate",
+				DisplayName: "Mileage Rate",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "VehFixedCost",
+				DisplayName: TEXT_FIXED_COST,
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			},
+			{
+				FieldName: "VehicleTotalCost",
+				DisplayName: "Total",
+				Width: '150px',
+				type: "number",
+				Precision: 2,
+				format: "{0:0.00}"
+			}
+		];
+	}
 
 	tf.fieldTripGridDefinition = new TF.GridDefinition.FieldTripGridDefinition();
 })();
