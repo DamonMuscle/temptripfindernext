@@ -71,7 +71,7 @@
 		const field = this.field;
 		const elem = this._getESignContainer(field);
 
-		this._initSignaturePad(elem);
+		this._initSignaturePad(elem, field);
 
 		elem.on('click', '.e-sign-cover-layer', e =>
 		{
@@ -132,7 +132,7 @@
 		this.elem = elem;
 	}
 
-	SignatureBlock.prototype._initSignaturePad = function(elem)
+	SignatureBlock.prototype._initSignaturePad = function(elem, field)
 	{
 		const $canvas = elem.find(`#${field.Guid}`);
 		if ($canvas.length > 0)

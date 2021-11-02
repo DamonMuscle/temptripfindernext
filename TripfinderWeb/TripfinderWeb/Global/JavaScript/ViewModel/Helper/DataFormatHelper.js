@@ -1,13 +1,24 @@
 (function()
 {
 	createNamespace("TF").DataFormatHelper = DataFormatHelper;
+	if (!String.prototype.format)
+	{
+		String.prototype.format = function()
+		{
+			var args = arguments;
+			return this.replace(/{(\d+)}/g, function(match, number)
+			{
+				return typeof args[number] != 'undefined' ? args[number] : match;
+			});
+		};
+	}
 
 	var MAX_NUMBER = 999999999;
 	var PHONE_NUMBER_PATTERNS = [{
 		order: 1,
 		mode: /^\D*(?:1|01|001)?\D*(\d{3})\D*(\d{3})\D*(\d{4})\D*$/,
-		display: "001-(${groups[1]})${groups[2]}-${groups[3]}",
-		value: "001${groups[1]}${groups[2]}${groups[3]}",
+		display: "001-({0}){1}-{2}",
+		value: "001{0}{1}{2}",
 		region: "USA,Canada"
 	}];
 
@@ -58,9 +69,10 @@
 		let longPhoneNumberMatched = false;
 		for (const pattern of phoneNumberWithCountryCodePatterns)
 		{
-			if (cleanPhone.match(pattern.mode))
+			const groups = cleanPhone.match(pattern.mode);
+			if (groups)
 			{
-				content = eval(`\`${pattern.value}\``);
+				content = pattern.value.format(groups[1], groups[2], groups[3]);
 				longPhoneNumberMatched = true;
 				break;
 			}
@@ -134,7 +146,7 @@
 				groups = cleanPhone.match(pattern.mode);
 				if (groups)
 				{
-					content = eval(`\`${pattern.display}\``);
+					content = pattern.display.format(groups[1], groups[2], groups[3]);
 					longPhoneNumberMatched = true;
 					break;
 				}

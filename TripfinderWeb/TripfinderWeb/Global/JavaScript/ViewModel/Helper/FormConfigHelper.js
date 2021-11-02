@@ -287,7 +287,7 @@
 			case TYPE_PHONE_NUMBER:
 				return _formatPhoneNumberSysField(value);
 			case "FieldTripStage":
-				return _formatFieldTripStageSysField(value);
+				return _formatFieldTripStageSysField(el, value);
 			case "HasObject":
 				return _formatHasObjectSysField(value)
 			case "Checkbox":
@@ -341,7 +341,7 @@
 		return tf.dataFormatHelper.phoneFormatter(value);
 	}
 
-	function _formatFieldTripStageSysField(value)
+	function _formatFieldTripStageSysField(el, value)
 	{
 		if (value !== null && value !== "")
 		{
