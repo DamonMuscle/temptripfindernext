@@ -235,7 +235,6 @@ const OrientationchangeMIMD = "orientationchange.mapIsMobileDevice";
 			saveBtn.hide();
 			saveBtn.on("click", function(e)
 			{
-				// todo check layer has graphic or not
 				self.routingMapTool.$container.find(".expand-button").click();
 				self.isDrawing = false;
 				self.currentLocationMaker = null;

@@ -92,11 +92,8 @@ function getParameterByName(name, url)
 	name = name.replace(/[\[\]]/g, "\\$&");
 	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
 		results = regex.exec(url);
-	if (!results)
-	{
-		return;
-	}
-	if (!results[2])
+
+	if (!results || !results[2])
 	{
 		return '';
 	}
