@@ -57,6 +57,10 @@
 					item = child;
 					return true;
 				}
+				else
+				{
+					return false;
+				}
 			});
 			if (item)
 			{

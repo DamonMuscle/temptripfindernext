@@ -849,19 +849,19 @@
 	EsriTool.prototype._combineTouchedPolygons = function(polygons)
 	{
 		var self = this, resultPolygons = [polygons[0]], rings = [];
-		polygons.map(function(p)
+		polygons.forEach(function(p)
 		{
-			p.rings.map(function(r)
+			p.rings.forEach(function(r)
 			{
 				rings.push(r);
 			});
 
 		})
 		polygons.shift();
-		polygons.map(function(p, index)
+		polygons.forEach(function(p, index)
 		{
 			var istouch = false;
-			resultPolygons.map(function(pr)
+			resultPolygons.forEach(function(pr)
 			{
 				if (self._arcgis.geometryEngine.contains(pr, p) && self._arcgis.geometryEngine.contains(p, pr))
 				{
@@ -869,7 +869,7 @@
 				}
 				else if (self._isTouches(pr, p, rings))
 				{
-					p.rings.map(function(r)
+					p.rings.forEach(function(r)
 					{
 						pr.addRing(r);
 					});
