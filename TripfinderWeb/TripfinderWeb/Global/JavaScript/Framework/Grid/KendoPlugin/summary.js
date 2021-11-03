@@ -218,10 +218,7 @@
 		var fields = {};
 		this._gridDefinition.Columns.forEach(function(definition)
 		{
-			const field = {
-				type: "string"
-			};
-			fields[definition.FieldName] = field;
+			fields[definition.FieldName] = { type: "string" };
 		});
 		return fields;
 	};
