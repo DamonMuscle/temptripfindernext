@@ -1681,7 +1681,7 @@
 			info = self.getAllGridsAndColumns($detailView, gridName),
 			grids = info["grids"],
 			columns = info["columns"];
-		tf.DataTypeHelper.getRecordByIdsAndColumns(dataType, dataId, columns)
+		tf.DataTypeHelper.getRecordByIdsAndColumns(tf.datasourceManager.databaseId, dataType, dataId, columns)
 			.then(function(entities)
 			{
 				$.each(grids, function(_, item)
@@ -1723,7 +1723,7 @@
 			grids = info["grids"],
 			columns = info["columns"];
 
-		tf.DataTypeHelper.getRecordByIdsAndColumns(dataType, dataIds, columns)
+		tf.DataTypeHelper.getRecordByIdsAndColumns(tf.datasourceManager.databaseId, dataType, dataIds, columns)
 			.then(function(entities)
 			{
 				$.each(grids, function(_, item)
@@ -1805,7 +1805,7 @@
 			grids = info["grids"],
 			columns = info["columns"];
 
-		tf.DataTypeHelper.getRecordByIdsAndColumns(dataType, dataIds, columns)
+		tf.DataTypeHelper.getRecordByIdsAndColumns(tf.datasourceManager.databaseId, dataType, dataIds, columns)
 			.then(function(entities)
 			{
 				$.each(grids, function(_, item)
