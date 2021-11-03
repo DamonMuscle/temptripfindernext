@@ -195,7 +195,7 @@
 			return item.selectedUserId();
 		});
 		var searchData = new TF.SearchParameters(null, null, null, null, null, ids, null);
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "user"), {
+		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "users"), {
 			data: searchData.data
 		})
 			.then(function(apiResponse)
