@@ -49,6 +49,7 @@
 				DBName: "FieldTripID",
 				DisplayName: "FieldTripID",
 				FieldName: "Id",
+				type: "integer",
 				Width: "150px"
 			}]
 		};
