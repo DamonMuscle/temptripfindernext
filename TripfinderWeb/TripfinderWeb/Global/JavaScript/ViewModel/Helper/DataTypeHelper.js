@@ -386,15 +386,13 @@
 		{
 			var nameIdTable = {};
 
-			response.Items.forEach(function(item) // NOSONAR
+			response.Items.forEach(function(item)
 			{
-				if (!item.Type)
+				if (item.Type)
 				{
-					return true;
+					const dataTypeKey = _getDataTypeKey(item.Type)
+					nameIdTable[dataTypeKey] = item.ID;
 				}
-
-				const dataTypeKey = _getDataTypeKey(item.Type)
-				nameIdTable[dataTypeKey] = item.ID;
 			});
 
 			Object.keys(_DATA_TYPE_ATTRIBUTES).forEach(function(attrKey)
