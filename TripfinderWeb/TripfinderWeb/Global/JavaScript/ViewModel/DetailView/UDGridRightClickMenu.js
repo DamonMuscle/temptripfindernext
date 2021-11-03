@@ -121,11 +121,11 @@
 	UDGridRightClickMenu.prototype.omitSelectionClick = function()
 	{
 		var items = [], selected = this.getSelectedItems();
-		this.gridBlock.grid.dataSource.data().forEach((item) =>
+		this.gridBlock.grid.dataSource.data().forEach((record) =>
 		{
-			if (selected.indexOf(item) < 0)
+			if (selected.indexOf(record) < 0)
 			{
-				items.push(item);
+				items.push(record);
 			}
 		});
 		this.gridBlock.grid.clearSelection();

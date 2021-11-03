@@ -318,256 +318,312 @@
 		}
 	}
 
+	UDGridBlock.prototype._initDetailGridColumn = function(col, columns, originFieldMapping)
+	{
+		var self = this;
+		let specialColumns = [];
+
+		const isXCoordField = TF.DetailView.UserDefinedGridHelper.isXCoordField(col);
+		const isYCoordField = TF.DetailView.UserDefinedGridHelper.isYCoordField(col);
+		if (isXCoordField || isYCoordField)
+		{
+			col = TF.DetailView.UserDefinedGridHelper.getPureFieldName(col);
+		}
+
+		if (col === "Action")
+		{
+			const isEditableBasedOnSignedPolicy = tf.udgHelper.getEditableBasedOnSignedPolicy(self.options);
+			columns.push(self._getActionColumns(isEditableBasedOnSignedPolicy, self.isReadOnly()));
+		}
+		else if (TF.DetailView.UserDefinedGridHelper.isGeoInfoColumn(col))
+		{
+			const geoColumn = self._geoColumns.find(i => i.FieldName === col);
+			_setGeoeInfoColumn(geoColumn)
+			columns.push(geoColumn);
+		}
+		else if (TF.DetailView.UserDefinedGridHelper.isUpdatedInfoColumn(col))
+		{
+
+			const updatedColumn = self._updatedInfoColumns.find(i => i.FieldName === col);
+			_setUpdateInfoColumn(updatedColumn);
+			columns.push(updatedColumn);
+		}
+		else if (originFieldMapping[col])
+		{
+			const udgField = self.options.UDGridFields.find(field => field.Guid === col),
+				column = {
+					FieldName: col,
+					DisplayName: originFieldMapping[col],
+					width: 165,
+					lockWidth: true,
+					originalUdfField: udgField
+				};
+
+			switch (udgField.FieldOptions.TypeName)
+			{
+				case "Map":
+					const xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
+					specialColumns = _setSpecialColumns(specialColumns, isXCoordField, isYCoordField, xyCoordColumns)
+
+					break;
+				case "Signature":
+					_setColumnSignature(column, col);
+					break;
+				case "Date/Time":
+					_setColumnDateTime(column, col);
+					break;
+				case "Date":
+					_setColumnDate(column, col);
+					break;
+				case "Time":
+					_setColumnTime(column, col);
+					break;
+				case "List":
+					_setColumnList(column, col);
+					break;
+				case "Boolean":
+					_setColumnBoolean(column, col, udgField)
+					break;
+				case "Number":
+					_setColumnNumber(column, col, udgField)
+					break;
+				case "Phone Number":
+					_setColumnPhoneNumber(column, col);
+					break;
+				case "System Field":
+					self._setIgnoredColumnNames(col);
+					break;
+			}
+
+			if (specialColumns.length)
+			{
+				specialColumns.forEach(sc =>
+				{
+					sc.headerTemplate = GetQuestionHeaderTemplate(sc.DisplayName);
+				});
+				columns = columns.concat(specialColumns);
+			}
+			else
+			{
+				column.headerTemplate = GetQuestionHeaderTemplate(originFieldMapping[col]);
+				columns.push(column);
+			}
+
+			function GetQuestionHeaderTemplate(displayName)
+			{
+				return `<span title="${displayName}" style="overflow: hidden;text-overflow: ellipsis;">${displayName}</span>`;
+			}
+		}
+
+		return columns;
+	}
+
+	function _setSpecialColumns(specialColumns, isXCoordField, isYCoordField, xyCoordColumns)
+	{
+		if (isXCoordField)
+		{
+			specialColumns = [xyCoordColumns[0]];
+		}
+		else if (isYCoordField)
+		{
+			specialColumns = [xyCoordColumns[1]];
+		}
+		else
+		{
+			specialColumns = xyCoordColumns;
+		}
+
+		return specialColumns;
+	}
+
+	function _setGeoeInfoColumn(geoColumn, col)
+	{
+		geoColumn.template = function(item)
+		{
+			const value = item[col];
+			return value == null ? '' : Number(value).toFixed(6);
+		};
+	}
+
+	function _setUpdateInfoColumn(updatedColumn, col)
+	{
+		switch (updatedColumn.type)
+		{
+			case "datetime":
+				updatedColumn.template = _dateTimeTemplateLocalZone;
+				break;
+			case "string":
+			default:
+				updatedColumn.template = function(item)
+				{
+					const value = item[col];
+					return value || "";
+				};
+				break;
+		}
+	}
+
+	function _dateTimeTemplateLocalZone(item, col)
+	{
+		const value = item[col];
+		const dt = moment(value);
+		if (tf.localTimeZone)
+		{
+			dt.add(tf.localTimeZone.hoursDiff, "hours");
+		}
+
+		return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
+	}
+
+	function _setColumnSignature(column, col)
+	{
+		column.type = "boolean";
+		column.udfType = "SignatureBlock";
+		column.template = function(item)
+		{
+			return `<div class='signature-checkbox-container'>
+					<input type='checkbox' disabled class='signature-checkbox' ${item[col] ? 'checked' : ''}/>
+				</div>`;
+		};
+	}
+	function _setColumnDateTime(column, col)
+	{
+		var dateTimeTemplate = function(item)
+		{
+			const value = item[col];
+			const dt = moment(value);
+			return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
+		};
+
+		column.template = dateTimeTemplate;
+		column.type = "datetime";
+	}
+	function _setColumnDate(column, col)
+	{
+		column.template = function(item)
+		{
+			const value = item[col];
+			const date = moment(value);
+			return date.isValid() ? moment(value).format("MM/DD/YYYY") : "";
+		};
+		column.type = "date";
+	}
+	function _setColumnTime(column, col)
+	{
+		column.template = function(item)
+		{
+			const value = item[col];
+			let time = moment(value);
+			if (time.isValid())
+			{
+				return time.format("hh:mm A");
+			}
+			time = moment("1900-1-1 " + value);
+			return time.isValid() ? time.format("hh:mm A") : "";
+		};
+	}
+	function _setColumnList(column, col)
+	{
+		column.template = function(item)
+		{
+			const value = item[col];
+			if (value instanceof Array)
+			{
+				return value.join(", ");
+			}
+			return isNullObj(value) ? "" : value;
+		};
+		column.type = "list";
+	}
+	function _setColumnBoolean(column, col, udgField)
+	{
+		column.template = function(item)
+		{
+			const value = item[col];
+			if (isNullObj(value))
+			{
+				return '';
+			}
+			return value ? udgField.positiveLabel : udgField.negativeLabel || value;
+		};
+		/*
+		 * Remove type for boolean since it impact the mini grid Boolean question, Boolean question always show TRUE label,
+		 * because method "KendoGridHelper.prototype.getKendoField" covert "string" and "boolean" as "string", if here need type,please change the method
+		 * "KendoGridHelper.prototype.getKendoField" as well.
+		 */
+	}
+	function _setColumnNumber(column, col, udgField)
+	{
+		column.template = function(item)
+		{
+			let value = item[col];
+			if (value == null || value === "")
+			{
+				return "";
+			}
+
+			const precision = udgField.FieldOptions.NumberPrecision;
+			if (isNaN(Number(value)))
+			{
+				value = 0;
+			}
+			return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
+
+		};
+		column.type = "number";
+	}
+	function _setColumnPhoneNumber(column, col)
+	{
+		column.template = function(item)
+		{
+			let value = item[col];
+			if (isNullObj(value))
+			{
+				return '';
+			}
+			value = tf.dataFormatHelper.phoneFormatter(value);
+			return value;
+		};
+	}
+
+	UDGridBlock.prototype._setIgnoredColumnNames = function name(col)
+	{
+		const targetUdfFieldGuid = self.options.UDGridFields.find(x => x.Guid === col).editType.targetField;
+		const targetUdf = self.recordEntity.UserDefinedFields.find(x => x.Guid === targetUdfFieldGuid);
+		if (targetUdf)
+		{
+			const udfDatasourceIds = targetUdf.UDFDataSources.map(x => x.DBID);
+			if (udfDatasourceIds.indexOf(tf.datasourceManager.databaseId) < 0)
+			{
+				self._ignoredColumnNames.push(col);
+				return;
+			}
+		}
+		else
+		{
+			self._ignoredColumnNames.push(col);
+		}
+	}
+
 	UDGridBlock.prototype.initDetailGrid = function()
 	{
 		var self = this,
 			isReadMode = self.isReadMode(),
 			columns = [];
 
-		let specialColumns = [];
 		if (self.options.columns && self.options.columns.length > 0)
 		{
 			var originFieldMapping = tf.udgHelper.getGuidToNameMappingOfGridFields(self.options, true, true);
-			self.options.columns.forEach(col =>
+			self.options.columns.forEach((c) =>
 			{
-				const isXCoordField = TF.DetailView.UserDefinedGridHelper.isXCoordField(col);
-				const isYCoordField = TF.DetailView.UserDefinedGridHelper.isYCoordField(col);
-				if (isXCoordField || isYCoordField)
-				{
-					col = TF.DetailView.UserDefinedGridHelper.getPureFieldName(col);
-				}
-
-				var dateTimeTemplate = function(item)
-				{
-					const value = item[col];
-					const dt = moment(value);
-					return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
-				};
-
-				var dateTimeTemplateLocalZone = function(item)
-				{
-					const value = item[col];
-					const dt = moment(value);
-					if (tf.localTimeZone)
-					{
-						dt.add(tf.localTimeZone.hoursDiff, "hours");
-					}
-
-					return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
-				};
-
-				if (col === "Action")
-				{
-					const isEditableBasedOnSignedPolicy = tf.udgHelper.getEditableBasedOnSignedPolicy(self.options);
-					columns.push(self._getActionColumns(isEditableBasedOnSignedPolicy, self.isReadOnly()));
-					return null;
-				}
-				else if (TF.DetailView.UserDefinedGridHelper.isGeoInfoColumn(col))
-				{
-					const geoColumn = self._geoColumns.find(i => i.FieldName === col);
-					geoColumn.template = function(item)
-					{
-						const value = item[col];
-						return value == null ? '' : Number(value).toFixed(6);
-					};
-					columns.push(geoColumn);
-					return;
-				}
-				else if (TF.DetailView.UserDefinedGridHelper.isUpdatedInfoColumn(col))
-				{
-
-					const updatedColumn = self._updatedInfoColumns.find(i => i.FieldName === col);
-					switch (updatedColumn.type)
-					{
-						case "datetime":
-							updatedColumn.template = dateTimeTemplateLocalZone;
-							break;
-						case "string":
-						default:
-							updatedColumn.template = function(item)
-							{
-								const value = item[col];
-								return value || "";
-							};
-							break;
-					}
-
-					columns.push(updatedColumn);
-					return;
-				}
-				else if (originFieldMapping[col])
-				{
-					const udgField = self.options.UDGridFields.find(field => field.Guid === col),
-						column = {
-							FieldName: col,
-							DisplayName: originFieldMapping[col],
-							width: 165,
-							lockWidth: true,
-							originalUdfField: udgField
-						};
-
-					switch (udgField.FieldOptions.TypeName)
-					{
-						case "Map":
-							const xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
-							if (isXCoordField)
-							{
-								specialColumns = [xyCoordColumns[0]];
-							}
-							else if (isYCoordField)
-							{
-								specialColumns = [xyCoordColumns[1]];
-							}
-							else
-							{
-								specialColumns = xyCoordColumns;
-							}
-							break;
-						case "Signature":
-							column.type = "boolean";
-							column.udfType = "SignatureBlock";
-							column.template = function(item)
-							{
-								return `<div class='signature-checkbox-container'>
-										<input type='checkbox' disabled class='signature-checkbox' ${item[col] ? 'checked' : ''}/>
-									</div>`;
-							};
-							break;
-						case "Date/Time":
-							column.template = dateTimeTemplate;
-							column.type = "datetime";
-							break;
-						case "Date":
-							column.template = function(item)
-							{
-								const value = item[col];
-								const date = moment(value);
-								return date.isValid() ? moment(value).format("MM/DD/YYYY") : "";
-							};
-							column.type = "date";
-							break;
-						case "Time":
-							column.template = function(item)
-							{
-								const value = item[col];
-								let time = moment(value);
-								if (time.isValid())
-								{
-									return time.format("hh:mm A");
-								}
-								time = moment("1900-1-1 " + value);
-								return time.isValid() ? time.format("hh:mm A") : "";
-							};
-							break;
-						case "List":
-							column.template = function(item)
-							{
-								const value = item[col];
-								if (value instanceof Array)
-								{
-									return value.join(", ");
-								}
-								return isNullObj(value) ? "" : value;
-							};
-							column.type = "list";
-							break;
-						case "Boolean":
-							column.template = function(item)
-							{
-								const value = item[col];
-								if (isNullObj(value))
-								{
-									return '';
-								}
-								return value ? udgField.positiveLabel : udgField.negativeLabel || value;
-							};
-							/*
-							 * Remove type for boolean since it impact the mini grid Boolean question, Boolean question always show TRUE label,
-							 * because method "KendoGridHelper.prototype.getKendoField" covert "string" and "boolean" as "string", if here need type,please change the method
-							 * "KendoGridHelper.prototype.getKendoField" as well.
-							 */
-							break;
-						case "Number":
-							column.template = function(item)
-							{
-								let value = item[col];
-								if (value == null || value === "")
-								{
-									return "";
-								}
-
-								const precision = udgField.FieldOptions.NumberPrecision;
-								if (isNaN(Number(value)))
-								{
-									value = 0;
-								}
-								return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
-
-							};
-							column.type = "number";
-							break;
-						case "Phone Number":
-							column.template = function(item)
-							{
-								let value = item[col];
-								if (isNullObj(value))
-								{
-									return '';
-								}
-								value = tf.dataFormatHelper.phoneFormatter(value);
-								return value;
-							};
-							break;
-						case "System Field":
-							{
-								const targetUdfFieldGuid = self.options.UDGridFields.find(x => x.Guid === col).editType.targetField;
-								const targetUdf = self.recordEntity.UserDefinedFields.find(x => x.Guid === targetUdfFieldGuid);
-								if (targetUdf)
-								{
-									const udfDatasourceIds = targetUdf.UDFDataSources.map(x => x.DBID);
-									if (udfDatasourceIds.indexOf(tf.datasourceManager.databaseId) < 0)
-									{
-										self._ignoredColumnNames.push(col);
-										return;
-									}
-								} else
-								{
-									self._ignoredColumnNames.push(col);
-									return;
-								}
-							}
-							break;
-					}
-
-					if (specialColumns.length)
-					{
-						specialColumns.forEach(sc =>
-						{
-							sc.headerTemplate = GetQuestionHeaderTemplate(sc.DisplayName);
-						});
-						columns = columns.concat(specialColumns);
-						specialColumns = [];
-					}
-					else
-					{
-						column.headerTemplate = GetQuestionHeaderTemplate(originFieldMapping[col]);
-						columns.push(column);
-					}
-
-					function GetQuestionHeaderTemplate(displayName)
-					{
-						return `<span title="${displayName}" style="overflow: hidden;text-overflow: ellipsis;">${displayName}</span>`;
-					}
-
-					return;
-				}
+				self._initDetailGridColumn(c, columns, originFieldMapping);
 			});
-
 		}
 		else
 		{
 			columns = self.getGridColumnsByType();
 		}
+
 		self.$el.data("columns", columns);
 		var getDataSource = function()
 		{
@@ -580,30 +636,8 @@
 			{
 				const udGridId = self.options.ID,
 					udGrids = self.detailView.fieldEditorHelper.editFieldList["UDGrids"];
-				let currentEditUDGrid = [],
-					dataSourceItems = [];
 
-				if (udGrids)
-				{
-					currentEditUDGrid = udGrids.filter(udGrid => udGrid.ID === udGridId);
-				}
-
-				if (currentEditUDGrid.length > 0)
-				{
-					dataSourceItems = currentEditUDGrid[0].UDGridRecordsValues;
-					dataSourceItems.forEach(item =>
-					{
-						if (Array.isArray(item.DocumentUDGridRecords))
-						{
-							item.DocumentCount = item.DocumentUDGridRecords.length;
-						}
-						else
-						{
-							item.DocumentCount = 0;
-						}
-					});
-				}
-				self.dataItems = dataSourceItems;
+				self.dataItems = _formatNewDataSourceItems(udGridId, udGrids);
 				return Promise.resolve({
 					dataItems: dataSourceItems,
 					totalCount: dataSourceItems.length,
@@ -673,6 +707,35 @@
 			refreshGrid();
 		}));
 	};
+
+	function _formatNewDataSourceItems(udGridId, udGrids)
+	{
+		let currentEditUDGrid = [],
+			dataSourceItems = [];
+
+		if (udGrids)
+		{
+			currentEditUDGrid = udGrids.filter(udGrid => udGrid.ID === udGridId);
+		}
+
+		if (currentEditUDGrid.length > 0)
+		{
+			dataSourceItems = currentEditUDGrid[0].UDGridRecordsValues;
+			dataSourceItems.forEach(item =>
+			{
+				if (Array.isArray(item.DocumentUDGridRecords))
+				{
+					item.DocumentCount = item.DocumentUDGridRecords.length;
+				}
+				else
+				{
+					item.DocumentCount = 0;
+				}
+			});
+		}
+
+		return dataSourceItems;
+	}
 
 	UDGridBlock.prototype._bindMiniGridEvent = function($grid)
 	{
