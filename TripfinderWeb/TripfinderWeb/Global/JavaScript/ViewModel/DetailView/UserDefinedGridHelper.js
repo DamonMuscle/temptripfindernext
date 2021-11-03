@@ -529,11 +529,19 @@
 		return false;
 	};
 
-
 	UserDefinedGridHelper.prototype.getEditableBasedOnSignedPolicy = function(udGrid)
 	{
-		console.log("Todo: getEditableBasedOnSignedPolicy -> Get Result Based on Workflow Setting")
-		return true;
+		var result = false;
+		if (udGrid && udGrid.UDGridFields && udGrid.UDGridFields.length > 0)
+		{
+			udGrid.UDGridFields.forEach(udGridField => {
+				if (udGridField.FieldOptions && udGridField.FieldOptions.TypeName && udGridField.FieldOptions.TypeName === "Signature")
+				{
+					result = true;
+				}
+			});
+		}
+		return result;
 	};
 
 	UserDefinedGridHelper.prototype.getIsReadOnlyBasedOnSignedPolicy = function(selectedRecord, udgridFields)

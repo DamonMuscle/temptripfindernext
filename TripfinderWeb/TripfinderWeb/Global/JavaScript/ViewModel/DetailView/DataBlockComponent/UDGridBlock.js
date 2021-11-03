@@ -49,8 +49,14 @@
 			}
 			else
 			{
-				// Remove the isEditableBasedOnSignedPolicy logic here, cause the value of isEditableBasedOnSignedPolicy didn't implement now. It leader the view button issue.
-				command.push(editBtnOption);
+				if (isEditableBasedOnSignedPolicy)
+				{
+					command.push(viewBtnOption);
+				}
+				else
+				{
+					command.push(editBtnOption);
+				}
 				command.push(deleteBtnOption);
 			}
 
