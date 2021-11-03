@@ -333,14 +333,14 @@
 		else if (TF.DetailView.UserDefinedGridHelper.isGeoInfoColumn(col))
 		{
 			const geoColumn = self._geoColumns.find(i => i.FieldName === col);
-			_setGeoeInfoColumn(geoColumn)
+			_setGeoeInfoColumn(geoColumn, col);
 			columns.push(geoColumn);
 		}
 		else if (TF.DetailView.UserDefinedGridHelper.isUpdatedInfoColumn(col))
 		{
 
 			const updatedColumn = self._updatedInfoColumns.find(i => i.FieldName === col);
-			_setUpdateInfoColumn(updatedColumn);
+			_setUpdateInfoColumn(updatedColumn, col);
 			columns.push(updatedColumn);
 		}
 		else if (originFieldMapping[col])
@@ -445,7 +445,17 @@
 		switch (updatedColumn.type)
 		{
 			case "datetime":
-				updatedColumn.template = _dateTimeTemplateLocalZone;
+				updatedColumn.template = function(item)
+				{
+					const value = item[col];
+					const dt = moment(value);
+					if (tf.localTimeZone)
+					{
+						dt.add(tf.localTimeZone.hoursDiff, "hours");
+					}
+
+					return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
+				}
 				break;
 			case "string":
 			default:
@@ -456,18 +466,6 @@
 				};
 				break;
 		}
-	}
-
-	function _dateTimeTemplateLocalZone(item, col)
-	{
-		const value = item[col];
-		const dt = moment(value);
-		if (tf.localTimeZone)
-		{
-			dt.add(tf.localTimeZone.hoursDiff, "hours");
-		}
-
-		return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
 	}
 
 	function _setColumnSignature(column, col)
