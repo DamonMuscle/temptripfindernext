@@ -4,9 +4,9 @@
 
 (function()
 {
-	createNamespace("TF.Map").Symbol = Symbol;
+	createNamespace("TF.Map").Symbol = MapSymbol;
 
-	function Symbol()
+	function MapSymbol()
 	{
 		this.ArcGIS = tf.map.ArcGIS;
 
@@ -21,7 +21,7 @@
 		this.selectionColor = "#B0FFFF";
 
 		this._colorList = ["#FF0800", "#8800FF", "#3333FF", "#FF6700", "#FF00FF", "#00FFFF", "#73D952", "#FFFF00",
-		"#AA0000", "#0000A2", "#CC5200", "#E10087", "#00CCCC", "#006600", "#FFCC00", "#D47F7F", "#7F7FD0", "#E5A87F", "#F07FC3", "#7FE5E5", "#7FB27F", "#FFE57F"];
+			"#AA0000", "#0000A2", "#CC5200", "#E10087", "#00CCCC", "#006600", "#FFCC00", "#D47F7F", "#7F7FD0", "#E5A87F", "#F07FC3", "#7FE5E5", "#7FB27F", "#FFE57F"];
 
 		this.symbolColors = {
 			blueForSelect: [39, 147, 226],
@@ -36,7 +36,7 @@
 		this.offSetY = 8;
 	}
 
-	Symbol.prototype.school = function(hexColor, alpha, size)
+	MapSymbol.prototype.school = function(hexColor, alpha, size)
 	{
 		var symbol, rgb;
 		hexColor = hexColor ? hexColor : "#E000E0";
@@ -45,7 +45,7 @@
 		rgb.a = alpha;
 		size = size ? size : 16;
 		var pathString = 'M9.000,5.000 L9.000,10.000 L-0.000,10.000 L-0.000,5.000 L4.000,5.000 L4.000,3.000 L4.000,2.000 L4.000,-0.000 L5.000,-0.000 L6.000,-0.000 L6.000,'
-		+'1.000 L5.000,1.000 L5.000,2.000 L6.000,2.000 L6.000,3.000 L5.000,3.000 L5.000,5.000 L9.000,5.000 ZM8.000,1.000 L8.000,2.000 L6.000,2.000 L6.000,1.000 L8.000,1.000 Z';
+			+ '1.000 L5.000,1.000 L5.000,2.000 L6.000,2.000 L6.000,3.000 L5.000,3.000 L5.000,5.000 L9.000,5.000 ZM8.000,1.000 L8.000,2.000 L6.000,2.000 L6.000,1.000 L8.000,1.000 Z';
 		symbol = new this.ArcGIS.SimpleMarkerSymbol();
 		symbol.size = size;
 		symbol.color = rgb;
@@ -55,7 +55,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.student = function(hexColor, alpha, size)
+	MapSymbol.prototype.student = function(hexColor, alpha, size)
 	{
 		const self = this;
 		var symbol, rgb;
@@ -80,16 +80,16 @@
 		return symbol;
 	};
 
-	Symbol.prototype.assignedStudent = function(hexColor)
+	MapSymbol.prototype.assignedStudent = function(hexColor)
 	{
 		const self = this;
 		var rgb;
 		hexColor = hexColor ? hexColor : this.default.color;
 		rgb = this.ArcGIS.Color.fromHex(hexColor);
 		var pathString = "M101.141 14.0454C116.141 29.0454 116.141 75.0454 101.141 90.0454C93.1407 98.0454 93.1407 102.045 100.141 102.045C116.141 102.045 152.141 163.045 146."
-		+"141 179.045C143.141 186.045 135.141 192.045 127.141 192.045C118.141 192.045 113.141 210.045 111.141 249.045C108.141 306.045 108.141 307.045 78.1407 307.045C49."
-		+"1407 306.045 48.1407 305.045 45.1407 249.045C42.1407 200.045 39.1407 192.045 23.1407 192.045C-4.8593 192.045 -2.8593 160.045 27.1407 125.045C45.1407 103.045 49."
-		+"1407 92.0454 41.1407 73.0454C35.1407 56.0455 37.1407 42.0455 48.1407 26.0454C65.1407 0.0454478 83.1407 -3.95455 101.141 14.0454Z";
+			+ "141 179.045C143.141 186.045 135.141 192.045 127.141 192.045C118.141 192.045 113.141 210.045 111.141 249.045C108.141 306.045 108.141 307.045 78.1407 307.045C49."
+			+ "1407 306.045 48.1407 305.045 45.1407 249.045C42.1407 200.045 39.1407 192.045 23.1407 192.045C-4.8593 192.045 -2.8593 160.045 27.1407 125.045C45.1407 103.045 49."
+			+ "1407 92.0454 41.1407 73.0454C35.1407 56.0455 37.1407 42.0455 48.1407 26.0454C65.1407 0.0454478 83.1407 -3.95455 101.141 14.0454Z";
 
 		return {
 			type: self.Str_SimpleMarker,
@@ -99,37 +99,37 @@
 		};
 	};
 
-	Symbol.prototype.unassignedStudent = function()
+	MapSymbol.prototype.unassignedStudent = function()
 	{
 		return this.student("#005CE6", 0.75);
 	};
 
-	Symbol.unassignedStudentColor = "#1940aa";
-	Symbol.unassignedStudentHighlightColor = "#ffff00";
+	MapSymbol.unassignedStudentColor = "#1940aa";
+	MapSymbol.unassignedStudentHighlightColor = "#ffff00";
 
-	Symbol.prototype.getUnassignedStudentSymbol = function()
+	MapSymbol.prototype.getUnassignedStudentSymbol = function()
 	{
-		return this.student(TF.Map.Symbol.unassignedStudentColor, 1, 10);
+		return this.student(TF.Map.MapSymbol.unassignedStudentColor, 1, 10);
 	};
 
-	Symbol.prototype.getPartMatchStudentSymbol = function()
+	MapSymbol.prototype.getPartMatchStudentSymbol = function()
 	{
 		var symbol = this.student("#60b5ff", 1, 10);
 		symbol.outline = new tf.map.ArcGIS.SimpleLineSymbol({ width: 2, color: "#005CE6" });
 		return symbol;
 	};
 
-	Symbol.prototype.getUnassignedStudentHighlightSymbol = function()
+	MapSymbol.prototype.getUnassignedStudentHighlightSymbol = function()
 	{
-		return this.student(TF.Map.Symbol.unassignedStudentHighlightColor, 1, 10);
+		return this.student(TF.Map.MapSymbol.unassignedStudentHighlightColor, 1, 10);
 	};
 
-	Symbol.prototype.getAssignedStudentSymbol = function(color)
+	MapSymbol.prototype.getAssignedStudentSymbol = function(color)
 	{
 		return this.student(color, 1, 10);
 	};
 
-	Symbol.prototype.stop = function(hexColor, width, alpha)
+	MapSymbol.prototype.stop = function(hexColor, width, alpha)
 	{
 		const self = this;
 		var rgb;
@@ -148,7 +148,7 @@
 		};
 	};
 
-	Symbol.prototype.tripStop = function(sequence, color)
+	MapSymbol.prototype.tripStop = function(sequence, color)
 	{
 		const self = this;
 		var labelColor = TF.isLightness(color) ? "#000000" : "#ffffff"
@@ -162,7 +162,7 @@
 		return new tf.map.ArcGIS.PictureMarkerSymbol({ url: svg, height: 28, width: 28 });
 	};
 
-	Symbol.prototype.tripBoundaryPolygon = function(color)
+	MapSymbol.prototype.tripBoundaryPolygon = function(color)
 	{
 		const self = this;
 		return {
@@ -178,7 +178,7 @@
 		};
 	};
 
-	Symbol.prototype.tripPath = function(color)
+	MapSymbol.prototype.tripPath = function(color)
 	{
 		const self = this;
 		return {
@@ -189,7 +189,7 @@
 		};
 	};
 
-	Symbol.prototype.createStudentLabelSymbol = function(data, autoOffset)
+	MapSymbol.prototype.createStudentLabelSymbol = function(data, autoOffset)
 	{
 		var self = this;
 		var width = 60, height = 18;
@@ -206,7 +206,7 @@
 			});
 	};
 
-	Symbol.prototype.trialStopSymbol = function(color)
+	MapSymbol.prototype.trialStopSymbol = function(color)
 	{
 		var self = this;
 		var svgString = "<svg xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg' width='28' height='28'>" +
@@ -219,7 +219,7 @@
 		return new tf.map.ArcGIS.PictureMarkerSymbol({ url: svg, height: 32, width: 32 });
 	};
 
-	Symbol.prototype.labelSymbol = function(text, width, height, backgroundColor, borderColor, xoffset, yoffset)
+	MapSymbol.prototype.labelSymbol = function(text, width, height, backgroundColor, borderColor, xoffset, yoffset)
 	{
 		var self = this;
 		var svg = self.Str_DataImageSvg + btoa(
@@ -234,7 +234,7 @@
 		return new tf.map.ArcGIS.PictureMarkerSymbol({ url: svg, height: height + "px", width: width + "px", xoffset: xoffset + "px", yoffset: yoffset + "px" });
 	};
 
-	Symbol.prototype.createStopPoolSymbol = function(color)
+	MapSymbol.prototype.createStopPoolSymbol = function(color)
 	{
 		var self = this;
 		color = color ? color : self.symbolColors.bluePoint;
@@ -251,7 +251,7 @@
 			}
 		};
 	};
-	Symbol.prototype.highlightStopPoolSymbol = function(color)
+	MapSymbol.prototype.highlightStopPoolSymbol = function(color)
 	{
 		var self = this;
 		color = color ? color : self.symbolColors.bluePoint;
@@ -269,7 +269,7 @@
 		};
 	};
 
-	Symbol.prototype.PolygonReDrawSymbol = function()
+	MapSymbol.prototype.PolygonReDrawSymbol = function()
 	{
 		var self = this;
 		return {
@@ -285,7 +285,7 @@
 		};
 	};
 
-	Symbol.prototype.PolygonCreateSymbol = function()
+	MapSymbol.prototype.PolygonCreateSymbol = function()
 	{
 		var self = this;
 		return {
@@ -300,7 +300,7 @@
 			}
 		};
 	};
-	Symbol.prototype.highlightPolygonSymbol = function()
+	MapSymbol.prototype.highlightPolygonSymbol = function()
 	{
 		var self = this;
 		return {
@@ -316,7 +316,7 @@
 		};
 	};
 
-	Symbol.prototype.getHighlightLineSymbol = function()
+	MapSymbol.prototype.getHighlightLineSymbol = function()
 	{
 		const self = this;
 		return {
@@ -326,7 +326,7 @@
 		};
 	};
 
-	Symbol.prototype.tripStopSimpleMarker = function(color, size)
+	MapSymbol.prototype.tripStopSimpleMarker = function(color, size)
 	{
 		const self = this;
 		return {
@@ -343,7 +343,7 @@
 		};
 	};
 
-	Symbol.prototype.tripStopLabel = function(color)
+	MapSymbol.prototype.tripStopLabel = function(color)
 	{
 		var labelColor = TF.isLightness(color) ? "#000000" : "#ffffff"
 		return {
@@ -357,7 +357,7 @@
 		};
 	};
 
-	Symbol.prototype.studentCount = function(sequence, color)
+	MapSymbol.prototype.studentCount = function(sequence, color)
 	{
 		var self = this;
 		var labelColor = TF.isLightness(color) ? "#000000" : "#ffffff"
@@ -371,7 +371,7 @@
 		return new tf.map.ArcGIS.PictureMarkerSymbol({ url: svg, height: 24, width: 24 });
 	};
 
-	Symbol.prototype.schoolLocation = function(color, outlineColor)
+	MapSymbol.prototype.schoolLocation = function(color, outlineColor)
 	{
 		color = color || [112, 123, 249];
 		outlineColor = outlineColor || [215, 236, 254];
@@ -389,7 +389,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.getVehicleSymbol = function(heading)
+	MapSymbol.prototype.getVehicleSymbol = function(heading)
 	{
 		var url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAUgQAAFIEBla/'
 			+ 'LogAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAPlSURBVEiJnZXPSyRHFMe/VV09PXOYQBbZ0ZVRL7ogITE6Bxf0IrL+2MFA2KMKC4InPe'
@@ -416,7 +416,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.getEventSymbol = function(isStopEvent, color)
+	MapSymbol.prototype.getEventSymbol = function(isStopEvent, color)
 	{
 		var symbol;
 		if (isStopEvent)
@@ -431,7 +431,7 @@
 		return symbol;
 	};
 
-	Symbol.crossInCircleTemplate =
+	MapSymbol.crossInCircleTemplate =
 		'<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24" x="0px" xml:space="preserve" y="0px">'
 		+ '<g>'
 		+ '<circle cx="12" cy="12" fill="none" r="11" stroke="black" stroke-miterlimit="10" stroke-width="1"/>'
@@ -443,18 +443,18 @@
 		+ '<rect x="6" y="10" height="4" width="12" fill="{color}"/>'
 		+ '</g>'
 		+ '</svg>';
-	Symbol.circleTemplate = '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 6 6" viewBox="0 0 6 6" x="0px" xml:space="preserve" y="0px">'
+	MapSymbol.circleTemplate = '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 6 6" viewBox="0 0 6 6" x="0px" xml:space="preserve" y="0px">'
 		+ '<circle cx="3" cy="3" r="3" fill="black"/>'
 		+ '<circle cx="3" cy="3" r="2" fill="{color}"/>'
 		+ '</svg>';
-	Symbol.prototype.crossInCircle = function(color, size, offset)
+	MapSymbol.prototype.crossInCircle = function(color, size, offset)
 	{
 		var self = this;
 		var svg = self.Str_DataImageSvg + btoa(Symbol.crossInCircleTemplate.split("{color}").join(color));
 		return this.svgSymbol(svg, size, offset);
 	};
 
-	Symbol.prototype.circle = function(color)
+	MapSymbol.prototype.circle = function(color)
 	{
 		var self = this;
 		var size = [6, 6];
@@ -462,7 +462,7 @@
 		return this.svgSymbol(svg, size);
 	};
 
-	Symbol.prototype.editVertex = function()
+	MapSymbol.prototype.editVertex = function()
 	{
 		var symbol = new this.ArcGIS.SimpleMarkerSymbol();
 		symbol.setSize(10);
@@ -472,7 +472,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.editGhostVertex = function()
+	MapSymbol.prototype.editGhostVertex = function()
 	{
 		var symbol = new this.ArcGIS.SimpleMarkerSymbol();
 		symbol.setSize(10);
@@ -482,7 +482,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.editGhostLine = function(hexColor)
+	MapSymbol.prototype.editGhostLine = function(hexColor)
 	{
 		hexColor = hexColor ? hexColor : "#89C8C7";
 		var rgb = this.ArcGIS.Color.fromHex(hexColor);
@@ -496,7 +496,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.georegionPoint = function()
+	MapSymbol.prototype.georegionPoint = function()
 	{
 		const self = this;
 		return {
@@ -506,7 +506,7 @@
 		};
 	};
 
-	Symbol.prototype.georegionPolygon = function(geoRegionType)
+	MapSymbol.prototype.georegionPolygon = function(geoRegionType)
 	{
 		const self = this;
 		var opacity = 0,
@@ -540,7 +540,7 @@
 		};
 	};
 
-	Symbol.prototype.geosearchPolygon = function()
+	MapSymbol.prototype.geosearchPolygon = function()
 	{
 		var symbol = null;
 		symbol = new this.ArcGIS.SimpleFillSymbol();
@@ -549,14 +549,14 @@
 		return symbol;
 	};
 
-	Symbol.prototype.geosearchLine = function()
+	MapSymbol.prototype.geosearchLine = function()
 	{
 		var symbol = null;
 		symbol = new this.ArcGIS.ColorSimpleLineSymbol().setWidth(1).setColor([18, 89, 208, 0.6]);
 		return symbol;
 	};
 
-	Symbol.prototype.trip = function(hexColor, width, alpha, style)
+	MapSymbol.prototype.trip = function(hexColor, width, alpha, style)
 	{
 		var symbol, rgb;
 		hexColor = hexColor ? hexColor : this.default.color;
@@ -571,7 +571,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.svgSymbol = function(svg, size, offset)
+	MapSymbol.prototype.svgSymbol = function(svg, size, offset)
 	{
 		return new tf.map.ArcGIS.PictureMarkerSymbol({
 			url: svg,
@@ -582,7 +582,7 @@
 		});
 	};
 
-	Symbol.prototype.pathSymbol = function(pathString, color, size, isOutline, outlineColor, outlineWidth)
+	MapSymbol.prototype.pathSymbol = function(pathString, color, size, isOutline, outlineColor, outlineWidth)
 	{
 		const self = this;
 		var symbol, dString;
@@ -610,16 +610,16 @@
 		return symbol;
 	};
 
-	Symbol.prototype.clusterPoint = function(size)
+	MapSymbol.prototype.clusterPoint = function(size)
 	{
 		var symbol;
 		size = size ? size : 16;
 		symbol = new this.ArcGIS.SimpleMarkerSymbol().setSize(size).setColor(new this.ArcGIS.Color.fromHex('#000000'))
-		.setOutline(new this.ArcGIS.SimpleLineSymbol().setColor(new this.ArcGIS.Color.fromHex('#FFFFFF')).setWidth(2));
+			.setOutline(new this.ArcGIS.SimpleLineSymbol().setColor(new this.ArcGIS.Color.fromHex('#FFFFFF')).setWidth(2));
 		return symbol;
 	};
 
-	Symbol.prototype.label = function(text, xoffset, yoffset)
+	MapSymbol.prototype.label = function(text, xoffset, yoffset)
 	{
 		return {
 			type: "text",
@@ -634,7 +634,7 @@
 		};
 	};
 
-	Symbol.prototype.snapPoint = function()
+	MapSymbol.prototype.snapPoint = function()
 	{
 		var symbol = new this.ArcGIS.SimpleMarkerSymbol();
 		symbol.setStyle(this.ArcGIS.SimpleMarkerSymbol.STYLE_SQUARE);
@@ -645,7 +645,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.stopBuffer = function(hexColor)
+	MapSymbol.prototype.stopBuffer = function(hexColor)
 	{
 		var symbol, rgb;
 		hexColor = hexColor ? hexColor : this.default.color;
@@ -661,17 +661,17 @@
 		return symbol;
 	};
 
-	Symbol.prototype.transparentStop = function()
+	MapSymbol.prototype.transparentStop = function()
 	{
 		return this.stop("#000000", null, 0);
 	};
 
-	Symbol.prototype.highlightStop = function()
+	MapSymbol.prototype.highlightStop = function()
 	{
 		return this.stop(this.selectionColor);
 	};
 
-	Symbol.prototype.drawingCursor = function()
+	MapSymbol.prototype.drawingCursor = function()
 	{
 		var symbol = new this.ArcGIS.SimpleMarkerSymbol();
 		symbol.setOutline(new this.ArcGIS.SimpleLineSymbol().setColor(new this.ArcGIS.Color([137, 200, 199])));
@@ -680,7 +680,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.editGhostStop = function()
+	MapSymbol.prototype.editGhostStop = function()
 	{
 		var symbol = this.highlightStop();
 		symbol.setOutline(new this.ArcGIS.SimpleLineSymbol().setStyle(this.ArcGIS.SimpleLineSymbol.STYLE_DASH));
@@ -688,7 +688,7 @@
 		return symbol;
 	};
 
-	Symbol.prototype.measurementLocation = function()
+	MapSymbol.prototype.measurementLocation = function()
 	{
 		var self = this;
 		return new self.ArcGIS.SimpleMarkerSymbol()
@@ -697,22 +697,22 @@
 			.setSize(8);
 	};
 
-	Symbol.prototype.measurementLine = function()
+	MapSymbol.prototype.measurementLine = function()
 	{
 		return new this.ArcGIS.SimpleLineSymbol().setWidth(1).setColor([40, 128, 252, 1]);
 	};
 
-	Symbol.prototype.measurementLineVertex = function()
+	MapSymbol.prototype.measurementLineVertex = function()
 	{
 		// This is intentional
 	};
 
-	Symbol.prototype.measurementPolygon = function()
+	MapSymbol.prototype.measurementPolygon = function()
 	{
 		// This is intentional
 	};
 
-	Symbol.prototype.drawPointSymbol = function()
+	MapSymbol.prototype.drawPointSymbol = function()
 	{
 		var self = this;
 		return {
@@ -725,7 +725,7 @@
 		};
 	};
 
-	Symbol.prototype.editPointSymbol = function()
+	MapSymbol.prototype.editPointSymbol = function()
 	{
 		var self = this;
 		return {
@@ -738,7 +738,7 @@
 		};
 	};
 
-	Symbol.prototype.highlightPointSymbol = function(size)
+	MapSymbol.prototype.highlightPointSymbol = function(size)
 	{
 		const self = this;
 		return {
@@ -757,7 +757,7 @@
 		};
 	};
 
-	Symbol.prototype.drawPolylineSymbol = function()
+	MapSymbol.prototype.drawPolylineSymbol = function()
 	{
 		var self = this;
 		return {
@@ -768,7 +768,7 @@
 		};
 	};
 
-	Symbol.prototype.editPolylineSymbol = function()
+	MapSymbol.prototype.editPolylineSymbol = function()
 	{
 		const self = this;
 		return {
@@ -779,7 +779,7 @@
 		};
 	};
 
-	Symbol.prototype.drawPolygonSymbol = function()
+	MapSymbol.prototype.drawPolygonSymbol = function()
 	{
 		var self = this;
 		return new tf.map.ArcGIS.SimpleFillSymbol({
@@ -794,7 +794,7 @@
 		});
 	};
 
-	Symbol.prototype.editPolygonSymbol = function()
+	MapSymbol.prototype.editPolygonSymbol = function()
 	{
 		const self = this;
 		return new tf.map.ArcGIS.SimpleFillSymbol({
@@ -809,7 +809,7 @@
 		});
 	};
 
-	Symbol.prototype.postalCodePolygonSymbol = function()
+	MapSymbol.prototype.postalCodePolygonSymbol = function()
 	{
 		const self = this;
 		return new tf.map.ArcGIS.SimpleFillSymbol({
@@ -824,7 +824,7 @@
 		});
 	};
 
-	Symbol.prototype.waterPolygonSymbol = function()
+	MapSymbol.prototype.waterPolygonSymbol = function()
 	{
 		const self = this;
 		return new tf.map.ArcGIS.SimpleFillSymbol({
@@ -839,7 +839,7 @@
 		});
 	};
 
-	Symbol.prototype.waterPolylineSymbol = function()
+	MapSymbol.prototype.waterPolylineSymbol = function()
 	{
 		const self = this;
 		return {
@@ -850,7 +850,7 @@
 		};
 	};
 
-	Symbol.prototype.landmarkPolygonSymbol = function()
+	MapSymbol.prototype.landmarkPolygonSymbol = function()
 	{
 		const self = this;
 		return new tf.map.ArcGIS.SimpleFillSymbol({
@@ -865,7 +865,7 @@
 		});
 	};
 
-	Symbol.prototype.landmarkPolylineSymbol = function()
+	MapSymbol.prototype.landmarkPolylineSymbol = function()
 	{
 		const self = this;
 		return {
@@ -876,7 +876,7 @@
 		};
 	};
 
-	Symbol.prototype.landmarkPointSymbol = function()
+	MapSymbol.prototype.landmarkPointSymbol = function()
 	{
 		const self = this;
 		return {
@@ -895,7 +895,7 @@
 		};
 	};
 
-	Symbol.prototype.railroadPolylineSymbol = function()
+	MapSymbol.prototype.railroadPolylineSymbol = function()
 	{
 		const self = this;
 		return {
@@ -906,7 +906,7 @@
 		};
 	};
 
-	Symbol.prototype.polygonSymbol = function(color, outlineColor)
+	MapSymbol.prototype.polygonSymbol = function(color, outlineColor)
 	{
 		const self = this;
 		color = TF.Helper.MapHelper.getColorArray(color);
@@ -922,12 +922,12 @@
 		});
 	};
 
-	Symbol.prototype._setOpacity = function(color, opacity)
+	MapSymbol.prototype._setOpacity = function(color, opacity)
 	{
 		return color.concat([opacity / 255]);
 	};
 
-	Symbol.prototype.setHexColorOpacity = function(hexColor, opacity)
+	MapSymbol.prototype.setHexColorOpacity = function(hexColor, opacity)
 	{
 		var currentColor = hexColor ? tf.map.ArcGIS.Color.fromHex(hexColor) : tf.map.ArcGIS.Color.fromHex('#FF0000'),
 			currentOpacity = opacity ? opacity : 0;
@@ -935,7 +935,7 @@
 		return currentColor;
 	};
 
-	Symbol.prototype.arrow = function(color)
+	MapSymbol.prototype.arrow = function(color)
 	{
 		const self = this;
 		color = color || "#000000";
@@ -952,7 +952,7 @@
 		};
 	};
 
-	Symbol.prototype.arrowToPoint = function(color)
+	MapSymbol.prototype.arrowToPoint = function(color)
 	{
 		const self = this;
 		color = color || "#000000";
@@ -971,7 +971,7 @@
 		};
 	};
 
-	Symbol.prototype.arrowOnSide = function(color)
+	MapSymbol.prototype.arrowOnSide = function(color)
 	{
 		const self = this;
 		return {
@@ -984,7 +984,7 @@
 		};
 	};
 
-	Symbol.prototype.dispose = function()
+	MapSymbol.prototype.dispose = function()
 	{
 		tfdispose(this);
 	};

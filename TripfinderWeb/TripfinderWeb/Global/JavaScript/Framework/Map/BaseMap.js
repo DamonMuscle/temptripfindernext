@@ -114,7 +114,7 @@
 				// "esri/symbols/CIMSymbol",
 				"esri/views/draw/support/settings"
 			], function(
-				Map,
+				EsriMap,
 				Basemap,
 				// SceneView,
 				MapView,
@@ -203,7 +203,7 @@
 			{
 				self.ArcGIS = {
 					Color: Color,
-					Map: Map,
+					Map: EsriMap,
 					Basemap: Basemap,
 					MapView: MapView,
 					// mapViewDeps: mapViewDeps,
