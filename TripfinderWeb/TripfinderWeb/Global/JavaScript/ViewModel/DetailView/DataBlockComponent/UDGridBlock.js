@@ -53,10 +53,11 @@
 				{
 					command.push(viewBtnOption);
 				}
-				else
-				{
-					command.push(editBtnOption);
-				}
+				command.push(editBtnOption);
+			}
+
+			if (!isReadOnly)
+			{
 				command.push(deleteBtnOption);
 			}
 
