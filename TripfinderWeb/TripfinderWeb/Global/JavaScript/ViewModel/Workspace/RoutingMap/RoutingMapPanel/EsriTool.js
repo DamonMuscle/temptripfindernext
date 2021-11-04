@@ -1286,7 +1286,7 @@
 		{
 			if (item && item.type)
 			{
-				const bufferRegion = EsriTool._calculateExtendBufferInTurn(item, buffer);
+				const bufferRegion = EsriTool._calculateExtendBufferInTurn(item, buffer, map);
 				if (bufferRegion)
 				{
 					xmin = bufferRegion.xmin;
@@ -1305,7 +1305,7 @@
 		});
 	};
 
-	EsriTool._calculateExtendBufferInTurn = function(item, buffer)
+	EsriTool._calculateExtendBufferInTurn = function(item, buffer, map)
 	{
 		var xmax, xmin, ymax, ymin;
 		var geometryExtent = item.extent;
