@@ -4,7 +4,7 @@
 	</div>
 	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 	<!-- /ko -->
-	<div class="row" style="">
+	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
 				<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Vehicle')"></strong></h4>
@@ -17,7 +17,7 @@
 				<label class="requirestar" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Vehicle')"></label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obVehicleSource,format:function(obj){return obj.BusNum;},drowDownShow:true,selectedValue:obSelectedVehicle,notSort:true}">
-						<!-- ko customInput:{type:"String",value:obSelectedVehicleText,attributes:{class:"form-control",name:"vehicle"}} --><!-- /ko -->
+						<!-- ko customInput:{type:"Select",value:obSelectedVehicleText,attributes:{class:"form-control",name:"vehicle"}} --><!-- /ko -->
 					</div>
 					<div class="input-group-btn">
 						<button type="button" class="btn btn-default btn-sharp">
@@ -63,7 +63,7 @@
 		</div>
 	</div>
 
-	<div class="row" style="">
+	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
 				<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Driver')"></strong></h4>
@@ -76,7 +76,7 @@
 				<label class="" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Driver')"></label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obDriverSource,format:function(obj){return obj.FullName;},drowDownShow:true,selectedValue:obSelectedDriver,notSort:true}">
-						<!-- ko customInput:{type:"String",value:obSelectedDriverText,attributes:{class:"form-control",name:"driver"}} --><!-- /ko -->
+						<!-- ko customInput:{type:"Select",value:obSelectedDriverText,attributes:{class:"form-control",name:"driver"}} --><!-- /ko -->
 					</div>
 					<div class="input-group-btn">
 						<button type="button" class="btn btn-default btn-sharp">
@@ -176,7 +176,7 @@
 	</div>
 
 
-	<div class="row" style="">
+	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
 				<h4><strong data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')"></strong></h4>
@@ -189,7 +189,7 @@
 				<label class="" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide')"></label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obBusaideSource,format:function(obj){return obj.FullName;},drowDownShow:true,selectedValue:obSelectedBusAide,notSort:true}">
-						<!-- ko customInput:{type:"String",value:obSelectedBusAideText,attributes:{class:"form-control",name:"aide"}} --><!-- /ko -->
+						<!-- ko customInput:{type:"Select",value:obSelectedBusAideText,attributes:{class:"form-control",name:"aide"}} --><!-- /ko -->
 					</div>
 					<div class="input-group-btn">
 						<button type="button" class="btn btn-default btn-sharp">
