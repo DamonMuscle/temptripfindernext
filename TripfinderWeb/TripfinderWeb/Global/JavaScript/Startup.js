@@ -343,6 +343,10 @@
 						if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
 						{
 							tf.timezonetotalminutes = timeZoneResponse.Items[0];
+							tf.localTimeZone = {
+								timeZoneTotalMinutes: tf.timezonetotalminutes,
+								hoursDiff: tf.timezonetotalminutes / 60
+							};
 						}
 					});
 					var p3 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applications"), {
