@@ -83,9 +83,9 @@
 
 			{ fieldName: 'MileageRate', entityKey: 'MileageRate' },
 			{ fieldName: 'DriverRate', entityKey: 'DriverRate' },
-			{ fieldName: 'DriverOTRate', entityKey: 'DriverOTRate' },
+			{ fieldName: 'DriverOtrate', entityKey: 'DriverOTRate' },
 			{ fieldName: 'AideRate', entityKey: 'AideRate' },
-			{ fieldName: 'AideOTRate', entityKey: 'AideOTRate' },
+			{ fieldName: 'AideOtrate', entityKey: 'AideOTRate' },
 		]
 	};
 
