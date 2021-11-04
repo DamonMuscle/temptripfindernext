@@ -43,6 +43,7 @@
 		if (this.field.readonly)
 		{
 			input.attr("readonly", "readonly")
+			this.maskedInput.readonly();
 		}
 		input.val(tf.dataFormatHelper.phoneFormatter(this.field.value));
 		this._value = this.field.value;//this._value: different from this.value, will not trigger validation

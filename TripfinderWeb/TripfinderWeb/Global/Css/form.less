@@ -890,6 +890,7 @@
 							.memo-question.question,
 							.currency-question .question,
 							.telphone-question,
+							input.phone-question,
 							.systemfield-question.question
 							{
 								border: 1px solid @editableTextBorderColor;
@@ -1084,7 +1085,7 @@
 							
 							&.readonly
 							{
-								input[type='text'],input[type='number'], textarea
+								input[type='text'],input[type='tel'],input[type='number'], textarea
 								{
 									&[readonly], &[disabled]
 									{
