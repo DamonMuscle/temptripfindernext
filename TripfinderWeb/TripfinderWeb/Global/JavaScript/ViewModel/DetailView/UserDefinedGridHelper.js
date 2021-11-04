@@ -534,7 +534,8 @@
 		var result = false;
 		if (udGrid && udGrid.UDGridFields && udGrid.UDGridFields.length > 0)
 		{
-			udGrid.UDGridFields.forEach(udGridField => {
+			udGrid.UDGridFields.forEach(udGridField =>
+			{
 				if (udGridField.FieldOptions && udGridField.FieldOptions.TypeName && udGridField.FieldOptions.TypeName === "Signature")
 				{
 					result = true;
@@ -650,7 +651,6 @@
 		}
 
 		const recordValueObj = JSON.parse(rawFormRecord.RecordValue);
-		convertedRecord = {};
 		convertedRecord.Id = rawFormRecord.ID;
 		for (const fguid in formQuestionGuidToNameDict)
 		{
