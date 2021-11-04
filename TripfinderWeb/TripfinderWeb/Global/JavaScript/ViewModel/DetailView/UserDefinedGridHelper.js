@@ -638,7 +638,7 @@
 
 	UserDefinedGridHelper.prototype.getFormRecord = function(formQuestionGuidToNameDict, rawFormRecord)
 	{
-		let convertedRecord = {};
+		var convertedRecord = {};
 		//Created By / Last Updated By / Last Updated On
 		TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().forEach(c =>
 		{
