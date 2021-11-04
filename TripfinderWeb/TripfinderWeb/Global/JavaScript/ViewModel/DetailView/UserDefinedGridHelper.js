@@ -534,7 +534,8 @@
 		var result = false;
 		if (udGrid && udGrid.UDGridFields && udGrid.UDGridFields.length > 0)
 		{
-			udGrid.UDGridFields.forEach(udGridField => {
+			udGrid.UDGridFields.forEach(udGridField =>
+			{
 				if (udGridField.FieldOptions && udGridField.FieldOptions.TypeName && udGridField.FieldOptions.TypeName === "Signature")
 				{
 					result = true;
@@ -638,6 +639,12 @@
 	UserDefinedGridHelper.prototype.getFormRecord = function(formQuestionGuidToNameDict, rawFormRecord)
 	{
 		let convertedRecord = {};
+		//Created By / Last Updated By / Last Updated On
+		TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().forEach(c =>
+		{
+			convertedRecord[c.FieldName] = rawFormRecord[c.FieldName] || "";
+		});
+
 		if (!rawFormRecord || !rawFormRecord.RecordValue)
 		{
 			return convertedRecord;
@@ -677,11 +684,6 @@
 			convertedRecord["longitude"] = recordValueObj["longitude"];
 		}
 
-		//Created By / Last Updated By / Last Updated On
-		TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().forEach(c =>
-		{
-			convertedRecord[c.FieldName] = rawFormRecord[c.FieldName] || "";
-		});
 
 		return convertedRecord;
 	};
