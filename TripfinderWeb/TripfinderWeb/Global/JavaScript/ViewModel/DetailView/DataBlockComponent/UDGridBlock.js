@@ -7,7 +7,6 @@
 	function UDGridBlock(options, detailView)
 	{
 		var self = this;
-
 		TF.DetailView.DataBlockComponent.BaseDataBlock.call(self, detailView);
 		self.$detailView = detailView.$element;
 		self.gridType = detailView.gridType;
@@ -24,45 +23,26 @@
 			DisplayName: "Document Count",
 			Width: "120px"
 		};
-		self._getActionColumns = function(isEditableBasedOnSignedPolicy, isReadOnly)
+		self._getActionColumns = function()
 		{
-			const command = [];
-			const viewBtnOption = {
-				name: 'view',
-				template: '<a class="k-button k-button-icontext k-grid-view" title="View" href="javascript:void(0)"></a>',
-				click: self.editClickEvent.bind(self)
-			};
-			const editBtnOption = {
-				name: 'edit',
-				template: '<a class="k-button k-button-icontext k-grid-edit" title="Edit"></a>',
-				click: self.editClickEvent.bind(self)
-			};
-			const deleteBtnOption = {
-				name: "delete",
-				template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"></a>',
-				click: self.deleteRecord.bind(self)
-			};
-
-			if (isReadOnly)
-			{
-				command.push(viewBtnOption);
-			}
-			else
-			{
-				if (isEditableBasedOnSignedPolicy)
-				{
-					command.push(viewBtnOption);
-				}
-				command.push(editBtnOption);
-			}
-
-			if (!isReadOnly)
-			{
-				command.push(deleteBtnOption);
-			}
-
 			return {
-				command: command,
+				command: [
+					{
+						name: 'view',
+						template: '<a style="display:none" class="k-button k-button-icontext k-grid-view" title="View" href="javascript:void(0)"></a>',
+						click: self.editClickEvent.bind(self)
+					},
+					{
+						name: 'edit',
+						template: '<a style="display:none" class="k-button k-button-icontext k-grid-edit" title="Edit"></a>',
+						click: self.editClickEvent.bind(self)
+					},
+					{
+						name: "delete",
+						template: '<a style="display:none" class="k-button k-button-icontext k-grid-delete" title="Delete"></a>',
+						click: self.deleteRecord.bind(self)
+					}
+				],
 				FieldName: "Action",
 				DisplayName: "Action",
 				Width: '80px',
@@ -204,9 +184,7 @@
 		{
 			originColumns.push(self._documentColumn);
 		}
-
-		const isEditableBasedOnSignedPolicy = tf.udgHelper.getEditableBasedOnSignedPolicy(self.options);
-		return originColumns.concat(self._getActionColumns(isEditableBasedOnSignedPolicy));
+		return originColumns.concat(self._getActionColumns());
 	};
 
 	UDGridBlock.prototype.initEvents = function()
@@ -328,8 +306,7 @@
 
 		if (col === "Action")
 		{
-			const isEditableBasedOnSignedPolicy = tf.udgHelper.getEditableBasedOnSignedPolicy(self.options);
-			columns.push(self._getActionColumns(isEditableBasedOnSignedPolicy, self.isReadOnly()));
+			columns.push(self._getActionColumns());
 		}
 		else if (TF.DetailView.UserDefinedGridHelper.isGeoInfoColumn(col))
 		{
@@ -664,6 +641,10 @@
 			dataBound: function()
 			{
 				self._bindMiniGridEvent(self.$el.find(KENDO_GRID_SELECTOR));
+				if (self.grid)
+				{
+					UDGridBlock.renderCommandBtn.bind(self)();
+				}
 			}
 		};
 
@@ -677,10 +658,6 @@
 			dataSource: getDataSource,
 			sort: self.options.sort,
 			gridOptions: $.extend(defaultGridOptions, {}),
-			afterRenderCallback: function(kendoGrid, dataItems)
-			{
-				TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(kendoGrid, dataItems);
-			}.bind(self)
 		};
 
 		var grid = tf.helpers.kendoGridHelper.createSimpleGrid(self.$el, options);
@@ -689,10 +666,6 @@
 
 		function refreshGrid()
 		{
-			grid.options.afterRenderCallback = function(kendoGrid, dataItems)
-			{
-				TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(kendoGrid, dataItems);
-			}.bind(self)
 			tf.helpers.kendoGridHelper.setGridDataSource(grid, getDataSource, grid.options);
 		}
 
@@ -899,9 +872,17 @@
 		return tf.authManager.isAuthorizedForDataType(dataType, "edit");
 	};
 
-	UDGridBlock.renderCommandBtn = function(kendoGrid, dataItems)
+	UDGridBlock.renderCommandBtn = function()
 	{
-		if (!kendoGrid || !dataItems || !dataItems.length)
+		const self = this;
+		const kendoGrid = self.grid;
+		if (!kendoGrid)
+		{
+			return;
+		}
+
+		const dataItems = self.grid.dataItems();
+		if (!dataItems || !dataItems.length)
 		{
 			return;
 		}
@@ -916,7 +897,7 @@
 		{
 			if ($rows.length >= idx + 1)
 			{
-				_SetEditAndReadBtn(kendoGrid, dataItem, idx, $rows)
+				_SetEditAndReadBtn.bind(self)(kendoGrid, dataItem, idx, $rows)
 			}
 
 		});
@@ -924,26 +905,29 @@
 
 	function _SetEditAndReadBtn(kendoGrid, dataItem, idx, $rows)
 	{
+		const self = this;
 		const $editBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-edit');
 		const $viewBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-view');
-
+		const $delBtn = $($rows[idx + 1]).find('.k-button.k-button-icontext.k-grid-delete');
 		const udfFields = kendoGrid.options.columns.filter(c => c.udfType === "SignatureBlock").map(d =>
 		{
 			return { Type: 15, Guid: d.FieldName };
 		});
-		const isReadOnly = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(dataItem, udfFields);
-		if (isReadOnly)
+		const hasSignatureRespond = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(dataItem, udfFields);
+		if (self.isReadOnly())
 		{
-			if ($editBtn && $editBtn.length)
-			{
-				$editBtn.hide();
-			}
+			$viewBtn.show();
 		}
 		else
 		{
-			if ($viewBtn && $viewBtn.length)
+			$delBtn.show();
+			if (hasSignatureRespond)
 			{
-				$viewBtn.hide();
+				$viewBtn.show();
+			}
+			else
+			{
+				$editBtn.show();
 			}
 		}
 	}
