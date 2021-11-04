@@ -1286,7 +1286,7 @@
 		{
 			if (item && item.type)
 			{
-				const bufferRegion = self._calculateExtendBufferInTurn(item, buffer);
+				const bufferRegion = EsriTool._calculateExtendBufferInTurn(item, buffer);
 				if (bufferRegion)
 				{
 					xmin = bufferRegion.xmin;

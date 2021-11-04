@@ -1218,6 +1218,7 @@
 		{
 			this.locationMarkerTool = new TF.Form.Map.LocationMarkerTool(this);
 		}
+		this.locationMarkerTool.disableTrashBtn();
 		this.locationMarkerTool.drawMarker(locatonMarker);
 	}
 

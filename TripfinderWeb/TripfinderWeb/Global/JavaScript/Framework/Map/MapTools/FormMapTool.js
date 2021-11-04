@@ -429,6 +429,15 @@ const OrientationchangeMIMD = "orientationchange.mapIsMobileDevice";
 		}
 	}
 
+	LocationMarkerTool.prototype.disableTrashBtn = function()
+	{
+		var self = this;
+		if (self.routingMapTool.$mapToolBar)
+		{
+			self.routingMapTool.$mapToolBar.find('.trash').addClass('disable');
+		}
+	}
+
 	function intializeShapeDraw()
 	{
 		const self = this;

@@ -14,7 +14,7 @@
 	{
 		const input = $(`<input class="phone-question question" type="tel" placeholder="Enter your phone number"/>`);
 		this.maskedInput = input.kendoMaskedTextBox({
-			mask: '0000000000000',
+			mask: this.field.readonly ? '' : '0000000000000',
 			change: () =>
 			{
 				if (this.maskedInput.element[0].value.length > 13)
@@ -42,7 +42,7 @@
 
 		if (this.field.readonly)
 		{
-			input.attr("readonly", "readonly")
+			input.attr("readonly", "readonly");
 		}
 		input.val(tf.dataFormatHelper.phoneFormatter(this.field.value));
 		this._value = this.field.value;//this._value: different from this.value, will not trigger validation
