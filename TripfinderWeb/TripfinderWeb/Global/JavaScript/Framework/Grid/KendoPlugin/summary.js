@@ -338,21 +338,20 @@
 		{
 			return value;
 		}
-		if (column.type === "date")
+		if (column.type === "date" || column.type === "time" || column.type === "datetime")
 		{
-			if (new Date(value) !== 'Invalid Date' && moment(value).isValid() === true && value !== 0)
+			let formartedValue = "";
+			if (column.type === "time")
 			{
-				value = moment(value).toDate();
-				return kendo.format(column.format, value);
+				value = `${moment().format("YYYY-MM-DD")} ${value}`;
 			}
-			else
+			var momentValue = moment(value);
+			if (momentValue.isValid() === true)
 			{
-				return "";
+				value = momentValue.toDate();
+				formartedValue = kendo.format(column.format, value);
 			}
-		}
-		if (column.type === "time")
-		{
-			return kendo.format(column.format, value);
+			return formartedValue
 		}
 		if (operator === 'Average' || ((operator === 'Sum' || operator === 'Min' || operator === 'Max') && column.type === 'number'))
 		{
