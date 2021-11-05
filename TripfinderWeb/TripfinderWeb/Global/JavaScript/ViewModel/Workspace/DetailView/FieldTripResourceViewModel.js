@@ -236,6 +236,7 @@
 		{
 			self._populateDriverFieldValues();
 		});
+		self.obSelectedDriverIsNull = ko.observable(true);
 		self.obDriverBillingHours = ko.observable(isNew ? null : entity.DriverHours);
 		self.obDriverBillingRate = ko.observable(isNew ? null : entity.DriverRate);
 		self.obDriverBillingCost = ko.computed(function()
@@ -294,6 +295,7 @@
 		{
 			self._populateAideFieldValues();
 		});
+		self.obSelectedAideIsNull = ko.observable(false);
 		self.obAideBillingHours = ko.observable(isNew ? null : entity.AideHours);
 		self.obAideBillingRate = ko.observable(isNew ? null : entity.AideRate);
 		self.obAideBillingCost = ko.computed(function()
@@ -381,6 +383,7 @@
 
 		if (driver && driver.Id != -1)
 		{
+			self.obSelectedDriverIsNull(false);
 			if (!self.isSelectedDriverChanged && (self.options.entity == null || driver.Id != self.options.entity.DriverId))
 			{
 				self.isSelectedDriverChanged = true;
@@ -403,10 +406,18 @@
 		}
 		else
 		{
+			self.obSelectedDriverIsNull(true);
 			self.obDriverBillingHours(null);
 			self.obDriverBillingRate(null);
+			self.obDriverBillingOTHours(null);
 			self.obDriverBillingOTRate(null);
 			self.obDriverBillingFixedCost(null);
+			self.obExpensesParking(null);
+			self.obExpensesTolls(null);
+			self.obExpensesMeals(null);
+			self.obExpensesMisc(null);
+
+
 		}
 	};
 
@@ -416,6 +427,7 @@
 
 		if (aide && aide.Id != -1)
 		{
+			this.obSelectedAideIsNull(false);
 			if (!self.isSelectedAideChanged && (self.options.entity == null || aide.Id != self.options.entity.AideId))
 			{
 				self.isSelectedAideChanged = true;
@@ -438,10 +450,12 @@
 		}
 		else
 		{
+			this.obSelectedAideIsNull(true);
 			self.obAideBillingHours(null);
 			self.obAideBillingRate(null);
 			self.obAideBillingOTRate(null);
 			self.obAideBillingFixedCost(null);
+			self.obAideBillingOTHours(null);
 		}
 	};
 

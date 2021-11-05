@@ -36,19 +36,22 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Start</label>
-					<!-- ko customInput:{type:"Decimal",value:obOdometerStart,attributes:{class:"form-control",name:"odometerstart", maxlength:"50"}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obOdometerStart,attributes:{class:"form-control",name:"odometerstart", maxlength:"50"}} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Ending</label>
-					<!-- ko customInput:{type:"Decimal",value:obOdometerEnding,attributes:{class:"form-control",name:"odometerending", maxlength:"50"}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obOdometerEnding,attributes:{class:"form-control",name:"odometerending", maxlength:"50"}} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group">
 					<label>Total Miles</label>
-					<input readonly type="text" name="difference" class="form-control" data-bind="value:obOdometerDifference()" />
+					<input readonly type="text" name="difference" class="form-control"
+						data-bind="value:obOdometerDifference()" />
 				</div>
 			</div>
 		</div>
@@ -56,7 +59,8 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Mileage Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obMileageRate,attributes:{class:"form-control",name:"mileagerate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obMileageRate,attributes:{class:"form-control",name:"mileagerate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -110,13 +114,15 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Hours</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingHours,attributes:{class:"form-control",name:"driverbillinghours", maxlength:"50"}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingHours,attributes:{class:"form-control",name:"driverbillinghours", maxlength:"50"},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingRate,attributes:{class:"form-control",name:"driverbillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingRate,attributes:{class:"form-control",name:"driverbillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -130,13 +136,15 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>OT Hours</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTHours,attributes:{class:"form-control",name:"driverbillingothours", maxlength:"50"}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTHours,attributes:{class:"form-control",name:"driverbillingothours", maxlength:"50"}, disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>OT Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTRate,attributes:{class:"form-control",name:"driverbillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingOTRate,attributes:{class:"form-control",name:"driverbillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -150,7 +158,8 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Fixed Cost</label>
-					<!-- ko customInput:{type:"Decimal",value:obDriverBillingFixedCost,attributes:{class:"form-control",name:"driverbillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obDriverBillingFixedCost,attributes:{class:"form-control",name:"driverbillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 		</div>
@@ -165,13 +174,15 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Parking</label>
-					<!-- ko customInput:{type:"Decimal",value:obExpensesParking,attributes:{class:"form-control",name:"expensesparking", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obExpensesParking,attributes:{class:"form-control",name:"expensesparking", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Tolls</label>
-					<!-- ko customInput:{type:"Decimal",value:obExpensesTolls,attributes:{class:"form-control",name:"expensestolls", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obExpensesTolls,attributes:{class:"form-control",name:"expensestolls", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 		</div>
@@ -179,13 +190,15 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Meals</label>
-					<!-- ko customInput:{type:"Decimal",value:obExpensesMeals,attributes:{class:"form-control",name:"expensesmeals", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obExpensesMeals,attributes:{class:"form-control",name:"expensesmeals", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Misc</label>
-					<!-- ko customInput:{type:"Decimal",value:obExpensesMisc,attributes:{class:"form-control",name:"expensesmisc", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obExpensesMisc,attributes:{class:"form-control",name:"expensesmisc", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedDriverIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -239,13 +252,15 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Hours</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingHours,attributes:{class:"form-control",name:"aidebillinghours", maxlength:"50"}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingHours,attributes:{class:"form-control",name:"aidebillinghours", maxlength:"50"},disable:obSelectedAideIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingRate,attributes:{class:"form-control",name:"aidebillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingRate,attributes:{class:"form-control",name:"aidebillingRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedAideIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -259,13 +274,15 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>OT Hours</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTHours,attributes:{class:"form-control",name:"aidebillingothours", maxlength:"50"}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTHours,attributes:{class:"form-control",name:"aidebillingothours", maxlength:"50"},disable:obSelectedAideIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>OT Rate</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTRate,attributes:{class:"form-control",name:"aidebillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingOTRate,attributes:{class:"form-control",name:"aidebillingotRate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedAideIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 			<div class="col-xs-8">
@@ -279,7 +296,8 @@
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
 					<label>Fixed Cost</label>
-					<!-- ko customInput:{type:"Decimal",value:obAideBillingFixedCost,attributes:{class:"form-control",name:"aidebillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} --><!-- /ko -->
+					<!-- ko customInput:{type:"Decimal",value:obAideBillingFixedCost,attributes:{class:"form-control",name:"aidebillingfixedcost", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange},disable:obSelectedAideIsNull} -->
+					<!-- /ko -->
 				</div>
 			</div>
 		</div>
