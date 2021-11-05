@@ -70,7 +70,7 @@
 			return 0;
 		}
 		return Number(fieldTripResourceDataEntry.DriverHours) * Number(fieldTripResourceDataEntry.DriverRate) +
-			Number(fieldTripResourceDataEntry.DriverOthours) * Number(fieldTripResourceDataEntry.DriverOtrate) +
+			Number(fieldTripResourceDataEntry.DriverOTHours) * Number(fieldTripResourceDataEntry.DriverOTRate) +
 			Number(fieldTripResourceDataEntry.DriverFixedCost);
 	}
 
@@ -82,7 +82,7 @@
 	FieldTripResourcesHelper.prototype.busAideCostComputer = function(fieldTripResourceDataEntry)
 	{
 		return Number(fieldTripResourceDataEntry.AideHours) * Number(fieldTripResourceDataEntry.AideRate) +
-			Number(fieldTripResourceDataEntry.AideOthours) * Number(fieldTripResourceDataEntry.AideOtrate) +
+			Number(fieldTripResourceDataEntry.AideOTHours) * Number(fieldTripResourceDataEntry.AideOTRate) +
 			Number(fieldTripResourceDataEntry.AideFixedCost);
 	}
 

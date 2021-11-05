@@ -1725,8 +1725,8 @@
 
 		for (var i = 0; i < resource1.length; i++)
 		{
-			var fields = ["AideFixedCost", "AideHours", "AideId", "AideOthours", "AideOtrate", "AideRate", "Chaperone", "Chaperone2", "Chaperone3", "Chaperone4",
-				"DriverExpMeals", "DriverExpMisc", "DriverExpParking", "DriverExpTolls", "DriverFixedCost", "DriverHours", "DriverId", "DriverOthours", "DriverOtrate", "DriverRate",
+			var fields = ["AideFixedCost", "AideHours", "AideId", "AideOTHours", "AideOTRate", "AideRate", "Chaperone", "Chaperone2", "Chaperone3", "Chaperone4",
+				"DriverExpMeals", "DriverExpMisc", "DriverExpParking", "DriverExpTolls", "DriverFixedCost", "DriverHours", "DriverId", "DriverOTHours", "DriverOTRate", "DriverRate",
 				"Endingodometer", "MileageRate", "Startingodometer", "VehFixedCost", "VehicleId"];
 			if (!this.areFieldsSame(resource1[i], resource2[i], fields))
 			{

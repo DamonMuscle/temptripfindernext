@@ -72,7 +72,7 @@
 						<div class="col-xs-20">
 							<label data-bind="text:$parent.getUserName($data,'driver')"></label>
 							<div>
-								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.DriverRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.DriverOtrate)"></span>
+								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.DriverRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.DriverOTRate)"></span>
 							</div>
 						</div>
 					</div>
@@ -80,11 +80,11 @@
 					<hr />
 					<label>Hours Worked</label>
 					<div class="info">Regular<span class="info pull-right" data-bind="text:$data.DriverHours"></span></div>
-					<div class="info">Overtime<span class="info pull-right" data-bind="text:$data.DriverOthours"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$data.DriverOTHours"></span></div>
 					<hr />
 					<label>Billing</label>
 					<div class="info">Regular<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverHours * $data.DriverRate)"></span></div>
-					<div class="info">Overtime<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverOthours * $data.DriverOtrate)"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverOTHours * $data.DriverOTRate)"></span></div>
 					<div class="info">Fixed Cost<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.DriverFixedCost)"></span></div>
 					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
 					<div class="info text-right" data-bind="text:$parent.driverCostComputer($data).toFixed(2)"></div>
@@ -106,7 +106,7 @@
 						<div class="col-xs-20">
 							<label data-bind="text:$parent.getUserName($data,'staff')"></label>
 							<div>
-								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.AideRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.AideOtrate)"></span>
+								<span class="info" data-bind="text:'Hourly: ' + $parent.formatCurrency($data.AideRate) + ', ' + 'Overtime: ' + $parent.formatCurrency($data.AideOTRate)"></span>
 							</div>
 						</div>
 					</div>
@@ -114,11 +114,11 @@
 					<hr />
 					<label>Hours Worked</label>
 					<div class="info">Regular<span class="info pull-right" data-bind="text:$data.AideHours"></span></div>
-					<div class="info">Overtime<span class="info pull-right" data-bind="text:$data.AideOthours"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$data.AideOTHours"></span></div>
 					<hr />
 					<label>Billing</label>
 					<div class="info">Regular<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideHours * $data.AideRate)"></span></div>
-					<div class="info">Overtime<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideOthours * $data.AideOtrate)"></span></div>
+					<div class="info">Overtime<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideOTHours * $data.AideOTRate)"></span></div>
 					<div class="info">Fixed Cost<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.AideFixedCost)"></span></div>
 					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
 					<div class="info text-right" data-bind="text:$parent.formatCurrency($parent.busAideCostComputer($data))"></div>

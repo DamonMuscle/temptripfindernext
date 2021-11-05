@@ -30,7 +30,7 @@
 		this.obDriverTotal = ko.computed(function()
 		{
 			return Number(this.obEntityDataModel().driverHours()) * Number(this.obEntityDataModel().driverRate())
-				+ Number(this.obEntityDataModel().driverOthours()) * Number(this.obEntityDataModel().driverOtrate())
+				+ Number(this.obEntityDataModel().driverOTHours()) * Number(this.obEntityDataModel().driverOTRate())
 				+ Number(this.obEntityDataModel().driverFixedCost())
 				+ Number(this.obEntityDataModel().driverExpParking())
 				+ Number(this.obEntityDataModel().driverExpTolls())
@@ -41,7 +41,7 @@
 		this.obAideTotal = ko.computed(function()
 		{
 			return Number(this.obEntityDataModel().aideHours()) * Number(this.obEntityDataModel().aideRate())
-				+ Number(this.obEntityDataModel().aideOthours()) * Number(this.obEntityDataModel().aideOtrate())
+				+ Number(this.obEntityDataModel().aideOTHours()) * Number(this.obEntityDataModel().aideOTRate())
 				+ Number(this.obEntityDataModel().aideFixedCost());
 		}.bind(this));
 
@@ -80,13 +80,13 @@
 				if (this.obFieldTrip)
 				{
 					this.obEntityDataModel().driverRate(this.obFieldTrip.DriverRate || e.Rate ? this.obFieldTrip.DriverRate || e.Rate : 0);
-					this.obEntityDataModel().driverOtrate(this.obFieldTrip.DriverOtrate || e.Otrate ? this.obFieldTrip.DriverOtrate || e.Otrate : 0);
+					this.obEntityDataModel().driverOTRate(this.obFieldTrip.DriverOtrate || e.Otrate ? this.obFieldTrip.DriverOtrate || e.Otrate : 0);
 					this.obEntityDataModel().driverFixedCost(this.obFieldTrip.DriverFixedCost ? this.obFieldTrip.DriverFixedCost : 0);
 				}
 				else
 				{
 					this.obEntityDataModel().driverRate(e.Rate ? e.Rate : 0);
-					this.obEntityDataModel().driverOtrate(e.Otrate ? e.Otrate : 0);
+					this.obEntityDataModel().driverOTRate(e.Otrate ? e.Otrate : 0);
 				}
 			}
 		}.bind(this));
@@ -101,13 +101,13 @@
 				if (this.obFieldTrip)
 				{
 					this.obEntityDataModel().aideRate(this.obFieldTrip.AideRate || e.Rate ? this.obFieldTrip.AideRate || e.Rate : 0);
-					this.obEntityDataModel().aideOtrate(this.obFieldTrip.AideOtrate || e.Otrate ? this.obFieldTrip.AideOtrate || e.Otrate : 0);
+					this.obEntityDataModel().aideOTRate(this.obFieldTrip.AideOtrate || e.Otrate ? this.obFieldTrip.AideOtrate || e.Otrate : 0);
 					this.obEntityDataModel().aideFixedCost(this.obFieldTrip.AideFixedCost ? this.obFieldTrip.AideFixedCost : 0);
 				}
 				else
 				{
 					this.obEntityDataModel().aideRate(e.Rate ? e.Rate : 0);
-					this.obEntityDataModel().aideOtrate(e.Otrate ? e.Otrate : 0);
+					this.obEntityDataModel().aideOTRate(e.Otrate ? e.Otrate : 0);
 				}
 			}
 		}.bind(this));
