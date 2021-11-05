@@ -100,7 +100,4 @@
 	{
 		return tf.authManager.authorizationUrl('image', imageType, imageId);
 	}
-
-
 })();
-

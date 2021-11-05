@@ -38,16 +38,14 @@
 		{ from: "DriverOthours", default: 0 },
 		{ from: "DriverOtrate", default: 0 },
 		{ from: "DriverRate", default: 0 },
-		{ from: "Endingodometer", default: 0 },
+		{ from: "EndingOdometer", default: 0 },
 		{ from: "FieldTripResourceGroupId", default: 0 },
 		{ from: "MileageRate", default: 0 },
-		{ from: "Startingodometer", default: 0 },
+		{ from: "StartingOdometer", default: 0 },
 		{ from: "VehFixedCost", default: 0 },
 		{ from: "Vehicle", default: "" },
 		{ from: "VehicleId", default: 0 },
 		{ from: "VehicleName", default: "" },
 		{ from: "resourceId", default: 0 }
 	];
-
-
 })();

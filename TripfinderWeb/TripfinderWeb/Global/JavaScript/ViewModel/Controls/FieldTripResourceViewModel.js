@@ -21,7 +21,7 @@
 		{
 			if (this.obEditTieldTrip())
 			{
-				return (Number(this.obEntityDataModel().endingodometer()) - Number(this.obEntityDataModel().startingodometer())) * Number(this.obEntityDataModel().mileageRate())
+				return (Number(this.obEntityDataModel().endingOdometer()) - Number(this.obEntityDataModel().startingOdometer())) * Number(this.obEntityDataModel().mileageRate())
 					+ Number(this.obEntityDataModel().vehFixedCost());
 			}
 			else { return Number(this.obEntityDataModel().vehFixedCost()) }
