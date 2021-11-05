@@ -416,8 +416,6 @@
 			self.obExpensesTolls(null);
 			self.obExpensesMeals(null);
 			self.obExpensesMisc(null);
-
-
 		}
 	};
 
