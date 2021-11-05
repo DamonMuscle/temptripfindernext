@@ -53,9 +53,9 @@
 	{
 		if (fieldTripResourceDataEntry.FieldTripId == 0)
 		{
-			return 0 //FT-296 When add a new field trip the Endingodometer will be disable and the MileageRate will not be calculated.
+			return 0 //FT-296 When add a new field trip the EndingOdometer will be disable and the MileageRate will not be calculated.
 		}
-		return (Number(fieldTripResourceDataEntry.Endingodometer) - Number(fieldTripResourceDataEntry.Startingodometer)) * Number(fieldTripResourceDataEntry.MileageRate);
+		return (Number(fieldTripResourceDataEntry.EndingOdometer) - Number(fieldTripResourceDataEntry.StartingOdometer)) * Number(fieldTripResourceDataEntry.MileageRate);
 	}
 
 	FieldTripResourcesHelper.prototype.vehicleCostComputer = function(fieldTripResourceDataEntry)
@@ -70,7 +70,7 @@
 			return 0;
 		}
 		return Number(fieldTripResourceDataEntry.DriverHours) * Number(fieldTripResourceDataEntry.DriverRate) +
-			Number(fieldTripResourceDataEntry.DriverOthours) * Number(fieldTripResourceDataEntry.DriverOtrate) +
+			Number(fieldTripResourceDataEntry.DriverOTHours) * Number(fieldTripResourceDataEntry.DriverOTRate) +
 			Number(fieldTripResourceDataEntry.DriverFixedCost);
 	}
 
@@ -82,7 +82,7 @@
 	FieldTripResourcesHelper.prototype.busAideCostComputer = function(fieldTripResourceDataEntry)
 	{
 		return Number(fieldTripResourceDataEntry.AideHours) * Number(fieldTripResourceDataEntry.AideRate) +
-			Number(fieldTripResourceDataEntry.AideOthours) * Number(fieldTripResourceDataEntry.AideOtrate) +
+			Number(fieldTripResourceDataEntry.AideOTHours) * Number(fieldTripResourceDataEntry.AideOTRate) +
 			Number(fieldTripResourceDataEntry.AideFixedCost);
 	}
 
