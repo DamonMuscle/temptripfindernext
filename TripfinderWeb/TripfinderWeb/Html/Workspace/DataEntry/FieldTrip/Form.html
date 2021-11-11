@@ -93,7 +93,7 @@
 							data-bind="css:obRequiredFields()&&((obRequiredFields().FieldTripActivityId&&obRequiredFields().FieldTripActivityId.Required)
 							||(obRequiredFields().DistrictDepartmentId&&obRequiredFields().DistrictDepartmentId.Required))?'requirestar':null">Department/Activity:</label>
 						<div class="input-group">
-							<div data-bind="typeahead:{source:obAccount,notSort:true,format:function(obj){return obj.Id < 0 ? '' : (obj.Department.Name+' / '+obj.FieldTripActivity.Name);},drowDownShow:true,selectedValue:obSelectedAccount},
+							<div data-bind="typeahead:{source:obAccount,notSort:false,format:function(obj){return obj.Id < 0 ? '' : (obj.Department.Name+' / '+obj.FieldTripActivity.Name);},drowDownShow:true,selectedValue:obSelectedAccount},
 								 attr:IsRequired(obRequiredFields()&&((obRequiredFields().FieldTripActivityId&&obRequiredFields().FieldTripActivityId.Required)
 														||(obRequiredFields().DistrictDepartmentId&&obRequiredFields().DistrictDepartmentId.Required)))">
 								<!-- ko customInput:{type:"Select",value:obCurrentAccountName,attributes:{class:"form-control", name:"account"}} -->
@@ -195,7 +195,8 @@
 								data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedReturnDateTime&&obRequiredFields().EstimatedReturnDateTime.Required?'requirestar':null">Time</label>
 							<!-- ko customInput:{type:"Time",value:obEntityDataModel().returnTime,attributes:{class:"form-control",name:"estimatedReturnTime"}, disable:obReturnTimeDisable} -->
 							<!-- /ko -->
-							<label class="returnTimeRequired" data-bind="css: (obEntityDataModel().returnDate() && !obEntityDataModel().returnTime()) ? 'showReturnTimeRequired' : null">required</label>
+							<label class="returnTimeRequired"
+								data-bind="css: (obEntityDataModel().returnDate() && !obEntityDataModel().returnTime()) ? 'showReturnTimeRequired' : null">required</label>
 						</div>
 					</div>
 					<div class="form-group col-xs-24 no-padding-left no-padding-right">
