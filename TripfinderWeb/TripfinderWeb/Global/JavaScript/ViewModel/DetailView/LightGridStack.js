@@ -796,7 +796,8 @@
 			case "section-header":
 				return new TF.DetailView.DataBlockComponent.SectionHeaderBlock(item, self.detailView, self.getCurrentWidth(), self.toggleSectionHeaderEvent);
 			case "Boolean":
-				return new TF.DetailView.DataBlockComponent.BooleanBlock(self.getRawDataBlockValue(item), item, self.detailView);
+				var content = self.getRawDataBlockValue(item);
+				return new TF.DetailView.DataBlockComponent.GeneralBlock(_.upperFirst(content), item, self.detailView);
 			case "image":
 				return new TF.DetailView.DataBlockComponent.ImageBlock(item, self.detailView);
 			case "Map":
