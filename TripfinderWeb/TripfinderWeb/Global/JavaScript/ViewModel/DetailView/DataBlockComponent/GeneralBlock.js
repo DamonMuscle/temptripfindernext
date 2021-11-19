@@ -8,6 +8,8 @@
 
 		TF.DetailView.DataBlockComponent.BaseDataBlock.call(self);
 
+		content = this.initContentForBooleanBlock(content, options);
+
 		var detailViewHelper = tf.helpers.detailViewHelper,
 			editable = !!options.editType
 				&& (isCreateGridNewRecord || !options.editType.forCreateOnly)
@@ -33,7 +35,7 @@
 
 		if (options.type === "String")
 		{
-			$wrapper.addClass("text-content")
+			$wrapper.addClass("text-content");
 		}
 
 		$wrapper.append($itemContent);
@@ -41,4 +43,17 @@
 		self.options = options;
 	}
 	GeneralBlock.prototype = Object.create(TF.DetailView.DataBlockComponent.BaseDataBlock.prototype);
+
+	GeneralBlock.prototype.initContentForBooleanBlock = function(content, options)
+	{
+		var newContent = content;
+		if (["True", "False"].includes(content))
+		{
+			newContent = content === "True";
+		}
+
+		var valueNotSpecified = typeof newContent !== "boolean";
+		newContent = valueNotSpecified ? content : (newContent ? options.positiveLabel : options.negativeLabel);
+		return newContent;
+	};
 })();

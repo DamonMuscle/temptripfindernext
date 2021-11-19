@@ -90,7 +90,7 @@
 			$container.css(
 				{
 					position: "absolute",
-					left: offset.left,
+					left: offset.left -1 ,
 					top: offset.top
 				});
 			$target.addClass("contextmenu-open");
