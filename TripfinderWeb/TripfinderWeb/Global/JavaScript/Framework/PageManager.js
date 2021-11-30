@@ -35,6 +35,7 @@
 
 		//Initial parameters
 		self.availableApplications = {
+			chatfinder: { route: "Chatfinder", title: "Chatfinder", url: "Chatfinder" },
 			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
 			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
 			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
@@ -63,6 +64,8 @@
 				return 'viewfinder';
 			case "ent":
 				return 'stopfinderadmin';
+			case "cfweb":
+				return 'chatfinder';
 			default:
 				return null;
 		}
