@@ -1295,6 +1295,8 @@
 			entity.DestinationFax = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.DestinationFax);
 		}
 
+		entity.FieldTripDestinationId = (this.obSelectedDestination() || {}).Id || null;
+
 		if (this.obSelectedEquipment() && this.obSelectedEquipment().Id)
 		{
 			entity.FieldTripEquipmentIds = [this.obSelectedEquipment().Id];
