@@ -3369,6 +3369,8 @@
 		{
 			self.searchOption = options;
 		}
+		
+		self.onFilterChanged.notify(options);
 
 		return options;
 
