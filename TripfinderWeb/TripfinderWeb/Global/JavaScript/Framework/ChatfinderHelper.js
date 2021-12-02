@@ -1,5 +1,6 @@
 (function()
 {
+	createNamespace("TF").ChatfinderHelper = new ChatfinderHelper();
 	function ChatfinderHelper()
 	{
 	}
@@ -128,6 +129,4 @@
 			}
 		}
 	}
-
-	createNamespace("TF").ChatfinderHelper = new ChatfinderHelper();
 })();
