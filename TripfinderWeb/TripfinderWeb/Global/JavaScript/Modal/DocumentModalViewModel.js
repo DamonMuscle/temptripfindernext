@@ -42,8 +42,7 @@
 					paramData: {
 						"@filter": "in(id," + attachIds.toString() + ")",
 					}
-				})
-					.then(function(data)
+				}).then(function(data)
 					{
 						var name, displayType;
 						for (var i in data.Items)
