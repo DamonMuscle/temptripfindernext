@@ -14,40 +14,6 @@
 		ko.applyBindings(self, self._$modalContainer[0]);
 		self._handlers = {};
 
-
-		$("body").delegate("input,textarea,body,button,a", "focus.modal", function(e)
-		{
-			var focusList = ['<input class="k-color-value form-control">'];
-			//if user click tab key in the keyboard and the focus is not in modal which is opened, the first input will be focused in the modal
-			if (tf.modalManager.obBaseModalViewModels().length > 0)
-			{
-				var $target = tf.modalManager.obBaseModalViewModels()[tf.modalManager.obBaseModalViewModels().length - 1].$target;
-				var $modalBody = $target ? $target.find(".modal-body") : undefined;
-				if ($modalBody && $modalBody.closest(".message-center").length > 0)
-				{
-					return;
-					e.preventDefault();
-				}
-				if ($modalBody && $modalBody[0] && !$modalBody[0].contains(e.target) && !$(e.target).closest(".typeahead").length > 0 && focusList.indexOf(e.target.outerHTML) == -1)
-				{
-					//find the first input or textarea in modal which is opened
-					var $inputs = $modalBody.find("input[tabindex!=-1]:visible:enabled:first,textarea[tabindex!=-1]:visible:enabled:first");
-					if ($inputs.length > 0)
-					{
-						$($inputs[0]).focus();
-					}
-					else 
-					{
-						var focusHtml = "<input class='used-for-focus' />";
-						$modalBody.append(focusHtml);
-						$modalBody.find(".used-for-focus").focus();
-						$modalBody.find(".used-for-focus").remove();
-					}
-					e.preventDefault();
-				}
-			}
-		});
-
 		self._$modalContainer.on('shown.bs.modal', function(e)
 		{
 			var $modal = $(e.target), baseModalViewModel = ko.dataFor($modal[0]),
