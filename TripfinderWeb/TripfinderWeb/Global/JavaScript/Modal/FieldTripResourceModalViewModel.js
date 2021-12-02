@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Modal').FieldTripResourceModalViewModel = FieldTripResourceModalViewModel;
 
-	function FieldTripResourceModalViewModel(source, id, resourceGroupDate, obFieldTrip)
+	function FieldTripResourceModalViewModel(source, id, resourceGroupDate, obFieldTrip, isNew)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.obPositiveButtonLabel("Apply");
@@ -12,7 +12,7 @@
 		this.data(this.fieldTripResourceViewModel);
 		this.sizeCss = "modal-dialog-lg";
 
-		var viewTitle = "Add " + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Resource";
+		var viewTitle = (isNew ? "Add " : "Edit ") + tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + " Resource";
 
 		this.title(viewTitle);
 
