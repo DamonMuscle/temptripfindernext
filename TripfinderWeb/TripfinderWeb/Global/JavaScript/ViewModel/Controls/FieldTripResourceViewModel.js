@@ -19,30 +19,37 @@
 
 		this.obVehTotal = ko.computed(function()
 		{
+			var value;
 			if (this.obEditTieldTrip())
 			{
-				return (Number(this.obEntityDataModel().endingOdometer()) - Number(this.obEntityDataModel().startingOdometer())) * Number(this.obEntityDataModel().mileageRate())
-					+ Number(this.obEntityDataModel().vehFixedCost());
+				value = (Number(this.obEntityDataModel().endingOdometer()) - Number(this.obEntityDataModel().startingOdometer())) * Number(this.obEntityDataModel().mileageRate())
+					+ Number(this.obEntityDataModel().vehFixedCost()) || 0;
 			}
-			else { return Number(this.obEntityDataModel().vehFixedCost()) }
+			else
+			{
+				value = Number(this.obEntityDataModel().vehFixedCost()) || 0;
+			}
+			return value.toFixed(2);
 		}.bind(this));
 
 		this.obDriverTotal = ko.computed(function()
 		{
-			return Number(this.obEntityDataModel().driverHours()) * Number(this.obEntityDataModel().driverRate())
+			var value = (Number(this.obEntityDataModel().driverHours()) * Number(this.obEntityDataModel().driverRate())
 				+ Number(this.obEntityDataModel().driverOTHours()) * Number(this.obEntityDataModel().driverOTRate())
 				+ Number(this.obEntityDataModel().driverFixedCost())
 				+ Number(this.obEntityDataModel().driverExpParking())
 				+ Number(this.obEntityDataModel().driverExpTolls())
 				+ Number(this.obEntityDataModel().driverExpMeals())
-				+ Number(this.obEntityDataModel().driverExpMisc());
+				+ Number(this.obEntityDataModel().driverExpMisc())) || 0;
+			return value.toFixed(2);
 		}.bind(this));
 
 		this.obAideTotal = ko.computed(function()
 		{
-			return Number(this.obEntityDataModel().aideHours()) * Number(this.obEntityDataModel().aideRate())
+			var value = (Number(this.obEntityDataModel().aideHours()) * Number(this.obEntityDataModel().aideRate())
 				+ Number(this.obEntityDataModel().aideOTHours()) * Number(this.obEntityDataModel().aideOTRate())
-				+ Number(this.obEntityDataModel().aideFixedCost());
+				+ Number(this.obEntityDataModel().aideFixedCost())) || 0;
+			return value.toFixed(2);
 		}.bind(this));
 
 		this.pageLevelViewModel = new TF.PageLevel.BaseDataEntryPageLevelViewModel();
