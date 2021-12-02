@@ -38,8 +38,11 @@
 					attachIds.push(documentRelationshipEntities[i].AttachedToId);
 				}
 
-				// TODO-V2, need to research
-				promiseAll.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, this.getUrlIdsName(type)), { data: attachIds })
+				promiseAll.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(type)), {
+					paramData: {
+						"@filter": "in(id," + attachIds.toString() + ")",
+					}
+				})
 					.then(function(data)
 					{
 						var name, displayType;
