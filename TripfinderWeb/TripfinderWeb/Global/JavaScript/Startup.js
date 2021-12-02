@@ -370,6 +370,7 @@
 					return Promise.all([p1, p2, p3, p4])
 						.then(function()
 						{
+							TF.ChatfinderHelper.registerHub();
 							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub']);
 							TF.SignalRHelper.bindEvent('TimeZoneHub', 'update', function update(result)
 							{
