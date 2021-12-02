@@ -120,7 +120,7 @@
 
 						self.requiredFields[typeKey].push({
 							name: item.FieldName,
-							title: item.Label,
+							title: dataPoint && dataPoint.title || item.Label,
 							field: dataPoint && dataPoint.field || item.FieldName,
 							dataPointTitle: dataPoint && dataPoint.title || item.Label,
 						});
