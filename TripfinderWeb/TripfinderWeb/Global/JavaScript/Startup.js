@@ -329,7 +329,7 @@
 				}).then(function()
 				{
 					tf.UDFDefinition = new TF.GridDefinition.UDFDefinition();
-					return tf.UDFDefinition.init();
+					return tf.UDFDefinition.loadAll();
 				}).then(function()
 				{
 					tf.helpers.detailViewHelper.init();
