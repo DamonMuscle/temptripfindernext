@@ -2,7 +2,7 @@
 {
 	createNamespace("TF").NavigationMenu = NavigationMenu;
 
-	function NavigationMenu ()
+	function NavigationMenu()
 	{
 		var self = this;
 		self.$navigationMenu = null;
@@ -20,7 +20,7 @@
 		self.defaultToggleNavAnimationDuration = 350;
 		self.defaultOpenMenuAnimationDuration = 250;
 
-		self.availableApplications = tf.pageManager?tf.pageManager.availableApplications:"";
+		self.availableApplications = tf.pageManager ? tf.pageManager.availableApplications : "";
 
 		self.isMacintosh = isMacintosh();
 		self.NavigationMenuExpandStatueKey = TF.productName + ".navigationmenu.expandstatus";
@@ -40,7 +40,7 @@
 
 		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
-		tf.pageManager?tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self)):"";
+		tf.pageManager ? tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self)) : "";
 	}
 
 	/**
@@ -90,8 +90,8 @@
 
 	/**
 	 * Initialize the navigation menu state.
- 	* @return {void}
- 	*/
+	  * @return {void}
+	  */
 	NavigationMenu.prototype.initNavigationMenuState = function()
 	{
 		var self = this,
@@ -1174,7 +1174,7 @@
 			redirectWindow.document.title = routeName;
 		});
 		redirectWindow.blur();
-		
+
 		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)
 		{
 			return prod.Name.toLowerCase() == routeName.toLowerCase()
@@ -1187,7 +1187,8 @@
 
 			// must remove the stopfinder token when app switch, keep the routerfinder token is new
 			var prodName = prod[0] && (prod[0].Name || '').toLowerCase();
-			if (prodName.indexOf("stopfinder admin") !== -1  || prodName.indexOf("stopfinderadmin") !== -1) {
+			if (prodName.indexOf("stopfinder admin") !== -1 || prodName.indexOf("stopfinderadmin") !== -1)
+			{
 				var sfStoreTokenKey = "sfaweb.token", sfEntTokenKey = "ent.stopfinderToken";
 				var _getDomain = function()
 				{
@@ -1204,34 +1205,15 @@
 				tf.authManager.updateToken = true;
 			}
 
-			var promise = null;
 			if (routeName == "Fleetfinder" && url.indexOf("admin.html") < 0)
 			{
 				url += url.charAt(url.length - 1) == "/" ? "admin.html" : "/admin.html";
 			}
-			promise = Promise.resolve();
-			
-			promise.then(function()
+
+			self.resolveUrl(url, routeTitle).then(r =>
 			{
-				var xhr = new XMLHttpRequest();
-				xhr.open('GET', url, true);
-				xhr.onload = function(e)
-				{
-					if (this.response.indexOf('<title>' + routeTitle + '</title>') > 0)
-					{
-						redirectWindow.location = url;
-					}
-					else
-					{
-						redirectWindow.location.href = routeName + "notexisting.html";
-					}
-				};
-				xhr.onerror = function(e)
-				{
-					redirectWindow.location.href = routeName + "notexisting.html";
-				}
-				xhr.send();
-			}).catch(function()
+				redirectWindow.location = r;
+			}).catch(() =>
 			{
 				redirectWindow.location.href = routeName + "notexisting.html";
 			});
@@ -1240,10 +1222,41 @@
 		{
 			redirectWindow.location.href = routeName + "notexisting.html";
 		}
+
 		ga('send', 'event', 'Action', 'App Switcher', data[0].toUpperCase() + data.slice(1));
-
 		self.toggleAppSwitcherMenu(false);
+	};
 
+	NavigationMenu.prototype.resolveUrl = function(url, routeTitle)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			let xhr = new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.onload = () =>
+			{
+				if (xhr.response.indexOf('<title>' + routeTitle + '</title>') > 0)
+				{
+					resolve(url);
+					return;
+				}
+
+				reject();
+			};
+
+			xhr.onerror = () =>
+			{
+				if (!url.endsWith('/'))
+				{
+					this.resolveUrl(url + '/', routeTitle).then(resolve).catch(reject);
+					return;
+				}
+
+				reject();
+			}
+
+			xhr.send();
+		});
 	};
 
 	/**
