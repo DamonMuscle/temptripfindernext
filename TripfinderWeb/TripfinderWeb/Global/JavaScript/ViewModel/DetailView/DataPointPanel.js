@@ -433,7 +433,8 @@
 					DataTypeId: dataTypeId
 				}
 			}),
-			tf.udgHelper.getUDGridsByDataType(self.gridType)
+			tf.udgHelper.getUDGridsByDataType(self.gridType),
+			tf.UDFDefinition.updateByType(self.gridType)
 		]).then(function(values)
 		{
 			var udfResult = values[0];
