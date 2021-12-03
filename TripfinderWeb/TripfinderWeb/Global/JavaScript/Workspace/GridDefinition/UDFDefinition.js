@@ -10,13 +10,13 @@
 
 	UDFDefinition.prototype.getAll = function()
 	{
-		return this._collection;
+		return this.collection;
 	}
 
 	UDFDefinition.prototype.loadAll = function()
 	{
 		let self = this;
-		self._collection = [];
+		self.collection = [];
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"), {
 			paramData: {
 				"@Relationships": "UDFPickListOptions,UDFDataSources,UDFType"
@@ -31,7 +31,7 @@
 					var type = tf.dataTypeHelper.getAvailableDataTypes().find(r => r.id == typeId);
 					if (type && type.key)
 					{
-						self._collection.push({
+						self.collection.push({
 							gridType: type.key,
 							userDefinedFields: groupUdf[typeId].map(function(field)
 							{
@@ -58,7 +58,7 @@
 			return Promise.resolve(false);
 		}
 
-		let exsit = self._collection.find(r => r.gridType == type);
+		let exsit = self.collection.find(r => r.gridType == type);
 		if (exsit)
 		{
 			return Promise.resolve(false);
@@ -71,7 +71,7 @@
 			}
 		}).then(function(result)
 		{
-			self._collection.push({
+			self.collection.push({
 				gridType: type,
 				userDefinedFields: result.Items.map((field) => self._format(field, type))
 			});
@@ -84,13 +84,7 @@
 
 	UDFDefinition.prototype.get = function(gridType)
 	{
-		return this._collection.find(item => item.gridType === gridType);
-	};
-
-	UDFDefinition.prototype.get = function(gridType)
-	{
-		var self = this;
-		return self.collection.filter(function(item) { return item.gridType === gridType; })[0];
+		return this.collection.find(item => item.gridType === gridType);
 	};
 
 	UDFDefinition.prototype.getAvailableWithCurrentDataSource = function(gridType)
@@ -229,8 +223,8 @@
 	UDFDefinition.prototype._update = function(gridType, items)
 	{
 		let self = this;
-		self._collection = self._collection.filter(item => item.gridType != gridType);
-		self._collection.push({
+		self.collection = self.collection.filter(item => item.gridType != gridType);
+		self.collection.push({
 			gridType: gridType,
 			userDefinedFields: items.map(item => self._format(item, gridType))
 		});
