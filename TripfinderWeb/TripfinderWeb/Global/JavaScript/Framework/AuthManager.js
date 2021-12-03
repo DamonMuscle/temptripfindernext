@@ -69,6 +69,10 @@
 			.then(function(results)
 			{
 				tf.entStorageManager.save("isLoggedin", false);
+				if (tf.cfConnection) 
+				{
+					tf.cfConnection.stop();
+				}
 			})
 	};
 

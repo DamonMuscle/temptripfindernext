@@ -73,8 +73,10 @@
 			}
 
 			tf.promiseBootbox.alert("Login session expired")
-				.then(function()
-				{
+				.then(function () {
+					if (tf.cfConnection) {
+						tf.cfConnection.stop();
+					}
 					self._authManager.logOffTag = true;
 					location.reload();
 				});

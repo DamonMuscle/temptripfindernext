@@ -157,6 +157,14 @@
 							});
 						}
 					})
+					.then(function () {
+						if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
+							&& tf.pageManager.applicationURLMappingList.find(p => p.Name == "Chatfinder")) {
+							var chatfinderhelper = new TF.ChatfinderHelper();
+							chatfinderhelper.registerHub();
+						}
+					})
+
 			});
 		}
 	}

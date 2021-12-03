@@ -1,6 +1,6 @@
 (function()
 {
-	createNamespace("TF").ChatfinderHelper = new ChatfinderHelper();
+	createNamespace("TF").ChatfinderHelper = ChatfinderHelper;
 	function ChatfinderHelper()
 	{
 	}
@@ -11,24 +11,22 @@
 		var ChatfinderAPIAddress = "https://serviceplus01.transfinder.com/ChatfinderApi";
 
 		var self = this;
-		if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0)
-		{
-			var verifyData = {
-				paramData: {
-					"clientId": tf.entStorageManager.get("clientKey"),
-					"vendor": "Transfinder",
-					"username": tf.authManager.userName,
-				},
-				headers: {
-					'Transfinder': tf.api.server()
-				}
+		var verifyData = {
+			paramData: {
+				"clientId": tf.entStorageManager.get("clientKey"),
+				"vendor": "Transfinder",
+				"username": tf.authManager.userName,
+			},
+			headers: {
+				'Transfinder': tf.api.server()
 			}
+		}
 
 			tf.promiseAjax.get(pathCombine(ChatfinderAPIAddress, "auth", "verify"), verifyData)
 			.then(function(response)
 			{
 				var connection = new signalR.HubConnectionBuilder()
-					.withUrl(self.pathCombine(ChatfinderAPIAddress, "chatfinderHub?ConnectFrom=rfweb"), {
+					.withUrl(self.pathCombine(ChatfinderAPIAddress, "chatfinderHub?ConnectFrom=tfweb"), {
 						skipNegotiation: true,
 						transport: signalR.HttpTransportType.WebSockets,
 						accessTokenFactory: () =>
@@ -47,8 +45,10 @@
 					self.tryNotification(chatThreadId, from, chatMessage)
 				});
 	
-				connection.on("connectInfo", (info) =>
-				{
+				connection.on("connectInfo", (info) => {
+					if (connection && info === "Disconnect") {
+						connection.stop();
+					}
 					console.log(info);
 				});
 	
@@ -60,7 +60,6 @@
 					console.log(err);
 				}
 			})
-		}
 	}
 
 	ChatfinderHelper.prototype.pathCombine = function()
@@ -122,11 +121,8 @@
 		notification.onclick = function()
 		{
 			var chatfinderDetail = tf.pageManager.applicationURLMappingList.find(p => p.Name == "Chatfinder");
-			if (chatfinderDetail)
-			{
-				var chatfinderUrl = chatfinderDetail.Uri
-				window.open(chatfinderUrl,"_blank")
-			}
+			var chatfinderUrl = chatfinderDetail.Uri
+			window.open(chatfinderUrl, "_blank")
 		}
 	}
 })();
