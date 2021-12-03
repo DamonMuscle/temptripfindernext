@@ -53,7 +53,7 @@
 		{
 			if (result)
 			{
-				this.positiveClose(result);
+				this.negativeClose(false);
 			}
 		}.bind(this));
 	};
