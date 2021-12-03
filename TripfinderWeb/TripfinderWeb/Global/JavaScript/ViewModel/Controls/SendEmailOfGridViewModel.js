@@ -1337,21 +1337,8 @@
 		}
 		if (this.intervalID)
 			clearInterval(this.intervalID);
-		if (this.option.modelType === 'SendTo')
-		{
-			return this.resetProgress().then(function()
-			{
-				return tf.promiseAjax["delete"](pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email/delete"),
-					{
-						data: data
-					}, { overlay: false })
-					.then(function(response) { }.bind(this));
-			}.bind(this));
-		}
-		else
-		{
-			return Promise.resolve(true);
-		}
+
+		return Promise.resolve(true);
 	};
 
 })();

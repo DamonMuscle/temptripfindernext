@@ -315,9 +315,13 @@
 					setRequestOption: self.setRequestOption ? self.setRequestOption.bind(self) : undefined,
 				})
 		)
-			.then(function()
+			.then(function(result)
 			{
-				return Promise.resolve(true);
+				if(result)
+				{
+					tf.promiseBootbox.alert("An email has been sent successfully.", "Email Sent Successfully");
+				}
+				return Promise.resolve(result);
 			}.bind(this));
 	};
 
