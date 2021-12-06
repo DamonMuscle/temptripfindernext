@@ -82,6 +82,7 @@
 	SchedulerPage.prototype.filterCleared = function(e)
 	{
 		var self = this;
+		self.searchGrid.initFieldTripStageFilters();
 		self.filterData = null;
 		self.EnsureOrRefreshScheduler();
 	};
