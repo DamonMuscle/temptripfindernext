@@ -21,10 +21,11 @@
 			btnLabel: "Associate"
 		},
 		"DocumentGrid": {
-			checkPermission: function() { 
-				return tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]) && 
+			checkPermission: function()
+			{
+				return tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]) &&
 					tf.authManager.isAuthorizedForDataType("documentTab", ["add", "edit"]);
-			 },
+			},
 			btnClass: "add-document",
 			btnLabel: "Associate"
 		},
@@ -657,7 +658,7 @@
 
 		return kendoGrids;
 	};
-	
+
 	function isAssociationChanged(selectedData, response)
 	{
 		return response.isNewRecordCreated || !_.isEqual(selectedData.map(d => d.Id), response.selectedIds);
@@ -827,7 +828,7 @@
 			self.fieldEditorHelper.editFieldList[fieldName] = editStash;
 
 			self.obEditing(true);
-			
+
 			return Promise.resolve(true);
 		}
 		else
@@ -880,10 +881,10 @@
 			documentId = documentEntity.Id,
 			gridName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType).toLowerCase();
 
-			var WarningMessage = "Are you sure you want to disassociate this " + gridName + " from \"" + documentEntity.Name + "\"?"
-			if (self.gridBlockType = "DocumentGrid")
-				WarningMessage = `Disassociate this ${ gridName } from ${ documentEntity.Name } will also remove associations between document and UDF Groups. Are you sure you want to apply these changes?`
-			tf.promiseBootbox.yesNo(WarningMessage, CONFIRMATION_TITLE)
+		var WarningMessage = "Are you sure you want to disassociate this " + gridName + " from \"" + documentEntity.Name + "\"?"
+		if (self.gridBlockType = "DocumentGrid")
+			WarningMessage = `Disassociate this ${gridName} from ${documentEntity.Name} will also remove associations between document and UDF Groups. Are you sure you want to apply these changes?`
+		tf.promiseBootbox.yesNo(WarningMessage, CONFIRMATION_TITLE)
 			.then(function(res)
 			{
 				if (!res) return;
@@ -904,43 +905,43 @@
 				}
 
 				Promise.all(tasks).then(res =>
+				{
+					if (self.isCreateGridNewRecord)
 					{
-						if (self.isCreateGridNewRecord)
+						self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
 						{
-							self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
+							udGrid.UDGridRecordsValues.forEach(udGridRecord =>
 							{
-								udGrid.UDGridRecordsValues.forEach(udGridRecord =>
-								{
-									_.remove(udGridRecord.DocumentUDGridRecords, documentUDGridRecord => documentId == documentUDGridRecord.DocumentID);
-								});
+								_.remove(udGridRecord.DocumentUDGridRecords, documentUDGridRecord => documentId == documentUDGridRecord.DocumentID);
 							});
-	
-							return Promise.resolve(true);
-						}
-	
-						return tf.udgHelper.updateAssociateDocuments(self.recordId, tf.dataTypeHelper.getId(self.gridType), [documentId])
-					}).then
-						(function(response)
-						{
-							tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "document", [documentId]);
-							PubSub.publish("udgrid", {});
-	
-							// Remove this contact in stack.
-							if (self.fieldEditorHelper.editFieldList &&
-								self.fieldEditorHelper.editFieldList.DocumentRelationships &&
-								Array.isArray(self.fieldEditorHelper.editFieldList.DocumentRelationships.value) &&
-								self.fieldEditorHelper.editFieldList.DocumentRelationships.value.length > 0)
-							{
-								self.fieldEditorHelper.editFieldList.DocumentRelationships.value =
-									self.fieldEditorHelper.editFieldList.DocumentRelationships.value.filter(function(item)
-									{
-										return item.DocumentID !== documentId;
-									});
-							}
-	
-							self.detailView.pageLevelViewModel.clearError();
-							self.detailView.pageLevelViewModel.popupSuccessMessage('The association has been removed.');
 						});
+
+						return Promise.resolve(true);
+					}
+
+					return tf.udgHelper.updateAssociateDocuments(self.recordId, tf.dataTypeHelper.getId(self.gridType), [documentId])
+				}).then
+					(function(response)
+					{
+						tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "document", [documentId]);
+						PubSub.publish("udgrid", {});
+
+						// Remove this contact in stack.
+						if (self.fieldEditorHelper.editFieldList &&
+							self.fieldEditorHelper.editFieldList.DocumentRelationships &&
+							Array.isArray(self.fieldEditorHelper.editFieldList.DocumentRelationships.value) &&
+							self.fieldEditorHelper.editFieldList.DocumentRelationships.value.length > 0)
+						{
+							self.fieldEditorHelper.editFieldList.DocumentRelationships.value =
+								self.fieldEditorHelper.editFieldList.DocumentRelationships.value.filter(function(item)
+								{
+									return item.DocumentID !== documentId;
+								});
+						}
+
+						self.detailView.pageLevelViewModel.clearError();
+						self.detailView.pageLevelViewModel.popupSuccessMessage('The association has been removed.');
+					});
 			});
 	};
 
@@ -1812,7 +1813,8 @@
 	GridBlock.prototype._bindMiniGridEvent = function(miniGridType, $grid)
 	{
 		let self = this;
-		let bindDBClickEvent = () => {
+		let bindDBClickEvent = () =>
+		{
 			$grid.off("dblclick").on("dblclick", ".k-grid-content table tr", function(e)
 			{
 				self.editMiniGridRecord(miniGridType, e);
@@ -1820,13 +1822,15 @@
 		};
 
 		// This function firing multiple times on kendoGrid dataBound / dataBinding event.
-		switch (miniGridType) {
+		switch (miniGridType)
+		{
 			case GridBlock.MINI_GRID_TYPE.CONTACT:
 				bindDBClickEvent();
 				break;
 			case GridBlock.MINI_GRID_TYPE.DOCUMENT:
-				if (tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]) && 
-					tf.authManager.isAuthorizedForDataType("documentTab", ["add", "edit"])) {
+				if (tf.authManager.isAuthorizedForDataType("document", ["add", "edit"]) &&
+					tf.authManager.isAuthorizedForDataType("documentTab", ["add", "edit"]))
+				{
 					bindDBClickEvent();
 				}
 				break;
@@ -2399,7 +2403,7 @@
 				// update invoice data in cached record entity
 				self.recordEntity.FieldTripInvoices = invoices;
 
-				self.fieldEditorHelper.checkAndUpdateFieldTripInvoiceGridStatus(null, invoices);
+				self.fieldEditorHelper.checkAndUpdateFieldTripInvoiceGridStatus(invoices);
 
 				return invoices;
 			});

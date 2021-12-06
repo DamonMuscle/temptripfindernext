@@ -477,12 +477,22 @@
 					}
 					else 
 					{
-						checkInvoices = self.checkFieldTripInvoices(account, entity.FieldTripInvoices)
-							.then(function(isValid)
+						checkInvoices = self.getInvalidInvoices(res, entity.FieldTripInvoices)
+							.then(invalidInvoices =>
 							{
-								if (!isValid)
+								if (invalidInvoices.length)
 								{
-									var errorMsg = `Strict account code is on, please remove any existing invoice that is not using account ${account.Code}.`;
+									let errorMsg = `Strict account code is on, please remove `;
+									if (invalidInvoices.length == 1)
+									{
+										errorMsg += 'this account: ';
+									}
+									else
+									{
+										errorMsg += 'these accounts: ';
+									}
+
+									errorMsg += invalidInvoices.map(i => i.AccountName).join(", ") + ".";
 									return { fieldName: "FieldTripInvoiceGrid", message: errorMsg };
 								}
 							});
@@ -494,6 +504,7 @@
 						{
 							resultList.push(error);
 						}
+
 						return resultList;
 					});
 				});
@@ -502,17 +513,15 @@
 		return Promise.resolve([]);
 	};
 
-	FieldtripFieldEditorHelper.prototype.checkAndUpdateFieldTripInvoiceGridStatus = function(account, invoices)
+	FieldtripFieldEditorHelper.prototype.checkAndUpdateFieldTripInvoiceGridStatus = function(invoices)
 	{
-		var self = this;
-		self.checkFieldTripInvoices(account, invoices)
-			.then(function(isValid)
+		this.getInvalidInvoices(invoices).then(invalidInvoices =>
+		{
+			if (invalidInvoices && invalidInvoices.length)
 			{
-				if (isValid)
-				{
-					self.toggleValidationErrorToFieldsByName(["FieldTripInvoiceGrid"], false);
-				}
-			});
+				this.toggleValidationErrorToFieldsByName(["FieldTripInvoiceGrid"], false);
+			}
+		});
 	};
 
 	FieldtripFieldEditorHelper.prototype.checkSchoolDeptActivityCombination = function()
@@ -520,25 +529,13 @@
 		return this.fetchMatchedAccounts().then(function(res) { return res.length > 0; });
 	};
 
-	/**
-	 * Check if field trip invoices match the eligible account.
-	 *
-	 * @param {object} account
-	 * @param {Array} invoices
-	 * @returns
-	 */
-	FieldtripFieldEditorHelper.prototype.checkFieldTripInvoices = function(account, invoices)
+	FieldtripFieldEditorHelper.prototype.getInvalidInvoices = function(accountData, invoices)
 	{
-		var fetchAccount = account ?
-			Promise.resolve(account) :
-			this.fetchMatchedAccounts().then(function(res) { return res[0]; });
-
-		return fetchAccount.then(function(acc)
+		let fetchAccounts = accountData ? Promise.resolve(accountData) : this.fetchMatchedAccounts();
+		return fetchAccounts.then(accounts =>
 		{
-			return acc && (invoices || []).every(function(item)
-			{
-				return item.FieldTripAccountId === acc.Id;
-			});
+			invoices = invoices || [];
+			return invoices.filter(i => accounts.every(a => a.Id !== i.FieldTripAccountId));
 		});
 	};
 

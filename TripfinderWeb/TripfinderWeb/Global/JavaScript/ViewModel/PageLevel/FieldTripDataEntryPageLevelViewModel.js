@@ -44,8 +44,9 @@
 		endDateInput = $form.find("input[name='estimatedReturnDate']");
 		departTimeInput = $form.find("input[name='departTime']");
 		endTimeInput = $form.find("input[name='estimatedReturnTime']");
-		
-		if (self.fieldTripDE.obEntityDataModel().returnDate() && !self.fieldTripDE.obEntityDataModel().returnTime()) {
+
+		if (self.fieldTripDE.obEntityDataModel().returnDate() && !self.fieldTripDE.obEntityDataModel().returnTime())
+		{
 			message = 'Return time is required';
 			validationErrors.push({ message: message, field: endTimeInput });
 		}
@@ -96,8 +97,8 @@
 
 	FieldTripDataEntryPageLevelViewModel.prototype.getValidationErrors = function(valid)
 	{
-		var self=this,baseValidationErrors = namespace.BasePageLevelViewModel.prototype.getValidationErrors.call(this),
-		isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
+		var self = this, baseValidationErrors = namespace.BasePageLevelViewModel.prototype.getValidationErrors.call(this),
+			isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 		var validationErrors = [];
 		if (isStrictAccountCodeOn)
 		{
@@ -116,22 +117,32 @@
 		return validationErrors;
 	};
 
-	FieldTripDataEntryPageLevelViewModel.prototype.getStrictAccountCodeErrors =  function()
+	FieldTripDataEntryPageLevelViewModel.prototype.getStrictAccountCodeErrors = function()
 	{
-		var self = this, entity=self.fieldTripDE.obEntityDataModel();
-		var res=self.fetchMatchedAccounts(entity.districtDepartmentId(), entity.fieldTripActivityId(), entity.school());
-		var resultList = [],account = res[0];
+		var self = this, entity = self.fieldTripDE.obEntityDataModel();
+		var res = self.fetchMatchedAccounts(entity.districtDepartmentId(), entity.fieldTripActivityId(), entity.school());
+		var resultList = [], account = res[0];
 		if (!account)
 		{
-			resultList.push({ name: "DeptActivity", rightMessage: ERROR_MESSAGE.STRICT_ACCOUNT_DEPT_ACTIVITY,leftMessage: "", field: null});
+			resultList.push({ name: "DeptActivity", rightMessage: ERROR_MESSAGE.STRICT_ACCOUNT_DEPT_ACTIVITY, leftMessage: "", field: null });
 		}
 		else 
 		{
-			var isValid  = self.checkFieldTripInvoices(account, self.fieldTripDE.obInvoiceGridDataSource());
-			if (!isValid)
+			var invalidInvoices = self.getInvalidInvoices(res, self.fieldTripDE.obInvoiceGridDataSource());
+			if (invalidInvoices.length)
 			{
-				var errorMsg = `Strict account code is on, please remove any existing invoice that is not using account ${account.Code}.`;
-				resultList.push({ name: "FieldTripInvoiceGrid", rightMessage: errorMsg,leftMessage: "", field: null });
+				let errorMsg = `Strict account code is on, please remove `;
+				if (invalidInvoices.length == 1)
+				{
+					errorMsg += 'this account: ';
+				}
+				else
+				{
+					errorMsg += 'these accounts: ';
+				}
+
+				errorMsg += invalidInvoices.map(i => i.AccountName).join(", ") + ".";
+				resultList.push({ name: "FieldTripInvoiceGrid", rightMessage: errorMsg, leftMessage: "", field: null });
 			}
 		}
 		return resultList;
@@ -156,30 +167,28 @@
 			);
 		var result = [];
 		tf.ajax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts"),
-		{
-			paramData: {
-				"@fields": "Id,Code",
-				"@filter": filter,
-				"@relationships": "Department,Activity"
-			},
-			async: false
-		}).then(response => {
-			if(response && response.Items)
 			{
-				result = response.Items;
-			}
-		});
+				paramData: {
+					"@fields": "Id,Code",
+					"@filter": filter,
+					"@relationships": "Department,Activity"
+				},
+				async: false
+			}).then(response =>
+			{
+				if (response && response.Items)
+				{
+					result = response.Items;
+				}
+			});
 		return result;
 	};
 
-	FieldTripDataEntryPageLevelViewModel.prototype.checkFieldTripInvoices = function(account, invoices)
+	FieldTripDataEntryPageLevelViewModel.prototype.getInvalidInvoices = function(accounts, invoices)
 	{
-		var fetchAccount = account ? account:
-			this.fetchMatchedAccounts()[0];
-			return fetchAccount && (invoices || []).every(function(item)
-			{
-				return item.FieldTripAccountId === fetchAccount.Id;
-			});
+		accounts = accounts || this.fetchMatchedAccounts() || [];
+		invoices = invoices || [];
+		return invoices.filter(i => accounts.every(a => a.Id !== i.FieldTripAccountId));
 	};
 })();
 
