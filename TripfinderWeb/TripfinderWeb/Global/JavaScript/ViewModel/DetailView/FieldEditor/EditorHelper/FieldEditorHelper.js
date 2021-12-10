@@ -1359,16 +1359,6 @@
 					relationships.push("UDF");
 				}
 
-				if (gridType === "fieldtrip" && relationships.indexOf("all") === -1)
-				{
-					relationships.push("all");
-				}
-
-				if (gridType === "trip" && recordEntity.Id == 0 && relationships.indexOf("TripStop") === -1)
-				{
-					relationships.push("TripStop");
-				}
-
 				// Add relationships in request url.
 				if (relationships.length > 0)
 				{
@@ -1376,20 +1366,7 @@
 				}
 
 				// Generate requests url and parameters.
-				if (gridType === "contact")
-				{
-					url = pathCombine(tf.api.apiPrefixWithoutDatabase(), endpoint);
-					recordEntity.DataTypeID = tf.dataTypeHelper.getId(gridType);
-				}
-				else
-				{
-					if (gridType === "document" && recordEntity.DocumentRelationships === undefined)
-					{
-						recordEntity.DocumentRelationships = [];
-					}
-
-					url = pathCombine(tf.api.apiPrefix(), endpoint);
-				}
+				url = pathCombine(tf.api.apiPrefix(), endpoint);
 
 				return self.automation(gridType, recordEntity)
 					.then(function()
