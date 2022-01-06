@@ -84,7 +84,7 @@
 	{
 		var options = {
 			body: "Someone is trying to reach you in Chatfinder",
-			icon: "./Global/Img/chatfinder/chatfinderLogo.ico"
+			icon: "./Global/Img/chatfinder/chat-icon-viridian.png"
 		}
 
 		// check Notification avaliable for current browser
