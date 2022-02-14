@@ -398,7 +398,7 @@
 	DetailViewHelper.prototype.getDataPointByIdentifierAndGrid = function(identifier, gridType, includeEntityKey)
 	{
 		var key = typeof identifier === "number" ? "UDFId" : "field",
-			udfDataPoints = dataPointsJSON[gridType]["User Defined"] || [],
+			udfDataPoints = gridType? (dataPointsJSON[gridType]["User Defined"] || []) : [],
 			generalPoints = _.flatMap(dataPointsJSON[gridType]).filter(function(p)
 			{
 				return !udfDataPoints.includes(p);

@@ -11,8 +11,10 @@
 	<meta name="format-detection" content="telephone=no" />
 
 	<script>
-		(function (i, s, o, g, r, a, m) {
-			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+		(function (i, s, o, g, r, a, m)
+		{
+			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function ()
+			{
 				(i[r].q = i[r].q || []).push(arguments)
 			}, i[r].l = 1 * new Date(); a = s.createElement(o),
 				m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
@@ -49,7 +51,8 @@
 	</style>
 	<script>
 		var broswerInfo = getBrowserInfo();
-		function getBrowserInfo() {
+		function getBrowserInfo()
+		{
 			var Sys = {}, s, ua = navigator.userAgent.toLowerCase();
 			(s = ua.match(/edge\/([\d.]+)/)) ? Sys.edge = s[1] :
 				(s = ua.match(/edg\/([\d.]+)/)) ? Sys.edge = s[1] :
@@ -70,7 +73,8 @@
 			return { broswer: "", version: "0" };
 		}
 
-		if (broswerInfo.broswer === "IE" || (broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79)) {
+		if (broswerInfo.broswer === "IE" || (broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79))
+		{
 			window.location.href = 'ie.html';
 		}
 		window.dojoConfig = {
@@ -404,6 +408,7 @@
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/TimeQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/CurrencyQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/MapQuestion.js"></script>
+	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/ListFromDataQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/Question/SystemFieldQuestion.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/AttachBlock.js"></script>
 	<script src="Global/JavaScript/ViewModel/Form/Controls/FormRecordSelector.js"></script>

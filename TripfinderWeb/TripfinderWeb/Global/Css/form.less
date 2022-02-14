@@ -685,6 +685,572 @@
 					}
 				}
 
+				.form-section
+				{
+					&.form-section-title
+					{
+						padding: 20px 30px 20px 30px;
+						background-color: #f2f2f2;
+						.form-entity-title {
+							font-size:16px;
+							font-weight: bold;
+							color: #000000;
+						}
+					}
+
+					&.form-section-mobile-title
+					{
+						padding: 15px 30px 10px 30px !important;
+						background-color: #f2f2f2;
+					}
+				}
+
+				.form-base-container
+				{
+					padding: 20px 30px;
+
+					.k-picker-wrap.k-state-border-down
+					{
+						padding-bottom: 0px;
+						border-bottom-width: 1px;
+					}
+					.k-datepicker.date-question.question,
+					.k-datetimepicker.datetime-question.question,
+					.k-timepicker.time-question.question
+					{
+						height: 30px !important;
+					}
+
+
+					.k-datepicker .k-picker-wrap.k-state-default .k-select {
+						height: 29px;
+						line-height: 29px;
+						width: 2em;
+						background-color: #fff;
+					}
+
+					.k-autocomplete.k-state-hover, .k-autocomplete.k-state-focused, 
+					.k-dropdown-wrap.k-state-hover, .k-dropdown-wrap.k-state-focused,
+					.k-numeric-wrap.k-state-hover, .k-numeric-wrap.k-state-focused,
+					.k-picker-wrap.k-state-hover, .k-picker-wrap.k-state-focused {
+						border-color: @editableTextColor;
+					}
+					
+					.k-picker-wrap.k-state-hover, .k-picker-wrap.k-state-focused,
+					.k-numeric-wrap.k-state-hover, .k-numeric-wrap.k-state-focused {
+						.k-select {
+							border-color: @editableTextColor;
+						}
+					}
+					
+					.k-maskedtextbox .k-textbox
+					{
+						&:hover,&:focus {
+							border-color: @editableTextColor;
+						}
+					}
+
+					.form-question,
+					.e-sign-wrapper {
+						&.invalid
+						{
+							border: 1px solid red;
+
+							.invalid-message
+							{
+								color: red;
+								display: inline;
+							}
+						}
+					}
+
+					.form-question
+					{
+						position:relative;
+						padding: 5px;
+						margin: 5px;
+						padding-bottom: 10px;
+						&:last-child{
+							padding-bottom: 5px;
+						}
+
+						.question-title
+						{
+							padding-bottom: 10px;
+							.title-close-warn-msg
+							{
+								color: red;
+								padding-left: 4px;
+							}
+
+							.invalid-message
+							{
+								display: none;
+							}
+
+							td, th
+							{
+								border: 1px solid #dddddd;
+								text-align: left;
+								padding: 8px;
+							}
+
+						}
+
+						.invalid-message
+						{
+							display: none;
+						}
+
+						.question-content
+						{
+							@clearXColor: black;
+							position: relative;
+
+							.date-question {
+								background-color: white;
+								span.k-picker-wrap{
+									display: flex;
+									align-items: center;
+								}
+
+								.clear-x{
+									visibility: visible;
+									color: @clearXColor;
+									margin-left: -21px;
+									font-size: 22px;
+									font-family: 'SourceSansPro-Regular', Arial;
+									line-height: 1;
+								}
+
+								.empty.clear-x {
+									visibility: hidden;
+								}
+							}
+
+							input[time] + span.clear-x{
+								margin-left: -14px;
+								color: @clearXColor;
+								position: relative;
+								z-index: 22;
+								visibility: visible;
+								font-size: 21px;
+								font-family: 'SourceSansPro-Regular', Arial;
+
+								&.empty{
+									visibility: hidden;
+								}
+							}
+
+							.datetime-question-container {
+								display: flex;
+
+								.input-group {
+									padding-left:10px;
+								}
+							}
+							.question
+							{
+								width: 100%;
+								&:is(input[type=text])
+								{
+									padding-right: 8px;
+								}
+							}
+							.systemfield-question {
+								&:is(input[type=text])
+								{
+									padding-left: 8px;
+								}
+							}
+							.number-question,
+							.date-question {
+								text-indent: 0em;
+
+								.k-picker-wrap
+								{
+									.date-question
+									{
+										padding-left: 8px;
+									}
+								}
+							}
+							.list-from-data-question {
+								.k-combobox {
+									width: 100%;
+								
+									input.nil{
+										opacity: .6;
+										width: 120px;
+									}
+
+									span.k-icon.k-i-arrow-60-down {
+										top: -1px;
+									}
+
+									span.k-icon.k-i-x {
+										margin-right: -20px;
+									}
+
+									.k-dropdown-wrap {
+										height: 24px;
+
+										.k-clear-value {
+											padding-bottom: 3px;
+											right: 35px; 
+										}
+
+										&:hover {
+											border-color: #515151;
+											background-color: #fff;
+											color: #333;
+										}
+										&.k-state-disabled {
+											.k-input {
+												height: 1.65em;
+											}
+										}
+									}
+								}
+
+								.k-multiselect {
+									span.k-icon.k-i-arrow-60-down {
+										padding-top: 12px;
+										top: -1px;
+									}
+
+									input.k-input {
+										width: 120px !important;
+									}
+
+									li.k-button > span[unselectable="on"]
+									{
+										overflow: hidden;
+										text-overflow:ellipsis;
+									}
+
+									span.k-clear-value {
+										top: 3px;
+										line-height: 14px;
+										&>.k-i-x {
+											padding-right: 22px;
+											top: 2px;
+										}
+									}
+								}
+
+								.k-multiselect {
+									&.k-state-hover{
+										.k-clear-value {
+											top: 3px;
+											line-height: 14px;
+										}
+
+										.k-multiselect-wrap {
+											border-color: rgb(51,51,51);
+										}
+
+										span.k-icon.k-i-arrow-60-down
+										{
+											padding-top: 12px;
+										}
+
+										span.k-icon.k-i-x {
+											padding-right: 22px;
+											top: 2px;
+										}
+									}
+									&.k-state-focused {
+										.k-multiselect-wrap {
+											border-color: rgb(51,51,51);
+										}
+									}
+								}
+							}
+							textarea
+							{
+								min-height: 26px;
+								resize: vertical !important;
+								padding-left: 8px;
+								padding-right: 8px;
+							}
+
+							
+							.list-question-option .text-question[disabled] {
+								border: 1px solid @editableTextBorderColor;
+							}
+
+							.grid-icon.grid-icon-reddot {
+								height:16px;
+								width:16px;
+								background-size: 16px;
+								background-image: url(../../Global/img/grid/reddot.png);
+							}
+							.grid-icon.grid-icon-yellowdot {
+								height:16px;
+								width:16px;
+								background-size: 16px;
+								background-image: url(../../Global/img/grid/yellowdot.png);
+							}
+
+							.text-question.question:not([disabled]),
+							.memo-question.question,
+							.currency-question .question,
+							.telphone-question,
+							.currency-question .question,
+							.systemfield-question.question
+							{
+								border: 1px solid @editableTextBorderColor;
+								outline: none;
+								&:hover, &:focus {
+									border-color: @editableTextColor;
+								}
+							}
+							
+							.currency-question input[type=number] {
+								padding-left:16px !important;
+							}
+
+							.number-question,
+							.datetime-question,
+							.date-question,
+							.time-question
+							{
+								height: 28px;
+							}
+
+							.time-question input.form-control
+							{
+								font-size:14px;
+							}
+
+							.telphone-question
+							{
+								height: 28px;
+								font-size: 14px;
+								color:@editableTextColor;
+								&::placeholder{
+									color:rgb(117, 117, 117);
+								}
+								&[readonly] {
+									background: #fff;
+									cursor: default;
+								}
+							}
+							.date-question.k-datepicker .k-picker-wrap {
+								height: 30px;
+							}
+
+							input.date-question[readonly]
+							{
+								color: @editableTextColor;
+							}
+
+							.number-question
+							{
+								.k-numeric-wrap
+								{
+									.number-question
+									{
+										padding-left: 8px;
+									}
+								}
+
+								input[type=number]
+								{
+									-moz-appearance:textfield;
+									&::-webkit-inner-spin-button, ::-webkit-outer-spin-button
+									{
+										display: none;
+									}
+								}
+							}
+
+							.currency-question
+							{
+								position: relative;
+								.currency-symbol {
+									position:absolute;
+									padding: 0px 8px;
+									line-height: 28px;
+								}
+								input[type=number]
+								{
+									height: 28px;
+									padding-left:15px;
+									border: 1px solid #c5c5c5;
+									-moz-appearance:textfield;
+									&::-webkit-inner-spin-button, ::-webkit-outer-spin-button
+									{
+										display: none;
+									}
+									&:hover,&:focus {
+										border-width: 1px;
+										outline: none;
+									}
+								}
+							}
+
+							.systemfield-question
+							{
+								height: 28px;
+								&:hover, &:active, &:focus{
+									outline: 0;
+								    border-width: 1px;	
+								}
+							}
+
+							.question[disabled]
+							{
+								&:hover, &:active, &:focus{
+									border: 1px solid #c5c5c5;
+								}
+							}
+							
+							.rating-question
+							{
+								width: 100%;
+								position: relative;
+
+								.left-label
+								{
+									margin-top: 15px;
+								}
+
+								.right-label
+								{
+									position: absolute;
+									right: 10px;
+								}
+
+							}
+
+							.map-question
+							{
+								width: 100%;
+								position: relative;
+								height: 400px;
+
+								div.map-question-zoom-cover
+								{ 
+									background-color: rgba(0,0,0,0.45);
+									text-align: center;
+
+									&>p.map-question-zoom-cover-tip
+									{
+										font-size: 22px;
+										color: white;
+										font-family: "SourceSansPro-SemiBold",Arial,sans-serif;
+										position: relative;
+										margin: 0;
+										top: 50%;
+										-webkit-transform: translateY(-50%);
+										-ms-transform: translateY(-50%);
+										transform: translateY(-50%);
+									}
+								}					
+							}
+
+							.slider.slider-horizontal
+							{
+								width: 100%;
+								height: 45px;
+								margin-top: -5px;
+								
+								.tooltip-arrow, .tooltip-inner
+								{
+									background-color: white;
+									color:black;
+									border: 0;
+								}
+							}
+
+							.slider .tooltip.top
+							{
+								margin-top: -26px;
+							}
+
+							.tooltip-min, .tooltip-max
+							{
+								display: none;
+							}
+
+							.input-group {
+								.form-control {
+									height: 30px;
+									border-radius: 0;
+									-webkit-transition:  none !important;
+									transition: none!important;
+									-o-transition: none!important;
+								}
+								.input-group-addon.datepickerbutton {
+									background-color: #fff;
+									width: 2em;
+									font-size: 14px;
+								}
+							}
+							
+							input:not([type="checkbox"]):not([type="radio"]),
+							textarea
+							{
+								border-radius: 0;
+							}
+
+							.input-group:not(.disabled):hover,
+							.input-group:not(.disabled):focus {
+								.form-control, .input-group-addon {
+									border-color: @editableTextColor !important;
+								}
+							}
+							
+							&.readonly
+							{
+								input[type='text'],input[type='number'], textarea
+								{
+									&[readonly], &[disabled]
+									{
+										&:hover, &:focus {
+											border-color: @editableTextBorderColor !important;
+										}
+									}
+								}
+
+
+								.input-group.datetime-question, .input-group.time-question 
+								{
+									input[type='text'], .datepickerbutton
+									{
+										border-color: @editableTextBorderColor;
+									}
+								}
+
+								.k-i-calendar,.k-link .k-icon {
+									cursor: default !important;
+								}
+								.number-question {
+									.k-select, .k-link, .k-link span {
+										&:hover{
+											cursor: default !important;
+											background-color:transparent;
+										}
+									 }
+								}
+								.time-question  {
+									.form-control,.datepickerbutton{
+											&:hover {
+												border-color: @editableTextBorderColor !important;
+											}
+									}
+								}
+								
+								.clear-x
+								{
+									display: none;
+								}
+							}
+						}
+					}
+				}
 				.form-question-container
 				{
 					padding: 20px 30px;
