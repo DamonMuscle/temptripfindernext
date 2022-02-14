@@ -200,6 +200,7 @@
 				}, 10);
 			}).catch(err =>
 			{
+				self.handleScrollLocationWhenErrorDisplay();
 				tf.loadingIndicator.tryHide();
 			});
 		}
@@ -1235,6 +1236,25 @@
 		}
 	}
 
+	Form.prototype.handleScrollLocationWhenErrorDisplay = function ()
+	{
+		const self = this;
+		if (tf.isFromWayfinder || isMobileDevice())
+		{
+			const errorElems = self.elem.find(".invalid");
+			if (errorElems && errorElems.length > 0)
+			{
+				const errorElem = errorElems[0];
+				const top = errorElem.offsetTop;
+				const shouldScrollTop = top > 30 ? top - 30 : 0;
+				$(".form-body").scroll();
+				$(".form-body").animate({
+					scrollTop: shouldScrollTop
+				}, 1000);
+			}
+		}
+	};
+
 	Form.prototype.fetchFilterData = function ()
 	{
 		let config = TF.Form.formConfig[this.dataType];
@@ -1284,7 +1304,7 @@
 			self.removeAllChildNodes($footerModel[0]);
 			let newFooter = `<div class="action-bar">
 							<button type="button" data-bind="visible: currentSectionId() === lastSectionId()"
-							class="form-button btn tf-btn-black btn-sm form-save${this.isFormExpired() ? ' disabled' : ''}"${this.isFormExpired() ? ' disabled' : ''}>
+							class="form-button btn tf-btn-black btn-sm form-save${self.isFormExpired() ? ' disabled' : ''}"${self.isFormExpired() ? ' disabled' : ''}>
 								<div class="action submit">Submit</div>
 							</button>
 							<button type="button" class="form-button btn tf-btn-black btn-sm form-next" data-bind="visible: currentSectionId() !== lastSectionId()">
