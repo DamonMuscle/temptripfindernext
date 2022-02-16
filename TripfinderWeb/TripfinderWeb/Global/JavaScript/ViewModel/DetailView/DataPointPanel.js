@@ -478,6 +478,11 @@
 
 			if (values[2])
 			{
+				values[2] = values[2].filter(obj =>
+				{
+					obj = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(obj);
+					return obj.UDGridFields.length > 0;
+				});
 				tf.udgHelper.updateDataPoint(self.gridType, values[2]);
 			}
 

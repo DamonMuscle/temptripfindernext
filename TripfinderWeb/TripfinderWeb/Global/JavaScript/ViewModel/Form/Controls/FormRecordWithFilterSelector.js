@@ -1,7 +1,8 @@
+const NAMESPACE_TFCONTROLE = "TF.Control";
+const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
+
 (function ()
 {
-	const NAMESPACE_TFCONTROLE = "TF.Control";
-	const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 
 	createNamespace(NAMESPACE_TFCONTROLE).FormRecordWithFilterSelector = FormRecordWithFilterSelector;
 
