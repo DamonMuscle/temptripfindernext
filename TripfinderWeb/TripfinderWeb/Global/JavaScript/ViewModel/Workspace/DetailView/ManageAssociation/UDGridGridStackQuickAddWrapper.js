@@ -1,5 +1,6 @@
 (function ()
 {
+	const MODAL_BODY_SELECTOR = '.modal-body';
 	createNamespace("TF.DetailView").UDGridGridStackQuickAddWrapper = UDGridGridStackQuickAddWrapper;
 	const CSS_MIN_HEIGHT = "min-height";
 	function UDGridGridStackQuickAddWrapper(options)
@@ -31,7 +32,7 @@
 	{
 		var self = this;
 		self.$element = $(element);
-		self.$scrollBody = self.$element.closest('.modal-body');
+		self.$scrollBody = self.$element.closest(MODAL_BODY_SELECTOR);
 
 		self.initCustomDetailView();
 	};
@@ -116,7 +117,7 @@
 			}
 			self.$element.find(".custom-detail-view").empty().append(self.form.element);
 			//set form min-height to adapt page view size,  30(modal padding)
-			self.form.element.find(".form").css(CSS_MIN_HEIGHT, `${parseInt(self.$element.parents(".modal-body").css("max-height")) - 30}px`);
+			self.form.element.find(".form").css(CSS_MIN_HEIGHT, `${parseInt(self.$element.parents(MODAL_BODY_SELECTOR).css("max-height")) - 30}px`);
 
 			if (TF.isMobileDevice)
 			{
@@ -125,12 +126,12 @@
 
 				let dialog = self.$element.closest('.modal-dialog');
 				dialog.addClass("modal-fullscreen");
-				dialog.find('.modal-body').css("max-height", $(window).height() - 46);
+				dialog.find(MODAL_BODY_SELECTOR).css("max-height", $(window).height() - 46);
 
-				let bodyHeight = dialog.find('.modal-body').height();
+				let bodyHeight = dialog.find(MODAL_BODY_SELECTOR).height();
 				self.$element.closest(".grid-stack-container").css(CSS_MIN_HEIGHT, bodyHeight + "px");
 
-				let bodyHeightWithoutPadding = dialog.find('.modal-body').height();
+				let bodyHeightWithoutPadding = dialog.find(MODAL_BODY_SELECTOR).height();
 				self.$element.closest(".basic-quick-add").css(CSS_MIN_HEIGHT, bodyHeightWithoutPadding + "px");
 				self.$element.find(".form").css(CSS_MIN_HEIGHT, bodyHeightWithoutPadding + "px");
 

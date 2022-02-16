@@ -1,9 +1,12 @@
 (function ()
 {
+	const USER_DEFINED_GROUP = "User Defined Group";
+	const PRAMATER_KEY_RELATIONSHIP = "@relationships";
 	createNamespace("TF.DetailView").UserDefinedGridHelper = UserDefinedGridHelper;
 
 	function UserDefinedGridHelper()
 	{
+		return;
 		// This is intentional
 	}
 
@@ -13,7 +16,7 @@
 	{
 		function utc2Local(value)
 		{
-			var dt = moment(value);
+			const dt = moment(value);
 			let tmpStr = "";
 			if (tf.localTimeZone)
 			{
@@ -162,11 +165,11 @@
 
 	UserDefinedGridHelper.prototype.getAllValidUDGrids = function ()
 	{
-		let self = this;
+		const self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
 			{
 				paramData: {
-					"@relationships": "UDGridDataSources,UDGridFields,UDGridSections"
+					[PRAMATER_KEY_RELATIONSHIP]: "UDGridDataSources,UDGridFields,UDGridSections"
 				}
 			},
 			{ overlay: false }
@@ -186,13 +189,13 @@
 
 	UserDefinedGridHelper.prototype.filterAssignedForms = function (rawForms)
 	{
-		let isAdmin = tf.authManager.authorizationInfo.isAdmin;
+		const isAdmin = tf.authManager.authorizationInfo.isAdmin;
 		if (isAdmin || !Array.isArray(rawForms))
 		{
 			return rawForms;
 		}
 
-		let forms = tf.authManager.authorizationInfo.authorizationTree.forms;
+		const forms = tf.authManager.authorizationInfo.authorizationTree.forms;
 		return rawForms.filter(function (item)
 		{
 			return item.Public || forms.indexOf(item.ID) > -1;
@@ -208,7 +211,7 @@
 					"DataTypeId": dataTypeId,
 					"Public": isPublic,
 					"checkIP": true,
-					"@relationships": "UDGridFields,UDGridDataSources,UDGridSections"
+					[PRAMATER_KEY_RELATIONSHIP]: "UDGridFields,UDGridDataSources,UDGridSections"
 				}
 			},
 			{ overlay: false }
@@ -291,7 +294,7 @@
 				paramData: {
 					"Id": id,
 					"checkIP": true,
-					"@relationships": "UDGridFields,UDGridDataSources,UDGridSections,RoleForms"
+					[PRAMATER_KEY_RELATIONSHIP]: "UDGridFields,UDGridDataSources,UDGridSections,RoleForms"
 				}
 			},
 			{ overlay: false }
@@ -648,7 +651,7 @@
 					RecordDataType: dataTypeId,
 					RecordID: entityId,
 					UDGridID: udGridId,
-					"@relationships": relationships
+					[PRAMATER_KEY_RELATIONSHIP]: relationships
 				}
 			},
 			{ overlay: false }
@@ -758,12 +761,12 @@
 		if (record.DocumentUDGridRecords)
 		{
 			rawRecord.DocumentUDGridRecords = record.DocumentUDGridRecords;
-			if (paramData["@relationships"])
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
 			{
-				paramData["@relationships"] += ",";
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "DocumentUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "DocumentUDGridRecords";
 		}
 
 		if (record.MapUDGridRecords)
@@ -778,12 +781,12 @@
 				});
 			}
 
-			if (paramData["@relationships"])
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
 			{
-				paramData["@relationships"] += ",";
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "MapUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "MapUDGridRecords";
 		}
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
@@ -831,12 +834,12 @@
 		if (record.DocumentUDGridRecords)
 		{
 			rawRecord.DocumentUDGridRecords = record.DocumentUDGridRecords;
-			if (paramData["@relationships"])
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
 			{
-				paramData["@relationships"] += ",";
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "DocumentUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "DocumentUDGridRecords";
 		}
 
 		if (record.MapUDGridRecords)
@@ -851,12 +854,12 @@
 				});
 			}
 
-			if (paramData["@relationships"])
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
 			{
-				paramData["@relationships"] += ",";
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "MapUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "MapUDGridRecords";
 			paramData["guidValue"] = guid;
 		}
 
@@ -889,7 +892,7 @@
 			{
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "documents", "?ignore_blob=true"),
 					{
-						paramData: { "@relationships": "DocumentRelationship" },
+						paramData: { [PRAMATER_KEY_RELATIONSHIP]: "DocumentRelationship" },
 						data: attachementsOfNew
 					}, { overlay: false }
 				).then(res =>
@@ -909,7 +912,7 @@
 			{
 				return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "documents", "?ignore_blob=true"),
 					{
-						paramData: { "@relationships": "DocumentRelationship" },
+						paramData: { [PRAMATER_KEY_RELATIONSHIP]: "DocumentRelationship" },
 						data: attachementsOfModify
 					}, { overlay: false }
 				).then(res =>
@@ -963,12 +966,12 @@
 				path: "/DocumentUDGridRecords",
 				value: JSON.stringify(record.DocumentUDGridRecords),
 			});
-			if (paramData["@relationships"])
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
 			{
-				paramData["@relationships"] += ",";
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "DocumentUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "DocumentUDGridRecords";
 		}
 
 		if (record.MapUDGridRecords)
@@ -987,12 +990,12 @@
 				path: "/MapUDGridRecords",
 				value: JSON.stringify(record.MapUDGridRecords),
 			});
-			if (paramData["@relationships"])
+			if (paramData[PRAMATER_KEY_RELATIONSHIP])
 			{
-				paramData["@relationships"] += ",";
+				paramData[PRAMATER_KEY_RELATIONSHIP] += ",";
 			}
-			paramData["@relationships"] = paramData["@relationships"] || "";
-			paramData["@relationships"] += "MapUDGridRecords";
+			paramData[PRAMATER_KEY_RELATIONSHIP] = paramData[PRAMATER_KEY_RELATIONSHIP] || "";
+			paramData[PRAMATER_KEY_RELATIONSHIP] += "MapUDGridRecords";
 		}
 
 		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
@@ -1429,14 +1432,14 @@
 
 	UserDefinedGridHelper.prototype.updateDataPoint = function (gridType, udGrids)
 	{
-		dataPointsJSON[gridType]["User Defined Group"] = udGrids.map(item =>
+		dataPointsJSON[gridType][USER_DEFINED_GROUP] = udGrids.map(item =>
 		{
 			return _.extend(item, {
 				"field": "UDGridId",
 				"title": item.Name,
 				"UDGridId": item.ID,
 				"type": "UDGrid",
-				"defaultValue": "User Defined Group",
+				"defaultValue": USER_DEFINED_GROUP,
 				"min-height": 3,
 				"min-width": 2
 			})
@@ -1445,7 +1448,7 @@
 
 	UserDefinedGridHelper.prototype.generateQuickAddLayout = function (udGridId, gridType, dataPoint)
 	{
-		let udGridDataPoint = dataPointsJSON[gridType]["User Defined Group"].find(udGrid => udGrid.ID == udGridId);
+		let udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].find(udGrid => udGrid.ID == udGridId);
 		if (!udGridDataPoint)
 		{
 			udGridDataPoint = dataPoint
@@ -1572,7 +1575,7 @@
 
 	UserDefinedGridHelper.prototype.getDataPointByIdentifierAndGrid = function (udGridFieldId, udGridId, gridType)
 	{
-		const udGridDataPoint = dataPointsJSON[gridType]["User Defined Group"].filter(udGrid => udGrid.ID == udGridId)[0];
+		const udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID == udGridId)[0];
 		const udGridFieldDataPoint = udGridDataPoint.UDGridFields.filter(udGridField => udGridField.UDGridFieldId == udGridFieldId);
 
 		return $.extend(true, {}, udGridFieldDataPoint[0]);
@@ -1580,7 +1583,7 @@
 
 	UserDefinedGridHelper.prototype.getDataPointByUDGridId = function (udGridId, gridType)
 	{
-		return dataPointsJSON[gridType]["User Defined Group"].filter(udGrid => udGrid.ID === udGridId)[0];
+		return dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID === udGridId)[0];
 	};
 
 	UserDefinedGridHelper.prototype.getDocumentGridRecords = function (columnFields, documentIds)

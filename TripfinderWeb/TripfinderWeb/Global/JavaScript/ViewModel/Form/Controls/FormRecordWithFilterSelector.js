@@ -1,7 +1,9 @@
 (function ()
 {
+	const NAMESPACE_TFCONTROLE = "TF.Control";
+	const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 
-	createNamespace("TF.Control").FormRecordWithFilterSelector = FormRecordWithFilterSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormRecordWithFilterSelector = FormRecordWithFilterSelector;
 
 	function FormRecordWithFilterSelector(elem, options)
 	{
@@ -37,7 +39,7 @@
 				<div class="modal" id="myModal" tabindex="-1" role="dialog">
 				</div>`);
 
-		let tfFilter = ele.find('.k-icon.tf-filter'),
+		let tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			modalEle = ele.find('#myModal'),
 			clearFilterEle = ele.find('.current-filter-label .k-clear-value');
 
@@ -81,7 +83,7 @@
 	FormRecordWithFilterSelector.prototype.toggleFilterApply = function (applyFilter)
 	{
 		let ele = this.autoComplete.wrapper,
-			tfFilter = ele.find('.k-icon.tf-filter'),
+			tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			filterLabel = ele.find('.current-filter-label');
 
 		if (applyFilter)
@@ -103,7 +105,7 @@
 	FormRecordWithFilterSelector.prototype.toggleFilterEnable = function (enableFilter)
 	{
 		let ele = this.autoComplete.wrapper,
-			tfFilter = ele.find('.k-icon.tf-filter'),
+			tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			clearFilterEle = ele.find('.current-filter-label .k-clear-value');
 
 		if (enableFilter)
@@ -244,7 +246,7 @@
 	FormRecordWithFilterSelector.prototype.dispose = function ()
 	{
 		let ele = this.autoComplete.wrapper,
-			tfFilter = ele.find('.k-icon.tf-filter'),
+			tfFilter = ele.find(CLASS_NAME_KICON_TFFILTER),
 			modalEle = ele.find('#myModal');
 
 		tfFilter.off('click');
@@ -258,7 +260,7 @@
 (function ()
 {
 
-	createNamespace("TF.Control").FormStaffRecordSelector = FormStaffRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormStaffRecordSelector = FormStaffRecordSelector;
 
 	function FormStaffRecordSelector(elem, options)
 	{
@@ -336,7 +338,7 @@
 (function ()
 {
 
-	createNamespace("TF.Control").FormTripRecordSelector = FormTripRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormTripRecordSelector = FormTripRecordSelector;
 
 	function FormTripRecordSelector(elem, options)
 	{
@@ -393,7 +395,7 @@
 (function ()
 {
 
-	createNamespace("TF.Control").FormVehicleRecordSelector = FormVehicleRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormVehicleRecordSelector = FormVehicleRecordSelector;
 
 	function FormVehicleRecordSelector(elem, options)
 	{
@@ -467,7 +469,7 @@
 (function ()
 {
 
-	createNamespace("TF.Control").FormStudentRecordSelector = FormStudentRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormStudentRecordSelector = FormStudentRecordSelector;
 
 	function FormStudentRecordSelector(elem, options)
 	{
@@ -522,7 +524,7 @@
 (function ()
 {
 
-	createNamespace("TF.Control").FormFieldtripRecordSelector = FormFieldtripRecordSelector;
+	createNamespace(NAMESPACE_TFCONTROLE).FormFieldtripRecordSelector = FormFieldtripRecordSelector;
 
 	function FormFieldtripRecordSelector(elem, options)
 	{

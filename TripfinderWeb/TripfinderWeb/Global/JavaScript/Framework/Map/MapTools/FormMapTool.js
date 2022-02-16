@@ -1,7 +1,9 @@
+const TFFormMapStr = "TF.Form.Map";
+const OrientationchangeMIMD = "orientationchange.mapIsMobileDevice";
 /* Home button: click Home button to reset geometry to make home location in center of map */
 !function ()
 {
-	createNamespace("TF.Form.Map").HomeTool = HomeTool;
+	createNamespace(TFFormMapStr).HomeTool = HomeTool;
 
 	function HomeTool(routingMapTool)
 	{
@@ -28,7 +30,7 @@
 /* Location marker */
 !function ()
 {
-	createNamespace("TF.Form.Map").LocationMarkerTool = LocationMarkerTool;
+	createNamespace(TFFormMapStr).LocationMarkerTool = LocationMarkerTool;
 	function LocationMarkerTool(routingMapTool)
 	{
 		var self = this;
@@ -492,7 +494,7 @@
 /* Trush: delete shape*/
 !function ()
 {
-	createNamespace("TF.Form.Map").DeleteShapeTool = DeleteShapeTool;
+	createNamespace(TFFormMapStr).DeleteShapeTool = DeleteShapeTool;
 	function DeleteShapeTool(routingMapTool)
 	{
 		var self = this;
@@ -516,7 +518,7 @@
 /* My location:  draw icon on map to show current location*/
 !function ()
 {
-	createNamespace("TF.Form.Map").MyLocationTool = MyLocationTool;
+	createNamespace(TFFormMapStr).MyLocationTool = MyLocationTool;
 	function MyLocationTool(routingMapTool)
 	{
 		const self = this;
