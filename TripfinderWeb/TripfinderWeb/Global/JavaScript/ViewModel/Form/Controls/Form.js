@@ -8,34 +8,125 @@
 	const CLASS_NAME_LINE_CLAMP2 = "line-clamp-2";
 	const CLASS_NAME_LINE_CLAMP3 = "line-clamp-3";
 	createNamespace("TF.Control.Form").Form = Form;
+
+	const SPECIFY_RECORD_TYPE_MY_RECORD = 3;
+
+	function _initSpecifyOptions(options)
+	{
+		const gridType = tf.dataTypeHelper.getKeyById(Number(options.DataTypeId));
+		let isMyRecordsFilterRequired = undefined;
+		let specifyRecordOptions = {};
+
+		if (options.GridOptions)
+		{
+			const gridOptions = JSON.parse(options.GridOptions);
+			isMyRecordsFilterRequired = gridOptions.IsMyRecordsFilterRequired;
+
+			if (gridOptions && gridOptions.SpecifyRecordOptions)
+			{
+				specifyRecordOptions = gridOptions.SpecifyRecordOptions;
+			}
+		}
+
+		return TF.DetailView.UserDefinedGridHelper.initSpecifyRecordOption(gridType, specifyRecordOptions, isMyRecordsFilterRequired);
+	}
+
 	function Form(dataType, options)
 	{
+		const self = this;
 		this.dataType = dataType;
+
+		options = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(options);
+
 		this.options = options;
+		this._specifyOptions = _initSpecifyOptions(this.options);
+
 		this.obRecordID = ko.observable(null);
+		this.isFormExpired = options.obFormExpiredAfterOpen;
+
 		this.obRecordID.subscribe(recordId => this.toggleSystemFieldValue(recordId));
+		this.getPublicTokenPromise = Promise.resolve();
+		if (options.Public)
+		{
+			this.getPublicTokenPromise = TF.DetailView.UserDefinedGridHelper.getPublicFormTokenbyId(options.ID, true);
+		}
+
+		this.hasSections = this.options.UDGridSections && this.options.UDGridSections.length > 0;
+		// For section display
+		if (self.hasSections && this.options.DisplayOneSection)
+		{
+			this.options.UDGridSections = this.options.UDGridSections.sort((a, b) => a.Sequence - b.Sequence);
+			const firstSection = this.options.UDGridSections[0];
+			const lastSection = this.options.UDGridSections[this.options.UDGridSections.length - 1];
+			this.currentSectionId = ko.observable(firstSection.Id);
+			this.lastSectionId = ko.observable(lastSection.Id);
+			this.firstSectionId = ko.observable(firstSection.Id);
+			this.doOneSection = ko.observable(true);
+			this.currentSectionName = ko.observable(firstSection.Name);
+		}
+		else
+		{
+			this.currentSectionId = ko.observable();
+			this.lastSectionId = ko.observable();
+			this.firstSectionId = ko.observable();
+			this.doOneSection = ko.observable(false);
+			this.currentSectionName = ko.observable(false);
+		}
+
+		this.displayOneSection = this.options.DisplayOneSection;
 		this.questions = [];
+		this.sections = [];
 		this.searchControlTemplate = new TF.Control.SearchControlViewModel();
 		this.onFormElementInit = new TF.Events.Event();
 		this.elem = this.initElement();
 		this.onFormElementInit.notify();
-		this.initUDFSystemFieldStatePromise = this.initUDFSystemFieldState().then(() =>
+		if (self.hasSections && this.options.DisplayOneSection)
 		{
-			this.resetSubmitButtonsAndWarningMessage(this.elem);
-		});
-		this.initRecordSelector();
-		this.initEvents();
-
-		if (!this.checkModifyPermission(dataType))
-		{
-			this.options.isReadOnly = true;
+			self.handleFooterForSectionGrid();
 		}
 
-		// waiting element attched to appropriate node
-		setTimeout(() =>
+		this.initUDFSystemFieldStatePromise = this.initUDFSystemFieldState().then(() =>
 		{
-			this.attachActionOnFormHeader(this.elem);
-		}, 100);
+			if (this.sections.length > 0) 
+			{
+				this.sections.forEach((section, index) =>
+				{
+					const onlyContainsSystemFields = (section.element.find(".form-question:visible").length === 0) && (section.element.find(".systemfield-question").length > 0);
+					if (onlyContainsSystemFields)
+					{
+						section.element.find(".system-field-invalid").removeClass("hide");
+					}
+				});
+
+			} else
+			{
+				this.resetSubmitButtonsAndWarningMessage(this.elem);
+			}
+			if (self.doOneSection())
+			{
+				ko.applyBindings(self, self.elem.find(".form-section")[0]);
+			}
+		});
+
+		this.getPublicTokenPromise.then((res) =>
+		{
+			if (res)
+			{
+				tf.authManager.surveyToken = res;
+			}
+			this.initRecordSelectorPromise = this.initRecordSelector().then((res) =>
+			{
+				this.initEvents();
+
+				this.options.isReadOnly = !this.checkModifyPermission(dataType);
+
+				// waiting element attched to appropriate node
+				setTimeout(() =>
+				{
+					this.attachActionOnFormHeader(this.elem);
+				}, 100);
+			});
+		});
 	}
 
 	Form.prototype = Object.create(TF.Control.Form.Form.prototype);
@@ -48,44 +139,100 @@
 			configurable: false
 		});
 
-	Form.prototype.initEvents = function()
+	Form.prototype.initEvents = function ()
 	{
-		this.elem.on('click', '.form-close', () =>
+		const footerElement = $('.modal-footer');
+		footerElement.on('click', '.form-close', () =>
 		{
-			const hasValue = this.questions.some(question => question.hasValue()),
-				hasAttachments = this.attachBlock && this.attachBlock.formDocuments.length > 0;
-			if (hasValue || hasAttachments)
-			{
-				tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Unsaved Changes")
-					.then(result =>
-					{
-						if (result)
-						{
-							this.closeForm();
-						}
-					});
-			}
-			else
-			{
-				this.closeForm();
-			}
+			this.triggerCloseForm();
 		});
-		this.elem.on('click', '.form-save', () =>
+		footerElement.on('click', '.form-save', () =>
 		{
-			this.saveForm();
+			this._saveBtnClickEvent();
+		});
+		footerElement.on('click', '.form-next', () =>
+		{
+			this._nextBtnClickEvent();
+		});
+		footerElement.on('click', '.form-previous', () =>
+		{
+			this._previousBtnClickEvent();
 		});
 	}
 
-	Form.prototype.closeForm = function()
+	Form.prototype.closeForm = function ()
 	{
 		this.elem.trigger('formClose');
-		$(window).off(EVENT_ORIENTATION_CHANGE_MOBILE);
+		tf.authManager.surveyToken = undefined;
 	}
 
-	Form.prototype.validateLocationRequired = function()
+	Form.prototype.triggerCloseForm = function ()
+	{
+		this.elem.trigger('triggerFormClose');
+	}
+
+	Form.prototype._saveBtnClickEvent = function ()
+	{
+		this.elem.trigger('formSave');
+	}
+
+	Form.prototype._nextBtnClickEvent = function ()
+	{
+		const self = this;
+		if (self.currentSectionId() !== self.lastSectionId())
+		{
+			const currentSection = self.sections.filter((s) => s.Id === self.currentSectionId());
+			Promise.all([...currentSection[0].questions.map(q => q.validate())]).then(() =>
+			{
+				let nextIndex = 0;
+				self.sections.forEach((section, index) =>
+				{
+					if (section.Id === self.currentSectionId())
+					{
+						nextIndex = index + 1;
+					}
+				});
+				self.currentSectionId(self.sections[nextIndex].Id);
+				self.currentSectionName(self.sections[nextIndex].Name);
+				setTimeout(function ()
+				{
+					$(".form-body").scrollTop(0);
+				}, 10);
+			}).catch(err =>
+			{
+				self.handleScrollLocationWhenErrorDisplay();
+				tf.loadingIndicator.tryHide();
+			});
+		}
+	}
+
+	Form.prototype._previousBtnClickEvent = function ()
+	{
+		const self = this;
+		if (self.currentSectionId() !== self.firstSectionId())
+		{
+			let previousIndex = 0;
+			self.sections.forEach((section, index) =>
+			{
+				if (section.Id === self.currentSectionId())
+				{
+					previousIndex = index - 1;
+				}
+			});
+			self.currentSectionId(self.sections[previousIndex].Id);
+			self.currentSectionName(self.sections[previousIndex].Name);
+			setTimeout(function ()
+			{
+				$(".form-body").scrollTop(0);
+			}, 10);
+		}
+	}
+
+
+	Form.prototype.validateLocationRequired = function ()
 	{
 		//Do not validate location required when the form is edited.
-		if (this.options.udGridRecordId)
+		if (this.options.udGridRecordId) 
 		{
 			return Promise.resolve(true);
 		}
@@ -99,132 +246,9 @@
 		});
 	}
 
-	Form.prototype.wrapQuestionAnswer = function()
+	Form.prototype.saveForm = function ()
 	{
-		const udgRecord = {};
-		this.questions.filter(q => q.field.questionType !== 'Map').forEach(q =>
-		{
-			//filter out attachment since multi-documents saved in sperate table
-			if (q.constructor.name !== 'AttachBlock')
-			{
-				udgRecord[q.field.Guid] = q.value;
-
-				// format phone
-				if (q.field.questionType === 'Phone')
-				{
-					udgRecord[q.field.Guid] = tf.dataFormatHelper.getStandardPhoneNumberValue(q.value);
-				}
-			}
-
-			if (q instanceof TF.Control.Form.SignatureBlockQuestion && q.value)
-			{
-				udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] = udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] || [];
-				udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField].push(q.field.Guid);
-			}
-		});
-
-		return udgRecord;
-	}
-
-	Form.prototype.tryObtainLocation = function()
-	{
-		return TF.getLocation().then(locationRes =>
-		{
-			if (this.options.isLocationRequired && locationRes.errorCode !== 0)
-			{
-				tf.loadingIndicator.tryHide();
-				let errorTipMessage = "Unknown error of getting geolocation";
-				switch (locationRes.errorCode)
-				{
-					case GeolocationPositionError.PERMISSION_DENIED:
-						errorTipMessage = "Location services must be turned on in order to submit this form.";
-						break;
-					case GeolocationPositionError.POSITION_UNAVAILABLE:
-						errorTipMessage = "Location services must be enabled in order to submit this form.";
-						break;
-					case GeolocationPositionError.TIMEOUT:
-						errorTipMessage = "Location getting timed out, please try to submit this form again.";
-						break;
-				}
-				tf.promiseBootbox.alert({
-					message: errorTipMessage,
-					title: 'Location Service Not Available'
-				});
-				return Promise.reject();
-			}
-			else
-			{
-				return Promise.resolve({
-					latitude: locationRes.latitude,
-					longitude: locationRes.longitude
-				});
-			}
-		});
-	}
-
-	Form.prototype.tranlateAnswer = function(udgRecord)
-	{
-		return Promise.resolve().then(() =>
-		{
-			// attachment associated
-			const attachmentQuestions = this.questions.filter(q => q.field.questionType === 'AttachBlock' && q.value);
-			if (attachmentQuestions.length > 0)
-			{
-				const promises = attachmentQuestions.map(q =>
-				{
-					const attachments = q.value.map(_ =>
-					{
-						return {
-							Id: _.documentId,
-							FileContent: _.FileContentBase64,
-							FileName: _.FileName,
-							FileSizeKB: _.FileSizeKB,
-							LastUpdated: (new Date()).toISOString(),
-							Name: _.Name,
-							MimeType: _.MimeType,
-							DocumentClassificationID: 8, //general
-							DocumentRelationships: [{ AttachedToID: this.obRecordID(), AttachedToType: tf.dataTypeHelper.getId(this.dataType), DBID: tf.datasourceManager.databaseId }]
-						};
-					});
-					return tf.udgHelper.uploadAttachments(attachments).then(res =>
-					{
-						return { questionid: q.field.Guid, attachments: res }
-					});
-				})
-				return Promise.all(promises);
-			}
-			else
-			{
-				return Promise.resolve([]);
-			}
-		}).then(docs =>
-		{
-			udgRecord.DocumentUDGridRecords = [];
-			if (docs.length > 0)
-			{
-				udgRecord.DocumentUDGridRecords = docs.flatMap(qa => qa.attachments.map(a =>
-				{
-					return {
-						DBID: tf.datasourceManager.databaseId,
-						UDGridField: qa.questionid,
-						DocumentID: a.Id
-					};
-				}));
-			}
-
-			udgRecord.MapUDGridRecords = this.questions.filter(q => q.field.questionType === 'Map').map(q =>
-			{
-				return {
-					DBID: tf.datasourceManager.databaseId,
-					UDGridField: q.field.Guid,
-					ShapeData: JSON.stringify(q.value)
-				};
-			});
-		});
-	}
-
-	Form.prototype.saveForm = function()
-	{
+		const self = this;
 		if (this.obRecordID() == null)
 		{
 			const aStr = this.dataType === 'altsite' ? 'an' : 'a';
@@ -232,53 +256,195 @@
 			return tf.promiseBootbox.alert({
 				message: `Please select ${aStr} ${dateType} first.`,
 				title: `No ${dateType} Selected`
-			}).then(function()
+			}).then(function ()
 			{
 				return null;
 			});
 		}
-		return Promise.all([...this.questions.map(q => q.validate())])
-			.then(() =>
+
+		const filterOptions = {
+			gridDataEditFilter: true
+		};
+
+
+		return TF.getLocation()
+			.then(res =>
 			{
-				return this.validateLocationRequired().then(resolve =>
+				if (this.options.isLocationRequired && res.errorCode !== 0)
 				{
-					return Promise.resolve();
-				}, rej =>
-				{
-					if (rej === 'location access denied')
+					tf.loadingIndicator.tryHide();
+					let errorTipMessage = "Unknown error of getting geolocation";
+					switch (res.errorCode)
 					{
-						tf.promiseBootbox.alert({
-							message: `Location services must be enabled in order to submit this form.`,
-							title: 'Location Service Not Available'
-						})
+						case GeolocationPositionError.PERMISSION_DENIED:
+							errorTipMessage = "Location services must be turned on in order to submit this form.";
+							break;
+						case GeolocationPositionError.POSITION_UNAVAILABLE:
+							errorTipMessage = "Location services must be enabled in order to submit this form.";
+							break;
+						case GeolocationPositionError.TIMEOUT:
+							errorTipMessage = "Location getting timed out, please try to submit this form again.";
+							break;
 					}
+					tf.promiseBootbox.alert({
+						message: errorTipMessage,
+						title: 'Location Service Not Available'
+					});
 					return Promise.reject();
-				})
+				}
+				else
+				{
+					self.coord = res;
+					return Promise.resolve();
+				}
+			})
+			.then(() => 
+			{
+				return tf.udgHelper.getUDGridById(self.options.ID)
+					.then(udgrids =>
+					{
+						var availableFields = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(udgrids[0]).UDGridFields.map(x => x.UDGridFieldId);
+						var optionsFields = self.options.UDGridFields.map(x => x.UDGridFieldId).filter(Boolean);
+
+						//validate if availableFields contains optionsFields
+						for (var i of optionsFields)
+						{
+							if (availableFields.indexOf(i) === -1)
+							{
+								return Promise.reject("not_available");
+							}
+						}
+						return Promise.resolve();
+					});
+			})
+			.then(() => 
+			{
+				tf.loadingIndicator.showImmediately();
+				return tf.udgHelper.queryValidUDGridById(self.options.ID, filterOptions);
+			})
+			.then(validUDGrid =>
+			{
+				if (!validUDGrid)
+				{
+					return Promise.reject("not_available");
+				}
+
+				return Promise.resolve();
 			})
 			.then(() =>
 			{
-				const udgRecord = this.wrapQuestionAnswer();
-				tf.loadingIndicator.showImmediately();
-				return this.tranlateAnswer(udgRecord).then(() =>
+				return Promise.all([...this.questions.map(q => q.validate()), this.validateLocationRequired()])
+			}).then(() =>
+			{
+				var udgRecord = {};
+				this.questions.filter(q => q.field.questionType !== 'Map').forEach(q =>
 				{
-					return Promise.resolve(this.tryObtainLocation())
-						.then(coord =>
+					//filter out attachment since multi-documents saved in sperate table
+					if (q.field.questionType !== 'AttachBlock')
+					{
+						udgRecord[q.field.Guid] = q.value;
+
+						// format phone
+						if (q.field.questionType === 'Phone')
 						{
-							udgRecord.latitude = coord.latitude;
-							udgRecord.longitude = coord.longitude;
-							// save new record
-							if (!this.options.udGridRecordId)
+							udgRecord[q.field.Guid] = tf.dataFormatHelper.getStandardPhoneNumberValue(q.value);
+						}
+					}
+
+					if (q instanceof TF.Control.Form.SignatureBlockQuestion && q.value)
+					{
+						udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] = udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField] || [];
+						udgRecord[TF.DetailView.UserDefinedGridHelper.signedFieldListField].push(q.field.Guid);
+					}
+				});
+				return new Promise(resolve =>
+				{
+					// attachment associated
+					const attachmentQuestions = this.questions.filter(q => q.field.questionType === 'AttachBlock' && q.value);
+					if (attachmentQuestions.length > 0)
+					{
+						const promises = attachmentQuestions.map(q =>
+						{
+							const attachments = q.value.map(_ =>
+							{
+								return {
+									Id: _.documentId,
+									FileContent: _.FileContentBase64,
+									FileName: _.FileName,
+									FileSizeKB: _.FileSizeKB,
+									LastUpdated: (new Date()).toISOString(),
+									Name: _.Name,
+									MimeType: _.MimeType,
+									DocumentClassificationID: 8, //general
+									DocumentRelationships: [{ AttachedToID: this.obRecordID(), AttachedToType: tf.dataTypeHelper.getId(this.dataType), DBID: tf.datasourceManager.databaseId }]
+								};
+							});
+							return tf.udgHelper.uploadAttachments(attachments).then(res =>
+							{
+								return { questionid: q.field.Guid, attachments: res }
+							});
+						})
+						Promise.all(promises).then(res => resolve(res));
+					}
+					else
+					{
+						resolve([]);
+					}
+				}).then(res =>
+				{
+					udgRecord.DocumentUDGridRecords = [];
+					if (res.length > 0)
+					{
+						udgRecord.DocumentUDGridRecords = res.flatMap(qa => qa.attachments.map(a =>
+						{
+							return {
+								DBID: tf.datasourceManager.databaseId,
+								UDGridField: qa.questionid,
+								DocumentID: a.Id
+							};
+						}));
+					}
+
+					udgRecord.MapUDGridRecords = this.questions.filter(q => q.field.questionType === 'Map').map(q =>
+					{
+						return {
+							DBID: tf.datasourceManager.databaseId,
+							UDGridField: q.field.Guid,
+							ShapeData: JSON.stringify(q.value)
+						};
+					});
+
+					// normal
+					if (self.coord.errorCode === 0)
+					{
+						udgRecord.latitude = self.coord.latitude;
+						udgRecord.longitude = self.coord.longitude;
+					}
+
+					return Promise.resolve().then(() =>
+					{
+						if (!this.options.udGridRecordId)
+						{
+							if (!this.options.Public)
 							{
 								return tf.udgHelper.addUDGridRecordOfEntity(this.options, tf.dataTypeHelper.getId(this.dataType), this.obRecordID(), udgRecord);
-							}
-							// update exsiting record
-							else
+							} else
 							{
-								udgRecord.Id = this.options.udGridRecordId;
-								return tf.udgHelper.updateUDGridRecordOfEntity(this.options, udgRecord);
+								return TF.DetailView.UserDefinedGridHelper.getNewSurvey(self.options.ID)
+									.then(function (udgridSurvey)
+									{
+										return tf.udgHelper.addSurveyUDGridRecordOfEntity(self.options, tf.dataTypeHelper.getId(self.dataType), self.obRecordID(), udgRecord, udgridSurvey);
+									});
 							}
-						});
-				}).then(res =>
+						}
+						// update exsiting record
+						else
+						{
+							udgRecord.Id = this.options.udGridRecordId;
+							return tf.udgHelper.updateUDGridRecordOfEntity(this.options, udgRecord);
+						}
+					});
+				}).then((res) =>
 				{
 					if (this.saved)
 					{
@@ -298,10 +464,25 @@
 				{
 					tf.loadingIndicator.tryHide();
 				});
+			}, rej =>
+			{
+				tf.loadingIndicator.tryHide();
+				if (rej === 'location access denied')
+				{
+					tf.promiseBootbox.alert({
+						message: `Location services must be enabled in order to submit this form.`,
+						title: 'Location Service Not Available'
+					})
+				}
+				else if (rej === 'not_available')
+				{
+					tf.promiseBootbox.alert('This form cannot be submitted.', 'Not Available');
+				}
 			});
+
 	}
 
-	Form.prototype.onChange = function(e)
+	Form.prototype.onChange = function (e)
 	{
 		if (e.sender && e.sender.dataItem())
 		{
@@ -313,56 +494,117 @@
 		}
 	}
 
-	Form.prototype.initRecordSelector = function()
+	Form.prototype.initRecordSelector = function ()
 	{
 		const autoCompleteElem = this.elem.find(".form-entity-input");
-		let type = this.dataType, selector = 'FormRecordSelector';
+		const dbID = tf.datasourceManager.databaseId || this.dbId;
+		let type = this.dataType;
+		let selector = 'FormRecordSelector';
 
-		type = type[0].toUpperCase() + type.substring(1);
-		/**
-		if (((tf.staffInfo.isStaff && type === 'staff') || type === 'Fieldtrip' || tf.staffInfo.isDriver || tf.staffInfo.isAide) &&
-			TF.Control[`Form${type}RecordSelector`]) {
-			selector = `Form${type}RecordSelector`;
-		}*/
-		if (type === 'Fieldtrip' &&
-			TF.Control[`Form${type}RecordSelector`])
+		if (!this.options.Public && this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_MY_RECORD)
 		{
-			selector = `Form${type}RecordSelector`;
-		}
-		//initialize FormRecordSelector
-		this.recordSelector = new TF.Control[selector](autoCompleteElem, {
-			dataType: this.dataType,
-			enable: this.options.RecordID == null,
-			canClearFilter: this.options.canClearFilter,
-			valueChanged: val =>
+			type = type[0].toUpperCase() + type.substring(1);
+			if (((tf.staffInfo.isStaff && type === 'staff') || type === 'Fieldtrip' || tf.staffInfo.isDriver || tf.staffInfo.isAide) &&
+				TF.Control[`Form${type}RecordSelector`])
 			{
-				this.obRecordID(val);
+				selector = `Form${type}RecordSelector`;
 			}
-		});
-		autoCompleteElem.css("width", '');
-		if (this.options.isReadOnly || this.options.signatureReadonly)
-		{
-			autoCompleteElem.attr("disabled", 'disabled');
 		}
-		autoCompleteElem.keydown(function(event)
+
+		autoCompleteElem.keydown(function (event)
 		{
 			if (event.keyCode === 13)
 			{
 				event.stopPropagation()
 			}
 		});
+
+
+		return TF.DetailView.UserDefinedGridHelper.getFormSearchData('', dbID, this.dataType, true, this._specifyOptions).then((res) =>
+		{
+			let onlyOneRecord = false;
+			if (res && res.Items && res.Items.length === 1)
+			{
+				onlyOneRecord = true;
+			}
+			this.elem.find("div.form-entity-container").show();
+
+			//initialize FormRecordSelector
+			if (this.options.udGridRecordId)
+			{
+				this.recordSelector = new TF.Control[selector](autoCompleteElem, {
+					dbId: tf.datasourceManager.databaseId || this.dbId,
+					dataType: this.dataType,
+					enable: this.options.RecordID == null,
+					canClearFilter: this.options.canClearFilter,
+					valueChanged: val =>
+					{
+						this.obRecordID(val);
+					},
+					specifyOptions: this._specifyOptions,
+					isPublicForm: this.options.Public
+				});
+				autoCompleteElem.css("width", '');
+				if (this.options.isReadOnly || this.options.signatureReadonly)
+				{
+					autoCompleteElem.attr("disabled", 'disabled');
+				}
+			}
+			else
+			{
+				let enableStatus = this.options.RecordID == null;
+				if (onlyOneRecord)
+				{
+					enableStatus = false;
+				}
+				this.recordSelector = new TF.Control[selector](autoCompleteElem, {
+					dbId: tf.datasourceManager.databaseId || this.dbId,
+					dataType: this.dataType,
+					enable: enableStatus,
+					canClearFilter: this.options.canClearFilter,
+					valueChanged: val =>
+					{
+						this.obRecordID(val);
+					},
+					specifyOptions: this._specifyOptions,
+					isPublicForm: this.options.Public
+				});
+
+				if (onlyOneRecord)
+				{
+					const config = TF.Form.formConfig[this.dataType];
+					const recValue = res.Items[0], nameVal = config.formatItem(res.Items[0]).text;
+					this.obRecordID(recValue.Id);
+					this.recordSelector.elem.val(nameVal);
+					this.disAbleFormRecordSelector();
+				}
+			}
+			return Promise.resolve(true);
+		});
 	}
 
-	Form.prototype.checkModifyPermission = function(type)
+	Form.prototype.checkModifyPermission = function (type)
 	{
-		return tf.authManager.isAuthorizedForDataType(type, ["edit"]);
+		return tf.authManager.isAuthorizedForDataType(type, this.options.udGridRecordId ? "edit" : "add");
 	};
 
-	Form.prototype.initElement = function()
+	Form.prototype.initElement = function ()
 	{
-		const color = this.options.color,
+		const self = this;
+		let color = this.options.color,
 			dateType = tf.dataTypeHelper.getFormDataType(this.dataType),
-			searchHint = dateType === "Staff" ? "Search " + dateType : `Search ${dateType}s`;
+			searchHint = dateType === "Staff" ? "Search " + dateType : "Search " + dateType + "s";
+
+		const newButton = `<button type="button" class="form-button form-next" data-bind="visible: currentSectionId() !== lastSectionId()">
+								<div class="action next">Next</div>
+							</button>
+							<button type="button" class="form-button form-previous" data-bind="visible: currentSectionId() !== firstSectionId()">
+								<div class="action previous">Previous</div>
+							</button>`;
+
+		const sectionTitle = `<div class="form-entity-container form-section ${TF.isMobileDevice ? 'form-section-mobile-title' : 'form-section-title'}">
+						<div class="form-entity-title" data-bind="html: currentSectionName">Test</div>
+					</div>`;
 
 		let elem = $(`<div class="form-container hide">
 			<div class="form-layer" style="background-color:${this.convertHex(color, 0.2)}">
@@ -376,13 +618,13 @@
 							</svg>
 						</div>
 					</div>
-					<div class="form-body">	
-						<div class="form-entity-container">
+					<div class="form-body">
+					${self.doOneSection() ? sectionTitle : ''}
+						<div class="form-entity-container" style="display:none">
 							<span class="form-entity-title">${dateType}: </span>
 							<input class="form-entity-input" name="form-entity-input" placeholder="${searchHint}"></input>
 						</div>
-						<div class="form-question-container">
-							<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+					<div class="form-base-container">
 						</div>
 						<div class="e-sign">
 							<div class="e-sign-container">
@@ -398,27 +640,27 @@
 			elem = $(`<div class="form-container hide">
 			<div class="form-layer" style="background-color:${this.convertHex(color, 0.2)}">
 				<div class="form">
-				<div class="form-body">	
-					<div class="form-header" style="background-color:${color}">
-						<div class="form-title">${this.options.Name || ''}</div>
-						<div class="form-subtitle">${this.options.Description || ''}</div>
-					</div>
-					
-						<div class="form-entity-container">
-							<span class="form-entity-title">${dateType}: </span>
-							<input class="form-entity-input" name="form-entity-input" placeholder="${searchHint}"></input>
+					<div class="form-body">	
+						<div class="form-header" style="background-color:${color}">
+							<div class="form-title">${this.options.Name || ''}</div>
+							<div class="form-subtitle">${this.options.Description || ''}</div>
 						</div>
-						<div class="form-question-container">
-							<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+							${self.doOneSection() ? sectionTitle : ''}
+							<div class="form-entity-container" style="display:none">
+								<span class="form-entity-title">${dateType}: </span>
+								<input class="form-entity-input" name="form-entity-input" placeholder="${searchHint}"></input>
+							</div>
+
+					<div class="form-base-container">
 						</div>
-						<div class="e-sign">
-							<div class="e-sign-container">
+							<div class="e-sign">
+								<div class="e-sign-container">
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>`);
+			</div>`);
 		}
 
 		/* hack default kendo behavor */
@@ -429,37 +671,55 @@
 			kendoNumericWidget.widget.fn._keypress = () => true;
 		}
 
-		this.createQuestions(elem);
+		if (this.hasSections)
+		{
+			if (this.displayOneSection)
+			{
+				this.createSections(elem);
+			}
+			else
+			{
+				this.createDisplayAllSections(elem);
+			}
+		}
+		else
+		{
+			elem.find('.form-base-container').append(`
+				<div class="form-question-container">
+							<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+				</div>`);
+			this.createQuestions(elem.find('.form-base-container'), this.options.UDGridFields);
+		}
 		this._processElement(elem);
 
-		const self = this;
 		if (TF.isMobileDevice)
 		{
 			$(window).off(EVENT_ORIENTATION_CHANGE_MOBILE)
 				.on(EVENT_ORIENTATION_CHANGE_MOBILE, () =>
 				{
-					setTimeout(function()
+					setTimeout(function ()
 					{
 
-						const classNameModalBody = ".modal-body";
-						const cssNameMinHeight = "min-height";
-						const dialog = elem.closest('.modal-dialog');
+						let dialog = elem.closest('.modal-dialog');
 						if (dialog.length > 0)
 						{
-							dialog.find(classNameModalBody).css(cssNameMinHeight, $(window).height() - 46);
-							const bodyHeight = dialog.find(classNameModalBody).height();
-							elem.closest(".grid-stack-container").css(cssNameMinHeight, bodyHeight + "px");
+							dialog.find('.modal-body').css("max-height", $(window).height() - 46);
+							let bodyHeight = dialog.find('.modal-body').height();
+							// elem.closest(".basic-quick-add").css("max-height", bodyHeight + "px");
+							elem.closest(".grid-stack-container").css("min-height", bodyHeight + "px");
 
-							const bodyHeightWithoutPadding = dialog.find(classNameModalBody).height();
-							elem.closest(".basic-quick-add").css(cssNameMinHeight, bodyHeightWithoutPadding + "px");
-							elem.find(".form").css(cssNameMinHeight, bodyHeightWithoutPadding + "px");
+							let bodyHeightWithoutPadding = dialog.find('.modal-body').height();
+							elem.closest(".basic-quick-add").css("min-height", bodyHeightWithoutPadding + "px");
+							elem.find(".form").css("min-height", bodyHeightWithoutPadding + "px");
 
-							setTimeout(function()
+							setTimeout(function ()
 							{
-								const keepRotate = true;
-								self.resetFormHeader(elem, keepRotate);
-								setTimeout(function()
+								//self.checkHeaderWrapped(elem);
+								let keepRotate = true;
+								let toRotate = self.resetFormHeader(elem, keepRotate);
+								setTimeout(function ()
 								{
+									//self.resetFormSubTitleClamp(elem, toRotate); // for sticky header
 									window.scroll(0, 1);
 								}, 200);
 							}, 100);
@@ -472,32 +732,48 @@
 	}
 
 	/* assign type record, invoked by UDGridGridStackQuickAddWrapper.prototype._updateQuickAddDetailView */
-	Form.prototype.assginEntityRecord = function(record)
+	Form.prototype.assignEntityRecord = function (record)
 	{
-		const id = record && (record.RecordID || record.Id); // recordID contains value when form opened on form grid
-		if (!!id)
+		this.getPublicTokenPromise.then((res) =>
 		{
-			this.obRecordID(id);
-		}
-		if (this.obRecordID() !== null)
-		{
-			if (this.recordSelector.options.enable)
+			if (res)
 			{
-				this.recordSelector.autoComplete.enable(false);
+				tf.authManager.surveyToken = res;
 			}
-			this.fetchFilterData();
-		}
+
+			this.initRecordSelectorPromise.then(() =>
+			{
+				const id = record && (record.RecordID || record.Id); // recordID contains value when form opened on form grid
+				if (!!id)
+				{
+					this.obRecordID(id);
+				}
+				if (this.obRecordID() !== null)
+				{
+					if (this.recordSelector && this.recordSelector.options.enable)
+					{
+						this.recordSelector.autoComplete.enable(false);
+						const autoSearchElem = this.elem.find(".k-i-search");
+						if (autoSearchElem && autoSearchElem.length > 0)
+						{
+							autoSearchElem.remove();
+						}
+					}
+					this.fetchFilterData();
+				}
+			});
+		});
 	}
 
-	Form.prototype._processElement = function(element)
+	Form.prototype._processElement = function (element)
 	{
-		const anchors = element.find('.question-title a');
+		let anchors = element.find('.question-title a');
 		if (anchors.length > 0)
 		{
 			$.each(anchors, (idx, a) =>
 			{
-				const $a = $(a);
-				if ($a.attr('target') !== '_blank')
+				let $a = $(a);
+				if ($a.attr('target') != '_blank')
 				{
 					$a.attr('target', '_blank');
 				}
@@ -505,27 +781,21 @@
 		}
 	}
 
-	Form.prototype.getUDFDefinationOfSystemFieldQuestion = function()
+	Form.prototype.initUDFSystemFieldState = function ()
 	{
-		return Promise.resolve().then(() =>
+		const getUDFOptionPromise = () =>
 		{
 			const systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
 
 			if (this.udfOptionPromise === undefined)
 			{
-				this.udfOptionPromise = Promise.resolve(this.udfs).then(udfs =>
+				this.udfOptionPromise = Promise.resolve(this.udfs).then(udfs => 
 				{
 					const udfUniqueIds = systemFieldQuestions.filter(q => q.field.FieldOptions.IsUDFSystemField).map(q => q.field.FieldOptions.DefaultText);
 					if (udfs === undefined && udfUniqueIds.length > 0)
 					{
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
-							{
-								paramData: {
-									"@Relationships": "UDFDataSources",
-									"@fields": "DisplayName,Guid,UDFDataSources",
-									"@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})`
-								}
-							},
+							{ paramData: { "@Relationships": "UDFDataSources", "@fields": "DisplayName,Guid,UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
 							{ overlay: false })
 							.then(data =>
 							{
@@ -534,7 +804,6 @@
 									this.udfs = data.Items;
 									return this.udfs;
 								}
-								return [];
 							});
 					}
 					else
@@ -545,92 +814,80 @@
 			}
 
 			return this.udfOptionPromise;
-		});
-	}
+		};
 
-	Form.prototype.hideSystemFieldQuestionNoMatchedDb = function(question, udfs)
-	{
-		let existsDbMatchedUDF = false;
-		// re assign targetField with udf display name
-		udfs && udfs.forEach(udf =>
-		{
-			if (udf.Guid === question.field.FieldOptions.DefaultText && udf.UDFDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId))
-			{
-				existsDbMatchedUDF = true;
-			}
-
-			if (question.field.FieldOptions.IsUDFSystemField && question.field.editType.targetField === udf.Guid)
-			{
-				question.field.editType.targetField = udf.DisplayName.trim();
-			}
-		})
-
-		// hide question if current database does not exists in udf database source list
-		if (!existsDbMatchedUDF)
-		{
-			question.elem.hide();
-		}
-	}
-
-	Form.prototype.initUDFSystemFieldState = function()
-	{
-		const getUDFOptionPromise = this.getUDFDefinationOfSystemFieldQuestion();
 		return new Promise((resolve) =>
 		{
-			const systemFieldUDFQuestions = this.questions.filter(q => q.field.FieldOptions
-				&& q.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD
-				&& q.field.FieldOptions.IsUDFSystemField);
+			const systemFieldUDFQuestions = this.questions.filter(q => q.field.FieldOptions && q.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD && q.field.FieldOptions.IsUDFSystemField);
 			if (systemFieldUDFQuestions.length === 0)
 			{
 				resolve();
 			}
 
-			const promiseArr = systemFieldUDFQuestions.map(q =>
+			systemFieldUDFQuestions.forEach(q =>
 			{
-				return getUDFOptionPromise.then(udfs =>
+				getUDFOptionPromise().then(udfs =>
 				{
-					this.hideSystemFieldQuestionNoMatchedDb(q, udfs);
+					let existsDbMatchedUDF = false;
+					// re assign targetField with udf display name
+					udfs && udfs.forEach(udf =>
+					{
+						if (udf.Guid === q.field.FieldOptions.DefaultText && udf.UDFDataSources.some(ds => ds.DBID === tf.datasourceManager.databaseId))
+						{
+							existsDbMatchedUDF = true;
+						}
+
+						if (q.field.FieldOptions.IsUDFSystemField && q.field.editType.targetField === udf.Guid)
+						{
+							q.field.editType.targetField = udf.DisplayName.trim();
+						}
+					})
+
+					// hide question if current database does not exists in udf database source list
+					if (!existsDbMatchedUDF)
+					{
+						q.elem.hide();
+					}
+
+					resolve();
 				});
 			});
-
-			Promise.all(promiseArr).then(() => resolve());
 		});
 
 	}
 
-	Form.prototype.attachActionOnFormHeader = function($element)
+	Form.prototype.attachActionOnFormHeader = function ($element)
 	{
 		// make subtitle display block to calculate full height
 		$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
-		const subtitleHeight = $element.find(CLASS_NAME_FORM_SUBTITLE).outerHeight(),
+		let subtitleHeight = $element.find(CLASS_NAME_FORM_SUBTITLE).outerHeight(),
 			headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
 			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
 		/*
-		 * greater than 0 means insufficient height for subtitle(form description),
+		 * greater than 0 means insufficient height for subtitle(form description), 
 		 * need show "shore more" icon for arrow down to present full height content
 		 */
-		const offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
-		const self = this;
+		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+		let self = this;
 		if (!TF.isMobileDevice)
 		{
 			self.checkHeaderWrapped($element);
 			const isRotated = $element.find(".showmore").hasClass("rotate");
-			setTimeout(function()
+			setTimeout(function ()
 			{
 				self.resetFormSubTitleClamp($element, isRotated);
 			}, 200);
 		}
-
 		if (offsetHeight > 0)
 		{
 			if (!TF.isMobileDevice)
 			{
-				$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "-webkit-box");
+				$element.find(".form-subtitle").css("display", "-webkit-box");
 			}
 			this.elem.find(".showmore").show().on("click", ev =>
 			{
-				const toRotate = this.resetFormHeader($element);
-				setTimeout(function()
+				let toRotate = this.resetFormHeader($element);
+				setTimeout(function ()
 				{
 					self.resetFormSubTitleClamp($element, toRotate);
 				}, 200);
@@ -638,34 +895,34 @@
 		}
 	}
 
-	Form.prototype.checkHeaderWrapped = function($element)
+	Form.prototype.checkHeaderWrapped = function ($element)
 	{
-		const titleEle = $element.find(CLASS_NAME_FORM_TITLE),
+		let titleEle = $element.find(CLASS_NAME_FORM_TITLE),
 			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
 
 		titleEle.css('white-space', 'nowrap');
-		const height = titleEle.outerHeight();
+		let height = titleEle.outerHeight();
 		titleEle.css('white-space', 'normal');
 
-		$element.find(CLASS_NAME_FORM_SUBTITLE).removeClass(CLASS_NAME_LINE_CLAMP2);
+		$element.find('.form-subtitle').removeClass(CLASS_NAME_LINE_CLAMP2);
 		if (height < titleHeight)
 		{
 			//add mini-class to subtitle
-			$element.find(CLASS_NAME_FORM_SUBTITLE).addClass(CLASS_NAME_LINE_CLAMP2);
+			$element.find('.form-subtitle').addClass(CLASS_NAME_LINE_CLAMP2);
 		}
 	}
 
-	Form.prototype.resetFormHeader = function($element, keepRotate)
+	Form.prototype.resetFormHeader = function ($element, keepRotate)
 	{
-		//Recalcultaing height in case of orientation change
-		$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
+		//Recalculating height in case of orientation change
+		$element.find(".form-subtitle").css("display", "block");
 
-		const subtitleHeight = $element.find(CLASS_NAME_FORM_SUBTITLE).outerHeight(),
+		let subtitleHeight = $element.find(".form-subtitle").outerHeight(),
 			headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
 			headerOuterHeight = $element.find(CLASS_NAME_FORM_HEADER).outerHeight(),
 			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight(),
-			headerTop = $element.find(CLASS_NAME_FORM_HEADER).position().top;
-		let offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
+			headerTop = $element.find(CLASS_NAME_FORM_HEADER).position().top,
+			offsetHeight = subtitleHeight - (headerInnerHeight - titleHeight);
 
 		if (isMobileDevice())
 		{
@@ -680,9 +937,9 @@
 			{
 				$element.find(".showmore").addClass("rotate");
 			}
-			const formHeaderHeight = headerOuterHeight + offsetHeight;
+			let formHeaderHeight = headerOuterHeight + offsetHeight;
 			$element.find(CLASS_NAME_FORM_HEADER).outerHeight(formHeaderHeight);
-			$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
+			$element.find(".form-subtitle").css("display", "block");
 			$element.find(".form-body").css("top", formHeaderHeight + headerTop - 15);
 		}
 		else
@@ -692,23 +949,24 @@
 				$element.find(".showmore").removeClass("rotate");
 			}
 			$element.find(CLASS_NAME_FORM_HEADER).css("height", "");
-			$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "");
+			$element.find(".form-subtitle").css("display", "");
 			$element.find(".form-body").css("top", "");
 		}
 
 		return toRotate;
 	}
 
-	Form.prototype.resetFormSubTitleClamp = function($element, toRotate)
+	Form.prototype.resetFormSubTitleClamp = function ($element, toRotate)
 	{
-		const rotateBtnHeight = 20;
-		const lineHeight = 22;
+		let rotateBtnHeight = 20;
+		let lineHeight = 22;
 
-		const $formSubtitle = $element.find(CLASS_NAME_FORM_SUBTITLE);
-		const displayText = $formSubtitle.css("display");
+		let $formSubtitle = $element.find(".form-subtitle");
+		let displayText = $formSubtitle.css("display");
 		$formSubtitle.css("display", "block");
-		const formSubtitleHeight = $formSubtitle.height();
-		const isLineClampDisabled = formSubtitleHeight <= lineHeight;
+		let formSubtitleHeight = $formSubtitle.height();
+
+		let isLineClampDisabled = formSubtitleHeight <= lineHeight;
 
 		if (isLineClampDisabled)
 		{
@@ -721,21 +979,21 @@
 		$formSubtitle.css("display", displayText);
 		$element.find(".showmore").show();
 
-		const headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
+		let headerInnerHeight = $element.find(CLASS_NAME_FORM_HEADER).height(),
 			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
 
-		const lineClampValue = Math.floor((headerInnerHeight - titleHeight - rotateBtnHeight) / lineHeight);
+		let lineClampValue = Math.floor((headerInnerHeight - titleHeight - rotateBtnHeight) / lineHeight);
 		$formSubtitle.removeClass(CLASS_NAME_LINE_CLAMP2).removeClass(CLASS_NAME_LINE_CLAMP3).addClass('line-clamp-' + lineClampValue);
 	}
 
-	Form.prototype.toggleSystemFieldValue = function(recordId)
+	Form.prototype.toggleSystemFieldValue = function (recordId)
 	{
 		this.initUDFSystemFieldStatePromise && this.initUDFSystemFieldStatePromise.then(() =>
 		{
-			const systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
-			const targetColumns = systemFieldQuestions.map(el => el.field.editType.targetField);
+			let systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
+			let targetColumns = systemFieldQuestions.map(el => el.field.editType.targetField);
 
-			if (targetColumns.length === 0)
+			if (targetColumns.length == 0)
 			{
 				return;
 			}
@@ -766,35 +1024,72 @@
 				{
 					if (data.FilteredRecordCount === 1)
 					{
-						systemFieldQuestions.forEach(q =>
+						systemFieldQuestions.forEach(async q =>
 						{
-							q.setValue(data.Items[0][q.field.editType.targetField]);
+							const value = await this.getSystemFieldValue(data.Items[0], q);
+							q.setValue(value);
 						});
 					}
 				});
 		});
 	}
 
-	Form.prototype.restoreAttachment = function(docs, docRelationships)
+	Form.prototype.getSystemFieldValue = async function (data, question)
+	{
+		const fieldOptions = question.field.FieldOptions;
+		let value = data[question.field.editType.targetField];
+		if (fieldOptions.IsUDFSystemField)
+		{
+			const udf = this.udfs.filter(udf => udf.DisplayName === question.field.editType.targetField)[0];
+			if (udf && udf.UDFDataSources.length === 1)
+			{
+				const udfId = udf.UDFDataSources[0].UDFID;
+				const recordEntity = await tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
+					{
+						paramData: {
+							"@Relationships": "all",
+							"@filter": `eq(DataTypeId,${this.options.DataTypeId})`
+						}
+					},
+					{ overlay: false })
+
+				const currentField = recordEntity.Items && recordEntity.Items.filter(item => item.Id === udfId)[0];
+				if (currentField && fieldOptions.SystemFieldType === "Boolean")
+				{
+					if (value === true)
+					{
+						value = currentField.TrueDisplayName || "true";
+					}
+					else
+					{
+						value = currentField.FalseDisplayName || "false";
+					}
+				}
+			}
+		}
+		return value;
+	}
+
+	Form.prototype.restoreAttachment = function (docs, docRelationships)
 	{
 		if (docs.length > 0 && docRelationships.length > 0)
 		{
-			const attachmentsOfQuestions = _.groupBy(docRelationships, "UDGridField");
+			let attachmentsOfQuestions = _.groupBy(docRelationships, "UDGridField");
 			this.questions.filter(q => q.field.type === 'AttachBlock').forEach(q =>
 			{
 				const docRelations = attachmentsOfQuestions[q.field.Guid];
 				if (docRelations)
 				{
-					const docsOfAttachment = docs.filter(d => docRelations.some(dr => dr.DocumentID === d.Id));
+					const docsOfAttachment = docs.filter(d => docRelations.some(dr => dr.DocumentID == d.Id));
 					q.restore(docsOfAttachment);
 				}
 			});
 		}
 	}
 
-	Form.prototype.drawMapShapes = function(mapRecords)
+	Form.prototype.drawMapShapes = function (mapRecords)
 	{
-		if (mapRecords.length === 0)
+		if (mapRecords.length == 0)
 		{
 			return;
 		}
@@ -815,12 +1110,72 @@
 		}, 100);
 	}
 
-	Form.prototype.createQuestions = function(element)
+	Form.prototype.createDisplayAllSections = function (element)
 	{
-		const fields = this.options.UDGridFields.sort((a, b) => a.Index - b.Index),
-			questionContainer = element.find('.form-question-container');
+		const self = this;
 
-		if (fields.length === 0)
+		const sections = self.options.UDGridSections.sort((a, b) => a.Sequence - b.Sequence),
+			sectionContainer = element.find('.form-base-container');
+		sectionContainer.css('padding', '0px');
+		sections.forEach(section =>
+		{
+			if (!section)
+			{
+				return;
+			}
+
+			var currentSectionBlock = $(`<div class="form-entity-container form-section ${tf.isFromWayfinder || isMobileDevice() ? 'form-section-mobile-title' : 'form-section-title'}">
+						<div class="form-entity-title">${section.Name}</div>
+					</div>
+					<div class="section-block" style="padding: 20px 30px">
+		<div class="form-question-container">
+			<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+		</div>
+		</div>`);
+			self.createQuestions($(currentSectionBlock[2]), section.UDGridFields, section);
+			section.element = currentSectionBlock;
+			self.sections.push(section);
+			sectionContainer.append(currentSectionBlock);
+		});
+	}
+
+	Form.prototype.createSections = function (element)
+	{
+		const self = this;
+
+		const sections = self.options.UDGridSections.sort((a, b) => a.Sequence - b.Sequence),
+			sectionContainer = element.find('.form-base-container');
+
+		if (sections.length === 0)
+		{
+			return;
+		}
+		sections.forEach(section =>
+		{
+			if (!section)
+			{
+				return;
+			}
+
+			var currentSectionBlock = $(`<div class="section-block" id="${section.Id}" data-bind="visible: currentSectionId() === ${section.Id}">
+		<div class="form-question-container">
+			<div class="system-field-invalid warning hide">System field is not in the current data source</div>
+		</div>
+</div>`);
+			ko.applyBindings(self, currentSectionBlock[0]);
+			self.createQuestions(currentSectionBlock.find('.form-question-container'), section.UDGridFields, section);
+			section.element = currentSectionBlock;
+			self.sections.push(section);
+			sectionContainer.append(currentSectionBlock);
+		});
+	}
+
+	Form.prototype.createQuestions = function (element, newFields, currentSection)
+	{
+		let fields = newFields.sort((a, b) => a.Index - b.Index),
+			questionContainer = element;
+
+		if (fields.length == 0)
 		{
 			return;
 		}
@@ -830,25 +1185,34 @@
 			{
 				return;
 			}
-			const questionControl = new TF.Control.Form[field.questionType + 'Question'](field, this.options.DataTypeId, this.onFormElementInit);
+			let questionControl = new TF.Control.Form[field.questionType + 'Question'](field, this.options.DataTypeId, this.onFormElementInit);
 			this.questions.push(questionControl);
+			if (currentSection)
+			{
+				if (!currentSection.questions)
+				{
+					currentSection.questions = [];
+				}
+				currentSection.questions.push(questionControl);
+			}
 			questionContainer.append(questionControl.element);
 		});
 
 	}
 
-	Form.prototype.convertHex = function(hex, opacity)
+	Form.prototype.convertHex = function (hex, opacity)
 	{
 		hex = hex.replace('#', '');
-		const r = parseInt(hex.substring(0, 2), 16),
-			g = parseInt(hex.substring(2, 4), 16),
-			b = parseInt(hex.substring(4, 6), 16);
-		return `rgba(${r},${g},${b},${opacity})`;
+		r = parseInt(hex.substring(0, 2), 16);
+		g = parseInt(hex.substring(2, 4), 16);
+		b = parseInt(hex.substring(4, 6), 16);
+		result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')';
+		return result;
 	}
 
-	Form.prototype.resetSubmitButtonsAndWarningMessage = function(element)
+	Form.prototype.resetSubmitButtonsAndWarningMessage = function (element)
 	{
-		const onlyContainsSystemFields = (element.find(".form-question:visible").length === 0) && (element.find(".systemfield-question").length > 0);
+		let onlyContainsSystemFields = (element.find(".form-question:visible").length === 0) && (element.find(".systemfield-question").length > 0);
 		if (onlyContainsSystemFields)
 		{
 			element.find(".system-field-invalid").removeClass("hide");
@@ -856,14 +1220,14 @@
 
 		if (onlyContainsSystemFields)
 		{
-			const $modal = element.closest(".modal-dialog")
-			const $positiveBtn = $modal.find(".btn.positive");
+			let $modal = element.closest(".modal-dialog")
+			let $positiveBtn = $modal.find(".btn.positive");
 			if ($positiveBtn && $positiveBtn.length)
 			{
 				$positiveBtn.remove();
 			}
 
-			const $negativeBtn = $modal.find(".btn.negative");
+			let $negativeBtn = $modal.find(".btn.negative");
 			if ($negativeBtn && $negativeBtn.length)
 			{
 				$negativeBtn.removeClass("btn-link").addClass("tf-btn-black");
@@ -872,10 +1236,29 @@
 		}
 	}
 
-	Form.prototype.fetchFilterData = function()
+	Form.prototype.handleScrollLocationWhenErrorDisplay = function ()
 	{
-		const config = TF.Form.formConfig[this.dataType];
-		const opts = {
+		const self = this;
+		if (tf.isFromWayfinder || isMobileDevice())
+		{
+			const errorElems = self.elem.find(".invalid");
+			if (errorElems && errorElems.length > 0)
+			{
+				const errorElem = errorElems[0];
+				const top = errorElem.offsetTop;
+				const shouldScrollTop = top > 30 ? top - 30 : 0;
+				$(".form-body").scroll();
+				$(".form-body").animate({
+					scrollTop: shouldScrollTop
+				}, 1000);
+			}
+		}
+	};
+
+	Form.prototype.fetchFilterData = function ()
+	{
+		let config = TF.Form.formConfig[this.dataType];
+		let opts = {
 			paramData: {
 				take: 10,
 				//skip: 0,
@@ -895,24 +1278,135 @@
 			{ overlay: false })
 			.then(data =>
 			{
-				const text = config.formatItem(data.Items[0]).text;
+				let text = config.formatItem(data.Items[0]).text;
 				this.recordSelector.elem.val(text);
+				this.disAbleFormRecordSelector();
 			});
 	}
 
-	Form.prototype.dispose = function()
+	Form.prototype.disAbleFormRecordSelector = function ()
 	{
-		this.questions.forEach(q =>
+		this.recordSelector.autoComplete.enable(false);
+		const autoSearchElem = this.elem.find(".k-i-search");
+		if (autoSearchElem && autoSearchElem.length > 0)
 		{
-			q.dispose()
-		});
+			autoSearchElem.remove();
+		}
+	};
+
+	Form.prototype.handleFooterForSectionGrid = function ()
+	{
+		const self = this;
+		const $footerModel = $('.modal-footer');
+		if ($footerModel.length > 0)
+		{
+			const currentIsReadOnly = self.options.isReadOnly || self.options.signatureReadonly;
+			self.removeAllChildNodes($footerModel[0]);
+			let newFooter = `<div class="action-bar">
+							<button type="button" data-bind="visible: currentSectionId() === lastSectionId()"
+							class="form-button btn tf-btn-black btn-sm form-save${self.isFormExpired() ? ' disabled' : ''}"${self.isFormExpired() ? ' disabled' : ''}>
+								<div class="action submit">Submit</div>
+							</button>
+							<button type="button" class="form-button btn tf-btn-black btn-sm form-next" data-bind="visible: currentSectionId() !== lastSectionId()">
+								<div class="action next">Next</div>
+							</button>
+							<button type="button" class="form-button btn btn-link btn-sm form-previous" data-bind="visible: currentSectionId() !== firstSectionId()">
+								<div class="action previous">Previous</div>
+							</button>
+							<button type="button" class="form-button btn btn-link btn-sm form-close">
+								<div class="action cancel">Cancel</div>
+							</button>
+						</div>`;
+			if (currentIsReadOnly)
+			{
+				newFooter = `<div class="action-bar">
+							<button type="button" class="form-button btn tf-btn-black btn-sm positive form-close">
+								<div class="action cancel">Close</div>
+							</button>
+							<button type="button" class="form-button btn tf-btn-black btn-sm form-next" data-bind="visible: currentSectionId() !== lastSectionId()">
+								<div class="action next">Next</div>
+							</button>
+							<button type="button" class="form-button btn btn-link btn-sm form-previous" data-bind="visible: currentSectionId() !== firstSectionId()">
+								<div class="action previous">Previous</div>
+							</button>
+						</div>`;
+			}
+			const newFooterEntity = $(newFooter);
+			ko.applyBindings(self, newFooterEntity[0])
+			$footerModel.append(newFooterEntity[0]);
+		}
+	};
+
+	Form.prototype.removeAllChildNodes = function (parent)
+	{
+		while (parent.firstChild)
+		{
+			parent.removeChild(parent.firstChild);
+		}
+	};
+
+	Form.prototype.dispose = function ()
+	{
+		this.questions.forEach(q => q.dispose());
 		this.elem.off('click');
 		this.elem.remove();
 		["from_kendo-control", "form_timepicker", "form_rating"].forEach(el => document.getElementById(el) && document.getElementById(el).remove());
+		tf.authManager.surveyToken = undefined;
 		const kendoNumericWidget = kendo.widgets.find(_ => _.name === "kendoNumericTextBox");
 		if (kendoNumericWidget && this._kendoNumericTextBox_keypress)
 		{
 			kendoNumericWidget.widget.fn._keypress = this._kendoNumericTextBox_keypress;
 		}
+	}
+
+	function _isSubmitAvailable(udgrids, options)
+	{
+		const msgText = 'This form cannot be submitted.';
+		const msgTitle = 'Not Available';
+
+		var availableFields = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(udgrids[0]).UDGridFields.map(x => x.UDGridFieldId);
+		var optionsFields = options.UDGridFields.map(x => x.UDGridFieldId);
+
+		//validate if availableFields contains optionsFields
+		for (var i of optionsFields)
+		{
+			if (availableFields.indexOf(i) === -1)
+			{
+				tf.promiseBootbox.alert(mstText, msgTitle);
+				return Promise.reject();
+			}
+		}
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				return udgrids.length === 0 ? Promise.reject() : Promise.resolve();
+			})
+			.then(() =>
+			{
+				const isFormExpired = TF.DetailView.UserDefinedGridHelper.isExpiredForm(udgrids[0]);
+				return isFormExpired ? Promise.reject() : Promise.resolve();
+			})
+			.then(() =>
+			{
+				return tf.udgHelper.checkUDGridsInIPBoundary(formId).then(res =>
+				{
+					const isWithInIPBoundary = !(res && res.Items && res.Items.length === 0);
+					return isWithInIPBoundary ? Promise.resolve() : Promise.reject();
+				})
+			})
+			.then(() =>
+			{
+				return Promise.resolve(tf.udgHelper.checkUDGridsInGeofense(this.coord, udgrids[0].GeofenceBoundaries)).then(res =>
+				{
+					const isWithInGeofense = res;
+					return isWithInGeofense ? Promise.resolve() : Promise.reject();
+				});
+			})
+			.catch(() =>
+			{
+				tf.promiseBootbox.alert(msgText, msgTitle);
+				return Promise.reject();
+			});
 	}
 })();

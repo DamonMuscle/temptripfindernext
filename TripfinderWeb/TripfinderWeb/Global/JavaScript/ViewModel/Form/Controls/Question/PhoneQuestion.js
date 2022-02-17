@@ -1,7 +1,6 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Control.Form").PhoneQuestion = PhoneQuestion;
-
 	function PhoneQuestion()
 	{
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
@@ -10,47 +9,32 @@
 	PhoneQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	PhoneQuestion.prototype.constructor = PhoneQuestion;
 
-	PhoneQuestion.prototype.initQuestionContent = function()
+	PhoneQuestion.prototype.initQuestionContent = function ()
 	{
-		const input = $(`<input class="phone-question question" type="tel" placeholder="Enter your phone number"/>`);
-		this.maskedInput = input.kendoMaskedTextBox({
-			mask: this.field.readonly ? '' : '0000000000000',
-			change: () =>
-			{
-				if (this.maskedInput.element[0].value.length > 13)
-				{
-					return;
-				}
-				this.value = this.maskedInput.value().replaceAll("_", "");
-				if (this.value.length === 10)
-				{
-					this.maskedInput.element[0].value = `(${this.value.substr(0, 3)})${this.value.substr(3, 3)}-${this.value.substring(6)}`;
-				}
-				else if (this.value.length > 10)
-				{
-					if (tf.dataFormatHelper.isValidPhoneNumber(this.value))
-					{
-						this.maskedInput.element[0].value = tf.dataFormatHelper.phoneFormatter(this.value);
-					}
-				}
-			}
-		}).data('kendoMaskedTextBox');
-		input.keyup(ev =>
+		let formatValue = !!this.field.readonly ? tf.dataFormatHelper.phoneFormatter(this.field.value) : this.field.value;
+		const phonebox = new TF.Input.PhoneBox(formatValue || "", { readonly: !!this.field.readonly, maxlength: 18, placeholder: "Enter your phone number" });
+		this.phonebox = phonebox;
+		phonebox.onValueChange.subscribe((ev, newvalue) =>
 		{
-			this.value = ev.target.value.replace(/_/g, '');
+			this.value = newvalue;
 		});
 
-		if (this.field.readonly)
+		if (this.field.value) 
 		{
-			input.attr("readonly", "readonly");
+			this.value = this.field.value;
 		}
-		input.val(tf.dataFormatHelper.phoneFormatter(this.field.value));
-		this._value = this.field.value;//this._value: different from this.value, will not trigger validation
-		return this.maskedInput.wrapper;
+
+		phonebox.getElement().addClass("telphone-question");
+		return phonebox.getElement();
 	}
 
-	PhoneQuestion.prototype.getValidateResult = function()
+	PhoneQuestion.prototype.getValidateResult = function ()
 	{
+		if (this.phonebox.getElement().is(':focus'))
+		{
+			//do not validate when input is focused to prevent from validating error when typing.
+			return '';
+		}
 		let result = '';
 		if (this.field.Required && !this.value)
 		{

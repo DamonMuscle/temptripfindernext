@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.DetailView").BasicQuickAddModalViewModel = BasicQuickAddModalViewModel;
 
@@ -6,41 +6,61 @@
 	{
 		const self = this,
 			dataType = options.dataType,
-			editModelName = options.isReadOnly ? "" : "Edit",
-			typeName = tf.dataTypeHelper.getFormalDataTypeName(dataType);
+			typeName = tf.dataTypeHelper.getFormalDataTypeName(dataType),
+			editModelName = options.isReadOnly ? "" : "Edit";
 		let modeName = !options.recordId ? "Add" : editModelName,
 			title = String.format("{0} {1}", modeName, typeName);
-
+		self.isUDFGroup = options.isUDFGroup;
+		self.isReadOnly = options.isReadOnly;
 		if (options.isUDFGroup)
 		{
 			modeName = !options.recordEntity ? "Add" : editModelName;
 			title = String.format("{0} {1} Entry", modeName, options.udGrid.Name);
+			self.obFormExpiredAfterOpen = ko.observable(null);
+			self.formId = options.udGrid.UDGridId;
+			options.obFormExpiredAfterOpen = self.obFormExpiredAfterOpen;
+			self.obFormExpiredAfterOpen.subscribe(function (expired)
+			{
+				self.initButtonTemplate(options.isReadOnly, expired);
+			});
 		}
-
+		options.negativeClick = self.negativeClick.bind(self);
+		options.negativeClose = self.negativeClose.bind(self);
+		options.positiveClick = self.positiveClick.bind(self);
 		const viewModel = new TF.DetailView.BasicQuickAddViewModel(options);
-
 		TF.Modal.BaseModalViewModel.call(self);
-
-		self.isReadOnly = options.isReadOnly;
 		self.sizeCss = "modal-dialog-xl";
 		self.modalClass = 'quick-add enable-tab';
 		self.data(viewModel);
 		self.title(title);
 		self.contentTemplate("Workspace/detailview/ManageAssociation/BasicQuickAdd");
-		if (self.isReadOnly)
+		self.initButtonTemplate(options.isReadOnly);
+	}
+
+	BasicQuickAddModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
+	BasicQuickAddModalViewModel.prototype.constructor = BasicQuickAddModalViewModel;
+	BasicQuickAddModalViewModel.prototype.initButtonTemplate = function (readonly, formExpiredAfterOpen)
+	{
+		const self = this;
+		if (readonly)
 		{
 			self.buttonTemplate("modal/positive");
 			self.obPositiveButtonLabel("OK");
-			if (options.isUDFGroup)
+			if (self.isUDFGroup)
 			{
 				self.obPositiveButtonLabel("Close");
 			}
-		} else
+		}
+		else
 		{
 			self.buttonTemplate("modal/positivenegative");
-			if (options.isUDFGroup)
+			if (self.isUDFGroup)
 			{
 				self.obPositiveButtonLabel("Submit");
+				if (formExpiredAfterOpen)
+				{
+					self.obDisableControl(true);
+				}
 			}
 			else
 			{
@@ -49,22 +69,20 @@
 		}
 	}
 
-	BasicQuickAddModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
-	BasicQuickAddModalViewModel.prototype.constructor = BasicQuickAddModalViewModel;
-
 	/**
 	 * React when the positive button is clicked.
 	 * @return {void}
 	 */
-	BasicQuickAddModalViewModel.prototype.positiveClick = function()
+	BasicQuickAddModalViewModel.prototype.positiveClick = function ()
 	{
 		var self = this;
-		if (this.isReadOnly)
+		if (self.isReadOnly)
 		{
 			self.negativeClose();
-		} else
+		}
+		else
 		{
-			self.data().save().then(function(result)
+			self.data().save().then(function (result)
 			{
 				if (result)
 				{
@@ -82,7 +100,7 @@
 	 * React when the negative button is clicked.
 	 * @return {void}
 	 */
-	BasicQuickAddModalViewModel.prototype.negativeClick = function()
+	BasicQuickAddModalViewModel.prototype.negativeClick = function ()
 	{
 		var self = this;
 		if (self.data().cancel && self.data().quickAddViewModel && self.data().quickAddViewModel.cancel)
@@ -102,7 +120,7 @@
 	 * Dispose
 	 * @return {void}
 	 */
-	BasicQuickAddModalViewModel.prototype.dispose = function()
+	BasicQuickAddModalViewModel.prototype.dispose = function ()
 	{
 		this.data().dispose();
 	};

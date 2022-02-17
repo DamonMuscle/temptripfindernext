@@ -577,6 +577,7 @@
 
 											tf.pageManager.openNewPage(pageName, null, true);
 										});
+										self.changeStaffType();
 										return true;
 									});
 								});
@@ -594,6 +595,53 @@
 						});
 				});
 		});
+	};
+
+	Startup.prototype.changeStaffType = function ()
+	{
+		if (tf.staffInfo != null)
+		{
+			return;
+		}
+		tf.staffInfo = {
+			isStaff: false,
+			isDriver: false,
+			isAide: false,
+			staffID: []
+		};
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'staff'), {
+			paramData: {
+				'@relationships': 'all',
+				userid: tf.authManager.authorizationInfo.authorizationTree.userId
+			}
+		})
+			.then(function (apiResponse)
+			{
+				if (apiResponse.Items && apiResponse.Items.length > 0)
+				{
+					tf.staffInfo.items = apiResponse.Items;
+					apiResponse.Items.forEach(item =>
+					{
+						tf.staffInfo.staffID.push(item.Id);
+						if (item.StaffTypeIds && item.StaffTypeIds.length > 0)
+						{
+							item.StaffTypeIds.forEach(type =>
+							{
+								if (type === 2)
+								{
+									tf.staffInfo.isStaff = true;
+									tf.staffInfo.isDriver = true;
+								}
+								else if (type === 1)
+								{
+									tf.staffInfo.isStaff = true;
+									tf.staffInfo.isAide = true;
+								}
+							});
+						}
+					});
+				}
+			});
 	};
 
 	Startup.prototype._loadApplicationTerm = function()

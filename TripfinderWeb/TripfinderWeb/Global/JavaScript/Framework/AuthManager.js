@@ -242,6 +242,25 @@
 		this.password = tf.storageManager.get("password", true);
 	};
 
+	AuthManager.prototype.updateAuthInfos = function ()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
+			paramData: {
+				prefix: 'tfweb'
+			}
+		}, {
+			overlay: false,
+			auth: {
+				noInterupt: true
+			}
+		})
+			.then(function (apiResponse)
+			{
+				this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
+				tf.userEntity = apiResponse.Items[0].UserEntity;
+			}.bind(this));
+	};
+
 	AuthManager.prototype.getPurchasedProducts = function()
 	{
 		var self = this;
