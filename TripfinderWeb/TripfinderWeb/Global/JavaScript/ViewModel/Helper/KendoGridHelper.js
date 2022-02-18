@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Helper").KendoGridHelper = KendoGridHelper;
 	KendoGridHelper.studentRequirementItemsUrl = "studentrequirementitems";
@@ -30,7 +30,7 @@
 	 * @param {Object} gridOptions
 	 * @returns
 	 */
-	KendoGridHelper.prototype.createSimpleGrid = function($container, options)
+	KendoGridHelper.prototype.createSimpleGrid = function ($container, options)
 	{
 		// dataSource itself or its response should have 'dataItems' and 'totalCount'. 
 		var self = this, kendoGrid,
@@ -51,7 +51,7 @@
 		return kendoGrid;
 	};
 
-	KendoGridHelper.prototype.setGridOnDemandAction = function(kendoGrid, onDemandActions)
+	KendoGridHelper.prototype.setGridOnDemandAction = function (kendoGrid, onDemandActions)
 	{
 		if (!onDemandActions || onDemandActions.length == 0)
 		{
@@ -59,20 +59,17 @@
 		}
 		var kendoGridElement = $(kendoGrid.element);
 
-		kendoGrid.bind("change", function()
+		kendoGrid.bind("change", function ()
 		{
 			// refresh background color
 			var $container = kendoGridElement.find(".k-grid-content"),
 				$onDemandContainer = $container.find(".on-demand-container");
-			if ($onDemandContainer.length)
-			{
-				$onDemandContainer.css({
-					background: $onDemandContainer.data("tr").children("td").css("background-color")
-				});
-			}
+			$onDemandContainer.css({//Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
+				background: $onDemandContainer.data("tr").children("td").css("background-color") == "rgba(0, 0, 0, 0)" ? 'white' : $onDemandContainer.data("tr").children("td").css("background-color")
+			});
 		});
 
-		kendoGrid.bind("dataBound", function()
+		kendoGrid.bind("dataBound", function ()
 		{
 			// remove when not focus on row
 			var isFocus = false,
@@ -85,7 +82,7 @@
 				y = offset.left + 2;
 			}
 
-			kendoGridElement.find(".k-grid-content tbody>tr").each(function(index, item)
+			kendoGridElement.find(".k-grid-content tbody>tr").each(function (index, item)
 			{
 				if (!isFocus)
 				{
@@ -103,14 +100,14 @@
 			}
 		});
 
-		kendoGridElement.find(".k-virtual-scrollable-wrap").on("scroll", function()
+		kendoGridElement.find(".k-virtual-scrollable-wrap").on("scroll", function ()
 		{
 			kendoGridElement.find(".on-demand-container").css({
 				right: -$(this).scrollLeft()
 			});
 		});
 
-		kendoGridElement.delegate(".k-grid-content tbody>tr", "mouseover", function()
+		kendoGridElement.delegate(".k-grid-content tbody>tr", "mouseover", function ()
 		{
 			var $tr = $(this),
 				$container = $tr.closest("table").parent(),
@@ -118,13 +115,13 @@
 			if ($onDemandContainer.length == 0)
 			{
 				$onDemandContainer = $("<div class='on-demand-container'></div>");
-				onDemandActions.forEach(function(action)
+				onDemandActions.forEach(function (action)
 				{
 					var button = $(action.template);
-					button.on("click", function(e)
+					button.on("click", function (e)
 					{
 						var tr;
-						$container.find("tr").each(function(index, item)
+						$container.find("tr").each(function (index, item)
 						{
 							var rect = item.getBoundingClientRect();
 							if (e.clientX < rect.right && e.clientX > rect.left && e.clientY > rect.top && e.clientY < rect.bottom)
@@ -147,28 +144,46 @@
 				});
 				$container.append($onDemandContainer);
 			}
+
+			setButtonDisableStatus($onDemandContainer, onDemandActions, $tr);
+
 			$onDemandContainer.data("tr", $tr).css({
 				height: $tr.height(),
 				top: $tr.offset().top + $container.scrollTop() - $container.offset().top,
 				right: -$container.scrollLeft(),
-				background: $tr.children("td").css("background-color")
+				background: $tr.children("td").css("background-color") == "rgba(0, 0, 0, 0)" ? 'white' : $tr.children("td").css("background-color")//Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
 			}).show();
 
 			var iconHeight = 12;
 			$onDemandContainer.find("a").css("margin-top", ($tr.height() - iconHeight) / 2 + "px");
-		}).on("mouseout", function(e)
+		}).on("mouseout", function (e)
 		{
 			hideOnDemandAction(e);
-		}).on("mousemove", function(e)
+		}).on("mousemove", function (e)
 		{
 			hideOnDemandAction(e);
 		});
+
+		function setButtonDisableStatus(onDemandContainer, onDemandActions, $tr)
+		{
+			onDemandActions.forEach(function (action, index)
+			{
+				var button = onDemandContainer.children().eq(index);
+				if ($.isFunction(action.disable) && action.disable(kendoGrid.dataItem($tr)))
+				{
+					button.hide();
+				} else
+				{
+					button.show();
+				}
+			});
+		}
 
 		function hideOnDemandAction(e)
 		{
 			// hide action when outside table
 			clearTimeout(kendoGrid.timeoutOnDemandAction);
-			kendoGrid.timeoutOnDemandAction = setTimeout(function()
+			kendoGrid.timeoutOnDemandAction = setTimeout(function ()
 			{
 				var table = kendoGridElement.find(".k-grid-content table");
 				var rect = table[0].getBoundingClientRect();
@@ -188,7 +203,7 @@
 	 *
 	 * @param {Object} kendoGrid
 	 */
-	KendoGridHelper.prototype.setGridDataSource = function(kendoGrid, dataSource, options)
+	KendoGridHelper.prototype.setGridDataSource = function (kendoGrid, dataSource, options)
 	{
 		var self = this,
 			columns = options.columns,
@@ -197,7 +212,7 @@
 			afterRenderCallback = options.afterRenderCallback;
 
 		return Promise.resolve(typeof dataSource === 'function' ? dataSource() : dataSource)
-			.then(function(result)
+			.then(function (result)
 			{
 				if (kendoGrid == null || kendoGrid.element == null)
 				{
@@ -211,6 +226,7 @@
 					totalCount = result.totalCount;
 				}
 
+				self.handleListFromDataColumns(columns, dataItems);
 				kendoGrid.setDataSource(new kendo.data.DataSource({
 					schema: {
 						model: {
@@ -232,13 +248,44 @@
 			});
 	};
 
+
+	KendoGridHelper.prototype.handleListFromDataColumns = function (columns, dataItems)
+	{
+		var listFromDataColumns = columns.filter((item) =>
+		{
+			return item.originalUdfField && item.originalUdfField.questionType && item.originalUdfField.questionType === "ListFromData";
+		});
+		if (listFromDataColumns.length > 0)
+		{
+			listFromDataColumns.forEach((listFromDataColumn) =>
+			{
+				var lfdColumnGuid = listFromDataColumn.field;
+				if (dataItems.length > 0)
+				{
+					dataItems.forEach((item) =>
+					{
+						if (item[lfdColumnGuid] && item[lfdColumnGuid].length > 0)
+						{
+							var lfdValues = item[lfdColumnGuid].map((lfd) =>
+							{
+								return lfd.value;
+							});
+							item[`${lfdColumnGuid}_originalValue`] = item[lfdColumnGuid];
+							item[lfdColumnGuid] = lfdValues.join(', ');
+						}
+					});
+				}
+			});
+		}
+	};
+
 	/**
 	 * Get grid definition by data type.
 	 *
 	 * @param {String} type
 	 * @returns
 	 */
-	KendoGridHelper.prototype.getGridColumnsFromDefinitionByType = function(type)
+	KendoGridHelper.prototype.getGridColumnsFromDefinitionByType = function (type)
 	{
 		var self = this, columns = [];
 		switch (type.toLowerCase())
@@ -300,7 +347,10 @@
 				columns = tf.vehicleGridDefinition.gridDefinition().Columns;
 				break;
 			case "contact":
-				columns = tf.contactGridDefinition.gridDefinition(self.gridType).Columns;
+				columns = tf.contactGridDefinition.gridDefinition().Columns;
+				break;
+			case "contactinformation":
+				columns = tf.contactGridDefinition.gridDefinition("contactinformation").Columns;
 				break;
 			case "triphistory":
 				columns = tf.TripHistoryGridDefinition.gridDefinition().Columns;
@@ -368,16 +418,19 @@
 						FieldName: "PuLocation",
 						DisplayName: "PU Location",
 						width: "150px",
+						template: "<span>#: PuLocation ? PuLocation : 'N/A' #</span>"
 					},
 					{
 						FieldName: "DoLocation",
 						DisplayName: "DO Location",
 						width: "150px",
+						template: "<span>#: DoLocation ? DoLocation : 'N/A' #</span>"
 					},
 					{
 						FieldName: "ProhibitCross",
 						DisplayName: "Prohibit Cross Street",
 						width: "150px",
+						template: "<span>#: ProhibitCross ? 'yes' : 'no' #</span>"
 					}
 				];
 				break;
@@ -403,7 +456,7 @@
 						FieldName: "ProhibitCross",
 						DisplayName: "Prohibit Cross Street",
 						width: "150px",
-						template: "<span>#: ProhibitCross ? ProhibitCross.toString().toUpperCase() : 'FALSE' #</span>"
+						template: "<span>#: ProhibitCross ? 'yes' : 'no' #</span>"
 					},
 					{
 						FieldName: "Days",
@@ -493,6 +546,74 @@
 						width: "180px",
 						type: "string",
 						encoded: false,
+					},
+					{
+						FieldName: "IsException",
+						DisplayName: "Exception",
+						width: "100px",
+						type: "boolean",
+					}
+				];
+				break;
+			case "attendancegrids":
+				columns = [
+					{
+						FieldName: "AttendanceDate",
+						DisplayName: "Attendance Date",
+						width: "160px",
+						type: "date",
+					},
+					{
+						FieldName: "TripName",
+						DisplayName: "Trip Name",
+						width: "150px",
+						type: "string"
+					},
+					{
+						FieldName: "StopLocation",
+						DisplayName: "Stop Location",
+						width: "200px",
+						type: "string"
+					},
+					{
+						FieldName: "ActualStopTime",
+						DisplayName: "Actual Stop Time",
+						width: "150px",
+						type: "time",
+					},
+					{
+						FieldName: "Unplanned",
+						Width: '150px',
+						type: "boolean",
+						template: item => !item.Unplanned ? "" : ((item.Unplanned || "false").toLowerCase() === "true" ? "True" : "False")
+					},
+					{
+						FieldName: "CreatedOn",
+						DisplayName: "Created On",
+						width: "150px",
+						type: "datetime",
+						hidden: true
+					}
+				];
+				break;
+			case "studenttagids":
+				columns = [
+					{
+						FieldName: "TagId",
+						DisplayName: "Card ID",
+						type: "string",
+					},
+					{
+						FieldName: "StartDate",
+						DisplayName: "Start Datetime",
+						type: "string",
+						template: "<span>#: moment(StartDate).format('MM/DD/YYYY hh:mm A') #</span>"
+					},
+					{
+						FieldName: "EndDate",
+						DisplayName: "End Datetime",
+						type: "string",
+						template: "<span>#: EndDate?moment(EndDate).format('MM/DD/YYYY hh:mm A'):'' #</span>"
 					}
 				];
 				break;
@@ -503,7 +624,7 @@
 		return columns;
 	};
 
-	KendoGridHelper.renderDateRange = function(startDate, endDate)
+	KendoGridHelper.renderDateRange = function (startDate, endDate)
 	{
 		if (startDate && typeof startDate === "string")
 		{
@@ -541,22 +662,59 @@
 		return "Starting " + moment(startDate).format("L");
 	};
 
+	KendoGridHelper.dataSourceRenderDateRange = function (startDate, endDate)
+	{
+		if (startDate && typeof startDate === "string")
+		{
+			var start = moment(startDate);
+			if (start.year() === 1 && start.month() === 0 && start.date() === 1)
+			{
+				startDate = null;
+			}
+		}
+
+		if (endDate && typeof endDate === "string")
+		{
+			var end = moment(endDate);
+			if (end.year() === 9999 && end.month() === 11 && end.date() === 31)
+			{
+				endDate = null;
+			}
+		}
+
+		if (startDate && endDate)
+		{
+			return moment(startDate).format("L") + " - " + moment(endDate).format("L");
+		}
+
+		if (!startDate && !endDate)
+		{
+			return "";
+		}
+
+		if (!startDate)
+		{
+			return "Until " + moment(endDate).format("L");
+		}
+
+		return "Starting " + moment(startDate).format("L");
+	};
 	/**
 	 * Format kendo grid columns from definition columns.
 	 *
 	 * @param {Array} columns
 	 * @returns
 	 */
-	KendoGridHelper.prototype.getDefinitionLayoutColumns = function(columns)
+	KendoGridHelper.prototype.getDefinitionLayoutColumns = function (columns)
 	{
-		return Enumerable.From(columns).Where(function(c)
+		return Enumerable.From(columns).Where(function (c)
 		{
 			return !c.onlyForFilter;
-		}).Select(function(c)
+		}).Select(function (c)
 		{
 			function updateString(str)
 			{
-				$.each(tf.APPLICATIONTERMDEFAULTVALUES, function(_, defaultTerm)
+				$.each(tf.APPLICATIONTERMDEFAULTVALUES, function (_, defaultTerm)
 				{
 					if (tf.applicationTerm[defaultTerm.Term])
 					{
@@ -590,10 +748,10 @@
 	 * @param {Array} columns
 	 * @returns
 	 */
-	KendoGridHelper.prototype.getKendoField = function(columns)
+	KendoGridHelper.prototype.getKendoField = function (columns)
 	{
 		var fields = {};
-		columns.forEach(function(definition)
+		columns.forEach(function (definition)
 		{
 			var field = {};
 			switch (definition.type)
@@ -618,7 +776,7 @@
 		return fields;
 	};
 
-	KendoGridHelper.prototype.updateGridFooter = function($grid, filterCount, totalCount)
+	KendoGridHelper.prototype.updateGridFooter = function ($grid, filterCount, totalCount)
 	{
 		var pageFooter = $grid.find(".k-pager-wrap"),
 			footerInfo = pageFooter.find(".count-info"),
@@ -651,26 +809,29 @@
 	 * @param {Array} currentColumns
 	 * @returns
 	 */
-	KendoGridHelper.prototype.getKendoColumnsExtend = function(currentColumns)
+	KendoGridHelper.prototype.getKendoColumnsExtend = function (currentColumns)
 	{
 		var defaultColumnWidth = "80px";
-		var columns = currentColumns.map(function(definition)
+		var columns = currentColumns.map(function (definition)
 		{
-            var column = definition;
-            var widthOfPerChar = 7;
+			var column = definition;
+			var widthOfPerChar = 7;
 			column.field = definition.FieldName;
 			column.title = definition.DisplayName;
 			if (!column.width)
 				column.width = definition.Width || defaultColumnWidth;
 			else
-                definition.Width = column.width;
+				definition.Width = column.width;
 
-            if (column.lockWidth !== true) {
-                column.width = `${Math.max(
-                    (column.title || "").trim().length * widthOfPerChar,
-                    Number.isNaN(parseInt(column.width)) ? parseInt(defaultColumnWidth) : parseInt(column.width)
-                )}px`;
-            }
+			if (column.lockWidth !== true)
+			{
+				column.width = `${Math.max(
+					(column.title || "").trim().length * widthOfPerChar,
+					Number.isNaN(parseInt(column.width)) ? parseInt(defaultColumnWidth) : parseInt(column.width)
+				)}px`;
+			}
+			column.Width = column.width;
+
 			if (definition.filterable == null)
 			{
 				column.filterable = {
@@ -712,7 +873,7 @@
 	 * @param {string} defaultField
 	 * @returns
 	 */
-	KendoGridHelper.prototype.getDefaultSortItems = function(gridType, defaultField)
+	KendoGridHelper.prototype.getDefaultSortItems = function (gridType, defaultField)
 	{
 		var sortFields = [defaultField];
 		switch (gridType)
@@ -721,12 +882,11 @@
 			case "contractor":
 			case "district":
 			case "document":
-			case "report":
 			case "georegion":
 			case "school":
 			case "trip":
-			case "report":
 			case "tripstop":
+			case "route":
 				sortFields = ["Name"];
 				break;
 			case "contact":
@@ -749,7 +909,199 @@
 		}));
 	};
 
-	KendoGridHelper.getStringOfRecords = function(records, columns)
+	//#region open in
+
+	const SUPPORTED_OPENIN_PRODUCTS = {
+		"Viewfinder": {
+			generateUrl: (url) => url.replace(/http:\/\/.*\//, location.origin + "/") + "/#/nw",
+		},
+		"Routefinder Plus": {
+			generateUrl: (url) => url.replace(/http:\/\/.*\//, location.origin + "/") + "/en-US/html/#/nw",
+		},
+		// "Stopfinder Admin": {
+		// 	supportedGridTypes: ["contact", "student", "trip", "tripstop"],
+		// 	securedAppName: "ent"
+		// },
+		// "Tripfinder": {
+		// 	supportedGridTypes: ["fieldtrip"]
+		// }
+	};
+	const basicGenerateUrl = (url) => url = (url.charAt(url.length - 1) === "/") ? url + "#/nw" : url + "/#/nw";;
+
+	/**
+	 * Get supported products for "Open In".
+	 *
+	 * @param {Array} products
+	 * @param {string} gridType
+	 * @param {boolean} requireLicense
+	 * @param {boolean} excludeCurrent
+	 * @returns
+	 */
+	KendoGridHelper.getShareableProducts = function (products, gridType, requireLicense, excludeCurrent)
+	{
+		const authorizedAppNames = tf.helpers.applicationDataHelper.getAuthorizedApplicationData().map(o => o.Name);
+		const currentProductName = TF.productName === "routefinder" ? "Routefinder Plus" : TF.productName;
+
+		return products
+			.filter(p =>
+			{
+				// to fix inconsistent plus name in vendor and DB.
+				if (p.Name === "RoutefinderPlus")
+				{
+					p.Name = "Routefinder Plus";
+				}
+
+				const supportInfo = SUPPORTED_OPENIN_PRODUCTS[p.Name];
+
+				return supportInfo
+					&& !(excludeCurrent && p.Name === currentProductName)
+					&& (!requireLicense || authorizedAppNames.includes(p.Name)
+						|| tf.authManager.authorizationInfo.authorizationTree.applications.includes(supportInfo.securedAppName))
+					&& (!Array.isArray(supportInfo.supportedGridTypes) || supportInfo.supportedGridTypes.includes(gridType));
+			}).sort((a, b) =>
+			{
+				// ensure current product is on top
+				return a.Name === currentProductName ? -1 :
+					(b.Name === currentProductName ? 1 :
+						(a.Name > b.Name ? 1 : -1));
+			});
+	};
+
+	KendoGridHelper.createShareURL = function (type, selectedIds, layoutColumns, targetProduct)
+	{
+		return tf.helpers.gridLinkHelper.createGridLink(tf.datasourceManager.databaseId, type, selectedIds, layoutColumns)
+			.then((gridLink) =>
+			{
+				if (!gridLink) { return; }
+
+				var url;
+				var targetProductName = targetProduct.Name;
+				const supportInfo = SUPPORTED_OPENIN_PRODUCTS[targetProductName];
+
+				if (supportInfo && typeof supportInfo.generateUrl === 'function')
+				{
+					url = supportInfo.generateUrl(targetProduct.Uri);
+				}
+				else
+				{
+					url = basicGenerateUrl(targetProduct.Uri);
+				}
+
+				if (type == "gpsevent")
+				{
+					var prefix = tf.helpers.applicationDataHelper.FindByName(targetProductName);
+					tf.userPreferenceManager.UserPreferenceDataList.forEach(item =>
+					{
+						if (item.Key.includes("gpsevent.listFilterWithSelectDateTimeRange"))
+						{
+							tf.userPreferenceManager.save(prefix + item.Key.substr(item.Key.indexOf(".")), item.Value);
+						}
+					});
+				}
+
+				if (url)
+				{
+					url += "?" + $.param({ GridLinkGuid: gridLink.GUID });
+				}
+
+				return url;
+			});
+	}
+
+	KendoGridHelper.openInGrid = function (type, selectedIds, layoutColumns, targetProduct)
+	{
+		TF.Helper.KendoGridHelper.createShareURL(type, selectedIds, layoutColumns, targetProduct)
+
+			.then((url) =>
+			{
+				if (url)
+				{
+					window.open(url, "_blank", "");
+				}
+			});
+	};
+
+	KendoGridHelper.loadGridLink = function (guid)
+	{
+		if (!guid) { return; }
+
+		return tf.helpers.gridLinkHelper.getGridLink(guid)
+			.then((gridLink) =>
+			{
+				if (!gridLink)
+				{
+					tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id. You will be directed to welcome page for now.");
+					return;
+				}
+
+				if (!gridLink.isAuthorized)
+				{
+					const noPermissionWarningMsg = "You don't have permissions for this URL link.";
+					tf.promiseBootbox.alert(noPermissionWarningMsg);
+					return;
+				}
+
+				const switchDatasourceConfirmMsg = "The URL leads to a different data source, switching data source would cause opened tabs closed. Are you sure you want to continue?";
+				let loadDatasourceTask = gridLink.DBID === tf.datasourceManager.databaseId
+					? Promise.resolve(true) :
+					tf.promiseBootbox.confirm(
+						{
+							message: switchDatasourceConfirmMsg,
+							title: "Confirmation Message"
+						})
+						.then((result) =>
+						{
+							if (!result)
+							{
+								return false;
+							}
+
+							return tf.datasourceManager.findDatabaseById(gridLink.DBID)
+								.then(targetDB =>
+								{
+									if (!targetDB) { return false; }
+
+									return tf.datasourceManager.choose(targetDB, true)
+										.then(() => true);
+								});
+
+						});
+
+				return loadDatasourceTask
+					.then((shouldProceed) =>
+					{
+						if (!shouldProceed) { return; }
+
+						const { DataTypeId, Ids, Layout } = gridLink;
+
+						let layoutColumns = null;
+						const gridType = tf.dataTypeHelper.getKeyById(DataTypeId);
+						const filterName = `${tf.dataTypeHelper.getFormalDataTypeName(gridType)} (Selected Records)`;
+
+						try
+						{
+							layoutColumns = JSON.parse(Layout);
+						}
+						catch (e)
+						{
+							layoutColumns = null;
+						}
+
+						tf.storageManager.save(tf.storageManager.gridCurrentQuickFilter(gridType), null);
+						const predefinedGridData = {
+							filteredIds: Ids.split(','),
+							gridType: gridType,
+							filterName: filterName,
+							layoutColumns: layoutColumns
+						};
+
+						return predefinedGridData;
+					});
+			});
+	};
+	//#endregion
+
+	KendoGridHelper.getStringOfRecords = function (records, columns)
 	{
 		var strRecords = "", strRecord = "";
 		for (var i = 0; i < columns.length; i++)
@@ -798,6 +1150,10 @@
 				if (new Date(validDateValue) != 'Invalid Date' && momentValue.isValid() === true && validDateValue !== 0)
 				{
 					value = momentValue.toDate();
+					if (!column.format)
+					{
+						column = setColumnFormat(column);
+					}
 					return kendo.format(column.format, value);
 				}
 				else
@@ -806,34 +1162,59 @@
 				}
 			}
 
-			if (column.questionType === 'Phone' || column.UDFType === 'phone number' 
-					|| ((!column.questionType && !column.UDFType) 
-						&& (column.FieldName.endsWith("Phone") || column.FieldName.endsWith("Fax"))))
+			if (column.questionType === 'Phone' || column.UDFType === 'phone number'
+				|| ((!column.questionType && !column.UDFType)
+					&& (column.FieldName.endsWith("Phone") || column.FieldName.endsWith("Fax"))))
 			{
 				return tf.dataFormatHelper.phoneFormatter(value);
 			}
 
 			return value;
 		}
-    };
-    KendoGridHelper.getListOfRecords = function (records, columns) {
-        var data = [[]];
-        for (var i = 0; i < columns.length; i++) {
-            data[0].push(columns[i].DisplayName);
-        }
-        for (i = 0; i < records.length; i++) {
-            var theRecord = records[i];
-            var record = [];
-            for (var j = 0; j < columns.length; j++) {
-                var value = theRecord[columns[j].FieldName];
-                if ($.isArray(value)) {
-                    value = value.length == 0 ? "" : value.toString();
-                }
-                record.push(value);
-            }
-            data.push(record);
-        }
-        return data;
-    };
 
+		function setColumnFormat(column)
+		{
+			switch (column.type)
+			{
+				case "integer":
+					column.format = "{0:n0}";
+					break;
+				case "time":
+					column.format = "{0:h:mm tt}";
+					break;
+				case "date":
+					column.format = "{0:MM/dd/yyyy}";
+					break;
+				case "datetime":
+					column.format = "{0:MM/dd/yyyy hh:mm tt}";
+					break;
+			}
+			return column;
+		}
+	};
+
+	KendoGridHelper.getListOfRecords = function (records, columns)
+	{
+		var data = [[]];
+		for (var i = 0; i < columns.length; i++)
+		{
+			data[0].push(columns[i].DisplayName);
+		}
+		for (i = 0; i < records.length; i++)
+		{
+			var theRecord = records[i];
+			var record = [];
+			for (var j = 0; j < columns.length; j++)
+			{
+				var value = theRecord[columns[j].FieldName];
+				if ($.isArray(value))
+				{
+					value = value.length == 0 ? "" : value.toString();
+				}
+				record.push(value);
+			}
+			data.push(record);
+		}
+		return data;
+	};
 })();

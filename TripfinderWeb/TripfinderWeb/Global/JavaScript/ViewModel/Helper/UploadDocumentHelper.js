@@ -1,6 +1,5 @@
-(function()
+(function ()
 {
-	const INNER_MASK_SELECTOR = ".inner-mask";
 	createNamespace("TF.Form").UploadDocumentHelper = UploadDocumentHelper;
 
 	function UploadDocumentHelper(targetQuestion)
@@ -12,30 +11,30 @@
 		{
 			self.init();
 		}
-	}
+	};
 	UploadDocumentHelper.prototype.constructor = UploadDocumentHelper;
 
-	UploadDocumentHelper.maxNumber = 5; // 50MB
-	UploadDocumentHelper.maxFileByteSize = 50 * 1024 * 1024; // 50MB
+	UploadDocumentHelper.maxNumber = 5; // 5 files limit
+	UploadDocumentHelper.maxFileByteSize = 250 * 1024 * 1024; // 50MB
 	UploadDocumentHelper.acceptFileExtensions = ['.csv', '.bmp', '.doc', '.gif', '.docm', '.jpeg',
 		'.docx', '.jpg', '.dotm', '.png', '.dotx', '.tif', '.tiff', '.htm', '.wmf', '.html',
-		'.odp', '.odt', '.pdf', '.pps', '.ppt', '.pptx', '.rtf', '.txt', '.xls', '.xlsx', '.xps'];
+		'.odp', '.odt', '.pdf', '.pps', '.ppt', '.pptx', '.rtf', '.txt', '.xls', '.xlsx', '.xps', '.mp4', '.mov'];
 	UploadDocumentHelper.acceptMimeType = "*.*";
 
-	UploadDocumentHelper.prototype.isInvalid = function()
+	UploadDocumentHelper.prototype.isInvalid = function ()
 	{
 		const self = this;
 		return self.targetQuestion.value && self.targetQuestion.value.length === UploadDocumentHelper.maxNumber;
 	}
 
-	UploadDocumentHelper.prototype.init = function()
+	UploadDocumentHelper.prototype.init = function ()
 	{
 		const self = this;
 		const $element = self.$targetEle,
-			$uploadFileContainer = $(`<div class='upload-file-container'>
-										<label class='input-label'>Drop file to attach to this form.</label>
-										<div class='inner-mask' style='position:absolute;top:0;right:0;bottom:0;left:0;'></div>
-									</div>`),
+			$uploadFileContainer = $("<div class='upload-file-container'>\
+										<label class='input-label'>Drop file to attach to this form.</label>\
+										<div class='inner-mask' style='position:absolute;top:0;right:0;bottom:0;left:0;'></div>\
+									</div>"),
 			$dragoverMask = $("<div class='dragover-mask'></div>");
 
 		$element.addClass("allow-file-upload");
@@ -44,7 +43,7 @@
 		$element.append($uploadFileContainer);
 		$uploadFileContainer.hide();
 
-		$($element).on("dragenter" + ".form", function(e)
+		$($element).on("dragenter" + ".form", function (e)
 		{
 			if (self.isInvalid())
 			{
@@ -59,13 +58,8 @@
 			}
 			$dragoverMask.css("z-index", "99999");
 		});
-		self.initDragEventPart2($dragoverMask, $uploadFileContainer);
-	};
 
-	UploadDocumentHelper.prototype.initDragEventPart2 = function($dragoverMask, $uploadFileContainer)
-	{
-		const self = this;
-		$dragoverMask.on("dragenter.form", function(e)
+		$dragoverMask.on("dragenter.form", function (e)
 		{
 			if (self.isInvalid())
 			{
@@ -81,7 +75,7 @@
 			$uploadFileContainer.show();
 		});
 
-		$uploadFileContainer.find(INNER_MASK_SELECTOR).on("dragleave.form", function(e)
+		$uploadFileContainer.find(".inner-mask").on("dragleave.form", function (e)
 		{
 			if (self.isInvalid())
 			{
@@ -91,7 +85,7 @@
 			$dragoverMask.css("z-index", "-1");
 		});
 
-		$uploadFileContainer.find(INNER_MASK_SELECTOR).on('drag dragstart dragend dragover dragenter dragleave drop', function(e)
+		$uploadFileContainer.find(".inner-mask").on('drag dragstart dragend dragover dragenter dragleave drop', function (e)
 		{
 			if (self.isInvalid())
 			{
@@ -101,7 +95,7 @@
 			e.stopPropagation();
 		});
 
-		$uploadFileContainer.find(INNER_MASK_SELECTOR).on("drop.form", function(e)
+		$uploadFileContainer.find(".inner-mask").on("drop.form", function (e)
 		{
 			if (self.isInvalid())
 			{
@@ -122,21 +116,23 @@
 				self.addDocuments(files);
 			}
 		});
-	}
-
-	UploadDocumentHelper.prototype.addDocuments = function(files)
-	{
-		this.targetQuestion.uploadedFiles(files);
 	};
 
-	UploadDocumentHelper.prototype.validateFile = function(fileName, fileSize)
+	UploadDocumentHelper.prototype.addDocuments = function (files)
+	{
+		let self = this;
+		self.targetQuestion.uploadedFiles(files);
+	};
+
+	UploadDocumentHelper.prototype.validateFile = function (fileName, fileSize)
 	{
 		return this._validateAttachFileExtension(fileName) && this._validateAttachFileSize(fileSize);
 	};
 
-	UploadDocumentHelper.prototype._validateAttachFileExtension = function(fileName)
+	UploadDocumentHelper.prototype._validateAttachFileExtension = function (fileName)
 	{
-		var index = fileName.lastIndexOf('.'),
+		var self = this,
+			index = fileName.lastIndexOf('.'),
 			extension = fileName.substr(index, fileName.length - index).toLowerCase(), result;
 
 		if (index > 0 && UploadDocumentHelper.acceptFileExtensions.includes(extension))
@@ -147,20 +143,21 @@
 		return result;
 	};
 
-	UploadDocumentHelper.prototype._validateAttachFileSize = function(size)
+	UploadDocumentHelper.prototype._validateAttachFileSize = function (size)
 	{
-		return size < UploadDocumentHelper.maxFileByteSize;
+		var result = size < UploadDocumentHelper.maxFileByteSize;
+		return result;
 	};
 
-	UploadDocumentHelper.prototype.getFileStream = function(rawFile)
+	UploadDocumentHelper.prototype.getFileStream = function (rawFile)
 	{
 		const self = this;
-		return new Promise(function(resolve, reject)
+		return new Promise(function (resolve, reject)
 		{
 			var file = rawFile, reader = new FileReader();
 
 			reader.readAsDataURL(file);
-			reader.onload = function(e)
+			reader.onload = function (e)
 			{
 				if (!self.validateFile(rawFile.name, rawFile.size))
 				{
@@ -171,14 +168,14 @@
 					resolve(e.target.result);
 				}
 			};
-			reader.onerror = function(error)
+			reader.onerror = function (error)
 			{
 				reject(error);
 			};
 		});
 	};
 
-	UploadDocumentHelper.prototype.dispose = function()
+	UploadDocumentHelper.prototype.dispose = function ()
 	{
 		var self = this,
 			$element = self.form.elem;

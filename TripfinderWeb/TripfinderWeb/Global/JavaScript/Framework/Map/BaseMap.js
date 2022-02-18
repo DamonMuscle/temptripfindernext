@@ -112,7 +112,8 @@
 				// "extras/FlareClusterLayer",
 				// "esri/renderers/ClassBreaksRenderer",
 				// "esri/symbols/CIMSymbol",
-				"esri/views/draw/support/settings"
+				"esri/views/draw/support/settings",
+				"esri/geometry/support/geodesicUtils"
 			], function(
 				EsriMap,
 				Basemap,
@@ -198,7 +199,8 @@
 				// FlareClusterLayer,
 				// ClassBreaksRenderer,
 				// CIMSymbol,
-				settings
+				settings,
+				geodesicUtils
 			)
 			{
 				self.ArcGIS = {
@@ -272,6 +274,7 @@
 					// ClassBreaksRenderer: ClassBreaksRenderer,
 					// CIMSymbol: CIMSymbol,
 					settings: settings,
+					geodesicUtils: geodesicUtils,
 					dojo: {
 						color: color,
 						// lang: lang
