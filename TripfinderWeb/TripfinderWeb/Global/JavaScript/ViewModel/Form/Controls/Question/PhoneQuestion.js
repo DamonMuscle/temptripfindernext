@@ -13,6 +13,7 @@
 	{
 		let formatValue = !!this.field.readonly ? tf.dataFormatHelper.phoneFormatter(this.field.value) : this.field.value;
 		const phonebox = new TF.Input.PhoneBox(formatValue || "", { readonly: !!this.field.readonly, maxlength: 18, placeholder: "Enter your phone number" });
+		phonebox.$input.attr("type", "tel");
 		this.phonebox = phonebox;
 		phonebox.onValueChange.subscribe((ev, newvalue) =>
 		{
