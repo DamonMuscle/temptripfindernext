@@ -55,7 +55,7 @@
 
 	MapQuestion.prototype.initQuestionContent = () =>
 		$(`<div class='map-question question'>
-		<div class='map-item map-page'>
+		<div class='map-item map-page doc'>
 			<div class='map' style='max-height: 2000px; height: 100%; width: 100%; background: #e1e1e1'>
 				<div id='mapPlaceholder' style='height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center'>Loading Map...</div>
 			</div>
