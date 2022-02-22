@@ -1,4 +1,4 @@
-!function()
+!function ()
 {
 	createNamespace("TF.Control.Form").MapQuestion = MapQuestion;
 
@@ -11,10 +11,9 @@
 	MapQuestion.defaultPinSymbol = {
 		symbolNumber: "18",
 		symbolColor: "#ff0606",
-		symbolSize: "15",
+		symbolSize: 15,
 		borderColor: "#000000",
 		borderSize: "1",
-		borderishow: true
 	}
 
 	MapQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
@@ -54,23 +53,22 @@
 		get() { return JSON.stringify(this.initialValue || []) !== JSON.stringify((this.value || [])) }
 	});
 
-	MapQuestion.prototype.initQuestionContent = function()
-	{
-		return $(`<div class='map-question question'>
-					<div class='map-item map-page doc'>
-						<div class='map' style='max-height: 2000px; height: 100%; width: 100%; background: #e1e1e1'>
-						</div>
-					</div>
-				</div>
-				<div class="cordinate" style="text-align:left;color:#8e7878;"></div>`);
-	}
+	MapQuestion.prototype.initQuestionContent = () =>
+		$(`<div class='map-question question'>
+		<div class='map-item map-page'>
+			<div class='map' style='max-height: 2000px; height: 100%; width: 100%; background: #e1e1e1'>
+				<div id='mapPlaceholder' style='height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center'>Loading Map...</div>
+			</div>
+		</div>
+	</div>
+	<div class="cordinate" style="text-align:left;color:#8e7878;"></div>`)
 
-	MapQuestion.prototype.initEvents = function()
+	MapQuestion.prototype.initEvents = function ()
 	{
 		// Keep empty
 	}
 
-	MapQuestion.prototype.getValidateResult = function()
+	MapQuestion.prototype.getValidateResult = function ()
 	{
 		let result = '';
 		if (this.isRequired && (this.value.length === 0))
@@ -80,139 +78,9 @@
 		return result;
 	}
 
-	MapQuestion.prototype.intializeLocationMakerOptions = function(options)
+	MapQuestion.prototype.createMap = function ($el)
 	{
-		//Pin default if not specified.
-		if (options.locationMarkerList.length === 0)
-		{
-			let shape = "Polygon";
-			if (TF.isMobileDevice)
-			{
-				shape = "Draw";
-			}
-			options.locationMarkerList.push(shape);
-		}
-		else
-		{
-			if (TF.isMobileDevice)
-			{
-				options.locationMarkerList = ["Draw"];
-			}
-		}
-	}
 
-	MapQuestion.prototype.intializeMapCovers = function($el)
-	{
-		const self = this;
-		const coverDom = $(`<div class="map-question-zoom-cover" 
-				style="display:none;z-index: 25000; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 1;"></div>`);
-		if (!TF.isMobileDevice)
-		{
-			self._mapView.navigation.browserTouchPanEnabled = true;
-			const $zoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip">Use ctrl + scroll to zoom the map</p>`);
-			$zoomCover.on("keydown mousewheel", function(evt)
-			{
-				if (evt && evt.ctrlKey && self._map.expandMapTool.status)
-				{
-					evt.preventDefault();
-					evt.stopPropagation();
-					$zoomCover.hide();
-					// keep the event propagation when overlay not hide
-					if (!self.canvas)
-					{
-						self.canvas = $(map.mapView.root).find("canvas")[0];
-					}
-					const originalEvent = evt.originalEvent;
-					const newEvt = new originalEvent.constructor(originalEvent.type, originalEvent);
-					self.canvas.dispatchEvent(newEvt);
-				}
-			});
-			$(self._mapView.root).after($zoomCover);
-			self._mapView.on("mouse-wheel", function(evt)
-			{
-				if (evt && evt.native && !evt.native.ctrlKey && self._map.expandMapTool.status)
-				{
-					evt.preventDefault();
-					evt.stopPropagation();
-					$zoomCover.fadeIn(500).fadeOut(2000);
-				}
-			});
-		}
-		else
-		{
-			self.intializeMapCoversMobileEvents(coverDom, $el);
-		}
-	}
-
-	MapQuestion.prototype.mapCoversMobileOnTouchmove = function($el, $mobileZoomCover)
-	{
-		const self = this;
-		$el.off("touchmove.checkFingers")
-			.on("touchmove.checkFingers", (evt) =>
-			{
-				const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
-				const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
-				const mapToolIsActive = self.element.find(".off-map-tool").hasClass("active");
-				// return when map is drawing.
-				if (locationMarkerTool && locationMarkerTool.isDrawing === true)
-				{
-					evt.preventDefault();
-					evt.stopPropagation();
-					return;
-				}
-
-				if (touches.length <= 1 && self._map.expandMapTool.status && !mapToolIsActive)
-				{
-					$mobileZoomCover.show();
-				}
-
-				if (touches.length > 1 && self._map.expandMapTool.status)
-				{
-					$mobileZoomCover.hide();
-				}
-			});
-	}
-
-	MapQuestion.prototype.intializeMapCoversMobileEvents = function(coverDom, $el)
-	{
-		const self = this;
-		self._mapView.navigation.browserTouchPanEnabled = false;
-		const $mobileZoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip" style="font-size:16px">Use two fingers to move the map</p>`);
-		$(self._mapView.root).after($mobileZoomCover);
-
-		self.mapCoversMobileOnTouchmove($el, $mobileZoomCover);
-		$el.off("touchstart.checkFingers")
-			.on("touchstart.checkFingers", (evt) =>
-			{
-				const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
-				if (locationMarkerTool && locationMarkerTool.isDrawing === true)
-				{
-					const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
-					TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "none");
-				}
-			});
-
-		$el.off("touchend.checkFingers")
-			.on("touchend.checkFingers", (evt) =>
-			{
-				const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
-				if (touches.length <= 1 && self._map.expandMapTool.status)
-				{
-					$mobileZoomCover.hide();
-				}
-
-				const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
-				TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "auto");
-			});
-
-		self._mapView.on(["pointer-up", "pointer-leave"], function(e)
-		{
-			$mobileZoomCover.hide();
-		});
-	}
-
-	MapQuestion.prototype.createMap = function($el)
-	{
 		var self = this;
 		var options = {
 			thematicLayerId: self.studentLayerId,
@@ -232,6 +100,7 @@
 			manuallyPinAvailable: false,
 			drawBoundaryAvailable: false,
 			geoFinderAvailable: false,
+			myMapAvailable: false,
 			GoogleStreet: false,
 			center: [self.field.FieldOptions.HomeLocation.Longitude, self.field.FieldOptions.HomeLocation.Latitude],
 			zoomLevel: self.field.FieldOptions.HomeLocation.ZoomLevel,
@@ -241,16 +110,46 @@
 				container: $(document.body)
 			}
 		};
-		self.intializeLocationMakerOptions(options);
 
-
-		let borderColor = null, borderSize = null;
-		const pinOption = self.field.FieldOptions.PinOption;
-		if (self.field.FieldOptions.PinOption.ShowBorder)
+		//Pin default if not specified.
+		if (options.locationMarkerList.length === 0)
 		{
-			borderColor = pinOption.BorderColor || "#000000";
-			borderSize = pinOption.BorderSize || "1";
+			if (TF.isMobileDevice)
+			{
+				options.locationMarkerList.push("Draw");
+			}
+			else
+			{
+				options.locationMarkerList.push("Polygon");
+			}
 		}
+		else
+		{
+			if (TF.isMobileDevice)
+			{
+				const mobileLocationMarkerList = [];
+				let removed = false;
+				for (const marker of options.locationMarkerList)
+				{
+					if (["Polygon", "Rectangle", "Draw", "Circle"].includes(marker))
+					{
+						if (!removed)
+						{
+							removed = true;
+						}
+					} else
+					{
+						mobileLocationMarkerList.push(marker);
+					}
+				}
+				if (removed)
+				{
+					mobileLocationMarkerList.push("Draw");
+				}
+				options.locationMarkerList = mobileLocationMarkerList;
+			}
+		}
+		const pinOption = self.field.FieldOptions.PinOption;
 		const pinIconOption = $.extend(
 			{},
 			TF.Control.Form.MapQuestion.defaultPinSymbol,
@@ -258,40 +157,148 @@
 				symbolNumber: pinOption.Icon,
 				symbolColor: pinOption.Color,
 				symbolSize: pinOption.Size,
-				borderColor: borderColor,
-				borderSize: borderSize
+				borderColor: pinOption.BorderColor,
+				borderSize: pinOption.BorderSize,
+				isWithBorder: pinOption.ShowBorder
 			}
 		);
 
-		const routeState = Math.random().toString(36).substring(7);
 		self.mapViewModel = {
 			element: self.elem.find(".map-item.map-page"),
 			homeCoordinates: [self.field.FieldOptions.HomeLocation.Longitude, self.field.FieldOptions.HomeLocation.Latitude],
 			pinIconOption: pinIconOption,
-			routeState: routeState,
+			routeState: tf.storageManager.get("routeState", false, true),
 			isForm: true,
+			isDrawing: false,
 			shapeDrawn: () => self.value = true
 		};
 
-		options.disableTrashBtn = true;
-		TF.getLocation().then(coord =>
+		options.disableTrashBtn = true; // clear button always gray when first open
+
+		var locationPromise;
+		if (tf.isFromWayfinder)
 		{
+			locationPromise = TF.getWayfinderLocation;
+		}
+		else
+		{
+			locationPromise = TF.getLocation;
+		}
+		self.initDependencePromise = Promise.all([locationPromise]).then(results =>
+		{
+			var coord = results[0];
 			if (!coord.latitude && !coord.longitude)
 			{
 				options.disableMyLocationBtn = true;
 			}
+
+			var mapPlaceholder = document.getElementById('mapPlaceholder');
+			mapPlaceholder.remove();
+
 			var map = TF.Helper.MapHelper.createMap($el, self.mapViewModel, options);
 			self._map = map;
 			self._mapView = map.mapView;
 
-			self.intializeMapCovers($el);
+			const coverDom = $(`<div class="map-question-zoom-cover" style="display:none;z-index: 25000; position: absolute; ` +
+				`height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 1;"></div>`);
+			if (!TF.isMobileDevice)
+			{
+				self._mapView.navigation.browserTouchPanEnabled = true;
+				const $zoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip">Use ctrl + scroll to zoom the map</p>`);
+				$zoomCover.on("keydown mousewheel", function (evt)
+				{
+					if (evt && evt.ctrlKey && self._map.expandMapTool.status)
+					{
+						evt.preventDefault();
+						evt.stopPropagation();
+						$zoomCover.hide();
+						// keep the event propagation when overlay not hide
+						if (!self.canvas)
+						{
+							self.canvas = $(map.mapView.root).find("canvas")[0];
+						}
+						const originalEvent = evt.originalEvent;
+						const newEvt = new originalEvent.constructor(originalEvent.type, originalEvent);
+						self.canvas.dispatchEvent(newEvt);
+					}
+				});
+				$(self._mapView.root).after($zoomCover);
+				self._mapView.on("mouse-wheel", function (evt)
+				{
+					if (evt && evt.native && !evt.native.ctrlKey && self._map.expandMapTool.status)
+					{
+						evt.preventDefault();
+						evt.stopPropagation();
+						$zoomCover.fadeIn(500).fadeOut(2000);
+					}
+				});
+			}
+			else
+			{
+				self._mapView.navigation.browserTouchPanEnabled = false;
+				const $mobileZoomCover = coverDom.append(`<p class="map-question-zoom-cover-tip" style="font-size:16px">Use two fingers to move the map</p>`);
+				$(self._mapView.root).after($mobileZoomCover);
+				$el.off("touchmove.checkFingers")
+					.on("touchmove.checkFingers", (evt) =>
+					{
+						const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
+						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
+						// return when map is drawing.
+						if (locationMarkerTool && locationMarkerTool.isDrawing === true)
+						{
+							evt.preventDefault();
+							evt.stopPropagation();
+							return;
+						}
+
+						if (touches.length <= 1 && self._map.expandMapTool.status)
+						{
+							$mobileZoomCover.show();
+						}
+
+						if (touches.length > 1 && self._map.expandMapTool.status)
+						{
+							$mobileZoomCover.hide();
+						}
+					});
+
+				$el.off("touchstart.checkFingers")
+					.on("touchstart.checkFingers", (evt) =>
+					{
+						const locationMarkerTool = self.mapViewModel.RoutingMapTool.locationMarkerTool;
+						if (locationMarkerTool && locationMarkerTool.isDrawing === true)
+						{
+							const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
+							TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "none");
+						}
+					});
+
+				$el.off("touchend.checkFingers")
+					.on("touchend.checkFingers", (evt) =>
+					{
+						const touches = evt && evt.originalEvent && evt.originalEvent.touches || [];
+						if (touches.length <= 1 && self._map.expandMapTool.status)
+						{
+							$mobileZoomCover.hide();
+						}
+
+						const mapContainer = self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.$container;
+						TF.isMobileDevice && mapContainer && mapContainer.css("touch-action", "auto");
+					});
+
+				self._mapView.on(["pointer-up", "pointer-leave"], function (e)
+				{
+					$mobileZoomCover.hide();
+				});
+			}
+
 			//location marker layer: create graphics on layer when click triggered on map
 			self.locationMarkerLayer = new tf.map.ArcGIS.GraphicsLayer({ id: "locationMarker" });
 			map.add(self.locationMarkerLayer);
 			// to enable map tools on map view
 			self.mapViewModel.RoutingMapTool.toolkitBtnClickEventEnable = true;
 			// Adjust map tool whether adopt with landscape(not enough height to show tools by vertical)
-			self.mapViewModel.RoutingMapTool.toolkitBtnClickEvent.subscribe(function(e, callback)
+			self.mapViewModel.RoutingMapTool.toolkitBtnClickEvent.subscribe(function (e, callback)
 			{
 				var $offMapTool = self.mapViewModel.RoutingMapTool.$offMapTool;
 				$offMapTool.css("z-index", 24000);
@@ -314,43 +321,9 @@
 				}
 				callback();
 			});
-
-			self.subscribeMapToolClickEvent();
 		});
 
 		window.addEventListener("orientationchange", hideMapTool.bind(this));
-	}
-
-	MapQuestion.prototype.subscribeMapToolClickEvent = function()
-	{
-		var self = this;
-		if (self.removeUselessBaseMapItemTimeout)
-		{
-			clearTimeout(self.removeUselessBaseMapItemTimeout);
-		}
-
-		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
-		self.onBasemapToolClickToken = PubSub.subscribe("MapToolClicked", (_, item) =>
-		{
-			if (item.title !== "Basemap")
-			{
-				return;
-			}
-			if (item.isActive === true || TF.isPhoneDevice)
-			{
-				self.removeUselessBaseMapItemTimeout = setTimeout(() =>
-				{
-					// hide "My Maps (Vector Tile)", "Live Traffic Data" in basemap.
-					var $gallery = TF.isPhoneDevice ? $(".mobile-modal-content-body").find(".esri-basemap-gallery") : $(".map-page.doc.esri-view").find(".esri-basemap-gallery"),
-						liList = $gallery.find("li").toArray(),
-						hideItems = liList.filter(liItem => $.inArray(liItem.innerText.trim(), ["My Maps (Vector Tile)", "Live Traffic Data"]) >= 0);
-					hideItems.forEach(li =>
-					{
-						$(li).hide();
-					});
-				}, 50);
-			}
-		});
 	}
 
 	function hideMapTool()
@@ -363,39 +336,52 @@
 		}
 	}
 
-	MapQuestion.prototype.restoreShape = function(shapeData)
+	MapQuestion.prototype.restoreShape = function (shapeData)
 	{
-		if (this.locationMarkerLayer && shapeData)
+		let doPromise = Promise.resolve();
+		if (this.initDependencePromise)
 		{
-			shapeData.forEach(shape =>
-			{
-				const graphic = tf.map.ArcGIS.Graphic.fromJSON(shape);
-				this.locationMarkerLayer.add(graphic)
-				this.value = true; //triger value calculate
-			});
-
-			if (Array.isArray(shapeData) && shapeData.length)
-			{
-				this._mapView.scale = 5000;
-			}
-
-			// currently, we only have one graphic on mape in same time, make the graphic in center of map
-			if (this.locationMarkerLayer.graphics.length > 0 && this._mapView)
-			{
-				const geometry = this.locationMarkerLayer.graphics.items[0].geometry;
-				this._mapView.goTo(geometry);
-			}
+			doPromise = this.initDependencePromise;
 		}
-		this.initialValue = this.locationMarkerLayer.graphics.toJSON();
 
-		if (!this.field.readonly && Array.isArray(shapeData) && shapeData.length &&
-			this.mapViewModel && this.mapViewModel.RoutingMapTool && this.mapViewModel.RoutingMapTool.$mapToolContainer)
+		doPromise.then(() =>
 		{
-			this.mapViewModel.RoutingMapTool.$mapToolBar.find('.trash').removeClass('disable');
-		}
+			if (this.locationMarkerLayer && shapeData)
+			{
+				shapeData.forEach(shape =>
+				{
+					const graphic = tf.map.ArcGIS.Graphic.fromJSON(shape);
+					this.locationMarkerLayer.add(graphic)
+					this.value = true; //triger value calculate
+				});
+
+				if (Array.isArray(shapeData) && shapeData.length)
+				{
+					this._mapView.scale = 5000;
+				}
+
+				// currently, we only have one graphic on mape in same time, make the graphic in center of map
+				if (this.locationMarkerLayer.graphics.length > 0 && this._mapView)
+				{
+					const geometry = this.locationMarkerLayer.graphics.items[0].geometry;
+					this._mapView.goTo(geometry);
+				}
+			}
+			this.initialValue = this.locationMarkerLayer.graphics.toJSON();
+
+			if (!this.field.readonly
+				&& Array.isArray(shapeData)
+				&& (shapeData.length > 0)
+				&& this.mapViewModel
+				&& this.mapViewModel.RoutingMapTool
+				&& this.mapViewModel.RoutingMapTool.$mapToolContainer)
+			{
+				this.mapViewModel.RoutingMapTool.$mapToolBar.find('.trash').removeClass('disable');
+			}
+		})
 	}
 
-	MapQuestion.prototype.dispose = function()
+	MapQuestion.prototype.dispose = function ()
 	{
 		const self = this;
 		self._map = null;
@@ -403,7 +389,5 @@
 		self.mapViewModel && self.mapViewModel.RoutingMapTool && self.mapViewModel.RoutingMapTool.dispose();
 		self.mapViewModel = null;
 		window.removeEventListener("orientationchange", hideMapTool);
-		self.onBasemapToolClickToken && PubSub.unsubscribe(self.onBasemapToolClickToken);
-		self.onBasemapToolClickToken = null;
 	}
 }()

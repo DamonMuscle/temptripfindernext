@@ -64,17 +64,55 @@
 		return leftFilterWhereClause === rightFilterWhereClause;
 	};
 
-	FilterHelper.getGridDefinitionByType = function functionName (gridType)
+	FilterHelper.getGridDefinitionByType = function (gridType)
 	{
-		var result = null;
-		switch (gridType)
+		switch ((gridType || '').toLowerCase())
 		{
+			case 'altsite':
+			case 'alternatesite':
+				return tf.altsiteGridDefinition.gridDefinition();
+			case 'contractor':
+				return tf.contractorGridDefinition.gridDefinition();
+			case 'district':
+				return tf.districtGridDefinition.gridDefinition();
 			case 'fieldtrip':
-				result = tf.fieldTripGridDefinition.gridDefinition();
-				break;
-			default:
+				return tf.fieldTripGridDefinition.gridDefinition();
+			case 'vehicle':
+				return tf.vehicleGridDefinition.gridDefinition();
+			case 'school':
+				return tf.schoolGridDefinition.gridDefinition();
+			case 'trip':
+				return tf.tripGridDefinition.gridDefinition();
+			case 'route':
+				return tf.routeGridDefinition.gridDefinition();
+			case 'georegion':
+				return tf.georegionGridDefinition.gridDefinition();
+			case 'student':
+				return tf.studentGridDefinition.gridDefinition();
+			case 'staff':
+			case 'driver':
+				return tf.staffGridDefinition.gridDefinition();
+			case 'tripstop':
+				return tf.tripStopGridDefinition.gridDefinition();
+			case 'equipment':
+				return tf.equipmentGridDefinition.gridDefinition();
+			case 'stopstudent':
+				return tf.studentGridDefinition.gridDefinition();
+			case 'ethnic_codes':
+				return tf.ethnicGridDefinition.gridDefinition();
+			case 'disability_codes':
+				return tf.disabilityGridDefinition.gridDefinition();
+			case 'busfinderhistorical':
+				return tf.busfinderHistoricalGridDifinition.gridDefinition();
+			case 'recordcontact':
+				return tf.recordContactGridDefinition.gridDefinition();
+			case 'contact':
+				return tf.contactGridDefinition.gridDefinition();
+			case 'specialequipment':
+				return tf.specialEquipmentGridDefinition.gridDefinition();
 		}
-		return result;
+
+		return '';
 	};
 
 	FilterHelper.mergeOnlyForFilterColumns = function(gridType, columns)
