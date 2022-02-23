@@ -155,7 +155,8 @@
 						item.FieldTripStageId = statusId;
 					});
 					return true;
-				});
+				})
+				.catch(result => tf.promiseBootbox.alert(result.TransfinderMessage || result.Message, "Error"));
 		});
 	};
 
