@@ -4203,6 +4203,50 @@ var today = (new Date()).toDateString(),
 				}
 			]
 		},
+		"route": {
+			"Main": [
+				{
+					"field": "Name",
+					"title": "Name",
+					"type": "String",
+					"defaultValue": "42 Bus",
+					"editType": {
+						"format": "String",
+						"maxLength": 150
+					}
+				}
+			],
+			"Miscellaneous": [{
+				"field": "Notes",
+				"title": "Notes",
+				"type": "Note",
+				"defaultValue": "Lorem ipsum dolor sit amet.",
+				"editType": {
+					"format": "Note",
+					"maxLength": 2000
+				},
+			},
+			{
+				"field": "Map",
+				"title": "Map",
+				"type": "Map",
+				"defaultValue": "Map",
+				"min-height": "4"
+			}],
+			"User Defined": [],
+			"User Defined Group": [],
+			"State Report Fields": [],
+			"Grid": [
+				{
+					"field": "TripGrid",
+					"title": "Trip Grid",
+					"type": "grid",
+					"url": "trip",
+					"min-height": "3",
+					"min-width": 2
+				}
+			]
+		},
 		"vehicle": {
 			"Main": [
 				{
