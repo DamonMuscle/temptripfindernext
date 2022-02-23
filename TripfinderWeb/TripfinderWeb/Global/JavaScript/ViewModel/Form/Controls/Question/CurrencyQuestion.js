@@ -1,5 +1,6 @@
-(function()
+(function ()
 {
+	const DEFAULT_DECIMALS = 2;
 	createNamespace("TF.Control.Form").CurrencyQuestion = CurrencyQuestion;
 
 	function CurrencyQuestion()
@@ -10,75 +11,122 @@
 	CurrencyQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	CurrencyQuestion.prototype.constructor = CurrencyQuestion;
 
-	CurrencyQuestion.prototype.initQuestionContent = function()
+	CurrencyQuestion.prototype.getValidateInputs = function ()
 	{
-		const field = this.field;
-		const $inputContainer = $(`<div class="currency-question">
-		<span class="currency-symbol">${this.field.currencySymbol || "$"}</span>
-		<input type="number" class="question" step="any" />
-		</div>`);
+		return this.element.find('input:not(.k-formatted-value)');
+	}
 
-		const $input = $inputContainer.find("input");
-		$input.keypress(ev => 
-		{
-			var keyCode = ev.which || ev.keyCode || 0;
-			if (
-				(keyCode != ".".charCodeAt(0) || $(ev.target).val().indexOf('.') !== -1)
-				&& (keyCode != "-".charCodeAt(0))
-				&& (keyCode < "0".charCodeAt(0) || keyCode > "9".charCodeAt(0))
-				&& !(keyCode == 37 && ev.key != "%")
-				&& !(keyCode == 39 && ev.key != "'")
-				&& keyCode !== 9)
+	CurrencyQuestion.prototype._getNumericOption = function (input)
+	{
+		const numericOption = {
+			change: (e) =>
 			{
-				ev.preventDefault();
-				ev.stopPropagation();
+				this.value = this.numericInput.value();
+			},
+			spin: (e) =>
+			{
+				let flootValue = Math.floor(this.numericInput.value());
+				if (flootValue < 0)
+				{
+					flootValue = flootValue * -1;
+					if (flootValue.toString().length > 10)
+					{
+						this.numericInput.value(this.numericInput.value() + 1);
+						input.val(this.numericInput.value());
+					}
+					else
+					{
+						this.value = flootValue;
+					}
+				} else
+				{
+					if (flootValue.toString().length > 10)
+					{
+						this.numericInput.value(this.numericInput.value() - 1);
+						input.val(this.numericInput.value());
+					}
+					else
+					{
+						this.value = flootValue;
+					}
+				}
+			}
+		};
+
+		numericOption.decimals = DEFAULT_DECIMALS;
+		numericOption.format = "c";
+
+		const decimals = this.field.editType.maxIntegerLength;
+		if (decimals !== DEFAULT_DECIMALS)
+		{
+			numericOption.restrictDecimals = true;
+			numericOption.decimals = decimals;
+			numericOption.format = "c" + decimals.toString();
+		}
+
+		var currCulture = kendo.culture();
+		currCulture.numberFormat.currency.symbol = this.field.currencySymbol || '$';
+		currCulture.numberFormat.currency.pattern[0] = "$-n";
+		numericOption.currCulture = currCulture;
+
+		return numericOption;
+	}
+
+	CurrencyQuestion.prototype.initQuestionContent = function ()
+	{
+		var input = $(`<input class="number-question question" placeholder="Enter your answer"/>`);
+		const numericOption = this._getNumericOption(input);
+
+		this.numericInput = input.kendoNumericTextBox(numericOption).data("kendoNumericTextBox");
+		this.previousValue = null;
+		input.attr("type", "number");
+		input.attr("step", "any");
+
+		input.keydown((e) =>
+		{
+			const flootValue = Math.floor(input.val());
+			if (Math.abs(flootValue).toString().length > 10)
+			{
+				e.preventDefault();
+				return false;
+			}
+			this.previousValue = input.val();
+			return undefined;
+		});
+		input.keyup(() =>
+		{
+			if (input.val() === '')
+			{
+				this.value = '';
 				return;
 			}
-
-		}).keyup(ev =>
-		{
-			const unSafedNumber = (ev.target.value || '').split('.');
-			if (unSafedNumber[0].length > field.editType.maxIntegerLength ||
-				(unSafedNumber.length === 2 && unSafedNumber[1].length > field.editType.maxDecimalLength))
+			let flootValue = Math.floor(input.val());
+			if (flootValue < 0)
 			{
-				const newValue = [];
-				newValue[0] = unSafedNumber[0].substring(0, field.editType.maxIntegerLength);
-				unSafedNumber.length === 2 && (newValue[1] = unSafedNumber[1].substring(0, field.editType.maxDecimalLength))
-				ev.target.value = newValue.join('.');
+				flootValue = flootValue * -1;
 			}
-
-			if (ev.target.value == "" && $(ev.target).data("oldValue") != "")
+			if (flootValue.toString().length > 10)
 			{
-				ev.target.value = "";
+				input.val(this.previousValue);
 			}
-			this.value = ev.target.value;
-			$(ev.target).data("oldValue", ev.target.value);
-		}).blur(ev =>
-		{
-			/* 
-			 * follow line maybe looks weird, for input[type=number], if we type "--345.45" which it is invalid number,
-			 * the event.target.value will got empty string but the invalid number still show on input box
-			 */
-			if (ev.target.value == "")
+			else
 			{
-				ev.target.value = "";
+				this.value = flootValue;
 			}
-		}).change(ev =>
-		{
-			this.value = ev.target.value;
 		});
 
-		if (this.field.value) 
+		if (this.field.value)
 		{
 			this.value = this.field.value;
-			$input.val(this.field.value)
+			this.numericInput.value(this.field.value);
 		}
 
-		if (this.field.readonly) 
+		if (this.field.readonly)
 		{
-			$input.attr("readonly", "readonly")
-		}
+			this.numericInput.readonly();
+			this.numericInput.wrapper.find("input[type=text]").off("focus");
 
-		return $inputContainer;
+		}
+		return this.numericInput.wrapper;
 	}
 })();
