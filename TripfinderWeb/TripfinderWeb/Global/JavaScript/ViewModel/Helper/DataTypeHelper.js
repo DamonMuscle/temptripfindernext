@@ -326,6 +326,18 @@
 			name: "Mailing State",
 			hasDBID: true,
 		},
+		route: {
+			endpoint: "routes",
+			name: "Route",
+			idParamName: "routeId",
+			gridDefinition: "routeGridDefinition",
+			gridReportType: "trip",
+			isMajorType: true,
+			authorization: "trip",
+			hasDBID: true,
+			enableDetailView: true,
+			validUDFListData: true
+		},
 		form: {
 			endpoint: "formResults",
 			idParamName: 'ID',
