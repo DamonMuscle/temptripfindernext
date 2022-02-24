@@ -480,6 +480,25 @@
 							};
 							column.type = "number";
 							break;
+						case "Currency":
+							column.template = function (item)
+							{
+								let value = item[col];
+								if (value == null || value == "")
+								{
+									return "";
+								}
+
+								const precision = udgField.FieldOptions.MaxLength;
+								if (isNaN(Number(value)))
+								{
+									value = 0;
+								}
+								return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
+
+							};
+							column.type = "number";
+							break;
 						case "Phone Number":
 							column.template = function (item)
 							{
