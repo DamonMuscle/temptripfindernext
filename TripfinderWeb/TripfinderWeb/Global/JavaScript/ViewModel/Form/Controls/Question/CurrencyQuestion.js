@@ -56,8 +56,8 @@
 		numericOption.decimals = DEFAULT_DECIMALS;
 		numericOption.format = "c";
 
-		const decimals = this.field.editType.maxIntegerLength;
-		if (decimals !== DEFAULT_DECIMALS)
+		const decimals = this.field.FieldOptions.MaxLength;
+		if (decimals !== DEFAULT_DECIMALS && decimals !== null && decimals !== undefined)
 		{
 			numericOption.restrictDecimals = true;
 			numericOption.decimals = decimals;
