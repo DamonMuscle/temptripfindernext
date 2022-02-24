@@ -426,7 +426,7 @@
 							return "";
 						}
 
-						const precision = col.FieldOptions.TypeName === 'Currency' ? 2 : col.FieldOptions.NumberPrecision;
+						const precision = col.FieldOptions.TypeName === 'Currency' ? col.FieldOptions.MaxLength : col.FieldOptions.NumberPrecision;
 						if (isNaN(Number(value)))
 						{
 							value = 0;
@@ -1093,10 +1093,12 @@
 					}
 					break;
 				case 'Currency':
+					var currencyPrecision = fieldOptions.MaxLength,
+						nullCurrencyPrecision = (currencyPrecision === 0 || currencyPrecision === null);
 					editType = {
 						"format": "Number",
-						"maxIntegerLength": fieldOptions.MaxLength || 10,
-						"maxDecimalLength": 2
+						"maxLength": 10 + (nullCurrencyPrecision ? 0 : (1 + currencyPrecision)),
+						"maxValue": 9999999999 + (nullCurrencyPrecision ? 0 : (1 - (Math.pow(10, -1 * currencyPrecision))))
 					};
 					result = {
 						"field": item.Name,
@@ -1105,6 +1107,12 @@
 						"editType": editType,
 						"questionType": type
 					};
+					if (currencyPrecision != null)
+					{
+						var format = 0;
+						format = format.toFixed(parseInt(currencyPrecision)).toString();
+						result["format"] = format;
+					}
 					break;
 				case 'Phone Number':
 					editType = {
