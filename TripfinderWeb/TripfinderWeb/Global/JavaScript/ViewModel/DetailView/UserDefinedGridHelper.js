@@ -718,7 +718,7 @@
 		{
 			if ((c.FieldName === "CreatedByUserName" || c.FieldName === "LastUpdatedByUserName") && udGrid.Public)
 			{
-				convertedRecord[c.FieldName] = "Public";
+				convertedRecord[c.FieldName] = rawFormRecord[c.FieldName] || "Public";
 			}
 			else
 			{
