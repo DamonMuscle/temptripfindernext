@@ -944,8 +944,9 @@
 	{
 		var unsyncedDBLayout = null;
 		var self = this;
+		const dataTypeId = tf.dataTypeHelper.getId(self.options.gridType)
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + self.options.gridType))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + dataTypeId))
 			.then(function(apiResponse)
 			{
 				var gridLayoutExtendedDataModels =
@@ -953,22 +954,33 @@
 
 				// updated layout except applied
 				var stickLayoutId = stickGridConfig.stickLayoutModel ? stickGridConfig.stickLayoutModel.id() : null;
-				var layoutCnt = self.obGridLayoutExtendedDataModels().length;
+				const currentLayouts = self.obGridLayoutExtendedDataModels();
+				let currentLayoutsChanged = false;
+				var layoutCnt = currentLayouts.length;
 				for (var idx = layoutCnt - 1; idx >= 0; idx--)
 				{
-					if (self.obGridLayoutExtendedDataModels()[idx].id() !== stickLayoutId)
+					if (currentLayouts[idx].id() !== stickLayoutId)
 					{
-						self.obGridLayoutExtendedDataModels().splice(idx, 1);
+						currentLayouts.splice(idx, 1);
+						currentLayoutsChanged = true;
 					}
 				}
 
 				gridLayoutExtendedDataModels.map(function(layout, idx)
 				{
 					if (layout.id() !== stickLayoutId)
-						self.obGridLayoutExtendedDataModels().push(layout);
+					{
+						currentLayouts.push(layout);
+						currentLayoutsChanged = true;
+					}
 					else
 						unsyncedDBLayout = layout;
 				});
+
+				if (currentLayoutsChanged)
+				{
+					self.obGridLayoutExtendedDataModels(currentLayouts);
+				}
 
 				return Promise.resolve(unsyncedDBLayout);
 			});
