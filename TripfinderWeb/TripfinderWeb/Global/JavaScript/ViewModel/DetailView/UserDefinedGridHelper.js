@@ -1540,7 +1540,7 @@
 			{
 				filterOptions = {
 					activeFilter: gridFilterOptions && gridFilterOptions.activeFilter,
-					expiredFilter: gridFilterOptions && gridFilterOptions.expiredFilter,
+					expiredFilter: false,//gridFilterOptions && gridFilterOptions.expiredFilter,
 					ipRangeFilter: false,
 					geofenseFilter: false,
 					gridDataEditFilter: !udGrid.isReadOnly
