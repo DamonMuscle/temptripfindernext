@@ -33,14 +33,14 @@
 				}
 			};
 
-			var ChatfinderAddress = self.chatfinderDetail.Uri;
-			var ChatfinderAPIAddress = self.chatfinderApiDetail.Uri;
+			var chatfinderAddress = self.chatfinderDetail.Uri;
+			var chatfinderAPIAddress = self.chatfinderApiDetail.Uri;
 	
-				tf.promiseAjax.get(pathCombine(ChatfinderAPIAddress, "auth", "verify"), verifyData)
+			tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData)
 				.then(function(response)
 				{
 					var connection = new signalR.HubConnectionBuilder()
-						.withUrl(self.pathCombine(ChatfinderAPIAddress, "chatfinderHub?ConnectFrom=tfweb"), {
+						.withUrl(self.pathCombine(chatfinderAPIAddress, "chatfinderHub?ConnectFrom=tfweb"), {
 							skipNegotiation: true,
 							transport: signalR.HttpTransportType.WebSockets,
 							accessTokenFactory: () =>
@@ -52,7 +52,7 @@
 						.withAutomaticReconnect()
 						.build();
 		
-					self.registerServiceWorker(`${ChatfinderAddress}/chatfinder-service-worker.js`)
+					self.registerServiceWorker(`${chatfinderAddress}/chatfinder-service-worker.js`)
 					tf.cfConnection = connection;
 		
 					connection.on("receivedMessage", (chatThreadId, from, chatMessage, fromUserName) =>
