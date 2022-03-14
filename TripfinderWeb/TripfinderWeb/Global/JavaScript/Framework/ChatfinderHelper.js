@@ -1,65 +1,92 @@
 (function()
 {
 	createNamespace("TF").ChatfinderHelper = ChatfinderHelper;
-	function ChatfinderHelper()
+	function ChatfinderHelper(prefix)
 	{
+		this.prefix = prefix;
+		this.chatfinderDetail = null;
+		this.registration = null;
+	}
+
+	ChatfinderHelper.prototype.registerServiceWorker = async function(scriptUrl)
+	{
+		var self = this;
+		self.registration = await navigator.serviceWorker.register(scriptUrl);
 	}
 
 	ChatfinderHelper.prototype.registerHub = function()
 	{
-		// Hard code for test
-		var ChatfinderAPIAddress = "https://serviceplus01.transfinder.com/ChatfinderApi";
-
 		var self = this;
-		var verifyData = {
-			paramData: {
-				"clientId": tf.entStorageManager.get("clientKey"),
-				"vendor": "Transfinder",
-				"username": tf.authManager.userName,
-			},
-			headers: {
-				'Transfinder': tf.api.server()
-			}
-		}
-
-			tf.promiseAjax.get(pathCombine(ChatfinderAPIAddress, "auth", "verify"), verifyData)
-			.then(function(response)
-			{
-				var connection = new signalR.HubConnectionBuilder()
-					.withUrl(self.pathCombine(ChatfinderAPIAddress, "chatfinderHub?ConnectFrom=tfweb"), {
-						skipNegotiation: true,
-						transport: signalR.HttpTransportType.WebSockets,
-						accessTokenFactory: () =>
-						{
-							return response.Items[0].OpaqueToken;
-						}
-					})
-					// .configureLogging(signalR.LogLevel.Information)
-					.withAutomaticReconnect()
-					.build();
-	
-				tf.cfConnection = connection;
-	
-				connection.on("notification", (chatThreadId, from, chatMessage) =>
-				{
-					self.tryNotification(chatThreadId, from, chatMessage)
-				});
-	
-				connection.on("connectInfo", (info) => {
-					if (connection && info === "Disconnect") {
-						connection.stop();
-					}
-					console.log(info);
-				});
-	
-				try
-				{
-					connection.start();
-				} catch (err)
-				{
-					console.log(err);
+		self.chatfinderDetail = tf.authManager.supportedProducts.find(p => p.Name == "Chatfinder");
+		self.chatfinderApiDetail = tf.authManager.supportedProducts.find(p => p.Name == "ChatfinderAPI");
+		if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
+			&& self.chatfinderDetail && self.chatfinderApiDetail)
+		{
+			var verifyData = {
+				paramData: {
+					"clientId": tf.entStorageManager.get("clientKey"),
+					"vendor": "Transfinder",
+					"username": tf.authManager.userName,
+				},
+				headers: {
+					'Transfinder': tf.api.server()
 				}
-			})
+			};
+
+			var chatfinderAddress = self.chatfinderDetail.Uri;
+			var chatfinderAPIAddress = self.chatfinderApiDetail.Uri;
+	
+			tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData)
+				.then(function(response)
+				{
+					var connection = new signalR.HubConnectionBuilder()
+						.withUrl(self.pathCombine(chatfinderAPIAddress, "chatfinderHub?ConnectFrom=tfweb"), {
+							skipNegotiation: true,
+							transport: signalR.HttpTransportType.WebSockets,
+							accessTokenFactory: () =>
+							{
+								return response.Items[0].OpaqueToken;
+							}
+						})
+						// .configureLogging(signalR.LogLevel.Information)
+						.withAutomaticReconnect()
+						.build();
+		
+					self.registerServiceWorker(`${chatfinderAddress}/chatfinder-service-worker.js`)
+					tf.cfConnection = connection;
+		
+					connection.on("receivedMessage", (chatThreadId, from, chatMessage, fromUserName) =>
+					{
+						if (self.registration)
+						{
+							var data = {
+								chatThreadId: chatThreadId,
+								sentByName: fromUserName,
+								message: chatMessage
+							}
+							self.registration.active.postMessage(JSON.stringify(data));
+						}
+					});
+		
+					connection.on("connectInfo", (info) => {
+						if (connection && info === "Disconnect") {
+							connection.stop();
+						}
+						console.log(info);
+					});
+		
+					try
+					{
+						connection.start();
+					} catch (err)
+					{
+						console.log(err);
+					}
+				}, err => 
+				{
+					console.error('Failed to verify token to Chatfinder.', err || err.Message);
+				})
+		}
 	}
 
 	ChatfinderHelper.prototype.pathCombine = function()
@@ -79,50 +106,4 @@
 		output = output.replace(/[/]+/g, "/").replace("http:/", "http://").replace("https:/", "https://");
 		return output;
 	};
-
-	ChatfinderHelper.prototype.tryNotification = function(chatThreadId, from, chatMessage)
-	{
-		var options = {
-			body: "Someone is trying to reach you in Chatfinder",
-			icon: "./Global/Img/chatfinder/chatfinderLogo.ico"
-		}
-
-		// check Notification avaliable for current browser
-		if (!("Notification" in window))
-		{
-			console.log("This browser does not support desktop notification");
-		}
-
-		// if user agrees to use notifications
-		else if (Notification.permission === "granted")
-		{
-			// If it's okay let's create a notification
-			this.createNotification(options)
-		}
-
-		// ask user for permission
-		else if (Notification.permission !== "denied")
-		{
-			Notification.requestPermission().then(function(permission)
-			{
-				if (permission === "granted")
-				{
-					this.createNotification(options);
-				}
-			});
-
-		}
-	}
-
-	ChatfinderHelper.prototype.createNotification = function(options)
-	{
-		var notification = new Notification("New Chatfinder Message!", options);
-		// redirect
-		notification.onclick = function()
-		{
-			var chatfinderDetail = tf.pageManager.applicationURLMappingList.find(p => p.Name == "Chatfinder");
-			var chatfinderUrl = chatfinderDetail.Uri
-			window.open(chatfinderUrl, "_blank")
-		}
-	}
 })();
