@@ -192,8 +192,10 @@
 						nextIndex = index + 1;
 					}
 				});
-				self.currentSectionId(self.sections[nextIndex].Id);
-				self.currentSectionName(self.sections[nextIndex].Name);
+				const nextSection = self.sections[nextIndex];
+				self.currentSectionId(nextSection.Id);
+				self.currentSectionName(nextSection.Name);
+				self.resetWarningMessage(nextSection.element);
 				setTimeout(function ()
 				{
 					$(".form-body").scrollTop(0);
@@ -219,8 +221,10 @@
 					previousIndex = index - 1;
 				}
 			});
-			self.currentSectionId(self.sections[previousIndex].Id);
-			self.currentSectionName(self.sections[previousIndex].Name);
+			const previousSection = self.sections[previousIndex];
+			self.currentSectionId(previousSection.Id);
+			self.currentSectionName(previousSection.Name);
+			self.resetWarningMessage(previousSection.element);
 			setTimeout(function ()
 			{
 				$(".form-body").scrollTop(0);
@@ -1234,6 +1238,12 @@
 				$negativeBtn.find("p").text("Close");
 			}
 		}
+	}
+
+	Form.prototype.resetWarningMessage = function(element)
+	{
+		const onlyContainsSystemFields = (element.find(".form-question:visible").length === 0) && (element.find(".systemfield-question").length > 0);
+		element.find(".system-field-invalid").toggleClass("hide", !onlyContainsSystemFields);
 	}
 
 	Form.prototype.handleScrollLocationWhenErrorDisplay = function ()
