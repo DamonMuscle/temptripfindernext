@@ -1,10 +1,10 @@
 (function()
 {
+	const NOTIFICATION_DISPLAY_TIME = 15000;
 	createNamespace("TF").ChatfinderHelper = ChatfinderHelper;
 	function ChatfinderHelper(prefix)
 	{
 		this.prefix = prefix;
-		this.chatfinderDetail = null;
 		this.registration = null;
 	}
 
@@ -12,15 +12,16 @@
 	{
 		var self = this;
 		self.registration = await navigator.serviceWorker.register(scriptUrl);
+		self.registerOnMessage();
 	}
 
 	ChatfinderHelper.prototype.registerHub = function()
 	{
 		var self = this;
-		self.chatfinderDetail = tf.authManager.supportedProducts.find(p => p.Name == "Chatfinder");
-		self.chatfinderApiDetail = tf.authManager.supportedProducts.find(p => p.Name == "ChatfinderAPI");
+		var chatfinderSite = tf.authManager.supportedProducts.find(p => p.Name == "Chatfinder");
+		var chatfinderApi = tf.authManager.supportedProducts.find(p => p.Name == "ChatfinderAPI");
 		if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
-			&& self.chatfinderDetail && self.chatfinderApiDetail)
+			&& chatfinderSite && chatfinderApi)
 		{
 			var verifyData = {
 				paramData: {
@@ -33,8 +34,8 @@
 				}
 			};
 
-			var chatfinderAddress = self.chatfinderDetail.Uri;
-			var chatfinderAPIAddress = self.chatfinderApiDetail.Uri;
+			var chatfinderAddress = chatfinderSite.Uri;
+			var chatfinderAPIAddress = chatfinderApi.Uri;
 	
 			tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData)
 				.then(function(response)
@@ -91,6 +92,44 @@
 				message: chatMessage
 			}
 			self.registration.active.postMessage(JSON.stringify(data));
+		}
+	}
+
+	ChatfinderHelper.prototype.registerOnMessage = function()
+	{
+		var self = this;
+		navigator.serviceWorker.addEventListener('message', event =>
+		{
+			const param = event.data
+			switch (param.type)
+			{
+				case "showNotification":
+					var options = param.data;
+					options.icon = '../../Global/img/chatfinder/chatfinderLogo.ico'
+					self.showNotification(options);
+					break;
+			}
+		})
+	}
+	
+	ChatfinderHelper.prototype.showNotification = function(options)
+	{
+		var notification = new Notification(options.title, options);
+
+		notification.onclick = function(event)
+		{
+			var notifyData = event.target.data
+			const urlSurfix = `/#/conversation?chatThreadId=${notifyData.chatThreadId}`
+			var newwindow = window.open('/chatfinder' + urlSufix);
+			newwindow.focus();
+		}
+
+		notification.onshow = function()
+		{
+			setTimeout(() =>
+			{
+				notification.close();
+			}, NOTIFICATION_DISPLAY_TIME);
 		}
 	}
 
