@@ -40,8 +40,8 @@
 	UserDefinedGridHelper.getGeoInfoColumns = function ()
 	{
 		return [
-			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "130px" },
-			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "130px" }
+			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "135px" },
+			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "135px" }
 		];
 	};
 
