@@ -61,7 +61,10 @@
 					});
 		
 					connection.on("reactToMessage", (chatReaction) => {
-						self.postMessage(chatReaction.ChatMessage.ChatThreadId, chatReaction.entUserId, chatReaction.ChatMessage)
+						if (chatReaction.ReactToEntUserId == tf.authManager.authorizationInfo.authorizationTree.userId)
+						{
+							self.postMessage(chatReaction.ChatMessage.ChatThreadId, chatReaction.UserId, chatReaction.ChatMessage)
+						}
 					});
 		
 					try
