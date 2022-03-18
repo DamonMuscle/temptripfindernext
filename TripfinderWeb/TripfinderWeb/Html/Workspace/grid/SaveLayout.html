@@ -1,6 +1,8 @@
 ﻿<form data-bind="uiInit:initialize">
 	<div class="row" data-bind="visible:$parent.description">
-		<div class="col-xs-24 description"><pre class="titleNotify" data-bind="text:$parent.description"></pre></div>
+		<div class="col-xs-24 description">
+			<pre class="titleNotify" data-bind="text:$parent.description"></pre>
+		</div>
 	</div>
 	<div class="document-dataentry">
 		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
@@ -10,7 +12,7 @@
 		<div class="col-xs-12">
 			<div class="form-group">
 				<label class="requirestar bold-Label">Name</label>
-				<input type="text" name="layoutName" class="form-control" data-bind="value: gridLayoutExtendedDataModel.name,valueUpdate:'keyup'" />
+				<input type="text" name="layoutName" maxlength="255" class="form-control" data-bind="value: gridLayoutExtendedDataModel.name,valueUpdate:'keyup'" />
 			</div>
 		</div>
 		<div class="col-xs-12">
@@ -18,7 +20,8 @@
 				<label class="bold-Label">Filter</label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obGridFilterDataModels,format:function(obj){return obj.name();},drowDownShow:true,selectedValue:obSelectedGridFilterDataModel,sortWithOutFirstValue:true}">
-						<!-- ko customInput:{type:"Select",value:obSelectedGridFilterDataModelText,attributes:{class:"form-control"}} --><!-- /ko -->
+						<!-- ko customInput:{type:"Select",value:obSelectedGridFilterDataModelText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
 					</div>
 					<div class="input-group-btn">
 						<button type="button" class="btn btn-default btn-sharp">
