@@ -367,13 +367,30 @@
 					window.tf.map = new TF.Map.BaseMap();
 					var p4 = window.tf.map.usingArcGIS(extrasLocation);
 
-					return Promise.all([p1, p2, p3, p4])
+					var p5 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clienttimezoneinfo")).then(function(timeZoneResponse)
+					{
+						if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
+						{
+							tf.clientTimeZone = timeZoneResponse.Items[0];
+						}
+					});
+
+					return Promise.all([p1, p2, p3, p4, p5])
 						.then(function()
 						{
-							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub']);
+							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub', 'TimeZoneInfoHub']);
 							TF.SignalRHelper.bindEvent('TimeZoneHub', 'update', function update(result)
 							{
 								tf.timezonetotalminutes = result;
+								if (tf.localTimeZone)
+								{
+									tf.localTimeZone.timeZoneTotalMinutes = tf.timezonetotalminutes;
+									tf.localTimeZone.hoursDiff = tf.timezonetotalminutes / 60;
+								}
+							});
+							TF.SignalRHelper.bindEvent('TimeZoneInfoHub', 'update', function update(result)
+							{
+								tf.clientTimeZone = result;
 							});
 
 							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),

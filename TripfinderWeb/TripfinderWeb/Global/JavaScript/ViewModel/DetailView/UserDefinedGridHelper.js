@@ -16,14 +16,8 @@
 	{
 		function utc2Local(value)
 		{
-			const dt = moment(value);
-			let tmpStr = "";
-			if (tf.localTimeZone)
-			{
-				dt.add(tf.localTimeZone.hoursDiff, "hours");
-			}
-			tmpStr = dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
-			return tmpStr;
+			const dt = utcToClientTimeZone(value);
+			return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
 		}
 
 		return [
