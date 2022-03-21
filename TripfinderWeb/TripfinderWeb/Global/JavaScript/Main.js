@@ -595,6 +595,58 @@ function toISOStringWithoutTimeZone(m)
 	return m.format('YYYY-MM-DDTHH:mm:ss.SSS');
 }
 
+function utcToClientTimeZone(utcValue)
+{
+	if (typeof (utcValue) !== "string")
+	{
+		utcValue = toISOStringWithoutTimeZone(moment(utcValue));
+	}
+
+	var m = moment.utc(utcValue);
+	if (tf.clientTimeZone)
+	{
+		if (tf.clientTimeZone.IanaId)
+		{
+			m.tz(tf.clientTimeZone.IanaId);
+		}
+		else
+		{
+			m.add(tf.clientTimeZone.HoursDiff, "hours");
+		}
+	}
+
+	return m;
+}
+
+function clientTimeZoneToUtc(clientValue)
+{
+	if (typeof (clientValue) !== "string")
+	{
+		clientValue = toISOStringWithoutTimeZone(moment(clientValue));
+	}
+
+	let dt;
+	if (tf.clientTimeZone)
+	{
+		if (tf.clientTimeZone.IanaId)
+		{
+			dt = moment.tz(clientValue, tf.clientTimeZone.IanaId);
+			dt.utc();
+		}
+		else
+		{
+			dt = moment(clientValue);
+			dt.add(tf.clientTimeZone.HoursDiff * -1, "hours");
+		}
+	}
+	else
+	{
+		dt = moment(clientValue);
+	}
+
+	return dt;
+}
+
 function getTitleByType(type)
 {
 	var pageTitle = "", pageType = type.toLowerCase();

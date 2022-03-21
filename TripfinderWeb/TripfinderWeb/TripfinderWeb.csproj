@@ -381,6 +381,7 @@
     <Content Include="Global\ThirdParty\knockout\koExternalTemplateEngine_all.js" />
     <Content Include="Global\ThirdParty\linq.min.js" />
     <Content Include="Global\ThirdParty\moment-with-locales.min.js" />
+    <content Include="Global\ThirdParty\moment-timezone-with-data-1970-2030.js.js" />
     <Content Include="Global\ThirdParty\pubsub.js" />
     <Content Include="Global\ThirdParty\psl.js" />
     <Content Include="Global\ThirdParty\store.min.js" />

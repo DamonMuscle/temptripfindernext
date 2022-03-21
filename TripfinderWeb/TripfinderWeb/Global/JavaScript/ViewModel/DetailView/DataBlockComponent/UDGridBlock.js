@@ -326,12 +326,8 @@
 				var dateTimeTemplateLocalZone = function (item)
 				{
 					let value = item[col];
-					let dt = moment(value);
-					if (tf.localTimeZone)
-					{
-						dt.add(tf.localTimeZone.hoursDiff, "hours");
-					}
-
+					let dt = moment(value); // value is Date object
+					dt = utcToClientTimeZone(toISOStringWithoutTimeZone(dt));
 					return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
 				};
 
