@@ -24,6 +24,7 @@
 			this.disableWeekend = attributes.disableWeekend;
 			this.ignoreReadonly = attributes.ignoreReadonly;
 			this.inputEnable = attributes.inputEnable;
+			this._exactFormat = attributes.exactFormat;
 		}
 		this.initialize.call(this);
 
@@ -167,7 +168,7 @@
 				if (!event.date) return;
 				if (!event.oldDate)
 				{
-					this.value(toISOStringWithoutTimeZone(event.date));
+					this.value(this.getValueString(event.date));
 					return;
 				}
 				var oldDate = moment(event.oldDate),
@@ -184,7 +185,7 @@
 				}
 				if (!newDate.isSame(oldDate, 'minutes'))
 				{
-					this.value(toISOStringWithoutTimeZone(newDate));
+					this.value(this.getValueString(newDate));
 				}
 			}.bind(this), this.delayChange ? 500 : 0);
 		}.bind(this));
@@ -434,7 +435,7 @@
 		{
 			var isTimeColumn = TF.DateTimeBoxHelper.testIsTimeColumn($(e.currentTarget));
 
-			this.value(toISOStringWithoutTimeZone(dateTime));
+			this.value(this.getValueString(dateTime));
 
 			if (isTimeColumn)
 				e ? (timePatten.test(text) ? null : (e.currentTarget.value = dateTime.format('h:mm') + ' ' + (dateTime.hours() < 12 ? 'AM' : 'PM'))) : null;
@@ -449,6 +450,20 @@
 			return false;
 		}
 	};
+
+	DateTimeBox.prototype.getValueString = function(dateTime)
+	{
+		if(!dateTime || !dateTime.isValid())
+		{
+			return null;
+		}
+
+		if (this._exactFormat)
+		{
+			return dateTime.format(this.formatString);
+		}
+		return toISOStringWithoutTimeZone(dateTime);
+	}
 
 	DateTimeBox.prototype.getElement = function()
 	{
