@@ -361,7 +361,7 @@
 					{
 						return tf.promiseBootbox.okRetry(
 							{
-								message: "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfnder.com or 888-427-2403",
+								message: "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfinder.com or 888-427-2403",
 								title: "Unable to Send Email"
 							})
 							.then(function(confirm)
