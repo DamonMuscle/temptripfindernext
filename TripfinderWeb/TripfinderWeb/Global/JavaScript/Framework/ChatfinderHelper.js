@@ -6,6 +6,7 @@
 	{
 		this.prefix = prefix;
 		this.registration = null;
+		this.notifications = new Map();
 	}
 
 	ChatfinderHelper.prototype.registerServiceWorker = async function(scriptUrl)
@@ -117,7 +118,9 @@
 	
 	ChatfinderHelper.prototype.showNotification = function(options)
 	{
+		var self = this;
 		var notification = new Notification(options.title, options);
+		self.notifications.set(notification.timestamp, notification);
 
 		notification.onclick = function(event)
 		{
@@ -134,6 +137,19 @@
 				notification.close();
 			}, NOTIFICATION_DISPLAY_TIME);
 		}
+
+		notification.onclose = function(event)
+		{
+			self.notifications.delete(event.target.timestamp);
+		}
+	}
+
+	ChatfinderHelper.prototype.clearNotifications = function() 
+	{
+		this.notifications.forEach(function(n) {
+		  n.close();
+		})
+		this.notifications.clear();
 	}
 
 	ChatfinderHelper.prototype.pathCombine = function () {
