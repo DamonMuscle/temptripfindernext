@@ -392,9 +392,38 @@
 		e.preventDefault();
 
 		var self = this, entity = self.getLayoutTemplateForEvent(e),
-			id = entity.id();
+			id = entity.id(),
+			downloadUrl = pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreenfiles", id);
 
-		window.location = pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreenfiles", id);
+		tf.promiseAjax.get(downloadUrl, {
+			success: function(data, xhr)
+			{
+				var contentType = xhr.getResponseHeader("content-type"),
+					contentDisposition = xhr.getResponseHeader("content-disposition"),
+					fileName;
+	
+				contentDisposition.split(";").some(function(value)
+				{
+					value = value.trim();
+					if (value.indexOf("filename") >= 0)
+					{
+						fileName = value.split("=")[1];
+						fileName = fileName.trim().replace(/^"|"$/g, '');
+						return true;
+					}
+				});
+	
+				let windowUrl = window.URL || window.webkitURL;
+				let blob = new Blob([xhr.responseText], { type: contentType });
+				let objectURL = windowUrl.createObjectURL(blob);
+		
+				let anchor = $(document.createElement('a'));
+				anchor.prop('href', objectURL);
+				anchor.prop('download', fileName);
+				anchor.get(0).click();
+				windowUrl.revokeObjectURL(objectURL);
+			}
+		});
 	};
 
 	/**
