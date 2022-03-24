@@ -79,11 +79,24 @@
 			$ele.closest(".e-sign-wrapper").removeClass('invalid');
 			!this.field.readonly && this.enterFullPage();
 		});
-
 		const questionContent = elem.find(".form-question");
 		questionContent.on('click', '.e-sign-close-button', e =>
 		{
-			this.exitFullPage();
+			if (!this.elem.find(".e-sign-save-button").prop("disabled"))
+			{
+				tf.promiseBootbox.yesNo("Do you want to close current signature editor without saving?", "Unsaved Signature")
+				.then(isToClose =>
+				{
+					if (isToClose)
+					{
+						this.exitFullPage();
+					}
+				})
+			}
+			else
+			{
+				this.exitFullPage();
+			}
 		});
 
 		questionContent.on('click', '.k-button', e =>
