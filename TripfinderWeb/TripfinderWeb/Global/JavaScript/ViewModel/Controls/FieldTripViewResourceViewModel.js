@@ -86,18 +86,18 @@
 		return resourceGroupExpandData;
 	}
 
-	FieldTripViewResourceViewModel.prototype.getVehiclePicture = function(studentId)
+	FieldTripViewResourceViewModel.prototype.getVehiclePicture = function(studentId, $element)
 	{
-		return this.getPicture('vehicle', studentId);
+		return this.getPicture('vehicle', studentId, $element);
 	}
 
-	FieldTripViewResourceViewModel.prototype.getStaffPicture = function(staffId)
+	FieldTripViewResourceViewModel.prototype.getStaffPicture = function(staffId, $element)
 	{
-		return this.getPicture('staff', staffId);
+		return this.getPicture('staff', staffId, $element);
 	}
 
-	FieldTripViewResourceViewModel.prototype.getPicture = function(imageType, imageId)
+	FieldTripViewResourceViewModel.prototype.getPicture = function(imageType, obj, element)
 	{
-		return tf.authManager.authorizationUrl('image', imageType, imageId);
+		this.checkPicture(imageType, obj, element);
 	}
 })();
