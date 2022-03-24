@@ -595,6 +595,7 @@
 											tf.pageManager.openNewPage(pageName, null, true);
 										});
 										self.changeStaffType();
+										self._initClosePageConfirm();
 										return true;
 									});
 								});
@@ -832,5 +833,12 @@
 					window.ExagoBIServerUrl = response.Items[0].InfoValue;
 				}
 			});
+	};
+	Startup.prototype._initClosePageConfirm = function()
+	{
+		window.addEventListener("beforeunload", function(event)
+		{
+			tf.chatfinderHelper.clearNotifications();
+		});
 	};
 })();
