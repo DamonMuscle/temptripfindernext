@@ -133,22 +133,22 @@
 		</div>
 		<!-- /ko -->
 		<!-- ko if: !obResoucesExpand()-->
-		<div class="grid-body-with-subtitle fieldtrip-dataview-resource ">
+		<div class="grid grid-body-with-subtitle fieldtrip-dataview-resource ">
 			<ul data-bind="foreach:obRespurcesExpendData">
 				<li>
 					<div class="row">
 						<div class="col-xs-8">
-							<span><img data-bind="attr: { src: $parent.getVehiclePicture($data.VehicleId) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { alt: $parent.getVehiclePicture($data.VehicleId,$element) }" alt="" class="img-circle"></span>
 							&nbsp;
 							<label data-bind="text: $data.Vehicle&&$data.Vehicle.BusNum"></label>
 						</div>
 						<div class="col-xs-8">
-							<span><img data-bind="attr: { src: $parent.getStaffPicture($data.Staffs[0].Driver.Id) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { alt: $parent.getStaffPicture($data.Staffs[0].Driver.Id,$element) }" alt="" class="img-circle"></span>
 							&nbsp;
 							<label data-bind="text: $data.Staffs[0].Driver.Name"></label>
 						</div>
 						<div class="col-xs-8">
-							<span><img data-bind="attr: { src: ($data.Staffs[0].BusAide && $data.Staffs[0].BusAide.Id) ? $parent.getStaffPicture($data.Staffs[0].BusAide.Id) : $parent.getStaffPicture(0) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { alt: ($data.Staffs[0].BusAide && $data.Staffs[0].BusAide.Id,$element) ? $parent.getStaffPicture($data.Staffs[0].BusAide.Id) : $parent.getStaffPicture(0) }" alt="" class="img-circle"></span>
 							&nbsp;
 							<label data-bind="text: $data.Staffs[0].BusAide ? $data.Staffs[0].BusAide.Name : ''"></label>
 						</div>
@@ -157,12 +157,12 @@
 					<hr style="margin-top:0" class="col-xs-16 col-xs-offset-8" />
 					<div class="row">
 						<div class="col-xs-8 col-xs-offset-8">
-							<span><img data-bind="attr: { src: $parents[1].getStaffPicture(Staff.Driver.Id) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { src: $parents[1].getStaffPicture(Staff.Driver.Id,$element) }" alt="" class="img-circle"></span>
 							&nbsp;
 							<label data-bind="text: Staff.Driver.Name"></label>
 						</div>
 						<div class="col-xs-8">
-							<span><img data-bind="attr: { src: Staff.BusAide ? $parents[1].getStaffPicture(Staff.BusAide.Id) : $parents[0].getStaffPicture(Staff.BusAide.Id) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { src: Staff.BusAide ? $parents[1].getStaffPicture(Staff.BusAide.Id,$element) : $parents[0].getStaffPicture(Staff.BusAide.Id,$element) }" alt="" class="img-circle"></span>
 							&nbsp;
 							<label data-bind="text: Staff.BusAide ? Staff.BusAide.Name : ''"></label>
 						</div>
