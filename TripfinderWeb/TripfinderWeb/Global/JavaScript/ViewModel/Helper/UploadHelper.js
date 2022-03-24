@@ -29,9 +29,20 @@
 		self.uploader = $input.kendoUpload({
 			multiple: false,
 			async: {
-				saveUrl: pathCombine(tf.api.server(), "actions", "files", "upload", "document?clientKey=" + tf.authManager.clientKey),
+				saveUrl: pathCombine(tf.api.apiPrefixWithoutDatabase(), 'uploadfiles?fileType=document'),
 				withCredentials: false,
+				token: tf.entStorageManager.get("token",true),
 				autoUpload: false
+			},
+			upload: function(e){
+				var xhr = e.XMLHttpRequest;
+				if (xhr) {
+					xhr.addEventListener("readystatechange", function (e) {
+						if (xhr.readyState == 1) {
+							xhr.setRequestHeader("Token", tf.entStorageManager.get("token",true));
+						}
+					});
+				}
 			},
 			success: function(e)
 			{
