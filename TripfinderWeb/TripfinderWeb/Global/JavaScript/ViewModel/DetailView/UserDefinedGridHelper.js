@@ -1872,6 +1872,17 @@
 		}
 		options = $.extend({}, defaultFilterOptions, options);
 
+		const getIsLocationRequired = function(item)
+		{
+			let isLocationRequired = true;
+			if (item.GridOptions && typeof(item.GridOptions) === "string")
+			{
+				const gridOptions = JSON.parse(item.GridOptions);
+				isLocationRequired = !!gridOptions.IsLocationRequired;
+			}
+			return isLocationRequired;
+		};
+
 		const currentDBID = tf.datasourceManager.databaseId || tf.surveyDBId;
 		udgrids = _.filter(udgrids, item => item.UDGridDataSources.some(ds => ds.DBID === currentDBID));
 
@@ -1916,14 +1927,14 @@
 		{
 			udgrids = udgrids.filter((udgrid) =>
 			{
-				return udgrid.InIPBoundary;
+				return !getIsLocationRequired(udgrid) || udgrid.InIPBoundary;
 			})
 		}
 
 		// geofence filter
 		if (options.coord && options.geofenseFilter)
 		{
-			udgrids = udgrids.filter(udgrid => this.checkUDGridsInGeofense(options.coord, udgrid.GeofenceBoundaries));
+			udgrids = udgrids.filter(udgrid => !getIsLocationRequired(udgrid) || this.checkUDGridsInGeofense(options.coord, udgrid.GeofenceBoundaries));
 		}
 
 		// section filter
