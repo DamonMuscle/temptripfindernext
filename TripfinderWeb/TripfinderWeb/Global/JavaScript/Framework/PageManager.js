@@ -88,11 +88,11 @@
 		{
 			supportedProducts = tf.authManager.supportedProducts.filter(function(prod)
 			{
-				var productName = prod.toLowerCase();
+				var productName = prod.Name.toLowerCase();
 				return self.availableApplications.hasOwnProperty(productName);
 			}).map(function(v)
 			{
-				return v.toLowerCase();
+				return v.Name.toLowerCase();
 			});
 
 			var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app)

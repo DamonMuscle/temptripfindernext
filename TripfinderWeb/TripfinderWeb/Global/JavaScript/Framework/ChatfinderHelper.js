@@ -19,10 +19,9 @@
 	ChatfinderHelper.prototype.registerHub = function()
 	{
 		var self = this;
-		var chatfinderSite = tf.authManager.supportedProducts.find(p => p.Name == "Chatfinder");
-		var chatfinderApi = tf.authManager.supportedProducts.find(p => p.Name == "ChatfinderAPI");
-		if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
-			&& chatfinderSite && chatfinderApi)
+		var chatfinderSite = tf.authManager.supportedProducts.find(p => p => p.Name && p.Name.toLowerCase() == "chatfinder");
+		var chatfinderApi = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinderapi");
+		if (chatfinderSite && chatfinderApi)
 		{
 			var verifyData = {
 				paramData: {
@@ -37,7 +36,7 @@
 
 			var chatfinderAddress = chatfinderSite.Uri;
 			var chatfinderAPIAddress = chatfinderApi.Uri;
-	
+
 			tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData)
 				.then(function(response)
 				{
@@ -53,21 +52,23 @@
 						// .configureLogging(signalR.LogLevel.Information)
 						.withAutomaticReconnect()
 						.build();
-		
+
 					self.registerServiceWorker(`${chatfinderAddress}/chatfinder-service-worker.js`)
 					tf.cfConnection = connection;
-		
-					connection.on("receivedMessage", (chatThreadId, from, chatMessage, fromUserName) => {
+
+					connection.on("receivedMessage", (chatThreadId, from, chatMessage, fromUserName) =>
+					{
 						self.postMessage(chatThreadId, from, chatMessage, fromUserName);
 					});
-		
-					connection.on("reactToMessage", (chatReaction) => {
+
+					connection.on("reactToMessage", (chatReaction) =>
+					{
 						if (chatReaction.ReactToEntUserId == tf.authManager.authorizationInfo.authorizationTree.userId)
 						{
 							self.postMessage(chatReaction.ChatMessage.ChatThreadId, chatReaction.UserId, chatReaction.ChatMessage)
 						}
 					});
-		
+
 					try
 					{
 						connection.start();
@@ -82,14 +83,17 @@
 		}
 	}
 
-	ChatfinderHelper.prototype.postMessage = function (chatThreadId, fromEntId, chatMessage, fromUserName) {
+	ChatfinderHelper.prototype.postMessage = function(chatThreadId, fromEntId, chatMessage, fromUserName)
+	{
 		var self = this;
 		// self sent messgage, for keeping message in sync, but do not notify user self.
-		if (tf.authManager.authorizationInfo.authorizationTree.userId == fromEntId) {
+		if (tf.authManager.authorizationInfo.authorizationTree.userId == fromEntId)
+		{
 			return;
 		}
 
-		if (self.registration) {
+		if (self.registration)
+		{
 			var data = {
 				chatThreadId: chatThreadId,
 				sentByName: fromUserName,
@@ -115,7 +119,7 @@
 			}
 		})
 	}
-	
+
 	ChatfinderHelper.prototype.showNotification = function(options)
 	{
 		var self = this;
@@ -146,19 +150,24 @@
 
 	ChatfinderHelper.prototype.clearNotifications = function() 
 	{
-		this.notifications.forEach(function(n) {
-		  n.close();
+		this.notifications.forEach(function(n)
+		{
+			n.close();
 		})
 		this.notifications.clear();
 	}
 
-	ChatfinderHelper.prototype.pathCombine = function () {
+	ChatfinderHelper.prototype.pathCombine = function()
+	{
 		var output = arguments[0];
-		for (var i = 1, len = arguments.length; i < len; i++) {
-			if (output.substr(output.length - 1) != "/") {
+		for (var i = 1, len = arguments.length; i < len; i++)
+		{
+			if (output.substr(output.length - 1) != "/")
+			{
 				output += "/" + arguments[i];
 			}
-			else {
+			else
+			{
 				output += arguments[i];
 			}
 		}

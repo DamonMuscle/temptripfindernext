@@ -1040,7 +1040,7 @@
 			var applications = [];
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
-				var productName = item.toLowerCase();
+				var productName = item.Name.toLowerCase();
 				if (self.availableApplications.hasOwnProperty(productName)
 					&& self.availableApplications[productName].permission)
 				{
