@@ -185,7 +185,12 @@
 			{
 				return col.listItemConverter(value);
 			}
-			switch (col.UDFType || col.type)
+			let type = col.UDFType || col.type;
+			if (col.UDFType === 'roll-up')
+			{
+				type = col.type;
+			}
+			switch (type)
 			{
 				case "string":
 					return value;

@@ -24,6 +24,14 @@
 		let dataTypeId = this.dataTypeId;
 		let editType = this.field.editType;
 		let systemFieldType = this.field.FieldOptions.SystemFieldType;
+		if (systemFieldType === 'Roll-up')
+		{
+			const udfField = tf.UDFDefinition.getUDFByGuid(this.field.FieldOptions.DefaultText);
+			if (udfField)
+			{
+				systemFieldType = udfField.OriginalType;
+			}
+		}
 		let targetField = editType.targetField;
 		let formType = TF.Form.FormConfigHelper.systemFieldsConfig[dataTypeId];
 		if (formType) {
