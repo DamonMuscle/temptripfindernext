@@ -220,7 +220,7 @@
 				{
 					tf.promiseAjax.get(pathCombine(tf.api.server(), $.trim(this.loginViewModel.obClientKey()), "authinfos"), {
 						paramData: {
-							prefix : 'tfweb'
+							prefix: 'tfweb'
 						},
 						error: function(message, status)
 						{
@@ -242,7 +242,7 @@
 								.then(function(purchasedProducts)
 								{
 									this.loginViewModel.obLoginErrorMessage('');
-									if (purchasedProducts.indexOf("Tripfinder") === -1)
+									if (!purchasedProducts.find(x => x.Name == 'Tripfinder'))
 									{
 										this.loginViewModel.obLoginErrorMessage('Tripfinder is not enabled for this Client ID.  Contact us at support@transfinder.com or 888-427-2403 to inquire about enabling this product.');
 										return;

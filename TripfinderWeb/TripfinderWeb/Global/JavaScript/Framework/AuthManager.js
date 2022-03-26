@@ -156,7 +156,7 @@
 					return tf.authManager.getPurchasedProducts()
 						.then(function(purchasedProducts)
 						{
-							if (purchasedProducts.indexOf("Tripfinder") === -1)
+							if (!purchasedProducts.find(x => x.Name == 'Tripfinder'))
 							{
 								return self._loginUseModal(loginViewModal);
 							}
@@ -268,7 +268,7 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "vendoraccessinfo"))
 			.then(function(response)
 			{
-				self.supportedProducts = response.Items[0].Products;
+				self.supportedProducts = response.Items[0].ProductDetails || [];;
 				return self.supportedProducts;
 			}.bind(this));
 	};
