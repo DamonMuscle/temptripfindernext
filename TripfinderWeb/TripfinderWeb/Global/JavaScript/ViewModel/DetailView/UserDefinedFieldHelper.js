@@ -120,9 +120,11 @@
         items.sort((a, b) => a.DisplayName.toUpperCase() > b.DisplayName.toUpperCase() ? 1 : -1);
 
         return items.map(function (item) {
-            var editType,
+            var isRollup = item.TypeId === UserDefinedFieldHelper.DataTypeId.RollUp,
+                editType,
                 result,
-                type = item.Type;
+                type = isRollup ? UserDefinedFieldHelper.valueFormatToType(item.ValueFormat) : item.Type;
+                
 
             switch (type) {
                 case 'Text':
@@ -384,4 +386,27 @@
             });
         }
     }
+
+    UserDefinedFieldHelper.DataTypeId = {
+		RollUp: 19
+	}
+
+	UserDefinedFieldHelper.valueFormatToType = function(valueFormat)
+	{
+		switch (valueFormat)
+		{
+			case 1:
+				return "Date"
+			case 2:
+				return "Date/Time"
+			case 3:
+				return "Number"
+			case 4:
+				return "Text"
+			case 5:
+				return "Time"
+			default:
+				return "String"
+		}
+	}
 })();

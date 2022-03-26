@@ -237,6 +237,7 @@
 				(Array.isArray(item.UDGridDataSource) ? item.UDGridDataSource : []) :
 				(Array.isArray(item.UDFDataSources) ? item.UDFDataSources : []),
 			fieldName = item.Guid,
+			type = getItemType(item),
 			columnDefinition = {
 				UDFDataSources: associatedDBIDs,
 				FieldName: fieldName,
@@ -250,11 +251,7 @@
 				SystemDefined: item.SystemDefined,
 				AttributeFlag: item.AttributeFlag,
 				format: item.FormatString,
-				type: item.Type.replace(/date\/time/i, "datetime")
-					.replace(/list/i, "select")
-					.replace(/memo/i, "string")
-					.replace(/text/i, "string")
-					.replace(/Phone Number/i, "string").toLowerCase()
+				type: getGridDisplayType(type)
 			};
 
 		switch (item.Type)
@@ -350,4 +347,23 @@
 
 		return template;
 	};
+
+	function getItemType(item)
+	{
+		var type = item.Type;
+		if (item.TypeId === TF.DetailView.UserDefinedFieldHelper.DataTypeId.RollUp)
+		{
+			type = TF.DetailView.UserDefinedFieldHelper.valueFormatToType(item.ValueFormat);
+		}
+		return type;
+	}
+
+	function getGridDisplayType(type)
+	{
+		return type.replace(/date\/time/i, "datetime")
+			.replace(/list/i, "select")
+			.replace(/memo/i, "string")
+			.replace(/text/i, "string")
+			.replace(/Phone Number/i, "string").toLowerCase()
+	}
 })();
