@@ -47,15 +47,19 @@
 
 			resourceExpandData = {
 				VehicleId: resourceData.VehicleId,
+				Vehicle: {
+					Id: resourceData.VehicleId,
+					Name: resourceData.VehicleName || ''
+				},
 				Staffs: [
 					{
 						Driver: {
 							Id: resourceData.DriverId,
-							Name: resourceData.Driver ? this.getUserName(resourceData.Driver) : ''
+							Name: resourceData.DriverName || ''
 						},
 						BusAide: {
 							Id: resourceData.AideId,
-							Name: resourceData.Aide ? this.getUserName(resourceData.Aide) : ''
+							Name: resourceData.AideName || ''
 						}
 					}
 				]
@@ -86,9 +90,9 @@
 		return resourceGroupExpandData;
 	}
 
-	FieldTripViewResourceViewModel.prototype.getVehiclePicture = function(studentId, $element)
+	FieldTripViewResourceViewModel.prototype.getVehiclePicture = function(vehicleId, $element)
 	{
-		return this.getPicture('vehicle', studentId, $element);
+		return this.getPicture('vehicle', vehicleId, $element);
 	}
 
 	FieldTripViewResourceViewModel.prototype.getStaffPicture = function(staffId, $element)

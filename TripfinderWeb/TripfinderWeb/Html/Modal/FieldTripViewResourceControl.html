@@ -138,9 +138,9 @@
 				<li>
 					<div class="row">
 						<div class="col-xs-8">
-							<span><img data-bind="attr: { alt: $parent.getVehiclePicture($data.VehicleId,$element) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { alt: $parent.getVehiclePicture($data.Vehicle.Id,$element) }" alt="" class="img-circle"></span>
 							&nbsp;
-							<label data-bind="text: $data.Vehicle&&$data.Vehicle.BusNum"></label>
+							<label data-bind="text: $data.Vehicle&&$data.Vehicle.Name"></label>
 						</div>
 						<div class="col-xs-8">
 							<span><img data-bind="attr: { alt: $parent.getStaffPicture($data.Staffs[0].Driver.Id,$element) }" alt="" class="img-circle"></span>
