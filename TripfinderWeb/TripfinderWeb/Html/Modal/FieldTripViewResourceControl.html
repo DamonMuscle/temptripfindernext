@@ -148,7 +148,7 @@
 							<label data-bind="text: $data.Staffs[0].Driver.Name"></label>
 						</div>
 						<div class="col-xs-8">
-							<span><img data-bind="attr: { alt: ($data.Staffs[0].BusAide && $data.Staffs[0].BusAide.Id,$element) ? $parent.getStaffPicture($data.Staffs[0].BusAide.Id) : $parent.getStaffPicture(0) }" alt="" class="img-circle"></span>
+							<span><img data-bind="attr: { alt: ($data.Staffs[0].BusAide && $data.Staffs[0].BusAide.Id) ? $parent.getStaffPicture($data.Staffs[0].BusAide.Id,$element) : $parent.getStaffPicture(0) }" alt="" class="img-circle"></span>
 							&nbsp;
 							<label data-bind="text: $data.Staffs[0].BusAide ? $data.Staffs[0].BusAide.Name : ''"></label>
 						</div>
