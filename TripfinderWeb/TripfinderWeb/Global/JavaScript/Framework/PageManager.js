@@ -160,8 +160,8 @@
 					.then(function () {
 						if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
 							&& tf.pageManager.applicationURLMappingList.find(p => p.Name == "Chatfinder")) {
-							tf.chatfinderhelper = new TF.ChatfinderHelper("tfweb");
-							tf.chatfinderhelper.registerHub();
+							tf.chatfinderHelper = new TF.ChatfinderHelper("tfweb");
+							tf.chatfinderHelper.registerHub();
 						}
 					})
 
