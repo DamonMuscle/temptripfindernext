@@ -34,7 +34,7 @@
 				}
 			};
 
-			var chatfinderAddress = chatfinderSite.Uri;
+			var chatfinderAddress = chatfinderSite.Uri.toLowerCase();;
 			var chatfinderAPIAddress = chatfinderApi.Uri;
 
 			tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData)
