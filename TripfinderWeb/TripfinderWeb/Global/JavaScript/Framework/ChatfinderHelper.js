@@ -19,7 +19,7 @@
 	ChatfinderHelper.prototype.registerHub = function()
 	{
 		var self = this;
-		var chatfinderSite = tf.authManager.supportedProducts.find(p => p => p.Name && p.Name.toLowerCase() == "chatfinder");
+		var chatfinderSite = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinder");
 		var chatfinderApi = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinderapi");
 		if (chatfinderSite && chatfinderApi)
 		{
