@@ -47,7 +47,25 @@
 				<div class="mobile-modal-grid-select-option form-group" data-bind="css:{disabled:obValueFieldType()==='Disabled'}">
 					<label class="bold">Value</label>
 					<div class="flex-column">
-						<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control text-right"},events:{blur:function(){inputValue();}}} --><!-- /ko -->
+						<!-- ko if: obValueFieldType() == "Select" -->
+						<div class="form-group" data-bind="event:{keydown:valueKeypress}">
+							<div class="input-group">
+								<div data-bind="typeahead:{source:ListMoverOptions,format:function(item){return item.PickList;},drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
+									<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control unBindHotKey"}} -->
+									<!-- /ko -->
+								</div>
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-default btn-sharp">
+										<span class="caret"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<!-- /ko -->
+						<!-- ko if: obValueFieldType() != "Select" -->
+						<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{class:"form-control text-right"}} -->
+						<!-- /ko -->
+						<!-- /ko -->
 					</div>
 				</div>
 				<div class="mobile-modal-grid-select-option" data-bind="click:function(){goToSelect('logical');}">
