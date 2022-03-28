@@ -27,7 +27,7 @@
 				paramData: {
 					"clientId": tf.entStorageManager.get("clientKey"),
 					"vendor": "Transfinder",
-					"username": tf.authManager.userName,
+					"username": tf.authManager.userName || tf.authManager.authorizationInfo.authorizationTree.username,
 				},
 				headers: {
 					'Transfinder': tf.api.server()
@@ -129,8 +129,8 @@
 		notification.onclick = function(event)
 		{
 			var notifyData = event.target.data
-			const urlSurfix = `/#/conversation?chatThreadId=${notifyData.chatThreadId}`
-			var newwindow = window.open('/chatfinder' + urlSufix);
+			const urlSuffix = `/#/conversation?chatThreadId=${notifyData.chatThreadId}`
+			var newwindow = window.open('/chatfinder' + urlSuffix);
 			newwindow.focus();
 		}
 
