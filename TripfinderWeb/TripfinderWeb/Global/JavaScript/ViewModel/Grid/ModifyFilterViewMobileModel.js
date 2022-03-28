@@ -125,7 +125,7 @@
 	ModifyFilterViewMobileModel.prototype.selectFilter = function(option, e)
 	{
 		this.goToMain();
-
+		const self = this;
 		var name;
 
 		switch (this.obSelectType())
@@ -135,6 +135,18 @@
 				{
 					this.obValueFieldType("Disabled");
 					return;
+				}
+				if (option.TypeCode === "Select")
+				{
+					this.obValueFieldValue("");
+					self.ListMoverOptions([]);
+					if (option.UDFPickListOptions && option.UDFPickListOptions.length > 0)
+					{
+						setTimeout(function ()
+						{
+							self.ListMoverOptions(option.UDFPickListOptions);
+						});
+					}
 				}
 				this.obValueFieldType(option.TypeCode);
 				name = "[" + option.PersistenceName + "]";

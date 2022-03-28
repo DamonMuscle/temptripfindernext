@@ -68,9 +68,10 @@
             $(".k-calendar-container.k-state-border-up").css('display') != 'none';
       }.bind(this);
 
+			let fieldType = this.obValueFieldType() === "Select" ? "String" : this.obValueFieldType();
 			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
       {
-				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
+				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(fieldType, this.obValueFieldValue()));
 			}
 		}.bind(this));
 
