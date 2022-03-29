@@ -24,6 +24,7 @@
 		{
 			gridFilter = new TF.DataModel.GridFilterDataModel();
 			gridFilter.gridType(gridType);
+			gridFilter.dataTypeID(tf.dataTypeHelper.getId(gridType));
 		}
 		else
 		{
