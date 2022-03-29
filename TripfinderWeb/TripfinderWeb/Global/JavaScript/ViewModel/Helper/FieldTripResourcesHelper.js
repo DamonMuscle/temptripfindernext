@@ -25,11 +25,16 @@
 		this.getImage(typeName, imageId)
 			.then(function(result)
 			{
+				var src = "";
 				if (result && result.Items && result.Items[0] && result.Items[0].FileContent)
 				{
 					var src = `data:image/jpeg;base64,${result.Items[0].FileContent}`;
-					$(element).attr("src", src);
 				}
+				else
+				{
+					src = tf.helpers.detailViewHelper.getDefaultRecordPicture(typeName);
+				}
+				$(element).attr("src", src);
 			}.bind(this));
 		return "";
 	}
