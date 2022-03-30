@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+    <style>
+        @font-face {
+            font-family: "SourceSansPro-Regular";
+            src: url("Global/Css/fonts/SourceSansPro_Regular.ttf") format("truetype");
+        }
+
+        html,
+        body {
+            min-height: 550px;
+            overflow-y: auto;
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+        }
+
+        body {
+            font-family: "SourceSansPro-Regular";
+            background: linear-gradient(to bottom, #ffeeee, #00B1B0);
+            background: -moz-linear-gradient(top, #ffeeee, #00B1B0);
+            background: -webkit-linear-gradient(top, #ffeeee, #00B1B0);
+            background: -o-linear-gradient(top, #ffeeee, #00B1B0);
+        }
+
+        #centered {
+            text-align: center;
+            width: 400px;
+            height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: calc(50vh - 200px);
+        }
+
+        p {
+            margin: 0px;
+            padding-top: 45px;
+            color: #333333;
+        }
+    </style>
+    <script src="/routefinderweb/Global/ThirdParty/jquery-1.12.4.min.js"></script>
+    <script>
+        $(function () {
+            var $window = $(window), $body = $("body"), updateLayout = function () {
+                if ($window.height() < $body.height()) {
+                    $("#centered").css("paddingTop", ($body.height() / 2 - 200) + "px");
+                }
+                else {
+                    $("#centered").css("paddingTop", "");
+                }
+            };
+            updateLayout();
+            $window.on("resize", function () {
+                updateLayout();
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="centered">
+        <img src="Global/Img/ChatfinderLogo.svg">
+
+        <p style="font-size:22px">
+            Chatfinder is not configured correctly.
+        </p>
+        <p style="font-size:20px">
+            For more information, please contact Support at support@transfinder.com or 888-427-2403.
+        </p>
+    </div>
+</body>
+
+</html>

@@ -130,6 +130,7 @@ module.exports = function(grunt)
 						'Stopfinderadminnotexisting.html',
 						'Tfadminnotexisting.html',
 						'Routefinderplusnotexisting.html',
+						'Chatfindernotexisting.html',
 						'loading.html',
 						'local_settings.js',
 						'Web.config',
