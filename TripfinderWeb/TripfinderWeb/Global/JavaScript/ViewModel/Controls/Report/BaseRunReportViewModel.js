@@ -824,29 +824,27 @@
 		if (useFilter)
 		{
 			// summaryFilter
-			return self.initReportSummaryFilter();
-
+			return self.initReportSummaryFilter(reportItem);
 		}
-		else if (useSpecifiedRecords)
-		{
-			var idListStr = convertRecordsToString(self.obSpecifiedRecords()),
-				idList = parseRecordIdsFromString(idListStr);
 
-			if (idList.length > 0)
-			{
-				reportItem.SpecificRecordIds = idList;
-				return Promise.resolve(reportItem);
-			}
-
-			return Promise.resolve(null);
-		}
-		else	// Use All Records
+		if (!useSpecifiedRecords)
 		{
 			return Promise.resolve(reportItem);
 		}
+
+		var idListStr = convertRecordsToString(self.obSpecifiedRecords()),
+			idList = parseRecordIdsFromString(idListStr);
+
+		if (idList.length > 0)
+		{
+			reportItem.SpecificRecordIds = idList;
+			return Promise.resolve(reportItem);
+		}
+
+		return Promise.resolve(null);
 	};
 
-	BaseRunReportViewModel.prototype.initReportSummaryFilter = function()
+	BaseRunReportViewModel.prototype.initReportSummaryFilter = function(reportItem)
 	{
 		const self = this;
 		var dataSourceId = self.obSelectedDataSource().id,
@@ -862,25 +860,23 @@
 					return Promise.resolve(reportItem);
 				}
 				return Promise.resolve(null);
-			})
-		}
-		else
-		{
-			return tf.exagoReportDataHelper.getRecordIdsByFilterClause(
-				dataSourceId,
-				dataSchema,
-				self.obSelectedFilterWhereClause()
-			).then(function(idsFromFilter)
-			{
-				if (Array.isArray(idsFromFilter) && idsFromFilter.length > 0)
-				{
-					reportItem.SpecificRecordIds = idsFromFilter;
-					return Promise.resolve(reportItem);
-				}
-
-				return Promise.resolve(null);
 			});
 		}
+
+		return tf.exagoReportDataHelper.getRecordIdsByFilterClause(
+			dataSourceId,
+			dataSchema,
+			self.obSelectedFilterWhereClause()
+		).then(function(idsFromFilter)
+		{
+			if (Array.isArray(idsFromFilter) && idsFromFilter.length > 0)
+			{
+				reportItem.SpecificRecordIds = idsFromFilter;
+				return Promise.resolve(reportItem);
+			}
+
+			return Promise.resolve(null);
+		});
 	}
 
 	BaseRunReportViewModel.prototype.initMapSettings = function(TripMap, StudentMap, TripStopMap)
