@@ -51,7 +51,11 @@
 		{
 			tf.entStorageManager.save("token", "");
 		}
-		tf.chatfinderHelper.clearNotifications();
+
+		if (tf.chatfinderHelper)
+		{
+			tf.chatfinderHelper.clearNotifications();
+		}
 
 		this.logOffWithoutRefresh()
 			.then(function()
