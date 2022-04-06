@@ -838,7 +838,10 @@
 	{
 		window.addEventListener("beforeunload", function(event)
 		{
-			tf.chatfinderHelper.clearNotifications();
+			if (tf.chatfinderHelper)
+			{
+				tf.chatfinderHelper.clearNotifications();
+			}
 		});
 	};
 })();
