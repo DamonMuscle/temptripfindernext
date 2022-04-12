@@ -300,6 +300,14 @@
 					columnDefinition.Precision = item.NumberPrecision;
 				}
 				break;
+			case "Currency":
+				if (_.isNumber(item.MaxLength))
+				{
+					// Both NumberPrecision and Precision properties will be used in different places
+					columnDefinition.NumberPrecision = item.MaxLength;
+					columnDefinition.Precision = item.MaxLength;
+				}
+				break;
 			case "List":
 				columnDefinition.UDFPickListOptions = item.UDFPickListOptions || [];
 				columnDefinition.ListFilterTemplate = self._generateListFilterTemplate(item, gridType);
@@ -364,6 +372,7 @@
 			.replace(/list/i, "select")
 			.replace(/memo/i, "string")
 			.replace(/text/i, "string")
+			.replace(/currency/i, "number")
 			.replace(/Phone Number/i, "string").toLowerCase()
 	}
 })();

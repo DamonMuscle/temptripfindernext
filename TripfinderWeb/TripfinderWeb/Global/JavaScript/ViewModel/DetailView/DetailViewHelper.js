@@ -1007,6 +1007,7 @@
 				content = self.formatStringContent(content, format);
 				break;
 			case "Number":
+			case "Currency":
 				content = self.formatNumberContent(content, format, UDFItem);
 				break;
 			case "Date":
