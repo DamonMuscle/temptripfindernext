@@ -64,7 +64,9 @@
                 currentValue = udf.DefaultMemo;
                 break;
             case 'Number':
-                currentValue = udf.DefaultNumeric;
+				currentValue = udf.DefaultNumeric;
+			case 'Currency':
+				currentValue = udf.DefaultText === "" ? null : parseFloat(udf.DefaultText);
                 break;
             case 'Phone Number':
                 currentValue = udf.DefaultPhoneNumber;
@@ -176,7 +178,29 @@
                         format = format.toFixed(parseInt(precision)).toString();
                         result["format"] = format;
                     }
-                    break;
+					break;
+				case 'Currency':
+					var currencyPrecision = item.MaxLength,
+						nullCurrencyPrecision = (currencyPrecision === 0 || currencyPrecision === null);
+					editType = {
+						"format": "Number",
+						"maxLength": 10 + (nullCurrencyPrecision ? 0 : (1 + currencyPrecision)),
+						"maxValue": 9999999999 + (nullCurrencyPrecision ? 0 : (1 - (Math.pow(10, -1 * currencyPrecision))))
+					};
+					result = {
+						"field": item.DisplayName,
+						"title": item.DisplayName,
+						"type": "Number",
+						"editType": editType,
+						"value": item.DefaultText === "" ? null : parseFloat(item.DefaultText)
+					};
+					if (currencyPrecision != null)
+					{
+						var format = 0;
+						format = format.toFixed(parseInt(currencyPrecision)).toString();
+						result["format"] = format;
+					}
+					break;
                 case 'Phone Number':
                     editType = {
                         "format": "Phone"
