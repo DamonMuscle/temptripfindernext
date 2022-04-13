@@ -1061,7 +1061,7 @@
 
 		if (UDFItem)
 		{
-			var precision = UDFItem.NumberPrecision;
+			var precision = UDFItem.Type === "Currency" ? UDFItem.MaxLength : UDFItem.NumberPrecision;
 			return value.toFixed(_.isNumber(precision) ? precision : 0);
 		}
 
