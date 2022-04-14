@@ -2767,10 +2767,7 @@
 				};
 				break;
 			case "number":
-				if (column.FieldName.indexOf('UserNum') !== 0)
-				{
-					column.format = definition.format || "{0:n2}";
-				}
+				column.format = column.format || (!!column.UDFId ? (_.isNumber(column.Precision) && Number(column.Precision) > 0 ? String.format("{0:n{0}}", column.Precision) : "{0:0}") : "{0:n2}");
 				column.filterable = {
 					cell: {
 						operator: "eq",
