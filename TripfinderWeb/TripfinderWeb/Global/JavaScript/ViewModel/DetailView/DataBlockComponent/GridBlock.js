@@ -41,12 +41,18 @@
 			btnLabel: "Add"
 		},
 		"FieldTripResourceGrid": {
-			checkPermission: function () { return tf.authManager.isAuthorizedFor("fieldtrip", ["add", "edit"]); },
+			checkPermission: function()
+			{
+				return tf.helpers.fieldTripAuthHelper.canModifyResourceRecord();
+			},
 			btnClass: "add-fieldtrip-resource",
 			btnLabel: "Add"
 		},
 		"FieldTripInvoiceGrid": {
-			checkPermission: function () { return tf.authManager.isAuthorizedFor("fieldtrip", ["add", "edit"]); },
+			checkPermission: function()
+			{
+				return tf.helpers.fieldTripAuthHelper.canModifyInvoiceRecord();
+			},
 			btnClass: "add-fieldtrip-invoice",
 			btnLabel: "Add"
 		},

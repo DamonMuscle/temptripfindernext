@@ -331,4 +331,21 @@
 				return [];
 		}
 	};
+
+	FieldTripAuthHelper.prototype.canModifyResourceRecord = function()
+	{
+		return tf.authManager.authorizationInfo.isAdmin ||
+			tf.authManager.isAuthorizedFor(securedItemDefinition.transportationAdministrator, ["add", "edit"]);
+	};
+
+	FieldTripAuthHelper.prototype.canModifyInvoiceRecord = function()
+	{
+		return tf.authManager.authorizationInfo.isAdmin ||
+			tf.authManager.isAuthorizedFor(securedItemDefinition.transportationAdministrator, ["add", "edit"]) ||
+			tf.authManager.isAuthorizedFor(securedItemDefinition.level4Administrator, ["add", "edit"]) ||
+			tf.authManager.isAuthorizedFor(securedItemDefinition.level3Administrator, ["add", "edit"]) ||
+			tf.authManager.isAuthorizedFor(securedItemDefinition.level2Administrator, ["add", "edit"]) ||
+			tf.authManager.isAuthorizedFor(securedItemDefinition.level1Requestor, ["add", "edit"]);
+	};
+
 })();
