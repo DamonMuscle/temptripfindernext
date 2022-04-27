@@ -293,12 +293,15 @@
 	{
 		var self = this,
 			isReadMode = self.isReadMode(),
-			columns = [];
+			columns = [], prepareColumns = [];
 
 		let specialColumns = [];
 
 		//#RW-25103 refresh option columns every time
-		self.options.columns = self.getGridColumnsByType().map(x => x.FieldName);
+		prepareColumns = self.prepareColumnsForDetailGrid(); 
+		if (prepareColumns && prepareColumns.length > 0) {
+			self.options.columns = prepareColumns.map(x => x.FieldName);
+		}		
 
 		if (self.options.columns && self.options.columns.length > 0)
 		{
@@ -771,6 +774,31 @@
 			UDGRecord = kendoGrid.dataItem($tr[0]);
 		self.editRecord(UDGRecord);
 	}
+
+	UDGridBlock.prototype.prepareColumnsForDetailGrid = function()
+	{
+		var self = this,
+			columns,
+			allColumns = self.getGridColumnsByType();
+
+		if (self.options.columns && self.options.columns.length > 0)
+		{
+			columns = self.options.columns.map(function(savedColumn)
+			{
+				var columnName = typeof savedColumn === "string" ? savedColumn : savedColumn.FieldName;
+				return allColumns.filter(function(column)
+				{
+					return column.FieldName === columnName;
+				})[0];
+			});
+
+			columns = columns.filter(function(c)
+			{
+				return !!c;
+			});
+		} 
+		return columns;
+	};
 
 	UDGridBlock.prototype.editRecord = function (UDGRecord)
 	{
