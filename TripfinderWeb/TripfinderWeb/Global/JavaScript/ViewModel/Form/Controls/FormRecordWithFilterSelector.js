@@ -30,12 +30,12 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		let ele = this.autoComplete.wrapper,
 			pHolder = this.getPlaceHolder();
 
-		ele.append(`<span class="k-icon tf-filter" data-toggle="modal"></span>
+		ele.prepend(`<span class="k-icon tf-filter" data-toggle="modal"></span>
 				<span class="current-filter-label">
 					<span class="filter-label" style="display:block;">Current Filter: 
 						<span class="filter-type-label">${pHolder}</span>
 					</span>
-					<span class="k-icon k-clear-value k-i-close" title="clear" role="button"></span>
+					<span class="k-icon k-clear-value k-i-close filter-close" title="clear" role="button"></span>
 				</span>
 				<div class="modal" id="myModal" tabindex="-1" role="dialog">
 				</div>`);
@@ -71,6 +71,7 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			$('.form-record-tooltip .tooltip-inner').on('click', e =>
 			{
 				this.toggleFilterApply(true);
+				this.value = null;
 				modalEle.modal('hide');
 			});
 		}).on('hide.bs.modal', e =>
@@ -100,6 +101,11 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			filterLabel.hide();
 			tfFilter.removeClass('filter-applied');
 			this.autoComplete.value('');
+		}
+
+		if (this.checkOneRecord)
+		{
+			this.checkOneRecord(applyFilter);
 		}
 	}
 
@@ -220,7 +226,7 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			let items = filterItems.map(item =>
 			{
 				//Contains => contains. there're issues if operator is eq or others.
-				return `${item.Operator.toLowerCase()}(${item.FieldName},${item.Value})`;
+				return `${item.Operator.toLowerCase()}(${item.FieldName},${encodeURIComponent(item.Value)})`
 			});
 			queryString += items.join(operatorKey);
 			queryStringArr.push(queryString);
@@ -236,7 +242,7 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 					return `${item.Operator.toLowerCase()}(${item.FieldName},${item.Value})`;
 				})
 				let key = set.LogicalOperator === 'And' ? '&' : '|'
-				return `(${setItems.join(key)})`;
+				return `(${encodeURIComponent(setItems.join(key))})`;
 			});
 			queryString += items.join(operatorKey);
 			queryStringArr.push(queryString);
@@ -273,29 +279,59 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 
 	FormStaffRecordSelector.prototype.getPlaceHolder = function ()
 	{
-		return 'My Records';
+		return 'My Record';
 	}
 
-	FormStaffRecordSelector.prototype.init = function ()
+	FormStaffRecordSelector.prototype.init = function()
 	{
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
+		 this.toggleFilterApply(true);
+	}
 
-		let staffInfo = tf.staffInfo;
-		if (staffInfo.staffID && staffInfo.staffID.length === 1)
+	FormStaffRecordSelector.prototype.checkOneRecord = function(applyFilter)
+	{
+		if (applyFilter)
 		{
-			let config = TF.Form.formConfig[this.options.dataType],
-				item = config.formatItem(staffInfo.items[0]);
+			const staffInfo = tf.staffInfo;
+			if (staffInfo.staffID && staffInfo.staffID.length === 1)
+			{
+				const config = TF.Form.formConfig[this.options.dataType],
+					item = config.formatItem(staffInfo.items[0]);
 
-			this.toggleFilterApply(true);
-			this.autoComplete.value(item.text);
-			this.value = item.value;
-			this.autoComplete.dataSource.read();
-		}
-		else
+				this.autoComplete.value(item.text);
+				this.value = item.value;
+				this.checkOnlyOneRecord = true;
+				if (this.options.onlyOneRecordCallback)
+				{
+					this.options.onlyOneRecordCallback(true);
+				}
+			}
+		} else
 		{
-			this.toggleFilterApply(true);
+			var opts = {
+				"paramData": {
+					"getCount": true,
+					"take": 10
+				}
+			}
+
+			TF.DetailView.UserDefinedGridHelper.fetchFormSearchData(opts, this.options.dbId, this.options.dataType)
+				.then((_res) =>
+				{
+					if (_res.Items && _res.Items.length == 1)
+					{
+						const config = TF.Form.formConfig[this.options.dataType],
+							item = config.formatItem(_res.Items[0]);
+
+						this.autoComplete.value(item.text);
+						this.value = item.value;
+					}
+					if (this.options.onlyOneRecordCallback)
+					{
+						this.options.onlyOneRecordCallback(_res.Items && _res.Items.length == 1);
+					}
+				});
 		}
-		// this.toggleFilterApply(true);
 	}
 
 	FormStaffRecordSelector.prototype.validateData = function (data, options)
@@ -355,6 +391,62 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		this.toggleFilterApply(true);
 	}
 
+	FormTripRecordSelector.prototype.checkOneRecord = function(applyFilter)
+	{
+		const staffInfo = tf.staffInfo;
+		var newOpts = {
+			"paramData": {
+				"getCount": true,
+				"take": 10
+			},
+			"data": {
+				"filterSet": {
+					"FilterItems": []
+				}
+			}
+		}
+		if (this.isFilterApplied)
+		{
+			const filterItems = newOpts.data && newOpts.data.filterSet && newOpts.data.filterSet.FilterItems;
+			const filterItem = {
+				FieldName: '',
+				IsListFilter: true,
+				Operator: 'In',
+				TypeHint: 'Number',
+				Value: staffInfo.staffID.join(','),
+				ValueList: JSON.stringify(staffInfo.staffID)
+			}
+			if (staffInfo.isDriver)
+			{
+				filterItem.FieldName = 'CurrentDriverID';
+				filterItems.push(filterItem);
+			}
+			else if (staffInfo.isAide)
+			{
+				filterItem.FieldName = 'CurrentBusAideID';
+				filterItems.push(filterItem);
+			}
+		}
+
+		TF.DetailView.UserDefinedGridHelper.fetchFormSearchData(newOpts, this.options.dbId, this.options.dataType)
+			.then((_res) =>
+			{
+				if (_res.Items && _res.Items.length == 1)
+				{
+					const config = tf.formConfig[this.options.dataType],
+						item = config.formatItem(_res.Items[0]);
+
+					this.autoComplete.value(item.text);
+					this.value = item.value;
+				}
+				if (this.options.onlyOneRecordCallback)
+				{
+					this.options.onlyOneRecordCallback(_res.Items && _res.Items.length == 1);
+				}
+			});
+
+	}
+
 	FormTripRecordSelector.prototype.fetchData = function (opts, options)
 	{
 		let newOpts = JSON.parse(JSON.stringify(opts));
@@ -410,6 +502,77 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
 
 		this.toggleFilterApply(true);
+	}
+
+	FormVehicleRecordSelector.prototype.checkOneRecord = function(isFilterApplied)
+	{
+		var options = this.options;
+		if (isFilterApplied)
+		{
+			this.fetchMyTripIDs().then(res =>
+			{
+				if (!res || !res.length)
+				{
+					return;
+				}
+
+				let vehicleData = res.map(r =>
+				{
+					return { Id: r.CurrentVehicleID, BusNum: r.CurrentVehicle };
+				});
+				const vehicleIds = [];
+				vehicleData = vehicleData.filter(r =>
+				{
+					const isValidVehicleId = (r && r.Id && vehicleIds.indexOf(r.Id) === -1);
+					if (isValidVehicleId)
+					{
+						vehicleIds.push(r.Id);
+					}
+
+					return isValidVehicleId;
+				});
+
+				if (vehicleData && vehicleData.length == 1)
+				{
+					const config = TF.Form.formConfig[this.options.dataType],
+						item = config.formatItem(vehicleData[0]);
+
+					this.autoComplete.value(item.text);
+					this.value = item.value;
+				}
+				if (this.options.onlyOneRecordCallback)
+				{
+					this.options.onlyOneRecordCallback(vehicleData && vehicleData.length == 1);
+				}
+
+			});
+		}
+		else
+		{
+			var opts = {
+				"paramData": {
+					"getCount": true,
+					"take": 10
+				}
+			}
+
+			TF.DetailView.UserDefinedGridHelper.fetchFormSearchData(opts, this.options.dbId, this.options.dataType)
+				.then((_res) =>
+				{
+					if (_res.Items && _res.Items.length == 1)
+					{
+						const config = tf.formConfig[this.options.dataType],
+							item = config.formatItem(_res.Items[0]);
+
+						this.autoComplete.value(item.text);
+						this.value = item.value;
+					}
+					if (this.options.onlyOneRecordCallback)
+					{
+						this.options.onlyOneRecordCallback(_res.Items && _res.Items.length == 1);
+					}
+				});
+		}
 	}
 
 	FormVehicleRecordSelector.prototype.fetchData = function (opts, options)
@@ -486,6 +649,57 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		this.toggleFilterApply(true);
 	}
 
+	FormStudentRecordSelector.prototype.checkOneRecord = function(applyFilter)
+	{
+		const params = [`take=10`, `getCount=true`, `filterType=submitted`];
+		if (applyFilter)
+		{
+			this.fetchMyTripIDs().then(res =>
+			{
+				if (res && res.length > 0)
+				{
+					params.push(`tripIds=${res.map(r => r.Id).join(',')}`);
+					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint(this.options.dataType), '?' + params.join('&')))
+						.then(_res =>
+						{
+							if (_res.Items && _res.Items.length == 1)
+							{
+								const config = TF.Form.formConfig[this.options.dataType],
+									item = config.formatItem(_res.Items[0]);
+
+								this.autoComplete.value(item.text);
+								this.value = item.value;
+							}
+							if (this.options.onlyOneRecordCallback)
+							{
+								this.options.onlyOneRecordCallback(_res.Items && _res.Items.length == 1);
+							}
+						});
+				}
+			});
+		}
+		else
+		{
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint(this.options.dataType), '?' + params.join('&')))
+				.then(_res =>
+				{
+					if (_res.Items && _res.Items.length == 1)
+					{
+						const config = TF.Form.formConfig[this.options.dataType],
+							item = config.formatItem(_res.Items[0]);
+
+						this.autoComplete.value(item.text);
+						this.value = item.value;
+					}
+					if (this.options.onlyOneRecordCallback)
+					{
+						this.options.onlyOneRecordCallback(_res.Items && _res.Items.length == 1);
+					}
+				});
+		}
+
+	}
+
 	FormStudentRecordSelector.prototype.fetchData = function (opts, options)
 	{
 		if (this.isFilterApplied)
@@ -539,6 +753,31 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		TF.Control.FormRecordWithFilterSelector.prototype.init.apply(this, arguments);
 
 		this.toggleFilterApply(true);
+	}
+
+	FormFieldtripRecordSelector.prototype.checkOneRecord = function(applyFilter)
+	{
+		const params = [`take=10`, `getCount=true`]
+		if (applyFilter)
+		{
+			params.push(`filterType=submitted`);
+		}
+		const url = pathCombine(tf.api.apiPrefix(), 'search', 'fieldtrips?' + params.join('&'));
+		tf.promiseAjax.post(url, null, { overlay: false })
+			.then(_res =>
+			{
+				if (_res.Items && _res.Items.length == 1)
+				{
+					const config = TF.Form.formConfig[this.options.dataType],
+						item = config.formatItem(_res.Items[0]);
+					this.autoComplete.value(item.text);
+					this.value = item.value;
+				}
+				if (this.options.onlyOneRecordCallback)
+				{
+					this.options.onlyOneRecordCallback(_res.Items && _res.Items.length == 1);
+				}
+			});
 	}
 
 	FormFieldtripRecordSelector.prototype.fetchData = function (opts, options)

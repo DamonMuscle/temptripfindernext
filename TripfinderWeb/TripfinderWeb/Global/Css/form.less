@@ -596,7 +596,7 @@
 
 				.form-entity-container
 				{
-					padding: 30px 30px 40px 30px;
+					padding: 50px 30px 20px 30px;
 					border-bottom: 2px solid #f2f2f2;
 
 					.form-entity-title
@@ -621,6 +621,8 @@
 							position: absolute;
 							display: none;
 							width: 190px;
+							top: -40px;
+							padding-bottom: 10px;
 
 							.filter-label
 							{
@@ -647,7 +649,7 @@
 						{
 							padding-right: 40px;
 								.k-clear-value:not(.k-icon) {
-									right: calc(1em - 8px);
+									right: calc(1em + 10px);
 									top: 12px;
 								}
 							.k-icon.tf-filter
@@ -671,7 +673,8 @@
 								}
 							}
 							.filter-disabled{
-								display: none !important;
+								//display: none !important;
+								cursor:default !important;
 							}
 						}
 					}
@@ -682,11 +685,15 @@
 					}
 
 					.k-clear-value {
-						//right: -38px;
+						right: -50px;
 						outline-color: transparent;
-						display: none;
 					}
 
+					.form-entity-input .k-clear-value:not(.filter-close) {
+						right: -30px;
+						padding-left: 0px !important;
+					}
+					
 					.k-icon.k-i-search {
 						left: 5px;
 						 top: 50%;
