@@ -1543,15 +1543,16 @@
 			validPromise = Promise.resolve()
 				.then(() =>
 				{
+					tf.loadingIndicator.showImmediately();
 					return tf.udgHelper.queryValidUDGridById(udGrid.ID, filterOptions);
 				})
 				.then(validUDGrid =>
 				{
+					tf.loadingIndicator.tryHide();
 					if (!validUDGrid)
 					{
 						return Promise.reject();
-					}
-
+					}					
 					return getPublicTokenPromise;
 				});
 		}

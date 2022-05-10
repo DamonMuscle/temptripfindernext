@@ -10,6 +10,9 @@
 	createNamespace("TF.Control.Form").Form = Form;
 
 	const SPECIFY_RECORD_TYPE_MY_RECORD = 3;
+	const ALL_RECORD = 1;
+	const FILTER_RECORD = 2;
+	const SPECIFY_RECORD_TYPE_SPECIFIC = 4;
 
 	function _initSpecifyOptions(options)
 	{
@@ -503,9 +506,13 @@
 		const autoCompleteElem = this.elem.find(".form-entity-input");
 		const dbID = tf.datasourceManager.databaseId || this.dbId;
 		let type = this.dataType;
-		let selector = 'FormRecordSelector';
+		let selector = 'FormRecordSelector',
+		submitFormIsAllRecordType = this._specifyOptions.TypeId === ALL_RECORD && this.options.udGridRecordId;;
 
-		if (!this.options.Public && this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_MY_RECORD)
+		if (!this.options.Public &&
+			this._specifyOptions.TypeId !== SPECIFY_RECORD_TYPE_SPECIFIC &&
+			this._specifyOptions.TypeId !== FILTER_RECORD &&
+			!submitFormIsAllRecordType)
 		{
 			type = type[0].toUpperCase() + type.substring(1);
 			if (((tf.staffInfo.isStaff && type === 'staff') || type === 'Fieldtrip' || tf.staffInfo.isDriver || tf.staffInfo.isAide) &&
@@ -527,6 +534,10 @@
 		return TF.DetailView.UserDefinedGridHelper.getFormSearchData('', dbID, this.dataType, true, this._specifyOptions).then((res) =>
 		{
 			let onlyOneRecord = false;
+			
+			//FORM-1874, show record selector any time
+			this.elem.find("div.form-entity-container").show();		
+
 			if (res && res.Items && res.Items.length === 1)
 			{
 				onlyOneRecord = true;
@@ -540,6 +551,7 @@
 					dbId: tf.datasourceManager.databaseId || this.dbId,
 					dataType: this.dataType,
 					enable: this.options.RecordID == null,
+					needOneRecordCheck: !this.options.udGridRecordId, 
 					canClearFilter: this.options.canClearFilter,
 					valueChanged: val =>
 					{
@@ -565,16 +577,44 @@
 					dbId: tf.datasourceManager.databaseId || this.dbId,
 					dataType: this.dataType,
 					enable: enableStatus,
+					needOneRecordCheck: !this.options.udGridRecordId, 
 					canClearFilter: this.options.canClearFilter,
 					valueChanged: val =>
 					{
 						this.obRecordID(val);
 					},
+					onlyOneRecordCallback: (oneRecord) =>
+					{
+						//FORM-1874
+						const autoCompleteElem = $("input[name='form-entity-input']");
+						if (oneRecord)
+						{
+							autoCompleteElem.attr("disabled", "disabled");
+							autoCompleteElem.addClass("k-state-disabled");
+							autoCompleteElem.parent(".k-widget").children(".k-clear-valu").hide();
+							const autoSearchElem = this.elem.find(".k-i-search");
+							if (autoSearchElem && autoSearchElem.length > 0)
+							{
+								autoSearchElem.hide();
+							}
+						}
+						else
+						{
+							autoCompleteElem.removeAttr("disabled");
+							autoCompleteElem.removeClass("k-state-disabled");
+							autoCompleteElem.parent(".k-widget").children(".k-clear-valu").show();
+							const autoSearchElem = this.elem.find(".k-i-search");
+							if (autoSearchElem && autoSearchElem.length > 0)
+							{
+								autoSearchElem.show();
+							}
+						}
+					},
 					specifyOptions: this._specifyOptions,
 					isPublicForm: this.options.Public
 				});
 
-				if (onlyOneRecord)
+				if (onlyOneRecord && selector == "FormRecordSelector")
 				{
 					const config = TF.Form.formConfig[this.dataType];
 					const recValue = res.Items[0], nameVal = config.formatItem(res.Items[0]).text;
