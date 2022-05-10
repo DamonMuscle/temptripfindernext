@@ -206,6 +206,7 @@
 
 	TripfinderLoginModel.prototype.positiveClick = function(viewModel, e)
 	{
+		this.loginViewModel.obLoginErrorMessage('');
 		if (!this.checkRequiredField())
 		{
 			return;
