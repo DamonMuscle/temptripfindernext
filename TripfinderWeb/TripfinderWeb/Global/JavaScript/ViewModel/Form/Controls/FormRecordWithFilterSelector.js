@@ -103,7 +103,7 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 			this.autoComplete.value('');
 		}
 
-		if (this.checkOneRecord)
+		if (this.checkOneRecord && this.options.needOneRecordCheck)
 		{
 			this.checkOneRecord(applyFilter);
 		}
