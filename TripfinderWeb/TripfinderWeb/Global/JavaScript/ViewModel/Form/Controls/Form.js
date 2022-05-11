@@ -577,7 +577,7 @@
 					dbId: tf.datasourceManager.databaseId || this.dbId,
 					dataType: this.dataType,
 					enable: enableStatus,
-					needOneRecordCheck: !this.options.udGridRecordId, 
+					needOneRecordCheck: !this.options.udGridRecordId && !this.options.uniqueClassName, 
 					canClearFilter: this.options.canClearFilter,
 					valueChanged: val =>
 					{
