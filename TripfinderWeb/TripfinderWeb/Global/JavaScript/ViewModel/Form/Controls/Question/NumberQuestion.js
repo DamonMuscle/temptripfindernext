@@ -51,11 +51,12 @@
 			}
 		};
 
-		if (this.field.FieldOptions.NumberPrecision) 
+		const decimals = this.field.FieldOptions.NumberPrecision;
+		if (_.isNumber(decimals))
 		{
-			numericOption.decimals = this.field.FieldOptions.NumberPrecision;
+			numericOption.decimals = decimals;
 			numericOption.restrictDecimals = true;
-			numericOption.format = "N" + this.field.FieldOptions.NumberPrecision.toString();
+			numericOption.format = "N" + decimals.toString();
 		}
 		else
 		{
