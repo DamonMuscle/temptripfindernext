@@ -30,7 +30,7 @@ const CLASS_NAME_KICON_TFFILTER = ".k-icon.tf-filter";
 		let ele = this.autoComplete.wrapper,
 			pHolder = this.getPlaceHolder();
 
-		ele.prepend(`<span class="k-icon tf-filter" data-toggle="modal"></span>
+		ele.append(`<span class="k-icon tf-filter" data-toggle="modal"></span>
 				<span class="current-filter-label">
 					<span class="filter-label" style="display:block;">Current Filter: 
 						<span class="filter-type-label">${pHolder}</span>
