@@ -124,6 +124,11 @@ function isPhoneDevice()
 	return isMobileDevice() && window.screen.width < 768;
 }
 
+function isIOS()
+{
+	return navigator.userAgent.match(/(iPod|iPhone|iPad)/) ? true : false;
+}
+
 function isSafari()
 {
 	var chrome = navigator.userAgent.indexOf('CriOS') > -1 || navigator.userAgent.indexOf('Chrome') > -1;
@@ -218,6 +223,7 @@ function getLocation()
 createNamespace("TF").getLocation = getLocation;
 createNamespace("TF").isMobileDevice = isMobileDevice();
 createNamespace("TF").isSafari = isSafari();
+createNamespace("TF").isIOS = isIOS();
 createNamespace("TF").isPhoneDevice = isPhoneDevice();
 createNamespace("TF").isPortrait = isPortrait();
 createNamespace("TF").isLandscape = isLandscape();
