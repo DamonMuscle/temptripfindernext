@@ -560,7 +560,7 @@
 			end = moment("2000-1-1 " + blockOutTime.EndTime);
 			if ((timeM.isSame(begin) || timeM.isAfter(begin)) && (timeM.isSame(end) || timeM.isBefore(end)))
 			{
-				message = time.format('hh:mm A') + " is invalid because of the blockout period of " + begin.format("hh:mm A") + " and " + end.format("hh:mm A") + ".";
+				message = time.format('hh:mm A') + " is invalid because of the blockout period of " + begin.format("hh:mm A") + " to " + end.format("hh:mm A") + ".";
 				return false;
 			}
 		});

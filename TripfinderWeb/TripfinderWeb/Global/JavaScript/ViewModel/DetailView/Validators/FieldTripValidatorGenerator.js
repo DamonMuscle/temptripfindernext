@@ -125,7 +125,7 @@
 						return !mmtObj.isBetween(startTime, endTime);
 					});
 
-				return { valid: valid, message: mmtObj.format('hh:mm A') + " is invalid because of the blockout period of " + startTime.format("hh:mm A") + " and " + endTime.format("hh:mm A") + "." };
+				return { valid: valid, message: mmtObj.format('hh:mm A') + " is invalid because of the blockout period of " + startTime.format("hh:mm A") + " to " + endTime.format("hh:mm A") + "." };
 			});
 	};
 })();
