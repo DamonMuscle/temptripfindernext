@@ -81,9 +81,27 @@
 		this.previousValue = null;
 		input.attr("type", "number");
 		input.attr("step", "any");
-
+		if (TF.isMobileDevice && TF.isIOS) {
+			// prevent autocomplete
+			input.attr("autocomplete", "off");
+			input.attr("autocorrect", "off");
+		}
 		input.keydown((e) =>
 		{
+			if (e.key === "e") {
+				e.preventDefault();
+				return false;
+			}	
+			if (TF.isMobileDevice && TF.isIOS) {
+				const charCode = (e.which) ? e.which : e.keyCode;
+				// back, - ,. and number
+				if (charCode != 190 &&charCode != 189 && charCode != 8  
+					&& (charCode < 48 || charCode > 57 || this.isSpecialCharacter(e.key))){	
+						e.preventDefault();
+						return false;
+					}
+			}
+
 			const flootValue = Math.floor(input.val());
 			if (Math.abs(flootValue).toString().length > 10)
 			{
@@ -128,5 +146,14 @@
 
 		}
 		return this.numericInput.wrapper;
+	}
+
+	CurrencyQuestion.prototype.isSpecialCharacter = function(key) {
+		// has same key with number
+		const specials = ["!","@","#","$","%","^","&","*","(",")"];
+		if (specials.indexOf(key)> -1) {
+			return true;
+		}
+		return false;
 	}
 })();
