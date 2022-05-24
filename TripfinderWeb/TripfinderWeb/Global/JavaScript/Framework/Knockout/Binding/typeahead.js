@@ -409,15 +409,12 @@
 				input.trigger('focus');
 			}
 
-			// reset the tab index on input type is select with the select typeahead
+			// set the tab index on input type is select with the select typeahead
 			var inputTabindex = input.attr("tabindex");
 			if (Number(inputTabindex) >= 0)
 			{
-				setTimeout(function()
-				{
-					input.attr("tabindex", inputTabindex);
-					$element.parent().find(".input-group-btn button").attr("tabindex", inputTabindex);
-				});
+				input.attr("tabindex", inputTabindex);
+				$element.parent().find(".input-group-btn button").attr("tabindex", inputTabindex);
 			}
 		},
 		bindInputLostFouse: function($element, option, bindingContext)

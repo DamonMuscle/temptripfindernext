@@ -238,9 +238,10 @@
 
 		//all buttons can not focus when tab keypress
 		//all drop down menu can not focus when tab keypress
-		$(this.$form.context).find("button").attr("tabindex", "-1");
-		$(this.$form.context).find("input[type=button]").attr("tabindex", "-1");
-		$(this.$form.context).find("input[data-tf-input-type=Select]").attr("tabindex", "-1");
+		// remove the disable tabs FT-2340
+		// $(this.$form.context).find("button").attr("tabindex", "-1");
+		// $(this.$form.context).find("input[type=button]").attr("tabindex", "-1");
+		// $(this.$form.context).find("input[data-tf-input-type=Select]").attr("tabindex", "-1");
 
 		if (this._view && this._view.id)
 		{
@@ -427,9 +428,9 @@
 				validatorFields[name].validators.callback = {
 					message: " invalid " + type + " number",
 					callback: function(value)
-						{
-							return value === '' || tf.dataFormatHelper.isValidPhoneNumber(value);
-						}
+					{
+						return value === '' || tf.dataFormatHelper.isValidPhoneNumber(value);
+					}
 				};
 			}
 			else
@@ -440,9 +441,9 @@
 						callback: {
 							message: " invalid " + type + " number",
 							callback: function(value)
-								{
-									return value === '' || tf.dataFormatHelper.isValidPhoneNumber(value);
-								}
+							{
+								return value === '' || tf.dataFormatHelper.isValidPhoneNumber(value);
+							}
 						}
 					}
 				}
