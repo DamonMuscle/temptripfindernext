@@ -286,6 +286,10 @@
 
 		this.obGridDefinitionColumns().forEach(c =>
 		{
+			if (c.UDFId)
+			{
+				return;
+			}
 			whereClause = whereClause.replace(new RegExp("\\b" + c.PersistenceName + "\\b", "gi"), c.PersistenceName)
 		})
 		self.gridFilterDataModel.whereClause(whereClause);
