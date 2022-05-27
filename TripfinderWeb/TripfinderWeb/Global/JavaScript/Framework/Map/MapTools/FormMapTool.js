@@ -569,6 +569,14 @@ const MAP_NAME_SPACE = "TF.Form.Map";
 		self.obEndLatLong(tf.map.ArcGIS.webMercatorUtils.xyToLngLat(x, y));
 	}
 
+	function initializeCirclePanel(self, e) {
+		if (!self.circleRadiusPanel) {
+			self.circleRadiusPanel = new CircleRadiusPanel(self.routingMapTool.$container);
+			self.routingMapTool.circleRadiusPanel = self.circleRadiusPanel;
+		}
+		self.circleRadiusPanel.setStartLatLong(...e.toolEventInfo.added);
+	}
+
 	function intializeShapeDraw()
 	{
 		const self = this;
@@ -600,9 +608,7 @@ const MAP_NAME_SPACE = "TF.Form.Map";
 				case "start":
 					if (e.tool === "circle")
 					{
-						self.circleRadiusPanel || (self.circleRadiusPanel = new CircleRadiusPanel(self.routingMapTool.$container));
-						self.circleRadiusPanel || (self.routingMapTool.circleRadiusPanel = self.circleRadiusPanel);
-						self.circleRadiusPanel.setStartLatLong(...e.toolEventInfo.added);
+						initializeCirclePanel(self, e);
 					}
 					else
 					{
