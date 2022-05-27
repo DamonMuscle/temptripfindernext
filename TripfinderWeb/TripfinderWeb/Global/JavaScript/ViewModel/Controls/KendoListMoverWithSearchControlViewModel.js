@@ -827,8 +827,8 @@
 							item[define.FieldName] = moment(moment(new Date(item[define.FieldName])).format("L")).toDate();
 							break;
 						case "time":
-							item[define.FieldName] = moment(moment(item[define.FieldName]).format("1899/12/30 HH:mm:00")).toDate();
-							// item[define.FieldName] = moment(toISOStringWithoutTimeZone(moment(moment(item[define.FieldName]).format('1899/12/30 HH:mm:00')))).toDate()
+							let time = item[define.FieldName];
+							item[define.FieldName] = moment(moment(time.length === 8 && time.includes(":") ? `1899/12/30 ${time}` : time).format("1899/12/30 HH:mm:00")).toDate();
 							break;
 						case "boolean":
 							item[define.FieldName] = item[define.FieldName].toString();
