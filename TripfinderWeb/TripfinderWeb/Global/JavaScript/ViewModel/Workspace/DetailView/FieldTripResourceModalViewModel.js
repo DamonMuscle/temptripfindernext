@@ -14,8 +14,6 @@
 		self.sizeCss = "modal-md";
 		var data = new TF.DetailView.FieldTripResourceViewModel(options);
 		self.data(data);
-		self.cancelPrompt = true;
-		self.cancelPromptTitle = "Confirmation";
 	};
 
 	FieldTripResourceModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
@@ -31,6 +29,29 @@
 				self.positiveClose(data);
 			}
 		});
+	};
+
+	FieldTripResourceModalViewModel.prototype.negativeClose = function(returnData)
+	{
+		if (this.data().apiIsDirty())
+		{
+			return tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes prior to closing?", backdrop: true, title: "Unsaved Changes", closeButton: true })
+				.then(function(result)
+				{
+					if (result === true)
+					{
+						return this.positiveClick();
+					}
+					if (result === false)
+					{
+						return TF.Modal.BaseModalViewModel.prototype.negativeClose.call(this, returnData);
+					}
+				}.bind(this));
+		}
+		else
+		{
+			TF.Modal.BaseModalViewModel.prototype.negativeClose.call(this, returnData);
+		}
 	};
 
 	FieldTripResourceModalViewModel.prototype.dispose = function()
