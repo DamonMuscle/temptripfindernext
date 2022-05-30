@@ -473,7 +473,7 @@
 		});
 	};
 
-	FieldTripResourceViewModel.prototype.save = function()
+	FieldTripResourceViewModel.prototype.getCurrentEntity = function()
 	{
 		var self = this, fieldtripResourceEntity = {
 			VehicleId: self.obSelectedVehicle() == null ? null : self.obSelectedVehicle().Id,
@@ -506,6 +506,49 @@
 			AideFixedCost: self.obAideBillingFixedCost(),
 			TotalCost: self.obTotalCost()
 		};
+		return fieldtripResourceEntity;
+	}
+
+	FieldTripResourceViewModel.prototype.apiIsDirty = function()
+	{
+		let currentEntity = this.getCurrentEntity(),
+			entity = this.options.entity,
+			isDirty = false;
+
+		if (entity == null)
+		{
+			for (let key in currentEntity)
+			{
+				if (!this.isEmpty(currentEntity[key]))
+				{
+					isDirty = true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (let key in currentEntity)
+			{
+				if (currentEntity[key] != entity[key] && (!this.isEmpty(currentEntity[key]) || !this.isEmpty(entity[key])))
+				{
+					isDirty = true;
+					break;
+				}
+			}
+
+		}
+		return isDirty;
+	}
+
+	FieldTripResourceViewModel.prototype.isEmpty = function(val)
+	{
+		return val === 0 || val === '' || val == null;
+	}
+
+	FieldTripResourceViewModel.prototype.save = function()
+	{
+		let self = this, fieldtripResourceEntity = self.getCurrentEntity();
 
 		if (self.options.newEntityDataSource)
 		{
