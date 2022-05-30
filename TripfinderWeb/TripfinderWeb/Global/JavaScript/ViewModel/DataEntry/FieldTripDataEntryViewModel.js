@@ -182,7 +182,8 @@
 		}.bind(this));
 		this.obReturnTimeDisable = ko.computed(function()
 		{
-			if (!this.obEntityDataModel().returnDate()) {
+			if (!this.obEntityDataModel().returnDate())
+			{
 				this.obEntityDataModel().returnTime(null)
 			}
 			return !(this.obEntityDataModel().returnDate());
@@ -314,7 +315,7 @@
 							var classificationDataModels = data.Items;
 							if (self.obDocumentGridViewModel() !== null)
 							{
-								setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
+								setDocumentGridButtons(self.obDocumentGridViewModel, ownedDocumentAddPermission, ownedDocumentEditPermission);
 							}
 							if (resources)
 							{
@@ -363,7 +364,7 @@
 							self.obDocumentKendoDataSource(documentFontEndRecources);
 							let documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
 							self.obDocumentGridViewModel(documentGrid);
-							setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
+							setDocumentGridButtons(self.obDocumentGridViewModel, ownedDocumentAddPermission, ownedDocumentEditPermission);
 							self.obEntityDataModel().updateEntityBackup();
 						});
 
@@ -374,22 +375,18 @@
 		{
 			if (ownedDocumentReadPermission && ownedDocumentAddPermission)
 			{
-				tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getEndpoint("documentclassification")))
-					.then(function(data)
-					{
-						var classificationDataModels = data.Items;
-						let documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
-						self.obDocumentGridViewModel(documentGrid);
-						setDocumentGridButtons(self.obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission);
-					});
+				let documentGrid = new TF.Control.GridControlViewModel("documentmini", filteredIds, self.obEntityDataModel().id(), "fieldtripEntry");
+				self.obDocumentGridViewModel(documentGrid);
+				setDocumentGridButtons(self.obDocumentGridViewModel, ownedDocumentAddPermission, ownedDocumentEditPermission);
 			}
 		}
 
 
-		let setDocumentGridButtons = (obDocumentGridViewModel, classificationDataModels, ownedDocumentAddPermission, ownedDocumentEditPermission) =>
+		let setDocumentGridButtons = (obDocumentGridViewModel, ownedDocumentAddPermission, ownedDocumentEditPermission) =>
 		{
 
-			if (classificationDataModels != null && classificationDataModels.length > 0)
+			let canDocumentAdd = tf.authManager.isAuthorizedForDataType("document", "add");
+			if (canDocumentAdd)
 			{
 				obDocumentGridViewModel().obCanAdd(ownedDocumentAddPermission);
 				obDocumentGridViewModel().obCanAddNew(ownedDocumentAddPermission);
@@ -1282,15 +1279,15 @@
 		entity.FieldTripResourceGroups = this.obFieldTripResourceGroupData();
 		entity.FieldTripInvoices = this.obInvoiceGridDataSource();
 		entity.DocumentRelationships = this.obDocumentRelationshipSource();
-		if(entity.ContactPhone && tf.dataFormatHelper.isValidPhoneNumber(entity.ContactPhone))
+		if (entity.ContactPhone && tf.dataFormatHelper.isValidPhoneNumber(entity.ContactPhone))
 		{
 			entity.ContactPhone = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.ContactPhone);
 		}
-		if(entity.DestinationContactPhone && tf.dataFormatHelper.isValidPhoneNumber(entity.DestinationContactPhone))
+		if (entity.DestinationContactPhone && tf.dataFormatHelper.isValidPhoneNumber(entity.DestinationContactPhone))
 		{
 			entity.DestinationContactPhone = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.DestinationContactPhone);
 		}
-		if(entity.DestinationFax && tf.dataFormatHelper.isValidPhoneNumber(entity.DestinationFax))
+		if (entity.DestinationFax && tf.dataFormatHelper.isValidPhoneNumber(entity.DestinationFax))
 		{
 			entity.DestinationFax = tf.dataFormatHelper.getStandardPhoneNumberValue(entity.DestinationFax);
 		}
@@ -1451,7 +1448,7 @@
 
 		invoiceGridViewModel._viewfromDBClick = this.editInvoiceEvent.bind(this);
 
-		
+
 		if (requiredFields)
 		{
 			const { AccountName, FieldTripAccountId, InvoiceDate, PaymentDate, PurchaseOrder } = requiredFields;
