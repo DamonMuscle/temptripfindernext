@@ -15,6 +15,7 @@
 		var data = new TF.DetailView.FieldTripResourceViewModel(options);
 		self.data(data);
 		self.cancelPrompt = true;
+		self.cancelPromptTitle = "Confirmation";
 	};
 
 	FieldTripResourceModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
