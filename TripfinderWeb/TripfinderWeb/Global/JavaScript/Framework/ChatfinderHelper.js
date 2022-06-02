@@ -9,12 +9,19 @@
 		this.notifications = new Map();
 	}
 
-	ChatfinderHelper.prototype.registerServiceWorker = async function(scriptUrl)
-	{
-		var self = this;
-		self.registration = await navigator.serviceWorker.register(scriptUrl);
-		self.registerOnMessage();
-	}
+    ChatfinderHelper.prototype.registerServiceWorker = async function(scriptUrl)
+    {
+        if ("serviceWorker" in navigator)
+        {
+            var self = this;
+            self.registration = await navigator.serviceWorker.register(scriptUrl);
+            self.registerOnMessage();
+        }
+        else
+        {
+            console.warn("Service worker is not enabled, please check broswer compatibility and settings.");
+        }
+    }
 
 	ChatfinderHelper.prototype.registerHub = function()
 	{
