@@ -596,6 +596,7 @@
 										});
 										self.changeStaffType();
 										self._initClosePageConfirm();
+										TF.SessionItem.refresh();
 										return true;
 									});
 								});
