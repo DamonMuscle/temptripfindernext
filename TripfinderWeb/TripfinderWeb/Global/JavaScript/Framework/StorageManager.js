@@ -2,6 +2,8 @@
 {
 	createNamespace("TF").StorageManager = StorageManager;
 
+	const allowCookieList = ["ent.token", "ent.clientKey", "ent.isLoggedin", "ent.stopfinderToken"];
+
 	function StorageManager(prefix)
 	{
 		this.prefix = prefix + ".";
@@ -18,7 +20,7 @@
 		else if (isLocal)
 		{
 			
-			if((key == "ent.token" || key == "ent.isLoggedin" || key == "ent.clientKey" || "ent.stopfinderToken") && CheckDomain())
+			if(allowCookieList.includes(key) && CheckDomain())
 			{
 			return Promise.resolve(setCookie(key, data));
 			}
@@ -58,7 +60,7 @@
 		}
 		else if (isLocal)
 		{
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" || "ent.stopfinderToken") && CheckDomain())
+			if(allowCookieList.includes(key) && CheckDomain())
 			{
 				return getCookie(key);
 			}
