@@ -1131,13 +1131,13 @@
 					excuteSetFilter = (ans !== false && ans.operationResult !== null);
 
 				if (excuteSetFilter)
-					return self.setGridFilter(gridFilterDataModel);
+					return self.setGridFilter(gridFilterDataModel,true);
 				else
 					return Promise.resolve(ans.operationResult);
 			});
 	};
 
-	KendoGridFilterMenu.prototype.setGridFilter = function(gridFilterDataModel)
+	KendoGridFilterMenu.prototype.setGridFilter = function(gridFilterDataModel,isApplyFilter)
 	{
 		if (!gridFilterDataModel.isValid())
 		{
@@ -1147,9 +1147,18 @@
 			}.bind(this));
 		}
 		this.obSelectedGridFilterId(gridFilterDataModel.id());
-		return this.loadGridFilter(false).then(function()
+		if(isApplyFilter)
 		{
-			var self = this;
+			this.setCurrentFilter(gridFilterDataModel);
+			return;
+		}
+		
+		return this.loadGridFilter(false).then(()=>{this.setCurrentFilter(gridFilterDataModel)});
+	};
+
+	KendoGridFilterMenu.prototype.setCurrentFilter = function(gridFilterDataModel)
+	{
+		var self = this;
 			function refresh()
 			{
 				var filter = {};
@@ -1163,7 +1172,6 @@
 				refresh();
 				return false;
 			}
-
 			else if (this.options.summaryFilterFunction && gridFilterDataModel.id() < 0)
 			{
 				return this.options.summaryFilterFunction(gridFilterDataModel.id())
@@ -1187,8 +1195,7 @@
 				refresh();
 				return Promise.resolve(false);
 			}
-		}.bind(this));
-	};
+	}
 
 	KendoGridFilterMenu.prototype._currentFilterChange = function()
 	{
