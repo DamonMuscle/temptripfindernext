@@ -403,16 +403,7 @@
 
 								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
 							}
-							else if (!tf.storageManager.get("datasourceId"))
-							{
-								updateDataSourcePromise = tf.datasourceManager.getAllDataSources()
-									.then(function(dataSources)
-									{
-										var candidateDB = dataSources.length > 0 ? dataSources[0] : {};
 
-										return tf.storageManager.save("datasourceId", candidateDB.DBID);
-									});
-							}
 
 							return updateDataSourcePromise
 								.then(function()
@@ -430,7 +421,7 @@
 									}
 									else
 									{
-										return false;
+										return isValid;
 									}
 								});
 						})
@@ -442,18 +433,18 @@
 								tf.datasourceManager.setDatabaseInfo();
 								return Promise.resolve(true);
 							}
-							else
+							else if (validateResult === false)
 							{
 								tf.loadingIndicator.tryHide();
 								return tf.datasourceManager.getAllDataSources()
-									.then(function(dataSources)
+									.then(function (dataSources)
 									{
 										if (dataSources && dataSources.length > 0)
 										{
 											return tf.promiseBootbox.alert({
-												message: "The Data Source requested is no longer available.Please select an active Data Source.",
+												message: "The Data Source requested is no longer available. Please select an active Data Source.",
 												title: "No Data Source Selected"
-											}).then(function()
+											}).then(function ()
 											{
 												return false;
 											});
@@ -471,7 +462,7 @@
 														className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
 													}
 												}
-											}).then(function()
+											}).then(function ()
 											{
 												tf.entStorageManager.save("token", "");
 												tf.reloadPageWithDatabaseId(null);
@@ -479,6 +470,10 @@
 											});
 										}
 									});
+							} else
+							{
+								tf.loadingIndicator.tryHide();
+								return Promise.resolve(false);
 							}
 						})
 						.then(function(isPass)

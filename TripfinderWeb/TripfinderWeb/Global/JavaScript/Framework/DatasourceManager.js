@@ -51,7 +51,7 @@
 		if (!databaseId)
 		{
 			self.navbarDisplay(false);
-			return Promise.resolve(false);//no datasource, but still could login.
+			return Promise.resolve(null);//no datasource, but still could login.
 		}
 
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications?dbid=" + databaseId))
