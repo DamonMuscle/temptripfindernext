@@ -2,9 +2,9 @@
 {
 	createNamespace("TF.Grid").LayoutHelper = LayoutHelper;
 
-	function LayoutHelper ()
+	function LayoutHelper()
 	{ }
-	LayoutHelper.compareLayoutColumns = function functionName (leftColumns, rightColumns)
+	LayoutHelper.compareLayoutColumns = function functionName(leftColumns, rightColumns)
 	{
 		var isEqual = true;
 
@@ -103,7 +103,7 @@
 
 	createNamespace("TF.Grid").KendoGridLayoutMenu = KendoGridLayoutMenu;
 
-	function KendoGridLayoutMenu ()
+	function KendoGridLayoutMenu()
 	{
 		this.setStorageLayoutDataKey();
 		this._obCurrentGridLayoutExtendedDataModel = ko.observable(null);
@@ -362,16 +362,22 @@
 				}
 				if (selectGridLayoutExtendedEntity)
 				{
+					var currentGridLayoutExtendedEntityForWidth = currentGridLayoutExtendedEntity;
+					if (TF.isMobileDevice)
+					{
+						currentGridLayoutExtendedEntityForWidth = tf.storageManager.get(this.options.storageKey);
+					}
 					//set width in layout
-					if (currentGridLayoutExtendedEntity && currentGridLayoutExtendedEntity.LayoutColumns.length > 0)
+					if (currentGridLayoutExtendedEntityForWidth && currentGridLayoutExtendedEntityForWidth.LayoutColumns.length > 0)
 					{
 						selectGridLayoutExtendedEntity.layoutColumns().forEach(function(column)
 						{
-							currentGridLayoutExtendedEntity.LayoutColumns.forEach(function(columnInStorage)
+							currentGridLayoutExtendedEntityForWidth.LayoutColumns.forEach(function(columnInStorage)
 							{
 								if (columnInStorage.FieldName == column.FieldName)
 								{
 									column.Width = columnInStorage.Width;
+									column.width = columnInStorage.Width;
 									return;
 								}
 							});
@@ -508,6 +514,7 @@
 					if (layoutColumn.Width)
 					{
 						this._gridDefinition.Columns[i].Width = layoutColumn.Width;
+						this._gridDefinition.Columns[i].width = layoutColumn.Width;
 					}
 					if (layoutColumn.locked)
 					{
