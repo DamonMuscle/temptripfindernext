@@ -374,7 +374,8 @@
 						{
 							currentGridLayoutExtendedEntityForWidth.LayoutColumns.forEach(function(columnInStorage)
 							{
-								if (columnInStorage.FieldName == column.FieldName)
+								if ((columnInStorage.FieldName && columnInStorage.FieldName == column.FieldName) ||
+									(columnInStorage.UDFId && columnInStorage.UDFId == column.UDFId))
 								{
 									column.Width = columnInStorage.Width;
 									column.width = columnInStorage.Width;
@@ -591,6 +592,10 @@
 				FieldName: selectedColumns[i].FieldName,
 				Width: selectedColumns[i].width
 			};
+			if (selectedColumns[i].UDFId)
+			{
+				layoutColumn.UDFId = selectedColumns[i].UDFId;
+			}
 			if (selectedColumns[i].locked)
 			{
 				layoutColumn.locked = true;
