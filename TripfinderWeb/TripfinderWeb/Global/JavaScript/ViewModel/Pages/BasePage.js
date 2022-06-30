@@ -272,28 +272,14 @@
 		return self.searchGrid.getSelectedRecordsFromServer()
 			.then(function(response)
 			{
-				return tf.promiseBootbox.confirm({
-					message: "Data has been retrieved. Would you like to copy this to your clipboard?",
-					title: "Confirmation",
-					buttons: {
-						OK: {
-							label: "Yes"
-						},
-						Cancel: {
-							label: "No"
-						}
-					}
-				}).then(function(result)
-				{
-					if (!result) return;
-
-					var el = document.createElement('textarea');
-					el.value = TF.Helper.KendoGridHelper.getStringOfRecords(response.Items, self.searchGrid._obSelectedColumns());
-					document.body.appendChild(el);
-					el.select();
-					document.execCommand('copy');
-					document.body.removeChild(el);
-				});
+				var el = document.createElement('textarea');
+				el.value = TF.Helper.KendoGridHelper.getStringOfRecords(response.Items, self.searchGrid._obSelectedColumns());
+				document.body.appendChild(el);
+				el.select();
+				document.execCommand('copy');
+				document.body.removeChild(el);
+				self.pageLevelViewModel.clearError();
+				self.pageLevelViewModel.popupSuccessMessage("Content has been copied to your clipboard.");
 			});
 	};
 
