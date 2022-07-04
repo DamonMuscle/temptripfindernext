@@ -47,22 +47,36 @@
 
 	AuthManager.prototype.logOff = function()
 	{
-		if (this.token === tf.entStorageManager.get("token"))
-		{
-			tf.entStorageManager.save("token", "");
-		}
-
-		if (tf.chatfinderHelper)
-		{
-			tf.chatfinderHelper.clearNotifications();
-		}
-
+		var self = this,
+			prefix = tf.storageManager.prefix;
+		prefix = prefix.split('.')[0];
+		
+		var password = tf.entStorageManager.get("password");
 		this.logOffWithoutRefresh()
 			.then(function()
 			{
-				setTimeout(function()
+				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
+					data: {
+						Prefix: prefix,
+						UserName: tf.authManager.userName,
+						Password: password
+					}
+				}).then(function()
 				{
-					location.reload();
+					if (self.token === tf.entStorageManager.get("token"))
+					{
+						tf.entStorageManager.save("token", "");
+					}
+	
+					if (tf.chatfinderHelper)
+					{
+						tf.chatfinderHelper.clearNotifications();
+					}
+	
+					setTimeout(function()
+					{
+						location.reload();
+					});
 				});
 			});
 	};
