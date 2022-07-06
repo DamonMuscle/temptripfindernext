@@ -300,6 +300,13 @@
 			type: "time"
 		},
 		{
+			FieldName: "DriverName",
+			DisplayName: "Driver",
+			Width: '200px',
+			type: "string",
+			ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Staff.Driver.FirstNameInFront
+		},
+		{
 			FieldName: "ClassificationName",
 			DisplayName: "Classification",
 			Width: '150px',
