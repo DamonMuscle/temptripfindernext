@@ -303,6 +303,19 @@
 			}
 		}, true);
 
+	ListFilterDefinition.ListFilterTemplate.Staff.Driver.FirstNameInFront = $.extend(
+		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff.Driver,
+		{
+			filterField: function(item)
+			{
+				var name = item.FirstName;
+				if (item.LastName)
+					name += ' ' + item.LastName;
+
+				return name;
+			}
+		}, true);
+
 	ListFilterDefinition.ListFilterTemplate.Staff.BusAide = $.extend(
 		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff,
 		{
