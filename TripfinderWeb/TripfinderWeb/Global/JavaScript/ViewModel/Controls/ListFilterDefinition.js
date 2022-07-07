@@ -13,6 +13,11 @@
 		filterField: ""
 	};
 
+	function getFullName(nameDisplayFirst, nameDisplayLast, splitStr)
+	{
+		return [nameDisplayFirst, nameDisplayLast].filter(x => x).join(splitStr);
+	}
+
 	ListFilterDefinition.ListFilterTemplate.GPSEventType = $.extend(
 		{}, ListFilterTemplateDefaultOption,
 		{
@@ -243,11 +248,7 @@
 			GridType: "Staff",
 			filterField: function(item)
 			{
-				var name = item.LastName;
-				if (item.FirstName)
-					name += ', ' + item.FirstName;
-
-				return name;
+				return getFullName(item.LastName, item.FirstName, ', ')
 			},
 			getUrl: function()
 			{
@@ -295,11 +296,16 @@
 		{
 			filterField: function(item)
 			{
-				var name = item.LastName;
-				if (item.FirstName)
-					name += ' ' + item.FirstName;
+				return getFullName(item.LastName, item.FirstName, ' ')
+			}
+		}, true);
 
-				return name;
+	ListFilterDefinition.ListFilterTemplate.Staff.Driver.FirstNameInFront = $.extend(
+		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff.Driver,
+		{
+			filterField: function(item)
+			{
+				return getFullName(item.FirstName, item.LastName, ' ')
 			}
 		}, true);
 
