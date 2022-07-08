@@ -270,8 +270,8 @@
 		}
 
 		const vehicleId = this.obSelectedVehicle()? this.obSelectedVehicle().Id : null;
-
-		if (this.resourceGroupDate.filter(function(item) { return item.VehicleId == vehicleId }.bind(this)).length > 0)
+		
+		if (this.resourceGroupData && this.resourceGroupData.some(item => item.VehicleId === vehicleId))
 		{
 			return false;
 		}
