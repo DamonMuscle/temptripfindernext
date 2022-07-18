@@ -270,6 +270,12 @@
 			type: "integer"
 		},
 		{
+			FieldName: "DocumentCount",
+			DisplayName: "# Documents",
+			Width: '150px',
+			type: "integer"
+		},
+		{
 			FieldName: "EstimatedMiles",
 			DisplayName: "Estimated " + tf.localization.UnitsOfMeasure,
 			Width: '150px',
