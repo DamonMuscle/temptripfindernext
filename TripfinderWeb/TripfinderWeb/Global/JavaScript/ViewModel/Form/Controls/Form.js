@@ -1219,6 +1219,11 @@
 		let fields = newFields.sort((a, b) => a.Index - b.Index),
 			questionContainer = element;
 
+		if (currentSection && !currentSection.questions)
+		{
+			currentSection.questions = [];
+		}
+
 		if (fields.length == 0)
 		{
 			return;
@@ -1233,10 +1238,6 @@
 			this.questions.push(questionControl);
 			if (currentSection)
 			{
-				if (!currentSection.questions)
-				{
-					currentSection.questions = [];
-				}
 				currentSection.questions.push(questionControl);
 			}
 			questionContainer.append(questionControl.element);

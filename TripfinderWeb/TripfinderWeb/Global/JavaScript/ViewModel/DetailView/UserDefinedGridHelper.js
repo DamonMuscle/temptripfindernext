@@ -2435,7 +2435,6 @@
 				section.UDGridFields = currentFields;
 			});
 
-			newOptions.UDGridSections = newOptions.UDGridSections.filter((section) => section.UDGridFields && section.UDGridFields.length > 0);
 		}
 	};
 
