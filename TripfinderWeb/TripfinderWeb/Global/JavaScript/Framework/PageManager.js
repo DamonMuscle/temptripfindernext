@@ -8,13 +8,16 @@
 		self.obContextMenuVisible = ko.observable(false);
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
-		self.currentDatabaseName.subscribe(function(v) {
-			if(!v){
+		self.currentDatabaseName.subscribe(function(v)
+		{
+			if (!v)
+			{
 				$('title').html('Tripfinder');
-			}else{
-				$('title').html('Tripfinder - '+ v);
+			} else
+			{
+				$('title').html('Tripfinder - ' + v);
 			}
-			
+
 		});
 		self.obVersion = ko.observable("Version 1.0.9999"); // DO NOT CHANGE THIS NUMBER
 		self.isTryGoAway = true;
@@ -39,8 +42,8 @@
 			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
 			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
 			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
-			formfinder: {route: "Formfinder", title: "Formfinder", url: "Formfinder"},
-			stopfinderadmin: {route: "StopfinderAdmin", title: "StopfinderAdmin", url: "StopfinderAdmin"}
+			formfinder: { route: "Formfinder", title: "Formfinder", url: "Formfinder" },
+			stopfinderadmin: { route: "StopfinderAdmin", title: "StopfinderAdmin", url: "StopfinderAdmin" }
 		};
 
 		self.initApplicationSwitcher();
@@ -62,7 +65,7 @@
 				return 'formfinder';
 			case "vfweb":
 				return 'viewfinder';
-			case "ent":
+			case "sta":
 				return 'stopfinderadmin';
 			case "cfweb":
 				return 'chatfinder';
@@ -152,14 +155,17 @@
 							{
 								return item.Name.toLowerCase();
 							});
-							self.applicationSwitcherList = self.applicationSwitcherList.sort(function (a, b) {
+							self.applicationSwitcherList = self.applicationSwitcherList.sort(function(a, b)
+							{
 								return self.availableApplications[a].title.localeCompare(self.availableApplications[b].title);
 							});
 						}
 					})
-					.then(function () {
+					.then(function()
+					{
 						if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
-							&& tf.pageManager.applicationURLMappingList.find(p => p.Name == "Chatfinder")) {
+							&& tf.pageManager.applicationURLMappingList.find(p => p.Name == "Chatfinder"))
+						{
 							tf.chatfinderHelper = new TF.ChatfinderHelper("tfweb");
 							tf.chatfinderHelper.registerHub();
 						}
@@ -316,17 +322,17 @@
 				}
 			});
 		}
-		else if(self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.detailView && self.obPages()[0].data.detailView.obEditing())
+		else if (self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.detailView && self.obPages()[0].data.detailView.obEditing())
 		{
 			self.showConfirmation("Do you want to close " + getTitleByType(self.obPages()[0].data.type) + " detail view without saving?")
-			.then(function(result)
-			{
-				if (result)
+				.then(function(result)
 				{
-					self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
-				}
-				return;
-			});
+					if (result)
+					{
+						self._openNewPage(type, gridOptions, firstLoad, skipSavePage);
+					}
+					return;
+				});
 		}
 		else
 		{
@@ -459,15 +465,15 @@
 					className: "btn-no-mobile"
 				}
 			} : {
-					OK: {
-						label: "Log Out",
-						className: "btn-primary btn-sm btn-primary-black"
-					},
-					Cancel: {
-						label: "Cancel",
-						className: "btn-default btn-sm btn-default-link"
-					}
+				OK: {
+					label: "Log Out",
+					className: "btn-primary btn-sm btn-primary-black"
 				},
+				Cancel: {
+					label: "Cancel",
+					className: "btn-default btn-sm btn-default-link"
+				}
+			},
 			title: "Log Out",
 			message: "Are you sure you want to log out?"
 		}).then(function(result)
