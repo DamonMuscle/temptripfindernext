@@ -37,7 +37,7 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group tf-validate">
-				<label>Mileage Rate</label>
+				<label data-bind="text:`Rate/${tf.measurementUnitConverter.getShortUnits()}`">Rate/km</label>
 				<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().mileageRate,attributes:{class:"form-control",name:"mileageRate"}} --><!-- /ko -->
 			</div>
 		</div>

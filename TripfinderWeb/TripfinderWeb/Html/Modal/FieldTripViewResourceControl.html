@@ -31,7 +31,7 @@
 						<div class="col-xs-20">
 							<label data-bind="text:$parent.getVehicleName($data)"></label>
 							<div>
-								<span class="info">Rate: </span><span class="info" data-bind="text:$parent.formatCurrency($data.MileageRate)"></span><span class="info">/mi</span>
+								<span class="info">Rate: </span><span class="info" data-bind="text:$parent.formatCurrency($data.MileageRate)"></span><span class="info" data-bind="text:`${tf.measurementUnitConverter.getShortUnits()}`">km</span>
 							</div>
 						</div>
 					</div>
@@ -42,7 +42,7 @@
 					<hr />
 					<label>Cost</label>
 					<div class="info">Fixed Cost<span class="info pull-right" data-bind="text:$parent.formatCurrency($data.VehFixedCost)"></span></div>
-					<div class="info">Calculated Mileage Rate<span class="info pull-right" data-bind="text:$parent.formatCurrency($parent.calculatedMileageRateComputer($data))"></span></div>
+					<div class="info"><span class="info pull-right" data-bind="text:`Calculated Rate/${tf.measurementUnitConverter.getShortUnits()}`"></span><span class="info pull-right" data-bind="text:$parent.formatCurrency($parent.calculatedMileageRateComputer($data))"></span></div>
 					<div>&nbsp;<div class="pull-right tf-horizontal info-divider" style="width:40px"></div></div>
 					<div class="info text-right" data-bind="text:$parent.formatCurrency($parent.vehicleCostComputer($data))"></div>
 					<div>&nbsp;</div>

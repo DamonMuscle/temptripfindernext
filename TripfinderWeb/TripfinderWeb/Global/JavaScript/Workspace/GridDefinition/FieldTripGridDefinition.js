@@ -971,11 +971,13 @@
 			},
 			{
 				FieldName: "MileageRate",
-				DisplayName: "Mileage Rate",
+				DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 				Width: '150px',
 				type: "number",
 				Precision: 2,
-				format: "{0:0.00}"
+				format: "{0:0.00}",
+				UnitOfMeasureSupported: true,
+				UnitOfMeasureReverse: true,
 			},
 			{
 				FieldName: "VehFixedCost",

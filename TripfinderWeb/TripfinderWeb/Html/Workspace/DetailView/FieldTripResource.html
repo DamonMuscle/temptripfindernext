@@ -49,7 +49,7 @@
 			</div>
 			<div class="col-xs-8">
 				<div class="form-group">
-					<label>Total Miles</label>
+					<label>Total Distance</label>
 					<input readonly type="text" name="difference" class="form-control"
 						data-bind="value:obOdometerDifference()" />
 				</div>
@@ -58,7 +58,7 @@
 		<div class="row">
 			<div class="col-xs-8">
 				<div class="form-group tf-validate">
-					<label>Mileage Rate</label>
+					<label data-bind="text:`Rate/${tf.measurementUnitConverter.getShortUnits()}`">Rate/km</label>
 					<!-- ko customInput:{type:"Decimal",value:obMileageRate,attributes:{class:"form-control",name:"mileagerate", maxlength:"50"},events:{change:onCurrencyFieldChange,keyup:onCurrencyFieldChange}} -->
 					<!-- /ko -->
 				</div>

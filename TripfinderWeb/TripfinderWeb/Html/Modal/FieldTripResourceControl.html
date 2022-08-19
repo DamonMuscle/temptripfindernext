@@ -29,7 +29,7 @@
 		</div>
 		<div class="col-xs-6">
 			<div class="form-group">
-				<label>Mileage Rate</label>
+				<label data-bind="text:`Rate/${tf.measurementUnitConverter.getShortUnits()}`">Rate/km</label>
 				<input type="text" name="mileageRate" class="form-control" data-bind="value:obEntityDataModel().mileageRate" maxlength="50" />
 			</div>
 		</div>
