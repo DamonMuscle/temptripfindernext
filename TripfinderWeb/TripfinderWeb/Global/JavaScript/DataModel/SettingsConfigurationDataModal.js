@@ -23,7 +23,8 @@
 		{ from: "MailCcList", default: [] },
 		{ from: "MailBccList", default: [] },
 		{ from: "EmailSubject", default: "" },
-		{ from: "EmailMessage", default: "" }
+		{ from: "EmailMessage", default: "" },
+		{ from: "UnitOfMeasure", default: 0 }
 	];
 
 })();

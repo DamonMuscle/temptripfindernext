@@ -305,6 +305,7 @@
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
+					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
 					return sessionValidator.activate();
 				})
 				.then(function()

@@ -277,7 +277,8 @@
 		},
 		{
 			FieldName: "EstimatedMiles",
-			DisplayName: "Estimated " + tf.localization.UnitsOfMeasure,
+			DisplayName: "Estimated Distance",
+			UnitOfMeasureSupported: true,
 			Width: '150px',
 			type: "number"
 		},
@@ -430,7 +431,9 @@
 		},
 		{
 			FieldName: "MileageRate",
-			DisplayName: "Mileage Rate",
+			DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+			UnitOfMeasureSupported: true,
+			UnitOfMeasureReverse: true,
 			Width: '150px',
 			type: "number",
 			hidden: true

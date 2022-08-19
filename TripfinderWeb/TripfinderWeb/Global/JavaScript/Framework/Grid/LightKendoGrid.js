@@ -2668,7 +2668,7 @@
 				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithList;
 		});
 		this.currentDisplayColumns(columns);
-		return columns;
+		return tf.measurementUnitConverter.handleUnitOfMeasure(columns);
 	};
 
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)

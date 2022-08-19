@@ -591,11 +591,38 @@
 			{
 				return editFieldList[item.field].value;
 			}
-			else
+			
+			if (self.detailView.newCopyContext &&
+				self.detailView.newCopyContext.autoAssignedFields.map(f => typeof f === "string" ? f : f.field).some(f => f === item.field))
 			{
-				return self.detailView.isCreateGridNewRecord ?
-					self.detailView.defaultRecordEntity[item.entityFieldName || item.field] : (self.detailView.recordEntity && self.detailView.recordEntity[item.entityFieldName || item.field]);
+				return self.detailView.newCopyContext.baseEntity[item.field]
 			}
+
+			content = self.detailView.isCreateGridNewRecord ?
+				self.detailView.defaultRecordEntity[item.entityFieldName || item.field] : (self.detailView.recordEntity && self.detailView.recordEntity[item.entityFieldName || item.field]);
+			const matchedUnitOfMeasureSupportedField = self.detailViewHelper.getUnitOfMeasureSupportedFields(self.detailView.gridType).find(x => x.field === item.field);
+			if (matchedUnitOfMeasureSupportedField)
+			{
+				if (item.field === 'DrivingDirections')
+				{
+					return tf.measurementUnitConverter.unifyDirectionMeasurementUnit(content, tf.measurementUnitConverter.isImperial());
+				}
+				if (tf.measurementUnitConverter.isNeedConversion(matchedUnitOfMeasureSupportedField.UnitInDatabase))
+				{
+					return tf.measurementUnitConverter.convert({
+						value: content,
+						originalUnit: matchedUnitOfMeasureSupportedField.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+						targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+						isReverse: !!matchedUnitOfMeasureSupportedField.UnitOfMeasureReverse,
+					});
+				}
+				else
+				{
+					// handle precision
+					return Number(content).toFixed(2);
+				}
+			}
+			return content;
 		}
 		else
 		{
