@@ -28,7 +28,7 @@
 		self.obPreEnglishMessage = ko.observable();
 		self.obPreSpanishMessage = ko.observable();
 		self.originalUnitOfMeasure = tf.measurementUnitConverter.getCurrentUnitOfMeasure();
-		self.obUnitOfMeasure = ko.observable(self.originalUnitOfMeasure);
+		self.obUnitOfMeasure = ko.observable();
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
@@ -79,7 +79,15 @@
 				self.obEntityDataModel().apiIsDirty(false);
 				self.setValidation();
 				self.initEditor();
+				self.setMeasurement(data.Items[0]);
 			}.bind(this));
+	};
+
+	SettingsConfigurationPage.prototype.setMeasurement = function(config)
+	{
+		tf.measurementUnitConverter.updateCurrentUnitOfMeasure(config);
+		this.originalUnitOfMeasure = tf.measurementUnitConverter.getCurrentUnitOfMeasure();
+		this.obUnitOfMeasure(this.originalUnitOfMeasure);
 	};
 
 	SettingsConfigurationPage.prototype.initEditor = function()

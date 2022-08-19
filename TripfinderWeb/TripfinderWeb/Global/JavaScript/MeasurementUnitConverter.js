@@ -16,19 +16,33 @@
 
 	function MeasurementUnitConverter()
 	{
-		this.updateCurrentUnitOfMeasure();
 	}
+
+	MeasurementUnitConverter.prototype.init = function()
+	{
+		return this.updateCurrentUnitOfMeasure();
+	};
 
 	MeasurementUnitConverter.prototype.updateCurrentUnitOfMeasure = function(value)
 	{
+		var self = this;
+		function getValue(config)
+		{
+			return config.UnitOfMeasure !== self.MeasurementUnitEnum.Imperial ? self.MeasurementUnitEnum.Metric : self.MeasurementUnitEnum.Imperial
+		}
 		if (!value)
 		{
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "clientconfigs"), { data: { clientId: tf.authManager.clientKey } }).then((response) =>
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), { data: { clientId: tf.authManager.clientKey } }).then((response) =>
 			{
 				const config = response.Items[0];
-				currentUnitOfMeasure(config.UnitOfMeasure !== this.MeasurementUnitEnum.Imperial ? this.MeasurementUnitEnum.Metric : this.MeasurementUnitEnum.Imperial);
+				currentUnitOfMeasure(getValue(config));
 				return currentUnitOfMeasure();
 			});
+		}
+
+		if (value.hasOwnProperty("UnitOfMeasure"))
+		{
+			value = getValue(value);
 		}
 
 		if (!["Imperial", "Metric"].includes(value))

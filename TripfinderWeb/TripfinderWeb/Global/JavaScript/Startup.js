@@ -306,10 +306,11 @@
 				.then(function()
 				{
 					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
-					return sessionValidator.activate();
+					return tf.measurementUnitConverter.init();
 				})
 				.then(function()
 				{
+					sessionValidator.activate();
 					tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
 					tf.dataTypeHelper = tf.DataTypeHelper;
 					return tf.DataTypeHelper.init();
