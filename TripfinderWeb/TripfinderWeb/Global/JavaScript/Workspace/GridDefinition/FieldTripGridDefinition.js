@@ -434,6 +434,7 @@
 			DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 			UnitOfMeasureSupported: true,
 			UnitOfMeasureReverse: true,
+			NotReplaceApplicationTermDefaultValue: true,
 			Width: '150px',
 			type: "number",
 			hidden: true

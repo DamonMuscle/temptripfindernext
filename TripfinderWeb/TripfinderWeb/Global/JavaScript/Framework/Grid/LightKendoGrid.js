@@ -4734,6 +4734,11 @@
 
 	LightKendoGrid.prototype._updateGridDefinitionDisplayNameFromTerm = function(column)
 	{
+		if(column.NotReplaceApplicationTermDefaultValue && column.NotReplaceApplicationTermDefaultValue)
+		{
+			return;
+		}
+
 		if (!column.DisplayName)
 		{
 			column.DisplayName = column.FieldName;
