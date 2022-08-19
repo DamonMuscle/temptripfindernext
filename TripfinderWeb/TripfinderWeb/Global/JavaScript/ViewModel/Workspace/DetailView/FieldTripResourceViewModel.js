@@ -200,7 +200,6 @@
 
 			return fixFloat(ending - start);
 		});
-		self.obMileageRate = ko.observable(isNew ? null : entity.MileageRate);
 		self.obMileageRate = ko.observable(isNew ? null : tf.measurementUnitConverter.convert({
 			originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 			targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
@@ -357,7 +356,6 @@
 			}
 			else
 			{
-				self.obMileageRate(billingClassification.MileageRate);
 				self.obMileageRate(tf.measurementUnitConverter.convert({
 					originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 					targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
@@ -501,7 +499,12 @@
 			StartingOdometer: self.obOdometerStart(),
 			EndingOdometer: self.obOdometerEnding(),
 			VehFixedCost: self.obVehicleFixedCost(),
-			MileageRate: self.obMileageRate(),
+			MileageRate: tf.measurementUnitConverter.convert({
+				originalUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+				targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+				value: self.obMileageRate(),
+				isReverse: true,
+			}),
 			DriverHours: self.obDriverBillingHours(),
 			DriverRate: self.obDriverBillingRate(),
 			DriverOTHours: self.obDriverBillingOTHours(),
