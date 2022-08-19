@@ -181,6 +181,10 @@
 			{
 				col = {};
 			}
+			if (col.UnitOfMeasureSupported)
+			{
+				value = tf.measurementUnitConverter.handleColumnUnitOfMeasure(value, col);
+			}
 			if (col.listItemConverter)
 			{
 				return col.listItemConverter(value);
