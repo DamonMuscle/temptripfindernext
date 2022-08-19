@@ -145,17 +145,28 @@
 
 	FieldEditorHelper.prototype._getNonUDFDefaultValue = function(data, recordEntity)
 	{
-		var self = this,
+		let self = this,
 			editFieldList = self.editFieldList,
-			fieldName = data.UDGridField ? data.UDGridField.Guid : (data.editType.entityKey || data.field),
+			fieldName = data.UDGridField ? data.UDGridField.Guid : (data.editType && data.editType.entityKey || data.field),
 			defaultValue = recordEntity[fieldName],
 			isModified = Object.keys(editFieldList).some(function(item)
 			{
 				return item === fieldName;
-			}),
-			lastValue = isModified && editFieldList[fieldName].value;
+			});
 
-		return isModified ? lastValue : defaultValue;
+		if (isModified)
+		{
+			return editFieldList[fieldName].value;
+		}
+
+		const matchedItem = tf.helpers.detailViewHelper.getUnitOfMeasureSupportedFields(self.dataType).find(x => x.field === data.field);
+
+		return !matchedItem ? defaultValue : tf.measurementUnitConverter.convert({
+			value: defaultValue,
+			originalUnit: matchedItem.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+			targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+			isReverse: !!matchedItem.UnitOfMeasureReverse,
+		});
 	};
 
 	FieldEditorHelper.prototype._getUDFDefaultValue = function(data, recordEntity)
@@ -1969,10 +1980,31 @@
 			}
 			else
 			{
-				entity[key] = self.getFieldRawValue(fieldItem);
+				let rawValue = self.getFieldRawValue(fieldItem);
+				entity[key] = self.handleUnitOfMeasurementValue(rawValue, fieldItem);
 			}
 		});
 	};
+	
+	FieldEditorHelper.prototype.handleUnitOfMeasurementValue = function(value, fieldItem)
+	{
+		const self = this,
+			unitOfMeasureSupportedFields = tf.helpers.detailViewHelper.getUnitOfMeasureSupportedFields(self.dataType),
+			matchedItem = unitOfMeasureSupportedFields.find(x => x.field === fieldItem.blockName);
+
+		if (matchedItem && tf.measurementUnitConverter.isNeedConversion(matchedItem.UnitInDatabase))
+		{
+			return tf.measurementUnitConverter.convert({
+				value: Number(value),
+				originalUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+				targetUnit: matchedItem.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+				isReverse: !!matchedItem.UnitOfMeasureReverse,
+				precision: 4
+			});
+		}
+
+		return value;
+	}
 
 	/**
 	 * Get raw value of data block

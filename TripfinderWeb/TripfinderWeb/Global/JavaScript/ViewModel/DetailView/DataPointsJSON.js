@@ -2982,14 +2982,20 @@ window.dataPointsJSON = {
 					"title": "Distance (Attendance)",
 					"type": "Geodistance",
 					"UnitOfMeasureSupported": true,
-					"defaultValue": () => `1.3 ${tf.measurementUnitConverter.getShortUnits()}`,
+					get defaultValue()
+					{
+						return `1.3 ${tf.measurementUnitConverter.getShortUnits()}`;
+					}
 				},
 				{
 					"field": "MifromResidSch",
 					"title": "Distance (Residence)",
 					"type": "Geodistance",
 					"UnitOfMeasureSupported": true,
-					"defaultValue": () => `1.3 ${tf.measurementUnitConverter.getShortUnits()}`,
+					get defaultValue()
+					{
+						return `1.3 ${tf.measurementUnitConverter.getShortUnits()}`;
+					}
 				},
 				{
 					"field": "ResidenceSchoolName",
