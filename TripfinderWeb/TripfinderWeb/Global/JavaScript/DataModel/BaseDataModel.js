@@ -4,7 +4,7 @@
 	namespace.BaseDataModel = BaseDataModel;
 
 
-	function BaseDataModel (entity)
+	function BaseDataModel(entity)
 	{
 		this._modified = ko.observableArray();
 		this._entityBackup = null;
@@ -60,6 +60,7 @@
 			toKey = mapping[index].to;
 			format = mapping[index].format;
 			notNull = mapping[index].notNull;
+			value = tf.measurementUnitConverter.convertToDisplay(value, mapping[index]);
 			if (!toKey)
 			{
 				toKey = fromKey.substring(0, 1).toLowerCase() + fromKey.substring(1, fromKey.length)
@@ -193,6 +194,7 @@
 					{
 						output[fromKey] = toMapping(this[toKey]());
 					}
+					output[fromKey] = tf.measurementUnitConverter.convertToSave(output[fromKey], mapping[index]);
 				}
 			}
 			else

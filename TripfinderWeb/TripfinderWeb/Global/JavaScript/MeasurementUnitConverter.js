@@ -88,6 +88,11 @@
 		return this.isImperial() ? "ft" : "m";
 	}
 
+	MeasurementUnitConverter.prototype.getOdometerUnits = function()
+	{
+		return this.isImperial() ? "Mileage" : "Odometer";
+	}
+
 	MeasurementUnitConverter.prototype.getRatio = function()
 	{
 		return this.isImperial() ? 5280 : 1000;
@@ -174,9 +179,65 @@
 		});
 	};
 
+	MeasurementUnitConverter.prototype.convertToDisplay = function(value, config)
+	{
+		if (config.mapping)
+		{
+			if (!ko.isObservable(value) && $.isPlainObject(value))
+			{
+				for (var i = 0; i < config.mapping.length; i++)
+				{
+					value[config.mapping[i].from] = this.convertToDisplay(value[config.mapping[i].from], config.mapping[i]);
+				}
+			}
+			else if (ko.isObservableArray(value) === true || ko.isObservable(value) === true )
+			{
+				this.convertToDisplay(value(), config);
+			}
+			else if ($.isArray(value))
+			{
+				value.forEach(item =>
+				{
+					this.convertToDisplay(item, config);
+				});
+			}
+		}
+		else if (config.UnitOfMeasureSupported && value !== null)
+		{
+			return this.convert({
+				value: value,
+				originalUnit: config.UnitInDatabase || this.MeasurementUnitEnum.Metric,
+				targetUnit: this.getCurrentUnitOfMeasure(),
+				isReverse: !!config.UnitOfMeasureReverse,
+			});
+		}
+		return value;
+	};
+
+	MeasurementUnitConverter.prototype.convertToSave = function(value, config)
+	{
+		if (config.UnitOfMeasureSupported && value !== null)
+		{
+			return this.convert({
+				value: Number(value),
+				originalUnit: this.getCurrentUnitOfMeasure(),
+				targetUnit: config.UnitInDatabase || this.MeasurementUnitEnum.Metric,
+				isReverse: !!config.UnitOfMeasureReverse,
+				precision: 4
+			});
+		}
+		return value;
+	};
+
 	MeasurementUnitConverter.prototype.handleColumnUnitOfMeasure = function(item, column)
 	{
-		const originValue = item[column.FieldName || column.field];
+		var originValue = item;
+		const fieldName = column.FieldName || column.field;
+		if (item.hasOwnProperty(fieldName))
+		{
+			originValue = item[fieldName];
+		}
+
 		if ([undefined, null].includes(originValue))
 		{
 			return "";
