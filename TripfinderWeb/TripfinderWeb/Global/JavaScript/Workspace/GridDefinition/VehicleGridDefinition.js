@@ -231,6 +231,7 @@
 				{
 					FieldName: "PurchaseMileage",
 					DisplayName: "Purchase Odometer",
+					UnitOfMeasureSupported: true,
 					Width: '150px',
 					type: "number",
 					hidden: true
@@ -259,6 +260,7 @@
 				{
 					FieldName: "SalvageMileage",
 					DisplayName: "Salvage Odometer",
+					UnitOfMeasureSupported: true,
 					Width: '150px',
 					type: "number",
 					hidden: true

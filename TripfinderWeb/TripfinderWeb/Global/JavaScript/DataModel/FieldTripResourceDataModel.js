@@ -40,7 +40,7 @@
 		{ from: "DriverRate", default: 0 },
 		{ from: "EndingOdometer", default: 0 },
 		{ from: "FieldTripResourceGroupId", default: 0 },
-		{ from: "MileageRate", default: 0 },
+		{ from: "MileageRate", default: 0, UnitOfMeasureSupported: true, UnitOfMeasureReverse: true },
 		{ from: "StartingOdometer", default: 0 },
 		{ from: "VehFixedCost", default: 0 },
 		{ from: "Vehicle", default: "" },

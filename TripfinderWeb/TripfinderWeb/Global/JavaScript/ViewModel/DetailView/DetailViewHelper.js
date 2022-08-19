@@ -1933,6 +1933,11 @@
 			.then(record => record && JSON.parse(record.Layout));
 	};
 
+	DetailViewHelper.prototype.getUnitOfMeasureSupportedFields = function(gridType)
+	{
+		return _.flatMap(dataPointsJSON[gridType]).filter((x) => x.UnitOfMeasureSupported);
+	};
+
 	DetailViewHelper.prototype.dispose = function()
 	{
 

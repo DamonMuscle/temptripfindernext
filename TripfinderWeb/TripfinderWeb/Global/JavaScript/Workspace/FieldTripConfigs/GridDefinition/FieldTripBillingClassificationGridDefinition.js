@@ -18,7 +18,9 @@
 			},
 			{
 				field: "MileageRate",
-				title: "Mileage Rate",
+				title: () => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+				"UnitOfMeasureSupported": true,
+				"UnitOfMeasureReverse": true,
 				defaultValue: null,
 				type: "number",
 				width: '120px',

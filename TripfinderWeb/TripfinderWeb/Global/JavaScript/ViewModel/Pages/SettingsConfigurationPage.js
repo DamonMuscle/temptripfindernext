@@ -27,6 +27,8 @@
 		self.spanishEditorChanged = false;
 		self.obPreEnglishMessage = ko.observable();
 		self.obPreSpanishMessage = ko.observable();
+		self.originalUnitOfMeasure = tf.measurementUnitConverter.getCurrentUnitOfMeasure();
+		self.obUnitOfMeasure = ko.observable();
 	}
 
 	SettingsConfigurationPage.prototype.constructor = SettingsConfigurationPage;
@@ -77,7 +79,15 @@
 				self.obEntityDataModel().apiIsDirty(false);
 				self.setValidation();
 				self.initEditor();
+				self.setMeasurement(data.Items[0]);
 			}.bind(this));
+	};
+
+	SettingsConfigurationPage.prototype.setMeasurement = function(config)
+	{
+		tf.measurementUnitConverter.updateCurrentUnitOfMeasure(config);
+		this.originalUnitOfMeasure = tf.measurementUnitConverter.getCurrentUnitOfMeasure();
+		this.obUnitOfMeasure(this.originalUnitOfMeasure);
 	};
 
 	SettingsConfigurationPage.prototype.initEditor = function()
@@ -373,12 +383,20 @@
 		if(data.SMTPPassword) {
 			submitData.push({ "op": "replace", "path": "/SMTPPassword", "value": data.SMTPPassword });
 		}
+
+		if (self.obUnitOfMeasure() !== self.originalUnitOfMeasure)
+		{
+			submitData.push({ "op": "replace", "path": "/UnitOfMeasure", "value": self.obUnitOfMeasure() });
+		}
+
 		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), {
 			data: submitData
 		}, { overlay: false }).then(function(data)
 		{
 			self.obEntityDataModel().apiIsDirty(false);
 			this.obEntityDataModel().sMTPPassword(this.displayPassword);
+			self.originalUnitOfMeasure = self.obUnitOfMeasure();
+			tf.measurementUnitConverter.updateCurrentUnitOfMeasure(self.originalUnitOfMeasure);
 			return true;
 		}.bind(this), function(data)
 		{
@@ -415,7 +433,7 @@
 		self.checkDataChanges();
 		var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 
-		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged)
+		if (self.obEntityDataModel().apiIsDirty() || self.changeTotalCost || self.changeMessageStatus || self.englishEditorChanged || self.spanishEditorChanged||self.obUnitOfMeasure() !== self.originalUnitOfMeasure)
 		{
 			tf.promiseBootbox.yesNo("You have unsaved changes.  Would you like to save your changes prior to canceling?", "Unsaved Changes")
 				.then(function(result)

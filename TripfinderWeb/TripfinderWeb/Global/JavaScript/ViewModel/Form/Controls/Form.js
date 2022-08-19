@@ -1082,6 +1082,7 @@
 	{
 		const fieldOptions = question.field.FieldOptions;
 		let value = data[question.field.editType.targetField];
+		value = this.convertValueByMeasurementUnit(value, question.field.editType.targetField);
 		if (fieldOptions.IsUDFSystemField)
 		{
 			const udf = this.udfs.filter(udf => udf.DisplayName === question.field.editType.targetField)[0];
@@ -1113,6 +1114,19 @@
 		}
 		return value;
 	}
+
+	Form.prototype.convertValueByMeasurementUnit = function(value, fieldName)
+	{
+		var item = {};
+		item[fieldName] = value;
+		var column = tf.helpers.kendoGridHelper.getGridColumnsFromDefinitionByType(this.dataType).filter(x => x.FieldName.toLowerCase() === fieldName.toLowerCase());
+		if (column && column.length === 1)
+		{
+			column = column[0];
+			return tf.measurementUnitConverter.handleColumnUnitOfMeasure(item, column);
+		}
+		return value;
+	};
 
 	Form.prototype.restoreAttachment = function (docs, docRelationships)
 	{

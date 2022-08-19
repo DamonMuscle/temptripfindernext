@@ -1,6 +1,9 @@
-var today = (new Date()).toDateString(),
-	dataPointsJSONVersion = '1.0.0',
-	dataPointsJSON = {
+(function()
+{
+var today = (new Date()).toDateString();
+
+window.dataPointsJSONVersion = '1.0.0';
+window.dataPointsJSON = {
 		"altsite": {
 			"Main": [
 				{
@@ -1102,7 +1105,8 @@ var today = (new Date()).toDateString(),
 				},
 				{
 					"field": "EstimatedMiles",
-					"title": "Estimated Miles",
+					"title": "Estimated Distance",
+					"UnitOfMeasureSupported": true,
 					"type": "Number",
 					"editType": {
 						"format": "Number",
@@ -1423,7 +1427,9 @@ var today = (new Date()).toDateString(),
 				},
 				{
 					"field": "MileageRate",
-					"title": "Rate/mi",
+					"title":() => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+					"UnitOfMeasureSupported": true,
+					"UnitOfMeasureReverse": true,
 					"type": "Number",
 					"format": "Money",
 					"defaultValue": "0.00",
@@ -2975,13 +2981,21 @@ var today = (new Date()).toDateString(),
 					"field": "Mifromschl",
 					"title": "Distance (Attendance)",
 					"type": "Geodistance",
-					"defaultValue": "1.3 mi"
+					"UnitOfMeasureSupported": true,
+					get defaultValue()
+					{
+						return `1.3 ${tf.measurementUnitConverter.getShortUnits()}`;
+					}
 				},
 				{
 					"field": "MifromResidSch",
 					"title": "Distance (Residence)",
 					"type": "Geodistance",
-					"defaultValue": "1.3 mi",
+					"UnitOfMeasureSupported": true,
+					get defaultValue()
+					{
+						return `1.3 ${tf.measurementUnitConverter.getShortUnits()}`;
+					}
 				},
 				{
 					"field": "ResidenceSchoolName",
@@ -3620,6 +3634,7 @@ var today = (new Date()).toDateString(),
 				{
 					"field": "Distance",
 					"title": "Distance",
+					"UnitOfMeasureSupported": true,
 					"type": "Number",
 					"format": "0.00",
 					"defaultValue": "7.98",
@@ -3638,13 +3653,13 @@ var today = (new Date()).toDateString(),
 					}
 				},
 				{
-					"field": "Dhdistance",
-					"title": "Dead Head",
+					"title": "Deadhead Distance",
+					"UnitOfMeasureSupported": true,
 					"type": "Number",
 					"format": "0.00",
 					"defaultValue": "1.3",
 					"editType": {
-						"format": "Integer"
+						"format": "Number"
 					}
 				}
 			],
@@ -4128,6 +4143,7 @@ var today = (new Date()).toDateString(),
 				{
 					"field": "PreviousDistance",
 					"title": "Distance",
+					"UnitOfMeasureSupported": true,
 					"type": "Number",
 					"format": "0.00",
 					"defaultValue": ".5"
@@ -4350,7 +4366,9 @@ var today = (new Date()).toDateString(),
 				},
 				{
 					"field": "Cost",
-					"title": "Rate/mi",
+					"title": () => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+					"UnitOfMeasureSupported": true,
+					"UnitOfMeasureReverse": true,
 					"type": "Number",
 					"format": "Money",
 					"defaultValue": ".30",
@@ -4516,6 +4534,7 @@ var today = (new Date()).toDateString(),
 				{
 					"field": "PurchaseMileage",
 					"title": "Purchase Odometer",
+					"UnitOfMeasureSupported": true,
 					"type": "Number",
 					"defaultValue": "100000",
 					"editType": {
@@ -4526,6 +4545,7 @@ var today = (new Date()).toDateString(),
 				{
 					"field": "SalvageMileage",
 					"title": "Salvage Odometer",
+					"UnitOfMeasureSupported": true,
 					"type": "Number",
 					"defaultValue": "200000",
 					"editType": {
@@ -4948,3 +4968,47 @@ function getGeoAddressInnerFields()
 		row: 2
 	}];
 };
+
+!function updateColumn()
+	{
+		for (let entityName in dataPointsJSON)
+		{
+			if (!dataPointsJSON.hasOwnProperty(entityName))
+			{
+				return;
+			}
+
+			const entry = dataPointsJSON[entityName]
+			for (let groupName in entry)
+			{
+				if (!entry.hasOwnProperty(groupName))
+				{
+					return;
+				}
+
+				for (let col of entry[groupName])
+				{
+					if ((entityName === "fieldtrip" && col.field === "MileageRate") || (entityName === "vehicle" && col.field === "Cost"))
+					{
+						delete col.title
+						Object.defineProperty(col, "title", {
+							get()
+							{
+								if (tf.measurementUnitConverter && tf.measurementUnitConverter.isImperial())
+								{
+									return "Rate/mi";
+								}
+								else
+								{
+									return "Rate/km";
+								}
+							},
+							enumerable: true,
+							configurable: true
+						})
+					}
+				}
+			}
+		}
+	}()
+})();

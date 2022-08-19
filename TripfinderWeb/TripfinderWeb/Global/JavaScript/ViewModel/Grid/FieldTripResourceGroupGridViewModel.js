@@ -76,7 +76,9 @@
 					},
 					{
 						FieldName: "MileageRate",
-						DisplayName: "Mileage Rate",
+						DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+						"UnitOfMeasureSupported": true,
+						"UnitOfMeasureReverse": true,
 						type: "number",
 						Precision: 2,
 						format: "{0:0.00}"

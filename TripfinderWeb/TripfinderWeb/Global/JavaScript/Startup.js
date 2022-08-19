@@ -305,10 +305,12 @@
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
-					return sessionValidator.activate();
+					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
+					return tf.measurementUnitConverter.init();
 				})
 				.then(function()
 				{
+					sessionValidator.activate();
 					tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
 					tf.dataTypeHelper = tf.DataTypeHelper;
 					return tf.DataTypeHelper.init();

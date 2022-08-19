@@ -5,7 +5,7 @@
 	function FieldTripViewResourceViewModel(source, obEntity)
 	{
 		this.obResoucesExpand = ko.observable(true);
-		this.obFieldTripResourceGroupData = source;
+		this.obFieldTripResourceGroupData = tf.measurementUnitConverter.convertToDisplay(source, new TF.DataModel.FieldTripResourceDataModel());
 		this.obEntityDataModel = obEntity;
 
 		$.extend(this, new TF.Helper.FieldTripResourcesHelper());

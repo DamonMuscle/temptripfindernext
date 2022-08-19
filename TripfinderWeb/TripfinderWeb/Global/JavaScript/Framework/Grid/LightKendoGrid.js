@@ -2668,7 +2668,7 @@
 				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithList;
 		});
 		this.currentDisplayColumns(columns);
-		return columns;
+		return tf.measurementUnitConverter.handleUnitOfMeasure(columns);
 	};
 
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)
@@ -3371,7 +3371,11 @@
 		{
 			self.searchOption = options;
 		}
-
+		
+		if (options.data && options.data.filterSet)
+		{
+			tf.measurementUnitConverter.processUnitsOfMeasureFilters(self.getKendoColumn(), options.data.filterSet);
+		}
 		self.onFilterChanged.notify(options);
 
 		return options;
@@ -4730,6 +4734,11 @@
 
 	LightKendoGrid.prototype._updateGridDefinitionDisplayNameFromTerm = function(column)
 	{
+		if(column.NotReplaceApplicationTermDefaultValue && column.NotReplaceApplicationTermDefaultValue)
+		{
+			return;
+		}
+
 		if (!column.DisplayName)
 		{
 			column.DisplayName = column.FieldName;

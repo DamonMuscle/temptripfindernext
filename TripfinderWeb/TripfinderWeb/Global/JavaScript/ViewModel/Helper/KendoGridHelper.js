@@ -1132,6 +1132,11 @@
 
 		function formatData(column, value)
 		{
+			if ($.isFunction(column.template))
+			{
+				return column.template(theRecord);
+			}
+
 			if (column.formatCopyValue)
 			{
 				return column.formatCopyValue(value);
