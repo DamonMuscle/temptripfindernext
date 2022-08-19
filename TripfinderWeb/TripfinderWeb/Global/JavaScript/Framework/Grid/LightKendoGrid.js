@@ -3371,7 +3371,11 @@
 		{
 			self.searchOption = options;
 		}
-
+		
+		if (options.data && options.data.filterSet)
+		{
+			tf.measurementUnitConverter.processUnitsOfMeasureFilters(self.getKendoColumn(), options.data.filterSet);
+		}
 		self.onFilterChanged.notify(options);
 
 		return options;

@@ -933,12 +933,16 @@
 	KendoGridFilterMenu.prototype.saveAndEditGridFilter = function(isNew, gridFilterDataModel, getCurrentHeaderFilters, getCurrentOmittedRecords, options)
 	{
 		options = options || {};
-		options.currentObFilters = this.obGridFilterDataModels.slice();
+		options.currentObFilters = this.obGridFilterDataModels.slice();	
+		
+		const currentHeaderFilters = this.findCurrentHeaderFilters(true);
+		tf.measurementUnitConverter.processUnitsOfMeasureFilters(this.getKendoColumn(), currentHeaderFilters);
+
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
 				this.options.gridType, isNew,
 				gridFilterDataModel ? gridFilterDataModel : null,
-				getCurrentHeaderFilters ? this.findCurrentHeaderFilters() : null,
+				getCurrentHeaderFilters ? currentHeaderFilters : null,
 				{
 					Columns: convertToOldGridDefinition(this.options.gridDefinition)
 				},
