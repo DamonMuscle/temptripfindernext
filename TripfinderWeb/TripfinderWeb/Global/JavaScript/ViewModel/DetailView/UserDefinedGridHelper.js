@@ -192,7 +192,7 @@
 		const forms = tf.authManager.authorizationInfo.authorizationTree.forms;
 		return rawForms.filter(function (item)
 		{
-			return item.Public || forms.indexOf(item.ID) > -1;
+			return item.Public || item.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId || forms.indexOf(item.ID) > -1;
 		});
 	}
 
@@ -1889,7 +1889,7 @@
 
 		udgrids = _.filter(udgrids, (item) =>
 		{
-			return TF.DetailView.UserDefinedGridHelper.isAssignedFormIdSync(item.ID) || item.Public;
+			return TF.DetailView.UserDefinedGridHelper.isAssignedFormIdSync(item.ID) || item.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId || item.Public;
 		});
 
 		if (options.gridDataReadFilter)
@@ -2440,50 +2440,46 @@
 
 	UserDefinedGridHelper.handleFilterFormData = function (udgrid)
 	{
-		//AT THIS POINT
+		//filter fields by section roles
+		var isAdmin = tf.authManager.authorizationInfo.isAdmin;
+		var isSurvey = tf.surveyGuid !== undefined;
+		var isCreatedBy = udgrid.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId;
+		var isPublic = udgrid.Public === true;
 
-		//check if udgrid is suvery or public
-		if (tf.surveyGuid !== undefined || udgrid.Public === true)
+		//check if udgrid is survey or public or isCreateBy
+		if (!udgrid || isSurvey || isPublic || isAdmin || isCreatedBy)
 		{
 			return udgrid;
 		}
 
-		//filter fields by section roles
-		var isAdmin = tf.authManager.authorizationInfo.isAdmin;;
 		var userEntityRoles = tf.userEntity.UserRoles.map(x => x.RoleID);
-
-		if (!isAdmin)
+		udgrid.UDGridSections = udgrid.UDGridSections.filter(function(section)
 		{
-			udgrid.UDGridSections = udgrid.UDGridSections.filter(function (section)
+			if (section.RoleSections.length === 0)
 			{
-				if (section.RoleSections.length === 0)
+				return true;
+			}
+			for (var singleRole of section.RoleSections)
+			{
+				if (userEntityRoles.indexOf(singleRole.RoleID) >= 0)
 				{
 					return true;
 				}
-				for (var singleRole of section.RoleSections)
-				{
-					if (userEntityRoles.indexOf(singleRole.RoleID) >= 0)
-					{
-						return true;
-					}
-				}
-				return false;
-			});
-
-			var sectionsAllowed = udgrid.UDGridSections.map(x => x.Id);
-
-			udgrid.UDGridFields = udgrid.UDGridFields.filter(function (field)
-			{
-				return field.UDGridSectionId ? sectionsAllowed.indexOf(field.UDGridSectionId) >= 0 : true;
-			});
-
-			//filter menu by Assigned Rights
-			var key = tf.dataTypeHelper.getKeyById(udgrid.DataTypeId);
-			if (!tf.authManager.isAuthorizedForDataType(key, 'read'))
-			{
-				udgrid.UDGridFields = [];
 			}
-		}
+			return false;
+		});
+
+		var sectionsAllowed = udgrid.UDGridSections.map(x => x.Id);
+
+		udgrid.UDGridFields = udgrid.UDGridFields.filter(function(field)
+		{
+			return field.UDGridSectionId ? sectionsAllowed.indexOf(field.UDGridSectionId) >= 0 : true;
+		});
+
+		//filter menu by Assigned Rights
+		var key = tf.dataTypeHelper.getKeyById(udgrid.DataTypeId);
+		tf.authManager.isAuthorizedForDataType(key, 'read') || (udgrid.UDGridFields = []);
+
 		return udgrid;
 	};
 
