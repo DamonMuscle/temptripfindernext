@@ -621,7 +621,7 @@
 				break;
 		}
 
-		return columns;
+		return tf.measurementUnitConverter.handleUnitOfMeasure(columns);
 	};
 
 	KendoGridHelper.renderDateRange = function (startDate, endDate)
