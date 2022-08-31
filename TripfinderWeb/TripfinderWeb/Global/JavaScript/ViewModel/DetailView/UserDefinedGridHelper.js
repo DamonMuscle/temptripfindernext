@@ -12,6 +12,8 @@
 
 	UserDefinedGridHelper.prototype.constructor = UserDefinedGridHelper;
 
+	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
+
 	UserDefinedGridHelper.getUpdatedInfoColumns = function ()
 	{
 		function utc2Local(value)
@@ -1521,6 +1523,8 @@
 			isUDFGroup: true,
 			isReadOnly: udGrid.isReadOnly
 		};
+		const restrictionMessageWarpper = {};
+		let errorMessage = TF.DetailView.UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE;
 		let getPublicTokenPromise = Promise.resolve();
 		if (options.udGrid.Public)
 		{
@@ -1544,10 +1548,14 @@
 				.then(() =>
 				{
 					tf.loadingIndicator.showImmediately();
-					return tf.udgHelper.queryValidUDGridById(udGrid.ID, filterOptions);
+					return tf.udgHelper.queryValidUDGridById(udGrid.ID, filterOptions, restrictionMessageWarpper);
 				})
 				.then(validUDGrid =>
 				{
+					if (restrictionMessageWarpper.message)
+					{
+						errorMessage = restrictionMessageWarpper.message;
+					}
 					tf.loadingIndicator.tryHide();
 					if (!validUDGrid)
 					{
@@ -1572,7 +1580,7 @@
 			.catch(function ()
 			{
 				tf.authManager.surveyToken = undefined;
-				tf.promiseBootbox.alert('This form cannot be submitted.', 'Not Available');
+				tf.promiseBootbox.alert(errorMessage, 'Not Available');
 			});
 	};
 
@@ -1813,7 +1821,7 @@
 		return tf.authManager.authorizationInfo.authorizationTree.forms.includes(formId);
 	}
 
-	UserDefinedGridHelper.prototype.queryValidUDGridById = function (id, options)
+	UserDefinedGridHelper.prototype.queryValidUDGridById = function (id, options, restrictionMessageWarpper)
 	{
 		options = $.extend({}, { ipRangeFilter: true, geofenseFilter: true }, options);
 		const self = this,
@@ -1844,10 +1852,14 @@
 				{
 					if (!ret || !ret.Items || !ret.Items.length)
 					{
+						if (restrictionMessageWarpper)
+						{
+							restrictionMessageWarpper.message = 'You do not have permissions for this form.';
+						}
 						return [];
 					}
 
-					return self.filterValidUDGrids(ret.Items, options)
+					return self.filterValidUDGrids(ret.Items, options, restrictionMessageWarpper)
 
 				}).then(validUDrids =>
 				{
@@ -1860,7 +1872,7 @@
 			});
 	}
 
-	UserDefinedGridHelper.prototype.filterValidUDGrids = function (udgrids, options)
+	UserDefinedGridHelper.prototype.filterValidUDGrids = function (udgrids, options, restrictionMessageWarpper)
 	{
 		const defaultFilterOptions = {
 			activeFilter: true,
@@ -1872,11 +1884,15 @@
 			sectionFilter: true,
 		}
 		options = $.extend({}, defaultFilterOptions, options);
+		const hasGotLocationValue = function()
+		{
+			return !options.coord.errorCode && (options.coord.longitude !== null);
+		};
 
 		const getIsLocationRequired = function(item)
 		{
 			let isLocationRequired = true;
-			if (item.GridOptions && typeof(item.GridOptions) === "string")
+			if (item.GridOptions && typeof (item.GridOptions) === "string")
 			{
 				const gridOptions = JSON.parse(item.GridOptions);
 				isLocationRequired = !!gridOptions.IsLocationRequired;
@@ -1885,18 +1901,20 @@
 		};
 
 		const currentDBID = tf.datasourceManager.databaseId || tf.surveyDBId;
+
+		const countOfFormsBeforeAccessRightCheck = udgrids.length;
 		udgrids = _.filter(udgrids, item => item.UDGridDataSources.some(ds => ds.DBID === currentDBID));
 
 		udgrids = _.filter(udgrids, (item) =>
 		{
-			return TF.DetailView.UserDefinedGridHelper.isAssignedFormIdSync(item.ID) || item.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId || item.Public;
+			return item.Public || item.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId || TF.DetailView.UserDefinedGridHelper.isAssignedFormIdSync(item.ID);
 		});
 
 		if (options.gridDataReadFilter)
 		{
 			udgrids = _.filter(udgrids, (item) =>
 			{
-				return tf.authManager.isAuthorizedForDataType(tf.dataTypeHelper.getKeyById(item.DataTypeId), "read") || item.Public;
+				return item.Public || tf.authManager.isAuthorizedForDataType(tf.dataTypeHelper.getKeyById(item.DataTypeId), "read");
 			});
 		}
 
@@ -1904,8 +1922,56 @@
 		{
 			udgrids = _.filter(udgrids, (item) =>
 			{
-				return tf.authManager.isAuthorizedForDataType(tf.dataTypeHelper.getKeyById(item.DataTypeId), "edit") || item.Public;
+				return item.Public || tf.authManager.isAuthorizedForDataType(tf.dataTypeHelper.getKeyById(item.DataTypeId), "edit");
 			});
+		}
+
+		// section filter
+		if (options.sectionFilter)
+		{
+			udgrids = udgrids.filter((udgrid) =>
+			{
+				udgrid = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(udgrid);
+				return udgrid.UDGridFields.length > 0;
+			});
+		}
+
+		const countOfFormsBeforeGeoLocationCheck = countOfFormsAfterAccessRightCheck = udgrids.length;
+
+		if ((countOfFormsAfterAccessRightCheck !== countOfFormsBeforeAccessRightCheck)
+			&& restrictionMessageWarpper && !restrictionMessageWarpper.message)
+		{
+			restrictionMessageWarpper.message = 'You do not have permissions for this form.';
+		}
+
+		// geolocation filter
+		if (options.coord)
+		{
+			udgrids = udgrids.filter(udgrid => !getIsLocationRequired(udgrid) || hasGotLocationValue());
+		}
+
+		const countOfFormsBeforeGeofenseCheck = countOfFormsAfterGeoLocationCheck = udgrids.length;
+		if ((countOfFormsBeforeGeoLocationCheck !== countOfFormsAfterGeoLocationCheck)
+			&& restrictionMessageWarpper && !restrictionMessageWarpper.message)
+		{
+			restrictionMessageWarpper.message = 'This form requires your location services to be turned on.';
+		}
+
+		// geofence filter
+		if (options.coord && options.geofenseFilter)
+		{
+			udgrids = udgrids.filter((udgrid) =>
+			{
+				return !getIsLocationRequired(udgrid) || this.checkUDGridsInGeofense(options.coord, udgrid.GeofenceBoundaries);
+			});
+		}
+
+		const countOfFormsBeforeDateRangeCheck = countOfFormsAfterGeofenseCheck = udgrids.length;
+
+		if ((countOfFormsBeforeGeofenseCheck !== countOfFormsAfterGeofenseCheck)
+			&& restrictionMessageWarpper && !restrictionMessageWarpper.message)
+		{
+			restrictionMessageWarpper.message = 'This form requires this device to be within a specific location to answer.';
 		}
 
 		if (options.activeFilter)
@@ -1924,6 +1990,13 @@
 			})
 		}
 
+		const countOfFormsBeforeIpRangeCheck = countOfFormsAfterDateRangeCheck = udgrids.length;
+		if ((countOfFormsBeforeDateRangeCheck !== countOfFormsAfterDateRangeCheck)
+			&& restrictionMessageWarpper && !restrictionMessageWarpper.message)
+		{
+			restrictionMessageWarpper.message = 'This form is not in the selected date range.';
+		}
+
 		if (options.ipRangeFilter)
 		{
 			udgrids = udgrids.filter((udgrid) =>
@@ -1932,20 +2005,11 @@
 			})
 		}
 
-		// geofence filter
-		if (options.coord && options.geofenseFilter)
+		const countOfFormsAfterIpRangeCheck = udgrids.length;
+		if ((countOfFormsBeforeIpRangeCheck !== countOfFormsAfterIpRangeCheck)
+			&& restrictionMessageWarpper && !restrictionMessageWarpper.message)
 		{
-			udgrids = udgrids.filter(udgrid => !getIsLocationRequired(udgrid) || this.checkUDGridsInGeofense(options.coord, udgrid.GeofenceBoundaries));
-		}
-
-		// section filter
-		if (options.sectionFilter)
-		{
-			udgrids = udgrids.filter((udgrid) =>
-			{
-				udgrid = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(udgrid);
-				return udgrid.UDGridFields.length > 0;
-			});
+			restrictionMessageWarpper.message = 'This form doesn’t fall into the designated IP Range.';
 		}
 
 		return udgrids;

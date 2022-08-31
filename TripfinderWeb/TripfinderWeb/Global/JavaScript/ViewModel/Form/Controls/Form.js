@@ -483,7 +483,7 @@
 				}
 				else if (rej === 'not_available')
 				{
-					tf.promiseBootbox.alert('This form cannot be submitted.', 'Not Available');
+					tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE, 'Not Available');
 				}
 			});
 
@@ -1426,7 +1426,7 @@
 
 	function _isSubmitAvailable(udgrids, options)
 	{
-		const msgText = 'This form cannot be submitted.';
+		const msgText = TF.DetailView.UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE;
 		const msgTitle = 'Not Available';
 
 		var availableFields = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(udgrids[0]).UDGridFields.map(x => x.UDGridFieldId);
