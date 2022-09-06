@@ -29,7 +29,10 @@
 			{ DisplayName: "Last Updated On", FieldName: "LastUpdatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local },
 			{ DisplayName: "IP Address", FieldName: "IPAddress", Width: '100px', type: "string" },
 			{ DisplayName: "Host", FieldName: "Host", Width: '100px', type: "string" },
-			{ DisplayName: "User Agent", FieldName: "UserAgent", Width: '150px', type: "string" }
+			{ DisplayName: "User Agent", FieldName: "UserAgent", Width: '150px', type: "string" },
+			{ DisplayName: "Email", FieldName: "Email", Width: '150px', type: "string" },
+			{ DisplayName: "Unique Url", FieldName: "UniqueUrl", Width: '150px', type: "string" }
+
 		];
 	};
 
