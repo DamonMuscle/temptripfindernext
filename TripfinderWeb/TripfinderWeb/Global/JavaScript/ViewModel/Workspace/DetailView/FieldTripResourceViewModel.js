@@ -64,6 +64,10 @@
 		var self = this;
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.options = options;
+		options.entity = $.extend({}, options.entity);
+		tf.measurementUnitConverter.convertToDisplay(options.entity, new TF.DataModel.FieldTripResourceDataModel());
+		options.BillingClassification = $.extend({}, options.BillingClassification);
+		tf.measurementUnitConverter.convertToDisplay(options.BillingClassification, new TF.DataModel.FieldTripBillingClassificationDataModel());
 		self.isSelectedVehicleChanged = false;
 		self.isSelectedDriverChanged = false;
 		self.isSelectedAideChanged = false;
@@ -200,12 +204,7 @@
 
 			return fixFloat(ending - start);
 		});
-		self.obMileageRate = ko.observable(isNew ? null : tf.measurementUnitConverter.convert({
-			originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
-			targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
-			value: entity.MileageRate,
-			isReverse: true,
-		}));
+		self.obMileageRate = ko.observable(isNew ? null : entity.MileageRate);
 		self.obVehicleFixedCost = ko.observable(isNew ? null : entity.VehFixedCost);
 		self.obVehicleTotal = ko.computed(function()
 		{
@@ -356,12 +355,7 @@
 			}
 			else
 			{
-				self.obMileageRate(tf.measurementUnitConverter.convert({
-					originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
-					targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
-					value: billingClassification.MileageRate,
-					isReverse: true,
-				}));
+				self.obMileageRate(billingClassification.MileageRate);
 				self.obVehicleFixedCost(billingClassification.VehFixedCost);
 			}
 		}
@@ -499,12 +493,7 @@
 			StartingOdometer: self.obOdometerStart(),
 			EndingOdometer: self.obOdometerEnding(),
 			VehFixedCost: self.obVehicleFixedCost(),
-			MileageRate: tf.measurementUnitConverter.convert({
-				originalUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
-				targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
-				value: self.obMileageRate(),
-				isReverse: true,
-			}),
+			MileageRate: self.obMileageRate(),
 			DriverHours: self.obDriverBillingHours(),
 			DriverRate: self.obDriverBillingRate(),
 			DriverOTHours: self.obDriverBillingOTHours(),
@@ -564,7 +553,7 @@
 	FieldTripResourceViewModel.prototype.save = function()
 	{
 		let self = this, fieldtripResourceEntity = self.getCurrentEntity();
-
+		tf.measurementUnitConverter.convertToSave(fieldtripResourceEntity, new TF.DataModel.FieldTripResourceDataModel());
 		if (self.options.newEntityDataSource)
 		{
 			var fieldtripResourceData = (new TF.DataModel.FieldTripResourceDataModel(fieldtripResourceEntity)).toData();

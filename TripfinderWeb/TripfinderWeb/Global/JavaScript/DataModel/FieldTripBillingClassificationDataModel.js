@@ -14,7 +14,7 @@
 	namespace.FieldTripBillingClassificationDataModel.prototype.mapping = [
 		{ from: "Id", default: 0 },
 		{ from: "Name", default: "" },
-		{ from: "MileageRate", default: null },
+		{ from: "MileageRate", default: null, UnitOfMeasureSupported: true, UnitOfMeasureReverse: true },
 		{ from: "FixedCost", default: null },
 		{ from: "AideFixedCost", default: null },
 		{ from: "DriverFixedCost", default: null },

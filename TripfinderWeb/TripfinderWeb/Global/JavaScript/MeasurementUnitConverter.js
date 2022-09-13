@@ -103,6 +103,14 @@
 		Metric: "Metric"
 	};
 
+	MeasurementUnitConverter.prototype.MeasurementUnitTypeEnum = {
+		MileToKilometer: 1.609344,
+		FootToMeter: 0.3048,
+		GallonToLiter: 3.7854118,
+		MpgToKml: 0.425143707,
+		PoundToKilogram: 0.45359237
+	};
+
 	MeasurementUnitConverter.prototype.isNeedConversion = function(originalUnit)
 	{
 		originalUnit = originalUnit || this.MeasurementUnitEnum.Metric;
@@ -123,7 +131,7 @@
 	MeasurementUnitConverter.prototype.convert = function(options)
 	{
 		const self = this;
-		let { value, originalUnit, targetUnit, precision = 2, isReverse = false } = options;
+		let { value, originalUnit, targetUnit, precision = 2, isReverse = false, unitType = self.MeasurementUnitTypeEnum.MileToKilometer } = options;
 		if (originalUnit === targetUnit)
 		{
 			return value;
@@ -139,12 +147,12 @@
 
 		function multiply(v, p)
 		{
-			return Number((v * self.milePerKilometer).toFixed(p));
+			return Number((v * unitType).toFixed(p));
 		}
 
 		function divide(v, p)
 		{
-			return Number((v / self.milePerKilometer).toFixed(p));
+			return Number((v / unitType).toFixed(p));
 		}
 	};
 
@@ -181,50 +189,59 @@
 
 	MeasurementUnitConverter.prototype.convertToDisplay = function(value, config)
 	{
+		var self = this;
+		return this.convertData(value, config, (v, convertConfig) =>
+		{
+			return {
+				value: v,
+				originalUnit: convertConfig.UnitInDatabase || self.MeasurementUnitEnum.Metric,
+				targetUnit: self.getCurrentUnitOfMeasure(),
+				isReverse: !!convertConfig.UnitOfMeasureReverse,
+			}
+		})
+	};
+
+	MeasurementUnitConverter.prototype.convertToSave = function(value, config)
+	{
+		var self = this;
+		return this.convertData(value, config, (v, convertConfig) =>
+		{
+			return {
+				value: Number(v),
+				originalUnit: self.getCurrentUnitOfMeasure(),
+				targetUnit: convertConfig.UnitInDatabase || self.MeasurementUnitEnum.Metric,
+				isReverse: !!convertConfig.UnitOfMeasureReverse,
+				precision: 4
+			}
+		})
+	};
+
+	MeasurementUnitConverter.prototype.convertData = function(value, config, getSetting)
+	{
 		if (config.mapping)
 		{
 			if (!ko.isObservable(value) && $.isPlainObject(value))
 			{
 				for (var i = 0; i < config.mapping.length; i++)
 				{
-					value[config.mapping[i].from] = this.convertToDisplay(value[config.mapping[i].from], config.mapping[i]);
+					value[config.mapping[i].from] = this.convertData(value[config.mapping[i].from], config.mapping[i], getSetting);
 				}
 			}
-			else if (ko.isObservableArray(value) === true || ko.isObservable(value) === true )
+			else if (ko.isObservableArray(value) === true || ko.isObservable(value) === true)
 			{
-				this.convertToDisplay(value(), config);
+				this.convertData(value(), config, getSetting);
 			}
 			else if ($.isArray(value))
 			{
 				value.forEach(item =>
 				{
-					this.convertToDisplay(item, config);
+					this.convertData(item, config, getSetting);
 				});
 			}
 		}
 		else if (config.UnitOfMeasureSupported && value !== null)
 		{
-			return this.convert({
-				value: value,
-				originalUnit: config.UnitInDatabase || this.MeasurementUnitEnum.Metric,
-				targetUnit: this.getCurrentUnitOfMeasure(),
-				isReverse: !!config.UnitOfMeasureReverse,
-			});
-		}
-		return value;
-	};
-
-	MeasurementUnitConverter.prototype.convertToSave = function(value, config)
-	{
-		if (config.UnitOfMeasureSupported && value !== null)
-		{
-			return this.convert({
-				value: Number(value),
-				originalUnit: this.getCurrentUnitOfMeasure(),
-				targetUnit: config.UnitInDatabase || this.MeasurementUnitEnum.Metric,
-				isReverse: !!config.UnitOfMeasureReverse,
-				precision: 4
-			});
+			return this.convert(getSetting(value, config));
 		}
 		return value;
 	};
@@ -369,7 +386,7 @@
 				isReverse: !!convertToImperialUnit,
 				value: parseFloat(g1)
 			});
-			const feetInMeter = 3.28084;
+			const feetInMeter = 1 / this.MeasurementUnitTypeEnum.FootToMeter;
 
 			let unit = "";
 			if (convertToImperialUnit)
@@ -414,13 +431,4 @@
 	{
 		subscriptions.forEach(s => s.dispose());
 	};
-
-	Object.defineProperty(MeasurementUnitConverter.prototype, "milePerKilometer", {
-		get()
-		{
-			return 1.609344;
-		},
-		enumerable: true,
-		configurable: true
-	});
 })();
