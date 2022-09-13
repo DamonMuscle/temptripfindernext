@@ -764,7 +764,8 @@
 				FieldName: "TotalCost",
 				Width: '150px',
 				DisplayName: "Total Cost",
-				type: "number"
+				type: "number",
+				format: "{0:0.00}"
 			}
 		];
 	}
@@ -960,6 +961,7 @@
 				Width: '150px',
 				type: "number",
 				Precision: 2,
+				UnitOfMeasureSupported: true,
 				format: "{0:0}"
 			},
 			{
@@ -968,6 +970,7 @@
 				Width: '150px',
 				type: "number",
 				Precision: 2,
+				UnitOfMeasureSupported: true,
 				format: "{0:0}"
 			},
 			{
