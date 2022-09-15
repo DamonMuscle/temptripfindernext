@@ -493,9 +493,12 @@
 	{
 		var self = this;
 		var filterUrl = "gridfilters";
+		let filter = TF.isMobileDevice ? `(eq(dbid, ${tf.datasourceManager.databaseId})|isnull(dbid,))&eq(datatypeId,${tf.dataTypeHelper.getId(self.options.gridType)})`
+			: `(eq(datatypeId,${tf.dataTypeHelper.getId(self.options.gridType)}))`;
+
 		var gridfiltersPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
 			paramData: {
-				"@filter": String.format("(eq(dbid, {0})|isnull(dbid,))&eq(datatypeId,{1})", tf.datasourceManager.databaseId, tf.dataTypeHelper.getId(self.options.gridType)),
+				"@filter": filter,
 				"@relationships": "OmittedRecord,Reminder"
 			}
 		}).then(apiResponse => apiResponse.Items);

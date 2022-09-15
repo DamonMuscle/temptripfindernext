@@ -909,6 +909,11 @@
 		}));
 	};
 
+	KendoGridHelper.prototype.isCurrentDBFilter = function(filterDBID)
+	{
+		return filterDBID == null || filterDBID === tf.datasourceManager.databaseId;
+	}
+
 	//#region open in
 
 	const SUPPORTED_OPENIN_PRODUCTS = {

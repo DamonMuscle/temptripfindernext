@@ -27,8 +27,18 @@
 			this.optionType = isNew;
 			this.title(this._getTitle(isNew, options));
 			this.contentTemplate('workspace/grid/savefilter');
-			this.buttonTemplate('modal/positivenegative');
-			this.obPositiveButtonLabel = ko.observable("Save");
+
+			if (isNew !== "view")
+			{
+				this.buttonTemplate('modal/positivenegative');
+				this.obPositiveButtonLabel = ko.observable("Save");
+			}
+			else
+			{
+				this.buttonTemplate('modal/positive');
+				this.obPositiveButtonLabel = ko.observable("Close");
+			}
+
 			this.modifyFilterViewModel = new TF.Grid.ModifyFilterViewModel(gridType, isNew, gridFilterDataModel, headerFilters, gridMetadata, omittedRecordIds, options, searchFilter);
 			this.data(this.modifyFilterViewModel);
 		}
@@ -48,10 +58,18 @@
 			else
 				title = options.title;
 		}
+		else if (isNew === "view")
+		{
+			title = 'View Filter';
+		}
 		else if (isNew === "edit")
+		{
 			title = 'Edit Filter';
+		}
 		else
+		{
 			title = 'Save Filter';
+		}
 
 		if (TF.isPhoneDevice)
 			title = title.toUpperCase();
@@ -61,6 +79,12 @@
 
 	ModifyFilterModalViewModel.prototype.positiveClick = function(viewModel, e)
 	{
+		if (this.optionType === 'view')
+		{
+			this.negativeClick();
+			return;
+		}
+		
 		this.modifyFilterViewModel.apply().then(function(result)
 		{
 			if (result)
