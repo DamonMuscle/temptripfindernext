@@ -358,10 +358,11 @@
 			if (tf.measurementUnitConverter.isNeedConversion(column.UnitInDatabase) && column.UnitOfMeasureSupported)
 			{
 				value = tf.measurementUnitConverter.convert({
+					value: value,
 					originalUnit: column.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 					targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
 					isReverse: !!column.UnitOfMeasureReverse,
-					value
+					unitType: column.UnitTypeOfMeasureSupported
 				});
 			}
 			return kendo.format("{0:n2}", value);

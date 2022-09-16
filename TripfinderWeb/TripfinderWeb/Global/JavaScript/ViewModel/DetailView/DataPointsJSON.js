@@ -1,9 +1,9 @@
 (function()
 {
-var today = (new Date()).toDateString();
+	var today = (new Date()).toDateString();
 
-window.dataPointsJSONVersion = '1.0.0';
-window.dataPointsJSON = {
+	window.dataPointsJSONVersion = '1.0.0';
+	window.dataPointsJSON = {
 		"altsite": {
 			"Main": [
 				{
@@ -1427,7 +1427,7 @@ window.dataPointsJSON = {
 				},
 				{
 					"field": "MileageRate",
-					"title":() => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+					"title": () => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 					"UnitOfMeasureSupported": true,
 					"UnitOfMeasureReverse": true,
 					"type": "Number",
@@ -4356,7 +4356,10 @@ window.dataPointsJSON = {
 				},
 				{
 					"field": "Mpg",
-					"title": "MPG",
+					get title()
+					{
+						return `${tf.measurementUnitConverter.isImperial() ? "MPG" : "KM/L"}`;
+					},
 					"type": "Number",
 					"defaultValue": "10",
 					"editType": {
@@ -4483,7 +4486,15 @@ window.dataPointsJSON = {
 				},
 				{
 					"field": "FuelCapacity",
-					"title": "Fuel Capacity(gal)",
+					get title()
+					{
+						return `Fuel Capacity(${tf.measurementUnitConverter.isImperial() ? "gal" : "l"})`;
+					},
+					"UnitOfMeasureSupported": true,
+					get UnitTypeOfMeasureSupported()
+					{
+						return tf.measurementUnitConverter.MeasurementUnitTypeEnum.GallonToLiter;
+					},
 					"type": "Number",
 					"defaultValue": "22",
 					"editType": {
@@ -4867,109 +4878,109 @@ window.dataPointsJSON = {
 		}
 	};
 
-function getAvailableSites(studentId)
-{
-	var url = !studentId ? pathCombine(tf.api.apiPrefix(), "alternatesites?includePublicSite=true&@fields=Id,Name")
-		: pathCombine(tf.api.apiPrefix(), String.format("alternatesites?studentids={0}&includePublicSite=true&@fields=Id,Name", studentId));
-	return tf.promiseAjax.get(url).then(function(result)
+	function getAvailableSites(studentId)
 	{
-		var sites = result.Items.map(function(item)
+		var url = !studentId ? pathCombine(tf.api.apiPrefix(), "alternatesites?includePublicSite=true&@fields=Id,Name")
+			: pathCombine(tf.api.apiPrefix(), String.format("alternatesites?studentids={0}&includePublicSite=true&@fields=Id,Name", studentId));
+		return tf.promiseAjax.get(url).then(function(result)
 		{
-			return {
-				'text': item["Name"],
-				'value': item["Id"]
-			};
-		});
-		var privateSites = sites.filter(function(s)
-		{
-			return s.value <= 0;
-		}),
-			publicSites = sites.filter(function(s)
+			var sites = result.Items.map(function(item)
 			{
-				return s.value > 0;
+				return {
+					'text': item["Name"],
+					'value': item["Id"]
+				};
 			});
+			var privateSites = sites.filter(function(s)
+			{
+				return s.value <= 0;
+			}),
+				publicSites = sites.filter(function(s)
+				{
+					return s.value > 0;
+				});
 
-		privateSites.unshift({ text: "Private Sites", isTitle: true });
-		if (publicSites.length > 0)
-		{
-			publicSites.unshift({ text: "Public Sites", isTitle: true });
-		}
+			privateSites.unshift({ text: "Private Sites", isTitle: true });
+			if (publicSites.length > 0)
+			{
+				publicSites.unshift({ text: "Public Sites", isTitle: true });
+			}
 
-		return [{ text: "(None)", value: -1 }].concat(privateSites.concat(publicSites));
-	});
-}
-
-function fetchGeoCities()
-{
-	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
-		.then(function(result)
-		{
-			return result.Items.map(function(item) { return { text: item.Name, value: item.Name }; })
+			return [{ text: "(None)", value: -1 }].concat(privateSites.concat(publicSites));
 		});
-};
+	}
 
-function fetchGeoZipCodes()
-{
-	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "arcgis", "postalcodes?@fields=Name"))
-		.then(function(result)
-		{
-			return result.Items.map(function(item) { return { "text": item.Name, "value": item.Name }; })
-		});
-};
+	function fetchGeoCities()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
+			.then(function(result)
+			{
+				return result.Items.map(function(item) { return { text: item.Name, value: item.Name }; })
+			});
+	};
 
-function fetchMailingZipCodes()
-{
-	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingpostalcodes?@fields=Id,Postal"))
-		.then(function(result)
-		{
-			return result.Items.map(function(item) { return { text: item.Postal, value: item.Id }; })
-		});
-};
+	function fetchGeoZipCodes()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "arcgis", "postalcodes?@fields=Name"))
+			.then(function(result)
+			{
+				return result.Items.map(function(item) { return { "text": item.Name, "value": item.Name }; })
+			});
+	};
 
-// different from fetch geo cities in value property.
-function fetchMailingCities()
-{
-	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
-		.then(function(result)
-		{
-			return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; })
-		});
-};
+	function fetchMailingZipCodes()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingpostalcodes?@fields=Id,Postal"))
+			.then(function(result)
+			{
+				return result.Items.map(function(item) { return { text: item.Postal, value: item.Id }; })
+			});
+	};
 
-function fetchDefaultGenders()
-{
-	return Promise.resolve([
-		{ text: "Female", value: "F" },
-		{ text: "Male", value: "M" },
-	]);
-}
+	// different from fetch geo cities in value property.
+	function fetchMailingCities()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
+			.then(function(result)
+			{
+				return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; })
+			});
+	};
 
-function getGeoAddressInnerFields()
-{
-	return [{
-		title: "GEOCODE ST",
-		field: "GeoStreet",
-		class: "left-align one-half",
-		row: 1
-	}, {
-		title: "GEOCODE POSTAL CODE",
-		field: "GeoZip",
-		class: "right-align one-half",
-		row: 1,
-	}, {
-		title: "GEOCODE CITY/TOWN",
-		field: "GeoCity",
-		class: "left-align one-half",
-		row: 2,
-	}, {
-		title: "GEOCONFIDENCE",
-		field: "GeoConfidence",
-		class: "right-align one-half",
-		row: 2
-	}];
-};
+	function fetchDefaultGenders()
+	{
+		return Promise.resolve([
+			{ text: "Female", value: "F" },
+			{ text: "Male", value: "M" },
+		]);
+	}
 
-!function updateColumn()
+	function getGeoAddressInnerFields()
+	{
+		return [{
+			title: "GEOCODE ST",
+			field: "GeoStreet",
+			class: "left-align one-half",
+			row: 1
+		}, {
+			title: "GEOCODE POSTAL CODE",
+			field: "GeoZip",
+			class: "right-align one-half",
+			row: 1,
+		}, {
+			title: "GEOCODE CITY/TOWN",
+			field: "GeoCity",
+			class: "left-align one-half",
+			row: 2,
+		}, {
+			title: "GEOCONFIDENCE",
+			field: "GeoConfidence",
+			class: "right-align one-half",
+			row: 2
+		}];
+	};
+
+	!function updateColumn()
 	{
 		for (let entityName in dataPointsJSON)
 		{

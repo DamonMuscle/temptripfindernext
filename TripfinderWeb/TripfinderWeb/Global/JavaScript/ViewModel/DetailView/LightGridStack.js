@@ -83,7 +83,7 @@
 	LightGridStack.prototype.initEvents = function()
 	{
 		var self = this;
-		
+
 		function updateBlocks(data)
 		{
 			let highlightBlocks = self.detailView.dataPointPanel.highlightBlocks();
@@ -108,7 +108,7 @@
 						} else if (item.uniqueClassName === block.uniqueClassName || (item.field === 'Map' && item.uniqueClassName.includes(block.uniqueClassName)))
 						{
 							block.ownedBy = item.ownedBy;
-						} 
+						}
 					}
 				})
 			});
@@ -150,9 +150,10 @@
 		self.$wrapper.on("removed", function(e)
 		{
 			var $removingBlock = $(".data-point.dragging-helper.removing .dragging-helper-wrapper").find(">.grid-stack-item");
-			if ($removingBlock.length == 0){
+			if ($removingBlock.length == 0)
+			{
 				return;
-			} 
+			}
 
 			var className = self.detailViewHelper.getDomUniqueClassName($removingBlock);
 			self.dataBlocks = self.dataBlocks.filter(function(block)
@@ -591,7 +592,7 @@
 			{
 				return editFieldList[item.field].value;
 			}
-			
+
 			if (self.detailView.newCopyContext &&
 				self.detailView.newCopyContext.autoAssignedFields.map(f => typeof f === "string" ? f : f.field).some(f => f === item.field))
 			{
@@ -614,6 +615,7 @@
 						originalUnit: matchedUnitOfMeasureSupportedField.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 						targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
 						isReverse: !!matchedUnitOfMeasureSupportedField.UnitOfMeasureReverse,
+						unitType: matchedUnitOfMeasureSupportedField.UnitTypeOfMeasureSupported
 					});
 				}
 				else
@@ -1013,13 +1015,13 @@
 					let field = item.field || (item.options && item.options.field);
 					if (isSectionHeader)
 					{
-						blocks = blocks.filter(e => !(e.ownedBy === item.uniqueClassName  
+						blocks = blocks.filter(e => !(e.ownedBy === item.uniqueClassName
 							|| (e.field === 'Map' && item.uniqueClassName.includes(e.ownedBy))));
 					} else
 					{
 						let i = blocks.findIndex(e => e.uniqueClassName === item.uniqueClassName
 							|| e.ownedBy === item.uniqueClassName
-							|| (e.field === 'Map'  && item.uniqueClassName.includes(e.ownedBy))
+							|| (e.field === 'Map' && item.uniqueClassName.includes(e.ownedBy))
 							|| (e.field === 'Map' && item.uniqueClassName.includes(e.uniqueClassName)));
 						if (i > -1)
 						{
