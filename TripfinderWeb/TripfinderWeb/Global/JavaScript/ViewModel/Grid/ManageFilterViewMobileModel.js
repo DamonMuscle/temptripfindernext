@@ -120,7 +120,7 @@
 		var filterId = filter.id(),
 			gridType = filter.gridType();
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "gridlayout/filter", filterId))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?filterId=" + filterId))
 			.then(function(apiResponse)
 			{
 				var displayMessage = apiResponse.length ? 'This Filter is associated with one or more Layouts. Deleting it will remove it from those Layouts. Are you sure you want to delete?' : 'Are you sure you want to delete this Filter?';
@@ -153,7 +153,7 @@
 									if (currentStickFilterId === filterId)
 										tf.storageManager.save(_storageFilterDataKey, '');
 
-									if (response.Items[0])
+									if (response > 0)
 									{
 										this.obGridFilterDataModels.remove(filter);
 									}

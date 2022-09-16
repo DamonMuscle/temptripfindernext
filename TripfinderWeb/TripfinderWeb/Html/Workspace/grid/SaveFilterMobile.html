@@ -16,7 +16,17 @@
 					<input type="text" class="form-control text-right" data-bind="value: gridFilterDataModel.name" name="filterName" required />
 				</div>
 			</div>
-			
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option form-group' data-bind="css:{disabled:obGlobalFilterDisabled}">
+					<label class="bold">Make available in all data sources</label>
+					<label class="switch">
+						<input type="checkbox" data-bind="checked: obIsGlobalFilterChecked,disable:obGlobalFilterDisabled">
+						<div class="slider round">
+							<div class="slider-block"></div>
+						</div>
+					</label>
+				</div>
+			</div>
 			<div class="mobile-modal-group-head"></div>
 			<div class="mobile-modal-grid-select-option-wrap">
 				<div class='mobile-modal-grid-select-option form-group'>

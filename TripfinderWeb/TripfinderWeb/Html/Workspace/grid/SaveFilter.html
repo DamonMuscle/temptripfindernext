@@ -1,9 +1,11 @@
 <form data-bind="uiInit:initialize">
+	<!--ko if:!obIsViewModel() -->
 	<div class="row" data-bind="visible:$parent.description">
 		<div class="col-xs-24 description">
 			<pre class="titleNotify" data-bind="text:$parent.description"></pre>
 		</div>
 	</div>
+	<!-- /ko -->
 	<div class="document-dataentry">
 		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
 		<!-- /ko -->
@@ -13,10 +15,20 @@
 			<div class="form-group" style="height:56px">
 				<label class="requirestar bold-Label">Name</label>
 				<input type="text" name="filterName" data-bv-error-name="Filter Name" maxlength="80" class="form-control"
-					data-bind="value:gridFilterDataModel.name,valueUpdate:'keyup'" />
+					data-bind="attr:{readonly:obIsViewModel()},value:gridFilterDataModel.name,valueUpdate:'keyup'" />
 			</div>
 		</div>
+		<!--ko if:!obIsViewModel() -->
+		<div class="col-xs-10" style="padding-top:20px">
+			<div class="form-group applycheckbox-form-group">
+				<div class="checkbox">
+					<label><input type="checkbox" data-bind="checked: obIsGlobalFilterChecked,disable:obGlobalFilterDisabled">Make available in all data sources</label>
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
 	</div>
+	<!--ko if:!obIsViewModel() -->
 	<div class="row">
 		<div class="col-xs-10">
 			<div class="form-group">
@@ -105,15 +117,17 @@
 			</div>
 		</div>
 	</div>
+	<!-- /ko -->
 	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group" style="height:112px">
 				<label style="display:none">Filter Statement</label>
 				<textarea class="form-control verticalResize" rows="5" name="sqlStatement"
-					data-bind="value:gridFilterDataModel.whereClause,valueUpdate:'keyup',domReference:textAreaElement"></textarea>
+					data-bind="attr:{readonly:obIsViewModel()},value:gridFilterDataModel.whereClause,valueUpdate:'keyup',domReference:textAreaElement"></textarea>
 			</div>
 		</div>
 	</div>
+	<!--ko if:!obIsViewModel() -->
 	<div class="row">
 		<div class="col-xs-4">
 			<div class="form-group verifybutton-form-group">
@@ -134,7 +148,8 @@
 			</div>
 		</div>
 	</div>
-	<!--ko if:obOmitRecords().length > 0-->
+	<!-- /ko -->
+	<!--ko if:obOmitRecords().length > 0 && !obIsViewModel() -->
 	<div class="row">
 		<div class="col-xs-20" style="margin-bottom:30px;width: 100%;">
 			<div>

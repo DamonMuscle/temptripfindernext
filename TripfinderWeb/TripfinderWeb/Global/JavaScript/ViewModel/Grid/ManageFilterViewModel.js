@@ -36,7 +36,20 @@
 				type: "image",
 				template: '<div title="#: tf.ManageFilterViewModel.getIconTitle_IsValid(IsValid,Id)#" class="#: tf.ManageFilterViewModel.getIconUrl_IsValid(IsValid,Id)#"></div>'
 			},
-			{ field: "Name", title: "Filter Name" },
+			{ field: "Name", title: "Filter Name", encoded: true },
+			{
+				field: "DBID",
+				title: "Available in all data sources",
+				template: (item) =>
+				{
+					const checked = item.DBID == null ? "checked" : "";
+					return `<input type="checkbox" disabled ${checked} />`
+				},
+				attributes:
+				{
+					"class": "text-center"
+				}
+			},
 			{
 				command: [
 					{
@@ -51,6 +64,20 @@
 								return;
 							}
 							self.fnSaveAndEditGridFilter("edit", currentModel, null, false);
+						}
+					},
+					{
+						name: "view",
+						template: '<a class="k-button k-button-icontext k-grid-view" title="View"></a>',
+						click: function(e)
+						{
+							e.preventDefault();
+							var currentModel = self.getGridFilterDataModel(e);
+							if (currentModel.id() < 0 || currentModel.isSystem())
+							{
+								return;
+							}
+							self.fnSaveAndEditGridFilter("view", currentModel, null, false);
 						}
 					}, {
 						name: "copyandnew",
@@ -72,6 +99,11 @@
 						{
 							e.preventDefault();
 							var currentModel = self.getGridFilterDataModel(e);
+							const isCurrentDBFilter = tf.helpers.kendoGridHelper.isCurrentDBFilter(currentModel.dBID());
+							if (!isCurrentDBFilter)
+							{
+								return;
+							}
 							if (currentModel.id() < 0)
 							{
 								return;
@@ -88,7 +120,7 @@
 
 		if (!this.reminderHide)
 		{
-			columns.splice(2, 0, { field: "ReminderName", title: "Reminder" });
+			columns.splice(3, 0, { field: "ReminderName", title: "Reminder" });
 		}
 		this.element.find(".managefiltergrid-container").kendoGrid({
 			dataSource: {
@@ -97,7 +129,24 @@
 			height: 300,
 			scrollable: true,
 			selectable: true,
-			columns: columns
+			columns: columns,
+			dataBound: (d) =>
+			{
+				const $gridContainer = this.element.find(".managefiltergrid-container");
+				var $footer = $gridContainer.find(".k-grid-footer");
+				if ($footer.length === 0)
+				{
+					$gridContainer.append("<div class='k-grid-footer'>0 Record</div>");
+					$footer = $gridContainer.find(".k-grid-footer");
+				}
+
+				const lineHeight = 22;
+				$gridContainer.height($gridContainer.height() + lineHeight);
+
+				const count = d.sender.dataSource._data.length;
+				const footerLabel = `${count} record${(count === 0 || count > 1) ? "s" : ""}`;
+				$footer.text(footerLabel);
+			}
 		});
 		this.element.find(".managefiltergrid-container tr").each(function(n, item)
 		{
@@ -115,11 +164,25 @@
 				$(item).find(".k-grid-edit,.k-grid-copyandnew,.k-grid-delete").addClass("disable");
 			}
 
+			const isCurrentDBFilter = tf.helpers.kendoGridHelper.isCurrentDBFilter(data.DBID);
+			if (isCurrentDBFilter)
+			{
+				$(item).find(".k-grid-view").hide();
+			}
+			else
+			{
+				$(item).find(".k-grid-delete").addClass("disable");
+				$(item).find(".k-grid-edit").hide();
+			}
 		}.bind(this));
 		//double click
 		this.element.find(".managefiltergrid-container .k-grid-content tr").dblclick(function(e)
 		{
 			var gridFilterDataModel = this.getGridFilterDataModel(e);
+			if (!tf.helpers.kendoGridHelper.isCurrentDBFilter(gridFilterDataModel.dBID()))
+			{
+				return;
+			}
 			this.positiveClose();
 			this.fnApplyGridFilter(gridFilterDataModel);
 		}.bind(this));

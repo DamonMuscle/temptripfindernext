@@ -59,6 +59,20 @@
 			this.booleanSelectedData = value;
 		});
 
+		const filterDBID = this.gridFilterDataModel.dBID();
+		const isFilterContainsDataBaseSpecificFields = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
+
+		const isGlobalFilter = this.isNew ? ((!omittedRecordIds || !omittedRecordIds.length) && !isFilterContainsDataBaseSpecificFields) : !filterDBID;
+		this.obIsGlobalFilterChecked = ko.observable(isGlobalFilter);
+		this.obGlobalFilterDisabled = ko.computed(() =>
+		{
+			return !!this.obOmitRecords().length ||
+				TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
+		});
+
+		this.isViewModel = isNew === "view";
+		this.obIsViewModel = ko.observable(this.isViewModel);
+
 		this.obValueFieldValue.subscribe(function(newFiledValue)
 		{
 			let isDateTimeControlOpened = function()
@@ -452,7 +466,8 @@
 				setReminder(this.gridFilterDataModel);
 				this.gridFilterDataModel.omittedRecords(this.obOmitRecords());
 				var data = this.gridFilterDataModel.toData();
-				data.DBID = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause()) ? tf.datasourceManager.databaseId : null;
+				const saveWithDBID = !this.obIsGlobalFilterChecked() || TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
+			data.DBID = saveWithDBID ? tf.datasourceManager.databaseId : null;
 			data.isValid = true;
 			return tf.promiseAjax[this.isNew ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 					{
@@ -668,7 +683,8 @@
 									.then(function(apiResponse)
 									{
 										var existFilter = apiResponse.Items[0];
-										if (!existFilter || (!self.isNew && existFilter.Name === data.Name && existFilter.Id == data.Id))
+										const checkIsNew = typeof (self.isNew) == 'string' ? self.isNew === "new" : self.isNew;
+										if (!existFilter || (!checkIsNew && existFilter.Name === data.Name && existFilter.Id == data.Id))
 										{
 											return true;
 										}
