@@ -316,21 +316,13 @@
 	{
 		const self = this,
 			filters = filterSet.FilterItems,
-			equalItems = (filters || []).filter(function(f)
-			{
-				const matchedField = self.getUnitOfMeasureSupportedField(allColumns, f.FieldName);
-				return matchedField
-					&& self.isNeedConversion(matchedField.UnitInDatabase)
-					&& f.Operator === "EqualTo"
-			}),
-			notEqualItems = (filters || []).filter(function(f)
-			{
-				const matchedField = self.getUnitOfMeasureSupportedField(allColumns, f.FieldName);
-				return matchedField
-					&& self.isNeedConversion(matchedField.UnitInDatabase)
-					&& f.Operator === "NotEqualTo"
-			}),
-			remainingItems = (filters || []).filter(f => !equalItems.concat(notEqualItems).includes(f));
+			equalItems = self.getFilterItemByType(allColumns, filterSet, "EqualTo"),
+			notEqualItems = self.getFilterItemByType(allColumns, filterSet, "NotEqualTo"),
+			lessThanOrEqualToItems = self.getFilterItemByType(allColumns, filterSet, "LessThanOrEqualTo"),
+			lessThanItems = self.getFilterItemByType(allColumns, filterSet, "LessThan"),
+			greaterThanOrEqualToItems = self.getFilterItemByType(allColumns, filterSet, "GreaterThanOrEqualTo"),
+			greaterThanItems = self.getFilterItemByType(allColumns, filterSet, "GreaterThan"),
+			remainingItems = (filters || []).filter(f => ![...equalItems, ...notEqualItems, ...lessThanOrEqualToItems, ...lessThanItems, ...greaterThanOrEqualToItems, ...greaterThanItems].includes(f));
 
 		filterSet.FilterItems = remainingItems.concat(equalItems.reduce(function(result, currentItem)
 		{
@@ -340,8 +332,28 @@
 			}
 
 			return result.concat([
-				{ ...currentItem, Operator: "GreaterThanOrEqualTo", Value: currentItem.Value - 10 ** (- currentItem.Precision) / 2 },
-				{ ...currentItem, Operator: "LessThan", Value: currentItem.Value + 10 ** (- currentItem.Precision) / 2 }
+				{ ...currentItem, Operator: "GreaterThanOrEqualTo", alreadyHandled: true, Value: currentItem.Value - 10 ** (- currentItem.Precision) / 2 },
+				{ ...currentItem, Operator: "LessThan", alreadyHandled: true, Value: currentItem.Value + 10 ** (- currentItem.Precision) / 2 }
+			]);
+		}, [])).concat(lessThanOrEqualToItems.reduce(function(result, currentItem)
+		{
+			return result.concat([
+				{ ...currentItem, Operator: "LessThanOrEqualTo", alreadyHandled: true, Value: currentItem.Value + 10 ** (- currentItem.Precision) / 2 }
+			]);
+		}, [])).concat(lessThanItems.reduce(function(result, currentItem)
+		{
+			return result.concat([
+				{ ...currentItem, Operator: "LessThan", alreadyHandled: true, Value: currentItem.Value - 10 ** (- currentItem.Precision) / 2 }
+			]);
+		}, [])).concat(greaterThanOrEqualToItems.reduce(function(result, currentItem)
+		{
+			return result.concat([
+				{ ...currentItem, Operator: "GreaterThanOrEqualTo", alreadyHandled: true, Value: currentItem.Value - 10 ** (- currentItem.Precision) / 2 }
+			]);
+		}, [])).concat(greaterThanItems.reduce(function(result, currentItem)
+		{
+			return result.concat([
+				{ ...currentItem, Operator: "GreaterThan", alreadyHandled: true, Value: currentItem.Value + 10 ** (- currentItem.Precision) / 2 }
 			]);
 		}, []));
 
@@ -351,8 +363,8 @@
 				FilterItems: notEqualItems.reduce(function(result, currentItem)
 				{
 					return result.concat([
-						{ ...currentItem, Operator: "LessThan", Value: currentItem.Value - 10 ** (-currentItem.Precision) / 2 },
-						{ ...currentItem, Operator: "GreaterThan", Value: currentItem.Value + 10 ** (-currentItem.Precision) / 2 }
+						{ ...currentItem, Operator: "LessThan", alreadyHandled: true, Value: currentItem.Value - 10 ** (-currentItem.Precision) / 2 },
+						{ ...currentItem, Operator: "GreaterThan", alreadyHandled: true, Value: currentItem.Value + 10 ** (-currentItem.Precision) / 2 }
 					]);
 				}, []),
 				FilterSets: [],
@@ -364,6 +376,20 @@
 	MeasurementUnitConverter.prototype.getUnitOfMeasureSupportedField = function(allColumns, fieldName)
 	{
 		return (allColumns || []).find(x => x.UnitOfMeasureSupported && x.FieldName === fieldName);
+	};
+
+	MeasurementUnitConverter.prototype.getFilterItemByType = function(allColumns, filterSet, type)
+	{
+		const self = this;
+
+		return (filterSet && filterSet.FilterItems || []).filter(function(f)
+		{
+			const matchedField = self.getUnitOfMeasureSupportedField(allColumns, f.FieldName);
+			return matchedField
+				&& self.isNeedConversion(matchedField.UnitInDatabase)
+				&& f.Operator === type
+				&& !f.alreadyHandled
+		});
 	};
 
 	MeasurementUnitConverter.prototype.unifyDirectionMeasurementUnit = function(rawDirectionString, convertToImperialUnit)
