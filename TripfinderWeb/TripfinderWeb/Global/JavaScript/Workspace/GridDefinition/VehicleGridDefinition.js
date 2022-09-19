@@ -134,6 +134,8 @@
 				{
 					FieldName: "FuelCapacity",
 					DisplayName: "Fuel Capacity",
+					UnitOfMeasureSupported: true,
+					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.GallonToLiter,
 					Width: '150px',
 					type: "number",
 					hidden: true
@@ -156,6 +158,8 @@
 					FieldName: "Height",
 					Width: '150px',
 					type: "number",
+					UnitOfMeasureSupported: true,
+					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.FootToMeter,
 					hidden: true
 				},
 				{
@@ -197,19 +201,25 @@
 				{
 					FieldName: "Length",
 					Width: '150px',
+					UnitOfMeasureSupported: true,
+					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.FootToMeter,
 					type: "number",
 					hidden: true
 				},
 				{
 					FieldName: "MaxWeight",
 					DisplayName: "Max Weight",
+					UnitOfMeasureSupported: true,
+					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.PoundToKilogram,
 					Width: '150px',
 					type: "number",
 					hidden: true
 				},
 				{
 					FieldName: "Mpg",
-					DisplayName: tf.localization.Vehicle,
+					DisplayName: `${tf.measurementUnitConverter.isImperial() ? "MPG" : "KM/L"}`,
+					UnitOfMeasureSupported: true,
+					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.MpgToKml,
 					Width: '150px',
 					type: "number",
 					hidden: true
@@ -296,6 +306,8 @@
 				{
 					FieldName: "Width",
 					Width: '150px',
+					UnitOfMeasureSupported: true,
+					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.FootToMeter,
 					type: "number",
 					hidden: true
 				},

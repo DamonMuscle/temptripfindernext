@@ -166,6 +166,7 @@
 			originalUnit: matchedItem.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 			targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
 			isReverse: !!matchedItem.UnitOfMeasureReverse,
+			unitType: matchedItem.UnitTypeOfMeasureSupported
 		});
 	};
 
@@ -1985,7 +1986,7 @@
 			}
 		});
 	};
-	
+
 	FieldEditorHelper.prototype.handleUnitOfMeasurementValue = function(value, fieldItem)
 	{
 		const self = this,
@@ -1999,7 +2000,8 @@
 				originalUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
 				targetUnit: matchedItem.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 				isReverse: !!matchedItem.UnitOfMeasureReverse,
-				precision: 4
+				precision: 4,
+				unitType: matchedItem.UnitTypeOfMeasureSupported
 			});
 		}
 

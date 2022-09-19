@@ -274,7 +274,8 @@
 			originalUnit: column.UnitInDatabase || this.MeasurementUnitEnum.Metric,
 			targetUnit: currentUnitOfMeasure(),
 			value: originValue,
-			isReverse: !!column.UnitOfMeasureReverse
+			isReverse: !!column.UnitOfMeasureReverse,
+			unitType: column.UnitTypeOfMeasureSupported
 		});
 
 		return Number(v) === v ? v.toFixed(2) : v;
@@ -299,6 +300,7 @@
 					originalUnit: currentUnitOfMeasure(),
 					targetUnit: matchedField.UnitInDatabase || self.MeasurementUnitEnum.Metric,// the unit of legacy GPS data is Imperial. 
 					isReverse: !!matchedField.UnitOfMeasureReverse,
+					unitType: matchedField.UnitTypeOfMeasureSupported,
 					precision: f.Precision
 				});
 			}
