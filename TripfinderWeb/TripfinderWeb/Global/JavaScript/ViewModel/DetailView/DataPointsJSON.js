@@ -4365,6 +4365,11 @@
 					"editType": {
 						"format": "Integer",
 						"maxLength": 8
+					},
+					UnitOfMeasureSupported: true,
+					get UnitTypeOfMeasureSupported()
+					{
+						return tf.measurementUnitConverter.MeasurementUnitTypeEnum.MpgToKml;
 					}
 				},
 				{
@@ -4394,20 +4399,36 @@
 					"field": "Length",
 					"title": "Length",
 					"type": "Number",
-					"defaultValue": "20 ft",
+					get defaultValue()
+					{
+						return `20 ${tf.measurementUnitConverter.getRulerUnits()}`;
+					},
 					"editType": {
 						"format": "Integer",
 						"maxLength": 8
+					},
+					"UnitOfMeasureSupported": true,
+					get UnitTypeOfMeasureSupported()
+					{
+						return tf.measurementUnitConverter.MeasurementUnitTypeEnum.FootToMeter;
 					}
 				},
 				{
 					"field": "Height",
 					"title": "Height",
 					"type": "Number",
-					"defaultValue": "8 ft",
+					get defaultValue()
+					{
+						return `8 ${tf.measurementUnitConverter.getRulerUnits()}`;
+					},
 					"editType": {
 						"format": "Integer",
 						"maxLength": 8
+					},
+					"UnitOfMeasureSupported": true,
+					get UnitTypeOfMeasureSupported()
+					{
+						return tf.measurementUnitConverter.MeasurementUnitTypeEnum.FootToMeter;
 					}
 				},
 				{
@@ -4428,6 +4449,11 @@
 					"editType": {
 						"format": "Integer",
 						"maxLength": 8
+					},
+					"UnitOfMeasureSupported": true,
+					get UnitTypeOfMeasureSupported()
+					{
+						return tf.measurementUnitConverter.MeasurementUnitTypeEnum.PoundToKilogram;
 					}
 				},
 				{
@@ -4438,6 +4464,11 @@
 					"editType": {
 						"format": "Integer",
 						"maxLength": 8
+					},
+					UnitOfMeasureSupported: true,
+					get UnitTypeOfMeasureSupported()
+					{
+						return tf.measurementUnitConverter.MeasurementUnitTypeEnum.FootToMeter;
 					}
 				},
 				{
