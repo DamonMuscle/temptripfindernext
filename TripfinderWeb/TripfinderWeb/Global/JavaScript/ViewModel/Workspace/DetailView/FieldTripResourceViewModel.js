@@ -96,6 +96,15 @@
 			.then(function(result)
 			{
 				var vehicles = result.Items;
+				vehicles.forEach(v =>
+				{
+					v.Cost = tf.measurementUnitConverter.convert({
+						value: v.Cost,
+						originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+						targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+						isReverse: true
+					});
+				});
 				self.obVehicles(vehicles);
 				if (!self.options.isNew)
 				{
