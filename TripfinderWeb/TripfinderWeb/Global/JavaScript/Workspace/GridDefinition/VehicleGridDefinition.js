@@ -107,7 +107,9 @@
 					FieldName: "Cost",
 					Width: '150px',
 					type: "number",
-					hidden: true
+					hidden: true,
+					UnitOfMeasureReverse: true,
+					UnitOfMeasureSupported: true
 				},
 				{
 					FieldName: "EmmissInsp",

@@ -194,6 +194,15 @@
 					return !!$.trim(item.BusNum);
 				}) : [];
 				vehicleItems = sortArray(vehicleItems, "BusNum");
+				vehicleItems.forEach(v =>
+				{
+					v.Cost = tf.measurementUnitConverter.convert({
+						value: v.Cost,
+						originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+						targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+						isReverse: true
+					});
+				});
 				this.obVehicleSource(vehicleItems);
 			}.bind(this));
 
