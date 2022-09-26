@@ -4,7 +4,7 @@
 
 	ManageFilterViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ManageFilterViewModel.prototype.constructor = ManageFilterViewModel;
-	function ManageFilterViewModel (obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, positiveClose, reminderHide)
+	function ManageFilterViewModel(obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, positiveClose, reminderHide)
 	{
 		this.fnSaveAndEditGridFilter = fnSaveAndEditGridFilter;
 		this.fnApplyGridFilter = fnApplyGridFilter;
@@ -12,9 +12,20 @@
 		this.positiveClose = positiveClose;
 		this.element = null;
 		this.reminderHide = reminderHide;
+		this.enableGridRefresh = true;
+		this.filterModelJSONString = null
 	}
 
 	ManageFilterViewModel.prototype.init = function(viewModel, el)
+	{
+		this.element = $(el);
+		if (this.enableGridRefresh)
+		{
+			this.initFilterGrid();
+		}
+	}
+
+	ManageFilterViewModel.prototype.initFilterGrid = function(viewModel, el)
 	{
 		var self = this;
 		var filters = this.obGridFilterDataModels().map(function(filter)
@@ -24,12 +35,13 @@
 		{
 			return filter.Type !== "relatedFilter";
 		});
-		this.element = $(el);
+
 		var grid = this.element.find(".managefiltergrid-container").data("kendoGrid");
 		if (grid)
 		{
 			grid.destroy();
 		}
+
 		var columns = [
 			{
 				width: '30px',
@@ -63,7 +75,7 @@
 							{
 								return;
 							}
-							self.fnSaveAndEditGridFilter("edit", currentModel, null, false);
+							self.editGridFilter(currentModel);
 						}
 					},
 					{
@@ -122,6 +134,7 @@
 		{
 			columns.splice(3, 0, { field: "ReminderName", title: "Reminder" });
 		}
+
 		this.element.find(".managefiltergrid-container").kendoGrid({
 			dataSource: {
 				data: filters
@@ -148,6 +161,7 @@
 				$footer.text(footerLabel);
 			}
 		});
+
 		this.element.find(".managefiltergrid-container tr").each(function(n, item)
 		{
 			var data = this.element.find(".managefiltergrid-container").data("kendoGrid").dataItem($(item));
@@ -175,6 +189,7 @@
 				$(item).find(".k-grid-edit").hide();
 			}
 		}.bind(this));
+
 		//double click
 		this.element.find(".managefiltergrid-container .k-grid-content tr").dblclick(function(e)
 		{
@@ -191,6 +206,7 @@
 		$gridContent.css({
 			"overflow-y": "auto"
 		});
+
 		if ($gridContent.children('table').height() <= $gridContent.height())
 		{
 			this.element.find('.k-grid-header').css({
@@ -198,6 +214,7 @@
 			});
 		}
 	};
+
 	ManageFilterViewModel.prototype.getIconTitle_IsValid = function(value, id)
 	{
 		if (id < 0)
@@ -213,6 +230,7 @@
 			return '';
 		}
 	};
+
 	ManageFilterViewModel.prototype.getIconUrl_IsValid = function(value, id)
 	{
 		if (id < 0)
@@ -228,6 +246,7 @@
 			return '';
 		}
 	};
+
 	ManageFilterViewModel.prototype.getGridFilterDataModel = function(e)
 	{
 		var data = this.element.find(".managefiltergrid-container").data("kendoGrid").dataItem($(e.target).closest("tr"));
@@ -290,6 +309,31 @@
 	ManageFilterViewModel.prototype.newFilterButtonClick = function(viewModel, e)
 	{
 		this.fnSaveAndEditGridFilter("new", null, false, false, { title: "New Filter" });
+	};
+
+	/**
+	 * Edit grid filter.
+	 *
+	 * @param {*} gridFilter
+	 */
+	ManageFilterViewModel.prototype.editGridFilter = function(gridFilter)
+	{
+		const editTask = this.fnSaveAndEditGridFilter("edit", gridFilter, null, false);
+		this.enableGridRefresh = false;
+		this.filterModelJSONString = gridFilter ? JSON.stringify(gridFilter.toData()) : null;
+
+		Promise.resolve(editTask)
+			.then((result) =>
+			{
+				let resultFilterModelJSONString = typeof result === "object" ? JSON.stringify(result.toData()) : null;
+				if (resultFilterModelJSONString && this.filterModelJSONString !== resultFilterModelJSONString)
+				{
+					this.initFilterGrid();
+				}
+			}).finally(() =>
+			{
+				this.enableGridRefresh = true;
+			});
 	};
 	tf.ManageFilterViewModel = new TF.Grid.ManageFilterViewModel();
 })();
