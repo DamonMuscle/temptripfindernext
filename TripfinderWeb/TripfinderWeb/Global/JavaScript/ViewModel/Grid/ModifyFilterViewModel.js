@@ -5,7 +5,7 @@
 	ModifyFilterViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ModifyFilterViewModel.prototype.constructor = ModifyFilterViewModel;
 
-	function ModifyFilterViewModel (gridType, isNew, gridFilterDataModel, headerFilters, gridDefinition, omittedRecordIds, options, searchFilter)
+	function ModifyFilterViewModel(gridType, isNew, gridFilterDataModel, headerFilters, gridDefinition, omittedRecordIds, options, searchFilter)
 	{
 		this.isNew = typeof (isNew) == 'string' ? isNew === "new" : isNew;
 		this.gridType = gridType;
@@ -76,15 +76,15 @@
 		this.obValueFieldValue.subscribe(function(newFiledValue)
 		{
 			let isDateTimeControlOpened = function()
-      {
-        return (this.obValueFieldType() && (this.obValueFieldType().toLowerCase() === "datetime" || this.obValueFieldType().toLowerCase() === "time")) &&
-            $(".k-calendar-container.k-state-border-up").length &&
-            $(".k-calendar-container.k-state-border-up").css('display') != 'none';
-      }.bind(this);
+			{
+				return (this.obValueFieldType() && (this.obValueFieldType().toLowerCase() === "datetime" || this.obValueFieldType().toLowerCase() === "time")) &&
+					$(".k-calendar-container.k-state-border-up").length &&
+					$(".k-calendar-container.k-state-border-up").css('display') != 'none';
+			}.bind(this);
 
 			let fieldType = this.obValueFieldType() === "Select" ? "String" : this.obValueFieldType();
 			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
-      {
+			{
 				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(fieldType, this.obValueFieldValue()));
 			}
 		}.bind(this));
@@ -113,7 +113,7 @@
 			if (gridType === 'gpsevent')
 			{
 				url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", tf.dataTypeHelper.getEndpoint(gridType) + "/rawfilterclause?databaseId=0");
-							}
+			}
 
 			tf.promiseAjax.post(url, { data: searchData.data.filterSet })
 				.then(function(apiResponse)
@@ -270,20 +270,20 @@
 			this.pageLevelViewModel.popupSuccessMessage(msg);
 			$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").hide();
 		}.bind(this), function()
-			{
-				tf.loadingIndicator.tryHide();
-				var $field = $("textarea[name='sqlStatement']");
-				this.pageLevelViewModel.obErrorMessageDivIsShow(true);
-				this.pageLevelViewModel.obValidationErrorsSpecifed([
-					{
-						field: this._$form.find("textarea[name='sqlStatement']"),
-						message: "Filter Statement syntax is invalid"
-					}]);
-				var validator = $.trim(this.gridFilterDataModel.whereClause()) === '' ? 'notEmpty' : 'callback';
-				this._$form.find('[data-bv-validator = "' + validator + '"][data-bv-for="sqlStatement"]').show().closest(".form-group").addClass("has-error");
-				$field.focus();
-				$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").text("Invalid Syntax").show();
-			}.bind(this));
+		{
+			tf.loadingIndicator.tryHide();
+			var $field = $("textarea[name='sqlStatement']");
+			this.pageLevelViewModel.obErrorMessageDivIsShow(true);
+			this.pageLevelViewModel.obValidationErrorsSpecifed([
+				{
+					field: this._$form.find("textarea[name='sqlStatement']"),
+					message: "Filter Statement syntax is invalid"
+				}]);
+			var validator = $.trim(this.gridFilterDataModel.whereClause()) === '' ? 'notEmpty' : 'callback';
+			this._$form.find('[data-bv-validator = "' + validator + '"][data-bv-for="sqlStatement"]').show().closest(".form-group").addClass("has-error");
+			$field.focus();
+			$('textarea[name=sqlStatement]').closest('.form-group').find(".help-block").text("Invalid Syntax").show();
+		}.bind(this));
 	};
 
 	ModifyFilterViewModel.prototype.verify = function(getCount)
@@ -431,7 +431,7 @@
 		this.obStatementVerify(false);
 		var self = this;
 		tf.loadingIndicator.setSubtitle('Saving Filter');
-		tf.loadingIndicator.show();
+		tf.loadingIndicator.showImmediately();
 
 		var validator = self._$form.data("bootstrapValidator");
 
@@ -453,7 +453,7 @@
 	{
 		return this.saveReminder().then(function(reminder)
 		{
-			function setReminder (gridFilterDataModel)
+			function setReminder(gridFilterDataModel)
 			{
 				if (reminder && reminder.Id)
 				{
@@ -463,19 +463,19 @@
 				}
 			}
 
-				setReminder(this.gridFilterDataModel);
-				this.gridFilterDataModel.omittedRecords(this.obOmitRecords());
-				var data = this.gridFilterDataModel.toData();
-				const saveWithDBID = !this.obIsGlobalFilterChecked() || TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
+			setReminder(this.gridFilterDataModel);
+			this.gridFilterDataModel.omittedRecords(this.obOmitRecords());
+			var data = this.gridFilterDataModel.toData();
+			const saveWithDBID = !this.obIsGlobalFilterChecked() || TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
 			data.DBID = saveWithDBID ? tf.datasourceManager.databaseId : null;
 			data.isValid = true;
 			return tf.promiseAjax[this.isNew ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
-					{
-						paramData: { "@relationships": "OmittedRecord" },
-						data: [data]
+				{
+					paramData: { "@relationships": "OmittedRecord" },
+					data: [data]
 				}).then(function(apiResponse)
-					{
-						this.gridFilterDataModel.update(apiResponse.Items[0]);
+				{
+					this.gridFilterDataModel.update(apiResponse.Items[0]);
 					if (this.originalGridFilterDataModel && !this.isNew)
 					{
 						// change school boundary filter
@@ -499,16 +499,16 @@
 						this.originalGridFilterDataModel.update(apiResponse.Items[0]);
 					}
 
-						return this.gridFilterDataModel;
+					return this.gridFilterDataModel;
 				}.bind(this)).catch(function(apiResponse)
-					{
-						this.obErrorMessageDivIsShow(true);
-						this.obValidationErrors([
-							{
-								message: apiResponse.Message
-							}]);
-						throw apiResponse;
-					});
+				{
+					this.obErrorMessageDivIsShow(true);
+					this.obValidationErrors([
+						{
+							message: apiResponse.Message
+						}]);
+					throw apiResponse;
+				});
 		}.bind(this));
 	};
 
@@ -763,10 +763,10 @@
 			};
 
 			this._$form.bootstrapValidator({
-						excluded: [':hidden', ':not(:visible)'],
-						live: 'enabled',
-						message: 'This value is not valid',
-						fields: fields
+				excluded: [':hidden', ':not(:visible)'],
+				live: 'enabled',
+				message: 'This value is not valid',
+				fields: fields
 			});
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		}.bind(this), 0);

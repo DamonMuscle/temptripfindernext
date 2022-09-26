@@ -936,8 +936,8 @@
 	KendoGridFilterMenu.prototype.saveAndEditGridFilter = function(isNew, gridFilterDataModel, getCurrentHeaderFilters, getCurrentOmittedRecords, options)
 	{
 		options = options || {};
-		options.currentObFilters = this.obGridFilterDataModels.slice();	
-		
+		options.currentObFilters = this.obGridFilterDataModels.slice();
+
 		const currentHeaderFilters = this.findCurrentHeaderFilters(true);
 		tf.measurementUnitConverter.processUnitsOfMeasureFilters(this.getKendoColumn(), currentHeaderFilters);
 
@@ -977,7 +977,7 @@
 						return this.setGridFilter(savedGridFilterDataModel);
 					}
 				}
-				return true;
+				return savedGridFilterDataModel;
 			}.bind(this));
 	};
 
@@ -1115,12 +1115,15 @@
 		return self._syncFilterAndNotifyStatusUpdated(gridFilterDataModel.id())
 			.then(function(filterExisted)
 			{
-				if (filterExisted) {
-					if (currentFilterId < 0) {
+				if (filterExisted)
+				{
+					if (currentFilterId < 0)
+					{
 						return true;
 					}
 					return self.saveCurrentFilter();
-				} else {
+				} else
+				{
 					return false;
 				}
 			})
@@ -1138,13 +1141,13 @@
 					excuteSetFilter = (ans !== false && ans.operationResult !== null);
 
 				if (excuteSetFilter)
-					return self.setGridFilter(gridFilterDataModel,true);
+					return self.setGridFilter(gridFilterDataModel, true);
 				else
 					return Promise.resolve(ans.operationResult);
 			});
 	};
 
-	KendoGridFilterMenu.prototype.setGridFilter = function(gridFilterDataModel,isApplyFilter)
+	KendoGridFilterMenu.prototype.setGridFilter = function(gridFilterDataModel, isApplyFilter)
 	{
 		if (!gridFilterDataModel.isValid())
 		{
@@ -1154,54 +1157,54 @@
 			}.bind(this));
 		}
 		this.obSelectedGridFilterId(gridFilterDataModel.id());
-		if(isApplyFilter)
+		if (isApplyFilter)
 		{
 			this.setCurrentFilter(gridFilterDataModel);
 			return;
 		}
-		
-		return this.loadGridFilter(false).then(()=>{this.setCurrentFilter(gridFilterDataModel)});
+
+		return this.loadGridFilter(false).then(() => { this.setCurrentFilter(gridFilterDataModel) });
 	};
 
 	KendoGridFilterMenu.prototype.setCurrentFilter = function(gridFilterDataModel)
 	{
 		var self = this;
-			function refresh()
-			{
-				var filter = {};
-				self.initStatusBeforeRefresh();
-				self.kendoGrid.dataSource.filter(filter);
-			}
-			if (gridFilterDataModel.type() == "relatedFilter")
-			{
-				self._gridState.filteredIds = this.relatedFilterEntity.filteredIds;
-				self._gridState.filterClause = "";
-				refresh();
-				return false;
-			}
-			else if (this.options.summaryFilterFunction && gridFilterDataModel.id() < 0)
-			{
-				return this.options.summaryFilterFunction(gridFilterDataModel.id())
-					.then(function(filteredIds)
+		function refresh()
+		{
+			var filter = {};
+			self.initStatusBeforeRefresh();
+			self.kendoGrid.dataSource.filter(filter);
+		}
+		if (gridFilterDataModel.type() == "relatedFilter")
+		{
+			self._gridState.filteredIds = this.relatedFilterEntity.filteredIds;
+			self._gridState.filterClause = "";
+			refresh();
+			return false;
+		}
+		else if (this.options.summaryFilterFunction && gridFilterDataModel.id() < 0)
+		{
+			return this.options.summaryFilterFunction(gridFilterDataModel.id())
+				.then(function(filteredIds)
+				{
+					if ($.isArray(filteredIds))
 					{
-						if ($.isArray(filteredIds))
-						{
-							this._gridState.filteredIds = filteredIds;
-						}
-						else if (typeof (filteredIds) === "string")
-						{
-							delete this._gridState.filteredIds;
-							this._gridState.filterClause = filteredIds;
-						}
-						refresh();
-						return false;
-					}.bind(this));
-			}
-			else
-			{
-				refresh();
-				return Promise.resolve(false);
-			}
+						this._gridState.filteredIds = filteredIds;
+					}
+					else if (typeof (filteredIds) === "string")
+					{
+						delete this._gridState.filteredIds;
+						this._gridState.filterClause = filteredIds;
+					}
+					refresh();
+					return false;
+				}.bind(this));
+		}
+		else
+		{
+			refresh();
+			return Promise.resolve(false);
+		}
 	}
 
 	KendoGridFilterMenu.prototype._currentFilterChange = function()
