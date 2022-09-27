@@ -687,7 +687,7 @@
 							"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
 							"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
 							"<br/><input id='xlsradio' type='radio' name='type' value='xlsx' />" +
-							"<label for='xlsradio'>Excel 2007 Workbook (.xlsx)</label>" +
+							"<label for='xlsradio'>Excel Workbook (.xlsx)</label>" +
 							"<div>" +
 							"</div>",
 						buttons:
