@@ -53,9 +53,11 @@
 	ModifyLayoutViewModel.prototype.save = function()
 	{
 		var self = this;
+		tf.loadingIndicator.showImmediately();
 		return this.pageLevelViewModel.saveValidate()
 			.then(function(valid)
 			{
+				tf.loadingIndicator.tryHide();
 				if (valid)
 				{
 					return self._save();
