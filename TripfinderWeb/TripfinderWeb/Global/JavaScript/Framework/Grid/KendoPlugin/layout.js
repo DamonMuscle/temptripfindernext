@@ -1059,7 +1059,7 @@
 						this.applyLayout(gridLayoutExtendedDataModel, isNoConfirm);
 					}
 				}
-				return true;
+				return savedGridLayoutExtendedDataModel;
 			}.bind(this));
 	};
 

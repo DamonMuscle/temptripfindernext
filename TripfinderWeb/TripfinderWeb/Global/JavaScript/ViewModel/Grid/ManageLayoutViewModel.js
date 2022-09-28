@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.Grid").ManageLayoutViewModel = ManageLayoutViewModel;
 
-	function ManageLayoutViewModel (obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, positiveClose)
+	function ManageLayoutViewModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, positiveClose)
 	{
 		this.obGridLayoutExtendedDataModels = obGridLayoutExtendedDataModels;
 		this.obGridFilterDataModels = obGridFilterDataModels;
@@ -10,21 +10,33 @@
 		this.fnApplyGridLayout = fnApplyGridLayout;
 		this.positiveClose = positiveClose;
 		this.element = null;
+		this.enableGridRefresh = true;
+		this.layoutModelJSONString = null
 	}
 
 	ManageLayoutViewModel.prototype.init = function(viewModel, el)
+	{
+		this.element = $(el);
+		if (this.enableGridRefresh)
+		{
+			this.initLayoutGrid();
+		}
+	};
+
+	ManageLayoutViewModel.prototype.initLayoutGrid = function()
 	{
 		var self = this;
 		var layouts = this.obGridLayoutExtendedDataModels().map(function(layout)
 		{
 			return layout.toData();
 		});
-		this.element = $(el);
+
 		var grid = this.element.find(".managelayoutgrid-container").data("kendoGrid");
 		if (grid)
 		{
 			grid.destroy();
 		}
+
 		this.element.find(".managelayoutgrid-container").kendoGrid(
 			{
 				dataSource:
@@ -69,7 +81,7 @@
 								click: function(e)
 								{
 									e.preventDefault();
-									self.fnSaveAndEditGridLayout("edit", self.getGridLayoutDataModel(e));
+									self.editGridLayout(self.getGridLayoutDataModel(e));
 								}
 							},
 							{
@@ -125,6 +137,26 @@
 		})[0];
 	};
 
+	ManageLayoutViewModel.prototype.editGridLayout = function(gridLayout)
+	{
+		const editTask = this.fnSaveAndEditGridLayout("edit", gridLayout);
+		this.enableGridRefresh = false;
+		this.layoutModelJSONString = gridLayout ? JSON.stringify(gridLayout.toData()) : null;
+
+		Promise.resolve(editTask)
+			.then((result) =>
+			{
+				let resultLayoutModelJSONString = typeof result === "object" ? JSON.stringify(result.toData()) : null;
+				if (resultLayoutModelJSONString && this.layoutModelJSONString !== resultLayoutModelJSONString)
+				{
+					this.initLayoutGrid();
+				}
+			}).finally(() =>
+			{
+				this.enableGridRefresh = true;
+			});
+	};
+
 	ManageLayoutViewModel.prototype.deleteGridLayout = function(gridLayoutExtendedDataModel)
 	{
 		tf.promiseBootbox.yesNo("Are you sure you want to delete this layout?", "Delete Confirmation")
@@ -150,7 +182,7 @@
 {
 	createNamespace("TF.Grid.Layout").LayoutExtenstion = LayoutExtenstion;
 
-	function LayoutExtenstion ()
+	function LayoutExtenstion()
 	{ }
 
 	LayoutExtenstion.prototype.getDataExportImg = function(value)
