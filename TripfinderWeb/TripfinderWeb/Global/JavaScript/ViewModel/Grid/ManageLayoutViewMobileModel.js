@@ -25,60 +25,60 @@
 				if (item instanceof HTMLElement && $(item).hasClass("mobile-modal-grid-select-option"))
 				{
 					new TF.TapHelper(item,
-					{
-						swipingLeft: function(evt)
 						{
-							self.isTouching = true;
-							var $element = $(evt.target).closest(".mobile-modal-grid-select-option"),
-								swipedItem;
-							$.each($(item).parent().find(".mobile-modal-grid-select-option"), function(index, option)
+							swipingLeft: function(evt)
 							{
-								if ($(option).css("marginLeft") === "-134px")
+								self.isTouching = true;
+								var $element = $(evt.target).closest(".mobile-modal-grid-select-option"),
+									swipedItem;
+								$.each($(item).parent().find(".mobile-modal-grid-select-option"), function(index, option)
 								{
-									swipedItem = $(option);
-									return false;
+									if ($(option).css("marginLeft") === "-134px")
+									{
+										swipedItem = $(option);
+										return false;
+									}
+								});
+								if ($element.is(':animated') || $element.css("marginLeft") === "-134px" || (swipedItem && swipedItem.is(':animated')))
+									return;
+								if (swipedItem)
+								{
+									swipedItem.stop().animate(
+										{
+											marginLeft: "15px",
+											marginRight: "0"
+										}, 200);
 								}
-							});
-							if ($element.is(':animated') || $element.css("marginLeft") === "-134px" || (swipedItem && swipedItem.is(':animated')))
-								return;
-							if (swipedItem)
+								$element.stop().animate(
+									{
+										marginLeft: "-134px",
+										marginRight: "134px"
+									}, 200);
+							},
+							swipingRight: function(evt)
 							{
-								swipedItem.stop().animate(
+								self.isTouching = true;
+								var $element = $(evt.target).closest(".mobile-modal-grid-select-option");
+								if ($element.is(':animated') || $element.css("marginLeft") !== "-134px")
+									return;
+								$element.stop().animate(
+									{
+										marginLeft: "15px",
+										marginRight: "0"
+									}, 200);
+							},
+							touchOver: function(evt)
+							{
+								//make sure delete/edit event won't invoke after swiping the item.
+								if (self.isTouching)
 								{
-									marginLeft: "15px",
-									marginRight: "0"
-								}, 200);
+									setTimeout(function()
+									{
+										self.isTouching = false;
+									}, 200);
+								}
 							}
-							$element.stop().animate(
-							{
-								marginLeft: "-134px",
-								marginRight: "134px"
-							}, 200);
-						},
-						swipingRight: function(evt)
-						{
-							self.isTouching = true;
-							var $element = $(evt.target).closest(".mobile-modal-grid-select-option");
-							if ($element.is(':animated') || $element.css("marginLeft") !== "-134px")
-								return;
-							$element.stop().animate(
-							{
-								marginLeft: "15px",
-								marginRight: "0"
-							}, 200);
-						},
-						touchOver: function(evt)
-						{
-							//make sure delete/edit event won't invoke after swiping the item.
-							if (self.isTouching)
-							{
-								setTimeout(function()
-								{
-									self.isTouching = false;
-								}, 200);
-							}
-						}
-					});
+						});
 				}
 			});
 		});
@@ -90,10 +90,10 @@
 		if ($element.length > 0 && $element.css("marginLeft") === "-134px" && !$element.is(':animated'))
 		{
 			$element.stop().animate(
-			{
-				marginLeft: "15px",
-				marginRight: "0"
-			}, 200);
+				{
+					marginLeft: "15px",
+					marginRight: "0"
+				}, 200);
 			return;
 		}
 		var gridLayoutExtendedDataModel = layout;
@@ -138,10 +138,10 @@
 				if (result)
 				{
 					var self = this;
-					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "gridlayout", gridLayoutExtendedDataModel.id()))
+					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", gridLayoutExtendedDataModel.id()))
 						.then(function(apiResponse)
 						{
-							if (apiResponse.Items[0])
+							if (apiResponse)
 							{
 								self.obGridLayoutExtendedDataModels.remove(gridLayoutExtendedDataModel);
 							}
@@ -167,10 +167,10 @@
 			return;
 		}
 		$(e.target).closest(".mobile-modal-grid-select-option").stop().animate(
-		{
-			marginLeft: "15px",
-			marginRight: "0"
-		}, 200);
+			{
+				marginLeft: "15px",
+				marginRight: "0"
+			}, 200);
 		this.fnSaveAndEditGridLayout("edit", gridLayoutExtendedDataModel);
 	};
 
