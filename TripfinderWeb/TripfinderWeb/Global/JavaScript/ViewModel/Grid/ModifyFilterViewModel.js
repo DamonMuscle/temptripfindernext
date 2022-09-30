@@ -58,12 +58,16 @@
 		{
 			this.booleanSelectedData = value;
 		});
-
+		
+		this.needCheckFormFilterDataTypes = tf.dataTypeHelper.getFormCheckFilterDataTypes().map(a => a.ID);
 		const filterDBID = this.gridFilterDataModel.dBID();
 		const isFilterContainsDataBaseSpecificFields = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
 
 		const isGlobalFilter = this.isNew ? ((!omittedRecordIds || !omittedRecordIds.length) && !isFilterContainsDataBaseSpecificFields) : !filterDBID;
 		this.obIsGlobalFilterChecked = ko.observable(isGlobalFilter);
+		this.obIsGlobalFilterChecked.subscribe((newValue) => {
+			this.globalFilterChange(newValue);
+		});
 		this.obGlobalFilterDisabled = ko.computed(() =>
 		{
 			return !!this.obOmitRecords().length ||
@@ -770,6 +774,28 @@
 			});
 			this.pageLevelViewModel.load(this._$form.data("bootstrapValidator"));
 		}.bind(this), 0);
+	};
+
+	ModifyFilterViewModel.prototype.globalFilterChange = function(newValue)
+	{
+		const self = this,
+			dataTypeID = tf.dataTypeHelper.getId(self.gridType),
+			needCheckFormFilter = self.needCheckFormFilterDataTypes.indexOf(dataTypeID) > -1,
+			isEdit = !self.isNew || self.isNew === 'edit';
+		if (isEdit && !self.obGlobalFilterDisabled() && !newValue && needCheckFormFilter)
+		{
+			tf.udgHelper.checkUDGridsWithFilterIdInSpecifyRecord(dataTypeID, this.gridFilterDataModel.id()).then(res =>
+			{
+				if (res.Items && res.Items[0] && res.Items[0].length > 0)
+				{
+					// now get first 3 names show
+					self.obIsGlobalFilterChecked(true);
+					let formNames = res.Items[0].length === 1 ? `${res.Items[0]} form` : `${res.Items[0].slice(0, 3).join(", ")} forms`;
+					tf.promiseBootbox.alert(`This filter is in use on the ${formNames}. It must remain available for all data sources.`);					
+					return;
+				}
+			});
+		}
 	};
 
 	ModifyFilterViewModel.prototype.apply = function()
