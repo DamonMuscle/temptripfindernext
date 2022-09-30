@@ -2016,6 +2016,19 @@
 		return udgrids;
 	};
 
+	UserDefinedGridHelper.prototype.checkUDGridsWithFilterIdInSpecifyRecord = function(dataTypeId, filterId)
+	{
+		const paramData = {
+			"dataTypeId": dataTypeId,
+			"filterId": filterId			
+		};
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
+			paramData: paramData
+		}, {
+			overlay: false
+		});
+	};
+
 	UserDefinedGridHelper.saveUserdefinedfield = function (udfEntity)
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {

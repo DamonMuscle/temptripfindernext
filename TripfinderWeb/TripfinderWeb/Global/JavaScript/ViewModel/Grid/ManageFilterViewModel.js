@@ -13,12 +13,13 @@
 		this.element = null;
 		this.reminderHide = reminderHide;
 		this.enableGridRefresh = true;
-		this.filterModelJSONString = null
+		this.filterModelJSONString = null;		
 	}
 
 	ManageFilterViewModel.prototype.init = function(viewModel, el)
 	{
 		this.element = $(el);
+		this.needCheckFormFilterDataTypes = tf.DataTypeHelper.getFormCheckFilterDataTypes().map(a => a.ID);
 		if (this.enableGridRefresh)
 		{
 			this.initFilterGrid();
@@ -258,12 +259,31 @@
 
 	ManageFilterViewModel.prototype._deleteGridFilter = function(gridFilterDataModel)
 	{
-		var self = this;
-		self._dbConfirmDeleteAction.bind(self)(gridFilterDataModel)
-			.then(function(result)
+		var self = this,
+			isWithoutDB = gridFilterDataModel.dBID() === null,
+			dataTypeID = gridFilterDataModel.dataTypeID(),
+			needCheckFormFilter = isWithoutDB && self.needCheckFormFilterDataTypes.indexOf(dataTypeID) > -1,
+			checkUDGridsWithFilterId = !needCheckFormFilter ?
+				Promise.resolve([]) :
+				tf.udgHelper.checkUDGridsWithFilterIdInSpecifyRecord(dataTypeID, gridFilterDataModel.id());
+		
+		// only check without datasource and specify data type
+		checkUDGridsWithFilterId.then(res =>
+		{
+			if (res.Items && res.Items[0] && res.Items[0].length > 0)
 			{
-				self._executeDeleteAction.bind(self)(result, gridFilterDataModel);
-			});
+				// now get firt 3 names show
+				let formNames = res.Items[0].length === 1 ? `${res.Items[0]} form` : `${res.Items[0].slice(0, 3).join(", ")} forms`;
+				tf.promiseBootbox.alert(`This filter is in use on the ${formNames}. It must remain available for all data sources.`);
+				return;
+			}
+
+			self._dbConfirmDeleteAction.bind(self)(gridFilterDataModel)
+				.then(function(result)
+				{
+					self._executeDeleteAction.bind(self)(result, gridFilterDataModel);
+				});
+		});
 	};
 
 	ManageFilterViewModel.prototype._dbConfirmDeleteAction = function(gridFilterDataModel)

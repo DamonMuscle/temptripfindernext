@@ -1246,6 +1246,23 @@
 		return pathCombine("search", dataTypeKey + 'exportfiles');
 	};
 
+	DataTypeHelper.prototype.getFormCheckFilterDataTypes = function()
+	{
+		return	[{ ID: 1, Type: "Alternate Site" }
+			,{ID:19,Type:"Contact"}
+			,{ID:2,Type:"Contractor"}
+			,{ID:3,Type:"District"}
+			,{ID:4,Type:"Field Trip"}
+			,{ID:5,Type:"Geo Region"}
+			,{ID:31,Type:"Route"}
+			,{ID:7,Type:"School"}
+			,{ID:8,Type:"Staff"}
+			,{ID:9,Type:"Student"}
+			,{ID:10,Type:"Trip"}
+			,{ID:13,Type:"Trip Stop"}
+			,{ ID: 11, Type: "Vehicle" }];
+	};
+
 	DataTypeHelper.prototype.saveTripCalendarRecords = function(trips)
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "TripCalendarRecords"), {

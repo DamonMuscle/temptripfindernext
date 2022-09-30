@@ -14,6 +14,7 @@
 		this.obIsSafari = ko.observable(TF.isSafari);
 		this.negativeClick = negativeClick;
 		this.element = null;
+		this.needCheckFormFilterDataTypes = tf.dataTypeHelper.getFormCheckFilterDataTypes().map(a => a.ID);
 	}
 
 	ManageFilterViewMobileModel.prototype.loaded = function(items)
@@ -117,50 +118,70 @@
 	ManageFilterViewMobileModel.prototype.delete = function(filter, e)
 	{
 		e.stopPropagation();
-		var filterId = filter.id(),
-			gridType = filter.gridType();
-
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?filterId=" + filterId))
-			.then(function(apiResponse)
+		var self = this,
+			filterId = filter.id(),
+			gridType = filter.gridType(),
+			dataTypeID = filter.dataTypeID(),
+			isWithoutDB = filter.dBID() === null,
+			needCheckFormFilter = isWithoutDB && self.needCheckFormFilterDataTypes.indexOf(dataTypeID) > -1,
+			checkUDGridsWithFilterId = !needCheckFormFilter ?
+				Promise.resolve([]) :
+				tf.udgHelper.checkUDGridsWithFilterIdInSpecifyRecord(dataTypeID, filterId);
+		 		
+		return checkUDGridsWithFilterId.then(res =>
+		{
+			if (res.Items && res.Items[0] && res.Items[0].length > 0)
 			{
-				var displayMessage = apiResponse.length ? 'This Filter is associated with one or more Layouts. Deleting it will remove it from those Layouts. Are you sure you want to delete?' : 'Are you sure you want to delete this Filter?';
+				// now get firt 3 names show
+				let formNames = res.Items[0].length === 1 ? `${res.Items[0]} form` : `${res.Items[0].slice(0, 3).join(", ")} forms`;
+				tf.promiseBootbox.alert(`This filter is in use on the ${formNames}. It must remain available for all data sources.`);
+				return;
+			}
 
-				return tf.promiseBootbox.yesNo(
-					{
-						message: displayMessage,
-						buttons:
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?filterId=" + filterId))
+			.then(function(apiResponse)
+				{
+					var displayMessage = apiResponse.length ? 'This Filter is associated with one or more Layouts. Deleting it will remove it from those Layouts. Are you sure you want to delete?' : 'Are you sure you want to delete this Filter?';
+
+					return tf.promiseBootbox.yesNo(
 						{
-							yes:
+							message: displayMessage,
+							buttons:
 							{
-								label: "Delete",
-								className: "btn-delete-mobile"
-							},
-							no:
-							{
-								label: "Cancel",
-								className: "btn-cancel-mobile"
-							}
-						}
-					}, "Delete Confirmation").then(function(result)
-					{
-						if (result)
-						{
-							tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId))
-								.then(function(response)
+								yes:
 								{
-									var _storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
-									var currentStickFilterId = tf.storageManager.get(_storageFilterDataKey);
-									if (currentStickFilterId === filterId)
-										tf.storageManager.save(_storageFilterDataKey, '');
-
-									if (response > 0)
+									label: "Delete",
+									className: "btn-delete-mobile"
+								},
+								no:
+								{
+									label: "Cancel",
+									className: "btn-cancel-mobile"
+								}
+							}
+						}, "Delete Confirmation").then(function(result)
+						{
+							if (result)
+							{
+								tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId))
+									.then(function(response)
 									{
-										this.obGridFilterDataModels.remove(filter);
-									}
-								}.bind(this));
-						}
-					}.bind(this));
-			}.bind(this));
+										const filterKey = `grid.currentfilter.${gridType}.id`;
+										var currentStickFilterId = tf.storageManager.get(filterKey);
+										if (currentStickFilterId === filterId)
+										{
+											tf.storageManager.save(filterKey, '');
+										}
+
+										if (response > 0)
+										{
+											this.obGridFilterDataModels.remove(filter);
+										}
+									}.bind(this));
+							}
+						}.bind(this));
+				}.bind(this));
+		});
 	};
 
 	ManageFilterViewMobileModel.prototype.copy = function(filter, e)
