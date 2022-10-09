@@ -270,6 +270,11 @@
 			return this.unifyDirectionMeasurementUnit(originValue, tf.measurementUnitConverter.isImperial());
 		}
 
+		if (!column.UnitTypeOfMeasureSupported)
+		{
+			return originValue;
+		}
+
 		let v = this.convert({
 			originalUnit: column.UnitInDatabase || this.MeasurementUnitEnum.Metric,
 			targetUnit: currentUnitOfMeasure(),
