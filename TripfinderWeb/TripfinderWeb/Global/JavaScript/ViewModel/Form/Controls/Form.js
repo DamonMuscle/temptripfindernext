@@ -1120,7 +1120,7 @@
 		var item = {};
 		item[fieldName] = value;
 		var column = tf.helpers.kendoGridHelper.getGridColumnsFromDefinitionByType(this.dataType).filter(x => x.FieldName.toLowerCase() === fieldName.toLowerCase());
-		if (column && column.length === 1)
+		if (column && column.length === 1 && column[0].UnitOfMeasureSupported)
 		{
 			column = column[0];
 			return tf.measurementUnitConverter.handleColumnUnitOfMeasure(item, column);
