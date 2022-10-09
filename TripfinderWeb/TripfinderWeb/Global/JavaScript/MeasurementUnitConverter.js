@@ -270,7 +270,7 @@
 			return this.unifyDirectionMeasurementUnit(originValue, tf.measurementUnitConverter.isImperial());
 		}
 
-		if (!column.UnitTypeOfMeasureSupported)
+		if (!column.UnitOfMeasureSupported)
 		{
 			return originValue;
 		}
