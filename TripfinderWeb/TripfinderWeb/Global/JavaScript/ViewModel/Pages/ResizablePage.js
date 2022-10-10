@@ -314,10 +314,9 @@
 	ResizablePage.prototype.resizeGrid = function(left)
 	{
 		var self = this, $grid, lockedHeaderWidth, paddingRight, width, totalWidth = self.$element.outerWidth(),
-			iconRow, wrapRow, iconRowTop, iconRowLeft, $rightGrid, pageHeader, pageTitle, newRequest, newRequestTop, newRequestLeft;
+			iconRow, wrapRow, iconRowTop, iconRowLeft, pageHeader, pageTitle, newRequest, newRequestTop, newRequestLeft;
 
 		$grid = self.$leftPage.find(".kendo-grid");
-		$rightGrid = self.$rightPage.find(".kendo-grid");
 		if ($grid.length > 0)
 		{
 			lockedHeaderWidth = $grid.find('.k-grid-header-locked').width();
@@ -440,20 +439,6 @@
 					iconRow.css("display", "flex");
 				}
 			}
-		}
-		if ($rightGrid && $rightGrid.length > 0)
-		{
-			lockedHeaderWidth = $rightGrid.find('.k-grid-header-locked').width();
-			paddingRight = parseInt($rightGrid.find(".k-grid-content").css("padding-right"));
-			width = $rightGrid.find(".k-grid-header").outerWidth() - lockedHeaderWidth - paddingRight;
-
-			$.each($rightGrid, function(index, container)
-			{
-				let customGrid = $(container).closest(".custom-grid");
-				if (customGrid && customGrid.attr("mini-grid-type") === "UDGrid") {
-					return;
-				}	
-			});
 		}
 	};
 
