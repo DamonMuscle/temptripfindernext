@@ -483,7 +483,7 @@
 					{
 						if (self.gridType == "trip")
 						{
-							tf.dataTypeHelper.saveTripCalendarRecords([result.entity]);
+							tf.dataTypeHelper.saveTripResources([result.entity]);
 						}
 						self.recordEntity = result.entity;
 						self.recordId = result.entity.Id;

@@ -1263,9 +1263,9 @@
 			,{ ID: 11, Type: "Vehicle" }];
 	};
 
-	DataTypeHelper.prototype.saveTripCalendarRecords = function(trips)
+	DataTypeHelper.prototype.saveTripResources = function(trips)
 	{
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "TripCalendarRecords"), {
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "TripResources"), {
 			data: trips.map(trip =>
 			{
 				return {
