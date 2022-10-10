@@ -448,12 +448,11 @@
 			width = $rightGrid.find(".k-grid-header").outerWidth() - lockedHeaderWidth - paddingRight;
 
 			$.each($rightGrid, function(index, container)
-            {
-                let customGrid = $(container).closest(".custom-grid");
-                if (customGrid && customGrid.attr("mini-grid-type") === "UDGrid") {
+			{
+				let customGrid = $(container).closest(".custom-grid");
+				if (customGrid && customGrid.attr("mini-grid-type") === "UDGrid") {
 					return;
-			}
-				$(container).find(".k-auto-scrollable,.k-grid-content").width(width);
+				}	
 			});
 		}
 	};
