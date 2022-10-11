@@ -729,7 +729,7 @@
 			for (idx = conditionSetting.length; idx > 0; idx--)
 			{
 				condition = conditionSetting[idx - 1];
-				if (self.checkConditionMatch(condition))
+				if (self.checkConditionMatch(condition, item))
 				{
 					styles.backgroundColor = condition.backgroundColor;
 					styles.titleColor = condition.titleColor;
@@ -742,7 +742,7 @@
 		return styles;
 	};
 
-	LightGridStack.prototype.checkConditionMatch = function(condition)
+	LightGridStack.prototype.checkConditionMatch = function(condition, fieldDefinition)
 	{
 		if (this.detailView.isCreateGridNewRecord)
 		{
@@ -756,6 +756,17 @@
 			conditionType = condition.type.toLowerCase(),
 			conditionValue = condition.value,
 			conditionOperator = condition.operator.name;
+
+		if (fieldDefinition.UnitOfMeasureSupported)
+		{
+			entityFieldValue = tf.measurementUnitConverter.convert({
+				value: entityFieldValue,
+				originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+				targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+				isReverse: !!fieldDefinition.UnitOfMeasureReverse,
+				unitType: fieldDefinition.UnitTypeOfMeasureSupported
+			});
+		}
 
 		if (entity[condition.field] == null &&
 			entity.UserDefinedFields !== null)
