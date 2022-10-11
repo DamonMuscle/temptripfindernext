@@ -838,7 +838,7 @@
 		{
 			if (tf.chatfinderHelper)
 			{
-				tf.chatfinderHelper.clearNotifications();
+				tf.chatfinderHelper.stop();
 			}
 		});
 	};
