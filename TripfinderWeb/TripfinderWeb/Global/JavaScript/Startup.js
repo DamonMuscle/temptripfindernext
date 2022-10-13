@@ -836,10 +836,7 @@
 	{
 		window.addEventListener("beforeunload", function(event)
 		{
-			if (tf.chatfinderHelper)
-			{
-				tf.chatfinderHelper.stop();
-			}
+			tf.chatfinderHelper && tf.chatfinderHelper.stop();
 		});
 	};
 })();

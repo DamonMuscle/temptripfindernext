@@ -161,59 +161,44 @@
 							});
 						}
 					})
-					.then(async function()
+					.then(function()
 					{
-						await registerChatfinderHub();
+						registerChatfinderHub();
 					})
 
 			});
 		}
 	}
 
-	async function registerChatfinderHub()
+	function registerChatfinderHub()
 	{
-		return new Promise((res, rej) =>
+		const chatfinderSite = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinder");
+		const chatfinderApi = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinderapi");
+		if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
+			&& chatfinderSite && chatfinderApi)
 		{
-			const chatfinderSite = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinder");
-			const chatfinderApi = tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "chatfinderapi");
-			if (tf.authManager.authorizationInfo.authorizationTree.applications.indexOf("cfweb") >= 0
-				&& chatfinderSite && chatfinderApi)
-			{
-				// remove trailing slashes to avoid duplicated serviceworker scope registration
-				const chatfinderAddress = chatfinderSite.Uri.replace(/\/+$/, "").toLowerCase();
-				const chatfinderAPIAddress = chatfinderApi.Uri;
-				const verifyData = {
-					paramData: {
-						"clientId": tf.entStorageManager.get("clientKey"),
-						"vendor": "Transfinder",
-						"username": tf.authManager.userName || tf.authManager.authorizationInfo.authorizationTree.username,
-					},
-					headers: {
-						'Transfinder': tf.api.server()
-					}
-				};
-				const script = document.createElement("script");
-				script.src = `${chatfinderAddress}/chatfinderhelper.min.js`;
-				script.onload = () =>
-				{
+			// remove trailing slashes to avoid duplicated serviceworker scope registration
+			const chatfinderAddress = chatfinderSite.Uri.replace(/\/+$/, "").toLowerCase();
+			const chatfinderAPIAddress = chatfinderApi.Uri;
+			const verifyData = {
+				paramData: {
+					"clientId": tf.entStorageManager.get("clientKey"),
+					"vendor": "Transfinder",
+					"username": tf.authManager.userName || tf.authManager.authorizationInfo.authorizationTree.username,
+				},
+				headers: {
+					'Transfinder': tf.api.server()
+				}
+			};
 
-					if (!(TF.ChatfinderHelper instanceof Function))
-					{
-						return rej("Cannot find Chatfinderhelper.");
-					}
-
-					tf.chatfinderHelper = new TF.ChatfinderHelper(tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData), "tfweb", TF.productName);
-					tf.chatfinderHelper.entUserId = tf.authManager.authorizationInfo.authorizationTree.userId;
-					return res(tf.chatfinderHelper.registerHub(chatfinderAPIAddress, chatfinderAddress));
-				};
-				document.head.appendChild(script);
-			}
-			else
-			{
-				var err = 'Chatfinder is not supported.';
-				return rej(err);
-			}
-		})
+			tf.chatfinderHelper = new TF.ChatfinderHelper(tf.promiseAjax.get(pathCombine(chatfinderAPIAddress, "auth", "verify"), verifyData), "tfweb", TF.productName);
+			tf.chatfinderHelper.entUserId = tf.authManager.authorizationInfo.authorizationTree.userId;
+			tf.chatfinderHelper.registerHub(chatfinderAPIAddress, chatfinderAddress);
+		}
+		else
+		{
+			console.error('Chatfinder is not supported.');
+		}
 	}
 
 	PageManager.prototype.initNavgationBar = function()
