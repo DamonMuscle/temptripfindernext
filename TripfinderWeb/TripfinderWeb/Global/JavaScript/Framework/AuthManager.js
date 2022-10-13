@@ -50,7 +50,7 @@
 		var self = this,
 			prefix = tf.storageManager.prefix;
 		prefix = prefix.split('.')[0];
-		
+
 		var password = tf.entStorageManager.get("password");
 		this.logOffWithoutRefresh()
 			.then(function()
@@ -67,12 +67,9 @@
 					{
 						tf.entStorageManager.save("token", "");
 					}
-	
-					if (tf.chatfinderHelper)
-					{
-						tf.chatfinderHelper.stop();
-					}
-	
+
+					tf.chatfinderHelper && tf.chatfinderHelper.stop();
+
 					setTimeout(function()
 					{
 						location.reload();
@@ -107,10 +104,10 @@
 
 	AuthManager.prototype.auth = function(loginViewModal)
 	{
-		let self = this; 
+		let self = this;
 		var prefix = tf.storageManager.prefix;
 		prefix = prefix.split('.')[0];
-		
+
 		var p = null;
 		if (self._hasLoggedin)
 		{
@@ -140,10 +137,10 @@
 				}
 				return Promise.resolve(true);
 			})
-			.catch(function()
-			{
-				return Promise.resolve(false);
-			})
+				.catch(function()
+				{
+					return Promise.resolve(false);
+				})
 
 		} else
 		{
@@ -158,15 +155,15 @@
 				return Promise.reject("login failed");
 			}
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
-					paramData: {
-						prefix: 'tfweb'
-					}
-				}, {
-					overlay: false,
-					auth: {
-						noInterupt: true
-					}
-				})
+				paramData: {
+					prefix: 'tfweb'
+				}
+			}, {
+				overlay: false,
+				auth: {
+					noInterupt: true
+				}
+			})
 				.then(function(apiResponse)
 				{
 					self.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
@@ -200,10 +197,11 @@
 							self.obIsLogIn(true);
 						});
 
-				}).catch(function(apiResponse) { 
+				}).catch(function(apiResponse)
+				{
 					if (apiResponse.StatusCode == 401)
 					{
-						return self._loginUseModal(loginViewModal,"Have no permission to this product");
+						return self._loginUseModal(loginViewModal, "Have no permission to this product");
 					}
 				});
 
@@ -261,7 +259,7 @@
 		this.password = tf.storageManager.get("password", true);
 	};
 
-	AuthManager.prototype.updateAuthInfos = function ()
+	AuthManager.prototype.updateAuthInfos = function()
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 			paramData: {
@@ -273,7 +271,7 @@
 				noInterupt: true
 			}
 		})
-			.then(function (apiResponse)
+			.then(function(apiResponse)
 			{
 				this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
 				tf.userEntity = apiResponse.Items[0].UserEntity;
