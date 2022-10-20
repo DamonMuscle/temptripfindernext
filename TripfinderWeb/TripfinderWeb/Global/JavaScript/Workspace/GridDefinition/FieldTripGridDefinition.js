@@ -724,10 +724,9 @@
 				FieldName: "TheDateTime",
 				Width: '150px',
 				DisplayName: "Updated Date Time",
-				type: "datetime",
 				template: function(dataItem)
 				{
-					return moment(dataItem["TheDateTime"].toString("YYYY-MM-DD HH:mm:ss") + "Z").currentTimeZoneTimeFormat("MM/DD/YYYY hh:mm A");
+					return moment.utc(dataItem["TheDateTime"]).currentTimeZoneTimeFormat("MM/DD/YYYY hh:mm A");
 				}
 			},
 			{
