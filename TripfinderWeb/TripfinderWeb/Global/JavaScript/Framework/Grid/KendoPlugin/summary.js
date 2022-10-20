@@ -353,20 +353,8 @@
 			}
 			return formartedValue
 		}
-		if (operator === 'Average' || ((operator === 'Sum' || operator === 'Min' || operator === 'Max') && column.type === 'number'))
-		{
-			if (tf.measurementUnitConverter.isNeedConversion(column.UnitInDatabase) && column.UnitOfMeasureSupported)
-			{
-				value = tf.measurementUnitConverter.convert({
-					value: value,
-					originalUnit: column.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
-					targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
-					isReverse: !!column.UnitOfMeasureReverse,
-					unitType: column.UnitTypeOfMeasureSupported
-				});
-			}
-			return kendo.format("{0:n2}", value);
-		}
+
+		value = tf.measurementUnitConverter.aggregateConvert(value, operator, column);
 
 		return kendo.format(column.format, value);
 	};

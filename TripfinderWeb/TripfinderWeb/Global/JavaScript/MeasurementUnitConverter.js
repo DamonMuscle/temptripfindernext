@@ -460,6 +460,43 @@
 		return rawDirectionString.trim().replace(regexp, _replace);
 	}
 
+	/**
+	* convert measurement unit for aggregate
+	* @param {number} value 
+	* @param {string} operator 
+	* @param {*} columnOrDataType column definition or data type
+	* @param {string} field field name which need to convert
+	* @returns 
+	*/
+	MeasurementUnitConverter.prototype.aggregateConvert = function(value, operator, columnOrDataType, field)
+	{
+		var column;
+		if (!field)
+		{
+			column = columnOrDataType;
+		} else
+		{
+			column = tf.dataTypeHelper.getGridDefinition(columnOrDataType).Columns.filter(x => x.FieldName === field)[0];
+		}
+
+		if (["sum", "min", "max", "average", "range"].includes(operator.toLowerCase())
+			&& tf.measurementUnitConverter.isNeedConversion(column.UnitInDatabase)
+			&& column.UnitOfMeasureSupported)
+		{
+			value = tf.measurementUnitConverter.convert({
+				value: value,
+				originalUnit: column.UnitInDatabase || tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+				targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+				isReverse: !!column.UnitOfMeasureReverse,
+				unitType: column.UnitTypeOfMeasureSupported
+			});
+
+			return value;
+		}
+
+		return value;
+	}
+
 	MeasurementUnitConverter.prototype.dispose = function()
 	{
 		subscriptions.forEach(s => s.dispose());

@@ -3371,11 +3371,7 @@
 		{
 			self.searchOption = options;
 		}
-		
-		if (options.data && options.data.filterSet)
-		{
-			tf.measurementUnitConverter.processUnitsOfMeasureFilters(self.getKendoColumn(), options.data.filterSet);
-		}
+
 		self.onFilterChanged.notify(options);
 
 		return options;
@@ -4734,7 +4730,7 @@
 
 	LightKendoGrid.prototype._updateGridDefinitionDisplayNameFromTerm = function(column)
 	{
-		if(column.NotReplaceApplicationTermDefaultValue && column.NotReplaceApplicationTermDefaultValue)
+		if (column.NotReplaceApplicationTermDefaultValue && column.NotReplaceApplicationTermDefaultValue)
 		{
 			return;
 		}
