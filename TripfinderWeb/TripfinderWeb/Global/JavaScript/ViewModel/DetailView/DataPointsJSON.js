@@ -1674,6 +1674,31 @@
 						"relationshipKey": "FieldTripEquipment"
 					}
 				},
+				{
+					"field": "FieldTripClassificationName",
+					"title": "Classification",
+					"type": "String",
+					"defaultValue": "",
+					"editType": {
+						"format": "DropDown",
+						"getSource": function()
+						{
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripClassifications"))
+								.then(function(result)
+								{
+									return result.Items.map(function(item)
+									{
+										return {
+											'text': item["Code"],
+											'value': item["Id"]
+										};
+									});
+								});
+						},
+						"allowNullValue": true,
+						"entityKey": "FieldTripClassificationId"
+					}
+				}
 			]
 		},
 		"georegion": {
