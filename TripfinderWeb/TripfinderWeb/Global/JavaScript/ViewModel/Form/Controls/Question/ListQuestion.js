@@ -4,7 +4,25 @@
 
 	function ListQuestion()
 	{
+		const self = this;
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
+		if (TF.isMobileDevice)
+		{
+			$(window).on("orientationchange.lfdq", function()
+			{
+				setTimeout(function()
+				{
+					if (self.multiSelect)
+					{
+						self.multiSelect.close();
+					}
+					else if (self.comboBox)
+					{
+						self.comboBox.close();
+					}
+				});
+			});
+		}
 	}
 
 	ListQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
@@ -16,10 +34,14 @@
 			// multi-select
 			if (Array.isArray(this.value))
 			{
-				return this.value.sort().join(',') !== (this.initialValue || []).sort().join(',')
+				const oldValue = this.convertToSavedValue(this.initialValue, true)
+				const valueArr = this.value.sort();
+				const valueIntial = oldValue.sort();
+				return valueArr.join(',') !== valueIntial.join(',')
 			}
 			// single select
-			return (this.initialValue || '') !== (this.value || '');
+			const oldValue = this.convertToSavedValue(this.initialValue, false);
+			return oldValue !== (this.value || '');
 		}
 	});
 
@@ -28,7 +50,15 @@
 		return !(this.value == null || this.value == '' || (Array.isArray(this.value) && this.value.length == 0));
 	}
 
-	ListQuestion.prototype.initQuestionContent = function ()
+	ListQuestion.prototype.initQuestionContent = function()
+	{
+		const isDropDown = this.field.FieldOptions.PickListIsDropdown;
+		return !isDropDown
+			? this.buildNormalListQuestionContent()
+			: this.buildDropDownListQuestionContent();
+	}
+
+	ListQuestion.prototype.buildNormalListQuestionContent = function()
 	{
 		let field = this.field,
 			defVal = field.DefaultValue,
@@ -195,6 +225,394 @@
 		return options;
 	}
 
+	const ignoreCarriageReturn = function(e)
+	{
+		if (e.keyCode === 13) // 13:carriage return key code
+		{
+			e.stopPropagation();
+		}
+	};
+
+	const extraScrollbarWidth = 12;
+
+	ListQuestion.prototype.buildDropDownListQuestionContent = function()
+	{
+		const field = this.field,
+			fieldOptions = field.FieldOptions,
+			isMultiple = fieldOptions.PickListMultiSelect,
+			isAddOtherOption = fieldOptions.PickListAddOtherOption,
+			listDataOptions = fieldOptions.UDFPickListOptions,
+			self = this,
+			guid = field.Guid;
+
+		const controlId = guid,
+			controlName = guid;
+
+		self._value = self.convertToSavedValue(self.field.value, isMultiple);
+
+		return isMultiple
+			? self.buildMultiSelectListQuestionContent(controlId, controlName, field, listDataOptions, isAddOtherOption)
+			: self.buildComboBoxListQuestionContent(controlId, controlName, field, listDataOptions, isAddOtherOption);
+	};
+
+	ListQuestion.prototype.convertToSavedValue = function(value, isMultiple)
+	{
+		// default value
+		if (!value || !value.length)
+		{
+			return isMultiple ? [] : '';
+		}
+
+		if (!isMultiple) // single select
+		{
+			value = `${value}`; // convert to string
+		}
+		else if (!$.isArray(value)) // multiple select + string value
+		{
+			value = [`${value}`]; // convert to array
+		}
+
+		return value;
+	}
+
+	ListQuestion.prototype.buildComboBoxListQuestionContent = function(controlId, controlName, field, listDataOptions, isAddOtherOption)
+	{
+		const self = this;
+		const htmlStr = `<div class="list-from-data-question question"><input id="${controlId}" name="${controlName}"></div>`;
+		const $options = $(htmlStr);
+		const $selectControl = $options.find(`#${controlId}`);
+		const controlInitConfig = {
+			enable: !field.readonly,
+			dataTextField: "label",
+		 	dataValueField: "value",
+			filter: "contains",
+			syncValueAndText: false,
+			placeholder: "Select item...",
+			change: function(e)
+			{
+				const widget = e.sender;
+				if (widget.text() && widget.select() === -1)
+				{
+					// custom has been selected
+					if (isAddOtherOption)
+					{
+						widget.value(widget.text().trim());
+					}
+					else
+					{
+						widget.value(""); //reset widget
+					}
+				}
+
+				const value = widget.value();
+				self.value = value;
+				widget.input.toggleClass("nil", !value);
+
+				// include the custom item into the datasource
+				if (isAddOtherOption)
+				{
+					const dataSource = self.getComboBoxDataSource(listDataOptions, isAddOtherOption);
+					widget.setDataSource(dataSource);
+					widget.value(value); // reset the value to break the relations between selected custom item with temp custom item
+				}
+			},
+			open: function(e)
+			{
+				const widget = e.sender;
+				widget.list.width(widget.input.width());
+				widget.ul.width("auto");
+				setTimeout(() => {
+					const scrollWidth = widget.list.find("div.k-list-scroller")[0].scrollWidth;
+					widget.ul.find(">li").width(scrollWidth - extraScrollbarWidth);
+				});
+			}
+		};
+
+		$selectControl.kendoComboBox(controlInitConfig);
+		const comboBox = $selectControl.data("kendoComboBox");
+		self.comboBox = comboBox;
+
+		const dataSource = this.getComboBoxDataSource(listDataOptions, isAddOtherOption);
+		comboBox.setDataSource(dataSource);
+		comboBox.value(self.value);
+		if(!isAddOtherOption && comboBox.value() && comboBox.select() === -1)
+		{
+			comboBox.value(""); // clear custom
+		}
+
+		comboBox.list.addClass("list-form-data");
+		comboBox.input.css({display: "inline-block", "text-overflow": "ellipsis"});
+		comboBox.input.toggleClass("nil", !comboBox.value());
+		comboBox.input.bind("keydown", ignoreCarriageReturn);
+		if(isAddOtherOption)
+		{
+			comboBox.input.bind("input", () => {
+				self.updateComboBoxCustomItem(comboBox); // update temp custom item
+				comboBox.open();
+			});
+		}
+
+		return $options;
+	};
+	
+	ListQuestion.prototype.buildMultiSelectListQuestionContent = function(controlId, controlName, field, listDataOptions, isAddOtherOption)
+	{
+		const self = this;
+		const htmlStr = `<div class="list-from-data-question question"><select id="${controlId}" 
+					name="${controlName}" multiple="multiple" data-placeholder="Select items..." 
+					style="width:100%"></div>`;
+		const $options = $(htmlStr);
+		const $selectControl = $options.find(`#${controlId}`);
+		const narrowLongSelectedItem = function(multiSelect)
+		{
+			const maxWidth = multiSelect.input.parent().width() - 36;
+			multiSelect.input.parent().find("li.k-button>span[unselectable='on']").css({ "max-width": maxWidth });
+		};
+		const controlInitConfig = {
+			enable: !field.readonly,
+			dataTextField: "label",
+		 	dataValueField: "value",
+			filter: "contains",
+			autoClose: false,
+			change: function(e)
+			{
+				const widget = e.sender;
+				const value = widget.value();
+				self.value = value;
+
+				// include the custom item into the datasource
+				if (isAddOtherOption)
+				{
+					const dataSource = self.getMultiSelectDataSource(listDataOptions, isAddOtherOption);
+					widget.setDataSource(dataSource);
+					widget.value(value); // reset the value to break the relations between selected custom item with temp custom item
+					self.updateMultiSelectCustomItem(widget);
+				}
+			},
+			open: function(e)
+			{
+				const widget = e.sender;
+				widget.list.width(widget.input.width());
+				widget.ul.width("auto");
+				setTimeout(() => {
+					const scrollWidth = widget.list.find("div.k-list-scroller")[0].scrollWidth;
+					widget.ul.find(">li").width(scrollWidth - extraScrollbarWidth);
+				});
+				
+				if (isAddOtherOption)
+				{
+					self.removeMultiSelectCustomItem(widget);
+				}
+			},
+			close: function(e)
+			{
+				const widget = e.sender;
+				narrowLongSelectedItem(widget);
+			}
+		};
+
+		$selectControl.kendoMultiSelect(controlInitConfig);
+		const multiSelect = $selectControl.data("kendoMultiSelect");
+		self.multiSelect = multiSelect;
+
+		const dataSource = this.getMultiSelectDataSource(listDataOptions, isAddOtherOption);
+		multiSelect.setDataSource(dataSource);
+		multiSelect.value(self.value);
+		
+		multiSelect.list.addClass("list-form-data");
+		multiSelect.input.parent().append(`<span unselectable="on" class="k-select" aria-label="select" role="button"><span class="k-icon k-i-arrow-60-down"></span></span>`);
+		narrowLongSelectedItem(multiSelect);
+
+		multiSelect.input.bind("keydown", ignoreCarriageReturn);
+		if(isAddOtherOption)
+		{
+			multiSelect.input.bind("input", () => {
+				self.updateMultiSelectCustomItem(multiSelect); // update temp custom item
+			});
+		}
+
+		return $options;
+	};
+
+	ListQuestion.prototype.removeMultiSelectCustomItem = function(widget)
+	{
+		const ds = widget.dataSource;
+		let customItem = ds.get(-1); // temp custom item
+		if(customItem)
+		{
+			ds.remove(customItem);
+		}
+	}
+
+	ListQuestion.prototype.updateMultiSelectCustomItem = function(widget)
+	{
+		const ds = widget.dataSource;
+		let customItem = ds.get(-1); // temp custom item
+		const text = widget.input.val(),
+			val = text.trim(),
+			valLowerCase = val.toLowerCase();
+
+		// remove temp custom item if input nothing
+		if (!val)
+		{
+			if(customItem)
+			{
+				ds.remove(customItem);
+			}
+			return;
+		}
+		
+		var len = ds.data().length;
+		var found = false;
+		for(let i = 0; i < len; i++)
+		{
+			var item = ds.at(i);
+			if(item && item.id !== -1 && item.get("value").toLowerCase() === valLowerCase)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		// remove temp custom item if the input match existing items
+		if(found)
+		{
+			if(customItem)
+			{
+				ds.remove(customItem);
+			}
+			return;
+		}
+
+		// add temp custom item the input does not match existing items
+		if (!customItem)
+		{
+			ds.add({ label: "", value: "", id: -1 });
+			customItem = ds.get(-1);
+		}
+		
+		// upate temp custom item
+		customItem.set("label", `(+) ${text}`);
+		customItem.set("value", val);
+	};
+
+	ListQuestion.prototype.updateComboBoxCustomItem = function(widget)
+	{
+		const ds = widget.dataSource;
+		let customItem = ds.get(-1); // temp custom item
+		let customItem2 = ds.get(-2); // custom item
+		const text = widget.input.val(),
+			val = text.trim(),
+			valLowerCase = val.toLowerCase();
+
+		// remove temp custom item if input nothing
+		if (!val)
+		{
+			if(customItem)
+			{
+				ds.remove(customItem);
+			}
+
+			if(customItem2)
+			{
+				ds.remove(customItem2);
+			}
+			return;
+		}
+		
+		var len = ds.data().length;
+		var found = false;
+		for(let i = 0; i < len; i++)
+		{
+			var item = ds.at(i);
+			if(item && item.id != -1 && item.get("value").toLowerCase() === valLowerCase)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		// remove temp custom item if the input match existing items
+		if(found)
+		{
+			if(customItem)
+			{
+				ds.remove(customItem);
+			}
+			return;
+		}
+
+		if(customItem2)
+		{
+			ds.remove(customItem2);
+		}
+
+		// add temp custom item the input does not match existing items
+		if (!customItem)
+		{
+			ds.add({ label: "", value: "", id: -1 });
+			customItem = ds.get(-1);
+			widget.text(text); // add a custom item will update the text with selected value, need restore the input text
+		}
+
+		// upate temp custom item
+		customItem.set("label", `(+) ${text}`);
+		customItem.set("value", val);
+	}
+
+	ListQuestion.prototype.getComboBoxDataSource = function(listDataOptions, isAddOtherOption)
+	{
+		const self = this;
+		let dataValues = listDataOptions.map((opt) => opt.PickList);
+		
+		let dataItems = dataValues.map((val, idx) => {
+			return {
+				label: val,
+				value: val,
+				id: idx
+			};
+		});
+		
+		if (isAddOtherOption && self.value && dataValues.indexOf(self.value) === -1)
+		{
+			dataItems.push(
+			{
+				label: self.value,
+				value: self.value,
+				id: -2
+			});
+		}
+		
+		return new kendo.data.DataSource({
+			data: dataItems
+		});
+	};
+
+	ListQuestion.prototype.getMultiSelectDataSource = function(listDataOptions, isAddOtherOption)
+	{
+		const self = this;
+		let dataValues = listDataOptions.map((opt) => opt.PickList);
+
+		// add other items
+		if(isAddOtherOption && self.value)
+		{
+			const otherItems = self.value.filter((v) => dataValues.indexOf(v) === -1);
+			dataValues.push(...otherItems);
+		}
+
+		let dataItems = dataValues.map((val, idx) => {
+			return {
+				label: val,
+				value: val,
+				id: idx
+			};
+		});
+
+		return new kendo.data.DataSource({
+			data: dataItems
+		});
+	};
+
 	ListQuestion.prototype.getValidateResult = function ()
 	{
 		let result = '';
@@ -203,6 +621,23 @@
 			result = 'Answer is required.';
 		}
 		return result;
+	}
+
+	ListQuestion.prototype.dispose = function()
+	{
+		if (TF.isMobileDevice)
+		{
+			$(window).off("orientationchange.lfdq");
+		}
+
+		if (this.multiSelect)
+		{
+			this.multiSelect.popup.wrapper.remove();
+		}
+		else if (this.comboBox)
+		{
+			this.comboBox.popup.wrapper.remove();
+		}
 	}
 
 	ListQuestion.prototype.generateOption = function (isMultiple, idx, option, guid)
