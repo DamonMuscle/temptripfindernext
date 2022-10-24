@@ -684,7 +684,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "mailingcities");
+				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities");
 			}
 		}, true);
 
@@ -696,7 +696,7 @@
 			filterField: "Item",
 			getUrl: function()
 			{
-				return pathCombine(tf.api.apiPrefix(), "mailingcities");
+				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities");
 			}
 		}, true);
 
