@@ -4996,7 +4996,7 @@
 	// different from fetch geo cities in value property.
 	function fetchMailingCities()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities?@fields=Id,Name"))
 			.then(function(result)
 			{
 				return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; })
