@@ -337,16 +337,16 @@
 		var self = this;
 		if (e.view == "List")
 		{
-			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "none");
-			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "none");
-			self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-navigation .k-nav-prev").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-navigation .k-nav-next").css("display", "none");
+			self.$kendoscheduler.find(".k-scheduler-toolbar a.k-nav-current").css("display", "none");
 		} else
 		{
-			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-prev").css("display", "inline-block");
-			self.$kendoscheduler.find(".k-state-default.k-header.k-nav-next").css("display", "inline-block");
+			self.$kendoscheduler.find(".k-scheduler-navigation .k-nav-prev").css("display", "inline-block");
+			self.$kendoscheduler.find(".k-scheduler-navigation .k-nav-next").css("display", "inline-block");
 			if (!TF.isMobileDevice)
 			{
-				self.$kendoscheduler.find(".k-scheduler-toolbar li.k-nav-current .k-lg-date-format").css("display", "inline");
+				self.$kendoscheduler.find(".k-scheduler-toolbar a.k-nav-current").css("display", "inline");
 			}
 		}
 	};
