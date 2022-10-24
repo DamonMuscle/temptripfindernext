@@ -13,6 +13,7 @@
 	UserDefinedGridHelper.prototype.constructor = UserDefinedGridHelper;
 
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
+	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
 
 	UserDefinedGridHelper.getUpdatedInfoColumns = function ()
 	{

@@ -100,6 +100,10 @@
 						section.element.find(".system-field-invalid").removeClass("hide");
 					}
 				});
+				if (this.isFormsResultsReadOnly() && !this.options.DisplayOneSection) // handle not DisplayOneSection: footer read-oly
+				{
+					this.handleFooterForReadOnly(this.elem);
+				}	
 
 			} else
 			{
@@ -507,7 +511,7 @@
 		const dbID = tf.datasourceManager.databaseId || this.dbId;
 		let type = this.dataType;
 		let selector = 'FormRecordSelector',
-		submitFormIsAllRecordType = this._specifyOptions.TypeId === ALL_RECORD && this.options.udGridRecordId;;
+		submitFormIsAllRecordType = this._specifyOptions.TypeId === ALL_RECORD && this.options.udGridRecordId;
 
 		if (!this.options.Public &&
 			this._specifyOptions.TypeId !== SPECIFY_RECORD_TYPE_SPECIFIC &&
@@ -1277,22 +1281,16 @@
 			element.find(".system-field-invalid").removeClass("hide");
 		}
 
-		if (onlyContainsSystemFields)
+		if (onlyContainsSystemFields || this.isFormsResultsReadOnly())
 		{
-			let $modal = element.closest(".modal-dialog")
-			let $positiveBtn = $modal.find(".btn.positive");
-			if ($positiveBtn && $positiveBtn.length)
-			{
-				$positiveBtn.remove();
-			}
-
-			let $negativeBtn = $modal.find(".btn.negative");
-			if ($negativeBtn && $negativeBtn.length)
-			{
-				$negativeBtn.removeClass("btn-link").addClass("tf-btn-black");
-				$negativeBtn.find("p").text("Close");
-			}
+			this.handleFooterForReadOnly(element);
 		}
+	}
+
+	Form.prototype.isFormsResultsReadOnly = function()
+	{
+		return !this.options.udGridRecordId ? !tf.authManager.isAuthorizedFor("formsResults", "add"):
+					!tf.authManager.isAuthorizedFor("formsResults", "edit");
 	}
 
 	Form.prototype.resetWarningMessage = function(element)
@@ -1359,13 +1357,31 @@
 		}
 	};
 
+	Form.prototype.handleFooterForReadOnly = function (element)
+	{
+		let $modal = element.closest(".modal-dialog")
+		let $positiveBtn = $modal.find(".btn.positive");
+		if ($positiveBtn && $positiveBtn.length)
+		{
+			$positiveBtn.remove();
+		}
+
+		let $negativeBtn = $modal.find(".btn.negative");
+		if ($negativeBtn && $negativeBtn.length)
+		{
+			$negativeBtn.removeClass("btn-link").addClass("tf-btn-black");
+			$negativeBtn.find("p").text("Close");
+		}
+	};
+
 	Form.prototype.handleFooterForSectionGrid = function ()
 	{
 		const self = this;
 		const $footerModel = $('.modal-footer');
+		const formsResultsReadOnly =  self.isFormsResultsReadOnly();
 		if ($footerModel.length > 0)
 		{
-			const currentIsReadOnly = self.options.isReadOnly || self.options.signatureReadonly;
+			const currentIsReadOnly = self.options.isReadOnly || self.options.signatureReadonly || formsResultsReadOnly;
 			self.removeAllChildNodes($footerModel[0]);
 			let newFooter = `<div class="action-bar">
 							<button type="button" data-bind="visible: currentSectionId() === lastSectionId()"

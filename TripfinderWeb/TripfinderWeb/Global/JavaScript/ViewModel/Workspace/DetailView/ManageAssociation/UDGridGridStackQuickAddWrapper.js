@@ -104,7 +104,7 @@
 
 				formOption.latitude = self.recordEntity.latitude;
 				formOption.longitude = self.recordEntity.longitude;
-				if (self.isReadOnly)
+				if (self.isReadOnly || !tf.authManager.isAuthorizedFor("formsResults", "edit"))
 				{
 					formOption.UDGridFields.forEach(field => field.readonly = true);
 				}
@@ -240,22 +240,36 @@
 	UDGridGridStackQuickAddWrapper.prototype.save = function ()
 	{
 		var self = this;
-
-		return self.form.saveForm()
-			.then(function (result)
+		// update auth info
+		let updateAuthPromise = tf.authManager.updateAuthInfos();
+		return updateAuthPromise.then(() =>
+		{
+			const isReadOnly = !self.form.options.udGridRecordId? !tf.authManager.isAuthorizedFor("formsResults", "add"):
+				 !tf.authManager.isAuthorizedFor("formsResults", "edit");
+			if (isReadOnly)
 			{
-				if (result == null)
+				return tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION, 'Warning').then(() =>
 				{
-					result = { success: false };
-				}
+					this.negativeClose();
+				});	
+			}
 
-				if (result.success == null)
+			return self.form.saveForm()
+				.then(function(result)
 				{
-					result.success = true;
-				}
+					if (result == null)
+					{
+						result = { success: false };
+					}
 
-				return result;
-			});
+					if (result.success == null)
+					{
+						result.success = true;
+					}
+
+					return result;
+				});
+		});
 	};
 
 	/*
