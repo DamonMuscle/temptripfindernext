@@ -103,7 +103,7 @@
 
 	UDGridBlock.prototype.isAddBtnDisabled = function ()
 	{
-		return this.isReadOnly();
+		return this.isReadOnly() || !tf.authManager.isAuthorizedFor("formsResults", "add");
 	};
 
 	UDGridBlock.prototype.initElement = function (options)
@@ -123,9 +123,13 @@
 					options.ExternalID.trim() !== "" ? title + ` ( External ID: ${options.ExternalID.trim()} )` : title
 			});
 
-		if (self.isAddBtnDisabled())
+		if (self.isAddBtnDisabled() || !tf.authManager.isAuthorizedFor("formsResults", "edit"))
 		{
 			$btn.addClass("disabled");
+			if (tf.authManager.isAuthorizedFor("formsResults", "delete"))
+			{
+				$delBtn.show();
+			}
 		}
 		// Fix RW-19496: Add button is overlap on label
 		$itemTitleText.css({

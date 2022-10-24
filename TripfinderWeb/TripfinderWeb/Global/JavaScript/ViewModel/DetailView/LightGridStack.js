@@ -888,7 +888,10 @@
 	LightGridStack.prototype._addDataBlocks = function(item)
 	{
 		var self = this;
-
+		if (item.type === "UDGrid" && !tf.authManager.isAuthorizedFor("formsResults", "read"))
+		{
+			return;
+		}
 		switch (item.type)
 		{
 			case "horizontalLine":

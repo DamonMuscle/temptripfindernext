@@ -15,7 +15,8 @@
 		trip: "trip",
 		contact: "contact",
 		document: "documentCenter",
-		documentTab: "documentTab"
+		documentTab: "documentTab",
+		form: "formsResults"
 	}
 
 	function AuthManager()
@@ -258,6 +259,24 @@
 		this.userName = tf.storageManager.get("userName", true);
 		this.password = tf.storageManager.get("password", true);
 	};
+
+	AuthManager.prototype.hasFormsResultsAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+
+		let securedForms = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.formsResults;
+		if (securedForms != null && Array.isArray(securedForms))
+		{
+			return securedForms.some(item => item === type);
+		}
+		return false;
+	}
 
 	AuthManager.prototype.updateAuthInfos = function()
 	{
