@@ -123,13 +123,9 @@
 					options.ExternalID.trim() !== "" ? title + ` ( External ID: ${options.ExternalID.trim()} )` : title
 			});
 
-		if (self.isAddBtnDisabled() || !tf.authManager.isAuthorizedFor("formsResults", "edit"))
+		if (self.isAddBtnDisabled())
 		{
 			$btn.addClass("disabled");
-			if (tf.authManager.isAuthorizedFor("formsResults", "delete"))
-			{
-				$delBtn.show();
-			}
 		}
 		// Fix RW-19496: Add button is overlap on label
 		$itemTitleText.css({
@@ -913,8 +909,11 @@
 		}
 		else
 		{
-			$delBtn.show();
-			if (hasSignatureRespond)
+			if (tf.authManager.isAuthorizedFor("formsResults", "delete"))
+			{
+				$delBtn.show();
+			}
+			if (hasSignatureRespond || !tf.authManager.isAuthorizedFor("formsResults", "edit"))
 			{
 				$viewBtn.show();
 			}
