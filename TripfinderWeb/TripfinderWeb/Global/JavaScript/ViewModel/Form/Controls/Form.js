@@ -100,7 +100,8 @@
 						section.element.find(".system-field-invalid").removeClass("hide");
 					}
 				});
-				if (this.isFormsResultsReadOnly() && !this.options.DisplayOneSection) // handle not DisplayOneSection: footer read-oly
+				// add this.options.isReadOnly condition: for detail view mini grid is readonly, skip this
+				if (!this.options.isReadOnly && this.isFormsResultsReadOnly() && !this.options.DisplayOneSection) // handle not DisplayOneSection: footer read-oly
 				{
 					this.handleFooterForReadOnly(this.elem);
 				}	
