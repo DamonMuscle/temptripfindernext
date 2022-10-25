@@ -4968,7 +4968,7 @@
 
 	function fetchGeoCities()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingcities?@fields=Id,Name"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities?@fields=Id,Name"))
 			.then(function(result)
 			{
 				return result.Items.map(function(item) { return { text: item.Name, value: item.Name }; })
@@ -4986,7 +4986,7 @@
 
 	function fetchMailingZipCodes()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingpostalcodes?@fields=Id,Postal"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingpostalcodes?@fields=Id,Postal"))
 			.then(function(result)
 			{
 				return result.Items.map(function(item) { return { text: item.Postal, value: item.Id }; })

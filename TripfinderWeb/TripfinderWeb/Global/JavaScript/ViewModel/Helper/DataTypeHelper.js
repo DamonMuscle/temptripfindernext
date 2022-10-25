@@ -304,7 +304,7 @@
 		mailingpostalcode: {
 			endpoint: "mailingpostalcodes",
 			name: "Mailing Postal Code",
-			hasDBID: true,
+			hasDBID: false,
 		},
 		tripalias: {
 			endpoint: "tripalias",

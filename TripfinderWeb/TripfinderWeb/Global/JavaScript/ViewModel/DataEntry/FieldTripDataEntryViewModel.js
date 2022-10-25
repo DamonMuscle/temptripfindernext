@@ -468,7 +468,7 @@
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripConfigs")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RequiredFields")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "MailingCities")),
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "MailingPostalCodes")),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "MailingPostalCodes")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripAccounts")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripHolidays")),
 		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripBlockOuts"))];
