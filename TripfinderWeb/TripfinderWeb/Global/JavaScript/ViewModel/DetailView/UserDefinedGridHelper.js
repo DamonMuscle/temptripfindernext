@@ -1691,6 +1691,11 @@
 			{
 				flag = flag || tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(selectedRecord, result.UDGridFields)
 					|| (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(dataType) || "").toLowerCase(), "edit") && !result.isPublic);
+				// put form result permission 
+				flag = flag || !tf.authManager.isAuthorizedFor("formsResults", "edit");
+			} else
+			{
+				flag = flag || !tf.authManager.isAuthorizedFor("formsResults", "add");
 			}
 
 			return flag;

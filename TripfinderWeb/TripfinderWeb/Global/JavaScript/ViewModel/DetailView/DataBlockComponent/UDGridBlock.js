@@ -762,6 +762,11 @@
 			{
 				readonly = true;
 			}
+			//if main grid has no edit permission, the form should be readonly
+			if (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(this.options.DataTypeId) || "").toLowerCase(), "edit"))
+			{
+				readonly = true;
+			}
 			readonly ? this.viewRecord(selectedRecord) : this.editRecord(selectedRecord);
 		});
 	}
