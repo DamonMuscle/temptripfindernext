@@ -100,12 +100,6 @@
 						section.element.find(".system-field-invalid").removeClass("hide");
 					}
 				});
-				// add this.options.isReadOnly condition: for detail view mini grid is readonly, skip this
-				if (!this.options.isReadOnly && this.isFormsResultsReadOnly() && !this.options.DisplayOneSection) // handle not DisplayOneSection: footer read-oly
-				{
-					this.handleFooterForReadOnly(this.elem);
-				}	
-
 			} else
 			{
 				this.resetSubmitButtonsAndWarningMessage(this.elem);
@@ -1282,7 +1276,7 @@
 			element.find(".system-field-invalid").removeClass("hide");
 		}
 
-		if (onlyContainsSystemFields || this.isFormsResultsReadOnly())
+		if (onlyContainsSystemFields)
 		{
 			this.handleFooterForReadOnly(element);
 		}
