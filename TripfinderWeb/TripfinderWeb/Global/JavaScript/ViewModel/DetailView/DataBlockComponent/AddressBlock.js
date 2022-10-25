@@ -171,7 +171,7 @@
 
 	AddressBlock.prototype.fetchDropDownDataSource = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "mailingpostalcodes?@fields=Id,Postal"))
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingpostalcodes?@fields=Id,Postal"))
 			.then(result =>
 			{
 				return result.Items.map(item =>
