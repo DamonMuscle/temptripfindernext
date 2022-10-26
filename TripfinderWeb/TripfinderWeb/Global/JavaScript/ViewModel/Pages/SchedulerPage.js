@@ -332,10 +332,10 @@
 		});
 	};
 
-	SchedulerPage.prototype.resetSchedulerToolbar = function(e)
+	SchedulerPage.prototype.resetSchedulerToolbar = function(view)
 	{
 		var self = this;
-		if (e.view == "List")
+		if (view == "List")
 		{
 			self.$kendoscheduler.find(".k-scheduler-navigation .k-nav-prev").css("display", "none");
 			self.$kendoscheduler.find(".k-scheduler-navigation .k-nav-next").css("display", "none");
@@ -595,7 +595,11 @@
 				{
 					self.getScrollBarPosition();
 					self.kendoScheduleChanged(e);
-					self.resetSchedulerToolbar(e);
+					self.resetSchedulerToolbar(e.view);
+				},
+				dataBound: function(e)
+				{
+					self.resetSchedulerToolbar(e.sender._selectedViewName);
 				},
 				footer: false
 			}).data("kendoScheduler");
