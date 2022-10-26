@@ -599,7 +599,7 @@
 				},
 				dataBound: function(e)
 				{
-					self.resetSchedulerToolbar(e.sender._selectedViewName);
+					self.resetSchedulerToolbar(e.sender.view().title);
 				},
 				footer: false
 			}).data("kendoScheduler");
