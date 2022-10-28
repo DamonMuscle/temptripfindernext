@@ -2745,7 +2745,7 @@
 		}
 		else
 		{
-			noMatchedAccountErrorMsg = "No account is avilable, please add in field trip configurations.";
+			noMatchedAccountErrorMsg = "No account is available, please add in field trip configurations.";
 			fetchEligibleAccounts = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts?@fields=Id,Code"))
 				.then(function(res)
 				{
