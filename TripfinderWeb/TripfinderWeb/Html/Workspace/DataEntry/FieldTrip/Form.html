@@ -489,11 +489,11 @@
 							Estimated Distance
 						</label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().EstimatedDistance && obRequiredFields().EstimatedDistance.Required)-->
-						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().EstimatedDistance,attributes:{class:"form-control",required:"required",maxlength:"5",name:"estimatedDistance"}} -->
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedDistance,attributes:{class:"form-control",required:"required",maxlength:"5",name:"estimatedDistance"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 						<!-- ko if: !(obRequiredFields() && obRequiredFields().EstimatedDistance) || (obRequiredFields() && obRequiredFields().EstimatedDistance && !obRequiredFields().EstimatedDistance.Required)-->
-						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().EstimatedDistance,attributes:{class:"form-control",maxlength:"5",name:"estimatedDistance"}} -->
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedDistance,attributes:{class:"form-control",maxlength:"5",name:"estimatedDistance"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
