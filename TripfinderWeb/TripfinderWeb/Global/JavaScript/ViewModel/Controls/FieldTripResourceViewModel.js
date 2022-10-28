@@ -2,7 +2,7 @@
 {
 	createNamespace('TF.Control').FieldTripResourceViewModel = FieldTripResourceViewModel;
 
-	function FieldTripResourceViewModel (source, id, resourceGroupDate, obFieldTrip)
+	function FieldTripResourceViewModel(source, id, resourceGroupDate, obFieldTrip)
 	{
 		this.obEntityDataModel = ko.observable(new TF.DataModel.FieldTripResourceDataModel(source));
 		this.obEntityDataModel().fieldTripId(id);
@@ -22,7 +22,7 @@
 			var value;
 			if (this.obEditTieldTrip())
 			{
-				value = (Number(this.obEntityDataModel().endingOdometer()) - Number(this.obEntityDataModel().startingOdometer())) * Number(this.obEntityDataModel().mileageRate())
+				value = (Number(this.obEntityDataModel().endingOdometer()) - Number(this.obEntityDataModel().startingOdometer())) * Number(this.obEntityDataModel().fuelConsumptionRate())
 					+ Number(this.obEntityDataModel().vehFixedCost()) || 0;
 			}
 			else
@@ -66,12 +66,12 @@
 			{
 				if (this.obFieldTrip)
 				{
-					this.obEntityDataModel().mileageRate(this.obFieldTrip.MileageRate || e.Cost ? this.obFieldTrip.MileageRate || e.Cost : 0);
+					this.obEntityDataModel().fuelConsumptionRate(this.obFieldTrip.FuelConsumptionRate || e.Cost ? this.obFieldTrip.FuelConsumptionRate || e.Cost : 0);
 					this.obEntityDataModel().vehFixedCost(this.obFieldTrip.FixedCost ? this.obFieldTrip.FixedCost : 0);
 				}
 				else
 				{
-					this.obEntityDataModel().mileageRate(e.Cost ? e.Cost : 0);
+					this.obEntityDataModel().fuelConsumptionRate(e.Cost ? e.Cost : 0);
 				}
 			}
 		}.bind(this));
@@ -278,8 +278,8 @@
 			return true;
 		}
 
-		const vehicleId = this.obSelectedVehicle()? this.obSelectedVehicle().Id : null;
-		
+		const vehicleId = this.obSelectedVehicle() ? this.obSelectedVehicle().Id : null;
+
 		if (this.resourceGroupData && this.resourceGroupData.some(item => item.VehicleId === vehicleId))
 		{
 			return false;

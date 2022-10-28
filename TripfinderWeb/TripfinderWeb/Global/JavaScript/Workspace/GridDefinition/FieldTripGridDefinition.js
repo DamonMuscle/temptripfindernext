@@ -276,7 +276,7 @@
 			type: "integer"
 		},
 		{
-			FieldName: "EstimatedMiles",
+			FieldName: "EstimatedDistance",
 			DisplayName: "Estimated Distance",
 			UnitOfMeasureSupported: true,
 			Width: '150px',
@@ -430,7 +430,7 @@
 			hidden: true
 		},
 		{
-			FieldName: "MileageRate",
+			FieldName: "FuelConsumptionRate",
 			DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 			UnitOfMeasureSupported: true,
 			UnitOfMeasureReverse: true,
@@ -973,7 +973,7 @@
 				format: "{0:0}"
 			},
 			{
-				FieldName: "MileageRate",
+				FieldName: "FuelConsumptionRate",
 				DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 				Width: '150px',
 				type: "number",

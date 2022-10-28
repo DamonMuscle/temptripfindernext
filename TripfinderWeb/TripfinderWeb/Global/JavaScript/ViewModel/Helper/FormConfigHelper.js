@@ -77,7 +77,7 @@
 			"DriverRate": { type: "number" },
 			"EstimatedCost": { type: "number" },
 			"EstimatedHours": { type: "number" },
-			"EstimatedMiles": { type: "number" },
+			"EstimatedDistance": { type: "number" },
 			"FixedCost": { type: "number" },
 			"MileageRate": { type: "number" },
 			"MinimumCost": { type: "number" },

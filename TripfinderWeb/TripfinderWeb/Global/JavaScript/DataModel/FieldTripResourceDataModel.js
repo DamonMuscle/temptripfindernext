@@ -1,7 +1,9 @@
-﻿(function () {
+﻿(function()
+{
 	var namespace = window.createNamespace("TF.DataModel");
 
-	namespace.FieldTripResourceDataModel = function (fieldTripResourceEntity) {
+	namespace.FieldTripResourceDataModel = function(fieldTripResourceEntity)
+	{
 		namespace.BaseDataModel.call(this, fieldTripResourceEntity);
 	}
 
@@ -38,7 +40,7 @@
 		{ from: "DriverRate", default: 0 },
 		{ from: "EndingOdometer", default: 0, UnitOfMeasureSupported: true },
 		{ from: "FieldTripResourceGroupId", default: 0 },
-		{ from: "MileageRate", default: 0, UnitOfMeasureSupported: true, UnitOfMeasureReverse: true },
+		{ from: "FuelConsumptionRate", default: 0, UnitOfMeasureSupported: true, UnitOfMeasureReverse: true },
 		{ from: "StartingOdometer", default: 0, UnitOfMeasureSupported: true },
 		{ from: "VehFixedCost", default: 0 },
 		{ from: "Vehicle", default: "" },

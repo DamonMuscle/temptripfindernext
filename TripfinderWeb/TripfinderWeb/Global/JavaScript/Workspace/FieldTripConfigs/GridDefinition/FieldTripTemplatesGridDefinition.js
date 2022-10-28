@@ -118,7 +118,7 @@
 					type: "integer"
 				},
 				{
-					field: "EstimatedMiles",
+					field: "EstimatedDistance",
 					title: "Estimated Distance",
 					"UnitOfMeasureSupported": true,
 					width: '150px',
