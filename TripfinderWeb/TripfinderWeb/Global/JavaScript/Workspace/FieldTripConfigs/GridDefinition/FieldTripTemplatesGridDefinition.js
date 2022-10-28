@@ -218,7 +218,7 @@
 				},
 
 				{
-					field: "MileageRate",
+					field: "FuelConsumptionRate",
 					title: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 					"UnitOfMeasureSupported": true,
 					"UnitOfMeasureReverse": true,

@@ -79,7 +79,7 @@
 			"EstimatedHours": { type: "number" },
 			"EstimatedDistance": { type: "number" },
 			"FixedCost": { type: "number" },
-			"MileageRate": { type: "number" },
+			"FuelConsumptionRate": { type: "number" },
 			"MinimumCost": { type: "number" },
 			"TotalAmount": { type: "number" },
 			"FieldTripStageName": { type: "FieldTripStage" },

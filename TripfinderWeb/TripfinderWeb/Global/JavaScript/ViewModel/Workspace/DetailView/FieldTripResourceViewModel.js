@@ -213,13 +213,13 @@
 
 			return fixFloat(ending - start);
 		});
-		self.obMileageRate = ko.observable(isNew ? null : entity.MileageRate);
+		self.obFuelConsumptionRate = ko.observable(isNew ? null : entity.FuelConsumptionRate);
 		self.obVehicleFixedCost = ko.observable(isNew ? null : entity.VehFixedCost);
 		self.obVehicleTotal = ko.computed(function()
 		{
 			var difference = getFloatOrNull(self.obOdometerDifference()),
 				fixedCost = getFloatOrNull(self.obVehicleFixedCost()),
-				milerate = getFloatOrNull(self.obMileageRate()),
+				milerate = getFloatOrNull(self.obFuelConsumptionRate()),
 				total = null, mileCost = null;
 
 			if (difference != null && milerate != null)
@@ -360,17 +360,17 @@
 
 			if (!billingClassification)
 			{
-				self.obMileageRate(vehicle.Cost);
+				self.obFuelConsumptionRate(vehicle.Cost);
 			}
 			else
 			{
-				self.obMileageRate(billingClassification.MileageRate);
+				self.obFuelConsumptionRate(billingClassification.FuelConsumptionRate);
 				self.obVehicleFixedCost(billingClassification.VehFixedCost);
 			}
 		}
 		else
 		{
-			self.obMileageRate(null);
+			self.obFuelConsumptionRate(null);
 			self.obVehicleFixedCost(null);
 		}
 	};
@@ -502,7 +502,7 @@
 			StartingOdometer: self.obOdometerStart(),
 			EndingOdometer: self.obOdometerEnding(),
 			VehFixedCost: self.obVehicleFixedCost(),
-			MileageRate: self.obMileageRate(),
+			FuelConsumptionRate: self.obFuelConsumptionRate(),
 			DriverHours: self.obDriverBillingHours(),
 			DriverRate: self.obDriverBillingRate(),
 			DriverOTHours: self.obDriverBillingOTHours(),

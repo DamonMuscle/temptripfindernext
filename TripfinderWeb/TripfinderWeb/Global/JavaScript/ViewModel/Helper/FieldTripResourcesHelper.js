@@ -54,18 +54,18 @@
 		});
 	}
 
-	FieldTripResourcesHelper.prototype.calculatedMileageRateComputer = function(fieldTripResourceDataEntry)
+	FieldTripResourcesHelper.prototype.calculatedFuelConsumptionRateComputer = function(fieldTripResourceDataEntry)
 	{
 		if (fieldTripResourceDataEntry.FieldTripId == 0)
 		{
-			return 0 //FT-296 When add a new field trip the EndingOdometer will be disable and the MileageRate will not be calculated.
+			return 0 //FT-296 When add a new field trip the EndingOdometer will be disable and the FuelConsumptionRate will not be calculated.
 		}
-		return (Number(fieldTripResourceDataEntry.EndingOdometer) - Number(fieldTripResourceDataEntry.StartingOdometer)) * Number(fieldTripResourceDataEntry.MileageRate);
+		return (Number(fieldTripResourceDataEntry.EndingOdometer) - Number(fieldTripResourceDataEntry.StartingOdometer)) * Number(fieldTripResourceDataEntry.FuelConsumptionRate);
 	}
 
 	FieldTripResourcesHelper.prototype.vehicleCostComputer = function(fieldTripResourceDataEntry)
 	{
-		return this.calculatedMileageRateComputer(fieldTripResourceDataEntry) + Number(fieldTripResourceDataEntry.VehFixedCost);
+		return this.calculatedFuelConsumptionRateComputer(fieldTripResourceDataEntry) + Number(fieldTripResourceDataEntry.VehFixedCost);
 	}
 
 	FieldTripResourcesHelper.prototype.driverCostComputer = function(fieldTripResourceDataEntry)

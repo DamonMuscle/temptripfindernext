@@ -81,7 +81,7 @@
 			{ fieldName: 'DriverFixedCost', entityKey: 'DriverFixedCost' },
 			{ fieldName: 'VehFixedCost', entityKey: 'VehFixedCost' },
 
-			{ fieldName: 'MileageRate', entityKey: 'MileageRate' },
+			{ fieldName: 'FuelConsumptionRate', entityKey: 'FuelConsumptionRate' },
 			{ fieldName: 'DriverRate', entityKey: 'DriverRate' },
 			{ fieldName: 'DriverOtrate', entityKey: 'DriverOTRate' },
 			{ fieldName: 'AideRate', entityKey: 'AideRate' },
@@ -232,7 +232,7 @@
 						}, {});
 						var updatedResGroups = items.map(function(item)
 						{
-							item['MileageRate'] = item.VehicleId && vehicles[item.VehicleId].Cost;
+							item['FuelConsumptionRate'] = item.VehicleId && vehicles[item.VehicleId].Cost;
 							item['AideOTRate'] = item.AideId && staffs[item.AideId].Otrate;
 							item['AideRate'] = item.AideId && staffs[item.AideId].Rate;
 							item['DriverOTRate'] = item.DriverId && staffs[item.DriverId].Otrate;
@@ -264,8 +264,8 @@
 				rs.DriverOTRate = billingClassification.DriverOTRate && billingClassification.DriverOTRate;
 				rs.DriverFixedCost = billingClassification.DriverFixedCost && billingClassification.DriverFixedCost;
 
-				rs.MileageRate = billingClassification.MileageRate && billingClassification.MileageRate;
-				rs.VehFixedCost = billingClassification.MileageRate && billingClassification.VehFixedCost;
+				rs.FuelConsumptionRate = billingClassification.FuelConsumptionRate && billingClassification.FuelConsumptionRate;
+				rs.VehFixedCost = billingClassification.FuelConsumptionRate && billingClassification.VehFixedCost;
 
 				rs.AideRate = billingClassification.AideRate && billingClassification.AideRate;
 				rs.AideOTRate = billingClassification.AideOTRate && billingClassification.AideOTRate;
@@ -275,7 +275,7 @@
 
 				rs.AideTotalCost += sumNubers(rs.AideTotalCost, rs.AideHours * rs.AideRate, rs.AideOTHours * rs.AideOTRate, rs.AideFixedCost);
 				rs.DriverTotalCost += sumNubers(rs.DriverTotalCost, rs.DriverFixedCost, rs.DriverHours * rs.DriverRate, rs.DriverOTHours * rs.DriverOTRate, rs.DriverExpMeals, rs.DriverExpMisc, rs.DriverExpParking, rs.DriverExpTolls);
-				rs.VehicleTotalCost += sumNubers(rs.VehicleTotalCost, (rs.EndingOdometer - rs.StartingOdometer) * rs.MileageRate, rs.VehFixedCost);
+				rs.VehicleTotalCost += sumNubers(rs.VehicleTotalCost, (rs.EndingOdometer - rs.StartingOdometer) * rs.FuelConsumptionRate, rs.VehFixedCost);
 				rs.TotalCost = sumNubers(rs.DriverTotalCost, rs.AideTotalCost, rs.VehicleTotalCost)
 				return rs;
 			})

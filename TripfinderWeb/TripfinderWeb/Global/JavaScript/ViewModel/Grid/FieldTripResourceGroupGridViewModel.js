@@ -75,7 +75,7 @@
 						format: "{0:0}"
 					},
 					{
-						FieldName: "MileageRate",
+						FieldName: "FuelConsumptionRate",
 						DisplayName: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 						"UnitOfMeasureSupported": true,
 						"UnitOfMeasureReverse": true,
