@@ -118,7 +118,7 @@
 					type: "integer"
 				},
 				{
-					field: "EstimatedMiles",
+					field: "EstimatedDistance",
 					title: "Estimated Distance",
 					"UnitOfMeasureSupported": true,
 					width: '150px',
@@ -218,7 +218,7 @@
 				},
 
 				{
-					field: "MileageRate",
+					field: "FuelConsumptionRate",
 					title: `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
 					"UnitOfMeasureSupported": true,
 					"UnitOfMeasureReverse": true,

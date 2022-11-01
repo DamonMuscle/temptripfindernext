@@ -3,7 +3,7 @@
 	/**
 	 * Grid Definition:
 	 *              UnitOfMeasureSupported: A field supports conversion between Miles and Kilometers
-	 *              UnitOfMeasureReverse: to support some fields like [MileageRate] in field trip definition. the unit is in the denominator. example: [1/mile or 1/kilometer]
+	 *              UnitOfMeasureReverse: to support some fields like [FuelConsumptionRate] in field trip definition. the unit is in the denominator. example: [1/mile or 1/kilometer]
 	 *              UnitInDatabase: For legacy GPS data, the unit in database is [Imperial]. And the rest data's unit is [Metric]. Default to [Metric]
 	 * 
 	 * Attention to MeasurementUnitConverter.prototype.convert

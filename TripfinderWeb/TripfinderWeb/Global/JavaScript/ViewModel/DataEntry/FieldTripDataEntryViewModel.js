@@ -1726,7 +1726,7 @@
 		{
 			var fields = ["AideFixedCost", "AideHours", "AideId", "AideOTHours", "AideOTRate", "AideRate", "Chaperone", "Chaperone2", "Chaperone3", "Chaperone4",
 				"DriverExpMeals", "DriverExpMisc", "DriverExpParking", "DriverExpTolls", "DriverFixedCost", "DriverHours", "DriverId", "DriverOTHours", "DriverOTRate", "DriverRate",
-				"Endingodometer", "MileageRate", "Startingodometer", "VehFixedCost", "VehicleId"];
+				"Endingodometer", "FuelConsumptionRate", "Startingodometer", "VehFixedCost", "VehicleId"];
 			if (!this.areFieldsSame(resource1[i], resource2[i], fields))
 			{
 				return false;

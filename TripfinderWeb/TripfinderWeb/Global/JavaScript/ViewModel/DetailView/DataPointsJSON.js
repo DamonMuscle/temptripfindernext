@@ -1104,7 +1104,7 @@
 					}
 				},
 				{
-					"field": "EstimatedMiles",
+					"field": "EstimatedDistance",
 					"title": "Estimated Distance",
 					"UnitOfMeasureSupported": true,
 					"type": "Number",
@@ -1426,8 +1426,8 @@
 					}
 				},
 				{
-					"field": "MileageRate",
-					"title": () => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+					"field": "FuelConsumptionRate",
+					get title() { return `Rate/${tf.measurementUnitConverter.getShortUnits()}`; },
 					"UnitOfMeasureSupported": true,
 					"UnitOfMeasureReverse": true,
 					"type": "Number",
@@ -4399,7 +4399,7 @@
 				},
 				{
 					"field": "Cost",
-					"title": () => `Rate/${tf.measurementUnitConverter.getShortUnits()}`,
+					get title() { return `Rate/${tf.measurementUnitConverter.getShortUnits()}`; },
 					"UnitOfMeasureSupported": true,
 					"UnitOfMeasureReverse": true,
 					"type": "Number",
@@ -5035,47 +5035,4 @@
 			row: 2
 		}];
 	};
-
-	!function updateColumn()
-	{
-		for (let entityName in dataPointsJSON)
-		{
-			if (!dataPointsJSON.hasOwnProperty(entityName))
-			{
-				return;
-			}
-
-			const entry = dataPointsJSON[entityName]
-			for (let groupName in entry)
-			{
-				if (!entry.hasOwnProperty(groupName))
-				{
-					return;
-				}
-
-				for (let col of entry[groupName])
-				{
-					if ((entityName === "fieldtrip" && col.field === "MileageRate") || (entityName === "vehicle" && col.field === "Cost"))
-					{
-						delete col.title
-						Object.defineProperty(col, "title", {
-							get()
-							{
-								if (tf.measurementUnitConverter && tf.measurementUnitConverter.isImperial())
-								{
-									return "Rate/mi";
-								}
-								else
-								{
-									return "Rate/km";
-								}
-							},
-							enumerable: true,
-							configurable: true
-						})
-					}
-				}
-			}
-		}
-	}()
 })();
