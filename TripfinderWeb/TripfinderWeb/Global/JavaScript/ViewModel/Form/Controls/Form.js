@@ -198,6 +198,11 @@
 				self.currentSectionId(nextSection.Id);
 				self.currentSectionName(nextSection.Name);
 				self.resetWarningMessage(nextSection.element);
+				// update the Rating Scale Matrix label width for it's in next section can not be visible
+				self.questions.filter(q => q.field.questionType === "RatingScaleMatrix").forEach(q =>
+				{
+					q.refresh();
+				})
 				setTimeout(function ()
 				{
 					$(".form-body").scrollTop(0);

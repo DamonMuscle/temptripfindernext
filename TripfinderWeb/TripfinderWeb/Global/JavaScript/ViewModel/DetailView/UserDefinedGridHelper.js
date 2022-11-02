@@ -1262,6 +1262,26 @@
 						"questionType": "Rating"
 					};
 					break;
+				case 'Rating Scale Matrix':
+					var ratingItems = Array.from({ length: fieldOptions.Scale }, (_, i) => i + 1);
+					var getSource = function()
+					{
+						return ratingItems;
+					};
+					result = {
+						"field": item.Name,
+						"title": item.Name,
+						"type": "String",
+						"defaultValue": "Rating Value Matrix",
+						"editType": {
+							"format": "DropDown",
+							"getSource": function() { return Promise.resolve(getSource()); },
+							"allowNullValue": true,
+							"entityKey": ""
+						},
+						"questionType": "RatingScaleMatrix"
+					};
+					break;
 				case 'System Field':
 					result = {
 						"field": item.Name,
