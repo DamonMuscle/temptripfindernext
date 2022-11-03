@@ -66,8 +66,10 @@
 		self.options = options;
 		options.entity = $.extend({}, options.entity);
 		tf.measurementUnitConverter.convertToDisplay(options.entity, new TF.DataModel.FieldTripResourceDataModel());
-		options.BillingClassification = $.extend({}, options.BillingClassification);
-		tf.measurementUnitConverter.convertToDisplay(options.BillingClassification, new TF.DataModel.FieldTripBillingClassificationDataModel());
+		if(options.BillingClassification != null){
+			options.BillingClassification = $.extend({}, options.BillingClassification);
+			tf.measurementUnitConverter.convertToDisplay(options.BillingClassification, new TF.DataModel.FieldTripBillingClassificationDataModel());
+		}
 		self.isSelectedVehicleChanged = false;
 		self.isSelectedDriverChanged = false;
 		self.isSelectedAideChanged = false;
