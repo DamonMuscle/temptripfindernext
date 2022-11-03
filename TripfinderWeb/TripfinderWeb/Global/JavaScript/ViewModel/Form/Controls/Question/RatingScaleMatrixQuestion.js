@@ -10,6 +10,18 @@
 	RatingScaleMatrixQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	RatingScaleMatrixQuestion.prototype.constructor = RatingScaleMatrixQuestion;
 
+	Object.defineProperty(RatingScaleMatrixQuestion.prototype, 'value', {
+		get() { return this._value; },
+		set(val)
+		{
+			this._value = val;
+			this.validateValueInternal();
+			this.valueChanged();
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	RatingScaleMatrixQuestion.prototype.initQuestionContent = function () {
 		let field = this.field, fieldOptions = field.FieldOptions,
 			min = field.startScale,
@@ -63,6 +75,16 @@
 			result = 'Answer is required.';
 		}
 		return result;
+	}
+
+	// don not validate the value, only check the value with submit
+	RatingScaleMatrixQuestion.prototype.validateValueInternal = function()
+	{
+		let result = this.getValidateResult();
+		if (this.element.find('.invalid-message').html().length > 0 && result.length === 0)
+		{
+			this.element.removeClass('invalid');
+		}
 	}
 
 	// TODO: maybe need to change value format
