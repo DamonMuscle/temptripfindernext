@@ -211,7 +211,7 @@
 				originalUnit: self.getCurrentUnitOfMeasure(),
 				targetUnit: convertConfig.UnitInDatabase || self.MeasurementUnitEnum.Metric,
 				isReverse: !!convertConfig.UnitOfMeasureReverse,
-				precision: 4
+				precision: 12
 			}
 		})
 	};
