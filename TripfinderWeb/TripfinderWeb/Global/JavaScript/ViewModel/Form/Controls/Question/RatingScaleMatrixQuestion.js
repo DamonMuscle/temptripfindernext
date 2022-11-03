@@ -52,14 +52,32 @@
 		}
 	}
 
+	RatingScaleMatrixQuestion.prototype.getValidateResult = function()
+	{
+		let result = '',
+			matrixItems = this.field.FieldOptions.UDFPickListOptions ?
+				this.field.FieldOptions.UDFPickListOptions.map(item => { return item.PickList }) : [];
+
+		if (this.isRequired && (this.value == null || this.value === '' || this.value.length !== matrixItems.length))
+		{
+			result = 'Answer is required.';
+		}
+		return result;
+	}
+
 	// TODO: maybe need to change value format
 	RatingScaleMatrixQuestion.prototype.formatValue = function (value)
 	{
-		let keys = Object.keys(value), valueStr = '', valueArr = [];
-		keys.forEach(key =>
+		let matrixItems = this.field.FieldOptions.UDFPickListOptions ?
+			this.field.FieldOptions.UDFPickListOptions.map(item => { return item.PickList }) : [];
+		let valueStr = '', valueArr = [];
+		matrixItems.forEach(key =>
 		{
-			valueStr = key + ": " + value[key];
-			valueArr.push(valueStr);
+			if (value[key])
+			{
+				valueStr = key + ": " + value[key];
+				valueArr.push(valueStr);
+			}
 		});
 		return valueArr;
 	}
