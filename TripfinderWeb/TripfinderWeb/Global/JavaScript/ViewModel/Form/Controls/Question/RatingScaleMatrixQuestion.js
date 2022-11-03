@@ -10,6 +10,18 @@
 	RatingScaleMatrixQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	RatingScaleMatrixQuestion.prototype.constructor = RatingScaleMatrixQuestion;
 
+	Object.defineProperty(RatingScaleMatrixQuestion.prototype, 'value', {
+		get() { return this._value; },
+		set(val)
+		{
+			this._value = val;
+			this.validateValueInternal();
+			this.valueChanged();
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	RatingScaleMatrixQuestion.prototype.initQuestionContent = function () {
 		let field = this.field, fieldOptions = field.FieldOptions,
 			min = field.startScale,
@@ -52,14 +64,42 @@
 		}
 	}
 
+	RatingScaleMatrixQuestion.prototype.getValidateResult = function()
+	{
+		let result = '',
+			matrixItems = this.field.FieldOptions.UDFPickListOptions ?
+				this.field.FieldOptions.UDFPickListOptions.map(item => { return item.PickList }) : [];
+
+		if (this.isRequired && (this.value == null || this.value === '' || this.value.length !== matrixItems.length))
+		{
+			result = 'Answer is required.';
+		}
+		return result;
+	}
+
+	// don not validate the value, only check the value with submit
+	RatingScaleMatrixQuestion.prototype.validateValueInternal = function()
+	{
+		let result = this.getValidateResult();
+		if (this.element.find('.invalid-message').html().length > 0 && result.length === 0)
+		{
+			this.element.removeClass('invalid');
+		}
+	}
+
 	// TODO: maybe need to change value format
 	RatingScaleMatrixQuestion.prototype.formatValue = function (value)
 	{
-		let keys = Object.keys(value), valueStr = '', valueArr = [];
-		keys.forEach(key =>
+		let matrixItems = this.field.FieldOptions.UDFPickListOptions ?
+			this.field.FieldOptions.UDFPickListOptions.map(item => { return item.PickList }) : [];
+		let valueStr = '', valueArr = [];
+		matrixItems.forEach(key =>
 		{
-			valueStr = key + ": " + value[key];
-			valueArr.push(valueStr);
+			if (value[key])
+			{
+				valueStr = key + ": " + value[key];
+				valueArr.push(valueStr);
+			}
 		});
 		return valueArr;
 	}
