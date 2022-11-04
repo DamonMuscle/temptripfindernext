@@ -182,7 +182,20 @@
 
 		this.$form.find("select[name=vehicle]").focus();
 		this.load();
+		this.setValidation();
 	};
+
+
+	FieldTripResourceViewModel.prototype.setValidation = function()
+	{
+		this.$form.find("input[name='fuelConsumptionRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		this.$form.find("input[name='startingOdometer']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		this.$form.find("input[name='endingOdometer']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		this.$form.find("input[name='driverRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		this.$form.find("input[name='driverOtrate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		this.$form.find("input[name='aideRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		this.$form.find("input[name='aideOtrate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+	}
 
 	FieldTripResourceViewModel.prototype.load = function()
 	{
@@ -200,7 +213,9 @@
 						value: v.Cost,
 						originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 						targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
-						isReverse: true
+						isReverse: true,
+						keep2Decimal: true,
+						precision: 2
 					});
 				});
 				this.obVehicleSource(vehicleItems);

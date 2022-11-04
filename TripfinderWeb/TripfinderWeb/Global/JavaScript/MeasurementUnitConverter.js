@@ -134,7 +134,7 @@
 		let { value, originalUnit, targetUnit, precision = 2, isReverse = false, unitType = self.MeasurementUnitTypeEnum.MileToKilometer, keep2Decimal } = options;
 		if (originalUnit === targetUnit)
 		{
-			return !!keep2Decimal ? value.toFixed(precision) : value;
+			return !!keep2Decimal && value ? (value * 1).toFixed(precision) : value;
 		}
 
 		switch (targetUnit)
