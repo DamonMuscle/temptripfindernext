@@ -193,6 +193,7 @@
     <Content Include="Global\JavaScript\Framework\Input\DateBox.js" />
     <Content Include="Global\JavaScript\Framework\Input\DateTimeBox.js" />
     <Content Include="Global\JavaScript\Framework\Input\DecimalBox.js" />
+    <Content Include="Global\JavaScript\Framework\Input\DecimalBoxHelper.js" />
     <Content Include="Global\JavaScript\Framework\Input\DisabledBox.js" />
     <Content Include="Global\JavaScript\Framework\Input\IntegerBox.js" />
     <Content Include="Global\JavaScript\Framework\Input\NumberBox.js" />

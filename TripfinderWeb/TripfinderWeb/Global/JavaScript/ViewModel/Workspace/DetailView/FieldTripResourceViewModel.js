@@ -105,7 +105,9 @@
 						value: v.Cost,
 						originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 						targetUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
-						isReverse: true
+						isReverse: true,
+						keep2Decimal: true,
+						precision: 2
 					});
 				});
 				self.obVehicles(vehicles);
@@ -193,8 +195,22 @@
 				});
 
 			self.pageLevelViewModel.load($(self.element).data("bootstrapValidator"));
+
+			self.setValidation();
 		});
 	};
+	
+	FieldTripResourceViewModel.prototype.setValidation = function()
+	{
+		const $o = $(this.element);
+		$o.find("input[name='fuelConsumptionRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='odometerstart']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='odometerending']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='driverbillingRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='driverbillingotRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='aidebillingRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='aidebillingotRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+	}
 
 	FieldTripResourceViewModel.prototype._initVehicleFields = function()
 	{
