@@ -288,37 +288,6 @@
 		return Number(v) === v ? v.toFixed(2) : v;
 	};
 
-	MeasurementUnitConverter.prototype.processUnitsOfMeasureFilters = function(allColumns, filterSet)
-	{
-		if (!filterSet || !Array.isArray(allColumns)) { return; }
-
-		const self = this;
-
-		self.handlePrecisionForUnitsOfMeasureFilters(allColumns, filterSet);
-
-		(filterSet.FilterItems || []).forEach(function(f)
-		{
-			let matchedField = self.getUnitOfMeasureSupportedField(allColumns, f.FieldName);
-			if (matchedField && self.isNeedConversion(matchedField.UnitInDatabase))
-			{
-				f.Precision = 4;
-				f.Value = self.convert({
-					value: f.Value,
-					originalUnit: currentUnitOfMeasure(),
-					targetUnit: matchedField.UnitInDatabase || self.MeasurementUnitEnum.Metric,// the unit of legacy GPS data is Imperial. 
-					isReverse: !!matchedField.UnitOfMeasureReverse,
-					unitType: matchedField.UnitTypeOfMeasureSupported,
-					precision: f.Precision
-				});
-			}
-		});
-
-		(filterSet.FilterSets || []).forEach(function(fs)
-		{
-			self.processUnitsOfMeasureFilters(allColumns, fs);
-		});
-	};
-
 	MeasurementUnitConverter.prototype.handlePrecisionForUnitsOfMeasureFilters = function(allColumns, filterSet)
 	{
 		const self = this,
