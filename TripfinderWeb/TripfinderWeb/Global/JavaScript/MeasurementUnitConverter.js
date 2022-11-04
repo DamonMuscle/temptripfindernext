@@ -131,10 +131,10 @@
 	MeasurementUnitConverter.prototype.convert = function(options)
 	{
 		const self = this;
-		let { value, originalUnit, targetUnit, precision = 2, isReverse = false, unitType = self.MeasurementUnitTypeEnum.MileToKilometer } = options;
+		let { value, originalUnit, targetUnit, precision = 2, isReverse = false, unitType = self.MeasurementUnitTypeEnum.MileToKilometer, keep2Decimal } = options;
 		if (originalUnit === targetUnit)
 		{
-			return value;
+			return !!keep2Decimal ? value.toFixed(precision) : value;
 		}
 
 		switch (targetUnit)
@@ -197,6 +197,8 @@
 				originalUnit: convertConfig.UnitInDatabase || self.MeasurementUnitEnum.Metric,
 				targetUnit: self.getCurrentUnitOfMeasure(),
 				isReverse: !!convertConfig.UnitOfMeasureReverse,
+				keep2Decimal: true,
+				precision: 2
 			}
 		})
 	};
