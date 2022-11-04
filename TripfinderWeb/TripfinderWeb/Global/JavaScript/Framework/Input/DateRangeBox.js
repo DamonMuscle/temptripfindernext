@@ -33,7 +33,8 @@
 			"Last Year",
 			"This Year",
 			"Next X Days",
-			"Last X Days"
+			"Last X Days",
+			"All"
 		]
 
 		DateRangeItems = DateRangeItems.sort(function(s, t) {  
@@ -174,6 +175,11 @@
 
 		switch(dtype)
 		{
+			case "All":
+				this.setVisable(false, false, false)
+				value.EndDate = '9999-01-01' //reference the date range of datetime in sql server
+				value.StartDate = '1753-01-01'
+				break
 			case 'On':
 				this.setVisable(false,true,false)
 				value.StartDate = this.today 
@@ -374,7 +380,7 @@
 			element.kendoDatePicker(
 				{
 					max: new Date("12/31/9999"),
-					min: new Date("1/1/1900"),
+					min: new Date("1/1/1753"),
 					format: 'MM/dd/yyyy',
 					open: function(e)
 					{
