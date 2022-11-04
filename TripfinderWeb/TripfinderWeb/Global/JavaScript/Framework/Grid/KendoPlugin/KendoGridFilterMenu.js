@@ -939,7 +939,6 @@
 		options.currentObFilters = this.obGridFilterDataModels.slice();
 
 		const currentHeaderFilters = this.findCurrentHeaderFilters(true);
-		tf.measurementUnitConverter.processUnitsOfMeasureFilters(this.getKendoColumn(), currentHeaderFilters);
 
 		return tf.modalManager.showModal(
 			new TF.Modal.Grid.ModifyFilterModalViewModel(
