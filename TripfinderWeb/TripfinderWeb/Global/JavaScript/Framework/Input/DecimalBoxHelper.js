@@ -47,7 +47,7 @@
 			}
 		}
 
-		if (event.type == "blur")
+		if (event.type == "blur" && $(this).val() !== '')
 		{//sometimes to replace the previous number to dot.
 			$(this).val(parseFloat($(this).val()).toFixed(2));
 		}
@@ -95,7 +95,7 @@
 			}
 		}
 
-		if (event.type == "blur")
+		if (event.type == "blur" && $(this).val() !== '')
 		{//sometimes to replace the previous number to dot.
 			$(this).val(parseFloat($(this).val()).toFixed(2));
 		}
