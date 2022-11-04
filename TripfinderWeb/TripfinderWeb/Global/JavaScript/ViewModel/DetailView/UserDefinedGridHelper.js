@@ -35,6 +35,8 @@
 		];
 	};
 
+	UserDefinedGridHelper.DEFAULT_CANNOT_SUBMIT_FORM_MESSAGE = 'This form cannot be submitted.';
+
 	UserDefinedGridHelper.getGeoInfoColumns = function ()
 	{
 		return [
@@ -76,6 +78,7 @@
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
+		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForDateTimeType(dataItem, columns, true);
 		return dataItem;
 	};
 
@@ -84,8 +87,39 @@
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
+		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForDateTimeType(dataItem, columns, false);
 		return dataItem;
 	};
+
+	UserDefinedGridHelper.handleItemForDateTimeType = function(dataItem, columns, toClientTimeZone)
+	{
+		if (!columns || !columns.length)
+		{
+			return dataItem;
+		}
+		columns.forEach(col =>
+		{
+			if (col.FieldName === "CreatedOn" || col.FieldName === "LastUpdatedOn") // only convert for CreatedOn/LastUpdatedOn
+			{
+				let value = dataItem[col.FieldName];
+				if (value) // skip the empty value
+				{
+					// RW-18022
+					// the original value is utc string with browser time zone subtracted (2022/3/23 17:15 (+8) => "2022/03/23T09:15:00Z")
+					// convert to iso string with browser time zone added ("2022/03/23T09:15:00Z" => "2022/03/23T17:15:00")
+					value = toISOStringWithoutTimeZone(moment(value));
+					if (toClientTimeZone)
+					{
+						// for copy action, the client time zone would be considered on getting content string
+						// for saveAs action, the client time zone should be considered here for server side exporting
+						value = toISOStringWithoutTimeZone(utcToClientTimeZone(value));
+					}
+					dataItem[col.FieldName] = value;
+				}
+			}
+		});
+		return dataItem;
+	}
 
 	UserDefinedGridHelper.handleItemForBooleanType = function (dataItem, columns)
 	{
@@ -1702,21 +1736,29 @@
 
 				result.IsFormInvalid = false;
 				result.isPublic = res[0].Public;
+				result.OneResponsePerRecipient = res[0].OneResponsePerRecipient;
 			}
 			return result;
 		}).then(result =>
 		{
 			let flag = result.IsFormInvalid;
-			if (selectedRecord)
-			{
-				flag = flag || tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(selectedRecord, result.UDGridFields)
-					|| (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(dataType) || "").toLowerCase(), "edit") && !result.isPublic);
-				// put form result permission 
-				flag = flag || !tf.authManager.isAuthorizedFor("formsResults", "edit");
-			} else
-			{
-				flag = flag || !tf.authManager.isAuthorizedFor("formsResults", "add");
-			}
+			 if (selectedRecord)
+            {
+                var dataTypeName = (tf.dataTypeHelper.getKeyById(dataType) || "").toLowerCase();
+                var authRule = isReadOnlyAsEditable ? "read" : "edit";
+                const isSignedPolicy = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(selectedRecord, result.UDGridFields);
+                const isOneResponse = result.OneResponsePerRecipient;
+                const isAuthDataType = (!result.isPublic && !tf.authManager.isAuthorizedForDataType(dataTypeName,authRule));
+                const hasEditPermission = tf.authManager.isAuthorizedFor("formsResults", "edit");
+                flag = flag || isSignedPolicy
+                || isOneResponse
+                || isAuthDataType
+                || !hasEditPermission;
+            } else
+            {
+                const hasAddPermission = tf.authManager.isAuthorizedFor("formsResults", "add");
+                flag = flag || !hasAddPermission;
+            }
 
 			return flag;
 		});
