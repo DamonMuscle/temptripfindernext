@@ -1354,6 +1354,19 @@
 						"editType": {}
 					};
 					break;
+				case 'QR and Barcode':
+					editType = {
+						"format": "Note",
+						"maxLength": fieldOptions.MaxLength || 2000
+					};
+					result = {
+						"field": item.Name,
+						"title": item.Name,
+						"type": "String",
+						"questionType": "QRandBarcode",
+						"editType": editType
+					};
+					break;
 				default:
 					break;
 			}
