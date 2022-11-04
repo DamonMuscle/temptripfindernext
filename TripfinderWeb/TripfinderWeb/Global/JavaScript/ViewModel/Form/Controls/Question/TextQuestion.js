@@ -10,6 +10,25 @@
 	TextQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	TextQuestion.prototype.constructor = TextQuestion;
 
+	Object.defineProperty(TextQuestion.prototype, 'value', {
+		get() { return this._value; },
+		set(val)
+		{
+			if (!val)
+			{
+				this._value = val;
+			}
+			else
+			{
+				this._value = val.trim();
+			}
+			this.validateInternal();
+			this.valueChanged();
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	TextQuestion.prototype.initQuestionContent = function ()
 	{
 
@@ -43,6 +62,7 @@
 				$(input[1]).show();
 			}).blur(() =>
 			{
+				input.val(input.val().trim());
 				$(input[1]).hide();
 			});
 		}
