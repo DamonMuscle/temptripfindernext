@@ -276,8 +276,9 @@
 		const filterOptions = {
 			gridDataEditFilter: true
 		};
-
-
+		const restrictionMessageWrapper = {};
+		let errorMessage = TF.DetailView.UserDefinedGridHelper.DEFAULT_CANNOT_SUBMIT_FORM_MESSAGE;
+		tf.loadingIndicator.showImmediately(); //#RW-32658
 		return TF.getLocation()
 			.then(res =>
 			{
@@ -330,13 +331,17 @@
 			})
 			.then(() => 
 			{
-				tf.loadingIndicator.showImmediately();
-				return tf.udgHelper.queryValidUDGridById(self.options.ID, filterOptions);
+				//tf.loadingIndicator.showImmediately(); #RW-32658 fix
+				return tf.udgHelper.queryValidUDGridById(self.options.ID, filterOptions, restrictionMessageWrapper);
 			})
 			.then(validUDGrid =>
 			{
 				if (!validUDGrid)
 				{
+					if (restrictionMessageWrapper.message)
+					{
+						errorMessage = restrictionMessageWrapper.message;
+					}
 					return Promise.reject("not_available");
 				}
 
