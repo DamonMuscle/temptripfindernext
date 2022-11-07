@@ -457,6 +457,68 @@
 	}
 }
 
+//Form(QRVideoSteam)
+.video-stream-container {
+	height: 100%;
+	width: 986px;
+	left: calc(50% - 493px);
+	position: fixed;
+	z-index: 50000;
+	top: 0;
+	bottom: 0;
+	line-height: 0;
+	display: none;
+
+	.scan-tips {
+		width: 210px;
+		height: 60px;
+		line-height: 60px;
+		text-align: center;
+		background-color: rgba(0, 0, 0, 1);
+		color: white;
+		font-size: 20px;
+		position: absolute;
+		top: 10%;
+		left: calc(50% - 105px);
+		border-radius: 15px;
+		opacity: 0.7;
+	}
+
+	.scan-icon {
+		display: block;
+		position: absolute;
+		background-image: url("../../Global/Img/Icons/scanner.png");
+		background-color: transparent;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+
+	.scan-close-button {
+		display: block;
+		position: absolute;
+		border: 0;
+		width: 30px;
+		height: 30px;
+		top: 15px;
+		right: 15px;
+		background-image: url("../../Global/Img/Icons/Close-White.svg");
+		background-color: transparent;
+		background-size: 30px 30px;
+		background-repeat: no-repeat;
+		background-position: center;
+		z-index: 9999;
+		cursor: pointer;
+	}
+
+	video {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		background-color: black;
+	}
+}
+
 //Form(Question)
 .form-container
 {
