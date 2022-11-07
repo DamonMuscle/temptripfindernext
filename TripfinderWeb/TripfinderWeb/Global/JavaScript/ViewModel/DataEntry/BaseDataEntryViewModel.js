@@ -704,7 +704,7 @@
 			})
 			.then(function(data)
 			{
-				obEntityDataModel.update(data.Items[0]);
+				obEntityDataModel.update(tf.measurementUnitConverter.convertToDisplay(data.Items[0], new TF.DataModel.FieldTripDataModel()));
 				this._view.id = obEntityDataModel.id();
 				this.onContentChange.notify();
 				if (isNew)
