@@ -1733,7 +1733,7 @@
 		return false;
 	}
 
-	UserDefinedGridHelper.prototype.isFormReadonly = function (formId, selectedRecord, dataType)
+	UserDefinedGridHelper.prototype.isFormReadonly = function (formId, selectedRecord, dataType, isReadOnlyAsEditable = false)
 	{
 		var self = this;
 		return self.getUDGridById(formId).then(res =>
