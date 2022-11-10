@@ -95,7 +95,7 @@
 
 		self.element = el;
 		tf.loadingIndicator.showImmediately();
-		promises.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "Vehicles"))
+		promises.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "Vehicles?Inactive=false"))
 			.then(function(result)
 			{
 				var vehicles = result.Items;
@@ -119,7 +119,7 @@
 				}
 			}));
 
-		promises.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"),
+		promises.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?ActiveFlag=true"),
 			{
 				paramData: {
 					staffType: "Driver"
@@ -140,7 +140,7 @@
 				}
 			}));
 
-		promises.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff"),
+		promises.push(tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?ActiveFlag=true"),
 			{
 				paramData: {
 					staffType: "Bus Aide"
@@ -199,7 +199,7 @@
 			self.setValidation();
 		});
 	};
-	
+
 	FieldTripResourceViewModel.prototype.setValidation = function()
 	{
 		const $o = $(this.element);
