@@ -4380,7 +4380,7 @@
 					}
 				},
 				{
-					"field": "Mpg",
+					"field": "FuelConsumption",
 					get title()
 					{
 						return `${tf.measurementUnitConverter.isImperial() ? "MPG" : "KM/L"}`;
@@ -4599,7 +4599,7 @@
 					}
 				},
 				{
-					"field": "PurchaseMileage",
+					"field": "PurchaseOdometer",
 					"title": "Purchase Odometer",
 					"UnitOfMeasureSupported": true,
 					"type": "Number",
@@ -4610,7 +4610,7 @@
 					}
 				},
 				{
-					"field": "SalvageMileage",
+					"field": "SalvageOdometer",
 					"title": "Salvage Odometer",
 					"UnitOfMeasureSupported": true,
 					"type": "Number",

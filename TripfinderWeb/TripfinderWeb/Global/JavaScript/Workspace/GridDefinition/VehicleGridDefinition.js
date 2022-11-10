@@ -218,7 +218,7 @@
 					hidden: true
 				},
 				{
-					FieldName: "Mpg",
+					FieldName: "FuelConsumption",
 					DisplayName: `${tf.measurementUnitConverter.isImperial() ? "MPG" : "KM/L"}`,
 					UnitOfMeasureSupported: true,
 					UnitTypeOfMeasureSupported: tf.measurementUnitConverter.MeasurementUnitTypeEnum.MpgToKml,
@@ -241,7 +241,7 @@
 					hidden: true
 				},
 				{
-					FieldName: "PurchaseMileage",
+					FieldName: "PurchaseOdometer",
 					DisplayName: "Purchase Odometer",
 					UnitOfMeasureSupported: true,
 					Width: '150px',
@@ -270,7 +270,7 @@
 					hidden: true
 				},
 				{
-					FieldName: "SalvageMileage",
+					FieldName: "SalvageOdometer",
 					DisplayName: "Salvage Odometer",
 					UnitOfMeasureSupported: true,
 					Width: '150px',
