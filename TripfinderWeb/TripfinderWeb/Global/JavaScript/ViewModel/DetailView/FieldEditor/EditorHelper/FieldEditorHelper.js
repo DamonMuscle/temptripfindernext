@@ -1607,7 +1607,7 @@
 					{
 						if (!recordEntity.Xcoord || !recordEntity.SchoolCode)
 						{
-							recordEntity.Mifromschl = 0;
+							recordEntity.DistanceFromSchl = 0;
 						}
 						return TF.AutomationHelper.autoFind(recordEntity, setting);
 					}

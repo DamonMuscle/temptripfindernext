@@ -3003,7 +3003,7 @@
 					}
 				},
 				{
-					"field": "Mifromschl",
+					"field": "DistanceFromSchl",
 					"title": "Distance (Attendance)",
 					"type": "Geodistance",
 					"UnitOfMeasureSupported": true,
@@ -3013,7 +3013,7 @@
 					}
 				},
 				{
-					"field": "MifromResidSch",
+					"field": "DistanceFromResidSch",
 					"title": "Distance (Residence)",
 					"type": "Geodistance",
 					"UnitOfMeasureSupported": true,

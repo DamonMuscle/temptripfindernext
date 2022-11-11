@@ -133,14 +133,14 @@
 					hidden: true
 				},
 				{
-					FieldName: "Mifromschl",
+					FieldName: "DistanceFromSchl",
 					DisplayName: "Distance From School of Attendance",
 					Width: '150px',
 					type: "number",
 					hidden: true
 				},
 				{
-					FieldName: "MifromResidSch",
+					FieldName: "DistanceFromResidSch",
 					DisplayName: "Distance From School of Residence",
 					Width: '150px',
 					type: "number",

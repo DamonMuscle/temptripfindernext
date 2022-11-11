@@ -136,8 +136,8 @@
 		},
 		9: {
 			"Dob": { type: "Date" },
-			"Mifromschl": { type: "number" },
-			"MifromResidSch": { type: "number" },
+			"DistanceFromSchl": { type: "number" },
+			"DistanceFromResidSch": { type: "number" },
 			"EntryDate": { type: "Date/Time" },
 			"Geo": { type: "Geo" },
 			"IntGratDate1": { type: "Date" },
