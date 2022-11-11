@@ -199,7 +199,7 @@
 
 	FieldTripResourceViewModel.prototype.load = function()
 	{
-		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("vehicle")))
+		var p0 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("vehicle")+"?Inactive=false"))
 			.then(function(data)
 			{
 				var vehicleItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
@@ -221,7 +221,7 @@
 				this.obVehicleSource(vehicleItems);
 			}.bind(this));
 
-		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?staffTypeId=2"))
+		var p1 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?staffTypeId=2&ActiveFlag=true"))
 			.then(function(data)
 			{
 				var driverItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
@@ -232,7 +232,7 @@
 				this.obDriverSource(driverItems);
 			}.bind(this));
 
-		var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?staffTypeId=1"))
+		var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "staff?staffTypeId=1&ActiveFlag=true"))
 			.then(function(data)
 			{
 				var busaideItems = (data && Array.isArray(data.Items)) ? data.Items.filter(function(item)
