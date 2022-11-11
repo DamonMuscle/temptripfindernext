@@ -145,8 +145,7 @@
 
 	UploadDocumentHelper.prototype._validateAttachFileSize = function (size)
 	{
-		var result = size < UploadDocumentHelper.maxFileByteSize;
-		return result;
+		return size > 0 && size < UploadDocumentHelper.maxFileByteSize;
 	};
 
 	UploadDocumentHelper.prototype.getFileStream = function (rawFile)
