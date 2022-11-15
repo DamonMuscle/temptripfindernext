@@ -474,7 +474,7 @@
 			data.DBID = saveWithDBID ? tf.datasourceManager.databaseId : null;
 			data.isValid = true;
 			let isNew = this.isNew;
-			if ((this.isNew || "").toLowerCase() === "edit")
+			if (typeof isNew === "string" && isNew.toLowerCase() === "edit")
 			{
 				isNew = false;
 			}
