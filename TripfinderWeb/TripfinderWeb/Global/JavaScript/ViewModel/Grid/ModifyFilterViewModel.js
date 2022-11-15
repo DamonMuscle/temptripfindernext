@@ -473,7 +473,12 @@
 			const saveWithDBID = !this.obIsGlobalFilterChecked() || TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
 			data.DBID = saveWithDBID ? tf.datasourceManager.databaseId : null;
 			data.isValid = true;
-			return tf.promiseAjax[this.isNew ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
+			let isNew = this.isNew;
+			if ((this.isNew || "").toLowerCase() === "edit")
+			{
+				isNew = false;
+			}
+			return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 				{
 					paramData: { "@relationships": "OmittedRecord" },
 					data: [data]
