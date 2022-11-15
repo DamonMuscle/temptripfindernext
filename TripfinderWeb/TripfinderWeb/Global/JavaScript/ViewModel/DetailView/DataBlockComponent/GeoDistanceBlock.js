@@ -95,8 +95,8 @@
 			gridType = self.gridType,
 			entity = self.recordEntity,
 			fieldsMap = {
-				"AttendanceSchoolName": "Mifromschl",
-				"ResidenceSchoolName": "MifromResidSch"
+				"AttendanceSchoolName": "DistanceFromSchl",
+				"ResidenceSchoolName": "DistanceFromResidSch"
 			};
 
 		if (self.isCreateGridNewRecord || !entity)

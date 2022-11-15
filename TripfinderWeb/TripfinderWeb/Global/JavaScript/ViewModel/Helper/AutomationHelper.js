@@ -101,27 +101,27 @@
 			{
 				dbid = tf.datasourceManager.databaseId;
 			}
-			if (!student.Mifromschl || forceChange)
+			if (!student.DistanceFromSchl || forceChange)
 			{
 				promises.push(
 					this.findMiDistanceFromSchool(student, student.SchoolCode, dbid).then(function(distance)
 					{
 						if (distance)
 						{
-							student.Mifromschl = distance;
+							student.DistanceFromSchl = distance;
 							return true;
 						}
 						return false;
 					}));
 			}
-			if (!student.MifromResidSch || forceChange)
+			if (!student.DistanceFromResidSch || forceChange)
 			{
 				promises.push(
 					this.findMiDistanceFromSchool(student, student.ResidSchool, dbid).then(function(distance)
 					{
 						if (distance)
 						{
-							student.MifromResidSch = distance;
+							student.DistanceFromResidSch = distance;
 							return true;
 						}
 						return false;
