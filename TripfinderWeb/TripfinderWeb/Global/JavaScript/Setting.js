@@ -6,7 +6,7 @@
 	{
 		this.userProfile = {
 			RoutingProfile:
-			{}
+				{}
 		};
 	}
 
@@ -23,9 +23,9 @@
 						{};
 					this.userProfile.District = this.userProfile.District || "";
 					this.userProfile.AreaCode = this.userProfile.AreaCode || "";
-					this.userProfile.Mailcity = this.userProfile.Mailcity || "";
-					this.userProfile.MailState = this.userProfile.MailState || "";
-					this.userProfile.Mailzip = this.userProfile.Mailzip || "";
+					this.userProfile.Mailcity = this.userProfile.MailCityValue || "";
+					this.userProfile.MailState = this.userProfile.MailStateValue || "";
+					this.userProfile.Mailzip = this.userProfile.MailZipValue || "";
 					Setting.setProfileStyle(this.userProfile);
 					if (tf.colorSource && this.userProfile.TripColors)
 					{
