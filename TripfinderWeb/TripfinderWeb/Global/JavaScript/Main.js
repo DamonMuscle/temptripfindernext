@@ -966,3 +966,13 @@ if (!String.prototype.format)
 		});
 	};
 }
+
+Math.tfRound = function(value, precision = 0)
+{
+	if (precision < 0 || !Number.isInteger(precision))
+	{
+		throw new Error("Invalid parameter!");
+	}
+
+	return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision);
+}
