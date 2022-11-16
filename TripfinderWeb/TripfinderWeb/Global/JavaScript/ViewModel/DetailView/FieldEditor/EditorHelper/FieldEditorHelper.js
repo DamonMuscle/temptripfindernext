@@ -2026,7 +2026,7 @@
 		}
 		else
 		{
-			return editField.value;
+			return (editField.value !== null && editField.value !== undefined) ? editField.value : editField.textValue;
 		}
 	}
 
