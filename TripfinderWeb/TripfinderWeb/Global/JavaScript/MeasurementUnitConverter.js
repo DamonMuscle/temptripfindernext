@@ -128,33 +128,33 @@
 	 * @param {*} options 
 	 * @returns 
 	 */
-	MeasurementUnitConverter.prototype.convert = function(options)
-	{
-		const self = this;
-		let { value, originalUnit, targetUnit, precision = 2, isReverse = false, unitType = self.MeasurementUnitTypeEnum.MileToKilometer, keep2Decimal } = options;
-		if (originalUnit === targetUnit)
-		{
-			return !!keep2Decimal && value ? (value * 1).toFixed(precision) : value;
-		}
-
-		switch (targetUnit)
-		{
-			case this.MeasurementUnitEnum.Imperial:
-				return !isReverse ? divide(value, precision) : multiply(value, precision);
-			case this.MeasurementUnitEnum.Metric:
-				return !isReverse ? multiply(value, precision) : divide(value, precision);
-		}
-
-		function multiply(v, p)
-		{
-			return Number((v * unitType).toFixed(p));
-		}
-
-		function divide(v, p)
-		{
-			return Number((v / unitType).toFixed(p));
-		}
-	};
+	 MeasurementUnitConverter.prototype.convert = function(options)
+	 {
+		 const self = this;
+		 let { value, originalUnit, targetUnit, precision = 2, isReverse = false, unitType = self.MeasurementUnitTypeEnum.MileToKilometer, keep2Decimal } = options;
+		 if (originalUnit === targetUnit)
+		 {
+			 return !!keep2Decimal && value ? Math.tfRound(value * 1, precision) : value;
+		 }
+ 
+		 switch (targetUnit)
+		 {
+			 case this.MeasurementUnitEnum.Imperial:
+				 return !isReverse ? divide(value, precision) : multiply(value, precision);
+			 case this.MeasurementUnitEnum.Metric:
+				 return !isReverse ? multiply(value, precision) : divide(value, precision);
+		 }
+ 
+		 function multiply(v, p)
+		 {
+			 return Math.tfRound(Number(v * unitType), p);
+		 }
+ 
+		 function divide(v, p)
+		 {
+			 return Math.tfRound(Number(v / unitType), p);
+		 }
+	 };
 
 	MeasurementUnitConverter.prototype.handleUnitOfMeasure = function(columns)
 	{
@@ -250,7 +250,7 @@
 
 	MeasurementUnitConverter.prototype.handleColumnUnitOfMeasure = function(item, column)
 	{
-		var originValue = item;
+		let originValue = item;
 		const fieldName = column.FieldName || column.field;
 		if (item.hasOwnProperty(fieldName))
 		{
@@ -277,15 +277,18 @@
 			return originValue;
 		}
 
+		const precision = column.Precision || 2;
+
 		let v = this.convert({
 			originalUnit: column.UnitInDatabase || this.MeasurementUnitEnum.Metric,
 			targetUnit: currentUnitOfMeasure(),
 			value: originValue,
 			isReverse: !!column.UnitOfMeasureReverse,
-			unitType: column.UnitTypeOfMeasureSupported
+			unitType: column.UnitTypeOfMeasureSupported,
+			precision
 		});
 
-		return Number(v) === v ? v.toFixed(2) : v;
+		return Number(v) === v ? Math.tfRound(v, precision) : v;
 	};
 
 	MeasurementUnitConverter.prototype.handlePrecisionForUnitsOfMeasureFilters = function(allColumns, filterSet)
