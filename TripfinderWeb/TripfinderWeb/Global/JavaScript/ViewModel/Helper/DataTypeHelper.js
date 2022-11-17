@@ -218,6 +218,7 @@
 		},
 		fieldtriptemplate: {
 			endpoint: "fieldtriptemplates",
+			name: 'Field Trip Template',
 			isMajorType: false,
 			hasDBID: true
 		},
