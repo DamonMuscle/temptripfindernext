@@ -2,6 +2,11 @@
 {
 	createNamespace("TF.Control.Form").DateTimeQuestion = DateTimeQuestion;
 
+	const STR_DATE_FORMAT = "YYYY-MM-DD";
+	const STR_DATE_SHOW_FORMAT = 'M/D/YYYY';
+	const STR_TIME_FORMAT = 'HH:mm:ss';
+	const STR_TIME_SHOW_FORMAT = 'h:m A';
+
 	function DateTimeQuestion()
 	{
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
@@ -21,15 +26,20 @@
 
 	DateTimeQuestion.prototype.initQuestionContent = function()
 	{
-		let dtContainer = $("<div class='datetime-question-container'></div>");
+		const dtContainer = $("<div class='datetime-question-container'></div>");
 		this.dateValue = null;
 		this.timeValue = null;
-		let input = $(`<input class="date-question question" />`);
+		const input = $(`<input class="date-question question" placeholder="Enter your date" />`);
+		const popupOption = !TF.isMobileDevice ? {
+			origin: "bottom right",
+			position: "top center"
+		} : {};
 		this.datePicker = input.kendoDatePicker({
+			popup: popupOption,
 			change: () =>
 			{
 				this.dateValue = moment(this.datePicker.value()).format('YYYY-MM-DD');
-				this.value = this.timeValue ? this.dateValue + "T" + this.timeValue : this.dateValue + "T00:00:00";
+				this.value = this.timeValue ? `${this.dateValue}T${this.timeValue}` : this.dateValue + "T00:00:00";
 			},
 			open: ({ sender }) =>
 			{
@@ -44,7 +54,15 @@
 				this.validateInternal();
 			}
 		}).data("kendoDatePicker");
-		input.attr("readonly", true);
+		const $clearX = $(`<span class="clear-x empty" title="clear">&times;</span>`);
+		this.$clearX = $clearX;
+		input.after($clearX);
+		$clearX.click(() =>
+		{
+			this.dateValue = null;
+			input.val('');
+			this.value = this.timeValue;
+		});
 		if (this.field.value)
 		{
 			this.datePicker.value(this.field.value)
@@ -54,20 +72,41 @@
 		{
 			input.click(ev =>
 			{
-				this.datePicker.dateView.toggle();
+				if (!input.val())
+				{
+					const now = new moment();
+					const strShowDateNow = now.format(STR_DATE_SHOW_FORMAT);
+					input.val(strShowDateNow);
+					this.dateValue = now.format(STR_DATE_FORMAT);
+					this.field.value = this.value = this.timeValue ? `${this.dateValue}T${this.timeValue}` : this.dateValue + "T00:00:00";
+				}
 			});
 		}
+
+		input.on("focusout", ev =>{
+			if (!this.field.readonly)
+			{
+				const dateText = input.val();
+				const dateValue = new moment(dateText, STR_DATE_SHOW_FORMAT, true);
+				this.value = this.field.value = this.timeValue ? `${this.dateValue}T${this.timeValue}` : this.dateValue + "T00:00:00";
+				this.validateInternal();
+			}
+		});
+
 		if (this.field.readonly)
 		{
 			this.datePicker.readonly();
+			input.attr("readonly", true);
 		}
 
 		// time 
-		let timeContainer = $("<div></div>");
-		let timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, tabindex: '4' }, undefined, undefined, $('<div></div>'));
-		let timeboxEle = timebox.getElement();
+		const timeContainer = $("<div></div>");
+		const timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, showClearIcon: !this.field.readonly,
+			tabindex: '4', adjustPopupPosition: this.adjustTimePopupPosition }, undefined, undefined, $('<div></div>'));
+		const timeboxEle = timebox.getElement();
 		timebox.value(null);
-
+		const $timeInputBox = timebox.$element.first();
+		$timeInputBox.attr("placeholder", `Enter your time`);
 		if (TF.isMobileDevice)
 		{
 			timebox._dateTimePicker.widgetPositioning({ horizontal: 'right' });
@@ -75,18 +114,45 @@
 
 		timebox.onValueChange.subscribe((ev, newvalue) =>
 		{
-			this.timeValue = moment(newvalue).format('HH:mm:ss');
-			this.value = this.dateValue ? this.dateValue + "T" + this.timeValue : this.timeValue;
-		});
-		timebox.$element.first()
-			.attr("readonly", true).css("background-color", "#fff").css("color", "#333").css("cursor", "text")
-			.click(ev =>
+			if (newvalue && newvalue !== "Invalid date")
 			{
-				if (!this.field.readonly)
+				const newTimeValue = moment(newvalue);
+				this.timeValue = newTimeValue.format(STR_TIME_FORMAT);
+				$timeInputBox.val(newTimeValue.format(STR_TIME_SHOW_FORMAT));
+				this.value = this.dateValue ? `${this.dateValue}T${this.timeValue}` : this.timeValue;
+			}
+			else
+			{
+				if (!newvalue)
 				{
-					timebox._dateTimePicker.toggle();
+					this.timeValue = "";
+					this.value = `${this.dateValue}T00:00:00`;
 				}
-			});
+
+				this.validateInternal();
+			}
+		});
+		$timeInputBox
+			.click(ev => 
+			{
+				if (!this.timeValue)
+				{
+					const now = new moment();
+					const newShowTimeValue = now.format(STR_TIME_SHOW_FORMAT);
+					$timeInputBox.val(newShowTimeValue);
+					this.timeValue = now.format(STR_TIME_FORMAT);
+					timebox.value(this.timeValue);
+					this.value = this.dateValue ? `${this.dateValue}T${this.timeValue}` : this.timeValue;
+				}
+			})
+			.css("background-color", "#fff").css("color", "#333").css("cursor", "text");
+		timebox.$element.filter(".datepickerbutton").click(ev =>
+		{
+			if (!this.field.readonly)
+			{
+				timebox._dateTimePicker.toggle();
+			}
+		});
 
 		timebox.$element.on('dp.hide', () =>
 		{
@@ -105,13 +171,14 @@
 		timeboxEle.addClass("time-question");
 		if (this.field.value)
 		{
-			let time = moment(this.field.value).format('HH:mm:ss')
+			const time = moment(this.field.value).format('HH:mm:ss')
 			timebox.value(time);
 		}
 		if (this.field.readonly)
 		{
 			timebox.$element.off("click");
 			timeboxEle.addClass("disabled");
+			$timeInputBox.attr("readonly", true);
 		}
 		this.datePicker.wrapper.css("width", "50%");
 		timeContainer.css("width", "50%");
@@ -121,10 +188,50 @@
 		return dtContainer;
 	}
 
-	DateTimeQuestion.prototype.initEvents = function () {
-		if (!TF.isMobileDevice) {
-			this.bindValidateValueEvents();
+	DateTimeQuestion.prototype.valueChanged = function()
+	{
+		if (this.dateValue && this.dateValue !== "Invalid date")
+		{
+			this.$clearX.removeClass("empty");
+		} else
+		{
+			this.$clearX.addClass("empty");
 		}
+	}
+
+	DateTimeQuestion.prototype.getValidateResult = function()
+	{
+		let result = '';
+		if (this.isRequired)
+		{
+			if (this.dateValue === null || this.dateValue === '' ||
+				this.timeValue === null || this.timeValue === '')
+			{
+				result = 'Answer is required.';
+			}
+		}
+		else
+		{
+			if (this.dateValue && !this.timeValue)
+			{
+				result = 'Time is required.';
+			}
+			else if (!this.dateValue && this.timeValue)
+			{
+				result = 'Date is required.';
+			}
+		}
+
+		if (this.dateValue === 'Invalid date')
+		{
+			result = `Incorrect date format. Correct format: ${STR_DATE_SHOW_FORMAT}, e.g., 8/25/2022`;
+		}
+		else if (this.timeValue === 'Invalid date')
+		{
+			result = `Incorrect time format. Correct format: ${STR_TIME_SHOW_FORMAT}, e.g., 8:11 AM, 2:20 PM`;
+		}
+
+		return result;
 	}
 
 	DateTimeQuestion.prototype.getValidateResult = function()
@@ -153,48 +260,11 @@
 
 	DateTimeQuestion.prototype.adjustDatePopupPosition = function(senderElement, calendarViewElement)
 	{
-		let timeInteval = TF.isMobileDevice ? 200 : 0;
-		setTimeout(function()
-		{
-			var zindex = Math.max(...Array.from(senderElement.parents()).map(el => parseInt($(el).css("z-index"))).filter(x => !Number.isNaN(x)));
-			var rect = senderElement[0].getBoundingClientRect(),
-				calendarWidth = calendarViewElement.closest(".k-animation-container").width(),
-				calendarHeight = calendarViewElement.closest(".k-animation-container").height(),
-				bodyWidth = $("body").width();
-
-			let isPopupOnTop = rect.bottom + 1 + calendarHeight > document.body.clientHeight;
-			// adjust calendar popup layer position: popup from associated textbox top if not enouch height in the bottom area, otherwise popup from the bottom
-			const popupTop = isPopupOnTop ? rect.top - calendarHeight : rect.bottom - 1;
-			calendarViewElement.closest(".k-animation-container").css({
-				"z-index": zindex + 1,
-				top: popupTop + 1,
-				left: rect.left + calendarWidth < bodyWidth ? rect.left : bodyWidth - calendarWidth
-			});
-		}, timeInteval);
+		TF.Control.QuestionHelper.adjustDatePopupPosition(senderElement, calendarViewElement);
 	};
 
-	DateTimeQuestion.prototype.adjustTimePopupPosition = function ($senderElement, $timerElement) {
-		let adjustFun = function () {
-			let rect = $senderElement.parent()[0].getBoundingClientRect();
-			if (rect.bottom + $timerElement.outerHeight(true) < document.body.clientHeight) {
-				$timerElement.css({ top: `${rect.bottom}px`, right: "auto", bottom: "auto" })
-				if (rect.left + $timerElement.outerWidth(true) > document.body.clientWidth) {
-					var rightPos = document.body.clientWidth - rect.right;
-					$timerElement.css({ left: "auto", right: `${rightPos}px` });
-				}
-					
-			}
-			else {
-				$timerElement.css({ top: "auto", right: "auto", bottom: `${document.body.offsetHeight - $senderElement.first()[0].getBoundingClientRect().top}px` })
-			};
-		}
-
-		if (TF.isMobileDevice && TF.isIOS && TF.getIOSVersion[0] === 11) {
-			setTimeout(function () {
-				adjustFun();
-			}, 200);
-		} else {
-			adjustFun();
-		}
+	DateTimeQuestion.prototype.adjustTimePopupPosition = function($senderElement, $timerElement)
+	{
+		TF.Control.QuestionHelper.adjustTimerPopupPosition($senderElement, $timerElement);
 	}
 })();
