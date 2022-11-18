@@ -285,7 +285,7 @@
 		return tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
 	};
 
-	FieldTripDataEntryViewModel.prototype.loadDocument = function()
+	FieldTripDataEntryViewModel.prototype.loadDocument = function(isReload)
 	{
 		let self = this,
 			document = this.obDocumentGridViewModel(),
@@ -301,7 +301,7 @@
 			document.dispose();
 		}
 		var filteredIds = [], documentRecources = [], documentFontEndRecources = [];
-		if (this.obMode() === "Edit")
+		if (this.obMode() === "Edit" || isReload)
 		{
 			if (ownedDocumentReadPermission)
 			{
@@ -419,9 +419,18 @@
 	FieldTripDataEntryViewModel.prototype.getDocumentEntities = function()
 	{
 		var self = this;
+		var attachedToID = self.obEntityDataModel().id();
+		var attachedToTypeID = tf.DataTypeHelper.getId(self.type);
+
+		// override 'attachedToID' and 'attachedToTypeID' if template is selected
+		if(this.obSelectedTemplateSource()?.Id){
+			attachedToID = this.obSelectedTemplateSource().Id;
+			attachedToTypeID = tf.DataTypeHelper._getObjectByType("fieldtriptemplate").id;
+		}
+		
 		var paramData = {
-			AttachedToID: self.obEntityDataModel().id(),
-			AttachedToTypeID: tf.DataTypeHelper.getId(self.type),
+			AttachedToID: attachedToID,
+			AttachedToTypeID: attachedToTypeID,
 			"@relationships": "DocumentRelationships,FieldTrip,LastUpdatedName"
 		}
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("document")), {
@@ -1012,6 +1021,12 @@
 							$(".destinationname").find("input").val(this.obEntityDataModel().destination());
 						}
 					}
+					
+					this.getFieldTripInvoiceTemplates(item.Id).then(function(){
+						this.loadInvoicing(true);
+					}.bind(this));
+
+					this.loadDocument(true);
 				}
 			}.bind(this));
 		}
@@ -1099,6 +1114,19 @@
 		}.bind(this));
 	};
 
+	FieldTripDataEntryViewModel.prototype.getFieldTripInvoiceTemplates = function(fieldTripId)
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripInvoiceTemplates"), {
+			paramData: {
+				"@relationships": "FieldTripAccount",
+				"@filter": `eq(FieldTripTemplateId,${fieldTripId})`
+			}
+		}).then(function(result){
+			this.obEntityDataModel().fieldTripInvoices(result.Items);			
+			return Promise.resolve();
+		}.bind(this));
+	}
+
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
 		var obGridViewModel = this.obResourcesGridViewModel().obGridViewModel();
@@ -1141,14 +1169,14 @@
 		tf.loadingIndicator.showImmediately();
 	};
 
-	FieldTripDataEntryViewModel.prototype.loadInvoicing = function()
+	FieldTripDataEntryViewModel.prototype.loadInvoicing = function(isReload)
 	{
 		var invoicing = this.obInvoicingGridViewModel();
 		if (invoicing !== null && invoicing !== undefined)
 		{
 			invoicing.dispose();
 		}
-		if (this.obMode() === "Edit")
+		if (this.obMode() === "Edit" || isReload)
 		{
 			var resources = this.obEntityDataModel().fieldTripInvoices();
 			resources.forEach(function(item)
