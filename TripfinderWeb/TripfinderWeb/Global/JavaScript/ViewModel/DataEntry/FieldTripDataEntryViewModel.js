@@ -423,7 +423,7 @@
 		var attachedToTypeID = tf.DataTypeHelper.getId(self.type);
 
 		// override 'attachedToID' and 'attachedToTypeID' if template is selected
-		if(this.obSelectedTemplateSource().Id){
+		if(this.obSelectedTemplateSource()?.Id){
 			attachedToID = this.obSelectedTemplateSource().Id;
 			attachedToTypeID = tf.DataTypeHelper._getObjectByType("fieldtriptemplate").id;
 		}
