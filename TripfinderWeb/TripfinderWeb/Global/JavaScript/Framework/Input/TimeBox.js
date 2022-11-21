@@ -222,7 +222,7 @@
 				bodyWidth = widget.offsetParent().width();
 			if (TF.isPhoneDevice || tf.isFromWayfinder)
 			{
-				var overlay = $("body>.bootstrap-datetimepicker-overlay");
+				var overlay = $(".bootstrap-datetimepicker-overlay");
 				overlay.on("click", function()
 				{
 					this._dateTimePicker.hide();
@@ -290,17 +290,18 @@
 						if (modal.length > 0)
 						{
 							bodyWidth = modal.width();
-						}
-						if (modal && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
-						{
-							wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
-						}
-						else if (modal && wightOffsetLeft < modal.offset().left + 5)
-						{
-							wightCss['left'] = modal.offset().left;
-						} else
-						{
-							wightCss['left'] = wightOffsetLeft;
+
+							if (modal && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
+							{
+								wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
+							}
+							else if (modal && wightOffsetLeft < modal.offset().left + 5)
+							{
+								wightCss['left'] = modal.offset().left;
+							} else
+							{
+								wightCss['left'] = wightOffsetLeft;
+							}
 						}
 					}
 					else
@@ -368,7 +369,17 @@
 									bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
 								});
 						}
-					}.bind(this), 100);
+
+						const widgetToLeft = offset.left + this.$element.outerWidth() - widget.outerWidth();
+						if (widgetToLeft > 0)
+						{
+							widget.css({left: widgetToLeft});
+						}
+						else
+						{
+							widget.css({left: offset.left});
+						}
+					}.bind(this));
 				}
 				$(window).on("resize.dateTime", function()
 				{

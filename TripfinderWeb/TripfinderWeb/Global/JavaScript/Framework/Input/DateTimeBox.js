@@ -298,24 +298,16 @@
 					}
 
 				}
-				var top = 0, currentTargetOffset = $(e.currentTarget).offset();
 
-				if (preWightOffset.top <= 0)
+				const widgetToBottom = widget.outerHeight()+this.$element.offset().top +this.$element.outerHeight();
+				if (widgetToBottom <= widget.offsetParent()[0].clientHeight + widget.offsetParent().scrollTop())
 				{
-					top = currentTargetOffset.top - widget.outerHeight();
+					widget.css({top: this.$element.offset().top + this.$element.outerHeight()});
 				}
-				else if (preWightOffset.top !== currentTargetOffset.top + $(e.currentTarget).height())
+				else
 				{
-					top = currentTargetOffset.top + $(e.currentTarget).height();
-					if (top + widget.outerHeight() > widgetParent.height() && widgetParent.height() > 0)
-					{
-						top = currentTargetOffset.top - widget.outerHeight();
-					}
+					widget.css({top: this.$element.offset().top -  widget.outerHeight()});
 				}
-
-				wightCss['top'] = top;
-				wightCss['bottom'] = "auto";
-				widget.css(wightCss);
 
 				//for form
 				if ($(e.currentTarget).closest(".form-container").length > 0) {
