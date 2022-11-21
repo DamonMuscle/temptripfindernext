@@ -151,3 +151,83 @@
 	}
 
 })();
+
+(function()
+{
+	createNamespace("TF.Control").QuestionHelper = QuestionHelper;
+
+	function QuestionHelper()
+	{
+	}
+
+	QuestionHelper.adjustTimerPopupPosition = function($senderElement, $timerElement)
+	{
+		let adjustFun = function()
+		{
+			let rect = $senderElement.first()[0].getBoundingClientRect();
+
+			let timeBtnRight = $senderElement.last()[0].getBoundingClientRect().right;
+			let timeCtrlWidth = $timerElement.outerWidth();
+			let halfTimeCtrlWidth = timeCtrlWidth / 2;
+
+			let cssOptions = {};
+			if (rect.bottom + $timerElement.outerHeight(true) < document.body.clientHeight)
+			{
+				cssOptions = { top: `${rect.bottom}px`, right: "auto", bottom: "auto" };
+			}
+			else
+			{
+				cssOptions = { top: "auto", right: "auto", bottom: `${document.body.offsetHeight - $senderElement.first()[0].getBoundingClientRect().top}px` };
+			}
+
+			const htmlWidth = document.body.parentNode.clientWidth;
+			const leftPosition = (timeBtnRight + halfTimeCtrlWidth > htmlWidth) ?
+				htmlWidth - timeCtrlWidth :
+				timeBtnRight - halfTimeCtrlWidth;
+
+				$.extend(cssOptions, { left: `${leftPosition}px` });
+
+			$timerElement.css(cssOptions);
+		}
+
+		if (TF.isMobileDevice && TF.isIOS && TF.getIOSVersion[0] === 11)
+		{
+			setTimeout(function()
+			{
+				adjustFun();
+			}, 200);
+		} else
+		{
+			adjustFun();
+		}
+	}
+
+	QuestionHelper.adjustDatePopupPosition = function(senderElement, calendarViewElement)
+	{
+		let timeInteval = TF.isMobileDevice ? 200 : 0;
+		setTimeout(function()
+		{
+			var zindex = Math.max(...Array.from(senderElement.parents()).map(el => parseInt($(el).css("z-index"))).filter(x => !Number.isNaN(x)));
+			var rect = senderElement[0].getBoundingClientRect(),
+				calendarWidth = calendarViewElement.closest(".k-animation-container").width(),
+				calendarHeight = calendarViewElement.closest(".k-animation-container").height(),
+				bodyWidth = $("body").width();
+
+			let isPopupOnTop = rect.bottom + 1 + calendarHeight > document.body.clientHeight;
+			// adjust calendar popup layer position: popup from associated textbox top if not enouch height in the bottom area, otherwise popup from the bottom
+			const popupTop = isPopupOnTop ? rect.top - calendarHeight : rect.bottom - 1;
+			calendarViewElement.closest(".k-animation-container").css({
+				"z-index": zindex + 1,
+				top: popupTop + 1,
+				left: rect.left + calendarWidth < bodyWidth ? rect.left : bodyWidth - calendarWidth
+			});
+		}, timeInteval);
+	};
+
+	QuestionHelper.formatQuestionName = function (name)
+	{
+		if (!name) return "";
+		return name.trim().replace(/(?:^(?:&nbsp;)+)|(?:(?:&nbsp;)+$)/g, '');
+	}
+})();
+
