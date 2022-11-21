@@ -178,17 +178,14 @@
 			else
 			{
 				cssOptions = { top: "auto", right: "auto", bottom: `${document.body.offsetHeight - $senderElement.first()[0].getBoundingClientRect().top}px` };
-			};
+			}
 
-			if (!TF.isMobileDevice)
-			{
-				const htmlWidth = document.body.parentNode.clientWidth;
-				let leftPosition = (timeBtnRight + halfTimeCtrlWidth > htmlWidth) ?
-					htmlWidth - timeCtrlWidth :
-					timeBtnRight - halfTimeCtrlWidth;
+			const htmlWidth = document.body.parentNode.clientWidth;
+			const leftPosition = (timeBtnRight + halfTimeCtrlWidth > htmlWidth) ?
+				htmlWidth - timeCtrlWidth :
+				timeBtnRight - halfTimeCtrlWidth;
 
 				$.extend(cssOptions, { left: `${leftPosition}px` });
-			}
 
 			$timerElement.css(cssOptions);
 		}

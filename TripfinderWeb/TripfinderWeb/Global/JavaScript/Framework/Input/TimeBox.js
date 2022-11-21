@@ -219,7 +219,7 @@
 
 			var widget = widgetParent.find(".bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last"),
 				widgetWidth = widget.width(),
-				bodyWidth = widgetParent.width();
+				bodyWidth = widget.offsetParent().width();
 			if (TF.isPhoneDevice || tf.isFromWayfinder)
 			{
 				var overlay = $("body>.bootstrap-datetimepicker-overlay");

@@ -129,6 +129,16 @@ function isIOS()
 	return navigator.userAgent.match(/(iPod|iPhone|iPad)/) ? true : false;
 }
 
+function getIOSVersion()
+{
+	const ua = navigator.userAgent;
+	if (/(iPhone|iPod|iPad)/i.test(ua))
+	{
+		return ua.match(/OS [\d_]+/i)[0].substr(3).split('_').map(n => parseInt(n));
+	}
+	return [0];
+}
+
 function isSafari()
 {
 	var chrome = navigator.userAgent.indexOf('CriOS') > -1 || navigator.userAgent.indexOf('Chrome') > -1;
@@ -228,6 +238,7 @@ createNamespace("TF").isPhoneDevice = isPhoneDevice();
 createNamespace("TF").isPortrait = isPortrait();
 createNamespace("TF").isLandscape = isLandscape();
 createNamespace("TF").isAndroid = isAndroid();
+createNamespace("TF").getIOSVersion = getIOSVersion();
 
 createNamespace("TF").getSingularOrPluralTitle = function(title, count)
 {
