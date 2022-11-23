@@ -10,6 +10,7 @@
 	function DateTimeQuestion()
 	{
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
+		this.validateOnBlur = true;
 	}
 
 	DateTimeQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
@@ -68,20 +69,6 @@
 			this.datePicker.value(this.field.value)
 			this.dateValue = moment(this.datePicker.value()).format('YYYY-MM-DD');
 		}
-		if (!this.field.readonly)
-		{
-			input.click(ev =>
-			{
-				if (!input.val())
-				{
-					const now = new moment();
-					const strShowDateNow = now.format(STR_DATE_SHOW_FORMAT);
-					input.val(strShowDateNow);
-					this.dateValue = now.format(STR_DATE_FORMAT);
-					this.field.value = this.value = this.timeValue ? `${this.dateValue}T${this.timeValue}` : this.dateValue + "T00:00:00";
-				}
-			});
-		}
 
 		input.on("focusout", ev =>{
 			if (!this.field.readonly)
@@ -133,18 +120,6 @@
 			}
 		});
 		$timeInputBox
-			.click(ev => 
-			{
-				if (!this.timeValue)
-				{
-					const now = new moment();
-					const newShowTimeValue = now.format(STR_TIME_SHOW_FORMAT);
-					$timeInputBox.val(newShowTimeValue);
-					this.timeValue = now.format(STR_TIME_FORMAT);
-					timebox.value(this.timeValue);
-					this.value = this.dateValue ? `${this.dateValue}T${this.timeValue}` : this.timeValue;
-				}
-			})
 			.css("background-color", "#fff").css("color", "#333").css("cursor", "text");
 		timebox.$element.filter(".datepickerbutton").click(ev =>
 		{
@@ -224,11 +199,11 @@
 
 		if (this.dateValue === 'Invalid date')
 		{
-			result = `Incorrect date format. Correct format: ${STR_DATE_SHOW_FORMAT}, e.g., 8/25/2022`;
+			result = `Invalid date`;
 		}
 		else if (this.timeValue === 'Invalid date')
 		{
-			result = `Incorrect time format. Correct format: ${STR_TIME_SHOW_FORMAT}, e.g., 8:11 AM, 2:20 PM`;
+			result = `Invalid time`;
 		}
 
 		return result;

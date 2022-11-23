@@ -8,6 +8,7 @@
 	function TimeQuestion()
 	{
 		TF.Control.Form.BaseQuestion.apply(this, arguments);
+		this.validateOnBlur = true;
 	}
 
 	TimeQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
@@ -43,16 +44,6 @@
 			}
 		});
 		$timeInputBox
-			.click(ev => 
-			{
-				if (!this.value)
-				{
-					const now = new moment();
-					$timeInputBox.val(now.format(STR_TIME_SHOW_FORMAT));
-					this.value = now.format(STR_TIME_FORMAT);
-					timebox.value(this.value);
-				}
-			})
 			.css("background-color", "#fff").css("color", "#333").css("cursor", "text");
 		timebox.$element.filter(".datepickerbutton").click(ev =>
 		{
