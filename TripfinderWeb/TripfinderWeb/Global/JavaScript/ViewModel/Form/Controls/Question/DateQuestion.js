@@ -53,19 +53,6 @@
 			input.val('');
 			this.value = null;
 		});
-		
-		if (!this.field.readonly) 
-		{
-			input.click(ev =>
-			{
-				if (!input.val())
-				{
-					const now = new moment();
-					input.val(now.format(STR_DATE_SHOW_FORMAT));
-					this.value = this.field.value = now.format(STR_DATE_FORMAT);
-				}
-			});
-		}
 
 		input.on("focusout", ev =>{
 			if (!this.field.readonly)
@@ -106,7 +93,7 @@
 			{
 				if (this.value === 'Invalid date')
 				{
-					result = `Incorrect date format. Correct format: ${STR_DATE_SHOW_FORMAT}, e.g., 8/25/2022`;
+					result = `Invalid date`;
 				}
 			}
 		}
