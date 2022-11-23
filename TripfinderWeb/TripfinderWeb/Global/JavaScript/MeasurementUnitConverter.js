@@ -389,7 +389,7 @@
 			const distance = tf.measurementUnitConverter.convert({
 				originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Imperial,
 				targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
-				precision: 5,
+				precision: 2,
 				isReverse: !!convertToImperialUnit,
 				value: parseFloat(g1)
 			});
