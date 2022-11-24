@@ -15,6 +15,7 @@
 		}
 
 		TF.Input.BaseBox.call(this, initialValue, attributes, disable);
+		this.keepInvalid = true;
 		this._noWrap = noWrap;
 		this.delayChange = delayChange;
 		this._dateTimePicker = null;
@@ -26,6 +27,7 @@
 				this.formatString = attributes.format;
 			}
 
+			this.keepInvalid = attributes.hasOwnProperty("keepInvalid") ? attributes.keepInvalid : true;
 			this.minDate = attributes.min;
 			this.maxDate = attributes.max;
 			this.disableWeekend = attributes.disableWeekend;
@@ -147,6 +149,7 @@
 		$element.datetimepicker({
 			widgetParent: $container,
 			useCurrent: false,
+			keepInvalid: this.keepInvalid,
 			keepInvalid: true,
 			minDate: this.minDate,
 			maxDate: this.maxDate,
@@ -373,11 +376,11 @@
 						const widgetToLeft = offset.left + this.$element.outerWidth() - widget.outerWidth();
 						if (widgetToLeft > 0)
 						{
-							widget.css({left: widgetToLeft});
+							widget.css({ left: widgetToLeft });
 						}
 						else
 						{
-							widget.css({left: offset.left});
+							widget.css({ left: offset.left });
 						}
 					}.bind(this));
 				}
@@ -472,7 +475,8 @@
 		}
 	};
 
-	TimeBox.prototype.getTimeString = function(dateTime) {
+	TimeBox.prototype.getTimeString = function(dateTime)
+	{
 		if (this._exactFormat)
 		{
 			return `${dateTime.format('hh:mm')} ${(dateTime.hours() < 12 ? 'AM' : 'PM')}`;

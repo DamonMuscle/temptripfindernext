@@ -16,8 +16,10 @@
 
 	TimeQuestion.prototype.initQuestionContent = function()
 	{
-		const timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, showClearIcon: !this.field.readonly,
-			tabindex: '4', adjustPopupPosition: this.adjustPopupPosition }, undefined, undefined, $('<div></div>'));
+		const timebox = new TF.Input.TimeBox(null, {
+			class: 'form-control', ignoreReadonly: true, showClearIcon: !this.field.readonly,
+			tabindex: '4', adjustPopupPosition: this.adjustPopupPosition, keepInvalid: false
+		}, undefined, undefined, $('<div></div>'));
 		timebox.value(null);
 		const $timeInputBox = timebox.$element.first();
 		$timeInputBox.attr("placeholder", `Enter your time`);
@@ -75,8 +77,10 @@
 		return timeEle;
 	}
 
-	TimeQuestion.prototype.initEvents = function () {
-		if (!TF.isMobileDevice) {
+	TimeQuestion.prototype.initEvents = function()
+	{
+		if (!TF.isMobileDevice)
+		{
 			this.bindValidateValueEvents();
 		}
 	}
