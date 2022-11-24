@@ -302,11 +302,11 @@
 				const widgetToBottom = widget.outerHeight()+this.$element.offset().top +this.$element.outerHeight();
 				if (widgetToBottom <= widget.offsetParent()[0].clientHeight + widget.offsetParent().scrollTop())
 				{
-					widget.css({top: this.$element.offset().top + this.$element.outerHeight()});
+					widget.css({top: this.$element.offset().top + this.$element.outerHeight(), position: "relative"});
 				}
 				else
 				{
-					widget.css({top: this.$element.offset().top -  widget.outerHeight()});
+					widget.css({top: this.$element.offset().top -  widget.outerHeight(), position: "relative"});
 				}
 
 				//for form
