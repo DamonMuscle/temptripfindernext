@@ -39,7 +39,14 @@
 			popup: popupOption,
 			change: () =>
 			{
-				this.dateValue = moment(this.datePicker.value()).format('YYYY-MM-DD');
+				if (!this.datePicker.value())
+				{
+					this.dateValue = null;
+				}
+				else
+				{
+					this.dateValue = moment(this.datePicker.value()).format('YYYY-MM-DD');
+				}
 				this.value = this.timeValue ? `${this.dateValue}T${this.timeValue}` : this.dateValue + "T00:00:00";
 			},
 			open: ({ sender }) =>
@@ -70,12 +77,22 @@
 			this.dateValue = moment(this.datePicker.value()).format('YYYY-MM-DD');
 		}
 
-		input.on("focusout", ev =>{
+		input.on("focusout", ev =>
+		{
 			if (!this.field.readonly)
 			{
-				const dateText = input.val();
+				const dateText = input.val().trim();
 				const dateValue = new moment(dateText, STR_DATE_SHOW_FORMAT, true);
+				if (!dateValue.isValid())
+				{
+					this.value = this.timeValue;
+					this.dateValue = null;
+					input.val('');
+					return;
+				}
+				this.dateValue = dateValue.format('YYYY-MM-DD');
 				this.value = this.field.value = this.timeValue ? `${this.dateValue}T${this.timeValue}` : this.dateValue + "T00:00:00";
+				input.val(dateText);
 				this.validateInternal();
 			}
 		});
@@ -88,8 +105,10 @@
 
 		// time 
 		const timeContainer = $("<div></div>");
-		const timebox = new TF.Input.TimeBox(null, { class: 'form-control', ignoreReadonly: true, showClearIcon: !this.field.readonly,
-			tabindex: '4', adjustPopupPosition: this.adjustTimePopupPosition }, undefined, undefined, $('<div></div>'));
+		const timebox = new TF.Input.TimeBox(null, {
+			class: 'form-control', ignoreReadonly: true, showClearIcon: !this.field.readonly,
+			tabindex: '4', adjustPopupPosition: this.adjustTimePopupPosition, keepInvalid: false
+		}, undefined, undefined, $('<div></div>'));
 		const timeboxEle = timebox.getElement();
 		timebox.value(null);
 		const $timeInputBox = timebox.$element.first();
@@ -134,8 +153,10 @@
 			this.validateInternal();
 		});
 
-		timebox.$element.on('dp.show', (sender) => {
-			if (TF.isMobileDevice) {
+		timebox.$element.on('dp.show', (sender) =>
+		{
+			if (TF.isMobileDevice)
+			{
 				timebox._dateTimePicker.widgetPositioning({ horizontal: 'right' });
 				var widgetParent = $(timebox._dateTimePicker.widgetParent());
 				var widget = widgetParent.find(".bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last");

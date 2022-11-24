@@ -39,7 +39,15 @@
 			popup: popupOption,
 			change: () =>
 			{
-				this.value = moment(this.datePicker.value()).format(STR_DATE_FORMAT);
+				const dateValue = this.datePicker.value();
+				if (!dateValue)
+				{
+					this.value = '';
+				}
+				else
+				{
+					this.value = moment(this.datePicker.value()).format(STR_DATE_FORMAT);
+				}
 			},
 			close: () =>
 			{
@@ -54,12 +62,23 @@
 			this.value = null;
 		});
 
-		input.on("focusout", ev =>{
+		input.on("focusout", ev =>
+		{
 			if (!this.field.readonly)
 			{
-				const dateText = input.val();
-				const dateValue = new moment(dateText, STR_DATE_SHOW_FORMAT, true);
-				this.value = this.field.value = dateValue.format(STR_DATE_FORMAT);
+				const dateText = input.val().trim();
+				if (dateText)
+				{
+					const dateValue = new moment(dateText, STR_DATE_SHOW_FORMAT, true);
+					if (!dateValue.isValid())
+					{
+						this.value = null;
+						input.val("");
+						return;
+					}
+					this.value = this.field.value = dateValue.format(STR_DATE_FORMAT);
+					input.val(dateText);
+				}
 				this.validateInternal();
 			}
 		});
@@ -88,15 +107,23 @@
 			if (this.value === null || this.value === '')
 			{
 				result = 'Answer is required.';
-			}
-			else
-			{
-				if (this.value === 'Invalid date')
-				{
-					result = `Invalid date`;
-				}
+				return result;
 			}
 		}
+
+		if (this.value === 'Invalid date')
+		{
+			result = `Invalid date`;
+		}
+		else if (moment(this.value).isValid())
+		{
+			const dateValue = moment(this.value);
+			if (dateValue > this.datePicker.max() || dateValue < this.datePicker.min())
+			{
+				result = `Invalid date`;
+			}
+		}
+
 		return result;
 	}
 
