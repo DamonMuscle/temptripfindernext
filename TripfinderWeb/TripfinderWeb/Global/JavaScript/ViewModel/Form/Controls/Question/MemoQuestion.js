@@ -10,6 +10,25 @@
 	MemoQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	MemoQuestion.prototype.constructor = MemoQuestion;
 
+	Object.defineProperty(MemoQuestion.prototype, 'value', {
+		get() { return this._value; },
+		set(val)
+		{
+			if (!val)
+			{
+				this._value = val;
+			}
+			else
+			{
+				this._value = val.trim();
+			}
+			this.validateInternal();
+			this.valueChanged();
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	MemoQuestion.prototype.initQuestionContent = function()
 	{
 		let memoTextArea = $(`<textarea class="memo-question question" placeholder="Enter your answer"></textarea>`);
@@ -22,6 +41,9 @@
 				ev.target.style.height = ev.target.scrollHeight + 2 + 'px';
 			}
 			this.value = memoTextArea.val();
+		}).blur(() =>
+		{
+			memoTextArea.val(memoTextArea.val().trim());
 		});
 
 		if (this.field.value) 

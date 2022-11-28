@@ -160,6 +160,13 @@
 			$(ev.target).next('small').show();
 		}).blur(ev =>
 		{
+			const originalValue = $(ev.target).val();
+			const trimmedValue = originalValue.trim();
+			if (originalValue && (trimmedValue !== originalValue))
+			{
+				$(ev.target).val(trimmedValue);
+				$(ev.target).trigger('change');
+			}
 			$(ev.target).next('small').hide();
 		});
 
