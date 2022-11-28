@@ -291,8 +291,8 @@
 
 	/**
 	 * Validate the layout entity.
-	 * @param {Object} layoutEntity 
-	 * @param {String} gridType 
+	 * @param {Object} layoutEntity
+	 * @param {String} gridType
 	 * @return {Boolean}
 	 */
 	DetailViewHelper.prototype.validateLayoutEntity = function(entity, gridType)
@@ -317,9 +317,9 @@
 
 	/**
 	 * Check if the data block item is valid.
-	 * @param {Object} item 
+	 * @param {Object} item
 	 * @param {Number} colNum
-	 * @return {Boolean} 
+	 * @return {Boolean}
 	 */
 	DetailViewHelper.prototype.validateDataBlockItem = function(itemObj, colNum)
 	{
@@ -970,7 +970,7 @@
 		}
 		return weekDay;
 	};
-	
+
 	DetailViewHelper.prototype.tryConvertUDFSubTitle = function(subtitleField)
 	{
 
@@ -1004,6 +1004,7 @@
 		switch (type)
 		{
 			case "String":
+			case "Email":
 				content = self.formatStringContent(content, format);
 				break;
 			case "Number":
@@ -1136,7 +1137,7 @@
 
 	/**
 	 * get unique class name of data block
-	 * @param {Object} dataBlock 
+	 * @param {Object} dataBlock
 	 */
 	DetailViewHelper.prototype.getBlockUniqueClassName = function(dataBlock)
 	{
@@ -1368,7 +1369,7 @@
 		{
 			blameMessage = "this layout is not available";
 		}
-		else 
+		else
 		{
 			let missingFields = this.validateRequiredFields(layoutData, dataType);
 			if (missingFields.length > 0)
@@ -1945,7 +1946,7 @@
 
 	/**
 	 * Ensure all required fields for document entity type is included in the fields collection
-	 * @param {Array} fields 
+	 * @param {Array} fields
 	 */
 	function ensureRequiredDocumentFields(fields)
 	{
@@ -1972,7 +1973,7 @@
 			var w = block.w,
 				h = block.h;
 
-			if (w > layoutWidth) 
+			if (w > layoutWidth)
 			{
 				w = layoutWidth;
 			}
@@ -1988,7 +1989,7 @@
 		function initFilledBlocks()
 		{
 			var filledBlocks = [];
-			for (var i = 0; i < layoutWidth; i++) 
+			for (var i = 0; i < layoutWidth; i++)
 			{
 				filledBlocks.push({ x: i, y: -1 });
 			}
@@ -1999,14 +2000,14 @@
 		function filterAndSortBlocks(blocks)
 		{
 			var ignoredTypeList = ["spacer", "verticalLine", "horizontalLine"];
-			blocks = blocks.filter(function(b) 
+			blocks = blocks.filter(function(b)
 			{
 				return b.w > 0 && ignoredTypeList.indexOf(b.type) < 0;
 			});
 
 			blocks = blocks.sort(function(a, b)
 			{
-				if (a.y === b.y) 
+				if (a.y === b.y)
 				{
 					return a.x - b.x;
 				}
