@@ -155,7 +155,7 @@
 						"field": item.DisplayName,
 						"title": item.DisplayName,
 						"type": "String",
-						"defaultValue": item.DefaultEmail,
+						"defaultValue": item.DefaultEmail || "User Defined Email",
 						"value": item.DefaultEmail,
 						"editType": editType
 					};
