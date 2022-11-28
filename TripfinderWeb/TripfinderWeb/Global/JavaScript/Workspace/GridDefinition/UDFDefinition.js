@@ -138,7 +138,7 @@
 		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "UserDefinedFields"),
 			{
 				data: data
-			}).then(result => 
+			}).then(result =>
 			{
 				if (result && result.Items && result.Items[0])
 				{
@@ -372,6 +372,7 @@
 			.replace(/list/i, "select")
 			.replace(/memo/i, "string")
 			.replace(/text/i, "string")
+			.replace(/email/i, "string")
 			.replace(/currency/i, "number")
 			.replace(/Phone Number/i, "string").toLowerCase()
 	}

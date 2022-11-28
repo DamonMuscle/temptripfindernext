@@ -60,6 +60,9 @@
             case 'Text':
                 currentValue = udf.DefaultText;
                 break;
+            case 'Email':
+                    currentValue = udf.DefaultEmail;
+                    break;
             case 'Memo':
                 currentValue = udf.DefaultMemo;
                 break;
@@ -126,7 +129,7 @@
                 editType,
                 result,
                 type = isRollup ? UserDefinedFieldHelper.valueFormatToType(item.ValueFormat) : item.Type;
-                
+
 
             switch (type) {
                 case 'Text':
@@ -143,6 +146,20 @@
                         "editType": editType
                     };
                     break;
+                case 'Email':
+					editType = {
+						"format": "Email",
+						"maxLength": 200
+					};
+					result = {
+						"field": item.DisplayName,
+						"title": item.DisplayName,
+						"type": "String",
+						"defaultValue": item.DefaultEmail,
+						"value": item.DefaultEmail,
+						"editType": editType
+					};
+					break;
                 case 'Memo':
                     editType = {
                         "format": "Note",
