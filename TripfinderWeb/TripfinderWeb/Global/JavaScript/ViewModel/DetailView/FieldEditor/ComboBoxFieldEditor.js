@@ -278,7 +278,8 @@
 	ComboBoxFieldEditor.prototype.getCustomFieldText = function()
 	{
 		const { editFieldList, entityKey } = this.options;
-		return editFieldList[entityKey] ? editFieldList[entityKey].textValue : "";
+		const defaultValue = this.options.defaultValue ?? "";
+		return editFieldList[entityKey] ? editFieldList[entityKey].textValue : defaultValue;
 	};
 
 	ComboBoxFieldEditor.prototype.dispose = function()
