@@ -876,7 +876,7 @@
 				Width: '150px',
 				type: "number",
 				Precision: 2,
-				format: "{0:0}"
+				format: "{0:0.00}"
 			},
 			{
 				FieldName: "AideRate",
@@ -892,7 +892,7 @@
 				Width: '150px',
 				type: "number",
 				Precision: 2,
-				format: "{0:0}"
+				format: "{0:0.00}"
 			},
 			{
 				FieldName: "AideOTRate",
