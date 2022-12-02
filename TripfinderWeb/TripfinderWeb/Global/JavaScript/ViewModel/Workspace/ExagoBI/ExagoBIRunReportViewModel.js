@@ -139,9 +139,7 @@
 					return execResult;
 				}).catch(function(ex)
 				{
-					tf.loadingIndicator.tryHide();
-					var errMessage = String.format("Error occurred when trying to execute report \"{0}\"", reportName);
-					tf.promiseBootbox.alert(errMessage, "Exago Reporting Error");
+					self._displayError(ex, reportName);
 					return null;
 				});
 			})
@@ -270,13 +268,21 @@
 
 				return execResultData;
 			})
-			.catch(function()
+			.catch(function(ex)
 			{
-				tf.loadingIndicator.tryHide();
-				var errMessage = String.format("Error occurred when trying to execute report \"{0}\"", reportName);
-				tf.promiseBootbox.alert(errMessage, "Exago Reporting Error");
+				self._displayError(ex, reportName);
 				return null;
 			});
+	}
+
+	ExagoBIRunReportViewModel.prototype._displayError = function(ex, reportName)
+	{
+		tf.loadingIndicator.tryHide();
+		var errMessage = String.format("Error occurred when trying to execute report \"{0}\"", reportName);
+
+		if (ex.Error || ex.Message) errMessage = ex.Error || ex.Message;
+
+		tf.promiseBootbox.alert(errMessage, "Exago Reporting Error");
 	}
 
 })();
