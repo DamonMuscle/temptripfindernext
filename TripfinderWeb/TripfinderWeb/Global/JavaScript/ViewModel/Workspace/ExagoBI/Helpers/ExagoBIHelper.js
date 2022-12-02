@@ -403,6 +403,8 @@
 			{ overlay: false }
 		).then(function(result)
 		{
+			if (result.Error) throw result;
+
 			var pageUrl = result.Data;
 
 			return self._webBaseUrl + pageUrl;
@@ -432,6 +434,8 @@
 			{ overlay: false }
 		).then(function(result)
 		{
+			if (result.Error) throw result;
+
 			var pageUrl = result.Data;
 
 			return self._webBaseUrl + pageUrl;
