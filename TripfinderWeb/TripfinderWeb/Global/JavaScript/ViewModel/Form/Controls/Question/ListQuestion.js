@@ -183,7 +183,7 @@
 			{
 				const bindValue = _v =>
 				{
-					const $item = options.find(`input[type=checkbox][value="${_v}"]`);
+					const $item = options.find(`input[type=checkbox][value="${_v.replace(/\"/g, '\\"')}"]`);
 					if ($item.length > 0) 
 					{
 						$item.prop("checked", true);
@@ -208,7 +208,7 @@
 			}
 			else
 			{
-				const normalItem = options.find(`input[type=radio][value="${this.field.value}"]`);
+				const normalItem = options.find(`input[type=radio][value="${this.field.value.replace(/\"/g, '\\"')}"]`);
 				//cannot found means need fill into other textbox.
 				if (normalItem.length == 0)
 				{
