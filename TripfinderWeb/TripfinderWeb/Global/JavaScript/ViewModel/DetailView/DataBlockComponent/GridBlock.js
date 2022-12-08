@@ -2662,6 +2662,14 @@
 			}));
 		}
 
+		if (miniGridType == "fieldtripvehicle" || miniGridType == "fieldtripdriver" || miniGridType == "fieldtripaide")
+		{
+			self.pubSubSubscriptions.push(PubSub.subscribe("fieldtripresource", function()
+			{
+				refreshGrid();
+			}));
+		}
+
 		if (miniGridType == "fieldtripinvoice")
 		{
 			grid.tbody.on("dblclick", "tr.k-state-selected", function(e)
