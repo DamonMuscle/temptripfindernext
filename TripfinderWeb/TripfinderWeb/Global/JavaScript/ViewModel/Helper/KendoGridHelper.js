@@ -617,6 +617,9 @@
 					}
 				];
 				break;
+			case "communicationhistory":
+				columns = tf.communicationHistoryGridDefinition.gridDefinition().Columns;
+				break;
 			default:
 				break;
 		}

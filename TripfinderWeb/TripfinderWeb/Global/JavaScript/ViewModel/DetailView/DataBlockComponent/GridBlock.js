@@ -85,6 +85,7 @@
 
 		self.options = options;
 		self.gridBlockType = options.field;
+		self.miniGridType = (options.url || "").toLowerCase();
 		self.gridType = detailView.gridType;
 		self.extraGridConfigs = self.getExtraGridConfigurations(options.field, detailView._getLayoutObjInCache().width);
 		self.detailView = detailView;
@@ -217,6 +218,18 @@
 
 		// set on demand action
 		self.onDemandGridActions = {};
+
+		if (self.miniGridType === "communicationhistory" && tf.authManager.isAuthorizedFor('mergeDocuments','read'))
+		{
+			self.onDemandGridActions[self.miniGridType] = [{
+				name: "view",
+				template: '<a class="k-button k-button-icontext k-grid-view" title="View"></a>',
+				click: function(e)
+				{
+					self.viewMiniGridCommunicationHistory(e);
+				}
+			}];
+		}
 
 		if (isReadOnly)
 		{
@@ -1249,6 +1262,28 @@
 	};
 
 	/**
+	 * View Commuication History.
+	 *
+	 * @param {Event} e
+	 */
+	 GridBlock.prototype.viewMiniGridCommunicationHistory = function(e)
+	 {
+		 var self = this,
+			 $tr = $(e.target).closest("tr"),
+			 $grid = $tr.closest(".kendo-grid"),
+			 kendoGrid = $grid.data("kendoGrid"),
+			 dataItem = kendoGrid.dataItem($tr);
+		 const options = {
+			 recordId: dataItem.Id,
+			 dataType: self.gridType,
+			 pageLevelViewModel: self.detailView.pageLevelViewModel,
+			 parentDocument: self
+		 };
+ 
+		 tf.modalManager.showModal(new TF.Modal.CommunicationHistoryModalViewModel(options));
+	 };
+
+	/**
 	 * Preview on document grid action button.
 	 *
 	 * @param {Event} e
@@ -1870,6 +1905,8 @@
 			case "AttendanceGrid": // RW-21544, user need 'Trip Calendar/Attendance Records' permission to visit trip calendar and student attendance grid
 			case "CalendarEventsGrid":
 				return tf.authManager.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
+			case "CommunicationHistoryGrid":
+				return tf.authManager.isAuthorizedFor('mergeDocuments','read');
 			default:
 				return tf.authManager.isAuthorizedForDataType(dataItem.url, "read");
 		}
@@ -2089,6 +2126,25 @@
 							}]
 						}
 					});
+				});
+			case "CommunicationHistoryGrid":
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "mergedocumentssents"), {
+					data: {
+						filterSet: {
+							FilterItems: [
+								{ FieldName: "RecordID", Operator: "EqualTo", Value: self.recordId },
+								{ FieldName: "DBID", Operator: "EqualTo", Value: tf.datasourceManager.databaseId },
+								{ FieldName: "DataTypeId", Operator: "EqualTo", Value: tf.dataTypeHelper.getId(self.gridType) }
+							],
+							LogicalOperator: "and",
+							FilterSets: []
+						},
+						sortItems: [{
+							Name: "SentOn",
+							isAscending: "desc",
+							Direction: "Descending"
+						}]
+					}
 				});
 			default:
 				paramData = {};
@@ -2477,8 +2533,7 @@
 	{
 		var self = this,
 			isReadMode = self.isReadMode(),
-			miniGridType = (self.options.url || "").toLowerCase(),
-			columns = self.prepareColumnsForDetailGrid(miniGridType, self.options),
+			columns = self.prepareColumnsForDetailGrid(self.miniGridType, self.options),
 			hasPermission = self.checkLoadDataPermission(self.options);
 
 		/**
@@ -2496,7 +2551,7 @@
 			if (!self.recordId)
 			{
 				let whetherGetRelatedData = false;
-				if (self.gridType == "route" && miniGridType == "trip")
+				if (self.gridType == "route" && self.miniGridType == "trip")
 				{
 					let fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
 					let editFieldList = self.fieldEditorHelper.editFieldList[fieldName];
@@ -2508,7 +2563,7 @@
 
 				if (!whetherGetRelatedData)
 				{
-					var items = self.detailView.newEntityRelationships[miniGridType] || [];
+					var items = self.detailView.newEntityRelationships[self.miniGridType] || [];
 					return Promise.resolve({
 						dataItems: items,
 						totalCount: items.length,
@@ -2562,10 +2617,10 @@
 		var defaultGridOptions = {
 			dataBound: function()
 			{
-				self._bindMiniGridEvent(miniGridType, self.$el.find(".kendo-grid"));
+				self._bindMiniGridEvent(self.miniGridType, self.$el.find(".kendo-grid"));
 
 				self._setDefaultStudentRequirementAddable();
-				switch (miniGridType)
+				switch (self.miniGridType)
 				{
 					case "document":
 						self.$el.find(".kendo-grid .k-grid-content table tr").each(function(index, el)
@@ -2594,8 +2649,8 @@
 
 		var options = {
 			columns: columns,
-			isFieldTripInvoice: miniGridType === "fieldtripinvoice",
-			onDemandActions: this.onDemandGridActions[miniGridType],
+			isFieldTripInvoice: self.miniGridType === "fieldtripinvoice",
+			onDemandActions: this.onDemandGridActions[self.miniGridType],
 			dataSource: getDataSource,
 			sort: self.options.sort,
 			gridOptions: $.extend(defaultGridOptions, hasPermission ? {} : {
@@ -2605,7 +2660,7 @@
 			})
 		};
 
-		if (miniGridType === "fieldtripinvoice")
+		if (self.miniGridType === "fieldtripinvoice")
 		{
 			options.afterRenderCallback = function(kendoGrid, dataItems)
 			{
@@ -2616,7 +2671,7 @@
 			}.bind(self);
 		}
 
-		if ([TF.Helper.KendoGridHelper.studentRequirementItemsUrl, TF.Helper.KendoGridHelper.studentAdditionalRequirementUrl, "studentschedule"].indexOf(miniGridType) >= 0)
+		if ([TF.Helper.KendoGridHelper.studentRequirementItemsUrl, TF.Helper.KendoGridHelper.studentAdditionalRequirementUrl, "studentschedule"].indexOf(self.miniGridType) >= 0)
 		{
 			options.totalCountHidden = true;
 			self.pubSubSubscriptions.push(PubSub.subscribe(studentRequirementsUrl, function(key, result)
@@ -2628,7 +2683,7 @@
 			}));
 		}
 
-		if (miniGridType === "attendancegrids")
+		if (self.miniGridType === "attendancegrids"  || self.miniGridType === "communicationhistory")
 		{
 			options.totalCountHidden = true;
 		}
@@ -2638,7 +2693,7 @@
 		var grid = tf.helpers.kendoGridHelper.createSimpleGrid(self.$el, options);
 		self.grid = grid;
 		grid.options.totalCountHidden = options.totalCountHidden;
-		if ([TF.Helper.KendoGridHelper.studentRequirementItemsUrl, TF.Helper.KendoGridHelper.studentAdditionalRequirementUrl].indexOf(miniGridType) >= 0)
+		if ([TF.Helper.KendoGridHelper.studentRequirementItemsUrl, TF.Helper.KendoGridHelper.studentAdditionalRequirementUrl].indexOf(self.miniGridType) >= 0)
 		{
 			grid.tbody.on("dblclick", "tr.k-state-selected", function(e)
 			{
@@ -2646,7 +2701,7 @@
 			});
 		}
 
-		if (miniGridType == "fieldtripresource")
+		if (self.miniGridType == "fieldtripresource")
 		{
 			grid.tbody.on("dblclick", "tr.k-state-selected", function(e)
 			{
@@ -2662,7 +2717,7 @@
 			}));
 		}
 
-		if (miniGridType == "fieldtripvehicle" || miniGridType == "fieldtripdriver" || miniGridType == "fieldtripaide")
+		if (self.miniGridType == "fieldtripvehicle" || self.miniGridType == "fieldtripdriver" || self.miniGridType == "fieldtripaide")
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("fieldtripresource", function()
 			{
@@ -2670,7 +2725,7 @@
 			}));
 		}
 
-		if (miniGridType == "fieldtripinvoice")
+		if (self.miniGridType == "fieldtripinvoice")
 		{
 			grid.tbody.on("dblclick", "tr.k-state-selected", function(e)
 			{
@@ -2683,7 +2738,7 @@
 			}));
 		}
 
-		if (miniGridType == "triphistory")
+		if (self.miniGridType == "triphistory")
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("tripHistoryChange", function(key, result)
 			{
@@ -2693,7 +2748,7 @@
 				}
 			}));
 		}
-		else if (miniGridType == "studentschedule")
+		else if (self.miniGridType == "studentschedule")
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("studentscheduleChange", function(key, result)
 			{
@@ -2704,7 +2759,7 @@
 			}));
 		}
 
-		if (miniGridType == "studenttagids")
+		if (self.miniGridType == "studenttagids")
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("studentCardChange", function(key, result)
 			{
@@ -2715,7 +2770,7 @@
 			}));
 		}
 
-		if (miniGridType == "trip" && self.gridType == "route")
+		if (self.miniGridType == "trip" && self.gridType == "route")
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("tripChange", function(key, result)
 			{

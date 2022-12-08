@@ -1635,6 +1635,14 @@
 					"url": "document",
 					"min-height": "3",
 					"min-width": 2
+				},
+				{
+					"field": "CommunicationHistoryGrid",
+					"title": "Communication History Grid",
+					"type": "grid",
+					"url": "communicationhistory",
+					"min-height": "3",
+					"min-width": 2
 				}
 			],
 			"Miscellaneous": [
