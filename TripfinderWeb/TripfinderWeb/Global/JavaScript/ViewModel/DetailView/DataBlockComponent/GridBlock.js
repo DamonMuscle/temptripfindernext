@@ -219,7 +219,7 @@
 		// set on demand action
 		self.onDemandGridActions = {};
 
-		if (self.miniGridType === "communicationhistory" && tf.authManager.isAuthorizedFor('mergeDocuments','read'))
+		if (self.miniGridType === "communicationhistory" && self.checkLoadDataPermission(self.options))
 		{
 			self.onDemandGridActions[self.miniGridType] = [{
 				name: "view",
@@ -1906,7 +1906,7 @@
 			case "CalendarEventsGrid":
 				return tf.authManager.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
 			case "CommunicationHistoryGrid":
-				return tf.authManager.isAuthorizedFor('mergeDocuments','read');
+				return tf.authManager.isAuthorizedFor('mergeEmailMessages','read') && tf.authManager.isAuthorizedFor('scheduledMergeDocument','read');
 			default:
 				return tf.authManager.isAuthorizedForDataType(dataItem.url, "read");
 		}
