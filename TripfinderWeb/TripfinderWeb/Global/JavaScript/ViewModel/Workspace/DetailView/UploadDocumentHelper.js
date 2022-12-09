@@ -27,7 +27,7 @@
 		'.asf', '.jpeg', '.docx', '.m4a', '.avi', '.jpg', '.dotm', '.mp3', '.divx', '.png', '.dotx',
 		'.ogg', '.flv', '.tif', '.tiff', '.htm', '.rmi', '.m2ts', '.wmf', '.html', '.wav', '.m4v', '.odp',
 		'.wma', '.mkv', '.odt', '.mov', '.pdf', '.mp4', '.pps', '.mpe', '.ppt', '.mpeg', '.pptx', '.mpeg4',
-		'.rtf', '.mpg', '.txt', '.ogv', '.xls', '.qt', '.xlsx', '.swf', '.xps', '.vob', '.wmv'];
+		'.rtf', '.mpg', '.txt', '.ogv', '.xls', '.qt', '.xlsx', '.swf', '.xps', '.vob', '.wmv', '.tfformconfiguration'];
 	UploadDocumentHelper.acceptMimeType = "*.*";
 
 	UploadDocumentHelper.prototype.isDetailViewReadOnly = function()
