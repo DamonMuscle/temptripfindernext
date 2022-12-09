@@ -409,6 +409,10 @@
 										<input type='checkbox' disabled class='signature-checkbox' ${item[col] ? 'checked' : ''}/>
 									</div>`;
 							};
+							column.formatCopyValue = function(value)
+							{
+								return value == null ? "" : `${value}`;
+							};
 							break;
 						case "Date/Time":
 							column.template = dateTimeTemplate;
@@ -454,6 +458,10 @@
 							{
 								let value = item[col];
 								if (isNullObj(value)) return '';
+								if (value === udgField.positiveLabel || value === udgField.negativeLabel)
+								{
+									return value;
+								}
 								return value ? udgField.positiveLabel : udgField.negativeLabel || value;
 							};
 							/* 
