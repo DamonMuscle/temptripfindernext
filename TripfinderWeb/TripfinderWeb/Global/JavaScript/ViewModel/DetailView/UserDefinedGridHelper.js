@@ -434,7 +434,7 @@
 								return '';
 							}
 
-							return value === 'true' ? col.positiveLabel : col.negativeLabel || value;
+							return (value === true || value === 'true') ? col.positiveLabel : col.negativeLabel || value;
 						};
 					break;
 				case "SignatureBlock":
@@ -445,6 +445,10 @@
 						return `<div class='signature-checkbox-container'>
 										<input type='checkbox' disabled class='signature-checkbox' ${checked ? 'checked' : ''}/>
 									</div>`;
+					};
+					column.formatCopyValue = function(value)
+					{
+						return value == null ? "" : `${value}`;
 					};
 					break;
 				case "Number":

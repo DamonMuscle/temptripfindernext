@@ -1140,14 +1140,14 @@
 
 		function formatData(column, value)
 		{
-			if ($.isFunction(column.template))
-			{
-				return column.template(theRecord);
-			}
-
 			if (column.formatCopyValue)
 			{
 				return column.formatCopyValue(value);
+			}
+
+			if ($.isFunction(column.template))
+			{
+				return column.template(theRecord);
 			}
 
 			if (column.type === "date" || column.type === "time" || column.type === "datetime")
