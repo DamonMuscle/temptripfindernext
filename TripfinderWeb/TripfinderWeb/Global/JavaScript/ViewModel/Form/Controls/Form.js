@@ -550,8 +550,11 @@
 			if (res && res.Items && res.Items.length === 1)
 			{
 				onlyOneRecord = true;
+				if (this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_SPECIFIC)
+				{
+					this.elem.find("div.form-entity-container").hide();
+				}
 			}
-			this.elem.find("div.form-entity-container").show();
 
 			//initialize FormRecordSelector
 			if (this.options.udGridRecordId)
@@ -574,6 +577,9 @@
 				{
 					autoCompleteElem.attr("disabled", 'disabled');
 				}
+
+				this.elem.find("div.form-entity-container").show();
+				return Promise.resolve(true);
 			}
 			else
 			{
@@ -600,7 +606,7 @@
 						{
 							autoCompleteElem.attr("disabled", "disabled");
 							autoCompleteElem.addClass("k-state-disabled");
-							autoCompleteElem.parent(".k-widget").children(".k-clear-valu").hide();
+							autoCompleteElem.parent(".k-widget").children(".k-clear-value").hide();
 							const autoSearchElem = this.elem.find(".k-i-search");
 							if (autoSearchElem && autoSearchElem.length > 0)
 							{
@@ -611,7 +617,7 @@
 						{
 							autoCompleteElem.removeAttr("disabled");
 							autoCompleteElem.removeClass("k-state-disabled");
-							autoCompleteElem.parent(".k-widget").children(".k-clear-valu").show();
+							autoCompleteElem.parent(".k-widget").children(".k-clear-value").show();
 							const autoSearchElem = this.elem.find(".k-i-search");
 							if (autoSearchElem && autoSearchElem.length > 0)
 							{
