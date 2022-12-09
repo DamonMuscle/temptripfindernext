@@ -993,7 +993,7 @@
 		{
 			fileName = file.name;
 			fileSize = file.size != null ? (file.size / 1024).toFixed(2) : null;
-			fileType = file.type;
+			fileType = self.isTfFormConfigurationType(fileName)? 'text/plain' : file.type;
 			if (self._shouldUpdateNameWithFileName())
 			{
 				name = fileName.split(".")[0];
@@ -1028,6 +1028,17 @@
 			$nameBlock.parent().find('small').remove();
 		}
 	};
+
+	BaseCustomGridStackViewModel.prototype.isTfFormConfigurationType = function (fileName)
+	{
+		if (fileName)
+		{
+			const index = fileName.lastIndexOf('.'),
+			extension = fileName.substr(index, fileName.length - index).toLowerCase();
+			return extension === '.tfformconfiguration';
+		}
+		return false;
+	}
 
 	BaseCustomGridStackViewModel.prototype.refreshEditStatus = function()
 	{
