@@ -85,12 +85,28 @@
 		{
 			if (res)
 			{
+				res.Body = self.updateImages(res.Body);
+
 				const dt = utcToClientTimeZone(res.SentOn);
 				res.SentOn = dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
 				self.obEntityData(res);
 				self.dataInitialized = true;
 			}
 		})
+	};
+
+	MergeDocumentsSentDetailViewViewModel.prototype.updateImages = function(body)
+	{
+		let container = $("<div>").append($(body));
+		let imgs = container.find("img[src^='cid']");
+		$.each(imgs, (i, img) =>
+		{
+			//substring "cid:", length = 4
+			let id = $(img).attr("src").slice(4);
+			let content = container.find(`#${id}`).html();
+			container.find(`img[src='cid:${id}']`).attr("src", `data:image/png;base64,${content}`);
+		});
+		return container.html();
 	};
 
 	/**
@@ -102,7 +118,7 @@
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "mergedocumentssents"), {
 			data: {
-				fields:["Name","Description","RecipientEmail","Subject","Body","LoginID","SentOn","SentAs","Id","SentResult","DataTypeName","MergeTemplateTypeName","RecordName"],
+				fields: ["Name", "Description", "RecipientEmail", "Subject", "Body", "LoginID", "SentOn", "SentAs", "Id", "SentResult", "DataTypeName", "MergeTemplateTypeName", "RecordName"],
 				idFilter: {
 					IncludeOnly: [recordId]
 				}
