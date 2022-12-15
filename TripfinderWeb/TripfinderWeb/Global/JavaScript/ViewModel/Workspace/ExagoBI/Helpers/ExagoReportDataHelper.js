@@ -183,17 +183,19 @@
 				{ overlay: false }
 			),
 			p2 = self.getReportExecutionInfo(reportId),
+			p3 = self.getReportDataSources(),
 			reportEntity;
 
-		return Promise.all([p1, p2])	// Retrieve report record and associated parameter values
+		return Promise.all([p1, p2, p3])	// Retrieve report record and associated parameter values
 			.then(function(results)
 			{
-				var resp1 = results[0], resp2 = results[1], dataSchema;
+				var resp1 = results[0], resp2 = results[1], resp3 = results[2], dataSchema;
 
 				if (!resp1 || !Array.isArray(resp1.Items) || resp1.Items.length === 0) return null;
 
 				reportEntity = resp1.Items[0];
 				reportEntity.execInfo = resp2;
+				reportEntity.dataSources = resp3;
 				dataSchema = tf.dataTypeHelper.getReportDataSchemaById(reportEntity.ReportDataSchemaID);
 
 				return self.getReportMetadata(reportId, dataSchema, previewReportName);
@@ -213,6 +215,20 @@
 				reportEntity.isTripStopDrivingDirectionsUsed = metaData.isTripStopDrivingDirectionsUsed;
 
 				return reportEntity;
+			});
+	};
+
+	ExagoReportDataHelper.prototype.getReportDataSources = function()
+	{
+		if (tf.authManager.authorizationInfo.isAdmin)
+		{
+			return Promise.resolve(tf.datasourceManager.datasources);
+		}
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases?authedOnly=true&@sort=Name"))
+			.then(function(apiResponse)
+			{
+				return apiResponse.Items;
 			});
 	};
 

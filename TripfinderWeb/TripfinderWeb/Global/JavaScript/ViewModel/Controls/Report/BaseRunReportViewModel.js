@@ -71,7 +71,7 @@
 
 		self.fromSchedule = ko.observable(option['fromSchedule'] && option['fromSchedule'] === true);
 		self.generateMapSettingProperties();
-		self.generateFilterSettingProperties();	// Prepare observables and properties for fitler settings
+		self.generateFilterSettingProperties(option);	// Prepare observables and properties for fitler settings
 		self.generateParameterItemViewModels();	// Generate ViewModels for each report parameters
 		if (Array.isArray(explicitRecordIds) && explicitRecordIds.length > 0)
 		{
@@ -170,18 +170,18 @@
 		});
 	}
 
-	BaseRunReportViewModel.prototype.generateFilterSettingProperties = function()
+	BaseRunReportViewModel.prototype.generateFilterSettingProperties = function(option)
 	{
 		var self = this,
 			outputTypes = tf.exagoReportDataHelper.getAllOutputTypes(),
-			dataSources = tf.datasourceManager.datasources.map(function(item)
+			dataSources = option.entity.dataSources.map(function(item)
 			{
 				return {
 					name: item.Name,
 					id: item.DBID,
 					version: item.DBVersion
 				};
-			}),
+			}).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())),
 			specifyRecordMethods = tf.exagoReportDataHelper.getAllSpecifyRecordMethods();
 
 		// fields for storing current settings (for comparison in observable to trigger change event)
