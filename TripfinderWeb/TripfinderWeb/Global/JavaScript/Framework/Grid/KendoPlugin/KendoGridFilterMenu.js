@@ -493,8 +493,7 @@
 	{
 		var self = this;
 		var filterUrl = "gridfilters";
-		let filter = TF.isMobileDevice ? `(eq(dbid, ${tf.datasourceManager.databaseId})|isnull(dbid,))&eq(datatypeId,${tf.dataTypeHelper.getId(self.options.gridType)})`
-			: `(eq(datatypeId,${tf.dataTypeHelper.getId(self.options.gridType)}))`;
+		let filter = `(eq(dbid, ${tf.datasourceManager.databaseId})|isnull(dbid,))&eq(datatypeId,${tf.dataTypeHelper.getId(self.options.gridType)})`;
 
 		var gridfiltersPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
 			paramData: {
