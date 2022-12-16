@@ -309,6 +309,8 @@
 					widget.css({top: this.$element.offset().top -  widget.outerHeight(), position: "relative"});
 				}
 
+				widget.css({ left: wightCss['left'] });
+
 				//for form
 				if ($(e.currentTarget).closest(".form-container").length > 0) {
 					let timeEle = $(e.currentTarget).closest(".input-group.time-question").find("input.form-control"),
