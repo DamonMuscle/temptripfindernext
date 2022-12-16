@@ -33,6 +33,11 @@
 				event.preventDefault();
 				event.stopPropagation();
 			}
+
+			if (Number(attributes.decimalMax) > 0)
+			{
+				$(this).val(self.formatDecimalValue($(this).val(), attributes.decimalMax || 2));
+			}
 		});
 
 		this.getElement().on("blur", function(event)
@@ -47,6 +52,31 @@
 	DecimalBox.prototype = Object.create(namespace.StringBox.prototype);
 
 	DecimalBox.constructor = DecimalBox;
+
+	DecimalBox.prototype.formatDecimalValue = function(val, decimalMax)
+	{
+		if (!val)
+		{
+			return val;
+		}
+
+		let splitVal = `${val}`.split(".");
+		let integer = splitVal[0];
+		let decimal = splitVal[1];
+		if (Number(decimal) > 0 && Number(decimalMax) > 0)
+		{
+			decimal = decimal.substring(0, decimalMax);
+		}
+
+		if (Number(decimal) > 0)
+		{
+			return `${integer}.${decimal}`;
+		} else if (splitVal.length > 1){
+			return `${integer}.`;
+		} else{
+			return val;
+		}
+	}
 
 	DecimalBox.prototype.type = "Decimal";
 
