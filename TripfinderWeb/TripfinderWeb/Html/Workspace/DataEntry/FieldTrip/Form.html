@@ -301,7 +301,7 @@
 						<div class="input-group">
 							<div
 								data-bind="typeahead:{source:obMailZipDataModels,format:function(obj){return obj.Postal;},drowDownShow:true},attr:IsRequired(obRequiredFields()&&obRequiredFields().DestinationZip?obRequiredFields().DestinationZip.Required:null)">
-								<!-- ko customInput:{disable:obStrictDest,type:"Decimal",value:obEntityDataModel().destinationZip,attributes:{class:"form-control",maxlength:"5",name:'zip'}} -->
+								<!-- ko customInput:{disable:obStrictDest,type:"String",value:obEntityDataModel().destinationZip,attributes:{class:"form-control",maxlength:"5",name:'zip'}} -->
 								<!-- /ko -->
 							</div>
 							<div class="input-group-btn">
