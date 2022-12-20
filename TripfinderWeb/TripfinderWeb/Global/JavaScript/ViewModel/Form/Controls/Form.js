@@ -141,7 +141,7 @@
 			configurable: false
 		});
 
-	Form.prototype.initEvents = function ()
+	Form.prototype.initEvents = function()
 	{
 		const footerElement = $('.modal-footer');
 		footerElement.on('click', '.form-close', () =>
@@ -162,23 +162,23 @@
 		});
 	}
 
-	Form.prototype.closeForm = function ()
+	Form.prototype.closeForm = function()
 	{
 		this.elem.trigger('formClose');
 		tf.authManager.surveyToken = undefined;
 	}
 
-	Form.prototype.triggerCloseForm = function ()
+	Form.prototype.triggerCloseForm = function()
 	{
 		this.elem.trigger('triggerFormClose');
 	}
 
-	Form.prototype._saveBtnClickEvent = function ()
+	Form.prototype._saveBtnClickEvent = function()
 	{
 		this.elem.trigger('formSave');
 	}
 
-	Form.prototype._nextBtnClickEvent = function ()
+	Form.prototype._nextBtnClickEvent = function()
 	{
 		const self = this;
 		if (self.currentSectionId() !== self.lastSectionId())
@@ -203,7 +203,7 @@
 				{
 					q.refresh();
 				})
-				setTimeout(function ()
+				setTimeout(function()
 				{
 					$(".form-body").scrollTop(0);
 				}, 10);
@@ -215,7 +215,7 @@
 		}
 	}
 
-	Form.prototype._previousBtnClickEvent = function ()
+	Form.prototype._previousBtnClickEvent = function()
 	{
 		const self = this;
 		if (self.currentSectionId() !== self.firstSectionId())
@@ -232,7 +232,7 @@
 			self.currentSectionId(previousSection.Id);
 			self.currentSectionName(previousSection.Name);
 			self.resetWarningMessage(previousSection.element);
-			setTimeout(function ()
+			setTimeout(function()
 			{
 				$(".form-body").scrollTop(0);
 			}, 10);
@@ -240,7 +240,7 @@
 	}
 
 
-	Form.prototype.validateLocationRequired = function ()
+	Form.prototype.validateLocationRequired = function()
 	{
 		//Do not validate location required when the form is edited.
 		if (this.options.udGridRecordId) 
@@ -257,7 +257,7 @@
 		});
 	}
 
-	Form.prototype.saveForm = function ()
+	Form.prototype.saveForm = function()
 	{
 		const self = this;
 		if (this.obRecordID() == null)
@@ -267,7 +267,7 @@
 			return tf.promiseBootbox.alert({
 				message: `Please select ${aStr} ${dateType} first.`,
 				title: `No ${dateType} Selected`
-			}).then(function ()
+			}).then(function()
 			{
 				return null;
 			});
@@ -447,7 +447,7 @@
 							} else
 							{
 								return TF.DetailView.UserDefinedGridHelper.getNewSurvey(self.options.ID)
-									.then(function (udgridSurvey)
+									.then(function(udgridSurvey)
 									{
 										return tf.udgHelper.addSurveyUDGridRecordOfEntity(self.options, tf.dataTypeHelper.getId(self.dataType), self.obRecordID(), udgRecord, udgridSurvey);
 									});
@@ -498,7 +498,7 @@
 
 	}
 
-	Form.prototype.onChange = function (e)
+	Form.prototype.onChange = function(e)
 	{
 		if (e.sender && e.sender.dataItem())
 		{
@@ -510,13 +510,11 @@
 		}
 	}
 
-	Form.prototype.initRecordSelector = function ()
+	Form.prototype.initRecordSelector = async function()
 	{
-		const autoCompleteElem = this.elem.find(".form-entity-input");
-		const dbID = tf.datasourceManager.databaseId || this.dbId;
 		let type = this.dataType;
 		let selector = 'FormRecordSelector',
-		submitFormIsAllRecordType = this._specifyOptions.TypeId === ALL_RECORD && this.options.udGridRecordId;
+			submitFormIsAllRecordType = this._specifyOptions.TypeId === ALL_RECORD && this.options.udGridRecordId;
 
 		if (!this.options.Public &&
 			this._specifyOptions.TypeId !== SPECIFY_RECORD_TYPE_SPECIFIC &&
@@ -531,7 +529,15 @@
 			}
 		}
 
-		autoCompleteElem.keydown(function (event)
+		const dbId = tf.datasourceManager.databaseId || this.dbId;
+		await this.renderFormEntityContainer('', dbId, this.dataType, true, this._specifyOptions, selector);
+	}
+
+	Form.prototype.renderFormEntityContainer = async function(searchValue, dbId, dataType, isSearchAll, specifyOptions, selector)
+	{
+		const autoCompleteElem = this.elem.find(".form-entity-input");
+
+		autoCompleteElem.keydown(function(event)
 		{
 			if (event.keyCode === 13)
 			{
@@ -539,96 +545,96 @@
 			}
 		});
 
+		let onlyOneRecord = false;
+		onlyOneRecord = await TF.DetailView.UserDefinedGridHelper.isOnlyOneRecord(searchValue, dbId, dataType, isSearchAll, specifyOptions);
 
-		return TF.DetailView.UserDefinedGridHelper.getFormSearchData('', dbID, this.dataType, true, this._specifyOptions).then((res) =>
+		//FORM-1874, show record selector any time
+		this.elem.find("div.form-entity-container").show();
+
+		if (onlyOneRecord)
 		{
-			let onlyOneRecord = false;
-			
-			//FORM-1874, show record selector any time
-			this.elem.find("div.form-entity-container").show();		
-
-			if (res && res.Items && res.Items.length === 1)
+			if (this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_SPECIFIC)
 			{
-				onlyOneRecord = true;
-				if (this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_SPECIFIC)
+				this.elem.find("div.form-entity-container").hide();
+			}
+		}
+
+		//initialize FormRecordSelector
+		if (this.options.udGridRecordId)
+		{
+			this.recordSelector = new TF.Control[selector](autoCompleteElem, {
+				dbId: tf.datasourceManager.databaseId || this.dbId,
+				dataType: this.dataType,
+				enable: this.options.RecordID == null,
+				needOneRecordCheck: !this.options.udGridRecordId,
+				canClearFilter: this.options.canClearFilter,
+				valueChanged: val =>
 				{
-					this.elem.find("div.form-entity-container").hide();
-				}
+					this.obRecordID(val);
+				},
+				specifyOptions: this._specifyOptions,
+				isPublicForm: this.options.Public
+			});
+			autoCompleteElem.css("width", '');
+			if (this.options.isReadOnly || this.options.signatureReadonly)
+			{
+				autoCompleteElem.attr("disabled", 'disabled');
 			}
 
-			//initialize FormRecordSelector
-			if (this.options.udGridRecordId)
-			{
-				this.recordSelector = new TF.Control[selector](autoCompleteElem, {
-					dbId: tf.datasourceManager.databaseId || this.dbId,
-					dataType: this.dataType,
-					enable: this.options.RecordID == null,
-					needOneRecordCheck: !this.options.udGridRecordId, 
-					canClearFilter: this.options.canClearFilter,
-					valueChanged: val =>
-					{
-						this.obRecordID(val);
-					},
-					specifyOptions: this._specifyOptions,
-					isPublicForm: this.options.Public
-				});
-				autoCompleteElem.css("width", '');
-				if (this.options.isReadOnly || this.options.signatureReadonly)
-				{
-					autoCompleteElem.attr("disabled", 'disabled');
-				}
+			this.elem.find("div.form-entity-container").show();
+			return Promise.resolve(true);
+		}
 
-				this.elem.find("div.form-entity-container").show();
-				return Promise.resolve(true);
-			}
-			else
-			{
-				let enableStatus = this.options.RecordID == null;
-				if (onlyOneRecord)
-				{
-					enableStatus = false;
-				}
-				this.recordSelector = new TF.Control[selector](autoCompleteElem, {
-					dbId: tf.datasourceManager.databaseId || this.dbId,
-					dataType: this.dataType,
-					enable: enableStatus,
-					needOneRecordCheck: !this.options.udGridRecordId && !this.options.uniqueClassName, 
-					canClearFilter: this.options.canClearFilter,
-					valueChanged: val =>
-					{
-						this.obRecordID(val);
-					},
-					onlyOneRecordCallback: (oneRecord) =>
-					{
-						//FORM-1874
-						const autoCompleteElem = $("input[name='form-entity-input']");
-						if (oneRecord)
-						{
-							autoCompleteElem.attr("disabled", "disabled");
-							autoCompleteElem.addClass("k-state-disabled");
-							autoCompleteElem.parent(".k-widget").children(".k-clear-value").hide();
-							const autoSearchElem = this.elem.find(".k-i-search");
-							if (autoSearchElem && autoSearchElem.length > 0)
-							{
-								autoSearchElem.hide();
-							}
-						}
-						else
-						{
-							autoCompleteElem.removeAttr("disabled");
-							autoCompleteElem.removeClass("k-state-disabled");
-							autoCompleteElem.parent(".k-widget").children(".k-clear-value").show();
-							const autoSearchElem = this.elem.find(".k-i-search");
-							if (autoSearchElem && autoSearchElem.length > 0)
-							{
-								autoSearchElem.show();
-							}
-						}
-					},
-					specifyOptions: this._specifyOptions,
-					isPublicForm: this.options.Public
-				});
+		let enableStatus = this.options.RecordID == null;
+		if (onlyOneRecord)
+		{
+			enableStatus = false;
+		}
 
+		this.recordSelector = new TF.Control[selector](autoCompleteElem, {
+			dbId: tf.datasourceManager.databaseId || this.dbId,
+			dataType: this.dataType,
+			enable: enableStatus,
+			needOneRecordCheck: !this.options.udGridRecordId && !this.options.uniqueClassName,
+			canClearFilter: this.options.canClearFilter,
+			valueChanged: val =>
+			{
+				this.obRecordID(val);
+			},
+			onlyOneRecordCallback: (oneRecord) =>
+			{
+				//FORM-1874
+				const autoCompleteElem = $("input[name='form-entity-input']");
+				if (oneRecord)
+				{
+					autoCompleteElem.attr("disabled", "disabled");
+					autoCompleteElem.addClass("k-state-disabled");
+					autoCompleteElem.parent(".k-widget").children(".k-clear-value").hide();
+					const autoSearchElem = this.elem.find(".k-i-search");
+					if (autoSearchElem && autoSearchElem.length > 0)
+					{
+						autoSearchElem.hide();
+					}
+				}
+				else
+				{
+					autoCompleteElem.removeAttr("disabled");
+					autoCompleteElem.removeClass("k-state-disabled");
+					autoCompleteElem.parent(".k-widget").children(".k-clear-value").show();
+					const autoSearchElem = this.elem.find(".k-i-search");
+					if (autoSearchElem && autoSearchElem.length > 0)
+					{
+						autoSearchElem.show();
+					}
+				}
+			},
+			specifyOptions: this._specifyOptions,
+			isPublicForm: this.options.Public
+		});
+
+		return TF.DetailView.UserDefinedGridHelper.getFormSearchData('', dbId, this.dataType, true, this._specifyOptions)
+			.then((res) =>
+			{
 				if (onlyOneRecord && selector == "FormRecordSelector")
 				{
 					const config = TF.Form.formConfig[this.dataType];
@@ -637,17 +643,17 @@
 					this.recordSelector.elem.val(nameVal);
 					this.disAbleFormRecordSelector();
 				}
-			}
-			return Promise.resolve(true);
-		});
+
+				return Promise.resolve(true);
+			});
 	}
 
-	Form.prototype.checkModifyPermission = function (type)
+	Form.prototype.checkModifyPermission = function(type)
 	{
 		return tf.authManager.isAuthorizedForDataType(type, this.options.udGridRecordId ? "edit" : "add");
 	};
 
-	Form.prototype.initElement = function ()
+	Form.prototype.initElement = function()
 	{
 		const self = this;
 		let color = this.options.color,
@@ -756,7 +762,7 @@
 			$(window).off(EVENT_ORIENTATION_CHANGE_MOBILE)
 				.on(EVENT_ORIENTATION_CHANGE_MOBILE, () =>
 				{
-					setTimeout(function ()
+					setTimeout(function()
 					{
 
 						let dialog = elem.closest('.modal-dialog');
@@ -771,12 +777,12 @@
 							elem.closest(".basic-quick-add").css("min-height", bodyHeightWithoutPadding + "px");
 							elem.find(".form").css("min-height", bodyHeightWithoutPadding + "px");
 
-							setTimeout(function ()
+							setTimeout(function()
 							{
 								//self.checkHeaderWrapped(elem);
 								let keepRotate = true;
 								let toRotate = self.resetFormHeader(elem, keepRotate);
-								setTimeout(function ()
+								setTimeout(function()
 								{
 									//self.resetFormSubTitleClamp(elem, toRotate); // for sticky header
 									window.scroll(0, 1);
@@ -791,7 +797,7 @@
 	}
 
 	/* assign type record, invoked by UDGridGridStackQuickAddWrapper.prototype._updateQuickAddDetailView */
-	Form.prototype.assignEntityRecord = function (record)
+	Form.prototype.assignEntityRecord = function(record)
 	{
 		this.getPublicTokenPromise.then((res) =>
 		{
@@ -824,7 +830,7 @@
 		});
 	}
 
-	Form.prototype._processElement = function (element)
+	Form.prototype._processElement = function(element)
 	{
 		let anchors = element.find('.question-title a');
 		if (anchors.length > 0)
@@ -840,7 +846,7 @@
 		}
 	}
 
-	Form.prototype.initUDFSystemFieldState = function ()
+	Form.prototype.initUDFSystemFieldState = function()
 	{
 		const getUDFOptionPromise = () =>
 		{
@@ -915,7 +921,7 @@
 
 	}
 
-	Form.prototype.attachActionOnFormHeader = function ($element)
+	Form.prototype.attachActionOnFormHeader = function($element)
 	{
 		// make subtitle display block to calculate full height
 		$element.find(CLASS_NAME_FORM_SUBTITLE).css("display", "block");
@@ -932,7 +938,7 @@
 		{
 			self.checkHeaderWrapped($element);
 			const isRotated = $element.find(".showmore").hasClass("rotate");
-			setTimeout(function ()
+			setTimeout(function()
 			{
 				self.resetFormSubTitleClamp($element, isRotated);
 			}, 200);
@@ -946,7 +952,7 @@
 			this.elem.find(".showmore").show().on("click", ev =>
 			{
 				let toRotate = this.resetFormHeader($element);
-				setTimeout(function ()
+				setTimeout(function()
 				{
 					self.resetFormSubTitleClamp($element, toRotate);
 				}, 200);
@@ -954,7 +960,7 @@
 		}
 	}
 
-	Form.prototype.checkHeaderWrapped = function ($element)
+	Form.prototype.checkHeaderWrapped = function($element)
 	{
 		let titleEle = $element.find(CLASS_NAME_FORM_TITLE),
 			titleHeight = $element.find(CLASS_NAME_FORM_TITLE).outerHeight();
@@ -971,7 +977,7 @@
 		}
 	}
 
-	Form.prototype.resetFormHeader = function ($element, keepRotate)
+	Form.prototype.resetFormHeader = function($element, keepRotate)
 	{
 		//Recalculating height in case of orientation change
 		$element.find(".form-subtitle").css("display", "block");
@@ -1015,7 +1021,7 @@
 		return toRotate;
 	}
 
-	Form.prototype.resetFormSubTitleClamp = function ($element, toRotate)
+	Form.prototype.resetFormSubTitleClamp = function($element, toRotate)
 	{
 		let rotateBtnHeight = 20;
 		let lineHeight = 22;
@@ -1045,7 +1051,7 @@
 		$formSubtitle.removeClass(CLASS_NAME_LINE_CLAMP2).removeClass(CLASS_NAME_LINE_CLAMP3).addClass('line-clamp-' + lineClampValue);
 	}
 
-	Form.prototype.toggleSystemFieldValue = function (recordId)
+	Form.prototype.toggleSystemFieldValue = function(recordId)
 	{
 		this.initUDFSystemFieldStatePromise && this.initUDFSystemFieldStatePromise.then(() =>
 		{
@@ -1093,7 +1099,7 @@
 		});
 	}
 
-	Form.prototype.getSystemFieldValue = async function (data, question)
+	Form.prototype.getSystemFieldValue = async function(data, question)
 	{
 		const fieldOptions = question.field.FieldOptions;
 		let value = data[question.field.editType.targetField];
@@ -1143,7 +1149,7 @@
 		return value;
 	};
 
-	Form.prototype.restoreAttachment = function (docs, docRelationships)
+	Form.prototype.restoreAttachment = function(docs, docRelationships)
 	{
 		if (docs.length > 0 && docRelationships.length > 0)
 		{
@@ -1160,7 +1166,7 @@
 		}
 	}
 
-	Form.prototype.drawMapShapes = function (mapRecords)
+	Form.prototype.drawMapShapes = function(mapRecords)
 	{
 		if (mapRecords.length == 0)
 		{
@@ -1183,7 +1189,7 @@
 		}, 100);
 	}
 
-	Form.prototype.createDisplayAllSections = function (element)
+	Form.prototype.createDisplayAllSections = function(element)
 	{
 		const self = this;
 
@@ -1212,7 +1218,7 @@
 		});
 	}
 
-	Form.prototype.createSections = function (element)
+	Form.prototype.createSections = function(element)
 	{
 		const self = this;
 
@@ -1243,7 +1249,7 @@
 		});
 	}
 
-	Form.prototype.createQuestions = function (element, newFields, currentSection)
+	Form.prototype.createQuestions = function(element, newFields, currentSection)
 	{
 		let fields = newFields.sort((a, b) => a.Index - b.Index),
 			questionContainer = element;
@@ -1274,7 +1280,7 @@
 
 	}
 
-	Form.prototype.convertHex = function (hex, opacity)
+	Form.prototype.convertHex = function(hex, opacity)
 	{
 		hex = hex.replace('#', '');
 		r = parseInt(hex.substring(0, 2), 16);
@@ -1284,7 +1290,7 @@
 		return result;
 	}
 
-	Form.prototype.resetSubmitButtonsAndWarningMessage = function (element)
+	Form.prototype.resetSubmitButtonsAndWarningMessage = function(element)
 	{
 		let onlyContainsSystemFields = (element.find(".form-question:visible").length === 0) && (element.find(".systemfield-question").length > 0);
 		if (onlyContainsSystemFields)
@@ -1300,8 +1306,8 @@
 
 	Form.prototype.isFormsResultsReadOnly = function()
 	{
-		return !this.options.udGridRecordId ? !tf.authManager.isAuthorizedFor("formsResults", "add"):
-					!tf.authManager.isAuthorizedFor("formsResults", "edit");
+		return !this.options.udGridRecordId ? !tf.authManager.isAuthorizedFor("formsResults", "add") :
+			!tf.authManager.isAuthorizedFor("formsResults", "edit");
 	}
 
 	Form.prototype.resetWarningMessage = function(element)
@@ -1310,7 +1316,7 @@
 		element.find(".system-field-invalid").toggleClass("hide", !onlyContainsSystemFields);
 	}
 
-	Form.prototype.handleScrollLocationWhenErrorDisplay = function ()
+	Form.prototype.handleScrollLocationWhenErrorDisplay = function()
 	{
 		const self = this;
 		if (tf.isFromWayfinder || isMobileDevice())
@@ -1329,7 +1335,7 @@
 		}
 	};
 
-	Form.prototype.fetchFilterData = function ()
+	Form.prototype.fetchFilterData = function()
 	{
 		let config = TF.Form.formConfig[this.dataType];
 		let opts = {
@@ -1358,7 +1364,7 @@
 			});
 	}
 
-	Form.prototype.disAbleFormRecordSelector = function ()
+	Form.prototype.disAbleFormRecordSelector = function()
 	{
 		this.recordSelector.autoComplete.enable(false);
 		const autoSearchElem = this.elem.find(".k-i-search");
@@ -1368,7 +1374,7 @@
 		}
 	};
 
-	Form.prototype.handleFooterForReadOnly = function (element)
+	Form.prototype.handleFooterForReadOnly = function(element)
 	{
 		let $modal = element.closest(".modal-dialog")
 		let $positiveBtn = $modal.find(".btn.positive");
@@ -1385,11 +1391,11 @@
 		}
 	};
 
-	Form.prototype.handleFooterForSectionGrid = function ()
+	Form.prototype.handleFooterForSectionGrid = function()
 	{
 		const self = this;
 		const $footerModel = $('.modal-footer');
-		const formsResultsReadOnly =  self.isFormsResultsReadOnly();
+		const formsResultsReadOnly = self.isFormsResultsReadOnly();
 		if ($footerModel.length > 0)
 		{
 			const currentIsReadOnly = self.options.isReadOnly || self.options.signatureReadonly || formsResultsReadOnly;
@@ -1429,7 +1435,7 @@
 		}
 	};
 
-	Form.prototype.removeAllChildNodes = function (parent)
+	Form.prototype.removeAllChildNodes = function(parent)
 	{
 		while (parent.firstChild)
 		{
@@ -1437,7 +1443,7 @@
 		}
 	};
 
-	Form.prototype.dispose = function ()
+	Form.prototype.dispose = function()
 	{
 		this.questions.forEach(q => q.dispose());
 		this.elem.off('click');

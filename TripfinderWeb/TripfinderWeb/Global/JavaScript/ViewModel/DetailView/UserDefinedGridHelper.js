@@ -1,4 +1,4 @@
-(function ()
+(function()
 {
 	const USER_DEFINED_GROUP = "User Defined Group";
 	const PRAMATER_KEY_RELATIONSHIP = "@relationships";
@@ -15,7 +15,7 @@
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
 	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
 
-	UserDefinedGridHelper.getUpdatedInfoColumns = function ()
+	UserDefinedGridHelper.getUpdatedInfoColumns = function()
 	{
 		function utc2Local(value)
 		{
@@ -37,7 +37,7 @@
 
 	UserDefinedGridHelper.DEFAULT_CANNOT_SUBMIT_FORM_MESSAGE = 'This form cannot be submitted.';
 
-	UserDefinedGridHelper.getGeoInfoColumns = function ()
+	UserDefinedGridHelper.getGeoInfoColumns = function()
 	{
 		return [
 			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "135px" },
@@ -46,25 +46,25 @@
 	};
 
 
-	UserDefinedGridHelper.isUpdatedInfoColumn = function (fieldName)
+	UserDefinedGridHelper.isUpdatedInfoColumn = function(fieldName)
 	{
 		const updatedInfoFieldNames = TF.DetailView.UserDefinedGridHelper.getUpdatedInfoColumns().map(i => i.FieldName);
 		return updatedInfoFieldNames.indexOf(fieldName) >= 0;
 	};
 
-	UserDefinedGridHelper.isGeoInfoColumn = function (fieldName)
+	UserDefinedGridHelper.isGeoInfoColumn = function(fieldName)
 	{
 		const geoInfoFieldNames = TF.DetailView.UserDefinedGridHelper.getGeoInfoColumns().map(i => i.FieldName);
 		return geoInfoFieldNames.indexOf(fieldName) >= 0;
 	};
 
-	UserDefinedGridHelper.getSignatureColumn = function ()
+	UserDefinedGridHelper.getSignatureColumn = function()
 	{
 		return {
 			DisplayName: "Signature",
 			FieldName: "signature",
 			Width: "70px",
-			template: function (dataItem)
+			template: function(dataItem)
 			{
 				return `<div class='signature-checkbox-container'>
 										<input type='checkbox' disabled class='signature-checkbox' ${dataItem && dataItem.signature ? 'checked' : ''}/>
@@ -73,7 +73,7 @@
 		};
 	};
 
-	UserDefinedGridHelper.handleItemForSaveAs = function (dataItem, columns, signatureFields)
+	UserDefinedGridHelper.handleItemForSaveAs = function(dataItem, columns, signatureFields)
 	{
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
@@ -82,7 +82,7 @@
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.handleItemForCopy = function (dataItem, columns, signatureFields)
+	UserDefinedGridHelper.handleItemForCopy = function(dataItem, columns, signatureFields)
 	{
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
@@ -121,7 +121,7 @@
 		return dataItem;
 	}
 
-	UserDefinedGridHelper.handleItemForBooleanType = function (dataItem, columns)
+	UserDefinedGridHelper.handleItemForBooleanType = function(dataItem, columns)
 	{
 		if (columns && columns.length)
 		{
@@ -149,7 +149,7 @@
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.handleItemForPhoneType = function (dataItem, columns)
+	UserDefinedGridHelper.handleItemForPhoneType = function(dataItem, columns)
 	{
 		if (columns && columns.length)
 		{
@@ -169,7 +169,7 @@
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.convertSignatureColumnToBoolean = function (dataItem, signatureFields)
+	UserDefinedGridHelper.convertSignatureColumnToBoolean = function(dataItem, signatureFields)
 	{
 		if (!dataItem)
 		{
@@ -183,7 +183,7 @@
 		return dataItem;
 	};
 
-	UserDefinedGridHelper.formatContent = function (questionContent)
+	UserDefinedGridHelper.formatContent = function(questionContent)
 	{
 		if (!questionContent)
 		{
@@ -195,7 +195,7 @@
 		return wrapper.text();
 	};
 
-	UserDefinedGridHelper.prototype.getAllValidUDGrids = function ()
+	UserDefinedGridHelper.prototype.getAllValidUDGrids = function()
 	{
 		const self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
@@ -219,7 +219,7 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.filterAssignedForms = function (rawForms)
+	UserDefinedGridHelper.prototype.filterAssignedForms = function(rawForms)
 	{
 		const isAdmin = tf.authManager.authorizationInfo.isAdmin;
 		if (isAdmin || !Array.isArray(rawForms))
@@ -228,13 +228,13 @@
 		}
 
 		const forms = tf.authManager.authorizationInfo.authorizationTree.forms;
-		return rawForms.filter(function (item)
+		return rawForms.filter(function(item)
 		{
 			return item.Public || item.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId || forms.indexOf(item.ID) > -1;
 		});
 	}
 
-	UserDefinedGridHelper.prototype._getUDGridsByDataTypeId = function (dataTypeId, isPublic)
+	UserDefinedGridHelper.prototype._getUDGridsByDataTypeId = function(dataTypeId, isPublic)
 	{
 		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
@@ -266,7 +266,7 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.checkUDGridsInIPBoundary = function (id)
+	UserDefinedGridHelper.prototype.checkUDGridsInIPBoundary = function(id)
 	{
 		const paramData = {
 			"Id": id,
@@ -279,7 +279,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.checkUDGridsInGeofense = function (coord, geofenceBoundaries)
+	UserDefinedGridHelper.prototype.checkUDGridsInGeofense = function(coord, geofenceBoundaries)
 	{
 		const existsGeoBoundaries = !!geofenceBoundaries;
 		if (existsGeoBoundaries && tf.map && tf.map.ArcGIS)
@@ -299,7 +299,7 @@
 		}
 	};
 
-	UserDefinedGridHelper.prototype.getUDGridById = function (id)
+	UserDefinedGridHelper.prototype.getUDGridById = function(id)
 	{
 		return this.getRawUDGridById(id).then(items =>
 		{
@@ -319,7 +319,7 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.getRawUDGridById = function (id)
+	UserDefinedGridHelper.prototype.getRawUDGridById = function(id)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"),
 			{
@@ -336,13 +336,13 @@
 		})
 	}
 
-	UserDefinedGridHelper.prototype.getUDGridColumns = function (res)
+	UserDefinedGridHelper.prototype.getUDGridColumns = function(res)
 	{
 		let columns = [];
 		let specialColumns = [];
 
 		this.resetUDFIndex(res[0]);
-		let sortFields = res[0].UDGridFields.sort(function (a, b)
+		let sortFields = res[0].UDGridFields.sort(function(a, b)
 		{
 			return a.Index - b.Index;
 		});
@@ -371,7 +371,7 @@
 			{
 				case "Date/Time":
 					column.type = "datetime",
-						column.template = function (item)
+						column.template = function(item)
 						{
 							let value = item[col.Guid];
 							if (value === "")
@@ -384,7 +384,7 @@
 					break;
 				case "Date":
 					column.type = "date",
-						column.template = function (item)
+						column.template = function(item)
 						{
 							let value = item[col.Guid];
 							if (value === "")
@@ -397,7 +397,7 @@
 					break;
 				case "Time":
 					column.type = "time",
-						column.template = function (item)
+						column.template = function(item)
 						{
 							let value = item[col.Guid];
 							if (value === "")
@@ -414,7 +414,7 @@
 						};
 					break;
 				case "List":
-					column.template = function (item)
+					column.template = function(item)
 					{
 						let value = item[col.Guid];
 						if (value instanceof Array)
@@ -426,7 +426,7 @@
 					break;
 				case "Boolean":
 					column.type = "boolean",
-						column.template = function (item)
+						column.template = function(item)
 						{
 							let value = item[col.Guid];
 							if (isNullObj(value))
@@ -439,7 +439,7 @@
 					break;
 				case "SignatureBlock":
 					column.type = "boolean";
-					column.template = function (item)
+					column.template = function(item)
 					{
 						let checked = (item[col.Guid] === 'true');
 						return `<div class='signature-checkbox-container'>
@@ -454,7 +454,7 @@
 				case "Number":
 				case "Currency":
 					column.type = "number";
-					column.template = function (item)
+					column.template = function(item)
 					{
 						let value = item[col.Guid];
 						if (value == null || value === undefined || value === "")
@@ -472,7 +472,7 @@
 					};
 					break;
 				case "Phone Number":
-					column.template = function (item)
+					column.template = function(item)
 					{
 						let value = item[col.Guid];
 						if (isNullObj(value))
@@ -494,7 +494,7 @@
 
 			if ((col.questionType === "Phone") && (column.template === undefined))
 			{
-				column.template = function (item)
+				column.template = function(item)
 				{
 					let value = item[col.Guid];
 					if (isNullObj(value)) return '';
@@ -539,13 +539,13 @@
 		return columns;
 	};
 
-	UserDefinedGridHelper.prototype.getUDGridsByDataType = function (dataType, isPublic)
+	UserDefinedGridHelper.prototype.getUDGridsByDataType = function(dataType, isPublic)
 	{
 		const dataTypeId = tf.dataTypeHelper.getId(dataType);
 		return this._getUDGridsByDataTypeId(dataTypeId, isPublic);
 	};
 
-	UserDefinedGridHelper.prototype.resetUDFIndex = function (udGrid)
+	UserDefinedGridHelper.prototype.resetUDFIndex = function(udGrid)
 	{
 		if (!udGrid)
 		{
@@ -572,7 +572,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.prototype.getNameToGuidMappingOfGridFields = function (udGrid)
+	UserDefinedGridHelper.prototype.getNameToGuidMappingOfGridFields = function(udGrid)
 	{
 		const gridFields = Array.isArray(udGrid.UDGridFields) ? _.sortBy(udGrid.UDGridFields, 'Index') : [];
 		var nameToGuidDict = {};
@@ -584,7 +584,7 @@
 		return nameToGuidDict;
 	};
 
-	UserDefinedGridHelper.prototype.getGuidToNameMappingOfGridFields = function (udGrid, excludeSystemField, excludeSignedFields)
+	UserDefinedGridHelper.prototype.getGuidToNameMappingOfGridFields = function(udGrid, excludeSystemField, excludeSignedFields)
 	{
 		this.resetUDFIndex(udGrid);
 		const gridFields = Array.isArray(udGrid.UDGridFields) ? _.sortBy(udGrid.UDGridFields, 'Index') : [];
@@ -608,7 +608,7 @@
 		return guidToNameDict;
 	};
 
-	UserDefinedGridHelper.prototype.isDocumentIncluded = function (udGrid)
+	UserDefinedGridHelper.prototype.isDocumentIncluded = function(udGrid)
 	{
 		if (udGrid.GridOptions)
 		{
@@ -625,12 +625,12 @@
 	};
 
 
-	UserDefinedGridHelper.prototype.getEditableBasedOnSignedPolicy = function (udGrid)
+	UserDefinedGridHelper.prototype.getEditableBasedOnSignedPolicy = function(udGrid)
 	{
 		return true;
 	};
 
-	UserDefinedGridHelper.prototype.getIsReadOnlyBasedOnSignedPolicy = function (selectedRecord, udgridFields)
+	UserDefinedGridHelper.prototype.getIsReadOnlyBasedOnSignedPolicy = function(selectedRecord, udgridFields)
 	{
 		const signatureFileds = udgridFields.filter(u =>
 		{
@@ -639,7 +639,7 @@
 		return signatureFileds.some(f => selectedRecord[f] === "true" || (selectedRecord[f] && selectedRecord[f].includes("data:image")));
 	};
 
-	UserDefinedGridHelper.prototype.updateAssociateDocuments = function (entityId, dataTypId, documentIds)
+	UserDefinedGridHelper.prototype.updateAssociateDocuments = function(entityId, dataTypId, documentIds)
 	{
 		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
 			{
@@ -652,7 +652,7 @@
 			})
 	}
 
-	UserDefinedGridHelper.prototype.getAffectedDocumentUDGridCount = function (entityId, dataTypeId, documentIds)
+	UserDefinedGridHelper.prototype.getAffectedDocumentUDGridCount = function(entityId, dataTypeId, documentIds)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentUDGridRecords"),
 			{
@@ -673,7 +673,7 @@
 			})
 	}
 
-	UserDefinedGridHelper.prototype.getUDGridRecordsOfEntity = function (udGrid, dataTypeId, entityId)
+	UserDefinedGridHelper.prototype.getUDGridRecordsOfEntity = function(udGrid, dataTypeId, entityId)
 	{
 		let self = this,
 			udGridId = udGrid.ID,
@@ -708,7 +708,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.getFormRecord = function (formQuestionGuidToNameDict, rawFormRecord, udGrid)
+	UserDefinedGridHelper.prototype.getFormRecord = function(formQuestionGuidToNameDict, rawFormRecord, udGrid)
 	{
 		let convertedRecord = null;
 		if (!!rawFormRecord && !!rawFormRecord.RecordValue)
@@ -765,7 +765,7 @@
 		return convertedRecord;
 	};
 
-	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = function (udGrid, dataTypeId, entityId, record)
+	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record)
 	{
 		let self = this,
 			udGridId = udGrid.ID,
@@ -837,7 +837,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = function (udGrid, dataTypeId, entityId, record, udgridSurvey)
+	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record, udgridSurvey)
 	{
 		let self = this,
 			udGridId = udGrid.ID,
@@ -912,7 +912,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.uploadAttachments = function (attachements) 
+	UserDefinedGridHelper.prototype.uploadAttachments = function(attachements) 
 	{
 
 		const attachementsOfNew = attachements.filter(a => !a.Id);
@@ -961,7 +961,7 @@
 		return Promise.all([newPromise, modifyPromise]).then(res => Promise.resolve(res[0].concat(res[1])));
 	};
 
-	UserDefinedGridHelper.prototype.updateUDGridRecordOfEntity = function (udGrid, record)
+	UserDefinedGridHelper.prototype.updateUDGridRecordOfEntity = function(udGrid, record)
 	{
 		let self = this,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -1045,7 +1045,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.deleteUDGridRecordOfEntity = function (recordIds)
+	UserDefinedGridHelper.prototype.deleteUDGridRecordOfEntity = function(recordIds)
 	{
 		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
 			{
@@ -1059,7 +1059,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype._updateUserDefinedGridFields = function (items)
+	UserDefinedGridHelper.prototype._updateUserDefinedGridFields = function(items)
 	{
 		if (items.length === 0)
 		{
@@ -1068,7 +1068,7 @@
 
 		var today = (new Date()).toDateString(), self = this;
 
-		return items.map(function (item)
+		return items.map(function(item)
 		{
 			var editType,
 				result,
@@ -1237,16 +1237,16 @@
 					result = self.updateListFormData(item);
 					break;
 				case 'List':
-					var defaultItems = fieldOptions.UDFPickListOptions.filter(function (item)
+					var defaultItems = fieldOptions.UDFPickListOptions.filter(function(item)
 					{
 						return item.IsDefaultItem;
-					}).map(function (item)
+					}).map(function(item)
 					{
 						return item.PickList;
 					}),
-						getSource = function ()
+						getSource = function()
 						{
-							return fieldOptions.UDFPickListOptions.map(function (item)
+							return fieldOptions.UDFPickListOptions.map(function(item)
 							{
 								return item.PickList;
 							});
@@ -1260,7 +1260,7 @@
 						"editType": fieldOptions.PickListMultiSelect ?
 							{
 								"format": "ListMover",
-								"getSource": function ()
+								"getSource": function()
 								{
 									return Promise.resolve(getSource());
 								},
@@ -1268,7 +1268,7 @@
 								"entityKey": ""
 							} : {
 								"format": "DropDown",
-								"getSource": function () { return Promise.resolve(getSource()); },
+								"getSource": function() { return Promise.resolve(getSource()); },
 								"allowNullValue": true,
 								"entityKey": ""
 							},
@@ -1277,11 +1277,11 @@
 					break;
 				case 'Rating Scale':
 					var ratingItems = Array.from({ length: fieldOptions.Scale }, (_, i) => i + 1);
-					var defaultItems = ratingItems.filter(function (item)
+					var defaultItems = ratingItems.filter(function(item)
 					{
 						return 1;
 					});
-					var getSource = function ()
+					var getSource = function()
 					{
 						return ratingItems;
 					};
@@ -1293,7 +1293,7 @@
 						"startScale": defaultItems[0],
 						"editType": {
 							"format": "DropDown",
-							"getSource": function () { return Promise.resolve(getSource()); },
+							"getSource": function() { return Promise.resolve(getSource()); },
 							"allowNullValue": true,
 							"entityKey": ""
 						},
@@ -1394,7 +1394,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.updateListFormData = function (item)
+	UserDefinedGridHelper.prototype.updateListFormData = function(item)
 	{
 		var self = this, result = {
 			"field": item.Name,
@@ -1425,7 +1425,7 @@
 							"type": "String",
 							"editType": {},
 							"questionType": "ListFromData",
-							template: function (resValue)
+							template: function(resValue)
 							{
 								return UserDefinedGridHelper.getRidershipStatusTemp(resValue, item.Guid);
 							}
@@ -1438,7 +1438,7 @@
 							"type": "String",
 							"editType": {},
 							"questionType": "ListFromData",
-							template: function (resValue)
+							template: function(resValue)
 							{
 								return UserDefinedGridHelper.getPolicyDeviationTemp(resValue, item.Guid);
 							}
@@ -1453,7 +1453,7 @@
 		return result;
 	};
 
-	UserDefinedGridHelper.getPolicyDeviationTemp = function (resValue, guidValue)
+	UserDefinedGridHelper.getPolicyDeviationTemp = function(resValue, guidValue)
 	{
 		let tempResult = "";
 		if (resValue[guidValue])
@@ -1478,7 +1478,7 @@
 		return tempResult;
 	};
 
-	UserDefinedGridHelper.getRidershipStatusTemp = function (resValue, guidValue)
+	UserDefinedGridHelper.getRidershipStatusTemp = function(resValue, guidValue)
 	{
 		let tempResult = "";
 		if (resValue[guidValue])
@@ -1507,7 +1507,7 @@
 		return tempResult;
 	}
 
-	UserDefinedGridHelper.prototype.updateDataPoint = function (gridType, udGrids)
+	UserDefinedGridHelper.prototype.updateDataPoint = function(gridType, udGrids)
 	{
 		dataPointsJSON[gridType][USER_DEFINED_GROUP] = udGrids.map(item =>
 		{
@@ -1523,7 +1523,7 @@
 		})
 	};
 
-	UserDefinedGridHelper.prototype.generateQuickAddLayout = function (udGridId, gridType, dataPoint)
+	UserDefinedGridHelper.prototype.generateQuickAddLayout = function(udGridId, gridType, dataPoint)
 	{
 		let udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].find(udGrid => udGrid.ID == udGridId);
 		if (!udGridDataPoint)
@@ -1584,7 +1584,7 @@
 		return layout;
 	};
 
-	UserDefinedGridHelper.prototype.addEditUDFGroupRecordInQuickAddModal = function (udGrid, gridType, baseRecordEntity, udgRecord, dataPoint, gridFilterOptions)
+	UserDefinedGridHelper.prototype.addEditUDFGroupRecordInQuickAddModal = function(udGrid, gridType, baseRecordEntity, udgRecord, dataPoint, gridFilterOptions)
 	{
 		const layout = tf.udgHelper.generateQuickAddLayout(udGrid.ID, gridType, dataPoint);
 		const options = {
@@ -1633,7 +1633,7 @@
 					if (!validUDGrid)
 					{
 						return Promise.reject();
-					}					
+					}
 					return getPublicTokenPromise;
 				});
 		}
@@ -1650,14 +1650,14 @@
 				modalVm.obEnableEsc(false);
 				return tf.modalManager.showModal(modalVm);
 			})
-			.catch(function ()
+			.catch(function()
 			{
 				tf.authManager.surveyToken = undefined;
 				tf.promiseBootbox.alert(errorMessage, 'Not Available');
 			});
 	};
 
-	UserDefinedGridHelper.prototype.getDataPointByIdentifierAndGrid = function (udGridFieldId, udGridId, gridType)
+	UserDefinedGridHelper.prototype.getDataPointByIdentifierAndGrid = function(udGridFieldId, udGridId, gridType)
 	{
 		const udGridDataPoint = dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID == udGridId)[0];
 		const udGridFieldDataPoint = udGridDataPoint.UDGridFields.filter(udGridField => udGridField.UDGridFieldId == udGridFieldId);
@@ -1665,18 +1665,18 @@
 		return $.extend(true, {}, udGridFieldDataPoint[0]);
 	};
 
-	UserDefinedGridHelper.prototype.getDataPointByUDGridId = function (udGridId, gridType)
+	UserDefinedGridHelper.prototype.getDataPointByUDGridId = function(udGridId, gridType)
 	{
 		return dataPointsJSON[gridType][USER_DEFINED_GROUP].filter(udGrid => udGrid.ID === udGridId)[0];
 	};
 
-	UserDefinedGridHelper.prototype.getDocumentGridRecords = function (columnFields, documentIds)
+	UserDefinedGridHelper.prototype.getDocumentGridRecords = function(columnFields, documentIds)
 	{
 		var excludeFields = ['FileContent'];
 
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "documents"), {
 			data: {
-				fields: columnFields.filter(function (name)
+				fields: columnFields.filter(function(name)
 				{
 					return excludeFields.indexOf(name) === -1;
 				}),
@@ -1695,7 +1695,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.isActiveForm = function (udgrid)
+	UserDefinedGridHelper.isActiveForm = function(udgrid)
 	{
 		if (!udgrid.HasActiveOn)
 		{
@@ -1716,7 +1716,7 @@
 		return true;
 	}
 
-	UserDefinedGridHelper.isExpiredForm = function (udgrid)
+	UserDefinedGridHelper.isExpiredForm = function(udgrid)
 	{
 		if (!udgrid.HasExpiredOn)
 		{
@@ -1737,7 +1737,7 @@
 		return false;
 	}
 
-	UserDefinedGridHelper.prototype.isFormReadonly = function (formId, selectedRecord, dataType, isReadOnlyAsEditable = false)
+	UserDefinedGridHelper.prototype.isFormReadonly = function(formId, selectedRecord, dataType, isReadOnlyAsEditable = false)
 	{
 		var self = this;
 		return self.getUDGridById(formId).then(res =>
@@ -1759,29 +1759,29 @@
 		}).then(result =>
 		{
 			let flag = result.IsFormInvalid;
-			 if (selectedRecord)
-            {
-                var dataTypeName = (tf.dataTypeHelper.getKeyById(dataType) || "").toLowerCase();
-                var authRule = isReadOnlyAsEditable ? "read" : "edit";
-                const isSignedPolicy = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(selectedRecord, result.UDGridFields);
-                const isOneResponse = result.OneResponsePerRecipient;
-                const isAuthDataType = (!result.isPublic && !tf.authManager.isAuthorizedForDataType(dataTypeName,authRule));
-                const hasEditPermission = tf.authManager.isAuthorizedFor("formsResults", "edit");
-                flag = flag || isSignedPolicy
-                || isOneResponse
-                || isAuthDataType
-                || !hasEditPermission;
-            } else
-            {
-                const hasAddPermission = tf.authManager.isAuthorizedFor("formsResults", "add");
-                flag = flag || !hasAddPermission;
-            }
+			if (selectedRecord)
+			{
+				var dataTypeName = (tf.dataTypeHelper.getKeyById(dataType) || "").toLowerCase();
+				var authRule = isReadOnlyAsEditable ? "read" : "edit";
+				const isSignedPolicy = tf.udgHelper.getIsReadOnlyBasedOnSignedPolicy(selectedRecord, result.UDGridFields);
+				const isOneResponse = result.OneResponsePerRecipient;
+				const isAuthDataType = (!result.isPublic && !tf.authManager.isAuthorizedForDataType(dataTypeName, authRule));
+				const hasEditPermission = tf.authManager.isAuthorizedFor("formsResults", "edit");
+				flag = flag || isSignedPolicy
+					|| isOneResponse
+					|| isAuthDataType
+					|| !hasEditPermission;
+			} else
+			{
+				const hasAddPermission = tf.authManager.isAuthorizedFor("formsResults", "add");
+				flag = flag || !hasAddPermission;
+			}
 
 			return flag;
 		});
 	};
 
-	UserDefinedGridHelper.getPublicFormTokenbyId = function (formId, isPublic)
+	UserDefinedGridHelper.getPublicFormTokenbyId = function(formId, isPublic)
 	{
 		const ret = "";
 		if (!formId)
@@ -1796,7 +1796,7 @@
 				return Promise.resolve(tf.authManager.surveyToken);
 			}
 			return this.getNewSurvey(formId)
-				.then(function (udgSurvey)
+				.then(function(udgSurvey)
 				{
 					if (!udgSurvey)
 					{
@@ -1812,7 +1812,7 @@
 		}
 	}
 
-	UserDefinedGridHelper.prototype.tryRemoveBaseRecordDocumentRelationships = function (baseRecordId, dataTypeId, documentIds)
+	UserDefinedGridHelper.prototype.tryRemoveBaseRecordDocumentRelationships = function(baseRecordId, dataTypeId, documentIds)
 	{
 		return tf.udgHelper.getAffectedDocumentUDGridCount(baseRecordId, dataTypeId, documentIds.join())
 			.then(res =>
@@ -1855,7 +1855,7 @@
 			})
 	};
 
-	UserDefinedGridHelper.prototype.bindCounterBoxEvent = function ($inputEl, maxlength, $counterEl, preventEnterKey, getLength)
+	UserDefinedGridHelper.prototype.bindCounterBoxEvent = function($inputEl, maxlength, $counterEl, preventEnterKey, getLength)
 	{
 		$inputEl.keyup(ev => 
 		{
@@ -1897,7 +1897,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.isAssignedFormIdSync = function (formId)
+	UserDefinedGridHelper.isAssignedFormIdSync = function(formId)
 	{
 		if (tf.authManager.authorizationInfo.isAdmin)
 		{
@@ -1907,7 +1907,7 @@
 		return tf.authManager.authorizationInfo.authorizationTree.forms.includes(formId);
 	}
 
-	UserDefinedGridHelper.prototype.queryValidUDGridById = function (id, options, restrictionMessageWarpper)
+	UserDefinedGridHelper.prototype.queryValidUDGridById = function(id, options, restrictionMessageWarpper)
 	{
 		options = $.extend({}, { ipRangeFilter: true, geofenseFilter: true }, options);
 		const self = this,
@@ -1958,7 +1958,7 @@
 			});
 	}
 
-	UserDefinedGridHelper.prototype.filterValidUDGrids = function (udgrids, options, restrictionMessageWarpper)
+	UserDefinedGridHelper.prototype.filterValidUDGrids = function(udgrids, options, restrictionMessageWarpper)
 	{
 		const defaultFilterOptions = {
 			activeFilter: true,
@@ -2105,7 +2105,7 @@
 	{
 		const paramData = {
 			"dataTypeId": dataTypeId,
-			"filterId": filterId			
+			"filterId": filterId
 		};
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
 			paramData: paramData
@@ -2114,7 +2114,7 @@
 		});
 	};
 
-	UserDefinedGridHelper.saveUserdefinedfield = function (udfEntity)
+	UserDefinedGridHelper.saveUserdefinedfield = function(udfEntity)
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
 			paramData: { "@Relationships": "UDGridFields,UDGridSections,RoleForms" },
@@ -2122,7 +2122,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.removeIdentityInfo = function (udfEntity)
+	UserDefinedGridHelper.removeIdentityInfo = function(udfEntity)
 	{
 		resetFields(udfEntity, ["ID", "Id", "Guid"]);
 
@@ -2171,7 +2171,7 @@
 		}
 	}
 
-	UserDefinedGridHelper.handleUDGridSectionWhenExport = function (dataItem)
+	UserDefinedGridHelper.handleUDGridSectionWhenExport = function(dataItem)
 	{
 		if (dataItem.UDGridSections && dataItem.UDGridSections.length > 0 && dataItem.UDGridFields && dataItem.UDGridFields.length > 0)
 		{
@@ -2185,7 +2185,7 @@
 		}
 	}
 
-	UserDefinedGridHelper.formatHtmlContent = function (questionContent)
+	UserDefinedGridHelper.formatHtmlContent = function(questionContent)
 	{
 		if (!questionContent)
 		{
@@ -2197,42 +2197,42 @@
 		return wrapper.text();
 	}
 
-	UserDefinedGridHelper.getPureFieldName = function (fieldName)
+	UserDefinedGridHelper.getPureFieldName = function(fieldName)
 	{
 		return fieldName.substring(0, fieldName.length - 7);
 	}
 
-	UserDefinedGridHelper.getXCoordFieldName = function (fieldName)
+	UserDefinedGridHelper.getXCoordFieldName = function(fieldName)
 	{
 		return `${fieldName}_XCoord`;
 	}
 
-	UserDefinedGridHelper.getYCoordFieldName = function (fieldName)
+	UserDefinedGridHelper.getYCoordFieldName = function(fieldName)
 	{
 		return `${fieldName}_YCoord`;
 	}
 
-	UserDefinedGridHelper.getXCoordDisplayName = function (displayName)
+	UserDefinedGridHelper.getXCoordDisplayName = function(displayName)
 	{
 		return `${displayName} X Coord`;
 	}
 
-	UserDefinedGridHelper.getYCoordDisplayName = function (displayName)
+	UserDefinedGridHelper.getYCoordDisplayName = function(displayName)
 	{
 		return `${displayName} Y Coord`;
 	}
 
-	UserDefinedGridHelper.isXCoordField = function (fieldName)
+	UserDefinedGridHelper.isXCoordField = function(fieldName)
 	{
 		return fieldName.includes("_XCoord");
 	}
 
-	UserDefinedGridHelper.isYCoordField = function (fieldName)
+	UserDefinedGridHelper.isYCoordField = function(fieldName)
 	{
 		return fieldName.includes("_YCoord");
 	}
 
-	UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns = function (column)
+	UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns = function(column)
 	{
 		$.extend(column, {
 			type: "number",
@@ -2248,7 +2248,7 @@
 		let xCoordColumn = $.extend({}, column, {
 			FieldName: xCoordFieldName,
 			DisplayName: TF.DetailView.UserDefinedGridHelper.getXCoordDisplayName(displayName),
-			template: function (item)
+			template: function(item)
 			{
 				let fieldName = xCoordFieldName;
 				let value = item[fieldName];
@@ -2262,7 +2262,7 @@
 		let yCoordColumn = $.extend({}, column, {
 			FieldName: yCoordFieldName,
 			DisplayName: TF.DetailView.UserDefinedGridHelper.getYCoordDisplayName(displayName),
-			template: function (item)
+			template: function(item)
 			{
 				let fieldName = yCoordFieldName;
 				let value = item[fieldName];
@@ -2275,7 +2275,7 @@
 		return specialColumns;
 	}
 
-	UserDefinedGridHelper.prepareMapData = function (record)
+	UserDefinedGridHelper.prepareMapData = function(record)
 	{
 		if (!record || !record.ShapeData)
 		{
@@ -2299,7 +2299,7 @@
 		return record;
 	}
 
-	UserDefinedGridHelper.getAllActivedPublicForms = function ()
+	UserDefinedGridHelper.getAllActivedPublicForms = function()
 	{
 		let ret = [];
 
@@ -2309,7 +2309,7 @@
 				"@filter": `eq(public, true)`,
 				"@relationships": "UDGridDataSources"
 			}
-		}).then(function (data)
+		}).then(function(data)
 		{
 			if (!data.Items || !data.Items.length)
 			{
@@ -2322,7 +2322,7 @@
 			});
 
 			return ret;
-		}).then(function (ret)
+		}).then(function(ret)
 		{
 			ret = ret.filter((f) =>
 			{
@@ -2342,7 +2342,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.getFormURLbyId = function (formId, isPublic)
+	UserDefinedGridHelper.getFormURLbyId = function(formId, isPublic)
 	{
 		const ret = "";
 		if (!formId)
@@ -2353,7 +2353,7 @@
 		if (isPublic)
 		{
 			return this.getNewSurvey(formId)
-				.then(function (udgSurvey)
+				.then(function(udgSurvey)
 				{
 					if (!udgSurvey)
 					{
@@ -2369,7 +2369,7 @@
 		}
 	}
 
-	UserDefinedGridHelper._getFormURL = function (formId)
+	UserDefinedGridHelper._getFormURL = function(formId)
 	{
 		if (!formId)
 		{
@@ -2388,7 +2388,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.getNewSurvey = function (formId)
+	UserDefinedGridHelper.getNewSurvey = function(formId)
 	{
 		if (!formId)
 		{
@@ -2399,7 +2399,7 @@
 			UDGridID: formId,
 			DBID: tf.datasourceManager.databaseId
 		}];
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridsurveys"), { data: newUDGridSurveys }).then(function (data)
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridsurveys"), { data: newUDGridSurveys }).then(function(data)
 		{
 			if (!data.Items || !data.Items.length)
 			{
@@ -2410,7 +2410,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.copyPublicFormURL = function (publicFormURL, pageLevelViewModel)
+	UserDefinedGridHelper.copyPublicFormURL = function(publicFormURL, pageLevelViewModel)
 	{
 		if (!publicFormURL)
 		{
@@ -2435,7 +2435,7 @@
 		}
 	}
 
-	UserDefinedGridHelper.IsUDGridWithSubmission = function (udGridId)
+	UserDefinedGridHelper.IsUDGridWithSubmission = function(udGridId)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"), {
 			paramData: {
@@ -2448,7 +2448,7 @@
 		});
 	}
 
-	UserDefinedGridHelper.isFormExpired = function (options)
+	UserDefinedGridHelper.isFormExpired = function(options)
 	{
 		options = options || {};
 		const isPublic = !!options.Public;
@@ -2457,7 +2457,7 @@
 		return isPublic && hasExpiredOn && moment(Date.now()).utc().isAfter(moment.utc(expiredOn));
 	}
 
-	UserDefinedGridHelper.getFormSearchDataOptions = function (searchValue, dbId, dataType, isSearchAll, specifyOptions)
+	UserDefinedGridHelper.getFormSearchDataOptions = async function(searchValue, dbId, dataType, isSearchAll, specifyOptions)
 	{
 		const value = (searchValue || '').trim(),
 			config = TF.Form.formConfig[dataType],
@@ -2550,7 +2550,7 @@
 		}
 	};
 
-	UserDefinedGridHelper.getFormSearchData = function (searchValue, dbId, dataType, isSearchAll, specifyOptions)
+	UserDefinedGridHelper.getFormSearchData = function(searchValue, dbId, dataType, isSearchAll, specifyOptions)
 	{
 		return this.getFormSearchDataOptions(searchValue, dbId, dataType, isSearchAll, specifyOptions)
 			.then((opts) =>
@@ -2559,7 +2559,44 @@
 			})
 	};
 
-	UserDefinedGridHelper.fetchFormSearchData = function (opts, dbId, dataType)
+	UserDefinedGridHelper.isOnlyOneRecord = async function(searchValue, dbId, dataType, isSearchAll, specifyOptions)
+	{
+		let isOnlyOneRecord = false;
+
+		try
+		{
+			const opts = await this.getFormSearchDataOptions(searchValue, dbId, dataType, isSearchAll, specifyOptions)
+
+			this.noRightFetchingData = false;
+			const apiPrefix = `${tf.api.apiPrefixWithoutDatabase()}/${dbId}`;
+
+			opts.data.fields = ['id'];
+			delete opts.data.sortItems;
+			opts.paramData = { take: 2, skip: 0, getCount: true };
+
+			let test = await tf.promiseAjax.post(pathCombine(apiPrefix,
+				"search",
+				`${tf.dataTypeHelper.getEndpoint(dataType)}`,
+				`id?dateTime=${new Date().toISOString().split("T")[0]}`,
+			),
+				opts,
+				{ overlay: false });
+
+			isOnlyOneRecord = test.Items.length === 1;
+		}
+		catch (e)
+		{
+			f(ex.StatusCode === 403 && ex.Message === `The roles of this user doesn't have the right to access this API`)
+			{
+				// Wait this.noRightFetchingData = true;
+				console.warn(ex.Message);
+			}
+		}
+
+		return isOnlyOneRecord;
+	}
+
+	UserDefinedGridHelper.fetchFormSearchData = function(opts, dbId, dataType)
 	{
 		this.noRightFetchingData = false;
 		const apiPrefix = `${tf.api.apiPrefixWithoutDatabase()}/${dbId}`;
@@ -2585,7 +2622,7 @@
 			});
 	};
 
-	UserDefinedGridHelper.handleFormSection = function (newOptions)
+	UserDefinedGridHelper.handleFormSection = function(newOptions)
 	{
 		if (newOptions.UDGridSections && newOptions.UDGridSections.length > 0 && newOptions.UDGridFields && newOptions.UDGridFields.length > 0)
 		{
@@ -2601,7 +2638,7 @@
 		}
 	};
 
-	UserDefinedGridHelper.handleFilterFormData = function (udgrid)
+	UserDefinedGridHelper.handleFilterFormData = function(udgrid)
 	{
 		//filter fields by section roles
 		var isAdmin = tf.authManager.authorizationInfo.isAdmin;
@@ -2654,7 +2691,7 @@
 	const SPECIFY_RECORD_TYPE_SPECIFIC = 4;
 
 	UserDefinedGridHelper.WITH_MY_RECORD_FILTER_GRID_TYPES = ["staff", "trip", "fieldtrip", "vehicle", "student"];
-	UserDefinedGridHelper.initSpecifyRecordOption = function (gridType, specifyRecordOptions, gridOptionIsMyRecordsFilterRequired)
+	UserDefinedGridHelper.initSpecifyRecordOption = function(gridType, specifyRecordOptions, gridOptionIsMyRecordsFilterRequired)
 	{
 		const isMyRecordsFilterRequired = (this.WITH_MY_RECORD_FILTER_GRID_TYPES.indexOf(gridType) >= 0 && typeof gridOptionIsMyRecordsFilterRequired !== "boolean") ?
 			true : !!gridOptionIsMyRecordsFilterRequired;
@@ -2668,7 +2705,7 @@
 		return $.extend({}, defaultOptions, specifyRecordOptions);
 	}
 
-	UserDefinedGridHelper.prototype.getUDGridIdFilter = function (formId)
+	UserDefinedGridHelper.prototype.getUDGridIdFilter = function(formId)
 	{
 		return [{
 			"FieldName": "UDGridID",
