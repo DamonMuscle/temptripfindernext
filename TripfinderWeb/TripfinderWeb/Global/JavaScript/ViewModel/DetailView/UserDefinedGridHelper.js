@@ -2574,7 +2574,7 @@
 			delete opts.data.sortItems;
 			opts.paramData = { take: 2, skip: 0, getCount: true };
 
-			let test = await tf.promiseAjax.post(pathCombine(apiPrefix,
+			let res = await tf.promiseAjax.post(pathCombine(apiPrefix,
 				"search",
 				`${tf.dataTypeHelper.getEndpoint(dataType)}`,
 				`id?dateTime=${new Date().toISOString().split("T")[0]}`,
@@ -2582,7 +2582,7 @@
 				opts,
 				{ overlay: false });
 
-			isOnlyOneRecord = test.Items.length === 1;
+			isOnlyOneRecord = res.Items.length === 1;
 		}
 		catch (e)
 		{
