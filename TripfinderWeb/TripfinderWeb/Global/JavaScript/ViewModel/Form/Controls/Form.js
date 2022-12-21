@@ -546,17 +546,21 @@
 		});
 
 		let onlyOneRecord = false;
+		const willHideRecordSelector = specifyOptions.TypeId === SPECIFY_RECORD_TYPE_SPECIFIC && specifyOptions.SpecificRecordIds?.length === 1;
+		if (!willHideRecordSelector)
+		{
+			//FORM-1874, show record selector any time
+			this.showRecordSelector();
+		}
 		onlyOneRecord = await TF.DetailView.UserDefinedGridHelper.isOnlyOneRecord(searchValue, dbId, dataType, isSearchAll, specifyOptions);
 
-		//FORM-1874, show record selector any time
-		this.elem.find("div.form-entity-container").show();
-
-		if (onlyOneRecord)
+		if (onlyOneRecord && this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_SPECIFIC)
 		{
-			if (this._specifyOptions.TypeId === SPECIFY_RECORD_TYPE_SPECIFIC)
-			{
-				this.elem.find("div.form-entity-container").hide();
-			}
+			this.hideRecordSelector();
+		}
+		else if (willHideRecordSelector)
+		{
+			this.showRecordSelector();
 		}
 
 		//initialize FormRecordSelector
@@ -581,7 +585,7 @@
 				autoCompleteElem.attr("disabled", 'disabled');
 			}
 
-			this.elem.find("div.form-entity-container").show();
+			this.showRecordSelector();
 			return Promise.resolve(true);
 		}
 
@@ -648,6 +652,24 @@
 			});
 	}
 
+	Form.prototype.showRecordSelector = function()
+	{
+		const $recordSelector = this.elem.find("div.form-entity-container.entity-record");
+		if ($recordSelector)
+		{
+			$recordSelector.show();
+		}
+	}
+
+	Form.prototype.hideRecordSelector = function()
+	{
+		const $recordSelector = this.elem.find("div.form-entity-container.entity-record");
+		if ($recordSelector)
+		{
+			$recordSelector.hide();
+		}
+	}
+
 	Form.prototype.checkModifyPermission = function(type)
 	{
 		return tf.authManager.isAuthorizedForDataType(type, this.options.udGridRecordId ? "edit" : "add");
@@ -685,7 +707,7 @@
 					</div>
 					<div class="form-body">
 					${self.doOneSection() ? sectionTitle : ''}
-						<div class="form-entity-container" style="display:none">
+						<div class="form-entity-container entity-record" style="display:none">
 							<span class="form-entity-title">${dateType}: </span>
 							<input class="form-entity-input" name="form-entity-input" placeholder="${searchHint}"></input>
 						</div>
@@ -711,7 +733,7 @@
 							<div class="form-subtitle">${this.options.Description || ''}</div>
 						</div>
 							${self.doOneSection() ? sectionTitle : ''}
-							<div class="form-entity-container" style="display:none">
+							<div class="form-entity-container entity-record" style="display:none">
 								<span class="form-entity-title">${dateType}: </span>
 								<input class="form-entity-input" name="form-entity-input" placeholder="${searchHint}"></input>
 							</div>
