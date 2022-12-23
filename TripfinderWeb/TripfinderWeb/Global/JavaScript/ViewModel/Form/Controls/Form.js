@@ -479,6 +479,10 @@
 				}).catch(err =>
 				{
 					tf.loadingIndicator.tryHide();
+					if (err && err.Message)
+					{
+						tf.promiseBootbox.alert(err.Message, 'Warning');
+					}
 				});
 			}, rej =>
 			{
