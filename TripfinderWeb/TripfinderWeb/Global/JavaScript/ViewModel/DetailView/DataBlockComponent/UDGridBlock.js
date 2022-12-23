@@ -191,58 +191,73 @@
 		return originColumns.concat(self._getActionColumns());
 	};
 
-	UDGridBlock.prototype.initEvents = function ()
+	UDGridBlock.prototype.initEvents = function()
 	{
 		var self = this,
 			$btn = self.$el.find(".grid-top-right-button");
 		$btn.on("click", () =>
 		{
-			tf.udgHelper.addEditUDFGroupRecordInQuickAddModal(self.options, self.gridType, self.detailView.recordEntity).then((result) =>
+			let checkFormHasSubmittedWithOneResponse = Promise.resolve([]);
+			if (self.options.OneResponsePerRecipient)
 			{
-				if (!result)
+				checkFormHasSubmittedWithOneResponse = tf.udgHelper.getUDGridRecordsWithCreatedBy(self.options.UDGridId, self.options.DataTypeId);
+			}
+			checkFormHasSubmittedWithOneResponse.then(res =>
+			{
+				if (res && res.length > 0)
 				{
+					tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED, 'Warning');
 					return;
 				}
-
-				if (self.detailView.isCreateGridNewRecord)
+				tf.udgHelper.addEditUDFGroupRecordInQuickAddModal(self.options, self.gridType, self.detailView.recordEntity).then((result) =>
 				{
-					if (!self.detailView.fieldEditorHelper.editFieldList.UDGrids)
+					if (!result)
 					{
-						self.detailView.fieldEditorHelper.editFieldList.UDGrids = [];
+						return;
 					}
 
-					let udGrid = self.options;
-					let editUdGrid = self.detailView.fieldEditorHelper.editFieldList.UDGrids.filter(item => item.ID == udGrid.ID);
-					if (editUdGrid.length == 0)
+					if (self.detailView.isCreateGridNewRecord)
 					{
-						self.detailView.fieldEditorHelper.editFieldList.UDGrids.push(udGrid);
+						if (!self.detailView.fieldEditorHelper.editFieldList.UDGrids)
+						{
+							self.detailView.fieldEditorHelper.editFieldList.UDGrids = [];
+						}
+
+						let udGrid = self.options;
+						let editUdGrid = self.detailView.fieldEditorHelper.editFieldList.UDGrids.filter(item => item.ID == udGrid.ID);
+						if (editUdGrid.length == 0)
+						{
+							self.detailView.fieldEditorHelper.editFieldList.UDGrids.push(udGrid);
+						}
+						else
+						{
+							udGrid = editUdGrid[0];
+						}
+
+						if (!udGrid.UDGridRecordsValues)
+						{
+							udGrid.UDGridRecordsValues = [];
+						}
+						result.Id = udGrid.UDGridRecordsValues.length + 1;// fake ID
+						udGrid.UDGridRecordsValues.push(result);
+						self.obEditing(true);
+						seld.checkFormHasSubmittedWithOneResponse();
+						self.detailView.pageLevelViewModel.popupSuccessMessage('Record has been added successfully.');
 					}
 					else
 					{
-						udGrid = editUdGrid[0];
+						self.detailView.pageLevelViewModel.popupSuccessMessage('Updates have been saved successfully.');
 					}
 
-					if (!udGrid.UDGridRecordsValues)
+					if (result.DocumentUDGridRecords)
 					{
-						udGrid.UDGridRecordsValues = [];
+						self.updateDocumentGrid(result.DocumentUDGridRecords.map(document => document.DocumentID), []);
 					}
-					result.Id = udGrid.UDGridRecordsValues.length + 1;// fake ID
-					udGrid.UDGridRecordsValues.push(result);
-					self.obEditing(true);
-					self.detailView.pageLevelViewModel.popupSuccessMessage('Record has been added successfully.');
-				}
-				else
-				{
-					self.detailView.pageLevelViewModel.popupSuccessMessage('Updates have been saved successfully.');
-				}
 
-				if (result.DocumentUDGridRecords)
-				{
-					self.updateDocumentGrid(result.DocumentUDGridRecords.map(document => document.DocumentID), []);
-				}
-
-				PubSub.publish("udgrid", {});
+					PubSub.publish("udgrid", {});
+				});
 			});
+
 		});
 	}
 

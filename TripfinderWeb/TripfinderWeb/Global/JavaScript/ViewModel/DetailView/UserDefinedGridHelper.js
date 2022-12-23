@@ -14,6 +14,7 @@
 
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
 	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
+	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per person.';
 
 	UserDefinedGridHelper.getUpdatedInfoColumns = function()
 	{
@@ -2457,6 +2458,29 @@
 		return isPublic && hasExpiredOn && moment(Date.now()).utc().isAfter(moment.utc(expiredOn));
 	}
 
+	UserDefinedGridHelper.prototype.getUDGridRecordsWithCreatedBy = function(udGridId, dataTypeId)
+	{
+		const userId = tf.authManager.authorizationInfo.authorizationTree.userId;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
+			{
+				paramData: {
+					DBID: tf.datasourceManager.databaseId,
+					RecordDataType: dataTypeId,
+					UDGridID: udGridId,
+					CreatedBy: userId
+				}
+			},
+			{ overlay: false }
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
+				return resp.Items;
+			}
+
+			return [];
+		});
+	};
 	UserDefinedGridHelper.getFormSearchDataOptions = async function(searchValue, dbId, dataType, isSearchAll, specifyOptions)
 	{
 		const value = (searchValue || '').trim(),
