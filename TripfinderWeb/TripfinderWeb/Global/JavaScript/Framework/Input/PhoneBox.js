@@ -8,6 +8,9 @@
 			if (event.which !== 37 && event.which !== 39) {
 				var $input = $(e.target);
 				var inputSourceValue = $input.val();
+				// avoid the re-format if edit existing number(cursor in text range)
+				if(e.target.selectionEnd < inputSourceValue.length) return;
+								
 				if (e.keyCode === 8 && inputSourceValue.endsWith(")")) {
 					var inputPureValue = tf.dataFormatHelper.getPurePhoneNumber(inputSourceValue);
 					inputPureValue = inputPureValue.substring(0, inputPureValue.length - 1);
