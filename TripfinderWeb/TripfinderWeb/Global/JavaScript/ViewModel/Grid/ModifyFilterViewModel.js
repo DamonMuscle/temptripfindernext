@@ -45,7 +45,6 @@
 		this.selectFieldOpen = false;
 		this.selectOperatorOpen = false;
 		this.selectLogicalOperatorOpen = false;
-		this.isValueEnterpress = false;
 		this._gridType = gridType;
 		this.obOmitRecords = ko.observableArray([]);
 		this.ListMoverOptions = ko.observableArray([]);
@@ -88,12 +87,10 @@
 			}.bind(this);
 
 			let fieldType = this.obValueFieldType() === "Select" ? "String" : this.obValueFieldType();
-			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened() && !this.isValueEnterpress)
+			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
 			{
 				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(fieldType, this.obValueFieldValue()));
 			}
-
-			this.isValueEnterpress = false;
 		}.bind(this));
 
 		this.obValueFieldType.subscribe(function()
@@ -574,7 +571,6 @@
 	{
 		if (e.keyCode == 13)
 		{
-			this.isValueEnterpress = true;
 			var baseBox = ko.dataFor(e.target);
 			var value = baseBox.$element.val();
 			this.insertFragmentToCurrentCursorPostion(this.valueToSQL(baseBox.getType(), value));
@@ -604,7 +600,14 @@
 		this.gridFilterDataModel.whereClause(whereClause);
 		$(this.textAreaElement()).prop("selectionStart", cursorPosition + fragment.length + pad);
 		$(this.textAreaElement()).prop("selectionEnd", cursorPosition + fragment.length + pad);
-		$(this.textAreaElement()).focus();
+		// RW-24739, set focus in timeout to ensure the datetime/time dropdown can be hide without js error
+		if (['DateTime', 'Time'].includes(this.obValueFieldType()))
+		{
+			setTimeout(function()
+			{
+				$(this.textAreaElement()).focus();
+			}.bind(this));
+		}
 		this._$form.data('bootstrapValidator').revalidateField("sqlStatement");
 	};
 
