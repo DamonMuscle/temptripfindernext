@@ -600,7 +600,14 @@
 		this.gridFilterDataModel.whereClause(whereClause);
 		$(this.textAreaElement()).prop("selectionStart", cursorPosition + fragment.length + pad);
 		$(this.textAreaElement()).prop("selectionEnd", cursorPosition + fragment.length + pad);
-		$(this.textAreaElement()).focus();
+		// RW-24739, set focus in timeout to ensure the datetime/time dropdown can be hide without js error
+		if (['DateTime', 'Time'].includes(this.obValueFieldType()))
+		{
+			setTimeout(function()
+			{
+				$(this.textAreaElement()).focus();
+			}.bind(this));
+		}
 		this._$form.data('bootstrapValidator').revalidateField("sqlStatement");
 	};
 
