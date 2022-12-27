@@ -45,6 +45,7 @@
 		this.selectFieldOpen = false;
 		this.selectOperatorOpen = false;
 		this.selectLogicalOperatorOpen = false;
+		this.isValueEnterpress = false;
 		this._gridType = gridType;
 		this.obOmitRecords = ko.observableArray([]);
 		this.ListMoverOptions = ko.observableArray([]);
@@ -87,10 +88,12 @@
 			}.bind(this);
 
 			let fieldType = this.obValueFieldType() === "Select" ? "String" : this.obValueFieldType();
-			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
+			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened() && !this.isValueEnterpress)
 			{
 				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(fieldType, this.obValueFieldValue()));
 			}
+
+			this.isValueEnterpress = false;
 		}.bind(this));
 
 		this.obValueFieldType.subscribe(function()
@@ -571,6 +574,7 @@
 	{
 		if (e.keyCode == 13)
 		{
+			this.isValueEnterpress = true;
 			var baseBox = ko.dataFor(e.target);
 			var value = baseBox.$element.val();
 			this.insertFragmentToCurrentCursorPostion(this.valueToSQL(baseBox.getType(), value));
