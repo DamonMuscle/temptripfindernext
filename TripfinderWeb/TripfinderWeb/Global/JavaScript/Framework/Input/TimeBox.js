@@ -209,6 +209,9 @@
 				{
 					this.value(this.getTimeString(newDate));
 				}
+				if(TF.isPhoneDevice) {
+					this._dateTimePicker.hide();
+				}
 			}.bind(this), this.delayChange ? 500 : 0);
 		}.bind(this));
 		$element.on('dp.show', function(e)
