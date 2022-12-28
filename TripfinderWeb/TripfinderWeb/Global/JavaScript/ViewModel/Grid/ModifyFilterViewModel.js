@@ -600,14 +600,23 @@
 		this.gridFilterDataModel.whereClause(whereClause);
 		$(this.textAreaElement()).prop("selectionStart", cursorPosition + fragment.length + pad);
 		$(this.textAreaElement()).prop("selectionEnd", cursorPosition + fragment.length + pad);
-		// RW-24739, set focus in timeout to ensure the datetime/time dropdown can be hide without js error
-		if (['DateTime', 'Time'].includes(this.obValueFieldType()))
+		
+		if (TF.isMobileDevice)
 		{
-			setTimeout(function()
-			{
-				$(this.textAreaElement()).focus();
-			}.bind(this));
+			$(this.textAreaElement()).focus();
 		}
+		else
+		{
+			// RW-24739, set focus in timeout to ensure the datetime/time dropdown can be hide without js error
+			if (['DateTime', 'Time'].includes(this.obValueFieldType()))
+			{
+				setTimeout(function()
+				{
+					$(this.textAreaElement()).focus();
+				}.bind(this));
+			}
+		}
+
 		this._$form.data('bootstrapValidator').revalidateField("sqlStatement");
 	};
 

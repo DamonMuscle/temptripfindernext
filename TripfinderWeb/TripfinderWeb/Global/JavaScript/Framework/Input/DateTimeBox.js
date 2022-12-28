@@ -187,6 +187,9 @@
 				{
 					this.value(this.getValueString(newDate));
 				}
+				if (TF.isPhoneDevice) {
+					this._dateTimePicker.hide();
+				}
 			}.bind(this), this.delayChange ? 500 : 0);
 		}.bind(this));
 		$element.on('dp.show', function(e)
@@ -324,7 +327,7 @@
 			}
 			this._toggleScroll(false);
 			this._toggleScroll(true);
-			if (TF.isPhoneDevice && modal.length > 0) //VIEW-1252 Date Control is not visible when focus is still set to input
+			if (TF.isPhoneDevice && modal.length > 0 && this.type === "Date") //VIEW-1252 Date Control is not visible when focus is still set to input
 			{
 				if (widget.closest(".modal-dialog").length == 0)
 				{
