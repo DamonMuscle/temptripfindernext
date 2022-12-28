@@ -197,6 +197,7 @@
 			switch (type)
 			{
 				case "string":
+					value = value.replace(/[\r\n]/g, '');
 					return value;
 				case "datetime":
 				case "date/time":
