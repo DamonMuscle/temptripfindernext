@@ -2905,7 +2905,7 @@
 							args.element.kendoDropDownList({
 								dataSource: new kendo.data.DataSource({
 									data: [
-										{ someField: "", valueField: "" },
+										{ someField: "(not specified)", valueField: "null" },
 										{ someField: "True", valueField: "true" },
 										{ someField: "False", valueField: "false" }
 									]
