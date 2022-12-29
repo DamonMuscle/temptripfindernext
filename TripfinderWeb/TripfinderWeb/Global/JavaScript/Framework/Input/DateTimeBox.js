@@ -350,8 +350,7 @@
 							//bottom
 							widget.css(
 								{
-									top: 'auto',
-									bottom: windowHeight - this.$element.offset().top - widget.outerHeight() - this.$element.outerHeight()
+									top: this.$element.offset().top + this.$element.outerHeight()
 								});
 						}
 					}.bind(this), 100);
