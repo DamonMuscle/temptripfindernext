@@ -490,7 +490,7 @@
 							column.template = function (item)
 							{
 								let value = item[col];
-								if (value == null || value == "") return "";
+								if (value == null || value === "") return "";
 
 								let precision = udgField.FieldOptions.NumberPrecision;
 								if (isNaN(Number(value)))
@@ -506,7 +506,7 @@
 							column.template = function (item)
 							{
 								let value = item[col];
-								if (value == null || value == "")
+								if (value == null || value === "")
 								{
 									return "";
 								}
