@@ -11,6 +11,15 @@
 	CurrencyQuestion.prototype = Object.create(TF.Control.Form.BaseQuestion.prototype);
 	CurrencyQuestion.prototype.constructor = CurrencyQuestion;
 
+	Object.defineProperty(CurrencyQuestion.prototype, 'dirty', {
+	get()
+	{
+		const _intialValue = this.initialValue === undefined ? null : this.initialValue;
+		const _value = this.value === undefined ? null : this.value;
+		return _intialValue !== _value;
+	}
+	});
+
 	CurrencyQuestion.prototype.getValidateInputs = function ()
 	{
 		return this.element.find('input:not(.k-formatted-value)');
@@ -70,6 +79,11 @@
 		numericOption.currCulture = currCulture;
 
 		return numericOption;
+	}
+
+	CurrencyQuestion.prototype.setInitialValue = function()
+	{
+		this.initialValue = this.field.value;
 	}
 
 	CurrencyQuestion.prototype.initQuestionContent = function ()
@@ -133,7 +147,7 @@
 			}
 		});
 
-		if (this.field.value)
+		if (this.field.value !== undefined && this.field.value !== null) 
 		{
 			this.value = this.field.value;
 			this.numericInput.value(this.field.value);
