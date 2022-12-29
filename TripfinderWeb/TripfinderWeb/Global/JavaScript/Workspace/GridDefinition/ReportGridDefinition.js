@@ -59,16 +59,15 @@
 					DisplayName: "Report Type",
 					Width: '150px',
 					type: "string"
-				}
-				,
+				},
 				{
 					FieldName: "IsFavorite",
 					DisplayName: "Favorite",
 					Width: '150px',
-					type: "bool",
+					type: "boolean",
 					template: function(item)
 					{
-						if (item.IsFavorite)
+						if (item.IsFavorite && item.IsFavorite !== "false")
 							return "<div class='icon-inner favorite-report'></div>";
 						else
 							return "<div class='icon-inner'></div>";
