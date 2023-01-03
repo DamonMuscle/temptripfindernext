@@ -160,7 +160,7 @@
 				return;
 		}
 
-		this.insertFragmentToCurrentCursorPostion(name);
+		this.insertFragmentToCurrentCursorPosition(name);
 	};
 
 	ModifyFilterViewMobileModel.prototype.clearSingleOmittedRecord = function(record, e)
@@ -184,7 +184,7 @@
 
 	ModifyFilterViewMobileModel.prototype.inputValue = function(viewModel, e)
 	{
-		this.insertFragmentToCurrentCursorPostion(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
+		this.insertFragmentToCurrentCursorPosition(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
 	};
 
 	ModifyFilterViewMobileModel.prototype.verifyClick = function()
