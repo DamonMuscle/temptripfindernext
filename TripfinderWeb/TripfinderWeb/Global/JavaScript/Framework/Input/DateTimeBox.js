@@ -187,7 +187,7 @@
 				{
 					this.value(this.getValueString(newDate));
 				}
-				if (TF.isPhoneDevice) {
+				if (TF.isPhoneDevice && self.type !== "DateTime") {
 					this._dateTimePicker.hide();
 				}
 			}.bind(this), this.delayChange ? 500 : 0);
@@ -376,6 +376,11 @@
 
 			this._toggleScroll(false);
 			$(window).off("resize.dateTime");
+
+			if (self.attributes && self.attributes.afterHide && self.type === "DateTime")
+			{
+				self.attributes.afterHide();
+			}
 		}.bind(this));
 
 		var reg = this.getInvalidCharacterRegex();

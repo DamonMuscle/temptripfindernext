@@ -79,6 +79,11 @@
 
 		this.obValueFieldValue.subscribe(function(newFiledValue)
 		{
+			if (this.obValueFieldType() === "DateTime")
+			{
+				return;
+			}
+			
 			let isDateTimeControlOpened = function()
 			{
 				return (this.obValueFieldType() && (this.obValueFieldType().toLowerCase() === "datetime" || this.obValueFieldType().toLowerCase() === "time")) &&
@@ -89,7 +94,7 @@
 			let fieldType = this.obValueFieldType() === "Select" ? "String" : this.obValueFieldType();
 			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
 			{
-				this.insertFragmentToCurrentCursorPostion(this.valueToSQL(fieldType, this.obValueFieldValue()));
+				this.insertFragmentToCurrentCursorPosition(this.valueToSQL(fieldType, this.obValueFieldValue()));
 			}
 		}.bind(this));
 
@@ -158,7 +163,21 @@
 			return visableOmitArray;
 		}, this);
 
+		this.afterValueControlHide = this.afterValueControlHide.bind(this);
+		this._afterValueControlHideTimer;
 		this.valueKeypress = this.valueKeypress.bind(this);
+	}
+
+	ModifyFilterViewModel.prototype.afterValueControlHide = function()
+	{
+		clearTimeout(this._afterValueControlHideTimer);
+		if (this.obValueFieldValue && this.obValueFieldValue() !== "")
+		{
+			this._afterValueControlHideTimer = setTimeout(() =>
+			{
+				this.insertFragmentToCurrentCursorPosition(this.valueToSQL(this.obValueFieldType(), this.obValueFieldValue()));
+			}, 100); // The reason to add time to excute afterValueControlHide is it called twice when dataTime cotnrol is hidden, but haven't got root cause when spent half day to investigate it
+		}
 	}
 
 	ModifyFilterViewModel.prototype.loadMoreOmitedRecordClick = function()
@@ -529,7 +548,7 @@
 			this.obValueFieldType("Disabled");
 			return;
 		}
-		this.insertFragmentToCurrentCursorPostion("[" + columnDefinition.PersistenceName + "]");
+		this.insertFragmentToCurrentCursorPosition("[" + columnDefinition.PersistenceName + "]");
 
 		if (columnDefinition.TypeCode === "Boolean")
 		{
@@ -554,7 +573,7 @@
 		var value = this.selectedOperator();
 		if (value != " ")
 		{
-			this.insertFragmentToCurrentCursorPostion(value);
+			this.insertFragmentToCurrentCursorPosition(value);
 		}
 	};
 
@@ -563,7 +582,7 @@
 		var value = this.selectedLogicalOperator();
 		if (value != " ")
 		{
-			this.insertFragmentToCurrentCursorPostion(value);
+			this.insertFragmentToCurrentCursorPosition(value);
 		}
 	};
 
@@ -573,13 +592,13 @@
 		{
 			var baseBox = ko.dataFor(e.target);
 			var value = baseBox.$element.val();
-			this.insertFragmentToCurrentCursorPostion(this.valueToSQL(baseBox.getType(), value));
+			this.insertFragmentToCurrentCursorPosition(this.valueToSQL(baseBox.getType(), value));
 			return false;
 		}
 		return true;
 	};
 
-	ModifyFilterViewModel.prototype.insertFragmentToCurrentCursorPostion = function(fragment)
+	ModifyFilterViewModel.prototype.insertFragmentToCurrentCursorPosition = function(fragment)
 	{
 		var cursorPosition = $(this.textAreaElement()).prop("selectionStart");
 		var whereClause = this.gridFilterDataModel.whereClause();
