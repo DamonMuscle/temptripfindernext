@@ -37,10 +37,14 @@
 		paramData: {}
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report'];
-	var customClickAndTouchEvent = "click.LightKendoGrid touchend.LightKendoGrid";
+	var customClickAndTouchEvent;
 
 	function LightKendoGrid($container, options, gridState, geoFields)
 	{
+		// make click event namespace unique in each instance.
+		this.randomKey = (new Date()).getTime();
+		customClickAndTouchEvent = `click.LightKendoGrid${this.randomKey} touchend.LightKendoGrid${this.randomKey}`;
+
 		this.geoFields = geoFields;
 		if (geoFields)
 		{
