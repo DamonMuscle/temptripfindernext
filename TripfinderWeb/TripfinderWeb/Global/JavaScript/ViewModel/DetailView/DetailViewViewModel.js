@@ -938,6 +938,9 @@
 
 		return promiseTask.then(function()
 		{
+			// Update UDF required state
+			tf.helpers.detailViewHelper.updateUDFRequiredFields(self.gridType);
+			
 			self.setStackBlocks(self.options);
 			self.onColumnChangedEvent.notify(self.rootGridStack.getCurrentWidth());
 

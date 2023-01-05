@@ -129,6 +129,26 @@
 		});
 	};
 
+	DetailViewHelper.prototype.updateUDFRequiredFields = function(gridType)
+	{
+		let self = this,
+			udfDefinition = tf.UDFDefinition.get(gridType),
+			udfRequiredFields = udfDefinition ? udfDefinition.userDefinedFields.filter(udf =>
+				(udf.SystemDefined || udf.UDFDataSources.some(db => db.DBID === tf.datasourceManager.databaseId)) && udf.Required
+			).map(udf =>
+			{
+				return {
+					name: udf.OriginalName,
+					title: udf.DisplayName,
+					udfId: udf.UDFId
+				}
+			}) : [];
+
+		self.requiredFields[gridType] = self.requiredFields[gridType]
+			? self.requiredFields[gridType].filter(field => !field.udfId).concat(udfRequiredFields)
+			: udfRequiredFields;
+	};
+
 	/**
 	 * handle layout which is stored before refactor. RW-6465
 	 */
