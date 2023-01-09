@@ -2,7 +2,7 @@
 	<div class="visible-lg-block" style="margin-top:calc(39px + 15vh )"></div>
 	<div class="visible-sm-block visible-md-block" style="margin-top:calc(10vh )"></div>
 	<div class="visible-xs-block" style="margin-top:20px"></div>
-	<div class="row tf-login-row" data-bind="visible:$parent.obShowLogin()">
+	<div class="row tf-login-row" data-bind="visible:$parent.obShowLogin() && !obIsShowCode()">
 		<div class="col-sm-12 col-md-10 col-lg-8">
 			<div class="col-sm-24" style="padding-left:0px;margin-top:10px;">
 				<div class="logo-container" style="margin-bottom: calc(5vh + 20px);"></div>
@@ -11,13 +11,17 @@
 				<div class="panel-body">
 					<div>
 						<form class="form-horizontal loginform" role="form">
-							<div class="form-group" style="margin-top: 10px" data-bind="css: obClientKeyWarning()?'has-error':''">
+							<div class="form-group" style="margin-top: 10px"
+								data-bind="css: obClientKeyWarning()?'has-error':''">
 								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
 									<label for="firstName">
 										Client ID
 									</label>
-									<input type="text" id="firstName" name="clientId" class="form-control" placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage" tabindex="1">
-									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId" data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
+									<input type="text" id="firstName" name="clientId" class="form-control"
+										placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage"
+										tabindex="1">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId"
+										data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
 								</div>
 							</div>
 							<div class="form-group" data-bind="css: obUsernameWarning()?'has-error':''">
@@ -25,8 +29,11 @@
 									<label for="userName">
 										User Name
 									</label>
-									<input type="text" id="userName" name="userName" class="form-control" placeholder="User Name" data-bind="value:obUsername, click:cleanErrorMessage" tabindex="1">
-									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName" data-bv-result="INVALID" data-bind="visible:obUsernameWarning">required</small>
+									<input type="text" id="userName" name="userName" class="form-control"
+										placeholder="User Name" data-bind="value:obUsername, click:cleanErrorMessage"
+										tabindex="1">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName"
+										data-bv-result="INVALID" data-bind="visible:obUsernameWarning">required</small>
 								</div>
 							</div>
 							<div class="form-group" data-bind="css: obPasswordWarning()?'has-error':''">
@@ -34,28 +41,36 @@
 									<label for="password">
 										Password
 									</label>
-									<input type="password" id="password" name="password" autocomplete="off" class="form-control" placeholder="Password" data-bind="value:obPassword, click:cleanErrorMessage" tabindex="1">
-									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="password" data-bv-result="INVALID" data-bind="visible:obPasswordWarning" style="float:left">required</small>
+									<input type="password" id="password" name="password" autocomplete="off"
+										class="form-control" placeholder="Password"
+										data-bind="value:obPassword, click:cleanErrorMessage" tabindex="1">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="password"
+										data-bv-result="INVALID" data-bind="visible:obPasswordWarning"
+										style="float:left">required</small>
 								</div>
 							</div>
 							<div class="form-group">
 								<div class="col-sm-12">
 									<div class="checkbox">
 										<label style="padding-left: 20px;">
-											<input style="margin-left: -20px;" type="checkbox" data-bind="checked:obRememberMe" tabindex="1" />Remember Me
+											<input style="margin-left: -20px;" type="checkbox"
+												data-bind="checked:obRememberMe" tabindex="1" />Remember Me
 										</label>
 									</div>
 								</div>
 								<div class="col-sm-12">
-									<a class="forget-password pull-right" data-bind="click:$parent.forgotPasswordClick" tabindex="2">Forgot Password?</a>
+									<a class="forget-password pull-right" data-bind="click:$parent.forgotPasswordClick"
+										tabindex="2">Forgot Password?</a>
 								</div>
 							</div>
-							<div class="login-error" data-bind="style: {visibility: obLoginErrorMessage? 'visible': 'hidden'}">
+							<div class="login-error"
+								data-bind="style: {visibility: obLoginErrorMessage? 'visible': 'hidden'}">
 								<span data-bind="text:obLoginErrorMessage"></span>
 							</div>
 							<div class="form-group">
 								<div class="col-sm-24">
-									<button type="submit" class="btn btn-login bv-hidden-submit" data-bind="click:$parent.positiveClick" tabindex="1">Log In</button>
+									<button type="submit" class="btn btn-login bv-hidden-submit"
+										data-bind="click:$parent.positiveClick" tabindex="1">Log In</button>
 								</div>
 							</div>
 							<div class="form-group">
@@ -81,7 +96,8 @@
 									<label for="userName">
 										User Name
 									</label>
-									<input type="text" id="userNameRP" name="userNameRP" required class="form-control" disabled="disabled" data-bind="value:obUsernameRP">
+									<input type="text" id="userNameRP" name="userNameRP" required class="form-control"
+										disabled="disabled" data-bind="value:obUsernameRP">
 								</div>
 							</div>
 							<div class="form-group">
@@ -89,8 +105,9 @@
 									<label for="passwordRP" class="requirestar">
 										Password
 									</label>
-									<input type="password" name="passwordRP" autocomplete="off" autofocus="autofocus" id="passwordRP" required class="form-control" placeholder="Password"
-										   data-bind="value:obPasswordRP">
+									<input type="password" name="passwordRP" autocomplete="off" autofocus="autofocus"
+										id="passwordRP" required class="form-control" placeholder="Password"
+										data-bind="value:obPasswordRP">
 								</div>
 							</div>
 							<div class="form-group">
@@ -98,19 +115,64 @@
 									<label for="passwordRP" class="requirestar">
 										Verify Password
 									</label>
-									<input type="password" name="verifyPasswordRP" id="verifyPasswordRP" autocomplete="off" required class="form-control" placeholder="Verify Password"
-										   data-bind="value:obVerifyPasswordRP">
+									<input type="password" name="verifyPasswordRP" id="verifyPasswordRP"
+										autocomplete="off" required class="form-control" placeholder="Verify Password"
+										data-bind="value:obVerifyPasswordRP">
 								</div>
 							</div>
-							<div class="login-error" data-bind="style: {visibility: obLoginErrorMessageRP? 'visible': 'hidden'}">
+							<div class="login-error"
+								data-bind="style: {visibility: obLoginErrorMessageRP? 'visible': 'hidden'}">
 								<span data-bind="text:obLoginErrorMessageRP"></span>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="edit-bottombar">
-					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.resetPasswordClick" style="margin-right:10px;width: 125px">Reset Password</button>
+					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.resetPasswordClick"
+						style="margin-right:10px;width: 125px">Reset Password</button>
 					<button type="button" class="btn tf-btn-gray" data-bind="click:$parent.cancelClick">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row tf-login-row" data-bind="visible:obIsShowCode()">
+		<div class="col-sm-12 col-md-10 col-lg-10">
+			<div class="panel panel-default">
+				<div class="panel-heading">Authentication</div>
+				<div class="panel-body">
+					<div>
+						<div class="form-horizontal resetForm" role="form">
+							<div class="form-group">
+								<div class="col-sm-24 multifactor-authentication-box">
+									<span>This account has multifactor authentication enabled, please check your email
+										for your authentication code.</span>
+									<div class="pin-code-box">
+										<div class="form-group">
+											<input tabindex="4" type="text" id="securityCode" name="securityCode"
+												required class="form-control" maxlength="6"
+												placeholder="enter your code here" data-bind="value:obSecurityCode">
+											<div class="resend-code-width">
+												<span class="resend-code-float">
+													<label>
+														<a input tabindex="5"
+															data-bind="click:resendCodeClick, css:{disabled:!obResendCodeCanClick()}">Resend</a>
+													</label>
+												</span>
+											</div>
+											<small class="login-code-error" data-bind="visible:obLoginCodeErrorMessage">
+												<span data-bind="text:obLoginCodeErrorMessage"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="edit-bottombar">
+					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.positiveClick"
+						style="margin-right:10px;padding: 0px 12px;">Submit</button>
+					<button type="button" class="btn tf-btn-gray" data-bind="click:backClick">Back</button>
 				</div>
 			</div>
 		</div>
