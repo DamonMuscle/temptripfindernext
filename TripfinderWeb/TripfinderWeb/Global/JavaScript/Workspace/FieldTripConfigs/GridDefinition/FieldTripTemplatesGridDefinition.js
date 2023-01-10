@@ -152,7 +152,7 @@
 				},
 				{
 					field: "DestinationState",
-					title: "Destination " + tf.localization.AreaName,
+					title: "Destination State",
 					width: '130px',
 					type: "string",
 					hidden: true

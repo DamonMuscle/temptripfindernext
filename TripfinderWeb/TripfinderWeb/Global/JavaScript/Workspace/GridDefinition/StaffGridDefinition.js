@@ -132,7 +132,7 @@
 				},
 				{
 					FieldName: "LicenseState",
-					DisplayName: "License " + tf.localization.AreaName,
+					DisplayName: "License State",
 					Width: '150px',
 					type: "string"
 				},

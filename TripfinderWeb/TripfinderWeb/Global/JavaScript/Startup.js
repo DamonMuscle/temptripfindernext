@@ -785,7 +785,7 @@
 	{
 		tf.localization = {
 			Postal: 'Zip Code',
-			AreaName: 'State',
+			AreaName: 'State/Province',
 			LocalName: 'United States',
 			MeasureSystem: 'US',
 			UnitsOfMeasure: 'Miles',
@@ -800,7 +800,7 @@
 				if (response.Items && response.Items.length > 0)
 				{
 					// hard code the Postal and AreaName on RW-33366
-					tf.localization = {...response.Items[0], Postal: 'Postal Code', AreaName: 'State'};
+					tf.localization = {...response.Items[0], Postal: 'Postal Code', AreaName: 'State/Province'};
 					tf.localization.PerHour = tf.localization.PerHour.toUpperCase();
 					tf.localization.Vehicle = tf.localization.Vehicle.toUpperCase();
 				}

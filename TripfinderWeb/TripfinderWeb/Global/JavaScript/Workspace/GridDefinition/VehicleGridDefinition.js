@@ -293,14 +293,14 @@
 				},
 				{
 					FieldName: "StateInspection",
-					DisplayName: tf.localization.AreaName + " Inspection",
+					DisplayName: "State Inspection",
 					Width: '150px',
 					type: "string",
 					hidden: true
 				},
 				{
 					FieldName: "InspectionExp",
-					DisplayName: tf.localization.AreaName + " Inspection Expiration",
+					DisplayName: "State Inspection Expiration",
 					Width: '160px',
 					type: "date",
 					hidden: true

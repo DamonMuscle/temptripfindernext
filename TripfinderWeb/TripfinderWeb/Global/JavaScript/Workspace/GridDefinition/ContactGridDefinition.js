@@ -89,7 +89,7 @@
 			},
 			{
 				FieldName: "State",
-				DisplayName: "Mail State",
+				DisplayName: "Mail State/Province",
 				type: "string",
 				Width: '300px'
 			},
