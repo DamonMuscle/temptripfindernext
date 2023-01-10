@@ -123,7 +123,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -489,7 +489,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -641,7 +641,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -1824,7 +1824,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -2220,7 +2220,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -2637,7 +2637,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -3312,7 +3312,7 @@
 				},
 				{
 					"field": "MailState",
-					"title": "Mailing Address State",
+					"title": "Mailing Address State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {

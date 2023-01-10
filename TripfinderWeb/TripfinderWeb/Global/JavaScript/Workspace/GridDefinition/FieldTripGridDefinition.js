@@ -364,7 +364,7 @@
 		},
 		{
 			FieldName: "DestinationState",
-			DisplayName: "Destination " + tf.localization.AreaName,
+			DisplayName: "Destination State",
 			Width: '130px',
 			type: "string",
 			hidden: true
