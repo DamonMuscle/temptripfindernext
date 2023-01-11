@@ -390,7 +390,7 @@
 		{
 			DisplayFilterTypeName: "Field Trip Classifications",
 			GridType: "FieldTripClassification",
-			filterField: "Name",
+			filterField: "Code",
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripclassifications");
