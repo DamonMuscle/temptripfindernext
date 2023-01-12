@@ -335,7 +335,7 @@
 		});
 	};
 
-	TripfinderLoginViewModel.prototype.countDown = function()
+	TripfinderLoginViewModel.prototype.resendCountDown = function()
 	{
 		let timeLeft = 30;
 		clearInterval(this.counter);
@@ -365,7 +365,7 @@
 			auth: { noInterupt: true }
 		}).then(() =>
 		{
-			self.countDown();
+			self.resendCountDown();
 			self.obLoginCodeErrorMessage('');
 		});
 	};
