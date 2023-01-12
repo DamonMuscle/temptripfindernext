@@ -135,7 +135,14 @@
 			</div>
 		</div>
 	</div>
-	<div class="row tf-login-row" data-bind="visible:obIsShowCode()">
+	<!-- ko if: obIsShowCode() -->
+	<div class="row tf-login-row">
+		<div class="col-sm-12 col-md-10 col-lg-8">
+			<div class="logo-container" style="margin:10px 15px calc(5vh + 20px) 0;">
+			</div>
+		</div>
+	</div>
+	<div class="row tf-login-row">
 		<div class="col-sm-12 col-md-10 col-lg-10">
 			<div class="panel panel-default">
 				<div class="panel-heading">Authentication</div>
@@ -155,7 +162,7 @@
 												<span class="resend-code-float">
 													<label>
 														<a input tabindex="5"
-															data-bind="click:resendCodeClick, css:{disabled:!obResendCodeCanClick()}">Resend</a>
+															data-bind="click:generatePin, css:{disabled:!obResendCodeCanClick()}">Resend</a>
 													</label>
 												</span>
 											</div>
@@ -172,9 +179,10 @@
 				<div class="edit-bottombar">
 					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.positiveClick"
 						style="margin-right:10px;padding: 0px 12px;">Submit</button>
-					<button type="button" class="btn tf-btn-gray" data-bind="click:backClick">Back</button>
+					<button type="button" class="btn tf-btn-gray" data-bind="click:backFromMFAtoLogin">Back</button>
 				</div>
 			</div>
 		</div>
 	</div>
+	<!-- /ko -->
 </div>
