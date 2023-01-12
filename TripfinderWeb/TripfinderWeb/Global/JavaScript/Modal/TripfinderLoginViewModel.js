@@ -4,6 +4,9 @@
 
 	TripfinderLoginViewModel.prototype = Object.create(TF.LoginViewModel.prototype);
 	TripfinderLoginViewModel.prototype.constructor = TripfinderLoginViewModel;
+	const SAML_REDIRECT_USERNAME_REGEX = /^\S+@\S+\.\S+$/;
+	const SAML_POSTFORM_REMOVE_DELAY = 60000;
+	const SAML_DELAY_REQUEST = 1000;
 
 	function TripfinderLoginViewModel()
 	{
@@ -59,15 +62,163 @@
 	//to avoid required field check, override apply function in TF.LoginViewModel
 	TripfinderLoginViewModel.prototype.apply = function()
 	{
-		return this.signIn();
+		var self = this,
+			securityCode = $.trim(self.obSecurityCode());
+		if (securityCode)
+		{
+			return self.signIn();
+		}
+
+		return self.getSAMLSecurity();
 	}
 
-	TripfinderLoginViewModel.prototype.signIn = function()
+	/**
+	 * Get SAML user authentication.
+	 *
+	 * @returns
+	 */
+	TripfinderLoginViewModel.prototype.getSAMLSecurity = function()
 	{
-		return this.trySignIn(true);
+		var self = this,
+			clientKey = $.trim(self.obClientKey()),
+			username = $.trim(self.obUsername()),
+			password = self.obPassword();
+
+		return tf.promiseAjax.post(
+			pathCombine(tf.api.server(), clientKey, "saml/sprequestinfo"),
+			{
+				paramData: { username },
+				data: `"${password}"`,
+			},
+			{
+				auth: { noInterupt: true }
+			}
+		).then((apiResponse) => 
+		{
+			const samlConfig = apiResponse.Items[0];
+			const { IsSAMLSecurityOn, IdentityProvider, Saml2Id, PostContent } = samlConfig;
+
+			if (IsSAMLSecurityOn)
+			{
+				// For ADFS, we just need to use form post
+				if (IdentityProvider === "ADFS")
+				{
+					if (PostContent)
+					{
+						return self.authSamlViaPost(Saml2Id, PostContent);
+					}
+				}
+				// For others (currently Google or Azure), SAML authentication would require redirceted login form
+				else if (SAML_REDIRECT_USERNAME_REGEX.test(username))
+				{
+					return self.authSamlViaRedirect(username, Saml2Id, PostContent);
+				}
+			}
+
+			return self.signIn();
+		})
 	};
 
-	TripfinderLoginViewModel.prototype.trySignIn = function(confirmLogged)
+	/**
+	 * Authenticate SAML via form post.
+	 *
+	 * @param {*} postContent
+	 */
+	TripfinderLoginViewModel.prototype.authSamlViaPost = function(saml2Id, postContent)
+	{
+		let iframe = document.createElement('iframe');
+		iframe.srcdoc = postContent;
+		document.getElementById("SAMLIframe").appendChild(iframe);
+		setTimeout(() =>
+		{
+			$('iframe:eq(-1)').remove()
+		}, SAML_POSTFORM_REMOVE_DELAY);
+
+		return this.signIn(saml2Id);
+	};
+
+	/**
+	 * Authenticate SAML via redirected login form.
+	 *
+	 * @param {*} username
+	 * @param {*} saml2Id
+	 * @param {*} samlPostContent
+	 * @returns
+	 */
+	TripfinderLoginViewModel.prototype.authSamlViaRedirect = function(username, saml2Id, postContent)
+	{
+		const self = this;
+		// Re-establish the SignalR connection
+		TF.SignalRHelper.init();
+		TF.SignalRHelper.registerSignalRHubs([`SamlNotificationHub`], { 'Saml2Id': saml2Id });
+
+		tf.loadingIndicator.show();
+
+		return TF.SignalRHelper.ensureConnection()
+			.then(() =>
+			{
+				let redirectWindow = null;
+
+				return new Promise((resolve, reject) =>
+				{
+					// First bind the front-end notification method of singalR
+					TF.SignalRHelper.bindEvent('SamlNotificationHub', 'update', self.samlLoginStateUpdate.bind(self, username, resolve, reject));
+
+					// Wait for singalR to establish a connection
+					setTimeout(() =>
+					{
+						const winUrl = URL.createObjectURL(
+							new Blob([postContent], { type: "text/html" })
+						);
+
+						redirectWindow = window.open(winUrl);
+
+					}, SAML_DELAY_REQUEST);
+				}).then(() =>
+				{
+					return self.signIn(saml2Id);
+				}).finally(() =>
+				{
+					if (redirectWindow)
+					{
+						redirectWindow.close();
+					}
+
+					// Unbind event and close the connection.
+					TF.SignalRHelper.unbindEvent('SamlNotificationHub', 'update', self.samlLoginStateUpdate.bind(self));
+					TF.SignalRHelper.dispose();
+
+					tf.loadingIndicator.tryHide();
+				})
+			});
+	};
+
+	/**
+	 * On when SAML IDP calls back API with authentication result.
+	 *
+	 * @param {*} userName
+	 * @param {*} resolve
+	 * @param {*} reject
+	 * @param {*} result
+	 */
+	TripfinderLoginViewModel.prototype.samlLoginStateUpdate = function(username, resolve, reject, result)
+	{
+		if (result.LoginID && username && result.LoginID.toLowerCase() === username.toLowerCase())
+		{
+			resolve();
+		}
+		else
+		{
+			reject({ Message: "Invalid Client ID, User Name and Password combination",StatusCode: 401 });
+		}
+	};
+
+	TripfinderLoginViewModel.prototype.signIn = function(saml2Id)
+	{
+		return this.trySignIn(true, saml2Id);
+	};
+
+	TripfinderLoginViewModel.prototype.trySignIn = function(confirmLogged, saml2Id)
 	{
 		const self = this;
 		const clientKey = $.trim(self.obClientKey());
@@ -76,7 +227,7 @@
 		const securityCode = $.trim(self.obSecurityCode());
 		const promiseTask = self.obIsShowCode()
 			? self.validatePin(clientKey, username, password, securityCode, confirmLogged)
-			: self.sendSignInRequest(clientKey, username, password, confirmLogged)
+			: self.sendSignInRequest(clientKey, username, password, confirmLogged, saml2Id)
 
 		return promiseTask.catch(function(exceptionRes)
 		{
@@ -90,7 +241,7 @@
 							{
 								if (choice)
 								{
-									return self.trySignIn(false);
+									return self.trySignIn(false, saml2Id);
 								}
 								else
 								{
@@ -124,7 +275,7 @@
 				vendor: "Transfinder",
 				securityCode: securityCode,
 				username: username,
-				prefix: tf.storageManager.prefix.split('.')[0],
+				prefix: self.getProductPrefix(),
 				confirmLogged: confirmLogged
 			}
 		}, {
@@ -147,18 +298,25 @@
 		return { clientKey: clientKey, username: username, password: password };
 	}
 
-	TripfinderLoginViewModel.prototype.sendSignInRequest = function(clientKey, username, password, confirmLogged)
+	TripfinderLoginViewModel.prototype.sendSignInRequest = function(clientKey, username, password, confirmLogged, saml2Id)
 	{
 		const self = this;
+		const prefix = self.getProductPrefix();
+		const paramData = {
+			vendor: "Transfinder",
+			prefix,
+			username,
+			confirmLogged,
+		};
+
+		if (saml2Id)
+		{
+			paramData.saml2Id = saml2Id;
+		}
 
 		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos"),
 			{
-				paramData: {
-					vendor: "Transfinder",
-					prefix: tf.storageManager.prefix.split('.')[0],
-					username,
-					confirmLogged,
-				},
+				paramData: paramData,
 				data: '"' + password + '"'
 			}, {
 			auth: { noInterupt: true }
@@ -201,7 +359,7 @@
 		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos/mfa"), {
 			paramData: {
 				username: userName,
-				prefix: tf.storageManager.prefix.split('.')[0]
+				prefix: self.getProductPrefix()
 			}
 		}, {
 			auth: { noInterupt: true }
@@ -218,5 +376,10 @@
 		this.obSecurityCode("");
 		this.obLoginCodeErrorMessage("");
 		this.$form.data('bootstrapValidator').disableSubmitButtons(false);
+	};
+
+	TripfinderLoginViewModel.prototype.getProductPrefix = function()
+	{
+		return tf.storageManager.prefix.split('.')[0];
 	};
 })();
