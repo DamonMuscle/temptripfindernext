@@ -1,12 +1,16 @@
 (function()
 {
-	var connection = null;
 	function SignalRHelper()
 	{
+		this.connection = null;
+		this.continuouslyCheckConnectionInterval = null;
+		this.init();
+	}
+
+	SignalRHelper.prototype.init = function()
+	{
 		// do NOT use pathCombine, because Viewfinder cannot access this function at this place.
-		connection = $.hubConnection(this.pathCombine(this.getApiServerUrl(), "signalr"), { useDefaultPath: false });
-		// connection.logging = true;
-		TF.connection = connection;
+		TF.connection = this.connection = $.hubConnection(this.pathCombine(this.getApiServerUrl(), "Signalr"), { useDefaultPath: false });
 	}
 
 	SignalRHelper.prototype.getApiServerUrl = function()
@@ -42,57 +46,66 @@
 		return output;
 	};
 
-	SignalRHelper.prototype.registerSignalRHubs = function(hubs) 
+	SignalRHelper.prototype.registerSignalRHubs = function(hubs,qs) 
 	{
-		var hubProxys = [];
+		const self = this;
+		const hubProxys = [];
 		var f = function() { };
-		hubs.map(function(hub)
+		hubs.forEach(function(hub)
 		{
 			try
 			{
-				var hubProxy = connection.createHubProxy(hub);
+				var hubProxy = self.connection.createHubProxy(hub);
 				hubProxys.push(hubProxy);
 				hubProxy.on("addCallmap", f);
-			} catch (e) { }
+			} catch (e)
+			{
+				console.error(e);
+			}
 		});
 
-		connection.qs = {
+		self.connection.qs = qs? qs :{
 			'username': tf.authManager.userName,
 			'clientkey': tf.authManager.clientKey,
 			'sessionitemid': TF.SessionItem.getId()
 		};
-		connection.start();
-		hubProxys.map(function(hubProxy)
+		self.connection.start();
+		hubProxys.forEach(function(hubProxy)
 		{
 			hubProxy.off("addCallmap", f);
 		});
+
+		self.continuouslyCheckConnectionInterval = setInterval(() =>
+		{
+			self.ensureConnection();
+		}, 2000);
 	};
 
 	SignalRHelper.prototype.bindEvent = function(hubName, eventName, event)
 	{
 		//$.connection.GpsEventHub.updateGPSEvent
-		connection.proxies[hubName.toLowerCase()].on(eventName, event);
+		this.connection.proxies[hubName.toLowerCase()].on(eventName, event);
 	};
 
 	SignalRHelper.prototype.unbindEvent = function(hubName, eventName, event)
 	{
 		//$.connection.GpsEventHub.updateGPSEvent
-		connection.proxies[hubName.toLowerCase()].off(eventName, event);
+		this.connection.proxies[hubName.toLowerCase()].off(eventName, event);
 	};
 
 	SignalRHelper.prototype.send = function(hubName, eventName)
 	{
-		var hubProxy = connection.proxies[hubName.toLowerCase()];
+		var hubProxy = this.connection.proxies[hubName.toLowerCase()];
 		hubProxy.invoke.apply(hubProxy, Array.prototype.slice.call(arguments, 1));
 	};
 
 	SignalRHelper.prototype.ensureConnection = function()
 	{
-		if (!connection.id)
+		if (!this.connection.id)
 		{
 			return new Promise((resolve) =>
 			{
-				connection.start().done(() =>
+				this.connection.start().done(() =>
 				{
 					resolve();
 				});
@@ -100,6 +113,12 @@
 		}
 		return Promise.resolve();
 	};
+
+	SignalRHelper.prototype.dispose = function()
+	{
+		this.connection.stop();
+		clearInterval(this.continuouslyCheckConnectionInterval);
+	}
 
 	createNamespace("TF").SignalRHelper = new SignalRHelper();
 })();
