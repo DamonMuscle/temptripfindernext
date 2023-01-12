@@ -70,7 +70,15 @@
 	TripfinderLoginViewModel.prototype.trySignIn = function(confirmLogged)
 	{
 		const self = this;
-		return (self.obIsShowCode() ? self.validatePin(confirmLogged) : self.sendSignInRequest(confirmLogged)).catch(function(exceptionRes)
+		const clientKey = $.trim(self.obClientKey());
+		const username = $.trim(self.obUsername());
+		const password = self.obPassword();
+		const securityCode = $.trim(self.obSecurityCode());
+		const promiseTask = self.obIsShowCode()
+			? self.validatePin(clientKey, username, password, securityCode, confirmLogged)
+			: self.sendSignInRequest(clientKey, username, password, confirmLogged)
+
+		return promiseTask.catch(function(exceptionRes)
 		{
 			switch (exceptionRes.StatusCode)
 			{
@@ -108,20 +116,15 @@
 		});
 	}
 
-	TripfinderLoginViewModel.prototype.validatePin = function(confirmLogged)
+	TripfinderLoginViewModel.prototype.validatePin = function(clientKey, username, password, securityCode, confirmLogged)
 	{
-		const self = this,
-			prefix = tf.storageManager.prefix.split('.')[0],
-			clientKey = $.trim(self.obClientKey()),
-			userName = $.trim(self.obUsername()),
-			securityCode = $.trim(self.obSecurityCode());
-
+		const self = this;
 		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos"), {
 			paramData: {
 				vendor: "Transfinder",
 				securityCode: securityCode,
-				username: userName,
-				prefix: prefix,
+				username: username,
+				prefix: tf.storageManager.prefix.split('.')[0],
 				confirmLogged: confirmLogged
 			}
 		}, {
@@ -129,58 +132,47 @@
 		}).then(apiResponse =>
 		{
 			const token = apiResponse.Items[0];
-			return token;
-		}).then((token) =>
-		{
-			return this.buildUserInfo(token);
+			return self.buildUserInfo(clientKey, username, password, token);
 		});
 	};
 
-	TripfinderLoginViewModel.prototype.buildUserInfo = function(token)
+	TripfinderLoginViewModel.prototype.buildUserInfo = function(clientKey, username, password, token)
 	{
-		const self = this,
-			clientKey = $.trim(self.obClientKey()),
-			userName = $.trim(self.obUsername()),
-			password = self.obPassword();
-
 		tf.storageManager.delete("datasourceId", true, true);
 		tf.entStorageManager.save("token", token, true);
 		if (tf.authManager)
 		{
 			tf.authManager.token = token;
 		}
-		return { clientKey: clientKey, username: userName, password: password };
+		return { clientKey: clientKey, username: username, password: password };
 	}
 
-	TripfinderLoginViewModel.prototype.sendSignInRequest = function(confirmLogged)
+	TripfinderLoginViewModel.prototype.sendSignInRequest = function(clientKey, username, password, confirmLogged)
 	{
-		const self = this,
-			clientKey = $.trim(self.obClientKey()),
-			userName = $.trim(self.obUsername()),
-			password = self.obPassword(),
-			prefix = tf.storageManager.prefix.split('.')[0];
+		const self = this;
 
-		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos"), {
-			paramData: {
-				vendor: "Transfinder",
-				prefix: prefix,
-				username: userName,
-				confirmLogged: confirmLogged
-			},
-			data: '"' + password + '"'
-		}, {
+		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos"),
+			{
+				paramData: {
+					vendor: "Transfinder",
+					prefix: tf.storageManager.prefix.split('.')[0],
+					username,
+					confirmLogged,
+				},
+				data: '"' + password + '"'
+			}, {
 			auth: { noInterupt: true }
-		}).then(function(apiResponse)
+		}).then((apiResponse) =>
 		{
 			const tokenResultString = apiResponse.Items[0];
 			if (tokenResultString === 'MFA')
 			{
 				self.obIsShowCode(true);
-				self.countDown();
+				self.resendCountDown();
 			}
 			else
 			{
-				return self.buildUserInfo(tokenResultString);
+				return self.buildUserInfo(clientKey, username, password, tokenResultString);
 			}
 		});
 	};
@@ -200,7 +192,7 @@
 		}, 1000);
 	}
 
-	TripfinderLoginViewModel.prototype.resendCodeClick = function()
+	TripfinderLoginViewModel.prototype.generatePin = function()
 	{
 		const self = this,
 			clientKey = $.trim(self.obClientKey()),
@@ -208,7 +200,8 @@
 
 		return tf.promiseAjax.post(pathCombine(tf.api.server(), clientKey, "authinfos/mfa"), {
 			paramData: {
-				username: userName
+				username: userName,
+				prefix: tf.storageManager.prefix.split('.')[0]
 			}
 		}, {
 			auth: { noInterupt: true }
@@ -219,7 +212,7 @@
 		});
 	};
 
-	TripfinderLoginViewModel.prototype.backClick = function()
+	TripfinderLoginViewModel.prototype.backFromMFAtoLogin = function()
 	{
 		this.obIsShowCode(false);
 		this.obSecurityCode("");
