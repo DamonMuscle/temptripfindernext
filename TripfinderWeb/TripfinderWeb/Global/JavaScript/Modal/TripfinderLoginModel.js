@@ -315,7 +315,11 @@
 						this.loginViewModel.obLoginErrorMessage(apiResponse.Message);
 					}
 				}
-			}.bind(this));
+			}.bind(this))
+			.finally(() =>
+			{
+				this.loginViewModel.$form.data('bootstrapValidator').disableSubmitButtons(false);
+			});
 	};
 
 	TripfinderLoginModel.prototype.checkRequiredField = function()
