@@ -181,7 +181,10 @@
 			{
 				this._onBeforeSend(xmlHttpRequest, settings, option.overlay, beforeSend)
 				var token = tf.entStorageManager.get("token", true);
-				xmlHttpRequest.setRequestHeader('Token', token);
+				if(token)
+				{
+					xmlHttpRequest.setRequestHeader('Token', token);
+				}
 				if (tf.authManager && tf.authManager.surveyToken)
 				{
 					xmlHttpRequest.setRequestHeader('SurveyToken', tf.authManager.surveyToken);
