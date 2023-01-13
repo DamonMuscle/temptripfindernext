@@ -444,8 +444,6 @@
 			if (tokenResultString === MULTIFACTOR_KEY)
 			{
 				this.obIsShowCode(true);
-				this.securityCodeValidator();
-				this.removeSecurityCodePage();
 				this.resendCountDown();
 			}
 			else
