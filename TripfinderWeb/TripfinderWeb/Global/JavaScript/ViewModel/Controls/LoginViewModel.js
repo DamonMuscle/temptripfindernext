@@ -253,18 +253,13 @@
 	LoginViewModel.prototype.authSamlViaRedirect = function(username, saml2Id, postContent)
 	{
 		const self = this;
-		const hubObj = {
-			hubs: [`SamlNotificationHub`],
-			qs: { 'Saml2Id': saml2Id }
-		};
-
 		// Re-establish the SignalR connection
-		TF.SignalRMinimumHelper.init();
-		TF.SignalRMinimumHelper.registerSignalRHubs(hubObj);
+		TF.SignalRHelper.init();
+		TF.SignalRHelper.registerSignalRHubs([`SamlNotificationHub`], { 'Saml2Id': saml2Id });
 
 		tf.loadingIndicator.show();
 
-		return TF.SignalRMinimumHelper.ensureConnection()
+		return TF.SignalRHelper.ensureConnection()
 			.then(() =>
 			{
 				let redirectWindow = null;
@@ -272,7 +267,7 @@
 				return new Promise((resolve, reject) =>
 				{
 					// First bind the front-end notification method of singalR
-					TF.SignalRMinimumHelper.bindEvent('SamlNotificationHub', 'update', self.samlLoginStateUpdate.bind(self, username, resolve, reject));
+					TF.SignalRHelper.bindEvent('SamlNotificationHub', 'update', self.samlLoginStateUpdate.bind(self, username, resolve, reject));
 
 					// Wait for singalR to establish a connection
 					setTimeout(() =>
@@ -295,8 +290,8 @@
 					}
 
 					// Unbind event and close the connection.
-					TF.SignalRMinimumHelper.unbindEvent('SamlNotificationHub', 'update', self.samlLoginStateUpdate.bind(self));
-					TF.SignalRMinimumHelper.getConnection().stop();
+					TF.SignalRHelper.unbindEvent('SamlNotificationHub', 'update', self.samlLoginStateUpdate.bind(self));
+					TF.SignalRHelper.dispose();
 
 					tf.loadingIndicator.tryHide();
 				})
