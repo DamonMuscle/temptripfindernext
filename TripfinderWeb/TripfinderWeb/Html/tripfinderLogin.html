@@ -144,44 +144,46 @@
 	</div>
 	<div class="row tf-login-row">
 		<div class="col-sm-12 col-md-10 col-lg-10">
-			<div class="panel panel-default" style="border:1px solid #ccc;padding-bottom: 10px;">
-				<div class="panel-heading">Authentication</div>
-				<div class="panel-body">
-					<div>
-						<div class="form-horizontal resetForm" role="form">
-							<div class="form-group">
-								<div class="col-sm-24 multifactor-authentication-box">
-									<span>This account has multifactor authentication enabled, please check your email
-										for your authentication code.</span>
-									<div class="pin-code-box">
-										<div class="form-group">
-											<input tabindex="4" type="text" id="securityCode" name="securityCode"
-												required class="form-control" maxlength="6"
-												placeholder="enter your code here" data-bind="value:obSecurityCode">
-											<div class="resend-code-width">
-												<span class="resend-code-float">
-													<label>
-														<a input tabindex="5"
-															data-bind="click:generatePin, css:{disabled:!obResendCodeCanClick()}">Resend</a>
-													</label>
-												</span>
+			<form class="security-code-form">
+				<div class="panel panel-default" style="border:1px solid #ccc;padding-bottom: 10px;">
+					<div class="panel-heading">Authentication</div>
+					<div class="panel-body">
+						<div>
+							<div class="form-horizontal resetForm" role="form">
+								<div class="form-group">
+									<div class="col-sm-24 multifactor-authentication-box">
+										<span>This account has multifactor authentication enabled, please check your email
+											for your authentication code.</span>
+										<div class="pin-code-box">
+											<div class="form-group">
+												<input tabindex="4" type="text" id="securityCode" name="securityCode"
+													required class="form-control" maxlength="6"
+													placeholder="enter your code here" data-bind="value:obSecurityCode">
+												<div class="resend-code-width">
+													<span class="resend-code-float">
+														<label>
+															<a input tabindex="5"
+																data-bind="click:generatePin, css:{disabled:!obResendCodeCanClick()}">Resend</a>
+														</label>
+													</span>
+												</div>
+												<small class="login-code-error" data-bind="visible:obLoginCodeErrorMessage">
+													<span data-bind="text:obLoginCodeErrorMessage"></span>
+												</small>
 											</div>
-											<small class="login-code-error" data-bind="visible:obLoginCodeErrorMessage">
-												<span data-bind="text:obLoginCodeErrorMessage"></span>
-											</small>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<div class="edit-bottombar" style="padding: 0 25px;">
+						<button type="button" class="btn tf-btn-black" data-bind="click:$parent.positiveClick"
+							style="margin-right:10px;padding: 0px 12px;">Submit</button>
+						<button type="button" class="btn" style="background-color: transparent;" data-bind="click:backFromMFAtoLogin">Back</button>
+					</div>
 				</div>
-				<div class="edit-bottombar" style="padding: 0 25px;">
-					<button type="button" class="btn tf-btn-black" data-bind="click:$parent.positiveClick"
-						style="margin-right:10px;padding: 0px 12px;">Submit</button>
-					<button type="button" class="btn" style="background-color: transparent;" data-bind="click:backFromMFAtoLogin">Back</button>
-				</div>
-			</div>
+			</form>
 		</div>
 	</div>
 	<!-- /ko -->
