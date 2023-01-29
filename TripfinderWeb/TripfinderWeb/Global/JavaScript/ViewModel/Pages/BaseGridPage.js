@@ -801,6 +801,12 @@
 			}.bind(self))
 			.catch(function(response)
 			{
+				if (response && response.StatusCode === 412)
+				{
+					self.pageLevelViewModel.popupErrorMessage(response.Message);
+					return Promise.reject(response);
+				}
+
 				if (response && response.StatusCode === 404)
 				{
 					return Promise.reject(response);
