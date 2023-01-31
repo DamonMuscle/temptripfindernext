@@ -917,7 +917,7 @@
 			case "Disabled":
 				return "";
 			case "Boolean":
-				return (value ? 1 : 0).toString();
+				return (value == "True" ? 1 : 0).toString();
 			case "String":
 			case "DateTime":
 			case "Date":

@@ -72,7 +72,11 @@
 							</div>
 						</div>
 						<!-- /ko -->
-						<!-- ko if: obValueFieldType() != "Select" -->
+						<!-- ko if: obValueFieldType() == "Boolean"-->
+						<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{inputEnable:false,afterHide:afterValueControlHide ,class:"form-control text-right",exactFormat:true}} -->
+						<!-- /ko -->
+						<!-- /ko -->
+						<!-- ko if: obValueFieldType() != "Select" && obValueFieldType() != "Boolean"-->
 						<!-- ko customInput:{type:obValueFieldType,value:obValueFieldValue,name:"valueField",attributes:{afterHide:afterValueControlHide ,class:"form-control text-right",exactFormat:true}} -->
 						<!-- /ko -->
 						<!-- /ko -->
