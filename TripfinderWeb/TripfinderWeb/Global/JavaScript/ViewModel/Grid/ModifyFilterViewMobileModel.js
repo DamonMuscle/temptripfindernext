@@ -149,6 +149,23 @@
 						});
 					}
 				}
+
+				if (option.TypeCode === "Boolean")
+				{
+					this.obValueFieldType("Disabled");
+
+					if (option.UDFId != null)
+					{
+						let udf = tf.UDFDefinition.get(this.gridType).userDefinedFields.find(udf => udf.UDFId == option.UDFId);
+						this.obTrueDisplayName(udf.TrueDisplayName);
+						this.obFalseDisplayName(udf.FalseDisplayName);
+					}
+					else
+					{
+						this.obTrueDisplayName(null);
+						this.obFalseDisplayName(null);
+					}
+				}
 				this.obValueFieldType(option.TypeCode);
 				name = "[" + option.PersistenceName + "]";
 				break;

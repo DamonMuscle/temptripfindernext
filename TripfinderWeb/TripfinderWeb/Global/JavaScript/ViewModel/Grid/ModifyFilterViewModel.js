@@ -94,7 +94,24 @@
 			let fieldType = this.obValueFieldType() === "Select" ? "String" : this.obValueFieldType();
 			if (this.obValueFieldValue() !== "" && !isDateTimeControlOpened())
 			{
-				this.insertFragmentToCurrentCursorPosition(this.valueToSQL(fieldType, this.obValueFieldValue()));
+				switch (this.obValueFieldType())
+				{
+					case "Boolean":
+						let columnDefinition = this.obSelectedField();
+						if (columnDefinition && !columnDefinition.UDFId && columnDefinition.FieldName === 'Geo')
+						{
+							//For the geo field, 4 means geocoded and blank means ungeocoded.
+							let geoFragment = this.booleanSelectedData?.value ? "'4'" : "''";
+							this.insertFragmentToCurrentCursorPosition(geoFragment);
+						} else
+						{
+							this.insertFragmentToCurrentCursorPosition(this.valueToSQL("Boolean", this.booleanSelectedData?.value));
+						}
+						break;
+					default:
+						this.insertFragmentToCurrentCursorPosition(this.valueToSQL(fieldType, newFiledValue));
+						break;
+				}
 			}
 		}.bind(this));
 
@@ -552,11 +569,18 @@
 
 		if (columnDefinition.TypeCode === "Boolean")
 		{
+			this.obValueFieldType("Disabled");
+
 			if (columnDefinition.UDFId != null)
 			{
 				let udf = tf.UDFDefinition.get(this.gridType).userDefinedFields.find(udf => udf.UDFId == columnDefinition.UDFId);
 				this.obTrueDisplayName(udf.TrueDisplayName);
 				this.obFalseDisplayName(udf.FalseDisplayName);
+			}
+			else
+			{
+				this.obTrueDisplayName(null);
+				this.obFalseDisplayName(null);
 			}
 		}
 
@@ -917,7 +941,7 @@
 			case "Disabled":
 				return "";
 			case "Boolean":
-				return (value == "True" ? 1 : 0).toString();
+				return (value ? 1 : 0).toString();
 			case "String":
 			case "DateTime":
 			case "Date":
