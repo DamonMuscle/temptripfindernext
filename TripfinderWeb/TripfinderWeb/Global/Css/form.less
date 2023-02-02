@@ -2113,6 +2113,17 @@
 						}
 					}
 				}
+				.form-base-container {
+					.boolean-question.question .boolean-question-option,
+					.list-question.question .list-question-option {
+						&:not(:first-child) {
+							margin-top: 8px;
+							@media screen and (max-width: 1180px) {
+								margin-top: 20px;
+							}
+						}
+					}
+				}
 				.e-sign-wrapper
 				{
 					&.full-page
