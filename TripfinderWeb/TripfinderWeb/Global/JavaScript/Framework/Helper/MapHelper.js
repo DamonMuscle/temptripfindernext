@@ -99,6 +99,39 @@
 		return Math.sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
 	};
 
+	MapHelper.addLayer = function(map, layer)
+	{
+		map.layers.add(layer);
+	};
+
+	MapHelper.removeLayer = function(map, layer)
+	{
+		map.layers.remove(layer);
+	};
+
+	/**
+	* remove all graphics in layer
+	*/
+	MapHelper.clearLayer = function(layer)
+	{
+		if (layer.type == "graphics")
+		{
+			layer.removeAll();
+			return Promise.resolve();
+		}
+		if (layer.type == "feature")
+		{
+			return layer.queryFeatures().then(function(featureSet)
+			{
+				if (featureSet.features.length > 0)
+				{
+					return layer.applyEdits({ deleteFeatures: featureSet.features });
+				}
+			});
+		}
+	};
+
+
 	MapHelper.setMapCursor = function(map, cursorString)
 	{
 		var cursor = cursorString;
@@ -130,6 +163,45 @@
 		}
 	};
 
+	MapHelper.getLayer = function(map, id)
+	{
+		return map.findLayerById(id);
+	};
+
+	MapHelper.disableDoubleClickZoom = function(map)
+	{
+		if (map.mapView)
+		{
+			if (!map._viewDoubleClickEvent)
+			{
+				map._viewDoubleClickEvent = map.mapView.on("double-click", function(event)
+				{
+					event.stopPropagation();
+				});
+			}
+		}
+		else
+		{
+			map.disableDoubleClickZoom();
+		}
+	};
+
+	MapHelper.enableDoubleClickZoom = function(map)
+	{
+		if (map.mapView)
+		{
+			if (map._viewDoubleClickEvent)
+			{
+				map._viewDoubleClickEvent.remove();
+				map._viewDoubleClickEvent = null;
+			}
+		}
+		else
+		{
+			map.enableDoubleClickZoom();
+		}
+	};
+	
 	MapHelper.centerAndZoom = function(map, point, zoom)
 	{
 		map.mapView.center = new tf.map.ArcGIS.Point({ x: point.x, y: point.y, spatialReference: { wkid: point.spatialReference.wkid } });
@@ -234,6 +306,15 @@
 		}
 
 		return symbol;
+	};
+
+	MapHelper.getGraphics = function(layer)
+	{
+		if (layer.graphics.items)
+		{
+			return layer.graphics.items;
+		}
+		return layer.graphics;
 	};
 
 	MapHelper.getColorArray = function(color)
