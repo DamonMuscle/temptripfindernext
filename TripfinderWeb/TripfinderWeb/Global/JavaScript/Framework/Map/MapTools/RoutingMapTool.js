@@ -26,6 +26,7 @@
 			printAvailable: false,
 			isDetailView: false,
 			thematicInfo: null,
+			GoogleStreet: true,
 			legendStatus: null,
 			onThematicChanged: null,
 			onLegendStatusChanged: null,
@@ -229,6 +230,16 @@
 				header: 'Thematics',
 				icon: 'thematics',
 				click: self.thematicsToolClick.bind(self)
+			}));
+		}
+		
+		if (this.options.GoogleStreet)
+		{
+			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+				header: 'Google Street View',
+				icon: 'googlestreet',
+				closable: true,
+				click: self.googleStreetClick.bind(self)
 			}));
 		}
 
@@ -677,6 +688,17 @@
 		self.geoFinderTool.startGeoFinder(e.config.type);
 	};
 
+	RoutingMapTool.prototype.googleStreetClick = function(e, data)
+	{
+		var self = this;
+		if (!self.googleStreetTool)
+			self.googleStreetTool = new TF.Map.GoogleStreetTool(self.routingMapDocumentViewModel._map, tf.map.ArcGIS, self.getRouteState(), this);
+
+		var isActive = self.googleStreetTool.isMeasurementActive();
+		if (isActive) self.googleStreetTool.deactivate();
+		else self.googleStreetTool.activate();
+	};
+	
 	RoutingMapTool.prototype.baseMapBtnClick = function (menuItem)
 	{
 		this.toggleBaseMapGalleryDisplayStatus(menuItem);
