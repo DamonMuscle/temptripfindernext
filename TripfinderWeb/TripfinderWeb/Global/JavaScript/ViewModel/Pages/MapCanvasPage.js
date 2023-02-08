@@ -56,19 +56,19 @@
 	{
 		var self = this;
 		var routeState = self.routeState;
-		self.travelScenariosPaletteViewModel = {}; // new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
-		self.directionPaletteViewModel = {}; // new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
-		self.parcelPaletteViewModel = {}; // new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
-		self.boundaryPaletteViewModel = {}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
-		self.mapEditingPaletteViewModel = {}; // new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
-		self.mapLayersPaletteViewModel = {}; // new TF.RoutingMap.MapLayersPaletteViewModel(self, true, routeState);
-		self.routingPaletteViewModel = {}; // new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);
-		self.customMapPaletteViewModel = {}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
-		self.gpsPaletteViewModel = {}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
-		self.geoSearchPaletteViewModel = {}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
-		self.routingMapPanelManager = {}; // new TF.RoutingMap.RoutingMapPanelManager(self);
-		self.traceManager = {}; // new TF.RoutingMap.TracingManager();
-		self.routingSnapManager = {}; // new TF.Document.RoutingSnapManger(self);
+		self.travelScenariosPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
+		self.directionPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
+		self.parcelPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
+		self.boundaryPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
+		self.mapEditingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
+		self.mapLayersPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapLayersPaletteViewModel(self, true, routeState);
+		self.routingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);
+		self.customMapPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
+		self.gpsPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
+		self.geoSearchPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
+		self.routingMapPanelManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.RoutingMapPanelManager(self);
+		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
+		self.routingSnapManager = {obShow: ko.observable(false)}; // new TF.Document.RoutingSnapManger(self);
 		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
 		// self.routingPaletteViewModel.unassignedStudentViewModel.eventsManager.requireDetails.subscribe((e, data) =>
 		// {

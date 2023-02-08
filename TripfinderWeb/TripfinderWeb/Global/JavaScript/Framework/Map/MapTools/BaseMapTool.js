@@ -395,6 +395,14 @@
 	BaseMapTool.prototype.BuildSubMenuItems = function(menuItem)
 	{
 		var self = this;
+
+		menuItem.children.forEach((item) => {
+			if(!item.toggleStatus)
+			{
+				item.toggleStatus = ko.observable(false);
+			}
+		});
+
 		var items = menuItem.children;
 		if (!items || items.length === 0)
 		{
