@@ -1167,24 +1167,24 @@
 		this.onUpdateRecordsEvent.unsubscribeAll();
 		this.menuDataUpdateEvent.unsubscribeAll();
 		this.onStopEditingEvent.unsubscribeAll();
-		this.routingSnapManager.dispose();
+		// this.routingSnapManager.dispose();
 
-		this.directionPaletteViewModel.dispose();
-		this.parcelPaletteViewModel.dispose();
-		this.boundaryPaletteViewModel.dispose();
-		this.mapEditingPaletteViewModel.dispose();
-		this.travelScenariosPaletteViewModel.dispose();
-		this.mapLayersPaletteViewModel.dispose();
-		this.routingPaletteViewModel.dispose();
-		this.customMapPaletteViewModel.dispose();
-		this.gpsPaletteViewModel.dispose();
-		this.geoSearchPaletteViewModel.dispose();
-		this.routingMapPanelManager.dispose();
-		this.wayfinderPaletteViewModel && this.wayfinderPaletteViewModel.dispose();
+		// this.directionPaletteViewModel.dispose();
+		// this.parcelPaletteViewModel.dispose();
+		// this.boundaryPaletteViewModel.dispose();
+		// this.mapEditingPaletteViewModel.dispose();
+		// this.travelScenariosPaletteViewModel.dispose();
+		// this.mapLayersPaletteViewModel.dispose();
+		// this.routingPaletteViewModel.dispose();
+		// this.customMapPaletteViewModel.dispose();
+		// this.gpsPaletteViewModel.dispose();
+		// this.geoSearchPaletteViewModel.dispose();
+		// this.routingMapPanelManager.dispose();
+		// this.wayfinderPaletteViewModel && this.wayfinderPaletteViewModel.dispose();
 
-		this._directionsTool && this._directionsTool.dispose();
-		this.RoutingMapTool && this.RoutingMapTool.dispose();
-		tf.documentEvent.unbindAllByRouteState(this.routeState);
+		// this._directionsTool && this._directionsTool.dispose();
+		// this.RoutingMapTool && this.RoutingMapTool.dispose();
+		// tf.documentEvent.unbindAllByRouteState(this.routeState);
 		PubSub.unsubscribe(this.mapCanvasUpdatedRecord);
 		PubSub.unsubscribe(this.menuDataUpdatd);
 
@@ -1196,6 +1196,6 @@
 		this._map && this._map.mapView && this._map.mapView.destroy();
 		this._map && this._map.destroy();
 
-		TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
+		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
 	};
 })();
