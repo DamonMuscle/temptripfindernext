@@ -417,6 +417,11 @@
 		return false;
 	}
 
+	AuthManager.prototype.hasTraffic = function()
+	{
+		return this.supportedProducts.some((c) => { return c.Name == "Traffic"; });
+	};
+
 	AuthManager.prototype.updateAuthInfos = function()
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
