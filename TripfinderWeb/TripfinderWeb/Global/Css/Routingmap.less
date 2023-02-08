@@ -1578,17 +1578,23 @@ html {
 	background-color: #FFFFFF;
 }
 
-.off-map-tool .thematic-menu {
-	z-index: 19999;
-	width: 185px;
-	font-size: 15px;
-
-	&.is-phone-device {
-		max-height: 50vh;
-		overflow-y: scroll;
+.off-map-tool {
+	&.active {
+		z-index: 1000;
 	}
-	.thematic-menu-content ul li {
-		padding-right: 0px;
+
+	.thematic-menu {
+		z-index: 19999;
+		width: 185px;
+		font-size: 15px;
+
+		&.is-phone-device {
+			max-height: 50vh;
+			overflow-y: scroll;
+		}
+		.thematic-menu-content ul li {
+			padding-right: 0px;
+		}
 	}
 }
 
