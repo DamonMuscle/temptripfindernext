@@ -507,6 +507,30 @@
 		});
 	}
 
+	MapHelper.getPointExtent = function(map, point, tolerance)
+	{
+		var screenPoint = map.toScreen ? map.toScreen(point) : map.mapView.toScreen(point);
+		tolerance = tolerance || 10;
+		var p1, p2;
+		if (screenPoint.offset)
+		{
+			p1 = map.toMap(screenPoint.offset(-tolerance, tolerance));
+			p2 = map.toMap(screenPoint.offset(tolerance, -tolerance));
+		} else
+		{
+			var s1 = {};
+			s1.x = screenPoint.x - tolerance;
+			s1.y = screenPoint.y + tolerance;
+			var s2 = {};
+			s2.x = screenPoint.x + tolerance;
+			s2.y = screenPoint.y - tolerance;
+			p1 = map.mapView.toMap(s1);
+			p2 = map.mapView.toMap(s2);
+		}
+		var extent = new tf.map.ArcGIS.Extent(p1.x, p1.y, p2.x, p2.y, map.spatialReference || map.mapView.spatialReference);
+		return extent;
+	};
+
 	MapHelper.prototype.dispose = function()
 	{
 		var self = this;

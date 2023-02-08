@@ -31,7 +31,7 @@
 			onLegendStatusChanged: null,
 			obTrips: null
 		}, options);
-		self.options.trafficMapAvailable = false;
+		self.options.trafficMapAvailable = self.options.trafficMapAvailable && tf.authManager.hasTraffic();;
 		self.routingMapDocumentViewModel = routingMapDocumentViewModel;
 		self.$container = routingMapDocumentViewModel.element;
 		TF.Map.BaseMapTool.call(
