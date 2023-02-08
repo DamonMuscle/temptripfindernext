@@ -1,0 +1,19 @@
+<div class="doc document-map">
+    <div class="map-page" data-bind="uiInit:init">
+        <div class="main_container noselect DesktopModal">
+            <div class="map_panel">
+                <div class="map"></div>
+            </div>
+            <!-- ko foreach: palettes -->
+            <div data-bind="template: { name: 'workspace/RoutingMap/RoutingMapPanel/RoutingMapPanel', data: $data}"></div>
+            <!-- /ko -->
+            <!-- ko foreach: editModals -->
+            <div data-bind="template: { name: $data.template, data: $data}"></div>
+            <!-- /ko -->
+            <div id="esriDirectionWidgetContainer">
+                <div id="esriDirectionWidget"></div>
+            </div>
+        </div>
+        <div data-bind="template: { name: 'workspace/DocumentToastMessage', data: $data}"></div>
+    </div>
+</div>

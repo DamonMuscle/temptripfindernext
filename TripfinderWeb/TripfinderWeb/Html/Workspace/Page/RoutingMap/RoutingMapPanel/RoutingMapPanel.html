@@ -1,0 +1,14 @@
+﻿<div class="routingmap_panel" data-bind="uiInit:init, css:obDockStyle, visible:obVisible">
+	<div class="slide-container">
+		<div class="panel-handle" data-bind="click: togglePanel, attr:{ title: obTitle} "></div>
+	</div>
+	<div class="left-resize-handle" style="background-clip: padding-box;-webkit-background-clip: padding-box; "></div>
+	<div class="right-resize-handle" style="background-clip: padding-box;-webkit-background-clip: padding-box; "></div>
+	<div class="bottom-resize-handle" style="background-clip: padding-box;-webkit-background-clip: padding-box; "></div>
+	<div class="resize-handle" style="background-clip: padding-box;-webkit-background-clip: padding-box; "></div>
+	<div class="drop-mask"></div>
+	<div class="list-container" data-bind="css:isScrollable?'scrollable':'un-scrollable'">
+		<div class="list">
+		</div>
+	</div>
+</div>

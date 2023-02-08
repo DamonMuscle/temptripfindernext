@@ -417,6 +417,10 @@
 				pageData = new TF.Page.MyRequestSchedulerPage(gridType);
 				templateName = "workspace/page/schedulerpage";
 				break;
+			case "mapcanvas":
+				pageData = new TF.Page.MapCanvasPage();
+				templateName = "workspace/page/RoutingMap/mapcanvaspage";
+				break;
 		}
 
 		self.resizablePage.leftPageType = type;
