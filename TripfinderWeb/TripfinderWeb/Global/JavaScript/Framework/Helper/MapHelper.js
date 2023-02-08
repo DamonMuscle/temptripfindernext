@@ -49,27 +49,27 @@
 				id: "streets-vector"
 			})
 		},
-		{
-			title: "White Canvas",
-			id: WhiteCanvasMapId,
-			thumbnail: 'data:image/svg+xml;charset=UTF-8;base64,' +
-				btoa(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" width="93" height="63">
-					<rect width="93" height="63" stroke-width="1" stroke="black" fill="white"></rect>
-				</svg>`),
-			getBasemap: () => new tf.map.ArcGIS.Basemap({
-				baseLayers: [],
-				id: WhiteCanvasMapId,
-				title: "White Canvas"
-			})
-		},
-		{
-			title: "My Maps (Vector Tile)",
-			id: "my-maps",
-			thumbnail: 'data:image/svg+xml;charset=UTF-8;base64,' +
-				btoa(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" width="93" height="63">
-					<rect width="93" height="63" stroke-width="1" stroke="black" fill="white"></rect>
-				</svg>`),
-		},
+		// {
+		// 	title: "White Canvas",
+		// 	id: WhiteCanvasMapId,
+		// 	thumbnail: 'data:image/svg+xml;charset=UTF-8;base64,' +
+		// 		btoa(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" width="93" height="63">
+		// 			<rect width="93" height="63" stroke-width="1" stroke="black" fill="white"></rect>
+		// 		</svg>`),
+		// 	getBasemap: () => new tf.map.ArcGIS.Basemap({
+		// 		baseLayers: [],
+		// 		id: WhiteCanvasMapId,
+		// 		title: "White Canvas"
+		// 	})
+		// },
+		// {
+		// 	title: "My Maps (Vector Tile)",
+		// 	id: "my-maps",
+		// 	thumbnail: 'data:image/svg+xml;charset=UTF-8;base64,' +
+		// 		btoa(`<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" width="93" height="63">
+		// 			<rect width="93" height="63" stroke-width="1" stroke="black" fill="white"></rect>
+		// 		</svg>`),
+		// },
 	];
 
 	namespace.MapHelper = MapHelper;
