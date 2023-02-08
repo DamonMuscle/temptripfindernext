@@ -1,0 +1,13 @@
+<div class=" toast-messages document-dataentry page-level-message-container container" data-bind="event:{mouseenter:toastMessagesMouseEnter,mouseleave:toastMessagesMouseLeave}" style="position:fixed">
+		<!--ko foreach:obToastMessages-->
+		<div class="edit-success" data-bind="css:{'edit-success':type=='success','edit-error':type=='error','toast-messages-fade':obFade}">
+			<div class="icon-container">
+				<span class="iconbutton success" data-bind="css:{'success':type=='success','error':type=='error'}"></span>
+			</div>
+			<div class="success-description" data-bind="css:{'success-description':type=='success','error-description':type=='error'}">
+				<span data-bind="htmlWithBinding:content"></span>
+			</div>
+			<div class="close-button" data-bind="click :$parent.closeToastMessages"></div>
+		</div>
+		<!-- /ko -->
+</div>

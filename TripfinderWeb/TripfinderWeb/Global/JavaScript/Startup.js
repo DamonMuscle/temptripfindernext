@@ -378,7 +378,7 @@
 					}
 				});
 
-				return Promise.all([p1, p2, p3, p4, p5])
+				return Promise.all([p1, p2, p3, p4, p5, TF.initSystemMapSettings()])
 					.then(function()
 					{
 						TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub', 'TimeZoneInfoHub']);

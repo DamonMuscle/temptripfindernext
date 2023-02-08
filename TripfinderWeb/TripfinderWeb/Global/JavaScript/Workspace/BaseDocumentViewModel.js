@@ -130,7 +130,7 @@
 	BaseDocumentViewModel.prototype.addToHash = function()
 	{
 		//add the page to userpreference to take the sequence first
-		tf.documentManagerViewModel.addToHash(this);
+		// tf.documentManagerViewModel.addToHash(this);
 	};
 
 	BaseDocumentViewModel.prototype.initialize = function()
@@ -148,7 +148,7 @@
 
 	BaseDocumentViewModel.prototype.closeThisDocument = function()
 	{
-		tf.documentManagerViewModel.closeDocument(this);
+		// tf.documentManagerViewModel.closeDocument(this);
 	};
 
 	BaseDocumentViewModel.prototype.raiseRouteChangeRequest = function()

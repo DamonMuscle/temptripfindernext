@@ -1018,3 +1018,60 @@ Math.tfRound = function(value, precision = 0)
 
 	return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision);
 }
+
+//#region Map Canvas Associated
+
+const defaultMapSettings = {
+	extent: {
+		spatialReference: {
+			wkid: 102100
+		},
+		xmin: -8232222.558154176,
+		ymin: 5280026.892399614,
+		xmax: -8219056.253699447,
+		ymax: 5289017.815833504
+	}
+};
+
+if (typeof MapSettings == "undefined")
+{
+	MapSettings = {};
+}
+
+createNamespace("TF").initSystemMapSettings = function()
+{
+	return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo?InfoID=MapSettings"), null, { overlay: false })
+		.then(function(response)
+		{
+			if (response.Items && response.Items.length)
+			{
+				const json = response.Items[0].InfoValue;
+				try
+				{
+					MapSettings = JSON.parse(json);
+				}
+				catch (ex)
+				{
+				}
+			}
+		});
+};
+createNamespace("TF").getMapSettings = function()
+{
+	const userMapSettings = tf.userPreferenceManager.get("rfweb.mapSettings") || {};
+	return $.extend({}, defaultMapSettings, MapSettings, userMapSettings);
+};
+
+createNamespace("TF").createDefaultMapExtent = function()
+{
+	const settings = TF.getMapSettings() || {},
+		extentSettings = settings.extent;
+	if (extentSettings)
+	{
+		return new tf.map.ArcGIS.Extent(extentSettings);
+	}
+
+	return null;
+};
+
+//#endregion
