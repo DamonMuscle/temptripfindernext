@@ -35,7 +35,7 @@
 		// arrange the panels and palettes.
 
 		self.palettes = ko.observableArray([]);
-		// self.initViewModels();
+		self.initViewModels();
 		this.isEnableTrace = false;
 		this.changeHighlight = this.changeHighlight.bind(this);
 		this.autoPan = null;
@@ -57,27 +57,27 @@
 		var self = this;
 		var routeState = self.routeState;
 		self.travelScenariosPaletteViewModel = {}; // new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
-		self.directionPaletteViewModel = new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
-		self.parcelPaletteViewModel = new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
-		self.boundaryPaletteViewModel = new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
-		self.mapEditingPaletteViewModel = new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
-		self.mapLayersPaletteViewModel = new TF.RoutingMap.MapLayersPaletteViewModel(self, true, routeState);
-		self.routingPaletteViewModel = new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);
-		self.customMapPaletteViewModel = new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
-		self.gpsPaletteViewModel = new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
-		self.geoSearchPaletteViewModel = new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
-		self.routingMapPanelManager = new TF.RoutingMap.RoutingMapPanelManager(self);
-		self.traceManager = new TF.RoutingMap.TracingManager();
-		self.routingSnapManager = new TF.Document.RoutingSnapManger(self);
-		self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
-		self.routingPaletteViewModel.unassignedStudentViewModel.eventsManager.requireDetails.subscribe((e, data) =>
-		{
-			self.requireDetails.notify(data);
-		});
-		self.routingPaletteViewModel.tripViewModel.eventsManager.requireDetails.subscribe((e, data) =>
-		{
-			self.requireDetails.notify(data);
-		});
+		self.directionPaletteViewModel = {}; // new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
+		self.parcelPaletteViewModel = {}; // new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
+		self.boundaryPaletteViewModel = {}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
+		self.mapEditingPaletteViewModel = {}; // new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
+		self.mapLayersPaletteViewModel = {}; // new TF.RoutingMap.MapLayersPaletteViewModel(self, true, routeState);
+		self.routingPaletteViewModel = {}; // new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);
+		self.customMapPaletteViewModel = {}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
+		self.gpsPaletteViewModel = {}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
+		self.geoSearchPaletteViewModel = {}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
+		self.routingMapPanelManager = {}; // new TF.RoutingMap.RoutingMapPanelManager(self);
+		self.traceManager = {}; // new TF.RoutingMap.TracingManager();
+		self.routingSnapManager = {}; // new TF.Document.RoutingSnapManger(self);
+		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
+		// self.routingPaletteViewModel.unassignedStudentViewModel.eventsManager.requireDetails.subscribe((e, data) =>
+		// {
+		// 	self.requireDetails.notify(data);
+		// });
+		// self.routingPaletteViewModel.tripViewModel.eventsManager.requireDetails.subscribe((e, data) =>
+		// {
+		// 	self.requireDetails.notify(data);
+		// });
 	};
 
 	MapCanvasPage.prototype.init = function(model, element)
@@ -627,11 +627,11 @@
 					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel));
 				}
 
-				if (tf.authManager.hasWayfinder())
-				{
-					self.wayfinderPaletteViewModel = new TF.RoutingMap.WayfinderPaletteViewModel(self, true, self.routeState);
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Wayfinder', 'wayfinder', self.wayfinderPaletteViewModel, self.togglePalettePanel));
-				}
+				// if (tf.authManager.hasWayfinder())
+				// {
+				// 	self.wayfinderPaletteViewModel = new TF.RoutingMap.WayfinderPaletteViewModel(self, true, self.routeState);
+				// 	palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Wayfinder', 'wayfinder', self.wayfinderPaletteViewModel, self.togglePalettePanel));
+				// }
 
 				return palettes;
 			}
