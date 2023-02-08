@@ -389,6 +389,16 @@
 		this.password = tf.storageManager.get("password", true);
 	};
 
+	AuthManager.prototype.hasGPS = function()
+	{
+		return this.supportedProducts.some((c) => { return c.Name == "GPSConnect"; });
+	};
+
+	AuthManager.prototype.hasWayfinder = function()
+	{
+		return this.supportedProducts.some((c) => { return c.Name.toLowerCase() == "wayfinder"; });
+	};
+
 	AuthManager.prototype.hasFormsResultsAccess = function(type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
