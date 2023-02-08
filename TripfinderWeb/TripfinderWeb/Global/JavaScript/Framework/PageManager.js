@@ -381,6 +381,9 @@
 			self.obPages()[0].data.dispose();
 			self.obPages()[0].data = null;
 		}
+
+		const routeState = Math.random().toString(36).substring(7);
+
 		switch (type)
 		{
 			case "approvals":
@@ -418,7 +421,7 @@
 				templateName = "workspace/page/schedulerpage";
 				break;
 			case "mapcanvas":
-				pageData = new TF.Page.MapCanvasPage();
+				pageData = new TF.Page.MapCanvasPage(null, routeState);
 				templateName = "workspace/page/RoutingMap/mapcanvaspage";
 				break;
 		}

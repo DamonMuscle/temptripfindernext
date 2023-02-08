@@ -74,6 +74,15 @@
 		}
 		else
 		{
+			if (tf.pageManager && tf.pageManager.obPages()[0])
+			{
+				const routeState = tf.pageManager.obPages()[0].data.routeState;
+				if (routeState)
+				{
+					return routeState;
+				}
+			}
+
 			return tf.storageManager.get("routeState", false, true);
 		}
 	};
