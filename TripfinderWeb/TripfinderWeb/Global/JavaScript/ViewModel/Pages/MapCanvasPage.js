@@ -604,12 +604,12 @@
 			buildPalettes: function()
 			{
 				const palettes = [
-					TF.Map.RoutingMapTool.buildMenuItem('Boundary Planning', 'boundary', self.boundaryPaletteViewModel, self.togglePalettePanel),
+					// TF.Map.RoutingMapTool.buildMenuItem('Boundary Planning', 'boundary', self.boundaryPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Map Viewer', 'custommap', self.customMapPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
+					// TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
+					// TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
 				];
 
 				if (tf.authManager.hasGPS())
@@ -619,12 +619,12 @@
 
 				if (tf.authManager.isAuthorizedFor("mapEdit", "read"))
 				{
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Map Editing', 'mapedit', self.mapEditingPaletteViewModel, self.togglePalettePanel));
+					// palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Map Editing', 'mapedit', self.mapEditingPaletteViewModel, self.togglePalettePanel));
 					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Travel Scenarios', 'travelScenarios', self.travelScenariosPaletteViewModel, self.togglePalettePanel));
 				}
 				if (tf.authManager.isAuthorizedFor("routingMap", 'read'))
 				{
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel));
+					// palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel));
 				}
 
 				// if (tf.authManager.hasWayfinder())
