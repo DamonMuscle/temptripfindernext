@@ -1381,8 +1381,9 @@
 	{
 		if (items.length > 0)
 		{
-			var extent = EsriTool.getCenterExtentMultipleItem(map, items);
-			return map.mapView.goTo(extent);
+			// var extent = EsriTool.getCenterExtentMultipleItem(map, items);
+			// return map.mapView.goTo(extent);
+			return map.mapView.goTo(items);
 		}
 		return Promise.resolve();
 	};
