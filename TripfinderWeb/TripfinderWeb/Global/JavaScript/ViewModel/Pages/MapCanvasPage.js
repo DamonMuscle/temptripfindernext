@@ -98,7 +98,7 @@
 			{
 				try
 				{
-					// updatingEvent.remove();
+					updatingEvent.remove();
 					// self._map.mapView.watch(["extent", "rotation"], self._refreshMapArrow.bind(self));
 					// self._map.mapView.on("drag", () =>
 					// {
