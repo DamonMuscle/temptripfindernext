@@ -24,7 +24,8 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tokens"), {
 			paramData: {
 				verify: true,
-				includeAuthInfo: true
+				includeAuthInfo: true,
+				includeUserEntity: false
 			}
 		}, { overlay: false }).then(function(response)
 		{
@@ -73,8 +74,10 @@
 			}
 
 			tf.promiseBootbox.alert("Login session expired")
-				.then(function () {
-					if (tf.cfConnection) {
+				.then(function()
+				{
+					if (tf.cfConnection)
+					{
 						tf.cfConnection.stop();
 					}
 					self._authManager.logOffTag = true;
