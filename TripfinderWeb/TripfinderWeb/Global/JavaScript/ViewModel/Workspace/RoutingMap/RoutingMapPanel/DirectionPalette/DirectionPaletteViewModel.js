@@ -4,7 +4,6 @@
 
 	function DirectionPaletteViewModel(viewModal, isOpen, routeState)
 	{
-		console.log("DirectionPaletteViewModel()");
 		var self = this;
 		TF.RoutingMap.BasePaletteViewModel.call(self, viewModal, isOpen, routeState);
 		self.type = "direction";

@@ -60,7 +60,7 @@
 			self[name + "ViewModel"].isShowMode(isShow);
 			self[name + "ViewModel"].show();
 		});
-		tf.gaHelper.send('Area', 'Map Editing');
+		// tf.gaHelper.send('Area', 'Map Editing');
 		this.addShowCount();
 		return Promise.resolve(true);
 	};
