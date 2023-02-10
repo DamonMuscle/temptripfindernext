@@ -201,11 +201,80 @@
 			map.enableDoubleClickZoom();
 		}
 	};
+
+	MapHelper.disablePan = function(map)
+	{
+		if (map.mapView)
+		{
+			map._viewDragEvent = map.mapView.on('drag', function(event)
+			{
+				event.stopPropagation();
+			});
+
+			map._viewKeyDownEvent = map.mapView.on('key-down', function(event)
+			{
+				var keyPressed = event.key;
+				if (keyPressed.slice(0, 5) === "Arrow")
+				{
+					event.stopPropagation();
+				}
+			});
+		}
+		else
+		{
+			map.disablePan();
+		}
+	};
+
+	MapHelper.enablePan = function(map)
+	{
+		if (map.mapView)
+		{
+			if (map._viewDragEvent)
+			{
+				map._viewDragEvent.remove();
+				map._viewDragEvent = null;
+			}
+
+			if (map._viewKeyDownEvent)
+			{
+				map._viewKeyDownEvent.remove();
+				map._viewKeyDownEvent = null;
+			}
+		}
+		else
+		{
+			map.enablePan();
+		}
+	};
 	
 	MapHelper.centerAndZoom = function(map, point, zoom)
 	{
 		map.mapView.center = new tf.map.ArcGIS.Point({ x: point.x, y: point.y, spatialReference: { wkid: point.spatialReference.wkid } });
 		map.mapView.zoom = zoom;
+	};
+
+	MapHelper.getMapGraphicsLayerIds = function(map)
+	{
+		var layers = map.layers.toArray(),
+			graphicsLayers = layers.filter(function(layer)
+			{
+				return layer.type === 'graphics';
+			});
+		return graphicsLayers.map(function(layer)
+		{
+			return layer.id;
+		});
+	};
+
+	MapHelper.getMapLayerIndex = function(map, layerId)
+	{
+		var layers = map.layers.toArray(),
+			layerIds = layers.map(function(layer)
+			{
+				return layer.id;
+			});
+		return $.inArray(layerId, layerIds);
 	};
 
 	MapHelper.bind = function(map, event, callback)

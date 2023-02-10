@@ -128,6 +128,7 @@
 				self._tripVertexLayer.removeAll();
 				self._clearWayPoints();
 				self.notifyDirectionChanged();
+				console.error(error)
 				return Promise.reject(error);
 			})
 		})

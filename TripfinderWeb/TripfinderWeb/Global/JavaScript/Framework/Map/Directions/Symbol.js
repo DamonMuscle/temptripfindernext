@@ -24,18 +24,18 @@
 		self._lastDestinationPointFill = '#CC0000';
 		self._destinationPointSize = 20;
 
-		self._firstStopImgUrl = "../../Global/img/Routing Map/destinations/greenPoint.png";
-		self._firstStopMoveImgUrl = "../../Global/img/Routing Map/destinations/greenPointMove.png";
-		self._stopImgUrl = "../../Global/img/Routing Map/destinations/bluePoint.png";
-		self._stopMoveImgUrl = "../../Global/img/Routing Map/destinations/bluePointMove.png";
-		self._lastStopImgUrl = "../../Global/img/Routing Map/destinations/redPoint.png";
-		self._lastStopMoveImgUrl = "../../Global/img/Routing Map/destinations/redPointMove.png";
+		self._firstStopImgUrl = "Global/img/Routing Map/destinations/greenPoint.png";
+		self._firstStopMoveImgUrl = "Global/img/Routing Map/destinations/greenPointMove.png";
+		self._stopImgUrl = "Global/img/Routing Map/destinations/bluePoint.png";
+		self._stopMoveImgUrl = "Global/img/Routing Map/destinations/bluePointMove.png";
+		self._lastStopImgUrl = "Global/img/Routing Map/destinations/redPoint.png";
+		self._lastStopMoveImgUrl = "Global/img/Routing Map/destinations/redPointMove.png";
 		self._stopImgWidth = 21;
 		self._stopImgHight = 29;
 		self._stopImgXOffset = 0;
 		self._stopImgYOffset = 10;
 
-		self.roundTripStopPointUrl = '../../Global/img/direction-setting-panel/Directions-Bullseye.png';
+		self.roundTripStopPointUrl = 'Global/img/direction-setting-panel/Directions-Bullseye.png';
 		self.roundTripStopPointWidth = 20;
 		self.roundTripStopPointHeight = 20;
 

@@ -4,7 +4,7 @@ if (typeof kendo != 'undefined')
 }
 $(function()
 {
-	var tf = createNamespace("tf.debug");
+	const tf = createNamespace("tf");
 	tf.startup = new TF.Startup();
 	tf.startup.start();
 });
@@ -1041,6 +1041,130 @@ createNamespace("TF").createDefaultMapExtent = function()
 	}
 
 	return null;
+};
+
+/*reversegeocode by use choose param(addresspoint or address)*/
+createNamespace("TF").locationToAddress = function(geometry, param, geocodeServiceUrl)
+{
+	var addressPointGeocoder, streetGeocoder;
+	return tf.startup.loadArcgisUrls().then(function()
+	{
+		addressPointGeocoder = new tf.map.ArcGIS.Locator(geocodeServiceUrl || arcgisUrls.AddressPointGeocodeService);
+		streetGeocoder = new tf.map.ArcGIS.Locator(geocodeServiceUrl || arcgisUrls.StreetGeocodeServiceFile);
+		if (param && param.GeocodeType === TF.Helper.TripHelper.GeocodeSource.addressPoint.value)
+		{
+			return addressPointGeocoder.locationToAddress({ location: geometry }).then(function(apResult)
+			{
+				apResult.attributes.Street = normalizeStreet(apResult.attributes.Street ? apResult.attributes.Street : apResult.attributes.Address);
+				return apResult.attributes;
+
+			}, function()
+			{
+				return false;
+			});
+		}
+		else if (param && param.GeocodeType === TF.Helper.TripHelper.GeocodeSource.mapStreet.value)
+		{
+			return streetGeocoder.locationToAddress({ location: geometry }).then(function(streetResult)
+			{
+				streetResult.attributes.Street = normalizeStreet(streetResult.attributes.Street ? streetResult.attributes.Street : streetResult.attributes.Address);
+				return streetResult.attributes;
+			}, function()
+			{
+				return false;
+			});
+		} else
+		{
+			return addressPointGeocoder.locationToAddress({ location: geometry }).then(function(apResult)
+			{
+				apResult.attributes.Street = normalizeStreet(apResult.attributes.Street ? apResult.attributes.Street : apResult.attributes.Address);
+				return apResult.attributes;
+
+			}, function()
+			{
+				return streetGeocoder.locationToAddress({ location: geometry }).then(function(streetResult)
+				{
+					streetResult.attributes.Street = normalizeStreet(streetResult.attributes.Street ? streetResult.attributes.Street : streetResult.attributes.Address);
+					return streetResult.attributes;
+				}, function()
+				{
+					return false;
+				});
+			});
+		}
+
+	});
+
+	function normalizeStreet(street)
+	{
+		var result = /(\d*\.?\d*)(.*)/.exec(street);
+		if (result.length > 2 && result[1])
+		{
+			return parseInt(result[1]) + result[2];
+		}
+		return street;
+	}
+};
+
+createNamespace("TF").queryTravelSCenarios = function(scenarioId, isRouting)
+{
+	var promiseCurbApproachsFile = null;
+	var promiseTravelRegionsFile = null;
+	if (isRouting)
+	{
+		promiseCurbApproachsFile = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/24", scenarioId);
+		promiseTravelRegionsFile = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/25", scenarioId);
+	}
+	else
+	{
+		promiseCurbApproachsFile = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/24", scenarioId);
+		promiseTravelRegionsFile = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/25", scenarioId);
+	}
+	return Promise.all([promiseCurbApproachsFile, promiseTravelRegionsFile]).then(function(data)
+	{
+		return Promise.resolve([data[0].features, data[1].features]);
+	}).catch(function()
+	{
+		tf.loadingIndicator.hideWhenError();
+	});
+};
+
+function cacheQueryFeature(url, scenarioId)
+{
+	const cacheKey = url + "-" + (scenarioId ? scenarioId.toString() : ""), currentTimeSpan = moment();
+	if (window[cacheKey] && window[cacheKey + "TimeSpan"] && currentTimeSpan.diff(window[cacheKey + "TimeSpan"], 'seconds') <= 2)
+	{
+		return Promise.resolve(window[cacheKey]);
+	}
+	if (window["Promise" + cacheKey])
+	{
+		return window["Promise" + cacheKey];
+	}
+	window["Promise" + cacheKey] = queryFeature(url, scenarioId);
+	return window["Promise" + cacheKey].then(result =>
+	{
+		window[cacheKey] = result;
+		window[cacheKey + "TimeSpan"] = moment();
+		window["Promise" + cacheKey] = null;
+		return result;
+	});
+}
+
+function queryFeature(url, scenarioId)
+{
+	let query = new tf.map.ArcGIS.Query();
+	const queryTask = new tf.map.ArcGIS.QueryTask({ url: url });
+	query.outFields = ["*"];
+	query.where = scenarioId ? ("ScenarioId=" + scenarioId) : "1=1";
+	query.returnGeometry = true;
+	return queryTask.execute(query);
+}
+
+createNamespace("TF").uturnDic = {
+	"allow-backtrack": "esriNFSBAllowBacktrack",
+	"at-dead-ends-only": "esriNFSBAtDeadEndsOnly",
+	"at-dead-ends-and-intersections": "esriNFSBAtDeadEndsAndIntersections",
+	"no-backtrack": "esriNFSBNoBacktrack"
 };
 
 //#endregion

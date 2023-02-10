@@ -25,8 +25,6 @@
 		self._initialize();
 	}
 
-	Tool.prototype.constructor = Tool;
-
 	Tool.prototype._initializeTooltip = function()
 	{
 		this._tooltipViewModel = null;
