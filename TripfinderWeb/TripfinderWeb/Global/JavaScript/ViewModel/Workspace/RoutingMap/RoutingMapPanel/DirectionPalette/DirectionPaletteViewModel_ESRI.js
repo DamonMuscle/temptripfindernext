@@ -4,7 +4,7 @@
 
 	function DirectionPaletteViewModel(viewModal, isOpen, routeState)
 	{
-		var self = this;
+		const self = this;
 		TF.RoutingMap.BasePaletteViewModel.call(self, viewModal, isOpen, routeState);
 		self.type = "direction";
 		self.title = "Directions";

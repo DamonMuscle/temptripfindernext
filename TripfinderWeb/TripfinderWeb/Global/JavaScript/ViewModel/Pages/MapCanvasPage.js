@@ -109,19 +109,19 @@
 					// }, 50);
 					// self._map.mapView.on("click", self.onRightClickMenu.bind(self));
 					// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
-					// self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
-					// self.autoPan.initialize(self.element, 20);
-					// self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
-					// self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
+					self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
+					self.autoPan.initialize(self.element, 20);
+					self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
+					self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
 
-					// self._initDirectionTool();
+					self._initDirectionTool();
 
 					self._initMapTool();
-					// self.routingMapPanelManager.init();
+					self.routingMapPanelManager.init();
 					// tf.loadingIndicator.tryHide();
 					// PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
 
-					// self._onMapLoad();
+					self._onMapLoad();
 
 					// // the trips that need to be auto open
 					// if (self.DocumentData.data && self.DocumentData.data.trips)
@@ -223,7 +223,7 @@
 
 	MapCanvasPage.prototype._initDirectionTool = function()
 	{
-		var self = this;
+		const self = this;
 
 		self._createDirectionsTool();
 		self._directionsTool.subscribe("onStopChanged", self.stopChanged.bind(self));
@@ -703,7 +703,7 @@
 	{
 		var self = this;
 		tf.loadingIndicator.tryHide();
-		self.routingSnapManager.init(this._map);
+		// self.routingSnapManager.init(this._map);
 		self._initShortKeyDownEvent();
 		// self._initToggleTrace();
 		self._initSketchTool();

@@ -133,7 +133,7 @@
 		if (self.sequence === 1)
 		{
 			// first stop symbol
-			symbol.url = "../../Global/img/Routing Map/destinations/greenPoint.png";
+			symbol.url = "Global/img/Routing Map/destinations/greenPoint.png";
 		}
 		else if (self.stopType === TF.RoutingMap.Directions.Enum.StopTypeEnum.TERMINAL)
 		{
