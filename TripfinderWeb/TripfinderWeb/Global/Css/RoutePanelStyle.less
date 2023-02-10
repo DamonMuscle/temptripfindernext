@@ -1,0 +1,174 @@
+#routing-panel-tool {
+	height: 30px;
+	background-color: #F2F2F2;
+	padding: 0 1px;
+}
+
+#icon {
+	float: left;
+	height: 30px;
+	width: 30px;
+	margin: 0 1px;
+	padding: 0 4px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 16px;
+	cursor: pointer;
+}
+
+#vertical-line {
+	border-right: 1px solid #ccc;
+	width: 1px;
+	float: left;
+	height: 22px;
+	margin-top: 4px;
+}
+
+#Popover-Menu {
+	.menu {
+		position: absolute;
+		top: 30px;
+		left: 66px;
+		z-index: 200;
+		background: linear-gradient(to right, #4b4b4b 30px, #ffffff 30px);
+		width: 220px;
+		display: none;
+		cursor: default;
+
+		.menu-title {
+			margin-top: 10px;
+			border: 1px solid #c5c5c5;
+			border-left: none;
+			border-bottom: none;
+			font-size: 13px;
+			font-weight: bold;
+			line-height: 20px;
+			padding: 20px 0 0 10px;
+		}
+
+		ul {
+			padding: 0 0 20px 0;
+			margin: 0;
+			border: 1px solid #c5c5c5;
+			border-left: none;
+			border-top: none;
+
+			>li {
+				list-style: none;
+				cursor: pointer;
+				height: 30px;
+				margin-left: 0;
+
+				.check {
+					float: left;
+					height: 30px;
+					width: 30px;
+					display: none;
+					background-image: url('../Img/Routing Map/check-white.png');
+					background-position: center;
+					background-size: 12px;
+					background-repeat: no-repeat;
+				}
+
+				&:hover {
+					>.text {
+						background-color: #E7F3FC;
+					}
+				}
+
+				.text {
+					margin-left: 30px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+
+					span {
+						cursor: pointer;
+						padding-left: 10px;
+						padding-right: 10px;
+						line-height: 30px;
+					}
+				}
+
+				&.select {
+					font-weight: bold;
+
+					.check {
+						display: block;
+					}
+				}
+			}
+		}
+	}
+}
+
+.arcgis-search-without-btn-template(@width: 100%) {
+	width: @width;
+
+	.arcgisSearch {
+		.arcgis-search-without-btn-remove-btn-template;
+		.arcgis-search-without-btn-width-template;
+	}
+}
+
+.arcgis-search-without-btn-width-template {
+	width: 100%;
+
+	.searchGroup {
+		width: 100%;
+
+		.searchExpandContainer {
+			width: 100%;
+
+			.searchInputGroup {
+				width: 100%;
+
+				.searchInput {
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+
+.arcgis-search-without-btn-remove-btn-template {
+	.searchClear {
+		display: none;
+	}
+
+	.searchGroup {
+		display: flex;
+	}
+
+	.searchBtn.searchSubmit {
+		display: none;
+	}
+
+	.searchBtn.searchToggle {
+		display: none;
+	}
+
+	.searchGroup .searchInput {
+		font-size: 12px; //width: ~'calc(200px - 12px)';
+		padding: 0;
+		padding: 0 12px;
+		border-radius: 0;
+		border-right: 1px solid #57585A;
+	}
+
+	.searchMenu {
+		border-radius: 0;
+		padding: 0;
+		margin: 0; // border: none;
+		color: #333333;
+		top: 0;
+		left: 0;
+	}
+
+	.searchGroup .searchInput::-webkit-input-placeholder,
+	.searchGroup .searchInput::-moz-placeholder,
+	.searchGroup .searchInput:-ms-input-placeholder,
+	.searchGroup .searchInput:-moz-placeholder {
+		font-size: 12px;
+	}
+}

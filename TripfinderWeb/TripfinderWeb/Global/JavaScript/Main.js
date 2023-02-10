@@ -1044,3 +1044,10 @@ createNamespace("TF").createDefaultMapExtent = function()
 };
 
 //#endregion
+
+function IsEmptyString(str)
+{
+	return (str === null ||
+		str === undefined ||
+		str === "");
+}

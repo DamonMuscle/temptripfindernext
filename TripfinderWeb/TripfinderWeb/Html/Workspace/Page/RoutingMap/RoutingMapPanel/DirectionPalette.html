@@ -1,0 +1,222 @@
+﻿<div class="item-container" data-bind="visible:obShow">
+	<div class="deleteBtn" title="Remove" data-bind="click: $parent.removePanel"></div>
+	<div class="item-header item-header-helper" data-bind="css:type, event: {dblclick: $parent.toggleContent,mousedown:$parent.mouseDown}">
+		<div class="icon"></div>
+		<div class="title" style="width:260px" data-bind="text:obTitle,attr:{title:obTitle}"></div>
+		<div data-bind="visible:isEyeVisible&&isEyeVisible(),click:toggleShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide ' + eyeTitle():'Show '+ eyeTitle()}" class="show-eye"></div>
+	</div>
+
+	<div class="item-content" data-bind="css:className, style: { display: isOpen ? 'block' : 'none' }">
+		<div class="directions-tool">
+			<div class="icon destination-opacity" title="Drop Destinations and Through Points" data-bind="clickButton:{disable:!isShowMode(),click:openDestinationDropModeClick}"></div>
+			<div class="destination-opacity-background" data-bind="css:{'drop-mode-open': obIsDropModeOpen,disable:!isShowMode()}"></div>
+			<div class="vertical-line"></div>
+			<div class="icon print" title="Print" data-bind="clickButton:{disable:obDirectionDetails().length==0,click:printClick}"></div>
+			<div class="print-setting-group" title="Print Settings" data-bind="dropDownMenu">
+				<div class="icon print-setting fixed-menu-btn"></div>
+				<div class="menu" data-bind="click:dropDownMenuClick">
+					<div class="menu-title">Include in Printed Map</div>
+					<ul>
+						<!--ko foreach: {data: obPrintSettingMenu }-->
+						<li data-bind="click:$parents[1].selectPringSettingItemClick">
+							<div class="check"></div>
+							<div class="text"><span data-bind="text: $data"></span></div>
+						</li>
+						<!--/ko-->
+					</ul>
+				</div>
+			</div>
+			<div class="vertical-line"></div>
+			<div class="icon zoom-map-to-layers" title="Zoom Map to Layers" data-bind="clickButton:{disable:!isShowMode(),click:zoomToLayersClick}"></div>
+			<div class="icon clear-all" title="Clear All" data-bind="click:clearAllClick"></div>
+			<div class="uturn-setting-group" title="UTurn Settings" data-bind="dropDownMenu">
+				<div class="icon uturn-setting fixed-menu-btn"></div>
+				<div class="menu">
+					<div class="menu-title">UTurn Policy</div>
+					<ul>
+						<!--ko foreach: {data:  obUturnSettingMenu }-->
+						<li data-bind="click:$parents[1].selectUturnSettingItemClick,css:{select:$index()===0}">
+							<div class="check"></div>
+							<div class="text"><span data-bind="text: $data"></span></div>
+						</li>
+						<!--/ko-->
+					</ul>
+				</div>
+			</div>
+			<div class="vertical-line"></div>
+			<div class="icon iconbutton refresh" title="Refresh" data-bind="click:rerunClick"></div>
+			<div class="print-setting-group pull-right" data-bind="dropDownMenu,visible:tf.authManager.authorizationInfo.isAdmin">
+				<div class="icon settings fixed-menu-btn"></div>
+				<div class="menu">
+					<ul style="padding:15px 0 20px 0">
+						<!--ko foreach: {data: travelScenarios }-->
+						<li data-bind="click:$parents[1].selectSelectTravelScenarioClick,
+							css:{select:check()}">
+							<div class="check"></div>
+							<div class="text"><span data-bind="text: title,attr:{title:title}"></span></div>
+						</li>
+						<!--/ko-->
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="directions-content">
+			<div class="directions-stops">
+				<div class="row">
+					<div class="directions-check-box-group">
+						<input type="checkbox" data-bind="checked: obDestinationDetailsChecked" />
+						<span>Show Details</span>
+						<input type="checkbox" data-bind="checked: obDestinationRoundTripChecked" />
+						<span>Round Trip</span>
+					</div>
+				</div>
+				<div class="row hidden">
+					<div class="directions-check-box-group">
+						<input type="checkbox" data-bind="checked: obChangeRouteChecked" />
+						<span>Change Route</span>
+						<input type="checkbox" data-bind="checked: obMapDetailsChecked" />
+						<span>Map Details</span>
+						<input type="checkbox" data-bind="checked: obShowArrowsChecked" />
+						<span>Show Arrows</span>
+					</div>
+				</div>
+				<div class="row directions-items-wrapper resize-listiner toggler-listiner">
+					<!-- <div class="row directions-items-wrapper"> -->
+					<div class="directions-items">
+						<!--ko foreach: {data: obDestinationsArray } -->
+						<div class="directions-item">
+							<div class="directions-destination-item">
+								<div class="directions-destination-sort" title="Click and drag to adjust the destination sequence." data-bind="click:$parents[1].sequenceDestinationClick"></div>
+								<div class="directions-destination-circle middle-destination-color" data-bind="text: $data.seq, css: {'directions-roundtrip-circle':($parents[1].obDestinationRoundTripChecked() && $index() === 0),'first-destination-color': (!$parents[1].obDestinationRoundTripChecked() &&$index() === 0),'last-destination-color': (!$parents[1].obDestinationRoundTripChecked() && $index() === $parents[1].obDestinationsArray().length - 1)}">
+								</div>
+								<div class="directions-destination-search-wrapper">
+									<div class="data-destination-seq" data-bind="attr: { 'data-destination-seq': $data.seq(), id: 'directions-destination-search-'+ $parent.routeState + $data.seq()}">
+									</div>
+								</div>
+								<div class="directions-destination-button-group">
+									<!--ko if: $data.address() -->
+									<!--ko ifnot:
+								(
+									$index() === 0 ||
+									(
+											!$parent.obDestinationRoundTripChecked() &&
+										$index() === $parents[1].obDestinationsArray().length - 1
+									) || $parents[1].obDestinationsArray().length < 3
+								)
+							-->
+									<div class="directions-destination-set-as-through-point" title="Convert to Through Point" data-bind="click:$parents[1].setAsThroughPointClick"></div>
+									<!--/ko-->
+									<div class="directions-destination-remove" title="Remove" data-bind="click:$parents[1].removeDestinationClick"></div>
+									<!--/ko-->
+								</div>
+							</div>
+
+							<!--ko if: $parents[1].obHasFilledFirstDestOneTime() &&
+						IsEmptyString($data.address()) &&
+						(
+							$index() === 0 || $index() === $parents[1].obDestinationsArray().length - 1
+							|| $parents[1].obDestinationsArray().length < 3
+						)
+					-->
+							<div class="required-message">required</div>
+							<!--/ko-->
+							<!--ko if: $data.throughPoints().length > 0 -->
+							<div class="direction-through-point-content direction-through-point-items">
+								<!--ko foreach: {data: $data.throughPoints } -->
+								<div class="direction-through-point-item">
+									<div class="through-point-circle"></div>
+									<div class="through-point-address" data-bind="text: $parents[2].formatThrougPointDisplayString($data.address()), attr: {title: $parents[2].formatThrougPointDisplayString($data.address())}">
+									</div>
+									<div class="through-point-btn-group">
+										<a class="through-point-link-btn" data-bind="click:$parents[2].removeThroughPointClick">remove</a>
+										<span style="color:darkgray">|</span>
+										<a class="through-point-link-btn" data-bind="click:$parents[2].setAsDestinationClick">set as destination</a>
+									</div>
+								</div>
+								<!--/ko-->
+							</div>
+							<!--/ko-->
+						</div>
+						<!--/ko-->
+						<!-- ko if: obDestinationRoundTripChecked -->
+						<div class="directions-item sticky directions-item-footer">
+							<div class="directions-destination-item" style="margin-left: 14px;">
+								<div class="directions-destination-circle directions-roundtrip-circle" data-bind="text: obDestinationsArray().length + 1 "></div>
+								<div class="directions-destination-address-input">
+									<input type="text" disabled="disabled" data-bind="textInput:obDestinationsArray()[0].address" />
+								</div>
+							</div>
+						</div>
+						<!--/ko-->
+					</div>
+				</div>
+				<div class="row">
+					<div class="directions-item-footer-wrapper">
+						<div class="padding-top-5" data-bind="css:{'directions-item-footer': !obDestinationRoundTripChecked() }">
+						</div>
+						<div class="directions-destination-circle-add-button" data-bind="click:addNewDestinationClick">
+							+
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="collapseExpandController" data-bind="click:togglsStopsDisplay">
+						<div class="icon"></div>
+					</div>
+				</div>
+			</div>
+			<div class="directions-info" data-bind="visible: obIsDirectionAvailable()">
+				<div class="summary">
+					<div class="time">
+						<div class="content">
+							<div class="section hour" data-bind="visible: obTotalTimeHourDisplay() > 0">
+								<div class="value" data-bind="text:obTotalTimeHourDisplay"></div>
+								<div class="unit" data-bind="text:obTotalTimeHourDisplay()>1?'hrs':'hr'"></div>
+							</div>
+							<div class="section minute" data-bind="visible: obTotalTimeMinuteDisplay() > 0">
+								<div class="value" data-bind="text:obTotalTimeMinuteDisplay"></div>
+								<div class="unit" data-bind="text:obTotalTimeMinuteDisplay()>1?'mins':'min'"></div>
+							</div>
+							<div class="section second" data-bind="visible: obTotalTimeHourDisplay() == 0 && obTotalTimeMinuteDisplay() == 0">
+								<div class="value" data-bind="text:obTotalTimeSecondDisplay"></div>
+								<div class="unit" data-bind="text:obTotalTimeSecondDisplay()>1?'secs':'sec'"></div>
+							</div>
+						</div>
+						<div class="description">Total Time</div>
+					</div>
+					<div class="distance">
+						<div class="content">
+							<div class="section mile" data-bind="visible: obTotalDistanceMileDisplay() > 0">
+								<div class="value" data-bind="text:obTotalDistanceMileDisplay"></div>
+								<div class="unit" data-bind="text:obUnitOfMeasure"></div>
+							</div>
+							<div class="section feet" data-bind="visible: obTotalDistanceMileDisplay() == 0">
+								<div class="value">
+									< 0.01</div>
+										<div class="unit" data-bind="text:obUnitOfMeasure"></div>
+								</div>
+							</div>
+							<div class="description">Distance</div>
+						</div>
+					</div>
+					<div class="directions-details">
+						<div class="directions-elementList">
+							<!-- ko foreach: obDirectionDetails -->
+							<div class="directions-element" data-bind="css:{'directions-element-stop':type()=='esriDMTDepart'||type()=='esriDMTStop'},event:{mouseenter:$parent.directionDetailsMouseEnter, mouseleave:$parent.directionDetailsMouseLeave}">
+								<div class="symbol" data-bind="text:$data.sequence, css: $data.type"></div>
+								<div class="text">
+									<div class="instruction" data-bind="text:$data.text, attr: {title: $data.instruction}">
+									</div>
+									<div class="distance" data-bind="text:$data.distance"></div>
+									<div class="time" data-bind="text:$data.time"></div>
+								</div>
+								<div class="vertical-line"></div>
+							</div>
+							<!-- /ko -->
+						</div>
+						<div class="warning">Cannot find a route.</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

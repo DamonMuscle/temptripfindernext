@@ -305,6 +305,7 @@
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
+					self.getArcgisUrls();
 					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
 					return tf.measurementUnitConverter.init();
 				})
@@ -318,11 +319,11 @@
 				.then(function()
 				{
 					return self.loadExagoBIServerUrl()
-						.then(function()
-						{
-							tf.exagoBIHelper = new TF.Helper.ExagoBIHelper();
-							tf.exagoBIHelper.initClientReportContext();
-						})
+					.then(function()
+					{
+						tf.exagoBIHelper = new TF.Helper.ExagoBIHelper();
+						tf.exagoBIHelper.initClientReportContext();
+					});
 				})
 				.then(function()
 				{
@@ -378,6 +379,25 @@
 					});
 
 					return Promise.all([p1, p2, p3, p4, p5, TF.initSystemMapSettings()])
+					.then(function(){
+						return self.loadArcgisUrls().then(function()
+							{
+								return self._registerToken().then(function(response)
+								{
+									if (response)
+									{
+										self.loadSourceOId();
+										return;
+									}
+	
+									return tf.promiseBootbox.alert("An error has occurred with ArcGIS. Please contact Transfinder Support.", "Warning").then(function()
+									{
+										tf.authManager.logOff();
+										return Promise.reject();
+									});
+								});
+							});
+					})
 						.then(function()
 						{
 							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub', 'TimeZoneInfoHub']);
@@ -838,6 +858,154 @@
 		window.addEventListener("beforeunload", function(event)
 		{
 			tf.chatfinderHelper && tf.chatfinderHelper.stop();
+		});
+	};
+
+	Startup.prototype._registerToken = function()
+	{
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase("v2"), "arcgis", "token")).catch(function(err) { console.log("ArcGIS server token failed!") }).then(function(data)
+		{
+			let credentialsJSON = {
+				serverInfos: [],
+				oAuthInfos: [],
+				credentials: []
+			};
+			if (data)
+			{
+				var serverToken = data.Items[0];
+				tf.arcgisTokenInfo = serverToken;
+				var arcgisServer = (serverToken.ArcgisServer[serverToken.ArcgisServer.length - 1] == "/") ? serverToken.ArcgisServer : (serverToken.ArcgisServer + "/");
+				tf.map.ArcGIS.esriConfig.request.trustedServers.push(serverToken.ArcgisServer);
+				credentialsJSON.serverInfos.push({
+					server: arcgisServer,
+					tokenServiceUrl: arcgisServer + "arcgis/admin/generateToken",
+					adminTokenServiceUrl: arcgisServer + "arcgis/admin/generateToken",
+					shortLivedTokenValidity: 60,
+					currentVersion: 10.6,
+					hasServer: true
+				});
+				credentialsJSON.credentials.push({
+					userId: serverToken.UserName,
+					server: arcgisServer + "arcgis",
+					token: serverToken.Token,
+					expires: +serverToken.Expires,
+					validity: 60,
+					isAdmin: false,
+					ssl: false,
+					creationTime: serverToken.Expires - (60000 * 60),
+					scope: "server",
+					resources: [
+						arcgisUrls.AddressPointGeocodeService,
+						arcgisUrls.CreateMmpkGPService,
+						arcgisUrls.MapEditingOneServiceFile,
+						arcgisUrls.MapEditingOneServiceFile.replace('MapServer', 'NAServer'),
+						arcgisUrls.MapEditingOneService,
+						arcgisUrls.MapEditingOneService.replace('FeatureServer', 'MapServer'),
+						arcgisUrls.MasterFileGDBGPService,
+						arcgisUrls.StreetGeocodeServiceFile,
+						arcgisUrls.TFUtilitiesGPService,
+						arcgisUrls.UpdateVectorBasemapService
+					]
+				})
+			}
+			else
+			{
+				return Promise.resolve(true);
+			}
+
+			tf.map.ArcGIS.IdentityManager.destroyCredentials();
+			tf.map.ArcGIS.IdentityManager.initialize(credentialsJSON);
+			tf.map.ArcGIS.IdentityManager.credentials.forEach(credential =>
+			{
+				clearTimeout(credential._refreshTimer);
+			});
+
+			return Promise.resolve(true);
+		}, function()
+		{
+			// Temporary solution to skip when failed.
+			console.error("ArcGIS token failed.");
+			Promise.resolve(true);
+		});
+	};
+
+	Startup.prototype.loadArcgisUrls = function()
+	{
+		const self = this, currentTimeSpan = moment();
+		if (window.arcgisUrls && window.arcgisUrlsTimeSpan && currentTimeSpan.diff(window.arcgisUrlsTimeSpan, 'seconds') <= 2)
+		{
+			return Promise.resolve(window.arcgisUrls);
+		}
+		if (window.promiseArCGISUrls)
+		{
+			return window.promiseArCGISUrls;
+		}
+		window.promiseArCGISUrls = self.getArcgisUrls();
+		return window.promiseArCGISUrls.then(function(result)
+		{
+			window.arcgisUrlsTimeSpan = moment();
+			window.promiseArCGISUrls = null;
+			return result;
+		});
+	};
+
+	Startup.prototype.getArcgisUrls = function()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"), null, { overlay: false })			.then(function(response)
+			{
+				if (response.Items && response.Items.length > 0)
+				{
+					const setting = {};
+					response.Items.forEach(function(obj)
+					{
+						setting[obj.InfoID] = obj.InfoValue;
+					});
+
+					if (!window.arcgisUrls)
+					{
+						window.arcgisUrls = {};
+					}
+					if (setting["ARCGISSERVER"])
+					{
+						arcgisUrls.ServiceDirectory = $.trim(setting["ARCGISSERVER"]) + "/arcgis/rest/services/";
+					}
+					if (setting["StreetFCID"])
+					{
+						window.streetFCID = setting["StreetFCID"];
+					}
+					const fileBasedFolderName = setting["ActiveServiceFolderName"] + "/",
+						rebuildFileFolderName = (setting["ActiveServiceFolderName"].endsWith("_Master") ? setting["ActiveServiceFolderName"] : setting["InActiveServiceFolderName"]) + "/";
+
+					arcgisUrls.WalkoutRoute = arcgisUrls.ServiceDirectory + fileBasedFolderName + setting["MapEditingOneService"] + '/NAServer/ServiceAreaLayer';
+					arcgisUrls.LocalRouteFile = arcgisUrls.ServiceDirectory + fileBasedFolderName + setting["MapEditingOneService"] + '/NAServer/routingLayer';
+					arcgisUrls.ODCostMatrixLayer = arcgisUrls.ServiceDirectory + fileBasedFolderName + setting["MapEditingOneService"] + '/NAServer/ODCostMatrixLayer';
+					arcgisUrls.MapEditingOneService = arcgisUrls.ServiceDirectory + setting["MapEditingOneService"] + '/FeatureServer';
+					arcgisUrls.MapEditingOneServiceDynamic = arcgisUrls.ServiceDirectory + setting["MapEditingOneService"] + '/MapServer';
+					arcgisUrls.MapEditingOneServiceFile = arcgisUrls.ServiceDirectory + fileBasedFolderName + setting["MapEditingOneService"] + '/MapServer';
+					arcgisUrls.MasterFileGDBGPService = arcgisUrls.ServiceDirectory + rebuildFileFolderName + setting["MasterFileGDBGPService"] + '/GPServer';
+					arcgisUrls.TFUtilitiesGPService = arcgisUrls.ServiceDirectory + setting["TFUtilitiesGPService"] + '/GPServer';
+					arcgisUrls.CreateMmpkGPService = arcgisUrls.ServiceDirectory + setting["CreateMmpkGPService"] + '/GPServer';
+					arcgisUrls.AddressPointGeocodeService = arcgisUrls.ServiceDirectory + setting["AddressPointGeocodeService"] + '/GeocodeServer';
+					arcgisUrls.StreetGeocodeServiceFile = arcgisUrls.ServiceDirectory + fileBasedFolderName + setting["StreetGeocodeService"] + '/GeocodeServer';
+					arcgisUrls.UpdateVectorBasemapService = arcgisUrls.ServiceDirectory + setting["UpdateVectorBasemapService"] + '/GPServer';
+					arcgisUrls.PortalURL = $.trim(setting["PortalURL"]);
+					arcgisUrls.VectorFolder = setting["VectorFolder"];
+					arcgisUrls.ActiveServiceFolderName = setting["ActiveServiceFolderName"];
+					arcgisUrls.FileGDBPath = setting["FileGDBPath"];
+					arcgisUrls.LinuxFolderRootPath = setting["LinuxFolderRootPath"];
+					arcgisUrls.ProjectFolder4UpdateVector = setting["ProjectFolder4UpdateVector"];
+					arcgisUrls.CrossRailroadPointUrl = arcgisUrls.MapEditingOneServiceFile + "/29";
+					arcgisUrls.signpostTable = arcgisUrls.MapEditingOneService + "/47";
+				}
+				return window.arcgisUrls;
+		});
+	};
+
+	Startup.prototype.loadSourceOId = function()
+	{
+		return tf.map.ArcGIS.esriRequest(arcgisUrls.LocalRouteFile + "?f=json").then(result =>
+		{
+			tf.streetSourceOid = result.data.networkDataset.networkSources.find(i => i.elementType == "esriNETEdge").id;
 		});
 	};
 })();
