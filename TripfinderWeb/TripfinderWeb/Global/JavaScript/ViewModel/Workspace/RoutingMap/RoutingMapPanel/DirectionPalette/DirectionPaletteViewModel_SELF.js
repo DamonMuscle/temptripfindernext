@@ -176,7 +176,7 @@
 
 	DirectionPaletteViewModel.prototype.show = function()
 	{
-		tf.gaHelper.send('Area', 'Directions');
+		// tf.gaHelper.send('Area', 'Directions');
 		if (this.obShow())
 		{
 			this.initTravelScenarios();
@@ -1690,10 +1690,10 @@
 	DirectionPaletteViewModel.prototype.selectSelectTravelScenarioClick = function(scenario)
 	{
 		var self = this;
-		if (self.travelScenario)
-		{
-			TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(self.travelScenario.Id, this.routeState);
-		}
+		// if (self.travelScenario)
+		// {
+		// 	TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(self.travelScenario.Id, this.routeState);
+		// }
 		tf.storageManager.save(SCENARIO_STORAGE_KEY, scenario.Id + "_" + (scenario.isFile ? 1 : 0));
 		self.travelScenario = scenario;
 		self.obTitle("Directions - " + self.travelScenario.title);
@@ -1702,7 +1702,7 @@
 			scenario.check(false);
 		});
 		scenario.check(true);
-		TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.useTravelScenario(scenario.Id, this.routeState);
+		// TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.useTravelScenario(scenario.Id, this.routeState);
 	};
 
 	DirectionPaletteViewModel.prototype.unitConvert = function(value)
@@ -1720,11 +1720,11 @@
 		this._viewModal._directionsTool._onEscMode();
 		this.resetPanel();
 		this._viewModal._directionsTool.clear();
-		if (this.travelScenario)
-		{
-			TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(this.travelScenario.Id, this.routeState);
-			this.travelScenario = null;
-		}
+		// if (this.travelScenario)
+		// {
+		// 	TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(this.travelScenario.Id, this.routeState);
+		// 	this.travelScenario = null;
+		// }
 	};
 
 	DirectionPaletteViewModel.prototype.dispose = function()
@@ -1732,10 +1732,10 @@
 		this.destroySearches();
 		this._viewModal.menuDataUpdateEvent.unsubscribe(this._travelScenariosChange);
 		PubSub.unsubscribe(this._travelScenariosChange);
-		if (this.travelScenario)
-		{
-			TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(this.travelScenario.Id, this.routeState);
-			this.travelScenario = null;
-		}
+		// if (this.travelScenario)
+		// {
+		// 	TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(this.travelScenario.Id, this.routeState);
+		// 	this.travelScenario = null;
+		// }
 	};
 })();

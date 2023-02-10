@@ -59,6 +59,9 @@
 
 		self.travelScenariosPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
 		self.directionPaletteViewModel = new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
+		self.directionPaletteViewModel_ESRI_HOSTED = new TF.RoutingMap.DirectionPaletteViewModel_ESRI(self, true, routeState + "E");
+		self.directionPaletteViewModel_OSM = new TF.RoutingMap.DirectionPaletteViewModel_OSM(self, true, routeState + "O");
+		self.directionPaletteViewModel_SELF_HOSTED = new TF.RoutingMap.DirectionPaletteViewModel_SELF(self, true, routeState + "S");
 		self.parcelPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
 		self.boundaryPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
 		self.mapEditingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
@@ -493,11 +496,69 @@
 		viewModel.panel = panel;
 	};
 
-	MapCanvasPage.prototype.togglePalettePanel = function(data, icon)
+	MapCanvasPage.prototype.togglePalettePanel = async function(data, icon)
 	{
 		var self = this;
 		var show = data.obShow();
 		var promise = show ? data.unSaveCheck() : Promise.resolve(true);
+
+		var _handleDirectionsResearch = async () =>
+		{
+			// close opening direction palette.
+			var _data = null;	
+			if (self.directionPaletteViewModel_ESRI_HOSTED.obShow())
+			{
+				_data = self.directionPaletteViewModel_ESRI_HOSTED;
+			}
+	
+			if (self.directionPaletteViewModel_SELF_HOSTED.obShow())
+			{
+				_data = self.directionPaletteViewModel_SELF_HOSTED;
+			}
+	
+			if (self.directionPaletteViewModel_OSM.obShow())
+			{
+				_data = self.directionPaletteViewModel_OSM;
+			}
+	
+			if (_data !== null)
+			{
+				_data.unSaveCheck();
+				await _closeDirectionPalette(null, _data);
+			}
+
+			_closeDirectionPalette = async (_, _data) =>
+			{
+				_data.close();
+				_data.obShow(false);
+				self.updatePanelsStatus(_data);
+	
+				self.toggleTravelScenarioLock();
+				return Promise.resolve(true);
+			};
+
+			if (data instanceof TF.RoutingMap.DirectionPaletteViewModel ||
+				data instanceof TF.RoutingMap.DirectionPaletteViewModel_ESRI ||
+				data instanceof TF.RoutingMap.DirectionPaletteViewModel_OSM ||
+				data instanceof TF.RoutingMap.DirectionPaletteViewModel_SELF)
+			{
+				if (self.directionPaletteViewModel != null) {
+					self.directionPaletteViewModel.dispose();
+					self.directionPaletteViewModel = null;
+				}
+
+				self.directionPaletteViewModel = data;
+				if (self.directionPaletteViewModel)
+				{
+					self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
+					self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
+				}
+	
+				self._initDirectionTool();
+			}
+		}
+		await _handleDirectionsResearch();
+
 
 		if (!self.checkRoutingAndBoundaryCannotOpenTogether(data))
 		{
@@ -608,7 +669,10 @@
 				const palettes = [
 					// TF.Map.RoutingMapTool.buildMenuItem('Boundary Planning', 'boundary', self.boundaryPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Map Viewer', 'custommap', self.customMapPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Directions - original', 'direction', self.directionPaletteViewModel, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Directions - ESRI HOSTED', 'direction', self.directionPaletteViewModel_ESRI_HOSTED, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Directions - SELF HOSTED', 'direction', self.directionPaletteViewModel_SELF_HOSTED, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Directions - OSM', 'direction', self.directionPaletteViewModel_OSM, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
