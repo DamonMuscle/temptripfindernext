@@ -54,10 +54,11 @@
 
 	MapCanvasPage.prototype.initViewModels = function()
 	{
-		var self = this;
-		var routeState = self.routeState;
+		const self = this,
+			routeState = self.routeState;
+
 		self.travelScenariosPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
-		self.directionPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
+		self.directionPaletteViewModel = new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
 		self.parcelPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.ParcelPaletteViewModel(self, true, routeState);
 		self.boundaryPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
 		self.mapEditingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
@@ -66,7 +67,7 @@
 		self.customMapPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
 		self.gpsPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
 		self.geoSearchPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
-		self.routingMapPanelManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.RoutingMapPanelManager(self);
+		self.routingMapPanelManager = new TF.RoutingMap.RoutingMapPanelManager(self);
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
 		self.routingSnapManager = {obShow: ko.observable(false)}; // new TF.Document.RoutingSnapManger(self);
 		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
@@ -550,6 +551,7 @@
 
 	MapCanvasPage.prototype.toggleTravelScenarioLock = function()
 	{
+        return;
 		var shows = [this.mapEditingPaletteViewModel.obShow(), this.routingPaletteViewModel.obShow(), this.travelScenariosPaletteViewModel.obShow()];
 		var selectedTravelScenario = this.travelScenariosPaletteViewModel.travelScenariosViewModel.obSelectedTravelScenarios();
 		if (selectedTravelScenario)
@@ -641,14 +643,14 @@
 		{
 			self.RoutingMapTool.onCandidatesStudentsChangeEvent(self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.all, self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlighted);
 		}
-		this.routingPaletteViewModel.tripViewModel.dataModel.onCandidatesStudentsChangeToMapEvent.subscribe(onCandidatesStudentsChangeEvent);
-		this.routingPaletteViewModel.tripViewModel.dataModel.onStudentChangeEvent.subscribe(onCandidatesStudentsChangeEvent);
-		this.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlightChangedEvent.subscribe(function()
-		{
-			self.RoutingMapTool.highlightChangedEvent(self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlighted);
-		});
+		// this.routingPaletteViewModel.tripViewModel.dataModel.onCandidatesStudentsChangeToMapEvent.subscribe(onCandidatesStudentsChangeEvent);
+		// this.routingPaletteViewModel.tripViewModel.dataModel.onStudentChangeEvent.subscribe(onCandidatesStudentsChangeEvent);
+		// this.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlightChangedEvent.subscribe(function()
+		// {
+		// 	self.RoutingMapTool.highlightChangedEvent(self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlighted);
+		// });
 
-		self.palettes().map(function(palette)
+		self.palettes().forEach(function(palette)
 		{
 			palette.routingMapTool = self.RoutingMapTool;
 		});
