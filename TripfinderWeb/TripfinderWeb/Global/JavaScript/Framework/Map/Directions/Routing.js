@@ -441,7 +441,19 @@
 				self._routeParameters.travelMode.impedanceAttributeName = "TravelTime";
 				self._routeParameters.pointBarriers = [];
 				self._routeParameters.polylineBarriers = [];
-				self._routeParameters.polygonBarriers = [];
+
+				// self._routeParameters.polygonBarriers = [];
+				var polygonFeatures = self._routeParameters.polygonBarriers.features;
+				if (polygonFeatures)
+				{
+					polygonFeatures.forEach(feature =>
+					{
+						if (feature.attributes)
+						{
+							feature.attributes["Attr_TravelTime"] = feature.attributes["Attr_Time"];
+						}
+					})
+				}
 			}
 
 			var task = new tf.map.ArcGIS.RouteTask(url);
