@@ -1226,6 +1226,11 @@ createNamespace("TF").createId = function(randomNumber)
 	return parseFloat((new Date()).getTime().toString().substr(8, 13) + "" + Math.floor(Math.random() * number));
 };
 
+createNamespace("TF").xyToGeometry = function(x, y)
+{
+	var p = new tf.map.ArcGIS.Point(x, y, tf.map.ArcGIS.SpatialReference.WGS84);
+	return tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(p);
+};
 //#endregion
 
 function IsEmptyString(str)

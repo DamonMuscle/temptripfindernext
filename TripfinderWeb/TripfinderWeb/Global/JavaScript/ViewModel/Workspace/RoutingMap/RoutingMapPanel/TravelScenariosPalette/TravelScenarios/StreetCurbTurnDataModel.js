@@ -733,9 +733,10 @@
 	StreetCurbTurnDataModel.prototype.clearUI = function()
 	{
 		this.onControlChangeEvent.notify();
-		var streetViewModel = this._viewModal.mapEditingPaletteViewModel.myStreetsViewModel;
-		streetViewModel.editModal.closeEditModal();
-		streetViewModel.drawTool && streetViewModel.drawTool.stop();
+		// TODO: uncomment the following line if map editing palette is added
+		// var streetViewModel = this._viewModal.mapEditingPaletteViewModel.myStreetsViewModel;
+		// streetViewModel.editModal.closeEditModal();
+		// streetViewModel.drawTool && streetViewModel.drawTool.stop();
 		PubSub.publish("clear_ContextMenu_Operation");
 	};
 
