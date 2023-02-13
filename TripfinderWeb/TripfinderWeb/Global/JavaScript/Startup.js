@@ -297,7 +297,8 @@
 				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
 			};
 			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();
-
+			tf.lockData = new TF.LockData();
+			tf.AGSServiceUtil = new TF.AGSServiceUtil();
 			//tf.dataTypeHelper = new TF..DataTypeHelper();
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
@@ -628,6 +629,22 @@
 							}
 
 							return tf.pageManager.loadDataSourceName();
+						}).then(function(value)
+						{
+							createNamespace("TF.key");
+							var ctrlKeyTimeout;
+							$("body").on("keydown", function(event)
+							{
+								TF.key.ctrlKey = event.ctrlKey;
+								clearTimeout(ctrlKeyTimeout);
+								ctrlKeyTimeout = setTimeout(function()
+								{
+									TF.key.ctrlKey = false;
+								}, 1000);
+							}).on("keyup", function(event)
+							{
+								TF.key.ctrlKey = event.ctrlKey;
+							});
 						});
 				});
 		});

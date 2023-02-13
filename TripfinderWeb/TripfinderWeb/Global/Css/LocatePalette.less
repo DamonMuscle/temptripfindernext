@@ -1,0 +1,457 @@
+@import (reference) "RoutePanelStyle";
+
+#locate-tool-icon {
+	#icon;
+
+	&.select-all-black {
+		background-image: url('../img/Routing Map/locate/Select-All-Black.png');
+	}
+
+	&.show-palette {
+		background-image: url('../img/Routing Map/locate/Show.png');
+	}
+
+	&.hide-palette {
+		background-image: url('../img/Routing Map/locate/Hide-Palette_Records.png');
+	}
+
+	&.settings {
+		background-image: url('../img/Routing Map/locate/Settings-Black.png');
+	}
+}
+
+#locate-tab-icon {
+	#icon;
+	opacity: 0.3;
+
+	&.locate-students {
+		background-image: url('../img/Routing Map/locate/Locate-Students.png');
+	}
+
+	&.locate-schools {
+		background-image: url('../img/Routing Map/locate/Locate-Schools.png');
+	}
+
+	&.locate-addresses {
+		background-image: url('../img/Routing Map/locate/Locate-Addresses.png');
+	}
+
+	&.locate-coordinates {
+		background-image: url('../img/Routing Map/locate/Locate-Coordinates.png');
+	}
+
+	&.locate-georegions {
+		background-image: url('../img/Routing Map/locate/Locate-Geo-Regions.png');
+	}
+
+	&.locate-alternatesites {
+		background-image: url('../img/Routing Map/locate/Locate-Alternate-Sites.png');
+	}
+
+	&.locate-tripstops {
+		background-image: url('../img/Routing Map/locate/Locate-Trip-Stops.png');
+	}
+}
+
+.locate-tool {
+	#routing-panel-tool;
+	position: relative;
+	border-bottom: 2px solid #dedede;
+	box-sizing: content-box;
+
+	.icon {
+		#locate-tool-icon;
+	}
+
+	.vertical-line {
+		#vertical-line;
+	}
+}
+
+#sort-order-icon {
+	#icon;
+	float: right;
+	background-image: url('../img/Routing Map/locate/Sort-A-Z.png');
+
+	&.inverted {
+		background-image: url('../img/Routing Map/locate/Sort-Z-A.png');
+	}
+}
+
+.locate-content {
+
+	.locate-tab {
+		border: none;
+		background-color: white;
+		box-shadow: none;
+
+		>ul {
+			background-color: #eaefff;
+			padding: 0;
+
+			li {
+				background: none;
+				border: none;
+
+				.k-loading.k-complete {
+					display: none;
+				}
+
+				.tab-item {
+					#locate-tab-icon;
+				}
+
+				&.k-state-active {
+					.tab-item {
+						opacity: 1;
+					}
+				}
+			}
+		}
+
+		.locate-template {
+			border: none;
+			padding: 40px 20px 5px 20px;
+			margin: 0;
+
+			.locate-student,
+			.locate-alternatesite,
+			.locate-tripstop,
+			.locate-georegion,
+			.locate-coordinates,
+			.locate-addresses {
+				.locate-template-container {
+					width: 100%;
+					float: left;
+
+					.title-container {
+						float: left;
+						width: 50%;
+
+						&.colspan {
+							width: 100%;
+						}
+
+						&.right {
+							label {
+								margin-left: 20px;
+							}
+						}
+					}
+
+					input,
+					select {
+						width: calc(~"100% - 20px");
+						border: 1px solid #ccc;
+						height: 22px;
+						padding: 2px 8px;
+						box-sizing: border-box;
+
+						&.left {
+							margin-left: 20px;
+						}
+
+						&.whole {
+							width: 100%;
+						}
+
+						&.input-checkbox {
+							width: auto;
+							float: left;
+						}
+					}
+
+					.title-inactive {
+						float: left;
+						margin-top: 8px;
+						margin-left: 5px;
+					}
+
+					.half-input-container {
+						width: 50%;
+						margin-bottom: 10px;
+						float: left;
+
+						.input-group {
+							width: calc(~"100% - 20px");
+						}
+
+						.input-group-btn {
+							float: left;
+						}
+
+						&.right {
+							.input-group {
+								width: 100%;
+							}
+
+							.input-group-btn {
+								float: none;
+							}
+						}
+					}
+
+					.full-input-container {
+						margin-bottom: 10px;
+						width: 100%;
+						float: left;
+					}
+
+					.input-group-btn {
+
+						button {
+							height: 22px;
+							padding: 0;
+							box-sizing: border-box;
+						}
+					}
+				}
+			}
+
+			.locate-coordinates {
+				padding-bottom: 20px;
+
+				.title-container {
+					padding: 0;
+				}
+
+				.half-input-container {
+					padding: 0;
+
+					input[type=number]::-webkit-inner-spin-button,
+					input[type=number]::-webkit-outr-spin-button,
+						{
+						-webkit-appearance: none;
+						margin: 0;
+					}
+
+					.help-block {
+						color: #FF0000;
+					}
+
+					&.help-left {
+						.help-block {
+							margin-left: 20px;
+						}
+					}
+				}
+			}
+
+			.locate-addresses {
+				height: 150px;
+
+				.title-container {
+					padding: 0;
+				}
+
+				.full-input-container {
+					padding: 0;
+					margin-bottom: 30px !important;
+
+					.help-block {
+						color: #FF0000;
+					}
+
+					&.help-left {
+						.help-block {
+							margin-left: 20px;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.locate-find {
+		height: 30px;
+		margin: 0 20px 5px 20px;
+
+		input {
+			float: right;
+			background-color: #333;
+			color: #b1b1b1;
+			width: 80px;
+			height: 28px;
+			outline: 0;
+			border: 1px solid grey;
+			font-size: 14px;
+		}
+	}
+
+	.locate-result {
+		border-top: 2px solid #ececec;
+
+		.result-sort {
+			height: 30px;
+			line-height: 30px;
+			padding-left: 15px;
+
+			.sort-button {
+				position: relative;
+				float: left;
+				#Popover-Menu;
+
+				.sort-name span {
+					margin-left: 10px;
+				}
+
+				.menu {
+					border: 0;
+					top: 25px;
+					left: 35px;
+					width: 150px;
+
+					ul {
+						border-left: 1px solid #c5c5c5;
+
+						.menu-title {
+							border-right: 0;
+							margin-top: 0;
+						}
+					}
+				}
+
+				&.active {
+					.menu {
+						display: block;
+					}
+				}
+			}
+
+			.sort-order {
+				#sort-order-icon;
+			}
+		}
+
+		.result-content {
+			float: left;
+			width: 100%;
+
+			.result-item {
+				padding: 5px 15px 0 15px;
+				float: left;
+				width: 100%;
+
+				.item-box {
+
+					.item-separator {
+						height: 1px;
+						width: 100%;
+						background-color: #cecece;
+						margin-top: 5px;
+					}
+
+					.item-head {
+						min-height: 24px;
+						line-height: 24px;
+						font-size: 14px;
+						color: #333333;
+						display: inline-block;
+
+						.item-title {
+							float: left;
+							font-weight: bold;
+							margin-right: 10px;
+						}
+
+						.item-subtitle {
+							float: left;
+							margin-left: 2px;
+						}
+
+						.item-subtext {
+							float: right;
+							font-size: 11px;
+							color: #999999;
+						}
+					}
+
+					.item-contents {
+						height: 16px;
+						line-height: 16px;
+						font-size: 11px;
+						color: #999999;
+
+						.left-text {
+							float: left;
+
+							&.ellipsis {
+								max-width: 90%;
+								white-space: nowrap;
+								text-overflow: ellipsis;
+								overflow: hidden;
+							}
+						}
+
+						.right-text {
+							float: right;
+						}
+					}
+				}
+
+				&:last-child {
+					.item-box {
+						border-bottom: none;
+					}
+				}
+			}
+		}
+
+		.result-bottom {
+			height: 35px;
+			line-height: 35px;
+			text-align: center;
+			background-color: #f2f2f2;
+			width: 100%;
+			float: left;
+		}
+
+		.result-loading,
+		.result-empty {
+			height: 80px;
+			text-align: center;
+		}
+
+		.result-empty {
+			line-height: 80px;
+		}
+
+		.result-loading {
+			font-size: 12px;
+			color: #0033cc;
+
+			svg {
+				width: 200px;
+				height: 15px;
+				margin-top: 20px;
+			}
+
+			.loading-text {
+				margin-top: 5px;
+			}
+		}
+
+		.result-empty {
+			font-size: 13px;
+			color: #666666;
+		}
+	}
+
+	.locate-bottom {
+		height: 15px;
+	}
+}
+
+.locate-settings {
+	margin-top: 15px;
+	margin-bottom: 30px;
+
+	.k-select {
+		display: block !important;
+		width: 23px;
+	}
+}
+
+.address-search-wrapper {
+	.arcgis-search-without-btn-template(100%);
+}

@@ -90,6 +90,41 @@
 		}
 	};
 
+	RoutingMapTool.prototype.inactiveOtherBy = function(toolName)
+	{
+		var previousToolName = this._currentToolName;
+		this._currentToolName = toolName;
+		if (this.routingMapDocumentViewModel.gridMapPopup && this.routingMapDocumentViewModel.disableMouseEvent)
+		{
+			this.routingMapDocumentViewModel.disableMouseEvent();
+		}
+
+		if (toolName != "measurementTool" && previousToolName == "measurementTool")
+		{
+			this.measurementTool && this.measurementTool.deactivate();
+		}
+		if (toolName != "geoSearchTool" && previousToolName == "geoSearchTool")
+		{
+			this.geoSearchTool && this.geoSearchTool.cancelGeoSearchChanges();
+		}
+		if (toolName != "geoFinderTool" && previousToolName == "geoFinderTool")
+		{
+			this.geoFinderTool && this.geoFinderTool.endGeoFinder();
+		}
+		if (toolName != "manuallyPinTool" && previousToolName == "manuallyPinTool")
+		{
+			this.manuallyPinTool && this.manuallyPinTool.stopPin();
+		}
+		if (toolName != "drawGeoregionBoundaryTool" && previousToolName == "drawGeoregionBoundaryTool")
+		{
+			this.drawGeoregionBoundaryTool && this.drawGeoregionBoundaryTool.stopDraw();
+		}
+		if (toolName != "googleStreetTool" && previousToolName == "googleStreetTool")
+		{
+			this.googleStreetTool && this.googleStreetTool.deactivate();
+		}
+	};
+
 	RoutingMapTool.prototype.stopSketch = function (toolName)
 	{
 		if (toolName === this._currentToolName)

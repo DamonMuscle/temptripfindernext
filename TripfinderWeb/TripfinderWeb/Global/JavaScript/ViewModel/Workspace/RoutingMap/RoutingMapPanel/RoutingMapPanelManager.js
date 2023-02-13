@@ -163,7 +163,7 @@
 
 	RoutingMapPanelManager.prototype.getRoutingMapPanel = function()
 	{
-		return "workspace/Routing Map/RoutingMapPanel/RoutingMapPanel";
+		return "workspace/RoutingMap/RoutingMapPanel/RoutingMapPanel";
 	};
 
 	RoutingMapPanelManager.prototype.newPanelDragStart = function(e, target)
