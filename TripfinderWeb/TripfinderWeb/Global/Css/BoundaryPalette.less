@@ -1,0 +1,249 @@
+﻿	.boundarypalette {
+		.segmented-control {
+			height: 30px;
+			background-color: #f3d3dc;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			>div {
+				flex: 1;
+				justify-content: center;
+				align-items: center;
+				display: flex;
+				background-repeat: no-repeat;
+				background-position: center center;
+				height: 100%;
+			}
+
+			.zone {
+				background-image: url('../img/Routing Map/menuicon/zones.png');
+			}
+		}
+	}
+
+	.boundaryEditModal {
+		.student-count {
+			background: #ffffcc;
+			border: 1px solid #FFCC33;
+			padding: 4px 10px;
+			border-radius: 2px;
+			margin-right: 12px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+
+	.routingmap_panel .item-header.panel-grid-header {
+		background-color: #E0E0E0;
+		margin-left: 0px;
+		width: 100%;
+
+		&.first-panel-grid {
+			// border-top: none;
+		}
+
+		.school-boundary.icon {
+			background-image: url('../img/Routing Map/menuicon/School-Black.png');
+		}
+
+		.population-region.icon,
+		.travel-regions.icon,
+		.municipal-boundaries.icon,
+		.postal-code-boundaries.icon {
+			background-image: url('../img/Routing Map/menuicon/Parcel-Black.png');
+		}
+
+		.travel-scenarios.icon {
+			background-image: url('../img/Routing Map/travel-scenario.png');
+		}
+
+		.railroad.icon {
+			background-image: url('../img/Routing Map/railroad.png');
+		}
+
+		.water.icon {
+			background-image: url('../img/Routing Map/water-element.png');
+		}
+
+		.polyline.icon {
+			background-image: url('../img/Routing Map/polyline.png');
+		}
+
+		.my-landmarks.icon {
+			background-image: url('../img/Routing Map/beach-filled.png');
+		}
+
+		.my-satellite-panel.icon {
+			background-image: url('../img/Routing Map/satellite.png');
+		}
+
+		.street-sign.icon,
+		.my-street-panel.icon {
+			background-image: url('../img/Routing Map/street-sign.png');
+		}
+
+		.my-railroad-panel.icon {
+			background-image: url('../img/Routing Map/railroad.png');
+		}
+
+		.my-landmark-panel.icon {
+			background-image: url('../img/Routing Map/beach-filled.png');
+		}
+
+		.parcel.icon {
+			background-image: url('../img/Routing Map/MyParcels-black.png');
+		}
+
+		.student.icon {
+			background-image: url('../img/Routing Map/student.png');
+		}
+
+		.trial-stop.icon {
+			background-image: url('../img/Routing Map/TrialStop.svg');
+		}
+
+		&.maplayers-palette-head {
+			&:hover {
+				.center {
+					display: block;
+				}
+			}
+		}
+	}
+
+
+	.parcelpalette .pannel-item-content .content-wrapper .content-container.boundary-planning-container {
+		width: 100%;
+		margin-left: 0px;
+
+		.left-column-icon-container {
+			width: 32px;
+			margin-right: 0px;
+
+			.content-type-icon {
+				margin-left: 8px;
+			}
+		}
+
+		.boundary-svg {
+			height: 34px;
+			margin-right: 10px;
+		}
+
+		.water-line {
+			margin-left: 5px;
+			margin-top: 10px;
+		}
+
+		.content {
+			.day {
+				font-size: 12px;
+			}
+		}
+
+		.show-eye {
+			width: 18px;
+			height: 18px;
+			margin: 10px 8px 10px 0px;
+			background: url('../img/Routing Map/show.png') center center no-repeat;
+			background-size: contain;
+		}
+
+		.hide-eye {
+			background-image: url('../img/Routing Map/hide.png');
+		}
+
+		.warning-icon {
+			width: 20px;
+			height: 20px;
+			background: url('../img/Icons/de_forms/AdjustedLoadTime.png') no-repeat;
+		}
+
+		.layer-color {
+			float: left;
+			width: 15px;
+			height: inherit;
+			background-color: #000000;
+		}
+
+		.layer-context {
+			margin-left: 5px !important;
+
+			.layer-name {
+				display: flex;
+				width: calc(~"100% - 55px");
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+				margin: 0px 22px 0 0;
+			}
+
+			.layer-description {
+				margin: 2px 0 0 0;
+				font-size: 11px !important;
+				font-weight: normal !important;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				line-height: 1em;
+			}
+		}
+
+	}
+
+	.routingmap_panel .item-container .boundarypalette .bottom-info-container {
+		padding: 6px 1px;
+	}
+
+	.parcel-edit-modal-container .body.boundary-street-list-body,
+	.parcel-edit-modal-container .body.population-street-list-body {
+		padding: 15px 15px 0px 15px;
+
+		.boundary-street-list,
+		.population-street-list {
+			padding: 0 25px;
+			max-height: 300px;
+			overflow: auto;
+		}
+	}
+
+	.street-list-close {
+		float: right;
+		top: 7px;
+		position: relative;
+	}
+
+	.boundary-expand-all-check,
+	.population-expand-all-check {
+		float: right;
+	}
+
+	.expand-all-label {
+		float: right;
+	}
+
+	.street-list-bottom {
+		padding: 0 15px 0 15px;
+		height: 39px;
+
+		.boundary-expand-all-check,
+		.population-expand-all-check,
+		.expand-all-label {
+			float: right;
+			position: relative;
+			top: 13px;
+			margin-left: 5px;
+		}
+
+		.boundary-expand-all-check,
+		.population-expand-all-check {
+			margin: 1px 0 1px 5px;
+		}
+
+		.btn {
+			position: relative;
+			top: 7px;
+		}
+	}

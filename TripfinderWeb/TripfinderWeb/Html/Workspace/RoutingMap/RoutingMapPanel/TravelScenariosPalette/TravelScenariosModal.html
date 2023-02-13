@@ -1,0 +1,36 @@
+<div class="row" style="height:110px;" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+	<div class="col-xs-24">
+		<div class="content-container">
+			<div class="row">
+				<div class="col-xs-12">
+					<h4 class="section-title"><strong>General Information</strong></h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="form-group">
+						<label class="requirestar">Name</label>
+						<input type="text" data-bind="value:travelScenarioDataModel.name" name="tsname" class="form-control">
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="form-group" data-bind="visible:editType().indexOf('new')>=0">
+						<label class="">Copy Existing Travel Scenarios</label>
+						<div class="input-group">
+							<div data-bind="typeahead:{source:obCopyTravelScenariosDataModels,drowDownShow:true,mustMatch:true,showEmpty:true,format:function(obj){return obj.name();},selectedValue:obSelectedCopyTravelScenarios}">
+								<!-- ko customInput:{type:"String",value:obCurrentCopyTravelScenariosName,attributes:{class:"form-control",name:"name", readonly:"readonly", style:"background-color:white;"}} --><!-- /ko -->
+							</div>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default">
+									<span class="caret"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

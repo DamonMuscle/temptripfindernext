@@ -1,0 +1,1405 @@
+(function()
+{
+	createNamespace("TF.RoutingMap.RoutingPalette").RoutingTripStopDataModel = RoutingTripStopDataModel;
+
+	function RoutingTripStopDataModel(dataModel)
+	{
+		var self = this;
+		self.dataModel = dataModel;
+		self.viewModel = dataModel.viewModel;
+		self.featureData = dataModel.featureData.tripStopFeatureData;
+		self.tripBoundaryFeatureData = dataModel.featureData.tripBoundaryFeatureData;
+		self.tripPathFeatureData = dataModel.featureData.tripPathFeatureData;
+		self._viewModal = dataModel.viewModel._viewModal;
+		self.currentTripStudentsCount = 0;
+	}
+
+	RoutingTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequence, isDuplicate, notBroadcast)
+	{
+		var self = this;
+		self._viewModal.revertMode = "create-TripStop";
+		self._viewModal.revertData = [];
+		var data = self.createNewData(newData);
+		data.OpenType = "Edit";
+		self.insertTripStopToTrip(data, insertToSpecialSequence);
+		return self.viewModel.drawTool.stopTool.attachClosetStreetToStop([data]).then(function()
+		{
+			return self.setTripStopPathAndSequence(data, "new", insertToSpecialSequence > 0).then(function(prevStop)
+			{
+				// set stop time to new trip stop by calculate
+				self.dataModel.setActualStopTime([self.dataModel.getTripById(data.TripId)]);
+				if (!isDuplicate) data.StopTime = data.ActualStopTime;
+				self.insertToRevertData(data);
+				self.dataModel.routingStudentManager.refreshDictionary(true);
+				self.dataModel.recalculateAble = false;
+				self.dataModel.onTripStopsChangeEvent.notify({
+					add: [data],
+					delete: [],
+					edit: []
+				});
+				if (!isFromRevert && !notBroadcast)
+				{
+					self.dataModel.tripEditBroadcast.createTripStop(data);
+				}
+				setTimeout(function()
+				{
+					self.dataModel.recalculateAble = true;
+					self.dataModel.onTripStopsChangeEvent.notify({
+						add: [],
+						delete: [],
+						edit: prevStop ? [prevStop] : []
+					});
+				});
+				self.dataModel.changeTripVisibility(data.TripId, true);
+				self._runAfterPathChanged([data], null, true);
+				self.changeRevertStack(data, isFromRevert);
+				return true;
+			});
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.createMultiple = function(tripStops, insertBehindSpecialSequences, resetScheduleTime)
+	{
+		var self = this;
+		if (!tripStops)
+		{
+			return Promise.resolve();
+		}
+		var grouped = {};
+		var boundary = [];
+		var stops = [];
+		var id = TF.createId();
+		return self.viewModel.drawTool.stopTool.attachClosetStreetToStop(tripStops).then(function()
+		{
+			tripStops.forEach(function(tripStop)
+			{
+				if (!tripStop)
+				{
+					return;
+				}
+				if (!grouped[tripStop.TripId])
+				{
+					grouped[tripStop.TripId] = {
+						tripId: tripStop.TripId,
+						existsStops: self.dataModel.getTripById(tripStop.TripId).TripStops,
+						newStops: []
+					};
+				}
+				tripStop.id = id++;
+				tripStop = self.createNewData(tripStop, true);
+				tripStop.OpenType = "Edit";
+				boundary.push(tripStop.boundary);
+				stops.push(tripStop);
+				grouped[tripStop.TripId].newStops.push(tripStop);
+			});
+
+			var index = 0;
+			var stopCreatePromises = [];
+			for (var key in grouped)
+			{
+				var data = grouped[key];
+				var sequences = getSequence(data.newStops);// insertBehindSpecialSequences.length > 1 ? insertBehindSpecialSequences.slice(index, index + data.newStops.length) : (insertBehindSpecialSequences.length == 1 ? [insertBehindSpecialSequences[0]] : null);
+				index = index + data.newStops.length;
+				var createPromise = self.moveTripStopsFromOtherTrip(data.newStops, data.existsStops, sequences, true, null, null, null, resetScheduleTime, true);
+				stopCreatePromises.push(createPromise);
+
+			}
+			function getSequence(newStops)
+			{
+				if (!insertBehindSpecialSequences || insertBehindSpecialSequences.length == 0) return null;
+				if (insertBehindSpecialSequences.length == 1) return [insertBehindSpecialSequences[0]];
+				var sequences = [];
+				newStops.forEach(function(stop)
+				{
+					for (var i = 0; i < tripStops.length; i++)
+					{
+						if (tripStops[i].id == stop.id)
+						{
+							sequences.push(insertBehindSpecialSequences[i]);
+							break;
+						}
+					}
+				});
+				return sequences;
+			}
+			self.dataModel.onTripsChangeEventCalled = false;
+			return Promise.all(stopCreatePromises).then(function()
+			{
+				return self._runAfterPathChanged(stops, null, true, true);
+			}).then(function()
+			{
+				if (!self.dataModel.onTripsChangeEventCalled)
+				{
+					// refresh trips in case assign student not occur for the trip refresh
+					self.refreshTripByStops(stops);
+				}
+			});
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.refreshTripByStops = function(stops)
+	{
+		var tripIds = new Set();
+		stops.forEach(x =>
+		{
+			tripIds.add(x.TripId);
+		});
+		var trips = [];
+		tripIds.forEach(x => trips.push(this.dataModel.getTripById(x)));
+		this.dataModel.onTripsChangeEvent.notify({ add: [], edit: trips, delete: [] });
+	}
+
+	RoutingTripStopDataModel.prototype.addTripStopsToNewTrip = function(newTripStops, insertToStops, targetTrip)
+	{
+		var self = this, stops;
+		self.bindTripDataToTripStop(newTripStops, targetTrip);
+		var solvePromise = Promise.resolve([]);
+
+		if (!self.dataModel.getSmartSequenceSetting())
+		{
+			stops = insertToStops.slice().map(function(stop) { return $.extend({}, stop); });
+			stops = self.appendNewStopsToTrip(newTripStops, stops, targetTrip);
+			solvePromise = Promise.resolve(stops);
+		}
+		else
+		{
+			solvePromise = insertToStops.length === 0 ? Promise.resolve(newTripStops) :
+				self._refreshTripByAddMultiStopsSmart(newTripStops, insertToStops, targetTrip); // if there only a stop, don't need to calculate the path
+		}
+
+		return solvePromise.then(function(tripStops)
+		{
+			targetTrip.TripStops = targetTrip.TripStops.concat(newTripStops);
+
+			// trip stops is solved
+			if (tripStops && tripStops[0])
+			{
+				tripStops.forEach(function(data, i)
+				{
+					var sequence = i + 1;
+					var sourceTripStop = Enumerable.From(targetTrip.TripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
+					if (sourceTripStop)
+					{
+						sourceTripStop.path = data.path;
+						sourceTripStop.Sequence = sequence;
+					}
+				});
+
+				targetTrip.TripStops = self._sortTripStops(targetTrip.TripStops);
+			}
+
+			return targetTrip;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.bindTripDataToTripStop = function(newTripStops, trip)
+	{
+		newTripStops.forEach(function(tripStop)
+		{
+			tripStop.TripId = trip.id;
+			if (tripStop.path) tripStop.path.TripId = trip.id;
+			tripStop.boundary.TripId = trip.id;
+			tripStop.routeStops = null;
+			tripStop.color = trip.color;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.createNewData = function(newData, isKeepStopId, ignoreBoundary)
+	{
+		var data = this.getDataModel();
+		if ($.isArray(newData))
+		{
+			newData = newData[0];
+		}
+		for (var key in newData)
+		{
+			data[key] = newData[key];
+		}
+		if (!isKeepStopId)
+		{
+			data.id = TF.createId();
+		}
+		data.TripStopId = data.id;
+		this.bindCoordinate(data);
+		if (!ignoreBoundary)
+		{
+			data.boundary = this.createTripBoundary(data);
+		} else
+		{
+			data.boundary.TripId = data.TripId;
+			data.boundary.TripStopId = data.id;
+		}
+		data.routeStops = null;
+		return data;
+	};
+
+	RoutingTripStopDataModel.prototype.moveTripStopsFromOtherTrip = function(newTripStops, insertToStops, atSequences, isNotifyTripStopChangeEvent, isSequenceOptimize, isSmartSequence, isPreserve, resetScheduleTime, notNotifyTreeAndMap)
+	{
+		var self = this, stops;
+		self._viewModal.revertMode = "";
+		self._viewModal.revertData = [];
+		insertToStops = self._sortTripStops(insertToStops);
+		var targetTrip = self.dataModel.getTripById(insertToStops[0].TripId);
+		var sequenceOffset = insertToStops[0].Sequence;
+		self.bindTripDataToTripStop(newTripStops, targetTrip);
+		var solvePromise = Promise.resolve([]);
+
+		if (atSequences && atSequences.length > 0)
+		{
+			stops = insertToStops.slice().map(function(stop) { return $.extend({}, stop); });
+			newTripStops.forEach(function(stop, index)
+			{
+				var sequence = atSequences.length == 1 ? atSequences[0] : atSequences[index];
+				stops.splice(sequence - 1, 0, stop);
+			});
+			stops.forEach(function(stop, i)
+			{
+				stop.Sequence = i + 1;
+			});
+			stops = self._sortTripStops(stops);
+			solvePromise = self._refreshTripPathByTripStops(stops);
+		}
+		else if (isSmartSequence)
+		{
+			// add one stop smart sequence
+			var stop = newTripStops[0];
+			stop.TripId = insertToStops[0].TripId;
+			solvePromise = self._refreshTripByAddStopSmart(newTripStops[0]);
+		}
+		else if (isSequenceOptimize)
+		{
+			if (isPreserve)
+			{
+				solvePromise = self._refreshTripSequenceOptimizeAndPreserve(newTripStops, insertToStops);
+			} else
+			{
+				// add stop(s) and do smart sequence
+				solvePromise = self._refreshTripByAddMultiStopsSmart(newTripStops, insertToStops);
+			}
+		} else
+		{
+			// if (isPreserve)
+			// {
+			// add stops to the end
+			stops = insertToStops.slice().map(function(stop) { return $.extend({}, stop); });
+			stops = self.appendNewStopsToTrip(newTripStops, stops);
+			solvePromise = self._refreshTripPathByTripStops(stops);
+			// } else
+			// {
+			// 	solvePromise = self._refreshTipPathByInsertToEnd(insertToStops, newTripStops);
+			// }
+		}
+
+		return solvePromise.then(function(response)
+		{
+			var tripStops = response.hasOwnProperty("stops") ? response.stops : response;
+			if (response.err) tf.promiseBootbox.alert(response.err);
+			// if (isSmartSequence)
+			// {
+			// 	targetTrip.TripStops = tripStops.concat(newTripStops);
+			// } else
+			// {
+			if (!tripStops)
+			{
+				newTripStops.map(function(tripStop)
+				{
+					tripStop.path = null;
+					tripStop.Distance = 0;
+					tripStop.Speed = 0;
+				});
+				if (!atSequences && !isSequenceOptimize)
+				{
+					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+				}
+				else if (atSequences)
+				{
+					targetTrip.TripStops = stops ? stops : self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+				}
+				else
+				{
+					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);//targetTrip.TripStops.concat(newTripStops);
+				}
+				targetTrip.TripStops.forEach(function(stop, index) { stop.Sequence = index + 1; });
+			}
+			else
+			{
+				if (!atSequences && !isSequenceOptimize)
+				{
+					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+				}
+				else if (isSequenceOptimize && isPreserve)
+				{
+					targetTrip.TripStops = tripStops;
+				}
+				else if (atSequences)
+				{
+					targetTrip.TripStops = stops ? stops : self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+				}
+				else
+				{
+					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);//targetTrip.TripStops.concat(newTripStops);
+				}
+				tripStops.forEach(function(data, i)
+				{
+					var sequence = i + sequenceOffset;
+					var sourceTripStop = Enumerable.From(targetTrip.TripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
+					var newTripStop = Enumerable.From(newTripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
+					if (newTripStop)
+					{
+						newTripStop.Sequence = sequence;
+						updateStopPathAndDirection(newTripStop, data);
+					}
+					else if (sourceTripStop)
+					{
+						sourceTripStop.Sequence = sequence;
+						if (isSequenceOptimize || isStopNearNewStop(sequence, newTripStops))
+						{
+							updateStopPathAndDirection(sourceTripStop, data);
+						}
+					}
+					function updateStopPathAndDirection(oldStop, newStop)
+					{
+						oldStop.path = newStop.path;
+						oldStop.Distance = newStop.Distance;
+						oldStop.Speed = newStop.Speed;
+						oldStop.DrivingDirections = newStop.DrivingDirections;
+						oldStop.RouteDrivingDirections = newStop.DrivingDirections;
+						oldStop.IsCustomDirection = false;
+					}
+					function isStopNearNewStop(sequence, newTripStops)
+					{
+						var isNear = false;
+						for (var i = 0; i < newTripStops.length; i++)
+						{
+							if ((newTripStops[i].Sequence == sequence + 1))
+							{
+								isNear = true;
+								break;
+							}
+						}
+						return isNear;
+					}
+				});
+
+			}
+			//}
+
+			targetTrip.TripStops = self._sortTripStops(targetTrip.TripStops);
+			if (!tripStops)
+			{
+				self.clearPreviousStopPathIfUnsolved(newTripStops, targetTrip);
+			}
+			// update routingStudentManager.schoolStopDictionary
+			self.updateAnotherTripStop(newTripStops);
+			self.dataModel.routingStudentManager.calculateStudentPUDOStatus();
+
+			self.dataModel.routingStudentManager.refresh();
+			if (isNotifyTripStopChangeEvent)
+			{
+				newTripStops = Enumerable.From(newTripStops).OrderBy("$.Sequence").ToArray();
+				self.dataModel.onTripStopsChangeEvent.notify({
+					add: newTripStops,
+					delete: [],
+					edit: [],
+					options: {
+						resetScheduleTime: resetScheduleTime,
+						notNotifyTreeAndMap: notNotifyTreeAndMap
+					}
+				});
+			}
+
+			self.dataModel.onTripSequenceChangeEvent.notify(targetTrip.TripStops);
+			self.changeRevertStack(newTripStops, false);
+			return newTripStops;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.clearPreviousStopPathIfUnsolved = function(tripStops, trip)
+	{
+		// clear previous stop path If inserted stops can not calculate path.
+		var minSequence = Math.min(tripStops.map(function(tripStop)
+		{
+			return tripStop.Sequence;
+		}));
+
+		var previousStop = Enumerable.From(trip.TripStops).FirstOrDefault(null, function(ts)
+		{
+			return ts.Sequence == minSequence - 1;
+		});
+		if (previousStop)
+		{
+			previousStop.path = null;
+		}
+	};
+
+	RoutingTripStopDataModel.prototype.appendNewStopsToTrip = function(newTripStops, stops, targetTrip)
+	{
+		var session = targetTrip && targetTrip.Session ? targetTrip.Session : this.dataModel.getSession();
+		var sequence = TF.Helper.TripHelper.getTripStopInsertSequence(stops, session);
+		stops = stops.slice(0, sequence - 1).concat(newTripStops).concat(stops.slice(sequence - 1, stops.length));
+		stops.forEach(function(stop, i)
+		{
+			stop.Sequence = i + 1;
+		});
+		return this._sortTripStops(stops);
+	};
+
+	/**
+	* change trip stop path
+	*/
+	RoutingTripStopDataModel.prototype.updatePath = function(tripStopChanged, isFromBroadCastSync)
+	{
+		var tripStop = this.dataModel.getTripStop(tripStopChanged.id);
+		if (!tripStop) return;
+		var originalData = [this.dataModel.tripEditBroadcast.copyTripStop(tripStop)];
+		this.copyPathInfoToStop(tripStopChanged);
+		this._updateTripStops([tripStop], false);
+		PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), [tripStop]);
+		if (!isFromBroadCastSync) { this.dataModel.tripEditBroadcast.send(originalData, [tripStop], tripStopChanged.routeStops); }
+	};
+
+	RoutingTripStopDataModel.prototype.copyPathInfoToStop = function(tripStopChanged)
+	{
+		var tripStop = this.dataModel.getTripStop(tripStopChanged.id);
+
+		if (tripStopChanged.path && tripStopChanged.path.geometry)
+		{
+			tripStop.path.geometry = tripStopChanged.path.geometry.clone();
+			tripStop.DrivingDirections = tripStopChanged.DrivingDirections;
+			tripStop.RouteDrivingDirections = tripStopChanged.DrivingDirections;
+			tripStop.routeStops = tripStopChanged.routeStops;
+			tripStop.Distance = tripStopChanged.Distance;
+			tripStop.Speed = tripStopChanged.Speed;
+			tripStop.IsCustomDirection = false;
+		} else
+		{
+			tripStop.DrivingDirections = "";
+			tripStop.RouteDrivingDirections = "";
+			tripStop.Distance = 0;
+			tripStop.Speed = 0;
+			tripStop.routeStops = null;
+			tripStop.IsCustomDirection = false;
+		}
+		return tripStop;
+	};
+
+	RoutingTripStopDataModel.prototype.updateAnotherTripStop = function(newTripStops)
+	{
+		let exceptionMap = {};
+		this.dataModel.candidateStudents.forEach(s =>
+		{
+			if (s.RequirementID)
+			{
+				return;
+			}
+
+			let key = `${s.id}_${s.TripStopID}_${s.AnotherTripStopID}`,
+				list = exceptionMap[key] || [];
+			exceptionMap[key] = list;
+			list.push(s);
+		});
+
+		newTripStops.forEach(tripStop =>
+		{
+			tripStop.Students.forEach(s =>
+			{
+				let school = this.dataModel.findRealSchoolStops(tripStop, s),
+					key = `${s.id}_${s.TripStopID}_${s.AnotherTripStopID}`,
+					exceptionList = exceptionMap[key];
+				s.AnotherTripStopID = school.id;
+				if (exceptionList)
+				{
+					exceptionList.forEach(e => e.AnotherTripStopID = school.id);
+				}
+			});
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync)
+	{
+		var self = this;
+		self._viewModal.revertMode = "update-TripStop";
+		self._viewModal.revertData = [];
+		var changeData = [];
+		var moveTripStops = [];
+		self.viewModel.routingChangePath.clearAll();
+		var promises = [];
+		var originalData = [];
+		modifyDataArray.forEach(function(modifyData)
+		{
+			var data = self.dataModel.getTripStop(modifyData.id);
+			originalData.push(self.dataModel.tripEditBroadcast.copyTripStop(data));
+			if (data.geometry.x != modifyData.geometry.x ||
+				data.geometry.y != modifyData.geometry.y ||
+				data.vehicleCurbApproach != modifyData.vehicleCurbApproach ||
+				data.SchoolLocation != modifyData.SchoolLocation)
+			{
+				moveTripStops.push(modifyData);
+				moveTripStops.forEach(function(stop) { stop.StreetSegment = null; })
+				promises.push(self.viewModel.drawTool.stopTool.attachClosetStreetToStop(moveTripStops));
+			}
+			self.insertToRevertData(data);
+			$.extend(data, modifyData, { Students: data.Students });
+			self.bindCoordinate(data);
+			if (modifyData.geometry)
+			{
+				data.geometry = TF.cloneGeometry(modifyData.geometry);
+			}
+			changeData.push(data);
+		});
+		return Promise.all(promises).then(function()
+		{
+			moveTripStops.forEach(function(stop)
+			{
+				self.dataModel.getTripStop(stop.id).StreetSegment = stop.StreetSegment;
+			});
+			var pathPromise = Promise.resolve();
+			if (moveTripStops.length > 0)
+			{
+				pathPromise = self.setTripStopPathAndSequence(moveTripStops[0], "move").then(function(prevStop)
+				{
+					if (prevStop)
+					{
+						changeData.push(prevStop);
+					}
+				});
+			}
+			return pathPromise.then(function()
+			{
+				self._updateTripStops(changeData);
+				if (!isFromBroadCastSync) { self.dataModel.tripEditBroadcast.send(originalData, changeData); }
+				return Promise.resolve(modifyDataArray);
+			});
+		});
+	};
+
+	RoutingTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip)
+	{
+		this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
+		this.changeRevertStack(tripStops, false);
+		this._runAfterPathChanged(tripStops, null, tf.storageManager.get("notAutoAssignUnassignedStudent") === false);
+	};
+
+	RoutingTripStopDataModel.prototype._runAfterPathChanged = function(tripStops, type, autoAssign, isCreateMultiple)
+	{
+		this.refreshOptimizeSequenceRate(tripStops);
+		return this.updateStudentCross(tripStops, type, autoAssign, isCreateMultiple);
+	};
+
+	RoutingTripStopDataModel.prototype.updateStudentCross = function(modifyDataArray, type, autoAssign, isCreateMultiple)
+	{
+		modifyDataArray = modifyDataArray.filter(x => x.boundary && x.boundary.geometry);
+		var self = this;
+		var studentCrossChangeStops = self._getStudentCrossChangeStops(modifyDataArray, type);
+		if (!studentCrossChangeStops || studentCrossChangeStops.length == 0)
+		{
+			return Promise.resolve(true);
+		}
+
+		return self.updateTripBoundaryStudents(studentCrossChangeStops.map(function(c) { return c.boundary; }), studentCrossChangeStops, null, null, null, autoAssign).then(function()
+		{
+			if (!isCreateMultiple)
+			{
+				self.dataModel.onStudentCrossStreetStopChangeEvent.notify(studentCrossChangeStops);
+			}
+			return Promise.resolve(true);
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.refreshOptimizeSequenceRate = function(stops)
+	{
+		var self = this;
+		if (self.dataModel.showImpactDifferenceChart())
+		{
+			var tripIds = stops.map(function(s) { return s.TripId; });
+			var uniqueIds = Enumerable.From(tripIds).Distinct().ToArray();
+			uniqueIds.forEach(function(tripId)
+			{
+				self.dataModel.refreshOptimizeSequenceRate(tripId);
+			});
+		}
+	};
+
+	RoutingTripStopDataModel.prototype.delete = function(deleteArray, isFromRevert, isFromBroadCastSync)
+	{
+		var self = this;
+		return this.deleteTripStop(deleteArray, true, isFromRevert).then(function(deleteTripStops)
+		{
+			self.dataModel.routingStudentManager.refreshDictionary(true);
+			self.dataModel.onTripStopsChangeEvent.notify({ add: [], edit: [], delete: deleteTripStops });
+			if (!isFromBroadCastSync && !isFromRevert)
+			{
+				self.dataModel.tripEditBroadcast.deleteTripStop(deleteArray);
+			}
+			self._runAfterPathChanged(deleteTripStops, "delete");
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.deleteTripStop = function(toDeleteData, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip)
+	{
+		var self = this;
+		var deleteArray = this.dataModel.singleToArray(toDeleteData);
+		var tripStopsGroup = Enumerable.From(deleteArray).GroupBy("$.TripId").ToArray();
+		var promiseArray = [];
+		for (var i = 0; i < tripStopsGroup.length; i++)
+		{
+			promiseArray.push(self._deleteTripStopInOneTrip(tripStopsGroup[i].source, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip));
+		}
+		return Promise.all(promiseArray).then(function(data)
+		{
+			var deleteData = [];
+			data.forEach(function(d)
+			{
+				deleteData = deleteData.concat(d);
+			});
+			return deleteData;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype._deleteTripStopInOneTrip = function(deleteArray, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip)
+	{
+		var self = this;
+		self._viewModal.revertMode = "delete-TripStop";
+		self._viewModal.revertData = [];
+		deleteArray = this.dataModel.singleToArray(deleteArray);
+		var deleteTripStops = [];
+		var editTripStops = [];
+		var changePathTripStops = [];
+		var trip = self.dataModel.getTripById(deleteArray[0].TripId);
+		var studentsTripStops = [];
+		deleteArray.forEach(function(tripStop)
+		{
+			var deleteData = self.dataModel.getTripStop(tripStop.id);
+			deleteData.routeStops = null;
+			if (!isMoveToOtherTrip)
+			{
+				studentsTripStops.push({ students: deleteData.Students, tripStop: deleteData });
+
+				trip.TripStops.forEach(function(stop)
+				{
+					var anotherStudents = Enumerable.From(stop.Students).Where(function(c) { return c.AnotherTripStopID == deleteData.id; }).ToArray();
+					if (anotherStudents.length > 0)
+					{
+						studentsTripStops.push({ students: anotherStudents, tripStop: stop });
+					}
+				});
+			}
+		});
+
+		self.dataModel.unAssignStudentMultiple(studentsTripStops, false);
+
+		deleteArray.forEach(function(tripStop)
+		{
+			var deleteData = self.dataModel.getTripStop(tripStop.id);
+			deleteData.routeStops = null;
+			if (!isMoveToOtherTrip)
+			{
+				self.insertToRevertData(deleteData);
+			}
+			deleteTripStops.push(tripStop);
+			if (tripStop.Sequence > 1)
+			{
+				var prevStop = self.dataModel.getTripStopBySequence(trip, tripStop.Sequence - 1);
+				if (prevStop)
+				{
+					if (changePathTripStops.length == 0)
+					{
+						editTripStops.push(prevStop);
+					}
+					changePathTripStops.push(prevStop);
+				}
+			}
+		});
+
+		var tripStops = trip.TripStops.filter(function(stop)
+		{
+			return !Enumerable.From(deleteTripStops).Any(function(c) { return c.id == stop.id; });
+		});
+		tripStops.forEach(function(stop, i)
+		{
+			var newSequence = i + 1;
+			if (stop.Sequence != newSequence)
+			{
+				editTripStops.push(stop);
+				// commented to fix bug RW-6524
+				// if (i > 1)
+				// {
+				// 	editTripStops.push(trip.TripStops[i - 1]);
+				// }
+				stop.Sequence = newSequence;
+			}
+		});
+		tripStops = self._sortTripStops(tripStops);
+		trip.TripStops = tripStops;
+		return self._refreshTripPathByTripStops(tripStops, deleteTripStops).then(function(tripStops)
+		{
+			editTripStops.forEach(function(stop)
+			{
+				if (!tripStops) { stop.path = {}; }
+				var tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == stop.id; });
+				var needChangePath = Enumerable.From(changePathTripStops).Any(function(c) { return c.id == stop.id; });
+				if (tripStop && needChangePath)
+				{
+					stop.path = tripStop.path;
+				}
+			});
+			self.dataModel.onTripSequenceChangeEvent.notify(editTripStops);
+			self.changeRevertStack(deleteArray, isFromRevert);
+			return deleteTripStops;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, tripId, newSequence)
+	{
+		var self = this;
+		if (tripStop.TripId == tripId)
+		{
+			return self._reorderTripStopSequenceInOneTrip(tripStop, newSequence);
+		}
+		return self.moveTripStopsToOtherTrip([tripStop], tripId, newSequence);
+	};
+
+	RoutingTripStopDataModel.prototype.moveTripStopsToOtherTrip = function(tripStops, tripId, newSequence, isSequenceOptimize, isSmartSequence, isPreserve)
+	{
+		var self = this;
+		var trip = self.dataModel.getTripById(tripId);
+		var tripDeleteStop = self.dataModel.getTripById(tripStops[0].TripId);
+		var stopAssignedStudentsDictionary = {};
+		tripStops.map(function(tripStop)
+		{
+			stopAssignedStudentsDictionary[tripStop.id] = tripStop.Students;
+		});
+		if (isSmartSequence)
+		{
+			self.viewModel.drawTool.redrawPath(tripDeleteStop);
+			var getSequencePromise = Promise.resolve(tripStops);
+			if (isPreserve) getSequencePromise = self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(tripStops, trip, self.viewModel.drawTool);
+			else { getSequencePromise = self.viewModel.eventsManager.vrpTool.getSmartAssignment_multi(tripStops, [trip], true, self.viewModel.drawTool); }
+			return getSequencePromise.then(function(stops)
+			{
+				if (!stops || !$.isArray(stops) || stops.length == 0) return stops;
+				var sequences = newSequence ? [newSequence] : null;
+				if (stops && $.isArray(stops)) sequences = stops.map(function(stop) { return stop.Sequence; })
+				return self.moveTripStopsFromOtherTrip(stops, trip.TripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
+			}).then(function(edits)
+			{
+				if (!edits || !$.isArray(edits) || edits.length == 0) return edits;
+				return self.deleteTripStop(tripStops, false, false, true).then(function()
+				{
+					var changedStudents = [];
+					edits.map(function(stop)
+					{
+						changedStudents = changedStudents.concat(stop.Students);
+					});
+					self.dataModel.routingStudentManager.refresh();
+					self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
+					self.viewModel.drawTool.onAssignStudentsChangeEvent(null, { add: [], edit: changedStudents, delete: [] });
+					self.viewModel.drawTool.redrawPath(trip);
+					return edits;
+				})
+			});
+		} else
+		{
+			return self.deleteTripStop(tripStops, false, false, true).then(function()
+			{
+				self.viewModel.drawTool.redrawPath(tripDeleteStop);
+				var getSequencePromise = Promise.resolve(tripStops);
+				return getSequencePromise.then(function(stops)
+				{
+					var sequences = newSequence ? [newSequence] : null;
+					return self.moveTripStopsFromOtherTrip(stops, trip.TripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
+				})
+
+			}).then(function(edits)
+			{
+				var changedStudents = [];
+				edits.map(function(stop)
+				{
+					changedStudents = changedStudents.concat(stop.Students);
+				});
+				self.dataModel.routingStudentManager.refresh();
+				self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
+				self.viewModel.drawTool.onAssignStudentsChangeEvent(null, { add: [], edit: changedStudents, delete: [] });
+				self.viewModel.drawTool.redrawPath(trip);
+				return edits;
+			});
+		}
+
+	};
+
+	RoutingTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, isFromBroadCastSync)
+	{
+		var self = this;
+		self._viewModal.revertMode = "";
+		self._viewModal.revertData = [];
+		var oldSequence = tripStop.Sequence;
+		var editTripPathStops = [];
+		var trip = self.dataModel.getTripById(tripStop.TripId);
+		if (!isFromBroadCastSync) self.dataModel.tripEditBroadcast.moveTripStop(trip, tripStop, newSequence);
+		var newPrevStop = newSequence > 1 ? self.dataModel.getTripStopBySequence(trip, newSequence - 1) : null;
+		var oldPrevStop = oldSequence > 1 ? self.dataModel.getTripStopBySequence(trip, oldSequence - 1) : null;
+		if (oldSequence < newSequence)
+		{
+			newPrevStop = self.dataModel.getTripStopBySequence(trip, newSequence);
+		}
+		editTripPathStops.push(tripStop);
+		if (newPrevStop)
+		{
+			editTripPathStops.push(newPrevStop);
+		}
+		if (oldPrevStop)
+		{
+			editTripPathStops.push(oldPrevStop);
+		}
+		trip.TripStops.splice(oldSequence - 1, 1);
+		trip.TripStops.splice(newSequence - 1, 0, tripStop);
+		trip.TripStops.forEach(function(stop, i)
+		{
+			stop.Sequence = i + 1;
+		});
+		return self._refreshTripPathByTripStops(trip.TripStops).then(function(tripStops)
+		{
+			editTripPathStops.forEach(function(stop)
+			{
+				var tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == stop.id; });
+				if (tripStop)
+				{
+					stop.path = tripStop.path;
+					stop.Distance = tripStop.Distance;
+					stop.DrivingDirections = tripStop.DrivingDirections;
+					stop.RouteDrivingDirections = tripStop.DrivingDirections;
+					stop.Speed = tripStop.Speed;
+					stop.IsCustomDirection = false;
+				}
+			});
+			var sequenceChanges = trip.TripStops.filter(function(c) { return c.Sequence <= Math.max(oldSequence, newSequence); });
+			self.dataModel.onTripSequenceChangeEvent.notify(sequenceChanges);
+			self.changeRevertStack(editTripPathStops, false);
+		});
+	};
+
+	RoutingTripStopDataModel.prototype._refreshTripByAddStopSmart = function(tripStop)
+	{
+		var self = this;
+		var sequenceChanges = [];
+		tripStop.routeStops = null;
+		return self.viewModel.drawTool.NAtool.refreshTrip(tripStop, "new", false, true).then(function(data)
+		{
+			var prevStop = data[0];
+			var currentStop = data.length > 1 ? data[1] : null;
+			if (currentStop)
+			{
+				var stop = self.dataModel.getTripStop(currentStop.id);
+				if (stop)
+				{
+					stop.path.geometry = currentStop.path.geometry;
+					currentStop.path = stop.path;
+					stop.Distance = currentStop.Distance;
+				}
+			}
+			if (prevStop)
+			{
+				prevStop.routeStops = null;
+			}
+			var tripStops = self.dataModel.getTripById(tripStop.TripId).TripStops;
+			tripStops = self._sortTripStops(tripStops);
+			var startSequence = currentStop ? currentStop.Sequence : prevStop.Sequence;
+
+			for (var i = 0; i < tripStops.length; i++)
+			{
+				if (prevStop && (tripStops[i].id == prevStop.id))
+				{
+					tripStops[i].path = prevStop.path;
+				} else if (currentStop && tripStops[i].id == currentStop.id)
+				{
+					tripStops[i].path = currentStop.path;
+					tripStops[i].Sequence = currentStop.Sequence;
+				} else if (tripStops[i].Sequence >= startSequence)
+				{
+					tripStops[i].Sequence = ++startSequence;
+					sequenceChanges.push(tripStops[i]);
+				}
+			}
+			return tripStops;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype._refreshTripByAddMultiStopsSmart = function(newTripStops, currentTripStops, newTrip)
+	{
+		var self = this;
+		return self.viewModel.drawTool.NAtool.refreshTripByAddMultiStopsSmart(newTripStops, currentTripStops, newTrip);
+	};
+
+	RoutingTripStopDataModel.prototype._refreshTripSequenceOptimizeAndPreserve = function(newTripStops, currentTripStops)
+	{
+		var self = this;
+		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentTripStops, true).then(function(currentStops)
+		{
+			currentStops.forEach(function(stop, index) { stop.Sequence = index + 1; })
+			return self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(newTripStops, { TripStops: currentStops }, self.viewModel.drawTool).then(function(newStops)
+			{
+				newStops.forEach(function(stop)
+				{
+					currentStops = currentStops.slice(0, stop.Sequence - 1).concat([stop]).concat(currentStops.slice(stop.Sequence - 1));
+				});
+				return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentStops, false).then(function(currentStops)
+				{
+					return { stops: currentStops };
+				})
+			})
+
+		})
+	}
+
+	// RoutingTripStopDataModel.prototype._refreshTipPathByInsertToEnd = function(currentTripStops, newTripStops)
+	// {
+	// 	var self = this;
+	// 	var trip = self.dataModel.getTripById(currentTripStops[0].TripId);
+	// 	var currentEndStops = trip.Session == 0 ? currentTripStops.slice(currentTripStops.length - 2) : currentEndStops.slice(0, 2);
+	// 	currentEndStops = [currentEndStops[0]].concat(newTripStops).concat([currentEndStops[1]]);
+	// 	return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentEndStops, true).then(function(stops)
+	// 	{
+	// 		if (trip.Session == 0)
+	// 		{
+	// 			return currentTripStops.slice(0, currentTripStops.length - 2).concat(stops);
+	// 		} else
+	// 		{
+	// 			return stops.concat(currentTripStops.slice(2));
+	// 		}
+
+	// 	})
+	// }
+
+	RoutingTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
+	{
+		var self = this;
+		var tripStopsCopy = JSON.parse(JSON.stringify({ stops: tripStops }));
+		TF.loopCloneGeometry(tripStopsCopy, { stops: tripStops });
+
+		if (deleteStops && deleteStops.length == 1)
+		{
+			return self.viewModel.drawTool.NAtool.refreshTrip(deleteStops[0], "delete");
+		}
+		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(tripStopsCopy.stops, isBestSequence).then((stops) =>
+		{
+			return stops;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.updateTripBoundary = function(modifyDataArray, isFromRevert)
+	{
+		var self = this;
+		self._viewModal.revertMode = "update-TripBoundary";
+		!isFromRevert && (self._viewModal.revertData = []);
+		var changeData = [];
+		var boundaries = [];
+		var originalData = [];
+		modifyDataArray.forEach(function(modifyData)
+		{
+			var tripStop = self.dataModel.getTripStop(modifyData.TripStopId);
+			if (tripStop.boundary && !tripStop.boundary.id)
+			{
+				tripStop.boundary = self.createTripBoundary(tripStop);
+			}
+			tripStop.originalBoundaryGeometry = tripStop.boundary && tripStop.boundary.geometry;
+			originalData.push(self.dataModel.tripEditBroadcast.copyTripStop(tripStop));
+			var data = tripStop.boundary;
+			!isFromRevert && self.insertToRevertData(data);
+			$.extend(data, modifyData);
+			if (modifyData.geometry)
+			{
+				data.geometry = TF.cloneGeometry(modifyData.geometry);
+			}
+			changeData.push(tripStop);
+		});
+		boundaries = changeData.map(function(tripStop) { return tripStop.boundary; });
+		self.dataModel.tripEditBroadcast.send(originalData, changeData);
+		self.dataModel.routingStudentManager.refreshDictionary();
+		return self.updateTripBoundaryStudents(boundaries, null, null, null, null, tf.storageManager.get("notAutoAssignUnassignedStudent") === false).then(function()
+		{
+			self.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: changeData });
+			self.changeRevertStack(modifyDataArray, isFromRevert);
+			return Promise.resolve(changeData);
+		});
+	};
+
+	RoutingTripStopDataModel.prototype._getStudentCrossChangeStops = function(modifyDataArray, type)
+	{
+		var self = this;
+		if (!$.isArray(modifyDataArray)) { modifyDataArray = [modifyDataArray]; }
+		var StudentCrossChangesStops = type == "delete" ? [] : modifyDataArray;
+		modifyDataArray.forEach(function(data)
+		{
+			var afterStopIndex = type == "delete" ? data.Sequence - 1 : data.Sequence;
+			var afterStop = self.dataModel.getTripById(data.TripId).TripStops[afterStopIndex];
+			if (afterStop && (!afterStop.SchoolCode || afterStop.SchoolCode.length == 0)
+				&& StudentCrossChangesStops.filter(function(c) { return c.id == afterStop.id; }).length == 0 && !afterStop.solvePathGeometryNotChange)
+			{
+				StudentCrossChangesStops.push(afterStop);
+			}
+		});
+		return StudentCrossChangesStops;
+	};
+
+	RoutingTripStopDataModel.prototype.updateTripBoundaryStudents = function(boundaries, tripStops, notifyEvent, notifyMapEvent, trip, autoAssign)
+	{
+		var self = this;
+		return self.assignStudentInBoundary(boundaries, notifyEvent, tripStops, notifyMapEvent, trip, autoAssign).then((studentsNeedToUnassign) =>
+		{
+			self.unAssignStudentInBoundary(boundaries, tripStops, studentsNeedToUnassign);
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.setTripStopPathAndSequence = function(tripStop, type, hasSpecialSequence)
+	{
+		var self = this;
+		var sequenceChanges = [];
+		tf.loadingIndicator.show();
+		tripStop.routeStops = null;
+		return self.viewModel.drawTool.NAtool.refreshTrip(tripStop, type, hasSpecialSequence).then(function(response)
+		{
+			var data = response.hasOwnProperty("stops") ? response.stops : response;
+			if (!data) return data;
+			tf.loadingIndicator.tryHide();
+			if (response.err)
+			{
+				tf.promiseBootbox.alert(response.err);
+			}
+			var prevStop = data[0];
+			var currentStop = data.length > 1 ? data[1] : null;
+			if (tripStop.Sequence == 1)
+			{
+				prevStop = null;
+				currentStop = data[0];
+			}
+			if (currentStop)
+			{
+				var stop = self.dataModel.getTripStop(currentStop.id);
+				stop.path.geometry = currentStop.path.geometry;
+				currentStop.path = stop.path;
+				stop.Speed = currentStop.Speed;
+				stop.Distance = currentStop.Distance;
+				stop.DrivingDirections = currentStop.DrivingDirections;
+				stop.RouteDrivingDirections = stop.DrivingDirections;
+				stop.IsCustomDirection = false;
+			}
+			if (prevStop)
+			{
+				prevStop.routeStops = null;
+			}
+			if (type == "move") { return prevStop; }
+			var tripStops = self.dataModel.getTripById(tripStop.TripId).TripStops;
+			tripStops = self._sortTripStops(tripStops);
+			var startSequence = currentStop ? currentStop.Sequence : prevStop.Sequence;
+			if (type == "delete")
+			{
+				startSequence = currentStop.Sequence - 1;
+			}
+			for (var i = 0; i < tripStops.length; i++)
+			{
+				if (prevStop && (tripStops[i].id == prevStop.id))
+				{
+					tripStops[i].path = prevStop.path;
+					tripStops[i].DrivingDirections = prevStop.DrivingDirections;
+					tripStops[i].RouteDrivingDirections = tripStops[i].DrivingDirections;
+					tripStops[i].IsCustomDirection = false;
+				} else if (currentStop && tripStops[i].id == currentStop.id)
+				{
+					tripStops[i].path = currentStop.path;
+					tripStops[i].Sequence = currentStop.Sequence;
+					tripStops[i].DrivingDirections = currentStop.DrivingDirections;
+					tripStops[i].RouteDrivingDirections = tripStops[i].DrivingDirections;
+					tripStops[i].IsCustomDirection = false;
+				} else if (tripStops[i].Sequence >= startSequence)
+				{
+					tripStops[i].Sequence = ++startSequence;
+					sequenceChanges.push(tripStops[i]);
+				}
+				tripStops[i].prevSolvePathGeometry = self.viewModel.drawTool.NAtool.stopTool.getOppositePoint(tripStops[i].geometry, tripStops[i].StreetSegment?.geometry);
+				tripStops[i].currentSolvePathGeometry = self.viewModel.drawTool.NAtool.stopTool.getOppositePoint(tripStops[i].geometry, tripStops[i].StreetSegment?.geometry);
+				if (tripStops[i].prevSolvePathGeometry && tripStops[i].currentSolvePathGeometry && (tripStops[i].prevSolvePathGeometry.x == tripStops[i].currentSolvePathGeometry.x))
+				{
+					tripStops[i].solvePathGeometryNotChange = true;
+				}
+			}
+			self.dataModel.getTripById(tripStop.TripId).TripStops = self._sortTripStops(tripStops);
+			PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), tripStops);
+			if (sequenceChanges.length > 0)
+			{
+				self.dataModel.onTripSequenceChangeEvent.notify(sequenceChanges);
+			}
+			return prevStop;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.bindCoordinate = function(data)
+	{
+		var geoGraphic = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(data.geometry);
+		data.XCoord = geoGraphic.x.toFixed(11);
+		data.YCoord = geoGraphic.y.toFixed(11);
+	};
+
+	RoutingTripStopDataModel.prototype.unAssignStudentInBoundary = function(boundaries, tripStops, studentsNeedToUnassign)
+	{
+		var self = this;
+		var intersects = tf.map.ArcGIS.geometryEngine.intersects;
+		boundaries.forEach(function(boundary)
+		{
+			if (boundary.TripStopId)
+			{
+				var newCandidateStudents = [];
+				var tripStop = self.dataModel.getTripStop(boundary.TripStopId);
+				if (tripStops)
+				{
+					tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.TripStopId; });
+				}
+				var assignStudents = tripStop.Students;
+				assignStudents.forEach(function(student)
+				{
+					const studentNeedToUnassign = studentsNeedToUnassign && studentsNeedToUnassign.indexOf(student.id) >= 0;
+					const studentNotInBoundary = student.geometry && student.geometry.x && boundary.geometry && !intersects(boundary.geometry, student.geometry);
+					const studentInOriginalBounday = student.geometry && student.geometry.x && tripStop.originalBoundaryGeometry && intersects(tripStop.originalBoundaryGeometry, student.geometry);
+					if (studentNotInBoundary && studentInOriginalBounday)
+					{
+						newCandidateStudents.push(student);
+					}
+					else
+					{
+						if (tripStop && student.CrossToStop)
+						{
+							if (tripStop.ProhibitCrosser || studentNeedToUnassign || student.ProhibitCross)
+							{
+								newCandidateStudents.push(student);
+							}
+						}
+					}
+				});
+				self.dataModel.unAssignStudent(newCandidateStudents, tripStop);
+			}
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.assignStudentInBoundary = function(boundaries, notifyEvent, tripStops, notifyMapEvent, trip, autoAssign)
+	{
+		var self = this;
+		boundaries = boundaries.filter(function(c) { return c.TripStopId; });
+		if (boundaries.length == 0)
+		{
+			return Promise.resolve();
+		}
+		var allNewAssignStudents = self.dataModel.getUnAssignStudentInBoundary(boundaries);
+		var promiseList = [];
+		var trips = {};
+		var studentTripStops = [];
+		boundaries.forEach(function(boundary)
+		{
+			var students = (boundary.newAssignStudent || []).filter(function(student)
+			{
+				return Enumerable.From(allNewAssignStudents).Any(function(c) { return c.id == student.id; });
+			});
+			var tripStop = self.dataModel.getTripStop(boundary.TripStopId);
+			if (tripStop && !trips[tripStop.TripId])
+			{
+				trips[tripStop.TripId] = self.dataModel.getTripById(tripStop.TripId);
+			}
+			if (tripStops)
+			{
+				tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.TripStopId; });
+			}
+			if (tripStop.unassignStudent && tripStop.unassignStudent.length > 0) students = tripStop.unassignStudent;
+
+			studentTripStops.push({ students: students, tripStop: tripStop });
+			// change assign student cross status
+			promiseList.push(self.dataModel.calculateStudentCrossStatus(tripStop, tripStop.Students, false, trip, true));
+		});
+
+		// assign new student in boundary
+		if (autoAssign)
+		{
+			promiseList.push(self.dataModel.assignStudentMultiple(studentTripStops, notifyEvent, null, notifyMapEvent, trip, autoAssign, null, null, false));
+		}
+
+		return Promise.all(promiseList).then(function(results)
+		{
+			self.viewModel.display.resetTripInfo(Object.values(trips));
+			var studentsNeedToUnassignList = [];
+			for (var i = 0; i < results.length - 1; i++)
+			{
+				studentsNeedToUnassignList = studentsNeedToUnassignList.concat(results[i]);
+			}
+			return studentsNeedToUnassignList;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.autoAssignStudent = function(tripStops)
+	{
+		var self = this, students = [];
+		tripStops.map(function(tripStop)
+		{
+			if (self.dataModel.tripStopDictionary[tripStop.id])
+			{
+				students = students.concat(self.dataModel.tripStopDictionary[tripStop.id].map(function(studentEntity)
+				{
+					return studentEntity.student;
+				}));
+			}
+		});
+
+		var studentsTripStops = [];
+		tripStops.forEach(function(tripStop)
+		{
+			if (self.dataModel.tripStopDictionary[tripStop.id])
+			{
+				var studentEntities = self.dataModel.tripStopDictionary[tripStop.id].filter(function(studentEntity)
+				{
+					if (Enumerable.From(students).Any(function(c) { return c.id == studentEntity.student.id; }) && studentEntity.canBeAssigned)
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				});
+				studentsTripStops.push({ tripStop: tripStop, students: studentEntities.map(function(s) { return s.student; }) });
+			}
+		});
+		return self.dataModel.assignStudentMultiple(studentsTripStops, false, null, false, null, true, null, null, null, false);
+	};
+
+	RoutingTripStopDataModel.prototype.getStudentInCandidateStudents = function(studentIds)
+	{
+		var self = this;
+		return self.dataModel.candidateStudents.filter(function(student)
+		{
+			return Enumerable.From(studentIds).Any(function(c) { return c == student.id; });
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
+	{
+		var self = this;
+		var trip = this.dataModel.getTripById(data.TripId);
+		if (positionIndex == undefined)
+		{
+			if (data.doorToDoorSchoolId) { trip.TripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.TripStops.filter(s => s.id != data.id), trip.Session, data.doorToDoorSchoolId) - 1, 0, data); }
+			else { trip.TripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequence(trip.TripStops, trip.Session) - 1, 0, data); }
+
+		}
+		else
+		{
+			trip.TripStops.splice(positionIndex, 0, data);
+		}
+
+		if (!this.dataModel.getSmartSequenceSetting() ||
+			positionIndex != undefined)
+		{
+			self.updateSequence(trip);
+		}
+	};
+
+	/**
+	 * calculate trip stop smart sequence
+	 * @param {*} trip
+	 * @param {*} tripStop
+	 */
+	RoutingTripStopDataModel.prototype.calculateSmartSequence = function(trip, tripStop)
+	{
+		var self = this;
+		var tripStopToCalc = $.extend({}, tripStop, { TripId: trip.id });
+		return self.viewModel.drawTool.NAtool.refreshTrip(tripStopToCalc, "new").then(function(data)
+		{
+			return Enumerable.From(data).FirstOrDefault({}, function(c) { return c.id == tripStopToCalc.id; }).Sequence;
+		});
+	};
+
+	RoutingTripStopDataModel.prototype.changeRevertStack = function(data, isFromRevert)
+	{
+		if (!isFromRevert)
+		{
+			var toObject = {};
+			if ($.isArray(data))
+			{
+				toObject = [];
+			}
+			this.dataModel.changeDataStack.push($.extend(true, toObject, data));
+		} else
+		{
+			this.dataModel.changeDataStack.pop();
+		}
+	};
+
+	RoutingTripStopDataModel.prototype.updateSequence = function(trip)
+	{
+		for (var i = 0; i < trip.TripStops.length; i++)
+		{
+			trip.TripStops[i].Sequence = i + 1;
+		}
+	};
+
+	RoutingTripStopDataModel.prototype.insertToRevertData = function(data)
+	{
+		this._viewModal.revertData.push($.extend({}, data, { geometry: data && data.geometry ? TF.cloneGeometry(data.geometry) : null }));
+	};
+
+	RoutingTripStopDataModel.prototype.createTripBoundary = function(tripStop)
+	{
+		return {
+			OBJECTID: 0,
+			id: TF.createId(),
+			TripId: tripStop.TripId,
+			TripStopId: tripStop.id,
+			geometry: tripStop.boundary ? tripStop.boundary.geometry : null,
+			type: "tripBoundary",
+			BdyType: tripStop.boundary ? tripStop.boundary.BdyType : 1
+		};
+	};
+
+	RoutingTripStopDataModel.prototype._sortTripStops = function(stops)
+	{
+		return stops.sort(function(a, b) { return a.Sequence > b.Sequence ? 1 : -1; });
+	};
+
+	RoutingTripStopDataModel.prototype.getDataModel = function()
+	{
+		return {
+			id: 0,
+			SchoolCode: "",
+			SchoolId: -1,
+			Sequence: 0,
+			StopTime: "00:00:00",
+			TotalStopTime: "00:00:00",
+			TotalStopTimeManualChanged: false,
+			IShow: true,
+			IsCustomDirection: false,
+			RouteDrivingDirections: "",
+			Street: "",
+			City: "",
+			XCoord: "",
+			YCoord: "",
+			Comment: "",
+			TripId: "",
+			StopType: "",
+			Students: [],
+			type: "tripStop",
+			ActualStopTime: "00:00:00",
+			AssignedStudentCount: 0,
+			Distance: 0,
+			Duration: "00:00:00",
+			Speed: 0,
+			TotalStudentCount: 0,
+			Travel: "00:00:00",
+			ProhibitCrosser: 0,
+			path: {},
+			boundary: {},
+			vehicleCurbApproach: tf.storageManager.get("tripStop-vehicleCurbApproach") >= 0 ? tf.storageManager.get("tripStop-vehicleCurbApproach") : 1,
+			isSnapped: false,
+			unassignStudent: false,
+			SchoolLocation: null,
+			LockStopTime: false,
+			StreetSegment: null,
+			StreetSpeed: 0,
+			IncludeNoStudStop: tf.storageManager.get("tripStop-IncludeNoStudStop") ? true : false,
+		};
+	};
+})();

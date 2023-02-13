@@ -1,0 +1,26 @@
+<div class="row" data-bind="uiInit:init">
+	<div class="col-xs-24">
+		<div class="checkbox">
+			<label>
+				<input data-bind="checked: obShowStreet" type="checkbox">
+				<span>Show Street</span>
+			</label>
+		</div>
+	</div>
+	<div class="col-xs-24">
+		<div class="checkbox">
+			<label>
+				<input data-bind="checked: obShowCurb,enable:obShowStreet()" type="checkbox">
+				<span>Show Curb Approach</span>
+			</label>
+		</div>
+	</div>
+	<div class="col-xs-24">
+		<div class="checkbox">
+			<label>
+				<input data-bind="checked: obShowManeuvers,enable:obShowStreet()" type="checkbox">
+				<span>Show Junctions with Custom Maneuvers</span>
+			</label>
+		</div>
+	</div>
+</div>

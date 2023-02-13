@@ -1198,6 +1198,34 @@ createNamespace("TF").uturnDic = {
 	"no-backtrack": "esriNFSBNoBacktrack"
 };
 
+createNamespace("TF").convertToBoolean = function(data)
+{
+	if (typeof (data) == "string")
+	{
+		return data.toLowerCase() == "true";
+	}
+	if (data == null)
+	{
+		return false;
+	}
+	return !!data;
+};
+
+createNamespace("TF").cloneGeometry = function(geometry)
+{
+	if (!geometry)
+	{
+		return null;
+	}
+	return geometry.clone();
+};
+
+createNamespace("TF").createId = function(randomNumber)
+{
+	var number = randomNumber ? randomNumber : 1000;
+	return parseFloat((new Date()).getTime().toString().substr(8, 13) + "" + Math.floor(Math.random() * number));
+};
+
 //#endregion
 
 function IsEmptyString(str)

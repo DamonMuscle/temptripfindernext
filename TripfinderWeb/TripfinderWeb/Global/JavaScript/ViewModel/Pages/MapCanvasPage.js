@@ -57,7 +57,7 @@
 		const self = this,
 			routeState = self.routeState;
 
-		self.travelScenariosPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
+		self.travelScenariosPaletteViewModel = new TF.RoutingMap.TravelScenariosPaletteViewModel(self, true, routeState);
 		self.directionPaletteViewModel = new TF.RoutingMap.DirectionPaletteViewModel(self, true, routeState);
 		self.directionPaletteViewModel_ESRI_HOSTED = new TF.RoutingMap.DirectionPaletteViewModel_ESRI(self, true, routeState + "E");
 		self.directionPaletteViewModel_OSM = new TF.RoutingMap.DirectionPaletteViewModel_OSM(self, true, routeState + "O");
@@ -72,7 +72,7 @@
 		self.geoSearchPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
 		self.routingMapPanelManager = new TF.RoutingMap.RoutingMapPanelManager(self);
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
-		self.routingSnapManager = {obShow: ko.observable(false)}; // new TF.Document.RoutingSnapManger(self);
+		self.routingSnapManager = new TF.Document.RoutingSnapManger(self);
 		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
 		// self.routingPaletteViewModel.unassignedStudentViewModel.eventsManager.requireDetails.subscribe((e, data) =>
 		// {
@@ -122,7 +122,7 @@
 					self._initMapTool();
 					self.routingMapPanelManager.init();
 					// tf.loadingIndicator.tryHide();
-					// PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
+					PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
 
 					self._onMapLoad();
 
@@ -580,16 +580,16 @@
 					{
 						data.show();
 					}, 100);
+
+					data.obShow(isShow);
+					self.updatePanelsStatus(data);					
 				} else
 				{
 					if (icon)
 					{
 						icon.addClass("disable");
 					}
-					data.close();
 				}
-				data.obShow(isShow);
-				self.updatePanelsStatus(data);
 			} else
 			{
 				var menuItem = null;
@@ -605,14 +605,12 @@
 					TF.Map.RoutingMapTool.prototype.clickFirstSubMenu(menuItem);
 				}
 			}
-			self.toggleTravelScenarioLock();
 			return Promise.resolve(true);
 		});
 	};
 
 	MapCanvasPage.prototype.toggleTravelScenarioLock = function()
 	{
-        return;
 		var shows = [this.mapEditingPaletteViewModel.obShow(), this.routingPaletteViewModel.obShow(), this.travelScenariosPaletteViewModel.obShow()];
 		var selectedTravelScenario = this.travelScenariosPaletteViewModel.travelScenariosViewModel.obSelectedTravelScenarios();
 		if (selectedTravelScenario)
@@ -1239,7 +1237,7 @@
 		// this.parcelPaletteViewModel.dispose();
 		// this.boundaryPaletteViewModel.dispose();
 		// this.mapEditingPaletteViewModel.dispose();
-		// this.travelScenariosPaletteViewModel.dispose();
+		this.travelScenariosPaletteViewModel.dispose();
 		// this.mapLayersPaletteViewModel.dispose();
 		// this.routingPaletteViewModel.dispose();
 		// this.customMapPaletteViewModel.dispose();

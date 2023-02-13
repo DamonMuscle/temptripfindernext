@@ -1,0 +1,86 @@
+<div class="item-container parcelpalette" data-bind="uiInit:init,visible:obShow">
+	<div class="deleteBtn" title="Remove" data-bind="click: $parent.removePanel"></div>
+	<div class="item-header item-header-helper" data-bind="css:type, event: {dblclick: $parent.toggleContent,mousedown:$parent.mouseDown}">
+		<div class="icon">
+			<div class="badge"></div>
+		</div>
+		<div class="title" data-bind="text:'Travel Scenario'+(travelScenariosViewModel.obSelectedTravelScenarios() ? (' - '+travelScenariosViewModel.obSelectedTravelScenarios().Name) : '')"></div>
+		<div data-bind="visible:isEyeVisible&&isEyeVisible(),click:toggleShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide ' + eyeTitle():'Show '+ eyeTitle()}" class="show-eye"></div>
+	</div>
+	<div class="slider-list item-content" data-bind="css:className, style: { display: isOpen ? 'block' : 'none' }">
+		<!-- ko with: travelScenariosViewModel -->
+		<div class=" school-mapediting-grid content-container">
+			<div class="item-content panel-grid-content show">
+				<div class="parcelpalette mapeditingpalette">
+					<div class="directions-tool locate-tool parcelpoint-tool" data-bind="uiInit:uiInit">
+						<div class="print-setting-group" data-bind="dropDownMenu">
+							<div class="icon file fixed-menu-btn" title="File"></div>
+							<div class="menu fileMenu withsub-menu with-sub-menu">
+								<ul>
+									<li class="menu-item">
+										<div class="menuIcon"></div>
+										<div class="menu-label text"><span>Open</span><span class="k-icon k-i-arrow-e"></span></div>
+										<!-- ko if:  obTravelScenarios().length>0 -->
+										<div>
+											<ul class="sub-menu sub-context-menu sub-context-menu-contain-icon" data-bind="foreach:{ data:obTravelScenarios}">
+												<li class="firstMenuItem active" data-bind="css: {firstMenuItem:$index==0,active:$parent.obSelectedTravelScenarios()&&$parent.obSelectedTravelScenarios().Id==$data.Id},click:$parent.eventsManager.openTravelScenarioClick">
+													<div class="menu-label text"><span data-bind="text: Name,attr: {title: Name }"></span></div>
+												</li>
+											</ul>
+										</div>
+										<!-- /ko -->
+										<!-- ko if:  obTravelScenarios().length<=0 -->
+										<div>
+											<ul class="sub-menu sub-context-menu sub-context-menu-contain-icon">
+												<li class="firstMenuItem menu-item">
+													<div class="menu-label text"><span>No Travel Scenarios exist</span></div>
+												</li>
+											</ul>
+										</div>
+										<!-- /ko -->
+									</li>
+									<li class="firstMenuItem" data-bind="clickButton:{click:eventsManager.newTravelScenariosClick.bind(eventsManager),disable:!tf.authManager.isAuthorizedFor('mapEdit', 'add')}">
+										<div class="menuIcon"></div>
+										<div class="menu-label text"><span>New</span></div>
+									</li>
+									<li class="menu-item" data-bind="clickButton:{click:eventsManager.manageTravelScenarioClick.bind(eventsManager),disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])}">
+										<div class="menuIcon"></div>
+										<div class="menu-label text"><span>Manage</span></div>
+									</li>
+									<li class="menu-divider">
+										<div class="rule"></div>
+									</li>
+									<li class="menu-item" data-bind="click:eventsManager.settingsClick">
+										<div class="menuIcon"></div>
+										<div class="menu-label text"><span>Settings</span></div>
+									</li>
+									<li class="menu-item" data-bind="clickButton:{click:eventsManager.saveClick,disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])||streetCurbTurnDataModel.obSelfChangeCount()==0}">
+										<div class="menuIcon save"></div>
+										<div class="menu-label text"><span>Save</span></div>
+									</li>
+									<li class="menu-item" data-bind="clickButton:{click:eventsManager.revertClick,disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])||streetCurbTurnDataModel.obSelfChangeCount()==0}">
+										<div class="menuIcon revert"></div>
+										<div class="menu-label text"><span>Revert</span></div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="item-header" style="position: absolute;right:0;">
+							<div class="save-icon head-icon" title="Save Changes On Current Tab" data-bind="click:eventsManager.saveClick,visible:streetCurbTurnDataModel.obSelfChangeCount()>0 ">
+								<div class="badge" data-bind="css:{'hide-number': streetCurbTurnDataModel.obSelfChangeCount()==0 }, text:streetCurbTurnDataModel.obSelfChangeCount()"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="parcelpalette boundarypalette">
+					<div class="bottom-info-container">
+						<div data-bind="text:obTravelScenariosFooterDisplay"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+		<!-- ko template: { name: 'workspace/RoutingMap/RoutingMapPanel/TravelScenariosPalette/TravelRegionsMenu',data:travelRegionsViewModel} -->
+		<!-- /ko -->
+	</div>
+</div>

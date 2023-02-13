@@ -1,0 +1,144 @@
+<div class="item-header panel-grid-header mapediting-palette-head">
+	<div class="icon travel-regions">
+		<div class="badge" data-bind="text:dataModel.travelRegionLockData.obOtherChangeCount(),visible:dataModel.travelRegionLockData.obOtherChangeCount()>0"></div>
+		<div class="tooltip" data-bind="toolTip">
+			<div class="content">
+				<span class="scroll-content" data-bind="html:dataModel.travelRegionLockData.obOtherChangeContent()"></span> <a class="fix-at-bottom" data-bind="click:dataModel.travelRegionLockData.refreshOtherChange">Refresh map</a>
+			</div>
+		</div>
+	</div>
+	<div class="title" data-bind="text:'Travel Regions'"></div>
+	<div class="head-icon show-eye" data-bind="visible:isEyeVisible&&isEyeVisible(), click:toggleTravelRegionShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide ' + eyeTitle():'Show '+ eyeTitle()}"></div>
+	<div class="save-icon head-icon" title="Save Changes On Current Tab" data-bind="click:eventsManager.saveTravelRegionClick.bind(eventsManager),visible:dataModel.travelRegionLockData.obSelfChangeCount()>0 || dataModel.travelRegionLockData.obSelfChangeStyle()">
+		<div class="badge" data-bind="css:{'hide-number': dataModel.travelRegionLockData.obSelfChangeCount()==0 && dataModel.travelRegionLockData.obSelfChangeStyle()}, text:dataModel.travelRegionLockData.obSelfChangeCount()"></div>
+	</div>
+</div>
+<div class="school-mapediting-grid content-container">
+	<div class="item-content panel-grid-content show">
+		<div class="parcelpalette mapeditingpalette">
+			<div class="directions-tool locate-tool parcelpoint-tool" data-bind="uiInit:uiInit">
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon file fixed-menu-btn" title="File" data-bind="css:{disable:obIsTravelRegionEditButtonDisable()}"></div>
+					<div class="menu fileMenu withsub-menu">
+						<ul>
+							<li class="firstMenuItem" data-bind="clickButton:{click:eventsManager.settingsClick.bind(eventsManager),disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])}">
+								<div class="menuIcon settings"></div>
+								<div class="text"><span>Settings</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li data-bind="clickButton:{click:eventsManager.saveTravelRegionClick.bind(eventsManager),disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])|| (dataModel.travelRegionLockData.obSelfChangeCount()==0 && !dataModel.travelRegionLockData.obSelfChangeStyle())}">
+								<div class="menuIcon save"></div>
+								<div class="text"><span>Save</span></div>
+							</li>
+							<li data-bind="clickButton:{click:eventsManager.revertTravelRegionClick.bind(eventsManager),disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])||dataModel.travelRegionLockData.obSelfChangeCount()==0}">
+								<div class="menuIcon revert"></div>
+								<div class="text"><span>Revert</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon add-parcel fixed-menu-btn" title="Add Travel Region" data-bind="css:{disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])||obIsTravelRegionEditButtonDisable()}"></div>
+					<div class="menu checkable withsub-menu with-sub-menu">
+						<ul>
+							<li class="menu-item" data-bind="click:eventsManager.createTravelRegionClick.bind(eventsManager),mapModeStyleButton">
+								<div class="menuIcon create-parcel"></div>
+								<div class="menu-label text"><span>Create Travel Region</span></div>
+							</li>
+							<li class="menu-item" data-bind="clickButton:{disable:eventsManager.copyFromObject()==null,click:eventsManager.createTravelRegionFromSelectionClick}">
+								<div class="check"></div>
+								<div class="menu-label text"><span>Create Travel Region from Selection</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- <div class="icon edit-boundaries" title="Edit Boundaries" data-bind="clickButton:{disable:!obBoundarySeleted(),click:editBoundariesClick}" mode="Boundary-EditBoundaries"></div> -->
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon select-area fixed-menu-btn select" title="Select Map Area" data-bind="css:{disable:obIsTravelRegionEditButtonDisable()}"></div>
+					<div class="menu selectAreaMenu checkable withsub-menu">
+						<ul>
+							<li class="point" data-bind="click:eventsManager.travelRegionSelectAreaOptionClick.bind(eventsManager,'point'),mapModeStyleButton">
+								<div class="menuIcon point"></div>
+								<div class="text"><span>Point</span></div>
+							</li>
+							<li class="polygon" data-bind="click:eventsManager.travelRegionSelectAreaOptionClick.bind(eventsManager,'polygon'),mapModeStyleButton">
+								<div class="menuIcon polygon"></div>
+								<div class="text"><span>Polygon</span></div>
+							</li>
+							<li class="rectangle" data-bind="click:eventsManager.travelRegionSelectAreaOptionClick.bind(eventsManager,'rectangle'),mapModeStyleButton">
+								<div class="menuIcon rectangle"></div>
+								<div class="text"><span>Rectangle</span></div>
+							</li>
+							<li class="draw" data-bind="click:eventsManager.travelRegionSelectAreaOptionClick.bind(eventsManager,'draw'),mapModeStyleButton">
+								<div class="menuIcon draw"></div>
+								<div class="text"><span>Draw</span></div>
+							</li>
+							<li class="circle" data-bind="click:eventsManager.travelRegionSelectAreaOptionClick.bind(eventsManager,'circle'),mapModeStyleButton">
+								<div class="menuIcon circle"></div>
+								<div class="text"><span>Circle</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="icon zoom-map-to-layers" title="Zoom Map to Layers" data-bind="clickButton:{disable:obIsTravelRegionEditButtonDisable(),click:eventsManager.centerMapClick.bind(eventsManager)}"></div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon select-all fixed-menu-btn" title="Select Travel Region" data-bind="css:{disable:obIsTravelRegionEditButtonDisable()}"></div>
+					<div class="menu selectMenu withsub-menu">
+						<ul>
+							<li data-bind="click:eventsManager.travelRegionSelectAllClick.bind(eventsManager)">
+								<div class="menuIcon select-all-white"></div>
+								<div class="text"><span>Select All</span></div>
+							</li>
+							<li data-bind="click:eventsManager.travelRegionDeselectAllClick.bind(eventsManager)">
+								<div class="menuIcon clear-all-white"></div>
+								<div class="text"><span>Deselect All</span></div>
+							</li>
+							<li data-bind="click:eventsManager.travelRegionClearAllClick.bind(eventsManager)">
+								<div class="menuIcon omit-White"></div>
+								<div class="text"><span>Clear All</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="icon boundary-details" title="Travel Region Details" data-bind="clickButton:{disable:!obHighlightedTravelRegion()||obIsTravelRegionEditButtonDisable(),click:eventsManager.travelRegionDetailsClick.bind(eventsManager)}"></div>
+				<div class="vertical-line"></div>
+				<div class="icon delete" title="Delete" data-bind="clickButton:{disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])||!obHighlightedTravelRegion()||obIsTravelRegionEditButtonDisable(),click:eventsManager.deleteTravelRegionClick.bind(eventsManager)}"></div>
+			</div>
+		</div>
+		<div class="parcelpalette boundarypalette" data-bind="with: travelRegionsDisplay">
+			<div class="pannel-item-content" data-bind="panelContentDrag:{displayArray:obTravelRegions}">
+				<!-- ko foreach: obTravelRegions -->
+				<div class="content-wrapper parcel-warpper" data-bind="css:{'selected':$data.obIsHighlighted()}">
+					<div class="content-container boundary-planning-container" data-bind="event:{ click: $parent.selectTravelClick.bind($parent)}">
+						<div class="left-column-icon-container">
+							<div class="left-column-icon">
+								<div class="content-type-icon " data-bind="css:{'lock':$data.obIsLockedByOther()},attr:{title:$data.obLockedByUser()}">
+								</div>
+							</div>
+						</div>
+						<svg class="boundary-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+							<path d="M6,26H26V18.25L12.62,6.69,6,12.87Z" / data-bind="style:{fillOpacity: 0.6, fill: $parent.dataModel.getColorByType($data.obType()),
+						stroke: $parent.dataModel.getColorByType($data.obType()),
+						strokeWidth:'3px'}">
+						</svg>
+						<div class="content parcel-content" data-bind="text:$data.obName()"></div>
+						<div class="buttons">
+							<div class="icon zoom-map-to-layers" title="Center Map" data-bind="click:$parent.eventsManager.centerMapClick.bind($parent.eventsManager)"></div>
+							<div class="icon delete" title="Delete" data-bind="clickButton:{click:$parent.eventsManager.deleteClick.bind($parent.eventsManager),disable:!tf.authManager.isAuthorizedFor('mapEdit', ['edit','add'])}"></div>
+						</div>
+					</div>
+				</div>
+				<!--/ko-->
+			</div>
+			<div class="bottom-info-container">
+				<div data-bind="text:obTravelRegionFooterDisplay()"></div>
+			</div>
+		</div>
+	</div>
+</div>

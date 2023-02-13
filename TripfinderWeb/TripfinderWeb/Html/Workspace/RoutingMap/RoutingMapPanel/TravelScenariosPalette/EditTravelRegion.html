@@ -1,0 +1,119 @@
+<div class="parcel-edit-overlay" data-bind="visible:obOverlayVisible,click:overlayClick">
+</div>
+<div class="parcel-edit-modal-container travelEditModal" data-bind="visible:obVisible,uiInit:onInit">
+	<div class="content document-dataentry edittravelregion">
+		<div class="head" data-bind="click:toggleCollapseClick ">
+			<span data-bind="text:obTitle"></span>
+			<span class="close" data-bind="click:cancelClick">×</span>
+		</div>
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+		<div class="modify-content">
+			<div class="body">
+				<div class="dataentry-paginator clearafter" data-bind="visible:obRecordsCount()>1&&obShowPaging() " style="right: 4px;top:18px;">
+					<div class="page-group">
+						<a class="iconbutton page-previous" data-bind="click:previousClick,css: { disabled: obCurrentPage()<=0 }" role="button"></a>
+						<a class="iconbutton page-next" data-bind="click:nextClick,css: { disabled: obCurrentPage()+1>=obRecordsCount() }" role="button"></a>
+						<div class="page-indicator"><span data-bind="text:obCurrentPage()+1"></span> of <span data-bind="text:obRecordsCount"></span></div>
+					</div>
+				</div>
+				<div style="padding:0 25px;">
+					<div class="row">
+						<div class="col-xs-24">
+							<div class="form-group">
+								<div class="form-group">
+									<label>Name</label>
+									<input type="text" data-bind="value:obName,disable:isReadOnly" name="name" class="form-control">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group no-arrow">
+								<label>Type</label>
+							</div>
+						</div>
+						<div class="col-xs-20">
+							<div class="row" style="margin-top: 6px;">
+								<div class="checkbox">
+									<div>
+										<label>
+											<input data-bind="checked: obType,value:TF.RoutingMap.MapEditingPalette.Type.Preferred,disable:isReadOnly" type="radio" name="type" style="margin-top:0px;vertical-align:middle">
+											<span>Preferred</span>
+										</label>
+									</div>
+								</div>
+								<div data-bind="visible:obType() == TF.RoutingMap.MapEditingPalette.Type.Preferred">
+									<div style="margin-left:36px">
+										<span>Increase Travel Speed by: </span>
+									</div>
+									<div style="margin-left:188px;margin-top:-20px">
+										<span>
+											<input data-bind="checked:obPreferRatio,checkedValue:0.5,disable:isReadOnly" type="radio" name="ratio" value="0.5" style="margin-top:0px;vertical-align:middle">
+											<span>2X</span>
+										</span>
+										<span>
+											<input data-bind="checked:obPreferRatio,checkedValue:0.2,disable:isReadOnly" type="radio" name="ratio" value="0.2" style="margin-top:0px;vertical-align:middle">
+											<span>5X</span>
+										</span>
+										<span>
+											<input data-bind="checked:obPreferRatio,checkedValue:0.1,disable:isReadOnly" type="radio" name="ratio" value="0.1" style="margin-top:0px;vertical-align:middle">
+											<span>10X</span>
+										</span>
+									</div>
+
+								</div>
+								<div class="checkbox">
+									<div>
+										<label>
+											<input data-bind="checked: obType,value:TF.RoutingMap.MapEditingPalette.Type.Restricted,disable:isReadOnly" type="radio" name="type" style="margin-top:0px;vertical-align:middle">
+											<span>Restricted</span>
+										</label>
+									</div>
+								</div>
+								<div data-bind="visible:obType() == TF.RoutingMap.MapEditingPalette.Type.Restricted">
+									<div style="margin-left:36px">
+										<span>Reduce Travel Speed by: </span>
+									</div>
+									<div style="margin-left:188px;margin-top:-20px">
+										<span>
+											<input data-bind="checked:obRestrictRatio,checkedValue:2,disable:isReadOnly" type="radio" name="ratio2" value="2" style="margin-top:0px;vertical-align:middle">
+											<span>2X</span>
+										</span>
+										<span>
+											<input data-bind="checked:obRestrictRatio,checkedValue:5,disable:isReadOnly" type="radio" name="ratio2" value="5" style="margin-top:0px;vertical-align:middle">
+											<span>5X</span>
+										</span>
+										<span>
+											<input data-bind="checked:obRestrictRatio,checkedValue:10,disable:isReadOnly" type="radio" name="ratio2" value="10" style="margin-top:0px;vertical-align:middle">
+											<span>10X</span>
+										</span>
+									</div>
+								</div>
+								<div class="checkbox">
+									<label>
+										<input data-bind="checked: obType,value:TF.RoutingMap.MapEditingPalette.Type.Prohibited,disable:isReadOnly" type="radio" name="type">
+										<span>Prohibited</span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row" style="margin-left:0;margin-top:10px">
+						<div>
+							<label>
+								<input type="checkbox" data-bind="checked:obChangeTime,disable:isReadOnly" style="margin-top:0px;vertical-align:middle">
+								<span>Change Travel Time</span>
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="foot">
+				<button type="button" data-bind="click:applyClick,visible:!isReadOnly()" class="btn tf-btn-black">Apply</button>
+				<button type="button" data-bind="click:cancelClick" class="btn btn-link">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
