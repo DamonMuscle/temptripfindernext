@@ -1224,8 +1224,7 @@
 			operationResult: true
 		};
 
-		if (self.obSelectedGridFilterId() &&
-			(self.findCurrentHeaderFilters() || self.findCurrentOmittedRecords().length > 0))
+		if (self.obSelectedGridFilterId() && self.findCurrentOmittedRecords().length > 0)
 		{
 			var message = self._getSaveCurrentFilterPromtMessage(triggerName);
 			return tf.promiseBootbox.yesNo(
