@@ -61,6 +61,29 @@
 			</div>
 		</div>
 		<div class="directions-content">
+			<div class="directions-items" style="margin: 10px;">
+				<label>Map Service</label>
+				<div>
+					<span class="radio" style="display: inline-block;">
+						<label>
+							<input type="radio" data-bind="checked:obMapServiceType,checkedValue:0" name="mapService" value="0">
+							<span>ESRI HOSTED</span>
+						</label>				
+					</span>
+					<span class="radio" style="display: inline-block;">
+						<label>
+							<input type="radio" data-bind="checked:obMapServiceType,checkedValue:1" name="mapService" value="1" disabled>
+							<span>OSM</span>
+						</label>
+					</span>
+					<span class="radio" style="display: inline-block;">
+						<label>
+							<input type="radio" data-bind="checked:obMapServiceType,checkedValue:2" name="mapService" value="2">
+							<span>SELF HOSTED</span>
+						</label>
+					</span>	
+				</div>			
+			</div>			
 			<div class="directions-stops">
 				<div class="row">
 					<div class="directions-check-box-group">
