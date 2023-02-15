@@ -322,7 +322,12 @@
 			travelRegions.forEach(function(graphic)
 			{
 				var barrier = new self._arcgis.Graphic();
-				barrier.geometry = self._arcgis.webMercatorUtils.webMercatorToGeographic(graphic.geometry);
+				var geometry = graphic.geometry;
+				if (geometry && geometry.spatialReference && geometry.spatialReference.wkid === 102100)
+				{
+					geometry = self._arcgis.webMercatorUtils.webMercatorToGeographic(geometry);
+				}
+				barrier.geometry = geometry;
 				var type = graphic.attributes.Type == 2 ? 0 : 1;
 				var weight = graphic.attributes.Weight;
 				var attrTimeKey = "Attr_Time";
