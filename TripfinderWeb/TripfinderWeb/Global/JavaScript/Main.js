@@ -1144,12 +1144,12 @@ createNamespace("TF").queryTravelSCenarios = function(scenarioId, isRouting)
 	if (isRouting)
 	{
 		promiseCurbApproachsFile = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/24", scenarioId);
-		promiseTravelRegionsFile = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/25", scenarioId);
+		promiseTravelRegionsFile = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"), scenarioId);
 	}
 	else
 	{
 		promiseCurbApproachsFile = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/24", scenarioId);
-		promiseTravelRegionsFile = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/25", scenarioId);
+		promiseTravelRegionsFile = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneServiceFile + "/25"), scenarioId);
 	}
 	return Promise.all([promiseCurbApproachsFile, promiseTravelRegionsFile]).then(function(data)
 	{
@@ -1231,6 +1231,19 @@ createNamespace("TF").xyToGeometry = function(x, y)
 	var p = new tf.map.ArcGIS.Point(x, y, tf.map.ArcGIS.SpatialReference.WGS84);
 	return tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(p);
 };
+
+// FOR DEMO ONLY
+createNamespace("TF").getOnlineUrl = function(url){
+	if(typeof window.mapServiceType == 'undefined' || window.mapServiceType == 0)
+	{
+		if(url.endsWith("/FeatureServer/25") || url.endsWith("/MapServer/25"))
+		{
+			url = "https://services8.arcgis.com/kULjRYHBqUKIzQCS/arcgis/rest/services/travelscenario03/FeatureServer/0";
+		}
+	}
+
+	return url;
+}
 //#endregion
 
 function IsEmptyString(str)

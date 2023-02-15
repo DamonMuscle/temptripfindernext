@@ -328,7 +328,7 @@
 	TravelRegionsDataModel.createTravelRegionFeatureData = function()
 	{
 		return new TF.RoutingMap.FeatureDataModel({
-			url: arcgisUrls.MapEditingOneService + "/25",
+			url: TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"),
 			query: function(queryOption)
 			{
 				var query = new tf.map.ArcGIS.Query();

@@ -51,7 +51,7 @@
 				// TODO: update tomtomna GeocodeServer
 				// geocodeUrl = "http://tomtomna.transfinder.com/arcgis/rest/services/NorthAmerica/";
 			}
-			else if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 1)
+			else if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 0)
 			{
 				self._arcgis.esriConfig.apiKey = "AAPK831e30fbca2e488eb45497c69f753bc6ufPNUlFdFwgUJODDnT0wC1wWks-xJN2dLidH1m9x3bB-Mov6i1RbGoVAVwLgjn8P";
 				geocodeUrl =  "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";

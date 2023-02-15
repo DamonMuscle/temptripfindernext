@@ -33,7 +33,12 @@
 		self.obIsDropModeOpen = ko.observable(false);
 		self.resetPanel();
 		self.travelScenarios = ko.observableArray();
+		
+		// FOR DEMO ONLY
 		self.obMapServiceType = ko.observable(0);
+		self.obMapServiceType.subscribe((value) => {
+			window.mapServiceType = value;
+		});
 
 		// Tools
 		self.openDestinationDropModeClick = self.openDestinationDropModeClick.bind(self);
