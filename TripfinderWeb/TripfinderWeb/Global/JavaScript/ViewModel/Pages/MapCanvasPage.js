@@ -664,7 +664,7 @@
 				const palettes = [
 					// TF.Map.RoutingMapTool.buildMenuItem('Boundary Planning', 'boundary', self.boundaryPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Map Viewer', 'custommap', self.customMapPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Directions - original', 'direction', self.directionPaletteViewModel, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - ESRI HOSTED', 'direction', self.directionPaletteViewModel_ESRI_HOSTED, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - SELF HOSTED', 'direction', self.directionPaletteViewModel_SELF_HOSTED, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - OSM', 'direction', self.directionPaletteViewModel_OSM, self.togglePalettePanel),
