@@ -182,7 +182,7 @@
 		if (menuItem)
 		{
 			menuItem.onclick();
-			// menuItem.toggleStatus = false;
+			menuItem.toggleStatus(false);
 		}
 	};
 
