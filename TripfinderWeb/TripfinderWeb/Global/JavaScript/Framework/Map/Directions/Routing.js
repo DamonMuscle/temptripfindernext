@@ -350,7 +350,7 @@
 			if (self._viewModel)
 			{
 				if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 2) {
-					return "http://tomtomna.transfinder.com/arcgis/rest/services/NorthAmerica/NAServer/Route";
+					return "http://172.16.10.36/arcgis/rest/services/NorthAmerica/NAServer/Route";
 				} else if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 0) {
 					self._arcgis.esriConfig.apiKey = "AAPK831e30fbca2e488eb45497c69f753bc6ufPNUlFdFwgUJODDnT0wC1wWks-xJN2dLidH1m9x3bB-Mov6i1RbGoVAVwLgjn8P";
 					return "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
