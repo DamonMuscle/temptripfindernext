@@ -114,8 +114,8 @@
 					// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
 					self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
 					self.autoPan.initialize(self.element, 20);
-					// self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
-					// self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
+					self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
+					self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
 
 					self._initDirectionTool();
 
@@ -502,59 +502,59 @@
 		var show = data.obShow();
 		var promise = show ? data.unSaveCheck() : Promise.resolve(true);
 
-		var _handleDirectionsResearch = async () =>
-		{
-			// close opening direction palette.
-			var _data = null;	
-			// if (self.directionPaletteViewModel_ESRI_HOSTED.obShow())
-			// {
-			// 	_data = self.directionPaletteViewModel_ESRI_HOSTED;
-			// }
+		// var _handleDirectionsResearch = async () =>
+		// {
+		// 	// close opening direction palette.
+		// 	var _data = null;	
+		// 	// if (self.directionPaletteViewModel_ESRI_HOSTED.obShow())
+		// 	// {
+		// 	// 	_data = self.directionPaletteViewModel_ESRI_HOSTED;
+		// 	// }
 	
-			// if (self.directionPaletteViewModel_SELF_HOSTED.obShow())
-			// {
-			// 	_data = self.directionPaletteViewModel_SELF_HOSTED;
-			// }
+		// 	// if (self.directionPaletteViewModel_SELF_HOSTED.obShow())
+		// 	// {
+		// 	// 	_data = self.directionPaletteViewModel_SELF_HOSTED;
+		// 	// }
 	
-			if (self.directionPaletteViewModel.obShow())
-			{
-				_data = self.directionPaletteViewModel;
-			}
+		// 	if (self.directionPaletteViewModel.obShow())
+		// 	{
+		// 		_data = self.directionPaletteViewModel;
+		// 	}
 	
-			if (_data !== null)
-			{
-				_data.unSaveCheck();
-				await _closeDirectionPalette(null, _data);
-			}
+		// 	if (_data !== null)
+		// 	{
+		// 		_data.unSaveCheck();
+		// 		await _closeDirectionPalette(null, _data);
+		// 	}
 
-			_closeDirectionPalette = async (_, _data) =>
-			{
-				_data.close();
-				_data.obShow(false);
-				self.updatePanelsStatus(_data);
+		// 	_closeDirectionPalette = async (_, _data) =>
+		// 	{
+		// 		_data.close();
+		// 		_data.obShow(false);
+		// 		self.updatePanelsStatus(_data);
 	
-				self.toggleTravelScenarioLock();
-				return Promise.resolve(true);
-			};
+		// 		self.toggleTravelScenarioLock();
+		// 		return Promise.resolve(true);
+		// 	};
 
-			if (data instanceof TF.RoutingMap.DirectionPaletteViewModel)
-			{
-				if (self.directionPaletteViewModel != null) {
-					self.directionPaletteViewModel.dispose();
-					self.directionPaletteViewModel = null;
-				}
+		// 	if (data instanceof TF.RoutingMap.DirectionPaletteViewModel)
+		// 	{
+		// 		if (self.directionPaletteViewModel != null) {
+		// 			self.directionPaletteViewModel.dispose();
+		// 			self.directionPaletteViewModel = null;
+		// 		}
 
-				self.directionPaletteViewModel = data;
-				if (self.directionPaletteViewModel)
-				{
-					self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
-					self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
-				}
+		// 		self.directionPaletteViewModel = data;
+		// 		if (self.directionPaletteViewModel)
+		// 		{
+		// 			self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
+		// 			self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
+		// 		}
 	
-				self._initDirectionTool();
-			}
-		}
-		await _handleDirectionsResearch();
+		// 		self._initDirectionTool();
+		// 	}
+		// }
+		// await _handleDirectionsResearch();
 
 
 		if (!self.checkRoutingAndBoundaryCannotOpenTogether(data))
