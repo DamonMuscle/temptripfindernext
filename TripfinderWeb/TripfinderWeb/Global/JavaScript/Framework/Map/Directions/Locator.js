@@ -49,7 +49,7 @@
 			if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 2)
 			{
 				// TODO: update tomtomna GeocodeServer
-				// geocodeUrl = "http://tomtomna.transfinder.com/arcgis/rest/services/NorthAmerica/";
+				geocodeUrl = "http://172.16.10.36/arcgis/rest/services/NorthAmerica/GeocodeServer";
 			}
 			else if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 0)
 			{
