@@ -35,7 +35,7 @@
 		self.travelScenarios = ko.observableArray();
 		
 		// FOR DEMO ONLY
-		self.obMapServiceType = ko.observable(0);
+		self.obMapServiceType = ko.observable(1);
 		self.obMapServiceType.subscribe((value) => {
 			window.mapServiceType = value;
 		});
