@@ -207,11 +207,11 @@
 
 		var children = this.options.buildPalettes().sort(function (a, b)
 		{
-			if (a.header > b.header)
+			if (a.sequence > b.sequence)
 			{
 				return 1;
 			}
-			else if (a.header === b.header)
+			else if (a.sequence === b.sequence)
 			{
 				return 0;
 			}
@@ -485,7 +485,7 @@
 		});
 	};
 
-	RoutingMapTool.buildMenuItem = function (header, icon, viewModel, click)
+	RoutingMapTool.buildMenuItem = function (header, icon, viewModel, click, sequence)
 	{
 		return new TF.RoutingMap.MenuItem({
 			header: header,
@@ -494,6 +494,7 @@
 			isToggled: true,
 			disable: click ? false : true,
 			toggleStatus: viewModel.obShow,
+			sequence: sequence,
 			click: function ()
 			{
 				if(!viewModel.type)

@@ -663,26 +663,26 @@
 			{
 				const palettes = [
 					// TF.Map.RoutingMapTool.buildMenuItem('Boundary Planning', 'boundary', self.boundaryPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Map Viewer', 'custommap', self.customMapPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Map Viewer', 'custommap', self.customMapPaletteViewModel, self.togglePalettePanel, 4),
+					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel, 0),
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - ESRI HOSTED', 'direction', self.directionPaletteViewModel_ESRI_HOSTED, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - SELF HOSTED', 'direction', self.directionPaletteViewModel_SELF_HOSTED, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - OSM', 'direction', self.directionPaletteViewModel_OSM, self.togglePalettePanel),
 					// // TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel),
-					TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.fieldTripViewModel, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel, 3),
+					TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.fieldTripViewModel, self.togglePalettePanel, 2),
 					// TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
 				];
 
 				if (tf.authManager.hasGPS())
 				{
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('GPS', 'gps', self.gpsPaletteViewModel, self.togglePalettePanel));
+					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('GPS', 'gps', self.gpsPaletteViewModel, self.togglePalettePanel, 1));
 				}
 
 				if (tf.authManager.isAuthorizedFor("mapEdit", "read"))
 				{
 					// palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Map Editing', 'mapedit', self.mapEditingPaletteViewModel, self.togglePalettePanel));
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Travel Scenarios', 'travelScenarios', self.travelScenariosPaletteViewModel, self.togglePalettePanel));
+					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Travel Scenarios', 'travelScenarios', self.travelScenariosPaletteViewModel, self.togglePalettePanel, 5));
 				}
 				if (tf.authManager.isAuthorizedFor("routingMap", 'read'))
 				{
