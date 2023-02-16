@@ -69,6 +69,7 @@
 		self.routingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);
 		self.customMapPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
 		self.gpsPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
+		self.fieldTripViewModel = {obShow: ko.observable(false)};
 		self.geoSearchPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
 		self.routingMapPanelManager = new TF.RoutingMap.RoutingMapPanelManager(self);
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
@@ -669,6 +670,7 @@
 					// TF.Map.RoutingMapTool.buildMenuItem('Directions - OSM', 'direction', self.directionPaletteViewModel_OSM, self.togglePalettePanel),
 					// // TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel),
+					TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.fieldTripViewModel, self.togglePalettePanel),
 					// TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
 				];
 
