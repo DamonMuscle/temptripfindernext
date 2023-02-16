@@ -56,15 +56,21 @@
 	 */
 	Tool.prototype._calculateTrip = function()
 	{
-		var self = this,
+		let self = this,
 			features = self.getStopsClone(),
 			stops = new self._arcgis.FeatureSet();
+
+		if(self._viewModel.directionPaletteViewModel.obMapServiceType() == 1)
+		{
+			return self._calculateTripByOSM();
+		}
 
 		if (features.length == 0)
 		{
 			return Promise.resolve();
 		}
-		var barriersPromise = self._getSelectedBarriers();
+
+		let barriersPromise = self._getSelectedBarriers();
 		stops.features = self._featuresToNAStops(features);
 		return Promise.all([barriersPromise]).then(function(res)
 		{
@@ -133,6 +139,120 @@
 			})
 		})
 	};
+
+	Tool.prototype._calculateTripByOSM = function()
+	{
+		let self = this,
+			features = self.getStopsClone();
+		let points = (features || []).map(({geometry})=>{
+			if (geometry && geometry.spatialReference && !geometry.spatialReference.isWGS84)
+			{
+				return self._arcgis.webMercatorUtils.webMercatorToGeographic(geometry);
+			}
+			return geometry;
+		}).map(({x,y})=>[x,y]);
+
+		console.log(points);
+
+		const parameters = {
+			points,
+			elevation:true,
+			locale: "en_US",
+			profile: "car",
+			snap_preventions: ["ferry"],
+			details:  ["road_class", "road_environment", "surface", "max_speed", "average_speed", "toll", "track_type", "country"],
+			instructions: true,
+			points_encoded: false,
+			optimize: "false",
+		};
+
+		return fetch("https://graphhopper.com/api/1/route?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651",{
+			method:"post",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json"
+			},
+			body:JSON.stringify(parameters), 
+			mode:"cors"}).then(function(res){
+				return res.json();
+			}).then(function(res){
+				res = decodeResult(res, parameters.elevation);
+				var line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
+				self._addTrip(line);
+			});
+
+			function decodeResult(e, t){
+				return e.paths.map((e=>({
+                    ...e,
+                    points: decodePoints(e, t),
+                    snapped_waypoints: decodeWaypoints(e, t)
+                }))).map((e=>({
+                    ...e,
+                    instructions: setPointsOnInstructions(e)
+                })));
+			}
+
+			function decodePoints(e, t) {
+                return e.points_encoded ? {
+                    type: "LineString",
+                    coordinates: decodePath(e.points, t)
+                } : e.points
+            }
+
+			function decodeWaypoints(e, t) {
+                return e.points_encoded ? {
+                    type: "LineString",
+                    coordinates: decodePath(e.snapped_waypoints, t)
+                } : e.snapped_waypoints
+            }
+
+			function setPointsOnInstructions(e) {
+                return e.instructions ? e.instructions.map((t=>({
+                    ...t,
+                    points: e.points.coordinates.slice(t.interval[0], t.interval[1] + 1)
+                }))) : e.instructions
+            }
+
+			function decodePath(e, t) {
+                const n = e.length;
+                let r = 0;
+                const i = [];
+                let o = 0
+                  , s = 0
+                  , a = 0;
+                for (; r < n; ) {
+                    let n, l = 0, u = 0;
+                    do {
+                        n = e.charCodeAt(r++) - 63,
+                        u |= (31 & n) << l,
+                        l += 5
+                    } while (n >= 32);
+                    o += 1 & u ? ~(u >> 1) : u >> 1,
+                    l = 0,
+                    u = 0;
+                    do {
+                        n = e.charCodeAt(r++) - 63,
+                        u |= (31 & n) << l,
+                        l += 5
+                    } while (n >= 32);
+                    if (s += 1 & u ? ~(u >> 1) : u >> 1,
+                    t) {
+                        l = 0,
+                        u = 0;
+                        do {
+                            n = e.charCodeAt(r++) - 63,
+                            u |= (31 & n) << l,
+                            l += 5
+                        } while (n >= 32);
+                        a += 1 & u ? ~(u >> 1) : u >> 1,
+                        i.push([1e-5 * s, 1e-5 * o, a / 100])
+                    } else
+                        i.push([1e-5 * s, 1e-5 * o])
+                }
+                return i
+            }
+	}
+
 	/**
 	 * recalculate the actual routing result time without barriers affected.
 	 * @param  {object} results (Optional) extra route parameters.
