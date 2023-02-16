@@ -1579,6 +1579,7 @@
 
 	DirectionPaletteViewModel.prototype.directionDetailsMouseEnter = function(viewModel, e)
 	{
+		return;
 		var self = this, element = e;
 		self.onDetailsMouseEntered.notify(viewModel);
 		$(element.currentTarget).css("cursor", "pointer");
@@ -1587,6 +1588,7 @@
 
 	DirectionPaletteViewModel.prototype.directionDetailsMouseLeave = function(viewModel, e)
 	{
+		return;
 		var self = this, element = e;
 		self.onDetailsMouseLeaved.notify();
 		$(element.currentTarget).css("cursor", "default");
