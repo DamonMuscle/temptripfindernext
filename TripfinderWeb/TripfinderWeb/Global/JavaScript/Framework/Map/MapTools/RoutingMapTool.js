@@ -496,6 +496,11 @@
 			toggleStatus: viewModel.obShow,
 			click: function ()
 			{
+				if(!viewModel.type)
+				{
+					return;
+				}
+				
 				click && click(viewModel);
 			}
 		});

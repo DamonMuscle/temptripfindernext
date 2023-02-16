@@ -576,10 +576,7 @@
 					setTimeout(function()
 					{
 						data.show();
-					}, 100);
-
-					data.obShow(isShow);
-					self.updatePanelsStatus(data);					
+					}, 100);			
 				} else
 				{
 					if (icon)
@@ -587,6 +584,8 @@
 						icon.addClass("disable");
 					}
 				}
+				data.obShow(isShow);
+				self.updatePanelsStatus(data);						
 			} else
 			{
 				var menuItem = null;
