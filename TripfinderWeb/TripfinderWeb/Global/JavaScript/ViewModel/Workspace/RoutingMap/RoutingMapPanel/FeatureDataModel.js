@@ -39,17 +39,26 @@
 	FeatureDataModel.prototype.getFeatureLayer = function()
 	{
 		var self = this;
-		if (self.featureLayer)
-		{
-			return self.featureLayer;
-		}
+		// if (self.featureLayer)
+		// {
+		// 	return self.featureLayer;
+		// }
 
+		// self.featureLayer = new self.arcgis.FeatureLayer({
+		// 	url: self.url,
+		// 	spatialReference: {
+		// 		wkid: 102100
+		// 	},
+		// 	objectIdField: "OBJECTID"
+		// });
+
+		// FOR DEMO ONLY
 		self.featureLayer = new self.arcgis.FeatureLayer({
-			url: self.url,
+			url: TF.getOnlineUrl(self.url),
 			spatialReference: {
 				wkid: 102100
 			},
-			objectIdField: "OBJECTID"
+			objectIdField: "OBJECTID"			
 		});
 
 		return self.featureLayer;
@@ -189,7 +198,8 @@
 			self._canQuery = true;
 			var query = self.options.query(queryOption);
 			query.returnGeometry = true;
-			self.getFeatureLayer().queryFeatures(query).then(
+			var featureLayer = self.getFeatureLayer();
+			featureLayer.queryFeatures(query).then(
 				function(featureSet)
 				{
 					if (!self._canQuery)
