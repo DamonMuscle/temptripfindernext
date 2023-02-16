@@ -259,14 +259,14 @@
 			this.rootMenuItem.addChild(drawBoundaryMenuItem);
 		}
 
-		if (this.options.thematicAvailable && tf.authManager.isAuthorizedFor("thematics", "read"))
-		{
-			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
-				header: 'Thematics',
-				icon: 'thematics',
-				click: self.thematicsToolClick.bind(self)
-			}));
-		}
+		// if (this.options.thematicAvailable && tf.authManager.isAuthorizedFor("thematics", "read"))
+		// {
+		// 	this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+		// 		header: 'Thematics',
+		// 		icon: 'thematics',
+		// 		click: self.thematicsToolClick.bind(self)
+		// 	}));
+		// }
 		
 		if (this.options.GoogleStreet)
 		{
@@ -278,70 +278,70 @@
 			}));
 		}
 
-		if (this.options.geoFinderAvailable)
-		{
-			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
-				header: 'Geofinder',
-				icon: 'geofinder',
-				click: function ()
-				{
-					// This is intentional
-				},
-				children: [
-					new TF.RoutingMap.MenuItem({
-						toggleStatus: ko.observable(false),
-						header: 'Find in Polygon',
-						closable: true,
-						type: "polygon",
-						click: self.geoFindClick
-					}),
-					new TF.RoutingMap.MenuItem({
-						toggleStatus: ko.observable(false),
-						header: 'Find in Walkout',
-						closable: true,
-						type: "walkout",
-						click: self.geoFindClick
-					}),
-					new TF.RoutingMap.MenuItem({
-						toggleStatus: ko.observable(false),
-						header: 'Find in Drive To',
-						closable: true,
-						type: "driveto",
-						click: self.geoFindClick
-					})
-				]
-			}));
-		}
+		// if (this.options.geoFinderAvailable)
+		// {
+		// 	this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+		// 		header: 'Geofinder',
+		// 		icon: 'geofinder',
+		// 		click: function ()
+		// 		{
+		// 			// This is intentional
+		// 		},
+		// 		children: [
+		// 			new TF.RoutingMap.MenuItem({
+		// 				toggleStatus: ko.observable(false),
+		// 				header: 'Find in Polygon',
+		// 				closable: true,
+		// 				type: "polygon",
+		// 				click: self.geoFindClick
+		// 			}),
+		// 			new TF.RoutingMap.MenuItem({
+		// 				toggleStatus: ko.observable(false),
+		// 				header: 'Find in Walkout',
+		// 				closable: true,
+		// 				type: "walkout",
+		// 				click: self.geoFindClick
+		// 			}),
+		// 			new TF.RoutingMap.MenuItem({
+		// 				toggleStatus: ko.observable(false),
+		// 				header: 'Find in Drive To',
+		// 				closable: true,
+		// 				type: "driveto",
+		// 				click: self.geoFindClick
+		// 			})
+		// 		]
+		// 	}));
+		// }
 
-		if (this.options.geoSearchAvailable)
-		{
-			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
-				header: 'Geo Search',
-				icon: 'geosearch',
-				closable: true,
-				click: self.geoSearchToolClick.bind(self)
-			}));
-		}
+		// if (this.options.geoSearchAvailable)
+		// {
+		// 	this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+		// 		header: 'Geo Search',
+		// 		icon: 'geosearch',
+		// 		closable: true,
+		// 		click: self.geoSearchToolClick.bind(self)
+		// 	}));
+		// }
 
-		if (this.options.homeToSchoolPathAvailable)
-		{
-			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
-				header: 'Home to School Path',
-				icon: 'studentWalk',
-				closable: true,
-				click: self.homeToSchoolPathClick.bind(self)
-			}));
-		}
+		// if (this.options.homeToSchoolPathAvailable)
+		// {
+		// 	this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+		// 		header: 'Home to School Path',
+		// 		icon: 'studentWalk',
+		// 		closable: true,
+		// 		click: self.homeToSchoolPathClick.bind(self)
+		// 	}));
+		// }
 
-		if (this.options.clearGeoSearchAvailable)
-		{
-			this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
-				header: 'Clear Shapes',
-				icon: 'clear-geosearch',
-				closable: true,
-				click: self.clearGeoSearchToolClick.bind(self)
-			}));
-		}
+		// if (this.options.clearGeoSearchAvailable)
+		// {
+		// 	this.rootMenuItem.addChild(new TF.RoutingMap.MenuItem({
+		// 		header: 'Clear Shapes',
+		// 		icon: 'clear-geosearch',
+		// 		closable: true,
+		// 		click: self.clearGeoSearchToolClick.bind(self)
+		// 	}));
+		// }
 
 		if (this.options.measurementAvailable)
 		{
