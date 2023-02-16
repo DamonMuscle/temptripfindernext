@@ -10,12 +10,13 @@
 
 	UserPreferenceManager.prototype.getAllKey = function()
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userpreferences"), { paramData: { "@filter": "contains(key," + tf.storageManager.prefix + ")" } })
+		const self = this;
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userpreferences"), { paramData: { "@filter": `contains(key, ${tf.storageManager.prefix}) | contains(key, mapSettings)` } })
 			.then(function(apiResponse)
 			{
-				this.UserPreferenceDataList = apiResponse.Items;
-				this.updateLocalStorage();
-			}.bind(this));
+				self.UserPreferenceDataList = apiResponse.Items;
+				self.updateLocalStorage();
+			});
 	};
 
 	UserPreferenceManager.prototype.updateLocalStorage = function()
