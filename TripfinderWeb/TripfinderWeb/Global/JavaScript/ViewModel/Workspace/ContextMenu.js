@@ -33,6 +33,7 @@
 		this.html = null;
 		this.isDevider = !!config.isDevider;
 		this.isDisable = config.disable;
+		this.sequence = config.sequence;
 	}
 
 	function clearAllTimeOut(menuItem)
