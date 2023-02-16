@@ -315,6 +315,11 @@
 
 	BaseDocumentViewModel.prototype.dispose = function()
 	{
+		if(!this.obFocusState)
+		{
+			return;
+		}
+
 		this.obFocusState.dispose();
 		clearInterval(this.toastMessagesTimer);
 	};
