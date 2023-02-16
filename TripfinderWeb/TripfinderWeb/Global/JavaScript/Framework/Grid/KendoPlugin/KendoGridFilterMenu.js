@@ -710,35 +710,23 @@
 	{
 		var self = this;
 
-		if (filterId && !message)
-			message = 'This Filter has been deleted. It cannot be applied.';
-
 		return TF.Grid.FilterHelper.validFilterId(filterId)
 			.then(function(filterExist)
 			{
 				if (filterExist)
-					return Promise.resolve(true);
-
+				{
+					return true;
+				}
+				message = message || 'This Filter has been deleted. It cannot be applied.';
 				return tf.promiseBootbox.alert(message, 'Warning', 40000)
 					.then(function()
 					{
-						return self._deleteForeignKey.bind(self)(filterId);
-					})
-					.then(function()
-					{
-						return self._deleteStickFilter.bind(self)(filterId);
-					})
-					.then(function()
-					{
-						return self._clearFilterListCache.bind(self)(filterId);
-					})
-					.then(function()
-					{
-						return self._clearObSelectedGridFilterId.bind(self)(filterId);
-					})
-					.then(function()
-					{
-						return Promise.resolve(false);
+						return Promise.all(
+							self._deleteForeignKey.bind(self)(filterId),
+							self._deleteStickFilter.bind(self)(filterId),
+							self._clearFilterListCache.bind(self)(filterId),
+							self._clearObSelectedGridFilterId.bind(self)(filterId)
+						).then(() => false);
 					});
 			});
 	};
@@ -1110,38 +1098,18 @@
 			self.obHeaderFilters([]);
 		}
 
-		return self._syncFilterAndNotifyStatusUpdated(gridFilterDataModel.id())
-			.then(function(filterExisted)
-			{
-				if (filterExisted)
-				{
-					if (currentFilterId < 0)
-					{
-						return true;
-					}
-					return self.saveCurrentFilter();
-				} else
-				{
-					return false;
-				}
-			})
-			.then(function(ans)
+		return self._syncFilterAndNotifyStatusUpdated(nextFilterId)
+			.then(function(nextFilterExistence)	
 			{
 				if (TF.Grid.FilterHelper.isDrillDownFillter(nextFilterId) && self.obHeaderFilters.length > 0)
 				{
 					self.clearQuickFilterCompent();
 				}
-
-				var excuteSetFilter = true;
-				if (typeof ans == 'boolean')
-					excuteSetFilter = (ans !== false);
-				else
-					excuteSetFilter = (ans !== false && ans.operationResult !== null);
-
-				if (excuteSetFilter)
+				if (nextFilterExistence)
+				{
 					return self.setGridFilter(gridFilterDataModel, true);
-				else
-					return Promise.resolve(ans.operationResult);
+				}
+				return false;
 			});
 	};
 
@@ -1213,56 +1181,6 @@
 			if (quickFilter)
 				this.saveQuickFilter(quickFilter);
 		}
-	};
-
-	KendoGridFilterMenu.prototype.saveCurrentFilter = function(triggerName)
-	{
-		var self = this;
-
-		var handleResult = {
-			savedResult: true,
-			operationResult: true
-		};
-
-		if (self.obSelectedGridFilterId() &&
-			(self.findCurrentHeaderFilters() || self.findCurrentOmittedRecords().length > 0))
-		{
-			var message = self._getSaveCurrentFilterPromtMessage(triggerName);
-			return tf.promiseBootbox.yesNo(
-				{
-					message: message,
-					closeButton: true
-				}, "Unsaved Changes")
-				.then(function(operationResult)
-				{
-					handleResult.operationResult = operationResult;
-					if (operationResult && self.obSelectedGridFilterModified())
-					{
-						return self.saveFilter().then(function(savedResult)
-						{
-							handleResult.savedResult = savedResult;
-							return Promise.resolve(handleResult);
-						});
-					}
-					else
-						return Promise.resolve(handleResult);
-				});
-		}
-		else
-			return Promise.resolve(handleResult);
-	};
-
-	KendoGridFilterMenu.prototype._getSaveCurrentFilterPromtMessage = function(triggerName)
-	{
-		triggerName = triggerName || 'filter';
-		var self = this;
-
-		var message = 'Save the current modified filter?';
-		var gridFilterDataModel = self.obSelectedGridFilterDataModel();
-		if (gridFilterDataModel)
-			message = 'The currently applied filter (' + gridFilterDataModel.name() +
-				') has unsaved changes.  Would you like to save these changes before applying this ' + triggerName + '?';
-		return message;
 	};
 
 	KendoGridFilterMenu.prototype._selectedGridFilterIdChange = function()

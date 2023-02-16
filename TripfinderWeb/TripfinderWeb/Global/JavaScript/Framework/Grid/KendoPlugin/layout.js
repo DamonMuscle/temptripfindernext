@@ -735,32 +735,27 @@
 
 		var isCheckedItem = $(e.target).parent().hasClass('menu-item-checked');
 		if (TF.isPhoneDevice && isCheckedItem)
+		{
 			return self._resetLayout();
+		}
 		else
-			return self.notifyUpdateAndApplyLayout.bind(self)(gridLayoutExtendDataModel);
+		{
+			return self.notifyUpdateAndApplyLayout(gridLayoutExtendDataModel);
+		}
 	};
 
-	KendoGridLayoutMenu.prototype.notifyUpdateAndApplyLayout = function(gridLayoutExtendDataModel)
+	KendoGridLayoutMenu.prototype.notifyUpdateAndApplyLayout = function(layout)
 	{
-		var self = this;
-		var saveCurrentFilterOperationResult = true;
+		var self = this, prepareTask = null;
+		if (self.kendoGrid.dataSource.filter() && layout.filterId() != null)
+		{
+			prepareTask = self.clearKendoGridQuickFilter();
+		}
 
-		var triggerName = 'layout';
-		return self.saveCurrentFilter(triggerName)
-			.then(function(result)
+		return Promise.resolve(prepareTask)
+			.then(() =>
 			{
-				saveCurrentFilterOperationResult = result.operationResult;
-				if (saveCurrentFilterOperationResult !== null && self.kendoGrid.dataSource.filter())
-					return self.clearKendoGridQuickFilter.bind(self)();
-				else
-					return Promise.resolve();
-			})
-			.then(function()
-			{
-				if (saveCurrentFilterOperationResult !== null)
-					return self.applyLayout.bind(self)(gridLayoutExtendDataModel);
-				else
-					return Promise.resolve(saveCurrentFilterOperationResult);
+				return self.applyLayout(layout);
 			});
 	};
 
