@@ -964,7 +964,8 @@
 						PubSub.publish("clear_ContextMenu_Operation");
 						self.setMode("", "Normal");
 					}
-					self.mapEditingPaletteViewModel.myStreetsViewModel.drawTool._stopSplit();
+					// TODO: Use the above method if mapEditingPaletteViewModel is added in the future.
+					self.RoutingMapTool.googleStreetTool?.deactivate();
 				}
 			}
 		});
