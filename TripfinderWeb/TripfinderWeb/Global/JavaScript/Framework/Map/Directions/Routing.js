@@ -177,8 +177,26 @@
 				return res.json();
 			}).then(function(res){
 				res = decodeResult(res, parameters.elevation);
-				var line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
+				console.log(res);
+				const line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
 				self._addTrip(line);
+				self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/60/1000));
+				self._viewModel.directionPaletteViewModel.obTotalDistance(Math.round(res[0].distance/1000));
+				self._viewModel.directionPaletteViewModel.obDirectionDetails(res[0].instructions.map((i,index,array)=>{
+					let type = "";
+					if(index === 0)
+					{
+						type = "esriDMTDepart";
+					}
+
+					if(index === array.length -1)
+					{
+						type = "esriDMTStop";
+					}
+					return {...i, sequence:index+1, instruction:i.text, type:ko.observable(type), 
+					time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/60/1000)), 
+					distance: self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000))}
+				}));
 			});
 
 			function decodeResult(e, t){
