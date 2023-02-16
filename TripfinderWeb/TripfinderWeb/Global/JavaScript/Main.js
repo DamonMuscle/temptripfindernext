@@ -1241,6 +1241,13 @@ createNamespace("TF").getOnlineUrl = function(url){
 			url = "https://services8.arcgis.com/kULjRYHBqUKIzQCS/arcgis/rest/services/travelscenario03/FeatureServer/0";
 		}
 	}
+	else if(window.mapServiceType == 2)
+	{
+		if(url.endsWith("/FeatureServer/0"))
+		{
+			url = arcgisUrls.MapEditingOneService + "/25"
+		}
+	}
 
 	return url;
 }
