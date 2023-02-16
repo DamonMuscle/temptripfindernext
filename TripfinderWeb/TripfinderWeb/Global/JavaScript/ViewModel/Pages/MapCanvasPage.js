@@ -1225,18 +1225,20 @@
 	MapCanvasPage.prototype.dispose = function()
 	{
 		TF.Document.BaseDocumentViewModel.prototype.dispose.call(this);
-		this.onMapLoad.unsubscribeAll();
-		this.onModeChangeEvent.unsubscribeAll();
-		this.onUpdateRecordsEvent.unsubscribeAll();
-		this.menuDataUpdateEvent.unsubscribeAll();
-		this.onStopEditingEvent.unsubscribeAll();
+
+		// Add optional chaining(?.) operator, in case the referenced object has been disposed already.
+		this.onMapLoad?.unsubscribeAll();
+		this.onModeChangeEvent?.unsubscribeAll();
+		this.onUpdateRecordsEvent?.unsubscribeAll();
+		this.menuDataUpdateEvent?.unsubscribeAll();
+		this.onStopEditingEvent?.unsubscribeAll();
 		// this.routingSnapManager.dispose();
 
-		// this.directionPaletteViewModel.dispose();
+		this.directionPaletteViewModel?.dispose();
 		// this.parcelPaletteViewModel.dispose();
 		// this.boundaryPaletteViewModel.dispose();
 		// this.mapEditingPaletteViewModel.dispose();
-		this.travelScenariosPaletteViewModel.dispose();
+		this.travelScenariosPaletteViewModel?.dispose();
 		// this.mapLayersPaletteViewModel.dispose();
 		// this.routingPaletteViewModel.dispose();
 		// this.customMapPaletteViewModel.dispose();
@@ -1260,5 +1262,7 @@
 		this._map && this._map.destroy();
 
 		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
+		// TODO: Use the method above if MapEditPalette is added in the future.
+		tfdispose(this);
 	};
 })();

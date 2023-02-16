@@ -450,6 +450,9 @@
 		this._canQuery = false;
 		this.backupData = null;
 		this.caches = null;
-		TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
+		
+		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
+		// TODO: Use the method above if MapEditPalette is added in the future.
+		tfdispose(this);
 	};
 })();
