@@ -1183,19 +1183,6 @@
 		}
 	};
 
-	KendoGridFilterMenu.prototype._getSaveCurrentFilterPromtMessage = function(triggerName)
-	{
-		triggerName = triggerName || 'filter';
-		var self = this;
-
-		var message = 'Save the current modified filter?';
-		var gridFilterDataModel = self.obSelectedGridFilterDataModel();
-		if (gridFilterDataModel)
-			message = 'The currently applied filter (' + gridFilterDataModel.name() +
-				') has unsaved changes.  Would you like to save these changes before applying this ' + triggerName + '?';
-		return message;
-	};
-
 	KendoGridFilterMenu.prototype._selectedGridFilterIdChange = function()
 	{
 		var self = this;
