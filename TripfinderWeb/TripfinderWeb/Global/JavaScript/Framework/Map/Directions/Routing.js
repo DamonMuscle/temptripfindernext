@@ -139,6 +139,9 @@
 			})
 		})
 	};
+	
+	const baseSpeed = 0.1,
+		baseTime = 1 / baseSpeed;
 
 	Tool.prototype._calculateTripByOSM = function()
 	{
@@ -189,7 +192,7 @@
 					self._tripLayer.removeAll();
 
 					self._addTrip(line);
-					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/60/1000));
+					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/baseTime/60/1000));
 					self._viewModel.directionPaletteViewModel.obTotalDistance(Math.round(res[0].distance/1000));
 					self._viewModel.directionPaletteViewModel.obDirectionDetails(res[0].instructions.map((i,index,array)=>{
 						let type = "";
@@ -203,7 +206,7 @@
 							type = "esriDMTStop";
 						}
 						return {...i, sequence:index+1, instruction:i.text, type:ko.observable(type), 
-						time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/60/1000)), 
+						time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/baseTime/60/1000)), 
 						distance: self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000))}
 					}));
 				});
@@ -291,7 +294,7 @@
 		{
 			return TF.queryTravelSCenarios(travelScenarioId);
 		}).then(function([, travelRegions]){
-			return travelRegions.reduce(function(acc, region)
+			const p = travelRegions.reduce(function(acc, region)
 			{
 				acc.speed = acc.speed || [];
 				acc.areas = acc.areas || {};
@@ -317,18 +320,14 @@
 					}
 				});
 	
+				let weight = region.attributes.Weight || 1;
 				switch(region.attributes.Type)
 				{
 					case 0:// preferred
-						acc.speed.push({
-							if: `in_${areaName}`,
-							multiply_by: 1
-						});
-					break;
 					case 1:// restricted
-						acc.speed.push({
+					acc.speed.push({
 							if: `in_${areaName}`,
-							multiply_by: 0.6
+							multiply_by: baseSpeed*(1/weight)
 						});
 					break;
 					case 2://prohibited
@@ -341,6 +340,13 @@
 	
 				return acc;
 			}, {});
+
+			p.speed.push({
+				"else": "",
+				"multiply_by": baseSpeed
+			});
+
+			return p;
 		});
 	}
 
