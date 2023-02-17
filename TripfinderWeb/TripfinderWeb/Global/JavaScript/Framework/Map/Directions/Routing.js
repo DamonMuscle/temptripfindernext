@@ -157,179 +157,191 @@
 			return;
 		}
 
-		const parameters = {
-			points,
-			elevation:true,
-			locale: "en_US",
-			profile: "car",
-			snap_preventions: ["ferry"],
-			details:  ["road_class", "road_environment", "surface", "max_speed", "average_speed", "toll", "track_type", "country"],
-			instructions: true,
-			points_encoded: false,
-			optimize: "false",
-			"ch.disable":true,
-			custom_model: self.buildOSMTravelRegionParamters()
-		};
+		return self.buildOSMTravelRegionParamters().then(function(customInfo){
+			const parameters = {
+				points,
+				elevation:true,
+				locale: "en_US",
+				profile: "car",
+				snap_preventions: ["ferry"],
+				details:  ["road_class", "road_environment", "surface", "max_speed", "average_speed", "toll", "track_type", "country"],
+				instructions: true,
+				points_encoded: false,
+				optimize: "false",
+				"ch.disable":true,
+				custom_model: customInfo
+			};
+	
+			return fetch("https://graphhopper.com/api/1/route?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651",{
+				method:"post",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json"
+				},
+				body:JSON.stringify(parameters), 
+				mode:"cors"}).then(function(res){
+					return res.json();
+				}).then(function(res){
+					res = decodeResult(res, parameters.elevation);
+					console.log(res);
+					const line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
 
-		return fetch("https://graphhopper.com/api/1/route?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651",{
-			method:"post",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json"
-			},
-			body:JSON.stringify(parameters), 
-			mode:"cors"}).then(function(res){
-				return res.json();
-			}).then(function(res){
-				res = decodeResult(res, parameters.elevation);
-				console.log(res);
-				const line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
-				self._addTrip(line);
-				self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/60/1000));
-				self._viewModel.directionPaletteViewModel.obTotalDistance(Math.round(res[0].distance/1000));
-				self._viewModel.directionPaletteViewModel.obDirectionDetails(res[0].instructions.map((i,index,array)=>{
-					let type = "";
-					if(index === 0)
-					{
-						type = "esriDMTDepart";
-					}
+					self._tripLayer.removeAll();
 
-					if(index === array.length -1)
-					{
-						type = "esriDMTStop";
-					}
-					return {...i, sequence:index+1, instruction:i.text, type:ko.observable(type), 
-					time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/60/1000)), 
-					distance: self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000))}
-				}));
-			});
+					self._addTrip(line);
+					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/60/1000));
+					self._viewModel.directionPaletteViewModel.obTotalDistance(Math.round(res[0].distance/1000));
+					self._viewModel.directionPaletteViewModel.obDirectionDetails(res[0].instructions.map((i,index,array)=>{
+						let type = "";
+						if(index === 0)
+						{
+							type = "esriDMTDepart";
+						}
+	
+						if(index === array.length -1)
+						{
+							type = "esriDMTStop";
+						}
+						return {...i, sequence:index+1, instruction:i.text, type:ko.observable(type), 
+						time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/60/1000)), 
+						distance: self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000))}
+					}));
+				});
+		});
+		
+		function decodeResult(e, t){
+			return e.paths.map((e=>({
+				...e,
+				points: decodePoints(e, t),
+				snapped_waypoints: decodeWaypoints(e, t)
+			}))).map((e=>({
+				...e,
+				instructions: setPointsOnInstructions(e)
+			})));
+		}
 
-			function decodeResult(e, t){
-				return e.paths.map((e=>({
-                    ...e,
-                    points: decodePoints(e, t),
-                    snapped_waypoints: decodeWaypoints(e, t)
-                }))).map((e=>({
-                    ...e,
-                    instructions: setPointsOnInstructions(e)
-                })));
+		function decodePoints(e, t) {
+			return e.points_encoded ? {
+				type: "LineString",
+				coordinates: decodePath(e.points, t)
+			} : e.points
+		}
+
+		function decodeWaypoints(e, t) {
+			return e.points_encoded ? {
+				type: "LineString",
+				coordinates: decodePath(e.snapped_waypoints, t)
+			} : e.snapped_waypoints
+		}
+
+		function setPointsOnInstructions(e) {
+			return e.instructions ? e.instructions.map((t=>({
+				...t,
+				points: e.points.coordinates.slice(t.interval[0], t.interval[1] + 1)
+			}))) : e.instructions
+		}
+
+		function decodePath(e, t) {
+			const n = e.length;
+			let r = 0;
+			const i = [];
+			let o = 0
+				, s = 0
+				, a = 0;
+			for (; r < n; ) {
+				let n, l = 0, u = 0;
+				do {
+					n = e.charCodeAt(r++) - 63,
+					u |= (31 & n) << l,
+					l += 5
+				} while (n >= 32);
+				o += 1 & u ? ~(u >> 1) : u >> 1,
+				l = 0,
+				u = 0;
+				do {
+					n = e.charCodeAt(r++) - 63,
+					u |= (31 & n) << l,
+					l += 5
+				} while (n >= 32);
+				if (s += 1 & u ? ~(u >> 1) : u >> 1,
+				t) {
+					l = 0,
+					u = 0;
+					do {
+						n = e.charCodeAt(r++) - 63,
+						u |= (31 & n) << l,
+						l += 5
+					} while (n >= 32);
+					a += 1 & u ? ~(u >> 1) : u >> 1,
+					i.push([1e-5 * s, 1e-5 * o, a / 100])
+				} else
+					i.push([1e-5 * s, 1e-5 * o])
 			}
-
-			function decodePoints(e, t) {
-                return e.points_encoded ? {
-                    type: "LineString",
-                    coordinates: decodePath(e.points, t)
-                } : e.points
-            }
-
-			function decodeWaypoints(e, t) {
-                return e.points_encoded ? {
-                    type: "LineString",
-                    coordinates: decodePath(e.snapped_waypoints, t)
-                } : e.snapped_waypoints
-            }
-
-			function setPointsOnInstructions(e) {
-                return e.instructions ? e.instructions.map((t=>({
-                    ...t,
-                    points: e.points.coordinates.slice(t.interval[0], t.interval[1] + 1)
-                }))) : e.instructions
-            }
-
-			function decodePath(e, t) {
-                const n = e.length;
-                let r = 0;
-                const i = [];
-                let o = 0
-                  , s = 0
-                  , a = 0;
-                for (; r < n; ) {
-                    let n, l = 0, u = 0;
-                    do {
-                        n = e.charCodeAt(r++) - 63,
-                        u |= (31 & n) << l,
-                        l += 5
-                    } while (n >= 32);
-                    o += 1 & u ? ~(u >> 1) : u >> 1,
-                    l = 0,
-                    u = 0;
-                    do {
-                        n = e.charCodeAt(r++) - 63,
-                        u |= (31 & n) << l,
-                        l += 5
-                    } while (n >= 32);
-                    if (s += 1 & u ? ~(u >> 1) : u >> 1,
-                    t) {
-                        l = 0,
-                        u = 0;
-                        do {
-                            n = e.charCodeAt(r++) - 63,
-                            u |= (31 & n) << l,
-                            l += 5
-                        } while (n >= 32);
-                        a += 1 & u ? ~(u >> 1) : u >> 1,
-                        i.push([1e-5 * s, 1e-5 * o, a / 100])
-                    } else
-                        i.push([1e-5 * s, 1e-5 * o])
-                }
-                return i
-            }
+			return i
+		}
 	}
 
-	Tool.prototype.buildOSMTravelRegionParamters = function(){
+	Tool.prototype.buildOSMTravelRegionParamters = function()
+	{
 		const self = this,
-		travelRegions = self._viewModel.travelScenariosPaletteViewModel?.travelRegionsViewModel?.dataModel?.travelRegions || [];
-
-		return travelRegions.reduce(function(acc, region)
+			travelscenario = self._viewModel.directionPaletteViewModel.travelScenario,
+			travelScenarioId = self.travelScenarioId || travelscenario.Id;
+		
+		return tf.startup.loadArcgisUrls().then(function()
 		{
-			acc.speed = acc.speed || [];
-			acc.areas = acc.areas || {};
-
-			const areaName = (region.name || "").replace(/\s|-/gi,"")+ Date.now();
-
-			let g = 	region.geometry;
-			
-			if (region.geometry && region.geometry.spatialReference && !region.geometry.spatialReference.isWGS84)
+			return TF.queryTravelSCenarios(travelScenarioId);
+		}).then(function([, travelRegions]){
+			return travelRegions.reduce(function(acc, region)
 			{
-				g = self._arcgis.webMercatorUtils.webMercatorToGeographic(g);
-			}
-
-			acc.areas = Object.assign(acc.areas, {
-				[areaName]:{
-					type: "Feature",
-					id: areaName,
-					properties: {},
-					geometry:{
-						type: "Polygon",
-						coordinates: g.toJSON().rings
-					}
+				acc.speed = acc.speed || [];
+				acc.areas = acc.areas || {};
+	
+				const areaName = (region.attributes.Name || "").replace(/\s|-/gi,"")+ Date.now();
+	
+				let g = region.geometry;
+				
+				if (g && g.spatialReference && !g.spatialReference.isWGS84)
+				{
+					g = self._arcgis.webMercatorUtils.webMercatorToGeographic(g);
 				}
-			});
-
-			switch(region.type)
-			{
-				case 0:// preferred
-					acc.speed.push({
-						if: `in_${areaName}`,
-						multiply_by: 1
-					});
-				break;
-				case 1:// restricted
-					acc.speed.push({
-						if: `in_${areaName}`,
-						multiply_by: 0.6
-					});
-				break;
-				case 2://prohibited
-					acc.speed.push({
-						if: `in_${areaName}`,
-						multiply_by: 0.01
-					});
-				break;
-			}
-
-			return acc;
-		}, {});
+	
+				acc.areas = Object.assign(acc.areas, {
+					[areaName]:{
+						type: "Feature",
+						id: areaName,
+						properties: {},
+						geometry:{
+							type: "Polygon",
+							coordinates: g.toJSON().rings
+						}
+					}
+				});
+	
+				switch(region.attributes.Type)
+				{
+					case 0:// preferred
+						acc.speed.push({
+							if: `in_${areaName}`,
+							multiply_by: 1
+						});
+					break;
+					case 1:// restricted
+						acc.speed.push({
+							if: `in_${areaName}`,
+							multiply_by: 0.6
+						});
+					break;
+					case 2://prohibited
+						acc.speed.push({
+							if: `in_${areaName}`,
+							multiply_by: 0
+						});
+					break;
+				}
+	
+				return acc;
+			}, {});
+		});
 	}
 
 	/**
@@ -491,10 +503,10 @@
 		var allBarriers = [pointbarriers, linebarriers, polygonbarriers];
 		var travelscenario = self._viewModel.directionPaletteViewModel.travelScenario;
 		var travelScenarioId = self.travelScenarioId || travelscenario.Id;
-		var isFile = self.useFileService || travelscenario.isFile ? false : true;
+		var isFile = self.useFileService || travelscenario.isFile;
 		var queryPromise = tf.startup.loadArcgisUrls().then(function()
 		{
-			return TF.queryTravelSCenarios(travelScenarioId, isFile);
+			return TF.queryTravelSCenarios(travelScenarioId, !!isFile);
 		});
 		return queryPromise.then(function(res)
 		{

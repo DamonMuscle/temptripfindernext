@@ -1106,23 +1106,23 @@ createNamespace("TF").locationToAddress = function(geometry, param, geocodeServi
 	}
 };
 
-createNamespace("TF").queryTravelSCenarios = function(scenarioId, isRouting)
+createNamespace("TF").queryTravelSCenarios = function(scenarioId, usingFileService)
 {
-	var promiseCurbApproachsFile = null;
-	var promiseTravelRegionsFile = null;
-	if (isRouting)
+	let curbApproachsPromise = null,
+		travelRegionsPromise = null;
+	if (usingFileService)
 	{
-		promiseCurbApproachsFile = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/24", scenarioId);
-		promiseTravelRegionsFile = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"), scenarioId);
+		curbApproachsPromise = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/24", scenarioId);
+		travelRegionsPromise = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneServiceFile + "/25"), scenarioId);
 	}
 	else
 	{
-		promiseCurbApproachsFile = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/24", scenarioId);
-		promiseTravelRegionsFile = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneServiceFile + "/25"), scenarioId);
+		curbApproachsPromise = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/24", scenarioId);
+		travelRegionsPromise = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"), scenarioId);
 	}
-	return Promise.all([promiseCurbApproachsFile, promiseTravelRegionsFile]).then(function(data)
+	return Promise.all([curbApproachsPromise, travelRegionsPromise]).then(function(data)
 	{
-		return Promise.resolve([data[0].features, data[1].features]);
+		return [data[0].features, data[1].features];
 	}).catch(function()
 	{
 		tf.loadingIndicator.hideWhenError();
