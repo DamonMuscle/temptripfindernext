@@ -414,6 +414,13 @@
 	{
 		var self = this, params = {}, publishSets = null, isPublishStreet = !travelScenarioData;
 		var setting = {};
+
+		// Only rebuild TravelScenario if connect to self hosted ArcGIS environment
+		if(self._viewModal.directionPaletteViewModel.obMapServiceType() != 2)
+		{
+			return Promise.resolve("success");
+		}
+
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"))
 			.then(function(response)
 			{
