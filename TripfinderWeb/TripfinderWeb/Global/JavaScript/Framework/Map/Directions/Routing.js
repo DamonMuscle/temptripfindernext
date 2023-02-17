@@ -296,9 +296,6 @@
 		}).then(function([, travelRegions]){
 			const p = travelRegions.reduce(function(acc, region)
 			{
-				acc.speed = acc.speed || [];
-				acc.areas = acc.areas || {};
-	
 				const areaName = (region.attributes.Name || "").replace(/\s|-/gi,"")+ Date.now();
 	
 				let g = region.geometry;
@@ -339,7 +336,10 @@
 				}
 	
 				return acc;
-			}, {});
+			}, {
+				speed: [],
+				areas: {}
+			});
 
 			p.speed.push({
 				"else": "",
