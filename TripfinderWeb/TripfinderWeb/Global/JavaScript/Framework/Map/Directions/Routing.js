@@ -171,9 +171,15 @@
 				instructions: true,
 				points_encoded: false,
 				optimize: "false",
-				"ch.disable":true,
-				custom_model: customInfo
 			};
+
+			const conversionRequired = !!customInfo;
+
+			if(conversionRequired)
+			{
+				parameters["ch.disable"] = true;
+				parameters.custom_model = customInfo;
+			}
 	
 			return fetch("https://graphhopper.com/api/1/route?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651",{
 				method:"post",
@@ -192,7 +198,7 @@
 					self._tripLayer.removeAll();
 
 					self._addTrip(line);
-					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/baseTime/60/1000));
+					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/(conversionRequired ? baseTime : 1)/60/1000));
 					self._viewModel.directionPaletteViewModel.obTotalDistance(Math.round(res[0].distance/1000));
 					self._viewModel.directionPaletteViewModel.obDirectionDetails(res[0].instructions.map((i,index,array)=>{
 						let type = "";
@@ -206,7 +212,7 @@
 							type = "esriDMTStop";
 						}
 						return {...i, sequence:index+1, instruction:i.text, type:ko.observable(type), 
-						time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/baseTime/60/1000)), 
+						time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/(conversionRequired ? baseTime : 1)/60/1000)), 
 						distance: self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000))}
 					}));
 				});
@@ -293,7 +299,13 @@
 		return tf.startup.loadArcgisUrls().then(function()
 		{
 			return TF.queryTravelSCenarios(travelScenarioId);
-		}).then(function([, travelRegions]){
+		}).then(function([, travelRegions])
+		{
+			if(travelRegions.length === 0)
+			{
+				return null;
+			}
+
 			const p = travelRegions.reduce(function(acc, region)
 			{
 				const areaName = (region.attributes.Name || "").replace(/\s|-/gi,"")+ Date.now();
