@@ -1234,7 +1234,7 @@ createNamespace("TF").xyToGeometry = function(x, y)
 
 // FOR DEMO ONLY
 createNamespace("TF").getOnlineUrl = function(url){
-	if(typeof window.mapServiceType == 'undefined' || window.mapServiceType == 0)
+	if(typeof window.mapServiceType == 'undefined' || window.mapServiceType == 0 || window.mapServiceType == 1)
 	{
 		if(url.endsWith("/FeatureServer/25") || url.endsWith("/MapServer/25"))
 		{
