@@ -153,6 +153,9 @@
 		}).map(({x,y})=>[x,y]);
 
 		console.log(points);
+		if(points.length<2) {
+			return;
+		}
 
 		const parameters = {
 			points,
@@ -164,6 +167,8 @@
 			instructions: true,
 			points_encoded: false,
 			optimize: "false",
+			"ch.disable":true,
+			custom_model: self.buildOSMTravelRegionParamters()
 		};
 
 		return fetch("https://graphhopper.com/api/1/route?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651",{
@@ -269,6 +274,62 @@
                 }
                 return i
             }
+	}
+
+	Tool.prototype.buildOSMTravelRegionParamters = function(){
+		const self = this,
+		travelRegions = self._viewModel.travelScenariosPaletteViewModel?.travelRegionsViewModel?.dataModel?.travelRegions || [];
+
+		return travelRegions.reduce(function(acc, region)
+		{
+			acc.speed = acc.speed || [];
+			acc.areas = acc.areas || {};
+
+			const areaName = (region.name || "").replace(/\s|-/gi,"")+ Date.now();
+
+			let g = 	region.geometry;
+			
+			if (region.geometry && region.geometry.spatialReference && !region.geometry.spatialReference.isWGS84)
+			{
+				g = self._arcgis.webMercatorUtils.webMercatorToGeographic(g);
+			}
+
+			acc.areas = Object.assign(acc.areas, {
+				[areaName]:{
+					type: "Feature",
+					id: areaName,
+					properties: {},
+					geometry:{
+						type: "Polygon",
+						coordinates: g.toJSON().rings
+					}
+				}
+			});
+
+			switch(region.type)
+			{
+				case 0:// preferred
+					acc.speed.push({
+						if: `in_${areaName}`,
+						multiply_by: 1
+					});
+				break;
+				case 1:// restricted
+					acc.speed.push({
+						if: `in_${areaName}`,
+						multiply_by: 0.6
+					});
+				break;
+				case 2://prohibited
+					acc.speed.push({
+						if: `in_${areaName}`,
+						multiply_by: 0.01
+					});
+				break;
+			}
+
+			return acc;
+		}, {});
 	}
 
 	/**
