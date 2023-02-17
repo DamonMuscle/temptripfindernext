@@ -327,7 +327,7 @@
 					case 1:// restricted
 					acc.speed.push({
 							if: `in_${areaName}`,
-							multiply_by: baseSpeed*(1/weight)
+							multiply_by: Math.min(1, baseSpeed*(1/weight))
 						});
 					break;
 					case 2://prohibited
