@@ -45,21 +45,65 @@
 		return tf.startup.loadArcgisUrls().then(function()
 		{
 			var geocodeUrl = arcgisUrls.StreetGeocodeServiceFile;
+			const mapServiceType = self._viewModel.directionPaletteViewModel.obMapServiceType();
 
-			if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 2)
+			if (mapServiceType === 2)
 			{
 				// TODO: update tomtomna GeocodeServer
 				geocodeUrl = "http://172.16.10.36/arcgis/rest/services/NorthAmerica/GeocodeServer";
 			}
-			else if (self._viewModel.directionPaletteViewModel.obMapServiceType() == 0)
+			else if (mapServiceType === 1)
+			{
+				geocodeUrl = "https://graphhopper.com/api/1/geocode";
+			}
+			else if (mapServiceType === 0)
 			{
 				self._arcgis.esriConfig.apiKey = "AAPK831e30fbca2e488eb45497c69f753bc6ufPNUlFdFwgUJODDnT0wC1wWks-xJN2dLidH1m9x3bB-Mov6i1RbGoVAVwLgjn8P";
 				geocodeUrl =  "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
 			}
 
-			self._searchTool.sources.items[0].locator.url = geocodeUrl;
+			if (mapServiceType === 1)
+			{
+				const point = `${mapPoint.latitude},${mapPoint.longitude}`;
+				const url = `${geocodeUrl}?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651&reverse=true&point=${point}`;
+				const settings = {
+					method: "get",
+					mode: "cors"
+				};
+				return fetch(url, settings).then(function(res)
+				{
+					return res.json();
+				}).then(function(res)
+				{
+					if (!res || !res.hits || !res.hits.length)
+					{
+						return false;
+					}
 
-			return TF.locationToAddress(mapPoint, null, geocodeUrl);
+					const hit = res.hits.find(h => h.housenumber !== undefined) || res.hits[0];
+					let address = `${hit.city}, ${hit.state}, ${hit.postcode}`;
+					if (hit.street)
+					{
+						address = `${hit.street}, ${address}`;
+						if (hit.housenumber !== undefined)
+						{
+							address = `${hit.housenumber} ${address}`;
+						}
+					}
+
+					return {
+						Match_addr: address
+					};
+				}).catch(function()
+				{
+					return false;
+				});
+			}
+			else
+			{
+				self._searchTool.sources.items[0].locator.url = geocodeUrl;
+				return TF.locationToAddress(mapPoint, null, geocodeUrl);
+			}
 		});
 	};
 })();
