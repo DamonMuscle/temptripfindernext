@@ -602,7 +602,7 @@
 			var task = new tf.map.ArcGIS.RouteTask(url);
 			return task.solve(self._routeParameters).then((results) => 
 			{
-				self._arcgis.esriConfig.apiKey = null;
+				// self._arcgis.esriConfig.apiKey = null;
 				return self.crossRailwayWarning(results);
 			}, function(err)
 			{
