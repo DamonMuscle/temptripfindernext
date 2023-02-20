@@ -806,7 +806,7 @@
 					return;
 				}
 				self.racalculateDirectionTimeWithBarriers(results, barriers);
-				self.addArrow(results);
+				self.addArrow(result.directions?.mergedGeometry);
 				self._prevRouteResult = results;
 				self._routeDirections = result.directions;
 				if (self._noReachedRoute)
