@@ -193,33 +193,96 @@
 				}).then(function(res){
 					res = decodeResult(res, parameters.elevation);
 					console.log(res);
-					const line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
+					const routeGeometry = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
 
 					self._tripLayer.removeAll();
 					self._arrowLayer.removeAll();
 					self._tripVertexLayer.removeAll();
 
-					self._addTrip(line);
 					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/(conversionRequired ? baseTime : 1)/60/1000));
 					self._viewModel.directionPaletteViewModel.obTotalDistance(Math.round(res[0].distance/1000));
-					self._viewModel.directionPaletteViewModel.obDirectionDetails(res[0].instructions.map((i,index,array)=>{
+
+					const directionFeatures = [];
+					const directionDetails = [];
+
+					const instructions = res[0].instructions;
+					const startPoint = instructions[0].points[0];
+					const startAddress = features[0].attributes["Address"] || "N/A";
+					const startText = `Start at ${startAddress}`;
+					const startInstruction = {
+						text: startText,
+						distance: 0,
+						time: 0,
+						points: [startPoint, startPoint]
+					};
+					instructions.unshift(startInstruction);
+
+					res[0].instructions.forEach((i, index, array) => {
 						let type = "";
 						if(index === 0)
 						{
 							type = "esriDMTDepart";
 						}
-	
+
 						if(index === array.length -1)
 						{
 							type = "esriDMTStop";
 						}
-						return {...i, sequence:index+1, instruction:i.text, type:ko.observable(type), 
-						time: self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/(conversionRequired ? baseTime : 1)/60/1000)), 
-						distance: self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000))}
-					}));
+
+						const text = i.text;
+						const distance = self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000));
+						const time = self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/(conversionRequired ? baseTime : 1)/60/1000));
+						let geometry = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: i.points });
+						geometry = self._arcgis.webMercatorUtils.geographicToWebMercator(geometry);
+
+						const detail = new TF.DataModel.DirectionDetailDataModel({
+							Instruction: text,
+							Text: text,
+							Sequence: index + 1,
+							Type: type,
+							Distance: distance,
+							Time: time,
+							Geometry: geometry,
+							Index: index
+						});
+						directionDetails.push(detail);
+
+						const feature = {
+							geometry: geometry,
+							attributes: {
+								length: distance,
+								text: text,
+								maneuverType: type,
+								time: time
+							}
+						};
+						directionFeatures.push(feature);
+					});
+
+					const directions = {
+						features: directionFeatures,
+						geometryType: "esriGeometryPolyline"
+					};
+
+					self._routeDirections = directions;
+
+					if (routeGeometry && routeGeometry.paths.length > 0)
+					{
+						self._routeGeometry = routeGeometry;
+						self._refreshRoutingResult(self._routeDirections, routeGeometry);
+					}
+					else
+					{
+						self._routeGeometry = null;
+						self._routeDirections = null;
+						self._tripVertices.length = 0;
+						self._tripVertexLayer.removeAll();
+					}
+
+					self._viewModel.directionPaletteViewModel.obDirectionDetails(directionDetails);
 				});
 		});
-		
+
 		function decodeResult(e, t){
 			return e.paths.map((e=>({
 				...e,
