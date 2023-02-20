@@ -1580,10 +1580,6 @@
 	DirectionPaletteViewModel.prototype.directionDetailsMouseEnter = function(viewModel, e)
 	{
 		const self = this, element = e;
-		if(self.obMapServiceType() == 1)
-		{
-			return;
-		}
 		self.onDetailsMouseEntered.notify(viewModel);
 		$(element.currentTarget).css("cursor", "pointer");
 		$(element.currentTarget).css("background-color", "lightblue");
@@ -1592,10 +1588,6 @@
 	DirectionPaletteViewModel.prototype.directionDetailsMouseLeave = function(viewModel, e)
 	{
 		const self = this, element = e;
-		if(self.obMapServiceType() == 1)
-		{
-			return;
-		}
 		self.onDetailsMouseLeaved.notify();
 		$(element.currentTarget).css("cursor", "default");
 		$(element.currentTarget).css("background-color", "transparent");
