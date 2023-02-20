@@ -157,7 +157,7 @@
 
 		console.log(points);
 		if(points.length<2) {
-			return;
+			return Promise.resolve();
 		}
 
 		return self.buildOSMTravelRegionParamters().then(function(customInfo){
