@@ -196,6 +196,8 @@
 					const line = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: [res[0].points.coordinates] });
 
 					self._tripLayer.removeAll();
+					self._arrowLayer.removeAll();
+					self._tripVertexLayer.removeAll();
 
 					self._addTrip(line);
 					self._viewModel.directionPaletteViewModel.obTotalTime(Math.round(res[0].time/(conversionRequired ? baseTime : 1)/60/1000));
