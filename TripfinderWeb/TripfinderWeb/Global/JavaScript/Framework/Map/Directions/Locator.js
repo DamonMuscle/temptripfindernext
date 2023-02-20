@@ -50,7 +50,7 @@
 			if (mapServiceType === 2)
 			{
 				// TODO: update tomtomna GeocodeServer
-				geocodeUrl = "http://172.16.10.36/arcgis/rest/services/NorthAmerica/GeocodeServer";
+				geocodeUrl = "http://devmulti18.transfinder.com/arcgis/rest/services/NorthAmerica/GeocodeServer";
 			}
 			else if (mapServiceType === 1)
 			{
