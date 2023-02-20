@@ -572,6 +572,7 @@
 					{
 						icon.addClass("disable");
 					}
+					data.close && data.close();
 				}
 				data.obShow(isShow);
 				self.updatePanelsStatus(data);						
