@@ -39,27 +39,27 @@
 	FeatureDataModel.prototype.getFeatureLayer = function()
 	{
 		var self = this;
-		// if (self.featureLayer)
-		// {
-		// 	return self.featureLayer;
-		// }
+		if (self.featureLayer)
+		{
+			return self.featureLayer;
+		}
 
-		// self.featureLayer = new self.arcgis.FeatureLayer({
-		// 	url: self.url,
-		// 	spatialReference: {
-		// 		wkid: 102100
-		// 	},
-		// 	objectIdField: "OBJECTID"
-		// });
-
-		// FOR DEMO ONLY
 		self.featureLayer = new self.arcgis.FeatureLayer({
-			url: TF.getOnlineUrl(self.url),
+			url: self.url,
 			spatialReference: {
 				wkid: 102100
 			},
-			objectIdField: "OBJECTID"			
+			objectIdField: "OBJECTID"
 		});
+
+		// FOR DEMO ONLY
+		// self.featureLayer = new self.arcgis.FeatureLayer({
+		// 	url: TF.getOnlineUrl(self.url),
+		// 	spatialReference: {
+		// 		wkid: 102100
+		// 	},
+		// 	objectIdField: "OBJECTID"			
+		// });
 
 		return self.featureLayer;
 	};

@@ -328,7 +328,7 @@
 	TravelRegionsDataModel.createTravelRegionFeatureData = function()
 	{
 		return new TF.RoutingMap.FeatureDataModel({
-			url: TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"),
+			url: arcgisUrls.MapEditingOneService + "/25",
 			query: function(queryOption)
 			{
 				var query = new tf.map.ArcGIS.Query();
@@ -566,8 +566,7 @@
 				self.travelRegionLockData.saveData(changeData);
 				self.travelRegionLockData.unLockCurrentDocument();
 
-				// TODO: uncomment this line if need to create MMPK file
-				// self.createMmpk();
+				self.createMmpk();
 				return Promise.resolve(true);
 			}).catch((ex) =>
 			{

@@ -10,9 +10,9 @@
 		this.tripPathFeatureData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/37", namespace.TripPathDataModelMaps, "tripPath");
 		this.tripBoundaryFeatureData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/38", namespace.TripBoundaryDataModelMaps, "tripBoundary");
 		this.curbApproachData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/24", namespace.curbApproachDataModelMaps);
-		this.travelRegionData = this._createFeatureData(TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"), namespace.travelRegionDataModelMaps);
+		this.travelRegionData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/25", namespace.travelRegionDataModelMaps);
 		this.curbApproachFileData = this._createFeatureData(arcgisUrls.MapEditingOneServiceFile + "/24", namespace.curbApproachDataModelMaps);
-		this.travelRegionFileData = this._createFeatureData(TF.getOnlineUrl(arcgisUrls.MapEditingOneServiceFile + "/25"), namespace.travelRegionDataModelMaps);
+		this.travelRegionFileData = this._createFeatureData(arcgisUrls.MapEditingOneServiceFile + "/25", namespace.travelRegionDataModelMaps);
 		this.municipalBoundaryData = this._createFeatureData(arcgisUrls.MapEditingOneService + "/30", namespace.municipalBoundaryDataModelMaps);
 	}
 
@@ -214,7 +214,7 @@
 		var self = this;
 
 		//TODO: This is Temp Solution.
-		url = TF.getOnlineUrl(url);
+		//url = TF.getOnlineUrl(url);
 
 		var featureData = new TF.RoutingMap.FeatureDataModel(
 			{
@@ -234,7 +234,7 @@
 	RoutingFeatureData.prototype._updateFeatureDataFile = function()
 	{
 		this.curbApproachFileData = this._createFeatureData(arcgisUrls.MapEditingOneServiceFile + "/24", namespace.curbApproachDataModelMaps);
-		this.travelRegionFileData = this._createFeatureData(TF.getOnlineUrl(arcgisUrls.MapEditingOneServiceFile + "/25"), namespace.travelRegionDataModelMaps);
+		this.travelRegionFileData = this._createFeatureData(arcgisUrls.MapEditingOneServiceFile + "/25", namespace.travelRegionDataModelMaps);
 	};
 
 	namespace.TripPathDataModelMaps = [
