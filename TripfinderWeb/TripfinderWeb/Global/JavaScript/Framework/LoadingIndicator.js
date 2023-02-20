@@ -180,6 +180,9 @@
 				self.progressLabel(message);
 			}
 		},
+		hideWhenError: function(){
+			
+		},
 		_updateSubtitleDiplay: function(subtitleText)
 		{
 			if (subtitleText != "")
