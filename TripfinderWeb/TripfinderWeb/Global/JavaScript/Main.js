@@ -1113,12 +1113,12 @@ createNamespace("TF").queryTravelSCenarios = function(scenarioId, usingFileServi
 	if (usingFileService)
 	{
 		curbApproachsPromise = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/24", scenarioId);
-		travelRegionsPromise = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneServiceFile + "/25"), scenarioId);
+		travelRegionsPromise = cacheQueryFeature(arcgisUrls.MapEditingOneServiceFile + "/25", scenarioId);
 	}
 	else
 	{
 		curbApproachsPromise = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/24", scenarioId);
-		travelRegionsPromise = cacheQueryFeature(TF.getOnlineUrl(arcgisUrls.MapEditingOneService + "/25"), scenarioId);
+		travelRegionsPromise = cacheQueryFeature(arcgisUrls.MapEditingOneService + "/25", scenarioId);
 	}
 	return Promise.all([curbApproachsPromise, travelRegionsPromise]).then(function(data)
 	{
