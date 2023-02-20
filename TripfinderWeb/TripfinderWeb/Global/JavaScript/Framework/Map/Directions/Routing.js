@@ -308,7 +308,7 @@
 
 			const p = travelRegions.reduce(function(acc, region)
 			{
-				const areaName = (region.attributes.Name || "").replace(/\s|-/gi,"")+ Date.now();
+				const areaName = (region.attributes.Name || "").replace(/\W/gi,"")+ Date.now();
 	
 				let g = region.geometry;
 				
