@@ -155,6 +155,11 @@
 			return geometry;
 		}).map(({x,y})=>[x,y]);
 
+		if (self.isRoundTrip)
+		{
+			points.push(points[0]);
+		}
+
 		console.log(points);
 		if(points.length<2) {
 			return Promise.resolve();
@@ -233,7 +238,7 @@
 						const distance = self._viewModel.directionPaletteViewModel.formatDistanceString(Math.floor( i.distance/1000));
 						const time = self._viewModel.directionPaletteViewModel.formatTimeString(Math.floor(i.time/(conversionRequired ? baseTime : 1)/60/1000));
 						let geometry = new tf.map.ArcGIS.Polyline({ spatialReference: new tf.map.ArcGIS.SpatialReference({ wkid: 4326 }), paths: i.points });
-						geometry = self._arcgis.webMercatorUtils.geographicToWebMercator(geometry);
+						geometry = self._geographicToWebMercator(geometry);
 
 						const detail = new TF.DataModel.DirectionDetailDataModel({
 							Instruction: text,
@@ -270,7 +275,7 @@
 					{
 						self._routeGeometry = routeGeometry;
 						self._refreshRoutingResult(self._routeDirections, routeGeometry);
-						self.addArrow(routeGeometry);
+						self.addArrow(self._geographicToWebMercator(routeGeometry));
 					}
 					else
 					{
