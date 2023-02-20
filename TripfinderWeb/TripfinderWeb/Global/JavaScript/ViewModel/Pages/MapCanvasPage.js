@@ -935,7 +935,7 @@
 								self.sketchTool.currentDrawTool && self.sketchTool.currentDrawTool.stopPreview();
 								self.sketchTool.stopAndClear();
 								self.setMode("", "Normal");
-								TF.RoutingMap.ContextMenuBase.prototype.removeContextMenu();
+								// TF.RoutingMap.ContextMenuBase.prototype.removeContextMenu();
 							} else
 							{
 								self.restartDraw();
