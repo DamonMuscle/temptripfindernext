@@ -94,7 +94,7 @@
 						{
 							return;
 						}
-						self.addArrow(results);
+						self.addArrow(result.directions?.mergedGeometry);
 						self.racalculateDirectionTimeWithBarriers(results, res[0]);
 						self._routeDirections = result.directions;
 						self._prevRouteResult = results;
@@ -270,6 +270,7 @@
 					{
 						self._routeGeometry = routeGeometry;
 						self._refreshRoutingResult(self._routeDirections, routeGeometry);
+						self.addArrow(routeGeometry);
 					}
 					else
 					{
@@ -476,7 +477,7 @@
 		direction.totalTime = direction.totalTime + totalAddedTime;
 	}
 
-	Tool.prototype.addArrow = function(theResult)
+	Tool.prototype.addArrow = function(routeGeometry)
 	{
 		var self = this,
 			arrowLayer = self._arrowLayer;
@@ -491,15 +492,10 @@
 			return;
 		}
 
-		if (theResult)
+		if (routeGeometry)
 		{
-			self.lastResult = theResult;
-		}
-		if (self.lastResult)
-		{
-			var result = self.lastResult;
 			var helper = TF.RoutingMap.MapEditingPalette.MyStreetsHelper;
-			var arrowGraphics = helper.createArrows(self._map, result.routeResults[0].directions.mergedGeometry, true, [83, 126, 147], false, true);
+			var arrowGraphics = helper.createArrows(self._map, routeGeometry, true, [83, 126, 147], false, true);
 			arrowGraphics.forEach(function(arrowGraphic)
 			{
 				arrowLayer.add(arrowGraphic);
