@@ -299,8 +299,6 @@
 				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
 			};
 			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();
-			tf.lockData = new TF.LockData();
-			tf.AGSServiceUtil = new TF.AGSServiceUtil();
 			//tf.dataTypeHelper = new TF..DataTypeHelper();
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
@@ -308,6 +306,8 @@
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel()).then(function()
 			{
 				tf.loadingIndicator.showByName(startupIndicatorName);
+				tf.lockData = new TF.LockData();
+				tf.AGSServiceUtil = new TF.AGSServiceUtil();
 				self.getArcgisUrls();
 				tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
 				return tf.measurementUnitConverter.init();
