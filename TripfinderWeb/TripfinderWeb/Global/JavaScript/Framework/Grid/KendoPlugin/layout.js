@@ -790,52 +790,7 @@
 				if (!existLayout)
 					return Promise.resolve(false);
 
-				if (self.obSelectedGridLayoutModified() == "modified" && self._obSelectedGridLayoutExtendedDataModel() && !isNoConfirm)
-				{
-					var message = "The currently applied layout (" + self._obSelectedGridLayoutExtendedDataModel().name() + ") has unsaved changes. Would you like to save these changes before applying this layout?";
-					return tf.promiseBootbox.yesNo(message, "Unsaved Changes"
-					).then(function(result)
-					{
-						if (result)
-						{
-							return Promise.resolve()
-								.then(function(result)
-								{
-									return self.obSelectedGridLayoutModified() ? self.saveLayout() : Promise.resolve(result && true);
-								})
-								.then(function(result)
-								{
-									//IF the request from search, do not sticky the filter.
-									if (self.options.fromSearch || self.options.isTemporaryFilter)
-									{
-										return self.applyLayoutExtended(gridLayoutExtendDataModel);
-									}
-									return tf.storageManager.save(self._storageFilterDataKey, gridLayoutExtendDataModel.filterId())
-										.then(function()
-										{
-											return self.applyLayoutExtended(gridLayoutExtendDataModel);
-										});
-								});
-						}
-						else if (result === false)
-						{
-							self._revertCurrentLayoutChange();
-							return self.applyLayoutExtended(gridLayoutExtendDataModel);
-						}
-						else
-						{
-							// Click cross button, nothing to do.
-						}
-					});
-				}
-				else
-				{
-					if (self.obSelectedGridLayoutModified() == "modified")
-					{
-						self._revertCurrentLayoutChange();
-					}
-					return self.applyLayoutExtended(gridLayoutExtendDataModel);
-				}
+				return self.applyLayoutExtended(gridLayoutExtendDataModel);
 			});
 	};
 
