@@ -824,7 +824,7 @@
 			)
 		).then(function()
 		{
-			if (selectedFilterModelJSONString != JSON.stringify(this.obSelectedGridFilterDataModel() ? this.obSelectedGridFilterDataModel().toData() : null))
+			if (typeof filterData !== "boolean" && selectedFilterModelJSONString != JSON.stringify(this.obSelectedGridFilterDataModel() ? this.obSelectedGridFilterDataModel().toData() : null))
 			{
 				this.refreshClick();
 			}
