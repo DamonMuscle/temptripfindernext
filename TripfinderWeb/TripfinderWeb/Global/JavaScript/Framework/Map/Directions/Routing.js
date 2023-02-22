@@ -176,16 +176,30 @@
 				instructions: true,
 				points_encoded: false,
 				optimize: "false",
+				"ch.disable": true,
 			};
 
 			const conversionRequired = !!customInfo;
 
 			if(conversionRequired)
 			{
-				parameters["ch.disable"] = true;
 				parameters.custom_model = customInfo;
 			}
-	
+
+			switch(self.uTurnPolicy)
+			{
+				case 'allow-backtrack':
+				case 'at-dead-ends-only':
+				case 'at-dead-ends-and-intersections':
+					parameters.pass_through = false;
+					parameters.heading_penalty = 300;
+					break;
+				case 'no-backtrack':
+					parameters.pass_through = true;
+					parameters.heading_penalty = 300;
+					break;
+			}
+
 			return fetch("https://graphhopper.com/api/1/route?key=aaa190b8-70ca-468b-8aa6-0fa2897e1651",{
 				method:"post",
 				headers: {
