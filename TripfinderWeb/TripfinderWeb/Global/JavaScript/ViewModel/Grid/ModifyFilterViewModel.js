@@ -58,14 +58,15 @@
 		{
 			this.booleanSelectedData = value;
 		});
-		
+
 		this.needCheckFormFilterDataTypes = tf.dataTypeHelper.getFormCheckFilterDataTypes().map(a => a.ID);
 		const filterDBID = this.gridFilterDataModel.dBID();
 		const isFilterContainsDataBaseSpecificFields = TF.Grid.GridHelper.checkFilterContainsDataBaseSpecificFields(this.gridType, this.gridFilterDataModel.whereClause());
 
 		const isGlobalFilter = this.isNew ? ((!omittedRecordIds || !omittedRecordIds.length) && !isFilterContainsDataBaseSpecificFields) : !filterDBID;
 		this.obIsGlobalFilterChecked = ko.observable(isGlobalFilter);
-		this.obIsGlobalFilterChecked.subscribe((newValue) => {
+		this.obIsGlobalFilterChecked.subscribe((newValue) =>
+		{
 			this.globalFilterChange(newValue);
 		});
 		this.obGlobalFilterDisabled = ko.computed(() =>
@@ -83,7 +84,7 @@
 			{
 				return;
 			}
-			
+
 			let isDateTimeControlOpened = function()
 			{
 				return (this.obValueFieldType() && (this.obValueFieldType().toLowerCase() === "datetime" || this.obValueFieldType().toLowerCase() === "time")) &&
@@ -473,14 +474,27 @@
 		tf.loadingIndicator.setSubtitle('Saving Filter');
 		tf.loadingIndicator.showImmediately();
 
-		var validator = self._$form.data("bootstrapValidator");
-
 		return this.pageLevelViewModel.saveValidate().then(function(valid)
 		{
 			tf.loadingIndicator.tryHide();
 			if (valid)
 			{
-				return this._save();
+				var message = `This filter is associated with [${self.gridFilterDataModel.autoExportNames()}].`;
+				message += " Changes to this filter will affect the data and format of the data being exported. Are you sure you want to modify this filter?";
+				var promise = (!self.isNew && self.gridFilterDataModel.autoExportExists())
+					? tf.promiseBootbox.yesNo(message, "Confirmation Message")
+					: Promise.resolve(true);
+				return promise.then(function(canSave)
+				{
+					if (canSave)
+					{
+						return self._save();
+					}
+					else
+					{
+						return Promise.resolve(null);
+					}
+				}.bind(self));
 			}
 			else
 			{
@@ -643,7 +657,7 @@
 		this.gridFilterDataModel.whereClause(whereClause);
 		$(this.textAreaElement()).prop("selectionStart", cursorPosition + fragment.length + pad);
 		$(this.textAreaElement()).prop("selectionEnd", cursorPosition + fragment.length + pad);
-		
+
 		if (TF.isMobileDevice)
 		{
 			$(this.textAreaElement()).focus();
@@ -738,8 +752,7 @@
 								return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"),
 									{
 										paramData: {
-											"@filter": String.format("eq(datatypeId,{1})&eq(name,{2})",
-												tf.datasourceManager.databaseId, data.DataTypeID, data.Name),
+											"@filter": `eq(datatypeId,${data.DataTypeID})&eq(name,${data.Name})`,
 											"@fields": "Id,DBID,Name"
 										},
 										data: data,
@@ -855,7 +868,7 @@
 					// now get first 3 names show
 					self.obIsGlobalFilterChecked(true);
 					let formNames = res.Items[0].length === 1 ? `${res.Items[0]} form` : `${res.Items[0].slice(0, 3).join(", ")} forms`;
-					tf.promiseBootbox.alert(`This filter is in use on the ${formNames}. It must remain available for all data sources.`);					
+					tf.promiseBootbox.alert(`This filter is in use on the ${formNames}. It must remain available for all data sources.`);
 					return;
 				}
 			});

@@ -37,9 +37,28 @@ function topicCombine()
 	return null;
 }
 
+/**
+ * Fuzzy compare, so two empty values could match.
+ *
+ * @param {any} val1
+ * @param {any} val2
+ * @return {Boolean} 
+ */
+function fuzzyCompare(val1, val2)
+{
+	return (IsEmptyString(val1) && IsEmptyString(val2)) || val1 === val2;
+}
+
 function isNullObj(obj)
 {
 	return obj === null || obj === undefined;
+}
+
+function IsEmptyString(str)
+{
+	return (str === null ||
+		str === undefined ||
+		str === "");
 }
 
 function pathCombine()

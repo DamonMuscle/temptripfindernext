@@ -5,15 +5,21 @@
 	ManageFilterViewMobileModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ManageFilterViewMobileModel.prototype.constructor = ManageFilterViewMobileModel;
 
-	function ManageFilterViewMobileModel (obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, obSelectedGridFilterName, negativeClick)
+	function ManageFilterViewMobileModel(options)
 	{
-		this.fnSaveAndEditGridFilter = fnSaveAndEditGridFilter;
-		this.fnApplyGridFilter = fnApplyGridFilter;
-		this.obGridFilterDataModels = obGridFilterDataModels;
-		this.obSelectedGridFilterName = obSelectedGridFilterName;
+		const { obAllFilters, editFilter, applyFilter, filterName, negativeClick } = options;
+
+		this.fnSaveAndEditGridFilter = editFilter;
+		this.fnApplyGridFilter = applyFilter;
+		this.obGridFilterDataModels = obAllFilters;
+		this.obSelectedGridFilterName = filterName;
 		this.obIsSafari = ko.observable(TF.isSafari);
 		this.negativeClick = negativeClick;
 		this.element = null;
+
+		this.onFilterEdited = new TF.Events.Event();
+		this.onFilterDeleted = new TF.Events.Event();
+
 		this.needCheckFormFilterDataTypes = tf.dataTypeHelper.getFormCheckFilterDataTypes().map(a => a.ID);
 	}
 
@@ -112,7 +118,20 @@
 		{
 			return;
 		}
-		this.fnSaveAndEditGridFilter("edit", filter);
+
+		this.filterModelJSONString = filter ? JSON.stringify(filter.toData()) : null;
+		const editTask = this.fnSaveAndEditGridFilter("edit", filter);
+		Promise.resolve(editTask)
+			.then((result) =>
+			{
+				let resultFilterModelJSONString = typeof result === "object" ? JSON.stringify(result.toData()) : null;
+
+				if (resultFilterModelJSONString && this.filterModelJSONString !== resultFilterModelJSONString)
+				{
+					this.onFilterEdited.notify(result);
+					this.obGridFilterDataModels.sort(this._sortFilterDataModels);
+				}
+			});
 	};
 
 	ManageFilterViewMobileModel.prototype.delete = function(filter, e)
@@ -127,7 +146,7 @@
 			checkUDGridsWithFilterId = !needCheckFormFilter ?
 				Promise.resolve([]) :
 				tf.udgHelper.checkUDGridsWithFilterIdInSpecifyRecord(dataTypeID, filterId);
-		 		
+
 		return checkUDGridsWithFilterId.then(res =>
 		{
 			if (res.Items && res.Items[0] && res.Items[0].length > 0)
@@ -139,7 +158,7 @@
 			}
 
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?filterId=" + filterId))
-			.then(function(apiResponse)
+				.then(function(apiResponse)
 				{
 					var displayMessage = apiResponse.length ? 'This Filter is associated with one or more Layouts. Deleting it will remove it from those Layouts. Are you sure you want to delete?' : 'Are you sure you want to delete this Filter?';
 

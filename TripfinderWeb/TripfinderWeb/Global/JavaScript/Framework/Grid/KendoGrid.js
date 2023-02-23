@@ -90,7 +90,6 @@
 					this._obDocumentFocusState.subscribe(this._documentFocusStateChange, this);
 				}
 				this._dataChangeReceive = this._dataChangeReceive.bind(this);
-				this._gridLayoutExtendedDataModelsChange();
 				this._gridFilterDataModelsChange();
 				PubSub.subscribe(topicCombine(pb.DATA_CHANGE, this._gridType), this._dataChangeReceive);
 				this._gridLoadingEnd = true;
@@ -136,26 +135,21 @@
 			return Promise.resolve();
 		}
 		return this.loadGridDefaults()
-			.then(function()
+			.then(() =>
 			{
 				return this.loadLayout();
-			}.bind(this))
-			.then(function()
+			})
+			.then(() =>
 			{
-				if (this.options.entityType)
-				{
-					return this._setConfiguration();
-				} else
-				{
-					return Promise.all([
-						this.loadGridFilter()
-					]).then(function()
-					{
-						return this._setConfiguration();
-					}.bind(this));
-				}
-
-			}.bind(this));
+				return this.loadGridFilter();
+			})
+			.then(() =>
+			{
+				this._applyingLayout = true;
+				this._setGridColumnConfiguration(this.options.fromSearch);
+				this._applyingLayout = false;
+				return;
+			});
 	};
 
 	KendoGrid.prototype.loadGridDefaults = function()
@@ -1770,17 +1764,17 @@
 				return this._grid;
 			}
 			this._grid = [{
-					gridType: "fieldtrip",
-					tableName: "fieldtrip",
-					authName: "fieldtrip",
-					type: "baseGrid",
-					plural: tf.applicationTerm.getApplicationTermPluralByName('Field Trip'),
-					singular: tf.applicationTerm.getApplicationTermSingularByName('Field Trip'),
-					get apiGridDefinition()
-					{
-						return self._convertToOldGridDefinition(tf.fieldTripGridDefinition);
-					}
-				}];
+				gridType: "fieldtrip",
+				tableName: "fieldtrip",
+				authName: "fieldtrip",
+				type: "baseGrid",
+				plural: tf.applicationTerm.getApplicationTermPluralByName('Field Trip'),
+				singular: tf.applicationTerm.getApplicationTermSingularByName('Field Trip'),
+				get apiGridDefinition()
+				{
+					return self._convertToOldGridDefinition(tf.fieldTripGridDefinition);
+				}
+			}];
 			return this._grid;
 		}
 	};

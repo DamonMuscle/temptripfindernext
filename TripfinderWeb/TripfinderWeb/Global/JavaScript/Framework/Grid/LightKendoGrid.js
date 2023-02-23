@@ -104,6 +104,7 @@
 		self.searchOption = null;
 		self._availableColumns = [];
 		self._obSelectedColumns = ko.observableArray([]);
+		self._obSelectedInvisibleColumns = ko.observableArray([]);
 
 		self.obFilteredExcludeAnyIds = ko.observable(self._gridState.filteredExcludeAnyIds);
 		self.obTempOmitExcludeAnyIds = ko.observable([]);
@@ -183,8 +184,6 @@
 		self.suspendRefresh = false;
 		self.isBigGrid = options.isBigGrid === true || Enumerable.From(bigGridTypes).Contains(self._gridType) && !options.isSmallGrid;
 		self.currentDisplayColumns = ko.observableArray();
-
-		self.obResetLayout = ko.observable(false);
 	};
 
 	LightKendoGrid.prototype.loadAndCreateGrid = function()
@@ -2674,6 +2673,73 @@
 		this.currentDisplayColumns(columns);
 		return tf.measurementUnitConverter.handleUnitOfMeasure(columns);
 	};
+
+	LightKendoGrid.prototype.handleInvisibleUDFColumns = function(columns)
+	{
+		var self = this,
+			needHandleTypes = tf.dataTypeHelper.getAvailableDataTypes()
+				.map(function(item) { return item.key; });
+
+		if (columns
+			&& columns instanceof Array
+			&& needHandleTypes.some(function(type) { return type === self._gridType; }))
+		{
+			var invisibleUDFs = tf.UDFDefinition.getInvisibleUDFs(self._gridType);
+
+			return _.intersectionBy(columns, invisibleUDFs, function(item) { return item.UDFId; }).map(function(i)
+			{
+				var result = $.extend(true, {}, i);
+
+				result.FieldName = i.FieldName;
+				result.OriginalName = i.OriginalName;
+				result.DisplayName = i.DisplayName;
+				return result;
+			});
+		}
+
+		return [];
+	};
+
+	LightKendoGrid.prototype.handleUDFColumns = function(columns)
+	{
+		var self = this,
+			needHandleTypes = tf.dataTypeHelper.getAvailableDataTypes().map(function(item)
+			{
+				return item.key;
+			});
+
+		if (columns
+			&& columns instanceof Array
+			&& needHandleTypes.some(function(type) { return type === self._gridType; }))
+		{
+			var udfs = tf.UDFDefinition.getAvailableWithCurrentDataSource(self._gridType);
+			return columns.map(function(c)
+			{
+				if (!c.UDFId) return c;
+
+				var matched = udfs.filter(function(u) { return u.UDFId == c.UDFId; });
+
+				if (matched.length == 0)
+				{
+					return "";
+				}
+				else
+				{
+					var result = $.extend(true, {}, c);
+					result.FieldName = matched[0].FieldName;
+					result.OriginalName = matched[0].OriginalName;
+					result.DisplayName = matched[0].DisplayName;
+					return result;
+				}
+			}).filter(function(item)
+			{
+				return !!item;
+			});
+		}
+
+		return columns;
+	};
+
 
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)
 	{
@@ -5167,6 +5233,16 @@
 			return items[0];
 		}
 		return items;
+	};
+
+	/**
+	 * Check is this grid used as dashboard widget.
+	 *
+	 * @return {*}
+	 */
+	LightKendoGrid.prototype.isDashboardWidget = function()
+	{
+		return this.options.customGridType === "dashboardwidget"
 	};
 })();
 

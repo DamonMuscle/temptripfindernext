@@ -13,7 +13,10 @@
 		this.element = null;
 		this.reminderHide = reminderHide;
 		this.enableGridRefresh = true;
-		this.filterModelJSONString = null;		
+		this.filterModelJSONString = null;
+
+		this.onFilterEdited = new TF.Events.Event();
+		this.onFilterDeleted = new TF.Events.Event();
 	}
 
 	ManageFilterViewModel.prototype.init = function(viewModel, el)
@@ -117,11 +120,11 @@
 							{
 								return;
 							}
-							if (currentModel.id() < 0)
+							if (currentModel.id() < 0 || currentModel.isSystem())
 							{
 								return;
 							}
-							self._deleteGridFilter(currentModel);
+							self.deleteGridFilter(currentModel);
 						}
 					}],
 				title: "Action",
@@ -257,7 +260,7 @@
 		})[0];
 	};
 
-	ManageFilterViewModel.prototype._deleteGridFilter = function(gridFilterDataModel)
+	ManageFilterViewModel.prototype.deleteGridFilter = function(gridFilterDataModel)
 	{
 		var self = this,
 			isWithoutDB = gridFilterDataModel.dBID() === null,
@@ -266,7 +269,13 @@
 			checkUDGridsWithFilterId = !needCheckFormFilter ?
 				Promise.resolve([]) :
 				tf.udgHelper.checkUDGridsWithFilterIdInSpecifyRecord(dataTypeID, gridFilterDataModel.id());
-		
+		if (gridFilterDataModel.autoExportExists())
+		{
+			const exportsHolder = (gridFilterDataModel.autoExports() && gridFilterDataModel.autoExports().length > 1) ? "data exports" : "data export";
+			tf.promiseBootbox.alert(`This filter is associated with the [${gridFilterDataModel.autoExportNames()}] ${exportsHolder}. It cannot be deleted.`);
+			return;
+		}
+
 		// only check without datasource and specify data type
 		checkUDGridsWithFilterId.then(res =>
 		{
@@ -313,15 +322,20 @@
 			tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId))
 				.then(function(apiResponse)
 				{
-					var _storageFilterDataKey = "grid.currentfilter." + gridFilterDataModel.gridType() + ".id";
-					var currentStickFilterId = tf.storageManager.get(_storageFilterDataKey);
+					const filterKey = `grid.currentfilter.${gridFilterDataModel.gridType()}.id`;
+					var currentStickFilterId = tf.storageManager.get(filterKey);
 					if (currentStickFilterId === filterId)
-						tf.storageManager.save(_storageFilterDataKey, '');
+					{
+						tf.storageManager.save(filterKey, '');
+					}
 
 					if (apiResponse > 0)
 					{
 						self.obGridFilterDataModels.remove(gridFilterDataModel);
+						self.initFilterGrid();
 					}
+
+					self.onFilterDeleted.notify(filterId);
 				});
 		}
 	};
