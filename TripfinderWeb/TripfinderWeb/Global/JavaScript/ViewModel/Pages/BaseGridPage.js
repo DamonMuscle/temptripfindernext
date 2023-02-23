@@ -317,7 +317,7 @@
 		)
 			.then(function(result)
 			{
-				if(result)
+				if (result)
 				{
 					tf.promiseBootbox.alert("An email has been sent successfully.", "Email Sent Successfully");
 				}
@@ -533,11 +533,6 @@
 		self.obSelectedGridLayoutModified = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutModified();
-		}, self);
-
-		self.obSelectedGridFilterModifiedMessage = ko.computed(function()
-		{
-			return self.searchGridInited() && self.searchGrid.obSelectedGridFilterModifiedMessage();
 		}, self);
 
 		self.obSelectedGridFilterName = ko.computed(function()

@@ -143,7 +143,7 @@
 					self.ListMoverOptions([]);
 					if (option.UDFPickListOptions && option.UDFPickListOptions.length > 0)
 					{
-						setTimeout(function ()
+						setTimeout(function()
 						{
 							self.ListMoverOptions(option.UDFPickListOptions);
 						});

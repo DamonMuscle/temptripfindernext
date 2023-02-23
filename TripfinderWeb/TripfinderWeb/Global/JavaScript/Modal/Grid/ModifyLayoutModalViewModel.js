@@ -2,8 +2,10 @@
 {
 	createNamespace("TF.Modal.Grid").ModifyLayoutModalViewModel = ModifyLayoutModalViewModel;
 
-	function ModifyLayoutModalViewModel (gridType, isNew, gridLayoutExtendDataModel, obGridFilterDataModels, obSelectedGridFilterId)
+	function ModifyLayoutModalViewModel(options)
 	{
+		const { isNew } = options;
+
 		TF.Modal.BaseModalViewModel.call(this);
 		this.optionType = isNew;
 		this.description("Changes to this layout can be saved (visible columns, display order, and sorting).  Additionally, the name may be changed and the associated filter may be changed or removed.");
@@ -31,13 +33,14 @@
 		}
 		else
 		{
-			this.sizeCss = "modal-dialog-lg";
+			this.sizeCss = "modal-dialog-sm";
 			this.modalClass = 'savelayout-modal';
 			this.contentTemplate('workspace/grid/savelayout');
 			this.buttonTemplate('modal/positivenegative');
 			this.obPositiveButtonLabel = ko.observable("Save");
 		}
-		this.modifyLayoutViewModel = new TF.Grid.ModifyLayoutViewModel(gridType, isNew, gridLayoutExtendDataModel, obGridFilterDataModels, obSelectedGridFilterId);
+
+		this.modifyLayoutViewModel = new TF.Grid.ModifyLayoutViewModel(options);
 		this.data(this.modifyLayoutViewModel);
 	}
 
