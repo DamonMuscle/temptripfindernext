@@ -49,13 +49,7 @@
 	 */
 	function fixFloat(value, decimal = 2)
 	{
-		var v = value.toFixed(decimal);
-
-		if (v.endsWith("0"))
-		{
-			v = v.substring(0, v.length - 1);
-		}
-
+		var v = !IsEmptyString(value) ? value.toFixed(decimal) : value;
 		return v;
 	}
 
@@ -210,6 +204,14 @@
 		$o.find("input[name='driverbillingotRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
 		$o.find("input[name='aidebillingRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
 		$o.find("input[name='aidebillingotRate']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+
+		$o.find("input[name='fixedcost']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='driverbillingfixedcost']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='expensesparking']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='expensestolls']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='expensesmisc']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='expensesmeals']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
+		$o.find("input[name='aidebillingfixedcost']").on("keypress keyup blur", TF.DecimalBoxHelper.precision20scale2);
 	}
 
 	FieldTripResourceViewModel.prototype._initVehicleFields = function()
@@ -232,8 +234,8 @@
 
 			return fixFloat(ending - start);
 		});
-		self.obFuelConsumptionRate = ko.observable(isNew ? null : entity.FuelConsumptionRate);
-		self.obVehicleFixedCost = ko.observable(isNew ? null : entity.VehFixedCost);
+		self.obFuelConsumptionRate = ko.observable(isNew ? null : fixFloat(entity.FuelConsumptionRate));
+		self.obVehicleFixedCost = ko.observable(isNew ? null : fixFloat(entity.VehFixedCost));
 		self.obVehicleTotal = ko.computed(function()
 		{
 			var difference = getFloatOrNull(self.obOdometerDifference()),
@@ -270,7 +272,7 @@
 		});
 		self.obSelectedDriverIsNull = ko.observable(true);
 		self.obDriverBillingHours = ko.observable(isNew ? null : entity.DriverHours);
-		self.obDriverBillingRate = ko.observable(isNew ? null : entity.DriverRate);
+		self.obDriverBillingRate = ko.observable(isNew ? null : fixFloat(entity.DriverRate));
 		self.obDriverBillingCost = ko.computed(function()
 		{
 			var hour = getFloatOrNull(self.obDriverBillingHours()), rate = getFloatOrNull(self.obDriverBillingRate());
@@ -279,7 +281,7 @@
 			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
 		self.obDriverBillingOTHours = ko.observable(isNew ? null : entity.DriverOTHours);
-		self.obDriverBillingOTRate = ko.observable(isNew ? null : entity.DriverOTRate);
+		self.obDriverBillingOTRate = ko.observable(isNew ? null : fixFloat(entity.DriverOTRate));
 		self.obDriverBillingOTCost = ko.computed(function()
 		{
 			var hour = getFloatOrNull(self.obDriverBillingOTHours()), rate = getFloatOrNull(self.obDriverBillingOTRate());
@@ -287,11 +289,11 @@
 
 			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
-		self.obDriverBillingFixedCost = ko.observable(isNew ? null : entity.DriverFixedCost);
-		self.obExpensesParking = ko.observable(isNew ? null : entity.DriverExpParking);
-		self.obExpensesTolls = ko.observable(isNew ? null : entity.DriverExpTolls);
-		self.obExpensesMeals = ko.observable(isNew ? null : entity.DriverExpMeals);
-		self.obExpensesMisc = ko.observable(isNew ? null : entity.DriverExpMisc);
+		self.obDriverBillingFixedCost = ko.observable(isNew ? null : fixFloat(entity.DriverFixedCost));
+		self.obExpensesParking = ko.observable(isNew ? null : fixFloat(entity.DriverExpParking));
+		self.obExpensesTolls = ko.observable(isNew ? null : fixFloat(entity.DriverExpTolls));
+		self.obExpensesMeals = ko.observable(isNew ? null : fixFloat(entity.DriverExpMeals));
+		self.obExpensesMisc = ko.observable(isNew ? null : fixFloat(entity.DriverExpMisc));
 		self.obExpensesCost = ko.computed(function()
 		{
 			var total = nullableFloatSum([self.obExpensesParking(), self.obExpensesTolls(), self.obExpensesMeals(), self.obExpensesMisc()]);
@@ -329,7 +331,7 @@
 		});
 		self.obSelectedAideIsNull = ko.observable(false);
 		self.obAideBillingHours = ko.observable(isNew ? null : entity.AideHours);
-		self.obAideBillingRate = ko.observable(isNew ? null : entity.AideRate);
+		self.obAideBillingRate = ko.observable(isNew ? null : fixFloat(entity.AideRate));
 		self.obAideBillingCost = ko.computed(function()
 		{
 			var hour = getFloatOrNull(self.obAideBillingHours()), rate = getFloatOrNull(self.obAideBillingRate());
@@ -338,7 +340,7 @@
 			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
 		self.obAideBillingOTHours = ko.observable(isNew ? null : entity.AideOTHours);
-		self.obAideBillingOTRate = ko.observable(isNew ? null : entity.AideOTRate);
+		self.obAideBillingOTRate = ko.observable(isNew ? null : fixFloat(entity.AideOTRate));
 		self.obAideBillingOTCost = ko.computed(function()
 		{
 			var hour = getFloatOrNull(self.obAideBillingOTHours()), rate = getFloatOrNull(self.obAideBillingOTRate());
@@ -346,7 +348,7 @@
 
 			return tf.dataFormatHelper.currencyFormatter(fixFloat(hour * rate));
 		});
-		self.obAideBillingFixedCost = ko.observable(isNew ? null : entity.AideFixedCost);
+		self.obAideBillingFixedCost = ko.observable(isNew ? null : fixFloat(entity.AideFixedCost));
 		self.obAideTotal = ko.computed(function()
 		{
 			var total = nullableFloatSum([self.obAideBillingFixedCost(), self.obAideBillingCost(), self.obAideBillingOTCost()]);
