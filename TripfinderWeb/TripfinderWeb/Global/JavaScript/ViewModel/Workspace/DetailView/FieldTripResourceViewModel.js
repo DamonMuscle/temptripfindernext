@@ -49,7 +49,7 @@
 	 */
 	function fixFloat(value, decimal = 2)
 	{
-		var v = value? value.toFixed(decimal) : value;
+		var v = !IsEmptyString(value) ? value.toFixed(decimal) : value;
 		return v;
 	}
 
