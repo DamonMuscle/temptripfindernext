@@ -178,12 +178,11 @@
 			leftGrid.manageFilterClick = function()
 			{
 				tf.modalManager.showModal(
-					new TF.Modal.Grid.ManageFilterModalViewModel(
-						leftGrid.obGridFilterDataModelsFromDataBase,
-						saveAndEditGridFilter,
-						applyGridFilter,
-						null
-					)
+					new TF.Modal.Grid.ManageFilterModalViewModel({
+						obAllFilters: leftGrid.obGridFilterDataModelsFromDataBase,
+						editFilter: saveAndEditGridFilter,
+						applyFilter: applyGridFilter
+					})
 				).then(function()
 				{
 					if (!Enumerable.From(leftGrid.obGridFilterDataModelsFromDataBase()).Any(function(c) { return c.id() == leftGrid.obSelectedGridFilterId(); }))
