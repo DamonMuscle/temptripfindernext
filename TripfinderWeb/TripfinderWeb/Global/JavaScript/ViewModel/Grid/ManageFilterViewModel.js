@@ -4,11 +4,16 @@
 
 	ManageFilterViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ManageFilterViewModel.prototype.constructor = ManageFilterViewModel;
-	function ManageFilterViewModel(obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, positiveClose, reminderHide)
+
+	function ManageFilterViewModel(options)
 	{
-		this.fnSaveAndEditGridFilter = fnSaveAndEditGridFilter;
-		this.fnApplyGridFilter = fnApplyGridFilter;
-		this.obGridFilterDataModels = obGridFilterDataModels;
+		const {
+			obAllFilters, editFilter, applyFilter, positiveClose, reminderHide
+		} = options;
+
+		this.fnSaveAndEditGridFilter = editFilter;
+		this.fnApplyGridFilter = applyFilter;
+		this.obGridFilterDataModels = obAllFilters;
 		this.positiveClose = positiveClose;
 		this.element = null;
 		this.reminderHide = reminderHide;
@@ -50,7 +55,7 @@
 			{
 				width: '30px',
 				type: "image",
-				template: '<div title="#: tf.ManageFilterViewModel.getIconTitle_IsValid(IsValid,Id)#" class="#: tf.ManageFilterViewModel.getIconUrl_IsValid(IsValid,Id)#"></div>'
+				template: '<div title="#: TF.Grid.ManageFilterViewModel.getIconTitle_IsValid(IsValid,Id)#" class="#: TF.Grid.ManageFilterViewModel.getIconUrl_IsValid(IsValid,Id)#"></div>'
 			},
 			{ field: "Name", title: "Filter Name", encoded: true },
 			{
@@ -219,7 +224,7 @@
 		}
 	};
 
-	ManageFilterViewModel.prototype.getIconTitle_IsValid = function(value, id)
+	ManageFilterViewModel.getIconTitle_IsValid = function(value, id)
 	{
 		if (id < 0)
 		{
@@ -235,7 +240,7 @@
 		}
 	};
 
-	ManageFilterViewModel.prototype.getIconUrl_IsValid = function(value, id)
+	ManageFilterViewModel.getIconUrl_IsValid = function(value, id)
 	{
 		if (id < 0)
 		{
@@ -369,5 +374,4 @@
 				this.enableGridRefresh = true;
 			});
 	};
-	tf.ManageFilterViewModel = new TF.Grid.ManageFilterViewModel();
 })();
