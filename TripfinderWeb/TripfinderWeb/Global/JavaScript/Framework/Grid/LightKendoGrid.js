@@ -2502,7 +2502,7 @@
 							$filterContainersNeedBindClick.push($filterContainers[i]); // for avoid bind the click multiple
 						}
 					}
-					$($filterContainersNeedBindClick).on(this.clickEventName,
+					$($filterContainersNeedBindClick).on(customClickAndTouchEvent,
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
@@ -3521,6 +3521,8 @@
 					break;
 				case "time":
 				case "datetime":
+					field.type = "datetime";
+					break;
 				case "date":
 					field.type = "date";
 					break;
