@@ -1337,14 +1337,59 @@
 		}
 	};
 
-	KendoGridFilterMenu.prototype.findCurrentHeaderFilters = function()
+	KendoGridFilterMenu.prototype.findCurrentHeaderFilters = function(forRawFilterClause)
 	{
-		var filterItems = this.obHeaderFilters();
-		TF.ListFilterHelper.addSelectedIdsIntoFilterItems(filterItems, this.listFilters);
-		var filterSets = this.obHeaderFilterSets();
+		let filterItems = $.extend(true, [], this.obHeaderFilters());
+		let filterSets = $.extend(true, [], this.obHeaderFilterSets());
+		let gridColumns = tf.dataTypeHelper.getGridDefinition(this._gridType) && tf.dataTypeHelper.getGridDefinition(this._gridType).Columns;
+
+		const updateFilterValue = (_filterItems) =>
+		{
+			(_filterItems || []).forEach((filterItem) =>
+			{
+				const fieldItemDefinition = (gridColumns || []).find(item => item && (item.FieldName === filterItem.FieldName));
+				if (fieldItemDefinition && !!fieldItemDefinition.isUTC && (filterItem.TypeHint || "").toLowerCase() === "datetime" &&
+					TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(filterItem.Operator.toLowerCase()) === -1)
+				{
+					filterItem.Value = toISOStringWithoutTimeZone(utcToClientTimeZone(moment(filterItem.Value).format("YYYY-MM-DDTHH:mm:ss")));
+				}
+			});
+		};
+
+		(filterItems && filterItems.length > 0) && updateFilterValue(filterItems);
+
+		if (filterSets && filterSets.length > 0)
+		{
+			const updateFilterValueByFilterSets = (_filterSets) =>
+			{
+				(_filterSets || []).forEach(_filterSet =>
+				{
+					if (_filterSet.FilterSets && _filterSet.FilterSets.length > 0)
+					{
+						updateFilterValueByFilterSets(_filterSet.FilterSets);
+					}
+
+					if (_filterSet.FilterItems && _filterSet.FilterItems.length > 0)
+					{
+						updateFilterValue(_filterSet.FilterItems);
+					}
+				});
+			};
+			updateFilterValueByFilterSets(filterSets);
+		}
+
 		if (filterItems.length || filterSets.length)
 		{
 			var filterSet = new TF.FilterSet('And', filterItems, filterSets);
+			var _dateTimeFields = tf.helpers.kendoGridHelper.getDateTimeFields(this._gridType);
+			var _definitionDateTimeColumns = Array.from((gridColumns || []).filter(column => (column.type || "").toLowerCase() === "datetime" && column.isUTC), column => column.FieldName);
+			var dateTimeFields = Array.from(new Set(_dateTimeFields.concat(_definitionDateTimeColumns)));
+			if (forRawFilterClause && dateTimeFields.length)
+			{
+				filterSet = JSON.parse(JSON.stringify(filterSet));
+				filterSet.IsConvertDateTimeToLocalFormat = true;
+				this.setDateTimeSecondTypeHint(filterSet, dateTimeFields);
+			}
 			return filterSet;
 		}
 		return null;

@@ -869,6 +869,116 @@
 		return columns;
 	};
 
+	KendoGridHelper.prototype.getDateTimeFields = function(gridType)
+	{
+		let specificGridDefinition = null;
+		switch (gridType)
+		{
+			case "form":
+				specificGridDefinition = tf.formGridDefinition;
+				break;
+			case "forms":
+				specificGridDefinition = tf.formsGridDefinition;
+				break;
+			case "scheduledmergedocument":
+				specificGridDefinition = tf.scheduledMergeDocumentGridDefinition;
+				break;
+			case "session":
+				specificGridDefinition = tf.sessionGridDefinition;
+				break;
+			case "altsite":
+				specificGridDefinition = tf.altsiteGridDefinition;
+				break;
+			case "contact":
+				specificGridDefinition = tf.contactGridDefinition;
+				break;
+			case "contractor":
+				specificGridDefinition = tf.contractorGridDefinition;
+				break;
+			case "district":
+				specificGridDefinition = tf.districtGridDefinition;
+				break;
+			case "document":
+				specificGridDefinitionl = tf.documentGridDefinition;
+				break;
+			case "fieldtrip":
+				specificGridDefinition = tf.fieldTripGridDefinition;
+				break;
+			case "georegion":
+				specificGridDefinition = tf.georegionGridDefinition;
+				break;
+			case "gpsevent":
+				specificGridDefinition = tf.gpsEventGridDefinition;
+				break;
+			case "route":
+				specificGridDefinition = tf.routeGridDefinition;
+				break;
+			case "school":
+				specificGridDefinition = tf.schoolGridDefinition;
+				break;
+			case "staff":
+				specificGridDefinition = tf.staffGridDefinition;
+				break;
+			case "student":
+				specificGridDefinition = tf.studentGridDefinition;
+				break;
+			case "studentattendanceschedule":
+				specificGridDefinition = tf.studentScheduleGridDefinition;
+				break;
+			case "trip":
+				specificGridDefinition = tf.tripGridDefinition;
+				break;
+			case "tripschedule":
+				specificGridDefinition = tf.tripScheduleGridDefinition;
+				break;
+			case "tripstop":
+				specificGridDefinition = tf.tripStopGridDefinition;
+				break;
+			case "tripstopschedule":
+				specificGridDefinition = tf.tripStopScheduleGridDefinition;
+				break;
+			case "vehicle":
+				specificGridDefinition = tf.vehicleGridDefinition;
+				break;
+			case "mergedocument":
+				specificGridDefinition = tf.mergeDocumentGridDefinition;
+				break;
+			case "mergeemailmessage":
+				specificGridDefinition = tf.mergeEmailMessageGridDefinition;
+				break;
+			case "mergeDocumentLibrary":
+				specificGridDefinition = tf.mergeDocumentLibraryGridDefinition;
+				break;
+			case "scheduledmergedocument":
+				specificGridDefinition = tf.scheduledMergeDocumentGridDefinition;
+				break;
+			case "mergeDocumentsSent":
+				specificGridDefinition = tf.mergeDocumentsSentGridDefinition;
+				break;
+			case "report":
+				specificGridDefinition = tf.reportGridDefinition;
+				break;
+			case "reportlibrary":
+				specificGridDefinition = tf.ReportLibraryGridDefinition;
+				break;
+			case "scheduledreport":
+				specificGridDefinition = tf.scheduledReportGridDefinition;
+				break;
+			case "scheduledReportsSent":
+				specificGridDefinition = tf.scheduledReportsSentGridDefinition;
+				break;
+			case "reminder":
+				specificGridDefinition = tf.reminderGridDefinition;
+				break;
+		}
+
+		if (specificGridDefinition)
+		{
+			return specificGridDefinition.gridDefinition().Columns.filter(x => x.isUTC).map(x => x.FieldName);
+		}
+		return [];
+	}
+
 	/**
 	 * Get default sorting columns
 	 *
