@@ -2238,7 +2238,7 @@
 
 		var $menuFilterBtn = this._findMenuFilterBtn.bind(this)(e);
 		var $input = this._findDDLInput(e);
-		var checkSetEmptyFilter = $input.data('isempty') || $input.data('islist');
+		var checkSetEmptyFilter = $input.data('isempty') || $input.data('islist')|| $input.data('dateTimeNonParam');
 		self.visibleCustomFilterBtnCommon($menuFilterBtn, $input);
 
 		this.hideAndClearSpecialFilterBtn.bind(this)(e, 'custom');
@@ -2285,6 +2285,10 @@
 		{
 			$menuFilterBtn.addClass("data-picker-custom-filter");
 		}
+		if ($input.data('kendo-role') === "datetimepicker")
+		{
+			TF.FilterHelper.hideDatetimeNumberCell($input);
+		}	
 
 		TF.FilterHelper.disableFilterCellInput($input);
 		$input.addClass('k-filter-custom-input');
@@ -2508,13 +2512,21 @@
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
 								fieldName = input.closest("[data-kendo-field]").attr("data-kendo-field"),
 								field = self._gridDefinition.Columns.filter(function (c) { return c.FieldName === fieldName }),
+								filterCellType = 'default',
 								filterType = field[0]? field[0].type: '';
 							if (filterType === 'datetime') // handle the datetime filter cell
 							{
 								$(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox").value(null);
 								self.handleDatetimeFilter(e);
+								var filter = $(e.currentTarget).text();
+								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
+								{
+									filterCellType = 'empty';
+									var filterDateTimeCell = input.closest('span.k-filtercell');
+									filterDateTimeCell.find(".datepickerinput.k-input").data("dateTimeNonParam", true);
+								}
 							}
-							self.hideAndClearSpecialFilterBtn.bind(self)(e, 'default');
+							self.hideAndClearSpecialFilterBtn.bind(self)(e, filterCellType);
 						});
 					break;
 			}
@@ -2790,6 +2802,10 @@
 
 			var $filterItem = $item.parent().parent().parent().parent();
 			var fieldName = $filterItem.data('kendo-field');
+			if (!self.kendoGrid.dataSource.filter())
+			{
+				return;
+			}
 
 			self.kendoGrid.dataSource.filter().filters.map(function(filter)
 			{
@@ -5795,6 +5811,8 @@
 		'nextbusinessday', 'nextmonth', 'nextweek',
 		'nextyear', 'thismonth', 'thisweek', 'thisyear', 'today', 'tomorrow', 'yesterday'];
 
+	FilterHelper.dateTimeDateParamFiltersOperator = ['onx', 'onorafterx', 'onorbeforex'];
+
 	FilterHelper.getSortColumns = function(columns)
 	{
 		return columns.filter(function(column) { return column.isSortItem; });
@@ -5860,6 +5878,17 @@
 
 		if (isNormalInput)
 			$input.attr('disabled', true).addClass('is-disabled-text-input');
+	};
+
+	FilterHelper.hideDatetimeNumberCell = function ($input)
+	{
+		var dateTimeFilterCell = $input.closest('.k-filtercell'); //hide the number box when select nil filter
+		var dateTimeNumberFilterCell = dateTimeFilterCell.find("span.date-number");
+		if (dateTimeNumberFilterCell)
+		{
+			dateTimeNumberFilterCell.hide();
+			dateTimeNumberFilterCell.closest(".k-filtercell").find(".tf-filter").show();
+		}
 	};
 
 	FilterHelper.enableFilterCellInput = function($input, isNormalInput)
@@ -5986,7 +6015,8 @@
 		{
 			return item.value === 'custom' || item.value === 'list' ||
 				TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(item.value) > -1 ||
-				TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(item.value) > -1 ;
+				TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(item.value) > -1 | 
+				TF.FilterHelper.dateTimeDateParamFiltersOperator.indexOf(item.value) > -1 ;
 		});
 		specialItems.map(function(specialItem)
 		{
