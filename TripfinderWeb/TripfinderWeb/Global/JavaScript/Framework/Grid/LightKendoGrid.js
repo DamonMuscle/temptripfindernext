@@ -2519,11 +2519,12 @@
 								$(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox").value(null);
 								self.handleDatetimeFilter(e);
 								var filter = $(e.currentTarget).text();
+								var filterDateTimeCell = input.closest('span.k-filtercell');
+								filterDateTimeCell.find(".datepickerinput").data("dateTimeNonParam", false);
 								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
 								{
 									filterCellType = 'empty';
-									var filterDateTimeCell = input.closest('span.k-filtercell');
-									filterDateTimeCell.find(".datepickerinput.k-input").data("dateTimeNonParam", true);
+									filterDateTimeCell.find(".datepickerinput").data("dateTimeNonParam", true);
 								}
 							}
 							self.hideAndClearSpecialFilterBtn.bind(self)(e, filterCellType);
@@ -3050,6 +3051,7 @@
 
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)
 	{
+		const self = this;
 		switch (definition.type)
 		{
 			case "string":
