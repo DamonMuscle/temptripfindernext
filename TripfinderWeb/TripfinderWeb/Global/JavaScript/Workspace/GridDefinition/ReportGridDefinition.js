@@ -40,12 +40,10 @@
 					DisplayName: "Created On",
 					Width: '150px',
 					type: "datetime",
-					template: function(item)
+					template: function(dataItem)
 					{
-						if (item.CreatedOn == null) return '';
-
-						item.CreatedOn.setMinutes(item.CreatedOn.getMinutes() + tf.timezonetotalminutes);
-						return kendo.format("{0:MM/dd/yyyy hh:mm tt}", item.CreatedOn);
+						let dt = utcToClientTimeZone(dataItem["CreatedOn"]);
+						return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
 					}
 				},
 				{
