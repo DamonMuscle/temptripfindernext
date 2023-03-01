@@ -633,6 +633,11 @@ function toISOStringWithoutTimeZone(m)
 
 function utcToClientTimeZone(utcValue)
 {
+	if (!utcValue)
+	{
+		return moment('invalid');
+	}
+
 	if (typeof (utcValue) !== "string")
 	{
 		utcValue = toISOStringWithoutTimeZone(moment(utcValue));
