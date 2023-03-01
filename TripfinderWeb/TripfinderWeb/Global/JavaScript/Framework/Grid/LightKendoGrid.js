@@ -391,6 +391,12 @@
 		this.allIds = [];
 	};
 
+	LightKendoGrid.prototype.clearDateTimeNumberFilterCellBeforeRefresh = function()
+	{
+		var self = this;
+		self.$container.children(".k-grid-header").find(".k-filtercell .k-input.date-number").val("");
+	};
+
 	LightKendoGrid.prototype.refresh = function()
 	{
 		var self = this;
@@ -2491,7 +2497,8 @@
 								var filterCell = input.closest('span.k-filtercell');
 								filterCell.find(".tf-filter").show();
 								filterCell.find("span.date-number").hide();
-								filterCell.find(".datepickerinput.k-input").data("isempty", true); 
+								filterCell.find(".datepickerinput").data("isempty", true); 
+
 							}
 							self.hideAndClearSpecialFilterBtn.bind(self)(e, 'empty');
 						});
