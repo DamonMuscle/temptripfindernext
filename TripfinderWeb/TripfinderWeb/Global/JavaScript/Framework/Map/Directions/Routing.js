@@ -203,6 +203,7 @@
 			const graphhopperKey = "aaa190b8-70ca-468b-8aa6-0fa2897e1651";
 
 			let ghRouting = new GraphHopper.Routing({key: graphhopperKey}, parameters);
+			ghRouting.timeout = 10000000;
 
 			return	ghRouting.doRequest({points}).then(function(res){
 					console.log(res);
@@ -366,10 +367,10 @@
 				areas: {}
 			});
 
-			p.priority.push({
-				"else": "",
-				"multiply_by": baseSpeed
-			});
+			// p.priority.push({
+			// 	"else": "",
+			// 	"multiply_by": baseSpeed
+			// });
 
 			return p;
 		});
