@@ -1245,6 +1245,7 @@
 			var filter = {};
 			self.initStatusBeforeRefresh();
 			self.kendoGrid.dataSource.filter(filter);
+			self.clearDateTimeNumberFilterCellBeforeRefresh();
 		}
 		if (gridFilterDataModel.type() == "relatedFilter")
 		{
