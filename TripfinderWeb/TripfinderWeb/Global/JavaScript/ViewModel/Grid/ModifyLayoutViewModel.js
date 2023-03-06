@@ -305,14 +305,6 @@
 	};
 	ModifyLayoutViewModel.prototype.apply = function(viewModel, e)
 	{
-		if (!this.obSelectedGridFilterDataModel().isValid())
-		{
-			return tf.promiseBootbox.alert("Filter is invalid. It cannot be saved.", 'Warning', 40000).then(function()
-			{
-				return false;
-			}.bind(this));
-		}
-
 		return this.save()
 			.then(function(savedGridLayoutExtendedDataModel)
 			{
