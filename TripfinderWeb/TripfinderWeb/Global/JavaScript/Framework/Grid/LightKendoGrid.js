@@ -2844,9 +2844,10 @@
 								case "datetime":
 									if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(filter.operator) > -1)
 									{
+										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
 										$filterItem.find("span.date-number").show(); // show the input
 										$filterItem.find("input.date-number").val(filter.value);
-										$filterItem.find(".input-group.tf-filter").hide();			
+										$filterItem.find(dateCellClass).hide();		
 										// hide the clear button
 										setTimeout(function ()
 										{
