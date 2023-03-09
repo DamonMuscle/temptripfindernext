@@ -394,7 +394,15 @@
 	LightKendoGrid.prototype.clearDateTimeNumberFilterCellBeforeRefresh = function()
 	{
 		var self = this;
-		self.$container.children(".k-grid-header").find(".k-filtercell .k-input.date-number").val("");
+		var $dateNumberCells = self.$container.find('input[data-kendo-role="numerictextbox"].k-input.date-number');
+		$dateNumberCells.each((index) =>
+		{
+			let dateNumber = $($dateNumberCells[index]).data('kendoNumericTextBox');
+			if (dateNumber && dateNumber.value() !== null)
+			{
+				dateNumber.value(null);
+			}
+		});
 	};
 
 	LightKendoGrid.prototype.refresh = function()
