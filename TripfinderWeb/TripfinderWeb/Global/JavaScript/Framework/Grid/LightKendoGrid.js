@@ -4215,7 +4215,7 @@
 				if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(item.operator) >= 0)
 				{
 					filter.Operator = this.operatorKendoMapTF[item.operator];
-					if (columnConfig.isUTC)
+					if (griddefinition.isUTC)
 					{
 						filter.ConvertedToUTC = true;
 					}
@@ -6044,6 +6044,7 @@
 		return (filterItem.TypeHint === 'Date'
 			&& filterItem.Operator !== 'Empty'
 			&& filterItem.Operator !== 'IsNotNull' && filterItem.Operator !== 'IsNull'
+			&& TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(filterItem.Operator.toLowerCase()) === -1
 			&& (filterItem.Value === '' || filterItem.Value === "Invalid date"));
 	}
 
