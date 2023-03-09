@@ -4212,26 +4212,33 @@
 			else if (griddefinition.type === "date")
 			{
 				filter.TypeHint = "Date";
+				if (griddefinition.isUTC)
+				{
+					filter.ConvertedToUTC = true;
+				}
 				if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(item.operator) >= 0)
 				{
 					filter.Operator = this.operatorKendoMapTF[item.operator];
+				}
+				else if (TF.FilterHelper.dateTimeDateParamFiltersOperator.indexOf(item.operator) > -1)
+				{
+					filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+				}
+				else
+				{
 					if (griddefinition.isUTC)
 					{
-						filter.ConvertedToUTC = true;
-					}
-				} else
-				{
-					if (griddefinition.isUTC && TF.FilterHelper.dateTimeDateParamFiltersOperator.indexOf(item.operator) < 0)
-					{
 						filter.Value = toISOStringWithoutTimeZone(clientTimeZoneToUtc(moment(filter.Value).format("YYYY-MM-DDTHH:mm:ss")));
-						filter.ConvertedToUTC = true;
 						filter.ExactHint = "utc";
-					} else
+					}
+					else if (filter.Operator !== "IsWithIn")
 					{
 						filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
 					}
-
-					filter.Value = filter.Operator === "IsWithIn" ? filter.Value : toISOStringWithoutTimeZone(moment(filter.Value));
+					else
+					{
+						// Nothing to do
+					}
 				}
 			}
 
