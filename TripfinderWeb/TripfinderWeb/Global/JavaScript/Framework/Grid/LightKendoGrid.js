@@ -2290,10 +2290,12 @@
 		{
 			$menuFilterBtn.addClass("data-picker-custom-filter");
 		}
-		if ($input.data('kendo-role') === "datetimepicker")
+
+		let cellWidget = $input.data('kendo-role');
+		if (cellWidget === "datetimepicker" || cellWidget ===  'datepicker')
 		{
-			TF.FilterHelper.hideDatetimeNumberCell($input);
-		}	
+			TF.FilterHelper.hideDatetimeNumberCell($input, cellWidget);
+		}
 
 		TF.FilterHelper.disableFilterCellInput($input);
 		$input.addClass('k-filter-custom-input');
@@ -2539,11 +2541,12 @@
 								$(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox").value(null);
 								self.handleDateFilter(e);
 								let filterDateCell = input.closest('span.k-filtercell');
-								filterDateCell.find(".k-datepicker .k-input").data("dateTimeNonParam", false);
+								let dateTimeNonParamValue = TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1 ||
+									TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1;
+								filterDateCell.find(".k-datepicker .k-input").data("dateTimeNonParam", dateTimeNonParamValue);
 								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
 								{
 									filterCellType = 'empty';
-									filterDateCell.find(".k-datepicker .k-input").data("dateTimeNonParam", true);
 								}
 							}
 							self.hideAndClearSpecialFilterBtn.bind(self)(e, filterCellType);
@@ -5956,12 +5959,13 @@
 
 	FilterHelper.hideDatetimeNumberCell = function ($input)
 	{
-		var dateTimeFilterCell = $input.closest('.k-filtercell'); //hide the number box when select nil filter
-		var dateTimeNumberFilterCell = dateTimeFilterCell.find("span.date-number");
+		let dateTimeFilterCell = $input.closest('.k-filtercell'); //hide the number box when select nil filter
+		let dateTimeNumberFilterCell = dateTimeFilterCell.find("span.date-number");
+		let cellClass = cellWidget === "datetimepicker" ? ".tf-filter" : ".k-datepicker";
 		if (dateTimeNumberFilterCell)
 		{
 			dateTimeNumberFilterCell.hide();
-			dateTimeNumberFilterCell.closest(".k-filtercell").find(".tf-filter").show();
+			dateTimeNumberFilterCell.closest(".k-filtercell").find(cellClass).show();
 		}
 	};
 
