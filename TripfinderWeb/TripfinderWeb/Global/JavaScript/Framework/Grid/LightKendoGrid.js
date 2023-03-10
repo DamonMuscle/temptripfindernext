@@ -5957,7 +5957,7 @@
 			$input.attr('disabled', true).addClass('is-disabled-text-input');
 	};
 
-	FilterHelper.hideDatetimeNumberCell = function ($input)
+	FilterHelper.hideDatetimeNumberCell = function ($input, cellWidget)
 	{
 		let dateTimeFilterCell = $input.closest('.k-filtercell'); //hide the number box when select nil filter
 		let dateTimeNumberFilterCell = dateTimeFilterCell.find("span.date-number");
