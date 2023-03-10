@@ -3268,6 +3268,8 @@
 							});
 							var datePicker = args.element.data("kendoDatePicker");
 							var dateHelper = new TF.DateBoxHelper(datePicker);
+							datePicker.dateView.popup.options.origin="bottom right";
+							datePicker.dateView.popup.options.position="top right";
 							dateHelper.trigger = function()
 							{
 								this.trigger("change");
