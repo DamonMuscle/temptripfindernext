@@ -32,7 +32,7 @@
 	 */
 	KendoGridHelper.prototype.createSimpleGrid = function ($container, options)
 	{
-		// dataSource itself or its response should have 'dataItems' and 'totalCount'. 
+		// dataSource itself or its response should have 'dataItems' and 'totalCount'.
 		var self = this, kendoGrid,
 			$grid = $container.find(".kendo-grid"),
 			gridOptions = $.extend({}, self.defaultGridOptions, options.gridOptions),
@@ -1205,7 +1205,7 @@
 							layoutColumns = null;
 						}
 
-						tf.storageManager.save(tf.storageManager.gridCurrentQuickFilter(gridType), null);
+						tf.storageManager.delete(tf.storageManager.gridCurrentQuickFilter(gridType));
 						const predefinedGridData = {
 							filteredIds: Ids.split(','),
 							gridType: gridType,

@@ -862,7 +862,7 @@
 		{
 			const otherGridFilters = ret[0] || [];
 			const otherGridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, otherGridFilters);
-			// hide the otherGridFilterDataModels in phone device for VIEW-6244	
+			// hide the otherGridFilterDataModels in phone device for VIEW-6244
 			let gridFilterDataModels = TF.isPhoneDevice && tf.isViewfinder ? this.obGridFilterDataModels() : this.obGridFilterDataModels().concat(otherGridFilterDataModels);
 			const filterData = ko.observableArray(gridFilterDataModels);
 			filterData.sort(this._sortGridFilterDataModelsInternal);
@@ -974,11 +974,11 @@
 		//IF the request from search, do not sticky filter.
 		if (!self.options.fromSearch && !self.options.isTemporaryFilter)
 		{
-			tf.storageManager.save(self._storageFilterDataKey, null);
-			tf.storageManager.save(tf.storageManager.gridCurrentQuickFilter(self.options.gridType), new TF.SearchParameters(null, null, null, null, null, null, null));
+			tf.storageManager.delete(self._storageFilterDataKey);
+			tf.storageManager.delete(tf.storageManager.gridCurrentQuickFilter(self.options.gridType));
 		}
 		self.obClassicFilterSet(null);
-		tf.storageManager.save(tf.storageManager.gridCurrentClassicSearchFilter(self.options.gridType), null);
+		tf.storageManager.delete(tf.storageManager.gridCurrentClassicSearchFilter(self.options.gridType));
 		if (self.isFromRelated())
 		{ //if is from related, the id not change, so need refresh it
 			self._selectedGridFilterIdChange();
@@ -1204,7 +1204,7 @@
 		}
 
 		return self._syncFilterAndNotifyStatusUpdated(nextFilterId)
-			.then(function(nextFilterExistence)	
+			.then(function(nextFilterExistence)
 			{
 				if (TF.Grid.FilterHelper.isDrillDownFillter(nextFilterId) && self.obHeaderFilters.length > 0)
 				{
