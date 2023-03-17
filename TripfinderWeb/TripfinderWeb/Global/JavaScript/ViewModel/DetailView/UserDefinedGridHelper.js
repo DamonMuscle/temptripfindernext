@@ -2115,6 +2115,19 @@
 		});
 	};
 
+	UserDefinedGridHelper.prototype.timeFieldFilterUpdated = function(item)
+	{
+		const timeFields = ["CreatedOn", "LastUpdatedOn"];
+		const isNilFilter = TF.FilterHelper.dateTimeNilFiltersOperator.includes(item.Operator.toLowerCase());
+		const isDateParamFilter = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(item.Operator.toLowerCase());
+
+		if (timeFields.includes(item.FieldName) && !item.ConvertedToUTC && !isNilFilter && !isDateParamFilter)
+		{
+			var dt = clientTimeZoneToUtc(item.Value);
+			item.Value = toISOStringWithoutTimeZone(dt);
+		}
+	}
+
 	UserDefinedGridHelper.saveUserdefinedfield = function(udfEntity)
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgrids"), {
