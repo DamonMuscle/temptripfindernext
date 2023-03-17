@@ -174,7 +174,7 @@
 	{
 		return this.gridBlock.grid.columns.filter((item) =>
 		{
-			return !item.command || item.command.length === 0;
+			return item.field != "bulk_menu" && (!item.command || item.command.length == 0);
 		});
 	};
 

@@ -608,6 +608,8 @@
 			case "grid":
 				descriptor.sort = layoutItem.sort;
 				descriptor.columns = layoutItem.columns;
+				descriptor.showQuickFilter = layoutItem.showQuickFilter;
+				descriptor.showSummary = layoutItem.showSummary;
 				descriptor.field = layoutItem.field;
 				break;
 			case "multipleGrid":
@@ -1782,7 +1784,7 @@
 	DetailViewHelper.prototype.getAllGridsAndColumns = function($detailView, fieldName)
 	{
 		var columns = [],
-			grids = $detailView.find(".kendo-grid")
+			grids = $detailView.find(".kendo-grid:not(.kendo-summarygrid-container)")
 				.filter(function(_, item)
 				{
 					var $item = $(item),
@@ -1791,7 +1793,7 @@
 					{
 						var kendoGrid = $item.data("kendoGrid");
 
-						kendoGrid.columns.forEach(function(col)
+						kendoGrid.columns.filter(x => x.field != "bulk_menu").forEach(function(col)
 						{
 							if (columns.indexOf(col.FieldName) === -1)
 							{

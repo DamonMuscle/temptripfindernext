@@ -819,6 +819,7 @@
 	{
 		var self = this,
 			dataBlockStyles = self.getDataBlockStyles(item),
+			isReadMode = self.detailView.isReadMode(),
 			udfItem = item.UDFId ? self.getUDFItem(item.UDFId) : null;
 
 		if (item.UDFId && !self.detailView.userDefinedFieldHelper.isShowInCurrentDataSource(udfItem))
@@ -848,6 +849,10 @@
 				if (self.detailView.udGrid)
 				{
 					return new TF.DetailView.DataBlockComponent.UDGridRecordGridBlock($.extend(item, { gridConfigs: self.detailView.generateDocumentGridConfigs(item) }), self.detailView);
+				}
+				if (tf.helpers.miniGridHelper.checkGridSupportFilter(item.field))
+				{
+					return new TF.DetailView.DataBlockComponent.LightGridBlock(item, self.detailView);
 				}
 				return new TF.DetailView.DataBlockComponent.GridBlock(item, self.detailView);
 			case "RecordPicture":
@@ -1276,11 +1281,17 @@
 		{
 			case "UDGrid":
 			case "grid":
-				var $grid = $el.find(".kendo-grid");
+				var $grid = $el.find(".kendo-grid-container");	
+				if ($grid.length == 0)
+				{
+					$grid = $el.find(".kendo-grid");
+				}
 				if ($grid.length > 0)
 				{
 					extData = {
-						sort: $grid.data("kendoGrid").dataSource.sort(),
+						sort: $grid.data("kendoGrid") ? $grid.data("kendoGrid").dataSource.sort() : [],
+						showSummary: elData["showSummary"] || $el.attr("showSummary"),
+						showQuickFilter: elData["showQuickFilter"] || $el.attr("showQuickFilter"),
 						url: elData["url"] || $el.attr("url"),
 						subUrl: elData["subUrl"] || $el.attr("subUrl"),
 						columns: elData["columns"]
@@ -1811,23 +1822,39 @@
 
 	/**
 	 * Event handler when grid data block is resized.
-	 * 
+	 *
 	 * @param {Event} e
 	 * @returns
 	 */
 	LightGridStack.prototype.handleGridBlockResized = function(e)
 	{
-		var uniqueClassName = this.detailViewHelper.getDomUniqueClassName($(e.target)),
-			$minigrid = $("." + uniqueClassName).find(">.grid-stack-item-content.custom-grid").find(".kendo-grid");
-		if ($minigrid.length == 0)
+		var self = this,
+			uniqueClassName = this.detailViewHelper.getDomUniqueClassName($(e.target)),
+			$miniGrid = $("." + uniqueClassName).find(">.grid-stack-item-content.custom-grid").find(".kendo-grid"),
+			$miniGridWithFilter = $("." + uniqueClassName).find(">.grid-stack-item-content.custom-grid").find(".kendo-grid-container");
+
+		if ($miniGrid.length == 0)
 		{
-			$minigrid = $("." + uniqueClassName).find(">.grid-stack-item-content>.custom-grid").find(".kendo-grid").last();
+			$miniGrid = $("." + uniqueClassName).find(">.grid-stack-item-content>.custom-grid").find(".kendo-grid").last();
 		}
-		if ($minigrid.length > 0)
+
+		if ($miniGridWithFilter.length == 0)
+		{
+			$miniGridWithFilter = $("." + uniqueClassName).find(">.grid-stack-item-content>.custom-grid").find(".kendo-grid-container").last();
+		}
+
+		if ($miniGridWithFilter.length > 0)
 		{
 			setTimeout(function()
 			{
-				var kendoGrid = $minigrid.data("kendoGrid");
+				self.fitContainer(uniqueClassName);
+			}, 250);
+		}
+		else if ($miniGrid.length > 0)
+		{
+			setTimeout(function()
+			{
+				var kendoGrid = $miniGrid.data("kendoGrid");
 				if (kendoGrid)
 				{
 					kendoGrid.refresh();
@@ -1835,6 +1862,59 @@
 			}, 250);
 		}
 	};
+
+	LightGridStack.prototype.fitContainer = function(uniqueClassName)
+	{
+		var element = $("." + uniqueClassName);
+		// get the kendo gird pager warp height
+		const gridPagerHeight = element.find(".k-pager-wrap").outerHeight();
+		if (gridPagerHeight === null)
+		{
+			return;
+		}
+
+		const stackPadding = 8;
+		// get the stack height, not include the padding and border
+		const stackHeight = element.height();
+		// get the stack title height
+		const stackTitleHeight = element.find(".item-title").outerHeight();
+		// get the summary bar container
+		const $summaryGridContainer = element.find(".kendo-grid.kendo-summarygrid-container").css("height", "");
+		// get the summary bar height, roughly equal to 83px
+		const summaryGridHeight = $summaryGridContainer.find(".k-grid-content.k-auto-scrollable").outerHeight() || 0;
+		// set the stack grid container height and get the container
+		const $stackGridContainer = element.find(".grid").height(stackHeight - stackTitleHeight);
+
+		// set the kendo grid height, not include the summary bar
+		const kendoGridHeight = stackHeight - stackTitleHeight - summaryGridHeight - gridPagerHeight - stackPadding;
+		const $kendoGridContainer = $stackGridContainer.find(".kendo-grid.kendo-grid-container").height(kendoGridHeight);
+
+		// set the kendo grid display block height
+		const $kendoGridDisplayBlock = $kendoGridContainer.find(".k-grid-display-block");
+		const summaryGridTableHeight = summaryGridHeight > 0 ? $summaryGridContainer.find(".k-grid-content table").outerHeight() : 4;
+		$kendoGridDisplayBlock.height(kendoGridHeight - summaryGridTableHeight);
+
+		// set the kendo grid content height, not include the pager height and kendo header height
+		const kendoGridHeaderHeight = $kendoGridContainer.find(".k-grid-header").height();
+		const $kendoGridContent = $kendoGridContainer.find(".k-grid-content").height(kendoGridHeight - gridPagerHeight - kendoGridHeaderHeight);
+
+		// set the kendo grid virtual scroll and lock height
+		const $kendoGridScrollWrap = $kendoGridContent.find(".k-virtual-scrollable-wrap")[0];
+		const $kendoGridLocked = $kendoGridContainer.find(".k-grid-content-locked");;
+		let horizontalScrollHeight = 0;
+		if ($kendoGridScrollWrap && ($kendoGridScrollWrap.scrollWidth > $kendoGridScrollWrap.clientWidth))
+		{
+			horizontalScrollHeight = $kendoGridScrollWrap.offsetHeight - $kendoGridScrollWrap.clientHeight;
+		}
+		$kendoGridLocked.height(kendoGridHeight - gridPagerHeight - kendoGridHeaderHeight - horizontalScrollHeight);
+
+		const $targetBlock = this.dataBlocks.filter(function(dataBlock)
+		{
+			return dataBlock.uniqueClassName == uniqueClassName;
+		})[0];
+
+		$targetBlock?.lightKendoGrid?.fitContainer();
+	}
 
 	/**
 	 * Event handler when data block is deleted.
@@ -2096,16 +2176,21 @@
 			self.shorteningBlocks(shorteningCandidateGroups, shorteningTabCandidates);
 		}
 
-		var kendoGrids = self.$wrapper.find('>.grid-stack-item .kendo-grid');
+		var kendoGrids = self.$wrapper.find('>.grid-stack-item .kendo-grid-container');
 		if (kendoGrids && kendoGrids.length > 0)
 		{
 			$.each(kendoGrids, function(_, kendoGrid)
 			{
+				if ($(kendoGrid).hasClass("kendo-grid-container") || $(kendoGrid).hasClass("kendo-summarygrid-container"))
+				{
+					return;
+				}
+
 				var grid = $(kendoGrid).data("kendoGrid");
 				if (grid)
 				{
 					grid.refresh();
-					TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(grid, grid.dataSource.data());
+					//TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(grid, grid.dataSource.data());
 				}
 			})
 		}

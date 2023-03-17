@@ -232,7 +232,16 @@
 					"type": "grid",
 					"url": "contact",
 					"min-height": "3",
-					"min-width": 2
+					"min-width": 2,
+					"extraColumns": [{
+					'FieldName': "IsPrimary",
+					'DisplayName': "Primary",
+					"type": "nofilter",
+					"filterable": false,
+					'template': function(item)
+					{
+						return item.IsPrimary ? 'Primary' : '';
+					}
 				},
 				{
 					"field": "DocumentGrid",

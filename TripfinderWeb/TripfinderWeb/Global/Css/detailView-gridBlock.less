@@ -4,13 +4,14 @@
 			height: calc(~"100% - 30px") !important;
 		}
 
-		.kendo-grid {
+		.kendo-grid,
+		.kendo-grid-container {
 			border: 1px solid #eee;
 			height: calc(~"100% - 2px");
 			position: relative;
 
 			table {
-				width: 100%;
+				width: 100% !important;
 			}
 
 			.k-pager-info {
@@ -28,6 +29,23 @@
 				right: 10px;
 			}
 		}
+
+		.kendo-grid-container {
+
+			.count-info,
+			.pageInfoSelect {
+				display: none !important;
+			}
+		}
+		.kendo-summarygrid-container {
+			height: auto;
+
+			.k-grid-content-locked {
+				position: relative;
+				z-index: -1;
+			}
+
+		}
 	}
 	.item-title{
 			.badge-right{
@@ -42,12 +60,13 @@
 				height: calc(~"100% - 13px") !important;
 			}
 
-			.kendo-grid {
+			.kendo-grid,
+			.kendo-grid-container {
 				border: 1px solid #eee;
 				height: calc(~"100% - 2px");
 
 				table {
-					width: 100%;
+					width: 100% !important;
 				}
 
 				.k-pager-info {
@@ -64,9 +83,43 @@
 				float: right;
 			}
 		}
+
+		.grid-top-right-button,
+		.copy-address-btn {
+			display: none !important;
+		}
 	}
+
 
 	.in.grid {
 		background-color: #f2f2f2;
+	}
+}
+.grid-stack>.grid-stack-item>.grid-stack-item-content {
+	&.no-permission {
+
+		.kendo-grid,
+		.kendo-grid-container.k-grid {
+			background-color: #ddd;
+
+			>.k-grid-pager {
+				display: none;
+			}
+
+			.k-grid-content {
+				color: #333;
+
+				p {
+					font-size: 17px;
+					color: #555;
+					width: 100%;
+					text-align: center;
+					line-height: 22px;
+					top: 5px;
+					position: absolute;
+					margin: 0;
+				}
+			}
+		}
 	}
 }

@@ -17,6 +17,9 @@
 		self.title = itemData.title;
 		self.field = itemData.field;
 		self.type = !isLine ? itemData.type : ($(self.target).closest(".hori-line, .verti-line").attr("type") || "");
+		self.showQuickFilter = !!itemData.showQuickFilter;
+		self.showSummary = !!itemData.showSummary;
+		self.isSupportFilter = tf.helpers.miniGridHelper.checkGridSupportFilter(itemData.field);
 
 		switch (self.type)
 		{
@@ -86,6 +89,8 @@
 		self.groupDataPoint = self.groupDataPoint.bind(self);
 		self.imageChange = self.imageChange.bind(self);
 		self.changeColumns = self.changeColumns.bind(self);
+		self.changeQuickFilterBar = self.changeQuickFilterBar.bind(self);
+		self.changeSummaryBar = self.changeSummaryBar.bind(self);
 		self.openConditionalAppearanceModal = self.openConditionalAppearanceModal.bind(self);
 		self.editClicked = self.editClicked.bind(self);
 		self.obDefaultTitle = ko.observable(self.title);
@@ -119,6 +124,45 @@
 
 		return allDataBlocks;
 	};
+
+	DataBlocksMenuViewModel.prototype.changeQuickFilterBar = function(viewModel, e)
+	{
+		var self = this,
+			gridBlock = $(self.target).closest(".grid-stack-item");
+		var filterBar = !gridBlock.data("showQuickFilter");
+		gridBlock.data("showQuickFilter", filterBar);
+		self.rebuildDetailGrid(gridBlock);
+	}
+
+	DataBlocksMenuViewModel.prototype.changeSummaryBar = function(viewModel, e)
+	{
+		var self = this,
+			gridBlock = $(self.target).closest(".grid-stack-item");
+		var filterBar = !gridBlock.data("showSummary");
+		gridBlock.data("showSummary", filterBar);
+		self.rebuildDetailGrid(gridBlock);
+	}
+
+	DataBlocksMenuViewModel.prototype.rebuildDetailGrid = function(gridBlock)
+	{
+		var self = this;
+		var targetBlock = self.getAllDataBlocks().filter(function(dataBlock)
+		{
+			if (!dataBlock.uniqueClassName) return;
+
+			return gridBlock.hasClass(dataBlock.uniqueClassName);
+		})[0];
+
+		if (targetBlock.dispose)
+		{
+			targetBlock.dispose();
+		}
+
+		if (targetBlock.initDetailGrid)
+		{
+			targetBlock.initDetailGrid();
+		}
+	}
 
 	DataBlocksMenuViewModel.prototype.changeColumns = function(viewModel, e)
 	{
@@ -194,7 +238,16 @@
 		{
 			if (editColumnViewModel)
 			{
-				self.detailView.changeGridColumns(editColumnViewModel, gridBlock);
+				if (gridBlock.find(".kendo-grid-container").length > 0)
+				{
+					// Need to rebuild the mini grid if mini grid support quick filter.
+					gridBlock.data("columns", editColumnViewModel.selectedColumns);
+					self.rebuildDetailGrid(gridBlock);
+				}
+				else
+				{
+					self.detailView.changeGridColumns(editColumnViewModel, gridBlock);
+				}
 			}
 		}.bind(this));
 	};

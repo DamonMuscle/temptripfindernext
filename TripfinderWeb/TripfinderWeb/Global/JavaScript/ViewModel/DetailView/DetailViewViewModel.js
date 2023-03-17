@@ -417,6 +417,11 @@
 			self.pageLevelViewModel.clearError();
 		});
 
+		self.onResizePage.subscribe(() =>
+		{
+			self.updateDetailViewGridWidth();
+		});
+
 		self.obSelectName.subscribe(function(value)
 		{
 			tf.storageManager.save("current_detail_layout_name", value, true);
@@ -1860,6 +1865,27 @@
 			$overlay.append($("<div></div>", { class: "detail-view-background" }));
 			$('body').append($overlay);
 		}
+	}
+
+	/**
+	 * Update the grid width.
+	 * @return {void}
+	 */
+	DetailViewViewModel.prototype.updateDetailViewGridWidth = function()
+	{
+		if (this.fitContainerTimer != null)
+		{
+			clearTimeout(this.fitContainerTimer);
+		}
+
+		this.fitContainerTimer = setTimeout(function()
+		{
+			this.rootGridStack.dataBlocks.forEach((dataBlock) =>
+			{
+				dataBlock?.lightKendoGrid?.fitContainer();
+			});
+			this.fitContainerTimer = null;
+		}.bind(this), 50);
 	}
 
 	/**

@@ -17,13 +17,29 @@
 			</div>
 		</li>
 		<!-- /ko -->
+		<!--ko if: ( type == "grid" && isSupportFilter ) || type == "UDGrid" -->
+		<li class="menu-item">
+			<div class="menu-icon " data-bind="css:{'checked': showQuickFilter}">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:changeQuickFilterBar">
+				Quick Filter Bar
+			</div>
+		</li>
+		<li class="menu-item">
+			<div class="menu-icon " data-bind="css:{'checked': showSummary}">
+			</div>
+			<div class="menu-label" data-bind="contextMenuClick:changeSummaryBar">
+				Summary Bar
+			</div>
+		</li>
+		<!-- /ko -->
 		<!--ko if: type !== "section-header" && type !== "spacer" && type !== "horizontalLine" && type !== "verticalLine" && type !== "tab" -->
 
 		<li class="menu-item">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label"
-			data-bind="contextMenuClick:editClicked,css:{disabled:!obEditAppearanceEnable()||type=='treeList'||type=='multipleGrid'||type === 'grid'||type === 'File'||type==='systemGroup'||type==='UDGrid'}">
+				 data-bind="contextMenuClick:editClicked,css:{disabled:!obEditAppearanceEnable()||type=='treeList'||type=='multipleGrid'||type === 'grid'||type === 'File'||type==='systemGroup'||type==='UDGrid'}">
 				Edit
 			</div>
 		</li>

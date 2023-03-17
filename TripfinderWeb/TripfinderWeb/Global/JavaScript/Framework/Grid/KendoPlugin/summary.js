@@ -196,6 +196,7 @@
 				item.headerTemplate = null;
 				item.template = null;
 				item.filterable = false;
+				item.command = null;
 				return item;
 			}
 			item.filterable = self.getSummaryHeader(item);
@@ -295,6 +296,11 @@
 
 	KendoGridSummaryGrid.prototype.onSummaryDropDownChange = function(operator, fieldName)
 	{
+		if (this.options && this.options.miniGridEditMode)
+		{
+			return;
+		}
+
 		if (!operator)
 		{
 			this.setDataSource(fieldName, operator, "");
@@ -305,7 +311,7 @@
 			return definition.field === fieldName;
 		})[0];
 
-		tf.loadingIndicator.showImmediately();
+		!this.options.isMiniGrid && tf.loadingIndicator.showImmediately();
 		this.loadSummary(fieldName, operator).then(function(apiResponse)
 		{
 			tf.loadingIndicator.tryHide();

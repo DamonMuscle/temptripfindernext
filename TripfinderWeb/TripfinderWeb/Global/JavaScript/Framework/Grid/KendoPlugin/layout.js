@@ -335,7 +335,7 @@
 		}
 
 		var UDGridId = gridData ? gridData.value : null;
-		var promise = !typeName ? Promise.resolve([]) :
+		var promise = (!typeName || self.options.isMiniGrid) ? Promise.resolve([]) :
 			TF.Grid.LayoutHelper.findGridLayouts({ dataType: typeName, showOverlay: true, UDGridId: UDGridId, relationships: "AutoExport,Filter" });
 
 		return promise.then(function(gridLayouts)
@@ -782,8 +782,9 @@
 		const shouldUseStickyLayout = self.shouldUseStickyLayout();
 		const isDashboardWidget = self.options.customGridType && self.options.customGridType.toLowerCase() == "dashboardwidget";
 		const shouldUsePredefinedLayout = this.shouldUsePredefinedLayout();
+		const isMiniGrid = !!self.options.isMiniGrid;
 
-		if (!shouldUseStickyLayout || isDashboardWidget || shouldUsePredefinedLayout)
+		if (!shouldUseStickyLayout || isDashboardWidget || shouldUsePredefinedLayout || isMiniGrid)
 		{
 			return;
 		}

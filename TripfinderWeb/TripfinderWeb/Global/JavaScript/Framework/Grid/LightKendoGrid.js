@@ -702,6 +702,21 @@
 				transport: {
 					read: function(options)
 					{
+						function setEmpty()
+						{
+							options.success({
+								d: {
+									__count: 0,
+									results: []
+								}
+							});
+						}
+						if (self.options.withoutData || self.options.miniGridEditMode)
+						{
+							setEmpty();
+							return;
+						}
+
 						//the count of request in the process of change filter
 						if (!self.kendoDataSourceTransportReadCount) self.kendoDataSourceTransportReadCount = 0;
 						self.kendoDataSourceTransportReadCount = self.kendoDataSourceTransportReadCount + 1;
@@ -842,7 +857,7 @@
 				allowUnsort: true
 			},
 			reorderable: self.options.reorderable === false ? false : true,
-			resizable: true,
+			resizable: self.options.resizable !== false,
 			pageable: {
 				refresh: true,
 				pageSizes: [25, 50, 100, 500, 1000, 2000],
@@ -2243,6 +2258,7 @@
 
 		var $menuFilterBtn = this._findMenuFilterBtn.bind(this)(e);
 		var $input = this._findDDLInput(e);
+		var isMiniGridEditMode = !!(self.options && self.options.miniGridEditMode);
 		var checkSetEmptyFilter = $input.data('isempty') || $input.data('islist')|| $input.data('dateTimeNonParam');
 		self.visibleCustomFilterBtnCommon($menuFilterBtn, $input);
 
@@ -2255,6 +2271,12 @@
 				self.$customFilterBtn = $menuFilterBtn;
 				$input.val('');
 				self.setEmptyCustomFilter(e, $menuFilterBtn);
+
+				if (isMiniGridEditMode)
+				{
+					// Mini Grid Edit Mode do not need to fresh the grid. Open the custom menu directly.
+					$menuFilterBtn.click();
+				}
 			}
 			else
 			{
@@ -2420,10 +2442,19 @@
 			return;
 		}
 
-		$listContainer = $(".k-list-container:not(.not-lightkendogrid)");
+		$listContainer = $(".k-list-container:not(.not-lightkendogrid):not(.filter-updated)");
 		$listContainer = $listContainer.filter(function()
 		{
 			return $(this).parents('form.k-filter-menu').length == 0;
+		});
+
+		const updatedClassName = "filter-updated";
+		const uniqueClassName = self.$container.data("uniqueClassName") ? "filter-container-" + self.$container.data("uniqueClassName") : "";
+
+		$listContainer.each(function(i, item)
+		{
+			$(item).addClass(updatedClassName);
+			uniqueClassName && $(item).addClass(uniqueClassName);
 		});
 
 		for (var key in this.filterNames)
@@ -4934,9 +4965,11 @@
 			var $nomatching = self.$container.find(".no-matching-records");
 			if ($nomatching.length === 0)
 			{
-
 				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
-				$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				if (!self.options.withoutData && !self.options.isMiniGrid)
+				{
+					$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				}
 				$parent.find("table").css("display", "none");
 				$parent.find(".kendogrid-blank-fullfill").css("display", "none");
 			}
@@ -5000,7 +5033,8 @@
 			self._staffGridDraggable();
 		}
 
-		if ((self.geoFields && self.geoFields.length > 0) || self._gridType === "trip")
+		var showLoading = (self.geoFields && self.geoFields.length > 0) || self._gridType === "trip";
+		if (showLoading && !self.options.isMiniGrid)
 		{
 			tf.loadingIndicator.showImmediately();
 		}

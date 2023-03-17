@@ -277,7 +277,8 @@
 			});
 		}
 
-		var kendoGrids = self.$element.find(".grid-stack > .grid-stack-item .kendo-grid");
+		var kendoGrids = self.$element.find(".grid-stack > .grid-stack-item .kendo-grid-container");
+		kendoGrids.push(self.$element.find(".grid-stack > .grid-stack-item .kendo-grid"));
 		if (kendoGrids.length > 0)
 		{
 			$.each(kendoGrids, function(_, grid)

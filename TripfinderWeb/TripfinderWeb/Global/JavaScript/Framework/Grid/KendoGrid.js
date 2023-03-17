@@ -65,7 +65,7 @@
 
 	KendoGrid.prototype.loadAndCreateGrid = function()
 	{
-		if (this.options.kendoGridOption.autoBind !== false)
+		if (this.options.kendoGridOption.autoBind !== false && !this.options.isMiniGrid)
 		{
 			tf.loadingIndicator.showImmediately();
 		}
@@ -454,6 +454,11 @@
 
 	KendoGrid.prototype.getKendoSortColumn = function()
 	{
+		if (Array.isArray(this.options.defaultSort) && this.options.defaultSort.length > 0)
+		{
+			return this.options.defaultSort;
+		}
+
 		if (this._obCurrentGridLayoutExtendedDataModel() && this._obCurrentGridLayoutExtendedDataModel().layoutColumns())
 		{
 			var list = Enumerable.From(this._obCurrentGridLayoutExtendedDataModel().layoutColumns()).Where(function(c)
@@ -764,7 +769,7 @@
 		if (this.options.isGridView && $lockedContent &&
 			this.obSummaryGridVisible && this.obSummaryGridVisible() && this.overlay !== false)
 		{
-			tf.loadingIndicator.showImmediately();
+			!this.options.isMiniGrid && tf.loadingIndicator.showImmediately();
 			this.createSummaryGrid();
 			this._delayHideLoadingIndicator();
 
@@ -1137,6 +1142,10 @@
 	KendoGrid.prototype.resizableBinding = function()
 	{
 		var self = this;
+		if (self.options.resizable === false)
+		{
+			return;
+		}
 		self.kendoGrid.resizable.bind("start", function(e)
 		{
 			self.resizeTh = $(e.currentTarget).data("th");
@@ -1434,6 +1443,10 @@
 		var header = self.$container.find("th[role='columnheader']");
 		$(header).on("mousedown", function(e)
 		{
+			if (self.options.isMiniGrid)
+			{
+				return;
+			}
 			if (e.which == 3)
 			{
 				var index = parseInt($(this).attr("data-" + kendo.ns + "index"));
