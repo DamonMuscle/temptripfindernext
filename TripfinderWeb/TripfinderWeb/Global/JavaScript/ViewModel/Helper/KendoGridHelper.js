@@ -159,10 +159,10 @@
 
 			var iconHeight = 12;
 			$onDemandContainer.find("a").css("margin-top", ($tr.height() - iconHeight) / 2 + "px");
-		}.on("mouseleave", function (e)
+		}).on("mouseleave", function (e)
 		{
 			hideOnDemandAction(e);
-		})
+		});
 
 		function setButtonDisableStatus(onDemandContainer, onDemandActions, $tr)
 		{
