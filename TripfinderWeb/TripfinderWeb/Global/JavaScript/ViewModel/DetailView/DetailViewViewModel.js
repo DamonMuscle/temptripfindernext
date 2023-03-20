@@ -1220,6 +1220,7 @@
 		}
 
 		self.$element.find('.detail-view-panel').trigger('detail-view-panel-resize');
+		self.updateDetailViewGridWidth();
 	};
 
 	/**
