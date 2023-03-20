@@ -2287,6 +2287,22 @@
 	}
 }
 
+.k-grid-content-locked,
+.k-grid-footer-locked,
+.k-grid-header-locked {
+  border: none;
+}
+
+.k-grid-header + .k-grid-content td:first-child {
+  border-width: 0 0 0 0 !important;
+}
+.k-filter-row > th:first-child,
+.k-grid tbody td:first-child,
+.k-grid tfoot td:first-child,
+.k-grid-header th.k-header:first-child {
+  border-left-width: 1px;
+}
+
 .k-grid-header-locked,
 .k-grid-content-locked,
 .k-grid-footer-locked,

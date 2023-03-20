@@ -194,7 +194,7 @@
 			var item = $.extend({}, col);
 			item.dataType = item.type;
 			item.type = "string";
-			if (item.field === "bulk_menu")
+			if (item.field === "bulk_menu" || item.disableSummary == true)
 			{
 				item.title = "";
 				item.headerTemplate = null;
