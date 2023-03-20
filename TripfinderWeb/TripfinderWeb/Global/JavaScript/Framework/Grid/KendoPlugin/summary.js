@@ -22,9 +22,13 @@
 		this.bindOnClearFilterEvent();
 	}
 
-	KendoGridSummaryGrid.prototype.createSummaryGrid = function()
+	KendoGridSummaryGrid.prototype.createSummaryGrid = function(forceCreate)
 	{
 		var self = this, scrollLeft = 0;
+		if (!forceCreate && (!this.obSummaryGridVisible || !this.obSummaryGridVisible()))
+		{
+			return;
+		}
 		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
 		if (self.summaryKendoGrid)
 		{

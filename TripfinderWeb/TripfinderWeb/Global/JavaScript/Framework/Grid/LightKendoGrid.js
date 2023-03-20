@@ -984,6 +984,19 @@
 			};
 		}
 
+		if (self.options.filterable === false)
+		{
+			kendoGridOption.filterable = false;
+		}
+		else
+		{
+			kendoGridOption.filterable = {
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			};
+		}
+
 		kendoGridOption = $.extend(true, kendoGridOption, this.options.kendoGridOption);
 		this.filterClearButtonInUnLockedArea = this.options.kendoGridOption.filterClearButtonInUnLockedArea;
 

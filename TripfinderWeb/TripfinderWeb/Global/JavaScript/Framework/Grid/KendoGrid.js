@@ -130,7 +130,8 @@
 
 	KendoGrid.prototype.loadPresetData = function()
 	{
-		if (!this.isBigGrid)
+		var self = this;
+		if (!this.isBigGrid && !this.options.isMiniGrid)
 		{
 			return Promise.resolve();
 		}
@@ -141,15 +142,23 @@
 			})
 			.then(() =>
 			{
-				return this.loadGridFilter();
-			})
-			.then(() =>
-			{
-				this._applyingLayout = true;
-				this._setGridColumnConfiguration(this.options.fromSearch);
-				this._applyingLayout = false;
-				return;
-			});
+					if (this.options.isMiniGrid)
+					{
+						var promise = Promise.resolve();
+					}
+					else
+					{
+						var promise = Promise.all([self.loadGridFilter()]);
+					}
+
+					return promise.then(function()
+					{
+						self._applyingLayout = true;
+						self._setGridColumnConfiguration(self.options.fromSearch);
+						self._applyingLayout = false;
+						return;
+					});
+			})			
 	};
 
 	KendoGrid.prototype.loadGridDefaults = function()
@@ -766,7 +775,7 @@
 
 		var $container = this.$container;
 		var $lockedContent = $container.find(".k-grid-content-locked");
-		if (this.options.isGridView && $lockedContent &&
+		if ($lockedContent &&
 			this.obSummaryGridVisible && this.obSummaryGridVisible() && this.overlay !== false)
 		{
 			!this.options.isMiniGrid && tf.loadingIndicator.showImmediately();

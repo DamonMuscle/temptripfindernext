@@ -18,6 +18,7 @@
 		self.field = itemData.field;
 		self.type = !isLine ? itemData.type : ($(self.target).closest(".hori-line, .verti-line").attr("type") || "");
 		self.showQuickFilter = !!itemData.showQuickFilter;
+		self.showSetQuickFilter = !!itemData.showSetQuickFilter;
 		self.showSummary = !!itemData.showSummary;
 		self.isSupportFilter = tf.helpers.miniGridHelper.checkGridSupportFilter(itemData.field);
 
@@ -90,6 +91,7 @@
 		self.imageChange = self.imageChange.bind(self);
 		self.changeColumns = self.changeColumns.bind(self);
 		self.changeQuickFilterBar = self.changeQuickFilterBar.bind(self);
+		self.changeSetQuickFilterBar = self.changeSetQuickFilterBar.bind(self);
 		self.changeSummaryBar = self.changeSummaryBar.bind(self);
 		self.openConditionalAppearanceModal = self.openConditionalAppearanceModal.bind(self);
 		self.editClicked = self.editClicked.bind(self);
@@ -134,12 +136,47 @@
 		self.rebuildDetailGrid(gridBlock);
 	}
 
+	DataBlocksMenuViewModel.prototype.changeSetQuickFilterBar = function(viewModel, e)
+	{
+		var self = this,
+			gridBlock = $(self.target).closest(".grid-stack-item");
+		var lazyRebuildGrid = true;
+		var setFilterBar = !gridBlock.data("showSetQuickFilter");
+		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
+		{
+			return;
+		}
+
+		var filter = lightKendoGrid.kendoGrid.dataSource.filter();
+		if (filter && !setFilterBar)
+		{
+			return tf.promiseBootbox.confirm(
+				{
+					message: "By unselecting this you will lose your saved filter selections. Do you wish to continue?",
+					title: "Confirmation"
+				})
+				.then(function(result)
+				{
+					if (result)
+					{
+						gridBlock.data("showSetQuickFilter", setFilterBar);
+						lightKendoGrid.kendoGrid.dataSource.filter({}, lazyRebuildGrid);
+						lightKendoGrid.rebuildGrid(); // Only rebuild top kendoGrid. Do not need to call rebuild Detail Grid.
+					}
+					return;
+				}.bind(self));
+		}
+
+		gridBlock.data("showSetQuickFilter", setFilterBar);
+	}
+
 	DataBlocksMenuViewModel.prototype.changeSummaryBar = function(viewModel, e)
 	{
 		var self = this,
 			gridBlock = $(self.target).closest(".grid-stack-item");
-		var filterBar = !gridBlock.data("showSummary");
-		gridBlock.data("showSummary", filterBar);
+		var summaryBar = !gridBlock.data("showSummary");
+		gridBlock.data("showSummary", summaryBar);
 		self.rebuildDetailGrid(gridBlock);
 	}
 
