@@ -5400,9 +5400,15 @@
 		var contentHeight = height - 105 + self._filterHeight + pagerHeight;
 		self.$container.height(height).find(".k-grid-content-locked,.k-grid-content").height(contentHeight);
 		self.$container.next(".kendo-summarygrid-container").find(".k-grid-content-locked,.k-grid-content").height(self.summaryHeight);
-		self.kendoGrid._adjustLockedHorizontalScrollBar();
+		if (self.kendoGrid && self.kendoGrid.virtualScrollable)
+		{
+			self.kendoGrid._rowHeight = null;
+			self.kendoGrid.virtualScrollable.repaintScrollbar();
+		}
 
 		self.resetGridContainerHorizontalLayout();
+		//self.changeLockedColumnHeight();
+		self._refreshGridBlank();
 	};
 
 	/** */

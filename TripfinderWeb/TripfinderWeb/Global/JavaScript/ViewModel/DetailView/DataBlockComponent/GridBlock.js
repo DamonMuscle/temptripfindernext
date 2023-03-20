@@ -1,7 +1,11 @@
 (function()
 {
 	createNamespace("TF.DetailView.DataBlockComponent").GridBlock = GridBlock;
-
+	let STATUS = {
+		EXPAND: 0,
+		RESTORE: 1
+	};
+	const ADD_BUTTON_CLASS_NAME = '.grid-top-right-button.add-event';
 	var FIELD_TRIP_INVOICE_KEY = "fieldtripinvoice";
 	var studentRequirementsUrl = "studentrequirements";
 	var CONFIRMATION_TITLE = "Confirmation Message";
@@ -90,17 +94,22 @@
 		self.extraGridConfigs = self.getExtraGridConfigurations(options.field, detailView._getLayoutObjInCache().width);
 		self.detailView = detailView;
 		self.$detailView = detailView.$element;
+		self.expandContainer = self.$detailView.find('.right-container');
 		self.isCreateGridNewRecord = detailView.isCreateGridNewRecord;
 		self.recordEntity = detailView.recordEntity;
 		self.recordId = detailView.recordId;
 		self.fieldEditorHelper = detailView.fieldEditorHelper;
 		self.obEditing = detailView.obEditing;
-
+		self.status = STATUS.RESTORE;
 		self._initGridActions();
 		self._detailviewFieldChange = self._detailviewFieldChange.bind(self);
 		detailView.onFieldChange.subscribe(self._detailviewFieldChange);
 		self.initElement(options);
-
+		self.addHotLink = self.addHotLink.bind(this);
+		self.pubSubSubscriptions.push(PubSub.subscribe('tripsLoadedOnMap' + detailView.eventNameSpace, this.setTripsLoadedOnMap.bind(this)));
+		self.tripLoadedNumber = 0;
+		self.tripIsLoaded = false;
+		self.gridMaxHeightBeforeExpand = 0;
 		self.isBlockReadOnly.subscribe(val =>
 		{
 			if (val)
@@ -118,17 +127,16 @@
 					e.preventDefault();
 					e.stopPropagation();
 				});
-				self.$el.find(".grid-top-right-button").addClass("disabled");
+				self.$el.find(ADD_BUTTON_CLASS_NAME).addClass("disabled");
 				self.grid.hideColumn("Action");
 			} else
 			{
 				self.grid.wrapper.off('.readonlyBlock');
-				self.$el.find(".grid-top-right-button").removeClass("disabled");
+				self.$el.find(ADD_BUTTON_CLASS_NAME).removeClass("disabled");
 				self.grid.showColumn("Action");
 			}
 		});
 	};
-
 	GridBlock.prototype = Object.create(TF.DetailView.DataBlockComponent.BaseDataBlock.prototype);
 
 	GridBlock.prototype._detailviewFieldChange = function(e, data)
@@ -142,19 +150,135 @@
 					if (self.detailView.recordEntity && self.detailView.recordEntity.FieldTripResourceGroups)
 					{
 						var FieldTripResourceGroupsWithBC = self.fieldEditorHelper.applyBCtoResourceGroups(self.detailView.recordEntity.FieldTripResourceGroups, data.result.selectedItem)
-						// self.fieldEditorHelper.editFieldList.FieldTripResourceGroups =
-						// {
-
-						// 	value: FieldTripResourceGroupsWithBC,
-						// 	blockName: "FieldTripResourceGroups"
-						// };
-						// Update grid data
 						self._updateResourceGrid(FieldTripResourceGroupsWithBC);
 					}
 					PubSub.publish("fieldtripresource", {});
 				}
 				break;
 		}
+	};
+	GridBlock.prototype._restore = function()
+	{
+		this.status = STATUS.RESTORE;
+		this.$el.removeAttr('style');
+		this.$el.height(this.expandedPrevHeight);
+		this.$innerGrid && this.$innerGrid.css('height', this.$innerGridPreHeight);
+		if (this.options.inMultipleGridBlock)
+		{
+			this.$el.find('.item-content.grid .kendo-grid.k-grid').css('height', 'auto');
+		}
+		if (this.$originalPrevious && this.$originalPrevious.length > 0)
+		{
+			this.$el.insertAfter(this.$originalPrevious);
+			if (this.options.inMultipleGridBlock)
+			{
+				this.$el.css('padding-top', '15px');
+			}
+		} else if (this.$originalContainer && this.$originalContainer.length > 0)
+		{
+			this.$originalContainer.prepend(this.$el);
+		}
+		this.expandContainer.children().css({ "visibility": "visible" });
+		this.expandContainer.css("overflow-y", "auto");
+		this.expandedDom && this.expandedDom.remove();
+	};
+
+	GridBlock.prototype._expand = function()
+	{
+		this.status = STATUS.EXPAND;
+		const headerHeight = 34, footerHeight = 34;
+		this.gridMaxHeightBeforeExpand = this.$el.find(".item-content.grid").height() - headerHeight - footerHeight;
+		if (this.options.inMultipleGridBlock)
+		{
+			this.expandedDom = $(`<div class="grid-stack"><div style="height:100%;padding-top:5px;" class="grid-stack-item-content"></div></div>`);
+		} else
+		{
+			this.expandedDom = $(`<div class="grid-stack"></div>`);
+		}
+		this.expandContainer.children().css({ "visibility": "hidden" });
+		this.expandContainer.css("overflow-y", "hidden");
+		this.expandContainer.append(this.expandedDom);
+		this.expandContainer.css({ position: "relative" });
+		this.expandedDom.css({
+			position: "absolute",
+			top: this.expandContainer.scrollTop(),
+			left: 0,
+			right: 0,
+			bottom: 0,
+			"z-index": 500,
+			"background-color": "white"
+		});
+		this.expandedPrevHeight = this.$el[0].style['height'];
+		this.expandedPreWidth = this.$el.width();
+		this.expandedPreLeft = this.$el.position().left;
+		this.$originalPrevious = this.$el.prev();
+		this.$originalContainer = this.$el.parent();
+		this.$innerGrid = this.$el.find('.kendo-grid .k-grid-content');
+		this.$innerGridPreHeight = this.$innerGrid[0].style['height'];
+		if (this.options.inMultipleGridBlock)
+		{
+			this.expandedDom.find('.grid-stack-item-content').append(this.$el);
+			let itemGrid = this.expandedDom.find('.item-content.grid');
+			itemGrid.parent().css('height', '100%');
+			this.$el.find('.item-content.grid .kendo-grid.k-grid').css('height', '100%');
+			itemGrid.css('height', 'calc(100% - 40px)');
+		} else
+		{
+			this.expandedDom.append(this.$el);
+
+		}
+		this.$el.css({ 'width': '100%', 'height': '100%', 'left': 0 });
+		this._fitExpandGridHeight();
+	};
+
+	GridBlock.prototype.manageLayout = function()
+	{
+		clearTimeout(this.reSizeExpandGridTimer);
+		this.reSizeExpandGridTimer = setTimeout(() =>
+		{
+			if (this.status == STATUS.EXPAND)
+			{
+				this._fitExpandGridHeight();
+			}
+		}, 200)
+	};
+
+	GridBlock.prototype._fitExpandGridHeight = function()
+	{
+		this.$innerGrid && this.$innerGrid.css('height', this.$innerGrid.parent().height() - 68);
+	};
+
+	GridBlock.prototype._toggleClick = function()
+	{
+		if (this.status == STATUS.RESTORE)
+		{
+			this._expand();
+
+		} else
+		{
+			this._restore();
+		}
+		this.expandButton.toggleClass('restore');
+		this.expandButton.attr('title', this.status == STATUS.RESTORE ? 'Expand' : 'Restore');
+	};
+
+	GridBlock.prototype._addExpandButton = function()
+	{
+		let self = this;
+		if (!self.expandButton)
+		{
+			self.expandButton = $("<div title='Expand' style='margin-left:8px;width:30px;height:30px;padding:0;' class='grid-top-right-button expand-button'></div>")
+			if (self.options.inMultipleGridBlock)
+			{
+				self.$el.find('div.item-title').css({ 'margin-bottom': '15px', 'position': 'relative', 'top': '15px' }).prepend(self.expandButton);
+			}
+			else
+			{
+				self.$el.find(`.custom-grid div.item-title`).css({ 'margin-bottom': '15px', 'position': 'relative', 'top': '15px' }).prepend(self.expandButton);
+			}
+		}
+		self.expandButton.on('click', self._toggleClick.bind(self));
+
 	};
 
 	GridBlock.prototype._updateResourceGrid = function(FieldTripResources)
@@ -173,7 +297,7 @@
 	GridBlock.prototype._initGridActions = function()
 	{
 		var self = this,
-			isReadOnly = self.isReadOnly();
+			isReadOnly = self.isReadOnly() || !self.extraGridConfigs.permission;
 
 		self.kendoGridActions = {
 			"document": {
@@ -218,6 +342,12 @@
 
 		// set on demand action
 		self.onDemandGridActions = {};
+
+		if (tf.isViewfinder && self.gridType === "route")
+		{
+			self.onDemandGridActions["trip"] = [];
+			self.addTripVisibilityAction();
+		}
 
 		if (self.miniGridType === "communicationhistory" && self.checkLoadDataPermission(self.options))
 		{
@@ -318,15 +448,16 @@
 
 			if (self.gridType === "route")
 			{
-				self.onDemandGridActions["trip"] = [
+				self.onDemandGridActions["trip"] = [];
+				self.addTripVisibilityAction();
+				self.onDemandGridActions["trip"].push({
+					name: "delete",
+					template: '<a class="k-button k-button-icontext k-grid-delete" title="Remove"></a>',
+					click: function(e)
 					{
-						name: "delete",
-						template: '<a class="k-button k-button-icontext k-grid-delete" title="Remove"></a>',
-						click: function(e)
-						{
-							self.unassignTrip(this, e.target);
-						}
-					}];
+						self.unassignTrip(this, e.target);
+					}
+				});
 			}
 		}
 
@@ -481,12 +612,16 @@
 
 		self.$el = options.inMultipleGridBlock ? $gridStackItem : $element;
 		self.uniqueClassName = uniqueClassName;
+		if (self.expandContainer && self.expandContainer.length > 0)
+		{
+			self._addExpandButton();
+		}
 	};
 
 	GridBlock.prototype.initEvents = function()
 	{
 		var self = this,
-			$btn = self.$el.find(".grid-top-right-button");
+			$btn = self.$el.find(ADD_BUTTON_CLASS_NAME);
 
 		// Check if permission check could pass.
 		if (!self.extraGridConfigs || self.extraGridConfigs.permission)
@@ -541,7 +676,7 @@
 				case "FieldTripResourceGrid":
 					$btn.on("click.detailView", function()
 					{
-						self.showFieldTripResourceModal(null);
+						self.showFieldTripResourceModal(null, self.recordId, self.grid);
 					});
 					break;
 				case "FieldTripInvoiceGrid":
@@ -655,7 +790,8 @@
 			if (fieldName === "ContactAssociationGrid")
 			{
 				self.updateContactAssociationRecordEntity(selected);
-			} else if (fieldName === "DocumentAssociationGrid")
+			}
+			else if (fieldName === "DocumentAssociationGrid")
 			{
 				self.updateDocumentAssociationRecordEntity(selected);
 			}
@@ -680,14 +816,28 @@
 		var self = this,
 			grids = tf.helpers.detailViewHelper.getAllGridsAndColumns(self.$detailView, fieldName)["grids"];
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), 'contacts'), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'contacts'), {
 			paramData: {
-				databaseID: tf.datasourceManager.databaseId,
 				dataType: dataType,
 				recordIds: self.recordId
 			}
 		}).then(function(response)
 		{
+			if (response && response.Items)
+			{
+				response.Items.forEach(item =>
+				{
+					var udfs = item.UserDefinedFields;
+					if (udfs && udfs.length)
+					{
+						udfs.forEach(udf =>
+						{
+							item[udf.Guid] = udf.RecordValue;
+						});
+					}
+				});
+			}
+
 			$.each(grids, function(_, item)
 			{
 				var $item = $(item);
@@ -731,7 +881,7 @@
 			return;
 		}
 
-		return TF.DetailView.StudentRequirementViewModel.checkStudentRequirementLocked(data.Id).then(function()
+		return TF.DetailView.StudentRequirementViewModel.checkStudentRequirementLocked(data.Id, 'delete').then(function()
 		{
 			return tf.promiseBootbox.yesNo("Are you sure you want to delete this record?", "Delete Confirmation")
 				.then(function(res)
@@ -958,7 +1108,7 @@
 									updatePromises.push(self.updateAssociationEditList(associationType, selectedIds));
 									Promise.all(updatePromises).then(function(res)
 									{
-										if (self.gridBlockType == "ContactGrid")
+										if (self.gridBlockType == "ContactGrid" && self.recordId != null)
 										{
 											self.updateAllContactGridsDataSource(tf.dataTypeHelper.getNameByType(self.gridType), "ContactGrid");
 										}
@@ -1064,7 +1214,9 @@
 										}
 									}
 
-									PubSub.publish("tripChange", { Id: id, tripIds: selectedIds });
+									let currentGridExistsTrips = this.detailView.invisibleTrips.filter(trip => selectedIds.includes(trip.tripId));
+									this.detailView.invisibleTrips = currentGridExistsTrips;
+									PubSub.publish("tripChange", { Id: id, tripIds: selectedIds, invisibleTrips: this.detailView.invisibleTrips, tripsColors: this.tripsColors });
 								}
 								else
 								{
@@ -1158,7 +1310,7 @@
 			kendoGrid = $grid.data("kendoGrid"),
 			documentEntity = kendoGrid.dataItem($tr),
 			documentId = documentEntity.Id,
-			gridName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType).toLowerCase();
+			gridName = tf.dataTypeHelper.getDisplayNameByDataType(self.gridType).toLowerCase();
 
 		var WarningMessage = "Are you sure you want to disassociate this " + gridName + " from \"" + documentEntity.Name + "\"?"
 		if (self.gridBlockType = "DocumentGrid")
@@ -1245,10 +1397,6 @@
 				requestUrl = pathCombine(tf.api.apiPrefix(), typeEndpoint);
 				requestUrl += String.format('?@relationships=all&@excluded=FileContent&{0}={1}', idParamName, recordId);
 				break;
-			case 'contact':
-				requestUrl = pathCombine(tf.api.apiPrefixWithoutDatabase(), typeEndpoint, recordId);
-				requestUrl += '?@relationships=all';
-				break;
 			default:
 				requestUrl = pathCombine(tf.api.apiPrefix(), typeEndpoint);
 				requestUrl += String.format('?@relationships=all&{0}={1}', idParamName, recordId);
@@ -1266,22 +1414,22 @@
 	 *
 	 * @param {Event} e
 	 */
-	 GridBlock.prototype.viewMiniGridCommunicationHistory = function(e)
-	 {
-		 var self = this,
-			 $tr = $(e.target).closest("tr"),
-			 $grid = $tr.closest(".kendo-grid"),
-			 kendoGrid = $grid.data("kendoGrid"),
-			 dataItem = kendoGrid.dataItem($tr);
-		 const options = {
-			 recordId: dataItem.Id,
-			 dataType: self.gridType,
-			 pageLevelViewModel: self.detailView.pageLevelViewModel,
-			 parentDocument: self
-		 };
- 
-		 tf.modalManager.showModal(new TF.Modal.CommunicationHistoryModalViewModel(options));
-	 };
+	GridBlock.prototype.viewMiniGridCommunicationHistory = function(e)
+	{
+		var self = this,
+			$tr = $(e.target).closest("tr"),
+			$grid = $tr.closest(".kendo-grid"),
+			kendoGrid = $grid.data("kendoGrid"),
+			dataItem = kendoGrid.dataItem($tr);
+		const options = {
+			recordId: dataItem.Id,
+			dataType: self.gridType,
+			pageLevelViewModel: self.detailView.pageLevelViewModel,
+			parentDocument: self
+		};
+
+		tf.modalManager.showModal(new TF.Modal.CommunicationHistoryModalViewModel(options));
+	};
 
 	/**
 	 * Preview on document grid action button.
@@ -1389,6 +1537,18 @@
 				tf.dataTypeHelper.getAssociationTotalCount("contact")
 					.then(function(totalCount)
 					{
+						if (!!recordEntity.IsStopfinder && recordEntity.Type && recordEntity.Type === "Student")
+						{
+							self.getRecordEntity("student", recordEntity.Id).then(function(entity)
+							{
+								if (entity && entity.LocalId)
+								{
+									self.recordEntity.LocalId = entity.LocalId;
+									self.deactiveContactSubscription(self.recordEntity);
+								}
+							});
+						}
+
 						tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "contactassociation", [recordEntity.Id], totalCount);
 
 						var data = kendoGrid.dataSource.data();
@@ -1531,7 +1691,13 @@
 			if (index > -1)
 			{
 				editFieldList.value.splice(index, 1);
-				PubSub.publish("tripChange", { Id: 0, tripIds: editFieldList.value });
+				let tripIndex = this.detailView.invisibleTrips.findIndex(trip => trip.tripId === entity.Id);
+				if (tripIndex > -1)
+				{
+					this.detailView.invisibleTrips.splice(tripIndex, 1);
+				}
+
+				PubSub.publish("tripChange", { Id: 0, tripIds: editFieldList.value, invisibleTrips: this.detailView.invisibleTrips, tripsColors: this.tripsColors });
 			}
 
 			return;
@@ -1555,8 +1721,20 @@
 					}
 				}).then(() =>
 				{
-					tripIds.splice(tripIds.findIndex(r => r == entity.Id), 1);
-					PubSub.publish("tripChange", { Id: this.recordEntity.Id, tripIds: tripIds });
+					let tripIndex = tripIds.findIndex(r => r == entity.Id);
+					delete this.tripsColors[entity.Id];
+					if (tripIndex > -1)
+					{
+						tripIds.splice(tripIndex, 1);
+						let invisibleTripIndex = this.detailView.invisibleTrips.findIndex(trip => trip.tripId === entity.Id);
+						if (invisibleTripIndex > -1)
+						{
+							this.detailView.invisibleTrips.splice(invisibleTripIndex, 1);
+						}
+
+						PubSub.publish("tripChange", { Id: this.recordEntity.Id, tripIds: tripIds, invisibleTrips: this.detailView.invisibleTrips, tripsColors: this.tripsColors });
+					}
+
 					if (this.detailView.parentDocument.gridMap.isShowing())
 					{
 						this._refreshChangedRouteMapData();
@@ -1578,6 +1756,34 @@
 		});
 	}
 
+	GridBlock.prototype.deactiveContactSubscription = function(contactEntity)
+	{
+		if (this.recordEntity && this.recordEntity.LocalId && contactEntity.Email)
+		{
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "contacts/deactiveSubscription"),
+				{
+					data: {
+						LocalId: this.recordEntity.LocalId,
+						Email: contactEntity.Email
+					}
+				}
+			).then(() =>
+			{
+				tf.promiseBootbox.dialog({
+					message: "Stopfinder Subscriptions for Contact [ " + contactEntity.Email + " ] and Student [ " + this.recordEntity.Name + " ] have been disabled.",
+					title: "Message",
+					closeButton: true,
+					buttons: {
+						ok: {
+							label: "OK",
+							className: "tf-btn-black"
+						}
+					}
+				});
+			});
+		}
+	}
+
 	GridBlock.prototype.removeAssociationToContact = function(e, $target)
 	{
 		var self = this,
@@ -1588,7 +1794,7 @@
 			contactEntity = kendoGrid.dataItem($tr),
 			contactName = tf.dataTypeHelper.getEntityName("contact", contactEntity),
 			contactId = contactEntity.Id,
-			gridName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType).toLowerCase();
+			gridName = tf.dataTypeHelper.getDisplayNameByDataType(self.gridType).toLowerCase();
 
 		tf.promiseBootbox.yesNo("Are you sure you want to disassociate this " + gridName + " from \"" + contactName + "\"?", CONFIRMATION_TITLE)
 			.then(function(res)
@@ -1611,6 +1817,12 @@
 				Promise.all(tasks).then(function(response)
 				{
 					tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "contact", [contactEntity.Id]);
+
+					//Remove Contact Subscription
+					if (!!contactEntity.IsStopfinder)
+					{
+						self.deactiveContactSubscription(contactEntity);
+					}
 
 					// Remove this contact in stack.
 					if (self.fieldEditorHelper.editFieldList &&
@@ -1654,7 +1866,7 @@
 
 		if (config)
 		{
-			var $btn = $("<div/>", { class: "grid-top-right-button " + config.btnClass, text: config.btnLabel }),
+			var $btn = $("<div/>", { class: "grid-top-right-button add-event " + config.btnClass, text: config.btnLabel }),
 				hasPermission = (typeof config.checkPermission === "function" ? config.checkPermission() : true);
 
 			result = {
@@ -1822,9 +2034,8 @@
 
 	GridBlock.prototype.getContactAssociations = function(contactId, includeDataTypes)
 	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "contacts", contactId, "contactrelationships"), {
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "contacts", contactId, "contactrelationships"), {
 			paramData: {
-				"databaseID": tf.datasourceManager.databaseId,
 				"@relationships": includeDataTypes.join(",")
 			}
 		}).then(function(response)
@@ -1890,7 +2101,6 @@
 				return tf.authManager.isAuthorizedForDataType("document", "read");
 			case "ContactAssociationGrid":
 			case "DocumentAssociationGrid":
-			case "StudentRequirementGrid":
 			case "FieldTripHistoryGrid":
 			case "FieldTripVehicleGrid":
 			case "FieldTripDriverGrid":
@@ -1900,13 +2110,14 @@
 				return tf.authManager.isAuthorizedForDataType("fieldtrip", "read");
 			case "StudentScheduleGrid":
 			case "StudentCardGrid":
+			case "StudentRequirementGrid":
 			case "AdditionalRequirementGrid":
 				return tf.authManager.isAuthorizedFor("student", "read");
 			case "AttendanceGrid": // RW-21544, user need 'Trip Calendar/Attendance Records' permission to visit trip calendar and student attendance grid
 			case "CalendarEventsGrid":
 				return tf.authManager.isAuthorizedFor("tripCalendarAttendanceRecords", "read");
 			case "CommunicationHistoryGrid":
-				return tf.authManager.isAuthorizedFor('mergeEmailMessages','read') && tf.authManager.isAuthorizedFor('scheduledMergeDocument','read');
+				return tf.authManager.hasMergeEmailMessageAccess('read') && tf.authManager.hasScheduledMergeDocumentAccess('read');
 			default:
 				return tf.authManager.isAuthorizedForDataType(dataItem.url, "read");
 		}
@@ -1926,7 +2137,7 @@
 			}
 		}
 
-		var columnFields = columns.map(function(column)
+		var columnFields = columns.filter(x => x.FieldName).map(function(column)
 		{
 			return column.FieldName;
 		}),
@@ -2017,12 +2228,11 @@
 				});
 			case "AltsiteGrid":
 				paramData = {
-					"@fields": "AltSiteID",
-					"StudentId": self.recordId,
-					"DBID": tf.datasourceManager.databaseId,
-					"@filter": "gt(AltSiteID,0)"
+					"@fields": "Id",
+					"studentIds": self.recordId,
+					"@filter": "gt(Id,0)"
 				};
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "AlternateSites"), {
 					paramData: paramData
 				}).then(function(result)
 				{
@@ -2033,7 +2243,7 @@
 
 					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
 					{
-						return item.AltSiteID;
+						return item.Id;
 					}) : [-1];
 					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
 						data: {
@@ -2204,6 +2414,11 @@
 
 					sortItemsName = "StartTime";
 				}
+				else if (dataItem.url == "trip" && self.gridType == "vehicle")
+				{
+					paramData["@fields"] = "Id";
+					paramData["vehicleId"] = self.recordId;
+				}
 				else
 				{
 					var dataIdentifier = dataItem.subUrl,
@@ -2312,9 +2527,9 @@
 	{
 		if (this.options.url == TF.Helper.KendoGridHelper.studentRequirementItemsUrl)
 		{
-			var addButton = this.$el.find(".grid-top-right-button");
+			var addButton = this.$el.find(ADD_BUTTON_CLASS_NAME);
 			var grid = this.$el.find(".kendo-grid").data("kendoGrid");
-			if (this.isBlockReadOnly())
+			if (this.isBlockReadOnly() || this.isReadOnly())
 			{
 				addButton.addClass("disabled");
 				return;
@@ -2399,7 +2614,7 @@
 
 		if (requirementCache)
 		{
-			self.showStudentRequirementModal(requirementCache);
+			self.showStudentRequirementModal(requirementCache, self.gridBlockType == "StudentRequirementGrid" ? TF.StudentRequirementType.default : TF.StudentRequirementType.additional);
 			return;
 		}
 
@@ -2419,10 +2634,10 @@
 		var self = this,
 			tr = $(e.target).closest("tr"),
 			data = grid.dataItem(tr);
-		self.showFieldTripResourceModal(data);
+		self.showFieldTripResourceModal(data, self.recordId, self.grid);
 	};
 
-	GridBlock.prototype.showFieldTripResourceModal = function(fieldtripResource)
+	GridBlock.prototype.showFieldTripResourceModal = function(fieldtripResource, fieldtrip, resourceGrid)
 	{
 		var self = this,
 			isNew = !fieldtripResource,
@@ -2440,7 +2655,7 @@
 			options.newEntityDataSource = fieldtripresourceDataSource;
 		}
 
-		tf.modalManager.showModal(new TF.DetailView.FieldTripResourceModalViewModel(options))
+		tf.modalManager.showModal(new TF.DetailView.FieldTripResourceModalViewModel(options, fieldtrip, resourceGrid))
 			.then(function(result)
 			{
 				if (!result)
@@ -2529,6 +2744,137 @@
 		this.initDetailGrid();
 	};
 
+	GridBlock.prototype._getAssociateData = function(selectedItemKeys)
+	{
+		if (!selectedItemKeys || selectedItemKeys.length === 0)
+		{
+			return Promise.resolve([]);
+		}
+
+		const groupByType = (selectedItemKeys) =>
+		{
+			const groupedItems = {};
+			selectedItemKeys.forEach((i) =>
+			{
+				if (!groupedItems[i.DataTypeId])
+				{
+					groupedItems[i.DataTypeId] = [];
+				}
+
+				groupedItems[i.DataTypeId].push(i.RecordID);
+			});
+
+			return groupedItems;
+		}
+		const convertToEntity = (selectedItemKeys) =>
+		{
+			let getRelatedContacts = [];
+			const groupedItems = groupByType(selectedItemKeys);
+			Object.keys(groupedItems).forEach((dataTypeId) =>
+			{
+				const dataTypeName = tf.dataTypeHelper.getNameById(Number.parseInt(dataTypeId));
+				const dataType = tf.dataTypeHelper.getKeyById(Number.parseInt(dataTypeId));
+				const url = pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(dataType));
+				let fields = TF.DetailView.AssociateRecordsViewModel.prototype.getNecessaryFieldsByDataType({ dataType: dataType });
+				fields.push("Id");
+				const params = {
+					"idFilter": {
+						"IncludeOnly": groupedItems[dataTypeId],
+						"ExcludeAny": [],
+					},
+					"filterSet": null,
+					"fields": fields
+				}
+				getRelatedContacts.push(
+					tf.promiseAjax.post(url, { data: params }).then((ret) =>
+					{
+						ret.Items.forEach(i =>
+						{
+							i.Type = dataTypeName;
+							i.DataTypeId = dataTypeId;
+							i.Name = TF.DetailView.AssociateRecordsViewModel.prototype._getNameByDataType(dataTypeName, i);
+							i.RecordID = i.Id;
+						})
+						return ret.Items;
+					})
+				);
+			});
+
+			return getRelatedContacts;
+		}
+
+		return Promise.all(convertToEntity(selectedItemKeys))
+			.then(results =>
+			{
+				let result = [];
+				results.forEach(r =>
+				{
+					if (r && r.length > 0)
+					{
+						result = result.concat(r);
+					}
+				});
+
+				return result;
+			});
+	};
+
+	GridBlock.prototype._updateDocumentGrid = function(selectedItemKeys, fields)
+	{
+		if (!selectedItemKeys || selectedItemKeys.length === 0)
+		{
+			return Promise.resolve([]);
+		}
+
+		const keys = selectedItemKeys.map(s => s.DocumentID);
+		const url = pathCombine(tf.api.apiPrefix(), "search", "documents");
+		fields = fields.push['Id'];
+		const params = {
+			"idFilter": {
+				"IncludeOnly": keys,
+				"ExcludeAny": [],
+			},
+			"filterSet": null,
+			"fields": fields
+		}
+
+		return tf.promiseAjax.post(url, { data: params })
+			.then((ret) =>
+			{
+				return (ret && ret.Items) ? ret.Items : [];
+			});
+	}
+
+	GridBlock.prototype._isAssociateContacts = function()
+	{
+		return this.detailView &&
+			this.detailView.$element &&
+			this.detailView.$element.closest('.modal-dialog') &&
+			this.detailView.$element.closest('.modal-dialog').find('.panel-heading') &&
+			this.detailView.$element.closest('.modal-dialog').find('.panel-heading').text() === 'Associate Contacts';
+	}
+
+	GridBlock.prototype._prepareAssociateContactData = function(getItemsAsync)
+	{
+		var self = this;
+		if (self.options.field === "ContactAssociationGrid" &&
+			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact] &&
+			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact].value)
+		{
+			const selectedItemKeys = _.cloneDeep(self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact].value || []);
+			getItemsAsync = self._getAssociateData(selectedItemKeys);
+		}
+		else if (self.options.field === "DocumentGrid" &&
+			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document] &&
+			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document].value)
+		{
+			const selectedItemKeys = _.cloneDeep(self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document].value || []);
+			getItemsAsync = self._updateDocumentGrid(selectedItemKeys, self.options.columns || []);
+		}
+
+		return getItemsAsync;
+	}
+
 	GridBlock.prototype.initDetailGrid = function()
 	{
 		var self = this,
@@ -2563,12 +2909,31 @@
 
 				if (!whetherGetRelatedData)
 				{
-					var items = self.detailView.newEntityRelationships[self.miniGridType] || [];
-					return Promise.resolve({
-						dataItems: items,
-						totalCount: items.length,
-						pageSize: 50
-					});
+					let items = self.detailView.newEntityRelationships[self.miniGridType] || [];
+					let getItemsAsync = Promise.resolve(items);
+
+					if (self.options.field === "ContactGrid"
+						&& self.gridType === "student"
+						&& self.detailView.newCopyContext
+						&& self.detailView.newCopyContext.baseEntity.Contacts
+					)
+					{
+						items = _.cloneDeep(self.detailView.newCopyContext.baseEntity.Contacts);
+					}
+					else if (self._isAssociateContacts())
+					{
+						getItemsAsync = self._prepareAssociateContactData(getItemsAsync);
+					}
+
+					return getItemsAsync
+						.then(items =>
+						{
+							return {
+								dataItems: items,
+								totalCount: items.length,
+								pageSize: 50
+							};
+						});
 				}
 			}
 
@@ -2597,6 +2962,14 @@
 						{
 							item[udf.FieldName] = item[udf.OriginalName];
 						});
+					});
+				}
+
+				if (self.gridBlockType === 'TripGrid' && (self.grid.dataSource.options && !self.grid.dataSource.options.serverPaging))
+				{
+					response.Items.forEach(trip =>
+					{
+						trip.Schools = trip.Schools.replace(/!/g, ", ").trim().tfTrimEnd(',');
 					});
 				}
 				return response;
@@ -2683,13 +3056,35 @@
 			}));
 		}
 
-		if (self.miniGridType === "attendancegrids"  || self.miniGridType === "communicationhistory")
+		if (self.miniGridType === "attendancegrids" || self.miniGridType === "communicationhistory")
 		{
 			options.totalCountHidden = true;
 		}
 
 		self.originalGridOptions = options;
-
+		self.originalGridOptions.afterRenderCallback = (kendoGrid, dataItems) =>
+		{
+			self.addHotLink(self.miniGridType, kendoGrid);
+		};
+		if (self.miniGridType == "trip" && self.gridType == "route")
+		{
+			options.gridOptions.showLockedColumn = true;
+			options.gridOptions.lockColumnTemplate = [
+				{
+					field: "bulk_menu",
+					title: "<div></div>",
+					width: '30px',
+					sortable: false,
+					filterable: false,
+					locked: true,
+					template: function(data)
+					{
+						const color = self.getTripColor(data.Id);
+						return `<div class='k-hierarchy-cell' style='display: none}' ><a class='k-icon k-i-expand' style='display:none' aria-label='Expand'></a></div><div class='left-color-icon' style='border-radius:50%;display:block} ;background-color:${color}'></div>`;
+					}
+				}
+			];
+		}
 		var grid = tf.helpers.kendoGridHelper.createSimpleGrid(self.$el, options);
 		self.grid = grid;
 		grid.options.totalCountHidden = options.totalCountHidden;
@@ -2776,6 +3171,8 @@
 			{
 				refreshGrid();
 			}));
+			self.initChangeTripColor();
+			self.grid.hideColumn(self.grid.columns[0]);
 		}
 
 		function refreshGrid()
@@ -2808,7 +3205,7 @@
 		}
 		else
 		{
-			noMatchedAccountErrorMsg = "No account is available, please add in field trip configurations.";
+			noMatchedAccountErrorMsg = "No account is avilable, please add in field trip configurations.";
 			fetchEligibleAccounts = tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtripaccounts?@fields=Id,Code"))
 				.then(function(res)
 				{
@@ -2840,7 +3237,7 @@
 					return tf.promiseBootbox.alert(noMatchedAccountErrorMsg);
 				}
 
-				options.accounts = accounts;
+				options.accounts = sortArray(accounts, "Code");
 				options.originalItem = dataItem;
 
 				if (!self.recordEntity)
@@ -2964,19 +3361,24 @@
 			border = "1px solid #eee";
 		kendoGridElement.css("border", "none");
 		gridContent.css({ "border-left": border, "border-right": border });
-		var maxHeight = kendoGridElement.height() - 67;
-		if (kendoGrid.dataSource.data().length == 0)
-		{
-			gridContent.height(0);
-		} else
+		var maxHeight = Math.max(kendoGridElement.height() - 67, gridContent.height());
+		var gridHeight = 0;
+		if (kendoGrid.dataSource.data().length != 0)
 		{
 			var height = kendoGrid.dataSource.data().length * 34;
 			if (gridContent.find(".k-virtual-scrollable-wrap").width() < gridContent.find("table").width())
 			{
 				height += 18;
 			}
-			gridContent.height(Math.min(maxHeight, height));
+			gridHeight = Math.min(maxHeight, height);
 		}
+
+		this.$innerGridPreHeight = `${Math.min(this.gridMaxHeightBeforeExpand, gridHeight)}px`;
+		if (self.status === STATUS.RESTORE)
+		{
+			gridContent.height(gridHeight);
+		}
+
 	};
 
 	GridBlock.prototype.editCalendarEventModal = function(grid, e)
@@ -3150,6 +3552,154 @@
 		}
 	}
 
+	GridBlock.prototype.setTripsLoadedOnMap = function(e)
+	{
+		this.tripLoadedNumber++;
+		if (this.detailView.getMapNumber() == this.tripLoadedNumber)
+		{
+			this.grid.showColumn(this.grid.columns[0]);
+			this.tripLoadedNumber = 0;
+		}
+		this.tripIsLoaded = true;
+	};
+
+	GridBlock.prototype.getTripColor = function(tripId)
+	{
+		if (!this.tripsColors)
+		{
+			this.tripsColors = {};
+		}
+		if (this.tripsColors && this.tripsColors[tripId])
+		{
+			return this.tripsColors[tripId];
+		}
+		const index = Object.keys(this.tripsColors).length;
+		if (index >= 0)
+		{
+			this.tripsColors[tripId] = tf.colorSource[index % tf.colorSource.length].toLowerCase();
+			return this.tripsColors[tripId];
+		}
+		this.tripsColors[tripId] = tf.colorSource[0].toLowerCase();
+		return this.tripsColors[tripId];
+	};
+
+	GridBlock.prototype.initChangeTripColor = function()
+	{
+		let self = this;
+		let colorPickerInput = $("<input type='text' />");
+		let inputContainer = $("<div style='position:absolute;opacity:0'></div>");
+		inputContainer.append(colorPickerInput);
+		colorPickerInput.kendoColorPicker({
+			buttons: false,
+		});
+
+		this.$el.delegate("div.left-color-icon", "click", (event) =>
+		{
+			event.preventDefault();
+			$(event.target).after(inputContainer);
+			var row = $(event.target).closest("tr");
+			var dataItem = this.grid.dataItem(row);
+			var color = $(event.target).css("background-color");
+			var colorPicker = $(colorPickerInput).data("kendoColorPicker");
+			colorPicker.color(color);
+			colorPicker.open();
+			colorPicker.unbind("change").bind("change", (e) =>
+			{
+				this.tripsColors[dataItem.Id] = e.value;
+				$(event.target).css("background-color", e.value);
+				changeTripColor(dataItem, e.value);
+			});
+		});
+
+		function changeTripColor(trip, color)
+		{
+			PubSub.publish('tripColorChange' + self.detailView.eventNameSpace, { tripId: trip.Id, color: color });
+		}
+	}
+
+	GridBlock.prototype.addTripVisibilityAction = function()
+	{
+		let self = this;
+		if (self.detailView.getMapNumber() > 0)
+		{
+			this.detailView.invisibleTrips = [];
+			let tripVisibilityAction = {
+				name: "tripVisibility",
+				template: '<a class="k-button k-button-icontext k-grid-show-eye" title="Show Trips"></a>',
+				click: function(e)
+				{
+					if (self.tripIsLoaded)
+					{
+						self.setTripVisibilityData(this, e.target, $(e.clickTarget));
+					}
+				},
+				mouseover: function(demandContainer, dataItem)
+				{
+					let eyeBtn = demandContainer.children().eq(0);
+					let tripId = dataItem.Id;
+
+					let index = self.detailView.invisibleTrips.findIndex(trip => trip.tripId === tripId);
+					if (index > -1)
+					{
+						eyeBtn.removeClass('k-grid-show-eye');
+						eyeBtn.addClass('k-grid-hide-eye');
+						eyeBtn.prop('title', 'Show Trips');
+					} else
+					{
+						eyeBtn.removeClass('k-grid-hide-eye');
+						eyeBtn.addClass('k-grid-show-eye');
+						eyeBtn.prop('title', 'Hide Trips');
+					}
+				}
+			};
+
+			self.onDemandGridActions["trip"].push(tripVisibilityAction);
+		}
+	}
+
+	GridBlock.prototype.setTripVisibilityData = function(e, $target, clickTarget)
+	{
+		$target = $target || $(e.currentTarget);
+		let $tr = $target.closest('tr'),
+			$grid = $target.closest('.kendo-grid'),
+			kendoGrid = $grid.data('kendoGrid'),
+			entity = kendoGrid.dataItem($tr);
+
+		if (clickTarget.attr('class').includes('show-eye'))
+		{
+			clickTarget.removeClass('k-grid-show-eye');
+			clickTarget.addClass('k-grid-hide-eye');
+			clickTarget.prop('title', 'Show Trips');
+			this.detailView.invisibleTrips.push({ tripId: entity.Id });
+			PubSub.publish('tripVisibilityChange' + this.detailView.eventNameSpace, { visibility: false, trips: this.detailView.invisibleTrips });
+		} else
+		{
+			if (this.detailView.invisibleTrips)
+			{
+				clickTarget.removeClass('k-grid-hide-eye');
+				clickTarget.addClass('k-grid-show-eye');
+				clickTarget.prop('title', 'Hide Trips');
+
+				let index = this.detailView.invisibleTrips.findIndex((trip) => trip.tripId === entity.Id);
+				if (index > -1)
+				{
+					let visibleTrip = this.detailView.invisibleTrips.splice(index, 1);
+					PubSub.publish('tripVisibilityChange' + this.detailView.eventNameSpace, { visibility: true, trips: visibleTrip, invisibleTrips: this.detailView.invisibleTrips });
+				}
+			}
+		}
+	}
+
+	GridBlock.prototype.addHotLink = function(miniGridType, grid)
+	{
+		const hotLinkConfig = {
+			studentschedule: [{ targetGrid: "trip", fields: ["TripName"], }]
+		}
+		const $table = $(grid.table);
+		TF.Grid.GridHotLinkHelper && TF.Grid.GridHotLinkHelper.setHotLink(miniGridType, $table, hotLinkConfig, grid)
+
+	};
+
 	GridBlock.prototype.dispose = function()
 	{
 		var self = this;
@@ -3169,6 +3719,7 @@
 		{
 			kendoGrid.destroy();
 		}
+		self._restore();
 	};
 
 
@@ -3184,4 +3735,17 @@
 			if (fields.indexOf(field) < 0) fields.push(field);
 		});
 	}
+
+	function sortArray(array, sortField)
+	{
+		return array.sort(function(a, b)
+		{
+			if (a[sortField].toUpperCase() === b[sortField].toUpperCase())
+			{
+				return 0;
+			}
+			return a[sortField].toUpperCase() > b[sortField].toUpperCase() ? 1 : -1;
+		});
+	}
+
 })();
