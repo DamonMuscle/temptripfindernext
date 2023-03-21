@@ -887,38 +887,7 @@
 
 	LightGridBlock.prototype.getMiniGridSelectedRecords = function(miniGridType)
 	{
-		var self = this,
-			records = [],
-			kendoGrids = self.getMiniGrid(miniGridType);
-		kendoGrids.forEach(function(kendoGrid)
-		{
-			records = kendoGrid.dataSource.data().slice();
-		});
-
-		return records;
-	};
-
-	LightGridBlock.prototype.getMiniGrid = function(miniGridType)
-	{
-		var self = this,
-			gridName = LightGridBlock.MINI_GRID_NAME_DICTIONARY[miniGridType],
-			kendoGrids = [],
-			fieldData, $item;
-
-		self.$detailView.find(".kendo-grid-container")
-			.each(function(_, item)
-			{
-				$item = $(item);
-				fieldData = $item.closest(".grid-stack-item").data();
-				if (fieldData &&
-					fieldData.field === gridName)
-				{
-					var kendoGrid = $item.data("kendoGrid");
-					kendoGrids.push(kendoGrid);
-				}
-			});
-
-		return kendoGrids;
+		return this.includeIds.filter(c => c > 0).map(c => ({ "Id": c }));
 	};
 
 	function isAssociationChanged(selectedData, response)
@@ -1851,13 +1820,7 @@
 			{
 				return !!c;
 			});
-		} else if (gridType === "document")
-		{
-			columns = allColumns.filter(function(c)
-			{
-				return ["Name", "FileName", "Description", "Action"].indexOf(c.FieldName) > -1;
-			});
-		} else
+		}  else
 		{
 			columns = self.getGridColumnsFromAllColumnsByType(allColumns, gridType)
 				.map(function(c)
@@ -1874,11 +1837,23 @@
 		let self = this, columns = allColumns;
 		switch (type.toLowerCase())
 		{
+			case "student":
+				columns = allColumns.filter(function(c)
+				{
+					return ["LocalId", "LastName", "FirstName", "Schoolname", "MailStreet1", "MailCity", "MailState", "MailZip"].includes(c.FieldName);
+				});
+				break;
+			case "document":
+				columns = allColumns.filter(function(c)
+				{
+					return ["Name", "FileName", "Description", "Action"].includes(c.FieldName);
+				});
+				break;
 			case "trip":
 				columns = self.getTripGridColumnsFromColumnsByType(allColumns, self.gridType);
 				break;
 			default:
-				allColumns.filter(r => !r.hidden);
+				columns = allColumns.filter(r => !r.hidden);
 				break;
 		}
 
@@ -1896,7 +1871,7 @@
 				columns = columns.sort((a, b) => defaultColumnsByRoute.indexOf(a.FieldName) - defaultColumnsByRoute.indexOf(b.FieldName));
 				break;
 			default:
-				allColumns.filter(r => !r.hidden);
+				columns = allColumns.filter(r => !r.hidden);
 				break;
 		}
 
@@ -2114,7 +2089,7 @@
 		switch (dataItem.field)
 		{
 			case "ContactGrid":
-				return tf.helpers.detailViewHelper._getContactGridRecords(self.gridType, self.recordId).then((result) =>
+				return tf.helpers.detailViewHelper._getContactIds(self.gridType, self.recordId).then((result) =>
 				{
 					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
 					{
@@ -2303,15 +2278,6 @@
 					return includeIds;
 				});
 		}
-	};
-
-	LightGridBlock.prototype.getContactGridTotalCount = function()
-	{
-		var self = this;
-		return tf.helpers.detailViewHelper._getContactGridRecords(self.gridType, self.recordId).then(function(response)
-		{
-			return response.TotalRecordCount;
-		});
 	};
 
 	LightGridBlock.prototype.editMiniGridRecord = function(miniGridType, e, $target)

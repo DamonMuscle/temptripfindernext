@@ -1524,6 +1524,20 @@
 		});
 	};
 
+	DetailViewHelper.prototype._getContactIds = function(gridType, recordId)
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "contacts"), {
+			paramData: {
+				"dataType": tf.dataTypeHelper.getDisplayNameByDataType(gridType),
+				"recordIds": recordId || 0,
+				"@fields": "Id"
+			}
+		}).then(response =>
+		{
+			return response;
+		});
+	};
+
 	DetailViewHelper.prototype.getContactGridTotalCount = function(gridType, recordId)
 	{
 		var self = this;

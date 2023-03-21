@@ -4979,7 +4979,7 @@
 			if ($nomatching.length === 0)
 			{
 				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
-				if (!self.options.withoutData && !self.options.isMiniGrid)
+				if (!self.options.withoutData && !self.options.miniGridEditMode)
 				{
 					$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
 				}
@@ -5427,18 +5427,17 @@
 	/** */
 	LightKendoGrid.prototype.resetGridContainerHorizontalLayout = function()
 	{
-		var self = this, $item,
+		var self = this,
 			$summaryGrid = self.$container.next(),
 			warpWidth = self.$container.width(),
-			lockHeaderWidth = self.$container.find('.k-grid-header-locked').width(),
+			lockHeaderWidth = self.$container.children(".k-grid-header").children('.k-grid-header-locked').width(),
 			remainedWidth = warpWidth - lockHeaderWidth,
-			paddingRight = parseInt(self.$container.find(".k-grid-content").css("padding-right"));;
+			paddingRight = parseInt(self.$container.children(".k-grid-content").css("padding-right"));
 
-
-		self.$container.find(".k-grid-content").css("width", remainedWidth - paddingRight);
-		self.$container.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
-		$summaryGrid.find(".k-grid-content").css("width", remainedWidth);
-		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth);
+		self.$container.children(".k-grid-content").css("width", remainedWidth - paddingRight);
+		self.$container.children(".k-grid-header").children(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-grid-content").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
 	};
 
 	LightKendoGrid.prototype.getGridFullHeight = function()

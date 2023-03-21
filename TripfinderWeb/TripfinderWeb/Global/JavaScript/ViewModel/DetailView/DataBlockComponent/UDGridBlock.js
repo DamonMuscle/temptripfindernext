@@ -566,11 +566,15 @@
 							DisplayName: originFieldMapping[col],
 							width: 165,
 							lockWidth: true,
+							type: 'string',
 							originalUdfField: udgField
 						};
 
 					switch (udgField.FieldOptions.TypeName)
 					{
+						case "Attachment":
+							column.type = "integer";
+							break;
 						case "Map":
 							let xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
 							if (isXCoordField)
