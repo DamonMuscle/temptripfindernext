@@ -2631,10 +2631,11 @@
 			filterable: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
 			gridLayout: summaryConfig,
 			defaultSort: self.options.sort,
+			defaultFilter: self.miniGridHelper.getFilterConfig(self.$el, self.options),
 			isMiniGrid: true, // set the grid to mini grid mode
 			showOverlay: false,
 			totalCountHidden: self.options.totalCountHidden,
-			resizable: false, // disable column resize.
+			resizable: true, // enable column resize.
 			miniGridEditMode: !isReadMode, // set the miniGrid to Edit mode
 			setRequestURL: () =>
 			{

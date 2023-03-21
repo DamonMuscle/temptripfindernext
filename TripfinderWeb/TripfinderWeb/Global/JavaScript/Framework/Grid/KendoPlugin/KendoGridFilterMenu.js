@@ -276,6 +276,14 @@
 		{
 			return new TF.SearchParameters(null, null, null, null, null, null, null);
 		}
+
+		//If the request from mini grid. use sticky quick filter from options.
+		if (self.options.isMiniGrid)
+		{
+			let filterSet = self.options.defaultFilter ? self.convertKendo2RequestFilterSet({}, self.options.defaultFilter) : null;
+			return new TF.SearchParameters(null, null, null, filterSet, null, null, null);
+		}
+
 		return tf.storageManager.get(tf.storageManager.gridCurrentQuickFilter(gridType)) ||
 			new TF.SearchParameters(null, null, null, null, null, null, null);
 	};

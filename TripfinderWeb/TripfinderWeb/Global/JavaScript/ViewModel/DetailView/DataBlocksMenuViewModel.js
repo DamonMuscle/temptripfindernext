@@ -18,7 +18,6 @@
 		self.field = itemData.field;
 		self.type = !isLine ? itemData.type : ($(self.target).closest(".hori-line, .verti-line").attr("type") || "");
 		self.showQuickFilter = !!itemData.showQuickFilter;
-		self.showSetQuickFilter = !!itemData.showSetQuickFilter;
 		self.showSummary = !!itemData.showSummary;
 		self.isSupportFilter = tf.helpers.miniGridHelper.checkGridSupportFilter(itemData.field);
 
@@ -91,7 +90,6 @@
 		self.imageChange = self.imageChange.bind(self);
 		self.changeColumns = self.changeColumns.bind(self);
 		self.changeQuickFilterBar = self.changeQuickFilterBar.bind(self);
-		self.changeSetQuickFilterBar = self.changeSetQuickFilterBar.bind(self);
 		self.changeSummaryBar = self.changeSummaryBar.bind(self);
 		self.openConditionalAppearanceModal = self.openConditionalAppearanceModal.bind(self);
 		self.editClicked = self.editClicked.bind(self);
@@ -132,16 +130,8 @@
 		var self = this,
 			gridBlock = $(self.target).closest(".grid-stack-item");
 		var filterBar = !gridBlock.data("showQuickFilter");
-		gridBlock.data("showQuickFilter", filterBar);
-		self.rebuildDetailGrid(gridBlock);
-	}
+		var lazyRebuildGrid = false;
 
-	DataBlocksMenuViewModel.prototype.changeSetQuickFilterBar = function(viewModel, e)
-	{
-		var self = this,
-			gridBlock = $(self.target).closest(".grid-stack-item");
-		var lazyRebuildGrid = true;
-		var setFilterBar = !gridBlock.data("showSetQuickFilter");
 		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
 		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
 		{
@@ -149,7 +139,7 @@
 		}
 
 		var filter = lightKendoGrid.kendoGrid.dataSource.filter();
-		if (filter && !setFilterBar)
+		if (filter && !filterBar)
 		{
 			return tf.promiseBootbox.confirm(
 				{
@@ -160,24 +150,40 @@
 				{
 					if (result)
 					{
-						gridBlock.data("showSetQuickFilter", setFilterBar);
+						gridBlock.data("showQuickFilter", filterBar);
 						lightKendoGrid.kendoGrid.dataSource.filter({}, lazyRebuildGrid);
-						lightKendoGrid.rebuildGrid(); // Only rebuild top kendoGrid. Do not need to call rebuild Detail Grid.
+						lightKendoGrid.rebuildGrid().then(() =>
+						{
+							lightKendoGrid._setQuickFilterBarStatus(filterBar);
+						});
+
 					}
 					return;
 				}.bind(self));
 		}
 
-		gridBlock.data("showSetQuickFilter", setFilterBar);
+		gridBlock.data("showQuickFilter", filterBar);
+		lightKendoGrid.rebuildGrid().then(() =>
+		{
+			lightKendoGrid._setQuickFilterBarStatus(filterBar);
+		});
 	}
 
 	DataBlocksMenuViewModel.prototype.changeSummaryBar = function(viewModel, e)
 	{
 		var self = this,
 			gridBlock = $(self.target).closest(".grid-stack-item");
+		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+		var summaryContainer = gridBlock.find(".kendo-summarygrid-container");
+		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
+		{
+			return;
+		}
+
 		var summaryBar = !gridBlock.data("showSummary");
 		gridBlock.data("showSummary", summaryBar);
-		self.rebuildDetailGrid(gridBlock);
+		summaryContainer && summaryContainer.css("display", summaryBar ? "block" : "none");
+		lightKendoGrid.obSummaryGridVisible(summaryBar);
 	}
 
 	DataBlocksMenuViewModel.prototype.rebuildDetailGrid = function(gridBlock)
@@ -275,11 +281,14 @@
 		{
 			if (editColumnViewModel)
 			{
-				if (gridBlock.find(".kendo-grid-container").length > 0)
+				var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+				if (lightKendoGrid)
 				{
 					// Need to rebuild the mini grid if mini grid support quick filter.
+					lightKendoGrid._obSelectedColumns(editColumnViewModel.selectedColumns);
+					lightKendoGrid.removeHiddenColumnQuickFilter(editColumnViewModel.availableColumns);
 					gridBlock.data("columns", editColumnViewModel.selectedColumns);
-					self.rebuildDetailGrid(gridBlock);
+					lightKendoGrid.rebuildGrid();
 				}
 				else
 				{

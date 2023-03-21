@@ -799,12 +799,13 @@
 			gridDefinition: self.miniGridHelper.getKendoColumnsExtend(columns),
 			totalCountHidden: self.options.totalCountHidden,
 			defaultSort: self.options.sort,
+			defaultFilter: self.miniGridHelper.getFilterConfig(self.$el, self.options),
 			gridType: "form",
 			gridData: { value: formId },
 			isMiniGrid: true, // apply some special settings 
 			miniGridEditMode: !isReadMode,
 			showOverlay: false, // do not need loading
-			resizable: false, // disable column resize.
+			resizable: true, // enable column resize.
 			filterable: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
 			gridLayout: summaryConfig,
 			url: pathCombine(tf.api.apiPrefix(), "search", "formResults"),

@@ -1290,6 +1290,7 @@
 				{
 					extData = {
 						sort: $grid.data("kendoGrid") ? $grid.data("kendoGrid").dataSource.sort() : [],
+						filter: $grid.data("kendoGrid") ? $grid.data("kendoGrid").dataSource.filter() : null,
 						showSummary: elData["showSummary"] || $el.attr("showSummary"),
 						showQuickFilter: elData["showQuickFilter"] || $el.attr("showQuickFilter"),
 						url: elData["url"] || $el.attr("url"),

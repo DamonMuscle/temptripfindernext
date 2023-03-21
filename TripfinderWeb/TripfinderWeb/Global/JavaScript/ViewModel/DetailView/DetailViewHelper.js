@@ -607,6 +607,7 @@
 				descriptor.UDGridId = layoutItem.UDGridId;
 			case "grid":
 				descriptor.sort = layoutItem.sort;
+				descriptor.filter = layoutItem.filter;
 				descriptor.columns = layoutItem.columns;
 				descriptor.showQuickFilter = layoutItem.showQuickFilter;
 				descriptor.showSummary = layoutItem.showSummary;

@@ -106,6 +106,36 @@
 	};
 
 	/**
+	 * Get filter Config for KendoGrid
+	 *
+	 * @param {jQuery} $grid
+	 * @param {object} options
+	 * @returns
+	 */
+	MiniGridHelper.prototype.getFilterConfig = function($grid, options)
+	{
+		if (!$grid)
+		{
+			return null;
+		}
+
+		var data = $grid.data();
+		var isQuickFilter = data["showQuickFilter"] != undefined ? data["showQuickFilter"] : options.showQuickFilter;
+		var filter = data["filter"] != undefined ? data["filter"] : options.filter;
+		$grid.find(".kendo-grid-container").data("filter", filter); // RCM functionality need this data
+
+		if (isQuickFilter)
+		{
+			return filter;
+		}
+		else
+		{
+			return null;
+		}
+	};
+
+
+	/**
 	 * Get kendo grid columns with extension.
 	 *
 	 * @param {Array} currentColumns
