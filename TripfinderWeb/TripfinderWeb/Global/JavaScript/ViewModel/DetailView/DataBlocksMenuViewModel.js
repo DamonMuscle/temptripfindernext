@@ -311,7 +311,12 @@
 					lightKendoGrid._obSelectedColumns(editColumnViewModel.selectedColumns);
 					lightKendoGrid.removeHiddenColumnQuickFilter(editColumnViewModel.availableColumns);
 					gridBlock.data("columns", editColumnViewModel.selectedColumns);
-					lightKendoGrid.rebuildGrid();
+					lightKendoGrid.rebuildGrid().then(() =>
+					{
+						var filterBar = gridBlock.data("showQuickFilter");
+						lightKendoGrid._setQuickFilterBarStatus(filterBar);
+						self._updateLockedColumnVisibility(gridBlock);
+					});
 				}
 				else
 				{

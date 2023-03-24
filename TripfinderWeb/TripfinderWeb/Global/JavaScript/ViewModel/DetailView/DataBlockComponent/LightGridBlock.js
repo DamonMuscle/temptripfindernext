@@ -2601,7 +2601,7 @@
 	LightGridBlock.prototype.initDetailGrid = function()
 	{
 		var self = this,
-			isReadMode = self.isReadMode(),
+			isDesignMode = !self.isReadMode(),
 			columns = self.options.columns,
 			hasPermission = self.checkLoadDataPermission(self.options),
 			summaryConfig = self.miniGridHelper.getSummaryBarConfig(self.$el, self.options);
@@ -2635,8 +2635,10 @@
 			isMiniGrid: true, // set the grid to mini grid mode
 			showOverlay: false,
 			totalCountHidden: self.options.totalCountHidden,
-			resizable: true, // enable column resize.
-			miniGridEditMode: !isReadMode, // set the miniGrid to Edit mode
+			resizable: !isDesignMode, // enable column resize if not design mode.
+			reorderable: false, // disable column reorder.
+			canDragDelete: false, // disable drag delete.
+			miniGridEditMode: isDesignMode, // set the miniGrid to Edit mode
 			setRequestURL: () =>
 			{
 				return self._setRequestURL();
@@ -2679,10 +2681,14 @@
 					return requestOption;
 				})
 			},
-			onDataBound: function()
+			onCreateGrid: () =>
 			{
 				self.grid = self.lightKendoGrid.kendoGrid;
-				tf.helpers.kendoGridHelper.setGridOnDemandAction(self.grid, self.onDemandGridActions[self.miniGridType]);
+			},
+			onDataBound: function()
+			{
+				self.tripIsLoaded && self.grid.showColumn(self.grid.columns[0]);
+				isDesignMode || tf.helpers.kendoGridHelper.setGridOnDemandAction(self.grid, self.onDemandGridActions[self.miniGridType]);
 				self._updateGridFooter();
 				self._bindMiniGridEvent(self.miniGridType, self.$el.find(".kendo-grid-container"));
 				self._setDefaultStudentRequirementAddable();

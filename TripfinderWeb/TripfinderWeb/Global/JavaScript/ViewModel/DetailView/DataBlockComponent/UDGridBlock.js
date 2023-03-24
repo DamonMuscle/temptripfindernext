@@ -472,7 +472,7 @@
 	UDGridBlock.prototype.initDetailGrid = function()
 	{
 		var self = this,
-			isReadMode = self.isReadMode(),
+			isDesignMode = !self.isReadMode(),
 			columns = [], prepareColumns = [],
 			summaryConfig = self.miniGridHelper.getSummaryBarConfig(self.$el, self.options);
 
@@ -801,9 +801,11 @@
 			gridType: "form",
 			gridData: { value: formId },
 			isMiniGrid: true, // apply some special settings 
-			miniGridEditMode: !isReadMode,
+			miniGridEditMode: isDesignMode,
 			showOverlay: false, // do not need loading
-			resizable: true, // enable column resize.
+			resizable: !isDesignMode, // enable column resize if not design mode
+			reorderable: false, // disable column reorder.
+			canDragDelete: false, // disable drag delete.
 			displayQuickFilterBar: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
 			lockColumnTemplate: self.miniGridHelper.getLockedColumnTemplate(self.$el, self.options),
 			gridLayout: summaryConfig,
@@ -824,6 +826,10 @@
 					};
 					return requestOption;
 				})
+			},
+			onCreateGrid: () =>
+			{
+				self.grid = self.lightKendoGrid.kendoGrid;
 			},
 			onDataBound: () =>
 			{
@@ -850,7 +856,6 @@
 	UDGridBlock.prototype._onDataBound = function()
 	{
 		var self = this;
-		self.grid = self.lightKendoGrid.kendoGrid;
 		self._updateGridFooter();
 		self._bindMiniGridEvent(self.$el.find(".kendo-grid-container"));
 		self.renderCommandBtn();

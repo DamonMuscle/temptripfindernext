@@ -557,6 +557,26 @@
 
 		tf.helpers.detailViewHelper.updateSectionHeaderTextInputWidth(undefined, self.nestedGridStacks[self.getCurrentIndex()].$wrapper);
 		self.rootGridStack.detailView.manageLayout();
+		self.nestedGridStacks.forEach(function(gridstack, i)
+		{
+			gridstack.dataBlocks.forEach(function(dataBlock)
+			{
+				if (dataBlock.widget && dataBlock.widget.fitGridHeight)
+				{
+					dataBlock.widget.fitGridHeight();
+				}
+
+				if (dataBlock.lightKendoGrid)
+				{
+					dataBlock.lightKendoGrid.fitContainer();
+				}
+
+				if (dataBlock.grid)
+				{
+					dataBlock.grid.resize(true);
+				}
+			});
+		});
 	};
 
 	TabStripBlock.prototype.dispose = function()

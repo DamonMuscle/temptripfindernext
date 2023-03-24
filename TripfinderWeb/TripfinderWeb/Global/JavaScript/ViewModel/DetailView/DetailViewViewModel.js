@@ -1883,7 +1883,25 @@
 		{
 			this.rootGridStack.dataBlocks.forEach((dataBlock) =>
 			{
-				dataBlock?.lightKendoGrid?.fitContainer();
+				if (dataBlock.lightKendoGrid)
+				{
+					dataBlock.lightKendoGrid.fitContainer();
+				}
+
+				if (dataBlock.nestedGridStacks)
+				{
+					dataBlock.nestedGridStacks.forEach(function(gridstack, i)
+					{
+						gridstack.dataBlocks.forEach(function(dataBlock)
+						{
+							if (dataBlock.lightKendoGrid)
+							{
+								dataBlock.lightKendoGrid.fitContainer();
+							}
+						});
+					});
+				}
+
 			});
 			this.fitContainerTimer = null;
 		}.bind(this), 50);

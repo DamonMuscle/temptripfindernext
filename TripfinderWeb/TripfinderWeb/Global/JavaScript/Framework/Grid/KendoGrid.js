@@ -252,9 +252,9 @@
 
 		this.changeSortModel(); //bind the function of chang sort model in colunm mousedown
 		this.resizableBinding();
-		this.createDragDelete();
+		this.options.canDragDelete && this.createDragDelete();
 		this.lockUnlockColumn();
-		this.initDragHeadEvent();
+		this.options.reorderable && this.initDragHeadEvent();
 
 		this.initQuickFilterBar();
 

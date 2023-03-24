@@ -1032,6 +1032,7 @@
 		this.blurFilterInputWhenClickGrid();
 		this.handleClickClearQuickFilterBtn();
 		this.bindCalendarButton();
+		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
 
 	LightKendoGrid.prototype.filterMenuInit = function(e)

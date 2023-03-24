@@ -1866,49 +1866,6 @@
 
 	LightGridStack.prototype.fitContainer = function(uniqueClassName)
 	{
-		var element = $("." + uniqueClassName);
-		// get the kendo gird pager warp height
-		const gridPagerHeight = element.find(".k-pager-wrap").outerHeight();
-		if (gridPagerHeight === null)
-		{
-			return;
-		}
-
-		const stackPadding = 8;
-		// get the stack height, not include the padding and border
-		const stackHeight = element.height();
-		// get the stack title height
-		const stackTitleHeight = element.find(".item-title").outerHeight();
-		// get the summary bar container
-		const $summaryGridContainer = element.find(".kendo-grid.kendo-summarygrid-container").css("height", "");
-		// get the summary bar height, roughly equal to 83px
-		const summaryGridHeight = $summaryGridContainer.find(".k-grid-content.k-auto-scrollable").outerHeight() || 0;
-		// set the stack grid container height and get the container
-		const $stackGridContainer = element.find(".grid").height(stackHeight - stackTitleHeight);
-
-		// set the kendo grid height, not include the summary bar
-		const kendoGridHeight = stackHeight - stackTitleHeight - summaryGridHeight - gridPagerHeight - stackPadding;
-		const $kendoGridContainer = $stackGridContainer.find(".kendo-grid.kendo-grid-container").height(kendoGridHeight);
-
-		// set the kendo grid display block height
-		const $kendoGridDisplayBlock = $kendoGridContainer.find(".k-grid-display-block");
-		const summaryGridTableHeight = summaryGridHeight > 0 ? $summaryGridContainer.find(".k-grid-content table").outerHeight() : 4;
-		$kendoGridDisplayBlock.height(kendoGridHeight - summaryGridTableHeight);
-
-		// set the kendo grid content height, not include the pager height and kendo header height
-		const kendoGridHeaderHeight = $kendoGridContainer.find(".k-grid-header").height();
-		const $kendoGridContent = $kendoGridContainer.find(".k-grid-content").height(kendoGridHeight - gridPagerHeight - kendoGridHeaderHeight);
-
-		// set the kendo grid virtual scroll and lock height
-		const $kendoGridScrollWrap = $kendoGridContent.find(".k-virtual-scrollable-wrap")[0];
-		const $kendoGridLocked = $kendoGridContainer.find(".k-grid-content-locked");;
-		let horizontalScrollHeight = 0;
-		if ($kendoGridScrollWrap && ($kendoGridScrollWrap.scrollWidth > $kendoGridScrollWrap.clientWidth))
-		{
-			horizontalScrollHeight = $kendoGridScrollWrap.offsetHeight - $kendoGridScrollWrap.clientHeight;
-		}
-		$kendoGridLocked.height(kendoGridHeight - gridPagerHeight - kendoGridHeaderHeight - horizontalScrollHeight);
-
 		const $targetBlock = this.dataBlocks.filter(function(dataBlock)
 		{
 			return dataBlock.uniqueClassName == uniqueClassName;
