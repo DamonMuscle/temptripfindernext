@@ -62,18 +62,7 @@
 		var data = $grid.data();
 		var isFilter = data["showQuickFilter"] != undefined ? data["showQuickFilter"] : options.showQuickFilter;
 		$grid.data("showQuickFilter", isFilter); // RCM Show Quick Filter functionality need this data
-		if (isFilter)
-		{
-			return {
-				extra: true,
-				mode: "menu row",
-				operators: TF.Grid.LightKendoGrid.DefaultOperator
-			}
-		}
-		else
-		{
-			return false;
-		}
+		return !!isFilter;
 	};
 
 	/**
@@ -103,6 +92,38 @@
 		{
 			return null;
 		}
+	};
+
+	/**
+	 * Get Locked Column Config for KendoGrid
+	 *
+	 * @param {jQuery} $grid
+	 * @param {object} options
+	 * @returns
+	 */
+	MiniGridHelper.prototype.getLockedColumnTemplate = function($grid, options)
+	{
+		if (!$grid)
+		{
+			return null;
+		}
+
+		var data = $grid.data();
+		var isSummary = data["showSummary"] != undefined ? data["showSummary"] : options.showSummary;
+		var isQuickFilter = data["showQuickFilter"] != undefined ? data["showQuickFilter"] : options.showQuickFilter;
+
+		return [
+			{
+				field: "bulk_menu",
+				title: "<div></div>",
+				width: '30px',
+				sortable: false,
+				filterable: false,
+				locked: true,
+				hidden: !isSummary && !isQuickFilter, // hide locked column if summary and filter are unselected
+				template: ""
+			}
+		];
 	};
 
 	/**

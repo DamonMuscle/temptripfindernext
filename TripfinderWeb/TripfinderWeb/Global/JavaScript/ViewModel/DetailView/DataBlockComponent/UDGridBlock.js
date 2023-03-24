@@ -418,12 +418,11 @@
 
 	UDGridBlock.prototype.getIncludeIds = function()
 	{
-		var self = this,
-			isReadMode = self.isReadMode();
-
-		if (!isReadMode)
+		var self = this;
+		var isDesignMode = !self.isReadMode();
+		if (isDesignMode)
 		{
-			return Promise.resolve();
+			return Promise.resolve([]);
 		}
 
 		if (!self.recordId)
@@ -641,7 +640,6 @@
 								}
 								return isNullObj(value) ? "" : value;
 							};
-							column.type = "list";
 							break;
 						case "Boolean":
 							column.template = function(item)
@@ -806,7 +804,8 @@
 			miniGridEditMode: !isReadMode,
 			showOverlay: false, // do not need loading
 			resizable: true, // enable column resize.
-			filterable: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			displayQuickFilterBar: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			lockColumnTemplate: self.miniGridHelper.getLockedColumnTemplate(self.$el, self.options),
 			gridLayout: summaryConfig,
 			url: pathCombine(tf.api.apiPrefix(), "search", "formResults"),
 			setRequestOption: requestOption =>

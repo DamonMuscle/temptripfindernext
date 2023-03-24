@@ -155,6 +155,7 @@
 						lightKendoGrid.rebuildGrid().then(() =>
 						{
 							lightKendoGrid._setQuickFilterBarStatus(filterBar);
+							self._updateLockedColumnVisibility(gridBlock);
 						});
 
 					}
@@ -166,6 +167,7 @@
 		lightKendoGrid.rebuildGrid().then(() =>
 		{
 			lightKendoGrid._setQuickFilterBarStatus(filterBar);
+			self._updateLockedColumnVisibility(gridBlock);
 		});
 	}
 
@@ -184,6 +186,27 @@
 		gridBlock.data("showSummary", summaryBar);
 		summaryContainer && summaryContainer.css("display", summaryBar ? "block" : "none");
 		lightKendoGrid.obSummaryGridVisible(summaryBar);
+		self._updateLockedColumnVisibility(gridBlock);
+	}
+
+	DataBlocksMenuViewModel.prototype._updateLockedColumnVisibility = function(gridBlock)
+	{
+		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+		var summaryBar = gridBlock.data("showSummary");
+		var filterBar = gridBlock.data("showQuickFilter");
+		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
+		{
+			return;
+		}
+
+		if (!!summaryBar || !!filterBar)
+		{
+			lightKendoGrid.kendoGrid.showColumn(lightKendoGrid.kendoGrid.columns[0]);
+		}
+		else
+		{
+			lightKendoGrid.kendoGrid.hideColumn(lightKendoGrid.kendoGrid.columns[0]);
+		}
 	}
 
 	DataBlocksMenuViewModel.prototype.rebuildDetailGrid = function(gridBlock)

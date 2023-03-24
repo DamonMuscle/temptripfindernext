@@ -729,7 +729,7 @@
 					{
 						$btn.on("click.detailView", function()
 						{
-							self.simpleRecordAssociation(GridBlock.MINI_GRID_TYPE.TRIP);
+							self.simpleRecordAssociation(LightGridBlock.MINI_GRID_TYPE.TRIP);
 						});
 					}
 					break;
@@ -1952,14 +1952,13 @@
 
 	LightGridBlock.prototype.getIncludeIds = function()
 	{
-		var self = this,
-			isReadMode = self.isReadMode(),
-			columns = self.prepareColumnsForDetailGrid(self.miniGridType, self.options),
-			hasPermission = self.checkLoadDataPermission(self.options);
+		var self = this;
+		var hasPermission = self.checkLoadDataPermission(self.options);
+		var isDesignMode = !self.isReadMode();
 
-		if (!isReadMode)
+		if (isDesignMode)
 		{
-			return Promise.resolve();
+			return Promise.resolve([]);
 		}
 
 		if (!self.recordId)
@@ -2625,10 +2624,11 @@
 		}
 
 		var options = {
-			gridType: tf.dataTypeHelper.getEndpoint(self.options.url),
+			gridType: self.gridBlockType,
 			gridDefinition: self.miniGridHelper.getKendoColumnsExtend(columns),
 			isFieldTripInvoice: self.miniGridType === "fieldtripinvoice",
-			filterable: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			displayQuickFilterBar: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			lockColumnTemplate: self.miniGridHelper.getLockedColumnTemplate(self.$el, self.options),
 			gridLayout: summaryConfig,
 			defaultSort: self.options.sort,
 			defaultFilter: self.miniGridHelper.getFilterConfig(self.$el, self.options),
@@ -2755,8 +2755,7 @@
 		};
 		if (self.miniGridType == "trip" && self.gridType == "route")
 		{
-			options.gridOptions.showLockedColumn = true;
-			options.gridOptions.lockColumnTemplate = [
+			options.lockColumnTemplate = [
 				{
 					field: "bulk_menu",
 					title: "<div></div>",
@@ -2764,6 +2763,7 @@
 					sortable: false,
 					filterable: false,
 					locked: true,
+					hidden: true, // show column after trips on map loaded 
 					template: function(data)
 					{
 						const color = self.getTripColor(data.Id);
@@ -2879,7 +2879,6 @@
 				refreshGrid();
 			}));
 			self.initChangeTripColor();
-			self.grid.hideColumn(self.grid.columns[0]);
 		}
 
 		function refreshGrid()
