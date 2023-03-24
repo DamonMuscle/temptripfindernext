@@ -476,7 +476,6 @@
 			columns = [], prepareColumns = [],
 			summaryConfig = self.miniGridHelper.getSummaryBarConfig(self.$el, self.options);
 
-		let specialColumns = [];
 		let formId = self.options.ID;
 
 		self.options.columns = self.renameUDGridColumnName(self.options.columns);
@@ -490,7 +489,6 @@
 
 		if (self.options.columns && self.options.columns.length > 0)
 		{
-			var originFieldMapping = tf.udgHelper.getGuidToNameMappingOfGridFields(self.options, true, true);
 			self.options.columns.forEach(col =>
 			{
 				let isXCoordField = TF.DetailView.UserDefinedGridHelper.isXCoordField(col);
@@ -557,230 +555,17 @@
 					columns.push(updatedColumn);
 					return;
 				}
-				else if (originFieldMapping[col])
-				{
-					let udgField = self.options.UDGridFields.find(field => field.Guid == col),
-						column = {
-							FieldName: col,
-							DisplayName: originFieldMapping[col],
-							width: 165,
-							lockWidth: true,
-							type: 'string',
-							originalUdfField: udgField
-						};
-
-					switch (udgField.FieldOptions.TypeName)
-					{
-						case "Attachment":
-							column.type = "integer";
-							break;
-						case "Map":
-							let xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
-							if (isXCoordField)
-							{
-								specialColumns = [xyCoordColumns[0]];
-							}
-							else if (isYCoordField)
-							{
-								specialColumns = [xyCoordColumns[1]];
-							}
-							else
-							{
-								specialColumns = xyCoordColumns;
-							}
-							break;
-						case "Signature":
-							column.type = "boolean";
-							column.udfType = "SignatureBlock";
-							column.template = function(item)
-							{
-								return `<div class='signature-checkbox-container'>
-										<input type='checkbox' disabled class='signature-checkbox' ${item[col] === 'true' ? 'checked' : ''}/>
-									</div>`;
-							};
-							column.formatCopyValue = function(value)
-							{
-								return value == null ? "" : `${value}`;
-							};
-							break;
-						case "Date/Time":
-							column.template = dateTimeTemplate;
-							column.type = "datetime";
-							break;
-						case "Date":
-							column.template = function(item)
-							{
-								let value = item[col];
-								let date = moment(value);
-								return date.isValid() ? moment(value).format("MM/DD/YYYY") : "";
-							};
-							column.type = "date";
-							break;
-						case "Time":
-							column.template = function(item)
-							{
-								let value = item[col];
-								let time = moment(value);
-								if (time.isValid())
-								{
-									return time.format("hh:mm A");
-								}
-								time = moment("1900-1-1 " + value);
-								return time.isValid() ? time.format("hh:mm A") : "";
-							};
-							column.type = "time";
-							break;
-						case "List":
-							column.template = function(item)
-							{
-								let value = item[col];
-								if (value instanceof Array)
-								{
-									return value.join(", ");
-								}
-								return isNullObj(value) ? "" : value;
-							};
-							break;
-						case "Boolean":
-							column.template = function(item)
-							{
-								let value = item[col];
-								if (isNullObj(value)) return '';
-								return (value === 'true' || value === true) ? udgField.positiveLabel : udgField.negativeLabel || value;
-							};
-							column.type = "boolean";
-							break;
-						case "Number":
-						case "Currency":
-							const formatStr = 0;
-							column.Precision = udgField.FieldOptions.TypeName === 'Currency' ? udgField.FieldOptions.MaxLength : udgField.FieldOptions.NumberPrecision;
-							column.format = "{0:" + formatStr.toFixed(parseInt(column.Precision)).toString() + "}";
-							column.template = function(item)
-							{
-								let value = item[col];
-								if (value == null || value === "")
-								{
-									return "";
-								}
-
-								const precision = column.Precision;
-								if (isNaN(Number(value)))
-								{
-									value = 0;
-								}
-								return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
-
-							};
-							column.type = "number";
-							break;
-						case "Phone Number":
-							column.template = function(item)
-							{
-								let value = item[col];
-								if (isNullObj(value)) return '';
-								value = tf.dataFormatHelper.phoneFormatter(value);
-								return value;
-							};
-							break;
-						case "System Field":
-							{
-								let targetUdfFieldGuid = self.options.UDGridFields.find(x => x.Guid === col).editType.targetField;
-								let targetUdf = self.recordEntity.UserDefinedFields.find(x => x.Guid === targetUdfFieldGuid);
-								if (targetUdf)
-								{
-									let udfDatasourceIds = targetUdf.UDFDataSources.map(x => x.DBID);
-									if (udfDatasourceIds.indexOf(tf.datasourceManager.databaseId) < 0)
-									{
-										self._ignoredColumnNames.push(col);
-										return;
-									}
-								} else
-								{
-									self._ignoredColumnNames.push(col);
-									return;
-								}
-							}
-							break;
-						case "List From Data":
-							const fieldName = udgField.FieldOptions.UDFPickListOptions.field.name;
-							if (fieldName === "RidershipStatus")
-							{
-								column.template = function(resValue)
-								{
-									return TF.DetailView.UserDefinedGridHelper.getRidershipStatusTemp(resValue, udgField.Guid);
-								}
-							}
-							else if (fieldName === "PolicyDeviation")
-							{
-								column.template = function(resValue)
-								{
-									return TF.DetailView.UserDefinedGridHelper.getPolicyDeviationTemp(resValue, udgField.Guid);
-								}
-							}
-							break;
-					}
-
-					if (specialColumns.length)
-					{
-						specialColumns.forEach(sc =>
-						{
-							sc.headerTemplate = GetQuestionHeaderTemplate(sc.DisplayName);
-						});
-						columns = columns.concat(specialColumns);
-						specialColumns = [];
-					}
-					else
-					{
-						column.headerTemplate = GetQuestionHeaderTemplate(originFieldMapping[col]);
-						columns.push(column);
-					}
-
-					if (udgField.questionType === "ListFromData" || (udgField.questionType === "List" && udgField.FieldOptions.PickListMultiSelect))
-					{
-						let fieldName = column.FieldName;
-						column.type = "select";
-						column.ListFilterTemplate = tf.udgHelper.generateListFilterTemplate(udgField, "");
-						column.ListFilterTemplate.filterField = fieldName;
-						column.ListFilterTemplate.columnSources = [{ FieldName: fieldName, DisplayName: column.DisplayName, Width: "150px", type: "string", isSortItem: true }];
-						// add AllItems
-						column.ListFilterTemplate.requestOptions = tf.udgHelper.getRequestOption(udgField);
-
-					}
-
-					if (udgField.questionType === "ListFromData" && udgField.template !== undefined && column.template === undefined)
-					{
-						column.template = udgField.template;
-					}
-
-					if (udgField.questionType === "List" && !udgField.FieldOptions.PickListMultiSelect)
-					{
-						let pickUpList = [];
-						udgField.FieldOptions.UDFPickListOptions.forEach(plo =>
-						{
-							pickUpList.push(plo.PickList);
-						});
-						column.ListFilterTemplate = {
-							listFilterType: 'Enum',
-							sortType: 'byAllItems',
-							AllItems: pickUpList,
-							leftGridWithSearch: true,
-							EnumListFilterColumnName: "Display Name",
-							DisplayFilterTypeName: "Options"
-						}
-					}
-
-					function GetQuestionHeaderTemplate(displayName)
-					{
-						return `<span title="${displayName}" style="overflow: hidden;text-overflow: ellipsis;">${displayName}</span>`;
-					}
-
-					return;
-				}
+				self.miniGridHelper.updateUDGridColumns(columns, col, self);
 			});
 
 		}
 		else
-			columns = self.getGridColumnsByType();
+		{
+			self.getGridColumnsByType().map(c =>
+			{
+				self.miniGridHelper.updateUDGridColumns(columns, c.FieldName, self);
+			});
+		}
 
 		self.$el.data("columns", columns);
 

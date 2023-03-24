@@ -452,7 +452,12 @@
 				this.overlayShow = true;
 				this.obTempOmitExcludeAnyIds([]);
 				var kendoOptions = this.kendoGrid.getOptions();
-				kendoOptions.height = this.getGridFullHeight();
+				if (kendoOptions.height !== 0)
+				{
+					// Fix UI issues after user change columns;
+					// FIx UI issues if a light kendo grid is in tab;
+					kendoOptions.height = this.getGridFullHeight();
+				}
 				kendoOptions.columns = this.getKendoColumn();
 				kendoOptions.dataSource.sort = sortInfo || this.getKendoSortColumn();
 				if (kendoOptions.columns.length == 1)

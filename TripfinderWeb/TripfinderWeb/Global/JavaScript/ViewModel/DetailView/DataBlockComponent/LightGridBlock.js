@@ -2675,7 +2675,10 @@
 
 					if (self.options.field == "ContactGrid" && self.recordId)
 					{
-						requestOption.data.extendParameter = { RecordId: self.recordId }
+						requestOption.data.extendParameter = {
+							RecordId: self.recordId,
+							DataTypeId: tf.dataTypeHelper.getId(self.gridType)
+						}
 					}
 
 					return requestOption;
