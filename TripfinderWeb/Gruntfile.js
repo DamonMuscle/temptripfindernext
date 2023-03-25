@@ -133,6 +133,7 @@ module.exports = function(grunt)
 						'Chatfindernotexisting.html',
 						'loading.html',
 						'local_settings.js',
+						'checkAuth.js',
 						'Web.config',
 						'PdfPreview.html',
 						'ie.html'

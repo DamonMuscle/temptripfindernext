@@ -4,9 +4,16 @@ if (typeof kendo != 'undefined')
 }
 $(function()
 {
-	var tf = createNamespace("tf.debug");
-	tf.startup = new TF.Startup();
-	tf.startup.start();
+	var redirectingPromise = window.determineRedirect2VanityUrlPromise || Promise.resolve(false);
+	redirectingPromise.then(function(redirecting)
+	{
+		if (!redirecting)
+		{
+			var tf = createNamespace("tf.debug");
+			tf.startup = new TF.Startup();
+			tf.startup.start();
+		}
+	});
 });
 
 createNamespace("TF").productName = "Tripfinder";
