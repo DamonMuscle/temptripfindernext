@@ -285,17 +285,35 @@
 		};
 	};
 
-	KendoGridSummaryGrid.prototype.loadSummary = function(fildName, operator)
+	KendoGridSummaryGrid.prototype.loadSummary = function(fieldName, operator)
 	{
-		var includeIds = this._gridState.filteredIds;
-		var excludeIds = this.getExcludeAnyIds();
-		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), this.obSelectedGridFilterClause(), includeIds, excludeIds);
-		console.log(`SearchParameters intialized success! ${!!searchData}`);
-		return tf.promiseAjax.post(pathCombine(this.options.url, "aggregate"), {
-			paramData: $.extend(true, { FieldName: tf.UDFDefinition.getOriginalName(fildName), AggregateOperator: operator }, this.options.paramData || {}),
+		var apiPrefix = tf.api.apiPrefix();
+		var param = {
+			FieldName: tf.UDFDefinition.getOriginalName(fieldName),//Convert udf name to original name.
+			AggregateOperator: operator,
+			databaseId: tf.datasourceManager.databaseId
+		};
+
+		var url;
+		if (this.options.setRequestURL)
+		{
+			url = this.options.setRequestURL(apiPrefix);
+		}
+		else
+		{
+			url = pathCombine(apiPrefix, "search", tf.dataTypeHelper.getEndpoint(this.options.gridType));
+		}
+
+		if (!this.searchOption || !this.searchOption.data)
+		{
+			return Promise.resolve();
+		}
+
+		return tf.promiseAjax.post(pathCombine(url, "aggregate"), {
+			paramData: param,
 			data: this.searchOption.data,
 			traditional: true
-		}, { overlay: true });
+		}, { overlay: this.options.customGridType !== "dashboardwidget" });
 	};
 
 	KendoGridSummaryGrid.prototype.onSummaryDropDownChange = function(operator, fieldName)
