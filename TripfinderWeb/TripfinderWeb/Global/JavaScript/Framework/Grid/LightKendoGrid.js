@@ -3435,11 +3435,15 @@
 					var validateResult = self.validateDateTimeInteger(operator, value);
 					if (validateResult !== null)
 					{
-						tf.promiseBootbox.alert('The filter value must be range: ' + validateResult + '.').then(function ()
+						e.preventDefault();
+						setTimeout(() =>
 						{
-							numberInput.parent().find('.k-formatted-value').focus();
-						});
-						return;
+							tf.promiseBootbox.alert('The filter value must be range: ' + validateResult + '.', 500).then(function ()
+							{
+								numberInput.parent().find('.k-formatted-value').focus();
+							});
+						})
+						return false;
 					}
 				}
 
