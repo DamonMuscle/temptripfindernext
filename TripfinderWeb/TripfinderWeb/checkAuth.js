@@ -80,11 +80,6 @@ const vanitySessionGuard = {
 		});
 	},
 
-	needRedirectToEnterpriseLogin: function()
-	{
-		return !this.isDevEnvironment();
-	},
-
 	generateEnterpriseLoginUri: function()
 	{
 		const existingUrl = location.origin;
@@ -128,10 +123,19 @@ const vanitySessionGuard = {
 
 	/**
 	 * determine whether we need to redirect vanity url.
-	 * @returns true: redirect, false: user is on vanity url now.
+	 * @returns
+	 * true: redirect to vanity url
+	 * false: 1. user is on vanity url (that's our expectation)
+	 *        2. development environment(convenient for development)
 	 */
 	determineRedirect2VanityUrl: function()
 	{
+		if (this.isDevEnvironment())
+		{
+			// Stay current page. development environment(convenient for development)
+			return Promise.resolve(false);
+		}
+
 		return this.getVanityDomain().then(vanityDomain =>
 		{
 			if (vanityDomain && vanityDomain !== location.hostname)
@@ -141,20 +145,14 @@ const vanitySessionGuard = {
 				return true;
 			}
 
-			if (!vanityDomain && this.needRedirectToEnterpriseLogin())
+			if (!vanityDomain)
 			{
 				// re-enter this page by vanity url after passing authentication in Enterprise Login
 				this.redirect(this.generateEnterpriseLoginUri());
 				return true;
 			}
 
-			/**
-			 * Stay current page.
-			 * 1. vanity url (that's our expectation)
-			 * 
-			 * 2. development environment(convenient for development)
-			 * 3. applied _noredirect in querystring(convenient for debug in serviceplus environment)
-			 */
+			// Stay current page. vanity url (that's our expectation)
 			return false;
 		})
 	},
