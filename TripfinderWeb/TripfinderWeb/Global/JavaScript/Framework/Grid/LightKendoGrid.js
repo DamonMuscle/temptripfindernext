@@ -2908,6 +2908,7 @@
 										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
 										$filterItem.find("span.date-number").show(); // show the input
 										$filterItem.find("input.date-number").val(filter.value);
+										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").value(filter.value);
 										$filterItem.find(dateCellClass).hide();		
 										// hide the clear button
 										setTimeout(function ()
@@ -3442,20 +3443,17 @@
 					}
 				}
 
-				self.handleDateTimeNilFilterToKendoDataSource(numberInput.val(), fieldName, operator);
-
-				// hide the clear button
-				setTimeout(function (e)
+				if (value !== null && value !== '')
 				{
-					if (value === null)
+					self.handleDateTimeNilFilterToKendoDataSource(numberInput.val(), fieldName, operator);
+				} else
+				{
+					let filterCell = span.closest(".k-filtercell").data('kendoFilterCell');
+					if (filterCell)
 					{
-						var clearBtn = numberInput.closest("[data-kendo-field]").find(".k-i-filter-clear").parent();
-						if (clearBtn)
-						{
-							clearBtn.hide();
-						}
+						filterCell.clearFilter();
 					}
-				}, 500)
+				}
 			}
 		});
 
