@@ -294,6 +294,7 @@
 			tf.helpers = {
 				detailViewHelper: new TF.DetailView.DetailViewHelper(),
 				kendoGridHelper: new TF.Helper.KendoGridHelper(),
+				miniGridHelper: new TF.Helper.MiniGridHelper(),
 				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
 			};
 			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();

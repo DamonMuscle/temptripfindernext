@@ -452,7 +452,12 @@
 				this.overlayShow = true;
 				this.obTempOmitExcludeAnyIds([]);
 				var kendoOptions = this.kendoGrid.getOptions();
-				kendoOptions.height = this.getGridFullHeight();
+				if (kendoOptions.height !== 0)
+				{
+					// Fix UI issues after user change columns;
+					// FIx UI issues if a light kendo grid is in tab;
+					kendoOptions.height = this.getGridFullHeight();
+				}
 				kendoOptions.columns = this.getKendoColumn();
 				kendoOptions.dataSource.sort = sortInfo || this.getKendoSortColumn();
 				if (kendoOptions.columns.length == 1)
@@ -702,6 +707,21 @@
 				transport: {
 					read: function(options)
 					{
+						function setEmpty()
+						{
+							options.success({
+								d: {
+									__count: 0,
+									results: []
+								}
+							});
+						}
+						if (self.options.withoutData || self.options.miniGridEditMode)
+						{
+							setEmpty();
+							return;
+						}
+
 						//the count of request in the process of change filter
 						if (!self.kendoDataSourceTransportReadCount) self.kendoDataSourceTransportReadCount = 0;
 						self.kendoDataSourceTransportReadCount = self.kendoDataSourceTransportReadCount + 1;
@@ -842,7 +862,7 @@
 				allowUnsort: true
 			},
 			reorderable: self.options.reorderable === false ? false : true,
-			resizable: true,
+			resizable: self.options.resizable !== false,
 			pageable: {
 				refresh: true,
 				pageSizes: [25, 50, 100, 500, 1000, 2000],
@@ -969,6 +989,19 @@
 			};
 		}
 
+		if (self.options.filterable === false)
+		{
+			kendoGridOption.filterable = false;
+		}
+		else
+		{
+			kendoGridOption.filterable = {
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			};
+		}
+
 		kendoGridOption = $.extend(true, kendoGridOption, this.options.kendoGridOption);
 		this.filterClearButtonInUnLockedArea = this.options.kendoGridOption.filterClearButtonInUnLockedArea;
 
@@ -1004,6 +1037,7 @@
 		this.blurFilterInputWhenClickGrid();
 		this.handleClickClearQuickFilterBtn();
 		this.bindCalendarButton();
+		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
 
 	LightKendoGrid.prototype.filterMenuInit = function(e)
@@ -2243,6 +2277,7 @@
 
 		var $menuFilterBtn = this._findMenuFilterBtn.bind(this)(e);
 		var $input = this._findDDLInput(e);
+		var isMiniGridEditMode = !!(self.options && self.options.miniGridEditMode);
 		var checkSetEmptyFilter = $input.data('isempty') || $input.data('islist')|| $input.data('dateTimeNonParam');
 		self.visibleCustomFilterBtnCommon($menuFilterBtn, $input);
 
@@ -2255,6 +2290,12 @@
 				self.$customFilterBtn = $menuFilterBtn;
 				$input.val('');
 				self.setEmptyCustomFilter(e, $menuFilterBtn);
+
+				if (isMiniGridEditMode)
+				{
+					// Mini Grid Edit Mode do not need to fresh the grid. Open the custom menu directly.
+					$menuFilterBtn.click();
+				}
 			}
 			else
 			{
@@ -2420,10 +2461,19 @@
 			return;
 		}
 
-		$listContainer = $(".k-list-container:not(.not-lightkendogrid)");
+		$listContainer = $(".k-list-container:not(.not-lightkendogrid):not(.filter-updated)");
 		$listContainer = $listContainer.filter(function()
 		{
 			return $(this).parents('form.k-filter-menu').length == 0;
+		});
+
+		const updatedClassName = "filter-updated";
+		const uniqueClassName = self.$container.data("uniqueClassName") ? "filter-container-" + self.$container.data("uniqueClassName") : "";
+
+		$listContainer.each(function(i, item)
+		{
+			$(item).addClass(updatedClassName);
+			uniqueClassName && $(item).addClass(uniqueClassName);
 		});
 
 		for (var key in this.filterNames)
@@ -2858,6 +2908,7 @@
 										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
 										$filterItem.find("span.date-number").show(); // show the input
 										$filterItem.find("input.date-number").val(filter.value);
+										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").value(filter.value);
 										$filterItem.find(dateCellClass).hide();		
 										// hide the clear button
 										setTimeout(function ()
@@ -3392,20 +3443,17 @@
 					}
 				}
 
-				self.handleDateTimeNilFilterToKendoDataSource(numberInput.val(), fieldName, operator);
-
-				// hide the clear button
-				setTimeout(function (e)
+				if (value !== null && value !== '')
 				{
-					if (value === null)
+					self.handleDateTimeNilFilterToKendoDataSource(numberInput.val(), fieldName, operator);
+				} else
+				{
+					let filterCell = span.closest(".k-filtercell").data('kendoFilterCell');
+					if (filterCell)
 					{
-						var clearBtn = numberInput.closest("[data-kendo-field]").find(".k-i-filter-clear").parent();
-						if (clearBtn)
-						{
-							clearBtn.hide();
-						}
+						filterCell.clearFilter();
 					}
-				}, 500)
+				}
 			}
 		});
 
@@ -4934,9 +4982,11 @@
 			var $nomatching = self.$container.find(".no-matching-records");
 			if ($nomatching.length === 0)
 			{
-
 				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
-				$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				if (!self.options.withoutData && !self.options.miniGridEditMode)
+				{
+					$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				}
 				$parent.find("table").css("display", "none");
 				$parent.find(".kendogrid-blank-fullfill").css("display", "none");
 			}
@@ -5000,7 +5050,8 @@
 			self._staffGridDraggable();
 		}
 
-		if ((self.geoFields && self.geoFields.length > 0) || self._gridType === "trip")
+		var showLoading = (self.geoFields && self.geoFields.length > 0) || self._gridType === "trip";
+		if (showLoading && !self.options.isMiniGrid)
 		{
 			tf.loadingIndicator.showImmediately();
 		}
@@ -5366,26 +5417,31 @@
 		var contentHeight = height - 105 + self._filterHeight + pagerHeight;
 		self.$container.height(height).find(".k-grid-content-locked,.k-grid-content").height(contentHeight);
 		self.$container.next(".kendo-summarygrid-container").find(".k-grid-content-locked,.k-grid-content").height(self.summaryHeight);
-		self.kendoGrid._adjustLockedHorizontalScrollBar();
+		if (self.kendoGrid && self.kendoGrid.virtualScrollable)
+		{
+			self.kendoGrid._rowHeight = null;
+			self.kendoGrid.virtualScrollable.repaintScrollbar();
+		}
 
 		self.resetGridContainerHorizontalLayout();
+		//self.changeLockedColumnHeight();
+		self._refreshGridBlank();
 	};
 
 	/** */
 	LightKendoGrid.prototype.resetGridContainerHorizontalLayout = function()
 	{
-		var self = this, $item,
+		var self = this,
 			$summaryGrid = self.$container.next(),
 			warpWidth = self.$container.width(),
-			lockHeaderWidth = self.$container.find('.k-grid-header-locked').width(),
+			lockHeaderWidth = self.$container.children(".k-grid-header").children('.k-grid-header-locked').width(),
 			remainedWidth = warpWidth - lockHeaderWidth,
-			paddingRight = parseInt(self.$container.find(".k-grid-content").css("padding-right"));;
+			paddingRight = parseInt(self.$container.children(".k-grid-content").css("padding-right"));
 
-
-		self.$container.find(".k-grid-content").css("width", remainedWidth - paddingRight);
-		self.$container.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
-		$summaryGrid.find(".k-grid-content").css("width", remainedWidth);
-		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth);
+		self.$container.children(".k-grid-content").css("width", remainedWidth - paddingRight);
+		self.$container.children(".k-grid-header").children(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-grid-content").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
 	};
 
 	LightKendoGrid.prototype.getGridFullHeight = function()

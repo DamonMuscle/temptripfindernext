@@ -119,7 +119,7 @@
 						{
 							self.gridBlock.grid.dataSource.data(originDataSource);
 						}
-
+						PubSub.publish("contactChange", {});
 						self.gridBlock.detailView.pageLevelViewModel.popupSuccessMessage("The updates have been saved successfully.");
 					})
 				}

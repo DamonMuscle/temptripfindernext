@@ -127,7 +127,7 @@
 
 			if (filters.length)
 			{
-				if (result.filters.length)
+				if (result.filters?.length)
 				{
 					expression.filters = filters;
 

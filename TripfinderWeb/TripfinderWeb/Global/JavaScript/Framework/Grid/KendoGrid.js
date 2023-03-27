@@ -65,7 +65,7 @@
 
 	KendoGrid.prototype.loadAndCreateGrid = function()
 	{
-		if (this.options.kendoGridOption.autoBind !== false)
+		if (this.options.kendoGridOption.autoBind !== false && !this.options.isMiniGrid)
 		{
 			tf.loadingIndicator.showImmediately();
 		}
@@ -130,7 +130,8 @@
 
 	KendoGrid.prototype.loadPresetData = function()
 	{
-		if (!this.isBigGrid)
+		var self = this;
+		if (!this.isBigGrid && !this.options.isMiniGrid)
 		{
 			return Promise.resolve();
 		}
@@ -141,15 +142,23 @@
 			})
 			.then(() =>
 			{
-				return this.loadGridFilter();
-			})
-			.then(() =>
-			{
-				this._applyingLayout = true;
-				this._setGridColumnConfiguration(this.options.fromSearch);
-				this._applyingLayout = false;
-				return;
-			});
+					if (this.options.isMiniGrid)
+					{
+						var promise = Promise.resolve();
+					}
+					else
+					{
+						var promise = Promise.all([self.loadGridFilter()]);
+					}
+
+					return promise.then(function()
+					{
+						self._applyingLayout = true;
+						self._setGridColumnConfiguration(self.options.fromSearch);
+						self._applyingLayout = false;
+						return;
+					});
+			})			
 	};
 
 	KendoGrid.prototype.loadGridDefaults = function()
@@ -243,9 +252,9 @@
 
 		this.changeSortModel(); //bind the function of chang sort model in colunm mousedown
 		this.resizableBinding();
-		this.createDragDelete();
+		this.options.canDragDelete && this.createDragDelete();
 		this.lockUnlockColumn();
-		this.initDragHeadEvent();
+		this.options.reorderable && this.initDragHeadEvent();
 
 		this.initQuickFilterBar();
 
@@ -454,6 +463,11 @@
 
 	KendoGrid.prototype.getKendoSortColumn = function()
 	{
+		if (Array.isArray(this.options.defaultSort) && this.options.defaultSort.length > 0)
+		{
+			return this.options.defaultSort;
+		}
+
 		if (this._obCurrentGridLayoutExtendedDataModel() && this._obCurrentGridLayoutExtendedDataModel().layoutColumns())
 		{
 			var list = Enumerable.From(this._obCurrentGridLayoutExtendedDataModel().layoutColumns()).Where(function(c)
@@ -761,10 +775,10 @@
 
 		var $container = this.$container;
 		var $lockedContent = $container.find(".k-grid-content-locked");
-		if (this.options.isGridView && $lockedContent &&
+		if ($lockedContent &&
 			this.obSummaryGridVisible && this.obSummaryGridVisible() && this.overlay !== false)
 		{
-			tf.loadingIndicator.showImmediately();
+			!this.options.isMiniGrid && tf.loadingIndicator.showImmediately();
 			this.createSummaryGrid();
 			this._delayHideLoadingIndicator();
 
@@ -1137,6 +1151,10 @@
 	KendoGrid.prototype.resizableBinding = function()
 	{
 		var self = this;
+		if (self.options.resizable === false)
+		{
+			return;
+		}
 		self.kendoGrid.resizable.bind("start", function(e)
 		{
 			self.resizeTh = $(e.currentTarget).data("th");
@@ -1434,6 +1452,10 @@
 		var header = self.$container.find("th[role='columnheader']");
 		$(header).on("mousedown", function(e)
 		{
+			if (self.options.isMiniGrid)
+			{
+				return;
+			}
 			if (e.which == 3)
 			{
 				var index = parseInt($(this).attr("data-" + kendo.ns + "index"));

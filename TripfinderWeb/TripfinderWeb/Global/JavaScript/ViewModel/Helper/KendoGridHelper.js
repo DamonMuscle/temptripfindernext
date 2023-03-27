@@ -59,13 +59,16 @@
 		}
 		var kendoGridElement = $(kendoGrid.element);
 
-		kendoGrid.bind("change", function ()
+		kendoGrid.bind("change", function()
 		{
-			// refresh background color
 			var $container = kendoGridElement.find(".k-grid-content"),
-				$onDemandContainer = $container.find(".on-demand-container");
-			$onDemandContainer.css({//Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
-				background: $onDemandContainer.data("tr").children("td").css("background-color") == "rgba(0, 0, 0, 0)" ? 'white' : $onDemandContainer.data("tr").children("td").css("background-color")
+				$onDemandContainer = $container.find(".on-demand-container"),
+				$containerColor = $onDemandContainer.data("tr")?.children("td")?.css("background-color");
+
+			var color = (!$containerColor || $containerColor == "rgba(0, 0, 0, 0)") ? 'white' : $containerColor;
+
+			$onDemandContainer.css({
+				background: color //Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
 			});
 		});
 
@@ -107,7 +110,7 @@
 			});
 		});
 
-		kendoGridElement.delegate(".k-grid-content tbody>tr", "mouseover", function ()
+		kendoGridElement.delegate(".k-grid-content tbody>tr", "mouseenter", function ()
 		{
 			var $tr = $(this),
 				$container = $tr.closest("table").parent(),
@@ -148,7 +151,7 @@
 			setButtonDisableStatus($onDemandContainer, onDemandActions, $tr);
 
 			$onDemandContainer.data("tr", $tr).css({
-				height: $tr.height(),
+				height: $tr.height() - 1,// border width
 				top: $tr.offset().top + $container.scrollTop() - $container.offset().top,
 				right: -$container.scrollLeft(),
 				background: $tr.children("td").css("background-color") == "rgba(0, 0, 0, 0)" ? 'white' : $tr.children("td").css("background-color")//Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
@@ -156,10 +159,7 @@
 
 			var iconHeight = 12;
 			$onDemandContainer.find("a").css("margin-top", ($tr.height() - iconHeight) / 2 + "px");
-		}).on("mouseout", function (e)
-		{
-			hideOnDemandAction(e);
-		}).on("mousemove", function (e)
+		}).on("mouseleave", function (e)
 		{
 			hideOnDemandAction(e);
 		});

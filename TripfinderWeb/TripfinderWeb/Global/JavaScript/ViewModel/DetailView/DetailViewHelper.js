@@ -607,7 +607,10 @@
 				descriptor.UDGridId = layoutItem.UDGridId;
 			case "grid":
 				descriptor.sort = layoutItem.sort;
+				descriptor.filter = layoutItem.filter;
 				descriptor.columns = layoutItem.columns;
+				descriptor.showQuickFilter = layoutItem.showQuickFilter;
+				descriptor.showSummary = layoutItem.showSummary;
 				descriptor.field = layoutItem.field;
 				break;
 			case "multipleGrid":
@@ -1522,6 +1525,20 @@
 		});
 	};
 
+	DetailViewHelper.prototype._getContactIds = function(gridType, recordId)
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "contacts"), {
+			paramData: {
+				"dataType": tf.dataTypeHelper.getDisplayNameByDataType(gridType),
+				"recordIds": recordId || 0,
+				"@fields": "Id"
+			}
+		}).then(response =>
+		{
+			return response;
+		});
+	};
+
 	DetailViewHelper.prototype.getContactGridTotalCount = function(gridType, recordId)
 	{
 		var self = this;
@@ -1782,7 +1799,7 @@
 	DetailViewHelper.prototype.getAllGridsAndColumns = function($detailView, fieldName)
 	{
 		var columns = [],
-			grids = $detailView.find(".kendo-grid")
+			grids = $detailView.find(".kendo-grid:not(.kendo-summarygrid-container)")
 				.filter(function(_, item)
 				{
 					var $item = $(item),
@@ -1791,7 +1808,7 @@
 					{
 						var kendoGrid = $item.data("kendoGrid");
 
-						kendoGrid.columns.forEach(function(col)
+						kendoGrid.columns.filter(x => x.field != "bulk_menu").forEach(function(col)
 						{
 							if (columns.indexOf(col.FieldName) === -1)
 							{

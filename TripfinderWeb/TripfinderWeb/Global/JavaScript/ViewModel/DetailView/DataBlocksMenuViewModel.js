@@ -17,6 +17,9 @@
 		self.title = itemData.title;
 		self.field = itemData.field;
 		self.type = !isLine ? itemData.type : ($(self.target).closest(".hori-line, .verti-line").attr("type") || "");
+		self.showQuickFilter = !!itemData.showQuickFilter;
+		self.showSummary = !!itemData.showSummary;
+		self.isSupportFilter = tf.helpers.miniGridHelper.checkGridSupportFilter(itemData.field);
 
 		switch (self.type)
 		{
@@ -86,6 +89,8 @@
 		self.groupDataPoint = self.groupDataPoint.bind(self);
 		self.imageChange = self.imageChange.bind(self);
 		self.changeColumns = self.changeColumns.bind(self);
+		self.changeQuickFilterBar = self.changeQuickFilterBar.bind(self);
+		self.changeSummaryBar = self.changeSummaryBar.bind(self);
 		self.openConditionalAppearanceModal = self.openConditionalAppearanceModal.bind(self);
 		self.editClicked = self.editClicked.bind(self);
 		self.obDefaultTitle = ko.observable(self.title);
@@ -119,6 +124,111 @@
 
 		return allDataBlocks;
 	};
+
+	DataBlocksMenuViewModel.prototype.changeQuickFilterBar = function(viewModel, e)
+	{
+		var self = this,
+			gridBlock = $(self.target).closest(".grid-stack-item");
+		var filterBar = !gridBlock.data("showQuickFilter");
+		var lazyRebuildGrid = false;
+
+		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
+		{
+			return;
+		}
+
+		var filter = lightKendoGrid.kendoGrid.dataSource.filter();
+		if (filter && !filterBar)
+		{
+			return tf.promiseBootbox.confirm(
+				{
+					message: "By unselecting this you will lose your saved filter selections. Do you wish to continue?",
+					title: "Confirmation"
+				})
+				.then(function(result)
+				{
+					if (result)
+					{
+						gridBlock.data("showQuickFilter", filterBar);
+						lightKendoGrid.kendoGrid.dataSource.filter({}, lazyRebuildGrid);
+						lightKendoGrid.rebuildGrid().then(() =>
+						{
+							lightKendoGrid._setQuickFilterBarStatus(filterBar);
+							self._updateLockedColumnVisibility(gridBlock);
+						});
+
+					}
+					return;
+				}.bind(self));
+		}
+
+		gridBlock.data("showQuickFilter", filterBar);
+		lightKendoGrid.rebuildGrid().then(() =>
+		{
+			lightKendoGrid._setQuickFilterBarStatus(filterBar);
+			self._updateLockedColumnVisibility(gridBlock);
+		});
+	}
+
+	DataBlocksMenuViewModel.prototype.changeSummaryBar = function(viewModel, e)
+	{
+		var self = this,
+			gridBlock = $(self.target).closest(".grid-stack-item");
+		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+		var summaryContainer = gridBlock.find(".kendo-summarygrid-container");
+		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
+		{
+			return;
+		}
+
+		var summaryBar = !gridBlock.data("showSummary");
+		gridBlock.data("showSummary", summaryBar);
+		summaryContainer && summaryContainer.css("display", summaryBar ? "block" : "none");
+		lightKendoGrid.obSummaryGridVisible(summaryBar);
+		self._updateLockedColumnVisibility(gridBlock);
+	}
+
+	DataBlocksMenuViewModel.prototype._updateLockedColumnVisibility = function(gridBlock)
+	{
+		var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+		var summaryBar = gridBlock.data("showSummary");
+		var filterBar = gridBlock.data("showQuickFilter");
+		if (!lightKendoGrid || !lightKendoGrid.kendoGrid)
+		{
+			return;
+		}
+
+		if (!!summaryBar || !!filterBar)
+		{
+			lightKendoGrid.kendoGrid.showColumn(lightKendoGrid.kendoGrid.columns[0]);
+		}
+		else
+		{
+			lightKendoGrid.kendoGrid.hideColumn(lightKendoGrid.kendoGrid.columns[0]);
+		}
+	}
+
+	DataBlocksMenuViewModel.prototype.rebuildDetailGrid = function(gridBlock)
+	{
+		var self = this;
+		var targetBlock = self.getAllDataBlocks().filter(function(dataBlock)
+		{
+			if (!dataBlock.uniqueClassName) return;
+
+			return gridBlock.hasClass(dataBlock.uniqueClassName);
+		})[0];
+
+		if (targetBlock.dispose)
+		{
+			targetBlock.dispose();
+		}
+
+		if (targetBlock.initDetailGrid)
+		{
+			targetBlock.initDetailGrid();
+		}
+	}
 
 	DataBlocksMenuViewModel.prototype.changeColumns = function(viewModel, e)
 	{
@@ -194,7 +304,24 @@
 		{
 			if (editColumnViewModel)
 			{
-				self.detailView.changeGridColumns(editColumnViewModel, gridBlock);
+				var lightKendoGrid = gridBlock.find(".kendo-grid-container")?.data("lightKendoGrid");
+				if (lightKendoGrid)
+				{
+					// Need to rebuild the mini grid if mini grid support quick filter.
+					lightKendoGrid._obSelectedColumns(editColumnViewModel.selectedColumns);
+					lightKendoGrid.removeHiddenColumnQuickFilter(editColumnViewModel.availableColumns);
+					gridBlock.data("columns", editColumnViewModel.selectedColumns);
+					lightKendoGrid.rebuildGrid().then(() =>
+					{
+						var filterBar = gridBlock.data("showQuickFilter");
+						lightKendoGrid._setQuickFilterBarStatus(filterBar);
+						self._updateLockedColumnVisibility(gridBlock);
+					});
+				}
+				else
+				{
+					self.detailView.changeGridColumns(editColumnViewModel, gridBlock);
+				}
 			}
 		}.bind(this));
 	};

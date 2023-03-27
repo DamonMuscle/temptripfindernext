@@ -41,8 +41,8 @@
 	UserDefinedGridHelper.getGeoInfoColumns = function()
 	{
 		return [
-			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "135px" },
-			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "135px" }
+			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "130px", type: "number" },
+			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "130px", type: "number" }
 		];
 	};
 
@@ -2114,6 +2114,19 @@
 			overlay: false
 		});
 	};
+
+	UserDefinedGridHelper.prototype.timeFieldFilterUpdated = function(item)
+	{
+		const timeFields = ["CreatedOn", "LastUpdatedOn"];
+		const isNilFilter = TF.FilterHelper.dateTimeNilFiltersOperator.includes(item.Operator.toLowerCase());
+		const isDateParamFilter = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(item.Operator.toLowerCase());
+
+		if (timeFields.includes(item.FieldName) && !item.ConvertedToUTC && !isNilFilter && !isDateParamFilter)
+		{
+			var dt = clientTimeZoneToUtc(item.Value);
+			item.Value = toISOStringWithoutTimeZone(dt);
+		}
+	}
 
 	UserDefinedGridHelper.saveUserdefinedfield = function(udfEntity)
 	{

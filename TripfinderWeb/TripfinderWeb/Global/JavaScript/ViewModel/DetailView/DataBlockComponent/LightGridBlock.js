@@ -1,6 +1,7 @@
 (function()
 {
-	createNamespace("TF.DetailView.DataBlockComponent").GridBlock = GridBlock;
+	createNamespace("TF.DetailView.DataBlockComponent").LightGridBlock = LightGridBlock;
+
 	let STATUS = {
 		EXPAND: 0,
 		RESTORE: 1
@@ -77,15 +78,16 @@
 		additional: 1
 	};
 
-	function GridBlock(options, detailView)
+	function LightGridBlock(options, detailView)
 	{
 		var self = this;
-
 		TF.DetailView.DataBlockComponent.BaseDataBlock.call(self, detailView);
 
 		self.$element = null;
 		self.uniqueClassName = null;
+		self.lightKendoGrid = null;
 		self.pubSubSubscriptions = [];
+		self.includeIds = [];
 
 		self.options = options;
 		self.gridBlockType = options.field;
@@ -101,6 +103,8 @@
 		self.fieldEditorHelper = detailView.fieldEditorHelper;
 		self.obEditing = detailView.obEditing;
 		self.status = STATUS.RESTORE;
+
+		self.miniGridHelper = tf.helpers.miniGridHelper;
 		self._initGridActions();
 		self._detailviewFieldChange = self._detailviewFieldChange.bind(self);
 		detailView.onFieldChange.subscribe(self._detailviewFieldChange);
@@ -137,9 +141,10 @@
 			}
 		});
 	};
-	GridBlock.prototype = Object.create(TF.DetailView.DataBlockComponent.BaseDataBlock.prototype);
 
-	GridBlock.prototype._detailviewFieldChange = function(e, data)
+	LightGridBlock.prototype = Object.create(TF.DetailView.DataBlockComponent.BaseDataBlock.prototype);
+
+	LightGridBlock.prototype._detailviewFieldChange = function(e, data)
 	{
 		var self = this;
 		switch (self.gridType)
@@ -157,7 +162,8 @@
 				break;
 		}
 	};
-	GridBlock.prototype._restore = function()
+
+	LightGridBlock.prototype._restore = function()
 	{
 		this.status = STATUS.RESTORE;
 		this.$el.removeAttr('style');
@@ -181,9 +187,10 @@
 		this.expandContainer.children().css({ "visibility": "visible" });
 		this.expandContainer.css("overflow-y", "auto");
 		this.expandedDom && this.expandedDom.remove();
+		this._fitExpandGridHeight();
 	};
 
-	GridBlock.prototype._expand = function()
+	LightGridBlock.prototype._expand = function()
 	{
 		this.status = STATUS.EXPAND;
 		const headerHeight = 34, footerHeight = 34;
@@ -231,7 +238,7 @@
 		this._fitExpandGridHeight();
 	};
 
-	GridBlock.prototype.manageLayout = function()
+	LightGridBlock.prototype.manageLayout = function()
 	{
 		clearTimeout(this.reSizeExpandGridTimer);
 		this.reSizeExpandGridTimer = setTimeout(() =>
@@ -243,12 +250,12 @@
 		}, 200)
 	};
 
-	GridBlock.prototype._fitExpandGridHeight = function()
+	LightGridBlock.prototype._fitExpandGridHeight = function()
 	{
-		this.$innerGrid && this.$innerGrid.css('height', this.$innerGrid.parent().height() - 68);
+		this.lightKendoGrid.fitContainer();
 	};
 
-	GridBlock.prototype._toggleClick = function()
+	LightGridBlock.prototype._toggleClick = function()
 	{
 		if (this.status == STATUS.RESTORE)
 		{
@@ -262,7 +269,7 @@
 		this.expandButton.attr('title', this.status == STATUS.RESTORE ? 'Expand' : 'Restore');
 	};
 
-	GridBlock.prototype._addExpandButton = function()
+	LightGridBlock.prototype._addExpandButton = function()
 	{
 		let self = this;
 		if (!self.expandButton)
@@ -281,7 +288,7 @@
 
 	};
 
-	GridBlock.prototype._updateResourceGrid = function(FieldTripResources)
+	LightGridBlock.prototype._updateResourceGrid = function(FieldTripResources)
 	{
 		var self = this;
 		if (FieldTripResources == null) return;
@@ -294,7 +301,7 @@
 			}
 		});
 	}
-	GridBlock.prototype._initGridActions = function()
+	LightGridBlock.prototype._initGridActions = function()
 	{
 		var self = this,
 			isReadOnly = self.isReadOnly() || !self.extraGridConfigs.permission;
@@ -324,18 +331,12 @@
 		if (!isReadOnly)
 		{
 			self.kendoGridActions.contact = {
-				edit: self.editMiniGridRecord.bind(self, GridBlock.MINI_GRID_TYPE.CONTACT),
+				edit: self.editMiniGridRecord.bind(self, LightGridBlock.MINI_GRID_TYPE.CONTACT),
 				delete: self.removeAssociationToContact.bind(self)
 			};
 			self.kendoGridActions.contactinformation = {
-				edit: self.editMiniGridRecord.bind(self, GridBlock.MINI_GRID_TYPE.CONTACT),
+				edit: self.editMiniGridRecord.bind(self, LightGridBlock.MINI_GRID_TYPE.CONTACT),
 				delete: self.removeAssociationToContact.bind(self)
-			};
-			self.kendoGridActions.contactrelationships = {
-				delete: self.removeContactAssociation.bind(self)
-			};
-			self.kendoGridActions.documentrelationships = {
-				delete: self.removeDocumentAssociation.bind(self)
 			};
 			self.kendoGridActions.document.delete = self.removeAssociationToDocument.bind(self);
 		}
@@ -544,32 +545,32 @@
 		}
 	};
 
-	GridBlock.MINI_GRID_TYPE = {
+	LightGridBlock.MINI_GRID_TYPE = {
 		"CONTACT": "contact",
 		"CONTACTINFORMATION": "contactinformation",
 		"DOCUMENT": "document",
 		"TRIP": "trip",
 	};
 
-	GridBlock.MINI_GRID_NAME_DICTIONARY = {
+	LightGridBlock.MINI_GRID_NAME_DICTIONARY = {
 		"contact": "ContactGrid",
 		"document": "DocumentGrid",
 		"trip": "TripGrid",
 	};
 
-	GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME = {
+	LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME = {
 		"contact": "RecordContacts",
 		"document": "DocumentRelationships",
 		"trip": "TripIds"
 	};
 
-	GridBlock.MINI_GRID_RELATIONSHIP_KEY = {
+	LightGridBlock.MINI_GRID_RELATIONSHIP_KEY = {
 		"contact": "contactAssociation",
 		"document": "DocumentRelationship",
 		"trip": "Trip"
 	};
 
-	GridBlock.prototype.initElement = function(options)
+	LightGridBlock.prototype.initElement = function(options)
 	{
 		var self = this,
 			uniqueClassName = options.uniqueClassName || tf.helpers.detailViewHelper.generateUniqueClassName(),
@@ -580,7 +581,10 @@
 			$itemTitleInput = $("<input>", { class: "item-title", type: "text", value: title }),
 			$itemTitleDiv = $("<div>", { class: "item-title", text: title }),
 			$itemContent = $("<div>", { class: "item-content grid" }),
-			$kendoGrid = $("<div>", { class: "kendo-grid" });
+			$kendoGrid = $("<div>", { class: "kendo-grid kendo-grid-container" }),
+			$summaryContainer = $("<div>", { class: "kendo-grid kendo-summarygrid-container" });
+
+		self.removeAllFilterContainer();
 
 		if (extraGridConfigs)
 		{
@@ -606,9 +610,11 @@
 			$gridStackItem.attr("mini-grid-type", "contact");
 		}
 
-		$itemContent.append($kendoGrid);
+		$itemContent.append($kendoGrid, $summaryContainer);
 		$gridStackItem.append($itemTitleInput, $itemTitleDiv, $itemContent);
 		$element.append($gridStackItem);
+
+		$kendoGrid.data("uniqueClassName", uniqueClassName);
 
 		self.$el = options.inMultipleGridBlock ? $gridStackItem : $element;
 		self.uniqueClassName = uniqueClassName;
@@ -618,7 +624,7 @@
 		}
 	};
 
-	GridBlock.prototype.initEvents = function()
+	LightGridBlock.prototype.initEvents = function()
 	{
 		var self = this,
 			$btn = self.$el.find(ADD_BUTTON_CLASS_NAME);
@@ -631,20 +637,13 @@
 				case "ContactGrid":
 					$btn.on("click.detailView", function()
 					{
-						self.manageRecordAssociation(GridBlock.MINI_GRID_TYPE.CONTACT);
+						self.manageRecordAssociation(LightGridBlock.MINI_GRID_TYPE.CONTACT);
 					});
 					break;
 				case "DocumentGrid":
 					$btn.on("click.detailView", function()
 					{
-						self.manageRecordAssociation(GridBlock.MINI_GRID_TYPE.DOCUMENT);
-					});
-					break;
-				case "ContactAssociationGrid":
-				case "DocumentAssociationGrid":
-					$btn.on("click.detailView", function(e)
-					{
-						self.addRecordAssociation(e);
+						self.manageRecordAssociation(LightGridBlock.MINI_GRID_TYPE.DOCUMENT);
 					});
 					break;
 				case "AdditionalRequirementGrid":
@@ -730,7 +729,7 @@
 					{
 						$btn.on("click.detailView", function()
 						{
-							self.simpleRecordAssociation(GridBlock.MINI_GRID_TYPE.TRIP);
+							self.simpleRecordAssociation(LightGridBlock.MINI_GRID_TYPE.TRIP);
 						});
 					}
 					break;
@@ -740,12 +739,12 @@
 		}
 	};
 
-	GridBlock.prototype.editStudentException = function(e, $target)
+	LightGridBlock.prototype.editStudentException = function(e, $target)
 	{
 		var self = this,
 			$target = $target || $(e.currentTarget),
 			$tr = $target.closest("tr"),
-			entity = $target.closest(".kendo-grid").data("kendoGrid").dataItem($tr);
+			entity = $target.closest(".kendo-grid-container").data("kendoGrid").dataItem($tr);
 
 		return tf.modalManager.showModal(new TF.DetailView.StudentExceptionModalViewModel(self.recordEntity, entity)).then(response =>
 		{
@@ -755,50 +754,7 @@
 		});
 	};
 
-	/**
-	 * Event handler when add association button is clicked.
-	 *
-	 * @param {Event} e
-	 */
-	GridBlock.prototype.addRecordAssociation = function(e)
-	{
-		var self = this,
-			$grid = $(e.currentTarget).closest('.grid-stack-item-content').find(".kendo-grid"),
-			kendoGrid = $grid.data().kendoGrid,
-			fieldName = $grid.closest(".grid-stack-item").data().field,
-			selected = !kendoGrid ? [] : kendoGrid.dataSource.data(),
-			options = {
-				Id: self.recordId,
-				selectedData: selected.map(function(item)
-				{
-					return {
-						Id: item.Id,
-						Name: item.Name,
-						DataType: item.Type,
-						IsPrimary: item.IsPrimary
-					};
-				}),
-				gridType: self.gridType,
-			};
-
-		tf.modalManager.showModal(new TF.DetailView.AssociateRecordsModalViewModel(options)).then(function(result)
-		{
-			if (!result) return;
-
-			var selected = result.data;
-			self.updateAllGridsDataSource(fieldName, selected);
-			if (fieldName === "ContactAssociationGrid")
-			{
-				self.updateContactAssociationRecordEntity(selected);
-			}
-			else if (fieldName === "DocumentAssociationGrid")
-			{
-				self.updateDocumentAssociationRecordEntity(selected);
-			}
-		});
-	};
-
-	GridBlock.prototype.updateAllGridsDataSource = function(fieldName, dataSource)
+	LightGridBlock.prototype.updateAllGridsDataSource = function(fieldName, dataSource)
 	{
 		var self = this,
 			grids = tf.helpers.detailViewHelper.getAllGridsAndColumns(self.$detailView, fieldName)["grids"];
@@ -811,43 +767,19 @@
 		});
 	};
 
-	GridBlock.prototype.updateAllContactGridsDataSource = function(dataType, fieldName)
+	LightGridBlock.prototype.updateAllContactGridsDataSource = function(dataType, fieldName)
 	{
 		var self = this,
 			grids = tf.helpers.detailViewHelper.getAllGridsAndColumns(self.$detailView, fieldName)["grids"];
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'contacts'), {
-			paramData: {
-				dataType: dataType,
-				recordIds: self.recordId
-			}
-		}).then(function(response)
+		$.each(grids, function(_, item)
 		{
-			if (response && response.Items)
-			{
-				response.Items.forEach(item =>
-				{
-					var udfs = item.UserDefinedFields;
-					if (udfs && udfs.length)
-					{
-						udfs.forEach(udf =>
-						{
-							item[udf.Guid] = udf.RecordValue;
-						});
-					}
-				});
-			}
-
-			$.each(grids, function(_, item)
-			{
-				var $item = $(item);
-				$item.data("kendoGrid").dataSource.data(response.Items);
-				tf.helpers.kendoGridHelper.updateGridFooter($item, response.FilteredRecordCount, response.FilteredRecordCount);
-			});
-		})
+			var $item = $(item);
+			$item.data("lightKendoGrid").refresh();
+		});
 	};
 
-	GridBlock.prototype.removeStudentRequirement = function(grid, e, type)
+	LightGridBlock.prototype.removeStudentRequirement = function(grid, e, type)
 	{
 		var self = this,
 			tr = $(e.target).closest("tr"),
@@ -904,7 +836,7 @@
 												StudentId: studentId
 											});
 
-											var studentScheduleGrid = $(".grid-stack-item-content[data-block-field-name='StudentScheduleGrid']").find(".kendo-grid"),
+											var studentScheduleGrid = $(".grid-stack-item-content[data-block-field-name='StudentScheduleGrid']").find(".kendo-grid-container"),
 												studentScheduleKendoGrid = studentScheduleGrid.length > 0 && studentScheduleGrid.data("kendoGrid");
 											PubSub.publish("studentscheduleChange", {
 												studentId: studentId,
@@ -923,7 +855,7 @@
 		}).catch(function() { });
 	};
 
-	GridBlock.prototype.getAllAffected = function(requirement)
+	LightGridBlock.prototype.getAllAffected = function(requirement)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "requirementaffectedtrips"),
 			{
@@ -948,45 +880,14 @@
 			});
 	};
 
-	GridBlock.prototype.setEntityRelationship = function(name, value)
+	LightGridBlock.prototype.setEntityRelationship = function(name, value)
 	{
 		this.detailView.newEntityRelationships[name] = value;
 	};
 
-	GridBlock.prototype.getMiniGridSelectedRecords = function(miniGridType)
+	LightGridBlock.prototype.getMiniGridSelectedRecords = function(miniGridType)
 	{
-		var self = this,
-			records = [],
-			kendoGrids = self.getMiniGrid(miniGridType);
-		kendoGrids.forEach(function(kendoGrid)
-		{
-			records = kendoGrid.dataSource.data().slice();
-		});
-
-		return records;
-	};
-
-	GridBlock.prototype.getMiniGrid = function(miniGridType)
-	{
-		var self = this,
-			gridName = GridBlock.MINI_GRID_NAME_DICTIONARY[miniGridType],
-			kendoGrids = [],
-			fieldData, $item;
-
-		self.$detailView.find(".kendo-grid")
-			.each(function(_, item)
-			{
-				$item = $(item);
-				fieldData = $item.closest(".grid-stack-item").data();
-				if (fieldData &&
-					fieldData.field === gridName)
-				{
-					var kendoGrid = $item.data("kendoGrid");
-					kendoGrids.push(kendoGrid);
-				}
-			});
-
-		return kendoGrids;
+		return this.includeIds.filter(c => c > 0).map(c => ({ "Id": c }));
 	};
 
 	function isAssociationChanged(selectedData, response)
@@ -994,7 +895,7 @@
 		return response.isNewRecordCreated || !_.isEqual(selectedData.map(d => d.Id), response.selectedIds);
 	}
 
-	GridBlock.prototype.manageRecordAssociation = function(associationType)
+	LightGridBlock.prototype.manageRecordAssociation = function(associationType)
 	{
 		var self = this,
 			p1 = tf.helpers.detailViewHelper.getQuickAddLayoutByType(associationType),
@@ -1108,16 +1009,19 @@
 									updatePromises.push(self.updateAssociationEditList(associationType, selectedIds));
 									Promise.all(updatePromises).then(function(res)
 									{
-										if (self.gridBlockType == "ContactGrid" && self.recordId != null)
+										if (self.gridBlockType == "ContactGrid")
 										{
-											self.updateAllContactGridsDataSource(tf.dataTypeHelper.getNameByType(self.gridType), "ContactGrid");
+											PubSub.publish("contactChange", { ids: selectedIds });
+										}
+										if (self.gridBlockType == "DocumentGrid")
+										{
+											PubSub.publish("documentChange", { ids: selectedIds });
 										}
 										if (res && res[1])
 										{
 											PubSub.publish("udgrid", {});
 										}
 										self.detailView.pageLevelViewModel.popupSuccessMessage("The updates have been saved successfully.");
-										tf.helpers.detailViewHelper.updateAllGridsDataSourceByIds(associationType, selectedIds, selectedIds.length, self.$detailView);
 									});
 								}
 								else return;
@@ -1128,7 +1032,7 @@
 		});
 	};
 
-	GridBlock.prototype.simpleRecordAssociation = function(associationType)
+	LightGridBlock.prototype.simpleRecordAssociation = function(associationType)
 	{
 		let self = this, extendOptions = {};
 
@@ -1229,7 +1133,7 @@
 		});
 	};
 
-	GridBlock.prototype.updateAssociationEditList = function(miniGridType, recordIds)
+	LightGridBlock.prototype.updateAssociationEditList = function(miniGridType, recordIds)
 	{
 		if (this.isReadOnly())
 		{
@@ -1238,7 +1142,7 @@
 		var self = this,
 			recordType = self.gridType,
 			recordId = (!self.isCreateGridNewRecord && self.recordEntity) ? self.recordEntity.Id : 0,
-			fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME[miniGridType],
+			fieldName = LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME[miniGridType],
 			associations = recordIds.map(function(id)
 			{
 				return tf.dataTypeHelper.createAssociationEntity(recordType, recordId, miniGridType, id);
@@ -1250,7 +1154,7 @@
 			if (!Array.isArray(editStash))
 			{
 				editStash = {
-					relationshipKey: GridBlock.MINI_GRID_RELATIONSHIP_KEY[miniGridType],
+					relationshipKey: LightGridBlock.MINI_GRID_RELATIONSHIP_KEY[miniGridType],
 					value: []
 				};
 			}
@@ -1268,11 +1172,11 @@
 		}
 	};
 
-	GridBlock.prototype.downloadMiniGridDocumentFile = function(e)
+	LightGridBlock.prototype.downloadMiniGridDocumentFile = function(e)
 	{
 		var self = this,
 			$tr = $(e.target).closest("tr"),
-			$grid = $tr.closest(".kendo-grid"),
+			$grid = $tr.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			dataItem = kendoGrid.dataItem($tr),
 			helper = tf.docFilePreviewHelper;
@@ -1301,12 +1205,12 @@
 	 *
 	 * @param {Event} e
 	 */
-	GridBlock.prototype.removeAssociationToDocument = function(e)
+	LightGridBlock.prototype.removeAssociationToDocument = function(e)
 	{
 		var self = this,
 			$target = $(e.currentTarget),
 			$tr = $target.closest("tr"),
-			$grid = $target.closest(".kendo-grid"),
+			$grid = $target.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			documentEntity = kendoGrid.dataItem($tr),
 			documentId = documentEntity.Id,
@@ -1339,13 +1243,13 @@
 				{
 					if (self.isCreateGridNewRecord)
 					{
-						self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
-						{
-							udGrid.UDGridRecordsValues.forEach(udGridRecord =>
-							{
-								_.remove(udGridRecord.DocumentUDGridRecords, documentUDGridRecord => documentId == documentUDGridRecord.DocumentID);
-							});
-						});
+						// self.fieldEditorHelper.editFieldList.UDGrids.forEach(udGrid =>
+						// {
+						// 	udGrid.UDGridRecordsValues.forEach(udGridRecord =>
+						// 	{
+						// 		_.remove(udGridRecord.DocumentUDGridRecords, documentUDGridRecord => documentId == documentUDGridRecord.DocumentID);
+						// 	});
+						// });
 
 						return Promise.resolve(true);
 					}
@@ -1354,7 +1258,11 @@
 				}).then
 					(function(response)
 					{
-						tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "document", [documentId]);
+						var documentIds = self.includeIds.filter((id) =>
+						{
+							return id !== documentId;
+						});
+						PubSub.publish("documentChange", { ids: documentIds });
 						PubSub.publish("udgrid", {});
 
 						// Remove this contact in stack.
@@ -1381,7 +1289,7 @@
 	 * @param {String} gridType
 	 * @param {Number} recordId
 	 */
-	GridBlock.prototype.getRecordEntity = function(gridType, recordId)
+	LightGridBlock.prototype.getRecordEntity = function(gridType, recordId)
 	{
 		var requestUrl,
 			typeEndpoint = tf.dataTypeHelper.getEndpoint(gridType),
@@ -1414,11 +1322,11 @@
 	 *
 	 * @param {Event} e
 	 */
-	GridBlock.prototype.viewMiniGridCommunicationHistory = function(e)
+	LightGridBlock.prototype.viewMiniGridCommunicationHistory = function(e)
 	{
 		var self = this,
 			$tr = $(e.target).closest("tr"),
-			$grid = $tr.closest(".kendo-grid"),
+			$grid = $tr.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			dataItem = kendoGrid.dataItem($tr);
 		const options = {
@@ -1436,11 +1344,11 @@
 	 *
 	 * @param {Event} e
 	 */
-	GridBlock.prototype.previewMiniGridDocumentFile = function(e)
+	LightGridBlock.prototype.previewMiniGridDocumentFile = function(e)
 	{
 		var self = this,
 			$tr = $(e.target).closest("tr"),
-			$grid = $tr.closest(".kendo-grid"),
+			$grid = $tr.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			dataItem = kendoGrid.dataItem($tr);
 
@@ -1458,7 +1366,7 @@
 	 *
 	 * @param {Array} associations
 	 */
-	GridBlock.prototype.updateDocumentAssociationRecordEntity = function(associations)
+	LightGridBlock.prototype.updateDocumentAssociationRecordEntity = function(associations)
 	{
 		var self = this;
 		self.fieldEditorHelper.editFieldList['DocumentRelationships'] = {
@@ -1482,124 +1390,11 @@
 	};
 
 	/**
-	 * Remove document association on document detail view.
-	 *
-	 * @param {Event} e
-	 */
-	GridBlock.prototype.removeDocumentAssociation = function(e)
-	{
-		var self = this,
-			$tr = $(e.target).closest("tr"),
-			kendoGrid = $tr.closest(".kendo-grid").data("kendoGrid"),
-			recordEntity = kendoGrid.dataItem($tr[0]);
-
-		tf.promiseBootbox.yesNo("Are you sure you want to disassociate this document from \"" + recordEntity.Name + "\"?", CONFIRMATION_TITLE)
-			.then(function(res)
-			{
-				if (!res) return;
-
-				tf.dataTypeHelper.getAssociationTotalCount("document")
-					.then(function(totalCount)
-					{
-						tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "documentassociation", [recordEntity.Id], totalCount);
-
-						var data = kendoGrid.dataSource.data();
-						var associations = data.map(function(item)
-						{
-							return {
-								Id: item.Id,
-								Type: item.Type
-							}
-						});
-
-						self.updateDocumentAssociationRecordEntity(associations);
-					});
-			});
-	};
-
-	/**
-	 * Remove a contact association on contact detail view.
-	 *
-	 * @param {Event} e
-	 */
-	GridBlock.prototype.removeContactAssociation = function(e)
-	{
-		var self = this,
-			$tr = $(e.target).closest("tr"),
-			kendoGrid = $tr.closest(".kendo-grid").data("kendoGrid"),
-			recordEntity = kendoGrid.dataItem($tr[0]);
-
-		tf.promiseBootbox.yesNo("Are you sure you want to disassociate this contact from \"" + recordEntity.Name + "\"?", CONFIRMATION_TITLE)
-			.then(function(res)
-			{
-				if (!res) return;
-
-				tf.dataTypeHelper.getAssociationTotalCount("contact")
-					.then(function(totalCount)
-					{
-						if (!!recordEntity.IsStopfinder && recordEntity.Type && recordEntity.Type === "Student")
-						{
-							self.getRecordEntity("student", recordEntity.Id).then(function(entity)
-							{
-								if (entity && entity.LocalId)
-								{
-									self.recordEntity.LocalId = entity.LocalId;
-									self.deactiveContactSubscription(self.recordEntity);
-								}
-							});
-						}
-
-						tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "contactassociation", [recordEntity.Id], totalCount);
-
-						var data = kendoGrid.dataSource.data();
-						var associations = data.map(function(item)
-						{
-							return {
-								Id: item.Id,
-								Type: item.Type,
-								IsPrimary: item.IsPrimary
-							}
-						});
-
-						self.updateContactAssociationRecordEntity(associations);
-					});
-			});
-	};
-
-	/**
-	 * Update contact associations.
-	 *
-	 * @param {Array} associations
-	 */
-	GridBlock.prototype.updateContactAssociationRecordEntity = function(associations)
-	{
-		var self = this;
-		self.fieldEditorHelper.editFieldList['RecordContacts'] = {
-			relationshipKey: 'contactAssociation',
-			value: associations.map(function(item)
-			{
-				return {
-					DataTypeId: tf.dataTypeHelper.getIdByName(item.Type),
-					DBID: tf.datasourceManager.databaseId,
-					RecordID: item.Id,
-					ContactID: self.recordId || 0,
-					IsPrimary: item.IsPrimary
-				};
-			})
-		};
-
-		if (!!self.recordEntity)
-		{
-			self.detailView.updateEntity();
-		}
-	};
-
-	/**
 	 * Update the entity.
 	 *
 	 * @returns
 	 */
-	GridBlock.prototype.updateEntity = function()
+	LightGridBlock.prototype.updateEntity = function()
 	{
 		var self = this,
 			dataType = self.gridType;
@@ -1619,11 +1414,11 @@
 		});
 	};
 
-	GridBlock.prototype.openTrip = function(e, $target)
+	LightGridBlock.prototype.openTrip = function(e, $target)
 	{
 		var $target = $target || $(e.currentTarget),
 			$tr = $target.closest("tr"),
-			$grid = $target.closest(".kendo-grid"),
+			$grid = $target.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			entity = kendoGrid.dataItem($tr),
 			docData = TF.Document.DocumentData.RoutingMapInfo.create();
@@ -1642,12 +1437,12 @@
 			});
 	};
 
-	GridBlock.prototype.unassignStudent = function(e, $target)
+	LightGridBlock.prototype.unassignStudent = function(e, $target)
 	{
 		var self = this,
 			$target = $target || $(e.currentTarget),
 			$tr = $target.closest("tr"),
-			$grid = $target.closest(".kendo-grid"),
+			$grid = $target.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			entity = kendoGrid.dataItem($tr);
 
@@ -1669,18 +1464,18 @@
 			});
 	};
 
-	GridBlock.prototype.unassignTrip = function(e, $target)
+	LightGridBlock.prototype.unassignTrip = function(e, $target)
 	{
 		$target = $target || $(e.currentTarget);
 		let $tr = $target.closest("tr"),
-			$grid = $target.closest(".kendo-grid"),
+			$grid = $target.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			entity = kendoGrid.dataItem($tr),
 			tripIds = kendoGrid.dataSource.data().map(r => r.Id);
 
 		if (!this.recordEntity)
 		{
-			let fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
+			let fieldName = LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
 			let editFieldList = this.fieldEditorHelper.editFieldList[fieldName];
 			if (!editFieldList)
 			{
@@ -1747,7 +1542,7 @@
 
 	};
 
-	GridBlock.prototype._refreshChangedRouteMapData = function()
+	LightGridBlock.prototype._refreshChangedRouteMapData = function()
 	{
 		this.detailView.parentDocument.gridMapHelper.getGridFilterIds(true).then((dataIds) =>
 		{
@@ -1756,7 +1551,7 @@
 		});
 	}
 
-	GridBlock.prototype.deactiveContactSubscription = function(contactEntity)
+	LightGridBlock.prototype.deactiveContactSubscription = function(contactEntity)
 	{
 		if (this.recordEntity && this.recordEntity.LocalId && contactEntity.Email)
 		{
@@ -1784,12 +1579,12 @@
 		}
 	}
 
-	GridBlock.prototype.removeAssociationToContact = function(e, $target)
+	LightGridBlock.prototype.removeAssociationToContact = function(e, $target)
 	{
 		var self = this,
 			$target = $target || $(e.currentTarget),
 			$tr = $target.closest("tr"),
-			$grid = $target.closest(".kendo-grid"),
+			$grid = $target.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			contactEntity = kendoGrid.dataItem($tr),
 			contactName = tf.dataTypeHelper.getEntityName("contact", contactEntity),
@@ -1816,7 +1611,11 @@
 
 				Promise.all(tasks).then(function(response)
 				{
-					tf.helpers.detailViewHelper.removeFromAllGridsDataSourceByIds(self.$detailView, "contact", [contactEntity.Id]);
+					var contactIds = self.includeIds.filter((id) =>
+					{
+						return id !== contactId;
+					});
+					PubSub.publish("contactChange", { ids: contactIds });
 
 					//Remove Contact Subscription
 					if (!!contactEntity.IsStopfinder)
@@ -1849,7 +1648,7 @@
 	 * @param {string} gridName
 	 * @returns
 	 */
-	GridBlock.prototype.getExtraGridConfigurations = function(gridName, layoutColumnCount)
+	LightGridBlock.prototype.getExtraGridConfigurations = function(gridName, layoutColumnCount)
 	{
 		let self = this;
 		if (self.gridType === "route")
@@ -1884,7 +1683,7 @@
 		return result;
 	};
 
-	GridBlock.prototype.getKendoGridActionColumn = function(gridType)
+	LightGridBlock.prototype.getKendoGridActionColumn = function(gridType)
 	{
 		var actions = this.kendoGridActions[gridType];
 		if (!actions)
@@ -1935,13 +1734,16 @@
 			FieldName: "Action",
 			DisplayName: "Action",
 			Width: columnWidth,
+			type: "nofilter",
+			filterable: false,
+			disableSummary: true,
 			attributes: {
 				class: "text-center"
 			}
 		};
 	};
 
-	GridBlock.prototype.getGridColumnsByType = function(type)
+	LightGridBlock.prototype.getGridColumnsByType = function(type)
 	{
 		var self = this,
 			columns = tf.helpers.kendoGridHelper.getGridColumnsFromDefinitionByType(type),
@@ -1959,13 +1761,51 @@
 		return tf.helpers.kendoGridHelper.getDefinitionLayoutColumns(columns);
 	};
 
-	GridBlock.prototype.prepareColumnsForDetailGrid = function(gridType, dataItem)
+	LightGridBlock.prototype.renameColumn = function(gridType, dataItem)
+	{
+		var renameColumns = null;
+		var columns = dataItem.columns;
+		switch (gridType)
+		{
+			case "contactinformation":
+				renameColumns = {
+					"Name": "FullName"
+				}
+				break;
+
+		}
+
+		if (renameColumns)
+		{
+			columns && columns.forEach((val, idx) =>
+			{
+				if (val && renameColumns.hasOwnProperty(val))
+				{
+					columns[idx] = renameColumns[val];
+				}
+			});
+		}
+		return columns;
+	};
+
+	LightGridBlock.prototype.prepareColumnsForDetailGrid = function(gridType, dataItem)
 	{
 		var self = this,
 			columns,
 			allColumns = self.getGridColumnsByType(gridType);
 
-		if (dataItem.columns && dataItem.columns.length > 0)
+		if (self.$el.data("columns") && self.$el.data("columns").length > 0)
+		{
+			// columns cached from edit mode.
+			columns = self.$el.data("columns").map(function(savedColumn)
+			{
+				var columnName = typeof savedColumn === "string" ? savedColumn : savedColumn.FieldName;
+				return allColumns.filter(function(column)
+				{
+					return column.FieldName === columnName;
+				})[0];
+			});
+		} else if (dataItem.columns && dataItem.columns.length > 0)
 		{
 			columns = dataItem.columns.map(function(savedColumn)
 			{
@@ -1980,13 +1820,7 @@
 			{
 				return !!c;
 			});
-		} else if (gridType === "document")
-		{
-			columns = allColumns.filter(function(c)
-			{
-				return ["Name", "FileName", "Description", "Action"].indexOf(c.FieldName) > -1;
-			});
-		} else
+		}  else
 		{
 			columns = self.getGridColumnsFromAllColumnsByType(allColumns, gridType)
 				.map(function(c)
@@ -1998,23 +1832,35 @@
 		return columns;
 	};
 
-	GridBlock.prototype.getGridColumnsFromAllColumnsByType = function(allColumns, type)
+	LightGridBlock.prototype.getGridColumnsFromAllColumnsByType = function(allColumns, type)
 	{
 		let self = this, columns = allColumns;
 		switch (type.toLowerCase())
 		{
+			case "student":
+				columns = allColumns.filter(function(c)
+				{
+					return ["LocalId", "LastName", "FirstName", "Schoolname", "MailStreet1", "MailCity", "MailState", "MailZip"].includes(c.FieldName);
+				});
+				break;
+			case "document":
+				columns = allColumns.filter(function(c)
+				{
+					return ["Name", "FileName", "Description", "Action"].includes(c.FieldName);
+				});
+				break;
 			case "trip":
 				columns = self.getTripGridColumnsFromColumnsByType(allColumns, self.gridType);
 				break;
 			default:
-				allColumns.filter(r => !r.hidden);
+				columns = allColumns.filter(r => !r.hidden);
 				break;
 		}
 
 		return columns;
 	}
 
-	GridBlock.prototype.getTripGridColumnsFromColumnsByType = function(allColumns, parentType)
+	LightGridBlock.prototype.getTripGridColumnsFromColumnsByType = function(allColumns, parentType)
 	{
 		let columns = allColumns;
 		switch (parentType)
@@ -2025,14 +1871,14 @@
 				columns = columns.sort((a, b) => defaultColumnsByRoute.indexOf(a.FieldName) - defaultColumnsByRoute.indexOf(b.FieldName));
 				break;
 			default:
-				allColumns.filter(r => !r.hidden);
+				columns = allColumns.filter(r => !r.hidden);
 				break;
 		}
 
 		return columns;
 	};
 
-	GridBlock.prototype.getContactAssociations = function(contactId, includeDataTypes)
+	LightGridBlock.prototype.getContactAssociations = function(contactId, includeDataTypes)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "contacts", contactId, "contactrelationships"), {
 			paramData: {
@@ -2072,26 +1918,7 @@
 		});
 	};
 
-	GridBlock.prototype.getDocumentAssociations = function(documentId, includeDataTypes)
-	{
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationshipRecords"), {
-			paramData: {
-				"documentId": documentId,
-				"dbid": tf.datasourceManager.databaseId,
-				"@relationships": includeDataTypes.join(",")
-			}
-		}).then(function(response)
-		{
-			response.Items.sort(function(a, b)
-			{
-				return (a.Type && b.Type && a.Type.localeCompare(b.Type)) ||
-					(a.Name && b.Name && a.Name.localeCompare(b.Name));
-			});
-			return response;
-		});
-	};
-
-	GridBlock.prototype.checkLoadDataPermission = function(dataItem)
+	LightGridBlock.prototype.checkLoadDataPermission = function(dataItem)
 	{
 		switch (dataItem.field)
 		{
@@ -2123,9 +1950,127 @@
 		}
 	};
 
-	GridBlock.prototype.getGridRelatedData = function(dataItem, columns)
+	LightGridBlock.prototype.getIncludeIds = function()
 	{
 		var self = this;
+		var hasPermission = self.checkLoadDataPermission(self.options);
+		var isDesignMode = !self.isReadMode();
+
+		if (isDesignMode)
+		{
+			return Promise.resolve([]);
+		}
+
+		if (!self.recordId)
+		{
+			let whetherGetRelatedData = false;
+			if (self.includeIds && self.includeIds.length > 0)
+			{
+				return Promise.resolve(self.includeIds);
+			}
+
+			if (self.gridType == "route" && self.miniGridType == "trip")
+			{
+				let fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
+				let editFieldList = self.fieldEditorHelper.editFieldList[fieldName];
+				if (editFieldList && editFieldList.value)
+				{
+					whetherGetRelatedData = true;
+				}
+			}
+
+			if (!whetherGetRelatedData)
+			{
+				let items = self.detailView.newEntityRelationships[self.miniGridType] || [];
+				let getItemsAsync = Promise.resolve(items);
+
+				if (self.options.field === "ContactGrid"
+					&& self.gridType === "student"
+					&& self.detailView.newCopyContext
+					&& self.detailView.newCopyContext.baseEntity.Contacts
+				)
+				{
+					items = _.cloneDeep(self.detailView.newCopyContext.baseEntity.Contacts);
+				}
+				else if (self._isAssociateContacts())
+				{
+					getItemsAsync = self._prepareAssociateContactData(getItemsAsync);
+				}
+
+				return getItemsAsync
+					.then(items =>
+					{
+						var includeIds = (Array.isArray(items) && items.length > 0) ? items.map(function(item)
+						{
+							return item.Id;
+						}) : [-1];
+						return includeIds;
+					});
+			}
+		}
+
+		if (!hasPermission)
+		{
+			return Promise.resolve();
+		}
+
+		return self.getGridRelatedData().then(function(includeIds)
+		{
+			return includeIds;
+		});
+	}
+
+	LightGridBlock.prototype._setRequestURL = function()
+	{
+		var self = this;
+		var apiPrefix = tf.api.apiPrefix();
+		var urlNode = tf.dataTypeHelper.getEndpoint(self.options.url);
+
+		switch (urlNode)
+		{
+			case "contactinformation":
+				urlNode = "contacts";
+				break;
+			case "communicationhistory":
+				urlNode = "mergedocumentssents";
+				apiPrefix = tf.api.apiPrefixWithoutDatabase();
+				break;
+		}
+
+		return pathCombine(apiPrefix, "search", urlNode);
+	}
+
+	LightGridBlock.prototype.getDefaultSortItem = function()
+	{
+		var self = this;
+		var sortItemsName = "Id";
+		var sortItemsDirction = "Ascending";
+
+		if (self.options.field == "CommunicationHistoryGrid")
+		{
+			sortItemsName = "SentOn";
+			sortItemsDirction = "Descending";
+		}
+		else if (self.options.url == "tripstop" && self.gridType == "trip")
+		{
+			sortItemsName = "Sequence";
+		}
+		else if (self.options.url == "trip" && self.gridType == "route")
+		{
+			sortItemsName = "StartTime";
+		}
+
+		return [{
+			Name: sortItemsName,
+			isAscending: sortItemsDirction == "Ascending" ? "asc" : "desc",
+			Direction: sortItemsDirction
+		}]
+	}
+
+	LightGridBlock.prototype.getGridRelatedData = function()
+	{
+		var self = this;
+		var dataItem = self.options;
 		if (dataItem.getDataSource)
 		{
 			if (dataItem.getDataSource instanceof Function)
@@ -2137,70 +2082,29 @@
 			}
 		}
 
-		var columnFields = columns.filter(x => x.FieldName).map(function(column)
-		{
-			return column.FieldName;
-		}),
-			paramData = {},
-			urlNode = tf.dataTypeHelper.getEndpoint(dataItem.url),
-			idParamName = tf.dataTypeHelper.getIdParamName(self.gridType);
+		var paramData = {},
+			urlNode = tf.dataTypeHelper.getEndpoint(dataItem.url);
 
 		switch (dataItem.field)
 		{
 			case "ContactGrid":
-				return tf.helpers.detailViewHelper._getContactGridRecords(self.gridType, self.recordId);
+				return tf.helpers.detailViewHelper._getContactIds(self.gridType, self.recordId).then((result) =>
+				{
+					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
+					{
+						return item.Id;
+					}) : [-1];
+					return includeIds;
+				});
 			case "DocumentGrid":
-				ensureRequiredDocumentFields(columnFields);
-				return tf.helpers.detailViewHelper._getDocumentGridRecords(columnFields, self.gridType, self.recordId);
-			case "ContactAssociationGrid":
-				var includeDataTypes = tf.dataTypeHelper.getAvailableContactAssociationGridDataTypes()
-					.map(function(item)
-					{
-						return item.name.replace(/ /g, "");
-					});
-
-				return tf.dataTypeHelper.getAssociationTotalCount("contact").then(function(totalCount)
+				var columnFields = ["Id"];
+				return tf.helpers.detailViewHelper._getDocumentGridRecords(columnFields, self.gridType, self.recordId).then((result) =>
 				{
-					return self.getContactAssociations(self.recordId, includeDataTypes).then(function(response)
+					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
 					{
-						response.TotalRecordCount = totalCount;
-						return response;
-					});
-				});
-			case "DocumentAssociationGrid":
-				var includeDataTypes = tf.dataTypeHelper.getAvailableDocumentAssociationGridDataTypes()
-					.map(function(item)
-					{
-						return item.name.replace(/ /g, "");
-					});
-
-				return tf.dataTypeHelper.getAssociationTotalCount("document").then(function(totalCount)
-				{
-					return self.getDocumentAssociations(self.recordId, includeDataTypes).then(function(response)
-					{
-						response.TotalRecordCount = totalCount;
-						return response;
-					});
-				});
-			case "StudentRequirementGrid":
-				paramData[idParamName] = self.recordId;
-				paramData.DBID = tf.datasourceManager.databaseId;
-				paramData.Type = 0;
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), urlNode), {
-					paramData: paramData
-				});
-			case "AdditionalRequirementGrid":
-				paramData[idParamName] = self.recordId;
-				paramData.DBID = tf.datasourceManager.databaseId;
-				paramData.Type = 1;
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "studentrequirementitems"), {
-					paramData: paramData
-				});
-			case "CalendarEventsGrid":
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), urlNode), {
-					paramData: {
-						tripId: self.recordId
-					}
+						return item.Id;
+					}) : [-1];
+					return includeIds;
 				});
 			case "StudentScheduleGrid":
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", "StudentSchedules"), {
@@ -2210,21 +2114,13 @@
 					data: {
 						filterSet: { FilterItems: [{ FieldName: "StudentID", Operator: "EqualTo", Value: self.detailView.recordId }] }
 					}
-				});
-			case "StudentCardGrid":
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), urlNode), {
-					paramData: {
-						dbid: tf.datasourceManager.databaseId,
-						StudentId: self.recordId,
-						"@sort": "StartDate|desc"
-					}
-				});
-			case "AttendanceGrid":
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), urlNode), {
-					paramData: {
-						databaseId: tf.datasourceManager.databaseId,
-						studentId: self.recordId
-					}
+				}).then((result) =>
+				{
+					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
+					{
+						return item.Id;
+					}) : [-1];
+					return includeIds;
 				});
 			case "AltsiteGrid":
 				paramData = {
@@ -2236,31 +2132,11 @@
 					paramData: paramData
 				}).then(function(result)
 				{
-					if (columnFields.indexOf("Id") === -1)
-					{
-						columnFields.push("Id");
-					}
-
 					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
 					{
 						return item.Id;
 					}) : [-1];
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
-						data: {
-							fields: columnFields,
-							filterClause: "",
-							filterSet: null,
-							idFilter: {
-								IncludeOnly: includeIds,
-								ExcludeAny: []
-							},
-							sortItems: [{
-								Name: "Id",
-								isAscending: "asc",
-								Direction: "Ascending"
-							}]
-						}
-					});
+					return includeIds;
 				});
 			case "AMTripGrid":
 			case "PMTripGrid":
@@ -2280,27 +2156,7 @@
 				return TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId(dataItem.idField, dataItem.tripType, self.recordId)
 					.then(function(result)
 					{
-						if (columnFields.indexOf("Id") === -1)
-						{
-							columnFields.push("Id");
-						}
-
-						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
-							data: {
-								fields: columnFields,
-								filterClause: "",
-								filterSet: null,
-								idFilter: {
-									IncludeOnly: result.length > 0 ? result : [-1],
-									ExcludeAny: []
-								},
-								sortItems: [{
-									Name: "Id",
-									isAscending: "asc",
-									Direction: "Ascending"
-								}]
-							}
-						});
+						return result.length > 0 ? result : [-1];
 					});
 			case "AllTripStopGrid":
 				var p1 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("PUStopId", "am", self.recordId),
@@ -2310,32 +2166,12 @@
 					p5 = TF.RelatedDataHelper.getIdsFromStudentSchedulesByStudentId("DOStopId", "shuttle", self.recordId);
 				return Promise.all([p1, p2, p3, p4, p5]).then(function(response)
 				{
-					if (columnFields.indexOf("Id") === -1)
-					{
-						columnFields.push("Id");
-					}
-
 					var includeIds = [];
 					response.forEach(result =>
 					{
 						includeIds = includeIds.concat(result);
 					});
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
-						data: {
-							fields: columnFields,
-							filterClause: "",
-							filterSet: null,
-							idFilter: {
-								IncludeOnly: includeIds.length > 0 ? includeIds : [-1],
-								ExcludeAny: []
-							},
-							sortItems: [{
-								Name: "Id",
-								isAscending: "asc",
-								Direction: "Ascending"
-							}]
-						}
-					});
+					return includeIds.length > 0 ? includeIds : [-1];
 				});
 			case "CommunicationHistoryGrid":
 				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "mergedocumentssents"), {
@@ -2349,13 +2185,15 @@
 							LogicalOperator: "and",
 							FilterSets: []
 						},
-						sortItems: [{
-							Name: "SentOn",
-							isAscending: "desc",
-							Direction: "Descending"
-						}]
 					}
-				});
+				}).then(function(result)
+				{
+					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
+					{
+						return item.Id;
+					}) : [-1];
+					return includeIds;
+				});;
 			default:
 				paramData = {};
 				urlNode = tf.dataTypeHelper.getEndpoint(dataItem.url);
@@ -2393,11 +2231,9 @@
 					});
 				}
 
-				var sortItemsName = "Id";
 				if (dataItem.url == "tripstop" && self.gridType == "trip")
 				{
 					paramData["@filter"] = `eq(${tf.dataTypeHelper.getIdParamName(self.gridType)},${self.recordId})`;
-					sortItemsName = "Sequence";
 				}
 				else if (dataItem.url == "trip" && self.gridType == "route")
 				{
@@ -2411,8 +2247,6 @@
 					{
 						paramData["@filter"] = `eq(${tf.dataTypeHelper.getIdParamName(self.gridType)},${self.recordId})`;
 					}
-
-					sortItemsName = "StartTime";
 				}
 				else if (dataItem.url == "trip" && self.gridType == "vehicle")
 				{
@@ -2436,45 +2270,16 @@
 					paramData: paramData
 				}).then(function(result)
 				{
-					if (columnFields.indexOf("Id") === -1)
-					{
-						columnFields.push("Id");
-					}
-
 					var includeIds = (Array.isArray(result.Items) && result.Items.length > 0) ? result.Items.map(function(item)
 					{
 						return item.Id;
 					}) : [-1];
-					return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "search", urlNode), {
-						data: {
-							fields: columnFields,
-							filterClause: "",
-							filterSet: null,
-							idFilter: {
-								IncludeOnly: includeIds,
-								ExcludeAny: []
-							},
-							sortItems: [{
-								Name: sortItemsName,
-								isAscending: "asc",
-								Direction: "Ascending"
-							}]
-						}
-					});
+					return includeIds;
 				});
 		}
 	};
 
-	GridBlock.prototype.getContactGridTotalCount = function()
-	{
-		var self = this;
-		return tf.helpers.detailViewHelper._getContactGridRecords(self.gridType, self.recordId).then(function(response)
-		{
-			return response.TotalRecordCount;
-		});
-	};
-
-	GridBlock.prototype.editMiniGridRecord = function(miniGridType, e, $target)
+	LightGridBlock.prototype.editMiniGridRecord = function(miniGridType, e, $target)
 	{
 		if (this.isReadOnly())
 		{
@@ -2483,7 +2288,7 @@
 		var self = this,
 			$target = $target || $(e.currentTarget),
 			$tr = $target.closest("tr"),
-			$grid = $tr.closest(".kendo-grid"),
+			$grid = $tr.closest(".kendo-grid-container"),
 			kendoGrid = $grid.data("kendoGrid"),
 			recordId = kendoGrid.dataItem($tr).Id;
 
@@ -2492,29 +2297,48 @@
 	};
 
 	/**
+	 * Update Grid Footer Information
+	 *
+	 */
+	LightGridBlock.prototype._updateGridFooter = function()
+	{
+		var self = this;
+		var item = self.$el.find(".kendo-grid-container");
+		var total = 0;
+		var result = 0;
+		if (self.isReadMode())
+		{
+			total = self.grid.dataSource.total();
+			result = Array.isArray(self.includeIds) ? self.includeIds.filter(x => x > 0).length : [];
+		}
+
+		tf.helpers.miniGridHelper.updateGridFooter(item, total, result);
+	}
+
+	/**
 	 * Bind contact related events to detail mini grid.
 	 *
 	 * @param {String} miniGridType
 	 * @param {Object} kendoGrid
 	 * @returns
 	 */
-	GridBlock.prototype._bindMiniGridEvent = function(miniGridType, $grid)
+	LightGridBlock.prototype._bindMiniGridEvent = function(miniGridType, $grid)
 	{
 		// This function firing multiple times on kendoGrid dataBound / dataBinding event.
 		var self = this;
 		switch (miniGridType)
 		{
-			case GridBlock.MINI_GRID_TYPE.CONTACTINFORMATION:
-			case GridBlock.MINI_GRID_TYPE.CONTACT:
+			case LightGridBlock.MINI_GRID_TYPE.CONTACTINFORMATION:
+			case LightGridBlock.MINI_GRID_TYPE.CONTACT:
 				$grid.off("dblclick").on("dblclick", ".k-grid-content table tr", function(e)
 				{
-					self.editMiniGridRecord(GridBlock.MINI_GRID_TYPE.CONTACT, e);
+					self.editMiniGridRecord(LightGridBlock.MINI_GRID_TYPE.CONTACT, e);
 				});
 				break;
-			case GridBlock.MINI_GRID_TYPE.DOCUMENT:
+			case LightGridBlock.MINI_GRID_TYPE.DOCUMENT:
 				$grid.off("dblclick").on("dblclick", ".k-grid-content table tr", function(e)
 				{
-					self.editMiniGridRecord(GridBlock.MINI_GRID_TYPE.DOCUMENT, e);
+					self.editMiniGridRecord(LightGridBlock.MINI_GRID_TYPE.DOCUMENT, e);
 				});
 				break;
 			default:
@@ -2523,12 +2347,12 @@
 
 	};
 
-	GridBlock.prototype._setDefaultStudentRequirementAddable = function()
+	LightGridBlock.prototype._setDefaultStudentRequirementAddable = function()
 	{
 		if (this.options.url == TF.Helper.KendoGridHelper.studentRequirementItemsUrl)
 		{
-			var addButton = this.$el.find(ADD_BUTTON_CLASS_NAME);
-			var grid = this.$el.find(".kendo-grid").data("kendoGrid");
+			var addButton = this.$el.find(".grid-top-right-button");
+			var grid = this.$el.find(".kendo-grid-container").data("kendoGrid");
 			if (this.isBlockReadOnly() || this.isReadOnly())
 			{
 				addButton.addClass("disabled");
@@ -2544,14 +2368,14 @@
 		}
 	};
 
-	GridBlock.prototype.getAndCreateNewEntityRelationship = function(name)
+	LightGridBlock.prototype.getAndCreateNewEntityRelationship = function(name)
 	{
 		var cache = this.detailView.newEntityRelationships[name] || [];
 		this.detailView.newEntityRelationships[name] = cache;
 		return cache;
 	};
 
-	GridBlock.prototype.showStudentRequirementModal = function(requirement, type)
+	LightGridBlock.prototype.showStudentRequirementModal = function(requirement, type)
 	{
 		var self = this,
 			isNew = !requirement,
@@ -2600,7 +2424,7 @@
 		});
 	};
 
-	GridBlock.prototype.editStudentRequirement = function(grid, e)
+	LightGridBlock.prototype.editStudentRequirement = function(grid, e)
 	{
 		if (this.isReadOnly())
 		{
@@ -2625,7 +2449,7 @@
 		});
 	};
 
-	GridBlock.prototype.editFieldTripResource = function(grid, e)
+	LightGridBlock.prototype.editFieldTripResource = function(grid, e)
 	{
 		if (this.isReadOnly())
 		{
@@ -2637,7 +2461,7 @@
 		self.showFieldTripResourceModal(data, self.recordId, self.grid);
 	};
 
-	GridBlock.prototype.showFieldTripResourceModal = function(fieldtripResource, fieldtrip, resourceGrid)
+	LightGridBlock.prototype.showFieldTripResourceModal = function(fieldtripResource, fieldtrip, resourceGrid)
 	{
 		var self = this,
 			isNew = !fieldtripResource,
@@ -2682,7 +2506,7 @@
 			});
 	};
 
-	GridBlock.prototype.removeFieldTripResource = function(grid, e)
+	LightGridBlock.prototype.removeFieldTripResource = function(grid, e)
 	{
 		var self = this,
 			tr = $(e.target).closest("tr"),
@@ -2739,113 +2563,12 @@
 			});
 	};
 
-	GridBlock.prototype.afterDomAttached = function()
+	LightGridBlock.prototype.afterDomAttached = function()
 	{
 		this.initDetailGrid();
 	};
 
-	GridBlock.prototype._getAssociateData = function(selectedItemKeys)
-	{
-		if (!selectedItemKeys || selectedItemKeys.length === 0)
-		{
-			return Promise.resolve([]);
-		}
-
-		const groupByType = (selectedItemKeys) =>
-		{
-			const groupedItems = {};
-			selectedItemKeys.forEach((i) =>
-			{
-				if (!groupedItems[i.DataTypeId])
-				{
-					groupedItems[i.DataTypeId] = [];
-				}
-
-				groupedItems[i.DataTypeId].push(i.RecordID);
-			});
-
-			return groupedItems;
-		}
-		const convertToEntity = (selectedItemKeys) =>
-		{
-			let getRelatedContacts = [];
-			const groupedItems = groupByType(selectedItemKeys);
-			Object.keys(groupedItems).forEach((dataTypeId) =>
-			{
-				const dataTypeName = tf.dataTypeHelper.getNameById(Number.parseInt(dataTypeId));
-				const dataType = tf.dataTypeHelper.getKeyById(Number.parseInt(dataTypeId));
-				const url = pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(dataType));
-				let fields = TF.DetailView.AssociateRecordsViewModel.prototype.getNecessaryFieldsByDataType({ dataType: dataType });
-				fields.push("Id");
-				const params = {
-					"idFilter": {
-						"IncludeOnly": groupedItems[dataTypeId],
-						"ExcludeAny": [],
-					},
-					"filterSet": null,
-					"fields": fields
-				}
-				getRelatedContacts.push(
-					tf.promiseAjax.post(url, { data: params }).then((ret) =>
-					{
-						ret.Items.forEach(i =>
-						{
-							i.Type = dataTypeName;
-							i.DataTypeId = dataTypeId;
-							i.Name = TF.DetailView.AssociateRecordsViewModel.prototype._getNameByDataType(dataTypeName, i);
-							i.RecordID = i.Id;
-						})
-						return ret.Items;
-					})
-				);
-			});
-
-			return getRelatedContacts;
-		}
-
-		return Promise.all(convertToEntity(selectedItemKeys))
-			.then(results =>
-			{
-				let result = [];
-				results.forEach(r =>
-				{
-					if (r && r.length > 0)
-					{
-						result = result.concat(r);
-					}
-				});
-
-				return result;
-			});
-	};
-
-	GridBlock.prototype._updateDocumentGrid = function(selectedItemKeys, fields)
-	{
-		if (!selectedItemKeys || selectedItemKeys.length === 0)
-		{
-			return Promise.resolve([]);
-		}
-
-		const keys = selectedItemKeys.map(s => s.DocumentID);
-		const url = pathCombine(tf.api.apiPrefix(), "search", "documents");
-		fields = fields.push['Id'];
-		const params = {
-			"idFilter": {
-				"IncludeOnly": keys,
-				"ExcludeAny": [],
-			},
-			"filterSet": null,
-			"fields": fields
-		}
-
-		return tf.promiseAjax.post(url, { data: params })
-			.then((ret) =>
-			{
-				return (ret && ret.Items) ? ret.Items : [];
-			});
-	}
-
-	GridBlock.prototype._isAssociateContacts = function()
+	LightGridBlock.prototype._isAssociateContacts = function()
 	{
 		return this.detailView &&
 			this.detailView.$element &&
@@ -2854,7 +2577,7 @@
 			this.detailView.$element.closest('.modal-dialog').find('.panel-heading').text() === 'Associate Contacts';
 	}
 
-	GridBlock.prototype._prepareAssociateContactData = function(getItemsAsync)
+	LightGridBlock.prototype._prepareAssociateContactData = function(getItemsAsync)
 	{
 		var self = this;
 		if (self.options.field === "ContactAssociationGrid" &&
@@ -2875,130 +2598,116 @@
 		return getItemsAsync;
 	}
 
-	GridBlock.prototype.initDetailGrid = function()
+	LightGridBlock.prototype.initDetailGrid = function()
 	{
 		var self = this,
-			isReadMode = self.isReadMode(),
-			columns = self.prepareColumnsForDetailGrid(self.miniGridType, self.options),
-			hasPermission = self.checkLoadDataPermission(self.options);
+			isDesignMode = !self.isReadMode(),
+			columns = self.options.columns,
+			hasPermission = self.checkLoadDataPermission(self.options),
+			summaryConfig = self.miniGridHelper.getSummaryBarConfig(self.$el, self.options);
 
+
+		columns = self.renameColumn(self.miniGridType, self.options);
+		columns = self.prepareColumnsForDetailGrid(self.miniGridType, self.options);
 		/**
 		 * show/hide columns functionality needs the data
 		 */
 		self.$el.data("columns", columns);
 
-		var getDataSource = function()
+		if (summaryConfig && summaryConfig["ShowSummaryBar"])
 		{
-			if (!isReadMode)
-			{
-				return Promise.resolve();
-			}
+			self.$el.find(".kendo-summarygrid-container").css("display", "block");
+		}
+		else
+		{
+			self.$el.find(".kendo-summarygrid-container").css("display", "none");
+		}
 
-			if (!self.recordId)
+		var options = {
+			gridType: self.gridBlockType,
+			gridDefinition: self.miniGridHelper.getKendoColumnsExtend(columns),
+			isFieldTripInvoice: self.miniGridType === "fieldtripinvoice",
+			displayQuickFilterBar: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			lockColumnTemplate: self.miniGridHelper.getLockedColumnTemplate(self.$el, self.options),
+			gridLayout: summaryConfig,
+			defaultSort: self.options.sort,
+			defaultFilter: self.miniGridHelper.getFilterConfig(self.$el, self.options),
+			isMiniGrid: true, // set the grid to mini grid mode
+			showOverlay: false,
+			totalCountHidden: self.options.totalCountHidden,
+			resizable: !isDesignMode, // enable column resize if not design mode.
+			reorderable: false, // disable column reorder.
+			canDragDelete: false, // disable drag delete.
+			miniGridEditMode: isDesignMode, // set the miniGrid to Edit mode
+			setRequestURL: () =>
 			{
-				let whetherGetRelatedData = false;
-				if (self.gridType == "route" && self.miniGridType == "trip")
+				return self._setRequestURL();
+			},
+			setRequestOption: requestOption =>
+			{
+				requestOption.data.fields = columns.map(x => x.FieldName);
+
+				if (self.options.field == "DocumentGrid")
 				{
-					let fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
-					let editFieldList = self.fieldEditorHelper.editFieldList[fieldName];
-					if (editFieldList && editFieldList.value)
+					ensureRequiredDocumentFields(requestOption.data.fields);
+				}
+				else if (self.options.field == "StudentScheduleGrid")
+				{
+					ensureRequiredScheduleFields(requestOption.data.fields);
+				}
+
+				if ((requestOption.data.sortItems || []).length == 0)
+				{
+					requestOption.data.sortItems = self.getDefaultSortItem();
+				}
+				return requestOption;
+			},
+			getAsyncRequestOption: requestOption =>
+			{
+				return self.getIncludeIds().then((includeIds) =>
+				{
+					includeIds = [...new Set(includeIds)];
+					self.includeIds = includeIds;
+					requestOption.data.idFilter = {
+						IncludeOnly: includeIds,
+						ExcludeAny: []
+					};
+
+					if (self.options.field == "ContactGrid" && self.recordId)
 					{
-						whetherGetRelatedData = true;
+						requestOption.data.extendParameter = {
+							RecordId: self.recordId,
+							DataTypeId: tf.dataTypeHelper.getId(self.gridType)
+						}
 					}
-				}
 
-				if (!whetherGetRelatedData)
-				{
-					let items = self.detailView.newEntityRelationships[self.miniGridType] || [];
-					let getItemsAsync = Promise.resolve(items);
-
-					if (self.options.field === "ContactGrid"
-						&& self.gridType === "student"
-						&& self.detailView.newCopyContext
-						&& self.detailView.newCopyContext.baseEntity.Contacts
-					)
-					{
-						items = _.cloneDeep(self.detailView.newCopyContext.baseEntity.Contacts);
-					}
-					else if (self._isAssociateContacts())
-					{
-						getItemsAsync = self._prepareAssociateContactData(getItemsAsync);
-					}
-
-					return getItemsAsync
-						.then(items =>
-						{
-							return {
-								dataItems: items,
-								totalCount: items.length,
-								pageSize: 50
-							};
-						});
-				}
-			}
-
-			if (!hasPermission)
+					return requestOption;
+				})
+			},
+			onCreateGrid: () =>
 			{
-				return Promise.resolve();
-			}
-
-			return self.getGridRelatedData(self.options, columns.map(function(c)
+				self.grid = self.lightKendoGrid.kendoGrid;
+			},
+			onDataBound: function()
 			{
-				var column = $.extend(true, {}, c);
-				column.FieldName = tf.UDFDefinition.getOriginalName(c.FieldName);
-				return column;
-			})).then(function(response)
-			{
-				var udfs = columns.filter(function(c)
-				{
-					return tf.UDFDefinition.isUDF(c.FieldName);
-				});
-
-				if (response && response.Items && udfs.length > 0)
-				{
-					response.Items.forEach(function(item)
-					{
-						udfs.forEach(function(udf)
-						{
-							item[udf.FieldName] = item[udf.OriginalName];
-						});
-					});
-				}
-
-				if (self.gridBlockType === 'TripGrid' && (self.grid.dataSource.options && !self.grid.dataSource.options.serverPaging))
-				{
-					response.Items.forEach(trip =>
-					{
-						trip.Schools = trip.Schools.replace(/!/g, ", ").trim().tfTrimEnd(',');
-					});
-				}
-				return response;
-			}).then(function(result)
-			{
-				return {
-					dataItems: result.Items,
-					totalCount: result.Items.length,
-					pageSize: 50
-				};
-			}, function(error)
-			{
-				self.$el.find(".custom-grid").addClass("no-permission");
-				self.$el.find(".k-grid-content").empty().append("<p>You don't have permission to view data.</p>");
-			});
-		};
-
-		var defaultGridOptions = {
-			dataBound: function()
-			{
-				self._bindMiniGridEvent(self.miniGridType, self.$el.find(".kendo-grid"));
-
+				self.tripIsLoaded && self.grid.showColumn(self.grid.columns[0]);
+				isDesignMode || tf.helpers.kendoGridHelper.setGridOnDemandAction(self.grid, self.onDemandGridActions[self.miniGridType]);
+				self._updateGridFooter();
+				self._bindMiniGridEvent(self.miniGridType, self.$el.find(".kendo-grid-container"));
 				self._setDefaultStudentRequirementAddable();
 				switch (self.miniGridType)
 				{
 					case "document":
-						self.$el.find(".kendo-grid .k-grid-content table tr").each(function(index, el)
+						var kendoGrid = self.$el.find(".kendo-grid-container").data("kendoGrid");
+						kendoGrid.content.find("tr").each(function(index, el)
 						{
-							var data = $(el).closest(".kendo-grid").data("kendoGrid").dataItem(el);
+							var uid = $(el).data('kendo-uid') || "";
+							var data = kendoGrid.dataSource.getByUid(uid);
+							if (!data)
+							{
+								return;
+							}
+
 							if (!data.FileName)
 							{
 								$(el).find(".k-grid-view").addClass("disable");
@@ -3018,20 +2727,7 @@
 
 				self.noHeightWhenEmpty(this);
 			}
-		};
-
-		var options = {
-			columns: columns,
-			isFieldTripInvoice: self.miniGridType === "fieldtripinvoice",
-			onDemandActions: this.onDemandGridActions[self.miniGridType],
-			dataSource: getDataSource,
-			sort: self.options.sort,
-			gridOptions: $.extend(defaultGridOptions, hasPermission ? {} : {
-				noRecords: {
-					template: "You don't have permission to view data."
-				}
-			})
-		};
+		}
 
 		if (self.miniGridType === "fieldtripinvoice")
 		{
@@ -3068,8 +2764,7 @@
 		};
 		if (self.miniGridType == "trip" && self.gridType == "route")
 		{
-			options.gridOptions.showLockedColumn = true;
-			options.gridOptions.lockColumnTemplate = [
+			options.lockColumnTemplate = [
 				{
 					field: "bulk_menu",
 					title: "<div></div>",
@@ -3077,6 +2772,7 @@
 					sortable: false,
 					filterable: false,
 					locked: true,
+					hidden: true, // show column after trips on map loaded 
 					template: function(data)
 					{
 						const color = self.getTripColor(data.Id);
@@ -3085,9 +2781,11 @@
 				}
 			];
 		}
-		var grid = tf.helpers.kendoGridHelper.createSimpleGrid(self.$el, options);
-		self.grid = grid;
-		grid.options.totalCountHidden = options.totalCountHidden;
+
+		self.$el.find(".kendo-grid-container").html('');
+		self.lightKendoGrid = new TF.Grid.KendoGrid(self.$el.find(".kendo-grid-container"), options);
+		self.$el.find(".kendo-grid-container").data("lightKendoGrid", self.lightKendoGrid);
+
 		if ([TF.Helper.KendoGridHelper.studentRequirementItemsUrl, TF.Helper.KendoGridHelper.studentAdditionalRequirementUrl].indexOf(self.miniGridType) >= 0)
 		{
 			grid.tbody.on("dblclick", "tr.k-state-selected", function(e)
@@ -3116,6 +2814,24 @@
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("fieldtripresource", function()
 			{
+				refreshGrid();
+			}));
+		}
+
+		if (self.miniGridType == "document")
+		{
+			self.pubSubSubscriptions.push(PubSub.subscribe("documentChange", function(key, result)
+			{
+				result?.ids && (self.includeIds = result.ids);
+				refreshGrid();
+			}));
+		}
+
+		if (self.miniGridType == "contactinformation")
+		{
+			self.pubSubSubscriptions.push(PubSub.subscribe("contactChange", function(key, result)
+			{
+				result?.ids && (self.includeIds = result.ids);
 				refreshGrid();
 			}));
 		}
@@ -3172,18 +2888,17 @@
 				refreshGrid();
 			}));
 			self.initChangeTripColor();
-			self.grid.hideColumn(self.grid.columns[0]);
 		}
 
 		function refreshGrid()
 		{
-			tf.helpers.kendoGridHelper.setGridDataSource(grid, getDataSource, grid.options);
+			self.lightKendoGrid.refresh();
 		}
 	};
 
 	//#region Field Trip Invoice
 
-	GridBlock.prototype.addEditFieldTripInvoice = function(event)
+	LightGridBlock.prototype.addEditFieldTripInvoice = function(event)
 	{
 		if (this.isReadOnly())
 		{
@@ -3257,7 +2972,7 @@
 			});
 	};
 
-	GridBlock.prototype.deleteFieldTripInvoice = function(event)
+	LightGridBlock.prototype.deleteFieldTripInvoice = function(event)
 	{
 		var self = this,
 			item = self.grid.dataItem(event.target);
@@ -3299,7 +3014,7 @@
 	 * Refresh field trip invoice grid after modification.
 	 *
 	 */
-	GridBlock.prototype.refreshFieldTripInvoice = function()
+	LightGridBlock.prototype.refreshFieldTripInvoice = function()
 	{
 		var self = this, task = null;
 
@@ -3349,7 +3064,7 @@
 	/**
 	* when noHeightWhenEmpty setting is true, change the grid body height to zero when no record to display
 	*/
-	GridBlock.prototype.noHeightWhenEmpty = function(kendoGrid)
+	LightGridBlock.prototype.noHeightWhenEmpty = function(kendoGrid)
 	{
 		var self = this;
 		if (!self.options.noHeightWhenEmpty)
@@ -3361,27 +3076,22 @@
 			border = "1px solid #eee";
 		kendoGridElement.css("border", "none");
 		gridContent.css({ "border-left": border, "border-right": border });
-		var maxHeight = Math.max(kendoGridElement.height() - 67, gridContent.height());
-		var gridHeight = 0;
-		if (kendoGrid.dataSource.data().length != 0)
+		var maxHeight = kendoGridElement.height() - 67;
+		if (kendoGrid.dataSource.data().length == 0)
+		{
+			gridContent.height(0);
+		} else
 		{
 			var height = kendoGrid.dataSource.data().length * 34;
 			if (gridContent.find(".k-virtual-scrollable-wrap").width() < gridContent.find("table").width())
 			{
 				height += 18;
 			}
-			gridHeight = Math.min(maxHeight, height);
+			gridContent.height(Math.min(maxHeight, height));
 		}
-
-		this.$innerGridPreHeight = `${Math.min(this.gridMaxHeightBeforeExpand, gridHeight)}px`;
-		if (self.status === STATUS.RESTORE)
-		{
-			gridContent.height(gridHeight);
-		}
-
 	};
 
-	GridBlock.prototype.editCalendarEventModal = function(grid, e)
+	LightGridBlock.prototype.editCalendarEventModal = function(grid, e)
 	{
 		if (this.isReadOnly())
 		{
@@ -3399,7 +3109,7 @@
 		});
 	};
 
-	GridBlock.prototype.deleteCalendarEventModal = function(grid, e)
+	LightGridBlock.prototype.deleteCalendarEventModal = function(grid, e)
 	{
 		var self = this;
 		tf.promiseBootbox.yesNo("Are you sure you want to delete this record?", "Delete Confirmation")
@@ -3422,20 +3132,20 @@
 
 	};
 
-	GridBlock.prototype._notifyTripHistoryGridRefresh = function()
+	LightGridBlock.prototype._notifyTripHistoryGridRefresh = function()
 	{
 		PubSub.publish("tripHistoryChange", {
 			tripId: this.recordEntity.Id
 		});
 	};
 
-	GridBlock.prototype.showCalendarEventModal = function(tripHistoryId)
+	LightGridBlock.prototype.showCalendarEventModal = function(tripHistoryId)
 	{
 		var trip = this.recordEntity;
 		return tf.modalManager.showModal(new TF.Modal.TripHistoryModalViewModel(trip.Id, trip.Name, tripHistoryId));
 	};
 
-	GridBlock.prototype.editStudentCardModal = function(grid, e)
+	LightGridBlock.prototype.editStudentCardModal = function(grid, e)
 	{
 		if (this.isReadOnly())
 		{
@@ -3471,7 +3181,7 @@
 		});
 	};
 
-	GridBlock.prototype.deleteStudentCardModal = function(grid, e)
+	LightGridBlock.prototype.deleteStudentCardModal = function(grid, e)
 	{
 		var self = this,
 			item = self.grid.dataItem(e.target);
@@ -3512,14 +3222,14 @@
 
 	};
 
-	GridBlock.prototype._notifyStudentCardGridRefresh = function()
+	LightGridBlock.prototype._notifyStudentCardGridRefresh = function()
 	{
 		PubSub.publish("studentCardChange", {
 			StudentId: this.recordEntity ? this.recordEntity.Id : null
 		});
 	}
 
-	GridBlock.prototype.updateStudentTagIdRecord = function(response)
+	LightGridBlock.prototype.updateStudentTagIdRecord = function(response)
 	{
 		var newRes = this.detailView.newEntityRelationships["studenttagids"] || [];
 		var editedRes = newRes.filter(function(r) { return r.Id === response.Id });
@@ -3538,7 +3248,7 @@
 
 	}
 
-	GridBlock.prototype.autoFindSchedule = async function()
+	LightGridBlock.prototype.autoFindSchedule = async function()
 	{
 		if (this.detailView.gridType !== "student") return;
 		if (this.detailView.pageType !== "detailview") return;
@@ -3552,7 +3262,7 @@
 		}
 	}
 
-	GridBlock.prototype.setTripsLoadedOnMap = function(e)
+	LightGridBlock.prototype.setTripsLoadedOnMap = function(e)
 	{
 		this.tripLoadedNumber++;
 		if (this.detailView.getMapNumber() == this.tripLoadedNumber)
@@ -3563,7 +3273,7 @@
 		this.tripIsLoaded = true;
 	};
 
-	GridBlock.prototype.getTripColor = function(tripId)
+	LightGridBlock.prototype.getTripColor = function(tripId)
 	{
 		if (!this.tripsColors)
 		{
@@ -3583,7 +3293,7 @@
 		return this.tripsColors[tripId];
 	};
 
-	GridBlock.prototype.initChangeTripColor = function()
+	LightGridBlock.prototype.initChangeTripColor = function()
 	{
 		let self = this;
 		let colorPickerInput = $("<input type='text' />");
@@ -3617,12 +3327,11 @@
 		}
 	}
 
-	GridBlock.prototype.addTripVisibilityAction = function()
+	LightGridBlock.prototype.addTripVisibilityAction = function()
 	{
 		let self = this;
 		if (self.detailView.getMapNumber() > 0)
 		{
-			this.detailView.invisibleTrips = [];
 			let tripVisibilityAction = {
 				name: "tripVisibility",
 				template: '<a class="k-button k-button-icontext k-grid-show-eye" title="Show Trips"></a>',
@@ -3657,11 +3366,11 @@
 		}
 	}
 
-	GridBlock.prototype.setTripVisibilityData = function(e, $target, clickTarget)
+	LightGridBlock.prototype.setTripVisibilityData = function(e, $target, clickTarget)
 	{
 		$target = $target || $(e.currentTarget);
 		let $tr = $target.closest('tr'),
-			$grid = $target.closest('.kendo-grid'),
+			$grid = $target.closest('.kendo-grid-container'),
 			kendoGrid = $grid.data('kendoGrid'),
 			entity = kendoGrid.dataItem($tr);
 
@@ -3690,7 +3399,7 @@
 		}
 	}
 
-	GridBlock.prototype.addHotLink = function(miniGridType, grid)
+	LightGridBlock.prototype.addHotLink = function(miniGridType, grid)
 	{
 		const hotLinkConfig = {
 			studentschedule: [{ targetGrid: "trip", fields: ["TripName"], }]
@@ -3700,7 +3409,7 @@
 
 	};
 
-	GridBlock.prototype.dispose = function()
+	LightGridBlock.prototype.dispose = function()
 	{
 		var self = this;
 		self.detailView.onFieldChange.unsubscribe(self._detailviewFieldChange);
@@ -3714,14 +3423,32 @@
 			self.pubSubSubscriptions = [];
 		}
 
-		var kendoGrid = self.$el.find(".kendo-grid").data("kendoGrid");
+		var kendoGrid = self.$el.find(".kendo-grid-container").data("kendoGrid");
 		if (kendoGrid)
 		{
 			kendoGrid.destroy();
+			self.$el.find(".kendo-grid-container").data('ShortcutExtender')?.dispose();
+			self.$el.find(".kendo-grid-container").html("");
 		}
 		self._restore();
+
+		var summaryGrid = self.$el.find(".kendo-summarygrid-container").data("kendoGrid");
+		if (summaryGrid)
+		{
+			summaryGrid.destroy();
+			self.$el.find(".kendo-summarygrid-container").data('ShortcutExtender')?.dispose();
+			self.$el.find(".kendo-summarygrid-container").css("height", "0px");
+			self.$el.find(".kendo-summarygrid-container").html("");
+		}
+
+		self.removeAllFilterContainer();
 	};
 
+	LightGridBlock.prototype.removeAllFilterContainer = function(dataType)
+	{
+		// remove all filter k-list-container by uniqueClassName for better performance
+		$(".filter-container-" + this.uniqueClassName).remove();
+	};
 
 	/**
 	 * Ensure all required fields for document entity type is included in the fields collection
@@ -3730,6 +3457,19 @@
 	function ensureRequiredDocumentFields(fields)
 	{
 		var requiredDocumentFields = ['Name', 'FileName', 'MimeType'];
+		$.each(requiredDocumentFields, function(_, field)
+		{
+			if (fields.indexOf(field) < 0) fields.push(field);
+		});
+	}
+
+	/**
+	 * Ensure all required fields for Student Schedule entity type is included in the fields collection
+	 * @param {Array} fields 
+	 */
+	function ensureRequiredScheduleFields(fields)
+	{
+		var requiredDocumentFields = ['TripId', 'StudentID'];
 		$.each(requiredDocumentFields, function(_, field)
 		{
 			if (fields.indexOf(field) < 0) fields.push(field);

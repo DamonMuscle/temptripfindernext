@@ -417,6 +417,11 @@
 			self.pageLevelViewModel.clearError();
 		});
 
+		self.onResizePage.subscribe(() =>
+		{
+			self.updateDetailViewGridWidth();
+		});
+
 		self.obSelectName.subscribe(function(value)
 		{
 			tf.storageManager.save("current_detail_layout_name", value, true);
@@ -1215,6 +1220,7 @@
 		}
 
 		self.$element.find('.detail-view-panel').trigger('detail-view-panel-resize');
+		self.updateDetailViewGridWidth();
 	};
 
 	/**
@@ -1860,6 +1866,45 @@
 			$overlay.append($("<div></div>", { class: "detail-view-background" }));
 			$('body').append($overlay);
 		}
+	}
+
+	/**
+	 * Update the grid width.
+	 * @return {void}
+	 */
+	DetailViewViewModel.prototype.updateDetailViewGridWidth = function()
+	{
+		if (this.fitContainerTimer != null)
+		{
+			clearTimeout(this.fitContainerTimer);
+		}
+
+		this.fitContainerTimer = setTimeout(function()
+		{
+			this.rootGridStack.dataBlocks.forEach((dataBlock) =>
+			{
+				if (dataBlock.lightKendoGrid)
+				{
+					dataBlock.lightKendoGrid.fitContainer();
+				}
+
+				if (dataBlock.nestedGridStacks)
+				{
+					dataBlock.nestedGridStacks.forEach(function(gridstack, i)
+					{
+						gridstack.dataBlocks.forEach(function(dataBlock)
+						{
+							if (dataBlock.lightKendoGrid)
+							{
+								dataBlock.lightKendoGrid.fitContainer();
+							}
+						});
+					});
+				}
+
+			});
+			this.fitContainerTimer = null;
+		}.bind(this), 50);
 	}
 
 	/**
