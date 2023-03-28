@@ -152,6 +152,11 @@
 		}
 		this.gridBlock.grid.select().each((i, item) =>
 		{
+			if ($(item).children("td")?.data()?.kendoField === "bulk_menu")
+			{
+				return;
+			}
+
 			let dataItem = JSON.parse(JSON.stringify(this.gridBlock.grid.dataItem(item)));
 			switch (operationType)
 			{

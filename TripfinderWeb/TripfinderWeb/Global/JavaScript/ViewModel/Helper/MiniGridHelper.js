@@ -62,7 +62,18 @@
 		var data = $grid.data();
 		var isFilter = data["showQuickFilter"] != undefined ? data["showQuickFilter"] : options.showQuickFilter;
 		$grid.data("showQuickFilter", isFilter); // RCM Show Quick Filter functionality need this data
-		return !!isFilter;
+		if (isFilter)
+		{
+			return {
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			}
+		}
+		else
+		{
+			return false;
+		}
 	};
 
 	/**

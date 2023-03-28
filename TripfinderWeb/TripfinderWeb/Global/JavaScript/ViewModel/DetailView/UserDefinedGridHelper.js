@@ -26,9 +26,9 @@
 
 		return [
 			{ DisplayName: "Created By", FieldName: "CreatedByUserName", Width: "120px", type: "string" },
-			{ DisplayName: "Created On", FieldName: "CreatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local },
+			{ DisplayName: "Created On", FieldName: "CreatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local, formatSummaryValue: utc2Local },
 			{ DisplayName: "Last Updated By", FieldName: "LastUpdatedByUserName", Width: "120px", type: "string" },
-			{ DisplayName: "Last Updated On", FieldName: "LastUpdatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local },
+			{ DisplayName: "Last Updated On", FieldName: "LastUpdatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local, formatSummaryValue: utc2Local },
 			{ DisplayName: "IP Address", FieldName: "IPAddress", Width: '100px', type: "string" },
 			{ DisplayName: "Host", FieldName: "Host", Width: '100px', type: "string" },
 			{ DisplayName: "User Agent", FieldName: "UserAgent", Width: '150px', type: "string" }
