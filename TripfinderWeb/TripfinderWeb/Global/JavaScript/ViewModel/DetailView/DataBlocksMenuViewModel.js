@@ -127,8 +127,8 @@
 
 	DataBlocksMenuViewModel.prototype.changeQuickFilterBar = function(viewModel, e)
 	{
-		var self = this,
-			gridBlock = $(self.target).closest(".grid-stack-item");
+		var self = this;
+		var gridBlock = $(self.target).closest(".grid-stack-item");
 		var filterBar = !gridBlock.data("showQuickFilter");
 		var lazyRebuildGrid = false;
 
@@ -139,12 +139,25 @@
 		}
 
 		var filter = lightKendoGrid.kendoGrid.dataSource.filter();
+		var isFilterableDisabled = lightKendoGrid.kendoGrid.options.filterable === false;
+
 		if (filter && !filterBar)
 		{
 			return tf.promiseBootbox.confirm(
 				{
 					message: "By unselecting this you will lose your saved filter selections. Do you wish to continue?",
-					title: "Confirmation"
+					title: "Confirmation",
+					buttons:
+					{
+						OK:
+						{
+							label: "Yes"
+						},
+						Cancel:
+						{
+							label: "No"
+						}
+					}
 				})
 				.then(function(result)
 				{
@@ -152,18 +165,30 @@
 					{
 						gridBlock.data("showQuickFilter", filterBar);
 						lightKendoGrid.kendoGrid.dataSource.filter({}, lazyRebuildGrid);
+
+						if (isFilterableDisabled)
+						{
+							self.rebuildDetailGrid(gridBlock);
+							return;
+						}
+
 						lightKendoGrid.rebuildGrid().then(() =>
 						{
 							lightKendoGrid._setQuickFilterBarStatus(filterBar);
 							self._updateLockedColumnVisibility(gridBlock);
 						});
-
 					}
 					return;
 				}.bind(self));
 		}
 
 		gridBlock.data("showQuickFilter", filterBar);
+		if (isFilterableDisabled)
+		{
+			self.rebuildDetailGrid(gridBlock);
+			return;
+		}
+
 		lightKendoGrid.rebuildGrid().then(() =>
 		{
 			lightKendoGrid._setQuickFilterBarStatus(filterBar);
@@ -311,6 +336,10 @@
 					lightKendoGrid._obSelectedColumns(editColumnViewModel.selectedColumns);
 					lightKendoGrid.removeHiddenColumnQuickFilter(editColumnViewModel.availableColumns);
 					gridBlock.data("columns", editColumnViewModel.selectedColumns);
+
+					let updatedGridDefinition = tf.helpers.miniGridHelper.getKendoColumnsExtend(editColumnViewModel.selectedColumns);
+					lightKendoGrid.options.gridDefinition = updatedGridDefinition;
+					lightKendoGrid.refreshGridColumnDefinition();
 					lightKendoGrid.rebuildGrid().then(() =>
 					{
 						var filterBar = gridBlock.data("showQuickFilter");

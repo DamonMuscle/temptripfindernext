@@ -253,6 +253,93 @@
 		return pathCombine.apply(null, arguments);
 	};
 
+	AuthManager.prototype.hasMergeDocumentAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		let securedMergeDocuments = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.mergeDocuments;
+		if (securedMergeDocuments != null && Array.isArray(securedMergeDocuments))
+		{
+			return securedMergeDocuments.some(item => item === type);
+		}
+		return false;
+	}
+
+	AuthManager.prototype.hasMergeEmailMessageAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		let securedMergeEmailMessages = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.mergeEmailMessages;
+		if (securedMergeEmailMessages != null && Array.isArray(securedMergeEmailMessages))
+		{
+			return securedMergeEmailMessages.some(item => item === type);
+		}
+		return false;
+	}
+
+		AuthManager.prototype.hasScheduledMergeDocumentAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		const securedScheduledMergeDocuments = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.scheduledMergeDocuments;
+		if (securedScheduledMergeDocuments != null && Array.isArray(securedScheduledMergeDocuments))
+		{
+			return securedScheduledMergeDocuments.some(item => item === type);
+		}
+		return false;
+	}
+
+	AuthManager.prototype.hasScheduledReportsAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		let securedScheduledReports = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.scheduledReports;
+		if (securedScheduledReports != null && Array.isArray(securedScheduledReports))
+		{
+			return securedScheduledReports.some(item => item === type);
+		}
+		return false;
+	}
+
+	AuthManager.prototype.hasMergeLibraryAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+
+		const securedMergeLibrary = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.mergeLibrary;
+		if (securedMergeLibrary != null && Array.isArray(securedMergeLibrary))
+		{
+			return securedMergeLibrary.some(item => item === type);
+		}
+
+		return false;
+	}
+
 	AuthManager.prototype.updateInfo = function()
 	{
 		this.clientKey = tf.storageManager.get("clientKey", true);

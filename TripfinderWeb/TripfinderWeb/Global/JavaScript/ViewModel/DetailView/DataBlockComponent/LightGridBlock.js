@@ -1971,7 +1971,7 @@
 
 			if (self.gridType == "route" && self.miniGridType == "trip")
 			{
-				let fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
+				let fieldName = LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
 				let editFieldList = self.fieldEditorHelper.editFieldList[fieldName];
 				if (editFieldList && editFieldList.value)
 				{
@@ -2627,7 +2627,7 @@
 			gridType: self.gridBlockType,
 			gridDefinition: self.miniGridHelper.getKendoColumnsExtend(columns),
 			isFieldTripInvoice: self.miniGridType === "fieldtripinvoice",
-			displayQuickFilterBar: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			filterable: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
 			lockColumnTemplate: self.miniGridHelper.getLockedColumnTemplate(self.$el, self.options),
 			gridLayout: summaryConfig,
 			defaultSort: self.options.sort,
@@ -2885,6 +2885,7 @@
 		{
 			self.pubSubSubscriptions.push(PubSub.subscribe("tripChange", function(key, result)
 			{
+				result?.tripIds && (self.includeIds = result.tripIds);
 				refreshGrid();
 			}));
 			self.initChangeTripColor();

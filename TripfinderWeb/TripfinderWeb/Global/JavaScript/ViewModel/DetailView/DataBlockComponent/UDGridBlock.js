@@ -591,7 +591,7 @@
 			resizable: !isDesignMode, // enable column resize if not design mode
 			reorderable: false, // disable column reorder.
 			canDragDelete: false, // disable drag delete.
-			displayQuickFilterBar: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
+			filterable: self.miniGridHelper.getFilterableConfig(self.$el, self.options),
 			lockColumnTemplate: self.miniGridHelper.getLockedColumnTemplate(self.$el, self.options),
 			gridLayout: summaryConfig,
 			url: pathCombine(tf.api.apiPrefix(), "search", "formResults"),
@@ -803,23 +803,39 @@
 
 	UDGridBlock.prototype.editClickEvent = function(e)
 	{
-		const $tr = $(e.target).closest("tr"),
-			kendoGrid = $tr.closest(".kendo-grid-container").data("kendoGrid"),
-			selectedRecord = kendoGrid.dataItem($tr[0]);
-		tf.udgHelper.isFormReadonly(this.options.UDGridId, selectedRecord, this.options.DataTypeId).then(readonly =>
+		const self = this;
+		const $tr = $(e.target).closest("tr");
+		const kendoGrid = $tr.closest(".kendo-grid-container").data("kendoGrid");
+		const formRecord = kendoGrid.dataItem($tr[0]);
+		const gridArg = { UDGridFields: self.options.UDGridFields };
+		const udGridRecordPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
+			{
+				paramData: {
+					"Id": formRecord.Id,
+					"@relationship": "DocumentUDGridRecords,MapUDGridRecords"
+				}
+			},
+			{ overlay: false }
+		);
+
+		udGridRecordPromise.then(res =>
 		{
-			if (window.location.href.indexOf("/newwindow/") >= 0)
+			const selectedRecord = tf.udgHelper.getFormRecord(tf.udgHelper.getGuidToNameMappingOfGridFields(gridArg), res.Items[0], self.options);
+			tf.udgHelper.isFormReadonly(this.options.UDGridId, selectedRecord, this.options.DataTypeId).then(readonly =>
 			{
-				readonly = true;
-			}
+				if (window.location.href.indexOf("/newwindow/") >= 0)
+				{
+					readonly = true;
+				}
 
-			//if main grid has no edit permission, the form should be readonly
-			if (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(this.options.DataTypeId) || "").toLowerCase(), "edit"))
-			{
-				readonly = true;
-			}
+				//if main grid has no edit permission, the form should be readonly
+				if (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(this.options.DataTypeId) || "").toLowerCase(), "edit"))
+				{
+					readonly = true;
+				}
 
-			readonly ? this.viewRecord(selectedRecord) : this.editRecord(selectedRecord);
+				readonly ? this.viewRecord(selectedRecord) : this.editRecord(selectedRecord);
+			});
 		});
 	}
 
@@ -975,7 +991,7 @@
 	{
 		const self = this;
 		const kendoGrid = self.grid;
-		if (!kendoGrid)
+		if (!kendoGrid || !kendoGrid.content)
 		{
 			return;
 		}
