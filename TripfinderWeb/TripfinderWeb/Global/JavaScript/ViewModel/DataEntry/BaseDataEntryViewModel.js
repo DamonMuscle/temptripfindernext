@@ -751,12 +751,20 @@
 					})
 					.then(function(data)
 					{
-						this.getTemplate(data, true);
+						this.saveTemplateRelationships(fieldTripTemplateEntity, data).then(()=>
+						{
+							this.getTemplate(data, true);
+						});
 					}.bind(this))
 					.catch(function(response)
 					{
 					}.bind(this))
 			}.bind(this));
+	};
+
+	BaseDataEntryViewModel.prototype.saveTemplateRelationships = function(fieldTripTemplateEntity, data)
+	{
+		return Promise.resolve();
 	};
 
 	BaseDataEntryViewModel.prototype.getSaveData = function()
