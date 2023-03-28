@@ -366,6 +366,12 @@
 		{
 			return value;
 		}
+
+		if (column.formatSummaryValue)
+		{
+			return column.formatSummaryValue(item);
+		}
+
 		if (column.type === "date" || column.type === "time" || column.type === "datetime")
 		{
 			let formartedValue = "";
