@@ -978,6 +978,7 @@
 					}
 					dataModel.templateName(item.Name);
 					dataModel.id(0);
+					this.obSelectedDestination(this.obDestinationDataModels().find(r=>r.Id == dataModel.fieldTripDestinationId()));
 					this.obEntityDataModel(dataModel);
 					this.obEntityDataModel().name(templateDataModel.fieldTripName());
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
@@ -1126,6 +1127,84 @@
 			return Promise.resolve();
 		}.bind(this));
 	}
+
+	FieldTripDataEntryViewModel.prototype.saveTemplateRelationships = function(fieldTripTemplateEntity, data)
+	{
+		fieldTripTemplateEntity.Id = data.Items[0].Id;
+		fieldTripTemplateEntity.DBID = data.Items[0].DBID;
+		return Promise.all([this.addFieldTripInvoiceTemplates(fieldTripTemplateEntity), this.attachFieldTripDocument(fieldTripTemplateEntity)]);
+	};
+
+	FieldTripDataEntryViewModel.prototype.addFieldTripInvoiceTemplates = function(fieldtripTemplate)
+	{
+		let invoices = fieldtripTemplate.FieldTripInvoices;
+
+		if (!invoices.length) return Promise.resolve();
+
+		return Promise.all(invoices.map(({ FieldTripAccountId, Amount }) => tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoicetemplates"), {
+			data: [{
+				FieldTripTemplateId: fieldtripTemplate.Id,
+				FieldTripAccountId,
+				Amount
+			}]
+		})));
+	};
+
+	FieldTripDataEntryViewModel.prototype.attachFieldTripDocument = function(fieldtripTemplate)
+	{
+		let self = this;
+		let documents = fieldtripTemplate.FieldTripDocuments;
+
+		if (!documents.length) return Promise.resolve();
+
+		let unsavedDocuments = documents.filter(r => !r.ObjectId);
+		let p;
+		if (unsavedDocuments.length > 0)
+		{
+			p =  tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("document")), {
+				data: unsavedDocuments
+			});
+		}
+		else
+		{
+			p = Promise.resolve();
+		}
+
+		return p.then(function(response)
+		{
+			let documentIds = response && response.Items && response.Items.map(x => x.Id) || [];
+			documentIds = documentIds.concat(documents.filter(r => r.ObjectId).map(r => r.Id));
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationships"), {
+				data: documentIds.map(function(id)
+				{
+					return {
+						DocumentID: id,
+						DBID: fieldtripTemplate.DBID,
+						AttachedToType: self.getDataTypeIdOfFieldTripTemplate(),
+						AttachedToID: fieldtripTemplate.Id
+					}
+				})
+			})
+		});
+	};
+
+	FieldTripDataEntryViewModel.prototype.getFileNameWithoutExtension = function(fullName)
+	{
+		var pattern = /\.{1}[a-z]{1,}$/;
+		if (pattern.exec(fullName) !== null)
+		{
+			return (fullName.slice(0, pattern.exec(fullName).index));
+		}
+		else
+		{
+			return fullName;
+		}
+	};
+
+	FieldTripDataEntryViewModel.prototype.getDataTypeIdOfFieldTripTemplate = function()
+	{
+		return tf.dataTypeHelper._getObjectByType("fieldtriptemplate").id;
+	};
 
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
