@@ -978,7 +978,7 @@
 					}
 					dataModel.templateName(item.Name);
 					dataModel.id(0);
-					this.obSelectedDestination(this.obDestinationDataModels().filter(r=>r.Id == dataModel.fieldTripDestinationId())[0]);
+					this.obSelectedDestination(this.obDestinationDataModels().find(r=>r.Id == dataModel.fieldTripDestinationId()));
 					this.obEntityDataModel(dataModel);
 					this.obEntityDataModel().name(templateDataModel.fieldTripName());
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
@@ -1131,74 +1131,60 @@
 	FieldTripDataEntryViewModel.prototype.saveTemplateRelationships = function(fieldTripTemplateEntity, data)
 	{
 		fieldTripTemplateEntity.Id = data.Items[0].Id;
-		return Promise.all([this.addFieldTripInvoiceTemplates(fieldTripTemplateEntity), attachFieldTripDocument(fieldTripTemplateEntity)]);
+		fieldTripTemplateEntity.DBID = data.Items[0].DBID;
+		return Promise.all([this.addFieldTripInvoiceTemplates(fieldTripTemplateEntity), this.attachFieldTripDocument(fieldTripTemplateEntity)]);
 	};
 
-	FieldTripDataEntryViewModel.prototype.addFieldTripInvoiceTemplates = function(fieldtriptemplate)
+	FieldTripDataEntryViewModel.prototype.addFieldTripInvoiceTemplates = function(fieldtripTemplate)
 	{
-		let invoices = fieldtriptemplate.FieldTripInvoices;
+		let invoices = fieldtripTemplate.FieldTripInvoices;
 
 		if (!invoices.length) return Promise.resolve();
 
 		return Promise.all(invoices.map(({ FieldTripAccountId, Amount }) => tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoicetemplates"), {
 			data: [{
-				FieldTripTemplateId: fieldtriptemplate.Id,
+				FieldTripTemplateId: fieldtripTemplate.Id,
 				FieldTripAccountId,
 				Amount
 			}]
 		})));
 	};
 
-	FieldTripDataEntryViewModel.prototype.attachFieldTripDocument = function(fieldtriptemplate)
+	FieldTripDataEntryViewModel.prototype.attachFieldTripDocument = function(fieldtripTemplate)
 	{
 		let self = this;
-		let documents = fieldtriptemplate.FieldTripDocuments;
+		let documents = fieldtripTemplate.FieldTripDocuments;
 
 		if (!documents.length) return Promise.resolve();
 
-		return Promise.all(documents.map(document =>
+		let unsavedDocuments = documents.filter(r => !r.ObjectId);
+		let p;
+		if (unsavedDocuments.length > 0)
 		{
-			let helper = new TF.UploadHelper({
-				maxFileByteSize: TF.DetailView.UploadDocumentHelper.maxFileByteSize,
-				acceptFileExtensions: TF.DetailView.UploadDocumentHelper.acceptFileExtensions,
+			p =  tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("document")), {
+				data: unsavedDocuments
 			});
-
-			var $fileSelector = helper.createFileSelector("document-file-selector");
-			helper.init($fileSelector);
-
-			helper.selectFile(document.originalFile);
-			return helper.upload().then(value => ({ tempFileName: value, ...document }));
-		})).then(function(values)
+		}
+		else
 		{
-			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("document")), {
-				data: values.map(d =>
+			p = Promise.resolve();
+		}
+
+		return p.then(function(response)
+		{
+			let documentIds = response && response.Items && response.Items.map(x => x.Id) || [];
+			documentIds = documentIds.concat(documents.filter(r => r.ObjectId).map(r => r.Id));
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationships"), {
+				data: documentIds.map(function(id)
 				{
 					return {
-						MimeType: d.originalFile.type,
-						FileName: d.originalFile.name,
-						FileSizeKB: (d.originalFile.size / 1024).toFixed(2),
-						Description: d.Description,
-						TempFileName: d.tempFileName,
-						Name: self.getFileNameWithoutExtension(d.originalFile.name),
-						DocumentClassificationID: d.classification.key
+						DocumentID: id,
+						DBID: fieldtripTemplate.DBID,
+						AttachedToType: self.getDataTypeIdOfFieldTripTemplate(),
+						AttachedToID: fieldtripTemplate.Id
 					}
 				})
-			}).then(function(response)
-			{
-				let documentIds = response && response.Items && response.Items.map(x => x.Id) || [];
-
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationships"), {
-					data: documentIds.map(function(id)
-					{
-						return {
-							DocumentID: id,
-							DBID: fieldtriptemplate.DBID,
-							AttachedToType: self.getDataTypeIdOfFieldTripTemplate(),
-							AttachedToID: fieldtriptemplate.Id
-						}
-					})
-				})
-			});
+			})
 		});
 	};
 
