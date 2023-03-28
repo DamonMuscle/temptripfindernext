@@ -443,7 +443,7 @@
 		})
 			.then(function()
 			{
-				if (!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable"))
+				if ((!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable")) && !this.options.isMiniGrid) 
 				{
 					tf.loadingIndicator.tryHide();
 					return Promise.resolve(false);
@@ -989,7 +989,7 @@
 			};
 		}
 
-		if (self.options.filterable === false)
+		if (self.options.disableQuickFilter === true || self.options.filterable === false)
 		{
 			kendoGridOption.filterable = false;
 		}
