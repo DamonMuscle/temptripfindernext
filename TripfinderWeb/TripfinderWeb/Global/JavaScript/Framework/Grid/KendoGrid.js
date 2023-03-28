@@ -231,11 +231,11 @@
 			{
 				if (result !== false)
 				{
-					this.createDragDelete();
+					this.options.canDragDelete && this.createDragDelete();
 					this.changeSortModel(); //bind the function of change sort model in column mouse down
 					this.resizableBinding();
 					this.lockUnlockColumn();
-					this.initDragHeadEvent();
+					this.options.reorderable && this.initDragHeadEvent();
 					this.initQuickFilterBar();
 
 					this.createDropDocument();
