@@ -187,9 +187,18 @@
 		return tf.datasourceManager.databaseId + ".grid." + gridType + ".map.thematic";
 	};
 
+	StorageManager.prototype.removeCookie = expireCookie;
+	StorageManager.prototype.checkDomain = CheckDomain;
+	StorageManager.prototype.getCookie = getCookie;
+
+	StorageManager.prototype.hasCookie = function(name)
+	{
+		return document.cookie.split(";").some((x) => x.trim().startsWith(`${name}=`));
+	};
+
 	function expireCookie(name)
-	{ 
-		document.cookie = name + "=;Expires="+ new Date() +";path=/;domain=."+ GetDomain();
+	{
+		document.cookie = `${name}=;path=/;domain=.${GetDomain()};Max-Age=0`;
 	}
 
 	function CheckDomain() {
