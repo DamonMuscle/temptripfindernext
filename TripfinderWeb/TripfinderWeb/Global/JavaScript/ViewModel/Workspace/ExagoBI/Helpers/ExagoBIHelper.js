@@ -54,8 +54,6 @@
 			Id: null
 		};
 
-		$.get(self._exagoAdminPageUrl);	// Try accessing Exago Admin page for warming up
-
 		return self.initExagoReportContext(null)
 			.then(function(ctxData)
 			{
