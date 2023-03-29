@@ -356,13 +356,13 @@
 
 	KendoGridSummaryGrid.prototype.getFormatedValue = function(column, item, operator)
 	{
-		var value = $.isArray(item) ? item[0] : item;
+		let value = $.isArray(item) ? item[0] : item;
 		if (!column || !column.format)
 		{
 			return value;
 		}
 
-		if (operator === 'Count' || operator === 'DistinctCount')
+		if (["Count", "DistinctCount"].includes(operator))
 		{
 			return value;
 		}
@@ -372,20 +372,29 @@
 			return column.formatSummaryValue(item);
 		}
 
-		if (column.type === "date" || column.type === "time" || column.type === "datetime")
+		if (["date", "time", "datetime"].includes(column.type))
 		{
-			let formartedValue = "";
+			if (column.isUTC)
+			{
+				let dt = utcToClientTimeZone(value);
+				value = dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : value;
+			}
+
+			let momentValue = moment(value);
+			let validDateValue = value;
 			if (column.type === "time")
 			{
-				value = `${moment().format("YYYY-MM-DD")} ${value}`;
+				validDateValue = convertToMoment(value);
+				momentValue = moment(validDateValue);
 			}
-			var momentValue = moment(value);
-			if (momentValue.isValid() === true)
+
+			if (value !== 0 && new Date(validDateValue) != 'Invalid Date' && momentValue.isValid() === true && validDateValue !== 0)
 			{
 				value = momentValue.toDate();
-				formartedValue = kendo.format(column.format, value);
+				return kendo.format(column.format, value);
 			}
-			return formartedValue
+
+			return "";
 		}
 
 		value = tf.measurementUnitConverter.aggregateConvert(value, operator, column);
