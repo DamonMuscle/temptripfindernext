@@ -53,8 +53,7 @@
 		prefix = prefix.split('.')[0];
 
 		var password = tf.entStorageManager.get("password");
-		this.logOffWithoutRefresh()
-			.then(function()
+		return this.logOffWithoutRefresh().then(function()
 			{
 				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 					data: {
@@ -70,11 +69,6 @@
 					}
 
 					tf.chatfinderHelper && tf.chatfinderHelper.stop();
-
-					setTimeout(function()
-					{
-						location.reload();
-					});
 				});
 			});
 	};

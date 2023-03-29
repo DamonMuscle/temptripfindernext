@@ -513,21 +513,24 @@
 
 	PageManager.prototype.logout = function(flag)
 	{
-		tf.authManager.logOff();
-		location.reload();
-		var rememberMe = tf.storageManager.get("rememberMe", true) || false;
-		if (!rememberMe)
+		tf.authManager.logOff().then(function()
 		{
-			if (flag)
+			const rememberMe = tf.storageManager.get("rememberMe", true) || false;
+			if (!rememberMe)
 			{
-				tf.entStorageManager.save("clientKey", "");
-				tf.entStorageManager.save("userName", "");
-				tf.entStorageManager.save("password", "");
+				if (flag)
+				{
+					tf.entStorageManager.save("clientKey", "");
+					tf.entStorageManager.save("userName", "");
+					tf.entStorageManager.save("password", "");
+				}
+				tf.storageManager.save("clientKey", "", true);
+				tf.storageManager.save("userName", "", true);
+				tf.storageManager.save("password", "", true);
 			}
-			tf.storageManager.save("clientKey", "", true);
-			tf.storageManager.save("userName", "", true);
-			tf.storageManager.save("password", "", true);
-		}
+
+			location.reload();
+		});
 	};
 
 	PageManager.prototype.showContextMenu = function(model, event)
