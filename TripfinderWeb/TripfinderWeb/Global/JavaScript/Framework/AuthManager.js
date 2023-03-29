@@ -19,8 +19,52 @@
 		form: "formsResults"
 	}
 
+	
+	/**
+	 * Restore userName, password and rememberMe from cookie to local storage, so that we can retain previous behavior.
+	 * 
+	 * Plus(serviceplus01.transfinder.com) and Enterprise Login(servicepluslogin.transfinder.com) have different domains.
+	 * Cookie could be shared between Plus and Enterprise Login by setting cookie's domain, however local storage cann't.
+	 * Refer to StorageManager.js (allowCookieList = ["ent.token", "ent.clientKey", "ent.isLoggedin", "ent.stopfinderToken"])
+	 * ent.userName and ent.password are not in the cookie allowed list.
+	 */
+	function restoreInfo()
+	{
+		if (tf.storageManager.checkDomain())
+		{
+			const userKey = "ent.userName",
+				passwordKey = "ent.password",
+				userName = tf.storageManager.getCookie(userKey),
+				password = tf.storageManager.getCookie(passwordKey);
+
+			if (userName)
+			{
+				localStorage.setItem(userKey, userName);
+				tf.storageManager.removeCookie(userKey);
+			}
+			if (password)
+			{
+				localStorage.setItem(passwordKey, password);
+				tf.storageManager.removeCookie(passwordKey);
+			}
+		}
+
+		const rememberMeKey = `${tf.storageManager.prefix}rememberMe`;
+		if (tf.storageManager.hasCookie(rememberMeKey))
+		{
+			/**
+			 * The existence of this cookie(rememberMe) means that user comes from Enterprise Login,
+			 * and we only take care of this scenario.
+			 */
+			const rememberMe = tf.storageManager.getCookie(rememberMeKey);
+			tf.storageManager.removeCookie(rememberMeKey);
+			tf.storageManager.save("rememberMe", !!rememberMe, true);
+		}
+	}
+
 	function AuthManager()
 	{
+		restoreInfo();
 		this.clientKey = null;
 		this.userName = null;
 		this.password = null;
@@ -30,8 +74,8 @@
 
 		this.obIsLogIn = ko.observable(false);
 		var clientKey = tf.entStorageManager.get("clientKey", true) || tf.storageManager.get("clientKey");
-		var username = tf.storageManager.get("userName", true);
-		var password = tf.storageManager.get("password", true);
+		var username = tf.entStorageManager.get("userName", true) || tf.storageManager.get("userName", true);
+		var password = tf.entStorageManager.get("password", true) || tf.storageManager.get("password", true);
 		this.token = tf.entStorageManager.get("token");
 		var isLoggedin = typeof (tf.entStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.entStorageManager.get("isLoggedin"));
 		this.clientKey = clientKey;
