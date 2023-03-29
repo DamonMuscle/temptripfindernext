@@ -1214,7 +1214,7 @@
 			kendoGrid = $grid.data("kendoGrid"),
 			documentEntity = kendoGrid.dataItem($tr),
 			documentId = documentEntity.Id,
-			gridName = tf.dataTypeHelper.getDisplayNameByDataType(self.gridType).toLowerCase();
+			gridName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType).toLowerCase();
 
 		var WarningMessage = "Are you sure you want to disassociate this " + gridName + " from \"" + documentEntity.Name + "\"?"
 		if (self.gridBlockType = "DocumentGrid")
@@ -1820,7 +1820,7 @@
 			{
 				return !!c;
 			});
-		}  else
+		} else
 		{
 			columns = self.getGridColumnsFromAllColumnsByType(allColumns, gridType)
 				.map(function(c)
