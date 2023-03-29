@@ -94,7 +94,7 @@
 			{
 				return that._value;
 			}
-			if (that._old !== value)
+			if (that._old !== value || value === null)
 			{
 				that._old = that._value;
 				that._value = value;
