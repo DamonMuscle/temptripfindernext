@@ -3204,7 +3204,7 @@
 													url = this.options.setRequestURL(url);
 												}
 
-												tf.ajax["post"](pathCombine(url, "aggregate"), options, { overlay: false });
+												!this.options.disableAutoComplete && this.postRequestData(pathCombine(url, "aggregate"), options);
 											}
 											else if (this._gridType === "busfinderhistorical")
 											{
@@ -3214,11 +3214,11 @@
 												var options = this.getApiRequestOption(kendoOption);
 												options.data.fields = [column.field];
 
-												tf.ajax["post"](url, options, { overlay: false });
+												this.postRequestData(url, options);
 											}
 											else
 											{
-												tf.ajax["post"](this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption), { overlay: false });
+												this.postRequestData(this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption));
 											}
 										}.bind(this)
 									}
@@ -3507,6 +3507,23 @@
 		}
 		return value > allowRange ? '1 ~ ' + allowRange : null;
 
+	}
+
+	LightKendoGrid.prototype.postRequestData = function(url, requestOption)
+	{
+		let promise;
+		if (this.options.getAsyncRequestOption)
+		{
+			promise = this.options.getAsyncRequestOption(requestOption);
+		}
+		else
+		{
+			promise = Promise.resolve(requestOption);
+		}
+		promise.then(response =>
+		{
+			tf.ajax["post"](url, response, { overlay: false });
+		})
 	}
 
 	LightKendoGrid.prototype.getKendoColumnsExtend = function(currentColumns, defalultColumnWidth)
