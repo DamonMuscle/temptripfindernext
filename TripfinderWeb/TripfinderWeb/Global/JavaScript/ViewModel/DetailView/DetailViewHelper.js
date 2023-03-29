@@ -418,7 +418,7 @@
 	DetailViewHelper.prototype.getDataPointByIdentifierAndGrid = function(identifier, gridType, includeEntityKey)
 	{
 		var key = typeof identifier === "number" ? "UDFId" : "field",
-			udfDataPoints = gridType? (dataPointsJSON[gridType]["User Defined"] || []) : [],
+			udfDataPoints = gridType ? (dataPointsJSON[gridType]["User Defined"] || []) : [],
 			generalPoints = _.flatMap(dataPointsJSON[gridType]).filter(function(p)
 			{
 				return !udfDataPoints.includes(p);
@@ -1135,7 +1135,7 @@
 			content = content.replace('\n', '');
 		}
 
-		if (["Phone","Fax"].includes(format))
+		if (["Phone", "Fax"].includes(format))
 		{
 			content = tf.dataFormatHelper.phoneFormatter(content);
 		}
@@ -1400,9 +1400,9 @@
 				const isSingle = missingFields.length === 1;
 				const suffix = isSingle ? "" : "s";
 				const link = isSingle ? "is" : "are";
-				const fieldLabels = missingFields.map(field => `"${ field.dataPointTitle }"`).join(", ");
+				const fieldLabels = missingFields.map(field => `"${field.dataPointTitle}"`).join(", ");
 
-				blameMessage = `required field${ suffix } ${ fieldLabels } ${ link } missing`;
+				blameMessage = `required field${suffix} ${fieldLabels} ${link} missing`;
 			}
 		}
 
@@ -1410,7 +1410,7 @@
 		{
 			const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(dataType);
 
-			errorMessage = `Cannot create a new ${ dataTypeName } with current layout, because ${ blameMessage }!`;
+			errorMessage = `Cannot create a new ${dataTypeName} with current layout, because ${blameMessage}!`;
 		}
 
 		return errorMessage;
@@ -1425,13 +1425,13 @@
 	DetailViewHelper.prototype.getQuickAddLayoutByType = function(type)
 	{
 		let self = this, getLayoutPromise = null, errMsg = "";
-		const storageKey = `grid.detailscreenlayoutid.${ type }.quickadd`;
+		const storageKey = `grid.detailscreenlayoutid.${type}.quickadd`;
 		const quickAddLayoutId = tf.storageManager.get(storageKey);
 
 		if (quickAddLayoutId)
 		{
 			getLayoutPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"),
-				{ paramData: { "@filter": `eq(Id,${ quickAddLayoutId })` } })
+				{ paramData: { "@filter": `eq(Id,${quickAddLayoutId})` } })
 				.then(res => res && res.Items[0]);
 		}
 
@@ -1441,7 +1441,7 @@
 				if (!layout)
 				{
 					const typeName = tf.dataTypeHelper.getFormalDataTypeName(type);
-					errMsg = `No quick-add layout available for ${ typeName }, please select one first!`;
+					errMsg = `No quick-add layout available for ${typeName}, please select one first!`;
 					return tf.promiseBootbox.alert(errMsg)
 						.then(() =>
 						{
@@ -1881,7 +1881,7 @@
 				databaseId: tf.datasourceManager.databaseId
 			};
 
-			tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getAssociationEndpoint(associateRecordType)), {
+			return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.DataTypeHelper.getAssociationEndpoint(associateRecordType)), {
 				paramData: paramData,
 				data: associations
 			});
@@ -1890,7 +1890,7 @@
 			relationshipType = "DocumentRelationship";
 			path = "/DocumentRelationships";
 
-			tf.promiseAjax.patch(tf.DataTypeHelper.getApiPrefix(mainRecordType), {
+			return tf.promiseAjax.patch(tf.DataTypeHelper.getApiPrefix(mainRecordType), {
 				data: [{
 					Id: mainRecordId,
 					"op": "relationship",

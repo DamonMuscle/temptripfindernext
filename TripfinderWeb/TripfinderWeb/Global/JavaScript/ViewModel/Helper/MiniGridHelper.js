@@ -32,7 +32,7 @@
 	MiniGridHelper.prototype.updateGridFooter = function($grid, filterCount, totalCount)
 	{
 		let pageFooter = $grid.find(".k-pager-wrap");
-		let footerInfo = pageFooter.find(".pageInfo");
+		let footerInfo = pageFooter.find(".pageInfoMini");
 		let content = filterCount + " of " + totalCount;
 
 		if (footerInfo.length > 0)
@@ -41,7 +41,7 @@
 		}
 		else
 		{
-			pageFooter.append($("<div class='pageInfo'>" + content + "</div>"));
+			pageFooter.append($("<div class='pageInfoMini'>" + content + "</div>"));
 		}
 	};
 
