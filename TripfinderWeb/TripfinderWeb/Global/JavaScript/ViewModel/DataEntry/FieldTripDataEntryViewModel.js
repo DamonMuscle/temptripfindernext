@@ -1141,50 +1141,39 @@
 
 		if (!invoices.length) return Promise.resolve();
 
-		return Promise.all(invoices.map(({ FieldTripAccountId, Amount }) => tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoicetemplates"), {
-			data: [{
-				FieldTripTemplateId: fieldtripTemplate.Id,
-				FieldTripAccountId,
-				Amount
-			}]
-		})));
+		let data = invoices.map(r =>
+			{ 
+				return { 
+					"FieldTripTemplateId": fieldtripTemplate.Id,
+					"FieldTripAccountId": r.FieldTripAccountId,
+					"Amount": r.Amount 
+				} 
+			});
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoicetemplates"), {data: data});
 	};
 
 	FieldTripDataEntryViewModel.prototype.attachFieldTripDocument = function(fieldtripTemplate)
 	{
 		let self = this;
-		let documents = fieldtripTemplate.FieldTripDocuments;
-
-		if (!documents.length) return Promise.resolve();
-
-		let unsavedDocuments = documents.filter(r => !r.ObjectId);
-		let p;
-		if (unsavedDocuments.length > 0)
+		return self.uploadDocuments().then(result=>
 		{
-			p =  tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("document")), {
-				data: unsavedDocuments
-			});
-		}
-		else
-		{
-			p = Promise.resolve();
-		}
-
-		return p.then(function(response)
-		{
-			let documentIds = response && response.Items && response.Items.map(x => x.Id) || [];
-			documentIds = documentIds.concat(documents.filter(r => r.ObjectId).map(r => r.Id));
-			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationships"), {
-				data: documentIds.map(function(id)
-				{
-					return {
-						DocumentID: id,
-						DBID: fieldtripTemplate.DBID,
-						AttachedToType: self.getDataTypeIdOfFieldTripTemplate(),
-						AttachedToID: fieldtripTemplate.Id
-					}
+			self.generateDocumentRelationships(result.Items);
+			return self.updateDocuments().then((updateResult)=>
+			{
+				let documents = ((Array.isArray(result) ? result : result.Items) || []).concat((Array.isArray(updateResult) ? updateResult : updateResult.Items) || []);
+				self.obDocumentGridDataSource(documents);
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationships"), {
+					data: self.obDocumentRelationshipSource().map(r =>
+					{
+						return {
+							DocumentID: r.DocumentID,
+							DBID: fieldtripTemplate.DBID,
+							AttachedToType: self.getDataTypeIdOfFieldTripTemplate(),
+							AttachedToID: fieldtripTemplate.Id
+						}
+					})
 				})
-			})
+			});
 		});
 	};
 
