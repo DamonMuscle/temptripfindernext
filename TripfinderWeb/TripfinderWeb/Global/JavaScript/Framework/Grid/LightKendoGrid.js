@@ -3005,7 +3005,6 @@
 										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
 										let operatorName = self.getOpetatorName(filter.operator);
 										$filterItem.find("span.date-number").show(); // show the input
-										//$filterItem.find("input.date-number").val(filter.value);
 										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").setOptions({
 											format: operatorName.replace("X", "0")
 										});
