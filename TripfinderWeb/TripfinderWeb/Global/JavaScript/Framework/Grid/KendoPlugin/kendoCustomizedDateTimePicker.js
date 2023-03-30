@@ -120,6 +120,8 @@
 					var format = "MM/dd/yyyy hh:mm tt";
 					var timeOut = that.options.init === true ? 0 : 500;
 					that.options.init = true;
+
+					// The settimeout is to fix the delay in modifying control values when components are first loaded. Will be removed if there are better solution.
 					setTimeout(() =>
 					{
 						operatorName && that.inputElement.val(operatorName + kendo.format("{0:" + format + "}", moment(value).toDate()));

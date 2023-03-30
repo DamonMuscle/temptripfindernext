@@ -1430,6 +1430,8 @@
 			const operator = kendoFilterCellDomain.viewModel.operator;
 			const operatorName = hackDomain.getOpetatorName(operator);
 			const columnType = currentlyColumn.type;
+
+			// This settimeout is desined to make sure that the value is setted to field correctly. So the time is 0. Will be removed if there is better solution.
 			setTimeout(() =>
 			{
 				if (isDateTimeNonParam)
@@ -1526,14 +1528,14 @@
 
 	LightKendoGrid.prototype.setKendoDateTimeDateParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
 	{
-		let inputCell = $filterCell.find('input[type=text]:first');
-		let inputCellVale = inputCell.val();
-		let preprendStr = displayVal.replace("X", '');
+		const inputCell = $filterCell.find('input[type=text]:first');
+		const inputCellVale = inputCell.val();
+		const preprendStr = displayVal.replace("X", '');
 
 		if (inputCellVale && inputCellVale !== '' && !inputCell.attr("reloadfilter"))
 		{
 			// add reloadfilter for avoding reloade the data 
-			let valueArr = inputCellVale.split(preprendStr);
+			const valueArr = inputCellVale.split(preprendStr);
 			if (valueArr.length === 1)
 			{
 				displayVal = displayVal.replace("X", inputCellVale);
@@ -3488,6 +3490,7 @@
 										{
 											operatorName = operatorName.replace("X", "");
 										}
+										// This settimeout is designed to make sure value is setted correctly. Will be removed if there is better solution.
 										setTimeout(() =>
 										{
 											$(args.element).val(operatorName + cellValue);
