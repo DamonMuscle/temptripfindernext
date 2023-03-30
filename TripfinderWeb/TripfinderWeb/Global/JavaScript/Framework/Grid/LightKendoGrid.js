@@ -626,8 +626,6 @@
 		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator)
 	};
 
-	LightKendoGrid.OperatorWithDateTime = jQuery.extend(true, {}, LightKendoGrid.OperatorWithDateTime);
-
 	LightKendoGrid.DefaultDateOperator = jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator);
 	delete LightKendoGrid.DefaultDateOperator.lastxhours;
 	delete LightKendoGrid.DefaultDateOperator.nextxhours;
@@ -636,7 +634,6 @@
 		string: jQuery.extend(true, {}, LightKendoGrid.DefaultDateOperator),
 		date: jQuery.extend(true, {}, LightKendoGrid.DefaultDateOperator)
 	};
-	LightKendoGrid.OperatorWithDate = jQuery.extend(true, {}, LightKendoGrid.OperatorWithDate);
 
 	LightKendoGrid.OperatorWithList = {
 		string: {
