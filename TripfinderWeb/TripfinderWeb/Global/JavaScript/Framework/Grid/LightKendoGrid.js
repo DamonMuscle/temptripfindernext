@@ -1421,16 +1421,27 @@
 			return;
 
 		// handle date special filter
-		if (TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator)) 
+		const isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
+		const isDateTimeDateParam = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
+		if (isDateTimeNonParam || isDateTimeDateParam) 
 		{
-			let kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
-			let currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
-			let operator = kendoFilterCellDomain.viewModel.operator;
-			let operatorName = hackDomain.getOpetatorName(operator);
-			let columnType = currentlyColumn[0].type;
+			const kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
+			const currentlyColumn = hackDomain.options.gridDefinition.Columns.find(function(column) { return column.FieldName === kendoFilterCellDomainField; });
+			const operator = kendoFilterCellDomain.viewModel.operator;
+			const operatorName = hackDomain.getOpetatorName(operator);
+			const columnType = currentlyColumn.type;
+
+			// This settimeout is desined to make sure that the value is setted to field correctly. So the time is 0. Will be removed if there is better solution.
 			setTimeout(() =>
 			{
-				hackDomain.setKendoDateFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
+				if (isDateTimeNonParam)
+				{
+					hackDomain.setKendoDateTimeNonParamFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
+				}
+				else
+				{
+					hackDomain.setKendoDateTimeDateParamFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
+				}
 			})
 			return;
 		}
@@ -1515,7 +1526,27 @@
 		}
 	};
 
-	LightKendoGrid.prototype.setKendoFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	LightKendoGrid.prototype.setKendoDateTimeDateParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	{
+		const inputCell = $filterCell.find('input[type=text]:first');
+		const inputCellVale = inputCell.val();
+		const preprendStr = displayVal.replace("X", '');
+
+		if (inputCellVale && inputCellVale !== '' && !inputCell.attr("reloadfilter"))
+		{
+			// add reloadfilter for avoding reloade the data 
+			const valueArr = inputCellVale.split(preprendStr);
+			if (valueArr.length === 1)
+			{
+				displayVal = displayVal.replace("X", inputCellVale);
+				inputCell.attr('title', displayVal);
+				inputCell.val(displayVal);
+				inputCell.attr("reloadfilter", "true");
+			}
+		}
+	};
+
+	LightKendoGrid.prototype.setKendoDateTimeNonParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
 	{
 		$filterCell.find('input[type=text]').attr('title', displayVal);
 		if (filterType === 'listFilter' ||
@@ -2695,6 +2726,11 @@
 								{
 									filterCellType = 'empty';
 								}
+								else if (TF.FilterHelper.dateTimeDateParamFiltersNames.indexOf(filter) > -1) 
+								{
+									// for avoid the flash the grid
+									filterDateCellInput.attr('reloadfilter', true);
+								}
 							}
 							self.hideAndClearSpecialFilterBtn.bind(self)(e, filterCellType);
 						});
@@ -3424,6 +3460,44 @@
 							});
 							var datePicker = args.element.data("kendoDatePicker");
 							var dateHelper = new TF.DateBoxHelper(datePicker);
+							args.element.on("focus", (e) =>
+							{
+								// for recover the raw date value string
+								let datePicker = args.element.data("kendoDatePicker");
+								let span = $(args.element[0].parentElement).parent().parent();
+								let operator = span.find("input.k-dropdown-operator").val();
+								if (TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(operator))
+								{
+									let oldText = datePicker._oldText;
+									if (oldText)
+									{
+										$(args.element).val(oldText);
+									}
+								}
+							});
+							args.element.on("blur", (e) =>
+							{
+								// for setting the "ON","On or After", "On or Before" label for date filter cell
+								let cellValue = $(args.element).val();
+								let span = $(args.element[0].parentElement).parent().parent();
+								let operator = span.find("input.k-dropdown-operator").val();
+								if (TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(operator))
+								{
+									if (cellValue && cellValue !== '')
+									{
+										let operatorName = span.find('input.k-dropdown-operator').attr("aria-label");
+										if (operatorName)
+										{
+											operatorName = operatorName.replace("X", "");
+										}
+										// This settimeout is designed to make sure value is setted correctly. Will be removed if there is better solution.
+										setTimeout(() =>
+										{
+											$(args.element).val(operatorName + cellValue);
+										});
+									}
+								}
+							});
 							datePicker.dateView.popup.options.origin = "bottom right";
 							datePicker.dateView.popup.options.position = "top right";
 							dateHelper.trigger = function()
