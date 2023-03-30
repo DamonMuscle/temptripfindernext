@@ -1287,29 +1287,6 @@
 		)
 			return;
 
-		let isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
-		let isDateTimeDateParam = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
-		if (isDateTimeNonParam || isDateTimeDateParam) 
-		{
-			let kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
-			let currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
-			let operator = kendoFilterCellDomain.viewModel.operator;
-			let operatorName = hackDomain.getOpetatorName(operator);
-			let columnType = currentlyColumn[0].type;
-			setTimeout(() =>
-			{
-				if (isDateTimeNonParam)
-				{
-					hackDomain.setKendoDateTimeNonParamFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
-				}
-				else
-				{
-					hackDomain.setKendoDateTimeDateParamFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
-				}
-			})
-			return;
-		}
-
 		var isCustomFilter = kendoFilterCellDomain.wrapper.find('input').hasClass('k-filter-custom-input');
 		if (!isCustomFilter)
 			return;
@@ -1444,15 +1421,15 @@
 			return;
 
 		// handle date special filter
-		let isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
-		let isDateTimeDateParam = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
+		const isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
+		const isDateTimeDateParam = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
 		if (isDateTimeNonParam || isDateTimeDateParam) 
 		{
-			let kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
-			let currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
-			let operator = kendoFilterCellDomain.viewModel.operator;
-			let operatorName = hackDomain.getOpetatorName(operator);
-			let columnType = currentlyColumn[0].type;
+			const kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
+			const currentlyColumn = hackDomain.options.gridDefinition.Columns.find(function(column) { return column.FieldName === kendoFilterCellDomainField; });
+			const operator = kendoFilterCellDomain.viewModel.operator;
+			const operatorName = hackDomain.getOpetatorName(operator);
+			const columnType = currentlyColumn.type;
 			setTimeout(() =>
 			{
 				if (isDateTimeNonParam)
