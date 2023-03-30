@@ -580,6 +580,14 @@
 	LightKendoGrid.DefaultOperator = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.DefaultOperator);
 
 	LightKendoGrid.DefaultDateTimeOperator = {
+		eq: "Equal To",
+		neq: "Not Equal To",
+		isempty: "Empty",
+		isnotempty: "Not Empty",
+		lt: "Less Than",
+		lte: "Less Than or Equal To",
+		gt: "Greater Than",
+		gte: "Greater Than or Equal To",
 		all: 'All',
 		lastmonth: 'Last Month',
 		lastweek: 'Last Week',
@@ -618,7 +626,7 @@
 		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator)
 	};
 
-	LightKendoGrid.OperatorWithDateTime = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.OperatorWithDateTime);
+	LightKendoGrid.OperatorWithDateTime = jQuery.extend(true, {}, LightKendoGrid.OperatorWithDateTime);
 
 	LightKendoGrid.DefaultDateOperator = jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator);
 	delete LightKendoGrid.DefaultDateOperator.lastxhours;
@@ -628,7 +636,7 @@
 		string: jQuery.extend(true, {}, LightKendoGrid.DefaultDateOperator),
 		date: jQuery.extend(true, {}, LightKendoGrid.DefaultDateOperator)
 	};
-	LightKendoGrid.OperatorWithDate = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.OperatorWithDate);
+	LightKendoGrid.OperatorWithDate = jQuery.extend(true, {}, LightKendoGrid.OperatorWithDate);
 
 	LightKendoGrid.OperatorWithList = {
 		string: {
@@ -649,6 +657,23 @@
 		}
 	};
 	LightKendoGrid.OperatorWithList = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.OperatorWithList);
+
+	LightKendoGrid.DefaultNumberOperator = {
+		eq: "Equal To",
+		neq: "Not Equal To",
+		isempty: "Empty",
+		isnotempty: "Not Empty",
+		lt: "Less Than",
+		lte: "Less Than or Equal To",
+		gt: "Greater Than",
+		gte: "Greater Than or Equal To",
+		custom: 'Custom'
+	};
+
+	LightKendoGrid.OperatorWithNumber = {
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator),
+		number: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator)
+	};
 
 	LightKendoGrid.Operator2DisplayValue = {
 		eq: "Equal To",
@@ -1398,6 +1423,24 @@
 		)
 			return;
 
+		// handle date special filter
+		if (TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator)) 
+		{
+			let kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
+			let currentlyColumn = hackDomain.options.gridDefinition.Columns.filter(function(column) { return column.FieldName === kendoFilterCellDomainField; });
+			let operator = kendoFilterCellDomain.viewModel.operator;
+			let operatorName = hackDomain.getOpetatorName(operator);
+			let columnType = currentlyColumn[0].type;
+			setTimeout(() =>
+			{
+				hackDomain.setKendoDateFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
+			})
+			return;
+		} else if (TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator))
+		{
+			//todo date param
+		}
+
 		var isCustomFilter = kendoFilterCellDomain.wrapper.find('input').hasClass('k-filter-custom-input');
 
 		if (!isCustomFilter)
@@ -1484,6 +1527,13 @@
 		if (filterType === 'listFilter' ||
 			filterType === 'customFilter')
 			$filterCell.find('input[type=text]').val(displayVal);
+	};
+
+	LightKendoGrid.prototype.setKendoDateFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	{
+		let inputCell = $filterCell.find('input[type=text]:first');
+		inputCell.attr('title', displayVal);
+		inputCell.val(displayVal);
 	};
 
 	LightKendoGrid.prototype._buildCustomFilterCellDisplayVal = function(filterLeft, filterRight, logic, columnType)
@@ -2600,16 +2650,29 @@
 								filterCellType = 'default',
 								filterType = field[0] ? field[0].type : '',
 								filter = $(e.currentTarget).text();
+
+							var numberFilterCell = $(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox");
+
 							if (filterType === 'datetime') // handle the datetime filter cell
 							{
-								$(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox").value(null);
-								self.handleDatetimeFilter(e);
 								let filterDateTimeCell = input.closest('span.k-filtercell');
-								filterDateTimeCell.find(".datepickerinput").data("dateTimeNonParam", false);
+								let $inputElement = filterDateTimeCell.find(".datepickerinput.k-input");
+								numberFilterCell.value(null);
+								self.handleDatetimeFilter(e);
+								numberFilterCell.setOptions({
+									format: "{0:0}"
+								});
+								if (TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1)
+								{
+									numberFilterCell.setOptions({
+										format: filter.replace("X", "0")
+									});
+								}
+								$inputElement.data("dateTimeNonParam", false);
 								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
 								{
 									filterCellType = 'empty';
-									filterDateTimeCell.find(".datepickerinput").data("dateTimeNonParam", true);
+									$inputElement.data("dateTimeNonParam", true);
 								}
 							} else if (filterType === 'date') // date has differen cell struct with datetime
 							{
@@ -2618,7 +2681,22 @@
 								let filterDateCell = input.closest('span.k-filtercell');
 								let dateTimeNonParamValue = TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1 ||
 									TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1;
-								filterDateCell.find(".k-datepicker .k-input").data("dateTimeNonParam", dateTimeNonParamValue);
+								let filterDateCellInput = filterDateCell.find(".k-datepicker .k-input");
+								numberFilterCell.value(null);
+								self.handleDateFilter(e);
+
+								numberFilterCell.setOptions({
+									format: "{0:0}"
+								});
+
+								if (TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1)
+								{
+									numberFilterCell.setOptions({
+										format: filter.replace("X", "0")
+									});
+								}
+
+								filterDateCellInput.data("dateTimeNonParam", dateTimeNonParamValue);
 								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
 								{
 									filterCellType = 'empty';
@@ -2650,11 +2728,11 @@
 				var $filterCellInner = $filterCell.find('> span');
 
 				var input = $filterCell.find("input[type=text]");
+				let isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(this.text()) > -1;
 				TF.FilterHelper.clearFilterCellInput(input);
 				//remove display css for clear button
 				TF.CustomFilterHelper.removeCustomFilterEllipsisClass(input);
-				if (isSpecialFilterType(input) ||
-					TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(this.text()) > -1)  //User should not type in values when "empty" or "not empty" filters are applied
+				if (isSpecialFilterType(input) || isDateTimeNonParam)  //User should not type in values when "empty" or "not empty" filters are applied
 				{
 					TF.FilterHelper.disableFilterCellInput(input);
 					$filterCellInner.addClass("hide-cross-button");
@@ -2931,8 +3009,12 @@
 									if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(filter.operator) > -1)
 									{
 										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
+										let operatorName = self.getOpetatorName(filter.operator);
 										$filterItem.find("span.date-number").show(); // show the input
-										$filterItem.find("input.date-number").val(filter.value);
+										//$filterItem.find("input.date-number").val(filter.value);
+										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").setOptions({
+											format: operatorName.replace("X", "0")
+										});
 										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").value(filter.value);
 										$filterItem.find(dateCellClass).hide();
 										// hide the clear button
@@ -2943,10 +3025,6 @@
 												self.hideClearBtn($filterItem);
 											}
 										}, 200);
-									} else if (TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(filter.operator) > -1) // handle the non param input cell
-									{
-										var dateInput = $filterItem.find(".tf-filter>input.datepickerinput");
-										TF.FilterHelper.disableFilterCellInput(dateInput);
 									}
 									break;
 								default:
@@ -3061,6 +3139,7 @@
 		var supportListFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.ListFilterTemplate; });
 		var supportDateTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'datetime'; });
 		var supportDateFilterColumns = this._gridType === 'gpsevent' ? [] : this._gridDefinition.Columns.filter(function(column) { return column.type === 'date'; });
+		var supportNumberFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'number'; });
 		columns.forEach(function(column)
 		{
 			if (supportDateTimeFilterColumns.some(function(sc)
@@ -3083,6 +3162,14 @@
 			}))
 			{
 				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithList;
+			}
+
+			if (supportNumberFilterColumns.some(function(sc)
+			{
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
+				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithNumber;
 			}
 		});
 
@@ -3463,7 +3550,7 @@
 						e.preventDefault();
 						setTimeout(() =>
 						{
-							tf.promiseBootbox.alert('The filter value must be range: ' + validateResult + '.', 500).then(function()
+							tf.promiseBootbox.alert('The filter value must be range: ' + validateResult + '.').then(function()
 							{
 								numberInput.parent().find('.k-formatted-value').focus();
 							});
@@ -5946,6 +6033,20 @@
 		'OnOrBeforeX': 'onorbeforex'
 	};
 
+	LightKendoGrid.prototype.getOpetatorName = function(value)
+	{
+		let self = this, name = '';
+		for (var key in self.filterNames)
+		{
+			if (value === self.filterNames[key])
+			{
+				name = key;
+				return name;
+			}
+		}
+		return name;
+	};
+
 	LightKendoGrid.normalizeResultItem = function(items)
 	{
 		if (items.length === 1 && $.isArray(items[0]))
@@ -5988,6 +6089,26 @@
 		'nextyear', 'thismonth', 'thisweek', 'thisyear', 'today', 'tomorrow', 'yesterday'];
 
 	FilterHelper.dateTimeDateParamFiltersOperator = ['onx', 'onorafterx', 'onorbeforex'];
+
+	FilterHelper.dateTimeDateParamFiltersNames = ['On X', 'On or After X', 'On or Before X'];
+
+	// TODO: remove
+	FilterHelper.getFormatStringDateParamFilters = function(formatPattern)
+	{
+		if (formatPattern.indexOf('ON OR AFTER') > -1)
+		{
+			return formatPattern.replace('ON OR AFTER', '').trim();
+		}
+		if (formatPattern.indexOf('ON OR BEFORE') > -1)
+		{
+			return formatPattern.replace('ON OR BEFORE', '').trim();
+		}
+		if (formatPattern.indexOf('ON ') > -1)
+		{
+			return formatPattern.replace('ON ', '').trim();
+		}
+		return formatPattern;
+	}
 
 	FilterHelper.getSortColumns = function(columns)
 	{
