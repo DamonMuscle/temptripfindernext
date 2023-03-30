@@ -32,6 +32,8 @@
 			that.inputElement = element.find(".datepickerinput");
 			that.inputElement
 				.on("blur" + NS, proxy(that._blur, that))
+			that.inputElement
+				.on("focus" + NS, proxy(that._focus, that))
 
 			kendo.notify(that);
 		},
@@ -49,6 +51,18 @@
 
 			//to debug and find the real element
 			that._change(that.inputElement.val());
+		},
+		_focus: function()
+		{
+			var that = this;
+			var value = that.inputElement.val();
+			var prefix = getOperatorName(that.inputElement);
+			if (prefix && value.indexOf(prefix) > -1)
+			{
+				value = value.replace(prefix, "");
+			}
+
+			that.inputElement.val(value);
 		},
 		_change: function(value)
 		{
@@ -100,8 +114,18 @@
 				that._value = value;
 				if (moment(value).isValid())
 				{
-					that.inputElement.data('DateTimePicker').date(moment(value));
-				} else
+					var kendoDateTimePicker = that.inputElement.data('DateTimePicker');
+					kendoDateTimePicker.date(moment(value));
+					var operatorName = getOperatorName(that.inputElement);
+					var format = "MM/dd/yyyy hh:mm tt";
+					var timeOut = that.options.init === true ? 0 : 500;
+					that.options.init = true;
+					setTimeout(() =>
+					{
+						operatorName && that.inputElement.val(operatorName + kendo.format("{0:" + format + "}", moment(value).toDate()));
+					}, timeOut);
+				}
+				else
 				{
 					that.inputElement.val('');
 				}
@@ -119,6 +143,20 @@
 		parseFormats.splice(0, 0, options.format);
 		options.parseFormats = parseFormats;
 	};
+
+	function getOperatorName(element)
+	{
+		var dateTimeDateParamFiltersNames = ['On X', 'On or After X', 'On or Before X'];
+		var name = element.parent()?.parent()?.find('input.k-dropdown-operator')?.attr("aria-label");
+		if (dateTimeDateParamFiltersNames.includes(name))
+		{
+			return name.replace("X", "");
+		}
+		else
+		{
+			return "";
+		}
+	}
 
 	kendo.ui.plugin(customizedTimePickerWidget);
 
