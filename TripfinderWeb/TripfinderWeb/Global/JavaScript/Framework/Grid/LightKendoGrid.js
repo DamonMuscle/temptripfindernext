@@ -1436,9 +1436,6 @@
 				hackDomain.setKendoDateFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
 			})
 			return;
-		} else if (TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator))
-		{
-			//todo date param
 		}
 
 		var isCustomFilter = kendoFilterCellDomain.wrapper.find('input').hasClass('k-filter-custom-input');
@@ -2252,7 +2249,7 @@
 	{
 		var filter = $(e.currentTarget).text(),
 			input, cellContainer = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']");
-		if (TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1) // show the number box when select nil filter
+		if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1) // show the number box when select nil filter
 		{
 
 			input = cellContainer.prev().prev().find("input");
@@ -2277,7 +2274,7 @@
 	{
 		var filter = $(e.currentTarget).text(),
 			cellContainer = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").parent();
-		if (TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1) // show the number box when select nil filter
+		if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1) // show the number box when select nil filter
 		{
 			//input = cellContainer.prev().prev().find("input");
 			cellContainer.find("span.date-number").show(); // show the input
@@ -2662,7 +2659,7 @@
 								numberFilterCell.setOptions({
 									format: "{0:0}"
 								});
-								if (TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1)
+								if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1)
 								{
 									numberFilterCell.setOptions({
 										format: filter.replace("X", "0")
@@ -2680,7 +2677,7 @@
 								self.handleDateFilter(e);
 								let filterDateCell = input.closest('span.k-filtercell');
 								let dateTimeNonParamValue = TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1 ||
-									TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1;
+									TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1;
 								let filterDateCellInput = filterDateCell.find(".k-datepicker .k-input");
 								numberFilterCell.value(null);
 								self.handleDateFilter(e);
@@ -2689,7 +2686,7 @@
 									format: "{0:0}"
 								});
 
-								if (TF.FilterHelper.dateTimeNilFiltersName.indexOf(filter) > -1)
+								if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1)
 								{
 									numberFilterCell.setOptions({
 										format: filter.replace("X", "0")
@@ -6072,7 +6069,7 @@
 	FilterHelper = function() { };
 	createNamespace("TF").FilterHelper = FilterHelper;
 
-	FilterHelper.dateTimeNilFiltersName = ['Last X Days', 'Last X Hours', 'Last X Months', 'Last X Weeks', 'Last X Years',
+	FilterHelper.dateTimeNumberFiltersName = ['Last X Days', 'Last X Hours', 'Last X Months', 'Last X Weeks', 'Last X Years',
 		'Next X Days', 'Next X Hours', 'Next X Months', 'Next X Weeks', 'Next X Years',
 		'Older than X Months', 'Older than X Years', 'On Year X'];
 
@@ -6091,24 +6088,6 @@
 	FilterHelper.dateTimeDateParamFiltersOperator = ['onx', 'onorafterx', 'onorbeforex'];
 
 	FilterHelper.dateTimeDateParamFiltersNames = ['On X', 'On or After X', 'On or Before X'];
-
-	// TODO: remove
-	FilterHelper.getFormatStringDateParamFilters = function(formatPattern)
-	{
-		if (formatPattern.indexOf('ON OR AFTER') > -1)
-		{
-			return formatPattern.replace('ON OR AFTER', '').trim();
-		}
-		if (formatPattern.indexOf('ON OR BEFORE') > -1)
-		{
-			return formatPattern.replace('ON OR BEFORE', '').trim();
-		}
-		if (formatPattern.indexOf('ON ') > -1)
-		{
-			return formatPattern.replace('ON ', '').trim();
-		}
-		return formatPattern;
-	}
 
 	FilterHelper.getSortColumns = function(columns)
 	{
