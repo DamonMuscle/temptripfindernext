@@ -1546,7 +1546,7 @@
 		}
 	};
 
-	LightKendoGrid.prototype.setKendoDateTimeNonParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	LightKendoGrid.prototype.setKendoFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
 	{
 		$filterCell.find('input[type=text]').attr('title', displayVal);
 		if (filterType === 'listFilter' ||
@@ -1554,7 +1554,7 @@
 			$filterCell.find('input[type=text]').val(displayVal);
 	};
 
-	LightKendoGrid.prototype.setKendoDateFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	LightKendoGrid.prototype.setKendoDateTimeNonParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
 	{
 		let inputCell = $filterCell.find('input[type=text]:first');
 		inputCell.attr('title', displayVal);
