@@ -71,10 +71,22 @@
 			value = that._parse(value);
 			that._value = value;
 
-			if (that._old != value)
+			var left = that._old && that._old.toString();
+			var right = value && value.toString();
+
+			if (left !== right)
 			{
 				that._old = value;
 				that.trigger(CHANGE);
+			}
+			else if (!!value)
+			{
+				var operatorName = getOperatorName(that.inputElement);
+				var format = "MM/dd/yyyy hh:mm tt";
+				if (operatorName && value.toString().indexOf(operatorName) == -1)
+				{
+					that.inputElement.val(operatorName + kendo.format("{0:" + format + "}", moment(value).toDate()));
+				}
 			}
 		},
 		_parse: function(value)
@@ -86,6 +98,12 @@
 			if (value instanceof DATE)
 			{
 				return value;
+			}
+
+			var prefix = getOperatorName(that.inputElement);
+			if (prefix && value.indexOf(prefix) > -1)
+			{
+				value = value.replace(prefix, "");
 			}
 
 			value = parse(value, options.parseFormats, options.culture);
