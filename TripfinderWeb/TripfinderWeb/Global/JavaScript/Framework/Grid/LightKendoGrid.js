@@ -2689,6 +2689,12 @@
 					$($filterContainersNeedBindClick).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
+							if (customTouchMoveTimeOut)
+							{
+								clearTimeout(customTouchMoveTimeOut)
+								customTouchMoveTimeOut = null;
+							}
+
 							if (customTouchMoveLock === true && TF.isMobileDevice)
 							{
 								customTouchMoveLock = false;
