@@ -39,12 +39,14 @@
 
 			if (userName)
 			{
-				localStorage.setItem(userKey, userName);
+				tf.storageManager.save("userName", userName, true);
+				tf.entStorageManager.save("userName", userName);
 				tf.storageManager.removeCookie(userKey);
 			}
 			if (password)
 			{
-				localStorage.setItem(passwordKey, password);
+				tf.storageManager.save("password", password, true);
+				tf.entStorageManager.save("password", password);
 				tf.storageManager.removeCookie(passwordKey);
 			}
 		}
@@ -59,6 +61,9 @@
 			const rememberMe = tf.storageManager.getCookie(rememberMeKey);
 			tf.storageManager.removeCookie(rememberMeKey);
 			tf.storageManager.save("rememberMe", !!rememberMe, true);
+
+			const clientKey = tf.entStorageManager.get("clientKey") || "";
+			tf.storageManager.save("clientKey", clientKey, true);
 		}
 	}
 
