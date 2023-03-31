@@ -79,7 +79,7 @@
 
 		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
 		const isLogged = isLoggedInStorage === true || isLoggedInStorage === "true";
-		this.obIsLogIn = ko.observable(!!(isLogged && Boolean(this.clientKey) && Boolean(token)));
+		this.obIsLogIn = ko.observable(!!(isLogged && Boolean(this.clientKey) && Boolean(this.token)));
 	}
 
 	AuthManager.prototype.logOff = function()
