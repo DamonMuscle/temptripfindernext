@@ -65,29 +65,21 @@
 	function AuthManager()
 	{
 		restoreInfo();
-		this.clientKey = null;
-		this.userName = null;
-		this.password = null;
-		this._hasLoggedin = null;
 		this.beforeLogOff = new TF.Events.PromiseEvent();
 		this.logOffTag = false;
 
-		this.obIsLogIn = ko.observable(false);
 		var clientKey = tf.entStorageManager.get("clientKey", true) || tf.storageManager.get("clientKey");
 		var username = tf.entStorageManager.get("userName", true) || tf.storageManager.get("userName", true);
 		var password = tf.entStorageManager.get("password", true) || tf.storageManager.get("password", true);
 		this.token = tf.entStorageManager.get("token");
-		var isLoggedin = typeof (tf.entStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.entStorageManager.get("isLoggedin"));
 		this.clientKey = clientKey;
 		this.userName = username;
 		this.password = password;
-		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(this.token);
 		this.supportedProducts = [];
 
-		if (this._hasLoggedin)
-		{
-			this.obIsLogIn(true);
-		}
+		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
+		const isLogged = isLoggedInStorage === true || isLoggedInStorage === "true";
+		this.obIsLogIn = ko.observable(!!(isLogged && Boolean(this.clientKey) && Boolean(token)));
 	}
 
 	AuthManager.prototype.logOff = function()
@@ -148,7 +140,7 @@
 		prefix = prefix.split('.')[0];
 
 		var p = null;
-		if (self._hasLoggedin)
+		if (self.obIsLogIn())
 		{
 			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 				paramData: {
@@ -232,7 +224,6 @@
 							}
 
 							tf.entStorageManager.save("isLoggedin", true);
-							self._hasLoggedin = true;
 							self.obIsLogIn(true);
 						});
 
