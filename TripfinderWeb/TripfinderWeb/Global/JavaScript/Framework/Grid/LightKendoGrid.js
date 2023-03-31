@@ -38,14 +38,16 @@
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report'];
 	var customClickAndTouchEvent;
-	var customClickEvent;
+	var customTouchMoveEvent;
+	var customTouchMoveTimeOut = null;
+	var customTouchMoveLock = false;
 
 	function LightKendoGrid($container, options, gridState, geoFields)
 	{
 		// make click event namespace unique in each instance.
 		this.randomKey = (new Date()).getTime();
 		customClickAndTouchEvent = `click.LightKendoGrid${this.randomKey} touchend.LightKendoGrid${this.randomKey}`;
-		customClickEvent = `click.LightKendoGrid${this.randomKey}`;
+		customTouchMoveEvent = `touchmove.LightKendoGrid${this.randomKey}`;
 
 		this.geoFields = geoFields;
 		if (geoFields)
@@ -2591,13 +2593,13 @@
 					var customCssSelectorStr = cssSelectorStr + ':not(".has-custom-filter-btn-click")';
 					var $containers = $listContainer.find(customCssSelectorStr).filter(function() { return $(this).text() === key; });
 
-					$containers.off(customClickEvent).on(customClickEvent, self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
+					$containers.off(customClickAndTouchEvent).on(customClickAndTouchEvent, self.customFilterBtnClick.bind(self)).addClass('has-custom-filter-btn-click');
 					break;
 				case "List":
 					var listCssSelectorStr = cssSelectorStr + ':not(".has-list-filter-btn-click")';
 					var $containers = $listContainer.find(listCssSelectorStr).filter(function() { return $(this).text() === key; });
 
-					$containers.off(customClickEvent).on(customClickEvent, self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
+					$containers.off(customClickAndTouchEvent).on(customClickAndTouchEvent, self.listFilterBtnClick.bind(self)).addClass('has-list-filter-btn-click');
 					break;
 				case "Empty":
 				case "Not Empty":
@@ -2610,7 +2612,7 @@
 							$listContainersNeedBindClick.push($listContainers[i]);
 						}
 					}
-					$($listContainersNeedBindClick).off(customClickEvent).on(customClickEvent,
+					$($listContainersNeedBindClick).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
@@ -2668,9 +2670,31 @@
 							$filterContainersNeedBindClick.push($filterContainers[i]); // for avoid bind the click multiple
 						}
 					}
-					$($filterContainersNeedBindClick).off(customClickEvent).on(customClickEvent,
+
+					$($filterContainersNeedBindClick).off(customTouchMoveEvent).on(customTouchMoveEvent, function(ev)
+					{
+						if (customTouchMoveTimeOut)
+						{
+							clearTimeout(customTouchMoveTimeOut)
+							customTouchMoveTimeOut = null;
+						}
+
+						// Ignore the touchend event caused by touchmove.
+						customTouchMoveTimeOut = setTimeout(() =>
+						{
+							customTouchMoveLock = true;
+						}, 50);
+					});
+
+					$($filterContainersNeedBindClick).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
+							if (customTouchMoveLock === true && TF.isMobileDevice)
+							{
+								customTouchMoveLock = false;
+								return;
+							}
+
 							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
 								fieldName = input.closest("[data-kendo-field]").attr("data-kendo-field"),
 								field = self._gridDefinition.Columns.filter(function(c) { return c.FieldName === fieldName }),
