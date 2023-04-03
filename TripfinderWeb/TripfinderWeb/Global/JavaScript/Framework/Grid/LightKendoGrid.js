@@ -1177,9 +1177,22 @@
 			var kendoGridDomain = this;
 
 			var filter = kendoGridDomain.kendoGrid.dataSource.filter();
+			var clearCustomFilterCell = function (e)
+			{
+				// filter is null, but the CustomFilter has not been removed in UI
+				let customContainer = $(e.sender.element);
+				let filterCells = customContainer.find('input.datepickerinput');
+				if (filterCells && filterCells[1] && $(filterCells[1]).val() !== '')
+				{
+					$(filterCells[1]).val('');
+				}
+			}	
 
 			if (!filter)
+			{
+				clearCustomFilterCell(e);
 				return;
+			}	
 
 			var currentFilter = filter.filters.filter(function(item)
 			{
@@ -1195,14 +1208,7 @@
 				$(e.sender.element.find('input')[0]).val(inputCellText);
 			} else
 			{
-				// filter is null, but the CustomFilter has not been removed in UI
-				let customContainer = $(e.sender.element);
-				let filterCells = customContainer.find('input.datepickerinput');
-				if (filterCells && filterCells[1] && $(filterCells[1]).val() !== '')
-				{
-					$(filterCells[1]).val('');
-				}
-
+				clearCustomFilterCell(e);
 			}
 		};
 
