@@ -1188,11 +1188,21 @@
 
 			if (currentFilter.length)
 			{
-				var col = kendoGridDomain.kendoGrid.columns.filter(function(col) { return col.FieldName === field; });
+				var col = kendoGridDomain.kendoGrid.columns.filter(function (col) { return col.FieldName === field; });
 				var tmpType = col[0].type;
 				var inputCellText = currentFilter[0].filters[0].value;
 				inputCellText = TF.FilterHelper.formatFilterCellInputValue(inputCellText, tmpType);
 				$(e.sender.element.find('input')[0]).val(inputCellText);
+			} else
+			{
+				// filter is null, but the CustomFilter has not been removed in UI
+				let customContainer = $(e.sender.element);
+				let filterCells = customContainer.find('input.datepickerinput');
+				if (filterCells && filterCells[1] && $(filterCells[1]).val() !== '')
+				{
+					$(filterCells[1]).val('');
+				}
+
 			}
 		};
 
