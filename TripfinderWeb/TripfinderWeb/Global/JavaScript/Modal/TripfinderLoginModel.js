@@ -174,7 +174,8 @@
 				product: TF.productName,
 				username: userName,
 				vendor: TF.vendor
-			}
+			},
+			headers: { "tf-referer": `${location.origin}${location.pathname}` },
 		};
 		tf.promiseAjax.get(pathCombine(tf.api.server(), clientKey, "passwords"), forgetPasswordData)
 			.then(function(apiResponse)
