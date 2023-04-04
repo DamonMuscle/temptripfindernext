@@ -43,7 +43,7 @@
 			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
 			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
 			formfinder: { route: "Formfinder", title: "Formfinder", url: "Formfinder" },
-			stopfinderadmin: { route: "StopfinderAdmin", title: "StopfinderAdmin", url: "StopfinderAdmin" }
+			stopfinderadmin: { route: "StopfinderAdmin", title: "Stopfinder Administration", url: "StopfinderAdmin" }
 		};
 
 		self.initApplicationSwitcher();
