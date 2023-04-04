@@ -1206,7 +1206,8 @@
 				var inputCellText = currentFilter[0].filters[0].value;
 				inputCellText = TF.FilterHelper.formatFilterCellInputValue(inputCellText, tmpType);
 				$(e.sender.element.find('input')[0]).val(inputCellText);
-			} else
+			}
+			else
 			{
 				clearCustomFilterCell(e);
 			}
