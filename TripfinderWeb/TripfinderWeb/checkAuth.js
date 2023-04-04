@@ -16,6 +16,7 @@ const EnterpriseLoginProductRoutePath = "tripfinder";
  */
 const vanitySessionGuard = {
 	productionUrlSuffix: "transfinder.com",
+	vendorAccessInfoCache: {},
 	parseCookie: function()
 	{
 		return document.cookie.split(';')
@@ -109,7 +110,7 @@ const vanitySessionGuard = {
 
 			const targetInfo = window.location.hash || window.location.search;
 			const search = (!targetInfo || targetInfo === "#/") ? "" : `?target=${btoa(targetInfo)}`;
-			return `${loginUrl}#/${EnterpriseLoginProductRoutePath}${search}`;
+			return `${loginUrl}/${EnterpriseLoginProductRoutePath}${search}`;
 		});
 	},
 
@@ -176,15 +177,25 @@ const vanitySessionGuard = {
 		let potentialClientKey;
 		if (!fromCookie)
 		{
-			potentialClientKey = (hostname.split(".")[0] || "").trim();
+			potentialClientKey = (hostname.split(".")[0] || "").trim().toLowerCase();
 		}
 		else
 		{
 			const cookies = this.parseCookie();
-			potentialClientKey = (cookies["ent.clientKey"] || "").replace(/\"/g, "").trim();
+			potentialClientKey = (cookies["ent.clientKey"] || "").replace(/\"/g, "").trim().toLowerCase();
 		}
 
-		return (!!potentialClientKey ? fetch(`${MyTransfinderApiUrl}/simplevendoraccessinfo?clientid=${potentialClientKey}&_=${Date.now()}`, {
+		let promise = Promise.resolve(false);
+		if (!!potentialClientKey)
+		{
+			const cachedItem = this.vendorAccessInfoCache[potentialClientKey];
+			if (cachedItem !== undefined)
+			{
+				promise = Promise.resolve(!!cachedItem);
+			}
+			else
+			{
+				promise = fetch(`${MyTransfinderApiUrl}/simplevendoraccessinfo?clientid=${potentialClientKey}&_=${Date.now()}`, {
 			method: "GET",
 			mode: "cors"
 		}).then(response =>
@@ -193,7 +204,11 @@ const vanitySessionGuard = {
 		}).catch(() =>
 		{
 			return false;
-		}) : Promise.resolve(false)).then((result) =>
+				});
+			}
+		}
+
+		return promise.then((result) =>
 		{
 			if (result)
 			{
@@ -208,6 +223,8 @@ const vanitySessionGuard = {
 				 */
 				return this.getVanityDomain(true);
 			}
+
+			return "";
 		});
 	},
 
@@ -217,7 +234,33 @@ const vanitySessionGuard = {
 	redirect: function(url)
 	{
 		Promise.resolve(url).then((value) => window.location.href = `${value}`);
-	}
+	},
+
+	getApiServer: function()
+	{
+		if (this.isDevEnvironment())
+		{
+			return;
+		}
+
+		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
+		document.write(`<script src='${MyTransfinderApiUrl}/simplevendoraccessinfo?clientid=${potentialClientKey}&callback=setRoutefinderApiServer&_=${Date.now()}'></script>`);
+	},
+
+	setApiServer: function(result)
+	{
+		if (!result)
+		{
+			return;
+		}
+
+		this.vendorAccessInfoCache[result.ClientId] = result.AccessInfo;
+		const apiUrl = result.AccessInfo?.Products?.find(p => p.Name === "RoutefinderApi")?.Uri;
+		if (apiUrl)
+		{
+			window.APIServer = apiUrl;
+		}
+	},
 }
 
 function parseUrlParam(url)
@@ -236,3 +279,6 @@ function parseUrlParam(url)
 
 	return parmResult;
 }
+
+var setRoutefinderApiServer = vanitySessionGuard.setApiServer.bind(vanitySessionGuard);
+vanitySessionGuard.getApiServer();

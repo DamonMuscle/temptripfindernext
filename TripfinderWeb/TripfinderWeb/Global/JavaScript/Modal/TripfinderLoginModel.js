@@ -15,7 +15,10 @@
 		this.type = TF.productName;
 		this.contentTemplate('tripfinderLogin');
 		this.buttonTemplate('');
-		this.loginViewModel = new TF.TripfinderLoginViewModel();
+		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
+		const isVanityUrl = !!vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
+		const clientKey = isVanityUrl ? potentialClientKey : null;
+		this.loginViewModel = new TF.TripfinderLoginViewModel(clientKey);
 		this.data(this.loginViewModel);
 		this.validateIsForgetPassword();
 	}

@@ -17,6 +17,7 @@
 		var rememberMe = Boolean(tf.storageManager.get("rememberMe", true));
 		this.obRememberMe = ko.observable(rememberMe);
 		this.obClientKey = ko.observable(clientKey);
+		this.obClientKeyEnabled = ko.observable(!clientKey);
 		this.obUsername = ko.observable('');
 		this.obPassword = ko.observable('');
 		this.obClientKeyRP = ko.observable('');

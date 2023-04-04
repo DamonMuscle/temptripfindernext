@@ -18,7 +18,7 @@
 										Client ID
 									</label>
 									<input type="text" id="firstName" name="clientId" class="form-control"
-										placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage"
+										placeholder="Client Id" data-bind="value:obClientKey, enable:obClientKeyEnabled, click:cleanErrorMessage"
 										tabindex="1">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId"
 										data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
