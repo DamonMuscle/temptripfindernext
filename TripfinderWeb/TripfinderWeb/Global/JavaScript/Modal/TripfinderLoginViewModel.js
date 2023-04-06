@@ -5,9 +5,9 @@
 	TripfinderLoginViewModel.prototype = Object.create(TF.LoginViewModel.prototype);
 	TripfinderLoginViewModel.prototype.constructor = TripfinderLoginViewModel;
 
-	function TripfinderLoginViewModel()
+	function TripfinderLoginViewModel(clientKey)
 	{
-		TF.LoginViewModel.call(this);
+		TF.LoginViewModel.call(this, clientKey);
 
 		this.obClientKeyWarning = ko.observable(false);
 		this.obUsernameWarning = ko.observable(false);
