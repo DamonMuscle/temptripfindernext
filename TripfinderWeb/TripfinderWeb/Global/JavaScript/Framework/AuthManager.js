@@ -82,10 +82,18 @@
 		this.password = password;
 		this.supportedProducts = [];
 
-		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
-		const isLogged = isLoggedInStorage === true || isLoggedInStorage === "true";
-		this.obIsLogIn = ko.observable(!!(isLogged && Boolean(this.clientKey) && Boolean(this.token)));
+		this.obIsLogIn = ko.observable(this.getLoginStatus());
 	}
+
+	AuthManager.prototype.getLoginStatus = function()
+	{
+		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
+		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
+		const isVanityUrl = !!vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
+
+		const isLogged = !!((isLoggedInStorage === true || isLoggedInStorage === "true") && Boolean(this.clientKey) && Boolean(this.token));
+		return !isVanityUrl ? isLogged : (isLogged && potentialClientKey === this.clientKey);
+	};
 
 	AuthManager.prototype.logOff = function()
 	{
