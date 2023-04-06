@@ -708,7 +708,7 @@
 			self.obAccount.removeAll();
 			$.each(self.fieldTripAccountList, function(index, item)
 			{// FT-2772 The '[Any]' department doesn't have a DepartmentId.
-				if (item.School === school && (!item.Department ||!item.DepartmentId || self.hasPermissionForDistrictDepartment(item.Department.Id)))
+				if (item.School === school && (!item.Department ||!item.Department.Id || self.hasPermissionForDistrictDepartment(item.Department.Id)))
 				{
 					departActivityName = (item.Department ? item.Department.Name : "[Any]") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : "[Any]");
 
