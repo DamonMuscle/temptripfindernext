@@ -32,6 +32,11 @@ const vanitySessionGuard = {
 			}, {});
 	},
 
+	/**
+	 * This method is reachable only when user accesses website by vanity url.
+	 * so we can get the client key from vanity url.
+	 * @returns a flag of whether user has a valid session
+	 */
 	checkAuth: function()
 	{
 		const cookies = this.parseCookie();
@@ -46,6 +51,12 @@ const vanitySessionGuard = {
 		}
 
 		if (!clientKey || !token) return Promise.resolve(false);
+
+		if (!this.isDevEnvironment())
+		{
+			const clientKeyFromUrl = (location.hostname.split(".")[0] || "").trim().toLowerCase();
+			if (clientKey !== clientKeyFromUrl) return Promise.resolve(false);
+		}
 
 		let baseUrl = "";
 
@@ -196,14 +207,14 @@ const vanitySessionGuard = {
 			else
 			{
 				promise = fetch(`${MyTransfinderApiUrl}/simplevendoraccessinfo?clientid=${potentialClientKey}&_=${Date.now()}`, {
-			method: "GET",
-			mode: "cors"
-		}).then(response =>
-		{
-			return response.ok;
-		}).catch(() =>
-		{
-			return false;
+					method: "GET",
+					mode: "cors"
+				}).then(response =>
+				{
+					return response.ok;
+				}).catch(() =>
+				{
+					return false;
 				});
 			}
 		}
