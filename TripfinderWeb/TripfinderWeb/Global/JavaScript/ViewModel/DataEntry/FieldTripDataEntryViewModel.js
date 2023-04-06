@@ -427,7 +427,7 @@
 			attachedToID = this.obSelectedTemplateSource().Id;
 			attachedToTypeID = tf.DataTypeHelper._getObjectByType("fieldtriptemplate").id;
 		}
-		
+
 		var paramData = {
 			AttachedToID: attachedToID,
 			AttachedToTypeID: attachedToTypeID,
@@ -707,8 +707,8 @@
 		{
 			self.obAccount.removeAll();
 			$.each(self.fieldTripAccountList, function(index, item)
-			{
-				if (item.School === school && (!item.Department || self.hasPermissionForDistrictDepartment(item.Department.Id)))
+			{// FT-2772 The '[Any]' department doesn't have a DepartmentId.
+				if (item.School === school && (!item.Department ||!item.DepartmentId || self.hasPermissionForDistrictDepartment(item.Department.Id)))
 				{
 					departActivityName = (item.Department ? item.Department.Name : "[Any]") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : "[Any]");
 
@@ -1022,7 +1022,7 @@
 							$(".destinationname").find("input").val(this.obEntityDataModel().destination());
 						}
 					}
-					
+
 					this.getFieldTripInvoiceTemplates(item.Id).then(function(){
 						this.loadInvoicing(true);
 					}.bind(this));
@@ -1123,7 +1123,7 @@
 				"@filter": `eq(FieldTripTemplateId,${fieldTripId})`
 			}
 		}).then(function(result){
-			this.obEntityDataModel().fieldTripInvoices(result.Items);			
+			this.obEntityDataModel().fieldTripInvoices(result.Items);
 			return Promise.resolve();
 		}.bind(this));
 	}
@@ -1142,12 +1142,12 @@
 		if (!invoices.length) return Promise.resolve();
 
 		let data = invoices.map(r =>
-			{ 
-				return { 
+			{
+				return {
 					"FieldTripTemplateId": fieldtripTemplate.Id,
 					"FieldTripAccountId": r.FieldTripAccountId,
-					"Amount": r.Amount 
-				} 
+					"Amount": r.Amount
+				}
 			});
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoicetemplates"), {data: data});
 	};
@@ -1629,7 +1629,7 @@
 			}.bind(this));
 	};
 
-	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e) 
+	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e)
 	{
 		var row = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.select();
 		if (row.length)
