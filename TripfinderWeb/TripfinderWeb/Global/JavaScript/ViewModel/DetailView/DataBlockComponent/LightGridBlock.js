@@ -2306,7 +2306,8 @@
 		var item = self.$el.find(".kendo-grid-container");
 		var total = 0;
 		var result = 0;
-		if (self.isReadMode())
+		var hasPermission = self.checkLoadDataPermission(self.options);
+		if (self.isReadMode() && hasPermission)
 		{
 			total = self.grid.dataSource.total();
 			result = Array.isArray(self.includeIds) ? self.includeIds.filter(x => x > 0).length : [];
@@ -2633,6 +2634,7 @@
 			defaultSort: self.options.sort,
 			defaultFilter: self.miniGridHelper.getFilterConfig(self.$el, self.options),
 			isMiniGrid: true, // set the grid to mini grid mode
+			hasPermission: hasPermission,
 			showOverlay: false,
 			totalCountHidden: self.options.totalCountHidden,
 			resizable: !isDesignMode, // enable column resize if not design mode.
