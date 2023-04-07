@@ -269,8 +269,18 @@ const vanitySessionGuard = {
 		const apiUrl = result.AccessInfo?.Products?.find(p => p.Name === "RoutefinderApi")?.Uri;
 		if (apiUrl)
 		{
-			window.APIServer = apiUrl;
+			window.APIServer = this.removeTrailingSlash(apiUrl);
 		}
+	},
+
+	removeTrailingSlash: function(url)
+	{
+		if (url.charAt(url.length - 1) === "/")
+		{
+			return url.substring(0, url.length - 1);
+		}
+
+		return url;
 	},
 }
 
