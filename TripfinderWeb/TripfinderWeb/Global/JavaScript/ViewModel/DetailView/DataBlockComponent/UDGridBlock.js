@@ -586,6 +586,7 @@
 			gridType: "form",
 			gridData: { value: formId },
 			isMiniGrid: true, // apply some special settings 
+			hasPermission: tf.authManager.isAuthorizedFor("formsResults", "read"),
 			miniGridEditMode: isDesignMode,
 			showOverlay: false, // do not need loading
 			resizable: !isDesignMode, // enable column resize if not design mode
@@ -722,7 +723,8 @@
 		var item = self.$el.find(".kendo-grid-container");
 		var total = 0;
 		var result = 0;
-		if (self.isReadMode())
+		var hasPermission = tf.authManager.isAuthorizedFor("formsResults", "read");
+		if (self.isReadMode() && hasPermission)
 		{
 			total = self.grid.dataSource.total();
 			result = Array.isArray(self.includeIds) ? self.includeIds.filter(x => x > 0).length : [];

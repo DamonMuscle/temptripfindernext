@@ -742,7 +742,8 @@
 								}
 							});
 						}
-						if (self.options.withoutData || self.options.miniGridEditMode)
+						if (self.options.withoutData || self.options.miniGridEditMode
+							||(self.options.isMiniGrid && self.options.hasPermission === false))
 						{
 							setEmpty();
 							return;
@@ -5232,7 +5233,11 @@
 			if ($nomatching.length === 0)
 			{
 				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
-				if (!self.options.withoutData && !self.options.miniGridEditMode)
+				if (self.options.isMiniGrid && self.options.hasPermission === false && !self.options.miniGridEditMode)
+				{
+					$parent.append("<div class='col-md-20 no-matching-records'>You don't have permission to view data.</div>");
+				}
+				else if (!self.options.withoutData && !self.options.miniGridEditMode)
 				{
 					$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
 				}
