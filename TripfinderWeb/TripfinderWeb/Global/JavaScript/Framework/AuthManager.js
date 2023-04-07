@@ -89,7 +89,7 @@
 	{
 		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
 		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
-		const isVanityUrl = !!vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
+		const isVanityUrl = !!window.vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
 
 		const isLogged = !!((isLoggedInStorage === true || isLoggedInStorage === "true") && Boolean(this.clientKey) && Boolean(this.token));
 		return !isVanityUrl ? isLogged : (isLogged && potentialClientKey === this.clientKey);
