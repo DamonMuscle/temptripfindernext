@@ -301,5 +301,6 @@ function parseUrlParam(url)
 	return parmResult;
 }
 
+window.vanitySessionGuard = vanitySessionGuard;
 var setRoutefinderApiServer = vanitySessionGuard.setApiServer.bind(vanitySessionGuard);
 vanitySessionGuard.getApiServer();
