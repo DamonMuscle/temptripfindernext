@@ -37,7 +37,14 @@
 
 		if (rememberMe)
 		{
-			this.obClientKey(tf.storageManager.get("clientKey", true) || '');
+			if (!clientKey)
+			{
+				/**
+				 * If user visit our products by vanity url, we will populate obClientKey with the value what is getting from the url.
+				 * So discarding the value in local storage.
+				 */
+				this.obClientKey(tf.storageManager.get("clientKey", true) || '');
+			}
 			this.obUsername(tf.storageManager.get("userName", true) || '');
 			this.obPassword(tf.storageManager.get("password", true) || '');
 		}

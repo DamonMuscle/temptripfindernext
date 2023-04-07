@@ -121,7 +121,7 @@ const vanitySessionGuard = {
 
 			const targetInfo = window.location.hash || window.location.search;
 			const search = (!targetInfo || targetInfo === "#/") ? "" : `?target=${btoa(targetInfo)}`;
-			return `${loginUrl}/${EnterpriseLoginProductRoutePath}${search}`;
+			return `${loginUrl}${EnterpriseLoginProductRoutePath}${search}`;
 		});
 	},
 
