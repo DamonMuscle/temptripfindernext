@@ -121,7 +121,7 @@ const vanitySessionGuard = {
 
 			const targetInfo = window.location.hash || window.location.search;
 			const search = (!targetInfo || targetInfo === "#/") ? "" : `?target=${btoa(targetInfo)}`;
-			return `${loginUrl}/${EnterpriseLoginProductRoutePath}${search}`;
+			return `${loginUrl}${EnterpriseLoginProductRoutePath}${search}`;
 		});
 	},
 
@@ -269,8 +269,18 @@ const vanitySessionGuard = {
 		const apiUrl = result.AccessInfo?.Products?.find(p => p.Name === "RoutefinderApi")?.Uri;
 		if (apiUrl)
 		{
-			window.APIServer = apiUrl;
+			window.APIServer = this.removeTrailingSlash(apiUrl);
 		}
+	},
+
+	removeTrailingSlash: function(url)
+	{
+		if (url.charAt(url.length - 1) === "/")
+		{
+			return url.substring(0, url.length - 1);
+		}
+
+		return url;
 	},
 }
 
@@ -291,5 +301,6 @@ function parseUrlParam(url)
 	return parmResult;
 }
 
+window.vanitySessionGuard = vanitySessionGuard;
 var setRoutefinderApiServer = vanitySessionGuard.setApiServer.bind(vanitySessionGuard);
 vanitySessionGuard.getApiServer();

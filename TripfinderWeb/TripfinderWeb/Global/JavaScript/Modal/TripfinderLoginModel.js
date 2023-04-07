@@ -16,7 +16,7 @@
 		this.contentTemplate('tripfinderLogin');
 		this.buttonTemplate('');
 		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
-		const isVanityUrl = !!vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
+		const isVanityUrl = !!window.vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
 		const clientKey = isVanityUrl ? potentialClientKey : null;
 		this.loginViewModel = new TF.TripfinderLoginViewModel(clientKey);
 		this.data(this.loginViewModel);
