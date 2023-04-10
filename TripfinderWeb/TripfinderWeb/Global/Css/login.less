@@ -22,10 +22,16 @@
 }
 
 .tf-login {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 100%;
+	
 	.tf-login-row {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		margin: 0;
 
 		.tf-btn-black {
 			padding: 3px 12px;
@@ -34,10 +40,6 @@
 		.tf-btn-gray {
 			border: none;
 		}
-	}
-
-	.loginform {
-		max-width: 325px;
 	}
 
 	.logo-container {
@@ -79,10 +81,10 @@
 
 	.panel {
 		box-shadow: none;
+		margin: 0;
 	}
 
 	.panel-body {
-		padding-top: 5px;
 		padding-left: 8px;
 		padding-right: 8px;
 	}
@@ -138,6 +140,8 @@
 
 	.version-release-info {
 		padding-top: 20px;
+		text-align:center;
+		line-height: 1;
 
 		.tf-version {
 			max-width: 30px;
