@@ -1,24 +1,21 @@
 ﻿<div class="container tf-login" data-bind="uiInit:$parent.containerLoaded,finish:init.bind($data)">
-	<div class="visible-lg-block" style="margin-top:calc(39px + 15vh )"></div>
-	<div class="visible-sm-block visible-md-block" style="margin-top:calc(10vh )"></div>
-	<div class="visible-xs-block" style="margin-top:20px"></div>
 	<div class="row tf-login-row" data-bind="visible:$parent.obShowLogin() && !obIsShowCode()">
 		<div class="col-sm-12 col-md-10 col-lg-8">
-			<div class="col-sm-24" style="padding-left:0px;margin-top:10px;">
-				<div class="logo-container" style="margin-bottom: calc(5vh + 20px);"></div>
+			<div class="col-sm-24" style="padding-left:0px;padding-right:0px;">
+				<div class="logo-container" style="margin-bottom: 65px;"></div>
 			</div>
 			<div class="panel">
 				<div class="panel-body">
 					<div>
 						<form class="form-horizontal loginform" role="form">
-							<div class="form-group" style="margin-top: 10px"
+							<div class="form-group"
 								data-bind="css: obClientKeyWarning()?'has-error':''">
 								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
 									<label for="firstName">
 										Client ID
 									</label>
 									<input type="text" id="firstName" name="clientId" class="form-control"
-										placeholder="Client Id" data-bind="value:obClientKey, enable:obClientKeyEnabled, click:cleanErrorMessage"
+										placeholder="Client ID" data-bind="value:obClientKey, enable:obClientKeyEnabled, click:cleanErrorMessage"
 										tabindex="1">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId"
 										data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
@@ -74,7 +71,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="version-release-info" style="text-align:center;">
+								<div class="version-release-info">
 									<span class="tf-version">Version 1.0.9999</span>
 								</div>
 							</div>
