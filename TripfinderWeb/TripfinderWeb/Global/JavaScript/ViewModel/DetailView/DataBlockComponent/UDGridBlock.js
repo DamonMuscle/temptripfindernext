@@ -288,10 +288,7 @@
 			}
 			else
 			{
-				originColumns.push({
-					FieldName: key,
-					DisplayName: fieldNameAndGUID[key],
-				});
+				self.miniGridHelper.updateUDGridColumns(originColumns, key, self);
 			}
 		}
 		originColumns.push(...self._updatedInfoColumns);
@@ -561,10 +558,7 @@
 		}
 		else
 		{
-			self.getGridColumnsByType().map(c =>
-			{
-				self.miniGridHelper.updateUDGridColumns(columns, c.FieldName, self);
-			});
+			columns = self.getGridColumnsByType();
 		}
 
 		self.$el.data("columns", columns);
