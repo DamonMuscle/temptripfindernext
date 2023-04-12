@@ -597,6 +597,7 @@
 			setRequestURL: this.setLeftGridRequestURL.bind(this),
 			setRequestOption: this.setLeftRequestOption.bind(this),
 			gridType: this.options.type,
+			udGridID: this.options.UDGridID,
 			isSmallGrid: true,
 			url: this.options.getUrl(this.options.type, this.options),
 			showBulkMenu: this.options.showBulkMenu,
@@ -680,7 +681,34 @@
 		{
 			requestOption.data.filterClause = this.leftSearchGrid.obSelectedGridFilterClause();
 		}
-		return tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption)
+		var promise;
+		switch (self.options.GridType)
+		{
+			case 'GPSEventType':
+				promise = TF.Helper.VehicleEventHelper.getEventTypes();
+				break;
+			case 'GeneralDataListsDisabilityCode':
+				promise = tf.promiseAjax.get(self.options.getUrl(self.options.type, self.options));
+				break;
+			case 'Form':
+				const filterSet = {};
+				const uDGridID = self.options.UDGridID;
+				var defaultFilter = tf.udgHelper.getUDGridIdFilter(uDGridID);
+				filterSet["FilterItems"] = [];
+				filterSet["FilterItems"].push(...defaultFilter);
+				filterSet["FilterSets"] = [];
+				filterSet["LogicalOperator"] = "and";
+				requestOption.data.fields = [self.options.filterField];
+				requestOption.data.filterSet = filterSet;
+				requestOption.data.filterSet.UDGridID = uDGridID;
+				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
+				break;
+			default:
+				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
+				break;
+		}
+
+		return promise
 			.then(function(response)
 			{
 				/**

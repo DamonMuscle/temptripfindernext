@@ -182,6 +182,7 @@
 			var widthOfPerChar = 7;
 			column.field = definition.FieldName;
 			column.title = definition.DisplayName;
+			column.minResizableWidth = 80; // Set the min Resizable width to prevent columns collapse.
 			column.headerTemplate = `<span class="column-title">${kendo.htmlEncode(definition.DisplayName ?? definition.FieldName ?? "")}</span>`;
 			if (!column.width)
 				column.width = definition.Width || defaultColumnWidth;
