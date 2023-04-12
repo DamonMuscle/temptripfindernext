@@ -504,6 +504,17 @@
 				};
 			}
 
+			if (col.questionType === "ListFromData" || (col.questionType === "List" && col.FieldOptions.PickListMultiSelect))
+			{
+				let fieldName = column.FieldName;
+				column.type = "select";
+				column.ListFilterTemplate = this.generateListFilterTemplate(col, "");
+				column.ListFilterTemplate.filterField = fieldName;
+				column.ListFilterTemplate.columnSources = [{ FieldName: fieldName, DisplayName: column.DisplayName, Width: "150px", type: "string", isSortItem: true }];
+				// add AllItems 
+				column.ListFilterTemplate.requestOptions = this.getRequestOption(col);
+			}
+
 			if (col.questionType === "ListFromData" && col.template !== undefined && column.template === undefined)
 			{
 				column.template = col.template;
@@ -538,6 +549,41 @@
 		});
 
 		return columns;
+	};
+
+	UserDefinedGridHelper.prototype.getRequestOption = function(col)
+	{
+		const filterSet = {}, requestOption = {};
+		const uDGridID = col.UDGridID;
+		const defaultFilter = tf.udgHelper.getUDGridIdFilter(uDGridID);
+		filterSet["FilterItems"] = [];
+		filterSet["FilterItems"].push(...defaultFilter);
+		filterSet["FilterSets"] = [];
+		filterSet["LogicalOperator"] = "and";
+		requestOption.data = {};
+		requestOption.data.fields = [col.Guid];
+		requestOption.data.filterSet = filterSet;
+		requestOption.data.filterSet.UDGridID = uDGridID;
+
+		return requestOption;
+	}
+
+	UserDefinedGridHelper.prototype.generateListFilterTemplate = function(listUdf, gridType)
+	{
+		var template = {
+			UDGridID: listUdf.UDGridID,
+			listFilterType: "WithSearchGrid",
+			DisplayFilterTypeName: listUdf.Name,
+			GridType: "Form",
+			_gridType: "form",
+			OriginalName: listUdf.DisplayName,
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "search", "formresults");
+			}
+		};
+
+		return template;
 	};
 
 	UserDefinedGridHelper.prototype.getUDGridsByDataType = function(dataType, isPublic)

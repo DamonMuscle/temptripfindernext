@@ -3407,6 +3407,27 @@
 
 												this.postRequestData(url, options);
 											}
+											else if (this._gridType === "Form")
+											{
+												const url = this.getApiRequestURL(this.options.url);
+												const udGridID = this.options.udGridID;
+												let options = this.getApiRequestOption(kendoOption);
+												const defaultFilter = tf.udgHelper.getUDGridIdFilter(udGridID);
+												if (options.data.filterSet)
+												{
+													options.data.filterSet["FilterItems"].push(...defaultFilter);
+												} else
+												{
+													const filterSet = {};
+													filterSet["FilterItems"] = [];
+													filterSet["FilterItems"].push(...defaultFilter);
+													filterSet["FilterSets"] = [];
+													filterSet["LogicalOperator"] = "and";
+													options.data.filterSet = filterSet;
+												}
+												options.data.filterSet.UDGridID = udGridID;
+												this.postRequestData(url, options);
+											}
 											else
 											{
 												this.postRequestData(this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption));
