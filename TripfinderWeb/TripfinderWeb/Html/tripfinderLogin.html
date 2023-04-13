@@ -135,19 +135,19 @@
 	<!-- ko if: obIsShowCode() -->
 	<div class="row tf-login-row">
 		<div class="col-sm-12 col-md-10 col-lg-8 login-form">
-			<div class="logo-container" style="margin:10px 15px calc(5vh + 20px) 0;">
+			<div class="logo-container">
 			</div>
 		</div>
 	</div>
-	<div class="row tf-login-row">
-		<div class="col-sm-12 col-md-10 col-lg-10">
+	<div class="row tf-login-row" style="position:relative;top:-10px;height:296px;box-sizing: content-box;">
+		<div style="width:370px;font-size:14px;">
 			<form class="security-code-form">
 				<div class="panel panel-default" style="border:1px solid #ccc;padding-bottom: 10px;">
 					<div class="panel-heading">Authentication</div>
 					<div class="panel-body">
 						<div>
 							<div class="form-horizontal resetForm" role="form">
-								<div class="form-group">
+								<div class="form-group" style='padding:8.5px 30px 23.5px;'>
 									<div class="col-sm-24 multifactor-authentication-box">
 										<span>This account has multifactor authentication enabled, please check your email
 											for your authentication code.</span>
@@ -176,7 +176,7 @@
 					</div>
 					<div class="edit-bottombar" style="padding: 0 25px;">
 						<button type="button" class="btn tf-btn-black" data-bind="click:$parent.positiveClick"
-							style="margin-right:10px;padding: 0px 12px;">Submit</button>
+							style="margin-right:18px;padding: 0px 12px;">Submit</button>
 						<button type="button" class="btn" style="background-color: transparent;" data-bind="click:backFromMFAtoLogin">Back</button>
 					</div>
 				</div>
