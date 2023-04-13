@@ -135,11 +135,12 @@
 		self.onShiftUp = self.onShiftUp.bind(self);
 		self.refreshClick = self.refreshClick.bind(self);
 
-		if (self.options.showOmittedCount)
+		if (self.options.showOmittedCount && !self.options.isMiniGrid)
 		{
 			tf.shortCutKeys.bind("ctrl+o", self.onCtrlOPress, self.options.routeState);
 		}
-		if (self.options.selectable && self.options.selectable.indexOf("multiple") != -1)
+
+		if (self.options.selectable && self.options.selectable.indexOf("multiple") != -1 && !self.options.isMiniGrid)
 		{
 			tf.shortCutKeys.bind("ctrl+a", self.onCtrlAPress, self.options.routeState);
 			tf.shortCutKeys.bind("ctrl+i", self.onCtrlIPress, self.options.routeState);
