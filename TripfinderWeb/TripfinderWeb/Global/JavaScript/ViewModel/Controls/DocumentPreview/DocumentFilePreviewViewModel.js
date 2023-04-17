@@ -989,6 +989,26 @@
 		a.remove();
 	};
 
+	/**
+	 * Trigger download of the file on browser.
+	 *
+	 * @param {String} fileName
+	 * @param {String} mimeType
+	 * @param {String} url
+	 */
+	DocumentFilePreviewViewModel.prototype.initDownloadFromUrlOnBrowser = function(fileName, mimeType, url)
+	{
+		var a = document.createElement('a');
+		a.style = "display: none";
+		a.target = "_blank";
+		document.body.appendChild(a);
+		a.download = fileName;
+		a.type = mimeType;
+		a.href = url;
+		a.click();
+		a.remove();
+	};
+
 	function convertBase64DataToBlob(fileContent, mimeType)
 	{
 		var binStr = atob(fileContent),
