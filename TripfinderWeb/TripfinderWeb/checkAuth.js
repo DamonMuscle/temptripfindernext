@@ -8,7 +8,7 @@
  * The MyTransfinderApiUrl will be updated before release. see MYT-371
  */
 const MyTransfinderApiUrl = "https://mytf.transfinder.com/mytfapi/v1";
-const DefaultEnterpriseLoginUrl = "https:/login.transfinder.com";
+const DefaultEnterpriseLoginUrl = "https://login.transfinder.com";
 const EnterpriseLoginProductRoutePath = "tripfinder";
 
 /**
