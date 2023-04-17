@@ -264,7 +264,12 @@
 				tf.loadingIndicator.tryHide();
 
 				var execResultData = result.Data;
-				tf.docFilePreviewHelper.initDownloadOnBrowser(execResultData.FileName, execResultData.MimeType, execResultData.Base64FileContent);
+				if (execResultData.IsFileContentExist)
+				{
+					var url = tf.exagoBIHelper.getDownloadFileUrl(reportId, reportName, self.obSelectedOutputType().type, execResultData.Id)
+					tf.docFilePreviewHelper.initDownloadFromUrlOnBrowser(execResultData.FileName, execResultData.MimeType, url);
+					return execResultData;
+				}
 
 				return execResultData;
 			})
