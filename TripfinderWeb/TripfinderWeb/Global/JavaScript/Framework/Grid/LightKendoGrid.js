@@ -191,6 +191,14 @@
 		self.currentDisplayColumns = ko.observableArray();
 	};
 
+	LightKendoGrid.prototype.refreshGridColumnDefinition = function()
+	{
+		var self = this;
+
+		self.options.gridDefinition = self._excludeOnlyForFilterColumns(self.options.gridDefinition);
+		self._gridDefinition = self.options.gridDefinition = self.extendAdditionGridDefinition(self.options.gridDefinition, self.options.additionGridDefinition);
+	};
+
 	LightKendoGrid.prototype.loadAndCreateGrid = function()
 	{
 		//use setTimeout to fix "You cannot apply bindings multiple times to the same element." error on time box when use lightKendoGrid on init event;
@@ -744,7 +752,7 @@
 							});
 						}
 						if (self.options.withoutData || self.options.miniGridEditMode
-							||(self.options.isMiniGrid && self.options.hasPermission === false))
+							|| (self.options.isMiniGrid && self.options.hasPermission === false))
 						{
 							setEmpty();
 							return;
@@ -1179,7 +1187,7 @@
 			var kendoGridDomain = this;
 
 			var filter = kendoGridDomain.kendoGrid.dataSource.filter();
-			var clearCustomFilterCell = function (e)
+			var clearCustomFilterCell = function(e)
 			{
 				// filter is null, but the CustomFilter has not been removed in UI
 				let customContainer = $(e.sender.element);
@@ -1188,13 +1196,13 @@
 				{
 					$(filterCells[1]).val('');
 				}
-			}	
+			}
 
 			if (!filter)
 			{
 				clearCustomFilterCell(e);
 				return;
-			}	
+			}
 
 			var currentFilter = filter.filters.filter(function(item)
 			{
@@ -1203,7 +1211,7 @@
 
 			if (currentFilter.length)
 			{
-				var col = kendoGridDomain.kendoGrid.columns.filter(function (col) { return col.FieldName === field; });
+				var col = kendoGridDomain.kendoGrid.columns.filter(function(col) { return col.FieldName === field; });
 				var tmpType = col[0].type;
 				var inputCellText = currentFilter[0].filters[0].value;
 				inputCellText = TF.FilterHelper.formatFilterCellInputValue(inputCellText, tmpType);
