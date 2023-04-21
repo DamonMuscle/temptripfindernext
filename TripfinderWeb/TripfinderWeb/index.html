@@ -93,7 +93,14 @@
 	<script>
 		var tfRegion = "US";
 	</script>
-	<script src="local_settings.js"></script>
+	<script src="local_settings.js"></script>	
+	<script src="checkAuth.js"></script>
+	<script>
+		(function()
+		{
+			window.determineRedirect2VanityUrlPromise = vanitySessionGuard.determineRedirect2VanityUrl();
+		})();
+	</script>
 	<script src="Global/ThirdParty/jquery-1.12.4.min.js"></script>
 	<script src="Global/ThirdParty/jquery-ui-1.10.4.custom.min.js"></script>
 	<script src="Global/ThirdParty/moment-with-locales.min.js"></script>
@@ -601,13 +608,6 @@
 	<script src="Global/JavaScript/ViewModel/Workspace/SwitchGridMenuViewModel.js"></script>
 	<!-- endbuild -->
 	<script src="Global/ThirdParty/4.18/dojo/dojo.js" data-dojo-config="async: true"></script>
-	<script src="checkAuth.js"></script>
-	<script>
-		(function()
-		{
-			window.determineRedirect2VanityUrlPromise = vanitySessionGuard.determineRedirect2VanityUrl();
-		})();
-	</script>
 </head>
 
 <body>
