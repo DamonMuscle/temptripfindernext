@@ -2936,6 +2936,11 @@
 		$filterItemDropDownLists.map(function(idx, filterItemDropDownList)
 		{
 			var kendoDropDownList = $(filterItemDropDownList).data('kendoDropDownList');
+			/*
+			 * under most scenario except datetime/date filter, 400px is enough as the height for the popup,
+			 * and the KendoDropDownList should shrink to it's fit height if current height less than the height configured from options
+			 */
+			kendoDropDownList.options.height = 400;
 			if (kendoDropDownList)
 			{
 				//when grid's parent page is closed, self situation happens, like view page dispose.
@@ -2991,9 +2996,7 @@
 					$listContainer.css({ "height": "", "display": "block" });
 					$listParent.find('.k-list').parent().css({ "height": "" });
 					$listContainer.find("div, ul, li").css("box-sizing", "content-box");
-
 					var orgHeight = $listParent[0].scrollHeight;
-
 					setTimeout(function()
 					{
 						$listParent.height(orgHeight);
@@ -3003,8 +3006,8 @@
 						// handle datetime 
 						if (TF.FilterHelper.isDateOrDateTimeFilterType(filterType))
 						{
-							$listParent.css("max-height", '400px');
-							$listContainer.css("max-height", '400px');
+							$listParent.css("max-height", `${kendoDropDownList.options.height}px`);
+							$listContainer.css("max-height", `${kendoDropDownList.options.height}px`);
 							$listParent.css("overflow-y", "auto");
 						}
 					}, 10);
