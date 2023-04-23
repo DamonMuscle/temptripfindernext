@@ -92,7 +92,7 @@
 		const isVanityUrl = !!window.vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
 
 		const isLogged = !!((isLoggedInStorage === true || isLoggedInStorage === "true") && Boolean(this.clientKey) && Boolean(this.token));
-		return !isVanityUrl ? isLogged : (isLogged && potentialClientKey === this.clientKey);
+		return !isVanityUrl ? isLogged : (isLogged && potentialClientKey === (this.clientKey || "").toLowerCase());
 	};
 
 	AuthManager.prototype.logOff = function()
