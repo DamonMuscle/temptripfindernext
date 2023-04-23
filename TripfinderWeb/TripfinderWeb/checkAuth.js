@@ -41,12 +41,12 @@ const vanitySessionGuard = {
 	{
 		const cookies = this.parseCookie();
 
-		let clientKey = (cookies["ent.clientKey"] || "").replace(/\"/g, "").trim();
+		let clientKey = (cookies["ent.clientKey"] || "").replace(/\"/g, "").trim().toLowerCase();
 		let token = (cookies["ent.token"] || "").replace(/\"/g, "").trim();
 
 		if (!token && !clientKey)
 		{
-			clientKey = (localStorage.getItem("ent.clientKey") || "").replace(/\"/g, "").trim();
+			clientKey = (localStorage.getItem("ent.clientKey") || "").replace(/\"/g, "").trim().toLowerCase();
 			token = (localStorage.getItem("ent.token") || "").replace(/\"/g, "").trim();
 		}
 
