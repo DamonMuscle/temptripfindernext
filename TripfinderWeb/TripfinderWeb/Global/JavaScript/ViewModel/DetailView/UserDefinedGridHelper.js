@@ -86,7 +86,8 @@
 	UserDefinedGridHelper.handleItemForCopy = function(dataItem, columns, signatureFields)
 	{
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
-		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
+		// Migrate Bug from PLUS
+		// dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForDateTimeType(dataItem, columns, false);
 		return dataItem;
