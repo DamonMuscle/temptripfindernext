@@ -1404,6 +1404,22 @@
 		return null;
 	};
 
+	KendoGridFilterMenu.prototype.setDateTimeSecondTypeHint = function(filterSet, dateTimeFields)
+	{
+		(filterSet.FilterSets || []).forEach(fs =>
+		{
+			this.setDateTimeSecondTypeHint(fs, dateTimeFields);
+		});
+
+		(filterSet.FilterItems || []).forEach(fi =>
+		{
+			if (dateTimeFields.indexOf(fi.FieldName) !== -1)
+			{
+				fi.TypeHint = "DateTimeSecond"; // DateTime will convert to range in one minute
+			}
+		});
+	};
+
 	KendoGridFilterMenu.prototype.findCurrentOmittedRecords = function()
 	{
 		return omittedRecords = this.obTempOmitExcludeAnyIds();
