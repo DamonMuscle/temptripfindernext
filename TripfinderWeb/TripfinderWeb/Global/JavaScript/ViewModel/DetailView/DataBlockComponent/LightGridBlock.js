@@ -2827,6 +2827,7 @@
 				result?.ids && (self.includeIds = result.ids);
 				refreshGrid();
 			}));
+			self.pubSubSubscriptions.push(PubSub.subscribe("document_restore", () => { self.lightKendoGrid.fitContainer();}));
 		}
 
 		if (self.miniGridType == "contactinformation")

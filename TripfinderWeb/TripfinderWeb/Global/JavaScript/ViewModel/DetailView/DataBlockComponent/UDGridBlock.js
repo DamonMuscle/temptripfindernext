@@ -169,6 +169,10 @@
 		this.expandContainer.children().show();
 		this.expandedDom && this.expandedDom.remove();
 		this._fitExpandGridHeight();
+
+		// for refresh the UI of grid
+		PubSub.publish("udgrid_restore");
+		PubSub.publish("document_restore");
 	};
 
 	UDGridBlock.prototype.manageLayout = function()
@@ -630,7 +634,15 @@
 			self.lightKendoGrid.refresh();
 		}
 
+		function fitContainer()
+		{
+			self.lightKendoGrid.fitContainer();
+		}
+
 		self.pubSubSubscriptions.push(PubSub.subscribe("udgrid", () => { refreshGrid() }));
+		// Expand mode: when refresh the others grid, they are invisible and cannot get correct size of them;
+		// so need refresh the ui after restoring
+		self.pubSubSubscriptions.push(PubSub.subscribe("udgrid_restore", () => { fitContainer() }));
 	};
 
 	UDGridBlock.prototype._onDataBound = function()
