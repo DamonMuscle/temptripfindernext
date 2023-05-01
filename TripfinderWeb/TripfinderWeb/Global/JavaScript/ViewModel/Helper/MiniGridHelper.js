@@ -1,7 +1,7 @@
 (function()
 {
 	createNamespace("TF.Helper").MiniGridHelper = MiniGridHelper;
-	MiniGridHelper.gridsSupportFilter = ["StudentGrid", "ContactGrid", "DocumentGrid", "StudentScheduleGrid", "AltsiteGrid",
+	MiniGridHelper.gridsSupportFilter = ["StudentGrid", "DocumentGrid", "StudentScheduleGrid", "AltsiteGrid",
 		"AMTripGrid", "PMTripGrid", "AMTransferTripGrid", "PMTransferTripGrid", "AllTripGrid", "AllTripStopGrid", "AMTripStopGrid", "PMTripStopGrid",
 		"AMTransferTripStopGrid", "PMTransferTripStopGrid", "CommunicationHistoryGrid", "AideGrid", "DriverGrid", "VehicleGrid", "StopGrid", "TripGrid"];
 
