@@ -25,9 +25,9 @@
 		}
 
 		return [
-			{ DisplayName: "Created By", FieldName: "CreatedByUserName", Width: "120px", type: "string" },
+			{ DisplayName: "Created By", FieldName: "CreatedBy", Width: "120px", type: "string" },
 			{ DisplayName: "Created On", FieldName: "CreatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local, formatSummaryValue: utc2Local },
-			{ DisplayName: "Last Updated By", FieldName: "LastUpdatedByUserName", Width: "120px", type: "string" },
+			{ DisplayName: "Last Updated By", FieldName: "LastUpdatedBy", Width: "120px", type: "string" },
 			{ DisplayName: "Last Updated On", FieldName: "LastUpdatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local, formatSummaryValue: utc2Local },
 			{ DisplayName: "IP Address", FieldName: "IPAddress", Width: '100px', type: "string" },
 			{ DisplayName: "Host", FieldName: "Host", Width: '100px', type: "string" },
@@ -41,8 +41,8 @@
 	UserDefinedGridHelper.getGeoInfoColumns = function()
 	{
 		return [
-			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "130px", type: "number" },
-			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "130px", type: "number" }
+			{ DisplayName: "Location Y Coord", FieldName: "Latitude", Width: "130px", type: "number" },
+			{ DisplayName: "Location X Coord", FieldName: "Longitude", Width: "130px", type: "number" }
 		];
 	};
 
