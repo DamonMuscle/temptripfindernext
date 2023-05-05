@@ -229,8 +229,6 @@
 					options.ExternalID.trim() !== "" ? title + ` ( External ID: ${options.ExternalID.trim()} )` : title
 			});
 
-		self.removeAllFilterContainer();
-
 		if (self.isAddBtnDisabled())
 		{
 			$btn.addClass("disabled");
@@ -980,34 +978,7 @@
 			self.$el.find(".kendo-summarygrid-container").html("");
 		}
 
-		self.removeAllFilterContainer();
 		self._restore();
-	};
-
-	UDGridBlock.prototype.removeAllFilterContainer = function(dataType)
-	{
-		// remove all filter k-list-container for better performance
-		var self = this;
-		if (!self.$el)
-		{
-			return;
-		}
-
-		// KendoDropDownList is cleaned in GridMultiDocumentViewModel.closeDetailViewPanel but the DOM is not removed yet.
-		// Remove k-list-container DOM Manually here by ID.
-		var $dropDownLists = self.$el.find('input[data-kendo-role="dropdownlist"]');
-		$dropDownLists.each(function(idx, item)
-		{
-			var id = $(item)?.parent("span")?.attr("aria-controls")?.split("_")[0];
-			id && $(`#${id}-list`).remove();
-		});
-
-		var $autocompleteDropDownLists = self.$el.find('input[data-kendo-role="autocomplete"]');
-		$autocompleteDropDownLists.each(function(idx, item)
-		{
-			var id = $(item)?.attr("aria-controls")?.split("_")[0];
-			id && $(`#${id}-list`).remove();
-		});
 	};
 
 	UDGridBlock.prototype.checkModifyPermission = function(dataType)
