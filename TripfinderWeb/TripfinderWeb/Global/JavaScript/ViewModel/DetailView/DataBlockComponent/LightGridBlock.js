@@ -2827,7 +2827,7 @@
 				result?.ids && (self.includeIds = result.ids);
 				refreshGrid();
 			}));
-			self.pubSubSubscriptions.push(PubSub.subscribe("document_restore", () => { self.lightKendoGrid.fitContainer();}));
+			self.pubSubSubscriptions.push(PubSub.subscribe("document_restore", () => { self.lightKendoGrid.fitContainer(); }));
 		}
 
 		if (self.miniGridType == "contactinformation")
@@ -3450,8 +3450,28 @@
 
 	LightGridBlock.prototype.removeAllFilterContainer = function(dataType)
 	{
-		// remove all filter k-list-container by uniqueClassName for better performance
-		$(".filter-container-" + this.uniqueClassName).remove();
+		// remove all filter k-list-container for better performance
+		var self = this;
+		if (!self.$el)
+		{
+			return;
+		}
+
+		// KendoDropDownList is cleaned in GridMultiDocumentViewModel.closeDetailViewPanel but the DOM is not removed yet.
+		// Remove k-list-container DOM Manually here by ID.
+		var $dropDownLists = self.$el.find('input[data-kendo-role="dropdownlist"]');
+		$dropDownLists.each(function(idx, item)
+		{
+			var id = $(item)?.parent("span")?.attr("aria-controls")?.split("_")[0];
+			id && $(`#${id}-list`).remove();
+		});
+
+		var $autocompleteDropDownLists = self.$el.find('input[data-kendo-role="autocomplete"]');
+		$autocompleteDropDownLists.each(function(idx, item)
+		{
+			var id = $(item)?.attr("aria-controls")?.split("_")[0];
+			id && $(`#${id}-list`).remove();
+		});
 	};
 
 	/**
