@@ -229,8 +229,6 @@
 					options.ExternalID.trim() !== "" ? title + ` ( External ID: ${options.ExternalID.trim()} )` : title
 			});
 
-		self.removeAllFilterContainer();
-
 		if (self.isAddBtnDisabled())
 		{
 			$btn.addClass("disabled");
@@ -980,14 +978,7 @@
 			self.$el.find(".kendo-summarygrid-container").html("");
 		}
 
-		self.removeAllFilterContainer();
 		self._restore();
-	};
-
-	UDGridBlock.prototype.removeAllFilterContainer = function(dataType)
-	{
-		// remove all filter k-list-container by uniqueClassName for better performance
-		$(".filter-container-" + this.uniqueClassName).remove();
 	};
 
 	UDGridBlock.prototype.checkModifyPermission = function(dataType)

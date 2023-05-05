@@ -584,8 +584,6 @@
 			$kendoGrid = $("<div>", { class: "kendo-grid kendo-grid-container" }),
 			$summaryContainer = $("<div>", { class: "kendo-grid kendo-summarygrid-container" });
 
-		self.removeAllFilterContainer();
-
 		if (extraGridConfigs)
 		{
 			if (extraGridConfigs.minWidth)
@@ -2827,7 +2825,7 @@
 				result?.ids && (self.includeIds = result.ids);
 				refreshGrid();
 			}));
-			self.pubSubSubscriptions.push(PubSub.subscribe("document_restore", () => { self.lightKendoGrid.fitContainer();}));
+			self.pubSubSubscriptions.push(PubSub.subscribe("document_restore", () => { self.lightKendoGrid.fitContainer(); }));
 		}
 
 		if (self.miniGridType == "contactinformation")
@@ -3444,14 +3442,6 @@
 			self.$el.find(".kendo-summarygrid-container").css("height", "0px");
 			self.$el.find(".kendo-summarygrid-container").html("");
 		}
-
-		self.removeAllFilterContainer();
-	};
-
-	LightGridBlock.prototype.removeAllFilterContainer = function(dataType)
-	{
-		// remove all filter k-list-container by uniqueClassName for better performance
-		$(".filter-container-" + this.uniqueClassName).remove();
 	};
 
 	/**
