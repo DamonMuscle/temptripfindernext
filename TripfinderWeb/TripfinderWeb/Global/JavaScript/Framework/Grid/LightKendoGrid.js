@@ -2748,8 +2748,9 @@
 								});
 								if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1)
 								{
+									const formatStr = TF.FilterHelper.getNilFiltersFormat(filter);
 									numberFilterCell.setOptions({
-										format: filter.replace("X", "0")
+										format: formatStr.replace("X", "0")
 									});
 								}
 								$inputElement.data("dateTimeNonParam", false);
@@ -2775,8 +2776,9 @@
 
 								if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1)
 								{
+									const formatStr = TF.FilterHelper.getNilFiltersFormat(filter);
 									numberFilterCell.setOptions({
-										format: filter.replace("X", "0")
+										format: formatStr.replace("X", "0")
 									});
 								}
 
@@ -3103,8 +3105,9 @@
 										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
 										let operatorName = self.getOpetatorName(filter.operator);
 										$filterItem.find("span.date-number").show(); // show the input
+										let formatStr = TF.FilterHelper.getNilFiltersFormat(operatorName);
 										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").setOptions({
-											format: operatorName.replace("X", "0")
+											format: formatStr.replace("X", "0")
 										});
 										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").value(filter.value);
 										$filterItem.find(dateCellClass).hide();
@@ -6245,6 +6248,15 @@
 	FilterHelper.dateTimeDateParamFiltersOperator = ['onx', 'onorafterx', 'onorbeforex'];
 
 	FilterHelper.dateTimeDateParamFiltersNames = ['On X', 'On or After X', 'On or Before X'];
+
+	FilterHelper.getNilFiltersFormat = function(filter)
+	{
+		if (filter === 'On Year X') return filter;
+
+		let formatStr = filter.slice(0, -1);
+		formatStr = formatStr + '(s)';
+		return formatStr;
+	}
 
 	FilterHelper.getSortColumns = function(columns)
 	{
