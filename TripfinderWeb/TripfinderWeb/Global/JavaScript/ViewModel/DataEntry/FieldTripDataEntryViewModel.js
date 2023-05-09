@@ -1601,6 +1601,7 @@
 		var option = {
 			entityId: this.obEntityDataModel().id(),
 			entityType: "fieldtrip",
+			operationType: "Add",
 			strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
 			selectAccount: this.obSelectedAccount(),
 			selectedSchool: this.obEntityDataModel().school(),
@@ -1647,6 +1648,7 @@
 			var option = {
 				entityId: this.obEntityDataModel().id(),
 				entityType: "fieldtrip", data: data,
+				operationType: "Edit",
 				strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
 				selectAccount: this.obSelectedAccount(),
 				selectedSchool: this.obEntityDataModel().school(),
