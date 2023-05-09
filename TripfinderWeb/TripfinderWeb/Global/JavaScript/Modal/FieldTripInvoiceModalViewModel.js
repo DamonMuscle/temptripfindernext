@@ -12,20 +12,7 @@
 		this.fieldTripInvoiceViewModel = new TF.Control.FieldTripInvoiceViewModel(option);
 		this.data(this.fieldTripInvoiceViewModel);
 		this.sizeCss = "modal-sm";
-
-		var viewTitle;
-
-		///this is going to check if the popup form is add new records or edit an existing record
-		if (option.id)
-		{
-			viewTitle = "Edit Invoicing Information";
-		}
-		else
-		{
-			viewTitle = "Add Invoicing Information";
-		}
-
-		this.title(viewTitle);
+		this.title(`${option.operationType} Invoicing Information`);
 	}
 
 	FieldTripInvoiceModalViewModel.prototype = Object.create(TF.Modal.BaseModalViewModel.prototype);
