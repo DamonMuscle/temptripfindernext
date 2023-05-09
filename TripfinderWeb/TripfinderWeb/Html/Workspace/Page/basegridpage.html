@@ -25,41 +25,42 @@
 	<div class="grid-icons" data-bind="css:{'is-mobile-device':TF.isPhoneDevice}">
 		<div class="iconrow">
 			<!-- ko if: pageType !== "reports"-->
-			<button class="iconbutton gridview" title="Grid View"
-				data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
-			<!-- ko if:detailButton-->
-			<button class="iconbutton details" title="Detail View"
-				data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
+				<button class="iconbutton gridview" title="Grid View"
+					data-bind="css:{open: !obShowDetailPanel()&&!obShowFieldTripDEPanel()}"></button>
+				<!-- ko if:detailButton-->
+				<button class="iconbutton details" title="Detail View"
+					data-bind="css:{open:obShowDetailPanel()}, enable:obIsSelectRow"></button>
+				<!-- /ko -->
+				<!-- ko if:schedulerButton-->
+				<button class="iconbutton kendo-scheduler" title="Calendar View"
+					data-bind="click:schedulerViewClick"></button>
+				<!-- /ko -->
+				<div class="divider" title=""></div>
+				<button class="iconbutton summarybar" title="Summary Bar"
+					data-bind="css:{open:obSummaryGridVisible()}"></button>
+				<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
+				<div class="divider" title=""></div>
+				<button class="iconbutton layout" title="Layouts"
+					data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
+				<button class="iconbutton filter" title="Filters"
+					data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
+
+				<button class="iconbutton refresh" title="Refresh"></button>
+
+				<!-- ko if: changeStatusButton || cancelButton-->
+				<div class="divider" title=""></div>
+				<!-- /ko -->
+				<!-- ko if: changeStatusButton-->
+				<button class="iconbutton approve" title="Change Status" data-bind="enable:selectedItemsEditable"></button>
+				<!-- /ko -->
+				<!-- ko if: cancelButton-->
+				<button class="iconbutton cancel" title="Cancel Trip" data-bind="enable:selectedItemsEditable"></button>
+				<!-- /ko -->
+				<!-- ko if: copyButton-->
+				<button class="iconbutton copy" title="Copy Trip" data-bind="enable:obCanCopyFieldTrip"></button>
+				<!-- /ko -->
 			<!-- /ko -->
-			<!-- ko if:schedulerButton-->
-			<button class="iconbutton kendo-scheduler" title="Calendar View"
-				data-bind="click:schedulerViewClick"></button>
-			<!-- /ko -->
-			<div class="divider" title=""></div>
-			<button class="iconbutton summarybar" title="Summary Bar"
-				data-bind="css:{open:obSummaryGridVisible()}"></button>
-			<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
-			<button class="iconbutton layout" title="Layouts"
-				data-bind="css:{'tf-layout-applied':(obSelectedGridLayoutName() !=='Default' )}"></button>
-			<button class="iconbutton filter" title="Filters"
-				data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
-			<!-- ko if: changeStatusButton || cancelButton-->
-			<div class="divider" title=""></div>
-			<!-- /ko -->
-			<!-- ko if: changeStatusButton-->
-			<button class="iconbutton approve" title="Change Status" data-bind="enable:selectedItemsEditable"></button>
-			<!-- /ko -->
-			<!-- ko if: cancelButton-->
-			<button class="iconbutton cancel" title="Cancel Trip" data-bind="enable:selectedItemsEditable"></button>
-			<!-- /ko -->
-			<!-- ko if: copyButton-->
-			<button class="iconbutton copy" title="Copy Trip" data-bind="enable:obCanCopyFieldTrip"></button>
-			<!-- /ko -->
-			<!-- /ko -->
-			<!-- ko if: pageType != "reports"-->
-			<div class="divider" title=""></div>
-			<button class="iconbutton refresh" title="Refresh"></button>
-			<!-- /ko -->
+
 			<!-- ko if: pageType === "reports"-->
 			<button class="iconbutton addremovecolumn" title="Show/Hide Grid Columns"></button>
 			<button class="iconbutton refresh" title="Refresh"></button>
