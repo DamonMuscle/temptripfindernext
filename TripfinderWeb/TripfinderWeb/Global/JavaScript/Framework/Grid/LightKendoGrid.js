@@ -3382,6 +3382,21 @@
 											{
 												var options = this.getApiRequestOption(kendoOption);
 												options.paramData = { FieldName: tf.UDFDefinition.getOriginalName(column.field), AggregateOperator: 'Distinct100' };
+												if(tf && tf.pageManager)
+												{
+													switch(tf.pageManager.oldPageType)
+													{
+														case "myrequests":
+															options.paramData.filterType = "submitted";
+															break;
+														case "approvals":
+															options.paramData.filterType = "permission";
+															break;
+														default:
+															break;
+													}
+												}
+
 												options.success = function(result)
 												{
 													result.Items = LightKendoGrid.normalizeResultItem(result.Items, this._gridType, this.options);
