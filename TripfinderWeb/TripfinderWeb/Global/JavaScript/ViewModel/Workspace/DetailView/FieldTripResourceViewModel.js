@@ -58,7 +58,7 @@
 		var self = this;
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.options = options;
-		options.entity = $.extend({}, options.entity);
+		options.entity = $.extend({EndingOdometer: null, FuelConsumptionRate: null, StartingOdometer: null}, options.entity);
 		tf.measurementUnitConverter.convertToDisplay(options.entity, new TF.DataModel.FieldTripResourceDataModel());
 		if(options.BillingClassification != null)
 		{
