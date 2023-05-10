@@ -49,6 +49,7 @@
 		customClickAndTouchEvent = `click.LightKendoGrid${this.randomKey} touchend.LightKendoGrid${this.randomKey}`;
 		customTouchMoveEvent = `touchmove.LightKendoGrid${this.randomKey}`;
 
+		this.pendingTaskOnNextDataBound = null;
 		this.geoFields = geoFields;
 		if (geoFields)
 		{
@@ -5074,6 +5075,20 @@
 		this.getSelectedIds(id == null ? [] : [id]);
 	};
 
+	/**
+	 * Run specified task on next data bound.
+	 *
+	 * @param {Function} task
+	 */
+	LightKendoGrid.prototype.runOnNextDataBound = function(task)
+	{
+		if (!!this.pendingTaskOnNextDataBound)
+		{
+			console.log("Pending task overriden.");
+		}
+		this.pendingTaskOnNextDataBound = task;
+	}
+
 	LightKendoGrid.prototype.scrollToSelection = function()
 	{
 		var index = this.obSelectedIndex(),
@@ -5364,6 +5379,12 @@
 		self._loadIdsWhenOnDataBound()
 			.then(function()
 			{
+				if (typeof self.pendingTaskOnNextDataBound === "function")
+				{
+					self.pendingTaskOnNextDataBound();
+					self.pendingTaskOnNextDataBound = null;
+				}
+
 				newIds = self.obAllIds().slice();
 				if (oldIds.sort().join(',') === newIds.sort().join(','))
 				{
@@ -5906,6 +5927,25 @@
 					}
 				});
 			});
+	};
+
+	LightKendoGrid.prototype.scrollToRowById = function(id)
+	{
+		var self = this,
+			index = self.obAllIds().indexOf(id);
+
+		if (index > -1)
+		{
+			var $scroll = self.$container.children(".k-grid-content").find(".k-scrollbar.k-scrollbar-vertical"),
+				containerHeight = $scroll.height(),
+				totalHeight = $scroll.contents().height(),
+				unitHeight = self.$container.children(".k-grid-content").find(".k-virtual-scrollable-wrap .fillItem").height(),
+				scrollTop = unitHeight * index,
+				lastPageTop = totalHeight - containerHeight;
+
+			scrollTop = Math.min(scrollTop, lastPageTop);
+			$scroll.scrollTop(scrollTop);
+		}
 	};
 
 	LightKendoGrid.prototype.getSelectedRecordsFromServer = function()
