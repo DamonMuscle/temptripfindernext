@@ -186,11 +186,103 @@
 		if (TF.isMobileDevice)
 		{
 			self.isDetailViewEdited = true;
+			self.detailView.refresh();
 		} else
 		{
-			self.searchGrid.refreshClick();
+			self.updateGridRecord(recordEntity.Id, true);
 		}
-		self.detailView.refresh();
+	};
+
+	BasePage.prototype.updateGridRecord = function(recordId, updateDetailView)
+	{
+		const self = this;
+		self.refreshPage();
+
+		self._validateGridFilter(recordId).then(function(match)
+		{
+			if (!match)
+			{
+				self._confirmResetFilter().then(function(result)
+				{
+					if (result)
+					{
+						self.searchGrid.runOnNextDataBound && self.searchGrid.runOnNextDataBound(function()
+						{
+							self._selectRecordAndShowDetailView(recordId);
+						});
+					}
+					else if (updateDetailView)
+					{
+						self.showDetailsClick(recordId);
+					}
+				});
+			}
+			else if (updateDetailView)
+			{
+				self.showDetailsClick(recordId);
+			}
+		});
+	};
+
+	BasePage.prototype.refreshPage = function()
+	{
+		const self = this;
+		self.searchGrid.kendoGrid.dataSource.read();
+		self.detailView?.refresh();
+	}
+
+	BasePage.prototype._validateGridFilter = function(recordId)
+	{
+		const self = this,
+		grid = self.searchGrid,
+		promise = new Promise(function(resolve, reject)
+		{
+			TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(grid).then(function(ids)
+			{
+				resolve(ids.includes(recordId));
+			});
+		});
+		return promise;
+	}
+
+	BasePage.prototype._confirmResetFilter = function()
+	{
+		const self = this,
+			grid = self.searchGrid,
+			message = 'The saved record would not be displayed in grid because of the applied filter, do you want to reset the filter?';
+		return self.detailView.showConfirmation(message).then(function(result)
+		{
+			if (result && grid.clearGridFilterClick)
+			{
+				return grid.clearGridFilterClick().then(function()
+				{
+					return true;
+				});
+			}
+			else
+			{
+				return false;
+			}
+		});
+	};
+
+	BasePage.prototype._selectRecordAndShowDetailView = function(recordId)
+	{
+		const self = this, grid = self.searchGrid;
+		grid.scrollToRowById && grid.scrollToRowById(recordId);
+		grid.getSelectedIds([recordId]);
+		self.showDetailsClick(recordId);
+
+		const records = grid.getSelectedRecords()
+		if (!records || !records.length)
+		{
+			const subscription = grid.getSelectedRecords.subscribe(function() {
+				subscription?.dispose();
+				self.updateEditable();
+				const isReadOnly = !self.selectedItemEditable();
+				self.detailView.showDetailViewById(self.selectedRecordIds[0], null, null, isReadOnly);
+			});
+		}
 	};
 
 	BasePage.prototype.editClick = function(viewModel, e)
