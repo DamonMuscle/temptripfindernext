@@ -568,6 +568,16 @@
 			gt: "Greater Than",
 			gte: "Greater Than or Equal To"
 		},
+		time: {
+			eq: "Equal To",
+			neq: "Not Equal To",
+			isempty: "Empty",
+			isnotempty: "Not Empty",
+			lt: "Less Than",
+			lte: "Less Than or Equal To",
+			gt: "Greater Than",
+			gte: "Greater Than or Equal To"
+		},
 		datetime: {
 			eq: "Equal To",
 			neq: "Not Equal To",
@@ -684,6 +694,12 @@
 	LightKendoGrid.OperatorWithNumber = {
 		string: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator),
 		number: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator)
+	};
+
+	LightKendoGrid.OperatorWithTime = {
+		// here need set "datetime" not "time" for time type column
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator),
+		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator)		
 	};
 
 	LightKendoGrid.Operator2DisplayValue = {
@@ -3234,7 +3250,8 @@
 		var supportListFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.ListFilterTemplate; });
 		var supportDateTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'datetime'; });
 		var supportDateFilterColumns = this._gridType === 'gpsevent' ? [] : this._gridDefinition.Columns.filter(function(column) { return column.type === 'date'; });
-		var supportNumberFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'number'; });
+		var supportNumberFilterColumns = this._gridDefinition.Columns.filter(function (column) { return column.type === 'number' || column.type === 'integer'; });
+		var supportTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'time' });
 		columns.forEach(function(column)
 		{
 			if (supportDateTimeFilterColumns.some(function(sc)
@@ -3265,6 +3282,14 @@
 			}))
 			{
 				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithNumber;
+			}
+
+			if (supportTimeFilterColumns.some(function(sc)
+			{
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
+				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithTime;
 			}
 		});
 
