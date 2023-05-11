@@ -84,6 +84,33 @@
 				}
 			}.bind(this), delayTime || (progressbar ? 0 : 1000));
 		},
+		enhancedShow: function(promiseOrFunction){
+			const self = this;
+			if (!(promiseOrFunction instanceof Function || promiseOrFunction instanceof Promise))
+			{
+				throw new Error("Accepting promise or function only.");
+			}
+
+			self.show();
+
+			return new Promise(function(resolve)
+			{
+				if (promiseOrFunction instanceof Function)
+				{
+					resolve(promiseOrFunction());
+				}
+				else
+				{
+					resolve(promiseOrFunction);
+				}
+			}).then(function(result)
+			{
+				return result;
+			}, function(error){
+				// Generally, we should never arrive here. Exceptions should be handled in promiseOrFunction
+				console.error(error);
+			}).finally(() => self.tryHide());
+		},
 		showImmediately: function()
 		{
 			if (!this.subtitle())

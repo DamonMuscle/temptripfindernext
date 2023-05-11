@@ -271,14 +271,14 @@
 	Startup.prototype.start = function()
 	{
 		var self = this;
-		self.libraryInitialization().then(function()
+		tf.loadingIndicator = self._createLoadingIndicator();
+		tf.loadingIndicator.enhancedShow(self.libraryInitialization().then(function()
 		{
 			tf.dataFormatHelper = new TF.DataFormatHelper();
 			tf.fullScreenHelper = new TF.FullScreenHelper();
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
 			tf.entStorageManager = new TF.EntStorageManager();
-			tf.loadingIndicator = self._createLoadingIndicator();
 			tf.ajax = new TF.Ajax(tf.loadingIndicator, true);
 			tf.promiseAjax = new TF.PromiseAjax(tf.ajax);
 			tf.documentEvent = new TF.DocumentEvent();
@@ -303,7 +303,7 @@
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
 			TF.getLocation(); //request permission
-			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
+			return tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
 				.then(function()
 				{
 					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
@@ -611,7 +611,7 @@
 							return tf.pageManager.loadDataSourceName();
 						});
 				});
-		});
+		}));
 	};
 
 	Startup.prototype.changeStaffType = function ()
