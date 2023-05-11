@@ -588,9 +588,26 @@
 
 		if (!item.UDFId)
 		{
-			if (Object.keys(editFieldList).includes(item.field))
+			if (item.hasOwnProperty("editType") && item.editType.hasOwnProperty("entityKey"))
 			{
-				return editFieldList[item.field].value;
+				if (Object.keys(editFieldList).includes(item.editType.entityKey))
+				{
+					if (editFieldList[item.editType.entityKey].type === "ListMover")
+					{
+						return editFieldList[item.editType.entityKey].recordValue;
+					}
+					else
+					{
+						return editFieldList[item.editType.entityKey].textValue;
+					}
+				}
+			}
+			else
+			{
+				if (Object.keys(editFieldList).includes(item.field))
+				{
+					return editFieldList[item.field].value;
+				}
 			}
 
 			if (self.detailView.newCopyContext &&

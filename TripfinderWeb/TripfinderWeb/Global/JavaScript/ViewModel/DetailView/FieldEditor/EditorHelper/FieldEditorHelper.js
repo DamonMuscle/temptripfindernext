@@ -710,6 +710,7 @@
 			{
 				case "ListMover":
 					obj.value = result.selectPickListOptionIDs;
+					obj.recordValue = result.recordValue;
 					if (result.blockName === "Schools")
 					{
 						self.editFieldList["Schools"] = {
