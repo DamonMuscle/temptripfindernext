@@ -679,7 +679,7 @@
 	};
 	LightKendoGrid.OperatorWithList = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.OperatorWithList);
 
-	LightKendoGrid.DefaultNumberOperator = {
+	LightKendoGrid.DefaultGeneralOperator = {  //user for number/interger/number
 		eq: "Equal To",
 		neq: "Not Equal To",
 		isempty: "Empty",
@@ -692,14 +692,14 @@
 	};
 
 	LightKendoGrid.OperatorWithNumber = {
-		string: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator),
-		number: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator)
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator),
+		number: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)
 	};
 
 	LightKendoGrid.OperatorWithTime = {
 		// here need set "datetime" not "time" for time type column
-		string: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator),
-		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultNumberOperator)		
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator),
+		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)		
 	};
 
 	LightKendoGrid.Operator2DisplayValue = {
