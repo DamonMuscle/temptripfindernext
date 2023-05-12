@@ -1035,9 +1035,10 @@
 
 	FieldTripDataEntryViewModel.prototype.loadResources = function()
 	{
-		if (!tf.authManager.authorizationInfo.isFieldTripAdmin)
+		var canModify = false;
+		if (tf.helpers.fieldTripAuthHelper.canModifyResourceRecord())
 		{
-			return;
+			canModify = true;
 		}
 
 		var self = this;
@@ -1087,15 +1088,15 @@
 				}.bind(this));
 
 				this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-				this.obResourcesGridViewModel().obEditEnable(true);
-				this.obResourcesGridViewModel().obCanAdd(true);
+				this.obResourcesGridViewModel().obEditEnable(canModify);
+				this.obResourcesGridViewModel().obCanAdd(canModify);
 			}.bind(this));
 		}
 		else
 		{
 			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-			this.obResourcesGridViewModel().obEditEnable(true);
-			this.obResourcesGridViewModel().obCanAdd(true);
+			this.obResourcesGridViewModel().obEditEnable(canModify);
+			this.obResourcesGridViewModel().obCanAdd(canModify);
 		}
 	};
 
