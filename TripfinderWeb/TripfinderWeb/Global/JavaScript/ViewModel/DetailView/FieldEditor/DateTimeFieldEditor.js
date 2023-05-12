@@ -22,6 +22,12 @@
 		var self = this;
 		self._$element = $("<div class='custom-field-input datetime'><!-- ko customInput:{type:\"" + self.type + "\",value:obValue,attributes:{class:\"form-control\",format:'" + self.format + "'}} --><!-- /ko --></div>");
 		ko.applyBindings(self, self._$element[0]);
+
+		const $button = self._$element.find(".input-group-addon.datepickerbutton");
+		$button.on('dp.show', function(e)
+		{
+			self.adjustWidgetPosition();
+		});
 	};
 
 	DateTimeFieldEditor.prototype.getFormatedValue = function(value)
