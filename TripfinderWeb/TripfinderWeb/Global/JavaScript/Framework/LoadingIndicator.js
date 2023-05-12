@@ -14,6 +14,7 @@
 		self.$kendoProgress = self._$progressbar.find(".progress-bar");
 		this._$subtitle = $element.find(".spinner .subtitle").hide();
 		this._counter = 0;
+		this._mapper = {};
 		this._handle = null;
 
 		this.subtitle = ko.observable("");
@@ -35,13 +36,13 @@
 	LoadingIndicator.prototype = {
 		setSubtitle: function(subtitle)
 		{
-			if (this._counter <= 0)
+			if (this.isHiding())
 				this.subtitle(subtitle);
 		},
 		tryHide: function()
 		{
 			this._counter--;
-			if (this._counter <= 0)
+			if (this.isHiding())
 			{
 				this._counter = 0;
 				clearTimeout(this._handle);
@@ -53,9 +54,20 @@
 				this.reminderLoadingStatus.notify(false);
 			}
 		},
+		hideByName: function(name)
+		{
+			if (!name || !this._mapper[name])
+			{
+				return; // never shown by this name
+			}
+
+			delete this._mapper[name];
+			this.tryHide();
+		},
 		hideCompletely: function()
 		{
 			this._counter = 0;
+			this._mapper = {};
 			this.tryHide();
 		},
 		show: function(progressbar, overlay, delayTime)
@@ -66,7 +78,7 @@
 			var self = this;
 			this._handle = setTimeout(function()
 			{
-				if (self._counter != 0)
+				if (self.isShowing())
 				{
 					this._$overlay.show();
 					if (overlay === false)
@@ -83,6 +95,14 @@
 					}
 				}
 			}.bind(this), delayTime || (progressbar ? 0 : 1000));
+		},
+		showByName: function(name) {
+			if (this._mapper[name])
+			{
+				return; // already shown by this name
+			}
+			this._mapper[name] = true;
+			this.show();
 		},
 		enhancedShow: function(promiseOrFunction){
 			const self = this;
@@ -121,7 +141,7 @@
 			this._counter++;
 			this._$element.show(0);
 			this.reminderLoadingStatus.notify(true);
-			if (this._counter != 0)
+			if (this.isShowing())
 			{
 				this._$overlay.show(0);
 				this._$spinner.show(0);
@@ -129,7 +149,10 @@
 		},
 		isShowing: function()
 		{
-			return this._counter != 0;
+			return this._counter != 0 || Object.keys(this._mapper).length > 0;
+		},
+		isHiding: function() {
+			return this._counter <= 0 && !Object.keys(this._mapper).length;
 		},
 		resetProgressbar: function()
 		{
