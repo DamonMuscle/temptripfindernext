@@ -329,7 +329,7 @@
 		if ($(e.target).closest(".k-hierarchy-cell", $row).length === 0
 			&& !$row.hasClass("k-detail-row"))
 		{
-			self._refreshGridBlank();
+			setTimeout(self._refreshGridBlank.bind(self)); // use setTimeout to redraw the fill color after the cell color is updated
 
 			if (!isHotLink(e))
 			{
