@@ -271,14 +271,14 @@
 	Startup.prototype.start = function()
 	{
 		var self = this;
-		tf.loadingIndicator = self._createLoadingIndicator();
-		tf.loadingIndicator.enhancedShow(self.libraryInitialization().then(function()
+		self.libraryInitialization().then(function()
 		{
 			tf.dataFormatHelper = new TF.DataFormatHelper();
 			tf.fullScreenHelper = new TF.FullScreenHelper();
 			tf.shortCutKeys = new TF.ShortCutKeys();
 			tf.storageManager = new TF.StorageManager("tfweb");
 			tf.entStorageManager = new TF.EntStorageManager();
+			tf.loadingIndicator = self._createLoadingIndicator();
 			tf.ajax = new TF.Ajax(tf.loadingIndicator, true);
 			tf.promiseAjax = new TF.PromiseAjax(tf.ajax);
 			tf.documentEvent = new TF.DocumentEvent();
@@ -303,8 +303,9 @@
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
 			TF.getLocation(); //request permission
-			return tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
-				.then(function()
+			tf.authManager.auth(new TF.Modal.TripfinderLoginModel()).then(function()
+			{
+				return tf.loadingIndicator.enhancedShow(Promise.resolve().then(function()
 				{
 					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
 					return tf.measurementUnitConverter.init();
@@ -610,8 +611,9 @@
 
 							return tf.pageManager.loadDataSourceName();
 						});
-				});
-		}));
+				}));
+			});
+		});
 	};
 
 	Startup.prototype.changeStaffType = function ()
