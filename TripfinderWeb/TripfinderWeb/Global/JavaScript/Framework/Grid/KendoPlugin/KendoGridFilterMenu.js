@@ -539,7 +539,7 @@
 				"@filter": filter,
 				"@relationships": "OmittedRecord,Reminder"
 			}
-		}).then(apiResponse => apiResponse.Items);
+		}).then(apiResponse => apiResponse.Items, () => []);
 		let dataTypeId = tf.dataTypeHelper.getId(self._gridType);
 		var staticfiltersPromise = Number.isInteger(dataTypeId) ? tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "staticfilters"), {
 			paramData: {
