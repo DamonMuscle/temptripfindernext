@@ -102,6 +102,21 @@
 
 		.login-form{
 			width: 380px;
+			button[type="submit"] {
+				width: 100%;
+				background-color: #333333;
+				color: #fff;
+		
+				&.btn-login {
+					background-color: @systemColor;
+					padding: 3px 12px;
+					height: 40px;
+		
+					&:focus {
+						outline: solid 2px #4D90FE !important;
+					}
+				}
+			}
 
 			@media (max-width: 480px) {
 				padding: 0;
@@ -174,22 +189,6 @@
 	.forget-password {
 		cursor: pointer;
 		color: @systemColor;
-	}
-
-	button[type="submit"] {
-		width: 100%;
-		background-color: #333333;
-		color: #fff;
-
-		&.btn-login {
-			background-color: @systemColor;
-			padding: 3px 12px;
-			height: 40px;
-
-			&:focus {
-				outline: solid 2px #4D90FE !important;
-			}
-		}
 	}
 
 	.form-group {
