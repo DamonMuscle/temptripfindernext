@@ -2304,27 +2304,38 @@
 		}
 
 		var self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays || [], nonWorkdays = [6, 0],
-			deadlineDays = settings.ScheduleDaysInAdvance || 0, departDate = new moment(departDate),
-			deadlineDate = new moment(), message;
+			deadlineDays = settings.ScheduleDaysInAdvance || 0, departDate = new moment(departDate).startOf("day"),
+			deadlineDate = new moment().startOf("day"), schoolDays = 0, message;
 
-		while (deadlineDays > 0)
+		const isSchoolDay = function(mmtDay)
 		{
-			if (nonWorkdays.indexOf(deadlineDate.day()) < 0 && !TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(deadlineDate, holidays))
+			const notWeekend = nonWorkdays.indexOf(mmtDay.day()) < 0,
+				notHoliday = !TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(mmtDay, holidays);
+			return notWeekend && notHoliday;
+		}
+
+		while (schoolDays < deadlineDays)
+		{
+			deadlineDate.add(1, "days");
+			if (isSchoolDay(deadlineDate))
 			{
-				deadlineDays--;
+				++schoolDays;
 			}
-			deadlineDate = deadlineDate.add(1, 'day');
 		}
 
 		if (deadlineDate.diff(departDate, 'days') > 0)
 		{
-			message = "Depart Date must be on or after " + deadlineDate.format("M/D/YYYY");
+			message = `Depart Date must be on or after ${deadlineDate.format("M/D/YYYY")}.`;
 		}
 		else
 		{
 			if (TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(departDate, holidays))
 			{
-				message = "Depart Date falls on a holiday. " + departDate.format("M/D/YYYY") + ".";
+				message = `Depart Date falls on a holiday. ${departDate.format("M/D/YYYY")}.`;
+			}
+			else if (!isSchoolDay(departDate))
+			{
+				message = "Must depart on school day.";
 			}
 		}
 

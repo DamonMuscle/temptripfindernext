@@ -571,9 +571,10 @@
 	FieldtripFieldEditorHelper.isHoliday = function(date, holidays)
 	{
 		var result = false, self = this, holidays = holidays || [];
+		date = moment(date).startOf("day");
 		$.each(holidays, function(index, holiday)
 		{
-			var holidayM = moment(new Date(holiday));
+			var holidayM = moment(new Date(holiday)).startOf("day");
 			if (holidayM.diff(date.startOf("day"), "days") === 0 && holidayM.diff(date, "months") === 0 && holidayM.diff(date, "years") === 0)
 			{
 				result = true;

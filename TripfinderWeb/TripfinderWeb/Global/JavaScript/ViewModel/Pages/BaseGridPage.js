@@ -778,7 +778,7 @@
 			if (!result.valid)
 			{
 				self.pageLevelViewModel.popupErrorMessage(result.message);
-				return Promise.reject(result);
+				return;
 			}
 
 			selectedId = selectedIds[0];
@@ -859,8 +859,10 @@
 			{
 				const isSchoolDay = function(mmtDay)	// helper function for detect if a given day (moment date) is school day
 				{
-					const dateStr = mmtDay.format("YYYY-MM-DD");
-					return !holidayMap[dateStr];
+					var dateStr = mmtDay.format("YYYY-MM-DD"), weekdayIndex = mmtDay.weekday();
+					const notWeekend = weekdayIndex > 0 && weekdayIndex < 6,
+						notHoliday = !holidayMap[dateStr];
+					return  notWeekend && notHoliday;
 				};
 
 				if (!isSchoolDay(mmtObj))
