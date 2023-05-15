@@ -534,12 +534,16 @@
 		var filterUrl = "gridfilters";
 		let filter = `(eq(dbid, ${tf.datasourceManager.databaseId})|isnull(dbid,))&eq(datatypeId,${tf.dataTypeHelper.getId(self.options.gridType)})`;
 
-		var gridfiltersPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
-			paramData: {
-				"@filter": filter,
-				"@relationships": "OmittedRecord,Reminder"
-			}
-		}).then(apiResponse => apiResponse.Items, () => []);
+		let gridfiltersPromise = Promise.resolve([]);
+		if (tf.permissions.filtersRead)
+		{ 
+			gridfiltersPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), filterUrl), {
+				paramData: {
+					"@filter": filter,
+					"@relationships": "OmittedRecord,Reminder"
+				}
+			}).then(apiResponse => apiResponse.Items, () => []);
+		}
 		let dataTypeId = tf.dataTypeHelper.getId(self._gridType);
 		var staticfiltersPromise = Number.isInteger(dataTypeId) ? tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "staticfilters"), {
 			paramData: {
