@@ -171,6 +171,7 @@
 							if (apiResponse)
 							{
 								self.obGridLayoutExtendedDataModels.remove(gridLayoutExtendedDataModel);
+								self.initLayoutGrid();
 							}
 						});
 				}
