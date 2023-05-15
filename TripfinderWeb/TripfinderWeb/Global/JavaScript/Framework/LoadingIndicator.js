@@ -16,6 +16,7 @@
 		this._counter = 0;
 		this._mapper = {};
 		this._handle = null;
+		this._hideHandle = null;
 
 		this.subtitle = ko.observable("");
 		this.subtitle.subscribe(this._updateSubtitleDiplay.bind(this));
@@ -42,6 +43,13 @@
 		tryHide: function()
 		{
 			this._counter--;
+			this._hideHandle = setTimeout(function()
+			{
+				this.hide();
+			}.bind(this), 200);
+		},
+		hide: function()
+		{
 			if (this.isHiding())
 			{
 				this._counter = 0;
@@ -75,6 +83,7 @@
 			this._counter++;
 			this._$element.show();
 			this.reminderLoadingStatus.notify(true);
+			clearTimeout(this._hideHandle);
 			var self = this;
 			this._handle = setTimeout(function()
 			{
