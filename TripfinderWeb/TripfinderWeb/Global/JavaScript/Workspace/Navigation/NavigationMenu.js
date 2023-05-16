@@ -32,16 +32,78 @@
 		self.obSettingPages = ko.observableArray([]);
 		self.obDashboardLoRes = ko.observable(false);
 		self.obShowMessageCenter = ko.observable(false);
+		const availableGridPages = tf.dataTypeHelper.getAvailableDataTypes({ includeFakeMajorType: true });
+		self.availableGridPages = availableGridPages.filter(val => val.key !== 'form');		
+		self.obGridPages = ko.observableArray(self.availableGridPages);
 
 		self.bindWithKnockout();
 		self.tooltip = new TF.Helper.TFTooltip();
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
+		self.menuViewClick = self.menuViewClick.bind(self);
 
 		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
 		tf.pageManager ? tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self)) : "";
 	}
+
+	NavigationMenu.prototype.showSubMenu = function(data, evt)
+	{
+		evt.stopPropagation();
+		var subMenu = $(evt.currentTarget).find("ul")[0];
+		this.showSubMenuImpl(subMenu, evt.currentTarget);
+	};
+
+	NavigationMenu.prototype.hideSubMenu = function(data, evt)
+	{
+		var $subMenu = $(evt.currentTarget).find("ul");
+		if ($subMenu.length > 0)
+		{
+			$subMenu.hide();
+		}
+	}
+
+	NavigationMenu.prototype.showSubMenuImpl = function(element, of)
+	{
+		if (!element) { return; }
+		var self = this;
+		this.$navigationMenu.find("li.menu-container ul").each(function()
+		{
+			if (((this == element) || (element.parent && element.parent.parent && this == element.parent.parent)
+				|| (element.parent && element.parent.parent
+					&& element.parent.parent.parent && element.parent.parent.parent.parent
+					&& this == element.parent.parent.parent.parent))
+				&& $('.navigation-item.menu-opened .item-menu').width() >= 300)
+			{
+				const positionOptions = { my: "left top", at: "right top", of: of, collision: "none flipfit" };
+				$(this).show();
+				$(this).position(positionOptions);
+				this.scrollTop = 0;
+				self.repositionUpDownArrows(this);
+				self.updateUpDownArrowStyle(this);
+
+				// The up/down arrow is hidden, need reposition the submenu
+				if (this.classList.contains(CLASS_HEIGHT_FITTED))
+				{
+					$(this).position(positionOptions);
+				}
+			}
+		});
+	};	
+
+	NavigationMenu.prototype.menuViewClick = function(viewModel, e)
+	{
+		var type = $(e.target).closest('[clicktype]').attr("clicktype");
+		if (type !== 'form')
+		{
+			// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
+		}
+		else
+		{
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	};
 
 	/**
 	 * Bind data with html elements using knockout.

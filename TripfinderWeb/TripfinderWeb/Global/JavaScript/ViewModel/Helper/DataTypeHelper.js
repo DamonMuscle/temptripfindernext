@@ -366,6 +366,7 @@
 	var _RPT_DATA_SCHEMAS = []; // Store ReportDataSchema list
 
 	const _noObjectIdDataTypes = ["contact", "scheduledreport", "dashboards"];
+	const _tripfinderDataTypes = ["vehicle"]; // ["vehicle", "staff", "contact"]
 
 	function DataTypeHelper()
 	{
@@ -627,7 +628,7 @@
 	{
 		function isAvailableDataTypeFun(dataTypeAttribute)
 		{
-			return dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary
+			return dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary && _tripfinderDataTypes.includes(dataTypeAttribute.name.toLowerCase());
 		}
 
 		return TF.Helper.DataTypeHelper.getValidDataTypes(isAvailableDataTypeFun);
