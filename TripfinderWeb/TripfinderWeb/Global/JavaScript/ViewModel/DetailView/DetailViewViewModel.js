@@ -254,13 +254,10 @@
 				case "UDGrid":
 					targetBlock = null;
 					let currentTarget = e.currentTarget;
-					self.rootGridStack.dataBlocks.forEach(function(dataBlock)
+					const dataBlocks = self.rootGridStack.dataBlocks;
+					for (let index = 0; index < dataBlocks.length; index++)
 					{
-						if (targetBlock != null)
-						{
-							return;
-						}
-
+						const dataBlock = dataBlocks[index];
 						if (_isTargetGridStackItem(currentTarget, dataBlock))
 						{
 							targetBlock = dataBlock;
@@ -269,7 +266,12 @@
 						{
 							targetBlock = _getUDGridFromTabStripBlock(currentTarget, dataBlock);
 						}
-					});
+
+						if (targetBlock != null)
+						{
+							break;
+						}
+					}
 					tf.contextMenuManager.showMenu($visualTarget,
 						new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/UDGridRightClickMenu",
 							new TF.DetailView.UDGridRightClickMenu(targetBlock, miniGridType)));
@@ -291,22 +293,31 @@
 					return targetBlock;
 				}
 
-				dataBlock.nestedGridStacks.forEach((nestedGridStack) =>
+				let nestedGridStacks = dataBlock.nestedGridStacks;
+				for (let idx = 0; idx < nestedGridStacks.length; idx++)
 				{
-					if (!nestedGridStack.dataBlocks || targetBlock != null)
+					const nestedGridStack = nestedGridStacks[idx];
+					if (!nestedGridStack.dataBlocks)
 					{
-						return;
+						continue;
 					}
 
-					nestedGridStack.dataBlocks.forEach((nestedDataBlock) =>
+					let nestedDataBlocks = nestedGridStack.dataBlocks;
+					for (let idy = 0; idy < nestedDataBlocks.length; idy++)
 					{
+						const nestedDataBlock = nestedDataBlocks[idy];
 						if (_isTargetGridStackItem(currentTarget, nestedDataBlock))
 						{
 							targetBlock = nestedDataBlock;
-							return;
+							break;
 						}
-					});
-				});
+					}
+
+					if (targetBlock != null)
+					{
+						break;
+					}
+				};
 
 				return targetBlock;
 			}
