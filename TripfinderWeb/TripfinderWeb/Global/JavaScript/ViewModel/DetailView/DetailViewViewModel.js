@@ -293,9 +293,9 @@
 
 				dataBlock.nestedGridStacks.forEach((nestedGridStack) =>
 				{
-					if (!nestedGridStack.dataBlocks)
+					if (!nestedGridStack.dataBlocks || targetBlock != null)
 					{
-						return true;
+						return;
 					}
 
 					nestedGridStack.dataBlocks.forEach((nestedDataBlock) =>
@@ -303,14 +303,9 @@
 						if (_isTargetGridStackItem(currentTarget, nestedDataBlock))
 						{
 							targetBlock = nestedDataBlock;
-							return false;
+							return;
 						}
 					});
-
-					if (targetBlock != null)
-					{
-						return false;
-					}
 				});
 
 				return targetBlock;
