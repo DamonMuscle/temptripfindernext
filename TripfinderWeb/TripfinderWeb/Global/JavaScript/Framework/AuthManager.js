@@ -19,32 +19,81 @@
 		form: "formsResults"
 	}
 
+	
+	/**
+	 * Restore userName, password and rememberMe from cookie to local storage, so that we can retain previous behavior.
+	 * 
+	 * Plus(serviceplus01.transfinder.com) and Enterprise Login(servicepluslogin.transfinder.com) have different domains.
+	 * Cookie could be shared between Plus and Enterprise Login by setting cookie's domain, however local storage cann't.
+	 * Refer to StorageManager.js (allowCookieList = ["ent.token", "ent.clientKey", "ent.isLoggedin", "ent.stopfinderToken"])
+	 * ent.userName and ent.password are not in the cookie allowed list.
+	 */
+	function restoreInfo()
+	{
+		if (tf.storageManager.checkDomain())
+		{
+			const userKey = "ent.userName",
+				passwordKey = "ent.password",
+				userName = tf.storageManager.getCookie(userKey),
+				password = tf.storageManager.getCookie(passwordKey);
+
+			if (userName)
+			{
+				tf.storageManager.save("userName", userName, true);
+				tf.entStorageManager.save("userName", userName);
+				tf.storageManager.removeCookie(userKey);
+			}
+			if (password)
+			{
+				tf.storageManager.save("password", password, true);
+				tf.entStorageManager.save("password", password);
+				tf.storageManager.removeCookie(passwordKey);
+			}
+		}
+
+		const rememberMeKey = `${tf.storageManager.prefix}rememberMe`;
+		if (tf.storageManager.hasCookie(rememberMeKey))
+		{
+			/**
+			 * The existence of this cookie(rememberMe) means that user comes from Enterprise Login,
+			 * and we only take care of this scenario.
+			 */
+			const rememberMe = tf.storageManager.getCookie(rememberMeKey);
+			tf.storageManager.removeCookie(rememberMeKey);
+			tf.storageManager.save("rememberMe", !!rememberMe, true);
+
+			const clientKey = tf.entStorageManager.get("clientKey") || "";
+			tf.storageManager.save("clientKey", clientKey, true);
+		}
+	}
+
 	function AuthManager()
 	{
-		this.clientKey = null;
-		this.userName = null;
-		this.password = null;
-		this._hasLoggedin = null;
+		restoreInfo();
 		this.beforeLogOff = new TF.Events.PromiseEvent();
 		this.logOffTag = false;
 
-		this.obIsLogIn = ko.observable(false);
 		var clientKey = tf.entStorageManager.get("clientKey", true) || tf.storageManager.get("clientKey");
-		var username = tf.storageManager.get("userName", true);
-		var password = tf.storageManager.get("password", true);
+		var username = tf.entStorageManager.get("userName", true) || tf.storageManager.get("userName", true);
+		var password = tf.entStorageManager.get("password", true) || tf.storageManager.get("password", true);
 		this.token = tf.entStorageManager.get("token");
-		var isLoggedin = typeof (tf.entStorageManager.get("isLoggedin")) === 'undefined' ? false : JSON.parse(tf.entStorageManager.get("isLoggedin"));
 		this.clientKey = clientKey;
 		this.userName = username;
 		this.password = password;
-		this._hasLoggedin = isLoggedin && Boolean(this.clientKey) && Boolean(this.token);
 		this.supportedProducts = [];
 
-		if (this._hasLoggedin)
-		{
-			this.obIsLogIn(true);
-		}
+		this.obIsLogIn = ko.observable(this.getLoginStatus());
 	}
+
+	AuthManager.prototype.getLoginStatus = function()
+	{
+		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
+		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
+		const isVanityUrl = !!window.vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
+
+		const isLogged = !!((isLoggedInStorage === true || isLoggedInStorage === "true") && Boolean(this.clientKey) && Boolean(this.token));
+		return !isVanityUrl ? isLogged : (isLogged && potentialClientKey === (this.clientKey || "").toLowerCase());
+	};
 
 	AuthManager.prototype.logOff = function()
 	{
@@ -53,8 +102,7 @@
 		prefix = prefix.split('.')[0];
 
 		var password = tf.entStorageManager.get("password");
-		this.logOffWithoutRefresh()
-			.then(function()
+		return this.logOffWithoutRefresh().then(function()
 			{
 				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 					data: {
@@ -70,11 +118,6 @@
 					}
 
 					tf.chatfinderHelper && tf.chatfinderHelper.stop();
-
-					setTimeout(function()
-					{
-						location.reload();
-					});
 				});
 			});
 	};
@@ -110,7 +153,7 @@
 		prefix = prefix.split('.')[0];
 
 		var p = null;
-		if (self._hasLoggedin)
+		if (self.obIsLogIn())
 		{
 			p = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 				paramData: {
@@ -194,7 +237,6 @@
 							}
 
 							tf.entStorageManager.save("isLoggedin", true);
-							self._hasLoggedin = true;
 							self.obIsLogIn(true);
 						});
 
@@ -252,6 +294,93 @@
 		Array.prototype.unshift.call(arguments, tf.api.apiPrefix());
 		return pathCombine.apply(null, arguments);
 	};
+
+	AuthManager.prototype.hasMergeDocumentAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		let securedMergeDocuments = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.mergeDocuments;
+		if (securedMergeDocuments != null && Array.isArray(securedMergeDocuments))
+		{
+			return securedMergeDocuments.some(item => item === type);
+		}
+		return false;
+	}
+
+	AuthManager.prototype.hasMergeEmailMessageAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		let securedMergeEmailMessages = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.mergeEmailMessages;
+		if (securedMergeEmailMessages != null && Array.isArray(securedMergeEmailMessages))
+		{
+			return securedMergeEmailMessages.some(item => item === type);
+		}
+		return false;
+	}
+
+		AuthManager.prototype.hasScheduledMergeDocumentAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		const securedScheduledMergeDocuments = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.scheduledMergeDocuments;
+		if (securedScheduledMergeDocuments != null && Array.isArray(securedScheduledMergeDocuments))
+		{
+			return securedScheduledMergeDocuments.some(item => item === type);
+		}
+		return false;
+	}
+
+	AuthManager.prototype.hasScheduledReportsAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+		let securedScheduledReports = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.scheduledReports;
+		if (securedScheduledReports != null && Array.isArray(securedScheduledReports))
+		{
+			return securedScheduledReports.some(item => item === type);
+		}
+		return false;
+	}
+
+	AuthManager.prototype.hasMergeLibraryAccess = function(type)
+	{
+		const authInfo = tf.authManager.authorizationInfo;
+		if (authInfo.isAdmin)
+		{
+			return true;
+		}
+
+		const securedMergeLibrary = authInfo.authorizationTree &&
+			authInfo.authorizationTree.securedItems &&
+			authInfo.authorizationTree.securedItems.mergeLibrary;
+		if (securedMergeLibrary != null && Array.isArray(securedMergeLibrary))
+		{
+			return securedMergeLibrary.some(item => item === type);
+		}
+
+		return false;
+	}
 
 	AuthManager.prototype.updateInfo = function()
 	{

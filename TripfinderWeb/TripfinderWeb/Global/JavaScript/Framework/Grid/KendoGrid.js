@@ -65,7 +65,7 @@
 
 	KendoGrid.prototype.loadAndCreateGrid = function()
 	{
-		if (this.options.kendoGridOption.autoBind !== false)
+		if (this.options.kendoGridOption.autoBind !== false && !this.options.isMiniGrid)
 		{
 			tf.loadingIndicator.showImmediately();
 		}
@@ -90,7 +90,6 @@
 					this._obDocumentFocusState.subscribe(this._documentFocusStateChange, this);
 				}
 				this._dataChangeReceive = this._dataChangeReceive.bind(this);
-				this._gridLayoutExtendedDataModelsChange();
 				this._gridFilterDataModelsChange();
 				PubSub.subscribe(topicCombine(pb.DATA_CHANGE, this._gridType), this._dataChangeReceive);
 				this._gridLoadingEnd = true;
@@ -131,31 +130,35 @@
 
 	KendoGrid.prototype.loadPresetData = function()
 	{
-		if (!this.isBigGrid)
+		var self = this;
+		if (!this.isBigGrid && !this.options.isMiniGrid)
 		{
 			return Promise.resolve();
 		}
 		return this.loadGridDefaults()
-			.then(function()
+			.then(() =>
 			{
 				return this.loadLayout();
-			}.bind(this))
-			.then(function()
+			})
+			.then(() =>
 			{
-				if (this.options.entityType)
-				{
-					return this._setConfiguration();
-				} else
-				{
-					return Promise.all([
-						this.loadGridFilter()
-					]).then(function()
+					if (this.options.isMiniGrid)
 					{
-						return this._setConfiguration();
-					}.bind(this));
-				}
+						var promise = Promise.resolve();
+					}
+					else
+					{
+						var promise = Promise.all([self.loadGridFilter()]);
+					}
 
-			}.bind(this));
+					return promise.then(function()
+					{
+						self._applyingLayout = true;
+						self._setGridColumnConfiguration(self.options.fromSearch);
+						self._applyingLayout = false;
+						return;
+					});
+			})			
 	};
 
 	KendoGrid.prototype.loadGridDefaults = function()
@@ -228,11 +231,11 @@
 			{
 				if (result !== false)
 				{
-					this.createDragDelete();
+					this.options.canDragDelete && this.createDragDelete();
 					this.changeSortModel(); //bind the function of change sort model in column mouse down
 					this.resizableBinding();
 					this.lockUnlockColumn();
-					this.initDragHeadEvent();
+					this.options.reorderable && this.initDragHeadEvent();
 					this.initQuickFilterBar();
 
 					this.createDropDocument();
@@ -249,9 +252,9 @@
 
 		this.changeSortModel(); //bind the function of chang sort model in colunm mousedown
 		this.resizableBinding();
-		this.createDragDelete();
+		this.options.canDragDelete && this.createDragDelete();
 		this.lockUnlockColumn();
-		this.initDragHeadEvent();
+		this.options.reorderable && this.initDragHeadEvent();
 
 		this.initQuickFilterBar();
 
@@ -460,6 +463,11 @@
 
 	KendoGrid.prototype.getKendoSortColumn = function()
 	{
+		if (Array.isArray(this.options.defaultSort) && this.options.defaultSort.length > 0)
+		{
+			return this.options.defaultSort;
+		}
+
 		if (this._obCurrentGridLayoutExtendedDataModel() && this._obCurrentGridLayoutExtendedDataModel().layoutColumns())
 		{
 			var list = Enumerable.From(this._obCurrentGridLayoutExtendedDataModel().layoutColumns()).Where(function(c)
@@ -767,10 +775,10 @@
 
 		var $container = this.$container;
 		var $lockedContent = $container.find(".k-grid-content-locked");
-		if (this.options.isGridView && $lockedContent &&
+		if ($lockedContent &&
 			this.obSummaryGridVisible && this.obSummaryGridVisible() && this.overlay !== false)
 		{
-			tf.loadingIndicator.showImmediately();
+			!this.options.isMiniGrid && tf.loadingIndicator.showImmediately();
 			this.createSummaryGrid();
 			this._delayHideLoadingIndicator();
 
@@ -1143,6 +1151,10 @@
 	KendoGrid.prototype.resizableBinding = function()
 	{
 		var self = this;
+		if (self.options.resizable === false)
+		{
+			return;
+		}
 		self.kendoGrid.resizable.bind("start", function(e)
 		{
 			self.resizeTh = $(e.currentTarget).data("th");
@@ -1440,6 +1452,10 @@
 		var header = self.$container.find("th[role='columnheader']");
 		$(header).on("mousedown", function(e)
 		{
+			if (self.options.isMiniGrid)
+			{
+				return;
+			}
 			if (e.which == 3)
 			{
 				var index = parseInt($(this).attr("data-" + kendo.ns + "index"));
@@ -1770,17 +1786,17 @@
 				return this._grid;
 			}
 			this._grid = [{
-					gridType: "fieldtrip",
-					tableName: "fieldtrip",
-					authName: "fieldtrip",
-					type: "baseGrid",
-					plural: tf.applicationTerm.getApplicationTermPluralByName('Field Trip'),
-					singular: tf.applicationTerm.getApplicationTermSingularByName('Field Trip'),
-					get apiGridDefinition()
-					{
-						return self._convertToOldGridDefinition(tf.fieldTripGridDefinition);
-					}
-				}];
+				gridType: "fieldtrip",
+				tableName: "fieldtrip",
+				authName: "fieldtrip",
+				type: "baseGrid",
+				plural: tf.applicationTerm.getApplicationTermPluralByName('Field Trip'),
+				singular: tf.applicationTerm.getApplicationTermSingularByName('Field Trip'),
+				get apiGridDefinition()
+				{
+					return self._convertToOldGridDefinition(tf.fieldTripGridDefinition);
+				}
+			}];
 			return this._grid;
 		}
 	};

@@ -1325,4 +1325,36 @@
 
 		return '';
 	};
+
+	DataTypeHelper.prototype.checkAutoExportSupport = function(gridType)
+	{
+		const notSupportAutoExportGrid = ["tripschedule", "studentschedule", "tripstopschedule", "gpsevent", "report", "reportlibrary", "scheduledreport"];
+
+		return !notSupportAutoExportGrid.includes(gridType);
+	}
+
+	DataTypeHelper.prototype.mappingLayoutColumns = function(originColumns, gridType)
+	{
+		const definedColumns = tf.dataTypeHelper.getGridDefinition(gridType).Columns,
+			udfData = tf.UDFDefinition.get(gridType),
+			udfColumns = udfData ? udfData.userDefinedFields : [];
+
+		originColumns = originColumns.map(function(col)
+		{
+			if (col.UDFId)
+			{
+				return udfColumns.find(function(item)
+				{
+					return item.UDFId == col.UDFId;
+				});
+			}
+
+			return definedColumns.find(function(item)
+			{
+				return item && (item.FieldName == col.FieldName);
+			});
+		})
+
+		return _.remove(originColumns, undefined);
+	};
 })();

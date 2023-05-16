@@ -2,38 +2,49 @@
 {
 	createNamespace("TF.Grid").ModifyLayoutViewModel = ModifyLayoutViewModel;
 
+	const getPlaceholderDataModel = () => ({ id: ko.observable(null), name: ko.observable("Do Not Include") });
+
 	ModifyLayoutViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ModifyLayoutViewModel.prototype.constructor = ModifyLayoutViewModel;
 
-	function ModifyLayoutViewModel(gridType, isNew, gridLayoutExtendedDataModel, obGridFilterDataModels, obSelectedGridFilterId)
+	function ModifyLayoutViewModel(options)
 	{
+		const {
+			gridType, isNew, gridLayout, allFilters,
+			selectedFilterId, uDGridId
+		} = options;
+
 		this.isNew = isNew;
-		gridLayoutExtendedDataModel = gridLayoutExtendedDataModel.clone();
-		var displayFilter;
+		this._gridType = gridType;
+		const gridLayoutExtendedDataModel = gridLayout.clone();
 		if (isNew === "new")
 		{
 			gridLayoutExtendedDataModel.id(0);
-			gridLayoutExtendedDataModel.dataTypeId(tf.DataTypeHelper.getId(gridType));
-			gridLayoutExtendedDataModel.gridType(gridType);
+			gridLayoutExtendedDataModel.dataTypeId(tf.dataTypeHelper.getId(gridType));
 			gridLayoutExtendedDataModel.apiIsNew(true);
 			gridLayoutExtendedDataModel.apiIsDirty(true);
 			gridLayoutExtendedDataModel.name("");
 			gridLayoutExtendedDataModel.description("");
-			displayFilter = obSelectedGridFilterId();
+			gridLayoutExtendedDataModel.uDGridId(uDGridId);
+			gridLayoutExtendedDataModel.autoExportExists(false);
+			gridLayoutExtendedDataModel.autoExports([]);
+			displayFilterId = selectedFilterId;
+
 		}
 		else
 		{
-			displayFilter = gridLayoutExtendedDataModel.filterId()
+			displayFilterId = gridLayoutExtendedDataModel.filterId();
 		}
 		this.obStatus = ko.observable('layout');
 		this.obSearchFilter = ko.observable("");
 		this.obSearchFilter.subscribe(this.searchFilter.bind(this));
 		this.gridLayoutExtendedDataModel = gridLayoutExtendedDataModel;
 		this.obFilterDataList = ko.observableArray([]);
-		this.obGridFilterDataModels = ko.observableArray(obGridFilterDataModels().concat());
-		this.obGridFilterDataModels().unshift({ id: ko.observable(null), name: ko.observable("Do Not Include"), isValid: ko.observable(true) });
-		var selectedGridFilterDataModel = Enumerable.From(this.obGridFilterDataModels()).Where(function(c) { return c.id() == displayFilter }).ToArray()[0];
+		this.obGridFilterDataModels = ko.observableArray([...allFilters]);
+		this.obGridFilterDataModels().unshift(getPlaceholderDataModel());
+		var selectedGridFilterDataModel = this.obGridFilterDataModels().find((c) => c.id() == displayFilterId) || this.obGridFilterDataModels()[0];
 		this.obSelectedGridFilterDataModel = ko.observable(selectedGridFilterDataModel);
+
 		this.obApplyOnSave = ko.observable(false);
 		this.obIsSafari = ko.observable(TF.isSafari);
 
@@ -46,6 +57,7 @@
 		//drop down list
 		this.obSelectedGridFilterDataModelText = ko.observable(selectedGridFilterDataModel ? selectedGridFilterDataModel.name() : "");
 		this.obSelectedGridFilterDataModelText.subscribe(this.selectedGridFilterDataModelChange, this);
+
 		this.validationMessage = null;
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
@@ -60,7 +72,22 @@
 				tf.loadingIndicator.tryHide();
 				if (valid)
 				{
-					return self._save();
+					var message = `This layout is associated with ${self.gridLayoutExtendedDataModel.autoExportNames()}.`;
+					message += " Changes to this layout will affect the data and format of the data being exported. Are you sure you want to modify this layout?";
+					var promise = (self.isNew === "edit" && self.gridLayoutExtendedDataModel.autoExportExists())
+						? tf.promiseBootbox.yesNo(message, "Confirmation Message")
+						: Promise.resolve(true);
+					return promise.then(function(canSave)
+					{
+						if (canSave)
+						{
+							return self._save();
+						}
+						else
+						{
+							return Promise.resolve(null);
+						}
+					}.bind(self));
 				}
 				else
 				{
@@ -74,6 +101,8 @@
 	{
 		if (this.gridLayoutExtendedDataModel.apiIsDirty())
 		{
+			const layoutColumns = this.gridLayoutExtendedDataModel.layoutColumns();
+			const layoutAutoExportColumns = tf.dataTypeHelper.checkAutoExportSupport(this._gridType) ? tf.dataTypeHelper.mappingLayoutColumns(layoutColumns, this._gridType) : "";
 			var requestData = {
 				DataTypeID: this.gridLayoutExtendedDataModel.dataTypeId(),
 				Name: this.gridLayoutExtendedDataModel.name(),
@@ -81,12 +110,15 @@
 				FilterName: this.gridLayoutExtendedDataModel.filterName() || "",
 				ShowSummaryBar: this.gridLayoutExtendedDataModel.showSummaryBar() || null,
 				Description: this.gridLayoutExtendedDataModel.description(),
-				LayoutColumns: JSON.stringify(this.gridLayoutExtendedDataModel.layoutColumns())
+				LayoutColumns: JSON.stringify(layoutColumns),
+				LayoutAutoExportColumns: JSON.stringify(layoutAutoExportColumns),
+				UDGridId: this.gridLayoutExtendedDataModel.uDGridId(),
 			};
 			if (this.isNew !== "new")
 			{
 				requestData.ID = this.gridLayoutExtendedDataModel.id()
 			}
+
 			return (
 				this.isNew === "new" ?
 					tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts"), { data: [requestData] }) :
@@ -94,16 +126,17 @@
 			)
 				.then(function(apiResponse)
 				{
-					this.gridLayoutExtendedDataModel.dataTypeId(apiResponse.Items[0].DataTypeId);
-					this.gridLayoutExtendedDataModel.name(apiResponse.Items[0].Name);
-					this.gridLayoutExtendedDataModel.filterId(apiResponse.Items[0].FilterId);
-					this.gridLayoutExtendedDataModel.filterName(apiResponse.Items[0].FilterName);
-					this.gridLayoutExtendedDataModel.showSummaryBar(apiResponse.Items[0].ShowSummaryBar);
-					this.gridLayoutExtendedDataModel.description(apiResponse.Items[0].Description);
-					this.gridLayoutExtendedDataModel.layoutColumns(JSON.parse(apiResponse.Items[0].LayoutColumns));
-					this.gridLayoutExtendedDataModel.id(apiResponse.Items[0].Id);
+					const savedLayout = apiResponse.Items[0];
+					this.gridLayoutExtendedDataModel.dataTypeId(savedLayout.DataTypeId);
+					this.gridLayoutExtendedDataModel.name(savedLayout.Name);
+					this.gridLayoutExtendedDataModel.filterId(savedLayout.FilterId);
+					this.gridLayoutExtendedDataModel.filterName(savedLayout.FilterName);
+					this.gridLayoutExtendedDataModel.showSummaryBar(savedLayout.ShowSummaryBar);
+					this.gridLayoutExtendedDataModel.description(savedLayout.Description);
+					this.gridLayoutExtendedDataModel.layoutColumns(JSON.parse(savedLayout.LayoutColumns));
+					this.gridLayoutExtendedDataModel.id(savedLayout.Id);
+					this.gridLayoutExtendedDataModel.uDGridId(savedLayout.UDGridId);
 					this.gridLayoutExtendedDataModel.apiIsDirty(false);
-
 					return this.gridLayoutExtendedDataModel;
 				}.bind(this))
 				.catch(function(apiResponse)
@@ -272,14 +305,6 @@
 	};
 	ModifyLayoutViewModel.prototype.apply = function(viewModel, e)
 	{
-		if (!this.obSelectedGridFilterDataModel().isValid())
-		{
-			return tf.promiseBootbox.alert("Filter is invalid. It cannot be saved.", 'Warning', 40000).then(function()
-			{
-				return false;
-			}.bind(this));
-		}
-
 		return this.save()
 			.then(function(savedGridLayoutExtendedDataModel)
 			{

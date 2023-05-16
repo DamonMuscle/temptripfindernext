@@ -1066,7 +1066,9 @@
 					"defaultValue": "8",
 					"editType": {
 						"format": "Integer",
-						"maxLength": 8
+						"naturalNumber": true,
+						"maxLength": 8,
+						"acceptableValueReg": /^(0|[1-9]\d{0,7})$/
 					}
 				},
 				{
@@ -1076,7 +1078,9 @@
 					"defaultValue": "1",
 					"editType": {
 						"format": "Integer",
-						"maxLength": 8
+						"naturalNumber": true,
+						"maxLength": 8,
+						"acceptableValueReg": /^(0|[1-9]\d{0,7})$/
 					}
 				},
 				{

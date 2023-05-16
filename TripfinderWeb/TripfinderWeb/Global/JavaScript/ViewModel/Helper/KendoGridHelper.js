@@ -32,7 +32,7 @@
 	 */
 	KendoGridHelper.prototype.createSimpleGrid = function ($container, options)
 	{
-		// dataSource itself or its response should have 'dataItems' and 'totalCount'. 
+		// dataSource itself or its response should have 'dataItems' and 'totalCount'.
 		var self = this, kendoGrid,
 			$grid = $container.find(".kendo-grid"),
 			gridOptions = $.extend({}, self.defaultGridOptions, options.gridOptions),
@@ -59,13 +59,16 @@
 		}
 		var kendoGridElement = $(kendoGrid.element);
 
-		kendoGrid.bind("change", function ()
+		kendoGrid.bind("change", function()
 		{
-			// refresh background color
 			var $container = kendoGridElement.find(".k-grid-content"),
-				$onDemandContainer = $container.find(".on-demand-container");
-			$onDemandContainer.css({//Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
-				background: $onDemandContainer.data("tr").children("td").css("background-color") == "rgba(0, 0, 0, 0)" ? 'white' : $onDemandContainer.data("tr").children("td").css("background-color")
+				$onDemandContainer = $container.find(".on-demand-container"),
+				$containerColor = $onDemandContainer.data("tr")?.children("td")?.css("background-color");
+
+			var color = (!$containerColor || $containerColor == "rgba(0, 0, 0, 0)") ? 'white' : $containerColor;
+
+			$onDemandContainer.css({
+				background: color //Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
 			});
 		});
 
@@ -107,7 +110,7 @@
 			});
 		});
 
-		kendoGridElement.delegate(".k-grid-content tbody>tr", "mouseover", function ()
+		kendoGridElement.delegate(".k-grid-content tbody>tr", "mouseenter", function ()
 		{
 			var $tr = $(this),
 				$container = $tr.closest("table").parent(),
@@ -148,7 +151,7 @@
 			setButtonDisableStatus($onDemandContainer, onDemandActions, $tr);
 
 			$onDemandContainer.data("tr", $tr).css({
-				height: $tr.height(),
+				height: $tr.height() - 1,// border width
 				top: $tr.offset().top + $container.scrollTop() - $container.offset().top,
 				right: -$container.scrollLeft(),
 				background: $tr.children("td").css("background-color") == "rgba(0, 0, 0, 0)" ? 'white' : $tr.children("td").css("background-color")//Avoid the background color to be set as transparent rgba(0, 0, 0, 0)
@@ -156,10 +159,7 @@
 
 			var iconHeight = 12;
 			$onDemandContainer.find("a").css("margin-top", ($tr.height() - iconHeight) / 2 + "px");
-		}).on("mouseout", function (e)
-		{
-			hideOnDemandAction(e);
-		}).on("mousemove", function (e)
+		}).on("mouseleave", function (e)
 		{
 			hideOnDemandAction(e);
 		});
@@ -869,6 +869,116 @@
 		return columns;
 	};
 
+	KendoGridHelper.prototype.getDateTimeFields = function(gridType)
+	{
+		let specificGridDefinition = null;
+		switch (gridType)
+		{
+			case "form":
+				specificGridDefinition = tf.formGridDefinition;
+				break;
+			case "forms":
+				specificGridDefinition = tf.formsGridDefinition;
+				break;
+			case "scheduledmergedocument":
+				specificGridDefinition = tf.scheduledMergeDocumentGridDefinition;
+				break;
+			case "session":
+				specificGridDefinition = tf.sessionGridDefinition;
+				break;
+			case "altsite":
+				specificGridDefinition = tf.altsiteGridDefinition;
+				break;
+			case "contact":
+				specificGridDefinition = tf.contactGridDefinition;
+				break;
+			case "contractor":
+				specificGridDefinition = tf.contractorGridDefinition;
+				break;
+			case "district":
+				specificGridDefinition = tf.districtGridDefinition;
+				break;
+			case "document":
+				specificGridDefinitionl = tf.documentGridDefinition;
+				break;
+			case "fieldtrip":
+				specificGridDefinition = tf.fieldTripGridDefinition;
+				break;
+			case "georegion":
+				specificGridDefinition = tf.georegionGridDefinition;
+				break;
+			case "gpsevent":
+				specificGridDefinition = tf.gpsEventGridDefinition;
+				break;
+			case "route":
+				specificGridDefinition = tf.routeGridDefinition;
+				break;
+			case "school":
+				specificGridDefinition = tf.schoolGridDefinition;
+				break;
+			case "staff":
+				specificGridDefinition = tf.staffGridDefinition;
+				break;
+			case "student":
+				specificGridDefinition = tf.studentGridDefinition;
+				break;
+			case "studentattendanceschedule":
+				specificGridDefinition = tf.studentScheduleGridDefinition;
+				break;
+			case "trip":
+				specificGridDefinition = tf.tripGridDefinition;
+				break;
+			case "tripschedule":
+				specificGridDefinition = tf.tripScheduleGridDefinition;
+				break;
+			case "tripstop":
+				specificGridDefinition = tf.tripStopGridDefinition;
+				break;
+			case "tripstopschedule":
+				specificGridDefinition = tf.tripStopScheduleGridDefinition;
+				break;
+			case "vehicle":
+				specificGridDefinition = tf.vehicleGridDefinition;
+				break;
+			case "mergedocument":
+				specificGridDefinition = tf.mergeDocumentGridDefinition;
+				break;
+			case "mergeemailmessage":
+				specificGridDefinition = tf.mergeEmailMessageGridDefinition;
+				break;
+			case "mergeDocumentLibrary":
+				specificGridDefinition = tf.mergeDocumentLibraryGridDefinition;
+				break;
+			case "scheduledmergedocument":
+				specificGridDefinition = tf.scheduledMergeDocumentGridDefinition;
+				break;
+			case "mergeDocumentsSent":
+				specificGridDefinition = tf.mergeDocumentsSentGridDefinition;
+				break;
+			case "report":
+				specificGridDefinition = tf.reportGridDefinition;
+				break;
+			case "reportlibrary":
+				specificGridDefinition = tf.ReportLibraryGridDefinition;
+				break;
+			case "scheduledreport":
+				specificGridDefinition = tf.scheduledReportGridDefinition;
+				break;
+			case "scheduledReportsSent":
+				specificGridDefinition = tf.scheduledReportsSentGridDefinition;
+				break;
+			case "reminder":
+				specificGridDefinition = tf.reminderGridDefinition;
+				break;
+		}
+
+		if (specificGridDefinition)
+		{
+			return specificGridDefinition.gridDefinition().Columns.filter(x => x.isUTC).map(x => x.FieldName);
+		}
+		return [];
+	}
+
 	/**
 	 * Get default sorting columns
 	 *
@@ -1095,7 +1205,7 @@
 							layoutColumns = null;
 						}
 
-						tf.storageManager.save(tf.storageManager.gridCurrentQuickFilter(gridType), null);
+						tf.storageManager.delete(tf.storageManager.gridCurrentQuickFilter(gridType));
 						const predefinedGridData = {
 							filteredIds: Ids.split(','),
 							gridType: gridType,

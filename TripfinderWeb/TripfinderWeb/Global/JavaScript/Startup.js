@@ -271,6 +271,7 @@
 	Startup.prototype.start = function()
 	{
 		var self = this;
+		const startupIndicatorName = "startup";
 		self.libraryInitialization().then(function()
 		{
 			tf.dataFormatHelper = new TF.DataFormatHelper();
@@ -294,6 +295,7 @@
 			tf.helpers = {
 				detailViewHelper: new TF.DetailView.DetailViewHelper(),
 				kendoGridHelper: new TF.Helper.KendoGridHelper(),
+				miniGridHelper: new TF.Helper.MiniGridHelper(),
 				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
 			};
 			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();
@@ -301,352 +303,358 @@
 			//tf.dataTypeHelper.init();
 			tf.urlParm = self.getURLParm();// For the link in notification email FT-380
 			TF.getLocation(); //request permission
-			tf.authManager.auth(new TF.Modal.TripfinderLoginModel())
-				.then(function()
-				{
-					tf.lockData = new TF.LockData();
-					tf.AGSServiceUtil = new TF.AGSServiceUtil();
-					self.getArcgisUrls();
-					tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
-					return tf.measurementUnitConverter.init();
-				})
-				.then(function()
-				{
-					sessionValidator.activate();
-					tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
-					tf.dataTypeHelper = tf.DataTypeHelper;
-					return tf.DataTypeHelper.init();
-				})
-				.then(function()
-				{
-					return self.loadExagoBIServerUrl()
+			tf.authManager.auth(new TF.Modal.TripfinderLoginModel()).then(function()
+			{
+				tf.loadingIndicator.showByName(startupIndicatorName);
+				tf.lockData = new TF.LockData();
+				tf.AGSServiceUtil = new TF.AGSServiceUtil();
+				self.getArcgisUrls();
+				tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
+				return tf.measurementUnitConverter.init();
+			})
+			.then(function()
+			{
+				sessionValidator.activate();
+				tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
+				tf.dataTypeHelper = tf.DataTypeHelper;
+				return tf.DataTypeHelper.init();
+			})
+			.then(function()
+			{
+				return self.loadExagoBIServerUrl()
 					.then(function()
 					{
 						tf.exagoBIHelper = new TF.Helper.ExagoBIHelper();
 						tf.exagoBIHelper.initClientReportContext();
 					});
-				})
-				.then(function()
+			})
+			.then(function()
+			{
+				tf.setting = new TF.Setting();
+				return tf.setting.getRoutingConfig();
+			}).then(function()
+			{
+				tf.UDFDefinition = new TF.GridDefinition.UDFDefinition();
+				return tf.UDFDefinition.loadAll();
+			}).then(function()
+			{
+				tf.helpers.detailViewHelper.init();
+			})
+			.then(function()
+			{
+				var p1 = tf.userPreferenceManager.getAllKey();
+				var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "timezonetotalminutes")).then(function(timeZoneResponse)
 				{
-					tf.setting = new TF.Setting();
-					return tf.setting.getRoutingConfig();
-				}).then(function()
-				{
-					tf.UDFDefinition = new TF.GridDefinition.UDFDefinition();
-					return tf.UDFDefinition.loadAll();
-				}).then(function()
-				{
-					tf.helpers.detailViewHelper.init();
-				})
-				.then(function()
-				{
-					tf.loadingIndicator.showImmediately();
-					var p1 = tf.userPreferenceManager.getAllKey();
-					var p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "timezonetotalminutes")).then(function(timeZoneResponse)
+					if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
 					{
-						if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
+						tf.timezonetotalminutes = timeZoneResponse.Items[0];
+						tf.localTimeZone = {
+							timeZoneTotalMinutes: tf.timezonetotalminutes,
+							hoursDiff: tf.timezonetotalminutes / 60
+						};
+					}
+				});
+				var p3 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applications"), {
+					paramData: {
+						"Name": TF.productName
+					}
+				}).then(function(apiResponse)
+				{
+					TF.productID = apiResponse.Items[0].ID;
+				});
+
+				const array = location.pathname.split("/").filter(r => r);
+				// get extra js location
+				var extrasLocation = location.origin.concat(
+					array.length === 1 ? "/" + array[0] : "",
+					"/Global/JavaScript/Framework/Map");
+
+				window.tf.map = new TF.Map.BaseMap();
+				var p4 = window.tf.map.usingArcGIS(extrasLocation);
+
+				var p5 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clienttimezoneinfo")).then(function(timeZoneResponse)
+				{
+					if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
+					{
+						tf.clientTimeZone = timeZoneResponse.Items[0];
+					}
+				});
+
+				return Promise.all([p1, p2, p3, p4, p5, TF.initSystemMapSettings()])
+				.then(function(){
+					return self.loadArcgisUrls().then(function()
 						{
-							tf.timezonetotalminutes = timeZoneResponse.Items[0];
-							tf.localTimeZone = {
-								timeZoneTotalMinutes: tf.timezonetotalminutes,
-								hoursDiff: tf.timezonetotalminutes / 60
-							};
-						}
-					});
-					var p3 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "applications"), {
-						paramData: {
-							"Name": TF.productName
-						}
-					}).then(function(apiResponse)
-					{
-						TF.productID = apiResponse.Items[0].ID;
-					});
-
-					const array = location.pathname.split("/").filter(r => r);
-					// get extra js location
-					var extrasLocation = location.origin.concat(
-						array.length === 1 ? "/" + array[0] : "",
-						"/Global/JavaScript/Framework/Map");
-
-					window.tf.map = new TF.Map.BaseMap();
-					var p4 = window.tf.map.usingArcGIS(extrasLocation);
-
-					var p5 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clienttimezoneinfo")).then(function(timeZoneResponse)
-					{
-						if (timeZoneResponse && timeZoneResponse.Items && timeZoneResponse.Items[0] != undefined && timeZoneResponse.Items[0] != null)
-						{
-							tf.clientTimeZone = timeZoneResponse.Items[0];
-						}
-					});
-
-					return Promise.all([p1, p2, p3, p4, p5, TF.initSystemMapSettings()])
-					.then(function(){
-						return self.loadArcgisUrls().then(function()
+							return self._registerToken().then(function(response)
 							{
-								return self._registerToken().then(function(response)
+								if (response)
 								{
-									if (response)
-									{
-										self.loadSourceOId();
-										return;
-									}
-	
-									return tf.promiseBootbox.alert("An error has occurred with ArcGIS. Please contact Transfinder Support.", "Warning").then(function()
-									{
-										tf.authManager.logOff();
-										return Promise.reject();
-									});
+									self.loadSourceOId();
+									return;
+								}
+
+								return tf.promiseBootbox.alert("An error has occurred with ArcGIS. Please contact Transfinder Support.", "Warning").then(function()
+								{
+									tf.authManager.logOff();
+									return Promise.reject();
 								});
 							});
-					})
-						.then(function()
+						});
+				})
+					.then(function()
+					{
+						TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub', 'TimeZoneInfoHub']);
+						TF.SignalRHelper.bindEvent('TimeZoneHub', 'update', function update(result)
 						{
-							TF.SignalRHelper.registerSignalRHubs(['TimeZoneHub', 'TimeZoneInfoHub']);
-							TF.SignalRHelper.bindEvent('TimeZoneHub', 'update', function update(result)
+							tf.timezonetotalminutes = result;
+							if (tf.localTimeZone)
 							{
-								tf.timezonetotalminutes = result;
-								if (tf.localTimeZone)
+								tf.localTimeZone.timeZoneTotalMinutes = tf.timezonetotalminutes;
+								tf.localTimeZone.hoursDiff = tf.timezonetotalminutes / 60;
+							}
+						});
+						TF.SignalRHelper.bindEvent('TimeZoneInfoHub', 'update', function update(result)
+						{
+							tf.clientTimeZone = result;
+						});
+
+						var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
+							updateDataSourcePromise = Promise.resolve(true);
+
+						if (dbIdSuppliedInUrl)
+						{
+							var dbIdInUrlValue = parseInt(tf.urlParm.DB),
+								databaseIdFromUrl = (Number.isInteger(dbIdInUrlValue) && dbIdInUrlValue) ? dbIdInUrlValue : -1;
+
+							updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
+						}
+
+
+						return updateDataSourcePromise
+							.then(function()
+							{
+								return tf.datasourceManager.validate();
+							})
+							.then(function(isValid)
+							{
+								if (isValid === true)
 								{
-									tf.localTimeZone.timeZoneTotalMinutes = tf.timezonetotalminutes;
-									tf.localTimeZone.hoursDiff = tf.timezonetotalminutes / 60;
+									tf.storageManager.save("databaseType", tf.datasourceManager.databaseType);
+									tf.storageManager.save("datasourceId", tf.datasourceManager.databaseId);
+									tf.storageManager.save("databaseName", tf.datasourceManager.databaseName);
+									return true;
+								}
+								else
+								{
+									return isValid;
 								}
 							});
-							TF.SignalRHelper.bindEvent('TimeZoneInfoHub', 'update', function update(result)
-							{
-								tf.clientTimeZone = result;
-							});
-
-							var dbIdSuppliedInUrl = tf.urlParm && tf.urlParm.hasOwnProperty("DB"),
-								updateDataSourcePromise = Promise.resolve(true);
-
-							if (dbIdSuppliedInUrl)
-							{
-								var dbIdInUrlValue = parseInt(tf.urlParm.DB),
-									databaseIdFromUrl = (Number.isInteger(dbIdInUrlValue) && dbIdInUrlValue) ? dbIdInUrlValue : -1;
-
-								updateDataSourcePromise = tf.storageManager.save("datasourceId", databaseIdFromUrl);
-							}
-
-
-							return updateDataSourcePromise
-								.then(function()
+					})
+					.then(function(validateResult)
+					{
+						if (validateResult === true)
+						{
+							tf.datasourceManager.getAllDataSources();
+							tf.datasourceManager.setDatabaseInfo();
+							return Promise.resolve(true);
+						}
+						else if (validateResult === false)
+						{
+							tf.loadingIndicator.hideByName(startupIndicatorName); // hide indicator before showing alert
+							return tf.datasourceManager.getAllDataSources()
+								.then(function (dataSources)
 								{
-									return tf.datasourceManager.validate();
-								})
-								.then(function(isValid)
-								{
-									if (isValid === true)
+									if (dataSources && dataSources.length > 0)
 									{
-										tf.storageManager.save("databaseType", tf.datasourceManager.databaseType);
-										tf.storageManager.save("datasourceId", tf.datasourceManager.databaseId);
-										tf.storageManager.save("databaseName", tf.datasourceManager.databaseName);
-										return true;
+										return tf.promiseBootbox.alert({
+											message: "The Data Source requested is no longer available. Please select an active Data Source.",
+											title: "No Data Source Selected"
+										}).then(function ()
+										{
+											return false;
+										});
 									}
 									else
 									{
-										return isValid;
+										var message = "There is no active Data Source available.Please contact your Tripfinder Administrator.";
+										return tf.promiseBootbox.alert({
+											message: message,
+											title: "No Data Source Selected",
+											className: null,
+											buttons: {
+												yes: {
+													label: "Choose Data Source",
+													className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
+												}
+											}
+										}).then(function ()
+										{
+											tf.entStorageManager.save("token", "");
+											tf.reloadPageWithDatabaseId(null);
+											return null;
+										});
 									}
 								});
-						})
-						.then(function(validateResult)
+						} else
 						{
-							if (validateResult === true)
+							tf.loadingIndicator.hideByName(startupIndicatorName); // hide indicator before showing select datasource modal
+							return Promise.resolve(false);
+						}
+					})
+					.then(function(isPass)
+					{
+						if (isPass === null)
+						{
+							// the indicator is hide already
+							return null;
+						} else if (!isPass)
+						{
+							// the indicator is hide already
+							tf.datasourceManager.clearDBInfo();
+							return tf.showSelectDataSourceModel(null, true).then((value) => {
+								tf.loadingIndicator.showByName(startupIndicatorName); // show indicator for next steps
+								return value;
+							});
+						}
+						return true;
+					})
+					.then(function(value)
+					{
+						if (value !== null)
+						{
+							return self._locatizationInitialization().then(function()
 							{
-								tf.datasourceManager.getAllDataSources();
-								tf.datasourceManager.setDatabaseInfo();
-								return Promise.resolve(true);
-							}
-							else if (validateResult === false)
+								if (tf.authManager.clientKey !== "support")
+								{
+									return self._loadApplicationTerm();
+								}
+
+								return null;
+							}).then(function()
 							{
-								tf.loadingIndicator.tryHide();
-								return tf.datasourceManager.getAllDataSources()
-									.then(function (dataSources)
+								tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
+								self.changePermissions();
+								tf.fieldTripConfigsDataHelper.CacheConfigs();
+
+								tf.pageManager = new TF.Page.PageManager();
+								var promise;
+								if (!TF.isPhoneDevice)
+								{
+
+									promise = tf.pageManager.initNavgationBar();
+								}
+								else
+								{
+									promise = Promise.resolve();
+								}
+
+								return promise.then(function()
+								{
+									tf.pageManager.initResizePanel();
+
+									tf.pageManager.resizablePage.onLoaded.subscribe(function()
 									{
-										if (dataSources && dataSources.length > 0)
+										tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
+
+										if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
 										{
-											return tf.promiseBootbox.alert({
-												message: "The Data Source requested is no longer available. Please select an active Data Source.",
-												title: "No Data Source Selected"
-											}).then(function ()
+											var pageType = getParameterByName("pagetype");
+											if (pageType)
 											{
-												return false;
-											});
+												tf.pageManager.openNewPage(pageType, null, true, true);
+												return;
+											}
+										}
+
+										if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
+										{
+											var id = getParameterByName('id');
+											if (id != null)
+											{
+												//var detailView = new TF.DetailView.DetailViewViewModel(id);
+												var detailView = new TF.DetailView.DetailViewViewModel(id, null, true, {});
+												tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
+												return;
+											}
 										}
 										else
 										{
-											var message = "There is no active Data Source available.Please contact your Tripfinder Administrator.";
-											return tf.promiseBootbox.alert({
-												message: message,
-												title: "No Data Source Selected",
-												className: null,
-												buttons: {
-													yes: {
-														label: "Choose Data Source",
-														className: TF.isPhoneDevice ? "btn-yes-mobile" : "btn-primary btn-sm btn-primary-black"
-													}
-												}
-											}).then(function ()
-											{
-												tf.entStorageManager.save("token", "");
-												tf.reloadPageWithDatabaseId(null);
-												return null;
-											});
+											tf.pageManager.showMessageModal(true);
 										}
-									});
-							} else
-							{
-								tf.loadingIndicator.tryHide();
-								return Promise.resolve(false);
-							}
-						})
-						.then(function(isPass)
-						{
-							if (isPass === null)
-							{
-								return null;
-							} else if (!isPass)
-							{
-								tf.datasourceManager.clearDBInfo();
-								return tf.showSelectDataSourceModel(null, true);
-							}
-							return true;
-						})
-						.then(function(value)
-						{
-							if (value !== null)
-							{
-								return self._locatizationInitialization().then(function()
-								{
-									if (tf.authManager.clientKey !== "support")
-									{
-										return self._loadApplicationTerm().then(function() { tf.loadingIndicator.tryHide(); });
-									}
 
-									tf.loadingIndicator.tryHide();
-
-									return null;
-								}).then(function()
-								{
-									tf.authManager.authorizationInfo.onUpdateAuthorized.subscribe(self.changePermissions.bind(self));
-									self.changePermissions();
-									tf.fieldTripConfigsDataHelper.CacheConfigs();
-
-									tf.pageManager = new TF.Page.PageManager();
-									var promise;
-									if (!TF.isPhoneDevice)
-									{
-
-										promise = tf.pageManager.initNavgationBar();
-									}
-									else
-									{
-										promise = Promise.resolve();
-									}
-
-									return promise.then(function()
-									{
-										tf.pageManager.initResizePanel();
-
-										tf.pageManager.resizablePage.onLoaded.subscribe(function()
+										if (tf.urlParm)
 										{
-											tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
-
-											if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
+											if (tf.urlParm.tripid)
 											{
-												var pageType = getParameterByName("pagetype");
-												if (pageType)
+												var pageOptions = {	// FT-1231 - setup some special flags for open a certain trip record on-demand
+													filteredIds: [tf.urlParm.tripid],
+													isTemporaryFilter: true,
+													showRecordDetails: true
+												};
+												tf.pageManager.openNewPage("fieldtrips", pageOptions, true);
+												return;
+											}
+											else if (tf.urlParm.DB)
+											{
+												if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.onlyLevel1)
 												{
-													tf.pageManager.openNewPage(pageType, null, true, true);
+													tf.pageManager.openNewPage("fieldtrips", null, true);
+													return;
+												}
+												else
+												{
+													tf.pageManager.openNewPage("approvals", null, true);
 													return;
 												}
 											}
+										}
 
-											if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
-											{
-												var id = getParameterByName('id');
-												if (id != null)
-												{
-													//var detailView = new TF.DetailView.DetailViewViewModel(id);
-													var detailView = new TF.DetailView.DetailViewViewModel(id, null, true, {});
-													tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
-													return;
-												}
-											}
-											else
-											{
-												tf.pageManager.showMessageModal(true);
-											}
+										var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
+										if (!pageName || pageName === "settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
+										{
+											pageName = "fieldtrips";
+										}
 
-											if (tf.urlParm)
-											{
-												if (tf.urlParm.tripid)
-												{
-													var pageOptions = {	// FT-1231 - setup some special flags for open a certain trip record on-demand
-														filteredIds: [tf.urlParm.tripid],
-														isTemporaryFilter: true,
-														showRecordDetails: true
-													};
-													tf.pageManager.openNewPage("fieldtrips", pageOptions, true);
-													return;
-												}
-												else if (tf.urlParm.DB)
-												{
-													if (tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.onlyLevel1)
-													{
-														tf.pageManager.openNewPage("fieldtrips", null, true);
-														return;
-													}
-													else
-													{
-														tf.pageManager.openNewPage("approvals", null, true);
-														return;
-													}
-												}
-											}
-
-											var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
-											if (!pageName || pageName === "settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
-											{
-												pageName = "fieldtrips";
-											}
-
-											tf.pageManager.openNewPage(pageName, null, true);
-										});
-										self.changeStaffType();
-										self._initClosePageConfirm();
-										TF.SessionItem.refresh();
-										return true;
+										tf.pageManager.openNewPage(pageName, null, true);
 									});
+									self.changeStaffType();
+									self._initClosePageConfirm();
+									TF.SessionItem.refresh();
+									return true;
 								});
-							}
-							return null;
-						})
-						.then(function(value)
-						{
-							if (!value)
-							{
-								return;
-							}
-
-							return tf.pageManager.loadDataSourceName();
-						}).then(function(value)
-						{
-							createNamespace("TF.key");
-							var ctrlKeyTimeout;
-							$("body").on("keydown", function(event)
-							{
-								TF.key.ctrlKey = event.ctrlKey;
-								clearTimeout(ctrlKeyTimeout);
-								ctrlKeyTimeout = setTimeout(function()
-								{
-									TF.key.ctrlKey = false;
-								}, 1000);
-							}).on("keyup", function(event)
-							{
-								TF.key.ctrlKey = event.ctrlKey;
 							});
+						}
+						return null;
+					})
+					.then(function(value)
+					{
+						if (!value)
+						{
+							return;
+						}
+
+						return tf.pageManager.loadDataSourceName();
+					}).then(function(value)
+					{
+						createNamespace("TF.key");
+						var ctrlKeyTimeout;
+						$("body").on("keydown", function(event)
+						{
+							TF.key.ctrlKey = event.ctrlKey;
+							clearTimeout(ctrlKeyTimeout);
+							ctrlKeyTimeout = setTimeout(function()
+							{
+								TF.key.ctrlKey = false;
+							}, 1000);
+						}).on("keyup", function(event)
+						{
+							TF.key.ctrlKey = event.ctrlKey;
 						});
-				});
+					})
+					.finally(function()
+					{
+						tf.loadingIndicator.hideByName(startupIndicatorName); // force to hide indicator in finally
+					});
+			});
 		});
 	};
 

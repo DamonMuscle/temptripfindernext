@@ -689,42 +689,86 @@
 
 	BaseDataEntryViewModel.prototype.save = function()
 	{
-		var self = this;
-		var obEntityDataModel = this.obEntityDataModel();
-		var isNew = obEntityDataModel.id() ? false : true;
-		var paramDatas = this.type === 'fieldtrip' ? {
-			'@relationships': "FieldTripResourceGroup,FieldTripInvoice,DocumentRelationship,FieldTripEquipment"
-		} : {};
-		return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.type)),
+		const self = this,
+			obEntityDataModel = self.obEntityDataModel(),
+			isNew = obEntityDataModel.id() ? false : true,
+			paramDatas = self.type === 'fieldtrip' ? {
+				'@relationships': "FieldTripResourceGroup,FieldTripInvoice,DocumentRelationship,FieldTripEquipment"
+			} : {},
+			entity = self.getSaveData();
+
+		let p = Promise.resolve(entity);
+
+		if(isNew)
+		{
+			p =	tf.UDFDefinition.udfHelper.get(self.type).then(function(udfs)
+			{
+				entity.UserDefinedFields = entity.UserDefinedFields || [];
+
+				udfs.forEach(udf=>
+				{
+					if (udf.value == null) return;
+
+					const field = {
+						Id: udf.UDFId,
+						Name: udf.field,
+						RecordValue: udf.value,
+						errorMessages: null,
+						TypeId: udf.editType.TypeId,
+						DataTypeId: udf.editType.DataTypeId
+					}
+
+					if (udf.UDFType === "List")
+					{
+						field.AlternateKey = "SelectPickListOptionIDs";
+						field.SelectPickListOptionIDs = udf.value.map(function(v) { return v.value; });
+						field.RecordValue = udf.value.map(function(v) { return v.text; }).join(", ");
+					}
+
+					entity.UserDefinedFields.push(field);
+					if(!paramDatas["@relationships"].endsWith(",UDF"))
+					{
+						paramDatas["@relationships"] += ",UDF";
+					}
+				})
+
+				return entity;
+			});
+		}
+
+		return p.then(function(entity)
+		{
+			return tf.promiseAjax[isNew ? "post" : "put"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(self.type)),
 			{
 				paramData: paramDatas,
-				data: [this.getSaveData()],
+				data: [entity],
 				//async:true will generate an non user interaction, which will make window.open opens a Popup
 				async: false
 			})
 			.then(function(data)
 			{
 				obEntityDataModel.update(tf.measurementUnitConverter.convertToDisplay(data.Items[0], new TF.DataModel.FieldTripDataModel()));
-				this._view.id = obEntityDataModel.id();
-				this.onContentChange.notify();
+				self._view.id = obEntityDataModel.id();
+				self.onContentChange.notify();
 				if (isNew)
 				{
-					this._view.mode = "Edit";
-					var hasEditRights = tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(this.obEntityDataModel() ? this.obEntityDataModel()._entityBackup : null);
-					this.obMode(this._view.mode);
-					this.obNeedSave(hasEditRights);
-					this.obNeedSaveTemplate(hasEditRights);
-					this.obNeedSaveAndClose(hasEditRights);
+					self._view.mode = "Edit";
+					var hasEditRights = tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(self.obEntityDataModel() ? self.obEntityDataModel()._entityBackup : null);
+					self.obMode(self._view.mode);
+					self.obNeedSave(hasEditRights);
+					self.obNeedSaveTemplate(hasEditRights);
+					self.obNeedSaveAndClose(hasEditRights);
 				}
-				PubSub.publish(topicCombine(pb.DATA_CHANGE, this.type, pb.EDIT), obEntityDataModel.id());
+				PubSub.publish(topicCombine(pb.DATA_CHANGE, self.type, pb.EDIT), obEntityDataModel.id());
 				if (self.obDocumentGridViewModel())
 				{
 					self.refreshDocumentMiniGrid(obEntityDataModel.toData().Id, isNew);
 				}
-			}.bind(this))
+			})
 			.catch(function(response)
 			{
-			}.bind(this));
+			});
+		});
 	};
 
 	BaseDataEntryViewModel.prototype.saveTemplate = function()
@@ -751,12 +795,20 @@
 					})
 					.then(function(data)
 					{
-						this.getTemplate(data, true);
+						this.saveTemplateRelationships(fieldTripTemplateEntity, data).then(()=>
+						{
+							this.getTemplate(data, true);
+						});
 					}.bind(this))
 					.catch(function(response)
 					{
 					}.bind(this))
 			}.bind(this));
+	};
+
+	BaseDataEntryViewModel.prototype.saveTemplateRelationships = function(fieldTripTemplateEntity, data)
+	{
+		return Promise.resolve();
 	};
 
 	BaseDataEntryViewModel.prototype.getSaveData = function()

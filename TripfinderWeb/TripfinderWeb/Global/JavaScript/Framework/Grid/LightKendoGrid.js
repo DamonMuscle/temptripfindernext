@@ -38,13 +38,18 @@
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report'];
 	var customClickAndTouchEvent;
+	var customTouchMoveEvent;
+	var customTouchMoveTimeOut = null;
+	var customTouchMoveLock = false;
 
 	function LightKendoGrid($container, options, gridState, geoFields)
 	{
 		// make click event namespace unique in each instance.
 		this.randomKey = (new Date()).getTime();
 		customClickAndTouchEvent = `click.LightKendoGrid${this.randomKey} touchend.LightKendoGrid${this.randomKey}`;
+		customTouchMoveEvent = `touchmove.LightKendoGrid${this.randomKey}`;
 
+		this.pendingTaskOnNextDataBound = null;
 		this.geoFields = geoFields;
 		if (geoFields)
 		{
@@ -104,6 +109,7 @@
 		self.searchOption = null;
 		self._availableColumns = [];
 		self._obSelectedColumns = ko.observableArray([]);
+		self._obSelectedInvisibleColumns = ko.observableArray([]);
 
 		self.obFilteredExcludeAnyIds = ko.observable(self._gridState.filteredExcludeAnyIds);
 		self.obTempOmitExcludeAnyIds = ko.observable([]);
@@ -130,11 +136,12 @@
 		self.onShiftUp = self.onShiftUp.bind(self);
 		self.refreshClick = self.refreshClick.bind(self);
 
-		if (self.options.showOmittedCount)
+		if (self.options.showOmittedCount && !self.options.isMiniGrid)
 		{
 			tf.shortCutKeys.bind("ctrl+o", self.onCtrlOPress, self.options.routeState);
 		}
-		if (self.options.selectable && self.options.selectable.indexOf("multiple") != -1)
+
+		if (self.options.selectable && self.options.selectable.indexOf("multiple") != -1 && !self.options.isMiniGrid)
 		{
 			tf.shortCutKeys.bind("ctrl+a", self.onCtrlAPress, self.options.routeState);
 			tf.shortCutKeys.bind("ctrl+i", self.onCtrlIPress, self.options.routeState);
@@ -183,8 +190,14 @@
 		self.suspendRefresh = false;
 		self.isBigGrid = options.isBigGrid === true || Enumerable.From(bigGridTypes).Contains(self._gridType) && !options.isSmallGrid;
 		self.currentDisplayColumns = ko.observableArray();
+	};
 
-		self.obResetLayout = ko.observable(false);
+	LightKendoGrid.prototype.refreshGridColumnDefinition = function()
+	{
+		var self = this;
+
+		self.options.gridDefinition = self._excludeOnlyForFilterColumns(self.options.gridDefinition);
+		self._gridDefinition = self.options.gridDefinition = self.extendAdditionGridDefinition(self.options.gridDefinition, self.options.additionGridDefinition);
 	};
 
 	LightKendoGrid.prototype.loadAndCreateGrid = function()
@@ -316,7 +329,7 @@
 		if ($(e.target).closest(".k-hierarchy-cell", $row).length === 0
 			&& !$row.hasClass("k-detail-row"))
 		{
-			self._refreshGridBlank();
+			setTimeout(self._refreshGridBlank.bind(self)); // use setTimeout to redraw the fill color after the cell color is updated
 
 			if (!isHotLink(e))
 			{
@@ -392,6 +405,20 @@
 		this.allIds = [];
 	};
 
+	LightKendoGrid.prototype.clearDateTimeNumberFilterCellBeforeRefresh = function()
+	{
+		var self = this;
+		var $dateNumberCells = self.$container.find('input[data-kendo-role="numerictextbox"].k-input.date-number');
+		$dateNumberCells.each((index) =>
+		{
+			let dateNumber = $($dateNumberCells[index]).data('kendoNumericTextBox');
+			if (dateNumber && dateNumber.value() !== null)
+			{
+				dateNumber.value(null);
+			}
+		});
+	};
+
 	LightKendoGrid.prototype.refresh = function()
 	{
 		var self = this;
@@ -430,7 +457,7 @@
 		})
 			.then(function()
 			{
-				if (!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable"))
+				if ((!this.kendoGrid || !this.kendoGrid.wrapper || !this.kendoGrid.wrapper.data("kendoReorderable")) && !this.options.isMiniGrid) 
 				{
 					tf.loadingIndicator.tryHide();
 					return Promise.resolve(false);
@@ -439,7 +466,12 @@
 				this.overlayShow = true;
 				this.obTempOmitExcludeAnyIds([]);
 				var kendoOptions = this.kendoGrid.getOptions();
-				kendoOptions.height = this.getGridFullHeight();
+				if (kendoOptions.height !== 0)
+				{
+					// Fix UI issues after user change columns;
+					// FIx UI issues if a light kendo grid is in tab;
+					kendoOptions.height = this.getGridFullHeight();
+				}
 				kendoOptions.columns = this.getKendoColumn();
 				kendoOptions.dataSource.sort = sortInfo || this.getKendoSortColumn();
 				if (kendoOptions.columns.length == 1)
@@ -455,6 +487,7 @@
 				TF.ListFilterHelper.initListFilterBtn(this.$container);
 				this.addFilterClass();
 				this.setColumnCurrentFilterIcon();
+				this.setColumnCurrentFilterInput();
 				this.setFilterIconByKendoDSFilter();
 				this._refillAllListFilterFilterCellInput();
 				this.disableFilterCellWhenEmptyOrNotEmptyApplied();
@@ -535,6 +568,26 @@
 			gt: "Greater Than",
 			gte: "Greater Than or Equal To"
 		},
+		time: {
+			eq: "Equal To",
+			neq: "Not Equal To",
+			isempty: "Empty",
+			isnotempty: "Not Empty",
+			lt: "Less Than",
+			lte: "Less Than or Equal To",
+			gt: "Greater Than",
+			gte: "Greater Than or Equal To"
+		},
+		datetime: {
+			eq: "Equal To",
+			neq: "Not Equal To",
+			isempty: "Empty",
+			isnotempty: "Not Empty",
+			lt: "Less Than",
+			lte: "Less Than or Equal To",
+			gt: "Greater Than",
+			gte: "Greater Than or Equal To",
+		},
 		enums: {
 			eq: "Equal To",
 			neq: "Not Equal To"
@@ -545,9 +598,66 @@
 		string: { custom: 'Custom' },
 		number: { custom: 'Custom' },
 		date: { custom: 'Custom' },
+		datetime: { custom: 'Custom' },
 		enums: { custom: 'Custom' }
 	};
 	LightKendoGrid.DefaultOperator = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.DefaultOperator);
+
+	LightKendoGrid.DefaultDateTimeOperator = {
+		eq: "Equal To",
+		neq: "Not Equal To",
+		isempty: "Empty",
+		isnotempty: "Not Empty",
+		lt: "Less Than",
+		lte: "Less Than or Equal To",
+		gt: "Greater Than",
+		gte: "Greater Than or Equal To",
+		all: 'All',
+		lastmonth: 'Last Month',
+		lastweek: 'Last Week',
+		lastyear: 'Last Year',
+		lastxdays: "Last X Days",
+		lastxhours: "Last X Hours",
+		lastxmonths: 'Last X Months',
+		lastxweeks: 'Last X Weeks',
+		lastxyears: 'Last X Years',
+		nextbusinessday: 'Next Business Day',
+		nextmonth: 'Next Month',
+		nextweek: 'Next Week',
+		nextyear: 'Next Year',
+		nextxdays: 'Next X Days',
+		nextxhours: 'Next X Hours',
+		nextxmonths: 'Next X Months',
+		nextxweeks: 'Next X Weeks',
+		nextxyears: 'Next X Years',
+		olderthanxmonths: 'Older than X Months',
+		olderthanxyears: 'Older than X Years',
+		onyearx: 'On Year X',
+		onx: 'On X',
+		onorafterx: 'On or After X',
+		onorbeforex: 'On or Before X',
+		thismonth: 'This Month',
+		thisweek: 'This Week',
+		thisyear: 'This Year',
+		today: 'Today',
+		tomorrow: 'Tomorrow',
+		yesterday: 'Yesterday',
+		custom: 'Custom'
+	};
+
+	LightKendoGrid.OperatorWithDateTime = {
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator),
+		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator)
+	};
+
+	LightKendoGrid.DefaultDateOperator = jQuery.extend(true, {}, LightKendoGrid.DefaultDateTimeOperator);
+	delete LightKendoGrid.DefaultDateOperator.lastxhours;
+	delete LightKendoGrid.DefaultDateOperator.nextxhours;
+
+	LightKendoGrid.OperatorWithDate = {
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultDateOperator),
+		date: jQuery.extend(true, {}, LightKendoGrid.DefaultDateOperator)
+	};
 
 	LightKendoGrid.OperatorWithList = {
 		string: {
@@ -569,6 +679,29 @@
 	};
 	LightKendoGrid.OperatorWithList = jQuery.extend(true, {}, LightKendoGrid.BaseOperator, LightKendoGrid.OperatorWithList);
 
+	LightKendoGrid.DefaultGeneralOperator = {  //user for number/interger/number
+		eq: "Equal To",
+		neq: "Not Equal To",
+		isempty: "Empty",
+		isnotempty: "Not Empty",
+		lt: "Less Than",
+		lte: "Less Than or Equal To",
+		gt: "Greater Than",
+		gte: "Greater Than or Equal To",
+		custom: 'Custom'
+	};
+
+	LightKendoGrid.OperatorWithNumber = {
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator),
+		number: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)
+	};
+
+	LightKendoGrid.OperatorWithTime = {
+		// here need set "datetime" not "time" for time type column
+		string: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator),
+		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)		
+	};
+
 	LightKendoGrid.Operator2DisplayValue = {
 		eq: "Equal To",
 		neq: "Not Equal To",
@@ -583,7 +716,38 @@
 		gt: "Greater Than",
 		gte: "Greater Than or Equal To",
 		custom: 'Custom',
-		list: 'List'
+		list: 'List',
+		wi: 'Is Within',
+		lastxdays: "Last X Days",
+		lastxhours: "Last X Hours",
+		lastxmonths: 'Last X Months',
+		lastxweeks: 'Last X Weeks',
+		lastxyears: 'Last X Years',
+		nextxdays: 'Next X Days',
+		nextxhours: 'Next X Hours',
+		nextxmonths: 'Next X Months',
+		nextxweeks: 'Next X Weeks',
+		nextxyears: 'Next X Years',
+		olderthanxmonths: 'Older than X Months',
+		olderthanxyears: 'Older than X Years',
+		onyearx: 'On Year X',
+		all: 'All',
+		lastmonth: 'Last Month',
+		lastweek: 'Last Week',
+		lastyear: 'Last Year',
+		nextbusinessday: 'Next Business Day',
+		nextmonth: 'Next Month',
+		nextweek: 'Next Week',
+		nextyear: 'Next Year',
+		thismonth: 'This Month',
+		thisweek: 'This Week',
+		thisyear: 'This Year',
+		today: 'Today',
+		tomorrow: 'Tomorrow',
+		yesterday: 'Yesterday',
+		onx: 'On X',
+		onorafterx: 'On or After X',
+		onorbeforex: 'On or Before X'
 	};
 
 	LightKendoGrid.prototype.createGrid = function()
@@ -595,6 +759,22 @@
 				transport: {
 					read: function(options)
 					{
+						function setEmpty()
+						{
+							options.success({
+								d: {
+									__count: 0,
+									results: []
+								}
+							});
+						}
+						if (self.options.withoutData || self.options.miniGridEditMode
+							|| (self.options.isMiniGrid && self.options.hasPermission === false))
+						{
+							setEmpty();
+							return;
+						}
+
 						//the count of request in the process of change filter
 						if (!self.kendoDataSourceTransportReadCount) self.kendoDataSourceTransportReadCount = 0;
 						self.kendoDataSourceTransportReadCount = self.kendoDataSourceTransportReadCount + 1;
@@ -621,90 +801,115 @@
 								.then(function(result)
 								{
 									self.setFilterIconByKendoDSFilter.bind(self)();
+									var requestOptions = self.getApiRequestOption(options);
+									if (self.options.getAsyncRequestOption)
+									{
+										promise = self.options.getAsyncRequestOption(requestOptions);
+									}
+									else
+									{
+										promise = Promise.resolve(requestOptions);
+									}
 
-									tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
-										.then(function()
-										{
-											//the count of request callback in the process of change filter
-											if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
-											self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
-											//check the filter Whether custom or not
-											if (self.$customFilterBtn)
+									promise.then(response =>
+									{
+										tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
+											.then(function()
 											{
-												//when user change the custom filter, show the custom filter menu now
-												//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
-												if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
+												//the count of request callback in the process of change filter
+												if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
+												self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
+												//check the filter Whether custom or not
+												if (self.$customFilterBtn)
 												{
-													self.$customFilterBtn.click();
+													//when user change the custom filter, show the custom filter menu now
+													//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
+													if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
+													{
+														self.$customFilterBtn.click();
+														self.kendoDataSourceTransportRequestBackCount = 0;
+														self.kendoDataSourceTransportReadCount = 0;
+														self.$customFilterBtn = undefined;
+													}
+												}
+												else
+												{
+													//reset the request count, request callback count and custom button
 													self.kendoDataSourceTransportRequestBackCount = 0;
 													self.kendoDataSourceTransportReadCount = 0;
 													self.$customFilterBtn = undefined;
 												}
-											}
-											else
+											}).fail(function(ex)
 											{
-												//reset the request count, request callback count and custom button
-												self.kendoDataSourceTransportRequestBackCount = 0;
-												self.kendoDataSourceTransportReadCount = 0;
-												self.$customFilterBtn = undefined;
-											}
-										}).fail(function(ex)
-										{
-											if (self.overlay && self.options.showOverlay)
-											{
-												tf.loadingIndicator.tryHide();
-											}
+												if (self.overlay && self.options.showOverlay)
+												{
+													tf.loadingIndicator.tryHide();
+												}
 
-											self.gridAlert.show({
-												alert: "Danger",
-												title: "Error",
-												message: ex.responseJSON.Message
+												self.gridAlert.show({
+													alert: "Danger",
+													title: "Error",
+													message: ex.responseJSON.Message
+												});
 											});
-										});
+									});
 								});
 						}
 						else
 						{
-							tf.ajax.post(self.getApiRequestURL(self.options.url), self.getApiRequestOption(options), { overlay: self.overlay && self.options.showOverlay })
-								.then(function()
-								{
-									//the count of request callback in the process of change filter
-									if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
-									self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
-									//check the filter Whether custom or not
-									if (self.$customFilterBtn)
+							var requestOptions = self.getApiRequestOption(options);
+							if (self.options.getAsyncRequestOption)
+							{
+								promise = self.options.getAsyncRequestOption(requestOptions);
+							}
+							else
+							{
+								promise = Promise.resolve(requestOptions);
+							}
+
+							promise.then(response =>
+							{
+								tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
+									.then(function()
 									{
-										//when user change the custom filter, show the custom filter menu now
-										//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
-										if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
+										//the count of request callback in the process of change filter
+										if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
+										self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
+										//check the filter Whether custom or not
+										if (self.$customFilterBtn)
 										{
-											self.$customFilterBtn.click();
+											//when user change the custom filter, show the custom filter menu now
+											//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
+											if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
+											{
+												self.$customFilterBtn.click();
+												self.kendoDataSourceTransportRequestBackCount = 0;
+												self.kendoDataSourceTransportReadCount = 0;
+												self.$customFilterBtn = undefined;
+											}
+										}
+										else
+										{
+											//reset the request count, request callback count and custom button
 											self.kendoDataSourceTransportRequestBackCount = 0;
 											self.kendoDataSourceTransportReadCount = 0;
 											self.$customFilterBtn = undefined;
 										}
-									}
-									else
-									{
-										//reset the request count, request callback count and custom button
-										self.kendoDataSourceTransportRequestBackCount = 0;
-										self.kendoDataSourceTransportReadCount = 0;
-										self.$customFilterBtn = undefined;
-									}
 
-								}).fail(function(ex)
-								{
-									if (self.overlay && self.options.showOverlay)
+									}).fail(function(ex)
 									{
-										tf.loadingIndicator.tryHide();
-									}
+										if (self.overlay && self.options.showOverlay)
+										{
+											tf.loadingIndicator.tryHide();
+										}
 
-									self.gridAlert.show({
-										alert: "Danger",
-										title: "Error",
-										message: ex.responseJSON.Message
-									})
-								});
+										self.gridAlert.show({
+											alert: "Danger",
+											title: "Error",
+											message: ex.responseJSON.Message
+										})
+									});
+							});
 						}
 					}
 				},
@@ -735,7 +940,7 @@
 				allowUnsort: true
 			},
 			reorderable: self.options.reorderable === false ? false : true,
-			resizable: true,
+			resizable: self.options.resizable !== false,
 			pageable: {
 				refresh: true,
 				pageSizes: [25, 50, 100, 500, 1000, 2000],
@@ -862,6 +1067,19 @@
 			};
 		}
 
+		if (self.options.disableQuickFilter === true || self.options.filterable === false)
+		{
+			kendoGridOption.filterable = false;
+		}
+		else
+		{
+			kendoGridOption.filterable = {
+				extra: true,
+				mode: "menu row",
+				operators: TF.Grid.LightKendoGrid.DefaultOperator
+			};
+		}
+
 		kendoGridOption = $.extend(true, kendoGridOption, this.options.kendoGridOption);
 		this.filterClearButtonInUnLockedArea = this.options.kendoGridOption.filterClearButtonInUnLockedArea;
 
@@ -897,6 +1115,7 @@
 		this.blurFilterInputWhenClickGrid();
 		this.handleClickClearQuickFilterBtn();
 		this.bindCalendarButton();
+		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
 
 	LightKendoGrid.prototype.filterMenuInit = function(e)
@@ -985,9 +1204,22 @@
 			var kendoGridDomain = this;
 
 			var filter = kendoGridDomain.kendoGrid.dataSource.filter();
+			var clearCustomFilterCell = function(e)
+			{
+				// filter is null, but the CustomFilter has not been removed in UI
+				let customContainer = $(e.sender.element);
+				let filterCells = customContainer.find('input.datepickerinput');
+				if (filterCells && filterCells[1] && $(filterCells[1]).val() !== '')
+				{
+					$(filterCells[1]).val('');
+				}
+			}
 
 			if (!filter)
+			{
+				clearCustomFilterCell(e);
 				return;
+			}
 
 			var currentFilter = filter.filters.filter(function(item)
 			{
@@ -1001,6 +1233,10 @@
 				var inputCellText = currentFilter[0].filters[0].value;
 				inputCellText = TF.FilterHelper.formatFilterCellInputValue(inputCellText, tmpType);
 				$(e.sender.element.find('input')[0]).val(inputCellText);
+			}
+			else
+			{
+				clearCustomFilterCell(e);
 			}
 		};
 
@@ -1070,11 +1306,22 @@
 		this.$container.delegate('.k-grid-header button', 'click', function(e)
 		{
 			var $button = $(this);
+			self.clearDateNilFilterCell($button);
 			if ($button.children(".k-i-close").length === 0)
 				return;
 
 			$button.parent().find('input:text').focus();
 		});
+	};
+
+	LightKendoGrid.prototype.clearDateNilFilterCell = function(button)
+	{
+		var cellContainer = button.closest("span.k-filtercell"),
+			operator = cellContainer.find("input.k-dropdown-operator").val();
+		if ((button.children(".k-i-filter-clear").length === 0) ||
+			TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(operator) === -1) return;
+
+		cellContainer.find("input.date-number").val("");
 	};
 
 	// Hack Filter Cell Refresh UI for support display filter menu selector on filter cell
@@ -1221,6 +1468,32 @@
 		)
 			return;
 
+		// handle date special filter
+		const isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
+		const isDateTimeDateParam = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(kendoFilterCellDomain.viewModel.operator);
+		if (isDateTimeNonParam || isDateTimeDateParam) 
+		{
+			const kendoFilterCellDomainField = kendoFilterCellDomain.options.field;
+			const currentlyColumn = hackDomain.options.gridDefinition.Columns.find(function(column) { return column.FieldName === kendoFilterCellDomainField; });
+			const operator = kendoFilterCellDomain.viewModel.operator;
+			const operatorName = hackDomain.getOpetatorName(operator);
+			const columnType = currentlyColumn.type;
+
+			// This settimeout is desined to make sure that the value is setted to field correctly. So the time is 0. Will be removed if there is better solution.
+			setTimeout(() =>
+			{
+				if (isDateTimeNonParam)
+				{
+					hackDomain.setKendoDateTimeNonParamFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
+				}
+				else
+				{
+					hackDomain.setKendoDateTimeDateParamFilterCellInputValue(kendoFilterCellDomain.wrapper, operatorName, operator, columnType);
+				}
+			})
+			return;
+		}
+
 		var isCustomFilter = kendoFilterCellDomain.wrapper.find('input').hasClass('k-filter-custom-input');
 
 		if (!isCustomFilter)
@@ -1301,12 +1574,39 @@
 		}
 	};
 
+	LightKendoGrid.prototype.setKendoDateTimeDateParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	{
+		const inputCell = $filterCell.find('input[type=text]:first');
+		const inputCellVale = inputCell.val();
+		const preprendStr = displayVal.replace("X", '');
+
+		if (inputCellVale && inputCellVale !== '' && !inputCell.attr("reloadfilter"))
+		{
+			// add reloadfilter for avoding reloade the data 
+			const valueArr = inputCellVale.split(preprendStr);
+			if (valueArr.length === 1)
+			{
+				displayVal = displayVal.replace("X", inputCellVale);
+				inputCell.attr('title', displayVal);
+				inputCell.val(displayVal);
+				inputCell.attr("reloadfilter", "true");
+			}
+		}
+	};
+
 	LightKendoGrid.prototype.setKendoFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
 	{
 		$filterCell.find('input[type=text]').attr('title', displayVal);
 		if (filterType === 'listFilter' ||
 			filterType === 'customFilter')
 			$filterCell.find('input[type=text]').val(displayVal);
+	};
+
+	LightKendoGrid.prototype.setKendoDateTimeNonParamFilterCellInputValue = function($filterCell, displayVal, filterType, columnType)
+	{
+		let inputCell = $filterCell.find('input[type=text]:first');
+		inputCell.attr('title', displayVal);
+		inputCell.val(displayVal);
 	};
 
 	LightKendoGrid.prototype._buildCustomFilterCellDisplayVal = function(filterLeft, filterRight, logic, columnType)
@@ -1558,9 +1858,13 @@
 
 	LightKendoGrid.prototype._findDDLInput = function(e)
 	{
-
 		var parentId = $(e.currentTarget).parent().find("[id]")[0].id,
-			$input = $("[aria-activedescendant='" + parentId + "']").prev().find("input");
+			$input = $("[aria-activedescendant='" + parentId + "']").prev().find("input"),
+			filterType = this.getColumnType(e);;
+		if (TF.FilterHelper.isDateOrDateTimeFilterType(filterType)) // datetime include datetimpicker and numberbox 
+		{
+			$input = $("[aria-activedescendant='" + parentId + "']").prev().prev().find("input");
+		}
 
 		return $input;
 	}
@@ -1639,6 +1943,40 @@
 		{
 			filters.push(listFilter);
 		}
+		self.kendoGrid.dataSource.filter({ logic: 'and', filters: filters });
+	};
+
+	LightKendoGrid.prototype.handleDateTimeNilFilterToKendoDataSource = function(value, fieldName, operator)
+	{
+		var self = this;
+
+		var kendoFilters = self.kendoGrid.dataSource.filter();
+		var filters = [],
+			filter = { field: fieldName, operator: operator, value: value };
+
+		if (kendoFilters)
+		{
+			for (var i = 0; i < kendoFilters.filters.length; i++)
+			{
+				if (kendoFilters.filters[i].field !== fieldName)
+				{
+					if (kendoFilters.filters[i].filters)
+					{
+						if (kendoFilters.filters[i].filters.length > 0 &&
+							kendoFilters.filters[i].filters[0].field !== fieldName)
+							filters.push(kendoFilters.filters[i]);
+					}
+					else
+					{
+						filters.push(kendoFilters.filters[i]);
+					}
+				}
+			}
+		}
+
+		filters.push(filter);
+
+		//filters.push(nilFilter);
 		self.kendoGrid.dataSource.filter({ logic: 'and', filters: filters });
 	};
 
@@ -1983,6 +2321,49 @@
 		self.visibleCustomFilterBtnByClick(e);
 	};
 
+	LightKendoGrid.prototype.handleDatetimeFilter = function(e)
+	{
+		var filter = $(e.currentTarget).text(),
+			input, cellContainer = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']");
+		if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1) // show the number box when select nil filter
+		{
+
+			input = cellContainer.prev().prev().find("input");
+			input.closest(".k-filtercell").find("span.date-number").show(); // show the input
+			input.closest(".input-group.tf-filter").hide();
+		} else
+		{
+			input = cellContainer.prev().find("input");
+			var numberFilterCell = input.closest('span.date-number'); //hide the number box when select nil filter
+			numberFilterCell.hide();
+			numberFilterCell.closest(".k-filtercell").find(".tf-filter").show(); // show the input
+
+			if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
+			{
+				var dateInput = numberFilterCell.closest(".k-filtercell").find(".tf-filter>input.datepickerinput");
+				TF.FilterHelper.disableFilterCellInput(dateInput);
+			}
+		}
+	};
+
+	LightKendoGrid.prototype.handleDateFilter = function(e)
+	{
+		var filter = $(e.currentTarget).text(),
+			cellContainer = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").parent();
+		if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1) // show the number box when select nil filter
+		{
+			//input = cellContainer.prev().prev().find("input");
+			cellContainer.find("span.date-number").show(); // show the input
+			cellContainer.find(".k-datepicker").hide();
+		} else
+		{
+			//input = cellContainer.prev().find("input");
+			var numberFilterCell = cellContainer.find('span.date-number'); //hide the number box when select nil filter
+			numberFilterCell.hide();
+			cellContainer.find(".k-datepicker").show(); // show the input
+		}
+	};
+
 	LightKendoGrid.prototype.setEmptyCustomFilter = function(e)
 	{
 		var self = this;
@@ -2044,7 +2425,8 @@
 
 		var $menuFilterBtn = this._findMenuFilterBtn.bind(this)(e);
 		var $input = this._findDDLInput(e);
-		var checkSetEmptyFilter = $input.data('isempty') || $input.data('islist');
+		var isMiniGridEditMode = !!(self.options && self.options.miniGridEditMode);
+		var checkSetEmptyFilter = $input.data('isempty') || $input.data('islist') || $input.data('dateTimeNonParam');
 		self.visibleCustomFilterBtnCommon($menuFilterBtn, $input);
 
 		this.hideAndClearSpecialFilterBtn.bind(this)(e, 'custom');
@@ -2056,6 +2438,12 @@
 				self.$customFilterBtn = $menuFilterBtn;
 				$input.val('');
 				self.setEmptyCustomFilter(e, $menuFilterBtn);
+
+				if (isMiniGridEditMode)
+				{
+					// Mini Grid Edit Mode do not need to fresh the grid. Open the custom menu directly.
+					$menuFilterBtn.click();
+				}
 			}
 			else
 			{
@@ -2090,6 +2478,12 @@
 		if ($input.data('kendo-role') === "datepicker")
 		{
 			$menuFilterBtn.addClass("data-picker-custom-filter");
+		}
+
+		let cellWidget = $input.data('kendo-role');
+		if (cellWidget === "datetimepicker" || cellWidget === 'datepicker')
+		{
+			TF.FilterHelper.hideDatetimeNumberCell($input, cellWidget);
 		}
 
 		TF.FilterHelper.disableFilterCellInput($input);
@@ -2196,6 +2590,16 @@
 		}
 	};
 
+	LightKendoGrid.prototype.getColumnType = function(e)
+	{
+		var self = this,
+			input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
+			fieldName = input.closest("[data-kendo-field]").attr("data-kendo-field"),
+			field = self._gridDefinition.Columns.filter(function(c) { return c.FieldName === fieldName });
+
+		return field[0] ? field[0].type : '';
+	};
+
 	LightKendoGrid.prototype.addFilterClass = function()
 	{
 		var self = this, $listContainer;
@@ -2205,10 +2609,19 @@
 			return;
 		}
 
-		$listContainer = $(".k-list-container:not(.not-lightkendogrid)");
+		$listContainer = $(".k-list-container:not(.not-lightkendogrid):not(.filter-updated)");
 		$listContainer = $listContainer.filter(function()
 		{
 			return $(this).parents('form.k-filter-menu').length == 0;
+		});
+
+		const updatedClassName = "filter-updated";
+		const uniqueClassName = self.$container.data("uniqueClassName") ? "filter-container-" + self.$container.data("uniqueClassName") : "";
+
+		$listContainer.each(function(i, item)
+		{
+			$(item).addClass(updatedClassName);
+			uniqueClassName && $(item).addClass(uniqueClassName);
 		});
 
 		for (var key in this.filterNames)
@@ -2274,15 +2687,130 @@
 							filters.push(filter);
 							input.data("isempty", true);
 
+							// datetime filter cell dom tree is changed
+							var fieldName = input.closest("[data-kendo-field]").attr("data-kendo-field"),
+								field = self._gridDefinition.Columns.filter(function(c) { return c.FieldName === fieldName }),
+								filterType = field[0] ? field[0].type : '';
+							if (TF.FilterHelper.isDateOrDateTimeFilterType(filterType)) // hide the number input cell on datetime filter
+							{
+								let filterCell = input.closest('span.k-filtercell');
+								let rawCellCls = filterType === 'datetime' ? ".tf-filter" : ".k-datepicker";
+								let rawCellInputCls = filterType === 'datetime' ? ".datepickerinput" : ".k-datepicker .k-input";
+								filterCell.find(rawCellCls).show();
+								filterCell.find("span.date-number").hide();
+								filterCell.find(rawCellInputCls).data("isempty", true);
+
+							}
 							self.hideAndClearSpecialFilterBtn.bind(self)(e, 'empty');
 						});
 					break;
 				default:
-					$listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key }).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
+					var $filterContainers = $listContainer.find(cssSelectorStr).filter(function() { return $(this).text() === key; });
+					var $filterContainersNeedBindClick = [];
+					for (var i = 0; i < $filterContainers.length; i++)
+					{
+						if ($._data($filterContainers[i], "events") == undefined || $._data($filterContainers[i], "events").click == undefined)
+						{
+							$filterContainersNeedBindClick.push($filterContainers[i]); // for avoid bind the click multiple
+						}
+					}
+
+					$($filterContainersNeedBindClick).off(customTouchMoveEvent).on(customTouchMoveEvent, function(ev)
+					{
+						if (customTouchMoveTimeOut)
+						{
+							clearTimeout(customTouchMoveTimeOut)
+							customTouchMoveTimeOut = null;
+						}
+
+						// Ignore the touchend event caused by touchmove.
+						customTouchMoveTimeOut = setTimeout(() =>
+						{
+							customTouchMoveLock = true;
+						}, 50);
+					});
+
+					$($filterContainersNeedBindClick).off(customClickAndTouchEvent).on(customClickAndTouchEvent,
 						function(e)
 						{
-							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input");
-							self.hideAndClearSpecialFilterBtn.bind(self)(e, 'default');
+							if (customTouchMoveTimeOut)
+							{
+								clearTimeout(customTouchMoveTimeOut)
+								customTouchMoveTimeOut = null;
+							}
+
+							if (customTouchMoveLock === true && TF.isMobileDevice)
+							{
+								customTouchMoveLock = false;
+								return;
+							}
+
+							var input = $("[aria-activedescendant='" + $(e.currentTarget).parent().find("[id]")[0].id + "']").prev().find("input"),
+								fieldName = input.closest("[data-kendo-field]").attr("data-kendo-field"),
+								field = self._gridDefinition.Columns.filter(function(c) { return c.FieldName === fieldName }),
+								filterCellType = 'default',
+								filterType = field[0] ? field[0].type : '',
+								filter = $(e.currentTarget).text();
+
+							var numberFilterCell = $(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox");
+
+							if (filterType === 'datetime') // handle the datetime filter cell
+							{
+								let filterDateTimeCell = input.closest('span.k-filtercell');
+								let $inputElement = filterDateTimeCell.find(".datepickerinput.k-input");
+								numberFilterCell.value(null);
+								self.handleDatetimeFilter(e);
+								numberFilterCell.setOptions({
+									format: "{0:0}"
+								});
+								if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1)
+								{
+									const formatStr = TF.FilterHelper.getNilFiltersFormat(filter);
+									numberFilterCell.setOptions({
+										format: formatStr.replace("X", "0")
+									});
+								}
+								$inputElement.data("dateTimeNonParam", false);
+								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
+								{
+									filterCellType = 'empty';
+									$inputElement.data("dateTimeNonParam", true);
+								}
+							} else if (filterType === 'date') // date has differen cell struct with datetime
+							{
+								$(input.closest("[data-kendo-field]").find("input.date-number")[1]).data("kendoNumericTextBox").value(null);
+								self.handleDateFilter(e);
+								let filterDateCell = input.closest('span.k-filtercell');
+								let dateTimeNonParamValue = TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1 ||
+									TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1;
+								let filterDateCellInput = filterDateCell.find(".k-datepicker .k-input");
+								numberFilterCell.value(null);
+								self.handleDateFilter(e);
+
+								numberFilterCell.setOptions({
+									format: "{0:0}"
+								});
+
+								if (TF.FilterHelper.dateTimeNumberFiltersName.indexOf(filter) > -1)
+								{
+									const formatStr = TF.FilterHelper.getNilFiltersFormat(filter);
+									numberFilterCell.setOptions({
+										format: formatStr.replace("X", "0")
+									});
+								}
+
+								filterDateCellInput.data("dateTimeNonParam", dateTimeNonParamValue);
+								if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(filter) > -1) // handle the non param input cell
+								{
+									filterCellType = 'empty';
+								}
+								else if (TF.FilterHelper.dateTimeDateParamFiltersNames.indexOf(filter) > -1) 
+								{
+									// for avoid the flash the grid
+									filterDateCellInput.attr('reloadfilter', true);
+								}
+							}
+							self.hideAndClearSpecialFilterBtn.bind(self)(e, filterCellType);
 						});
 					break;
 			}
@@ -2308,10 +2836,11 @@
 				var $filterCellInner = $filterCell.find('> span');
 
 				var input = $filterCell.find("input[type=text]");
+				let isDateTimeNonParam = TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(this.text()) > -1;
 				TF.FilterHelper.clearFilterCellInput(input);
 				//remove display css for clear button
 				TF.CustomFilterHelper.removeCustomFilterEllipsisClass(input);
-				if (isSpecialFilterType(input))  //User should not type in values when "empty" or "not empty" filters are applied
+				if (isSpecialFilterType(input) || isDateTimeNonParam)  //User should not type in values when "empty" or "not empty" filters are applied
 				{
 					TF.FilterHelper.disableFilterCellInput(input);
 					$filterCellInner.addClass("hide-cross-button");
@@ -2426,12 +2955,20 @@
 		$filterItemDropDownLists.map(function(idx, filterItemDropDownList)
 		{
 			var kendoDropDownList = $(filterItemDropDownList).data('kendoDropDownList');
+			/*
+			 * under most scenario except datetime/date filter, 400px is enough as the height for the popup,
+			 * and the KendoDropDownList should shrink to it's fit height if current height less than the height configured from options
+			 */
+			kendoDropDownList.options.height = 400;
 			if (kendoDropDownList)
 			{
 				//when grid's parent page is closed, self situation happens, like view page dispose.
 				kendoDropDownList.bind('open', function()
 				{
 					var self = this;
+					var fieldName = self.element.parent().parent().parent().data('kendoField');
+					var fieldDef = that._gridDefinition.Columns.filter(function(c) { return c.FieldName === fieldName });
+					var filterType = fieldDef[0].type;
 					function highLightCustomFilterItem()
 					{
 						var kendoDropDownList = this;
@@ -2478,14 +3015,20 @@
 					$listContainer.css({ "height": "", "display": "block" });
 					$listParent.find('.k-list').parent().css({ "height": "" });
 					$listContainer.find("div, ul, li").css("box-sizing", "content-box");
-
 					var orgHeight = $listParent[0].scrollHeight;
-
 					setTimeout(function()
 					{
 						$listParent.height(orgHeight);
 						$listContainer.height(orgHeight);
 						$listContainer.find("div, ul, li").css("box-sizing", "");
+
+						// handle datetime 
+						if (TF.FilterHelper.isDateOrDateTimeFilterType(filterType))
+						{
+							$listParent.css("max-height", `${kendoDropDownList.options.height}px`);
+							$listContainer.css("max-height", `${kendoDropDownList.options.height}px`);
+							$listParent.css("overflow-y", "auto");
+						}
 					}, 10);
 
 					$listContainer.addClass('has-set-filter-ddl-size');
@@ -2507,8 +3050,14 @@
 			{
 				if (text === key)
 				{
-					switch (key)
+					let keyType = key;
+					if (TF.FilterHelper.dateTimeNonParamFiltersName.indexOf(key) > -1)
 					{
+						keyType = "Date Non Param";
+					}
+					switch (keyType)
+					{
+						case "Date Non Param":
 						case "Empty":
 						case "Not Empty":
 							var input = $item.parent().parent().parent().find('input');
@@ -2540,11 +3089,16 @@
 
 			var $filterItem = $item.parent().parent().parent().parent();
 			var fieldName = $filterItem.data('kendo-field');
+			if (!self.kendoGrid.dataSource.filter())
+			{
+				return;
+			}
 
 			self.kendoGrid.dataSource.filter().filters.map(function(filter)
 			{
-				if (fieldName === filter.FieldName)
+				if (fieldName === filter.FieldName || fieldName === filter.field)
 				{
+					// FieldName is for filter sticky; field is for change the column index
 					self.kendoGrid.columns.map(function(column)
 					{
 						if (column.FieldName === fieldName)
@@ -2561,6 +3115,29 @@
 										}
 									});
 									break;
+								case "date":
+								case "datetime":
+									if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(filter.operator) > -1)
+									{
+										let dateCellClass = column.type === 'date' ? '.k-datepicker' : '.input-group.tf-filter';
+										let operatorName = self.getOpetatorName(filter.operator);
+										$filterItem.find("span.date-number").show(); // show the input
+										let formatStr = TF.FilterHelper.getNilFiltersFormat(operatorName);
+										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").setOptions({
+											format: formatStr.replace("X", "0")
+										});
+										$($filterItem.find("input.date-number")[1]).data("kendoNumericTextBox").value(filter.value);
+										$filterItem.find(dateCellClass).hide();
+										// hide the clear button
+										setTimeout(function()
+										{
+											if (filter.value === '' || filter.value === null)
+											{
+												self.hideClearBtn($filterItem);
+											}
+										}, 200);
+									}
+									break;
 								default:
 									break;
 							}
@@ -2569,6 +3146,15 @@
 				}
 			});
 		});
+	};
+
+	LightKendoGrid.prototype.hideClearBtn = function($filterItem)
+	{
+		var clearBtn = $filterItem.find(".k-i-filter-clear").parent();
+		if (clearBtn)
+		{
+			clearBtn.hide();
+		}
 	};
 
 	LightKendoGrid.prototype.getKendoSortColumn = function()
@@ -2662,21 +3248,125 @@
 		}
 
 		var supportListFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.ListFilterTemplate; });
-		columns.map(function(column)
+		var supportDateTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'datetime'; });
+		var supportDateFilterColumns = this._gridType === 'gpsevent' ? [] : this._gridDefinition.Columns.filter(function(column) { return column.type === 'date'; });
+		var supportNumberFilterColumns = this._gridDefinition.Columns.filter(function (column) { return column.type === 'number' || column.type === 'integer'; });
+		var supportTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'time' });
+		columns.forEach(function(column)
 		{
-			var needProcess = supportListFilterColumns.filter(function(sc)
+			if (supportDateTimeFilterColumns.some(function(sc)
 			{
-				return sc.field === column.field;
-			})
-			if (needProcess.length > 0)
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
+				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithDateTime;
+			}
+			if (supportDateFilterColumns.some(function(sc)
+			{
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
+				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithDate;
+			}
+			if (supportListFilterColumns.some(function(sc)
+			{
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
 				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithList;
+			}
+
+			if (supportNumberFilterColumns.some(function(sc)
+			{
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
+				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithNumber;
+			}
+
+			if (supportTimeFilterColumns.some(function(sc)
+			{
+				return sc.field === column.field || (sc.UDFId != null && sc.UDFId === column.UDFId);
+			}))
+			{
+				column.filterable.operators = TF.Grid.LightKendoGrid.OperatorWithTime;
+			}
 		});
+
 		this.currentDisplayColumns(columns);
 		return tf.measurementUnitConverter.handleUnitOfMeasure(columns);
 	};
 
+	LightKendoGrid.prototype.handleInvisibleUDFColumns = function(columns)
+	{
+		var self = this,
+			needHandleTypes = tf.dataTypeHelper.getAvailableDataTypes()
+				.map(function(item) { return item.key; });
+
+		if (columns
+			&& columns instanceof Array
+			&& needHandleTypes.some(function(type) { return type === self._gridType; }))
+		{
+			var invisibleUDFs = tf.UDFDefinition.getInvisibleUDFs(self._gridType);
+
+			return _.intersectionBy(columns, invisibleUDFs, function(item) { return item.UDFId; }).map(function(i)
+			{
+				var result = $.extend(true, {}, i);
+
+				result.FieldName = i.FieldName;
+				result.OriginalName = i.OriginalName;
+				result.DisplayName = i.DisplayName;
+				return result;
+			});
+		}
+
+		return [];
+	};
+
+	LightKendoGrid.prototype.handleUDFColumns = function(columns)
+	{
+		var self = this,
+			needHandleTypes = tf.dataTypeHelper.getAvailableDataTypes().map(function(item)
+			{
+				return item.key;
+			});
+
+		if (columns
+			&& columns instanceof Array
+			&& needHandleTypes.some(function(type) { return type === self._gridType; }))
+		{
+			var udfs = tf.UDFDefinition.getAvailableWithCurrentDataSource(self._gridType);
+			return columns.map(function(c)
+			{
+				if (!c.UDFId) return c;
+
+				var matched = udfs.filter(function(u) { return u.UDFId == c.UDFId; });
+
+				if (matched.length == 0)
+				{
+					return "";
+				}
+				else
+				{
+					var result = $.extend(true, {}, c);
+					result.FieldName = matched[0].FieldName;
+					result.OriginalName = matched[0].OriginalName;
+					result.DisplayName = matched[0].DisplayName;
+					return result;
+				}
+			}).filter(function(item)
+			{
+				return !!item;
+			});
+		}
+
+		return columns;
+	};
+
+
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)
 	{
+		const self = this;
 		switch (definition.type)
 		{
 			case "string":
@@ -2718,6 +3408,21 @@
 											{
 												var options = this.getApiRequestOption(kendoOption);
 												options.paramData = { FieldName: tf.UDFDefinition.getOriginalName(column.field), AggregateOperator: 'Distinct100' };
+												if(tf && tf.pageManager)
+												{
+													switch(tf.pageManager.oldPageType)
+													{
+														case "myrequests":
+															options.paramData.filterType = "submitted";
+															break;
+														case "approvals":
+															options.paramData.filterType = "permission";
+															break;
+														default:
+															break;
+													}
+												}
+
 												options.success = function(result)
 												{
 													result.Items = LightKendoGrid.normalizeResultItem(result.Items, this._gridType, this.options);
@@ -2746,7 +3451,7 @@
 													url = this.options.setRequestURL(url);
 												}
 
-												tf.ajax["post"](pathCombine(url, "aggregate"), options, { overlay: false });
+												!this.options.disableAutoComplete && this.postRequestData(pathCombine(url, "aggregate"), options);
 											}
 											else if (this._gridType === "busfinderhistorical")
 											{
@@ -2756,11 +3461,32 @@
 												var options = this.getApiRequestOption(kendoOption);
 												options.data.fields = [column.field];
 
-												tf.ajax["post"](url, options, { overlay: false });
+												this.postRequestData(url, options);
+											}
+											else if (this._gridType === "Form")
+											{
+												const url = this.getApiRequestURL(this.options.url);
+												const udGridID = this.options.udGridID;
+												let options = this.getApiRequestOption(kendoOption);
+												const defaultFilter = tf.udgHelper.getUDGridIdFilter(udGridID);
+												if (options.data.filterSet)
+												{
+													options.data.filterSet["FilterItems"].push(...defaultFilter);
+												} else
+												{
+													const filterSet = {};
+													filterSet["FilterItems"] = [];
+													filterSet["FilterItems"].push(...defaultFilter);
+													filterSet["FilterSets"] = [];
+													filterSet["LogicalOperator"] = "and";
+													options.data.filterSet = filterSet;
+												}
+												options.data.filterSet.UDGridID = udGridID;
+												this.postRequestData(url, options);
 											}
 											else
 											{
-												tf.ajax["post"](this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption), { overlay: false });
+												this.postRequestData(this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption));
 											}
 										}.bind(this)
 									}
@@ -2861,10 +3587,54 @@
 							});
 							var datePicker = args.element.data("kendoDatePicker");
 							var dateHelper = new TF.DateBoxHelper(datePicker);
+							args.element.on("focus", (e) =>
+							{
+								// for recover the raw date value string
+								let datePicker = args.element.data("kendoDatePicker");
+								let span = $(args.element[0].parentElement).parent().parent();
+								let operator = span.find("input.k-dropdown-operator").val();
+								if (TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(operator))
+								{
+									let oldText = datePicker._oldText;
+									if (oldText)
+									{
+										$(args.element).val(oldText);
+									}
+								}
+							});
+							args.element.on("blur", (e) =>
+							{
+								// for setting the "ON","On or After", "On or Before" label for date filter cell
+								let cellValue = $(args.element).val();
+								let span = $(args.element[0].parentElement).parent().parent();
+								let operator = span.find("input.k-dropdown-operator").val();
+								if (TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(operator))
+								{
+									if (cellValue && cellValue !== '')
+									{
+										let operatorName = span.find('input.k-dropdown-operator').attr("aria-label");
+										if (operatorName)
+										{
+											operatorName = operatorName.replace("X", "");
+										}
+										// This settimeout is designed to make sure value is setted correctly. Will be removed if there is better solution.
+										setTimeout(() =>
+										{
+											$(args.element).val(operatorName + cellValue);
+										});
+									}
+								}
+							});
+							datePicker.dateView.popup.options.origin = "bottom right";
+							datePicker.dateView.popup.options.position = "top right";
 							dateHelper.trigger = function()
 							{
 								this.trigger("change");
 							}.bind(datePicker);
+
+							// insert number for integer paramber								
+							var span = $(args.element[0].parentElement).parent().parent()
+							self.createDateIntegerFilterCell(span, 'date');
 						}
 					}
 				};
@@ -2880,6 +3650,8 @@
 							var span = $(args.element[0].parentElement);
 							span.empty();
 							span.append($("<span class='input-group tf-filter' data-kendo-bind='value: value' data-kendo-role='customizeddatetimepicker'></span>"));
+							// insert number for integer paramber								
+							self.createDateIntegerFilterCell(span, 'datetime');
 						}
 					},
 					ui: function(element)
@@ -2947,6 +3719,118 @@
 				break;
 		}
 	};
+
+	LightKendoGrid.prototype.createDateIntegerFilterCell = function(span, columnType)
+	{
+		let self = this,
+			numberInput = $("<input type='text' class='date-number'>");
+		span.append(numberInput);
+		numberInput.kendoNumericTextBox({
+			format: "{0:0}",
+			decimals: 0,
+			min: 1,
+			change: function(e)
+			{
+				//this.trigger('change');
+				var fieldName = numberInput.closest("[data-kendo-field]").attr("data-kendo-field"),
+					value = this.value(),
+					operator = span.find("input.k-dropdown-operator").val();
+
+				if (value !== null)
+				{
+					var validateResult = self.validateDateTimeInteger(operator, value);
+					if (validateResult !== null)
+					{
+						e.preventDefault();
+						setTimeout(() =>
+						{
+							tf.promiseBootbox.alert('The filter value must be range: ' + validateResult + '.').then(function()
+							{
+								numberInput.parent().find('.k-formatted-value').focus();
+							});
+						})
+						return false;
+					}
+				}
+
+				if (value !== null && value !== '')
+				{
+					self.handleDateTimeNilFilterToKendoDataSource(numberInput.val(), fieldName, operator);
+				} else
+				{
+					let filterCell = span.closest(".k-filtercell").data('kendoFilterCell');
+					if (filterCell)
+					{
+						filterCell.clearFilter();
+					}
+				}
+			}
+		});
+
+		numberInput.hide();
+	};
+
+	LightKendoGrid.prototype.validateDateTimeInteger = function(operator, value)
+	{
+		let allowRange = 0;
+
+		if (operator === 'onyearx')
+		{
+			return value > 2040 || value < 1970 ? '1970 ~ 2040' : null;
+		}
+
+		switch (operator)
+		{
+			case "lastxdays":
+			case "nextxdays":
+				allowRange = 30 * 12 * 365;
+				break;
+			case "lastxhours":
+			case "nextxhours":
+				allowRange = 30 * 12 * 365 * 24;
+				break;
+			case "lastxmonths":
+			case "nextxmonths":
+				allowRange = 30 * 12;
+				break;
+			case "lastxweeks":
+			case "nextxweeks":
+				allowRange = 30 * 12 * 4;
+				break;
+			case "nextxyears":
+			case "lastxyears":
+				allowRange = 30;
+				break;
+			case "olderthanxmonths":
+				allowRange = 30 * 12;
+				break;
+			case "olderthanxyears":
+				allowRange = 30 * 2;
+				break;
+			case "lastxhours":
+				allowRange = 30 * 12 * 365 * 24;
+				break;
+		}
+		return value > allowRange ? '1 ~ ' + allowRange : null;
+
+	}
+
+	LightKendoGrid.prototype.postRequestData = function(url, requestOption)
+	{
+		let promise;
+		if (this.options.getAsyncRequestOption)
+		{
+			promise = this.options.getAsyncRequestOption(requestOption);
+		}
+		else
+		{
+			promise = Promise.resolve(requestOption);
+		}
+		promise.then(response =>
+		{
+			tf.ajax["post"](url, response, { overlay: false });
+		})
+	}
 
 	LightKendoGrid.prototype.getKendoColumnsExtend = function(currentColumns, defalultColumnWidth)
 	{
@@ -3075,6 +3959,8 @@
 					break;
 				case "time":
 				case "datetime":
+					field.type = "datetime";
+					break;
 				case "date":
 					field.type = "date";
 					break;
@@ -3690,12 +4576,58 @@
 			else if (griddefinition.type === "datetime")
 			{
 				filter.TypeHint = "DateTime";
-				filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+				if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(item.operator) >= 0)
+				{
+					filter.Operator = this.operatorKendoMapTF[item.operator];
+					if (griddefinition.isUTC)
+					{
+						filter.ConvertedToUTC = true;
+					}
+
+				} else
+				{
+					if (griddefinition.isUTC)
+					{
+						filter.Value = toISOStringWithoutTimeZone(clientTimeZoneToUtc(moment(filter.Value).format("YYYY-MM-DDTHH:mm:ss")));
+						filter.ConvertedToUTC = true;
+					}
+					else
+					{
+						filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+					}
+				}
 			}
 			else if (griddefinition.type === "date")
 			{
 				filter.TypeHint = "Date";
-				filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+				if (griddefinition.isUTC)
+				{
+					filter.ConvertedToUTC = true;
+				}
+				if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(item.operator) >= 0)
+				{
+					filter.Operator = this.operatorKendoMapTF[item.operator];
+				}
+				else if (TF.FilterHelper.dateTimeDateParamFiltersOperator.indexOf(item.operator) > -1)
+				{
+					filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+				}
+				else
+				{
+					if (griddefinition.isUTC)
+					{
+						filter.Value = toISOStringWithoutTimeZone(clientTimeZoneToUtc(moment(filter.Value).format("YYYY-MM-DDTHH:mm:ss")));
+						filter.ExactHint = "utc";
+					}
+					else if (filter.Operator !== "IsWithIn")
+					{
+						filter.Value = toISOStringWithoutTimeZone(moment(filter.Value));
+					}
+					else
+					{
+						// Nothing to do
+					}
+				}
 			}
 
 			if (griddefinition.TypeHint)
@@ -4168,6 +5100,20 @@
 		this.getSelectedIds(id == null ? [] : [id]);
 	};
 
+	/**
+	 * Run specified task on next data bound.
+	 *
+	 * @param {Function} task
+	 */
+	LightKendoGrid.prototype.runOnNextDataBound = function(task)
+	{
+		if (!!this.pendingTaskOnNextDataBound)
+		{
+			console.log("Pending task overriden.");
+		}
+		this.pendingTaskOnNextDataBound = task;
+	}
+
 	LightKendoGrid.prototype.scrollToSelection = function()
 	{
 		var index = this.obSelectedIndex(),
@@ -4377,9 +5323,15 @@
 			var $nomatching = self.$container.find(".no-matching-records");
 			if ($nomatching.length === 0)
 			{
-
 				var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
-				$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				if (self.options.isMiniGrid && self.options.hasPermission === false && !self.options.miniGridEditMode)
+				{
+					$parent.append("<div class='col-md-20 no-matching-records'>You don't have permission to view data.</div>");
+				}
+				else if (!self.options.withoutData && !self.options.miniGridEditMode)
+				{
+					$parent.append("<div class='col-md-20 no-matching-records'>There are no matching records.</div>");
+				}
 				$parent.find("table").css("display", "none");
 				$parent.find(".kendogrid-blank-fullfill").css("display", "none");
 			}
@@ -4443,7 +5395,8 @@
 			self._staffGridDraggable();
 		}
 
-		if ((self.geoFields && self.geoFields.length > 0) || self._gridType === "trip")
+		var showLoading = (self.geoFields && self.geoFields.length > 0) || self._gridType === "trip";
+		if (showLoading && !self.options.isMiniGrid)
 		{
 			tf.loadingIndicator.showImmediately();
 		}
@@ -4451,6 +5404,12 @@
 		self._loadIdsWhenOnDataBound()
 			.then(function()
 			{
+				if (typeof self.pendingTaskOnNextDataBound === "function")
+				{
+					self.pendingTaskOnNextDataBound();
+					self.pendingTaskOnNextDataBound = null;
+				}
+
 				newIds = self.obAllIds().slice();
 				if (oldIds.sort().join(',') === newIds.sort().join(','))
 				{
@@ -4809,26 +5768,31 @@
 		var contentHeight = height - 105 + self._filterHeight + pagerHeight;
 		self.$container.height(height).find(".k-grid-content-locked,.k-grid-content").height(contentHeight);
 		self.$container.next(".kendo-summarygrid-container").find(".k-grid-content-locked,.k-grid-content").height(self.summaryHeight);
-		self.kendoGrid._adjustLockedHorizontalScrollBar();
+		if (self.kendoGrid && self.kendoGrid.virtualScrollable)
+		{
+			self.kendoGrid._rowHeight = null;
+			self.kendoGrid.virtualScrollable.repaintScrollbar();
+		}
 
 		self.resetGridContainerHorizontalLayout();
+		//self.changeLockedColumnHeight();
+		self._refreshGridBlank();
 	};
 
 	/** */
 	LightKendoGrid.prototype.resetGridContainerHorizontalLayout = function()
 	{
-		var self = this, $item,
+		var self = this,
 			$summaryGrid = self.$container.next(),
 			warpWidth = self.$container.width(),
-			lockHeaderWidth = self.$container.find('.k-grid-header-locked').width(),
+			lockHeaderWidth = self.$container.children(".k-grid-header").children('.k-grid-header-locked').width(),
 			remainedWidth = warpWidth - lockHeaderWidth,
-			paddingRight = parseInt(self.$container.find(".k-grid-content").css("padding-right"));;
+			paddingRight = parseInt(self.$container.children(".k-grid-content").css("padding-right"));
 
-
-		self.$container.find(".k-grid-content").css("width", remainedWidth - paddingRight);
-		self.$container.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
-		$summaryGrid.find(".k-grid-content").css("width", remainedWidth);
-		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth);
+		self.$container.children(".k-grid-content").css("width", remainedWidth - paddingRight);
+		self.$container.children(".k-grid-header").children(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-grid-content").css("width", remainedWidth - paddingRight);
+		$summaryGrid.find(".k-auto-scrollable").css("width", remainedWidth - paddingRight);
 	};
 
 	LightKendoGrid.prototype.getGridFullHeight = function()
@@ -4990,6 +5954,25 @@
 			});
 	};
 
+	LightKendoGrid.prototype.scrollToRowById = function(id)
+	{
+		var self = this,
+			index = self.obAllIds().indexOf(id);
+
+		if (index > -1)
+		{
+			var $scroll = self.$container.children(".k-grid-content").find(".k-scrollbar.k-scrollbar-vertical"),
+				containerHeight = $scroll.height(),
+				totalHeight = $scroll.contents().height(),
+				unitHeight = self.$container.children(".k-grid-content").find(".k-virtual-scrollable-wrap .fillItem").height(),
+				scrollTop = unitHeight * index,
+				lastPageTop = totalHeight - containerHeight;
+
+			scrollTop = Math.min(scrollTop, lastPageTop);
+			$scroll.scrollTop(scrollTop);
+		}
+	};
+
 	LightKendoGrid.prototype.getSelectedRecordsFromServer = function()
 	{
 		var self = this, options = {
@@ -5090,7 +6073,12 @@
 
 	LightKendoGrid.AllFilterTypes = ['contains', 'isequalto', 'isnotequalto', 'startswith',
 		'doesnotcontain', 'endswith', 'islessthanorequalto', 'isgreaterthanorequalto',
-		'isgreaterthan', 'islessthan', 'isempty', 'isnotempty', 'custom', 'list'];
+		'isgreaterthan', 'islessthan', 'isempty', 'isnotempty', 'custom', 'list',
+		'lastxdays', 'lastxhours', 'lastxmonths', 'lastxweeks', 'lastxyears',
+		'nextxdays', 'nextxhours', 'nextxmonths', 'nextxweeks', 'nextxyears',
+		'olderthanxmonths', 'olderthanxyears', 'onyearx', 'all', 'lastmonth', 'lastweek', 'lastyear',
+		'nextbusinessday', 'nextmonth', 'nextweek', 'nextyear', 'thismonth', 'thisweek', 'thisyear',
+		'today', 'tomorrow', 'yesterday', 'onx', 'onorafterx', 'onorbeforex'];
 
 	LightKendoGrid.prototype.filterNames = {
 		'Equal To': 'isequalto',
@@ -5106,7 +6094,37 @@
 		'Empty': 'isempty',
 		'Not Empty': 'isnotempty',
 		'Custom': 'custom',
-		'List': 'list'
+		'List': 'list',
+		'Last X Days': 'lastxdays',
+		'Last X Hours': 'lastxhours',
+		'Last X Months': 'lastxmonths',
+		'Last X Weeks': 'lastxweeks',
+		'Last X Years': 'lastxyears',
+		'Next X Days': 'nextxdays',
+		'Next X Hours': 'nextxhours',
+		'Next X Months': 'nextxmonths',
+		'Next X Weeks': 'nextxweeks',
+		'Next X Years': 'nextxyears',
+		'Older than X Months': 'olderthanxmonths',
+		'Older than X Years': 'olderthanxyears',
+		'On Year X': 'onyearx',
+		'All': 'all',
+		'Last Month': 'lastmonth',
+		'Last Week': 'lastweek',
+		'Last Year': 'lastyear',
+		'Next Business Day': 'nextbusinessday',
+		'Next Month': 'nextmonth',
+		'Next Week': 'nextweek',
+		'Next Year': 'nextyear',
+		'This Month': 'thismonth',
+		'This Week': 'thisweek',
+		'This Year': 'thisyear',
+		'Today': 'today',
+		'Tomorrow': 'tomorrow',
+		'Yesterday': 'yesterday',
+		'On X': 'onx',
+		'On or After X': 'onorafterx',
+		'On or Before X': 'onorbeforex'
 	};
 
 	LightKendoGrid.prototype.operatorKendoMapFilterNameValue = {
@@ -5123,7 +6141,37 @@
 		'isempty': 'isempty',
 		'isnotempty': 'isnotempty',
 		'custom': 'custom',
-		'list': 'list'
+		'list': 'list',
+		'lastxdays': 'lastxdays',
+		'lastxhours': 'lastxhours',
+		'lastxmonths': 'lastxmonths',
+		'lastxweeks': 'lastxweeks',
+		'lastxyears': 'lastxyears',
+		'nextxdays': 'nextxdays',
+		'nextxhours': 'nextxhours',
+		'nextxmonths': 'nextxmonths',
+		'nextxweeks': 'nextxweeks',
+		'nextxyears': 'nextxyears',
+		'olderthanxmonths': 'olderthanxmonths',
+		'olderthanxyears': 'olderthanxyears',
+		'onyearx': 'onyearx',
+		'all': 'all',
+		'lastmonth': 'lastmonth',
+		'lastweek': 'lastweek',
+		'lastyear': 'lastyear',
+		'nextbusinessday': 'nextbusinessday',
+		'nextmonth': 'nextmonth',
+		'nextweek': 'nextweek',
+		'nextyear': 'nextyear',
+		'thismonth': 'thismonth',
+		'thisweek': 'thisweek',
+		'thisyear': 'thisyear',
+		'today': 'today',
+		'tomorrow': 'tomorrow',
+		'yesterday': 'yesterday',
+		'onx': 'onx',
+		'onorafterx': 'onorafterx',
+		'onorbeforex': 'onorbeforex'
 	}
 
 	LightKendoGrid.prototype.operatorKendoMapTF = {
@@ -5140,7 +6188,38 @@
 		'isempty': 'IsNull',
 		'isnotempty': 'IsNotNull',
 		'custom': 'Custom',
-		'list': 'In'
+		'list': 'In',
+		'wi': 'IsWithIn',
+		'lastxdays': 'LastXDays',
+		'lastxhours': 'LastXHours',
+		'lastxmonths': 'LastXMonths',
+		'lastxweeks': 'LastXWeeks',
+		'lastxyears': 'LastXYears',
+		'nextxdays': 'NextXDays',
+		'nextxhours': 'NextXHours',
+		'nextxmonths': 'NextXMonths',
+		'nextxweeks': 'NextXWeeks',
+		'nextxyears': 'NextXYears',
+		'olderthanxmonths': 'OlderthanXMonths',
+		'olderthanxyears': 'OlderthanXYears',
+		'onyearx': 'OnYearX',
+		'all': 'All',
+		'lastmonth': 'LastMonth',
+		'lastweek': 'LastWeek',
+		'lastyear': 'LastYear',
+		'nextbusinessday': 'NextBusinessDay',
+		'nextmonth': 'NextMonth',
+		'nextweek': 'NextWeek',
+		'nextyear': 'NextYear',
+		'thismonth': 'ThisMonth',
+		'thisweek': 'ThisWeek',
+		'thisyear': 'ThisYear',
+		'today': 'Today',
+		'tomorrow': 'Tomorrow',
+		'yesterday': 'Yesterday',
+		'onx': 'OnX',
+		'onorafterx': 'OnOrAfterX',
+		'onorbeforex': 'OnOrBeforeX'
 	};
 
 	LightKendoGrid.prototype.operatorTFMapKendo = {
@@ -5157,7 +6236,52 @@
 		'IsNull': 'isempty',
 		'IsNotNull': 'isnotempty',
 		'Custom': 'custom',
-		'In': 'list'
+		'In': 'list',
+		'IsWithIn': 'wi',
+		'LastXDays': 'lastxdays',
+		'LastXHours': 'lastxhours',
+		'LastXMonths': 'lastxmonths',
+		'LastXWeeks': 'lastxweeks',
+		'LastXYears': 'lastxyears',
+		'NextXDays': 'nextxdays',
+		'NextXHours': 'nextxhours',
+		'NextXMonths': 'nextxmonths',
+		'NextXWeeks': 'nextxweeks',
+		'NextXYears': 'nextxyears',
+		'OlderthanXMonths': 'olderthanxmonths',
+		'OlderthanXYears': 'olderthanxyears',
+		'OnYearX': 'onyearx',
+		'All': 'all',
+		'LastMonth': 'lastmonth',
+		'LastWeek': 'lastweek',
+		'LastYear': 'lastyear',
+		'NextBusinessDay': 'nextbusinessday',
+		'NextMonth': 'nextmonth',
+		'NextWeek': 'nextweek',
+		'NextYear': 'nextyear',
+		'ThisMonth': 'thismonth',
+		'ThisWeek': 'thisweek',
+		'ThisYear': 'thisyear',
+		'Today': 'today',
+		'Tomorrow': 'tomorrow',
+		'Yesterday': 'yesterday',
+		'OnX': 'onx',
+		'OnOrAfterX': 'onorafterx',
+		'OnOrBeforeX': 'onorbeforex'
+	};
+
+	LightKendoGrid.prototype.getOpetatorName = function(value)
+	{
+		let self = this, name = '';
+		for (var key in self.filterNames)
+		{
+			if (value === self.filterNames[key])
+			{
+				name = key;
+				return name;
+			}
+		}
+		return name;
 	};
 
 	LightKendoGrid.normalizeResultItem = function(items)
@@ -5168,12 +6292,51 @@
 		}
 		return items;
 	};
+
+	/**
+	 * Check is this grid used as dashboard widget.
+	 *
+	 * @return {*}
+	 */
+	LightKendoGrid.prototype.isDashboardWidget = function()
+	{
+		return this.options.customGridType === "dashboardwidget"
+	};
 })();
 
 (function()
 {
 	FilterHelper = function() { };
 	createNamespace("TF").FilterHelper = FilterHelper;
+
+	FilterHelper.dateTimeNumberFiltersName = ['Last X Days', 'Last X Hours', 'Last X Months', 'Last X Weeks', 'Last X Years',
+		'Next X Days', 'Next X Hours', 'Next X Months', 'Next X Weeks', 'Next X Years',
+		'Older than X Months', 'Older than X Years', 'On Year X'];
+
+	FilterHelper.dateTimeNilFiltersOperator = ['lastxdays', 'lastxhours', 'lastxmonths', 'lastxweeks', 'lastxyears',
+		'nextxdays', 'nextxhours', 'nextxmonths', 'nextxweeks', 'nextxyears',
+		'olderthanxmonths', 'olderthanxyears', 'onyearx'];
+
+	FilterHelper.dateTimeNonParamFiltersName = ['All', 'Last Month', 'Last Week', 'Last Year',
+		'Next Business Day', 'Next Month', 'Next Week',
+		'Next Year', 'This Month', 'This Week', 'This Year', 'Today', 'Tomorrow', 'Yesterday'];
+
+	FilterHelper.dateTimeNonParamFiltersOperator = ['all', 'lastmonth', 'lastweek', 'lastyear',
+		'nextbusinessday', 'nextmonth', 'nextweek',
+		'nextyear', 'thismonth', 'thisweek', 'thisyear', 'today', 'tomorrow', 'yesterday'];
+
+	FilterHelper.dateTimeDateParamFiltersOperator = ['onx', 'onorafterx', 'onorbeforex'];
+
+	FilterHelper.dateTimeDateParamFiltersNames = ['On X', 'On or After X', 'On or Before X'];
+
+	FilterHelper.getNilFiltersFormat = function(filter)
+	{
+		if (filter === 'On Year X') return filter;
+
+		let formatStr = filter.slice(0, -1);
+		formatStr = formatStr + '(s)';
+		return formatStr;
+	}
 
 	FilterHelper.getSortColumns = function(columns)
 	{
@@ -5213,6 +6376,11 @@
 		}
 	}
 
+	FilterHelper.isDateOrDateTimeFilterType = function(filterType)
+	{
+		return filterType === 'datetime' || filterType === 'date';
+	}
+
 	FilterHelper.disableFilterCellInput = function($input, isNormalInput)
 	{
 		var kendoAutoComplete = $($input[0]).data('kendoAutoComplete');
@@ -5231,8 +6399,27 @@
 		if (DateTimePicker !== undefined)
 			DateTimePicker.disable(true);
 
+		var kendoDateTimePicker = $($input[0]).data('kendoDateTimePicker');
+		if (kendoDateTimePicker !== undefined)
+		{
+			kendoDateTimePicker.enable(false);
+			kendoDateTimePicker.element.parent().find('.datepickerbutton').addClass('k-state-disabled');
+		}
+
 		if (isNormalInput)
 			$input.attr('disabled', true).addClass('is-disabled-text-input');
+	};
+
+	FilterHelper.hideDatetimeNumberCell = function($input, cellWidget)
+	{
+		let dateTimeFilterCell = $input.closest('.k-filtercell'); //hide the number box when select nil filter
+		let dateTimeNumberFilterCell = dateTimeFilterCell.find("span.date-number");
+		let cellClass = cellWidget === "datetimepicker" ? ".tf-filter" : ".k-datepicker";
+		if (dateTimeNumberFilterCell)
+		{
+			dateTimeNumberFilterCell.hide();
+			dateTimeNumberFilterCell.closest(".k-filtercell").find(cellClass).show();
+		}
 	};
 
 	FilterHelper.enableFilterCellInput = function($input, isNormalInput)
@@ -5252,6 +6439,13 @@
 		var DateTimePicker = $($input[0]).data('DateTimePicker');
 		if (DateTimePicker !== undefined)
 			DateTimePicker.enable(true);
+
+		var kendoDateTimePicker = $($input[0]).data('kendoDateTimePicker');
+		if (kendoDateTimePicker !== undefined)
+		{
+			kendoDateTimePicker.enable(true);
+			kendoDateTimePicker.element.parent().find('.datepickerbutton').removeClass('k-state-disabled');
+		}
 
 		if (isNormalInput)
 			$input.attr('disabled', false).removeClass('is-disabled-text-input');
@@ -5313,6 +6507,7 @@
 		return (filterItem.TypeHint === 'Time'
 			&& filterItem.Operator !== 'Empty'
 			&& filterItem.Operator !== 'IsNotNull' && filterItem.Operator !== 'IsNull'
+			&& TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(filterItem.Operator.toLowerCase()) === -1
 			&& (filterItem.Value === '' || filterItem.Value === "Invalid date"));
 	}
 
@@ -5321,6 +6516,7 @@
 		return (filterItem.TypeHint === 'Date'
 			&& filterItem.Operator !== 'Empty'
 			&& filterItem.Operator !== 'IsNotNull' && filterItem.Operator !== 'IsNull'
+			&& TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(filterItem.Operator.toLowerCase()) === -1
 			&& (filterItem.Value === '' || filterItem.Value === "Invalid date"));
 	}
 
@@ -5329,6 +6525,7 @@
 		return (filterItem.TypeHint === 'DateTime'
 			&& filterItem.Operator !== 'Empty'
 			&& filterItem.Operator !== 'IsNotNull' && filterItem.Operator !== 'IsNull'
+			&& TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(filterItem.Operator.toLowerCase()) === -1
 			&& (filterItem.Value === '' || filterItem.Value === "Invalid date"));
 	}
 
@@ -5349,7 +6546,10 @@
 	{
 		var specialItems = dropdownList.dataItems().filter(function(item)
 		{
-			return item.value === 'custom' || item.value === 'list';
+			return item.value === 'custom' || item.value === 'list' ||
+				TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(item.value) > -1 ||
+				TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(item.value) > -1 |
+				TF.FilterHelper.dateTimeDateParamFiltersOperator.indexOf(item.value) > -1;
 		});
 		specialItems.map(function(specialItem)
 		{

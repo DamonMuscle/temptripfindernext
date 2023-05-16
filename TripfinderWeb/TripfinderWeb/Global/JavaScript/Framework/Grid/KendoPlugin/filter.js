@@ -56,7 +56,7 @@
 	FilterHelper.clearQuickFilter = function(gridType)
 	{
 		//it's better used only in KendoGridFilterMenu
-		return TF.Grid.FilterHelper.saveQuickFilter(gridType, new TF.SearchParameters(null, null, null, null, null, null, null));
+		return tf.storageManager.delete(tf.storageManager.gridCurrentQuickFilter(gridType));
 	};
 
 	FilterHelper.compareFilterWhereClause = function(leftFilterWhereClause, rightFilterWhereClause)

@@ -4,6 +4,28 @@
 	namespace.GridFilterDataModel = function(gridFilterEntity)
 	{
 		namespace.BaseDataModel.call(this, gridFilterEntity);
+		this.autoExportNames = ko.computed(function()
+		{
+			const autoExports = this.autoExports();
+			if (!autoExports || !autoExports.length)
+			{
+				return "";
+			}
+
+			var names = autoExports.map(e => e.Name);
+			if (names.length === 1)
+			{
+				return names[0];
+			}
+
+			var lastOne = names.pop();
+			return `${names.join(", ")} and ${lastOne}`;
+		}, this);
+		this.reminderExists = ko.computed(function()
+		{
+			var reminders = this.reminders();
+			return reminders && reminders.length > 0;
+		}, this);
 	}
 
 	namespace.GridFilterDataModel.prototype = Object.create(namespace.BaseDataModel.prototype);
@@ -28,6 +50,9 @@
 		{ from: "ReminderUserId", default: 0 },
 		{ from: "DBID", default: null },
 		{ from: "IsStatic", default: null },
-		{ from: "IsSystem", default: 0 }
+		{ from: "IsSystem", default: 0 },
+		{ from: "UDGridId", default: null },
+		{ from: "AutoExportExists", default: false },
+		{ from: "AutoExports", default: [] },
 	];
 })();

@@ -4,16 +4,24 @@
 
 	ManageFilterViewModel.prototype = Object.create(TF.Control.BaseControl.prototype);
 	ManageFilterViewModel.prototype.constructor = ManageFilterViewModel;
-	function ManageFilterViewModel(obGridFilterDataModels, fnSaveAndEditGridFilter, fnApplyGridFilter, positiveClose, reminderHide)
+
+	function ManageFilterViewModel(options)
 	{
-		this.fnSaveAndEditGridFilter = fnSaveAndEditGridFilter;
-		this.fnApplyGridFilter = fnApplyGridFilter;
-		this.obGridFilterDataModels = obGridFilterDataModels;
+		const {
+			obAllFilters, editFilter, applyFilter, positiveClose, reminderHide
+		} = options;
+
+		this.fnSaveAndEditGridFilter = editFilter;
+		this.fnApplyGridFilter = applyFilter;
+		this.obGridFilterDataModels = obAllFilters;
 		this.positiveClose = positiveClose;
 		this.element = null;
 		this.reminderHide = reminderHide;
 		this.enableGridRefresh = true;
-		this.filterModelJSONString = null;		
+		this.filterModelJSONString = null;
+
+		this.onFilterEdited = new TF.Events.Event();
+		this.onFilterDeleted = new TF.Events.Event();
 	}
 
 	ManageFilterViewModel.prototype.init = function(viewModel, el)
@@ -47,7 +55,7 @@
 			{
 				width: '30px',
 				type: "image",
-				template: '<div title="#: tf.ManageFilterViewModel.getIconTitle_IsValid(IsValid,Id)#" class="#: tf.ManageFilterViewModel.getIconUrl_IsValid(IsValid,Id)#"></div>'
+				template: '<div title="#: TF.Grid.ManageFilterViewModel.getIconTitle_IsValid(IsValid,Id)#" class="#: TF.Grid.ManageFilterViewModel.getIconUrl_IsValid(IsValid,Id)#"></div>'
 			},
 			{ field: "Name", title: "Filter Name", encoded: true },
 			{
@@ -117,11 +125,11 @@
 							{
 								return;
 							}
-							if (currentModel.id() < 0)
+							if (currentModel.id() < 0 || currentModel.isSystem())
 							{
 								return;
 							}
-							self._deleteGridFilter(currentModel);
+							self.deleteGridFilter(currentModel);
 						}
 					}],
 				title: "Action",
@@ -216,7 +224,7 @@
 		}
 	};
 
-	ManageFilterViewModel.prototype.getIconTitle_IsValid = function(value, id)
+	ManageFilterViewModel.getIconTitle_IsValid = function(value, id)
 	{
 		if (id < 0)
 		{
@@ -232,7 +240,7 @@
 		}
 	};
 
-	ManageFilterViewModel.prototype.getIconUrl_IsValid = function(value, id)
+	ManageFilterViewModel.getIconUrl_IsValid = function(value, id)
 	{
 		if (id < 0)
 		{
@@ -257,7 +265,7 @@
 		})[0];
 	};
 
-	ManageFilterViewModel.prototype._deleteGridFilter = function(gridFilterDataModel)
+	ManageFilterViewModel.prototype.deleteGridFilter = function(gridFilterDataModel)
 	{
 		var self = this,
 			isWithoutDB = gridFilterDataModel.dBID() === null,
@@ -266,7 +274,13 @@
 			checkUDGridsWithFilterId = !needCheckFormFilter ?
 				Promise.resolve([]) :
 				tf.udgHelper.checkUDGridsWithFilterIdInSpecifyRecord(dataTypeID, gridFilterDataModel.id());
-		
+		if (gridFilterDataModel.autoExportExists())
+		{
+			const exportsHolder = (gridFilterDataModel.autoExports() && gridFilterDataModel.autoExports().length > 1) ? "data exports" : "data export";
+			tf.promiseBootbox.alert(`This filter is associated with the [${gridFilterDataModel.autoExportNames()}] ${exportsHolder}. It cannot be deleted.`);
+			return;
+		}
+
 		// only check without datasource and specify data type
 		checkUDGridsWithFilterId.then(res =>
 		{
@@ -313,15 +327,20 @@
 			tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId))
 				.then(function(apiResponse)
 				{
-					var _storageFilterDataKey = "grid.currentfilter." + gridFilterDataModel.gridType() + ".id";
-					var currentStickFilterId = tf.storageManager.get(_storageFilterDataKey);
+					const filterKey = `grid.currentfilter.${gridFilterDataModel.gridType()}.id`;
+					var currentStickFilterId = tf.storageManager.get(filterKey);
 					if (currentStickFilterId === filterId)
-						tf.storageManager.save(_storageFilterDataKey, '');
+					{
+						tf.storageManager.save(filterKey, '');
+					}
 
 					if (apiResponse > 0)
 					{
 						self.obGridFilterDataModels.remove(gridFilterDataModel);
+						self.initFilterGrid();
 					}
+
+					self.onFilterDeleted.notify(filterId);
 				});
 		}
 	};
@@ -355,5 +374,4 @@
 				this.enableGridRefresh = true;
 			});
 	};
-	tf.ManageFilterViewModel = new TF.Grid.ManageFilterViewModel();
 })();

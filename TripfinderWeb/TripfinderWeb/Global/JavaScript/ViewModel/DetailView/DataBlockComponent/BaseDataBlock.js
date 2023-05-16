@@ -27,7 +27,7 @@
 		{
 			return true;
 		}
-		return this.detailView.isReadMode();
+		return this.detailView.isReadMode && this.detailView.isReadMode();
 	}
 
 })();

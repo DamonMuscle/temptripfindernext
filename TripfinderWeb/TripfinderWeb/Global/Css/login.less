@@ -14,6 +14,10 @@
 
 	.modal-body {
 		height: 100vh;
+
+		@media (max-width: 1366px) {
+			padding: 5px;
+		}
 	}
 }
 
@@ -22,10 +26,71 @@
 }
 
 .tf-login {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 100%;
+	min-height: 538px;
+	@media (max-width: 480px) {
+		padding: 0;
+	}
+
+	
 	.tf-login-row {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		margin: 0;
+
+		&.mfa {
+			position: relative;
+			top: -10px;
+			height: 296px;
+			box-sizing: content-box;
+
+			.auth-container {
+				width: 370px;
+				font-size: 14px;
+
+				.panel.panel-default {
+					border: 1px solid #E6E6E6;
+					box-sizing: content-box;
+
+					.panel-heading {
+						width: 370px;
+						padding: 11px 15px;
+					}
+
+					.panel-body {
+						padding: 27.5px 23.5px;
+						box-sizing: content-box;
+
+						.resetForm {
+							padding: 0;
+							.form.form-group {
+								padding: 0;
+								margin: 0;
+							}
+						}
+					}
+	
+					.edit-bottombar {
+						padding: 12px 25px;
+	
+						.btn {
+							&.submit {
+								margin-right: 18px;
+								padding: 0px 12px;
+							}
+
+							&.back {
+								line-height: 15px;
+							}
+						}
+					}
+				}
+			}
+		}
 
 		.tf-btn-black {
 			padding: 3px 12px;
@@ -34,18 +99,51 @@
 		.tf-btn-gray {
 			border: none;
 		}
-	}
 
-	.loginform {
-		max-width: 325px;
+		.login-form{
+			width: 380px;
+			button[type="submit"] {
+				width: 100%;
+				background-color: #333333;
+				color: #fff;
+		
+				&.btn-login {
+					background-color: @systemColor;
+					padding: 3px 12px;
+					height: 40px;
+		
+					&:focus {
+						outline: solid 2px #4D90FE !important;
+					}
+				}
+			}
+
+			@media (max-width: 480px) {
+				padding: 0;
+				width: 350px;
+			}
+		}
+
+		.form-group.remember-me{
+			display:flex;
+		
+			& > .col-sm-12:nth-of-type(1){
+				margin-right: auto;
+			}
+		
+			& > .col-sm-12:nth-of-type(2){
+				margin-left: auto;
+			}
+		}
 	}
 
 	.logo-container {
 		background: url("../img/loginlogo.svg") no-repeat center;
 		height: 100px;
+		margin-bottom: 65px;
 
-		@media (max-width: 1366px) {
-			margin-bottom: calc(~"5% + 10px") !important;
+		@media (max-width: 480px) {
+			margin-bottom: 59px;
 		}
 	}
 
@@ -59,6 +157,7 @@
 	.panel-heading {
 		background-color: @systemColor;
 		color: #fff;
+		line-height: 23px;
 	}
 
 	.panel-bottom {
@@ -79,10 +178,10 @@
 
 	.panel {
 		box-shadow: none;
+		margin: 0;
 	}
 
 	.panel-body {
-		padding-top: 5px;
 		padding-left: 8px;
 		padding-right: 8px;
 	}
@@ -92,28 +191,12 @@
 		color: @systemColor;
 	}
 
-	button[type="submit"] {
-		width: 100%;
-		background-color: #333333;
-		color: #fff;
-
-		&.btn-login {
-			background-color: @systemColor;
-			padding: 3px 12px;
-			height: 40px;
-
-			&:focus {
-				outline: solid 2px #4D90FE !important;
-			}
-		}
-	}
-
 	.form-group {
 		margin-bottom: 0;
 	}
 
 	.login-error {
-		margin-top: 5px;
+		margin: 5px 0 15px 0;
 		display: block;
 		min-height: 40px;
 	}
@@ -138,6 +221,8 @@
 
 	.version-release-info {
 		padding-top: 20px;
+		text-align:center;
+		line-height: 1;
 
 		.tf-version {
 			max-width: 30px;
@@ -170,8 +255,8 @@
 
 .multifactor-authentication-box {
 	height: 125px;
-	margin-bottom: 5px;
-	margin-top: 8px;
+	padding: 0;
+	line-height: 23px;
 
 	.email {
 		display: inline-block;

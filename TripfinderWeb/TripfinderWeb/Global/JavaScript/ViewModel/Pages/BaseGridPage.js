@@ -317,7 +317,7 @@
 		)
 			.then(function(result)
 			{
-				if(result)
+				if (result)
 				{
 					tf.promiseBootbox.alert("An email has been sent successfully.", "Email Sent Successfully");
 				}
@@ -533,11 +533,6 @@
 		self.obSelectedGridLayoutModified = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutModified();
-		}, self);
-
-		self.obSelectedGridFilterModifiedMessage = ko.computed(function()
-		{
-			return self.searchGridInited() && self.searchGrid.obSelectedGridFilterModifiedMessage();
 		}, self);
 
 		self.obSelectedGridFilterName = ko.computed(function()
@@ -777,18 +772,27 @@
 		{
 			return;
 		}
-		selectedId = selectedIds[0];
-		selectedName = selectedRecords[0].Name;
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("FieldTrip")), {
-			paramData: {
-				copyFromId: selectedId,
-				fieldTripName: TF.Helper.NewCopyNameHelper.generateNewCopyName(selectedName,
-					self.searchGrid.kendoGrid.dataSource._data.map(function(d)
-					{
-						return d.Name;
-					}))
+
+		return self.validateFieldTrip(selectedRecords[0]).then(function(result)
+		{
+			if (!result.valid)
+			{
+				self.pageLevelViewModel.popupErrorMessage(result.message);
+				return;
 			}
-		})
+
+			selectedId = selectedIds[0];
+			selectedName = selectedRecords[0].Name;
+			return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("FieldTrip")), {
+				paramData: {
+					copyFromId: selectedId,
+					fieldTripName: TF.Helper.NewCopyNameHelper.generateNewCopyName(selectedName,
+						self.searchGrid.kendoGrid.dataSource._data.map(function(d)
+						{
+							return d.Name;
+						}))
+				}
+			})
 			.then(function(response)
 			{
 				if (response && response.StatusCode === 404)
@@ -811,7 +815,80 @@
 				{
 					return Promise.reject(response);
 				}
-			}.bind(self))
+			}.bind(self));
+		});
+	};
+
+	BaseGridPage.prototype.validateFieldTrip = function(record)
+	{
+		if (tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
+		{
+			return Promise.resolve({ valid: true, message: "" });
+		}
+
+		return this.checkFieldTripDeadline(record.DepartDateTime);
+	};
+
+	BaseGridPage.prototype.checkFieldTripDeadline = function(dateTime)
+	{
+		if (!dateTime)
+		{
+			return Promise.resolve({ valid: true, message: "" });
+		}
+
+		const mmtObj = moment(dateTime);
+		if(!mmtObj.isValid())
+		{
+			return Promise.resolve({ valid: false, message: "Depart Date is invalid." });
+		}
+
+		return this._validateScheduleDaysInAdvance(dateTime);
+	};
+
+	BaseGridPage.prototype._validateScheduleDaysInAdvance = function(dateTime)
+	{
+		const mmtObj = moment(dateTime);
+		let daysInAdvance = tf.fieldTripConfigsDataHelper.fieldTripConfigs.ScheduleDaysInAdvance;
+		if (!Number.isInteger(daysInAdvance) || daysInAdvance < 0)	// at least 0 day in advance (>= today)
+		{
+			daysInAdvance = 0;
+		}
+
+		return tf.fieldTripConfigsDataHelper.getHolidayMap()
+			.then(function(holidayMap)
+			{
+				const isSchoolDay = function(mmtDay)	// helper function for detect if a given day (moment date) is school day
+				{
+					var dateStr = mmtDay.format("YYYY-MM-DD"), weekdayIndex = mmtDay.weekday();
+					const notWeekend = weekdayIndex > 0 && weekdayIndex < 6,
+						notHoliday = !holidayMap[dateStr];
+					return  notWeekend && notHoliday;
+				};
+
+				if (!isSchoolDay(mmtObj))
+				{
+					return { valid: false, message: "Must depart on school day." };
+				}
+
+				let schoolDays = 0;	// counter for valid school days passed
+				const mmtLeftBound = moment().startOf("day");	// start from today
+
+				while (schoolDays < daysInAdvance)
+				{
+					mmtLeftBound.add(1, "days");
+					if (isSchoolDay(mmtLeftBound))
+					{
+						++schoolDays;
+					}
+				}
+
+				if (mmtObj.startOf("day") < mmtLeftBound)
+				{
+					return { valid: false, message: String.format("Depart Date must be on or after {0}", mmtLeftBound.format("M/D/YYYY")) };
+				}
+
+				return { valid: true, message: "" };
+			});
 	};
 
 	BaseGridPage.prototype.editFieldTripStatusCore = function(cancel)

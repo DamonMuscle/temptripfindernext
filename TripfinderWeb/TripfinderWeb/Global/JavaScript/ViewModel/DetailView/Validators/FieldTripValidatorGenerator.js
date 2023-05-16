@@ -75,13 +75,10 @@
 			{
 				var isSchoolDay = function(mmtDay)	// helper function for detect if a given day (moment date) is school day
 				{
-					var dateStr = mmtDay.format("YYYY-MM-DD");
-					if (!holidayMap[dateStr])
-					{
-						return true;
-					}
-
-					return false;
+					var dateStr = mmtDay.format("YYYY-MM-DD"), weekdayIndex = mmtDay.weekday();
+					const notWeekend = weekdayIndex > 0 && weekdayIndex < 6,
+						notHoliday = !holidayMap[dateStr];
+					return  notWeekend && notHoliday;
 				};
 
 				if (!isSchoolDay(mmtObj))

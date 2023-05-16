@@ -17,8 +17,9 @@
 		var rememberMe = Boolean(tf.storageManager.get("rememberMe", true));
 		this.obRememberMe = ko.observable(rememberMe);
 		this.obClientKey = ko.observable(clientKey);
-		this.obUsername = ko.observable('admin');
-		this.obPassword = ko.observable('admin');
+		this.obClientKeyEnabled = ko.observable(!clientKey);
+		this.obUsername = ko.observable('');
+		this.obPassword = ko.observable('');
 		this.obClientKeyRP = ko.observable('');
 		this.obUsernameRP = ko.observable('');
 		this.obPasswordRP = ko.observable('');
@@ -36,7 +37,14 @@
 
 		if (rememberMe)
 		{
-			this.obClientKey(tf.storageManager.get("clientKey", true) || '');
+			if (!clientKey)
+			{
+				/**
+				 * If user visit our products by vanity url, we will populate obClientKey with the value what is getting from the url.
+				 * So discarding the value in local storage.
+				 */
+				this.obClientKey(tf.storageManager.get("clientKey", true) || '');
+			}
 			this.obUsername(tf.storageManager.get("userName", true) || '');
 			this.obPassword(tf.storageManager.get("password", true) || '');
 		}

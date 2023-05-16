@@ -25,10 +25,10 @@
 		}
 
 		return [
-			{ DisplayName: "Created By", FieldName: "CreatedByUserName", Width: "120px", type: "string" },
-			{ DisplayName: "Created On", FieldName: "CreatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local },
-			{ DisplayName: "Last Updated By", FieldName: "LastUpdatedByUserName", Width: "120px", type: "string" },
-			{ DisplayName: "Last Updated On", FieldName: "LastUpdatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local },
+			{ DisplayName: "Created By", FieldName: "CreatedBy", Width: "120px", type: "string" },
+			{ DisplayName: "Created On", FieldName: "CreatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local, formatSummaryValue: utc2Local },
+			{ DisplayName: "Last Updated By", FieldName: "LastUpdatedBy", Width: "120px", type: "string" },
+			{ DisplayName: "Last Updated On", FieldName: "LastUpdatedOn", Width: "150px", type: "datetime", formatCopyValue: utc2Local, formatSummaryValue: utc2Local },
 			{ DisplayName: "IP Address", FieldName: "IPAddress", Width: '100px', type: "string" },
 			{ DisplayName: "Host", FieldName: "Host", Width: '100px', type: "string" },
 			{ DisplayName: "User Agent", FieldName: "UserAgent", Width: '150px', type: "string" }
@@ -41,8 +41,8 @@
 	UserDefinedGridHelper.getGeoInfoColumns = function()
 	{
 		return [
-			{ DisplayName: "Location Y Coord", FieldName: "latitude", Width: "135px" },
-			{ DisplayName: "Location X Coord", FieldName: "longitude", Width: "135px" }
+			{ DisplayName: "Location Y Coord", FieldName: "Latitude", Width: "130px", type: "number" },
+			{ DisplayName: "Location X Coord", FieldName: "Longitude", Width: "130px", type: "number" }
 		];
 	};
 
@@ -86,7 +86,8 @@
 	UserDefinedGridHelper.handleItemForCopy = function(dataItem, columns, signatureFields)
 	{
 		dataItem = TF.DetailView.UserDefinedGridHelper.convertSignatureColumnToBoolean(dataItem, signatureFields);
-		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
+		// Migrate Bug from PLUS
+		// dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForBooleanType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForPhoneType(dataItem, columns);
 		dataItem = TF.DetailView.UserDefinedGridHelper.handleItemForDateTimeType(dataItem, columns, false);
 		return dataItem;
@@ -504,6 +505,17 @@
 				};
 			}
 
+			if (col.questionType === "ListFromData" || (col.questionType === "List" && col.FieldOptions.PickListMultiSelect))
+			{
+				let fieldName = column.FieldName;
+				column.type = "select";
+				column.ListFilterTemplate = this.generateListFilterTemplate(col, "");
+				column.ListFilterTemplate.filterField = fieldName;
+				column.ListFilterTemplate.columnSources = [{ FieldName: fieldName, DisplayName: column.DisplayName, Width: "150px", type: "string", isSortItem: true }];
+				// add AllItems 
+				column.ListFilterTemplate.requestOptions = this.getRequestOption(col);
+			}
+
 			if (col.questionType === "ListFromData" && col.template !== undefined && column.template === undefined)
 			{
 				column.template = col.template;
@@ -538,6 +550,41 @@
 		});
 
 		return columns;
+	};
+
+	UserDefinedGridHelper.prototype.getRequestOption = function(col)
+	{
+		const filterSet = {}, requestOption = {};
+		const uDGridID = col.UDGridID;
+		const defaultFilter = tf.udgHelper.getUDGridIdFilter(uDGridID);
+		filterSet["FilterItems"] = [];
+		filterSet["FilterItems"].push(...defaultFilter);
+		filterSet["FilterSets"] = [];
+		filterSet["LogicalOperator"] = "and";
+		requestOption.data = {};
+		requestOption.data.fields = [col.Guid];
+		requestOption.data.filterSet = filterSet;
+		requestOption.data.filterSet.UDGridID = uDGridID;
+
+		return requestOption;
+	}
+
+	UserDefinedGridHelper.prototype.generateListFilterTemplate = function(listUdf, gridType)
+	{
+		var template = {
+			UDGridID: listUdf.UDGridID,
+			listFilterType: "WithSearchGrid",
+			DisplayFilterTypeName: listUdf.Name,
+			GridType: "Form",
+			_gridType: "form",
+			OriginalName: listUdf.DisplayName,
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "search", "formresults");
+			}
+		};
+
+		return template;
 	};
 
 	UserDefinedGridHelper.prototype.getUDGridsByDataType = function(dataType, isPublic)
@@ -2114,6 +2161,19 @@
 			overlay: false
 		});
 	};
+
+	UserDefinedGridHelper.prototype.timeFieldFilterUpdated = function(item)
+	{
+		const timeFields = ["CreatedOn", "LastUpdatedOn"];
+		const isNilFilter = TF.FilterHelper.dateTimeNilFiltersOperator.includes(item.Operator.toLowerCase());
+		const isDateParamFilter = TF.FilterHelper.dateTimeDateParamFiltersOperator.includes(item.Operator.toLowerCase());
+
+		if (timeFields.includes(item.FieldName) && !item.ConvertedToUTC && !isNilFilter && !isDateParamFilter)
+		{
+			var dt = clientTimeZoneToUtc(item.Value);
+			item.Value = toISOStringWithoutTimeZone(dt);
+		}
+	}
 
 	UserDefinedGridHelper.saveUserdefinedfield = function(udfEntity)
 	{

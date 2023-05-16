@@ -427,7 +427,7 @@
 			attachedToID = this.obSelectedTemplateSource().Id;
 			attachedToTypeID = tf.DataTypeHelper._getObjectByType("fieldtriptemplate").id;
 		}
-		
+
 		var paramData = {
 			AttachedToID: attachedToID,
 			AttachedToTypeID: attachedToTypeID,
@@ -707,8 +707,8 @@
 		{
 			self.obAccount.removeAll();
 			$.each(self.fieldTripAccountList, function(index, item)
-			{
-				if (item.School === school && (!item.Department || self.hasPermissionForDistrictDepartment(item.Department.Id)))
+			{// FT-2772 The '[Any]' department doesn't have a DepartmentId.
+				if (item.School === school && (!item.Department ||!item.Department.Id || self.hasPermissionForDistrictDepartment(item.Department.Id)))
 				{
 					departActivityName = (item.Department ? item.Department.Name : "[Any]") + ' / ' + (item.FieldTripActivity ? item.FieldTripActivity.Name : "[Any]");
 
@@ -978,6 +978,7 @@
 					}
 					dataModel.templateName(item.Name);
 					dataModel.id(0);
+					this.obSelectedDestination(this.obDestinationDataModels().find(r=>r.Id == dataModel.fieldTripDestinationId()));
 					this.obEntityDataModel(dataModel);
 					this.obEntityDataModel().name(templateDataModel.fieldTripName());
 					this.obEntityDataModel().updateClone(this.obEntityDataModel());
@@ -1021,7 +1022,7 @@
 							$(".destinationname").find("input").val(this.obEntityDataModel().destination());
 						}
 					}
-					
+
 					this.getFieldTripInvoiceTemplates(item.Id).then(function(){
 						this.loadInvoicing(true);
 					}.bind(this));
@@ -1034,9 +1035,10 @@
 
 	FieldTripDataEntryViewModel.prototype.loadResources = function()
 	{
-		if (!tf.authManager.authorizationInfo.isFieldTripAdmin)
+		var canModify = false;
+		if (tf.helpers.fieldTripAuthHelper.canModifyResourceRecord())
 		{
-			return;
+			canModify = true;
 		}
 
 		var self = this;
@@ -1086,15 +1088,15 @@
 				}.bind(this));
 
 				this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-				this.obResourcesGridViewModel().obEditEnable(true);
-				this.obResourcesGridViewModel().obCanAdd(true);
+				this.obResourcesGridViewModel().obEditEnable(canModify);
+				this.obResourcesGridViewModel().obCanAdd(canModify);
 			}.bind(this));
 		}
 		else
 		{
 			this.obResourcesGridViewModel(new TF.Control.GridControlViewModel("fieldtripresourcegroup", [], this.obEntityDataModel().id(), "resource", null, null, null, this.obFieldTripResourceGroupData(), "resource", true));
-			this.obResourcesGridViewModel().obEditEnable(true);
-			this.obResourcesGridViewModel().obCanAdd(true);
+			this.obResourcesGridViewModel().obEditEnable(canModify);
+			this.obResourcesGridViewModel().obCanAdd(canModify);
 		}
 	};
 
@@ -1122,10 +1124,77 @@
 				"@filter": `eq(FieldTripTemplateId,${fieldTripId})`
 			}
 		}).then(function(result){
-			this.obEntityDataModel().fieldTripInvoices(result.Items);			
+			this.obEntityDataModel().fieldTripInvoices(result.Items);
 			return Promise.resolve();
 		}.bind(this));
 	}
+
+	FieldTripDataEntryViewModel.prototype.saveTemplateRelationships = function(fieldTripTemplateEntity, data)
+	{
+		fieldTripTemplateEntity.Id = data.Items[0].Id;
+		fieldTripTemplateEntity.DBID = data.Items[0].DBID;
+		return Promise.all([this.addFieldTripInvoiceTemplates(fieldTripTemplateEntity), this.attachFieldTripDocument(fieldTripTemplateEntity)]);
+	};
+
+	FieldTripDataEntryViewModel.prototype.addFieldTripInvoiceTemplates = function(fieldtripTemplate)
+	{
+		let invoices = fieldtripTemplate.FieldTripInvoices;
+
+		if (!invoices.length) return Promise.resolve();
+
+		let data = invoices.map(r =>
+			{
+				return {
+					"FieldTripTemplateId": fieldtripTemplate.Id,
+					"FieldTripAccountId": r.FieldTripAccountId,
+					"Amount": r.Amount
+				}
+			});
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "fieldtripinvoicetemplates"), {data: data});
+	};
+
+	FieldTripDataEntryViewModel.prototype.attachFieldTripDocument = function(fieldtripTemplate)
+	{
+		let self = this;
+		return self.uploadDocuments().then(result=>
+		{
+			self.generateDocumentRelationships(result.Items);
+			return self.updateDocuments().then((updateResult)=>
+			{
+				let documents = ((Array.isArray(result) ? result : result.Items) || []).concat((Array.isArray(updateResult) ? updateResult : updateResult.Items) || []);
+				self.obDocumentGridDataSource(documents);
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "DocumentRelationships"), {
+					data: self.obDocumentRelationshipSource().map(r =>
+					{
+						return {
+							DocumentID: r.DocumentID,
+							DBID: fieldtripTemplate.DBID,
+							AttachedToType: self.getDataTypeIdOfFieldTripTemplate(),
+							AttachedToID: fieldtripTemplate.Id
+						}
+					})
+				})
+			});
+		});
+	};
+
+	FieldTripDataEntryViewModel.prototype.getFileNameWithoutExtension = function(fullName)
+	{
+		var pattern = /\.{1}[a-z]{1,}$/;
+		if (pattern.exec(fullName) !== null)
+		{
+			return (fullName.slice(0, pattern.exec(fullName).index));
+		}
+		else
+		{
+			return fullName;
+		}
+	};
+
+	FieldTripDataEntryViewModel.prototype.getDataTypeIdOfFieldTripTemplate = function()
+	{
+		return tf.dataTypeHelper._getObjectByType("fieldtriptemplate").id;
+	};
 
 	FieldTripDataEntryViewModel.prototype.ReloadResources = function()
 	{
@@ -1533,6 +1602,7 @@
 		var option = {
 			entityId: this.obEntityDataModel().id(),
 			entityType: "fieldtrip",
+			operationType: "Add",
 			strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
 			selectAccount: this.obSelectedAccount(),
 			selectedSchool: this.obEntityDataModel().school(),
@@ -1561,7 +1631,7 @@
 			}.bind(this));
 	};
 
-	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e) 
+	FieldTripDataEntryViewModel.prototype.editInvoiceEvent = function(e)
 	{
 		var row = this.obInvoicingGridViewModel().obGridViewModel().searchGrid.kendoGrid.select();
 		if (row.length)
@@ -1579,6 +1649,7 @@
 			var option = {
 				entityId: this.obEntityDataModel().id(),
 				entityType: "fieldtrip", data: data,
+				operationType: "Edit",
 				strictAcctCodes: this.obFieldTripSettings().StrictAcctCodes,
 				selectAccount: this.obSelectedAccount(),
 				selectedSchool: this.obEntityDataModel().school(),
@@ -2233,27 +2304,38 @@
 		}
 
 		var self = this, settings = self.obFieldTripSettings(), holidays = settings.Holidays || [], nonWorkdays = [6, 0],
-			deadlineDays = settings.ScheduleDaysInAdvance || 0, departDate = new moment(departDate),
-			deadlineDate = new moment(), message;
+			deadlineDays = settings.ScheduleDaysInAdvance || 0, departDate = new moment(departDate).startOf("day"),
+			deadlineDate = new moment().startOf("day"), schoolDays = 0, message;
 
-		while (deadlineDays > 0)
+		const isSchoolDay = function(mmtDay)
 		{
-			if (nonWorkdays.indexOf(deadlineDate.day()) < 0 && !TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(deadlineDate, holidays))
+			const notWeekend = nonWorkdays.indexOf(mmtDay.day()) < 0,
+				notHoliday = !TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(mmtDay, holidays);
+			return notWeekend && notHoliday;
+		}
+
+		while (schoolDays < deadlineDays)
+		{
+			deadlineDate.add(1, "days");
+			if (isSchoolDay(deadlineDate))
 			{
-				deadlineDays--;
+				++schoolDays;
 			}
-			deadlineDate = deadlineDate.add(1, 'day');
 		}
 
 		if (deadlineDate.diff(departDate, 'days') > 0)
 		{
-			message = "Depart Date must be on or after " + deadlineDate.format("M/D/YYYY");
+			message = `Depart Date must be on or after ${deadlineDate.format("M/D/YYYY")}.`;
 		}
 		else
 		{
 			if (TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.isHoliday(departDate, holidays))
 			{
-				message = "Depart Date falls on a holiday. " + departDate.format("M/D/YYYY") + ".";
+				message = `Depart Date falls on a holiday. ${departDate.format("M/D/YYYY")}.`;
+			}
+			else if (!isSchoolDay(departDate))
+			{
+				message = "Must depart on school day.";
 			}
 		}
 

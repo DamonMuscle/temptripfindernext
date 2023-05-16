@@ -4,6 +4,23 @@
 	namespace.GridLayoutExtendedDataModel = function(gridFilterEntity)
 	{
 		namespace.BaseDataModel.call(this, gridFilterEntity);
+		this.autoExportNames = ko.computed(function()
+		{
+			const autoExports = this.autoExports();
+			if (!autoExports || !autoExports.length)
+			{
+				return "";
+			}
+
+			var names = autoExports.map(e => e.Name);
+			if (names.length === 1)
+			{
+				return names[0];
+			}
+
+			var lastOne = names.pop();
+			return `${names.join(", ")} and ${lastOne}`;
+		}, this);
 	}
 
 	namespace.GridLayoutExtendedDataModel.prototype = Object.create(namespace.BaseDataModel.prototype);
@@ -15,11 +32,15 @@
 		{ from: "Id", default: 0, required: true },
 		{ from: "Name", default: "" },
 		{ from: "DataTypeId", default: "" },
-		{ from: "GridType", default: "" },
+		{ from: "DataTypeName", default: "" },
+		{ from: "UDGridId", default: null },
 		{ from: "FilterId", default: null },
 		{ from: "FilterName", default: "" },
 		{ from: "ShowSummaryBar", default: false },
+		{ from: "ShowRecurringDate", default: null },
 		{ from: "DataExportExists", default: false },
+		{ from: "AutoExportExists", default: false },
+		{ from: "AutoExports", default: [] },
 		{
 			from: "LayoutColumns",
 			default: [],

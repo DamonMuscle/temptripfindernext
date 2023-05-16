@@ -588,9 +588,26 @@
 
 		if (!item.UDFId)
 		{
-			if (Object.keys(editFieldList).includes(item.field))
+			if (item.hasOwnProperty("editType") && item.editType.hasOwnProperty("entityKey"))
 			{
-				return editFieldList[item.field].value;
+				if (Object.keys(editFieldList).includes(item.editType.entityKey))
+				{
+					if (editFieldList[item.editType.entityKey].type === "ListMover")
+					{
+						return editFieldList[item.editType.entityKey].recordValue;
+					}
+					else
+					{
+						return editFieldList[item.editType.entityKey].textValue;
+					}
+				}
+			}
+			else
+			{
+				if (Object.keys(editFieldList).includes(item.field))
+				{
+					return editFieldList[item.field].value;
+				}
 			}
 
 			if (self.detailView.newCopyContext &&
@@ -819,6 +836,7 @@
 	{
 		var self = this,
 			dataBlockStyles = self.getDataBlockStyles(item),
+			isReadMode = self.detailView.isReadMode(),
 			udfItem = item.UDFId ? self.getUDFItem(item.UDFId) : null;
 
 		if (item.UDFId && !self.detailView.userDefinedFieldHelper.isShowInCurrentDataSource(udfItem))
@@ -848,6 +866,10 @@
 				if (self.detailView.udGrid)
 				{
 					return new TF.DetailView.DataBlockComponent.UDGridRecordGridBlock($.extend(item, { gridConfigs: self.detailView.generateDocumentGridConfigs(item) }), self.detailView);
+				}
+				if (tf.helpers.miniGridHelper.checkGridSupportFilter(item.field))
+				{
+					return new TF.DetailView.DataBlockComponent.LightGridBlock(item, self.detailView);
 				}
 				return new TF.DetailView.DataBlockComponent.GridBlock(item, self.detailView);
 			case "RecordPicture":
@@ -1276,11 +1298,18 @@
 		{
 			case "UDGrid":
 			case "grid":
-				var $grid = $el.find(".kendo-grid");
+				var $grid = $el.find(".kendo-grid-container");	
+				if ($grid.length == 0)
+				{
+					$grid = $el.find(".kendo-grid");
+				}
 				if ($grid.length > 0)
 				{
 					extData = {
-						sort: $grid.data("kendoGrid").dataSource.sort(),
+						sort: $grid.data("kendoGrid") ? $grid.data("kendoGrid").dataSource.sort() : [],
+						filter: $grid.data("kendoGrid") ? $grid.data("kendoGrid").dataSource.filter() : null,
+						showSummary: elData["showSummary"] || $el.attr("showSummary"),
+						showQuickFilter: elData["showQuickFilter"] || $el.attr("showQuickFilter"),
 						url: elData["url"] || $el.attr("url"),
 						subUrl: elData["subUrl"] || $el.attr("subUrl"),
 						columns: elData["columns"]
@@ -1811,23 +1840,39 @@
 
 	/**
 	 * Event handler when grid data block is resized.
-	 * 
+	 *
 	 * @param {Event} e
 	 * @returns
 	 */
 	LightGridStack.prototype.handleGridBlockResized = function(e)
 	{
-		var uniqueClassName = this.detailViewHelper.getDomUniqueClassName($(e.target)),
-			$minigrid = $("." + uniqueClassName).find(">.grid-stack-item-content.custom-grid").find(".kendo-grid");
-		if ($minigrid.length == 0)
+		var self = this,
+			uniqueClassName = this.detailViewHelper.getDomUniqueClassName($(e.target)),
+			$miniGrid = $("." + uniqueClassName).find(">.grid-stack-item-content.custom-grid").find(".kendo-grid"),
+			$miniGridWithFilter = $("." + uniqueClassName).find(">.grid-stack-item-content.custom-grid").find(".kendo-grid-container");
+
+		if ($miniGrid.length == 0)
 		{
-			$minigrid = $("." + uniqueClassName).find(">.grid-stack-item-content>.custom-grid").find(".kendo-grid").last();
+			$miniGrid = $("." + uniqueClassName).find(">.grid-stack-item-content>.custom-grid").find(".kendo-grid").last();
 		}
-		if ($minigrid.length > 0)
+
+		if ($miniGridWithFilter.length == 0)
+		{
+			$miniGridWithFilter = $("." + uniqueClassName).find(">.grid-stack-item-content>.custom-grid").find(".kendo-grid-container").last();
+		}
+
+		if ($miniGridWithFilter.length > 0)
 		{
 			setTimeout(function()
 			{
-				var kendoGrid = $minigrid.data("kendoGrid");
+				self.fitContainer(uniqueClassName);
+			}, 250);
+		}
+		else if ($miniGrid.length > 0)
+		{
+			setTimeout(function()
+			{
+				var kendoGrid = $miniGrid.data("kendoGrid");
 				if (kendoGrid)
 				{
 					kendoGrid.refresh();
@@ -1835,6 +1880,16 @@
 			}, 250);
 		}
 	};
+
+	LightGridStack.prototype.fitContainer = function(uniqueClassName)
+	{
+		const $targetBlock = this.dataBlocks.filter(function(dataBlock)
+		{
+			return dataBlock.uniqueClassName == uniqueClassName;
+		})[0];
+
+		$targetBlock?.lightKendoGrid?.fitContainer();
+	}
 
 	/**
 	 * Event handler when data block is deleted.
@@ -2096,16 +2151,21 @@
 			self.shorteningBlocks(shorteningCandidateGroups, shorteningTabCandidates);
 		}
 
-		var kendoGrids = self.$wrapper.find('>.grid-stack-item .kendo-grid');
+		var kendoGrids = self.$wrapper.find('>.grid-stack-item .kendo-grid-container');
 		if (kendoGrids && kendoGrids.length > 0)
 		{
 			$.each(kendoGrids, function(_, kendoGrid)
 			{
+				if ($(kendoGrid).hasClass("kendo-grid-container") || $(kendoGrid).hasClass("kendo-summarygrid-container"))
+				{
+					return;
+				}
+
 				var grid = $(kendoGrid).data("kendoGrid");
 				if (grid)
 				{
 					grid.refresh();
-					TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(grid, grid.dataSource.data());
+					//TF.DetailView.DataBlockComponent.UDGridBlock.renderCommandBtn(grid, grid.dataSource.data());
 				}
 			})
 		}

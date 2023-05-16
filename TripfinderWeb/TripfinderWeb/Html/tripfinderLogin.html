@@ -1,24 +1,21 @@
 ﻿<div class="container tf-login" data-bind="uiInit:$parent.containerLoaded,finish:init.bind($data)">
-	<div class="visible-lg-block" style="margin-top:calc(39px + 15vh )"></div>
-	<div class="visible-sm-block visible-md-block" style="margin-top:calc(10vh )"></div>
-	<div class="visible-xs-block" style="margin-top:20px"></div>
 	<div class="row tf-login-row" data-bind="visible:$parent.obShowLogin() && !obIsShowCode()">
-		<div class="col-sm-12 col-md-10 col-lg-8">
-			<div class="col-sm-24" style="padding-left:0px;margin-top:10px;">
-				<div class="logo-container" style="margin-bottom: calc(5vh + 20px);"></div>
+		<div class="col-sm-12 col-md-10 col-lg-8 login-form">
+			<div class="col-sm-24" style="padding-left:0px;padding-right:0px;">
+				<div class="logo-container"></div>
 			</div>
 			<div class="panel">
 				<div class="panel-body">
 					<div>
 						<form class="form-horizontal loginform" role="form">
-							<div class="form-group" style="margin-top: 10px"
+							<div class="form-group"
 								data-bind="css: obClientKeyWarning()?'has-error':''">
 								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
 									<label for="firstName">
 										Client ID
 									</label>
 									<input type="text" id="firstName" name="clientId" class="form-control"
-										placeholder="Client Id" data-bind="value:obClientKey, click:cleanErrorMessage"
+										placeholder="Client ID" data-bind="value:obClientKey, enable:obClientKeyEnabled, click:cleanErrorMessage"
 										tabindex="1">
 									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId"
 										data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
@@ -50,7 +47,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-12">
+								<div class="col-sm-12 col-xs-12">
 									<div class="checkbox">
 										<label style="padding-left: 20px;">
 											<input style="margin-left: -20px;" type="checkbox"
@@ -58,7 +55,7 @@
 										</label>
 									</div>
 								</div>
-								<div class="col-sm-12">
+								<div class="col-sm-12 col-xs-12">
 									<a class="forget-password pull-right" data-bind="click:$parent.forgotPasswordClick"
 										tabindex="2">Forgot Password?</a>
 								</div>
@@ -74,7 +71,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="version-release-info" style="text-align:center;">
+								<div class="version-release-info">
 									<span class="tf-version">Version 1.0.9999</span>
 								</div>
 							</div>
@@ -137,20 +134,20 @@
 	</div>
 	<!-- ko if: obIsShowCode() -->
 	<div class="row tf-login-row">
-		<div class="col-sm-12 col-md-10 col-lg-8">
-			<div class="logo-container" style="margin:10px 15px calc(5vh + 20px) 0;">
+		<div class="col-sm-12 col-md-10 col-lg-8 login-form">
+			<div class="logo-container">
 			</div>
 		</div>
 	</div>
-	<div class="row tf-login-row">
-		<div class="col-sm-12 col-md-10 col-lg-10">
+	<div class="row tf-login-row mfa">
+		<div class="auth-container">
 			<form class="security-code-form">
-				<div class="panel panel-default" style="border:1px solid #ccc;padding-bottom: 10px;">
+				<div class="panel panel-default">
 					<div class="panel-heading">Authentication</div>
 					<div class="panel-body">
 						<div>
 							<div class="form-horizontal resetForm" role="form">
-								<div class="form-group">
+								<div class="form form-group">
 									<div class="col-sm-24 multifactor-authentication-box">
 										<span>This account has multifactor authentication enabled, please check your email
 											for your authentication code.</span>
@@ -177,10 +174,9 @@
 							</div>
 						</div>
 					</div>
-					<div class="edit-bottombar" style="padding: 0 25px;">
-						<button type="button" class="btn tf-btn-black" data-bind="click:$parent.positiveClick"
-							style="margin-right:10px;padding: 0px 12px;">Submit</button>
-						<button type="button" class="btn" style="background-color: transparent;" data-bind="click:backFromMFAtoLogin">Back</button>
+					<div class="edit-bottombar">
+						<button type="submit" class="btn tf-btn-black submit" data-bind="click:$parent.positiveClick">Submit</button>
+						<button type="button" class="btn back" style="background-color: transparent;" data-bind="click:backFromMFAtoLogin">Back</button>
 					</div>
 				</div>
 			</form>

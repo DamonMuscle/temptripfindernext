@@ -63,9 +63,20 @@
 		KendoFilterCellPrototype.updateDsFilter = KendoFilterCellPrototype.updateDsFilter.createInterceptor(function(e)
 		{
 			var kendoFilterCellDomain = this;
-			if (this.viewModel.operator == "isnotempty" || this.viewModel.operator == "isempty")
+			if (this.viewModel.operator == "isnotempty" || this.viewModel.operator == "isempty" ||
+				TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(this.viewModel.operator ) > -1)
 			{
 				this.viewModel.value = "";
+			}
+
+			// claer the date number input
+			if (TF.FilterHelper.dateTimeNilFiltersOperator.indexOf(this.viewModel.operator ) > -1 && this.viewModel.value === null)
+			{
+				var kendoNumber = $(this.element.find("input.date-number")[1]).data('kendoNumericTextBox');
+				if (kendoNumber)
+				{
+					kendoNumber.value(null);
+				}
 			}
 		});
 
@@ -81,7 +92,19 @@
 						logic: "and"
 					},
 				idx,
-				length;
+				length,
+				nonValueOperators = [
+					'isnull',
+					'isnotnull',
+					'isempty',
+					'isnotempty',
+					'isnullorempty',
+					'isnotnullorempty',
+					'all', 'lastmonth', 'lastweek', 'lastyear',
+					'nextbusinessday', 'nextmonth', 'nextweek',
+					'nextyear', 'thismonth', 'thisweek', 'thisyear',
+					'today', 'tomorrow', 'yesterday'
+				];
 
 			removeFiltersForField(result, that.options.field);
 
@@ -91,14 +114,20 @@
 				filter.value = that._parse(filter.value);
 			}
 
+			function isNonValueFilter (filter)
+			{
+				var operator = typeof filter === 'string' ? filter : filter.operator;
+				return $.inArray(operator, nonValueOperators) > -1;
+			}
+
 			filters = $.grep(filters, function(filter)
 			{
-				return filter.operator === "isnotempty" || filter.operator === "isempty" || (filter.value !== "" && filter.value !== null);
+				return filter.operator === "isnotempty" || filter.operator === "isempty" || (filter.value !== "" && filter.value !== null || isNonValueFilter(filter));
 			});
 
 			if (filters.length)
 			{
-				if (result.filters.length)
+				if (result.filters?.length)
 				{
 					expression.filters = filters;
 

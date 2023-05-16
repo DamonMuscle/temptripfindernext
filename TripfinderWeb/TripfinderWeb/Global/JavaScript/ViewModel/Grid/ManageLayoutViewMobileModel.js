@@ -114,6 +114,15 @@
 		{
 			return;
 		}
+
+		if (gridLayout.autoExportExists())
+		{
+			const isSigular = !gridLayout.autoExports() || gridLayout.autoExports().length === 1;
+			const exportsHolder = `data export${isSigular ? "" : "s"}`;
+			tf.promiseBootbox.alert(`This layout is associated with the ${gridLayout.autoExportNames()} ${exportsHolder}. It cannot be deleted.`);
+			return;
+		}
+
 		tf.promiseBootbox.confirm(
 			{
 				title: "Delete Confirmation",

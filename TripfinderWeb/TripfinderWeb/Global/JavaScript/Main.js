@@ -4,9 +4,16 @@ if (typeof kendo != 'undefined')
 }
 $(function()
 {
-	const tf = createNamespace("tf");
-	tf.startup = new TF.Startup();
-	tf.startup.start();
+	var redirectingPromise = window.determineRedirect2VanityUrlPromise || Promise.resolve(false);
+	redirectingPromise.then(function(redirecting)
+	{
+		if (!redirecting)
+		{
+			const tf = createNamespace("tf");
+			tf.startup = new TF.Startup();
+			tf.startup.start();
+		}
+	});
 });
 
 createNamespace("TF").productName = "Tripfinder";
@@ -37,9 +44,28 @@ function topicCombine()
 	return null;
 }
 
+/**
+ * Fuzzy compare, so two empty values could match.
+ *
+ * @param {any} val1
+ * @param {any} val2
+ * @return {Boolean} 
+ */
+function fuzzyCompare(val1, val2)
+{
+	return (IsEmptyString(val1) && IsEmptyString(val2)) || val1 === val2;
+}
+
 function isNullObj(obj)
 {
 	return obj === null || obj === undefined;
+}
+
+function IsEmptyString(str)
+{
+	return (str === null ||
+		str === undefined ||
+		str === "");
 }
 
 function pathCombine()
@@ -614,6 +640,11 @@ function toISOStringWithoutTimeZone(m)
 
 function utcToClientTimeZone(utcValue)
 {
+	if (!utcValue)
+	{
+		return moment('invalid');
+	}
+
 	if (typeof (utcValue) !== "string")
 	{
 		utcValue = toISOStringWithoutTimeZone(moment(utcValue));

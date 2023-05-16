@@ -28,9 +28,9 @@
 			departDate = new moment(self.fieldTripDE.obEntityDataModel().departDate()),
 			start = new moment(self.fieldTripDE.obEntityDataModel().departTime()),
 			end = new moment(self.fieldTripDE.obEntityDataModel().returnTime()),
-			isEndUndefined = self.fieldTripDE.obEntityDataModel().returnTime() == undefined,
+			isEndUndefined = self.fieldTripDE.obEntityDataModel().returnTime() == undefined || self.fieldTripDE.obEntityDataModel().returnDate() == undefined,
 			isSameDay = returnDate.isSame(departDate, "day"),
-			isDateAfter = departDate.isAfter(returnDate),
+			isDateAfter = !isEndUndefined && departDate.isValid() && returnDate.isValid() && departDate.isAfter(returnDate),
 			isTimeAfter = false, $form = self.fieldTripDE.$form,
 			message, departDateInput, endDateInput, departTimeInput, endTimeInput;
 

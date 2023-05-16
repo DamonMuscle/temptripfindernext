@@ -152,6 +152,11 @@
 		}
 		this.gridBlock.grid.select().each((i, item) =>
 		{
+			if ($(item).children("td")?.data()?.kendoField === "bulk_menu")
+			{
+				return;
+			}
+
 			let dataItem = JSON.parse(JSON.stringify(this.gridBlock.grid.dataItem(item)));
 			switch (operationType)
 			{
@@ -174,7 +179,7 @@
 	{
 		return this.gridBlock.grid.columns.filter((item) =>
 		{
-			return !item.command || item.command.length === 0;
+			return item.field != "bulk_menu" && (!item.command || item.command.length == 0);
 		});
 	};
 

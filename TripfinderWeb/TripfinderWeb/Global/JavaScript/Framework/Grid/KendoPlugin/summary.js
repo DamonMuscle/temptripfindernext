@@ -22,9 +22,13 @@
 		this.bindOnClearFilterEvent();
 	}
 
-	KendoGridSummaryGrid.prototype.createSummaryGrid = function()
+	KendoGridSummaryGrid.prototype.createSummaryGrid = function(forceCreate)
 	{
 		var self = this, scrollLeft = 0;
+		if (!forceCreate && (!this.obSummaryGridVisible || !this.obSummaryGridVisible()))
+		{
+			return;
+		}
 		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
 		if (self.summaryKendoGrid)
 		{
@@ -190,12 +194,13 @@
 			var item = $.extend({}, col);
 			item.dataType = item.type;
 			item.type = "string";
-			if (item.field === "bulk_menu")
+			if (item.field === "bulk_menu" || item.disableSummary == true)
 			{
 				item.title = "";
 				item.headerTemplate = null;
 				item.template = null;
 				item.filterable = false;
+				item.command = null;
 				return item;
 			}
 			item.filterable = self.getSummaryHeader(item);
@@ -280,21 +285,44 @@
 		};
 	};
 
-	KendoGridSummaryGrid.prototype.loadSummary = function(fildName, operator)
+	KendoGridSummaryGrid.prototype.loadSummary = function(fieldName, operator)
 	{
-		var includeIds = this._gridState.filteredIds;
-		var excludeIds = this.getExcludeAnyIds();
-		var searchData = new TF.SearchParameters(null, null, null, this.findCurrentHeaderFilters(), this.obSelectedGridFilterClause(), includeIds, excludeIds);
-		console.log(`SearchParameters intialized success! ${!!searchData}`);
-		return tf.promiseAjax.post(pathCombine(this.options.url, "aggregate"), {
-			paramData: $.extend(true, { FieldName: tf.UDFDefinition.getOriginalName(fildName), AggregateOperator: operator }, this.options.paramData || {}),
+		var apiPrefix = tf.api.apiPrefix();
+		var param = {
+			FieldName: tf.UDFDefinition.getOriginalName(fieldName),//Convert udf name to original name.
+			AggregateOperator: operator,
+			databaseId: tf.datasourceManager.databaseId
+		};
+
+		var url;
+		if (this.options.setRequestURL)
+		{
+			url = this.options.setRequestURL(apiPrefix);
+		}
+		else
+		{
+			url = pathCombine(apiPrefix, "search", tf.dataTypeHelper.getEndpoint(this.options.gridType));
+		}
+
+		if (!this.searchOption || !this.searchOption.data)
+		{
+			return Promise.resolve();
+		}
+
+		return tf.promiseAjax.post(pathCombine(url, "aggregate"), {
+			paramData: param,
 			data: this.searchOption.data,
 			traditional: true
-		}, { overlay: true });
+		}, { overlay: this.options.customGridType !== "dashboardwidget" });
 	};
 
 	KendoGridSummaryGrid.prototype.onSummaryDropDownChange = function(operator, fieldName)
 	{
+		if (this.options && this.options.miniGridEditMode)
+		{
+			return;
+		}
+
 		if (!operator)
 		{
 			this.setDataSource(fieldName, operator, "");
@@ -305,7 +333,7 @@
 			return definition.field === fieldName;
 		})[0];
 
-		tf.loadingIndicator.showImmediately();
+		!this.options.isMiniGrid && tf.loadingIndicator.showImmediately();
 		this.loadSummary(fieldName, operator).then(function(apiResponse)
 		{
 			tf.loadingIndicator.tryHide();
@@ -328,30 +356,45 @@
 
 	KendoGridSummaryGrid.prototype.getFormatedValue = function(column, item, operator)
 	{
-		var value = $.isArray(item) ? item[0] : item;
+		let value = $.isArray(item) ? item[0] : item;
 		if (!column || !column.format)
 		{
 			return value;
 		}
 
-		if (operator === 'Count' || operator === 'DistinctCount')
+		if (["Count", "DistinctCount"].includes(operator))
 		{
 			return value;
 		}
-		if (column.type === "date" || column.type === "time" || column.type === "datetime")
+
+		if (column.formatSummaryValue)
 		{
-			let formartedValue = "";
+			return column.formatSummaryValue(item);
+		}
+
+		if (["date", "time", "datetime"].includes(column.type))
+		{
+			if (column.isUTC)
+			{
+				let dt = utcToClientTimeZone(value);
+				value = dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : value;
+			}
+
+			let momentValue = moment(value);
+			let validDateValue = value;
 			if (column.type === "time")
 			{
-				value = `${moment().format("YYYY-MM-DD")} ${value}`;
+				validDateValue = convertToMoment(value);
+				momentValue = moment(validDateValue);
 			}
-			var momentValue = moment(value);
-			if (momentValue.isValid() === true)
+
+			if (value !== 0 && new Date(validDateValue) != 'Invalid Date' && momentValue.isValid() === true && validDateValue !== 0)
 			{
 				value = momentValue.toDate();
-				formartedValue = kendo.format(column.format, value);
+				return kendo.format(column.format, value);
 			}
-			return formartedValue
+
+			return "";
 		}
 
 		value = tf.measurementUnitConverter.aggregateConvert(value, operator, column);

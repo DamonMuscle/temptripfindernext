@@ -15,7 +15,10 @@
 		this.type = TF.productName;
 		this.contentTemplate('tripfinderLogin');
 		this.buttonTemplate('');
-		this.loginViewModel = new TF.TripfinderLoginViewModel();
+		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
+		const isVanityUrl = !!window.vanitySessionGuard?.vendorAccessInfoCache[potentialClientKey];
+		const clientKey = isVanityUrl ? potentialClientKey : null;
+		this.loginViewModel = new TF.TripfinderLoginViewModel(clientKey);
 		this.data(this.loginViewModel);
 		this.validateIsForgetPassword();
 	}
@@ -174,7 +177,8 @@
 				product: TF.productName,
 				username: userName,
 				vendor: TF.vendor
-			}
+			},
+			headers: { "tf-referer": `${location.origin}${location.pathname}` },
 		};
 		tf.promiseAjax.get(pathCombine(tf.api.server(), clientKey, "passwords"), forgetPasswordData)
 			.then(function(apiResponse)

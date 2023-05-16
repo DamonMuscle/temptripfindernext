@@ -152,4 +152,20 @@
 		var self = this;
 		self.passwordChangeViewModel.dispose();
 	};
+
+	PasswordChangeModalViewModel.prototype.negativeClick = function(viewModel, e)
+	{
+		if (this.passwordChangeViewModel.obCurrentPassword() || this.passwordChangeViewModel.obNewPassword() || this.passwordChangeViewModel.obConfirmNewPassword())
+		{
+			return tf.promiseBootbox.yesNo({ message: "Are you sure you want to cancel?", backdrop: true, title: "Unsaved Changes", closeButton: true })
+			.then(function(result)
+			{
+				if (result)
+				{
+					this.negativeClose();
+				}
+			}.bind(this));
+		}
+		this.negativeClose();
+	};
 })();

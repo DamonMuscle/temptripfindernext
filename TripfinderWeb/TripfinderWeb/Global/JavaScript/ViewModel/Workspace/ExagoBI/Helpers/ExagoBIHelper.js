@@ -54,8 +54,6 @@
 			Id: null
 		};
 
-		$.get(self._exagoAdminPageUrl);	// Try accessing Exago Admin page for warming up
-
 		return self.initExagoReportContext(null)
 			.then(function(ctxData)
 			{
@@ -504,6 +502,24 @@
 			},
 			{ overlay: false }
 		);
+	};
+
+	ExagoBIHelper.prototype.getDownloadFileUrl = function(reportId, reportName, outputType, resultId)
+	{
+		let clientKey = this._userCtx.clientKey,
+			ctxId = this._exagoCtx.Id,
+			apiUrl = this._executeReportUrl,
+			paramData = {
+				clientKey: clientKey,
+				ctxId: ctxId,
+				reportId: reportId,
+				reportName: reportName,
+				format: outputType ? outputType : 'pdf',
+				outputAsJson: "false",
+				resultId: resultId
+			};
+
+		return `${apiUrl}?${jQuery.param(paramData)}`;
 	};
 
 	ExagoBIHelper.prototype.executePreviewReport = function(reportId, reportName, previewReportName, sessionContextData, outputType)

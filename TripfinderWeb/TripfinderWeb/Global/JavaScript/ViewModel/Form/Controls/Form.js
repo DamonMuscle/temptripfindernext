@@ -498,6 +498,10 @@
 				{
 					tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE, 'Not Available');
 				}
+				else
+				{
+					self.handleScrollLocationWhenErrorDisplay();
+				}
 			});
 
 	}
@@ -1345,19 +1349,16 @@
 	Form.prototype.handleScrollLocationWhenErrorDisplay = function()
 	{
 		const self = this;
-		if (tf.isFromWayfinder || isMobileDevice())
+		const errorElems = self.elem.find(".invalid");
+		if (errorElems && errorElems.length > 0)
 		{
-			const errorElems = self.elem.find(".invalid");
-			if (errorElems && errorElems.length > 0)
-			{
-				const errorElem = errorElems[0];
-				const top = errorElem.offsetTop;
-				const shouldScrollTop = top > 30 ? top - 30 : 0;
-				$(".form-body").scroll();
-				$(".form-body").animate({
-					scrollTop: shouldScrollTop
-				}, 1000);
-			}
+			const errorElem = errorElems[0];
+			const top = errorElem.offsetTop;
+			const shouldScrollTop = top > 30 ? top - 30 : 0;
+			self.elem.find(".form-body").scroll();
+			self.elem.find(".form-body").animate({
+				scrollTop: shouldScrollTop
+			}, 1000);
 		}
 	};
 

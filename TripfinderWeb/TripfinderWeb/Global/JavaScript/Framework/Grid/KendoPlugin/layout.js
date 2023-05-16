@@ -2,103 +2,75 @@
 {
 	createNamespace("TF.Grid").LayoutHelper = LayoutHelper;
 
+	const LAYOUT_COLUMN_COMPARE_LIST = ["SortIndex", "SortAscending", "AggregationOperator"];
+	const PREVIOUS_GENDER_NAME = 'Sex';
+	const CURRENT_GENDER_NAME = 'Gender';
+
 	function LayoutHelper()
 	{ }
 	LayoutHelper.compareLayoutColumns = function functionName(leftColumns, rightColumns)
 	{
-		var isEqual = true;
-
-		if (leftColumns.length !== rightColumns.length)
-		{
-			isEqual = false;
-			return isEqual;
-		}
-
-		leftColumns.map(function(leftColumn, idx)
-		{
-			if (!isEqual)
-				return;
-
-			var rightColumn = rightColumns[idx];
-			if (leftColumn.FieldName !== rightColumn.FieldName)
+		return leftColumns.length === rightColumns.length
+			&& leftColumns.every((leftCol, idx) =>
 			{
-				isEqual = false;
-				return;
-			}
+				const rightCol = rightColumns[idx];
 
-			var leftColumnKeys = Object.keys(leftColumn);
-			var rightColumnKeys = Object.keys(rightColumn);
-			var differentKeys = leftColumnKeys.filter(function(leftColumnKey, idx)
-			{
-				if (!TF.Grid.LayoutHelper.compareLayoutColumnSortSetting(leftColumn, rightColumn))
-					return true; // Means has different keys
-
-				if (!TF.Grid.LayoutHelper.compareLayoutColumnSummarySetting(leftColumn, rightColumn))
-					return true; // Means has different keys
-				return leftColumn['FieldName'] !== rightColumn['FieldName'];
+				return LAYOUT_COLUMN_COMPARE_LIST.every(field => fuzzyCompare(leftCol[field], rightCol[field]))
+					&& leftCol['FieldName'] === rightCol['FieldName'];
 			});
-			if (differentKeys.length)
-			{
-				isEqual = false;
-				return; // jump out of the current loop
-			}
-		});
-
-		return isEqual;
 	};
 
-	LayoutHelper.compareLayoutColumnSortSetting = function(leftCol, rightCol)
+	/**
+	 * Find grid layouts by certain criterias.
+	 *
+	 * @param {Object} options
+	 * @returns
+	 */
+	LayoutHelper.findGridLayouts = function(options)
 	{
-		var fieldName = 'SortIndex';
-		var hasLeftColSortSetting = TF.Grid.LayoutHelper.hasIdentifyColumnSortSetting(leftCol, fieldName);
-		var hasRightColSortSetting = TF.Grid.LayoutHelper.hasIdentifyColumnSortSetting(rightCol, fieldName);
+		const paramData = {};
+		const filterList = [];
+		const showOverlay = options.hasOwnProperty("showOverlay") ? options.showOverlay : true;
 
-		if (hasLeftColSortSetting === hasRightColSortSetting)
-			return true;
-
-		if (hasLeftColSortSetting !== hasRightColSortSetting)
-			return false;
-
-		return (leftCol[fieldName] === rightCol[fieldName] &&
-			leftCol['SortAscending'] === rightCol['SortAscending']);
-	};
-
-	LayoutHelper.compareLayoutColumnSummarySetting = function(leftCol, rightCol)
-	{
-		var filedName = 'AggregationOperator';
-		var hasLeftColSummarySetting = TF.Grid.LayoutHelper.hasIdentifyColumnSummarySetting(leftCol, filedName);
-		var hasRightColSummarySetting = TF.Grid.LayoutHelper.hasIdentifyColumnSummarySetting(rightCol, filedName);
-
-		if (hasLeftColSummarySetting === hasRightColSummarySetting)
-			return true;
-
-		if (hasLeftColSummarySetting !== hasRightColSummarySetting)
-			return false;
-
-		return (leftCol[filedName] === rightCol[filedName]);
-	};
-
-	LayoutHelper.hasIdentifyLayoutColumnSetting = function(column, fieldName)
-	{
-		var columnSortIndexKeyIdx = Object.keys(column).indexOf(fieldName);
-		if (columnSortIndexKeyIdx < 0)
-			return false;
-
-		return column[fieldName] !== null;
-	};
-
-	LayoutHelper.hasIdentifyColumnSummarySetting = function(column, fieldName)
-	{
-		if (TF.Grid.LayoutHelper.hasIdentifyLayoutColumnSetting(column, fieldName) && column[fieldName] !== "")
+		if (options.dataType)
 		{
-			return true;
+			const dataTypeId = tf.dataTypeHelper.getId(options.dataType);
+			filterList.push(`eq(DataTypeID,${dataTypeId})`);
 		}
-		return false;
-	};
 
-	LayoutHelper.hasIdentifyColumnSortSetting = function(column, fieldName)
-	{
-		return TF.Grid.LayoutHelper.hasIdentifyLayoutColumnSetting(column, fieldName);
+		if (options.UDGridId)
+		{
+			filterList.push(`eq(UDGridId,${options.UDGridId})`);
+		}
+
+		if (options.layoutId)
+		{
+			filterList.push(`eq(ID,${options.layoutId})`);
+		}
+
+		if (filterList.length > 0)
+		{
+			paramData["@filter"] = filterList.join("&");
+		}
+
+		if (options.relationships)
+		{
+			paramData["@relationships"] = options.relationships;
+		}
+
+		if (options.fields)
+		{
+			paramData["@fields"] = options.fields;
+		}
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts"),
+			{
+				paramData: paramData
+			},
+			{
+				overlay: showOverlay
+			})
+			.then(res => res && res.Items);
 	};
 
 	createNamespace("TF.Grid").KendoGridLayoutMenu = KendoGridLayoutMenu;
@@ -109,28 +81,26 @@
 		this._obCurrentGridLayoutExtendedDataModel = ko.observable(null);
 		this.subscriptions.push(this._obCurrentGridLayoutExtendedDataModel.subscribe(this._currentLayoutChange, this));
 
-		this._obAppliedLayoutInitState = ko.observable(null);
-		this._obSelectedGridLayoutExtendedDataModel = ko.observable(null);
-		this._obDefaultLayoutDataModel = ko.observable(null);
-		this._obInitDefaultLayoutDataModel = ko.observable(null);
+		this.obGridLayoutExtendedDataModels = ko.observableArray();
+		this.obGridLayoutExtendedDataModels.subscribe(val =>
+		{
+			const selectedLayout = this._obCurrentGridLayoutExtendedDataModel();
+			if (selectedLayout && selectedLayout.id() && val.every(o => o.id() !== selectedLayout.id()))
+			{
+				this._resetLayout();
+			}
+		});
 
 		this.obSelectedGridLayoutName = ko.computed(this._selectedGridLayoutNameComputer, this);
-
-		this._obOnlyForUpdateSelectedGridLayoutModified = ko.observable(null);
-		ko.computed(this._selectedGridLayoutModifiedComputer, this);
-		this.obSelectedGridLayoutModified = ko.computed(function()
+		this.obSelectedGridLayoutModified = ko.computed(this._selectedGridLayoutModifiedComputer, this);
+		this.obCurrentLayoutStatus = ko.computed(() =>
 		{
-			return this._obOnlyForUpdateSelectedGridLayoutModified();
-		}, this);
+			return this.obSelectedGridLayoutModified() ? "(modified)" : "";
+		});
 
-		this.obGridLayoutExtendedDataModels = ko.observableArray();
 		this.obContextMenuDisplayGridLayoutExtendedDataModels = ko.computed(function()
 		{
-			var result = [];
-			result = this.obGridLayoutExtendedDataModels().map(function(item)
-			{
-				return item;
-			});
+			var result = this.obGridLayoutExtendedDataModels();
 
 			if (TF.isPhoneDevice &&
 				this.obSelectedGridLayoutName && this.obSelectedGridLayoutName())
@@ -148,10 +118,11 @@
 
 			return result;
 		}, this);
+
 		this._applyingLayout = false;
 
 		this.applyLayout = this.applyLayout.bind(this);
-		this.mangeLayoutClick = this.mangeLayoutClick.bind(this);
+		this.manageLayoutClick = this.manageLayoutClick.bind(this);
 		this.saveAndEditLayout = this.saveAndEditLayout.bind(this);
 		this.saveAsNewLayoutClick = this.saveAsNewLayoutClick.bind(this);
 	}
@@ -179,11 +150,10 @@
 
 	KendoGridLayoutMenu.prototype._selectedGridLayoutNameComputer = function()
 	{
-		this.obResetLayout();
 		this._setgridStateTwoRowWhenOverflow();
-		if (this._obSelectedGridLayoutExtendedDataModel())
+		if (this._obCurrentGridLayoutExtendedDataModel())
 		{
-			return this._obSelectedGridLayoutExtendedDataModel().name();
+			return this._obCurrentGridLayoutExtendedDataModel().name() || "Default";
 		}
 		else if (this.options.fromSearch && !this._gridLoadingEnd)//IF the request from search,  first go to view display " All Columns".
 		{
@@ -202,214 +172,257 @@
 
 	KendoGridLayoutMenu.prototype._selectedGridLayoutModifiedComputer = function()
 	{
-		var self = this;
-		this._setgridStateTwoRowWhenOverflow();
-		var initLayoutDataModel;
-		var currentlyLayoutDataModel;
-		if (self._obSelectedGridLayoutExtendedDataModel())
+		const self = this;
+		self._setgridStateTwoRowWhenOverflow();
+
+		let currentLayout = self._obCurrentGridLayoutExtendedDataModel();
+
+		// If there is not a current layout
+		if (!currentLayout)
 		{
-			initLayoutDataModel = self._obAppliedLayoutInitState();
-			currentlyLayoutDataModel = self._obSelectedGridLayoutExtendedDataModel();
-		}
-		else if (self._obInitDefaultLayoutDataModel())
-		{
-			initLayoutDataModel = self._obInitDefaultLayoutDataModel();
-			currentlyLayoutDataModel = self._obDefaultLayoutDataModel();
+			currentLayout = new TF.DataModel.GridLayoutExtendedDataModel(self._defaultGridLayoutExtendedEntity);
 		}
 
-		if (!currentlyLayoutDataModel || !currentlyLayoutDataModel.apiIsDirty())
+		// Check current layout and apiIsDirty status
+		if (!currentLayout)
 		{
-			self._obOnlyForUpdateSelectedGridLayoutModified(null);
-			return;
+			return false;
 		}
 
-		if (currentlyLayoutDataModel._entityBackup.ShowSummaryBar !== currentlyLayoutDataModel.showSummaryBar())
+		// Check if there is a change in summary bar status
+		if (Boolean(currentLayout._entityBackup.ShowSummaryBar) !== Boolean(currentLayout.showSummaryBar()))
 		{
-			self._obOnlyForUpdateSelectedGridLayoutModified("modified");
-			return;
+			return true;
 		}
 
-		var hasLayoutColumnsChange = !TF.Grid.LayoutHelper.compareLayoutColumns(
-			currentlyLayoutDataModel.layoutColumns(), initLayoutDataModel.layoutColumns()
-		);
-		var hasFilterIdChange = currentlyLayoutDataModel.filterId() != initLayoutDataModel.filterId();
+		const currentLayoutInitState = self.getCurrentLayoutInitState();
 
-		var hasFilterNameChange = initLayoutDataModel.filterId() > 0 && currentlyLayoutDataModel.filterName() != initLayoutDataModel.filterName();
-
-		if ((!hasLayoutColumnsChange && !hasFilterIdChange && !hasFilterNameChange))
+		if (!currentLayoutInitState)
 		{
-			self._obOnlyForUpdateSelectedGridLayoutModified(null);
-			return;
-		}
-		else if (hasLayoutColumnsChange || hasFilterNameChange)
-		{
-			self._obOnlyForUpdateSelectedGridLayoutModified("modified");
-			return;
+			return false;
 		}
 
-		if (!self._hasFilterIdNeedToRevet(currentlyLayoutDataModel))
+		// Need to compare filter name is because users could use quick filter to modify filter.
+		if (!TF.Grid.LayoutHelper.compareLayoutColumns(currentLayout.layoutColumns(), currentLayoutInitState.LayoutColumns)
+			|| !fuzzyCompare(currentLayout.filterId(), currentLayoutInitState.FilterId))
 		{
-			self._obOnlyForUpdateSelectedGridLayoutModified(null);
-			return;
+			return true;
 		}
-
-		var filterId = currentlyLayoutDataModel._entityBackup.FilterId ||
-			tf.storageManager.get(self._storageFilterDataKey) ||
-			this._obCurrentGridLayoutExtendedDataModel().filterId();
-		if (isNaN(filterId))
-		{
-			return;
-		}
-		return TF.Grid.FilterHelper.validFilterId(filterId)
-			.then(function(canRevertLayoutFilterId)
-			{
-				if (!canRevertLayoutFilterId)
-				{
-					currentlyLayoutDataModel._entityBackup.FilterId = null; // Fixed issue(applie filter the layout not displayed modified) happend when excuted the case mentioned in tickect-VIEW-649 and create a new filter and applied it on same layout
-					if (!currentlyLayoutDataModel.filterId() > 0)
-					{
-						self._obOnlyForUpdateSelectedGridLayoutModified(null);
-						currentlyLayoutDataModel.apiIsDirty(false);
-					}
-					else
-					{
-						self._obOnlyForUpdateSelectedGridLayoutModified("modified");
-					}
-					return;
-				}
-				else if (self._obSelectedGridLayoutExtendedDataModel()) // Fixed When a layout that includes a filter is applied and user chooses to reset layouts, the "None layout" appears to be modified.
-				{
-					self._obOnlyForUpdateSelectedGridLayoutModified("modified");
-					return;
-				}
-			});
 	};
 
-	KendoGridLayoutMenu.prototype._hasFilterIdNeedToRevet = function(gridLayoutExtendedDataModel)
+	KendoGridLayoutMenu.prototype.getCurrentLayoutInitState = function()
 	{
-		return gridLayoutExtendedDataModel.filterId() != gridLayoutExtendedDataModel._entityBackup.FilterId;
+		let currentLayoutInitState = null;
+		const currentLayout = this._obCurrentGridLayoutExtendedDataModel();
+
+		if (currentLayout && currentLayout.id() && currentLayout.id() > 0)
+		{
+			const item = this.obGridLayoutExtendedDataModels().find(d => d.id() === currentLayout.id());
+			if (item)
+			{
+				currentLayoutInitState = item.toData();
+			}
+		}
+		else
+		{
+			currentLayoutInitState = this._defaultGridLayoutExtendedEntity;
+		}
+
+		return currentLayoutInitState;
 	};
 
 	KendoGridLayoutMenu.prototype.getDefinitionLayoutColumns = function()
 	{
-		return Enumerable.From(this._gridDefinition.Columns).Where(function(c)
-		{
-			return !c.hidden;
-		}).Select(function(c)
-		{
-			return $.extend(
-				{}, c)
-		}).ToArray();
+		return this._gridDefinition.Columns
+			.filter(c => !c.hidden)
+			.map(c => ({
+				FieldName: c.FieldName,
+				Width: c.Width
+			}));
 	};
 
-	KendoGridLayoutMenu.prototype.loadLayout = function()
+	KendoGridLayoutMenu.prototype.syncLayoutAutoExports = function(layoutId)
 	{
-		var self = this;
-		var defaultGridLayoutExtendedEntity = {
-			GridType: this.options.gridType,
-			Name: "",
-			LayoutColumns: this.getDefinitionLayoutColumns()
-		};
-
-		this._defaultGridLayoutExtendedEntity = defaultGridLayoutExtendedEntity;
-
-		if (this.options.loadLayout === false)
+		const self = this;
+		const gridLayouts = self.obGridLayoutExtendedDataModels();
+		if (!gridLayouts || !gridLayouts.length)
 		{
-			this._obCurrentGridLayoutExtendedDataModel(new TF.DataModel.GridLayoutExtendedDataModel(defaultGridLayoutExtendedEntity));
 			return Promise.resolve();
 		}
 
-		var typeName = this.options.gridType;
-		if (this.options.kendoGridOption && this.options.kendoGridOption.entityType)
+		const options = {
+			fields: "Id,AutoExportExists,AutoExports",
+			relationships: "AutoExport"
+		};
+		if (layoutId)
 		{
-			typeName = this.options.kendoGridOption.entityType + "." + this.options.gridType;
+			options["layoutId"] = layoutId;
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + tf.DataTypeHelper.getId(this.options.gridType)))
-			.then(function(apiResponse)
+		else
+		{
+			var typeName = self.options.gridType;
+			if (self.options.kendoGridOption && self.options.kendoGridOption.entityType)
 			{
-				apiResponse.Items = [defaultGridLayoutExtendedEntity].concat(apiResponse.Items);
-				var validLayoutDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, apiResponse.Items.slice(1));
-				var gridLayoutExtendedDataModels = self._filterLayoutsByDefaultColumns(validLayoutDataModels);
-				this.obGridLayoutExtendedDataModels(gridLayoutExtendedDataModels);
-				this._sortGridLayoutExtendedDataModels();
-				var selectGridLayoutExtendedEntity = null, currentGridLayoutExtendedEntity = null;
-				//IF the request from search, do not use the sticky layout.
-				if (!this.options.fromSearch && !this.options.isTemporaryFilter)
-				{
-					var selectGridLayoutExtendedEntityId = tf.storageManager.get(this._storageLayoutDataKey);
-					if (selectGridLayoutExtendedEntityId && selectGridLayoutExtendedEntityId !== '')
-					{
-						selectGridLayoutExtendedEntity = Enumerable.From(gridLayoutExtendedDataModels).Where(function(c)
-						{
-							return c.name() == selectGridLayoutExtendedEntityId;
-						}).FirstOrDefault();
-					}
-					currentGridLayoutExtendedEntity = tf.storageManager.get(this.options.storageKey);
-					//set lock
-					if (currentGridLayoutExtendedEntity && currentGridLayoutExtendedEntity.LayoutColumns.length > 0)
-					{
-						currentGridLayoutExtendedEntity.LayoutColumns.forEach(function(columnInStorage)
-						{
-							if (columnInStorage.locked && columnInStorage.locked == true)
-							{
-								self.tobeLockedColumns.push(
-									{
-										field: columnInStorage.FieldName
-									});
-							}
-						});
-					}
-				}
-				if (selectGridLayoutExtendedEntity)
-				{
-					var currentGridLayoutExtendedEntityForWidth = currentGridLayoutExtendedEntity;
-					if (TF.isMobileDevice)
-					{
-						currentGridLayoutExtendedEntityForWidth = tf.storageManager.get(this.options.storageKey);
-					}
-					//set width in layout
-					if (currentGridLayoutExtendedEntityForWidth && currentGridLayoutExtendedEntityForWidth.LayoutColumns.length > 0)
-					{
-						selectGridLayoutExtendedEntity.layoutColumns().forEach(function(column)
-						{
-							currentGridLayoutExtendedEntityForWidth.LayoutColumns.forEach(function(columnInStorage)
-							{
-								if ((columnInStorage.FieldName && columnInStorage.FieldName == column.FieldName) ||
-									(columnInStorage.UDFId && columnInStorage.UDFId == column.UDFId))
-								{
-									column.Width = columnInStorage.Width;
-									column.width = columnInStorage.Width;
-									return;
-								}
-							});
-						});
-					}
-					this._obCurrentGridLayoutExtendedDataModel(selectGridLayoutExtendedEntity);
-					this._obSelectedGridLayoutExtendedDataModel(selectGridLayoutExtendedEntity);
-					this._resetAppliedLayoutInitState(this._obSelectedGridLayoutExtendedDataModel());
-				}
-				else
-				{
-					var gridLayoutExtendedEntity = currentGridLayoutExtendedEntity && currentGridLayoutExtendedEntity.LayoutColumns.length > 0 ? currentGridLayoutExtendedEntity : defaultGridLayoutExtendedEntity;
-					this._obCurrentGridLayoutExtendedDataModel(new TF.DataModel.GridLayoutExtendedDataModel(gridLayoutExtendedEntity));
-					var defaultLayoutDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, gridLayoutExtendedEntity);
-					this._obDefaultLayoutDataModel(defaultLayoutDataModels);
-				}
-				this._obInitDefaultLayoutDataModel(TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, defaultGridLayoutExtendedEntity));
-				this._layoutFilterId = this._obCurrentGridLayoutExtendedDataModel().filterId();
+				typeName = `${self.options.kendoGridOption.entityType}.${self.options.gridType}`;
+			}
+			var UDGridId = self.options.gridData ? self.options.gridData.value : null;
+			options["UDGridId"] = UDGridId;
+			options["dataType"] = typeName;
+		}
 
-				return this._alertMessageWhenLayoutIsDeleted().then(function()
+		return TF.Grid.LayoutHelper.findGridLayouts(options).then(function(layouts)
+		{
+			const layoutsMap = {};
+			layouts.forEach(r =>
+			{
+				layoutsMap[r.Id] = r;
+			});
+
+			gridLayouts.forEach(gl =>
+			{
+				const layout = layoutsMap[gl.id()];
+				var isDirty = gl.apiIsDirty();
+				if (layout)
 				{
-					this._confirmMessageWhenLayoutFilterIsNotAvailableInCurrentDatasource();
-				}.bind(this));
-			}.bind(this));
+					gl.autoExportExists(!!layout.AutoExportExists);
+					gl.autoExports(layout.AutoExports);
+				}
+				else if (!layoutId || gl.id() === layoutId)
+				{
+					gl.autoExportExists(false);
+					gl.autoExports(null);
+				}
+				gl.apiIsDirty(isDirty);
+			});
+
+			return Promise.resolve();
+		}.bind(self));
 	};
 
-	KendoGridLayoutMenu.prototype._isLayoutFilterIsNotAvaliable = function(gridLayoutExtendedEntity)
+
+	KendoGridLayoutMenu.prototype.loadLayout = function()
 	{
-		if (gridLayoutExtendedEntity && !gridLayoutExtendedEntity.filterId() && gridLayoutExtendedEntity.filterName())
+		const self = this;
+		const { gridType, loadLayout, gridLayout, kendoGridOption, gridData } = self.options;
+		const allColumns = self.getDefinitionLayoutColumns();
+		const defaultLayout = {
+			GridType: gridType,
+			Name: "",
+			LayoutColumns: allColumns,
+			isModified: false
+		};
+
+		self._defaultGridLayoutExtendedEntity = defaultLayout;
+
+		// don't load any layout, use default 
+		if (loadLayout === false)
 		{
-			switch (gridLayoutExtendedEntity.filterName())
+			self._obCurrentGridLayoutExtendedDataModel(new TF.DataModel.GridLayoutExtendedDataModel(defaultLayout));
+			return Promise.resolve();
+		}
+
+		// if layout is specified in option
+		if (gridLayout)
+		{
+			self._obCurrentGridLayoutExtendedDataModel(new TF.DataModel.GridLayoutExtendedDataModel(gridLayout));
+			return Promise.resolve();
+		}
+
+		let typeName = gridType;
+		if (kendoGridOption && kendoGridOption.entityType)
+		{
+			typeName = kendoGridOption.entityType + "." + gridType;
+		}
+
+		var UDGridId = gridData ? gridData.value : null;
+		var promise = (!typeName || self.options.isMiniGrid) ? Promise.resolve([]) :
+			TF.Grid.LayoutHelper.findGridLayouts({ dataType: typeName, showOverlay: true, UDGridId: UDGridId, relationships: "AutoExport,Filter" });
+
+		return promise.then(function(gridLayouts)
+		{
+			var gridLayoutExtendedDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, gridLayouts);
+			self.obGridLayoutExtendedDataModels(gridLayoutExtendedDataModels);
+			self._sortGridLayoutExtendedDataModels();
+			self.setFilterName();
+			let layout = null;
+
+			// If the request is from search, do not use the sticky layout.
+			if (self.shouldUseStickyLayout() && !self.shouldUsePredefinedLayout())
+			{
+				layout = self.getStickyLayout()
+			}
+
+
+			// If cannot find layout in sticky, use the default one
+			if (!layout || layout.layoutColumns().length === 0)
+			{
+				const defaultCopy = JSON.parse(JSON.stringify(defaultLayout));
+
+				if (self.shouldUsePredefinedLayout())
+				{
+					defaultCopy.LayoutColumns = self.options.predefinedGridData.layoutColumns;
+					defaultCopy.isModified = true;
+				}
+
+				layout = new TF.DataModel.GridLayoutExtendedDataModel(defaultCopy);
+			}
+
+
+			// Set lock columns
+			if (layout && layout.layoutColumns().length > 0)
+			{
+				layout.layoutColumns().forEach(function(columnInStorage)
+				{
+					if (columnInStorage.locked === true)
+					{
+						self.tobeLockedColumns.push({ field: columnInStorage.FieldName });
+					}
+				});
+			}
+
+			// Store in observable
+			self._obCurrentGridLayoutExtendedDataModel(layout);
+
+			return self._alertMessageWhenLayoutIsDeleted()
+				.then(() => self._confirmMessageWhenLayoutFilterIsNotAvailableInCurrentDatasource());
+		});
+	}
+
+	/**
+	 * Find sticky layout.
+	 *
+	 * @return {*} 
+	 */
+	KendoGridLayoutMenu.prototype.getStickyLayout = function()
+	{
+		// Firstly, find if there is a sticky layout
+		let layout = tf.storageManager.get(this.options.storageKey + (TF.isMobileDevice ? ".mobile" : ""));
+
+		// Secondly, find if there is a sticky layout id
+		if (layout)
+		{
+			layout = new TF.DataModel.GridLayoutExtendedDataModel(layout);
+		}
+		else
+		{
+			const selectedLayoutId = tf.storageManager.get(this._storageLayoutDataKey);
+			if (selectedLayoutId)
+			{
+				layout = this.obGridLayoutExtendedDataModels().find(o => o.id() === selectedLayoutId);
+
+				// use a clone to avoid affecting value in gridLayoutExtendedDataModels
+				layout && (layout = layout.clone());
+			}
+		}
+
+		return layout;
+	};
+
+	KendoGridLayoutMenu.prototype._isFilterUnavailable = function(gridLayout)
+	{
+		if (gridLayout && !gridLayout.filterId() && gridLayout.filterName())
+		{
+			switch (gridLayout.filterName())
 			{
 				case "Do Not Include":
 					return false;
@@ -423,10 +436,12 @@
 	KendoGridLayoutMenu.prototype._confirmMessageWhenLayoutFilterIsNotAvailableInCurrentDatasource = function(gridLayoutExtendedEntity)
 	{
 		var self = this;
-		var gridLayoutExtendedEntity = gridLayoutExtendedEntity || self._obSelectedGridLayoutExtendedDataModel();
-		if (self._isLayoutFilterIsNotAvaliable(gridLayoutExtendedEntity))
+		var gridLayoutExtendedEntity = gridLayoutExtendedEntity || self._obCurrentGridLayoutExtendedDataModel();
+		if (self._isFilterUnavailable(gridLayoutExtendedEntity))
 		{
-			return tf.promiseBootbox.alert("The Filter saved with this Layout is not in the current database.  Only layout changes will be applied.")
+			return tf.promiseBootbox.confirm({
+				message: "The Filter saved with this Layout is not in the current database.  Only layout changes will be applied."
+			})
 				.then(function(result)
 				{
 					if (result)
@@ -439,127 +454,206 @@
 		return Promise.resolve();
 	};
 
-	KendoGridLayoutMenu.prototype._alertMessageWhenLayoutIsDeleted = function(selectGridLayoutExtendedEntityId)
+	KendoGridLayoutMenu.prototype._alertMessageWhenLayoutIsDeleted = function(layoutId)
 	{
-		var message, isApply = !!selectGridLayoutExtendedEntityId;
-		if (!selectGridLayoutExtendedEntityId)
+		var message;
+		if (!layoutId)
 		{
-			selectGridLayoutExtendedEntityId = tf.storageManager.get(this._storageLayoutDataKey);
-			message = 'The Layout that was applied has been deleted. The system default Layout will be applied to this grid.';
+			layoutId = tf.storageManager.get(this._storageLayoutDataKey);
+			message = 'The applied Layout has been deleted. The system default Layout will be applied to this grid.';
 		}
 		else
 		{
 			message = 'This Layout has been deleted. It cannot be applied.';
 		}
-		if (selectGridLayoutExtendedEntityId && selectGridLayoutExtendedEntityId !== '')
+
+		if (layoutId && this.options.customGridType && this.options.customGridType.toLowerCase() !== "dashboardwidget")
 		{
-			var selectGridLayoutExtendedEntity;
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts?DataTypeID=" + tf.DataTypeHelper.getId(this.options.gridType)))
-				.then(function(apiResponse)
+			return TF.Grid.LayoutHelper.findGridLayouts(
 				{
-					selectGridLayoutExtendedEntity = Enumerable.From(apiResponse.Items).Where(function(c)
-					{
-						if (c)
-						{
-							return c.Name == selectGridLayoutExtendedEntityId;
-						}
-						return false;
-					}).FirstOrDefault();
-				}.bind(this)).then(function()
+					dataType: this.options.gridType,
+					showOverlay: true
+				}).then(function(layouts)
 				{
-					if (!selectGridLayoutExtendedEntity)
+					const selectedLayout = _.find(layouts, (item) => item.Id == layoutId);
+					if (!selectedLayout)
 					{
-						return tf.promiseBootbox.alert(message, 'Warning', 40000).then(function()
+						return true;
+					}
+
+					return tf.promiseBootbox.alert(message, 'Warning', 40000)
+						.then(function()
 						{
-							for (var i = 0, l = this.obGridLayoutExtendedDataModels().length; i < l; i++)
+							const gridLayouts = this.obGridLayoutExtendedDataModels();
+							for (var i = 0; i < gridLayouts.length; i++)
 							{
-								if (this.obGridLayoutExtendedDataModels()[i].name() === selectGridLayoutExtendedEntityId)
+								if (gridLayouts[i].id() === layoutId)
 								{
-									this.obGridLayoutExtendedDataModels.remove(this.obGridLayoutExtendedDataModels()[i]);
+									this.obGridLayoutExtendedDataModels.remove(gridLayouts[i]);
 									break;
 								}
 							}
-							if (!isApply)
-							{
-								this._resetLayout();
-							}
-							return Promise.resolve(false);
+
+							return false;
 						}.bind(this));
-					}
-					return Promise.resolve(true);
 				}.bind(this));
 		}
+
 		return Promise.resolve(true);
 	};
 
-	KendoGridLayoutMenu.prototype._setConfiguration = function(showAllColumns)
+	KendoGridLayoutMenu.prototype._setGridColumnConfiguration = function(showAllColumns, invisible2VisibleUDFs)
 	{
-		var self = this, visibleColumns = [], hiddenColumns = [],
-			layoutColumns = this._obCurrentGridLayoutExtendedDataModel().layoutColumns(), orderColumns = [];
+		const self = this;
+		const currentLayout = self._obCurrentGridLayoutExtendedDataModel();
+
+		if (!currentLayout) { return; }
+
+		var visibleColumns = [],
+			hiddenColumns = [],
+			orderColumns = [],
+			layoutColumns = currentLayout.layoutColumns() || [],
+			invisible2VisibleUDFs = invisible2VisibleUDFs || [],
+			allAvailableColumns = this._gridDefinition.Columns,
+			/**
+			 * Once user modify the layout, invisible udf columns will be discarded.
+			 * It means that all invisible udf columns were shown together at a specific previous point.
+			 */
+			invisibleUDFColumns = self.getInvisibleUDFColumnsForCurrentLayout();
+
 		//If show all columns
 		if (showAllColumns)
 		{
-			orderColumns = this._gridDefinition.Columns;
+			orderColumns = allAvailableColumns;
 		}
 		else
 		{
-			for (var i = 0, len = this._gridDefinition.Columns.length; i < len; i++)
+			if (typeof layoutColumns === 'string')
 			{
-				var fieldName = this._gridDefinition.Columns[i].FieldName;
-				var layoutColumn = Enumerable.From(layoutColumns).Where(function(c)
+				layoutColumns = JSON.parse(layoutColumns);
+			}
+
+			layoutColumns = layoutColumns.filter(function(c)
+			{
+				return !invisibleUDFColumns.some(function(i)
 				{
-					return c.FieldName == fieldName
-				}).ToArray()[0];
+					return i.UDFId === c.UDFId;
+				});
+			});
+
+			invisibleUDFColumns.sort(function(a, b)
+			{
+				return a.index - b.index;
+			}).forEach(function(item)
+			{
+				layoutColumns.splice(item.index, 0, item);
+			});
+
+			invisibleUDFColumns = self.handleInvisibleUDFColumns(layoutColumns).map(function(i)
+			{
+				return {
+					UDFId: i.UDFId,
+					index: _.findIndex(layoutColumns, function(u)
+					{
+						return u.UDFId === i.UDFId;
+					})
+				};
+			});
+
+			self._obSelectedInvisibleColumns(invisibleUDFColumns);
+
+			layoutColumns = self.handleUDFColumns(layoutColumns);
+			layoutColumnDict = _.keyBy(layoutColumns, col => col.FieldName);
+
+			allAvailableColumns.forEach(col =>
+			{
+				// forward compatibility: support 'Sex' field
+				if (col.FieldName === PREVIOUS_GENDER_NAME)
+				{
+					col.FieldName = CURRENT_GENDER_NAME;
+				}
+
+				const layoutColumn = layoutColumnDict[col.FieldName];
 				if (layoutColumn)
 				{
 					if (layoutColumn.Width)
 					{
-						this._gridDefinition.Columns[i].Width = layoutColumn.Width;
-						this._gridDefinition.Columns[i].width = layoutColumn.Width;
+						col.Width = layoutColumn.Width;
+						//When displaying data, assign Width to width, which is used for page display
+						col.width = layoutColumn.Width;
 					}
+
 					if (layoutColumn.locked)
 					{
-						this._gridDefinition.Columns[i].locked = layoutColumn.locked;
+						col.locked = layoutColumn.locked;
 					}
-					visibleColumns.push(this._gridDefinition.Columns[i]);
+
+					col.hidden = false;
+					visibleColumns.push(col);
 				}
 				else
 				{
-					hiddenColumns.push(this._gridDefinition.Columns[i]);
+					col.hidden = true;
+					hiddenColumns.push(col);
 				}
-			}
+			});
+
 
 			for (var i = 0, len = layoutColumns.length; i < len; i++)
 			{
-				var fieldName = layoutColumns[i].FieldName;
-				var layoutColumn = Enumerable.From(visibleColumns).Where(function(c)
+				var udfId = layoutColumns[i].UDFId;
+				if (udfId)
 				{
-					return c.FieldName == fieldName
-				}).ToArray()[0];
-				if (layoutColumn)
+					orderColumns = orderColumns.concat(visibleColumns.filter((c) => c.UDFId == udfId));
+				}
+				else
 				{
-					orderColumns.push(layoutColumn);
+					var fieldName = layoutColumns[i].FieldName;
+					var layoutColumn = visibleColumns.find((c) => c.FieldName == fieldName);
+					if (layoutColumn)
+					{
+						orderColumns.push(layoutColumn);
+					}
 				}
 			}
 		}
 
-		this.obSummaryGridVisible(this._obCurrentGridLayoutExtendedDataModel().showSummaryBar());
-		this._obSelectedColumns(orderColumns);
-		this._availableColumns = hiddenColumns;
-		var sortedItems = Enumerable.From(layoutColumns)
-			.Where(function(c)
+
+		orderColumns = orderColumns.filter((column) => !column.ParentField);
+
+		var allChildColumns = allAvailableColumns.filter((column) => column.ParentField);
+		if (allChildColumns.length > 0)
+		{
+			$.each(allChildColumns, function(i, childColumn)
 			{
-				return c.SortIndex != null
-			})
-			.Select(function(c)
+				var parentColumn = orderColumns.filter((column) => column.FieldName === childColumn.ParentField);
+
+				if (parentColumn && parentColumn.length > 0)
+				{
+					orderColumns.splice(orderColumns.indexOf(parentColumn[0]) + 1, 0, childColumn);
+				}
+			});
+		}
+
+		var sortedItems = layoutColumns
+			.filter((c) => c.SortIndex != null)
+			.map((c) =>
 			{
-				return new TF.Grid.SortItem(c.FieldName, c.SortAscending)
-			})
-			.ToArray();
-		if (!(this._obSortedItems().length == 0 && sortedItems.length == 0))
+				var fieldName = tf.UDFDefinition.getOriginalName(c.FieldName);
+				return new TF.Grid.SortItem(fieldName, c.SortAscending)
+			});
+
+		// Sort items need to be before selected columns.
+		if (this._obSortedItems().length > 0 || sortedItems.length > 0)
 		{
 			this._obSortedItems(sortedItems);
 		}
+
+		this._obSelectedColumns(orderColumns);
+		this._availableColumns = hiddenColumns;
+
+		this.obSummaryGridVisible(currentLayout.showSummaryBar());
+
 		var aggregationMap = {};
 		Enumerable.From(layoutColumns)
 			.Where(function(c)
@@ -570,83 +664,137 @@
 			{
 				aggregationMap[c.FieldName] = c.AggregationOperator;
 			});
+
 		this.obAggregationMap(aggregationMap);
+	};
+
+	KendoGridLayoutMenu.prototype.invisibleUDFColumnsStorageKey = function()
+	{
+		var self = this,
+			id = self._obCurrentGridLayoutExtendedDataModel() && self._obCurrentGridLayoutExtendedDataModel().id();
+
+		if (!id)
+		{
+			return String.format("grid.invisible.udfs.{0}", self.options.gridType);
+		}
+
+		return String.format("grid.invisible.udfs.{0}.{1}", self.options.gridType, id);
+	}
+
+	KendoGridLayoutMenu.prototype._invisibleUDFColumnsChange = function()
+	{
+		tf.storageManager.save(this.invisibleUDFColumnsStorageKey(), this._obSelectedInvisibleColumns(), null, null, false);
+	};
+
+	KendoGridLayoutMenu.prototype._clearInvisibleUDFColumns = function()
+	{
+		tf.storageManager.save(this.invisibleUDFColumnsStorageKey(), "", null, null, false);
+	};
+
+	KendoGridLayoutMenu.prototype.getInvisibleUDFColumnsForCurrentLayout = function()
+	{
+		return tf.storageManager.get(this.invisibleUDFColumnsStorageKey()) || [];
 	};
 
 	KendoGridLayoutMenu.prototype._updateCurrentLayout = function()
 	{
-		if (this._applyingLayout || !this.obLayoutFilterOperation || !this.obLayoutFilterOperation() || !this._obCurrentGridLayoutExtendedDataModel())
+		if (this._applyingLayout)
 		{
 			return;
 		}
-		var i, sortedItem, layoutColumn;
-		var selectedColumns = this._obSelectedColumns();
-		var sortedItems = this._obSortedItems();
-		var aggregationMap = this.obAggregationMap();
-		var currentGridLayoutExtendedDataModel = this._obCurrentGridLayoutExtendedDataModel();
 
-		var newLayoutColumns = [];
-		for (i = 0; i < selectedColumns.length; i++)
+		let isLayoutUpdated = false;
+		var selectedColumns = this._obSelectedColumns();
+		var sortItemList = this._obSortedItems();
+		var aggregationMap = this.obAggregationMap();
+		var currentLayout = this._obCurrentGridLayoutExtendedDataModel();
+
+		const sortItemDict = new Map();
+
+		sortItemList.forEach((item, index) => sortItemDict.set(item.Name, index));
+
+		const newLayoutColumns = selectedColumns.map(col =>
 		{
-			layoutColumn = {
-				FieldName: selectedColumns[i].FieldName,
-				Width: selectedColumns[i].width
+			var fieldName = tf.UDFDefinition.getOriginalName(col.FieldName);
+			const layoutColumn = {
+				FieldName: fieldName,
+				Width: col.width
 			};
-			if (selectedColumns[i].UDFId)
+
+			if (col.UDFId)
 			{
-				layoutColumn.UDFId = selectedColumns[i].UDFId;
+				layoutColumn.UDFId = col.UDFId;
+				delete layoutColumn.FieldName;
 			}
-			if (selectedColumns[i].locked)
+
+			if (col.locked)
 			{
 				layoutColumn.locked = true;
 			}
-			sortedItem = Enumerable.From(sortedItems).Where(function(c)
+
+			if (sortItemDict.has(fieldName))
 			{
-				return c.Name == selectedColumns[i].FieldName
-			}).ToArray()[0];
-			if (sortedItem)
-			{
-				layoutColumn.SortIndex = sortedItems.indexOf(sortedItem);
-				layoutColumn.SortAscending = sortedItem.isAscending();
+				const sortIndex = sortItemDict.get(fieldName);
+				const sortItem = sortItemList[sortIndex]
+				layoutColumn.SortIndex = sortIndex;
+				layoutColumn.SortAscending = sortItem.isAscending();
 			}
-			var aggregationOperator = aggregationMap[selectedColumns[i].FieldName];
+
+			var aggregationOperator = aggregationMap[fieldName];
 			if (aggregationOperator)
 			{
 				layoutColumn.AggregationOperator = aggregationOperator;
 			}
-			newLayoutColumns.push(layoutColumn);
-		}
-		var oldString = JSON.stringify(currentGridLayoutExtendedDataModel.layoutColumns());
+
+			return layoutColumn;
+		});
+
+		var oldString = JSON.stringify(currentLayout.layoutColumns());
 		var newString = JSON.stringify(newLayoutColumns);
 		if (oldString != newString)
 		{
-			currentGridLayoutExtendedDataModel.layoutColumns(newLayoutColumns);
+			currentLayout.layoutColumns(newLayoutColumns);
+			isLayoutUpdated = true;
 		}
-		currentGridLayoutExtendedDataModel.showSummaryBar(this.obSummaryGridVisible());
-		this._obCurrentGridLayoutExtendedDataModel.valueHasMutated();
+
+		const summaryVisibleState = this.obSummaryGridVisible();
+		if (currentLayout.showSummaryBar() !== summaryVisibleState)
+		{
+			currentLayout.showSummaryBar(summaryVisibleState);
+			isLayoutUpdated = true;
+		}
+
+		if (isLayoutUpdated)
+		{
+			this._currentLayoutChange();
+		}
 	};
 
 	KendoGridLayoutMenu.prototype._currentLayoutChange = function()
 	{
-		if (this.options.loadLayout === false)
+		const self = this;
+		if (self.options.loadLayout === false)
 		{
 			return;
 		}
-		var gridLayoutExtendedDataModel = this._obCurrentGridLayoutExtendedDataModel().clone();
-		gridLayoutExtendedDataModel.name("");
-		gridLayoutExtendedDataModel.description("");
-		gridLayoutExtendedDataModel.filterId(null);
-		this._obDefaultLayoutDataModel(gridLayoutExtendedDataModel);
-		this._obDefaultLayoutDataModel().apiIsDirty(true);
-		//IF the request from search, do not sticky the layout.
-		if (this.options.fromSearch || this.options.isTemporaryFilter)
+
+		// If the request from search, do not sticky the layout.
+		const shouldUseStickyLayout = self.shouldUseStickyLayout();
+		const isDashboardWidget = self.options.customGridType && self.options.customGridType.toLowerCase() == "dashboardwidget";
+		const shouldUsePredefinedLayout = this.shouldUsePredefinedLayout();
+		const isMiniGrid = !!self.options.isMiniGrid;
+
+		if (!shouldUseStickyLayout || isDashboardWidget || shouldUsePredefinedLayout || isMiniGrid)
 		{
 			return;
 		}
-		if (!this.options.isCalendarView)
-		{
-			tf.storageManager.save(this.options.storageKey, gridLayoutExtendedDataModel.toData(), null, null, false);
-		}
+
+		const key = `${self.options.storageKey}${(TF.isMobileDevice ? ".mobile" : "")}`;
+		const clone = self._obCurrentGridLayoutExtendedDataModel().clone();
+
+		clone.description("");
+
+		tf.storageManager.save(key, clone.toData(), null, null, false);
 	};
 
 	KendoGridLayoutMenu.prototype.resetLayoutClick = function(viewModel, e)
@@ -678,56 +826,77 @@
 
 	KendoGridLayoutMenu.prototype._resetLayout = function()
 	{
-		if (this._obCurrentGridLayoutExtendedDataModel()._entityBackup.FilterId && this._obCurrentGridLayoutExtendedDataModel()._entityBackup.FilterId === this._obCurrentGridLayoutExtendedDataModel().filterId())
-		{
-			this.obSelectedGridFilterId(null);
-		}
-		this._applyingLayout = true;
-		this._layoutFilterId = null;
-		this._revertCurrentLayoutChange();
+		const self = this;
+		const promiseTasks = [];
 
-		this._obSelectedGridLayoutExtendedDataModel(null);
-		this._resetAppliedLayoutInitState(null);
+		self._applyingLayout = true;
+		const defaultLayout = new TF.DataModel.GridLayoutExtendedDataModel(self._defaultGridLayoutExtendedEntity);
+		self._obCurrentGridLayoutExtendedDataModel(defaultLayout);
+		self.clearFilter();
 
-		this._obCurrentGridLayoutExtendedDataModel(new TF.DataModel.GridLayoutExtendedDataModel(this._defaultGridLayoutExtendedEntity));
-		this._setConfiguration();
-		this._setGridState();
-		this.obAggregationMap([]);
-		this.obSummaryGridVisible(false);
-		this._applyingLayout = false;
-		this.obResetLayout(true);
+		// clear predefined data from share link.
+		delete self.options.predefinedGridData;
+
 		//IF the request from search, do not sticky the layout.
-		if (this.options.fromSearch || this.options.isTemporaryFilter)
+		const shouldUseStickyLayout = self.shouldUseStickyLayout();
+		if (shouldUseStickyLayout)
 		{
-			return;
+			tf.storageManager.delete(self._storageLayoutDataKey);
+			tf.storageManager.delete(self._storageFilterDataKey);
 		}
-		tf.storageManager.save(this._storageLayoutDataKey, null);
+
+		self._setGridColumnConfiguration();
+		promiseTasks.push(self._setGridState({ obTempOmitExcludeAnyIds: self.obTempOmitExcludeAnyIds() }));
+		self.obAggregationMap([]);
+		self.obSummaryGridVisible(false);
+
+		return Promise.all(promiseTasks)
+			.then(() =>
+			{
+				self._applyingLayout = false;
+			});
 	};
 
-	KendoGridLayoutMenu.prototype.mangeLayoutClick = function(viewModel, e)
+	KendoGridLayoutMenu.prototype.manageLayoutClick = function(viewModel, e)
 	{
-		var self = this;
-		this.obGridLayoutExtendedDataModels().forEach(function(item)
+		const self = this;
+		self.setFilterName();
+		const reloadLayout = () =>
 		{
-			var filter = self.obGridFilterDataModels().filter(function(filter)
+			return self.loadGridFilter()
+				.then(() => { return self.loadLayout(); });
+		};
+
+		self.syncLayoutAutoExports().then(function()
+		{
+			tf.modalManager.showModal(
+				new TF.Modal.Grid.ManageLayoutModalViewModel(
+					self.obGridLayoutExtendedDataModels,
+					self.obGridFilterDataModels,
+					self.saveAndEditLayout,
+					self.applyLayout,
+					self.obSelectedGridLayoutName,
+					self.options,
+					reloadLayout
+				)
+			);
+		});
+	};
+
+	KendoGridLayoutMenu.prototype.setFilterName = function()
+	{
+		const self = this;
+		const filterIdDict = _.keyBy(self.obGridFilterDataModels(), o => o.id());
+
+		self.obGridLayoutExtendedDataModels().forEach(function(item)
+		{
+			const filter = filterIdDict[item.filterId()];
+			if (filter)
 			{
-				return filter.id() === item.filterId();
-			});
-			if (filter && filter.length > 0 && item.filterName() != filter[0].name())
-			{
-				item.filterName(filter[0].name());
+				item.filterName(filter.name());
 			}
 		});
-		tf.modalManager.showModal(
-			new TF.Modal.Grid.ManageLayoutModalViewModel(
-				this.obGridLayoutExtendedDataModels,
-				this.obGridFilterDataModels,
-				this.saveAndEditLayout,
-				this.applyLayout,
-				this.obSelectedGridLayoutName
-			)
-		);
-	};
+	}
 
 	KendoGridLayoutMenu.prototype.gridLayoutClick = function(gridLayoutExtendDataModel, e)
 	{
@@ -735,42 +904,37 @@
 
 		var isCheckedItem = $(e.target).parent().hasClass('menu-item-checked');
 		if (TF.isPhoneDevice && isCheckedItem)
+		{
 			return self._resetLayout();
+		}
 		else
-			return self.notifyUpdateAndApplyLayout.bind(self)(gridLayoutExtendDataModel);
+		{
+			return self.notifyUpdateAndApplyLayout(gridLayoutExtendDataModel);
+		}
 	};
 
-	KendoGridLayoutMenu.prototype.notifyUpdateAndApplyLayout = function(gridLayoutExtendDataModel)
+	KendoGridLayoutMenu.prototype.notifyUpdateAndApplyLayout = function(layout)
 	{
-		var self = this;
-		var saveCurrentFilterOperationResult = true;
+		var self = this, prepareTask = null;
+		if (self.kendoGrid.dataSource.filter() && layout.filterId() != null)
+		{
+			prepareTask = self.clearKendoGridQuickFilter();
+		}
 
-		var triggerName = 'layout';
-		return self.saveCurrentFilter(triggerName)
-			.then(function(result)
+		return Promise.resolve(prepareTask)
+			.then(() =>
 			{
-				saveCurrentFilterOperationResult = result.operationResult;
-				if (saveCurrentFilterOperationResult !== null && self.kendoGrid.dataSource.filter())
-					return self.clearKendoGridQuickFilter.bind(self)();
-				else
-					return Promise.resolve();
-			})
-			.then(function()
-			{
-				if (saveCurrentFilterOperationResult !== null)
-					return self.applyLayout.bind(self)(gridLayoutExtendDataModel);
-				else
-					return Promise.resolve(saveCurrentFilterOperationResult);
+				return self.applyLayout(layout);
 			});
 	};
 
-	KendoGridLayoutMenu.prototype._confirmMessageWhenfilterIsNotValid = function(filter, gridLayoutExtendDataModel)
+	KendoGridLayoutMenu.prototype._confirmMessageWhenfilterIsNotValid = function(filter, layoutName)
 	{
-		if (filter.IsValid === false)
+		if (filter && filter.IsValid === false)
 		{
 			return tf.promiseBootbox.yesNo(
 				{
-					message: "This Layout has a Filter associated with it that cannot be loaded. The Layout can be opened, but the Filter will not be applied. Are you sure you want to apply this Layout (" + gridLayoutExtendDataModel.name() + ")?"
+					message: "This Layout has a Filter associated with it that cannot be loaded. The Layout can be opened, but the Filter will not be applied. Are you sure you want to apply this Layout (" + layoutName + ")?"
 				},
 				"Confirmation Message"
 			).then(function(result)
@@ -785,62 +949,19 @@
 		return Promise.resolve(true);
 	};
 
-	KendoGridLayoutMenu.prototype.applyLayout = function(gridLayoutExtendDataModel, isNoConfirm)
+	KendoGridLayoutMenu.prototype.applyLayout = function(gridLayout, isNoConfirm)
 	{
 		var self = this;
 
-		return self._alertMessageWhenLayoutIsDeleted(gridLayoutExtendDataModel.name())
+		gridLayout = gridLayout.clone();
+
+		return self._alertMessageWhenLayoutIsDeleted(gridLayout.name())
 			.then(function(existLayout)
 			{
 				if (!existLayout)
 					return Promise.resolve(false);
 
-				if (self.obSelectedGridLayoutModified() == "modified" && self._obSelectedGridLayoutExtendedDataModel() && !isNoConfirm)
-				{
-					var message = "The currently applied layout (" + self._obSelectedGridLayoutExtendedDataModel().name() + ") has unsaved changes. Would you like to save these changes before applying this layout?";
-					return tf.promiseBootbox.yesNo(message, "Unsaved Changes"
-					).then(function(result)
-					{
-						if (result)
-						{
-							return Promise.resolve()
-								.then(function(result)
-								{
-									return self.obSelectedGridLayoutModified() ? self.saveLayout() : Promise.resolve(result && true);
-								})
-								.then(function(result)
-								{
-									//IF the request from search, do not sticky the filter.
-									if (self.options.fromSearch || self.options.isTemporaryFilter)
-									{
-										return self.applyLayoutExtended(gridLayoutExtendDataModel);
-									}
-									return tf.storageManager.save(self._storageFilterDataKey, gridLayoutExtendDataModel.filterId())
-										.then(function()
-										{
-											return self.applyLayoutExtended(gridLayoutExtendDataModel);
-										});
-								});
-						}
-						else if (result === false)
-						{
-							self._revertCurrentLayoutChange();
-							return self.applyLayoutExtended(gridLayoutExtendDataModel);
-						}
-						else
-						{
-							// Click cross button, nothing to do.
-						}
-					});
-				}
-				else
-				{
-					if (self.obSelectedGridLayoutModified() == "modified")
-					{
-						self._revertCurrentLayoutChange();
-					}
-					return self.applyLayoutExtended(gridLayoutExtendDataModel);
-				}
+				return self.applyLayoutExtended(gridLayout);
 			});
 	};
 
@@ -853,138 +974,211 @@
 			});
 	};
 
-	KendoGridLayoutMenu.prototype.applyLayoutExtended = function(gridLayoutExtendDataModel)
+	KendoGridLayoutMenu.prototype.applyLayoutExtended = function(gridLayout)
 	{
-		var self = this;
-		var layoutId = gridLayoutExtendDataModel.id();
-		var filterId = gridLayoutExtendDataModel.filterId();
-		var filter = null;
-		return TF.Grid.FilterHelper.getFilterById(filterId)
-			.then(function(filterObj)
-			{
-				filter = filterObj;
-				if (filterId && !filterObj)
-				{
-					message = 'The Filter that was applied has been deleted. The system default Filter will be applied to this grid.';
-					return tf.promiseBootbox.alert(message, 'Warning', 40000);
-				}
-				else
-					return Promise.resolve(true);
-			})
-			.then(function()
-			{
-				return this._confirmMessageWhenfilterIsNotValid(filter, gridLayoutExtendDataModel);
-			}.bind(this))
-			.then(function()
-			{
-				return self._getLayoutRelatedFilterId.bind(self)(layoutId);
-			})
+		const self = this;
+		const layoutId = gridLayout.id();
+
+		return self._getLayoutRelatedFilterId.bind(self)(layoutId)
 			.then(function(relatedFilterId)
 			{
-				gridLayoutExtendDataModel.filterId(relatedFilterId);
-				self._obSelectedGridLayoutExtendedDataModel(gridLayoutExtendDataModel);
-				self._resetAppliedLayoutInitState(self._obSelectedGridLayoutExtendedDataModel());
-				self._obCurrentGridLayoutExtendedDataModel(gridLayoutExtendDataModel);
-				self._applyLayoutExtended.bind(self)(gridLayoutExtendDataModel);
-
-				return Promise.resolve(true);
-			}).then(function()
+				gridLayout.filterId(relatedFilterId);
+				return self.requestForLayoutExtendedData(gridLayout)
+			})
+			.then(function(res)
 			{
-				return self._confirmMessageWhenLayoutFilterIsNotAvailableInCurrentDatasource();
-			}).catch(function() { });
+				return self._confirmMessageWhenfilterIsNotValid(res.filterData, gridLayout.name());
+			})
+			.then(function(shouldProceed)
+			{
+				if (!shouldProceed)
+				{
+					return;
+				}
+
+				//IF the request from search, do not sticky the layout.
+				const shouldUseStickyLayout = self.shouldUseStickyLayout();
+				if (shouldUseStickyLayout && !self.isDashboardWidget())
+				{
+					// Remove custom filter ids when a layout is applied.
+					tf.storageManager.delete(self._storageFilterDataKey);
+					tf.storageManager.save(self._storageLayoutDataKey, gridLayout.id());
+				}
+
+				// set _applyingLayout to true, to avoid unnecessary value updates during the process.
+				self._applyingLayout = true;
+				self._obCurrentGridLayoutExtendedDataModel(gridLayout);
+				self._applyLayoutExtended(gridLayout);
+				self._setGridColumnConfiguration();
+				return self._confirmMessageWhenLayoutFilterIsNotAvailableInCurrentDatasource()
+					.then(function()
+					{
+						return self._setGridState(gridLayout.filterId() ? undefined : { obTempOmitExcludeAnyIds: self.obTempOmitExcludeAnyIds() });
+					})
+					.then(function()
+					{
+						self._applyingLayout = false;
+						self._obCurrentGridLayoutExtendedDataModel.valueHasMutated();
+					});
+			})
+			.catch((error) =>
+			{
+				console.log(error);
+			});
 	};
 
-	KendoGridLayoutMenu.prototype._applyLayoutExtended = function(gridLayoutExtendDataModel)
+	/**
+	 * Currently, layout is not well linked to filter and thematic in EF.
+	 *
+	 * @param {*} layoutData
+	 * @returns
+	 */
+	KendoGridLayoutMenu.prototype.requestForLayoutExtendedData = function(layoutData)
 	{
-		var selectedObGridFilterDataModels = Enumerable.From(this.obGridFilterDataModels()).Where(function(c)
-		{
-			return c.id() == gridLayoutExtendDataModel.filterId();
-		}).ToArray();
+		const filterId = layoutData.filterId();
+		let requestForFilter = null;
 
-		if (selectedObGridFilterDataModels.length > 0)
-			this.obSelectedGridFilterId(gridLayoutExtendDataModel.filterId());
-		else
+		if (filterId)
 		{
-			this.obSelectedGridFilterId(null);
+			requestForFilter = TF.Grid.FilterHelper.getFilterById(filterId);
 		}
 
-		if (this.relatedFilterEntity)
+		return Promise.all([
+			requestForFilter
+		]).then((res) =>
+		{
+			const [filterData] = res;
+			const filterName = filterData ? filterData.Name : "";
+
+			layoutData.filterName(filterName);
+
+			return { filterData };
+		});
+	};
+
+	KendoGridLayoutMenu.prototype._applyLayoutExtended = function(gridLayout)
+	{
+		var layoutFilterId = gridLayout.filterId(),
+			currentFilterId = this.obSelectedGridFilterId(),
+			filterNeedsChange = layoutFilterId !== currentFilterId,
+			hasValidFilter = layoutFilterId && (this.obGridFilterDataModels() || []).some(c => c.id() === layoutFilterId);
+
+		// Switch filter when necessary.
+		if (filterNeedsChange)
+		{
+			this.obSelectedGridFilterId(layoutFilterId);
+		}
+
+		// Set up filter related variables.
+		if (layoutFilterId)
 		{
 			delete this.relatedFilterEntity;
-		}
-		if (this.obCallOutFilterName())
-		{
 			this.obCallOutFilterName(null);
-		}
-		if (this.options.callOutFilterName)
-		{
 			this.options.callOutFilterName = null;
-		}
-		if (this._gridState.filteredIds)
-		{
 			this._gridState.filteredIds = null;
-		}
-		if (this.isFromRelated())
-		{
 			this.isFromRelated(false);
 		}
-
-		if (gridLayoutExtendDataModel.filterId() && selectedObGridFilterDataModels.length === 0)
+		else
 		{
-			this._obSelectedGridLayoutExtendedDataModel().filterId(null);
+			filterNeedsChange = filterNeedsChange
+				|| this.relatedFilterEntity
+				|| this.obCallOutFilterName()
+				|| this.options.callOutFilterName
+				|| this._gridState.filteredIds
+				|| this.isFromRelated()
+				|| (this.obTempOmitExcludeAnyIds() && this.obTempOmitExcludeAnyIds().length);
+		}
+
+		// If there is an invalid in the layout, show the error message.
+		if (layoutFilterId && !hasValidFilter)
+		{
+			gridLayout.filterId(null);
 			this.obSelectedGridFilterId(null);
-			this.gridAlert.show(
-				{
-					alert: this.gridAlert.alertOption.danger,
-					message: "The layout filter doesn't exist. No filter applied."
-				});
+			this.gridAlert.show({
+				alert: this.gridAlert.alertOption.danger,
+				message: "The layout filter doesn't exist. No filter is applied."
+			});
 		}
 
-		this._setConfiguration();
-		this._setGridState();
-		this._obCurrentGridLayoutExtendedDataModel().apiIsDirty(false);
-		//IF the request from search, do not sticky the layout.
-		if (this.options.fromSearch || this.options.isTemporaryFilter)
-		{
-			return;
-		}
-		var layoutName = gridLayoutExtendDataModel.name();
-		ga('send', 'event', 'Action', 'Grid Layout', layoutName);
-		tf.storageManager.save(this._storageLayoutDataKey, layoutName);
+		this.clearPredefinedGridFilter();
+		gridLayout.apiIsDirty(filterNeedsChange);
 	};
 
 	KendoGridLayoutMenu.prototype.saveLayoutClick = function(viewModel, e)
 	{
 		var self = this;
-		var isNew = !self._obSelectedGridLayoutExtendedDataModel();
+		const selectedLayout = self._obCurrentGridLayoutExtendedDataModel();
+		var isNew = !selectedLayout.id();
+
 		if (isNew)
-			return self.saveAndEditLayout("new", self._obSelectedGridLayoutExtendedDataModel(), true);
+		{
+			return self.saveAndEditLayout("new", selectedLayout, true);
+		}
 		else
 		{
-			return self.syncFilter().then(self.saveLayout.bind(self)())
-				.then(function()
+			return self.syncFilter().then(self.saveLayout.bind(self))
+				.then(function(res)
 				{
-					return self._obSelectedGridLayoutExtendedDataModel().apiIsDirty(false);
+					if (res)
+					{
+						selectedLayout.apiIsDirty(false);
+					}
+					return res;
 				});
 		}
 	};
 
 	KendoGridLayoutMenu.prototype.saveLayout = function()
 	{
-		this._resetAppliedLayoutInitState(this._obSelectedGridLayoutExtendedDataModel());
-		this._updateGridLayoutExtendedDataModels(this._obSelectedGridLayoutExtendedDataModel());
-		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", this._obSelectedGridLayoutExtendedDataModel().id()),
+		const gridLayout = this._obCurrentGridLayoutExtendedDataModel();
+		const syncPromise = (gridLayout && gridLayout.id())
+			? this.syncLayoutAutoExports(gridLayout.id())
+			: Promise.resolve();
+		return syncPromise.then(function()
+		{
+			if (gridLayout && gridLayout.autoExportExists())
 			{
-				data: {
-					ID: this._obSelectedGridLayoutExtendedDataModel().id(),
-					DataTypeID: tf.DataTypeHelper.getId(this.options.gridType),
-					Name: this._obSelectedGridLayoutExtendedDataModel().name(),
-					FilterID: this._obSelectedGridLayoutExtendedDataModel().filterId(),
-					FilterName: this._obSelectedGridLayoutExtendedDataModel().filterName(),
-					ShowSummaryBar: this._obSelectedGridLayoutExtendedDataModel().showSummaryBar(),
-					Description: this._obSelectedGridLayoutExtendedDataModel().description(),
-					LayoutColumns: JSON.stringify(this._obSelectedGridLayoutExtendedDataModel().layoutColumns())
-				}
+				var message = `This layout is associated with ${gridLayout.autoExportNames()}.`;
+				message += " Changes to this layout will affect the data and format of the data being exported. Are you sure you want to modify this layout?";
+				return tf.promiseBootbox.yesNo(message, "Confirmation Message");
+			}
+			return Promise.resolve(true);
+		}.bind(this)).then(function(canSave)
+		{
+			return canSave ? this.saveLayoutCore() : Promise.resolve(false);
+		}.bind(this));
+	};
+
+	KendoGridLayoutMenu.prototype.getCurrentLayoutEntity = function(options)
+	{
+		const gridType = this._gridType;
+		const selectedLayout = this._obCurrentGridLayoutExtendedDataModel();
+		const layoutColumns = options && options.LayoutColumns || selectedLayout.layoutColumns();
+		const layoutAutoExportColumns = tf.dataTypeHelper.checkAutoExportSupport(gridType) ? tf.dataTypeHelper.mappingLayoutColumns(layoutColumns, gridType) : "";
+		const layoutEntity = {
+			ID: selectedLayout.id(),
+			DataTypeID: tf.dataTypeHelper.getId(gridType),
+			Name: selectedLayout.name(),
+			UDGridId: this.options.gridData ? this.options.gridData.value : null,
+			ShowSummaryBar: selectedLayout.showSummaryBar(),
+			Description: selectedLayout.description(),
+			LayoutColumns: JSON.stringify(layoutColumns),
+			LayoutAutoExportColumns: JSON.stringify(layoutAutoExportColumns),
+			FilterID: selectedLayout.filterId(),
+			FilterName: selectedLayout.filterName(),
+		};
+
+		return layoutEntity;
+	};
+
+	KendoGridLayoutMenu.prototype.saveLayoutCore = function()
+	{
+		const layoutModel = this._obCurrentGridLayoutExtendedDataModel();
+		const layoutEntity = this.getCurrentLayoutEntity();
+		this._updateGridLayoutExtendedDataModels(layoutModel);
+		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", layoutEntity.ID),
+			{
+				data: layoutEntity
 			});
 	};
 
@@ -1014,61 +1208,55 @@
 
 	KendoGridLayoutMenu.prototype.saveAsNewLayoutClick = function(viewModel, e)
 	{
-		if (this._obSelectedGridLayoutExtendedDataModel())
-		{
-			this.saveAndEditLayout("new", this._obSelectedGridLayoutExtendedDataModel(), true);
-		}
-		else
-		{
-			this.saveLayoutClick(viewModel, e);
-		}
+		const currentLayout = this._obCurrentGridLayoutExtendedDataModel();
+		this.saveAndEditLayout("new", currentLayout, true);
 	};
 
-	KendoGridLayoutMenu.prototype.saveAndEditLayout = function(isNew, gridLayoutExtendedDataModel, isNoConfirm)
+	KendoGridLayoutMenu.prototype.saveAndEditLayout = function(isNew, editingLayout, isNoConfirm)
 	{
-		return tf.modalManager.showModal(new TF.Modal.Grid.ModifyLayoutModalViewModel(
-			this._gridType,
+		return tf.modalManager.showModal(new TF.Modal.Grid.ModifyLayoutModalViewModel({
+			gridType: this._gridType,
 			isNew,
-			gridLayoutExtendedDataModel ? gridLayoutExtendedDataModel : this._obCurrentGridLayoutExtendedDataModel(),
-			this.obGridFilterDataModels,
-			this.obSelectedGridFilterId
-		))
-			.then(function(result)
-			{
-				if (!result)
-				{
-					return result;
-				}
-				var savedGridLayoutExtendedDataModel = result.savedGridLayoutExtendedDataModel;
-				if (isNew !== "new")
-				{
-					gridLayoutExtendedDataModel.update(savedGridLayoutExtendedDataModel.toData());
-				}
-				else
-				{
-					this.obGridLayoutExtendedDataModels.push(new TF.DataModel.GridLayoutExtendedDataModel(savedGridLayoutExtendedDataModel.toData()));
-				}
-				if (result.applyOnSave)
-				{
-					return this.applyLayout(savedGridLayoutExtendedDataModel, isNoConfirm);
-				}
-				else
-				{
-					if (this._obSelectedGridLayoutExtendedDataModel() && isNew !== "new" && this._obSelectedGridLayoutExtendedDataModel().id() == gridLayoutExtendedDataModel.id())
-					{
-						this.applyLayout(gridLayoutExtendedDataModel, isNoConfirm);
-					}
-				}
-				return savedGridLayoutExtendedDataModel;
-			}.bind(this));
-	};
-
-	KendoGridLayoutMenu.prototype._revertCurrentLayoutChange = function()
-	{
-		if (this._obSelectedGridLayoutExtendedDataModel())
+			gridLayout: editingLayout ? editingLayout : this._obCurrentGridLayoutExtendedDataModel(),
+			allFilters: this.obGridFilterDataModels(),
+			selectedFilterId: this.obSelectedGridFilterId(),
+			uDGridId: this.options.gridData ? this.options.gridData.value : null
+		})).then(function(result)
 		{
-			this._obSelectedGridLayoutExtendedDataModel().revert();
-		}
+			if (!result)
+			{
+				return result;
+			}
+
+			const savedLayout = result.savedGridLayoutExtendedDataModel;
+
+			if (isNew !== "new")
+			{
+				editingLayout.update(savedLayout.toData());
+			}
+			else
+			{
+				const newLayout = new TF.DataModel.GridLayoutExtendedDataModel(savedLayout.toData());
+				this.obGridLayoutExtendedDataModels.push(newLayout);
+				this._sortGridLayoutExtendedDataModels();
+			}
+
+			if (result.applyOnSave)
+			{
+				return this.applyLayout(savedLayout, isNoConfirm);
+			}
+			else
+			{
+				const selectedLayout = this._obCurrentGridLayoutExtendedDataModel();
+				const isApplied = selectedLayout && isNew !== "new" && selectedLayout.id() === editingLayout.id()
+				if (isApplied)
+				{
+					this.applyLayout(editingLayout, isNoConfirm);
+				}
+			}
+
+			return savedLayout;
+		}.bind(this));
 	};
 
 	KendoGridLayoutMenu.prototype._sortGridLayoutExtendedDataModels = function()
@@ -1078,54 +1266,28 @@
 			return left.name().toLowerCase() == right.name().toLowerCase() ? 0 : (left.name().toLowerCase() < right.name().toLowerCase() ? -1 : 1);
 		});
 	};
-	//Return all the layouts that  columns in default columns
-	KendoGridLayoutMenu.prototype._filterLayoutsByDefaultColumns = function(gridLayouts)
-	{
-		var self = this, defaultColumns = self.getDefinitionLayoutColumns().map(function(item) { return item.FieldName }), validGridLayouts = [];
-		gridLayouts.forEach(function(layout)
-		{
-			if (self._validColumns(layout, defaultColumns))
-			{
-				validGridLayouts.push(layout);
-			}
-		})
-		return validGridLayouts;
-	}
 
-	KendoGridLayoutMenu.prototype._validColumns = function(gridLayout, defaultColumns)
+	/**
+	 * Whether sticky layout should be used.
+	 *
+	 * @param {Object} options
+	 * @returns
+	 */
+	KendoGridLayoutMenu.prototype.shouldUseStickyLayout = function(options)
 	{
-		var self = this, isValid = false, columns = gridLayout.layoutColumns();
-		for (i = 0; i < columns.length; i++)
-		{
-			if (defaultColumns.includes(columns[i].FieldName))
-			{
-				isValid = true;
-				break;
-			}
-		}
-		return isValid;
-	}
-	KendoGridLayoutMenu.prototype._gridLayoutExtendedDataModelsChange = function()
+		const { fromSearch, isTemporaryFilter, useStickyLayout } = options || this.options;
+
+		// isTemporaryFilter was used more than just for filter, the logic is twisted with layout.
+		return (!fromSearch && !isTemporaryFilter) || useStickyLayout;
+	};
+
+	/**
+	 * Whether pre-defined layout should be used.
+	 *
+	 * @returns
+	 */
+	KendoGridLayoutMenu.prototype.shouldUsePredefinedLayout = function()
 	{
-		var self = this;
-		if (this._gridLayoutExtendedDataModelsChangeSubscription)
-		{
-			this._gridLayoutExtendedDataModelsChangeSubscription.dispose();
-		}
-		this._sortGridLayoutExtendedDataModels();
-		this._gridLayoutExtendedDataModelsChangeSubscription = this.obGridLayoutExtendedDataModels.subscribe(this._gridLayoutExtendedDataModelsChange, this);
-		this.subscriptions.push(this._gridLayoutExtendedDataModelsChangeSubscription);
-		// handle case of:
-		// 1.user 1 applied layout A
-		// 2.layout A be deleted by user 2
-		// 3.user 1 refresh grid
-		// 4.find layout A not exist, user 1's grid page reload
-		if (self._obSelectedGridLayoutExtendedDataModel() && !Enumerable.From(this.obGridLayoutExtendedDataModels()).Where(function(c)
-		{
-			return c.id() == self._obSelectedGridLayoutExtendedDataModel().id()
-		}).ToArray()[0])
-		{
-			this._resetLayout();
-		}
+		return this.options.predefinedGridData && this.options.predefinedGridData.layoutColumns;
 	};
 })();
