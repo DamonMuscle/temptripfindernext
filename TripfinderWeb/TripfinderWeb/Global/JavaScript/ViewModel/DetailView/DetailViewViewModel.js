@@ -231,37 +231,95 @@
 
 			var $target = $(e.currentTarget),
 				miniGridType = $target.closest(".custom-grid").attr("mini-grid-type"),
-				$virsualTarget = $("<div></div>").css({
+				$visualTarget = $("<div></div>").css({
 					position: "absolute",
 					left: e.clientX,
 					top: e.clientY
 				}).appendTo("body");
 
+			var targetBlock;
 			switch (miniGridType)
 			{
 				case "contact":
-					var targetBlock = self.rootGridStack.dataBlocks.filter(function(dataBlock)
+					targetBlock = self.rootGridStack.dataBlocks.filter(function(dataBlock)
 					{
 						if (!dataBlock.randomClass) return;
 
 						return $(e.currentTarget.closest(".grid-stack-item")).hasClass(dataBlock.randomClass);
 					})[0];
-					tf.contextMenuManager.showMenu($virsualTarget,
+					tf.contextMenuManager.showMenu($visualTarget,
 						new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/MiniGridRightClickMenu",
 							new TF.DetailView.MiniGridRightClickMenu(targetBlock, miniGridType, $target)));
-                    break;
-                case "UDGrid":
-                    var targetBlock = self.rootGridStack.dataBlocks.filter(function (dataBlock) {
-                        if (!dataBlock.uniqueClassName) return;
+					break;
+				case "UDGrid":
+					targetBlock = null;
+					let currentTarget = e.currentTarget;
+					const dataBlocks = self.rootGridStack.dataBlocks;
+					for (let index = 0; index < dataBlocks.length; index++)
+					{
+						const dataBlock = dataBlocks[index];
+						if (_isTargetGridStackItem(currentTarget, dataBlock))
+						{
+							targetBlock = dataBlock;
+						}
+						else if (dataBlock instanceof TF.DetailView.DataBlockComponent.TabStripBlock)
+						{
+							targetBlock = _getUDGridFromTabStripBlock(currentTarget, dataBlock);
+						}
 
-                        return $(e.currentTarget.closest(".grid-stack-item")).hasClass(dataBlock.uniqueClassName);
-                    })[0];
-                    tf.contextMenuManager.showMenu($virsualTarget,
-                        new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/UDGridRightClickMenu",
-                            new TF.DetailView.UDGridRightClickMenu(targetBlock, miniGridType)));
-                    break;
+						if (targetBlock != null)
+						{
+							break;
+						}
+					}
+					tf.contextMenuManager.showMenu($visualTarget,
+						new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/UDGridRightClickMenu",
+							new TF.DetailView.UDGridRightClickMenu(targetBlock, miniGridType)));
+					break;
 				default:
 					break;
+			}
+
+			function _isTargetGridStackItem(currentTarget, dataBlock)
+			{
+				return $(currentTarget.closest(".grid-stack-item")).hasClass(dataBlock.uniqueClassName);
+			}
+
+			function _getUDGridFromTabStripBlock(currentTarget, dataBlock)
+			{
+				let targetBlock = null;
+				if (!currentTarget || !dataBlock || !dataBlock.nestedGridStacks)
+				{
+					return targetBlock;
+				}
+
+				let nestedGridStacks = dataBlock.nestedGridStacks;
+				for (let idx = 0; idx < nestedGridStacks.length; idx++)
+				{
+					const nestedGridStack = nestedGridStacks[idx];
+					if (!nestedGridStack.dataBlocks)
+					{
+						continue;
+					}
+
+					let nestedDataBlocks = nestedGridStack.dataBlocks;
+					for (let idy = 0; idy < nestedDataBlocks.length; idy++)
+					{
+						const nestedDataBlock = nestedDataBlocks[idy];
+						if (_isTargetGridStackItem(currentTarget, nestedDataBlock))
+						{
+							targetBlock = nestedDataBlock;
+							break;
+						}
+					}
+
+					if (targetBlock != null)
+					{
+						break;
+					}
+				};
+
+				return targetBlock;
 			}
 		});
 
@@ -945,7 +1003,7 @@
 		{
 			// Update UDF required state
 			tf.helpers.detailViewHelper.updateUDFRequiredFields(self.gridType);
-			
+
 			self.setStackBlocks(self.options);
 			self.onColumnChangedEvent.notify(self.rootGridStack.getCurrentWidth());
 
@@ -1151,7 +1209,8 @@
 								}
 							});
 							subTitleLabel = self.detailViewHelper.formatDataContent(subtitleValue, subTitleDataPoint.type, subTitleDataPoint.format, subTitleDataPoint);
-						} else {
+						} else
+						{
 							subTitleLabel = self.detailViewHelper.formatDataContent(subtitleValue, subTitleDataPoint.type, subTitleDataPoint.format);
 						}
 					}
@@ -1996,12 +2055,12 @@
 	{
 		var self = this;
 		self.applyLayoutTemplate({ isReadMode: true, layoutId: self.getEffectiveDetailLayoutId() })
-		.then(function()
-		{
-			self.skipValidation = !self.recordId;
-			self.updateDetailViewTitle();
-			self.showDetailViewById(self.recordId);
-		});
+			.then(function()
+			{
+				self.skipValidation = !self.recordId;
+				self.updateDetailViewTitle();
+				self.showDetailViewById(self.recordId);
+			});
 
 		self.closeFieldEditor();
 	}
