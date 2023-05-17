@@ -390,6 +390,7 @@
 				pageData = new TF.Page.ApprovalsPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
+			case "fieldtrip":
 			case "fieldtrips":
 				pageData = new TF.Page.FieldTripPage(gridOptions);
 				templateName = "workspace/page/basegridpage";

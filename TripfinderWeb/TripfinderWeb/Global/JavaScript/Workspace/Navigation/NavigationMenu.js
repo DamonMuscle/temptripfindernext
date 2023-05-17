@@ -97,6 +97,8 @@
 		if (type !== 'form')
 		{
 			// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
+			
+			tf.pageManager.openNewPage(type);
 		}
 		else
 		{

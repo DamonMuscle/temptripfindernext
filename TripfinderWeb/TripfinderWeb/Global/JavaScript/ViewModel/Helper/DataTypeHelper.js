@@ -366,7 +366,7 @@
 	var _RPT_DATA_SCHEMAS = []; // Store ReportDataSchema list
 
 	const _noObjectIdDataTypes = ["contact", "scheduledreport", "dashboards"];
-	const _tripfinderDataTypes = ["vehicle"]; // ["vehicle", "staff", "contact"]
+	const _tripfinderDataTypes = ["fieldtrip","vehicle"]; // ["fieldtrip", "vehicle", "staff", "contact"]
 
 	function DataTypeHelper()
 	{
@@ -610,7 +610,8 @@
 					id: obj.id,
 					authorization: obj.authorization,
 					enableDetailView: obj.enableDetailView,
-					enableUDF: obj.enableUDF !== false
+					enableUDF: obj.enableUDF !== false,
+					endpoint: obj.endpoint
 				});
 			}
 		}
@@ -626,9 +627,9 @@
 	 */
 	DataTypeHelper.prototype.getAvailableDataTypes = function()
 	{
-		function isAvailableDataTypeFun(dataTypeAttribute)
+		function isAvailableDataTypeFun(dataTypeAttribute, key)
 		{
-			return dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary && _tripfinderDataTypes.includes(dataTypeAttribute.name.toLowerCase());
+			return dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary && _tripfinderDataTypes.includes(key.toLowerCase());
 		}
 
 		return TF.Helper.DataTypeHelper.getValidDataTypes(isAvailableDataTypeFun);
