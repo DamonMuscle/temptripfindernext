@@ -719,6 +719,9 @@ function getTitleByType(type)
 		case "settings":
 			pageTitle = "SETTINGS";
 			break;
+		case "vehicles":
+			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Vehicle");
+			break;
 		default:
 			break;
 	}

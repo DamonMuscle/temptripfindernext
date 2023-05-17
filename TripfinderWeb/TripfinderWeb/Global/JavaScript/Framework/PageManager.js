@@ -303,6 +303,9 @@
 			case "fieldtrips":
 				pageTitle = "Field Trips";
 				break;
+			case "vehicles":
+				pageTitle = "Vehicles"
+				break;
 			case "fieldtripScheduler":
 				pageTitle = "Field Trips Calendar";
 				break;
@@ -393,6 +396,11 @@
 			case "fieldtrip":
 			case "fieldtrips":
 				pageData = new TF.Page.FieldTripPage(gridOptions);
+				templateName = "workspace/page/basegridpage";
+				break;
+			case "vehicle":
+			case "vehicles":
+				pageData = new TF.Page.VehiclePage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
 			case "myrequests":
@@ -666,7 +674,8 @@
 	PageManager.prototype.getAvailableDataTypes = function()
 	{
 		var allDataTypes = [
-			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() }
+			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() },
+			{ name: "vehicle", label: "Vehicles", permission: tf.permissions.obVehicle() }
 		];
 		return allDataTypes.filter(function(item) { return item.permission; });
 	};

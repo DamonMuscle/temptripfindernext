@@ -42,6 +42,12 @@
 					type: "string"
 				},
 				{
+					FieldName: "DocumentCount",
+					DisplayName: "# Documents",
+					Width: '150px',
+					type: "integer"
+				},
+				{
 					FieldName: "YearMade",
 					DisplayName: "Year Made",
 					Width: '150px',
@@ -90,6 +96,24 @@
 					type: "date"
 				},
 				{
+					FieldName: "ComparativeAnalysis",
+					DisplayName: "Comparative Analysis",
+					Width: '150px',
+					type: "boolean",
+					template: function(item)
+					{
+						return item.ComparativeAnalysis && item.ComparativeAnalysis.toLowerCase() === "true" ? "Enabled" : "Disabled";
+					},
+					filterablePositiveLabel: "Enabled",
+					filterableNegativeLabel: "Disabled"
+				},
+				{
+					FieldName: "VendorName",
+					DisplayName: "Vendor",
+					Width: '150px',
+					type: "string",
+				},
+				{
 					FieldName: "AssetId",
 					DisplayName: "Asset ID",
 					Width: '150px',
@@ -108,8 +132,8 @@
 					Width: '150px',
 					type: "number",
 					hidden: true,
-					UnitOfMeasureReverse: true,
-					UnitOfMeasureSupported: true
+					UnitOfMeasureSupported: true,
+					UnitOfMeasureReverse: true
 				},
 				{
 					FieldName: "EmmissInsp",
@@ -197,8 +221,15 @@
 					FieldName: "LastUpdated",
 					DisplayName: "Last Updated Date",
 					Width: '160px',
+					dbType: "datetime",
 					type: "date",
-					hidden: true
+					hidden: true,
+					template: function(item)
+					{
+						let dt = utcToClientTimeZone(item["LastUpdated"]);
+						return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
+					},
+					isUTC: true,
 				},
 				{
 					FieldName: "Length",
@@ -315,18 +346,16 @@
 				},
 				{
 					FieldName: "ContractorId",
-					DBName: "Contractor_ID",
 					Width: '150px',
 					type: "integer",
 					hidden: true,
 					onlyForFilter: true
 				},
 				{
-					FieldName: "SfEquipmentId",
+					FieldName: "ContractorName",
+					DisplayName: "Contractor",
 					Width: '150px',
-					type: "integer",
-					hidden: true,
-					onlyForFilter: true
+					type: "string"
 				},
 				{
 					FieldName: "SIFChanged",

@@ -666,6 +666,9 @@
 			case "fieldtrips":
 				ga('send', 'event', 'Area', 'Field Trips');
 				break;
+			case "vehicles":
+				ga('send', 'event', 'Area', 'Vehicles');
+				break;
 			case "myrequests":
 				ga('send', 'event', 'Area', 'My Submitted Requests');
 				break;
