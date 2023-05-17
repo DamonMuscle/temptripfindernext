@@ -99,6 +99,12 @@
 			// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
 			
 			tf.pageManager.openNewPage(type);
+
+			// close the navigation menu in mobile device after click
+			if (TF.isPhoneDevice)
+			{
+				this.closeNavigation();
+			}
 		}
 		else
 		{
@@ -668,6 +674,10 @@
 				break;
 			case "settings":
 				ga('send', 'event', 'Area', 'Settings');
+				break;
+			case "datagrid":
+				ga('send', 'event', 'Area', 'Data Grids');
+				break;
 			default:
 				break;
 		}
@@ -685,7 +695,7 @@
 		var self = this, animationDeferred = $.Deferred(),
 			$itemMenu = $item.find(".item-menu"),
 			isOpened = $item.hasClass("menu-opened"),
-			pageCount = $itemMenu.find("ul:first-child>li").length;
+			pageCount = $itemMenu.find("ul:first-child>li").filter((index, el) => $(el).css('display') != 'none').length;
 
 		var contentHeight = $(".navigation-toolbar").offset().top - $item.offset().top;
 
