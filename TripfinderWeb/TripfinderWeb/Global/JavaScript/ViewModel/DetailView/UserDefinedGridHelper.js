@@ -14,7 +14,7 @@
 
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
 	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
-	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per person.';
+	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per recipient.';
 
 	UserDefinedGridHelper.getUpdatedInfoColumns = function()
 	{
