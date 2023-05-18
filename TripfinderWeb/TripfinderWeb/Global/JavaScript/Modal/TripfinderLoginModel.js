@@ -342,7 +342,7 @@
 			isPassed = false;
 		}
 
-		if (!self.loginViewModel.obPassword())
+		if (!self.loginViewModel.obPassword() && self.loginViewModel.obEnablePassword())
 		{
 			self.loginViewModel.obPasswordWarning(true);
 			isPassed = false;
