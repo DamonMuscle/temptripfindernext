@@ -10,17 +10,18 @@
 		return $element.closest('.tf-contextmenu-wrap').hasClass('filtermenu-wrap');
 	};
 
-	FilterHelper.getFilterById = function(filterId)
+	FilterHelper.getFilterById = function(filterId, option)
 	{
 		// filter no need to validate if it is none or it is special filter build for dashboard
 		if (!filterId || filterId <= 0)
 			return Promise.resolve(
 				{});
 
+		const overlay = option && option.hasOwnProperty("overlay") ? { overlay: option.overlay } : null;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), 'gridfilters'),
 			{
 				paramData: { id: filterId }
-			})
+			}, overlay)
 			.then(function(apiResponse)
 			{
 				if (apiResponse && apiResponse.Items && apiResponse.Items.length === 1)

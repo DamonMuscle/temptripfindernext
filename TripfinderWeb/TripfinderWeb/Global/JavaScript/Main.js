@@ -831,6 +831,13 @@ function booleanToCheckboxFormatter(value)
 	}
 })();
 
+createNamespace("TF").isLightness = function(color)
+{
+	var arcgisColor = new tf.map.ArcGIS.Color(color);
+	var brightness = (arcgisColor.r * 299 + arcgisColor.g * 587 + arcgisColor.b * 114) / 1000;
+	return brightness >= 123;
+};
+
 (function()
 {
 	createNamespace("TF").menuHelper = menuHelper;

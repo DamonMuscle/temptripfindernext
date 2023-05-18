@@ -2,14 +2,20 @@
 {
 	createNamespace("TF.Grid").ManageLayoutViewModel = ManageLayoutViewModel;
 
-	function ManageLayoutViewModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, positiveClose)
+	function ManageLayoutViewModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, obGridThematicDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, positiveClose, options, reloadLayout)
 	{
 		this.obGridLayoutExtendedDataModels = obGridLayoutExtendedDataModels;
 		this.obGridFilterDataModels = obGridFilterDataModels;
+		this.obGridThematicDataModels = obGridThematicDataModels;
 		this.fnSaveAndEditGridLayout = fnSaveAndEditGridLayout;
 		this.fnApplyGridLayout = fnApplyGridLayout;
 		this.positiveClose = positiveClose;
 		this.element = null;
+		this.gridType = options.gridType;
+		this.gridData = options.gridData;
+		this.thematicKendoGrid = null;
+		const isThematicSupported = tf.dataTypeHelper.checkGridThematicSupport(this.gridType);
+		this.obThematicSupported = ko.observable(isThematicSupported);
 		this.enableGridRefresh = true;
 		this.layoutModelJSONString = null
 	}
@@ -30,14 +36,13 @@
 		{
 			return layout.toData();
 		});
-
-		var grid = this.element.find(".managelayoutgrid-container").data("kendoGrid");
-		if (grid)
+		const $gridContainer = self.element.find(".managelayoutgrid-container");
+		if (self.thematicKendoGrid)
 		{
-			grid.destroy();
+			self.thematicKendoGrid.destroy();
 		}
 
-		this.element.find(".managelayoutgrid-container").kendoGrid(
+		$gridContainer.kendoGrid(
 			{
 				dataSource:
 				{
@@ -67,6 +72,12 @@
 							return "";
 
 						}
+					},
+					{
+						field: "ThematicName",
+						title: "Thematic",
+						hidden: !self.obThematicSupported(),
+						template: (data) => data.ThematicId ? data.ThematicName : "",
 					},
 					{
 						field: "DataExportExists",
@@ -101,7 +112,10 @@
 						}
 					}]
 			});
-		this.element.find(".managelayoutgrid-container .k-grid-content tr").dblclick(function(e)
+
+		self.thematicKendoGrid = $gridContainer.data("kendoGrid");
+
+		$gridContainer.find(".k-grid-content table[role=grid] tr").dblclick(function(e)
 		{
 			var gridLayoutExtendedDataModel = this.getGridLayoutDataModel(e);
 			this.fnApplyGridLayout(gridLayoutExtendedDataModel).then(function(ans)
@@ -130,7 +144,8 @@
 
 	ManageLayoutViewModel.prototype.getGridLayoutDataModel = function(e)
 	{
-		var data = this.element.find(".managelayoutgrid-container").data("kendoGrid").dataItem($(e.target).closest("tr"));
+		const $dataRow = $(e.target).closest("tr");
+		var data = this.thematicKendoGrid.dataItem($dataRow);
 		return this.obGridLayoutExtendedDataModels().filter(function(item)
 		{
 			return item.id() === data.Id;

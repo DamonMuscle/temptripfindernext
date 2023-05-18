@@ -1,0 +1,53 @@
+﻿<div class="tf-contextmenu-wrap filtermenu-wrap phone-wrap">
+	<ul class="tf-contextmenu">
+		<li class="menu-divider"></li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.createNewThematicClick">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				New Thematic
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.saveAsNewThematicClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 
+		&& !searchGrid.obSelectedGridFilterClause() || !!searchGrid.obSelectedStaticFilterName() || searchGrid.obIsSystemFilter() || searchGrid.options.fromSearch}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Save As New Thematic
+			</div>
+		</li>
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.manageGridThematicsClick">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Manage Thematics
+			</div>
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearGridThematicClick">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Clear
+			</div>
+		</li>
+		<!--ko if:searchGrid.obGridThematicDataModels().length > 0 -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+		<!--ko foreach:searchGrid.obGridThematicDataModels -->
+		<li class="menu-item" data-bind="
+				contextMenuClick:$parent.searchGrid.gridThematicClick.bind($parent.searchGrid),
+				attr: { title: name },
+				css:{'menu-item-checked':$data.name()==$parent.searchGrid.obSelectedGridThematicName()}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label" data-bind="text:name">
+			</div>
+		</li>
+		<!--/ko -->
+	</ul>
+</div>

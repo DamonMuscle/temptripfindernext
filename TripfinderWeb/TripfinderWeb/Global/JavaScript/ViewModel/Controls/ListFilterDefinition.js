@@ -706,6 +706,18 @@
 			DisplayFilterTypeName: "Mailing Cities",
 		}, true);
 
+	ListFilterDefinition.ListFilterTemplate.GeneralDataListsMailingState = $.extend(
+		{}, ListFilterTemplateMapDataOption,
+		{
+			DisplayFilterTypeName: "Mailing State/Provinces",
+			GridType: "MailingState",
+			filterField: "Item",
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "mailingstate");
+			}
+		}, true);
+
 	ListFilterDefinition.ListFilterTemplate.GeoZipCode = function(gridType, fieldName)
 	{
 		return $.extend(

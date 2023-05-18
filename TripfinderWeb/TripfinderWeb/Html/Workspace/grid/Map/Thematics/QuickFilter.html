@@ -1,0 +1,78 @@
+<div class="fields-main" data-bind="uiInit:init">
+	<!--ko foreach:obFields -->
+	<div class="field-item" data-bind="css:{'disabled':disabled},attr:{index:index}">
+		<div class="drag-handle" data-bind="css:($parent.obMultipleFieldsUnSelect() || filterDisabled()) ? 'disabled' : ''"></div>
+		<div class="field-title" data-bind="text:title"></div>
+		<div class="field-name">
+			<div class="input-group">
+				<div data-bind="typeahead:{source:fields,class:'thematic-modal-field',format:function(obj){return obj.DisplayName || obj.FieldName;},drowDownShow:true,selectedValue:selectField,notSort:true}">
+					<!-- ko customInput:{type:"Select", disable:disabled, attributes:{class: "enableHotkey form-control"}, value:selectFieldText, events: { change:$parent.onFieldSelectChange.bind({parent: $parent, data: $data}) }} --><!-- /ko -->
+				</div>
+				<div class="bottom-border"></div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="field-filter" data-bind="css:filterDisabled() ? 'disabled' : ''">
+			<!--ko ifnot: typeCode() === "Boolean"-->
+			<div class="menu-button" data-bind="attr:{role:role}">
+				<div class="filter-icon" data-bind="css:filterStyle, click:$parent.filterMenuButtonClick"></div>
+				<!--ko template: {name:"workspace/grid/map/thematics/filtermenu",data:filterMenuData} -->
+				<!--/ko -->
+			</div>
+			<!--/ko -->
+			<div class="text-input" data-bind="attr:{role:role}, css: (typeCode() + ' ' + filterType())">
+				<div class="text-input-group">
+					<!--ko if: filterStyle() === "custom" || filterStyle() === "list" -->
+					<!--ko customInput:{ type:"String", disable:true, value:filterValue, attributes:{class: "form-control normal-input"}, events: { input: $parent.filterTextInput.bind({parent: $parent, data: $data}) } } -->
+					<!--/ko -->
+					<!--/ko -->
+					<!--ko ifnot: filterStyle() === "custom" || filterStyle() === "list" -->
+					<!--ko if: filterStyle() === "isempty" || filterStyle() === "isnotempty" -->
+					<!--ko customInput:{ type:typeCode, disable:true, value:filterValue, attributes:{class: "form-control normal-input"}, events: { input: $parent.filterTextInput.bind({parent: $parent, data: $data}) } } -->
+					<!--/ko -->
+					<!--/ko -->
+					<!--ko ifnot: filterStyle() === "isempty" || filterStyle() === "isnotempty" -->
+					<!--ko customInput:{ type:typeCode, disable:filterDisabled, value:filterValue, attributes:{class: "form-control quick-filter-input k-input-needed", adjustPopupPosition: $parent.adjustCalendarPosition.bind($parent)}, events: { input: $parent.filterTextInput.bind({parent: $parent, data: $data}) } } -->
+					<!--/ko -->
+					<!--/ko -->
+					<!--/ko-->
+				</div>
+				<span class="k-icon k-loading"></span>
+				<!--ko if: filterValue() !== null && filterValue() !== undefined
+					&& (typeof(filterValue()) === "string" ? filterValue() !== "" : true)
+					&& (((type === "date" || type === "time" || type === "datetime") && filterType() !== "custom") ?
+						(moment("1/1/1753") <= moment(filterValue()) && moment(filterValue())<=moment("12/31/9999")) : true)-->
+				<button type="button" class="k-button k-button-icon clearButton" data-bind="click: $parent.clearButtonClick.bind($data)">
+					<span class="k-icon k-i-close"></span>
+				</button>
+				<!--/ko -->
+				<div class="k-filter-list-btn btn input-button" data-bind="click: $parent.openListFilterButtonClick">
+					<span class="glyphicon glyphicon-option-horizontal"></span>
+				</div>
+				<div class="autocompletion" data-bind="attr:{role:role}, event: { mousedown: $parent.autocompletionMouseDownEvent }">
+					<div class="k-list-container k-popup k-reset">
+						<ul class="k-list k-reset" tabindex="-1">
+							<!--ko foreach: autocompletion -->
+							<li tabindex="-1" class="k-item" data-bind="text:$data, click: $parents[1].autocompletionItemClick.bind({parents:$parents, data:$data})"></li>
+							<!--/ko -->
+						</ul>
+					</div>
+				</div>
+				<div class="custom-filter-group" data-bind="attr:{role:role}">
+					<button class="k-grid-filter k-filter-custom-btn input-button" tabindex="-1" data-bind="click: $parent.filterCustomButtonClick">
+						<span class="k-icon k-filter"></span>
+					</button>
+					<!--ko if: customActive -->
+					<!--ko template: {name:"workspace/grid/map/thematics/customfilter",data:customFilter} -->
+					<!--/ko -->
+					<!--/ko -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--/ko -->
+</div>

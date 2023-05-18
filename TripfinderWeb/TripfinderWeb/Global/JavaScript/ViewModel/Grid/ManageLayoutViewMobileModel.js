@@ -2,10 +2,11 @@
 {
 	createNamespace("TF.Grid").ManageLayoutViewMobileModel = ManageLayoutViewMobileModel;
 
-	function ManageLayoutViewMobileModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, obSelectedGridLayoutName, manageLayoutModal)
+	function ManageLayoutViewMobileModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, obGridThematicDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, obSelectedGridLayoutName, manageLayoutModal)
 	{
 		this.obGridLayoutExtendedDataModels = obGridLayoutExtendedDataModels;
 		this.obGridFilterDataModels = obGridFilterDataModels;
+		this.obGridThematicDataModels = obGridThematicDataModels;
 		this.fnSaveAndEditGridLayout = fnSaveAndEditGridLayout;
 		this.fnApplyGridLayout = fnApplyGridLayout;
 		this.manageLayoutModal = manageLayoutModal;

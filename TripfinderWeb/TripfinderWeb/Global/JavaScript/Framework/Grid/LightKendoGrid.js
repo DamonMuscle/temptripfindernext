@@ -37,6 +37,7 @@
 		paramData: {}
 	};
 	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report'];
+	var udfLazyLoadType = ['roll-up', 'case'];
 	var customClickAndTouchEvent;
 	var customTouchMoveEvent;
 	var customTouchMoveTimeOut = null;
@@ -58,6 +59,8 @@
 		this.filterClass = '.k-i-filter';
 		this.initParameter($container, options, gridState);
 		this.loadAndCreateGrid();
+		this.lazyloadFields = { general: [], udf: [] };
+		this.alreadyLoadId = { general: {}, udf: {} };
 	}
 
 	LightKendoGrid.prototype._excludeOnlyForFilterColumns = function functionName(gridDefintion)
@@ -442,7 +445,7 @@
 				tf.loadingIndicator.tryHide();
 			}, 1500);
 		}
-
+		this.alreadyLoadId = { general: {}, udf: {} };
 	};
 
 	LightKendoGrid.prototype.rebuildGrid = function(sortInfo)
@@ -463,6 +466,7 @@
 					return Promise.resolve(false);
 				}
 				this.getSelectedIds([]);
+				this.alreadyLoadId = { general: {}, udf: {} };
 				this.overlayShow = true;
 				this.obTempOmitExcludeAnyIds([]);
 				var kendoOptions = this.kendoGrid.getOptions();
@@ -813,6 +817,8 @@
 
 									promise.then(response =>
 									{
+										self.setLazyLoadFields(response.data);
+										self.updateLazyloadData = false;
 										tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
 											.then(function()
 											{
@@ -869,6 +875,8 @@
 
 							promise.then(response =>
 							{
+								self.setLazyLoadFields(response.data);
+								self.updateLazyloadData = false;
 								tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
 									.then(function()
 									{
@@ -1117,6 +1125,8 @@
 		this.bindCalendarButton();
 		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
+
+
 
 	LightKendoGrid.prototype.filterMenuInit = function(e)
 	{
@@ -4048,11 +4058,7 @@
 
 					if (result.Items && result.Items instanceof Array)
 					{
-						var currentColumns = [].concat(self._obSelectedColumns()).concat(self.getKendoColumn()),
-							udfs = _.uniqBy(currentColumns.filter(function(c)
-							{
-								return !!c.OriginalName;
-							}), "UDFId");
+						const udfs = self.getUdfs();
 						result.Items = result.Items.map(function(item)
 						{
 							udfs.forEach(function(udf)
@@ -4300,6 +4306,12 @@
 			return filterItems;
 		}
 	};
+
+	LightKendoGrid.prototype.getUdfs = function()
+	{
+		const currentColumns = [].concat(this._obSelectedColumns()).concat(this.getKendoColumn());
+		return _.uniqBy(currentColumns.filter(c => !!c.OriginalName), "UDFId");
+	}
 
 	LightKendoGrid.prototype.checkFilteredResponse = function(response)
 	{
@@ -5346,6 +5358,8 @@
 			var $parent = self.$container.find(".k-grid-content .k-virtual-scrollable-wrap");
 			$parent.find("table").css("display", "");
 			$parent.find(".kendogrid-blank-fullfill").css("display", "");
+
+			self.showLoadingForLazyLoad($parent);
 		}
 
 		//VIEW-1299 Grid columns do not move with grid header when tabbing through Quick Filter bar
@@ -5396,7 +5410,7 @@
 		}
 
 		var showLoading = (self.geoFields && self.geoFields.length > 0) || self._gridType === "trip";
-		if (showLoading && !self.options.isMiniGrid)
+		if (showLoading && !self.options.isMiniGrid && !this.updateLazyloadData)
 		{
 			tf.loadingIndicator.showImmediately();
 		}
@@ -5475,7 +5489,47 @@
 
 				self.onGridReadCompleted.notify();
 			});
+
+			if (this.lazyloadFields.udf.length > 0)
+			{
+				self.lazyLoadUdf();
+			}
+
+			if (this.lazyloadFields.general.length > 0)
+			{
+				self.lazyLoadGeneral();
+			}
 	};
+
+	LightKendoGrid.prototype.showLoadingForLazyLoad = function($o)
+	{
+		if (this.lazyloadFields.udf.length === 0 && this.lazyloadFields.general.length === 0 || this.kendoGrid.tbody == null)
+		{
+			return;
+		}
+
+		this.kendoGrid.items().each((index, item) =>
+		{
+			const row = $(item).closest('tr');
+			this.lazyloadFields.udf.forEach(f =>
+			{
+				const $ele = row.find(`[data-kendo-field='${f.FieldName}']`);
+				if ($ele.length > 0)
+				{
+					$ele.html('<span class="k-icon k-i-loading rollup-loading"></span>');
+				}
+			});
+
+			this.lazyloadFields.general.forEach(f =>
+			{
+				const $ele = row.find(`[data-kendo-field='${f.FieldName}']`);
+				if ($ele.length > 0)
+				{
+					$ele.html('<span class="k-icon k-i-loading lazy-loading"></span>');
+				}
+			});
+		});
+	}
 
 	LightKendoGrid.prototype.horizontalMoveScrollBar = function(isLeft)
 	{
@@ -5507,6 +5561,291 @@
 		gridBody.scrollLeft(scrollLeft);
 		self.lastGridScrollLeft = scrollLeft;
 	};
+
+	LightKendoGrid.prototype.setLazyLoadFields = function(data)
+	{
+		this.lazyloadFields = { general: [], udf: [] };
+		this.setLazyLoadGeneralFields(data);
+		this.setLazyLoadUdfFields(data);
+	}
+
+	LightKendoGrid.prototype.setLazyLoadGeneralFields = function(data)
+	{
+		const currentColumns = [].concat(this._obSelectedColumns()).concat(this.getKendoColumn());
+		let fields = _.uniqBy(currentColumns.filter(c => c.lazyLoad), "FieldName");
+		if (!fields.length)
+		{
+			return false;
+		}
+
+		fields = fields.filter(x => data.filterClause.indexOf(x.FieldName) < 0);
+		if (!fields.length)
+		{
+			return false;
+		}
+
+		if (data.filterSet)
+		{
+			fields = fields.filter(x => !data.filterSet.FilterItems.some(y => y.FieldName === x.FieldName));
+		}
+
+		if (!fields.length)
+		{
+			return false;
+		}
+
+		if (data.sortItems)
+		{
+			fields = fields.filter(x => !data.sortItems.some(y => y.Name === x.FieldName));
+		}
+
+		if (!fields.length)
+		{
+			return false;
+		}
+
+		this.lazyloadFields.general = fields;
+		data.fields = (data.fields || []).filter(x => !fields.some(y => y.field === x));
+		return true;
+	}
+
+	LightKendoGrid.prototype.setLazyLoadUdfFields = function(data)
+	{
+		let fields = (this.getUdfs() || []).filter(x => udfLazyLoadType.includes(x.UDFType));
+		if (fields.length === 0)
+		{
+			return false;
+		}
+
+		fields = fields.filter(x => data.filterClause.indexOf(x.OriginalName) < 0);
+		if (fields.length === 0)
+		{
+			return false;
+		}
+
+		if (data.filterSet)
+		{
+			fields = fields.filter(x => !data.filterSet.FilterItems.some(y => y.FieldName === x.OriginalName));
+		}
+
+		if (fields.length === 0)
+		{
+			return false;
+		}
+
+		if (data.sortItems)
+		{
+			fields = fields.filter(x => !data.sortItems.some(y => y.Name === x.OriginalName));
+		}
+
+		if (fields.length === 0)
+		{
+			return false;
+		}
+
+		this.lazyloadFields.udf = fields;
+		data.fields = data.fields.filter(x => !fields.some(y => y.OriginalName === x));
+		return true;
+	}
+
+	LightKendoGrid.prototype.lazyLoadUdf = async function()
+	{
+		let entityIds = this.kendoGrid.dataSource.data().map(x => x.Id);
+		const rollupUdfIds = this.lazyloadFields.udf.map(x => x.UDFId);
+		let rollupResult, shouldApplyThematic = true;
+		if (this.alreadyLoadId && this.alreadyLoadId.udf && Object.keys(this.alreadyLoadId.udf).length > 0)
+		{
+			entityIds = entityIds.filter(id =>
+			{
+				if (this.alreadyLoadId.udf[id])
+				{
+					return rollupUdfIds.some(x => !Object.keys(this.alreadyLoadId.udf[id]).includes(x.toString()));
+				}
+				return id;
+
+			});
+		}
+
+		if (!this.hasRollUpFieldsInThematicConfigs())
+		{
+			shouldApplyThematic = false;
+			this.applyGridThematicConfigs && this.applyGridThematicConfigs();
+		}
+
+		if (entityIds.length > 0)
+		{
+			const res = await tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "rollupudfs"), {
+				data: {
+					dataSourceId: tf.datasourceManager.databaseId,
+					udfIds: rollupUdfIds,
+					entityIds: entityIds
+				}
+			}, { overlay: false });
+			rollupResult = res && res.Items && res.Items[0];
+			this.alreadyLoadId.udf = {
+				...this.alreadyLoadId.udf,
+				...rollupResult
+			};
+		}
+		if ((!this.alreadyLoadId || !Object.keys(this.alreadyLoadId.udf).length) && shouldApplyThematic)
+		{
+			this.applyGridThematicConfigs && this.applyGridThematicConfigs();
+			return;
+		}
+
+		this.updateLazyloadData = true;
+		this.updateGridForUdfLazyLoad();
+		if (shouldApplyThematic)
+		{
+			this.applyGridThematicConfigs && this.applyGridThematicConfigs();
+		}
+	}
+
+	LightKendoGrid.prototype.lazyLoadGeneral = async function()
+	{
+		if (this.lazyloadFields.general.length === 0)
+		{
+			return;
+		}
+
+		let entityIds = this.kendoGrid.dataSource.data().map(x => x.Id);
+		if (this.alreadyLoadId && this.alreadyLoadId.general)
+		{
+			entityIds = entityIds.filter(id =>
+			{
+				return !this.alreadyLoadId.general[id];
+			});
+		}
+
+		if (!entityIds.length)
+		{
+			this.updateLazyloadData = true;
+			this.updateGridForGeneralLazyLoad();
+			return;
+		}
+
+		const chunkSize = 20;
+		for (let i = 0; i < entityIds.length; i += chunkSize)
+		{
+			const chunk = entityIds.slice(i, i + chunkSize);
+			if (chunk.length > 0)
+			{
+				const res = await tf.promiseAjax.post(pathCombine(this.getApiRequestURL(this.options.url)), {
+					data: {
+						"idFilter": {
+							"IncludeOnly": chunk,
+							"ExcludeAny": [],
+						},
+						"fields": ["Id", ...this.lazyloadFields.general.map(r => r.FieldName)],
+					}
+				}, { overlay: false });
+				let result = res && res.Items;
+				result.forEach(r =>
+				{
+					this.alreadyLoadId.general[r.Id] = r;
+				});
+			}
+			if (!this.alreadyLoadId || !Object.keys(this.alreadyLoadId.general).length)
+			{
+				return;
+			}
+
+			this.updateLazyloadData = true;
+			this.updateGridForGeneralLazyLoad();
+		}
+	}
+
+	LightKendoGrid.prototype.updateGridForUdfLazyLoad = function()
+	{
+		if (this.kendoGrid.tbody == null)
+		{
+			return;
+		}
+		this.kendoGrid.items().each((index, item) =>
+		{
+			const row = $(item).closest('tr');
+			const dataItem = this.kendoGrid.dataItem(row);
+			this.lazyloadFields.udf.forEach((udf) =>
+			{
+				const value = this.alreadyLoadId.udf[dataItem.Id] && this.alreadyLoadId.udf[dataItem.Id][udf.UDFId];
+				const $ele = row.find(`[data-kendo-field='${udf.FieldName}']`);
+				if ($ele.length > 0)
+				{
+					var formattedValue = this.udfFormatValue(udf, value);
+					$ele.html(formattedValue);
+					dataItem[udf.DisplayName] = formattedValue;
+				}
+			});
+		});
+	}
+
+	LightKendoGrid.prototype.updateGridForGeneralLazyLoad = function()
+	{
+		if (this.kendoGrid.tbody == null)
+		{
+			return;
+		}
+		this.kendoGrid.items().each((index, rowItem) =>
+		{
+			const row = $(rowItem).closest('tr');
+			const dataItem = this.kendoGrid.dataItem(row);
+			const item = this.alreadyLoadId.general[dataItem.Id];
+			if (!item)
+			{
+				return;
+			}
+
+			this.lazyloadFields.general.forEach((f) =>
+			{
+				const $ele = row.find(`[data-kendo-field='${f.FieldName}']`);
+				const fieldVal = item[f.FieldName];
+				if ($ele.length > 0)
+				{
+					var display = fieldVal;
+					if (kendo && f.template)
+					{
+						display = f.template(item);
+					}
+					else if (kendo && f.format)
+					{
+						display = kendo.toString(fieldVal, kendo._extractFormat(f.format));
+					}
+
+					$ele.html(display);
+				}
+			});
+		});
+	}
+
+	LightKendoGrid.prototype.udfFormatValue = function(udf, value)
+	{
+		if (value === null || value === undefined)
+		{
+			return value;
+		}
+
+		const _udf = Enumerable.From(this.kendoGrid.columns).FirstOrDefault(null, function(x)
+		{
+			return x.UDFId === udf.UDFId
+		});
+		if (_udf && _udf.format)
+		{
+			switch (udf.type)
+			{
+				case 'time':
+					value = new Date(`${moment(new Date()).format(dataFormat)} ${value}`);
+					break;
+				case 'datetime':
+				case 'date':
+					value = new Date(value);
+					break;
+				default:
+					break;
+			}
+			value = kendo.format(_udf.format, value);
+		}
+		return value;
+	}
 
 	LightKendoGrid.prototype._onGridItemClick = function(dataItem, e)
 	{
@@ -6301,6 +6640,30 @@
 	LightKendoGrid.prototype.isDashboardWidget = function()
 	{
 		return this.options.customGridType === "dashboardwidget"
+	};
+
+	LightKendoGrid.prototype.hasRollUpFieldsInThematicConfigs = function()
+	{
+		var hasRollUpField = false;
+		if (!this.selectedGridThematicConfigs)
+		{
+			return hasRollUpField;
+		}
+
+		this.selectedGridThematicConfigs.forEach(configs =>
+		{
+			if (hasRollUpField) return;
+
+			configs.forEach(config =>
+			{
+				if (hasRollUpField) return;
+
+				hasRollUpField = config.typeId === TF.DetailView.UserDefinedFieldHelper.DataTypeId.RollUp
+					|| config.typeId === TF.DetailView.UserDefinedFieldHelper.DataTypeId.Case;
+			});
+		});
+
+		return hasRollUpField;
 	};
 })();
 
