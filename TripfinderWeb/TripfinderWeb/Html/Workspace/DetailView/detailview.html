@@ -49,15 +49,16 @@
 				</div>
 			</div>
 			<div class="buttons" data-bind="css: {hide :!isReadMode()}">
-				<div class="selector-menu" data-bind="click:templateMenuClick">
+				<div class="selector-menu" data-bind="click:templateMenuClick,visible:obShowSelectorMenu">
 					<div class="select-type" data-bind="text:obSelectName,afterRender:updateDetailViewPanelHeader"></div>
 					<div class="icon bottom-caret"></div>
 				</div>
-				<div class="iconbutton print" data-bind="click:printClick" title="Print"></div>
+				<div class="iconbutton refresh-big" data-bind="click:refreshClick" title="Refresh"></div>
+				<div class="iconbutton print" data-bind="click:printClick, visible:obShowPrintButton" title="Print"></div>
 				<!-- ko if:!TF.isMobileDevice-->
-				<div class="iconbutton new-window" data-bind="click:newWindowClick" title="Open in new Tab"></div>
+				<div class="iconbutton new-window" data-bind="click:newWindowClick, visible:obShowOpenNewWindowButton" title="Open in new Tab"></div>
 				<!-- /ko -->
-				<div class="iconbutton save" data-bind="click:saveEntityClick, css: {disabled:!obEditing()}" title="Save"></div>
+				<div class="iconbutton save" data-bind="click:saveEntityClick, css: {disabled:!obEditing()}, visible:!saveBtnHidden" title="Save"></div>
 				<div class="iconbutton close-detail" data-bind="click:closeDetailClick" title="Close"></div>
 			</div>
 			<div class="group-buttons" data-bind="css: {hide :!isReadMode()}">

@@ -95,7 +95,8 @@
 	};
 
 	BasePage.prototype.showDetailsClick = function(rowSelectedId)
-	{
+	{	
+		var dataType = tf.pageManager.resizablePage.leftPageType;
 		var self = this, selectedId;
 		if (rowSelectedId)
 		{
@@ -119,7 +120,7 @@
 		{
 			ga('send', 'event', 'Area', 'Details');
 			var isReadOnly = !self.selectedItemEditable();
-			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, isReadOnly, {});
+			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, isReadOnly, {}, dataType);
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
 			);
@@ -190,6 +191,19 @@
 		} else
 		{
 			self.updateGridRecord(recordEntity.Id, true);
+		}
+	};
+
+	BasePage.prototype.onCreateNewRecordSuccessHandler = function(e, recordEntity)
+	{
+		var self = this;
+		if (TF.isMobileDevice)
+		{
+			self.isDetailViewEdited = true;
+			self.detailView.refresh();
+		} else
+		{
+			self.updateGridRecord(recordEntity.entity.Id, true);
 		}
 	};
 

@@ -17,13 +17,18 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function DetailViewViewModel(recordId, pageLevelViewModel, isReadOnly, options)
+	function DetailViewViewModel(recordId, pageLevelViewModel, isReadOnly, options, gridType)
 	{
 		var self = this;
+		if(typeof gridType === 'undefined')
+		{
+			gridType = "fieldtrip";
+		}
 
 		TF.DetailView.BaseCustomGridStackViewModel.call(self, recordId);
 
-		self.gridType = "fieldtrip";
+		self.saveBtnHidden = options && options.saveBtnHidden;
+		self.gridType = gridType;
 		self.pageType = "detailview";
 		self.recordId = recordId;
 		//vertical margin not support cannot set to 0, so set to 1, looks the same.
@@ -2054,12 +2059,13 @@
 	DetailViewViewModel.prototype.refresh = function()
 	{
 		var self = this;
-		self.applyLayoutTemplate({ isReadMode: true, layoutId: self.getEffectiveDetailLayoutId() })
+		const layoutId = self.getEffectiveDetailLayoutId();
+		self.applyLayoutTemplate({ isReadMode: self.isReadMode(), layoutId: layoutId})
 			.then(function()
 			{
 				self.skipValidation = !self.recordId;
 				self.updateDetailViewTitle();
-				self.showDetailViewById(self.recordId);
+				self.showDetailViewById(self.recordId, self.gridType, layoutId);
 			});
 
 		self.closeFieldEditor();

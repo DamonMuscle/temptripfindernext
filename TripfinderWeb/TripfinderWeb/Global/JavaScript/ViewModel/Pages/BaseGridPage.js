@@ -924,25 +924,53 @@
 
 	BaseGridPage.prototype.addClick = function(viewModel, e)
 	{
-		var self = this,
-			view = {
+		var self = this;
+
+		if(self.type == "fieldtrip") 
+		{
+			var view = {
 				id: undefined,
 				documentType: "DataEntry",
 				type: "fieldtrip",
 			};
-		ga('send', 'event', 'Area', 'Submit New Request');
-		self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel([], view);
-		if (TF.isMobileDevice)
-		{
-			tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
+			ga('send', 'event', 'Area', 'Submit New Request');
+			self.fieldTripDataEntry = new TF.DataEntry.FieldTripDataEntryViewModel([], view);
+			if (TF.isMobileDevice)
+			{
+				tf.pageManager.resizablePage.setLeftPage("workspace/dataentry/base", self.fieldTripDataEntry);
+			}
+			else
+			{
+				tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
+			}
+			if (!TF.isMobileDevice)
+			{
+				tf.pageManager.obFieldTripEditPage(self.fieldTripDataEntry);
+			}
 		}
-		else
+		else if(self.type == 'vehicle') //might check other types including Staff and Contact
 		{
-			tf.pageManager.resizablePage.setRightPage("workspace/dataentry/base", self.fieldTripDataEntry);
-		}
-		if (!TF.isMobileDevice)
-		{
-			tf.pageManager.obFieldTripEditPage(self.fieldTripDataEntry);
+			ga('send', 'event', 'Area', 'Details');
+			var isReadOnly = !this.selectedItemEditable();
+			this.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, this.type);
+			
+			this.detailView.onCloseDetailEvent.subscribe(
+				this.closeDetailClick.bind(this)
+			);
+			this.detailView.onCreateNewRecordSuccess.subscribe(
+				this.onCreateNewRecordSuccessHandler.bind(this)
+			);
+	
+			if (TF.isMobileDevice)
+			{
+				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", this.detailView);
+			}
+			else
+			{
+				tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", this.detailView);
+			}
+	
+
 		}
 
 		self.obShowFieldTripDEPanel(true);
@@ -1070,6 +1098,22 @@
 				}
 			});
 	};
+
+	BaseGridPage.prototype.getSubmitLabel = function() 
+	{
+		var label = "";
+		
+		switch(this.type)
+		{
+			case "vehicle":
+				label = "Add New Vehicle";
+				break;
+			default:
+				label = "Submit New Reqeust";
+		}
+
+		return label;
+	}
 
 	BaseGridPage.prototype.dispose = function()
 	{

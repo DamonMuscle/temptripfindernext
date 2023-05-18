@@ -57,6 +57,22 @@
 
 	VehiclePage.prototype.openVehicleRecordDetailsOnInitialLoad = function()
 	{
-		console.log("TODO: Open Vehicle Details View");
+		this.showDetailsClick();
+	};
+
+	VehiclePage.prototype.updateEditable = function()
+	{
+		var isEditable = false;
+		if (tf.authManager.authorizationInfo.isAdmin)
+		{
+			isEditable = true;
+		}
+		else
+		{
+			isEditable = tf.authManager.isAuthorizedForDataType(this.type, "edit");
+		}
+
+		this.selectedItemEditable(isEditable);
+		this.selectedItemsEditable(isEditable);
 	};
 })();
