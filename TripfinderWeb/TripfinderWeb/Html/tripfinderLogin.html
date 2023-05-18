@@ -8,17 +8,16 @@
 				<div class="panel-body">
 					<div>
 						<form class="form-horizontal loginform" role="form">
-							<div class="form-group"
-								data-bind="css: obClientKeyWarning()?'has-error':''">
+							<div class="form-group" data-bind="css: obClientKeyWarning()?'has-error':''">
 								<div class="col-sm-24" style="height:61px; margin-bottom:5px;">
 									<label for="firstName">
 										Client ID
 									</label>
-									<input type="text" id="firstName" name="clientId" class="form-control"
-										placeholder="Client ID" data-bind="value:obClientKey, enable:obClientKeyEnabled, click:cleanErrorMessage"
+									<input type="text" id="firstName" name="clientId" class="form-control" placeholder="Client ID"
+										data-bind="value:obClientKey, enable:obClientKeyEnabled, click:cleanErrorMessage,event: { blur: onClientKeyBlur }"
 										tabindex="1">
-									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId"
-										data-bv-result="INVALID" data-bind="visible:obClientKeyWarning">required</small>
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="clientId" data-bv-result="INVALID"
+										data-bind="visible:obClientKeyWarning">required</small>
 								</div>
 							</div>
 							<div class="form-group" data-bind="css: obUsernameWarning()?'has-error':''">
@@ -26,11 +25,10 @@
 									<label for="userName">
 										User Name
 									</label>
-									<input type="text" id="userName" name="userName" class="form-control"
-										placeholder="User Name" data-bind="value:obUsername, click:cleanErrorMessage"
-										tabindex="1">
-									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName"
-										data-bv-result="INVALID" data-bind="visible:obUsernameWarning">required</small>
+									<input type="text" id="userName" name="userName" class="form-control" placeholder="User Name"
+										data-bind="value:obUsername, click:cleanErrorMessage" tabindex="1">
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="userName" data-bv-result="INVALID"
+										data-bind="visible:obUsernameWarning">required</small>
 								</div>
 							</div>
 							<div class="form-group" data-bind="css: obPasswordWarning()?'has-error':''">
@@ -38,12 +36,15 @@
 									<label for="password">
 										Password
 									</label>
-									<input type="password" id="password" name="password" autocomplete="off"
-										class="form-control" placeholder="Password"
-										data-bind="value:obPassword, click:cleanErrorMessage" tabindex="1">
-									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="password"
-										data-bv-result="INVALID" data-bind="visible:obPasswordWarning"
-										style="float:left">required</small>
+									<!-- ko if:obEnablePassword() -->
+									<input type="password" id="password" name="password" autocomplete="off" class="form-control"
+										placeholder="Password" data-bind="value:obPassword, click:cleanErrorMessage" tabindex="1">
+									<!-- /ko -->
+									<!-- ko ifnot:obEnablePassword() -->
+									<input type="input" propertychanged class="form-control" disabled placeholder="SSO User">
+									<!-- /ko -->
+									<small class="help-block" data-bv-validator="notEmpty" data-bv-for="password" data-bv-result="INVALID"
+										data-bind="visible:obPasswordWarning" style="float:left">required</small>
 								</div>
 							</div>
 							<div class="form-group">

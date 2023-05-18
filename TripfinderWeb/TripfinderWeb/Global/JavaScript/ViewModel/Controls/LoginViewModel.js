@@ -1,5 +1,5 @@
 ﻿
-(function()
+(function ()
 {
 	createNamespace("TF").LoginViewModel = LoginViewModel;
 
@@ -48,6 +48,39 @@
 			this.obUsername(tf.storageManager.get("userName", true) || '');
 			this.obPassword(tf.storageManager.get("password", true) || '');
 		}
+
+		const self = this;
+
+		// The client key redirect required value cache. It can reduce duplicate requests.
+		self.clientKeyRedirectRequiredCache = new Map();
+
+		// If current client key enable SAML and SAML login should redirect to IPD server.
+		self.obRequireLoginRedirect = ko.observable(false);
+
+		// Caculate the password input box should be enable or disable.
+		self.obEnablePassword = ko.computed(function ()
+		{
+			const enablePassword = !(self.obRequireLoginRedirect() && self.isSAMLRedirectUsername(self.obUsername()));
+			if (!enablePassword)
+			{
+				// The password warning should be reset.
+				self.obPasswordWarning(false);
+				self.obPassword('');
+			}
+
+			return enablePassword;
+		});
+
+		// If disable password input, the password value should be empty.
+		self.obPassword.subscribe(function (value)
+		{
+			if (!self.obEnablePassword() && self.obPassword())
+			{
+				self.obPassword('');
+			}
+		});
+
+		self.requireLoginRedirect();
 	}
 
 	LoginViewModel.prototype.init = function(viewModel, el)
@@ -344,7 +377,7 @@
 					}
 				}
 				// For others (currently Google or Azure), SAML authentication would require redirceted login form
-				else if (SAML_REDIRECT_USERNAME_REGEX.test(username))
+				else if (self.isSAMLRedirectUsername(username))
 				{
 					return self.authSamlViaRedirect(username, Saml2Id, PostContent);
 				}
@@ -550,7 +583,72 @@
 		this.obLoginCodeErrorMessage('');
 	}
 
-	LoginViewModel.prototype.dispose = function()
+
+	/**
+	 * Check the user name with email regex. If the user name is email format, return true.
+	 * @param {*} userName 
+	 * @returns 
+	 */
+	LoginViewModel.prototype.isSAMLRedirectUsername = function (userName)
+	{
+		return SAML_REDIRECT_USERNAME_REGEX.test(userName);
+	}
+
+	/**
+	 * When the client key input box blur, it should call 'requireLoginRedirect' function to verify the SAML setting.
+	 */
+	LoginViewModel.prototype.onClientKeyBlur = function ()
+	{
+		this.requireLoginRedirect();
+	}
+
+	/**
+	 * Call endpoint to check is current SAML setting require redirect to idp server when SAML user login.
+	 */
+	LoginViewModel.prototype.requireLoginRedirect = function ()
+	{
+		const self = this;
+		const currentClientKey = this.obClientKey();
+
+		// If find value by client key in cache. Get cache value and set to obRequireLoginRedirect.
+		if (!currentClientKey)
+		{
+			self.obRequireLoginRedirect(false);
+		}
+		else if (self.clientKeyRedirectRequiredCache.has(currentClientKey))
+		{
+			self.obRequireLoginRedirect(self.clientKeyRedirectRequiredCache.get(currentClientKey));
+		}
+
+		// Call endpoint and get value. Then add into cache and  set to obRequireLoginRedirect.
+		else
+		{
+			let redirectRequired = false, storeInCache = true;
+
+			// Call /saml/redirectRequired endpoint.
+			tf.promiseAjax.get(pathCombine(tf.api.server(), this.obClientKey(), "saml", "redirectRequired"), {}, { overlay: false })
+				.then(function (apiResponse)
+				{
+					redirectRequired = apiResponse.Items[0];
+				})
+				.catch(function (apiResponse)
+				{
+					storeInCache = apiResponse.StatusCode == 404;
+				})
+				.finally(function ()
+				{
+					// Store cache if need do that.
+					if (storeInCache)
+					{
+						self.clientKeyRedirectRequiredCache.set(currentClientKey, redirectRequired);
+					}
+
+					self.obRequireLoginRedirect(redirectRequired);
+				});
+		}
+	}
+
+	LoginViewModel.prototype.dispose = function ()
 	{
 		clearInterval(this.resendCountDownInterval);
 	};
