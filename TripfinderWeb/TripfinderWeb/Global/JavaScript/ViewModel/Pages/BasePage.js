@@ -14,6 +14,7 @@
 		self.changeStatusButton = false;
 		self.cancelButton = false;
 		self.copyButton = false;
+		self.deleteButton = false;
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
@@ -473,6 +474,11 @@
 				});
 		}
 	};
+
+	BasePage.prototype.deleteSelectionClick = function(viewModel, e)
+	{
+		console.log("deleteSelectionClick");
+	}
 
 	BasePage.prototype.dispose = function()
 	{

@@ -20,6 +20,7 @@
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
+		self.deleteSelectionClick = self.deleteSelectionClick.bind(self);
 		self.kendoGridScroll = null;
 		self.isGridPage = true;
 
@@ -29,6 +30,7 @@
 		self.saveAsClick = this.saveAsClick.bind(self);
 		self.obIsSelectRow = ko.observable(false);
 		self.obCanCopyFieldTrip = ko.observable(false);
+		self.obCanDeleteRecord = ko.observable(false);
 		self.selectedItemEditable = ko.observable(false);
 		self.selectedItemsEditable = ko.observable(false);
 		self.sendToClick = self.sendToClick.bind(self);
@@ -103,6 +105,7 @@
 				{
 					self.obIsSelectRow(false);
 					self.obCanCopyFieldTrip(false);
+					self.obCanDeleteRecord(false);
 					return;
 				}
 
@@ -110,6 +113,7 @@
 				{
 					self.obIsSelectRow(current.length !== 0);
 					self.obCanCopyFieldTrip(current.length === 1 && self.obNewRequest());
+					self.obCanDeleteRecord(current.length === 1);
 					self.selectedRecordIds = current;
 					if (self.obShowDetailPanel())
 					{

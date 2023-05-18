@@ -57,7 +57,11 @@
 				<button class="iconbutton cancel" title="Cancel Trip" data-bind="enable:selectedItemsEditable"></button>
 				<!-- /ko -->
 				<!-- ko if: copyButton-->
-				<button class="iconbutton copy" title="Copy Trip" data-bind="enable:obCanCopyFieldTrip"></button>
+				<button class="iconbutton copy" title="Copy & New" data-bind="enable:obCanCopyFieldTrip"></button>
+				<!-- /ko -->
+				<!--ko if: (tf.authManager.isAuthorizedForDataType(type,"delete") && deleteButton) -->
+				<div class="divider"></div>
+				<button class="iconbutton delete" title="Delete" data-bind="click:deleteSelectionClick,enable:obCanDeleteRecord"></button>
 				<!-- /ko -->
 			<!-- /ko -->
 

@@ -14,6 +14,7 @@
 		self.copyButton = true;
 		self.detailButton = true;
 		self.schedulerButton = false;
+		self.deleteButton = true;
 	}
 
     VehiclePage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
