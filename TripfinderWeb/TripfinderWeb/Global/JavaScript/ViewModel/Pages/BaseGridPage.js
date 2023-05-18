@@ -947,33 +947,33 @@
 			{
 				tf.pageManager.obFieldTripEditPage(self.fieldTripDataEntry);
 			}
+
+			self.obShowFieldTripDEPanel(true);
 		}
 		else if(self.type == 'vehicle') //might check other types including Staff and Contact
 		{
 			ga('send', 'event', 'Area', 'Details');
-			var isReadOnly = !this.selectedItemEditable();
-			this.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, this.type);
+			var isReadOnly = !self.selectedItemEditable();
+			self.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, self.type);
 			
-			this.detailView.onCloseDetailEvent.subscribe(
-				this.closeDetailClick.bind(this)
+			self.detailView.onCloseDetailEvent.subscribe(
+				self.closeDetailClick.bind(this)
 			);
-			this.detailView.onCreateNewRecordSuccess.subscribe(
-				this.onCreateNewRecordSuccessHandler.bind(this)
+			self.detailView.onCreateNewRecordSuccess.subscribe(
+				self.onCreateNewRecordSuccessHandler.bind(self)
 			);
 	
 			if (TF.isMobileDevice)
 			{
-				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", this.detailView);
+				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
 			}
 			else
 			{
-				tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", this.detailView);
+				tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
 			}
-	
-
+			
+			self.obShowDetailPanel(true);
 		}
-
-		self.obShowFieldTripDEPanel(true);
 	};
 
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
