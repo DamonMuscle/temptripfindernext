@@ -502,6 +502,10 @@
 				}
 				this.autoLoadDataOnScrollBottom();
 				this.bindCalendarButton();
+				if (this.options.canDragDelete)
+				{
+					this.createDragDelete();
+				}
 				setTimeout(function()
 				{
 					this.overlayShow = false;
@@ -1123,6 +1127,7 @@
 		this.blurFilterInputWhenClickGrid();
 		this.handleClickClearQuickFilterBtn();
 		this.bindCalendarButton();
+		this.options.canDragDelete && this.createDragDelete();
 		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
 
@@ -6308,6 +6313,141 @@
 			scrollTop = Math.min(scrollTop, lastPageTop);
 			$scroll.scrollTop(scrollTop);
 		}
+	};
+
+	LightKendoGrid.prototype.createDragDelete = function()
+	{
+		var that = this,
+			deleteColumn = function(e)
+			{
+				$(window).off("mouseup");
+				$("body").off("mousemove");
+				var $dragEle = e.draggable.hint;
+				if (!$dragEle.hasClass("dragIn")) return;
+				$dragEle.remove();
+				var childColumns = that._obSelectedColumns().filter(function(column)
+				{
+					return column.ParentField;
+				});
+				if (that._obSelectedColumns().length <= 1 || (that._obSelectedColumns().length === 2 && childColumns && childColumns.length > 0))
+				{
+					return that.gridAlert.show(
+						{
+							alert: "Warning",
+							title: "Warning",
+							message: "There should be at least one non locked column",
+							key: that._columnsUnLockedTimesKey
+						});
+				}
+
+				if (that._removingOnlyOneUnLockColumn && that._removingOnlyOneUnLockColumn(e.draggable.hint.text()))
+				{
+					return;
+				}
+				//All visible columns to the left of this column are locked. Removing this column will unlock those columns. Are you sure you want to remove this column?
+				return tf.promiseBootbox.confirm(
+					{
+						message: "Are you sure you want to remove the column?",
+						title: "Remove Confirmation"
+					})
+					.then(function(result)
+					{
+						if (result)
+						{
+							var name = e.draggable.hint.text();
+							if (that.options.onDragRemoveColumn)
+							{
+								that.options.onDragRemoveColumn(name);
+							} else
+							{
+								that._removeColumn(name);
+								that.rebuildGrid();
+							}
+						}
+					}.bind(that));
+			};
+
+		var docRoot = $("body");
+		docRoot.kendoDropTarget(
+			{
+				group: that.kendoGrid._draggableInstance.options.group,
+				dragenter: function(e)
+				{
+					var $fromEle = e.draggable.currentTarget;
+					var $dragEle = e.draggable.hint;
+					$(window).off(".removecolumn");
+					$("body").on(this.isMobileDevice ? "touchmove.removecolumn" : "mousemove.removecolumn", function()
+					{
+						var grid = $fromEle.closest(".kendo-grid"), dragOffset = 40,
+							fromEleTop = $fromEle.offset().top,
+							dragEleTop = $dragEle.offset().top,
+							dragEleLeft = $dragEle.offset().left;
+						if (grid && (fromEleTop > dragEleTop + dragOffset || fromEleTop < dragEleTop - dragOffset ||
+							grid.offset().left - dragOffset > dragEleLeft || grid.offset().left + grid.outerWidth() + dragOffset < dragEleLeft))
+						{
+							$dragEle.addClass("dragIn");
+						}
+						else
+						{
+							$dragEle.removeClass("dragIn");
+						}
+					});
+				}.bind(this),
+				dragleave: function(e)
+				{
+					var $dragEle = e.draggable.hint;
+					if (e.pageX < 0 || e.pageX >= $(window).width() || e.pageY < 0 || e.pageY >= $(window).height())
+					{
+						$(window).off(".removecolumn").on(this.isMobileDevice ? "touchend.removecolumn" : "mouseup.removecolumn", function()
+						{
+							$("body").off(".removecolumn");
+							$(window).off(".removecolumn");
+							deleteColumn(e);
+							$dragEle.remove();
+						}.bind(this));
+						return;
+					}
+					$("body").off(".removecolumn");
+					$dragEle.removeClass("dragIn");
+				}.bind(this),
+				drop: function(e)
+				{
+					deleteColumn(e);
+					e.draggable.hint.remove();
+					$(window).off(".removecolumn");
+					$("body").off(".removecolumn");
+				}
+			});
+	};
+
+	LightKendoGrid.prototype._removeColumn = function(columnDisplayName)
+	{
+		var columns = this.kendoGrid.columns;
+		var avaColumns = this._availableColumns;
+		for (var idx = 0; idx < columns.length; idx++)
+		{
+			if (columns[idx].DisplayName === columnDisplayName)
+			{
+				var subColumn = columns.filter(function(column)
+				{
+					return column.ParentField === columns[idx].FieldName;
+				});
+				avaColumns.push(columns[idx]);
+				this.clearCustomFilterByFieldName(columns[idx].FieldName);
+				columns.splice(idx, 1);
+				if (subColumn && subColumn.length > 0)
+				{
+					avaColumns.push(subColumn[0]);
+					this.clearCustomFilterByFieldName(subColumn[0].FieldName);
+					subColumn.forEach(function(sColumn)
+					{
+						columns.splice(columns.indexOf(sColumn), 1);
+					});
+				}
+				break;
+			}
+		}
+		this._availableColumns = avaColumns;
 	};
 
 	LightKendoGrid.prototype.getSelectedRecordsFromServer = function()

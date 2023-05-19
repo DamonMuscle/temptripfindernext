@@ -3,7 +3,8 @@
 	createNamespace("TF.Grid").KendoGrid = KendoGrid;
 	var defaults = {
 		obDocumentFocusState: true,
-		layoutAndFilterOperation: true
+		layoutAndFilterOperation: true,
+		canDragDelete: true
 	};
 
 	const DEFAULT_THEMATIC_LABEL = "All Other Values";
