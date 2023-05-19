@@ -52,6 +52,7 @@
 			return false;
 		}, self);
 		self.supportAutoScroll = false;
+		self.deleteButton = true;
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -1117,6 +1118,13 @@
 		}
 
 		return label;
+	}
+
+	BaseGridPage.prototype.isAddVisible = function()
+	{
+		var self = this;
+		var dataTypes = tf.dataTypeHelper.getAvailableDataTypes();
+		return dataTypes.includes(item => item.key === self.type) && (!obShowFieldTripDEPanel() || !obShowDetailPanel()) && obNewRequest();
 	}
 
 	BaseGridPage.prototype.dispose = function()

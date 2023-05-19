@@ -199,6 +199,16 @@
 		return hasAddRight;
 	};
 
+	FieldTripAuthHelper.prototype.checkAddable = function(type)
+	{
+		if (type === "fieldtrip")
+		{
+			return this.checkFieldTripAddable();
+		}
+		else
+			return tf.authManager.isAuthorizedForDataType(type, "add");
+	}
+
 	FieldTripAuthHelper.prototype.checkFieldTripsEditable = function(items)
 	{
 		return items && items.length && items.every(this.checkFieldTripEditable, this);

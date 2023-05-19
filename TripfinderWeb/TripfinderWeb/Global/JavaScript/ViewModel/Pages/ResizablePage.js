@@ -356,7 +356,7 @@
 				if ((!self.obRightData() || self.obRightData().pageType === "detailview") && self.leftPageType !== "reports")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
-					if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+					if(tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
 					{
 						newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
 					}
@@ -374,7 +374,7 @@
 						{
 							pageTitle.css({ "display": "none", "width": "100%" });
 							pageHeader.css({ "height": "56px" });
-							if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+							if(tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
 							{
 								newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
 							}
@@ -394,7 +394,7 @@
 					else
 					{
 						pageTitle.css({ "display": "block", "width": "auto" });
-						if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+						if(tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
 						{
 							newRequest.css({ "display": "block" });
 						}

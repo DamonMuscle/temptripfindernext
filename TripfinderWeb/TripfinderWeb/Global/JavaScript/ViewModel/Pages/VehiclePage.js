@@ -64,16 +64,30 @@
 	VehiclePage.prototype.updateEditable = function()
 	{
 		var isEditable = false;
+		var isDeletable = false;
+		var isAddable = false;
+		
 		if (tf.authManager.authorizationInfo.isAdmin)
 		{
 			isEditable = true;
+			isDeletable = true;
+			isAddable = true;
 		}
 		else
 		{
 			isEditable = tf.authManager.isAuthorizedForDataType(this.type, "edit");
+			isDeletable = tf.authManager.isAuthorizedForDataType(this.type, "delete");
+			isAddable = tf.authManager.isAuthorizedForDataType(this.type, "add");
 		}
 
+		// update Edit observable variables
 		this.selectedItemEditable(isEditable);
 		this.selectedItemsEditable(isEditable);
+
+		// update Delete observable variable
+		this.obCanDeleteRecord(isDeletable);
+
+		// update Add observable variable
+		this.obNewRequest(isAddable);
 	};
 })();
