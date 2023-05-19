@@ -291,6 +291,7 @@
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
 			tf.kendoHackHelper = new TF.KendoHackHelper();
+			tf.thematicDefaultColorsManager = new TF.ThematicDefaultColorsManager();
 			tf.docFilePreviewHelper = new TF.Control.DocumentFilePreviewViewModel($("body"));
 			tf.helpers = {
 				detailViewHelper: new TF.DetailView.DetailViewHelper(),
@@ -330,7 +331,12 @@
 			{
 				tf.setting = new TF.Setting();
 				return tf.setting.getRoutingConfig();
-			}).then(function()
+			})
+			.then(function()
+			{
+				return tf.thematicDefaultColorsManager.getThematicDefaultColors();
+			})
+			.then(function()
 			{
 				tf.UDFDefinition = new TF.GridDefinition.UDFDefinition();
 				return tf.UDFDefinition.loadAll();

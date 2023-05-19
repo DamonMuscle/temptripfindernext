@@ -202,9 +202,12 @@
 			return false;
 		}
 
+		// need to check the filter and thematic only if there is a layout applied to grid.
+		let changedByOtherCondition = currentLayout.id() && (!fuzzyCompare(currentLayout.filterId(), currentLayoutInitState.FilterId)
+			|| !fuzzyCompare(currentLayout.thematicId(), currentLayoutInitState.ThematicId));
+
 		// Need to compare filter name is because users could use quick filter to modify filter.
-		if (!TF.Grid.LayoutHelper.compareLayoutColumns(currentLayout.layoutColumns(), currentLayoutInitState.LayoutColumns)
-			|| !fuzzyCompare(currentLayout.filterId(), currentLayoutInitState.FilterId))
+		if (!TF.Grid.LayoutHelper.compareLayoutColumns(currentLayout.layoutColumns(), currentLayoutInitState.LayoutColumns) || changedByOtherCondition)
 		{
 			return true;
 		}
@@ -343,7 +346,7 @@
 			var gridLayoutExtendedDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridLayoutExtendedDataModel, gridLayouts);
 			self.obGridLayoutExtendedDataModels(gridLayoutExtendedDataModels);
 			self._sortGridLayoutExtendedDataModels();
-			self.setFilterName();
+			self.setFilterAndThematicName();
 			let layout = null;
 
 			// If the request is from search, do not use the sticky layout.
@@ -833,6 +836,7 @@
 		const defaultLayout = new TF.DataModel.GridLayoutExtendedDataModel(self._defaultGridLayoutExtendedEntity);
 		self._obCurrentGridLayoutExtendedDataModel(defaultLayout);
 		self.clearFilter();
+		self.clearGridThematicConfigs();
 
 		// clear predefined data from share link.
 		delete self.options.predefinedGridData;
@@ -843,6 +847,7 @@
 		{
 			tf.storageManager.delete(self._storageLayoutDataKey);
 			tf.storageManager.delete(self._storageFilterDataKey);
+			tf.storageManager.delete(self._storageThematicDataKey);
 		}
 
 		self._setGridColumnConfiguration();
@@ -860,10 +865,11 @@
 	KendoGridLayoutMenu.prototype.manageLayoutClick = function(viewModel, e)
 	{
 		const self = this;
-		self.setFilterName();
+		self.setFilterAndThematicName();
 		const reloadLayout = () =>
 		{
 			return self.loadGridFilter()
+				.then(() => { return self.getThematicList(); })
 				.then(() => { return self.loadLayout(); });
 		};
 
@@ -873,6 +879,7 @@
 				new TF.Modal.Grid.ManageLayoutModalViewModel(
 					self.obGridLayoutExtendedDataModels,
 					self.obGridFilterDataModels,
+					self.obGridThematicDataModels,
 					self.saveAndEditLayout,
 					self.applyLayout,
 					self.obSelectedGridLayoutName,
@@ -883,10 +890,11 @@
 		});
 	};
 
-	KendoGridLayoutMenu.prototype.setFilterName = function()
+	KendoGridLayoutMenu.prototype.setFilterAndThematicName = function()
 	{
 		const self = this;
 		const filterIdDict = _.keyBy(self.obGridFilterDataModels(), o => o.id());
+		const thematicIdDict = _.keyBy(self.obGridThematicDataModels(), o => o.id());
 
 		self.obGridLayoutExtendedDataModels().forEach(function(item)
 		{
@@ -894,6 +902,12 @@
 			if (filter)
 			{
 				item.filterName(filter.name());
+			}
+
+			const thematic = thematicIdDict[item.thematicId()];
+			if (thematic)
+			{
+				item.thematicName(thematic.name());
 			}
 		});
 	}
@@ -974,6 +988,12 @@
 			});
 	};
 
+	/**
+	 * Apply layout related filter and thematic.
+	 *
+	 * @param {*} gridLayout
+	 * @return {*}
+	 */
 	KendoGridLayoutMenu.prototype.applyLayoutExtended = function(gridLayout)
 	{
 		const self = this;
@@ -1000,8 +1020,9 @@
 				const shouldUseStickyLayout = self.shouldUseStickyLayout();
 				if (shouldUseStickyLayout && !self.isDashboardWidget())
 				{
-					// Remove custom filter ids when a layout is applied.
+					// Remove custom filter & thematic ids when a layout is applied.
 					tf.storageManager.delete(self._storageFilterDataKey);
+					tf.storageManager.delete(self._storageThematicDataKey);
 					tf.storageManager.save(self._storageLayoutDataKey, gridLayout.id());
 				}
 
@@ -1036,37 +1057,58 @@
 	KendoGridLayoutMenu.prototype.requestForLayoutExtendedData = function(layoutData)
 	{
 		const filterId = layoutData.filterId();
+		const thematicId = layoutData.thematicId();
 		let requestForFilter = null;
+		let requestForThematic = null;
+
+		const isDashboardWidget = this.options && this.options.customGridType === "dashboardwidget";
+		const option = isDashboardWidget ? { overlay: false } : null;
 
 		if (filterId)
 		{
-			requestForFilter = TF.Grid.FilterHelper.getFilterById(filterId);
+			requestForFilter = TF.Grid.FilterHelper.getFilterById(filterId, option);
+		}
+
+		if (thematicId)
+		{
+			requestForThematic = TF.Helper.ThematicHelper.getThematicById(thematicId, option);
 		}
 
 		return Promise.all([
-			requestForFilter
+			requestForFilter,
+			requestForThematic
 		]).then((res) =>
 		{
-			const [filterData] = res;
+			const [filterData, thematicData] = res;
 			const filterName = filterData ? filterData.Name : "";
+			const thematicName = thematicData ? thematicData.Name : "";
 
 			layoutData.filterName(filterName);
+			layoutData.thematicName(thematicName);
 
-			return { filterData };
+			return { filterData, thematicData };
 		});
 	};
 
 	KendoGridLayoutMenu.prototype._applyLayoutExtended = function(gridLayout)
 	{
 		var layoutFilterId = gridLayout.filterId(),
+			layoutThematicId = gridLayout.thematicId(),
 			currentFilterId = this.obSelectedGridFilterId(),
+			currentThematicId = this.obSelectedGridThematicId(),
 			filterNeedsChange = layoutFilterId !== currentFilterId,
+			thematicNeedsChange = layoutThematicId !== currentThematicId,
 			hasValidFilter = layoutFilterId && (this.obGridFilterDataModels() || []).some(c => c.id() === layoutFilterId);
 
-		// Switch filter when necessary.
+		// Switch filter & thematic when necessary.
 		if (filterNeedsChange)
 		{
 			this.obSelectedGridFilterId(layoutFilterId);
+		}
+
+		if (thematicNeedsChange)
+		{
+			this.obSelectedGridThematicId(layoutThematicId);
 		}
 
 		// Set up filter related variables.
@@ -1101,7 +1143,7 @@
 		}
 
 		this.clearPredefinedGridFilter();
-		gridLayout.apiIsDirty(filterNeedsChange);
+		gridLayout.apiIsDirty(filterNeedsChange || thematicNeedsChange);
 	};
 
 	KendoGridLayoutMenu.prototype.saveLayoutClick = function(viewModel, e)
@@ -1168,6 +1210,12 @@
 			FilterName: selectedLayout.filterName(),
 		};
 
+		if (this.obThematicSupported())
+		{
+			layoutEntity["ThematicID"] = selectedLayout.thematicId();
+			layoutEntity["ThematicName"] = selectedLayout.thematicName();
+		}
+
 		return layoutEntity;
 	};
 
@@ -1219,7 +1267,9 @@
 			isNew,
 			gridLayout: editingLayout ? editingLayout : this._obCurrentGridLayoutExtendedDataModel(),
 			allFilters: this.obGridFilterDataModels(),
+			allThematics: this.obGridThematicDataModels(),
 			selectedFilterId: this.obSelectedGridFilterId(),
+			selectedThematicId: this.obSelectedGridThematicId(),
 			uDGridId: this.options.gridData ? this.options.gridData.value : null
 		})).then(function(result)
 		{

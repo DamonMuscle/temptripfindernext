@@ -15,7 +15,7 @@
 				<div class='mobile-modal-grid-select-option swipe' data-bind="click:$parent.selectLayout.bind($parent),css:{'checked':$data.name()==$parent.obSelectedGridLayoutName()}">
 					<div class="col-xs-18 title">
 						<div data-bind="text:name"></div>
-						<div class="filter-name" data-bind="text:'FILTER: ' + (!!filterName()?filterName():'None')"></div>
+						<div class="filter-name" data-bind="text:'FILTER: ' + (!!filterName()?filterName():'None') + ', THEMATIC: ' + (!!thematicName()?thematicName():'None')"></div>
 					</div>
 					<div class="col-xs-4 status" style="padding-right:15px;padding-left:0">
 						<div class="checked-icon">

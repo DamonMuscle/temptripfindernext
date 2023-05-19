@@ -11,12 +11,13 @@
 	{
 		const {
 			gridType, isNew, gridLayout, allFilters,
-			selectedFilterId, uDGridId
+			allThematics, selectedFilterId, selectedThematicId, uDGridId
 		} = options;
 
 		this.isNew = isNew;
 		this._gridType = gridType;
 		const gridLayoutExtendedDataModel = gridLayout.clone();
+		let displayFilterId, displayThematicId;
 		if (isNew === "new")
 		{
 			gridLayoutExtendedDataModel.id(0);
@@ -29,21 +30,30 @@
 			gridLayoutExtendedDataModel.autoExportExists(false);
 			gridLayoutExtendedDataModel.autoExports([]);
 			displayFilterId = selectedFilterId;
+			displayThematicId = selectedThematicId;
 
 		}
 		else
 		{
 			displayFilterId = gridLayoutExtendedDataModel.filterId();
+			displayThematicId = gridLayoutExtendedDataModel.thematicId();
 		}
 		this.obStatus = ko.observable('layout');
 		this.obSearchFilter = ko.observable("");
 		this.obSearchFilter.subscribe(this.searchFilter.bind(this));
+		this.obSearchThematic = ko.observable("");
+		this.obSearchThematic.subscribe(this.searchThematic.bind(this));
 		this.gridLayoutExtendedDataModel = gridLayoutExtendedDataModel;
 		this.obFilterDataList = ko.observableArray([]);
+		this.obThematicDataList = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray([...allFilters]);
 		this.obGridFilterDataModels().unshift(getPlaceholderDataModel());
+		this.obGridThematicDataModels = ko.observableArray([...allThematics]);
+		this.obGridThematicDataModels().unshift(getPlaceholderDataModel());
 		var selectedGridFilterDataModel = this.obGridFilterDataModels().find((c) => c.id() == displayFilterId) || this.obGridFilterDataModels()[0];
 		this.obSelectedGridFilterDataModel = ko.observable(selectedGridFilterDataModel);
+		var selectedGridThematicDataModel = this.obGridThematicDataModels().find((c) => c.id() == displayThematicId) || this.obGridThematicDataModels()[0];
+		this.obSelectedGridThematicDataModel = ko.observable(selectedGridThematicDataModel);
 
 		this.obApplyOnSave = ko.observable(false);
 		this.obIsSafari = ko.observable(TF.isSafari);
@@ -58,8 +68,13 @@
 		this.obSelectedGridFilterDataModelText = ko.observable(selectedGridFilterDataModel ? selectedGridFilterDataModel.name() : "");
 		this.obSelectedGridFilterDataModelText.subscribe(this.selectedGridFilterDataModelChange, this);
 
+		this.obSelectedGridThematicDataModelText = ko.observable(selectedGridThematicDataModel ? selectedGridThematicDataModel.name() : "");
+		this.obSelectedGridThematicDataModelText.subscribe(this.selectedGridThematicDataModelChange, this);
 		this.validationMessage = null;
 		this.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+
+		const isThematicSupported = tf.dataTypeHelper.checkGridThematicSupport(gridType);
+		this.obThematicSupported = ko.observable(isThematicSupported);
 	}
 
 	ModifyLayoutViewModel.prototype.save = function()
@@ -108,6 +123,8 @@
 				Name: this.gridLayoutExtendedDataModel.name(),
 				FilterID: this.gridLayoutExtendedDataModel.filterId() || null,
 				FilterName: this.gridLayoutExtendedDataModel.filterName() || "",
+				ThematicID: this.gridLayoutExtendedDataModel.thematicId() || null,
+				ThematicName: this.gridLayoutExtendedDataModel.thematicName() || "",
 				ShowSummaryBar: this.gridLayoutExtendedDataModel.showSummaryBar() || null,
 				Description: this.gridLayoutExtendedDataModel.description(),
 				LayoutColumns: JSON.stringify(layoutColumns),
@@ -131,6 +148,8 @@
 					this.gridLayoutExtendedDataModel.name(savedLayout.Name);
 					this.gridLayoutExtendedDataModel.filterId(savedLayout.FilterId);
 					this.gridLayoutExtendedDataModel.filterName(savedLayout.FilterName);
+					this.gridLayoutExtendedDataModel.thematicId(savedLayout.ThematicId);
+					this.gridLayoutExtendedDataModel.thematicName(savedLayout.ThematicName);
 					this.gridLayoutExtendedDataModel.showSummaryBar(savedLayout.ShowSummaryBar);
 					this.gridLayoutExtendedDataModel.description(savedLayout.Description);
 					this.gridLayoutExtendedDataModel.layoutColumns(JSON.parse(savedLayout.LayoutColumns));
@@ -158,11 +177,24 @@
 		this.gridLayoutExtendedDataModel.filterName(this.obSelectedGridFilterDataModel() ? this.obSelectedGridFilterDataModel().name() : null);
 	};
 
+	ModifyLayoutViewModel.prototype.selectedGridThematicDataModelChange = function()
+	{
+		this.gridLayoutExtendedDataModel.thematicId(this.obSelectedGridThematicDataModel() ? this.obSelectedGridThematicDataModel().id() : null);
+		this.gridLayoutExtendedDataModel.thematicName(this.obSelectedGridThematicDataModel() ? this.obSelectedGridThematicDataModel().name() : null)
+	};
+
 	ModifyLayoutViewModel.prototype.gotoSelectFilter = function(viewModel, el)
 	{
 		this.obSearchFilter("");
 		this.obFilterDataList(this.obGridFilterDataModels().slice());
 		this.obStatus('selectfilter');
+	};
+
+	ModifyLayoutViewModel.prototype.gotoSelectThematic = function(viewModel, el)
+	{
+		this.obSearchThematic("");
+		this.obThematicDataList(this.obGridThematicDataModels().slice());
+		this.obStatus('selectthematic');
 	};
 
 	ModifyLayoutViewModel.prototype.goToLayout = function()
@@ -188,6 +220,27 @@
 		this.obFilterDataList(Enumerable.From(this.obGridFilterDataModels()).Where(function(item)
 		{
 			return item.name().toLowerCase().indexOf(self.obSearchFilter().toLowerCase()) >= 0;
+		}).ToArray());
+	};
+
+	ModifyLayoutViewModel.prototype.emptySearchThematic = function()
+	{
+		this.obSearchThematic("");
+	};
+
+	ModifyLayoutViewModel.prototype.selectThematic = function(modal, e)
+	{
+		this.obSelectedGridThematicDataModel(modal);
+		this.selectedGridThematicDataModelChange();
+		this.obStatus('layout');
+	};
+
+	ModifyLayoutViewModel.prototype.searchThematic = function()
+	{
+		var self = this;
+		this.obThematicDataList(Enumerable.From(this.obGridThematicDataModels()).Where(function(item)
+		{
+			return item.name().toLowerCase().indexOf(self.obSearchThematic().toLowerCase()) >= 0;
 		}).ToArray());
 	};
 

@@ -36,6 +36,8 @@
 		{ from: "UDGridId", default: null },
 		{ from: "FilterId", default: null },
 		{ from: "FilterName", default: "" },
+		{ from: "ThematicId", default: null },
+		{ from: "ThematicName", default: "" },
 		{ from: "ShowSummaryBar", default: false },
 		{ from: "ShowRecurringDate", default: null },
 		{ from: "DataExportExists", default: false },

@@ -638,6 +638,15 @@ function toISOStringWithoutTimeZone(m)
 	return m.format('YYYY-MM-DDTHH:mm:ss.SSS');
 }
 
+function convertToMoment(value)
+{
+	if ((/^\d*:\d*:\d*$/g).test(value))
+	{
+		return moment("1900-01-01 " + value);
+	}
+	return moment(value);
+}
+
 function utcToClientTimeZone(utcValue)
 {
 	if (!utcValue)
@@ -830,6 +839,13 @@ function booleanToCheckboxFormatter(value)
 		return input.toUpperCase();
 	}
 })();
+
+createNamespace("TF").isLightness = function(color)
+{
+	var arcgisColor = new tf.map.ArcGIS.Color(color);
+	var brightness = (arcgisColor.r * 299 + arcgisColor.g * 587 + arcgisColor.b * 114) / 1000;
+	return brightness >= 123;
+};
 
 (function()
 {

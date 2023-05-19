@@ -169,6 +169,7 @@
 	<script src="Global/JavaScript/Framework/BulkContextMenu.js"></script>
 	<script src="Global/JavaScript/Framework/PrintHelper.js"></script>
 	<script src="Global/JavaScript/Framework/tfdispose.js"></script>
+	<script src="Global/JavaScript/Framework/ThematicDefaultColorsManager.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Knockout.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/contextMenuClick.js"></script>
 	<script src="Global/JavaScript/Framework/Knockout/Binding/singleClick.js"></script>
@@ -205,6 +206,7 @@
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/gridmenu.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/filter.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/KendoGridFilterMenu.js"></script>
+	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/KendoGridThematicMenu.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/layout.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/kendoGridLockbar.js"></script>
 	<script src="Global/JavaScript/Framework/Grid/KendoPlugin/summary.js"></script>
@@ -302,6 +304,9 @@
 	<script src="Global/JavaScript/ViewModel/Controls/MessageViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointsJSON.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DataPointPanel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/Grid Map/Thematics/EditThematicConfigViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/Grid Map/Thematics/SaveNewThematicViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Controls/Grid Map/Thematics/ManageThematicsViewModel.js"></script>
 
 	<script src="Global/JavaScript/ViewModel/DetailView/EditDataBlockAppearance.js"></script>
 	<script src="Global/JavaScript/ViewModel/DetailView/DetailViewHelper.js"></script>
@@ -343,6 +348,7 @@
 	<script src="Global/JavaScript/ViewModel/PageLevel/AddTwoFieldsPageViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/PageLevel/EditDocumentPageLevelViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/PageLevel/EmailPageLevelViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/PageLevel/EditThematicConfigPageLevelViewModel.js"></script>
 
 	<script src="Global/JavaScript/Modal/BaseModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/SelectMapMobileModalViewModel.js"></script>
@@ -382,7 +388,9 @@
 	<script src="Global/JavaScript/Modal/CopyDataModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/MessageModalViewModel.js"></script>
 	<script src="Global/JavaScript/Modal/CommunicationHistoryModalViewModel.js"></script>
-
+	<script src="Global/JavaScript/Modal/Grid Map/Thematics/EditThematicConfigModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid Map/Thematics/ManageThematicsModalViewModel.js"></script>
+	<script src="Global/JavaScript/Modal/Grid Map/Thematics/SaveNewThematicModalViewModel.js"></script>
 
 	<script src="Global/JavaScript/DataModel/BaseDataModel.js"></script>
 	<script src="Global/JavaScript/DataModel/UserPreferenceDataModel.js"></script>
@@ -404,10 +412,12 @@
 	<script src="Global/JavaScript/DataModel/GenerateReportDataModal.js"></script>
 	<script src="Global/JavaScript/DataModel/SettingsConfigurationDataModal.js"></script>
 	<script src="Global/JavaScript/DataModel/ReportReceiptDataModel.js"></script>
+	<script src="Global/JavaScript/DataModel/ThematicConfigurationDataModel.js"></script>
 
 	<script src="Global/JavaScript/Workspace/GridDefinition/UDFDefinition.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/KendoGridHelper.js"></script>
 	<script src="Global/JavaScript/ViewModel/Helper/MiniGridHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Helper/ThematicHelper.js"></script>
 
 	<script src="Global/JavaScript/Workspace/SessionItem.js"></script>
 	<script src="Global/JavaScript/Framework/Graphic/RectCollisionDetector.js"></script>
@@ -606,6 +616,13 @@
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddModalViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/DetailView/ManageAssociation/BasicQuickAddViewModel.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/SwitchGridMenuViewModel.js"></script>
+
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/DataFieldHelper.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/ThematicGridViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/QuickFilterViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/FilterMenuViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/CustomFilterViewModel.js"></script>
+	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/ListFilterTool.js"></script>
 	<!-- endbuild -->
 	<script src="Global/ThirdParty/4.18/dojo/dojo.js" data-dojo-config="async: true"></script>
 </head>

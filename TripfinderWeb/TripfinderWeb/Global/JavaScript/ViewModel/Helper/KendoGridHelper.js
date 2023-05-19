@@ -1085,9 +1085,9 @@
 			});
 	};
 
-	KendoGridHelper.createShareURL = function (type, selectedIds, layoutColumns, targetProduct)
+	KendoGridHelper.createShareURL = function (type, selectedIds, layoutColumns, targetProduct, thematicSetting, addtionalInfo)
 	{
-		return tf.helpers.gridLinkHelper.createGridLink(tf.datasourceManager.databaseId, type, selectedIds, layoutColumns)
+		return tf.helpers.gridLinkHelper.createGridLink(tf.datasourceManager.databaseId, type, selectedIds, layoutColumns, thematicSetting, addtionalInfo)
 			.then((gridLink) =>
 			{
 				if (!gridLink) { return; }
@@ -1190,11 +1190,21 @@
 					{
 						if (!shouldProceed) { return; }
 
-						const { DataTypeId, Ids, Layout } = gridLink;
+						const { DataTypeId, Ids, Layout, ThematicSetting, AdditionalInfo } = gridLink;
 
 						let layoutColumns = null;
 						const gridType = tf.dataTypeHelper.getKeyById(DataTypeId);
 						const filterName = `${tf.dataTypeHelper.getFormalDataTypeName(gridType)} (Selected Records)`;
+
+						let thematicSetting = null
+						if (ThematicSetting)
+						{
+							const { customDisplaySetting, quickFilters } = JSON.parse(ThematicSetting);
+							thematicSetting = {
+								CustomDisplaySetting: JSON.stringify(customDisplaySetting),
+								QuickFilters: JSON.stringify(quickFilters)
+							}
+						}
 
 						try
 						{
@@ -1210,7 +1220,9 @@
 							filteredIds: Ids.split(','),
 							gridType: gridType,
 							filterName: filterName,
-							layoutColumns: layoutColumns
+							layoutColumns: layoutColumns,
+							thematicSetting: thematicSetting,
+							additionalInfo: AdditionalInfo
 						};
 
 						return predefinedGridData;

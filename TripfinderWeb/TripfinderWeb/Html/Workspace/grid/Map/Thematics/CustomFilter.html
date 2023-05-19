@@ -1,0 +1,73 @@
+<div class="custom-filter" data-bind="attr:{role:obRole}, uiInit:init">
+	<div class="k-filter-menu k-popup k-group k-reset k-state-border-up">
+		<span class="k-dropdown filter-menu" role="filter-menu-first">
+			<!--ko with:obFirstFilterTypeCode -->
+			<span class="k-dropdown-wrap k-state-default" data-bind="click: $parent.filterMenuClick">
+				<span class="k-input" data-bind="text: $parent.obFirstFilterType"></span>
+				<span class="k-select">
+					<span class="k-icon k-i-arrow-s"></span>
+				</span>
+			</span>
+			<!--/ko --> 
+			<div class="filter-menu-custom" role="filter-menu-first">
+				<div class="k-list-container k-popup">
+					<ul class="k-list k-reset" tabindex="-1">
+						<!--ko foreach: obFilterTypes -->
+						<li tabindex="-1" class="k-item" data-bind="css:style, text:text, click: $parent.firstfilterClick"></li>
+						<!--/ko -->
+					</ul>
+				</div>
+			</div>
+		</span>
+		<div class="first-value" data-bind="css:{ 'disabled': (obFirstFilterTypeCode() === 'isnotempty' || obFirstFilterTypeCode() === 'isempty') } ">
+		<!--ko customInput:{ type:obFilterType, value:obFirstFilterValue, attributes:{class: "k-textbox form-control k-input-needed"} } -->
+		<!-- /ko -->
+		</div>
+		<span class="k-dropdown k-filter-and filter-menu" role="filter-state">
+			<!--ko with:obFilterStateCode -->
+			<span class="k-dropdown-wrap k-state-default" data-bind="click: $parent.filterMenuClick">
+				<span class="k-input" data-bind="text:$parent.obFilterState"></span>
+				<span class="k-select">
+					<span class="k-icon k-i-arrow-s"></span>
+				</span>
+			</span>
+			<!--/ko -->
+			<div class="filter-menu-custom filter-state" role="filter-state">
+				<div class="k-list-container k-popup">
+					<ul class="k-list k-reset" tabindex="-1">
+						<!--ko foreach: obFilterStateArray -->
+						<li tabindex="-1" class="k-item" data-bind="css:style, text:text, click: $parent.filterStateClick"></li>
+						<!--/ko -->
+					</ul>
+				</div>
+			</div>
+		</span>
+		<span class="k-dropdown filter-menu" role="second-menu-first">
+			<!--ko with:obSecondFilterTypeCode -->
+			<span class="k-dropdown-wrap k-state-default" data-bind="click: $parent.filterMenuClick">
+				<span class="k-input" data-bind="text: $parent.obSecondFilterType"></span>
+				<span class="k-select">
+					<span class="k-icon k-i-arrow-s"></span>
+				</span>
+			</span>
+			<!--/ko --> 
+			<div class="filter-menu-custom" role="second-menu-first">
+				<div class="k-list-container k-popup">
+					<ul class="k-list k-reset" tabindex="-1">
+						<!--ko foreach: obFilterTypes -->
+						<li tabindex="-1" class="k-item" data-bind="css:style, text:text, click: $parent.secondfilterClick"></li>
+						<!--/ko -->
+					</ul>
+				</div>
+			</div>
+		</span>
+		<div class="second-value"  data-bind="css:{ 'disabled': (obSecondFilterTypeCode() === 'isnotempty' || obSecondFilterTypeCode() === 'isempty') } ">
+		<!--ko customInput:{ type:obFilterType, value:obSecondFilterValue, attributes:{class: "k-textbox form-control k-input-needed"} } -->
+		<!-- /ko -->
+		</div>
+		<div class="custom-filter-buttons">
+			<button class="k-button k-primary" data-bind="click:applyClick">Apply</button>
+			<button class="k-button cancelButton" data-bind="click:cancelClick">Cancel</button>
+		</div>
+	</div>
+</div>

@@ -6,6 +6,11 @@
 		layoutAndFilterOperation: true
 	};
 
+	const DEFAULT_THEMATIC_LABEL = "All Other Values";
+	const THEMATIC_COLOR_ATTRIBUTE = "custom-bkg-color";
+	const SCHEDULE_GRIDS = ["studentattendanceschedule", "tripschedule", "tripstopschedule"];
+	const THEMATIC_NOT_BIG_GRIDS = ["session", "formsent", "dashboards", "dashboardLibrary", "scheduledmergedocument", "scheduledreport"];
+
 	function addPlugin()
 	{
 		var base, sub = arguments[0];
@@ -42,6 +47,16 @@
 			});
 		});
 
+		this.thematicFields = [];
+		this.selectedGridThematicConfigs = null;
+		this.tempGridThematicDataModel = null;
+		this.predefinedGridData = this.options.predefinedGridData;
+
+		const isThematicSupported = tf.dataTypeHelper.checkGridThematicSupport(this._gridType);
+		this.obThematicSupported = ko.observable(isThematicSupported);
+		this.obIsThematicApplied = ko.observable(false);
+
+		this.dataFieldHelper = new TF.Map.Thematics.DataFieldHelper();
 	}
 
 	KendoGrid.prototype = Object.create(TF.Grid.LightKendoGrid.prototype);
@@ -55,6 +70,7 @@
 		this._obDocumentFocusState = ko.observable(this.options.obDocumentFocusState);
 
 		TF.Grid.KendoGridFilterMenu.call(this);
+		TF.Grid.KendoGridThematicMenu.call(this);
 		TF.Grid.KendoGridLayoutMenu.call(this);
 		TF.Grid.KendoGridSummaryGrid.call(this);
 		this._obSortedItems.subscribe(this._updateCurrentLayout, this);
@@ -148,7 +164,7 @@
 					}
 					else
 					{
-						var promise = Promise.all([self.loadGridFilter()]);
+						var promise = Promise.all([self.loadGridFilter(), self.loadGridThematic()]);
 					}
 
 					return promise.then(function()
@@ -771,6 +787,14 @@
 		else
 			this.applyNotOnlyFirstColumnLockedStyle();
 
+		if (this.isBigGrid || SCHEDULE_GRIDS.concat(THEMATIC_NOT_BIG_GRIDS).includes(this._gridType))
+		{
+			if (!this.selectedGridThematicConfigs)
+			{
+				this.selectedGridThematicConfigs = this.getSelectedGridThematicConfigs();
+			}
+		}
+
 		TF.Grid.LightKendoGrid.prototype.onDataBound.apply(this);
 
 		var $container = this.$container;
@@ -866,6 +890,23 @@
 			$(".grid-staterow").find('span')[1].setAttribute('title', this.obSelectedGridFilterName());
 		}
 
+		if (this.isBigGrid || SCHEDULE_GRIDS.concat(THEMATIC_NOT_BIG_GRIDS).includes(this._gridType))
+		{
+			if (this.predefinedGridData)
+			{
+				this.predefinedGridData = null;
+			}
+			if (!this.selectedGridThematicConfigs)
+			{
+				this.selectedGridThematicConfigs = this.getSelectedGridThematicConfigs();
+			}
+
+			if (this.lazyloadFields.udf.length === 0)
+			{
+				this.applyGridThematicConfigs();
+			}
+		}
+
 		this._delayHideLoadingIndicator();
 	};
 
@@ -930,10 +971,18 @@
 
 	KendoGrid.prototype._setGridState = function()
 	{
-		var self = this;
-		self.loadGridFilter().then(function(modifiedStatus)
+		var self = this, args = arguments;
+		const preWorkList = [self.loadGridFilter()];
+
+		if (self.obThematicSupported())
 		{
-			TF.Grid.LightKendoGrid.prototype._setGridState.apply(self);
+			const currentLayout = self._obCurrentGridLayoutExtendedDataModel();
+			preWorkList.push(self.loadGridThematic(currentLayout.thematicId()));
+		}
+
+		return Promise.all(preWorkList).then(function()
+		{
+			TF.Grid.LightKendoGrid.prototype._setGridState.apply(self, args);
 		});
 	};
 
@@ -1681,6 +1730,180 @@
 		}
 	};
 
+	KendoGrid.prototype.bindNeedFileds = function(type, fields)
+	{
+		fields = TF.Grid.LightKendoGrid.prototype.bindNeedFileds.call(this, type, fields);
+		if (type === 'student' || type === 'altsite' || type === 'school' || type === "georegion")
+		{
+			if (!Enumerable.From(fields).Contains('Xcoord'))
+			{
+				fields = fields.concat(['Xcoord']);
+			}
+			if (!Enumerable.From(fields).Contains('Ycoord'))
+			{
+				fields = fields.concat(['Ycoord']);
+			}
+		}
+
+		this.getSelectedGridThematicConfigs();
+
+		if (this.thematicFields.length > 0)
+		{
+			var needToAddFields = [];
+			this.thematicFields.forEach(function(needField)
+			{
+				if (!Enumerable.From(fields).Contains(needField))
+				{
+					needToAddFields.push(needField);
+				}
+			});
+
+			fields = fields.concat(needToAddFields);
+		}
+
+		return fields;
+	};
+
+	KendoGrid.prototype.getCurrentGridLayout = function()
+	{
+		return this._obCurrentGridLayoutExtendedDataModel();
+	};
+
+	/**
+	 * Apply grid thematic configs.
+	 *
+	 * @param {*} selectedGridThematicConfigs
+	 * @return {*}
+	 */
+	KendoGrid.prototype.applyGridThematicConfigs = function(selectedGridThematicConfigs)
+	{
+		const self = this;
+
+		selectedGridThematicConfigs = selectedGridThematicConfigs || self.selectedGridThematicConfigs;
+
+		const isToApplyThematic = Boolean(selectedGridThematicConfigs);
+		const $table = (self.kendoGrid && self.kendoGrid.table) || self.$container.find("div[class^='k-grid-content'] table");
+		const $trList = $table.find(">tbody>tr.k-master-row");
+
+		self.obIsThematicApplied(isToApplyThematic);
+
+		// Clear thematic marks.
+		if (!isToApplyThematic)
+		{
+			$trList.attr(THEMATIC_COLOR_ATTRIBUTE, null);
+			return;
+		}
+
+		// Apply thematic configurations.
+		const $leadingTable = self.$container.find("div[class^='k-grid-content-locked'] table");
+		const $leadingRows = $leadingTable.find(">tbody>tr.k-master-row");
+		const $fullfillRows = self.$container.find(".kendogrid-blank-fullfill>tbody>tr.k-master-row");
+
+		const dataType = self._gridType;
+		const dataItems = self.kendoGrid.dataItems();
+		const dataItemColorDict = TF.Helper.ThematicHelper.getDataItemColorDict(dataType, dataItems, selectedGridThematicConfigs, self._gridDefinition.Columns);
+		const colorLightnessDict = new Map();
+
+		Array.from($trList).forEach((tr, idx) =>
+		{
+			const $tr = $(tr);
+			const uid = $tr.data().kendoUid;
+			const color = dataItemColorDict[uid];
+			let isLightColor;
+
+			if (colorLightnessDict.has(color))
+			{
+				isLightColor = colorLightnessDict.get(color);
+			}
+			else
+			{
+				isLightColor = TF.isLightness(color);
+				colorLightnessDict.set(color, isLightColor);
+			}
+
+			$tr.attr(THEMATIC_COLOR_ATTRIBUTE, color);
+
+			self.updateRowColor($tr, color, isLightColor);
+			self.updateRowColor($leadingRows.eq(idx), color, isLightColor);
+			self.updateRowColor($fullfillRows.eq(idx), color, isLightColor);
+		});
+	}
+
+	KendoGrid.prototype.updateRowColor = function($row, bkgColor, isLightColor)
+	{
+		if ($row)
+		{
+			$row.removeClass("k-alt");
+			$row.css("background-color", bkgColor);
+			$row.find("td").toggleClass("thematic-light", !isLightColor);
+		}
+	}
+
+	KendoGrid.prototype.getSelectedGridThematicConfigs = function()
+	{
+		var self = this, customDisplaySettings, quickFilters, gridThematicConfigs;
+
+		if (self.tempGridThematicDataModel)
+		{
+			customDisplaySettings = JSON.parse(self.tempGridThematicDataModel.customDisplaySetting());
+			quickFilters = JSON.parse(self.tempGridThematicDataModel.quickFilters());
+			gridThematicConfigs = [];
+		}
+		else if (self.obSelectedGridThematicDataModel && self.obSelectedGridThematicDataModel())
+		{
+			customDisplaySettings = JSON.parse(self.obSelectedGridThematicDataModel().customDisplaySetting());
+			quickFilters = JSON.parse(self.obSelectedGridThematicDataModel().quickFilters());
+			gridThematicConfigs = [];
+		}
+
+		if (customDisplaySettings)
+		{
+			customDisplaySettings.forEach(cds =>
+			{
+				var gridThematicConfig = [];
+				if (cds.DisplayLabel === DEFAULT_THEMATIC_LABEL)
+				{
+					gridThematicConfig.push(
+						{
+							"field": DEFAULT_THEMATIC_LABEL,
+							"value": DEFAULT_THEMATIC_LABEL,
+							"color": cds.Color,
+							"typeId": null,
+							"imperialValue": DEFAULT_THEMATIC_LABEL
+						});
+					gridThematicConfigs.push(gridThematicConfig);
+					return;
+				}
+
+				for (var i = 0; i < quickFilters.length; i++)
+				{
+					if (quickFilters[i].field)
+					{
+						gridThematicConfig.push(
+							{
+								"field": quickFilters[i].field,
+								"value": cds[`Value${i + 1}`],
+								"color": cds.Color,
+								"typeId": quickFilters[i].typeId,
+								"imperialValue": cds[`AdditionalValue${i + 1}`]
+							});
+
+						if (!Enumerable.From(self.thematicFields).Contains(quickFilters[i].field))
+						{
+							self.thematicFields.push(quickFilters[i].field);
+						}
+					}
+				}
+
+				gridThematicConfigs.push(gridThematicConfig);
+			});
+
+			return gridThematicConfigs;
+		}
+
+		return null;
+	}
+
 	KendoGrid.prototype.dispose = function()
 	{
 		$(window).off("resize", this._onWindowResize);
@@ -1704,10 +1927,22 @@
 			this.$lockbar = null;
 		}
 		$(window).off("orientationchange.gridStateTwoRowWhenOverflow" + this.randomKey, null);
+		if (this.thematicFields.length > 0)
+		{
+			this.thematicFields = [];
+		}
+		if (this.selectedGridThematicConfigs)
+		{
+			this.selectedGridThematicConfigs = null;
+		}
+		if (this.tempGridThematicDataModel)
+		{
+			this.tempGridThematicDataModel = null;
+		}
 		TF.Grid.LightKendoGrid.prototype.dispose.apply(this);
 	};
 
-	addPlugin(KendoGrid, TF.Grid.KendoGridFilterMenu, TF.Grid.KendoGridLayoutMenu, TF.Grid.KendoGridSummaryGrid);
+	addPlugin(KendoGrid, TF.Grid.KendoGridFilterMenu, TF.Grid.KendoGridThematicMenu, TF.Grid.KendoGridLayoutMenu, TF.Grid.KendoGridSummaryGrid);
 })();
 (function()
 {

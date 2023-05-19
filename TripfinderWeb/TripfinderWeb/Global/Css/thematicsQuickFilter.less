@@ -1,0 +1,741 @@
+@import "z-index";
+
+.fields-main {
+	height: 290px;
+
+	.field-item {
+		height: 90px;
+		background-color: white;
+		padding: 0 25px 0 30px;
+		margin-right: -10px;
+		margin-bottom: 10px;
+		margin-left: -15px;
+		position: relative;
+
+		&.ui-draggable-dragging {
+			position: fixed !important;
+			z-index: @DRAGGABLE_DRAGGING + 1;
+			pointer-events: none;
+			box-shadow: 0 2px 10px 0px rgba(0, 0, 0, 0.15);
+			padding-right: 15px;
+			padding-left: 10px;
+			margin-left: 5px;
+		}
+
+		&.draggable-protoType {
+			&::before {
+				content: " ";
+				height: calc(~"100% + 2px");
+				width: calc(~"100% - 28px");
+				margin-left: -11px;
+				position: absolute;
+				border: 1px dashed #cccccc;
+			}
+
+			div {
+				display: none !important;
+			}
+		}
+
+		.bottom-border {
+			display: none;
+			width: 100%;
+			border-bottom: solid 1px #BCBCBC;
+			height: 24px;
+		}
+
+		&.disabled {
+			opacity: 0.7;
+			pointer-events: none;
+
+			.bottom-border {
+				display: block;
+			}
+
+			.enableHotkey.form-control {
+				display: none;
+			}
+		}
+
+		.drag-handle {
+			position: absolute;
+			left: 0px;
+			cursor: move;
+			display: none;
+			background-image: url(../img/map/thematics/UpDn.svg);
+			background-repeat: no-repeat;
+			top: 0;
+			height: 100%;
+			width: 30px;
+			background-position: center;
+			background-size: 11px;
+
+			&.disabled,
+			&.moving {
+				display: none !important;
+			}
+		}
+
+		&:last-child,
+		&.last-enable {
+			.drag-handle {
+				background-image: url(../img/map/thematics/Up.svg);
+			}
+		}
+
+		&:first-child {
+			.drag-handle {
+				background-image: url(../img/map/thematics/Dn.svg);
+			}
+		}
+
+		&:hover {
+			.drag-handle {
+				display: block;
+			}
+		}
+
+		.field-title {
+			color: #333333;
+			font-size: 14px;
+			font-weight: bold;
+			font-family: "SourceSansPro-SemiBold";
+			padding-top: 3px;
+			letter-spacing: -0.5px;
+		}
+
+		.field-name {
+			padding-top: 2px;
+			padding-bottom: 10px;
+
+			input {
+				height: 24px;
+				color: #333333;
+				font-size: 15px;
+				background-color: transparent !important;
+				border-width: 0;
+				padding-left: 0;
+				padding-bottom: 4px;
+				border-bottom-width: 1px;
+				border-bottom-color: #BCBCBC;
+			}
+
+			.input-group-btn {
+				button {
+					border-width: 0;
+					border-bottom-width: 1px;
+					background-color: transparent;
+					border-bottom-color: #BCBCBC;
+					min-width: 20px;
+					width: 20px;
+					height: 24px;
+
+					&.btn-default:hover {
+						border-color: #ccc;
+					}
+				}
+
+				.caret {
+					color: #666666;
+					border-top-width: 6px;
+					border-right-width: 6px;
+					border-left-width: 6px;
+				}
+			}
+		}
+
+		.field-filter {
+			.menu-button {
+				float: left;
+				cursor: pointer;
+
+				.filter-icon {
+					width: 22px;
+					height: 22px;
+					background-repeat: no-repeat;
+					background-size: 16px;
+					background-position: center;
+					border: 1px solid #ccc;
+					background-color: #f2f2f2;
+
+					&:hover {
+						background-color: #bdb4af;
+					}
+
+					&.custom {
+						background-image: url('../../global/img/Filter/Custom.svg');
+						margin-bottom: -2px;
+					}
+
+					&.list {
+						background-image: url('../../global/img/Filter/List.svg');
+					}
+
+					&.contains {
+						background-image: url('../../global/img/Filter/Contains.svg');
+					}
+
+					&.isequalto {
+						background-image: url('../../global/img/Filter/Equals.svg');
+					}
+
+					&.isnotequalto {
+						background-image: url('../../global/img/Filter/DoesNotEqual.svg');
+					}
+
+					&.startswith {
+						background-image: url('../../global/img/Filter/StartsWith.svg');
+					}
+
+					&.doesnotcontain {
+						background-image: url('../../global/img/Filter/DoesNotContain.svg');
+					}
+
+					&.endswith {
+						background-image: url('../../global/img/Filter/EndsWith.svg');
+					}
+
+					&.islessthanorequalto {
+						background-image: url('../../global/img/Filter/LessThanEqual.svg');
+					}
+
+					&.isgreaterthanorequalto {
+						background-image: url('../../global/img/Filter/GreaterThanEqual.svg');
+					}
+
+					&.isgreaterthan {
+						background-image: url('../../global/img/Filter/GreaterThan.svg');
+					}
+
+					&.isafter {
+						background-image: url('../../global/img/Filter/GreaterThan.svg');
+					}
+
+					&.islessthan {
+						background-image: url('../../global/img/Filter/LessThan.svg');
+					}
+
+					&.isbefore {
+						background-image: url('../../global/img/Filter/LessThan.svg');
+					}
+
+					&.isbeforeorequalto {
+						background-image: url('../../global/img/Filter/LessThanEqual.svg');
+					}
+
+					&.isafterorequalto {
+						background-image: url('../../global/img/Filter/GreaterThanEqual.svg');
+					}
+
+					&.isnull {
+						background-image: none;
+					}
+
+					&.isnotnull {
+						background-image: none;
+					}
+
+					&.isempty {
+						background-image: url('../../global/img/Filter/Empty.svg');
+					}
+
+					&.isnotempty {
+						background-image: url('../../global/img/Filter/NotEmpty.svg');
+					}
+
+					&.all {
+						background-image: url('../../global/img/Filter/all.svg');
+						margin-bottom: -2px;
+					}
+
+					&.lastxdays {
+						background-image: url('../../global/img/Filter/lastxdays.svg');
+						margin-bottom: -2px;
+					}
+
+					&.lastxhours {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/lastxhours.svg');
+					}
+
+					&.lastxmonths {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/lastxmonths.svg');
+					}
+
+					&.lastxweeks {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/lastxweeks.svg');
+					}
+
+					&.lastxyears {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/lastxyears.svg');
+					}
+
+					&.nextxdays {
+						background-image: url('../../global/img/Filter/nextxdays.svg');
+						margin-bottom: -2px;
+					}
+
+					&.nextxhours {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/nextxhours.svg');
+					}
+
+					&.nextxmonths {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/nextxmonths.svg');
+					}
+
+					&.nextxweeks {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/nextxweeks.svg');
+					}
+
+					&.nextxyears {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/nextxyears.svg');
+					}
+
+					&.olderthanxmonths {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/olderthanxmonths.svg');
+					}
+
+					&.olderthanxyears {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/olderthanxyears.svg');
+					}
+
+					&.onyearx {
+						margin-bottom: -2px;
+						background-image: url('../../global/img/Filter/onyearx.svg');
+					}
+
+					&.lastmonth {
+						background-image: url('../../global/img/Filter/lastmonth.svg');
+						margin-bottom: -2px;
+					}
+
+					&.lastweek {
+						background-image: url('../../global/img/Filter/lastweek.svg');
+						margin-bottom: -2px;
+					}
+
+					&.lastyear {
+						background-image: url('../../global/img/Filter/lastyear.svg');
+						margin-bottom: -2px;
+					}
+
+					&.nextmonth {
+						background-image: url('../../global/img/Filter/nextmonth.svg');
+						margin-bottom: -2px;
+					}
+
+					&.nextweek {
+						background-image: url('../../global/img/Filter/nextweek.svg');
+						margin-bottom: -2px;
+					}
+
+					&.nextyear {
+						background-image: url('../../global/img/Filter/nextyear.svg');
+						margin-bottom: -2px;
+					}
+
+					&.onorafterx {
+						background-image: url('../../global/img/Filter/onorafterx.svg');
+						margin-bottom: -2px;
+					}
+
+					&.onorbeforex {
+						background-image: url('../../global/img/Filter/onorbeforex.svg');
+						margin-bottom: -2px;
+					}
+
+					&.onx {
+						background-image: url('../../global/img/Filter/onx.svg');
+						margin-bottom: -2px;
+					}
+
+					&.thismonth {
+						background-image: url('../../global/img/Filter/thismonth.svg');
+						margin-bottom: -2px;
+					}
+
+					&.thisweek {
+						background-image: url('../../global/img/Filter/thisweek.svg');
+						margin-bottom: -2px;
+					}
+
+					&.thisyear {
+						background-image: url('../../global/img/Filter/thisyear.svg');
+						margin-bottom: -2px;
+					}
+
+					&.today {
+						background-image: url('../../global/img/Filter/today.svg');
+						margin-bottom: -2px;
+					}
+
+					&.tomorrow {
+						background-image: url('../../global/img/Filter/tomorrow.svg');
+						margin-bottom: -2px;
+					}
+
+					&.yesterday {
+						background-image: url('../../global/img/Filter/yesterday.svg');
+						margin-bottom: -2px;
+					}
+
+					&.nextbusinessday {
+						background-image: url('../../global/img/Filter/nextbusinessday.svg');
+						margin-bottom: -2px;
+					}
+				}
+
+				.filter-menu {
+					width: 190px;
+					position: fixed;
+					-webkit-box-sizing: content-box;
+					box-sizing: content-box;
+					display: none;
+					z-index: @QUICK_FILTER_MENU_Z_INDEX;
+
+					&.active {
+						display: block;
+					}
+
+					li {
+						outline: 0;
+
+						&:hover {
+							background-color: #eaeaea;
+						}
+
+						&.active {
+							background-color: #FFFFCC;
+						}
+
+						&.filter.custom {
+							margin-bottom: 0;
+						}
+					}
+				}
+			}
+
+			.text-input {
+				float: right;
+				width: calc(~"100% - 22px");
+				position: relative;
+
+				&.Boolean {
+					width: 100%;
+
+					input {
+						border-left-width: 1px;
+						color: #333;
+					}
+
+					.k-button-icon.clearButton {
+						display: none;
+					}
+				}
+
+				&.custom,
+				&.list,
+				&.isnotempty,
+				&.isempty {
+					.text-input-group input {
+						opacity: 0.7;
+						pointer-events: none;
+						background-color: #eee;
+					}
+				}
+
+				&.list {
+					.k-button-icon.clearButton {
+						display: none;
+					}
+
+					.k-filter-list-btn {
+						display: block;
+
+						.glyphicon-option-horizontal {
+							top: 3px;
+						}
+					}
+
+					.text-input-group input {
+						width: calc(~"100% - 20px");
+						text-overflow: ellipsis;
+					}
+				}
+
+				&.custom {
+
+					.custom-filter-group,
+					.k-filter-custom-btn {
+						display: block;
+					}
+
+					.k-textbox {
+						margin-top: 7px;
+					}
+
+					.text-input-group input {
+						width: calc(~"100% - 20px");
+						text-overflow: ellipsis;
+					}
+
+					.clearButton {
+						right: 21px;
+					}
+				}
+
+				&.Date,
+				&.Time,
+				&.DateTime {
+					.clearButton {
+						right: 21px;
+					}
+				}
+
+				.clearButton {
+					box-shadow: none;
+
+					&:active {
+						color: #2e2e2e;
+						border-color: #b6b6b6;
+						background-color: #bcb4b0;
+					}
+				}
+
+				input {
+					border-left-width: 0;
+				}
+
+				.k-picker-wrap {
+					border-left-width: 0;
+				}
+
+				.k-loading {
+					position: absolute;
+					top: 3px;
+					right: 3px;
+					display: none;
+
+					&.active {
+						display: block;
+					}
+
+					&.right {
+						right: 25px;
+					}
+				}
+
+				.k-button {
+					position: absolute;
+					top: 0;
+					right: 0;
+					height: 22px;
+					width: 22px;
+					padding: 0;
+					z-index: @QUICK_FILTER_CLEAR_BUTTON;
+					cursor: pointer;
+				}
+
+				.autocompletion {
+					width: 236px;
+					max-height: 200px;
+					position: fixed;
+					background-color: white;
+					display: none;
+					z-index: @QUICK_FILTER_AUTOCOMPLETION;
+
+					&.active {
+						display: block;
+					}
+
+					.k-list-container {
+						max-height: 200px;
+						overflow: auto;
+
+						li {
+							outline: 0;
+						}
+					}
+				}
+
+				.input-button {
+					position: absolute;
+					top: 0;
+					right: 0;
+					display: none;
+					width: 22px;
+					height: 22px;
+					padding: 0;
+					border: 1px #c5c5c5 solid;
+					background-color: #eee;
+					cursor: pointer;
+
+					.k-icon {
+						cursor: pointer;
+						&.k-filter {
+							background-image: url('../../global/thirdparty/kendo/styles/default/sprite.png');
+							background-position: -32px -83px;
+							background-repeat: no-repeat;
+							width: 16px;
+							height: 13px;
+						}
+					}
+				}
+
+				&.hideClearButton {
+					.clearButton {
+						display: none !important;
+					}
+				}
+			}
+
+			.custom-filter {
+				width: 172px;
+				color: #333;
+				position: fixed;
+				margin-left: 64px;
+				display: none;
+				z-index: @QUICK_CUSTOM_FILTER_Z_INDEX;
+
+				&.active {
+					display: block;
+				}
+
+				.k-filter-menu {
+					border-radius: 0;
+					border-color: #bfbfbf;
+					margin-top: -1px;
+
+					.k-dropdown {
+						.k-dropdown-wrap {
+							background-image: none;
+							background-color: #fff;
+							border-color: #bfbfbf;
+						}
+
+						.filter-menu-custom {
+							width: 158px;
+							position: fixed;
+							margin-top: -1px;
+							z-index: @QUICK_CUSTOM_FILTER_Z_INDEX;
+							display: none;
+
+							.k-list-container {
+								.k-list {
+									.k-item {
+										outline: none;
+
+										&:hover {
+											background-color: #eaeaea;
+										}
+
+										&.active {
+											background: #FFFFCC;
+										}
+									}
+								}
+							}
+
+							&.filter-state {
+								width: 72px;
+							}
+
+							&.active {
+								display: block;
+							}
+						}
+					}
+
+					.k-textbox {
+						border-left-width: 1px;
+						color: #333;
+						height: 22px;
+					}
+
+					.k-datepicker {
+						border: 0;
+
+						.k-picker-wrap {
+							border-left-width: 1px;
+
+							.k-textbox {
+								height: 20px;
+								margin-top: 0px;
+							}
+
+							.k-i-calendar {
+								top: 0;
+							}
+						}
+					}
+
+					.input-group {
+						.k-textbox {
+							width: calc(~"100% - 22px");
+						}
+
+						.datepickerbutton {
+							height: 22px;
+							width: 22px;
+							margin-top: 2px;
+							padding-top: 1px;
+							display: block;
+							float: right;
+						}
+					}
+
+					.custom-filter-buttons {
+						.k-button {
+							position: relative;
+							background-image: none;
+							width: 47%;
+							height: 26px;
+							border-radius: 2px;
+							outline: none !important;
+							box-shadow: none;
+
+							&.k-primary {
+								background-color: #333333;
+								border-color: #444444;
+							}
+
+							&.cancelButton {
+								color: #333;
+								border-color: #bfbfbf;
+								background-color: #f2f2f2;
+
+								&:hover {
+									background-color: #eaeaea;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+}
+
+.thematic-modal-field {
+	width: 260px !important;
+	margin-left: -1px;
+}
+
+.form-control.quick-filter-input.k-input[disabled] {
+	color: #858585;
+	opacity: 0.6;
+}
