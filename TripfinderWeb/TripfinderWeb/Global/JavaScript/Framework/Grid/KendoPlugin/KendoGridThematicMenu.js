@@ -84,7 +84,7 @@
 				const prevConfig = self.selectedGridThematicConfigs;
 				const prevConfigStr = prevConfig ? JSON.stringify(prevConfig) : "";
 
-				newConfig = self.getSelectedGridThematicConigs();
+				newConfig = self.getSelectedGridThematicConfigs();
 				const newConfigStr = newConfig ? JSON.stringify(newConfig) : "";
 
 				self.applyGridThematicConfigs(newConfig);

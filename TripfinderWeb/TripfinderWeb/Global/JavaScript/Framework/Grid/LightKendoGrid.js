@@ -1126,8 +1126,6 @@
 		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
 
-
-
 	LightKendoGrid.prototype.filterMenuInit = function(e)
 	{
 		var kendoPopup = e.container.data().kendoPopup;

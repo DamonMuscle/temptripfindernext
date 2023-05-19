@@ -563,12 +563,12 @@
 			{
 				tempThematicDataModel.customDisplaySetting(dataObj.CustomDisplaySetting);
 				self.mapGrid.tempGridThematicDataModel = tempThematicDataModel;
-				self.mapGrid.selectedGridThematicConfigs = self.mapGrid.getSelectedGridThematicConigs();
+				self.mapGrid.selectedGridThematicConfigs = self.mapGrid.getSelectedGridThematicConfigs();
 			}
 			else
 			{
 				self.mapGrid.tempGridThematicDataModel = TF.DataModel.BaseDataModel.create(TF.DataModel.ThematicConfigurationDataModel, dataObj);
-				self.mapGrid.selectedGridThematicConfigs = self.mapGrid.getSelectedGridThematicConigs();
+				self.mapGrid.selectedGridThematicConfigs = self.mapGrid.getSelectedGridThematicConfigs();
 			}
 		}
 

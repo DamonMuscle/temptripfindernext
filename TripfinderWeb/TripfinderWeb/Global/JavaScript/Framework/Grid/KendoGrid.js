@@ -791,7 +791,7 @@
 		{
 			if (!this.selectedGridThematicConfigs)
 			{
-				this.selectedGridThematicConfigs = this.getSelectedGridThematicConigs();
+				this.selectedGridThematicConfigs = this.getSelectedGridThematicConfigs();
 			}
 		}
 
@@ -898,7 +898,7 @@
 			}
 			if (!this.selectedGridThematicConfigs)
 			{
-				this.selectedGridThematicConfigs = this.getSelectedGridThematicConigs();
+				this.selectedGridThematicConfigs = this.getSelectedGridThematicConfigs();
 			}
 
 			if (this.lazyloadFields.udf.length === 0)
@@ -1745,7 +1745,7 @@
 			}
 		}
 
-		this.getSelectedGridThematicConigs();
+		this.getSelectedGridThematicConfigs();
 
 		if (this.thematicFields.length > 0)
 		{
@@ -1839,7 +1839,7 @@
 		}
 	}
 
-	KendoGrid.prototype.getSelectedGridThematicConigs = function()
+	KendoGrid.prototype.getSelectedGridThematicConfigs = function()
 	{
 		var self = this, customDisplaySettings, quickFilters, gridThematicConfigs;
 

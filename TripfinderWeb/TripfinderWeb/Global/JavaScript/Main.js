@@ -638,6 +638,15 @@ function toISOStringWithoutTimeZone(m)
 	return m.format('YYYY-MM-DDTHH:mm:ss.SSS');
 }
 
+function convertToMoment(value)
+{
+	if ((/^\d*:\d*:\d*$/g).test(value))
+	{
+		return moment("1900-01-01 " + value);
+	}
+	return moment(value);
+}
+
 function utcToClientTimeZone(utcValue)
 {
 	if (!utcValue)

@@ -9,13 +9,13 @@
 		<!-- /ko -->
 	</div>
 	<div class="row" style="height: 74px;">
-		<div class="col-xs-12">
+		<div class="col-xs-24">
 			<div class="form-group">
 				<label class="requirestar bold-Label">Name</label>
 				<input type="text" name="layoutName" maxlength="255" class="form-control" data-bind="value: gridLayoutExtendedDataModel.name,valueUpdate:'keyup'" />
 			</div>
 		</div>
-		<div class="col-xs-12">
+		<div class="col-xs-24">
 			<div class="form-group">
 				<label class="bold-Label">Filter</label>
 				<div class="input-group">
@@ -31,25 +31,25 @@
 				</div>
 			</div>
 		</div>
-	</div>
-	<!--ko if:obThematicSupported() -->
-	<div class="col-xs-24">
-		<div class="form-group">
-			<label class="bold-Label">Thematic</label>
-			<div class="input-group">
-				<div data-bind="typeahead:{source:obGridThematicDataModels,format:function(obj){return obj.name();},drowDownShow:true,selectedValue:obSelectedGridThematicDataModel,sortWithOutFirstValue:true}">
-					<!-- ko customInput:{type:"Select",value:obSelectedGridThematicDataModelText,attributes:{class:"form-control"}} -->
-					<!-- /ko -->
-				</div>
-				<div class="input-group-btn">
-					<button type="button" class="btn btn-default btn-sharp">
-						<span class="caret"></span>
-					</button>
+		<!--ko if:obThematicSupported() -->
+		<div class="col-xs-24">
+			<div class="form-group">
+				<label class="bold-Label">Thematic</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obGridThematicDataModels,format:function(obj){return obj.name();},drowDownShow:true,selectedValue:obSelectedGridThematicDataModel,sortWithOutFirstValue:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedGridThematicDataModelText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
+		<!-- /ko -->
 	</div>
-	<!-- /ko -->
 	<div class="row">
 		<div class="col-xs-24">
 			<div class="form-group">
