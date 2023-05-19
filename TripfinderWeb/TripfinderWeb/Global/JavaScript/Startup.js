@@ -291,6 +291,7 @@
 			var sessionValidator = new TF.Session.SoftSessionValidator(tf.authManager);
 			tf.api = new TF.API(tf.authManager, tf.datasourceManager);
 			tf.kendoHackHelper = new TF.KendoHackHelper();
+			tf.urlHelper = new TF.URLHelper();
 			tf.docFilePreviewHelper = new TF.Control.DocumentFilePreviewViewModel($("body"));
 			tf.helpers = {
 				detailViewHelper: new TF.DetailView.DetailViewHelper(),

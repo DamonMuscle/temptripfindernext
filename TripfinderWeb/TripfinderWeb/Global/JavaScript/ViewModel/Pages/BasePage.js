@@ -477,8 +477,56 @@
 
 	BasePage.prototype.deleteSelectionClick = function(viewModel, e)
 	{
-		console.log("deleteSelectionClick");
+		var selectedIds = this.searchGrid.getSelectedIds();
+		if (selectedIds.length == 0)
+		{
+			return;
+		}
+
+		this.deleteSelectedItems(selectedIds);
 	}
+
+	BasePage.prototype.deleteSelectedItems = function(ids, isPopupConfirmMessage = true)
+	{
+		if (!Array.isArray(ids) || ids.length === 0) return Promise.resolve();
+
+		var self = this,
+			title = "Confirmation Message",
+			message = ids.length === 1 ?
+				"Are you sure you want to delete this record?" :
+				String.format("Are you sure you want to delete these {0} records?", ids.length);
+
+		var confirmPromise = isPopupConfirmMessage ? tf.promiseBootbox.yesNo(message, title) : Promise.resolve(true);
+		return confirmPromise
+			.then(function(result)
+			{
+				if (result)
+				{
+					promiseDelteRecords = tf.dataTypeHelper.deleteRecordByIds(self.type, ids);
+					
+					/*
+					// might check the data type to perform specific operation
+					if (self.type === "staff")
+					{
+						promiseDelteRecords = self._deleteStaff(ids);
+					}
+					*/
+
+					if (promiseDelteRecords)
+					{
+						return promiseDelteRecords
+							.then(function(results)
+							{
+								if (results && results > 0)
+								{
+									self.searchGrid.refreshClick();
+								}
+								return results;
+							});
+					}
+				}
+			});
+	};
 
 	BasePage.prototype.dispose = function()
 	{

@@ -113,7 +113,7 @@
 				{
 					self.obIsSelectRow(current.length !== 0);
 					self.obCanCopyFieldTrip(current.length === 1 && self.obNewRequest());
-					self.obCanDeleteRecord(current.length === 1);
+					self.obCanDeleteRecord(current.length > 0);
 					self.selectedRecordIds = current;
 					if (self.obShowDetailPanel())
 					{
