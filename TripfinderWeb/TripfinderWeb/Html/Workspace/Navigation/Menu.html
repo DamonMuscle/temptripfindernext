@@ -32,7 +32,7 @@
       <div class="item-icon mapcanvas"></div>
       <div class="item-label">Map Canvas</div>
     </div>
-    <div class="navigation-item datagrid" data-bind="click:navigationPageCategoryClick.bind($data, 'datagrid')">
+    <div class="navigation-item datagrid" data-bind="click:navigationPageCategoryClick.bind($data, 'datagrid')" pageType="datagrid">
 			<div class="item-icon datagrid"></div>
 			<div class="item-label">Data Grids</div>
 			<div class="item-menu">
@@ -42,7 +42,7 @@
 						<!-- ko if:typePage.items && typePage.items() && typePage.items().length -->
 						<div class="right-arrow"></div>
 						<ul class="sub-menu-container sub-menu-even-container" data-bind="foreach: { data: typePage.items, as:'form' }, visible: false">
-							<li data-bind="css: { 'menu-container': true, 'sub-menu-header':false } ,attr:{clicktype:typePage.key}, event: { mouseenter: $parents[1].showSubMenu.bind($parents[1]), mouseleave: $parents[1].hideSubMenu.bind($parents[1])}">
+							<li data-bind="css: { 'menu-container': true, 'sub-menu-header':false, active:isOpen} ,attr:{clicktype:typePage.key}, event: { mouseenter: $parents[1].showSubMenu.bind($parents[1]), mouseleave: $parents[1].hideSubMenu.bind($parents[1])}">
 								<span data-bind="css: { 'disable-auto-close': form.grids }, text:form.head.text,contextMenuClick:$parents[1].menuViewClick"></span>
 								<!-- ko if:form.grids && form.grids.length -->
 								<div class="right-arrow"></div>

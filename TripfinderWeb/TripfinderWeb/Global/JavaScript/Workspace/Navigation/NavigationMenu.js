@@ -613,7 +613,7 @@
 		}
 
 		//skip the method if user click the link to the same page.
-		if (($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active")) && type !== "settings")
+		if (($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active")) && type !== "settings" && type !== "datagrid")
 		{
 			return;
 		}
@@ -927,7 +927,7 @@
 
 		var self = this,
 			pageType = type.replace("Scheduler", ""),
-			$pageItem = $(".item-menu li[pageType='" + pageType + "']"),
+			$pageItem = $(".item-menu li[pageType='" + pageType + "'], [clicktype='"+ pageType +"']"),
 			$categoryItem = $pageItem.length > 0 ? $pageItem.closest(".navigation-item") : $(".navigation-item[pageType='" + pageType + "']");
 
 		if (self.$navigationMenu)
