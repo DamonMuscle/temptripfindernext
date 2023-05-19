@@ -813,8 +813,42 @@
 		return convertedRecord;
 	};
 
-	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record)
+	UserDefinedGridHelper.prototype._getObjectIds = async function(options)
 	{
+		let { dataTypeId, dbId, recordIds } = options;
+		dbId = dbId || tf.datasourceManager.databaseId;
+
+		const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
+		if (dataTypeKey === "contactType")
+		{
+			return Promise.resolve(recordIds);
+		}
+
+		const opts = {
+			data: {
+				fields: ["ObjectId"],
+				idFilter: { includeOnly: recordIds },
+				filterSet: null,
+			}
+		};
+
+		const apiPrefix = `${tf.api.apiPrefixWithoutDatabase()}/${dbId}`;
+		const dataTypeEndPoint = tf.dataTypeHelper.getEndpoint(dataTypeKey);
+		const url = pathCombine(apiPrefix, "search", `${dataTypeEndPoint}?dateTime=${new Date().toISOString().split("T")[0]}`);
+		const objectIds = await tf.promiseAjax.post(url, opts, { overlay: false })
+			.then(resp =>
+			{
+				return resp.Items.map((i) => i.ObjectId);
+			});
+
+		return objectIds;
+	}
+
+	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record)
+	{
+		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
+		const entityObjectId = objectIds[0];
+
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -823,6 +857,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
+				RecordObjectID: entityObjectId,
 				RecordValue: null
 			},
 			recordValueObj = {};
@@ -885,8 +920,11 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record, udgridSurvey)
+	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record, udgridSurvey)
 	{
+		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
+		const entityObjectId = objectIds[0];
+
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -896,6 +934,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
+				RecordObjectID: entityObjectId,
 				RecordValue: null,
 			},
 			recordValueObj = {};
