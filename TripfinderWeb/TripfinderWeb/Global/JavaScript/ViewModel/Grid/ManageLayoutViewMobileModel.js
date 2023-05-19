@@ -108,7 +108,7 @@
 		}.bind(this));
 	};
 
-	ManageLayoutViewMobileModel.prototype.deleteGridLayout = function(gridLayoutExtendedDataModel, e)
+	ManageLayoutViewMobileModel.prototype.deleteGridLayout = function(gridLayout, e)
 	{
 		e.stopPropagation();
 		if (this.isTouching)
@@ -148,12 +148,12 @@
 				if (result)
 				{
 					var self = this;
-					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", gridLayoutExtendedDataModel.id()))
+					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", gridLayout.id()))
 						.then(function(apiResponse)
 						{
 							if (apiResponse)
 							{
-								self.obGridLayoutExtendedDataModels.remove(gridLayoutExtendedDataModel);
+								self.obGridLayoutExtendedDataModels.remove(gridLayout);
 							}
 						});
 				}

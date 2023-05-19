@@ -41,8 +41,11 @@
 		this.obStatus = ko.observable('layout');
 		this.obSearchFilter = ko.observable("");
 		this.obSearchFilter.subscribe(this.searchFilter.bind(this));
+		this.obSearchThematic = ko.observable("");
+		this.obSearchThematic.subscribe(this.searchThematic.bind(this));
 		this.gridLayoutExtendedDataModel = gridLayoutExtendedDataModel;
 		this.obFilterDataList = ko.observableArray([]);
+		this.obThematicDataList = ko.observableArray([]);
 		this.obGridFilterDataModels = ko.observableArray([...allFilters]);
 		this.obGridFilterDataModels().unshift(getPlaceholderDataModel());
 		this.obGridThematicDataModels = ko.observableArray([...allThematics]);
@@ -187,6 +190,13 @@
 		this.obStatus('selectfilter');
 	};
 
+	ModifyLayoutViewModel.prototype.gotoSelectThematic = function(viewModel, el)
+	{
+		this.obSearchThematic("");
+		this.obThematicDataList(this.obGridThematicDataModels().slice());
+		this.obStatus('selectthematic');
+	};
+
 	ModifyLayoutViewModel.prototype.goToLayout = function()
 	{
 		this.obStatus('layout');
@@ -210,6 +220,27 @@
 		this.obFilterDataList(Enumerable.From(this.obGridFilterDataModels()).Where(function(item)
 		{
 			return item.name().toLowerCase().indexOf(self.obSearchFilter().toLowerCase()) >= 0;
+		}).ToArray());
+	};
+
+	ModifyLayoutViewModel.prototype.emptySearchThematic = function()
+	{
+		this.obSearchThematic("");
+	};
+
+	ModifyLayoutViewModel.prototype.selectThematic = function(modal, e)
+	{
+		this.obSelectedGridThematicDataModel(modal);
+		this.selectedGridThematicDataModelChange();
+		this.obStatus('layout');
+	};
+
+	ModifyLayoutViewModel.prototype.searchThematic = function()
+	{
+		var self = this;
+		this.obThematicDataList(Enumerable.From(this.obGridThematicDataModels()).Where(function(item)
+		{
+			return item.name().toLowerCase().indexOf(self.obSearchThematic().toLowerCase()) >= 0;
 		}).ToArray());
 	};
 

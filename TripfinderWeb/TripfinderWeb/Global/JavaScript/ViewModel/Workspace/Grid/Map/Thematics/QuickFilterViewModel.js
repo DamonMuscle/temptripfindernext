@@ -789,12 +789,12 @@
 		{
 			$dateTimeElem.find('.date-number').css('display', 'none');
 			let originalEl = $dateTimeElem.find('.input-group');
-			originalEl.css('display', 'block');
+			originalEl.css('display', '');
 			let originalInput = originalEl.find('.k-input');
 
 			if (originalInput.length > 0)
 			{
-				originalInput.css('width', '90%');
+				originalInput.css('width', '100%');
 				originalInput[0].disabled = false;
 				originalInput.val(this.getDateQuickFilterTypeHint(newType, null));
 				originalInput.css('display', 'block');
@@ -996,17 +996,6 @@
 	{
 		let $input = this.$el.find(".text-input[role=" + el.role + "]");
 		let $inputElem = $input.find('.text-input-group');
-
-		const $quickFilterInput = $inputElem.find('.quick-filter-input');
-		const inputType = $quickFilterInput?.attr('data-tf-input-type');
-		if (inputType === "Date" || inputType === "DateTime")
-		{
-			// this file is copied from plus
-			// plus using kendo widgets while tripfinder using bootstrap widgets
-			// this file and css depends on kendo widget which has k-input class for date/datetime input box
-			// so add k-input class here as a workaround
-			// $quickFilterInput.addClass("k-input");
-		}
 
 		if (this.quickDateFilterTypes.includes(el.type) &&
 			this.quickDateFilterTypes.includes(el.filterMenuData?.filterType))
