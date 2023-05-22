@@ -15,6 +15,8 @@
 		self.detailButton = true;
 		self.schedulerButton = false;
 		self.deleteButton = true;
+		self.endpoint = tf.DataTypeHelper.getEndpoint(self.type);
+		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
 
     VehiclePage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -34,7 +36,7 @@
 		self.options.gridDefinition = tf.vehicleGridDefinition.gridDefinition();
 		self.options.showOmittedCount = true;
 		self.options.isGridView = true;
-		self.options.url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
+		self.options.url = pathCombine(tf.api.apiPrefix(), "search", self.endpoint);
 		// self.options.extraFields = ["FieldTripStageId"];
 		self.options.loadUserDefined = false;
 		self.options.supportMobileMultipleSelect = true;
@@ -90,4 +92,67 @@
 		// update Add observable variable
 		this.obNewRequest(isAddable);
 	};
+
+	VehiclePage.prototype.newCopyClick = function()
+	{
+		var self = this;
+		var selectedRecords = this.searchGrid.getSelectedRecords();
+		if (!selectedRecords || selectedRecords.length === 0)
+		{
+			return;
+		}
+
+		if (selectedRecords.length > 1)
+		{
+			tf.promiseBootbox.alert("Only allow one record in each operation!", "Confirmation Message");
+			return;
+		}
+
+		// get 
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.endpoint), { paramData: { id: selectedRecords[0].Id, '@relationships': 'udf' } })
+			.then((response) =>
+			{
+				if (response.Items.length != 1)
+				{ return; }
+				// copy
+				var copyItem = $.extend(true, {}, response.Items[0],
+					{
+						BusNum: TF.Helper.NewCopyNameHelper.generateNewCopyName(response.Items[0].BusNum,
+							this.searchGrid.kendoGrid.dataSource._data.map(function(d)
+							{
+								return d.BusNum;
+							})),
+						GPSID: null,
+						ComparativeAnalysis: false,
+						Id: 0
+					});
+				// save
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this.endpoint),
+					{
+						data: [copyItem],
+						paramData: { '@relationships': 'udf' }
+					})
+					.then(() =>
+					{
+						self.pageLevelViewModel.popupSuccessMessage("Vehicle Copied");
+						self.searchGrid.refreshClick();
+					});
+			})
+			.catch((response) =>
+			{
+				if (response && response.StatusCode === 404)
+				{
+					return Promise.reject(response);
+				}
+			});
+	};
+
+	VehiclePage.prototype.bindButtonEvent = function()
+	{
+		var self = this;
+		TF.Page.BaseGridPage.prototype.bindButtonEvent.call(self);
+		
+		self.unBindEvent(".iconbutton.copy"); // unbind the default copy event from BaseGridPage
+		self.bindEvent(".iconbutton.copy", self.newCopyClick.bind(self));
+	}	
 })();

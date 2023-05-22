@@ -567,6 +567,12 @@
 		});
 	};
 
+	BaseGridPage.prototype.unBindEvent = function(buttonSelector)
+	{
+		var self = this;
+		self.$element.find(buttonSelector).off("click");
+	}
+
 	BaseGridPage.prototype.bindButtonEvent = function()
 	{
 		var self = this;
