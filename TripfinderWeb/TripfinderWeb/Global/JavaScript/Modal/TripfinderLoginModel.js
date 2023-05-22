@@ -164,6 +164,14 @@
 
 	TripfinderLoginModel.prototype.forgotPasswordClick = function(viewModel, e)
 	{
+		// Currently, only when it is a SSO user, will password field be disabled.
+		const isSSOUser = !this.loginViewModel.obEnablePassword();
+		if (isSSOUser)
+		{
+			const ssoUserAlertMsg = "This is an SSO account please contact your administrator for password reset.";
+			return tf.promiseBootbox.alert(ssoUserAlertMsg);
+		}
+
 		var clientKey = $.trim(this.loginViewModel.obClientKey());
 		var userName = $.trim(this.loginViewModel.obUsername());
 		if (clientKey === "" || userName === "")
