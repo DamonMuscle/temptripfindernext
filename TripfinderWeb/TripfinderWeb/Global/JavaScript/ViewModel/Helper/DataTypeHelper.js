@@ -1235,10 +1235,11 @@
 
 	DataTypeHelper.prototype.getSearchApiPrefix = function(dataTypeName, dbid)
 	{
-		var dataTypeId = this.getIdByName(dataTypeName),
+		const dataTypeId = this.getIdByName(dataTypeName),
 			dataTypeKey = this.getKeyById(dataTypeId),
-			obj = this._getObjectByType(dataTypeKey),
-			prefix = obj.hasDBID ? tf.api.apiPrefix(null, dbid) : tf.api.apiPrefixWithoutDatabase();
+			obj = this._getObjectByType(dataTypeKey || dataTypeName);
+		dbid = dbid || tf.datasourceManager.databaseId;
+		const prefix = obj.hasDBID ? tf.api.apiPrefix(null, dbid) : tf.api.apiPrefixWithoutDatabase();
 
 		return pathCombine(prefix, "search", obj.endpoint);
 	};
