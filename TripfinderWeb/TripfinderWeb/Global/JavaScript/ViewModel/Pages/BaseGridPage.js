@@ -1124,7 +1124,7 @@
 	{
 		var self = this;
 		var dataTypes = tf.dataTypeHelper.getAvailableDataTypes();
-		return dataTypes.includes(item => item.key === self.type) && (!obShowFieldTripDEPanel() || !obShowDetailPanel()) && obNewRequest();
+		return dataTypes.some(item => item.key === self.type) && (!self.obShowFieldTripDEPanel() || !self.obShowDetailPanel()) && self.obNewRequest();
 	}
 
 	BaseGridPage.prototype.dispose = function()
