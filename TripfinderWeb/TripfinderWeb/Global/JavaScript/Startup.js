@@ -569,10 +569,11 @@
 										if (window.opener && window.name.indexOf("new-detailWindow") >= 0)
 										{
 											var id = getParameterByName('id');
-											if (id != null)
+											var gridType = getParameterByName('gridtype');
+											if (id != null && gridType != null)
 											{
 												//var detailView = new TF.DetailView.DetailViewViewModel(id);
-												var detailView = new TF.DetailView.DetailViewViewModel(id, null, true, {});
+												var detailView = new TF.DetailView.DetailViewViewModel(id, null, true, {}, gridType);
 												tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", detailView, null, true);
 												return;
 											}

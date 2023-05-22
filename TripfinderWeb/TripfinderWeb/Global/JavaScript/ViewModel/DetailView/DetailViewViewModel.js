@@ -2042,7 +2042,7 @@
 	{
 		if (e.button === 0)
 		{
-			window.open("#/?id=" + data.recordId, "new-detailWindow_" + $.now());
+			window.open(`#/?id=${data.recordId}&gridtype=${this.gridType}`, "new-detailWindow_" + $.now());
 		}
 	};
 
