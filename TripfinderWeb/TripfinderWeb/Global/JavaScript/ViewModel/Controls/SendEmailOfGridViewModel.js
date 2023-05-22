@@ -828,18 +828,11 @@
 
 	SendEmailOfGridViewModel.prototype.deleteFileClick = function(viewModel, e)
 	{
-		return tf.promiseAjax["delete"](pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email/delete"),
+		this.documentEntities.remove(
+			function(item)
 			{
-				data: [viewModel.Guid()]
-			}, { overlay: false })
-			.then(function(response)
-			{
-				this.documentEntities.remove(
-					function(item)
-					{
-						return item.Filename == viewModel.Filename;
-					});
-			}.bind(this));
+				return item.FileName == viewModel.FileName;
+			});
 	};
 
 	SendEmailOfGridViewModel.prototype.apply = function()
