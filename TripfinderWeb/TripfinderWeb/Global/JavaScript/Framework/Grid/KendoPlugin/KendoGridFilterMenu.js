@@ -575,6 +575,9 @@
 		return Promise.all([gridfiltersPromise, staticfiltersPromise])
 			.then(Items =>
 			{
+				const currentLayout = self._obCurrentGridLayoutExtendedDataModel();
+				const layoutFilterId = currentLayout && currentLayout.filterId();
+
 				var gridFilterDataModels = TF.DataModel.BaseDataModel.create(TF.DataModel.GridFilterDataModel, Items.flat());
 				gridFilterDataModels.forEach(function(gridFilter)
 				{
@@ -633,7 +636,7 @@
 					{
 						if (tf.userPreferenceManager.getUserSetting("shouldRetainGridFilter"))
 						{
-							selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
+							selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || layoutFilterId;
 						} else
 						{
 							var temporaryFilterIdKey = "grid.temporaryfilter." + self._gridType + ".id";
@@ -642,7 +645,7 @@
 						}
 					} else
 					{
-						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || self._layoutFilterId;
+						selectGridFilterEntityId = tf.storageManager.get(self._storageFilterDataKey) || layoutFilterId;
 					}
 				}
 
