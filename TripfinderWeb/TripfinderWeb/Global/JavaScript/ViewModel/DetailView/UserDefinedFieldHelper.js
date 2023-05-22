@@ -133,6 +133,7 @@
 
             switch (type) {
                 case 'Text':
+                case 'Case':
                     editType = {
                         "format": "String",
                         "maxLength": item.MaxLength || 255

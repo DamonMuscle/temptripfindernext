@@ -986,14 +986,17 @@
 
 			self.recordId = recordId;
 			self.stopCreateNewMode();
-			promiseTask = self.updateGridType(gridType).then(function()
+			promiseTask = Promise.all([
+				self.updateGridType(gridType),
+				self.userDefinedFieldHelper.get(gridType),
+			]).then(function(values)
 			{
 				return self.getRecordEntity(gridType, recordId).then(function(recordEntity)
 				{
 					if (!recordEntity) { return; }
 
 					self.recordEntity = recordEntity;
-
+					self._userDefinedFields = values[1];
 					var recordPic = recordEntity.RecordPicture;
 					self.obRecordPicture(recordPic && recordPic !== 'None' ? 'url(data:' + recordPic.MimeType + ';base64,' + recordPic.FileContent : "");
 					self.updateDetailViewTitle(recordEntity);
