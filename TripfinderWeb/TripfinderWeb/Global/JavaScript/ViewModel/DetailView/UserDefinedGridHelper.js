@@ -819,23 +819,22 @@
 		dbId = dbId || tf.datasourceManager.databaseId;
 
 		const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
-		if (dataTypeKey === "contactType")
+		if (dataTypeKey === "contact")
 		{
 			return Promise.resolve(recordIds);
 		}
 
 		const opts = {
-			data: {
-				fields: ["ObjectId"],
-				idFilter: { includeOnly: recordIds },
-				filterSet: null,
+			paramData: {
+				"@fields": "ObjectId",
+				"@filter": "in(Id," + recordIds.join(",") + ")"
 			}
-		};
+		}
 
 		const apiPrefix = `${tf.api.apiPrefixWithoutDatabase()}/${dbId}`;
 		const dataTypeEndPoint = tf.dataTypeHelper.getEndpoint(dataTypeKey);
-		const url = pathCombine(apiPrefix, "search", `${dataTypeEndPoint}?dateTime=${new Date().toISOString().split("T")[0]}`);
-		const objectIds = await tf.promiseAjax.post(url, opts, { overlay: false })
+		const url = pathCombine(apiPrefix, `${dataTypeEndPoint}?dateTime=${new Date().toISOString().split("T")[0]}`);
+		const objectIds = await tf.promiseAjax.get(url, opts, { overlay: false })
 			.then(resp =>
 			{
 				return resp.Items.map((i) => i.ObjectId);
