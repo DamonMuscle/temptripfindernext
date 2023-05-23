@@ -3979,6 +3979,30 @@
 					field.type = "number";
 					break;
 				case "time":
+					field.parse = function(v)
+					{
+						if (!v) return "";
+
+						var formatStr = "YYYY/MM/DD HH:mm:ss";
+						var format = moment(v).format(formatStr);
+						if (format === "Invalid date")
+						{
+							formatStr = "HH:mm:ss";
+							format = moment(v).format(formatStr);
+						}
+						else
+						{
+							formatStr = "yyyy/MM/dd HH:mm:ss";
+						}
+
+						v = format !== "Invalid date" ? format : v;
+						if (typeof v === 'string' && (v.toLocaleLowerCase().indexOf('pm') > 0 || v.toLocaleLowerCase().indexOf('am') > 0))
+							return kendo.parseDate(v, formatStr + " t", kendo.getCulture())
+						else
+							return kendo.parseDate(v, formatStr, kendo.getCulture())
+					};
+					field.type = "date";
+					break;
 				case "datetime":
 					field.type = "datetime";
 					break;
