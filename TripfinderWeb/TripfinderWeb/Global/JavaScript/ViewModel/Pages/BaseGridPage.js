@@ -137,14 +137,15 @@
 					}
 				}
 
+				var cancelAction = function()
+				{
+					canceling = true;
+					self.searchGrid.getSelectedIds(self.selectedRecordIds);
+					canceling = false;
+				};
+
 				if (self.obShowFieldTripDEPanel() && self.fieldTripDataEntry && self.fieldTripDataEntry.obApiIsDirty())
 				{
-					var cancelAction = function()
-					{
-						canceling = true;
-						self.searchGrid.getSelectedIds(self.selectedRecordIds);
-						canceling = false;
-					};
 					tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes first?", backdrop: true, title: "Unsaved Changes", closeButton: true })
 						.then(function(result)
 						{
@@ -170,6 +171,22 @@
 								cancelAction();
 							}
 						});
+
+					return;
+				}
+				else if(self.obShowDetailPanel())
+				{
+					self.detailView.exitEditing().then(function(response)
+					{
+						if (!response)
+						{
+							cancelAction();
+						}
+						else
+						{
+							next();
+						}
+					});
 
 					return;
 				}
