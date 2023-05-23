@@ -705,9 +705,9 @@
 	};
 
 	LightKendoGrid.OperatorWithTime = {
-		// here need set "datetime" not "time" for time type column
+		// here need set "date" not "time" for time type column
 		string: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator),
-		datetime: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)		
+		date: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)		
 	};
 
 	LightKendoGrid.Operator2DisplayValue = {
@@ -7048,7 +7048,6 @@
 		return (filterItem.TypeHint === 'Time'
 			&& filterItem.Operator !== 'Empty'
 			&& filterItem.Operator !== 'IsNotNull' && filterItem.Operator !== 'IsNull'
-			&& TF.FilterHelper.dateTimeNonParamFiltersOperator.indexOf(filterItem.Operator.toLowerCase()) === -1
 			&& (filterItem.Value === '' || filterItem.Value === "Invalid date"));
 	}
 
