@@ -256,8 +256,15 @@
 					FieldName: "MyLastUpdated",
 					DisplayName: "Last Updated Date",
 					Width: '150px',
+					dbType: "datetime",
 					type: "date",
-					hidden: true
+					hidden: true,
+					template: function(item)
+					{
+						let dt = utcToClientTimeZone(item["MyLastUpdated"]);
+						return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
+					},
+					isUTC: true
 				},
 				{
 					FieldName: "MyLastUpdatedName",
