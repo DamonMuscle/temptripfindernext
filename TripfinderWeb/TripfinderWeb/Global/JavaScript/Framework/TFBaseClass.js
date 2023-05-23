@@ -32,6 +32,35 @@
 	};
 
 	var TF = createNamespace("TF");
+
+	TF.consoleOutput = function()
+	{
+		var type, obj;
+		if (arguments.length > 1)
+		{
+			type = arguments[0];
+			obj = arguments[1];
+		}
+		else
+		{
+			obj = arguments[0];
+		}
+
+		if (typeof obj == "string")
+		{
+			if (type)
+			{
+				obj = type + ": " + obj;
+			}
+
+			console.log(obj);
+			return;
+		}
+
+		type = type || "log";
+		console.log({ type: type, message: obj });
+	};
+
 	TF.extend = function()
 	{
 		var inlineOverride = function(o)
