@@ -70,6 +70,9 @@
 		self.pageLevelViewModel = pageLevelViewModel ? pageLevelViewModel : new TF.PageLevel.BasePageLevelViewModel();
 		self.basicGridConfig = {
 			fieldtrip: { title: "Name", subTitle: "DepartDateTime" },
+			contact: { title: "Name", subTitle: "Title" },
+			vehicle: { title: "VehicleName", subTitle: "MakeBody" },
+			staff: { title: "StaffName", subTitle: "AllStaffTypes" },
 		};
 
 		self.obShowSelectorMenu = ko.observable(true);
