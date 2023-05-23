@@ -1293,7 +1293,7 @@
 
 			if (result.applyOnSave)
 			{
-				return this.applyLayout(savedLayout, isNoConfirm);
+				this.applyLayout(savedLayout, isNoConfirm);
 			}
 			else
 			{
