@@ -561,12 +561,13 @@
 			FieldName: "LastUpdated",
 			DisplayName: "Last Updated Date",
 			Width: '150px',
+			dbType: "datetime",
 			type: "date",
 			template: function(item)
-					{
-						let dt = utcToClientTimeZone(item["LastUpdated"]);
-						return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
-					},
+			{
+				let dt = utcToClientTimeZone(item["LastUpdated"]);
+				return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
+			},
 			isUTC: true,
 		},
 		{

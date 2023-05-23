@@ -2140,7 +2140,7 @@
 			},
 			{
 				FieldName: "DirectionNotes",
-				DisplayName: "Destination Notes",
+				DisplayName: "Directions",
 				DBName: "DirectionNotes",
 				type: "string",
 			},
@@ -2148,7 +2148,7 @@
 				FieldName: "DestinationNotes",
 				DisplayName: "Destination Notes",
 				DBName: "DestinationNotes",
-				type: "",
+				type: "string",
 			},
 			{
 				FieldName: "DestinationContact",

@@ -288,7 +288,14 @@
 			precision
 		});
 
-		return Number(v) === v ? Math.tfRound(v, precision) : v;
+		if (Number(v) === v)
+		{
+			v = Math.tfRound(v, precision);
+			const format = column.format || `{0:n${precision}}`;
+			return kendo.format(format, v);
+		}
+
+		return v;
 	};
 
 	MeasurementUnitConverter.prototype.handlePrecisionForUnitsOfMeasureFilters = function(allColumns, filterSet)
