@@ -147,4 +147,26 @@
 		}
 		return content;
 	}
+
+	DataFormatHelper.prototype.clearPhoneNumberFormat = function(data, self)
+	{
+		const _getColumnByFieldName = (columns, item) =>
+			columns.find(x => x.field === item.field);
+		const _stripValue = (value) =>
+			value?.replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+
+		data?.forEach(item =>
+		{
+			let column = self.options.originalGridDefinition ?
+				_getColumnByFieldName(self.options.originalGridDefinition.Columns, item) :
+				_getColumnByFieldName(self.options.gridDefinition.Columns, item);
+			if (column &&
+				(column.formatType?.toLowerCase() === "phone" ||
+					column.questionType?.toLowerCase() === "phone" ||
+					column.UDFType === "phone number"))
+			{
+				item.value = _stripValue(item.value);
+			}
+		});
+	}
 })();

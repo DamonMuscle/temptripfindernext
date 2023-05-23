@@ -786,6 +786,9 @@
 						//the count of request in the process of change filter
 						if (!self.kendoDataSourceTransportReadCount) self.kendoDataSourceTransportReadCount = 0;
 						self.kendoDataSourceTransportReadCount = self.kendoDataSourceTransportReadCount + 1;
+
+						tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
+
 						if (!self.hasSendRequst)
 						{
 							self.hasSendRequst = true;
@@ -3442,7 +3445,10 @@
 													result.Items = Enumerable.From(result.Items).Select(function(item)
 													{
 														var obj = {};
-														obj[column.field] = $.trim(item);
+														obj[column.field] = column.formatType?.toLowerCase() === "phone" ||
+															(column.UDFType && column.UDFType === "phone number") ?
+																$.trim(tf.dataFormatHelper.phoneFormatter(item)) :
+																$.trim(item);
 														return obj;
 													}).Distinct("$." + column.field).OrderBy("$." + column.field).Take(10).ToArray();
 
@@ -3463,6 +3469,8 @@
 												{
 													url = this.options.setRequestURL(url);
 												}
+
+												tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
 
 												!this.options.disableAutoComplete && this.postRequestData(pathCombine(url, "aggregate"), options);
 											}
@@ -4002,6 +4010,11 @@
 		return "Id";
 	};
 
+	function isPhoneColumn(self, autoCompleteSelectedColumn) {
+		let columnField = self.options.gridDefinition.Columns?.find(x => x.FieldName === autoCompleteSelectedColumn);
+		return columnField && columnField.questionType?.toLowerCase() === "phone";
+	}
+
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
 		let paramData = {
@@ -4051,7 +4064,10 @@
 					{
 						result.Items = Enumerable.From(result.Items).Select(function(item)
 						{
-							item[autoCompleteSelectedColumn] = $.trim(item[autoCompleteSelectedColumn]);
+							let columnValue = isPhoneColumn(self, autoCompleteSelectedColumn) ?
+								tf.dataFormatHelper.phoneFormatter(item[autoCompleteSelectedColumn]) :
+								item[autoCompleteSelectedColumn];
+							item[autoCompleteSelectedColumn] = $.trim(columnValue);
 							return item;
 						}).Where(function(item)
 						{
