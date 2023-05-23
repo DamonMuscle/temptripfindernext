@@ -4703,7 +4703,44 @@
 					"type": "RecordPicture",
 					"defaultValue": false,
 					"min-height": "2"
-				}
+				},
+				{
+					"field": "ComparativeAnalysis",
+					"title": "Comparative Analysis",
+					"type": "Boolean",
+					"defaultValue": "False",
+					"displayValue": "Disabled",
+					"positiveLabel": "Enabled",
+					"negativeLabel": "Disabled",
+					"editType": {
+						"format": "BooleanDropDown"
+					}
+				},
+				{
+					"field": "VendorName",
+					"entityFieldName": "VendorName",
+					"title": "Vendor",
+					"type": "String",
+					"editType": {
+						"format": "DropDown",
+						"maxLength": 200,
+						"getSource": function()
+						{
+							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfvendors?@fields=ID,Name")).then(function(result)
+							{
+								return result.Items.map(function(item)
+								{
+									return {
+										'text': item["Name"],
+										'value': item["ID"]
+									};
+								});
+							});
+						},
+						"allowNullValue": true,
+						"entityKey": "VendorId"
+					},
+				},
 			],
 			"Equipment": [
 				{
@@ -4887,12 +4924,12 @@
 				}
 			],
 			"Miscellaneous": [
-				{
-					"field": "Map",
-					"title": "Map",
-					"type": "Map",
-					"min-height": "4"
-				},
+				// {
+				// 	"field": "Map",
+				// 	"title": "Map",
+				// 	"type": "Map",
+				// 	"min-height": "4"
+				// },
 				// {
 				// 	"field": "File",
 				// 	"title": "Documents",
