@@ -148,7 +148,7 @@
 		return content;
 	}
 
-	DataFormatHelper.prototype.stripPhoneNumberFormat = function(data, self)
+	DataFormatHelper.prototype.clearPhoneNumberFormat = function(data, self)
 	{
 		const _getColumnByFieldName = (columns, item) =>
 			columns.find(x => x.field === item.field);

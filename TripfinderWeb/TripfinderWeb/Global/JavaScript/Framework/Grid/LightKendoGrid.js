@@ -787,7 +787,7 @@
 						if (!self.kendoDataSourceTransportReadCount) self.kendoDataSourceTransportReadCount = 0;
 						self.kendoDataSourceTransportReadCount = self.kendoDataSourceTransportReadCount + 1;
 
-						tf.dataFormatHelper.stripPhoneNumberFormat(options.data?.filter?.filters, self);
+						tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
 
 						if (!self.hasSendRequst)
 						{
@@ -3470,7 +3470,7 @@
 													url = this.options.setRequestURL(url);
 												}
 
-												tf.dataFormatHelper.stripPhoneNumberFormat(options.data?.filter?.filters, self);
+												tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
 
 												!this.options.disableAutoComplete && this.postRequestData(pathCombine(url, "aggregate"), options);
 											}
@@ -4010,6 +4010,11 @@
 		return "Id";
 	};
 
+	function isPhoneColumn(self, autoCompleteSelectedColumn) {
+		let columnField = self.options.gridDefinition.Columns?.find(x => x.FieldName === autoCompleteSelectedColumn);
+		return columnField && columnField.questionType?.toLowerCase() === "phone";
+	}
+
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)
 	{
 		let paramData = {
@@ -4059,9 +4064,9 @@
 					{
 						result.Items = Enumerable.From(result.Items).Select(function(item)
 						{
-							let checkTypeField = self.options.gridDefinition.Columns?.find(x => x.FieldName === autoCompleteSelectedColumn);
-							let isCheckTypeField = checkTypeField && checkTypeField.questionType?.toLowerCase() === "phone";
-							let columnValue = isCheckTypeField ? tf.dataFormatHelper.phoneFormatter(item[autoCompleteSelectedColumn]) : item[autoCompleteSelectedColumn];
+							let columnValue = isPhoneColumn(self, autoCompleteSelectedColumn) ?
+								tf.dataFormatHelper.phoneFormatter(item[autoCompleteSelectedColumn]) :
+								item[autoCompleteSelectedColumn];
 							item[autoCompleteSelectedColumn] = $.trim(columnValue);
 							return item;
 						}).Where(function(item)
