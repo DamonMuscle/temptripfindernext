@@ -162,8 +162,8 @@
 				_getColumnByFieldName(self.options.gridDefinition.Columns, item);
 			if (column &&
 				(column.formatType?.toLowerCase() === "phone" ||
-					column.questionType?.toLowerCase() === "phone") ||
-					column.UDFType === "phone number")
+					column.questionType?.toLowerCase() === "phone" ||
+					column.UDFType === "phone number"))
 			{
 				item.value = _stripValue(item.value);
 			}
