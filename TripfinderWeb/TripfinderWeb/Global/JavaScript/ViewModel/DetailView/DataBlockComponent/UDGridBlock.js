@@ -824,25 +824,31 @@
 			{ overlay: false }
 		);
 
-		udGridRecordPromise.then(res =>
-		{
-			const selectedRecord = tf.udgHelper.getFormRecord(tf.udgHelper.getGuidToNameMappingOfGridFields(gridArg), res.Items[0], self.options);
-			tf.udgHelper.isFormReadonly(this.options.UDGridId, selectedRecord, this.options.DataTypeId).then(readonly =>
+		tf.loadingIndicator.showImmediately();
+		udGridRecordPromise
+			.then(res =>
 			{
-				if (window.location.href.indexOf("/newwindow/") >= 0)
+				const selectedRecord = tf.udgHelper.getFormRecord(tf.udgHelper.getGuidToNameMappingOfGridFields(gridArg), res.Items[0], self.options);
+				tf.udgHelper.isFormReadonly(this.options.UDGridId, selectedRecord, this.options.DataTypeId).then(readonly =>
 				{
-					readonly = true;
-				}
+					if (window.location.href.indexOf("/newwindow/") >= 0)
+					{
+						readonly = true;
+					}
 
-				//if main grid has no edit permission, the form should be readonly
-				if (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(this.options.DataTypeId) || "").toLowerCase(), "edit"))
-				{
-					readonly = true;
-				}
+					//if main grid has no edit permission, the form should be readonly
+					if (!tf.authManager.isAuthorizedForDataType((tf.dataTypeHelper.getKeyById(this.options.DataTypeId) || "").toLowerCase(), "edit"))
+					{
+						readonly = true;
+					}
 
-				readonly ? this.viewRecord(selectedRecord) : this.editRecord(selectedRecord);
+					readonly ? this.viewRecord(selectedRecord) : this.editRecord(selectedRecord);
+				});
+			})
+			.finally(() =>
+			{
+				tf.loadingIndicator.tryHide();
 			});
-		});
 	}
 
 	UDGridBlock.prototype.editMiniGridRecord = function(miniGridType, e, $target)
