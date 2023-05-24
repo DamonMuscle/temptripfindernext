@@ -115,7 +115,7 @@
 						$scheduleDom += self.setVehicleOrStaffScheduleContent();
 					}
 					self.$el.find(".scheduleContain").append($scheduleDom);
-					// self.gridstack.manageLayout();
+					self.detailView.rootGridStack.manageLayout(); // call manageLayout to resize the Schedule DataBlock
 				});
 			}
 			else
@@ -454,8 +454,8 @@
 				</li>\
 			</ul>",
 			(weekDay ? weekDay : (self.isReadMode() ? " " : "weekly")),
-			(startTime ? moment(startTime).format("LT") : (self.isReadMode() ? " " : "07:23:00 AM")),
-			(finishTime ? moment(finishTime).format("LT") : (self.isReadMode() ? " " : "07:32:00 PM")),
+			(startTime ? convertToMoment(startTime).format("LT") : (self.isReadMode() ? " " : "07:23:00 AM")),
+			(finishTime ? convertToMoment(finishTime).format("LT") : (self.isReadMode() ? " " : "07:32:00 PM")),
 			(description ? description : (self.isReadMode() ? " " : "Trip: 110 AM IMS")));
 
 		if (self.isReadMode())
