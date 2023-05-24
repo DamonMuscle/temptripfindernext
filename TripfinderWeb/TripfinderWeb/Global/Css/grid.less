@@ -2720,6 +2720,23 @@ span.k-dropdown-wrap.k-state-default {
 				}
 			}
 		}
+
+		.kendogrid-blank-fullfill {
+			>div.fillItem {
+				border-top: 1px solid @gridRowBorderColor;
+				box-sizing: border-box;
+
+				&.k-state-selected {
+					&:not(.disSelectable)
+					{
+						background-color: @gridRowSelectedBkgColor !important;
+					}
+
+					border-top: 1px solid @gridRowSelectedBorderColor !important;
+					border-bottom: 1px solid @gridRowSelectedBorderColor !important;
+				}
+			}
+		}
 	}
 
 	.k-filtercell {

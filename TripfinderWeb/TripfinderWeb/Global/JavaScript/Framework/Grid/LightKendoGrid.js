@@ -6027,10 +6027,17 @@
 			var $tr = $(tr),
 				fillItemColor = self._getFillItemColor($tr),
 				fillItemHeight = self._caculateFillItemHeight($tr);
-			$fillItem.height(fillItemHeight);
+			$fillItem.outerHeight(fillItemHeight);
 			$fillItem.css('background-color', fillItemColor);
+			self.updateSelectedStyle($tr, $fillItem);
 		});
 	};
+
+	LightKendoGrid.prototype.updateSelectedStyle = function($tr, $fillItem)
+	{
+		const isSelected = $tr.hasClass("k-state-selected");
+		$fillItem.toggleClass("k-state-selected", isSelected);
+	}
 
 	LightKendoGrid.prototype._caculateFillItemHeight = function($tr)
 	{
@@ -6039,8 +6046,14 @@
 
 	LightKendoGrid.prototype._getFillItemColor = function($tr)
 	{
-		var $td = $($tr.find('td')[0]);
-		return $td.css('background-color');
+		let color = $tr.attr("custom-bkg-color");
+		if (!color)
+		{
+			const $td = $($tr.find('td')[0]);
+			color = $td.css('background-color');
+		}
+
+		return color;
 	};
 
 	LightKendoGrid.prototype.clearSelection = function()
