@@ -1794,7 +1794,11 @@
 		// Apply thematic configurations.
 		const $leadingTable = self.$container.find("div[class^='k-grid-content-locked'] table");
 		const $leadingRows = $leadingTable.find(">tbody>tr.k-master-row");
-		const $fullfillRows = self.$container.find(".kendogrid-blank-fullfill>tbody>tr.k-master-row");
+		let $fullfillRows = self.$container.find(".kendogrid-blank-fullfill>tbody>tr.k-master-row");
+		if (!$fullfillRows.length)
+		{
+			$fullfillRows = self.$container.find(".kendogrid-blank-fullfill>div.fillItem");
+		}
 
 		const dataType = self._gridType;
 		const dataItems = self.kendoGrid.dataItems();
