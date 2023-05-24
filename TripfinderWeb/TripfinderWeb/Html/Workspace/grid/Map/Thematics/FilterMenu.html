@@ -1,0 +1,9 @@
+<div class="filter-menu" data-bind="attr:{role:obRole}, uiInit:init">
+	<div class="k-list-container k-popup k-reset not-lightkendogrid filter-menu-list-container">
+		<ul class="k-list k-reset" tabindex="-1">
+			<!--ko foreach: obFilters -->
+			<li tabindex="-1" class="k-item filter" data-bind="css:style, text:text, click: $parent.filterClick"></li>
+			<!--/ko -->
+		</ul>
+	</div>
+</div>

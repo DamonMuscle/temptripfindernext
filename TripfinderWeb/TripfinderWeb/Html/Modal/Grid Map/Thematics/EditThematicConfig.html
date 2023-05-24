@@ -1,0 +1,28 @@
+<div class="edit-thematic" data-bind="uiInit:init,css:{'new-mode':requireNameInput}">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="col-xs-8 fields" style="padding-right: 0;">
+			<!-- ko if: requireNameInput -->
+			<div class="form-group thematic-name">
+				<label class="requirestar">Thematic Name</label>
+				<input name="name" type="text" data-bind="value:obEntityDataModel().name" maxlength="48" />
+			</div>
+			<!-- /ko -->
+			<!-- ko if: quickfilterData() != null -->
+			<!-- ko template :{ name : "workspace/grid/map/thematics/quickfilter", data: quickfilterData(), afterRender: initQuickfilterFinish }-->
+			<!-- /ko -->
+			<!-- /ko -->
+			<div class="form-group applycheckbox-form-group" data-bind="visible:showApplyThematic">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" data-bind="checked:obApplyOnSave">Apply thematic changes upon saving
+					</label>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-16 grid">
+			<div class="thematic-grid kendo-grid"></div>
+		</div>
+	</div>
+</div>

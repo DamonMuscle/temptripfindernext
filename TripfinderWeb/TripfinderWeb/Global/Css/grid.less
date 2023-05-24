@@ -1,4 +1,12 @@
 @summaryGridHeight: 83px;
+@summaryGridMobileHeight: 65px;
+@gridRowHeight: 33px;
+@gridHeaderBackground: linear-gradient(#4b4b4b 0, #4b4b4b @gridRowHeight, #d6d6d6 @gridRowHeight, #d6d6d6 100%);
+@gridRowDefaultBkgColor: #fff;
+@gridRowSelectedBkgColor: #ffffce;
+@gridRowAltBkgColor: #ecf2f9;
+@gridRowBorderColor: #d5d5d5;
+@gridRowSelectedBorderColor: #2e2e2e;
 
 .sort-bar {
 	height: 25px;
@@ -254,6 +262,14 @@
 
 	&.contextmenu-open {
 		.grid-contextmenu-open('../../global/img/grid/filterOpen.svg');
+	}
+}
+
+.iconbutton.thematic {
+	background-image: url('../../global/img/grid/thematics.svg');
+
+	&.contextmenu-open {
+		.grid-contextmenu-open('../../global/img/grid/thematics-rev.svg');
 	}
 }
 
@@ -2656,6 +2672,56 @@ span.k-dropdown-wrap.k-state-default {
 }
 
 .kendo-grid-container {
+	&.thematic-applied {
+		&.has-locked-column .k-grid-content-locked table tr {
+			background-color: #ededed !important;
+
+			td {
+				color: #333 !important;
+			}
+		}
+
+		.k-grid-content,
+		.k-grid-content-locked {
+			table {
+				tr {
+					background-color: #fff;
+
+					&.k-state-selected {
+						td {
+							border-top: 1px solid @gridRowSelectedBorderColor !important;
+							border-bottom: 1px solid @gridRowSelectedBorderColor !important;
+						}
+					}
+
+					&:not(.k-state-selected) {
+						td.thematic-light {
+							color: #fff;
+						}
+					}
+
+					td {
+						border-top: 1px solid @gridRowBorderColor;
+					}
+				}
+			}
+		}
+
+		table.kendogrid-blank-fullfill {
+			tbody {
+				>tr {
+					border-top: 1px solid @gridRowBorderColor;
+					box-sizing: border-box;
+
+					&.k-state-selected {
+						border-top: 1px solid @gridRowSelectedBorderColor !important;
+						border-bottom: 1px solid @gridRowSelectedBorderColor !important;
+					}
+				}
+			}
+		}
+	}
+
 	.k-filtercell {
 		.k-button.k-button-icon {
 			.k-icon.k-i-close {

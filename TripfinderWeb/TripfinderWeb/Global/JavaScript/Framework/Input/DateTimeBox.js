@@ -97,6 +97,11 @@
 			this.applyAttribute($button, this.attributes.picker);
 		}
 
+		if($input.hasClass("k-input-needed"))
+		{
+			$input.addClass("k-input");
+		}
+
 		if (TF.isPhoneDevice) //VIEW-1252 Date Control is not visible when focus is still set to input
 		{
 			$button.click(function()

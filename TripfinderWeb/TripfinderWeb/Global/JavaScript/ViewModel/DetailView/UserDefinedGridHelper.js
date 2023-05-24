@@ -14,7 +14,7 @@
 
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
 	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
-	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per person.';
+	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per recipient.';
 
 	UserDefinedGridHelper.getUpdatedInfoColumns = function()
 	{
@@ -813,8 +813,41 @@
 		return convertedRecord;
 	};
 
-	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record)
+	UserDefinedGridHelper.prototype._getObjectIds = async function(options)
 	{
+		let { dataTypeId, dbId, recordIds } = options;
+		dbId = dbId || tf.datasourceManager.databaseId;
+
+		const dataTypeKey = tf.dataTypeHelper.getKeyById(dataTypeId);
+		if (dataTypeKey === "contact")
+		{
+			return Promise.resolve(recordIds);
+		}
+
+		const opts = {
+			paramData: {
+				"@fields": "ObjectId",
+				"@filter": "in(Id," + recordIds.join(",") + ")"
+			}
+		}
+
+		const apiPrefix = `${tf.api.apiPrefixWithoutDatabase()}/${dbId}`;
+		const dataTypeEndPoint = tf.dataTypeHelper.getEndpoint(dataTypeKey);
+		const url = pathCombine(apiPrefix, `${dataTypeEndPoint}?dateTime=${new Date().toISOString().split("T")[0]}`);
+		const objectIds = await tf.promiseAjax.get(url, opts, { overlay: false })
+			.then(resp =>
+			{
+				return resp.Items.map((i) => i.ObjectId);
+			});
+
+		return objectIds;
+	}
+
+	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record)
+	{
+		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
+		const entityObjectId = objectIds[0];
+
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -823,6 +856,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
+				RecordObjectID: entityObjectId,
 				RecordValue: null
 			},
 			recordValueObj = {};
@@ -885,8 +919,11 @@
 		});
 	};
 
-	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = function(udGrid, dataTypeId, entityId, record, udgridSurvey)
+	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record, udgridSurvey)
 	{
+		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
+		const entityObjectId = objectIds[0];
+
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -896,6 +933,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
+				RecordObjectID: entityObjectId,
 				RecordValue: null,
 			},
 			recordValueObj = {};

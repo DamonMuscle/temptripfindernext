@@ -2,10 +2,11 @@
 {
 	createNamespace("TF.Grid").ManageLayoutViewMobileModel = ManageLayoutViewMobileModel;
 
-	function ManageLayoutViewMobileModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, obSelectedGridLayoutName, manageLayoutModal)
+	function ManageLayoutViewMobileModel(obGridLayoutExtendedDataModels, obGridFilterDataModels, obGridThematicDataModels, fnSaveAndEditGridLayout, fnApplyGridLayout, obSelectedGridLayoutName, manageLayoutModal)
 	{
 		this.obGridLayoutExtendedDataModels = obGridLayoutExtendedDataModels;
 		this.obGridFilterDataModels = obGridFilterDataModels;
+		this.obGridThematicDataModels = obGridThematicDataModels;
 		this.fnSaveAndEditGridLayout = fnSaveAndEditGridLayout;
 		this.fnApplyGridLayout = fnApplyGridLayout;
 		this.manageLayoutModal = manageLayoutModal;
@@ -107,7 +108,7 @@
 		}.bind(this));
 	};
 
-	ManageLayoutViewMobileModel.prototype.deleteGridLayout = function(gridLayoutExtendedDataModel, e)
+	ManageLayoutViewMobileModel.prototype.deleteGridLayout = function(gridLayout, e)
 	{
 		e.stopPropagation();
 		if (this.isTouching)
@@ -147,12 +148,12 @@
 				if (result)
 				{
 					var self = this;
-					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", gridLayoutExtendedDataModel.id()))
+					tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts", gridLayout.id()))
 						.then(function(apiResponse)
 						{
 							if (apiResponse)
 							{
-								self.obGridLayoutExtendedDataModels.remove(gridLayoutExtendedDataModel);
+								self.obGridLayoutExtendedDataModels.remove(gridLayout);
 							}
 						});
 				}

@@ -30,6 +30,19 @@
 				</div>
 			</div>
 			<div class="mobile-modal-group-head">
+			</div>
+			<div class="mobile-modal-grid-select-option-wrap">
+				<div class='mobile-modal-grid-select-option' data-bind="click:gotoSelectThematic">
+					<label class="bold">Thematic</label>
+					<div class="flex-column">
+						<div class="text-right">
+							<span style="float: right;">&nbsp;></span>
+							<span class="current-thematic-name" style=" max-width: 200px;float: right;" data-bind="text:obSelectedGridThematicDataModel().name()"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mobile-modal-group-head">
 				Description
 			</div>
 			<div class="mobile-modal-grid-select-option-wrap">
@@ -70,6 +83,28 @@
 			<div class="mobile-modal-grid-select-option-wrap" data-bind="foreach:obFilterDataList">
 				<div class='mobile-modal-grid-select-option' data-bind="click:$parent.selectFilter.bind($parent)">
 					<div class="current-filter-name" data-bind="text:name"></div>
+				</div>
+			</div>
+			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}">
+			</div>
+		</div>
+	</div>
+	<div class="view-finder mobile-modal-grid-body hide" data-bind="css:{show:obStatus()==='selectthematic'}">
+		<div class="mobile-modal-grid-head">
+			<label class="col-xs-4 close-btn" data-bind="click:goToLayout">Cancel</label>
+			<label class="col-xs-16 text-center"><b>SELECT THEMATIC</b></label>
+			<label class="col-xs-4"></label>
+		</div>
+		<div class="mobile-modal-grid-description">
+			<div class="search-group">
+				<input type="text" placeholder="Search" data-bind="value:obSearchThematic,valueUpdate:'input'">
+				<button class="delete" data-bind="visible:obSearchThematic().length>0,click:emptySearchThematic">x</button>
+			</div>
+		</div>
+		<div class="mobile-modal-content-body has-search">
+			<div class="mobile-modal-grid-select-option-wrap" data-bind="foreach:obThematicDataList">
+				<div class='mobile-modal-grid-select-option' data-bind="click:$parent.selectThematic.bind($parent)">
+					<div class="current-thematic-name" data-bind="text:name"></div>
 				</div>
 			</div>
 			<div class="mobile-modal-group-bottom" data-bind="css:{safari:obIsSafari()}">

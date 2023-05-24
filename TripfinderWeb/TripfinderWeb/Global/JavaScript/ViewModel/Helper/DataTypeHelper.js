@@ -560,6 +560,22 @@
 	};
 
 	/**
+	 * Get display name for data type.
+	 *
+	 * @param {string} type
+	 * @returns
+	 */
+	DataTypeHelper.prototype.getDisplayNameByDataType = function(type)
+	{
+		var obj = this._getObjectByType(type);
+		if (obj && obj.displayName)
+		{
+			return obj.displayName;
+		}
+		return obj ? obj.name : type;
+	};
+
+	/**
 	 * Get parameter name for id in a request.
 	 *
 	 * @param {string} type
@@ -1221,10 +1237,11 @@
 
 	DataTypeHelper.prototype.getSearchApiPrefix = function(dataTypeName, dbid)
 	{
-		var dataTypeId = this.getIdByName(dataTypeName),
+		const dataTypeId = this.getIdByName(dataTypeName),
 			dataTypeKey = this.getKeyById(dataTypeId),
-			obj = this._getObjectByType(dataTypeKey),
-			prefix = obj.hasDBID ? tf.api.apiPrefix(null, dbid) : tf.api.apiPrefixWithoutDatabase();
+			obj = this._getObjectByType(dataTypeKey || dataTypeName);
+		dbid = dbid || tf.datasourceManager.databaseId;
+		const prefix = obj.hasDBID ? tf.api.apiPrefix(null, dbid) : tf.api.apiPrefixWithoutDatabase();
 
 		return pathCombine(prefix, "search", obj.endpoint);
 	};
@@ -1326,6 +1343,39 @@
 
 		return '';
 	};
+
+	DataTypeHelper.prototype.getParamDataByThematicType = function(thematicType, gridType, name, udgridId)
+	{
+		var filters = [`eq(type,${thematicType})`, `eq(DataTypeID,${tf.dataTypeHelper.getId(gridType.toLowerCase())})`];
+		if (udgridId)
+		{
+			filters.push(`eq(UDGridId,${udgridId})`);
+		}
+		var paramData = {};
+
+		if (!IsEmptyString(name))
+		{
+			filters.push(`eq(name,${name.trim()})`);
+		}
+
+		if (thematicType !== TF.ThematicTypeEnum.GRID)
+		{
+			paramData.dbid = tf.datasourceManager.databaseId;
+		}
+		paramData["@filter"] = filters.join("&");
+		return paramData;
+	}
+
+	DataTypeHelper.prototype.checkGridThematicSupport = function(gridType)
+	{
+		const supportGridThematicGrids = ["contact", "document", "studentattendanceschedule", "tripschedule",
+			"tripstopschedule", "student", "vehicle", "trip", "tripstop", "staff", "school", "georegion", "gpsevent",
+			"altsite", "contractor", "fieldtrip", "district", "route", "unassignedstudents", "report", "reportlibrary",
+			"scheduledreport", "scheduledReportsSent", "forms", "session", "form", "mergeDocumentsSent", "dashboards", "dashboardLibrary",
+			"mergedocument", "scheduledmergedocument", "mergeDocumentLibrary", "mergeemailmessage"];
+
+		return supportGridThematicGrids.includes(gridType);
+	}
 
 	DataTypeHelper.prototype.checkAutoExportSupport = function(gridType)
 	{

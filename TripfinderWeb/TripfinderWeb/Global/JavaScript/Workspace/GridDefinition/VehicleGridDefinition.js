@@ -229,7 +229,7 @@
 						let dt = utcToClientTimeZone(item["LastUpdated"]);
 						return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
 					},
-					isUTC: true,
+					isUTC: true
 				},
 				{
 					FieldName: "Length",

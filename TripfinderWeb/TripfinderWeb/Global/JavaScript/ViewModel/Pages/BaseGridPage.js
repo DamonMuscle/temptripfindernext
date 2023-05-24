@@ -388,6 +388,7 @@
 			filteredIds: option ? option.filteredIds : null
 		}));
 		self.searchGrid.filterMenuClick = self.searchGrid.filterMenuClick.bind(self);
+		self.searchGrid.thematicMenuClick = self.searchGrid.thematicMenuClick.bind(self);
 
 		if (!TF.isPhoneDevice)
 		{
@@ -565,6 +566,10 @@
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutName();
 		}, self);
+		self.obSelectedGridThematicName = ko.computed(function()
+		{
+			return self.searchGridInited() && self.searchGrid.obSelectedGridThematicName();
+		}, self);
 		self.obSummaryGridVisible = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSummaryGridVisible();
@@ -599,6 +604,7 @@
 			self.searchGrid.summarybarIconClick(model, e);
 		});
 		self.bindEvent(".iconbutton.filter", self.filterMenuClick);
+		self.bindEvent(".iconbutton.thematic", self.thematicMenuClick);
 		self.bindEvent(".iconbutton.addremovecolumn", function(model, e)
 		{
 			ga('send', 'event', 'Action', 'Grid Columns');
@@ -685,6 +691,31 @@
 		{
 			tf.pageManager.showContextMenu(e.currentTarge);
 			self.searchGrid.filterMenuClick(e, function()
+			{
+				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
+				if (iconWrap.length > 0)
+				{
+					iconWrap.css("display", "block");
+				}
+			});
+		}
+	};
+
+	BaseGridPage.prototype.thematicMenuClick = function(viewModel, e)
+	{
+		var self = this,
+			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
+			cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
+
+		if (cacheOperatorBeforeHiddenMenu)
+		{
+			TF.menuHelper.hiddenMenu();
+		}
+
+		if (cacheOperatorBeforeOpenMenu)
+		{
+			tf.pageManager.showContextMenu(e.currentTarge);
+			self.searchGrid.thematicMenuClick(e, function()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
 				if (iconWrap.length > 0)

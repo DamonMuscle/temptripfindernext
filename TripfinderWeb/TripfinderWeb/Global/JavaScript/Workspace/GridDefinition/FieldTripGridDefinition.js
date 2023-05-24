@@ -123,6 +123,7 @@
 					DisplayName: "Contact Phone",
 					Width: '150px',
 					type: "string",
+					formatType: "phone",
 					template: function(item)
 					{
 						return tf.dataFormatHelper.phoneFormatter(item.ContactPhone) || '';
@@ -166,6 +167,7 @@
 					DisplayName: "Destination Contact Phone",
 					Width: '190px',
 					type: "string",
+					formatType: "phone",
 					template: function(item)
 					{
 						return tf.dataFormatHelper.phoneFormatter(item.DestinationContactPhone) || '';
@@ -410,6 +412,11 @@
 			DisplayName: "Destination Fax",
 			Width: '150px',
 			type: "string",
+			formatType: "phone",
+			template: function(item)
+			{
+				return tf.dataFormatHelper.phoneFormatter(item.DestinationFax) || '';
+			},
 			hidden: true
 		},
 		{
@@ -554,12 +561,13 @@
 			FieldName: "LastUpdated",
 			DisplayName: "Last Updated Date",
 			Width: '150px',
+			dbType: "datetime",
 			type: "date",
 			template: function(item)
-					{
-						let dt = utcToClientTimeZone(item["LastUpdated"]);
-						return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
-					},
+			{
+				let dt = utcToClientTimeZone(item["LastUpdated"]);
+				return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
+			},
 			isUTC: true,
 		},
 		{

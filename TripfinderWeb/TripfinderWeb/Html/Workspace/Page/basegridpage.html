@@ -45,6 +45,11 @@
 				<button class="iconbutton filter" title="Filters"
 					data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
 
+				<!--ko if:searchGrid.obThematicSupported() -->
+				<button class="iconbutton thematic" title="Thematics"
+					data-bind="css:{'tf-thematic-applied':(obSelectedGridThematicName() !== 'None')}"></button>
+				<!-- /ko -->
+
 				<button class="iconbutton refresh" title="Refresh"></button>
 
 				<!-- ko if: changeStatusButton || cancelButton-->
@@ -77,6 +82,14 @@
 		<!-- ko if: pageType !== "reports"-->
 		<div class="pull-right grid-staterow-wrap">
 			<div class="grid-staterow">
+				<!--ko if:searchGrid.obThematicSupported()-->
+				<div class="grid-staterow-status text-overflow thematic">
+					<span class="title pull-left">Thematic:</span>
+					<span class="filtername-ellipsis text-overflow" data-bind="text:searchGrid.obSelectedGridThematicName,attr:{title:searchGrid.obSelectedGridThematicName}">
+					</span>
+					,&nbsp
+				</div>
+				<!-- /ko -->
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
 					<span class="filtername-ellipsis text-overflow"
@@ -100,7 +113,8 @@
 		<!-- /ko -->
 	</div>
 	<div class="grid-wrap">
-		<div class="kendo-grid kendo-grid-container"></div>
+		<div class="kendo-grid kendo-grid-container"
+			data-bind="css:{'thematic-applied':searchGrid.obIsThematicApplied}"></div>
 		<div class="kendo-grid kendo-summarygrid-container" data-bind="visible:obSummaryGridVisible()"></div>
 	</div>
 </div>

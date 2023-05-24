@@ -133,7 +133,7 @@
 
             switch (type) {
                 case 'Text':
-                case 'Case':
+                case "Case":
                     editType = {
                         "format": "String",
                         "maxLength": item.MaxLength || 255
@@ -430,8 +430,27 @@
     }
 
     UserDefinedFieldHelper.DataTypeId = {
-		RollUp: 19
+		RollUp: 19,
+		Case: 20
 	}
+
+    UserDefinedFieldHelper.getType = function(udf, toLower = true)
+	{
+		var isRollup = udf.TypeId === TF.DetailView.UserDefinedFieldHelper.DataTypeId.RollUp,
+			isCase = udf.TypeId === TF.DetailView.UserDefinedFieldHelper.DataTypeId.Case,
+			type = (isRollup ? TF.DetailView.UserDefinedFieldHelper.valueFormatToType(udf.ValueFormat) : udf.Type);
+		if (toLower)
+		{
+			type = type.toLowerCase();
+			return type == "text" || isCase ? "string" : type;
+		}
+
+		if (isCase)
+		{
+			return "Text";
+		}
+		return type;
+	};
 
 	UserDefinedFieldHelper.valueFormatToType = function(valueFormat)
 	{
