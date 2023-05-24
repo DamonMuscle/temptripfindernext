@@ -40,7 +40,8 @@
 				},
 				{
 					FieldName: "Dhdistance",
-					DisplayName: "Deadhead " + tf.localization.UnitsOfMeasure,
+					DisplayName: "Deadhead Distance",
+					UnitOfMeasureSupported: true,
 					Width: '150px',
 					type: "number",
 					format: "{0:0.00}"
@@ -61,6 +62,7 @@
 				{
 					FieldName: "Distance",
 					DisplayName: "Distance",
+					UnitOfMeasureSupported: true,
 					Width: '150px',
 					type: "number",
 					format: "{0:0.00}"
@@ -338,6 +340,7 @@
 				{
 					FieldName: "EstDistancePerYear",
 					DisplayName: "Est Distance/Year",
+					UnitOfMeasureSupported: true,
 					Width: '140px',
 					type: "number",
 					hidden: true
