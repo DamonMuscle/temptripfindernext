@@ -5336,7 +5336,8 @@
 			self._selectedIdsChange();
 		}
 
-		self.$container.find(".k-grid-content-locked tr, .k-grid-content tr").click(function(e)
+		const selector = ".k-grid-content-locked tr, .k-grid-content tr";
+		self.$container.off("click", selector).on("click", selector, function(e)
 		{
 			onKendoGridTRClickEvent.call(this, e, self);
 		});
