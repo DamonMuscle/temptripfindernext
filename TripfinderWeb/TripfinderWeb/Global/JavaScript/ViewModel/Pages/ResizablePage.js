@@ -495,7 +495,7 @@
 
 			if (!TF.isMobileDevice)
 			{
-				self.obGridData().searchGrid.fitContainer();
+				self.obGridData().searchGrid && self.obGridData().searchGrid.fitContainer();
 				self.resize(self.$leftPage.width());
 			}
 		}

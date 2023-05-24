@@ -387,6 +387,12 @@
 
 		const routeState = Math.random().toString(36).substring(7);
 
+		if (self.checkPermission(type) === false)
+		{
+			// No permission for Vehicle data, show Field Trip grid by default.
+			type = "fieldtrip";
+		}
+
 		switch (type)
 		{
 			case "approvals":
@@ -472,6 +478,20 @@
 				data: pageData
 			}]);
 	};
+
+	PageManager.prototype.checkPermission = function(type)
+	{
+		let permission = true;
+		switch (type)
+		{
+			case "vehicle":
+			case "vehicles":
+				permission = tf.permissions.obVehicle();
+			default:
+				break;
+		}
+		return permission;
+	}
 
 	PageManager.prototype.loadDataSourceName = function()
 	{
