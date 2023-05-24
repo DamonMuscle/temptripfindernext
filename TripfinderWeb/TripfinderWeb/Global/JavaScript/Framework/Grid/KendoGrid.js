@@ -677,30 +677,6 @@
 		self.getIdsWithCurrentFiltering()
 			.then(function(ids)
 			{
-				var gridLayoutExtendedEntity = self._obCurrentGridLayoutExtendedDataModel().toData();
-				gridLayoutExtendedEntity.LayoutColumns = self._obSelectedColumns();
-
-				var getDataUrl = url;
-				var getDataOption = {
-					paramData:
-					{
-						fileFormat: 'xlsx'
-					},
-					data:
-					{
-						"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
-						"selectedIds": selectedIds ? selectedIds : ids,
-						"sortItems": self.searchOption.data.sortItems
-					}
-				};
-
-				if (self.options.gridType === "busfinderhistorical")
-					self.options.setRequestOption(getDataOption);
-
-				return tf.promiseAjax.post(getDataUrl, getDataOption);
-			})
-			.then(function(keyApiResponse)
-			{
 				tf.promiseBootbox.dialog(
 					{
 						closeButton: true,
@@ -724,15 +700,35 @@
 								callback: function()
 								{
 									var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xlsx';
-									var fileUrl = url + "?key=" + keyApiResponse.Items[0] + "&fileFormat=" + fileFormat;
-									if (TF.isMobileDevice)
+
+									var gridLayoutExtendedEntity = self._obCurrentGridLayoutExtendedDataModel().toData();
+									gridLayoutExtendedEntity.LayoutColumns = self._obSelectedColumns();
+
+									var getDataUrl = url + '/';
+									var getDataOption = {
+										paramData:
+										{
+											fileFormat: fileFormat
+										},
+										data: {
+											"gridLayoutExtendedEntity": gridLayoutExtendedEntity,
+											"selectedIds": selectedIds ? selectedIds : ids,
+											"sortItems": self.searchOption.data.sortItems
+										}
+									};
+
+									if (self.options.gridType === "busfinderhistorical" ||
+										self.options.gridType === "form")
 									{
+										self.options.setRequestOption(getDataOption);
+									}
+
+									tf.promiseAjax.post(getDataUrl, getDataOption).then(function(keyApiResponse)
+									{
+										const exportFileName = (self.options.gridType === "form" ? self.options.gridData.text : self.options.gridType);
+										var fileUrl = `${url}?key=${keyApiResponse.Items[0]}&fileFormat=${fileFormat}&fileName=${encodeURIComponent(exportFileName)}`;
 										window.open(fileUrl);
-									}
-									else
-									{
-										window.location = fileUrl;
-									}
+									});
 								}
 							},
 							cancel:
