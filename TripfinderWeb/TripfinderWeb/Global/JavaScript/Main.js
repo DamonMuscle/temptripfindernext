@@ -803,6 +803,16 @@ function booleanToCheckboxFormatter(value)
 	//disable default right click menu
 	document.oncontextmenu = function(event)
 	{
+		let srcElement = event.target || event.srcElement;
+		if (srcElement
+			&& (
+				$(srcElement).attr('enableRightClickMenu') === 'true' ||
+				(($(srcElement).is(":text") || srcElement.nodeName.toLowerCase() == "textarea") && !srcElement.hasAttribute('readonly') && !srcElement.hasAttribute('disabled'))
+			))
+		{
+			return true;
+		}
+		
 		if (window.event)
 		{
 			event = window.event;
