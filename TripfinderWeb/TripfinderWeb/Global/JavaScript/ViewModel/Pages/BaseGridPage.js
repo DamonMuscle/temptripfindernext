@@ -107,6 +107,11 @@
 					self.obIsSelectRow(false);
 					self.obCanCopyFieldTrip(false);
 					self.obCanDeleteRecord(false);
+
+					if(self.obShowDetailPanel() || self.obShowFieldTripDEPanel())
+					{
+						tf.pageManager.resizablePage.closeRightPage();
+					}
 					return;
 				}
 
