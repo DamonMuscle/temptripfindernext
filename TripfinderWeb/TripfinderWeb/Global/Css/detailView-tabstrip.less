@@ -1,3 +1,5 @@
+@ThemeColor: #70A130;
+
 .grid-stack {
 
     .enable-edit {
@@ -34,7 +36,7 @@
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.6);
-            border: 2px dashed #8dc63f;
+            border: 2px dashed @ThemeColor;
 
             .enable-tab {
                 display: block;
@@ -131,18 +133,17 @@
                             }
 
                             &.k-state-active {
-                                border-bottom: 3px solid #8dc63f;
+                                border-bottom: 3px solid @ThemeColor;
                                 background-color: #d2d2d2;
 
                                 > span.k-link {
-                                    // font-weight: bolder;
-                                    // color: red;
+                                    color: @ThemeColor;
                                 }
                             }
 
                             &:hover {
                                 > span.k-link {
-                                    // font-weight: bold;
+                                    color: @ThemeColor;
                                 }
                             }
 
