@@ -991,6 +991,7 @@
 		var self = this;
 
 		self.clearSelection();
+		if(self.obShowDetailPanel()) return;
 
 		if(self.type == "fieldtrip") 
 		{
