@@ -990,6 +990,8 @@
 	{
 		var self = this;
 
+		self.clearSelection();
+
 		if(self.type == "fieldtrip") 
 		{
 			var view = {
@@ -1039,6 +1041,15 @@
 			self.obShowDetailPanel(true);
 		}
 	};
+
+	BaseGridPage.prototype.clearSelection = function()
+	{
+		var self = this, searchGrid = self.searchGrid;
+		if (searchGrid && searchGrid.getSelectedIds().length > 0)
+		{
+			searchGrid.clearSelection();
+		}
+	}
 
 	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
 	{
@@ -1199,7 +1210,7 @@
 				label = "Add New Vehicle";
 				break;
 			default:
-				label = "Submit New Reqeust";
+				label = "Submit New Request";
 		}
 
 		return label;
