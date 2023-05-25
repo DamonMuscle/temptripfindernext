@@ -6,7 +6,7 @@
 	{
 		var options = {
 			title: "Select Recipients ",
-			description: "You may select one or more of the Routefinder Pro user accounts. Only users that have an email may be selected.",
+			description: "You may select one or more of the Routefinder Plus user accounts. Only users that have an email may be selected.",
 			availableTitle: "Available",
 			selectedTitle: "Selected",
 			type: "user",
