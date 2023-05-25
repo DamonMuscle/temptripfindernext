@@ -1017,7 +1017,7 @@
 		else if(self.type == 'vehicle') //might check other types including Staff and Contact
 		{
 			ga('send', 'event', 'Area', 'Details');
-			var isReadOnly = !self.selectedItemEditable();
+			var isReadOnly = !self.selectedItemEditable() && !self.obNewRequest(); // readonly if both Edit and Add are not allowed
 			self.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, self.type);
 			
 			self.detailView.onCloseDetailEvent.subscribe(
