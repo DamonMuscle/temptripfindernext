@@ -33,7 +33,7 @@
 		self.obDashboardLoRes = ko.observable(false);
 		self.obShowMessageCenter = ko.observable(false);
 		const availableGridPages = tf.dataTypeHelper.getAvailableDataTypes({ includeFakeMajorType: true });
-		self.availableGridPages = availableGridPages.filter(val => val.key !== 'form');		
+		self.availableGridPages = availableGridPages.filter(val => val.key !== 'form' && val.key !== "document");
 		self.obGridPages = ko.observableArray(self.availableGridPages);
 
 		self.bindWithKnockout();
@@ -662,6 +662,9 @@
 		{
 			case "approvals":
 				ga('send', 'event', 'Area', 'My Pending Approvals');
+				break;
+			case "contacts":
+				ga('send', 'event', 'Area', 'Contacts');
 				break;
 			case "fieldtrips":
 				ga('send', 'event', 'Area', 'Field Trips');

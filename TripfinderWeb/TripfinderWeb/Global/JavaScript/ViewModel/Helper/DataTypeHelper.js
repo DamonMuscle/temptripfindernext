@@ -366,7 +366,7 @@
 	var _RPT_DATA_SCHEMAS = []; // Store ReportDataSchema list
 
 	const _noObjectIdDataTypes = ["contact", "scheduledreport", "dashboards"];
-	const _tripfinderDataTypes = ["fieldtrip","vehicle"]; // ["fieldtrip", "vehicle", "staff", "contact"]
+	const _tripfinderDataTypes = ["fieldtrip", "vehicle", "document"]; // ["fieldtrip", "vehicle", "staff", "contact"]
 
 	function DataTypeHelper()
 	{
