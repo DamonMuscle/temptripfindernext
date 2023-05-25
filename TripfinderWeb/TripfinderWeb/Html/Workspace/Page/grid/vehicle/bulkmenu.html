@@ -80,13 +80,13 @@
 					</li>
 				</ul>
 			</li>
-			<li class="menu-item" data-bind="visible:gridViewModel.obReports">
+			<li class="menu-item" data-bind="visible:gridViewModel.obReports, css:{disabled:!(gridViewModel.obReportLists() && gridViewModel.obReportLists().length > 0)}">
 				<div class="menu-icon report">
 				</div>
 				<div class="menu-label">
 					View Report
 				</div>
-				<!-- ko if: gridViewModel.obReportLists() -->
+				<!-- ko if: (gridViewModel.obReportLists() && gridViewModel.obReportLists().length > 0) -->
 				<ul class="tf-contextmenu" data-bind="foreach: gridViewModel.obReportLists">
 					<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.viewReportClick">
 						<div class="menu-icon">
@@ -96,7 +96,7 @@
 					</li>
 				</ul>
 				<!-- /ko -->
-			</li>			
+			</li>
 			<li class="menu-divider">
 				<div class="rule"></div>
 			</li>
