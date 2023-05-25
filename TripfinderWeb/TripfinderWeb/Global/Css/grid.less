@@ -1,6 +1,7 @@
 @summaryGridHeight: 83px;
 @summaryGridMobileHeight: 65px;
 @gridRowHeight: 33px;
+@thematicFullfillDivHeight: 34px;
 @gridHeaderBackground: linear-gradient(#4b4b4b 0, #4b4b4b @gridRowHeight, #d6d6d6 @gridRowHeight, #d6d6d6 100%);
 @gridRowDefaultBkgColor: #fff;
 @gridRowSelectedBkgColor: #ffffce;
@@ -1197,7 +1198,7 @@
 	}
 
 	tr {
-		height: 33px;
+		height: @gridRowHeight;
 
 		td {
 			&.has-link {
@@ -2419,12 +2420,12 @@
 
 		.l {
 			background-color: white;
-			height: 33px;
+			height: @gridRowHeight;
 		}
 
 		.l-alt {
 			background-color: #ecf2f9;
-			height: 33px;
+			height: @gridRowHeight;
 		}
 	}
 
@@ -2684,6 +2685,8 @@ span.k-dropdown-wrap.k-state-default {
 		.k-grid-content,
 		.k-grid-content-locked {
 			table {
+				border-collapse: collapse;
+
 				tr {
 					background-color: #fff;
 
@@ -2718,6 +2721,37 @@ span.k-dropdown-wrap.k-state-default {
 						border-bottom: 1px solid @gridRowSelectedBorderColor !important;
 					}
 				}
+			}
+		}
+
+		.kendogrid-blank-fullfill {
+			>div.fillItem {
+				border-top: 1px solid @gridRowBorderColor;
+				box-sizing: border-box;
+				height: @thematicFullfillDivHeight !important;
+				margin-top: -1px;
+
+				&:nth-child(1) {
+					margin-top: 0px;
+				}
+
+				&:last-child:not(.k-state-selected) {
+					height: @gridRowHeight !important;
+				}
+
+				&.k-state-selected {
+					&:not(.disSelectable)
+					{
+						background-color: @gridRowSelectedBkgColor !important;
+					}
+
+					border-top: 1px solid @gridRowSelectedBorderColor !important;
+					border-bottom: 1px solid @gridRowSelectedBorderColor !important;
+				}
+			}
+
+			.fillItem.k-state-selected+.fillItem:not(.k-state-selected) {
+				border-top: 1px solid @gridRowSelectedBorderColor !important;
 			}
 		}
 	}

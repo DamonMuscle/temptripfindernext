@@ -1574,14 +1574,18 @@
 				return o.OmittedRecordID;
 			});
 		}
-		var filterClause = " 1=1";
+		var filterClause = "";
 		if (this._gridState && this._gridState.filterClause)
 		{
-			filterClause += " and " + this._gridState.filterClause;
+			filterClause += this._gridState.filterClause;
 		}
 		if (this.obSelectedGridFilterClause())
 		{
-			filterClause += " and " + this.obSelectedGridFilterClause();
+			filterClause += this.obSelectedGridFilterClause();
+		}
+		if(!(filterClause || "").trim())
+		{
+			filterClause = " 1=1";
 		}
 		var searchData = new TF.SearchParameters(skip, take, null, filterSet, filterClause, this._gridState.filteredIds, omitIds);
 		searchData.data.fields = ['Id'];

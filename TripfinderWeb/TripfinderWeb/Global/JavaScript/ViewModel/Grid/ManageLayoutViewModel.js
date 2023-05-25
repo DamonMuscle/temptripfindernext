@@ -54,7 +54,11 @@
 				columns: [
 					{
 						field: "Name",
-						title: "Name"
+						title: "Name",
+						template: function(data)
+						{
+							return kendo.htmlEncode(data.Name);
+						}
 					},
 					{
 						field: "Description",
@@ -67,7 +71,7 @@
 						{
 							if (data.FilterId)
 							{
-								return data.FilterName;
+								return kendo.htmlEncode(data.FilterName);
 							}
 							return "";
 
@@ -77,7 +81,7 @@
 						field: "ThematicName",
 						title: "Thematic",
 						hidden: !self.obThematicSupported(),
-						template: (data) => data.ThematicId ? data.ThematicName : "",
+						template: (data) => data.ThematicId ? kendo.htmlEncode(data.ThematicName) : "",
 					},
 					{
 						field: "DataExportExists",
