@@ -919,9 +919,34 @@
 		return hintElements;
 	};
 
-	BaseKendoGridViewModel.prototype.loadReportLists = function()
+	BaseKendoGridViewModel.prototype._getValidReportIds = async function()
 	{
 		var self = this;
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search/exagoreports", "id"),
+			{
+				paramData: {
+					databaseId: tf.datasourceManager.databaseId,
+				},
+				data: {
+					"fields": ["Id"],
+					"filterSet": { "FilterItems": [], "FilterSets": [], "LogicalOperator": "and" }
+				}
+			}
+		).then(function(apiResponse)
+		{
+			self.allIds = apiResponse.Items;
+			return self.allIds.slice(0);
+		}).catch(function(ex)
+		{
+			console.log(ex);
+			return [];
+		});
+	}
+
+	BaseKendoGridViewModel.prototype.loadReportLists = async function()
+	{
+		var self = this;
+		const validReportIds = await self._getValidReportIds();
 		let getReporsPromise = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "exagoreports"), {
 			paramData: {
 				dataTypeId: tf.dataTypeHelper.getId(self.type),
@@ -943,6 +968,7 @@
 			});
 
 			let reportList = Array.sortBy(getReportsResponse.Items.filter(item => item.IsFavorite), "Name").concat(Array.sortBy(getReportsResponse.Items.filter(item => !item.IsFavorite), "Name"));
+			reportList = reportList.filter(r => validReportIds.indexOf(r.Id) > -1);
 			self.obReportList(reportList);
 		});
 	};

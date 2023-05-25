@@ -1,3 +1,5 @@
+@ThemeColor: #70A130;
+
 .k-mobile .page-container {
 	overflow-x: hidden;
 }
@@ -150,6 +152,14 @@ body {
 
 					.k-scheduler-mark{
 						border: 1px solid rgb(213, 213, 213);
+					}
+
+					.k-scheduler-weekview {
+						.k-scheduler-header {
+							th.k-today:before {
+								border-bottom-color: @ThemeColor;
+							}
+						}
 					}
 				}
 

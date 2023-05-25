@@ -8,6 +8,7 @@
 @gridRowAltBkgColor: #ecf2f9;
 @gridRowBorderColor: #d5d5d5;
 @gridRowSelectedBorderColor: #2e2e2e;
+@ThemeColor: #70A130;
 
 .sort-bar {
 	height: 25px;
@@ -2159,7 +2160,7 @@
 		&:after {
 			content: "";
 			display: block;
-			border-bottom: 8.5px solid #70A130;
+			border-bottom: 8.5px solid @ThemeColor;
 			border-right: 8.5px solid transparent;
 			border-left: 8.5px solid transparent;
 		}
@@ -2171,7 +2172,7 @@
 		&:after {
 			content: "";
 			display: block;
-			border-top: 8.5px solid #70A130;
+			border-top: 8.5px solid @ThemeColor;
 			border-right: 8.5px solid transparent;
 			border-left: 8.5px solid transparent;
 		}
@@ -3677,6 +3678,21 @@ form.k-filter-menu {
 			width: auto;
 		}
 	}
+
+	.k-today {
+		.k-link {
+			box-shadow: inset 0 0 0 1px @ThemeColor;
+		}
+	}
+
+	.k-century,
+	.k-decade,
+	.k-year,
+	.k-month {
+		.k-state-focused {
+			background-color: @ThemeColor;
+		}
+	}
 }
 
 .k-filtercell .clear-custom-filter-menu-btn.clearButtonPosition {
@@ -3707,6 +3723,20 @@ form.k-filter-menu {
 
 		td {
 			background-color: inherit;
+
+			&.k-state-selected {
+				.k-link {
+					border-color: @ThemeColor;
+					background-color: @ThemeColor;
+				}
+			}
+
+			&.k-state-focused {
+				.k-link {
+					border-color: @ThemeColor;
+					background-color: @ThemeColor;
+				}
+			}
 		}
 
 		.k-content td {
@@ -3740,10 +3770,10 @@ form.k-filter-menu {
 
 				td.k-state-focused,
 				td.k-state-focused.k-state-hover {
-					background-color: #337ab7;
+					background-color: @ThemeColor;
 
 					.k-link {
-						background-color: #337ab7;
+						background-color: @ThemeColor;
 					}
 				}
 			}
