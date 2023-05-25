@@ -97,7 +97,6 @@
 
 	BasePage.prototype.showDetailsClick = function(rowSelectedId)
 	{	
-		var dataType = tf.pageManager.resizablePage.leftPageType;
 		var self = this, selectedId;
 		if (rowSelectedId)
 		{
@@ -121,7 +120,8 @@
 		{
 			ga('send', 'event', 'Area', 'Details');
 			var isReadOnly = !self.selectedItemEditable();
-			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, isReadOnly, {}, dataType);
+			const gridType = self.type;
+			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, isReadOnly, {}, gridType);
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
 			);
