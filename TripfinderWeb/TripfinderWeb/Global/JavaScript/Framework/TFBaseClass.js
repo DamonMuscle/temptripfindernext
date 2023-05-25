@@ -5,6 +5,16 @@
 		return this.indexOf(suffix, this.length - suffix.length) !== -1;
 	};
 
+	String.prototype.tfTrimStart = function(s)
+	{
+		return this.replace(new RegExp("^" + s), '');
+	};
+
+	String.prototype.tfTrimEnd = function(s)
+	{
+		return this.replace(new RegExp(s + "*$"), '');
+	};
+
 	ko.subscribable.fn.subscribeChanged = function(callback)
 	{
 		var oldValue;

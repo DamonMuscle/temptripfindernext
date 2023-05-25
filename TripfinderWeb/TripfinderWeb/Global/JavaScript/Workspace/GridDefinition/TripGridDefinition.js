@@ -548,14 +548,17 @@
 			InvisibleUDFColumns: tf.UDFDefinition.getInvisibleUDFs("trip"),
 			formatter: function(value)
 			{
+				if (value.indexOf('!') === -1) 
+				{
+					return value;
+				}
+
 				if (!value)
 				{
 					return "";
 				}
-				var result = value.replace(/!/g, ",");
-				if (result.substr(value, length - 1, 1) == ",")
-					result = result.substr(0, value.length - 1);
-				return result;
+
+				return value.replace(/!/g, ", ").trim().tfTrimEnd(',');
 			},
 			getIconUrl_PolicyDeviation: function(value)
 			{
