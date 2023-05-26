@@ -991,7 +991,6 @@
 		var self = this;
 
 		self.clearSelection();
-		if(self.obShowDetailPanel()) return;
 
 		if(self.type == "fieldtrip") 
 		{
@@ -1021,22 +1020,30 @@
 		{
 			ga('send', 'event', 'Area', 'Details');
 			var isReadOnly = !self.selectedItemEditable() && !self.obNewRequest(); // readonly if both Edit and Add are not allowed
-			self.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, self.type);
-			
-			self.detailView.onCloseDetailEvent.subscribe(
-				self.closeDetailClick.bind(this)
-			);
-			self.detailView.onCreateNewRecordSuccess.subscribe(
-				self.onCreateNewRecordSuccessHandler.bind(self)
-			);
-	
-			if (TF.isMobileDevice)
+
+			if(self.detailView && self.obShowDetailPanel())
 			{
-				tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+				self.detailView.showDetailViewById(null, self.type, null, isReadOnly);
 			}
 			else
 			{
-				tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+				self.detailView = new TF.DetailView.DetailViewViewModel(null, this.pageLevelViewModel, isReadOnly, {}, self.type);	
+
+				self.detailView.onCloseDetailEvent.subscribe(
+					self.closeDetailClick.bind(this)
+				);
+				self.detailView.onCreateNewRecordSuccess.subscribe(
+					self.onCreateNewRecordSuccessHandler.bind(self)
+				);
+
+				if (TF.isMobileDevice)
+				{
+					tf.pageManager.resizablePage.setLeftPage("workspace/detailview/detailview", self.detailView);
+				}
+				else
+				{
+					tf.pageManager.resizablePage.setRightPage("workspace/detailview/detailview", self.detailView);
+				}
 			}
 			
 			self.obShowDetailPanel(true);

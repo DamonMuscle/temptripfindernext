@@ -98,6 +98,8 @@
 	BasePage.prototype.showDetailsClick = function(rowSelectedId)
 	{	
 		var self = this, selectedId;
+		const isReadOnly = !self.selectedItemEditable();
+		const gridType = self.type;
 		if (rowSelectedId)
 		{
 			selectedId = rowSelectedId;
@@ -114,13 +116,12 @@
 		}
 		if (self.detailView && self.detailView.isReadMode() && self.obShowDetailPanel())
 		{
-			self.detailView.showDetailViewById(selectedId);
+			self.detailView.showDetailViewById(selectedId, gridType, null, isReadOnly);
 		}
 		else
 		{
 			ga('send', 'event', 'Area', 'Details');
-			var isReadOnly = !self.selectedItemEditable();
-			const gridType = self.type;
+
 			self.detailView = new TF.DetailView.DetailViewViewModel(selectedId, self.pageLevelViewModel, isReadOnly, {}, gridType);
 			self.detailView.onCloseDetailEvent.subscribe(
 				self.closeDetailClick.bind(self)
