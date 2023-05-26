@@ -1,7 +1,14 @@
 ﻿<div class="description">
 	<pre class="titleNotify">Layouts may be applied, edited, or deleted. Double-click a layout to apply it to the grid.</pre>
 </div>
+<div class="row">
+	<div class="col-xs-24">
+		<button type="button" data-bind="click:importButtonClick" class="btn tf-btn-light-grey btn-sm" style="margin-bottom:6px;">Import</button>
+	</div>
+</div>
 <div class="row" data-bind="uiInit:$parent.containerLoaded,finish:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
 	<div class="col-xs-24">
 		<div data-bind="" class="vertical-size-large grid-container managelayoutgrid-container  kendo-grid">
 		</div>

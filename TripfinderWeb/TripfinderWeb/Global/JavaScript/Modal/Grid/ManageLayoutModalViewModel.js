@@ -36,7 +36,6 @@
 		{
 			this.manageLayoutViewModel.dispose();
 		}
-
 	};
 
 })();
