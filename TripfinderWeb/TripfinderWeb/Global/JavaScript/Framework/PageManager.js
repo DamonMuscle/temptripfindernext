@@ -417,6 +417,11 @@
 				pageData = new TF.Page.MyRequestSchedulerPage(gridType);
 				templateName = "workspace/page/schedulerpage";
 				break;
+			// if type is not matched use fieldtrip page as default
+			default:
+				pageData = new TF.Page.FieldTripPage(gridOptions);
+				templateName = "workspace/page/basegridpage";
+				break;
 		}
 
 		self.resizablePage.leftPageType = type;
