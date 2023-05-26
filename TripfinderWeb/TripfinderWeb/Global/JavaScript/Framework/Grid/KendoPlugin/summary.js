@@ -29,6 +29,10 @@
 		{
 			return;
 		}
+		if (!self.$summaryContainer.length)
+		{
+			return;
+		}
 		self.summaryKendoGrid = self.$summaryContainer.data("kendoGrid");
 		if (self.summaryKendoGrid)
 		{
