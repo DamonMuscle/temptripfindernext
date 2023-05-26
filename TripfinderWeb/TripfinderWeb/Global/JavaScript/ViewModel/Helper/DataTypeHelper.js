@@ -627,7 +627,7 @@
 					authorization: obj.authorization,
 					enableDetailView: obj.enableDetailView,
 					enableUDF: obj.enableUDF !== false,
-					endpoint: obj.endpoint
+					pageType: obj.endpoint
 				});
 			}
 		}

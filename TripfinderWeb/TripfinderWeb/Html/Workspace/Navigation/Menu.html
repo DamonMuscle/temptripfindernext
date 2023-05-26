@@ -37,36 +37,8 @@
 			<div class="item-label">Data Grids</div>
 			<div class="item-menu">
 				<ul class="datagrid" data-bind="foreach:{data:obGridPages, as:'typePage'}">
-					<li data-bind="css: { 'menu-container': typePage.items, 'menu-item': !typePage.items },visible:tf.authManager.isAuthorizedForDataType(key,'read') && ((!typePage.items) || (typePage.items && (typePage.items().length>0))),attr:{clicktype:key}, event: { mouseenter: $parent.showSubMenu.bind($parent), mouseleave: $parent.hideSubMenu.bind($parent)}">
+					<li data-bind="css: { 'menu-container': typePage.items, 'menu-item': !typePage.items },visible:tf.authManager.isAuthorizedForDataType(key,'read') && ((!typePage.items) || (typePage.items && (typePage.items().length>0))),attr:{clicktype:typePage.pageType}, event: { mouseenter: $parent.showSubMenu.bind($parent), mouseleave: $parent.hideSubMenu.bind($parent)}">
 						<span data-bind="css: { 'disable-auto-close': typePage.items }, text:label,contextMenuClick:$parent.menuViewClick"></span>
-						<!-- ko if:typePage.items && typePage.items() && typePage.items().length -->
-						<div class="right-arrow"></div>
-						<ul class="sub-menu-container sub-menu-even-container" data-bind="foreach: { data: typePage.items, as:'form' }, visible: false">
-							<li data-bind="css: { 'menu-container': true, 'sub-menu-header':false, active:isOpen} ,attr:{clicktype:typePage.key}, event: { mouseenter: $parents[1].showSubMenu.bind($parents[1]), mouseleave: $parents[1].hideSubMenu.bind($parents[1])}">
-								<span data-bind="css: { 'disable-auto-close': form.grids }, text:form.head.text,contextMenuClick:$parents[1].menuViewClick"></span>
-								<!-- ko if:form.grids && form.grids.length -->
-								<div class="right-arrow"></div>
-								<ul class="sub-menu-container sub-menu-container-with-up-down-arrow-button" data-bind="foreach: { data: form.grids, as: 'grid' }, visible: false, event:{scroll:$parents[2].scrollFormList.bind($parents[2]),resize:$parents[2].repositionUpDownArrows.bind($parents[2])}">
-									<!-- ko if: $index() === 0 -->
-									<div class="sub-menu-item up-arrow-container" data-bind="contextMenuClick:$parents[2].menuViewClick">
-										<div class="up-arrow-image"></div>
-									</div>
-									<!-- /ko -->
-									<!-- ko ifnot: grid.hidden -->
-									<li class="sub-menu-item" data-bind="text:text , attr: {title: text}, click:$parents[2].openFormButtonClick.bind($parents[2])">
-									</li>
-									<!-- /ko -->
-									<!-- ko if: ($index() === (form.grids.length - 1)) -->
-									<li class="firefox-padding-bottom"></li>
-									<div class="sub-menu-item down-arrow-container" data-bind="contextMenuClick:$parents[2].menuViewClick">
-										<div class="down-arrow-image"></div>
-									</div>
-									<!-- /ko -->
-								</ul>
-								<!-- /ko -->
-							</li>
-						</ul>
-						<!-- /ko -->
 					</li>
 				</ul>
 			</div>
