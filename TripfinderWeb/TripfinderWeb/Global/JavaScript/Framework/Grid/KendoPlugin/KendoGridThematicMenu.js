@@ -16,7 +16,7 @@
 
 	function KendoGridThematicMenu()
 	{
-		this._storageThematicDataKey = "grid.currentThematic." + this._gridType + ".id";
+		this._storageThematicDataKey = "grid.currentThematic." + this.getStorageKeyId() + ".id";
 
 		this.obSelectedGridThematicId = ko.observable();
 		this.obGridThematicDataModels = ko.observableArray();
