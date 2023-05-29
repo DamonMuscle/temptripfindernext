@@ -197,7 +197,7 @@
 		}
 		else
 		{
-			console.error('Chatfinder is not supported.');
+			console.log('Chatfinder is not supported.');
 		}
 	}
 
