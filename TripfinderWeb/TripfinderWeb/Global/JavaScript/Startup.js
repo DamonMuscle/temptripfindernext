@@ -777,6 +777,7 @@
 
 		var p1 = tf.authManager.isAuthorizedFor("staff", "read");
 		var p2 = tf.authManager.isAuthorizedFor("vehicle", "read");
+		var p3 = tf.authManager.isAuthorizedFor("contact", "read");
 
 		var docRead = tf.authManager.isAuthorizedFor("documentTab", "read");
 		var docAdd = tf.authManager.isAuthorizedFor("documentTab", "add");
@@ -791,6 +792,7 @@
 				obFieldTrips: ko.observable(ft),
 				obStaff: ko.observable(p1),
 				obVehicle: ko.observable(p2),
+				obContact: ko.observable(p3),
 				filtersRead: fltRead,
 				filtersAdd: fltAdd,
 				filtersEdit: fltEdit,

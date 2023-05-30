@@ -6,7 +6,7 @@
 
 	}
 
-	ContactGridDefinition.prototype.gridDefinition = function(gridType)
+	ContactGridDefinition.prototype.gridDefinition = function(Type)
 	{
 		var columns = [
 			{
@@ -20,6 +20,12 @@
 				DisplayName: "Last Name",
 				type: "string",
 				Width: '300px'
+			},
+			{
+				FieldName: "LocalID",
+				DisplayName: "Local ID",
+				Width: '150px',
+				type: "string"
 			},
 			{
 				FieldName: "Title",
@@ -38,6 +44,7 @@
 				DisplayName: "Phone",
 				type: "string",
 				Width: '300px',
+				formatType: "phone",
 				template: function(item)
 				{
 					return tf.dataFormatHelper.phoneFormatter(item.Phone) || '';
@@ -54,6 +61,7 @@
 				DisplayName: "Mobile Phone",
 				type: "string",
 				Width: '300px',
+				formatType: "phone",
 				template: function(item)
 				{
 					return tf.dataFormatHelper.phoneFormatter(item.Mobile) || '';
@@ -64,10 +72,17 @@
 				DisplayName: "Fax",
 				type: "string",
 				Width: '300px',
+				formatType: "phone",
 				template: function(item)
 				{
 					return tf.dataFormatHelper.phoneFormatter(item.Fax) || '';
 				}
+			},
+			{
+				FieldName: "DocumentCount",
+				DisplayName: "# Documents",
+				Width: '150px',
+				type: "integer"
 			},
 			{
 				FieldName: "Street1",
@@ -85,13 +100,15 @@
 				FieldName: "City",
 				DisplayName: "Mail City",
 				type: "string",
-				Width: '300px'
+				Width: '300px',
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeneralDataListsMailingCity", "contact", "City")
 			},
 			{
 				FieldName: "State",
 				DisplayName: "Mail State/Province",
 				type: "string",
-				Width: '300px'
+				Width: '300px',
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeneralDataListsMailingState", "contact", "State")
 			},
 			{
 				FieldName: "Zip",
@@ -106,6 +123,39 @@
 				Width: '500px'
 			}
 		];
+
+		if (Type === "contactinformation")
+		{
+			columns = columns.concat([{
+				FieldName: "ContactType",
+				DisplayName: "Contact Type",
+				type: "string",
+				Width: '200px'
+			}])
+
+			columns = columns.concat([{
+				FieldName: "FullName",
+				DisplayName: "Name",
+				Width: '300px',
+				type: "string"
+			}])
+		}
+		else
+		{
+			columns = columns.concat([{
+				FieldName: "AssociationCount",
+				DisplayName: "# Associated Records",
+				type: "integer",
+				Width: '180px'
+			}])
+
+			columns = columns.concat([{
+				FieldName: "FullName",
+				DisplayName: "Name",
+				Width: '300px',
+				type: "string"
+			}])
+		}
 
 		return {
 			Columns: columns.concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("contact")),

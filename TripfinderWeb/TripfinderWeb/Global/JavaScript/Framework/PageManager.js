@@ -300,6 +300,9 @@
 			case "approvalsScheduler":
 				pageTitle = "My Pending Approvals Calendar";
 				break;
+			case "contacts":
+				pageTitle = "Contacts"
+				break;
 			case "fieldtrips":
 				pageTitle = "Field Trips";
 				break;
@@ -399,6 +402,12 @@
 				pageData = new TF.Page.ApprovalsPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
+			case "contact":
+			case "contacts":
+				pageData = new TF.Page.ContactPage(gridOptions);
+				templateName = "workspace/page/basegridpage";
+				break;
+			case "fieldtrip":
 			case "fieldtrips":
 				pageData = new TF.Page.FieldTripPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
@@ -487,9 +496,14 @@
 		let permission = true;
 		switch (type)
 		{
+			case "contact":
+			case "contacts":
+				permission = tf.permissions.obContact();
+				break;
 			case "vehicle":
 			case "vehicles":
 				permission = tf.permissions.obVehicle();
+				break;
 			default:
 				break;
 		}
@@ -697,6 +711,7 @@
 	PageManager.prototype.getAvailableDataTypes = function()
 	{
 		var allDataTypes = [
+			{ name: "contact", label: "Contacts", permission: tf.permissions.obContact() },
 			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() },
 			{ name: "vehicle", label: "Vehicles", permission: tf.permissions.obVehicle() }
 		];

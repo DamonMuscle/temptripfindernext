@@ -709,6 +709,9 @@ function getTitleByType(type)
 	var pageTitle = "", pageType = type.toLowerCase();
 	switch (pageType)
 	{
+		case "contacts":
+			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Contact");
+			break;
 		case "scheduler":
 		case "fieldtrips":
 			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Field Trip");
