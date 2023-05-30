@@ -117,6 +117,26 @@
 			$printElement = $detailViewElement.clone();
 		$printElement.width(String($detailViewElement.width()) + "px").height("100%");
 
+		var grids = $printElement.find(".k-grid");
+		grids.toArray().forEach(element => {
+			if (element.style.height)
+			{
+				// kendo style change it to auto height in print
+				// make the height same as desktop
+				element.style.setProperty("height", element.style.height, "important");
+			}
+		});
+
+		var gridContents = $printElement.find(".k-grid-content");
+		gridContents.toArray().forEach(element => {
+			if (element.style.height)
+			{
+				// kendo style change it to auto height in print
+				// make the height same as desktop
+				element.style.setProperty("height", element.style.height, "important");
+			}
+		});
+
 		return new Promise(function(resolve, reject)
 		{
 			self.preLoadMapImage($detailViewElement).then(function()

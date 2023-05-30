@@ -29,7 +29,7 @@
 			}
 
 			table {
-				.fontSize(1, 2, true);
+				.fontSize(1, 0, true);
 			}
 		}
 
@@ -41,6 +41,30 @@
 
 			.grid-stack {
 				.grid-stack-item-content {
+					&.custom-grid {
+						.item-content {
+							display: table;
+							width: 100% !important;
+
+							>.kendo-grid {
+								/* change lock div and content div from inline-block + inline-block to block (float left) + block */
+								>.k-grid-content-locked {
+									display: block;
+									float: left;
+								}
+								>.k-grid-content {
+									display: block;
+									
+									.kendogrid-blank-fullfill {
+										>div.fillItem {
+											page-break-inside: avoid;
+										}
+									}
+								}
+							}
+						}
+					}
+
 					.item-title {
 						.fontSize(1, -1);
 					}
