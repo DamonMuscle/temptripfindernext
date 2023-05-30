@@ -529,6 +529,16 @@
 			});
 	};
 
+	BasePage.prototype.relatedClickGen = function(type, subUrl)
+	{
+		var redirectWindow = window.open('', '_blank');
+		redirectWindow.blur();
+		return function(viewModel, e)
+		{
+			this._openSelected(type, e, redirectWindow);
+		}.bind(this);
+	};
+
 	BasePage.prototype.dispose = function()
 	{
 		var self = this;

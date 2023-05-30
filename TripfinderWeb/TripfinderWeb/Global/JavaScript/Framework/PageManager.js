@@ -303,6 +303,9 @@
 			case "contacts":
 				pageTitle = "Contacts"
 				break;
+			case "staff":
+				pageTitle = "Staff";
+				break;
 			case "fieldtrips":
 				pageTitle = "Field Trips";
 				break;
@@ -410,6 +413,10 @@
 			case "fieldtrip":
 			case "fieldtrips":
 				pageData = new TF.Page.FieldTripPage(gridOptions);
+				templateName = "workspace/page/basegridpage";
+				break;
+			case "staff":
+				pageData = new TF.Page.StaffPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
 			case "vehicles":

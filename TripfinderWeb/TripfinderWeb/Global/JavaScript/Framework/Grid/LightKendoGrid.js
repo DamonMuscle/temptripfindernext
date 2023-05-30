@@ -6316,9 +6316,10 @@
 
 	LightKendoGrid.prototype._staffGridDraggable = function()
 	{//RW-997 once staff grid and the record without type dirver and bus aide, then no drag.
+		//self.kendoGrid = this.$container.data("kendoGrid");
+		//self.bindScrollXMoveSummayBarEvent();
 		var self = this;
-		// TODO-V2, need to remove
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "metastafftype"))
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "stafftypes"))
 			.then(function(staffTypes)
 			{
 				var BusAideId = 0, DriverId = 0;
@@ -6335,14 +6336,21 @@
 					}
 				});
 
+				if (!self.kendoGrid)
+				{
+					return;
+				}
+
 				$.map(self.kendoGrid.items(), function(item)
 				{
 					var row = $(item).closest("tr");
 					var dataItem = self.kendoGrid.dataItem(row);
-					if (dataItem.StaffTypes.some(function(staffType)
+					const containsBusOrDriver = dataItem.StaffTypes && $.type(dataItem.StaffTypes) === 'string' && dataItem.StaffTypes.split(",").some(function(staffType)
 					{
 						return staffType == BusAideId || staffType == DriverId;
-					}))
+					});
+
+					if (containsBusOrDriver)
 					{
 						row.addClass("draggable");
 					}

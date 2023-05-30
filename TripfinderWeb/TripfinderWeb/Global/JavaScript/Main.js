@@ -712,6 +712,9 @@ function getTitleByType(type)
 		case "contacts":
 			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Contact");
 			break;
+		case "staff":
+			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Staff");
+			break;
 		case "scheduler":
 		case "fieldtrips":
 			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Field Trip");
