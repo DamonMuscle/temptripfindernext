@@ -357,6 +357,16 @@
 			hasDBID: false,
 			enableDetailView: false
 		},
+		fieldtriplocation: {
+			endpoint: "fieldtriplocations",
+			name: "Location",
+			idParamName: "FieldTripDestinationID",
+			gridDefinition: "fieldTripDestinationGridDefinition",
+			isMajorType: true,
+			authorization: "location",
+			hasDBID: true,
+			enableDetailView: true
+		},		
 		other: {
 			name: "Other"
 		}
@@ -366,7 +376,7 @@
 	var _RPT_DATA_SCHEMAS = []; // Store ReportDataSchema list
 
 	const _noObjectIdDataTypes = ["contact", "scheduledreport", "dashboards"];
-	const _tripfinderDataTypes = ["contact", "fieldtrip", "vehicle", "document"]; // ["fieldtrip", "vehicle", "staff", "contact"]
+	const _tripfinderDataTypes = ["contact", "fieldtrip", "vehicle", "document", "fieldtriplocation"]; // ["fieldtrip", "vehicle", "staff", "contact"]
 
 	function DataTypeHelper()
 	{
@@ -539,6 +549,8 @@
 			case "fieldtripaide":
 				type = "fieldtripresource";
 				break;
+			case "location":
+				type = "FieldTripDestinations"
 			default:
 				break;
 		}

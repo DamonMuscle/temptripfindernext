@@ -36,7 +36,7 @@
 		removeTabIndex: false,
 		paramData: {}
 	};
-	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report', "contact"];
+	var bigGridTypes = ['staff', 'student', 'trip', 'tripstop', 'vehicle', 'school', 'georegion', 'fieldtrip', 'district', 'contractor', 'altsite', 'document', 'fieldtriptemplate', 'report', "contact", "fieldtriplocation"];
 	var udfLazyLoadType = ['roll-up', 'case'];
 	var customClickAndTouchEvent;
 	var customTouchMoveEvent;

@@ -111,6 +111,8 @@
 				return tf.contactGridDefinition.gridDefinition();
 			case 'specialequipment':
 				return tf.specialEquipmentGridDefinition.gridDefinition();
+			case 'fieldtriplocation':
+				return tf.fieldTripDestinationGridDefinition.gridDefinition();			
 		}
 
 		return '';

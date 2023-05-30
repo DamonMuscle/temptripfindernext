@@ -73,6 +73,7 @@
 			contact: { title: "Name", subTitle: "Title" },
 			vehicle: { title: "VehicleName", subTitle: "MakeBody" },
 			staff: { title: "StaffName", subTitle: "AllStaffTypes" },
+			fieldtriplocation: { title: "Name", subTitle: "City"}
 		};
 
 		self.obShowSelectorMenu = ko.observable(true);

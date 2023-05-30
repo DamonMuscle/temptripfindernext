@@ -1220,6 +1220,9 @@
 			case "vehicle":
 				label = "Add New Vehicle";
 				break;
+			case "fieldtriplocation":
+				label = "Add New Location";
+				break;
 			default:
 				label = "Submit New Request";
 		}
