@@ -131,6 +131,21 @@
 						<div class="menu-label"
 							data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
 					</li>
+					<li class="menu-divider">
+						<div class="rule"></div>
+					</li>
+					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('contact'),css:{disabled:!tf.authManager.isAuthorizedFor('contact','read')}">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Contact')">
+						</div>
+					</li>
+					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('document'),css:{disabled:!tf.authManager.isAuthorizedFor('documentCenter','read')}">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Document')">
+						</div>
+					</li>
 				</ul>
 			</li>
 			<li class="menu-divider">
