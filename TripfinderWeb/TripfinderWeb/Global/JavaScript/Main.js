@@ -379,6 +379,31 @@ Array.sortBy = function(arr, fieldName, desc)
 	});
 };
 
+Array.unique = function(arr)
+{
+	var seen = {}, out = [], len = arr.length, i = j = 0;
+	for (; i < len; i++)
+	{
+		var item = arr[i];
+		if (seen[item] !== 1)
+		{
+			seen[item] = 1;
+			out[j++] = item;
+		}
+	}
+
+	return out;
+};
+
+Array.groupBy = function(arr, key)
+{
+	return arr.reduce(function(rv, x)
+	{
+		(rv[x[key]] = rv[x[key]] || []).push(x);
+		return rv;
+	}, {});
+};
+
 Array.equals = function(arr1, arr2)
 {
 	arr1 = arr1.sort();

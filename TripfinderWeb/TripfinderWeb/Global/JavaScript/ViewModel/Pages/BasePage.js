@@ -19,6 +19,7 @@
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.openSelectedClick = self.openSelectedClick.bind(self);
+		self.relatedClickGen = self.relatedClickGen.bind(self);
 	}
 
 	BasePage.prototype.constructor = BasePage;
@@ -435,6 +436,72 @@
 		{
 			self.searchGrid.exportCurrentGrid(selectedIds);
 		}
+	};
+
+	BasePage.prototype.relatedClickGen = function(type, descriptor)
+	{
+		return function(viewModel, e)
+		{
+			const redirectWindow = window.open('', '_blank');
+			redirectWindow.blur();
+			this._openRelated(type, descriptor, e, redirectWindow);
+		}.bind(this)
+	};
+
+	BasePage.prototype._openRelated = function(gridType, descriptor, e, redirectWindow)
+	{
+		const self = this;
+		const selectedIds = self.searchGrid.getSelectedIds();
+		if (selectedIds.length > 0)
+		{
+			self._getIdsFromRelated(gridType, descriptor, selectedIds).then(function(ids)
+			{
+				//Maybe sooner change the data get from DB of new page loading
+				const fromMenu = $(e.currentTarget).find(".menu-label").text().trim();
+
+				const toGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[gridType]);
+				const fromGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[self.type]);
+
+				const dataType = tf.dataTypeHelper.getAvailableDataTypes().find(d => d.key === gridType);
+				const pageType = dataType ? dataType.pageType : gridType;
+
+				const filterName = `${toGridType} (${fromMenu} for Selected ${fromGridType})`;
+				//the filter will sticky once open a new grid, so save the sticky information in DB
+				const storageFilterDataKey = `grid.currentfilter.${pageType}.id`;
+
+				Promise.all([
+					TF.Grid.FilterHelper.clearQuickFilter(pageType),
+					tf.storageManager.save(`grid.currentlayout.${pageType}.id`, ''),
+					tf.storageManager.save(storageFilterDataKey, { "filteredIds": ids, "filterName": filterName })
+				]).then(function()
+				{
+					redirectWindow.location = "#/?pagetype=" + pageType;
+					redirectWindow.name = "new-pageWindow_" + $.now();
+				}.bind(self));
+			}.bind(self));
+		}
+		else
+		{
+			self.searchGrid.gridAlert.show(
+			{
+				message: "no data selected!"
+			});
+		}
+	};
+
+	BasePage.prototype._getIdsFromRelated = function(type, descriptor, relatedIds)
+	{
+		return new Promise(function(resolve, reject)
+		{
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, "ids", descriptor),
+				{
+					data: relatedIds,
+				})
+				.then(function(result)
+				{
+					resolve(result.Items[0]);
+				}.bind(this))
+		}.bind(this));
 	};
 
 	BasePage.prototype.openSelectedClick = function(viewModel, e)
