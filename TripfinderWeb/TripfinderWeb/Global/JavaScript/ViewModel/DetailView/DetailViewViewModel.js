@@ -2320,6 +2320,8 @@
 		var self = this;
 		if (self.dataPointPanel)
 		{
+			self.dataPointPanel.onCloseDataPointPanelEvent.notify();
+
 			self.dataPointPanel.dispose();
 			self.dataPointPanel = null;
 		}
