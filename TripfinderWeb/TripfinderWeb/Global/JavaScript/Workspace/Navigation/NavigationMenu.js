@@ -709,7 +709,26 @@
 			menuHeight = pageCount * self.pageItemHeight + self.pageCategoryHeight, targetWidth,
 			initWidth = self.obIsExpand() ?
 				self.expandWidth :
-				$item.find(".item-icon").outerWidth() + $item.find(".item-label").outerWidth();
+				$item.find(".item-icon").outerWidth() + $item.find(".item-label").outerWidth(),
+			$ul = $itemMenu.find('>ul'),
+			$label = $item.find(".item-label");
+
+		if(!TF.isPhoneDevice)
+		{
+			if(self.obIsExpand())
+			{
+				$itemMenu.css({ paddingTop: 0 });
+			}
+			else 
+			{
+				$itemMenu.css({ paddingTop: 54 }); // reserve display space for menu label
+			}
+
+			menuHeight = self.obIsExpand() ? pageCount * self.pageItemHeight : pageCount * self.pageItemHeight + self.pageCategoryHeight;
+		}
+
+		var menuLeft = self.obIsExpand() ? $item[0].clientWidth : $item.find(".item-icon").outerWidth();
+
 		if ($itemMenu.width() == 620) 
 		{
 			targetWidth = 620;
@@ -732,7 +751,26 @@
 			self.isOnAnimation = true;
 			$item.addClass("onAnimation");
 			$item.addClass("menu-opened");
-			$itemMenu.stop().animate({ width: targetWidth, height: menuHeight }, {
+
+			var itemTop = this.getCoords($item[0]).top,
+				bodyHeight = $(document.body).height(),
+				menuTop = Math.min($(window).height() - itemTop - menuHeight, 0);
+
+			var openAnimateParameters = { width: targetWidth, height: menuHeight };
+
+			if(!TF.isPhoneDevice)
+			{
+				$item.addClass("small-screen");
+
+				if (!self.obIsExpand())
+				{
+					$ul.before($label[0].outerHTML); // duplicate menu label
+				}
+				
+				openAnimateParameters = { width: targetWidth, height: menuHeight, top: menuTop, left: menuLeft };
+			}
+
+			$itemMenu.stop().animate(openAnimateParameters, {
 				duration: duration, queue: false, done: function()
 				{
 					self.isOnAnimation = false;
@@ -743,22 +781,31 @@
 		}
 		else if (!flag && isOpened)
 		{
+			var closeAnimateParameters = TF.isPhoneDevice ? 
+											{ width: initWidth, height: self.pageCategoryHeight } : 
+											{ width: initWidth, height: self.pageCategoryHeight, top: 0, left: menuLeft };
 			//If the item text is greater than 310, get the width.
 			targetWidth = targetWidth > $itemMenu.width() ? targetWidth : $itemMenu.width();
 
 			$itemMenu.css({ width: targetWidth, height: menuHeight });
+
 			self.isOnAnimation = true;
 			$item.addClass("onAnimation");
 			$item.removeClass("menu-opened");
-			$itemMenu.stop().animate({ width: initWidth, height: self.pageCategoryHeight }, {
+			$itemMenu.stop().animate(closeAnimateParameters, {
 				duration: duration, queue: false, done: function()
 				{
 					self.isOnAnimation = false;
 					$item.removeClass("onAnimation");
-					$itemMenu.css({ width: "", height: "", display: "" });
+					$itemMenu.css({ width: "", height: "", display: "", left: "", top: "" });
 					animationDeferred.resolve();
 				}
 			});
+
+			if ($itemMenu.find('.item-label'))
+			{
+				$itemMenu.find('.item-label').remove();
+			}
 		}
 		else
 		{
@@ -766,6 +813,21 @@
 		}
 
 		return animationDeferred;
+	};
+
+
+	NavigationMenu.prototype.getCoords = function(elem)
+	{
+		var box = elem.getBoundingClientRect(),
+			body = document.body,
+			docEl = document.documentElement,
+			scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop,
+			scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft,
+			clientTop = docEl.clientTop || body.clientTop || 0,
+			clientLeft = docEl.clientLeft || body.clientLeft || 0,
+			top = box.top + scrollTop - clientTop,
+			left = box.left + scrollLeft - clientLeft;
+		return { top: Math.round(top), left: Math.round(left) };
 	};
 
 	/**
