@@ -1016,7 +1016,9 @@
 
 			self.obShowFieldTripDEPanel(true);
 		}
-		else if(self.type == 'vehicle' || self.type == 'contact') //might check other types including Staff and Contact
+		else if(self.type == 'vehicle' ||
+			self.type == 'contact' ||
+			self.type == 'staff') //might check other types including Staff and Contact
 		{
 			ga('send', 'event', 'Area', 'Details');
 			var isReadOnly = !self.selectedItemEditable() && !self.obNewRequest(); // readonly if both Edit and Add are not allowed
@@ -1106,6 +1108,140 @@
 		var self = this;
 		ga('send', 'event', 'Area', 'Field Trip Scheduler');
 		tf.pageManager.openNewPage(self.pageType + "Scheduler");
+	};
+
+	BaseGridPage.prototype._getIdsFromRelated = function(relatedType, descriptor, relatedIds)
+	{
+		const self = this;
+		const dataType = self.type;
+
+		if (relatedType === "contact")
+		{
+			return self._getContactsRelatedGridRecords(dataType, relatedIds);
+		}
+		else if (relatedType === "document")
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "documentrelationships"), {
+				paramData: {
+					"DBID": tf.datasourceManager.databaseId,
+					"AttachedToType": tf.dataTypeHelper.getId(dataType),
+					"@fields": "DocumentID",
+					"@filter": "in(AttachedToID," + relatedIds.join(',') + ")"
+				}
+			}).then(function(idResponse)
+			{
+				return idResponse.Items.map(function(item)
+				{
+					return item.DocumentID;
+				});
+			});
+		}
+		else if (dataType === "contact")
+		{
+			return self._getRelatesToContactGridRecords(relatedType, relatedIds);
+		}
+		else
+		{
+			const urlNode = tf.dataTypeHelper.getEndpoint(relatedType);
+			const idsParamName = tf.dataTypeHelper.getIdsParamName(dataType);
+			const paramData = { "@fields": "Id" };
+
+			paramData[idsParamName] = relatedIds.join(",");
+
+			if (descriptor)
+			{
+				paramData["type"] = descriptor;
+			}
+
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), urlNode),
+				{
+					paramData: paramData
+				})
+				.then(res =>
+				{
+					return Array.isArray(res.Items) && res.Items.length > 0
+						? res.Items.map((o) => o.Id) : [-1];
+				});
+		}
+	};
+
+	BaseGridPage.prototype._getRelatesToContactGridRecords = function(type, relatedIds)
+	{
+		var url = pathCombine(tf.api.apiPrefixWithoutDatabase(), 'RecordContacts'),
+			dbQueryString = String.format("eq(DBID,{0})", tf.datasourceManager.databaseId),
+			dataTypeQueryString = String.format("&eq(DataTypeID,{0})", tf.dataTypeHelper.getId(type)),
+			inQueryTemplate = String.format("&in(ContactID,{0})", tf.urlHelper.TEMPLATE_REPLACE_STRING),
+			template = String.format("{0}?@filter={1}{2}{3}&@fields=RecordID", url, dbQueryString, dataTypeQueryString, inQueryTemplate),
+			idStringList = tf.urlHelper.splitExceedRequest(template, relatedIds),
+			deferred = [],
+			contactIDQueryString = paramData = p0 = null;
+
+		idStringList.forEach(function(idString)
+		{
+			contactIDQueryString = String.format("&in(ContactID,{0})", idString)
+			paramData = {
+				"@filter": String.format("{0}{1}{2}",
+					dbQueryString,
+					dataTypeQueryString,
+					contactIDQueryString),
+				"@fields": "RecordID"
+			};
+
+			p0 = tf.promiseAjax.get(url, { paramData: paramData });
+			deferred.push(p0);
+		});
+		return this._getRelatedRecordIds(deferred, "RecordID");
+	};
+
+	BaseGridPage.prototype._getContactsRelatedGridRecords = function(type, relatedIds)
+	{
+		var url = pathCombine(tf.api.apiPrefixWithoutDatabase(), 'RecordContacts'),
+			dbQueryString = String.format("eq(DBID,{0})", tf.datasourceManager.databaseId),
+			dataTypeQueryString = String.format("&eq(DataTypeID,{0})", tf.dataTypeHelper.getId(type)),
+			inQueryTemplate = String.format("&in(RecordID,{0})", tf.urlHelper.TEMPLATE_REPLACE_STRING),
+			template = String.format("{0}?@filter={1}{2}{3}&@fields=ContactID", url, dbQueryString, dataTypeQueryString, inQueryTemplate),
+			idStringList = tf.urlHelper.splitExceedRequest(template, relatedIds),
+			deferred = [],
+			recordIDQueryString = paramData = p0 = null;
+
+		idStringList.forEach(function(idString)
+		{
+			recordIDQueryString = String.format("&in(RecordID,{0})", idString)
+			paramData = {
+				"@filter": String.format("{0}{1}{2}",
+					dbQueryString,
+					dataTypeQueryString,
+					recordIDQueryString),
+				"@fields": "ContactID"
+			};
+
+			p0 = tf.promiseAjax.get(url, { paramData: paramData });
+			deferred.push(p0);
+		});
+		return this._getRelatedRecordIds(deferred, "ContactID");
+	};
+
+	BaseGridPage.prototype._getRelatedRecordIds = function(deferred, fieldName)
+	{
+		return Promise.all(deferred).then(function(results)
+		{
+			var recordIds = [];
+			for (var i = 0, count = results.length; i < count; i++)
+			{
+				var result = results[i]
+				if (Array.isArray(result.Items) && result.Items.length > 0)
+				{
+					recordIds = recordIds.concat(result.Items.map(function(item) { return item[fieldName]; }));
+				}
+			}
+
+			if (recordIds.length === 0)
+			{
+				return [-1];
+			}
+
+			return Array.unique(recordIds);
+		});
 	};
 
 	BaseGridPage.prototype._getValidReportIds = async function()
@@ -1216,6 +1352,9 @@
 		{
 			case "contact":
 				label = "Add New Contact";
+				break;
+			case "staff":
+				label = "Add New Staff";
 				break;
 			case "vehicle":
 				label = "Add New Vehicle";

@@ -31,6 +31,8 @@
 			busfinderhistorical: "GPS Events",
 			driver: "Staff",
 			aide: "Staff",
+			contact: "Contact",
+			route: "Route",
 		};
 	}
 

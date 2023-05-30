@@ -1,4 +1,4 @@
-﻿<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
+<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
 	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
 		<ul class="tf-contextmenu grid-menu">
 			<!-- ko if:gridViewModel.changeStatusButton || gridViewModel.cancelButton-->
@@ -7,20 +7,11 @@
 				<div class="menu-icon edit">
 				</div>
 				<div class="menu-label"
-					data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
+					data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Contact')">
 				</div>
 			</li>
 			<!-- /ko -->
-			<!-- ko if:gridViewModel.copyButton -->
-			<li class="menu-item"
-				data-bind="contextMenuClick:gridViewModel.copyFieldTrip.bind(gridViewModel),css:{disabled:!gridViewModel.obCanCopyFieldTrip()}">
-				<div class="menu-icon copy">
-				</div>
-				<div class="menu-label"
-					data-bind="text: 'Copy ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-				</div>
-			</li>
-			<!-- /ko -->
+
 			<li class="menu-item"
 				data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
 				<div class="menu-icon showdetails">
@@ -37,37 +28,10 @@
 				<div class="menu-icon showhidecolumns">
 				</div>
 				<div class="menu-label" data-bind="text: 'Show/Hide Grid Columns'"></div>
-			</li>
-			<!-- ko if:gridViewModel.changeStatusButton||gridViewModel.cancelButton-->
+			</li>			
 			<li class="menu-divider">
 				<div class="rule"></div>
 			</li>
-			<!-- ko if:gridViewModel.changeStatusButton-->
-			<li class="menu-item"
-				data-bind="contextMenuClick:gridViewModel.editFieldTripStatus.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
-				<div class="menu-icon approve">
-				</div>
-				<div class="menu-label"
-					data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
-					<span class="hotkey"></span>
-				</div>
-			</li>
-			<!-- /ko -->
-			<!-- ko if:gridViewModel.cancelButton-->
-			<li class="menu-item"
-				data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
-				<div class="menu-icon decline">
-				</div>
-				<div class="menu-label"
-					data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-					<span class="hotkey"></span>
-				</div>
-			</li>
-			<!-- /ko -->
-			<li class="menu-divider">
-				<div class="rule"></div>
-			</li>
-			<!-- /ko -->
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
 				<div class="menu-icon copytoclipboard">
 				</div>
@@ -99,7 +63,39 @@
 					Send To
 				</div>
 			</li>
-			<li class="menu-item" data-bind="visible:gridViewModel.obReports, css:{disabled:!(gridViewModel.obReportLists() && gridViewModel.obReportLists().length > 0)}">
+			<li class="menu-item"
+				data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					New Grid
+				</div>
+				<ul class="tf-contextmenu">
+					<li class="menu-item"
+						data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label"
+							data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Staff')"></div>
+					</li>
+                    <li class="menu-divider">
+                        <div class="rule"></div>
+                    </li>
+                    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('contact'),css:{disabled:!tf.authManager.isAuthorizedFor('contact','read')}">
+                        <div class="menu-icon">
+                        </div>
+                        <div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Contact')">
+                        </div>
+                    </li>
+                    <li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('document'),css:{disabled:!tf.authManager.isAuthorizedFor('documentCenter','read')}">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Document')">
+						</div>
+					</li>
+				</ul>
+			</li>
+            <li class="menu-item" data-bind="visible:gridViewModel.obReports, css:{disabled:!(gridViewModel.obReportLists() && gridViewModel.obReportLists().length > 0)}">
 				<div class="menu-icon report">
 				</div>
 				<div class="menu-label">
@@ -115,38 +111,6 @@
 					</li>
 				</ul>
 				<!-- /ko -->
-			</li>
-			<li class="menu-item"
-				data-bind="visible:gridViewModel.obNewGrids,css:{disabled:gridViewModel.obNoRecordsSelected}">
-				<div class="menu-icon">
-				</div>
-				<div class="menu-label">
-					New Grid
-				</div>
-				<ul class="tf-contextmenu">
-					<li class="menu-item"
-						data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
-						<div class="menu-icon">
-						</div>
-						<div class="menu-label"
-							data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
-					</li>
-					<li class="menu-divider">
-						<div class="rule"></div>
-					</li>
-					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('contact'),css:{disabled:!tf.authManager.isAuthorizedFor('contact','read')}">
-						<div class="menu-icon">
-						</div>
-						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Contact')">
-						</div>
-					</li>
-					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('document'),css:{disabled:!tf.authManager.isAuthorizedFor('documentCenter','read')}">
-						<div class="menu-icon">
-						</div>
-						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Document')">
-						</div>
-					</li>
-				</ul>
 			</li>
 			<li class="menu-divider">
 				<div class="rule"></div>
