@@ -442,13 +442,11 @@
 	{
 		return function(viewModel, e)
 		{
-			const redirectWindow = window.open('', '_blank');
-			redirectWindow.blur();
-			this._openRelated(type, descriptor, e, redirectWindow);
+			this._openRelated(type, descriptor, e);
 		}.bind(this)
 	};
 
-	BasePage.prototype._openRelated = function(gridType, descriptor, e, redirectWindow)
+	BasePage.prototype._openRelated = function(gridType, descriptor, e)
 	{
 		const self = this;
 		const selectedIds = self.searchGrid.getSelectedIds();
@@ -466,18 +464,21 @@
 				const pageType = dataType ? dataType.pageType : gridType;
 
 				const filterName = `${toGridType} (${fromMenu} for Selected ${fromGridType})`;
-				//the filter will sticky once open a new grid, so save the sticky information in DB
-				const storageFilterDataKey = `grid.currentfilter.${pageType}.id`;
 
-				Promise.all([
-					TF.Grid.FilterHelper.clearQuickFilter(pageType),
-					tf.storageManager.save(`grid.currentlayout.${pageType}.id`, ''),
-					tf.storageManager.save(storageFilterDataKey, { "filteredIds": ids, "filterName": filterName })
-				]).then(function()
+				sessionStorage.setItem("openRelated", JSON.stringify(
 				{
-					redirectWindow.location = "#/?pagetype=" + pageType;
-					redirectWindow.name = "new-pageWindow_" + $.now();
-				}.bind(self));
+					"gridType": gridType,
+					"type": self.type,
+					"pageType": pageType,
+					"filterName": filterName,
+					"selectedIds": ids,
+				}));
+
+				const location = "#/?pagetype=" + pageType;
+				const redirectWindow = window.open(location, "_blank");
+				redirectWindow.name = "new-pageWindow_" + $.now();
+
+				sessionStorage.removeItem("openRelated");
 			}.bind(self));
 		}
 		else
@@ -506,40 +507,37 @@
 
 	BasePage.prototype.openSelectedClick = function(viewModel, e)
 	{
-		var redirectWindow = window.open('', '_blank');
-		redirectWindow.blur();
-		this._openSelected(this.pageType, e, redirectWindow);
+		this._openSelected(this.type, e);
 	};
 
-	BasePage.prototype._openSelected = function(gridType, e, redirectWindow)
+	BasePage.prototype._openSelected = function(gridType, e)
 	{
 		var selectedIds = this.searchGrid.getSelectedIds();
-		//the filter will sticky once open a new grid, so save the sticky information in DB
-		var storageFilterDataKey = "grid.currentfilter." + gridType + ".id";
 		var filterName = $(e.currentTarget).find(".menu-label").text().trim() + ' (Selected Records)';
 		if (selectedIds.length > 0)
 		{
-			// TODO-temp
-			Promise.all([
-				TF.Grid.FilterHelper.clearQuickFilter(gridType),
-				tf.storageManager.save("grid.currentlayout." + gridType + ".id", ''),
-				tf.storageManager.save(storageFilterDataKey,
-					{
-						"filteredIds": selectedIds,
-						"filterName": filterName
-					})
-			]).then(function()
+			sessionStorage.setItem("openRelated", JSON.stringify(
 			{
-				redirectWindow.location = "#/?pagetype=" + this.pageType, redirectWindow.name = "new-pageWindow_" + $.now();
+				"selectedIds": selectedIds,
+				"gridType": gridType,
+				"type": this.type,
+				"pageType": this.pageType,
+				"filterName": filterName,
+				"self": true
+			}));
 
-			}.bind(this));
+			const location = "#/?pagetype=" + this.pageType;
+			const redirectWindow = window.open(location, "_blank");
+			redirectWindow.name = "new-pageWindow_" + $.now();
+
+			sessionStorage.removeItem("openRelated");
 		}
 		else
 		{
 			this.searchGrid.gridAlert.show(
-				{
-					message: "no data selected!"
-				});
+			{
+				message: "no data selected!"
+			});
 		}
 	};
 

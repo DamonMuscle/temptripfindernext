@@ -45,7 +45,7 @@
 				<button class="iconbutton filter" title="Filters"
 					data-bind="css:{'tf-filter-applied':(obSelectedGridFilterName() !== 'None')}"></button>
 
-				<!--ko if:searchGrid.obThematicSupported() -->
+				<!--ko if:obThematicSupported() -->
 				<button class="iconbutton thematic" title="Thematics"
 					data-bind="css:{'tf-thematic-applied':(obSelectedGridThematicName() !== 'None')}"></button>
 				<!-- /ko -->
@@ -82,10 +82,10 @@
 		<!-- ko if: pageType !== "reports"-->
 		<div class="pull-right grid-staterow-wrap">
 			<div class="grid-staterow">
-				<!--ko if:searchGrid.obThematicSupported()-->
+				<!--ko if:obThematicSupported()-->
 				<div class="grid-staterow-status text-overflow thematic">
 					<span class="title pull-left">Thematic:</span>
-					<span class="filtername-ellipsis text-overflow" data-bind="text:searchGrid.obSelectedGridThematicName,attr:{title:searchGrid.obSelectedGridThematicName}">
+					<span class="filtername-ellipsis text-overflow" data-bind="text:obSelectedGridThematicName,attr:{title:obSelectedGridThematicName}">
 					</span>
 					,&nbsp
 				</div>
@@ -93,19 +93,19 @@
 				<div class="grid-staterow-status text-overflow filter">
 					<span class="title pull-left">Filter:</span>
 					<span class="filtername-ellipsis text-overflow"
-						data-bind="text:searchGrid.obSelectedGridFilterName,attr:{title:searchGrid.obSelectedGridFilterName}"></span>
-					<!-- ko if:searchGrid.obSelectedGridFilterModified -->
+						data-bind="text:obSelectedGridFilterName,attr:{title:obSelectedGridFilterName}"></span>
+					<!-- ko if:obSelectedGridFilterModified -->
 					&nbsp
-					<span class="modified" data-bind="text:searchGrid.obSelectedGridFilterModifiedMessage"></span>
+					<span class="modified" data-bind="text:obSelectedGridFilterModifiedMessage"></span>
 					<!-- /ko -->
 					,&nbsp
 				</div>
 				<div class="grid-staterow-status text-overflow layout">
 					<span class="title">Layout:</span>
-					<span class="filtername-ellipsis text-overflow" data-bind="text:searchGrid.obSelectedGridLayoutName"></span>
-					<!-- ko if:searchGrid.obSelectedGridLayoutModified -->
+					<span class="filtername-ellipsis text-overflow" data-bind="text:obSelectedGridLayoutName"></span>
+					<!-- ko if:obSelectedGridLayoutModified -->
 					&nbsp
-					<span class="modified" data-bind="text:searchGrid.obCurrentLayoutStatus"></span>
+					<span class="modified" data-bind="text:obCurrentLayoutStatus"></span>
 					<!-- /ko -->
 				</div>
 			</div>
@@ -114,7 +114,7 @@
 	</div>
 	<div class="grid-wrap">
 		<div class="kendo-grid kendo-grid-container"
-			data-bind="css:{'thematic-applied':searchGrid.obIsThematicApplied}"></div>
+			data-bind="css:{'thematic-applied':obIsThematicApplied}"></div>
 		<div class="kendo-grid kendo-summarygrid-container" data-bind="visible:obSummaryGridVisible()"></div>
 	</div>
 </div>

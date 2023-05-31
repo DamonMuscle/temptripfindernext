@@ -91,7 +91,7 @@
 		else if (isLocal)
 		{
 			
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" || "ent.stopfinderToken") && CheckDomain())
+			if(allowCookieList.includes(key) && CheckDomain())
 			{
 				expireCookie(key);
 			}
@@ -115,7 +115,7 @@
 		}
 		else if (isLocal)
 		{
-			if((key == "ent.token" || key == "ent.clientKey" ||  key == "ent.isLoggedin" || "ent.stopfinderToken") && CheckDomain())
+			if(allowCookieList.includes(relatedKey) && CheckDomain())
 			{
 				expireCookie(relatedKey);
 			}
@@ -175,6 +175,16 @@
 	StorageManager.prototype.DocumentAssociationLeftGridSelectedColumns = function(gridType, userName)
 	{
 		return "documentAssociation.currentselectedcolumns." + gridType + "." + userName;
+	};
+
+	StorageManager.prototype.userSettingsIsUserFindTool = function()
+	{
+		return this.prefix + "usersettings.isUserFindTool";
+	};
+
+	StorageManager.prototype.userSettingsShouldRetainGridFilter = function()
+	{
+		return this.prefix + "usersettings.shouldRetainGridFilter";
 	};
 
 	/**

@@ -5,9 +5,9 @@
 	function MyRequestPage()
 	{
 		var self = this;
-		TF.Page.BaseGridPage.apply(self, arguments);
 		self.type = "fieldtrip";
 		self.pageType = "myrequests";
+		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = true;
 		self.copyButton = true;
 		self.detailButton = true;

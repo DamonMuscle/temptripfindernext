@@ -31,6 +31,7 @@
 		self.obIsSelectRow = ko.observable(false);
 		self.obCanCopyFieldTrip = ko.observable(false);
 		self.obCanDeleteRecord = ko.observable(false);
+		self.obThematicSupported = ko.observable(tf.dataTypeHelper.checkGridThematicSupport(self.type));
 		self.selectedItemEditable = ko.observable(false);
 		self.selectedItemsEditable = ko.observable(false);
 		self.sendToClick = self.sendToClick.bind(self);
@@ -68,6 +69,8 @@
 		{
 			self.updateOptions();
 		}
+
+		self.setRelatedFilterData();
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
 		self.bindButtonEvent();
@@ -208,6 +211,33 @@
 				tf.shortCutKeys.changeHashKey();
 			});
 		}
+	};
+
+	BaseGridPage.prototype.setRelatedFilterData = function()
+	{
+		var self = this,
+			openRelatedData = sessionStorage.getItem("openRelated");
+		if (!openRelatedData)
+		{
+			return;
+		}
+
+		sessionStorage.removeItem("openRelated");
+		try
+		{
+			openRelatedData = JSON.parse(openRelatedData);
+		}
+		catch
+		{
+			return;
+		}
+
+		if (!openRelatedData || openRelatedData.pageType !== self.pageType)
+		{
+			return;
+		}
+
+		self.options.openRelatedData = openRelatedData;
 	};
 
 	BaseGridPage.prototype.sendEmailClick = function(viewModel, e)
@@ -562,26 +592,44 @@
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutModified();
 		}, self);
+		self.obCurrentLayoutStatus = ko.computed(() =>
+		{
+			return self.obSelectedGridLayoutModified() ? "(modified)" : "";
+		});
+		self.obSelectedGridLayoutName = ko.computed(function()
+		{
+			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutName();
+		}, self);
 
+		self.obSelectedGridFilterModified = ko.computed(function()
+		{
+			return self.searchGridInited() && self.searchGrid.obSelectedGridFilterModified();
+		}, self);
+		self.obSelectedGridFilterModifiedMessage = ko.computed(function()
+		{
+			return self.obSelectedGridFilterModified() ? "(modified)" : "";
+		}, self);
 		self.obSelectedGridFilterName = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridFilterName();
 		}, self);
-		self.obSelectedGridLayoutName = ko.computed(function()
+
+		self.obIsThematicApplied = ko.computed(function()
 		{
-			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutName();
+			return self.searchGridInited() && self.searchGrid.obIsThematicApplied();
+		}, self);
+		self.noApplyFilterNoModified = ko.computed(function()
+		{
+			return self.searchGridInited() && self.searchGrid.noApplyFilterNoModified();
 		}, self);
 		self.obSelectedGridThematicName = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridThematicName();
 		}, self);
+
 		self.obSummaryGridVisible = ko.computed(function()
 		{
 			return self.searchGridInited() && self.searchGrid.obSummaryGridVisible();
-		}, self);
-		self.noApplyFilterNoModified = ko.computed(function()
-		{
-			return self.searchGridInited() && self.searchGrid.noApplyFilterNoModified();
 		}, self);
 	};
 

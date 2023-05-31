@@ -5,6 +5,9 @@
 	function SchedulerPage(gridType)
 	{
 		var self = this;
+		self.type = "fieldtrip";
+		self.gridType = gridType || "fieldtrips";
+		self.pageType = gridType;
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.detailView = null;
 		self.options = {};
@@ -12,8 +15,6 @@
 		self.searchGridInited = ko.observable(false);
 		self.obIsSelectEvent = ko.observable(false);
 		self.obRightClickOnSelected = ko.observable(false);
-		self.gridType = gridType || "fieldtrips";
-		self.pageType = gridType;
 		self.filterData = null;
 		self.selectEventId = null;
 		self.selectEventUid = null;

@@ -149,6 +149,25 @@
 		return this.getUserPreferenceValue(key, defaultValue);
 	};
 
+	UserPreferenceManager.prototype.getUserSetting = function(settingName)
+	{
+		switch (settingName)
+		{
+			case "shouldRetainGridFilter":
+				return this.getBooleanValue(tf.storageManager.userSettingsShouldRetainGridFilter(), true);
+			case "isUseFindTool":
+				return this.getBooleanValue(tf.storageManager.userSettingsIsUserFindTool(), false);
+			default:
+				return;
+		}
+	};
+
+	UserPreferenceManager.prototype.getBooleanValue = function(key, defaultValue)
+	{
+		var value = this.getUserPreferenceValue(key, defaultValue);
+		return value.toString().toLowerCase() === "true";
+	};
+
 	UserPreferenceManager.prototype.delete = function(key)
 	{
 		var apiPrefix = tf.api.apiPrefixWithoutDatabase();
