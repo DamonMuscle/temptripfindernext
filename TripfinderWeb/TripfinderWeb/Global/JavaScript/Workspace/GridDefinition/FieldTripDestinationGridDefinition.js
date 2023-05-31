@@ -82,6 +82,28 @@
 				defaultValue: "",
 				type: "string",
 				Width: '150px'
+			},
+			{
+				FieldName: "XCoord",
+				DisplayName: "X Coord",
+				Width: '150px',
+				type: "number",
+				Precision: 6,
+				format: "{0:0.000000}"
+			},
+			{
+				FieldName: "YCoord",
+				DisplayName: "Y Coord",
+				Width: '150px',
+				type: "number",
+				Precision: 6,
+				format: "{0:0.000000}"
+			},
+			{
+				FieldName: "GeocodeScore",
+				DisplayName: "Geocode Score",
+				Width: '150px',
+				type: "number",
 			}
 		];
 

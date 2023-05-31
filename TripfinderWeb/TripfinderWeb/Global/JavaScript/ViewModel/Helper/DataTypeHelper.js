@@ -361,7 +361,7 @@
 			endpoint: "fieldtriplocations",
 			name: "Location",
 			idParamName: "FieldTripDestinationID",
-			gridDefinition: "fieldTripDestinationGridDefinition",
+			gridDefinition: "fieldtripLocationGridDefinition",
 			isMajorType: true,
 			authorization: "location",
 			hasDBID: true,
