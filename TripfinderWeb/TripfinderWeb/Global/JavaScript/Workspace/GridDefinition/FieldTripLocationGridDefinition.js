@@ -1,12 +1,12 @@
 ﻿(function()
 {
-	createNamespace("TF.GridDefinition").FieldTripDestinationGridDefinition = FieldTripDestinationGridDefinition;
-	function FieldTripDestinationGridDefinition()
+	createNamespace("TF.GridDefinition").FieldTripLocationGridDefinition = FieldTripLocationGridDefinition;
+	function FieldTripLocationGridDefinition()
 	{
 
 	}
 
-	FieldTripDestinationGridDefinition.prototype.gridDefinition = function () {
+	FieldTripLocationGridDefinition.prototype.gridDefinition = function () {
 		var columns = [
 			{
 				FieldName: "Name",
@@ -44,19 +44,6 @@
 				defaultValue: "",
 				type: "string",
 				Width: '200px'
-			},
-			{
-				FieldName: "Contact",
-				DisplayName: "Contact",
-				defaultValue: "",
-				type: "string",
-				Width: '120px'
-			},
-			{
-				FieldName: "ContactTitle",
-				DisplayName: "Title",
-				defaultValue: "",
-				type: "string"
 			},
 			{
 				FieldName: "Email",
@@ -113,5 +100,5 @@
 		};
 	};
 
-	tf.fieldtripLocationGridDefinition = new TF.GridDefinition.FieldTripDestinationGridDefinition();
+	tf.fieldtripLocationGridDefinition = new TF.GridDefinition.FieldTripLocationGridDefinition();
 })();

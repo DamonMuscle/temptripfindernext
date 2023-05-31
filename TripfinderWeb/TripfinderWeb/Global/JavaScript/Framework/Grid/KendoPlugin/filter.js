@@ -112,7 +112,7 @@
 			case 'specialequipment':
 				return tf.specialEquipmentGridDefinition.gridDefinition();
 			case 'fieldtriplocation':
-				return tf.fieldTripDestinationGridDefinition.gridDefinition();			
+				return tf.fieldtripLocationGridDefinition.gridDefinition();			
 		}
 
 		return '';
