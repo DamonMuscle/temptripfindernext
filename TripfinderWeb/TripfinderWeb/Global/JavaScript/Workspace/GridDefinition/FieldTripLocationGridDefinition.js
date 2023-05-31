@@ -10,7 +10,7 @@
 		var columns = [
 			{
 				FieldName: "Name",
-				DisplayName: "Destination",
+				DisplayName: "Name",
 				defaultValue: "",
 				unique: true,
 				type: "string",
@@ -18,29 +18,33 @@
 			},
 			{
 				FieldName: "City",
+				DisplayName: "City",
 				defaultValue: "",
 				type: "string",
 				Width: '120px'
 			},
 			{
 				FieldName: "Street",
+				DisplayName: "Street",
 				defaultValue: "",
 				type: "string",
 				Width: '200px'
 			},
 			{
 				FieldName: "State",
+				DisplayName: "State",
 				defaultValue: "",
 				type: "string"
 			},
 			{
 				FieldName: "Zip",
-				DisplayName: "Postal Code",
+				DisplayName: "Zip",
 				defaultValue: "",
 				type: "string"
 			},
 			{
 				FieldName: "Notes",
+				DisplayName: "Notes",
 				defaultValue: "",
 				type: "string",
 				Width: '200px'

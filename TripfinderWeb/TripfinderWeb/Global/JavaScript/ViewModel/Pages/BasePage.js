@@ -7,14 +7,19 @@
 		var self = this;
 		self.obShowDetailPanel = ko.observable(false);
 		self.obShowFieldTripDEPanel = ko.observable(false);
+		self.obShowSplitmap = ko.observable(false);
 		self.obNewRequest = ko.observable(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable());
 		self.detailView = null;
 		self.fieldTripDataEntry = null;
+		self.obCanMassUpdate = ko.observable(false);
 
 		self.changeStatusButton = false;
 		self.cancelButton = false;
 		self.copyButton = false;
 		self.deleteButton = false;
+		self.mapviewButton = false;
+		self.massUpdateButton = false;
+		self.geocodeButton = false;
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();

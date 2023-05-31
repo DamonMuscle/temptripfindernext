@@ -14,7 +14,11 @@
 		self.copyButton = true;
 		self.detailButton = true;
 		self.schedulerButton = false;
+		self.mapviewButton = true;
+		self.massUpdateButton = true;
 		self.deleteButton = true;
+		self.geocodeButton = true;
+
 		self.endpoint = tf.DataTypeHelper.getEndpoint(self.type);
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 	}
@@ -65,18 +69,21 @@
 		var isEditable = false;
 		var isDeletable = false;
 		var isAddable = false;
+		var isBatchable = false;
 		
 		if (tf.authManager.authorizationInfo.isAdmin)
 		{
 			isEditable = true;
 			isDeletable = true;
 			isAddable = true;
+			isBatchable = true;
 		}
 		else
 		{
 			isEditable = tf.authManager.isAuthorizedForDataType(this.type, "edit");
 			isDeletable = tf.authManager.isAuthorizedForDataType(this.type, "delete");
 			isAddable = tf.authManager.isAuthorizedForDataType(this.type, "add");
+			isBatchable = tf.authManager.isAuthorizedForDataType(this.type, "batch");
 		}
 
 		// update Edit observable variables
@@ -88,6 +95,9 @@
 
 		// update Add observable variable
 		this.obNewRequest(isAddable);
+
+		// update Batch observable variable
+		this.obCanMassUpdate(isBatchable);
 	};
 
 	LocationPage.prototype.newCopyClick = function()
@@ -144,6 +154,31 @@
 		// 	});
 	};
 
+	LocationPage.prototype.mapIconClick = function()
+	{
+		console.log("Map Icon Clicked");
+	}
+
+	LocationPage.prototype.globalReplaceClick = function(viewModel, e)
+	{
+		console.log("Global Replace Clicked", e.target);
+	}
+
+	LocationPage.prototype.geocodingClick = function(viewModel, e)
+	{
+		tf.contextMenuManager.showMenu(e.target, new TF.ContextMenu.TemplateContextMenu("workspace/grid/GeoCodingMenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid)));
+	}
+
+	LocationPage.prototype.geocodedClick = function(searchGrid)
+	{
+		console.log("Geocoded Clicked",searchGrid);
+	}
+
+	LocationPage.prototype.ungeocodedClick = function(searchGrid)
+	{
+		console.log("Ungeocoded Clicked", searchGrid);
+	}
+
 	LocationPage.prototype.bindButtonEvent = function()
 	{
 		var self = this;
@@ -151,5 +186,5 @@
 		
 		self.unBindEvent(".iconbutton.copy"); // unbind the default copy event from BaseGridPage
 		self.bindEvent(".iconbutton.copy", self.newCopyClick.bind(self));
-	}	
+	}
 })();

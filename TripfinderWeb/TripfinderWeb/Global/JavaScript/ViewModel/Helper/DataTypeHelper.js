@@ -1384,7 +1384,7 @@
 			"tripstopschedule", "student", "vehicle", "trip", "tripstop", "staff", "school", "georegion", "gpsevent",
 			"altsite", "contractor", "fieldtrip", "district", "route", "unassignedstudents", "report", "reportlibrary",
 			"scheduledreport", "scheduledReportsSent", "forms", "session", "form", "mergeDocumentsSent", "dashboards", "dashboardLibrary",
-			"mergedocument", "scheduledmergedocument", "mergeDocumentLibrary", "mergeemailmessage"];
+			"mergedocument", "scheduledmergedocument", "mergeDocumentLibrary", "mergeemailmessage", "fieldtriplocation"];
 
 		return supportGridThematicGrids.includes(gridType);
 	}

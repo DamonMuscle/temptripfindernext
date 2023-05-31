@@ -35,6 +35,10 @@
 				<button class="iconbutton kendo-scheduler" title="Calendar View"
 					data-bind="click:schedulerViewClick"></button>
 				<!-- /ko -->
+				<!-- ko if:mapviewButton-->
+				<button class="iconbutton mapview" title="Map View"
+					data-bind="click:mapIconClick"></button>
+				<!-- /ko -->
 				<div class="divider" title=""></div>
 				<button class="iconbutton summarybar" title="Summary Bar"
 					data-bind="css:{open:obSummaryGridVisible()}"></button>
@@ -51,6 +55,14 @@
 				<!-- /ko -->
 
 				<button class="iconbutton refresh" title="Refresh"></button>
+
+				<!-- ko if:massUpdateButton && obCanMassUpdate()-->
+				<button class="iconbutton replace" title="Mass Update" data-bind="click:globalReplaceClick"></button>
+				<!-- /ko -->
+
+				<!-- ko if:geocodeButton-->
+				<button class="iconbutton geocoding" title="Geocoding" data-bind="click:geocodingClick"></button>
+				<!-- /ko -->
 
 				<!-- ko if: changeStatusButton || cancelButton-->
 				<div class="divider" title=""></div>
