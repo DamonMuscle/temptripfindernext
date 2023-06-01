@@ -49,8 +49,8 @@
 				$templateWrapper.addClass("hide-left-bar-top-border");
 			}
 
-			$container.append($templateWrapper);
 			ko.applyBindings(this, $templateWrapper[0]);
+			$container.append($templateWrapper);
 		};
 	}
 
