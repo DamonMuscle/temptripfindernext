@@ -11,7 +11,7 @@
 		var detailViewHelper = tf.helpers.detailViewHelper,
 			uniqueClassName = options.uniqueClassName || detailViewHelper.generateUniqueClassName(),
 			hasImage = image && image !== "None",
-			imageSrc = hasImage ? ('data:' + image.MimeType + ';base64,' + image.FileContent) : detailViewHelper.getDefaultRecordPicture(detailView.gridType);
+			imageSrc = hasImage ? ('data:' + image.MimeType + ';base64,' + (image.FileContent || image.ImageBase64)) : detailViewHelper.getDefaultRecordPicture(detailView.gridType);
 
 		self.$wrapper = $wrapper;
 		self.obRecordPicture = detailView.obRecordPicture;
