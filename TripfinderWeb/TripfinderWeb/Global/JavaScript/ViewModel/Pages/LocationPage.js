@@ -100,60 +100,6 @@
 		this.obCanMassUpdate(isBatchable);
 	};
 
-	LocationPage.prototype.newCopyClick = function()
-	{
-		var self = this;
-		var selectedRecords = this.searchGrid.getSelectedRecords();
-		if (!selectedRecords || selectedRecords.length === 0)
-		{
-			return;
-		}
-
-		if (selectedRecords.length > 1)
-		{
-			tf.promiseBootbox.alert("Only allow one record in each operation!", "Confirmation Message");
-			return;
-		}
-
-		// get 
-		// return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), this.endpoint), { paramData: { id: selectedRecords[0].Id, '@relationships': 'udf' } })
-		// 	.then((response) =>
-		// 	{
-		// 		if (response.Items.length != 1)
-		// 		{ return; }
-		// 		// copy
-		// 		var copyItem = $.extend(true, {}, response.Items[0],
-		// 			{
-		// 				BusNum: TF.Helper.NewCopyNameHelper.generateNewCopyName(response.Items[0].BusNum,
-		// 					this.searchGrid.kendoGrid.dataSource._data.map(function(d)
-		// 					{
-		// 						return d.BusNum;
-		// 					})),
-		// 				GPSID: null,
-		// 				ComparativeAnalysis: false,
-		// 				Id: 0
-		// 			});
-		// 		// save
-		// 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), this.endpoint),
-		// 			{
-		// 				data: [copyItem],
-		// 				paramData: { '@relationships': 'udf' }
-		// 			})
-		// 			.then(() =>
-		// 			{
-		// 				self.pageLevelViewModel.popupSuccessMessage("Contact Copied");
-		// 				self.searchGrid.refreshClick();
-		// 			});
-		// 	})
-		// 	.catch((response) =>
-		// 	{
-		// 		if (response && response.StatusCode === 404)
-		// 		{
-		// 			return Promise.reject(response);
-		// 		}
-		// 	});
-	};
-
 	LocationPage.prototype.mapIconClick = function()
 	{
 		console.log("Map Icon Clicked");
@@ -178,6 +124,57 @@
 	{
 		console.log("Ungeocoded Clicked", searchGrid);
 	}
+
+	LocationPage.prototype.newCopyClick = function()
+	{
+		var self = this;
+		var selectedRecords = this.searchGrid.getSelectedRecords();
+		if (!selectedRecords || selectedRecords.length === 0)
+		{
+			return;
+		}
+
+		if (selectedRecords.length > 1)
+		{
+			tf.promiseBootbox.alert("Only allow one record in each operation!", "Confirmation Message");
+			return;
+		}
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), self.endpoint), { paramData: { id: selectedRecords[0].Id, '@relationships': 'udf' } })
+			.then((response) =>
+			{
+				if (response.Items.length != 1)
+				{ return; }
+				// copy
+				var copyItem = $.extend(true, {}, response.Items[0],
+					{
+						Name: TF.Helper.NewCopyNameHelper.generateNewCopyName(response.Items[0].Name,
+							this.searchGrid.kendoGrid.dataSource._data.map(function(d)
+							{
+								return d.Name;
+							})),
+						Id: 0
+					});
+				// save
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), self.endpoint),
+					{
+						data: [copyItem],
+						paramData: { '@relationships': 'udf' }
+					})
+					.then(() =>
+					{
+						self.pageLevelViewModel.popupSuccessMessage(`${tf.dataTypeHelper.getFormalDataTypeName(self.type)} Copied`);
+						self.searchGrid.refreshClick();
+					});
+			})
+			.catch((response) =>
+			{
+				if (response && response.StatusCode === 404)
+				{
+					return Promise.reject(response);
+				}
+			});
+	};	
 
 	LocationPage.prototype.bindButtonEvent = function()
 	{
