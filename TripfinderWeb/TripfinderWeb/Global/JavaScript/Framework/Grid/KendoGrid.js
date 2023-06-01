@@ -696,7 +696,7 @@
 	KendoGrid.prototype.exportCurrentGrid = function(selectedIds)
 	{
 		var self = this,
-			url = pathCombine(tf.api.apiPrefix(), "search", `${tf.DataTypeHelper.getFormalDataTypeName(this.options.gridType).replace(" ", "")}ExportFiles`);
+			url = pathCombine(tf.api.apiPrefix(), "search", `${tf.DataTypeHelper.getFormalDataTypeName(this.options.gridType).replace(/\s+/gi, "")}ExportFiles`);
 
 		self.getIdsWithCurrentFiltering()
 			.then(function(ids)
