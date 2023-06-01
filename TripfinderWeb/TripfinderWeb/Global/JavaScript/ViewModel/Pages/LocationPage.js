@@ -127,54 +127,8 @@
 
 	LocationPage.prototype.newCopyClick = function()
 	{
-		var self = this;
-		var selectedRecords = this.searchGrid.getSelectedRecords();
-		if (!selectedRecords || selectedRecords.length === 0)
-		{
-			return;
-		}
-
-		if (selectedRecords.length > 1)
-		{
-			tf.promiseBootbox.alert("Only allow one record in each operation!", "Confirmation Message");
-			return;
-		}
-
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), self.endpoint), { paramData: { id: selectedRecords[0].Id, '@relationships': 'udf' } })
-			.then((response) =>
-			{
-				if (response.Items.length != 1)
-				{ return; }
-				// copy
-				var copyItem = $.extend(true, {}, response.Items[0],
-					{
-						Name: TF.Helper.NewCopyNameHelper.generateNewCopyName(response.Items[0].Name,
-							this.searchGrid.kendoGrid.dataSource._data.map(function(d)
-							{
-								return d.Name;
-							})),
-						Id: 0
-					});
-				// save
-				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), self.endpoint),
-					{
-						data: [copyItem],
-						paramData: { '@relationships': 'udf' }
-					})
-					.then(() =>
-					{
-						self.pageLevelViewModel.popupSuccessMessage(`${tf.dataTypeHelper.getFormalDataTypeName(self.type)} Copied`);
-						self.searchGrid.refreshClick();
-					});
-			})
-			.catch((response) =>
-			{
-				if (response && response.StatusCode === 404)
-				{
-					return Promise.reject(response);
-				}
-			});
-	};	
+		TF.Page.BaseGridPage.prototype.newCopyClick.call(this, "Name");
+	};
 
 	LocationPage.prototype.bindButtonEvent = function()
 	{

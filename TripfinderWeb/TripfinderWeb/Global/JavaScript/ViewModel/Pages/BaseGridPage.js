@@ -1100,6 +1100,69 @@
 		}
 	};
 
+	/**
+	 * Copy & New function 
+	 * @param {*} overrideProperty specify the which field should be overrided with new value
+	 * @returns 
+	 */
+	BaseGridPage.prototype.newCopyClick = function(overrideProperty)
+	{
+		var self = this;
+		var selectedRecords = this.searchGrid.getSelectedRecords();
+		if (!selectedRecords || selectedRecords.length === 0)
+		{
+			return;
+		}
+
+		if (selectedRecords.length > 1)
+		{
+			tf.promiseBootbox.alert("Only allow one record in each operation!", "Confirmation Message");
+			return;
+		}
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), self.endpoint), { paramData: { id: selectedRecords[0].Id, '@relationships': 'udf' } })
+			.then((response) =>
+			{
+				if (response.Items.length != 1)
+				{ return; }
+				// copy
+				var overrideFields = {};
+				if(typeof overrideProperty === "string")
+				{
+					var currentValue = response.Items[0][overrideProperty];
+					var valueList = self.searchGrid.kendoGrid.dataSource._data.map(function(d)
+					{
+						return d[overrideProperty];
+					});
+
+					overrideFields[overrideProperty] = TF.Helper.NewCopyNameHelper.generateNewCopyName(currentValue, valueList);
+				}
+				else if (typeof overrideProperty  === "function" ) 
+				{
+					overrideFields = overrideProperty(response.Items[0]);
+				}
+				var copyItem = $.extend(true, {}, response.Items[0], overrideFields);
+				// save
+				return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), self.endpoint),
+					{
+						data: [copyItem],
+						paramData: { '@relationships': 'udf' }
+					})
+					.then(() =>
+					{
+						self.pageLevelViewModel.popupSuccessMessage(`${tf.dataTypeHelper.getFormalDataTypeName(self.type)} Copied`);
+						self.searchGrid.refreshClick();
+					});
+			})
+			.catch((response) =>
+			{
+				if (response && response.StatusCode === 404)
+				{
+					return Promise.reject(response);
+				}
+			});
+	};	
+
 	BaseGridPage.prototype.clearSelection = function()
 	{
 		var self = this, searchGrid = self.searchGrid;
