@@ -43,6 +43,8 @@
 	var customTouchMoveTimeOut = null;
 	var customTouchMoveLock = false;
 
+	TF.Grid.KendoGridFilterCellHackHelper.init();
+
 	function LightKendoGrid($container, options, gridState, geoFields)
 	{
 		// make click event namespace unique in each instance.
@@ -707,7 +709,7 @@
 	LightKendoGrid.OperatorWithTime = {
 		// here need set "date" not "time" for time type column
 		string: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator),
-		date: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)		
+		date: jQuery.extend(true, {}, LightKendoGrid.DefaultGeneralOperator)
 	};
 
 	LightKendoGrid.Operator2DisplayValue = {
@@ -1099,10 +1101,7 @@
 		this.filterClearButtonInUnLockedArea = this.options.kendoGridOption.filterClearButtonInUnLockedArea;
 
 		kendoGridOption.dataSource.sort = this.getKendoSortColumn();
-
-		var kendoGridFilterCellHackHelper = new TF.Grid.KendoGridFilterCellHackHelper();
-		kendoGridFilterCellHackHelper.init.bind(self)(self._refreshUIInterceptorFun, self._refreshUICreateSequenceFun);
-
+		this.$container.data("lightKendoGrid", this);
 		this.$container.kendoGrid(kendoGridOption);
 		this.kendoGrid = this.$container.data("kendoGrid");
 		this.kendoGrid.dataSource.originalFilter = this.kendoGrid.dataSource.filter;
@@ -3266,7 +3265,7 @@
 		var supportListFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.ListFilterTemplate; });
 		var supportDateTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'datetime'; });
 		var supportDateFilterColumns = this._gridType === 'gpsevent' ? [] : this._gridDefinition.Columns.filter(function(column) { return column.type === 'date'; });
-		var supportNumberFilterColumns = this._gridDefinition.Columns.filter(function (column) { return column.type === 'number' || column.type === 'integer'; });
+		var supportNumberFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'number' || column.type === 'integer'; });
 		var supportTimeFilterColumns = this._gridDefinition.Columns.filter(function(column) { return column.type === 'time' });
 		columns.forEach(function(column)
 		{
@@ -3424,9 +3423,9 @@
 											{
 												var options = this.getApiRequestOption(kendoOption);
 												options.paramData = { FieldName: tf.UDFDefinition.getOriginalName(column.field), AggregateOperator: 'Distinct100' };
-												if(tf && tf.pageManager)
+												if (tf && tf.pageManager)
 												{
-													switch(tf.pageManager.oldPageType)
+													switch (tf.pageManager.oldPageType)
 													{
 														case "myrequests":
 															options.paramData.filterType = "submitted";
@@ -3447,8 +3446,8 @@
 														var obj = {};
 														obj[column.field] = column.formatType?.toLowerCase() === "phone" ||
 															(column.UDFType && column.UDFType === "phone number") ?
-																$.trim(tf.dataFormatHelper.phoneFormatter(item)) :
-																$.trim(item);
+															$.trim(tf.dataFormatHelper.phoneFormatter(item)) :
+															$.trim(item);
 														return obj;
 													}).Distinct("$." + column.field).OrderBy("$." + column.field).Take(10).ToArray();
 
@@ -4034,7 +4033,8 @@
 		return "Id";
 	};
 
-	function isPhoneColumn(self, autoCompleteSelectedColumn) {
+	function isPhoneColumn(self, autoCompleteSelectedColumn)
+	{
 		let columnField = self.options.gridDefinition.Columns?.find(x => x.FieldName === autoCompleteSelectedColumn);
 		return columnField && columnField.questionType?.toLowerCase() === "phone";
 	}
@@ -5534,15 +5534,15 @@
 				self.onGridReadCompleted.notify();
 			});
 
-			if (this.lazyloadFields.udf.length > 0)
-			{
-				self.lazyLoadUdf();
-			}
+		if (this.lazyloadFields.udf.length > 0)
+		{
+			self.lazyLoadUdf();
+		}
 
-			if (this.lazyloadFields.general.length > 0)
-			{
-				self.lazyLoadGeneral();
-			}
+		if (this.lazyloadFields.general.length > 0)
+		{
+			self.lazyLoadGeneral();
+		}
 	};
 
 	LightKendoGrid.prototype.showLoadingForLazyLoad = function($o)
@@ -6591,6 +6591,7 @@
 			this.subscriptions[i] = null;
 		}
 		this.subscriptions = [];
+		this.$container.removeData("lightKendoGrid");
 		if (this.kendoGrid)
 		{
 			this.kendoGrid.destroy();
