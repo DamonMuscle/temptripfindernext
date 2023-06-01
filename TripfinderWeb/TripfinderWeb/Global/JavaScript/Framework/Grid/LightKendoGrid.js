@@ -5688,7 +5688,10 @@
 		}
 
 		this.lazyloadFields.udf = fields;
-		data.fields = data.fields.filter(x => !fields.some(y => y.OriginalName === x));
+		if (data.fields)
+		{
+			data.fields = data.fields.filter(x => !fields.some(y => y.OriginalName === x));
+		}
 		return true;
 	}
 
