@@ -19,6 +19,8 @@
 		self.enableRefreshEvent = new TF.Events.Event();
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
+		self.obOpenInProductList = ko.observableArray([]);
+		self.obShareLinkProductList = ko.observableArray([]);
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.deleteSelectionClick = self.deleteSelectionClick.bind(self);
 		self.kendoGridScroll = null;
