@@ -359,7 +359,7 @@
 		},
 		fieldtriplocation: {
 			endpoint: "fieldtriplocations",
-			name: "Location",
+			name: "Field Trip Location",
 			idParamName: "FieldTripDestinationID",
 			gridDefinition: "fieldtripLocationGridDefinition",
 			isMajorType: true,

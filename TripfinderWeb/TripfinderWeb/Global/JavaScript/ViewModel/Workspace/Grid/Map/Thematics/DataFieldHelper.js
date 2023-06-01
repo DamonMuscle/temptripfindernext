@@ -2596,6 +2596,91 @@
 			},
 		];
 
+		/**************************************************************************************************************************************/
+		self.fieldTripLocationDataColumns = [
+			{
+				FieldName: "Name",
+				DisplayName: "Name",
+				unique: true,
+				type: "string",
+				Width: '150px'
+			},
+			{
+				FieldName: "City",
+				DisplayName: "City",
+				type: "string",
+				Width: '120px'
+			},
+			{
+				FieldName: "Street",
+				DisplayName: "Street",
+				defaultValue: "",
+				type: "string",
+				Width: '200px'
+			},
+			{
+				FieldName: "State",
+				DisplayName: "State",
+				defaultValue: "",
+				type: "string"
+			},
+			{
+				FieldName: "Zip",
+				DisplayName: "Zip",
+				defaultValue: "",
+				type: "string"
+			},
+			{
+				FieldName: "Notes",
+				DisplayName: "Notes",
+				defaultValue: "",
+				type: "string",
+				Width: '200px'
+			},
+			{
+				FieldName: "XCoord",
+				DisplayName: "X Coord",
+				Width: '150px',
+				type: "number",
+				Precision: 6,
+				format: "{0:0.000000}"
+			},
+			{
+				FieldName: "YCoord",
+				DisplayName: "Y Coord",
+				Width: '150px',
+				type: "number",
+				Precision: 6,
+				format: "{0:0.000000}"
+			},
+			{
+				FieldName: "GeocodeScore",
+				DisplayName: "Geocode Score",
+				Width: '150px',
+				type: "number",
+			},
+			{
+				FieldName: "LastUpdated",
+				DisplayName: "Last Updated Date",
+				Width: '150px',
+				dbType: "datetime",
+				type: "date",
+				isUTC: true
+			},
+			{
+				FieldName: "LastUpdatedName",
+				DisplayName: "Last Updated By",
+				Width: '150px',
+				type: "string",
+			},
+			{
+				FieldName: "Geocoded",
+				DisplayName: "Geocoded",
+				Width: '150px',
+				type: "boolean",
+			},
+		];
+
 		self.formResultDataColumns = [];
 
 		self._updateDisplayNameWithApplicationTerm();
@@ -2715,6 +2800,9 @@
 				break;
 			case "mergedocumentlibrary":
 				columns = tf.mergeDocumentLibraryGridDefinition.gridDefinition().Columns;
+				break;
+			case "fieldtriplocation":
+				columns = self.fieldTripLocationDataColumns;
 				break;
 		};
 
