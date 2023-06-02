@@ -802,6 +802,7 @@
 
 			self.isOnAnimation = true;
 			$item.addClass("onAnimation");
+			$item.removeClass("menu-opened");
 			$itemMenu.stop().animate(closeAnimateParameters, {
 				duration: duration, queue: false, done: function()
 				{
