@@ -1596,6 +1596,203 @@
 		return dataTypes.some(item => item.key === self.type) && (!self.obShowFieldTripDEPanel() || !self.obShowDetailPanel()) && self.obNewRequest();
 	}
 
+	BaseGridPage.prototype._openGlobalReplaceModal = function()
+	{
+		var self = this, selectedIds = self.searchGrid.getSelectedIds(), gridType = self.searchGrid._gridType;
+		return tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceSettingsModalViewModel(selectedIds.length, gridType)).then(function(result)
+		{
+			if (!result)
+			{
+				return;
+			}
+
+			var recordIds = [], field, newValue, relationshipKey;
+			if (result.specifyRecords == "selected")
+			{
+				recordIds = selectedIds;
+			}
+			else
+			{
+				recordIds = self.searchGrid.allIds;
+			}
+
+			field = result.targetField;
+			newValue = result.newValue;
+			if (result.replaceType == "Standard")
+			{
+				return self._globalReplaceConfirm(recordIds).then(function(yesOrNo)
+				{
+					if (!yesOrNo)
+					{
+						return;
+					}
+
+					if (result.format === 'Phone')
+					{
+						if (newValue instanceof Array)
+						{
+							newValue.forEach(x =>
+							{
+								x.RecordValue = tf.dataFormatHelper.getStandardPhoneNumberValue(x.RecordValue);
+							});
+						}
+						else if (newValue)
+						{
+							newValue = tf.dataFormatHelper.getStandardPhoneNumberValue(newValue);
+						}
+					}
+
+					result.newValue = newValue;
+					self._globalReplace(recordIds, result);
+				});
+			}
+
+			var seriesRunFailed, seriesRunError, afterSeriesRunReject = ex =>
+			{
+				seriesRunFailed = true;
+				seriesRunError = ex;
+				return false;
+			};
+
+			if (result.extended)
+			{
+				var promise = Promise.resolve(false);
+				if (result.extended != "resetAllDefaultRequirements")
+				{
+					let confirmationMessage;
+					switch (result.extended)
+					{
+						case "removeAllSchedule":
+							confirmationMessage = "This change will remove selected students from all their related Trips including any exception Trips. Do you wish to continue?";
+							break;
+						case "removeAllExceptions":
+							confirmationMessage = "This change will remove selected students from all their related exception Trips. Do you wish to continue?";
+							break;
+						default:
+							confirmationMessage = "This change may remove selected students from all their related Trips. Do you wish to continue?";
+							break;
+					}
+					promise = tf.promiseBootbox.yesNo(confirmationMessage, "Confirmation Message").then(function(yesOrNo)
+					{
+						if (yesOrNo)
+						{
+							var size = 1000;
+							return TF.seriesRun(recordIds, size, function(studentIds)
+							{
+								if (seriesRunFailed == null)
+								{
+									seriesRunFailed = false;
+								}
+
+								if (result.extended == "removeAllAdditionalRequirements")
+								{
+									// Remove all additional requirements
+									return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
+										paramData: {
+											"@filter": "in(StudentId," + studentIds.join(",") + ")&eq(Type,1)",
+											dbid: tf.datasourceManager.databaseId
+										}
+									}).catch(afterSeriesRunReject);
+								}
+								else if (result.extended == "removeAllExceptions")
+								{
+									// Remove all exceptions
+									return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentSchedules"), {
+										paramData: {
+											"@filter": "in(StudentId," + studentIds.join(",") + ")&isnull(StudentRequirementId)",
+											dbid: tf.datasourceManager.databaseId
+										}
+									}).catch(afterSeriesRunReject);
+								}
+								else if (result.extended == "removeAllSchedule")
+								{
+									// Remove all Schedule
+									return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentSchedules"), {
+										paramData: {
+											"@filter": "in(StudentId," + studentIds.join(",") + ")",
+											dbid: tf.datasourceManager.databaseId
+										}
+									}).catch(afterSeriesRunReject);
+								}
+								else if (result.extended == "removeAllDefaultRequirements")
+								{
+									// Remove all default requirements
+									return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
+										paramData: {
+											"@filter": "in(StudentId," + studentIds.join(",") + ")&eq(Type,0)",
+											dbid: tf.datasourceManager.databaseId
+										}
+									}).catch(afterSeriesRunReject);
+								}
+								else if (result.extended == "Update All Default Requirements to None")
+								{
+									// Update All Default Requirements to None
+									return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
+										paramData: {
+											databaseId: tf.datasourceManager.databaseId,
+											noTransportationId: result.noTransportationId,
+											resetDefaultRequirement: true
+										},
+										data: studentIds
+									}).catch(afterSeriesRunReject);
+								}
+							}, true, 0);
+						}
+					});
+				}
+				else
+				{
+					// reset default requirements
+					promise = tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "StudentRequirements"), {
+						data: recordIds,
+						paramData: {
+							resetDefaultRequirement: true,
+							databaseId: tf.datasourceManager.databaseId
+						}
+					});
+				}
+
+				var fail = function(error)
+				{
+					error = error || {};
+					tf.promiseBootbox.alert(error.Message || "Failed", "Mass Update failed.");
+				}, succeed = function()
+				{
+					self.searchGrid.refresh();
+					self.searchGrid.lightKendoGridDetail && self.searchGrid.lightKendoGridDetail.refresh();
+					tf.promiseBootbox.alert("Mass Update succeeded.");
+					PubSub.publish(topicCombine(pb.DATA_CHANGE, "trip"));
+				};
+				return promise.then(function(result)
+				{
+					if (result)
+					{
+						if (result instanceof Array && result.some(r => r === false))
+						{
+							fail(seriesRunError);
+						}
+						else
+						{
+							succeed();
+						}
+					}
+					else if (result == null)
+					{
+						if (seriesRunFailed === false)
+						{
+							succeed();
+						}
+						else if (seriesRunFailed === true)
+						{
+							fail(seriesRunError);
+						}
+					}
+				}, fail);
+			}
+		});
+	};
+
+
 	BaseGridPage.prototype.dispose = function()
 	{
 		var self = this;

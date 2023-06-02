@@ -107,7 +107,7 @@
 
 	LocationPage.prototype.globalReplaceClick = function(viewModel, e)
 	{
-		console.log("Global Replace Clicked", e.target);
+		this._openGlobalReplaceModal();
 	}
 
 	LocationPage.prototype.geocodingClick = function(viewModel, e)

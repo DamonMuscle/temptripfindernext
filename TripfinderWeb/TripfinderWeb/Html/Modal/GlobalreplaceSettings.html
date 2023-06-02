@@ -1,0 +1,92 @@
+<div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="radio">
+				<label>
+					<input type="radio" name="typeRadio" value="Standard" data-bind="checked:obReplaceType">
+					<strong>Standard</strong>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-24" data-bind="css:{'disabled-element':obStandardInputGroupDisable}">
+		<div class="row">
+			<div class="col-xs-12">
+				<label>Field</label>
+				<input class="full-width " data-bind="kendoDropDownList:{
+					dataSource:allFields,
+					value:targetFieldName,
+					dataTextField:'title',
+					dataValueField:'field'
+				}"/>
+			</div>
+			<div class="col-xs-12 mass-update-value">
+				<label data-bind="css: { requirestar: obIsValueRequired() }">New Value</label>
+				<div data-bind="css:{'disabled-element':!targetField()}" class="radio">
+					<div class="form-group tf-validate">
+						<label class="col-xs-6"><input type="radio" data-bind="checked:copyFrom,checkedValue:false" />Value</label>
+						<div class="col-xs-18">
+							<!-- ko customInput:{type:generateInputType(),disable:copyFrom,attributes:{class:"enableHotkey form-control col-xs-18",name:obSelectType(),maxLength:obMaxLength(), dataList:obSelectDataList(),title:obTitle(),gridOption:gridOption,inputEnable:inputEnable()},value:obNewValue} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="form-group tf-validate">
+						<label class="col-xs-6"><input type="radio" data-bind="checked:copyFrom,checkedValue:true,disable:!supportCopyFrom()" />Field</label>
+						<div class="col-xs-18">
+							<input class="full-width" name="sourceField" data-bind="kendoDropDownList:{
+								dataSource:sourceFields,
+								value:sourceFieldName,
+								dataTextField:'title',
+								dataValueField:'field',
+								enable: copyFrom
+							}"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="radio">
+				<label>
+					<input type="radio" name="typeRadio" value="Extended" data-bind="disable:replaceTypeDisable,checked:obReplaceType">
+					<strong>Extended</strong>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12" style="margin-bottom: 35px;">
+		<input class="full-width " data-bind="kendoDropDownList:{
+			dataSource:extendeds,
+			value:obSelectedExtended,
+			dataTextField:'display',
+			dataValueField:'key',
+			enable:obExtendedsEnable
+		}" />
+	</div>
+	<div class="col-xs-12" style="margin-bottom: 35px;" data-bind="visible:obDisplayUpdateRequirement">
+		<input class="full-width " data-bind="kendoDropDownList:{
+			dataSource:allNoTransportationTypes,
+			value:obSelectedNoTransportationType,
+			dataTextField:'Type',
+			dataValueField:'Id',
+			enable:obExtendedsEnable,
+			optionLabel:'Select a No Transportation Type...'
+		}" />
+	</div>
+
+	<div class="row">
+		<div class="col-xs-24">
+			<label><strong>Specify Records</strong></label>
+			<!-- ko foreach: obSpecifyRecords -->
+			<div class="radio">
+				<label>
+					<input type="radio" name="optionsRadios" value="all" data-bind="value:$data.value,checked: $parent.obSelectedSpecifyRecords,disable:$data.disable">
+					<span data-bind="text:$data.text"></span>
+				</label>
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

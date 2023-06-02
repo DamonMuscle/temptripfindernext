@@ -321,6 +321,7 @@
 			{
 				sessionValidator.activate();
 				tf.DataTypeHelper = new TF.Helper.DataTypeHelper();
+				tf.dataPointHelper = new TF.Helper.DataPointHelper();
 				tf.dataTypeHelper = tf.DataTypeHelper;
 				return tf.DataTypeHelper.init();
 			})

@@ -5114,6 +5114,50 @@
 					"min-width": 2
 				}
 			]
+		},
+		"fieldtriplocation": {
+			"Main": [
+				{
+					field: "Name",
+					title: "Name",
+					defaultValue: "",
+					unique: true,
+					type: "string",
+					width: '150px'
+				},
+				{
+					field: "City",
+					defaultValue: "",
+					type: "string",
+					width: '120px'
+				},
+				{
+					field: "Street",
+					defaultValue: "",
+					type: "string",
+					width: '200px'
+				},
+				{
+					field: "State",
+					defaultValue: "",
+					type: "string"
+				},
+				{
+					field: "Zip",
+					title: "Zip",
+					defaultValue: "",
+					type: "string"
+				},
+				{
+					field: "Notes",
+					defaultValue: "",
+					type: "string",
+					width: '200px'
+				}
+			],
+			"User Defined": [],
+			"User Defined Group": [],
+			"Grid": []
 		}
 	};
 
