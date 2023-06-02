@@ -350,7 +350,7 @@
 		else
 		{
 			var gridType = this.options.type.toLowerCase();
-			allColumns = TF.Grid.FilterHelper.getGridDefinitionByType(gridType).Columns.slice(0);
+			allColumns =  $.extend(true, [], TF.Grid.FilterHelper.getGridDefinitionByType(gridType).Columns);
 		}
 		allColumns = TF.Helper.KendoListMoverHelper.removeOnlyForFilterColumn(allColumns);
 		if (this.showRawImageColumn)

@@ -284,4 +284,69 @@
 		e.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 		fileSaver.dispatchEvent(e);
 	};
+
+	/* Code Copy From Extjs */
+	Function.prototype.createInterceptor = function(fcn, scope)
+	{
+		var method = this;
+
+		return !(typeof fcn === "function") ?
+			this :
+			function()
+			{
+				var me = this,
+					args = arguments;
+				fcn.target = me;
+				fcn.method = method;
+				return (fcn.apply(scope || me || window, args) !== false) &&
+					!(args[0] && args[0].sender && args[0].sender.operator === "custom") ?
+					method.apply(me || window, args) :
+					null;
+			};
+	};
+
+	Function.prototype.createSequence = function(fcn, scope)
+	{
+		var method = this;
+		return (typeof fcn != "function") ?
+			this :
+			function()
+			{
+				var retval = method.apply(this || window, arguments);
+				fcn.apply(scope || this || window, arguments);
+				return retval;
+			};
+	};
+
+	Function.prototype.createCallback = function()
+	{
+		// make args available, in function below
+		var args = arguments,
+			method = this;
+		return function()
+		{
+			return method.apply(window, args);
+		};
+	};
+
+	Function.prototype.interceptBefore = function(object, methodName, fn, scope)
+	{
+		var method = object[methodName] || function() { };
+		return (object[methodName] = function()
+		{
+			var ret = fn.apply(scope || this, arguments);
+			method.apply(this, arguments);
+			return ret;
+		});
+	};
+
+	Function.prototype.interceptAfter = function(object, methodName, fn, scope)
+	{
+		var method = object[methodName] || function() { };
+		return (object[methodName] = function()
+		{
+			method.apply(this, arguments);
+			return fn.apply(scope || this, arguments);
+		});
+	};
 })();
