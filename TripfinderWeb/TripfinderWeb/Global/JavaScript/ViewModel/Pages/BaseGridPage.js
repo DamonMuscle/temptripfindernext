@@ -2,6 +2,11 @@
 {
 	createNamespace("TF.Page").BaseGridPage = BaseGridPage;
 
+	const SHARE_TYPE_ENUM = {
+		COPY_LINK: 'Copy Link',
+		QR_CODE: 'QR Code'
+	}
+
 	function BaseGridPage()
 	{
 		var self = this;
@@ -39,6 +44,9 @@
 		self.sendToClick = self.sendToClick.bind(self);
 		self.sendEmailClick = self.sendEmailClick.bind(self);
 		self.viewReportClick = self.viewReportClick.bind(self);
+		self.openInClick = self.openInClick.bind(self);
+		self.copyLinkClick = self.copyLinkClick.bind(self);
+		self.generateQRCodeClick = self.generateQRCodeClick.bind(self);
 		self.obEmail = ko.computed(function()
 		{
 			if (self.searchGridInited())
@@ -403,6 +411,8 @@
 
 	BaseGridPage.prototype.createGrid = function(option)
 	{
+		this.initOpenInProducts();
+
 		var self = this, iconRow, statusRow, toolRow, containerWidth,
 			baseOptions = {
 				storageKey: "grid.currentlayout." + self.pageType,
@@ -506,6 +516,103 @@
 		}
 
 		this.showDetailsPreClick();
+	};
+
+	BaseGridPage.prototype.initOpenInProducts = function()
+	{
+		return tf.authManager.getPurchasedProducts()
+			.then(products =>
+			{
+				const openInProducts = TF.Helper.KendoGridHelper.getShareableProducts(products, this.type, true, true);
+				const shareLinkProducts = TF.Helper.KendoGridHelper.getShareableProducts(products, this.type, false, false);
+
+				this.obOpenInProductList(openInProducts);
+				this.obShareLinkProductList(shareLinkProducts);
+			});
+	};
+
+	BaseGridPage.prototype.openInClick = function(product)
+	{
+		const selectedIds = this.searchGrid.getSelectedIds();
+		const layoutColumns = this.searchGrid.getCurrentGridLayout().layoutColumns();
+
+		TF.Helper.KendoGridHelper.openInGrid(this.type, selectedIds, layoutColumns, product);
+	};
+
+	BaseGridPage.prototype.copyLinkClick = function(product)
+	{
+		this.shareAs(SHARE_TYPE_ENUM.COPY_LINK, product);
+	};
+
+	BaseGridPage.prototype.generateQRCodeClick = function(product)
+	{
+		this.shareAs(SHARE_TYPE_ENUM.QR_CODE, product);
+	};
+
+	BaseGridPage.prototype.shareAs = function(shareType, product)
+	{
+		const self = this;
+		const selectedIds = self.searchGrid.getSelectedIds();
+		const layoutColumns = self.searchGrid.getCurrentGridLayout().layoutColumns();
+		const thematicModel = self.searchGrid.tempGridThematicDataModel || (self.searchGrid.obSelectedGridThematicDataModel && self.searchGrid.obSelectedGridThematicDataModel());
+		let thematicSetting = null;
+
+		if (thematicModel)
+		{
+			thematicSetting = {
+				customDisplaySetting: JSON.parse(thematicModel.customDisplaySetting()),
+				quickFilters: JSON.parse(thematicModel.quickFilters())
+			};
+		}
+
+		let additionalInfo = null;
+		if (self.type === 'gpsevent')
+		{
+			additionalInfo = {
+				dayOfTheWeek: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.dayOfTheWeek`),
+				startDate: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.startDate`),
+				startTime: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.startTime`),
+				endDate: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.endDate`),
+				endTime: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.endTime`),
+				gpsEventTypeList: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.gpseventtypelist`),
+				vehicleList: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.vehiclelist`),
+			}
+		}
+
+		TF.Helper.KendoGridHelper.createShareURL(self.type, selectedIds, layoutColumns, product, thematicSetting, additionalInfo)
+			.then(url =>
+			{
+				if (!url) { return; }
+
+				switch (shareType)
+				{
+					case SHARE_TYPE_ENUM.COPY_LINK:
+						self.copyLink(url);
+						break;
+					case SHARE_TYPE_ENUM.QR_CODE:
+						self.downloadQRCode(url);
+						break;
+					default:
+						break;
+				}
+			})
+	};
+
+	BaseGridPage.prototype.copyLink = function(url)
+	{
+		try
+		{
+			this.copyText(url);
+		}
+		catch (e)
+		{
+			const copyLinkFailMsg = "Failed to copy Link to clipboard.";
+			this.pageLevelViewModel.popupErrorMessage(copyLinkFailMsg);
+			return;
+		}
+
+		const copyLinkSuccessMsg = "Link copied to clipboard.";
+		this.pageLevelViewModel.popupSuccessMessage(copyLinkSuccessMsg);
 	};
 
 	BaseGridPage.prototype._openBulkMenu = function()

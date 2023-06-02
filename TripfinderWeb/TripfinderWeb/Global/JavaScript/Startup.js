@@ -299,6 +299,8 @@
 				detailViewHelper: new TF.DetailView.DetailViewHelper(),
 				kendoGridHelper: new TF.Helper.KendoGridHelper(),
 				miniGridHelper: new TF.Helper.MiniGridHelper(),
+				applicationDataHelper: new TF.Helper.ApplicationDataHelper(),
+				gridLinkHelper: new TF.Helper.GridLinkHelper(),
 				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
 			};
 			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();
@@ -388,7 +390,7 @@
 					}
 				});
 
-				return Promise.all([p1, p2, p3, p4, p5, TF.initSystemMapSettings()])
+				return Promise.all([p1, p2, p3, p4, p5, TF.initSystemMapSettings(), tf.helpers.applicationDataHelper.init()])
 				.then(function(){
 					return self.loadArcgisUrls().then(function()
 						{

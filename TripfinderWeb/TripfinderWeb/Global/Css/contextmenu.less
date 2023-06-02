@@ -24,6 +24,16 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 	max-height: 200px;
+	width: calc(100% + 20px);
+}
+
+.tf-contextmenu.with-sub-menu {
+	overflow-x: initial;
+	overflow-y: initial;
+}
+
+.tf-contextmenu.with-sub-menu > li > .tf-contextmenu {
+	z-index: 1;
 }
 
 .tf-contextmenu .menu-item:not(.disabled) {
