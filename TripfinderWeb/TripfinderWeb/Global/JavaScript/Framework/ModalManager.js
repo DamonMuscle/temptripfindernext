@@ -180,6 +180,9 @@
 			baseModalViewModel.draggable = draggable == false ? false : true;
 			self.obBaseModalViewModels.push(baseModalViewModel);
 
+			// disable arcgis identity manager click hook
+			tf.map.ArcGIS.IdentityManager.dialog?._focusTrap?.pause();
+
 			//add the child hash key
 			tf.shortCutKeys.addChildKey(baseModalViewModel.shortCutKeyHashMapKeyName);
 			//Bind hot keys

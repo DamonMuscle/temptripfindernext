@@ -63,6 +63,7 @@
 		this.loadAndCreateGrid();
 		this.lazyloadFields = { general: [], udf: [] };
 		this.alreadyLoadId = { general: {}, udf: {} };
+		this.isFilterReset = false;
 	}
 
 	LightKendoGrid.prototype._excludeOnlyForFilterColumns = function functionName(gridDefintion)
@@ -814,119 +815,12 @@
 								.then(function(result)
 								{
 									self.setFilterIconByKendoDSFilter.bind(self)();
-									var requestOptions = self.getApiRequestOption(options);
-									if (self.options.getAsyncRequestOption)
-									{
-										promise = self.options.getAsyncRequestOption(requestOptions);
-									}
-									else
-									{
-										promise = Promise.resolve(requestOptions);
-									}
-
-									promise.then(response =>
-									{
-										self.setLazyLoadFields(response.data);
-										self.updateLazyloadData = false;
-										tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
-											.then(function()
-											{
-												//the count of request callback in the process of change filter
-												if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
-												self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
-												//check the filter Whether custom or not
-												if (self.$customFilterBtn)
-												{
-													//when user change the custom filter, show the custom filter menu now
-													//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
-													if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
-													{
-														self.$customFilterBtn.click();
-														self.kendoDataSourceTransportRequestBackCount = 0;
-														self.kendoDataSourceTransportReadCount = 0;
-														self.$customFilterBtn = undefined;
-													}
-												}
-												else
-												{
-													//reset the request count, request callback count and custom button
-													self.kendoDataSourceTransportRequestBackCount = 0;
-													self.kendoDataSourceTransportReadCount = 0;
-													self.$customFilterBtn = undefined;
-												}
-											}).fail(function(ex)
-											{
-												if (self.overlay && self.options.showOverlay)
-												{
-													tf.loadingIndicator.tryHide();
-												}
-
-												self.gridAlert.show({
-													alert: "Danger",
-													title: "Error",
-													message: ex.responseJSON.Message
-												});
-											});
-									});
+									self._readGrid(options);
 								});
 						}
 						else
 						{
-							var requestOptions = self.getApiRequestOption(options);
-							if (self.options.getAsyncRequestOption)
-							{
-								promise = self.options.getAsyncRequestOption(requestOptions);
-							}
-							else
-							{
-								promise = Promise.resolve(requestOptions);
-							}
-
-							promise.then(response =>
-							{
-								self.setLazyLoadFields(response.data);
-								self.updateLazyloadData = false;
-								tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
-									.then(function()
-									{
-										//the count of request callback in the process of change filter
-										if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
-										self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
-										//check the filter Whether custom or not
-										if (self.$customFilterBtn)
-										{
-											//when user change the custom filter, show the custom filter menu now
-											//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
-											if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
-											{
-												self.$customFilterBtn.click();
-												self.kendoDataSourceTransportRequestBackCount = 0;
-												self.kendoDataSourceTransportReadCount = 0;
-												self.$customFilterBtn = undefined;
-											}
-										}
-										else
-										{
-											//reset the request count, request callback count and custom button
-											self.kendoDataSourceTransportRequestBackCount = 0;
-											self.kendoDataSourceTransportReadCount = 0;
-											self.$customFilterBtn = undefined;
-										}
-
-									}).fail(function(ex)
-									{
-										if (self.overlay && self.options.showOverlay)
-										{
-											tf.loadingIndicator.tryHide();
-										}
-
-										self.gridAlert.show({
-											alert: "Danger",
-											title: "Error",
-											message: ex.responseJSON.Message
-										})
-									});
-							});
+							self._readGrid(options);
 						}
 					}
 				},
@@ -4360,35 +4254,57 @@
 	{
 		if ([400, 412].includes(response.StatusCode) && tf.dataTypeHelper.getNameByType(this.options.gridType))
 		{
-			var self = this,
-				filterId = self.obSelectedGridFilterId(),
-				message = filterId ? String.format("The applied filter \"{0}\" is invalid.", self.obSelectedGridFilterName()) : "The applied quick filter is invalid.";
-			return tf.promiseBootbox.alert(message).then(function()
-			{
-				self.clearGridFilterClick().then(function()
-				{
-					if (filterId && response.Message != "Invisible UDF")
-					{
-						// use response.Message to distinguish deleted udf and invisible udf.
-						tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId), {
-							data: [{ "op": "replace", "path": "/IsValid", "value": false }]
-						}).then(function()
-						{
-							var filters = self.obGridFilterDataModels().filter(function(filter)
-							{
-								return filter.id() == filterId;
-							});
-
-							if (filters && filters.length == 1)
-							{
-								filters[0].isValid(false);
-							}
-						})
-					}
-				});
-			});
+			this.resetFilterForCurrentInvalidFilter(response.Message);
 		}
 	};
+
+	LightKendoGrid.prototype.resetFilterForCurrentInvalidFilter = function(errorMessage)
+	{
+		var self = this;
+		if (self._isShowingInvalidFilterAlert || !self.obSelectedGridFilterId)
+		{
+			return;
+		}
+
+		self.isFilterReset = true;
+		self._isShowingInvalidFilterAlert = true;
+		var filterId = self.obSelectedGridFilterId(),
+			filterObj = self.obGridFilterDataModels().find(o => o.id() === filterId),
+			filterName = filterObj ? filterObj.name() : "None",
+			message = filterId ? `The applied filter "${filterName}" is invalid.` : "The applied quick filter is invalid.";
+		var isNonexistentUdf = errorMessage === 'Nonexistent UDF';
+		if (isNonexistentUdf)
+		{
+			message = 'The applied filters contains a nonexistent udf, system will clear applied filters.';
+		}
+
+		return tf.promiseBootbox.alert(message).then(function()
+		{
+			self._isShowingInvalidFilterAlert = false;
+			Promise.resolve(isNonexistentUdf ? self.clearGridFilterClick() : self.resetLayoutClick()).then(function()
+			{
+				if (filterId && errorMessage !== "Invisible UDF" && !isNonexistentUdf)
+				{
+					// use error message to distinguish deleted udf and invisible udf.
+					tf.promiseAjax.patch(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters", filterId), {
+						data: [{ "op": "replace", "path": "/IsValid", "value": false }]
+					}).then(function()
+					{
+						var filters = self.obGridFilterDataModels().filter(function(filter)
+						{
+							return filter.id() === filterId;
+						});
+
+						if (filters && filters.length === 1)
+						{
+							filters[0].isValid(false);
+						}
+					})
+				}
+			})
+		});
+	};
+
 
 	LightKendoGrid.prototype.setBooleanNotSpecifiedFilterItem = function(filterItems)
 	{
@@ -5605,6 +5521,75 @@
 		gridBody.scrollLeft(scrollLeft);
 		self.lastGridScrollLeft = scrollLeft;
 	};
+
+	LightKendoGrid.prototype._readGrid = function(options)
+	{
+		const self = this,
+			requestOptions = self.getApiRequestOption(options);
+		let promise;
+		if (self.options.getAsyncRequestOption)
+		{
+			promise = self.options.getAsyncRequestOption(requestOptions);
+		}
+		else
+		{
+			promise = Promise.resolve(requestOptions);
+		}
+
+		promise.then(response =>
+		{
+			self.setLazyLoadFields(response.data);
+			self.updateLazyloadData = false;
+			tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
+			.then(function()
+			{
+				//the count of request callback in the process of change filter
+				if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
+				self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
+				//check the filter Whether custom or not
+				if (self.$customFilterBtn)
+				{
+					//when user change the custom filter, show the custom filter menu now
+					//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
+					if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
+					{
+						self.$customFilterBtn.click();
+						self.kendoDataSourceTransportRequestBackCount = 0;
+						self.kendoDataSourceTransportReadCount = 0;
+						self.$customFilterBtn = undefined;
+					}
+				}
+				else
+				{
+					//reset the request count, request callback count and custom button
+					self.kendoDataSourceTransportRequestBackCount = 0;
+					self.kendoDataSourceTransportReadCount = 0;
+					self.$customFilterBtn = undefined;
+				}
+			}).fail(function(ex)
+			{
+				if (self.overlay && self.options.showOverlay)
+				{
+					tf.loadingIndicator.tryHide();
+				}
+
+				if ([400, 412].includes(ex.status))
+				{
+					self.resetFilterForCurrentInvalidFilter(ex.Message);
+				}
+				else if (ex.status === 408) //display Timeout message
+				{
+					tf.promiseBootbox.alert("Timeout expired, please try again.");
+				}
+
+				self.gridAlert.show({
+					alert: "Danger",
+					title: "Error",
+					message: ex.responseJSON.Message
+				})
+			});
+		});
+	}
 
 	LightKendoGrid.prototype.setLazyLoadFields = function(data)
 	{
