@@ -2374,500 +2374,634 @@
 			]
 		},
 		"staff": {
-			"Primary Information": [
-				{
-					"field": "StaffLocalId",
-					"title": "Local ID",
-					"type": "Number",
-					"defaultValue": "46290",
-					"editType": {
-						"format": "Number",
-						"maxLength": 8
-					}
-				},
-				{
-					"field": "ActiveFlag",
-					"title": "Status",
-					"type": "Boolean",
-					"defaultValue": "True",
-					"displayValue": "Active",
-					"positiveLabel": "Active",
-					"negativeLabel": "Inactive",
-					"editType": {
-						"format": "BooleanDropDown"
-					}
-				},
-				{
-					"field": "FirstName",
-					"title": "First Name",
-					"type": "String",
-					"defaultValue": "John",
-					"editType": {
-						"format": "String",
-						"maxLength": 50
-					}
-				},
-				{
-					"field": "LastName",
-					"title": "Last Name",
-					"type": "String",
-					"defaultValue": "Smith",
-					"editType": {
-						"format": "String",
-						"maxLength": 50
-					}
-				},
-				{
-					"field": "AllStaffTypes",
-					"title": "Type",
-					"type": "String",
-					"defaultValue": "Driver",
-					"editType": {
-						"format": "ListMover",
-						"getSource": function()
+			"Primary Information": [{
+				"field": "StaffLocalId",
+				"title": "Local ID",
+				"type": "String",
+				"defaultValue": "46290",
+				"editType": {
+					"format": "String",
+					"maxLength": 50
+				}
+			},
+			{
+				"field": "ActiveFlag",
+				"title": "Status",
+				"type": "Boolean",
+				"defaultValue": "True",
+				"displayValue": "Active",
+				"positiveLabel": "Active",
+				"negativeLabel": "Inactive",
+				"editType": {
+					"format": "BooleanDropDown"
+				}
+			},
+			{
+				"field": "FirstName",
+				"title": "First Name",
+				"type": "String",
+				"defaultValue": "John",
+				"editType": {
+					"format": "String",
+					"maxLength": 50
+				}
+			},
+			{
+				"field": "LastName",
+				"title": "Last Name",
+				"type": "String",
+				"defaultValue": "Smith",
+				"editType": {
+					"format": "String",
+					"maxLength": 50
+				}
+			},
+			{
+				"field": "MiddleName",
+				"title": "Middle Name",
+				"type": "String",
+				"defaultValue": "H",
+				"editType": {
+					"format": "String",
+					"maxLength": 50
+				}
+			},
+			{
+				"field": "AllStaffTypes",
+				"title": "Type",
+				"type": "String",
+				"defaultValue": "Driver",
+				"editType": {
+					"format": "ListMover",
+					"getSource": function()
+					{
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "stafftypes?@fields=StaffTypeName,StaffTypeId")).then(function(result)
 						{
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "stafftypes?@fields=StaffTypeName,StaffTypeId")).then(function(result)
+							return result.Items.map(function(item)
 							{
-								return result.Items.map(function(item)
-								{
-									return {
-										'text': item["StaffTypeName"],
-										'value': item["StaffTypeId"]
-									};
-								});
+								return {
+									'text': item["StaffTypeName"],
+									'value': item["StaffTypeId"]
+								};
 							});
-						},
-						"allowNullValue": false,
-						"entityKey": "StaffTypeIds",
-						"relationshipKey": "StaffType"
-					}
-				},
-				{
-					"field": "EmployeeId",
-					"title": "Employee ID",
-					"type": "String",
-					"defaultValue": "46290",
-					"editType": {
-						"format": "String",
-						"maxLength": 8
-					}
-				},
-				{
-					"field": "RecordPicture",
-					"title": "Picture",
-					"type": "RecordPicture",
-					"defaultValue": false,
-					"min-height": "2"
+						});
+					},
+					"allowNullValue": false,
+					"entityKey": "StaffTypeIds",
+					"relationshipKey": "StaffType"
 				}
+			},
+			{
+				"field": "EmployeeId",
+				"title": "Employee ID",
+				"type": "String",
+				"defaultValue": "46290",
+				"editType": {
+					"format": "String",
+					"maxLength": 50
+				}
+			},
+			{
+				"field": "RecordPicture",
+				"title": "Picture",
+				"type": "RecordPicture",
+				"defaultValue": false,
+				"min-height": "2"
+			}
 			],
-			"Main": [
-				{
-					"field": "LicenseNumber",
-					"title": "License Number",
-					"type": "String",
-					"defaultValue": "S967238",
-					"editType": {
-						"format": "String",
-						"maxLength": 20
-					}
-				},
-				{
-					"field": "LicenseState",
-					"title": "License State",
-					"type": "String",
-					"defaultValue": "NY",
-					"editType": {
-						"format": "String",
-						"maxLength": 2
-					}
-				},
-				{
-					"field": "LicenseClass",
-					"title": "License Class",
-					"type": "String",
-					"defaultValue": "CDL",
-					"editType": {
-						"format": "String",
-						"maxLength": 2
-					}
-				},
-				{
-					"field": "LicenseRestrictions",
-					"title": "License Restrictions",
-					"type": "String",
-					"defaultValue": "P, Q",
-					"editType": {
-						"format": "String",
-						"maxLength": 10
-					}
-				},
-				{
-					"field": "LicenseExpiration",
-					"title": "License Expiration",
-					"type": "Date",
-					"defaultValue": today,
-					"editType": {
-						"format": "Date"
-					}
-				},
-				{
-					"field": "LicenseEndorsements",
-					"title": "License Endorsements",
-					"type": "String",
-					"defaultValue": "F, G, H, M, N, P, R, S, T, W, X",
-					"editType": {
-						"format": "String",
-						"maxLength": 10
-					}
-				},
-				{
-					"field": "HireDate",
-					"title": "Date of Hire",
-					"type": "Date",
-					"defaultValue": today,
-					"editType": {
-						"format": "Date"
-					}
-				},
-				{
-					"field": "InactiveDate",
-					"title": "Inactive Date",
-					"type": "Date",
-					"defaultValue": today,
-					"editType": {
-						"format": "Date"
-					}
-				},
-				{
-					"field": "DateOfBirth",
-					"title": "Birth Date",
-					"type": "Date",
-					"defaultValue": today,
-					"editType": {
-						"format": "Date"
-					}
-				},
-				{
-					"field": "DisplayGender",
-					"title": "Gender",
-					"type": "String",
-					"defaultValue": "Male",
-					"editType": {
-						"format": "DropDown",
-						"getSource": fetchDefaultGenders,
-						"allowNullValue": true,
-						"entityKey": "Gender"
-					}
-				},
-				{
-					"field": "ContractorName",
-					"title": "Contractor",
-					"type": "String",
-					"defaultValue": "Joe's Charter Buses",
-					"editType": {
-						"format": "DropDown",
-						"getSource": function()
+			"Main": [{
+				"field": "LicenseNumber",
+				"title": "License Number",
+				"type": "String",
+				"defaultValue": "S967238",
+				"editType": {
+					"format": "String",
+					"maxLength": 20
+				}
+			},
+			{
+				"field": "LicenseState",
+				"title": "License State",
+				"type": "String",
+				"defaultValue": "NY",
+				"editType": {
+					"format": "String",
+					"maxLength": 2
+				}
+			},
+			{
+				"field": "LicenseClass",
+				"title": "License Class",
+				"type": "String",
+				"defaultValue": "CDL",
+				"editType": {
+					"format": "String",
+					"maxLength": 2
+				}
+			},
+			{
+				"field": "LicenseRestrictions",
+				"title": "License Restrictions",
+				"type": "String",
+				"defaultValue": "P, Q",
+				"editType": {
+					"format": "String",
+					"maxLength": 10
+				}
+			},
+			{
+				"field": "LicenseExpiration",
+				"title": "License Expiration",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date"
+				}
+			},
+			{
+				"field": "LicenseEndorsements",
+				"title": "License Endorsements",
+				"type": "String",
+				"defaultValue": "F, G, H, M, N, P, R, S, T, W, X",
+				"editType": {
+					"format": "String",
+					"maxLength": 10
+				}
+			},
+			{
+				"field": "HireDate",
+				"title": "Date of Hire",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date"
+				}
+			},
+			{
+				"field": "InactiveDate",
+				"title": "Inactive Date",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date"
+				}
+			},
+			{
+				"field": "DateOfBirth",
+				"title": "Birth Date",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date"
+				}
+			},
+			{
+				"field": "DisplayGender",
+				"title": "Gender",
+				"type": "String",
+				"defaultValue": "Male",
+				"editType": {
+					"format": "DropDown",
+					"getSource": fetchDefaultGenders,
+					"allowNullValue": true,
+					"entityKey": "GenderId",
+					"relationshipKey": "Gender",
+				}
+			},
+			{
+				"field": "ContractorName",
+				"title": "Contractor",
+				"type": "String",
+				"defaultValue": "Joe's Charter Buses",
+				"editType": {
+					"format": "DropDown",
+					"getSource": function()
+					{
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "contractors?@fields=Id,Name")).then(function(result)
 						{
-							return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "contractors?@fields=Id,Name")).then(function(result)
+							return result.Items.map(function(item)
 							{
-								return result.Items.map(function(item)
-								{
-									return {
-										'text': item["Name"],
-										'value': item["Id"]
-									};
-								});
+								return {
+									'text': item["Name"],
+									'value': item["Id"]
+								};
 							});
-						},
-						"allowNullValue": true,
-						"entityKey": "ContractorId"
-					}
-				},
-				{
-					"field": "Rate",
-					"title": "Rate",
-					"type": "Number",
+						});
+					},
+					"allowNullValue": true,
+					"entityKey": "ContractorId"
+				}
+			},
+			{
+				"field": "Rate",
+				"title": "Rate",
+				"type": "Number",
+				"format": "Money",
+				"defaultValue": "15.00",
+				"editType": {
 					"format": "Money",
-					"defaultValue": "15.00",
-					"editType": {
-						"format": "Money",
-						"maxLength": 8
-					}
-				},
-				{
-					"field": "Otrate",
-					"title": "OT Rate",
-					"type": "Number",
+					"maxLength": 8
+				}
+			},
+			{
+				"field": "Otrate",
+				"title": "OT Rate",
+				"type": "Number",
+				"format": "Money",
+				"defaultValue": "22.50",
+				"editType": {
 					"format": "Money",
-					"defaultValue": "22.50",
-					"editType": {
-						"format": "Money",
-						"maxLength": 8
-					}
+					"maxLength": 8
 				}
+			},
+			{
+				"field": "UserName",
+				"title": "User",
+				"type": "String",
+				"defaultValue": "Smith, John",
+				"editType": {
+					"format": "DropDown",
+					"getSource": function(recordId, entity)
+					{
+						var filter = "eq(Deactivated,false)" + (entity && entity.UserID ? "|eq(user," + entity.UserID + ")" : "");
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "users"), {
+							paramData: {
+								"@fields": "Id,FirstName,LastName",
+								"@filter": filter
+							}
+						}).then(function(result)
+						{
+							return result.Items.map(function(item)
+							{
+								return {
+									'text': (item["LastName"] ? item["LastName"] + (item["FirstName"] ? ", " : "") : "") + (item["FirstName"] ? item["FirstName"] : ""),
+									'value': item["Id"]
+								};
+							});
+						});
+					},
+					"allowNullValue": true,
+					"entityKey": "UserID"
+				}
+			},
+			{
+				"field": "DistrictName",
+				"title": "District",
+				"type": "String",
+				"defaultValue": "Springfield",
+				"editType": {
+					"format": "DropDown",
+					"getSource": function()
+					{
+						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "districts?@fields=Id,DistrictNameWithId")).then(function(result)
+						{
+							return result.Items.map(function(item)
+							{
+								return {
+									'text': item["DistrictNameWithId"],
+									'value': item["Id"]
+								};
+							});
+						});
+					},
+					"allowNullValue": true,
+					"entityKey": "DistrictId"
+				},
+				"wayfinderAvailable": true
+			}
 			],
-			"Contact Info": [
-				{
-					"field": "MailStreet1",
-					"title": "Mailing Address Street 1",
-					"type": "String",
-					"defaultValue": "440 State Street",
-					"editType": {
-						"format": "String",
-						"maxLength": 150
-					}
-				},
-				{
-					"field": "MailStreet2",
-					"title": "Mailing Address Street 2",
-					"type": "String",
-					"defaultValue": "Suite 1",
-					"editType": {
-						"format": "String",
-						"maxLength": 150
-					}
-				},
-				{
-					"field": "MailCity",
-					"title": "Mailing Address City/Town",
-					"type": "String",
-					"defaultValue": "Schenectady",
-					"editType": {
-						"format": "DropDown",
-						"getSource": fetchMailingCities,
-						"allowNullValue": true,
-						"entityKey": "MailCityId"
-					}
-				},
-				{
-					"field": "MailState",
-					"title": "Mailing Address State/Province",
-					"type": "String",
-					"defaultValue": "NY",
-					"editType": {
-						"format": "String",
-						"maxLength": 2
-					}
-				},
-				{
-					"field": "MailZip",
-					"title": "Mailing Address Postal Code",
-					"type": "String",
-					"defaultValue": "12305",
-					"editType": {
-						"format": "DropDown",
-						"getSource": fetchMailingZipCodes,
-						"allowNullValue": true,
-						"entityKey": "MailZipId"
-					}
-				},
-				{
-					"field": "HomePhone",
-					"title": "Home Phone",
-					"type": "String",
-					"format": "Phone",
-					"defaultValue": "(800) 373-3609",
-					"editType": {
-						"format": "Phone"
-					}
-				},
-				{
-					"field": "WorkPhone",
-					"title": "Work Phone",
-					"type": "String",
-					"format": "Phone",
-					"defaultValue": "(800) 373-3609",
-					"editType": {
-						"format": "Phone"
-					}
-				},
-				{
-					"field": "CellPhone",
-					"title": "Cell Phone",
-					"type": "String",
-					"format": "Phone",
-					"defaultValue": "(800) 373-3609",
-					"editType": {
-						"format": "Phone"
-					}
-				},
-				{
-					"field": "Email",
-					"title": "Email Address",
-					"type": "String",
-					"defaultValue": "name@email.com",
-					"editType": {
-						"format": "Email",
-						"maxLength": 100
-					}
+			"Contact Info": [{
+				"field": "MailStreet1",
+				"title": "Mailing Address Street 1",
+				"type": "String",
+				"defaultValue": "440 State Street",
+				"editType": {
+					"format": "String",
+					"maxLength": 150
 				}
+			},
+			{
+				"field": "MailStreet2",
+				"title": "Mailing Address Street 2",
+				"type": "String",
+				"defaultValue": "Suite 1",
+				"editType": {
+					"format": "String",
+					"maxLength": 150
+				}
+			},
+			{
+				"field": "MailCity",
+				"title": "Mailing Address City/Town",
+				"type": "String",
+				"defaultValue": "Schenectady",
+				"editType": {
+					"format": "DropDown",
+					"getSource": fetchMailingCities,
+					"allowNullValue": true,
+					"entityKey": "MailCityId"
+				}
+			},
+			{
+				"field": "MailCounty",
+				"title": "Mailing Address Map Set",
+				"type": "String",
+				"defaultValue": "Schenectady",
+				"editType": {
+					"format": "String",
+					"maxLength": 25
+				}
+			},
+			{
+				"field": "MailState",
+				"title": "Mailing Address State/Province",
+				"type": "String",
+				"defaultValue": "NY",
+				"editType": {
+					"format": "DropDown",
+					"getSource": fetchMailingStates,
+					"allowNullValue": true,
+					"entityKey": "MailStateId"
+				}
+			},
+			{
+				"field": "MailZip",
+				"title": "Mailing Address Postal Code",
+				"type": "String",
+				"defaultValue": "12305",
+				"editType": {
+					"format": "DropDown",
+					"getSource": fetchMailingZipCodes,
+					"allowNullValue": true,
+					"entityKey": "MailZipId"
+				}
+			},
+			{
+				"field": "HomePhone",
+				"title": "Home Phone",
+				"type": "String",
+				"format": "Phone",
+				"defaultValue": "(800) 373-3609",
+				"editType": {
+					"format": "Phone"
+				}
+			},
+			{
+				"field": "WorkPhone",
+				"title": "Work Phone",
+				"type": "String",
+				"format": "Phone",
+				"defaultValue": "(800) 373-3609",
+				"editType": {
+					"format": "Phone"
+				}
+			},
+			{
+				"field": "CellPhone",
+				"title": "Cell Phone",
+				"type": "String",
+				"format": "Phone",
+				"defaultValue": "(800) 373-3609",
+				"editType": {
+					"format": "Phone"
+				}
+			},
+			{
+				"field": "Email",
+				"title": "Email Address",
+				"type": "String",
+				"defaultValue": "name@email.com",
+				"editType": {
+					"format": "Email",
+					"maxLength": 100
+				}
+			}
 			],
-			"Requirements": [
-				{
-					"field": "ApplicationField",
-					"title": "Application",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "FingerPrint",
-					"title": "Finger Print",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "SuperintendentApprov",
-					"title": "Superintendent Approv.",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "NewHireOrient",
-					"title": "New Hire Orient",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "Abstract",
-					"title": "Abstract",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "Interview",
-					"title": "Interview",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "DefensiveDriving",
-					"title": "Defensive Driving",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "DrivingTestPractical",
-					"title": "Driving Test (Practical)",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "DrivingTestWritten",
-					"title": "Driving Test (Written)",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "MedicalExam",
-					"title": "Medical Exam",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "PPTField",
-					"title": "PPT",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "HepatitisB",
-					"title": "Hepatitis B",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "Certification",
-					"title": "Certification",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "BasicField",
-					"title": "Basic",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "Advanced",
-					"title": "Advanced",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "PreService",
-					"title": "Pre-Service",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "HandicapPreService",
-					"title": "Handicap Pre-Service",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "RefresherPart1",
-					"title": "Refresher (Part 1)",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "RefresherPart2",
-					"title": "Refresher (Part 2)",
-					"type": "Date",
-					"defaultValue": today
-				},
-				{
-					"field": "HandicapRef",
-					"title": "Handicap Ref",
-					"type": "Date",
-					"defaultValue": today
+			"Requirements": [{
+				"field": "ApplicationField",
+				"title": "Application",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
 				}
+			},
+			{
+				"field": "FingerPrint",
+				"title": "Finger Print",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "SuperintendentApprov",
+				"title": "Superintendent Approv.",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "NewHireOrient",
+				"title": "New Hire Orient",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "Abstract",
+				"title": "Abstract",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "Interview",
+				"title": "Interview",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "DefensiveDriving",
+				"title": "Defensive Driving",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "DrivingTestPractical",
+				"title": "Driving Test (Practical)",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "DrivingTestWritten",
+				"title": "Driving Test (Written)",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "MedicalExam",
+				"title": "Medical Exam",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "PPTField",
+				"title": "PPT",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "HepatitisB",
+				"title": "Hepatitis B",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "Certification",
+				"title": "Certification",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "BasicField",
+				"title": "Basic",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "Advanced",
+				"title": "Advanced",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "PreService",
+				"title": "Pre-Service",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "HandicapPreService",
+				"title": "Handicap Pre-Service",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "RefresherPart1",
+				"title": "Refresher (Part 1)",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "RefresherPart2",
+				"title": "Refresher (Part 2)",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			},
+			{
+				"field": "HandicapRef",
+				"title": "Handicap Ref",
+				"type": "Date",
+				"defaultValue": today,
+				"editType": {
+					"format": "Date",
+				}
+			}
 			],
-			"Miscellaneous": [
-				{
-					"field": "Schedule",
-					"title": "Schedule",
-					"type": "Schedule",
-					"min-height": "4"
-				},
-				// {
-				// 	"field": "File",
-				// 	"title": "Documents",
-				// 	"type": "File",
-				// 	"defaultValue": "File list/browser",
-				// 	"min-height": "3"
-				// },
-				{
-					"field": "Comments",
-					"title": "Notes",
-					"type": "Note",
-					"defaultValue": "Lorem ipsum dolor sit amet.",
-					"editType": {
-						"format": "Note",
-						"maxLength": 2000
-					}
+			"Miscellaneous": [{
+				"field": "Schedule",
+				"title": "Schedule",
+				"type": "Schedule",
+				"min-height": "4"
+			},
+			{
+				"field": "Comments",
+				"title": "Notes",
+				"type": "Note",
+				"defaultValue": "Lorem ipsum dolor sit amet.",
+				"editType": {
+					"format": "Note",
+					"maxLength": 2000
 				}
+			}
 			],
 			"User Defined": [],
 			"User Defined Group": [],
-			"Grid": [
-				{
-					"field": "ContactGrid",
-					"title": "Contact Information",
-					"type": "grid",
-					"url": "contact",
-					"min-height": "3",
-					"min-width": 2
-				},
-				{
-					"field": "DocumentGrid",
-					"title": "Documents Grid",
-					"type": "grid",
-					"url": "document",
-					"min-height": "3",
-					"min-width": 2
-				}
+			"State Report Fields": [],
+			"Grid": [{
+				"field": "ContactGrid",
+				"title": "Contact Information",
+				"type": "grid",
+				"url": "contactinformation",
+				"min-height": "3",
+				"min-width": 2
+			},
+			{
+				"field": "DocumentGrid",
+				"title": "Documents Grid",
+				"type": "grid",
+				"url": "document",
+				"min-height": "3",
+				"min-width": 2
+			},
+			{
+				"field": "CommunicationHistoryGrid",
+				"title": "Communication History Grid",
+				"type": "grid",
+				"url": "communicationhistory",
+				"min-height": "3",
+				"min-width": 2
+			}
 			]
 		},
 		"student": {
@@ -5048,9 +5182,18 @@
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities?@fields=Id,Name"))
 			.then(function(result)
 			{
-				return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; })
+				return result.Items.map(function(item) { return { text: item.Name, value: item.Id }; });;
 			});
 	};
+
+	function fetchMailingStates()
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingstates?@sort=Name&@fields=Id,Name"))
+			.then(result => result.Items.map(item => ({
+				text: item.Name,
+				value: item.Id
+			})));
+	}
 
 	function fetchDefaultGenders()
 	{
