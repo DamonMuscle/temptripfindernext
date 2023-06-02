@@ -1,16 +1,24 @@
+// Kendo Date Time Picker and Bootstrap Time Picker
 (function()
 {
-	var namespace = window.createNamespace("TF.Input");
-	namespace.DateTimeBox = DateTimeBox;
+	createNamespace("TF.Input").DateTimeBox = DateTimeBox;
 
 	function DateTimeBox(initialValue, attributes, disable, noWrap, delayChange, element)
 	{
 		this.keypress = this.keypress.bind(this);
 
-		namespace.BaseBox.call(this, initialValue, attributes, disable);
+		if (attributes && attributes.adjustPopupPosition)
+		{
+			this.adjustPopupPosition = attributes.adjustPopupPosition;
+			delete attributes.adjustPopupPosition;
+		}
+
+		this.eventNameSpace = `.datetimebox_${Math.random().toString(36).substring(7)}_${Date.now()}`;
+		TF.Input.BaseBox.call(this, initialValue, attributes, disable);
 		this._noWrap = noWrap;
 		this.delayChange = delayChange;
-		this._dateTimePicker = null;
+		this.kendoDateTimePicker = null;
+		this.isfocus = false;
 		this.$parent = $(element);
 		if (attributes)
 		{
@@ -18,389 +26,537 @@
 			{
 				this.formatString = attributes.format;
 			}
+			if (attributes.pickerFormat)
+			{
+				this.pickerFormat = attributes.pickerFormat;
+			}
 
 			this.minDate = attributes.minDate;
 			this.maxDate = attributes.maxDate;
 			this.disableWeekend = attributes.disableWeekend;
-			this.ignoreReadonly = attributes.ignoreReadonly;
 			this.inputEnable = attributes.inputEnable;
-			this._exactFormat = attributes.exactFormat;
+			this.disablePosition = !!attributes.disablePosition;
+			let disabled = disable;
+			if ($.isFunction(disable))
+			{
+				disabled = disable();
+			}
+			this.readonly = !!(attributes.readonly || disabled);
+			this.noIcon = !!attributes.noIcon;
+			this.position = attributes.position || 'center';
+
+			/**
+			 * when no initial value supplied, the default value would be [Today].
+			 * So if we want to make it empty, use this attribute
+			 */
+			if (!initialValue && !!attributes.discardDefaultValue)
+			{
+				this.value("");
+			}
 		}
-		this.initialize.call(this);
+		this.initialize();
 
 		this.height = 289;
 	}
 
-	DateTimeBox.prototype = Object.create(namespace.BaseBox.prototype);
+	DateTimeBox.prototype = Object.create(TF.Input.BaseBox.prototype);
 
 	DateTimeBox.prototype.type = "DateTime";
 
-	DateTimeBox.constructor = DateTimeBox;
+	DateTimeBox.prototype.constructor = DateTimeBox;
 
-	DateTimeBox.prototype.formatString = "L LT";
-
-	DateTimeBox.prototype.pickerIconClass = "k-i-calendar";
-
-	DateTimeBox.prototype.convertToDateFormat = function(strValue)
-	{
-		if (strValue.indexOf(".") > 0)
-		{
-			if (strValue.trim().split(".").length == 3)
-			{
-				strValue = strValue.replace(/\./g, "-");
-			}
-			else
-			{
-				return strValue;
-			}
-		}
-		if (strValue.indexOf("-") > 0)
-		{
-			var strArr = strValue.trim().split("-");
-			if (strArr.length == 3)
-			{
-				if (strArr[0].length == 4)
-				{
-					return strArr[1] + "/" + strArr[2] + "/" + strArr[0];
-				}
-				return strArr[1] + "/" + strArr[0] + "/" + strArr[2];
-			}
-			return strValue;
-		}
-		return strValue;
-	};
+	DateTimeBox.prototype.formatString = "MM/DD/YYYY hh:mm A";
+	DateTimeBox.prototype.pickerFormat = "MM/dd/yyyy hh:mm tt"; // format of kendo datetime picker
 
 	DateTimeBox.prototype.initialize = function()
 	{
 		var self = this;
-		this.onClearRequest.subscribe(function(e)
+
+		self.value.subscribe(function()
 		{
-			this._dateTimePicker.date(null);
-		}.bind(this));
-		this.value.subscribe(function(value)
-		{
-			var datetime = moment.utc(this.value(), [this.formatString, moment.ISO_8601]);
-			if (value == "Empty" || value == 'Not empty' || !value || !datetime.isValid())
+			var datetime = moment(self.value());
+
+			if (!datetime.isValid())
 			{
-				this._dateTimePicker.date(null);
+				self.kendoDateTimePicker.value(null);
+				if (self.type === "DateTime")
+				{
+					self.bootstrapTimePicker && self.bootstrapTimePicker.date(null);
+				}
+				$input.val(null);
 			}
 			else
 			{
-				this._dateTimePicker.date(datetime);
+				self.kendoDateTimePicker.value(datetime.toDate());
+				if (self.type === "DateTime")
+				{
+					self.bootstrapTimePicker && self.bootstrapTimePicker.date(datetime.toDate());
+				}
+				$input.val(datetime.format(self.formatString));
 			}
-		}, this);
-		var $input = $('<input ' + this.type + ' type="text" class="form-control datepickerinput" data-tf-input-type="' + this.type + '" data-bind="disable:disable, css:{disabled:disable},event: {blur: updateValue,keypress:keypress}" />');
-		this.applyAttribute($input, this.attributes);
-		var $button = $('<div class="input-group-addon glyphicon datepickerbutton"><span unselectable="on" class="k-icon ' + this.pickerIconClass + '">select</span></div>');
-		if (this.attributes)
+		});
+
+		var $input = $(`
+			<input ${self.type} type="text" class="form-control datepickerinput" data-tf-input-type="${self.type}"
+				data-bind="disable:disable, css:{disabled:disable},event: {keypress:keypress}" />
+		`);
+
+		self.applyAttribute($input, self.attributes);
+		var $button = $(`<div class="input-group-addon glyphicon datepickerbutton">
+							<span unselectable="on" class="k-icon k-i-calendar">select</span>
+						</div>`);
+
+		if (self.attributes)
 		{
-			this.applyAttribute($button, this.attributes.picker);
+			self.applyAttribute($button, self.attributes.picker);
 		}
 
-		if($input.hasClass("k-input-needed"))
-		{
-			$input.addClass("k-input");
-		}
+		var $element = self.noIcon ? $input : $input.add($button);
 
-		if (TF.isPhoneDevice) //VIEW-1252 Date Control is not visible when focus is still set to input
-		{
-			$button.click(function()
+		$input.kendoDateTimePicker({
+			max: self.maxDate,
+			min: self.minDate,
+			format: self.pickerFormat,
+			open: function({ sender })
 			{
-				$(":focus").blur();
-			});
-		}
-		var $element = $input.add($button);
-
-		if (this.$parent.closest(".document-dataentry").length > 0)
-		{
-			var parentContainer = $('<div style="position:relative;"></div>');
-			this.$parent.parent().append(parentContainer);
-			$element.datetimepicker(
+				self.initializeTimePicker(sender);
+				self.isWidgetOpen = true;
+				if (typeof self.adjustPopupPosition === "function" || (!self.disablePosition && sender.dateView.div))
 				{
-					widgetParent: parentContainer,
-					useCurrent: false,
-					keepInvalid: true,
-					minDate: this.minDate,
-					maxDate: this.maxDate,
-					daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
-					widgetPositioning:
-					{
-						horizontal: 'left'
-					},
-					format: this.formatString,
-					locale: moment.locale(),
-					keyBinds:
-					{
-						enter: null
-					}
-				});
-		}
-		else
-		{
-			$element.datetimepicker(
-				{
-					widgetParent: "body",
-					useCurrent: false,
-					keepInvalid: true,
-					ignoreReadonly: this.ignoreReadonly,
-					minDate: this.minDate,
-					maxDate: this.maxDate,
-					daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
-					widgetPositioning:
-					{
-						horizontal: 'left'
-					},
-					format: this.formatString,
-					locale: moment.locale(),
-					keyBinds:
-					{
-						enter: null
-					}
-				});
-		}
-
-		this._dateTimePicker = $element.data('DateTimePicker');
-		this.value.valueHasMutated();
-		ko.applyBindings(this, $element[0]);
-		this.$element = $element;
-
-		var delayTimeOut;
-		$element.on('dp.change', function(event)
-		{
-			clearTimeout(delayTimeOut);
-			delayTimeOut = setTimeout(function()
-			{
-				if (!event.date) return;
-				if (!event.oldDate)
-				{
-					this.value(this.getValueString(event.date));
-					return;
+					sender.dateView.div.css("left", "-1000px");
 				}
-				var oldDate = moment(event.oldDate),
-					newDate = moment(event.date);
-				//RW-13267 check whether the date changed is result from time changed
-				if (this.type == 'DateTime' && oldDate.date() !== newDate.date())	
+				if (!$input.is(':focus') && !TF.isMobileDevice)
 				{
-					var diff = newDate.diff(oldDate, 'minutes');
-
-					if (diff == 1 || diff == -1 || diff == 60 || diff == -60)
-					{
-						newDate.subtract(diff > 0 ? 1 : -1, 'days');
-					}
+					$input.focus();
 				}
-				if (!newDate.isSame(oldDate, 'minutes'))
+				$(document).on("mousedown.datetimepickopen touchstart.datetimepickopen", function(e)
 				{
-					this.value(this.getValueString(newDate));
-				}
-				if (TF.isPhoneDevice && self.type !== "DateTime") {
-					this._dateTimePicker.hide();
-				}
-			}.bind(this), this.delayChange ? 500 : 0);
-		}.bind(this));
-		$element.on('dp.show', function(e)
-		{
-			var widgetParent = $(this._dateTimePicker.widgetParent());
-			var $modalBody = widgetParent.closest(".modal-body");
-			if (TF.isMobileDevice && $modalBody.length)
-			{
-				$modalBody.bind('mousewheel touchmove', lockScroll);
-			}
-
-			var widget = widgetParent.find(".bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last"),
-				widgetWidth = widget.width(),
-				bodyWidth = $("body").width();//widgetParent.width();
-			if (TF.isPhoneDevice)
-			{
-				var overlay = $("body>.bootstrap-datetimepicker-overlay");
-				overlay.on("click", function()
-				{
-					this._dateTimePicker.hide();
-				}.bind(this));
-			}
-
-			if (widget.length == 0)
-			{
-				widget = this.$element.parent().find(".bootstrap-datetimepicker-widget");
-				if (widget)
-				{
-					var modal = this.$element.closest(".modal-dialog");
-					if (modal.length > 0)
+					if (self.type === "DateTime")
 					{
-
-						widget.css(
-							{
-								top: this.$element.outerHeight(), //+ this.$element.offset().top - modal.offset().top,
-								bottom: 'auto',
-								left: $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2 //$button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2 - modal.offset().left
-							});
-					}
-					else
-					{
-						var top = this.$element.outerHeight(),
-							left = $button.closest(".input-group").outerWidth() - $button.outerWidth() / 2 - widget.outerWidth() / 2,
-							widgetOffsetRight;
-						if (($button.offset().top + $button.outerHeight() + this.height + 67) > document.body.offsetHeight)
+						if ($(e.target).closest(".k-calendar").length > 0)
 						{
-							top = -this.height;
-						}
-						widget.css(
-							{
-								top: top,
-								left: left
-							});
-
-						widgetOffsetRight = widget.offset().left + widget.outerWidth();
-						if (widgetOffsetRight > document.body.offsetWidth)
+							self.keepWidgetOpen = true;
+						} else
 						{
-							left -= widgetOffsetRight - document.body.offsetWidth + 5;
-							widget.css(
-								{
-									left: left
-								});
+							self.keepWidgetOpen = false;
 						}
 					}
-					//widget.height(this.height - 10);
-				}
-			}
-			else if (widget && widget.offset())
-			{
-				var preWightOffset = widget.offset();
-				var wightOffsetLeft = $button.offset().left - widget.outerWidth() / 2 + $button.outerWidth() / 2;
-				var wightCss = {}, modal;
-				if (TF.isMobileDevice)
+				});
+				if (tf.isViewfinder && TF.isMobileDevice && self.type === "DateTime" )
 				{
-					if (widget.width() + wightOffsetLeft > window.outerWidth) {
-						wightOffsetLeft = window.outerWidth - (widget.width() + 25);
-					}
-
-					modal = this.$element.closest(".modal-dialog");
-					if (modal.length > 0)
+					$(document).one("mousedown.datetimepickopen touchstart.datetimepickopen", function (e)
 					{
-						bodyWidth = modal.width();
-					}
-
-					if (modal && modal.length > 0 && wightOffsetLeft > modal.offset().left + bodyWidth - widgetWidth && bodyWidth > widgetWidth)
-					{
-						wightCss['left'] = modal.offset().left + bodyWidth - widgetWidth - 10;
-					}
-					else if (modal && modal.length > 0 && wightOffsetLeft < modal.offset().left + 5)
-					{
-						wightCss['left'] = modal.offset().left;
-					} else
-					{
-						wightCss['left'] = wightOffsetLeft;
-					}
+						if ($(e.target).closest(".k-calendar-container").length <= 0)
+						{
+							self.kendoDateTimePicker.close();
+						}
+					});
 				}
-				else
+
+				if (sender && sender.dateView
+					&& sender.dateView.calendar
+					&& sender.dateView.calendar.element
+					&& sender.dateView.calendar.element.css)
 				{
-					if (wightOffsetLeft > bodyWidth - widgetWidth && bodyWidth > widgetWidth)
-					{
-						wightCss['left'] = bodyWidth - widgetWidth - 10;
-					}
-					else if (wightOffsetLeft < 5)
-					{
-						wightCss['left'] = 10;
-					} else
-					{
-						wightCss['left'] = wightOffsetLeft;
-					}
-
+					sender.dateView.calendar.element.css("font-size", "14px");
 				}
 
-				const widgetToBottom = widget.outerHeight()+this.$element.offset().top +this.$element.outerHeight();
-				if (widgetToBottom <= widget.offsetParent()[0].clientHeight + widget.offsetParent().scrollTop())
+				if (self.type !== "DateTime")
 				{
-					widget.css({top: this.$element.offset().top + this.$element.outerHeight(), position: "relative"});
+					// for Date, the selected date is not marked.
+					// I don't know why.
+					setTimeout(function()
+					{
+						var day = parseInt(moment(self.value()).format("DD"));
+						if (!!day)
+						{
+							var matched = Array.from(sender.dateView.calendar.element.find("td:not(.k-other-month)")).filter(current =>
+							{
+								return parseInt($(current).text()) == day;
+							});
+
+							$(matched[0]).addClass("k-state-selected k-state-focused");
+						}
+					});
 				}
-				else
+
+				if (typeof self.adjustPopupPosition === "function")
 				{
-					widget.css({top: this.$element.offset().top -  widget.outerHeight(), position: "relative"});
-				}
-
-				widget.css({ left: wightCss['left'] });
-
-				//for form
-				if ($(e.currentTarget).closest(".form-container").length > 0) {
-					let timeEle = $(e.currentTarget).closest(".input-group.time-question").find("input.form-control"),
-					rect = timeEle[0].getBoundingClientRect();
-					if (rect.bottom + widget.outerHeight(true) < document.body.clientHeight) {
-						widget.css({ top: `${rect.bottom}px`, right: "auto", bottom: "auto", left: `${rect.left}px` })
-					} else {
-						widget.css({ top: "auto", right: "auto", bottom: `${document.body.offsetHeight - rect.top}px`, left: `${rect.left}px` })
+					self.adjustPopupPosition(sender.element, sender.dateView.calendar.element, sender.dateView.div);
+					if (sender.dateView.div)
+					{
+						sender.dateView.div.css("left", "");
 					}
 				}
-			}
-			this._toggleScroll(false);
-			this._toggleScroll(true);
-			if (TF.isPhoneDevice && modal.length > 0 && this.type === "Date") //VIEW-1252 Date Control is not visible when focus is still set to input
-			{
-				if (widget.closest(".modal-dialog").length == 0)
+				else if (!self.disablePosition)
 				{
 					setTimeout(function()
 					{
-						var windowHeight = $(window).height();
-						var offset = this.$element.offset();
-						if (offset.top + widget.height() * 1.5 >= $(window).height() + $(window).scrollTop() &&
-							widget.height() + this.$element.outerHeight() < offset.top)
+						let target = sender.element,
+							calendar = sender.dateView.calendar.element;
+
+						var zindex = Math.max(...Array.from(target.parents()).map(el => parseInt($(el).css("z-index"))).filter(x => !Number.isNaN(x)));
+
+						var position;
+						if (target.closest("[data-kendo-role=customizeddatetimepicker]").length)
 						{
-							//top
-							widget.css(
+							// quick filter in grid
+							// no need to handle here. It's already handled in grid.
+							let rect = target[0].getBoundingClientRect(), $popup;
+							if ($input.closest(".k-filtercell[data-kendo-field]").length > 0)
+							{
+								rect = $input.closest(".k-filtercell[data-kendo-field]")[0].getBoundingClientRect();
+							}
+							if ($input.attr("aria-activedescendant"))
+							{
+								let id = $input.attr("aria-activedescendant").split("_")[0];
+								$popup = $(`#${id}`).closest(".k-animation-container");
+							}
+							else if ($input.data("DateTimePicker"))
+							{
+								$popup = $("body>.bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last");
+								$popup.css({ margin: 0, padding: 0 })
+							}
+
+							if ($popup)
+							{
+								if ($popup.width() + rect.left > $(window).width())
 								{
-									top: 'auto',
-									bottom: windowHeight - this.$element.offset().top
-								});
+									$popup.css({ left: $(window).width() - $popup.width() - 1, top: rect.top + rect.height + 1 });
+								}
+								else
+								{
+									$popup.css({ left: rect.left, top: rect.top + rect.height + 1 });
+								}
+							}
+							$popup.css({ "z-index": zindex + 5 });
 						}
 						else
 						{
-							//bottom
-							widget.css(
-								{
-									top: this.$element.offset().top + this.$element.outerHeight()
-								});
+							var rect = target[0].getBoundingClientRect(),
+								calendarWidth = calendar.closest(".k-animation-container").width(),
+								bodyWidth = $("body").width();
+
+							position = {
+								"z-index": zindex + 5,
+								top: rect.bottom - 1,
+								left: self.position === 'left' ? rect.left : (rect.right + calendarWidth / 2 > bodyWidth ? bodyWidth - calendarWidth - 1 : rect.right - calendarWidth / 2)
+							}
 						}
-					}.bind(this), 100);
+
+						if (position)
+						{
+							calendar.closest(".k-animation-container").css(position);
+						}
+						if (sender.dateView.div)
+						{
+							sender.dateView.div.css("left", "");
+						}
+					});
 				}
-				$(window).on("resize.dateTime", function()
+
+				sender.dateView.calendar.element.find(".k-footer a").off().on("click", function()
 				{
-					setTimeout(function()
+					if (self.type === "DateTime")
 					{
-						this._dateTimePicker.hide();
-					}.bind(this), 10);
-				}.bind(this));
-			}
-
-		}.bind(this));
-		$element.on('dp.hide', function()
-		{
-			var widgetParent = $(this._dateTimePicker.widgetParent());
-			var $modalBody = widgetParent.closest(".modal-body");
-			if (TF.isMobileDevice && $modalBody.length)
+						self.value(`${moment().format("MM/DD/YYYY")} ${moment(moment(self.value()).isValid() ? self.value() : new Date()).format("hh:mm A")}`);
+					}
+					else
+					{
+						self.value(`${moment().format("MM/DD/YYYY")}`);
+					}
+				});
+			},
+			change: self.handleChange.bind(self),
+			close: function(e)
 			{
-				$modalBody.unbind('mousewheel touchmove', lockScroll);
-			}
+				if (!self.isWidgetOpen) return;
 
-			this._toggleScroll(false);
-			$(window).off("resize.dateTime");
+				if (self.keepWidgetOpen && self.type === "DateTime")
+				{
+					e.preventDefault();
+					return;
+				}
 
-			if (self.attributes && self.attributes.afterHide && self.type === "DateTime")
-			{
-				self.attributes.afterHide();
-			}
-		}.bind(this));
+				self.isWidgetOpen = false;
+				self.restoreKendoDatePicker();
+				$input.blur();
 
-		var reg = this.getInvalidCharacterRegex();
-		$element.on("input", function()
-		{
-			var text = $(this).val();
-			if (self.inputEnable && text.indexOf('@') === 0)
-			{
-				$(this).val(text);
-			}
-			else
-			{
-				$(this).val(text.replace(reg, ""));
+				if (self.attributes && self.attributes.afterHide && self.type === "DateTime")
+				{
+					self.attributes.afterHide();
+				}
+
+				setTimeout(function()
+				{
+					$input.change();
+				});
 			}
 		});
+		self.kendoDateTimePicker = $input.data('kendoDateTimePicker');
+
+		$input.on(`blur${self.eventNameSpace}`, function({ target })
+		{
+			if (!$(target).val())
+			{
+				self.value(null);
+			}
+
+			self.kendoDateTimePicker.close();
+		});
+
+		$input.on(`change${self.eventNameSpace}`, function({ target })
+		{
+			var dateTimeVal = moment($(target).val(), self.formatString);
+			var isFromQuickFilter = $(target).parent().hasClass("tf-filter");
+			if ($(target).val() && !isFromQuickFilter)
+			{
+				if (dateTimeVal.year() === 0) 
+				{
+					const currentYear = new Date().getFullYear();
+					dateTimeVal.year(currentYear);
+				}
+				self.value(moment(dateTimeVal).format(self.formatString));
+				self.value.valueHasMutated();
+			}
+		});
+
+		if (!self.readonly) 
+		{
+			if (self.noIcon)
+			{
+				$input.off().on(`click${self.eventNameSpace}`, self.toggleWidget.bind(self));
+			} else
+			{
+				$button.off().on(`click${self.eventNameSpace}`, self.toggleWidget.bind(self));
+				if (TF.isMobileDevice)
+				{
+					$button.on('mousedown', function(e)
+					{
+						if ($input.is(":focus"))
+						{
+							self.isfocus = true;
+						}
+					});
+				}
+			}
+
+		}
+
+		$(window).on(`resize${self.eventNameSpace}`, function()
+		{
+			if (self && self.kendoDateTimePicker)
+			{
+				self.kendoDateTimePicker.close();
+			}
+		});
+
+		// close date time picker on detail view scrolling
+		$(".right-container").off(`wheel${self.eventNameSpace}`).on(`wheel${self.eventNameSpace}`, function()
+		{
+			if (self && self.kendoDateTimePicker)
+			{
+				self.kendoDateTimePicker.close();
+			}
+		});
+
+		self.value.valueHasMutated();
+		ko.applyBindings(self, $input[0]);
+		self.$element = $element;
+	};
+
+	DateTimeBox.prototype.handleChange = function()
+	{
+		var self = this;
+		if (!self.isWidgetOpen) return;
+
+		var date = moment(self.kendoDateTimePicker.value()),
+			time = self.bootstrapTimePicker && moment(self.bootstrapTimePicker.date());
+
+		if (!date.isValid())
+		{
+			date = moment();
+		}
+
+		if (self.type === "DateTime")
+		{
+			if (!time || !time.isValid())
+			{
+				time = moment();
+			}
+			self.value(`${date.format("MM/DD/YYYY")} ${time.format("hh:mm A")}`);
+		}
+		else
+		{
+			self.value(`${date.format("MM/DD/YYYY")}`);
+		}
+	};
+
+	DateTimeBox.prototype.initializeTimePicker = function(sender)
+	{
+		var self = this;
+		if (self.type !== "DateTime") return;
+
+		if (self.bootstrapTimePicker) return;
+
+		let $kendoDateTimePicker = sender.dateView.calendar.element.closest(".k-calendar-container");
+
+		if (!$kendoDateTimePicker.find("> .time-icon-container").length)
+		{
+			const $timeiconContainer = $(`<div class="time-icon-container" style="text-align: center;"></div>`);
+			$kendoDateTimePicker.append($timeiconContainer);
+			$kendoDateTimePicker.append(`<div class="time-picker"></div>`)
+
+			var $timeInput = $(`<input Time type="text" class="form-control datepickerinput" style="display:none;" data-tf-input-type="Time" />`);
+			var $timeButton = $(`<span unselectable="on" class="glyphicon glyphicon-time" style="cursor:pointer;color:#D0503C;"></span>`)
+			if (TF.productName === 'Viewfinder')
+			{
+				$timeButton.css('color', '#8E52A1');
+			}
+			var $el = $timeInput.add($timeButton)
+
+			$timeiconContainer.append($el)
+
+			$el.datetimepicker({
+				widgetParent: $kendoDateTimePicker.find(".time-picker"),
+				useCurrent: false,
+				keepInvalid: true,
+				daysOfWeekDisabled: this.disableWeekend ? [0, 6] : [],
+				widgetPositioning:
+				{
+					horizontal: 'left'
+				},
+				format: "hh:mm A",
+				locale: moment.locale(),
+				keyBinds: {
+					enter: null
+				}
+			});
+
+			self.bootstrapTimePicker = $el.data("DateTimePicker");
+			self.bootstrapTimePicker.date(moment(self.value()).toDate());
+
+			$el.on("dp.show", function()
+			{
+				function findClosestNoneStaticElement($el)
+				{
+					return Array.from($el.parents()).reduce(function(acc, current)
+					{
+						if (acc) return acc;
+
+						return $(current).css("position") !== "static" ? current : null;
+					}, null);
+				}
+
+				var inputDom = self.$element[0],
+					calendarMarginTop = 10,
+					position = {
+						left: 0,
+						top: 0
+					};
+				$widget = $kendoDateTimePicker.find(".time-picker .bootstrap-datetimepicker-widget");
+				let lockFromBottom = false;
+				if (inputDom && inputDom.getBoundingClientRect)
+				{
+					var inputRect = inputDom.getBoundingClientRect();
+					var widgetContainerRect = self.kendoDateTimePicker.dateView.div[0].getBoundingClientRect();
+
+					if (!(widgetContainerRect.top > inputRect.top && widgetContainerRect.bottom > inputRect.bottom))
+					{
+						lockFromBottom = true;
+						position = { left: 0, bottom: -($widget.parents(".k-animation-container").outerHeight(true) - $widget.parents(".bootstrap-datetimepicker-overlay").outerHeight(true)) };
+					}
+				}
+
+				if (!lockFromBottom)
+				{
+					$kendoDateTimePicker.find(".time-picker .bootstrap-datetimepicker-widget").css({
+						width: "100%",
+						padding: "0px",
+						left: position.left,
+						top: position.top
+					});
+				}
+				else 
+				{
+					$kendoDateTimePicker.find(".time-picker .bootstrap-datetimepicker-widget").css({
+						width: "100%",
+						padding: "0px",
+						left: position.left,
+						top: "auto",
+						bottom: position.bottom
+					});
+				}
+
+				self.calendarHeight = self.calendarHeight || $kendoDateTimePicker.find(".k-calendar").height();
+				$kendoDateTimePicker.addClass("enhanced-datetimepicker timepicker-selected");
+				$kendoDateTimePicker.find(".k-calendar").height(1);
+
+				$widget = $kendoDateTimePicker.find(".time-picker .bootstrap-datetimepicker-widget");
+				if (!lockFromBottom) 
+				{
+					$widget.css({ bottom: "auto" });
+				}
+
+				$widget.find(".calendar-icon-container .glyphicon-calendar").off().remove();
+				$widget.prepend(`<div class="calendar-icon-container" style="text-align: center;margin: ${calendarMarginTop}px 0px 0px 0px;">
+									<span class="glyphicon glyphicon-calendar" style="color:#D0503C; cursor: pointer;"></span>
+								</div>`);
+				$widget.find(".calendar-icon-container .glyphicon-calendar").on("click", self.restoreKendoDatePicker.bind(self));
+
+				if (TF.productName === 'Viewfinder')
+				{
+					$widget.find(".calendar-icon-container .glyphicon-calendar").css('color', '#8E52A1');
+				}
+				self.bootstrapTimePicker.date(moment(self.value()).toDate());
+			});
+
+			$el.on("dp.hide", function()
+			{
+				$kendoDateTimePicker.removeClass("timepicker-selected");
+			});
+
+			$el.on("dp.change", self.handleChange.bind(self));
+		}
+	}
+
+	DateTimeBox.prototype.restoreKendoDatePicker = function()
+	{
+		var self = this;
+		self.bootstrapTimePicker && self.bootstrapTimePicker.hide();
+		var $kendoDateTimePicker = self.kendoDateTimePicker.dateView.calendar.element.closest(".k-calendar-container");
+		$kendoDateTimePicker.find(".k-calendar").height(self.calendarHeight);
+		$kendoDateTimePicker.css({ "border-width": "1px", "box-shadow": "0 2px 2px 0 rgba(0, 0, 0, 0.2)" });
+		$kendoDateTimePicker.removeClass("timepicker-selected");
+	};
+
+	/**
+	 * toggle whole widget
+	 */
+	DateTimeBox.prototype.toggleWidget = function()
+	{
+		if (this.kendoDateTimePicker.element.prop('disabled')) // disable the button to open calendar when the widget is disable
+		{
+			return;
+		}
+
+		if (this.isfocus && TF.isMobileDevice)
+		{
+			this.kendoDateTimePicker.close();
+			this.isfocus = false;
+			return;
+		}
+		if (!this.isWidgetOpen)
+		{
+			this.kendoDateTimePicker.open();
+		}
+		else
+		{
+			this.kendoDateTimePicker
+				&& this.kendoDateTimePicker.dateView
+				&& this.kendoDateTimePicker.dateView.calendar
+				&& this.kendoDateTimePicker.dateView.calendar.element.hide();
+		}
 	};
 
 	DateTimeBox.prototype.getInvalidCharacterRegex = function()
@@ -410,66 +566,16 @@
 
 	DateTimeBox.prototype.keypress = function(viewModel, e)
 	{
-		if (e.keyCode == 13)
+		if (e.keyCode != 13)
 		{
-			setTimeout(function()
-			{
-				$(viewModel.$element[0]).blur();
-			}.bind(this), 0);
-		}
-		else
 			return true;
+		}
+
+		setTimeout(function()
+		{
+			viewModel.$element.eq(0).blur();
+		});
 	};
-
-	DateTimeBox.prototype.updateValue = function(self, e)
-	{
-		var text = e ? e.currentTarget.value : '';
-		if (this.inputEnable && text.indexOf('@') === 0)
-		{
-			return true;
-		}
-
-		var timePatten = /^([01]?[0-9]):[0-5]?[0-9]$/;
-
-		var dateTime = this.type == "Time" ? this._dateTimePicker.date() : moment(this.convertToDateFormat(text));
-		if (!dateTime)
-		{
-			this.value(null);
-			return true;
-		}
-		if (dateTime.isValid())
-		{
-			var isTimeColumn = TF.DateTimeBoxHelper.testIsTimeColumn($(e.currentTarget));
-
-			this.value(this.getValueString(dateTime));
-
-			if (isTimeColumn)
-				e ? (timePatten.test(text) ? null : (e.currentTarget.value = dateTime.format('h:mm') + ' ' + (dateTime.hours() < 12 ? 'AM' : 'PM'))) : null;
-			else
-				null;
-
-			return true;
-		}
-		else
-		{
-			this.value(null);
-			return false;
-		}
-	};
-
-	DateTimeBox.prototype.getValueString = function(dateTime)
-	{
-		if(!dateTime || !dateTime.isValid())
-		{
-			return null;
-		}
-
-		if (this._exactFormat)
-		{
-			return dateTime.format(this.formatString);
-		}
-		return toISOStringWithoutTimeZone(dateTime);
-	}
 
 	DateTimeBox.prototype.getElement = function()
 	{
@@ -477,83 +583,21 @@
 		{
 			return this.$element;
 		}
-		else
-		{
-			return $("<div>").addClass("input-group").append(this.$element);
-		}
-	};
 
-	DateTimeBox.prototype._toggleScroll = function(toggle)
-	{
-		var method = toggle ? "on" : "off";
-		var scrollableParents = this._scrollableParents();
-		if (method === "on")
-		{
-			scrollableParents.map(function(i, item)
-			{
-				$(item).data("scrollTop", item.scrollTop)
-			});
-			scrollableParents[method]("scroll.datatimebox", this._resizeProxy.bind(this));
-			scrollableParents[method]("mousedown.datatimebox", this.$element.data("DateTimePicker").hide);
-			$(window)[method]("scroll.datatimebox", this._resizeProxy.bind(this));
-			if (!TF.isPhoneDevice) //VIEW-1252 Date Control is not visible when focus is still set to input
-			{
-				$(window)[method]("resize.datatimebox", this.$element.data("DateTimePicker").hide);
-			}
-		}
-		else
-		{
-			scrollableParents[method]("scroll.datatimebox");
-			scrollableParents[method]("mousedown.datatimebox");
-			$(window)[method]("scroll.datatimebox");
-			$(window)[method]("resize.datatimebox");
-		}
-	};
-
-	DateTimeBox.prototype._scrollableParents = function()
-	{
-		var that = this;
-		return that.$element
-			.parentsUntil("body")
-			.filter(function(index, element)
-			{
-				return that._isScrollable(element);
-			});
-	};
-
-	DateTimeBox.prototype._isScrollable = function(element)
-	{
-		var overflow = $(element).css("overflow");
-		return overflow == "auto" || overflow == "scroll";
-	};
-
-	DateTimeBox.prototype._resizeProxy = function(e)
-	{
-		var widget = $("body>.bootstrap-datetimepicker-overlay>.bootstrap-datetimepicker-widget:last");
-		if (widget && widget.offset())
-		{
-			var scrollTop = $(e.currentTarget).data("scrollTop");
-			widget.css(
-				{
-					top: widget.offset().top + scrollTop - e.currentTarget.scrollTop,
-					height: this.height
-				});
-			$(e.currentTarget).data("scrollTop", e.currentTarget.scrollTop);
-		}
+		return $("<div>").addClass("input-group").append(this.$element);
 	};
 
 	DateTimeBox.prototype.dispose = function()
 	{
-		this._dateTimePicker.destroy();
+		$("*").off(this.eventNameSpace);
+		$(window).off(this.eventNameSpace);
+		this.kendoDateTimePicker.destroy();
+		this.bootstrapTimePicker && this.bootstrapTimePicker.destroy();
 		ko.removeNode(this.$element[0]);
-		namespace.BaseBox.prototype.dispose.call(this);
+		TF.Input.BaseBox.prototype.dispose.call(this);
 	};
-
-	function lockScroll(e)
-	{
-		e.preventDefault();
-	}
 })();
+
 
 (function()
 {
