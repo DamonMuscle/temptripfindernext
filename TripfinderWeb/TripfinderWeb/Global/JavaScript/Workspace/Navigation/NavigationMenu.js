@@ -319,6 +319,14 @@
 			currentStatus = self.obIsExpand();
 
 		self.toggleNavigationMenu(!currentStatus, self.defaultToggleNavAnimationDuration);
+		
+		$('.small-screen .item-menu').hide();
+
+		var $item = $('.navigation-item.active');
+		self.togglePageMenuDisplay($item, false, self.defaultOpenMenuAnimationDuration).then(() => {
+			$item.removeClass("small-screen");
+			$item.removeClass("menu-opened");
+		});
 	};
 
 	/**
@@ -648,7 +656,10 @@
 			}
 		} else if (alreadyOpened)
 		{
-			self.togglePageMenuDisplay($item, false, self.defaultOpenMenuAnimationDuration);
+			self.togglePageMenuDisplay($item, false, self.defaultOpenMenuAnimationDuration).then(() => {
+				$item.removeClass("small-screen");
+				$item.removeClass("menu-opened");
+			});
 			$item.addClass("hoverState");
 		} else
 		{
@@ -791,7 +802,6 @@
 
 			self.isOnAnimation = true;
 			$item.addClass("onAnimation");
-			$item.removeClass("menu-opened");
 			$itemMenu.stop().animate(closeAnimateParameters, {
 				duration: duration, queue: false, done: function()
 				{
