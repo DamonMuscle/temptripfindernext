@@ -5118,42 +5118,70 @@
 		"fieldtriplocation": {
 			"Main": [
 				{
-					field: "Name",
-					title: "Name",
-					defaultValue: "",
-					unique: true,
-					type: "string",
-					width: '150px'
+					"field": "Name",
+					"title": "Name",
+					"defaultValue": "",
+					"unique": true,
+					"type": "string",
+					"width": '150px',
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}
 				},
 				{
-					field: "City",
-					defaultValue: "",
-					type: "string",
-					width: '120px'
+					"field": "City",
+					"title": "City",
+					"defaultValue": "",
+					"type": "string",
+					"width": '120px',
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}					
 				},
 				{
-					field: "Street",
-					defaultValue: "",
-					type: "string",
-					width: '200px'
+					"field": "Street",
+					"title": "Street",
+					"defaultValue": "",
+					"type": "string",
+					"width": '200px',
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}					
 				},
 				{
-					field: "State",
-					defaultValue: "",
-					type: "string"
+					"field": "State",
+					"title": "State",
+					"defaultValue": "",
+					"type": "string",
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}					
 				},
 				{
-					field: "Zip",
-					title: "Zip",
-					defaultValue: "",
-					type: "string"
+					"field": "Zip",
+					"title": "Zip",
+					"defaultValue": "",
+					"type": "string",
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}					
 				},
 				{
-					field: "Notes",
-					defaultValue: "",
-					type: "string",
-					width: '200px'
-				}
+					"field": "Notes",
+					"title": "Notes",
+					"defaultValue": "",
+					"type": "string",
+					"width": '200px',
+					"editType": {
+						"format": "Note",
+						"maxLength": 255
+					}					
+				},
 			],
 			"User Defined": [],
 			"User Defined Group": [],

@@ -21,6 +21,8 @@
 
 		self.endpoint = tf.DataTypeHelper.getEndpoint(self.type);
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+
+		// self.gridMap = new TF.Grid.GridMap(self);
 	}
 
     LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -103,6 +105,38 @@
 	LocationPage.prototype.mapIconClick = function()
 	{
 		console.log("Map Icon Clicked");
+
+		var self = this, selectedId;
+		const isReadOnly = !self.selectedItemEditable();
+		const gridType = self.type;
+
+		var selectedIds = self.searchGrid.getSelectedIds();
+		if (!selectedIds || selectedIds.length <= 0)
+		{
+			return;
+		}
+		selectedId = selectedIds[0];
+		selectedIds.length > 1 && self.searchGrid.getSelectedIds([selectedId]);
+		
+		if (self.obShowSplitmap())
+		{
+			tf.pageManager.resizablePage.closeRightPage();
+		}
+		else
+		{
+			var pageData = new TF.Page.MapCanvasPage(null,  Math.random().toString(36).substring(7));
+	
+			if (TF.isMobileDevice)
+			{
+				tf.pageManager.resizablePage.setLeftPage("workspace/page/RoutingMap/mapcanvaspage", pageData);
+			}
+			else
+			{
+				tf.pageManager.resizablePage.setRightPage("workspace/page/RoutingMap/mapcanvaspage", pageData);
+			}
+		}
+
+		this.obShowSplitmap(true);
 	}
 
 	LocationPage.prototype.globalReplaceClick = function(viewModel, e)

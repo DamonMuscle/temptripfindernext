@@ -1792,6 +1792,71 @@
 		});
 	};
 
+	BaseGridPage.prototype._globalReplaceConfirm = function(recordIds)
+	{
+		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to mass update {0} {1}? These changes are permanent.', recordIds.length, recordIds.length == 1 ? 'record' : 'records'), "Confirmation Message");
+	};
+
+	BaseGridPage.prototype._globalReplace = function(recordIds, settings)
+	{
+		let self = this,
+			data,
+			paramData = { "@isMassUpdate": true },
+			newValue = settings.newValue,
+			relationshipKey = settings.relationshipKey,
+			enableNull = settings.editType ? settings.editType.allowNullValue : false;
+		if (settings.editType && settings.editType.format == "DropDown")
+		{
+			enableNull = self.type === 'trip' && settings.targetField === 'DriverId';
+		}
+
+		if (relationshipKey)
+		{
+			paramData["@relationships"] = relationshipKey;
+			const specialRelationshipKeys = ['DisabilityCode', 'EthnicCode', 'TripAlias', 'StaffType', 'Grade', 'Gender'];
+			newValue = specialRelationshipKeys.indexOf(relationshipKey) >= 0 ? newValue : JSON.stringify(newValue);
+		}
+		else if (!enableNull && newValue == null && settings.type != "Number")
+		{
+			newValue = "";
+		}
+
+		data = {
+			Ids: recordIds,
+			TargetField: settings.targetField,
+			TargetUdfId: settings.targetUdfId,
+			SourceField: settings.sourceField,
+			SourceUdfId: settings.sourceUdfId,
+			Value: newValue,
+			DataType: tf.dataTypeHelper.getId(self.type),
+			DBID: tf.datasourceManager.databaseId
+		};
+
+		if (settings.needConversion)
+		{
+			data.NeedConversion = settings.needConversion;
+			data.IsMultiply = settings.isMultiply;
+			data.ConversionParameter = settings.conversionParameter;
+		}
+
+		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint(self.searchGrid._gridType)), {
+			paramData: paramData,
+			data: data,
+		}).then(function(result)
+		{
+			if (result && result.Items && result.Items[0])
+			{
+				self.refreshAfterGlobalReplace();
+				tf.modalManager.showModal(new TF.Modal.Grid.GlobalReplaceResultsModalViewModel(result.Items[0], self.searchGrid._gridType));
+			}
+		});
+	};
+
+	BaseGridPage.prototype.refreshAfterGlobalReplace = function()
+	{
+		this.searchGrid.refresh();
+	}	
+
 
 	BaseGridPage.prototype.dispose = function()
 	{

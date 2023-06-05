@@ -892,9 +892,16 @@
 	{
 		var dataPoint = this.getDataPointByIdentifierAndGrid(field, type, true);
 
-		return dataPoint && dataPoint.editType && (typeof dataPoint.editType.allowEdit !== 'function' || dataPoint.editType.allowEdit())
+		return dataPoint && dataPoint.editType && this.editableThroughEditType(dataPoint.editType);
 	};
 
+	DetailViewHelper.prototype.editableThroughEditType = function(editType, recordEntity)
+	{
+		return editType.allowEdit == null
+			|| (typeof editType.allowEdit == 'boolean' && editType.allowEdit)
+			|| (typeof editType.allowEdit == 'function' && editType.allowEdit(recordEntity));
+	};
+	
 	DetailViewHelper.prototype.validateRequiredFields = function(layoutObj, gridType)
 	{
 		var self = this,
