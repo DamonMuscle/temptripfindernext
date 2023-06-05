@@ -113,7 +113,7 @@
 				},
 				template: function(item)
 				{
-					if (item.Geocoded == '1')
+					if (item.Geocoded == 'true')
 						return "<div class='icon-inner icon-geocoded'></div>";
 					else
 						return "<div></div>";
