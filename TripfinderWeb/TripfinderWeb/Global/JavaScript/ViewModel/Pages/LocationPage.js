@@ -149,14 +149,55 @@
 		tf.contextMenuManager.showMenu(e.target, new TF.ContextMenu.TemplateContextMenu("workspace/grid/GeoCodingMenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid)));
 	}
 
-	LocationPage.prototype.geocodedClick = function(searchGrid)
+	LocationPage.prototype.geocodeClick = function(gridMenuViewModel)
 	{
-		console.log("Geocoded Clicked",searchGrid);
+		const self = gridMenuViewModel.gridViewModel, selectedRecords = gridMenuViewModel.searchGrid.getSelectedRecords();
+		if (selectedRecords && selectedRecords.length === 1)
+		{
+			const record = selectedRecords[0];
+			if (record.Street)
+			{
+				const address = {
+					Street: record.Street,
+					City: record.City || '',
+					State: record.State || '',
+					Zone: record.Zip || ''
+				};
+				const analysis = TF.GIS.Analysis.getInstance();
+				analysis.geocodeService.addressToLocations(address).then((result) => {
+					const location = {
+						x: result.location.x,
+						y: result.location.y,
+						score: result.score
+					};
+
+					record.XCoord = +location.x.toFixed(6);
+					record.YCoord = +location.y.toFixed(6);
+					record.GeocodeScore = +location.score.toFixed(2);
+					record.Geocoded = true;
+					self.updateRecords([record], "Geocode success.");
+
+				}).catch((error) => {
+					console.log(error);
+				});
+			}
+		}
 	}
 
-	LocationPage.prototype.ungeocodedClick = function(searchGrid)
+	LocationPage.prototype.ungeocodeClick = function(gridMenuViewModel)
 	{
-		console.log("Ungeocoded Clicked", searchGrid);
+		const self = gridMenuViewModel.gridViewModel, selectedRecords = gridMenuViewModel.searchGrid.getSelectedRecords();
+		if (selectedRecords && selectedRecords.length > 0)
+		{
+			selectedRecords.forEach(item => {
+				item.XCoord = null;
+				item.YCoord = null;
+				item.GeocodeScore = null;
+				item.Geocoded = false;
+			});
+
+			self.updateRecords(selectedRecords, "Ungeocode success.");
+		}
 	}
 
 	LocationPage.prototype.newCopyClick = function()
@@ -171,5 +212,20 @@
 		
 		self.unBindEvent(".iconbutton.copy"); // unbind the default copy event from BaseGridPage
 		self.bindEvent(".iconbutton.copy", self.newCopyClick.bind(self));
+	}
+
+	LocationPage.prototype.updateRecords = function(records, successMessage)
+	{
+		const self = this;
+		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), self.endpoint),
+			{
+				data: records,
+				paramData: { '@relationships': 'udf' }
+			})
+			.then(() =>
+			{
+				successMessage && self.pageLevelViewModel.popupSuccessMessage(successMessage);
+				self.searchGrid.refreshClick();
+			});
 	}
 })();

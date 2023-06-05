@@ -7,12 +7,12 @@
 	{
 	}
 
-	GeoCodingMenu.prototype.geocodedClick = function(searchGrid)
+	GeoCodingMenu.prototype.geocodeClick = function(searchGrid)
 	{
 		searchGrid.gridViewModel.geocode();
 	}
 
-	GeoCodingMenu.prototype.ungeocodedClick = function(searchGrid)
+	GeoCodingMenu.prototype.ungeocodeClick = function(searchGrid)
 	{
 		searchGrid.gridViewModel.ungeocode();
 	}
