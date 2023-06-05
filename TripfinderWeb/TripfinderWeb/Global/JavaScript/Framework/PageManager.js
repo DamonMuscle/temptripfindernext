@@ -742,10 +742,14 @@
 				return "Student";
 			case "school":
 				return "School";
+			case "contact":
+				return "Contact";
 			case "district":
 				return "District";
 			case "contractor":
 				return "Contractor";
+			case "document":
+				return "Document";
 			case "vehicle":
 				return "Vehicle";
 			case "staff":
@@ -754,16 +758,32 @@
 				return "Alternate Site";
 			case "trip":
 				return "Trip";
+			case "route":
+				return "Route";
 			case "tripstop":
 				return "Trip Stop";
 			case "fieldtrip":
 				return "Field Trip";
+			case "gpsevent":
+				return "GPS Event"
 			case "georegion":
 				return "Geo Region";
+			case "form":
+				return "Form Result";
+			case "forms":
+				return "Forms";
+			case "mergeDocumentsSent":
+				return "Sent Merge";
+			case "scheduledReportsSent":
+				return "Sent Reports";
 			case "busfinderhistorical":
 				return 'Busfinder Historical';
 			case "report":
-				return "Report"
+				return "Report";
+			case "fieldtripinvoice":
+				return "Field Trip Invoice";
+			case "fieldtriplocation":
+				return "Field Trip Location";
 		}
 		return "";
 	}

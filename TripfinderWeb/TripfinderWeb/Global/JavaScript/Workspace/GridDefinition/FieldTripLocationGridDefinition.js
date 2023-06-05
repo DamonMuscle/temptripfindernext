@@ -117,6 +117,10 @@
 						return "<div class='icon-inner icon-geocoded'></div>";
 					else
 						return "<div></div>";
+				},
+				formatCopyValue: function(value)
+				{
+					return value ? "True": "False";
 				}
 			},
 		];

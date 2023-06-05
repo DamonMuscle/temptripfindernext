@@ -1032,19 +1032,16 @@
 	const SUPPORTED_OPENIN_PRODUCTS = {
 		"Viewfinder": {
 			generateUrl: (url) => url.replace(/http:\/\/.*\//, location.origin + "/") + "/#/nw",
+			excludeGridTypes: ['fieldtriplocation']
 		},
 		"Routefinder Plus": {
 			generateUrl: (url) => url.replace(/http:\/\/.*\//, location.origin + "/") + "/en-US/html/#/nw",
+			excludeGridTypes: ['fieldtriplocation']
 		},
-		// "Stopfinder Admin": {
-		// 	supportedGridTypes: ["contact", "student", "trip", "tripstop"],
-		// 	securedAppName: "ent"
-		// },
-		// "Tripfinder": {
-		// 	supportedGridTypes: ["fieldtrip"]
-		// }
+		"Tripfinder": {
+		}
 	};
-	const basicGenerateUrl = (url) => url = (url.charAt(url.length - 1) === "/") ? url + "#/nw" : url + "/#/nw";;
+	const basicGenerateUrl = (url) => url = (url.charAt(url.length - 1) === "/") ? url + "#/nw" : url + "/#/nw";
 
 	/**
 	 * Get supported products for "Open In".
@@ -1075,7 +1072,8 @@
 					&& !(excludeCurrent && p.Name === currentProductName)
 					&& (!requireLicense || authorizedAppNames.includes(p.Name)
 						|| tf.authManager.authorizationInfo.authorizationTree.applications.includes(supportInfo.securedAppName))
-					&& (!Array.isArray(supportInfo.supportedGridTypes) || supportInfo.supportedGridTypes.includes(gridType));
+					&& (!Array.isArray(supportInfo.supportedGridTypes) || supportInfo.supportedGridTypes.includes(gridType))
+					&& (!Array.isArray(supportInfo.excludeGridTypes) || !supportInfo.excludeGridTypes.includes(gridType));
 			}).sort((a, b) =>
 			{
 				// ensure current product is on top
