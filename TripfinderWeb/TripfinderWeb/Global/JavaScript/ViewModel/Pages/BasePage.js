@@ -261,7 +261,7 @@
 		{
 			TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(grid).then(function(ids)
 			{
-				resolve(ids.includes(recordId));
+				resolve(ids && ids.includes(recordId));
 			});
 		});
 		return promise;
