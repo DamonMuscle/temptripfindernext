@@ -662,7 +662,7 @@
 		elementList.forEach(function(item)
 		{
 			var content = $(item).find(".grid-stack-item-content");
-			self.fieldEditorHelper.initFieldEditor(item, content, "validate", false);
+			self.fieldEditorHelper.initFieldEditor(null, item, content, "validate", false);
 		});
 	};
 
