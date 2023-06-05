@@ -780,7 +780,7 @@
 						&& (ignoreList[self.gridType] == null || (ignoreList[self.gridType] && ignoreList[self.gridType].indexOf(item.field.toLowerCase()) === -1)))
 					{
 						var fieldName = item.editType.entityKey || item.field;
-						if (requiredFields.indexOf(fieldName) > -1)
+						if (requiredFields && requiredFields.indexOf(fieldName) > -1)
 						{
 							item.editType.validators = item.editType.validators || {};
 							item.editType.validators["notEmpty"] = { message: 'required' };
