@@ -1146,7 +1146,7 @@
 			{
 				if (!gridLink)
 				{
-					tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id. You will be directed to welcome page for now.");
+					tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id.");
 					return;
 				}
 

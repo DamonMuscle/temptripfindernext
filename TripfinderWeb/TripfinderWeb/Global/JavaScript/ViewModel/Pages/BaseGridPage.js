@@ -565,10 +565,10 @@
 			};
 		}
 
-		let additionalInfo = null;
+		let additionalInfo = { pageType: self.pageType };
 		if (self.type === 'gpsevent')
 		{
-			additionalInfo = {
+			additionalInfo = $.extend(additionalInfo, {
 				dayOfTheWeek: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.dayOfTheWeek`),
 				startDate: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.startDate`),
 				startTime: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.startTime`),
@@ -576,7 +576,7 @@
 				endTime: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.endTime`),
 				gpsEventTypeList: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.gpseventtypelist`),
 				vehicleList: tf.userPreferenceManager.get(`${tf.storageManager.prefix}dashboard.viewie.gpsevent.listFilterWithSelectDateTimeRange.vehiclelist`),
-			}
+			});
 		}
 
 		TF.Helper.KendoGridHelper.createShareURL(self.type, selectedIds, layoutColumns, product, thematicSetting, additionalInfo)
@@ -614,6 +614,24 @@
 		const copyLinkSuccessMsg = "Link copied to clipboard.";
 		this.pageLevelViewModel.popupSuccessMessage(copyLinkSuccessMsg);
 	};
+
+	// Copy method polyfill
+	BaseGridPage.prototype.copyText = function(content)
+	{
+		if (window.navigator.clipboard)
+		{
+			window.navigator.clipboard.writeText(content);
+		}
+		else
+		{
+			var el = document.createElement('textarea');
+			el.value = content;
+			document.body.appendChild(el);
+			el.select();
+			document.execCommand('copy');
+			document.body.removeChild(el);
+		}
+	}
 
 	BaseGridPage.prototype._openBulkMenu = function()
 	{

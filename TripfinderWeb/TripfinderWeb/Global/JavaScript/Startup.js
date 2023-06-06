@@ -272,6 +272,7 @@
 	Startup.prototype.start = function()
 	{
 		var self = this;
+		const urlParams = TF.URLHelper.parseUrlParam(location.href);
 		const startupIndicatorName = "startup";
 		self.libraryInitialization().then(function()
 		{
@@ -410,6 +411,24 @@
 								});
 							});
 						});
+				})
+				.then(function()
+				{
+					if (urlParams && urlParams.GridLinkGuid)
+					{
+						return tf.helpers.gridLinkHelper.getGridLink(urlParams.GridLinkGuid)
+						.then(gridLink =>
+						{
+							if (!gridLink)
+							{
+								tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id.");
+							}
+							else if (gridLink.isAuthorized)
+							{
+								tf.datasourceManager.setDataBaseId(gridLink.DBID);
+							}
+						});
+					}
 				})
 					.then(function()
 					{
@@ -568,7 +587,7 @@
 
 										if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
 										{
-											var pageType = getParameterByName("pagetype");
+											const pageType = getParameterByName("pagetype");
 											if (pageType)
 											{
 												tf.pageManager.openNewPage(pageType, null, true, true);
@@ -595,9 +614,42 @@
 
 										if (tf.urlParm)
 										{
-											if (tf.urlParm.tripid)
+											if (tf.urlParm.GridLinkGuid)
 											{
-												var pageOptions = {	// FT-1231 - setup some special flags for open a certain trip record on-demand
+												TF.Helper.KendoGridHelper.loadGridLink(tf.urlParm.GridLinkGuid)
+												.then(gridData =>
+												{
+													if (!gridData)
+													{
+														return;
+													}
+													var loadDataFromGridLink = true;
+													const pageOptions = {
+														filtertedIds: gridData.filteredIds,
+														predefinedGridData: gridData
+													}
+
+													let pageType = "fieldtrips";
+													if (gridData.additionalInfo)
+													{
+														try
+														{
+															const additionalInfo = JSON.parse(gridData.additionalInfo);
+															pageType = additionalInfo?.pageType || "fieldtrips";
+														}
+														catch
+														{
+															// do nothing
+														}
+													}
+
+													tf.pageManager.openNewPage(pageType, null, true);
+												});
+												return;
+											}
+											else if (tf.urlParm.tripid)
+											{
+												const pageOptions = {	// FT-1231 - setup some special flags for open a certain trip record on-demand
 													filteredIds: [tf.urlParm.tripid],
 													isTemporaryFilter: true,
 													showRecordDetails: true
@@ -871,6 +923,10 @@
 		var parmResult = new Object;
 		var start = parm.indexOf("?") != -1 ? parm.indexOf("?") + 1 : parm.length;
 		var end = parm.indexOf("#") != -1 ? parm.indexOf("#") : parm.length;
+		if (end < start) // like http://devlocal.transfinder.com/tripfinder/#/nw?GridLinkGuid=91228677-04ba-4404-a475-3e2802005a66
+		{
+			end = parm.length;
+		}
 		parm = parm.substring(start, end);
 		var parmArray = parm.split("&");
 		for (var i = 0; i < parmArray.length; i++)

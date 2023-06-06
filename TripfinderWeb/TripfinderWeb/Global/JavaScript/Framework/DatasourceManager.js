@@ -85,6 +85,17 @@
 			})
 	};
 
+	DatasourceManager.prototype.verifyDatabase = function(databaseId)
+	{
+		return tf.promiseAjax.get(
+			pathCombine(tf.api.apiPrefixWithoutDatabase(), "DatabaseVerifications"),
+			{
+				paramData: {
+					dbid: databaseId
+				}
+			}).then(result => result && result.Items && result.Items[0] && result.Items[0].AnyDatabasePass);
+	};
+
 	DatasourceManager.prototype.validateAllDBs = function(auth)
 	{
 		var p;
