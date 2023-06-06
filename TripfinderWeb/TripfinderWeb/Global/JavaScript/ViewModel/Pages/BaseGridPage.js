@@ -1173,9 +1173,7 @@
 
 			self.obShowFieldTripDEPanel(true);
 		}
-		else if(self.type == 'vehicle' ||
-			self.type == 'contact' ||
-			self.type == 'staff') //might check other types including Staff and Contact
+		else
 		{
 			ga('send', 'event', 'Area', 'Details');
 			var isReadOnly = !self.selectedItemEditable() && !self.obNewRequest(); // readonly if both Edit and Add are not allowed

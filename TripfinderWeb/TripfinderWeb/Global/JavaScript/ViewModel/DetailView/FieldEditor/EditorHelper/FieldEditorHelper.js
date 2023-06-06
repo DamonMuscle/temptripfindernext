@@ -1367,7 +1367,7 @@
 					endpoint = tf.dataTypeHelper.getEndpoint(gridType);
 
 				// Include UDF in relationship if needed.
-				if (recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") === -1)
+				if (recordEntity.UserDefinedFields && recordEntity.UserDefinedFields.length > 0 && relationships.indexOf("UDF") === -1)
 				{
 					relationships.push("UDF");
 				}

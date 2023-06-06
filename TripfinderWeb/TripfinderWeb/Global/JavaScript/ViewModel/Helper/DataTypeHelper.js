@@ -856,6 +856,9 @@
 			case "dashboard":
 				dataModel = new TF.DataModel.CustomizedDashboardDataModel();
 				break;
+			case "fieldtriplocation":
+				dataModel = new TF.DataModel.FieldTripDestinationDataModel();
+				break;
 		}
 
 		return dataModel;
