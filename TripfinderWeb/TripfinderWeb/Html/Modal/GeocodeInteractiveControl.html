@@ -1,0 +1,99 @@
+<div class="geocode-interactive" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-24">
+			<div class="line"><span data-bind="text:previousCount"></span> <span
+					data-bind="text:previousCount()==1?'record':'records'"></span> <span
+					data-bind="text:previousCount()==1?'was':'were'"></span> previously geocoded</div>
+			<div class="line"><span data-bind="text:successCount"></span> <span
+					data-bind="text:successCount()==1?'record':'records'"></span> <span
+					data-bind="text:successCount()==1?'was':'were'"></span> successfully matched</div>
+			<div class="line"><span data-bind="text:failCount"></span> <span
+					data-bind="text:failCount()==1?'record':'records'"></span> could not be matched</div>
+		</div>
+	</div>
+	<div class="box">
+		<div class="row line">
+			<div class="col-xs-4">
+				<div>Street:</div>
+			</div>
+			<div class="col-xs-20">
+				<span data-bind="text:obGeoStreet"></span>
+			</div>
+		</div>
+		<div class="row line">
+			<div class="col-xs-4">
+				<div>City/Town:</div>
+			</div>
+			<div class="col-xs-20">
+				<span data-bind="text:obGeoCity"></span>
+			</div>
+		</div>
+		<div class="row line">
+			<div class="col-xs-4">
+				<div>County:</div>
+			</div>
+			<div class="col-xs-20">
+				<span data-bind="text:obGeoCounty"></span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div>Postal Code:</div>
+			</div>
+			<div class="col-xs-20">
+				<span data-bind="text:obGeoZip"></span>
+			</div>
+		</div>
+	</div>
+	<h4 class="section-title"><strong>Details</strong></h4>
+	<div class="form-group row">
+		<label class="col-xs-3 control-label">Status:</label>
+		<div class="col-xs-11">
+			<input type="text" class="form-control" readonly data-bind="value:findResult().status" />
+		</div>
+		<label class="col-xs-3 control-label">Latitude:</label>
+		<div class="col-xs-7">
+			<input type="text" class="form-control" readonly data-bind="value:findResult().latitude" />
+		</div>
+	</div>
+	<div class="form-group row">
+		<label class="col-xs-3 control-label">Match:</label>
+		<div class="col-xs-11">
+			<input type="text" class="form-control" readonly data-bind="value:findResult().match" />
+		</div>
+		<label class="col-xs-3 control-label">Longitude:</label>
+		<div class="col-xs-7">
+			<input type="text" class="form-control" readonly data-bind="value:findResult().longitude" />
+		</div>
+	</div>
+	<div class="form-group row">
+		<label class="col-xs-3 control-label">Notes:</label>
+		<div class="col-xs-21">
+			<textarea class="form-control verticalResize" style="height: 100px;resize: none;" readonly
+				data-bind="value:findResult().notes">
+			</textarea>
+		</div>
+	</div>
+	<div class="form-group row">
+		<label class="col-xs-3 control-label"><span data-bind="text:currentRecordIndex()+1"></span> of <span
+				data-bind="text:records.length"></span></label>
+	</div>
+</div>
+<div class="modal-footer" style="margin:0 -15px -15px -15px;">
+	<button type="button" data-bind="click : acceptClick" class="btn tf-btn-black btn-sm positive">
+		<p>Accept</p>
+	</button>
+	<button type="button" data-bind="click : skipClick" class="btn tf-btn-black btn-sm positive">
+		<p>Skip</p>
+	</button>
+	<button type="button" data-bind="click : retryClick" class="btn tf-btn-black btn-sm positive">
+		<p>Retry</p>
+	</button>
+	<button type="button" data-bind="click : finishClick" class="btn tf-btn-black btn-sm positive">
+		<p>Finish</p>
+	</button>
+	<button type="button" data-bind="click : modalViewModel.negativeClick.bind(modalViewModel)"
+		class="btn btn-link btn-sm negative">
+		<p>Close</p>
+	</button>
+</div>

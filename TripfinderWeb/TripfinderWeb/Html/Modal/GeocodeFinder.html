@@ -1,0 +1,58 @@
+<div class="row geocode-finder-modal full-height" data-bind="uiInit:init">
+	<div class="col-xs-24 full-height">
+		<div class="col-xs-10 full-height">
+			<div class="col-xs-24">
+				<div class="form-group small-form-group">
+					<label>Geocode Source</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obGeocodeSources,selectedValue:obSelectedGeocodeSource,notSort:true,drowDownShow:true}">
+							<input type="text" readonly="" style="background:white" class="form-control"
+								data-bind="value:obSelectedGeocodeSource">
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-24">
+				<div class="form-group small-form-group">
+					<label>Street</label>
+					<div class="input-group">
+						<input type="text" class="form-control" data-bind="value:obGeoStreet,valueUpdate:'input',event:{change:reFindAddress}">
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp" data-bind="click:btnSearchClick">
+								<span class="glyphicon glyphicon-search"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-24">
+				<div class="form-group small-form-group">
+					<label>City</label>
+					<input type="text" class="form-control" data-bind="value:obGeoCity,valueUpdate:'input',event:{change:reFindAddress}">
+				</div>
+			</div>
+			<div class="col-xs-24">
+				<div class="form-group small-form-group">
+					<label>Postal Code</label>
+					<input type="text" class="form-control" data-bind="value:obGeoZip,valueUpdate:'input',event:{change:reFindAddress}">
+				</div>
+			</div>
+			<div class="col-xs-24 selects-container">
+				<div class="form-group small-form-group full-height">
+					<select size="10" class="selects form-control" data-bind="options: addressCandidates,  optionsText: 'address', value: obSelectedAddress">
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-13 full-height">
+			<div class="doc full-height">
+				<div class="map full-height"></div>
+			</div>
+		</div>
+	</div>
+</div>

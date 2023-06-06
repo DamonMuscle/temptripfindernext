@@ -23,6 +23,10 @@
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 
 		// self.gridMap = new TF.Grid.GridMap(self);
+
+		this.geocodeTool = new TF.Grid.GeocodeTool(this);
+		this.geocodingSelectionClick = this.geocodeTool.geocodingSelectionClick.bind(this.geocodeTool);
+		// this.geocodingClick = this.geocodeTool.geocodingClick.bind(this.geocodeTool);
 	}
 
     LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
