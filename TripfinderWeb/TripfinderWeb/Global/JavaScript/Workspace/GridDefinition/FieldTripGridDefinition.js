@@ -72,6 +72,13 @@
 					type: "number"
 				},
 				{
+					FieldName: "FieldTripStageID",
+					Width: '150px',
+					type: "string",
+					hidden: true,
+					onlyForFilter: true
+				},
+				{
 					FieldName: "FieldTripStageName",
 					DisplayName: "Status",
 					Width: '250px',
