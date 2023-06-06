@@ -20,46 +20,11 @@
 		self._$container = $container;
 		self._target = $target;
 
-		if (!TF.isPhoneDevice)
-		{
-			self._mouseover = function()
-			{
-				if (self._timer)
-				{
-					clearTimeout(self._timer);
-				}
-				$(document).unbind("mousemove", self._mouseout);
-			};
-
-			self._mouseout = function()
-			{
-				if (self._timer)
-				{
-					clearTimeout(self._timer);
-				}
-				//NOTE: context menu close
-				self._timer = setTimeout(function()
-				{
-					self.dispose();
-				}, 300);
-			};
-		}
-
 		var contextMenuClose = function()
 		{
 			self.dispose();
 		};
-		if (self._target.prop("className").split(" ").includes('iconbutton'))
-		{
-			self._target.on("mouseover", self._mouseover);
-			self._target.on("mouseout", self._mouseout);
-		}
-		else
-		{
-			$(document).on("mousemove", self._mouseout);
-		}
-		self._$container.on("mouseover", self._mouseover);
-		self._$container.on("mouseout", self._mouseout);
+
 		self._$container.on("contextMenuClose", contextMenuClose);
 
 		if (this.isElementTarget($target[0]))
@@ -123,6 +88,21 @@
 				});
 		}
 		$container.appendTo($wrapper);
+
+		$("body").on("mousemove.contextmenu", function(e)
+		{
+			var target = $(e.target);
+			clearTimeout(self._timer);
+			if (target.closest($container).length == 0 && target.closest($target).length == 0 && target.closest('.mobile-alert').length === 0)
+			{
+				self._timer = setTimeout(function()
+				{
+					self.dispose();
+
+				}, 100); // original 300ms might cause menu stuck if user moves very fast. Decrease to 100ms to prevent this issue.
+			}
+		});
+
 		return $container;
 	};
 
