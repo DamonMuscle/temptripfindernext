@@ -123,7 +123,7 @@
 	PromiseBootbox.prototype.dialog = function(arg, layerLevel)
 	{
 		// disable arcgis identity manager click hook
-		tf.map.ArcGIS.IdentityManager.dialog?._focusTrap?.pause();
+		tf.map?.ArcGIS?.IdentityManager?.dialog?._focusTrap?.pause();
 
 		var self = this;
 		if (arg.message != null && $.type(arg.message) === "string")
