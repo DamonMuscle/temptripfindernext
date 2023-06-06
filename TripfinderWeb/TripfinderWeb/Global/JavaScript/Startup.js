@@ -419,11 +419,7 @@
 						return tf.helpers.gridLinkHelper.getGridLink(urlParams.GridLinkGuid)
 						.then(gridLink =>
 						{
-							if (!gridLink)
-							{
-								tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id.");
-							}
-							else if (gridLink.isAuthorized)
+							if (gridLink && gridLink.isAuthorized)
 							{
 								tf.datasourceManager.setDataBaseId(gridLink.DBID);
 							}
@@ -583,6 +579,16 @@
 
 									tf.pageManager.resizablePage.onLoaded.subscribe(function()
 									{
+										const openDefaultPage = (firstLoad) => {
+											const pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
+											if (!pageName || pageName === "settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
+											{
+												pageName = "fieldtrips";
+											}
+
+											tf.pageManager.openNewPage(pageName, null, firstLoad);
+										};
+
 										tf.pageManager.resizablePage.onLoaded.unsubscribeAll();
 
 										if (window.opener && window.name.indexOf("new-pageWindow") >= 0)
@@ -617,33 +623,17 @@
 											if (tf.urlParm.GridLinkGuid)
 											{
 												TF.Helper.KendoGridHelper.loadGridLink(tf.urlParm.GridLinkGuid)
-												.then(gridData =>
-												{
-													if (!gridData)
+												.then((gridLinkData) => {
+													if (!gridLinkData)
 													{
+														openDefaultPage(false);
 														return;
 													}
-													var loadDataFromGridLink = true;
+
 													const pageOptions = {
-														filtertedIds: gridData.filteredIds,
-														predefinedGridData: gridData
+														predefinedGridData: gridLinkData
 													}
-
-													let pageType = "fieldtrips";
-													if (gridData.additionalInfo)
-													{
-														try
-														{
-															const additionalInfo = JSON.parse(gridData.additionalInfo);
-															pageType = additionalInfo?.pageType || "fieldtrips";
-														}
-														catch
-														{
-															// do nothing
-														}
-													}
-
-													tf.pageManager.openNewPage(pageType, null, true);
+													tf.pageManager.openNewPage(gridLinkData.pageType, pageOptions, false, true);
 												});
 												return;
 											}
@@ -672,13 +662,7 @@
 											}
 										}
 
-										var pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
-										if (!pageName || pageName === "settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
-										{
-											pageName = "fieldtrips";
-										}
-
-										tf.pageManager.openNewPage(pageName, null, true);
+										openDefaultPage(true);
 									});
 									self.changeStaffType();
 									self._initClosePageConfirm();

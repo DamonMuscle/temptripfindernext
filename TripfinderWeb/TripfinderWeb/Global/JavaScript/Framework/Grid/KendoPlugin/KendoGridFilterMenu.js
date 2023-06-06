@@ -629,6 +629,9 @@
 				{
 					selectGridFilterEntityId = tf.girdFilterFromNewWindow;
 					delete tf.girdFilterFromNewWindow;
+				} else if (self.options.predefinedGridData && self.options.predefinedGridData.gridType == self._gridType)
+				{
+					selectGridFilterEntityId = self.options.predefinedGridData;
 				}
 				else
 				{

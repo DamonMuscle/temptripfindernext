@@ -1139,93 +1139,110 @@
 
 	KendoGridHelper.loadGridLink = function (guid)
 	{
-		if (!guid) { return; }
+		if (!guid) { return Promise.resolve(null); }
 
 		return tf.helpers.gridLinkHelper.getGridLink(guid)
-			.then((gridLink) =>
+		.then((gridLink) =>
+		{
+			if (!gridLink)
 			{
-				if (!gridLink)
+				tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id.");
+				return;
+			}
+
+			if (!gridLink.isAuthorized)
+			{
+				const noPermissionWarningMsg = "You don't have permissions for this URL link.";
+				tf.promiseBootbox.alert(noPermissionWarningMsg);
+				return;
+			}
+
+			const switchDatasourceConfirmMsg = "The URL leads to a different data source, switching data source would cause opened tabs closed. Are you sure you want to continue?";
+			let loadDatasourceTask = gridLink.DBID === tf.datasourceManager.databaseId
+				? Promise.resolve(true) :
+				tf.promiseBootbox.confirm(
 				{
-					tf.promiseBootbox.alert("This GridLink is invalid. Please contact with the sharer to login with correct client id.");
-					return;
-				}
-
-				if (!gridLink.isAuthorized)
+					message: switchDatasourceConfirmMsg,
+					title: "Confirmation Message"
+				})
+				.then((result) =>
 				{
-					const noPermissionWarningMsg = "You don't have permissions for this URL link.";
-					tf.promiseBootbox.alert(noPermissionWarningMsg);
-					return;
-				}
-
-				const switchDatasourceConfirmMsg = "The URL leads to a different data source, switching data source would cause opened tabs closed. Are you sure you want to continue?";
-				let loadDatasourceTask = gridLink.DBID === tf.datasourceManager.databaseId
-					? Promise.resolve(true) :
-					tf.promiseBootbox.confirm(
-						{
-							message: switchDatasourceConfirmMsg,
-							title: "Confirmation Message"
-						})
-						.then((result) =>
-						{
-							if (!result)
-							{
-								return false;
-							}
-
-							return tf.datasourceManager.findDatabaseById(gridLink.DBID)
-								.then(targetDB =>
-								{
-									if (!targetDB) { return false; }
-
-									return tf.datasourceManager.choose(targetDB, true)
-										.then(() => true);
-								});
-
-						});
-
-				return loadDatasourceTask
-					.then((shouldProceed) =>
+					if (!result)
 					{
-						if (!shouldProceed) { return; }
+						return false;
+					}
 
-						const { DataTypeId, Ids, Layout, ThematicSetting, AdditionalInfo } = gridLink;
+					return tf.datasourceManager.findDatabaseById(gridLink.DBID)
+					.then(targetDB =>
+					{
+						if (!targetDB) { return false; }
 
-						let layoutColumns = null;
-						const gridType = tf.dataTypeHelper.getKeyById(DataTypeId);
-						const filterName = `${tf.dataTypeHelper.getFormalDataTypeName(gridType)} (Selected Records)`;
-
-						let thematicSetting = null
-						if (ThematicSetting)
-						{
-							const { customDisplaySetting, quickFilters } = JSON.parse(ThematicSetting);
-							thematicSetting = {
-								CustomDisplaySetting: JSON.stringify(customDisplaySetting),
-								QuickFilters: JSON.stringify(quickFilters)
-							}
-						}
-
-						try
-						{
-							layoutColumns = JSON.parse(Layout);
-						}
-						catch (e)
-						{
-							layoutColumns = null;
-						}
-
-						tf.storageManager.delete(tf.storageManager.gridCurrentQuickFilter(gridType));
-						const predefinedGridData = {
-							filteredIds: Ids.split(','),
-							gridType: gridType,
-							filterName: filterName,
-							layoutColumns: layoutColumns,
-							thematicSetting: thematicSetting,
-							additionalInfo: AdditionalInfo
-						};
-
-						return predefinedGridData;
+						return tf.datasourceManager.choose(targetDB, true)
+						.then(() => true);
 					});
+				});
+
+			return loadDatasourceTask.then((shouldProceed) =>
+			{
+				if (!shouldProceed) { return; }
+
+				const { DataTypeId, Ids, Layout, ThematicSetting, AdditionalInfo } = gridLink;
+
+				let layoutColumns = null;
+				const gridType = tf.dataTypeHelper.getKeyById(DataTypeId);
+				const filterName = `${tf.dataTypeHelper.getFormalDataTypeName(gridType)} (Selected Records)`;
+
+				let thematicSetting = null
+				if (ThematicSetting)
+				{
+					const { customDisplaySetting, quickFilters } = JSON.parse(ThematicSetting);
+					thematicSetting = {
+						CustomDisplaySetting: JSON.stringify(customDisplaySetting),
+						QuickFilters: JSON.stringify(quickFilters)
+					}
+				}
+
+				try
+				{
+					layoutColumns = JSON.parse(Layout);
+				}
+				catch (e)
+				{
+					layoutColumns = null;
+				}
+
+				let pageType = null;
+				if (AdditionalInfo)
+				{
+					try
+					{
+						const additionalInfoObj = JSON.parse(AdditionalInfo);
+						pageType = additionalInfoObj?.pageType;
+					}
+					catch
+					{
+						// do nothing
+					}
+				}
+				if (!pageType)
+				{
+					const dataTypes = tf.dataTypeHelper.getAvailableDataTypes();
+					const dataType = dataTypes.find(dt => dt.key === gridType);
+					pageType = dataType ? dataType.pageType : "fieldtrips";
+				}
+
+				tf.storageManager.delete(tf.storageManager.gridCurrentQuickFilter(gridType));
+				return {
+					filteredIds: Ids.split(','),
+					gridType: gridType,
+					pageType: pageType,
+					filterName: filterName,
+					layoutColumns: layoutColumns,
+					thematicSetting: thematicSetting,
+					additionalInfo: AdditionalInfo
+				};
 			});
+		});
 	};
 	//#endregion
 

@@ -147,6 +147,22 @@
 		this.onDatabaseIdSet.notify(databaseId);
 	};
 
+	/**
+	 * Find database by DBID.
+	 *
+	 * @param {number} databaseId
+	 * @returns
+	 */
+	DatasourceManager.prototype.findDatabaseById = function(databaseId)
+	{
+		return tf.promiseAjax.get(
+			pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases"),
+			{
+				paramData: { "@filter": `eq(DBID,${databaseId})` }
+			}
+		).then(res => res && res.Items[0]);
+	};
+
 	DatasourceManager.prototype.choose = function(database, skipNotification)
 	{
 		var self = this;

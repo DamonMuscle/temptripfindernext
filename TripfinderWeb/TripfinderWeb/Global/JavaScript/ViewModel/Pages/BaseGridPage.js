@@ -80,6 +80,11 @@
 			self.updateOptions();
 		}
 
+		if (self.gridOptions?.predefinedGridData)
+		{
+			self.options.predefinedGridData = self.gridOptions.predefinedGridData;
+		}
+
 		self.setRelatedFilterData();
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
