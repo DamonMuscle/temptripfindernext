@@ -14,6 +14,7 @@
 
 		self.searchGridInited = ko.observable(false);
 		self.isGridPage = true;
+		self.supportShortcut = true;
 		self.options = {};
 		self.bulkMenu = null;
 		self.selectedRecordIds = [];
@@ -505,7 +506,7 @@
 		self.targetID = ko.observable();
 		self.searchGridInited(true);
 
-		if (!TF.isPhoneDevice && self.searchGrid && self.type == "fieldtrip" && !self.isSchedulerPage)
+		if (!TF.isPhoneDevice && self.supportShortcut && self.searchGrid && !self.isSchedulerPage)
 		{
 			self.searchGrid.onCtrlSPress.subscribe(self.onCtrlSPress.bind(self));
 			self.searchGrid.onCtrlCPress.subscribe(self.onCtrlCPress.bind(self));

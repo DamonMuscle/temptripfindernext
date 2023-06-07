@@ -8,6 +8,7 @@
 		self.type = "report";
 		self.pageType = "reports";
 		TF.Page.BaseGridPage.apply(self, arguments);
+		self.supportShortcut = false;
 		self.cancelButton = false;
 		self.detailButton = false;
 		self.schedulerButton = false;

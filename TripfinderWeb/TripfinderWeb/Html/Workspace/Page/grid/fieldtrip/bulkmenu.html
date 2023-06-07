@@ -68,7 +68,7 @@
 				<div class="rule"></div>
 			</li>
 			<!-- /ko -->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick,css:{disabled:!gridViewModel.obIsSelectRow()}">
 				<div class="menu-icon copytoclipboard">
 				</div>
 				<div class="menu-label">
@@ -76,7 +76,7 @@
 					<span class="hotkey">Ctrl + C</span>
 				</div>
 			</li>
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick">
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.saveAsClick,css:{disabled:!gridViewModel.obIsSelectRow()}">
 				<div class="menu-icon saveas">
 				</div>
 				<div class="menu-label">
