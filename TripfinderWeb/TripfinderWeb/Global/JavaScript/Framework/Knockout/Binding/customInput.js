@@ -92,6 +92,12 @@
 					bindingValue.value(value);
 				});
 			}
+
+			if (viewModel && viewModel.customInputInit)
+			{
+				viewModel.customInputInit(element);
+			}
+
 			return { controlsDescendantBindings: true };
 		},
 

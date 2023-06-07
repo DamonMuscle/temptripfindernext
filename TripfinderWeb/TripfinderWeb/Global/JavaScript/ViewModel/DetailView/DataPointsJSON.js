@@ -5154,22 +5154,20 @@
 				{
 					"field": "State",
 					"title": "State",
-					"defaultValue": "",
 					"type": "string",
 					"editType": {
 						"format": "String",
-						"maxLength": 255
-					}					
+						"maxLength": 2
+					}
 				},
 				{
 					"field": "Zip",
 					"title": "Zip",
-					"defaultValue": "",
-					"type": "string",
+					"type": "Number",
 					"editType": {
-						"format": "String",
-						"maxLength": 255
-					}					
+						"format": "Number",
+						"maxLength": 5
+					}
 				},
 				{
 					"field": "Notes",
@@ -5180,7 +5178,7 @@
 					"editType": {
 						"format": "Note",
 						"maxLength": 255
-					}					
+					}
 				},
 			],
 			"User Defined": [],
