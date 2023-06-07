@@ -307,7 +307,8 @@
 				miniGridHelper: new TF.Helper.MiniGridHelper(),
 				applicationDataHelper: new TF.Helper.ApplicationDataHelper(),
 				gridLinkHelper: new TF.Helper.GridLinkHelper(),
-				fieldTripAuthHelper: new TF.FieldTripAuthHelper()
+				fieldTripAuthHelper: new TF.FieldTripAuthHelper(),
+				genderListDataHelper: new TF.Helper.GenderListDataHelper()
 			};
 			tf.fieldTripConfigsDataHelper = new TF.Helper.FieldTripConfigsDataHelper();
 			//tf.dataTypeHelper = new TF..DataTypeHelper();

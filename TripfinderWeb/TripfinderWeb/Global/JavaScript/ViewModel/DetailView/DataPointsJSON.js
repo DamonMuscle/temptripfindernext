@@ -5267,10 +5267,7 @@
 
 	function fetchDefaultGenders()
 	{
-		return Promise.resolve([
-			{ text: "Female", value: "F" },
-			{ text: "Male", value: "M" },
-		]);
+		return tf.helpers.genderListDataHelper.getGenderDataSource(false);
 	}
 
 	function getGeoAddressInnerFields()

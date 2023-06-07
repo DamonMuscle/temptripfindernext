@@ -720,7 +720,17 @@
 
 		return tf.promiseAjax.get(requestUrl).then(function(response)
 		{
-			return response.Items[0];
+			const data = response.Items[0];
+			if (data && gridType === 'staff')
+			{
+				return tf.helpers.genderListDataHelper.getValueById(data['GenderId']).then((result) =>
+				{
+					const { Code } = result || {};
+					data['DisplayGender'] = Code;
+					return data;
+				});
+			}
+			return data;
 		});
 	};
 
