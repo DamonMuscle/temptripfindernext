@@ -31,13 +31,13 @@
 	{
 		var self = this;
 		if (evt.sourceType != "Phone") self.obSelectedGeocodeSource(evt.sourceType);
-		self.initMap($(elem).find(".map"));
-		self.initLayers();
+		self.initMap($(elem).find(".map")).then(function(){
+			self.initLayers();
+		});
 	}
 
-	GeocodeFinderViewModel.prototype.initMap = function(mapElement)
+	GeocodeFinderViewModel.prototype.initMap = async function(mapElement)
 	{
-
 		var self = this;
 		self.element = mapElement;
 		var options = {
@@ -58,34 +58,35 @@
 			}
 		};
 
-		var map = TF.Helper.MapHelper.createMap(self.element, self, options);
-		self._map = map;
-		self._mapView = map.mapView;
+		var map = await TF.GIS.MapFactory.createInstance(mapElement, {eventHandlers:{onMapViewCreated:self._onMapLoad.bind(self)}});
+		// var map = TF.Helper.MapHelper.createMap(self.element, self, options);
+		self._map = map.map;
+		self._mapView = map.map.mapView;
 
-		var baseMapId = tf.userPreferenceManager.get(options.baseMapSaveKey);
-		if (baseMapId == "white-canvas")
-		{
-			$(map.mapView.container).css("background-color", "white");
-		}
-		else if (baseMapId == "my-maps")
-		{
-			// self.onMapLoad.subscribe(() =>
-			// {
-			// 	setTimeout(() =>
-			// 	{
-			// 		self.mapLayersPaletteViewModel.show();
-			// 	}, 100);
-			// });
-		}
+		// var baseMapId = tf.userPreferenceManager.get(options.baseMapSaveKey);
+		// if (baseMapId == "white-canvas")
+		// {
+		// 	$(map.mapView.container).css("background-color", "white");
+		// }
+		// else if (baseMapId == "my-maps")
+		// {
+		// 	// self.onMapLoad.subscribe(() =>
+		// 	// {
+		// 	// 	setTimeout(() =>
+		// 	// 	{
+		// 	// 		self.mapLayersPaletteViewModel.show();
+		// 	// 	}, 100);
+		// 	// });
+		// }
 
-		var updatingEvent = map.mapView.watch('updating', function(result)
-		{
-			if (!result)
-			{
-				updatingEvent.remove();
-				self._onMapLoad();
-			}
-		});
+		// var updatingEvent = map.mapView.watch('updating', function(result)
+		// {
+		// 	if (!result)
+		// 	{
+		// 		updatingEvent.remove();
+		// 		self._onMapLoad();
+		// 	}
+		// });
 		self.sketchTool = new TF.RoutingMap.SketchTool(self._map, self);
 	}
 

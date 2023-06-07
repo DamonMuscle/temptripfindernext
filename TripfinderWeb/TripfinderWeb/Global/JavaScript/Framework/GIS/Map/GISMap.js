@@ -24,83 +24,337 @@
 		}
 	};
 
-	function Map(options)
+	let _map;
+
+	function Map($mapContainer, options)
 	{
 		this.settings = Object.assign({}, defaultOptions, options);
-		this._map = null;
 		this.eventHandler = {
 			onMapViewCreatedPromise: null,
 			onMapViewDoubleClick: null,
 			onMapViewUpdating: null,
 		};
-		this.name = `Map - ${Date.now()}`;
+
+		this.create($mapContainer);
 	}
+
+	/**
+	 * Load Esri js SDK
+	 * @returns 
+	 */
+	Map.LoadResouces = async function()
+	{
+		Map.resourcesLoadingPromise = Map.resourcesLoadingPromise || new Promise(function(resolve, reject)
+		{
+			require({}, [
+				"esri/Map",
+				"esri/Basemap",
+				"esri/views/SceneView",
+				"esri/views/MapView",
+				"esri/views/2d/mapViewDeps",
+				"esri/views/2d/layers/VectorTileLayerView2D",
+				"esri/views/2d/layers/GraphicsLayerView2D",
+				"esri/views/2d/layers/FeatureLayerView2D",
+				"esri/layers/GraphicsLayer",
+				"esri/layers/MapImageLayer",
+				"esri/Graphic",
+				"esri/geometry/SpatialReference",
+				"esri/layers/FeatureLayer",
+				"esri/request",
+				"esri/config",
+				"esri/Color",
+				"esri/symbols/Font",
+				"esri/symbols/PictureMarkerSymbol",
+				"esri/symbols/SimpleFillSymbol",
+				"esri/symbols/SimpleLineSymbol",
+				"esri/symbols/SimpleMarkerSymbol",
+				"esri/symbols/TextSymbol",
+				"esri/widgets/BasemapGallery",
+				"esri/widgets/Directions",
+				"esri/widgets/Search",
+				"esri/widgets/Search/SearchViewModel",
+				"esri/geometry/Extent",
+				"esri/geometry/Point",
+				"esri/geometry/Polygon",
+				"esri/geometry/Circle",
+				"esri/geometry/Polyline",
+				"esri/geometry/Multipoint",
+				"esri/geometry/support/webMercatorUtils",
+				"esri/views/2d/draw/Draw",
+				"esri/tasks/Geoprocessor",
+				"esri/tasks/support/FeatureSet",
+				"esri/tasks/support/DirectionsFeatureSet",
+				"esri/tasks/ServiceAreaTask",
+				"esri/tasks/support/ServiceAreaParameters",
+				"esri/tasks/support/RelationshipQuery",
+				"esri/tasks/Locator",
+				"esri/tasks/GeometryService",
+				"esri/tasks/support/ProjectParameters",
+				"esri/core/watchUtils",
+				"esri/tasks/support/Query",
+				"esri/geometry/Geometry",
+				"esri/geometry/geometryEngine",
+				"esri/widgets/Sketch/SketchViewModel",
+				"esri/core/accessorSupport/decorators",
+				"esri/core/Evented",
+				"esri/core/Accessor",
+				"esri/core/lang",
+				"esri/core/maybe",
+				"esri/identity/IdentityManager",
+				"esri/tasks/RouteTask",
+				"esri/tasks/support/RouteParameters",
+				"esri/layers/TileLayer",
+				"esri/layers/WMSLayer",
+				"esri/layers/WMTSLayer",
+				"esri/layers/VectorTileLayer",
+				"esri/layers/CSVLayer",
+				"esri/layers/KMLLayer",
+				"esri/layers/GeoRSSLayer",
+				"esri/layers/ImageryLayer",
+				"esri/tasks/QueryTask",
+				"esri/tasks/FindTask",
+				"esri/tasks/support/FindParameters",
+				"esri/views/draw/support/GraphicMover",
+				"esri/views/draw/support/drawUtils",
+				"esri/views/draw/support/input/GraphicMoverEvents",
+				"esri/views/draw/PolylineDrawAction",
+				"esri/views/draw/PolygonDrawAction",
+				"esri/widgets/Popup",
+				"esri/PopupTemplate",
+				"esri/views/2d/engine/vectorTiles/VectorTile",
+				"esri/core/workers/RemoteClient",
+				"esri/layers/support/TileInfo",
+				"dijit/registry",
+				"dojo/_base/Color",
+				"dojo/_base/lang",
+				"dojo/dom-construct",
+				// "extras/FlareClusterLayer",
+				"esri/renderers/ClassBreaksRenderer",
+				"esri/symbols/CIMSymbol",
+				"esri/views/draw/support/settings",
+				"esri/geometry/support/geodesicUtils"
+			], function(
+				EsriMap,
+				Basemap,
+				SceneView,
+				MapView,
+				mapViewDeps,
+				VectorTileLayerView2D,
+				GraphicsLayerView2D,
+				FeatureLayerView2D,
+				GraphicsLayer,
+				MapImageLayer,
+				Graphic,
+				SpatialReference,
+				FeatureLayer,
+				esriRequest,
+				esriConfig,
+				Color,
+				Font,
+				PictureMarkerSymbol,
+				SimpleFillSymbol,
+				SimpleLineSymbol,
+				SimpleMarkerSymbol,
+				TextSymbol,
+				BasemapGallery,
+				Directions,
+				Search,
+				SearchViewModel,
+				Extent,
+				Point,
+				Polygon,
+				Circle,
+				Polyline,
+				Multipoint,
+				webMercatorUtils,
+				Draw,
+				Geoprocessor,
+				FeatureSet,
+				DirectionsFeatureSet,
+				ServiceAreaTask,
+				ServiceAreaParameters,
+				RelationshipQuery,
+				Locator,
+				GeometryService,
+				ProjectParameters,
+				watchUtils,
+				Query,
+				Geometry,
+				geometryEngine,
+				SketchViewModel,
+				decorators,
+				Evented,
+				Accessor,
+				coreLang,
+				maybe,
+				IdentityManager,
+				RouteTask,
+				RouteParameters,
+				TileLayer,
+				WMSLayer,
+				WMTSLayer,
+				VectorTileLayer,
+				CSVLayer,
+				KMLLayer,
+				GeoRSSLayer,
+				ImageryLayer,
+				QueryTask,
+				FindTask,
+				FindParameters,
+				GraphicMover,
+				drawUtils,
+				GraphicMoverEvents,
+				PolylineDrawAction,
+				PolygonDrawAction,
+				Popup,
+				PopupTemplate,
+				VectorTile,
+				RemoteClient,
+				TileInfo,
+				registry,
+				color,
+				lang,
+				domConstruct,
+				// FlareClusterLayer,
+				ClassBreaksRenderer,
+				CIMSymbol,
+				settings,
+				geodesicUtils
+			)
+			{
+				createNamespace("TF.GIS").SDK = {
+					Color: Color,
+					Map: EsriMap,
+					Basemap: Basemap,
+					MapView: MapView,
+					mapViewDeps: mapViewDeps,
+					VectorTileLayerView2D: VectorTileLayerView2D,
+					GraphicsLayerView2D: GraphicsLayerView2D,
+					FeatureLayerView2D: FeatureLayerView2D,
+					FeatureLayer: FeatureLayer,
+					SimpleMarkerSymbol: SimpleMarkerSymbol,
+					SimpleLineSymbol: SimpleLineSymbol,
+					BasemapGallery: BasemapGallery,
+					registry: registry,
+					GraphicsLayer: GraphicsLayer,
+					MapImageLayer: MapImageLayer,
+					SpatialReference: SpatialReference,
+					Graphic: Graphic,
+					Font: Font,
+					PictureMarkerSymbol: PictureMarkerSymbol,
+					SimpleFillSymbol: SimpleFillSymbol,
+					TextSymbol: TextSymbol,
+					Directions: Directions,
+					Search: Search,
+					Extent: Extent,
+					Point: Point,
+					Polygon: Polygon,
+					Circle: Circle,
+					Polyline: Polyline,
+					Multipoint: Multipoint,
+					webMercatorUtils: webMercatorUtils,
+					Draw: Draw,
+					Geoprocessor: Geoprocessor,
+					FeatureSet: FeatureSet,
+					DirectionsFeatureSet: DirectionsFeatureSet,
+					ServiceAreaTask: ServiceAreaTask,
+					ServiceAreaParameters: ServiceAreaParameters,
+					RelationshipQuery: RelationshipQuery,
+					Locator: Locator,
+					ProjectParameters: ProjectParameters,
+					GeometryService: GeometryService,
+					watchUtils: watchUtils,
+					Query: Query,
+					Geometry: Geometry,
+					geometryEngine: geometryEngine,
+					SketchViewModel: SketchViewModel,
+					RouteTask: RouteTask,
+					RouteParameters: RouteParameters,
+					esriRequest: esriRequest,
+					esriConfig: esriConfig,
+					TileLayer: TileLayer,
+					WMSLayer: WMSLayer,
+					WMTSLayer: WMTSLayer,
+					VectorTileLayer: VectorTileLayer,
+					CSVLayer: CSVLayer,
+					KMLLayer: KMLLayer,
+					GeoRSSLayer: GeoRSSLayer,
+					ImageryLayer: ImageryLayer,
+					QueryTask: QueryTask,
+					FindParameters: FindParameters,
+					FindTask: FindTask,
+					IdentityManager: IdentityManager,
+					domConstruct: domConstruct,
+					Popup: Popup,
+					PopupTemplate: PopupTemplate,
+					VectorTile: VectorTile,
+					TileInfo: TileInfo,
+					// FlareClusterLayer: FlareClusterLayer.FlareClusterLayer,
+					ClassBreaksRenderer: ClassBreaksRenderer,
+					CIMSymbol: CIMSymbol,
+					settings: settings,
+					geodesicUtils: geodesicUtils,
+					dojo: {
+						color: color,
+						lang: lang
+					}
+				};
+				resolve();
+			});
+		});
+
+		return Map.resourcesLoadingPromise;
+	};
 
 	Map.prototype.constructor = Map;
 
 	Object.defineProperty(Map.prototype, 'map', {
-		get() { return this._map; },
+		get() { return _map; },
 		enumerable: false,
 		configurable: false
 	});
 
-	Map.prototype.create = async function($mapUiElement)
+	Map.prototype.create = function($mapContainer)
 	{
 		const self = this;
-		let map = null;
-
-		return new Promise((resolve, reject) =>
-		{
-			try
-			{
-				require({}, ["esri/Map", "esri/views/MapView", "esri/geometry/SpatialReference"], (Map, MapView, SpatialReference) =>
-				{
-					map = new Map({
-						basemap: self.settings.baseMapId
-					});
-	
-					const view = new MapView({
-						container: $mapUiElement[0],
-						map: map,
-						spatialReference: self.settings.spatialReference,
-						center: self.settings.center,
-						zoom: self.options.zoom,
-						popup: {
-							autoOpenEnabled: false,
-							autoCloseEnabled: false,
-							collapseEnabled: false,
-							dockEnabled: false,
-							spinnerEnabled: false,
-							actions: [],
-							dockOptions: {
-								breakpoint: false
-							}
-						},
-						background: self.settings.background,
-						constraints: {
-							rotationEnabled: false,
-							minZoom: self.settings.minZoom
-						}
-					});
-	
-					if (view.zoom < 0)
-					{
-						view.scale = 5000;
-					}
-	
-					map.mapView = view;
-					self._map = map;
-
-					self.createMapEvents();
-	
-					resolve(map);
-				});
-			}
-			catch (ex)
-			{
-				reject(ex);
-			}			
+		let map = new TF.GIS.SDK.Map({
+			basemap: self.settings.baseMapId
 		});
+
+		const view = new TF.GIS.SDK.MapView({
+			container: $mapContainer[0],
+			map: map,
+			spatialReference: self.settings.spatialReference,
+			center: self.settings.center,
+			zoom: self.settings.zoom,
+			popup: {
+				autoOpenEnabled: false,
+				autoCloseEnabled: false,
+				collapseEnabled: false,
+				dockEnabled: false,
+				spinnerEnabled: false,
+				actions: [],
+				dockOptions: {
+					breakpoint: false
+				}
+			},
+			background: self.settings.background,
+			constraints: {
+				rotationEnabled: false,
+				minZoom: self.settings.minZoom
+			}
+		});
+
+		if (view.zoom < 0)
+		{
+			view.scale = 5000;
+		}
+
+		map.mapView = view;
+
+		_map = map;
+
+		self.createMapEvents();
 	}
 
 	Map.prototype.createMapEvents = function()
@@ -145,7 +399,7 @@
 
 	Map.prototype.setMapCursor = function(cursorType)
 	{
-		const map = this._map;
+		const map = _map;
 		const availableCursorTypes = ["default", "locate", "locate-white", "pin"];
 
 		$(map.mapView.container).removeClass("pin-cursor");
@@ -178,22 +432,21 @@
 
 	Map.prototype.removeAllLayers = function()
 	{
-		if (this._map)
+		if (_map)
 		{
-			this._map.removeAll();
+			_map.removeAll();
 		}
 	}
 
 	Map.prototype.getMapLayer = function(layerId)
 	{
-		const self = this;
-		if (self._map === null)
+		if (_map === null)
 		{
 			console.warn(`Map is null, return.`);
 			return null;
 		}
 
-		const layer = self._map.findLayerById(layerId);
+		const layer = _map.findLayerById(layerId);
 		if (!layer) {
 			console.warn(`Could not find the layer id = ${layerId}`);
 			return null;
@@ -204,9 +457,9 @@
 
 	Map.prototype.getMapLayers = function()
 	{
-		if (this._map)
+		if (_map)
 		{
-			return this._map.layers;
+			return _map.layers;
 		}
 
 		return null;
@@ -217,13 +470,11 @@
 		const self = this;
 		self.removeAllLayers();
 
-		if (self._map && self._map.mapView)
+		if (_map && _map.mapView)
 		{
-			self._map.mapView.destroy();
+			_map.mapView.destroy();
 		}
 
-		self._map = null;
+		_map = null;
 	}
-
-
 })();
