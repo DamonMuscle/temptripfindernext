@@ -5,6 +5,11 @@
 	const MAP_MIN_ZOOM_LEVEL = 3;
 	const MAP_MAX_ZOOM_LEVEL = 23;
 	const WKID_WEB_MERCATOR = 102100;
+	
+	const LAYER_TYPE = {
+		FEATURE: "feature",
+		GRAPHIC: "graphic"
+	};
 
 	const defaultOptions = {
 		baseMapId: "streets-vector",
@@ -430,6 +435,73 @@
 		}
 	}
 
+	Map.prototype.addLayer = function(options, layerType = LAYER_TYPE.GRAPHIC)
+	{
+		if (_map === null)
+		{
+			console.warn(`_map is null, return.`);
+			return null;
+		}
+
+		const defaultOptions = {
+			id: options.id || `layerId_${Date.now()}`,
+			index: options.index || -1,
+			eventHandlers: {
+				onLayerCreated: null
+			}
+		};
+
+		const settings = Object.assign({}, defaultOptions, options);
+		let layer = null;
+		switch (layerType)
+		{
+			case LAYER_TYPE.GRAPHIC:
+				layer = new TF.GIS.SDK.GraphicsLayer({ id: settings.id });
+				break;
+			case LAYER_TYPE.FEATURE:
+				layer = new TF.GIS.SDK.FeatureLayer({ ...settings });
+				break;
+			default:
+				console.warn(`Undefined layerType: ${layerType}, create layer failed.`);
+				break;
+		}
+
+		if (layer === null)
+		{
+			return null;
+		}
+
+		if (settings.eventHandlers.onLayerCreated)
+		{
+			_map.mapView.whenLayerView(layer).then((result) => settings.eventHandlers.onLayerCreated.call(result));
+		}
+
+		if (settings.index >= 0)
+		{
+			_map.add(layer, settings.index);
+		}
+		else
+		{
+			_map.add(layer);
+		}
+
+		return layer;
+	}
+
+	Map.prototype.removeLayer = function(layerId)
+	{
+		const self = this;
+		const layer = self.getMapLayer(layerId);
+
+		if (layer == null)
+		{
+			console.warn(`removeLayer failed, layerId: ${layerId}`);
+			return null;
+		}
+
+		_map.remove(layer);
+	}
+
 	Map.prototype.removeAllLayers = function()
 	{
 		if (_map)
@@ -442,7 +514,7 @@
 	{
 		if (_map === null)
 		{
-			console.warn(`Map is null, return.`);
+			console.warn(`_map is null, return.`);
 			return null;
 		}
 
