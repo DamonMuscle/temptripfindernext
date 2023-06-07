@@ -179,76 +179,32 @@
 
 	}
 
-	GeocodeFinderViewModel.prototype.findAddress = function(address, city, zip, sourceTypeInteractive)
+	GeocodeFinderViewModel.prototype.findAddress = function(address, city, zip)
 	{
 		var self = this;
 		self.addressCandidates([]);
 		self.obSelectedAddress(null);
 		if (!address) return Promise.resolve();
-		var promise = null;
 		address = address.replace(/&&/g, " & ").replace(/ and /g, " & ");
 		if (address.indexOf(" & ") < 0) { address = address.replace(/&/g, " & "); }
-		var searchAddress = [address, zip].filter(function(c) { return c; }).join(",");
-		if (sourceTypeInteractive)
-		{
-			promise = sourceTypeInteractive == "Address Point" ? self.geoSearch.suggestAddressPoint(searchAddress) : self.geoSearch.suggest(searchAddress);
-		} else
-		{
-			if (self.sourceType == "Address Point")
-			{
-				promise = self.geoSearch.suggestAddressPoint(searchAddress);
-			} else
-			{
-				promise = self.geoSearch.suggest(searchAddress);
-			}
-		}
-
+		var searchAddress = [address, city, zip].filter(function(c) { return c; }).join(",");
 
 		self.obGeoStreet(address);
 		self.obGeoCity(city);
 		self.obGeoZip(zip);
 
-		tf.loadingIndicator.show();
-		return promise.then(function(data)
+		return tf.loadingIndicator.enhancedShow(TF.GIS.Analysis.getInstance().geocodeService.suggestLocations(searchAddress).then(function(response)
 		{
-			tf.loadingIndicator.tryHide();
-			data = Enumerable.From(data || []).Distinct("$.address").ToArray();
-			var selectIndex = 0;
-			var exactMatchRecord = null;
-			data.forEach(function(item, index)
-			{
-				item.id = index;
-				if (!item.address.split(",")[3])
-				{
-					item.address += self.getZipCode(item.location);
-				}
+			let selectIndex = 0, exactMatchRecord = null;
+			data = response.addresses;
+			data.forEach((item, index) => {
+				item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
 
-				var lngLat = tf.map.ArcGIS.webMercatorUtils.xyToLngLat(item.location.x, item.location.y);
-				var addressSplit = item.address.split(",");
-				item.GeoStreet = addressSplit[0] || "";
-				item.GeoCity = addressSplit[1] || "";
-				item.GeoZip = addressSplit[3] || "";
-				item.Xcoord = lngLat[0];
-				item.Ycoord = lngLat[1];
-
-				var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.GeoStreet.toLowerCase()));
-				if (isStreetMatch &&
-					// ((city || "").toLowerCase() == $.trim(item.GeoCity.toLowerCase()) || !city) &&
-					$.trim(zip) == $.trim(item.GeoZip))
+				var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
+				if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
 				{
 					selectIndex = index;
 					exactMatchRecord = item;
-				}
-			});
-
-			data.sort((a, b) =>
-			{
-				if (b.score !== a.score)
-				{
-					return b.score - a.score; // Sort by 'score' field in descending order first.
-				} else
-				{
-					return a.address.localeCompare(b.address); // If 'score' is the same, sort by 'address' field in alphabetical order.
 				}
 			});
 
@@ -260,12 +216,9 @@
 			}
 			return {
 				candidates: data,
-				exactMatchRecord: exactMatchRecord
+				exactMatchRecord
 			};
-		}).catch(function()
-		{
-			tf.loadingIndicator.tryHide();
-		});
+		}));
 	};
 
 	GeocodeFinderViewModel.prototype.btnSearchClick = function()

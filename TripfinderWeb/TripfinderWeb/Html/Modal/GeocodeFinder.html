@@ -3,22 +3,6 @@
 		<div class="col-xs-10 full-height">
 			<div class="col-xs-24">
 				<div class="form-group small-form-group">
-					<label>Geocode Source</label>
-					<div class="input-group">
-						<div data-bind="typeahead:{source:obGeocodeSources,selectedValue:obSelectedGeocodeSource,notSort:true,drowDownShow:true}">
-							<input type="text" readonly="" style="background:white" class="form-control"
-								data-bind="value:obSelectedGeocodeSource">
-						</div>
-						<div class="input-group-btn">
-							<button type="button" class="btn btn-default">
-								<span class="caret"></span>
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-xs-24">
-				<div class="form-group small-form-group">
 					<label>Street</label>
 					<div class="input-group">
 						<input type="text" class="form-control" data-bind="value:obGeoStreet,valueUpdate:'input',event:{change:reFindAddress}">

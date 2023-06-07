@@ -261,7 +261,10 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 				const locator = new Locator({ url, outSpatialReference });
 				
 				locator.suggestLocations({ text: searchAddress }).then((response) => {
-					addresses = response.map(item => item.text);
+					addresses = response.map(item => {
+						const [country, zip, state, city, street]= item.text.split(",").map(x=>x.trim()).reverse();
+						return { text: item.text, country, zip, state, city, street };
+					});
 	
 					self.clearOnlineToken(esriConfig);
 					resolve( { addresses, errorMessage });
