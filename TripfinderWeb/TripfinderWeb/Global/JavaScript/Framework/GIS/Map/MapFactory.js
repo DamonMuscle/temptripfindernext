@@ -7,7 +7,6 @@
 		{
 			if($($mapContainer).attr(attrKey))
 			{
-				// return instances.find(x=>x.id === $($mapContainer).attr(attrKey));
 				throw new Error("Map instance has been created for this dom.");
 			}
 
@@ -23,5 +22,11 @@
 		{
 			return instances.find(x=>x.id === id);
 		},
+		destroyMapInstanceById: function(id)
+		{
+			const index = instances.findIndex(x=>x.id === id);
+			const [{instance}] = instances.splice(index, 1);
+			instance.dispose();
+		}
 	};
 })();
