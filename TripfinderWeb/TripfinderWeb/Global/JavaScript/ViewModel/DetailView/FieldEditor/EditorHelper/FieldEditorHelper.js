@@ -1433,7 +1433,7 @@
 									{
 										// Save api request failed.
 										tf.loadingIndicator.tryHide();
-										var error = 'API Error: ' + response.Message;
+										var error = response.Message;
 										if (response.StatusCode === 404)
 										{
 											error += "\r\nSuggest you refreshing the view to fetch the latest data.";
