@@ -620,6 +620,11 @@
 		this.pageLevelViewModel.popupSuccessMessage(copyLinkSuccessMsg);
 	};
 
+	BaseGridPage.prototype.downloadQRCode = function(url)
+	{
+		TF.URLHelper.generateQRCode(url);
+	};
+
 	// Copy method polyfill
 	BaseGridPage.prototype.copyText = function(content)
 	{

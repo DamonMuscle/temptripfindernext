@@ -76,7 +76,7 @@
 						<div class="menu-icon">
 						</div>
 						<div class="menu-label"
-							data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Contacts')"></div>
+							data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Contact')"></div>
 					</li>
 					<li class="menu-divider">
 						<div class="rule"></div>
@@ -93,6 +93,12 @@
 						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')">
 						</div>
 					</li>
+					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('fieldtriplocation'),css:{disabled:!tf.authManager.isAuthorizedFor('fieldtrip','read')}">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip Location')">
+						</div>
+					</li>
 					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('staff'),css:{disabled:!tf.authManager.isAuthorizedFor('staff','read')}">
 						<div class="menu-icon">
 						</div>
@@ -106,6 +112,67 @@
 						</div>
 					</li>
 				</ul>
+			</li>
+			<li class="menu-item disabled" data-bind="css:{disabled:gridViewModel.obOpenInProductList().length==0||gridViewModel.obNoRecordsSelected()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Open In
+				</div>
+				<!-- ko if: gridViewModel.obOpenInProductList() -->
+				<ul class="tf-contextmenu" data-bind="foreach: gridViewModel.obOpenInProductList">
+					<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.openInClick">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text:$data.Name">
+						</div>
+					</li>
+				</ul>
+				<!-- /ko -->
+			</li>
+			<li class="menu-item" data-bind="css:{disabled:gridViewModel.obNoRecordsSelected()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Share
+				</div>
+				<!-- ko if: gridViewModel.obShareLinkProductList() -->
+				<ul class="tf-contextmenu with-sub-menu" data-bind="foreach: gridViewModel.obShareLinkProductList">
+					<li class="menu-item">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text:$data.Name">
+						</div>
+						<ul class="tf-contextmenu">
+							<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.copyLinkClick">
+								<div class="menu-icon">
+								</div>
+								<div class="menu-label">
+									Copy Link
+								</div>
+							</li>
+							<li class="menu-item" data-bind="contextMenuClick:$parent.gridViewModel.generateQRCodeClick">
+								<div class="menu-icon"></div>
+								<div class="menu-label">
+									QR Code
+								</div>
+							</li>
+						</ul>
+					</li>
+					<!-- ko if: ($parent.gridViewModel.obShareLinkProductList().length > 1 && $index() === 0) -->
+					<li class="menu-divider">
+						<div class="rule"></div>
+					</li>
+					<!-- /ko -->
+				</ul>
+				<!-- /ko -->
+			</li>
+			<li class="menu-item disabled">
+				<div class="menu-icon sendTo">
+				</div>
+				<div class="menu-label">
+					Merge
+				</div>
 			</li>
 			<li class="menu-divider">
 				<div class="rule"></div>

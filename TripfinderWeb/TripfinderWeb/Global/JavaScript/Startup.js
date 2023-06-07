@@ -69,6 +69,7 @@
 		{ "Id": 63, "Term": "Work Phone", "Singular": "Work Phone", "Plural": "Work Phones", "Abbreviation": null },
 		{ "Id": 64, "Term": "Report", "Singular": "Report", "Plural": "Reports", "Abbreviation": null },
 		{ "Id": 65, "Term": "Field Trip Location", "Singular": "Location", "Plural": "Locations", "Abbreviation": null },
+		{ "Id": 66, "Term": "Document", "Singular": "Document", "Plural": "Documents", "Abbreviation": null },
 	];
 
 	tf.applicationTerm.getApplicationTermByName = function(term, type)

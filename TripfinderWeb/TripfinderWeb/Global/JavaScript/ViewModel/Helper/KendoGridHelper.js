@@ -1190,7 +1190,9 @@
 
 				let layoutColumns = null;
 				const gridType = tf.dataTypeHelper.getKeyById(DataTypeId);
-				const filterName = `${tf.dataTypeHelper.getFormalDataTypeName(gridType)} (Selected Records)`;
+				const gridTerm = tf.dataTypeHelper.getFormalDataTypeName(gridType);
+				const gridLabel = tf.applicationTerm.getApplicationTermPluralByName(gridTerm);
+				const filterName = `${gridLabel} (Selected Records)`;
 
 				let thematicSetting = null
 				if (ThematicSetting)
