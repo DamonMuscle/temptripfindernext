@@ -211,11 +211,15 @@
 							//verify datasource is change
 							if (datasource && datasource.DBID)
 							{
-								var p1 = tf.storageManager.save("datasourceId", datasource.DBID);
-								var p2 = tf.storageManager.save("databaseName", databaseName);
-								return Promise.all([p1, p2]).then(function()
+								const dbid = datasource.DBID, dbname = datasource.Name;
+								tf.storageManager.save("datasourceId", dbid, true, true);
+								tf.storageManager.save("databaseName", dbname, true);
+								var p1 = tf.storageManager.save("datasourceId", dbid);
+								var p2 = tf.storageManager.save("databaseName", dbname);
+								var p3 = tf.storageManager.save("databaseType", datasource.DBType);
+								return Promise.all([p1, p2, p3]).then(function()
 								{
-									tf.reloadPageWithDatabaseId(datasource.DBID);
+									tf.reloadPageWithDatabaseId(dbid);
 
 									return "loginpage";
 								});

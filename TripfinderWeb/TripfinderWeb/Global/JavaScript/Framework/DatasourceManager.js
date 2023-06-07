@@ -68,10 +68,12 @@
 							{
 								return false;
 							}
+
+							const dbName = datasource.DatabaseName || datasource.Name;
 							self.loginSource = datasource;
 							self.databaseId = databaseId;
-							self.databaseName = datasource.DatabaseName;
-							self.databaseNameWithWrapper = "(" + datasource.DatabaseName + ")";
+							self.databaseName = dbName;
+							self.databaseNameWithWrapper = "(" + dbName + ")";
 							self.databaseType = datasource.DBType;
 							return true;
 						});
@@ -145,6 +147,8 @@
 		}
 
 		this.onDatabaseIdSet.notify(databaseId);
+		tf.storageManager.save("datasourceId", databaseId);
+		tf.storageManager.save("datasourceId", databaseId, true, true);
 	};
 
 	/**
@@ -269,11 +273,6 @@
 
 	DatasourceManager.prototype.setDatabaseInfo = function()
 	{
-		var id = getQueryString("dbid");
-		if (id)
-		{
-			tf.storageManager.save("datasourceId", id, true, true);
-		}
 		this.setDataBaseId(parseInt(tf.storageManager.get("datasourceId", true, true) || tf.storageManager.get("datasourceId")));
 		this.databaseName = tf.storageManager.get("databaseName", true) || tf.storageManager.get("databaseName");
 		this.databaseType = tf.storageManager.get("databaseType");
