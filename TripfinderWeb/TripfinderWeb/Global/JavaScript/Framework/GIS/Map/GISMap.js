@@ -176,5 +176,54 @@
 		}
 	}
 
+	Map.prototype.removeAllLayers = function()
+	{
+		if (this._map)
+		{
+			this._map.removeAll();
+		}
+	}
+
+	Map.prototype.getMapLayer = function(layerId)
+	{
+		const self = this;
+		if (self._map === null)
+		{
+			console.warn(`Map is null, return.`);
+			return null;
+		}
+
+		const layer = self._map.findLayerById(layerId);
+		if (!layer) {
+			console.warn(`Could not find the layer id = ${layerId}`);
+			return null;
+		}
+	
+		return layer;
+	}
+
+	Map.prototype.getMapLayers = function()
+	{
+		if (this._map)
+		{
+			return this._map.layers;
+		}
+
+		return null;
+	}
+
+	Map.prototype.dispose = function()
+	{
+		const self = this;
+		self.removeAllLayers();
+
+		if (self._map && self._map.mapView)
+		{
+			self._map.mapView.destroy();
+		}
+
+		self._map = null;
+	}
+
 
 })();
