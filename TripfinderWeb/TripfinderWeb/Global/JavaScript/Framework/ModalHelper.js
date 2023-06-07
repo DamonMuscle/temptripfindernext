@@ -33,6 +33,7 @@
 			aide: "Staff",
 			contact: "Contact",
 			route: "Route",
+			fieldtriplocation: "Field Trip Location",
 		};
 	}
 

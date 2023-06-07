@@ -462,11 +462,12 @@
 				//Maybe sooner change the data get from DB of new page loading
 				const fromMenu = $(e.currentTarget).find(".menu-label").text().trim();
 
-				const toGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[gridType]);
+				let toGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[gridType]);
 				const fromGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[self.type]);
 
 				const dataType = tf.dataTypeHelper.getAvailableDataTypes().find(d => d.key === gridType);
 				const pageType = dataType ? dataType.pageType : gridType;
+				toGridType = toGridType || tf.applicationTerm.getApplicationTermPluralByName(dataType.name);
 
 				const filterName = `${toGridType} (${fromMenu} for Selected ${fromGridType})`;
 

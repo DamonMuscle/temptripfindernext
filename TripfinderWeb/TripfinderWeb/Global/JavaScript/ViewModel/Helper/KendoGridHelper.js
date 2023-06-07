@@ -1031,17 +1031,17 @@
 
 	const SUPPORTED_OPENIN_PRODUCTS = {
 		"Viewfinder": {
-			generateUrl: (url) => url.replace(/http:\/\/.*\//, location.origin + "/") + "/#/nw",
+			generateUrl: (url) => pathCombine(url, "/#/nw"),
 			excludeGridTypes: ['fieldtriplocation']
 		},
 		"Routefinder Plus": {
-			generateUrl: (url) => url.replace(/http:\/\/.*\//, location.origin + "/") + "/en-US/html/#/nw",
+			generateUrl: (url) => pathCombine(url, "/en-US/html/#/nw"),
 			excludeGridTypes: ['fieldtriplocation']
 		},
 		"Tripfinder": {
 		}
 	};
-	const basicGenerateUrl = (url) => url = (url.charAt(url.length - 1) === "/") ? url + "#/nw" : url + "/#/nw";
+	const basicGenerateUrl = (url) => pathCombine(url, "/#/nw");
 
 	/**
 	 * Get supported products for "Open In".
