@@ -11,7 +11,7 @@
 		self.routeState = self.routingMapTool.routingMapDocumentViewModel.routeState;
 		self.record = self.routingMapTool.routingMapDocumentViewModel.data;
 		self.type = self.routingMapTool.routingMapDocumentViewModel.type;
-		self.layer = self.routingMapTool.routingMapDocumentViewModel.layer;
+		self.layer = self.routingMapTool.routingMapDocumentViewModel.layer || self.routingMapTool.routingMapDocumentViewModel.getManuallyPinLayer();
 		self.detailView = self.routingMapTool.routingMapDocumentViewModel.options.detailView;
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(null, self.map, null);
 	}

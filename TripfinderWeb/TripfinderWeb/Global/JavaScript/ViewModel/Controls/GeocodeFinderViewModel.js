@@ -115,10 +115,15 @@
 		self.obSelectedAddress.subscribe(invalidateCoordinate);
 	}
 
+	GeocodeFinderViewModel.prototype.getManuallyPinLayer = function()
+	{
+		return this.mapInstance.getMapLayer(GeocodeInteractiveLayerId);
+	};
+
 	GeocodeFinderViewModel.prototype.drawCoordinate = function(geometry)
 	{
-		var self = this;
-		self.mapInstance.getMapLayer(GeocodeInteractiveLayerId).removeAll();
+		var self = this, layer = self.getManuallyPinLayer();
+		layer.removeAll();
 		if (geometry && geometry.x && geometry.y) return draw(geometry);
 		if (!self.obSelectedAddress()) return;
 		var x = self.obSelectedAddress().XCoord, y = self.obSelectedAddress().YCoord;
@@ -138,7 +143,8 @@
 					attributes: { type: self.type }
 				});
 
-			self.mapInstance.getMapLayer(GeocodeInteractiveLayerId).add(graphic);
+			layer.add(graphic);
+
 			if (!geometry)
 			{
 				self.mapInstance.centerAtPoint(point);
