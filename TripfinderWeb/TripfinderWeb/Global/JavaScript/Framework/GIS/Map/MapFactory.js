@@ -13,7 +13,7 @@
 			const mapId = `mapId_${Date.now()}`;
 			$($mapContainer).attr(attrKey, mapId);
 
-			await TF.GIS.Map.LoadResouces();
+			await TF.GIS.Map.LoadResources();
 			const map = new TF.GIS.Map($mapContainer, options);
 			instances.push({instance: map, id: mapId});
 			return map;

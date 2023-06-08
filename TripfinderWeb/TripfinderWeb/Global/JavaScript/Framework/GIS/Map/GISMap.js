@@ -47,7 +47,7 @@
 	 * Load Esri js SDK
 	 * @returns 
 	 */
-	Map.LoadResouces = async function()
+	Map.LoadResources = async function()
 	{
 		Map.resourcesLoadingPromise = Map.resourcesLoadingPromise || new Promise(function(resolve, reject)
 		{

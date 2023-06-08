@@ -729,7 +729,7 @@
 		}
 	};
 
-	GeocodeTool.getAddressFieldNameByGridType = function(fielType, gridType)
+	GeocodeTool.getAddressFieldNameByGridType = function(fieldType, gridType)
 	{
 		var fields = {
 			"street": "GeoStreet",
@@ -743,10 +743,16 @@
 			"zip": "SystemZip",
 			"state": "SystemState"
 		}
+		const location_fields = {
+			"street": "Street",
+			"city": "City",
+			"zip": "Zip",
+			"state": "State"
+		};
 
-		var fieldName = gridType == "student" ? student_fields[fielType.toLowerCase()] : fields[fielType.toLowerCase()];
+		var fieldName = gridType == "location" ? location_fields[fieldType.toLowerCase()] :
+			(gridType == "student" ? student_fields[fieldType.toLowerCase()] : fields[fieldType.toLowerCase()]);
 		return fieldName;
-
 	}
 
 })();

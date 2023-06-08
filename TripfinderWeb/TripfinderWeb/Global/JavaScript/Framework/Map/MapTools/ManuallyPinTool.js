@@ -52,17 +52,22 @@
 		clearTimeout(this.getGeoStreetInfoTimeout);
 		this.getGeoStreetInfoTimeout = setTimeout(function(reverseKey)
 		{
-			TF.locationToAddress(geometry).then(function(result)
+			TF.GIS.Analysis.getInstance().geocodeService.locationToAddress({x: geometry.longitude, y: geometry.latitude}).then(function(result)
 			{
 				if (!result || reverseKey !== self.reverseKey)
 				{
 					return;
 				}
-				var gridType = self.type === "geocodeInteractive" ? "student" : self.type;
-				self.updateResult(gridType, "street", result.Street);
-				self.updateResult(gridType, "city", result.City);
-				self.updateResult(gridType, "zip", result.Postal);
-				self.updateResult(gridType, "state", result.Region);
+				
+				var gridType = self.type === "geocodeInteractive" ? "location" : self.type;
+				if (result.errorMessage === null)
+				{
+					const address = result.address.split(",");
+					self.updateResult(gridType, "street", address[0]);
+					self.updateResult(gridType, "city", address[1]);
+					self.updateResult(gridType, "zip", address[3]);
+					self.updateResult(gridType, "state", address[2]);
+				}
 			});
 		}(this.reverseKey), 20);
 	};
