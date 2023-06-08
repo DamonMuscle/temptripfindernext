@@ -488,30 +488,37 @@
 
 			Object.keys(dataPointsForCurrentPage).forEach(function(key)
 			{
+				let dataPointsColumns = dataPointsForCurrentPage[key].map(column =>
+				{
+					var c = { ...column };
+					if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
+					{
+						c.isRequired = true;
+					}
+					let existBlocks = c.field === 'UDGridId' ?
+						self.highlightBlocks().filter(el => el.UDGridId === c.UDGridId) :
+						c.UDFId ? self.highlightBlocks().filter(el => el.UDFId === c.UDFId) :
+							self.highlightBlocks().filter(el => el.field === c.field);
+					if (existBlocks.length > 0)
+					{
+						c.hasHighlight = true;
+						c.multiCount = existBlocks.length;
+					} else
+					{
+						c.hasHighlight = false;
+						c.multiCount = 0;
+					}
+					return c;
+				});
+
+				if (key === 'Grid')
+				{
+					dataPointsColumns.sort((dp1, dp2) => dp1.title > dp2.title ? 1 : -1);
+				}
+
 				self.allColumns.push({
                     title: self.formatSectionLabel(key),
-					columns: ko.observableArray(dataPointsForCurrentPage[key].map(column =>
-					{
-						var c = { ...column };
-						if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
-						{
-							c.isRequired = true;
-						}
-						let existBlocks = c.field === 'UDGridId' ?
-							self.highlightBlocks().filter(el => el.UDGridId === c.UDGridId) :
-							c.UDFId ? self.highlightBlocks().filter(el => el.UDFId === c.UDFId) :
-							self.highlightBlocks().filter(el => el.field === c.field);
-						if (existBlocks.length > 0)
-						{
-							c.hasHighlight = true;
-							c.multiCount = existBlocks.length;
-						} else
-						{
-							c.hasHighlight = false;
-							c.multiCount = 0;
-						}
-						return c;
-					}))
+					columns: ko.observableArray(dataPointsColumns)
 				})
 			});
 
