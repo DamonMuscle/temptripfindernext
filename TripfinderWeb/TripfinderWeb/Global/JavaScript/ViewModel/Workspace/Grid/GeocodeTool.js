@@ -66,7 +66,7 @@
 				}
 				else
 				{
-					self._executeGeocodeAuto(needGeocodeRecords);
+					self._executeGeocodeAuto(res, needGeocodeRecords, previousCount);
 				}
 			})
 		}
@@ -83,6 +83,7 @@
 		}
 	}
 
+	// replace by next function with same name
 	GeocodeTool.prototype._executeGeocodeAuto = function(res, needGeocodeRecords, previousCount, viewmodel)
 	{
 		var self = this;
@@ -93,10 +94,12 @@
 		});
 	}
 
-	GeocodeTool.prototype._executeGeocodeAuto = function(needGeocodeRecords)
+	// the new way to use arcgis online
+	GeocodeTool.prototype._executeGeocodeAuto = function(res, needGeocodeRecords, previousCount)
 	{
 		const self = this;
-		Promise.all((needGeocodeRecords || []).map(record =>
+		needGeocodeRecords = needGeocodeRecords || [];
+		Promise.all((needGeocodeRecords).map(record =>
 		{
 			if (record.Street)
 			{
@@ -114,8 +117,8 @@
 						score: result.score
 					};
 
-					record.XCoord = +location.x.toFixed(6);
-					record.YCoord = +location.y.toFixed(6);
+					record.Xcoord = record.XCoord = +location.x.toFixed(6);
+					record.Ycoord = record.YCoord = +location.y.toFixed(6);
 					record.GeocodeScore = +location.score.toFixed(2);
 					record.Geocoded = true;
 					return record;
@@ -124,11 +127,7 @@
 				});
 			}
 		})).then((records)=>{
-			records.forEach(x=>{
-				delete x.Xcoord;
-				delete x.Ycoord;
-			});
-			self.viewModel.updateRecords(records.filter(Boolean), "Geocode success.");
+			self.updateRecordsByCoordinates(records, previousCount, needGeocodeRecords, res.obSelectedGeocodeSource());
 		});
 	}
 
@@ -560,12 +559,21 @@
 		var self = this, data = [], gridType = self.viewModel.type;
 		entities.forEach(function(entity)
 		{
-			data.push({ "Id": entity.Id, "op": "replace", "path": "/Xcoord", "value": entity.Xcoord });
-			data.push({ "Id": entity.Id, "op": "replace", "path": "/Ycoord", "value": entity.Ycoord });
-			data.push({ "Id": entity.Id, "op": "replace", "path": "/GeoConfidence", "value": GeocodeTool.getGeoConfidence(entity.isManuallyPin ? "ManuallyPin" : updateSource) });
-			if (gridType == "student" || updateSource == "Interactive")
+			if (gridType === "fieldtriplocation")
 			{
-				addSystemAddressFileds(data, entity, gridType);
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/XCoord", "value": entity.XCoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/YCoord", "value": entity.YCoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/GeocodeScore", "value": entity.GeocodeScore });
+			}
+			else
+			{
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/Xcoord", "value": entity.Xcoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/Ycoord", "value": entity.Ycoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/GeoConfidence", "value": GeocodeTool.getGeoConfidence(entity.isManuallyPin ? "ManuallyPin" : updateSource) });
+				if (gridType == "student" || updateSource == "Interactive")
+				{
+					addSystemAddressFileds(data, entity, gridType);
+				}
 			}
 		});
 
