@@ -537,6 +537,11 @@
 		return null;
 	}
 
+	Map.prototype.centerAtPoint = function(point)
+	{
+		_map.mapView.center = point;
+	}
+
 	Map.prototype.dispose = function()
 	{
 		const self = this;

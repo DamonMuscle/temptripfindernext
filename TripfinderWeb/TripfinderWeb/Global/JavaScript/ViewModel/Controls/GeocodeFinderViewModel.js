@@ -2,6 +2,7 @@
 {
 	createNamespace("TF.Control").GeocodeFinderViewModel = GeocodeFinderViewModel;
 
+	const GeocodeInteractiveLayerId = "geocodeInteractiveLayer";
 	function GeocodeFinderViewModel(zipCodes, modalViewModel)
 	{
 		var self = this;
@@ -55,8 +56,8 @@
 		};
 
 		var map = await TF.GIS.MapFactory.createInstance(mapElement, {eventHandlers:{onMapViewCreated:self._onMapLoad.bind(self)}});
+		self.mapInstance = map;
 		self._map = map.map;
-		self._mapView = map.map.mapView;
 
 		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, $.extend({
 			thematicLayerId: "",
@@ -67,30 +68,6 @@
 			self._map.expandMapTool = new TF.Map.ExpandMapTool(self._map, options.expand.container, self.RoutingMapTool);
 		}
 
-		// var baseMapId = tf.userPreferenceManager.get(options.baseMapSaveKey);
-		// if (baseMapId == "white-canvas")
-		// {
-		// 	$(map.mapView.container).css("background-color", "white");
-		// }
-		// else if (baseMapId == "my-maps")
-		// {
-		// 	// self.onMapLoad.subscribe(() =>
-		// 	// {
-		// 	// 	setTimeout(() =>
-		// 	// 	{
-		// 	// 		self.mapLayersPaletteViewModel.show();
-		// 	// 	}, 100);
-		// 	// });
-		// }
-
-		// var updatingEvent = map.mapView.watch('updating', function(result)
-		// {
-		// 	if (!result)
-		// 	{
-		// 		updatingEvent.remove();
-		// 		self._onMapLoad();
-		// 	}
-		// });
 		self.sketchTool = new TF.RoutingMap.SketchTool(self._map, self);
 	}
 
@@ -117,8 +94,7 @@
 
 	GeocodeFinderViewModel.prototype.initLayers = function()
 	{
-		var self = this,
-			coordLayer = new tf.map.ArcGIS.GraphicsLayer({ id: "geocodeInteractiveLayer" }),
+		let self = this,
 			drawCoordinateTimer,
 			invalidateCoordinate = function()
 			{
@@ -134,21 +110,15 @@
 				});
 			};
 
+		self.mapInstance.addLayer({ id: GeocodeInteractiveLayerId, eventHandlers:{onLayerCreated: function(){ invalidateCoordinate();}}});
 
-		self.layer = coordLayer;
-		self._map.add(self.layer);
 		self.obSelectedAddress.subscribe(invalidateCoordinate);
-
-		self._map.mapView.whenLayerView(coordLayer).then(function()
-		{
-			invalidateCoordinate();
-		});
 	}
 
 	GeocodeFinderViewModel.prototype.drawCoordinate = function(geometry)
 	{
 		var self = this;
-		self.layer.removeAll();
+		self.mapInstance.getMapLayer(GeocodeInteractiveLayerId).removeAll();
 		if (geometry && geometry.x && geometry.y) return draw(geometry);
 		if (!self.obSelectedAddress()) return;
 		var x = self.obSelectedAddress().XCoord, y = self.obSelectedAddress().YCoord;
@@ -159,18 +129,19 @@
 		function draw(point)
 		{
 			var markerSymbol = {
-				type: "simple-marker",
-				color: [112, 123, 249]
-			},
+					type: "simple-marker",
+					color: [112, 123, 249]
+				},
 				graphic = new tf.map.ArcGIS.Graphic({
 					geometry: point,
 					symbol: markerSymbol,
 					attributes: { type: self.type }
 				});
-			self.layer.add(graphic);
+
+			self.mapInstance.getMapLayer(GeocodeInteractiveLayerId).add(graphic);
 			if (!geometry)
 			{
-				self._map.mapView.center = point;
+				self.mapInstance.centerAtPoint(point);
 			}
 		}
 	}
