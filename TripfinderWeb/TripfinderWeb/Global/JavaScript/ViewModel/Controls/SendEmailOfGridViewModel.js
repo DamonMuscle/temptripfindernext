@@ -37,17 +37,17 @@
 					paramData:
 					{
 						"@filter": "in(id," + this.option.selectedIds.toString() + ")",
-						"@fields": "ContactEmail,DestinationEmail"
+						"@fields": "Email,ContactEmail,DestinationEmail"
 					}
 				}, { overlay: false }).then(function(result)
 				{
 					var address = [], addressList = [];
 					result.Items.filter(function(item)
 					{
-						return !!item.ContactEmail || !!item.DestinationEmail;
+						return !!item.ContactEmail || !!item.DestinationEmail || !!item.Email;
 					}).map(function(item)
 					{
-						addressList.push(item.ContactEmail, item.DestinationEmail);
+						addressList.push(item.ContactEmail, item.DestinationEmail, item.Email);
 					});
 					addressList.filter(function(item, index, arr)
 					{

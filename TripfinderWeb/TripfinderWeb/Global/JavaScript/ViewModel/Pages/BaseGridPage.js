@@ -23,6 +23,7 @@
 		self.requestResumeEvent = new TF.Events.Event();
 		self.releaseHoldEvent = new TF.Events.Event();
 		self.enableRefreshEvent = new TF.Events.Event();
+		self.selectedRowChanged = new TF.Events.Event();
 		self.obNewGrids = ko.observable(true);
 		self.obNoRecordsSelected = ko.observable(false);
 		self.obOpenInProductList = ko.observableArray([]);
@@ -31,6 +32,9 @@
 		self.deleteSelectionClick = self.deleteSelectionClick.bind(self);
 		self.kendoGridScroll = null;
 		self.isGridPage = true;
+
+		self.obIsAnyRowSelected = ko.observable(false);
+		self.obIsOnlyOneRowSelected = ko.observable(false);
 
 		self.obReportLists = ko.observable(false);
 		self.obReports = ko.observable(false);
@@ -116,11 +120,17 @@
 			{
 				self.updateEditable();
 
+				const current = self.searchGrid.getSelectedIds(),
+					isAnyRowSelected = current.length > 0;
+					self.obIsAnyRowSelected(isAnyRowSelected);
+					self.obIsOnlyOneRowSelected(current.length === 1);
+				isAnyRowSelected ? self.selectedRowChanged.notify({ recordId: current[0], silent: self.silentChangeSelection }) : self.selectedRowChanged.notify({ recordId: null });
+
 				if (canceling)
 				{
 					return;
 				}
-				var current = self.searchGrid.getSelectedIds();
+
 				if (!current[0])
 				{
 					self.obIsSelectRow(false);

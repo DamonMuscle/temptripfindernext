@@ -17,10 +17,21 @@
 		self.deleteButton = true;
 		self.endpoint = tf.DataTypeHelper.getEndpoint(self.type);
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
+
+		self.obHasEmail = ko.observable(false);
+		self.selectedRowChanged.subscribe(self.onSelectRowChanged.bind(self));
 	}
 
     StaffPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	StaffPage.prototype.constructor = StaffPage;
+
+	StaffPage.prototype.onSelectRowChanged = function()
+	{
+		const self = this;
+		const selectedRecords = self.searchGrid.getSelectedRecords();
+		const hasEmail = selectedRecords.some(item => item.Email && item.Email.trim());
+		self.obHasEmail(hasEmail);
+	};
 
     StaffPage.prototype.updateOptions = function()
 	{
