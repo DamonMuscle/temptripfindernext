@@ -6,7 +6,7 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function GeocodeInteractiveModalViewModel(sourceType, datasource, previousCount, gridViewModel)
+	function GeocodeInteractiveModalViewModel(datasource, previousCount, gridViewModel)
 	{
 		var self = this;
 		TF.Modal.BaseModalViewModel.call(self);
@@ -17,7 +17,7 @@
 		self.obPositiveButtonLabel("Apply");
 		self.obNegativeButtonLabel("Close");
 
-		self.model = new TF.Control.GeocodeInteractiveViewModel(sourceType, datasource, previousCount, gridViewModel, self);
+		self.model = new TF.Control.GeocodeInteractiveViewModel(datasource, previousCount, gridViewModel, self);
 		self.data(self.model);
 	}
 

@@ -2,11 +2,10 @@
 {
 	createNamespace("TF.Control").GeocodeFinderViewModel = GeocodeFinderViewModel;
 
-	function GeocodeFinderViewModel(sourceType, zipCodes, modalViewModel)
+	function GeocodeFinderViewModel(zipCodes, modalViewModel)
 	{
 		var self = this;
 		self.modalViewModel = modalViewModel;
-		self.sourceType = sourceType;
 		self.zipCodes = zipCodes;
 		self.obGeoStreet = ko.observable();
 		self.obGeoZip = ko.observable();
@@ -18,8 +17,6 @@
 		self.geoSearch = new TF.RoutingMap.RoutingPalette.GeoSearch(tf.map.ArcGIS, null, false, "102100");
 		self.result = null;
 		self.btnSearchClick = self.btnSearchClick.bind(this);
-		self.obGeocodeSources = ko.observable(['Address Point', 'Street Address Range']);
-		self.obSelectedGeocodeSource = ko.observable('Street Address Range');
 		self.options = { detailView: null };
 		self.type = "geocodeInteractive";
 		self.onMapLoad = new TF.Events.Event();
@@ -30,11 +27,10 @@
 	GeocodeFinderViewModel.prototype.init = function(evt, elem)
 	{
 		var self = this;
-		if (evt.sourceType != "Phone") self.obSelectedGeocodeSource(evt.sourceType);
 		self.initMap($(elem).find(".map")).then(function(){
 			self.initLayers();
 		});
-	}
+	};
 
 	GeocodeFinderViewModel.prototype.initMap = async function(mapElement)
 	{
@@ -59,9 +55,17 @@
 		};
 
 		var map = await TF.GIS.MapFactory.createInstance(mapElement, {eventHandlers:{onMapViewCreated:self._onMapLoad.bind(self)}});
-		// var map = TF.Helper.MapHelper.createMap(self.element, self, options);
 		self._map = map.map;
 		self._mapView = map.map.mapView;
+
+		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, $.extend({
+			thematicLayerId: "",
+		}, options));
+
+		if (options.expand && options.expand.enable)
+		{
+			self._map.expandMapTool = new TF.Map.ExpandMapTool(self._map, options.expand.container, self.RoutingMapTool);
+		}
 
 		// var baseMapId = tf.userPreferenceManager.get(options.baseMapSaveKey);
 		// if (baseMapId == "white-canvas")
@@ -109,7 +113,6 @@
 		if (this.sketchTool) this.sketchTool.stop();
 		if (this.RoutingMapTool.manuallyPinTool) this.RoutingMapTool.manuallyPinTool.stopPin();
 		if (this.RoutingMapTool.measurementTool) this.RoutingMapTool.measurementTool.deactivate();
-
 	}
 
 	GeocodeFinderViewModel.prototype.initLayers = function()
@@ -140,7 +143,6 @@
 		{
 			invalidateCoordinate();
 		});
-
 	}
 
 	GeocodeFinderViewModel.prototype.drawCoordinate = function(geometry)
@@ -174,10 +176,7 @@
 			{
 				self._map.mapView.center = point;
 			}
-
 		}
-
-
 	}
 
 	GeocodeFinderViewModel.prototype.findAddress = function(address, city, zip)
@@ -229,7 +228,7 @@
 
 	GeocodeFinderViewModel.prototype.reFindAddress = function()
 	{
-		this.findAddress(this.obGeoStreet(), this.obGeoCity(), this.obGeoZip(), this.obSelectedGeocodeSource());
+		this.findAddress(this.obGeoStreet(), this.obGeoCity(), this.obGeoZip());
 	};
 
 	GeocodeFinderViewModel.prototype.updateAddressFromPin = function(address, stopTool)

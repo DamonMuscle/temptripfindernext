@@ -134,7 +134,7 @@
 	GeocodeTool.prototype._executeGeocodeInteractive = function(res, needGeocodeRecords, previousCount, viewmodel)
 	{
 		var self = this;
-		var interactiveGeocodeModal = new TF.Modal.Grid.GeocodeInteractiveModalViewModel(res.obSelectedGeocodeSource(), needGeocodeRecords, previousCount, self.viewModel);
+		var interactiveGeocodeModal = new TF.Modal.Grid.GeocodeInteractiveModalViewModel(needGeocodeRecords, previousCount, self.viewModel);
 		tf.modalManager.showModal(interactiveGeocodeModal).then(function(result)
 		{
 			if (result)
@@ -273,7 +273,7 @@
 		});
 	};
 
-	GeocodeTool.geocodeAddresses = function(sourceType, records)
+	GeocodeTool.geocodeAddresses = function(records, sourceType)
 	{
 		if (sourceType == "Phone")
 		{

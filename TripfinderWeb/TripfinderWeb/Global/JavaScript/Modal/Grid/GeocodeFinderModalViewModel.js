@@ -6,7 +6,7 @@
 	 * Constructor
 	 * @returns {void} 
 	 */
-	function GeocodeFinderModalViewModel(sourceType, zipCodes)
+	function GeocodeFinderModalViewModel(zipCodes)
 	{
 		var self = this;
 		TF.Modal.BaseModalViewModel.call(self);
@@ -20,7 +20,7 @@
 		self.obBackdrop(false);
 		self.obEnableEnter(false);
 		self.obEnableEsc(false);
-		self.model = new TF.Control.GeocodeFinderViewModel(sourceType, zipCodes, self);
+		self.model = new TF.Control.GeocodeFinderViewModel(zipCodes, self);
 		self.data(self.model);
 	}
 

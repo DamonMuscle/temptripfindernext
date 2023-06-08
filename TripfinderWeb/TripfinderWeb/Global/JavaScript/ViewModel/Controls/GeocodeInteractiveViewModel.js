@@ -2,11 +2,10 @@
 {
 	createNamespace("TF.Control").GeocodeInteractiveViewModel = GeocodeInteractiveViewModel;
 
-	function GeocodeInteractiveViewModel(sourceType, dataSource, previousCount, gridViewModel, modalViewModel)
+	function GeocodeInteractiveViewModel(dataSource, previousCount, gridViewModel, modalViewModel)
 	{
 		var self = this;
 		self.modalViewModel = modalViewModel;
-		self.sourceType = sourceType;
 		self.dataSource = dataSource;
 		self.obGeoStreet = ko.observable("");
 		self.obGeoCity = ko.observable("");
@@ -69,23 +68,18 @@
 		{
 			this.findResult(this.emptyResult);
 
-			var geocodeFinderModalViewModel = new TF.Modal.Grid.GeocodeFinderModalViewModel(self.sourceType, self.gridViewModel ? self.gridViewModel.zipCodes : []);
+			var geocodeFinderModalViewModel = new TF.Modal.Grid.GeocodeFinderModalViewModel(self.gridViewModel ? self.gridViewModel.zipCodes : []);
 
 			var currentRecord = self.currentRecord();
 
-			geocodeFinderModalViewModel.data().findAddress(currentRecord.GeoStreet, currentRecord.GeoCity, currentRecord.GeoZip).then(function(data)
+			geocodeFinderModalViewModel.data().findAddress(currentRecord.Street, currentRecord.City, currentRecord.Zip).then(function(data)
 			{
-				if (!data || !data.candidates || data.candidates.length == 0)
-				{
-					tf.modalManager.showModal(geocodeFinderModalViewModel).then(function(ans)
-					{
-						self.afterAddressFind(ans);
-					});
-				} else if (data.exactMatchRecord)
+				if (data && data.exactMatchRecord && data.candidates && data.candidates.length > 0)
 				{
 					self.afterAddressFind(data.exactMatchRecord, true);
 					self.acceptClick();
-				} else
+				}
+				else
 				{
 					tf.modalManager.showModal(geocodeFinderModalViewModel).then(function(ans)
 					{
@@ -102,12 +96,12 @@
 	GeocodeInteractiveViewModel.prototype.afterAddressFind = function(address, exactMatch)
 	{
 		this.isFind = false;
-		if (address && address.GeoStreet)
+		if (address && address.street)
 		{
-			this.obGeoStreet(address.GeoStreet);
-			this.obGeoCity(address.GeoCity);
-			this.obGeoCounty(address.GeoCounty);
-			this.obGeoZip(address.GeoZip);
+			this.obGeoStreet(address.street);
+			this.obGeoCity(address.city);
+			this.obGeoCounty(address.state);
+			this.obGeoZip(address.zip);
 			this.isFind = true;
 		}
 
@@ -117,8 +111,8 @@
 				match: "exact match",
 				notes: "* Street name matched exactly\n* Address number matched exactly",
 				status: "Geocoded",
-				latitude: address.Ycoord,
-				longitude: address.Xcoord
+				latitude: address.YCoord,
+				longitude: address.XCoord
 			}));
 		}
 		else if (address && address.isManuallyPin)
@@ -131,8 +125,8 @@
 				match: "Inexact match",
 				notes: "* Manually pinned",
 				status: "Geocoded",
-				latitude: address.Ycoord,
-				longitude: address.Xcoord
+				latitude: address.YCoord,
+				longitude: address.XCoord
 			}));
 			this.isFind = true;
 		}
@@ -142,8 +136,8 @@
 				match: "Inexact match",
 				notes: "* Street name picked from interactive list\n* Address number matched exactly",
 				status: "Geocoded",
-				latitude: address.Ycoord,
-				longitude: address.Xcoord
+				latitude: address.YCoord,
+				longitude: address.XCoord
 			}));
 		} else
 		{
@@ -194,7 +188,7 @@
 		this.applyResult();
 		if (this.currentRecordIndex() < this.dataSource.length - 1)
 		{
-			promise = TF.Grid.GeocodeTool.geocodeAddresses(self.sourceType, self.dataSource.slice(self.currentRecordIndex() + 1, self.dataSource.length)).then(function(result)
+			promise = TF.Grid.GeocodeTool.geocodeAddresses(self.dataSource.slice(self.currentRecordIndex() + 1, self.dataSource.length)).then(function(result)
 			{
 				self.records = self.records.slice(0, self.currentRecordIndex() + 1).concat(result);
 			});

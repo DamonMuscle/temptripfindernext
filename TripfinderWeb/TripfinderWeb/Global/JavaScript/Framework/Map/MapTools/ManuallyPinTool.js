@@ -41,9 +41,9 @@
 		this.reverseKey = TF.createId();
 		var geoGraphic = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(geometry);
 		var coordName = self.record && typeof self.record.XCoord != "undefined" ? "Coord" : "coord";
-		update("X" + coordName, geoGraphic.x);
-		update("Y" + coordName, geoGraphic.y);
-		update("GeoConfidence", TF.Grid.GeocodeTool.getGeoConfidence("ManuallyPin"));
+		self.update("X" + coordName, geoGraphic.x);
+		self.update("Y" + coordName, geoGraphic.y);
+		self.update("GeoConfidence", TF.Grid.GeocodeTool.getGeoConfidence("ManuallyPin"));
 		if (this.detailView)
 		{
 			this.detailView.obEditing(true);
@@ -65,26 +65,27 @@
 				self.updateResult(gridType, "state", result.Region);
 			});
 		}(this.reverseKey), 20);
-
-		function update(fieldName, value)
-		{
-			self.detailView && self.detailView.fieldEditorHelper && self.detailView.fieldEditorHelper._onNonUDFEditorApplied({
-				lockName: fieldName,
-				errorMessages: null,
-				fieldName: fieldName,
-				recordValue: value,
-				relationshipKey: undefined,
-				text: undefined,
-			});
-		}
 	};
 
+	ManuallyPinTool.prototype.update = function(fieldName, value)
+	{
+		const self = this;
+		self.detailView && self.detailView.fieldEditorHelper && self.detailView.fieldEditorHelper._onNonUDFEditorApplied({
+			lockName: fieldName,
+			errorMessages: null,
+			fieldName: fieldName,
+			recordValue: value,
+			relationshipKey: undefined,
+			text: undefined,
+		});
+	};
 
 	ManuallyPinTool.prototype.updateResult = function(gridType, resultType, resultValue)
 	{
+		const self = this;
 		if (resultValue)
 		{
-			update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType(resultType, gridType), resultValue);
+			self.update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType(resultType, gridType), resultValue);
 		}
 	}
 
