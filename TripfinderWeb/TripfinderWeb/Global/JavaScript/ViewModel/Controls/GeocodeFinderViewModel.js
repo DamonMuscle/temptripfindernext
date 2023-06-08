@@ -197,27 +197,37 @@
 		{
 			let selectIndex = 0, exactMatchRecord = null;
 			data = response.addresses;
-			data.forEach((item, index) => {
-				item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
 
-				var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
-				if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
+			return Promise.all(data.map(item=>TF.GIS.Analysis.getInstance().geocodeService.addressToLocations({
+				Street: item.street,
+				City: item.city,
+				State: item.state,
+				Zone: item.zip
+			}))).then(function(locations){
+				data.forEach((item, index) => {
+					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
+					item.XCoord = locations[index]?.location.x;
+					item.YCoord = locations[index]?.location.y;
+	
+					var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
+					if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
+					{
+						selectIndex = index;
+						exactMatchRecord = item;
+					}
+				});
+	
+				self.addressCandidates(data);
+	
+				if (data.length > 0)
 				{
-					selectIndex = index;
-					exactMatchRecord = item;
+					self.obSelectedAddress(data[selectIndex]);
 				}
+				return {
+					candidates: data,
+					exactMatchRecord
+				};
 			});
-
-			self.addressCandidates(data);
-
-			if (data.length > 0)
-			{
-				self.obSelectedAddress(data[selectIndex]);
-			}
-			return {
-				candidates: data,
-				exactMatchRecord
-			};
 		}));
 	};
 

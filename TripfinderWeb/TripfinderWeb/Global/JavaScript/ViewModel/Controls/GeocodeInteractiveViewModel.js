@@ -130,7 +130,7 @@
 			}));
 			this.isFind = true;
 		}
-		else if (address && address.Xcoord)
+		else if (address && address.XCoord)
 		{
 			this.findResult($.extend(address, {
 				match: "Inexact match",
@@ -202,15 +202,15 @@
 	GeocodeInteractiveViewModel.prototype.applyResult = function()
 	{
 		var result = this.findResult();
-		if (result && result.Xcoord)
+		if (result && result.XCoord)
 		{
 			var record = this.records[this.currentRecordIndex()];
 			record.GeoStreet = result.GeoStreet;
 			record.GeoCity = result.GeoCity;
 			record.GeoZip = result.GeoZip;
 			record.GeoCounty = result.GeoCounty;
-			record.Xcoord = result.Xcoord;
-			record.Ycoord = result.Ycoord;
+			record.XCoord = result.XCoord;
+			record.YCoord = result.YCoord;
 			record.isManuallyPin = result.isManuallyPin;
 		}
 	};
@@ -241,7 +241,7 @@
 		var self = this;
 		var geoRecords = self.records.filter(function(item)
 		{
-			return item.Xcoord != 0 && item.Xcoord != null;
+			return item.XCoord != 0 && item.XCoord != null;
 		});
 		self.modalViewModel.hide();
 		self.modalViewModel.resolve(geoRecords);
