@@ -267,6 +267,16 @@
 					}
 				},
 				{
+					"field": "LocalID",
+					"title": "Local ID",
+					"type": "String",
+					"defaultValue": "46290",
+					"editType": {
+						"format": "String",
+						"maxLength": 50
+					}
+				},
+				{
 					"field": "Title",
 					"title": "Title",
 					"type": "String",
@@ -308,7 +318,7 @@
 				},
 				{
 					"field": "State",
-					"title": "State",
+					"title": "State/Province",
 					"type": "String",
 					"defaultValue": "NY",
 					"editType": {
@@ -385,6 +395,13 @@
 						"format": "Note",
 						"maxLength": 2000
 					}
+				},
+				{
+					"field": "RecordPicture",
+					"title": "Picture",
+					"type": "RecordPicture",
+					"defaultValue": false,
+					"min-height": "2"
 				}
 			],
 			"User Defined": [],

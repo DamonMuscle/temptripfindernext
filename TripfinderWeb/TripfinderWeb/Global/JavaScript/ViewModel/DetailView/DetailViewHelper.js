@@ -1512,7 +1512,7 @@
 	 */
 	DetailViewHelper.prototype.getDefaultRecordPicture = function(gridType)
 	{
-		if (gridType === "student" || gridType === "staff")
+		if (gridType === "student" || gridType === "staff" || gridType === "contact")
 		{
 			return this.imgUrl + "staff-student.svg";
 		} else if (gridType === "vehicle")
