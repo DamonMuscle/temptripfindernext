@@ -413,7 +413,44 @@
 					"type": "grid",
 					"url": "contactrelationships",
 					"min-height": "3",
-					"min-width": 2
+					"min-width": 2,
+					"extraColumns": [{
+						'FieldName': "ContactType",
+						'DisplayName': "Contact Relationship"
+					}, {
+						'FieldName': "IsPrimary",
+						'DisplayName': "Primary",
+						'template': function(item)
+						{
+							return item.IsPrimary ? 'Primary' : '';
+						}
+					}, {
+						'FieldName': "IsStopfinder",
+						'DisplayName': "Stopfinder",
+						'template': function(item)
+						{
+							if (item.IsStopfinder == null || item.IsStopfinder.toString() != 'true')
+							{
+								return ''
+							} else
+							{
+								return 'Stopfinder';
+							}
+						}
+					}, {
+						'FieldName': "IsWayfinder",
+						'DisplayName': "Wayfinder",
+						'template': function(item)
+						{
+							if (item.IsWayfinder == null || item.IsWayfinder.toString() != 'true')
+							{
+								return ''
+							} else
+							{
+								return 'Wayfinder';
+							}
+						}
+					}],
 				},
 				{
 					"field": "DocumentGrid",
