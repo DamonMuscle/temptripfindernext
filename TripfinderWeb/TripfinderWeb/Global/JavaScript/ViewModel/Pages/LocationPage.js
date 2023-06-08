@@ -196,15 +196,15 @@
 	{
 		const self = this;
 		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), self.endpoint),
-			{
-				data: records,
-				paramData: { '@relationships': 'udf' }
-			})
-			.then(() =>
-			{
-				successMessage && self.pageLevelViewModel.popupSuccessMessage(successMessage);
-				self.searchGrid.refreshClick();
-			});
+		{
+			data: records,
+			paramData: { '@relationships': 'udf' }
+		})
+		.then(() =>
+		{
+			self.searchGrid.refreshClick();
+			successMessage && tf.promiseBootbox.alert(successMessage);
+		});
 	}
 
 	LocationPage.prototype.ungeocodeSelectionClick = function()
@@ -230,7 +230,7 @@
 			data.push({ "Id": recordId, "op": "replace", "path": "/GeocodeScore", "value": null });				
 		});
 
-		this.updateRecords(data, "Ungeocode success.");
+		this.updateRecords(data, "Ungeocode success");
 	}
 
 	LocationPage.prototype._ungeocodeConfirm = function(recordIds)
