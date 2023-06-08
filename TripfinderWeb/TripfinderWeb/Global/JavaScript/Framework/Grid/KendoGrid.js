@@ -1754,7 +1754,7 @@
 	KendoGrid.prototype.bindNeedFileds = function(type, fields)
 	{
 		fields = TF.Grid.LightKendoGrid.prototype.bindNeedFileds.call(this, type, fields);
-		if (type === 'student' || type === 'altsite' || type === 'school' || type === "georegion")
+		if (type === 'student' || type === 'altsite' || type === 'school' || type === "georegion" || type == "fieldtriplocation")
 		{
 			if (!Enumerable.From(fields).Contains('Xcoord'))
 			{
@@ -1763,6 +1763,10 @@
 			if (!Enumerable.From(fields).Contains('Ycoord'))
 			{
 				fields = fields.concat(['Ycoord']);
+			}
+			if (!Enumerable.From(fields).Contains('Geocoded'))
+			{
+				fields = fields.concat(['Geocoded']);
 			}
 		}
 

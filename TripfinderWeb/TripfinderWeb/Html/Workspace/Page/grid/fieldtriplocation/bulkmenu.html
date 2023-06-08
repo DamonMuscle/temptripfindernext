@@ -44,6 +44,13 @@
 					Geocoding
 				</div>
 			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.ungeocodeSelectionClick, css:{disabled:!gridViewModel.obGeocoded()||gridViewModel.obNoRecordsSelected()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Ungeocode
+				</div>
+			</li>			
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.globalReplaceClick.bind(gridViewModel)">
 				<div class="menu-icon">
 				</div>

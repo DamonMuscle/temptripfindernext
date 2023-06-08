@@ -1,0 +1,16 @@
+<div>
+	<div class="row">
+		<div class="col-xs-24">
+			<label><strong>Specify Records</strong></label>
+			<!-- ko foreach: obSpecifyRecords -->
+			<div class="radio">
+				<label>
+					<input type="radio" name="optionsRadios" value="all"
+						data-bind="value:$data.value,checked: $parent.obSelectedSpecifyRecords,disable:$data.disable">
+					<span data-bind="text:$data.text"></span>
+				</label>
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

@@ -26,6 +26,8 @@
 
 		this.geocodeTool = new TF.Grid.GeocodeTool(this);
 		this.geocodingSelectionClick = this.geocodeTool.geocodingSelectionClick.bind(this.geocodeTool);
+		this.ungeocodeSelectionClick = this.ungeocodeSelectionClick.bind(this);
+		this.selectedRowChanged.subscribe(this.onSelectRowChanged.bind(this));
 		// this.geocodingClick = this.geocodeTool.geocodingClick.bind(this.geocodeTool);
 	}
 
@@ -155,53 +157,25 @@
 
 	LocationPage.prototype.geocodeClick = function(gridMenuViewModel)
 	{
-		const self = gridMenuViewModel.gridViewModel, selectedRecords = gridMenuViewModel.searchGrid.getSelectedRecords();
-		if (selectedRecords && selectedRecords.length === 1)
-		{
-			const record = selectedRecords[0];
-			if (record.Street)
-			{
-				const address = {
-					Street: record.Street,
-					City: record.City || '',
-					State: record.State || '',
-					Zone: record.Zip || ''
-				};
-				const analysis = TF.GIS.Analysis.getInstance();
-				analysis.geocodeService.addressToLocations(address).then((result) => {
-					const location = {
-						x: result.location.x,
-						y: result.location.y,
-						score: result.score
-					};
-
-					record.XCoord = +location.x.toFixed(6);
-					record.YCoord = +location.y.toFixed(6);
-					record.GeocodeScore = +location.score.toFixed(2);
-					record.Geocoded = true;
-					self.updateRecords([record], "Geocode success.");
-
-				}).catch((error) => {
-					console.log(error);
-				});
-			}
-		}
+		gridMenuViewModel.gridViewModel.geocodingSelectionClick();
 	}
 
 	LocationPage.prototype.ungeocodeClick = function(gridMenuViewModel)
 	{
 		const self = gridMenuViewModel.gridViewModel, selectedRecords = gridMenuViewModel.searchGrid.getSelectedRecords();
-		if (selectedRecords && selectedRecords.length > 0)
+		var selected = self.searchGrid.getSelectedIds();
+		return tf.modalManager.showModal(new TF.Modal.Grid.GridSelectionSettingModalViewModel(selectedRecords.length, "Ungeocode")).then(function(setting)
 		{
-			selectedRecords.forEach(item => {
-				item.XCoord = null;
-				item.YCoord = null;
-				item.GeocodeScore = null;
-				item.Geocoded = false;
+			if (!setting)
+			{
+				return;
+			}
+			var recordIds = setting.specifyRecords == "selected" ? selected : gridMenuViewModel.searchGrid.allIds;
+			return self._ungeocodeConfirm(recordIds).then(function(result)
+			{
+				self._ungeocode(recordIds);
 			});
-
-			self.updateRecords(selectedRecords, "Ungeocode success.");
-		}
+		});
 	}
 
 	LocationPage.prototype.newCopyClick = function()
@@ -221,7 +195,7 @@
 	LocationPage.prototype.updateRecords = function(records, successMessage)
 	{
 		const self = this;
-		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), self.endpoint),
+		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(), self.endpoint),
 			{
 				data: records,
 				paramData: { '@relationships': 'udf' }
@@ -232,4 +206,43 @@
 				self.searchGrid.refreshClick();
 			});
 	}
+
+	LocationPage.prototype.ungeocodeSelectionClick = function()
+	{
+		var self = this;
+		var recordIds = self.searchGrid.getSelectedIds();
+		self._ungeocodeConfirm(recordIds).then(function(confirm)
+		{
+			if (confirm)
+			{
+				self._ungeocode(recordIds);
+			}
+		});
+	}
+
+	LocationPage.prototype._ungeocode = function(recordIds)
+	{
+		var data = [];
+
+		recordIds.forEach(recordId => {
+			data.push({ "Id": recordId, "op": "replace", "path": "/XCoord", "value": null });
+			data.push({ "Id": recordId, "op": "replace", "path": "/YCoord", "value": null });				
+			data.push({ "Id": recordId, "op": "replace", "path": "/GeocodeScore", "value": null });				
+		});
+
+		this.updateRecords(data, "Ungeocode success.");
+	}
+
+	LocationPage.prototype._ungeocodeConfirm = function(recordIds)
+	{
+		return tf.promiseBootbox.yesNo(String.format('Are you sure you want to ungeocode {0} {1}?', recordIds.length, recordIds.length == 1 ? 'location' : 'locations'), "Confirmation Message");
+	};
+
+	LocationPage.prototype.onSelectRowChanged = function()
+	{
+		this.obGeocoded(this.searchGrid.getSelectedRecords().filter(function(item)
+		{
+			return item.Geocoded == 'true'
+		}).length > 0);
+	};	
 })();
