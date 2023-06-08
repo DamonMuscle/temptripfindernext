@@ -1039,6 +1039,7 @@
 			excludeGridTypes: ['fieldtriplocation']
 		},
 		"Tripfinder": {
+			generateUrl: (url) => pathCombine(location.origin, location.pathname, "/#/nw"),
 		}
 	};
 	const basicGenerateUrl = (url) => pathCombine(url, "/#/nw");
