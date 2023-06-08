@@ -151,13 +151,9 @@
 		self.layer.removeAll();
 		if (geometry && geometry.x && geometry.y) return draw(geometry);
 		if (!self.obSelectedAddress()) return;
-		var x = self.obSelectedAddress().Xcoord, y = self.obSelectedAddress().Ycoord;
+		var x = self.obSelectedAddress().XCoord, y = self.obSelectedAddress().YCoord;
 		if (!x || !y) return;
-		var p = {
-			attributes: self.obSelectedAddress().attributes,
-			location: $.extend(true, {}, self.obSelectedAddress().location)
-		}
-		var point = new tf.map.ArcGIS.Point({ x: p.location.x, y: p.location.y, spatialReference: { wkid: 102100 } });
+		var point = tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(new tf.map.ArcGIS.Point({ x, y }));
 		draw(point);
 
 		function draw(point)
@@ -251,8 +247,8 @@
 			GeoZip: address.Postal,
 			GeoCounty: address.Region,
 			address: undefined,
-			Xcoord: location.x,
-			Ycoord: location.y,
+			XCoord: location.x,
+			YCoord: location.y,
 			isManuallyPin: true
 		}
 		self.addressCandidates([]);
