@@ -1,7 +1,7 @@
 ﻿(function()
 {
 	createNamespace("TF.GridDefinition").DocumentGridDefinition = DocumentGridDefinition;
-	function DocumentGridDefinition ()
+	function DocumentGridDefinition()
 	{
 
 	}
@@ -11,12 +11,16 @@
 		return {
 			Columns: [
 				{
-					FieldName: "MimeType",
-					DisplayName: "File Icon",
+					FieldName: "FileType",
+					DisplayName: "File Type",
 					Width: '150px',
-					type: "string",
-					AllowFiltering: false,
-					template: "<span class='glyphicon #:tf.documentGridDefinition.gridDefinition().fileTypeFormatter(MimeType)#'></span>"
+					type: "string"
+				},
+				{
+					FieldName: "Name",
+					DisplayName: "Name",
+					Width: '190px',
+					type: "string"
 				},
 				{
 					FieldName: "FileName",
@@ -45,16 +49,16 @@
 				},
 				{
 					FieldName: "LastUpdated",
-					DisplayName: "Last Updated",
+					DisplayName: "Last Updated Date",
 					Width: '150px',
 					dbType: "datetime",
 					type: "date",
+					isUTC: true,
 					template: function(item)
 					{
 						let dt = utcToClientTimeZone(item["LastUpdated"]);
 						return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
 					},
-					isUTC: true
 				},
 				{
 					FieldName: "LastUpdatedName",
@@ -63,103 +67,85 @@
 					type: "string"
 				},
 				{
+					FieldName: "AltsiteRelationshipCount",
+					DisplayName: "Alternate Sites",
+					Width: '150px',
+					type: "integer"
+				},
+				{
+					FieldName: "ContactRelationshipCount",
+					DisplayName: "Contacts",
+					Width: '150px',
+					type: "integer"
+				},
+				{
 					FieldName: "ContractorRelationshipCount",
 					DisplayName: "Contractors",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Contractor
+					type: "integer"
 				},
 				{
 					FieldName: "DistrictRelationshipCount",
 					DisplayName: "Districts",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.District
+					type: "integer"
 				},
 				{
 					FieldName: "FieldTripRelationshipCount",
 					DisplayName: "Field Trips",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTrip
+					type: "integer"
 				},
 				{
 					FieldName: "GeoregionRelationshipCount",
 					DisplayName: "Geo Regions",
 					Width: '150px',
-					type: "string",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.GeoRegion
+					type: "integer"
 				},
 				{
 					FieldName: "SchoolRelationshipCount",
 					DisplayName: "Schools",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.School
+					type: "integer"
 				},
 				{
 					FieldName: "StaffRelationshipCount",
 					DisplayName: "Staff",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Staff
+					type: "integer"
 				},
 				{
 					FieldName: "StudentRelationshipCount",
 					DisplayName: "Students",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Student
+					type: "integer"
 				},
 				{
 					FieldName: "TripRelationshipCount",
 					DisplayName: "Trips",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Trip
+					type: "integer"
 				},
 				{
 					FieldName: "TripStopRelationshipCount",
 					DisplayName: "Trip Stops",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.TripStop
+					type: "integer"
 				},
 				{
 					FieldName: "VehicleRelationshipCount",
 					DisplayName: "Vehicles",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Vehicle
+					type: "integer"
 				},
 				{
 					FieldName: "FieldTripTemplateRelationshipCount",
 					DisplayName: "Field Trip Templates",
 					Width: '150px',
-					type: "integer",
-					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTripTemplate
-				},
-				{
-					FieldName: "Md5Hash",
-					DisplayName: "Md5Hash",
-					Width: '150px',
-					type: "string",
-					hidden: true
+					type: "integer"
 				}
-			],
-			fileTypeFormatter: function(value)
-			{
-				var classCss = "glyphicon-picture";
-				if (value === "image/jpeg")
-				{
-					classCss = "glyphicon-picture";
-				}
-				if (value === "application/pdf")
-				{
-					classCss = "glyphicon-list-alt";
-				}
-				return classCss;
-			},
+			].concat(tf.UDFDefinition.getAvailableWithCurrentDataSource("document")),
+			InvisibleUDFColumns: tf.UDFDefinition.getInvisibleUDFs("document"),
 			documentDeletion: function(value)
 			{
 				var baseDeletion = new TF.Executor.DocumentDeletion();
@@ -178,20 +164,21 @@
 		return {
 			Columns: [
 				{
+					FieldName: "Name",
+					DisplayName: "Name",
+					Width: '190px',
+					type: "string"
+				},
+				{
 					FieldName: "FileName",
 					DisplayName: "File Name",
 					Width: '190px',
-					type: "string",
-					template: function(data)
-					{
-						return data.FileName;
-					}
+					type: "string"
 				},
 				{
 					FieldName: "Description",
 					Width: '150px',
-					type: "string",
-					isSortItem: true
+					type: "string"
 				},
 				{
 					FieldName: "DocumentClassificationName",
@@ -202,7 +189,7 @@
 					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.GeneralDataListsDocumentClassification
 				},
 				{
-					FieldName: "FieldTripRelationshipCount",
+					FieldName: "AttachedCount",
 					DisplayName: "Attached",
 					Width: '150px',
 					type: "integer"
