@@ -3422,6 +3422,34 @@
 												options.data.filterSet.UDGridID = udGridID;
 												this.postRequestData(url, options);
 											}
+											else if (["GPSEventType", "StaffTypes"].includes(this._gridType))
+											{
+												//front-end simulated aggregation
+												const filter = kendoOption && kendoOption.data && kendoOption.data.filter && kendoOption.data.filter.filters && kendoOption.data.filter.filters[0];
+												const filterValue = filter && filter.value || "";
+												const viewModel = ko.dataFor(args.element.closest(".list-mover-mover")[0]);
+												const availableRecords = viewModel.allRecords.filter(x => !viewModel.selectedData.some(y => y.ID === x.ID));
+
+												if (filterValue)
+												{
+													const filteredRecords = availableRecords.filter(x => (x[filter.field] || "").toLowerCase().includes(filterValue));
+													kendoSuccess({
+														d: {
+															__count: filteredRecords.length,
+															results: filteredRecords
+														}
+													});
+												}
+												else
+												{
+													kendoSuccess({
+														d: {
+															__count: availableRecords.length,
+															results: availableRecords
+														}
+													});
+												}
+											}
 											else
 											{
 												this.postRequestData(this.getApiRequestURL(this.options.url), this.getApiRequestOption(kendoOption));
