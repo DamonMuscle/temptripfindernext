@@ -173,7 +173,10 @@
 			var recordIds = setting.specifyRecords == "selected" ? selected : gridMenuViewModel.searchGrid.allIds;
 			return self._ungeocodeConfirm(recordIds).then(function(result)
 			{
-				self._ungeocode(recordIds);
+				if (result)
+				{
+					self._ungeocode(recordIds);
+				}
 			});
 		});
 	}
@@ -202,8 +205,11 @@
 		})
 		.then(() =>
 		{
-			self.searchGrid.refreshClick();
+			self.searchGrid.refresh();
 			successMessage && tf.promiseBootbox.alert(successMessage);
+		}, function(error)
+		{
+			return tf.promiseBootbox.alert(error.Message, "Ungeocode failed");
 		});
 	}
 
