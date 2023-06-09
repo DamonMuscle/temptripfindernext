@@ -3283,7 +3283,11 @@
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)
 	{
 		const self = this;
-		switch (definition.type && column.filterable !== false)
+		if (!definition || column.filterable === false)
+		{
+			return;
+		}
+		switch (definition.type)
 		{
 			case "string":
 				column.filterable = {
