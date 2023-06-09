@@ -632,6 +632,7 @@
 												.then((gridLinkData) => {
 													if (!gridLinkData)
 													{
+														history.pushState({}, document.title, location.pathname);
 														openDefaultPage(false);
 														return;
 													}
