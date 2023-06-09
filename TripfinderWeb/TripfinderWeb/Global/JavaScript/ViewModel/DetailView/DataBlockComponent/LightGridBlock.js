@@ -2237,7 +2237,7 @@
 				{
 					if (self.isCreateGridNewRecord)
 					{
-						let fieldName = GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
+						let fieldName = LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME["trip"];
 						let selectedIds = self.fieldEditorHelper.editFieldList[fieldName].value.join();
 						paramData["@filter"] = `in(Id,${selectedIds})`;
 					}
@@ -2580,17 +2580,17 @@
 	{
 		var self = this;
 		if (self.options.field === "ContactAssociationGrid" &&
-			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact] &&
-			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact].value)
+			self.fieldEditorHelper.editFieldList[LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact] &&
+			self.fieldEditorHelper.editFieldList[LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact].value)
 		{
-			const selectedItemKeys = _.cloneDeep(self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact].value || []);
+			const selectedItemKeys = _.cloneDeep(self.fieldEditorHelper.editFieldList[LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.contact].value || []);
 			getItemsAsync = self._getAssociateData(selectedItemKeys);
 		}
 		else if (self.options.field === "DocumentGrid" &&
-			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document] &&
-			self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document].value)
+			self.fieldEditorHelper.editFieldList[LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document] &&
+			self.fieldEditorHelper.editFieldList[LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document].value)
 		{
-			const selectedItemKeys = _.cloneDeep(self.fieldEditorHelper.editFieldList[GridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document].value || []);
+			const selectedItemKeys = _.cloneDeep(self.fieldEditorHelper.editFieldList[LightGridBlock.MINI_GRID_ASSOCIATION_FIELD_NAME.document].value || []);
 			getItemsAsync = self._updateDocumentGrid(selectedItemKeys, self.options.columns || []);
 		}
 

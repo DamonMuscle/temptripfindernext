@@ -869,7 +869,6 @@
 					DBID: tf.datasourceManager.databaseId,
 					RecordID: item.Id,
 					ContactID: self.recordId || 0,
-					ContactTypeID: TF.DetailView.DataBlockComponent.GridBlock.CONTACT_TYPE.General // TODO: assign correct ContactTypeID.
 				};
 			})
 		};
