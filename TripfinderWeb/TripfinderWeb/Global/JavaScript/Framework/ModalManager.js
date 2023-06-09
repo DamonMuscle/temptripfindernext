@@ -301,10 +301,18 @@
 			{
 				underlineButtons.push({ underlineClass: baseModalViewModel.obPositiveUnderlineClass, buttonClass: ".modal-footer button.positive" });
 			}
-			//The "esc" should act like the close button.
-			bindExtend("esc", ".modal-header button.close", { permission: ["INPUT", "TEXTAREA", "SELECT"] });
-			//The "enter" should act like the positive button.
-			bindExtend("enter", ".modal-footer button.positive", { permission: ["INPUT", "SELECT"] });
+
+			if(baseModalViewModel.obEnableEsc())
+			{
+				//The "esc" should act like the close button.
+				bindExtend("esc", ".modal-header button.close", { permission: ["INPUT", "TEXTAREA", "SELECT"] });
+			}
+
+			if(baseModalViewModel.obEnableEnter())
+			{
+				//The "enter" should act like the positive button.
+				bindExtend("enter", ".modal-footer button.positive", { permission: ["INPUT", "SELECT"] });
+			}
 
 			//Not include the modal which only has one button.
 			if (buttonTemplateLocation !== "modal/positive")
