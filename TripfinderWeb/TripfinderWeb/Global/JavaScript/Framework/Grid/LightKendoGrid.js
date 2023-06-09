@@ -1926,6 +1926,19 @@
 				case 'WithSearchGrid':
 					var selectedItems = TF.ListFilterHelper.getSelectedFilterItemsForWithSearchGridType(self.listFilters, listFilterTemplate, fieldName);
 					var columnSources = {};
+
+					if (self._gridType === 'staff')
+					{
+						if (listFilterTemplate.GridType === 'District')
+						{
+							columnSources = { columnSources: TF.ListFilterDefinition.ColumnSource.StaffGridDistrict };
+						}
+						else if (listFilterTemplate.GridType === 'StaffTypes')
+						{
+							columnSources = { columnSources: TF.ListFilterDefinition.ColumnSource.StaffGridStaffTypes };
+						}
+					}
+
 					if ((self._gridType === 'student' || self._gridType === 'staff')
 						&& listFilterTemplate.GridType === 'Genders')
 					{
@@ -1933,7 +1946,7 @@
 					}
 					
 					return tf.modalManager.showModal(
-						new TF.Modal.ListMoverForListFilterControlModalViewModel(selectedItems, listFilterTemplate, { showRemoveColumnButton: false }, columnSources)
+						new TF.Modal.ListMoverForListFilterControlModalViewModel(selectedItems, $.extend(true, {}, listFilterTemplate, { showRemoveColumnButton: false }, columnSources))
 					)
 						.then(function(selectedFilterItems)
 						{
