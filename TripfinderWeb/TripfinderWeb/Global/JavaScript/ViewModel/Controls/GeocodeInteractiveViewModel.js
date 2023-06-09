@@ -209,6 +209,7 @@
 			record.GeoCity = result.GeoCity;
 			record.GeoZip = result.GeoZip;
 			record.GeoCounty = result.GeoCounty;
+			record.GeocodeScore = result.Score;
 			record.XCoord = result.XCoord;
 			record.YCoord = result.YCoord;
 			record.isManuallyPin = result.isManuallyPin;
