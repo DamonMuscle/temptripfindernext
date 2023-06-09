@@ -247,18 +247,39 @@
 				}).appendTo("body");
 
 			var targetBlock;
+			var getDataBlock = (array) =>
+			{
+				var targetBlock = array.reduce((acc, item) =>
+				{
+					if (acc) return acc;
+					if (item instanceof TF.DetailView.DataBlockComponent.TabStripBlock)
+					{
+						return item.nestedGridStacks.reduce(function(a, gridStack)
+						{
+							if (a) return a;
+							return getDataBlock(gridStack.dataBlocks);
+						}, undefined);
+					} else
+					{
+						if ($(e.currentTarget.closest(".grid-stack-item")).hasClass(item.uniqueClassName))
+						{
+							return item;
+						}
+					}
+
+				}, undefined);
+				return targetBlock;
+			};
 			switch (miniGridType)
 			{
 				case "contact":
-					targetBlock = self.rootGridStack.dataBlocks.filter(function(dataBlock)
+					if (!self.obIsReadOnly())
 					{
-						if (!dataBlock.randomClass) return;
-
-						return $(e.currentTarget.closest(".grid-stack-item")).hasClass(dataBlock.randomClass);
-					})[0];
-					tf.contextMenuManager.showMenu($visualTarget,
-						new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/MiniGridRightClickMenu",
-							new TF.DetailView.MiniGridRightClickMenu(targetBlock, miniGridType, $target)));
+						var targetBlock = getDataBlock(self.rootGridStack.dataBlocks);
+						tf.contextMenuManager.showMenu($visualTarget,
+							new TF.ContextMenu.TemplateContextMenu("workspace/DetailView/MiniGridRightClickMenu",
+								new TF.DetailView.MiniGridRightClickMenu(targetBlock, miniGridType, $target)));
+					}
 					break;
 				case "UDGrid":
 					targetBlock = null;
