@@ -1925,8 +1925,15 @@
 			{
 				case 'WithSearchGrid':
 					var selectedItems = TF.ListFilterHelper.getSelectedFilterItemsForWithSearchGridType(self.listFilters, listFilterTemplate, fieldName);
+					var columnSources = {};
+					if ((self._gridType === 'student' || self._gridType === 'staff')
+						&& listFilterTemplate.GridType === 'Genders')
+					{
+						columnSources = { columnSources: TF.ListFilterDefinition.ColumnSource.Gender };
+					}
+					
 					return tf.modalManager.showModal(
-						new TF.Modal.ListMoverForListFilterControlModalViewModel(selectedItems, listFilterTemplate)
+						new TF.Modal.ListMoverForListFilterControlModalViewModel(selectedItems, listFilterTemplate, { showRemoveColumnButton: false }, columnSources)
 					)
 						.then(function(selectedFilterItems)
 						{
@@ -3276,7 +3283,7 @@
 	LightKendoGrid.prototype.setColumnFilterableCell = function(column, definition, source)
 	{
 		const self = this;
-		switch (definition.type)
+		switch (definition.type && column.filterable !== false)
 		{
 			case "string":
 				column.filterable = {
@@ -7264,7 +7271,38 @@
 			else if (listFilterTemplate.setLeftGridRequestOption)
 				requestOption = listFilterTemplate.setLeftGridRequestOption(requestOption);
 
-			tf.promiseAjax.post(requestUrl, requestOption)
+			function processFilterWithField(selectedItems, listFilterTemplate, cachedListFilters, field)
+			{
+				selectedItems = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField);
+				selectedItems.sort(function(a, b) { return a.FilterItem.localeCompare(b.FilterItem); });
+				cachedListFilters[field].selectedItems = selectedItems;
+				var tmp = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField);
+				cachedListFilters[field].selectedFilterItems = tmp.map(function(item) { return item.FilterItem; });
+			}
+
+			function getData(requestUrl, idField)
+			{
+				tf.promiseAjax.get(requestUrl)
+					.then(function(response)
+					{
+						var selectedItems = response.Items.filter(x => selectedIds.some(y => y === x[idField]));
+						selectedItems.forEach(x => x.Id = x[idField]);
+						processFilterWithField(selectedItems, listFilterTemplate, cachedListFilters, field);
+					});
+			}
+
+			if (listFilterTemplate.GridType === 'StaffTypes')
+			{
+				getData(requestUrl, "StaffTypeId");
+			}
+			if (listFilterTemplate.GridType === 'GPSEventType'
+				|| listFilterTemplate.GridType === 'Genders')
+			{
+				getData(requestUrl, "ID");
+			}
+			else
+			{
+				tf.promiseAjax.post(requestUrl, requestOption)
 				.then(function(response)
 				{
 					var selectedItems = response.Items || [];
@@ -7274,6 +7312,9 @@
 					var tmp = TF.ListMoverForListFilterHelper.processSelectedData(selectedItems, listFilterTemplate.filterField)
 					cachedListFilters[field].selectedFilterItems = tmp.map(function(item) { return item.FilterItem; });;
 				});
+			}
+
+
 		}
 		else if (listFilterTemplate.listFilterType === 'MapData' && selectedIds.length > 0)
 		{

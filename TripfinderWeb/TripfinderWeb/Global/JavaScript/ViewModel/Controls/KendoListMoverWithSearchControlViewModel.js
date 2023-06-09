@@ -66,6 +66,12 @@
 		this.headerFilters = null;
 
 		this.columns = this.options.columnSources || this.columnSources[this.options.type];
+
+		if (!this.columns && this.options.type === 'Genders')
+		{
+			this.columns = TF.ListFilterDefinition.ColumnSource.Gender;
+		}
+
 		this.originalColumns = [];
 		this.allRecords = [];
 
@@ -687,6 +693,13 @@
 			case 'GPSEventType':
 				promise = TF.Helper.VehicleEventHelper.getEventTypes();
 				break;
+			case 'Grades':
+			case 'StaffTypes':
+			case 'GeneralDataListsDisabilityCode':
+			case 'Genders':
+			case 'schoollocation':
+				promise = tf.promiseAjax.get(self.options.getUrl(self.options.type, self.options));
+				break;				
 			case 'GeneralDataListsDisabilityCode':
 				promise = tf.promiseAjax.get(self.options.getUrl(self.options.type, self.options));
 				break;
@@ -711,6 +724,20 @@
 		return promise
 			.then(function(response)
 			{
+				// Preprocess StaffTypes
+				if (self.options.GridType === 'StaffTypes')
+				{
+					response.Items.forEach(x => x.Id = x.StaffTypeId);
+					response.Items.sort((x, y) => (x.StaffTypeName.toLowerCase() > y.StaffTypeName.toLowerCase() ? 1 : -1));
+				}
+
+				// Preprocess Genders
+				if (self.options.GridType === 'Genders')
+				{
+					response.Items.forEach(x => x.Id = x.ID);
+					response.Items.sort((x, y) => (x.Name.toLowerCase() > y.Name.toLowerCase() ? 1 : -1));
+				}
+
 				/**
 				 * preprocess response of UDF list
 				 */

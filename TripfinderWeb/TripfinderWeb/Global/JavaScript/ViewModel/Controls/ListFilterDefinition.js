@@ -791,13 +791,26 @@
 			AllItems: ['To School', 'From School', 'Shuttle']
 		}, true);
 
-	ListFilterDefinition.ListFilterTemplate.Gender = $.extend(
-		{}, ListFilterTemplateEnumOption,
-		{
-			DisplayFilterTypeName: "Gender",
-			EnumListFilterColumnName: "Gender",
-			AllItems: ['Male', 'Female', 'Unknown']
-		}, true);
+	function GenerateGenderListFilter(filedName)
+	{
+		return $.extend(
+			{}, ListFilterTemplateDefaultOption,
+			{
+				DisplayFilterTypeName: "Gender",
+				GridType: "Genders",
+				filterField: filedName || "Code",
+				showRemoveColumnButton: false,
+				serverPaging: false,
+				getUrl: function()
+				{
+					return pathCombine(tf.api.apiPrefixWithoutDatabase(), "genders");
+				},
+			}, true);
+	}
+
+
+	
+	ListFilterDefinition.ListFilterTemplate.Gender = GenerateGenderListFilter();
 
 	ListFilterDefinition.ListFilterTemplate.Grades = $.extend(
 		{}, ListFilterTemplateEnumOption,
@@ -900,6 +913,14 @@
 			Width: '150px',
 			type: "string"
 		}];
+	ListFilterDefinition.ColumnSource.Gender = [
+		{
+			FieldName: "Code",
+			DisplayName: "Gender",
+			type: "string",
+			isSortItem: true,
+			filterable: false
+		}];		
 	ListFilterDefinition.ColumnSource.GeoRegion = [
 		{
 			FieldName: "Name",
