@@ -181,6 +181,7 @@
 					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
 					item.XCoord = locations[index]?.location.x;
 					item.YCoord = locations[index]?.location.y;
+					item.Score = locations[index]?.score;
 	
 					var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
 					if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
@@ -189,7 +190,19 @@
 						exactMatchRecord = item;
 					}
 				});
-	
+
+				data.sort((a, b) =>
+				{
+					if (b.score !== a.score)
+					{
+						return b.score - a.score; // Sort by 'score' field in descending order first.
+					}
+					else
+					{
+						return a.address.localeCompare(b.address); // If 'score' is the same, sort by 'address' field in alphabetical order.
+					}
+				});
+
 				self.addressCandidates(data);
 	
 				if (data.length > 0)
