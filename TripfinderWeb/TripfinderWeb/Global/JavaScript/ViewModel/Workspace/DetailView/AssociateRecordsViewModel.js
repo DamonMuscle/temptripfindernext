@@ -367,13 +367,14 @@
 		{
 			var leftSelectedIds = self.leftSearchGrid.getSelectedIds(),
 				dataTypeName = self.obSelected().name,
+				dataTypeLabel = tf.applicationTerm.getApplicationTermSingularByName(dataTypeName),
 				leftSelectedItems = self.leftSearchGrid.getSelectedRecords().map(function(item)
 				{
 					return {
 						RowId: '',
 						Id: item.Id,
 						Name: self._getNameByDataType(dataTypeName, item),
-						DataType: dataTypeName
+						DataType: dataTypeLabel
 					};
 				});
 
