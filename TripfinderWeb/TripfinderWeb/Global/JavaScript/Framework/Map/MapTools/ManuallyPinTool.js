@@ -222,12 +222,11 @@
 		var self = this;
 		if (self.type === "geocodeInteractive")
 		{
-			TF.locationToAddress(geometry).then(function(result)
+			TF.GIS.Analysis.getInstance().geocodeService.locationToAddress({x: geometry.longitude, y: geometry.latitude}).then(function(result)
 			{
 				result.location = geometry;
 				self.routingMapTool.routingMapDocumentViewModel.updateAddressFromPin(result, self.stopTool);
-			})
-
+			});
 		}
 	};
 

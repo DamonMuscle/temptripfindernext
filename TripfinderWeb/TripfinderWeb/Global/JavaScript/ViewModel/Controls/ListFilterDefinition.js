@@ -103,6 +103,26 @@
 			}
 		}, true);
 
+	ListFilterDefinition.ListFilterTemplate.StaffContractorName = $.extend(
+		{}, ListFilterTemplateDefaultOption,
+		{
+			DisplayFilterTypeName: "Contractor Name",
+			GridType: "Staff",
+			filterField: "ContractorName",
+			serverPaging: false,
+			columnSources: [
+				{
+					FieldName: "ContractorName",
+					Width: '260px',
+					type: "string",
+					isSortItem: true
+				}],
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("staff"));
+			}
+		}, true);
+
 	ListFilterDefinition.ListFilterTemplate.District = $.extend(
 		{}, ListFilterTemplateDefaultOption,
 		{
@@ -791,6 +811,19 @@
 			AllItems: ['To School', 'From School', 'Shuttle']
 		}, true);
 
+	ListFilterDefinition.ListFilterTemplate.StaffTypes = $.extend(
+		{}, ListFilterTemplateDefaultOption,
+		{
+			DisplayFilterTypeName: "Staff Types",
+			GridType: "StaffTypes",
+			filterField: "StaffTypeName",
+			serverPaging: false,
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "stafftypes");
+			},
+		}, true);
+
 	function GenerateGenderListFilter(filedName)
 	{
 		return $.extend(
@@ -913,6 +946,28 @@
 			Width: '150px',
 			type: "string"
 		}];
+
+	ListFilterDefinition.ColumnSource.StaffGridDistrict = [
+		{
+			FieldName: "Name",
+			Width: '260px',
+			type: "string",
+			isSortItem: true
+		},
+		{
+			FieldName: "District",
+			Width: '150px',
+			type: "string"
+		}];
+		
+	ListFilterDefinition.ColumnSource.StaffGridStaffTypes = [
+		{
+			FieldName: "StaffTypeName",
+			Width: '260px',
+			type: "string",
+			isSortItem: true
+		}];		
+
 	ListFilterDefinition.ColumnSource.Gender = [
 		{
 			FieldName: "Code",

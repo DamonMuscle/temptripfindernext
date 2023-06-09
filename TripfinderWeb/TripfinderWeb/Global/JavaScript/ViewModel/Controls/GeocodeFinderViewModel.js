@@ -181,6 +181,7 @@
 					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
 					item.XCoord = locations[index]?.location.x;
 					item.YCoord = locations[index]?.location.y;
+					item.Score = locations[index]?.score;
 	
 					var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
 					if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
@@ -189,7 +190,19 @@
 						exactMatchRecord = item;
 					}
 				});
-	
+
+				data.sort((a, b) =>
+				{
+					if (b.score !== a.score)
+					{
+						return b.score - a.score; // Sort by 'score' field in descending order first.
+					}
+					else
+					{
+						return a.address.localeCompare(b.address); // If 'score' is the same, sort by 'address' field in alphabetical order.
+					}
+				});
+
 				self.addressCandidates(data);
 	
 				if (data.length > 0)
@@ -214,25 +227,27 @@
 		this.findAddress(this.obGeoStreet(), this.obGeoCity(), this.obGeoZip());
 	};
 
-	GeocodeFinderViewModel.prototype.updateAddressFromPin = function(address, stopTool)
+	GeocodeFinderViewModel.prototype.updateAddressFromPin = function(response, stopTool)
 	{
 		var self = this;
-		var location = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(address.location);
+		var location = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(response.location);
+		var results = response.address.split(",").map(item => item.trim());
 		var candidate = {
-			GeoStreet: address.Street,
-			GeoCity: address.City,
-			GeoZip: address.Postal,
-			GeoCounty: address.Region,
-			address: undefined,
+			GeoStreet: results[0] || null,
+			GeoCity: results[1] || null,
+			GeoZip: results[3] || null,
+			GeoCounty: results[2] || null,
+			address: response.address,
 			XCoord: location.x,
 			YCoord: location.y,
-			isManuallyPin: true
+			isManuallyPin: true,
+			Score: 100
 		}
 		self.addressCandidates([]);
 		setTimeout(function()
 		{
 			self.result = candidate;
-			self.drawCoordinate(address.location)
+			self.drawCoordinate(response.location)
 		});
 	}
 
