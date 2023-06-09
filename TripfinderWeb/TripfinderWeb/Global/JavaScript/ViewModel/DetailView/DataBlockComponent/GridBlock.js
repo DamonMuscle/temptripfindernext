@@ -775,6 +775,7 @@
 						Id: item.Id,
 						Name: item.Name,
 						DataType: item.Type,
+						DataTypeName: item.TypeName,
 						IsPrimary: item.IsPrimary
 					};
 				}),
@@ -1557,6 +1558,7 @@
 							return {
 								Id: item.Id,
 								Type: item.Type,
+								TypeName: item.TypeName,
 								IsPrimary: item.IsPrimary
 							}
 						});
@@ -1579,7 +1581,7 @@
 			value: associations.map(function(item)
 			{
 				return {
-					DataTypeId: tf.dataTypeHelper.getIdByName(item.Type),
+					DataTypeId: tf.dataTypeHelper.getIdByName(item.TypeName || item.Type),
 					DBID: tf.datasourceManager.databaseId,
 					RecordID: item.Id,
 					ContactID: self.recordId || 0,
@@ -2044,6 +2046,11 @@
 			{
 				return (a.Type && b.Type && a.Type.localeCompare(b.Type)) ||
 					(a.Name && b.Name && a.Name.localeCompare(b.Name));
+			});
+			response.Items.forEach(function(i)
+			{
+				i.TypeName = i.Type;
+				i.Type = tf.applicationTerm.getApplicationTermSingularByName(i.TypeName) || i.TypeName;
 			});
 			return response;
 		}).then(function(response)

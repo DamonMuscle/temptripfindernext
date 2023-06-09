@@ -374,7 +374,8 @@
 						RowId: '',
 						Id: item.Id,
 						Name: self._getNameByDataType(dataTypeName, item),
-						DataType: dataTypeLabel
+						DataType: dataTypeLabel,
+						DataTypeName: dataTypeName,
 					};
 				});
 
@@ -392,7 +393,8 @@
 						RowId: '',
 						Id: item.Id,
 						Name: self._getNameByDataType(dataTypeName, item),
-						DataType: self.obSelected().name
+						DataType: dataTypeLabel,
+						DataTypeName: dataTypeName,
 					}
 				}) : leftSelectedItems);
 			}
@@ -577,7 +579,8 @@
 					return {
 						'Id': item.Id,
 						'Name': item.Name,
-						'Type': item.DataType
+						'Type': item.DataType,
+						'TypeName': item.DataTypeName,
 					};
 				});
 
