@@ -281,6 +281,79 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		});
 	}
 
+	GeocodingService.prototype.suggestLocationsREST = async function(searchAddress)
+	{
+		const self = this;
+		const url = self.getValidLocatorUrl("suggestLocationsREST");
+		if (url === null) {
+			return;
+		}
+
+		return new Promise((resolve, reject) =>
+		{
+			let addresses = null, errorMessage = null;
+			const suggestUrl = `${url}/suggest`;
+			$.ajax({
+				url: suggestUrl,
+				data: {
+					countryCode: "USA",
+					text: searchAddress,
+					token: self.mode === MODE.ONLINE ? self.settings.onlineToken : null,
+					f: "json"
+				},
+				success: (response) => {
+					const suggestions = response.suggestions;
+					addresses = suggestions.map(item => {
+						const [country, zip, state, city, street]= item.text.split(",").map(x=>x.trim()).reverse();
+						return { text: item.text, country, zip, state, city, street, magicKey: item.magicKey };
+					}).filter((item) => {
+						const zipShouldBeDigits = /^[\d]+$/;
+						return zipShouldBeDigits.test(item.zip) && item.street != null;
+					});
+	
+					resolve( { addresses, errorMessage });
+				}
+			});
+		});
+	}
+
+	GeocodingService.prototype.findAddressCandidatesREST = async function(searchAddress, magicKey)
+	{
+		const self = this;
+		const url = self.getValidLocatorUrl("suggestLocationsREST");
+		if (url === null) {
+			return;
+		}
+
+		return new Promise((resolve, reject) =>
+		{
+			let location = null, errorMessage = null;
+			const findAddressCandidatesUrl = `${url}/findAddressCandidates`;
+			$.ajax({
+				url: findAddressCandidatesUrl,
+				data: {
+					magicKey: magicKey,
+					text: searchAddress,
+					token: self.mode === MODE.ONLINE ? self.settings.onlineToken : null,
+					f: "json"
+				},
+				success: (response) => {
+					if (response && response.candidates && response.candidates.length > 0) {
+						const matched = response.candidates[0];
+						const location = matched.location;
+						const score = matched.score;
+
+						resolve({ location, score, errorMessage });
+					} else {
+						errorMessage = `No location was found for this address ${JSON.stringify(searchAddress)}`;
+
+						reject({ location, errorMessage });
+					}
+				}
+			});
+		});
+	}
+
 	GeocodingService.prototype.getValidLocatorUrl = function(callerName)
 	{
 		const self = this;
@@ -345,21 +418,28 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 			Zone: null
 		};
 		
-		this.addressToLocations(address).then((result) => {
-			console.log({
-				x: result.location.x,
-				y: result.location.y,
-				score: result.score
-			});
-			// '{"x":-73.94121999999999,"y":42.812380000000076,"score":100}'
-		}).catch((error) => {
-			console.log(error);
-		});
+		// this.addressToLocations(address).then((result) => {
+		// 	console.log({
+		// 		x: result.location.x,
+		// 		y: result.location.y,
+		// 		score: result.score
+		// 	});
+		// 	// '{"x":-73.94121999999999,"y":42.812380000000076,"score":100}'
+		// }).catch((error) => {
+		// 	console.log(error);
+		// });
 
 
 		// const searchAddress = "1 Mickey Mouse Blvd, Lake Buena Vista, FL";
-		const searchAddress = "1 Mickey Mouse Blvd, Lake Buena Vista, Florida";
-		this.suggestLocations(searchAddress).then((result) => {
+		// let searchAddress = "1 Mickey Mouse Blvd, Lake Buena Vista, Florida";
+		// this.suggestLocations(searchAddress).then((result) => {
+		// 	console.log(result.addresses);
+		// }).catch((error) => {
+		// 	console.log(error.errorMessage);
+		// });
+
+		let searchAddress = "mmm";
+		this.suggestLocationsREST(searchAddress).then((result) => {
 			console.log(result.addresses);
 		}).catch((error) => {
 			console.log(error.errorMessage);

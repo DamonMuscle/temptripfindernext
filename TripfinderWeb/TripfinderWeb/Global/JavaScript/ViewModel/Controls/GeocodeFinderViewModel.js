@@ -166,17 +166,12 @@
 		self.obGeoCity(city);
 		self.obGeoZip(zip);
 
-		return tf.loadingIndicator.enhancedShow(TF.GIS.Analysis.getInstance().geocodeService.suggestLocations(searchAddress).then(function(response)
+		return tf.loadingIndicator.enhancedShow(TF.GIS.Analysis.getInstance().geocodeService.suggestLocationsREST(searchAddress).then(function(response)
 		{
 			let selectIndex = 0, exactMatchRecord = null;
 			data = response.addresses;
 
-			return Promise.all(data.map(item=>TF.GIS.Analysis.getInstance().geocodeService.addressToLocations({
-				Street: item.street,
-				City: item.city,
-				State: item.state,
-				Zone: item.zip
-			}))).then(function(locations){
+			return Promise.all(data.map(item=>TF.GIS.Analysis.getInstance().geocodeService.findAddressCandidatesREST(item.text, item.magicKey))).then(function(locations){
 				data.forEach((item, index) => {
 					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
 					item.XCoord = locations[index]?.location.x;
