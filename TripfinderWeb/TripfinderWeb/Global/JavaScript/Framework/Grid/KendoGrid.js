@@ -159,7 +159,7 @@
 		//the filter will sticky once open a new grid, so save the sticky information in DB
 		var storageFilterDataKey = `grid.currentfilter.${openRelatedData.pageType}.id`;
 		return Promise.all([
-			TF.Grid.FilterHelper.clearQuickFilter(openRelatedData.pageType),
+			TF.Grid.FilterHelper.clearQuickFilter(openRelatedData.gridType),
 			// tf.storageManager.save(`grid.currentlayout.${openRelatedData.pageType}.id`, ''),
 			tf.storageManager.save(storageFilterDataKey,
 			{
