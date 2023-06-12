@@ -1252,7 +1252,10 @@
 			return;
 		}
 
-		return this.loadGridFilter(false).then(() => { this.setCurrentFilter(gridFilterDataModel) });
+		return this.loadGridFilter(false).then(() => { 
+			this.setCurrentFilter(gridFilterDataModel);
+			return gridFilterDataModel;
+		});
 	};
 
 	KendoGridFilterMenu.prototype.setCurrentFilter = function(gridFilterDataModel)
