@@ -1312,7 +1312,9 @@
 					})
 					.then(() =>
 					{
-						self.pageLevelViewModel.popupSuccessMessage(`${tf.dataTypeHelper.getFormalDataTypeName(self.type)} Copied`);
+						const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.type);
+						const dataTypeLabel = tf.applicationTerm.getApplicationTermSingularByName(dataTypeName);
+						self.pageLevelViewModel.popupSuccessMessage(`${dataTypeLabel} Copied`);
 						self.searchGrid.refreshClick();
 					});
 			})
