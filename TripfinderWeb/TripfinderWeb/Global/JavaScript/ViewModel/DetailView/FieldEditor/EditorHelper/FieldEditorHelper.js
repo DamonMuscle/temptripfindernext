@@ -588,6 +588,11 @@
 
 		$content.css({ border: 'none', outline: 'none' });
 
+		if (!options.format)
+		{
+			return;
+		}
+
 		self._editor = self._createEditor(options.format);
 		options.editFieldList = self.editFieldList;
 		self._editor.editStart($element, options);
