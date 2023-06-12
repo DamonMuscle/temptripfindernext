@@ -961,6 +961,8 @@
 			self.autoScrollInit();
 		}
 
+		self.openDetailViewBySetting();
+
 		if (option && option.IsCallout)
 		{
 			delete option.IsCallout;
@@ -985,6 +987,19 @@
 			}
 			return false;
 		}.bind(this));
+	};
+
+	BaseGridPage.prototype.openDetailViewBySetting = function()
+	{
+		const self = this;
+		if(self.searchGridInited() && self.options?.openRelatedData?.openDetailView)
+		{
+			const [selectedId] = self.options?.openRelatedData?.selectedIds || [];
+			if(!!selectedId)
+			{
+				self.showDetailsClick(selectedId);
+			}
+		}
 	};
 
 	BaseGridPage.prototype.autoScrollInit = function()

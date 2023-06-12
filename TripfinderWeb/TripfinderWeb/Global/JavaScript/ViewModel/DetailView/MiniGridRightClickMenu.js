@@ -48,24 +48,29 @@
 		var $tr = this.$target.closest("tr"),
 			$grid = $tr.closest(".kendo-grid"),
 			kendoGrid = $grid.data("kendoGrid"),
-			recordId = kendoGrid.dataItem($tr).Id;
+			recordId = kendoGrid.dataItem($tr).Id,
+			gridType = this.miniGridType;
 
-		tf.documentManagerViewModel.obCurrentDocument().gridViewModel._openSpecificData(this.miniGridType, [recordId]);
+		const dataType = tf.dataTypeHelper.getAvailableDataTypes().find(d => d.key === gridType);
+		const pageType = dataType ? dataType.pageType : gridType;
 
-		var interval = setInterval(function()
+		const filterName = `${tf.dataTypeHelper.getDisplayNameByDataType(gridType)} (Selected Records)`;
+
+		sessionStorage.setItem("openRelated", JSON.stringify(
 		{
-			if (tf.documentManagerViewModel
-				&& tf.documentManagerViewModel.obCurrentDocument()
-				&& tf.documentManagerViewModel.obCurrentDocument().gridViewModel
-				&& tf.documentManagerViewModel.obCurrentDocument().gridViewModel.$container
-				&& tf.documentManagerViewModel.obCurrentDocument().gridViewModel.$container.length > 0
-				&& tf.documentManagerViewModel.obCurrentDocument().gridViewModel.$container.find(".k-grid-content tr").length == 1
-			)
-			{
-				clearInterval(interval);
-				tf.documentManagerViewModel.obCurrentDocument()._selectRecordAndShowDetailView(recordId);
-			}
-		}, 50);
+			"gridType": gridType,
+			"type": "detailview",
+			"pageType": pageType,
+			"filterName": filterName,
+			"selectedIds": [recordId],
+			"openDetailView": true
+		}));
+
+		const location = "#/?pagetype=" + pageType;
+		const redirectWindow = window.open(location, "_blank");
+		redirectWindow.name = "new-pageWindow_" + $.now();
+
+		sessionStorage.removeItem("openRelated");
 	}
 
 	MiniGridRightClickMenu.prototype.disassociateClicked = function(viewModel, e)
