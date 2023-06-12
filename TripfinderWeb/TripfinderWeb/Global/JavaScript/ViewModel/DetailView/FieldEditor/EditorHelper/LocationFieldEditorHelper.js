@@ -44,8 +44,7 @@
 			return acc;
 		},[]);
 
-		return msgStack.length === 0 ?
-		true : tf.modalManager.showModal(
+		return msgStack.length === 0 ? Promise.resolve(true) : tf.modalManager.showModal(
 			new TF.DetailView.DataEditorSaveConfirmationModalViewModel({
 				includeAll: msgStack.length >= count,
 				messages: msgStack,
