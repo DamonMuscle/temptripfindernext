@@ -1000,6 +1000,7 @@
 			case "trip":
 			case "tripstop":
 			case "route":
+			case "fieldtriplocation":
 				sortFields = ["Name"];
 				break;
 			case "contact":
