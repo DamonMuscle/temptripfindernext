@@ -620,7 +620,7 @@
 	DataTypeHelper.prototype.getEntityUpdateConfirmBlackList = function(type)
 	{
 		var obj = this._getObjectByType(type);
-		return obj ? obj.entityUpdateConfirmBlackList : [];
+		return obj?.entityUpdateConfirmBlackList || [];
 	};
 
 	DataTypeHelper.getValidDataTypes = function(isValidDataTypeFun)

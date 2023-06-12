@@ -5217,9 +5217,9 @@
 				{
 					"field": "Zip",
 					"title": "Zip",
-					"type": "Number",
+					"type": "string",
 					"editType": {
-						"format": "Number",
+						"format": "String",
 						"maxLength": 5
 					}
 				},

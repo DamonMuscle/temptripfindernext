@@ -1,0 +1,14 @@
+<div class="data-editor-save-confirmation-modal" data-bind="uiInit:init">
+	<div class="container">
+		<div class="list" data-bind="foreach:{data:obConfirmationList}">
+			<div class="item">
+				<div class="field" data-bind="text:$data.title,attr:{title:$data.title}"></div>
+				<div class="message" data-bind="text:$data.message"></div>
+				<div class="revert-button" data-bind="click:$parent.revertDataFieldChange.bind($data, $index)"></div>
+			</div>
+		</div>
+		<div class="empty-placeholder" data-bind="if:obConfirmationList().length === 0">
+			<span data-bind="text:obPlaceholderText"></span>
+		</div>
+	</div>
+</div>

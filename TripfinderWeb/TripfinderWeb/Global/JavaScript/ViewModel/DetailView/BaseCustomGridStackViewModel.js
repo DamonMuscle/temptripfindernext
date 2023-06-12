@@ -105,6 +105,9 @@
 			case "trip":
 				self.fieldEditorHelper = new TF.DetailView.FieldEditor.TripFieldEditorHelper(self);
 				break;
+			case "fieldtriplocation":
+				self.fieldEditorHelper = new TF.DetailView.FieldEditor.LocationFieldEditorHelper(self);
+				break;
 			default:
 				self.fieldEditorHelper = new TF.DetailView.FieldEditor.FieldEditorHelper(self);
 				break;
