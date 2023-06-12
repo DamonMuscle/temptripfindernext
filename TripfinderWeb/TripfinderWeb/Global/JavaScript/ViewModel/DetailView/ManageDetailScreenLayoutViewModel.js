@@ -12,11 +12,14 @@
 		self.detailViewHelper = tf.helpers.detailViewHelper;
 
 		self.disableApply = disableApply;
+		self.availableDataTypeIds = [];
 		var availableDataTypes = tf.dataTypeHelper.getAvailableDataTypes()
 			.filter(function(item) { return item.enableDetailView; })
 			.map(function(item)
 			{
+				self.availableDataTypeIds.push(item.id);
 				return {
+					id: ko.observable(item.id),
 					key: ko.observable(item.key),
 					name: ko.observable(item.name.toLowerCase()),
 					label: ko.observable(item.label),
@@ -104,7 +107,8 @@
 				width: "160px",
 				template: function(dataItem)
 				{
-					return tf.dataTypeHelper.getNameById(dataItem.DataTypeId);
+					const dataTypeName =  tf.dataTypeHelper.getNameById(dataItem.DataTypeId);
+					return tf.applicationTerm.getApplicationTermSingularByName(dataTypeName);
 				}
 			},
 			{
@@ -144,10 +148,11 @@
 			"@fields": "Id,Name,Comments,DataTypeId"
 		};
 
+		let dataTypeIds = self.availableDataTypeIds;
 		if (gridType && gridType !== "all")
 		{
 			paramData.dataTypeId = tf.dataTypeHelper.getId(gridType);
-
+			dataTypeIds = [paramData.dataTypeId];
 		}
 
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), {
@@ -156,7 +161,8 @@
 		{
 			if (response && response.Items)
 			{
-				var entityList = response.Items.map(function(item)
+				const items = response.Items.filter(item => dataTypeIds.indexOf(item.DataTypeId) > -1);
+				var entityList = items.map(function(item)
 				{
 					return new TF.DataModel.DetailScreenLayoutDataModel(self.detailViewHelper.formatLayoutTemplate(item));
 				});
