@@ -749,7 +749,17 @@
 
 									tf.promiseAjax.post(getDataUrl, getDataOption).then(function(keyApiResponse)
 									{
-										const exportFileName = (self.options.gridType === "form" ? self.options.gridData.text : self.options.gridType);
+										let exportFileName;
+										if (self.options.gridType === "form")
+										{
+											exportFileName = self.options.gridData.text;
+										}
+										else
+										{
+											const gridTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.options.gridType);
+											const gridTypeLabel = tf.applicationTerm.getApplicationTermSingularByName(gridTypeName);
+											exportFileName = gridTypeLabel.replaceAll(" ", "").toLowerCase();
+										}
 										var fileUrl = `${url}?key=${keyApiResponse.Items[0]}&fileFormat=${fileFormat}&fileName=${encodeURIComponent(exportFileName)}`;
 										window.open(fileUrl);
 									});
