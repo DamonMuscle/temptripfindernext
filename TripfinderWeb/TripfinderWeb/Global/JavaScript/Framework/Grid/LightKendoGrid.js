@@ -790,8 +790,6 @@
 						if (!self.kendoDataSourceTransportReadCount) self.kendoDataSourceTransportReadCount = 0;
 						self.kendoDataSourceTransportReadCount = self.kendoDataSourceTransportReadCount + 1;
 
-						tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
-
 						if (!self.hasSendRequst)
 						{
 							self.hasSendRequst = true;
@@ -5585,6 +5583,9 @@
 		const self = this,
 			requestOptions = self.getApiRequestOption(options);
 		let promise;
+
+		tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
+
 		if (self.options.getAsyncRequestOption)
 		{
 			promise = self.options.getAsyncRequestOption(requestOptions);
