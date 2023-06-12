@@ -46,6 +46,20 @@
 			</div>
 		</li>
 		<!--/ko -->
+
+		<!--ko if:searchGrid.options.gridType==="fieldtriplocation" && searchGrid.setReminder -->
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<li class="menu-item" data-bind="css:{disabled:!searchGrid.reminderMenuEnable() },contextMenuClick:searchGrid.setReminder.bind(searchGrid)">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Set Reminder
+			</div>
+		</li>
+		<!--/ko -->
+
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
