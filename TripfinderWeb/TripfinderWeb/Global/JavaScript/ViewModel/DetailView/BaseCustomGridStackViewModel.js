@@ -529,7 +529,7 @@
 		{
 			return self.fieldEditorHelper.saveEntity(uniqueObjects).then(function(result)
 			{
-				if (result && result.success)
+				if (result && (result.success || result.cancel))
 				{
 					self.onEditRecordSuccess.notify(result.entity);
 					self.obEditing(false);
