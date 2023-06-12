@@ -119,7 +119,7 @@
 		var selectedIds = self.searchGrid.getSelectedIds();
 		if (!selectedIds || selectedIds.length <= 0)
 		{
-			return;
+			// return;
 		}
 		selectedId = selectedIds[0];
 		selectedIds.length > 1 && self.searchGrid.getSelectedIds([selectedId]);
@@ -127,6 +127,7 @@
 		if (self.obShowSplitmap())
 		{
 			tf.pageManager.resizablePage.closeRightPage();
+			self.obShowSplitmap(false);
 		}
 		else
 		{
@@ -140,9 +141,8 @@
 			{
 				tf.pageManager.resizablePage.setRightPage("workspace/page/RoutingMap/mapcanvaspage", pageData);
 			}
+			self.obShowSplitmap(true);
 		}
-
-		this.obShowSplitmap(true);
 	}
 
 	LocationPage.prototype.globalReplaceClick = function(viewModel, e)
