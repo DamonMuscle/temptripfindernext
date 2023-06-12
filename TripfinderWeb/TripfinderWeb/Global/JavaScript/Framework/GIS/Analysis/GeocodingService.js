@@ -264,6 +264,9 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 					addresses = response.map(item => {
 						const [country, zip, state, city, street]= item.text.split(",").map(x=>x.trim()).reverse();
 						return { text: item.text, country, zip, state, city, street };
+					}).filter((item) => {
+						const zipShouldBeDigits = /^[\d]+$/;
+						return zipShouldBeDigits.test(item.zip) && item.street != null;
 					});
 	
 					self.clearOnlineToken(esriConfig);
@@ -320,5 +323,53 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		}
 
 		esriConfig.apiKey = null;
+	}
+
+	GeocodingService.prototype.unitTest = function()
+	{
+		let address = {
+			Street: "Disney World",
+			City: "Lake Buena Vista",
+			State: "FL",
+			Zone: null
+		};
+		
+		// const address = {
+		// 	SingleLine: "Niskayuna High School Dr, Schenectady, New York, 12309"
+		// };
+
+		address = {
+			Street: "Vale Park",
+			City: "Schenectady",
+			State: null,
+			Zone: null
+		};
+		
+		this.addressToLocations(address).then((result) => {
+			console.log({
+				x: result.location.x,
+				y: result.location.y,
+				score: result.score
+			});
+			// '{"x":-73.94121999999999,"y":42.812380000000076,"score":100}'
+		}).catch((error) => {
+			console.log(error);
+		});
+
+
+		// const searchAddress = "1 Mickey Mouse Blvd, Lake Buena Vista, FL";
+		const searchAddress = "1 Mickey Mouse Blvd, Lake Buena Vista, Florida";
+		this.suggestLocations(searchAddress).then((result) => {
+			console.log(result.addresses);
+		}).catch((error) => {
+			console.log(error.errorMessage);
+		});
+	}
+
+	GeocodingService.prototype.dispose = function()
+	{
+		this.settings = null;
+		this._mode = null;
+		this.name = null;
 	}
 })();

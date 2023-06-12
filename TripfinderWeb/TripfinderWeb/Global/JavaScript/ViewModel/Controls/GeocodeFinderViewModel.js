@@ -183,7 +183,7 @@
 					item.YCoord = locations[index]?.location.y;
 					item.Score = locations[index]?.score;
 	
-					var isStreetMatch = TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
+					var isStreetMatch = item.street && TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
 					if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
 					{
 						selectIndex = index;
