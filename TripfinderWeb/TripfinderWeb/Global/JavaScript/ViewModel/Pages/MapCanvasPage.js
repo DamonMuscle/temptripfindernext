@@ -95,7 +95,7 @@
 		await self._initMap();
 	};
 
-	MapCanvasPage.prototype.onMapViewUpdating = function(result)
+	MapCanvasPage.prototype.onMapViewUpdated = function()
 	{
 		const self = this;
 		if (!self.mapInstance)
@@ -103,47 +103,44 @@
 			return;
 		}
 
-		if (!result)
+		try
 		{
-			try
+			if (self.mapInstance.eventHandler.onMapViewUpdated)
 			{
-				if (self.mapInstance.eventHandler.onMapViewUpdating)
-				{
-					self.mapInstance.eventHandler.onMapViewUpdating.remove();
-				}
-				// self._map.mapView.watch(["extent", "rotation"], self._refreshMapArrow.bind(self));
-				// self._map.mapView.on("drag", () =>
-				// {
-				// 	self._dragging = true;
-				// 	clearTimeout(self._draggingTimeout);
-				// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
-				// }, 50);
-				// self._map.mapView.on("click", self.onRightClickMenu.bind(self));
-				// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
-				self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
-				self.autoPan.initialize(self.element, 20);
-				self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
-				self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
-
-				self._initDirectionTool();
-
-				self._initMapTool();
-				self.routingMapPanelManager.init();
-				// tf.loadingIndicator.tryHide();
-				PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
-
-				self._onMapLoad();
-
-				// // the trips that need to be auto open
-				// if (self.DocumentData.data && self.DocumentData.data.trips)
-				// {
-				// 	self.togglePalettePanel(self.routingPaletteViewModel, $("<div></div>"));
-				// }
+				self.mapInstance.eventHandler.onMapViewUpdated.remove();
 			}
-			catch (e)
-			{
-				console.error(e);
-			}
+			// self._map.mapView.watch(["extent", "rotation"], self._refreshMapArrow.bind(self));
+			// self._map.mapView.on("drag", () =>
+			// {
+			// 	self._dragging = true;
+			// 	clearTimeout(self._draggingTimeout);
+			// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
+			// }, 50);
+			// self._map.mapView.on("click", self.onRightClickMenu.bind(self));
+			// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
+			self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
+			self.autoPan.initialize(self.element, 20);
+			self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
+			self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
+
+			self._initDirectionTool();
+
+			self._initMapTool();
+			self.routingMapPanelManager.init();
+			// tf.loadingIndicator.tryHide();
+			PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
+
+			self._onMapLoad();
+
+			// // the trips that need to be auto open
+			// if (self.DocumentData.data && self.DocumentData.data.trips)
+			// {
+			// 	self.togglePalettePanel(self.routingPaletteViewModel, $("<div></div>"));
+			// }
+		}
+		catch (e)
+		{
+			console.error(e);
 		}
 	}
 
@@ -738,16 +735,15 @@
 					onMapViewCreated: () => {
 						self._mapView.extent = ext;
 					},
-					onMapViewUpdating: self.onMapViewUpdating.bind(self)
+					onMapViewUpdated: self.onMapViewUpdated.bind(self)
 				}
 			};
 
-		const map = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
-		self.mapInstance = map;
-		self._mapView = map.map.mapView;
-		self._map = map.map;
+		self.mapInstance = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
+		self._mapView = self.mapInstance.map.mapView;
+		self._map = self.mapInstance.map;
 
-		TF.Helper.MapHelper.restrictPanOutside(self._mapView);
+		self.mapInstance.restrictPanOutside();
 	}
 
 	MapCanvasPage.prototype._onMapLoad = function()
@@ -1249,8 +1245,11 @@
 			this.isTravelScenarioLock = false;
 			TF.RoutingMap.TravelScenariosPalette.TravelScenariosDataModel.unUseTravelScenario(this.travelScenariosPaletteViewModel.travelScenariosViewModel.obSelectedTravelScenarios().Id, this.routeState);
 		}
-		this._map && this._map.mapView && this._map.mapView.destroy();
-		this._map && this._map.destroy();
+
+		if (this.mapInstance)
+		{
+			TF.GIS.MapFactory.destroyMapInstanceById(this.mapInstance.settings.mapId);
+		}
 
 		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
 		// TODO: Use the method above if MapEditPalette is added in the future.

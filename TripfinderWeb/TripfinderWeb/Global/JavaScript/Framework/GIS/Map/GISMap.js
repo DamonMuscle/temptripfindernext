@@ -30,6 +30,7 @@
 		eventHandlers: {
 			onMapViewCreated: null,
 			onMapViewDoubleClick: null,
+			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 		}
 	};
@@ -42,6 +43,7 @@
 		this.eventHandler = {
 			onMapViewCreatedPromise: null,
 			onMapViewDoubleClick: null,
+			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 		};
 
@@ -378,6 +380,11 @@
 			self.eventHandler.onMapViewUpdating = self.map.mapView.watch('updating', self.settings.eventHandlers.onMapViewUpdating);
 		}
 
+		if (self.settings.eventHandlers.onMapViewUpdated)
+		{
+			self.eventHandler.onMapViewUpdated = TF.GIS.SDK.watchUtils.whenFalseOnce(self.map.mapView, "updating", self.settings.eventHandlers.onMapViewUpdated);
+		}
+
 		if (self.settings.eventHandlers.onMapViewCreated)
 		{
 			self.eventHandler.onMapViewCreatedPromise = self.map.mapView.when(self.settings.eventHandlers.onMapViewCreated);
@@ -397,6 +404,12 @@
 		{
 			self.eventHandler.onMapViewUpdating.remove();
 			self.eventHandler.onMapViewUpdating = null;
+		}
+
+		if (self.settings.eventHandlers.onMapViewUpdated && self.eventHandler.onMapViewUpdated)
+		{
+			self.eventHandler.onMapViewUpdated.remove();
+			self.eventHandler.onMapViewUpdated = null;
 		}
 
 		if (self.settings.eventHandlers.onMapViewCreated && self.eventHandler.onMapViewCreatedPromise)
@@ -545,16 +558,65 @@
 		_map.mapView.center = point;
 	}
 
+	Map.prototype.restrictPanOutside = function()
+	{
+		const self = this;
+		let recenterTimer = null;
+		const recenterMap = (extent) =>
+		{
+			if (recenterTimer != null)
+			{
+				// avoid call mapView.goTo continuously.
+				window.clearTimeout(recenterTimer);
+			}
+
+			recenterTimer = setTimeout(async () =>
+			{
+				recenterTimer = null;
+				await self.map.mapView.goTo(extent, { duration: 0, easing: "linear" });
+			}, 50);
+		}
+
+		const resetMapExtent = async () =>
+		{
+			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = self.map.mapView.extent;
+
+			if (mapExtent)
+			{
+				const mapHeight = mapExtent.ymax - mapExtent.ymin;
+				if (mapExtent.ymax - MERCATOR_MAX_Y > 1)
+				{
+					mapExtent.ymax = MERCATOR_MAX_Y;
+					mapExtent.ymin = MERCATOR_MAX_Y - mapHeight;
+					recenterMap(mapExtent);
+				}
+				else if (mapExtent.ymin - MERCATOR_MIN_Y < -1)
+				{
+					mapExtent.ymin = MERCATOR_MIN_Y;
+					mapExtent.ymax = MERCATOR_MIN_Y + mapHeight;
+					recenterMap(mapExtent);
+				}
+			}
+		}
+
+		self.map.mapView.watch("extent", async function(value)
+		{
+			resetMapExtent();
+		});
+	}
+
 	Map.prototype.dispose = function()
 	{
 		const self = this;
 		self.removeAllLayers();
+		self.destroyMapEvents();
 
-		if (_map && _map.mapView)
+		if (self.map)
 		{
-			_map.mapView.destroy();
-		}
+			self.map.mapView && self.map.mapView.destroy();
+			self.map.destroy && self.map.destroy();
 
-		_map = null;
+			_map = null;
+		}
 	}
 })();
