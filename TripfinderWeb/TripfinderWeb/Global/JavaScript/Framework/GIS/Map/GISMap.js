@@ -19,8 +19,13 @@
 		spatialReference: {
 			wkid: WKID_WEB_MERCATOR
 		},
+		highlightOptions: null,
 		background: {
 			color: [240, 237, 229]
+		},
+		constraints: {
+			rotationEnabled: false,
+			minZoom: MAP_MIN_ZOOM_LEVEL
 		},
 		eventHandlers: {
 			onMapViewCreated: null,
@@ -330,6 +335,7 @@
 			container: $mapContainer[0],
 			map: map,
 			spatialReference: self.settings.spatialReference,
+			highlightOptions: self.settings.highlightOptions,
 			center: self.settings.center,
 			zoom: self.settings.zoom,
 			popup: {
@@ -344,10 +350,7 @@
 				}
 			},
 			background: self.settings.background,
-			constraints: {
-				rotationEnabled: false,
-				minZoom: self.settings.minZoom
-			}
+			constraints: self.settings.constraints
 		});
 
 		if (view.zoom < 0)

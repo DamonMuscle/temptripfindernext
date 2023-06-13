@@ -82,7 +82,7 @@
 		// });
 	};
 
-	MapCanvasPage.prototype.init = function(model, element)
+	MapCanvasPage.prototype.init = async function(model, element)
 	{
 		var self = this;
 		self.element = $(element);
@@ -92,51 +92,60 @@
 		self.obDistanceUnit("Miles");
 		// init
 		self._arcgis = tf.map.ArcGIS;
-		self._initMap();
-
-		var updatingEvent = self._map.mapView.watch('updating', function(result)
-		{
-			if (!result)
-			{
-				try
-				{
-					updatingEvent.remove();
-					// self._map.mapView.watch(["extent", "rotation"], self._refreshMapArrow.bind(self));
-					// self._map.mapView.on("drag", () =>
-					// {
-					// 	self._dragging = true;
-					// 	clearTimeout(self._draggingTimeout);
-					// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
-					// }, 50);
-					// self._map.mapView.on("click", self.onRightClickMenu.bind(self));
-					// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
-					self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
-					self.autoPan.initialize(self.element, 20);
-					self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
-					self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
-
-					self._initDirectionTool();
-
-					self._initMapTool();
-					self.routingMapPanelManager.init();
-					// tf.loadingIndicator.tryHide();
-					PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
-
-					self._onMapLoad();
-
-					// // the trips that need to be auto open
-					// if (self.DocumentData.data && self.DocumentData.data.trips)
-					// {
-					// 	self.togglePalettePanel(self.routingPaletteViewModel, $("<div></div>"));
-					// }
-				}
-				catch (e)
-				{
-					console.error(e);
-				}
-			}
-		});
+		await self._initMap();
 	};
+
+	MapCanvasPage.prototype.onMapViewUpdating = function(result)
+	{
+		const self = this;
+		if (!self.mapInstance)
+		{
+			return;
+		}
+
+		if (!result)
+		{
+			try
+			{
+				if (self.mapInstance.eventHandler.onMapViewUpdating)
+				{
+					self.mapInstance.eventHandler.onMapViewUpdating.remove();
+				}
+				// self._map.mapView.watch(["extent", "rotation"], self._refreshMapArrow.bind(self));
+				// self._map.mapView.on("drag", () =>
+				// {
+				// 	self._dragging = true;
+				// 	clearTimeout(self._draggingTimeout);
+				// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
+				// }, 50);
+				// self._map.mapView.on("click", self.onRightClickMenu.bind(self));
+				// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
+				self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
+				self.autoPan.initialize(self.element, 20);
+				self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
+				self.directionPaletteViewModel.onRerunClicked.subscribe(self._rerun.bind(self));
+
+				self._initDirectionTool();
+
+				self._initMapTool();
+				self.routingMapPanelManager.init();
+				// tf.loadingIndicator.tryHide();
+				PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
+
+				self._onMapLoad();
+
+				// // the trips that need to be auto open
+				// if (self.DocumentData.data && self.DocumentData.data.trips)
+				// {
+				// 	self.togglePalettePanel(self.routingPaletteViewModel, $("<div></div>"));
+				// }
+			}
+			catch (e)
+			{
+				console.error(e);
+			}
+		}
+	}
 
 	MapCanvasPage.prototype._initRevertOperation = function()
 	{
@@ -704,46 +713,42 @@
 		TF.RoutingMap.GeocodeHelper.initialize();//used in directions palette/routing palette
 	};
 
-	// Initialize the map
-	MapCanvasPage.prototype._initMap = function()
+	MapCanvasPage.prototype._initMap = async function()
 	{
 		const self = this,
-		baseMapId = tf.userPreferenceManager.get("rfweb.baseMapId"),
-		_basemap = TF.Helper.MapHelper.getBaseMapById(baseMapId),
-		map = new self._arcgis.Map({
-			basemap: _basemap
-		}),
-		view = new self._arcgis.MapView({
-			container: self.$mapDiv[0],
-			map: map,
-			spatialReference: {
-				wkid: 102100
-			},
-			highlightOptions: {
-				color: [255, 255, 0, 1],
-				fillOpacity: 0
-			},
-			background: {
-				color: [240, 237, 229]
-			},
-			constraints: {
-				rotationEnabled: false,
-				lods: self._arcgis.TileInfo.create().lods,
-				minZoom: TF.Helper.MapHelper.MAP_MIN_ZOOM_LEVEL
-			}
-		}),
-		ext = TF.createDefaultMapExtent();
+			mapElement = self.$mapDiv,
+			ext = TF.createDefaultMapExtent(),
+			baseMapId = tf.userPreferenceManager.get("rfweb.baseMapId"),
+			_basemap = TF.Helper.MapHelper.getBaseMapById(baseMapId),
+			mapOptions = {
+				baseMapId: _basemap,
+				highlightOptions: {
+					color: [255, 255, 0, 1],
+					fillOpacity: 0
+				},
+				background: {
+					color: [240, 237, 229]
+				},
+				constraints: {
+					rotationEnabled: false,
+					lods: self._arcgis.TileInfo.create().lods,
+					minZoom: TF.Helper.MapHelper.MAP_MIN_ZOOM_LEVEL
+				},
+				eventHandlers: {
+					onMapViewCreated: () => {
+						self._mapView.extent = ext;
+					},
+					onMapViewUpdating: self.onMapViewUpdating.bind(self)
+				}
+			};
 
-		view.when().then(function()
-		{
-			view.extent = ext;
-		});
+		const map = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
+		self.mapInstance = map;
+		self._mapView = map.map.mapView;
+		self._map = map.map;
 
-		map.mapView = view;
-		self._mapView = view;
-		self._map = map;
-		TF.Helper.MapHelper.restrictPanOutside(view);
-	};
+		TF.Helper.MapHelper.restrictPanOutside(self._mapView);
+	}
 
 	MapCanvasPage.prototype._onMapLoad = function()
 	{
