@@ -471,7 +471,7 @@
 
 	AssociateRecordsViewModel.prototype.setLeftRequestOption = function(requestOptions)
 	{
-		var self = this, selectedId = this.selectedItems.filter(function(item) { return item.DataType === self.obSelected().name }).map(function(item) { return item.Id });
+		var self = this, selectedId = this.selectedItems.filter(function(item) { return item.DataTypeName === self.obSelected().name }).map(function(item) { return item.Id });
 		var excludeIds = selectedId;
 
 		if (this.options && this.options.gridOptions && this.options.gridOptions.excludeIds && this.options.gridOptions.excludeIds.length > 0)
