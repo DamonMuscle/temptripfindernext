@@ -845,9 +845,6 @@
 
 	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record)
 	{
-		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
-		const entityObjectId = objectIds[0];
-
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -856,7 +853,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
-				RecordObjectID: entityObjectId,
+				RecordObjectID: null,
 				RecordValue: null
 			},
 			recordValueObj = {};
@@ -921,9 +918,6 @@
 
 	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record, udgridSurvey)
 	{
-		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
-		const entityObjectId = objectIds[0];
-
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -933,7 +927,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
-				RecordObjectID: entityObjectId,
+				RecordObjectID: null,
 				RecordValue: null,
 			},
 			recordValueObj = {};
