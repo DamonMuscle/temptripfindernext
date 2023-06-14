@@ -4790,6 +4790,15 @@
 			{
 				fields = fields.concat(['StaffTypes']);
 			}
+			if (!Enumerable.From(fields).Contains('ContractorId'))
+			{
+				fields = fields.concat(['ContractorId']);
+			}
+			if (!Enumerable.From(fields).Contains('UserID'))
+			{
+				fields = fields.concat(['UserID']);
+			}
+			
 		}
 		if (type === 'fieldtrip')
 		{

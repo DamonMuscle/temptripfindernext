@@ -76,4 +76,26 @@
 		};
 		self.searchGrid.onDataBoundEvent.subscribe(initialDataBoundCallback);
 	};
+
+	FieldTripPage.prototype.getStaffs = function()
+	{
+		const self = this,
+			selectedIds = self.searchGrid.getSelectedIds().join(',');
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'staff'), {
+			paramData: {
+				fieldtripIds: selectedIds,
+				type: "driver"
+			}
+		}).then(function(apiResponse)
+		{
+			const drivers = apiResponse.Items;
+			if (drivers && drivers.length > 0)
+			{
+				return drivers;
+
+			}
+			tf.promiseBootbox.alert("No users are associated with the selected Staff record(s).");
+		});
+	};
 })();

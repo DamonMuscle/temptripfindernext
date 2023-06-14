@@ -92,6 +92,13 @@
 					Email
 				</div>
 			</li>
+			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendChatClick,css:{disabled: gridViewModel.obNoRecordsSelected() || !gridViewModel.obIsAuthorizedForChatFinder()}">
+				<div class="menu-icon">
+				</div>
+				<div class="menu-label">
+					Send Chat
+				</div>
+			</li>			
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.sendToClick">
 				<div class="menu-icon sendTo">
 				</div>

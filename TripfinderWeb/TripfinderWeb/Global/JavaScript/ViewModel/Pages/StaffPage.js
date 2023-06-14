@@ -108,5 +108,10 @@
 		
 		self.unBindEvent(".iconbutton.copy"); // unbind the default copy event from BaseGridPage
 		self.bindEvent(".iconbutton.copy", self.newCopyClick.bind(self));
-	}	
+	}
+
+	StaffPage.prototype.getStaffs = function()
+	{
+		return Promise.resolve(this.searchGrid.getSelectedRecords());
+	};	
 })();

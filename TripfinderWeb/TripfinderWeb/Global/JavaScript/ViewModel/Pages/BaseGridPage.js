@@ -53,6 +53,7 @@
 		self.openInClick = self.openInClick.bind(self);
 		self.copyLinkClick = self.copyLinkClick.bind(self);
 		self.generateQRCodeClick = self.generateQRCodeClick.bind(self);
+		self.sendChatClick = self.sendChatClick.bind(self);
 		self.obEmail = ko.computed(function()
 		{
 			if (self.searchGridInited())
@@ -70,6 +71,9 @@
 		}, self);
 		self.supportAutoScroll = false;
 		self.deleteButton = true;
+
+		const isAuthorizedForChatfinder = tf.authManager.supportedProducts.some(item => item.Name === 'Chatfinder');
+		self.obIsAuthorizedForChatFinder = ko.observable(isAuthorizedForChatfinder);		
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -1912,6 +1916,140 @@
 		this.searchGrid.refresh();
 	}	
 
+	BaseGridPage.prototype.sendChatClick = function()
+	{
+		const self = this;
+		self.getStaffs().then((staffs) =>
+		{
+			if (staffs && staffs.length > 0)
+			{
+				self.getAvailableUsers(staffs);
+			}
+		})
+	};
+
+	BaseGridPage.prototype.getStaffs = function()
+	{
+		return Promise.resolve(false);
+	};
+
+	BaseGridPage.prototype.getVerifiedUsersObj = function(users, availableStaffs, unavailableStaffNames)
+	{
+		const self = this;
+		let popupMessage = null;
+
+		if (unavailableStaffNames.length > 0)
+		{
+			popupMessage = "The following Staff are not associated with a User account. They will not be added to the chat:\n" + unavailableStaffNames;
+		}
+
+		var hasCurrentUser = false;
+		const currentUser = users.find(u => u.LoginID === tf.authManager.userName);
+
+		if (currentUser)
+		{
+			hasCurrentUser = true;
+			// exclude the current user from the chat recipients
+			users = users.filter(u => u.UserID !== currentUser.UserID)
+		}
+
+		let chatUsersResult = users;
+
+		if (!popupMessage && chatUsersResult && chatUsersResult.length > 0)
+		{
+			const chatStaffNames = availableStaffs.filter(staff => chatUsersResult.some(u => staff.UserID === u.UserID))
+				.map(s => self.getfullName(s)).join(' \n');
+			popupMessage = "You are about to be redirected to Chatfinder. Click OK to continue.";
+		} else if (hasCurrentUser && !popupMessage)
+		{
+			popupMessage = "You cannot send a chat to yourself.";
+		}
+		return { popupMessage, chatUsersResult }
+	}
+
+	BaseGridPage.prototype.getfullName = function(item)
+	{
+		const firstName = item.FirstName || '';
+		const lastName = item.LastName || '';
+		return [firstName, lastName].join(' ').trim();
+	}	
+
+	BaseGridPage.prototype.getAvailableUsers = function(staffs)
+	{
+		const self = this;
+		const getOnlyActiveUsers = (ids) =>
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "users"),
+				{
+					paramData: {
+						"@filter": `in(ID,${ids.join(",")})&eq(Deactivated,0)`,
+						"@fields": "Id,LoginID,UserID"
+					}
+				}).then(res => res.Items);
+		};
+
+		staffs.sort((a, b) =>
+		{
+			var aLast = a.LastName ? a.LastName.toLowerCase() : "";
+			var aFirst = a.FirstName ? a.FirstName.toLowerCase() : "";
+			var bLast = b.LastName ? b.LastName.toLowerCase() : "";
+			var bFirst = b.FirstName ? b.FirstName.toLowerCase() : "";
+			if (aLast < bLast || (aLast == bLast && aFirst < bFirst))
+			{
+				return -1;
+			} else if (aLast == bLast && aFirst == bFirst)
+			{
+				return 0;
+			} else
+			{
+				return 1;
+			}
+		});
+
+		const associatedUserIds = staffs.map(s => s.UserID).filter((item, idx, array) => item && array.indexOf(item) === idx);
+		return getOnlyActiveUsers(associatedUserIds)
+			.then((activeUsers) =>
+			{
+				const activeUserIds = activeUsers.map(u => u.UserID);
+				const unavailableStaffs = staffs.filter(staff => !activeUserIds.includes(staff.UserID));
+				var unavailableStaffNames = [];
+				if (unavailableStaffs && unavailableStaffs.length > 0)
+				{
+					unavailableStaffNames = unavailableStaffs.map(s => self.getfullName(s)).join(' \n');
+
+					if (unavailableStaffs.length === staffs.length)
+					{
+						return tf.promiseBootbox.alert({
+							message: "No users are associated with the selected Staff " + (staffs.length > 1 ? "records." : "record."),
+							maxHeight: 300
+						}).then(() => false);
+					}
+				}
+
+				const availableStaffs = staffs.filter(x => activeUserIds.includes(x.UserID));
+
+				let { popupMessage, chatUsersResult } = self.getVerifiedUsersObj(activeUsers, availableStaffs, unavailableStaffNames);
+				if (popupMessage)
+				{
+					return tf.promiseBootbox.alert({
+						message: popupMessage,
+						maxHeight: 300
+					}).then(() =>
+					{
+						const chatfinderDataObj = tf.authManager.supportedProducts.find(p => p.Name === "Chatfinder");
+						if (chatUsersResult && chatUsersResult.length > 0)
+						{
+							const userIdStr = chatUsersResult.map(user => user.UserID).join(',');
+							const chatfinderUrl = `${chatfinderDataObj.Uri}/#/conversation?userIds=${userIdStr}`;
+
+							newWindow = window.open("", "_blank");
+							newWindow.location = chatfinderUrl;
+						}
+					});
+				}
+			});
+
+	}	
 
 	BaseGridPage.prototype.dispose = function()
 	{
