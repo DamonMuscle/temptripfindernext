@@ -122,34 +122,30 @@
 
 	GeocodeFinderViewModel.prototype.drawCoordinate = function(geometry)
 	{
-		var self = this, layer = self.getManuallyPinLayer();
-		layer.removeAll();
-		if (geometry && geometry.x && geometry.y) return draw(geometry);
-		if (!self.obSelectedAddress()) return;
-		var x = self.obSelectedAddress().XCoord, y = self.obSelectedAddress().YCoord;
-		if (!x || !y) return;
-		var point = tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(new tf.map.ArcGIS.Point({ x, y }));
-		draw(point);
+		const self = this, layerInstance = this.mapInstance.getMapLayerInstance(GeocodeInteractiveLayerId);
+		const markerSymbol = {
+				type: "simple-marker",
+				color: [112, 123, 249]
+			},
+			attributes ={ type: self.type };
 
-		function draw(point)
-		{
-			var markerSymbol = {
-					type: "simple-marker",
-					color: [112, 123, 249]
-				},
-				graphic = new tf.map.ArcGIS.Graphic({
-					geometry: point,
-					symbol: markerSymbol,
-					attributes: { type: self.type }
-				});
+		layerInstance.clearLayer();
+		let featureGeometry = null;
 
-			layer.add(graphic);
-
-			if (!geometry)
-			{
-				self.mapInstance.centerAtPoint(point);
-			}
+		if (geometry && geometry.x && geometry.y) {
+			featureGeometry = geometry;
+			layerInstance.add(featureGeometry, markerSymbol, attributes);
+			return;
 		}
+
+		if (!self.obSelectedAddress()) return;
+
+		const longitude = self.obSelectedAddress().XCoord, latitude = self.obSelectedAddress().YCoord;
+		if (!longitude || !latitude) return;
+		
+		layerInstance.addPoint(longitude, latitude, markerSymbol, attributes);
+		
+		self.mapInstance.centerAt(longitude, latitude);
 	}
 
 	GeocodeFinderViewModel.prototype.findAddress = function(address, city, zip)

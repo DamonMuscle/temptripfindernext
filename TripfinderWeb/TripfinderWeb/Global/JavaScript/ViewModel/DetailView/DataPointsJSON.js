@@ -5184,46 +5184,6 @@
 					}
 				},
 				{
-					"field": "City",
-					"title": "City",
-					"defaultValue": "",
-					"type": "string",
-					"width": '120px',
-					"editType": {
-						"format": "String",
-						"maxLength": 255
-					}					
-				},
-				{
-					"field": "Street",
-					"title": "Street",
-					"defaultValue": "",
-					"type": "string",
-					"width": '200px',
-					"editType": {
-						"format": "String",
-						"maxLength": 255
-					}					
-				},
-				{
-					"field": "State",
-					"title": "State",
-					"type": "string",
-					"editType": {
-						"format": "String",
-						"maxLength": 2
-					}
-				},
-				{
-					"field": "Zip",
-					"title": "Zip",
-					"type": "string",
-					"editType": {
-						"format": "String",
-						"maxLength": 5
-					}
-				},
-				{
 					"field": "Notes",
 					"title": "Notes",
 					"defaultValue": "",
@@ -5341,7 +5301,16 @@
 			],
 			"User Defined": [],
 			"User Defined Group": [],
-			"Grid": []
+			"Grid": [
+				{
+					"field": "ContactGrid",
+					"title": "Contact Information",
+					"type": "grid",
+					"url": "contactinformation",
+					"min-height": "3",
+					"min-width": 2
+				},
+			]
 		}
 	};
 

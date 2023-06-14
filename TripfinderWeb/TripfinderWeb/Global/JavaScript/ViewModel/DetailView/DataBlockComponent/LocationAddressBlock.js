@@ -128,19 +128,19 @@
 
 		e.stopPropagation();
 
-		const updateGeoAddressFields = function(sourceValue, targetFieldName, title)
+		const updateGeoAddressFields = function(sourceValue, sourceContent, targetFieldName, title)
 		{
 			var $relatedFieldContents = self.$el.find(`.editable-field-container[data-block-field-name='${targetFieldName}'] .editable-field-value`);
 
-			if (sourceValue !== $relatedFieldContents.text())
+			if (sourceContent !== $relatedFieldContents.text())
 			{
 				helper.editFieldList[targetFieldName] = {
 					value: sourceValue,
 					blockName: targetFieldName,
 					title: title
 				};
-				helper._updateGeneralFieldsContent(targetFieldName, sourceValue, { updateAll: true });
-				$relatedFieldContents.text(sourceValue);
+				helper._updateGeneralFieldsContent(targetFieldName, sourceContent, { updateAll: true });
+				$relatedFieldContents.text(sourceContent);
 
 				self.obEditing(true);
 			}
@@ -156,7 +156,7 @@
 			{
 				sourceValue = self.entity[sourceFieldName];
 			}
-			updateGeoAddressFields(sourceValue || 'None', targetFieldName, title);
+			updateGeoAddressFields(sourceValue, sourceValue || "None", targetFieldName, title);
 		};
 
 		copyGeoAddressFields("Street", "GeoStreet", "GeoCode Address Street");

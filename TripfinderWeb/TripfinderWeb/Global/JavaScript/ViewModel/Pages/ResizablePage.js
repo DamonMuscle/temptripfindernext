@@ -2,6 +2,12 @@
 {
 	createNamespace("TF.Page").ResizablePage = ResizablePage;
 
+	const RightPageContentType = {
+		detailview: "detailview",
+		splitmap: "splitmap",
+		dataentry: "dataentry"
+	};
+
 	function ResizablePage(options)
 	{
 		var self = this;
@@ -15,10 +21,9 @@
 		self.obShowGrid = ko.observable(true);
 		self.obGridData = ko.observable();
 		self.obOtherData = ko.observable();
-		self.obRightData = ko.observable();
 		self.obGridTemplate = ko.observable();
 		self.obOtherTemplate = ko.observable();
-		self.obRightTemplate = ko.observable();
+		self.obRightContentType = ko.observable();
 
 		self.leftPageSizeKey = "leftpagesize.";
 		self.leftPageType = "";
@@ -93,20 +98,63 @@
 		self.reLayoutPage();
 	};
 
-	ResizablePage.prototype.setRightPage = function(templateName, data)
+	ResizablePage.prototype.setRightPage = async function(templateName, data, contentType)
 	{
-		var self = this, $content;
+		const self = this;
+		let $content;
+
+		if(!contentType)
+		{
+			if(data instanceof TF.DetailView.DetailViewViewModel)
+			{
+				contentType = RightPageContentType.detailview;
+			}
+			else if (data instanceof TF.DataEntry.FieldTripDataEntryViewModel)
+			{
+				contentType = RightPageContentType.dataentry;
+			}
+		}
 
 		self.clearRightContent();
 
-		self.obRightTemplate(templateName);
-		self.obRightData(data);
-		$content = $("<div class='main-body' data-bind='template:{ name: obRightTemplate, data: obRightData }'></div>");
+		self.obRightContentType(contentType);
 
-		self.$rightPage.append($content);
-		ko.applyBindings(ko.observable(self), $content[0]);
-
+		switch(contentType)
+		{
+			case RightPageContentType.dataentry:
+				self.obRightDataEntryTemplate = ko.observable(templateName);
+				self.obDataEntry = ko.observable(data);
+				$content = $("<div class='main-body' data-bind='template:{ name: obRightDataEntryTemplate, data: obDataEntry }'></div>");
+				self.$rightPage.find(".data-entry").append($content);
+				ko.applyBindings(ko.observable(self), $content[0]);
+				break;
+			case RightPageContentType.splitmap:
+				self.mapviewInstace = self.mapviewInstace || await TF.GIS.MapFactory.createInstance(self.$rightPage.find(".splitmap"), {eventHandlers:{onMapViewCreated:function(){console.log("map created")}}});
+				break;
+			case RightPageContentType.detailview:
+			default:
+				self.obRightDetailViewTemplate = ko.observable(templateName);
+				self.obDetailView = ko.observable(data);
+				$content = $("<div class='main-body' data-bind='template:{ name: obRightDetailViewTemplate, data: obDetailView }'></div>");
+				self.$rightPage.find(".detail-view-container").append($content);
+				ko.applyBindings(ko.observable(self), $content[0]);
+				break;
+		}
 		self.reLayoutPage();
+	};
+
+	ResizablePage.prototype.getRightData = function()
+	{
+		const self = this;
+		switch(self.obRightContentType())
+		{
+			case RightPageContentType.detailview:
+				return self.obDetailView();
+			case RightPageContentType.dataentry:
+				return self.obDataEntry();
+			case RightPageContentType.splitmap:
+				return self.mapviewInstace;
+		}
 	};
 
 	ResizablePage.prototype.refreshLeftGrid = function()
@@ -165,7 +213,7 @@
 			return;
 		}
 
-		if (self.obRightData())
+		if (self.obRightContentType())
 		{
 			if (leftWidth < self.minLeftWidth)
 			{
@@ -353,7 +401,7 @@
 				$(document).off(".newRequestHover");
 				pageHeader.off(".newRequestHover");
 
-				if ((!self.obRightData() || self.obRightData().pageType === "detailview") && self.leftPageType !== "reports")
+				if ((!self.obRightContentType() || self.obRightContentType() === RightPageContentType.detailview) && self.leftPageType !== "reports")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
 					if(tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
@@ -362,10 +410,7 @@
 					}
 					pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
 
-					if (self.obRightData())
-					{
-						self.obRightData().updateDetailViewPanelHeader();
-					}
+					self.getRightData()?.updateDetailViewPanelHeader();
 
 					if (pageHeader.outerHeight() > 56)
 					{
@@ -446,21 +491,22 @@
 	{
 		var self = this;
 
-		if (self.obRightData())
+		if (self.obRightContentType() && self.obRightContentType() !== RightPageContentType.splitmap)
 		{
+			const data = self.getRightData();
 			if (self.obGridData())
 			{
-				self.obGridData().clearRelatedRightPage(self.obRightData().pageType);
+				self.obGridData().clearRelatedRightPage(data.pageType);
 			}
 
-			if (self.obRightData().dispose)
+			if (data.dispose)
 			{
-				self.obRightData().dispose();
+				data.dispose();
 			}
 		}
 
-		self.$rightPage.empty();
-		self.obRightData(null);
+		self.$rightPage.find(">div.detail-view-container, >div.data-entry").empty();
+		self.obRightContentType(null);
 	};
 
 	ResizablePage.prototype.clearLeftGridContent = function()
@@ -524,5 +570,11 @@
 		var self = this;
 		self.clearRightContent();
 		self.clearLeftContent();
+	};
+
+	ResizablePage.prototype.showMapView = async function()
+	{
+		const self = this;
+		await self.setRightPage(null, null, RightPageContentType.splitmap);
 	};
 })();
