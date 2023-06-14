@@ -93,6 +93,12 @@
 						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Document')">
 						</div>
 					</li>
+					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('fieldtrip'),css:{disabled:!tf.authManager.isAuthorizedFor('fieldtrip','read')}">
+						<div class="menu-icon">
+						</div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')">
+						</div>
+					</li>
 				</ul>
 			</li>
 			<li class="menu-item disabled" data-bind="css:{disabled:gridViewModel.obOpenInProductList().length==0||gridViewModel.obNoRecordsSelected()}">
