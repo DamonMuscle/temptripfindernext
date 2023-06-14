@@ -2758,12 +2758,11 @@
 	{
 		//filter fields by section roles
 		var isAdmin = tf.authManager.authorizationInfo.isAdmin;
-		var isSurvey = tf.surveyGuid !== undefined;
 		var isCreatedBy = udgrid.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId;
 		var isPublic = udgrid.Public === true;
 
 		//check if udgrid is survey or public or isCreateBy
-		if (!udgrid || isSurvey || isPublic || isAdmin || isCreatedBy)
+		if (!udgrid || isAdmin || isCreatedBy)
 		{
 			return udgrid;
 		}
@@ -2771,7 +2770,7 @@
 		var userEntityRoles = tf.userEntity.UserRoles.map(x => x.RoleID);
 		udgrid.UDGridSections = udgrid.UDGridSections.filter(function(section)
 		{
-			if (section.RoleSections.length === 0)
+			if ((isPublic && section.IsPublic) || (section.RoleSections.length === 0))
 			{
 				return true;
 			}
