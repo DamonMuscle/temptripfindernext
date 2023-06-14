@@ -29,6 +29,11 @@
 		this.ungeocodeSelectionClick = this.ungeocodeSelectionClick.bind(this);
 		this.selectedRowChanged.subscribe(this.onSelectRowChanged.bind(this));
 		// this.geocodingClick = this.geocodeTool.geocodingClick.bind(this.geocodeTool);
+
+		self.subscription = tf.pageManager.resizablePage.obRightContentType.subscribe(function()
+		{
+			self.obShowSplitmap(tf.pageManager.resizablePage.obRightContentType() === "splitmap");
+		});
 	}
 
     LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -127,21 +132,10 @@
 		if (self.obShowSplitmap())
 		{
 			tf.pageManager.resizablePage.closeRightPage();
-			self.obShowSplitmap(false);
 		}
 		else
 		{
-			var pageData = new TF.Page.MapCanvasPage(null,  Math.random().toString(36).substring(7));
-	
-			if (TF.isMobileDevice)
-			{
-				tf.pageManager.resizablePage.setLeftPage("workspace/page/RoutingMap/mapcanvaspage", pageData);
-			}
-			else
-			{
-				tf.pageManager.resizablePage.setRightPage("workspace/page/RoutingMap/mapcanvaspage", pageData);
-			}
-			self.obShowSplitmap(true);
+			tf.pageManager.resizablePage.showMapView();
 		}
 	}
 
@@ -250,5 +244,12 @@
 		{
 			return item.Geocoded == 'true'
 		}).length > 0);
-	};	
+	};
+
+	LocationPage.prototype.dispose = function()
+	{
+		const self = this;
+		TF.Page.BaseGridPage.prototype.dispose.apply(self);
+		self.subscription && self.subscription.dispose();
+	};
 })();
