@@ -5184,46 +5184,6 @@
 					}
 				},
 				{
-					"field": "City",
-					"title": "City",
-					"defaultValue": "",
-					"type": "string",
-					"width": '120px',
-					"editType": {
-						"format": "String",
-						"maxLength": 255
-					}					
-				},
-				{
-					"field": "Street",
-					"title": "Street",
-					"defaultValue": "",
-					"type": "string",
-					"width": '200px',
-					"editType": {
-						"format": "String",
-						"maxLength": 255
-					}					
-				},
-				{
-					"field": "State",
-					"title": "State",
-					"type": "string",
-					"editType": {
-						"format": "String",
-						"maxLength": 2
-					}
-				},
-				{
-					"field": "Zip",
-					"title": "Zip",
-					"type": "string",
-					"editType": {
-						"format": "String",
-						"maxLength": 5
-					}
-				},
-				{
 					"field": "Notes",
 					"title": "Notes",
 					"defaultValue": "",
