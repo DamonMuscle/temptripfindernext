@@ -35,7 +35,7 @@
 		}
 	};
 
-	let _map;
+	let _map, _mapLayerInstances = [];
 
 	function Map($mapContainer, options)
 	{
@@ -460,27 +460,17 @@
 		}
 
 		const defaultOptions = {
-			id: options.id || `layerId_${Date.now()}`,
-			index: options.index || -1,
+			id: `layerId_${Date.now()}`,
+			index: null,
 			eventHandlers: {
 				onLayerCreated: null
 			}
 		};
 
 		const settings = Object.assign({}, defaultOptions, options);
-		let layer = null;
-		switch (layerType)
-		{
-			case LAYER_TYPE.GRAPHIC:
-				layer = new TF.GIS.SDK.GraphicsLayer({ id: settings.id });
-				break;
-			case LAYER_TYPE.FEATURE:
-				layer = new TF.GIS.SDK.FeatureLayer({ ...settings });
-				break;
-			default:
-				console.warn(`Undefined layerType: ${layerType}, create layer failed.`);
-				break;
-		}
+
+		const layerInstance = new TF.GIS.Layer(options, layerType);
+		const layer = layerInstance.layer;
 
 		if (layer === null)
 		{
@@ -492,14 +482,16 @@
 			_map.mapView.whenLayerView(layer).then((result) => settings.eventHandlers.onLayerCreated.call(result));
 		}
 
-		if (settings.index >= 0)
+		if (layerInstance.index >= 0)
 		{
-			_map.add(layer, settings.index);
+			_map.add(layer, layerInstance.index);
 		}
 		else
 		{
 			_map.add(layer);
 		}
+
+		_mapLayerInstances.push(layerInstance);
 
 		return layer;
 	}
@@ -543,6 +535,29 @@
 		return layer;
 	}
 
+	Map.prototype.getMapLayerInstance = function(layerId)
+	{
+		if (_map === null)
+		{
+			console.warn(`_map is null, return.`);
+			return null;
+		}
+
+		let instance = null;
+		for (let i = 0; i < _mapLayerInstances.length; i++) {
+			if (_mapLayerInstances[i].layer.id === layerId) {
+				instance = _mapLayerInstances[i];
+				break;
+			}
+		}
+
+		if (instance === null) {
+			console.warn(`Could not find the layer id = ${layerId}`);
+		}
+
+		return instance;
+	}
+
 	Map.prototype.getMapLayers = function()
 	{
 		if (_map)
@@ -551,6 +566,12 @@
 		}
 
 		return null;
+	}
+
+	Map.prototype.centerAt = function(longitude, latitude)
+	{
+		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
+		this.centerAtPoint(point);
 	}
 
 	Map.prototype.centerAtPoint = function(point)
