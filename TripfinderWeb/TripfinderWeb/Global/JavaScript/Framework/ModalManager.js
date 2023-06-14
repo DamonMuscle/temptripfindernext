@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Modal").ModalManager = ModalManager;
 
@@ -14,7 +14,7 @@
 		ko.applyBindings(self, self._$modalContainer[0]);
 		self._handlers = {};
 
-		self._$modalContainer.on('shown.bs.modal', function(e)
+		self._$modalContainer.on('shown.bs.modal', function (e)
 		{
 			var $modal = $(e.target), baseModalViewModel = ko.dataFor($modal[0]),
 				firstElement = $modal.find(':text,select,textarea,:checkbox,:password,:radio,:file').not(":disabled").eq(0);
@@ -36,7 +36,7 @@
 			{
 				if (!TF.isPhoneDevice)
 				{
-					var scrollElements = baseModalViewModel.$target.find(':visible').filter(function(index, element)
+					var scrollElements = baseModalViewModel.$target.find(':visible').filter(function (index, element)
 					{
 						var overflow = $(element).css("overflow");
 						return overflow == 'auto' || overflow == 'scroll';
@@ -45,24 +45,26 @@
 					for (var i = 0; i < scrollElements.length; i++)
 					{
 						new TF.TapHelper(scrollElements[i], {
-							swipingUp: function(e)
+							swipingUp: function (e)
 							{
 								e.stopPropagation();
 								var target = e.currentTarget, isForm = $(target).find(".form-body").length > 0;
 								if (target && target.scrollHeight - target.scrollTop <= target.clientHeight)
 								{
-									if (e.cancelable && !TF.isSafari && !isForm) {
+									if (e.cancelable && !TF.isSafari && !isForm)
+									{
 										e.preventDefault();
 									}
 								}
 							},
-							swipingDown: function(e)
+							swipingDown: function (e)
 							{
 								e.stopPropagation();
 								var target = e.currentTarget, isForm = $(target).find(".form-body").length > 0;
 								if (target && target.scrollTop <= 0)
 								{
-									if (e.cancelable && !TF.isSafari && !isForm) {
+									if (e.cancelable && !TF.isSafari && !isForm)
+									{
 										e.preventDefault();
 									}
 								}
@@ -77,7 +79,7 @@
 			$inputs.attr("tabIndex", -1);
 		});
 
-		self._$modalContainer.on('hidden.bs.modal', function(e)
+		self._$modalContainer.on('hidden.bs.modal', function (e)
 		{
 			var $modal = $(e.target);
 			var baseModalViewModel = ko.dataFor($modal[0]);
@@ -93,28 +95,16 @@
 				$("body").removeClass('modal-fullscreen-open');
 			}
 		});
-		var event = TF.isMobileDevice ? 'touchstart' : 'click';
-		self._$modalContainer.delegate(".modal .modal-backdrop", event, function(e)
-		{
-			e.preventDefault();
-			e.stopPropagation();
-			var $modal = $(e.target);
-			var baseModalViewModel = ko.dataFor($modal[0]);
-			if (!baseModalViewModel.OutSizeClickEnable)
-			{
-				baseModalViewModel.closeClick(baseModalViewModel, e);
-			}
-		});
 
-		$(window).resize(function(e)
+		$(window).resize(function (e)
 		{
 			// form is full screen; so ignore it
 			if (TF.isMobileDevice && self._$modalContainer.find(".form-container").length > 0)
-				return; 
+				return;
 
-			setTimeout(function()
+			setTimeout(function ()
 			{
-				self.obBaseModalViewModels().map(function(modal)
+				self.obBaseModalViewModels().map(function (modal)
 				{
 					var $dialog = modal.$target.find(".modal-dialog"),
 						offset = $dialog.offset(),
@@ -144,7 +134,7 @@
 	};
 
 	ModalManager.prototype = {
-		hideModal: function(baseModalViewModel)
+		hideModal: function (baseModalViewModel)
 		{
 			var $modal = null,
 				$modals = this._$modalContainer.find(".tfmodal"),
@@ -169,7 +159,7 @@
 			tf.shortCutKeys.removeChildKey(baseModalViewModel.shortCutKeyHashMapKeyName, baseModalViewModel.inheritChildrenShortCutKey);
 		},
 
-		showModal: function(baseModalViewModel, draggable)
+		showModal: function (baseModalViewModel, draggable)
 		{
 			if (!(baseModalViewModel instanceof TF.Modal.BaseModalViewModel))
 			{
@@ -187,7 +177,7 @@
 			return baseModalViewModel.getPromise();
 		},
 
-		hideAll: function()
+		hideAll: function ()
 		{
 			var self = this;
 			var openModals = this.obBaseModalViewModels();
@@ -206,7 +196,7 @@
 	 * @param {object} baseModalViewModel the object of modal .
 	 * @returns {void}
 	 */
-	ModalManager.prototype.bindHotKeys = function(baseModalViewModel)
+	ModalManager.prototype.bindHotKeys = function (baseModalViewModel)
 	{
 		var self = this;
 		//If this modal has buttons.
@@ -255,7 +245,7 @@
 					clearUnderline(underlineButtons);
 				}
 
-				tf.shortCutKeys.bind(bindKeysName, function()
+				tf.shortCutKeys.bind(bindKeysName, function ()
 				{
 					baseModalViewModel.notDelayTrigger ? buttonTrigger() : setTimeout(buttonTrigger);
 					return false;
@@ -269,7 +259,7 @@
 			 */
 			function clearUnderline(buttons)
 			{
-				buttons.forEach(function(item)
+				buttons.forEach(function (item)
 				{
 					item.underlineClass("");
 				});
@@ -282,7 +272,7 @@
 			 */
 			function setUnderline(buttons)
 			{
-				buttons.forEach(function(item)
+				buttons.forEach(function (item)
 				{
 					var $button = baseModalViewModel.$target.find(item.buttonClass);
 					if (!$button.attr("disabled"))
@@ -333,7 +323,7 @@
 			var timeOut = null, time = 500;
 			if (navigator.userAgent.indexOf('Firefox') >= 0)
 			{
-				tf.shortCutKeys.bind("alt", function()
+				tf.shortCutKeys.bind("alt", function ()
 				{
 					if (!timeOut)
 					{
@@ -343,7 +333,7 @@
 					{
 						clearTimeout(timeOut);
 					}
-					timeOut = setTimeout(function()
+					timeOut = setTimeout(function ()
 					{
 						clearUnderline(underlineButtons);
 						timeOut = null;
@@ -356,12 +346,12 @@
 			else
 			{
 				//VIEW-2408, Add the underlined letter corresponding to its hotkey when the 'Alt' key was pressed.
-				tf.shortCutKeys.bind("alt", function()
+				tf.shortCutKeys.bind("alt", function ()
 				{
 					setUnderline(underlineButtons);
 					return false;
 				}, baseModalViewModel.shortCutKeyHashMapKeyName, "keydown", { permission: ["INPUT", "TEXTAREA", "SELECT"] });
-				tf.shortCutKeys.bind("alt", function()
+				tf.shortCutKeys.bind("alt", function ()
 				{
 					clearUnderline(underlineButtons);
 					return false;
@@ -370,13 +360,13 @@
 		}
 	};
 
-	ModalManager.prototype.modalAdd = function(el, modalViewModel)
+	ModalManager.prototype.modalAdd = function (el, modalViewModel)
 	{
 		var options = { backdrop: (this.currentBaseModalViewModel.obCloseable() ? true : "static"), keyboard: false },
 			$el = $(el),
 			tfModal = $el.closest('.tfmodal'),
 			dialog = $el.closest('.modal-dialog');
-		if(TF.isMobileDevice && !dialog.hasClass("modal-dialog-lg-mobile"))
+		if (TF.isMobileDevice && !dialog.hasClass("modal-dialog-lg-mobile"))
 		{
 			dialog.addClass("modal-dialog-lg-mobile");
 		}
@@ -387,7 +377,7 @@
 		if (modalViewModel.draggable && !dialog.hasClass("modal-fullscreen"))
 		{
 			tf.promiseBootbox.modalDraggable(tfModal, dialog);
-			tfModal.find(".modal-header").on("click.inputblur", function(e)
+			tfModal.find(".modal-header").on("click.inputblur", function (e)
 			{
 				$(document.activeElement).blur();
 			});
@@ -396,13 +386,13 @@
 		if (dialog.hasClass("modal-fullscreen") && TF.isPhoneDevice)
 		{
 			$("body").addClass('modal-fullscreen-open');
-			dialog.find(".mobile-modal-grid-head").on("touchmove", function(e)
+			dialog.find(".mobile-modal-grid-head").on("touchmove", function (e)
 			{
 				e.stopPropagation();
 				e.preventDefault();
 			});
 			new TF.TapHelper(dialog[0], {
-				swipingUp: function(e)
+				swipingUp: function (e)
 				{
 					var modalBody = $(e.target).closest(".mobile-modal-content-body")[0];
 					if (modalBody && modalBody.scrollHeight - modalBody.scrollTop <= $(modalBody).height())
@@ -411,7 +401,7 @@
 						e.preventDefault();
 					}
 				},
-				swipingDown: function(e)
+				swipingDown: function (e)
 				{
 					var modalBody = $(e.target).closest(".mobile-modal-content-body")[0];
 					if (modalBody && modalBody.scrollTop <= 0)
