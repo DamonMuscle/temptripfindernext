@@ -5301,7 +5301,16 @@
 			],
 			"User Defined": [],
 			"User Defined Group": [],
-			"Grid": []
+			"Grid": [
+				{
+					"field": "ContactGrid",
+					"title": "Contact Information",
+					"type": "grid",
+					"url": "contactinformation",
+					"min-height": "3",
+					"min-width": 2
+				},
+			]
 		}
 	};
 
