@@ -2631,6 +2631,33 @@
 				type: "string"
 			},
 			{
+				FieldName: "GeoCity",
+				DisplayName: "Geo City",
+				DBName: "geo_city",
+				type: "string",
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoCity2", "fieldtriplocation", "GeoCity")
+			},
+			{
+				FieldName: "GeoCounty",
+				DisplayName: "Map Set",
+				DBName: "geo_county",
+				type: "string",
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("Mapset2", "fieldtriplocation", "GeoCounty")
+			},
+			{
+				FieldName: "GeoStreet",
+				DisplayName: "Geo Street",
+				DBName: "geo_street",
+				type: "string"
+			},
+			{
+				FieldName: "GeoZip",
+				DisplayName: "Geo " + tf.localization.Postal,
+				DBName: "geo_zip",
+				type: "string",
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoZipCode", "fieldtriplocation", "GeoZip")
+			},
+			{
 				FieldName: "Notes",
 				DisplayName: "Notes",
 				defaultValue: "",

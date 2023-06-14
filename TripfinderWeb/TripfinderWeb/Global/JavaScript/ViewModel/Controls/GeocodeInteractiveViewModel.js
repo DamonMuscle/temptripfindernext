@@ -72,7 +72,7 @@
 
 			var currentRecord = self.currentRecord();
 
-			geocodeFinderModalViewModel.data().findAddress(currentRecord.Street, currentRecord.City, currentRecord.Zip).then(function(data)
+			geocodeFinderModalViewModel.data().findAddress(currentRecord.GeoStreet, currentRecord.GeoCity, currentRecord.GeoZip).then(function(data)
 			{
 				if (data && data.exactMatchRecord && data.candidates && data.candidates.length > 0)
 				{
@@ -210,8 +210,8 @@
 			record.GeoZip = result.GeoZip;
 			record.GeoCounty = result.GeoCounty;
 			record.GeocodeScore = result.Score;
-			record.XCoord = result.XCoord;
-			record.YCoord = result.YCoord;
+			record.XCoord = record.Xcoord = result.XCoord;
+			record.YCoord = record.Ycoord = result.YCoord;
 			record.isManuallyPin = result.isManuallyPin;
 		}
 	};

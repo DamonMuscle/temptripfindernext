@@ -1366,6 +1366,7 @@
 				html = "<div class='record-image'></div>";
 				break;
 			case "address":
+			case "locationaddress":
 				var field = $target.attr("field"),
 					data = self.getDataPointByField(field),
 					contentHtml = tf.helpers.detailViewHelper.renderSpecialDefaultContent(data.defaultValue, type);

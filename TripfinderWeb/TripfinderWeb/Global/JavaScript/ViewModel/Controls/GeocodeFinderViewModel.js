@@ -173,9 +173,13 @@
 
 			return Promise.all(data.map(item=>TF.GIS.Analysis.getInstance().geocodeService.findAddressCandidatesREST(item.text, item.magicKey))).then(function(locations){
 				data.forEach((item, index) => {
+					item.GeoStreet = item.street;
+					item.GeoCity = item.city;
+					// item.GeoCounty = item.state;
+					item.GeoZip = item.zip;
 					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
-					item.XCoord = locations[index]?.location.x;
-					item.YCoord = locations[index]?.location.y;
+					item.XCoord = item.Xcoord = locations[index]?.location.x;
+					item.YCoord = item.Ycoord = locations[index]?.location.y;
 					item.Score = locations[index]?.score;
 	
 					var isStreetMatch = item.street && TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));

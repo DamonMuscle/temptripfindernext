@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.DetailView.FieldEditor").LocationFieldEditorHelper = LocationFieldEditorHelper;
 
-	const GeoAssocaitedFields = ["Street", "City", "State", "Zip"];
+	const GeoAssocaitedFields = ["GeoStreet", "GeoCity", "GeoCounty", "GeoZip"];
 	const GeoWarningMessage = "With this change, this location will be ungeocoded.";
 
 	function LocationFieldEditorHelper(detailView)
