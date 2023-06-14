@@ -572,9 +572,9 @@
 		self.clearLeftContent();
 	};
 
-	ResizablePage.prototype.showMapView = function()
+	ResizablePage.prototype.showMapView = async function()
 	{
 		const self = this;
-		self.setRightPage(null, null, RightPageContentType.splitmap);
+		await self.setRightPage(null, null, RightPageContentType.splitmap);
 	};
 })();

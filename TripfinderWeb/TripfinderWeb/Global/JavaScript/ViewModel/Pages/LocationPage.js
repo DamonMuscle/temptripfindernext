@@ -113,7 +113,7 @@
 		this.obCanMassUpdate(isBatchable);
 	};
 
-	LocationPage.prototype.mapIconClick = function()
+	LocationPage.prototype.mapIconClick = async function()
 	{
 		console.log("Map Icon Clicked");
 
@@ -135,8 +135,15 @@
 		}
 		else
 		{
-			tf.pageManager.resizablePage.showMapView();
+			await tf.pageManager.resizablePage.showMapView();
+			self.locationMapViewInstance = tf.pageManager.resizablePage.getRightData();
+			self.initMapTools();
 		}
+	}
+
+	LocationPage.prototype.initMapTools = function()
+	{
+		console.log("TODO: init map tools");
 	}
 
 	LocationPage.prototype.globalReplaceClick = function(viewModel, e)
