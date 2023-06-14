@@ -880,6 +880,8 @@
 				return new TF.DetailView.DataBlockComponent.AttachBlock(item, self.detailView);
 			case "address":
 				return new TF.DetailView.DataBlockComponent.AddressBlock(item, dataBlockStyles, self.getCurrentWidth(), self.detailView);
+			case "locationaddress":
+				return new TF.DetailView.DataBlockComponent.LocationAddressBlock(item, dataBlockStyles, self.getCurrentWidth(), self.detailView);
 			case "Geodistance":
 				return new TF.DetailView.DataBlockComponent.GeoDistanceBlock(item, dataBlockStyles, {
 					isReadMode: self.detailView.isReadMode,

@@ -43,6 +43,37 @@
 				type: "string"
 			},
 			{
+				FieldName: "GeoStreet",
+				DisplayName: "Geo Street",
+				DBName: "Geo_Street",
+				Width: '190px',
+				type: "string"
+			},,
+			{
+				FieldName: "GeoCity",
+				DisplayName: "Geo City",
+				DBName: "Geo_City",
+				Width: '150px',
+				type: "string",
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoCity2", "fieldtriplocation", "GeoCity")
+			},
+			{
+				FieldName: "GeoCounty",
+				DisplayName: "Map Set",
+				DBName: "Geo_County",
+				Width: '150px',
+				type: "string",
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("Mapset2", "fieldtriplocation", "GeoCounty")
+			},
+			{
+				FieldName: "GeoZip",
+				DisplayName: "Geo " + tf.localization.Postal,
+				DBName: "geo_zip",
+				Width: '150px',
+				type: "string",
+				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("GeoZipCode", "fieldtriplocation", "GeoZip")
+			},
+			{
 				FieldName: "Notes",
 				DisplayName: "Notes",
 				defaultValue: "",

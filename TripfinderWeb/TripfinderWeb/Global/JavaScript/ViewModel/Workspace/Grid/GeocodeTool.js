@@ -101,13 +101,13 @@
 		needGeocodeRecords = needGeocodeRecords || [];
 		Promise.all((needGeocodeRecords).map(record =>
 		{
-			if (record.Street)
+			if (record.GeoStreet)
 			{
 				const address = {
-					Street: record.Street,
-					City: record.City || '',
-					State: record.State || '',
-					Zone: record.Zip || ''
+					Street: record.GeoStreet,
+					City: record.GeoCity || '',
+					State: record.GeoCounty || '',
+					Zone: record.GeoZip || ''
 				};
 				const analysis = TF.GIS.Analysis.getInstance();
 				return analysis.geocodeService.addressToLocations(address).then((result) => {
@@ -227,7 +227,7 @@
 				filterData.fields = fields.concat(["GeoRegionTypeId", "Name"]);
 				break;
 			case "fieldtriplocation":
-				filterData.fields = fields.concat(["Name", "City", "Street", "State", "Zip", "XCoord", "YCoord"]);
+				filterData.fields = fields.concat(["Name", "XCoord", "YCoord"]);
 				break;
 			default:
 				filterData.fields = fields.concat(["Name"]);
@@ -561,21 +561,22 @@
 		{
 			if (gridType === "fieldtriplocation")
 			{
-				data.push({ "Id": entity.Id, "op": "replace", "path": "/XCoord", "value": entity.XCoord });
-				data.push({ "Id": entity.Id, "op": "replace", "path": "/YCoord", "value": entity.YCoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/XCoord", "value": entity.XCoord || entity.Xcoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/YCoord", "value": entity.YCoord || entity.Ycoord });
 				data.push({ "Id": entity.Id, "op": "replace", "path": "/GeocodeScore", "value": entity.GeocodeScore });
 			}
 			else
 			{
-				data.push({ "Id": entity.Id, "op": "replace", "path": "/Xcoord", "value": entity.Xcoord });
-				data.push({ "Id": entity.Id, "op": "replace", "path": "/Ycoord", "value": entity.Ycoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/Xcoord", "value": entity.Xcoord || entity.XCoord });
+				data.push({ "Id": entity.Id, "op": "replace", "path": "/Ycoord", "value": entity.Ycoord || entity.YCoord });
 				data.push({ "Id": entity.Id, "op": "replace", "path": "/GeoConfidence", "value": GeocodeTool.getGeoConfidence(entity.isManuallyPin ? "ManuallyPin" : updateSource) });
-				if (gridType == "student" || updateSource == "Interactive")
-				{
-					addSystemAddressFileds(data, entity, gridType);
-				}
 			}
-		});
+
+			if (gridType == "student" || updateSource == "Interactive")
+			{
+				addSystemAddressFileds(data, entity, gridType);
+			}
+	});
 
 		function addSystemAddressFileds(data, entity, gridType)
 		{
@@ -736,23 +737,15 @@
 			"city": "GeoCity",
 			"zip": "GeoZip",
 			"state": "GeoCounty"
-		}
+		};
 		var student_fields = {
 			"street": "SystemStreet",
 			"city": "SystemCity",
 			"zip": "SystemZip",
 			"state": "SystemState"
-		}
-		const location_fields = {
-			"street": "Street",
-			"city": "City",
-			"zip": "Zip",
-			"state": "State"
 		};
 
-		var fieldName = gridType == "location" ? location_fields[fieldType.toLowerCase()] :
-			(gridType == "student" ? student_fields[fieldType.toLowerCase()] : fields[fieldType.toLowerCase()]);
-		return fieldName;
+		return gridType === "student" ? student_fields[fieldType.toLowerCase()] : fields[fieldType.toLowerCase()];
 	}
 
 })();

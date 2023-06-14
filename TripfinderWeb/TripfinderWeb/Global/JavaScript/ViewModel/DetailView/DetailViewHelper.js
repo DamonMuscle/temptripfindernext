@@ -1927,6 +1927,15 @@
 
 				content.append($street, $zip, $city, $confidence);
 				break;
+			case "locationaddress":
+				var content = $("<div/>", { class: "item-content" }),
+					$street = self.createSingleEditableField(data.street.title, data.street.text, ["one-half", "left-align"]),
+					$zip = self.createSingleEditableField(data.zip.title, data.zip.text, ["one-half", "right-align"]),
+					$city = self.createSingleEditableField(data.city.title, data.city.text, ["one-half", "left-align"]),
+					$score = self.createSingleEditableField(data.score.title, data.score.text, ["one-half", "right-align"]);
+
+				content.append($street, $zip, $city, $score);
+				break;
 			default:
 				break;
 		}

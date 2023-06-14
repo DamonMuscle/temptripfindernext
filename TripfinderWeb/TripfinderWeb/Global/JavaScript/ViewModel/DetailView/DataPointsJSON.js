@@ -5234,6 +5234,110 @@
 						"maxLength": 255
 					}
 				},
+				{
+					"field": "Geocoded",
+					"title": "Geocoded",
+					"type": "Boolean",
+					"defaultValue": "True",
+					"displayValue": "Geocoded",
+					"positiveLabel": "Geocoded",
+					"negativeLabel": "Ungeocoded"
+				}
+			],
+			"Address": [
+				{
+					"field": "Street",
+					"title": "Street",
+					"defaultValue": "",
+					"type": "string",
+					"width": '200px',
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}
+				},
+				{
+					"field": "City",
+					"title": "City",
+					"defaultValue": "",
+					"type": "string",
+					"width": '120px',
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}
+				},
+				{
+					"field": "State",
+					"title": "State",
+					"type": "string",
+					"editType": {
+						"format": "String",
+						"maxLength": 2
+					}
+				},
+				{
+					"field": "Zip",
+					"title": "Zip",
+					"type": "string",
+					"editType": {
+						"format": "String",
+						"maxLength": 5
+					}
+				},
+				{
+					"field": "GeoStreet",
+					"title": "GeoCode Address Street",
+					"type": "String",
+					"defaultValue": "440 State St.",
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}
+				},
+				{
+					"field": "GeoCity",
+					"title": "GeoCode Address City/Town",
+					"type": "String",
+					"defaultValue": "Schenectady",
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}
+				},
+				{
+					"field": "GeoCounty",
+					"title": "GeoCode Address Map Set",
+					"type": "String",
+					"editType": {
+						"format": "String",
+						"maxLength": 255
+					}
+				},
+				{
+					"field": "GeoZip",
+					"title": "GeoCode Address Postal Code",
+					"type": "String",
+					"defaultValue": "12305",
+					"editType": {
+						"format": "String",
+						"maxLength": 5
+					}
+				},
+				{
+					"field": "Address",
+					"title": "Geo Address",
+					"type": "locationaddress",
+					"min-height": "3",
+					"min-width": "2",
+					"defaultValue": {
+						street: { title: "GEOCODE ST", text: "440 State St." },
+						zip: { title: "GEOCODE POSTAL CODE", text: "12305" },
+						city: { title: "GEOCODE CITY/TOWN", text: "Schenectady" },
+						score: { title: "GEOCODE SCORE", text: "100" }
+					},
+					"innerFields": getLocationGeoAddressInnerFields()
+				}
 			],
 			"User Defined": [],
 			"User Defined Group": [],
@@ -5344,6 +5448,35 @@
 		}, {
 			title: "GEOCONFIDENCE",
 			field: "GeoConfidence",
+			class: "right-align one-half",
+			row: 2
+		}];
+	};
+
+	function getLocationGeoAddressInnerFields()
+	{
+		return [{
+			title: "GEOCODE ST",
+			field: "GeoStreet",
+			defaultValue: "440 State St.",
+			class: "left-align one-half",
+			row: 1
+		}, {
+			title: "GEOCODE POSTAL CODE",
+			field: "GeoZip",
+			defaultValue: "12305",
+			class: "right-align one-half",
+			row: 1,
+		}, {
+			title: "GEOCODE CITY/TOWN",
+			field: "GeoCity",
+			defaultValue: "Schenectady",
+			class: "left-align one-half",
+			row: 2,
+		}, {
+			title: "GEOCODE SCORE",
+			field: "GeocodeScore",
+			defaultValue: "100",
 			class: "right-align one-half",
 			row: 2
 		}];
