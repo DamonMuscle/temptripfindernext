@@ -1334,8 +1334,9 @@
 	{
 		var self = this,
 			gridName = self._getGridName(),
+			gridLabel = tf.applicationTerm.getApplicationTermPluralByName(gridName),
 			layoutName = self.obName(),
-			confirmMsg = String.format("Do you want to close {0} edit mode ({1}) without saving?", gridName, layoutName);
+			confirmMsg = String.format("Do you want to close {0} edit mode ({1}) without saving?", gridLabel, layoutName);
 
 		return self.showConfirmation(confirmMsg)
 			.then(function(result)
@@ -2227,7 +2228,8 @@
 	DetailViewViewModel.prototype.exitEditing = function(message, silent)
 	{
 		var self = this,
-			gridName = self._getGridName();
+			gridName = self._getGridName(),
+			gridLabel = tf.applicationTerm.getApplicationTermPluralByName(gridName);
 
 		if (!self.obEditing())
 		{
@@ -2271,7 +2273,7 @@
 				self.obEditing(false);
 				return Promise.resolve(true);
 			}
-			return self.showConfirmation(message || ("Do you want to close " + gridName + " detail view without saving?"))
+			return self.showConfirmation(message || ("Do you want to close " + gridLabel + " detail view without saving?"))
 				.then(function(result)
 				{
 					if (result)

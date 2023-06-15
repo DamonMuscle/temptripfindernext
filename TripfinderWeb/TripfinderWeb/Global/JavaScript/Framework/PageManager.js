@@ -359,7 +359,7 @@
 		}
 		else if (self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.detailView && self.obPages()[0].data.detailView.obEditing())
 		{
-			self.showConfirmation("Do you want to close " + getTitleByType(self.obPages()[0].data.type) + " detail view without saving?")
+			self.showConfirmation("Do you want to close " + getTitleByType(self.obPages()[0].data.pageType) + " detail view without saving?")
 				.then(function(result)
 				{
 					if (result)
