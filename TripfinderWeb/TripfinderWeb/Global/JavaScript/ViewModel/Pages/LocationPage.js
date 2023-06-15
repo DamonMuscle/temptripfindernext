@@ -149,7 +149,34 @@
 
 	LocationPage.prototype.initMapTools = function()
 	{
-		console.log("TODO: init map tools");
+		const self = this;
+		const options = {
+			baseMapSaveKey: "tfweb.baseMapId.gridMap",
+			isDetailView: false,
+			isReadMode: false,
+			zoomAvailable: true,
+			thematicAvailable: true,
+			baseMapAvailable: true,
+			measurementAvailable: true,
+			manuallyPinAvailable: false,
+			drawBoundaryAvailable: false,
+			thematicInfo: false,
+			legendStatus: false,
+			geoFinderAvailable: true,
+			geoSearchAvailable: true,
+			printAvailable: true,
+			expand: {
+				enable: false,
+			}
+		};
+
+		self._map = self.locationMapViewInstance.map;  // self._map is used for RoutingMapTool.
+		self.element = tf.pageManager.resizablePage.$rightPage.find(".splitmap");
+		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, $.extend({
+			thematicLayerId: "",
+		}, options));
+
+		self.sketchTool = new TF.RoutingMap.SketchTool(self.locationMapViewInstance.map, self);
 	}
 
 	LocationPage.prototype.globalReplaceClick = function(viewModel, e)
@@ -354,6 +381,13 @@
 		const self = this;
 		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance]);
 		console.log(locationGraphics);
+	}
+
+	LocationPage.prototype.exitCurrentMode = function()
+	{
+		if (this.sketchTool) this.sketchTool.stop();
+		if (this.RoutingMapTool.manuallyPinTool) this.RoutingMapTool.manuallyPinTool.stopPin();
+		if (this.RoutingMapTool.measurementTool) this.RoutingMapTool.measurementTool.deactivate();
 	}
 
 	LocationPage.prototype.dispose = function()

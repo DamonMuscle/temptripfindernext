@@ -654,6 +654,9 @@
 		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, {
 			printAvailable: true,
 			trafficMapAvailable: true,
+			thematicAvailable: false,
+			geoFinderAvailable: false,
+			geoSearchAvailable: false,
 			buildPalettes: function()
 			{
 				const palettes = [
