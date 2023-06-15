@@ -5446,6 +5446,7 @@
 			title: "GEOCODE SCORE",
 			field: "GeocodeScore",
 			defaultValue: "100",
+			format: "0.00",
 			class: "right-align one-half",
 			row: 2
 		}];

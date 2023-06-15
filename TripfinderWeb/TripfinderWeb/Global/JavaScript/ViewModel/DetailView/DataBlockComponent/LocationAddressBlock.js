@@ -46,8 +46,12 @@
 
 		self.innerFields.forEach(item =>
 		{
-			var fieldValue = geoData[item.field],
-				$field = self.createTextFieldElement(item, fieldValue);
+			let fieldValue = geoData[item.field];
+			if (item.format)
+			{
+				fieldValue = tf.helpers.detailViewHelper.formatNumberContent(fieldValue, item.format);
+			}
+			const $field = self.createTextFieldElement(item, fieldValue);
 
 			$(rowElements[item.row - 1]).append($field);
 		});
