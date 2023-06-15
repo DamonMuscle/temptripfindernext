@@ -1795,7 +1795,7 @@
 			contactEntity = kendoGrid.dataItem($tr),
 			contactName = tf.dataTypeHelper.getEntityName("contact", contactEntity),
 			contactId = contactEntity.Id,
-			gridName = tf.dataTypeHelper.getDisplayNameByDataType(self.gridType).toLowerCase();
+			gridName = tf.applicationTerm.getApplicationTermSingularByName(tf.dataTypeHelper.getDisplayNameByDataType(self.gridType)).toLowerCase();
 
 		tf.promiseBootbox.yesNo("Are you sure you want to disassociate this " + gridName + " from \"" + contactName + "\"?", CONFIRMATION_TITLE)
 			.then(function(res)
