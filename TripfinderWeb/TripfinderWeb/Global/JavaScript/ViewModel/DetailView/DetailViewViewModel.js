@@ -765,7 +765,7 @@
 		});
 		self.obDataPointsForSubTitle = ko.computed(function()
 		{
-			var excludeList = ["grid", "file", "map", "calendar", "schedule", "recordpicture", 'address', 'treelist', 'multiplegrid'];
+			var excludeList = ["grid", "file", "map", "calendar", "schedule", "recordpicture", 'address', 'locationaddress', 'treelist', 'multiplegrid'];
 
 			return self.obDataPoints().filter(function(item)
 			{
