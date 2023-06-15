@@ -845,9 +845,6 @@
 
 	UserDefinedGridHelper.prototype.addUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record)
 	{
-		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
-		const entityObjectId = objectIds[0];
-
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -856,7 +853,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
-				RecordObjectID: entityObjectId,
+				RecordObjectID: null,
 				RecordValue: null
 			},
 			recordValueObj = {};
@@ -921,9 +918,6 @@
 
 	UserDefinedGridHelper.prototype.addSurveyUDGridRecordOfEntity = async function(udGrid, dataTypeId, entityId, record, udgridSurvey)
 	{
-		const objectIds = await this._getObjectIds({ dataTypeId: dataTypeId, recordIds: [entityId] });
-		const entityObjectId = objectIds[0];
-
 		let self = this,
 			udGridId = udGrid.ID,
 			guidToNameDict = self.getGuidToNameMappingOfGridFields(udGrid),
@@ -933,7 +927,7 @@
 				RecordDataType: dataTypeId,
 				RecordID: entityId,
 				UDGridID: udGridId,
-				RecordObjectID: entityObjectId,
+				RecordObjectID: null,
 				RecordValue: null,
 			},
 			recordValueObj = {};
@@ -2764,12 +2758,11 @@
 	{
 		//filter fields by section roles
 		var isAdmin = tf.authManager.authorizationInfo.isAdmin;
-		var isSurvey = tf.surveyGuid !== undefined;
 		var isCreatedBy = udgrid.CreatedBy === tf.authManager.authorizationInfo.authorizationTree.userId;
 		var isPublic = udgrid.Public === true;
 
 		//check if udgrid is survey or public or isCreateBy
-		if (!udgrid || isSurvey || isPublic || isAdmin || isCreatedBy)
+		if (!udgrid || isAdmin || isCreatedBy)
 		{
 			return udgrid;
 		}
@@ -2777,7 +2770,7 @@
 		var userEntityRoles = tf.userEntity.UserRoles.map(x => x.RoleID);
 		udgrid.UDGridSections = udgrid.UDGridSections.filter(function(section)
 		{
-			if (section.RoleSections.length === 0)
+			if ((isPublic && section.IsPublic) || (section.RoleSections.length === 0))
 			{
 				return true;
 			}
