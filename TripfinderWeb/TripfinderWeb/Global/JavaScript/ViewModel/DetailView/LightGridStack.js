@@ -1988,7 +1988,10 @@
 					title: data.dataPoint.title,
 					appearance: '',
 					customizedTitle: '',
-					defaultValue: data.dataPoint.defaultValue
+					defaultValue: data.dataPoint.defaultValue,
+					UDFId: data.dataPoint.UDFId || null,
+					UDFType: data.dataPoint.UDFType || null,
+					UDFTypeId: data.dataPoint.UDFTypeId || null,
 				};
 				if (data.dataPoint.type === "Boolean")
 				{
