@@ -265,9 +265,9 @@
 						},
 						{
 							title: 'Data Type',
-							field: "DataType",
+							field: "DataTypeLabel",
 							DisplayName: "Data Type",
-							FieldName: "DataType",
+							FieldName: "DataTypeLabel",
 							width: 100,
 							filterable: {
 								cell: {
@@ -374,8 +374,8 @@
 						RowId: '',
 						Id: item.Id,
 						Name: self._getNameByDataType(dataTypeName, item),
-						DataType: dataTypeLabel,
-						DataTypeName: dataTypeName,
+						DataType: dataTypeName,
+						DataTypeLabel: dataTypeLabel
 					};
 				});
 
@@ -393,8 +393,8 @@
 						RowId: '',
 						Id: item.Id,
 						Name: self._getNameByDataType(dataTypeName, item),
-						DataType: dataTypeLabel,
-						DataTypeName: dataTypeName,
+						DataType: dataTypeName,
+						DataTypeLabel: dataTypeLabel
 					}
 				}) : leftSelectedItems);
 			}
@@ -471,7 +471,7 @@
 
 	AssociateRecordsViewModel.prototype.setLeftRequestOption = function(requestOptions)
 	{
-		var self = this, selectedId = this.selectedItems.filter(function(item) { return item.DataTypeName === self.obSelected().name }).map(function(item) { return item.Id });
+		var self = this, selectedId = this.selectedItems.filter(function(item) { return item.DataType === self.obSelected().name }).map(function(item) { return item.Id });
 		var excludeIds = selectedId;
 
 		if (this.options && this.options.gridOptions && this.options.gridOptions.excludeIds && this.options.gridOptions.excludeIds.length > 0)
@@ -579,8 +579,7 @@
 					return {
 						'Id': item.Id,
 						'Name': item.Name,
-						'Type': item.DataType,
-						'TypeName': item.DataTypeName,
+						'Type': item.DataType
 					};
 				});
 

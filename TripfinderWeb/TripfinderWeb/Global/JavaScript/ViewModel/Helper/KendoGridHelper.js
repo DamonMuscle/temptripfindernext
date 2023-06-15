@@ -370,7 +370,11 @@
 					{
 						FieldName: "Type",
 						DisplayName: "Type",
-						Width: "100px"
+						Width: "100px",
+						template: function(dataItem)
+						{
+							return tf.applicationTerm.getApplicationTermSingularByName(dataItem.Type);
+						}
 					}
 				];
 				break;

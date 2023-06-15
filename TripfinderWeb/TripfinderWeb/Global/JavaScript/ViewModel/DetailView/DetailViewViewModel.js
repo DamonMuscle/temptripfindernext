@@ -1066,7 +1066,7 @@
 		TF.DetailView.BaseCustomGridStackViewModel.prototype.startCreateNewMode.call(self);
 
 		self.initButtons();
-		self.obTitle('New ' + tf.dataTypeHelper.getFormalDataTypeName(self.gridType));
+		self.obTitle('New ' +  tf.applicationTerm.getApplicationTermSingularByName(tf.dataTypeHelper.getFormalDataTypeName(self.gridType)));
 		self.obSubTitleLabel('');
 		self.obRecordPicture(null);
 		self.startReadMode();
