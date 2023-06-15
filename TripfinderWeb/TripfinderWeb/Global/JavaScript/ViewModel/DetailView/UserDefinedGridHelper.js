@@ -15,6 +15,7 @@
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
 	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
 	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per recipient.';
+	UserDefinedGridHelper.RECORD_VERSION = 1;
 
 	UserDefinedGridHelper.getUpdatedInfoColumns = function()
 	{
@@ -350,7 +351,8 @@
 		});
 		sortFields.forEach(col =>
 		{
-			if (col.type === 'SystemField')
+			const saveValueWithForm = col.FieldOptions?.SaveValueWithForm;
+			if (col.type === 'SystemField' && !saveValueWithForm)
 			{
 				return;
 			}
@@ -640,7 +642,8 @@
 
 		gridFields.forEach(gf =>
 		{
-			if (excludeSystemField && gf.type === 'SystemField')
+			const saveValueWithForm = gf.FieldOptions?.SaveValueWithForm;
+			if (excludeSystemField && gf.type === 'SystemField' && !saveValueWithForm)
 			{
 				return;
 			}
@@ -872,6 +875,7 @@
 		}
 
 		rawRecord.RecordValue = JSON.stringify(recordValueObj);
+		rawRecord.RecordVersion = TF.DetailView.UserDefinedGridHelper.RECORD_VERSION;
 		let paramData = {};
 		if (record.DocumentUDGridRecords)
 		{
@@ -946,6 +950,7 @@
 		}
 
 		rawRecord.RecordValue = JSON.stringify(recordValueObj);
+		rawRecord.RecordVersion = TF.DetailView.UserDefinedGridHelper.RECORD_VERSION;
 		let paramData = {};
 		if (record.DocumentUDGridRecords)
 		{

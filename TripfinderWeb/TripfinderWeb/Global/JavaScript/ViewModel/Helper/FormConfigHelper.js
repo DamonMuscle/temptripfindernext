@@ -265,11 +265,13 @@
 				</div>`);
 		}
 	}
-	FormConfigHelper.systemFieldsFormat = function(type, value, el)
+	FormConfigHelper.systemFieldsFormat = function(type, value, el, trueDisplayName, falseDisplayName)
 	{
 
 		switch (type)
 		{
+			case "Boolean":
+				return (value === null || value === '') ? "" : (value ? trueDisplayName : falseDisplayName);
 			case "Date":
 			case "date":
 				return _formatDataSysField(value);
