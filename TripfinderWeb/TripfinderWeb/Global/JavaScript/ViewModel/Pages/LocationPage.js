@@ -2,6 +2,8 @@
 {
     createNamespace("TF.Page").LocationPage = LocationPage;
 
+	const LocationGridLayerId = "locationGridLayer";
+
     function LocationPage(gridOptions)
 	{
 		var self = this;
@@ -138,6 +140,8 @@
 			await tf.pageManager.resizablePage.showMapView();
 			self.locationMapViewInstance = tf.pageManager.resizablePage.getRightData();
 			self.initMapTools();
+			self.initLocationMapGraphics();
+			
 		}
 	}
 
@@ -252,6 +256,91 @@
 			return item.Geocoded == 'true'
 		}).length > 0);
 	};
+
+	LocationPage.prototype.initLocationMapGraphics = function()
+	{
+		const self = this;
+		let timer = null;
+		const showLocationPoints = () =>
+			{
+				if (timer != null)
+				{
+					clearTimeout(timer);
+				}
+
+				timer = setTimeout(async () =>
+				{
+					await self.drawLocationPoints();
+					self.zoomToLocationGridLayerExtent();
+					timer = null;
+				});
+			};
+
+		if (!self.locationGridLayerInstance)
+		{
+			self.locationGridLayerInstance = self.locationMapViewInstance.addLayer({
+				id: LocationGridLayerId,
+				eventHandlers:{
+					onLayerCreated: () => {
+						showLocationPoints();
+					}
+				}
+			});
+		}
+		else
+		{
+			self.locationGridLayerInstance.clearLayer();
+			showLocationPoints();
+		}
+	}
+
+	LocationPage.prototype.drawLocationPoints = async function()
+	{
+		const self = this,
+			markerSymbol = {
+				type: "simple-marker",
+				color: [112, 123, 249]
+			},
+			records = await self.getLocationRecords();
+
+		for (let i = 0; i < records.length; i++)
+		{
+			const item = records[i];
+			const attributes = {
+				name: item.Name,
+				street: item.Street,
+				notes: item.Notes
+			}
+			if (item.XCoord && item.YCoord)
+			{
+				self.locationGridLayerInstance.addPoint(item.XCoord, item.YCoord, markerSymbol, attributes);
+			}
+		}
+	}
+
+	LocationPage.prototype.getLocationRecords = async function()
+	{
+		const self = this;
+		const recordIds = self.searchGrid.obAllIds();
+		return tf.promiseAjax.post(self.options.url, {
+			data: {
+				fields: ["Name", "Street", "XCoord", "YCoord", "Notes"],
+				idFilter: {
+					IncludeOnly: recordIds,
+					ExcludeAny: []
+				},
+			}
+		}).then(function(result)
+		{
+			return result.Items;
+		});
+	}
+
+	LocationPage.prototype.zoomToLocationGridLayerExtent = function()
+	{
+		const graphics = this.locationGridLayerInstance.layer.graphics;
+		this.locationMapViewInstance.setExtent(graphics);
+	}
 
 	LocationPage.prototype.dispose = function()
 	{

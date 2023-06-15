@@ -130,11 +130,9 @@
 			attributes ={ type: self.type };
 
 		layerInstance.clearLayer();
-		let featureGeometry = null;
 
 		if (geometry && geometry.x && geometry.y) {
-			featureGeometry = geometry;
-			layerInstance.add(featureGeometry, markerSymbol, attributes);
+			layerInstance.add(geometry, markerSymbol, attributes);
 			return;
 		}
 

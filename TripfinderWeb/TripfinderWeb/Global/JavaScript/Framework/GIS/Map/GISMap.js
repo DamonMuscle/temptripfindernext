@@ -420,10 +420,9 @@
 
 	Map.prototype.setMapCursor = function(cursorType)
 	{
-		const map = _map;
 		const availableCursorTypes = ["default", "locate", "locate-white", "pin"];
 
-		$(map.mapView.container).removeClass("pin-cursor");
+		$(_map.mapView.container).removeClass("pin-cursor");
 
 		let cursor = null;
 		switch (cursorType)
@@ -436,18 +435,18 @@
 				break;
 			case "pin":
 				cursor = "pin";
-				$(map.mapView.container).addClass("pin-cursor");
+				$(_map.mapView.container).addClass("pin-cursor");
 				break;
 			default:
 				cursor = cursorType;
 				break;
 		}
 
-		map.mapView.container.style.cursor = cursor;
+		_map.mapView.container.style.cursor = cursor;
 
 		if (availableCursorTypes.indexOf(cursorType) >= 0)
 		{
-			$(map.mapView.container).find(".esri-view-surface[data-interacting='true']").attr("data-interacting", false);
+			$(_map.mapView.container).find(".esri-view-surface[data-interacting='true']").attr("data-interacting", false);
 		}
 	}
 
@@ -493,7 +492,7 @@
 
 		_mapLayerInstances.push(layerInstance);
 
-		return layer;
+		return layerInstance;
 	}
 
 	Map.prototype.removeLayer = function(layerId)
@@ -579,6 +578,11 @@
 		_map.mapView.center = point;
 	}
 
+	Map.prototype.setExtent = async function(target)
+	{
+		await _map.mapView.goTo(target, { duration: 0, easing: "linear" });
+	}
+
 	Map.prototype.restrictPanOutside = function()
 	{
 		const self = this;
@@ -594,13 +598,13 @@
 			recenterTimer = setTimeout(async () =>
 			{
 				recenterTimer = null;
-				await self.map.mapView.goTo(extent, { duration: 0, easing: "linear" });
+				await self.setExtent(extent);
 			}, 50);
 		}
 
 		const resetMapExtent = async () =>
 		{
-			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = self.map.mapView.extent;
+			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = _map.mapView.extent;
 
 			if (mapExtent)
 			{
@@ -620,7 +624,7 @@
 			}
 		}
 
-		self.map.mapView.watch("extent", async function(value)
+		_map.mapView.watch("extent", async function(value)
 		{
 			resetMapExtent();
 		});
@@ -632,10 +636,10 @@
 		self.removeAllLayers();
 		self.destroyMapEvents();
 
-		if (self.map)
+		if (_map)
 		{
-			self.map.mapView && self.map.mapView.destroy();
-			self.map.destroy && self.map.destroy();
+			_map.mapView && _map.mapView.destroy();
+			_map.destroy && _map.destroy();
 
 			_map = null;
 		}
