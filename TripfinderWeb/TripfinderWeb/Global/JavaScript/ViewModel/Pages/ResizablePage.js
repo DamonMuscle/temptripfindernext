@@ -257,7 +257,7 @@
 
 	ResizablePage.prototype.initDragHandler = function()
 	{
-		var self = this, totalWidth = self.$element.outerWidth(), hasDragMoved, offsetLeftOnDragStart;
+		var self = this, hasDragMoved, offsetLeftOnDragStart;
 		self.$dragHandler.draggable(
 			{
 				distance: 0,
@@ -293,14 +293,7 @@
 					if (!ui.position || ui.position.left === null || ui.position.left === undefined) { return; }
 
 					var totalWidth = self.$element.outerWidth(), currentLeft = ui.position.left;
-					if (currentLeft < self.minLeftWidth)
-					{
-						currentLeft = self.minLeftWidth;
-					}
-					else if (totalWidth - currentLeft < self.minRightWidth)
-					{
-						currentLeft = totalWidth - self.minRightWidth;
-					}
+					currentLeft = self.determineLeftPageWidth(totalWidth, currentLeft);
 
 					if (offsetLeftOnDragStart !== ui.offset.left)
 					{
@@ -310,6 +303,29 @@
 					self.resize(currentLeft);
 				}
 			});
+	};
+
+	ResizablePage.prototype.determineLeftPageWidth = function(totalWidth, left)
+	{
+		const self = this;
+
+		if (left < self.minLeftWidth)
+		{
+			if (self.obRightContentType() !== RightPageContentType.splitmap)
+			{
+				left = self.minLeftWidth;
+			}
+			else
+			{
+				left = (left > self.minLeftWidth/2) ? self.minLeftWidth : 0;
+			}
+		}
+		else if (totalWidth - left < self.minRightWidth)
+		{
+			left = totalWidth - self.minRightWidth;
+		}
+
+		return left;
 	};
 
 	ResizablePage.prototype.savePageRate = function()
@@ -328,15 +344,7 @@
 	ResizablePage.prototype.resize = function(left)
 	{
 		var self = this, totalWidth = self.$element.outerWidth();
-
-		if (left < self.minLeftWidth)
-		{
-			left = self.minLeftWidth;
-		}
-		else if (totalWidth - left < self.minRightWidth)
-		{
-			left = totalWidth - self.minRightWidth;
-		}
+		left = self.determineLeftPageWidth(totalWidth, left);
 		self.$leftPage.width(left);
 		self.$rightPage.width(totalWidth - left);
 		if (!self.obShowGrid())
