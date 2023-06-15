@@ -29,6 +29,7 @@
 		},
 		eventHandlers: {
 			onMapViewCreated: null,
+			onMapViewClick: null,
 			onMapViewDoubleClick: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
@@ -42,6 +43,7 @@
 		this.settings = Object.assign({}, defaultOptions, options);
 		this.eventHandler = {
 			onMapViewCreatedPromise: null,
+			onMapViewClick: null,
 			onMapViewDoubleClick: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
@@ -369,31 +371,42 @@
 
 	Map.prototype.createMapEvents = function()
 	{
-		const self = this;
+		const self = this, mapView = _map.mapView;
+		if (self.settings.eventHandlers.onMapViewClick)
+		{
+			self.eventHandler.onMapViewClick = mapView.on("click", self.settings.eventHandlers.onMapViewClick);
+		}
+
 		if (self.settings.eventHandlers.onMapViewDoubleClick)
 		{
-			self.eventHandler.onMapViewDoubleClick = self.map.mapView.on("double-click", self.settings.eventHandlers.onMapViewDoubleClick);
+			self.eventHandler.onMapViewDoubleClick = mapView.on("double-click", self.settings.eventHandlers.onMapViewDoubleClick);
 		}
 
 		if (self.settings.eventHandlers.onMapViewUpdating)
 		{
-			self.eventHandler.onMapViewUpdating = self.map.mapView.watch('updating', self.settings.eventHandlers.onMapViewUpdating);
+			self.eventHandler.onMapViewUpdating = mapView.watch('updating', self.settings.eventHandlers.onMapViewUpdating);
 		}
 
 		if (self.settings.eventHandlers.onMapViewUpdated)
 		{
-			self.eventHandler.onMapViewUpdated = TF.GIS.SDK.watchUtils.whenFalseOnce(self.map.mapView, "updating", self.settings.eventHandlers.onMapViewUpdated);
+			self.eventHandler.onMapViewUpdated = TF.GIS.SDK.watchUtils.whenFalseOnce(mapView, "updating", self.settings.eventHandlers.onMapViewUpdated);
 		}
 
 		if (self.settings.eventHandlers.onMapViewCreated)
 		{
-			self.eventHandler.onMapViewCreatedPromise = self.map.mapView.when(self.settings.eventHandlers.onMapViewCreated);
+			self.eventHandler.onMapViewCreatedPromise = mapView.when(self.settings.eventHandlers.onMapViewCreated);
 		}
 	}
 
 	Map.prototype.destroyMapEvents = function()
 	{
 		const self = this;
+		if (self.settings.eventHandlers.onMapViewClick && self.eventHandler.onMapViewClick)
+		{
+			self.eventHandler.onMapViewClick.remove();
+			self.eventHandler.onMapViewClick = null;
+		}
+
 		if (self.settings.eventHandlers.onMapViewDoubleClick && self.eventHandler.onMapViewDoubleClick)
 		{
 			self.eventHandler.onMapViewDoubleClick.remove();
@@ -628,6 +641,30 @@
 		{
 			resetMapExtent();
 		});
+	}
+
+	Map.prototype.find = async function(queryGeometry, layerInstances = null)
+	{
+		if (layerInstances === null) {
+			layerInstances = _mapLayerInstances;
+		}
+
+		let spatialQueryGeometry = queryGeometry, findFeatureResults = [];
+		if (queryGeometry && queryGeometry.type === "point")
+		{
+			// use event extent to check the clicked graphic
+			const queryDistance = _map.mapView.scale / 1000;
+			spatialQueryGeometry = TF.GIS.SDK.geometryEngine.geodesicBuffer(queryGeometry, queryDistance, "meters");
+		}
+
+		for (let i = 0; i < layerInstances.length; i++)
+		{
+			const layerInstance = layerInstances[i];
+			const features = await layerInstance.queryFeatures(spatialQueryGeometry);
+			findFeatureResults = findFeatureResults.concat(features);
+		}
+
+		return Promise.resolve(findFeatureResults);
 	}
 
 	Map.prototype.dispose = function()

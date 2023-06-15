@@ -117,8 +117,6 @@
 
 	LocationPage.prototype.mapIconClick = async function()
 	{
-		console.log("Map Icon Clicked");
-
 		var self = this, selectedId;
 		const isReadOnly = !self.selectedItemEditable();
 		const gridType = self.type;
@@ -137,7 +135,11 @@
 		}
 		else
 		{
-			await tf.pageManager.resizablePage.showMapView();
+			const eventHandlers = {
+				onMapViewCreated: self.onMapViewCreated.bind(self),
+				onMapViewClick: self.onMapViewClick.bind(self),
+			};
+			await tf.pageManager.resizablePage.showMapView(eventHandlers);
 			self.locationMapViewInstance = tf.pageManager.resizablePage.getRightData();
 			self.initMapTools();
 			self.initLocationMapGraphics();
@@ -340,6 +342,18 @@
 	{
 		const graphics = this.locationGridLayerInstance.layer.graphics;
 		this.locationMapViewInstance.setExtent(graphics);
+	}
+
+	LocationPage.prototype.onMapViewCreated = function()
+	{
+		console.log("Map View created");
+	}
+
+	LocationPage.prototype.onMapViewClick = async function(event)
+	{
+		const self = this;
+		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance]);
+		console.log(locationGraphics);
 	}
 
 	LocationPage.prototype.dispose = function()

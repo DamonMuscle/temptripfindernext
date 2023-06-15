@@ -98,7 +98,7 @@
 		self.reLayoutPage();
 	};
 
-	ResizablePage.prototype.setRightPage = async function(templateName, data, contentType)
+	ResizablePage.prototype.setRightPage = async function(templateName, data, contentType, eventHandlers = null)
 	{
 		const self = this;
 		let $content;
@@ -129,7 +129,7 @@
 				ko.applyBindings(ko.observable(self), $content[0]);
 				break;
 			case RightPageContentType.splitmap:
-				self.mapviewInstace = self.mapviewInstace || await TF.GIS.MapFactory.createInstance(self.$rightPage.find(".splitmap"), {eventHandlers:{onMapViewCreated:function(){console.log("map created")}}});
+				self.mapviewInstace = self.mapviewInstace || await TF.GIS.MapFactory.createInstance(self.$rightPage.find(".splitmap"), { eventHandlers });
 				break;
 			case RightPageContentType.detailview:
 			default:
@@ -580,9 +580,9 @@
 		self.clearLeftContent();
 	};
 
-	ResizablePage.prototype.showMapView = async function()
+	ResizablePage.prototype.showMapView = async function(eventHandlers = null)
 	{
 		const self = this;
-		await self.setRightPage(null, null, RightPageContentType.splitmap);
+		await self.setRightPage(null, null, RightPageContentType.splitmap, eventHandlers);
 	};
 })();

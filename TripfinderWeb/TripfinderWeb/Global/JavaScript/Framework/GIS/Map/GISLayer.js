@@ -71,9 +71,12 @@
 
 	Layer.prototype.add = function(geometry, symbol, attributes)
 	{
-		if (_layer instanceof TF.GIS.SDK.GraphicsLayer) {
+		if (_layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
 			this.addGraphic(geometry, symbol, attributes);
-		} else if (_layer instanceof TF.GIS.SDK.FeatureLayer) {
+		}
+		else if (_layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
 			this.addFeature(geometry, symbol, attributes);
 		}
 	}
@@ -87,5 +90,36 @@
 	Layer.prototype.addFeature = function(geometry, symbol, attributes)
 	{
 		console.warn(`TODO: add graphic to FeatureLayer, promise`);
+	}
+
+	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
+	{
+		if (_layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
+			const results = [];
+			const items = _layer.graphics.items;
+			for (let i = 0; i < items.length; i++)
+			{
+				const item = items[i];
+				if (TF.GIS.SDK.geometryEngine.intersects(geometry, item.geometry))
+				{
+					results.push(item);
+				}
+			}
+
+			return Promise.resolve(results);
+		}
+		else if (_layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			console.warn(`TODO: query features on FeatureLayer`);
+			const queryParams = _layer.createQuery();
+			queryParams.geometry = geometry;
+			queryParams.where = condition;
+			queryParams.outSpatialReference = { wkid: 102100 };
+			queryParams.returnGeometry = true;
+			queryParams.outFields = ['*'];
+
+			return _layer.queryFeatures(queryParams);
+		}
 	}
 })();
