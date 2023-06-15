@@ -30,10 +30,10 @@
 		this.selectedRowChanged.subscribe(this.onSelectRowChanged.bind(this));
 		// this.geocodingClick = this.geocodeTool.geocodingClick.bind(this.geocodeTool);
 
-		self.subscription = tf.pageManager.resizablePage.obRightContentType.subscribe(function()
+		self.subscriptions.push(tf.pageManager.resizablePage.obRightContentType.subscribe(function()
 		{
 			self.obShowSplitmap(tf.pageManager.resizablePage.obRightContentType() === "splitmap");
-		});
+		}));
 	}
 
     LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -257,6 +257,5 @@
 	{
 		const self = this;
 		TF.Page.BaseGridPage.prototype.dispose.apply(self);
-		self.subscription && self.subscription.dispose();
 	};
 })();

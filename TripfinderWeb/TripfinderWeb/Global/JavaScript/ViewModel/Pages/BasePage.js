@@ -25,6 +25,8 @@
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.openSelectedClick = self.openSelectedClick.bind(self);
 		self.relatedClickGen = self.relatedClickGen.bind(self);
+
+		self.subscriptions = [];
 	}
 
 	BasePage.prototype.constructor = BasePage;
@@ -603,6 +605,10 @@
 	BasePage.prototype.dispose = function()
 	{
 		var self = this;
+
+		(self.subscriptions || []).forEach(subscription => {
+			subscription && subscription.dispose();
+		});
 
 		self.pageLevelViewModel.dispose();
 	};

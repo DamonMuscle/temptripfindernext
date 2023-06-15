@@ -2048,12 +2048,12 @@
 					});
 				}
 			});
-
-	}	
+	};
 
 	BaseGridPage.prototype.dispose = function()
 	{
 		var self = this;
+		TF.Page.BasePage.prototype.dispose.apply(self);
 		self.$element.find(".grid-icons").off(".swipe");
 		if (self.searchGrid)
 		{
@@ -2064,13 +2064,13 @@
 		tf.pageManager.resizablePage.$leftPage.off("focus.shortcutKeys").off("blur.shortcutKeys");
 		$(window).off(".toolbar");
 
-		self.pageLevelViewModel.dispose();
-
 		self.requestResumeEvent.unsubscribeAll();
 		self.requestPauseEvent.unsubscribeAll();
 		self.requestHoldEvent.unsubscribeAll();
 		self.releaseHoldEvent.unsubscribeAll();
 		self.enableRefreshEvent.unsubscribeAll();
+		self.selectedRowChanged.unsubscribeAll();
+
 		// release the objects
 		for (var i in self)
 		{
