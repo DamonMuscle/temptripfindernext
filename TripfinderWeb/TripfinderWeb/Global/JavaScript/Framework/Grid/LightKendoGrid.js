@@ -1025,6 +1025,70 @@
 		this.options.onCreateGrid && this.options.onCreateGrid();
 	};
 
+	LightKendoGrid.prototype._readGrid = function(options)
+	{
+		const self = this,
+			requestOptions = self.getApiRequestOption(options);
+		let promise;
+
+		// remove the placeholder of phone realted fields, keep the raw phone number only
+		tf.dataFormatHelper.clearPhoneNumberFormat(requestOptions, self);
+
+		if (self.options.getAsyncRequestOption)
+		{
+			promise = self.options.getAsyncRequestOption(requestOptions);
+		}
+		else
+		{
+			promise = Promise.resolve(requestOptions);
+		}
+
+		promise.then(response =>
+		{
+			self.setLazyLoadFields(response.data);
+			self.updateLazyloadData = false;
+			tf.ajax.post(self.getApiRequestURL(self.options.url), response, { overlay: self.overlay && self.options.showOverlay })
+				.then(function()
+				{
+					//the count of request callback in the process of change filter
+					if (!self.kendoDataSourceTransportRequestBackCount) self.kendoDataSourceTransportRequestBackCount = 0;
+					self.kendoDataSourceTransportRequestBackCount = self.kendoDataSourceTransportRequestBackCount + 1;
+					//check the filter Whether custom or not
+					if (self.$customFilterBtn)
+					{
+						//when user change the custom filter, show the custom filter menu now
+						//check the last request callback, if this back is the last request callback, show the custom filter menu and reset data
+						if (self.kendoDataSourceTransportRequestBackCount == self.kendoDataSourceTransportReadCount)
+						{
+							self.$customFilterBtn.click();
+							self.kendoDataSourceTransportRequestBackCount = 0;
+							self.kendoDataSourceTransportReadCount = 0;
+							self.$customFilterBtn = undefined;
+						}
+					}
+					else
+					{
+						//reset the request count, request callback count and custom button
+						self.kendoDataSourceTransportRequestBackCount = 0;
+						self.kendoDataSourceTransportReadCount = 0;
+						self.$customFilterBtn = undefined;
+					}
+				}).fail(function(ex)
+				{
+					if (self.overlay && self.options.showOverlay)
+					{
+						tf.loadingIndicator.tryHide();
+					}
+
+					self.gridAlert.show({
+						alert: "Danger",
+						title: "Error",
+						message: ex.responseJSON.Message
+					});
+				});
+		});
+	}
+
 	LightKendoGrid.prototype.filterMenuInit = function(e)
 	{
 		var kendoPopup = e.container.data().kendoPopup;
