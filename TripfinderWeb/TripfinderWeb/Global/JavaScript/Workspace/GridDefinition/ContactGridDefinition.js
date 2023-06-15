@@ -134,7 +134,7 @@
 			}])
 
 			columns = columns.concat([{
-				FieldName: "FullName",
+				FieldName: "Name",
 				DisplayName: "Name",
 				Width: '300px',
 				type: "string"

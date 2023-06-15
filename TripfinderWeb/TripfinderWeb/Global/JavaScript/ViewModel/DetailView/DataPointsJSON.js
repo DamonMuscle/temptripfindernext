@@ -230,7 +230,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -590,7 +590,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -748,7 +748,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -2012,7 +2012,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -2413,7 +2413,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -3627,7 +3627,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -4230,7 +4230,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -4430,7 +4430,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
@@ -5155,7 +5155,7 @@
 					"field": "ContactGrid",
 					"title": "Contact Information",
 					"type": "grid",
-					"url": "contact",
+					"url": "contactinformation",
 					"min-height": "3",
 					"min-width": 2
 				},
