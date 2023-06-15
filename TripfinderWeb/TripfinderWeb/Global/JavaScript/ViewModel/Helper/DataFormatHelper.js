@@ -148,14 +148,14 @@
 		return content;
 	}
 
-	DataFormatHelper.prototype.clearPhoneNumberFormat = function(data, self)
+	DataFormatHelper.prototype.clearPhoneNumberFormat = function(options, self)
 	{
 		const _getColumnByFieldName = (columns, item) =>
-			columns.find(x => x.field === item.field);
-		const _stripValue = (value) =>
-			value?.replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+			columns.find(x => x.FieldName === item.FieldName || x.OriginalName === item.FieldName);
+		const _stripValue = (val) =>
+			val.replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
 
-		data?.forEach(item =>
+		options.data?.filterSet?.FilterItems?.forEach(item =>
 		{
 			let column = self.options.originalGridDefinition ?
 				_getColumnByFieldName(self.options.originalGridDefinition.Columns, item) :
@@ -165,7 +165,7 @@
 					column.questionType?.toLowerCase() === "phone" ||
 					column.UDFType === "phone number"))
 			{
-				item.value = _stripValue(item.value);
+				item.Value = _stripValue(item.Value);
 			}
 		});
 	}

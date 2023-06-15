@@ -3385,7 +3385,7 @@
 													url = this.options.setRequestURL(url);
 												}
 
-												tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
+												tf.dataFormatHelper.clearPhoneNumberFormat(options, self);
 
 												!this.options.disableAutoComplete && this.postRequestData(pathCombine(url, "aggregate"), options);
 											}
@@ -5593,7 +5593,7 @@
 			requestOptions = self.getApiRequestOption(options);
 		let promise;
 
-		tf.dataFormatHelper.clearPhoneNumberFormat(options.data?.filter?.filters, self);
+		tf.dataFormatHelper.clearPhoneNumberFormat(requestOptions, self);
 
 		if (self.options.getAsyncRequestOption)
 		{
