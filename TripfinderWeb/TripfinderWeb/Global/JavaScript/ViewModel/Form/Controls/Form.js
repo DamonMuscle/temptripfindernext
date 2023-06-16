@@ -257,7 +257,7 @@
 		});
 	}
 
-	Form.prototype.saveForm = function()
+	Form.prototype.saveForm = async function()
 	{
 		const self = this;
 		if (this.obRecordID() == null)
@@ -271,6 +271,18 @@
 			{
 				return null;
 			});
+		}
+		else if (self.obRecordID() && self.options.OneResponsePerRecipient && !self.options.Public) 
+		{
+			//check private + one response + recorded first
+			let udGridRecords = await tf.udgHelper.getUDGridRecordsWithRecordId(self.options.ID, self.options.DataTypeId, this.obRecordID());
+			if (udGridRecords && udGridRecords.length > 0)
+			{
+				return tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED, 'Warning').then(()=>
+				{
+					return null;
+				});
+			}
 		}
 
 		const filterOptions = {

@@ -2578,6 +2578,30 @@
 			return [];
 		});
 	};
+
+	UserDefinedGridHelper.prototype.getUDGridRecordsWithRecordId = function(udGridId, dataTypeId, recordId)
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
+			{
+				paramData: {
+					DBID: tf.datasourceManager.databaseId,
+					RecordDataType: dataTypeId,
+					RecordId:recordId,
+					UDGridID: udGridId
+				}
+			},
+			{ overlay: false }
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
+				return resp.Items;
+			}
+
+			return [];
+		});
+	};
+
 	UserDefinedGridHelper.getFormSearchDataOptions = async function(searchValue, dbId, dataType, isSearchAll, specifyOptions)
 	{
 		const value = (searchValue || '').trim(),

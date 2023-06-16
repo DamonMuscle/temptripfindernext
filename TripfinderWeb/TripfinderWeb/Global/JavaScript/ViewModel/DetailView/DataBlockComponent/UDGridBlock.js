@@ -312,7 +312,9 @@
 			let checkFormHasSubmittedWithOneResponse = Promise.resolve([]);
 			if (self.options.OneResponsePerRecipient)
 			{
-				checkFormHasSubmittedWithOneResponse = tf.udgHelper.getUDGridRecordsWithCreatedBy(self.options.UDGridId, self.options.DataTypeId);
+				checkFormHasSubmittedWithOneResponse = self.options.Public ?
+					tf.udgHelper.getUDGridRecordsWithCreatedBy(self.options.UDGridId, self.options.DataTypeId) :
+					tf.udgHelper.getUDGridRecordsWithRecordId(self.options.UDGridId, self.options.DataTypeId, self.recordId);
 			}
 			checkFormHasSubmittedWithOneResponse.then(res =>
 			{
