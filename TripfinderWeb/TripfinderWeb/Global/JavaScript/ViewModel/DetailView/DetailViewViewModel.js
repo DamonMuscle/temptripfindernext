@@ -1334,7 +1334,7 @@
 	{
 		var self = this,
 			gridName = self._getGridName(),
-			gridLabel = tf.applicationTerm.getApplicationTermPluralByName(gridName),
+			gridLabel = tf.applicationTerm.getApplicationTermSingularByName(gridName),
 			layoutName = self.obName(),
 			confirmMsg = String.format("Do you want to close {0} edit mode ({1}) without saving?", gridLabel, layoutName);
 
@@ -2229,7 +2229,7 @@
 	{
 		var self = this,
 			gridName = self._getGridName(),
-			gridLabel = tf.applicationTerm.getApplicationTermPluralByName(gridName);
+			gridLabel = tf.applicationTerm.getApplicationTermSingularByName(gridName);
 
 		if (!self.obEditing())
 		{
