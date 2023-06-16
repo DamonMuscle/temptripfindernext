@@ -145,7 +145,7 @@
 				},
 				{
 					"field": "GeoStreet",
-					"title": "GeoCode Address Street",
+					"title": "Geocode Street",
 					"type": "String",
 					"defaultValue": "440 State St.",
 					"editType": {
@@ -155,7 +155,7 @@
 				},
 				{
 					"field": "GeoCity",
-					"title": "GeoCode Address City/Town",
+					"title": "Geocode City/Town",
 					"type": "String",
 					"defaultValue": "Schenectady",
 					"editType": {
@@ -166,7 +166,7 @@
 				},
 				{
 					"field": "GeoCounty",
-					"title": "GeoCode Address Map Set",
+					"title": "Geocode Map Set",
 					"type": "String",
 					"editType": {
 						"format": "String",
@@ -175,7 +175,7 @@
 				},
 				{
 					"field": "GeoZip",
-					"title": "GeoCode Address Postal Code",
+					"title": "Geocode Postal Code",
 					"type": "String",
 					"defaultValue": "12305",
 					"editType": {
@@ -1904,7 +1904,7 @@
 				},
 				{
 					"field": "GeoStreet",
-					"title": "GeoCode Address Street",
+					"title": "Geocode Street",
 					"type": "String",
 					"defaultValue": "440 State Street",
 					"editType": {
@@ -1914,7 +1914,7 @@
 				},
 				{
 					"field": "GeoCity",
-					"title": "GeoCode Address City/Town",
+					"title": "Geocode City/Town",
 					"type": "String",
 					"defaultValue": "Schenectady",
 					"editType": {
@@ -1925,7 +1925,7 @@
 				},
 				{
 					"field": "GeoCounty",
-					"title": "GeoCode Address Map Set",
+					"title": "Geocode Map Set",
 					"type": "String",
 					"editType": {
 						"format": "String",
@@ -1935,7 +1935,7 @@
 				},
 				{
 					"field": "GeoZip",
-					"title": "GeoCode Address Postal Code",
+					"title": "Geocode Postal Code",
 					"type": "String",
 					"defaultValue": "12305",
 					"editType": {
@@ -2300,7 +2300,7 @@
 				},
 				{
 					"field": "GeoStreet",
-					"title": "GeoCode Address Street",
+					"title": "Geocode Street",
 					"type": "String",
 					"defaultValue": "440 State Street",
 					"editType": {
@@ -2310,7 +2310,7 @@
 				},
 				{
 					"field": "GeoCity",
-					"title": "GeoCode Address City/Town",
+					"title": "Geocode City/Town",
 					"type": "String",
 					"defaultValue": "Schenectady",
 					"editType": {
@@ -2321,7 +2321,7 @@
 				},
 				{
 					"field": "GeoCounty",
-					"title": "GeoCode Address Map Set",
+					"title": "Geocode Map Set",
 					"type": "String",
 					"editType": {
 						"format": "String",
@@ -2330,7 +2330,7 @@
 				},
 				{
 					"field": "GeoZip",
-					"title": "GeoCode Address Postal Code",
+					"title": "Geocode Postal Code",
 					"type": "String",
 					"defaultValue": "12305",
 					"editType": {
@@ -3526,7 +3526,7 @@
 				},
 				{
 					"field": "GeoStreet",
-					"title": "GeoCode Address Street",
+					"title": "Geocode Street",
 					"type": "String",
 					"defaultValue": "440 State St.",
 					"editType": {
@@ -3536,7 +3536,7 @@
 				},
 				{
 					"field": "GeoCity",
-					"title": "GeoCode Address City/Town",
+					"title": "Geocode City/Town",
 					"type": "String",
 					"defaultValue": "Schenectady",
 					"editType": {
@@ -3547,7 +3547,7 @@
 				},
 				{
 					"field": "GeoCounty",
-					"title": "GeoCode Address Map Set",
+					"title": "Geocode Map Set",
 					"type": "String",
 					"editType": {
 						"format": "String",
@@ -3556,7 +3556,7 @@
 				},
 				{
 					"field": "GeoZip",
-					"title": "GeoCode Address Postal Code",
+					"title": "Geocode Postal Code",
 					"type": "String",
 					"defaultValue": "12305",
 					"editType": {
@@ -5247,7 +5247,7 @@
 				},
 				{
 					"field": "GeoStreet",
-					"title": "GeoCode Address Street",
+					"title": "Geocode Street",
 					"type": "String",
 					"defaultValue": "440 State St.",
 					"editType": {
@@ -5257,7 +5257,7 @@
 				},
 				{
 					"field": "GeoCity",
-					"title": "GeoCode Address City/Town",
+					"title": "Geocode City/Town",
 					"type": "String",
 					"defaultValue": "Schenectady",
 					"editType": {
@@ -5267,7 +5267,7 @@
 				},
 				{
 					"field": "GeoCounty",
-					"title": "GeoCode Address Map Set",
+					"title": "Geocode Map Set",
 					"type": "String",
 					"editType": {
 						"format": "String",
@@ -5276,7 +5276,7 @@
 				},
 				{
 					"field": "GeoZip",
-					"title": "GeoCode Address Postal Code",
+					"title": "Geocode Postal Code",
 					"type": "String",
 					"defaultValue": "12305",
 					"editType": {
