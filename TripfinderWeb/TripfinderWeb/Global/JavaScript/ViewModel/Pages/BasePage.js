@@ -111,6 +111,8 @@
 		if (rowSelectedId)
 		{
 			selectedId = rowSelectedId;
+			self.searchGrid.scrollToRowById(selectedId);
+			self.searchGrid.getSelectedIds([selectedId]);
 		}
 		else
 		{

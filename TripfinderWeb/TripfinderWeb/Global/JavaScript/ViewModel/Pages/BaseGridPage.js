@@ -1251,6 +1251,9 @@
 				self.detailView.onCreateNewRecordSuccess.subscribe(
 					self.onCreateNewRecordSuccessHandler.bind(self)
 				);
+				self.detailView.onEditRecordSuccess.subscribe(
+					self.onEditRecordSuccessHandler.bind(self)
+				);
 
 				if (TF.isMobileDevice)
 				{
