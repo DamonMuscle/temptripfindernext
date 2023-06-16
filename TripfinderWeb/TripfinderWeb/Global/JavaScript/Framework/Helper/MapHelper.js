@@ -600,6 +600,33 @@
 		return extent;
 	};
 
+	MapHelper.createMapInstance = async function(mapElement, eventHandlers)
+	{
+		const baseMapId = tf.userPreferenceManager.get("rfweb.baseMapId"),
+			_basemap = TF.Helper.MapHelper.getBaseMapById(baseMapId),
+			mapOptions = {
+				baseMapId: _basemap,
+				highlightOptions: {
+					color: [255, 255, 0, 1],
+					fillOpacity: 0
+				},
+				background: {
+					color: [240, 237, 229]
+				},
+				constraints: {
+					rotationEnabled: false,
+					lods: tf.map.ArcGIS.TileInfo.create().lods,
+					minZoom: MapHelper.MAP_MIN_ZOOM_LEVEL
+				},
+				eventHandlers: eventHandlers
+			};
+
+		const mapInstance = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
+		mapInstance.restrictPanOutside();
+
+		return mapInstance;
+	}
+
 	MapHelper.prototype.dispose = function()
 	{
 		var self = this;

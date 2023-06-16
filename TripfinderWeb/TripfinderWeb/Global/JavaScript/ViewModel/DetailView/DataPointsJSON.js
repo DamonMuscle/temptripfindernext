@@ -5299,6 +5299,14 @@
 					"innerFields": getLocationGeoAddressInnerFields()
 				}
 			],
+			"Miscellaneous": [
+				{
+					"field": "Map",
+					"title": "Map",
+					"type": "Map",
+					"min-height": "4"
+				}
+			],
 			"User Defined": [],
 			"User Defined Group": [],
 			"Grid": [

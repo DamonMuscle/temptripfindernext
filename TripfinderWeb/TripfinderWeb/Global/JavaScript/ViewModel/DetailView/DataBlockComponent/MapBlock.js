@@ -15,21 +15,26 @@
 		var editModeClass = self.isReadMode() ? "" : "temp-edit",
 			detailViewHelper = tf.helpers.detailViewHelper;
 
-		self.uniqueClassName = options.uniqueClassName || detailViewHelper.generateUniqueClassName();
-
+		self.uniqueClassName = (options.uniqueClassName || detailViewHelper.generateUniqueClassName()) + detailView.routeState;
 		self.$el = $(String.format("\
 			<div>\
 				<div class='grid-stack-item-content no-padding'>\
 					<div class='map-item {0}'>\
-						<div class='map' data-bind='template: { name: mapManager.templateUrl, data: mapManager }' style='height: 100%; width: 100%; background: #e1e1e1'>\
+						<div class='map' data-bind='template: { name: mapManager.templateUrl, data: mapManager }' style='max-height: 2000px; height: 100%; width: 100%; background: #e1e1e1'>\
 						</div>\
 					</div>\
 				</div>\
 			</div>", editModeClass)).addClass(self.uniqueClassName);
 
+		let recordEntity = detailView.recordEntity;
+		if (detailView.newCopyContext)
+		{
+			recordEntity = detailView.newCopyContext.baseEntity;
+		}
+
 		var opts = {
 			type: gridType,
-			onMainDataLoaded: new TF.Events.Event(),
+			mainData: recordEntity,
 			routeState: detailView.routeState,
 			disable: !self.isReadMode(),
 			detailView: detailView,
@@ -52,6 +57,8 @@
 		{
 			opts.mapToolOptions = options.mapToolOptions;
 		}
+
+		opts.mapBlockInstance = self;
 		var mapManager;
 		if (self.isReadMode() && TF.DetailView.BaseCustomGridStackViewModel.MapManagers[gridType])
 		{
@@ -63,7 +70,7 @@
 		}
 
 		self.mapManager = mapManager;
-		mapManager.onMainDataLoaded.notify(detailView.recordEntity);
+
 		ko.applyBindings({ mapManager: mapManager }, self.$el[0]);
 	};
 
@@ -71,10 +78,12 @@
 
 	MapBlock.prototype.dispose = function()
 	{
+		this.$el && ko.cleanNode(this.$el.find(".map-item>.map")[0]);
 		this.mapManager && this.mapManager.dispose();
+		tfdispose(this);
 	};
 
-	MapBlock.prototype.restore = function()
+	MapBlock.prototype.restoreFullScreen = function()
 	{
 		this.mapManager && this.mapManager.restore && this.mapManager.restore();
 	};

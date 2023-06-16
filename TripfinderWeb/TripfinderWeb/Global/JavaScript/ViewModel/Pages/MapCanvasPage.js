@@ -716,37 +716,16 @@
 	MapCanvasPage.prototype._initMap = async function()
 	{
 		const self = this,
-			mapElement = self.$mapDiv,
-			ext = TF.createDefaultMapExtent(),
-			baseMapId = tf.userPreferenceManager.get("rfweb.baseMapId"),
-			_basemap = TF.Helper.MapHelper.getBaseMapById(baseMapId),
-			mapOptions = {
-				baseMapId: _basemap,
-				highlightOptions: {
-					color: [255, 255, 0, 1],
-					fillOpacity: 0
+			eventHandlers = {
+				onMapViewCreated: () => {
+					self._mapView.extent = TF.createDefaultMapExtent();
 				},
-				background: {
-					color: [240, 237, 229]
-				},
-				constraints: {
-					rotationEnabled: false,
-					lods: self._arcgis.TileInfo.create().lods,
-					minZoom: TF.Helper.MapHelper.MAP_MIN_ZOOM_LEVEL
-				},
-				eventHandlers: {
-					onMapViewCreated: () => {
-						self._mapView.extent = ext;
-					},
-					onMapViewUpdated: self.onMapViewUpdated.bind(self)
-				}
+				onMapViewUpdated: self.onMapViewUpdated.bind(self)
 			};
 
-		self.mapInstance = await TF.GIS.MapFactory.createInstance(mapElement, mapOptions);
+		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;
 		self._mapView = self.mapInstance.map.mapView;
 		self._map = self.mapInstance.map;
-
-		self.mapInstance.restrictPanOutside();
 	}
 
 	MapCanvasPage.prototype._onMapLoad = function()
