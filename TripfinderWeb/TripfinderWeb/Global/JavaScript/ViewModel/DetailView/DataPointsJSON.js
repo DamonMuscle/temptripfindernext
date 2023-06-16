@@ -85,7 +85,7 @@
 					"defaultValue": "True",
 					"displayValue": "Geocoded",
 					"positiveLabel": "Geocoded",
-					"negativeLabel": "Ungeocoded"
+					"negativeLabel": "Not Geocoded"
 				}
 			],
 			"Address": [
@@ -1844,7 +1844,7 @@
 					"defaultValue": "True",
 					"displayValue": "Geocoded",
 					"positiveLabel": "Geocoded",
-					"negativeLabel": "Ungeocoded"
+					"negativeLabel": "Not Geocoded"
 				}
 			],
 			"Address": [
@@ -2240,7 +2240,7 @@
 					"defaultValue": "True",
 					"displayValue": "Geocoded",
 					"positiveLabel": "Geocoded",
-					"negativeLabel": "Ungeocoded"
+					"negativeLabel": "Not Geocoded"
 				}
 			],
 			"Address": [
@@ -3278,7 +3278,7 @@
 					"defaultValue": "True",
 					"displayValue": "Geocoded",
 					"positiveLabel": "Geocoded",
-					"negativeLabel": "Ungeocoded"
+					"negativeLabel": "Not Geocoded"
 				}
 			],
 			"Eligibility": [
@@ -5201,7 +5201,7 @@
 					"defaultValue": "True",
 					"displayValue": "Geocoded",
 					"positiveLabel": "Geocoded",
-					"negativeLabel": "Ungeocoded"
+					"negativeLabel": "Not Geocoded"
 				}
 			],
 			"Address": [

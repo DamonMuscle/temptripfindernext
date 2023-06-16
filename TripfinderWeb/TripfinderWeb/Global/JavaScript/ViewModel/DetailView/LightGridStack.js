@@ -854,8 +854,10 @@
 			case "section-header":
 				return new TF.DetailView.DataBlockComponent.SectionHeaderBlock(item, self.detailView, self.getCurrentWidth(), self.toggleSectionHeaderEvent);
 			case "Boolean":
-				var content = self.getRawDataBlockValue(item);
-				return new TF.DetailView.DataBlockComponent.GeneralBlock(_.upperFirst(content), item, self.detailView);
+				let itemContent = self.getRawDataBlockValue(item);
+				const itemNullAvatar = item.nullAvatar || NULL_AVATAR;
+				itemContent = [undefined, null, ""].includes(itemContent) ? itemNullAvatar : itemContent;
+				return new TF.DetailView.DataBlockComponent.GeneralBlock(_.upperFirst(itemContent), item, self.detailView);
 			case "image":
 				return new TF.DetailView.DataBlockComponent.ImageBlock(item, self.detailView);
 			case "Map":
