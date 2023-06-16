@@ -1,843 +1,843 @@
-	@import "z-index";
-	@import "mobile";
+@import "z-index";
+@import "mobile";
 
-	.esri-attribution__sources {
-		text-align: left;
-	}
+.esri-attribution__sources {
+	text-align: left;
+}
 
-	.esriPopup {
-		font-family: Roboto, Arial, sans-serif;
-		font-size: 13px;
-		font-weight: 300;
+.esriPopup {
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 13px;
+	font-weight: 300;
 
-		.esriPopupWrapper {
-			.contentPane {
-				padding: 15px;
+	.esriPopupWrapper {
+		.contentPane {
+			padding: 15px;
 
-				.map-tooltip.BaseArcGisGridMap-map-tooltip {
-					height: 220px;
+			.map-tooltip.BaseArcGisGridMap-map-tooltip {
+				height: 220px;
 
-					.callout-head {
-						height: 20px;
-					}
+				.callout-head {
+					height: 20px;
+				}
 
-					.callout-content {
-						overflow-y: auto;
-						height: 200px;
-					}
+				.callout-content {
+					overflow-y: auto;
+					height: 200px;
+				}
 
-					.page-group-wrap {
-						position: absolute;
-						right: 30px;
-						top: 11px;
-					}
+				.page-group-wrap {
+					position: absolute;
+					right: 30px;
+					top: 11px;
+				}
 
-					.student-image {
-						max-height: 100%;
-						max-width: 100%;
-						position: absolute;
-						top: 50%;
-						left: 50%;
-						transform: translateY(-50%) translateX(-50%);
-					}
+				.student-image {
+					max-height: 100%;
+					max-width: 100%;
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translateY(-50%) translateX(-50%);
+				}
 
-					.ellipsis {
-						white-space: nowrap;
-						overflow: hidden;
-						text-overflow: ellipsis;
-					}
+				.ellipsis {
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 
-					.drill-down-links {
-						cursor: pointer;
-					}
+				.drill-down-links {
+					cursor: pointer;
+				}
 
+				.calloutcomments {
+					width: 100%;
+				}
+
+				&.student-tooltip {
 					.calloutcomments {
 						width: 100%;
 					}
 
-					&.student-tooltip {
-						.calloutcomments {
-							width: 100%;
-						}
+					.calloutLoadTime {
+						width: 100%;
+						text-align: right;
+						color: #333;
+					}
+				}
 
-						.calloutLoadTime {
-							width: 100%;
-							text-align: right;
-							color: #333;
-						}
+				.page-group {
+					text-align: center;
+					min-width: 30px;
+
+					.iconbutton {
+						width: 10px;
+						display: inline-block;
+						background-size: 100% 100%;
+						height: 20px;
+						margin-right: 3px;
 					}
 
-					.page-group {
-						text-align: center;
-						min-width: 30px;
-
-						.iconbutton {
-							width: 10px;
-							display: inline-block;
-							background-size: 100% 100%;
-							height: 20px;
-							margin-right: 3px;
-						}
-
-						.page-indicator {
-							font-size: 9px;
-							line-height: 0;
-						}
+					.page-indicator {
+						font-size: 9px;
+						line-height: 0;
 					}
+				}
 
-					.flex-style {
+				.flex-style {
+					display: flex;
+					flex-direction: column;
+					white-space: nowrap;
+
+					.sub-tab {
+						width: 100%;
 						display: flex;
-						flex-direction: column;
-						white-space: nowrap;
+						flex-direction: row;
+						flex-wrap: wrap;
+						justify-content: space-between;
 
-						.sub-tab {
-							width: 100%;
-							display: flex;
-							flex-direction: row;
-							flex-wrap: wrap;
-							justify-content: space-between;
+						div {
+							min-width: 0px;
+						}
 
-							div {
-								min-width: 0px;
-							}
-
-							.gap {
-								padding-right: 20px;
-							}
-
-							.ellipsis {
-								display: block;
-							}
+						.gap {
+							padding-right: 20px;
 						}
 
 						.ellipsis {
-							overflow: hidden;
-							display: inline-block;
-							-webkit-flex: 1;
-							flex: 1;
-							min-width: 0;
-							text-overflow: ellipsis;
+							display: block;
 						}
 					}
-				}
-			}
-		}
 
-		.actionsPane,
-		.pointer.bottom,
-		.contentPane,
-		.esriPopupWrapper {
-			background-color: white;
-			box-shadow: none;
-			-webkit-box-shadow: none;
-			border-radius: 0;
-			-webkit-border-radius: 0;
-		}
-
-		.pointer.bottom,
-		.esriPopupWrapper {
-			background-color: white;
-			border: 1px solid rgb(204, 204, 204);
-		}
-
-		&.newest-style {
-			font-family: "SourceSansPro-Regular";
-
-			.base-box-shadow {
-				box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
-			}
-
-			.pointer-caret {
-				border: 0;
-				.base-box-shadow;
-				height: 32px !important;
-				width: 32px !important;
-				background-color: white;
-			}
-
-			.display-center {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			@skin-baseColor: #8F52A1;
-
-			.esriPopupWrapper {
-				border: 0;
-				.base-box-shadow;
-
-				.sizer {
-					width: 592px !important;
-					display: none;
-
-					&.content {
-						display: block;
+					.ellipsis {
+						overflow: hidden;
+						display: inline-block;
+						-webkit-flex: 1;
+						flex: 1;
+						min-width: 0;
+						text-overflow: ellipsis;
 					}
-				}
-
-				.sizer.content .contentPane {
-					padding: 0;
-					max-height: none !important;
-					overflow: inherit;
-					// .BaseArcGisGridMap-map-tooltip {
-					// 	height: auto !important;
-					// 	line-height: 18px;
-					// 	font-size: 14px;
-					// 	color: #333333;
-					// 	-moz-user-select: text;
-					// 	-webkit-user-select: text;
-					// 	.none-select {
-					// 		-moz-user-select: none;
-					// 		-webkit-user-select: none;
-					// 	}
-					// 	.ellipsis {
-					// 		overflow: hidden;
-					// 		text-overflow: ellipsis;
-					// 		word-break: keep-all;
-					// 		white-space: normal;
-					// 	}
-					// 	a.drill-down-links {
-					// 		color: #333333;
-					// 	}
-					// 	.head {
-					// 		background-color: #F3EDF5;
-					// 		padding: 16px 20px 10px 20px;
-					// 		color: @skin-baseColor;
-					// 		.photo {
-					// 			width: 74px;
-					// 			height: 74px;
-					// 			position: absolute;
-					// 			overflow: hidden;
-					// 			border-radius: 36px;
-					// 			border: 2px solid #F3EDF5;
-					// 			margin-top: -53px;
-					// 			img {
-					// 				width: 72px;
-					// 			}
-					// 			&.back {
-					// 				.base-box-shadow;
-					// 			}
-					// 			&.no-image {
-					// 				background-color: @skin-baseColor;
-					// 				color: #F3EDF5;
-					// 				text-align: center;
-					// 				font-size: 36px;
-					// 				line-height: 72px;
-					// 			}
-					// 		}
-					// 		.cover {
-					// 			width: 95px;
-					// 			height: 48px;
-					// 			position: absolute;
-					// 			margin-top: -16px;
-					// 			margin-left: -10px;
-					// 			background-color: #F3EDF5;
-					// 		}
-					// 		.head-pager {
-					// 			height: 31px;
-					// 			.page-group {
-					// 				text-align: right;
-					// 				float: right;
-					// 				margin-right: 10px;
-					// 				.page-indicator {
-					// 					font-size: 14px;
-					// 					line-height: inherit;
-					// 					float: left;
-					// 				}
-					// 				.right-caret,
-					// 				.left-caret {
-					// 					cursor: pointer;
-					// 					float: left;
-					// 					margin-top: 2px;
-					// 					&:before {
-					// 						content: '';
-					// 						position: absolute;
-					// 						border-top: 8px solid transparent;
-					// 						border-bottom: 8px solid transparent;
-					// 					}
-					// 					&.usbale {
-					// 						&:after {
-					// 							content: '';
-					// 							position: absolute;
-					// 							border-top: 6px solid transparent;
-					// 							border-bottom: 6px solid transparent;
-					// 							margin-top: 2px;
-					// 							margin-left: 1px;
-					// 						}
-					// 					}
-					// 				}
-					// 				.left-caret {
-					// 					margin-left: 10px;
-					// 					&:before {
-					// 						border-right: 8px solid @skin-baseColor;
-					// 					}
-					// 					&.usbale {
-					// 						&:after {
-					// 							border-right: 6px solid #F3EDF5;
-					// 						}
-					// 					}
-					// 				}
-					// 				.right-caret {
-					// 					margin-left: 20px;
-					// 					&:before {
-					// 						border-left: 8px solid @skin-baseColor;
-					// 					}
-					// 					&.usbale {
-					// 						&:after {
-					// 							border-left: 6px solid #F3EDF5;
-					// 						}
-					// 					}
-					// 				}
-					// 			}
-					// 		}
-					// 		.head-details {
-					// 			.detail-left {
-					// 				min-height: 22px;
-					// 				font-size: 20px;
-					// 				font-weight: bold;
-					// 				float: left;
-					// 			}
-					// 			.detail-right {
-					// 				font-family: "SourceSansPro-SemiBold";
-					// 				float: right;
-					// 			}
-					// 		}
-					// 	}
-					// 	.content {
-					// 		padding: 10px 20px 20px 20px;
-					// 		.module {
-					// 			float: left;
-					// 			width: 50%;
-					// 			&.full-width {
-					// 				width: 100% !important;
-					// 				padding-right: 0px !important;
-					// 			}
-					// 			&.no-padding {
-					// 				padding-right: 0px !important;
-					// 			}
-					// 			&.align-right {
-					// 				text-align: right;
-					// 			}
-					// 		}
-					// 		.content-main {
-					// 			display: flex;
-					// 		}
-					// 		.content-extend {
-					// 			margin-top: 20px;
-					// 			.tab-header {
-					// 				height: 30px;
-					// 				line-height: 28px;
-					// 				position: relative;
-					// 				text-align: center;
-					// 				color: @skin-baseColor;
-					// 				margin: auto;
-					// 				display: table;
-					// 				& ul {
-					// 					list-style: none;
-					// 					padding: 0;
-					// 					cursor: pointer;
-					// 					& li {
-					// 						float: left;
-					// 						width: 113px;
-					// 						border: 1px solid @skin-baseColor;
-					// 						border-right-width: 0;
-					// 						&.first {
-					// 							border-top-left-radius: 4px;
-					// 							border-bottom-left-radius: 4px;
-					// 						}
-					// 						&.last {
-					// 							border-right-width: 1px;
-					// 							border-top-right-radius: 4px;
-					// 							border-bottom-right-radius: 4px;
-					// 						}
-					// 						&.select {
-					// 							background-color: @skin-baseColor;
-					// 							color: white;
-					// 							border-width: 1px;
-					// 						}
-					// 					}
-					// 					&.small-width {
-					// 						li {
-					// 							width: 110px;
-					// 						}
-					// 					}
-					// 				}
-					// 			}
-					// 			.tab-content {
-					// 				position: relative;
-					// 				margin-top: 20px;
-					// 				.sub-content {
-					// 					display: none;
-					// 					overflow: hidden;
-					// 					width: 100%;
-					// 					&.auto-width {
-					// 						width: auto;
-					// 					}
-					// 					.cointainer {
-					// 						width: 100%;
-					// 						float: left;
-					// 					}
-					// 					&.select {
-					// 						display: block;
-					// 					}
-					// 					.module {
-					// 						margin-top: 20px;
-					// 						padding-right: 20px;
-					// 						.section-head {
-					// 							font-weight: bold;
-					// 							color: @skin-baseColor;
-					// 							a.drill-down-links {
-					// 								color: @skin-baseColor;
-					// 							}
-					// 						}
-					// 						.section-subhead {
-					// 							font-family: "SourceSansPro-SemiBold";
-					// 							font-size: 10px;
-					// 							font-weight: normal;
-					// 							color: @skin-baseColor;
-					// 							line-height: 12px;
-					// 							margin-top: 10px;
-					// 						}
-					// 						.line {
-					// 							margin-bottom: 10px;
-					// 						}
-					// 						&.vertical {
-					// 							width: 100%;
-					// 							padding-right: 0px;
-					// 							&.hide {
-					// 								display: none;
-					// 							}
-					// 							table {
-					// 								width: 100%;
-					// 								&:first-child {
-					// 									thead tr.fixed {
-					// 										position: absolute;
-					// 										z-index: 1;
-					// 									}
-					// 								}
-					// 								thead {
-					// 									tr.fixed {
-					// 										background-color: white;
-					// 										height: 25px;
-					// 										top: 0;
-					// 										z-index: 1;
-					// 										th {
-					// 											float: left;
-					// 											margin-top: 0;
-					// 											line-height: 20px;
-					// 											&:first-child {
-					// 												width: 55%;
-					// 											}
-					// 											&.grade,
-					// 											&.middle {
-					// 												width: 15%;
-					// 											}
-					// 										}
-					// 									}
-					// 								}
-					// 								tbody.fixed {
-					// 									margin-top: 25px;
-					// 									float: left;
-					// 									width: 100%;
-					// 									&.notfirst {
-					// 										margin-top: 0;
-					// 									}
-					// 									tr {
-					// 										float: left;
-					// 										width: 100%;
-					// 										height: 24px;
-					// 										td {
-					// 											float: left;
-					// 											overflow: hidden;
-					// 											text-overflow: ellipsis;
-					// 											word-break: normal;
-					// 											white-space: nowrap;
-					// 											&:first-child {
-					// 												width: 55%;
-					// 												&.full {
-					// 													width: 100%;
-					// 												}
-					// 											}
-					// 											&:nth-child(2) {
-					// 												width: 15%;
-					// 												&.full {
-					// 													width: 45%;
-					// 												}
-					// 											}
-					// 											&:nth-child(3) {
-					// 												width: 30%;
-					// 											}
-					// 										}
-					// 									}
-					// 								}
-					// 								tr {
-					// 									height: 24px;
-					// 									th:first-child {
-					// 										width: 50%;
-					// 									}
-					// 								}
-					// 							}
-					// 							.left-layout,
-					// 							.right-layout {
-					// 								float: left;
-					// 							}
-					// 							.left-layout {
-					// 								width: 140px;
-					// 								.subtext {
-					// 									font-size: 13px;
-					// 								}
-					// 							}
-					// 							.right-layout {
-					// 								width: 412px;
-					// 								.ellipsis {
-					// 									min-height: 18px;
-					// 								}
-					// 								.small-width,
-					// 								.lager-width,
-					// 								.full-width {
-					// 									float: left;
-					// 								}
-					// 								.full-width {
-					// 									width: 100%;
-					// 								}
-					// 								.full-width-extend {
-					// 									width: 100%;
-					// 									height: auto;
-					// 									overflow: auto;
-					// 									.first-section-subhead {
-					// 										margin-top: 5px;
-					// 									}
-					// 									.small-width {
-					// 										width: 140px;
-					// 									}
-					// 									.lager-width {
-					// 										width: 272px;
-					// 										padding-left: 5px;
-					// 									}
-					// 								}
-					// 							}
-					// 							.w50p {
-					// 								width: 50%;
-					// 							}
-					// 							.graderange {
-					// 								margin-right: 10px;
-					// 							}
-					// 							.studentnumber {
-					// 								width: 100px;
-					// 							}
-					// 						}
-					// 						&:first-child {
-					// 							margin-top: 0px;
-					// 						}
-					// 					}
-					// 					&.main-part {
-					// 						overflow: auto;
-					// 						margin-right: -20px;
-					// 					}
-					// 					.empty-content {
-					// 						.display-center;
-					// 						height: 100%;
-					// 					}
-					// 					.empty {
-					// 						font-family: "SourceSansPro-Italic";
-					// 						color: #777;
-					// 						font-size: 16px;
-					// 						text-align: center;
-					// 					}
-					// 					.notes-tab {
-					// 						height: 100%;
-					// 						width: 100%;
-					// 						display: block;
-					// 						&.empty-note {
-					// 							.display-center;
-					// 							.center-container {
-					// 								min-height: 68px;
-					// 								.empty {
-					// 									display: block;
-					// 								}
-					// 								.notes-control {
-					// 									.display-center;
-					// 									visibility: visible;
-					// 									.addNote {
-					// 										display: block;
-					// 									}
-					// 								}
-					// 								textarea {
-					// 									display: none;
-					// 								}
-					// 							}
-					// 						}
-					// 						&.edit-note {
-					// 							align-items: flex-start;
-
-					// 							.center-container {
-					// 								textarea {
-					// 									display: block !important;
-					// 									align-self: flex-start0;
-					// 									border: 1px solid #bcbcbc;
-					// 								}
-					// 								.empty {
-					// 									display: none;
-					// 								}
-					// 								.notes-control {
-					// 									width: 100%;
-					// 									visibility: visible;
-					// 									display: block;
-					// 									align-self: flex-end;
-					// 									button {
-					// 										&.addNote {
-					// 											display: none;
-					// 										}
-					// 										&.saveEdit,
-					// 										&.cancelEdit {
-					// 											display: block;
-					// 											float: left;
-					// 										}
-					// 									}
-					// 								}
-					// 							}
-					// 						}
-					// 						.center-container {
-					// 							width: 100%;
-					// 							height: auto;
-					// 							>div {
-					// 								float: none;
-					// 							}
-					// 							.empty-note {
-					// 								float: none;
-					// 							}
-					// 							.empty {
-					// 								display: none;
-					// 							}
-					// 							textarea {
-					// 								width: 100%;
-					// 								height: calc(~"100% - 50px");
-					// 								padding: 10px;
-					// 								font-family: "SourceSansPro-Regular";
-					// 								font-size: 14px;
-					// 								outline: none;
-					// 								border: 1px solid #fff;
-					// 								box-sizing: border-box;
-					// 								min-height: 94px;
-					// 								&:hover {
-					// 									border: 1px solid #bcbcbc;
-					// 								}
-					// 								&:focus {
-					// 									outline-color: @skin-baseColor;
-					// 								}
-					// 							}
-
-					// 							&.no-permission {
-					// 								textarea {
-					// 									border: 0;
-					// 									min-height: auto;
-					// 									padding: 0;
-					// 								}
-					// 							}
-
-					// 							.notes-control {
-					// 								height: 50px;
-					// 								width: 100%;
-					// 								button {
-					// 									padding: 10px;
-					// 									border: 1px solid @skin-baseColor;
-					// 									border-radius: 3px;
-					// 									background: #fff;
-					// 									color: @skin-baseColor;
-					// 									font-family: "SourceSansPro-Regular";
-					// 									font-size: 14px;
-					// 									margin-top: 10px;
-					// 									margin-right: 10px;
-					// 									&.addNote,
-					// 									&.saveEdit,
-					// 									&.cancelEdit {
-					// 										display: none;
-					// 									}
-					// 									&.cancelEdit {
-					// 										border-color: rgba(255, 255, 255, 0);
-					// 									}
-					// 								}
-					// 							}
-					// 						}
-					// 					}
-					// 				}
-					// 			}
-					// 		}
-					// 	}
-					// }
-				}
-
-				.pointer {
-					.pointer-caret;
-					margin-left: -16px !important;
-
-					&.bottom {
-						bottom: -12px !important;
-					}
-
-					&.top {
-						top: -12px !important;
-						background-color: #F3EDF5 !important;
-					}
-				}
-			}
-
-			.outerPointer {
-				.pointer-caret;
-				margin-top: -16px !important;
-
-				&.left {
-					left: 12px;
-				}
-
-				&.right {
-					right: 12px;
 				}
 			}
 		}
 	}
 
-	.esriSimpleSlider.esriSimpleSliderVertical.esriSimpleSliderTL {
-		border: none;
-		box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	.actionsPane,
+	.pointer.bottom,
+	.contentPane,
+	.esriPopupWrapper {
+		background-color: white;
+		box-shadow: none;
+		-webkit-box-shadow: none;
 		border-radius: 0;
+		-webkit-border-radius: 0;
+	}
 
+	.pointer.bottom,
+	.esriPopupWrapper {
+		background-color: white;
+		border: 1px solid rgb(204, 204, 204);
+	}
+
+	&.newest-style {
+		font-family: "SourceSansPro-Regular";
+
+		.base-box-shadow {
+			box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+		}
+
+		.pointer-caret {
+			border: 0;
+			.base-box-shadow;
+			height: 32px !important;
+			width: 32px !important;
+			background-color: white;
+		}
+
+		.display-center {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		@skin-baseColor: #8F52A1;
+
+		.esriPopupWrapper {
+			border: 0;
+			.base-box-shadow;
+
+			.sizer {
+				width: 592px !important;
+				display: none;
+
+				&.content {
+					display: block;
+				}
+			}
+
+			.sizer.content .contentPane {
+				padding: 0;
+				max-height: none !important;
+				overflow: inherit;
+				// .BaseArcGisGridMap-map-tooltip {
+				// 	height: auto !important;
+				// 	line-height: 18px;
+				// 	font-size: 14px;
+				// 	color: #333333;
+				// 	-moz-user-select: text;
+				// 	-webkit-user-select: text;
+				// 	.none-select {
+				// 		-moz-user-select: none;
+				// 		-webkit-user-select: none;
+				// 	}
+				// 	.ellipsis {
+				// 		overflow: hidden;
+				// 		text-overflow: ellipsis;
+				// 		word-break: keep-all;
+				// 		white-space: normal;
+				// 	}
+				// 	a.drill-down-links {
+				// 		color: #333333;
+				// 	}
+				// 	.head {
+				// 		background-color: #F3EDF5;
+				// 		padding: 16px 20px 10px 20px;
+				// 		color: @skin-baseColor;
+				// 		.photo {
+				// 			width: 74px;
+				// 			height: 74px;
+				// 			position: absolute;
+				// 			overflow: hidden;
+				// 			border-radius: 36px;
+				// 			border: 2px solid #F3EDF5;
+				// 			margin-top: -53px;
+				// 			img {
+				// 				width: 72px;
+				// 			}
+				// 			&.back {
+				// 				.base-box-shadow;
+				// 			}
+				// 			&.no-image {
+				// 				background-color: @skin-baseColor;
+				// 				color: #F3EDF5;
+				// 				text-align: center;
+				// 				font-size: 36px;
+				// 				line-height: 72px;
+				// 			}
+				// 		}
+				// 		.cover {
+				// 			width: 95px;
+				// 			height: 48px;
+				// 			position: absolute;
+				// 			margin-top: -16px;
+				// 			margin-left: -10px;
+				// 			background-color: #F3EDF5;
+				// 		}
+				// 		.head-pager {
+				// 			height: 31px;
+				// 			.page-group {
+				// 				text-align: right;
+				// 				float: right;
+				// 				margin-right: 10px;
+				// 				.page-indicator {
+				// 					font-size: 14px;
+				// 					line-height: inherit;
+				// 					float: left;
+				// 				}
+				// 				.right-caret,
+				// 				.left-caret {
+				// 					cursor: pointer;
+				// 					float: left;
+				// 					margin-top: 2px;
+				// 					&:before {
+				// 						content: '';
+				// 						position: absolute;
+				// 						border-top: 8px solid transparent;
+				// 						border-bottom: 8px solid transparent;
+				// 					}
+				// 					&.usbale {
+				// 						&:after {
+				// 							content: '';
+				// 							position: absolute;
+				// 							border-top: 6px solid transparent;
+				// 							border-bottom: 6px solid transparent;
+				// 							margin-top: 2px;
+				// 							margin-left: 1px;
+				// 						}
+				// 					}
+				// 				}
+				// 				.left-caret {
+				// 					margin-left: 10px;
+				// 					&:before {
+				// 						border-right: 8px solid @skin-baseColor;
+				// 					}
+				// 					&.usbale {
+				// 						&:after {
+				// 							border-right: 6px solid #F3EDF5;
+				// 						}
+				// 					}
+				// 				}
+				// 				.right-caret {
+				// 					margin-left: 20px;
+				// 					&:before {
+				// 						border-left: 8px solid @skin-baseColor;
+				// 					}
+				// 					&.usbale {
+				// 						&:after {
+				// 							border-left: 6px solid #F3EDF5;
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 		.head-details {
+				// 			.detail-left {
+				// 				min-height: 22px;
+				// 				font-size: 20px;
+				// 				font-weight: bold;
+				// 				float: left;
+				// 			}
+				// 			.detail-right {
+				// 				font-family: "SourceSansPro-SemiBold";
+				// 				float: right;
+				// 			}
+				// 		}
+				// 	}
+				// 	.content {
+				// 		padding: 10px 20px 20px 20px;
+				// 		.module {
+				// 			float: left;
+				// 			width: 50%;
+				// 			&.full-width {
+				// 				width: 100% !important;
+				// 				padding-right: 0px !important;
+				// 			}
+				// 			&.no-padding {
+				// 				padding-right: 0px !important;
+				// 			}
+				// 			&.align-right {
+				// 				text-align: right;
+				// 			}
+				// 		}
+				// 		.content-main {
+				// 			display: flex;
+				// 		}
+				// 		.content-extend {
+				// 			margin-top: 20px;
+				// 			.tab-header {
+				// 				height: 30px;
+				// 				line-height: 28px;
+				// 				position: relative;
+				// 				text-align: center;
+				// 				color: @skin-baseColor;
+				// 				margin: auto;
+				// 				display: table;
+				// 				& ul {
+				// 					list-style: none;
+				// 					padding: 0;
+				// 					cursor: pointer;
+				// 					& li {
+				// 						float: left;
+				// 						width: 113px;
+				// 						border: 1px solid @skin-baseColor;
+				// 						border-right-width: 0;
+				// 						&.first {
+				// 							border-top-left-radius: 4px;
+				// 							border-bottom-left-radius: 4px;
+				// 						}
+				// 						&.last {
+				// 							border-right-width: 1px;
+				// 							border-top-right-radius: 4px;
+				// 							border-bottom-right-radius: 4px;
+				// 						}
+				// 						&.select {
+				// 							background-color: @skin-baseColor;
+				// 							color: white;
+				// 							border-width: 1px;
+				// 						}
+				// 					}
+				// 					&.small-width {
+				// 						li {
+				// 							width: 110px;
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 			.tab-content {
+				// 				position: relative;
+				// 				margin-top: 20px;
+				// 				.sub-content {
+				// 					display: none;
+				// 					overflow: hidden;
+				// 					width: 100%;
+				// 					&.auto-width {
+				// 						width: auto;
+				// 					}
+				// 					.cointainer {
+				// 						width: 100%;
+				// 						float: left;
+				// 					}
+				// 					&.select {
+				// 						display: block;
+				// 					}
+				// 					.module {
+				// 						margin-top: 20px;
+				// 						padding-right: 20px;
+				// 						.section-head {
+				// 							font-weight: bold;
+				// 							color: @skin-baseColor;
+				// 							a.drill-down-links {
+				// 								color: @skin-baseColor;
+				// 							}
+				// 						}
+				// 						.section-subhead {
+				// 							font-family: "SourceSansPro-SemiBold";
+				// 							font-size: 10px;
+				// 							font-weight: normal;
+				// 							color: @skin-baseColor;
+				// 							line-height: 12px;
+				// 							margin-top: 10px;
+				// 						}
+				// 						.line {
+				// 							margin-bottom: 10px;
+				// 						}
+				// 						&.vertical {
+				// 							width: 100%;
+				// 							padding-right: 0px;
+				// 							&.hide {
+				// 								display: none;
+				// 							}
+				// 							table {
+				// 								width: 100%;
+				// 								&:first-child {
+				// 									thead tr.fixed {
+				// 										position: absolute;
+				// 										z-index: 1;
+				// 									}
+				// 								}
+				// 								thead {
+				// 									tr.fixed {
+				// 										background-color: white;
+				// 										height: 25px;
+				// 										top: 0;
+				// 										z-index: 1;
+				// 										th {
+				// 											float: left;
+				// 											margin-top: 0;
+				// 											line-height: 20px;
+				// 											&:first-child {
+				// 												width: 55%;
+				// 											}
+				// 											&.grade,
+				// 											&.middle {
+				// 												width: 15%;
+				// 											}
+				// 										}
+				// 									}
+				// 								}
+				// 								tbody.fixed {
+				// 									margin-top: 25px;
+				// 									float: left;
+				// 									width: 100%;
+				// 									&.notfirst {
+				// 										margin-top: 0;
+				// 									}
+				// 									tr {
+				// 										float: left;
+				// 										width: 100%;
+				// 										height: 24px;
+				// 										td {
+				// 											float: left;
+				// 											overflow: hidden;
+				// 											text-overflow: ellipsis;
+				// 											word-break: normal;
+				// 											white-space: nowrap;
+				// 											&:first-child {
+				// 												width: 55%;
+				// 												&.full {
+				// 													width: 100%;
+				// 												}
+				// 											}
+				// 											&:nth-child(2) {
+				// 												width: 15%;
+				// 												&.full {
+				// 													width: 45%;
+				// 												}
+				// 											}
+				// 											&:nth-child(3) {
+				// 												width: 30%;
+				// 											}
+				// 										}
+				// 									}
+				// 								}
+				// 								tr {
+				// 									height: 24px;
+				// 									th:first-child {
+				// 										width: 50%;
+				// 									}
+				// 								}
+				// 							}
+				// 							.left-layout,
+				// 							.right-layout {
+				// 								float: left;
+				// 							}
+				// 							.left-layout {
+				// 								width: 140px;
+				// 								.subtext {
+				// 									font-size: 13px;
+				// 								}
+				// 							}
+				// 							.right-layout {
+				// 								width: 412px;
+				// 								.ellipsis {
+				// 									min-height: 18px;
+				// 								}
+				// 								.small-width,
+				// 								.lager-width,
+				// 								.full-width {
+				// 									float: left;
+				// 								}
+				// 								.full-width {
+				// 									width: 100%;
+				// 								}
+				// 								.full-width-extend {
+				// 									width: 100%;
+				// 									height: auto;
+				// 									overflow: auto;
+				// 									.first-section-subhead {
+				// 										margin-top: 5px;
+				// 									}
+				// 									.small-width {
+				// 										width: 140px;
+				// 									}
+				// 									.lager-width {
+				// 										width: 272px;
+				// 										padding-left: 5px;
+				// 									}
+				// 								}
+				// 							}
+				// 							.w50p {
+				// 								width: 50%;
+				// 							}
+				// 							.graderange {
+				// 								margin-right: 10px;
+				// 							}
+				// 							.studentnumber {
+				// 								width: 100px;
+				// 							}
+				// 						}
+				// 						&:first-child {
+				// 							margin-top: 0px;
+				// 						}
+				// 					}
+				// 					&.main-part {
+				// 						overflow: auto;
+				// 						margin-right: -20px;
+				// 					}
+				// 					.empty-content {
+				// 						.display-center;
+				// 						height: 100%;
+				// 					}
+				// 					.empty {
+				// 						font-family: "SourceSansPro-Italic";
+				// 						color: #777;
+				// 						font-size: 16px;
+				// 						text-align: center;
+				// 					}
+				// 					.notes-tab {
+				// 						height: 100%;
+				// 						width: 100%;
+				// 						display: block;
+				// 						&.empty-note {
+				// 							.display-center;
+				// 							.center-container {
+				// 								min-height: 68px;
+				// 								.empty {
+				// 									display: block;
+				// 								}
+				// 								.notes-control {
+				// 									.display-center;
+				// 									visibility: visible;
+				// 									.addNote {
+				// 										display: block;
+				// 									}
+				// 								}
+				// 								textarea {
+				// 									display: none;
+				// 								}
+				// 							}
+				// 						}
+				// 						&.edit-note {
+				// 							align-items: flex-start;
+
+				// 							.center-container {
+				// 								textarea {
+				// 									display: block !important;
+				// 									align-self: flex-start0;
+				// 									border: 1px solid #bcbcbc;
+				// 								}
+				// 								.empty {
+				// 									display: none;
+				// 								}
+				// 								.notes-control {
+				// 									width: 100%;
+				// 									visibility: visible;
+				// 									display: block;
+				// 									align-self: flex-end;
+				// 									button {
+				// 										&.addNote {
+				// 											display: none;
+				// 										}
+				// 										&.saveEdit,
+				// 										&.cancelEdit {
+				// 											display: block;
+				// 											float: left;
+				// 										}
+				// 									}
+				// 								}
+				// 							}
+				// 						}
+				// 						.center-container {
+				// 							width: 100%;
+				// 							height: auto;
+				// 							>div {
+				// 								float: none;
+				// 							}
+				// 							.empty-note {
+				// 								float: none;
+				// 							}
+				// 							.empty {
+				// 								display: none;
+				// 							}
+				// 							textarea {
+				// 								width: 100%;
+				// 								height: calc(~"100% - 50px");
+				// 								padding: 10px;
+				// 								font-family: "SourceSansPro-Regular";
+				// 								font-size: 14px;
+				// 								outline: none;
+				// 								border: 1px solid #fff;
+				// 								box-sizing: border-box;
+				// 								min-height: 94px;
+				// 								&:hover {
+				// 									border: 1px solid #bcbcbc;
+				// 								}
+				// 								&:focus {
+				// 									outline-color: @skin-baseColor;
+				// 								}
+				// 							}
+
+				// 							&.no-permission {
+				// 								textarea {
+				// 									border: 0;
+				// 									min-height: auto;
+				// 									padding: 0;
+				// 								}
+				// 							}
+
+				// 							.notes-control {
+				// 								height: 50px;
+				// 								width: 100%;
+				// 								button {
+				// 									padding: 10px;
+				// 									border: 1px solid @skin-baseColor;
+				// 									border-radius: 3px;
+				// 									background: #fff;
+				// 									color: @skin-baseColor;
+				// 									font-family: "SourceSansPro-Regular";
+				// 									font-size: 14px;
+				// 									margin-top: 10px;
+				// 									margin-right: 10px;
+				// 									&.addNote,
+				// 									&.saveEdit,
+				// 									&.cancelEdit {
+				// 										display: none;
+				// 									}
+				// 									&.cancelEdit {
+				// 										border-color: rgba(255, 255, 255, 0);
+				// 									}
+				// 								}
+				// 							}
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// }
+			}
+
+			.pointer {
+				.pointer-caret;
+				margin-left: -16px !important;
+
+				&.bottom {
+					bottom: -12px !important;
+				}
+
+				&.top {
+					top: -12px !important;
+					background-color: #F3EDF5 !important;
+				}
+			}
+		}
+
+		.outerPointer {
+			.pointer-caret;
+			margin-top: -16px !important;
+
+			&.left {
+				left: 12px;
+			}
+
+			&.right {
+				right: 12px;
+			}
+		}
+	}
+}
+
+.esriSimpleSlider.esriSimpleSliderVertical.esriSimpleSliderTL {
+	border: none;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	border-radius: 0;
+
+	&>div {
+		width: 28px;
+		height: 27px;
+		font-size: 18px;
+	}
+
+	.esriSimpleSliderIncrementButton {
+		border-bottom: 1px solid rgb(230, 230, 230);
+	}
+}
+
+.esri-map-toolbar-top,
+.esri-map-toolbar-bottom {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: auto;
+	box-sizing: border-box;
+	padding: 15px 20px 15px 20px;
+
+	&.active {
+		pointer-events: auto;
+		display: block;
+	}
+
+	.toolbar-btn {
+		height: 31px;
+		cursor: pointer;
+		opacity: 1;
+		float: left;
+		text-align: center;
+		padding: 8px;
+		font-size: 12px;
+		font-family: "SourceSansPro-Regular";
+
+		&.white {
+			background-color: white;
+			color: black;
+			box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+
+			&:hover {
+				background-color: #ebebeb;
+			}
+
+			&.inactive {
+				cursor: default;
+				color: #999999;
+			}
+		}
+
+		&.black {
+			background-color: transparent;
+			color: white;
+		}
+	}
+}
+
+.esri-map-toolbar-top {
+	top: 0;
+	pointer-events: none;
+
+	&>div {
+		float: left;
+		margin: 0 20px 0 0;
+		background-color: #fff;
+		pointer-events: auto;
+	}
+
+	.tool-button {
 		&>div {
-			width: 28px;
-			height: 27px;
-			font-size: 18px;
+			background-repeat: no-repeat;
+			background-position: center;
+			width: 31px;
 		}
 
-		.esriSimpleSliderIncrementButton {
-			border-bottom: 1px solid rgb(230, 230, 230);
-		}
-	}
+		.draw-btn {
+			background-image: url(../img/map/view/Geo-Search-b.png);
 
-	.esri-map-toolbar-top,
-	.esri-map-toolbar-bottom {
-		position: absolute;
-		left: 0;
-		width: 100%;
-		height: auto;
-		box-sizing: border-box;
-		padding: 15px 20px 15px 20px;
-
-		&.active {
-			pointer-events: auto;
-			display: block;
-		}
-
-		.toolbar-btn {
-			height: 31px;
-			cursor: pointer;
-			opacity: 1;
-			float: left;
-			text-align: center;
-			padding: 8px;
-			font-size: 12px;
-			font-family: "SourceSansPro-Regular";
-
-			&.white {
-				background-color: white;
-				color: black;
-				box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-
-				&:hover {
-					background-color: #ebebeb;
-				}
-
-				&.inactive {
-					cursor: default;
-					color: #999999;
-				}
+			&.applied {
+				background-image: url(../img/map/view/Geo-Search-Applied-b.png);
 			}
+		}
 
-			&.black {
-				background-color: transparent;
-				color: white;
+		.thematic {
+			background-image: url(../img/map/view/thematics.svg);
+
+			&.applied {
+				background-color: #4b4b4b;
+				background-image: url(../img/map/view/thematics-rev.svg);
+			}
+		}
+
+		.fullextent-btn {
+			background-image: url(../img/map/view/CenterInMap.png);
+
+			&.applied {
+				background-image: url(../img/map/view/CenterInMapApplied.png);
 			}
 		}
 	}
 
-	.esri-map-toolbar-top {
-		top: 0;
-		pointer-events: none;
-
-		&>div {
-			float: left;
-			margin: 0 20px 0 0;
-			background-color: #fff;
-			pointer-events: auto;
+	.basemap-switch {
+		.toolbar-btn.white.switch-btn.applied {
+			color: black;
+			font-weight: bold;
 		}
 
-		.tool-button {
-			&>div {
-				background-repeat: no-repeat;
-				background-position: center;
-				width: 31px;
-			}
-
-			.draw-btn {
-				background-image: url(../img/map/view/Geo-Search-b.png);
-
-				&.applied {
-					background-image: url(../img/map/view/Geo-Search-Applied-b.png);
-				}
-			}
-
-			.thematic {
-				background-image: url(../img/map/view/thematics.svg);
-
-				&.applied {
-					background-color: #4b4b4b;
-					background-image: url(../img/map/view/thematics-rev.svg);
-				}
-			}
-
-			.fullextent-btn {
-				background-image: url(../img/map/view/CenterInMap.png);
-
-				&.applied {
-					background-image: url(../img/map/view/CenterInMapApplied.png);
-				}
-			}
-		}
-
-		.basemap-switch {
-			.toolbar-btn.white.switch-btn.applied {
-				color: black;
-				font-weight: bold;
-			}
-
-			.toolbar-btn.white.switch-btn {
-				color: rgb(86, 86, 86);
-			}
+		.toolbar-btn.white.switch-btn {
+			color: rgb(86, 86, 86);
 		}
 	}
+}
 
-	.esri-map-toolbar-bottom {
-		height: 61px;
-		bottom: 0;
-		background-color: rgba(20, 20, 20, 0.7);
-		display: none;
+.esri-map-toolbar-bottom {
+	height: 61px;
+	bottom: 0;
+	background-color: rgba(20, 20, 20, 0.7);
+	display: none;
 
-		&.active {
-			display: block;
-		}
-
-		&>div {
-			width: 70px;
-		}
-
-		.exit-btn {
-			float: right;
-		}
+	&.active {
+		display: block;
 	}
 
-	.map .esriMapTooltip {
-		width: 120px;
+	&>div {
+		width: 70px;
 	}
+
+	.exit-btn {
+		float: right;
+	}
+}
+
+.map .esriMapTooltip {
+	width: 120px;
+}
 
 .map-draw-circle-radius {
   display: none;
@@ -875,914 +875,920 @@
   margin-right: 5px;
 }
 
-	// New Map Tools
-	.on-map-tool {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		z-index: @MAP_ONMAP_TOOL;
-		pointer-events: none;
+// New Map Tools
+.on-map-tool {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: @MAP_ONMAP_TOOL;
+	pointer-events: none;
 
-		&.geosearch {
-			bottom: 61px;
+	&.geosearch {
+		bottom: 61px;
+	}
+
+	.zoom-controls {
+		position: absolute;
+		right: 15px;
+		bottom: 15px;
+		width: 44px;
+		pointer-events: auto;
+		z-index: @MAP_ONMAP_TOOL + 10;
+
+		&.left-align {
+			left: 15px;
+			right: auto;
 		}
 
-		.zoom-controls {
-			position: absolute;
-			right: 15px;
-			bottom: 15px;
-			width: 44px;
-			pointer-events: auto;
-			z-index: @MAP_ONMAP_TOOL + 10;
+		.zoom-btn {
+			box-sizing: content-box;
+			height: 40px;
+			width: 40px;
+			margin-bottom: 15px;
+			border: 2px solid #fff;
+			border-radius: 22px;
+			background-color: #fff;
+			background-position: center center;
+			background-repeat: no-repeat;
+			box-shadow: 0 5px 2px -2px rgba(0, 0, 0, 0.15);
+			cursor: pointer;
 
-			&.left-align {
-				left: 15px;
-				right: auto;
+			&.zoom-in {
+				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABlBMVEUAAAAAAAClZ7nPAAAAAXRSTlMAQObYZgAAABlJREFUeAFjoBZgZBwYQUYUgE+Q/u6kEgAALEwANQNmk1oAAAAASUVORK5CYII=);
 			}
 
-			.zoom-btn {
-				box-sizing: content-box;
-				height: 40px;
-				width: 40px;
-				margin-bottom: 15px;
-				border: 2px solid #fff;
-				border-radius: 22px;
-				background-color: #fff;
-				background-position: center center;
-				background-repeat: no-repeat;
-				box-shadow: 0 5px 2px -2px rgba(0, 0, 0, 0.15);
-				cursor: pointer;
-
-				&.zoom-in {
-					background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABlBMVEUAAAAAAAClZ7nPAAAAAXRSTlMAQObYZgAAABlJREFUeAFjoBZgZBwYQUYUgE+Q/u6kEgAALEwANQNmk1oAAAAASUVORK5CYII=);
-				}
-
-				&.zoom-out {
-					margin-bottom: 0;
-					background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABlBMVEUAAAAAAAClZ7nPAAAAAXRSTlMAQObYZgAAABJJREFUeAFjGPKAEQlgFxzqAAAVVAAZNiceeAAAAABJRU5ErkJggg==);
-				}
+			&.zoom-out {
+				margin-bottom: 0;
+				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAABlBMVEUAAAAAAAClZ7nPAAAAAXRSTlMAQObYZgAAABJJREFUeAFjGPKAEQlgFxzqAAAVVAAZNiceeAAAAABJRU5ErkJggg==);
 			}
 		}
 	}
+}
 
-	.off-map-tool {
+.off-map-tool {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 12000;
+	overflow: hidden;
+	pointer-events: none;
+
+	&.hide {
 		display: none;
-		position: absolute;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		right: 0;
-		z-index: 12000;
-		overflow: hidden;
-		pointer-events: none;
+	}
 
-		&.hide {
-			display: none;
-		}
+	&.active {
+		pointer-events: auto;
 
-		&.active {
-			pointer-events: auto;
-
-			&.basemap,
-			&.thematics {
-				.map-tool-container .map-tool-label {
-					display: none;
-					opacity: 0;
-				}
-
-				.tool-icon {
-					opacity: 0.5;
-
-					&.active {
-						opacity: 1;
-					}
-				}
+		&.basemap,
+		&.thematics {
+			.map-tool-container .map-tool-label {
+				display: none;
+				opacity: 0;
 			}
 
-			.map-tool-background {
-				pointer-events: auto;
-				opacity: 0.75;
-			}
+			.tool-icon {
+				opacity: 0.5;
 
-			.map-tool-container {
-				.generate-sequence(10);
-				.generate-sequence(@n, @i: 1) when (@i =< @n)
-				{
-					.sequence-@{i} {
-						transform: translate3d(0px, ((@i - 1) * 64 + 76px), 0px);
-					}
-					.generate-sequence(@n, (@i + 1));
-				}
-				.map-tool-label {
-					display: block;
+				&.active {
 					opacity: 1;
-				}
-			}
-
-			.map-tool-container.landscape {
-				.generate-sequence(10);
-				.generate-sequence(@n, @i: 1) when (@i =< @n)
-				{
-					.sequence-@{i} {
-						transform: translate3d(((@i - 1) * -64 - 70px), 6px, 0px);
-					}
-					.generate-sequence(@n, (@i + 1));
-				}
-				.map-tool-label {
-					display: none !important;
-				}
-			}
-		}
-
-		&.left-align {
-			.map-tool-container {
-				.map-tool-label {
-					padding-right: 0;
-					padding-left: 20px;
-
-					label {
-						text-align: left;
-					}
 				}
 			}
 		}
 
 		.map-tool-background {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: black;
-			opacity: 0;
-			pointer-events: none;
-			z-index: @MAP_MASK_BACKGROUND;
+			pointer-events: auto;
+			opacity: 0.75;
 		}
 
 		.map-tool-container {
-			position: absolute;
-			right: 65px;
-			top: 15px;
-			z-index: @MAP_TOOLKIT_CONTAINER;
-
-			.tool-icon {
-				position: absolute;
-				right: 0;
-				margin-left: 6px;
-				margin-right: 6px;
-				width: 40px;
-				height: 40px;
-				border-radius: 40px;
-				border: 2px solid white;
-				transform: translate3d(0px, 6px, 0px);
-				box-sizing: content-box;
-				&.disable
-				{
-					opacity: .5;
-					cursor: initial;
-				}
-			}
-
-			.zoom {
-				background-image: url("../img/map/view/CenterInMap.png");
-			}
-
-			.basemap {
-				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAABEklEQVQoFQXBMUiUAQAG0PefuCvddJtDBlrnKQ62hLS1mUho4iKok0MKbrrd0FC7ow4Rgi1CTVFOHXRLcCBBcYNLKHFwqIgnfr5XABjz2ojHCk1/ffALAHir61BTRHx3pg4AX5yZtOKfiHMTVl34DFDXU7YmIiJ65lREHWrujOBKREScGMSsqJYsKDw0aNwzC76BUx180rLKgYh5QElD3NkxhC0/aYtrZQBfRUTHA1O6JQX6vAB93psGDBjWhQMRUcO2iIiImnnNkhZgFEsAuHVpWYNHrkTs4kRERPz3TtcT2BTRs+63iLgRERsA+yKibd+iiqof4iMAvHEhDr301CtH2jaBAsCwGc+N6/fHsT0t4B4DN3sOpk3/YQAAAABJRU5ErkJggg==);
-			}
-
-			.thematics {
-				background-image: url("../img/map/view/thematics.svg");
-
-				&.disable {
-					cursor: not-allowed;
-					opacity: 0.5;
-					pointer-events: none;
-				}
-			}
-
-			.geofinder {
-				background-image: url("../img/map/view/Geo-Finder.png");
-			}
-
-			.studentWalk {
-				background-image: url("../img/map/view/students-walking.png");
-			}
-
-			.geosearch {
-				background-image: url("../img/map/view/Geo-Search-b.png");
-			}
-
-			.clear-geosearch {
-				background-image: url("../img/map/view/Clear-Geo-Search.png");
-			}
-
-			.measurement {
-				background-image: url("../img/map/view/Measure Icon.svg");
-			}
-
-			.print {
-				background-size: 24px;
-				background-image: url("../../global/img/detail-screen/print.svg");
-			}
-
-			.playback {
-				background-size: 34px;
-				background-image: url("../../global/img/detail-screen/play.svg");
-			}
-
-			.palettes {
-				background-size: 24px;
-				background-image: url("../img/map/view/palettes-black.png");
-			}
-
-			.home {
-				background-image: url("../img/map/view/home.svg");
-				background-size: 24px;
-			}
-
-			.location-arrow {
-				background-image: url("../img/map/view/location-arrow.svg");
-				background-size: 24px;
-			}
-
-			.trash
+			.generate-sequence(10);
+			.generate-sequence(@n, @i: 1) when (@i =< @n)
 			{
-				background-image: url("../img/map/view/trash.svg");
-				background-size: 24px;
-			}
-
-			.location-marker
-			{
-				background-image: url("../img/map/view/location-marker.svg");
-				background-size: 24px;
-			}
-
-			.manuallypin {
-				background-image: url("../img/map/view/pin.png");
-				background-position: center;
-				background-size: 24px;
-
-				&.on:after {
-					content: "";
-					display: block;
-					width: 18px;
-					height: 18px;
-					position: absolute;
-					top: 20px;
-					left: 20px;
-					background: url(../img/icons/checkmark.png) center no-repeat;
-					background-size: 12px 10px;
+				.sequence-@{i} {
+					transform: translate3d(0px, ((@i - 1) * 64 + 76px), 0px);
 				}
+				.generate-sequence(@n, (@i + 1));
 			}
-
-			.googlestreet {
-				background-size: 24px;
-				background-image: url("../img/map/view/GoogleStreet.svg");
-			}
-
 			.map-tool-label {
-				display: none;
-				opacity: 0;
-				position: absolute;
-				margin-top: 20px;
-				margin-right: 20px;
-				user-select: none;
-				white-space: nowrap;
+				display: block;
+				opacity: 1;
+			}
+		}
+
+		.map-tool-container.landscape {
+			.generate-sequence(10);
+			.generate-sequence(@n, @i: 1) when (@i =< @n)
+			{
+				.sequence-@{i} {
+					transform: translate3d(((@i - 1) * -64 - 70px), 6px, 0px);
+				}
+				.generate-sequence(@n, (@i + 1));
+			}
+			.map-tool-label {
+				display: none !important;
+			}
+		}
+	}
+
+	&.left-align {
+		.map-tool-container {
+			.map-tool-label {
+				padding-right: 0;
+				padding-left: 20px;
 
 				label {
+					text-align: left;
+				}
+			}
+		}
+	}
+
+	.map-tool-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: black;
+		opacity: 0;
+		pointer-events: none;
+		z-index: @MAP_MASK_BACKGROUND;
+	}
+
+	.map-tool-container {
+		position: absolute;
+		right: 65px;
+		top: 15px;
+		z-index: @MAP_TOOLKIT_CONTAINER;
+
+		.tool-icon {
+			position: absolute;
+			right: 0;
+			margin-left: 6px;
+			margin-right: 6px;
+			width: 40px;
+			height: 40px;
+			border-radius: 40px;
+			border: 2px solid white;
+			transform: translate3d(0px, 6px, 0px);
+			box-sizing: content-box;
+			&.disable
+			{
+				opacity: .5;
+				cursor: initial;
+			}
+		}
+
+		.zoom {
+			background-image: url("../img/map/view/CenterInMap.png");
+		}
+
+		.basemap {
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAABEklEQVQoFQXBMUiUAQAG0PefuCvddJtDBlrnKQ62hLS1mUho4iKok0MKbrrd0FC7ow4Rgi1CTVFOHXRLcCBBcYNLKHFwqIgnfr5XABjz2ojHCk1/ffALAHir61BTRHx3pg4AX5yZtOKfiHMTVl34DFDXU7YmIiJ65lREHWrujOBKREScGMSsqJYsKDw0aNwzC76BUx180rLKgYh5QElD3NkxhC0/aYtrZQBfRUTHA1O6JQX6vAB93psGDBjWhQMRUcO2iIiImnnNkhZgFEsAuHVpWYNHrkTs4kRERPz3TtcT2BTRs+63iLgRERsA+yKibd+iiqof4iMAvHEhDr301CtH2jaBAsCwGc+N6/fHsT0t4B4DN3sOpk3/YQAAAABJRU5ErkJggg==);
+		}
+
+		.thematics {
+			background-image: url("../img/map/view/thematics.svg");
+
+			&.disable {
+				cursor: not-allowed;
+				opacity: 0.5;
+				pointer-events: none;
+			}
+		}
+
+		.geofinder {
+			background-image: url("../img/map/view/Geo-Finder.png");
+		}
+
+		.studentWalk {
+			background-image: url("../img/map/view/students-walking.png");
+		}
+
+		.geosearch {
+			background-image: url("../img/map/view/Geo-Search-b.png");
+		}
+
+		.clear-geosearch {
+			background-image: url("../img/map/view/Clear-Geo-Search.png");
+		}
+
+		.measurement {
+			background-image: url("../img/map/view/Measure Icon.svg");
+		}
+
+		.print {
+			background-size: 24px;
+			background-image: url("../../global/img/detail-screen/print.svg");
+		}
+
+		.playback {
+			background-size: 34px;
+			background-image: url("../../global/img/detail-screen/play.svg");
+		}
+
+		.palettes {
+			background-size: 24px;
+			background-image: url("../img/map/view/palettes-black.png");
+		}
+
+		.home {
+			background-image: url("../img/map/view/home.svg");
+			background-size: 24px;
+		}
+
+		.location-arrow {
+			background-image: url("../img/map/view/location-arrow.svg");
+			background-size: 24px;
+		}
+
+		.trash
+		{
+			background-image: url("../img/map/view/trash.svg");
+			background-size: 24px;
+		}
+
+		.location-marker
+		{
+			background-image: url("../img/map/view/location-marker.svg");
+			background-size: 24px;
+		}
+
+		.manuallypin {
+			background-image: url("../img/map/view/pin.png");
+			background-position: center;
+			background-size: 24px;
+
+			&.on:after {
+				content: "";
+				display: block;
+				width: 18px;
+				height: 18px;
+				position: absolute;
+				top: 20px;
+				left: 20px;
+				background: url(../img/icons/checkmark.png) center no-repeat;
+				background-size: 12px 10px;
+			}
+		}
+
+		.googlestreet {
+			background-size: 24px;
+			background-image: url("../img/map/view/GoogleStreet.svg");
+		}
+
+		.map-tool-label {
+			display: none;
+			opacity: 0;
+			position: absolute;
+			margin-top: 20px;
+			margin-right: 20px;
+			user-select: none;
+			white-space: nowrap;
+
+			label {
+				text-align: right;
+				display: block;
+				font-size: 17px;
+				color: white;
+				font-weight: normal;
+				margin-bottom: 20px;
+				height: 44px;
+				line-height: 44px;
+				cursor: pointer;
+			}
+		}
+	}
+
+	.esri-basemap-gallery__item-container {
+		flex-flow: row;
+		flex-wrap: wrap;
+	}
+
+	.esriBasemapGallery,
+	.esri-basemap-gallery {
+		display: none;
+		position: absolute;
+		margin-right: 20px;
+		right: 90px;
+		width: 342px;
+		max-width: 500px;
+		height: auto;
+		padding-left: 15px;
+		background-color: #fff;
+		z-index: @MAP_TOOLKIT_MENU;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		&.active {
+			display: block;
+		}
+
+		.esriBasemapGalleryNode,
+		.esri-basemap-gallery__item {
+			margin: 10px 15px 0 0;
+			padding: 0;
+			flex-direction: column;
+			width: 93px;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			cursor: pointer;
+			border: none;
+
+			&.esriBasemapGallerySelectedNode .esriBasemapGalleryThumbnail,
+			&.esri-basemap-gallery__item--selected .esri-basemap-gallery__item-thumbnail {
+				border: 2px solid #00b1b0 !important;
+				box-shadow: 0 5px 2px -2px rgba(0, 0, 0, .15);
+			}
+
+			.esriBasemapGalleryThumbnail,
+			.esri-basemap-gallery__item-thumbnail {
+				width: inherit;
+				height: 63px;
+				margin: 0 0 10px 0;
+				background-size: 93px 63px;
+				box-shadow: none;
+			}
+
+			.esriBasemapGalleryLabelContainer,
+			.esri-basemap-gallery__item-title {
+				height: 56px;
+				margin-bottom: 10px;
+				font-family: "SourceSansPro-Regular";
+				font-size: 15px;
+				text-align: center;
+
+				span {
+					text-align: center;
+					vertical-align: middle;
+					font-size: 13px;
+					line-height: 1.42857143;
+					color: #333;
+				}
+			}
+		}
+	}
+
+	.tool-menu {
+		margin-left: 20px;
+
+		&.left-align .caret {
+			left: -13px;
+			right: auto;
+		}
+
+		.caret {
+			float: right;
+			width: 22px;
+			height: 22px;
+			position: absolute;
+			top: 86px;
+			right: -11px;
+			background-color: #fff;
+			transform: rotate(45deg);
+			border: none !important;
+			z-index: -1;
+		}
+	}
+}
+
+.map-tool-bar {
+	position: absolute;
+	z-index: 11080;
+	padding-left: 0;
+
+	& > li.map-tool-bar-item {
+		display: inline-block;
+		width: 40px;
+		height: 40px;
+		margin-right: 20px;
+		background-repeat: no-repeat;
+		background-position: center;
+		background-color: white;
+		border-radius: 20px;
+		box-shadow: 0 5px 2px -2px rgba(0, 0, 0, 0.15);
+
+		&:hover
+		{
+			cursor: pointer;
+		}
+
+		&.toolbar-item-selected
+		{
+			background-color: #e3e3e3;
+		}
+
+		&.toolbar-item-pin
+		{
+			background-image: url('../img/direction-setting-panel/drop-destination-dark.png');
+		}
+
+		&.toolbar-item-polygon
+		{
+			background-image: url('../img/Routing Map/menuicon/Select-Polygon-Black.png');
+		}
+
+		&.toolbar-item-rectangle
+		{
+			background-image: url('../img/Routing Map/menuicon/Select-Rectangle-Black.png');
+		}
+
+		&.toolbar-item-draw
+		{
+			background-image: url('../img/Routing Map/menuicon/Select-Freeform-Black.png');
+		}
+
+		&.toolbar-item-circle
+		{
+			background-image: url('../img/Routing Map/menuicon/Select-Circle-Black.png');
+		}
+
+		&.toolbar-item-clear
+		{
+			font-family: 'WebComponentsIcons';
+			font-size: 24px;
+			text-align: center;
+			line-height: 40px;
+			vertical-align: top;
+
+			&::before
+			{
+				content: "\e10c";
+			}
+
+			&.disable
+			{
+				display: none;
+			}
+		} 
+
+		&.disable
+		{
+			opacity: 0.5;
+			cursor: initial;
+		}
+	}
+
+	&.is-mobile>li.map-tool-bar-item
+	{
+		margin-right: 10px;
+	}
+}
+
+.on-map-tool,
+.off-map-tool {
+	&.active {
+		.map-tool-btn {
+			transform: rotate(180deg);
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAS1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADmYDp0AAAAGHRSTlMAAwYaNzpPUlRVV1laW1xdws7v9PX2+Pm2BE6WAAAAi0lEQVR42lWP2xLDIAhEkSTGaNNG8cL/f2kRHTv1gXH3LIjwJG9gHuPTA4lLwKHRZ04gJZ+o+sxcPBh1zNA56EUzaP+iFN40tDqWuDWm3jidT2NuL4RlXJW5+mX0ebVyttMxt8z3Vy9GuSsCx7MOhbuOUMBddMOdBEh0IDogMq19HHGELR6/7+9x+wLgPgj5LD2YpQAAAABJRU5ErkJggg==);
+		}
+	}
+
+	&.left-align {
+		&.active {
+			.map-tool-btn {
+				transform: rotate(-180deg);
+			}
+		}
+	}
+
+	.animate {
+		transition: all 400ms ease;
+	}
+
+	.tool-icon {
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-color: #fff;
+		margin-bottom: 20px;
+		cursor: pointer;
+	}
+
+	.map-tool-btn {
+		z-index: @MAP_TOOLKIT_ICON;
+		position: absolute;
+		width: 56px;
+		height: 56px;
+		border-radius: 56px;
+		top: 15px;
+		right: 15px;
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAM1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACjBUbJAAAAEHRSTlMAECAwQFBgcICPn6+/z9/vIxqCigAAAJ5JREFUeAGNz+EOgyAQA+Aihwz0vHv/p52sccLCEvvDhK+mIh5lWaaaVQOApNZpyOr+8dV97fxkOvbmJY7OQlBdbvcKcMnUD3o0b8n0MxbB95lKN5Fr9Ex7KD0CTBsy5Kqhdza8+eBs0twZeix/3LzOHMW9b+RVrv3aN8l1p/80WtqZPjSe2jeAruHdNg3LtuNurtl42Phn5XsQwfO8AeAwCo2Wpm9pAAAAAElFTkSuQmCC);
+		box-shadow: 0 5px 2px -2px rgba(0, 0, 0, 0.15);
+		transform: rotate(0deg);
+		pointer-events: auto;
+	}
+
+	.map-applied-geo-search {
+		.map-tool-btn;
+		background-image: url(../img/map/view/Geo-Search-b.png);
+		background-color: rgba(18, 89, 208, 0.8),
+	}
+}
+
+#measurementInfoPanel.measurement-info-panel {
+	display: none;
+	position: absolute;
+	bottom: 30px;
+	height: 110px;
+	width: 240px;
+	border-radius: 4px;
+	background: transparent;
+	font-family: "SourceSansPro-Regular";
+	color: #333;
+	overflow: hidden;
+	pointer-events: auto;
+
+	&.active {
+		display: block;
+	}
+
+	.measurement-tab-container {
+		width: 86px;
+		float: left;
+		background: transparent;
+
+		.measurement-tab:last-child {
+			margin-bottom: 0;
+		}
+
+		.measurement-tab {
+			height: 36px;
+			line-height: 36px;
+			margin-right: 1px;
+			margin-bottom: 1px;
+			padding-left: 10px;
+			font-size: 17px;
+			background-color: rgba(250, 250, 250, 0.8);
+			box-sizing: border-box;
+			cursor: pointer;
+
+			&.active {
+				width: 86px;
+				margin-right: 0;
+				background-color: rgba(255, 255, 255, 0.9);
+				font-family: "SourceSansPro-SemiBold";
+			}
+		}
+	}
+
+	.measurement-panel-container {
+		width: 154px;
+		height: 100%;
+		float: right;
+		background-color: rgba(255, 255, 255, 0.9);
+
+		.measurement-panel {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			display: none;
+
+			&.active {
+				display: inline-block;
+				align-items: center;
+				justify-content: center;
+			}
+
+			&.distance,
+			&.area {
+				.measurement-value {
+					float: right;
+					height: 38px;
+					line-height: 38px;
+					margin-top: 35px;
+					margin-right: 24px;
 					text-align: right;
-					display: block;
-					font-size: 17px;
-					color: white;
-					font-weight: normal;
-					margin-bottom: 20px;
-					height: 44px;
-					line-height: 44px;
+					font-family: "SourceSansPro-SemiBold";
+					font-size: 29px;
 					cursor: pointer;
 				}
 			}
-		}
 
-		.esri-basemap-gallery__item-container {
-			flex-flow: row;
-			flex-wrap: wrap;
-		}
+			&.location {
+				padding-top: 8px;
 
-		.esriBasemapGallery,
-		.esri-basemap-gallery {
-			display: none;
+				&.active.no-pin-location {
+					display: flex;
+
+					.location-track {
+						width: auto;
+					}
+
+					.location-pin {
+						display: none;
+					}
+
+					.measurement-latlon {
+						margin-left: 0;
+					}
+				}
+
+				.measurement-latlon:first-child {
+					margin-bottom: 6px;
+				}
+
+				.measurement-latlon {
+					position: relative;
+					height: 34px;
+					margin-left: 34px;
+					margin-bottom: 8px;
+					cursor: pointer;
+
+					&.location-pin .latlon-icon {
+						&::after {
+							content: "";
+							width: 8px;
+							height: 8px;
+							border-radius: 4px;
+							border: 1px solid #333;
+							margin-top: 13px;
+							margin-left: 4px;
+							position: relative;
+							display: block;
+						}
+					}
+
+					.latlon-icon {
+						position: absolute;
+						left: -24px;
+						width: 24px;
+						height: 34px;
+						cursor: pointer;
+					}
+
+					.latlon-container {
+						height: 17px;
+						width: 86px;
+						font-size: 12px;
+						overflow-wrap: normal;
+
+						.latlon-label {
+							float: left;
+							width: 28px;
+							font-family: "SourceSansPro-SemiBold";
+						}
+
+						.latlon-value {
+							float: right;
+							font-family: "SourceSansPro-Regular";
+							width: 58px;
+							text-align: right;
+							word-break: keep-all;
+						}
+					}
+
+					&.location-track {
+						cursor: default;
+
+						.latlon-icon {
+							background-image: url("../img/map/view/cursor.svg");
+							background-size: 20px;
+							background-position: -3px center;
+							cursor: default;
+						}
+					}
+				}
+
+				.measurement-unit {
+					position: absolute;
+					bottom: 8px;
+					right: 10px;
+				}
+			}
+
+			.measurement-unit {
+				position: relative;
+				float: right;
+				width: 100%;
+				margin-top: -5px;
+				padding-right: 24px;
+				font-size: 12px;
+				text-align: right;
+				white-space: nowrap;
+				cursor: pointer;
+
+				&:hover,
+				&.menu-opened {
+					text-decoration: underline;
+
+					.down-arrow {
+						display: block;
+					}
+				}
+
+				.down-arrow {
+					position: absolute;
+					display: none;
+					width: 8px;
+					height: 8px;
+					top: 6px;
+					right: 11px;
+					background-image: url("../img/map/view/down-arrow.svg");
+					background-size: 8px;
+				}
+			}
+		}
+	}
+
+	.close-btn {
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		width: 8px;
+		height: 8px;
+		background-image: url("../img/map/view/Close.svg");
+		background-size: 8px 8px;
+	}
+
+	.btn {
+		margin: 0;
+		padding: 0;
+		background-repeat: no-repeat;
+		background-position: center center;
+		cursor: pointer;
+
+		&:active {
+			box-shadow: none;
+		}
+	}
+
+	.icon {
+		margin: 0;
+		padding: 0;
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
+}
+
+.measurement-unit-menu {
+	position: absolute;
+	display: block;
+	pointer-events: auto;
+	background-color: #fafafa;
+	border: 1px solid #e4e4e4;
+	color: #333;
+	font-family: "SourceSansPro-Regular";
+	font-size: 12px;
+	box-shadow: 0 0 4px 0 rgba(51, 51, 51, 0.5);
+
+	ul.unit-menu-list {
+		position: relative;
+		padding: 8px 0;
+		margin: 0;
+
+		li {
+			list-style: none;
+			padding: 0 8px;
+			cursor: pointer;
+
+			&:hover {
+				background-color: #b9b9b9;
+			}
+		}
+	}
+}
+
+#measurementWidget {
+	display: none !important;
+}
+
+.pin-cursor {
+	cursor: url("../img/map/view/pin.png") 10 20, auto !important;
+}
+
+.expand-button {
+	width: 32px;
+	height: 32px;
+	background: url(../img/map/expand.png) center no-repeat white;
+	background-size: 24px 24px;
+	cursor: pointer;
+
+	&:hover {
+		background-color: #f0f0f0;
+	}
+
+	&.restore {
+		background-image: url('../img/map/restore.png');
+	}
+
+	&.calendar-expand-button {
+		right: 43%;
+		left: auto;
+		display: block;
+		height: 18px;
+		position: absolute;
+		width: 14.3%;
+		top: 5px;
+		background-size: 14px;
+		z-index: 1;
+
+		&:hover {
+			background-color: white;
+		}
+	}
+}
+
+
+
+// expand map tool
+.map-page {
+	.map-expand-button {
+		position: absolute;
+		top: 15px;
+		left: 79px;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+
+	.map-expand-button.is-mobile-device {
+		top: 15px;
+		left: 65px;
+	}
+
+		.confirm-location-mark {
 			position: absolute;
-			margin-right: 20px;
-			right: 90px;
-			width: 342px;
-			max-width: 500px;
-			height: auto;
-			padding-left: 15px;
-			background-color: #fff;
-			z-index: @MAP_TOOLKIT_MENU;
+				right: 15px;
+				bottom: 30px;
+				background-color: white;
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+				padding: 5px;
+		}
+}
+
+#mobileBasemapGallery {
+	.esri-basemap-gallery {
+		.esri-basemap-gallery__item-container {
 			flex-direction: row;
 			flex-wrap: wrap;
 
-			&.active {
-				display: block;
-			}
-
-			.esriBasemapGalleryNode,
 			.esri-basemap-gallery__item {
-				margin: 10px 15px 0 0;
-				padding: 0;
-				flex-direction: column;
-				width: 93px;
 				-webkit-user-select: none;
 				-moz-user-select: none;
 				-ms-user-select: none;
 				user-select: none;
 				cursor: pointer;
-				border: none;
 
-				&.esriBasemapGallerySelectedNode .esriBasemapGalleryThumbnail,
+				@media @small {
+					display: inline-block;
+					margin: 0 0 10px 0;
+					padding: 5px 10px 0 10px;
+					width: calc(100% / 3);
+				}
+
+				@media @small-landscape {
+					display: inline-block;
+					margin: 0 0 10px 0;
+					padding: 5px 10px 0 10px;
+					width: calc(100% / 6);
+				}
+
+				&.esri-basemap-gallery__item--selected {
+					border-left-color: #FFFFFF !important;
+				}
+
 				&.esri-basemap-gallery__item--selected .esri-basemap-gallery__item-thumbnail {
 					border: 2px solid #00b1b0 !important;
 					box-shadow: 0 5px 2px -2px rgba(0, 0, 0, .15);
 				}
 
-				.esriBasemapGalleryThumbnail,
 				.esri-basemap-gallery__item-thumbnail {
 					width: inherit;
 					height: 63px;
 					margin: 0 0 10px 0;
 					background-size: 93px 63px;
-					box-shadow: none;
-				}
-
-				.esriBasemapGalleryLabelContainer,
-				.esri-basemap-gallery__item-title {
-					height: 56px;
-					margin-bottom: 10px;
-					font-family: "SourceSansPro-Regular";
-					font-size: 15px;
-					text-align: center;
-
-					span {
-						text-align: center;
-						vertical-align: middle;
-						font-size: 13px;
-						line-height: 1.42857143;
-						color: #333;
-					}
-				}
-			}
-		}
-
-		.tool-menu {
-			margin-left: 20px;
-
-			&.left-align .caret {
-				left: -13px;
-				right: auto;
-			}
-
-			.caret {
-				float: right;
-				width: 22px;
-				height: 22px;
-				position: absolute;
-				top: 86px;
-				right: -11px;
-				background-color: #fff;
-				transform: rotate(45deg);
-				border: none !important;
-				z-index: -1;
-			}
-		}
-	}
-
-	.map-tool-bar {
-		position: absolute;
-		z-index: 11080;
-		padding-left: 0;
-
-		& > li.map-tool-bar-item {
-			display: inline-block;
-			width: 40px;
-			height: 40px;
-			margin-right: 20px;
-			background-repeat: no-repeat;
-			background-position: center;
-			background-color: white;
-			border-radius: 20px;
-			box-shadow: 0 5px 2px -2px rgba(0, 0, 0, 0.15);
-
-			&:hover
-			{
-				cursor: pointer;
-			}
-
-			&.toolbar-item-selected
-			{
-				background-color: #e3e3e3;
-			}
-
-			&.toolbar-item-pin
-			{
-				background-image: url('../img/direction-setting-panel/drop-destination-dark.png');
-			}
-
-			&.toolbar-item-polygon
-			{
-				background-image: url('../img/Routing Map/menuicon/Select-Polygon-Black.png');
-			}
-
-			&.toolbar-item-rectangle
-			{
-				background-image: url('../img/Routing Map/menuicon/Select-Rectangle-Black.png');
-			}
-
-			&.toolbar-item-draw
-			{
-				background-image: url('../img/Routing Map/menuicon/Select-Freeform-Black.png');
-			}
-
-			&.toolbar-item-circle
-			{
-				background-image: url('../img/Routing Map/menuicon/Select-Circle-Black.png');
-			}
-
-			&.toolbar-item-clear
-			{
-				font-family: 'WebComponentsIcons';
-				font-size: 24px;
-				text-align: center;
-				line-height: 40px;
-				vertical-align: top;
-
-				&::before
-				{
-					content: "\e10c";
-				}
-
-				&.disable
-				{
-					display: none;
-				}
-			} 
-
-			&.disable
-			{
-				opacity: 0.5;
-				cursor: initial;
-			}
-		}
-
-		&.is-mobile>li.map-tool-bar-item
-		{
-			margin-right: 10px;
-		}
-	}
-
-	.on-map-tool,
-	.off-map-tool {
-		&.active {
-			.map-tool-btn {
-				transform: rotate(180deg);
-				background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAS1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADmYDp0AAAAGHRSTlMAAwYaNzpPUlRVV1laW1xdws7v9PX2+Pm2BE6WAAAAi0lEQVR42lWP2xLDIAhEkSTGaNNG8cL/f2kRHTv1gXH3LIjwJG9gHuPTA4lLwKHRZ04gJZ+o+sxcPBh1zNA56EUzaP+iFN40tDqWuDWm3jidT2NuL4RlXJW5+mX0ebVyttMxt8z3Vy9GuSsCx7MOhbuOUMBddMOdBEh0IDogMq19HHGELR6/7+9x+wLgPgj5LD2YpQAAAABJRU5ErkJggg==);
-			}
-		}
-
-		&.left-align {
-			&.active {
-				.map-tool-btn {
-					transform: rotate(-180deg);
-				}
-			}
-		}
-
-		.animate {
-			transition: all 400ms ease;
-		}
-
-		.tool-icon {
-			background-position: center center;
-			background-repeat: no-repeat;
-			background-color: #fff;
-			margin-bottom: 20px;
-			cursor: pointer;
-		}
-
-		.map-tool-btn {
-			z-index: @MAP_TOOLKIT_ICON;
-			position: absolute;
-			width: 56px;
-			height: 56px;
-			border-radius: 56px;
-			top: 15px;
-			right: 15px;
-			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAM1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACjBUbJAAAAEHRSTlMAECAwQFBgcICPn6+/z9/vIxqCigAAAJ5JREFUeAGNz+EOgyAQA+Aihwz0vHv/p52sccLCEvvDhK+mIh5lWaaaVQOApNZpyOr+8dV97fxkOvbmJY7OQlBdbvcKcMnUD3o0b8n0MxbB95lKN5Fr9Ex7KD0CTBsy5Kqhdza8+eBs0twZeix/3LzOHMW9b+RVrv3aN8l1p/80WtqZPjSe2jeAruHdNg3LtuNurtl42Phn5XsQwfO8AeAwCo2Wpm9pAAAAAElFTkSuQmCC);
-			box-shadow: 0 5px 2px -2px rgba(0, 0, 0, 0.15);
-			transform: rotate(0deg);
-			pointer-events: auto;
-		}
-
-		.map-applied-geo-search {
-			.map-tool-btn;
-			background-image: url(../img/map/view/Geo-Search-b.png);
-			background-color: rgba(18, 89, 208, 0.8),
-		}
-	}
-
-	#measurementInfoPanel.measurement-info-panel {
-		display: none;
-		position: absolute;
-		bottom: 30px;
-		height: 110px;
-		width: 240px;
-		border-radius: 4px;
-		background: transparent;
-		font-family: "SourceSansPro-Regular";
-		color: #333;
-		overflow: hidden;
-		pointer-events: auto;
-
-		&.active {
-			display: block;
-		}
-
-		.measurement-tab-container {
-			width: 86px;
-			float: left;
-			background: transparent;
-
-			.measurement-tab:last-child {
-				margin-bottom: 0;
-			}
-
-			.measurement-tab {
-				height: 36px;
-				line-height: 36px;
-				margin-right: 1px;
-				margin-bottom: 1px;
-				padding-left: 10px;
-				font-size: 17px;
-				background-color: rgba(250, 250, 250, 0.8);
-				box-sizing: border-box;
-				cursor: pointer;
-
-				&.active {
-					width: 86px;
-					margin-right: 0;
-					background-color: rgba(255, 255, 255, 0.9);
-					font-family: "SourceSansPro-SemiBold";
-				}
-			}
-		}
-
-		.measurement-panel-container {
-			width: 154px;
-			height: 100%;
-			float: right;
-			background-color: rgba(255, 255, 255, 0.9);
-
-			.measurement-panel {
-				position: relative;
-				width: 100%;
-				height: 100%;
-				display: none;
-
-				&.active {
-					display: inline-block;
-					align-items: center;
-					justify-content: center;
-				}
-
-				&.distance,
-				&.area {
-					.measurement-value {
-						float: right;
-						height: 38px;
-						line-height: 38px;
-						margin-top: 35px;
-						margin-right: 24px;
-						text-align: right;
-						font-family: "SourceSansPro-SemiBold";
-						font-size: 29px;
-						cursor: pointer;
-					}
-				}
-
-				&.location {
-					padding-top: 8px;
-
-					&.active.no-pin-location {
-						display: flex;
-
-						.location-track {
-							width: auto;
-						}
-
-						.location-pin {
-							display: none;
-						}
-
-						.measurement-latlon {
-							margin-left: 0;
-						}
-					}
-
-					.measurement-latlon:first-child {
-						margin-bottom: 6px;
-					}
-
-					.measurement-latlon {
-						position: relative;
-						height: 34px;
-						margin-left: 34px;
-						margin-bottom: 8px;
-						cursor: pointer;
-
-						&.location-pin .latlon-icon {
-							&::after {
-								content: "";
-								width: 8px;
-								height: 8px;
-								border-radius: 4px;
-								border: 1px solid #333;
-								margin-top: 13px;
-								margin-left: 4px;
-								position: relative;
-								display: block;
-							}
-						}
-
-						.latlon-icon {
-							position: absolute;
-							left: -24px;
-							width: 24px;
-							height: 34px;
-							cursor: pointer;
-						}
-
-						.latlon-container {
-							height: 17px;
-							width: 86px;
-							font-size: 12px;
-							overflow-wrap: normal;
-
-							.latlon-label {
-								float: left;
-								width: 28px;
-								font-family: "SourceSansPro-SemiBold";
-							}
-
-							.latlon-value {
-								float: right;
-								font-family: "SourceSansPro-Regular";
-								width: 58px;
-								text-align: right;
-								word-break: keep-all;
-							}
-						}
-
-						&.location-track {
-							cursor: default;
-
-							.latlon-icon {
-								background-image: url("../img/map/view/cursor.svg");
-								background-size: 20px;
-								background-position: -3px center;
-								cursor: default;
-							}
-						}
-					}
-
-					.measurement-unit {
-						position: absolute;
-						bottom: 8px;
-						right: 10px;
-					}
-				}
-
-				.measurement-unit {
-					position: relative;
-					float: right;
-					width: 100%;
-					margin-top: -5px;
-					padding-right: 24px;
-					font-size: 12px;
-					text-align: right;
-					white-space: nowrap;
-					cursor: pointer;
-
-					&:hover,
-					&.menu-opened {
-						text-decoration: underline;
-
-						.down-arrow {
-							display: block;
-						}
-					}
-
-					.down-arrow {
-						position: absolute;
-						display: none;
-						width: 8px;
-						height: 8px;
-						top: 6px;
-						right: 11px;
-						background-image: url("../img/map/view/down-arrow.svg");
-						background-size: 8px;
-					}
-				}
-			}
-		}
-
-		.close-btn {
-			position: absolute;
-			top: 8px;
-			right: 8px;
-			width: 8px;
-			height: 8px;
-			background-image: url("../img/map/view/Close.svg");
-			background-size: 8px 8px;
-		}
-
-		.btn {
-			margin: 0;
-			padding: 0;
-			background-repeat: no-repeat;
-			background-position: center center;
-			cursor: pointer;
-
-			&:active {
-				box-shadow: none;
-			}
-		}
-
-		.icon {
-			margin: 0;
-			padding: 0;
-			background-repeat: no-repeat;
-			background-position: center center;
-		}
-	}
-
-	.measurement-unit-menu {
-		position: absolute;
-		display: block;
-		pointer-events: auto;
-		background-color: #fafafa;
-		border: 1px solid #e4e4e4;
-		color: #333;
-		font-family: "SourceSansPro-Regular";
-		font-size: 12px;
-		box-shadow: 0 0 4px 0 rgba(51, 51, 51, 0.5);
-
-		ul.unit-menu-list {
-			position: relative;
-			padding: 8px 0;
-			margin: 0;
-
-			li {
-				list-style: none;
-				padding: 0 8px;
-				cursor: pointer;
-
-				&:hover {
-					background-color: #b9b9b9;
-				}
-			}
-		}
-	}
-
-	#measurementWidget {
-		display: none !important;
-	}
-
-	.pin-cursor {
-		cursor: url("../img/map/view/pin.png") 10 20, auto !important;
-	}
-
-	.expand-button {
-		width: 32px;
-		height: 32px;
-		background: url(../img/map/expand.png) center no-repeat white;
-		background-size: 24px 24px;
-		cursor: pointer;
-
-		&:hover {
-			background-color: #f0f0f0;
-		}
-
-		&.restore {
-			background-image: url('../img/map/restore.png');
-		}
-
-		&.calendar-expand-button {
-			right: 43%;
-			left: auto;
-			display: block;
-			height: 18px;
-			position: absolute;
-			width: 14.3%;
-			top: 5px;
-			background-size: 14px;
-			z-index: 1;
-
-			&:hover {
-				background-color: white;
-			}
-		}
-	}
-
-
-
-	// expand map tool
-	.map-page {
-		.map-expand-button {
-			position: absolute;
-			top: 15px;
-			left: 79px;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-		}
-
-		.map-expand-button.is-mobile-device {
-			top: 15px;
-    		left: 65px;
-		}
-
-			.confirm-location-mark {
-				position: absolute;
-				 right: 15px;
-				 bottom: 30px;
-				 background-color: white;
-				 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-				 padding: 5px;
-			}
-	}
-
-	#mobileBasemapGallery {
-		.esri-basemap-gallery {
-			.esri-basemap-gallery__item-container {
-				flex-direction: row;
-				flex-wrap: wrap;
-
-				.esri-basemap-gallery__item {
-					-webkit-user-select: none;
-					-moz-user-select: none;
-					-ms-user-select: none;
-					user-select: none;
-					cursor: pointer;
 
 					@media @small {
-						display: inline-block;
-						margin: 0 0 10px 0;
-						padding: 5px 10px 0 10px;
-						width: calc(100% / 3);
+						width: auto;
 					}
 
 					@media @small-landscape {
-						display: inline-block;
-						margin: 0 0 10px 0;
-						padding: 5px 10px 0 10px;
-						width: calc(100% / 6);
+						width: auto;
 					}
+				}
 
-					&.esri-basemap-gallery__item--selected {
-						border-left-color: #FFFFFF !important;
-					}
+				.esri-basemap-gallery__item-title {
+					width: 93px;
+					height: 63px;
+					text-align: center;
 
-					&.esri-basemap-gallery__item--selected .esri-basemap-gallery__item-thumbnail {
-						border: 2px solid #00b1b0 !important;
-						box-shadow: 0 5px 2px -2px rgba(0, 0, 0, .15);
-					}
-
-					.esri-basemap-gallery__item-thumbnail {
-						width: inherit;
-						height: 63px;
-						margin: 0 0 10px 0;
-						background-size: 93px 63px;
-
-						@media @small {
-							width: auto;
-						}
-
-						@media @small-landscape {
-							width: auto;
-						}
-					}
-
-					.esri-basemap-gallery__item-title {
-						width: 93px;
-						height: 63px;
-						text-align: center;
-
-						@media @small {
-							width: 100%;
-						}
+					@media @small {
+						width: 100%;
 					}
 				}
 			}
 		}
 	}
+}
+
+.esri-view {
+	.esri-view-surface--inset-outline:focus::after {
+		outline: none;
+	}
+}
