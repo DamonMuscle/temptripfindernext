@@ -1252,3 +1252,12 @@ function IsEmptyString(str)
 		str === undefined ||
 		str === "");
 }
+
+function toCamelCase(input)
+{
+	if (input.length < 1)
+	{
+		return input;
+	}
+	return input[0].toUpperCase() + input.toLowerCase().substring(1, input.length);
+}

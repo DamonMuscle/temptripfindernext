@@ -667,6 +667,16 @@
 		return Promise.resolve(findFeatureResults);
 	}
 
+	Map.prototype.showPopup = function(content, location)
+	{
+		_map.mapView.popup.open({content, location});
+	}
+
+	Map.prototype.closePopup = function()
+	{
+		_map.mapView.popup.close();
+	}
+
 	Map.prototype.dispose = function()
 	{
 		const self = this;

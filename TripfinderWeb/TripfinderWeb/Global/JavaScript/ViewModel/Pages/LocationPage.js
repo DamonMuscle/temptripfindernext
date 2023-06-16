@@ -1,10 +1,10 @@
 (function()
 {
-    createNamespace("TF.Page").LocationPage = LocationPage;
+	createNamespace("TF.Page").LocationPage = LocationPage;
 
 	const LocationGridLayerId = "locationGridLayer";
 
-    function LocationPage(gridOptions)
+	function LocationPage(gridOptions)
 	{
 		var self = this;
 		self.type = "fieldtriplocation";
@@ -12,7 +12,7 @@
 		self.gridOptions = gridOptions;
 		TF.Page.BaseGridPage.apply(self, arguments);
 
-        self.changeStatusButton = false;
+		self.changeStatusButton = false;
 		self.copyButton = true;
 		self.detailButton = true;
 		self.schedulerButton = false;
@@ -24,8 +24,6 @@
 		self.endpoint = tf.DataTypeHelper.getEndpoint(self.type);
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 
-		// self.gridMap = new TF.Grid.GridMap(self);
-
 		this.geocodeTool = new TF.Grid.GeocodeTool(this);
 		this.geocodingSelectionClick = this.geocodeTool.geocodingSelectionClick.bind(this.geocodeTool);
 		this.ungeocodeSelectionClick = this.ungeocodeSelectionClick.bind(this);
@@ -36,12 +34,14 @@
 		{
 			self.obShowSplitmap(tf.pageManager.resizablePage.obRightContentType() === "splitmap");
 		}));
+
+		self.locationMapPopup = new TF.Grid.LocationMapPopup();
 	}
 
-    LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
+	LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	LocationPage.prototype.constructor = LocationPage;
 
-    LocationPage.prototype.updateOptions = function()
+	LocationPage.prototype.updateOptions = function()
 	{
 		var self = this;
 		if (self.gridOptions)
@@ -143,7 +143,6 @@
 			self.locationMapViewInstance = tf.pageManager.resizablePage.getRightData();
 			self.initMapTools();
 			self.initLocationMapGraphics();
-			
 		}
 	}
 
@@ -338,9 +337,7 @@
 		{
 			const item = records[i];
 			const attributes = {
-				name: item.Name,
-				street: item.Street,
-				notes: item.Notes
+				...item
 			}
 			if (item.XCoord && item.YCoord)
 			{
@@ -355,7 +352,7 @@
 		const recordIds = self.searchGrid.obAllIds();
 		return tf.promiseAjax.post(self.options.url, {
 			data: {
-				fields: ["Name", "Street", "XCoord", "YCoord", "Notes"],
+				fields: ["Name", "Street", "XCoord", "YCoord", "Notes", "City", "State", "Zip"],
 				idFilter: {
 					IncludeOnly: recordIds,
 					ExcludeAny: []
@@ -384,6 +381,14 @@
 		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
 		console.log(locationGraphics);
+
+		if(!locationGraphics || !locationGraphics.length)
+		{
+			self.locationMapViewInstance.closePopup();
+			return;
+		}
+
+		self.locationMapViewInstance.showPopup(self.locationMapPopup.buildContent(locationGraphics), locationGraphics[0].geometry)
 	}
 
 	LocationPage.prototype.exitCurrentMode = function()
