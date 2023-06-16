@@ -327,8 +327,10 @@
 	{
 		const self = this,
 			markerSymbol = {
-				type: "simple-marker",
-				color: [112, 123, 249]
+				type: "picture-marker",
+				url: "./global/img/map/map-pin.png",
+				width: "32px",
+				height: "32px",
 			},
 			records = await self.getLocationRecords();
 
