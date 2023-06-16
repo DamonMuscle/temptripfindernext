@@ -1030,6 +1030,21 @@
 		}
 	};
 
+	DataTypeHelper.prototype.getSearchUrl = function(dbid, dataType)
+	{
+		// currently gpsevent is not included in Tripfinder, comment the following code
+		/*
+		if (dataType === "gpsevent")
+		{
+			return TF.Helper.VehicleEventHelper.getRequestURL() + "?getCount=false&databaseId=" + dbid;
+		}
+		*/
+		
+		const prefix = dbid == null ? tf.api.apiPrefix() : `${tf.api.apiPrefixWithoutDatabase()}/${dbid}`;
+		const endpoint = this.getEndpoint(dataType);
+		return pathCombine(prefix, "search", endpoint);
+	};
+
 	DataTypeHelper.prototype.getRecordByIdsAndColumns = function(dbid, dataType, ids, columns, sortFields)
 	{
 		const generateSortItem = name => ({ Name: name, isAscending: "asc", Direction: "Ascending" });

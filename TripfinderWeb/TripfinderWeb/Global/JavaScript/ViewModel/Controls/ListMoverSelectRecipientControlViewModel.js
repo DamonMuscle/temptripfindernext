@@ -3,6 +3,13 @@
 	createNamespace('TF.Control').ListMoverSelectRecipientControlViewModel = ListMoverSelectRecipientControlViewModel;
 	function ListMoverSelectRecipientControlViewModel(selectedData, options)
 	{
+		if (options.columnSources)
+		{
+			this.columnSources = options.columnSources;
+		}
+
+		options.serverPaging = true;
+
 		TF.Control.KendoListMoverWithSearchControlViewModel.call(this, selectedData, options);
 	}
 
@@ -74,15 +81,21 @@
 	ListMoverSelectRecipientControlViewModel.prototype.onBeforeLeftGridDataBound = function(leftSearchGrid)
 	{
 		TF.Control.KendoListMoverWithSearchControlViewModel.prototype.onBeforeLeftGridDataBound.call(leftSearchGrid);
-		leftSearchGrid.$container.find(".k-grid-content tr").map(function(idx, row)
+		var self = this;
+		if (self.options.emailCheck === false)
+		{
+			return;
+		}
+
+		var emailColumnIndex = (self.options.type === "contact" || self.options.type === "staff") ? 2 : 3;
+
+		leftSearchGrid.$container.find(".k-grid-content table[role=grid] tr").map(function(idx, row)
 		{
 			var $row = $(row);
-			var $colMail = $($row.find("td")[3]);
-			if ($colMail.text().trim() === "")
+			var $colMail = $row.find("td").eq(emailColumnIndex);
+			if (!$colMail.text().trim() || (self.options.type === "user" && $row.find("td").eq(4).text() === "true"))
 			{
-				$row.addClass("disable");
-				$row.css("color", "grey");
-				$row.bind("select", function(e)
+				$row.addClass("disable").css("color", "grey").bind("select", function(e)
 				{
 					e.preventDefault();
 				});
@@ -124,11 +137,10 @@
 
 	ListMoverSelectRecipientControlViewModel.prototype.apply = function()
 	{
-		TF.Control.KendoListMoverWithSearchControlViewModel.prototype.apply.call(this);
-		return new Promise(function(resolve, reject)
+		return TF.Control.KendoListMoverWithSearchControlViewModel.prototype.apply.call(this).then(function(selectedData)
 		{
-			resolve(this.selectedData);
-		}.bind(this));
+			return selectedData;
+		});
 	};
 
 	ListMoverSelectRecipientControlViewModel.prototype.cancel = function()

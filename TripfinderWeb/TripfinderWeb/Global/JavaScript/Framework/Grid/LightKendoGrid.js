@@ -274,7 +274,7 @@
 
 	LightKendoGrid.prototype._initLinkTd = function()
 	{
-		this.$container.find("table tr td").each(function(i, item)
+		this.$container.find(">.k-grid-content>.k-virtual-scrollable-wrap>table>tbody>tr>td").each(function(i, item)
 		{
 			var htmlText = $(item).html(),
 				validateLink = this._validateLink(htmlText),
@@ -292,10 +292,36 @@
 					});
 				}
 				else
+				{
 					content = $('<div>' + htmlText + '</div>').addClass('link').css('padding', '0 .6em').css('cursor', 'pointer').attr('title', 'Press "Alt" and left click to open link');
+				}
+
+				if (this._gridType === 'form')
+				{
+					content.addClass("form-link");
+				}
 
 				$(item).empty().append(content);
 				$(item).addClass("has-link");
+			}
+			if (validateMail)
+			{
+				var content;
+				if (TF.isMobileDevice)
+				{
+					content = $('<a>' + htmlText + '</a>').addClass('link').addClass('tf-grid-mobile-inner-link').on('click', function(e)
+					{
+						window.open(htmlText, '_blank ');
+
+						e.stopPropagation();
+					});
+				}
+				else
+				{
+					content = $('<div><a href=mailto:' + htmlText + '>' + htmlText + '</a></div>').addClass('mail');
+				}
+
+				$(item).empty().append(content);
 			}
 		}.bind(this));
 	};

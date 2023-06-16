@@ -1,21 +1,22 @@
 (function()
 {
-	createNamespace('TF.Control').SendEmailOfGridViewModel = SendEmailOfGridViewModel;
+	createNamespace("TF.Control").SendEmailOfGridViewModel = SendEmailOfGridViewModel;
 
-	function SendEmailOfGridViewModel(option, obDisableControl)
+	const DataTypesWithSummary = ['staff'];
+	function SendEmailOfGridViewModel(options, obDisableControl)
 	{
-		this.option = option;
+		this.options = options;
 		this.status = ko.observable("sendEmail");
 		this.obdisabledSend = obDisableControl;
-		if (this.option.modelType === 'SendTo')
+		if (this.options.modelType === "SendTo")
 		{
-			this.disabledSendInMobile = ko.observable('disabled');
+			this.disabledSendInMobile = ko.observable("disabled");
 		}
 		else
 		{
-			this.disabledSendInMobile = ko.observable('');
+			this.disabledSendInMobile = ko.observable("");
 		}
-		this.titleContent = ko.observable(option.modelType === 'SendTo' ? 'SEND TO' : 'EMAIL');
+		this.titleContent = ko.observable(options.modelType === "SendTo" ? "SEND TO" : "EMAIL");
 		this.obRecipientList = ko.observableArray([]);
 		this.obSearchRecipient = ko.observable("");
 		this.obRecipientSearchResultIsEmpty = ko.observable(false);
@@ -27,55 +28,77 @@
 		this.obErrorMessageDivIsShow = ko.observable(false);
 		this.obValidationErrors = ko.observableArray([]);
 		this.obEntityDataModel = ko.observable(new TF.DataModel.SettingsConfigurationDataModal());
-		this.obEmails = ko.observableArray(option.emailAddress);
+		this.obEmails = ko.observableArray(options.emailAddress);
 		this.obCcEnable = ko.observable(false);
 		this.obBccEnable = ko.observable(false);
-		if (option.placeEmailTo)
+
+		this.obSelectEmailToList = ko.observableArray([]);
+		this.obSelectEmailCcList = ko.observableArray([]);
+		this.obSelectEmailBccList = ko.observableArray([]);
+
+		const self = this;
+		if (options.placeEmailTo && options.modelType === "Email")
 		{
-			tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint(this.option.type)),
+			// Click RCM -> Email in Contacts grid will reach here only.
+			Promise.all(tf.urlHelper.chunk(this.options.selectedIds, 500).map(function(tempArr)
+			{
+				return tf.promiseAjax.get(tf.dataTypeHelper.getApiPrefix(self.getEmailRecipientType()),
+					{
+						paramData: {
+							"@filter": `in(Id,${tempArr.join(",")})`
+						}
+					},
+					{
+						overlay: false
+					}
+				)
+			})).then(function(data)
+			{
+				return data.flatMap(function(cur)
 				{
-					paramData:
-					{
-						"@filter": "in(id," + this.option.selectedIds.toString() + ")",
-						"@fields": "Email,ContactEmail,DestinationEmail"
-					}
-				}, { overlay: false }).then(function(result)
+					return cur.Items;
+				});
+			}).then(function(result)
+			{
+				var address = [];
+				result.forEach(item =>
 				{
-					var address = [], addressList = [];
-					result.Items.filter(function(item)
+					if (item.Email)
 					{
-						return !!item.ContactEmail || !!item.DestinationEmail || !!item.Email;
-					}).map(function(item)
-					{
-						addressList.push(item.ContactEmail, item.DestinationEmail, item.Email);
-					});
-					addressList.filter(function(item, index, arr)
-					{
-						return arr.indexOf(item, 0) === index && !!item;
-					}).map(function(item)
-					{
-						address.push(
-							new TF.DataModel.ReportReceiptDataModel(
-								{
-									SelectedUserId: 0,
-									EmailAddress: item
-								}));
-					});
-					if (option.placeEmailTo == 'Bcc')
-					{
-						this.obEmailBccList(address);
-						this.obBccEnable(true);
+						const name = [item.FirstName, item.LastName].filter(x => x).join(" ") || item.LoginId;
+						address.push(new TF.DataModel.ScheduledReportReceiptDataModel({
+							SelectedUserId: item.Id,
+							EmailAddress: item.Email,
+							UserName: name
+						}));
 					}
-					else
-					{
-						this.obEmailToList(address);
-					}
-				}.bind(this));
+
+				});
+
+				if (options.placeEmailTo == "Bcc")
+				{
+					this.obEmailBccList(address);
+					this.obSelectEmailBccList(address);
+					this.obBccEnable(true);
+				}
+				else
+				{
+					this.obEmailToList(address);
+					this.obSelectEmailToList(address);
+				}
+			}.bind(this));
 		}
 
-		this.initFromEmailSource(option).then(function()
+		this.initFromEmailSource(options).then(function()
 		{
-			this.obEntityDataModel().emailAddress(option.emailAddress[0]);
+			// if (options.emailAddress.indexOf(tf.storageManager.get("fromEmailAddress")) >= 0)
+			// {
+			// 	this.obEntityDataModel().emailAddress(tf.storageManager.get("fromEmailAddress"));
+			// }
+			// else
+			// {
+			this.obEntityDataModel().emailAddress(options.emailAddress[0]);
+			// }
 		}.bind(this));
 		this.obEntityDataModel().emailAddress.subscribe(function()
 		{
@@ -89,96 +112,66 @@
 		this.obEmailDoneClickable = ko.observable(true);
 		this.obEmailToString = ko.computed(function()
 		{
-			if (TF.isPhoneDevice)
-			{
-				var emailCount = this.obEmailToList().length;
-				if (!this.obEmailToList() || emailCount === 0)
-				{
-					return "";
-				}
-				else if (emailCount === 1)
-				{
-					return this.EmailFormatter(this.obEmailToList()[0]);
-				}
-				else
-				{
-					return this.EmailFormatter(this.obEmailToList()[0]) + " & " + (emailCount - 1) + " others";
-				}
-			}
-			return this.obEmailToList().map(function(item)
-			{
-				return this.EmailFormatter(item);
-			}.bind(this)).join(";");
+			return this.convertEmailListToString(this.obEmailToList());
 		}.bind(this));
 		this.obEmailCcString = ko.computed(function()
 		{
-			if (TF.isPhoneDevice)
-			{
-				var emailCount = this.obEmailCcList().length;
-				if (!this.obEmailCcList() || emailCount === 0)
-				{
-					return "";
-				}
-				else if (emailCount === 1)
-				{
-					return this.EmailFormatter(this.obEmailCcList()[0]);
-				}
-				else
-				{
-					return this.EmailFormatter(this.obEmailCcList()[0]) + " & " + (emailCount - 1) + " others";
-				}
-			}
-			return this.obEmailCcList().map(function(item)
-			{
-				return this.EmailFormatter(item);
-			}.bind(this)).join(";");
+			return this.convertEmailListToString(this.obEmailCcList());
 		}.bind(this));
 		this.obEmailBccString = ko.computed(function()
 		{
-			if (TF.isPhoneDevice)
-			{
-				var emailCount = this.obEmailBccList().length;
-				if (!this.obEmailBccList() || emailCount === 0)
-				{
-					return "";
-				}
-				else if (emailCount === 1)
-				{
-					return this.EmailFormatter(this.obEmailBccList()[0]);
-				}
-				else
-				{
-					return this.EmailFormatter(this.obEmailBccList()[0]) + " & " + (emailCount - 1) + " others";
-				}
-			}
-			return this.obEmailBccList().map(function(item)
-			{
-				return this.EmailFormatter(item);
-			}.bind(this)).join(";");
+			return this.convertEmailListToString(this.obEmailBccList());
 		}.bind(this));
 		this.documentEntities = ko.observableArray([]);
-		if (this.option.modelType === 'SendTo')
+		if (this.options.modelType === "SendTo")
+		{
 			this.initAttachments();
+		}
 
 		this.setEmailSubject();
 		this.pageLevelViewModel = new TF.PageLevel.EmailPageLevelViewModel(this);
 		this.obSearchRecipient.subscribe(this.searchRecipientForMobile.bind(this));
 	}
 
+	SendEmailOfGridViewModel.prototype.convertEmailListToString = function(emailList)
+	{
+		var list = _.uniq((emailList || []).map(function(i)
+		{
+			return (i.emailAddress() || "").toLowerCase();
+		}).filter(Boolean));
+
+		if (TF.isPhoneDevice)
+		{
+			var emailCount = list.length;
+			if (emailCount === 0)
+			{
+				return "";
+			}
+			else if (emailCount === 1)
+			{
+				return list[0];
+			}
+			else
+			{
+				return list[0] + " & " + (emailCount - 1) + " others";
+			}
+		}
+
+		return list.join(";");
+	};
+
 	SendEmailOfGridViewModel.prototype.initAttachments = function()
 	{
 		this.documentEntities.push(
 			{
-				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".csv",
-				Guid: ko.observable(''),
+				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.options.term) + ".csv",
 				DatabaseId: tf.datasourceManager.databaseId,
 				DownLoadComplete: ko.observable(true),
 				UploadFailed: ko.observable(false)
 			});
 		this.documentEntities.push(
 			{
-				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".xls",
-				Guid: ko.observable(''),
+				FileName: tf.applicationTerm.getApplicationTermPluralByName(this.options.term) + ".xlsx",
 				DatabaseId: tf.datasourceManager.databaseId,
 				DownLoadComplete: ko.observable(true),
 				UploadFailed: ko.observable(false)
@@ -187,7 +180,10 @@
 
 	SendEmailOfGridViewModel.prototype.setEmailSubject = function()
 	{
-		this.obEntityDataModel().emailSubject(this.option.subject);
+		if (this.options.modelType !== 'Email')
+		{
+			this.obEntityDataModel().emailSubject(this.options.subject);
+		}
 	};
 
 	SendEmailOfGridViewModel.prototype.EmailFormatter = function(item)
@@ -195,39 +191,44 @@
 		return item.emailAddress();
 	};
 
-	SendEmailOfGridViewModel.prototype.initFromEmailSource = function(option)
+	SendEmailOfGridViewModel.prototype.initFromEmailSource = function(options)
 	{
-		if (option.emailAddress)
+		if (options.emailAddress)
 		{
 			return Promise.resolve();
 		}
-		option.emailAddress = [];
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), null, { overlay: false })
+		options.emailAddress = [];
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"),
+			{
+				paramData:
+				{
+					clientId: tf.authManager.clientKey
+				}
+			}, { overlay: false })
 			.then(function(data)
 			{
 				if (!!data.Items[0].EmailAddress)
 				{
-					option.emailAddress.push(data.Items[0].EmailAddress);
+					options.emailAddress.push(data.Items[0].EmailAddress);
 				}
 			}.bind(this)).then(function()
 			{
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userprofiles?dbid=" + tf.datasourceManager.databaseId + "&@relationships=all"), {}, { overlay: false })
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userprofiles?dbid=" + tf.datasourceManager.databaseId), {}, { overlay: false })
 					.then(function(response)
 					{
 						if (!!response.Items[0].Email)
 						{
-							if (option.emailAddress.length <= 0 || option.emailAddress[0] !== response.Items[0].Email)
+							if (options.emailAddress.length <= 0 || options.emailAddress[0] !== response.Items[0].Email)
 							{
-								option.emailAddress.push(response.Items[0].Email);
+								options.emailAddress.push(response.Items[0].Email);
 							}
 						}
 					}.bind(this));
 			}.bind(this)).then(function()
 			{
-				this.obEmails(option.emailAddress);
+				this.obEmails(options.emailAddress);
 			}.bind(this));
 	};
-
 
 	function testEmail(email)
 	{
@@ -235,7 +236,7 @@
 		var emailList = [];
 		email.split(reg).map(function(item)
 		{
-			if (item.trim() != '')
+			if (item.trim() != "")
 			{
 				emailList.push(item.trim());
 			}
@@ -279,7 +280,7 @@
 				});
 				self.pageLevelViewModel.obValidationErrors(errors);
 			};
-		var validator;
+
 		if (!TF.isPhoneDevice)
 		{
 			this._$form.find("input[name='from']").focus();
@@ -324,67 +325,8 @@
 				{
 					callback: function(value, validator, $field)
 					{
-						if (TF.isPhoneDevice)
-						{
-							return true;
-						}
-						if (value)
-						{
-							updateErrors($field, "required");
-						}
-						value = value.trim();
-						if (value === "")
-						{
-							this.obEmailToList([]);
-							return true;
-						}
-						var result = true;
-						var reg = /[,;]/;
-						var emailList = value.split(reg);
-						var errorEmails = [];
-						var oldList = this.obEmailToList();
-						var newList = [];
-						$.each(emailList, function(n, item)
-						{
-							item = item.trim();
-							if (item == "")
-							{
-								return;
-							}
-							var isValid = testEmail(item).valid;
-							if (!isValid)
-							{
-								errorEmails.push(item);
-								result = false;
-							}
-
-							var to = Enumerable.From(oldList).Where(function(c)
-							{
-								return this.EmailFormatter(c).trim() == item.trim();
-							}.bind(this)).ToArray();
-							if (to.length > 0)
-							{
-								newList.push(to[0]);
-							}
-							else
-							{
-								newList.push(
-									new TF.DataModel.ReportReceiptDataModel(
-										{
-											SelectedUserId: 0,
-											EmailAddress: item
-										})
-								);
-							}
-
-						}.bind(this));
-
-						this.obEmailToList(newList);
-						this._$form.find("small[data-bv-for=mailToList][data-bv-validator=callback]").text(errorEmails.length == 1 ? errorEmails[0] + ' is not a valid email.' : errorEmails.length + ' emails are invalid.');
-
-						return result;
-
-					}.bind(this)
+						return self.validateEmail("To", value, $field, updateErrors);
+					}
 				}
 			}
 		};
@@ -397,67 +339,8 @@
 				{
 					callback: function(value, validator, $field)
 					{
-						if (TF.isPhoneDevice)
-						{
-							return true;
-						}
-						if (value)
-						{
-							updateErrors($field, "required");
-						}
-						value = value.trim();
-						if (value === "")
-						{
-							this.obEmailCcList([]);
-							return true;
-						}
-						var result = true;
-						var reg = /[,;]/;
-						var emailList = value.split(reg);
-						var errorEmails = [];
-						var oldList = this.obEmailCcList();
-						var newList = [];
-						$.each(emailList, function(n, item)
-						{
-							item = item.trim();
-							if (item == "")
-							{
-								return;
-							}
-							var isValid = testEmail(item).valid;
-							if (!isValid)
-							{
-								errorEmails.push(item);
-								result = false;
-							}
-
-							var to = Enumerable.From(oldList).Where(function(c)
-							{
-								return this.EmailFormatter(c).trim() == item.trim();
-							}.bind(this)).ToArray();
-							if (to.length > 0)
-							{
-								newList.push(to[0]);
-							}
-							else
-							{
-								newList.push(
-									new TF.DataModel.ReportReceiptDataModel(
-										{
-											SelectedUserId: 0,
-											EmailAddress: item
-										})
-								);
-							}
-
-						}.bind(this));
-
-						this.obEmailCcList(newList);
-						this._$form.find("small[data-bv-for=mailCcList][data-bv-validator=callback]").text(errorEmails.length == 1 ? errorEmails[0] + ' is not a valid email.' : errorEmails.length + ' emails are invalid.');
-
-						return result;
-
-					}.bind(this)
+						return self.validateEmail("Cc", value, $field, updateErrors);
+					}
 				}
 			}
 		};
@@ -470,67 +353,8 @@
 				{
 					callback: function(value, validator, $field)
 					{
-						if (TF.isPhoneDevice)
-						{
-							return true;
-						}
-						if (value)
-						{
-							updateErrors($field, "required");
-						}
-						value = value.trim();
-						if (value === "")
-						{
-							this.obEmailBccList([]);
-							return true;
-						}
-						var result = true;
-						var reg = /[,;]/;
-						var emailList = value.split(reg);
-						var errorEmails = [];
-						var oldList = this.obEmailBccList();
-						var newList = [];
-						$.each(emailList, function(n, item)
-						{
-							item = item.trim();
-							if (item == "")
-							{
-								return;
-							}
-							var isValid = testEmail(item).valid;
-							if (!isValid)
-							{
-								errorEmails.push(item);
-								result = false;
-							}
-
-							var to = Enumerable.From(oldList).Where(function(c)
-							{
-								return this.EmailFormatter(c).trim() == item.trim();
-							}.bind(this)).ToArray();
-							if (to.length > 0)
-							{
-								newList.push(to[0]);
-							}
-							else
-							{
-								newList.push(
-									new TF.DataModel.ReportReceiptDataModel(
-										{
-											SelectedUserId: 0,
-											EmailAddress: item
-										})
-								);
-							}
-
-						}.bind(this));
-
-						this.obEmailBccList(newList);
-						this._$form.find("small[data-bv-for=mailBccList][data-bv-validator=callback]").text(errorEmails.length == 1 ? errorEmails[0] + ' is not a valid email.' : errorEmails.length + ' emails are invalid.');
-
-						return result;
-
-					}.bind(this)
+						return self.validateEmail("Bcc", value, $field, updateErrors);
+					}
 				}
 			}
 		};
@@ -538,13 +362,13 @@
 		$(el).bootstrapValidator(
 			{
 				excluded: [],
-				live: 'enabled',
-				message: 'This value is not valid',
+				live: "enabled",
+				message: "This value is not valid",
 				fields: validatorFields
-			}).on('success.field.bv', function(e, data)
+			}).on("success.field.bv", function(e, data)
 			{
-				var $parent = data.element.closest('.form-group');
-				$parent.removeClass('has-success');
+				var $parent = data.element.closest(".form-group");
+				$parent.removeClass("has-success");
 				if (!isValidating)
 				{
 					isValidating = true;
@@ -556,115 +380,160 @@
 		this.obEntityDataModel().apiIsDirty(false);
 		this.loadRecipientsForMobile();
 
-		this.obdisabledSend(false)
+		this.obdisabledSend(false);	// Allow send email after initialize (as no attachments pregeneration needed now)
 	};
 
-	SendEmailOfGridViewModel.prototype.GetProgress = function()
+	SendEmailOfGridViewModel.prototype.validateEmail = function(emailType, value, $field, updateErrors)
 	{
-		var self = this;
-		tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", self.option.type, "export", "getProgress"), {}, { overlay: false })
-			.then(function(response)
-			{
-				if (response.Items.length > 0)
-				{
-					self.documentEntities().map(function(item)
-					{
-						item.FileProgress(response.Items[0] + '%');
-					});
-				}
-			});
-	};
-
-	SendEmailOfGridViewModel.prototype.LoadAttachments = function()
-	{
-		var self = this;
-
-		var url = pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getExportEndpoint(this.option.type));
-		var requestOption =
+		if (TF.isPhoneDevice)
 		{
-			paramData:
-			{
-				fileFormat: 'xls'
-			},
-			data:
-			{
-				"gridLayoutExtendedEntity": this.option.layout,
-				term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
-				"selectedIds": this.option.selectedIds,
-				"sortItems": this.option.sortItems,
-			}
-		};
-
-		if (this.option.type === "busfinderhistorical")
-			self.option.setRequestOption(requestOption);
-
-		return tf.promiseAjax.post(url, requestOption, { overlay: false })
-			.then(function(response)
-			{
-				if (this.intervalID)
-					clearInterval(this.intervalID);
-				this.obdisabledSend(false);
-				this.disabledSendInMobile('');
-
-				if (response.StatusCode != 200)
-				{
-					this.documentEntities().map(function(item)
-					{
-						item.FileProgress('100%');
-						item.DownLoadComplete(true);
-						item.UploadFailed(true);
-					}.bind(this));
-				}
-				else
-				{
-					if (response.Items && response.Items.length > 0)
-					{
-						var obj = response.Items[0];
-						this.documentEntities().map(function(item)
-						{
-							item.FileProgress('100%');
-							item.DownLoadComplete(true);
-							item.UploadFailed(false);
-							if (item.Filename === tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".KML")
-							{
-								if (obj.Kml)
-								{
-									item.Guid(obj.Kml.Guid);
-								}
-							}
-							else if (obj.Document)
-							{
-								item.Guid(obj.Document.Guid);
-							}
-							else if (obj)
-							{
-								item.Guid(obj);
-							}
-						}.bind(this));
-					}
-				}
-				return this.resetProgress();
-			}.bind(this))
-			.catch(function()
-			{
-				this.documentEntities().map(function(item)
-				{
-					item.FileProgress('100%');
-					item.DownLoadComplete(true);
-					item.UploadFailed(true);
-				}.bind(this));
-			}.bind(this));
-	};
-
-	SendEmailOfGridViewModel.prototype.resetProgress = function()
-	{
-		if (this.option.modelType === 'SendTo')
-		{
-			if (this.setTimeoutID)
-				window.clearTimeout(this.setTimeoutID);
-			return tf.promiseAjax["get"](pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "resetProgress"), {}, { overlay: false });
+			return true;
 		}
-		return Promise.resolve(true);
+
+		var self = this,
+			obEmailList = self[String.format("obEmail{0}List", emailType)];
+		if (value)
+		{
+			updateErrors($field, "required");
+		}
+		value = value.trim();
+
+		if (!value)
+		{
+			obEmailList([]);
+			return true;
+		}
+
+		var result = true,
+			reg = /[,;]/,
+			errorEmails = [],
+			oldList = obEmailList(),
+			emptyEmailList = obEmailList().filter(function(item) { return !self.EmailFormatter(item); }),
+			newList = [];
+
+		_.uniq(value.split(reg).map(function(i) { return i.trim(); })).forEach(function(item)
+		{
+			item = item.trim();
+			if (!item)
+			{
+				return;
+			}
+
+			if (!testEmail(item).valid)
+			{
+				errorEmails.push(item);
+				result = false;
+			}
+
+			var matched = oldList.filter(function(c)
+			{
+				return (self.EmailFormatter(c) || "").trim().toLowerCase() == item.trim().toLowerCase();
+			})
+
+			if (matched.length > 0)
+			{
+				newList = newList.concat(matched);
+			}
+			else
+			{
+				newList.push(new TF.DataModel.ScheduledReportReceiptDataModel({
+					SelectedUserId: 0,
+					EmailAddress: item
+				}));
+			}
+		});
+
+		obEmailList(newList.concat(emptyEmailList));
+		if (self.shouldShowSummary())
+		{
+			return true;
+		}
+		var message = errorEmails.length == 1 ? errorEmails[0] + " is not a valid email." : errorEmails.length + " emails are invalid.";
+		self._$form.find(String.format("small[data-bv-for=mail{0}List][data-bv-validator=callback]", emailType)).text(message);
+
+		if (result)
+		{
+			self.pageLevelViewModel.obValidationErrorsSpecifed([]);
+		}
+
+		return result;
+	};
+
+	SendEmailOfGridViewModel.prototype.getOptionsForGeneratingAttachments = function()
+	{
+		var self = this,
+			fileFormats = self.documentEntities().map(function(entity)
+			{
+				var fileNameParts = entity.FileName.split(".");
+				return fileNameParts[fileNameParts.length - 1];
+			}),
+			requestOption =
+			{
+				databaseId: tf.datasourceManager.databaseId,
+				dataTypeId: tf.dataTypeHelper.getId(self.options.type),
+				fileFormats: fileFormats,
+				data:
+				{
+					DocumentType: fileFormats[0],
+					FilterSet: {},
+					GridLayoutExtendedEntity: self.options.layout,
+					SelectedIds: self.options.selectedIds,
+					SortItems: self.options.sortItems,
+					Term: tf.applicationTerm.getApplicationTermPluralByName(self.options.term)
+				}
+			};
+
+		requestOption.data.GridLayoutExtendedEntity.GridType = self.options.type;	// Set GridType property which is checked by GridExporter
+
+		if (self.options.type === "busfinderhistorical")
+		{
+			self.options.setRequestOption(requestOption);
+		}
+		else if (self.options.type === "form")
+		{
+			self.options.setRequestOption(requestOption, self.options.formId);
+		}
+
+		// return tf.promiseAjax.post(url, requestOption, { overlay: false }).then(function(response)
+		// {
+		// 	if (this.intervalID)
+		// 		clearInterval(this.intervalID);
+
+		// 	this.obdisabledSend(false);
+		// 	this.disabledSendInMobile("");
+
+		// 	if (response.StatusCode != 200)
+		// 	{
+		// 		this.documentEntities().map(function(item)
+		// 		{
+		// 			item.DownLoadComplete(true);
+		// 			item.UploadFailed(true);
+		// 		}.bind(this));
+		// 	}
+		// 	else
+		// 	{
+		// 		if (response.Items && response.Items.length > 0)
+		// 		{
+		// 			var obj = response.Items[0];
+		// 			this.documentEntities().map(function(item)
+		// 			{
+		// 				item.DownLoadComplete(true);
+		// 				item.UploadFailed(false);
+		// 			}.bind(this));
+		// 		}
+		// 	}
+		// 	return Promise.resolve(true);
+		// }.bind(this))
+		// 	.catch(function()
+		// 	{
+		// 		this.documentEntities().map(function(item)
+		// 		{
+		// 			item.DownLoadComplete(true);
+		// 			item.UploadFailed(true);
+		// 		}.bind(this));
+		// 	}.bind(this));
+
+		return requestOption;
 	};
 
 	SendEmailOfGridViewModel.prototype.focusField = function(viewModel, e)
@@ -684,146 +553,213 @@
 
 	SendEmailOfGridViewModel.prototype.selectRecipientToClick = function(viewModel, e)
 	{
-		var addressList;
-		var addressType = $(e.currentTarget).data('send-type');
-		if (addressType === 'To')
+		var self = this,
+			sendType = $(e.currentTarget).data("send-type"),
+			addressList = self[String.format("obEmail{0}List", sendType)],
+			selectAddressList = self[String.format("obSelectEmail{0}List", sendType)];
+		self.getSelectedItems(addressList()).then(function(selectedItems)
 		{
-			addressList = this.obEmailToList();
-		}
-		else if (addressType === 'Cc')
-		{
-			addressList = this.obEmailCcList();
-		}
-		else
-		{
-			addressList = this.obEmailBccList();
-		}
-		var ids = addressList.map(function(item)
-		{
-			return item.selectedUserId();
-		});
-		var searchData = new TF.SearchParameters(null, null, null, null, null, ids, null);
-		tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "users"),
-			{
-				data: searchData.data
-			})
-			.then(function(apiResponse)
-			{
-				tf.modalManager.showModal(
-					new TF.Modal.ListMoverSelectRecipientControlModalViewModel(
-						apiResponse.Items
-					))
-					.then(function(result)
+			var options = self.options.modelType != "Email" ? {} : {
+				type: self.getEmailRecipientType(),
+				skipEmptyAndDuplicateCheck: true,
+				columnSources: [
 					{
-						if (result === true)
+						FieldName: "FirstName",
+						DisplayName: "First Name",
+						type: "string",
+						Width: "80px"
+					},
+					{
+						FieldName: "LastName",
+						DisplayName: "Last Name",
+						type: "string",
+						Width: "80px"
+					},
+					{
+						FieldName: "Email",
+						DisplayName: "Email",
+						type: "string",
+						Width: "140px"
+					}
+				]
+			};
+			tf.modalManager.showModal(new TF.Modal.ListMoverSelectRecipientControlModalViewModel(selectedItems, options)).then(function(result)
+			{
+				if (!result)
+				{
+					return;
+				}
+				const emailAddressList = [];
+				var list = result.map(function(item)
+				{
+					const name = [item.FirstName, item.LastName].filter(x => x).join(" ") || item.LoginId;
+					if (!emailAddressList.includes(item.Email))
+					{
+						emailAddressList.push(item.Email);
+					}
+					return new TF.DataModel.ScheduledReportReceiptDataModel(
 						{
-							return;
-						}
-						var list = result.map(function(item)
-						{
-							var name = item.LoginId;
-							if (item.FirstName != "" || item.LastName != "")
-							{
-								name = item.FirstName + " " + item.LastName;
-							}
-							return new TF.DataModel.ReportReceiptDataModel(
-								{
-									SelectedUserId: item.Id,
-									EmailAddress: item.Email,
-									UserName: name
-								});
+							SelectedUserId: item.Id,
+							EmailAddress: item.Email,
+							UserName: name
 						});
-						$.each(addressList, function(n, item)
-						{
-							if (item.selectedUserId() == 0)
-							{
-								list.push(item);
-							}
-						});
-						if (addressType === 'To')
-						{
-							this.obEmailToList(list);
-						}
-						else if (addressType === 'Cc')
-						{
-							this.obEmailCcList(list);
-						}
-						else
-						{
-							this.obEmailBccList(list);
-						}
-					}.bind(this));
-			}.bind(this));
+				});
+				list = list.concat(addressList().filter(function(i) { return i.selectedUserId() == 0 && !emailAddressList.includes(i.emailAddress()) }));
+				addressList(list);
+				selectAddressList(list);
+				self.pageLevelViewModel.saveValidate();
+			});
+		});
+	};
+
+	SendEmailOfGridViewModel.prototype.getSelectedItems = function(recipients)
+	{
+		var self = this;
+		return self.options.modelType === "Email" ? self.getSelectedItemsForContact(recipients) : self.getSelectedItemsForSystemUser(recipients);
+	};
+
+	SendEmailOfGridViewModel.prototype.getSelectedItemsForContact = function(recipients)
+	{
+		var self = this,
+			emails = recipients.filter(function(item)
+			{
+				return item.selectedUserId() === 0;
+			}).map(function(item)
+			{
+				return (item.emailAddress() || "").trim().toLowerCase();
+			}).filter(Boolean),
+			ids = recipients.filter(function(item)
+			{
+				return item.selectedUserId() !== 0;
+			}).map(function(item)
+			{
+				return item.selectedUserId();
+			});
+
+		emails = _.uniq(emails);
+
+		return Promise.all([
+			self.getSelectedItemsByIds(ids),
+			self.getSelectedItemsByEmails(emails).then(function(v) { return v.filter(function(i) { return i.DBID == tf.datasourceManager.databaseId; }) })
+		]).then(function(values)
+		{
+			return _.uniqBy(_.flattenDeep(values), function(i) { return i.Id; });
+		});
+	};
+
+	SendEmailOfGridViewModel.prototype.getSelectedItemsForSystemUser = function(recipients)
+	{
+		var self = this,
+			emails = recipients.map(function(item)
+			{
+				return (item.emailAddress() || "").trim().toLowerCase();
+			}).filter(Boolean);
+
+		return self.getSelectedItemsByEmails(emails);
+	};
+
+	SendEmailOfGridViewModel.prototype.getSelectedItemsByIds = function(ids)
+	{
+		var self = this;
+		return !ids.length ? Promise.resolve([]) : Promise.all(tf.urlHelper.chunk(ids, 1000).map(function(emailChunk)
+		{
+			var filterSyntax = emailChunk.join(","),
+				paramData = { "@filter": String.format("in(Id,{0})", filterSyntax) };
+
+			return tf.promiseAjax.get(self.getRequestUrl(), { paramData: paramData }).then(function(r)
+			{
+				return r.Items;
+			}, function()
+			{
+				return [];
+			});
+		})).then(function(values)
+		{
+			return _.flattenDeep(values);
+		});
+	};
+
+	SendEmailOfGridViewModel.prototype.getSelectedItemsByEmails = function(emails)
+	{
+		var self = this;
+		return !emails.length ? Promise.resolve([]) : Promise.all(tf.urlHelper.chunk(emails, 100).map(function(emailChunk)
+		{
+			var filterSyntax = emailChunk.join(","),
+				paramData = { "@filter": String.format("in(Email,{0})", filterSyntax) };
+
+			return tf.promiseAjax.get(self.getRequestUrl(), { paramData: paramData }).then(function(r)
+			{
+				return r.Items;
+			}, function()
+			{
+				return [];
+			});
+		})).then(function(values)
+		{
+			return _.flattenDeep(values);
+		});
 	};
 
 	SendEmailOfGridViewModel.prototype.retryClick = function(viewModel, e)
 	{
-		viewModel.FileProgress('0%');
-		viewModel.DownLoadComplete(false);
-		viewModel.UploadFailed(false);
-		this.intervalID = this.GetProgress();
-		this.obdisabledSend(true);
-		this.disabledSendInMobile('disabled');
+		var self = this,
+			isSendToMode = self.options.modelType === "SendTo",
+			paramData;
 
-		return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefix(), "search", this.option.type, "export", "email"),
-			{
-				data:
-				{
-					gridLayoutExtendedEntity: this.option.layout,
-					term: tf.applicationTerm.getApplicationTermPluralByName(this.option.term),
-					SelectedIds: this.option.selectedIds,
-					sortItems: this.option.sortItems,
-					documentType: this.option.modelType === 'SendTo' ? 'csv' : 'xls'
-				}
-			}, { overlay: false })
-			.then(function(response)
-			{
-				if (this.intervalID)
-					clearInterval(this.intervalID);
-				this.obdisabledSend(false);
-				this.disabledSendInMobile('');
+		if (isSendToMode)
+		{
+			paramData = {
+				databaseId: tf.datasourceManager.databaseId
+			};
+		}
+		else
+		{
+			paramData = {
+				databaseId: tf.datasourceManager.databaseId,
+				dataTypeId: tf.dataTypeHelper.getId(self.options.type),
+			};
+		}
 
-				if (response.StatusCode != 200)
-				{
-					viewModel.FileProgress('100%');
-					viewModel.DownLoadComplete(true);
-					viewModel.UploadFailed(true);
-				}
-				else
-				{
-					if (response.Items && response.Items.length > 0)
-					{
-						var obj = response.Items[0];
-						viewModel.FileProgress('100%');
-						viewModel.DownLoadComplete(true);
-						viewModel.UploadFailed(false);
-						if (viewModel.Filename === tf.applicationTerm.getApplicationTermPluralByName(this.option.term) + ".KML")
-						{
-							if (obj.kml)
-							{
-								viewModel.Guid(obj.kml.Guid);
-							}
-						}
-						else
-						{
-							if (obj.document)
-							{
-								viewModel.Guid(obj.document.Guid);
-							}
-						}
-					}
-				}
-				this.resetProgress();
-			}.bind(this))
-			.catch(function()
+		return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails"),
 			{
-				this.documentEntities().map(function(item)
-				{
-					item.FileProgress('100%');
-					item.DownLoadComplete(true);
-					item.UploadFailed(true);
-				}.bind(this));
-			}.bind(this));;
+				paramData: paramData,
+				data: this.clientConfig,
+				overlay: false
+			});
+		// .then(function()
+		// {
+		// 	this.obdisabledSend(false);
+		// 	this.disabledSendInMobile("");
+
+		// 	viewModel.DownLoadComplete(true);
+		// 	viewModel.UploadFailed(false);
+
+		// }.bind(this))
+		// .catch(function()
+		// {
+		// 	viewModel.DownLoadComplete(true);
+		// 	viewModel.UploadFailed(true);
+
+		// 	this.documentEntities().map(function(item)
+		// 	{
+		// 		item.DownLoadComplete(true);
+		// 		item.UploadFailed(true);
+		// 	}.bind(this));
+		// }.bind(this));;
+	};
+
+	SendEmailOfGridViewModel.prototype.getRequestUrl = function()
+	{
+		if (this.options.modelType === "SendTo")
+		{
+			return pathCombine(tf.api.apiPrefixWithoutDatabase(), "users");
+		}
+		else
+		{
+			return tf.dataTypeHelper.getApiPrefix(this.getEmailRecipientType());
+		}
+
+
 	};
 
 	SendEmailOfGridViewModel.prototype.deleteFileClick = function(viewModel, e)
@@ -837,12 +773,7 @@
 
 	SendEmailOfGridViewModel.prototype.apply = function()
 	{
-		return this.trysave()
-			.then(function(data)
-			{
-				return data;
-			})
-			.catch(function() { });
+		return this.trysave().catch(function() { });
 	};
 
 	SendEmailOfGridViewModel.prototype.trysave = function()
@@ -872,8 +803,8 @@
 						}
 						validationErrors.push(
 							{
-								name: ($(fielddata).attr('data-bv-error-name') ? $(fielddata).attr('data-bv-error-name') : $(fielddata).closest("div.form-group").find("strong").text()),
-								message: messages[i].replace('&lt;', '<').replace('&gt;', '>'),
+								name: ($(fielddata).attr("data-bv-error-name") ? $(fielddata).attr("data-bv-error-name") : $(fielddata).closest("div.form-group").find("strong").text()),
+								message: messages[i].replace("&lt;", "<").replace("&gt;", ">"),
 								field: $(fielddata)
 							});
 
@@ -898,7 +829,7 @@
 						{
 							info = "The Message has";
 						}
-						return tf.promiseBootbox.yesNo(info + " not been specified.  Are you sure you want to send?", "Confirmation Message")
+						return tf.promiseBootbox.yesNo(info + " not been specified.  Are you sure you want to send this email?", "Confirmation Message")
 							.then(function(ans)
 							{
 								if (!ans)
@@ -916,28 +847,10 @@
 			}.bind(this));
 	};
 
-
-	SendEmailOfGridViewModel.prototype._convertDocumentEntitiesToJSON = function(documentEntities)
-	{
-		var result = documentEntities.map(function(doc)
-		{
-			return {
-				Filename: doc.Filename,
-				Guid: doc.Guid(),
-				DatabaseId: doc.DatabaseId,
-				FileProgress: doc.FileProgress(),
-				DownLoadComplete: doc.DownLoadComplete(),
-				UploadFailed: doc.UploadFailed()
-			};
-		});
-
-		return result;
-	};
-
 	SendEmailOfGridViewModel.prototype.save = function()
 	{
 		var self = this,
-			isSendToMode = self.option.modelType === "SendTo",
+			isSendToMode = self.options.modelType === "SendTo",
 			paramData;
 
 		if (isSendToMode)
@@ -950,69 +863,136 @@
 		{
 			paramData = {
 				databaseId: tf.datasourceManager.databaseId,
-				dataTypeId: tf.dataTypeHelper.getId(self.option.type)
+				dataTypeId: tf.dataTypeHelper.getId(self.options.type)
 			};
 		}
+
 		return self.checkConfigure().then(function(result)
 		{
-			if (result)
+			if (!result)
 			{
-				var sendData = self.clientConfig;
-				function handleEmail(emails)
-				{
-					return _.uniq(emails.map(function(i)
-					{
-						return (i.emailAddress() || "").trim().toLowerCase();
-					}).filter(Boolean));
-				}
-				sendData.MailToList = handleEmail(self.obEmailToList());
-				sendData.MailCcList = handleEmail(self.obEmailCcList());
-				sendData.MailBccList = handleEmail(self.obEmailBccList());
-				sendData.EmailMessage = self.obEntityDataModel().emailMessage();
-				sendData.EmailSubject = self.obEntityDataModel().emailSubject();
-				sendData.Attachments = [];
-				sendData.EmailAddress = self.obEntityDataModel().emailAddress();
+				tf.promiseBootbox.alert("The SMTP Server must be configured to send emails. This is not configured for your product. Contact your System Administrator to configure these settings. If you continue to experience issues, contact us at support@transfinder.com or 888-427-2403.", "SMTP Server Settings Are Not Configured");
+			}
 
-				if (isSendToMode)
+			var sendData = self.clientConfig;
+			function handleEmail(emails)
+			{
+				return _.uniq(emails.map(function(i)
 				{
-					var attachOptions = self.getOptionsForGeneratingAttachments();
-					sendData.DataTypeId = attachOptions.dataTypeId;
-					sendData.FileFormats = attachOptions.fileFormats;
-					sendData.GridLayoutAndSelectedId = attachOptions.data;
-				}
-				return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails"),
+					return (i.emailAddress() || "").trim().toLowerCase();
+				}).filter(Boolean));
+			}
+
+			sendData.MailToList = handleEmail(self.obEmailToList());
+			sendData.MailCcList = handleEmail(self.obEmailCcList());
+			sendData.MailBccList = handleEmail(self.obEmailBccList());
+			sendData.EmailMessage = self.obEntityDataModel().emailMessage();
+			sendData.EmailSubject = self.obEntityDataModel().emailSubject();
+			sendData.Attachments = [];
+			sendData.EmailAddress = self.obEntityDataModel().emailAddress();
+
+			const shouldShowSummary = self.shouldShowSummary();
+			if (isSendToMode)
+			{
+				var attachOptions = self.getOptionsForGeneratingAttachments();
+				sendData.DataTypeId = attachOptions.dataTypeId;
+				sendData.FileFormats = attachOptions.fileFormats;
+				sendData.GridLayoutAndSelectedId = attachOptions.data;
+			}
+			// if data type should show summary for send email
+			else if (shouldShowSummary)
+			{
+				paramData.showSummary = true;
+				const sendTypes = ['To', 'Cc', 'Bcc'];
+				sendTypes.forEach(sendType =>
+				{
+					const senderList = self[`obSelectEmail${sendType}List`];
+					const senders = senderList().map(item => 
 					{
-						paramData: paramData,
-						data: sendData
-					}).then(function()
+						return {
+							EmailAddress: item._entityBackup.EmailAddress || '',
+							SenderName: item._entityBackup.UserName,
+							Key: item._entityBackup.SelectedUserId
+						}
+					});
+					sendData[`Mail${sendType}Senders`] = senders;
+				});
+			}
+			return tf.promiseAjax["post"](pathCombine(tf.api.apiPrefixWithoutDatabase(), "emails"),
+				{
+					paramData: paramData,
+					data: sendData
+				}).then(function(response)
+				{
+					if (isSendToMode)
 					{
 						return true;
-					}).catch(function()
+					}
+
+					let sendEmailResult = true;
+					if (shouldShowSummary)
 					{
-						return tf.promiseBootbox.okRetry(
+						const summary = response && response.Items && response.Items[0];
+						if (!summary)
+						{
+							return sendEmailResult;
+						}
+						let errorCount = 0;
+						let errorMessages = [];
+						summary.ErrorList.forEach(item =>
+						{
+							const senderFullNameArr = item.SenderFullName.split(',')
+							senderFullNameArr.forEach(sender =>
 							{
-								message: "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfnder.com or 888-427-2403",
-								title: "Unable to Send " + (!!self.option.selectedIds ? "" : "Test ") + "Email"
-							}).then(function(confirm)
-							{
-								if (!confirm)
-								{
-									return self.save();
-								}
+								const senderName = sender.trim();
+								errorMessages.push({ senderName, errorMessage: item.ErrorMessage });
+								errorCount++;
 							});
-					});
-			}
-			else
-			{
-				tf.promiseBootbox.alert("The SMTP Server must be configured to send emails. This is not configured for your product. Contact your System Administrator to configure these settings. If you continue to experience issues, contact us at support@transfinder.com or 888-427-2403", "SMTP Server Settings Are Not Configured");
-			}
-		}.bind(this));
+
+						});
+						errorCount = summary.ErrorCount > errorCount ? summary.ErrorCount : errorCount;
+						sendEmailResult = {
+							successCount: summary.SuccessCount,
+							errorCount: errorCount,
+							errorMessages: errorMessages.sort((last, now) => last.senderName.toLowerCase() > now.senderName.toLowerCase() ? 1 : -1).map(x => `-[${x.senderName}] (${x.errorMessage})`)
+						};
+					}
+					return sendEmailResult;
+
+				}).catch(function (error)
+				{
+					var message = "An email could not be sent. Verify your SMTP Server settings. If you continue to experience issues, contact us at support@transfinder.com or 888-427-2403.";
+					if (error && error.StatusCode === 500 && error.Message && error.Message.indexOf("Your file size is too big") != -1)
+					{
+						message = error.Message;
+					}
+					
+					return tf.promiseBootbox.okRetry(
+						{
+							message: message,
+							title: "Unable to Send " + (!!self.options.selectedIds ? "" : "Test ") + "Email"
+						}).then(function(confirm)
+						{
+							if (!confirm)
+							{
+								return self.save();
+							}
+						});
+				});
+		});
 	};
 
 	SendEmailOfGridViewModel.prototype.checkConfigure = function()
 	{
 		var self = this;
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"), { data: { clientId: tf.authManager.clientKey } }, { overlay: false })
+
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "clientconfigs"),
+			{
+				paramData:
+				{
+					clientId: tf.authManager.clientKey
+				}
+			}, { overlay: false })
 			.then(function(data)
 			{
 				if (data.Items && data.Items.length > 0)
@@ -1027,47 +1007,13 @@
 			});
 	};
 
-	SendEmailOfGridViewModel.prototype.getOptionsForGeneratingAttachments = function()
-	{
-		var self = this,
-			fileFormats = self.documentEntities().map(function(entity)
-			{
-				var fileNameParts = entity.FileName.split(".");
-				return fileNameParts[fileNameParts.length - 1];
-			}),
-			requestOption =
-			{
-				databaseId: tf.datasourceManager.databaseId,
-				dataTypeId: tf.dataTypeHelper.getId(self.option.type),
-				fileFormats: fileFormats,
-				data:
-				{
-					DocumentType: fileFormats[0],
-					FilterSet: {},
-					GridLayoutExtendedEntity: self.option.layout,
-					SelectedIds: self.option.selectedIds,
-					SortItems: self.option.sortItems,
-					Term: tf.applicationTerm.getApplicationTermPluralByName(self.option.term)
-				}
-			};
-
-		requestOption.data.GridLayoutExtendedEntity.GridType = self.option.type;	// Set GridType property which is checked by GridExporter
-
-		if (self.option.type === "busfinderhistorical")
-		{
-			self.option.setRequestOption(requestOption);
-		}
-
-		return requestOption;
-	}
-
 	SendEmailOfGridViewModel.prototype.close = function()
 	{
 		return new Promise(function(resolve, reject)
 		{
 			if (this.obEntityDataModel() && this.obEntityDataModel().apiIsDirty())
 			{
-				resolve(tf.promiseBootbox.yesNo("Are you sure you want to cancel this " + (!!this.option.selectedIds ? "" : "test ") + "email?", "Confirmation Message"));
+				resolve(tf.promiseBootbox.yesNo("Are you sure you want to cancel this " + (!!this.options.selectedIds ? "" : "test ") + "email?", "Confirmation Message"));
 			}
 			else
 			{
@@ -1080,13 +1026,13 @@
 	SendEmailOfGridViewModel.prototype.selectRecipients = function(e)
 	{
 		var addressList;
-		var addressType = $(e).data('send-type');
-		if (addressType === 'To')
+		var addressType = $(e).data("send-type");
+		if (addressType === "To")
 		{
 			addressList = this.obEmailToList();
 			this.status("selectToRecipients");
 		}
-		else if (addressType === 'Cc')
+		else if (addressType === "Cc")
 		{
 			addressList = this.obEmailCcList();
 			this.status("selectCcRecipients");
@@ -1097,7 +1043,6 @@
 			this.status("selectBccRecipients");
 		}
 		$(".mobile-modal-content-body").scrollTop(0);
-		var self = this;
 		var recipients = [];
 		this.recipientListSource.forEach(function(item)
 		{
@@ -1119,8 +1064,8 @@
 						Id: 0,
 						obSelected: ko.observable(true),
 						isNew: true,
-						FirstName: '',
-						LastName: '',
+						FirstName: "",
+						LastName: "",
 						show: ko.observable(true)
 					});
 			}
@@ -1153,18 +1098,18 @@
 			return item.obSelected();
 		}).map(function(item)
 		{
-			return new TF.DataModel.ReportReceiptDataModel(
+			return new TF.DataModel.ScheduledReportReceiptDataModel(
 				{
 					SelectedUserId: item.Id,
 					EmailAddress: item.Email,
 					UserName: item.FirstName + " " + item.LastName
 				});
 		});
-		if (this.status() === 'selectToRecipients')
+		if (this.status() === "selectToRecipients")
 		{
 			this.obEmailToList(addressList);
 		}
-		else if (this.status() === 'selectCcRecipients')
+		else if (this.status() === "selectCcRecipients")
 		{
 			this.obEmailCcList(addressList);
 		}
@@ -1180,7 +1125,7 @@
 	{
 		if (this.obRecipientList().length === 0 && TF.isPhoneDevice)
 		{
-			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "users"), {}, { overlay: false }).then(function(apiResponse)
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "user"), {}, { overlay: false }).then(function(apiResponse)
 			{
 				apiResponse.Items = Enumerable.From(apiResponse.Items).Where("$.Email!=''").OrderBy("$.Email").ToArray();
 				apiResponse.Items.forEach(function(item)
@@ -1242,9 +1187,9 @@
 			{
 				var reg = /[,;]/;
 				var emailList = self.obNewEmail().split(reg);
-				emailList.forEach(function(mail, index)
+				emailList.forEach(function(mail)
 				{
-					if (mail && mail.trim() !== '')
+					if (mail && mail.trim() !== "")
 					{
 						self.obRecipientList.unshift(
 							{
@@ -1252,12 +1197,13 @@
 								Id: 0,
 								obSelected: ko.observable(true),
 								isNew: true,
-								FirstName: '',
-								LastName: '',
+								FirstName: "",
+								LastName: "",
 								show: ko.observable(true)
 							});
 					}
 				});
+				// self.obRecipientList(self.obRecipientList());
 				emailIsValid();
 			}
 		}
@@ -1317,19 +1263,36 @@
 		this.obSearchRecipient("");
 	};
 
+	SendEmailOfGridViewModel.prototype.getEmailRecipientType = function()
+	{
+		const self = this;
+		if (self.options.type === 'student')
+		{
+			return 'contact'
+		}
+		return self.options.type;
+	}
+
+	SendEmailOfGridViewModel.prototype.shouldShowSummary = function()
+	{
+		const self = this;
+		return DataTypesWithSummary.indexOf(self.getEmailRecipientType()) >= 0;
+	}
+
 	SendEmailOfGridViewModel.prototype.dispose = function()
 	{
-		var data = [];
 		this.pageLevelViewModel.dispose();
 		if (this.documentEntities)
 		{
-			this.documentEntities().forEach(function(item)
-			{
-				data.push(item.Guid());
-			});
+			this.documentEntities.length = 0;
 		}
+
 		if (this.intervalID)
+		{
 			clearInterval(this.intervalID);
+		}
+
+		//this._$form.data("bootstrapValidator").destroy();
 
 		return Promise.resolve(true);
 	};

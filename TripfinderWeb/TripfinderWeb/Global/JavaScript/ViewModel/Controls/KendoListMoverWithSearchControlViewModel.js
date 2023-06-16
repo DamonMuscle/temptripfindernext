@@ -1694,18 +1694,55 @@
 		this.careteKendoDropTargetEvent();
 	};
 
+	KendoListMoverWithSearchControlViewModel.prototype.getSelectedDataByIds = function(selectedData)
+	{
+		var self = this,
+			url = self.leftSearchGrid.getApiRequestURL(self.leftSearchGrid.options.url);
+		return tf.promiseAjax.post(pathCombine(url),
+			{
+				data: {
+					sortItems: self.leftSearchGrid.searchOption.data.sortItems,
+					fields: self.leftSearchGrid.searchOption.data.fields,
+					filterClause: '',
+					filterSet: null,
+					idFilter: {
+						ExcludeAny: [],
+						IncludeOnly: selectedData || null,
+					}
+				}
+			})
+			.then(function(apiResponse)
+			{
+				return apiResponse.Items;
+			});
+	}
+
 	KendoListMoverWithSearchControlViewModel.prototype.apply = function()
 	{
-		var firstFieldName = this.columns[0].FieldName;
-		this.saveCurrentSelectedColumns(this.options.type, this.columns);
-		this.selectedData = this.selectedData.sort(function(a, b)
+		var self = this;
+		var firstFieldName = self.columns[0].FieldName;
+		this.saveCurrentSelectedColumns(self.options.type, self.columns);
+		let p = Promise.resolve(self.selectedData);
+
+		if (self.options.serverPaging && !self.options.onlyReturnId)
 		{
-			if (typeof a[firstFieldName] === "string")
+			p = self.getSelectedDataByIds(self.selectedData);
+		}
+
+		return p.then(function(result)
+		{
+			self.selectedData = result;
+			self.selectedData = self.selectedData.sort(function(a, b)
 			{
-				return a[firstFieldName].toUpperCase() > (b[firstFieldName] || "").toUpperCase();
-			}
-			return 0;
-		}.bind(this));
+				if (typeof a[firstFieldName] === "string")
+				{
+					return a[firstFieldName].toUpperCase() > (b[firstFieldName] || "").toUpperCase();
+				}
+				return 0;
+			});
+			return self.selectedData;
+		})
+
 	};
 
 	KendoListMoverWithSearchControlViewModel.prototype.cancel = function() { };
