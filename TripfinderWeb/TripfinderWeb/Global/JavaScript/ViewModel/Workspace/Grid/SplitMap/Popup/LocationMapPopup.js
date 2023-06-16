@@ -10,11 +10,6 @@
 	LocationMapPopup.prototype = Object.create(TF.Grid.BaseMapPopup.prototype);
 	LocationMapPopup.prototype.constructor = LocationMapPopup;
 
-	LocationMapPopup.prototype.buildContent = function(graphics)
-	{
-		return TF.Grid.BaseMapPopup.prototype.buildContent.call(this, (graphics || []).map(x=>x.attributes));
-	};
-
 	LocationMapPopup.prototype.buildTitle = function(data)
 	{
 		return data.Name

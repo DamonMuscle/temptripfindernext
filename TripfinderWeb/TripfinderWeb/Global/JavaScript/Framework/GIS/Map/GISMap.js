@@ -667,14 +667,29 @@
 		return Promise.resolve(findFeatureResults);
 	}
 
-	Map.prototype.showPopup = function(content, location)
+	Map.prototype.showPopup = function({content, location, eventHandlers, eventNameSpace})
 	{
 		_map.mapView.popup.open({content, location});
+		if (eventHandlers && eventHandlers.prevClick)
+		{
+			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-previous", eventHandlers.prevClick);
+		}
+
+		if (eventHandlers && eventHandlers.nextClick)
+		{
+			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-next", eventHandlers.nextClick);
+		}
 	}
 
-	Map.prototype.closePopup = function()
+	Map.prototype.updatePopup = function(content)
+	{
+		$(_map.mapView.popup.container).find("article>div").html(content);
+	}
+
+	Map.prototype.closePopup = function(eventNameSpace)
 	{
 		_map.mapView.popup.close();
+		$(_map.mapView.popup.container).off(`click.${eventNameSpace}`);
 	}
 
 	Map.prototype.dispose = function()

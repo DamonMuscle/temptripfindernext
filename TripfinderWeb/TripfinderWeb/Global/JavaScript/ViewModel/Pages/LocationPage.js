@@ -35,7 +35,7 @@
 			self.obShowSplitmap(tf.pageManager.resizablePage.obRightContentType() === "splitmap");
 		}));
 
-		self.locationMapPopup = new TF.Grid.LocationMapPopup();
+		self.locationMapPopup = null;
 	}
 
 	LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -384,11 +384,13 @@
 
 		if(!locationGraphics || !locationGraphics.length)
 		{
-			self.locationMapViewInstance.closePopup();
+			self.locationMapPopup.close();
 			return;
 		}
 
-		self.locationMapViewInstance.showPopup(self.locationMapPopup.buildContent(locationGraphics), locationGraphics[0].geometry)
+		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({map:self.locationMapViewInstance});
+		
+		self.locationMapPopup.show(locationGraphics);
 	}
 
 	LocationPage.prototype.exitCurrentMode = function()
