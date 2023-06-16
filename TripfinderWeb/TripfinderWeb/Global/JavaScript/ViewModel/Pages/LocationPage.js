@@ -381,7 +381,8 @@
 	LocationPage.prototype.onMapViewClick = async function(event)
 	{
 		const self = this;
-		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance]);
+		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
+		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
 		console.log(locationGraphics);
 	}
 

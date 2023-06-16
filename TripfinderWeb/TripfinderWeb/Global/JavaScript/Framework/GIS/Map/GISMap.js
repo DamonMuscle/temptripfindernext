@@ -643,7 +643,7 @@
 		});
 	}
 
-	Map.prototype.find = async function(queryGeometry, layerInstances = null)
+	Map.prototype.find = async function(queryGeometry, layerInstances = null, searchScaleFactor = 1000)
 	{
 		if (layerInstances === null) {
 			layerInstances = _mapLayerInstances;
@@ -653,7 +653,7 @@
 		if (queryGeometry && queryGeometry.type === "point")
 		{
 			// use event extent to check the clicked graphic
-			const queryDistance = _map.mapView.scale / 1000;
+			const queryDistance = _map.mapView.scale / searchScaleFactor;
 			spatialQueryGeometry = TF.GIS.SDK.geometryEngine.geodesicBuffer(queryGeometry, queryDistance, "meters");
 		}
 
