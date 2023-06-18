@@ -10,6 +10,27 @@
 	LocationMapPopup.prototype = Object.create(TF.Grid.BaseMapPopup.prototype);
 	LocationMapPopup.prototype.constructor = LocationMapPopup;
 
+	LocationMapPopup.prototype.getData = function(ids)
+	{
+		if (!this.options.isDetailView)
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("fieldtriplocation")),{
+				paramData: {
+					id: ids.join(","),
+					"@relationships": ""
+				}
+			});
+		}
+		else
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("fieldtriplocation")),{
+				paramData: {
+					id: ids.join(",")
+				}
+			});
+		}
+	}
+
 	LocationMapPopup.prototype.buildTitle = function(data)
 	{
 		return data.Name
@@ -35,11 +56,7 @@
 
 	LocationMapPopup.prototype.createNoteHtml = function(data)
 	{
-		return `<div>
-					Notes
-					<div>
-						${data.Notes || ""}
-					</div>
-				</div>`;
+		// TODO: refine code to get rid of hard code
+		return this.createNotesTabHtml("Locations", data.Notes || "", "filedtriplocation");
 	}
 })();

@@ -195,24 +195,69 @@
 		return null;
 	};
 
+	BaseMapPopup.prototype.createNotesTabHtml = function(type, notes, dataType)
+	{
+		const self = this,
+			enableEdit = this.options.enableEdit,
+			permission = tf.authManager.isAuthorizedFor(dataType, "edit");
+
+		notes = notes || "";
+
+		let tabHtml = `<div class='module full-width ellipsis'>
+							<textarea class='${(enableEdit ? "editable" : "non-editable")}' ${permission ? "rows='4'" : ""} readonly>
+								${notes}
+							</textarea>
+						</div>`;
+
+		if (permission)
+		{
+			tabHtml += this.getEmptySegmentedPageString(type, "notes", true);
+			tabHtml += enableEdit ? ("<div class='notes-control'>" +
+				"<button class='addNote'>Add Note</button>" +
+				"<button class='saveEdit'>Save Note</button>" +
+				"<button class='cancelEdit'>Cancel</button>" +
+				"</div>") : "";
+			return "<div class='notes-tab" + (notes ? "" : " empty-note") + "'><div class='center-container'>" + tabHtml + "</div></div>";
+		}
+		else
+		{
+			return notes ? "<div class='notes-tab'><div class='center-container no-permission'>" + tabHtml + "</div></div>" : this.getEmptySegmentedPageString(type, "notes");
+		}
+	};
+
+	BaseMapPopup.prototype.getEmptySegmentedPageString = function(type, segmentedName, notCenter)
+	{
+		var html = `<div class='empty'>No ${segmentedName} for this ${type}</div>`;
+		if (!notCenter)
+		{
+			html = `<div class='empty-content'>${html}</div>`;
+		}
+		return html;
+	};
+
 	BaseMapPopup.prototype.show = function(graphics)
 	{
-		const self = this;
-		self.list = (graphics || []).map(x=>x.attributes);
+		const self = this,
+			ids = (graphics || []).map(x=>x.attributes && x.attributes.Id).filter(Boolean);
 
-		self.options.map.showPopup({
-			content: self.buildContent(),
-			location: graphics[0].geometry,
-			eventHandlers: {
-				prevClick: self.prevClick.bind(self),
-				nextClick: self.nextClick.bind(self)
-			},
-			eventNameSpace: this.eventNameSpace
-		});
-		setTimeout(function()
+		self.getData(ids).then(function(response)
 		{
-			self._updateSubContentHeight();
-		}, 100);
+			self.list = response.Items || [];
+			self.options.map.showPopup({
+				content: self.buildContent(),
+				location: graphics[0].geometry,
+				eventHandlers: {
+					prevClick: self.prevClick.bind(self),
+					nextClick: self.nextClick.bind(self)
+				},
+				eventNameSpace: this.eventNameSpace
+			});
+
+			setTimeout(function()
+			{
+				self._updateSubContentHeight();
+			}, 100);
+		});
 	};
 
 	BaseMapPopup.prototype.changeItem = function()

@@ -352,7 +352,7 @@
 		const recordIds = self.searchGrid.obAllIds();
 		return tf.promiseAjax.post(self.options.url, {
 			data: {
-				fields: ["Name", "Street", "XCoord", "YCoord", "Notes", "City", "State", "Zip"],
+				fields: ["Id", "Name", "Street", "XCoord", "YCoord", "Notes", "City", "State", "Zip"],
 				idFilter: {
 					IncludeOnly: recordIds,
 					ExcludeAny: []
