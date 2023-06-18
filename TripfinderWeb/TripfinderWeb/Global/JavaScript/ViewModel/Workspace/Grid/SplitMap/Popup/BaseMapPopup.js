@@ -9,6 +9,8 @@
 		this.eventNameSpace = `callout_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 		this.list = null;
 		this.index = 0;
+		this.selectedTabIndex = 0;
+		this.subContentMinHeight = 68;
 	}
 
 	BaseMapPopup.prototype.buildContent = function()
@@ -53,7 +55,8 @@
 				{
 					cssClass += " first ";
 				}
-				else if (index == content.contentExtend.length - 1)
+				// when only 1 tab, it's the first, and it's the last meanwhile.
+				if (index == content.contentExtend.length - 1)
 				{
 					cssClass += " last ";
 				}
@@ -206,6 +209,10 @@
 			},
 			eventNameSpace: this.eventNameSpace
 		});
+		setTimeout(function()
+		{
+			self._updateSubContentHeight();
+		}, 100);
 	};
 
 	BaseMapPopup.prototype.changeItem = function()
@@ -218,21 +225,88 @@
 		this.options.map.closePopup(this.eventNameSpace);
 	}
 	
-	BaseMapPopup.prototype.prevClick = function()
+	BaseMapPopup.prototype.prevClick = function(e)
 	{
 		if (this.index === 0)
 		{
 			return;
 		}
-		this.changeItem(this.index--);
+		this.index--
+		this.changeItem();
+		this._updateSubContentHeight(e.data.popupContainer);
 	}
 
-	BaseMapPopup.prototype.nextClick = function()
+	BaseMapPopup.prototype.nextClick = function(e)
 	{
 		if (this.index === this.list.length -1)
 		{
 			return;
 		}
-		this.changeItem(this.index++);
+		this.index++
+		this.changeItem();
+		this._updateSubContentHeight(e.data.popupContainer);
 	}
+
+	BaseMapPopup.prototype._updateSubContentHeight = function(popupContainer)
+	{
+		if (this.options.isDetailView || this.options.gridType == "gpsevent")
+		{
+			return;
+		}
+
+		var self = this,
+			$popupContainer = $(popupContainer),
+			$subContents = $popupContainer.find(".sub-content"),
+			maxHeight = 0;
+		if ($subContents.length == 0)
+		{
+			return;
+		}
+		var popupContainerClientRect = $popupContainer[0].getBoundingClientRect(),
+			subContentClientRect = $subContents[0].getBoundingClientRect(),
+			bodyHeight = $("body").height(),
+			subContentMaxHeight;
+
+		if ($popupContainer.attr("class").indexOf("-top-") >= 0)
+		{
+			// the content can not higher than body top 
+			subContentMaxHeight = popupContainerClientRect.bottom - 250;
+		}
+		else 
+		{
+			// the content can not lower than body bottom 
+			subContentMaxHeight = bodyHeight - subContentClientRect.top - 50;
+		}
+
+		// can not higher than max height of content
+		// if the max height less than min height means the popup content outsite the window, so the max height is 285,
+		subContentMaxHeight = subContentMaxHeight > self.subContentMinHeight ? Math.min(subContentMaxHeight, 285) : 285;
+
+		$subContents.each(function(index, item)
+		{
+			var height = 0;
+			var $subContent = $(item);
+			var hasSelected = $subContent.hasClass("select");
+			$subContent.addClass("select").css({ "height": "auto" });
+			height = $subContent.outerHeight();
+			if (!hasSelected)
+			{
+				$subContent.removeClass("select");
+			}
+			if (height > subContentMaxHeight)
+			{
+				$subContent.addClass("auto-width main-part");
+			}
+			else
+			{
+				$subContent.removeClass("auto-width main-part");
+			}
+			height = Math.min(Math.max(height, self.subContentMinHeight), subContentMaxHeight);
+			if (height > maxHeight)
+			{
+				maxHeight = height;
+			}
+		});
+		$subContents.height(maxHeight > subContentMaxHeight ? subContentMaxHeight : maxHeight);
+	};
 })();

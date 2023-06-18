@@ -672,12 +672,12 @@
 		_map.mapView.popup.open({content, location});
 		if (eventHandlers && eventHandlers.prevClick)
 		{
-			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-previous", eventHandlers.prevClick);
+			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-previous", {popupContainer: _map.mapView.popup.container}, eventHandlers.prevClick);
 		}
 
 		if (eventHandlers && eventHandlers.nextClick)
 		{
-			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-next", eventHandlers.nextClick);
+			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-next", {popupContainer: _map.mapView.popup.container}, eventHandlers.nextClick);
 		}
 	}
 
