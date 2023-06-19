@@ -18,7 +18,13 @@
 	{
 		var self = this, count = 0,
 			blackList = tf.dataTypeHelper.getEntityUpdateConfirmBlackList(self.dataType),
-			modifiedFields = {};
+			modifiedFields = {},
+			isGeocoded = self._detailView.recordEntity.Geocoded;
+
+		if (!isGeocoded)
+		{
+			return Promise.resolve(true);
+		}
 
 		for (let key in self.editFieldList)
 		{
