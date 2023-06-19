@@ -168,6 +168,10 @@
 		{
 			self.layer = self.map.findLayerById("georegionPointLayer");
 		}
+		if (this.type === "fieldtriplocation")
+		{
+			self.layer = self.map.findLayerById("ManuallyPinLayer");
+		}
 		return Enumerable.From(self.layer.graphics.items).FirstOrDefault(null, function(c)
 		{
 			return c.attributes.type === self.type;
@@ -200,6 +204,8 @@
 				return this.symbol.student();
 			case "altsite":
 				return this.symbol.student();
+			case "fieldtriplocation":
+				return this.symbol.fieldTripLocation();
 			default:
 				return this.symbol.student();
 		}

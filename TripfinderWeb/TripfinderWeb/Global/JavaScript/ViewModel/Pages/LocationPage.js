@@ -395,10 +395,15 @@
 
 	LocationPage.prototype.onMapViewPointerMove = function(event)
 	{
-		this.locationMapViewInstance.map.mapView.hitTest(event).then((response) =>
+		if (!this.locationMapViewInstance)
+		{
+			return;
+		}
+
+		this.locationMapViewInstance.hitTest(event).then((response) =>
 		{
 			let graphics = null, cursor = "default";
-			if (response.results.length > 0)
+			if (response && response.results.length > 0)
 			{
 				graphics = response.results;
 				const locationGraphics =  graphics.filter(item => item.graphic.layer.id === LocationGridLayerId);

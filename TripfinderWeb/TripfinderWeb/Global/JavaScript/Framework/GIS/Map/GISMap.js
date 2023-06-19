@@ -681,6 +681,11 @@
 		return Promise.resolve(findFeatureResults);
 	}
 
+	Map.prototype.hitTest = async function(event)
+	{
+		return _map.mapView && _map.mapView.hitTest(event) || null;
+	}
+
 	Map.prototype.showPopup = function({content, location, eventHandlers, eventNameSpace})
 	{
 		_map.mapView.popup.open({content, location});

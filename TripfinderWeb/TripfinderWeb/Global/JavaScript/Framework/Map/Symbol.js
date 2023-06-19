@@ -984,6 +984,16 @@
 		};
 	};
 
+	MapSymbol.prototype.fieldTripLocation = function()
+	{
+		return {
+			type: "picture-marker",
+			url: "./global/img/map/map-pin.png",
+			width: "32px",
+			height: "32px",
+		};
+	}
+
 	MapSymbol.prototype.dispose = function()
 	{
 		tfdispose(this);

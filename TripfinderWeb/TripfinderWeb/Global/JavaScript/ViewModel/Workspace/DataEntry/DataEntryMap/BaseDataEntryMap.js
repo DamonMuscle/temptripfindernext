@@ -590,6 +590,7 @@
 			};
 			const longitude = data.XCoord, latitude = data.YCoord;
 			const attributes = {
+				type: "fieldtriplocation",
 				Id: data.Id,
 				Name: data.Name,
 				Street: data.Street,
