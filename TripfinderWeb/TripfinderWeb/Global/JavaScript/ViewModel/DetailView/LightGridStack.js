@@ -857,7 +857,7 @@
 				let itemContent = self.getRawDataBlockValue(item);
 				const itemNullAvatar = item.nullAvatar || NULL_AVATAR;
 				itemContent = [undefined, null, ""].includes(itemContent) ? itemNullAvatar : itemContent;
-				return new TF.DetailView.DataBlockComponent.GeneralBlock(_.upperFirst(itemContent), item, self.detailView);
+				return new TF.DetailView.DataBlockComponent.GeneralBlock(_.upperFirst(itemContent), item, dataBlockStyles, self.detailView.isCreateGridNewRecord);
 			case "image":
 				return new TF.DetailView.DataBlockComponent.ImageBlock(item, self.detailView);
 			case "Map":
