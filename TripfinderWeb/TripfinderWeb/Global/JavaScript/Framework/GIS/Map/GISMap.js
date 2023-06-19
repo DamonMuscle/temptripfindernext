@@ -698,6 +698,8 @@
 		{
 			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-next", {popupContainer: _map.mapView.popup.container}, eventHandlers.nextClick);
 		}
+
+		return _map.mapView.popup.container;
 	}
 
 	Map.prototype.updatePopup = function(content)
@@ -707,8 +709,8 @@
 
 	Map.prototype.closePopup = function(eventNameSpace)
 	{
+		$(_map.mapView.popup.container).off(`.${eventNameSpace}`);
 		_map.mapView.popup.close();
-		$(_map.mapView.popup.container).off(`click.${eventNameSpace}`);
 	}
 
 	Map.prototype.dispose = function()

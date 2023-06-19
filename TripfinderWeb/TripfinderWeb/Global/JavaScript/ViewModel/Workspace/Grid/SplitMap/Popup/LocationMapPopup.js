@@ -16,16 +16,16 @@
 		{
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("fieldtriplocation")),{
 				paramData: {
-					id: ids.join(","),
+					"@filter": `in(Id,${ids.join(",")})`,
 					"@relationships": ""
-				}
+				},
 			});
 		}
 		else
 		{
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), tf.dataTypeHelper.getEndpoint("fieldtriplocation")),{
 				paramData: {
-					id: ids.join(",")
+					"@filter": `in(Id,${ids.join(",")})`,
 				}
 			});
 		}
@@ -57,6 +57,7 @@
 	LocationMapPopup.prototype.createNoteHtml = function(data)
 	{
 		// TODO: refine code to get rid of hard code
-		return this.createNotesTabHtml("Locations", data.Notes || "", "filedtriplocation");
+		const html = this.createNotesTabHtml("Location", data.Notes || "", "filedtriplocation");
+		return html;
 	}
 })();
