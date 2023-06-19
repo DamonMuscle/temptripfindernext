@@ -44,7 +44,7 @@
 
 		self.gridType = options.gridType;
 		var isEditAppearanceEnable = !["map", "attach", "boolean", "calendar", "horizontalline", "verticalline", "tab"].includes(self.type.toLowerCase()),
-			isConditionalAppearanceEnable = ["number", "string", "date", "time", "geodistance"].includes(self.type.toLowerCase());
+			isConditionalAppearanceEnable = ["number", "string", "date", "time", "geodistance", "boolean"].includes(self.type.toLowerCase());
 		if (itemData.UDFId)
 		{
 			var udfItem = self.detailView.recordEntity.UserDefinedFields.find(function(udf) { return udf.Id == itemData.UDFId; });

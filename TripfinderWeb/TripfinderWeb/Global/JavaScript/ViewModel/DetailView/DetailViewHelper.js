@@ -629,9 +629,12 @@
 				break;
 			case "Calendar":
 			case "File":
-			case "Boolean":
 			case "RecordPicture":
 				descriptor.field = layoutItem.field;
+				break;
+			case "Boolean":
+				descriptor.field = layoutItem.field;
+				descriptor.conditionalAppearance = layoutItem.conditionalAppearance;
 				break;
 			case "Schedule":
 				descriptor.field = layoutItem.field;
