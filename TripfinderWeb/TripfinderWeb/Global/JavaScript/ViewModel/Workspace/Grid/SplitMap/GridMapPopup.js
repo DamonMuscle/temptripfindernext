@@ -32,6 +32,11 @@
 			return;
 		}
 		layers = layers || this.layers;
+		if (!layers)
+		{
+			return;
+		}
+
 		this.layers = layers;
 		self.pointerMoveEvent = map.mapView.on("pointer-move", function(event)
 		{
