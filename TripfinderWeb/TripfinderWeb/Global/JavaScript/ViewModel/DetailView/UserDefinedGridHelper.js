@@ -136,11 +136,11 @@
 						posLabel = col.originalUdfField.positiveLabel,
 						negLabel = col.originalUdfField.negativeLabel;
 
-					posLabel = (posLabel == null || posLabel == '') ? true : posLabel;
-					negLabel = (negLabel == null || negLabel == '') ? false : negLabel;
+					posLabel = (posLabel == null || posLabel == '') ? "true" : posLabel;
+					negLabel = (negLabel == null || negLabel == '') ? "false" : negLabel;
 					if (item !== null)
 					{
-						dataItem[col.FieldName] = item == true ? posLabel : negLabel;
+						dataItem[col.FieldName] = item == "true" ? posLabel : negLabel;
 					}
 					else
 					{
