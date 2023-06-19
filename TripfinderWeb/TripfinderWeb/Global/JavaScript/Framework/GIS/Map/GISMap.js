@@ -31,6 +31,7 @@
 			onMapViewCreated: null,
 			onMapViewClick: null,
 			onMapViewDoubleClick: null,
+			onMapViewPointerMove: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 		}
@@ -45,6 +46,7 @@
 			onMapViewCreatedPromise: null,
 			onMapViewClick: null,
 			onMapViewDoubleClick: null,
+			onMapViewPointerMove: null,
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 		};
@@ -392,6 +394,11 @@
 			self.eventHandler.onMapViewUpdated = TF.GIS.SDK.watchUtils.whenFalseOnce(mapView, "updating", self.settings.eventHandlers.onMapViewUpdated);
 		}
 
+		if (self.settings.eventHandlers.onMapViewPointerMove)
+		{
+			self.eventHandler.onMapViewPointerMove = mapView.on('pointer-move', self.settings.eventHandlers.onMapViewPointerMove);
+		}
+
 		if (self.settings.eventHandlers.onMapViewCreated)
 		{
 			self.eventHandler.onMapViewCreatedPromise = mapView.when(self.settings.eventHandlers.onMapViewCreated);
@@ -425,6 +432,12 @@
 			self.eventHandler.onMapViewUpdated = null;
 		}
 
+		if (self.settings.eventHandlers.onMapViewPointerMove && self.eventHandler.onMapViewPointerMove)
+		{
+			self.eventHandler.onMapViewPointerMove.remove();
+			self.eventHandler.onMapViewPointerMove = null;
+		}
+
 		if (self.settings.eventHandlers.onMapViewCreated && self.eventHandler.onMapViewCreatedPromise)
 		{
 			self.eventHandler.onMapViewCreatedPromise = null;
@@ -433,7 +446,7 @@
 
 	Map.prototype.setMapCursor = function(cursorType)
 	{
-		const availableCursorTypes = ["default", "locate", "locate-white", "pin"];
+		const availableCursorTypes = ["default", "locate", "locate-white", "pin", "pointer"];
 
 		$(_map.mapView.container).removeClass("pin-cursor");
 
@@ -450,6 +463,7 @@
 				cursor = "pin";
 				$(_map.mapView.container).addClass("pin-cursor");
 				break;
+			case "pointer":
 			default:
 				cursor = cursorType;
 				break;

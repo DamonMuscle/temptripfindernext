@@ -138,6 +138,7 @@
 			const eventHandlers = {
 				onMapViewCreated: self.onMapViewCreated.bind(self),
 				onMapViewClick: self.onMapViewClick.bind(self),
+				onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
 			};
 			await tf.pageManager.resizablePage.showMapView(eventHandlers);
 			self.locationMapViewInstance = tf.pageManager.resizablePage.getRightData();
@@ -372,7 +373,7 @@
 
 	LocationPage.prototype.onMapViewCreated = function()
 	{
-		console.log("Map View created");
+		// Map View Created.
 	}
 
 	LocationPage.prototype.onMapViewClick = async function(event)
@@ -380,17 +381,35 @@
 		const self = this;
 		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
-		console.log(locationGraphics);
 
 		if(!locationGraphics || !locationGraphics.length)
 		{
-			self.locationMapPopup.close();
+			self.locationMapPopup && self.locationMapPopup.close();
 			return;
 		}
 
 		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({map:self.locationMapViewInstance});
 		
 		self.locationMapPopup.show(locationGraphics);
+	}
+
+	LocationPage.prototype.onMapViewPointerMove = function(event)
+	{
+		this.locationMapViewInstance.map.mapView.hitTest(event).then((response) =>
+		{
+			let graphics = null, cursor = "default";
+			if (response.results.length > 0)
+			{
+				graphics = response.results;
+				const locationGraphics =  graphics.filter(item => item.graphic.layer.id === LocationGridLayerId);
+				if (locationGraphics.length > 0)
+				{
+					cursor = "pointer";
+				}
+			}
+			
+			this.locationMapViewInstance.setMapCursor(cursor);
+		});
 	}
 
 	LocationPage.prototype.exitCurrentMode = function()
