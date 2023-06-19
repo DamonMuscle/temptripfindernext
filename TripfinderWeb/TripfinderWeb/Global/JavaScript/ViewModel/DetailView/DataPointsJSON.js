@@ -5180,7 +5180,7 @@
 					"width": '150px',
 					"editType": {
 						"format": "String",
-						"maxLength": 255
+						"maxLength": 200
 					}
 				},
 				{
@@ -5213,7 +5213,7 @@
 					"width": '200px',
 					"editType": {
 						"format": "String",
-						"maxLength": 255
+						"maxLength": 200
 					}
 				},
 				{
@@ -5224,7 +5224,7 @@
 					"width": '120px',
 					"editType": {
 						"format": "String",
-						"maxLength": 255
+						"maxLength": 100
 					}
 				},
 				{
