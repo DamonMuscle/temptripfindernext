@@ -466,7 +466,15 @@
 				{
 					return;
 				}
-				self.showDetailsPreClick();
+
+				if(self.obShowSplitmap())
+				{
+					// self.focusRecord
+				}
+				else
+				{
+					self.showDetailsPreClick();
+				}
 			});
 		}
 		else if (TF.isPhoneDevice)

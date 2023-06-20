@@ -388,7 +388,11 @@
 			return;
 		}
 
-		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({map:self.locationMapViewInstance});
+		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
+			parentPage: self,
+			map: self.locationMapViewInstance,
+			canShowDetailView: true
+		});
 		
 		self.locationMapPopup.show(locationGraphics);
 	}

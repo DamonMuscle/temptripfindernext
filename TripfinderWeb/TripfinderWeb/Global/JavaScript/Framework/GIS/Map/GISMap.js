@@ -670,19 +670,9 @@
 		return _map.mapView && _map.mapView.hitTest(event) || null;
 	}
 
-	Map.prototype.showPopup = function({content, location, eventHandlers, eventNameSpace})
+	Map.prototype.showPopup = function({content, location})
 	{
 		_map.mapView.popup.open({content, location});
-		if (eventHandlers && eventHandlers.prevClick)
-		{
-			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-previous", {popupContainer: _map.mapView.popup.container}, eventHandlers.prevClick);
-		}
-
-		if (eventHandlers && eventHandlers.nextClick)
-		{
-			$(_map.mapView.popup.container).on(`click.${eventNameSpace}`, ".page-next", {popupContainer: _map.mapView.popup.container}, eventHandlers.nextClick);
-		}
-
 		return _map.mapView.popup.container;
 	}
 
@@ -693,7 +683,6 @@
 
 	Map.prototype.closePopup = function(eventNameSpace)
 	{
-		$(_map.mapView.popup.container).off(`.${eventNameSpace}`);
 		_map.mapView.popup.close();
 	}
 

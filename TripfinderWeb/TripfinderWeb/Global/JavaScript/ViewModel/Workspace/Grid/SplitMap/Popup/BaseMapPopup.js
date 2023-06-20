@@ -37,6 +37,7 @@
 								</div>
 							</div>`;
 		}
+
 		if (content.photo)
 		{
 			photoString = `<div class="photo back"></div>
@@ -254,20 +255,28 @@
 		self.getData(ids).then(function(response)
 		{
 			self.list = response.Items || [];
-			const container = self.options.map.showPopup({
+			self.popupContainer = self.options.map.showPopup({
 				content: self.buildContent(),
 				location: graphics[0].geometry,
-				eventHandlers: {
-					prevClick: self.prevClick.bind(self),
-					nextClick: self.nextClick.bind(self)
-				},
-				eventNameSpace: self.eventNameSpace
 			});
 
 			setTimeout(function()
 			{
-				self._updateSubContentHeight(container);
+				self._updateSubContentHeight();
+                self.bindEvents();
 			}, 100);
+		});
+	};
+
+	BaseMapPopup.prototype.bindEvents = function()
+	{
+		const self = this;
+		$(self.popupContainer).on(`click.${self.eventNameSpace}`, ".page-previous", self.prevClick.bind(self));
+		$(self.popupContainer).on(`click.${self.eventNameSpace}`, ".page-next", self.nextClick.bind(self));
+		$(self.popupContainer).on(`click.${self.eventNameSpace}`, ".detail-left:not(.disable,.drill-down-links)", function()
+		{
+			var id = self.list[self.index].Id;
+			self.options.parentPage.showDetailsClick(id);
 		});
 	};
 
@@ -278,9 +287,11 @@
 
 	BaseMapPopup.prototype.close = function()
 	{
-		this.options.map.closePopup(this.eventNameSpace);
-		this.index = 0;
-		this.selectedTabIndex = 0;
+		const self = this;
+		self.options.map.closePopup();
+		$(self.popupContainer).off(`.${self.eventNameSpace}`)
+		self.index = 0;
+		self.selectedTabIndex = 0;
 	}
 	
 	BaseMapPopup.prototype.prevClick = function(e)
@@ -291,7 +302,7 @@
 		}
 		this.index--
 		this.changeItem();
-		this._updateSubContentHeight(e.data.popupContainer);
+		this._updateSubContentHeight();
 	}
 
 	BaseMapPopup.prototype.nextClick = function(e)
@@ -302,10 +313,10 @@
 		}
 		this.index++
 		this.changeItem();
-		this._updateSubContentHeight(e.data.popupContainer);
+		this._updateSubContentHeight();
 	}
 
-	BaseMapPopup.prototype._updateSubContentHeight = function(popupContainer)
+	BaseMapPopup.prototype._updateSubContentHeight = function()
 	{
 		if (this.options.isDetailView || this.options.gridType == "gpsevent")
 		{
@@ -313,7 +324,7 @@
 		}
 
 		var self = this,
-			$popupContainer = $(popupContainer),
+			$popupContainer = $(self.popupContainer),
 			$subContents = $popupContainer.find(".sub-content"),
 			maxHeight = 0;
 		if ($subContents.length == 0)
