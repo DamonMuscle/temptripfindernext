@@ -2515,7 +2515,7 @@
 		let results = [];
 		this.dataBlocks.forEach(i =>
 		{
-			if (i instanceof type)
+			if (type == null || i instanceof type)
 			{
 				results.push(i);
 				return;

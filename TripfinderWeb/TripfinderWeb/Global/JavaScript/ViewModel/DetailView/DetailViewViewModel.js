@@ -121,8 +121,7 @@
 
 	DetailViewViewModel.prototype.restoreMap = function()
 	{
-		var mapBlocks = this.rootGridStack.getBlocks(TF.DetailView.DataBlockComponent.MapBlock);
-		mapBlocks.forEach(m => m.restore());
+		this.rootGridStack.getBlocks().forEach(i => i.restoreFullScreen && i.restoreFullScreen());
 	};
 
 	/**
