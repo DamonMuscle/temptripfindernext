@@ -469,7 +469,7 @@
 
 				if(self.obShowSplitmap())
 				{
-					// self.focusRecord
+					self.focusRecordInMapView(data);
 				}
 				else
 				{

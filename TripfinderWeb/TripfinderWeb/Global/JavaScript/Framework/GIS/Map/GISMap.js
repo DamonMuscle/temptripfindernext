@@ -594,6 +594,14 @@
 		await _map.mapView.goTo(target, { duration: 0, easing: "linear" });
 	}
 
+	Map.prototype.centerAndZoom = function(longitude, latitude, scale)
+	{
+		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
+		this.centerAtPoint(point);
+
+		_map.mapView.scale = scale;
+	}
+
 	Map.prototype.restrictPanOutside = function()
 	{
 		const self = this;

@@ -247,14 +247,16 @@
 		return html;
 	};
 
-	BaseMapPopup.prototype.show = function(graphics)
+	BaseMapPopup.prototype.show = function(graphics, data)
 	{
 		const self = this,
 			ids = (graphics || []).map(x=>x.attributes && x.attributes.Id).filter(Boolean);
 
-		self.getData(ids).then(function(response)
+		let p = data ? Promise.resolve(data): self.getData(ids).then(response => response.Items || []);
+
+		p.then(function(list)
 		{
-			self.list = response.Items || [];
+			self.list = list;
 			self.popupContainer = self.options.map.showPopup({
 				content: self.buildContent(),
 				location: graphics[0].geometry,
@@ -263,7 +265,7 @@
 			setTimeout(function()
 			{
 				self._updateSubContentHeight();
-                self.bindEvents();
+				self.bindEvents();
 			}, 100);
 		});
 	};
@@ -378,6 +380,23 @@
 		});
 		$subContents.height(maxHeight > subContentMaxHeight ? subContentMaxHeight : maxHeight);
 	};
+
+	BaseMapPopup.prototype.focusRecord = function(recordId, graphics)
+	{
+		const self = this;
+
+		self.getData([recordId]).then(function(response)
+		{
+			const [record] = response.Items;
+			if (!record.XCoord || !record.YCoord || record.XCoord == 0 || record.YCoord == 0)
+			{
+				return;
+			}
+
+			self.options.map.centerAndZoom(record.XCoord, record.YCoord, 3000);
+			self.show(graphics.filter(x=>x.attributes.Id == recordId), [record]);
+		});
+	}
 
 	BaseMapPopup.prototype.dispose = function()
 	{

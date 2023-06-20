@@ -388,13 +388,27 @@
 			return;
 		}
 
+		self.getMapPopup().show(locationGraphics);
+	}
+
+	LocationPage.prototype.getMapPopup = function()
+	{
+		const self = this;
 		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
 			parentPage: self,
 			map: self.locationMapViewInstance,
 			canShowDetailView: true
 		});
-		
-		self.locationMapPopup.show(locationGraphics);
+
+		return self.locationMapPopup;
+	}
+
+	LocationPage.prototype.focusRecordInMapView = function(record)
+	{
+		const self = this,
+			allGraphics = self.locationGridLayerInstance.layer.graphics.items;
+
+		self.getMapPopup().focusRecord(record.Id, allGraphics);
 	}
 
 	LocationPage.prototype.onMapViewPointerMove = function(event)
