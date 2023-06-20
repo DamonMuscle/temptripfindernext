@@ -376,20 +376,24 @@
 					break;
 				case "System Field":
 					{
-						let targetUdfFieldGuid = self.options.UDGridFields.find(x => x.Guid === col).editType.targetField;
-						let targetUdf = self.recordEntity.UserDefinedFields.find(x => x.Guid === targetUdfFieldGuid);
-						if (targetUdf)
+						let isUDFSystemField = udgField.FieldOptions.IsUDFSystemField;
+						if (isUDFSystemField)
 						{
-							let udfDatasourceIds = targetUdf.UDFDataSources.map(x => x.DBID);
-							if (udfDatasourceIds.indexOf(tf.datasourceManager.databaseId) < 0)
+							let targetUdfFieldGuid = self.options.UDGridFields.find(x => x.Guid === col).editType.targetField;
+							let targetUdf = self.recordEntity.UserDefinedFields.find(x => x.Guid === targetUdfFieldGuid);
+							if (targetUdf)
+							{
+								let udfDatasourceIds = targetUdf.UDFDataSources.map(x => x.DBID);
+								if (udfDatasourceIds.indexOf(tf.datasourceManager.databaseId) < 0)
+								{
+									self._ignoredColumnNames.push(col);
+									return;
+								}
+							} else
 							{
 								self._ignoredColumnNames.push(col);
 								return;
 							}
-						} else
-						{
-							self._ignoredColumnNames.push(col);
-							return;
 						}
 					}
 					break;
