@@ -515,6 +515,11 @@
 
 		self.$rightPage.find(">div.detail-view-container, >div.data-entry").empty();
 		self.obRightContentType(null);
+		if (self.mapviewInstace)
+		{
+			TF.GIS.MapFactory.destroyMapInstanceById(self.mapviewInstace.settings.mapId);
+			self.mapviewInstace = null;
+		}
 	};
 
 	ResizablePage.prototype.clearLeftGridContent = function()

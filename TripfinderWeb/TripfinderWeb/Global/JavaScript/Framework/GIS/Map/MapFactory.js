@@ -16,7 +16,7 @@
 
 			await TF.GIS.Map.LoadResources();
 			const map = new TF.GIS.Map($mapContainer, options);
-			instances.push({instance: map, id: mapId});
+			instances.push({instance: map, id: mapId, container: $mapContainer});
 			return map;
 		},
 		getMapInstanceById: function(id)
@@ -26,7 +26,8 @@
 		destroyMapInstanceById: function(id)
 		{
 			const index = instances.findIndex(x=>x.id === id);
-			const [{instance}] = instances.splice(index, 1);
+			const [{instance, container}] = instances.splice(index, 1);
+			$(container).removeAttr(attrKey);
 			instance.dispose();
 		}
 	};
