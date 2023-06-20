@@ -9,7 +9,7 @@
 		georegion: { hasThematics: false, manuallyPin: true },
 		tripstop: { hasThematics: true, manuallyPin: false },
 		student: { hasThematics: false, manuallyPin: true },
-		fieldtriplocation: { hasThematics: false, manuallyPin: true },
+		fieldtriplocation: { hasThematics: true, manuallyPin: true, hasGeoSearch: true, hasPrint: true },
 	};
 	const ManuallyPinLayerId = "ManuallyPinLayer";
 
@@ -130,6 +130,8 @@
 			legendStatus: self.options.legendStatus,
 			onThematicChanged: self.onThematicChanged.bind(self),
 			geoFinderAvailable: getValueByAttr(mapToolOptions, "geoFinderAvailable", !self.options.disable),
+			geoSearchAvailable: self._hasGeoSearch(),
+			printAvailable: self._hasPrint(),
 			onLegendStatusChanged: self.onLegendStatusChanged.bind(self),
 			expand: {
 				enable: !self.options.disable,
@@ -253,6 +255,28 @@
 
 		return Promise.resolve(config[type] && config[type].manuallyPin);
 	};
+
+	BaseDataEntryMap.prototype._hasGeoSearch = function()
+	{
+		const type = this.type;
+		if (!type)
+		{
+			return false;
+		}
+
+		return config[type] ? config[type].hasGeoSearch : false;
+	}
+
+	BaseDataEntryMap.prototype._hasPrint = function()
+	{
+		const type = this.type;
+		if (!type)
+		{
+			return false;
+		}
+
+		return config[type] ? config[type].hasPrint : false;
+	}
 
 	BaseDataEntryMap.prototype._hasDrawBoundary = function()
 	{
