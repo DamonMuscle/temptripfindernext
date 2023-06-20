@@ -408,7 +408,8 @@
 		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
 			parentPage: self,
 			map: self.locationMapViewInstance,
-			canShowDetailView: true
+			canShowDetailView: true,
+			isDetailView: false
 		});
 
 		return self.locationMapPopup;

@@ -144,7 +144,7 @@
 	{
 		const self = this;
 		//return content elements
-		if (self.options.isDetailView)
+		if (self.options.isDetailView) // currently self.options.isDetailView is not available, using self.options.parentPage.detailView as alternative
 		{
 			return {
 				title: self.buildDetailViewTitle(data),
@@ -257,6 +257,7 @@
 		p.then(function(list)
 		{
 			self.list = list;
+			self._addDetailViewStyle();
 			self.popupContainer = self.options.map.showPopup({
 				content: self.buildContent(),
 				location: graphics[0].geometry,
@@ -268,6 +269,15 @@
 				self.bindEvents();
 			}, 100);
 		});
+	};
+
+	BaseMapPopup.prototype._addDetailViewStyle = function()
+	{
+		var self = this;
+		if (self.options.isDetailView)
+		{
+			$(self.map.map.mapView.popup.container).addClass("detail-view-popup");
+		}
 	};
 
 	BaseMapPopup.prototype.bindEvents = function()

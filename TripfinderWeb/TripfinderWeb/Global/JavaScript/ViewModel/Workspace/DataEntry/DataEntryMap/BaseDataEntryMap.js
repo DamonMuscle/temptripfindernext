@@ -97,8 +97,36 @@
 		self._map = self.mapInstance.map;
 		self._mapView = self.mapInstance.map.mapView;
 
+		self.mapClickEvent = self._mapView.on('click', async function(event) {
+			console.log(event);
+			
+			const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
+			const locationGraphics = await self.mapInstance.find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
+	
+			if(!locationGraphics || !locationGraphics.length)
+			{
+				self.locationMapPopup && self.locationMapPopup.close();
+				return;
+			}
+	
+			self.getMapPopup().show(locationGraphics);
+		});
+
 		self.sketchTool = new TF.RoutingMap.SketchTool(self._map, self);
 	};
+
+	BaseDataEntryMap.prototype.getMapPopup = function()
+	{
+		const self = this;
+		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
+			parentPage: self,
+			map: self.mapInstance,
+			canShowDetailView: true,
+			isDetailView: true
+		});
+
+		return self.locationMapPopup;
+	}
 
 	BaseDataEntryMap.prototype.onMapViewUpdated = function(mapToolOptions, hasManuallyPin)
 	{
