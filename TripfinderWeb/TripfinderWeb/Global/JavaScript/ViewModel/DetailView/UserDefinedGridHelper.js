@@ -15,6 +15,7 @@
 	UserDefinedGridHelper.DEFAULT_FORM_NOT_AVAILABLE_MESSAGE = 'This form cannot be submitted.';
 	UserDefinedGridHelper.HAS_NO_SUBMITTED_PERMISSION = 'You have no submit permission of forms.';
 	UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED = 'Your response has already been submitted. This form allows only one response per recipient.';
+	UserDefinedGridHelper.RECORD_VERSION = 1;
 
 	UserDefinedGridHelper.getUpdatedInfoColumns = function()
 	{
@@ -135,11 +136,11 @@
 						posLabel = col.originalUdfField.positiveLabel,
 						negLabel = col.originalUdfField.negativeLabel;
 
-					posLabel = (posLabel == null || posLabel == '') ? true : posLabel;
-					negLabel = (negLabel == null || negLabel == '') ? false : negLabel;
+					posLabel = (posLabel == null || posLabel == '') ? "true" : posLabel;
+					negLabel = (negLabel == null || negLabel == '') ? "false" : negLabel;
 					if (item !== null)
 					{
-						dataItem[col.FieldName] = item == true ? posLabel : negLabel;
+						dataItem[col.FieldName] = item == "true" ? posLabel : negLabel;
 					}
 					else
 					{
@@ -350,7 +351,8 @@
 		});
 		sortFields.forEach(col =>
 		{
-			if (col.type === 'SystemField')
+			const saveValueWithForm = col.FieldOptions?.SaveValueWithForm;
+			if (col.type === 'SystemField' && !saveValueWithForm)
 			{
 				return;
 			}
@@ -640,7 +642,8 @@
 
 		gridFields.forEach(gf =>
 		{
-			if (excludeSystemField && gf.type === 'SystemField')
+			const saveValueWithForm = gf.FieldOptions?.SaveValueWithForm;
+			if (excludeSystemField && gf.type === 'SystemField' && !saveValueWithForm)
 			{
 				return;
 			}
@@ -872,6 +875,7 @@
 		}
 
 		rawRecord.RecordValue = JSON.stringify(recordValueObj);
+		rawRecord.RecordVersion = TF.DetailView.UserDefinedGridHelper.RECORD_VERSION;
 		let paramData = {};
 		if (record.DocumentUDGridRecords)
 		{
@@ -946,6 +950,7 @@
 		}
 
 		rawRecord.RecordValue = JSON.stringify(recordValueObj);
+		rawRecord.RecordVersion = TF.DetailView.UserDefinedGridHelper.RECORD_VERSION;
 		let paramData = {};
 		if (record.DocumentUDGridRecords)
 		{
@@ -2573,6 +2578,30 @@
 			return [];
 		});
 	};
+
+	UserDefinedGridHelper.prototype.getUDGridRecordsWithRecordId = function(udGridId, dataTypeId, recordId)
+	{
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udgridrecords"),
+			{
+				paramData: {
+					DBID: tf.datasourceManager.databaseId,
+					RecordDataType: dataTypeId,
+					RecordId:recordId,
+					UDGridID: udGridId
+				}
+			},
+			{ overlay: false }
+		).then(resp =>
+		{
+			if (resp && Array.isArray(resp.Items))
+			{
+				return resp.Items;
+			}
+
+			return [];
+		});
+	};
+
 	UserDefinedGridHelper.getFormSearchDataOptions = async function(searchValue, dbId, dataType, isSearchAll, specifyOptions)
 	{
 		const value = (searchValue || '').trim(),

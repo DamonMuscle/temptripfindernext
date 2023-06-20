@@ -257,7 +257,7 @@
 		});
 	}
 
-	Form.prototype.saveForm = function()
+	Form.prototype.saveForm = async function()
 	{
 		const self = this;
 		if (this.obRecordID() == null)
@@ -271,6 +271,18 @@
 			{
 				return null;
 			});
+		}
+		else if (self.obRecordID() && self.options.OneResponsePerRecipient && !self.options.Public) 
+		{
+			//check private + one response + recorded first
+			let udGridRecords = await tf.udgHelper.getUDGridRecordsWithRecordId(self.options.ID, self.options.DataTypeId, this.obRecordID());
+			if (udGridRecords && udGridRecords.length > 0)
+			{
+				return tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED, 'Warning').then(()=>
+				{
+					return null;
+				});
+			}
 		}
 
 		const filterOptions = {
@@ -1119,50 +1131,27 @@
 				{
 					if (data.FilteredRecordCount === 1)
 					{
-						systemFieldQuestions.forEach(async q =>
+						systemFieldQuestions.forEach(q =>
 						{
-							const value = await this.getSystemFieldValue(data.Items[0], q);
-							q.setValue(value);
+							const value = this.getSystemFieldValue(data.Items[0], q);
+							q.setValue(value, self.udfs);
 						});
 					}
 				});
 		});
 	}
 
-	Form.prototype.getSystemFieldValue = async function(data, question)
+	Form.prototype.getSystemFieldValue = function(data, question)
 	{
 		const fieldOptions = question.field.FieldOptions;
 		let value = data[question.field.editType.targetField];
 		value = this.convertValueByMeasurementUnit(value, question.field.editType.targetField);
-		if (fieldOptions.IsUDFSystemField)
-		{
-			const udf = this.udfs.filter(udf => udf.DisplayName === question.field.editType.targetField)[0];
-			if (udf && udf.UDFDataSources.length === 1)
-			{
-				const udfId = udf.UDFDataSources[0].UDFID;
-				const recordEntity = await tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
-					{
-						paramData: {
-							"@Relationships": "all",
-							"@filter": `eq(DataTypeId,${this.options.DataTypeId})`
-						}
-					},
-					{ overlay: false })
 
-				const currentField = recordEntity.Items && recordEntity.Items.filter(item => item.Id === udfId)[0];
-				if (currentField && fieldOptions.SystemFieldType === "Boolean")
-				{
-					if (value === true)
-					{
-						value = currentField.TrueDisplayName || "true";
-					}
-					else
-					{
-						value = currentField.FalseDisplayName || "false";
-					}
-				}
-			}
+		if (fieldOptions.SaveValueWithForm && this.options.udGridRecordId)
+		{
+			value = question.field.value;
 		}
+
 		return value;
 	}
 
