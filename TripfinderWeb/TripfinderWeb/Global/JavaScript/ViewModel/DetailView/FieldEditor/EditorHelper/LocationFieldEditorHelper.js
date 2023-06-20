@@ -21,7 +21,7 @@
 			modifiedFields = {},
 			isGeocoded = self._detailView.recordEntity.Geocoded;
 
-		if (!isGeocoded)
+		if (!isGeocoded || self.isUpdatedByManualPin(self.editFieldList))
 		{
 			return Promise.resolve(true);
 		}
@@ -117,4 +117,19 @@
 
 		return result;
 	};
+
+	LocationFieldEditorHelper.prototype.isUpdatedByManualPin = function(editFieldList)
+	{
+		const manualPinAssocaitedFields = ["GeoConfidence", "XCoord", "YCoord"];
+		let matchCount = 0;
+
+		// increase counter if key matches in manualPinAssocaitedFields
+		manualPinAssocaitedFields.forEach((key) => {
+			if(!!editFieldList[key] && editFieldList[key].value)
+				matchCount += 1;
+		});
+
+		// return true if editFieldList contains all manualPinAssocaitedFields fields
+		return matchCount == manualPinAssocaitedFields.length;
+	}
 })();
