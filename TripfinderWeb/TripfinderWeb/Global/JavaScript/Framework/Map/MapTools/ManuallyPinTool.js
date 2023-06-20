@@ -43,7 +43,7 @@
 		var coordName = self.record && typeof self.record.XCoord != "undefined" ? "Coord" : "coord";
 		self.update("X" + coordName, geoGraphic.x);
 		self.update("Y" + coordName, geoGraphic.y);
-		self.update("GeoConfidence", TF.Grid.GeocodeTool.getGeoConfidence("ManuallyPin"));
+		self.update("GeocodeScore", 100); // use fixed value since ManuallyPin does not have Geo Confidence
 		if (this.detailView)
 		{
 			this.detailView.obEditing(true);

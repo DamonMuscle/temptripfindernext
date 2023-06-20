@@ -120,7 +120,7 @@
 
 	LocationFieldEditorHelper.prototype.isUpdatedByManualPin = function(editFieldList)
 	{
-		const manualPinAssocaitedFields = ["GeoConfidence", "XCoord", "YCoord"];
+		const manualPinAssocaitedFields = ["XCoord", "YCoord"];
 		let matchCount = 0;
 
 		// increase counter if key matches in manualPinAssocaitedFields
