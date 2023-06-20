@@ -318,8 +318,10 @@
 		}
 		else
 		{
-			self.locationGridLayerInstance.clearLayer();
-			showLocationPoints();
+			self.locationGridLayerInstance.clearLayer().then(() =>
+			{
+				showLocationPoints();
+			});
 		}
 	}
 
@@ -344,6 +346,15 @@
 			{
 				self.locationGridLayerInstance.addPoint(item.XCoord, item.YCoord, markerSymbol, attributes);
 			}
+		}
+	}
+
+	LocationPage.prototype.showDetailsClick = function()
+	{
+		TF.Page.BaseGridPage.prototype.showDetailsClick.call(this);
+		if (this.locationGridLayerInstance)
+		{
+			this.locationGridLayerInstance = null;
 		}
 	}
 
