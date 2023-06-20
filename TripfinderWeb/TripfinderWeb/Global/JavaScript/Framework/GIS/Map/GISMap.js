@@ -408,39 +408,23 @@
 	Map.prototype.destroyMapEvents = function()
 	{
 		const self = this;
-		if (self.settings.eventHandlers.onMapViewClick && self.eventHandler.onMapViewClick)
+		for (let name in self.settings.eventHandlers)
 		{
-			self.eventHandler.onMapViewClick.remove();
-			self.eventHandler.onMapViewClick = null;
-		}
+			if (self.eventHandler[name])
+			{
+				if (self.eventHandler[name].remove)
+				{
+					self.eventHandler[name].remove();
+				}
 
-		if (self.settings.eventHandlers.onMapViewDoubleClick && self.eventHandler.onMapViewDoubleClick)
-		{
-			self.eventHandler.onMapViewDoubleClick.remove();
-			self.eventHandler.onMapViewDoubleClick = null;
-		}
+				self.eventHandler[name] = null;
+			}
+			else if (self.eventHandler[`${name}Promise`])
+			{
+				self.eventHandler[`${name}Promise`] = null;
+			}
 
-		if (self.settings.eventHandlers.onMapViewUpdating && self.eventHandler.onMapViewUpdating)
-		{
-			self.eventHandler.onMapViewUpdating.remove();
-			self.eventHandler.onMapViewUpdating = null;
-		}
-
-		if (self.settings.eventHandlers.onMapViewUpdated && self.eventHandler.onMapViewUpdated)
-		{
-			self.eventHandler.onMapViewUpdated.remove();
-			self.eventHandler.onMapViewUpdated = null;
-		}
-
-		if (self.settings.eventHandlers.onMapViewPointerMove && self.eventHandler.onMapViewPointerMove)
-		{
-			self.eventHandler.onMapViewPointerMove.remove();
-			self.eventHandler.onMapViewPointerMove = null;
-		}
-
-		if (self.settings.eventHandlers.onMapViewCreated && self.eventHandler.onMapViewCreatedPromise)
-		{
-			self.eventHandler.onMapViewCreatedPromise = null;
+			self.settings.eventHandlers[name] = null;
 		}
 	}
 

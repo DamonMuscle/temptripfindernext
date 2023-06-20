@@ -161,6 +161,8 @@
 		}
 
 		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, options);
+
+		self._map.expandMapTool = new TF.Map.ExpandMapTool(self._map, options.expand.container, self.RoutingMapTool);
 	};
 
 	BaseDataEntryMap.prototype.toggleMenu = function(viewModel)
