@@ -38,12 +38,14 @@
 
 	LocationMapPopup.prototype.buildContentMain = function(data)
 	{
-		return `<div>${data.Street || ""}</div>
-				<div>
-					<span>${data.City}</span>
-					<span>${data.State}</span>
-					<span>${data.Zip}</span>
-				</div>`
+		const streetContent = data.Street ? `<div class='ellipsis'>${data.Street}</div>` : "";
+		const cityStateContent = [data.City, data.State].filter(item => !!item).join(", ");
+		let cityStateZipContent = [cityStateContent, data.Zip].filter(item => !!item).join(" ");
+		if (cityStateZipContent)
+		{
+			cityStateZipContent = `<div class='ellipsis'>${cityStateZipContent}</div>`;
+		}
+		return `${streetContent}${cityStateZipContent}`;
 	};
 
 	LocationMapPopup.prototype.buildContentExtend = function(data)
