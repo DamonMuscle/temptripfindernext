@@ -102,9 +102,10 @@
 		{
 			if (self.detailView && self.detailView.recordEntity && self.detailView.recordEntity.Geocoded)
 			{
-				const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.type);
+				const dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.type),
+					dataTypeLabel = tf.applicationTerm.getApplicationTermSingularByName(dataTypeName);
 				tf.promiseBootbox.yesNo({
-					message: `Are you sure you want to repin this ${dataTypeName}?`,
+					message: `Are you sure you want to repin this ${dataTypeLabel}?`,
 					title: "Confirmation Message"
 				}).then((res) =>
 				{
