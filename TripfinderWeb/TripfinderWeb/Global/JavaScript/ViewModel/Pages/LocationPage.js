@@ -409,6 +409,7 @@
 			parentPage: self,
 			map: self.locationMapViewInstance,
 			canShowDetailView: true,
+			type: self.type,
 			isDetailView: false
 		});
 

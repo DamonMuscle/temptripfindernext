@@ -5,13 +5,15 @@
 }
 
 .resizable-doc,
+.resizable-page,
 .customizeddashboard {
 	.esri-popup .esri-popup__main-container {
 		width: 592px;
 	}
 }
 
-.resizable-doc.small {
+.resizable-doc.small,
+.resizable-page.small {
 	.esri-popup .esri-popup__main-container {
 		width: 350px;
 	}
@@ -34,6 +36,7 @@
 }
 
 .resizable-doc,
+.resizable-page,
 .customizeddashboard {
 
 	.no-content {
@@ -80,6 +83,7 @@
 }
 
 .resizable-doc,
+.resizable-page,
 .customizeddashboard {
 	.esri-popup__main-container {
 		max-height: 500px;
@@ -124,6 +128,7 @@
 
 #FullPageCalloutContainer,
 .resizable-doc .esri-popup__main-container,
+.resizable-page .esri-popup__main-container,
 .customizeddashboard .esri-popup__main-container {
 	cursor: default;
 
@@ -789,6 +794,7 @@
 }
 
 .resizable-doc,
+.resizable-page,
 .customizeddashboard {
 	.esri-popup.detail-view-popup .esri-popup__main-container {
 		width: auto;
@@ -814,6 +820,7 @@
 }
 
 .resizable-doc,
+.resizable-page,
 .customizeddashboard {
 	.vehicle-popup {
 		.esri-popup__main-container {
@@ -939,7 +946,8 @@
 	}
 }
 
-.resizable-doc {
+.resizable-doc,
+.resizable-page {
 	.is-mobile-device:not(.detail-view-panel) {
 
 		.esri-component.esri-popup,

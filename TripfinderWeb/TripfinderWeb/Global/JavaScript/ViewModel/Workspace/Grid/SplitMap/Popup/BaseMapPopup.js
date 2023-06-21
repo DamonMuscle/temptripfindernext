@@ -4,11 +4,18 @@
 
 	function BaseMapPopup(options)
 	{
-		this.options = options;
+		this.options = $.extend({
+			isDetailView: false,
+			gridType: "",
+			dbId: "",
+			canShowDetailView: true,
+			enableHyperlink: true,
+			enableEdit: true
+		}, options);
 		this.viewModel = {};
 		this.eventNameSpace = `callout_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-		this.list = null;
-		this.index = 0;
+		this.dataModels = [];
+		this.pageIndex = 0;
 		this.selectedTabIndex = 0;
 		this.subContentMinHeight = 68;
 	}
@@ -16,13 +23,13 @@
 	BaseMapPopup.prototype.buildContent = function()
 	{
 		const self = this;
-		let index = self.index,
+		let index = self.pageIndex,
 			pagerString = "",
 			photoString = "",
 			subTitleString = "",
 			contentString = "",
-			entityCount = self.list.length,
-			dataModel = self.list[index],
+			entityCount = self.dataModels.length,
+			dataModel = self.dataModels[index],
 			content = self.generatePopupContent(dataModel),
 			contentExtend = "",
 			coverFloat = "";
@@ -127,7 +134,7 @@
 		// {
 		//	 title = "<div class='detail-left drill-down-links " + coverFloat + "' data-outname='" + content.title + "' data-outtype='" + this.options.gridType + "' data-type='" + mapPopupType + "' data-entityindex='" + dataModel.Id + "'>" + content.title + "</div>";
 		// }
-		return `<div class="tfweb-esri-popup-container">
+		return $(`<div class="tfweb-esri-popup-container">
 					<div class="head">
 						${photoString}
 						${pagerString}
@@ -137,7 +144,7 @@
 						</div>
 					</div>
 					${contentString}
-				</div>`;
+				</div>`)[0];
 	}
 
 	BaseMapPopup.prototype.generatePopupContent = function(data)
@@ -254,9 +261,9 @@
 
 		let p = data ? Promise.resolve(data): self.getData(ids).then(response => response.Items || []);
 
-		p.then(function(list)
+		p.then(function(dataModels)
 		{
-			self.list = list;
+			self.dataModels = dataModels;
 			self._addDetailViewStyle();
 			self.popupContainer = self.options.map.showPopup({
 				content: self.buildContent(),
@@ -282,15 +289,148 @@
 
 	BaseMapPopup.prototype.bindEvents = function()
 	{
-		const self = this;
-		$(self.popupContainer).on(`click.${self.eventNameSpace}`, ".page-previous", self.prevClick.bind(self));
-		$(self.popupContainer).on(`click.${self.eventNameSpace}`, ".page-next", self.nextClick.bind(self));
-		$(self.popupContainer).on(`click.${self.eventNameSpace}`, ".detail-left:not(.disable,.drill-down-links)", function()
+		const self = this, $popupContainer = $(self.popupContainer);
+		$popupContainer.on(`click.${self.eventNameSpace}`, ".page-previous", self.prevClick.bind(self));
+		$popupContainer.on(`click.${self.eventNameSpace}`, ".page-next", self.nextClick.bind(self));
+		$popupContainer.on(`click.${self.eventNameSpace}`, ".detail-left:not(.disable,.drill-down-links)", function()
 		{
-			var id = self.list[self.index].Id;
+			var id = self.dataModels[self.pageIndex].Id;
 			self.options.parentPage.showDetailsClick(id);
 		});
+		this._bindNoteEvent($popupContainer, self.options ? self.options.type : self.type);
 	};
+
+	BaseMapPopup.prototype._bindNoteEvent = function($popupContainer, featureType)
+	{
+		var self = this;
+		$popupContainer.delegate("button.addNote,button.saveEdit,button.cancelEdit,textarea", `click.${self.eventNameSpace}`, function(e)
+		{
+			var $notesTab = $popupContainer.find(".notes-tab");
+			var $target = $(e.currentTarget);
+			if (!$notesTab.find(".center-container").hasClass("no-permission"))
+			{
+				if ($target.hasClass("addNote"))
+				{
+					addNewNoteClick();
+				}
+				else if ($target.hasClass("saveEdit"))
+				{
+					saveEditNoteClick();
+				}
+				else if ($target.hasClass("cancelEdit"))
+				{
+					cancelEditNoteClick();
+				}
+				else if ($target.is("textarea"))
+				{
+					openNotesEditMode();
+				}
+			}
+		});
+
+		function addNewNoteClick()
+		{
+			var $notesTab = $popupContainer.find(".notes-tab");
+			self.tempEditNote = null;
+			self.switchEditNoteStatus($notesTab);
+		}
+
+		function saveEditNoteClick()
+		{
+			var $notesTab = $popupContainer.find(".notes-tab"),
+				note = $notesTab.find("textarea").val(),
+				entityId = self.dataModels[self.pageIndex].Id;
+
+			self.saveEntityNotes(featureType, entityId, note)
+				.then(function()
+				{
+					const noteField = self._getNoteField(featureType);
+					self.dataModels[self.pageIndex][noteField] = note;
+					self.switchEditNoteStatus($notesTab);
+				});
+		}
+
+		function cancelEditNoteClick()
+		{
+			var $notesTab = $popupContainer.find(".notes-tab"),
+				$textArea = $notesTab.find("textarea");
+
+			$textArea.val(self.tempEditNote);
+			self.switchEditNoteStatus($notesTab);
+		}
+
+		function openNotesEditMode()
+		{
+			var $notesTab = $popupContainer.find(".notes-tab"),
+				$textArea = $notesTab.find("textarea"),
+				isEditing = $notesTab.hasClass("edit-note");
+
+			self.tempEditNote = $textArea.val();
+			if (!isEditing)
+			{
+				self.switchEditNoteStatus($notesTab);
+			}
+		}
+	};
+
+	/**
+	 * Save the entity note to the DB.
+	 * @param {string} type The entity type.
+	 * @param {number} id The entity id.
+	 * @param {string} comment The comment to be saved.
+	 * @return {Promise} The save process.
+	 */
+	BaseMapPopup.prototype.saveEntityNotes = function(type, id, comment)
+	{
+		var field = this._getNoteField(type);
+		return tf.promiseAjax.patch(pathCombine(tf.api.apiPrefix(),
+			tf.dataTypeHelper.getEndpoint(type)) + "?id=" + id, {
+			data: [
+				{ "op": "replace", "path": "/" + field, "value": comment }
+			]
+		});
+	};
+
+	/**
+	 * Switch the activeness status of the notes.
+	 * @param {JQuery} $notesTab The notes tab jQuery object.
+	 * @param {boolean} status The desired status after switch.
+	 * @return {void}
+	 */
+	BaseMapPopup.prototype.switchEditNoteStatus = function($notesTab)
+	{
+		var self = this,
+			$textArea = $notesTab.find("textarea"),
+			isEditing = $notesTab.hasClass("edit-note"),
+			isEmpty = !$textArea.val();
+
+		if (isEditing)
+		{
+			$textArea.prop("readonly", true);
+			$notesTab.removeClass("edit-note");
+			$notesTab.toggleClass("empty-note", isEmpty);
+			self._updateSubContentHeight();
+		}
+		else
+		{
+			$textArea.prop("readonly", false);
+			$notesTab.addClass("edit-note");
+			self._updateSubContentHeight();
+			$textArea.focus();
+		}
+	};
+
+	BaseMapPopup.prototype._getNoteField = function(type)
+	{
+		if(type === 'fieldtriplocation')
+		{
+			return "Notes";
+		} else if (type === "tripstop")
+		{
+			return "Comment";
+		}
+		return "Comments";
+	}
 
 	BaseMapPopup.prototype.changeItem = function()
 	{
@@ -302,28 +442,28 @@
 		const self = this;
 		self.options.map.closePopup();
 		$(self.popupContainer).off(`.${self.eventNameSpace}`)
-		self.index = 0;
+		self.pageIndex = 0;
 		self.selectedTabIndex = 0;
 	}
 	
 	BaseMapPopup.prototype.prevClick = function(e)
 	{
-		if (this.index === 0)
+		if (this.pageIndex === 0)
 		{
 			return;
 		}
-		this.index--
+		this.pageIndex--
 		this.changeItem();
 		this._updateSubContentHeight();
 	}
 
 	BaseMapPopup.prototype.nextClick = function(e)
 	{
-		if (this.index === this.list.length -1)
+		if (this.pageIndex === this.dataModels.length -1)
 		{
 			return;
 		}
-		this.index++
+		this.pageIndex++
 		this.changeItem();
 		this._updateSubContentHeight();
 	}
