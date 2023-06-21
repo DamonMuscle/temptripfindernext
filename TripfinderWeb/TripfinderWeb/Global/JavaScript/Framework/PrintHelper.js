@@ -47,7 +47,6 @@
 		var self = this;
 		$.each(self.updateEndMapEvents, function(i, item)
 		{
-			item.remove();
 			item = null;
 		});
 		self.updateEndMapEvents.length = 0;
@@ -55,8 +54,8 @@
 
 	PrintHelper.prototype.preLoadMapImage = function($detailViewElement)
 	{
-		var self = this, $maps = $detailViewElement.find('.grid-stack-item .map'),
-			map, $item, promiseAll = [];
+		var self = this, $maps = $detailViewElement.find('.data-entry-map-container:visible'),
+			$item, promiseAll = [];
 
 		self.destroyMapEvents();
 
@@ -64,16 +63,27 @@
 		{
 			$item = $(item);
 			$item.css('width', '2000px');
-			map = $item.data().map;
+			var map = ko.dataFor($item[0])._map;
 
-			promiseAll.push(new Promise(function(resolve, reject)
+			if (map)
 			{
-				self.updateEndMapEvents.push(map.on("update-end", function()
-				{
-					resolve();
-				}));
-			}));
+				promiseAll.push(getImage(map));
+			}
 		});
+
+		function getImage(map)
+		{
+			return new Promise(function(resolve, reject)
+			{
+				self.updateEndMapEvents.push(map.mapView.when(function()
+				{
+					self._takeMapScreenshot(map).then(function(img)
+					{
+						resolve(img);
+					});
+				}));
+			});
+		}
 
 		return Promise.all(promiseAll);
 	};
@@ -111,6 +121,20 @@
 		self.destroyMapEvents();
 	};
 
+	PrintHelper.prototype._takeMapScreenshot = function(map)
+	{
+		return map.mapView.takeScreenshot({
+			'format': 'png'
+		}).then(function(screenshot)
+		{
+			var src = screenshot.dataUrl,
+				width = screenshot.data.width,
+				height = screenshot.data.height;
+
+			return String.format("<img width='{0}' height='{1}' src='{2}'>", width, height, src);
+		});
+	};
+
 	PrintHelper.prototype.print = function(detailViewElement, orientation)
 	{
 		var self = this, $detailViewElement = $(detailViewElement),
@@ -139,12 +163,18 @@
 
 		return new Promise(function(resolve, reject)
 		{
-			self.preLoadMapImage($detailViewElement).then(function()
+			self.preLoadMapImage($detailViewElement).then(function(imgs)
 			{
 				// remove virtual scrollbar padding.
 				$printElement.find('.grid-stack-item-content .kendo-grid .k-grid-content,.grid-stack-item-content .kendo-grid .k-grid-header')
 					.css("padding-right", "0px");
 				$('body').append($printElement);
+
+				$printElement.find('.data-entry-map-container:visible').each(function(i, item)
+				{
+					$(item).find("canvas").parent().html(imgs[i]);
+				});
+
 				$printElement.hide();
 
 				self.beforePrint($printElement, orientation);
