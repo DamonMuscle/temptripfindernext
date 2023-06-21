@@ -1379,7 +1379,12 @@
 
 	EsriTool.centerMultipleItem = function(map, items)
 	{
-		if (items.length > 0)
+		if (items.length === 1 && items[0].geometry.type === "point")
+		{
+			EsriTool.centerSingleItem(map, items[0]);
+			return Promise.resolve();
+		}
+		else if (items.length > 0)
 		{
 			// var extent = EsriTool.getCenterExtentMultipleItem(map, items);
 			// return map.mapView.goTo(extent);
