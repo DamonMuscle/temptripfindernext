@@ -951,7 +951,7 @@
 		self.symbol.dispose();
 		self.mapEventRemovers.forEach(x => x.remove());
 		self._removeEventListeners();
-		self._map.SketchViewModel.destroy();
+		self._map.SketchViewModel && self._map.SketchViewModel.destroy();
 
 		tfdispose(this);
 	}

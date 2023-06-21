@@ -56,6 +56,7 @@
 		this.onMapLoad = new TF.Events.Event();
 
 		this.symbol = new TF.Map.Symbol();
+		this.mapInstances = {};
 		this.gridMapPopup = new TF.Grid.GridMapPopup(this, {
 			isDetailView: true,
 			gridType: this.type
@@ -68,6 +69,14 @@
 		}
 	}
 
+	Object.defineProperty(BaseDataEntryMap.prototype, '_map', {
+		get() {
+			return this.getMapInstance().map;
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	BaseDataEntryMap.prototype.uiInit = function(modal, element)
 	{
 		var self = this;
@@ -76,6 +85,7 @@
 		self._hasManuallyPin().then(async function(hasManuallyPin)
 		{
 			await self.initMap(self.options.mapToolOptions, hasManuallyPin);
+
 			self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
 			self.autoPan.initialize(self.element, 20);
 			self.routingMapPanelManager = new TF.RoutingMap.RoutingMapPanelManager(self);
@@ -89,19 +99,21 @@
 		var self = this;
 		const eventHandlers = {
 			onMapViewCreated: () => {
-				self._mapView.extent = TF.createDefaultMapExtent();
+				self.getMapInstance().map.mapView.extent = TF.createDefaultMapExtent();
 			},
 			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin)
 		};
-		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
-		self._map = self.mapInstance.map;
-		self._mapView = self.mapInstance.map.mapView;
+		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
+		const mapId = mapInstance.settings.mapId;
+		self.mapInstances[mapId] = mapInstance;
+		console.log(`initMap: ${mapId}`);
 
-		self.mapClickEvent = self._mapView.on('click', async function(event) {
+		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
 			console.log(event);
-			
+			console.log(`click: ${mapId}`);
+
 			const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
-			const locationGraphics = await self.mapInstance.find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
+			const locationGraphics = await self.getMapInstance().find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
 	
 			if(!locationGraphics || !locationGraphics.length)
 			{
@@ -112,7 +124,7 @@
 			self.getMapPopup().show(locationGraphics);
 		});
 
-		self.sketchTool = new TF.RoutingMap.SketchTool(self._map, self);
+		self.sketchTool = new TF.RoutingMap.SketchTool(mapInstance.map, self);
 	};
 
 	BaseDataEntryMap.prototype.getMapPopup = function()
@@ -126,6 +138,17 @@
 		});
 
 		return self.locationMapPopup;
+	}
+
+	BaseDataEntryMap.prototype.getMapId = function()
+	{
+		return $(this.element).attr("data-mapid");
+	}
+
+	BaseDataEntryMap.prototype.getMapInstance = function()
+	{
+		const mapId = this.getMapId();
+		return TF.GIS.MapFactory.getMapInstanceById(mapId);
 	}
 
 	BaseDataEntryMap.prototype.onMapViewUpdated = function(mapToolOptions, hasManuallyPin)
@@ -360,13 +383,14 @@
 		PubSub.subscribe("MapCanvasUpdatedRecordsHub", self.mapCanvasUpdatedRecord);
 		if (self.options.disable)
 		{
-			self._mapView.ui.components = ["attribution"];
-			self._mapView.on("mouse-wheel", stopEvtPropagation);
-			self._mapView.on("double-click", stopEvtPropagation);
-			self._mapView.on("double-click", ["Control"], stopEvtPropagation);
-			self._mapView.on("drag", stopEvtPropagation);
-			self._mapView.on("drag", ["Shift"], stopEvtPropagation);
-			self._mapView.on("drag", ["Shift", "Control"], stopEvtPropagation);
+			const mapView = self._map.mapView;
+			mapView.ui.components = ["attribution"];
+			mapView.on("mouse-wheel", stopEvtPropagation);
+			mapView.on("double-click", stopEvtPropagation);
+			mapView.on("double-click", ["Control"], stopEvtPropagation);
+			mapView.on("drag", stopEvtPropagation);
+			mapView.on("drag", ["Shift"], stopEvtPropagation);
+			mapView.on("drag", ["Shift", "Control"], stopEvtPropagation);
 		}
 
 		if (!tf.isViewfinder)
@@ -483,7 +507,6 @@
 			}
 		});
 
-
 		// Add layers to map
 		self.addLayersToMap();
 
@@ -497,7 +520,7 @@
 	};
 
 	/**
-	 * Load relatd data and add graphics to map layers accordingly.
+	 * Load related data and add graphics to map layers accordingly.
 	 *
 	 * @returns Promise
 	 */
@@ -631,7 +654,8 @@
 				});
 			};
 
-		self.manuallyPinLayerInstance = self.mapInstance.addLayer({ id: ManuallyPinLayerId, eventHandlers:{onLayerCreated: function(){ invalidateCoordinate();}}});
+		self.manuallyPinLayerInstance = self.getMapInstance().addLayer({ id: ManuallyPinLayerId, eventHandlers:{onLayerCreated: function(){ invalidateCoordinate();}}});
+		console.log(self.manuallyPinLayerInstance.settings.id);
 	}
 
 	BaseDataEntryMap.prototype.drawCoordinate = function()
@@ -639,12 +663,7 @@
 		const self = this, data = self.data;
 		if (self.manuallyPinLayerInstance && data.XCoord && data.YCoord)
 		{
-			const markerSymbol = {
-				type: "picture-marker",
-				url: "./global/img/map/map-pin.png",
-				width: "32px",
-				height: "32px",
-			};
+			const markerSymbol = self.symbol.fieldTripLocation();
 			const longitude = data.XCoord, latitude = data.YCoord;
 			const attributes = {
 				type: "fieldtriplocation",
@@ -660,13 +679,14 @@
 			};
 
 			self.manuallyPinLayerInstance.addPoint(longitude, latitude, markerSymbol, attributes);
-			self.mapInstance.centerAt(longitude, latitude);
+
+			self.getMapInstance().centerAt(longitude, latitude);
 		}
 	}
 
 	BaseDataEntryMap.prototype.getManuallyPinLayer = function()
 	{
-		return this.mapInstance.getMapLayer(ManuallyPinLayerId);
+		return this.getMapInstance().getMapLayer(ManuallyPinLayerId);
 	}
 
 	function getValueByAttr(optionObj, attr, defaultValue)
@@ -696,24 +716,25 @@
 
 		this.sketchTool && this.sketchTool.dispose();
 
-		if (this._mapView)
+		const mapView = this._map && this._map.mapView;
+		if (mapView)
 		{
-			let canvas = this._mapView.container.querySelector('canvas');
+			let canvas = mapView.container && mapView.container.querySelector('canvas');
 			if (canvas)
 			{
 				let gl = canvas.getContext('webgl');
 				gl.getExtension('WEBGL_lose_context').loseContext();
-				this._mapView.container = null;
+				mapView.container = null;
 			}
 
-			this._mapView.destroy();
-			this._mapView.map = null;
+			mapView.destroy();
+			mapView.map = null;
 
-			this._mapView.center && !this._mapView.center.destroyed && this._mapView.center.destroy();
-			this._mapView.constraints && !this._mapView.constraints.destroyed && this._mapView.constraints.destroy();
-			this._mapView.layerViews && !this._mapView.layerViews.destroyed && this._mapView.layerViews.destroy();
-			this._mapView.magnifier && !this._mapView.magnifier.destroyed && this._mapView.magnifier.destroy();
-			this._mapView.spatialReference && !this._mapView.spatialReference.destroyed && this._mapView.spatialReference.destroy();
+			mapView.center && !mapView.center.destroyed && mapView.center.destroy();
+			mapView.constraints && !mapView.constraints.destroyed && mapView.constraints.destroy();
+			mapView.layerViews && !mapView.layerViews.destroyed && mapView.layerViews.destroy();
+			mapView.magnifier && !mapView.magnifier.destroyed && mapView.magnifier.destroy();
+			mapView.spatialReference && !mapView.spatialReference.destroyed && mapView.spatialReference.destroy();
 		}
 
 		if (this._map)

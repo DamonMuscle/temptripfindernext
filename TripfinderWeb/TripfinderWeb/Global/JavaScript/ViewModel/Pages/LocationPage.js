@@ -328,12 +328,7 @@
 	LocationPage.prototype.drawLocationPoints = async function()
 	{
 		const self = this,
-			markerSymbol = {
-				type: "picture-marker",
-				url: "./global/img/map/map-pin.png",
-				width: "32px",
-				height: "32px",
-			},
+			symbol = new TF.Map.Symbol(),
 			records = await self.getLocationRecords();
 
 		for (let i = 0; i < records.length; i++)
@@ -344,7 +339,7 @@
 			}
 			if (item.XCoord && item.YCoord)
 			{
-				self.locationGridLayerInstance.addPoint(item.XCoord, item.YCoord, markerSymbol, attributes);
+				self.locationGridLayerInstance.addPoint(item.XCoord, item.YCoord, symbol.fieldTripLocation(), attributes);
 			}
 		}
 	}

@@ -10,7 +10,7 @@
 				throw new Error("Map instance has been created for this dom.");
 			}
 
-			const mapId = `mapId_${Date.now()}`;
+			const mapId = `mapId_${Math.random().toString(36).substring(7)}`;
 			$($mapContainer).attr(attrKey, mapId);
 			options.mapId = mapId;
 
@@ -21,7 +21,7 @@
 		},
 		getMapInstanceById: function(id)
 		{
-			return instances.find(x=>x.id === id);
+			return instances.find(x=>x.id === id).instance;
 		},
 		destroyMapInstanceById: function(id)
 		{
