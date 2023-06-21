@@ -1579,13 +1579,14 @@
 			relationshipKey: 'contactAssociation',
 			value: associations.map(function(item)
 			{
-				return {
+				var originalRecord = self.recordEntity.RecordContacts.find(record => record.RecordID == item.Id);
+				return $.extend(originalRecord, {
 					DataTypeId: tf.dataTypeHelper.getIdByName(item.Type),
 					DBID: tf.datasourceManager.databaseId,
 					RecordID: item.Id,
 					ContactID: self.recordId || 0,
 					IsPrimary: item.IsPrimary
-				};
+				});
 			})
 		};
 
