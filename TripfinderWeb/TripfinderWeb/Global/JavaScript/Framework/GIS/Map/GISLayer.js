@@ -15,7 +15,7 @@
 		}
 	};
 
-	let _layer = null;
+	// let _layer = null;
 
 	function Layer(options, layerType = LAYER_TYPE.GRAPHIC)
 	{
@@ -24,7 +24,7 @@
 	}
 
 	Object.defineProperty(Layer.prototype, 'layer', {
-		get() { return _layer; },
+		get() { return this._layer; },
 		enumerable: false,
 		configurable: false
 	});
@@ -51,16 +51,16 @@
 				break;
 		}
 
-		_layer = layer;
+		this._layer = layer;
 	}
 
 	Layer.prototype.clearLayer = async function()
 	{
 		return new Promise((resolve, reject) =>
 		{
-			if (_layer instanceof TF.GIS.SDK.GraphicsLayer) {
-				const total = _layer.graphics.items.length;
-				_layer.on("after-changes", (event) =>
+			if (this._layer instanceof TF.GIS.SDK.GraphicsLayer) {
+				const total = this._layer.graphics.items.length;
+				this._layer.on("after-changes", (event) =>
 				{
 					console.log(event);
 					count--;
@@ -69,8 +69,8 @@
 						resolve();
 					}
 				});
-				_layer.removeAll();
-			} else if (_layer instanceof TF.GIS.SDK.FeatureLayer) {
+				this._layer.removeAll();
+			} else if (this._layer instanceof TF.GIS.SDK.FeatureLayer) {
 				console.warn(`TODO: clear FeatureLayer, promise`);
 				resolve();
 			}
@@ -85,11 +85,11 @@
 
 	Layer.prototype.add = function(geometry, symbol, attributes)
 	{
-		if (_layer instanceof TF.GIS.SDK.GraphicsLayer)
+		if (this._layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
 			this.addGraphic(geometry, symbol, attributes);
 		}
-		else if (_layer instanceof TF.GIS.SDK.FeatureLayer)
+		else if (this._layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
 			this.addFeature(geometry, symbol, attributes);
 		}
@@ -98,7 +98,7 @@
 	Layer.prototype.addGraphic = function(geometry, symbol, attributes)
 	{
 		const graphic = new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
-		_layer.add(graphic);
+		this._layer.add(graphic);
 	}
 
 	Layer.prototype.addFeature = function(geometry, symbol, attributes)
@@ -108,10 +108,10 @@
 
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
 	{
-		if (_layer instanceof TF.GIS.SDK.GraphicsLayer)
+		if (this._layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
 			const results = [];
-			const items = _layer.graphics.items;
+			const items = this._layer.graphics.items;
 			for (let i = 0; i < items.length; i++)
 			{
 				const item = items[i];
@@ -123,17 +123,17 @@
 
 			return Promise.resolve(results);
 		}
-		else if (_layer instanceof TF.GIS.SDK.FeatureLayer)
+		else if (this._layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
 			console.warn(`TODO: query features on FeatureLayer`);
-			const queryParams = _layer.createQuery();
+			const queryParams = this._layer.createQuery();
 			queryParams.geometry = geometry;
 			queryParams.where = condition;
 			queryParams.outSpatialReference = { wkid: 102100 };
 			queryParams.returnGeometry = true;
 			queryParams.outFields = ['*'];
 
-			return _layer.queryFeatures(queryParams);
+			return this._layer.queryFeatures(queryParams);
 		}
 	}
 })();
