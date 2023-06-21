@@ -405,7 +405,8 @@
 			map: self.locationMapViewInstance,
 			canShowDetailView: true,
 			type: self.type,
-			isDetailView: false
+			isDetailView: false,
+			viewDetailEvent: self.showDetailsClick.bind(this)
 		});
 
 		return self.locationMapPopup;

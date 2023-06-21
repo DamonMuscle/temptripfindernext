@@ -10,7 +10,8 @@
 			dbId: "",
 			canShowDetailView: true,
 			enableHyperlink: true,
-			enableEdit: true
+			enableEdit: true,
+			viewDetailEvent: function() { }
 		}, options);
 		this.viewModel = {};
 		this.eventNameSpace = `callout_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -295,7 +296,7 @@
 		$popupContainer.on(`click.${self.eventNameSpace}`, ".detail-left:not(.disable,.drill-down-links)", function()
 		{
 			var id = self.dataModels[self.pageIndex].Id;
-			self.options.parentPage.showDetailsClick(id);
+			self.options.viewDetailEvent(id);
 		});
 		this._bindNoteEvent($popupContainer, self.options ? self.options.type : self.type);
 	};

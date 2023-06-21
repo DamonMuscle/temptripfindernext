@@ -100,7 +100,8 @@
 			onMapViewCreated: () => {
 				self.getMapInstance().map.mapView.extent = TF.createDefaultMapExtent();
 			},
-			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin)
+			onMapViewUpdated: self.onMapViewUpdated.bind(self, mapToolOptions, hasManuallyPin),
+			onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
 		};
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
 		const mapId = mapInstance.settings.mapId;
@@ -154,6 +155,30 @@
 		this._initMapTool(mapToolOptions, hasManuallyPin);
 		this._onMapLoad();
 		this.initLayers();
+	}
+
+	BaseDataEntryMap.prototype.onMapViewPointerMove = function(event)
+	{
+		const self = this, mapInstance = self.getMapInstance();
+		if (!mapInstance)
+		{
+			return;
+		}
+
+		mapInstance.hitTest(event).then((response) =>
+		{
+			let graphics = null, cursor = "default";
+			if (response && response.results.length > 0)
+			{
+				graphics = response.results;
+				const locationGraphics =  graphics.filter(item => item.graphic.layer.id === ManuallyPinLayerId);
+				if (locationGraphics.length > 0)
+				{
+					cursor = "pointer";
+				}
+			}
+			mapInstance.setMapCursor(cursor);
+		});
 	}
 
 	BaseDataEntryMap.prototype._initMapTool = function(mapToolOptions, hasManuallyPin)
