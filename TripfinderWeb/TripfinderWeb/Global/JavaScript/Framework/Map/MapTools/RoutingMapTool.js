@@ -427,7 +427,7 @@
 			var horizontalMargin = Math.max((pageWidth - imgWidthInch) / 2, minMagin),
 				verticalMargin = Math.max((pageHeight - imgHeightInch) / 2, minMagin),
 				img = `<img width='${width}' height='${height}' src='${src}' class='printable' />)`,
-				pageCss = `@media print {@page {margin: ${verticalMargin.toFixed(2)}in ${horizontalMargin.toFixed(2)}in; size: ${pageWidth}in ${pageHeight}in;}}`,
+				pageCss = `@media print {@page {margin: ${verticalMargin.toFixed(2)}in ${horizontalMargin.toFixed(2)}in; size: ${pageWidth}in ${pageHeight}in;} html, body {min-height:auto;}}`,
 				styleHtml = `<style>${pageCss}</style>`,
 				styleEle = $(styleHtml).appendTo($(document).find("head")),
 				imgElement = $(img).on('load', () =>
