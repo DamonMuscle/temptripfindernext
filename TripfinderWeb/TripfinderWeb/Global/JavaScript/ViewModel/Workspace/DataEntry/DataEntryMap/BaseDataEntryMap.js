@@ -156,7 +156,7 @@
 	BaseDataEntryMap.prototype.onMapViewPointerMove = function(event)
 	{
 		const self = this, mapInstance = self.getMapInstance();
-		if (!mapInstance)
+		if (!mapInstance || mapInstance.map.mapView.pining)
 		{
 			return;
 		}
