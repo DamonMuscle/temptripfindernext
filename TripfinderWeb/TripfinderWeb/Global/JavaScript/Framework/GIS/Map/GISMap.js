@@ -42,7 +42,6 @@
 	function Map($mapContainer, options)
 	{
 		this.settings = Object.assign({}, defaultOptions, options);
-		this._map = null;
 		this._mapLayerInstances = [];
 		this.eventHandler = {
 			onMapViewCreatedPromise: null,
@@ -326,12 +325,6 @@
 
 	Map.prototype.constructor = Map;
 
-	Object.defineProperty(Map.prototype, 'map', {
-		get() { return this._map; },
-		enumerable: false,
-		configurable: false
-	});
-
 	Map.prototype.create = function($mapContainer)
 	{
 		const self = this;
@@ -369,14 +362,18 @@
 		map.mapView = view;
 		map.id = self.settings.mapId;
 
-		this._map = map;
+		Object.defineProperty(self, 'map', {
+			get() { return map; },
+			enumerable: false,
+			configurable: false
+		});
 
 		self.createMapEvents();
 	}
 
 	Map.prototype.createMapEvents = function()
 	{
-		const self = this, mapView = this._map.mapView;
+		const self = this, mapView = self.map.mapView;
 		if (self.settings.eventHandlers.onMapViewClick)
 		{
 			self.eventHandler.onMapViewClick = mapView.on("click", self.settings.eventHandlers.onMapViewClick);
@@ -435,7 +432,7 @@
 	{
 		const availableCursorTypes = ["default", "locate", "locate-white", "pin", "pointer"];
 
-		$(this._map.mapView.container).removeClass("pin-cursor");
+		$(this.map.mapView.container).removeClass("pin-cursor");
 
 		let cursor = null;
 		switch (cursorType)
@@ -448,7 +445,7 @@
 				break;
 			case "pin":
 				cursor = "pin";
-				$(this._map.mapView.container).addClass("pin-cursor");
+				$(this.map.mapView.container).addClass("pin-cursor");
 				break;
 			case "pointer":
 			default:
@@ -456,19 +453,19 @@
 				break;
 		}
 
-		this._map.mapView.container.style.cursor = cursor;
+		this.map.mapView.container.style.cursor = cursor;
 
 		if (availableCursorTypes.indexOf(cursorType) >= 0)
 		{
-			$(this._map.mapView.container).find(".esri-view-surface[data-interacting='true']").attr("data-interacting", false);
+			$(this.map.mapView.container).find(".esri-view-surface[data-interacting='true']").attr("data-interacting", false);
 		}
 	}
 
 	Map.prototype.addLayer = function(options, layerType = LAYER_TYPE.GRAPHIC)
 	{
-		if (this._map === null)
+		if (this.map === null)
 		{
-			console.warn(`this._map is null, return.`);
+			console.warn(`this.map is null, return.`);
 			return null;
 		}
 
@@ -492,16 +489,16 @@
 
 		if (settings.eventHandlers.onLayerCreated)
 		{
-			this._map.mapView.whenLayerView(layer).then((result) => settings.eventHandlers.onLayerCreated.call(result));
+			this.map.mapView.whenLayerView(layer).then((result) => settings.eventHandlers.onLayerCreated.call(result));
 		}
 
 		if (layerInstance.index >= 0)
 		{
-			this._map.add(layer, layerInstance.index);
+			this.map.add(layer, layerInstance.index);
 		}
 		else
 		{
-			this._map.add(layer);
+			this.map.add(layer);
 		}
 
 		this._mapLayerInstances.push(layerInstance);
@@ -520,26 +517,26 @@
 			return null;
 		}
 
-		this._map.remove(layer);
+		this.map.remove(layer);
 	}
 
 	Map.prototype.removeAllLayers = function()
 	{
-		if (this._map)
+		if (this.map)
 		{
-			this._map.removeAll();
+			this.map.removeAll();
 		}
 	}
 
 	Map.prototype.getMapLayer = function(layerId)
 	{
-		if (this._map === null)
+		if (this.map === null)
 		{
-			console.warn(`this._map is null, return.`);
+			console.warn(`this.map is null, return.`);
 			return null;
 		}
 
-		const layer = this._map.findLayerById(layerId);
+		const layer = this.map.findLayerById(layerId);
 		if (!layer) {
 			console.warn(`Could not find the layer id = ${layerId}`);
 			return null;
@@ -550,9 +547,9 @@
 
 	Map.prototype.getMapLayerInstance = function(layerId)
 	{
-		if (this._map === null)
+		if (this.map === null)
 		{
-			console.warn(`this._map is null, return.`);
+			console.warn(`this.map is null, return.`);
 			return null;
 		}
 
@@ -573,9 +570,9 @@
 
 	Map.prototype.getMapLayers = function()
 	{
-		if (this._map)
+		if (this.map)
 		{
-			return this._map.layers;
+			return this.map.layers;
 		}
 
 		return null;
@@ -589,12 +586,12 @@
 
 	Map.prototype.centerAtPoint = function(point)
 	{
-		this._map.mapView.center = point;
+		this.map.mapView.center = point;
 	}
 
 	Map.prototype.setExtent = async function(target)
 	{
-		await this._map.mapView.goTo(target, { duration: 0, easing: "linear" });
+		await this.map.mapView.goTo(target, { duration: 0, easing: "linear" });
 	}
 
 	Map.prototype.centerAndZoom = function(longitude, latitude, scale)
@@ -602,7 +599,7 @@
 		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
 		this.centerAtPoint(point);
 
-		this._map.mapView.scale = scale;
+		this.map.mapView.scale = scale;
 	}
 
 	Map.prototype.restrictPanOutside = function()
@@ -626,7 +623,7 @@
 
 		const resetMapExtent = async () =>
 		{
-			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = this._map.mapView.extent;
+			const MERCATOR_MAX_Y = 19972000, MERCATOR_MIN_Y = -19972000, mapExtent = this.map.mapView.extent;
 
 			if (mapExtent)
 			{
@@ -646,7 +643,7 @@
 			}
 		}
 
-		this._map.mapView.watch("extent", async function(value)
+		this.map.mapView.watch("extent", async function(value)
 		{
 			resetMapExtent();
 		});
@@ -662,7 +659,7 @@
 		if (queryGeometry && queryGeometry.type === "point")
 		{
 			// use event extent to check the clicked graphic
-			const queryDistance = this._map.mapView.scale / searchScaleFactor;
+			const queryDistance = this.map.mapView.scale / searchScaleFactor;
 			spatialQueryGeometry = TF.GIS.SDK.geometryEngine.geodesicBuffer(queryGeometry, queryDistance, "meters");
 		}
 
@@ -678,23 +675,23 @@
 
 	Map.prototype.hitTest = async function(event)
 	{
-		return this._map.mapView && this._map.mapView.hitTest(event) || null;
+		return this.map.mapView && this.map.mapView.hitTest(event) || null;
 	}
 
 	Map.prototype.showPopup = function({content, location})
 	{
-		this._map.mapView.popup.open({content, location});
-		return this._map.mapView.popup.container;
+		this.map.mapView.popup.open({content, location});
+		return this.map.mapView.popup.container;
 	}
 
 	Map.prototype.updatePopup = function(content)
 	{
-		$(this._map.mapView.popup.container).find("article>div").html(content);
+		$(this.map.mapView.popup.container).find("article>div").html(content);
 	}
 
 	Map.prototype.closePopup = function(eventNameSpace)
 	{
-		this._map.mapView.popup.close();
+		this.map.mapView.popup.close();
 	}
 
 	Map.prototype.dispose = function()
@@ -703,12 +700,10 @@
 		self.removeAllLayers();
 		self.destroyMapEvents();
 
-		if (this._map)
+		if (this.map)
 		{
-			this._map.mapView && this._map.mapView.destroy();
-			this._map.destroy && this._map.destroy();
-
-			this._map = null;
+			this.map.mapView && this.map.mapView.destroy();
+			this.map.destroy && this.map.destroy();
 		}
 	}
 })();
