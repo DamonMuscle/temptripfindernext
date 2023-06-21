@@ -104,12 +104,8 @@
 			onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
 		};
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
-		const mapId = mapInstance.settings.mapId;
-		console.log(`initMap: ${mapId}`);
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
-			console.log(event);
-			console.log(`click: ${mapId}`);
 
 			const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 			const locationGraphics = await self.getMapInstance().find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
@@ -678,7 +674,6 @@
 			};
 
 		self.manuallyPinLayerInstance = self.getMapInstance().addLayer({ id: ManuallyPinLayerId, eventHandlers:{onLayerCreated: function(){ invalidateCoordinate();}}});
-		console.log(self.manuallyPinLayerInstance.settings.id);
 	}
 
 	BaseDataEntryMap.prototype.drawCoordinate = function()
@@ -750,8 +745,8 @@
 				mapView.container = null;
 			}
 
-			mapView.destroy();
-			mapView.map = null;
+			// mapView.destroy();
+			// mapView.map = null;
 
 			mapView.center && !mapView.center.destroyed && mapView.center.destroy();
 			mapView.constraints && !mapView.constraints.destroyed && mapView.constraints.destroy();
@@ -762,17 +757,20 @@
 
 		if (this._map)
 		{
-			this._map.mapView = null;
+			// this._map.mapView = null;
 
 			this._map.ground && !this._map.ground.destroyed && this._map.ground.destroy();
 			this._map.layers && !this._map.layers.destroyed && this._map.layers.destroy();
 			this._map.basemap && !this._map.basemap.destroyed && this._map.basemap.destroy();
 			this._map.allLayers && !this._map.allLayers.destroyed && this._map.allLayers.destroy();
 			this._map.expandMapTool && this._map.expandMapTool.dispose();
-			this._map.destroy();
+			// this._map.destroy();
 
 			this._map.expandMapTool = null;
 			this._map.SketchViewModel = null;
+
+			const mapId = this.getMapId();
+			TF.GIS.MapFactory.destroyMapInstanceById(mapId);
 		}
 
 		if (this.mapViewerViewModel)
