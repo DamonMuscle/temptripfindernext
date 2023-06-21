@@ -56,7 +56,6 @@
 		this.onMapLoad = new TF.Events.Event();
 
 		this.symbol = new TF.Map.Symbol();
-		this.mapInstances = {};
 		this.gridMapPopup = new TF.Grid.GridMapPopup(this, {
 			isDetailView: true,
 			gridType: this.type
@@ -105,7 +104,6 @@
 		};
 		const mapInstance = await TF.Helper.MapHelper.createMapInstance(self.element, eventHandlers);
 		const mapId = mapInstance.settings.mapId;
-		self.mapInstances[mapId] = mapInstance;
 		console.log(`initMap: ${mapId}`);
 
 		self.mapClickEvent = mapInstance.map.mapView.on('click', async function(event) {
@@ -132,7 +130,7 @@
 		const self = this;
 		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
 			parentPage: self,
-			map: self.mapInstance,
+			map: self.getMapInstance(),
 			canShowDetailView: true,
 			isDetailView: true
 		});
