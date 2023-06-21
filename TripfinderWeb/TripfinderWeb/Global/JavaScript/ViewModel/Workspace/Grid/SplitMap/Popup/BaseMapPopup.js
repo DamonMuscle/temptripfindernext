@@ -264,11 +264,11 @@
 		p.then(function(dataModels)
 		{
 			self.dataModels = dataModels;
-			self._addDetailViewStyle();
 			self.popupContainer = self.options.map.showPopup({
 				content: self.buildContent(),
 				location: graphics[0].geometry,
 			});
+			self._addDetailViewStyle();
 
 			setTimeout(function()
 			{
@@ -283,7 +283,7 @@
 		var self = this;
 		if (self.options.isDetailView)
 		{
-			$(self.map.map.mapView.popup.container).addClass("detail-view-popup");
+			$(self.popupContainer).addClass("detail-view-popup");
 		}
 	};
 
