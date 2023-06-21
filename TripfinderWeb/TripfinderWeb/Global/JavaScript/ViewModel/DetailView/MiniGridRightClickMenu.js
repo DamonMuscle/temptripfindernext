@@ -24,7 +24,7 @@
 		{
 			this.obContactTypes = ko.observable([]);
 			
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.dataTypeHelper.getEndpoint("contacttypes")))
+			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), tf.dataTypeHelper.getEndpoint("contacttypes")), null, { overlay: false })
 			.then(function(response)
 			{
 				var result = [{ID : null, Type : '(None)'}].concat(Array.sortBy(response.Items,'Type',false))
