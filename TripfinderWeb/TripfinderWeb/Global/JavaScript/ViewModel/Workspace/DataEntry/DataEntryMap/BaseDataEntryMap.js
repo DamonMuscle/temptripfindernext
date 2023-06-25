@@ -172,7 +172,7 @@
 			if (response && response.results.length > 0)
 			{
 				graphics = response.results;
-				const locationGraphics =  graphics.filter(item => item.graphic.layer.id === ManuallyPinLayerId);
+				const locationGraphics =  graphics.filter(item => item.graphic?.layer?.id === ManuallyPinLayerId);
 				if (locationGraphics.length > 0)
 				{
 					cursor = "pointer";
