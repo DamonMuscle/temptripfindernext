@@ -5174,7 +5174,7 @@
 				{
 					"field": "Name",
 					"title": "Name",
-					"defaultValue": "",
+					"defaultValue": "Transfinder Location",
 					"unique": true,
 					"type": "string",
 					"width": '150px',
@@ -5189,6 +5189,7 @@
 					"defaultValue": "",
 					"type": "string",
 					"width": '200px',
+					"defaultValue": "Lorem ipsum dolor sit amet.",
 					"editType": {
 						"format": "Note",
 						"maxLength": 255
@@ -5208,7 +5209,7 @@
 				{
 					"field": "Street",
 					"title": "Street",
-					"defaultValue": "",
+					"defaultValue": "440 State St.",
 					"type": "string",
 					"width": '200px',
 					"editType": {
@@ -5222,6 +5223,7 @@
 					"defaultValue": "",
 					"type": "string",
 					"width": '120px',
+					"defaultValue": "Schenectady",
 					"editType": {
 						"format": "String",
 						"maxLength": 100
@@ -5231,6 +5233,7 @@
 					"field": "State",
 					"title": "State",
 					"type": "string",
+					"defaultValue": "NY",
 					"editType": {
 						"format": "String",
 						"maxLength": 2
@@ -5240,6 +5243,7 @@
 					"field": "Zip",
 					"title": "Zip",
 					"type": "string",
+					"defaultValue": "12305",
 					"editType": {
 						"format": "String",
 						"maxLength": 5
@@ -5269,6 +5273,7 @@
 					"field": "GeoCounty",
 					"title": "Geocode Map Set",
 					"type": "String",
+					"defaultValue": "NY",
 					"editType": {
 						"format": "String",
 						"maxLength": 255
