@@ -630,9 +630,9 @@
 											{
 												TF.Helper.KendoGridHelper.loadGridLink(tf.urlParm.GridLinkGuid)
 												.then((gridLinkData) => {
+													history.pushState({}, document.title, location.pathname);
 													if (!gridLinkData)
 													{
-														history.pushState({}, document.title, location.pathname);
 														openDefaultPage(false);
 														return;
 													}
