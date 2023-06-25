@@ -360,7 +360,7 @@
 		map.mapView = view;
 		map.id = self.settings.mapId;
 
-		self.defineReadOnlyProperty('map', map)
+		self.defineReadOnlyProperty('map', map);
 
 		self.createMapEvents();
 	}

@@ -166,6 +166,13 @@
 			return;
 		}
 
+		if (self.RoutingMapTool.measurementTool && self.RoutingMapTool.measurementTool.isActive)
+		{
+			const cursor = "crosshair";
+			mapInstance.setMapCursor(cursor);
+			return;
+		}
+
 		mapInstance.hitTest(event).then((response) =>
 		{
 			let graphics = null, cursor = "default";
