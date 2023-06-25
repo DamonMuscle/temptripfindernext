@@ -441,8 +441,8 @@
 	BaseMapPopup.prototype.close = function()
 	{
 		const self = this;
+		$(self.popupContainer).off(`.${self.eventNameSpace}`);
 		self.options.map.closePopup();
-		$(self.popupContainer).off(`.${self.eventNameSpace}`)
 		self.pageIndex = 0;
 		self.selectedTabIndex = 0;
 	}

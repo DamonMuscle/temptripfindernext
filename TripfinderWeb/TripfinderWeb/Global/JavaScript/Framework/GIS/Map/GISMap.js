@@ -695,7 +695,7 @@
 		$(this.map.mapView.popup.container).find("article>div").html(content);
 	}
 
-	Map.prototype.closePopup = function(eventNameSpace)
+	Map.prototype.closePopup = function()
 	{
 		this.map.mapView.popup.close();
 	}

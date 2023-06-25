@@ -33,6 +33,10 @@
 		self.subscriptions.push(tf.pageManager.resizablePage.obRightContentType.subscribe(function()
 		{
 			self.obShowSplitmap(tf.pageManager.resizablePage.obRightContentType() === "splitmap");
+			if(!self.obShowSplitmap())
+			{
+				self.locationMapPopup = null;
+			}
 		}));
 
 		self.locationMapPopup = null;
