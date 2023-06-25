@@ -681,6 +681,7 @@
 		const self = this, data = self.data;
 		if (self.manuallyPinLayerInstance && data.XCoord && data.YCoord)
 		{
+			const DEFAULT_PIN_SCALE = 5000;
 			const markerSymbol = self.symbol.fieldTripLocation();
 			const longitude = data.XCoord, latitude = data.YCoord;
 			const attributes = {
@@ -698,7 +699,7 @@
 
 			self.manuallyPinLayerInstance.addPoint(longitude, latitude, markerSymbol, attributes);
 
-			self.getMapInstance().centerAt(longitude, latitude);
+			self.getMapInstance().centerAndZoom(longitude, latitude, DEFAULT_PIN_SCALE);
 		}
 	}
 
