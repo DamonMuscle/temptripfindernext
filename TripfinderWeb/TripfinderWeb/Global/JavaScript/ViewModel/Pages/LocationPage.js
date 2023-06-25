@@ -444,6 +444,16 @@
 		});
 	}
 
+	LocationPage.prototype.refreshClick = function()
+	{
+		const self = this;
+		TF.Page.BaseGridPage.prototype.refreshClick.apply(self);
+		if (self.locationGridLayerInstance)
+		{
+			self.locationGridLayerInstance = null;
+		}
+	};
+
 	LocationPage.prototype.exitCurrentMode = function()
 	{
 		if (this.sketchTool) this.sketchTool.stop();

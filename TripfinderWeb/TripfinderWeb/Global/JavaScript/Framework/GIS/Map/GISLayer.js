@@ -54,23 +54,25 @@
 	{
 		return new Promise((resolve, reject) =>
 		{
-			if (this.layer instanceof TF.GIS.SDK.GraphicsLayer) {
-				const total = this.layer.graphics.items.length;
-				this.layer.on("after-changes", (event) =>
+			if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+			{
+				let total = this.layer.graphics.items.length;
+				this.layer.graphics.on("after-remove", (event) =>
 				{
-					console.log(event);
-					count--;
-					if (count === 0) {
-						console.log("clear all");
+					total--;
+					if (total === 0) {
 						resolve();
 					}
 				});
+
 				this.layer.removeAll();
-			} else if (this.layer instanceof TF.GIS.SDK.FeatureLayer) {
+			} else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+			{
 				console.warn(`TODO: clear FeatureLayer, promise`);
 				resolve();
 			}
 		});
+
 	}
 
 	Layer.prototype.addPoint = function(longitude, latitude, symbol, attributes)
