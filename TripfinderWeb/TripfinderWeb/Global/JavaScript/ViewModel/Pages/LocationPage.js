@@ -135,6 +135,7 @@
 		
 		if (self.obShowSplitmap())
 		{
+			self.exitCurrentMode();
 			tf.pageManager.resizablePage.closeRightPage();
 		}
 		else
