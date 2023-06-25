@@ -38,9 +38,9 @@
 
 	LocationMapPopup.prototype.buildContentMain = function(data)
 	{
-		const streetContent = data.Street ? `<div class='ellipsis'>${kendo.htmlEncode(data.Street)}</div>` : "";
-		const cityStateContent = [kendo.htmlEncode(data.City), kendo.htmlEncode(data.State)].filter(item => !!item).join(", ");
-		let cityStateZipContent = [cityStateContent, data.Zip].filter(item => !!item).join(" ");
+		const streetContent = data.Street ? `<div class='ellipsis'>${kendo.htmlEncode(data.Street || "")}</div>` : "";
+		const cityStateContent = [kendo.htmlEncode(data.City || ""), kendo.htmlEncode(data.State || "")].filter(item => !!item).join(", ");
+		let cityStateZipContent = [cityStateContent, data.Zip || ""].filter(item => !!item).join(" ");
 		if (cityStateZipContent)
 		{
 			cityStateZipContent = `<div class='ellipsis'>${cityStateZipContent}</div>`;
