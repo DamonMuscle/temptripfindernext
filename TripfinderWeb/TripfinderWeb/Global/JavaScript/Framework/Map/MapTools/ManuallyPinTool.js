@@ -52,21 +52,32 @@
 		clearTimeout(this.getGeoStreetInfoTimeout);
 		this.getGeoStreetInfoTimeout = setTimeout(function(reverseKey)
 		{
-			TF.GIS.Analysis.getInstance().geocodeService.locationToAddress({x: geometry.longitude, y: geometry.latitude}).then(function(result)
+			const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
+			geocodeService.locationToAddress({x: geometry.longitude, y: geometry.latitude}).then(function(result)
 			{
 				if (!result || reverseKey !== self.reverseKey)
 				{
 					return;
 				}
 				
-				var gridType = self.type === "geocodeInteractive" ? "location" : self.type;
+				const gridType = self.type === "geocodeInteractive" ? "location" : self.type;
+				
+				const countryCode = result.attributes && result.attributes.CountryCode || '';
+				if (!geocodeService.isAvailableCountry(countryCode))
+				{
+					self.updateResult(gridType, "street", '');
+					self.updateResult(gridType, "city", '');
+					self.updateResult(gridType, "zip", '');
+					self.updateResult(gridType, "state", '');
+					return;
+				}
+
 				if (result.errorMessage === null)
 				{
-					const address = result.address.split(",");
-					self.updateResult(gridType, "street", address[0]);
-					self.updateResult(gridType, "city", address[1]);
-					self.updateResult(gridType, "zip", address[3]);
-					self.updateResult(gridType, "state", address[2]);
+					self.updateResult(gridType, "street", result.attributes.Address);
+					self.updateResult(gridType, "city", result.attributes.City);
+					self.updateResult(gridType, "zip", result.attributes.Postal);
+					self.updateResult(gridType, "state", result.attributes.RegionAbbr);
 				}
 			});
 		}(this.reverseKey), 20);
@@ -88,7 +99,7 @@
 	ManuallyPinTool.prototype.updateResult = function(gridType, resultType, resultValue)
 	{
 		const self = this;
-		if (resultValue)
+		if (resultValue !== null)
 		{
 			self.update(TF.Grid.GeocodeTool.getAddressFieldNameByGridType(resultType, gridType), resultValue);
 		}

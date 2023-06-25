@@ -224,9 +224,10 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 					locator.locationToAddress({ location }).then((response) => {
 						address = response.address;
 						const score = response.score;
+						const attributes = response.attributes;
 		
 						self.clearOnlineToken(esriConfig);
-						resolve( { address, score, errorMessage });
+						resolve( { address, attributes, score, errorMessage });
 					}).catch(() => {
 						errorMessage = `No address was found for this location ${JSON.stringify(location)}`;
 						
@@ -377,6 +378,12 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		}
 
 		return url;
+	}
+
+	GeocodingService.prototype.isAvailableCountry = function(countryCode)
+	{
+		const AVAILABLE_COUNTRY_CODE = ['USA', 'CAN'];
+		return AVAILABLE_COUNTRY_CODE.includes(countryCode)
 	}
 
 	GeocodingService.prototype.setOnlineToken = function(esriConfig)
