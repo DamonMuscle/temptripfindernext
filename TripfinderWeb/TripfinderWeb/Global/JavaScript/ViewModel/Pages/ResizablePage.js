@@ -27,8 +27,8 @@
 
 		self.leftPageSizeKey = "leftpagesize.";
 		self.leftPageType = "";
-		self.minLeftWidth = 300;
-		self.minRightWidth = 580;
+		self.minLeftWidth = 400;
+		self.minRightWidth = 640;
 		self.leftGridSelectItems = [];
 		self.leftGrid = null;
 
