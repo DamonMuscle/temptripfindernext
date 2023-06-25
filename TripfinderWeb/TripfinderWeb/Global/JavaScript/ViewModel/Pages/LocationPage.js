@@ -344,9 +344,9 @@
 		}
 	}
 
-	LocationPage.prototype.showDetailsClick = function()
+	LocationPage.prototype.showDetailsClick = function(id)
 	{
-		TF.Page.BaseGridPage.prototype.showDetailsClick.call(this);
+		TF.Page.BaseGridPage.prototype.showDetailsClick.call(this, id);
 		if (this.locationGridLayerInstance)
 		{
 			this.locationGridLayerInstance = null;
