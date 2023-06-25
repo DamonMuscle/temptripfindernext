@@ -58,7 +58,8 @@
 						className: TF.isPhoneDevice ? "btn-mobile-confirm" : "tf-btn-black",
 						callback: arg.callback
 					}
-				}
+				},
+				maxHeight: arg.maxHeight
 			};
 		}
 		return self.dialog(arg, layerLevel).then(function()
@@ -128,7 +129,9 @@
 		var self = this;
 		if (arg.message != null && $.type(arg.message) === "string")
 		{
-			arg.message = "<pre class='titleNotify'>" + arg.message + "</pre>";
+			var style = arg.maxHeight ? `style='max-height:${arg.maxHeight}px'` : "",
+			css = arg.css || "";
+			arg.message = `<pre ${style} class='titleNotify ${css}'>${arg.message} </pre>`;
 		}
 		self._obCounter(self._obCounter() + 1);
 		return new Promise(function(resolve, reject)
