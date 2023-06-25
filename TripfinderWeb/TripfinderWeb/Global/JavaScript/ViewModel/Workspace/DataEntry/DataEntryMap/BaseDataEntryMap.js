@@ -689,7 +689,7 @@
 	BaseDataEntryMap.prototype.drawCoordinate = function()
 	{
 		const self = this, data = self.data;
-		if (self.manuallyPinLayerInstance && data.XCoord && data.YCoord)
+		if (self.manuallyPinLayerInstance && data && data.XCoord && data.YCoord)
 		{
 			const DEFAULT_PIN_SCALE = 5000;
 			const markerSymbol = self.symbol.fieldTripLocation();
