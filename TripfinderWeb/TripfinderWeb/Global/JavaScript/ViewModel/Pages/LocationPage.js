@@ -36,6 +36,7 @@
 			if(!self.obShowSplitmap())
 			{
 				self.locationMapPopup = null;
+				self.locationGridLayerInstance = null;
 			}
 		}));
 
