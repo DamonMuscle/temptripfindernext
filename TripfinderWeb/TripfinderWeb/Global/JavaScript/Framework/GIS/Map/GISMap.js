@@ -37,12 +37,9 @@
 		}
 	};
 
-	// let _map, _mapLayerInstances = [];
-
 	function Map($mapContainer, options)
 	{
 		this.settings = Object.assign({}, defaultOptions, options);
-		this._mapLayerInstances = [];
 		this.eventHandler = {
 			onMapViewCreatedPromise: null,
 			onMapViewClick: null,
@@ -52,6 +49,7 @@
 			onMapViewUpdating: null,
 		};
 
+		this.defineReadOnlyProperty('mapLayerInstances', []);
 		this.create($mapContainer);
 	}
 
@@ -362,14 +360,19 @@
 		map.mapView = view;
 		map.id = self.settings.mapId;
 
-		Object.defineProperty(self, 'map', {
-			get() { return map; },
-			enumerable: false,
-			configurable: false
-		});
+		self.defineReadOnlyProperty('map', map)
 
 		self.createMapEvents();
 	}
+
+	Map.prototype.defineReadOnlyProperty = function(propertyName, value)
+	{
+		Object.defineProperty(this, propertyName, {
+			get() { return value; },
+			enumerable: false,
+			configurable: false
+		});
+	};
 
 	Map.prototype.createMapEvents = function()
 	{
@@ -501,7 +504,7 @@
 			this.map.add(layer);
 		}
 
-		this._mapLayerInstances.push(layerInstance);
+		this.mapLayerInstances.push(layerInstance);
 
 		return layerInstance;
 	}
@@ -554,14 +557,17 @@
 		}
 
 		let instance = null;
-		for (let i = 0; i < this._mapLayerInstances.length; i++) {
-			if (this._mapLayerInstances[i].layer.id === layerId) {
-				instance = this._mapLayerInstances[i];
+		for (let i = 0; i < this.mapLayerInstances.length; i++)
+		{
+			if (this.mapLayerInstances[i].layer.id === layerId)
+			{
+				instance = this.mapLayerInstances[i];
 				break;
 			}
 		}
 
-		if (instance === null) {
+		if (instance === null)
+		{
 			console.warn(`Could not find the layer id = ${layerId}`);
 		}
 
@@ -652,7 +658,7 @@
 	Map.prototype.find = async function(queryGeometry, layerInstances = null, searchScaleFactor = 1000)
 	{
 		if (layerInstances === null) {
-			layerInstances = this._mapLayerInstances;
+			layerInstances = this.mapLayerInstances;
 		}
 
 		let spatialQueryGeometry = queryGeometry, findFeatureResults = [];
