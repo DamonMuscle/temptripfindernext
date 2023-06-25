@@ -180,6 +180,11 @@
 	BaseDataEntryMap.prototype._initMapTool = function(mapToolOptions, hasManuallyPin)
 	{
 		const self = this;
+		if (self.RoutingMapTool)
+		{
+			return;
+		}
+
 		var options = {
 			thematicLayerId: self.studentLayerId,
 			isDetailView: true,
@@ -718,7 +723,11 @@
 		tf.documentEvent.unbind("keydown.shortCutKey", this.routeState);
 
 		this.obIsReadOnly.dispose();
-		this.RoutingMapTool && this.RoutingMapTool.dispose();
+		if (this.RoutingMapTool)
+		{
+			this.RoutingMapTool.dispose();
+			this.RoutingMapTool = null;
+		}
 		this.restore();
 		this.mapLayersPaletteViewModel && this.mapLayersPaletteViewModel.dispose();
 
@@ -734,6 +743,12 @@
 		this.symbol && this.symbol.dispose();
 
 		this.sketchTool && this.sketchTool.dispose();
+
+		if (this.manuallyPinLayerInstance)
+		{
+			this.getMapInstance().removeLayer(ManuallyPinLayerId);
+			this.manuallyPinLayerInstance = null;
+		}
 
 		const mapView = this._map && this._map.mapView;
 		if (mapView)
