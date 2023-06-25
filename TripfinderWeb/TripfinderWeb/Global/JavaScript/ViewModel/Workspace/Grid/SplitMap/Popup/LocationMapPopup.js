@@ -33,13 +33,13 @@
 
 	LocationMapPopup.prototype.buildTitle = function(data)
 	{
-		return data && data.Name || "";
+		return kendo.htmlEncode(data && data.Name || "");
 	};
 
 	LocationMapPopup.prototype.buildContentMain = function(data)
 	{
-		const streetContent = data.Street ? `<div class='ellipsis'>${data.Street}</div>` : "";
-		const cityStateContent = [data.City, data.State].filter(item => !!item).join(", ");
+		const streetContent = data.Street ? `<div class='ellipsis'>${kendo.htmlEncode(data.Street)}</div>` : "";
+		const cityStateContent = [kendo.htmlEncode(data.City), kendo.htmlEncode(data.State)].filter(item => !!item).join(", ");
 		let cityStateZipContent = [cityStateContent, data.Zip].filter(item => !!item).join(" ");
 		if (cityStateZipContent)
 		{
