@@ -33,7 +33,7 @@
 
 	LocationMapPopup.prototype.buildTitle = function(data)
 	{
-		return data.Name
+		return data && data.Name || "";
 	};
 
 	LocationMapPopup.prototype.buildContentMain = function(data)

@@ -115,6 +115,11 @@
 				self.locationMapPopup && self.locationMapPopup.close();
 				return;
 			}
+
+			if (self.RoutingMapTool._manuallyPinActive)
+			{
+				return;
+			}
 	
 			self.getMapPopup().show(locationGraphics);
 		});
