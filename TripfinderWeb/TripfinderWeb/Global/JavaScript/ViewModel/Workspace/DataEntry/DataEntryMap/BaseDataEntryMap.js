@@ -116,7 +116,10 @@
 				return;
 			}
 
-			if (self.RoutingMapTool._manuallyPinActive)
+			if (self.RoutingMapTool && 
+				(self.RoutingMapTool._manuallyPinActive ||
+				(self.RoutingMapTool.measurementTool && self.RoutingMapTool.measurementTool.isActive) || 
+				(self.RoutingMapTool.googleStreetTool && self.RoutingMapTool.googleStreetTool.isActive)))
 			{
 				return;
 			}
@@ -166,7 +169,7 @@
 			return;
 		}
 
-		if (self.RoutingMapTool.measurementTool && self.RoutingMapTool.measurementTool.isActive)
+		if (self.RoutingMapTool && self.RoutingMapTool.measurementTool && self.RoutingMapTool.measurementTool.isActive)
 		{
 			const cursor = "crosshair";
 			mapInstance.setMapCursor(cursor);
