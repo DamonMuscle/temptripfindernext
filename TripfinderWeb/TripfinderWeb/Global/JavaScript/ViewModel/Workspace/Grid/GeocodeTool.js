@@ -17,13 +17,14 @@
 
 	GeocodeTool.prototype.geocodingSelectionClick = function(viewmodel, evt)
 	{
-		this.geocodingClick(viewmodel, evt);
+		const useSelected = true;
+		this.geocodingClick(viewmodel, evt, useSelected);
 	};
 
-	GeocodeTool.prototype.geocodingClick = function(viewmodel, evt)
+	GeocodeTool.prototype.geocodingClick = function(viewmodel, evt, useSelected = false)
 	{
 		var self = this;
-		self.getRecords().then(function(records)
+		self.getRecords(useSelected).then(function(records)
 		{
 			var allUngeocodeCount = records.length;
 			var selectUngeocodeRecords = records.filter(function(r) { return self.searchGrid.getSelectedIds().indexOf(r.Id) >= 0 });
@@ -88,36 +89,46 @@
 	{
 		const self = this;
 		needGeocodeRecords = needGeocodeRecords || [];
-		Promise.all((needGeocodeRecords).map(record =>
+		Promise.all((needGeocodeRecords).map(async record =>
 		{
 			if (record.GeoStreet)
 			{
-				const address = {
-					Street: record.GeoStreet,
-					City: record.GeoCity || '',
-					State: record.GeoCounty || '',
-					Zone: record.GeoZip || ''
-				};
+				const city = record.GeoCity ? `, ${record.GeoCity}` : '';
+				const state = record.GeoCounty ? `, ${record.GeoCounty}` : '';
+				const zone = record.GeoZip ? `, ${record.GeoZip}` : '';
+				const address = `${record.GeoStreet}${city}${state}${zone}`;
+
 				const analysis = TF.GIS.Analysis.getInstance();
-				return analysis.geocodeService.addressToLocations(address).then((result) => {
+				const response = await analysis.geocodeService.suggestLocationsREST(address);
+				if (response.addresses.length > 0)
+				{
+					const data = response.addresses[0];
+					const result = await TF.GIS.Analysis.getInstance().geocodeService.findAddressCandidatesREST(data.text, data.magicKey);
+
 					const location = {
 						x: result.location.x,
 						y: result.location.y,
 						score: result.score
 					};
-
+	
 					record.Xcoord = record.XCoord = +location.x.toFixed(6);
 					record.Ycoord = record.YCoord = +location.y.toFixed(6);
 					record.GeocodeScore = +location.score.toFixed(2);
 					record.Geocoded = true;
 					return record;
-				}).catch((error) => {
-					console.log(error);
-				});
+				}
+				else
+				{
+					return null;
+				}
 			}
-		})).then((records)=>{
-			self.updateRecordsByCoordinates(records, previousCount, needGeocodeRecords, res.obSelectedGeocodeSource());
-			self._addGraphicAfterGeocode(viewmodel, records);
+		})).then((records) =>
+		{
+			if (records)
+			{
+				self.updateRecordsByCoordinates(records, previousCount, needGeocodeRecords, res.obSelectedGeocodeSource());
+				self._addGraphicAfterGeocode(viewmodel, records);
+			}
 		});
 	}
 

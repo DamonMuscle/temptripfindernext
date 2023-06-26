@@ -134,7 +134,8 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 				const outSpatialReference = SpatialReference.WGS84;
 				const locator = new Locator({ url, outSpatialReference });
 
-				locator.addressToLocations({ address }).then((response) => {
+				const paramData = address.constructor === Object ? address : { address };
+				locator.addressToLocations(paramData).then((response) => {
 					if (response && response.length > 0) {
 						const matched = response[0];
 						const location = matched.location;

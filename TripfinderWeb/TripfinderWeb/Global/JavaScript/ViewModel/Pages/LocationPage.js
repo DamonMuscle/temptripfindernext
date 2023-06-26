@@ -207,7 +207,7 @@
 
 	LocationPage.prototype.geocodeClick = function(gridMenuViewModel)
 	{
-		gridMenuViewModel.gridViewModel.geocodingSelectionClick(gridMenuViewModel);
+		gridMenuViewModel.gridViewModel.geocodingSelectionClick(gridMenuViewModel, null, true);
 	}
 
 	LocationPage.prototype.ungeocodeClick = function(gridMenuViewModel)

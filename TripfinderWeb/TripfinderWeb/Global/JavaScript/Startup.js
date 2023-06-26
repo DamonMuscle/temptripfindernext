@@ -586,7 +586,7 @@
 									tf.pageManager.resizablePage.onLoaded.subscribe(function()
 									{
 										const openDefaultPage = (firstLoad) => {
-											const pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
+											let pageName = tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 											if (!pageName || pageName === "settingsConfig" || pageName === "reports" && !tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read"))
 											{
 												pageName = "fieldtrips";
