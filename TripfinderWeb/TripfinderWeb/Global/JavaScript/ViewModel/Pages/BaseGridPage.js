@@ -71,9 +71,6 @@
 		}, self);
 		self.supportAutoScroll = false;
 		self.deleteButton = true;
-
-		const isAuthorizedForChatfinder = tf.pageManager.navigationData.supportedProducts.includes('chatfinder');
-		self.obIsAuthorizedForChatFinder = ko.observable(isAuthorizedForChatfinder);
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);
@@ -242,6 +239,9 @@
 				tf.shortCutKeys.changeHashKey();
 			});
 		}
+
+		const isAuthorizedForChatfinder = tf.pageManager.navigationData.supportedProducts?.includes('chatfinder');
+		self.obIsAuthorizedForChatFinder = ko.observable(isAuthorizedForChatfinder);
 	};
 
 	BaseGridPage.prototype.setRelatedFilterData = function()

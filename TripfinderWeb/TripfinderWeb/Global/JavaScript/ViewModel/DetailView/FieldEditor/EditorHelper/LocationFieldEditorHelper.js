@@ -37,7 +37,7 @@
 
 		const msgStack = Object.keys(modifiedFields).reduce(function(acc, key)
 		{
-			if (!!modifiedFields[key] && GeoAssocaitedFields.includes(key))
+			if (typeof modifiedFields[key] !== 'undefined' && GeoAssocaitedFields.includes(key))
 			{
 				return acc.concat({
 					field: key,
