@@ -545,6 +545,7 @@
 			}
 
 			self.options.map.centerAndZoom(record.XCoord, record.YCoord, 3000);
+			self.close();
 			self.show(graphics.filter(x=>x.attributes.Id == recordId), [record]);
 		});
 	}
