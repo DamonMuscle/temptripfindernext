@@ -83,6 +83,7 @@
 		if (toolName !== "manuallyPinTool" && previousToolName === "manuallyPinTool")
 		{
 			this.manuallyPinTool && this.manuallyPinTool.stopPin();
+			this._manuallyPinActive = false;
 		}
 		if (toolName !== "drawGeoregionBoundaryTool" && previousToolName === "drawGeoregionBoundaryTool")
 		{
