@@ -110,9 +110,9 @@
 			const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 			const locationGraphics = await self.getMapInstance().find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
 	
+			self.locationMapPopup && self.locationMapPopup.close();
 			if(!locationGraphics || !locationGraphics.length)
 			{
-				self.locationMapPopup && self.locationMapPopup.close();
 				return;
 			}
 
