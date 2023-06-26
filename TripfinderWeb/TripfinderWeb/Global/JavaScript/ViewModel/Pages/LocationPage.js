@@ -73,7 +73,13 @@
 		self.options.url = pathCombine(tf.api.apiPrefix(), "search", self.endpoint);
 		self.options.loadUserDefined = false;
 		self.options.supportMobileMultipleSelect = true;
-
+		self.options.onAllIdBounded = function()
+		{
+			if(self.obShowSplitmap())
+			{
+				self.initLocationMapGraphics();
+			}
+		}
 	};
 
 	LocationPage.prototype.createGrid = function(option)

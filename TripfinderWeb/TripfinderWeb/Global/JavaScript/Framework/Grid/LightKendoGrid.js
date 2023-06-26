@@ -1694,11 +1694,11 @@
 			.then(function(apiResponse)
 			{
 				this.allIds = apiResponse.Items;
+				this.obAllIds(this.allIds);
 				if (this.options && this.options.onAllIdBounded)
 				{
 					this.options.onAllIdBounded();
 				}
-				this.obAllIds(this.allIds);
 				return this.allIds.slice(0);
 			}.bind(this))
 			.catch(function()
