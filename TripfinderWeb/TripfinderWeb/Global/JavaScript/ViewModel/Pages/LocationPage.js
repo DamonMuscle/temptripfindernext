@@ -197,7 +197,7 @@
 
 	LocationPage.prototype.geocodeClick = function(gridMenuViewModel)
 	{
-		gridMenuViewModel.gridViewModel.geocodingSelectionClick();
+		gridMenuViewModel.gridViewModel.geocodingSelectionClick(gridMenuViewModel);
 	}
 
 	LocationPage.prototype.ungeocodeClick = function(gridMenuViewModel)
@@ -216,6 +216,8 @@
 				if (result)
 				{
 					self._ungeocode(recordIds);
+					self._removeLocationGraphic(recordIds);
+					self.zoomToLocationGridLayerExtent();
 				}
 			});
 		});
@@ -262,6 +264,8 @@
 			if (confirm)
 			{
 				self._ungeocode(recordIds);
+				self._removeLocationGraphic(recordIds);
+				self.zoomToLocationGridLayerExtent();
 			}
 		});
 	}
@@ -277,6 +281,37 @@
 		});
 
 		this.updateRecords(data, "Ungeocode success");
+	}
+
+	LocationPage.prototype._addLocationGraphic = function(records)
+	{
+		const self = this;
+		if (!self.obShowSplitmap() || !self.locationGridLayerInstance)
+		{
+			return;
+		}
+		
+		self.drawLocationPoints(records);
+		self.zoomToLocationGridLayerExtent();
+	}
+
+	LocationPage.prototype._removeLocationGraphic = function(recordIds)
+	{
+		const self = this;
+		if (!self.obShowSplitmap() || !self.locationGridLayerInstance)
+		{
+			return;
+		}
+
+		const removeGraphics = self.locationGridLayerInstance.layer.graphics.items.filter(item => recordIds.includes(item.attributes.Id));
+		if (removeGraphics.length > 0)
+		{
+			for (let i = 0; i < removeGraphics.length; i++)
+			{
+				const graphic = removeGraphics[i];
+				self.locationGridLayerInstance.layer.remove(graphic);
+			}
+		}
 	}
 
 	LocationPage.prototype._ungeocodeConfirm = function(recordIds)
@@ -305,7 +340,8 @@
 
 				timer = setTimeout(async () =>
 				{
-					await self.drawLocationPoints();
+					const records = await self.getLocationRecords();
+					self.drawLocationPoints(records);
 					self.zoomToLocationGridLayerExtent();
 					timer = null;
 				});
@@ -331,11 +367,10 @@
 		}
 	}
 
-	LocationPage.prototype.drawLocationPoints = async function()
+	LocationPage.prototype.drawLocationPoints = function(records)
 	{
 		const self = this,
-			symbol = new TF.Map.Symbol(),
-			records = await self.getLocationRecords();
+			symbol = new TF.Map.Symbol();
 
 		for (let i = 0; i < records.length; i++)
 		{

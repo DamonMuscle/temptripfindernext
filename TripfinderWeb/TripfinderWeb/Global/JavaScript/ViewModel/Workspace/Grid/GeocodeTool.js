@@ -66,7 +66,7 @@
 				}
 				else
 				{
-					self._executeGeocodeAuto(res, needGeocodeRecords, previousCount);
+					self._executeGeocodeAuto(res, needGeocodeRecords, previousCount, viewmodel);
 				}
 			})
 		}
@@ -83,19 +83,8 @@
 		}
 	}
 
-	// replace by next function with same name
-	GeocodeTool.prototype._executeGeocodeAuto = function(res, needGeocodeRecords, previousCount, viewmodel)
-	{
-		var self = this;
-		tf.loadingIndicator.show();
-		GeocodeTool.geocodeAddresses(res.obSelectedGeocodeSource(), needGeocodeRecords).then(function(result)
-		{
-			self.updateRecordsByCoordinates(result, previousCount, needGeocodeRecords, res.obSelectedGeocodeSource());
-		});
-	}
-
 	// the new way to use arcgis online
-	GeocodeTool.prototype._executeGeocodeAuto = function(res, needGeocodeRecords, previousCount)
+	GeocodeTool.prototype._executeGeocodeAuto = function(res, needGeocodeRecords, previousCount, viewmodel)
 	{
 		const self = this;
 		needGeocodeRecords = needGeocodeRecords || [];
@@ -128,6 +117,7 @@
 			}
 		})).then((records)=>{
 			self.updateRecordsByCoordinates(records, previousCount, needGeocodeRecords, res.obSelectedGeocodeSource());
+			self._addGraphicAfterGeocode(viewmodel, records);
 		});
 	}
 
@@ -162,9 +152,19 @@
 					GeocodeTool.createBoundary(validResult);
 				}
 
-				self.updateRecordsByCoordinates(nonPinResults.concat(manuallyPinResults), previousCount, needGeocodeRecords, "Interactive");
+				const records = nonPinResults.concat(manuallyPinResults);
+				self.updateRecordsByCoordinates(records, previousCount, needGeocodeRecords, "Interactive");
+				self._addGraphicAfterGeocode(viewmodel, records);
 			}
 		});
+	}
+
+	GeocodeTool.prototype._addGraphicAfterGeocode = function(viewmodel, records)
+	{
+		if (viewmodel?.gridViewModel?._addLocationGraphic)
+		{
+			viewmodel.gridViewModel._addLocationGraphic(records);
+		}
 	}
 
 	GeocodeTool.prototype.getMessage = function(previousCount, geocodeCount, ungeocodeCount)
