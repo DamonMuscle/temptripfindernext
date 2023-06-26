@@ -688,7 +688,10 @@
 
 				drawCoordinateTimer = setTimeout(function()
 				{
-					self.drawCoordinate();
+					if(!self.options.disable)
+					{
+						self.drawCoordinate();
+					}
 					drawCoordinateTimer = null;
 				});
 			};
