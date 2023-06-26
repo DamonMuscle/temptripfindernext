@@ -1169,6 +1169,32 @@
 		$(".navigation-container").removeClass("mobile");
 	};
 
+	NavigationMenu.prototype.initApplicationSwitcherUrl = function(products)
+	{
+		var productNames = products.map(i => i.Name);
+		this.supportedProducts = productNames
+			.filter(prod =>
+			{
+				const info = this.availableApplications[simplifyProductName(prod)];
+				return info && tf.authManager.authorizationInfo.authorizationTree.applications.includes(info.prefix);
+			})
+			.map(prod => this.availableApplications[simplifyProductName(prod)].route.toLowerCase());
+		if (this.supportedProducts.length)
+		{
+			var hasURLProducts = products.filter(prod => !!prod.Uri && this.supportedProducts.indexOf(simplifyProductName(prod.Name)) !== -1);
+			if (!hasURLProducts.length)
+			{
+				return;
+			}
+
+			this.applicationURLMappingList = hasURLProducts;
+			this.applicationSwitcherList = hasURLProducts.map(function(item)
+			{
+				return item.Name.toLowerCase();
+			});
+		}
+	};
+
 	/**
 	 * Initialize application switcher.
 	 * @return {void}
@@ -1190,7 +1216,9 @@
 
 		return promise.then(function()
 		{
+
 			var applications = [];
+			self.initApplicationSwitcherUrl(tf.authManager.supportedProducts);
 			$.each(tf.authManager.supportedProducts, function(_, item)
 			{
 				var productName = item.Name.toLowerCase();
@@ -1411,6 +1439,11 @@
 			xhr.send();
 		});
 	};
+
+	function simplifyProductName(name)
+	{
+		return name.toLowerCase().replace(/\s/g, '');
+	}
 
 	/**
 	 * The dispose function.

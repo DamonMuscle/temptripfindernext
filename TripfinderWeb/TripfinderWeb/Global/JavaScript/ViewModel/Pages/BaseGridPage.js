@@ -72,8 +72,8 @@
 		self.supportAutoScroll = false;
 		self.deleteButton = true;
 
-		const isAuthorizedForChatfinder = tf.authManager.supportedProducts.some(item => item.Name === 'Chatfinder');
-		self.obIsAuthorizedForChatFinder = ko.observable(isAuthorizedForChatfinder);		
+		const isAuthorizedForChatfinder = tf.pageManager.navigationData.supportedProducts.includes('chatfinder');
+		self.obIsAuthorizedForChatFinder = ko.observable(isAuthorizedForChatfinder);
 	}
 
 	BaseGridPage.prototype = Object.create(TF.Page.BasePage.prototype);

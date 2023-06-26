@@ -38,12 +38,12 @@
 
 		//Initial parameters
 		self.availableApplications = {
-			chatfinder: { route: "Chatfinder", title: "Chatfinder", url: "Chatfinder" },
-			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin" },
-			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus" },
-			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder" },
-			formfinder: { route: "Formfinder", title: "Formfinder", url: "Formfinder" },
-			stopfinderadmin: { route: "StopfinderAdmin", title: "Stopfinder Administration", url: "StopfinderAdmin" }
+			chatfinder: { route: "Chatfinder", title: "Chatfinder", url: "Chatfinder", prefix: "cfweb"},
+			tfadmin: { route: "TFAdmin", title: "Administration", url: "TFAdmin", prefix: "tfaweb"},
+			routefinderplus: { route: "RoutefinderPlus", title: "Routefinder", url: "RoutefinderPlus", prefix:"rfweb" },
+			viewfinder: { route: "Viewfinder", title: "Viewfinder", url: "Viewfinder", prefix: "vfweb"},
+			formfinder: { route: "Formfinder", title: "Formfinder", url: "Formfinder", prefix: "formweb"},
+			stopfinderadmin: { route: "StopfinderAdmin", title: "Stopfinder Administration", url: "StopfinderAdmin", prefix: "sta"}
 		};
 
 		self.initApplicationSwitcher();
