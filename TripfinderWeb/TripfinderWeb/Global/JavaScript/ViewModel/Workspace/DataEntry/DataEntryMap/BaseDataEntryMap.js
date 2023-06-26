@@ -56,10 +56,10 @@
 		this.onMapLoad = new TF.Events.Event();
 
 		this.symbol = new TF.Map.Symbol();
-		this.gridMapPopup = new TF.Grid.GridMapPopup(this, {
-			isDetailView: true,
-			gridType: this.type
-		});
+		// this.gridMapPopup = new TF.Grid.GridMapPopup(this, {
+		// 	isDetailView: true,
+		// 	gridType: this.type
+		// });
 
 		if (!tf.isViewfinder)
 		{
@@ -667,12 +667,12 @@
 
 	BaseDataEntryMap.prototype.enableMouseEvent = function()
 	{
-		this.gridMapPopup.enableMouseEvent(this._map);
+		// this.gridMapPopup.enableMouseEvent(this._map);
 	};
 
 	BaseDataEntryMap.prototype.disableMouseEvent = function()
 	{
-		this.gridMapPopup.disableMouseEvent();
+		// this.gridMapPopup.disableMouseEvent();
 	};
 
 	BaseDataEntryMap.prototype.initLayers = function()

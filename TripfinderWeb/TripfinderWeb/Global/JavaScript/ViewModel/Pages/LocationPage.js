@@ -46,6 +46,16 @@
 	LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	LocationPage.prototype.constructor = LocationPage;
 
+	LocationPage.prototype.enableMouseEvent = function()
+	{
+		// do nothing, for compatible with RoutingMapTool
+	};
+
+	LocationPage.prototype.disableMouseEvent = function()
+	{
+		// do nothing, for compatible with RoutingMapTool
+	};
+
 	LocationPage.prototype.updateOptions = function()
 	{
 		var self = this;
