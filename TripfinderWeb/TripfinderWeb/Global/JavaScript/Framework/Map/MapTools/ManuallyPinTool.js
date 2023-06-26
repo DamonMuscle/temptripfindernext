@@ -37,20 +37,11 @@
 
 	ManuallyPinTool.prototype.modifyRecordToNewLocation = function(geometry)
 	{
-		var self = this;
-		this.reverseKey = TF.createId();
-		var geoGraphic = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(geometry);
-		var coordName = self.record && typeof self.record.XCoord != "undefined" ? "Coord" : "coord";
-		self.update("X" + coordName, geoGraphic.x);
-		self.update("Y" + coordName, geoGraphic.y);
-		self.update("GeocodeScore", 100); // use fixed value since ManuallyPin does not have Geo Confidence
-		if (this.detailView)
-		{
-			this.detailView.obEditing(true);
-		}
+		const self = this;
+		self.reverseKey = TF.createId();
 
-		clearTimeout(this.getGeoStreetInfoTimeout);
-		this.getGeoStreetInfoTimeout = setTimeout(function(reverseKey)
+		clearTimeout(self.getGeoStreetInfoTimeout);
+		self.getGeoStreetInfoTimeout = setTimeout(function(reverseKey)
 		{
 			const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
 			geocodeService.locationToAddress({x: geometry.longitude, y: geometry.latitude}).then(function(result)
@@ -60,28 +51,62 @@
 					return;
 				}
 				
-				const gridType = self.type === "geocodeInteractive" ? "location" : self.type;
 				
 				const countryCode = result.attributes && result.attributes.CountryCode || '';
 				if (!geocodeService.isAvailableCountry(countryCode))
 				{
-					self.updateResult(gridType, "street", '');
-					self.updateResult(gridType, "city", '');
-					self.updateResult(gridType, "zip", '');
-					self.updateResult(gridType, "state", '');
+					self.setEmptyRecord();
 					return;
 				}
 
 				if (result.errorMessage === null)
 				{
+					const coordName = self.record && typeof self.record.XCoord != "undefined" ? "Coord" : "coord";
+					const geoGraphic = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(geometry);
+					self.update("X" + coordName, geoGraphic.x);
+					self.update("Y" + coordName, geoGraphic.y);
+					self.update("GeocodeScore", 100); // use fixed value since ManuallyPin does not have Geo Confidence
+					
+					const gridType = self.type === "geocodeInteractive" ? "location" : self.type;
 					self.updateResult(gridType, "street", result.attributes.Address);
 					self.updateResult(gridType, "city", result.attributes.City);
 					self.updateResult(gridType, "zip", result.attributes.Postal);
 					self.updateResult(gridType, "state", result.attributes.RegionAbbr);
+
+					if (self.detailView)
+					{
+						self.detailView.obEditing(true);
+					}
 				}
 			});
-		}(this.reverseKey), 20);
+		}(self.reverseKey), 20);
 	};
+
+	ManuallyPinTool.prototype.setEmptyRecord = function()
+	{
+		const self = this,
+			gridType = self.type === "geocodeInteractive" ? "location" : self.type,
+			coordName = self.record && typeof self.record.XCoord != "undefined" ? "Coord" : "coord";
+
+		self.update("X" + coordName, '');
+		self.update("Y" + coordName, '');
+		self.update("GeocodeScore", 0);
+		if (self.layer.id === "ManuallyPinLayer")
+		{
+			// clear manually pin icon
+			self.layer.removeAll();
+		}
+
+		self.updateResult(gridType, "street", '');
+		self.updateResult(gridType, "city", '');
+		self.updateResult(gridType, "zip", '');
+		self.updateResult(gridType, "state", '');
+
+		return tf.promiseBootbox.alert({
+			message: "Please pin a location in USA or Canada.",
+			title: "Alert"
+		});
+	}
 
 	ManuallyPinTool.prototype.update = function(fieldName, value)
 	{
