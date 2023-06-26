@@ -400,6 +400,13 @@
 			return;
 		}
 
+		if (self.RoutingMapTool && 
+			((self.RoutingMapTool.measurementTool && self.RoutingMapTool.measurementTool.isActive) || 
+			(self.RoutingMapTool.googleStreetTool && self.RoutingMapTool.googleStreetTool.isActive)))
+		{
+			return;
+		}
+
 		self.getMapPopup().show(locationGraphics);
 	}
 
