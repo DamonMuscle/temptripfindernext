@@ -2,7 +2,7 @@
 {
 	createNamespace("TF.GIS").Map = Map;
 
-	const MAP_MIN_ZOOM_LEVEL = 3;
+	const MAP_MIN_ZOOM_LEVEL = 2;
 	const MAP_MAX_ZOOM_LEVEL = 23;
 	const WKID_WEB_MERCATOR = 102100;
 	
