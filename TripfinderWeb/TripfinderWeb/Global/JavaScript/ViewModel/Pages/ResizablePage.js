@@ -409,16 +409,23 @@
 				$(document).off(".newRequestHover");
 				pageHeader.off(".newRequestHover");
 
-				if ((!self.obRightContentType() || self.obRightContentType() === RightPageContentType.detailview) && self.leftPageType !== "reports")
+				if ((!self.obRightContentType() 
+						|| self.obRightContentType() === RightPageContentType.detailview 
+						|| self.obRightContentType() === RightPageContentType.splitmap
+					)
+					&& self.leftPageType !== "reports")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
-					if(tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
+					if (tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
 					{
 						newRequest.css({ "display": "block", "width": "140px" }).removeClass("pull-left").addClass("pull-right");
 					}
 					pageHeader.css({ "height": "unset", "float": "left", "width": "100%" });
 
-					self.getRightData()?.updateDetailViewPanelHeader();
+					if (self.getRightData()?.updateDetailViewPanelHeader)
+					{
+						self.getRightData().updateDetailViewPanelHeader();
+					}
 
 					if (pageHeader.outerHeight() > 56)
 					{
