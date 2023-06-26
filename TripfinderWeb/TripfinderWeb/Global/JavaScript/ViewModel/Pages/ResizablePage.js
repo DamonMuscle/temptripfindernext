@@ -517,6 +517,10 @@
 		self.obRightContentType(null);
 		if (self.mapviewInstace)
 		{
+			if (self.obGridData() && self.obGridData().exitCurrentMode)
+			{
+				self.obGridData().exitCurrentMode();
+			}
 			TF.GIS.MapFactory.destroyMapInstanceById(self.mapviewInstace.settings.mapId);
 			self.mapviewInstace = null;
 		}
