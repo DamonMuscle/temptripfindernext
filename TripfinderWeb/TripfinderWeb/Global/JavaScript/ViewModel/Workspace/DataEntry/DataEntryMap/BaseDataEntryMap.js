@@ -110,7 +110,7 @@
 			const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 			const locationGraphics = await self.getMapInstance().find(event.mapPoint, [self.manuallyPinLayerInstance], locationGridLayerSearchFactor);
 	
-			self.locationMapPopup && self.locationMapPopup.close();
+			self.gridMapPopup && self.gridMapPopup.close();
 			if(!locationGraphics || !locationGraphics.length)
 			{
 				return;
@@ -133,14 +133,14 @@
 	BaseDataEntryMap.prototype.getMapPopup = function()
 	{
 		const self = this;
-		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
+		self.gridMapPopup = self.gridMapPopup || new TF.Grid.LocationMapPopup({
 			parentPage: self,
 			map: self.getMapInstance(),
 			canShowDetailView: true,
 			isDetailView: true
 		});
 
-		return self.locationMapPopup;
+		return self.gridMapPopup;
 	}
 
 	BaseDataEntryMap.prototype.getMapId = function()

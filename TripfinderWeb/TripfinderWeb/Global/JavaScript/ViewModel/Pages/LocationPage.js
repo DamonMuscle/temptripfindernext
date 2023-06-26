@@ -35,12 +35,12 @@
 			self.obShowSplitmap(tf.pageManager.resizablePage.obRightContentType() === "splitmap");
 			if(!self.obShowSplitmap())
 			{
-				self.locationMapPopup = null;
+				self.gridMapPopup = null;
 				self.locationGridLayerInstance = null;
 			}
 		}));
 
-		self.locationMapPopup = null;
+		self.gridMapPopup = null;
 	}
 
 	LocationPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
@@ -429,7 +429,7 @@
 		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
 		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
 
-		self.locationMapPopup && self.locationMapPopup.close();
+		self.gridMapPopup && self.gridMapPopup.close();
 		if(!locationGraphics || !locationGraphics.length)
 		{
 			return;
@@ -448,7 +448,7 @@
 	LocationPage.prototype.getMapPopup = function()
 	{
 		const self = this;
-		self.locationMapPopup = self.locationMapPopup || new TF.Grid.LocationMapPopup({
+		self.gridMapPopup = self.gridMapPopup || new TF.Grid.LocationMapPopup({
 			parentPage: self,
 			map: self.locationMapViewInstance,
 			canShowDetailView: true,
@@ -457,7 +457,7 @@
 			viewDetailEvent: self.showDetailsClick.bind(this)
 		});
 
-		return self.locationMapPopup;
+		return self.gridMapPopup;
 	}
 
 	LocationPage.prototype.focusRecordInMapView = function(record)
