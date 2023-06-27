@@ -12,7 +12,7 @@
 			Columns: [
 				{
 					FieldName: "AccountName",
-					DisplayName: "Account Name",
+					DisplayName: "Account Code",
 					Width: '150px',
 					type: "string"
 				},

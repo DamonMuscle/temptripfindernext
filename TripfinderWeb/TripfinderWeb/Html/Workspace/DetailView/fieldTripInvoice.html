@@ -3,7 +3,7 @@
 	<!-- /ko -->
 	<div class="row">
 		<div class="col-xs-12 form-group tf-validate">
-				<label data-bind="css:{'requirestar':obIsAccountNameRequired}, text: tf.applicationTerm.getApplicationTermSingularByName('Account Name')"></label>
+				<label data-bind="css:{'requirestar':obIsAccountNameRequired}, text: tf.applicationTerm.getApplicationTermSingularByName('Account Code')"></label>
 				<div class="input-group">
 					<div data-bind="typeahead:{source:obAccountSource,format:function(obj){return obj.Code;},drowDownShow:true,selectedValue:obSelectedAccount,notSort:true}">
 						<!-- ko if: isStrictAcctCodes -->
