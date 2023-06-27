@@ -400,6 +400,54 @@
 		return tf.map.ArcGIS.Color.fromString(rgbColor).toRgb();
 	};
 
+	MapHelper.layerVisible = function(map, layer)
+	{
+		var scale = map.mapView.scale;
+		return layer.visible && (layer.minScale == 0 || layer.minScale >= scale) && (layer.maxScale == 0 || layer.maxScale <= scale);
+	};
+
+	MapHelper.zoomToScale = function(map, zoom)
+	{
+		var ret = 70.5310735;
+		if (!map) return ret;
+
+		var lods = (map.mapView.constraints && map.mapView.constraints.effectiveLODs) || LOD;
+		for (var i = 0, l = lods.length; i < l; i++)
+		{
+			if (lods[i].level == zoom)
+			{
+				return lods[i].scale;
+			}
+		}
+		return ret;
+	};
+
+	MapHelper.scaleToZoom = function(map, scale)
+	{
+		var lods = (map.mapView.constraints && map.mapView.constraints.effectiveLODs) || LOD;
+		for (var i = 0, l = lods.length; i < l; i++)
+		{
+			if (lods[i].scale == scale)
+			{
+				return lods[i].level;
+			}
+		}
+		return 23;
+	};
+
+	MapHelper.getOrder = function(map, layerId)
+	{
+		var layers = map.layers.items;
+		for (var i = 0; i < layers.length; i++)
+		{
+			if (layers[i].id == layerId)
+			{
+				return i;
+			}
+		}
+		return layers.length;
+	};
+
 	MapHelper.getAllBaseMaps = function()
 	{
 		return BASE_MAPS;

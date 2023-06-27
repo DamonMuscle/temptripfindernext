@@ -49,26 +49,26 @@
 		self.dataModel.getSetting().then(function(setting)
 		{
 			self.changePointLayerRenderer(self.getRenderer(setting));
-			self.initUnassignedStudentLegend();
+			// self.initUnassignedStudentLegend();
 		});
 
 		self.initializeOtherLayers();
 	};
 
-	UnassignedStudentMapTool.prototype.initUnassignedStudentLegend = function()
-	{
-		var self = this,
-			grid = { _gridType: "unassignedStudent" },
-			$onMapTool = self._viewModal.element.find(".on-map-tool");
-		self.unassignedStudentLegend = new TF.Map.Thematics.ThematicLegendViewModel(grid, $onMapTool, false, true, false);
-		self.unassignedStudentLegend.onCloseMapLegend.subscribe(self.onLegendClose.bind(self));
+	// UnassignedStudentMapTool.prototype.initUnassignedStudentLegend = function()
+	// {
+	// 	var self = this,
+	// 		grid = { _gridType: "unassignedStudent" },
+	// 		$onMapTool = self._viewModal.element.find(".on-map-tool");
+	// 	self.unassignedStudentLegend = new TF.Map.Thematics.ThematicLegendViewModel(grid, $onMapTool, false, true, false);
+	// 	self.unassignedStudentLegend.onCloseMapLegend.subscribe(self.onLegendClose.bind(self));
 
-		setTimeout(function()
-		{
-			// use timeout to fix thematicTool not initialize issue
-			self._viewModal.RoutingMapTool && self._viewModal.RoutingMapTool.thematicTool.thematicMenu.onSelectThematic.subscribe(self.closeLegend.bind(self));
-		}, 2000);
-	};
+	// 	setTimeout(function()
+	// 	{
+	// 		// use timeout to fix thematicTool not initialize issue
+	// 		self._viewModal.RoutingMapTool && self._viewModal.RoutingMapTool.thematicTool.thematicMenu.onSelectThematic.subscribe(self.closeLegend.bind(self));
+	// 	}, 2000);
+	// };
 
 	UnassignedStudentMapTool.prototype.refreshUnassignStudentLegend = function()
 	{

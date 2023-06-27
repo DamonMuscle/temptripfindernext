@@ -37,16 +37,16 @@
 	{
 		var self = this;
 		this.$element = $(element);
-		this.documentChange = tf.documentManagerViewModel.obCurrentDocument.subscribe(function(document)
-		{
-			if (document == self._viewModal)
-			{
-				setTimeout(function()
-				{
-					self.display.fixSchoolNodeStyle();
-				}, 20);
-			}
-		});
+		// this.documentChange = tf.documentManagerViewModel.obCurrentDocument.subscribe(function(document)
+		// {
+		// 	if (document == self._viewModal)
+		// 	{
+		// 		setTimeout(function()
+		// 		{
+		// 			self.display.fixSchoolNodeStyle();
+		// 		}, 20);
+		// 	}
+		// });
 	};
 
 	TripViewModel.prototype._onMapLoad = function()

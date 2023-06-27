@@ -399,6 +399,11 @@
 		return this.supportedProducts.some((c) => { return c.Name.toLowerCase() == "wayfinder"; });
 	};
 
+	AuthManager.prototype.hasInfofinderi = function()
+	{
+		return this.supportedProducts.some(c => c.Name === "Infofinderi");
+	};
+
 	AuthManager.prototype.hasFormsResultsAccess = function(type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;

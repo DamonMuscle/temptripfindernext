@@ -109,7 +109,7 @@
 
 	MapSymbol.prototype.getUnassignedStudentSymbol = function()
 	{
-		return this.student(TF.Map.MapSymbol.unassignedStudentColor, 1, 10);
+		return this.student(TF.Map.Symbol.unassignedStudentColor, 1, 10);
 	};
 
 	MapSymbol.prototype.getPartMatchStudentSymbol = function()
@@ -121,7 +121,7 @@
 
 	MapSymbol.prototype.getUnassignedStudentHighlightSymbol = function()
 	{
-		return this.student(TF.Map.MapSymbol.unassignedStudentHighlightColor, 1, 10);
+		return this.student(TF.Map.Symbol.unassignedStudentHighlightColor, 1, 10);
 	};
 
 	MapSymbol.prototype.getAssignedStudentSymbol = function(color)
