@@ -8,7 +8,7 @@
 		var self = this;
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel.viewModel._viewModal,
-			template: "workspace/Routing Map/RoutingMapPanel/MapEditingPalette/EditRailroad"
+			template: "workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/EditRailroad"
 		});
 		this.viewModel = viewModel;
 		this.dataModel = viewModel.dataModel;

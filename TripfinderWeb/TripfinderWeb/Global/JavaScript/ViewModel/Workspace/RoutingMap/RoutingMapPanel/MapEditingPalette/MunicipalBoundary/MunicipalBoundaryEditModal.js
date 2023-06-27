@@ -7,7 +7,7 @@
 		var self = this;
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel._viewModal,
-			template: "workspace/Routing Map/RoutingMapPanel/MapEditingPalette/EditMunicipalBoundary"
+			template: "workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/EditMunicipalBoundary"
 		});
 		this.viewModel = viewModel;
 		this.obName = ko.observable();

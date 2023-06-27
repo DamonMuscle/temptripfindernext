@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("My Streets Settings");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/MapEditingPalette/MapEditingSettingsModal');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/MapEditingSettingsModal');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("Apply")
 		this.obNegativeButtonLabel("Cancel")

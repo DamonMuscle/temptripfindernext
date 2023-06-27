@@ -241,36 +241,52 @@
 		return shortTerm ? str.substring(0, shortTerm) : str;
 	};
 
-	TF.createEnum = function(obj, displayNames, startValue)
+	TF.createEnum = function(displayNames, startValue)
 	{
+		var obj = {};
 		obj.all = [];
 		obj.allValues = [];
-		startValue = startValue || 0;
-		displayNames.forEach(function(item, index)
-		{
-			var name = item.replace(/ /g, "");
-			obj[name] = index + startValue;
-			obj.all.push({ displayName: item, name: name, id: index + startValue });
-			obj.allValues.push(index + startValue);
-		});
 
-		obj.findById = function(id)
+		let value = startValue || 0;
+		let getValue = index =>
 		{
-			return obj.all.find(function(item)
+			if (!Array.isArray(startValue))
 			{
-				return item.id === id;
-			});
+				return value + index;
+			}
+
+			let current = startValue[index];
+			if (current != null)
+			{
+				value = current;
+			}
+			else
+			{
+				value++;
+			}
+
+			return value;
 		};
 
-		obj.find = function(key)
+		displayNames.forEach((item, index) =>
+		{
+			var name = item.replace(/ /g, ""), itemValue = getValue(index);
+			obj[name] = itemValue;
+			var displayName = item[0] == "$" ? item.substring(1) : item;
+			obj.all.push({ displayName: displayName, name: name, id: itemValue });
+			obj.allValues.push(itemValue);
+		});
+
+		obj.findById = id => obj.all.find(item => item.id === id);
+
+		obj.find = key =>
 		{
 			key = (key || "").toLowerCase();
 			key = key.replace(/ /g, "");
-			return obj.all.find(function(item)
-			{
-				return item.name.toLowerCase() === key;
-			});
+			return obj.all.find(item => item.name.toLowerCase() === key);
 		};
+
+		return obj;
 	};
 
 	var fileSaver = document.createElement("a");

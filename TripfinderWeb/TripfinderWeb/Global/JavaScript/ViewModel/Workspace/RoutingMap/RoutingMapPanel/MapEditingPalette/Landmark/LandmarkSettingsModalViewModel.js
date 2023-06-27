@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Landmark Settings");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/MapEditingPalette/LandmarkSettingsModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/LandmarkSettingsModal");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

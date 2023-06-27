@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Railroad Settings");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/MapEditingPalette/RailroadSettingsModal');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/RailroadSettingsModal');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("Apply")
 		this.obNegativeButtonLabel("Cancel")

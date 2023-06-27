@@ -6,7 +6,7 @@
 	{
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel._viewModal,
-			template: "workspace/Routing Map/RoutingMapPanel/MapEditingPalette/EditZipCode"
+			template: "workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/EditZipCode"
 		});
 		this.onCloseEditModalEvent = new TF.Events.Event();
 		this.viewModel = viewModel;

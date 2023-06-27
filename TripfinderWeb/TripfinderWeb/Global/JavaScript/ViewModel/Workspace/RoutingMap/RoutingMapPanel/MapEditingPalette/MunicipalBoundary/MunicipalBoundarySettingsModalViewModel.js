@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Municipal Boundaries Settings");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/MapEditingPalette/MunicipalBoundarySettingsModal');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/MunicipalBoundarySettingsModal');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

@@ -6,7 +6,7 @@
 	{
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel.viewModel._viewModal,
-			template: "workspace/Routing Map/RoutingMapPanel/MapEditingPalette/EditWater"
+			template: "workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/EditWater"
 		});
 		this.viewModel = viewModel;
 		this.dataModel = viewModel.dataModel;

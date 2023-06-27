@@ -7,7 +7,7 @@
 		var self = this;
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel.viewModel._viewModal,
-			template: "workspace/Routing Map/RoutingMapPanel/MapEditingPalette/EditMyStreets"
+			template: "workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/EditMyStreets"
 		});
 		this.onEditModalDataChangeEvent = new TF.Events.Event();
 		this.viewModel = viewModel;

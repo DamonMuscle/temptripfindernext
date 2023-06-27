@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title(title + " Label Options");
 		this.sizeCss = "label-options-dialog";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/LabelOptionsDialog');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/LabelOptionsDialog');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("Save");
 		this.obNegativeButtonLabel("Cancel");

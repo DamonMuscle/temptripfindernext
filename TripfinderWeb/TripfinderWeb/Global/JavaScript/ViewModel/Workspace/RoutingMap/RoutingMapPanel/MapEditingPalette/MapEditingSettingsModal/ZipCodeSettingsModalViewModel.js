@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Postal Code Boundaries Settings");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/MapEditingPalette/ZipCodeSettingsModal');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/ZipCodeSettingsModal');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("Apply")
 		this.obNegativeButtonLabel("Cancel")

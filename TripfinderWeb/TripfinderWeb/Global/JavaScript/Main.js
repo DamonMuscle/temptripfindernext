@@ -894,6 +894,131 @@ createNamespace("TF").isLightness = function(color)
 	return brightness >= 123;
 };
 
+createNamespace("TF").saveStorage = function(key, routeState, value)
+{
+	tf.storageManager.save(key + "." + routeState, value);
+	tf.storageManager.save(key, value);
+};
+
+createNamespace("TF").getStorage = function(key, routeState)
+{
+	return tf.storageManager.get(key + "." + routeState) || tf.storageManager.get(key);
+};
+
+createNamespace("TF").seriesRun = function(allData, pageSize, func, isPromise, time)
+{
+	if (allData.length == 0)
+	{
+		return Promise.resolve(false);
+	}
+	var split = [], pageIndex = 0, returnValue = [];
+	for (var index = 0; index < allData.length; index++)
+	{
+		var splitIndex = Math.floor(index / pageSize);
+		if (!split[splitIndex])
+		{
+			split[splitIndex] = [];
+		}
+		split[splitIndex].push(allData[index]);
+	}
+
+	function run(resolve)
+	{
+		setTimeout(function()
+		{
+			if (isPromise)
+			{
+				func(split[pageIndex], pageIndex).then(function(ans)
+				{
+					returnValue.push(ans);
+					// stop run when return false
+					if (ans === false)
+					{
+						resolve(returnValue);
+						return;
+					}
+
+					pageIndex++;
+					if (pageIndex < split.length)
+					{
+						run(resolve);
+					} else
+					{
+						resolve(returnValue);
+					}
+				});
+			} else
+			{
+				func(split[pageIndex]);
+				pageIndex++;
+				if (pageIndex < split.length)
+				{
+					run(resolve);
+				} else
+				{
+					resolve();
+				}
+			}
+		}, time || 20);
+	}
+
+	return new Promise(function(resolve, reject)
+	{
+		run(resolve);
+	});
+};
+
+createNamespace("TF").parallelRun = function(allDataChunk, parallelCount, func, useRunNext)
+{
+	if (allDataChunk.length == 0)
+	{
+		return Promise.resolve(false);
+	}
+
+	if (allDataChunk.length < parallelCount)
+	{
+		parallelCount = allDataChunk.length;
+	}
+
+	var index = parallelCount, finishedCount = 0;
+	function runData(data, resolve)
+	{
+		function runNext()
+		{
+			if (index < allDataChunk.length)
+			{
+				runData(allDataChunk[index], resolve);
+				index++;
+				return;
+			}
+
+			if (useRunNext || finishedCount >= allDataChunk.length)
+			{
+				resolve();
+			}
+		}
+
+		if (useRunNext)
+		{
+			return func(data, runNext);
+		}
+
+		return func(data).then(() =>
+		{
+			finishedCount++;
+			runNext();
+		});
+	}
+
+	return new Promise(function(resolve, reject)
+	{
+		for (var i = 0; i < parallelCount; i++)
+		{
+			runData(allDataChunk[i], resolve);
+		}
+	});
+};
+
 (function()
 {
 	createNamespace("TF").menuHelper = menuHelper;

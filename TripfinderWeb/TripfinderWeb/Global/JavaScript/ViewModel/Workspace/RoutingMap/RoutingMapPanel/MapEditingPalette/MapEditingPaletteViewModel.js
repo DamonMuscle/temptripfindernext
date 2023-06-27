@@ -8,7 +8,7 @@
 		self.type = "mapEditing";
 		self.title = "Map Editing";
 		self.isOpen = !!isOpen;
-		self.templateName = "workspace/Routing Map/RoutingMapPanel/MapEditingPalette/MapEditingPalette";
+		self.templateName = "workspace/RoutingMap/RoutingMapPanel/MapEditingPalette/MapEditingPalette";
 		self.confirmWindowCount = 0;
 
 		this.$element = null;
