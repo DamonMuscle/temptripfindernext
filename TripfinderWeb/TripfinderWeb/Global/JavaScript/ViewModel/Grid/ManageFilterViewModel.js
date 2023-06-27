@@ -37,6 +37,7 @@
 	ManageFilterViewModel.prototype.initFilterGrid = function(viewModel, el)
 	{
 		var self = this;
+		this.obGridFilterDataModels.sort(this._sortFilterDataModels);
 		var filters = this.obGridFilterDataModels().map(function(filter)
 		{
 			return filter.toData();
@@ -111,8 +112,7 @@
 							{
 								return;
 							}
-							self.fnSaveAndEditGridFilter("new", currentModel, false, false);
-						}
+							self.copyAndNewGridFilter(currentModel.clone());						}
 					}, {
 						name: "delete",
 						template: '<a class="k-button k-button-icontext k-grid-delete" title="Delete"><span class=" "></span>delete</a>',
@@ -347,7 +347,31 @@
 
 	ManageFilterViewModel.prototype.newFilterButtonClick = function(viewModel, e)
 	{
-		this.fnSaveAndEditGridFilter("new", null, false, false, { title: "New Filter" });
+		const newTask = this.fnSaveAndEditGridFilter("new", null, false, false, { title: "New Filter" });
+		this.saveGridFilter(newTask);
+	};
+
+	ManageFilterViewModel.prototype.copyAndNewGridFilter = function(gridFilter)
+	{
+		const copyAndNewTask = this.fnSaveAndEditGridFilter("new", gridFilter, false, false);
+		this.saveGridFilter(copyAndNewTask);
+	};
+
+	ManageFilterViewModel.prototype.saveGridFilter = function(task)
+	{
+		this.enableGridRefresh = false;
+		Promise.resolve(task)
+			.then((result) =>
+			{
+				if (result && typeof result === "object")
+				{
+					this.obGridFilterDataModels.push(result);
+					this.initFilterGrid();
+				}
+			}).finally(() =>
+			{
+				this.enableGridRefresh = true;
+			});
 	};
 
 	/**
@@ -373,5 +397,18 @@
 			{
 				this.enableGridRefresh = true;
 			});
+	};
+
+	ManageFilterViewModel.prototype._sortFilterDataModels = function(left, right)
+	{
+		if (left.id() < 0 && right.id() > 0)
+		{
+			return 1;
+		}
+		if (left.id() > 0 && right.id() < 0)
+		{
+			return -1;
+		}
+		return left.name().toLowerCase() == right.name().toLowerCase() ? 0 : (left.name().toLowerCase() < right.name().toLowerCase() ? -1 : 1);
 	};
 })();
