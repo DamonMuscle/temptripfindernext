@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Copy Trip Stop");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/RoutingPalette/CopyTripStop');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/RoutingPalette/CopyTripStop');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("OK");
 		this.obNegativeButtonLabel("Cancel");

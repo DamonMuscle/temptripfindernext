@@ -301,7 +301,7 @@
 	{
 		event.stopPropagation();
 		var className = "trip-district-policy-result";
-		var templateUrl = "workspace/Routing Map/RoutingMapPanel/RoutingPalette/TripDistrictPolicyResult";
+		var templateUrl = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/TripDistrictPolicyResult";
 		var template = $("<div data-bind=\"template: { name: " + "'" + templateUrl + "'" + "}\"></div>").addClass(className);
 		var data = this._createDisplayData(analyzeResult, event);
 		ko.applyBindings(data, template[0]);

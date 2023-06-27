@@ -1,0 +1,51 @@
+<div class="playback-control-container">
+	<div class="time-slider-container">
+		<input type="text" data-slider-tooltip="hide" data-bind="bootstrapSlider:{ max:tripPlaybackControlTool.tickTool.obTimeSliderMax,min:tripPlaybackControlTool.tickTool.obTimeSliderMin,value:tripPlaybackControlTool.tickTool.obTargetTimeAsSecond,formatter:tripPlaybackControlTool.tickTool.secondToTimeFormatter}">
+	</div>
+	<div class="controls">
+		<div class="icon" data-bind="click:tripPlaybackControlTool.playButtonClick"><i class="glyphicon" data-bind="css:{'glyphicon-play':!tripPlaybackControlTool.tickTool.obPlaying(),'glyphicon-pause':tripPlaybackControlTool.tickTool.obPlaying()}"></i></div>
+		<div class="time" data-bind="text:tripPlaybackControlTool.tickTool.secondToTimeFormatter(tripPlaybackControlTool.tickTool.obTargetTimeAsSecond())"></div>
+		<div class="print-setting-group" data-bind="dropDownMenu:{toggle:true}">
+			<div class="icon"><i class="glyphicon glyphicon-cog"></i></div>
+			<div class="menu  map-pinpoint-white withsub-menu">
+				<ul>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 1)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==1}" class="menuIcon check-white"></div>
+						<div class="text"><span>Normal Speed</span></div>
+					</li>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 2)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==2}" class="menuIcon"></div>
+						<div class="text"><span>2x</span></div>
+					</li>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 10)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==10}" class="menuIcon"></div>
+						<div class="text"><span>10x</span></div>
+					</li>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 20)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==20}" class="menuIcon"></div>
+						<div class="text"><span>20x</span></div>
+					</li>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 30)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==30}" class="menuIcon"></div>
+						<div class="text"><span>30x</span></div>
+					</li>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 60)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==60}" class="menuIcon"></div>
+						<div class="text"><span>60x</span></div>
+					</li>
+					<li data-bind="click:tripPlaybackControlTool.changeSpeed.bind($data, 120)">
+						<div data-bind="css:{' check-white':tripPlaybackControlTool.tickTool.obPlaySpeed()==120}" class="menuIcon"></div>
+						<div class="text"><span>120x</span></div>
+					</li>
+					<li class="menu-divider">
+						<div class="rule"></div>
+					</li>
+					<li data-bind="click:close">
+						<div class="menuIcon"></div>
+						<div class="text"><span>Close playback</span></div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

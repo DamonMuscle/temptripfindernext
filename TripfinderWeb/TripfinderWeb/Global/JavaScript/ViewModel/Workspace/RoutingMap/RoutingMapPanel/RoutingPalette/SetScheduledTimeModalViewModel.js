@@ -8,7 +8,7 @@
 		this.title("Update Stop time");
 		this.sizeCss = "set-schedule-time-dialog";
 		this.modalClass = "update-stop-time-body";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/SetScheduledTime");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/SetScheduledTime");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("OK");
 		this.obNegativeButtonLabel("Cancel");

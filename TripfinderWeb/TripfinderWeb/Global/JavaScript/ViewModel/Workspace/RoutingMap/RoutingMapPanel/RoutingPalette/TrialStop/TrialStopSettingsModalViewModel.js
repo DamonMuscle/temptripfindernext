@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Trial Stop Settings");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/TrialStopSettingModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/TrialStopSettingModal");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

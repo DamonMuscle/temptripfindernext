@@ -1,0 +1,51 @@
+<div class="row" data-bind="uiInit:init">
+	<div class="col-xs-2">
+		<svg height="40" width="40">
+			<circle cx="20" cy="20" r="15" stroke="black" stroke-width="2" data-bind="attr:{fill:trip.color}" />
+			<text text-anchor="middle" x="20" y="25" font-size="16px" stroke-width="0" data-bind="attr:{fill:tripForeColor},text:tripStop.Sequence"></text>
+		</svg>
+	</div>
+	<div class="col-xs-22">
+		<div class="form-group">
+			<label style="margin-bottom: 10px;">Start Point</label>
+			<input data-bind="value:tripStop.Street" class="form-control" readonly />
+		</div>
+	</div>
+	<div class="col-xs-24">
+		<div class="form-group">
+			<label style="margin-bottom: 10px;">End Point</label>
+			<input data-bind="value:endPoint" class="form-control" readonly />
+		</div>
+	</div>
+	<div class="col-xs-8">
+		<div class="form-group">
+			<label>Average Speed</label>
+			<input data-bind="numericTextBox:{value:avgSpeed,decimals:2,format:'#.##',min:1,max:300}" name="avgSpeed" class="form-control narrow" /><span>
+				<!-- ko text: isImperialUnit ? 'mph' : 'kph' -->
+				<!-- /ko-->
+			</span>
+		</div>
+	</div>
+	<div class="col-xs-8">
+		<div class="form-group">
+			<label>Total Distance</label>
+			<input data-bind="value:distance" class="form-control narrow" readonly /><span>
+				<!-- ko text: isImperialUnit ? 'mile(s)' : 'km(s)' -->
+				<!-- /ko-->
+			</span>
+		</div>
+	</div>
+	<div class="col-xs-8">
+		<div class="form-group">
+			<label>Travel Time</label>
+			<input data-bind="value:duration" class="form-control narrow" readonly /><span> h:mm:ss</span>
+		</div>
+	</div>
+	<div class="col-xs-24">
+		<div class="form-group small-direction-area">
+			<label>Directions</label>
+			<!-- ko template: { name: 'workspace/RoutingMap/RoutingMapPanel/RoutingPalette/DirectionDetail',data:routingDirectionDetailViewModel} -->
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

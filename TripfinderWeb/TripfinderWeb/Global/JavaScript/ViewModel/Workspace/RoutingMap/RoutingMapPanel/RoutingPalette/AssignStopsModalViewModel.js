@@ -8,7 +8,7 @@
 		this.title("Trip Stops");
 		this.sizeCss = "modal-dialog";
 		this.modalClass = "assign-stop-body";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/AssignStops");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/AssignStops");
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obPositiveButtonLabel("OK");
 		this.obNegativeButtonLabel("Cancel");

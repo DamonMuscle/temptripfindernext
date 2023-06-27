@@ -1,0 +1,209 @@
+<div class="parcel-edit-overlay" data-bind="visible:obOverlayVisible,click:overlayClick">
+</div>
+<div class="parcel-edit-modal-container small-height-container boundaryEditModal" data-bind="visible:obVisible,uiInit:onInit">
+	<div class="content document-dataentry editRoutingTripStop">
+		<div class="head" data-bind="click:toggleCollapseClick ">
+			<span data-bind="text:obTitle"></span>
+			<span class="close" data-bind="click:cancelClick">×</span>
+		</div>
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+		<div class="modify-content">
+			<div class="body">
+				<div class="dataentry-paginator clearafter" data-bind="visible:obRecordsCount()>1&&obShowPaging() " style="right: 4px;top:18px;">
+					<div class="page-group">
+						<a class="iconbutton page-previous" data-bind="click:previousClick,css: { disabled: obCurrentPage()<=0 }" role="button"></a>
+						<a class="iconbutton page-next" data-bind="click:nextClick,css: { disabled: obCurrentPage()+1>=obRecordsCount() }" role="button"></a>
+						<div class="page-indicator"><span data-bind="text:obCurrentPage()+1"></span> of <span data-bind="text:obRecordsCount"></span></div>
+					</div>
+				</div>
+				<div style="padding:0 25px;">
+					<h4><strong>General</strong></h4>
+					<div class="row">
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
+							<div class="form-group small-form-group">
+								<label class="requirestar">Street Location</label>
+								<input type="text" data-bind="value:obDataModel.Street, disable:isReadOnly" name="street" class="form-control">
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
+							<div class="form-group small-form-group">
+								<label>City</label>
+								<input type="text" data-bind="value:obDataModel.City, disable:isReadOnly" name="city" class="form-control">
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
+							<div class="form-group small-form-group">
+								<label>Comments</label>
+								<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="comments" data-bind="value:obDataModel.Comments, disable:isReadOnly"></textarea>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:mode()=='new'&&!isCopied()||obIsMultipleCreate()">
+							<div class="form-group small-form-group">
+								<label>Stop Boundary Type</label>
+								<div class="input-group">
+									<div id="stopTypeDropDown" data-bind="typeahead:{source:obStopTypes,drowDownShow:true,notSort:true,selectedValue:obSelectedStopType}">
+										<!-- ko customInput:{type:"Select", disable:isReadOnly,value:obSelectedStopTypeText,attributes:{class:"form-control"}} -->
+										<!-- /ko -->
+									</div>
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-default btn-sharp">
+											<span class="caret"></span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24">
+							<div class="row">
+								<div class="col-xs-14">
+									<div class="form-group has-feedback has-feedback-left" >
+										<label>Total Stop Time</label>
+										<div class="input-group">
+											<input type="text" class="form-control" data-bind="value:obTotalStopTimeShow, disable:isReadOnly" name="totalStopTime" />
+											<div class="icon-input-alert form-control-feedback" title='The Total Stop Time has been manually changed'></div>
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-default btn-sharp" data-bind="click:minusTotalStopTimeClick,disable:isReadOnly">
+													<span class="glyphicon glyphicon-minus"></span>
+												</button>
+												<button type="button" class="btn btn-default btn-sharp" data-bind="click:addTotalStopTimeClick,disable:isReadOnly">
+													<span class="glyphicon glyphicon-plus"></span>
+												</button>
+												<button type="button" class="btn btn-default btn-sharp btn-calculateStopTime" data-bind="click:calculateTotalStopTimeClick,disable:isReadOnly">
+													<span class="glyphicon glyphicon-list-alt"></span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&obShowStopLocationMap()">
+							<div class="form-group small-form-group">
+								<label>Corner Stop</label>
+								<div class="stopLocationMap"></div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
+							<div class="form-group small-form-group">
+								<label>Vehicle Curb Approach</label>
+								<div class="radio stopPoolCurbApproachRadio">
+									<label>
+										<input type="radio" data-bind="checkedValue:0,checked:obDataModel.vehicleCurbApproach, disable:isReadOnly" value="0">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Either side of vehicle')"></span>
+									</label>
+								</div>
+								<div class="radio stopPoolCurbApproachRadio">
+									<label>
+										<input type="radio" data-bind="checked:obDataModel.vehicleCurbApproach,checkedValue:1,disable:isReadOnly()||obDataModel.isSnapped || isJunction()" value="1">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Right side of vehicle')"></span>
+									</label>
+								</div>
+								<div class="radio stopPoolCurbApproachRadio">
+									<label>
+										<input type="radio" data-bind="checked:obDataModel.vehicleCurbApproach,checkedValue:2,disable:isReadOnly()||obDataModel.isSnapped || isJunction()" value="2">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Left side of vehicle')"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()">
+							<div class="form-group small-form-group">
+								<label>Street Crossing</label>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" data-bind="checked:obDataModel.ProhibitCrosser,checkedValue:1, disable:isReadOnly">
+										<span>Prohibit</span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<h4 data-bind="visible:isNoWalkoutType()&&!isCopied()&&mode()=='new'&&!obIsMultipleCreate()"><strong>Walkout Guide</strong></h4>
+					<div data-bind="visible:!isCopied()&&mode()=='new'" class="row">
+						<div class="col-xs-24" data-bind="visible:isNoWalkoutType()">
+							<div class="form-group small-form-group">
+								<div class="checkbox">
+									<label>
+										<input id="stopPoolWalkoutCheckbox" data-bind="checked:showWalkout,checkedValue:1,disable:isReadOnly" type="checkbox">
+										<span>Show</span>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:isNoWalkoutType()">
+							<div class="form-group small-form-group">
+								<label>Walkout Type</label>
+								<div class="radio">
+									<label>
+										<input type="radio" name="stopPoolWalkoutType" data-bind="checkedValue:0,checked:walkoutType,checkedValue:0,disable:isReadOnly||disabled" value="0">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Street Path')"></span>
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="stopPoolWalkoutType" data-bind="checked:walkoutType,checkedValue:1,disable:isReadOnly||disabled" value="1">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Radius')"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:isNoWalkoutType()">
+							<div class="row">
+								<div class="form-group small-form-group col-xs-12">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Distance')"></label>
+									<div class="input-group">
+										<input id="stopPoolDistance" name="walkoutDistance" type="text" class="form-control" data-bind="numericTextBox:{value:walkoutDistance,disable:isReadOnly||walkoutDistanceDisable,decimals:3,format:'#.###'}"></input>
+									</div>
+								</div>
+								<div class="form-group small-form-group col-xs-8">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('')"></label>
+									<div class="input-group" data-bind="css:disabled() ? 'disabled' : ''">
+										<div id="stopPoolDistanceUnit" data-bind="typeahead:{source:obUnits,drowDownShow:true,notSort:true,selectedValue:obSelectedDistanceUnit}">
+											<!-- ko customInput:{type:"Select",value:obSelectedDistanceUnitText,attributes:{class:"form-control",name:'distanceUnit'},disable:isReadOnly||disabled} -->
+											<!-- /ko -->
+										</div>
+										<div class="input-group-btn">
+											<button data-bind="" type="button" class="btn btn-default btn-sharp">
+												<span class="caret"></span>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:walkoutBufferVisible">
+							<div class="row">
+								<div class="form-group small-form-group col-xs-12">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Buffer')"></label>
+									<div class="input-group">
+										<input name="walkoutBuffer" type="text" class="form-control" data-bind="numericTextBox:{value:walkoutBuffer,decimals:3,format:'#.###'}"></input>
+									</div>
+								</div>
+								<div class="form-group small-form-group col-xs-8">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('')"></label>
+									<div class="input-group">
+										<div data-bind="typeahead:{source:obUnits,drowDownShow:true,notSort:true,selectedValue:obSelectedBufferUnit}">
+											<!-- ko customInput:{type:"Select",value:obSelectedBufferUnitText,attributes:{class:"form-control",name:'bufferUnit'}} -->
+											<!-- /ko -->
+										</div>
+										<div class="input-group-btn">
+											<button type="button" class="btn btn-default btn-sharp">
+												<span class="caret"></span>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="foot">
+				<button type="button" data-bind="click:applyClick,visible:!isReadOnly()" class="btn tf-btn-black">Apply</button>
+				<button type="button" data-bind="click:cancelClick" class="btn btn-link">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>

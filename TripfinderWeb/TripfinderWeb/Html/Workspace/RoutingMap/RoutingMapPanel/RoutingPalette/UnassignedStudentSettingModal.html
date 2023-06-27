@@ -1,0 +1,167 @@
+<div class="container-fluid unassigned-student-setting" data-bind="uiInit:init">
+	<div class="row col-xs-24 group-row">
+		<div class="col-xs-24 group-element-row">
+			<!-- <div class="checkbox">
+                <label>
+					<input type="checkbox" data-bind="checked: obAutoRefresh">
+					<span>Auto Refresh Changes</span>
+				</label>
+            </div> -->
+			<div class="checkbox check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obNotAutoAssign">
+					<span>Edit Stop does not Auto Assign</span>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="row col-xs-24 form-group group-row">
+		<div class="col-xs-24 group-element-row">
+			<label>Days</label>
+		</div>
+		<div class="col-xs-24 group-element-row">
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obMonToFriChecked">
+					<span>Mon-Fri</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obTuChecked">
+					<span>Tuesday</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obThChecked">
+					<span>Thursday</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obSaChecked">
+					<span>Saturday</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-24 group-element-row">
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obMoChecked">
+					<span>Monday</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obWeChecked">
+					<span>Wednesday</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obFrChecked">
+					<span>Friday</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-5 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obSuChecked">
+					<span>Sunday</span>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="row col-xs-24 form-group group-row" style="margin-bottom:20px;">
+		<div class="col-xs-12 group-element-row date left">
+			<label>Start Date</label>
+			<!-- ko customInput:{type:"Date",value:startDate,attributes:{class:"form-control",name:"startDate"}} -->
+			<!-- /ko -->
+		</div>
+		<div class="col-xs-12 group-element-row date right">
+			<label>End Date</label>
+			<!-- ko customInput:{type:"Date",value:endDate,attributes:{class:"form-control",name:"endDate"}} -->
+			<!-- /ko -->
+		</div>
+	</div>
+	<div class="row col-xs-24 form-group group-row">
+		<div class="col-xs-12 group-element-row">
+			<label>Attending Schools in Criteria</label>
+		</div>
+		<div class="col-xs-12 group-element-row">
+			<label>Not Attending Schools in Criteria</label>
+		</div>
+		<div class="col-xs-24 group-element-row">
+			<div class="checkbox col-xs-12 check-option-interval attendingUnassigned">
+				<label>
+					<input type="checkbox" data-bind="checked: obAttendingUnAssigned">
+					<span>Unassigned</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-12 check-option-interval notAttendingUnassigned">
+				<label>
+					<input type="checkbox" data-bind="checked: obNotAttendingUnAssigned">
+					<span>Unassigned</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-24 group-element-row" style="margin-bottom:20px;">
+			<div class="col-xs-10 group-element-row">
+				<label>Filter</label>
+				<div data-bind='component: {
+                        name:"filter-drop-down-list",
+                        params:{type:"student",filter:obAttendingUnassignedFilter,onlyApply:false, needUpdate: obNeedUpdate, withRelationship: true}
+                }'></div>
+			</div>
+			<div class="col-xs-2">
+			</div>
+			<div class="col-xs-10 group-element-row">
+				<label>Filter</label>
+				<div data-bind='component: {
+                        name:"filter-drop-down-list",
+                        params:{type:"student",filter:obNotAttendingUnassignedFilter,onlyApply:false, needUpdate: obNeedUpdate, withRelationship: true}
+                }'></div>
+			</div>
+		</div>
+		<div class="col-xs-24 group-element-row">
+			<div class="checkbox col-xs-12 check-option-interval attendingScheduled">
+				<label>
+					<input type="checkbox" data-bind="checked: obAttendingScheduled">
+					<span>Scheduled Elsewhere</span>
+				</label>
+			</div>
+			<div class="checkbox col-xs-12 check-option-interval notAttendingScheduled">
+				<label>
+					<input type="checkbox" data-bind="checked: obNotAttendingScheduled">
+					<span>Scheduled Elsewhere</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-24 group-element-row" style="margin-bottom:20px;">
+			<div class="col-xs-10 group-element-row">
+				<label>Filter</label>
+				<div data-bind='component: {
+                        name:"filter-drop-down-list",
+                        params:{type:"student",filter:obAttendingScheduledFilter,onlyApply:false, needUpdate: obNeedUpdate, withRelationship: true}
+                }'></div>
+			</div>
+			<div class="col-xs-2">
+			</div>
+			<div class="col-xs-10 group-element-row">
+				<label>Filter</label>
+				<div data-bind='component: {
+                        name:"filter-drop-down-list",
+                        params:{type:"student",filter:obNotAttendingScheduledFilter,onlyApply:false, needUpdate: obNeedUpdate, withRelationship: true}
+                }'></div>
+			</div>
+		</div>
+		<div class="col-xs-24 group-element-row">
+			<div class="checkbox col-xs-12 check-option-interval">
+				<label>
+					<input type="checkbox" data-bind="checked: obShowLegend">
+					<span>Show Legend </span>
+				</label>
+			</div>
+		</div>
+	</div>
+</div>

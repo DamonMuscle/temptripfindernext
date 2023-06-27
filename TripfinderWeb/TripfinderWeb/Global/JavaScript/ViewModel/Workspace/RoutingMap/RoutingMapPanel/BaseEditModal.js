@@ -2,9 +2,39 @@
 {
 	createNamespace("TF.RoutingMap").BaseEditModal = BaseEditModal;
 
+	createNamespace("TF.RoutingMap").BaseDraggableModal = BaseDraggableModal;
+
+	function BaseDraggableModal() { }
+
+	BaseDraggableModal.prototype.makeDraggable = function(cancel)
+	{
+		this.element.draggable({
+			cancel: cancel,
+			containment: this.element.closest(".map-page"),
+			stop: (e, ui) =>
+			{
+				this.stickyModalWhenOverflow();
+				if (this.onDragStop)
+				{
+					this.onDragStop(e, ui);
+				}
+			}
+		});
+	};
+
+	BaseDraggableModal.prototype.stickyModalWhenOverflow = function()
+	{
+		var elementWidth = this.element.outerWidth();
+		if (this.element.position().left + elementWidth >= this.element.parent().width())
+		{
+			this.element.css('left', `calc(100% - ${elementWidth}px)`);
+		}
+	};
+
 	function BaseEditModal(options)
 	{
 		var self = this;
+		TF.RoutingMap.BaseDraggableModal.call(this, arguments);
 		var defaults = {
 			routingMapDocumentViewModel: null,
 			template: ""
@@ -38,6 +68,9 @@
 		this.obCollapsed = ko.observable(false);
 		this.obCollapsed.subscribe(this.toggleCollapseEvent.bind(this));
 	}
+
+	BaseEditModal.prototype = Object.create(TF.RoutingMap.BaseDraggableModal.prototype);
+	BaseEditModal.prototype.constructor = BaseEditModal;
 
 	BaseEditModal.prototype.onInit = function(data, element)
 	{
@@ -77,10 +110,7 @@
 			mapPageClass = mapArea;
 		}
 		var mapPage = this.element.closest(mapPageClass);
-		this.element.draggable({
-			cancel: ".document-dataentry",
-			containment: mapPage
-		});
+		this.makeDraggable(".document-dataentry");
 		this.element.find(".modify-content").resizable({
 			containment: mapPage,
 			handles: "s",
@@ -422,6 +452,7 @@
 			this.element.css("top", cssTop);
 		}
 		this.obVisible(true);
+		this.stickyModalWhenOverflow();
 	};
 
 	/**

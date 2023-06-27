@@ -4,7 +4,7 @@
 	var TripStopHelper = TF.Helper.TripStopHelper;
 	function StopPoolEditModal(viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel, "workspace/Routing Map/RoutingMapPanel/RoutingPalette/EditStopPool");
+		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditStopPool");
 		this.obDataModel = this.createObservableDataModel(TF.RoutingMap.RoutingPalette.StopPoolFeatureData.StopPoolData.getDataModel());
 		this.isCopied = ko.observable(false);
 		this.dataModel.highlightChangedEvent.subscribe(this.onHighLightChangedEvent.bind(this));

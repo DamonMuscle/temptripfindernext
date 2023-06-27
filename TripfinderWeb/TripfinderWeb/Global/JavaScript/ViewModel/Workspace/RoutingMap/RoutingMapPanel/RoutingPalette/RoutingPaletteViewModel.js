@@ -12,7 +12,7 @@
 		self.type = "routing";
 		self.title = "Routing";
 		self.isOpen = !!isOpen;
-		self.templateName = "workspace/Routing Map/RoutingMapPanel/RoutingPalette/RoutingPalette";
+		self.templateName = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingPalette";
 		self.$element = null;
 		self._viewModal = viewModal;
 		self.tripViewModel = new TF.RoutingMap.RoutingPalette.TripViewModel(self, routeState, trips);
@@ -20,8 +20,8 @@
 		self.stopPoolViewModel = new TF.RoutingMap.RoutingPalette.StopPoolViewModel(self);
 		self.trialStopViewModel = new TF.RoutingMap.RoutingPalette.TrialStopViewModel(self);
 		self.unassignedStudentViewModel = new TF.RoutingMap.RoutingPalette.UnassignedStudentViewModel(self);
-		self.nonEligibleZoneViewModel = new TF.RoutingMap.RoutingPalette.NonEligibleZoneViewModel(self);
-		self.childViewModels = [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel, self.nonEligibleZoneViewModel];
+		// self.nonEligibleZoneViewModel = new TF.RoutingMap.RoutingPalette.NonEligibleZoneViewModel(self);
+		self.childViewModels =[self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel]; // [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel, self.nonEligibleZoneViewModel];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 	}
@@ -61,7 +61,7 @@
 		var self = this;
 		if (self.showCount == 0)
 		{
-			tf.gaHelper.send('Area', 'Routing');
+			// tf.gaHelper.send('Area', 'Routing');
 			if (self.unassignedStudentViewModel.drawTool && self._viewModal.RoutingMapTool.thematicTool && self.unassignedStudentViewModel.drawTool.getSettingDisplayCount(self.unassignedStudentViewModel.dataModel.getCandidateSetting()) > 1)
 			{
 				self._viewModal.RoutingMapTool.thematicTool.thematicMenu.clearThematicSelection(true);
@@ -74,7 +74,10 @@
 			setTimeout(function()
 			{
 				// use timeout to make sure RoutingMapTool is ready
-				self._viewModal.RoutingMapTool.thematicTool.layerId = "candidateStudentFeatureLayer";
+				if (self._viewModal.RoutingMapTool.thematicTool)
+				{
+					self._viewModal.RoutingMapTool.thematicTool.layerId = "candidateStudentFeatureLayer";
+				}
 			}, 2000);
 		}
 		this.addShowCount();

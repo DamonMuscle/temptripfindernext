@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Trip Optimization Summary");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/VRPSummary");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/VRPSummary");
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obPositiveButtonLabel("Apply");
 		this.obOtherButtonLabel("Compare and open in new map canvas");

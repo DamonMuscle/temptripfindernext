@@ -9,7 +9,7 @@
 		var title = eventType.indexOf("new") >= 0 ? "New Stop Pool Category" : "Edit Stop Pool Category";
 		this.title(title);
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/StopPoolCategoryModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/StopPoolCategoryModal");
 		this.buttonTemplate("modal/positivenegative");
 		this.viewModel = new TF.RoutingMap.RoutingPalette.StopPoolCategoryViewModel(data, eventType);
 		this.data(this.viewModel);

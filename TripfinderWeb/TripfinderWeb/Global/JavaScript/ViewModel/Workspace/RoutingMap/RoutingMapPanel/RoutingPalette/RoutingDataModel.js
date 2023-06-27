@@ -67,15 +67,15 @@
 		// show impact difference chart
 		self.showImpactDifferenceChart = ko.observable(false);
 
-		self.streetDataModel = self._viewModal.mapEditingPaletteViewModel.myStreetsViewModel.dataModel;
-		self.streetMeterBuffer = 40;
+		// self.streetDataModel = self._viewModal.mapEditingPaletteViewModel.myStreetsViewModel.dataModel;
+		// self.streetMeterBuffer = 40;
 
 		self.setUserProfileTripColor = self.setUserProfileTripColor.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "userprofile", pb.EDIT), this.setUserProfileTripColor);
 		self.stopPathChange = self.stopPathChange.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "stoppath"), this.stopPathChange);
-		this.districtPolicyChange = this.districtPolicyChange.bind(this);
-		PubSub.subscribe("DistrictPolicyChange", this.districtPolicyChange);
+		// this.districtPolicyChange = this.districtPolicyChange.bind(this);
+		// PubSub.subscribe("DistrictPolicyChange", this.districtPolicyChange);
 		this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
 		this.tripEditBroadcast = new TF.RoutingMap.RoutingPalette.TripEditBroadcast(this);
 		self.geoLinkTool = new TF.RoutingMap.RoutingPalette.GeoLinkTool(self.tripStopDataModel);
@@ -95,10 +95,12 @@
 	{
 		var self = this;
 		this.tripEditBroadcast.init();
-		self.subscribeStreetChange();
+		// self.subscribeStreetChange();
 		this._viewModal.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
 		self._getUnassignedStudentViewModel().dataModel.settingChangeEvent.subscribe(this.unassignedStudentSettingChange.bind(this));
-		return Promise.all([self.setLoadTimeSettings(), self.setUserProfileTripColor()]).then(function()
+
+		// return Promise.all([self.setLoadTimeSettings(), self.setUserProfileTripColor()])
+		return Promise.all([self.setUserProfileTripColor()]).then(function()
 		{
 			var docData = self._viewModal.DocumentData.data;
 			// the trips that need to be auto open when trip panel initial
@@ -4589,99 +4591,99 @@
 	/**
 	 * subscribe street change to modify street Street Crossing
 	 */
-	RoutingDataModel.prototype.subscribeStreetChange = function()
-	{
-		var self = this;
-		var notAutoAssign = self.getNotAutoAssignStudentSetting();
-		self.onStreetModifyEvent = function(e, data)
-		{
-			var street = data.newData;
-			var modifyType = data.type;
-			var isChange = false;
+	// RoutingDataModel.prototype.subscribeStreetChange = function()
+	// {
+	// 	var self = this;
+	// 	var notAutoAssign = self.getNotAutoAssignStudentSetting();
+	// 	self.onStreetModifyEvent = function(e, data)
+	// 	{
+	// 		var street = data.newData;
+	// 		var modifyType = data.type;
+	// 		var isChange = false;
 
-			if (modifyType == "delete" && street.ProhibitCrosser)
-			{
-				isChange = true;
-			}
-			if (modifyType == "create" && street.ProhibitCrosser)
-			{
-				isChange = true;
-			}
-			if (modifyType == "update")
-			{
-				var oldStreet = data.oldData;
-				if (street.ProhibitCrosser != oldStreet.ProhibitCrosser)
-				{
-					isChange = true;
-				}
+	// 		if (modifyType == "delete" && street.ProhibitCrosser)
+	// 		{
+	// 			isChange = true;
+	// 		}
+	// 		if (modifyType == "create" && street.ProhibitCrosser)
+	// 		{
+	// 			isChange = true;
+	// 		}
+	// 		if (modifyType == "update")
+	// 		{
+	// 			var oldStreet = data.oldData;
+	// 			if (street.ProhibitCrosser != oldStreet.ProhibitCrosser)
+	// 			{
+	// 				isChange = true;
+	// 			}
 
-			}
+	// 		}
 
-			if (isChange)
-			{
-				var stops = self.findStopsIncludeStreet(street);
-				stops.forEach(function(stop)
-				{
-					var students = self.getUnAssignStudentInBoundary(stop.boundary);
-					if (stop.type == "tripStop" && !notAutoAssign) { self.assignStudent(students, stop); }
-					else if (stop.type == "trialStop") { self.viewModel.viewModel.trialStopViewModel.editModal.updateStudent(stop); }
-				});
-			}
-		};
-		self.streetDataModel.onStreetModifyEvent.subscribe(self.onStreetModifyEvent);
-	};
+	// 		if (isChange)
+	// 		{
+	// 			var stops = self.findStopsIncludeStreet(street);
+	// 			stops.forEach(function(stop)
+	// 			{
+	// 				var students = self.getUnAssignStudentInBoundary(stop.boundary);
+	// 				if (stop.type == "tripStop" && !notAutoAssign) { self.assignStudent(students, stop); }
+	// 				else if (stop.type == "trialStop") { self.viewModel.viewModel.trialStopViewModel.editModal.updateStudent(stop); }
+	// 			});
+	// 		}
+	// 	};
+	// 	self.streetDataModel.onStreetModifyEvent.subscribe(self.onStreetModifyEvent);
+	// };
 
-	RoutingDataModel.prototype.findStopsIncludeStreet = function(street)
-	{
-		var self = this;
-		var streetBuffer = tf.map.ArcGIS.geometryEngine.buffer(street.geometry, self.streetMeterBuffer, "meters");
-		var stops = [];
-		self.trips.forEach(function(trip)
-		{
-			trip.TripStops.forEach(function(tripStop)
-			{
-				if (tripStop.boundary && tripStop.boundary.geometry)
-				{
-					var isIntersect = tf.map.ArcGIS.geometryEngine.intersect(streetBuffer, tripStop.boundary.geometry);
-					if (isIntersect)
-					{
-						stops.push(tripStop);
-					}
-				}
-			});
-		});
+	// RoutingDataModel.prototype.findStopsIncludeStreet = function(street)
+	// {
+	// 	var self = this;
+	// 	var streetBuffer = tf.map.ArcGIS.geometryEngine.buffer(street.geometry, self.streetMeterBuffer, "meters");
+	// 	var stops = [];
+	// 	self.trips.forEach(function(trip)
+	// 	{
+	// 		trip.TripStops.forEach(function(tripStop)
+	// 		{
+	// 			if (tripStop.boundary && tripStop.boundary.geometry)
+	// 			{
+	// 				var isIntersect = tf.map.ArcGIS.geometryEngine.intersect(streetBuffer, tripStop.boundary.geometry);
+	// 				if (isIntersect)
+	// 				{
+	// 					stops.push(tripStop);
+	// 				}
+	// 			}
+	// 		});
+	// 	});
 
-		self.viewModel.drawTool._crossStreetLayer.graphics.forEach(function(graphic)
-		{
-			if (tf.map.ArcGIS.geometryEngine.intersects(graphic.geometry, street.geometry))
-			{
-				stops.push(graphic.attributes.tripStop);
-			}
-		});
+	// 	self.viewModel.drawTool._crossStreetLayer.graphics.forEach(function(graphic)
+	// 	{
+	// 		if (tf.map.ArcGIS.geometryEngine.intersects(graphic.geometry, street.geometry))
+	// 		{
+	// 			stops.push(graphic.attributes.tripStop);
+	// 		}
+	// 	});
 
-		var uniqueStopIds = Enumerable.From(stops).Distinct(function(c) { return c.id; }).Select("$.id").ToArray();
-		return self.getTripStopByIds(uniqueStopIds);
-	};
+	// 	var uniqueStopIds = Enumerable.From(stops).Distinct(function(c) { return c.id; }).Select("$.id").ToArray();
+	// 	return self.getTripStopByIds(uniqueStopIds);
+	// };
 
-	RoutingDataModel.prototype.getTripStopByIds = function(ids)
-	{
-		var self = this, stops = [];
-		if (!ids || ids.length == 0)
-		{
-			return [];
-		}
-		self.trips.forEach(function(trip)
-		{
-			trip.TripStops.forEach(function(tripStop)
-			{
-				if (ids.indexOf(tripStop.id) >= 0)
-				{
-					stops.push(tripStop);
-				}
-			});
-		});
-		return stops;
-	};
+	// RoutingDataModel.prototype.getTripStopByIds = function(ids)
+	// {
+	// 	var self = this, stops = [];
+	// 	if (!ids || ids.length == 0)
+	// 	{
+	// 		return [];
+	// 	}
+	// 	self.trips.forEach(function(trip)
+	// 	{
+	// 		trip.TripStops.forEach(function(tripStop)
+	// 		{
+	// 			if (ids.indexOf(tripStop.id) >= 0)
+	// 			{
+	// 				stops.push(tripStop);
+	// 			}
+	// 		});
+	// 	});
+	// 	return stops;
+	// };
 
 	// #endregion
 
@@ -6113,58 +6115,58 @@
 		return editTrips.length > 0 ? editTrips[0].Session == TF.Helper.TripHelper.Sessions.Both : false;
 	};
 
-	RoutingDataModel.prototype.districtPolicyChange = function()
-	{
-		this.setLoadTimeSettings().then(() =>
-		{
-			var trips = this.getEditTrips();
-			var candidateStudentDict = {};
-			var originalStudentsDict = {};
-			this.candidateStudents.forEach(student =>
-			{
-				if (!candidateStudentDict[student.id])
-				{
-					candidateStudentDict[student.id] = [];
-				}
-				candidateStudentDict[student.id].push(student);
-			});
+	// RoutingDataModel.prototype.districtPolicyChange = function()
+	// {
+	// 	this.setLoadTimeSettings().then(() =>
+	// 	{
+	// 		var trips = this.getEditTrips();
+	// 		var candidateStudentDict = {};
+	// 		var originalStudentsDict = {};
+	// 		this.candidateStudents.forEach(student =>
+	// 		{
+	// 			if (!candidateStudentDict[student.id])
+	// 			{
+	// 				candidateStudentDict[student.id] = [];
+	// 			}
+	// 			candidateStudentDict[student.id].push(student);
+	// 		});
 
-			trips.forEach((trip) =>
-			{
-				trip.originalStudents.forEach(student =>
-				{
-					if (!originalStudentsDict[student.id])
-					{
-						originalStudentsDict[student.id] = [];
-					}
-					originalStudentsDict[student.id].push(student);
-				});
-			});
+	// 		trips.forEach((trip) =>
+	// 		{
+	// 			trip.originalStudents.forEach(student =>
+	// 			{
+	// 				if (!originalStudentsDict[student.id])
+	// 				{
+	// 					originalStudentsDict[student.id] = [];
+	// 				}
+	// 				originalStudentsDict[student.id].push(student);
+	// 			});
+	// 		});
 
-			return this.recalculate(trips).then((response) =>
-			{
-				trips.forEach((trip) =>
-				{
-					var tripData = Enumerable.From(response).FirstOrDefault(null, function(c) { return c.id == trip.id; });
-					for (var j = 0; j < trip.TripStops.length; j++)
-					{
-						trip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-						trip.TripStops[j].Duration = tripData.TripStops[j].Duration;
-						trip.TripStops[j].Students.forEach((student, k) =>
-						{
-							student.LoadTime = tripData.TripStops[j].Students[k].LoadTime;
-							(candidateStudentDict[student.id] || []).concat(originalStudentsDict[student.id] || []).forEach((c) =>
-							{
-								c.LoadTime = student.LoadTime;
-							});
-						});
-					}
-				});
-				this.setActualStopTime(trips);
-				this.onTripsChangeEvent.notify({ add: [], edit: trips, delete: [], isAfterDistrictPolicyChanged: true });
-			});
-		});
-	};
+	// 		return this.recalculate(trips).then((response) =>
+	// 		{
+	// 			trips.forEach((trip) =>
+	// 			{
+	// 				var tripData = Enumerable.From(response).FirstOrDefault(null, function(c) { return c.id == trip.id; });
+	// 				for (var j = 0; j < trip.TripStops.length; j++)
+	// 				{
+	// 					trip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
+	// 					trip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+	// 					trip.TripStops[j].Students.forEach((student, k) =>
+	// 					{
+	// 						student.LoadTime = tripData.TripStops[j].Students[k].LoadTime;
+	// 						(candidateStudentDict[student.id] || []).concat(originalStudentsDict[student.id] || []).forEach((c) =>
+	// 						{
+	// 							c.LoadTime = student.LoadTime;
+	// 						});
+	// 					});
+	// 				}
+	// 			});
+	// 			this.setActualStopTime(trips);
+	// 			this.onTripsChangeEvent.notify({ add: [], edit: trips, delete: [], isAfterDistrictPolicyChanged: true });
+	// 		});
+	// 	});
+	// };
 
 	RoutingDataModel.prototype.dispose = function()
 	{
@@ -6177,14 +6179,14 @@
 		this.onTripColorChangeEvent.unsubscribeAll();
 		this.onChangeTripVisibilityEvent.unsubscribeAll();
 		this.onWalkTSRestrictionChangeEvent.unsubscribeAll();
-		this.streetDataModel.onStreetModifyEvent.unsubscribe(this.onStreetModifyEvent);
+		// this.streetDataModel.onStreetModifyEvent.unsubscribe(this.onStreetModifyEvent);
 		this.onShowChartChangeEvent.unsubscribeAll();
 		this._viewModal.onUpdateRecordsEvent.unsubscribe(this.onSchoolLocationDataSourceChange);
 		this.onSchoolLocationChangeEvent.unsubscribeAll();
 		this.routingStudentManager.dispose();
 		PubSub.unsubscribe(this.setUserProfileTripColor);
 		PubSub.unsubscribe(this.stopPathChange);
-		PubSub.unsubscribe(this.districtPolicyChange);
+		// PubSub.unsubscribe(this.districtPolicyChange);
 		this.schoolLockData.dispose();
 		this.tripLockData.dispose();
 		tfdispose(this);

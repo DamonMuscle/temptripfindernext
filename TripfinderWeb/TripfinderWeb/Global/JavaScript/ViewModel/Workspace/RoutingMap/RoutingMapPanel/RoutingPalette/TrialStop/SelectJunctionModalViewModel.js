@@ -6,7 +6,7 @@
 	{
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Select Stop");
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/SelectJunctionModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/SelectJunctionModal");
 		this.buttonTemplate("modal/positivenegativeother");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

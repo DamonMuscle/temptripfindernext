@@ -11,8 +11,6 @@
 		this.startPosition = {};
 		this.movingPanel = null;
 		this.placeholder = null;
-		this.dockLeftShadow = null;
-		this.dockRightShadow = null;
 	}
 	var minPanelWidth = 418;
 	var grayPadding = 20;
@@ -110,19 +108,23 @@
 				tf.documentEvent.unbind("mouseup.panel", self.routeState);
 				if (self.movingPanel)
 				{
-					self.viewModel.element.find(".routingmap_panel").css("z-index", 108);
+					const viewModelElement = self.movingPanel.closest(".dock-parent-container");
+					viewModelElement.find(".routingmap_panel").css("z-index", 108);
 					self.movingPanel.css("z-index", 109);
+					const dockRightShadow = viewModelElement.find(".dock-right-shadow");
+					const dockLeftShadow = viewModelElement.find(".dock-left-shadow");
+
 					if (self.placeholder.css("display") == "block")
 					{
 						self.combinePanels();
 					}
-					else if (self.dockRightShadow.css("display") == "block")
+					else if (dockRightShadow.css("display") == "block")
 					{
-						self._dockPanel("right");
+						self._dockPanel("right", viewModelElement);
 					}
-					else if (self.dockLeftShadow.css("display") == "block")
+					else if (dockLeftShadow.css("display") == "block")
 					{
-						self._dockPanel("left");
+						self._dockPanel("left", viewModelElement);
 					}
 					else
 					{
@@ -163,7 +165,7 @@
 
 	RoutingMapPanelManager.prototype.getRoutingMapPanel = function()
 	{
-		return "workspace/RoutingMap/RoutingMapPanel/RoutingMapPanel";
+		return "workspace/Routing Map/RoutingMapPanel/RoutingMapPanel";
 	};
 
 	RoutingMapPanelManager.prototype.newPanelDragStart = function(e, target)
@@ -171,8 +173,9 @@
 		var self = this;
 		var draggingPaletteContainer = $(target).closest(".item-container");
 		self.draggingPalette = ko.dataFor(draggingPaletteContainer[0]);
-		var container = $(target).closest(".main_container"), panelDom;
+		var container = $(target).closest(".routingmap_panel").parent().parent(), panelDom;
 		var startOffset = draggingPaletteContainer.offset();
+		var mapOffset = $(target).closest(".map-page").offset();
 		var mapPanel = ko.dataFor($(target).closest(".routingmap_panel")[0]);
 		var $panel;
 		if (mapPanel.palettes().length > 1)
@@ -181,7 +184,7 @@
 			panelDom = $("<div data-bind=\"template: { name: " + "'" + self.getRoutingMapPanel() + "'" + "}\"></div>");
 			container.append(panelDom[0]);
 			self.draggingPalette.needInit = false;
-			self.newPanel = new TF.RoutingMap.RoutingMapPanelViewModel([self.draggingPalette], null, self.getUniqueName(), true, { left: startOffset.left - grayPadding, top: startOffset.top - grayPadding }, self.routeState, self.viewModel);
+			self.newPanel = new TF.RoutingMap.RoutingMapPanelViewModel([self.draggingPalette], null, self.getUniqueName(), true, { left: startOffset.left - mapOffset.left - grayPadding, top: startOffset.top - mapOffset.top - grayPadding }, self.routeState, self.viewModel);
 			self.newPanel.needInitPalettes = false;
 			ko.applyBindings(self.newPanel, panelDom[0]);
 			panelDom.find(".list").append(draggingPaletteContainer.parent());
@@ -260,7 +263,7 @@
 			newTop = 0;
 		}
 
-		$panel.css({ left: newLeft, top: newTop });
+		$panel.css({ left: newLeft / containerRect.width * 100 + '%', top: newTop });
 		if (!self.highlightDock($panel))
 		{
 			var intersect = self.addPlaceholder(mapPage, $panel, e);
@@ -290,24 +293,27 @@
 		var leftPosition = parseInt($panel.css("left"));
 		var dock = false;
 		var mapPage = $panel.closest(".map-page");
-		this.dockLeftShadow.css("display", "none");
-		this.dockRightShadow.css("display", "none");
+		const dockLeftShadow = $panel.closest(".dock-parent-container").find(".dock-left-shadow");
+		const dockRightShadow = $panel.closest(".dock-parent-container").find(".dock-right-shadow");
+
+		dockLeftShadow.css("display", "none");
+		dockRightShadow.css("display", "none");
 
 		// dock right
 		if (mapPage[0].clientWidth - leftPosition - $panel.outerWidth() < 10)
 		{
-			this.dockRightShadow.css("display", "block");
+			dockRightShadow.css("display", "block");
 			dock = true;
 		}
 		// dock left
 		else if (leftPosition < 10)
 		{
-			this.dockLeftShadow.css("display", "block");
+			dockLeftShadow.css("display", "block");
 			dock = true;
 		}
 
 		// set dock shadow height
-		this.dockLeftShadow.add(this.dockRightShadow).height(mapPage.height() - 204);
+		dockLeftShadow.add(dockRightShadow).height(mapPage.height() - 204);
 		return dock;
 	};
 
@@ -394,14 +400,17 @@
 	 * Dock the panel to the left/right side.
 	 * @returns {void} 
 	 */
-	RoutingMapPanelManager.prototype._dockPanel = function(leftRight)
+	RoutingMapPanelManager.prototype._dockPanel = function(leftRight, viewModelElement)
 	{
 		var self = this,
 			dockCss = "dock-" + leftRight,
-			container = this.viewModel.element,
+			container = viewModelElement,
 			dockedPanel = container.find("." + dockCss),
 			panel,
 			panelViewModel = ko.dataFor(self.movingPanel[0]);
+
+		const dockRightShadow = container.find(".dock-right-shadow");
+		const dockLeftShadow = container.find(".dock-left-shadow");
 
 		self.placeholder.remove();
 		if (dockedPanel.length <= 0)
@@ -436,8 +445,9 @@
 			var $item = $(item);
 			$item.data("maxHeight", self.defaultMaxHeight);
 		});
-		self.dockLeftShadow.css("display", "none");
-		self.dockRightShadow.css("display", "none");
+
+		dockLeftShadow.css("display", "none");
+		dockRightShadow.css("display", "none");
 	};
 
 	RoutingMapPanelManager.prototype.setDockPanelStyle = function(panel, container)
@@ -452,16 +462,13 @@
 	RoutingMapPanelManager.prototype.addDockShadow = function()
 	{
 		var container = this.viewModel.element;
-		if (!this.dockLeftShadow)
-		{
-			this.dockLeftShadow = $("<div class='dock dock-left-shadow'>");
-			container.append(this.dockLeftShadow);
-		}
-		if (!this.dockRightShadow)
-		{
-			this.dockRightShadow = $("<div class='dock dock-right-shadow'>");
-			container.append(this.dockRightShadow);
-		}
+		container.addClass("dock-parent-container");
+
+		const dockRightShadow = container.find(".dock-right-shadow");
+		const dockLeftShadow = container.find(".dock-left-shadow");
+
+		dockLeftShadow.length <= 0 && container.append("<div class='dock dock-left-shadow'>");
+		dockRightShadow.length <= 0 && container.append("<div class='dock dock-right-shadow'>");
 	};
 
 	RoutingMapPanelManager.prototype.resizingPanelStart = function(e, target)

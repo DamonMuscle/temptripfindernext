@@ -192,9 +192,9 @@
 							return Promise.all(pList.map(function(c)
 							{
 								return c.save();
-							})).then(function()
+							})).then(results =>
 							{
-								return true;
+								return !results.some(result => result == false);
 							});
 						} else if (result == false)
 						{

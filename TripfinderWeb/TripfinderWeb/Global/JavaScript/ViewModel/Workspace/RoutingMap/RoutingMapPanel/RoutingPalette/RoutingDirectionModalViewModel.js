@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title(trip.Name);
 		this.sizeCss = "modal-dialog-lg";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/RoutingPalette/RoutingDirectionModal');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingDirectionModal');
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

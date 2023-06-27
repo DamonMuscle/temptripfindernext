@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Students Affected Schedules");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/SelectTripModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/SelectTripModal");
 		this.buttonTemplate("modal/positivenegativeother");
 		this.obPositiveButtonLabel("Save");
 		this.obNegativeButtonLabel("Cancel");

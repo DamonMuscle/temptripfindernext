@@ -1,0 +1,99 @@
+<div class="row vrp-summary-grid" data-bind="uiInit:init">
+    <div class="col-xs-24">
+        TRIP COMPARISON
+    </div>
+    <div class="col-xs-24">
+        <table style="width:100%">
+            <thead>
+                <tr>
+                    <th class="text-center td-1">
+                        Trip Name
+                    </th>
+                    <th class="text-center td-2">
+                        Students
+                    </th>
+                    <th class="text-center td-3">
+                        Stops
+                    </th>
+                    <th class="text-center td-4">
+                        Time (min.)
+                    </th>
+                    <th class="text-center td-5">
+                        Distance (mi.)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ko foreach: obData -->
+                <tr>
+                    <td class="text-left" data-bind="css:{delete:isDelete}">
+                        <div class="name" data-bind="text:name,css:{new:isNew}"></div>
+                    </td>
+                    <td>
+                        <div class="values"><span class="gray" data-bind="text:students.old"></span><span data-bind="text:students.new,css:students.style"></span></div>
+                    </td>
+                    <td>
+                        <div class="values"><span class="gray" data-bind="text:stops.old"></span><span data-bind="text:stops.new,css:stops.style"></span></div>
+                    </td>
+                    <td>
+                        <div class="values"><span class="gray" data-bind="text:time.old"></span><span data-bind="text:time.new,css:time.style"></span></div>
+                    </td>
+                    <td>
+                        <div class="values"><span class="gray" data-bind="text:distance.old"></span><span data-bind="text:distance.new,css:distance.style"></span></div>
+                    </td>
+                </tr>
+                <!--/ko-->
+            </tbody>
+        </table>
+        <div class="split-line">
+        </div>
+        <table style="width:100%">
+            <tbody>
+                <tr>
+                    <td class="td-1">
+                        <div class="name bold">Total</div>
+                    </td>
+                    <td class="td-2">
+                        <div class="values"><span class="gray" data-bind="text:obTotal().students.old"></span><span class="black" data-bind="text:obTotal().students.new,css:obTotal().students.style"></span></div>
+                        <div class="text-center small" data-bind="text:obTotal().students.message,css:obTotal().students.color"></div>
+                    </td>
+                    <td class="td-3">
+                        <div class="values"><span class="gray" data-bind="text:obTotal().stops.old"></span><span class="black" data-bind="text:obTotal().stops.new,css:obTotal().stops.style"></span></div>
+                        <div class="text-center small" data-bind="text:obTotal().stops.message,css:obTotal().stops.color"></div>
+                    </td>
+                    <td class="td-4">
+                        <div class="values"><span class="gray" data-bind="text:obTotal().time.old"></span><span class="black" data-bind="text:obTotal().time.new,css:obTotal().time.style"></span></div>
+                        <div class="text-center small" data-bind="text:obTotal().time.message,css:obTotal().time.color"></div>
+                    </td>
+                    <td class="td-5">
+                        <div class="values"><span class="gray" data-bind="text:obTotal().distance.old"></span><span class="black" data-bind="text:obTotal().distance.new,css:obTotal().distance.style"></span></div>
+                        <div class="text-center small" data-bind="text:obTotal().distance.message,css:obTotal().distance.color"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- ko if: notSolved.stops()>0 -->
+        <div class="split-line">
+        </div>
+        <div class="split-line">
+        </div>
+        <table style="width:100%">
+            <tbody>
+                <tr class="not-solved">
+                    <td class="td-1">
+                        <div class="name">Not Solved</div>
+                    </td>
+                    <td class="td-2" data-bind="text:notSolved.students()">
+                    </td>
+                    <td class="td-3" data-bind="text:notSolved.stops()>0?notSolved.stops():''">
+                    </td>
+                    <td class="td-4">
+                    </td>
+                    <td class="td-5">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!--/ko-->
+    </div>
+</div>

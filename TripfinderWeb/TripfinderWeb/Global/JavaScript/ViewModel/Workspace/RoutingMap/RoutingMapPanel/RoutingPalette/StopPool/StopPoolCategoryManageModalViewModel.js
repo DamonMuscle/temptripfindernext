@@ -11,7 +11,7 @@
 		this.obPositiveButtonLabel("Open");
 		this.obNegativeButtonLabel("Close");
 		this.obDisableControl(true);
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/StopPoolCategoryManageModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/StopPoolCategoryManageModal");
 		this.viewModel = new TF.RoutingMap.RoutingPalette.StopPoolCategoryManageViewModel(this, viewModel);
 		this.data(this.viewModel);
 	}

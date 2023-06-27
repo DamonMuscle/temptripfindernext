@@ -1,0 +1,399 @@
+<div class="container-fluid document-dataentry routing-trip-info-dialog" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="row">
+		<div class="tab-selection-header">
+			<div class="trip-tab tab-selection active" data-bind="click:switchTabClick.bind($data)">
+				<p>Trip Info</p>
+			</div>
+			<div class="stop-tab tab-selection" data-bind="click:switchTabClick.bind($data)">
+				<p>Stops</p>
+			</div>
+			<div class="direction-tab tab-selection" data-bind="click:switchTabClick.bind($data)">
+				<p>Direction</p>
+			</div>
+		</div>
+	</div>
+	<div class="row trip-info-container" data-bind="visible:obTabPage() == TF.RoutingMap.RoutingPalette.RoutingTripViewModel.PageTab.TripInfo">
+		<div class="row">
+			<div class="col-xs-13">
+				<div class="col-xs-24 form-group group-row">
+					<div class="col-xs-22 group-element-row name-area">
+						<div class="col-xs-15 group-title-row">
+							<label class="requirestar normal-font-size">Name</label>
+						</div>
+						<div class="col-xs-9 group-error">
+							<input type="text" name="tripname" class="form-control notinput-required-message" data-bind="value:obNameError(), attr: { 'data-bv-error-name': 'TripName'}" required />
+						</div>
+						<input type="text" name="name" maxlength="150" autocomplete="off" data-bind="value:obEntityDataModel().name,disable:isDisabled" class="form-control">
+					</div>
+					<div class="col-xs-2 small-button-color color-area">
+						<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Color')"></label>
+						<!-- ko customInput:{type:"Color",value:color,attributes:{class:"form-control", hex:true},disable:isDisabled} -->
+						<!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row" data-bind="style:{marginBottom: hasEditTrip ? '15px' : '10px'}">
+					<div class="col-xs-24 group-element-row">
+						<div class="col-xs-3 radio-option-interval">
+							<label class="normal-font-size" data-bind="css:!hasEditTrip ? 'requirestar' : '', text:!hasEditTrip ? 'Type' : 'Type:'"></label>
+						</div>
+						<!-- ko if: hasEditTrip -->
+						<label>
+							<span data-bind="text:getTripType()" style="margin-left: 4px;"></span>
+						</label>
+						<!-- /ko -->
+						<!-- ko if: !hasEditTrip -->
+						<div class="radio pull-left radio-option-interval">
+							<label>
+								<input type="radio" data-bind="checked:obEntityDataModel().session,checkedValue:0, disable:hasEditTrip||isDisabled" value="0">
+								<span>To School</span>
+							</label>
+						</div>
+						<div class="radio pull-left radio-option-interval">
+							<label>
+								<input type="radio" data-bind="checked:obEntityDataModel().session,checkedValue:1, disable:hasEditTrip||isDisabled" value="1">
+								<span>From School</span>
+							</label>
+						</div>
+						<div class="radio pull-left radio-option-interval">
+							<label>
+								<input type="radio" data-bind="checked:obEntityDataModel().session,checkedValue:3, disable:hasEditTrip||isDisabled" value="3">
+								<span>Both</span>
+							</label>
+						</div>
+						<div class="radio pull-left radio-option-interval">
+							<label>
+								<input type="radio" data-bind="checked:obEntityDataModel().session,checkedValue:2, disable:hasEditTrip||isDisabled" value="2">
+								<span>Shuttle</span>
+							</label>
+						</div>
+						<!-- /ko -->
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Trip Alias')" class="normal-font-size"></label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obTripAliasDataModels,noneable:true,selectedValue:obSelectedTripAlias,format:function(obj){return obj.Name;},drowDownShow:true}">
+							<!-- ko customInput:{type:"String",value:obSelectedTripAliasText,disable:isDisabled,attributes:{name:"tripalias"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label class="normal-font-size">Description</label>
+					<textarea class="form-control verticalResize" style="height: 100px;" data-bind="value:obEntityDataModel().description,disable:isDisabled" maxlength="12000" />
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label class="normal-font-size">Vehicle</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obVehicles,noneable:true,format:vehicleNameFormatter,selectedValue:obSelectedVehicle,notSort:true,drowDownShow:true,mustMatch:true,disable:hasTripOpen()||isDisabled}">
+							<!-- ko customInput:{type:"String",value:obSelectedVehicleText,disable:isDisabled,attributes:{name:"vehicle"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label class="normal-font-size">Driver</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obDrivers,noneable:true,format:staffNameFormatter,selectedValue:obSelectedDriver,notSort:true,drowDownShow:true,mustMatch:true,disable:hasTripOpen()||isDisabled}">
+							<!-- ko customInput:{type:"String",value:obSelectedDriverText,disable:isDisabled,attributes:{name:"driver"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label class="normal-font-size">Bus Aide</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obBusAides,noneable:true,format:staffNameFormatter,selectedValue:obSelectedBusAide,notSort:true,drowDownShow:true,mustMatch:true,disable:hasTripOpen()||isDisabled}">
+							<!-- ko customInput:{type:"String",value:obSelectedBusAideText,disable:isDisabled,attributes:{name:"busAide"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label class="normal-font-size">Route</label>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obRoutes,noneable:true,format:function(obj){return obj.Name;},selectedValue:obSelectedRoute,drowDownShow:true,mustMatch:true,disable:hasTripOpen()||isDisabled}">
+							<!-- ko customInput:{type:"String",value:obSelectedRouteText,disable:isDisabled,attributes:{name:"route"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row" style="display: flex;align-items: center;margin-top: 2px;justify-content: space-between;">
+					<label class="normal-font-size">Calculate Time</label>
+					<div class="checkbox">
+						<label>
+							<input data-bind="checked: obEntityDataModel().speedType,value:TF.Enums.RoutingSpeedType.StreetSpeed,disable:isDisabled" type="radio" name="routingSpeed">
+							<span>Street Speed</span>
+						</label>
+					</div>
+					<div style="display:flex;align-items:center;">
+						<div class="checkbox">
+							<label>
+								<input data-bind="checked: obEntityDataModel().speedType,value:TF.Enums.RoutingSpeedType.DefaultSpeed,disable:isDisabled" type="radio" name="routingSpeed">
+								<span>Default Speed</span>
+							</label>
+						</div>
+						<div class="input-group" style="display: inline-block;width:auto;margin-left:10px;">
+							<input data-bind="numericTextBox:{value:obEntityDataModel().defaultSpeed,min:1,max:300,disable:isDisabled}" name="avgSpeed" class="form-control" style="width:60px" /><span>&nbsp;
+								<!-- ko text: isImperialUnit ? 'mph' : 'kph' -->
+								<!-- /ko-->
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<div class="checkbox col-xs-24 check-option-interval">
+						<label style="padding-left: 5px;">
+							<input type="checkbox" data-bind="checked:obEntityDataModel().excludeNoStudStopAndDirections,disable:isDisabled">
+							<span>Exclude stops and directions when no students assigned</span>
+						</label>
+					</div>
+
+				</div>
+			</div>
+			<div class="col-xs-11">
+				<div class="col-xs-24 form-group group-row">
+					<div class="row">
+						<div class="col-xs-24">
+							<div class="col-xs-24 group-element-row">
+								<div class="col-xs-12 group-title-row">
+									<label class="requirestar normal-font-size">Students</label>
+								</div>
+								<div class="col-xs-12 group-error">
+									<!-- input for require message -->
+									<input type="text" name="triprequirements" class="form-control notinput-required-message" data-bind="value:obTripRequirements(), attr: { 'data-bv-error-name': tf.applicationTerm.getApplicationTermSingularByName(
+														'Trip Requirements')}" required />
+								</div>
+							</div>
+							<div class="col-xs-24 group-element-row">
+								<div class="checkbox col-xs-24 check-option-interval">
+									<label>
+										<input type="checkbox" data-bind="checked:obEntityDataModel().hasBusAide,disable:hasTripOpen()||isDisabled">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Bus Aide') + '&nbsp;'+tf.applicationTerm.getApplicationTermSingularByName( 'on this Trip')"></span>
+									</label>
+								</div>
+							</div>
+							<div class="col-xs-24 group-element-row">
+								<div class="checkbox col-xs-24 check-option-interval">
+									<label>
+										<input type="checkbox" data-bind="checked:obEntityDataModel().nonDisabled,disable:hasTripOpen()||isDisabled">
+										<span data-bind="text: 'Non-Disabled ' + tf.applicationTerm.getApplicationTermPluralByName('Student')"></span>
+									</label>
+								</div>
+							</div>
+							<div class="col-xs-24 group-element-row">
+								<div class="checkbox col-xs-24 check-option-interval">
+									<label>
+										<input type="checkbox" data-bind="checked:obEntityDataModel().disabled,disable:hasTripOpen()||isDisabled">
+										<span data-bind="text: 'Disabled ' + tf.applicationTerm.getApplicationTermPluralByName('Student')"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<div class="col-xs-24 group-element-row">
+						<div class="col-xs-12 group-title-row">
+							<label class="requirestar normal-font-size">Day Of Week</label>
+						</div>
+						<div class="col-xs-12 group-error">
+							<!-- input for require message -->
+							<input type="text" name="dayofweek" class="form-control notinput-required-message" data-bind="value:obDayOfWeek(), attr: { 'data-bv-error-name': 'DayOfWeek'}" required />
+						</div>
+					</div>
+					<div class="col-xs-24 group-element-row">
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().obMonToFri,disable:hasTripOpen()||isDisabled" /> <span>Mon-Fri</span> </label>
+						</div>
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().tuesday,disable:hasTripOpen()||isDisabled" /> <span>Tuesday</span> </label>
+						</div>
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().thursday,disable:hasTripOpen()||isDisabled" /> <span>Thursday</span> </label>
+						</div>
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().saturday,disable:hasTripOpen()||isDisabled" /> <span>Saturday</span> </label>
+						</div>
+					</div>
+					<div class="col-xs-24 group-element-row">
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().monday,disable:hasTripOpen()||isDisabled" /> <span>Monday</span> </label>
+						</div>
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().wednesday,disable:hasTripOpen()||isDisabled" /> <span>Wednesday</span> </label>
+						</div>
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().friday,disable:hasTripOpen()||isDisabled" /> <span>Friday</span> </label>
+						</div>
+						<div class="checkbox col-xs-6 check-option-interval">
+							<label> <input type="checkbox" data-bind="checked:obEntityDataModel().sunday,disable:hasTripOpen()||isDisabled" /> <span>Sunday</span> </label>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<div class="col-xs-12 group-element-row date left">
+						<div class="col-xs-24 group-element-row">
+							<div class="col-xs-11 group-title-row">
+								<span>Start Date :</span>
+							</div>
+							<div class="col-xs-13 group-error" style="padding:0;">
+								<input type="text" name="startdateerror" class="form-control notinput-required-message" data-bind="value:obStartDateValidFlag(), attr: { 'data-bv-error-name': 'TripStartDate'}" />
+							</div>
+						</div>
+						<div class="col-xs-24 group-element-row">
+							<!-- ko customInput:{disable:hasTripOpen()||isDisabled,type:"Date",value:obEntityDataModel().startDate,attributes:{class:"form-control",name:"startDate"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+					<div class="col-xs-12 group-element-row date right">
+						<div class="col-xs-24 group-element-row">
+							<div class="col-xs-11 group-title-row">
+								<span>End Date :</span>
+							</div>
+							<div class="col-xs-13 group-error" style="padding:0;">
+								<input type="text" name="enddateerror" class="form-control notinput-required-message" data-bind="value:obEndDateValidFlag(), attr: { 'data-bv-error-name': 'TripEndDate'}" />
+							</div>
+						</div>
+						<div class="col-xs-24 group-element-row">
+							<!-- ko customInput:{disable:hasTripOpen()||isDisabled,type:"Date",value:obEntityDataModel().endDate,attributes:{class:"form-control",name:"endDate"}} -->
+							<!-- /ko -->
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row has-feedback has-feedback-left">
+					<div class="col-xs-24 group-element-row">
+						<div class="col-xs-12 group-title-row">
+							<label class="requirestar normal-font-size" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('School')"></label>
+						</div>
+						<div class="col-xs-12 group-error">
+							<input type="text" name="schools" class="form-control notinput-required-message" data-bind="value:obEntityDataModel().schools, attr: { 'data-bv-error-name': tf.applicationTerm.getApplicationTermSingularByName( 'School')}" required />
+						</div>
+					</div>
+					<div class="input-group">
+						<div class="form-control" style="height: 113px; padding-left:8px;" data-bind="foreach:obSelectedSchools().map(schoolFormatter),attr:{disabled:hasTripOpen()||isDisabled}">
+							<div data-bind="text:$data"></div>
+						</div>
+						<div class="input-group-btn" style="vertical-align: top;">
+							<button type="button" class="btn btn-default btn-sharp" data-bind="click:selectSchools,disable:hasTripOpen()||isDisabled"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<label class="normal-font-size">Filter Students by</label>
+					<div data-bind='component: {
+							name:"filter-drop-down-list",
+							params:{type:"student",filter:obSelectedFilter,disable:hasTripOpen()||isDisabled, withRelationship: true}
+					}'></div>
+				</div>
+				<div class="col-xs-24 form-group group-row">
+					<div class="col-xs-24 group-element-row">
+						<div class="col-xs-12 group-title-row">
+							<label class="requirestar normal-font-size">Travel Scenario</label>
+						</div>
+						<div class="col-xs-12 group-error">
+							<input type="text" name="travelScenario" class="form-control notinput-required-message" data-bind="value:obTravelScenario, attr: { 'data-bv-error-name': 'Travel Scenario'}" required />
+						</div>
+					</div>
+					<div class="input-group">
+						<div data-bind="typeahead:{source:obTravelScenarios,format:travelScenarioNameFormatter,selectedValue:obSelectedTravelScenario,notSort:true,drowDownShow:true,mustMatch:true,disable:hasTripOpen()||isDisabled}">
+							<!-- ko customInput:{type:"Select",value:obSelectedTravelScenarioText,disable:hasTripOpen()||isDisabled,attributes:{name:"travelScenarioName"}} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" data-bind="visible:obTabPage() == TF.RoutingMap.RoutingPalette.RoutingTripViewModel.PageTab.StopInfo">
+		<div class="newTripDialogStopInfo">
+			<div class="col-xs-9" style="padding: 0;width:38%">
+				<!-- ko template: { name: 'workspace/Routing Map/RoutingMapSearch', data: routingMapSearch} -->
+				<!-- /ko -->
+			</div>
+			<div class="col-xs-15 stop-info-container" style="width:62%">
+				<div class="stop-info-head">
+					<div class="col-xs-9" style="text-indent:41px">Stop Name</div>
+					<div class="col-xs-4 text-center">Stop Time</div>
+					<div class="col-xs-5 text-center" style="margin-top: -6px;">
+						<div>Curb Approach</div>
+						<div style="font-size: 10px;display: flex;justify-content: space-evenly;"><span>L</span><span>Either</span><span>R</span></div>
+					</div>
+					<div class="col-xs-5 text-center">Boundary Type</div>
+				</div>
+				<div style="border: 1px solid #d8d8d8;">
+					<!--<div class="trip-empty-layer"></div>-->
+					<div id="trip-Stop-wrapper-sortable" style="overflow-y: auto;height: 459px;">
+						<!-- ko foreach: { data:obTripStops } -->
+						<div class="form-group underlined-blue stop-underlined-item">
+							<div style="width:100%">
+								<div class="col-xs-9 trip-stop-sort-column menu-item-title">
+									<span class="trip-stop-color-icon stop-info-tap" data-bind="text:Sequence, style:{'background-color':color, 'color':$parent.fontColor}" style="margin-top:1px; border:black solid 2px;"></span>
+									<span data-bind="text:Street"></span>
+								</div>
+								<div class="col-xs-4 trip-stop-sort-column trip-stop-click-able text-center" data-bind="text:convertToMoment(StopTime).format( 'h:mm a'), click:$parent.setTripStopScheduleTime.bind($parent)" style="border-bottom-width:0px;">
+
+								</div>
+								<div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" style="height: 30px;padding-top:6px;">
+									<input style="left: 27px;margin-top:4px;cursor:pointer;" type="radio" data-bind="disable:$parent.isDisabled,checkedValue:2,checked:obVehicleCurbApproach" value="2">
+									<input style="left: 59px;margin-top:4px;cursor:pointer;" type="radio" data-bind="disable:$parent.isDisabled,checkedValue:0,checked:obVehicleCurbApproach" value="0">
+									<input style="left: 91px;margin-top:4px;cursor:pointer;" type="radio" data-bind="disable:$parent.isDisabled,checkedValue:1,checked:obVehicleCurbApproach" value="1">
+									<div class="stop-curb-line"></div>
+								</div>
+								<div class="col-xs-5 trip-stop-sort-column trip-stop-click-able text-center" data-bind="css: (SchoolCode !=''&&SchoolCode !=null) ? 'disabled' : '', text:(SchoolCode==''||SchoolCode==null) ? (stopBoundaryType=='Walkout' ? (stopBoundaryType + ' (' + (walkoutType === 'Street Path' ? (walkoutDistance + '/' + walkoutBuffer ) : walkoutDistance) + ')') : stopBoundaryType) : 'School', click:$parent.setStopType.bind($parent)">
+								</div>
+								<div class="conditional-delete" data-bind="visible:!($parent.hasTripOpen()&& (SchoolCode !=''&&SchoolCode !=null)) && !$parent.isDisabled
+								,click:$parent.deleteTripStop.bind($parent)"></div>
+							</div>
+						</div>
+						<!-- /ko -->
+					</div>
+				</div>
+				<div class="form-group stop-grid-foot">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" data-bind="checked:obOptimizeSequence,disable:isDisabled">
+							<span>Optimize Sequence</span>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" data-bind="visible:obTabPage() == TF.RoutingMap.RoutingPalette.RoutingTripViewModel.PageTab.DirectionInfo">
+		<!-- ko template: { name: 'workspace/RoutingMap/RoutingMapPanel/RoutingPalette/DirectionDetail',data:routingDirectionDetailViewModel} -->
+		<!-- /ko -->
+	</div>
+</div>

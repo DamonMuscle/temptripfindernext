@@ -1,0 +1,142 @@
+<div class="row" data-bind="uiInit:init" style="height: 460px;">
+	<div class="col-xs-7" style="padding: 10px 10px 0 30px;">
+		<span class="list-checked-header-label" data-bind="text:$data.labelAreaHead"></span>
+		<div class="list-checked-container left-checked-container">
+			<!-- ko foreach: obLabelAttributes -->
+			<div class="checkbox list-checked" data-bind="css:{'active':Selected}">
+				<div>
+					<input data-bind="checked: $data.Check, checkedValue: $data" type="checkbox" style="cursor: pointer;margin-left:0;position:relative;vertical-align: top;" />
+					<span data-bind="text: $data.Name"></span>
+				</div>
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+	<div class="col-xs-5" style="padding: 10px 15px 0 25px;">
+		<a data-bind="click:toUpClick, css:{'inactive':disableMoveUp}" style="margin: 40px 0 10px 0;" class="btn btn-default btn-sm list-move-button">
+			<div class="icon move-up-button"></div>
+			Move Up
+		</a>
+		<a data-bind="click:toDownClick, css:{'inactive':disableMoveDown}" class="btn btn-default btn-sm list-move-button">
+			<div class="icon move-down-button"></div>
+			Move Down
+		</a>
+		<div style="margin: 40px 0 0 0;" data-bind="visible:obRoutingPanel">
+			<span class="list-checked-header-label">Separator</span>
+			<div class="input-group" style="margin-top: 8px;">
+				<div data-bind="typeahead:{source:separatorList,format:function(obj){return obj.text;},drowDownShow:true,selectedValue:obSelectedSeparator,notSort:true}">
+					<!-- ko customInput:{type:"Select",value:obSelectedSeparatorText,attributes:{class:"form-control"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12" style="padding: 10px 0px 0 10px;">
+		<span class="list-checked-header-label">Preview</span>
+		<div class="preview-container">
+			<div data-bind="attr:{class:obGeoType()+' preview-wrap'}">
+				<div data-bind="attr:{class:obSelectedPositionText()+' preview-label'},html:obPreviewText, style:{fontFamily:obSelectedFont().value,
+				fontSize:obSelectedFontSize().value, fontWeight:bolderStyle() ? 'bolder' : '', 
+				fontStyle:obliqueStyle() ? 'oblique' : 'normal', textDecoration:underLineStyle() ? 'underline' : '',
+				textShadow:obHalo() ? '2px 2px 5px ' + obHaloColor() : '', color:obColor() ? obColor() : '#333'}"></div>
+				<div class="preview-geometry"></div>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 35px; margin-right: 0px;">
+			<div class="col-xs-10 no-padding-right">
+				<div class="input-group">
+					<div data-bind="typeahead:{source:fontList,format:function(obj){return obj.text;},drowDownShow:true,selectedValue:obSelectedFont,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedFontText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-5 no-padding-right">
+				<div class="input-group">
+					<div data-bind="typeahead:{source:fontSizeList,format:function(obj){return obj.text;},drowDownShow:true,selectedValue:obSelectedFontSize,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedFontSizeText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-2 no-padding-right" style="padding-left: 10px;">
+				<div class="font-Style bolder" data-bind="click:bolderClick, css:{'icon-active':bolderStyle}"><span class="glyphicon glyphicon-bold" aria-hidden="true"></span></div>
+			</div>
+			<div class="col-xs-2 no-padding-right" style="padding-left: 4px;">
+				<div class="font-Style oblique" data-bind="click:obliqueClick, css:{'icon-active':obliqueStyle}"><span class="glyphicon glyphicon-italic" aria-hidden="true"></span></div>
+			</div>
+			<!-- <div class="col-xs-2 no-padding-right" style="padding-left: 0px;" data-bind="visible:obRoutingPanel">
+				<div class="font-Style" data-bind="click:underLineClick, css:{'icon-active':underLineStyle}">
+					<span class="underLine">U</span>
+				</div>
+			</div> -->
+			<div class="col-xs-3" style="padding-left: 6px;padding-right: 16px;">
+				<!-- ko customInput:{type:"Color",value:obColor,attributes:{class:"form-control borderColorPicker", hex:true}} -->
+				<!-- /ko -->
+			</div>
+		</div>
+		<div class="row" style="margin: 10px 0 0 -15px;">
+			<div class="col-xs-4">
+				<div class="checkbox">
+					<label>
+						<input data-bind="checked: obHalo" type="checkbox" style="cursor: pointer;" />
+						<span style="cursor: pointer;">Halo</span>
+					</label>
+				</div>
+			</div>
+			<div class="col-xs-3" style="padding:6px 7px 0 15px">
+				<!-- ko customInput:{type:"Color",value:obHaloColor,attributes:{class:"form-control haloColorPicker", hex:true}} -->
+				<!-- /ko -->
+			</div>
+		</div>
+		<div class="row" style="margin: 10px 0 0 0;">
+			<div class="col-xs-7 no-padding-left">
+				<label>Label Position</label>
+			</div>
+			<div class="col-xs-8 no-padding-left">
+				<div class="input-group">
+					<div data-bind="typeahead:{source:positionList,format:function(obj){return obj.text;},drowDownShow:true,selectedValue:obSelectedPosition,notSort:true}">
+						<!-- ko customInput:{type:"Select",value:obSelectedPositionText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="margin: 20px 0 0 0;">
+			<div class="col-xs-24 no-padding-left">
+				<div class="form-group">
+					<div class="visible-range">
+						<label>Visible Range</label>
+					</div>
+					<div class="slider-wrap">
+						<div>
+							<div class="current-zoom-level" data-bind="style:{left:(obCurrentZoomLevel()-3)/20*100+'%'}"></div>
+						</div>
+						<input type="text" data-provider="slider" data-slider-id="cluster-transparency-slider" data-slider-step="1" data-slider-min="3" data-slider-max="23" data-slider-range="true" data-slider-tooltip="hide" data-bind="bootstrapSlider:{ value:obVisibleRange,rendered:sliderRendered}" />
+					</div>
+					<small style="color: #ff0000;position: absolute;margin-top: -10px;" data-bind="visible:obShowWarningVisibleRange">Displaying labels at lower zoom levels may affect map performance.</small>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -8,7 +8,7 @@
 		this.title("Driving Path from '" + tripStop.Street + "'");
 		this.sizeCss = "driving-path-dialog";
 		this.modalClass = "driving-path-body";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/DrivingPath");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/DrivingPath");
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

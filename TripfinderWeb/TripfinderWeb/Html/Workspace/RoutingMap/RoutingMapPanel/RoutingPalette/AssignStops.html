@@ -1,0 +1,39 @@
+<div class="row"  data-bind="uiInit:init">
+	<div class="col-xs-24">
+		<div class="GridContainer vertical-size-large kendo-grid">
+		</div>
+	</div>
+	<div class="col-xs-8 form-group">
+		<label>
+			<input type="checkbox" data-bind="checked:obPreserveContiguous,disable:obContiguousDisable">
+			<span>Preserve Contiguous</span>
+		</label>
+	</div>
+	<div class="col-xs-8 form-group">
+		<label>
+			<input type="checkbox" data-bind="checked: obSequenceOptimize, disable:obOptimizeDisable">
+			<span>Sequence Optimization</span>
+		</label>
+	</div>
+	<div class="col-xs-8 form-group">
+		<label>
+			<input type="checkbox" data-bind="checked: obSmartSequence, disable:obSmartDisable">
+			<span>Smart Sequence</span>
+		</label>
+	</div>
+	<div>
+		<label data-bind="text:obLabelName" class="col-xs-4"></label>
+		<div class="input-group">
+			<div data-bind="style:{background:obSelectedTrip().color},visible:obSelectedTrip().color != undefined" style="position: absolute;background: red;width: 10px;height: 22px;top: 0;left: 0;z-index: 10;"></div>
+			<div class="assign-stop-trip-select" data-bind="typeahead:{source:obTrips,drowDownShow:true,template:tripSelectTemplate,format:function(obj){return obj.Name;},notSort:true,selectedValue:obSelectedTrip}">
+				<!-- ko customInput:{type:"Select",value:obSelectedTripText,attributes:{class:"form-control",style:"padding-left:16px"}} -->
+				<!-- /ko -->
+			</div>
+			<div class="input-group-btn">
+				<button type="button" class="btn btn-default btn-sharp">
+					<span class="caret"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

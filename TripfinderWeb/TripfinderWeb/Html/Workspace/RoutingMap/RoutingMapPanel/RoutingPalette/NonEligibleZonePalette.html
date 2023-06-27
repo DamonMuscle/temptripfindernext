@@ -1,0 +1,100 @@
+<div class="item-header panel-grid-header routing-palette-head">
+	<div class="icon travel-regions">
+		<div class="badge" data-bind="text:dataModel.lockData.obOtherChangeCount(),visible:dataModel.lockData.obOtherChangeCount()>0"></div>
+		<div class="tooltip" data-bind="toolTip">
+			<div class="content">
+				<span class="scroll-content" data-bind="html:dataModel.lockData.obOtherChangeContent()"></span> <a class="fix-at-bottom" data-bind="click:dataModel.lockData.refreshOtherChange">Refresh map</a>
+			</div>
+		</div>
+	</div>
+	<div class="title">Non Eligible Zone</div>
+	<div class="head-icon show-eye" title="Hide" data-bind="click:toggleShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide':'Show'}"></div>
+</div>
+<div class="population-region-grid content-container">
+	<div class="item-content panel-grid-content show">
+		<div class="parcelpalette boundarypalette">
+			<div class="directions-tool locate-tool parcelpoint-tool" data-bind="with:eventsManager">
+				<!-- <div class="print-setting-group" data-bind="dropDownMenu">
+                    <div class="icon file fixed-menu-btn" title="File"></div>
+                    <div class="menu fileMenu withsub-menu with-sub-menu">
+                        <ul>
+                            <li class="menu-item" data-bind="click:settingClick">
+                                <div class="menuIcon"></div>
+                                <div class="menu-label text"><span>Settings</span></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div> -->
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon select-area fixed-menu-btn select" title="GeoSelect" data-bind="css:{disable:!viewModel.isShowMode()}"></div>
+					<div class="menu selectAreaMenu checkable withsub-menu">
+						<ul>
+							<li class="point" data-bind="click:geoSelectOptionClick.bind($data, 'point'),mapModeStyleButton">
+								<div class="menuIcon point"></div>
+								<div class="text"><span>Point</span></div>
+							</li>
+							<li class="polygon" data-bind="click:geoSelectOptionClick.bind($data, 'polygon'),mapModeStyleButton">
+								<div class="menuIcon polygon"></div>
+								<div class="text"><span>Polygon</span></div>
+							</li>
+							<li class="rectangle" data-bind="click:geoSelectOptionClick.bind($data, 'rectangle'),mapModeStyleButton">
+								<div class="menuIcon rectangle"></div>
+								<div class="text"><span>Rectangle</span></div>
+							</li>
+							<li class="draw" data-bind="click:geoSelectOptionClick.bind($data, 'draw'),mapModeStyleButton">
+								<div class="menuIcon draw"></div>
+								<div class="text"><span>Draw</span></div>
+							</li>
+							<li class="circle" data-bind="click:geoSelectOptionClick.bind($data, 'circle'),mapModeStyleButton">
+								<div class="menuIcon circle"></div>
+								<div class="text"><span>Circle</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="icon zoom-map-to-layers" title="Zoom Map to Layers" data-bind="clickButton:{disable:!viewModel.isShowMode(),click:centerMapClick}"></div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon select-all fixed-menu-btn" title="Select" data-bind="css:{disable:!viewModel.isShowMode()}"></div>
+					<div class="menu selectMenu withsub-menu">
+						<ul>
+							<li data-bind="click:selectAllClick">
+								<div class="menuIcon select-all-white"></div>
+								<div class="text"><span>Select All</span></div>
+							</li>
+							<li data-bind="click:deselectAllClick">
+								<div class="menuIcon clear-all-white"></div>
+								<div class="text"><span>Deselect All</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="icon boundary-details disable" data-bind="clickButton:{disable:!obHighlighted()||!viewModel.isShowMode(),click:infoClick}" title="Details"></div>
+			</div>
+			<div class="pannel-item-content" data-bind="panelContentDrag,with:display">
+				<!-- ko foreach: obNonEligibleZones -->
+				<div class="content-wrapper parcel-warpper" data-bind="css:{ 'selected':$data.obIsHighlighted()}">
+					<div class="content-container boundary-planning-container" data-bind="event:{ click: $parent.selectClick.bind($parent)}">
+						<div class="left-column-icon-container">
+							<div class="left-column-icon">
+							</div>
+						</div>
+						<div class="content parcel-content">
+							<span data-bind="text:$data.obName()"></span>&nbsp;&nbsp;<span class="sm-sub-content " data-bind="text:obStudentCount()"></span>
+						</div>
+						<div class="buttons">
+							<div class="icon zoom-map-to-layers" title="Center Map" data-bind="click:$parent.viewModel.eventsManager.centerMapClick"></div>
+							<div class="icon show show-eye" data-bind="css:{'hide-eye':!obDisplay()},click:$parent.visibleClick"></div>
+						</div>
+					</div>
+				</div>
+				<!--/ko-->
+			</div>
+			<div class="bottom-info-container">
+				<div data-bind="text:display.obFooterDisplay()"></div>
+			</div>
+		</div>
+	</div>
+</div>

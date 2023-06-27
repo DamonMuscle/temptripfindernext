@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Unassigned Students Settings");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/UnassignedStudentSettingModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/UnassignedStudentSettingModal");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

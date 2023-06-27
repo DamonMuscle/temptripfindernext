@@ -31,7 +31,7 @@
 					type: "oid"
 				},
 				{
-					name: "id",// the id used by datamodel to identify 
+					name: "id",// the id used by datamodel to identify
 					type: "string"
 				}],
 			source: []
@@ -477,7 +477,7 @@
 	};
 
 	/**
-	* if graphic in feature layer need to transform or reshape, it must delete from feature layer and add to a graphic layer, 
+	* if graphic in feature layer need to transform or reshape, it must delete from feature layer and add to a graphic layer,
 	* then after modify finished, add them back
 	*/
 	EsriFeatureTool.prototype._getSketchGraphic = function(id, type, withDuplicate)
@@ -996,26 +996,30 @@
 	EsriFeatureTool.prototype.updateLayerSymbolColor = function(layerId, color)
 	{
 		var self = this;
-		var layer = self._map.findLayerById(layerId), originRenderer = layer.renderer.clone();
-		originRenderer.symbol.color = color;
-		if (layer.geometryType == 'polygon')
+		var layer = self._map.findLayerById(layerId);
+		if (layer)
 		{
-			originRenderer.symbol.outline.color = color;
+			const originRenderer = layer.renderer.clone();
+			originRenderer.symbol.color = color;
+			if (layer.geometryType == 'polygon')
+			{
+				originRenderer.symbol.outline.color = color;
+			}
+			layer.renderer = originRenderer;
 		}
-		layer.renderer = originRenderer;
 	};
 
 	EsriFeatureTool.prototype.updateDynamicLayerSymbolColor = function(layerId, color)
 	{
 		let layer = this._map.findLayerById(layerId);
-		if (layer.sublayers)
+		if (layer && layer.sublayers)
 		{
 			layer.sublayers.forEach(subLayer =>
 			{
 				subLayer.renderer.symbol.color = color;
 			});
 		}
-		layer.refresh();
+		layer && layer.refresh();
 	};
 	EsriFeatureTool.prototype.updateLayerOpacity = function(layerId, opacity)
 	{
@@ -1041,6 +1045,15 @@
 		}
 		return self._polygonLayer || self._polylineLayer || self._pointLayer;
 	};
+
+	EsriFeatureTool.prototype.getLayers = function()
+	{
+		let layers = [];
+		this._pointLayer && layers.push(this._pointLayer);
+		this._polylineLayer && layers.push(this._polylineLayer);
+		this._polygonLayer && layers.push(this._polygonLayer);
+		return layers;
+	}
 
 	EsriFeatureTool.prototype.itemsToGraphics = function(items)
 	{

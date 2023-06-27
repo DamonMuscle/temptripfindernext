@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title(isEdit ? 'Edit Stop' : 'New Stop');
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/NewStops");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/NewStops");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

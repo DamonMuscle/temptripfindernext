@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Create Stops From File");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/RoutingPalette/CreateStopsFromFile');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/RoutingPalette/CreateStopsFromFile');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("OK");
 		this.obNegativeButtonLabel("Cancel");

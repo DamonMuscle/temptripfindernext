@@ -5,7 +5,7 @@
 
 	function RoutingTripStopEditModal(viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel, "workspace/Routing Map/RoutingMapPanel/RoutingPalette/EditRoutingTripStop");
+		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingTripStop");
 
 		this.viewModel = viewModel;
 		this.dataModel = viewModel.dataModel;

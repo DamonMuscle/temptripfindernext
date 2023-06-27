@@ -107,7 +107,14 @@
 			{
 				var menuItemData = data[i];
 				if (!menuItemData) continue;
-				if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'parcel')
+
+				let type = typeof (menuItemData.type) == "string" ? menuItemData.type.toLowerCase() : "";
+				if (!type)
+				{
+					type = typeof (menuItemData.dataType) == "string" ? menuItemData.dataType.toLowerCase() : type;
+				}
+
+				if (type == 'parcel')
 				{
 					tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'parcelPoints'),
@@ -296,7 +303,7 @@
 						click: parcelPointsViewModel.eventsManager.deleteOneClick.bind(parcelPointsViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.parcels.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'point')
+				} else if (type == 'point')
 				{
 					tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'parcelPoints'),
@@ -373,7 +380,7 @@
 						click: parcelPointsViewModel.eventsManager.deleteOneClick.bind(parcelPointsViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.points.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'schoolboundary')
+				} else if (type == 'schoolboundary')
 				{
 					tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'boundary', boundaryViewModel),
@@ -586,7 +593,7 @@
 						click: boundaryViewModel.eventsManager.deleteClick.bind(boundaryViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.boundaries.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'populationregion')
+				} else if (type == 'populationregion')
 				{
 					tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'populationRegion'),
@@ -799,7 +806,7 @@
 						click: boundaryViewModel.eventsManager.deleteClick.bind(boundaryViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.popRegions.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'trip')
+				} else if (type == 'trip')
 				{
 					let tripName = getText(menuItemData, 'trip'),
 						realTripName = menuItemData.trip.Name;
@@ -816,6 +823,7 @@
 							header: 'Details',
 							icon: 'record-details',
 							data: menuItemData,
+							disable: !menuItemData.trip.Id,
 							click: routingPaletteViewModel.tripViewModel.eventsManager.tripDetailsClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, menuItemData.trip)
 						}));
 
@@ -862,7 +870,7 @@
 						}));
 						contextMenuCategories.tripPaths.push(tempParentMenuItem);
 					}
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && (menuItemData.type.toLowerCase() == 'tripboundary' || menuItemData.type.toLowerCase() == 'tripstop'))
+				} else if (type == 'tripboundary' || type == 'tripstop')
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.TripId),
 						tripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.TripStopId,
@@ -880,6 +888,7 @@
 							header: 'Details',
 							icon: 'record-details',
 							data: menuItemData,
+							disable: !trip.Id,
 							click: routingPaletteViewModel.tripViewModel.eventsManager.tripDetailsClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, trip)
 						}));
 
@@ -1174,7 +1183,7 @@
 						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, tripStopId)
 					}));
 					contextMenuCategories.tripSessions.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'student')
+				} else if (type == 'student')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'student'),
@@ -1195,7 +1204,7 @@
 						click: routingPaletteViewModel.tripViewModel.eventsManager.createDoorToDoorClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.students.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'stoppoolboundary')
+				} else if (type == 'stoppoolboundary')
 				{
 					var stopPoolItem = routingPaletteViewModel.stopPoolViewModel.dataModel.findByStopId(menuItemData.StopId);
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
@@ -1396,7 +1405,7 @@
 						click: routingPaletteViewModel.stopPoolViewModel.eventsManager.deleteClick.bind(routingPaletteViewModel.stopPoolViewModel.eventsManager, stopPoolItem)
 					}));
 					contextMenuCategories.stopPools.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase().indexOf('trialstop') >= 0)
+				} else if (type.indexOf('trialstop') >= 0)
 				{
 					var trialStopItem = routingPaletteViewModel.trialStopViewModel.dataModel.findById(menuItemData.id);
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
@@ -1450,7 +1459,7 @@
 						click: routingPaletteViewModel.trialStopViewModel.eventsManager.deleteClick.bind(routingPaletteViewModel.trialStopViewModel.eventsManager, trialStopItem)
 					}));
 					contextMenuCategories.trialStops.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'mystreets')
+				} else if (type == 'mystreets')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'mystreets'),
@@ -1497,7 +1506,7 @@
 						}));
 					}
 					contextMenuCategories.streets.push(tempParentMenuItem);
-				} else if (menuItemData.dataType && typeof menuItemData.dataType.toLowerCase && menuItemData.dataType.toLowerCase() == 'travelregion')
+				} else if (type == 'travelregion')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'travelRegion'),
@@ -1678,7 +1687,7 @@
 						click: travelScenariosPaletteViewModel.travelRegionsViewModel.eventsManager.deleteClick.bind(travelScenariosPaletteViewModel.travelRegionsViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.travelRegions.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'zipcode')
+				} else if (type == 'zipcode')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'zipCode'),
@@ -1722,7 +1731,7 @@
 						click: mapEditingPaletteViewModel.zipCodeViewModel.eventsManager.deleteZipCodeClick.bind(mapEditingPaletteViewModel.zipCodeViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.zipCodes.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'municipalboundary')
+				} else if (type == 'municipalboundary')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'municipalBoundary'),
@@ -1766,7 +1775,7 @@
 						click: mapEditingPaletteViewModel.municipalBoundaryViewModel.eventsManager.deleteClick.bind(mapEditingPaletteViewModel.municipalBoundaryViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.municipalBoundaries.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'railroad')
+				} else if (type == 'railroad')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'railroad'),
@@ -1801,7 +1810,7 @@
 						click: mapEditingPaletteViewModel.railroadViewModel.eventsManager.deleteClick.bind(mapEditingPaletteViewModel.railroadViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.railroads.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && (menuItemData.type.toLowerCase() == 'water' || menuItemData.type.toLowerCase() == 'waterpolygon' || menuItemData.type.toLowerCase() == 'waterpolyline'))
+				} else if (type == 'water' || type == 'waterpolygon' || type == 'waterpolyline')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'water'),
@@ -1846,7 +1855,7 @@
 						click: mapEditingPaletteViewModel.waterViewModel.eventsManager.deleteClick.bind(mapEditingPaletteViewModel.waterViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.water.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase().indexOf('landmark') >= 0)
+				} else if (type.indexOf('landmark') >= 0)
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'landmark'),
@@ -2050,7 +2059,7 @@
 						click: mapEditingPaletteViewModel.landmarkViewModel.eventsManager.deleteClick.bind(mapEditingPaletteViewModel.landmarkViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.landmarks.push(tempParentMenuItem);
-				} else if (typeof menuItemData.type.toLowerCase == 'function' && menuItemData.type.toLowerCase() == 'noneligiblezone')
+				} else if (type == 'noneligiblezone')
 				{
 					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: getText(menuItemData, 'nonEligibleZone'),
@@ -2476,14 +2485,15 @@
 							children: [],
 							data: { id: -989 },
 							disable: stopDisable,
-							click: routingPaletteViewModel.tripViewModel.eventsManager.createClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, null, $('.routingmap_panel' + routeState).find('.trip-section'))
+							cancelClick: routingPaletteViewModel.tripViewModel.cancelStopClick.bind(routingPaletteViewModel.tripViewModel),
+							click: routingPaletteViewModel.tripViewModel.addStopClick.bind(routingPaletteViewModel.tripViewModel, null, $('.routingmap_panel' + routeState).find('.trip-section'))
 						}),
 						new TF.RoutingMap.MenuItem({
 							header: 'Quick Add Stop(s)',
 							icon: null,
 							id: 'addStopsFromFile',
 							children: [],
-							data: { id: -989 },
+							data: { id: -989, notSelectable: true },
 							disable: stopDisable,
 							click: routingPaletteViewModel.tripViewModel.eventsManager.createFromSearchResultClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, null, $('.routingmap_panel' + routeState).find('.trip-section'))
 						}),
@@ -2522,7 +2532,7 @@
 							icon: null,
 							id: 'addStopPoolFromFile',
 							children: [],
-							data: { id: -988 },
+							data: { id: -988, notSelectable: true },
 							disable: stopPoolDisable,
 							click: routingPaletteViewModel.stopPoolViewModel.eventsManager.createFromSearchResultClick.bind(routingPaletteViewModel.stopPoolViewModel.eventsManager, null, $('.routingmap_panel' + routeState).find('.stop-pool-section'))
 						}),
@@ -3035,14 +3045,25 @@
 							// routingPaletteViewModel.trialStopViewModel.drawTool.stop();
 							// routingPaletteViewModel.trialStopViewModel.editTool.stop();
 							return false;
-						} else
+						}
+						else 
 						{
-							selectedMenuItemHeader[i].id = selectedMenuItem.config.data.id;
-							selectedMenuItemHeader[i].operation = selectedMenuItem.config.id ? selectedMenuItem.config.id : "";
+							if (selectedMenuItem.config.data.notSelectable)
+							{
+								selectedMenuItemHeader[i].id = -1;
+								selectedMenuItemHeader[i].operation = "";
+							}
+							else
+							{
+								selectedMenuItemHeader[i].id = selectedMenuItem.config.data.id;
+								selectedMenuItemHeader[i].operation = selectedMenuItem.config.id ? selectedMenuItem.config.id : "";
+							}
+
 						}
 					}
 				}
-			} else
+			}
+			else if (!selectedMenuItem.config.data.notSelectable)
 			{
 				selectedMenuItemHeader.push({
 					routeState: routeState,
@@ -3427,7 +3448,7 @@
 		return {
 			showContextMenu: function(documentViewModel, map, arcgis, e, routeState, lastPreventKey)
 			{
-				var container = documentViewModel.$mapDiv.closest('.map-page'),
+				var container = documentViewModel.$mapDiv.closest('#main'),
 					parcelPointsViewModel = documentViewModel.parcelPaletteViewModel,
 					boundaryViewModel = documentViewModel.boundaryPaletteViewModel,
 					mapEditingPaletteViewModel = documentViewModel.mapEditingPaletteViewModel,

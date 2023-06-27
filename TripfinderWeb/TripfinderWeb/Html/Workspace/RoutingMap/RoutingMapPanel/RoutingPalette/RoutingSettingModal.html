@@ -1,0 +1,254 @@
+<div class="container-fluid" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-14">
+			<div class="row">
+				<label>
+					Stops
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked: obShowAssignedStudents">
+					<span>Assigned Students Visible</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked: obShowAssignedStudentsCount">
+					<span>Assigned Students Count</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked:labelSetting.obShowLabel">
+					<span>Label</span>
+				</label>
+				<div class="input-group" style="margin: 0 0 10px 5px;float:right;width:84%;">
+					<input type="text" data-bind="value:labelSetting.obShowLabelAttributeDisplay" class="form-control" maxlength="20">
+					<div class="input-group-btn">
+						<button data-bind="click:labelSetting.setLabelOptions.bind(labelSetting)" type="button" class="btn btn-default btn-sharp" tabindex="-1">
+							<span class="glyphicon glyphicon-option-horizontal"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-10">
+			<div class="row">
+				<label>
+					Calculate Time
+				</label>
+			</div>
+			<div class="checkbox" style="margin-bottom:0;">
+				<label>
+					<input data-bind="checked: obSpeedType,value:TF.Enums.RoutingSpeedType.StreetSpeed" type="radio" name="routingSpeed">
+					<span>Street Speed</span>
+				</label>
+			</div>
+			<div style="display:flex;align-items:center;">
+				<div class="checkbox">
+					<label>
+						<input data-bind="checked: obSpeedType,value:TF.Enums.RoutingSpeedType.DefaultSpeed" type="radio" name="routingSpeed">
+						<span>Default Speed</span>
+					</label>
+				</div>
+				<div class="input-group" style="display: inline-block;width:auto;margin-left:10px;">
+					<input data-bind="numericTextBox:{value:obAvgSpeed,min:1,max:300}" name="avgSpeed" class="form-control" style="width:60px" /><span>&nbsp;
+						<!-- ko text: isImperialUnit ? 'mph' : 'kph' -->
+						<!-- /ko-->
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-7">
+			<div class="row">
+				<label>
+					Stop Boundaries
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked: obMoveDuplicateNodes">
+					<span>Move Duplicate Nodes</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked: obRemoveOverlapping">
+					<span style="white-space:nowrap">Remove Overlapping Boundaries</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked: obGeoLink">
+					<span>GeoLink</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-7">
+			<div class="row">
+				<label>
+					Line Style
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obBoundaryLineStyle,value:'short-dash'" type="radio" name="lineStyle">
+					<span>Dash</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obBoundaryLineStyle,value:'short-dot'" type="radio" name="lineStyle">
+					<span>Dotted</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obBoundaryLineStyle,value:'solid'" type="radio" name="lineStyle">
+					<span>Solid</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="row">
+				<label>
+					Fill Pattern
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obFillPattern,value:'None'" type="radio" name="fillPatten">
+					<span>None</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obFillPattern,value:'Semi'" type="radio" name="fillPatten">
+					<span>Semitransparent</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obFillPattern,value:'Solid'" type="radio" name="fillPatten">
+					<span>Solid</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="row">
+				<label>
+					Thickness
+				</label>
+			</div>
+			<div class="input-group thickness-control-container">
+				<input id="txtRoutingThickness" type="text" data-bind="numericTextBox:{value:obBoundaryThickness,min:0,max:9}" class="form-control">
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-14">
+			<div class="row">
+				<label>
+					UTurn Policy
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obUTurnPolicy,value:UTurnPolicy.Allowed" type="radio" name="UTurnPolicy">
+					<span>Allowed</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obUTurnPolicy,value:UTurnPolicy.AllowedOnlyatDeadEnds" type="radio" name="UTurnPolicy">
+					<span>Allowed Only at Dead Ends</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obUTurnPolicy,value:UTurnPolicy.AllowedOnlyatIntersectionsandDeadEnds" type="radio" name="UTurnPolicy">
+					<span>Allowed Only at Intersections and Dead Ends</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obUTurnPolicy,value:UTurnPolicy.NotAllowed" type="radio" name="UTurnPolicy">
+					<span>Not Allowed</span>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-7">
+			<div class="row">
+				<label>
+					Trip
+				</label>
+			</div>
+			<!-- <div class="checkbox">
+                <label>
+					<input type="checkbox"  data-bind="checked: obAutoRefresh">
+					<span>Auto Refresh Changes</span>
+				</label>
+            </div> -->
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked: obSmartSequence">
+					<span>Smart Sequence</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-7">
+			<div class="row">
+				<label>
+					Generate Path
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: ObImpedanceAttr" value="Time" type="radio" name="impedanceAttr">
+					<span>Time (Use Speed Limits)</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: ObImpedanceAttr" value="Length" type="radio" name="impedanceAttr">
+					<span>Distance (Ignore Speed Limits)</span>
+				</label>
+			</div>
+		</div>
+
+		<div class="col-xs-6">
+			<div class="row">
+				<label>
+					Path Arrow Position
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obArrowPosition,value:0" type="radio" name="arrowPosition">
+					<span>On the Street</span>
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input data-bind="checked: obArrowPosition,value:1" type="radio" name="arrowPosition">
+					<span>On the Side of Street</span>
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-4">
+			<div class="row">
+				<label>
+					Line Thickness
+				</label>
+			</div>
+			<div class="input-group thickness-control-container">
+				<input id="txtRoutingPathThickness" type="text" data-bind="numericTextBox:{value:obPathThickness,min:1,max:9}" class="form-control">
+			</div>
+		</div>
+	</div>
+</div>

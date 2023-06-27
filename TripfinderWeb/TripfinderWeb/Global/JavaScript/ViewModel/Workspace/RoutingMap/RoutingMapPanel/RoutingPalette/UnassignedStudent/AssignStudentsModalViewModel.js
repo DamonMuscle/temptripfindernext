@@ -8,7 +8,7 @@
 		this.title("Assign Students");
 		this.sizeCss = "modal-dialog";
 		this.modalClass = "assign-stop-body";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/AssignStudents");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/AssignStudents");
 		this.buttonTemplate('modal/positivenegative');
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

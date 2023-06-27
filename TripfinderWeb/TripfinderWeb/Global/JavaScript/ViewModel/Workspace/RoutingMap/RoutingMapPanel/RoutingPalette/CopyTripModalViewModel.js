@@ -8,7 +8,7 @@
 		this.title("Copy Trip");
 		this.sizeCss = "modal-dialog";
 		this.modalClass = "copy-trip-body";
-		this.contentTemplate('workspace/Routing Map/RoutingMapPanel/RoutingPalette/CopyTrip');
+		this.contentTemplate('workspace/RoutingMap/RoutingMapPanel/RoutingPalette/CopyTrip');
 		this.buttonTemplate('modal/PositiveNegative');
 		this.obPositiveButtonLabel("OK");
 		this.obNegativeButtonLabel("Cancel");

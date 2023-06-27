@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Walkout Stop Boundary");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/WalkoutStopBoundaryModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/WalkoutStopBoundaryModal");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

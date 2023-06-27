@@ -52,15 +52,6 @@
 			objectIdField: "OBJECTID"
 		});
 
-		// FOR DEMO ONLY
-		// self.featureLayer = new self.arcgis.FeatureLayer({
-		// 	url: TF.getOnlineUrl(self.url),
-		// 	spatialReference: {
-		// 		wkid: 102100
-		// 	},
-		// 	objectIdField: "OBJECTID"			
-		// });
-
 		return self.featureLayer;
 	};
 
@@ -75,7 +66,7 @@
 				resolve();
 				return;
 			}
-			self._deleteFakeId(data);
+			self._deleteFakeIdAndClearOBJECTIDWhenAdd(data);
 			self.getFeatureLayer().applyEdits({
 				addFeatures: data.addGraphic,
 				updateFeatures: data.editGraphic,
@@ -90,9 +81,12 @@
 				}
 				(addItems || []).forEach(function(item, i)
 				{
-					self.addItems[i].OBJECTID = item.objectId;
-					data.addGraphic[i].attributes.OBJECTID = item.objectId;
-					self._backupData(item);
+					if (item && item.objectId)
+					{
+						self.addItems[i].OBJECTID = item.objectId;
+						data.addGraphic[i].attributes.OBJECTID = item.objectId;
+						self._backupData(item);
+					}
 				});
 				(self.updateItems || []).forEach(function(item)
 				{
@@ -107,7 +101,7 @@
 		});
 	};
 
-	FeatureDataModel.prototype._deleteFakeId = function(data)
+	FeatureDataModel.prototype._deleteFakeIdAndClearOBJECTIDWhenAdd = function(data)
 	{
 		for (var key in data)
 		{
@@ -117,6 +111,10 @@
 				{
 					g.attributes = $.extend(true, {}, g.attributes);
 					delete g.attributes.id;
+				}
+				if (key === "addGraphic" && g.attributes && typeof (g.attributes.OBJECTID) != "undefined")
+				{
+					g.attributes.OBJECTID = null;
 				}
 			});
 		}
@@ -136,8 +134,16 @@
 				}
 			}
 		}
-		var deleteItemsEnumerable = Enumerable.From(this.deleteItems).Distinct(function(c) { return c.OBJECTID; }).Where(function(c) { return c.OBJECTID > 0; });
-		var updateItemsEnumerable = Enumerable.From(this.updateItems).Distinct(function(c) { return c.OBJECTID; }).Where(function(c) { return c.OBJECTID > 0 && !deleteItemsEnumerable.Any(function(d) { return c.id == d.id; }); });
+		if (this.updateItems && this.updateItems.length > 0)
+		{
+			this.updateItems = this.removeInvalidGeometries(this.updateItems);
+		}
+		if (this.addItems && this.addItems.length > 0)
+		{
+			this.addItems = this.removeInvalidGeometries(this.addItems);
+		}
+		var deleteItemsEnumerable = Enumerable.From(this.deleteItems).Distinct(function(c) { return c.OBJECTID; }).Where(function(c) { return c.OBJECTID != 0; });
+		var updateItemsEnumerable = Enumerable.From(this.updateItems).Distinct(function(c) { return c.OBJECTID; }).Where(function(c) { return c.OBJECTID != 0 && !deleteItemsEnumerable.Any(function(d) { return c.id == d.id; }); });
 		var addItemsEnumerable = Enumerable.From(this.addItems).Where(function(c) { return c.OBJECTID == 0 && !deleteItemsEnumerable.Any(function(d) { return c.id == d.id; }) && !updateItemsEnumerable.Any(function(d) { return c.id == d.id; }); });
 
 		return {
@@ -157,6 +163,32 @@
 			deleteGraphic: data.delete.map(function(item) { return self.options.convertToFeatureData(item); })
 		};
 	};
+
+	FeatureDataModel.prototype.removeInvalidGeometries = function(features)
+	{
+		return features.filter(item => this.geometryAccuracyChecking(item.geometry));
+	}
+
+	FeatureDataModel.prototype.geometryAccuracyChecking = function(geometry)
+	{
+		const XYResolution = 0.0001;
+		if (geometry?.type == 'polyline')
+		{
+			let line = new tf.map.ArcGIS.Polyline({
+				hasZ: false,
+				hasM: false,
+				paths: geometry.paths,
+				spatialReference: { wkid: 3857 }
+			});
+			if (line.extent.height < XYResolution && line.extent.width < XYResolution)
+			{
+				TF.consoleOutput("Warning", "The geometry of line feature is empty or less than layer accuracy: " + geometry.paths);
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	FeatureDataModel.prototype.getCount = function()
 	{
@@ -198,8 +230,7 @@
 			self._canQuery = true;
 			var query = self.options.query(queryOption);
 			query.returnGeometry = true;
-			var featureLayer = self.getFeatureLayer();
-			featureLayer.queryFeatures(query).then(
+			self.getFeatureLayer().queryFeatures(query).then(
 				function(featureSet)
 				{
 					if (!self._canQuery)
@@ -304,7 +335,7 @@
 
 	FeatureDataModel.prototype.update = function(data, force)
 	{
-		if (data.OBJECTID > 0)
+		if (data.OBJECTID != 0)
 		{
 			this.deleteItems = this.deleteItems.filter(function(c)
 			{
@@ -321,7 +352,7 @@
 				});
 			}
 		}
-		else 
+		else
 		{
 			this.add(data);
 		}
@@ -460,9 +491,6 @@
 		this._canQuery = false;
 		this.backupData = null;
 		this.caches = null;
-		
-		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
-		// TODO: Use the method above if MapEditPalette is added in the future.
-		tfdispose(this);
+		TF.RoutingMap.MapEditSaveHelper && TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
 	};
 })();

@@ -6,7 +6,7 @@
 	{
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel._viewModal,
-			template: "workspace/Routing Map/RoutingMapPanel/RoutingPalette/NonEligibleZoneEditModal"
+			template: "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/NonEligibleZoneEditModal"
 		});
 		this.obDataModel = this.createObservableDataModel(this.getDataModel());
 		this.viewModel = viewModel;

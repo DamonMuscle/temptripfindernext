@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Quick Add Stops");
 		this.sizeCss = "modal-dialog";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/RoutingSearchModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingSearchModal");
 		this.buttonTemplate("modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

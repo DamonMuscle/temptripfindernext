@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Routing Settings");
 		this.sizeCss = "modal-dialog-lg";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/RoutingSettingModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingSettingModal");
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obOtherButtonLabel("Default");
 		this.obPositiveButtonLabel("Apply");

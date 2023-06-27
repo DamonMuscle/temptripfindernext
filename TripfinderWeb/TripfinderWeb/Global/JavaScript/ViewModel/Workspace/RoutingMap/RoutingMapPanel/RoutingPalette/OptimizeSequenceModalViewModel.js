@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title('Trip Sequence Optimization Impact');
 		this.sizeCss = "optimize-sequence-model";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/OptimizeSequenceModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/OptimizeSequenceModal");
 		this.buttonTemplate("modal/positivenegativeother");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

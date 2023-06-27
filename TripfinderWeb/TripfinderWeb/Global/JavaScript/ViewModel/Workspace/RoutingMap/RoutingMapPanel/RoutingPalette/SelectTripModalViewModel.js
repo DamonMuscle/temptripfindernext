@@ -10,7 +10,7 @@
 		this.title(options.title);
 		this.description = ko.observable(options.description);
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/SelectTripModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/SelectTripModal");
 		this.buttonTemplate(options.otherButtonName ? "modal/positivenegativeother" : "modal/PositiveNegative");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

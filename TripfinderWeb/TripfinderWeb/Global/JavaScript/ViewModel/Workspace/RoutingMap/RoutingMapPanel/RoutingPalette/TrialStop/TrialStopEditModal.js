@@ -4,7 +4,7 @@
 
 	function TrialStopEditModal(viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel.parentViewModel, "workspace/Routing Map/RoutingMapPanel/RoutingPalette/EditTrialStop");
+		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel.parentViewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditTrialStop");
 		this.dataModel = viewModel.dataModel;
 		this.obDataModel = this.createObservableDataModel(this.getDataModel());
 		this.color = ko.observable("#0000ff");

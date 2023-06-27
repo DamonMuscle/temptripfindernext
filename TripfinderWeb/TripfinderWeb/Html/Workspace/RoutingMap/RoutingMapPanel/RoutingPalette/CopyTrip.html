@@ -1,0 +1,96 @@
+<div class="row">
+	<div class="col-xs-24">
+		<div class="row" style="margin-top: 10px;">
+			<div class="col-xs-4" style="font-weight:bold;">
+				Copy Trip:
+			</div>
+			<div class="col-xs-18" data-bind="text:obOriginalTripName">
+			</div>
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-xs-4" style="font-weight:bold;">
+				From:
+			</div>
+			<div class="col-xs-18" data-bind="text:obOriginalTripType">
+			</div>
+		</div>
+		<div class="row" style="margin-top: 15px;">
+			<div class="col-xs-8">
+				<div class="form-group small-form-group">
+					<label class="requirestar">Name</label>
+					<input type="text" data-bind="value:obName" name="Name" class="form-control">
+				</div>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 10px;">
+			<div class="col-xs-6">
+				<div class="form-group small-form-group">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" data-bind="checked:obReverse,checkedValue:1,disable:obTripType()==3 || obTripType()==2">
+							<span>Reverse</span>
+						</label>
+					</div>
+				</div>
+				<div class="form-group small-form-group">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" data-bind="checked:obAutoAssignStudent,checkedValue:1">
+							<span>Assign Students</span>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-6 form-group small-form-group" style="margin-top: 10px;">
+				<label>Trip Type</label>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checked:obTripType,checkedValue:0,disable:obTripType()==3 || obTripType()==2" value="0">
+						<span>To School</span>
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checked:obTripType,checkedValue:1,disable:obTripType()==3 || obTripType()==2" value="1">
+						<span>From School</span>
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checked:obTripType,checkedValue:2,disable:obTripType()!=2" value="2">
+						<span>Shuttle</span>
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checked:obTripType,checkedValue:3,disable:obTripType()!=3" value="3">
+						<span>Both</span>
+					</label>
+				</div>
+			</div>
+			<div class="col-xs-6 form-group small-form-group" style="height:120px;margin-top: 10px;">
+				<label>Open Type</label>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checked:obOpenType,checkedValue:0,disable:disableEditOption" value="0">
+						<span>Edit</span>
+					</label>
+				</div>
+				<div>
+					<div class="radio">
+						<label>
+							<input type="radio" data-bind="checked:obOpenType,checkedValue:1" value="1">
+							<span>View</span>
+						</label>
+					</div>
+					<div class="checkbox" data-bind="visible:obOpenType() == 1">
+						<label>
+							<input type="checkbox" data-bind="checked:obCreateTrip,checkedValue:1">
+							<span>Create Trip</span>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -134,10 +134,15 @@
 	 * Toggle the content of palette.
 	 * @param {type} model Bound view model
 	 * @param {type} e Event argument
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapPanelViewModel.prototype.toggleContent = function(model, e)
 	{
+		if (e && $(e.target).hasClass("show-eye"))
+		{
+			return;
+		}
+
 		var self = this,
 			content = $(e.target).closest(".item-container").children(".item-content");
 
@@ -163,7 +168,7 @@
 	/**
 	 * Remove the palette panel.
 	 * @param {type} model Bound view model
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapPanelViewModel.prototype.removePanel = function()
 	{
@@ -182,7 +187,7 @@
 		if (menuItem)
 		{
 			menuItem.onclick();
-			menuItem.toggleStatus(false);
+			// menuItem.toggleStatus = false;
 		}
 	};
 
@@ -190,7 +195,7 @@
 	 * Fired after mouse down.
 	 * @param {type} model Bound view model
 	 * @param {type} e Event argument
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapPanelViewModel.prototype.mouseDown = function()
 	{
@@ -201,7 +206,7 @@
 	 * Collapse/Expand the panel.
 	 * @param {type} viewModel Bound view model
 	 * @param {type} e Event argument
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapPanelViewModel.prototype.togglePanel = function()
 	{
@@ -221,8 +226,8 @@
 			animateOption = isLeft ? {
 				left: 0
 			} : {
-					right: 0
-				};
+				right: 0
+			};
 		}
 		else
 		{
@@ -231,8 +236,8 @@
 			animateOption = isLeft ? {
 				left: 0 - width
 			} : {
-					right: 0 - width
-				};
+				right: 0 - width
+			};
 		}
 		self.$panel.animate(animateOption, 500);
 		setTimeout(function()
@@ -271,7 +276,7 @@
 	 * Initialize.
 	 * @param {any} model Bound view model
 	 * @param {any} e Event argument
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapPanelViewModel.prototype.init = function(model, e)
 	{
@@ -326,7 +331,7 @@
 
 	/**
 	* To be called when the content is expanded or collapsed.
-	* @returns {void} 
+	* @returns {void}
 	*/
 	RoutingMapPanelViewModel.prototype.afterContentToggle = function()
 	{
@@ -341,18 +346,22 @@
 
 	/**
 	 * Dispose the panel.
-	 * @returns {void} 
+	 * @returns {void}
 	 */
 	RoutingMapPanelViewModel.prototype.dispose = function()
 	{
 		var self = this;
-		self.mutationObserver.disconnect();
-		self.$panel.off("." + self.name);
-		self.$panel.parent().remove();
-		$.each(self.palettes(), function(index, palette)
+		self.mutationObserver && self.mutationObserver.disconnect();
+		self.$panel && self.$panel.off("." + self.name);
+		self.$panel && self.$panel.parent().remove();
+		const palettes = self.palettes && self.palettes();
+		if (palettes && palettes.length > 0)
 		{
-			palette.dispose();
-		});
+			$.each(palettes, function(index, palette)
+			{
+				palette && palette.dispose();
+			});
+		}
 
 		tfdispose(self);
 	};

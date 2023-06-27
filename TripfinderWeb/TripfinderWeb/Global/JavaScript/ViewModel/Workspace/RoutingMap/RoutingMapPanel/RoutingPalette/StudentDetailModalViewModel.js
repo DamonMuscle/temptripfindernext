@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title("Student Detail");
 		this.sizeCss = "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/StudentDetail");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/StudentDetail");
 		this.buttonTemplate("modal/positive");
 		this.obPositiveButtonLabel("OK");
 		this.viewModel = new TF.RoutingMap.RoutingPalette.StudentDetailViewModel(students, isRightClick, this, canOpenDetail);

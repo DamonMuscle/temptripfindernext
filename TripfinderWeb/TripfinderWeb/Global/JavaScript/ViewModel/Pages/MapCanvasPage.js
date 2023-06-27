@@ -63,7 +63,7 @@
 		self.boundaryPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.BoundaryPaletteViewModel(self, true, routeState);
 		self.mapEditingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapEditingPaletteViewModel(self, true, routeState);
 		self.mapLayersPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.MapLayersPaletteViewModel(self, true, routeState);
-		self.routingPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);
+		self.routingPaletteViewModel = new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);  // {obShow: ko.observable(false)}; // 
 		self.customMapPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
 		self.gpsPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
 		self.fieldTripViewModel = {obShow: ko.observable(false)};
@@ -681,7 +681,7 @@
 				}
 				if (tf.authManager.isAuthorizedFor("routingMap", 'read'))
 				{
-					// palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel));
+					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel));
 				}
 
 				// if (tf.authManager.hasWayfinder())
@@ -1209,7 +1209,7 @@
 		// this.mapEditingPaletteViewModel.dispose();
 		this.travelScenariosPaletteViewModel?.dispose();
 		// this.mapLayersPaletteViewModel.dispose();
-		// this.routingPaletteViewModel.dispose();
+		this.routingPaletteViewModel.dispose();
 		// this.customMapPaletteViewModel.dispose();
 		// this.gpsPaletteViewModel.dispose();
 		// this.geoSearchPaletteViewModel.dispose();

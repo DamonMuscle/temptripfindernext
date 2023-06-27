@@ -1,0 +1,199 @@
+<div class="item-header panel-grid-header routing-palette-head">
+	<div class="icon travel-regions">
+		<div class="badge" data-bind="text:dataModel.tripLockData.obOtherChangeCount(),visible:dataModel.tripLockData.obOtherChangeCount()>0"></div>
+		<div class="tooltip" data-bind="toolTip">
+			<div class="content">
+				<span class="scroll-content" data-bind="html:dataModel.tripLockData.obOtherChangeContent()"></span> <a class="fix-at-bottom" data-bind="click:dataModel.tripLockData.refreshOtherChange">Refresh map</a>
+			</div>
+		</div>
+	</div>
+	<div class="title">Trips</div>
+	<div class="head-icon show-eye" data-bind="click:toggleShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide Trips':'Show Trips'}"></div>
+	<div class="head-icon save-icon" title="Save Changes On Current Tab" data-bind="click:eventsManager.saveClick.bind(eventsManager),visible:dataModel.obSelfChangeCount()>0">
+		<div class="badge" data-bind="text:dataModel.obSelfChangeCount()"></div>
+	</div>
+</div>
+<div class="school-boundary-grid content-container disable-resize trip-section">
+	<div class="item-content panel-grid-content show" data-bind="uiInit:uiInit">
+		<div class="parcelpalette mapeditingpalette">
+			<div class="directions-tool locate-tool parcelpoint-tool" data-bind="with:eventsManager">
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon file fixed-menu-btn" title="File" data-bind="css:{disable:!viewModel.isFileShow()}"></div>
+					<div class="menu fileMenu withsub-menu with-sub-menu">
+						<ul>
+							<li data-bind="clickButton:{click:createTripClick,disable:!tf.authManager.isAuthorizedFor('routingMap', 'add')}">
+								<div class="menuIcon"></div>
+								<div class="text"><span>New</span></div>
+							</li>
+							<li data-bind="clickButton:{click:openTripClick,disable:!tf.authManager.isAuthorizedFor('routingMap', 'edit')}">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Edit</span></div>
+							</li>
+							<li data-bind="click:openReadOnlyTripClick">
+								<div class="menuIcon"></div>
+								<div class="text"><span>View</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li data-bind="clickButton:{disable:!obTripSelected(),click:closeTripClick}">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Close</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li data-bind="clickButton:{disable:!obEditTripSelected(),click:optimizeSequenceMenuClick}">
+								<div class="text"><span>Optimize Sequence</span></div>
+							</li>
+							<li data-bind="clickButton:{disable:!obVrpableTripsSelected(),click:vrpRouteClick}">
+								<div class="text"><span>Optimize Trips</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li>
+								<div class="menuIcon"></div>
+								<div data-bind="css:{disable:!obEditTripSelected()}" class="menu-label text"><span>Student Assignment</span><span class="k-icon k-i-arrow-e"></span></div>
+								<div>
+									<ul class="sub-menu sub-context-menu sub-context-menu-contain-icon">
+										<li data-bind="clickButton:{disable:!obEditTripSelected(),click:autoAssignStudentClick}">
+											<div class="menu-label text"><span>Assign All</span></div>
+										</li>
+										<li data-bind="clickButton:{disable:!obEditTripSelected(),click:autoUnassignStudentClick}">
+											<div class="menu-label text"><span>Unassign All</span></div>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li class="firstMenuItem" data-bind="click:openSettingClick">
+								<div class="menuIcon settings"></div>
+								<div class="text"><span>Settings</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li class="firstMenuItem" data-bind="clickButton:{disable:!obEditTripSelected(),click:showImpactDifferenceChartClick}, style: {fontWeight: dataModel.showImpactDifferenceChart() ? 'bold' : '' } ">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Show Impact Difference Chart</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li class="firstMenuItem" data-bind="clickButton:{disable:!obTripSelected(),click:playBackClick}, style: {fontWeight: playBackControl.obPlayBackControlVisible() ? 'bold' : '' }">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Playback</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li data-bind="clickButton:{disable:!obDataChanged(),click:saveClick}">
+								<div class="menuIcon save"></div>
+								<div class="text"><span>Save</span></div>
+							</li>
+							<li data-bind="clickButton:{disable:!obDataChanged(),click:revertClick}">
+								<div class="menuIcon revert"></div>
+								<div class="text"><span>Revert</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group create-dropdown-list" data-bind="dropDownMenu">
+					<div class="icon fixed-menu-btn destination add-tripstop" title="Add Stop" data-bind="css:{disable:!obEditTripSelected()||!viewModel.isShowMode()},click:addStopClick.bind($data)"></div>
+					<div class="menu map-pinpoint-white withsub-menu">
+						<ul>
+							<li data-bind="click:createClick,mapModeStyleButton">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Add Stop from Map</span></div>
+							</li>
+							<li data-bind="click:createFromSearchResultClick">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Quick Add Stop(s)</span></div>
+							</li>
+							<li class="menu-divider">
+								<div class="rule"></div>
+							</li>
+							<li data-bind="clickButton:{disable:copyFromObject()==null,click:createFromSelectionClick}">
+								<div class="menuIcon"></div>
+								<div class="text"><span>Add Stop from Selection</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon map-pinpoint black fixed-menu-btn" title="Trip Stop Geo Select" data-bind="css:{disable:!obEditTripSelected()}"></div>
+					<div class="menu map-pinpoint-white withsub-menu">
+						<ul>
+							<li class="polygon" data-bind="click:changeStopSelectAreaClick.bind($data,'polygon'),mapModeStyleButton">
+								<div class="menuIcon polygon"></div>
+								<div class="text"><span>Polygon</span></div>
+							</li>
+							<li class="rectangle" data-bind="click:changeStopSelectAreaClick.bind($data,'rectangle'),mapModeStyleButton">
+								<div class="menuIcon rectangle"></div>
+								<div class="text"><span>Rectangle</span></div>
+							</li>
+							<li class="draw" data-bind="click:changeStopSelectAreaClick.bind($data,'draw'),mapModeStyleButton">
+								<div class="menuIcon draw"></div>
+								<div class="text"><span>Draw</span></div>
+							</li>
+							<li class="circle" data-bind="click:changeStopSelectAreaClick.bind($data,'circle'),mapModeStyleButton">
+								<div class="menuIcon circle"></div>
+								<div class="text"><span>Circle</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="icon zoom-map-to-layers" title="Zoom Map to Layers" data-bind="clickButton:{disable:!obTripSelected(),click:zoomClick}"></div>
+				<div class="vertical-line"></div>
+				<div class="icon collapse-all" title="Collapse All" data-bind="clickButton:{disable:!obTripSelected(),click:collapseAllClick}"></div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon black" title="Trip Path" data-bind="css:{disable:!obTripSelected(), 'path-lines': !obSequencePath(), 'sequence-lines': obSequencePath()}"></div>
+					<div class="menu withsub-menu" data-bind="css:{'path-lines-white': !obSequencePath(), 'sequence-lines-white': obSequencePath()}">
+						<ul>
+							<li class="sequence-lines" data-bind="click:toggleTripPath.bind($data,TF.Helper.TripHelper.PathLineTypes.Sequence),mapModeStyleButton:{autoActive:false}">
+								<div class="menuIcon sequence-lines"></div>
+								<div class="text"><span>Sequence Lines</span></div>
+							</li>
+							<li class="path-lines" data-bind="click:toggleTripPath.bind($data,TF.Helper.TripHelper.PathLineTypes.Path),mapModeStyleButton:{autoActive:false}">
+								<div class="menuIcon path-lines"></div>
+								<div class="text"><span>Path Lines</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="print-setting-group" data-bind="dropDownMenu">
+					<div class="icon black" title="Stop Boundary" data-bind="css:{disable:!obTripSelected(), 'add-parcel': obShowStopBoundary(), 'student-stop-assignments': !obShowStopBoundary()}"></div>
+					<div class="menu withsub-menu">
+						<ul>
+							<li class="add-parcel" data-bind="click:toggleStopBoundaryClick.bind($data,true),mapModeStyleButton:{autoActive:false}">
+								<div class="menuIcon add-parcel"></div>
+								<div class="text"><span>Stop Boundaries</span></div>
+							</li>
+							<li class="student-stop-assignments" data-bind="click:toggleStopBoundaryClick.bind($data,false),mapModeStyleButton:{autoActive:false}">
+								<div class="menuIcon student-stop-assignments"></div>
+								<div class="text"><span>Student Stop Assignments</span></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="vertical-line"></div>
+				<div class="icon vrp-line" title="Optimize Trips" data-bind="clickButton:{disable:!obVrpableTripsSelected(),click:vrpRouteClick}"></div>
+			</div>
+			<div class="pannel-item-content" data-bind="panelContentDrag,with: display">
+				<div id="routingtreeview" class="routing-tree-view"></div>
+			</div>
+			<div data-bind="visible:playBackControl.obPlayBackControlVisible()&&eventsManager.obTripSelected(), template: { name: 'workspace/RoutingMap/RoutingMapPanel/RoutingPalette/PlaybackControl', data: playBackControl}"></div>
+			<div class="bottom-info-container" data-bind="with: display">
+				<div data-bind="text:obFooterDisplay"></div>
+			</div>
+		</div>
+	</div>
+</div>

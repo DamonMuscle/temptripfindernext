@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 		this.title(isGeoLink ? "GeoLink" : "Trip Stops");
 		this.sizeCss = type == "stop" ? "modal-dialog-md" : "modal-dialog-sm";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/SelectTripStopModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/SelectTripStopModal");
 		this.buttonTemplate("modal/positivenegativeother");
 		this.obPositiveButtonLabel("Apply");
 		this.obNegativeButtonLabel("Cancel");

@@ -1,0 +1,74 @@
+<div class="row"  data-bind="uiInit:init">
+	<div class="col-xs-12">
+		<div class="form-group">
+			<label style="margin-bottom: 10px;">Time:</label>
+			<!-- ko customInput:{type:"Time",value:arrivalTime,attributes:{class:"form-control",name:"arrivalTime",placeholder:"hh:mm"}} --><!-- /ko -->
+		</div>
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" name="updateRelated" data-bind="checked:updateDisabled"> Update Related Times
+			</label>
+		</div>
+	</div>
+	<div class="col-xs-24" style="margin-top:10px">
+		<div class="col-xs-5" style="padding-left:0px">
+			<div class="form-group">
+				<label>Change</label>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checkedValue:0,checked:changeType,checkedValue:0, enable:updateDisabled()" name="change" value="0">
+						<span>Add</span>
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checkedValue:1,checked:changeType,checkedValue:1, enable:updateDisabled()"  name="change" value="1">
+						<span>Subtract</span>
+					</label>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-8">
+			<div class="form-group">
+				<label>Number of minutes</label>
+				<div class="input-group" style="margin-top:15px">
+				<!-- ko customInput:{type:"NaturalNumber",value:numOfMinutes, attributes:{class:"form-control",name:"numOfMinutes"}, disable:updateDisabledNumberBox} -->
+				<!-- /ko -->
+					<div class="input-group-btn">
+						<button class="btn btn-default btn-sharp" data-bind="click:minuMinutes, enable:updateDisabled()">
+							<span class="glyphicon glyphicon-minus">
+							</span>
+						</button>
+						<button class="btn btn-default btn-sharp" data-bind="click:addMinutes, enable:updateDisabled()">
+							<span class="glyphicon glyphicon-plus">
+							</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-11">
+			<div class="form-group">
+				<label>Stops to Affect</label>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checkedValue:0,checked:stopAffect,checkedValue:0,enable:updateDisabled()" name="affect" value="0">
+						<span>All Previous in Sequence</span>
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checkedValue:1,checked:stopAffect,checkedValue:1,enable:updateDisabled()"  name="affect" value="1">
+						<span>All Following in Sequence</span>
+					</label>
+				</div>
+				<div class="radio">
+					<label>
+						<input type="radio" data-bind="checkedValue:2,checked:stopAffect,checkedValue:2,enable:updateDisabled()"  name="affect" value="2">
+						<span>All Stops in this Sequence</span>
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

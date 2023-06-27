@@ -7,7 +7,7 @@
 		TF.Modal.BaseModalViewModel.call(this);
 
 		this.sizeCss = "modal-dialog-lg modal-dialog-xl new-trip-dailog";
-		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/RoutingTripModal");
+		this.contentTemplate("workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingTripModal");
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obOtherButtonLabel("Regenerate Directions");
 		this.obOtherButtonVisible(false);

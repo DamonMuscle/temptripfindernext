@@ -1,0 +1,77 @@
+<div data-bind="uiInit:uiInit">
+	<div class="arrow"></div>
+	<div class="content">
+		<!-- ko if:!isStudent -->
+		<div data-bind="if:capacity.real>capacity.max">
+			<span class="name">Capacity:</span>
+			<span class="real" data-bind="text:capacity.real"></span> > <span class="max" data-bind="text:capacity.max"></span>
+		</div>
+		<div data-bind="if:parseFloat(totalDistance.real)>parseFloat(totalDistance.max)">
+			<span class="name">Distance:</span>
+			<span class="real" data-bind="text:totalDistance.real+ ` ${tf.measurementUnitConverter.getShortUnits()}`"></span> > <span class="max" data-bind="text:totalDistance.max+ ` ${tf.measurementUnitConverter.getShortUnits()}`"></span>
+		</div>
+		<div data-bind="if:totalTime.real>totalTime.max">
+			<span class="name">Duration:</span>
+			<span class="real" data-bind="text:totalTime.real+' min'"></span> > <span class="max" data-bind="text:totalTime.max+' min'"></span>
+		</div>
+		<div class="stops parcelpalette ">
+			<!-- ko foreach: tripStops -->
+			<div class="stop-row pannel-item-content" data-bind="if:capacity>maxCapacity||(students.length>0&&students.some(x=>x. hasTotalTimeError||x.hasWalkDistanceError))">
+				<div class="left">
+					<div class="sequence" data-bind="text:stop.Sequence,style: { backgroundColor:$parent.color,color:TF.isLightness($parent.color) ? '#000000' : '#ffffff'}"></div>
+				</div>
+				<div class="right">
+					<div class="button-row">
+						<div class="name" data-bind="text:stop.Street"></div>
+						<div class="buttons">
+							<div class="icon zoom-map-to-layers" title="Center Map" data-bind="click:$parent.centerClick"></div>
+						</div>
+					</div>
+					<div class="sub-name" data-bind="if:capacity>maxCapacity">
+						Max Students per Stop > <span data-bind="text:maxCapacity"></span>
+					</div>
+					<div class="students sub-name">
+						<!-- ko foreach: students.sort(function(a,b){return a.name>b.name?1:-1}) -->
+						<!-- ko if: hasTotalTimeError||hasWalkDistanceError -->
+						<div class="button-row">
+							<div>
+								<span data-bind="text:name" class="student-name"></span>
+							</div>
+							<div class="buttons">
+								<div class="icon zoom-map-to-layers" title="Center Map" data-bind="click:$parents[1].centerClick"></div>
+							</div>
+						</div>
+						<!-- ko if: hasTotalTimeError -->
+						<div>
+							<span>Ride Time </span><span data-bind="text:totalTime+' min'"></span> > <span data-bind="text:maxRideTime+' min'"></span>
+						</div>
+						<!-- /ko -->
+						<!-- ko if: hasWalkDistanceError -->
+						<div>
+							<span>Walk to stop </span><span data-bind="text:walkToStopDistance+' '+ $root.measurementUnit"></span> > <span data-bind="text:maxWalkToStopDistance + ' ' + $root.measurementUnit"></span>
+						</div>
+						<!-- /ko -->
+						<!-- /ko -->
+						<!-- /ko -->
+					</div>
+				</div>
+			</div>
+			<!-- /ko -->
+		</div>
+		<!-- /ko -->
+		<!-- ko if:isStudent -->
+		<div class="students sub-name">
+			<!-- ko if: hasTotalTimeError -->
+			<div>
+				<span>Ride Time </span><span data-bind="text:totalTime+' min'"></span> > <span data-bind="text:maxRideTime+' min'"></span>
+			</div>
+			<!-- /ko -->
+			<!-- ko if: hasWalkDistanceError -->
+			<div>
+				<span>Walk to stop </span><span data-bind="text:walkToStopDistance + ' ' + $root.measurementUnit"></span> > <span data-bind="text:maxWalkToStopDistance + ' ' + $root.measurementUnit"></span>
+			</div>
+			<!-- /ko -->
+		</div>
+		<!-- /ko -->
+	</div>
+</div>

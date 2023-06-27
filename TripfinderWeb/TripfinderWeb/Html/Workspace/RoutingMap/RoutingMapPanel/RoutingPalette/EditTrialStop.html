@@ -1,0 +1,134 @@
+<div class="parcel-edit-overlay" data-bind="visible:obOverlayVisible,click:overlayClick">
+</div>
+<div class="parcel-edit-modal-container small-height-container boundaryEditModal" data-bind="visible:obVisible,uiInit:onInit">
+	<div class="content document-dataentry editTrialStop">
+		<div class="head" data-bind="click:toggleCollapseClick ">
+			<span data-bind="text:obTitle"></span>
+			<span class="close" data-bind="click:cancelClick">×</span>
+		</div>
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+		<div class="modify-content">
+			<div class="body">
+				<div class="dataentry-paginator clearafter" data-bind="visible:obRecordsCount()>1&&obShowPaging()&&mode()=='edit'" style="right: 4px;top:18px;">
+					<div class="page-group">
+						<a class="iconbutton page-previous" data-bind="click:previousClick,css: { disabled: obCurrentPage()<=0 }" role="button"></a>
+						<a class="iconbutton page-next" data-bind="click:nextClick,css: { disabled: obCurrentPage()+1>=obRecordsCount() }" role="button"></a>
+						<div class="page-indicator"><span data-bind="text:obCurrentPage()+1"></span> of <span data-bind="text:obRecordsCount"></span></div>
+					</div>
+				</div>
+				<div style="padding:0 25px;">
+					<div class="row" data-bind="visible:!(obRecordsCount()>1&&mode()=='new')">
+						<div class="col-xs-24">
+							<div class="form-group small-form-group">
+								<label class="requirestar">Street Location</label>
+								<input type="text" data-bind="value:obDataModel.Street" name="street" class="form-control">
+							</div>
+						</div>
+						<div class="col-xs-24">
+							<div class="form-group small-form-group">
+								<label>City</label>
+								<input type="text" data-bind="value:obDataModel.City" name="city" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-24">
+							<div class="form-group small-form-group">
+								<label>Street Crossing</label>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="prohibitCrosser" data-bind="checked:obDataModel.ProhibitCrosser,checkedValue:1">
+										<span>Prohibit</span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&obShowStopLocationMap()">
+						<div class="form-group small-form-group">
+							<label>Corner Stop</label>
+							<div class="stopLocationMap"></div>
+						</div>
+					</div>
+					<div class="row">
+						<!-- <div class="col-xs-24">
+                            <div class="form-group small-form-group">
+                                <label>Walkout Type</label>
+                                <div class="radio">
+                                    <label>
+										<input type="radio" name="walkoutType" data-bind="checkedValue:0,checked:obDataModel.WalkoutType,checkedValue:0" value="0">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Street Path')"></span>
+									</label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+										<input type="radio" name="walkoutType" data-bind="checked:obDataModel.WalkoutType,checkedValue:1" value="1">
+										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Radius')"></span>
+									</label>
+                                </div>
+                            </div>
+                        </div> -->
+						<div class="col-xs-24">
+							<div class="row">
+								<div class="form-group small-form-group col-xs-12" data-bind="visible:!isDoorToDoor()">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Distance')"></label>
+									<div class="input-group">
+										<input id="WalkoutDistanceBox" name="walkoutDistance" type="text" class="form-control" data-bind="numericTextBox:{value:obDataModel.Distance,decimals:3,format:'#.###'}"></input>
+									</div>
+								</div>
+								<div class="form-group small-form-group col-xs-8" data-bind="visible:!isDoorToDoor()">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('')"></label>
+									<div class="input-group">
+										<div id="WalkoutDistanceUnitBox" data-bind="typeahead:{source:obUnits,drowDownShow:true,notSort:true,selectedValue:obDataModel.DistanceUnit}">
+											<!-- ko customInput:{type:"Select",value:obDataModel.DistanceUnit,attributes:{class:"form-control",name:'distanceUnit'}} -->
+											<!-- /ko -->
+										</div>
+										<div class="input-group-btn">
+											<button data-bind="" type="button" class="btn btn-default btn-sharp">
+												<span class="caret"></span>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="form-group small-form-group col-xs-4 small-button-color">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Color')"></label>
+									<!-- ko customInput:{type:"Color",value:obDataModel.Color,attributes:{class:"form-control", hex:true}} -->
+									<!-- /ko -->
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!isDoorToDoor()">
+							<div class="row">
+								<div class="form-group small-form-group col-xs-12">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Buffer')"></label>
+									<div class="input-group">
+										<input id="WalkoutBufferBox" name="walkoutBuffer" type="text" class="form-control" data-bind="numericTextBox:{value:obDataModel.Buffer,decimals:3,format:'#.###'}"></input>
+									</div>
+								</div>
+								<div class="form-group small-form-group col-xs-8">
+									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('')"></label>
+									<div class="input-group">
+										<div id="WalkoutBufferUnitBox" data-bind="typeahead:{source:obUnits,drowDownShow:true,notSort:true,selectedValue:obDataModel.BufferUnit}">
+											<!-- ko customInput:{type:"Select",value:obDataModel.BufferUnit,attributes:{class:"form-control",name:'bufferUnit'}} -->
+											<!-- /ko -->
+										</div>
+										<div class="input-group-btn">
+											<button type="button" class="btn btn-default btn-sharp">
+												<span class="caret"></span>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="foot">
+				<button type="button" data-bind="click:applyClick" class="btn tf-btn-black">Apply</button>
+				<button type="button" data-bind="click:cancelClick" class="btn btn-link">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>

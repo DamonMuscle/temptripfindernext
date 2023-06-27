@@ -44,10 +44,7 @@
 	EsriTool.prototype.create = function(geometryType)
 	{
 		var self = this;
-		if (self._viewModal.gridMapPopup)
-		{
-			self._viewModal.disableMouseEvent();
-		}
+		if (self._viewModal.gridMapPopup) self._viewModal.disableMouseEvent();
 		self.sketchTool.create(geometryType, self.createCallback.bind(self), self);
 		self.startPreview(geometryType);
 	};
@@ -56,14 +53,7 @@
 	{
 		var self = this;
 		var layers = [];
-		[self._pointLayer, self._polylineLayer, self._polygonLayer]
-			.forEach(function(layer)
-			{
-				if (layer)
-				{
-					layers.push(layer);
-				}
-			});
+		[self._pointLayer, self._polylineLayer, self._polygonLayer].forEach(function(layer) { if (layer) layers.push(layer); });
 		self.sketchTool.select(geometryType, layers, function(graphics)
 		{
 			self.selectCallback(graphics, geometryType);
@@ -73,12 +63,9 @@
 	EsriTool.prototype.selectCallback = function(graphics, geometryType)
 	{
 		var self = this, selectIds = [];
-		if (TF.key.ctrlKey && geometryType === "point")
+		if (TF.key.ctrlKey && geometryType == "point")
 		{
-			selectIds = self.dataModel.getSelected().map(function(item)
-			{
-				return item.id
-			});
+			selectIds = self.dataModel.getSelected().map(function(item) { return item.id });
 		}
 		selectIds = selectIds.concat(graphics.map(function(graphic)
 		{
@@ -86,7 +73,7 @@
 		}));
 		self.selectionChange.notify(selectIds);
 
-		if (TF.key.ctrlKey && geometryType === "point")
+		if (TF.key.ctrlKey && geometryType == "point")
 		{
 			self.select("point");
 		} else
@@ -99,19 +86,16 @@
 	EsriTool.prototype.addRegion = function(geometryType, id)
 	{
 		var self = this;
-		if (self._viewModal.gridMapPopup)
-		{
-			self._viewModal.disableMouseEvent();
-		}
+		if (self._viewModal.gridMapPopup) self._viewModal.disableMouseEvent();
 		return new Promise(function(resolve, reject)
 		{
 			var graphic = self._findGraphicInLayerById(self._polygonLayer, id);
 			self._oldBoundaryGraphic = graphic;
 			self._oldBoundarySymbol = graphic.symbol.clone();
 			graphic.symbol = self.symbol.editPolygonSymbol();
-			self.sketchTool.addRegion(geometryType, function(grap)
+			self.sketchTool.addRegion(geometryType, function(graphic)
 			{
-				self.addRegionCallback(grap);
+				self.addRegionCallback(graphic);
 				resolve();
 			}, self);
 		});
@@ -120,50 +104,44 @@
 	EsriTool.prototype.removeRegion = function(geometryType, id)
 	{
 		var self = this;
-		if (self._viewModal.gridMapPopup)
-		{
-			self._viewModal.disableMouseEvent();
-		}
+		if (self._viewModal.gridMapPopup) self._viewModal.disableMouseEvent();
 		return new Promise(function(resolve, reject)
 		{
 			var graphic = self._findGraphicInLayerById(self._polygonLayer, id);
 			self._oldBoundaryGraphic = graphic;
 			self._oldBoundarySymbol = graphic.symbol.clone();
 			graphic.symbol = self.symbol.editPolygonSymbol();
-			self.sketchTool.removeRegion(geometryType, function(graph)
+			self.sketchTool.removeRegion(geometryType, function(graphic)
 			{
-				self.removeRegionCallback(graph);
+				self.removeRegionCallback(graphic);
 				resolve();
 			}, self);
 		});
 	}
 
-	EsriTool.prototype.redrawRegion = function(geometryType, id)
+	EsriTool.prototype.redrawRegion = function(geometryType, id, graphic)
 	{
 		var self = this;
-		if (self._viewModal.gridMapPopup)
-		{
-			self._viewModal.disableMouseEvent();
-		}
+		if (self._viewModal.gridMapPopup) self._viewModal.disableMouseEvent();
 		return new Promise(function(resolve, reject)
 		{
-			var graphic = self._findGraphicInLayerById(self._polygonLayer, id);
+			graphic = graphic || self._findGraphicInLayerById(self._polygonLayer, id);
 			self._oldBoundaryGraphic = graphic;
 			self._oldBoundarySymbol = graphic.symbol.clone();
 			graphic.symbol = self.symbol.editPolygonSymbol();
-			self.sketchTool.redrawRegion(geometryType, function(graph)
+			self.sketchTool.redrawRegion(geometryType, function(graphic)
 			{
-				self.redrawRegionCallback(graph);
+				self.redrawRegionCallback(graphic);
 				resolve();
 			}, self);
 		});
 	}
 
-	EsriTool.prototype.redrawByWalkout = function(boundary)
+	EsriTool.prototype.redrawByWalkout = function(boundary, graphic)
 	{
 		var self = this;
 		var tripStop = this.dataModel.getTripStopByStopId(boundary.TripStopId);
-		var graphic = self._findGraphicInLayerById(self._polygonLayer, boundary.id);
+		graphic = graphic || self._findGraphicInLayerById(self._polygonLayer, boundary.id);
 		self._oldBoundarySymbol = graphic.symbol.clone();
 		graphic.symbol = self.symbol.editPolygonSymbol();
 		self._oldBoundaryGraphic = graphic;
@@ -171,10 +149,7 @@
 			.then(function(g)
 			{
 				self._tempWalkoutRedrawLayer.removeAll();
-				if (self._oldBoundaryGraphic)
-				{
-					self._oldBoundaryGraphic.symbol = self._oldBoundarySymbol;
-				}
+				if (self._oldBoundaryGraphic) self._oldBoundaryGraphic.symbol = self._oldBoundarySymbol;
 				if (g)
 				{
 					var centroid = self._findGraphicInLayerById(self._pointLayer, graphic.attributes.dataModel.TripStopId);
@@ -195,9 +170,9 @@
 			var graphic = self._findGraphicInLayerById(self._polygonLayer, id);
 			self._oldBoundaryGraphic = graphic.clone();
 			self._oldBoundarySymbol = graphic.symbol.clone();
-			self.sketchTool.reshape(graphic, { moveDuplicateNode: self.getMoveDuplicateNode.bind(self) }, function(graph)
+			self.sketchTool.reshape(graphic, { moveDuplicateNode: self.getMoveDuplicateNode.bind(self) }, function(graphic)
 			{
-				self.reshapeCallback(graph);
+				self.reshapeCallback(graphic);
 				resolve();
 			});
 		});
@@ -234,9 +209,9 @@
 			self._oldBoundaryGraphic = graphic.clone();
 			self._oldBoundarySymbol = graphic.symbol.clone();
 			graphic.editSymbol = self.symbol.editPolygonSymbol();
-			self.sketchTool.transform(graphic, { moveDuplicateNode: self.getMoveDuplicateNode.bind(self) }, function(grap)
+			self.sketchTool.transform(graphic, { moveDuplicateNode: self.getMoveDuplicateNode.bind(self) }, function(graphic)
 			{
-				self.transformCallback(grap);
+				self.transformCallback(graphic);
 				resolve();
 			});
 		});
@@ -264,44 +239,46 @@
 				var boundaryGraphic = self._findGraphicInLayerById(self._polygonLayer, boundaryId);
 				self._oldBoundaryGraphic = boundaryGraphic;
 				self._oldBoundarySymbol = boundaryGraphic.symbol.clone();
-				boundaryGraphic.symbol = boundaryGraphic.geometry.type === "polygon" ? self.symbol.editPolygonSymbol() : self.symbol.editPolylineSymbol();
+				boundaryGraphic.symbol = boundaryGraphic.geometry.type == "polygon" ? self.symbol.editPolygonSymbol() : self.symbol.editPolylineSymbol();
 			}
 			self._oldTripStopGraphic = graphic.clone();
-			self.sketchTool.transform(graphic, { moveDuplicateNode: self.getMoveDuplicateNode.bind(self) }, function(grap)
+			self.sketchTool.transform(graphic, { moveDuplicateNode: self.getMoveDuplicateNode.bind(self) }, function(graphic)
 			{
-				self.movePointCallback(grap);
+				self.movePointCallback(graphic);
 				resolve();
 			});
 		});
 	};
 
-	EsriTool.prototype.createCallback = function(graphic)
+	EsriTool.prototype.createCallback = function(graphic, options)
 	{
-		const self = this;
-		if (self._viewModal.gridMapPopup)
+		var self = this;
+		if (self._viewModal.gridMapPopup) self._viewModal.enableMouseEvent();
+		if (graphic.geometry.type == "point")
 		{
-			self._viewModal.enableMouseEvent();
+			self.addPointToLayer(graphic, options);
+			if (self._viewModal.mode === "Routing-Create") return;
 		}
-		if (graphic.geometry.type === "point")
-		{
-			self.addPointToLayer(graphic);
-		}
-		else if (graphic.geometry.type === "polyline")
+		else if (graphic.geometry.type == "polyline")
 		{
 			self.addPolylineToLayer(graphic);
 		}
-		else if (graphic.geometry.type === "polygon")
+		else if (graphic.geometry.type == "polygon")
 		{
 			// check polygon is a valid geometry, to avoid line style polygon
 			if (tf.map.ArcGIS.geometryEngine.simplify(graphic.geometry))
 			{
 				self.addPolygonToLayer(graphic);
+				if (self._viewModal.mode === "Routing-Create") { return; }
 			} else
 			{
 				self.stop();
 				tf.promiseBootbox.alert("Please draw a valid polygon");
 			}
 
+		} else if (graphic.geometry.type == "polyline")
+		{
+			self.addPolylineToLayer(graphic);
 		}
 		self._viewModal.setMode("", "Normal");
 	};
@@ -314,10 +291,7 @@
 	EsriTool.prototype.endRegionCallback = function()
 	{
 		var self = this;
-		if (self._viewModal.gridMapPopup)
-		{
-			self._viewModal.enableMouseEvent();
-		}
+		if (self._viewModal.gridMapPopup) self._viewModal.enableMouseEvent();
 		PubSub.publish("clear_ContextMenu_Operation");
 		self._oldBoundaryGraphic.symbol = {
 			type: self._oldBoundarySymbol.type,
@@ -334,18 +308,14 @@
 		self._oldBoundaryGraphic.geometry = self._arcgis.geometryEngine.simplify(self._oldBoundaryGraphic.geometry);
 		if (self._arcgis.geometryEngine.intersects(graphic.geometry, self._oldBoundaryGraphic.geometry))
 		{
-			self._oldBoundaryGraphic.geometry = self._arcgis.geometryEngine.union(graphic.geometry, self._oldBoundaryGraphic.geometry);
+			var addGeometry = self.removeOverlapBoundary(graphic).geometry;
+			self._oldBoundaryGraphic.geometry = self._arcgis.geometryEngine.union(addGeometry, self._oldBoundaryGraphic.geometry);
 			var heartId = self.getBoundaryHeartId(self._oldBoundaryGraphic);
-			let centroid;
 			if (self._pointLayer && heartId)
 			{
-				centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
+				var centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
 			}
-			self._oldBoundaryGraphic.geometry = self.removeOverlapBoundary(self._oldBoundaryGraphic, centroid).geometry;
-			if (centroid)
-			{
-				self._oldBoundaryGraphic.geometry = self._cutResultHandler(self._oldBoundaryGraphic.geometry, centroid.geometry);
-			}
+			if (centroid) { self._oldBoundaryGraphic.geometry = self._cutResultHandler(self._oldBoundaryGraphic.geometry, centroid.geometry); }
 			self.updateDataModel([self._oldBoundaryGraphic]);
 		}
 	};
@@ -365,6 +335,11 @@
 		}
 		if (self._arcgis.geometryEngine.intersects(graphic.geometry, self._oldBoundaryGraphic.geometry))
 		{
+			if (self._arcgis.geometryEngine.contains(graphic.geometry, self._oldBoundaryGraphic.geometry))
+			{
+				return self.removeNezDialog();
+			}
+
 			self._oldBoundaryGraphic.geometry = self._arcgis.geometryEngine.difference(self._oldBoundaryGraphic.geometry, graphic.geometry);
 			self._oldBoundaryGraphic.geometry = self.removeOverlapBoundary(self._oldBoundaryGraphic, centroid).geometry;
 			if (centroid)
@@ -373,7 +348,6 @@
 			}
 			self.updateDataModel([self._oldBoundaryGraphic]);
 		}
-		return undefined;
 	};
 
 	EsriTool.prototype.redrawRegionCallback = function(graphic)
@@ -381,23 +355,20 @@
 		var self = this;
 		self.endRegionCallback();
 		var heartId = self.getBoundaryHeartId(self._oldBoundaryGraphic);
-		let centroid;
 		if (self._pointLayer && heartId)
 		{
-			centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
+			var centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
 			if (!self._arcgis.geometryEngine.intersects(centroid.geometry, graphic.geometry))
 			{
 				return self.redrawRegionDialog();
 			}
 		}
 		self._oldBoundaryGraphic.geometry = graphic.geometry;
-		self._oldBoundaryGraphic.geometry = self.removeOverlapBoundary(self._oldBoundaryGraphic, centroid).geometry;
-		if (centroid)
-		{
-			self._oldBoundaryGraphic.geometry = self._cutResultHandler(self._oldBoundaryGraphic.geometry, centroid.geometry);
-		}
+		let boundaryGraphic = self.removeOverlapBoundary(self._oldBoundaryGraphic, centroid);
+		self._oldBoundaryGraphic.geometry = boundaryGraphic.geometry;
+		if (boundaryGraphic.geometry.ShowRedrawRegionStatus) return self.redrawRegionDialog();
+		if (centroid) self._oldBoundaryGraphic.geometry = self._cutResultHandler(self._oldBoundaryGraphic.geometry, centroid.geometry);
 		self.updateDataModel([self._oldBoundaryGraphic]);
-		return undefined;
 	}
 
 	EsriTool.prototype.reshapeCallback = function(graphics)
@@ -418,9 +389,30 @@
 		var needToRevert = false;
 		graphics.forEach(function(graphic)
 		{
-			if (self.transofrmSingleGraphic(graphic))
+			if (self._pointLayer)
 			{
-				needToRevert = true;
+				var heartId = self.getBoundaryHeartId(graphic);
+				var centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
+				if (!self._arcgis.geometryEngine.intersects(graphic.geometry, centroid.geometry))
+				{
+					var nearestPoint = self._arcgis.geometryEngine.nearestCoordinate(graphic.geometry, centroid.geometry).coordinate;
+					var parcelWithFinger = self._createFinger(nearestPoint, centroid.geometry, graphic);
+					graphic.geometry = parcelWithFinger;
+				}
+				if (centroid)
+				{
+					graphic.geometry = self._cutResultHandler(graphic.geometry, centroid.geometry);
+				}
+			}
+			if (!self._allowOverlap)
+			{
+				if (!self.overlapCheck(centroid || graphic))
+				{
+					needToRevert = true;
+				} else
+				{
+					graphic.geometry = self.removeOverlapBoundary(graphic, centroid).geometry;
+				}
 			}
 		});
 		if (needToRevert)
@@ -435,102 +427,6 @@
 			self.updateDataModel(graphics);
 		}
 	};
-
-	EsriTool.prototype.transofrmSingleGraphic = function(graphic)
-	{
-		const self = this;
-		let needToRevert = false;
-		if (self._pointLayer)
-		{
-			var heartId = self.getBoundaryHeartId(graphic);
-			const centroid = self._findGraphicInLayerById(self._pointLayer, heartId);
-			if (!self._arcgis.geometryEngine.intersects(graphic.geometry, centroid.geometry))
-			{
-				var nearestPoint = self._arcgis.geometryEngine.nearestCoordinate(graphic.geometry, centroid.geometry).coordinate;
-				var parcelWithFinger = self._createFinger(nearestPoint, centroid.geometry, graphic);
-				graphic.geometry = parcelWithFinger;
-			}
-			if (centroid)
-			{
-				graphic.geometry = self._cutResultHandler(graphic.geometry, centroid.geometry);
-			}
-		}
-		if (!self._allowOverlap)
-		{
-			if (!self.overlapCheck(centroid || graphic))
-			{
-				needToRevert = true;
-			}
-			else
-			{
-				graphic.geometry = self.removeOverlapBoundary(graphic, centroid).geometry;
-			}
-		}
-		return needToRevert;
-	}
-
-
-	function setStreetName(grap)
-	{
-		var promise;
-		if (grap.attributes.junctionStreets)
-		{
-			promise = Promise.resolve(self.stopTool.getStreetAddressByJunctionStreets(grap.attributes.junctionStreets));
-		} else
-		{
-			promise = self.stopTool.reverseGeocodeStop(grap.geometry).then(function(result)
-			{
-				if (result)
-				{
-					return result ? result : "Unnamed";
-				}
-				return undefined;
-			});
-		}
-
-		return promise.then(function(name)
-		{
-			if (name)
-			{
-				grap.attributes.dataModel.Street = name;
-			}
-		});
-	}
-
-	function revertToOrigin()
-	{
-		graphic.geometry = self._oldTripStopGraphic.geometry;
-		self.updateDataModel([graphic]);
-	}
-
-	EsriTool.prototype.polygonMoveCallback = function(graphic)
-	{
-		const self = this;
-		var parcel = self._findGraphicInLayerById(self._polygonLayer, boundaryId);
-		parcel.symbol = self._oldBoundarySymbol;
-
-		if (self.removeOverlapCheck(graphic))
-		{
-			setStreetName(graphic).then(() =>
-			{
-				if (!self._arcgis.geometryEngine.intersects(parcel.geometry, graphic.geometry))
-				{
-					var nearestPointGeometry = self._arcgis.geometryEngine.nearestCoordinate(parcel.geometry, graphic.geometry).coordinate;
-					var parcelWithFinger = self._createFinger(nearestPointGeometry, graphic.geometry, parcel);
-					parcel.geometry = parcelWithFinger;
-				}
-				graphic.attributes.dataModel.City = TF.RoutingMap.GeocodeHelper.getCityName(graphic.attributes.dataModel.geometry);
-				self.updateDataModel([graphic]);
-			});
-		}
-		else
-		{
-			self.overlapDialogTransform().then(function()
-			{
-				revertToOrigin();
-			});
-		}
-	}
 
 	EsriTool.prototype.movePointCallback = function(graphics)
 	{
@@ -553,17 +449,73 @@
 
 			if (self._polygonLayer && boundaryId)
 			{
-				self.polygonMoveCallback(graphic);
-			}
-			else
+				var parcel = self._findGraphicInLayerById(self._polygonLayer, boundaryId);
+				if (parcel)
+				{
+					parcel.symbol = self._oldBoundarySymbol;
+				}
+				if (self.removeOverlapCheck(graphic))
+				{
+					setStreetName(graphic).then(() =>
+					{
+						if (parcel && !self._arcgis.geometryEngine.intersects(parcel.geometry, graphic.geometry))
+						{
+							var nearestPointGeometry = self._arcgis.geometryEngine.nearestCoordinate(parcel.geometry, graphic.geometry).coordinate;
+							var parcelWithFinger = self._createFinger(nearestPointGeometry, graphic.geometry, parcel);
+							parcel.geometry = parcelWithFinger;
+						}
+						graphic.attributes.dataModel.City = TF.RoutingMap.GeocodeHelper.getCityName(graphic.attributes.dataModel.geometry);
+						self.updateDataModel([graphic]);
+					});
+				} else
+				{
+					self.overlapDialogTransform().then(function()
+					{
+						revertToOrigin();
+					});
+				}
+			} else
 			{
 				self.updateDataModel([graphic]);
 			}
+
+			function revertToOrigin()
+			{
+				graphic.geometry = self._oldTripStopGraphic.geometry;
+				self.updateDataModel([graphic]);
+			}
 		});
+
+		function setStreetName(graphic)
+		{
+			var promise;
+			if (graphic.attributes.junctionStreets)
+			{
+				promise = Promise.resolve(self.stopTool.getStreetAddressByJunctionStreets(graphic.attributes.junctionStreets));
+			} else
+			{
+				promise = self.stopTool.reverseGeocodeStop(graphic.geometry).then(function(result)
+				{
+					if (result)
+					{
+						return result ? result : "Unnamed";
+					}
+				});
+			}
+
+			return promise.then(function(name)
+			{
+				if (name)
+				{
+					graphic.attributes.dataModel.Street = name;
+				}
+			});
+		}
 	};
 
 	EsriTool.prototype.getSnappedTripStop = function(tripStop)
 	{
+		// return Promise.resolve(tripStop);
 		var self = this;
 		return self.viewModel._viewModal.getSnappingPoint(tripStop.geometry).then(function(point)
 		{
@@ -584,38 +536,6 @@
 
 	};
 
-	EsriTool.prototype.forceStopToJunctionResolveStop = function(nearbyJunction, tripStop)
-	{
-		const self = this;
-		if (nearbyJunction && nearbyJunction.point)
-		{
-			if (result && result.distance <= self.snapOffsetDistance)
-			{
-				if (!tripStop.attributes)
-				{
-					tripStop.attributes = {};
-				}
-				tripStop.attributes.junctionStreets = nearbyJunction.streets;
-				tripStop.geometry = nearbyJunction.point;
-				return Promise.resolve(tripStop);
-			}
-			var polyline = new tf.map.ArcGIS.Polyline({
-				paths: [[tripStop.geometry.x, tripStop.geometry.y], [nearbyJunction.point.x, nearbyJunction.point.y]],
-				spatialReference: { wkid: 102100 }
-			});
-			if (tf.map.ArcGIS.geometryEngine.geodesicLength(polyline, "meters") <= self.snapInsetDistance)
-			{
-				if (!tripStop.attributes)
-				{
-					tripStop.attributes = {};
-				}
-				tripStop.attributes.junctionStreets = nearbyJunction.streets;
-				tripStop.geometry = nearbyJunction.point;
-				return Promise.resolve(tripStop);
-			}
-		}
-		return Promise.resolve(tripStop);
-	}
 	//snap point to junction if within 5 meter to street and 5 meters to junction
 	EsriTool.prototype.forceStopToJunction = function(tripStop)
 	{
@@ -629,7 +549,28 @@
 			var promise = self.viewModel._viewModal.getNearestJunctionPointInBuffer(tripStop.geometry, self.pointToJunctionDistance);
 			return promise.then(function(nearbyJunction)
 			{
-				return self.forceStopToJunctionResolveStop(nearbyJunction, tripStop);
+				if (nearbyJunction && nearbyJunction.point)
+				{
+					if (result && result.distance <= self.snapOffsetDistance)
+					{
+						if (!tripStop.attributes) tripStop.attributes = {};
+						tripStop.attributes.junctionStreets = nearbyJunction.streets;
+						tripStop.geometry = nearbyJunction.point;
+						return Promise.resolve(tripStop);
+					}
+					var polyline = new tf.map.ArcGIS.Polyline({
+						paths: [[tripStop.geometry.x, tripStop.geometry.y], [nearbyJunction.point.x, nearbyJunction.point.y]],
+						spatialReference: { wkid: 102100 }
+					});
+					if (tf.map.ArcGIS.geometryEngine.geodesicLength(polyline, "meters") <= self.snapInsetDistance)
+					{
+						if (!tripStop.attributes) tripStop.attributes = {};
+						tripStop.attributes.junctionStreets = nearbyJunction.streets;
+						tripStop.geometry = nearbyJunction.point;
+						return Promise.resolve(tripStop);
+					}
+				}
+				return Promise.resolve(tripStop);
 			});
 		});
 	};
@@ -650,34 +591,42 @@
 		return TF.Helper.MapHelper.convertPxToDistance(this._map, this._arcgis, distance)
 	};
 
+	/**
+	 * 
+	 * @param {*} graphic 
+	 * @param {*} centroid 
+	 * @returns {Graphic} ShowRedrawRegionStatus of graphic attributes means draw polygon is success or not and open redrawRegionDialog or not
+	 */
 	EsriTool.prototype.removeOverlapBoundary = function(graphic, centroid)
 	{
 		var self = this;
-		if (self._allowOverlap)
-		{
-			return graphic;
-		}
+		if (self._allowOverlap) return graphic;
 
 		var intersectGeometry = self._intersectWithCurrentPolygons(graphic);
 		if (intersectGeometry)
 		{
-			if (!centroid)
-			{
-				centroid = self._newTripStopGraphic;
-			}
+			if (!centroid) centroid = self._newTripStopGraphic;
 			var cutResult = self._arcgis.geometryEngine.difference(graphic.geometry, intersectGeometry);
-			if (centroid)
+			if (centroid && cutResult)
 			{
 				cutResult = self._cutResultHandler(cutResult, centroid.geometry);
 			}
-			graphic.geometry = cutResult;
+
+			if (cutResult)
+			{
+				graphic.geometry = cutResult;
+			}
+			else
+			{
+				graphic.geometry.ShowRedrawRegionStatus = true;
+			}
 		}
 		return graphic;
 	};
 
 	EsriTool.prototype.seperatePolygon = function(geometry)
 	{
-		var self = this, resultPolygons = [];
+		var self = this, geometries = [], resultPolygons = [];
 		var rings = geometry.rings;
 		var resultRings = self._findOutterRing(rings);
 		for (var i = 0; i < resultRings.length; i++)
@@ -704,11 +653,7 @@
 		var self = this;
 		var _resolve = null;
 		var _reject = null;
-		var promise = new Promise(function(resolve, reject)
-		{
-			_resolve = resolve;
-			_reject = reject;
-		});
+		var promise = new Promise(function(resolve, reject) { _resolve = resolve; _reject = reject; });
 
 		var currentStops = [], nonOverlapedStops = [];
 		self.dataModel.trips.forEach(function(trip)
@@ -719,35 +664,32 @@
 		stops.forEach(function(stop)
 		{
 			stop.address = stop.Street;
-			if (stop.boundary.BdyType === 0 || !self._isContainedByCurrentPolygons(stop))
+			if (stop.boundary.BdyType == 0 || !self._isContainedByCurrentPolygons(stop))
 			{
 				nonOverlapedStops.push(stop);
 			}
 		});
-		if (nonOverlapedStops.length === 0)
+		if (nonOverlapedStops.length == 0)
 		{
-			return _resolve(tf.promiseBootbox.alert(
-				`Remove Overlapping Boundaries is set true! Since ${stops.length === 1 ? "stop is" : "stops are"} falling in current stop boundaries, no stops will be created`, "Warning"));
+			return _resolve(tf.promiseBootbox.alert("Remove Overlapping Boundaries is set true! Since " + (stops.length == 1 ? "stop is" : "stops are") + " falling in current stop boundaries, no stops will be created", "Warning"));
 		}
 		else if (nonOverlapedStops.length < stops.length)
 		{
 			tf.loadingIndicator.tryHide();
-			tf.promiseBootbox.alert(
-				`Remove Overlapping Boundaries is set as true! Some ${stops.length - nonOverlapedStops.length === 1 ? "stop is" : "stops are"} falling in current stop boundaries`, "Warning")
-				.then(function()
-				{
-					tf.loadingIndicator.show();
-					self.stopTool.removeOverlapBoundariesByThiessen(nonOverlapedStops, currentStops).then(function(_stops)
-					{
-						return _resolve(_stops);
-					})
-				})
-		}
-		else if (nonOverlapedStops.length === stops.length)
-		{
-			self.stopTool.removeOverlapBoundariesByThiessen(stops, currentStops).then(function(_stops)
+			tf.promiseBootbox.alert("Remove Overlapping Boundaries is set as true! Some " + (stops.length - nonOverlapedStops.length == 1 ? "stop is" : "stops are") + " falling in current stop boundaries", "Warning").then(function()
 			{
-				return _resolve(_stops);
+				tf.loadingIndicator.show();
+				self.stopTool.removeOverlapBoundariesByThiessen(nonOverlapedStops, currentStops).then(function(stops)
+				{
+					return _resolve(stops);
+				})
+			})
+		}
+		else if (nonOverlapedStops.length == stops.length)
+		{
+			self.stopTool.removeOverlapBoundariesByThiessen(stops, currentStops).then(function(stops)
+			{
+				return _resolve(stops);
 			})
 		}
 		return promise;
@@ -765,15 +707,20 @@
 		return false;
 	}
 
+	EsriTool.prototype.removeOverlapCheckWithEditTrips = function(graphic)
+	{
+		let self = this;
+		let isIntersect = self._intersectWithCurrentEditTripBoundaries(graphic);
+		return !!(self._allowOverlap || (!self._allowOverlap && !isIntersect));
+	}
+
 	EsriTool.prototype.overlapCheck = function(graphic)
 	{
 		var self = this;
-		var isIntersect
-		if (graphic.geometry.type === "point")
+		if (graphic.geometry.type == "point")
 		{
-			isIntersect = self._intersectWithCurrentPolygons(graphic);
-		}
-		else
+			var isIntersect = self._intersectWithCurrentPolygons(graphic);
+		} else
 		{
 			isIntersect = self._isContainedByCurrentPolygons(graphic);
 		}
@@ -788,33 +735,57 @@
 		return false;
 	};
 
-	EsriTool.prototype.intersectGeometry = function(g, graphic)
+	EsriTool.prototype.overlapCheckCurrentEditTrips = function(graphic)
 	{
-		const self = this;
-		let intersectGeometry = null;
-		if (g.attributes && g.attributes.dataModel)
+		const self = this, isIntersect = self._intersectWithCurrentEditTripBoundaries(graphic);
+		if (self._allowOverlap || (!self._allowOverlap && !isIntersect))
 		{
-			if (g.geometry.type === "polygon")
+			return true;
+		}
+		if (isIntersect)
+		{
+			self.overlapDialog();
+		}
+		return false;
+	};
+
+	EsriTool.prototype._intersectWithCurrentEditTripBoundaries = function(g)
+	{
+		let self = this,
+			intersectGeometries = [];
+		const currentEditTripIds = (self.dataModel.tripDataModel || self.dataModel).trips.flatMap((trip) => { if (trip.OpenType == 'Edit') { return trip.id; } });
+		const graphics = self._polygonLayer.graphics.items.filter((item) => currentEditTripIds.includes(item.attributes.TripId));
+
+		graphics.map(function(graphic)
+		{
+			if (g.attribute?.dataModel)
 			{
-				if (graphic.attributes.dataModel.id !== g.attributes.dataModel.id && self._isIntersect(graphic, g))
+				if (g.geometry.type == "polygon")
 				{
-					intersectGeometry = self._arcgis.geometryEngine.simplify(graphic.geometry);
+					if (graphic.attributes.dataModel.id != g.attributes.dataModel.id && self._isIntersect(graphic, g))
+					{
+						intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
+					}
+				} else if (g.geometry.type == "point")
+				{
+					if (graphic.attributes.dataModel.id != g.attributes.dataModel.boundary.id && self._isIntersect(graphic, g))
+					{
+						intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
+					}
 				}
 			}
-			else if (g.geometry.type === "point")
+			else
 			{
-				if (graphic.attributes.dataModel.id !== g.attributes.dataModel.boundary.id && self._isIntersect(graphic, g))
+				if (self._isIntersect(graphic, g))
 				{
-					intersectGeometry = self._arcgis.geometryEngine.simplify(graphic.geometry);
+					intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
 				}
 			}
-		}
-		elseif(self._isIntersect(graphic, g))
-		{
-			intersectGeometry = self._arcgis.geometryEngine.simplify(graphic.geometry)
-		}
-		return intersectGeometry;
-	}
+
+		});
+		if (intersectGeometries.length > 0) return self._arcgis.geometryEngine.union(intersectGeometries);
+		return false;
+	};
 
 	EsriTool.prototype._intersectWithCurrentPolygons = function(g)
 	{
@@ -824,54 +795,67 @@
 
 		graphics.map(function(graphic)
 		{
-			const intersestGeometry = self.intersectGeometry(g, graphic);
-			if (intersestGeometry)
+			if (g.attributes && g.attributes.dataModel)
 			{
-				intersectGeometries.push(intersestGeometry);
+				if (g.geometry.type == "polygon")
+				{
+					if (graphic.attributes.dataModel.id != g.attributes.dataModel.id && self._isIntersect(graphic, g))
+					{
+						intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
+					}
+				} else if (g.geometry.type == "point")
+				{
+					if (graphic.attributes.dataModel.id != g.attributes.dataModel.boundary.id && self._isIntersect(graphic, g))
+					{
+						intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
+					}
+				}
 			}
+			else
+			{
+				if (self._isIntersect(graphic, g))
+				{
+					intersectGeometries.push(self._arcgis.geometryEngine.simplify(graphic.geometry));
+				}
+			}
+
 		});
-		if (intersectGeometries.length > 0)
-		{
-			return self._arcgis.geometryEngine.union(intersectGeometries);
-		}
+		if (intersectGeometries.length > 0) return self._arcgis.geometryEngine.union(intersectGeometries);
 		return false;
 	};
 
 	EsriTool.prototype._isContained = function(graphic1, graphic2)
 	{
-		if (this._arcgis.geometryEngine.contains(graphic1.geometry, graphic2.geometry) && graphic1.geometry !== graphic2.geometry)
+		if (this._arcgis.geometryEngine.contains(graphic1.geometry, graphic2.geometry) && !(graphic1.geometry == graphic2.geometry))
 		{
 			return true;
-		}
-		return false;
+		} return false;
 	};
 
 	EsriTool.prototype._combineTouchedPolygons = function(polygons)
 	{
 		var self = this, resultPolygons = [polygons[0]], rings = [];
-		polygons.forEach(function(p)
+		polygons.map(function(p)
 		{
-			p.rings.forEach(function(r)
-			{
-				rings.push(r);
-			});
+			p.rings.map(function(r) { rings.push(r); });
 
 		})
 		polygons.shift();
-		polygons.forEach(function(p, index)
+		polygons.map(function(p, index)
 		{
 			var istouch = false;
-			resultPolygons.forEach(function(pr)
+			resultPolygons.map(function(pr)
 			{
 				if (self._arcgis.geometryEngine.contains(pr, p) && self._arcgis.geometryEngine.contains(p, pr))
 				{
-					//empty
+
 				}
 				else if (self._isTouches(pr, p, rings))
 				{
-					p.rings.forEach(function(r)
+					p.rings.map(function(r)
 					{
 						pr.addRing(r);
+						return;
 					});
 					istouch = true;
 				}
@@ -888,10 +872,7 @@
 	EsriTool.prototype._isTouches = function(pc, p, rings)
 	{
 		var self = this;
-		if (self._arcgis.geometryEngine.touches(pc, p))
-		{
-			return true;
-		}
+		if (self._arcgis.geometryEngine.touches(pc, p)) return true;
 		else
 		{
 			for (var i = 0; i < rings.length; i++)
@@ -900,10 +881,7 @@
 					rings: rings[i],
 					spatialReference: self._map.mapView.spatialReference
 				});
-				if (self._arcgis.geometryEngine.touches(polygon, p) && self._isTouches(pc, polygon, rings.filter(function(r)
-				{
-					return r !== rings[i]
-				})))
+				if (self._arcgis.geometryEngine.touches(polygon, p) && self._isTouches(pc, polygon, rings.filter(function(r) { return r != rings[i] })))
 				{
 					return true;
 				}
@@ -923,7 +901,8 @@
 				spatialReference: self._map.mapView.spatialReference
 			});
 		});
-		return self._combineTouchedPolygons(outPolygons).length > 1;
+		if (self._combineTouchedPolygons(outPolygons).length > 1) return false;
+		else return true;
 	};
 
 	EsriTool.prototype._findOutterRing = function(rings)
@@ -935,6 +914,7 @@
 				rings: rings[i],
 				spatialReference: self._map.mapView.spatialReference
 			});
+			//geometries.push(self._arcgis.geometryEngine.simplify(polygon));
 			geometries.push(polygon);
 		}
 		var resultGeometry = self._arcgis.geometryEngine.union(geometries);
@@ -954,7 +934,7 @@
 		{
 			if (newParcel.attributes && newParcel.attributes.dataModel)
 			{
-				if (graphic.attributes.dataModel.id !== newParcel.attributes.dataModel.id && self._isContained(graphic, newParcel))
+				if (graphic.attributes.dataModel.id != newParcel.attributes.dataModel.id && self._isContained(graphic, newParcel))
 				{
 					isContained = true;
 				}
@@ -990,7 +970,7 @@
 		{
 			if (newParcel.attributes.dataModel)
 			{
-				if (graphic.attributes.dataModel.id !== newParcel.attributes.dataModel.id && self._isOverlap(graphic, newParcel))
+				if (graphic.attributes.dataModel.id != newParcel.attributes.dataModel.id && self._isOverlap(graphic, newParcel))
 				{
 					isOverlap = true;
 				}
@@ -1013,8 +993,7 @@
 			this._arcgis.geometryEngine.contains(graphic2.geometry, graphic1.geometry))
 		{
 			return true;
-		}
-		return false;
+		} return false;
 	};
 	EsriTool.prototype._warningDialogBox = function(message)
 	{
@@ -1076,16 +1055,15 @@
 
 	EsriTool.prototype._setOpacity = function(color, opacity)
 	{
-		return color.concat([opacity / 255]);
+		return color.concat([opacity / 255]);//TODO  Using V4 parm to set opacity.
 	};
 
 	EsriTool.prototype._isIntersect = function(graphic1, graphic2)
 	{
-		if (this._arcgis.geometryEngine.intersects(graphic1.geometry, graphic2.geometry) && graphic1.geometry !== graphic2.geometry)
+		if (this._arcgis.geometryEngine.intersects(graphic1.geometry, graphic2.geometry) && !(graphic1.geometry == graphic2.geometry))
 		{
 			return true;
-		}
-		return false;
+		} return false;
 	};
 
 	EsriTool.prototype.findPolygonById = function(id)
@@ -1111,7 +1089,7 @@
 		var graphics = layer.graphics.items;
 		for (var i = 0; i < graphics.length; i++)
 		{
-			if (graphics[i].attributes && graphics[i].attributes.dataModel && graphics[i].attributes.dataModel.id === id)
+			if (graphics[i].attributes && graphics[i].attributes.dataModel && graphics[i].attributes.dataModel.id == id)
 			{
 				return graphics[i];
 			}
@@ -1119,57 +1097,63 @@
 		return null;
 	};
 
+	/**
+	 * 
+	 * @param {*} cutResult 
+	 * @param {*} centroid 
+	 * @returns {Geometry} ShowRedrawRegionStatus of result object means draw polygon is success or not and open redrawRegionDialog or not
+	 */
 	EsriTool.prototype._cutResultHandler = function(cutResult, centroid)
 	{
 		var self = this;
+		if (!cutResult) { return cutResult; }
 		cutResult = tf.map.ArcGIS.geometryEngine.simplify(cutResult);
 		if (cutResult.rings.length > 1 && centroid)
 		{
+			var polygonWithCentroid = self._findRingwithPoint(cutResult.rings, centroid);
+			if (!polygonWithCentroid)
+			{
+				cutResult.ShowRedrawRegionStatus = true;
+				return cutResult;
+			}
 
-			self._cutResult(cutResult, centroid);
+			var removedids = [], remove = [], keep = [];
+			cutResult.rings.map(function(ring, index)
+			{
+				var polygon = polygon = new self._arcgis.Polygon({
+					type: "polygon",
+					rings: [ring],
+					spatialReference: self._map.mapView.spatialReference
+				});
+				if (!self._arcgis.geometryEngine.contains(polygonWithCentroid, polygon))
+				{
+					removedids.push(index);
+					remove.push(polygon);
+				}
+				else
+				{
+					keep.push(polygon);
+				}
+			});
+			for (var i = removedids.length - 1; i >= 0; i--)
+			{
+				var isremove = true;
+				for (var j = 0; j < keep.length; j++)
+				{
+					if (self._arcgis.geometryEngine.contains(keep[j], remove[i]))
+					{
+						isremove = false;
+						break;
+					}
+				}
+				if (isremove)
+				{
+					cutResult.removeRing(removedids[i]);
+				}
+			}
 		}
 		return cutResult;
 	};
-
-	EsriTool.prototype._cutResult = function(cutResult, centroid)
-	{
-		const self = this;
-		var polygonWithCentroid = self._findRingwithPoint(cutResult.rings, centroid);
-		var removedids = [], remove = [], keep = [];
-		cutResult.rings.map(function(ring, index)
-		{
-			var polygon = new self._arcgis.Polygon({
-				type: "polygon",
-				rings: [ring],
-				spatialReference: self._map.mapView.spatialReference
-			});
-			if (!self._arcgis.geometryEngine.contains(polygonWithCentroid, polygon))
-			{
-				removedids.push(index);
-				remove.push(polygon);
-			}
-			else
-			{
-				keep.push(polygon);
-			}
-		});
-		for (var i = removedids.length - 1; i >= 0; i--)
-		{
-			var isremove = true;
-			for (var j = 0; j < keep.length; j++)
-			{
-				if (self._arcgis.geometryEngine.contains(keep[j], remove[i]))
-				{
-					isremove = false;
-					break;
-				}
-			}
-			if (isremove)
-			{
-				cutResult.removeRing(removedids[i]);
-			}
-		}
-	}
 
 	EsriTool.prototype._findRingwithPoint = function(rings, centroid)
 	{
@@ -1227,7 +1211,7 @@
 		{
 			if (graphic.attributes.dataModel && graphic.attributes.dataModel.id)
 			{
-				var isHighlighted = highlightedItems[graphic.attributes.dataModel.id] === true;
+				var isHighlighted = highlightedItems[graphic.attributes.dataModel.id] == true;
 				graphic.symbol = self.getSymbol(graphic, isHighlighted ? self.StatusType.highlight : "");
 			}
 		});
@@ -1236,7 +1220,7 @@
 	EsriTool.prototype.glowAndVisibleGeometries = function(geometries)
 	{
 		var self = this;
-		if (geometries.length === 1 && !geometries[0].extent && !self._map.mapView.extent.contains(geometries[0]))
+		if (geometries.length == 1 && !geometries[0].extent && !self._map.mapView.extent.contains(geometries[0]))
 		{
 			self._map.mapView.goTo(geometries[0]);
 			return;
@@ -1272,7 +1256,7 @@
 		if (geometries && geometries.length > 0)
 		{
 			// geographic units (wkid: 4326)
-			if (geometries[0].spatialReference.wkid === 4326)
+			if (geometries[0].spatialReference && geometries[0].spatialReference.wkid === 4326)
 			{
 				buffer = buffer || (200 / 111000);
 			}
@@ -1286,13 +1270,45 @@
 		{
 			if (item && item.type)
 			{
-				const bufferRegion = EsriTool._calculateExtendBufferInTurn(item, buffer, map);
-				if (bufferRegion)
+				var geometryExtent = item.extent;
+				if (!geometryExtent)
 				{
-					xmin = bufferRegion.xmin;
-					ymin = bufferRegion.ymin;
-					xmax = bufferRegion.xmax;
-					ymax = bufferRegion.ymax;
+					if (!item.x || !item.y)
+					{
+						return;
+					}
+					geometryExtent = new tf.map.ArcGIS.Extent({
+						xmin: item.x - buffer,
+						ymin: item.y - buffer,
+						xmax: item.x + buffer,
+						ymax: item.y + buffer,
+						spatialReference: map.mapView.spatialReference
+					});
+				}
+				if (!xmax)
+				{
+					xmax = geometryExtent.xmax;
+					xmin = geometryExtent.xmin;
+					ymax = geometryExtent.ymax;
+					ymin = geometryExtent.ymin;
+				} else
+				{
+					if (geometryExtent.xmax > xmax)
+					{
+						xmax = geometryExtent.xmax;
+					}
+					if (geometryExtent.ymax > ymax)
+					{
+						ymax = geometryExtent.ymax;
+					}
+					if (geometryExtent.xmin < xmin)
+					{
+						xmin = geometryExtent.xmin;
+					}
+					if (geometryExtent.ymin < ymin)
+					{
+						ymin = geometryExtent.ymin;
+					}
 				}
 			}
 		});
@@ -1305,57 +1321,9 @@
 		});
 	};
 
-	EsriTool._calculateExtendBufferInTurn = function(item, buffer, map)
-	{
-		var xmax, xmin, ymax, ymin;
-		var geometryExtent = item.extent;
-		if (!geometryExtent)
-		{
-			if (!item.x || !item.y)
-			{
-				return null;
-			}
-			geometryExtent = new tf.map.ArcGIS.Extent({
-				xmin: item.x - buffer,
-				ymin: item.y - buffer,
-				xmax: item.x + buffer,
-				ymax: item.y + buffer,
-				spatialReference: map.mapView.spatialReference
-			});
-		}
-		if (!xmax)
-		{
-			xmax = geometryExtent.xmax;
-			xmin = geometryExtent.xmin;
-			ymax = geometryExtent.ymax;
-			ymin = geometryExtent.ymin;
-		}
-		else
-		{
-			if (geometryExtent.xmax > xmax)
-			{
-				xmax = geometryExtent.xmax;
-			}
-			if (geometryExtent.ymax > ymax)
-			{
-				ymax = geometryExtent.ymax;
-			}
-			if (geometryExtent.xmin < xmin)
-			{
-				xmin = geometryExtent.xmin;
-			}
-			if (geometryExtent.ymin < ymin)
-			{
-				ymin = geometryExtent.ymin;
-			}
-		}
-
-		return { xmax, xmin, ymax, ymin }
-	}
-
 	EsriTool.centerSingleItem = function(map, item)
 	{
-		if (item.geometry.type === "point")
+		if (item.geometry.type == "point")
 		{
 			TF.Helper.MapHelper.centerAndZoom(map, item.geometry, 17);
 		} else if (item.geometry.extent)
@@ -1374,21 +1342,57 @@
 			});
 			return EsriTool.getMaxExtent(geometries, map);
 		}
-		return undefined;
+	};
+
+	EsriTool.getMaxCenterExtent = function(map, extents)
+	{
+		if (Array.isArray(extents) && extents.length > 0)
+		{
+			var xmax, xmin, ymax, ymin;
+			extents.forEach(function(extent)
+			{
+				if (!xmax)
+				{
+					xmax = extent.xmax;
+					xmin = extent.xmin;
+					ymax = extent.ymax;
+					ymin = extent.ymin;
+				} else
+				{
+					if (extent.xmax > xmax)
+					{
+						xmax = extent.xmax;
+					}
+					if (extent.ymax > ymax)
+					{
+						ymax = extent.ymax;
+					}
+					if (extent.xmin < xmin)
+					{
+						xmin = extent.xmin;
+					}
+					if (extent.ymin < ymin)
+					{
+						ymin = extent.ymin;
+					}
+				}
+			});
+			return new tf.map.ArcGIS.Extent({
+				xmin: xmin,
+				ymin: ymin,
+				xmax: xmax,
+				ymax: ymax,
+				spatialReference: map.mapView.spatialReference
+			});
+		}
 	};
 
 	EsriTool.centerMultipleItem = function(map, items)
 	{
-		if (items.length === 1 && items[0].geometry.type === "point")
+		if (items.length > 0)
 		{
-			EsriTool.centerSingleItem(map, items[0]);
-			return Promise.resolve();
-		}
-		else if (items.length > 0)
-		{
-			// var extent = EsriTool.getCenterExtentMultipleItem(map, items);
-			// return map.mapView.goTo(extent);
-			return map.mapView.goTo(items);
+			var extent = EsriTool.getCenterExtentMultipleItem(map, items);
+			return map.mapView.goTo(extent);
 		}
 		return Promise.resolve();
 	};
@@ -1396,7 +1400,7 @@
 	EsriTool.centerLayer = function(map, layer)
 	{
 		var graphics = layer.graphics;
-		if (graphics.length === 0)
+		if (graphics.length == 0)
 		{
 			return;
 		}
@@ -1418,47 +1422,41 @@
 		return this._warningDialogBox("Region to be removed contains the center point!");
 	};
 
+	EsriTool.prototype.removeNezDialog = function()
+	{
+		return this._warningDialogBox("Region cannot be deleted all!");
+	};
+
 	EsriTool.prototype.overlapDialogTransform = function()
 	{
 		return this._warningDialogBox("Remove Overlapping Boundaries is set as true,stop cannot be moved here!");
 	};
 
-	EsriTool.prototype.prepareUpdatePolygonData = function(data)
-	{
-		const self = this;
-		return data.forEach(function(d)
-		{
-			if (self._polygonLayer)
-			{
-				var polygonGraphic = self._findGraphicInLayerById(self._polygonLayer, d.id);
-				if (polygonGraphic)
-				{
-					polygonGraphic.geometry = TF.cloneGeometry(d.geometry);
-				}
-			}
-			if (self._pointLayer)
-			{
-				var pointGraphic = self._findGraphicInLayerById(self._pointLayer, d.id);
-				if (pointGraphic)
-				{
-					pointGraphic.geometry = TF.cloneGeometry(d.geometry);
-				}
-			}
-		});
-	}
 	EsriTool.prototype.revert = function(data, type)
 	{
 		var self = this;
-		if (type === "update")
+		if (type == "update")
 		{
-			self.prepareUpdatePolygonData(data);
+			data.forEach(function(d)
+			{
+				if (self._polygonLayer)
+				{
+					var polygonGraphic = self._findGraphicInLayerById(self._polygonLayer, d.id);
+					if (polygonGraphic) polygonGraphic.geometry = TF.cloneGeometry(d.geometry);
+				}
+				if (self._pointLayer)
+				{
+					var pointGraphic = self._findGraphicInLayerById(self._pointLayer, d.id);
+					if (pointGraphic) pointGraphic.geometry = TF.cloneGeometry(d.geometry);
+				}
+
+			})
 			self.dataModel.update(data, true);
 		}
-		else if (type === "create")
+		else if (type == "create")
 		{
 			self.dataModel.delete(data);
-		}
-		else if (type === "delete")
+		} else if (type == "delete")
 		{
 			data.forEach(function(d)
 			{
@@ -1469,19 +1467,12 @@
 
 	EsriTool.prototype._clearTempDrawing = function()
 	{
-		//clearTeampDrawing
+
 	}
-	EsriTool.prototype.startPreview = function()
-	{
-		//start preview
-	}
-	EsriTool.prototype.stopPreview = function()
-	{
-		//stop preview
-	}
+	EsriTool.prototype.startPreview = function() { }
+	EsriTool.prototype.stopPreview = function() { }
 
 	EsriTool.prototype.dispose = function()
 	{
-		// dispose
 	};
 })();

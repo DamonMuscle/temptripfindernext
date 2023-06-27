@@ -1,0 +1,33 @@
+<div class="directions-info" data-bind="uiInit:init">
+	<div class="directions-details">
+		<div class="directions-elementList">
+			<!-- ko foreach: obDirectionDetails -->
+			<div class="directions-element">
+				<!-- ko if:  !$data.isCustomDirection() -->
+				<div class="symbol" data-bind="text:$data.sequence, css: $data.type,style:{'background-color':$data.backgroundColor,'color':$data.textColor}"></div>
+				<div class="text">
+					<div class="instruction" data-bind="attr: {title: $data.instruction}">
+						<span class="readonly-area" data-bind="text:$data.readOnlyArea"></span>
+						<div class="edit-area" data-bind="visible:$data.editable, click:$parent.editDirectionClick.bind($data)">
+							<input type="text" class="input-text" name="editDirection" autocomplete="off" data-bind="value:$data.editArea, visible:$data.active() && !$parent.readOnly, hasFocus:$data.active">
+							<span class="edit-text" data-bind="text:$data.editArea, attr: {title: $data.editArea}, visible:!$data.active(), css:$parent.readOnly?'':'edit-able'"></span>
+							<span class="edit-icon" data-bind="visible:!$data.active() && !$parent.readOnly"></span>
+						</div>
+					</div>
+					<div class="distance" data-bind="text:$data.distance,visible:$data.distanceNumber"></div>
+					<div class="time" data-bind="text:$data.time,visible:$data.timeNumber"></div>
+				</div>
+				<!-- /ko -->
+				<!-- ko if: !$parent.readOnly && !!$data.sequence() &&  $index() < ($parent.obDirectionDetails().length -1)  -->
+				<div class="edit-trip" data-bind="click:$parent.editTrip.bind($data, $parent), attr:{title: 'Convert Directions to Text'}"></div>
+					<textarea id="edit-area" class="edit-area edit-direction" data-bind="css:{'edit-show':$data.showEditarea}, attr:{rows:'1'}" style="height:30px"></textarea>
+				<!-- /ko -->
+				<!-- ko if:  !!$data.isCustomDirection() -->
+				<textarea class="text custom-text" data-bind="value:$data.editHtml,style:{height: $data.editareaHeight()}"></textarea>
+				<!-- /ko -->
+				<div class="vertical-line"></div>
+			</div>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>
