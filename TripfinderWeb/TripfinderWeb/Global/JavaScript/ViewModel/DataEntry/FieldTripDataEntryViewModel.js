@@ -1346,7 +1346,7 @@
 			}
 			else
 			{
-				var dateTimeValue = this.obEntityDataModel().departDate().split("T")[0] + "T" + this.obEntityDataModel().departTime().split("T")[1];
+				let dateTimeValue = `${moment(this.obEntityDataModel().departDate()).format("YYYY-MM-DD")}T${this.obEntityDataModel().departTime().split("T")[1]}`;
 				this.obEntityDataModel().departDateTime(dateTimeValue);
 			}
 		}
@@ -1358,7 +1358,7 @@
 		}
 		else
 		{
-			var dateTimeValue = this.obEntityDataModel().returnDate().split("T")[0] + "T" + this.obEntityDataModel().returnTime().split("T")[1];
+			let dateTimeValue = `${moment(this.obEntityDataModel().returnDate()).format("YYYY-MM-DD")}T${this.obEntityDataModel().returnTime().split("T")[1]}`;
 			this.obEntityDataModel().estimatedReturnDateTime(dateTimeValue);
 		}
 
