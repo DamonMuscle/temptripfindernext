@@ -18,15 +18,17 @@
 		this.stopRecords = [];
 	};
 
-	StopPoolFeatureData.prototype.query = function(refreshIds)
+	StopPoolFeatureData.prototype.query = function(refreshIds, categoryId)
 	{
 		var self = this;
-		if (!this.dataModel.selectedCategory() || !this.dataModel.selectedCategory().Id)
+		categoryId = categoryId ?? this.dataModel.selectedCategory()?.Id;
+		if (!categoryId)
 		{
 			self.stopRecords = [];
 			return Promise.resolve([]);
 		}
-		return self.queryStopPool(this.dataModel.selectedCategory().Id, refreshIds).then(function(data)
+
+		return self.queryStopPool(categoryId, refreshIds).then(function(data)
 		{
 			self.stopRecords = data;
 			return self.queryBoundary(self.stopRecords.map(function(c)
@@ -133,7 +135,7 @@
 	{
 		var data = TF.RoutingMap.BaseMapDataModel.convertServerToData(item, dataMaps);
 		data.geometry = item.geometry;
-		data.id = data.OBJECTID;
+		data.id = data.StopId;
 		if (type)
 		{
 			data.type = type;

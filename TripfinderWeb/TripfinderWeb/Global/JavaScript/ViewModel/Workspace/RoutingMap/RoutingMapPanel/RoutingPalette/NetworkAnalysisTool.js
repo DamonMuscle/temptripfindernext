@@ -193,12 +193,12 @@
 		return self.refreshTripByMultiStops(stops, false, true, isCurbApproachChange);
 	};
 
-	// calculate the start sequence and end sequene for a new stop to be smart inserted into the trip. 
+	// calculate the start sequence and end sequene for a new stop to be smart inserted into the trip.
 	NetworkAnalysisTool.prototype._getSequenceRangesToInsertStop = function(newTripStop, trip)
 	{
 		let self = this, schoolCodes = trip.TripStops.filter(s => s.SchoolCode).map(s => s.SchoolCode);
 		// RW-20666, stops needs to be placed before or after the students' school stop.
-		// KNOWN ISSUE: student might not be able to be assigned to this stop based on their cross student status, but cross status needs the trip path. 
+		// KNOWN ISSUE: student might not be able to be assigned to this stop based on their cross student status, but cross status needs the trip path.
 		let intersectedStudents = self.dataModel.candidateStudents.filter(s => tf.map.ArcGIS.geometryEngine.intersects(newTripStop.boundary.geometry, s.geometry));
 		if (intersectedStudents.length > 0)
 		{
@@ -375,7 +375,7 @@
 				{
 					if (!result.routeResults)
 					{
-						errMessage = originTripResult.errMessage;
+						errMessage = originTripResult.errMessage || result.errMessage;
 						return;
 					}
 
@@ -445,14 +445,8 @@
 
 			newTripStop.Sequence = TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.TripStops.filter(s => s.id != newTripStop.id), trip.Session, newTripStop.doorToDoorSchoolId);
 			var beforeTripStop = this._getBeforeStop(newTripStop);
-			var pathSegments = [{
-				geometry: new this._arcgis.Polyline(this._map.mapView.spatialReference).addPath([])
-			}, {
-				geometry: new this._arcgis.Polyline(this._map.mapView.spatialReference).addPath([])
-			}];
-
-			return Promise.resolve(this._notifyTripPathChange(beforeTripStop, newTripStop, pathSegments, res.errMessage));
-
+			var afterTripStop = this._getAfterStop(newTripStop);
+			return this.refreshTripByMultiStops([beforeTripStop, newTripStop, afterTripStop], false, true, true)
 		});
 	}
 
@@ -768,7 +762,7 @@
 						}
 					}
 
-					barrier.geometry = self._arcgis.webMercatorUtils.webMercatorToGeographic(curb.geometry);//there is an esri bug if geometry is 102100, so project it to 4326. 
+					barrier.geometry = self._arcgis.webMercatorUtils.webMercatorToGeographic(curb.geometry);//there is an esri bug if geometry is 102100, so project it to 4326.
 					var fullEdge = curb.attributes.Type == 0 ? true : false;
 					barrier.attributes = {
 						"FullEdge": fullEdge,
@@ -924,28 +918,7 @@
 				{
 					if (err.details.messages && err.details.messages.length > 0)
 					{
-						if (isMove)
-						{
-							tripStops.forEach(function(stop, index)
-							{
-								if (index != tripStops.length - 1)
-								{
-									stop.path = {
-										id: TF.createId(),
-										OBJECTID: 0,
-										type: "tripPath",
-										TripId: stop.tripId,
-										TripStopId: stop.id,
-										geometry: new self._arcgis.Polyline({ spatialReference: self._map.mapView.spatialReference })
-									};
-									stop.Distance = 0;
-									stop.DrivingDirections = "";
-									stop.Speed = 0;
-								}
-							})
-							return Promise.resolve({ stops: tripStops, err: self._getAlertMessage(err) });
-						}
-						if ((err.details.messages[0].indexOf("No solution found.") > 0 || err.details.messages[0].indexOf("Invalid locations detected") > 0) && !isMove && !isBestSequence && !isRecalculateTripPath && !isCurbApproachChange)
+						if (err.details.messages[0].indexOf("No solution found.") > 0 || err.details.messages[0].indexOf("Invalid locations detected") > 0)
 						{
 							tf.promiseBootbox.alert(self._getAlertMessage(err));
 							return self.refreshTripByStopsSeperately(tripStops, routeParameters);
@@ -986,35 +959,21 @@
 							Name: tripStop.Sequence ? tripStop.Sequence : index + 1,
 							SchoolLocation: tripStop.SchoolLocation
 						});
-					// var stop = new self._arcgis.Graphic(
-					// 	{
-					// 		geometry: self.getStopLocationGeom(tripStop),
-					// 		attributes:
-					// 		{
-					// 			StreetSegment: tripStop.StreetSegment,
-					// 			vehicleCurbApproach: tripStop.vehicleCurbApproach,
-					// 			SchoolLocation: tripStop.SchoolLocation
-					// 		}
-					// 	});
 					tripStopGraphics.push($.extend(true, {}, stop));
 				});
 				var routeParameters = self.initRouteParameters();
 				routeParameters.polygonBarriers = routeParams.polygonBarriers;
 				routeParameters.pointBarriers = routeParams.pointBarriers;
 				routeParameters.restrictionAttributes = routeParams.restrictionAttributes;
-				var vertexPromise = self._getVertexesCloseToStopOnPathSeperately(tripStops[index - 1], tripStops[index]);
+				let beforeStop = tripStops[index - 1] ? tripStops[index - 1] : self._getBeforeStop(tripStops[index]);
+				var vertexPromise = self._getVertexesCloseToStopOnPathSeperately(beforeStop, tripStops[index]);
 				return Promise.all([vertexPromise]).then(function(res)
 				{
 					var vertex = res[0];
-					//routeParameters = res[1];
 					if (vertex && vertex.geometry)
 					{
 						tripStopGraphics.unshift(vertex);
 					}
-					// if (vertexes[1] && vertexes[1].geometry)
-					// {
-					// 	tripStopGraphics.push(vertexes[1]);
-					// }
 					var stops = new self._arcgis.FeatureSet();
 					stops.features = self._getStops(tripStopGraphics);
 					routeParameters.stops = stops;
@@ -1359,7 +1318,7 @@
 			}
 			var attributes = {
 				curbApproach: curbApproach,
-				Name: (stop.attributes && stop.attributes.Name) ? stop.attributes.Name : parseInt(index) + 1
+				Name: parseInt(index) + 1 //RW-39325
 			};
 			attributes = self._appendNetWorkLocationAttributes(stop, attributes);
 			var _stop = new self._arcgis.Graphic(self.getStopLocationGeom(stop), null, attributes);
@@ -1917,7 +1876,7 @@
 			{
 				routeParameters.impedanceAttribute = "Length";
 			}
-			else 
+			else
 			{
 				routeParameters.impedanceAttribute = "Time";
 			}

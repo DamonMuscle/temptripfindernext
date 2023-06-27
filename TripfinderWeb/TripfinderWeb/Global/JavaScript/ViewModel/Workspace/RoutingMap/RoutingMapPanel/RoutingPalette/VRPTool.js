@@ -60,17 +60,32 @@
 		var tripStops = [], newTrips = [];
 		trips.forEach(function(trip)
 		{
-			tripStops = tripStops.concat(trip.TripStops.filter(function(stop) { return (!stop.SchoolCode || stop.SchoolCode.length == 0) && (stop.Sequence != 1) && (stop.Sequence != trip.TripStops.length) }));
 			var newTrip = $.extend(true, {}, trip);
-			newTrip.TripStops = trip.TripStops.filter(function(stop) { return (stop.SchoolCode && stop.SchoolCode.length > 0) || stop.Sequence == 1 || stop.Sequence == trip.TripStops.length });
+			if (trip.Session == 3)
+			{
+				// VRP for both trip, the depots is last from school stop and first to school stop, the orders is general stops
+				newTrip.SchoolTripStops = trip.TripStops.filter(stop => stop.SchoolCode);
+				let groups = Enumerable.From(newTrip.SchoolTripStops).GroupBy(stop => stop.SchoolCode);
+				let firstSchoolStop = groups.Select(g => g.source.sort((a, b)=> a.Sequence > b.Sequence ? 1: -1)[0]).OrderBy(stop => stop.Sequence).Last();
+				let lastSchoolStop = groups.Select(g => g.source.sort((a, b)=> a.Sequence < b.Sequence ? 1: -1)[0]).OrderBy(stop => stop.Sequence).First();
+				newTrip.TripStops = [firstSchoolStop, lastSchoolStop];
+				tripStops = tripStops.concat(trip.TripStops.filter(stop => !stop.SchoolCode));
+			}
+			else
+			{
+				tripStops = tripStops.concat(trip.TripStops.filter(function(stop) { return !stop.SchoolCode && (stop.Sequence != 1) && (stop.Sequence != trip.TripStops.length) }));
+				newTrip.TripStops = trip.TripStops.filter(function(stop) { return stop.SchoolCode || stop.Sequence == 1 || stop.Sequence == trip.TripStops.length });
+			}
+
 			newTrips.push(newTrip);
 		});
 		if (tripStops.length == 0) return Promise.resolve(trips.map(function(trip) { return trip.TripStops; }));
-		var requiredStops = trips[0].TripStops.filter(function(stop) { return (stop.SchoolCode && stop.SchoolCode.length > 0) || stop.Sequence == 1 || stop.Sequence == trips[0].TripStops.length });
+		var requiredStops = newTrips[0].TripStops;
 		var maxNumberofNewTrips = newTrips.length + 10;//tripStops.length - newTrips.length > 100 ? 100 : tripStops.length - newTrips.length;
+		let baseId = TF.createId(); // baseId should be same, if not, sometimes the TF.createId() + i should be same by different trips
 		for (var i = 0; i < maxNumberofNewTrips; i++)
 		{
-			var tripId = TF.createId() + i;
+			var tripId = baseId + i;
 			var _stops = requiredStops.map(function(stop, i)
 			{
 				var newStop = $.extend(true, {}, stop);
@@ -85,21 +100,52 @@
 		var tripSession = trips[0].Session;
 		if (tripSession > 1)
 		{
-			return self.getVRPSequence(tripStops, newTrips, drawTool, trips).then(function(results)
-			{
+			// Calculate timeToLastStop
+			let promises = [];
+			promises.push(self._getTimeFromCurrentFirstToTripFirst(newTrips[0].TripStops[0], trips[0].TripStops[0]));
+			promises.push(self._getTimeFromCurrentLastToTripLast(newTrips[0].TripStops[newTrips[0].TripStops.length - 1], trips[0].TripStops[trips[0].TripStops.length - 1]));
+			return Promise.all(promises).then(timeToLastStop => {
+				return self.getVRPSequence(tripStops, newTrips, drawTool, trips, timeToLastStop[0] + timeToLastStop[1]).then(function(results)
+				{
+					if (!results)
+					{
+						tf.loadingIndicator.tryHide();
+						return tf.promiseBootbox.alert("VRP calculation failed!");
+					}
+					var vrpData = [];
+					self._getCurrentTrips(results, currentTrips, drawTool).forEach(function(trip)
+					{
+						// Includes other school stops which are not calculated in VRP
+						if (trip.SchoolTripStops)
+						{
+							let beforeSchoolStops = [], afterSchoolStops = [], isBeforeSchoolStop = true;
+							trip.SchoolTripStops.forEach(stop => {
+								var existingStop = trip.TripStops.filter(_stop => _stop.id == stop.id)[0];
+								if (!existingStop)
+								{
+									if (isBeforeSchoolStop)
+									{
+										beforeSchoolStops.push(stop);
+									}
+									else
+									{
+										afterSchoolStops.push(stop);
+									}
+								}
+								else
+								{
+									isBeforeSchoolStop = false;
+								}
+							});
 
-				if (!results)
-				{
-					tf.loadingIndicator.tryHide();
-					return tf.promiseBootbox.alert("VRP calculation failed!");
-				}
-				var vrpData = [];
-				self._getCurrentTrips(results, currentTrips, drawTool).forEach(function(trip)
-				{
-					if (trip.TripStops.length > requiredStops.length) { vrpData.push(trip.TripStops) }
+							trip.TripStops = beforeSchoolStops.concat(trip.TripStops).concat(afterSchoolStops);
+						}
+
+						if (trip.TripStops.length > requiredStops.length) { vrpData.push(trip.TripStops) }
+					})
+					return vrpData;
 				})
-				return vrpData;
-			})
+			});		
 		}
 		var resolve = null;
 		var promise = new Promise(function(solve) { resolve = solve; });
@@ -108,7 +154,6 @@
 		if (tripSession == 1) schools = schools.reverse();
 		var schoolCount = schools.length;
 		var schoolCodes = schools.map(function(stop) { return stop.SchoolCode });
-
 
 		var i = 0, remainingStops = $.extend(true, [], tripStops), calculatedStops = [];
 		function vrpRequest()
@@ -165,7 +210,6 @@
 			}
 		}
 
-
 		return vrpRequest().then(function(results)
 		{
 			if (!results)
@@ -181,10 +225,42 @@
 				{
 					vrpData.push(trip.TripStops);
 				}
-			})
+			});
+
+			self._resolveFirstOrLastStopStudents(vrpData);
 			return vrpData;
 		})
-	}
+	};
+
+	// remove duplicated assigned students because first and last stop should not be changed during optimizing trip
+	VRPTool.prototype._resolveFirstOrLastStopStudents = function(vrpData)
+	{
+		if (vrpData.length > 1)
+		{
+			let firstTrip = vrpData[0], firstTripStop = firstTrip[0], toSchool = true;
+			if (firstTripStop.SchoolCode)
+			{
+				firstTripStop = firstTrip[firstTrip.length - 1];
+				toSchool = false;
+			}
+
+			let assignedStudents = {};
+			firstTripStop.Students.forEach(s =>
+			{
+				if (s.IsAssigned)
+				{
+					assignedStudents[s.id] = true;
+				}
+			});
+
+			var otherTrips = vrpData.slice(1);
+			otherTrips.forEach(t =>
+			{
+				let stop = toSchool ? t[0] : t[t.length - 1];
+				stop.Students = stop.Students.filter(s => !assignedStudents[s.id]);
+			});
+		}
+	};
 
 	VRPTool.prototype._getTimeFromCurrentFirstToTripFirst = function(currentFirstStop, originFirstStop)
 	{

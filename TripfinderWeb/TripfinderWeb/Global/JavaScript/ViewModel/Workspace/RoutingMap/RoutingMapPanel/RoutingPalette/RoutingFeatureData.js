@@ -212,10 +212,6 @@
 	RoutingFeatureData.prototype._createFeatureData = function(url, dataMaps, type)
 	{
 		var self = this;
-
-		//TODO: This is Temp Solution.
-		//url = TF.getOnlineUrl(url);
-
 		var featureData = new TF.RoutingMap.FeatureDataModel(
 			{
 				url: url,

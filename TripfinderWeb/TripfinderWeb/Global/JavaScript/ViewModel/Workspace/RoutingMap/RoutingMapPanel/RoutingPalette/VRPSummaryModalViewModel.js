@@ -10,7 +10,7 @@
 		this.contentTemplate("workspace/Routing Map/RoutingMapPanel/RoutingPalette/VRPSummary");
 		this.buttonTemplate("modal/PositiveNegativeOther");
 		this.obPositiveButtonLabel("Apply");
-		this.obOtherButtonLabel("Open in New Map Canvas");
+		this.obOtherButtonLabel("Compare and open in new map canvas");
 		this.viewModel = new TF.RoutingMap.RoutingPalette.VRPSummaryViewModel(options);
 		this.data(this.viewModel);
 	}

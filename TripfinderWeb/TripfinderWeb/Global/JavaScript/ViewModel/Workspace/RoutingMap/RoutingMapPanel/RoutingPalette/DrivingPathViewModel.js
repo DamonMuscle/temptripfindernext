@@ -10,6 +10,11 @@
 			return "23:59:59";
 		}
 
+		if (duration.milliseconds() > 500)
+		{
+			// keep consistent to api recalculate value
+			duration.add(1, 'second');
+		}
 		return duration.hours() + ":" + twoIntegerDigitsFormat.format(duration.minutes()) + ":" + twoIntegerDigitsFormat.format(duration.seconds());
 	}
 
@@ -21,12 +26,12 @@
 		self.isImperialUnit = tf.measurementUnitConverter.isImperial();
 		self.avgSpeed = ko.observable(tripStop.Speed);
 		self.distance = ko.observable(tripStop.Distance.toFixed(2));
-		if(self.isImperialUnit)
+		if (self.isImperialUnit)
 		{
 			self.avgSpeed = ko.observable(tf.measurementUnitConverter.convert({
 				originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 				targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Imperial,
-				precision: 2,
+				precision: 5,
 				value: self.tripStop.Speed
 			}));
 
@@ -37,7 +42,7 @@
 				value: self.tripStop.Distance
 			}));
 		}
-		
+
 		self.duration = ko.pureComputed(function()
 		{
 			if (!self.avgSpeed())
@@ -45,7 +50,7 @@
 				return "23:59:59";
 			}
 
-			var duration = self.tripStop.Distance / self.avgSpeed();
+			var duration = self.distance() / self.avgSpeed();
 			duration = moment.duration(duration, "hours");
 			return durationToHms(duration);
 		});
@@ -153,12 +158,12 @@
 			{
 				self.routingDirectionDetailViewModel.applyDirection([self.tripStop]);
 				let avgSpeed = self.avgSpeed();
-				if(self.isImperialUnit)
+				if (self.isImperialUnit)
 				{
 					avgSpeed = tf.measurementUnitConverter.convert({
 						originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Imperial,
 						targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
-						precision: 2,
+						precision: 5,
 						value: avgSpeed
 					});
 				}

@@ -1286,9 +1286,10 @@
 
 	RoutingTripMapTool.prototype._intersectWithCurrentPolygons = function(g)
 	{
-		var self = this,
+		let self = this,
 			intersectGeometries = [];
-		var graphics = self._polygonLayer.graphics.items;
+		let editTripIds = self.dataModel.trips.filter(r=> r.OpenType == "Edit" && r.Id > 0).map(r=> r.Id);
+		let graphics = self._polygonLayer.graphics.items.filter(r=> r.attributes.dataModel.OBJECTID == 0 || !editTripIds.indexOf(r.attributes.dataModel.TripId));
 
 		graphics.map(function(graphic)
 		{
@@ -1646,7 +1647,7 @@
 			});
 			TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
 		});
-	};
+	};	
 
 	RoutingTripMapTool.prototype.createDoorToDoorStop = function(student)
 	{
@@ -1694,7 +1695,7 @@
 					self._pointLayer.remove(self._newTripStopGraphic);
 				}
 			});
-		});
+		});			
 	};
 
 	RoutingTripMapTool.prototype.copyToTripStop = function(tripStop)

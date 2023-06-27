@@ -1035,6 +1035,7 @@
 			if (afterStop && (!afterStop.SchoolCode || afterStop.SchoolCode.length == 0)
 				&& StudentCrossChangesStops.filter(function(c) { return c.id == afterStop.id; }).length == 0 && !afterStop.solvePathGeometryNotChange)
 			{
+				afterStop.boundary.isNotCreate = true;
 				StudentCrossChangesStops.push(afterStop);
 			}
 		});
@@ -1097,12 +1098,14 @@
 			}
 			for (var i = 0; i < tripStops.length; i++)
 			{
+				var solvePathGeometryNotChange = true;
 				if (prevStop && (tripStops[i].id == prevStop.id))
 				{
 					tripStops[i].path = prevStop.path;
 					tripStops[i].DrivingDirections = prevStop.DrivingDirections;
 					tripStops[i].RouteDrivingDirections = tripStops[i].DrivingDirections;
 					tripStops[i].IsCustomDirection = false;
+					solvePathGeometryNotChange = false;
 				} else if (currentStop && tripStops[i].id == currentStop.id)
 				{
 					tripStops[i].path = currentStop.path;
@@ -1110,17 +1113,14 @@
 					tripStops[i].DrivingDirections = currentStop.DrivingDirections;
 					tripStops[i].RouteDrivingDirections = tripStops[i].DrivingDirections;
 					tripStops[i].IsCustomDirection = false;
+					solvePathGeometryNotChange = false;
 				} else if (tripStops[i].Sequence >= startSequence)
 				{
 					tripStops[i].Sequence = ++startSequence;
 					sequenceChanges.push(tripStops[i]);
 				}
-				tripStops[i].prevSolvePathGeometry = self.viewModel.drawTool.NAtool.stopTool.getOppositePoint(tripStops[i].geometry, tripStops[i].StreetSegment?.geometry);
-				tripStops[i].currentSolvePathGeometry = self.viewModel.drawTool.NAtool.stopTool.getOppositePoint(tripStops[i].geometry, tripStops[i].StreetSegment?.geometry);
-				if (tripStops[i].prevSolvePathGeometry && tripStops[i].currentSolvePathGeometry && (tripStops[i].prevSolvePathGeometry.x == tripStops[i].currentSolvePathGeometry.x))
-				{
-					tripStops[i].solvePathGeometryNotChange = true;
-				}
+
+				tripStops[i].solvePathGeometryNotChange = solvePathGeometryNotChange;
 			}
 			self.dataModel.getTripById(tripStop.TripId).TripStops = self._sortTripStops(tripStops);
 			PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), tripStops);
@@ -1208,7 +1208,8 @@
 			}
 			if (tripStop.unassignStudent && tripStop.unassignStudent.length > 0) students = tripStop.unassignStudent;
 
-			studentTripStops.push({ students: students, tripStop: tripStop });
+			studentTripStops.push({ students: students, tripStop: tripStop, isNotCreate: boundary.isNotCreate });
+			boundary.isNotCreate = undefined;
 			// change assign student cross status
 			promiseList.push(self.dataModel.calculateStudentCrossStatus(tripStop, tripStop.Students, false, trip, true));
 		});
@@ -1216,6 +1217,12 @@
 		// assign new student in boundary
 		if (autoAssign)
 		{
+			var autoAssignSetting = tf.storageManager.get("notAutoAssignUnassignedStudent") === false;
+			if (!autoAssignSetting)
+			{
+				// for create or createMultiple, autoAssign is always true, but not all studentTripStops are new data, so need to read setting and filter studentTripStops.
+				studentTripStops = studentTripStops.filter(i => !i.isNotCreate);
+			}
 			promiseList.push(self.dataModel.assignStudentMultiple(studentTripStops, notifyEvent, null, notifyMapEvent, trip, autoAssign, null, null, false));
 		}
 

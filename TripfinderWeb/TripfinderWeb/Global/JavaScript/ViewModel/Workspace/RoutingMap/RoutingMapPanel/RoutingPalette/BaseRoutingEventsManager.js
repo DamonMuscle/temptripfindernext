@@ -303,7 +303,7 @@
 				{
 					var value = stop[prop];
 					delete stop[prop];
-					stop[prop.replace(/[ ]+/g, "").replace(/[#]+/g, "Number").trim().toLowerCase()] = value;
+					stop[prop.replace(/[ ]+/g, "").replace(/[#]+/g, "Number").replace(/[/]|[\\]+/g, "_").trim().toLowerCase()] = value;
 				}
 			}
 		});

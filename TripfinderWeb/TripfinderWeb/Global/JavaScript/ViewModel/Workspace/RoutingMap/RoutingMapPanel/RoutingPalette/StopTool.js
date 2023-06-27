@@ -914,18 +914,17 @@
 
 	StopTool.prototype.getDoorToDoorLocationForStudent = function(student, streets)
 	{
-		var self = this;
-		return self.findClosestLocationOnStreetForDoorToDoor({ geometry: student.geometry, address: student.address }, streets).then(function(result)
+		return this.findClosestLocationOnStreetForDoorToDoor({ geometry: student.geometry, address: student.address }, streets).then(result =>
 		{
 			if (result)
 			{
 				var stopLocation = result.geometry;
-				var midPoint = self.getDoorToDoorLocation(stopLocation, student.geometry);
+				var midPoint = this.getDoorToDoorLocation(stopLocation, student.geometry);
 				return Promise.resolve(midPoint);
 			}
 			return Promise.resolve(student.geometry);
 		});
-	};
+	}
 
 	StopTool.prototype.getDoorToDoorLocation = function(streetPointGeometry, studentGeometry)
 	{

@@ -82,17 +82,7 @@
 
 	UnassignedStudentDataModel.prototype.sortSelected = function(source)
 	{
-		return source.sort(function(a, b)
-		{
-			if (a.LastName > b.LastName)
-			{
-				return 1;
-			} else if (a.LastName < b.LastName)
-			{
-				return -1;
-			}
-			return 0;
-		});
+		return Enumerable.From(source).OrderBy(r => r.LastName).ThenBy(r => r.FirstName).ToArray();
 	};
 
 	UnassignedStudentDataModel.prototype._getDataModelItems = function(items)

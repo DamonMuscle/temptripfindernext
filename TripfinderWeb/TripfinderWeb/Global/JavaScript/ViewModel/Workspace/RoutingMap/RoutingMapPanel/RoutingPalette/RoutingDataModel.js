@@ -136,7 +136,7 @@
 
 	RoutingDataModel.prototype.getExceptions = function(stopId)
 	{
-		return (this.getTripStop(stopId).Students || [])
+		return ((this.getTripStop(stopId) || {}).Students || [])
 			.filter(s => !s.RequirementID)
 			.concat((this.expiredExceptions[stopId] || []).filter(e => e.TripStopID == stopId));
 	};
@@ -2348,7 +2348,7 @@
 		var calculateList = [];
 		students.forEach(function(student)
 		{
-			if (typeof student.CrossToStop != "boolean" || useBefore == false)
+			if ((student.XCoord != 0 && student.YCoord != 0 && student.RequirementID) && (typeof student.CrossToStop != "boolean" || useBefore == false))
 			{
 				calculateList.push(student);
 			}
@@ -4226,7 +4226,8 @@
 						return tripStopEntity.student;
 					});
 					studentList.push(students);
-					promiseList.push(self.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, students, true, trip));
+					let needCalcuAcrossStreetStudents = students.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
+					promiseList.push(self.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, needCalcuAcrossStreetStudents, true, trip));
 				}
 			});
 		}
@@ -4250,7 +4251,8 @@
 						if (students.length != 0)
 						{
 							studentList.push(students);
-							promiseList.push(self.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, students, true));
+							let needCalcuAcrossStreetStudents = students.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
+							promiseList.push(self.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, needCalcuAcrossStreetStudents, true));
 						}
 					}
 				}
@@ -5544,10 +5546,12 @@
 
 	RoutingDataModel.prototype.getStudentRemoveCrosser = function(stop, newAssignStudents, trip, isAssignStudent)
 	{
-		var self = this;
-		var allNewAssignStudents = newAssignStudents.slice();
+		let self = this;
+		let allNewAssignStudents = newAssignStudents.slice();
+		// exclude the ungeocode and exception student.
+		let needCalcuAcrossStreetStudents = allNewAssignStudents.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
 
-		return self.viewModel.drawTool.NAtool._getAcrossStreetStudents(stop, allNewAssignStudents, null, trip, isAssignStudent).then(function(results)
+		return self.viewModel.drawTool.NAtool._getAcrossStreetStudents(stop, needCalcuAcrossStreetStudents, null, trip, isAssignStudent).then(function(results)
 		{
 			var crossStudentIds = results[0];
 			var stopCrossStudentIds = results[3] || [];
@@ -5743,6 +5747,12 @@
 			return Promise.reject();
 		}
 
+		if (name.length > 150)
+		{
+			tf.promiseBootbox.alert("Trip name should be less than 151 characters.");
+			return Promise.reject();
+		}
+
 		return Promise.resolve(Enumerable.From(self.trips).Any(function(c) { return c.Name == name && c.Id != tripId; }))
 			.then(function(nameDuplicate)
 			{
@@ -5928,7 +5938,7 @@
 			}, lockInfo);
 		});
 
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RoutingStudentLockDatas"), {
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "RoutingStudentLockDatas"), {
 			data: lockInfos
 		}).then(function(data)
 		{
@@ -5987,7 +5997,7 @@
 			});
 		});
 
-		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RoutingStudentLockDatas"), {
+		return tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(), "RoutingStudentLockDatas"), {
 			data: lockInfos
 		});
 	};
@@ -5995,10 +6005,10 @@
 	/**
 	* unlock routing student when close trip
 	*/
-	RoutingDataModel.unLockRoutingStudentByTrip = function(tripId, dbid)
+	RoutingDataModel.unLockRoutingStudentByTrip = function(tripId)
 	{
-		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "RoutingStudentLockDatas"), {
-			paramData: { tripId: tripId, dbid: dbid || tf.datasourceManager.databaseId }
+		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "RoutingStudentLockDatas"), {
+			paramData: { tripId: tripId }
 		});
 	};
 

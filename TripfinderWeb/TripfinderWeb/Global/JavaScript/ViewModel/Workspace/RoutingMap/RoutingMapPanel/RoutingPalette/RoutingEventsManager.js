@@ -1267,7 +1267,6 @@ This action cannot be undone.  Do you wish to continue?`;
 					return self._solveRouteSchoolLocations(newTripStops, trips);
 				}).then(function(newTripStops)
 				{
-					tf.loadingIndicator.tryHide();
 					if (newTripStops) PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), newTripStops);
 					self._displayVRPRoute(newTripStops, data);
 				});
@@ -1345,7 +1344,11 @@ This action cannot be undone.  Do you wish to continue?`;
 
 	RoutingEventsManager.prototype._displayVRPRoute = function(newTripStops, trips)
 	{
-		if (!newTripStops || !$.isArray(newTripStops)) return;
+		if (!newTripStops || !$.isArray(newTripStops))
+		{
+			tf.loadingIndicator.tryHide();
+			return;
+		}
 		var self = this;
 		self._getResultTrips(newTripStops, trips);
 		var oldTrips = self.copyTrips(trips);
@@ -1478,13 +1481,16 @@ This action cannot be undone.  Do you wish to continue?`;
 				tf.modalManager.showModal(
 					new TF.RoutingMap.RoutingPalette.VRPSummaryModalViewModel({
 						newTrips: newTripDataList,
-						oldTrips: oldTripDataList
+						oldTrips: oldTripDataList,
+						onUiInit: function()
+						{
+							tf.loadingIndicator.tryHide();
+						}
 					})
 				).then(function(res)
 				{
 					if (res)
 					{
-
 						tf.loadingIndicator.show();
 						self._createNewTripForNotSolvedStops(oldTrips, newTrips).then(function(notSolvedTrip)
 						{
@@ -1512,7 +1518,10 @@ This action cannot be undone.  Do you wish to continue?`;
 										});
 									});
 								});
-								tf.documentManagerViewModel.add(new TF.Document.DocumentData(TF.Document.DocumentData.RoutingMap, { type: 'RoutingMap', tabName: 'Routing Map', trips: newTrips }));
+								tf.documentManagerViewModel.add(new TF.Document.DocumentData(TF.Document.DocumentData.RoutingMap, { type: 'RoutingMap', tabName: 'Routing Map', trips: newTrips, autoOpen: false })).then((routeState) =>
+								{
+									self.viewModel.dataModel._viewModal.RoutingMapTool.compareMapCanvasTool.openCompareMapCanvasByRouteState(routeState);
+								});
 							}
 							else
 							{
@@ -1580,6 +1589,27 @@ This action cannot be undone.  Do you wish to continue?`;
 		// create new trips
 		newTrips.slice(oldTrips.length, newTrips.length).forEach(function(trip)
 		{
+			let schoolStops = {};
+			trip.TripStops.forEach(s =>
+			{
+				if (s.SchoolCode)
+				{
+					s.id = TF.createId();
+					schoolStops[s.SchoolCode] = s.id;
+				}
+			});
+
+			trip.TripStops.forEach(s =>
+			{
+				if (!s.SchoolCode)
+				{
+					s.Students.forEach(stu =>
+					{
+						stu.AnotherTripStopID = schoolStops[stu.SchoolCode];
+					});
+				}
+			});
+
 			self.dataModel.createNewTrip(trip);
 			self.dataModel.refreshOptimizeSequenceRate(trip.id);
 		});

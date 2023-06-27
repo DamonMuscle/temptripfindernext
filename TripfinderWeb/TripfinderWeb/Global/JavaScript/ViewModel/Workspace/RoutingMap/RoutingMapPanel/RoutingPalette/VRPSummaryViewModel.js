@@ -5,6 +5,7 @@
 	function VRPSummaryViewModel(options)
 	{
 		var self = this;
+		self.options = options;
 		self.newTrips = options.newTrips.sort(function(a, b) { return a.name > b.name ? 1 : -1; });
 		self.oldTrips = options.oldTrips.sort(function(a, b) { return a.name > b.name ? 1 : -1; });
 		self.obData = ko.observableArray([]);
@@ -80,6 +81,7 @@
 		self.notSolved.students(total.students.old - total.students.new);
 		var notSolveStops = (total.stops.old - self.oldTrips.length * 2) - (total.stops.new - self.newTrips.length * 2) - deleteStops; // total.stops.old - 2 - (total.stops.new - array.length * 2);
 		self.notSolved.stops(notSolveStops);
+		self.options.onUiInit && self.options.onUiInit();
 	};
 
 	VRPSummaryViewModel.prototype.getEntityModel = function()

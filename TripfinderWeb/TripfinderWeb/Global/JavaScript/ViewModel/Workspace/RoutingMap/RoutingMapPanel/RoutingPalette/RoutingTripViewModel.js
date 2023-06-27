@@ -188,7 +188,7 @@
 			tf.shortCutKeys.unbind("enter", Math.random().toString(36).substring(7));
 			$(".modal-body").on("keypress", event =>
 			{
-				if (event.keyCode === 13 && $(".trip-tab").hasClass("active"))
+				if (event.keyCode === 13 && $(".trip-tab").hasClass("active") && !$(event.target).is("textarea"))
 				{
 					this.apply();
 				}
@@ -1898,6 +1898,7 @@ This action cannot be undone.  Do you wish to continue?`;
 				}
 			}
 
+			newTripStops = newTripStops.filter(i => !!i);
 			// newTripStops[newTripStops.length - 1].path = {};
 			if (newTripStops.length > 0)
 			{

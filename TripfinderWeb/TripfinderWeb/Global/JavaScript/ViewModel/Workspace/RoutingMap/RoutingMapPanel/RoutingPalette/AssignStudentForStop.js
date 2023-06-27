@@ -113,6 +113,7 @@
 				});
 				bindLockInfo(trip, allStudent, []);
 				options.validation = verifyStudentDay;
+				options.showUngeocodedStudent = true;
 				let exceptionData = trip.Session !== TF.SessionType.Shuttle ? { trip: trip, tripStop: tripStop } : null
 				return tf.modalManager.showModal(new TF.Modal.KendoListMoverModalViewModel(data[0].Items, data[1].Items, data[2].Items, options, undefined, undefined, assignStudents, unAssignedStudents, exceptionData))
 					.then(function(editStudentViewModel)
@@ -524,7 +525,7 @@
 						UnitOfMeasureSupported: true,
 					}
 				],
-				sort:[{ field: "LastName", dir: "asc" }, { field: "FirstName", dir: "asc" }],
+				sort: [{ field: "LastName", dir: "asc" }, { field: "FirstName", dir: "asc" }],
 				filterable: false,
 			},
 			// left grid item can select to right grid or not

@@ -119,7 +119,7 @@
 		var self = this;
 		return self.featureData.query().then(function(items)
 		{
-			// set default vehicle curb approach value temporarily, will delete after T2 add this field to table. 
+			// set default vehicle curb approach value temporarily, will delete after T2 add this field to table.
 			items.forEach(function(item)
 			{
 				item.vehicleCurbApproach = 1;
@@ -167,7 +167,7 @@
 	};
 	/**
 	 * delete category
-	 * @param {number} id 
+	 * @param {number} id
 	 */
 	StopPoolDataModel.prototype.deleteCategory = function(id)
 	{
@@ -228,7 +228,7 @@
 
 	StopPoolDataModel.prototype.update = function(modifyDataArray)
 	{
-		var self = this;
+		var self = this, updateData = [];
 		self._viewModal.revertMode = "update-StopPool";
 		self._viewModal.revertData = [];
 		if (!$.isArray(modifyDataArray))
@@ -239,20 +239,24 @@
 		{
 			var data = self.findById(modifyData.id);
 			self.insertToRevertData(data);
-			$.extend(data, modifyData);
-			if (modifyData.geometry)
+			if (!TF.equals(data.boundary, modifyData.boundary, false))
 			{
-				data.geometry = TF.cloneGeometry(modifyData.geometry);
-			}
+				$.extend(data, modifyData);
+				if (modifyData.geometry)
+				{
+					data.geometry = TF.cloneGeometry(modifyData.geometry);
+				}
 
-			if (modifyData.boundary.geometry)
-			{
-				data.boundary.geometry = TF.cloneGeometry(modifyData.boundary.geometry);
+				if (modifyData.boundary.geometry)
+				{
+					data.boundary.geometry = TF.cloneGeometry(modifyData.boundary.geometry);
+				}
+				self.updateStudent(data);
+				self.featureData.update(data);
+				updateData.push(data);
 			}
-			self.updateStudent(data);
-			self.featureData.update(data);
 		});
-		self.onAllChangeEvent.notify({ add: [], edit: modifyDataArray, delete: [] });
+		if (updateData.length > 0) self.onAllChangeEvent.notify({ add: [], edit: updateData, delete: [] });
 		self.calcSelfChangeCount();
 	};
 

@@ -522,10 +522,16 @@
 				trips[i].NumTransport = tripData[i].NumTransport;
 				trips[i].MaxOnBus = tripData[i].MaxOnBus;
 				trips[i].Distance = tripData[i].Distance;
-				for (var j = 0; j < trips[i].TripStops.length; j++)
+				let tripDataTrip = tripData.find(r => r.id == trips[i].id);
+				if (tripDataTrip)
 				{
-					trips[i].TripStops[j].TotalStopTime = tripData[i].TripStops[j].TotalStopTime;
-					trips[i].TripStops[j].Duration = tripData[i].TripStops[j].Duration;
+					for (var j = 0; j < trips[i].TripStops.length; j++)
+					{
+						let tripDataStop = tripDataTrip.TripStops.find(n => n.id == trips[i].TripStops[j].id);
+						if (!tripDataStop) { continue; }
+						trips[i].TripStops[j].TotalStopTime = tripDataStop.TotalStopTime;
+						trips[i].TripStops[j].Duration = tripDataStop.Duration;
+					}
 				}
 				self.dataModel.setActualStopTime([trips[i]]);
 				self.dataModel.setStopTimeForEmptyRecords(trips[i]);
@@ -732,63 +738,72 @@
 					clearTimeout(self.treeviewDataBoundTimer);
 				}
 
-				const delay = self.treeview ? 100 : 0;
-				self.treeviewDataBoundTimer = setTimeout(() =>
+				if (!self.treeview)
 				{
-					self.treeviewDataBoundTimer = null;
-					if (e.node)
-					{
-						self.setLineColorAndStyle(e.node);
-						self.bindEventAndCustomElement(e.node);
-						return;
-					}
+					initTree(e);
+					return;
+				}
 
-					var tripNodes = self.viewModel.$element.find('#routingtreeview > ul > li');
-					tripNodes.prepend('<div class="icon close-current-item" title="Close"></div>');
-					self.viewModel.$element.find('#routingtreeview > ul').removeClass('k-group k-treeview-lines').addClass('km-fix-color-palette-position k-group k-treeview-lines');
-					tripNodes.map(function(index, tripNode)
-					{
-						var $tripColor = $(tripNode).find('.trip-color');
-						if ($tripColor.data('kendoColorPicker'))
-						{
-							return;
-						}
-
-						self.treeview = routingtreeview.data('kendoTreeView');
-						var dataItem = self.treeview.dataItem(tripNode);
-						var color = dataItem.customData.color;
-						$tripColor.kendoColorPicker({
-							buttons: false,
-							change: function(e)
-							{
-								self.routingDisplayHelper.setSequenceLineColor(e.value, tripNode, 'trip');
-								self.dataModel.changeTripColor(dataItem.id, e.value);
-							},
-							value: color,
-							open: function(e)
-							{
-								$(e.sender.element.closest('li')).attr('suspend', 'true');
-							}
-						});
-
-						self.koBindTripNode(tripNode, dataItem);
-					});
-					self.routingDisplayFixTitle.init({ scrollContainer: routingtreeview.closest("div.list-container"), fixElements: tripNodes.children("div") });
-					//disable double click expand or collapse
-					routingtreeview.data('kendoTreeView').items().each(function(i, el)
-					{
-						$(el).on("dblclick", function(event)
-						{
-							return false;
-						});
-					});
-
-					var $closeButton = routingtreeview.find(".icon.close-current-item");
-					$closeButton.off('click').on('click', closeClick.bind(self));
-					self.viewModel.analyzeTripByDistrictPolicy._displayWarning();
-				}, delay);
+				// Avoid updating the treeview UI too often
+				const delay = 100;
+				self.treeviewDataBoundTimer = setTimeout(() => initTree(e), delay);
 			}
 		});
+
+		function initTree(e)
+		{
+			self.treeviewDataBoundTimer = null;
+			if (e.node)
+			{
+				self.setLineColorAndStyle(e.node);
+				self.bindEventAndCustomElement(e.node);
+				return;
+			}
+
+			var tripNodes = self.viewModel.$element.find('#routingtreeview > ul > li');
+			tripNodes.prepend('<div class="icon close-current-item" title="Close"></div>');
+			self.viewModel.$element.find('#routingtreeview > ul').removeClass('k-group k-treeview-lines').addClass('km-fix-color-palette-position k-group k-treeview-lines');
+			tripNodes.map(function(index, tripNode)
+			{
+				var $tripColor = $(tripNode).find('.trip-color');
+				if ($tripColor.data('kendoColorPicker'))
+				{
+					return;
+				}
+
+				self.treeview = routingtreeview.data('kendoTreeView');
+				var dataItem = self.treeview.dataItem(tripNode);
+				var color = dataItem.customData.color;
+				$tripColor.kendoColorPicker({
+					buttons: false,
+					change: function(e)
+					{
+						self.routingDisplayHelper.setSequenceLineColor(e.value, tripNode, 'trip');
+						self.dataModel.changeTripColor(dataItem.id, e.value);
+					},
+					value: color,
+					open: function(e)
+					{
+						$(e.sender.element.closest('li')).attr('suspend', 'true');
+					}
+				});
+
+				self.koBindTripNode(tripNode, dataItem);
+			});
+			self.routingDisplayFixTitle.init({ scrollContainer: routingtreeview.closest("div.list-container"), fixElements: tripNodes.children("div") });
+			//disable double click expand or collapse
+			routingtreeview.data('kendoTreeView').items().each(function(i, el)
+			{
+				$(el).on("dblclick", function(event)
+				{
+					return false;
+				});
+			});
+
+			var $closeButton = routingtreeview.find(".icon.close-current-item");
+			$closeButton.off('click').on('click', closeClick.bind(self));
+			self.viewModel.analyzeTripByDistrictPolicy._displayWarning();
+		}
 
 		function closeSchoolLocation(node)
 		{
@@ -903,7 +918,8 @@
 			(function(key)
 			{
 				var tripStop = self.dataModel.getTripStopByStopId(key);
-				promises.push(self.dataModel.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, tripStopIds[key].entities, true).then(function(crossStudentArray)
+				let needCalcuAcrossStreetStudents = tripStopIds[key].entities.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
+				promises.push(self.dataModel.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, needCalcuAcrossStreetStudents, true).then(function(crossStudentArray)
 				{
 					tripStopIds[key].nodes.map(function(student)
 					{
@@ -1619,14 +1635,23 @@
 		}
 		else if (data.level() == 2)
 		{
-			if (data.customData.geometry.x == 0)
+			let message = "";
+			if (data.customData.geometry.x === 0)
 			{
-				return tf.promiseBootbox.alert(
-					{
-						message: "Cannot zoom to ungeocoded student.",
-						title: "Warning"
-					});
+				message = "Cannot zoom to ungeocoded student.";
+			} else if (!data.customData.requirementId)
+			{
+				message = "Cannot zoom to a student exception record.";
 			}
+
+			if (message !== "")
+			{
+				return tf.promiseBootbox.alert({
+					message: message,
+					title: "Warning"
+				});
+			}
+
 			type = 'student';
 		}
 		this.eventsManager.zoomClick(data, type);
@@ -3385,8 +3410,11 @@
 						treeview.remove(treeview.findByUid(deleteTrip[0].uid));
 						self.cleanRemovedTreeViewItem(deletingDom, deleteTrip[0]);
 					}
-					var newTrip = self.newTripData(trip);
-					newAddList.push(newTrip);
+					if (self.dataModel.trips.some(i => i.Name === trip.Name))
+					{
+						let newTrip = self.newTripData(trip);
+						newAddList.push(newTrip);
+					}
 				});
 				self.refreshNextTripData(newAddList);
 				sortItems(newAddList);

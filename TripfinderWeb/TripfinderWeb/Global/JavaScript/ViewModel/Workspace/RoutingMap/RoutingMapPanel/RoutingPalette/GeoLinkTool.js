@@ -2,10 +2,39 @@
 {
 	createNamespace('TF.RoutingMap.RoutingPalette').GeoLinkTool = GeoLinkTool
 
+	function mathRound(value, decimal)
+	{
+		decimal = decimal || 0;
+		let factor = Math.pow(10, decimal);
+		return Math.round(value * factor) / factor;
+	}
+
 	function GeoLinkTool(tripStopDataModel)
 	{
 		this.dataModel = tripStopDataModel;
 		this.precision = 0;
+	}
+
+	GeoLinkTool.prototype._isIntersectWithOtherPaths = function(oldItem, newItem)
+	{
+		let oldG = new tf.map.ArcGIS.Polyline({ spatialReference: 102100 });
+		oldG.paths = oldItem.path.paths;
+		let newG = new tf.map.ArcGIS.Polyline({ spatialReference: 102100 });
+		newG.paths = newItem.path.paths;
+		let diffG = tf.map.ArcGIS.geometryEngine.difference(oldG, newG);
+		let intersectStop = this.dataModel.dataModel.trips.some(trip =>
+		{
+			return trip.TripStops.some(tripStop =>
+			{
+				if (tripStop.id !== oldItem.id && tripStop.path && tripStop.path.geometry && tripStop.path.geometry.paths)
+				{
+					let intersections = tf.map.ArcGIS.geometryEngine.intersect(tripStop.path.geometry, diffG);
+					return intersections && intersections.paths && intersections.paths.length > 0 && intersections.paths[0].length > 1;
+
+				}
+			});
+		})
+		return intersectStop;
 	}
 
 	GeoLinkTool.prototype.getGeoLinkedData = function(data)
@@ -15,20 +44,25 @@
 		if (data.changeType == "path")
 		{
 			if (!data.originalData[0] || !data.originalData[0].path || !data.newData[0].path) return Promise.resolve(data);
+
 			data.originalData.forEach(function(oldItem, index)
 			{
-				var geoLinkedDataOneStop = [];
-				promises.push(self._getIdenticalPaths(oldItem, data.newData[index]).then(function(changedPathsDic)
+				if (self._isIntersectWithOtherPaths(oldItem, data.newData[index]))
 				{
-					for (var tripStopId in changedPathsDic)
+					var geoLinkedDataOneStop = [];
+					promises.push(self._getIdenticalPaths(oldItem, data.newData[index]).then(function(changedPathsDic)
 					{
-						geoLinkedDataOneStop.push({
-							TripStopId: tripStopId,
-							linkedPathSegments: changedPathsDic[tripStopId]
-						})
-					}
-					geoLinkedData.push(geoLinkedDataOneStop)
-				}));
+						for (var tripStopId in changedPathsDic)
+						{
+							geoLinkedDataOneStop.push({
+								TripStopId: tripStopId,
+								linkedPathSegments: changedPathsDic[tripStopId]
+							})
+						}
+						geoLinkedData.push(geoLinkedDataOneStop)
+					}));
+				}
+
 			});
 			return Promise.all(promises).then(function()
 			{
@@ -550,17 +584,16 @@
 
 	GeoLinkTool.prototype._reduceGeometryPrecision = function(g)
 	{
-		var self = this;
 		switch (g.type)
 		{
 			case 'point':
-				var point = new tf.map.ArcGIS.Point({ spatialReference: 102100, x: g.x.toFixed(self.precision), y: g.y.toFixed(self.precision) });
+				var point = new tf.map.ArcGIS.Point({ spatialReference: 102100, x: mathRound(g.x, this.precision), y: mathRound(g.y, this.precision) });
 				return point;
 			case 'polyline':
 				var polyline = new tf.map.ArcGIS.Polyline({ spatialReference: 102100 });
 				g.paths.forEach(function(p)
 				{
-					var path = p.map(function(point) { return [parseFloat(point[0].toFixed(self.precision)), parseFloat(point[1].toFixed(self.precision))] })
+					var path = p.map(point => [mathRound(point[0], this.precision), mathRound(point[1], this.precision)]);
 					polyline.addPath(path)
 				})
 				return polyline
@@ -568,7 +601,7 @@
 				var polygon = new tf.map.ArcGIS.Polygon({ spatialReference: 102100 })
 				g.rings.forEach(function(r)
 				{
-					var ring = r.map(function(point) { return [parseFloat(point[0].toFixed(self.precision)), parseFloat(point[1].toFixed(self.precision))] })
+					var ring = r.map(point => [mathRound(point[0], this.precision), mathRound(point[1], this.precision)]);
 					polygon.addRing(ring)
 				})
 				return polygon
@@ -577,7 +610,6 @@
 
 	GeoLinkTool.prototype._convertPolylineTolines = function(polyline)
 	{
-		var self = this
 		return polyline.paths.map(function(path)
 		{
 			return new tf.map.ArcGIS.Polyline({ spatialReference: 102100 }).addPath(path)
@@ -673,11 +705,9 @@
 	}
 	GeoLinkTool.prototype._equals = function(coor1, coor2)
 	{
-		var self = this;
-		if (coor1 && coor2 &&
-			coor1[0].toFixed(self.precision) == coor2[0].toFixed(self.precision) &&
-			coor1[1].toFixed(self.precision) == coor2[1].toFixed(self.precision)) return true;
-		return false;
+		return coor1 && coor2 &&
+			mathRound(coor1[0], this.precision) == mathRound(coor2[0], this.precision) &&
+			mathRound(coor1[1], this.precision) == mathRound(coor2[1], this.precision);
 	}
 
 	GeoLinkTool.prototype._isLinesOverlap = function(toPathGeo, oldG)
@@ -830,6 +860,8 @@
 			path.paths[0] = path.paths[0].slice(0, jointIndex).concat(newSegment.paths[0]).concat(path.paths[0].slice(jointIndex))
 		} else
 		{
+			path = tf.map.ArcGIS.geometryEngine.simplify(path);
+			oldSegment = tf.map.ArcGIS.geometryEngine.simplify(oldSegment);
 			var indexes = self._findSegmentIndexesOfPath(path, oldSegment);
 			var startIndex = indexes[0], endIndex = indexes[1];
 			if (startIndex >= 0 && endIndex >= 0 && endIndex >= startIndex)

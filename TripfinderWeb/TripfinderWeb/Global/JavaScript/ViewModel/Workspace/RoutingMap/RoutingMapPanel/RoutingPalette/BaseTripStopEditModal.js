@@ -595,7 +595,7 @@
 
 	BaseTripStopEditModal.prototype.show = function()
 	{
-		this.obVisible(true);
+		TF.RoutingMap.BaseEditModal.prototype.show.call(this, arguments);
 		this.element.find("[name=street]").focus();
 		this.element.find("div.body").scrollTop(0);
 	};

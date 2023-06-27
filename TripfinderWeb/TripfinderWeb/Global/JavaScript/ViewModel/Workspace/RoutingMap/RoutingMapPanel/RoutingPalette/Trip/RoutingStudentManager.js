@@ -902,7 +902,7 @@
 		for (var key in this.students)
 		{
 			var student = this.students[key];
-			if (student.isAnyAssigned && student.XCoord)
+			if (student.isAnyAssigned && student.XCoord && student.RequirementID)
 			{
 				studentsToShow[key] = $.extend({}, student, { key: key });
 			}

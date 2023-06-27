@@ -827,7 +827,7 @@
 				}
 
 				return {
-					Id: 0,
+					Id: item.id,
 					title: item.FirstName + " " + item.LastName,
 					subtitle: item.Address,
 					address: item.Address,
@@ -1406,10 +1406,11 @@
 	{
 		var self = this;
 		var stopPoolFeatureData = new TF.RoutingMap.RoutingPalette.StopPoolFeatureData({});
+		var escapedValue = value.replaceAll('\'', '\'\'');
 		var query = new tf.map.ArcGIS.Query();
 		query.returnGeometry = true;
 		query.outFields = ["*"];
-		query.where = "DBID=" + tf.datasourceManager.databaseId + " and (Street like '%" + value + "%' or City like '%" + value + "%' )";
+		query.where = "DBID=" + tf.datasourceManager.databaseId + " and (Street like '%" + escapedValue + "%' or City like '%" + escapedValue + "%' )";
 		return new Promise(function(resolve, reject)
 		{
 			stopPoolFeatureData.stopFeatureData.getFeatureLayer().queryFeatures(query).then(function(featureSet)

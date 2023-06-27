@@ -62,7 +62,7 @@
 		{
 			return this.obSelectedSequence();
 		});
-		this.obSelectedSequenceDisable = ko.computed(() => this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit'));
+		this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
 		this.initSequenceSubscribe();
 	}
 
@@ -638,7 +638,12 @@
 				}
 				else if (self.obIsSmartSequence())
 				{
-					const res = await self.viewModel.drawTool.NAtool.calculateSmartSequence(tripStop);
+					const _tripStop = { ...tripStop };
+					if (tripChanged)
+					{
+						_tripStop.TripId = targetTripId;
+					}
+					const res = await self.viewModel.drawTool.NAtool.calculateSmartSequence(_tripStop);
 					if (res.sequence != null)
 					{
 						position = res.sequence - 1;

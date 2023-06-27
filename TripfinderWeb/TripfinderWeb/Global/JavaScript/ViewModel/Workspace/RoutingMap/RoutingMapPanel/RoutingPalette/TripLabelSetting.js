@@ -28,11 +28,11 @@
 		{
 			name: "Stop Time",
 			check: false,
-			exampleValue: '6:45 am',
+			exampleValue: '6:45 AM',
 			fieldName: 'StopTime',
 			getText: function(data)
 			{
-				return moment(data.StopTime, "HH:mm:ss").format('h:mm a');
+				return moment(data.StopTime, "HH:mm:ss").format('h:mm A');
 			}
 		},
 		{

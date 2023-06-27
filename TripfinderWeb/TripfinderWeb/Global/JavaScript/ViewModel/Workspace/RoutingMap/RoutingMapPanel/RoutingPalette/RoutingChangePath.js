@@ -758,6 +758,13 @@
 			self._draggingMapMouseDragEvent.remove();
 			self._draggingMapMouseDragEvent = null;
 		}
+
+		if (self._draggingMapClickEvent)
+		{
+			self._draggingMapClickEvent.remove();
+			self._draggingMapClickEvent = null;
+		}
+
 		tf.documentEvent.unbind("keydown.changePath", self.routeState);
 		self._unbindDraggingEvents();
 	};

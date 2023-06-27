@@ -177,7 +177,7 @@
 				{
 					if (self.tripStops[i].id == tripStop.id)
 					{
-						tripStop.DrivingDirections = tf.measurementUnitConverter.unifyDirectionMeasurementUnit(self.tripStops[i].DrivingDirections, tf.measurementUnitConverter.isImperial());
+						tripStop.DrivingDirections = self.tripStops[i].DrivingDirections;
 						tripStop.IsCustomDirection = self.tripStops[i].IsCustomDirection;
 						break;
 					}

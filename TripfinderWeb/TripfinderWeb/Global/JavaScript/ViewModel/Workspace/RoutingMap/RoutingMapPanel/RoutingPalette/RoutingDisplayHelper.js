@@ -46,7 +46,7 @@
 
 	RoutingDisplayHelper.prototype.addNodeDataOnDemand = function(newNodeDataArray, parentNode)
 	{
-		newNodeDataArray.map(function(newNodeData)
+		newNodeDataArray.map((newNodeData) =>
 		{
 			if (!parentNode.children)
 			{
@@ -66,8 +66,14 @@
 				}
 				else
 				{
-					parentNode.items.push(newNodeData);
-					if (parentNode.children.options) parentNode.children.options.data.items.push(newNodeData);
+					var parentNodeElement = this.routingDisplay.treeview.element.find("[data-kendo-uid='" + parentNode.uid + "']");
+					var expanded = parentNode.expanded;
+					this.routingDisplay.treeview.append(newNodeData, parentNodeElement);
+					if (!expanded)
+					{
+						// treeView append will expand the node, change the expand status to original status
+						this.routingDisplay.treeview._expanded(parentNodeElement, false, true);
+					}
 				}
 			}
 		});
@@ -77,7 +83,8 @@
 	{
 		var self = this,
 			isAdd = false;
-		var studentsNodeElements = self.routingDisplay.treeview.findByUid(tripStopNode.uid).find('ul li');
+		var tripStopNodeElement = self.routingDisplay.treeview.findByUid(tripStopNode.uid);
+		var studentsNodeElements = tripStopNodeElement.find('ul li');
 		var node = null;
 		for (var i = 0; i < studentsNodeElements.length; i++)
 		{
@@ -93,9 +100,9 @@
 				break;
 			}
 		}
-		if (!isAdd)
+		if (!isAdd && tripStopNodeElement.length > 0)
 		{
-			node = self.routingDisplay.treeview.append(newStudentNode, self.routingDisplay.treeview.findByUid(tripStopNode.uid), null, self.routingDisplay.expandStatusDictionary[tripStopNode.id] ? self.routingDisplay.expandStatusDictionary[tripStopNode.id] : null);
+			node = self.routingDisplay.treeview.append(newStudentNode, tripStopNodeElement, null, self.routingDisplay.expandStatusDictionary[tripStopNode.id] ? self.routingDisplay.expandStatusDictionary[tripStopNode.id] : null);
 		}
 
 		return node;

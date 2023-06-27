@@ -4,7 +4,6 @@
 
 	function RoutingStudentEditModal(viewModel)
 	{
-		var self = this;
 		TF.RoutingMap.BaseEditModal.call(this, {
 			routingMapDocumentViewModel: viewModel.viewModel._viewModal,
 			template: "workspace/Routing Map/RoutingMapPanel/RoutingPalette/EditRoutingStudent"
@@ -12,54 +11,6 @@
 		this.viewModel = viewModel.viewModel;
 		this.dataModel = viewModel.dataModel;
 		this.obDataModel = this.createObservableDataModel(this.getDataModel());
-
-		// //modelType
-		// this.isSetCreateOption = false;
-		// if (modelType && modelType === 'set-Stops-Option')
-		// {
-		// 	this.isSetCreateOption = true;
-		// }
-
-		// // trips selector
-		// this.obTrips = ko.observableArray([]);
-		// this.obSelectedTrip = ko.observable({});
-		// this.tripSelectTemplate = this.tripSelectTemplate.bind(this);
-		// this.obSelectedTripText = ko.computed(function()
-		// {
-		// 	return this.obSelectedTrip().Name || "";
-		// }, this);
-
-		// this.isCopied = ko.observable(false);
-		// this.isDoorToDoor = ko.observable(false);
-
-		// // stop type selector
-		// this.obStopTypes = ko.observableArray(["Polygon", "Rectangle", "Draw", "Circle", "Door-to-Door", "Walkout"]);
-		// this.obSelectedStopType = ko.observable(self.obStopTypes()[4]);
-		// this.obSelectedStopTypeText = ko.computed(function()
-		// {
-		// 	return this.obSelectedStopType();
-		// }, this);
-
-		// this.createTripBoundary = null;
-		// this.showWalkout = ko.observable(true);
-		// this.obIsSmartAssignment = ko.observable(false);
-		// this.walkoutType = ko.observable(0);
-		// this.walkoutDistance = ko.observable(100);
-		// this.walkoutBuffer = ko.observable(30);
-		// this.obUnits = ko.observableArray(["meters", "feet", "kilometers", "miles", "yards"]);
-		// this.obSelectedDistanceUnit = ko.observable(this.obUnits()[0]);
-		// this.obSelectedBufferUnit = ko.observable(this.obUnits()[0]);
-		// this.obSelectedDistanceUnitText = ko.computed(function()
-		// {
-		// 	return this.obSelectedDistanceUnit();
-		// }, this);
-		// this.obSelectedBufferUnitText = ko.computed(function()
-		// {
-		// 	return this.obSelectedBufferUnit();
-		// }, this);
-		// this.disabled = ko.computed(function() { return this.showWalkout() == false; }, this);
-
-
 	}
 
 	RoutingStudentEditModal.prototype = Object.create(TF.RoutingMap.BaseEditModal.prototype);
@@ -67,45 +18,6 @@
 
 	RoutingStudentEditModal.prototype.init = function()
 	{
-		// var self = this;
-		// this.obCurrentPage(0);
-		// this.obRecordsCount(this.data.length);
-		// this.obTrips(self.dataModel.trips);
-		// this.obSelectedTrip(self.dataModel.trips[0]);
-		// this.obSelectedStopType(this.obStopTypes()[0]);
-		// this.obIsSmartAssignment(false);
-		// this.promise = new Promise(function(resolve, reject) { self.resolve = resolve; self.reject = reject; });
-		// for (var key in this.obDataModel)
-		// {
-		// 	if (ko.isObservable(this.obDataModel[key]))
-		// 	{
-		// 		this.obDataModel[key]("");
-		// 	}
-		// }
-		// this._enableKeyEnterApply();
-
-		// var input = $("#walkoutDistance");
-		// input.kendoNumericTextBox({
-		// 	min: 0,
-		// 	step: 1,
-		// 	decimals: 0,
-		// 	format: "0."
-		// });
-		// var input2 = $("#walkoutBuffer");
-		// input2.kendoNumericTextBox({
-		// 	min: 0,
-		// 	step: 1,
-		// 	decimals: 0,
-		// 	format: "0."
-		// });
-		// $("#showWalkoutCheckbox").bind("change", function()
-		// {
-		// 	var numerictextbox = input.data("kendoNumericTextBox");
-
-		// 	numerictextbox.enable(this.showWalkout());
-		// 	numerictextbox.value(this.walkoutDistance());
-		// }.bind(this));
-
 		return Promise.resolve();
 	};
 
@@ -163,8 +75,6 @@
 		{
 			this.$form.data("bootstrapValidator").destroy();
 		}
-		//this.onCloseEditModalEvent.notify();
-		//this.viewModel._viewModal.onStopEditingEvent.notify()
 	}
 	RoutingStudentEditModal.prototype.applyClick = function()
 	{

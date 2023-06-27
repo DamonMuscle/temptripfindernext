@@ -69,11 +69,13 @@
 
 		var splitAddress = searchText.split(",");
 		var houseNumber = splitAddress[0].split(" ")[0];
+		const digAndAlphaRegex = /^[0-9a-zA-Z]+$/;// RW-37432. With the changes in RW-16206 and RW-14543, the requirement for house number needs to allow digits or alphabets.
 
 		// quick search on address point with streetname only
-		if (isAddressPoint && Object.is(parseInt(houseNumber), NaN))
+		if (isAddressPoint && !digAndAlphaRegex.test(houseNumber))
 		{
-			var where = "Address like '%" + searchText + "%'";
+			var escapedText = searchText.replaceAll('\'', '\'\'');
+			var where = "Address like '%" + escapedText + "%'";
 			var queryTask = new self.arcgis.QueryTask(self.addressPointUrl);
 			var query = new self.arcgis.Query();
 			query.where = where;
@@ -159,7 +161,7 @@
 				{
 					if (response.data.candidates.length > 0)
 					{
-						var suggestion = response.data.candidates[0], reg = /^[0-9]+.?[0-9]*$/, firstInput = searchText.split(',')[0].trim().split(' ')[0];
+						var suggestion = response.data.candidates[0], reg = /^[0-9a-zA-Z]+\.?$/, firstInput = searchText.split(',')[0].trim().split(' ')[0];
 						// if (!(searchText.indexOf(" & ") >= 0 || searchText.indexOf(" && ") >= 0 || searchText.indexOf(" and ") >= 0) &&
 						// 	(!isAddressPoint && suggestion.attributes.Addr_type == "POI"))
 						// {
@@ -167,7 +169,7 @@
 						// 	return;
 						// }
 						if (firstInput.trim() != "0" &&
-							(!reg.test(firstInput) || suggestion.attributes.Addr_type !== "StreetName"))
+							(reg.test(firstInput) || suggestion.attributes.Addr_type !== "StreetName"))
 						{
 							if (!suggestion.address.split(",")[3])
 							{

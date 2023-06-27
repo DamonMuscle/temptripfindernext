@@ -36,7 +36,7 @@
 
 	UnassignedStudentEventsManager.prototype.menuInfoClick = function()
 	{
-		let studentIds = this.dataModel.highlighted.map(i => i.id);
+		let studentIds = this.dataModel.sortSelected(this.dataModel.highlighted).map(i => i.id);
 		this.requireDetails.notify({ dataType: "student", ids: studentIds });
 	};
 

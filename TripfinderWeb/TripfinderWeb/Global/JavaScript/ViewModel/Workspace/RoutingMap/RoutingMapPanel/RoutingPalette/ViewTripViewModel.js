@@ -19,7 +19,8 @@
 				FieldName: "Name",
 				DisplayName: "Name",
 				Width: "150px",
-				type: "string"
+				type: "string",
+				isSortItem: true
 			},
 			{
 				FieldName: "SessionName",

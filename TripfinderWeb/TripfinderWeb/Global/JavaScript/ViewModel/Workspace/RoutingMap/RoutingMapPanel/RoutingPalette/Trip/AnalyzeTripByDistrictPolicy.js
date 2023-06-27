@@ -83,8 +83,8 @@
 				real: 0
 			},
 			totalDistance: {
-				max: parseFloat(self.convertToCurrentMeasurementUnit(vrpSetting.totalDistance)).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
-				real: parseFloat(self.convertToCurrentMeasurementUnit(trip.Distance)).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+				max: vrpSetting.totalDistance == null ? Number.MAX_VALUE : self.convertToCurrentMeasurementUnit(vrpSetting.totalDistance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
+				real: self.convertToCurrentMeasurementUnit(trip.Distance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
 			},
 			totalTime: {
 				max: vrpSetting.totalTime,
@@ -133,8 +133,10 @@
 				tripStopResult.capacity++;
 
 				self.dataModel.calculateStudentTravelTime(student, tripStop, trip.TripStops);
-				var hasTotalTimeError = student.TotalTime > maxStudentRideTime;
-				var hasWalkDistanceError = student.WalkToStopDistance > maxWalkToStopDistance;
+				var hasTotalTimeError = student.TotalTime > maxStudentRideTime,
+					parsedWalkToStopDistance = self.convertToCurrentMeasurementUnit(student.WalkToStopDistance),
+					parsedMaxWalkToStopDistance = self.convertToCurrentMeasurementUnit(maxWalkToStopDistance),
+					hasWalkDistanceError = parsedWalkToStopDistance > parsedMaxWalkToStopDistance;
 
 				tripStopResult.students.push({
 					id: student.id,
@@ -142,8 +144,8 @@
 					totalTime: student.TotalTime,
 					maxRideTime: maxStudentRideTime,
 					hasTotalTimeError: hasTotalTimeError,
-					walkToStopDistance: parseFloat(self.convertToCurrentMeasurementUnit(student.WalkToStopDistance)).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
-					maxWalkToStopDistance: parseFloat(self.convertToCurrentMeasurementUnit(maxWalkToStopDistance)).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
+					walkToStopDistance: parsedWalkToStopDistance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
+					maxWalkToStopDistance: parsedMaxWalkToStopDistance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
 					hasWalkDistanceError: hasWalkDistanceError,
 					student: student
 				});
@@ -272,7 +274,7 @@
 		{
 			return true;
 		}
-		if (parseInt(analyzeResult.totalDistance.real) > parseInt(analyzeResult.totalDistance.max))
+		if (parseFloat(analyzeResult.totalDistance.real) > parseFloat(analyzeResult.totalDistance.max))
 		{
 			return true;
 		}
@@ -394,12 +396,16 @@
 		{
 			tripStop.Students.forEach(student =>
 			{
-				promises.push(this._calculateWalkToStopDistance(student.XCoord, student.YCoord, tripStop.XCoord, tripStop.YCoord, student).then(result =>
+				// exclude exception student
+				if (student.RequirementID)
 				{
-					student.WalkToStopDistance = result;
-					updateStudentWalkToStopDistance(tripStop.Students, student, result, studentManager);
-					this.studentWalkToStopResults[studentManager._getKey(student) + "," + tripStop.id] = result;
-				}));
+					promises.push(this._calculateWalkToStopDistance(student.XCoord, student.YCoord, tripStop.XCoord, tripStop.YCoord, student).then(result =>
+					{
+						student.WalkToStopDistance = result;
+						updateStudentWalkToStopDistance(tripStop.Students, student, result, studentManager);
+						this.studentWalkToStopResults[`${studentManager._getKey(student)},${tripStop.id}`] = result;
+					}));
+				}
 			});
 		});
 
@@ -498,19 +504,26 @@
 		}
 	};
 
+	function mathRound(value, decimal)
+	{
+		decimal = decimal || 0;
+		let factor = Math.pow(10, decimal);
+		return Math.round(value * factor) / factor;
+	}
+
 	AnalyzeTripByDistrictPolicy.prototype.convertToCurrentMeasurementUnit = function(value)
 	{
 		if (!tf.measurementUnitConverter.isImperial())
 		{
-			return value;
+			return mathRound(value, 2);
 		}
 
-		return tf.measurementUnitConverter.convert({
+		return mathRound(tf.measurementUnitConverter.convert({
 			originalUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
 			targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Imperial,
 			precision: 5,
 			value: value
-		}).toFixed(2);
+		}), 2);
 	};
 
 	AnalyzeTripByDistrictPolicy.prototype.dispose = function()
