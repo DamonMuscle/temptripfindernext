@@ -195,6 +195,7 @@
 										if (response > 0)
 										{
 											this.obGridFilterDataModels.remove(filter);
+											this.onFilterDeleted.notify(filterId);
 										}
 									}.bind(this));
 							}
@@ -210,7 +211,13 @@
 		{
 			return;
 		}
-		this.fnSaveAndEditGridFilter("new", filter, false, false);
+		this.copyAndNewGridFilter(filter.clone());				
+	};
+
+	ManageFilterViewMobileModel.prototype.copyAndNewGridFilter = function(gridFilter)
+	{
+		const copyAndNewTask = this.fnSaveAndEditGridFilter("new", gridFilter, false, false);
+		this.saveGridFilter(copyAndNewTask);
 	};
 
 	ManageFilterViewMobileModel.prototype.create = function(filter, e)
@@ -222,9 +229,36 @@
 			return;
 		}
 
-		this.fnSaveAndEditGridFilter("new", null, false, false,
+		const newTask = this.fnSaveAndEditGridFilter("new", null, false, false,
 			{
 				title: "New Filter"
 			});
+		this.saveGridFilter(newTask);
+	};
+
+	ManageFilterViewMobileModel.prototype.saveGridFilter = function(task)
+	{
+		Promise.resolve(task)
+			.then((result) =>
+			{
+				if (result && typeof result === "object")
+				{
+					this.obGridFilterDataModels.push(result);
+					this.obGridFilterDataModels.sort(this._sortFilterDataModels);
+				}
+			});
+	};
+
+	ManageFilterViewMobileModel.prototype._sortFilterDataModels = function(left, right)
+	{
+		if (left.id() < 0 && right.id() > 0)
+		{
+			return 1;
+		}
+		if (left.id() > 0 && right.id() < 0)
+		{
+			return -1;
+		}
+		return left.name().toLowerCase() == right.name().toLowerCase() ? 0 : (left.name().toLowerCase() < right.name().toLowerCase() ? -1 : 1);
 	};
 })();
