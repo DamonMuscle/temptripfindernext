@@ -1209,7 +1209,7 @@
 		// this.mapEditingPaletteViewModel.dispose();
 		this.travelScenariosPaletteViewModel?.dispose();
 		// this.mapLayersPaletteViewModel.dispose();
-		this.routingPaletteViewModel.dispose();
+		this.routingPaletteViewModel?.dispose();
 		// this.customMapPaletteViewModel.dispose();
 		// this.gpsPaletteViewModel.dispose();
 		// this.geoSearchPaletteViewModel.dispose();
