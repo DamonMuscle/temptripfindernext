@@ -5,6 +5,8 @@
 	var GeocodeHelper = {
 		initialize: function()
 		{
+			return;
+
 			if (zipCodes.length == 0)
 			{
 				var zipCodeUrl = arcgisUrls.MapEditingOneService + "/32";

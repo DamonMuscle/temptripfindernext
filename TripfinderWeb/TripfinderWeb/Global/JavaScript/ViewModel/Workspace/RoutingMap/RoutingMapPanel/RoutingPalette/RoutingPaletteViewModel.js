@@ -21,7 +21,7 @@
 		self.trialStopViewModel = new TF.RoutingMap.RoutingPalette.TrialStopViewModel(self);
 		self.unassignedStudentViewModel = new TF.RoutingMap.RoutingPalette.UnassignedStudentViewModel(self);
 		// self.nonEligibleZoneViewModel = new TF.RoutingMap.RoutingPalette.NonEligibleZoneViewModel(self);
-		self.childViewModels =[self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel]; // [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel, self.nonEligibleZoneViewModel];
+		self.childViewModels =[self.tripViewModel]; // [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel, self.nonEligibleZoneViewModel];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 	}

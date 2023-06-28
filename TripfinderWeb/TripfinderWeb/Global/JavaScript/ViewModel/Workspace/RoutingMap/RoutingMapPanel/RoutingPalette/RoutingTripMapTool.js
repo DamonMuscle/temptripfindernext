@@ -98,7 +98,7 @@
 		self._map.add(self._pointLayer);
 		self.viewModel.layers.push(layerIds.pointLayerId);
 
-		self.viewModel.viewModel.unassignedStudentViewModel.drawTool.initialize();// For correct layer order.
+		// self.viewModel.viewModel.unassignedStudentViewModel.drawTool.initialize();// For correct layer order.
 
 		self._studentCountLayer = new self._arcgis.GraphicsLayer({
 			"id": "studentCountLayer"
