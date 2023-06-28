@@ -9,7 +9,7 @@
 		this.obRightSelected = ko.observable(false);
 		this.obLeftRemaining = ko.observable(true);
 		this.obRightRemaining = ko.observable(true);
-		this.fixedData = options.fixedData || [];// fixed data, that can not be removed
+		this.fixedRightIds = options.fixedRightIds || [];// fixed data, that can not be removed
 		this.totalItemCount = options.availableSource.length + options.selectedSource.length;
 	}
 
@@ -51,7 +51,12 @@
 	{
 		var self = this,
 			leftKendoGrid = self.$element.find(".left-grid").data("kendoGrid"),
-			rightKendoGrid = self.$element.find(".right-grid").data("kendoGrid");
+			rightKendoGrid = self.$element.find(".right-grid").data("kendoGrid"),
+			gridHeight = 300;
+		if (self.options && self.options.gridHeight)
+		{
+			gridHeight = self.options.gridHeight;
+		}
 
 		if (leftKendoGrid && leftKendoGrid.destroy)
 		{
@@ -63,7 +68,7 @@
 		}
 
 		self.$element.find(".left-grid").kendoGrid({
-			dataSource: { data: availableSource },
+			dataSource: availableSource,
 			columns: [
 				{
 					title: self.options.title,
@@ -72,7 +77,7 @@
 				}
 			],
 			selectable: "multiple",
-			height: 300,
+			height: gridHeight,
 			change: function()
 			{
 				self.obLeftSelected(true);
@@ -86,7 +91,7 @@
 		});
 
 		self.$element.find(".right-grid").kendoGrid({
-			dataSource: { data: selectedSource },
+			dataSource: selectedSource,
 			columns: [
 				{
 					title: self.options.title,
@@ -99,7 +104,7 @@
 			{
 				var grid = self.$element.find(".right-grid").data("kendoGrid");
 				var selected = grid.select();
-				if (self.fixedData.length > 0)
+				if (self.fixedRightIds.length > 0)
 				{
 					// exclude can not remove data
 					selected = [];
@@ -107,7 +112,7 @@
 					{
 						var row = $(item).closest("tr");
 						var dataItem = grid.dataItem(row);
-						if (!Enumerable.From(self.fixedData).Any(function(c) { return c.value == dataItem.value; }))
+						if (!Enumerable.From(self.fixedRightIds).Any(function(c) { return c == dataItem.value; }))
 						{
 							selected.push(item);
 							return dataItem.uid;
@@ -131,22 +136,22 @@
 					self.updateBottomBar.call(this, self.$element.find(".right-grid .k-pager-wrap"), self.totalItemCount);
 				}
 			},
-			height: 300,
+			height: gridHeight,
 			pageable: {},
 			dataBound: function()
 			{
 				self.updateBottomBar.call(this, self.$element.find(".right-grid .k-pager-wrap"), self.totalItemCount);
 				setTimeout(function()
 				{
-					if (self.fixedData.length > 0)
+					if (self.fixedRightIds.length > 0)
 					{
 						// add gray style to can not remove data
 						var grid = self.$element.find(".right-grid").data("kendoGrid");
 						grid.dataSource.data().forEach(function(dataItem)
 						{
-							if (Enumerable.From(self.fixedData).Any(function(c) { return c.value == dataItem.value; }))
+							if (self.fixedRightIds.includes(dataItem.value))
 							{
-								grid.tbody.find("tr[data-kendo-uid='" + dataItem.uid + "']").addClass("disSelectable").css("color", "lightgray");
+								grid.tbody.find("tr[data-kendo-uid='" + dataItem.uid + "']").addClass("disSelectable");
 							}
 						});
 					}
@@ -235,7 +240,7 @@
 			.Where(function(dataItem)
 			{
 				// exclude can not remove data;
-				return !Enumerable.From(self.fixedData).Any(function(c) { return c.value == dataItem.value; });
+				return !self.fixedRightIds.includes(dataItem.value);
 			}).Select(function(dataItem)
 			{
 				return dataItem.uid;
@@ -275,15 +280,12 @@
 	ListMoverFieldEditorViewModel.prototype.apply = function(viewModel, e)
 	{
 		var self = this,
-			rightKendoGrid = self.$element.find(".right-grid").data("kendoGrid");
-		var selectedIds = rightKendoGrid.dataItems().map(function(item)
-		{
-			return item.value;
-		});
+			rightKendoGrid = self.$element.find(".right-grid").data("kendoGrid"),
+			selectedIds = rightKendoGrid.dataItems().map((item) => item.value);
 
 		if (selectedIds.length == 0 && !self.options.allowNullValue)
 		{
-			return tf.promiseBootbox.alert("One or more Data Sources is required. Please select one or more Data Sources to save.");
+			return tf.promiseBootbox.alert("One or more items are required. Please select one or more items to save.");
 		}
 		else if (self.options.validators)
 		{

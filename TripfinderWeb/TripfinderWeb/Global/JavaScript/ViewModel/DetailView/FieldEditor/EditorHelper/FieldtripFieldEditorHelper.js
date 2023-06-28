@@ -11,27 +11,6 @@
 	{
 		var self = this;
 		TF.DetailView.FieldEditor.FieldEditorHelper.call(self, detailView);
-		self.fieldRelatedMap = {
-			DepartDateTime: {
-				comparator: 'LessThan',
-				relatedField: 'EstimatedReturnDateTime',
-				option: {
-					type: 'dateTime',
-					message: 'Depart Date/Time should be earlier than Return Date/Time',
-					format: 'MM/DD/YYYY hh:mm A'
-				}
-
-			},
-			EstimatedReturnDateTime: {
-				comparator: 'GreaterThan',
-				relatedField: 'DepartDateTime',
-				option: {
-					type: 'dateTime',
-					message: 'Return Date/Time should be later than Depart Date/Time',
-					format: 'MM/DD/YYYY hh:mm A'
-				}
-			}
-		};
 	}
 
 	var FIELD_VALUE_PROP = {
@@ -89,6 +68,28 @@
 		]
 	};
 
+	var fieldRelatedMap = {
+		DepartDateTime: {
+			comparator: 'LessThan',
+			relatedField: 'EstimatedReturnDateTime',
+			option: {
+				type: 'dateTime',
+				message: 'Depart Date/Time should be earlier than Return Date/Time',
+				format: 'MM/DD/YYYY hh:mm A'
+			}
+
+		},
+		EstimatedReturnDateTime: {
+			comparator: 'GreaterThan',
+			relatedField: 'DepartDateTime',
+			option: {
+				type: 'dateTime',
+				message: 'Return Date/Time should be later than Depart Date/Time',
+				format: 'MM/DD/YYYY hh:mm A'
+			}
+		}
+	}
+
 	FieldtripFieldEditorHelper.prototype = Object.create(TF.DetailView.FieldEditor.FieldEditorHelper.prototype);
 	FieldtripFieldEditorHelper.prototype.constructor = FieldtripFieldEditorHelper;
 
@@ -101,7 +102,7 @@
 
 		if (editor.bootstrapValidator == null || editor.bootstrapValidator.isValid())
 		{
-			self.validateRelatedFields(result, self.fieldRelatedMap);
+			self.validateRelatedFields(result, fieldRelatedMap);
 		}
 	}
 
@@ -188,10 +189,13 @@
 						.forEach(function(mapping)
 						{
 							var datapoint = tf.helpers.detailViewHelper.getDataPointByIdentifierAndGrid(mapping.fieldName, self.dataType);
+							if (!datapoint) return;
 							var text = tf.helpers.detailViewHelper.formatDataContent(data[mapping.entityKey], datapoint.type, datapoint.format);
 
 							self.updateFields(mapping.fieldName, mapping.fieldName, text, data[mapping.entityKey]);
 						});
+						
+					data['FuelConsumptionRate'] = this._convertToMetric(data['FuelConsumptionRate']);
 					self.updateFields('BillingClassification', '', null, data);
 					var updatedResGroups = null
 					if (items)
@@ -206,53 +210,67 @@
 						{
 							self.updateFields(mapping.fieldName, mapping.fieldName, null, null);
 						});
-
-					var promises = [tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'staff'), {
-						paramData: {
-							fieldTripIds: [self._detailView.recordEntity.Id]
-						}
-					}),
-					tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'vehicles'), {
-						paramData: {
-							fieldTripIds: [self._detailView.recordEntity.Id]
-						}
-					})
-					];
-					Promise.all(promises).then(function(res)
-					{
-						var staffs = res[0].Items.reduce(function(map, obj)
-						{
-							map[obj.Id] = obj;
-							return map;
-						}, {});
-						var vehicles = res[1].Items.reduce(function(map, obj)
-						{
-							map[obj.Id] = obj;
-							return map;
-						}, {});
-						var updatedResGroups = items.map(function(item)
-						{
-							item['FuelConsumptionRate'] = item.VehicleId && vehicles[item.VehicleId].Cost;
-							item['AideOTRate'] = item.AideId && staffs[item.AideId].Otrate;
-							item['AideRate'] = item.AideId && staffs[item.AideId].Rate;
-							item['DriverOTRate'] = item.DriverId && staffs[item.DriverId].Otrate;
-							item['DriverRate'] = item.DriverId && staffs[item.DriverId].Rate;
-							item['DriverFixedCost'] = null;
-							item['AideFixedCost'] = null;
-							item['VehFixedCost'] = null;
-							return item;
-						});
-						self.updateFields('FieldTripResourceGroups', '', null, updatedResGroups);
-						self.recalculateFieldTripCosts();
-					})
-
+					self.updateFields('BillingClassification', '', null, null);
+					self.updateFieldTripResourceGroups(items);
 				}
 				break;
 			default:
 				break;
 		}
-
 	};
+
+	FieldtripFieldEditorHelper.prototype.updateFieldTripResourceGroups = function(fieldTripResourceGroups)
+	{
+		var self = this;
+		if (!self._detailView.recordEntity)
+		{
+			return;
+		}
+
+		var promises = [tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'staff'), {
+			paramData: {
+				fieldTripIds: [self._detailView.recordEntity.Id]
+			}
+		}),
+		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), 'vehicles'), {
+			paramData: {
+				fieldTripIds: [self._detailView.recordEntity.Id]
+			}
+		})
+		];
+		Promise.all(promises).then(function(res)
+		{
+			var staffs = res[0].Items.reduce(function(map, obj)
+			{
+				map[obj.Id] = obj;
+				return map;
+			}, {});
+			var vehicles = res[1].Items.reduce(function(map, obj)
+			{
+				map[obj.Id] = obj;
+				return map;
+			}, {});
+			var updatedResGroups = fieldTripResourceGroups.map(function(item)
+			{
+				item['FuelConsumptionRate'] = item.VehicleId && vehicles[item.VehicleId].Cost;
+				if (item.AideId && item.AideId !== -1)
+				{
+					item['AideOTRate'] = staffs[item.AideId].Otrate;
+					item['AideRate'] = staffs[item.AideId].Rate;
+				}
+
+				item['DriverOTRate'] = item.DriverId && staffs[item.DriverId].Otrate;
+				item['DriverRate'] = item.DriverId && staffs[item.DriverId].Rate;
+				item['DriverFixedCost'] = null;
+				item['AideFixedCost'] = null;
+				item['VehFixedCost'] = null;
+				return item;
+			});
+			self.updateFields('FieldTripResourceGroups', '', null, updatedResGroups);
+			self.recalculateFieldTripCosts();
+		})
+	};
+
 	FieldtripFieldEditorHelper.prototype.applyBCtoResourceGroups = function(resources, billingClassification)
 	{
 		if (resources != null && resources instanceof Array && billingClassification != null)
@@ -265,6 +283,7 @@
 				rs.DriverFixedCost = billingClassification.DriverFixedCost && billingClassification.DriverFixedCost;
 
 				rs.FuelConsumptionRate = billingClassification.FuelConsumptionRate && billingClassification.FuelConsumptionRate;
+
 				rs.VehFixedCost = billingClassification.FuelConsumptionRate && billingClassification.VehFixedCost;
 
 				rs.AideRate = billingClassification.AideRate && billingClassification.AideRate;
@@ -282,6 +301,24 @@
 		}
 		else return null;
 	}
+	
+	FieldtripFieldEditorHelper.prototype._convertToMetric = function(value)
+	{
+		if(!value)
+		{
+			return value;
+		}
+
+		return tf.measurementUnitConverter.convert({
+			originalUnit: tf.measurementUnitConverter.getCurrentUnitOfMeasure(),
+			targetUnit: tf.measurementUnitConverter.MeasurementUnitEnum.Metric,
+			value: value,
+			isReverse: true,
+			keep2Decimal: true,
+			precision: 18
+		})
+	}
+
 	FieldtripFieldEditorHelper.prototype.recalculateFieldTripCosts = function()
 	{
 		var self = this, resourceGroups = self.getFieldValue("FieldTripResourceGroups");
@@ -298,12 +335,12 @@
 			{
 				newCosts.AideCost = sumNubers(newCosts.AideCost, rs.AideTotalCost);
 				newCosts.DriverCost = sumNubers(newCosts.DriverCost, rs.DriverTotalCost);
-				newCosts.VehicleCost = sumNubers(newCosts.VehicleCost, rs.VehicleTotalCost);
+				newCosts.VehicleCost = Math.tfRound(sumNubers(newCosts.VehicleCost, rs.VehicleTotalCost), 2);
 			})
-			newCosts.SubTotalCost = sumNubers(newCosts.AideCost, newCosts.DriverCost, newCosts.VehicleCost);
+			newCosts.SubTotalCost = Math.tfRound(sumNubers(newCosts.AideCost, newCosts.DriverCost, newCosts.VehicleCost), 2);
 			var _minimum = self.getFieldValue("MinimumCost");
 			var _extendTotal = sumNubers(newCosts.SubTotalCost, self.getFieldValue("FixedCost"));
-			newCosts.TotalCost = Math.max(_minimum, _extendTotal);
+			newCosts.TotalCost = Math.tfRound(Math.max(_minimum, _extendTotal), 2);
 			Object.keys(newCosts).forEach(function(costName)
 			{
 				var datapoint = tf.helpers.detailViewHelper.getDataPointByIdentifierAndGrid(costName, self.dataType);
@@ -315,7 +352,7 @@
 
 	FieldtripFieldEditorHelper.prototype.showConfirmationMessages = function()
 	{
-		var self = this, paramsUrl, key, count = 0,
+		var self = this, paramsUrl, key,
 			endPoint = tf.dataTypeHelper.getEndpoint(self.dataType),
 			idParamName = tf.dataTypeHelper.getIdParamName(self.dataType),
 			blackList = tf.dataTypeHelper.getEntityUpdateConfirmBlackList(self.dataType),
@@ -326,39 +363,41 @@
 			if (blackList.includes(key))
 			{
 				modifiedFields[key] = self.editFieldList[key].value;
-				count++;
 			}
 		}
 
-		paramsUrl = String.format("{0}?{1}={2}&confirmData={3}", endPoint, idParamName, self._detailView.recordId, JSON.stringify(modifiedFields));
+		paramsUrl = String.format("{0}?{1}={2}", endPoint, idParamName, self._detailView.recordId);
 
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), paramsUrl))
-			.then(function(response)
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), paramsUrl), {
+			paramData: {
+				confirmData: JSON.stringify(modifiedFields)
+			}
+		}).then(function(response)
+		{
+			if (!response || !response.Items || !response.Items[0]) return false;
+
+			var confirmMsgs = response.Items[0];
+
+			var errors = confirmMsgs.Errors, warnings = confirmMsgs.Warnings;
+
+			if (Object.values(errors).length > 0)
 			{
-				if (!response || !response.Items || !response.Items[0]) return false;
-
-				var confirmMsgs = response.Items[0];
-
-				var errors = confirmMsgs.Errors, warnings = confirmMsgs.Warnings;
-
-				if (Object.values(errors).length > 0)
+				return tf.promiseBootbox.alert(Object.values(errors).join('\n'), "Failed").then(function(res)
 				{
-					return tf.promiseBootbox.alert(Object.values(errors).join('\n'), "Failed").then(function(res)
-					{
-						return false;
-					});
-				}
+					return false;
+				});
+			}
 
-				if (Object.values(warnings).length > 0)
-				{
-					return tf.promiseBootbox.confirm({
-						title: 'Warning',
-						message: Object.values(warnings).join('\n')
-					});
-				}
+			if (Object.values(warnings).length > 0)
+			{
+				return tf.promiseBootbox.confirm({
+					title: 'Warning',
+					message: Object.values(warnings).join('\n')
+				});
+			}
 
-				return true;
-			});
+			return true;
+		});
 	}
 
 	/**
@@ -377,32 +416,6 @@
 		return String.format("{0}/{1}", departmentName, activityName);
 	};
 
-	FieldtripFieldEditorHelper.prototype.getBlockoutSettings = function()
-	{
-		var self = this;
-		if (!self.fieldTripConfigs)
-		{
-			var promises = [tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripHolidays")),
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "FieldTripBlockOuts"))];
-
-			return Promise.all(promises).then(function(result)
-			{
-				var fieldTripConfigs = {};
-				fieldTripConfigs.Holidays = result[0].Items.map(function(item) { return item.Holiday; });
-				fieldTripConfigs.BlockOutTimes = result[1].Items.map(function(item)
-				{
-					return {
-						BeginTime: item.From,
-						EndTime: item.To
-					};
-				});
-				self.fieldTripConfigs = fieldTripConfigs;
-				return true;
-			});
-		}
-		return Promise.resolve(true);
-	};
-
 	FieldtripFieldEditorHelper.prototype.getFieldValue = function(field, getLabel)
 	{
 		var self = this;
@@ -419,46 +432,9 @@
 		}
 	}
 
-	FieldtripFieldEditorHelper.prototype.validateBlockout = function(result)
-	{
-		var self = this;
-
-		if (self._detailView.rootGridStack && self._detailView.rootGridStack.dataBlocks)
-		{
-			var checkFields = ["DepartDateTime"];
-			var blocks = self._detailView.rootGridStack.dataBlocks.filter(function(d) { return d.options && checkFields.includes(d.options.field) })
-			if (blocks && blocks.length > 0)
-			{
-				return Promise.resolve(self.getBlockoutSettings().then(function()
-				{
-					blocks.forEach(function(d, index)
-					{
-						if (d.options.field != result.fieldName)
-						{
-							return;
-						}
-						var date = moment(result.recordValue).format("YYYY-MM-DD");
-						var error = TF.DetailView.FieldEditor.FieldtripFieldEditorHelper.checkBlockTimes(moment(result.recordValue), date, self.fieldTripConfigs.BlockOutTimes);
-						if (error && !tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
-						{
-							self._detailView.$element.find('div.grid-stack-item-content[data-block-field-name=' + d.options.field + ']').addClass(self.VALIDATE_ERROR_CLASS);
-							self.editFieldList[result.fieldName] = {
-								errorMessages: [
-									error
-								],
-								title: error,
-								errorValue: result.recordValue
-							}
-						}
-					});
-				}));
-			}
-		}
-	}
-
 	FieldtripFieldEditorHelper.prototype.validateEntityByType = function(entity)
 	{
-		var self = this, resultList = [],
+		var self = this,
 			isStrictAccountCodeOn = tf.fieldTripConfigsDataHelper.fieldTripConfigs['StrictAcctCodes'];
 
 		if (isStrictAccountCodeOn)
@@ -504,7 +480,6 @@
 						{
 							resultList.push(error);
 						}
-
 						return resultList;
 					});
 				});
@@ -537,51 +512,6 @@
 			invoices = invoices || [];
 			return invoices.filter(i => accounts.every(a => a.Id !== i.FieldTripAccountId));
 		});
-	};
-
-	FieldtripFieldEditorHelper.checkBlockTimes = function(time, date, blockOutTimes)
-	{
-		date = moment(date);
-		if (!time || this.isHoliday(date) || date.weekday() === 6 || date.weekday() === 0)
-		{
-			return null;
-		}
-		var self = this, blockOutTimes = blockOutTimes || [],
-			timeM = time.year(2000).month(0).date(1), begin, end, message;
-
-		if (blockOutTimes.length === 0)
-		{
-			return null;
-		}
-
-		$.each(blockOutTimes, function(index, blockOutTime)
-		{
-			begin = moment("2000-1-1 " + blockOutTime.BeginTime);
-			end = moment("2000-1-1 " + blockOutTime.EndTime);
-			if ((timeM.isSame(begin) || timeM.isAfter(begin)) && (timeM.isSame(end) || timeM.isBefore(end)))
-			{
-				message = time.format('hh:mm A') + " is invalid because of the blockout period of " + begin.format("hh:mm A") + " to " + end.format("hh:mm A") + ".";
-				return false;
-			}
-		});
-
-		return message;
-	};
-
-	FieldtripFieldEditorHelper.isHoliday = function(date, holidays)
-	{
-		var result = false, self = this, holidays = holidays || [];
-		date = moment(date).startOf("day");
-		$.each(holidays, function(index, holiday)
-		{
-			var holidayM = moment(new Date(holiday)).startOf("day");
-			if (holidayM.diff(date.startOf("day"), "days") === 0 && holidayM.diff(date, "months") === 0 && holidayM.diff(date, "years") === 0)
-			{
-				result = true;
-				return false;
-			}
-		});
-		return result;
 	};
 
 	/**

@@ -28,10 +28,11 @@
 	NumberFieldEditor.prototype._initElement = function(options)
 	{
 		var self = this,
-			precision = self._getUDFDecimalPrecision(options),
 			isNumberUDF = self.isNumberUDF(options),
 			inputHtml,
 			$input;
+		self.minValue = options.minValue;
+		self.maxValue = options.maxValue;
 
 		inputHtml = `<div ${isNumberUDF ? "class='custom-field-input number'" : ""}>
 						<!-- ko customInput:{type:'Decimal',
@@ -40,6 +41,7 @@
 												class:'form-control item-content',
 												name:'number',
 												retainPrecision:'true',
+												nonNegative: ${options.nonNegative},
 												maxlength:'${options.maxLength || 19}'
 												${options.maxValue > 0 ? ",max:" + options.maxValue : ""}
 											},
@@ -52,10 +54,21 @@
 		ko.applyBindings(ko.observable(self), $input[0]);
 		self._$element = $input;
 
+		let precision = null;
 		if (isNumberUDF)
 		{
-			self._decimalPlaces = typeof precision === "number" ? precision : DEFAULT_DECIMAL_PLACES;
+			precision = self._getUDFDecimalPrecision(options);
 		}
+		else if (options.UDGridField != null)
+		{
+			precision = options.UDGridField.FieldOptions.NumberPrecision;
+		}
+		else if (options.format === "Number")
+		{
+			precision = isNullObj(options.numberPrecision) ? DEFAULT_DECIMAL_PLACES : options.numberPrecision;
+		}
+
+		self._decimalPlaces = typeof precision === "number" ? precision : DEFAULT_DECIMAL_PLACES;
 	};
 
 	/**
@@ -73,7 +86,18 @@
 			decimalPlaces = self.getCurrentPrecisionValue(),
 			index = inputValue.indexOf('.');
 
+		if (inputValue === '-' && !isNullObj(self.minValue) && self.minValue >= 0)
+		{
+			decimalBox.$input.val('');
+			return;
+		}
+
 		if (inputValue === '' || isNaN(number)) return;
+
+		if (!isNullObj(self.maxValue) && inputValue >= self.maxValue)
+		{
+			decimalBox.$input.val(self.maxValue);
+		}
 
 		if (inputValue > self.MAX_INTEGER_VALUE)
 		{
@@ -115,10 +139,17 @@
 		var self = this,
 			number = parseFloat(decimalBox.$input.val()),
 			precision = self.getCurrentPrecisionValue(),
-			value = number.toFixed(precision);
+			maxValue = decimalBox.attributes.max;
 
-		decimalBox.$input.val(isNaN(value) ? "None" : value);
-		self.obValue(isNaN(value) ? "None" : value);
+		if (typeof maxValue === "number" && !isNaN(maxValue))
+		{
+			number = Math.min(number, maxValue);
+		}
+
+		const value = number.toFixed(precision);
+
+		decimalBox.$input.val(isNaN(value) ? "" : value);
+		self.obValue(isNaN(value) ? "" : value);
 	};
 
 
@@ -216,5 +247,18 @@
 			text = Number.isNaN(value) ? "None" : tf.helpers.detailViewHelper.formatDataContent(value, "Number", "Money");
 
 		$content.text(text);
+	};
+
+	MoneyFieldEditor.prototype._fieldContentFormatter = function(value, options)
+	{
+		var self = this, precision = self.getCurrentPrecisionValue();
+
+		if (typeof value === "string" && value[0] === "$")
+		{
+			value = value.substring(1);
+		}
+		value = parseFloat(value).toFixed(precision || 0);
+
+		return isNaN(value) ? "" : value;
 	};
 })();

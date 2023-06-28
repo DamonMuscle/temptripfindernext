@@ -120,6 +120,11 @@
 	TextFieldEditor.prototype.editStop = function()
 	{
 		var self = this;
+		if (self.enableRightClickMenu)
+		{
+			self.obValue(self._$element.find("input,textarea").val());
+		}
+
 		return self.save()
 			.then(function()
 			{

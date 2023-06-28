@@ -22,21 +22,17 @@
 		this.afterMenuRender = new TF.Events.Event();
 	}
 
-	DropDownEditorMenuViewModel.prototype.init = function(model, element)
-	{
-		this.$element = $(element);
-	};
-
 	DropDownEditorMenuViewModel.prototype.menuClick = function(viewModel, e)
 	{
 		if (viewModel && viewModel.isTitle) return;
 		this.itemSelected.notify(viewModel);
 	};
 
-	DropDownEditorMenuViewModel.prototype.afterRender = function()
+	DropDownEditorMenuViewModel.prototype.afterRender = function(elements, viewModel)
 	{
-		this.$element.find(".title").off();
-		this.$element.find("li").attr("tabindex", "-1");
+		const $el = $(elements[0]);
+		$el.find(".title").off();
+		$el.find("li").attr("tabindex", "-1");
 		this.afterMenuRender.notify();
 	};
 

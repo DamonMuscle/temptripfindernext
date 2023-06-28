@@ -5,6 +5,7 @@
 	function StringFieldEditor(type)
 	{
 		var self = this;
+		self.enableRightClickMenu = true;
 		TF.DetailView.FieldEditor.TextFieldEditor.call(self, type);
 	};
 
@@ -16,9 +17,9 @@
 	{
 		var self = this,
 			$content = self.getContentElement(),
-			value = !self.obValue() ? "None" : String(self.obValue()).split(" ").join("&nbsp;");
+			value = !self.obValue() ? "None" : self.obValue();
 
-		$content.html(value);
+		$content.text(value);
 	};
 
 	StringFieldEditor.prototype._initElement = function(options)

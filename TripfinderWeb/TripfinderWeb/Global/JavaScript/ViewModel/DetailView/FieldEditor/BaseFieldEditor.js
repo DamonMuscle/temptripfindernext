@@ -12,6 +12,7 @@
 		self.editingCss = "editing";
 		self.innderFieldEditingCss = "inner-field-editing";
 		self._errorMessages = null;
+		self.editStopOnWheel = false;
 
 		self.applied = new TF.Events.Event();
 		self.valueChanged = new TF.Events.Event();
@@ -91,7 +92,7 @@
 
 		$parent.addClass(self.editingCss);
 		self.render(options);
-		self.bindEvents();
+		self.bindEvents(options);
 		$parent.data("editor", self);
 	};
 
@@ -106,6 +107,7 @@
 			self._$element.remove();
 		}
 		$parent.removeData("editor");
+		$parent.removeClass('validateError');
 	};
 
 	BaseFieldEditor.prototype._updateParentContent = function()
@@ -127,6 +129,11 @@
 			result["UDFId"] = data.UDFId;
 			result["TypeId"] = data.editType.TypeId;
 			result["DataTypeId"] = data.editType.DataTypeId;
+		}
+
+		if (data.UDGridField && data.UDGridField.Guid)
+		{
+			result["UDGridField_Guid"] = data.UDGridField.Guid;
 		}
 
 		self.applied.notify(result);

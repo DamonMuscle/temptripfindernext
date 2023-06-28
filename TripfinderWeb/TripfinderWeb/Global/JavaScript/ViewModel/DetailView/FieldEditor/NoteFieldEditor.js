@@ -5,6 +5,7 @@
 	function NoteFieldEditor(type)
 	{
 		var self = this;
+		this.enableRightClickMenu = true;
 		TF.DetailView.FieldEditor.StringFieldEditor.call(self, type);
 	};
 
@@ -105,6 +106,6 @@
 		{
 			return 'None';
 		}
-		return String(value).replace(" ", "&nbsp;").replace(/\n/g, '</br>');
+		return String(value).replace(/\n/g, '<br>');
 	};
 })();

@@ -2,19 +2,21 @@
 {
 	createNamespace("TF.DetailView.FieldEditor").DropDownFieldEditor = DropDownFieldEditor;
 
-	var DEFAULT_NULL_AVATAR = "(None)";
+	const DEFAULT_NULL_AVATAR = "(None)";
+	const DEFAULT_NULL_VALUE = -999;//means DBNull
 
 	function DropDownFieldEditor(type)
 	{
 		var self = this;
 
 		TF.DetailView.FieldEditor.NonInputFieldEditor.call(self, type);
-		self.NONE_VALUE = -999;//means DBNull
 		self.obStopped = ko.observable(false);
 		self.obIsFetchingData = ko.observable(false);
 
+		self.virtualScrollContext = null;
 		self._selectedIndex = null;
 		self._selectedItem = null;
+		self.maxItemsCount = 500;
 		self.quickSearchHelper = new TF.Helper.QuickSearchHelper(".menu-label", ["(none)"], self._findAllElements.bind(self), self.select.bind(self), self);
 	};
 
@@ -37,11 +39,32 @@
 		TF.DetailView.FieldEditor.NonInputFieldEditor.prototype._initElement.call(this, options);
 	};
 
+
 	DropDownFieldEditor.prototype._findElement = function(index)
 	{
-		var $menu = this._contextMenu.$menuContainer.find(".dropdown-editor-menu");
+		if (this.virtualScrollContext)
+		{
+			var $menu = this._contextMenu.$menuContainer.find(".dropdown-editor-menu");
 
-		return $menu.find("li:not('.title'):nth(" + index + ")");
+			var firstIndex = $menu.find("li:not('.title'):nth(0)").attr("item-index");
+			var maxCount = parseInt(this.virtualScrollContext.$element.height() / this.virtualScrollContext.singleHeight)
+
+			if (Math.abs(index - firstIndex) + 1 > maxCount)
+			{
+				var matchedItem = this.virtualScrollContext.source[index];
+				this.virtualScrollContext.resultListBox.scrollToItem(matchedItem);
+
+				$menu.focus();
+			}
+
+			return $menu.find("li:not('.title')[item-index=" + index + ']');
+		}
+		else
+		{
+			var $menu = this._contextMenu.$menuContainer.find(".dropdown-editor-menu");
+
+			return $menu.find("li:not('.title'):nth(" + index + ")");
+		}
 	};
 
 	DropDownFieldEditor.prototype._findAllElements = function()
@@ -55,14 +78,18 @@
 
 	DropDownFieldEditor.prototype.select = function(index)
 	{
-		var $currentItem = this._findElement(index);
 
-		this._findElement(this._selectedIndex).removeClass("document-hover");
+		if (this._selectedIndex)
+		{
+			this._findElement(this._selectedIndex).removeClass("document-hover");
+		}
+
+		this._selectedIndex = index;
+
+		var $currentItem = this._findElement(index);
 
 		$currentItem.focus();
 		$currentItem.addClass("document-hover");
-
-		this._selectedIndex = index;
 	};
 
 	DropDownFieldEditor.prototype.nextActiveItem = function(up)
@@ -70,7 +97,16 @@
 		if (this._contextMenu == null) return;
 
 		var self = this,
+			length = 0;
+
+		if (self.virtualScrollContext)
+		{
+			length = self.virtualScrollContext.source.length;
+		}
+		else
+		{
 			length = self._findAllElements().length;
+		}
 
 		if (self._selectedIndex == null)
 		{
@@ -164,19 +200,25 @@
 			if (self.obStopped()) return;
 
 			dropDownSource = dropDownSource.map(item =>
+			{
+				if (!(item instanceof Object))
 				{
-					if (!(item instanceof Object))
-					{
-						return {
-							text: item,
-							value: item
-						};
-					}
-	
-					return item;
-				});	
+					return {
+						text: item,
+						value: item
+					};
+				}
 
-			self.dropDownSource = self._sortByAlphaOrderWithTitles(dropDownSource);
+				return item;
+			});
+
+			if (self.options.title == "Route Name")
+			{
+				self.dropDownSource = dropDownSource;
+			} else
+			{
+				self.dropDownSource = self._sortByAlphaOrderWithTitles(dropDownSource);
+			}
 
 			var allowNullValue = options ? options.allowNullValue : false;
 
@@ -184,11 +226,11 @@
 			{
 				self.dropDownSource.unshift({
 					'text': options.nullAvatar || DEFAULT_NULL_AVATAR,
-					'value': self.NONE_VALUE
+					'value': DEFAULT_NULL_VALUE
 				});
 			}
 
-			var selectedValue = self._isKeyValid(options.defaultValue) ? options.defaultValue : self.NONE_VALUE;
+			var selectedValue = self._isKeyValid(options.defaultValue) ? options.defaultValue : DEFAULT_NULL_VALUE;
 			if (self._selectedItem)
 			{
 				selectedValue = self._selectedItem.value;
@@ -196,32 +238,42 @@
 
 			self._createDropDown(self.dropDownSource, selectedValue);
 		});
-	
-		if (TF.isMobileDevice && $(".grid-stack-container").length) {
-			$(".grid-stack-container").on('touchmove' + self._eventNamespace, function (e) {
-				e.preventDefault();
-				e.stopPropagation();
-				return false;
-			});
-		}
-
 	};
 
 	DropDownFieldEditor.prototype._createDropDown = function(source, selectedValue)
 	{
-		var self = this,
+		var self = this, dropDownMenuViewModel;
+		// If there are more than maxItemsCount(default 500) items, use virtual scrolling list box.
+		if (source.length > self.maxItemsCount)
+		{
+			dropDownMenuViewModel = new TF.Control.FieldEditor.VirtualScollingEditorMenuViewModel(source, selectedValue);
+
+
+			self._contextMenu = new TF.ContextMenu.TemplateContextMenu(
+				"workspace/detailview/fieldeditor/VirtualScrollingEditorMenu",
+				dropDownMenuViewModel
+			);
+
+			self.virtualScrollContext = dropDownMenuViewModel;
+		}
+		else
+		{
 			dropDownMenuViewModel = new TF.Control.FieldEditor.DropDownEditorMenuViewModel(source, selectedValue);
 
-		self._contextMenu = new TF.ContextMenu.TemplateContextMenu(
-			"workspace/detailview/fieldeditor/dropdowneditormenu",
-			dropDownMenuViewModel
-		);
+			self._contextMenu = new TF.ContextMenu.TemplateContextMenu(
+				"workspace/detailview/fieldeditor/dropdowneditormenu",
+				dropDownMenuViewModel
+			);
+		}
 
 		dropDownMenuViewModel.itemSelected.subscribe(function(e, selectedItem)
 		{
-			self._selectedItem = selectedItem;
-			self.setValue(selectedItem.value === -999 ? "" : selectedItem.text);
-			self.save(selectedItem);
+			if (selectedItem != null)
+			{
+				self._selectedItem = selectedItem;
+				self.setValue(selectedItem.value === -999 ? "" : selectedItem.text);
+				self.save(selectedItem);
+			}
 		});
 
 		dropDownMenuViewModel.afterMenuRender.subscribe(function()
@@ -235,6 +287,50 @@
 
 			$menu.find("li.menu-item-checked").focus();
 			self._$menu = $menu;
+			dropDownMenuViewModel.scrollToSelected && dropDownMenuViewModel.scrollToSelected();
+
+			var $content = self.getContentElement();
+			$menu.on("keydown" + self._eventNamespace, function(e)
+			{
+				if ($content.css('display') === 'none')
+				{
+					return;
+				};
+				var keyCode = e.keyCode || e.which;
+
+				if (self._contextMenu && keyCode !== $.ui.keyCode.UP && keyCode !== $.ui.keyCode.DOWN)
+				{
+					self.quickSearchHelper.quickSearch(e);
+				}
+
+				switch (keyCode)
+				{
+					case $.ui.keyCode.ESCAPE:
+						self.cancel();
+						break;
+					case $.ui.keyCode.UP:
+						self.nextActiveItem(true);
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+					case $.ui.keyCode.DOWN:
+						self.nextActiveItem(false);
+						e.preventDefault();
+						e.stopPropagation();
+						break;
+					case $.ui.keyCode.ENTER:
+						if (self._selectedIndex != null)
+						{
+							self._findElement(self._selectedIndex).trigger("click");
+						}
+						else
+						{
+							self.toggleDropDown();
+						}
+						e.stopPropagation();
+						break;
+				}
+			});
 		});
 
 		tf.contextMenuManager.showMenu(self.getContentElement(), self._contextMenu);
@@ -263,6 +359,7 @@
 		if ($content.css('display') !== 'none')
 		{
 			self.options = options;
+			self.options.previousValue = $content.text();
 
 			if (options.showWidget)
 			{
@@ -296,45 +393,6 @@
 			};
 			e.stopPropagation();
 			self.toggleDropDown();
-		});
-
-		$(document).on("keydown" + self._eventNamespace, function(e)
-		{
-			if ($content.css('display') === 'none')
-			{
-				return;
-			};
-			var keyCode = e.keyCode || e.which;
-
-			if (self._contextMenu && keyCode !== $.ui.keyCode.UP && keyCode !== $.ui.keyCode.DOWN)
-			{
-				self.quickSearchHelper.quickSearch(e);
-			}
-
-			switch (keyCode)
-			{
-				case $.ui.keyCode.ESCAPE:
-					self.cancel();
-					break;
-				case $.ui.keyCode.UP:
-					self.nextActiveItem(true);
-					e.preventDefault();
-					break;
-				case $.ui.keyCode.DOWN:
-					self.nextActiveItem(false);
-					e.preventDefault();
-					break;
-				case $.ui.keyCode.ENTER:
-					if (self._selectedIndex != null)
-					{
-						self._findElement(self._selectedIndex).trigger("click");
-					}
-					else
-					{
-						self.toggleDropDown();
-					}
-					break;
-			}
 		});
 
 		$(window).on("resize" + self._eventNamespace, function()
@@ -389,7 +447,7 @@
 		var self = this;
 
 		self._updateParentContent(selectedItem.text);
-		if (selectedItem.value === self.NONE_VALUE)
+		if (selectedItem.value === DEFAULT_NULL_VALUE)
 		{
 			self.apply(null);
 		}
@@ -429,9 +487,6 @@
 		if (this._contextMenu)
 		{
 			this._contextMenu.$menuContainer.trigger("contextMenuClose");
-			if (TF.isMobileDevice && $(".grid-stack-container").length) {
-				$(".grid-stack-container").off('touchmove' + this._eventNamespace);
-			}
 		}
 	};
 
@@ -499,6 +554,7 @@
 			self._contextMenu = null;
 		}
 		self._selectedIndex = null;
+		tf.dropdownExpanded = false;
 	};
 
 	DropDownFieldEditor.prototype._getAppliedResult = function(data, value, text)
@@ -523,8 +579,5 @@
 		$(window).off(this._eventNamespace);
 		$(document).off(this._eventNamespace);
 		this._$parent.off(this._eventNamespace);
-		if (TF.isMobileDevice) {
-			$(".grid-stack-container").off('touchmove' + this._eventNamespace);
-		}		
 	};
 })();
