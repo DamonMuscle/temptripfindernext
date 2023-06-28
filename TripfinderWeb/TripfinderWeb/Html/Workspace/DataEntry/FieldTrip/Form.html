@@ -502,11 +502,11 @@
 							data-bind="css:obRequiredFields()&&obRequiredFields().EstimatedCost&&obRequiredFields().EstimatedCost.Required?'requirestar':null">Estimated
 							Cost</label>
 						<!-- ko if: (obRequiredFields() && obRequiredFields().EstimatedCost && obRequiredFields().EstimatedCost.Required)-->
-						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedCost,attributes:{class:"form-control",required:"required",maxlength:"10",name:"estimatedCost",max:"9999999"}} -->
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedCost,attributes:{class:"form-control",required:"required",maxlength:"10",name:"estimatedCost",max:"9999999", decimalMax: "2"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 						<!-- ko if: !(obRequiredFields() && obRequiredFields().EstimatedCost) || (obRequiredFields() && obRequiredFields().EstimatedCost && !obRequiredFields().EstimatedCost.Required)-->
-						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedCost,attributes:{class:"form-control",maxlength:"10",name:"estimatedCost",max:"9999999"}} -->
+						<!-- ko customInput:{type:"Decimal",value:obEntityDataModel().estimatedCost,attributes:{class:"form-control",maxlength:"10",name:"estimatedCost",max:"9999999", decimalMax: "2"}} -->
 						<!-- /ko -->
 						<!--/ko-->
 					</div>
