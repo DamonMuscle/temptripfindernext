@@ -185,6 +185,18 @@
 					DisplayName: "Departure Date",
 					Width: '160px',
 					type: "date"
+				},
+				{
+					FieldName: "SchoolGeocoded",
+					DisplayName: "SchoolGeocoded",
+					Width: "150px",
+					type: "string"
+				},
+				{
+					FieldName: "FieldTripDestinationGeocoded",
+					DisplayName: "FieldTripDestinationGeocoded",
+					Width: "150px",
+					type: "string"
 				}
 			].concat(this.getGridColumnsDefinationPart2())
 				.concat(this.getGridColumnsDefinationPart3())

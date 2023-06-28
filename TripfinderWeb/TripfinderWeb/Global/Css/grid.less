@@ -3932,3 +3932,36 @@ input.quick-add-layout-radio:checked::after {
 		background-color: #EFEFEF;
 	}
 }
+
+.routing-tree-view {
+	.left-color-picker-container.h50 {
+		.k-widget.k-colorpicker {
+			height: 50px;
+		}
+	}
+
+	.trip-text-info,
+	.left-color-picker-container {
+		.k-widget.k-colorpicker {
+			float: left;
+			width: 15px;
+			height: 60px;
+
+			span {
+				width: 15px;
+				border-width: 0;
+				padding: 0;
+				height: inherit;
+
+				.k-icon.k-i-arrow-60-down::before {
+					content: '';
+				}
+			}
+		}
+	}
+
+	.k-icon.k-i-expand,
+	.k-icon.k-i-collapse {
+		display: none;
+	}
+}

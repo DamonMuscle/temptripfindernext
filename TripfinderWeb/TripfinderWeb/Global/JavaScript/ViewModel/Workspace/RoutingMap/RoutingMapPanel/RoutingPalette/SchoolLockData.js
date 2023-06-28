@@ -29,13 +29,13 @@
 			var unLockSchoolIds = alreadyLockIds.slice();
 			self.dataModel.getEditTrips().forEach(function(trip)
 			{
-				var schoolIds = trip.SchoolIds.split("!").filter(function(c) { return c; });
-				unLockSchoolIds = alreadyLockIds.filter(function(c) { return schoolIds.indexOf(c) < 0; });
-				var lockSchoolIds = schoolIds.filter(function(c) { return c && alreadyLockIds.indexOf(c) < 0; });
-				if (lockSchoolIds.length > 0)
-				{
-					self.lockIds(lockSchoolIds);
-				}
+				// var schoolIds = trip.SchoolIds.split("!").filter(function(c) { return c; });
+				// unLockSchoolIds = alreadyLockIds.filter(function(c) { return schoolIds.indexOf(c) < 0; });
+				// var lockSchoolIds = schoolIds.filter(function(c) { return c && alreadyLockIds.indexOf(c) < 0; });
+				// if (lockSchoolIds.length > 0)
+				// {
+				// 	self.lockIds(lockSchoolIds);
+				// }
 			});
 
 			if (unLockSchoolIds.length > 0)

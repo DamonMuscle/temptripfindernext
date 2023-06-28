@@ -18,10 +18,12 @@
 			showRemoveColumnButton: true,
 			displayCheckbox: true,
 			type: "fieldtrip",
+			GridType:"FieldTrip",
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("fieldtrip"));
-			}
+			},
+			serverPaging: false
 		});
 		TF.Modal.KendoListMoverWithSearchControlModalViewModel.call(this, selectedData, options);
 		this.obDisableControl(true);

@@ -1072,13 +1072,13 @@
 	{
 		return '#if(item.level() == 0) {#' +
 			'<div class="row tree-trip-row #: item.customData.openType == "View" ? "view-trip" : ""#">' +
-			'<div class="col-xs-24 context"><div class="trip-text-info"><div class="trip-color"></div><div class="context-text"><div class="text-name trip-name"><div>#: item.text# </div><div class="tree-buttons trip-button"><div class="icon trip-absorption #: item.customData.openType == "View"? "view-disabled-button":"" #" title="Absorption"></div><div class="icon optimize-sequence #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Optimize Sequence">' +
-			'</div><div class="icon copy-information #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Copy Calculated Duration"></div><div class="icon refresh #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Refresh Path"></div><div class="icon delete trip-delete #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Delete">' +
+			'<div class="col-xs-24 context"><div class="trip-text-info"><div class="trip-color"></div><div class="context-text"><div class="text-name trip-name"><div>#: item.text# </div><div class="tree-buttons trip-button"><div class="icon trip-absorption view-disabled-button" title="Absorption"></div><div class="icon optimize-sequence view-disabled-button" title="Optimize Sequence">' +
+			'</div><div class="icon copy-information #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Copy Calculated Duration"></div><div class="icon refresh #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Refresh Path"></div><div class="icon delete trip-delete view-disabled-button" title="Delete">' +
 			'</div><div class="icon copy copyTrip #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="New Copy"></div><div class="icon info trip-info" title="Info"></div><div class="icon zoom-map-to-layers" title="Center Map"></div><div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide trip" ></div></div>' +
 			'#if(item.customData.openType == "View") {#' +
 			'<div class="read-only"></div>' +
 			'#}#' +
-			'</div><div class="trip-info-text">' + this.getTripInfoTemplate() + '</div></div></div>' +
+			'</div><div class="trip-info-text">' + this.getFieldTripInfoTemplate() + '</div></div></div>' +
 			'<div class="trip-canvas-container"><canvas style="margin-left:10px" class="trip-canvas-distance-info" height="80" width="160"></canvas><canvas style="margin-left:10px" class="trip-canvas-duration-info" height="80" width="160"></canvas></div></div>' +
 			'</div>' +
 			'#}else if(item.level() == 1){#' +
@@ -1209,6 +1209,21 @@
 		return `<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
 	<span class="splitter"></span>
 	<span class="info-block">#:item.customData.students #<br/>Student#: item.customData.students==1 ? "" : "s" #</span>
+	<span class="splitter"></span>
+	<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
+	<span class="splitter"></span>
+	<span class="info-block">#: item.customData.tripTotalTime #<br/>min</span>
+	<span class="splitter"></span>
+	<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
+	<span class="splitter"></span>
+	<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
+	<span class="splitter"></span>
+	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>
+</div>`;
+	}
+	RoutingDisplayHelper.prototype.getFieldTripInfoTemplate = function()
+	{
+		return `<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
 	<span class="splitter"></span>
 	<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
 	<span class="splitter"></span>

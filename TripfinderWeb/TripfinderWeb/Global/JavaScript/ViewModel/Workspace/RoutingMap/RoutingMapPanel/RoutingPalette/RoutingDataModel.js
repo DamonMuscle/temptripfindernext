@@ -407,6 +407,128 @@
 		});
 	};
 
+	RoutingDataModel.prototype.setOpenFieldTrips = function(data, disableAutoZoom)
+	{
+		var self = this, newTrips = [], newTripIds = [], remainTripIds = [], remainTrips = [];
+
+		// if (data.length == 0)
+		// {
+		// 	// if no need to open,close all
+		// 	return self.closeAllEditTrips();
+		// }
+
+		// data = Enumerable.From(data).OrderBy("$.Name").ToArray();
+		// var viewTrips = self.getViewTrips().filter(function(trip)
+		// {
+		// 	return Enumerable.From(data).Any(function(c) { return c.Id == trip.id; });
+		// });
+		// if (viewTrips && viewTrips.length > 0)
+		// {
+		// 	self.closeByViewTrips(viewTrips);
+		// }
+		tf.loadingIndicator.showImmediately();
+		return self._filterNotLockTripIds(data).then(function(availableIds)
+		{
+			data = data.filter(function(c) { return availableIds.indexOf(c.Id + "") >= 0; });
+			if (data.length == 0)
+			{
+				return Promise.reject();
+			}
+			self.trips.forEach(function(trip)
+			{
+				if (Enumerable.From(data).Any(function(c) { return c.Id == trip.id; }))
+				{
+					remainTripIds.push(trip.id);
+					remainTrips.push(trip);
+				}
+			});
+
+			newTrips = self._getNewTrip(data);
+			newTripIds = newTrips.map(function(c) { return c.id; });
+			self.trips = self.trips.concat(newTrips);
+			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
+			// self._removeNotOpenEditTrips(data);
+			self.bindColor();
+			
+			/*var p1 = self._fetchTripData(newTripIds);
+			var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
+			{
+				if (!disableAutoZoom)
+				{
+					self.viewModel.eventsManager.zoomClick({});
+				}
+			});
+			
+			var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
+			
+			return Promise.all([p1, p2, p3]);
+			*/
+			return Promise.resolve();
+		}).then(function(tripsData)
+		{
+			tf.loadingIndicator.tryHide();
+
+			// const fetchedTripsData = tripsData[0].Trips;
+			const fetchedTripsData = self.trips;
+
+			// remove not exist new trip
+			newTrips = newTrips.filter(function(trip)
+			{
+				var exist = Enumerable.From(fetchedTripsData).Any(function(t) { return t.id == trip.id; });
+				if (!exist)
+				{
+					self.trips = self.trips.filter(function(t) { return t.id != trip.id; });
+				}
+				return exist;
+			});
+
+			// remember trip original assignment info.
+			for (let i = 0; i < fetchedTripsData.length; i++)
+			{
+				const tripData = fetchedTripsData[i];
+				self.originalTripAssignment[tripData.id] = tripData;
+			}
+
+			self._setOpenType(newTrips, "Edit");
+			/*
+			if (remainTripIds.length == 0)
+			{
+				self._setCandidateStudent(tripsData[0].CandidateStudents);
+			}
+			self.routingStudentManager.calculateStudentPUDOStatus();
+			self.setActualStopTime(self.trips);
+			self.setStudentTravelTime(self.trips);
+			self.setAllStudentValidProperty(self.trips);
+			self.routingStudentManager.refreshStudent();
+			self.viewModel.analyzeTripByDistrictPolicy.initCacheFromAssignedStudent();
+			*/
+			return Promise.resolve();
+		}).then(function()
+		{
+			// return self._getSchoolLocations(newTrips);
+		}).then(function()
+		{
+			self.routingStudentManager.refreshDictionary(null, null);
+			// self.viewModel.drawTool.stopTool.attachClosetStreetToStop(allTripStops); //comment for improve open trip performance.RW-11855
+			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false });
+			self.setTripOriginalData(newTrips);
+			if (self.showImpactDifferenceChart()) { newTrips.forEach(function(trip) { self.refreshOptimizeSequenceRate(trip.id); }); }
+			/*
+			self.viewModel.analyzeTripByDistrictPolicy._getDistrictPolicies().then(function()
+			{
+				self.viewModel.analyzeTripByDistrictPolicy.analyze(self.trips, false, true);
+			});
+			*/
+			self.routingStudentManager.refreshStudentLock();
+			self._updateTravelScenarioLock();
+		}).catch(function(args)
+		{
+			console.log(args);
+			self.tripLockData.unLock(data.map(x => x.Id));
+			tf.loadingIndicator.tryHide();
+		});		
+	}
+
 	/**
 	* open trip
 	*/
@@ -449,9 +571,10 @@
 			newTripIds = newTrips.map(function(c) { return c.id; });
 			self.trips = self.trips.concat(newTrips);
 			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
-			self._removeNotOpenEditTrips(data);
+			// self._removeNotOpenEditTrips(data);
 			self.bindColor();
-			var p1 = self._fetchTripData(newTripIds);
+			
+			/*var p1 = self._fetchTripData(newTripIds);
 			var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
 			{
 				if (!disableAutoZoom)
@@ -459,8 +582,12 @@
 					self.viewModel.eventsManager.zoomClick({});
 				}
 			});
+			
 			var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
+			
 			return Promise.all([p1, p2, p3]);
+			*/
+			return Promise.resolve();
 		}).then(function(tripsData)
 		{
 			tf.loadingIndicator.tryHide();
@@ -513,8 +640,9 @@
 			});
 			self.routingStudentManager.refreshStudentLock();
 			self._updateTravelScenarioLock();
-		}).catch(function()
+		}).catch(function(args)
 		{
+			console.log(args);
 			self.tripLockData.unLock(data.map(x => x.Id));
 			tf.loadingIndicator.tryHide();
 		});

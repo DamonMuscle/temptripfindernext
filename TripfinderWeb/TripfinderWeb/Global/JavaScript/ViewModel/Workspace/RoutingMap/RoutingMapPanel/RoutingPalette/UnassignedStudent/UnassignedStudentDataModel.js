@@ -31,7 +31,7 @@
 		self.settingChangeEvent = new TF.Events.Event();
 
 		self.tripDataModel.onCandidatesStudentsChangeToMapEvent.subscribe(this.onCandidatesStudentsChangeEvent.bind(this));
-		self.tripDataModel.onTripsChangeEvent.subscribe(this.onTripsChangeEvent.bind(this));
+		// self.tripDataModel.onTripsChangeEvent.subscribe(this.onTripsChangeEvent.bind(this));
 
 	}
 

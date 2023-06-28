@@ -1770,11 +1770,35 @@
 			}
 
 			.trip-info-text {
-				padding-left: 2px;
-				margin: 7px;
+				padding-left: 5px;
+				margin: 5px 0 0 0;
 				font-size: 11px;
 				overflow: hidden;
 				text-overflow: ellipsis;
+				text-align-last: justify;
+				line-height: 1em;
+
+				.info-block {
+					height: 28px;
+					display: inline-block;
+					min-width: 24px;
+					text-align-last: center;
+
+					&.loadingInfo {
+						background-image: url(../ThirdParty/kendo/Styles/Default/loading.gif);
+						background-repeat: no-repeat;
+						background-position-x: center;
+						background-size: 12px;
+					}
+				}
+
+				.splitter {
+					width: 1px;
+					display: inline-block;
+					background-color: #dedede;
+					height: 26px;
+					vertical-align: sub;
+				}				
 			}
 		}
 
@@ -3420,18 +3444,18 @@
 	}
 
 	.routing-tree-view .row.tree-trip-row {
-		height: 50px;
+		height: 60px;
 
 		.trip-canvas-container {
 			height: 80px;
 			width: 100%;
 			position: absolute;
-			top: 50px;
+			top: 60px;
 			display: none;
 		}
 
 		&.show-optimize-info {
-			height: 130px;
+			height: 145px;
 
 			.trip-canvas-container {
 				display: block;

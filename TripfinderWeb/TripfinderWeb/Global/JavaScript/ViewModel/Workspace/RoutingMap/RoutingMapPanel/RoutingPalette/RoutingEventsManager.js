@@ -136,7 +136,8 @@
 							{
 								if (result)
 								{
-									self.dataModel.setOpenTrips(data);
+									// self.dataModel.setOpenTrips(data);
+									self.dataModel.setOpenFieldTrips(data);
 								}
 							});
 						}
@@ -144,7 +145,8 @@
 				}
 				else
 				{
-					self.dataModel.setViewTrips(data);
+					// self.dataModel.setViewTrips(data);
+					self.dataModel.setOpenFieldTrips(data);
 				}
 			}
 		});

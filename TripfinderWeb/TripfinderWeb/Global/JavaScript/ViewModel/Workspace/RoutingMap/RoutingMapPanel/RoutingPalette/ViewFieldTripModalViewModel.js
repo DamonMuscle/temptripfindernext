@@ -17,6 +17,7 @@
 			showRemoveColumnButton: true,
 			displayCheckbox: true,
 			type: "fieldtrip",
+			GridType: "FieldTrip",
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("fieldtrip"));
