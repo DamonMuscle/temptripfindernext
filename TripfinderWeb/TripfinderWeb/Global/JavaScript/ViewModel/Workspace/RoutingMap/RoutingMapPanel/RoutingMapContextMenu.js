@@ -2059,21 +2059,22 @@
 						click: mapEditingPaletteViewModel.landmarkViewModel.eventsManager.deleteClick.bind(mapEditingPaletteViewModel.landmarkViewModel.eventsManager, menuItemData)
 					}));
 					contextMenuCategories.landmarks.push(tempParentMenuItem);
-				} else if (type == 'noneligiblezone')
-				{
-					var tempParentMenuItem = new TF.RoutingMap.MenuItem({
-						header: getText(menuItemData, 'nonEligibleZone'),
-						icon: null,
-						type: 'nonEligibleZone'
-					});
-					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
-						header: 'Info',
-						icon: 'info',
-						data: menuItemData,
-						click: routingPaletteViewModel.nonEligibleZoneViewModel.eventsManager.infoClick.bind(routingPaletteViewModel.nonEligibleZoneViewModel.eventsManager, menuItemData)
-					}));
-					contextMenuCategories.nonEligibleZones.push(tempParentMenuItem);
 				}
+				// else if (type == 'noneligiblezone')
+				// {
+				// 	var tempParentMenuItem = new TF.RoutingMap.MenuItem({
+				// 		header: getText(menuItemData, 'nonEligibleZone'),
+				// 		icon: null,
+				// 		type: 'nonEligibleZone'
+				// 	});
+				// 	tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
+				// 		header: 'Info',
+				// 		icon: 'info',
+				// 		data: menuItemData,
+				// 		click: routingPaletteViewModel.nonEligibleZoneViewModel.eventsManager.infoClick.bind(routingPaletteViewModel.nonEligibleZoneViewModel.eventsManager, menuItemData)
+				// 	}));
+				// 	contextMenuCategories.nonEligibleZones.push(tempParentMenuItem);
+				// }
 			}
 			// RCM option only when nothing is returned
 			if (data.length == 0)
