@@ -90,10 +90,10 @@
 	{
 		var self = this;
 		tf.modalManager.showModal(
-			isViewTrip ? (new TF.RoutingMap.RoutingPalette.ViewTripModalViewModel(
+			isViewTrip ? (new TF.RoutingMap.RoutingPalette.ViewFieldTripModalViewModel(
 				self.dataModel.getViewTrips(),
 				self.dataModel.getEditTrips()
-			)) : (new TF.RoutingMap.RoutingPalette.OpenTripModalViewModel(
+			)) : (new TF.RoutingMap.RoutingPalette.OpenFieldTripModalViewModel(
 				self.dataModel.getEditTrips(), {
 				getLockedInfo: self._getLockedByOtherTrips.bind(self)
 			}

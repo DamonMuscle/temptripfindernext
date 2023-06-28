@@ -1,8 +1,8 @@
 ﻿<div class="tf-contextmenu-wrap filtermenu-wrap phone-wrap">
-	<ul class="tf-contextmenu">
+	<ul class="tf-contextmenu" data-bind="css:{'overFlow-Hidden':!gridViewModel.obShowSplitmap()}">
 		<li class="menu-divider"></li>
 		<!--ko if:tf.permissions.filtersAdd -->
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.createNewFilterClick">
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.createNewFilterClick">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
@@ -10,8 +10,9 @@
 			</div>
 		</li>
 		<!--/ko -->
-		<!--ko if:tf.permissions.filtersEdit -->
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.saveFilterClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 || searchGrid.obSelectedGridFilterId() === null  || searchGrid.obSelectedGridFilterId() === undefined}">
+		<!--ko if:tf.permissions.filtersEdit && searchGrid.saveFilterClick-->
+		<li class="menu-item" data-bind="contextMenuClick:searchGrid.saveFilterClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 
+		|| searchGrid.obSelectedGridFilterId() === null  || searchGrid.obSelectedGridFilterId() === undefined || searchGrid.obIsSystemFilter() || searchGrid.options.fromSearch}">
 			<div class="menu-icon saveas">
 			</div>
 			<div class="menu-label">
@@ -19,8 +20,9 @@
 			</div>
 		</li>
 		<!--/ko -->
-		<!--ko if:tf.permissions.filtersAdd -->
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.saveAsNewFilterClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 && !searchGrid.obSelectedGridFilterClause()}">
+		<!--ko if:tf.permissions.filtersAdd && searchGrid.saveAsNewFilterClick-->
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.saveAsNewFilterClick,css:{disabled:searchGrid.obSelectedGridFilterId()<0 
+		&& !searchGrid.obSelectedGridFilterClause() || !!searchGrid.obSelectedStaticFilterName() || searchGrid.obIsSystemFilter() || searchGrid.options.fromSearch}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
@@ -29,7 +31,7 @@
 		</li>
 		<!--/ko -->
 		<!--ko if:tf.permissions.filtersEdit || tf.permissions.filtersAdd || tf.permissions.filtersDelete -->
-		<li class="menu-item" data-bind="contextMenuClick:searchGrid.manageFilterClick">
+		<li class="menu-item disable-auto-close" data-bind="contextMenuClick:searchGrid.manageFilterClick">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
@@ -37,20 +39,102 @@
 			</div>
 		</li>
 		<!--/ko -->
-		<!--ko if: searchGrid.options && searchGrid.options.isGridView -->
+		<!--ko if:searchGrid.quickFilterBarClick -->
 		<li class="menu-item menu-item-quick-filter" data-bind="contextMenuClick:searchGrid.quickFilterBarClick,css:searchGrid.obQuickFilterBarCheckIcon">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label">
 				Quick Filter Bar
 			</div>
+			<div class="menu-icon menu-icon-mobile">
+			</div>
 		</li>
 		<!--/ko -->
-
-		<!--ko if:searchGrid.options.gridType==="fieldtriplocation" && searchGrid.setReminder -->
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
+		<!--ko if:searchGrid.obShowGeoRegionType -->
+		<li class="menu-item" data-bind="css:{disabled:searchGrid.obGeoRegionTypes().length==0}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				Geo Region Type
+			</div>
+			<!--ko if: searchGrid.obGeoRegionTypes().length > 0 -->
+			<ul class="tf-contextmenu">
+				<!--ko foreach: searchGrid.obGeoRegionTypes-->
+				<li class="menu-item" data-bind="
+					contextMenuClick:$parent.searchGrid.geoRegionTypeClick,
+					css:{'menu-item-checked':$data.Id==$parent.searchGrid.obSelectedGeoRegionTypeId()}">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label" data-bind="text:Name">
+					</div>
+				</li>
+				<!--/ko -->
+			</ul>
+			<!--/ko -->
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+		<!--ko if:searchGrid.obShowNonEligibleZone -->
+		<li class="menu-item" data-bind="css:{disabled:searchGrid.obNonEligibleZones().length==0}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				School Non Eligible Zone
+			</div>
+			<!--ko if: searchGrid.obNonEligibleZones().length > 0 -->
+			<ul class="tf-contextmenu">
+				<!--ko foreach: searchGrid.obNonEligibleZones-->
+				<li class="menu-item" data-bind="
+									contextMenuClick:$parent.searchGrid.nonEligibleZoneClick,
+									css:{'menu-item-checked':$data.OBJECTID==$parent.searchGrid.obSelectedNonEligibleZoneId()}">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label" data-bind="text:$data.School+' - '+$data.Name">
+					</div>
+				</li>
+				<!--/ko -->
+			</ul>
+			<!--/ko -->
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+
+		<!--ko if:searchGrid.obGridFilterDataModelsFormDashBoard && searchGrid.obGridFilterDataModelsFormDashBoard().length > 0 -->
+		<li class="menu-item" data-bind="css:{disabled:searchGrid.obGridFilterDataModelsFormDashBoard && searchGrid.obGridFilterDataModelsFormDashBoard().length==0}">
+			<div class="menu-icon">
+			</div>
+			<div class="menu-label">
+				System Filters
+			</div>
+			<!--ko if: searchGrid.obGridFilterDataModelsFormDashBoard().length > 0 -->
+			<ul class="tf-contextmenu">
+				<!--ko foreach: searchGrid.obGridFilterDataModelsFormDashBoard-->
+				<li class="menu-item" data-bind="
+					contextMenuClick:$parent.searchGrid.gridFilterClick.bind($parent.searchGrid),
+				    attr: { title: name },
+					css:{'menu-item-checked':$data.id()==$parent.searchGrid.obSelectedGridFilterId()}">
+					<div class="menu-icon">
+					</div>
+					<div class="menu-label" data-bind="text:name">
+					</div>
+				</li>
+				<!--/ko -->
+			</ul>
+			<!--/ko -->
+		</li>
+		<li class="menu-divider">
+			<div class="rule"></div>
+		</li>
+		<!--/ko -->
+
+		<!--ko if:searchGrid.setReminder&&!tf.isViewfinder -->
 		<li class="menu-item" data-bind="css:{disabled:!searchGrid.reminderMenuEnable() },contextMenuClick:searchGrid.setReminder.bind(searchGrid)">
 			<div class="menu-icon">
 			</div>
@@ -58,11 +142,10 @@
 				Set Reminder
 			</div>
 		</li>
-		<!--/ko -->
-
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
+		<!--/ko -->
 		<li class="menu-item" data-bind="contextMenuClick:searchGrid.clearGridFilterClick.bind(searchGrid)">
 			<div class="menu-icon">
 			</div>
@@ -71,35 +154,21 @@
 			</div>
 		</li>
 
-		<!--ko if:searchGrid.options.gridType==="fieldtrip" && searchGrid.options.isCalendarView -->
-		<li class="menu-divider">
-			<div class="rule"></div>
-		</li>
 
-		<!--ko foreach:searchGrid.obFieldTripStageFilters -->
-		<li class="menu-item disable-auto-close" data-bind="contextMenuClick: $parent.searchGrid.gridFieldTripFilterClick.bind($parent.searchGrid),css: {'menu-item-checked': $.inArray($data, $parent.searchGrid.selectedFieldTripStageFilters())>=0}">
-			<div class="menu-icon">
-			</div>
-			<div class="field-trip-color" data-bind="style: { backgroundColor: tf.fieldTripGridDefinition.gridDefinition().stageFormatter($data)}"></div>
-			<div class="menu-label" data-bind="text:$parent.searchGrid.getFieldTripStageName($data)">
-			</div>
-		</li>
-		<!--/ko -->
-		<!--/ko -->
 		<!--ko if:TF.isPhoneDevice -->
 		<!--ko if:
 			(searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate) ||
 			(searchGrid.obGridFilterDataModelsFromDataBase().length > 0) ||
-			(searchGrid.obGridFilterDataModelsFormDashBoard().length > 0)||
 			(searchGrid.obGridFilterDataModelsFromRelatedFilter().length > 0)
 		-->
 		<!--/ko -->
+
 		<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase().length > 0 -->
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
 		<!--/ko -->
-		<div class="special-item-container">
+		<div data-bind="css:{'special-item-container':!gridViewModel.obShowSplitmap()}">
 			<!--ko if:searchGrid.options && searchGrid.options.specialFilterMenuItemTemplate -->
 			<!--ko if:searchGrid.obGridFilterDataModelsFromDataBase().length == 0 -->
 			<li class="menu-divider">
@@ -126,6 +195,7 @@
 					},
 					css: {
 						'menu-item-broken': !$data.isValid(),
+						'menu-item-dbspecific':$data.dBID()!=null,
 						'menu-item-checked': $data.id()==$parent.searchGrid.obSelectedGridFilterId()
 					}">
 				<div class="menu-icon">
@@ -143,6 +213,7 @@
 					},
 					css: {
 						'menu-item-broken': !$data.isValid(),
+						'menu-item-dbspecific':$data.dBID()!=null,
 						'menu-item-checked': $data.id()==$parent.searchGrid.obSelectedGridFilterId()
 					}">
 				<div class="menu-icon">
@@ -152,20 +223,6 @@
 			</li>
 			<!--/ko -->
 			<!--/ko -->
-			<!--ko if:searchGrid.obGridFilterDataModelsFormDashBoard().length > 0 -->
-			<li class="menu-divider">
-				<div class="rule"></div>
-			</li>
-			<!--ko foreach:searchGrid.obGridFilterDataModelsFormDashBoard -->
-			<li class="menu-item dashboad" data-bind="contextMenuClick:$parent.searchGrid.gridFilterClick.bind($parent.searchGrid),attr: { title: 'Filter is a Dashboard Drill Down. It cannot be modified.' },css:{'menu-item-checked':$data.id()==$parent.searchGrid.obSelectedGridFilterId()}">
-				<div class="menu-icon">
-				</div>
-				<div class="menu-label" data-bind="text:name">
-				</div>
-			</li>
-			<!--/ko -->
-			<!--/ko -->
-
 		</div>
 		<!--/ko -->
 		<!--ko if:!TF.isPhoneDevice -->
@@ -184,7 +241,6 @@
 		<li class="menu-divider">
 			<div class="rule"></div>
 		</li>
-
 		<!--ko foreach:searchGrid.obGridFilterDataModelsFromDataBase -->
 		<li class="menu-item" data-bind="
 					contextMenuClick: $parent.searchGrid.gridFilterClick.bind($parent.searchGrid),
@@ -193,24 +249,9 @@
 					},
 					css: {
 						'menu-item-broken': !$data.isValid(),
+						'menu-item-dbspecific':$data.dBID()!=null,
 						'menu-item-checked': $data.id()==$parent.searchGrid.obSelectedGridFilterId()
 					}">
-			<div class="menu-icon">
-			</div>
-			<div class="menu-label" data-bind="text:name">
-			</div>
-		</li>
-		<!--/ko -->
-		<!--/ko -->
-		<!--ko if:searchGrid.obGridFilterDataModelsFormDashBoard().length > 0 -->
-		<li class="menu-divider">
-			<div class="rule"></div>
-		</li>
-		<!--ko foreach:searchGrid.obGridFilterDataModelsFormDashBoard -->
-		<li class="menu-item dashboad" data-bind="
-					contextMenuClick:$parent.searchGrid.gridFilterClick.bind($parent.searchGrid),
-					attr: { title: 'Filter is a Dashboard Drill Down. It cannot be modified.' },
-					css:{'menu-item-checked':$data.id()==$parent.searchGrid.obSelectedGridFilterId()}">
 			<div class="menu-icon">
 			</div>
 			<div class="menu-label" data-bind="text:name">

@@ -677,11 +677,11 @@
 				if (tf.authManager.isAuthorizedFor("mapEdit", "read"))
 				{
 					// palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Map Editing', 'mapedit', self.mapEditingPaletteViewModel, self.togglePalettePanel));
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Travel Scenarios', 'travelScenarios', self.travelScenariosPaletteViewModel, self.togglePalettePanel, 5));
+					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Travel Scenarios', 'travelScenarios', self.travelScenariosPaletteViewModel, self.togglePalettePanel, 6));
 				}
 				if (tf.authManager.isAuthorizedFor("routingMap", 'read'))
 				{
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel));
+					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel, 5));
 				}
 
 				// if (tf.authManager.hasWayfinder())
