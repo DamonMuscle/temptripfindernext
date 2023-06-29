@@ -1070,168 +1070,242 @@
 
 	RoutingDisplayHelper.prototype.getTreeViewTemplate = function()
 	{
-		return '#if(item.level() == 0) {#' +
-			'<div class="row tree-trip-row #: item.customData.openType == "View" ? "view-trip" : ""#">' +
-			'<div class="col-xs-24 context"><div class="trip-text-info"><div class="trip-color"></div><div class="context-text"><div class="text-name trip-name"><div>#: item.text# </div><div class="tree-buttons trip-button"><div class="icon trip-absorption view-disabled-button" title="Absorption"></div><div class="icon optimize-sequence view-disabled-button" title="Optimize Sequence">' +
-			'</div><div class="icon copy-information #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Copy Calculated Duration"></div><div class="icon refresh #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Refresh Path"></div><div class="icon delete trip-delete view-disabled-button" title="Delete">' +
-			'</div><div class="icon copy copyTrip #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="New Copy"></div><div class="icon info trip-info" title="Info"></div><div class="icon zoom-map-to-layers" title="Center Map"></div><div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide trip" ></div></div>' +
-			'#if(item.customData.openType == "View") {#' +
-			'<div class="read-only"></div>' +
-			'#}#' +
-			'</div><div class="trip-info-text">' + this.getFieldTripInfoTemplate() + '</div></div></div></div>' +
-			'<div class="trip-canvas-container"><canvas style="margin-left:10px" class="trip-canvas-distance-info" height="80" width="160"></canvas><canvas style="margin-left:10px" class="trip-canvas-duration-info" height="80" width="160"></canvas></div></div>' +
-			'</div>' +
-			'#}else if(item.level() == 1){#' +
-			'<div class="row k-tripstop-state-hover #: item.customData.schoolCode ? "school-row" : ""# #: item.customData.openType == "View" ? "view-trip" : ""#">' +
-			'<div class="col-xs-24 context no-bottom-border k-tripstop-state-hover"><div class="sequence-line k-tripstop-state-hover #:item.customData.schoolCode ? "school-line":""#">#: item.customData.sequence#</div><div class="insert-front-stops-area"></div><div class="insert-icon"></div><div class="insert-behind-stops-area"></div>' +
-			'<div class="sublevel-context-text k-tripstop-state-hover">' +
-			'<div class="text-hover-overflow-hidden">' +
-			'<div class="text-name k-tripstop-state-hover">#: item.text# </div>' +
-			'<div class="tree-buttons k-tripstop-state-hover">' +
-			'<div class="icon lock-time k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>' +
-			'<div class="icon delete stop-delete k-tripstop-state-hover #: item.customData.openType == "View"||!item.customData.deletable ? "view-disabled-button" : ""#" title="Delete"></div>' +
-			'<div class="icon assign k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Assign Students"></div>' +
-			'<div class="icon copy copyStop  #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div><div class="icon info stop-info k-tripstop-state-hover" title="Trip Stop Details"></div>' +
-			'<div class="icon zoom-map-to-layers k-tripstop-state-hover" title="Center Map" ></div></div></div>' +
-			'<div class="trip-info k-tripstop-state-hover"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">' +
-			'#if(!item.customData.schoolCode){#' +
-			'<div class="student-count-info k-tripstop-state-hover">#:item.customData.session == 2 ? "" : (item.customData.assignedStudentCount==0&&item.customData.totalStudentCount==0?"No Students":(item.customData.assignedStudentCount + " of " + item.customData.totalStudentCount + (item.customData.totalStudentCount == 1 ? " Student " : " Students "))) #</div>' +
-			'#}#' +
-			'#if(item.customData.toSchoolStudents &&  item.customData.toSchoolStudents.HomeToSchool > 0){#' +
-			'<div>#: item.customData.toSchoolStudents.HomeToSchool + (item.customData.session == 1 ? " DO - school to home" : item.customData.session == 2 ? " DO - school to school" : " DO - home to school") #</div>' +
-			'#}#' +
-			'#if(item.customData.toSchoolStudents &&  item.customData.toSchoolStudents.SchoolToHome > 0){#' +
-			'<div>#: item.customData.toSchoolStudents.SchoolToHome + (item.customData.session == 0 ? " PU - home to school" : item.customData.session == 2 ? " PU - school to school" : " PU - school to home") #</div>' +
-			'#}#' +
-			'#if(item.customData.toTransStudents && item.customData.toTransStudents.HomeToTrans > 0){#' +
-			'<div>#: item.customData.toTransStudents.HomeToTrans + " DO - home to trans" #</div>' +
-			'#}#' +
-			'#if(item.customData.toTransStudents && item.customData.toTransStudents.TransToHome > 0){#' +
-			'<div>#: item.customData.toTransStudents.TransToHome +" PU - trans to home" #</div>' +
-			'#}#' +
-			'#if(item.customData.transToTrans && item.customData.transToTrans.PUTransToTrans > 0){#' +
-			'<div>#: item.customData.transToTrans.PUTransToTrans + " PU - trans to trans"#</div>' +
-			'#}#' +
-			'#if(item.customData.transToTrans && item.customData.transToTrans.DOTransToTrans > 0){#' +
-			'<div>#: item.customData.transToTrans.DOTransToTrans + " DO - trans to trans"#</div>' +
-			'#}#' +
-			'#if(item.customData.puTransToSchool && item.customData.puTransToSchool.TransToSchool > 0){#' +
-			'<div>#: item.customData.puTransToSchool.TransToSchool + " PU - trans to school" #</div>' +
-			'#}#' +
-			'#if(item.customData.puTransToSchool && item.customData.puTransToSchool.SchoolToTrans > 0){#' +
-			'<div>#: item.customData.puTransToSchool.SchoolToTrans + " PU - school to trans" #</div>' +
-			'#}#' +
-			'#if(item.customData.doTransToSchool && item.customData.doTransToSchool.TransToSchool > 0){#' +
-			'<div>#: item.customData.doTransToSchool.TransToSchool + " DO - trans to school" #</div>' +
-			'#}#' +
-			'#if(item.customData.doTransToSchool && item.customData.doTransToSchool.SchoolToTrans > 0){#' +
-			'<div>#: item.customData.doTransToSchool.SchoolToTrans + " DO - school to trans" #</div>' +
-			'#}#' +
-			'#if(!item.customData.schoolCode){#' +
-			'<span class="arrival-time-span k-tripstop-state-hover"><div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>' +
-			'<span title="Scheduled time" class="schedule-time">#:item.customData.stopTime#</span> #:" | "#' +
-			'<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed #</span>#:" | "#' +
-			'<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#' +
-			'<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>' +
-			'#}#' +
-			'</div></div>' +
-			'#if(item.customData.schoolCode){#' +
-			'<div class="dock-position-bottom"><div class="school-location"></div><div class="time-info"><span class="arrival-time-span k-tripstop-state-hover">' +
-			'<div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>' +
-			'<span title="Scheduled time" class="schedule-time">#:item.customData.stopTime#</span> #:" | "#' +
-			'<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed#</span>#:" | "#' +
-			'<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#' +
-			'<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>' +
-			'</span></div></div>' +
-			'#}#' +
-			'</div></div>' +
-			'#}else{#' +
-			'<div class="row student-row-under-stop #: item.customData.openType == "View" ? "view-trip" : ""#">' +
-			'<div class="col-xs-24 context no-bottom-border"><div class="sequence-line-line"></div><div class="insert-stops-area"></div>' +
-			'<div class="sublevel-context-text #: item.customData.isAssigned ? "assign-student-color" : "unassign-student-color"#">' +
-			'<div class="student-text"><div class="student-status-info"><div class="text-name opacity-change student-text-name" title="#: item.text#">#: item.text# </div>' +
-			'#if(item.customData.prohibitCross) {#' +
-			'<div class="prohibit-cross"></div>' +
-			'#}#' +
-			'#if(!item.customData.isValid) {#' +
-			'<div class="invalid-student"></div>' +
-			'#}#' +
-			'<div class="text-status opacity-change">' +
-			'#if(item.customData.tripSession != 3){#' +
-			'#: item.customData.PUDOStatus# ' +
-			'#}else{#' +
-			'<div class="student-PUDOStatus">' +
-			'<span title="PU" class="po status #:item.customData.session == 0 ? "checked" :""# #:item.customData.PUValid ? "" : "cannot-checked"#">PU</span>' +
-			'<span title="DO" class="du status #:item.customData.session == 1 ? "checked" :""# #:item.customData.DOValid ? "" : "cannot-checked"#">DO</span>' +
-			'</div>' +
-			'#}#' +
-			'</div>' +
-			'#if(!item.customData.requirementId) {#' +
-			'<div class="student-exception" title="Exception"></div>' +
-			'#}#' +
-			'</div></div>' +
-			'<div class="student-requirement">' +
-			'<span title="Monday" class="day #:item.customData.dayCheckList[0] ? "checked" : ""# #:item.customData.initDayUncheckableList[0] ? "cannot-checked" : ""# #:item.customData.dayDisableList[0]||item.customData.openType == "View" ? "disabled" : ""#">Mo</span>' +
-			'<span title="Tuesday" class="day #:item.customData.dayCheckList[1] ? "checked" : ""# #:item.customData.initDayUncheckableList[1] ? "cannot-checked" : ""# #:item.customData.dayDisableList[1]||item.customData.openType == "View" ? "disabled" : ""#">Tu</span>' +
-			'<span title="Wednesday" class="day #:item.customData.dayCheckList[2] ? "checked" : ""# #:item.customData.initDayUncheckableList[2] ? "cannot-checked" : ""# #:item.customData.dayDisableList[2]||item.customData.openType == "View" ? "disabled" : ""#">We</span>' +
-			'<span title="Thursday" class="day #:item.customData.dayCheckList[3] ? "checked" : ""# #:item.customData.initDayUncheckableList[3] ? "cannot-checked" : ""# #:item.customData.dayDisableList[3]||item.customData.openType == "View" ? "disabled" : ""#">Th</span>' +
-			'<span title="Friday" class="day #:item.customData.dayCheckList[4] ? "checked" : ""# #:item.customData.initDayUncheckableList[4] ? "cannot-checked" : ""# #:item.customData.dayDisableList[4] ||item.customData.openType == "View"? "disabled" : ""#">Fr</span>' +
-			'<span title="Saturday" class="day #:item.customData.dayCheckList[5] ? "checked" : ""# #:item.customData.initDayUncheckableList[5] ? "cannot-checked" : ""# #:item.customData.dayDisableList[5]||item.customData.openType == "View" ? "disabled" : ""#">Sa</span>' +
-			'<span title="Sunday" class="day #:item.customData.dayCheckList[6] ? "checked" : ""# #:item.customData.initDayUncheckableList[6] ? "cannot-checked" : ""# #:item.customData.dayDisableList[6]||item.customData.openType == "View" ? "disabled" : ""#">Su</span>' +
-			'</div>' +
-			'<div class="trip-info opacity-change">' +
-			'<span title="School">#: item.customData.schoolCode + " | "#</span> ' +
-			'<span title="Grade">#: item.customData.grade + " | "#</span>' +
-			'<span title="Walk to Stop">#: item.customData.walkToStopDistance + " | "#</span>' +
-			'<span title="Duration on Bus">#: item.customData.totalTime + " min | " #</span>' +
-			'<span title="Load Time">#: item.customData.loadTime #</span>' +
-			'</div>' +
-			'</div>' +
-			'<div class="cross-flex-box">' +
-			'#if(item.customData.crossToStop != null && item.customData.crossToStop) {#' +
-			'<div class="student-cross-street"></div>' +
-			'#} else if(item.customData.crossToStop == null){#' +
-			'<div class="cross-status-loading"></div>' +
-			'#}#' +
-			'</div></div>' +
-			'<div class="tree-buttons #: item.customData.isAssigned ? "assign-student-color" : "unassign-student-color"#">' +
-			'#if(!item.customData.isConfused){#' +
-			'<div class="icon #: item.customData.isAssigned ? "minus" : "add"# #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="#: item.customData.isAssigned ? "Remove" : "Add"#"></div>' +
-			'#}#' +
-			'<div class="icon zoom-map-to-layers" title="Center Map"></div></div>' +
-			'<div class="#: item.customData.walkToStopDistanceWarning && item.customData.isAssigned ? "warning-icon" : ""#"></div>' +
-			'</div>' +
-			'#}#';
+		return `#if(item.level() == 0) {#
+
+				<div class="row tree-trip-row #: item.customData.openType == "View" ? "view-trip" : ""#">
+					<div class="col-xs-24 context">
+						<div class="trip-text-info">
+							<div class="trip-color"></div>
+							<div class="context-text">
+								<div class="text-name trip-name">
+									<div>#: item.text# </div>
+									<div class="tree-buttons trip-button">
+										<div class="icon trip-absorption view-disabled-button" title="Absorption"></div>
+										<div class="icon optimize-sequence view-disabled-button" title="Optimize Sequence"></div>
+										<div class="icon copy-information #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Copy Calculated Duration"></div>
+										<div class="icon refresh #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Refresh Path"></div>
+										<div class="icon delete trip-delete view-disabled-button" title="Delete"></div>
+										<div class="icon copy copyTrip #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="New Copy"></div>
+										<div class="icon info trip-info" title="Info"></div>
+										<div class="icon zoom-map-to-layers" title="Center Map"></div>
+										<div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide trip" ></div>
+									</div>
+
+									#if(item.customData.openType == "View") {#
+									<div class="read-only"></div>
+									#}#
+
+								</div>
+								${this.getFieldTripInfoTemplate()}
+							</div>
+						</div>
+					</div>
+					<div class="trip-canvas-container">
+						<canvas style="margin-left:10px" class="trip-canvas-distance-info" height="80" width="160"></canvas>
+						<canvas style="margin-left:10px" class="trip-canvas-duration-info" height="80" width="160"></canvas>
+					</div>
+				</div>
+
+
+				#}else if(item.level() == 1){#
+				<div class="row k-tripstop-state-hover #: item.customData.schoolCode ? "school-row" : ""# #: item.customData.openType == "View" ? "view-trip" : ""#">
+					<div class="col-xs-24 context no-bottom-border k-tripstop-state-hover">
+						<div class="sequence-line k-tripstop-state-hover #:item.customData.schoolCode ? "school-line":""#">#: item.customData.sequence#</div>
+						<div class="insert-front-stops-area"></div>
+						<div class="insert-icon"></div>
+						<div class="insert-behind-stops-area"></div>
+						<div class="sublevel-context-text k-tripstop-state-hover">
+							<div class="text-hover-overflow-hidden">
+								<div class="text-name k-tripstop-state-hover">#: item.text# </div>
+								<div class="tree-buttons k-tripstop-state-hover">
+									<div class="icon lock-time k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
+									<div class="icon delete stop-delete k-tripstop-state-hover #: item.customData.openType == "View"||!item.customData.deletable ? "view-disabled-button" : ""#" title="Delete"></div>
+									<div class="icon assign k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Assign Students"></div>
+									<div class="icon copy copyStop  #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div><div class="icon info stop-info k-tripstop-state-hover" title="Trip Stop Details"></div>
+									<div class="icon zoom-map-to-layers k-tripstop-state-hover" title="Center Map" ></div></div></div>
+									<div class="trip-info k-tripstop-state-hover"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">
+
+									#if(!item.customData.schoolCode){#
+									<div class="student-count-info k-tripstop-state-hover">#:item.customData.session == 2 ? "" : (item.customData.assignedStudentCount==0&&item.customData.totalStudentCount==0?"No Students":(item.customData.assignedStudentCount + " of " + item.customData.totalStudentCount + (item.customData.totalStudentCount == 1 ? " Student " : " Students "))) #</div>
+									#}#
+
+									#if(item.customData.toSchoolStudents && item.customData.toSchoolStudents.HomeToSchool > 0){#
+									<div>#: item.customData.toSchoolStudents.HomeToSchool + (item.customData.session == 1 ? " DO - school to home" : item.customData.session == 2 ? " DO - school to school" : " DO - home to school") #</div>
+									#}#
+
+									#if(item.customData.toSchoolStudents &&  item.customData.toSchoolStudents.SchoolToHome > 0){#
+									<div>#: item.customData.toSchoolStudents.SchoolToHome + (item.customData.session == 0 ? " PU - home to school" : item.customData.session == 2 ? " PU - school to school" : " PU - school to home") #</div>
+									#}#
+
+									#if(item.customData.toTransStudents && item.customData.toTransStudents.HomeToTrans > 0){#
+									<div>#: item.customData.toTransStudents.HomeToTrans + " DO - home to trans" #</div>
+									#}#
+
+									#if(item.customData.toTransStudents && item.customData.toTransStudents.TransToHome > 0){#
+									<div>#: item.customData.toTransStudents.TransToHome +" PU - trans to home" #</div>
+									#}#
+
+									#if(item.customData.transToTrans && item.customData.transToTrans.PUTransToTrans > 0){#
+									<div>#: item.customData.transToTrans.PUTransToTrans + " PU - trans to trans"#</div>
+									#}#
+
+									#if(item.customData.transToTrans && item.customData.transToTrans.DOTransToTrans > 0){#
+									<div>#: item.customData.transToTrans.DOTransToTrans + " DO - trans to trans"#</div>
+									#}#
+
+									#if(item.customData.puTransToSchool && item.customData.puTransToSchool.TransToSchool > 0){#
+									<div>#: item.customData.puTransToSchool.TransToSchool + " PU - trans to school" #</div>
+									#}#
+
+									#if(item.customData.puTransToSchool && item.customData.puTransToSchool.SchoolToTrans > 0){#
+									<div>#: item.customData.puTransToSchool.SchoolToTrans + " PU - school to trans" #</div>
+									#}#
+
+									#if(item.customData.doTransToSchool && item.customData.doTransToSchool.TransToSchool > 0){#
+									<div>#: item.customData.doTransToSchool.TransToSchool + " DO - trans to school" #</div>
+									#}#
+
+									#if(item.customData.doTransToSchool && item.customData.doTransToSchool.SchoolToTrans > 0){#
+									<div>#: item.customData.doTransToSchool.SchoolToTrans + " DO - school to trans" #</div>
+									#}#
+
+									#if(!item.customData.schoolCode){#
+									<span class="arrival-time-span k-tripstop-state-hover"><div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>
+									<span title="Scheduled time" class="schedule-time">#:item.customData.stopTime#</span> #:" | "#
+									<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed #</span>#:" | "#
+									<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#
+									<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>
+									#}#
+								</div>
+							</div>
+
+							#if(item.customData.schoolCode){#
+							<div class="dock-position-bottom">
+								<div class="school-location"></div>
+								<div class="time-info">
+									<span class="arrival-time-span k-tripstop-state-hover">
+										<div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>
+										<span title="Scheduled time" class="schedule-time">#:item.customData.stopTime#</span> #:" | "#
+										<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed#</span>#:" | "#
+										<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#
+										<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>
+									</span>
+								</div>
+							</div>
+							#}#
+						</div>
+					</div>
+
+					#}else{#
+
+					<div class="row student-row-under-stop #: item.customData.openType == "View" ? "view-trip" : ""#">
+						<div class="col-xs-24 context no-bottom-border">
+							<div class="sequence-line-line"></div>
+							<div class="insert-stops-area"></div>
+							<div class="sublevel-context-text #: item.customData.isAssigned ? "assign-student-color" : "unassign-student-color"#">
+							<div class="student-text"><div class="student-status-info">
+								<div class="text-name opacity-change student-text-name" title="#: item.text#">#: item.text# </div>
+
+									#if(item.customData.prohibitCross) {#
+									<div class="prohibit-cross"></div>
+									#}#
+
+									#if(!item.customData.isValid) {#
+									<div class="invalid-student"></div>
+									#}#
+
+									<div class="text-status opacity-change">
+
+									#if(item.customData.tripSession != 3){#
+									#: item.customData.PUDOStatus#
+									#}else{#
+									<div class="student-PUDOStatus">
+										<span title="PU" class="po status #:item.customData.session == 0 ? "checked" :""# #:item.customData.PUValid ? "" : "cannot-checked"#">PU</span>
+										<span title="DO" class="du status #:item.customData.session == 1 ? "checked" :""# #:item.customData.DOValid ? "" : "cannot-checked"#">DO</span>
+									</div>
+									#}#
+								</div>
+
+								#if(!item.customData.requirementId) {#
+								<div class="student-exception" title="Exception"></div>
+								#}#
+							</div>
+						</div>
+
+						<div class="student-requirement">
+							<span title="Monday" class="day #:item.customData.dayCheckList[0] ? "checked" : ""# #:item.customData.initDayUncheckableList[0] ? "cannot-checked" : ""# #:item.customData.dayDisableList[0]||item.customData.openType == "View" ? "disabled" : ""#">Mo</span>
+							<span title="Tuesday" class="day #:item.customData.dayCheckList[1] ? "checked" : ""# #:item.customData.initDayUncheckableList[1] ? "cannot-checked" : ""# #:item.customData.dayDisableList[1]||item.customData.openType == "View" ? "disabled" : ""#">Tu</span>
+							<span title="Wednesday" class="day #:item.customData.dayCheckList[2] ? "checked" : ""# #:item.customData.initDayUncheckableList[2] ? "cannot-checked" : ""# #:item.customData.dayDisableList[2]||item.customData.openType == "View" ? "disabled" : ""#">We</span>
+							<span title="Thursday" class="day #:item.customData.dayCheckList[3] ? "checked" : ""# #:item.customData.initDayUncheckableList[3] ? "cannot-checked" : ""# #:item.customData.dayDisableList[3]||item.customData.openType == "View" ? "disabled" : ""#">Th</span>
+							<span title="Friday" class="day #:item.customData.dayCheckList[4] ? "checked" : ""# #:item.customData.initDayUncheckableList[4] ? "cannot-checked" : ""# #:item.customData.dayDisableList[4] ||item.customData.openType == "View"? "disabled" : ""#">Fr</span>
+							<span title="Saturday" class="day #:item.customData.dayCheckList[5] ? "checked" : ""# #:item.customData.initDayUncheckableList[5] ? "cannot-checked" : ""# #:item.customData.dayDisableList[5]||item.customData.openType == "View" ? "disabled" : ""#">Sa</span>
+							<span title="Sunday" class="day #:item.customData.dayCheckList[6] ? "checked" : ""# #:item.customData.initDayUncheckableList[6] ? "cannot-checked" : ""# #:item.customData.dayDisableList[6]||item.customData.openType == "View" ? "disabled" : ""#">Su</span>
+						</div>
+
+						<div class="trip-info opacity-change">
+							<span title="School">#: item.customData.schoolCode + " | "#</span>
+							<span title="Grade">#: item.customData.grade + " | "#</span>
+							<span title="Walk to Stop">#: item.customData.walkToStopDistance + " | "#</span>
+							<span title="Duration on Bus">#: item.customData.totalTime + " min | " #</span>
+							<span title="Load Time">#: item.customData.loadTime #</span>
+						</div>
+					</div>
+					<div class="cross-flex-box">
+						#if(item.customData.crossToStop != null && item.customData.crossToStop) {#
+						<div class="student-cross-street"></div>
+						#} else if(item.customData.crossToStop == null){#
+						<div class="cross-status-loading"></div>
+						#}#
+					</div>
+				</div>
+
+				<div class="tree-buttons #: item.customData.isAssigned ? "assign-student-color" : "unassign-student-color"#">
+					#if(!item.customData.isConfused){#
+					<div class="icon #: item.customData.isAssigned ? "minus" : "add"# #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="#: item.customData.isAssigned ? "Remove" : "Add"#"></div>
+					#}#
+					<div class="icon zoom-map-to-layers" title="Center Map"></div>
+				</div>
+
+				<div class="#: item.customData.walkToStopDistanceWarning && item.customData.isAssigned ? "warning-icon" : ""#"></div>
+				</div>
+				#}#`;
 	};
 
 	RoutingDisplayHelper.prototype.getTripInfoTemplate = function()
 	{
-		return `<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
-	<span class="splitter"></span>
-	<span class="info-block">#:item.customData.students #<br/>Student#: item.customData.students==1 ? "" : "s" #</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.tripTotalTime #<br/>min</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
-	<span class="splitter"></span>
-	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>`;
+		return `
+		<div class="trip-info-text">
+			<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
+			<span class="splitter"></span>
+			<span class="info-block">#:item.customData.students #<br/>Student#: item.customData.students==1 ? "" : "s" #</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.tripTotalTime #<br/>min</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
+			<span class="splitter"></span>
+			<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>
+		</div>`;
 	}
+
 	RoutingDisplayHelper.prototype.getFieldTripInfoTemplate = function()
 	{
-		return `<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.EstimatedHours #<br/>min</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.EstimatedDistance #<br/>#: item.customData.measurementUnit#</span>
-	<span class="splitter"></span>
-	<span class="info-block">#: item.customData.DepartDateTime #<br/>#: item.customData.EstimatedReturnDateTime #</span>
-	<span class="splitter"></span>
-	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>`;
+		return `
+		<div class="trip-info-text">
+			<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.EstimatedHours #<br/>min</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.EstimatedDistance #<br/>#: item.customData.measurementUnit#</span>
+			<span class="splitter"></span>
+			<span class="info-block">#: item.customData.DepartDateTime #<br/>#: item.customData.EstimatedReturnDateTime #</span>
+			<span class="splitter"></span>
+			<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>
+		</div>`;
 	}
 })();
