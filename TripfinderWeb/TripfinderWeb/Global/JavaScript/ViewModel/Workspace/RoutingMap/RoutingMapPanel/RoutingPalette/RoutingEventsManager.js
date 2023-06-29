@@ -68,17 +68,18 @@
 	RoutingEventsManager.prototype.openTripClick = function()
 	{
 		var self = this;
-		if (self.dataModel.trips.length == 1 && self.dataModel.hasUnsavedRestrictions())
-		{
-			tf.promiseBootbox.alert({
-				message: "There are unsaved restriction changes. You must save or revert changes before opening new trips.",
-				title: "Confirmation"
-			});
-		}
-		else
-		{
-			self.openTrip();
-		}
+		self.openTrip();
+		// if (self.dataModel.trips.length == 1 && self.dataModel.hasUnsavedRestrictions())
+		// {
+		// 	tf.promiseBootbox.alert({
+		// 		message: "There are unsaved restriction changes. You must save or revert changes before opening new trips.",
+		// 		title: "Confirmation"
+		// 	});
+		// }
+		// else
+		// {
+		// 	self.openTrip();
+		// }
 	};
 
 	RoutingEventsManager.prototype.openReadOnlyTripClick = function()

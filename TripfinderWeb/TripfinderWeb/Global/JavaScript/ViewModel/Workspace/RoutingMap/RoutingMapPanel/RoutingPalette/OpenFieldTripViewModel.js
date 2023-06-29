@@ -178,7 +178,7 @@
 			var isSelectableTrip = false;
 			rightData.forEach(r =>
 			{
-				if (TF.RoutingMap.RoutingPalette.RoutingDataModel.checkCriteria(r, l))
+				if (TF.RoutingMap.RoutingPalette.RoutingDataModel.checkFieldTripCriteria(r, l))
 				{
 					isSelectableTrip = true;
 				}
@@ -202,7 +202,7 @@
 
 		return sourceUnLocked.filter(function(trip)
 		{
-			return TF.RoutingMap.RoutingPalette.RoutingDataModel.checkCriteria(selected[0], trip);
+			return TF.RoutingMap.RoutingPalette.RoutingDataModel.checkFieldTripCriteria(selected[0], trip);
 		});
 	};
 

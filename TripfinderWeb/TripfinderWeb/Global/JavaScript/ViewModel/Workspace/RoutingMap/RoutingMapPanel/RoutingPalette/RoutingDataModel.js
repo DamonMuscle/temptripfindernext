@@ -6347,6 +6347,11 @@
 			&& tripA.TravelScenarioId == tripB.TravelScenarioId;
 	};
 
+	RoutingDataModel.checkFieldTripCriteria = function(tripA, tripB)
+	{
+		return true;
+	};
+
 	RoutingDataModel.sessions = [
 		{ name: "To School", session: 0 },
 		{ name: "From School", session: 1 },

@@ -56,7 +56,7 @@
 
 			trips.map(function(trip)
 			{
-				var newTrip = self.newTripData(trip);
+				var newTrip = self.newFieldTripData(trip);
 				newAddList.push(newTrip);
 				newTripDataList.push(self.newSummaryTripObject(trip.Name, trip.NumTransport,
 					trip.TripStops.length, convertToMoment(trip.ActualEndTime).diff(convertToMoment(trip.ActualStartTime), 'minutes'), trip.Distance));
@@ -3302,7 +3302,7 @@
 			var newAddList = [];
 			data.add.map(function(trip)
 			{
-				var newTrip = self.newTripData(trip);
+				var newTrip = self.newFieldTripData(trip);
 				newAddList.push(newTrip);
 			});
 			sortItems(newAddList);
@@ -3412,7 +3412,7 @@
 					}
 					if (self.dataModel.trips.some(i => i.Name === trip.Name))
 					{
-						let newTrip = self.newTripData(trip);
+						let newTrip = self.newFieldTripData(trip);
 						newAddList.push(newTrip);
 					}
 				});
@@ -3491,6 +3491,51 @@
 				openType: trip.OpenType,
 				hasDistrictPolicyError: self.viewModel.analyzeTripByDistrictPolicy.hasError(trip.id),
 				isTrip: true,
+				//durationOptimizeNmber: ""
+			},
+			items: self.newTripStopData(trip.TripStops, trip.Session, trip.Name)
+		};
+	}
+
+	RoutingDisplay.prototype.newFieldTripData = function(trip)
+	{
+		const self = this;
+		let = totalAssignedStudents = 0;
+		totalAssignedStudents = trip.TripStops
+			.reduce((prev, curr) => prev.concat(curr.Students), [])
+			.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
+			.length;
+		return {
+			id: trip.id,
+			text: trip.Name,
+			expand: false,
+			expanded: !!self.expandStatusDictionary['Trip' + trip.id],
+			visible: trip.visible,
+			session: trip.Session,
+			prevLayover: ko.observable(null),
+			nextLayover: ko.observable(null),
+			customData: {
+				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
+				students: totalAssignedStudents,
+				stops: trip.TripStops.length,
+				tripTotalTime: convertToMoment(trip.FinishTime).diff(convertToMoment(trip.StartTime), 'minutes'),
+				distance: self.convertToCurrentMeasurementUnit(trip.Distance).toFixed(2),
+				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
+				startTime: convertToMoment(trip.StartTime).format('h:mm a'),
+				endTime: convertToMoment(trip.FinishTime).format('h:mm a'),
+				actualStartTime: trip.ActualStartTime,
+				actualEndTime: trip.ActualEndTime,
+				//originalTrip: trip,
+				color: trip.color,
+				sortValue: trip.Name,
+				openType: trip.OpenType,
+				hasDistrictPolicyError: self.viewModel.analyzeTripByDistrictPolicy.hasError(trip.id),
+				isTrip: true,
+
+				EstimatedHours: trip.EstimatedHours ? trip.EstimatedHours * 60 : 0,
+				EstimatedDistance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance).toFixed(2),
+				DepartDateTime: convertToMoment(trip.DepartDateTime).format('h:mm a'),
+				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('h:mm a')
 				//durationOptimizeNmber: ""
 			},
 			items: self.newTripStopData(trip.TripStops, trip.Session, trip.Name)
@@ -3739,7 +3784,7 @@
 		{
 			self.initialTreeView();
 		}
-		self.recalculateAllSchoolStudentCount(data.add.concat(data.edit));
+		// self.recalculateAllSchoolStudentCount(data.add.concat(data.edit));
 		var result = self.getDataSource(data);
 		if (result != null)
 		{
