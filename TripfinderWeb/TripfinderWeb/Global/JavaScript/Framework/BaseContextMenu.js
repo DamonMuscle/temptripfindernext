@@ -193,7 +193,7 @@
 			self._target.removeClass("contextmenu-open");
 		}
 		$(window).off("resize.contextmenu");
-		$(document).unbind("mousemove", self._mouseout);
+		$(document).off("mousemove.contextmenu");
 	};
 
 	BaseContextMenu.prototype.render = function()
