@@ -147,7 +147,7 @@
 				else
 				{
 					// self.dataModel.setViewTrips(data);
-					self.dataModel.setOpenFieldTrips(data);
+					self.dataModel.setViewFieldTrips(data);
 				}
 			}
 		});
