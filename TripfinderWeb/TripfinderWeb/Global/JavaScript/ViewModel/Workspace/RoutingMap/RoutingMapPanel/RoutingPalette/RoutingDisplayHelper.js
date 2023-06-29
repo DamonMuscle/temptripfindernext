@@ -1078,7 +1078,7 @@
 			'#if(item.customData.openType == "View") {#' +
 			'<div class="read-only"></div>' +
 			'#}#' +
-			'</div><div class="trip-info-text">' + this.getFieldTripInfoTemplate() + '</div></div></div>' +
+			'</div><div class="trip-info-text">' + this.getFieldTripInfoTemplate() + '</div></div></div></div>' +
 			'<div class="trip-canvas-container"><canvas style="margin-left:10px" class="trip-canvas-distance-info" height="80" width="160"></canvas><canvas style="margin-left:10px" class="trip-canvas-duration-info" height="80" width="160"></canvas></div></div>' +
 			'</div>' +
 			'#}else if(item.level() == 1){#' +
@@ -1218,8 +1218,7 @@
 	<span class="splitter"></span>
 	<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
 	<span class="splitter"></span>
-	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>
-</div>`;
+	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>`;
 	}
 	RoutingDisplayHelper.prototype.getFieldTripInfoTemplate = function()
 	{
@@ -1233,7 +1232,6 @@
 	<span class="splitter"></span>
 	<span class="info-block">#: item.customData.DepartDateTime #<br/>#: item.customData.EstimatedReturnDateTime #</span>
 	<span class="splitter"></span>
-	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>
-</div>`;
+	<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>`;
 	}
 })();
