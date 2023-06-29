@@ -60,7 +60,7 @@
 				self.updateResult(gridType, "street", result.attributes.Address);
 				self.updateResult(gridType, "city", result.attributes.City);
 				self.updateResult(gridType, "zip", result.attributes.Postal);
-				self.updateResult(gridType, "state", result.attributes.RegionAbbr);
+				self.updateResult(gridType, "state", result.attributes.Subregion);
 
 				if (self.detailView)
 				{

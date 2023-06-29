@@ -167,14 +167,15 @@
 
 			return Promise.all(data.map(item=>TF.GIS.Analysis.getInstance().geocodeService.findAddressCandidatesREST(item.text, item.magicKey))).then(function(locations){
 				data.forEach((item, index) => {
+					const matched = locations[index];
 					item.GeoStreet = item.street;
-					item.GeoCity = item.city;
-					// item.GeoCounty = item.state;
-					item.GeoZip = item.zip;
+					item.GeoCity = matched?.attributes?.City || item.city;
+					item.GeoCounty = matched?.attributes?.Subregion || null;
+					item.GeoZip = matched?.attributes?.Postal || item.zip;
 					item.address = `${item.street}, ${item.city}, ${item.state}, ${item.zip}`;
-					item.XCoord = item.Xcoord = locations[index]?.location.x;
-					item.YCoord = item.Ycoord = locations[index]?.location.y;
-					item.Score = locations[index]?.score;
+					item.XCoord = item.Xcoord = matched?.location.x;
+					item.YCoord = item.Ycoord = matched?.location.y;
+					item.Score = matched?.score;
 	
 					var isStreetMatch = item.street && TF.RoutingMap.GeocodeHelper.isExactMatchStreet((address || "").toLowerCase(), $.trim(item.street.toLowerCase()));
 					if (isStreetMatch && $.trim(zip) == $.trim(item.zip))
@@ -186,9 +187,9 @@
 
 				data.sort((a, b) =>
 				{
-					if (b.score !== a.score)
+					if (b.Score !== a.Score)
 					{
-						return b.score - a.score; // Sort by 'score' field in descending order first.
+						return b.Score - a.Score; // Sort by 'score' field in descending order first.
 					}
 					else
 					{
@@ -226,10 +227,10 @@
 		var location = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(response.location);
 		var results = response.address.split(",").map(item => item.trim());
 		var candidate = {
-			GeoStreet: results[0] || null,
-			GeoCity: results[1] || null,
-			GeoZip: results[3] || null,
-			GeoCounty: results[2] || null,
+			GeoStreet: response.attributes?.Address || results[0] || null,
+			GeoCity: response.attributes?.City || results[1] || null,
+			GeoZip: response.attributes?.Postal || results[3] || null,
+			GeoCounty: response.attributes?.Subregion || null,
 			address: response.address,
 			XCoord: location.x,
 			YCoord: location.y,

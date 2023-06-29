@@ -336,6 +336,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 				data: {
 					magicKey: magicKey,
 					text: searchAddress,
+					outFields: "Score,Addr_type,LongLabel,ShortLabel,StAddr,City,Subregion,Region,RegionAbbr,Postal,PostalExt,Country",
 					token: self.mode === MODE.ONLINE ? self.settings.onlineToken : null,
 					f: "json"
 				},
@@ -344,8 +345,9 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 						const matched = response.candidates[0];
 						const location = matched.location;
 						const score = matched.score;
+						const attributes = matched.attributes || {};
 
-						resolve({ location, score, errorMessage });
+						resolve({ location, score, attributes, errorMessage });
 					} else {
 						errorMessage = `No location was found for this address ${JSON.stringify(searchAddress)}`;
 
