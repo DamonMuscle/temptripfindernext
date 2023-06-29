@@ -399,9 +399,14 @@
 	{
 		var self = this;
 		self.obTripSelected(self.dataModel.trips.length > 0);
-		self.obEditTripSelected(self.dataModel.getEditTrips().length > 0);
+		
+		// self.obEditTripSelected(self.dataModel.getEditTrips().length > 0);
+		self.obEditTripSelected(false);
 
-		self.obVrpableTripsSelected(self.dataModel.getEditTrips().length > 0);
+		// self.obVrpableTripsSelected(self.dataModel.getEditTrips().length > 0);
+		self.obVrpableTripsSelected(false);
+
+
 		// if (self.dataModel.getEditTrips().length > 0)
 		// {
 		// 	var schools = self.dataModel.getEditTrips()[0].TripStops.filter(function(stop)

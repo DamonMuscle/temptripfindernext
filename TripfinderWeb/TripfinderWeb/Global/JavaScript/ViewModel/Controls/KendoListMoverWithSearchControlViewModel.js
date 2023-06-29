@@ -517,29 +517,32 @@
 		var self = this;
 		setTimeout(function()
 		{
-			this.rightSearchGrid.$container.find("tbody tr").kendoDropTarget(
-				{
-					dragenter: function(e)
+			if (this.rightSearchGrid !== null)
+			{
+				this.rightSearchGrid.$container.find("tbody tr").kendoDropTarget(
 					{
-						if (self.options.disableDropIndicator)
+						dragenter: function(e)
 						{
-							return;
-						}
-						if (!self._isDragItem(e))
-							return;
-
-						var targetItem = $(e.dropTarget[0]);
-						targetItem.addClass("drag-target-insert-after-cursor");
-
-						this._appendDropTargetCursorTriangle(targetItem);
-					}.bind(this),
-					dragleave: function(e)
-					{
-						$(e.dropTarget[0]).removeClass("drag-target-insert-after-cursor");
-						this._removeDropTargetCursorTriangle();
-					}.bind(this),
-					drop: this._selectedDrop.bind(this)
-				});
+							if (self.options.disableDropIndicator)
+							{
+								return;
+							}
+							if (!self._isDragItem(e))
+								return;
+	
+							var targetItem = $(e.dropTarget[0]);
+							targetItem.addClass("drag-target-insert-after-cursor");
+	
+							this._appendDropTargetCursorTriangle(targetItem);
+						}.bind(this),
+						dragleave: function(e)
+						{
+							$(e.dropTarget[0]).removeClass("drag-target-insert-after-cursor");
+							this._removeDropTargetCursorTriangle();
+						}.bind(this),
+						drop: this._selectedDrop.bind(this)
+					});
+			}
 		}.bind(this), 1000);
 	};
 

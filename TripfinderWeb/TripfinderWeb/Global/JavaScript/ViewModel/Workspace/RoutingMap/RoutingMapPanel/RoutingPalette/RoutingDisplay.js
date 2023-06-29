@@ -62,7 +62,7 @@
 					trip.TripStops.length, convertToMoment(trip.ActualEndTime).diff(convertToMoment(trip.ActualStartTime), 'minutes'), trip.Distance));
 			});
 
-			self.refreshNextTripData(newAddList);
+			// self.refreshNextTripData(newAddList);
 			var homogeneous = new kendo.data.HierarchicalDataSource({
 				data: newAddList,
 				sort: { field: "customData.sortValue", dir: "asc" }
@@ -2221,10 +2221,10 @@
 		var self = this;
 		trip.TripStops.map(function(tripStop)
 		{
-			if (!IsEmptyString(tripStop.SchoolCode))
-			{
-				self.routingDisplayHelper.recalculateSchoolStudentCount(tripStop);
-			}
+			// if (!IsEmptyString(tripStop.SchoolCode))
+			// {
+			// 	self.routingDisplayHelper.recalculateSchoolStudentCount(tripStop);
+			// }
 			if (!onlyAffectSchool || (onlyAffectSchool && !IsEmptyString(tripStop.SchoolCode)))
 			{
 				self.refreshStopNode(tripStop, trip);
@@ -3349,7 +3349,7 @@
 				promise = self.resetTripInfo(data.add, null, null, data.options.resetScheduleTime);
 			}
 			//newAddList.forEach(function(trip) { self.dataModel.refreshOptimizeSequenceRate(trip.id) });
-			this.refreshNextTripData(newAddList);
+			// this.refreshNextTripData(newAddList);
 		}
 
 		if (data.delete.length > 0)
@@ -3416,7 +3416,7 @@
 						newAddList.push(newTrip);
 					}
 				});
-				self.refreshNextTripData(newAddList);
+				// self.refreshNextTripData(newAddList);
 				sortItems(newAddList);
 				var homogeneous = new kendo.data.HierarchicalDataSource({
 					data: newAddList,
@@ -3542,32 +3542,32 @@
 		};
 	}
 
-	RoutingDisplay.prototype.refreshNextTripData = function(trips)
-	{
-		tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "trips"),
-			{
-				paramData: {
-					"@fields": "id,LayoverToNextTrip,LayoverFromPreviousTrip",
-					specialCalculation: "NextTrip,PreviousTrip",
-					ids: trips.map(i => i.id).join(",")
-				}
-			}, { overlay: false }).then(response =>
-			{
-				let items = response.Items || [],
-					nextTripData = {};
-				items.forEach(i => nextTripData[i.Id] = i);
-				trips.forEach(trip =>
-				{
-					let data = nextTripData[trip.id] || {},
-						nextLayover = toMinutes(data.LayoverToNextTrip),
-						prevLayover = toMinutes(data.LayoverFromPreviousTrip);
-					trip.nextLayover = trip.nextLayover || ko.observable();
-					trip.prevLayover = trip.prevLayover || ko.observable();
-					trip.nextLayover(nextLayover);
-					trip.prevLayover(prevLayover);
-				});
-			});
-	};
+	// RoutingDisplay.prototype.refreshNextTripData = function(trips)
+	// {
+	// 	tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "trips"),
+	// 		{
+	// 			paramData: {
+	// 				"@fields": "id,LayoverToNextTrip,LayoverFromPreviousTrip",
+	// 				specialCalculation: "NextTrip,PreviousTrip",
+	// 				ids: trips.map(i => i.id).join(",")
+	// 			}
+	// 		}, { overlay: false }).then(response =>
+	// 		{
+	// 			let items = response.Items || [],
+	// 				nextTripData = {};
+	// 			items.forEach(i => nextTripData[i.Id] = i);
+	// 			trips.forEach(trip =>
+	// 			{
+	// 				let data = nextTripData[trip.id] || {},
+	// 					nextLayover = toMinutes(data.LayoverToNextTrip),
+	// 					prevLayover = toMinutes(data.LayoverFromPreviousTrip);
+	// 				trip.nextLayover = trip.nextLayover || ko.observable();
+	// 				trip.prevLayover = trip.prevLayover || ko.observable();
+	// 				trip.nextLayover(nextLayover);
+	// 				trip.prevLayover(prevLayover);
+	// 			});
+	// 		});
+	// };
 
 	function toMinutes(time)
 	{
@@ -3791,11 +3791,13 @@
 			result.then(function()
 			{
 				self.afterDataSourceBinding(data);
+				PubSub.publish("on_FieldTripMap_Change", data);
 			});
 		}
 		else
 		{
 			self.afterDataSourceBinding(data);
+			PubSub.publish("on_FieldTripMap_Change", data);
 		}
 	}
 
@@ -3868,20 +3870,20 @@
 		return self.dataModel.getTripStopsByStopIds(stopIds);
 	}
 
-	RoutingDisplay.prototype.recalculateAllSchoolStudentCount = function(trips)
-	{
-		var self = this;
-		trips.map(function(trip)
-		{
-			trip.TripStops.map(function(tripStop)
-			{
-				if (tripStop.SchoolCode && !tripStop.isSchoolStop)
-				{
-					self.routingDisplayHelper.recalculateSchoolStudentCount(tripStop);
-				}
-			});
-		});
-	}
+	// RoutingDisplay.prototype.recalculateAllSchoolStudentCount = function(trips)
+	// {
+	// 	var self = this;
+	// 	trips.map(function(trip)
+	// 	{
+	// 		trip.TripStops.map(function(tripStop)
+	// 		{
+	// 			if (tripStop.SchoolCode && !tripStop.isSchoolStop)
+	// 			{
+	// 				self.routingDisplayHelper.recalculateSchoolStudentCount(tripStop);
+	// 			}
+	// 		});
+	// 	});
+	// }
 
 	RoutingDisplay.prototype.setIsValidPropertyOnTree = function(trip)
 	{

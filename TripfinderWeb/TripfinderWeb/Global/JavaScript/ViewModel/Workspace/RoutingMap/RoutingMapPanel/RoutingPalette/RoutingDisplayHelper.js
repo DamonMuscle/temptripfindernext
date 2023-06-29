@@ -783,149 +783,149 @@
 		return false;
 	}
 
-	RoutingDisplayHelper.prototype.recalculateSchoolStudentCount = function(tripStop)
-	{
-		var students = [], self = this;
-		tripStop.ToSchoolStudents = { HomeToSchool: 0, SchoolToHome: 0 };
-		tripStop.ToTransStudents = { HomeToTrans: 0, TransToHome: 0 };
-		tripStop.TransToTrans = { PUTransToTrans: 0, DOTransToTrans: 0 };
-		tripStop.PUTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
-		tripStop.DOTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
+	// RoutingDisplayHelper.prototype.recalculateSchoolStudentCount = function(tripStop)
+	// {
+	// 	var students = [], self = this;
+	// 	tripStop.ToSchoolStudents = { HomeToSchool: 0, SchoolToHome: 0 };
+	// 	tripStop.ToTransStudents = { HomeToTrans: 0, TransToHome: 0 };
+	// 	tripStop.TransToTrans = { PUTransToTrans: 0, DOTransToTrans: 0 };
+	// 	tripStop.PUTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
+	// 	tripStop.DOTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
 
-		if (this.routingDisplay.dataModel.tripStopDictionary[tripStop.id])
-		{
-			students = students.concat(this.routingDisplay.dataModel.tripStopDictionary[tripStop.id].filter(function(s)
-			{
-				return s.student.IsAssigned;
-			}).map(function(s)
-			{
-				return s.student;
-			}));
-		}
-		if (this.routingDisplay.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id])
-		{
-			students = students.concat(this.routingDisplay.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(s)
-			{
-				return s.student.IsAssigned;
-			}).map(function(s)
-			{
-				return s.student;
-			}));
-		}
-		students = students.reduce((prev, item) => prev.some(x => x.id === item.id) ? prev : prev.concat(item), []);
-		students.map(function(s)
-		{
-			var directionStop = self.routingDisplay.dataModel.getTripStopByStopId(s.AnotherTripStopID);
-			if (directionStop == null)
-			{
-				return;
-			}
-			var isToAttendanceSchool = directionStop.SchoolCode == s.SchoolCode || !s.RequirementID;
-			if (s.PreviousScheduleID == 0)
-			{
-				if (isToAttendanceSchool)
-				{
-					if (s.Session == 0)
-					{
-						if (tripStop.id != s.TripStopID)
-						{
-							tripStop.ToSchoolStudents.HomeToSchool++;
-						}
-						else
-						{
-							tripStop.ToSchoolStudents.SchoolToHome++;
-						}
-					}
-					else if (s.Session == 1)
-					{
-						if (tripStop.id != s.TripStopID)
-						{
-							tripStop.ToSchoolStudents.SchoolToHome++;
-						}
-						else
-						{
-							tripStop.ToSchoolStudents.HomeToSchool++;
-						}
-					}
-					else
-					{
-						if (tripStop.id == s.AnotherTripStopID)
-						{
-							tripStop.ToSchoolStudents.HomeToSchool++;
-						}
-						else
-						{
-							tripStop.ToSchoolStudents.SchoolToHome++;
-						}
-					}
-				}
-				else
-				{
-					if (s.Session == 0)
-					{
-						tripStop.ToTransStudents.HomeToTrans++;
-					}
-					else
-					{
-						tripStop.ToTransStudents.TransToHome++;
-					}
-				}
-			}
-			else
-			{
-				if (isToAttendanceSchool)
-				{
-					if (s.Session == 0)
-					{
-						if (s.TripStopID == tripStop.id)
-						{
-							tripStop.PUTransToSchool.TransToSchool++;
-						}
-						else
-						{
-							tripStop.DOTransToSchool.TransToSchool++;
-						}
-					}
-					else
-					{
-						if (s.TripStopID == tripStop.id)
-						{
-							tripStop.DOTransToSchool.SchoolToTrans++;
-						}
-						else
-						{
-							tripStop.PUTransToSchool.SchoolToTrans++;
-						}
-					}
-				}
-				else
-				{
-					if (s.Session == 0)
-					{
-						if (s.TripStopID == tripStop.id)
-						{
-							tripStop.TransToTrans.PUTransToTrans++;
-						}
-						else
-						{
-							tripStop.TransToTrans.DOTransToTrans++;
-						}
-					}
-					else
-					{
-						if (s.TripStopID == tripStop.id)
-						{
-							tripStop.TransToTrans.DOTransToTrans++;
-						}
-						else
-						{
-							tripStop.TransToTrans.PUTransToTrans++;
-						}
-					}
-				}
-			}
-		});
-	};
+	// 	if (this.routingDisplay.dataModel.tripStopDictionary[tripStop.id])
+	// 	{
+	// 		students = students.concat(this.routingDisplay.dataModel.tripStopDictionary[tripStop.id].filter(function(s)
+	// 		{
+	// 			return s.student.IsAssigned;
+	// 		}).map(function(s)
+	// 		{
+	// 			return s.student;
+	// 		}));
+	// 	}
+	// 	if (this.routingDisplay.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id])
+	// 	{
+	// 		students = students.concat(this.routingDisplay.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(s)
+	// 		{
+	// 			return s.student.IsAssigned;
+	// 		}).map(function(s)
+	// 		{
+	// 			return s.student;
+	// 		}));
+	// 	}
+	// 	students = students.reduce((prev, item) => prev.some(x => x.id === item.id) ? prev : prev.concat(item), []);
+	// 	students.map(function(s)
+	// 	{
+	// 		var directionStop = self.routingDisplay.dataModel.getTripStopByStopId(s.AnotherTripStopID);
+	// 		if (directionStop == null)
+	// 		{
+	// 			return;
+	// 		}
+	// 		var isToAttendanceSchool = directionStop.SchoolCode == s.SchoolCode || !s.RequirementID;
+	// 		if (s.PreviousScheduleID == 0)
+	// 		{
+	// 			if (isToAttendanceSchool)
+	// 			{
+	// 				if (s.Session == 0)
+	// 				{
+	// 					if (tripStop.id != s.TripStopID)
+	// 					{
+	// 						tripStop.ToSchoolStudents.HomeToSchool++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.ToSchoolStudents.SchoolToHome++;
+	// 					}
+	// 				}
+	// 				else if (s.Session == 1)
+	// 				{
+	// 					if (tripStop.id != s.TripStopID)
+	// 					{
+	// 						tripStop.ToSchoolStudents.SchoolToHome++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.ToSchoolStudents.HomeToSchool++;
+	// 					}
+	// 				}
+	// 				else
+	// 				{
+	// 					if (tripStop.id == s.AnotherTripStopID)
+	// 					{
+	// 						tripStop.ToSchoolStudents.HomeToSchool++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.ToSchoolStudents.SchoolToHome++;
+	// 					}
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				if (s.Session == 0)
+	// 				{
+	// 					tripStop.ToTransStudents.HomeToTrans++;
+	// 				}
+	// 				else
+	// 				{
+	// 					tripStop.ToTransStudents.TransToHome++;
+	// 				}
+	// 			}
+	// 		}
+	// 		else
+	// 		{
+	// 			if (isToAttendanceSchool)
+	// 			{
+	// 				if (s.Session == 0)
+	// 				{
+	// 					if (s.TripStopID == tripStop.id)
+	// 					{
+	// 						tripStop.PUTransToSchool.TransToSchool++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.DOTransToSchool.TransToSchool++;
+	// 					}
+	// 				}
+	// 				else
+	// 				{
+	// 					if (s.TripStopID == tripStop.id)
+	// 					{
+	// 						tripStop.DOTransToSchool.SchoolToTrans++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.PUTransToSchool.SchoolToTrans++;
+	// 					}
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				if (s.Session == 0)
+	// 				{
+	// 					if (s.TripStopID == tripStop.id)
+	// 					{
+	// 						tripStop.TransToTrans.PUTransToTrans++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.TransToTrans.DOTransToTrans++;
+	// 					}
+	// 				}
+	// 				else
+	// 				{
+	// 					if (s.TripStopID == tripStop.id)
+	// 					{
+	// 						tripStop.TransToTrans.DOTransToTrans++;
+	// 					}
+	// 					else
+	// 					{
+	// 						tripStop.TransToTrans.PUTransToTrans++;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	});
+	// };
 
 	RoutingDisplayHelper.prototype.fixStopLineStyle = function(stopNodeData, stopNodeElement)
 	{
