@@ -375,7 +375,8 @@
 	RoutingEventsManager.prototype.copyTripClick = function(tripData)
 	{
 		this.viewModel.routingChangePath.stop();
-		this.dataModel.copyAsNewTrip(tripData);
+		// this.dataModel.copyAsNewTrip(tripData);
+		this.dataModel.copyAsNewFieldTrip(tripData);
 	};
 
 	RoutingEventsManager.prototype.copyTripStopClick = function(tripStopId)
@@ -975,7 +976,7 @@ This action cannot be undone.  Do you wish to continue?`;
 			{
 				if (data && data.length > 0)
 				{
-					self.dataModel.save(trips.filter(function(trip)
+					self.dataModel.saveFieldTrip(trips.filter(function(trip)
 					{
 						return Enumerable.From(data).Any(function(p) { return p.id == trip.id; });
 					}));

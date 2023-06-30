@@ -192,6 +192,47 @@
 		});
 	};
 
+	RoutingDataModel.prototype.tryOpenFieldTrip = function(fieldTrips)
+	{
+		var self = this;
+		var openedTripIds = self.fieldTrips.map(function(c) { return c.Id; });
+		fieldTrips = fieldTrips.filter((t) => { return openedTripIds.indexOf(t.Id) < 0; });
+		if (fieldTrips.length == 0)
+		{
+			return Promise.resolve();
+		}
+		return self.tripLockData.getLockInfo().then(function(lockInfo)
+		{
+			return lockInfo.selfLockedList.filter(function(item)
+			{
+				return item.ExtraInfo != self.routeState;
+			}).concat(lockInfo.lockedByOtherList).filter(item =>
+			{
+				return item.Type == "fieldtrip";
+			});
+		}).then(items =>
+		{
+			var openTrips = [],
+				viewTrips = [],
+				editTrips = self.getEditTrips(),
+				tripA = editTrips.length > 0 ? editTrips[0] : fieldTrips[0];
+			fieldTrips.forEach((trip) =>
+			{
+				if (items.some(i => i.Id == trip.Id))
+				{
+					viewTrips.push(trip);
+				} else
+				{
+					openTrips.push(trip);
+				}
+			});
+			return Promise.all([
+				openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
+				viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
+			]);
+		});
+	};
+
 	RoutingDataModel.prototype.initSchoolSequence = function(tripId, initTrips)
 	{
 		var self = this;
@@ -1601,6 +1642,28 @@
 		});
 	};
 
+	RoutingDataModel.prototype.resetCopyFieldTripValue = function(trip)
+	{
+		var self = this;
+		trip.id = TF.createId();
+		trip.Id = 0;
+		// trip.NumTransport = 0;
+		// trip.MaxOnBus = 0;
+		trip.color = self.getNewTripColor();
+		// trip.oldId = trip.id;
+		let tripStopTempId = TF.createId();
+		let stopBoundaryTempId = TF.createId();
+		trip.FieldTripStops.map(function(tripStop)
+		{
+			// FieldTripStop TODO: Reset FieldTripStop field here
+			tripStop.id = tripStopTempId++;
+			tripStop.color = trip.color;
+			tripStop.TripStopId = tripStop.id;
+			tripStop.TripId = trip.id;
+			
+		});
+	};
+
 	/**
 	* initial trip info for copy trip
 	*/
@@ -1629,6 +1692,62 @@
 			{
 				promise = self.tripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
 			}
+			return promise.then(function(newTripCandidateStudents)
+			{
+				var p = Promise.resolve(true);
+				if (trip.OpenType === 'View' && !notAutoAssignStudent)
+				{
+					p = self.assignedStudentsToViewTrip(newTripCandidateStudents, trip, changeTripType);
+				}
+				return p.then(function()
+				{
+					return self.recalculate([trip]).then(function(response)
+					{
+						var tripData = response[0];
+						trip.Distance = tripData.Distance;
+						for (var j = 0; j < trip.TripStops.length; j++)
+						{
+							trip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
+							trip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+						}
+						self.setActualStopTime([trip]);
+						self.setStudentTravelTime([trip]);
+						self.setAllStudentValidProperty([trip]);
+						return Promise.resolve(trip);
+					});
+				});
+			});
+		});
+	};
+
+	/**
+	* initial trip info for copy field trip
+	*/
+	RoutingDataModel.prototype.initialNewFieldTripInfo = function(trip, notAutoAssignStudent, changeTripType)
+	{
+		var self = this, promise = Promise.resolve(true), boundaries = [];
+		// if (trip.OpenType === 'Edit')
+		// {
+		// 	trip.TripStops.map(function(tripStop)
+		// 	{
+		// 		if (tripStop.boundary.TripStopId)
+		// 		{
+		// 			boundaries.push(tripStop.boundary);
+		// 		}
+		// 	});
+		// 	promise = self.initCandidateStudentsCrossStatus(trip);
+		// }
+		return promise.then(function()
+		{
+			promise = Promise.resolve(true);
+			// if (changeTripType)
+			// {
+			// 	promise = self.getCandidateStudent(trip);
+			// }
+			// else if (boundaries.length > 0 && !notAutoAssignStudent)
+			// {
+			// 	promise = self.tripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
+			// }
 			return promise.then(function(newTripCandidateStudents)
 			{
 				var p = Promise.resolve(true);
@@ -1701,6 +1820,37 @@
 			}
 		});
 		return Promise.all(promiseList);
+	};
+
+	RoutingDataModel.prototype.copyAsNewFieldTrip = function(trip)
+	{
+		var self = this;
+		tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.CopyFieldTripModalViewModel(trip, self))
+			.then(function(data)
+			{
+				if (!data)
+				{
+					return;
+				}
+				// self.routingStudentManager.refresh();
+				// var deleteCandidateStudents = [];
+
+				// data.TripStops.map(function(ts)
+				// {
+				// 	deleteCandidateStudents = deleteCandidateStudents.concat(ts.Students);
+				// });
+
+				// self.onStopCandidateStudentChangeEvent.notify({ add: [], edit: deleteCandidateStudents, delete: deleteCandidateStudents });
+				self.onTripsChangeEvent.notify({ add: [data], edit: [], delete: [], options: { resetScheduleTime: true } });
+				if (data.OpenType === 'Edit')
+				{
+					// if (self.showImpactDifferenceChart())
+					// {
+					// 	self.refreshOptimizeSequenceRate(data.id);
+					// }
+					self.changeDataStack.push(data);
+				}
+			});
 	};
 
 	RoutingDataModel.prototype.copyAsNewTrip = function(trip)
@@ -3700,7 +3850,7 @@
 			{
 				self.deleteChangeDataStackByTripId(trip.id);
 			});
-			promise = self._releaseStudentToUnAssign(tripsToClose);
+			// promise = self._releaseStudentToUnAssign(tripsToClose);
 			self.unLockTripData(tripsToClose);
 			self.removeNeedDeleteTrip(tripsToClose);
 			if (notifyChange != false)
@@ -3708,15 +3858,15 @@
 				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose });
 			}
 
-			self.routingStudentManager.refresh();
+			// self.routingStudentManager.refresh();
 		}
 
 		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
 		self.clearContextMenuOperation();
 		self.viewModel.editTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
-		self.clearTripOriginalData(tripsToClose);
-		self.clearFindCandidates(tripsToClose);
+		// self.clearTripOriginalData(tripsToClose);
+		// self.clearFindCandidates(tripsToClose);
 		return promise.then(function()
 		{
 			self._updateTravelScenarioLock(tripsToClose);
@@ -3895,7 +4045,7 @@
 			self.removeNeedDeleteTrip(viewTripsToClose);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 			// self.clearSchoolLocation(viewTripsToClose);
-			self.routingStudentManager.refresh();
+			// self.routingStudentManager.refresh();
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editTripStopModal.closeEditModal();
@@ -4179,6 +4329,41 @@
 					return trip.Id && trip.OpenType != "View";
 				}).map(i => i.Id));
 				self.viewModel.analyzeTripByDistrictPolicy.analyze(trips);
+			}
+		});
+	};
+
+	RoutingDataModel.prototype.saveFieldTrip = function(fieldTrips)
+	{
+		var self = this;
+		if (!fieldTrips || fieldTrips.length == 0)
+		{
+			fieldTrips = this.fieldTrips;
+		}
+		var failMessage = self.checkDataValid(fieldTrips);
+		if (failMessage)
+		{
+			tf.promiseBootbox.alert(
+				{
+					message: failMessage,
+					title: "Error"
+				});
+			return Promise.resolve();
+		}
+		self.viewModel.routingChangePath.stop();
+		return self.saveRoutingFieldTrips(fieldTrips).then(function(success)
+		{
+			if (success)
+			{
+				self.routingStudentManager.refresh(null, true);
+				self.showSaveSuccessToastMessage();
+				self.updateTripOriginalData(fieldTrips);
+				self.onTripDisplayRefreshEvent.notify(self.fieldTrips);
+				self.tripLockData.lockIds(fieldTrips.filter(function(trip)
+				{
+					return trip.Id && trip.OpenType != "View";
+				}).map(i => i.Id));
+				self.viewModel.analyzeTripByDistrictPolicy.analyze(fieldTrips);
 			}
 		});
 	};
@@ -4753,6 +4938,179 @@
 		}).then(function(result)
 		{
 			return self.copyTripUDFs(copiedTrips).then(() => result);
+		});
+	};
+
+	RoutingDataModel.prototype.saveRoutingFieldTrips = function(fieldTrips)
+	{
+		var self = this;
+		if (self.saving)
+		{
+			return Promise.resolve(false);
+		}
+	
+		let copiedTrips = fieldTrips.filter(t => !!t.copyFromFieldTripId);
+	
+		return self.validateName(fieldTrips).then(function(valid)
+		{
+			if (!valid)
+			{
+				return Promise.reject();
+			}
+	
+			self.clearRevertInfo();
+			tf.loadingIndicator.show();
+	
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripresources"), {
+				paramData: {
+					"DBID": tf.datasourceManager.databaseId,
+					"@filter": "in(TripId," + fieldTrips.map(x => x.id).join(",") + ")",
+					"@fields": "TripId,StartDate,EndDate,IsTripLevel"
+				}
+			}).then(function(response)
+			{
+				const tripResources = response && response.Items && response.Items.length > 0 ? response.Items.filter(c => !c.IsTripLevel) : null;
+				// Check if any trip's assignment has been updated.
+				let shouldUpdateTripResource = false;
+	
+				fieldTrips.forEach((trip) =>
+				{
+					trip.oldId = trip.id;
+					trip.UnsavedNewTrip = false;
+					const relatedTripResources = tripResources && tripResources.length > 0 ? tripResources.filter(c => c.TripId == trip.id) : null;
+					const originalAssignment = self.originalTripAssignment[trip.id];
+					if (self.hasFutureResource(relatedTripResources))
+					{
+						if (!shouldUpdateTripResource && originalAssignment)
+						{
+							if (self.compareTripAssignment(trip, originalAssignment))
+							{
+								shouldUpdateTripResource = true;
+							}
+						}
+					}
+				});
+	
+				if (shouldUpdateTripResource)
+				{
+					shouldUpdateTripResource = tf.promiseBootbox.yesNo(
+						"Future resource substitution exist.  Do you want to replace them with this change?",
+						"Confirmation"
+					);
+				}
+	
+				return Promise.resolve(shouldUpdateTripResource)
+					.then(result =>
+					{
+						self.HandleExceptionsBeforeSave(fieldTrips, self.expiredExceptions);
+						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "routingfieldtrips"),
+							{
+								/* paramData: { affectFutureResource: result }, */
+								data: fieldTrips
+							})
+							.then((response) =>
+							{
+								const savedTrips = response.Items;
+	
+								copiedTrips = savedTrips.reduce(function(result, st)
+								{
+									const matched = copiedTrips.find(x => x.Name === st.Name);
+									if (!matched)
+									{
+										return result;
+									}
+	
+									return result.concat({ ...st, copyFromTripId: matched.copyFromTripId })
+								}, []);
+	
+								// for (let i = 0; i < savedTrips.length; i++)
+								// {
+								// 	const tripData = savedTrips[i];
+								// 	self.originalTripAssignment[tripData.id] = tripData;
+								// 	let tripStopStudents = tripData.FieldTripStops.map(ts => ts.Students);
+								// 	let isExistsExceptionStds = tripStopStudents.some(stds => stds.some(std => std.IsExceptionScheduleChanged));
+								// 	if (isExistsExceptionStds)
+								// 	{
+								// 		self.changeExceptionStopInfo(tripData);
+								// 	}
+								// }
+	
+								// self.getStudentLockData().updateRecords();
+								var promises = [];
+								var unSuccessAssignStudents = [];
+								fieldTrips.forEach(function(trip)
+								{
+									// RoutingDataModel.unLockRoutingStudentByTrip(trip.oldId || trip.id);
+									self.deleteChangeDataStackByTripId(trip.oldId);
+									var savedTrip = Enumerable.From(savedTrips).FirstOrDefault({}, function(c) { return c.Name == trip.Name; });
+									// change id from local create to match the create after save 
+									self.featureData.changeId(trip, savedTrip);
+									self.viewModel.drawTool.updateTripId(trip.oldId, trip.id);
+									trip.originalStudents = [];
+									self.clearExpiredExceptionCacheOfStops(trip.TripStops, self.expiredExceptions);
+									// refresh trip stop original student
+									// trip.TripStops.forEach(function(tripStop)
+									// {
+									// 	var savedTripStop = Enumerable.From(savedTrip.TripStops).FirstOrDefault(null, function(stop) { return stop.id == tripStop.id; });
+									// 	tripStop.originalStudents = savedTripStop.Students.map(function(c) { return $.extend({}, c); });
+									// 	trip.originalStudents = trip.originalStudents.concat(tripStop.originalStudents);
+									// 	for (var i = 0; i < tripStop.Students.length; i++)
+									// 	{
+									// 		var student = tripStop.Students[i];
+									// 		if (!Enumerable.From(savedTripStop.Students).Any(function(st) { return st.RequirementID == student.RequirementID && st.PreviousScheduleID == student.PreviousScheduleID; }))
+									// 		{
+									// 			unSuccessAssignStudents.push(student);
+									// 			tripStop.Students.splice(i, 1);
+									// 			i--;
+									// 		}
+									// 	}
+	
+									// 	self.removeExpiredExceptions(tripStop.Students, tripStop.id, self.expiredExceptions);
+									// 	self.lockSchoolLocation(tripStop);
+									// });
+	
+									// save trip geometry data
+									// promises.push(self.featureData.save(trip.id));
+								});
+								// alert unsuccess assign student message
+								// if (unSuccessAssignStudents.length > 0)
+								// {
+								// 	var names = unSuccessAssignStudents.map(function(student)
+								// 	{
+								// 		return student.FirstName + " " + student.LastName;
+								// 	}).join(', ');
+								// 	var message = "Student " + names + " is assigned to other fieldTrips.";
+								// 	if (unSuccessAssignStudents.length > 1)
+								// 	{
+								// 		message = "Students " + names + " are assigned to other fieldTrips.";
+								// 	}
+								// 	tf.promiseBootbox.alert(
+								// 		{
+								// 			message: message,
+								// 			title: "Warning"
+								// 		});
+								// }
+	
+								return Promise.all(promises).then(function()
+								{
+									self.onTripSaveEvent.notify(fieldTrips);
+									self.tripLockData.saveData(fieldTrips);
+									self.saving = false;
+									tf.loadingIndicator.tryHide();
+									return Promise.resolve(true);
+								});
+							}).catch(function(error)
+							{
+								tf.loadingIndicator.tryHide();
+								if (error.Message) { tf.promiseBootbox.alert({ message: error.Message, title: "Error" }); }
+								self.saving = false;
+								return false;
+							});
+					});
+			});
+		}).then(function(result)
+		{
+			// return self.copyTripUDFs(copiedTrips).then(() => result);
 		});
 	};
 
@@ -6316,7 +6674,7 @@
 		var self = this;
 		self.getChangedTrips().forEach(function(trip)
 		{
-			self.viewModel.analyzeTripByDistrictPolicy.analyze(trip);
+			// self.viewModel.analyzeTripByDistrictPolicy.analyze(trip);
 		});
 	};
 
@@ -6484,6 +6842,43 @@
 	{
 		return true;
 	};
+
+	RoutingDataModel.prototype.copyFieldTrip = function(newTrip)
+	{
+		var self = this;
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), tf.DataTypeHelper.getEndpoint("FieldTrip")), {
+			paramData: {
+				copyFromId: newTrip.Id,
+				fieldTripName: newTrip.Name
+			}
+		})
+		.then(function(response)
+		{
+			if (response && response.StatusCode === 404)
+			{//change the api side to avoid http error, using response status 404 to identify the nonexistence.
+				return Promise.reject(response);
+			}
+			self.showSaveSuccessToastMessage();
+			return true;
+		}.bind(self))
+		.catch(function(response)
+		{
+			if (response && response.StatusCode === 412)
+			{
+				tf.promiseBootbox.alert(
+					{
+						message: response.Message,
+						title: "Error"
+					});		
+				return Promise.reject(response);
+			}
+
+			if (response && response.StatusCode === 404)
+			{
+				return Promise.reject(response);
+			}
+		}.bind(self));
+	}
 
 	RoutingDataModel.sessions = [
 		{ name: "To School", session: 0 },
