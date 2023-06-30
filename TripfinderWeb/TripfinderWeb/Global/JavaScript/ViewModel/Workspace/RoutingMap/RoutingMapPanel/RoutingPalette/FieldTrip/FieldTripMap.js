@@ -193,32 +193,69 @@
 		}
 	}
 
-	FieldTripMap.prototype.zoomToFieldTripLayer = function(fieldTrip)
+	FieldTripMap.prototype.zoomToFieldTripLayers = function(fieldTrips)
 	{
-		const DBID = fieldTrip.DBID,
-			Id = fieldTrip.Id,
+		const graphics = [],
 			stopFeatures = this.fieldTripStopLayerInstance.layer.graphics.items,
-			pathFeatures = this.fieldTripPathLayerInstance.layer.graphics.items,
-			graphics = [];
+			pathFeatures = this.fieldTripPathLayerInstance.layer.graphics.items;
 
-		for (let i = 0; i < stopFeatures.length; i++)
+		for (let j = 0; j < fieldTrips.length; j++)
 		{
-			const stopFeature = stopFeatures[i];
-			if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
+			const fieldTrip = fieldTrips[j],
+			 	DBID = fieldTrip.DBID,
+				Id = fieldTrip.Id;
+
+			for (let i = 0; i < stopFeatures.length; i++)
 			{
-				graphics.push(stopFeature);
+				const stopFeature = stopFeatures[i];
+				if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
+				{
+					graphics.push(stopFeature);
+				}
 			}
-		}
 
-		for (let i = 0; i < pathFeatures.length; i++)
-		{
-			const pathFeature = pathFeatures[i];
-			if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
+			for (let i = 0; i < pathFeatures.length; i++)
 			{
-				graphics.push(pathFeature);
+				const pathFeature = pathFeatures[i];
+				if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
+				{
+					graphics.push(pathFeature);
+				}
 			}
 		}
 
 		this.mapInstance.setExtent(graphics);
+	}
+
+	FieldTripMap.prototype.setFieldTripVisible = function(fieldTrips)
+	{
+		const stopFeatures = this.fieldTripStopLayerInstance.layer.graphics.items,
+			pathFeatures = this.fieldTripPathLayerInstance.layer.graphics.items;
+		
+		for (let i = 0; i < fieldTrips.length; i++)
+		{
+			const fieldTrip = fieldTrips[i],
+				DBID = fieldTrip.DBID,
+				Id = fieldTrip.Id,
+				visible = fieldTrip.visible;
+
+			for (let j = 0; j < stopFeatures.length; j++)
+			{
+				const stopFeature = stopFeatures[j];
+				if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
+				{
+					stopFeature.visible = visible;
+				}
+			}
+
+			for (let j = 0; j < pathFeatures.length; j++)
+			{
+				const pathFeature = pathFeatures[j];
+				if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
+				{
+					pathFeature.visible = visible;
+				}
+			}
+		}
 	}
 })();

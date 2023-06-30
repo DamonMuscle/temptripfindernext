@@ -27,6 +27,7 @@
 		self.layers = [];
 		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ZoomToLayers", self.onFieldTripMapZoomToLayers.bind(self));
+		PubSub.subscribe("on_FieldTripMap_ShowHide", self.onFieldTripMapShowHide.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -139,8 +140,8 @@
 			{
 				const fieldTrip = addFieldTrips[i];
 				this.fieldTripMap.drawStops(fieldTrip);
-				const routeResult = await this.fieldTripMap.calculateRoute(fieldTrip);
-				this.fieldTripMap.drawFieldTripPath(fieldTrip, routeResult);
+				// const routeResult = await this.fieldTripMap.calculateRoute(fieldTrip);
+				// this.fieldTripMap.drawFieldTripPath(fieldTrip, routeResult);
 			}
 		}
 		
@@ -157,7 +158,12 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToLayers = function(_, data)
 	{
-		this.fieldTripMap?.zoomToFieldTripLayer(data);
+		this.fieldTripMap?.zoomToFieldTripLayers(data);
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
+	{
+		this.fieldTripMap?.setFieldTripVisible(data);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

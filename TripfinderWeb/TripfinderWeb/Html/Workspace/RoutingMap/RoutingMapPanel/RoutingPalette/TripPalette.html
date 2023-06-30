@@ -149,7 +149,7 @@
 					</div>
 				</div>
 				<div class="vertical-line"></div>
-				<div class="icon zoom-map-to-layers" title="Zoom Map to Layers" data-bind="clickButton:{disable:!obTripSelected(),click:zoomClick}"></div>
+				<div class="icon zoom-map-to-layers" title="Zoom Map to Layers" data-bind="clickButton:{disable:!obTripSelected(),click:zoomClick.bind($data, null, 'fieldtrip')}"></div>
 				<div class="vertical-line"></div>
 				<div class="icon collapse-all" title="Collapse All" data-bind="clickButton:{disable:!obTripSelected(),click:collapseAllClick}"></div>
 				<div class="vertical-line"></div>

@@ -3684,6 +3684,9 @@
 			}
 		});
 		self.onChangeTripVisibilityEvent.notify({ TripIds: tripIds, visible: visible });
+
+		const trips = self.trips.filter(trip => tripIds.includes(trip.id));
+		PubSub.publish("on_FieldTripMap_ShowHide", trips);
 		self.routingStudentManager.refreshAssignStudents();
 	};
 

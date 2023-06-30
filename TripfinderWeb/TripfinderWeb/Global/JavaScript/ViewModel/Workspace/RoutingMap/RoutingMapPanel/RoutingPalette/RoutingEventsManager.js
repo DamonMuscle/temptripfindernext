@@ -179,6 +179,15 @@
 
 		if (type === 'fieldtrip')
 		{
+			if (data === null)
+			{
+				data = this.dataModel.trips;
+			}
+			else
+			{
+				data = [data];
+			}
+
 			PubSub.publish("on_FieldTripMap_ZoomToLayers", data);
 			return;
 		}
