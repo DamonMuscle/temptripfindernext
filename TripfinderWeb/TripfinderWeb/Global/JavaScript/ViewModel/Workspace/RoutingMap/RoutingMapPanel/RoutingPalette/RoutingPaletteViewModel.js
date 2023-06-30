@@ -1,6 +1,7 @@
 (function()
 {
 	createNamespace("TF.RoutingMap").RoutingPaletteViewModel = RoutingPaletteViewModel;
+
 	function RoutingPaletteViewModel(viewModal, isOpen, routeState, trips)
 	{
 		TF.RoutingMap.BasePaletteViewModel.call(this, viewModal, isOpen, routeState);
@@ -24,6 +25,7 @@
 		self.childViewModels =[self.tripViewModel]; // [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel, self.nonEligibleZoneViewModel];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
+		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -37,8 +39,9 @@
 	RoutingPaletteViewModel.prototype._onMapLoad = function()
 	{
 		var self = this;
-		var map = this._viewModal._map;
-		this.map = map;
+		var map = self._viewModal._map;
+		self.mapInstance = self._viewModal.mapInstance;
+		self.map = map;
 		self.initLabelSetting();
 		(self.obShow() && self.showCount == 0) && self.addShowCount();
 		self.childViewModels.forEach(function(childViewModel)
@@ -117,6 +120,40 @@
 		return layers;
 	};
 
+	RoutingPaletteViewModel.prototype.onFieldTripMapChange = async function(_, data)
+	{
+		if (!this.fieldTripMap)
+		{
+			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
+		}
+		await this.displayFieldTripPath(data);
+	}
+
+	RoutingPaletteViewModel.prototype.displayFieldTripPath = async function(data)
+	{
+		if (data && (data.add.length > 0))
+		{
+			const addFieldTrips = data.add;
+			for (let i = 0; i < addFieldTrips.length; i++)
+			{
+				const fieldTrip = addFieldTrips[i];
+				this.fieldTripMap.drawStops(fieldTrip);
+				const routeResult = await this.fieldTripMap.calculateRoute(fieldTrip);
+				this.fieldTripMap.drawFieldTripPath(fieldTrip, routeResult);
+			}
+		}
+		
+		if (data && (data.delete.length > 0))
+		{
+			const deleteFieldTrips = data.delete;
+			for (let i = 0; i < deleteFieldTrips.length; i++)
+			{
+				const fieldTrip = deleteFieldTrips[i];
+				this.fieldTripMap.removeFieldTrip(fieldTrip);
+			}
+		}
+	}
+
 	RoutingPaletteViewModel.prototype.close = function()
 	{
 		var self = this;
@@ -155,6 +192,7 @@
 		{
 			childViewModel.dispose();
 		});
+
 		tfdispose(this);
 	};
 })();

@@ -599,7 +599,7 @@
 		var drawTool = this.getUnassignedStudentDrawTool();
 		var query = new tf.map.ArcGIS.Query();
 		query.outFields = ["*"];
-		drawTool._pointLayer.queryFeatures(query).then(function(featureSet)
+		drawTool?._pointLayer.queryFeatures(query).then(function(featureSet)
 		{
 			if (self.dataModel.getEditTrips().length == 0)
 			{
@@ -635,7 +635,7 @@
 				}
 			}
 
-			drawTool._applyEditsForAdd(adds).then(function()
+			drawTool?._applyEditsForAdd(adds).then(function()
 			{
 				self.students && adds.forEach(function(add)
 				{
@@ -645,11 +645,11 @@
 			});
 			if (deletes.length > 0 || edits.length > 0)
 			{
-				drawTool._pointLayer.applyEdits({ deleteFeatures: deletes, updateFeatures: edits });
+				drawTool?._pointLayer.applyEdits({ deleteFeatures: deletes, updateFeatures: edits });
 			}
 			if (deleteArrows.length > 0)
 			{
-				drawTool.clearArrow(deleteArrows);
+				drawTool?.clearArrow(deleteArrows);
 			}
 
 			self.dataModel.onCandidatesStudentsChangeToMapEvent.notify({ add: adds, edit: [], delete: deleteArrows });

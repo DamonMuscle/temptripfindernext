@@ -257,7 +257,7 @@
 	RoutingDataModel.prototype.clearFindCandidates = function(trips)
 	{
 		var self = this;
-		if (self._viewModal.DocumentData.data.trips)
+		if (self._viewModal.DocumentData.data?.trips)
 		{
 			for (var i = 0; i < trips.length; i++)
 			{
@@ -3845,9 +3845,9 @@
 
 	RoutingDataModel.prototype.clearCandidateStudents = function()
 	{
-		if (this.candidateStudents)
+		if (this.candidateStudents && this.candidateStudents.length > 0)
 		{
-			var promise = this.onCandidatesStudentsChangeToMapEvent.notify({ add: [], edit: [], delete: this.candidateStudents });
+			var promise = this.onCandidatesStudentsChangeToMapEvent?.notify({ add: [], edit: [], delete: this.candidateStudents });
 			this.candidateStudents = [];
 			this.routingStudentManager.oldCandidateStudentsToShow = "";
 			this.viewModel.drawTool && this.viewModel.drawTool.clearCandidateStudents();

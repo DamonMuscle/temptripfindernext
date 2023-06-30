@@ -81,6 +81,17 @@
 		this.add(point, symbol, attributes);
 	}
 
+	Layer.prototype.addPolyline = function(paths, symbol, attributes)
+	{
+		const polyline = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Polyline({
+			hasZ: false,
+			hasM: false,
+			paths: paths,
+			spatialReference: { wkid: 4326 }
+		}));
+		this.add(polyline, symbol, attributes);
+	}
+
 	Layer.prototype.add = function(geometry, symbol, attributes)
 	{
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)

@@ -39,6 +39,9 @@
 		this.settings = Object.assign({}, defaultOptions, options);
 		this._mode = this.settings.mode;
 		this.name = `NetworkService - ${Date.now()}`;
+		this.defineReadOnlyProperty('CURB_APPROACH', CURB_APPROACH);
+		this.defineReadOnlyProperty('LOCATION_TYPE', LOCATION_TYPE);
+		this.defineReadOnlyProperty('U_TURN_POLICY', U_TURN_POLICY);
 	}
 
 	Object.defineProperty(NetworkService.prototype, 'mode', {
@@ -105,7 +108,7 @@
 
 				return routeTask.solve(routeParameters).then((response) => {
 					results = response;
-					console.log(results);
+					// console.log(results);
 
 					self.clearOnlineToken(esriConfig);
 					resolve( { results, errorMessage });
@@ -207,6 +210,15 @@
 			});
 		});
 	}
+
+	NetworkService.prototype.defineReadOnlyProperty = function(propertyName, value)
+	{
+		Object.defineProperty(this, propertyName, {
+			get() { return value; },
+			enumerable: false,
+			configurable: false
+		});
+	};
 
 	NetworkService.prototype.unitTest = async function()
 	{

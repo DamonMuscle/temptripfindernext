@@ -1913,8 +1913,8 @@
 
 	RoutingTripMapTool.prototype.clearCandidateStudents = function()
 	{
-		var layer = this.viewModel.viewModel.unassignedStudentViewModel.drawTool._pointLayer;
-		return layer.queryFeatures().then(function(result)
+		var layer = this.viewModel.viewModel.unassignedStudentViewModel.drawTool?._pointLayer;
+		return layer?.queryFeatures().then(function(result)
 		{
 			if (result.features.length > 0)
 			{
