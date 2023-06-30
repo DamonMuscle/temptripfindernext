@@ -2250,8 +2250,8 @@
 				StreetSpeed: null,
 				Travel: "00:00:00",
 				VehicleCurbApproach: 0,
-				XCoord: null,
-				YCoord: null,
+				XCoord: fieldTrip.SchoolXCoord,
+				YCoord: fieldTrip.SchoolYCoord,
 				type: "tripStop",
 				vehicleCurbApproach: 0
 			});
@@ -2285,8 +2285,8 @@
 				StreetSpeed: null,
 				Travel: "00:00:00",
 				VehicleCurbApproach: 0,
-				XCoord: null,
-				YCoord: null,
+				XCoord: fieldTrip.FieldTripDestinationXCoord,
+				YCoord: fieldTrip.FieldTripDestinationYCoord,
 				type: "tripStop",
 				vehicleCurbApproach: 0
 			});
