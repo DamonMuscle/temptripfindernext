@@ -1627,7 +1627,7 @@
 		if (data.level() == 0)
 		{
 			data = this.dataModel.getTripById(data.id);
-			type = 'trip';
+			type = 'fieldtrip';
 		}
 		else if (data.level() == 1)
 		{

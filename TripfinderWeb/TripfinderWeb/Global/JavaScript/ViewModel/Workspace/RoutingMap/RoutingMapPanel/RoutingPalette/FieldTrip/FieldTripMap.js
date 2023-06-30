@@ -73,28 +73,36 @@
 
 	FieldTripMap.prototype.drawStops = function(fieldTrip)
 	{
-		if (fieldTrip.TripStops.length === 0)
+		const color = fieldTrip.color,
+			DBID = fieldTrip.DBID,
+			Id = fieldTrip.Id,
+			attributes = {DBID, Id};
+
+		if (fieldTrip.FieldTripStops.length === 0)
 		{
-			const color = fieldTrip.color,
-				DBID = fieldTrip.DBID,
-				Id = fieldTrip.Id,
-				attributes = {DBID, Id};
 			this.fieldTripStopLayerInstance.addPoint(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, this.symbol.tripStop(1, color), attributes);
 			this.fieldTripStopLayerInstance.addPoint(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, this.symbol.tripStop(2, color), attributes);
-	
-			const graphics = this.fieldTripStopLayerInstance.layer.graphics;
-			this.mapInstance.setExtent(graphics);
 		}
 		else
 		{
-			console.log("TODO: draw TripStops");
+			const fieldTripStops = fieldTrip.FieldTripStops;
+			for (let i = 0; i < fieldTripStops.length; i++)
+			{
+				const stop = fieldTripStops[i];
+				this.fieldTripStopLayerInstance.addPoint(stop.XCoord, stop.YCoord, this.symbol.tripStop(stop.Sequence, color), attributes);
+			}
 		}
+
+		const graphics = this.fieldTripStopLayerInstance.layer.graphics;
+		this.mapInstance.setExtent(graphics);
 	}
 
 	FieldTripMap.prototype.calculateRoute = async function(fieldTrip)
 	{
 		const networkService = TF.GIS.Analysis.getInstance().networkService;
-		if (fieldTrip.TripStops.length === 0)
+		const stops = [];
+
+		if (fieldTrip.FieldTripStops.length === 0)
 		{
 			const stop1 = {
 				curbApproach: networkService.CURB_APPROACH.RIGHT_SIDE,
@@ -109,19 +117,35 @@
 				longitude: fieldTrip.FieldTripDestinationXCoord,
 				latitude: fieldTrip.FieldTripDestinationYCoord,
 			};
-			const stopFeatureSet = await networkService.createStopFeatureSet([stop1, stop2]);
-			const params = {
-				stops: stopFeatureSet,
-			};
-			const response = await networkService.solveRoute(params);
-
-			const result = response?.results?.routeResults[0];
-			return result;
+			stops.push(stop1);
+			stops.push(stop2);
 		}
 		else
 		{
-			return null;
+			
+			const fieldTripStops = fieldTrip.FieldTripStops;
+			for (let i = 0; i < fieldTripStops.length; i++)
+			{
+				const stop = fieldTripStops[i];
+				const stopObject = {
+					curbApproach: networkService.CURB_APPROACH.RIGHT_SIDE,
+					name: stop.Street,
+					sequence: stop.Sequence,
+					longitude: stop.XCoord,
+					latitude: stop.YCoord,
+				}
+				stops.push(stopObject);
+			}
 		}
+
+		const stopFeatureSet = await networkService.createStopFeatureSet(stops);
+		const params = {
+			stops: stopFeatureSet,
+		};
+		const response = await networkService.solveRoute(params);
+
+		const result = response?.results?.routeResults[0];
+		return result;
 	}
 
 	FieldTripMap.prototype.drawFieldTripPath = function(fieldTrip, routeResult)
@@ -167,5 +191,34 @@
 				i--;
 			}
 		}
+	}
+
+	FieldTripMap.prototype.zoomToFieldTripLayer = function(fieldTrip)
+	{
+		const DBID = fieldTrip.DBID,
+			Id = fieldTrip.Id,
+			stopFeatures = this.fieldTripStopLayerInstance.layer.graphics.items,
+			pathFeatures = this.fieldTripPathLayerInstance.layer.graphics.items,
+			graphics = [];
+
+		for (let i = 0; i < stopFeatures.length; i++)
+		{
+			const stopFeature = stopFeatures[i];
+			if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
+			{
+				graphics.push(stopFeature);
+			}
+		}
+
+		for (let i = 0; i < pathFeatures.length; i++)
+		{
+			const pathFeature = pathFeatures[i];
+			if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
+			{
+				graphics.push(pathFeature);
+			}
+		}
+
+		this.mapInstance.setExtent(graphics);
 	}
 })();

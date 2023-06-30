@@ -26,6 +26,7 @@
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
+		PubSub.subscribe("on_FieldTripMap_ZoomToLayers", self.onFieldTripMapZoomToLayers.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -152,6 +153,11 @@
 				this.fieldTripMap.removeFieldTrip(fieldTrip);
 			}
 		}
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToLayers = function(_, data)
+	{
+		this.fieldTripMap?.zoomToFieldTripLayer(data);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

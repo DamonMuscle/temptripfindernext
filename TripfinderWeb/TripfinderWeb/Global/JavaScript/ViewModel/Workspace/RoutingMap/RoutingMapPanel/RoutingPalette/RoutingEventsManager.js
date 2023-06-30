@@ -176,6 +176,13 @@
 		{
 			return;
 		}
+
+		if (type === 'fieldtrip')
+		{
+			PubSub.publish("on_FieldTripMap_ZoomToLayers", data);
+			return;
+		}
+
 		var map = this._viewModal._map;
 		var trips = [];
 		if (type != "trip" && data.customData && data.customData.geometry)
