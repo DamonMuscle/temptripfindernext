@@ -97,6 +97,8 @@
 		}
 
 		this.bindValidator();
+
+		$(document.body).addClass("no-scroll");
 	};
 
 	LoginViewModel.prototype.bindValidator = function($form)
@@ -650,6 +652,7 @@
 
 	LoginViewModel.prototype.dispose = function ()
 	{
+		$(document.body).removeClass("no-scroll");
 		clearInterval(this.resendCountDownInterval);
 	};
 })();
