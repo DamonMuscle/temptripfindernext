@@ -4363,7 +4363,7 @@
 				{
 					return trip.Id && trip.OpenType != "View";
 				}).map(i => i.Id));
-				self.viewModel.analyzeTripByDistrictPolicy.analyze(fieldTrips);
+				// self.viewModel.analyzeTripByDistrictPolicy.analyze(fieldTrips);
 			}
 		});
 	};
