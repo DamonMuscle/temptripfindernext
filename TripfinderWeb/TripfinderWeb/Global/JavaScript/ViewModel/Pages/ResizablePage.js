@@ -233,9 +233,9 @@
 
 					if (!hasDragMoved)
 					{
-						var _leftWidth = currentLeft === self.minLeftWidth ? savedWidth : self.minLeftWidth;
-						self.$dragHandler.css("left", _leftWidth + "px");
-						self.resize(_leftWidth);
+						var prevLeftWidth = currentLeft === self.minLeftWidth ? savedWidth : self.minLeftWidth;
+						self.$dragHandler.css("left", prevLeftWidth + "px");
+						self.resize(prevLeftWidth);
 					}
 					else
 					{
