@@ -1126,7 +1126,7 @@
 									<div class="trip-info k-tripstop-state-hover"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">
 
 									#if(!item.customData.schoolCode){#
-									<div class="student-count-info k-tripstop-state-hover">#:item.customData.session == 2 ? "" : (item.customData.assignedStudentCount==0&&item.customData.totalStudentCount==0?"No Students":(item.customData.assignedStudentCount + " of " + item.customData.totalStudentCount + (item.customData.totalStudentCount == 1 ? " Student " : " Students "))) #</div>
+									<div style="display:none;" class="student-count-info k-tripstop-state-hover">#:item.customData.session == 2 ? "" : (item.customData.assignedStudentCount==0&&item.customData.totalStudentCount==0?"No Students":(item.customData.assignedStudentCount + " of " + item.customData.totalStudentCount + (item.customData.totalStudentCount == 1 ? " Student " : " Students "))) #</div>
 									#}#
 
 									#if(item.customData.toSchoolStudents && item.customData.toSchoolStudents.HomeToSchool > 0){#
@@ -1172,9 +1172,9 @@
 									#if(!item.customData.schoolCode){#
 									<span class="arrival-time-span k-tripstop-state-hover"><div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>
 									<span title="Scheduled time" class="schedule-time">#:item.customData.stopTime#</span> #:" | "#
-									<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed #</span>#:" | "#
-									<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#
-									<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>
+									<span title="Avg. Speed" class="#: item.customData.PrimaryDestination ? "" : "avg-speed" #">#:item.customData.PrimaryDestination ? "<none>" : item.customData.avgSpeed #</span>#:" | "#
+									<span title="Distance">#:item.customData.PrimaryDestination ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#
+									<span title="Duration">#:item.customData.PrimaryDestination ? "<none>" : item.customData.duration#</span>
 									#}#
 								</div>
 							</div>

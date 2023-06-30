@@ -3006,7 +3006,7 @@
 				prohibitCrosser: tripStop.ProhibitCrosser,
 				isStop: true
 			},
-			items: this.newStudentData(tripStop)
+			items: []//this.newStudentData(tripStop)
 		}
 	}
 
@@ -3493,7 +3493,7 @@
 				isTrip: true,
 				//durationOptimizeNmber: ""
 			},
-			items: self.newTripStopData(trip.TripStops, trip.Session, trip.Name)
+			items: self.newTripStopData(trip.FieldTripStops, trip.Session, trip.Name)
 		};
 	}
 
@@ -3538,7 +3538,7 @@
 				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('h:mm a')
 				//durationOptimizeNmber: ""
 			},
-			items: self.newTripStopData(trip.TripStops, trip.Session, trip.Name)
+			items: self.newTripStopData(trip.FieldTripStops, trip.Session, trip.Name)
 		};
 	}
 

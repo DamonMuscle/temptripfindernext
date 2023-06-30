@@ -499,8 +499,8 @@
 			// self._removeNotOpenEditTrips(data);
 			self.bindColor();
 			
-			/*var p1 = self._fetchTripData(newTripIds);
-			var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
+			var p1 = self._fetchTripData(newTripIds);
+			/*var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
 			{
 				if (!disableAutoZoom)
 				{
@@ -509,10 +509,9 @@
 			});
 			
 			var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
-			
-			return Promise.all([p1, p2, p3]);
 			*/
-			return Promise.resolve();
+
+			return Promise.all([p1]);
 		}).then(function(tripsData)
 		{
 			tf.loadingIndicator.tryHide();
@@ -2082,15 +2081,15 @@
 		}
 	};
 
-	RoutingDataModel.prototype._fetchTripData = function(tripIds, overlay)
+	RoutingDataModel.prototype._fetchTripData = function(fieldTripIds, overlay)
 	{
 		var self = this;
-		if (tripIds.length == 0)
+		if (fieldTripIds.length == 0)
 		{
 			return { Trips: [] };
 		}
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "RoutingTrips"), {
-			paramData: $.extend({ tripIds: tripIds.toString() }, self._getCandidateSetting())
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "routingfieldtrips"), {
+			paramData: $.extend({ fieldTripIds: fieldTripIds.toString() }, self._getCandidateSetting())
 		}, { overlay: overlay != false ? true : false }).then(function(response)
 		{
 			var data = response.Items[0];
@@ -2100,10 +2099,10 @@
 				filterTips = 'The additional student filter is invalid.';
 			}
 
-			if (data.HasInvalidNEZFilter)
-			{
-				filterTips = filterTips === '' ? 'Map NEZ student filter is invalid.' : 'Map NEZ student filter and additional student filter are invalid.';
-			}
+			// if (data.HasInvalidNEZFilter)
+			// {
+			// 	filterTips = filterTips === '' ? 'Map NEZ student filter is invalid.' : 'Map NEZ student filter and additional student filter are invalid.';
+			// }
 
 			if (filterTips)
 			{
@@ -2111,28 +2110,28 @@
 			}
 
 			var schoolIdsDic = {}, schoolIds = [];
-			data.Trips.forEach(function(trip)
+			data.FieldTrips.forEach(function(trip)
 			{
 				trip.visible = true;
 				trip.type = "trip";
-				trip.TripStops.forEach(function(tripStop)
+				trip.FieldTripStops.forEach(function(fieldTripStop)
 				{
-					tripStop.TripId = trip.id;
-					tripStop.type = "tripStop";
-					tripStop.vehicleCurbApproach = tripStop.VehicleCurbApproach;
-					if (tripStop.SchoolLocation)
+					fieldTripStop.TripId = trip.id;
+					fieldTripStop.type = "tripStop";
+					fieldTripStop.vehicleCurbApproach = fieldTripStop.VehicleCurbApproach;
+					if (fieldTripStop.SchoolLocation)
 					{
-						tripStop.SchoolLocation.geometry = TF.xyToGeometry(tripStop.SchoolLocation.Xcoord, tripStop.SchoolLocation.Ycoord);
+						fieldTripStop.SchoolLocation.geometry = TF.xyToGeometry(fieldTripStop.SchoolLocation.Xcoord, fieldTripStop.SchoolLocation.Ycoord);
 					}
-					if (tripStop.SchoolId > 0 && (tripStop.XCoord == 0 || tripStop.YCoord == 0))
+					if (fieldTripStop.SchoolId > 0 && (fieldTripStop.XCoord == 0 || fieldTripStop.YCoord == 0))
 					{
-						if (!schoolIdsDic[tripStop.SchoolId])
+						if (!schoolIdsDic[fieldTripStop.SchoolId])
 						{
-							schoolIdsDic[tripStop.SchoolId] = tripStop.SchoolId;
+							schoolIdsDic[fieldTripStop.SchoolId] = fieldTripStop.SchoolId;
 						}
 					}
 
-					self.removeExpiredExceptions(tripStop.Students, tripStop.id, self.expiredExceptions);
+					// self.removeExpiredExceptions(fieldTripStop.Students, fieldTripStop.id, self.expiredExceptions);
 				});
 				return trip;
 			});
@@ -2152,15 +2151,15 @@
 				{
 					data.Trips.forEach(function(trip)
 					{
-						trip.TripStops.forEach(function(tripStop)
+						trip.TripStops.forEach(function(fieldTripStop)
 						{
-							if (tripStop.SchoolId > 0)
+							if (fieldTripStop.SchoolId > 0)
 							{
-								var school = Enumerable.From(result.Items).FirstOrDefault(null, function(s) { return s.Id == tripStop.SchoolId; });
+								var school = Enumerable.From(result.Items).FirstOrDefault(null, function(s) { return s.Id == fieldTripStop.SchoolId; });
 								if (school)
 								{
-									tripStop.XCoord = school.Xcoord;
-									tripStop.YCoord = school.Ycoord;
+									fieldTripStop.XCoord = school.Xcoord;
+									fieldTripStop.YCoord = school.Ycoord;
 								}
 							}
 						});
@@ -2176,7 +2175,7 @@
 		{
 			var allTripStops = [];
 			var assignedStudents = [];
-			tripsData.Trips.forEach(function(trip)
+			tripsData.FieldTrips.forEach(function(trip)
 			{
 				var existTrip = self.getTripById(trip.id);
 				if (existTrip)
@@ -2190,26 +2189,108 @@
 							existTrip[key] = trip[key];
 						}
 					}
-					existTrip.TripStops.forEach(function(tripStop)
+
+					self.handleDepatureAndDestinationStop(existTrip);
+
+					existTrip.FieldTripStops.forEach(function(fieldTripStop)
 					{
-						allTripStops.push(tripStop);
-						tripStop.geometry = TF.xyToGeometry(tripStop.XCoord, tripStop.YCoord);
-						tripStop.color = existTrip.color;
-						tripStop.Students.forEach(function(student)
+						allTripStops.push(fieldTripStop);
+						fieldTripStop.geometry = TF.xyToGeometry(fieldTripStop.XCoord, fieldTripStop.YCoord);
+						fieldTripStop.color = existTrip.color;
+						fieldTripStop.Students = fieldTripStop.Students || [];
+						fieldTripStop.Students.forEach(function(student)
 						{
 							student.geometry = TF.xyToGeometry(student.XCoord, student.YCoord);
 						});
-						tripStop.originalStudents = tripStop.Students.map(function(c) { return $.extend({ InCriteriaUnassigned: true }, c); });// save students data to trip stop to get the original students bind on the trip stop
-						existTrip.originalStudents = existTrip.originalStudents.concat(tripStop.originalStudents);
-						self.viewModel.drawTool && self.viewModel.drawTool._addTripStop(tripStop, existTrip.id);
-						assignedStudents = assignedStudents.concat(tripStop.originalStudents);
+						fieldTripStop.originalStudents = fieldTripStop.Students.map(function(c) { return $.extend({ InCriteriaUnassigned: true }, c); });// save students data to trip stop to get the original students bind on the trip stop
+						existTrip.originalStudents = existTrip.originalStudents.concat(fieldTripStop.originalStudents);
+						self.viewModel.drawTool && self.viewModel.drawTool._addTripStop(fieldTripStop, existTrip.id);
+						assignedStudents = assignedStudents.concat(fieldTripStop.originalStudents);
 					});
 				}
 			});
-			tripsData.CandidateStudents = tripsData.CandidateStudents.concat(assignedStudents.filter(function(c) { return c.CanBeCandidate; }));
+			tripsData.CandidateStudents = (tripsData.CandidateStudents || []).concat(assignedStudents.filter(function(c) { return c.CanBeCandidate; }));
 			tripsData.AllTripStops = allTripStops;
 			return tripsData;
 		});
+	};
+
+	/**
+	 * Once the legacy data migration is finished, this method will be removed.
+	 * @param {*} fieldTrip 
+	 */
+	RoutingDataModel.prototype.handleDepatureAndDestinationStop = function(fieldTrip)
+	{
+		const minSequence = Math.min(...fieldTrip.FieldTripStops.map(x=>x.Sequence));
+		if(minSequence==2)
+		{
+			fieldTrip.FieldTripStops.unshift({
+				DBID: fieldTrip.DBID,
+				TripId: fieldTrip.Id,
+				type: "tripStop",
+				ActualStopTime: "00:00:00",
+
+				City: null,
+				Comment: null,
+				Distance: 0,
+				DrivingDirections: null,
+				Duration: "00:00:00",
+				FieldTripDestinationId: null,
+				GeoPath: null,
+				IsCustomDirection: false,
+				LockStopTime: false,
+				PrimaryDeparture: true,
+				PrimaryDestination: false,
+				RouteDrivingDirections: null,
+				Sequence: 1,
+				Speed: 18,
+				StopTimeArrive: null,
+				StopTimeDepart: null,
+				Street: fieldTrip.SchoolName,
+				StreetSpeed: null,
+				Travel: "00:00:00",
+				VehicleCurbApproach: 0,
+				XCoord: null,
+				YCoord: null,
+				type: "tripStop",
+				vehicleCurbApproach: 0
+			});
+		}
+
+		if(!fieldTrip.FieldTripStops.map(x=>x.FieldTripDestinationId).includes(fieldTrip.FieldTripDestinationId))
+		{
+			fieldTrip.FieldTripStops.push({
+				DBID: fieldTrip.DBID,
+				TripId: fieldTrip.Id,
+				type: "tripStop",
+				ActualStopTime: "00:00:00",
+
+				City: null,
+				Comment: null,
+				Distance: 0,
+				DrivingDirections: null,
+				Duration: "00:00:00",
+				FieldTripDestinationId: fieldTrip.FieldTripDestinationId,
+				GeoPath: null,
+				IsCustomDirection: false,
+				LockStopTime: false,
+				PrimaryDeparture: false,
+				PrimaryDestination: true,
+				RouteDrivingDirections: null,
+				Sequence: fieldTrip.FieldTripStops.length + 1,
+				Speed: 18,
+				StopTimeArrive: null,
+				StopTimeDepart: null,
+				Street: fieldTrip.Destination,
+				StreetSpeed: null,
+				Travel: "00:00:00",
+				VehicleCurbApproach: 0,
+				XCoord: null,
+				YCoord: null,
+				type: "tripStop",
+				vehicleCurbApproach: 0
+			});
+		}
 	};
 
 	RoutingDataModel.prototype.removeExpiredExceptions = function(students, tripStopId, expiredExceptions)
