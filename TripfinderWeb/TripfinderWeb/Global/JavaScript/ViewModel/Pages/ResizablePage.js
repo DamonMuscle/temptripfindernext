@@ -209,7 +209,7 @@
 
 	ResizablePage.prototype.initDragHandler = function()
 	{
-		var self = this, totalWidth = self.$element.outerWidth(), hasDragMoved, offsetLeftOnDragStart;
+		var self = this, totalWidth = self.$element.outerWidth(), hasDragMoved, offsetLeftOnDragStart, savedWidth;
 		self.$dragHandler.draggable(
 			{
 				distance: 0,
@@ -222,6 +222,8 @@
 						$(e.currentTarget).find(".sliderbar-button").addClass("slider-tapped");
 					}
 					offsetLeftOnDragStart = ui.offset.left;
+					leftPanelWidth = self.$leftPage.width();
+					savedWidth = (leftPanelWidth === self.minLeftWidth) ? (savedWidth || (totalWidth - self.minLeftWidth)) : leftPanelWidth;
 					hasDragMoved = false;
 				},
 				stop: function(e, ui)
@@ -231,8 +233,9 @@
 
 					if (!hasDragMoved)
 					{
-						self.$dragHandler.css("left", self.minLeftWidth + "px");
-						self.resize(self.minLeftWidth);
+						var _leftWidth = currentLeft === self.minLeftWidth ? savedWidth : self.minLeftWidth;
+						self.$dragHandler.css("left", _leftWidth + "px");
+						self.resize(_leftWidth);
 					}
 					else
 					{
