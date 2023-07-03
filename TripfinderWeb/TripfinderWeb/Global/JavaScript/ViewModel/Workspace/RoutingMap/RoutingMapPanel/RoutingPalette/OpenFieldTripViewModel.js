@@ -253,7 +253,7 @@
 						Ycoord: fieldTrip.FieldTripDestinationYCoord,
 						FieldTripDestinationId: fieldTrip.FieldTripDestinationId,
 						Street: fieldTrip.DestinationStreet || fieldTrip.Destination,
-						Sequence: existingItems.filter(x => x.FieldTripId == fieldTrip.Id).length + 2,
+						Sequence: existingItems.filter(x => x.FieldTripId == fieldTrip.Id && !item.PrimaryDeparture && !item.PrimaryDestination).length + 2,
 					};
 
 				if(!existingItems.some(item => item.PrimaryDeparture && item.FieldTripId == fieldTrip.Id))
