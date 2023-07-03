@@ -3455,11 +3455,11 @@
 		{
 			if (self.trips[i].id == tripId)
 			{
-				for (var j = 0; j < self.trips[i].TripStops.length; j++)
+				for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 				{
-					if (self.trips[i].TripStops[j].LockStopTime)
+					if (self.trips[i].FieldTripStops[j].LockStopTime)
 					{
-						return self.trips[i].TripStops[j];
+						return self.trips[i].FieldTripStops[j];
 					}
 				}
 			}

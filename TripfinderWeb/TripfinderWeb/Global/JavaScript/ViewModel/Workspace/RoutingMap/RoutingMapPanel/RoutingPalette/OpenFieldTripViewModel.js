@@ -256,6 +256,11 @@
 						Sequence: existingItems.filter(x => x.FieldTripId == fieldTrip.Id && !x.PrimaryDeparture && !x.PrimaryDestination).length + 2,
 					};
 
+				if(!existingItems.find(x => x.FieldTripId == fieldTrip.Id && x.LockStopTime))
+				{
+					schoolStop.LockStopTime = true;
+				}
+
 				if(!existingItems.some(item => item.PrimaryDeparture && item.FieldTripId == fieldTrip.Id))
 				{
 					addingItems.push(schoolStop);
