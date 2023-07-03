@@ -25,9 +25,12 @@
 		self.childViewModels =[self.tripViewModel]; // [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel, self.nonEligibleZoneViewModel];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
+
 		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ZoomToLayers", self.onFieldTripMapZoomToLayers.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ShowHide", self.onFieldTripMapShowHide.bind(self));
+		PubSub.subscribe("on_FieldTripMap_UpdateColor", self.onFieldTripMapUpdateColor.bind(self));
+		PubSub.subscribe("on_FieldTripMap_TripPathTypeChange", self.onFieldTripMapTripPathTypeChange.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -139,9 +142,7 @@
 			for (let i = 0; i < addFieldTrips.length; i++)
 			{
 				const fieldTrip = addFieldTrips[i];
-				this.fieldTripMap.drawStops(fieldTrip);
-				// const routeResult = await this.fieldTripMap.calculateRoute(fieldTrip);
-				// this.fieldTripMap.drawFieldTripPath(fieldTrip, routeResult);
+				this.fieldTripMap.addFieldTrip(fieldTrip);
 			}
 		}
 		
@@ -164,6 +165,16 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
 	{
 		this.fieldTripMap?.setFieldTripVisible(data);
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapUpdateColor = function(_, data)
+	{
+		this.fieldTripMap?.updateSymbolColor(data);
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, type)
+	{
+		this.fieldTripMap?.setPathLineType(this.dataModel.trips, type);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

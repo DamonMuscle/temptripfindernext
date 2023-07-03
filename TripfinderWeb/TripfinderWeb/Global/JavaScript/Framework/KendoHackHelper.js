@@ -22,7 +22,7 @@
 			return BaseKendoMobilePaneWarp.call(this, element);
 		}
 
-		var KendoFlatColorPickerPrototype = null, KendoColorPickerPrototype = null, KendoDropDownListPrototype = null, KendoUploadPrototype = null;
+		var KendoFlatColorPickerPrototype = null, KendoColorPickerPrototype = null, KendoDropDownListPrototype = null, KendoUploadPrototype = null, KendoRangeSliderWidgetPrototype = null;
 
 		window.kendo.widgets.map(function(widget, idx)
 		{
@@ -34,6 +34,8 @@
 				KendoDropDownListPrototype = widget.widget.prototype;
 			if (widget.name === 'kendoUpload')
 				KendoUploadPrototype = widget.widget.prototype;
+			if (widget.name === 'kendoRangeSlider')
+				KendoRangeSliderWidgetPrototype = widget.widget.prototype;
 		});
 
 		var Const = {
@@ -783,6 +785,187 @@
 			}
 		});
 
+		function round(value, precision)
+		{
+			var power = pow(precision);
+			return Math.round(value * power) / power;
+		}
+
+		function pow(p)
+		{
+			if (p)
+			{
+				return Math.pow(10, p);
+			}
+			return 1;
+		}
+
+		function removeFraction(value)
+		{
+			return value * 10000;
+		}
+
+		KendoRangeSliderWidgetPrototype._setItemsWidth = function(pixelWidths)
+		{
+			const TICK_SELECTOR = '.k-tick';
+			var that = this, options = that.options, first = 0, last = pixelWidths.length - 1, items = that.wrapper.find(TICK_SELECTOR), i, paddingTop = 0, bordersWidth = 2, count = items.length, selection = 0;
+			const wrapperWidth = that.wrapper.width();
+			const cellWidth = Math.floor(wrapperWidth / (count - 1));
+
+			for (i = 0; i < count; i++)
+			{
+				if (i === 0 || i === count - 1)
+				{
+					$(items[i]).css('width', `calc(100% / ${count - 1} / 2)`)
+					if (i === count - 1)
+					{
+						$(items[i]).css('background-position-x', '90%');
+					}
+					//$(items[i]).width(Math.floor((wrapperWidth - cellWidth * (count - 2)) / 2));
+				}
+				else
+				{
+					$(items[i]).css('width', `calc(100% / ${count - 1})`)
+					//$(items[i]).width(cellWidth);
+				}
+			}
+
+			if (that._isHorizontal)
+			{
+				that.wrapper.find(TICK_SELECTOR + ':first').addClass('k-first');
+				that.wrapper.find(TICK_SELECTOR + ':last').addClass('k-last');
+			} else
+			{
+				$(items[last]).addClass('k-first')[that._sizeFn](pixelWidths[last]);
+				$(items[first]).addClass('k-last')[that._sizeFn](pixelWidths[last - 1]);
+			}
+			if (that._distance() % options.smallStep !== 0 && !that._isHorizontal)
+			{
+				for (i = 0; i < pixelWidths.length; i++)
+				{
+					selection += pixelWidths[i];
+				}
+				paddingTop = that._maxSelection - selection;
+				paddingTop += parseFloat(that._trackDiv.css(that._position), 10) + bordersWidth;
+				that.wrapper.find('.k-slider-items').css('padding-top', paddingTop);
+			}
+		}
+
+		KendoRangeSliderWidgetPrototype._sliderItemsInit = function()
+		{
+			var that = this, options = that.options;
+			const previewOptions = JSON.parse(that._prevOptionString || '{}');
+			if (that.element.closest("div.on-time-report-stack-item").length !== 0
+				&& that._prevWrapperWidth === that.wrapper.width()
+				&& previewOptions.max === options.max
+				&& previewOptions.min === options.min)
+			{
+				return; // skip item re-init if no option changes to improve experience
+			}
+
+			that._prevOptionString = JSON.stringify(options);
+			that._prevWrapperWidth = that.wrapper.width();
+			var sizeBetweenTicks = that._maxSelection / ((options.max - options.min) / options.smallStep);
+			var pixelWidths = that._calculateItemsWidth(Math.floor(removeFraction(that._distance()) / removeFraction(options.smallStep)));
+			const scale = calculateScale.bind(that)();
+			if (options.tickPlacement != 'none')
+			{
+				$(this.element).parent().find('.k-slider-items').remove();
+				that._trackDiv.before(createSliderItems.bind(that)(scale[0], that._distance()));
+				that._setItemsWidth(pixelWidths);
+				// that._setItemsTitle();
+
+			}
+			that._calculateSteps(pixelWidths);
+			if (options.tickPlacement != 'none' && options.largeStep >= options.smallStep)
+			{
+				that._setItemsLargeTickAndTitle(scale); // kendo only invoke method that._setItemsLargeTick
+			}
+
+			function calculateScale()
+			{
+				const wrapperWidth = this.wrapper.width()
+				const observationWindow = Math.floor(this._distance() / 2);
+				if (observationWindow <= 60) // handle 30/60/120
+				{
+					if (wrapperWidth >= 490)
+					{
+						return [1, 5];
+					}
+					else
+					{
+						return [5, 10];
+					}
+				}
+				else // handle 240
+				{
+					if (wrapperWidth >= 600)
+					{
+						return [1, 10];
+					}
+					else
+					{
+						return [10, 20];
+					}
+				}
+			}
+
+			function createSliderItems(smallStep, distance)
+			{
+				var result = '<ul class=\'k-reset k-slider-items\'>', count = Math.floor(round(distance / smallStep)) + 1, i;
+				for (i = 0; i < count; i++)
+				{
+					result += '<li class=\'k-tick\' role=\'presentation\'>&nbsp;</li>';
+				}
+				result += '</ul>';
+				return result;
+			}
+		};
+
+		KendoRangeSliderWidgetPrototype._setItemsLargeTickAndTitle = function(scale)
+		{
+			const TICK_SELECTOR = '.k-tick';
+			var that = this, options = that.options, items = that.wrapper.find(TICK_SELECTOR), i = 0, item, value;
+			const times = scale[1] / scale[0];
+			const itemsLen = items.length;
+			items.each((index, liItem) =>
+			{
+				const title = -((itemsLen - 1) / 2 * scale[0] - index * scale[0])
+				$(liItem).attr('title', title);
+				$(liItem).css('line-height', $(liItem)[that._sizeFn]() + 'px');
+				if (index % times === 0)
+				{
+					$(liItem).addClass('k-tick-large').html(`<span class='k-label'>${title}</span>`);
+				}
+			});
+
+			if (removeFraction(options.largeStep) % removeFraction(options.smallStep) === 0 || that._distance() / options.largeStep >= 3)
+			{
+				if (!that._isHorizontal && !that._isRtl)
+				{
+					items = $.makeArray(items).reverse();
+				}
+
+				for (i = 0; i < items.length; i++)
+				{
+					item = $(items[i]);
+					value = that._values[i];
+					var valueWithoutFraction = round(removeFraction(value - this.options.min));
+					if (valueWithoutFraction % removeFraction(options.smallStep) === 0 && valueWithoutFraction % removeFraction(options.largeStep) === 0)
+					{
+						if (i % scale[1] === 0)
+						{
+							item.addClass('k-tick-large').html(`<span class='k-label'>${item.attr('title')}</span>`);
+						}
+
+						if (i !== 0 && i !== items.length - 1)
+						{
+							item.css('line-height', item[that._sizeFn]() + 'px');
+						}
+					}
+				}
+			}
+		}
 		kendo.ui.TreeView.prototype._keypress = kendo.ui.TreeView.prototype._keypress.createInterceptor(function(e)
 		{
 			var that = this;
@@ -1888,6 +2071,14 @@
 			}
 		}
 		that._isPasted = false;
+	}
+
+	kendo.ui.Grid.prototype._oldAutoFitLeafColumn = kendo.ui.Grid.prototype._autoFitLeafColumn;
+	kendo.ui.Grid.prototype._autoFitLeafColumn = function(leafIndex)
+	{
+		var that = this;
+		if (!that.table.children("tbody").children().length) { return; }
+		kendo.ui.Grid.prototype._oldAutoFitLeafColumn.apply(this, arguments)
 	}
 
 	function isInputElement(element)

@@ -1338,6 +1338,96 @@ createNamespace("TF").cloneGeometry = function(geometry)
 	return geometry.clone();
 };
 
+createNamespace("TF").removeUndefinedProperty = function(data)
+{
+	function deleteUndefindedProp(data)
+	{
+		for (var i in data)
+		{
+			if (data.hasOwnProperty(i))
+			{
+				if (typeof data[i] === "object")
+				{
+					deleteUndefindedProp(data[i]);
+				}
+				else
+				{
+					if (data[i] === undefined)
+					{
+						delete data[i];
+					}
+				}
+			}
+		}
+	}
+
+	deleteUndefindedProp(data);
+};
+
+createNamespace("TF").loopCloneGeometry = function(newObj, oldObj)
+{
+	var self = this;
+	for (var prop in newObj)
+	{
+		if (newObj.hasOwnProperty(prop))
+		{
+			if (newObj[prop])
+			{
+				if (newObj[prop].constructor === Array)
+				{
+					newObj[prop].map(function(p, index)
+					{
+						self.loopCloneGeometry(p, oldObj[prop][index]);
+					});
+				}
+				else if (newObj[prop].constructor === Object)
+				{
+					if (prop == 'geometry')
+					{
+						newObj[prop] = TF.cloneGeometry(oldObj[prop]);
+					}
+					else
+					{
+						self.loopCloneGeometry(newObj[prop], oldObj[prop]);
+					}
+				}
+			}
+		}
+	}
+};
+
+createNamespace("TF").deepClone = function(source)
+{
+	if (source == null)
+	{
+		return source;
+	}
+
+	if (Array.isArray(source))
+	{
+		return source.map(i => this.deepClone(i));
+	}
+
+	if (typeof source.clone == "function")
+	{
+		return source.clone();
+	}
+
+	if (!$.isPlainObject(source))
+	{
+		return source;
+	}
+
+	let target = {};
+	for (var prop in source)
+	{
+		target[prop] = this.deepClone(source[prop]);
+	}
+
+	return target;
+};
+
+
 createNamespace("TF").createId = function(randomNumber)
 {
 	var number = randomNumber ? randomNumber : 1000;
@@ -1349,6 +1439,15 @@ createNamespace("TF").xyToGeometry = function(x, y)
 	var p = new tf.map.ArcGIS.Point(x, y, tf.map.ArcGIS.SpatialReference.WGS84);
 	return tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(p);
 };
+
+createNamespace("TF").ArrayToObject = function(array, key)
+{
+	return array.reduce((obj, item) =>
+	{
+		obj[item[key]] = item;
+		return obj;
+	}, {});
+}
 
 // FOR DEMO ONLY
 createNamespace("TF").getOnlineUrl = function(url){

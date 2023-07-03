@@ -259,6 +259,7 @@
 		tf.storageManager.save("pathLineType", type);
 		this.obSequencePath(type === 'Sequence');
 		this.dataModel.onTripPathLineDisplayChange.notify(type);
+		PubSub.publish("on_FieldTripMap_TripPathTypeChange", type);
 	};
 
 	RoutingEventsManager.prototype._getLockedByOtherTrips = function()

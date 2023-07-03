@@ -57,10 +57,13 @@
 			if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 			{
 				let total = this.layer.graphics.items.length;
-				this.layer.graphics.on("after-remove", (event) =>
+				let handler = this.layer.graphics.on("after-remove", (event) =>
 				{
 					total--;
 					if (total === 0) {
+						handler.remove();
+						handler = null;
+
 						resolve();
 					}
 				});
@@ -81,7 +84,7 @@
 		this.add(point, symbol, attributes);
 	}
 
-	Layer.prototype.addPolyline = function(paths, symbol, attributes)
+	Layer.prototype.addPolyline = function(paths, symbol, attributes, afterAdd = null)
 	{
 		const polyline = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Polyline({
 			hasZ: false,
@@ -89,28 +92,44 @@
 			paths: paths,
 			spatialReference: { wkid: 4326 }
 		}));
-		this.add(polyline, symbol, attributes);
+
+		this.add(polyline, symbol, attributes, afterAdd);
 	}
 
-	Layer.prototype.add = function(geometry, symbol, attributes)
+	Layer.prototype.add = function(geometry, symbol, attributes, afterAdd = null)
 	{
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
-			this.addGraphic(geometry, symbol, attributes);
+			this.addGraphic(geometry, symbol, attributes, afterAdd);
 		}
 		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
-			this.addFeature(geometry, symbol, attributes);
+			this.addFeature(geometry, symbol, attributes, afterAdd);
 		}
 	}
 
-	Layer.prototype.addGraphic = function(geometry, symbol, attributes)
+	Layer.prototype.addGraphic = function(geometry, symbol, attributes, afterAdd = null)
 	{
 		const graphic = new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
+
+		if (afterAdd !== null)
+		{
+			let total = 1;
+			let handler = this.layer.graphics.on("after-add", (event) =>
+			{
+				total--;
+				if (total === 0) {
+					handler.remove();
+					handler = null;
+
+					afterAdd();
+				}
+			});
+		}
 		this.layer.add(graphic);
 	}
 
-	Layer.prototype.addFeature = function(geometry, symbol, attributes)
+	Layer.prototype.addFeature = function(geometry, symbol, attributes, afterAdd = null)
 	{
 		console.warn(`TODO: add graphic to FeatureLayer, promise`);
 	}

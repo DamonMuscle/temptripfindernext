@@ -3787,7 +3787,9 @@
 		}
 
 		self.onTripColorChangeEvent.notify({ TripId: tripId, color: color });
-		self.routingStudentManager.refreshAssignStudents();
+		// self.routingStudentManager.refreshAssignStudents();
+		const fieldTrip = self.trips.filter(item => item.id === tripId)[0];
+		PubSub.publish("on_FieldTripMap_UpdateColor", fieldTrip);
 	};
 
 	RoutingDataModel.prototype.bindColor = function(force = false)
