@@ -153,7 +153,7 @@
 		const _getColumnByFieldName = (columns, item) =>
 			columns.find(x => x.FieldName === item.FieldName || x.OriginalName === item.FieldName);
 		const _stripValue = (val) =>
-			val.replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+			val.replace("(", "").replace(")", "").replace(/-/g, "").replace(" ", "");
 
 		options.data?.filterSet?.FilterItems?.forEach(item =>
 		{
