@@ -151,8 +151,87 @@
 	{
 		return new Promise(function(resolve)
 		{
-			resolve(this.selectedData);
+			this.prepareData(this.selectedData).then(()=>resolve(this.selectedData));
 		}.bind(this));
+	};
+
+	/**
+	 * once data migrated, this function should be removed.
+	 * @param {*} fieldTrips 
+	 * @returns 
+	 */
+	ViewFieldTripViewModel.prototype.prepareData = function(fieldTrips)
+	{
+		const fieldTripIds = fieldTrips.map(x => x.Id);
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(),"fieldtripstops"),{
+			paramData:{
+				"@filter":`in(FieldTripId,${fieldTripIds.join(",")})`
+			}
+		}).then(function(response){
+			const existingItems = response.Items,
+				addingItems = [],
+				updateinItems = [];
+
+			 fieldTrips.forEach(function(fieldTrip)
+			 {
+				const schoolStop = {
+						DBID: fieldTrip.DBID,
+						FieldTripId: fieldTrip.Id,
+						PrimaryDeparture: true,
+						Xcoord: fieldTrip.SchoolXCoord,
+						Ycoord: fieldTrip.SchoolYCoord,
+						Street: fieldTrip.SchoolName,
+						FieldTripDestinationId: 0,
+						Sequence: 1,
+						StopTimeDepart: fieldTrip.DepartDate
+					},
+					terminalStop = {
+						DBID: fieldTrip.DBID,
+						FieldTripId: fieldTrip.Id,
+						PrimaryDestination: true,
+						Xcoord: fieldTrip.FieldTripDestinationXCoord,
+						Ycoord: fieldTrip.FieldTripDestinationYCoord,
+						FieldTripDestinationId: fieldTrip.FieldTripDestinationId,
+						Street: fieldTrip.DestinationStreet || fieldTrip.Destination,
+						Sequence: existingItems.filter(x => x.FieldTripId == fieldTrip.Id && !x.PrimaryDeparture && !x.PrimaryDestination).length + 2,
+					};
+
+				if(!existingItems.find(x => x.FieldTripId == fieldTrip.Id && x.LockStopTime))
+				{
+					schoolStop.LockStopTime = true;
+				}
+
+				if(!existingItems.some(item => item.PrimaryDeparture && item.FieldTripId == fieldTrip.Id))
+				{
+					addingItems.push(schoolStop);
+				}
+				else
+				{
+					updateinItems.push($.extend({},existingItems.find(item => item.PrimaryDeparture && item.FieldTripId == fieldTrip.Id),schoolStop));
+				}
+
+				if(!existingItems.some(item => item.PrimaryDestination && item.FieldTripId == fieldTrip.Id))
+				{
+					addingItems.push(terminalStop);
+				}
+				else
+				{
+					updateinItems.push($.extend({},existingItems.find(item => item.PrimaryDestination && item.FieldTripId == fieldTrip.Id),terminalStop));
+				}
+			});
+
+			const p = [];
+			if(addingItems.length)
+			{
+				p.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(),"fieldtripstops"), {data: addingItems}));
+			}
+			if(updateinItems.length)
+			{
+				p.push(tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(),"fieldtripstops"), {data: updateinItems}));
+			}
+
+			return Promise.all(p);
+		});
 	};
 
 	ViewFieldTripViewModel.prototype.cancel = function()

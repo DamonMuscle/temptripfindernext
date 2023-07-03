@@ -480,7 +480,7 @@
 
 		// var p5 = self._getTripPathFeatureData(ids, Promise.all([p1, p2, p3]));
 		// var p6 = self._getTripBoundaryFeatureData(ids, Promise.all([p1, p2, p3]));
-		return Promise.all([true]).then(function()
+		return Promise.all([ self._fetchTripData(ids)]).then(function()
 		{
 			self._setOpenType(newTrips, "View");
 			// return self._removeNotOpenViewTrips(data, newTrips);

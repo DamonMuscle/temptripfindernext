@@ -220,6 +220,11 @@
 		}.bind(this));
 	};
 
+	/**
+	 * once data migrated, this function should be removed.
+	 * @param {*} fieldTrips 
+	 * @returns 
+	 */
 	OpenFieldTripViewModel.prototype.prepareData = function(fieldTrips)
 	{
 		const fieldTripIds = fieldTrips.map(x => x.Id);
