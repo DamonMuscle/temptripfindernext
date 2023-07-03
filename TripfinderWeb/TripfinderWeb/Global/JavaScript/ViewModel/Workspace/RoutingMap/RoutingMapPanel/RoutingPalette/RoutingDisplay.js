@@ -1295,6 +1295,9 @@
 
 	function insertTripStopsClick(e)
 	{
+		console.log("Tripfinder Next TODO: insertTripStopsClick");
+		return;
+
 		var insertIcon, self = this;
 		if ($(e.target).hasClass('insert-front-stops-area'))
 		{
@@ -1504,6 +1507,9 @@
 
 	function setLockTimeClick(e)
 	{
+		console.log("Tripfinder Next TODO: setLockTimeClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1573,6 +1579,9 @@
 
 	function infoClick(e)
 	{
+		console.log("Tripfinder Next TODO: infoClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1583,6 +1592,9 @@
 
 	function tripInfoClick(e)
 	{
+		console.log("Tripfinder Next TODO: tripInfoClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1592,6 +1604,9 @@
 
 	function tripDeleteClick(e)
 	{
+		console.log("Tripfinder Next TODO: tripDeleteClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1610,6 +1625,9 @@
 
 	function refreshPathClick(e)
 	{
+		console.log("Tripfinder Next TODO: refreshPathClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
