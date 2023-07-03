@@ -1291,7 +1291,8 @@
 			}
 		})
 		field.filterSet = null;
-		field.filterValue("");
+		const filterValue = field.typeCode() === "Date" ? null : "";
+		field.filterValue(filterValue);
 	};
 
 	/**
