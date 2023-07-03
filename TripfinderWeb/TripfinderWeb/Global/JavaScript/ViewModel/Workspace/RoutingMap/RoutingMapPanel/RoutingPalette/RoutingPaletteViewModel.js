@@ -139,6 +139,8 @@
 		if (data && (data.add.length > 0))
 		{
 			const addFieldTrips = data.add;
+			// this.fieldTripMap.updatePathArrowLayerRenderer(addFieldTrips);
+
 			for (let i = 0; i < addFieldTrips.length; i++)
 			{
 				const fieldTrip = addFieldTrips[i];

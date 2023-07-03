@@ -11,6 +11,12 @@
 		GRAPHIC: "graphic"
 	};
 
+	const GEOMETRY_TYPE = {
+		POINT: "point",
+		POLYLINE: "polyline",
+		POLYGON: "polygon"
+	};
+
 	const defaultOptions = {
 		baseMapId: "streets-vector",
 		center: [-73.9412, 42.8123],
@@ -50,6 +56,9 @@
 		};
 
 		this.defineReadOnlyProperty('mapLayerInstances', []);
+		this.defineReadOnlyProperty('LAYER_TYPE', LAYER_TYPE);
+		this.defineReadOnlyProperty('GEOMETRY_TYPE', GEOMETRY_TYPE);
+		this.defineReadOnlyProperty('WKID_WEB_MERCATOR', WKID_WEB_MERCATOR);
 		this.create($mapContainer);
 	}
 
@@ -662,7 +671,7 @@
 		}
 
 		let spatialQueryGeometry = queryGeometry, findFeatureResults = [];
-		if (queryGeometry && queryGeometry.type === "point")
+		if (queryGeometry && queryGeometry.type === GEOMETRY_TYPE.POINT)
 		{
 			// use event extent to check the clicked graphic
 			const queryDistance = this.map.mapView.scale / searchScaleFactor;
