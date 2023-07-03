@@ -3012,15 +3012,7 @@
 
 	RoutingDisplay.prototype.tripStopDeletable = function(tripStop)
 	{
-		var trip = this.dataModel.getTripById(tripStop.TripId);
-		if (tripStop.SchoolCode && trip)
-		{
-			if (Enumerable.From(trip.TripStops).Count(function(c) { return c.SchoolCode == tripStop.SchoolCode; }) <= 1)
-			{
-				return false;
-			}
-		}
-		return true;
+		return !(tripStop.PrimaryDeparture || tripStop.PrimaryDestination);
 	};
 
 	RoutingDisplay.prototype.onCandidatesStudentsChange = function(e, data)
