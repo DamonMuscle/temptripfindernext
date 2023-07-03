@@ -4953,7 +4953,7 @@
 	
 		let copiedTrips = fieldTrips.filter(t => !!t.copyFromFieldTripId);
 	
-		return self.validateName(fieldTrips).then(function(valid)
+		return self.validateFieldTripName(fieldTrips).then(function(valid)
 		{
 			if (!valid)
 			{
@@ -6360,6 +6360,23 @@
 		return valid(0);
 	};
 
+	RoutingDataModel.prototype.validateFieldTripName = function(fieldTrips)
+	{
+		var self = this;
+		function valid(index)
+		{
+			if (index == fieldTrips.length)
+			{
+				return Promise.resolve(true);
+			}
+			return self.validateUniqueFieldTripName(fieldTrips[index].Name, fieldTrips[index].Id).then(function()
+			{
+				return valid(++index);
+			});
+		}
+		return valid(0);
+	}
+
 	RoutingDataModel.prototype.validateUniqueName = function(name, id)
 	{
 		var self = this;
@@ -6402,6 +6419,49 @@
 				return Promise.reject();
 			});
 	};
+
+	RoutingDataModel.prototype.validateUniqueFieldTripName = function(name, id)
+	{
+		var self = this;
+		var tripId = id || 0;
+		if (name.trim() === '')
+		{
+			tf.promiseBootbox.alert("Field trip name is required.");
+			return Promise.reject();
+		}
+
+		// if (name.length > 150)
+		// {
+		// 	tf.promiseBootbox.alert("Field trip name should be less than 151 characters.");
+		// 	return Promise.reject();
+		// }
+
+		return Promise.resolve(Enumerable.From(self.trips).Any(function(c) { return c.Name == name && c.Id != tripId; }))
+			.then(function(nameDuplicate)
+			{
+				if (nameDuplicate)
+				{
+					return false;
+				}
+				// There is another trip in the database with the same name as this trip.Please change this trip"s name before saving it.
+				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips"), {
+					paramData: {
+						name: name
+					}
+				}).then(function(data)
+				{
+					return data.Items.length == 0 || tripId == data.Items[0].Id;
+				});
+			}).then(function(valid)
+			{
+				if (valid)
+				{
+					return Promise.resolve();
+				}
+				tf.promiseBootbox.alert("There is another field trip with the same name as this field trip. Please change this field trip's name before saving it.");
+				return Promise.reject();
+			});
+	};	
 
 	RoutingDataModel.prototype.getKey = function(studentId, requirementId, tripStopId, anotherTripStopID, previousScheduleID)
 	{
