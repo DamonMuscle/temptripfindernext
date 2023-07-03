@@ -1403,7 +1403,7 @@
 		return tf.promiseBootbox.confirm(
 			{
 				message: "You are about to Copy Calculated Duration for all trip stops. The Duration and the locked trip stop time (" +
-					moment(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('YYYY-MM-DD HH:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
+					moment(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
 				title: "Confirmation"
 			})
 			.then(function(result)
@@ -3029,7 +3029,7 @@
 				isLast: isLast,
 				duration: durationToString(tripStop.Duration),
 				avgSpeed: self.speedToString(tripStop.Speed),
-				stopTime: moment(tripStop.StopTimeArrive||tripStop.StopTimeDepart).format('YYYY-MM-DD HH:mm a'),
+				stopTime: moment(tripStop.StopTimeArrive||tripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a'),
 				sequence: tripStop.Sequence,
 				geometry: tripStop.geometry,
 				schoolCode: tripStop.SchoolCode,
@@ -3548,12 +3548,12 @@
 			customData: {
 				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
 				students: totalAssignedStudents,
-				stops: trip.TripStops.length,
-				tripTotalTime: convertToMoment(trip.FinishTime).diff(convertToMoment(trip.StartTime), 'minutes'),
-				distance: self.convertToCurrentMeasurementUnit(trip.Distance).toFixed(2),
+				stops: trip.FieldTripStops.length,
+				tripTotalTime: convertToMoment(trip.EstimatedReturnDatetime).diff(convertToMoment(trip.DepartDateTime), 'minutes'),
+				distance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance).toFixed(2),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
-				startTime: convertToMoment(trip.StartTime).format('h:mm a'),
-				endTime: convertToMoment(trip.FinishTime).format('h:mm a'),
+				startTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
+				endTime: convertToMoment(trip.EstimatedReturnDatetime).format('MM-DD-YYYY h:mm a'),
 				actualStartTime: trip.ActualStartTime,
 				actualEndTime: trip.ActualEndTime,
 				//originalTrip: trip,
@@ -3565,8 +3565,8 @@
 
 				EstimatedHours: trip.EstimatedHours ? trip.EstimatedHours * 60 : 0,
 				EstimatedDistance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance).toFixed(2),
-				DepartDateTime: convertToMoment(trip.DepartDateTime).format('h:mm a'),
-				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('h:mm a')
+				DepartDateTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
+				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('MM-DD-YYYY h:mm a'),
 				//durationOptimizeNmber: ""
 			},
 			items: self.newTripStopData(trip.FieldTripStops, trip.Session, trip.Name)

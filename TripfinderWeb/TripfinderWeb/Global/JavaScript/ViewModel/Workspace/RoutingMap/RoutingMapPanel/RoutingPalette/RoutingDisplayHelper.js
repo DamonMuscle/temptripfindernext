@@ -1296,9 +1296,9 @@
 		<div class="trip-info-text">
 			<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
 			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.EstimatedHours #<br/>min</span>
+			<span class="info-block">#: item.customData.tripTotalTime #<br/>min</span>
 			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.EstimatedDistance #<br/>#: item.customData.measurementUnit#</span>
+			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
 			<span class="splitter"></span>
 			<span class="info-block">#: item.customData.DepartDateTime #<br/>#: item.customData.EstimatedReturnDateTime #</span>
 		</div>`;
