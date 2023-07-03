@@ -1332,6 +1332,8 @@
 
 	function copyStopClick(e)
 	{
+		console.log("copy field trip stop. coming soon!");
+		return;
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1391,7 +1393,7 @@
 		return tf.promiseBootbox.confirm(
 			{
 				message: "You are about to Copy Calculated Duration for all trip stops. The Duration and the locked trip stop time (" +
-					moment(lockedTripStop.StopTime, "HH:mm:ss").format('h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
+					moment(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('YYYY-MM-DD HH:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
 				title: "Confirmation"
 			})
 			.then(function(result)
@@ -1579,7 +1581,7 @@
 
 	function infoClick(e)
 	{
-		console.log("Tripfinder Next TODO: infoClick");
+		console.log("Tripfinder Next TODO: field trip stop info infoClick");
 		return;
 
 		var self = this;
