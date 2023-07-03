@@ -1322,6 +1322,9 @@
 
 	function copyTripClick(e)
 	{
+		console.log("Tripfinder Next TODO: copyTripClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1332,8 +1335,9 @@
 
 	function copyStopClick(e)
 	{
-		console.log("copy field trip stop. coming soon!");
+		console.log("Tripfinder Next TODO: copyStopClick");
 		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1363,6 +1367,9 @@
 
 	function optimizeSequenceClick(e)
 	{
+		console.log("Tripfinder Next TODO: optimizeSequenceClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1375,6 +1382,9 @@
 
 	function tripAbsorptionClick(e)
 	{
+		console.log("Tripfinder Next TODO: tripAbsorptionClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1416,6 +1426,9 @@
 
 	function scheduledTimeClick(e)
 	{
+		console.log("Tripfinder Next TODO: scheduledTimeClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1473,6 +1486,9 @@
 
 	async function avgSpeedClick(e)
 	{
+		console.log("Tripfinder Next TODO: avgSpeedClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1560,6 +1576,9 @@
 
 	function deleteClick(e)
 	{
+		console.log("Tripfinder Next TODO: deleteClick");
+		return;
+
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
