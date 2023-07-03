@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Map.Thematics").ThematicGridViewModel = ThematicGridViewModel;
 
@@ -98,7 +98,7 @@
 		}
 	}
 
-	ThematicGridViewModel.prototype.generateDefaultDisplay = function()
+	ThematicGridViewModel.prototype.generateDefaultDisplay = function ()
 	{
 		return $.extend({}, this.defaultDisplayConfig.GENERAL);
 	};
@@ -109,7 +109,7 @@
 	 * @param {*} data
 	 * @returns
 	 */
-	ThematicGridViewModel.prototype.generateStylePreviewHtml = function(data)
+	ThematicGridViewModel.prototype.generateStylePreviewHtml = function (data)
 	{
 		let htmlString = "";
 		switch (this.thematicType)
@@ -132,7 +132,7 @@
 	 * Gets the select records
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.getSelectRecords = function(includeFormattedValue)
+	ThematicGridViewModel.prototype.getSelectRecords = function (includeFormattedValue)
 	{
 		let self = this, allRecords, dataSource, sort, query;
 		dataSource = self.grid.dataSource.data();
@@ -145,13 +145,13 @@
 		}
 
 		allRecords = JSON.parse(JSON.stringify(dataSource));
-		const data = allRecords.filter(function(record) { return record.Selected && record.Value1 !== undefined });
+		const data = allRecords.filter(function (record) { return record.Selected && record.Value1 !== undefined });
 		if (self.allOthersData)
 		{
 			data.push(self.allOthersData);
 		}
 
-		return data.map(function(record)
+		return data.map(function (record)
 		{
 			const display = JSON.parse(record.Display),
 				item = {
@@ -213,7 +213,7 @@
 	 * Get sort information of current grid.
 	 * @returns {string} The sort information object.
 	 */
-	ThematicGridViewModel.prototype.getSortInfo = function()
+	ThematicGridViewModel.prototype.getSortInfo = function ()
 	{
 		var self = this, result = "";
 		if (self.grid && self.grid.dataSource && self.grid.dataSource.sort() && self.grid.dataSource.sort()[0])
@@ -227,7 +227,7 @@
 	 * Get all data of current grid.
 	 * @returns {object} All data.
 	 */
-	ThematicGridViewModel.prototype.getGridData = function()
+	ThematicGridViewModel.prototype.getGridData = function ()
 	{
 		var self = this;
 		return self.grid.dataSource.data();
@@ -238,19 +238,19 @@
 	 * @param {*} groups thematic gropus
 	 * @returns GPS grid record count.
 	 */
-	ThematicGridViewModel.prototype.getGPSGridCount = function(groups)
+	ThematicGridViewModel.prototype.getGPSGridCount = function (groups)
 	{
 		const self = this;
 
 		return self.thematicType === TF.ThematicTypeEnum.GRID ? groups.reduce((result, x) => result + x.Count, 0) : self.mapGrid.obTotalCount();
 	}
 
-	ThematicGridViewModel.prototype.gpsGridFilterInitialized = function()
+	ThematicGridViewModel.prototype.gpsGridFilterInitialized = function ()
 	{
 		return this.mapGrid._gridType === 'gpsevent' && ((this.mapGrid.requestOptions && this.mapGrid.requestOptions()) || this.mapGrid.searchOption);
 	}
 
-	ThematicGridViewModel.prototype.getFilterSetFromGPSEventGridWithoutQuickFilter = function()
+	ThematicGridViewModel.prototype.getFilterSetFromGPSEventGridWithoutQuickFilter = function ()
 	{
 		const currentDocument = tf.documentManagerViewModel.obCurrentDocument();
 		if (currentDocument && currentDocument.gridViewModel instanceof TF.Grid.GPSEventGridViewModel)
@@ -259,35 +259,49 @@
 		}
 	};
 
-	ThematicGridViewModel.prototype.timeFieldFilterUpdated = function(fieldsData, allColumns)
+	ThematicGridViewModel.prototype.updateTimeFieldValue = function (item, allColumns)
 	{
-		if (!fieldsData) return;
-		if (!fieldsData.filterSet) return;
-		if (!fieldsData.filterSet.FilterItems) return;
-		if (!allColumns) return;
-
-		fieldsData.filterSet.FilterItems.forEach(item =>
+		let quickDateFilter = this.options.quickFilterData;
+		let isQuickDateFilterOperator =
+			quickDateFilter.quickDateFilterTypes.includes(item.Operator.toLowerCase()) ||
+			quickDateFilter.quickDateFilterTypesWithoutInput.includes(item.Operator.toLowerCase()) ||
+			quickDateFilter.quickDateFilterTypesDateTimeOnly.includes(item.Operator.toLowerCase());
+		allColumns.forEach(column =>
 		{
-			let quickDateFilter = this.options.quickFilterData;
-			let isQuickDateFilterOperator =
-				quickDateFilter.quickDateFilterTypes.includes(item.Operator.toLowerCase()) ||
-				quickDateFilter.quickDateFilterTypesWithoutInput.includes(item.Operator.toLowerCase()) ||
-				quickDateFilter.quickDateFilterTypesDateTimeOnly.includes(item.Operator.toLowerCase());
-			allColumns.forEach(column =>
+			if (column.FieldName === item.FieldName && column.isUTC && !isQuickDateFilterOperator)
 			{
-				if (column.FieldName === item.FieldName && column.isUTC && !isQuickDateFilterOperator)
-				{
-					item.Value = toISOStringWithoutTimeZone(clientTimeZoneToUtc(item.Value));
-				}
-			})
+				item.Value = toISOStringWithoutTimeZone(clientTimeZoneToUtc(item.Value));
+			}
+		})
+	}
+
+	ThematicGridViewModel.prototype.timeFieldFilterUpdated = function (fieldsData, allColumns)
+	{
+		if (!fieldsData || !fieldsData.filterSet || !allColumns)
+		{
+			return;
+		}
+
+		this.updateFilterSet(fieldsData.filterSet, allColumns);
+	}
+
+	ThematicGridViewModel.prototype.updateFilterSet = function (filterSet, allColumns)
+	{
+		filterSet.FilterItems?.forEach(item =>
+		{
+			this.updateTimeFieldValue(item, allColumns);
 		});
+		filterSet.FilterSets?.forEach(set =>
+		{
+			this.updateFilterSet(set, allColumns);
+		})
 	}
 
 	/**
 	 * Get data source for kendo grid.
 	 * @returns {kendo.data.DataSource} The data source for kendo grid.
 	 */
-	ThematicGridViewModel.prototype.getThematicGroupData = function(fieldsData, availableColumns)
+	ThematicGridViewModel.prototype.getThematicGroupData = function (fieldsData, availableColumns)
 	{
 		var self = this, dataSource, promise, fieldTypes = [];
 
@@ -329,7 +343,7 @@
 		const allColumns = availableColumns || self.dataFieldHelper.getColumnsByType(self.type.toLowerCase());
 		for (var i = 0; i < fieldsData.fields.length; i++)
 		{
-			allColumns.filter(function(item)
+			allColumns.filter(function (item)
 			{
 				if (item.FieldName === fieldsData.fields[i])
 				{
@@ -355,10 +369,10 @@
 
 			self.disabilityCodeIndex = fieldsData.fields.indexOf("DisabililityCode") + 1;
 			self.ethnicCodeIndex = fieldsData.fields.indexOf("EthnicCode") + 1;
-			var switchValue = function(data, oldIndex, newIndex)
+			var switchValue = function (data, oldIndex, newIndex)
 			{
 				var tempValue;
-				$.each(data, function(index, item)
+				$.each(data, function (index, item)
 				{
 					tempValue = item["Value" + oldIndex];
 					item["Value" + oldIndex] = item["Value" + newIndex];
@@ -392,8 +406,9 @@
 			{
 				fieldsData.filterSet.UDGridID = self.mapGrid.options.gridData.value;
 			}
-//
-			fieldsData.filterSet.FilterItems.forEach(item => {
+			//
+			fieldsData.filterSet.FilterItems.forEach(item =>
+			{
 				if (item.TypeHint === 'DateTime')
 				{
 					let columnInfo = allColumns.filter(x => x.FieldName === item.FieldName);
@@ -414,7 +429,7 @@
 						datatypeid: tf.dataTypeHelper.getId(self.dataType.toLowerCase())
 					},
 					headers: { Prefix: tf.storageManager?.prefix?.split('.')[0] }
-				}).then(function(response)
+				}).then(function (response)
 				{
 					if (response.Items === null)
 					{
@@ -438,7 +453,7 @@
 						{
 							self.disabilityCodeData = $.extend(true, [], data);
 							TF.Helper.ThematicHelper.convertCodeData(self.disabilityCodeData, self.disabilityCodeIndex);
-							data = Enumerable.From(data).Where(function(c) { return c["Value" + self.disabilityCodeIndex] }).ToArray();
+							data = Enumerable.From(data).Where(function (c) { return c["Value" + self.disabilityCodeIndex] }).ToArray();
 							self.currentDataSourceCount = response.TotalRecordCount;
 							self.currentFieldCount = data.length;
 						}
@@ -446,7 +461,7 @@
 						{
 							self.ethnicCodeData = $.extend(true, [], data);
 							TF.Helper.ThematicHelper.convertCodeData(self.ethnicCodeData, self.ethnicCodeIndex);
-							data = Enumerable.From(data).Where(function(c) { return c["Value" + self.ethnicCodeIndex] }).ToArray();
+							data = Enumerable.From(data).Where(function (c) { return c["Value" + self.ethnicCodeIndex] }).ToArray();
 							self.currentDataSourceCount = response.TotalRecordCount;
 							self.currentFieldCount = data.length;
 						}
@@ -467,7 +482,7 @@
 				}).catch(() => { tf.loadingIndicator.tryHide(); });
 		}
 
-		return promise.then(function(data)
+		return promise.then(function (data)
 		{
 			if (!data || data.length === 0)
 			{
@@ -488,7 +503,7 @@
 				{
 					if (self.sortInfo.field === "Count")
 					{
-						compare = function(a, b)
+						compare = function (a, b)
 						{
 							return parseInt(a.Count) - parseInt(b.Count);
 						};
@@ -499,7 +514,7 @@
 					}
 					else if (self.sortInfo.field === "DisplayLabel")
 					{
-						compare = function(a, b)
+						compare = function (a, b)
 						{
 							return (a.DisplayLabel.toLowerCase() < b.DisplayLabel.toLowerCase() ? -1 : (a.DisplayLabel.toLowerCase() > b.DisplayLabel.toLowerCase() ? 1 : 0));
 						};
@@ -514,11 +529,11 @@
 				dataSource = new kendo.data.DataSource({
 					pageSize: 20,
 					transport: {
-						read: function(e)
+						read: function (e)
 						{
 							e.success(data);
 						},
-						update: function(e)
+						update: function (e)
 						{
 						}
 					},
@@ -549,7 +564,7 @@
 		});
 	};
 
-	ThematicGridViewModel.prototype.formatThematicGroupData = function(data, fieldsData, fieldTypes, rowNumber)
+	ThematicGridViewModel.prototype.formatThematicGroupData = function (data, fieldsData, fieldTypes, rowNumber)
 	{
 		let self = this,
 			gridColumns = self.dataFieldHelper.getColumnsByType(self.dataType.toLowerCase()),
@@ -558,7 +573,7 @@
 
 		dataColumns = TF.Helper.ThematicHelper.mergeColumns(dataColumns, gridColumns);
 
-		return data.map(function(item)
+		return data.map(function (item)
 		{
 			item["RowNumber"] = rowNumber++;
 			var value = "";
@@ -610,7 +625,7 @@
 						{
 							item[`unitOfMeasureField${i}`] = field;
 						}
-						
+
 						const format = `{0:n${(column && column.Precision) || 2}}`;
 						item["FormattedValue" + i] = kendo.format(format, formattedValue);
 					}
@@ -648,7 +663,7 @@
 		});
 	}
 
-	ThematicGridViewModel.prototype.generateRowData = function(name, displayStr, data)
+	ThematicGridViewModel.prototype.generateRowData = function (name, displayStr, data)
 	{
 		return $.extend({}, {
 			RowNumber: 0,
@@ -666,7 +681,7 @@
 	 * @param {Array} displaySetting
 	 * @return {void}
 	 */
-	ThematicGridViewModel.prototype.applyDisplaySettingToDataSource = function(displaySetting)
+	ThematicGridViewModel.prototype.applyDisplaySettingToDataSource = function (displaySetting)
 	{
 		let self = this,
 			gridDataSource = self.grid.dataSource,
@@ -688,27 +703,27 @@
 		if (otherKeys.length > 0 && otherItem.length > 0)
 		{
 			var settings = [];
-			Object.keys(valueMapping).forEach((key, index)=>
+			Object.keys(valueMapping).forEach((key, index) =>
 			{
-				var setting = Enumerable.From(displaySetting).FirstOrDefault(null, function(x) { return x.Value == key; });
+				var setting = Enumerable.From(displaySetting).FirstOrDefault(null, function (x) { return x.Value == key; });
 				if (setting)
 				{
 					settings.push(setting);
 				}
 				else
 				{
-					settings.push({ 
+					settings.push({
 						DisplayLabel: key,
 						Value: key,
 						Value1: key,
-						Color: self.defaultColor[index % self.defaultColor.length], 
-						Changed: false, 
-						isNew: true ,
+						Color: self.defaultColor[index % self.defaultColor.length],
+						Changed: false,
+						isNew: true,
 						Symbol: 0,
 						Size: "12",
 						IsWithBorder: true,
 						BorderWidth: "1",
-						BorderColor:"#000000"
+						BorderColor: "#000000"
 					});
 				}
 			});
@@ -811,10 +826,10 @@
 	 * @param {Object} gridData The grid data.
 	 * @return {Object} The matched data row, null if nothing is found.
 	 */
-	ThematicGridViewModel.prototype.getMatchedDataRow = function(value, valueList, gridData)
+	ThematicGridViewModel.prototype.getMatchedDataRow = function (value, valueList, gridData)
 	{
 		var idx, tmp,
-			matchChcek = function(str1, str2)
+			matchChcek = function (str1, str2)
 			{
 				return (str1 || str2) ? (str1 == str2) : true;
 			};
@@ -837,17 +852,17 @@
 	 * @param {Array} availableColumns All available columns.
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.setFieldsInfo = function(fieldsData, availableColumns)
+	ThematicGridViewModel.prototype.setFieldsInfo = function (fieldsData, availableColumns)
 	{
 		var self = this, $gridContent = $(".k-grid-content"),
 			dataSource = new kendo.data.DataSource({
 				pageSize: 20,
 				transport: {
-					read: function(e)
+					read: function (e)
 					{
 						e.success([]);
 					},
-					update: function(e)
+					update: function (e)
 					{
 					}
 				},
@@ -897,7 +912,7 @@
 		{
 			tf.loadingIndicator.showImmediately();
 			let quickFilter = self.options.quickFilterData;
-			self.getThematicGroupData(fieldsData, availableColumns).then(function(data)
+			self.getThematicGroupData(fieldsData, availableColumns).then(function (data)
 			{
 				if (Array.isArray(data) && data.length === 0)
 				{
@@ -925,7 +940,7 @@
 		}
 	};
 
-	ThematicGridViewModel.prototype.sortByValue = function(a, b)
+	ThematicGridViewModel.prototype.sortByValue = function (a, b)
 	{
 		const self = this;
 		if (self.value1Type !== "string")
@@ -972,7 +987,7 @@
 	 *
 	 * @returns
 	 */
-	ThematicGridViewModel.prototype.getThematicGridColumns = function()
+	ThematicGridViewModel.prototype.getThematicGridColumns = function ()
 	{
 		const self = this;
 		const generalColumns = [
@@ -981,7 +996,7 @@
 				title: "CheckBox",
 				headerTemplate: "<input type='checkbox' id='selectAll' />",
 				width: "30px",
-				template: function(dataItem)
+				template: function (dataItem)
 				{
 					const value = dataItem.Selected ? 'checked' : '';
 					return `<input type='checkbox' class='thematicSelected'${value}/>`;
@@ -994,7 +1009,7 @@
 				title: "Value",
 				field: "Value",
 				width: "144px",
-				template: function(dataItem)
+				template: function (dataItem)
 				{
 					var title = kendo.htmlEncode(dataItem.Value),
 						contentStr = self.hasFormColor ? dataItem.Value : title.replace(/ /g, "&nbsp");
@@ -1007,7 +1022,7 @@
 		return generalColumns.concat(additionalColumns);
 	};
 
-	ThematicGridViewModel.prototype.getAdditionalColumnsByType = function(type)
+	ThematicGridViewModel.prototype.getAdditionalColumnsByType = function (type)
 	{
 		const self = this;
 		switch (type)
@@ -1016,14 +1031,14 @@
 				return [
 					{
 						sortable: {
-							compare: function(a, b)
+							compare: function (a, b)
 							{
 								return (a.DisplayLabel.toLowerCase() < b.DisplayLabel.toLowerCase() ? -1 : (a.DisplayLabel.toLowerCase() > b.DisplayLabel.toLowerCase() ? 1 : 0));
 							}
 						},
 						title: "Display Label",
 						field: "DisplayLabel",
-						template: function(dataItem)
+						template: function (dataItem)
 						{
 							var title = kendo.htmlEncode(dataItem.DisplayLabel),
 								contentStr = title.replace(/ /g, "&nbsp");
@@ -1033,7 +1048,7 @@
 					},
 					{
 						sortable: {
-							compare: function(a, b)
+							compare: function (a, b)
 							{
 								return parseInt(a.Count) - parseInt(b.Count);
 							}
@@ -1047,7 +1062,7 @@
 						title: "Display",
 						field: "Display",
 						width: "64px",
-						template: function(dataItem)
+						template: function (dataItem)
 						{
 							let symbolString = ""
 							if (dataItem.Selected)
@@ -1078,7 +1093,7 @@
 						title: "Color",
 						field: "Color",
 						width: "32px",
-						template: function(dataItem)
+						template: function (dataItem)
 						{
 							let previewHtml = "";
 							if (dataItem.Selected)
@@ -1111,7 +1126,7 @@
 	 * Create thematic grid
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.createGrid = function(data)
+	ThematicGridViewModel.prototype.createGrid = function (data)
 	{
 		var self = this;
 		self.gridDisplayChanged = false;
@@ -1140,10 +1155,10 @@
 					display: " "
 				}
 			},
-			sort: function(e)
+			sort: function (e)
 			{
 			},
-			dataBound: function(e)
+			dataBound: function (e)
 			{
 				if (self.grid && self.grid.dataSource)
 				{
@@ -1177,7 +1192,7 @@
 				self.onDataBound(e, data);
 			},
 			selectable: "cell",
-			edit: function(arg)
+			edit: function (arg)
 			{
 				self.onEditing(arg);
 			}
@@ -1198,7 +1213,7 @@
 		self.updateSelectAllCheckbox(data);
 	};
 
-	ThematicGridViewModel.prototype.onColorPickerClick = function(e)
+	ThematicGridViewModel.prototype.onColorPickerClick = function (e)
 	{
 		var self = this;
 		var $container = $(e.target).closest(".color-picker");
@@ -1208,7 +1223,7 @@
 			{
 				buttons: false,
 				value: dataItem.DisplayObj.color,
-				change: function(e)
+				change: function (e)
 				{
 					self.selectedColor = e.sender.element[0].value;
 					dataItem.Color = self.selectedColor;
@@ -1219,7 +1234,7 @@
 						dataItem.Display = JSON.stringify(displayObj);
 					}
 				},
-				open: function()
+				open: function ()
 				{
 					self.isColorPickerOpened = true;
 				}
@@ -1229,7 +1244,7 @@
 
 	}
 
-	ThematicGridViewModel.prototype.updateCounter = function(input, counterDiv)
+	ThematicGridViewModel.prototype.updateCounter = function (input, counterDiv)
 	{
 		var maxLength = 48, length = input.val().length;
 		if (length - maxLength >= -8)
@@ -1247,7 +1262,7 @@
 		}
 	};
 
-	ThematicGridViewModel.prototype.checkMaxLength = function(value, arg, counterDiv, input, originalValue)
+	ThematicGridViewModel.prototype.checkMaxLength = function (value, arg, counterDiv, input, originalValue)
 	{
 		var maxLength = 48, self = this, grid = self.grid;
 		if (value.length > maxLength)
@@ -1266,7 +1281,7 @@
 						className: "btn-default btn-sm btn-default-link"
 					}
 				}
-			}).then(function(result)
+			}).then(function (result)
 			{
 				if (result)
 				{
@@ -1304,7 +1319,7 @@
 	 * @param {any} arg Event argument.
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.onEditing = function(arg)
+	ThematicGridViewModel.prototype.onEditing = function (arg)
 	{
 		var self = this, grid = self.grid,
 			input = arg.container.find("input[name='DisplayLabel']"),
@@ -1321,7 +1336,7 @@
 		input.addClass("unBindHotKey");
 		input.attr("maxlength", "57");
 		self.updateCounter(input, counterDiv);
-		input.on("keydown.input", function(e)
+		input.on("keydown.input", function (e)
 		{
 			if (e.keyCode === $.ui.keyCode.ENTER)
 			{
@@ -1331,7 +1346,7 @@
 					value = arg.model.Value;
 				}
 				onProcessing = true;
-				setTimeout(function()
+				setTimeout(function ()
 				{
 					self.checkMaxLength(value, arg, counterDiv, input, originalValue);
 				});
@@ -1351,12 +1366,12 @@
 			}
 		});
 
-		input.on("input.input", function(e)
+		input.on("input.input", function (e)
 		{
 			self.updateCounter(input, counterDiv);
 		});
 
-		input.on("blur.input", function(e)
+		input.on("blur.input", function (e)
 		{
 			if (onProcessing)
 			{
@@ -1377,13 +1392,13 @@
 	 * @param {Array} data Datasource of grid
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.updateSelectAllCheckbox = function(data)
+	ThematicGridViewModel.prototype.updateSelectAllCheckbox = function (data)
 	{
 		var self = this, selectAll = $("#selectAll");
 
 		selectAll.prop("disabled", !data || !data.total || data.total() <= 0);
 
-		selectAll.change(function(ev)
+		selectAll.change(function (ev)
 		{
 			var checked = ev.target.checked, count = data.total(), sourceCount = 0;
 
@@ -1455,7 +1470,7 @@
 	 * @param {any} e event argument
 	 * @returns {void}
 	 */
-	ThematicGridViewModel.prototype.onDataBound = function(e, data)
+	ThematicGridViewModel.prototype.onDataBound = function (e, data)
 	{
 		var grid = e.sender, self = this;
 		if (!self.grid)
@@ -1464,14 +1479,14 @@
 		}
 		grid.element.find(".display-container").off(".display").on("click.display", self.onDisplayCellClick.bind(self));
 		grid.element.find(".color-picker").off(".colorpicker").on("click.colorpicker", self.onColorPickerClick.bind(self));
-		grid.element.find(".thematicSelected").off(".selected").on("change.selected", function()
+		grid.element.find(".thematicSelected").off(".selected").on("change.selected", function ()
 		{
 			self.checkBoxChanged(this);
 		});
 		self.updateAllOthersRow();
 	};
 
-	ThematicGridViewModel.prototype.checkBoxChanged = function(checkbox)
+	ThematicGridViewModel.prototype.checkBoxChanged = function (checkbox)
 	{
 		var self = this,
 			grid = self.grid,
@@ -1582,7 +1597,7 @@
 	 * Update the row in grid for all others
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.updateAllOthersRow = function()
+	ThematicGridViewModel.prototype.updateAllOthersRow = function ()
 	{
 		var self = this;
 		self.updateFooterRow();
@@ -1594,7 +1609,7 @@
 	 * @param {*} grid
 	 * @returns
 	 */
-	ThematicGridViewModel.prototype.getEssentialColumnIndices = function(grid)
+	ThematicGridViewModel.prototype.getEssentialColumnIndices = function (grid)
 	{
 		const columns = grid.columns;
 		const { VALUE_FIELD_NAME, LABEL_FIELD_NAME, DISPLAY_FIELD_NAME, COUNT_FIELD_NAME } = this.defaultDisplayConfig;
@@ -1624,7 +1639,7 @@
 		return { valueIdx, labelIdx, displayIdx, countIdx };
 	};
 
-	ThematicGridViewModel.prototype.updateFooterRowCell = function(data, row)
+	ThematicGridViewModel.prototype.updateFooterRowCell = function (data, row)
 	{
 		var self = this,
 			row = self.$element.find(".k-grid-footer-wrap tr"),
@@ -1654,18 +1669,18 @@
 		if (self.thematicType === TF.ThematicTypeEnum.GRID)
 		{
 			$displayCell.append(previewHtmlStr);
-			$displayCell.on("click", function(e)
+			$displayCell.on("click", function (e)
 			{
 				var $colorPicker = $(e.target).closest(".color-picker");
 				$colorPicker.kendoColorPicker({
 					buttons: false,
 					value: displayObj.color,
-					change: function(e)
+					change: function (e)
 					{
 						displayObj.color = e.sender.element[0].value;
 						data.Display = JSON.stringify(displayObj);
 					},
-					open: function()
+					open: function ()
 					{
 						self.isColorPickerOpened = true;
 					}
@@ -1680,7 +1695,7 @@
 		else
 		{
 			const $labelCell = tds.eq(labelIdx);
-			const closeInput = function()
+			const closeInput = function ()
 			{
 				$labelCell.empty();
 
@@ -1695,7 +1710,7 @@
 			previewHtmlStr = previewHtmlStr.replace("<svg", "<svg class='display'");
 			$displayCell.append("<div class='display-container'>" + previewHtmlStr + "</div>");
 
-			$labelCell.on("click", function(e)
+			$labelCell.on("click", function (e)
 			{
 				if (e.target.tagName === "INPUT")
 				{
@@ -1704,7 +1719,7 @@
 
 				var input = $("<input type='text' maxlength='57' class='unBindHotKey'>"), originalValue,
 					counterDiv = $("<div style='position:absolute;top:9px;right:8px;font-family:SourceSansPro-SemiBold;font-size:10px;'></div>"),
-					maxLength = 48, onProcess = false, checkMaxLength = function(value)
+					maxLength = 48, onProcess = false, checkMaxLength = function (value)
 					{
 						if (value.length > maxLength)
 						{
@@ -1722,7 +1737,7 @@
 										className: "btn-default btn-sm btn-default-link"
 									}
 								}
-							}).then(function(result)
+							}).then(function (result)
 							{
 								if (result)
 								{
@@ -1758,7 +1773,7 @@
 				$labelCell.addClass("editing");
 				self.updateCounter(input, counterDiv);
 
-				input.on("keydown.allotherInput", function(e)
+				input.on("keydown.allotherInput", function (e)
 				{
 					if (e.keyCode === $.ui.keyCode.ENTER)
 					{
@@ -1769,7 +1784,7 @@
 						}
 
 						onProcess = true;
-						setTimeout(function()
+						setTimeout(function ()
 						{
 							checkMaxLength(value);
 						});
@@ -1785,12 +1800,12 @@
 					}
 				});
 
-				input.on("input.allotherInput", function(e)
+				input.on("input.allotherInput", function (e)
 				{
 					self.updateCounter(input, counterDiv);
 				});
 
-				input.on("blur.allotherInput", function(e)
+				input.on("blur.allotherInput", function (e)
 				{
 					if (onProcess)
 					{
@@ -1811,7 +1826,7 @@
 		}
 	}
 
-	ThematicGridViewModel.prototype.updateFooterRow = function()
+	ThematicGridViewModel.prototype.updateFooterRow = function ()
 	{
 		var self = this, $row;
 		self.$element.find(".k-grid-footer-wrap tr.combination").remove();
@@ -1824,7 +1839,7 @@
 	 * Update the footer information of grid.
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.updateGridFooter = function()
+	ThematicGridViewModel.prototype.updateGridFooter = function ()
 	{
 		var self = this, dataType, currentSelectedRecordCount = self.currentSelectedRecordCount;
 
@@ -1852,7 +1867,7 @@
 	 * @param {Any} number The input number or string.
 	 * @return {string} The formatted number.
 	 */
-	ThematicGridViewModel.prototype.numberFormatter = function(number)
+	ThematicGridViewModel.prototype.numberFormatter = function (number)
 	{
 		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	};
@@ -1861,7 +1876,7 @@
 	 * Fires after clicked the display column of grid.
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.onDisplayCellClick = function(e)
+	ThematicGridViewModel.prototype.onDisplayCellClick = function (e)
 	{
 		if (e.target.className === "display-container") { return; }
 
@@ -1878,7 +1893,7 @@
 	 * @param {*} $container
 	 * @returns
 	 */
-	ThematicGridViewModel.prototype.openAdjustDisplayModal = function($container)
+	ThematicGridViewModel.prototype.openAdjustDisplayModal = function ($container)
 	{
 		var self = this, tr, selectedData, displayData,
 			selected = $container.parent();
@@ -1923,7 +1938,7 @@
 			};
 
 			tf.modalManager.showModal(new TF.Modal.AdjustValueDisplayModalViewModel(displayDetail))
-				.then(function(result)
+				.then(function (result)
 				{
 					if (result)
 					{
@@ -1945,7 +1960,7 @@
 	 * @param {Object} setting The display setting to be applied.
 	 * @return {void}
 	 */
-	ThematicGridViewModel.prototype.updateDisplayContainer = function($container, setting)
+	ThematicGridViewModel.prototype.updateDisplayContainer = function ($container, setting)
 	{
 		var self = this;
 
@@ -1961,7 +1976,7 @@
 	 * Gets the symbol html.
 	 * @return {String} The symbol html
 	 */
-	ThematicGridViewModel.prototype.GetSymbolString = function(setting)
+	ThematicGridViewModel.prototype.GetSymbolString = function (setting)
 	{
 		var borderColor, borderSize, maxdisplaySize = 24;
 		if (setting.borderishow)
@@ -1978,7 +1993,7 @@
 	 * convert utc time to local.
 	 * @return {String} The formatted date string
 	 */
-	ThematicGridViewModel.prototype.utc2Local = function(value)
+	ThematicGridViewModel.prototype.utc2Local = function (value)
 	{
 		const dt = utcToClientTimeZone(value);
 		return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
@@ -1988,7 +2003,7 @@
 	 * Dispose this view model
 	 * @returns {void} 
 	 */
-	ThematicGridViewModel.prototype.dispose = function()
+	ThematicGridViewModel.prototype.dispose = function ()
 	{
 		if (self.grid)
 		{
