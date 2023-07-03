@@ -2990,7 +2990,7 @@
 				isLast: isLast,
 				duration: durationToString(tripStop.Duration),
 				avgSpeed: self.speedToString(tripStop.Speed),
-				stopTime: moment(tripStop.StopTime, "HH:mm:ss").format('h:mm a'),
+				stopTime: moment(tripStop.StopTimeArrive||tripStop.StopTimeDepart).format('YYYY-MM-DD HH:mm a'),
 				sequence: tripStop.Sequence,
 				geometry: tripStop.geometry,
 				schoolCode: tripStop.SchoolCode,
