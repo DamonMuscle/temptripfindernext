@@ -1600,6 +1600,8 @@
 
 	function infoClick(e)
 	{
+		e.preventDefault();
+		e.stopPropagation();
 		console.log("Tripfinder Next TODO: field trip stop info infoClick");
 		return;
 
@@ -1613,6 +1615,8 @@
 
 	function tripInfoClick(e)
 	{
+		e.preventDefault();
+		e.stopPropagation();
 		console.log("Tripfinder Next TODO: tripInfoClick");
 		return;
 
@@ -1646,6 +1650,8 @@
 
 	function refreshPathClick(e)
 	{
+		e.preventDefault();
+		e.stopPropagation();
 		console.log("Tripfinder Next TODO: refreshPathClick");
 		return;
 
