@@ -2340,7 +2340,7 @@
 						}
 					}
 
-					self.handleDepatureAndDestinationStop(existTrip);
+					// self.handleDepatureAndDestinationStop(existTrip);
 
 					existTrip.FieldTripStops.forEach(function(fieldTripStop)
 					{
@@ -2366,6 +2366,8 @@
 	};
 
 	/**
+	 * REMOVING SOON
+	 * 
 	 * Once the legacy data migration is finished, this method will be removed.
 	 * @param {*} fieldTrip 
 	 */
