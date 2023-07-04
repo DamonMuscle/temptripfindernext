@@ -720,17 +720,13 @@
 				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
 				break;
 			case 'FieldTrip':
-				requestOption = this.setLeftRequestOption({
-					data:{
-						filterSet: {
-							FilterItems: [ 
-								{ FieldName: "SchoolGeocoded", Operator: "EqualTo", Value: "True"},
-								{ FieldName: "FieldTripDestinationGeocoded", Operator: "EqualTo", Value: "True" }
-							 ],
-							 LogicalOperator: 'and'
-						}
-					}
-				});
+				requestOption.data.filterSet = {
+					FilterItems:[ 
+						{ FieldName: "SchoolGeocoded", Operator: "EqualTo", Value: "True"},
+						{ FieldName: "FieldTripDestinationGeocoded", Operator: "EqualTo", Value: "True" }
+					],
+					LogicalOperator: "and"
+				};
 				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
 				break;
 			default:
