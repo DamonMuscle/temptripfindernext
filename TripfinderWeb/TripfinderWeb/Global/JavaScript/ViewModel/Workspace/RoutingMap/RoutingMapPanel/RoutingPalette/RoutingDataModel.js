@@ -4373,7 +4373,7 @@
 						});
 					return Promise.resolve();
 				}
-				return self.saveTrips(changedTripsToClose);
+				return self.saveRoutingFieldTrips(changedTripsToClose);
 				// self.refresh(openTrips);
 			}
 
@@ -5328,9 +5328,6 @@
 							});
 					});
 			});
-		}).then(function(result)
-		{
-			// return self.copyTripUDFs(copiedTrips).then(() => result);
 		});
 	};
 
