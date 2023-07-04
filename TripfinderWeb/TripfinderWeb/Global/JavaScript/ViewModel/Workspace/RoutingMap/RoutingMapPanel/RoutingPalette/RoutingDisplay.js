@@ -3494,46 +3494,6 @@
 		return promise;
 	}
 
-	RoutingDisplay.prototype.newTripData = function(trip)
-	{
-		const self = this;
-		let = totalAssignedStudents = 0;
-		totalAssignedStudents = trip.TripStops
-			.reduce((prev, curr) => prev.concat(curr.Students), [])
-			.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
-			.length;
-		return {
-			id: trip.id,
-			text: trip.Name,
-			expand: false,
-			expanded: !!self.expandStatusDictionary['Trip' + trip.id],
-			visible: trip.visible,
-			session: trip.Session,
-			prevLayover: ko.observable(null),
-			nextLayover: ko.observable(null),
-			customData: {
-				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
-				students: totalAssignedStudents,
-				stops: trip.TripStops.length,
-				tripTotalTime: convertToMoment(trip.FinishTime).diff(convertToMoment(trip.StartTime), 'minutes'),
-				distance: self.convertToCurrentMeasurementUnit(trip.Distance).toFixed(2),
-				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
-				startTime: convertToMoment(trip.StartTime).format('h:mm a'),
-				endTime: convertToMoment(trip.FinishTime).format('h:mm a'),
-				actualStartTime: trip.ActualStartTime,
-				actualEndTime: trip.ActualEndTime,
-				//originalTrip: trip,
-				color: trip.color,
-				sortValue: trip.Name,
-				openType: trip.OpenType,
-				hasDistrictPolicyError: self.viewModel.analyzeTripByDistrictPolicy.hasError(trip.id),
-				isTrip: true,
-				//durationOptimizeNmber: ""
-			},
-			items: self.newTripStopData(trip.FieldTripStops, trip.Session, trip.Name)
-		};
-	}
-
 	RoutingDisplay.prototype.newFieldTripData = function(trip)
 	{
 		const self = this;
@@ -3575,7 +3535,7 @@
 				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('MM-DD-YYYY h:mm a'),
 				//durationOptimizeNmber: ""
 			},
-			items: self.newTripStopData(trip.FieldTripStops, trip.Session, trip.Name)
+			items: self.newTripStopData(trip.FieldTripStops, trip)
 		};
 	}
 
@@ -3689,12 +3649,13 @@
 		}
 	}
 
-	RoutingDisplay.prototype.newTripStopData = function(tripStops, session, tripName)
+	RoutingDisplay.prototype.newTripStopData = function(tripStops, fieldTrip)
 	{
-		var self = this;
+		var self = this, {Session:session, Name: tripName} = fieldTrip;
 		var result = [];
-		function setTripStops(tripStop, session, originalTripStop)
+		function setTripStops(tripStop)
 		{
+			tripStop.OpenType = fieldTrip.OpenType;
 			result.push(self.newTripStop(tripStop, session, tripName));
 		}
 		var tslength = tripStops.length;
@@ -3703,7 +3664,7 @@
 			for (var i = 0; i < tslength; i++)
 			{
 				var tripStopTemp = $.extend(true, {}, tripStops[i]);
-				setTripStops(tripStopTemp, session, tripStops[i]);
+				setTripStops(tripStopTemp);
 			}
 		}
 		else
@@ -3711,7 +3672,7 @@
 			for (var j = tslength - 1; j > -1; j--)
 			{
 				var tripStopTemp = $.extend(true, {}, tripStops[j]);
-				setTripStops(tripStopTemp, session, tripStops[j]);
+				setTripStops(tripStopTemp);
 			}
 			result = result.reverse();
 		}

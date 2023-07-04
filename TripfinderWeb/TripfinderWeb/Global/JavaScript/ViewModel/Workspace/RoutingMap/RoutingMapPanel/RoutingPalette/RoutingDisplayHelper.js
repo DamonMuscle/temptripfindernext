@@ -1268,6 +1268,8 @@
 				<div class="#: item.customData.walkToStopDistanceWarning && item.customData.isAssigned ? "warning-icon" : ""#"></div>
 				</div>
 				#}#`;
+
+				//adding this code snippet to the template to debug #console.log(item);console.log($kendoOutput);#
 	};
 
 	RoutingDisplayHelper.prototype.getTripInfoTemplate = function()
