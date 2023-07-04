@@ -3499,7 +3499,7 @@
 				students: totalAssignedStudents,
 				stops: trip.FieldTripStops.length,
 				tripTotalTime: convertToMoment(trip.EstimatedReturnDateTime).diff(convertToMoment(trip.DepartDateTime), 'minutes'),
-				distance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance).toFixed(2),
+				distance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance || 0).toFixed(2),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
 				startTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
 				endTime: convertToMoment(trip.EstimatedReturnDatetime).format('MM-DD-YYYY h:mm a'),
@@ -3513,7 +3513,7 @@
 				isTrip: true,
 
 				EstimatedHours: trip.EstimatedHours ? trip.EstimatedHours * 60 : 0,
-				EstimatedDistance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance).toFixed(2),
+				EstimatedDistance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance || 0).toFixed(2),
 				DepartDateTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
 				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('MM-DD-YYYY h:mm a'),
 				//durationOptimizeNmber: ""
