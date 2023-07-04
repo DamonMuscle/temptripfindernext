@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Map.Thematics").QuickFilterViewModel = QuickFilterViewModel;
 
@@ -14,7 +14,7 @@
 		self.dataType = dataType;
 		self.filtersInfo = filtersInfo;
 		self.shouldDoFilter = true;
-		self.dataColumns = dataColumns.sort(function(a, b)
+		self.dataColumns = dataColumns.sort(function (a, b)
 		{
 			var displayNameA = a.DisplayName || a.FieldName, displayNameB = b.DisplayName || b.FieldName;
 			return (displayNameA.toLowerCase() < displayNameB.toLowerCase()) ? -1 : ((displayNameA.toLowerCase() == displayNameB.toLowerCase()) ? 0 : 1)
@@ -29,7 +29,7 @@
 		self.selectedFields = [];
 		if (filtersInfo && filtersInfo.length > 0)
 		{
-			$.each(filtersInfo, function(index, item)
+			$.each(filtersInfo, function (index, item)
 			{
 				if (item.field)
 				{
@@ -38,9 +38,9 @@
 			});
 		}
 		self.obFields = ko.observableArray([]);
-		self.obMultipleFieldsUnSelect = ko.computed(function()
+		self.obMultipleFieldsUnSelect = ko.computed(function ()
 		{
-			return self.obFields().length > 0 ? self.obFields().filter(function(field) { return !field.filterDisabled() }).length < 2 : true;
+			return self.obFields().length > 0 ? self.obFields().filter(function (field) { return !field.filterDisabled() }).length < 2 : true;
 		}, self);
 		self.discardDefaultValue = thematicType === TF.ThematicTypeEnum.GRID;
 
@@ -118,7 +118,7 @@
 	 * @param {object} e element.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.init = function(model, e)
+	QuickFilterViewModel.prototype.init = function (model, e)
 	{
 		var self = this,
 			initialFields = self.getInitFields();
@@ -154,7 +154,7 @@
 				4. Refresh the grid.
 		 */
 		// If drag handle icon was clicked, the input need to lose focus. If drag handle icon was dragged, the input do not lose focus.
-		self.$el.delegate(".drag-handle", "mousedown", function(e)
+		self.$el.delegate(".drag-handle", "mousedown", function (e)
 		{
 			if ($(document.activeElement).hasClass("quick-filter-input"))
 			{
@@ -173,7 +173,7 @@
 			$(".thematic-modal-field").hide();
 		});
 
-		$("body").on("mouseup.drag-handle", function(e)
+		$("body").on("mouseup.drag-handle", function (e)
 		{
 			// Only click event trigger and the mouse down event trigger from drag handle icon.
 			if (self.$activeEl)
@@ -194,7 +194,7 @@
 			}
 		});
 
-		$("body").delegate(".quick-filter-input", "blur.drag-handle", function(e)
+		$("body").delegate(".quick-filter-input", "blur.drag-handle", function (e)
 		{
 			// After drag, if the input trigger blur event.
 			if (self.isDragActiveEl)
@@ -227,10 +227,10 @@
 	 * @param {*} ignoreUnit ignore unit of measurement when determining whether the settings changed
 	 * @return {Array} The array of filter info.
 	 */
-	QuickFilterViewModel.prototype.getFiltersInfo = function(ignoreUnit = false)
+	QuickFilterViewModel.prototype.getFiltersInfo = function (ignoreUnit = false)
 	{
 		var self = this;
-		return self.obFields().filter(field => field.selectField().FieldName).map(function(field)
+		return self.obFields().filter(field => field.selectField().FieldName).map(function (field)
 		{
 			var value = field.filterValue();
 			if (field.filterType() === "custom")
@@ -292,13 +292,96 @@
 		});
 	};
 
+	QuickFilterViewModel.prototype.quickDateFilterFieldMaker = function (value, field)
+	{
+		let filterValue = Number(value);
+		field.filterValue(filterValue);
+		field.type = field.filterType();
+		return filterValue;
+	}
+
+	QuickFilterViewModel.prototype.isQuickDateFilter = function (field)
+	{
+		return this.quickDateFilterTypes.includes(field.filterType());
+	}
+
+	QuickFilterViewModel.prototype.parseFilterValue = function (value, field)
+	{
+		let filterValue;
+		switch (field.typeCode())
+		{
+			case "Boolean":
+				let dataField = field.selectField();
+				// convert the diaplay value to boolean for filtering
+				if (dataField.questionType === 'Boolean')
+				{
+					let trueDisplayName = dataField.filterable.positiveLabel;
+					let falseDisplayName = dataField.filterable.negativeLabel;
+					if (trueDisplayName && value === trueDisplayName)
+					{
+						filterValue = true;
+					}
+					else if (falseDisplayName && value === falseDisplayName)
+					{
+						filterValue = false;
+					}
+					else
+					{
+						filterValue = value.toLowerCase() === "true" ? true : false;
+					}
+				}
+				else
+				{
+					filterValue = value.toLowerCase() === "true" ? true : false;
+				}
+				break;
+			case "Time":
+				if (moment(value).isValid())
+				{
+					filterValue = toISOStringWithoutTimeZone(moment(value));
+				}
+				else if (moment(kendo.parseDate(value)).isValid())
+				{
+					var format1 = 'h:m tt';
+					var timeValue = kendo.parseDate(value, format1) || kendo.parseDate(value);
+					filterValue = toISOStringWithoutTimeZone(moment(timeValue));
+				}
+				break;
+			case "Date":
+				if (this.isQuickDateFilter(field)) //we only need this here because these are required to use input number as type.
+				{
+					this.quickDateFilterFieldMaker();
+					break;
+				}
+				filterValue = toISOStringWithoutTimeZone(moment(value));
+				break;
+			case "DateTime":
+				if (this.isQuickDateFilter(field))
+				{
+					this.quickDateFilterFieldMaker();
+					break;
+				}
+				filterValue = toISOStringWithoutTimeZone(moment(value));
+				break;
+			default:
+				filterValue = value;
+				if (this.isQuickDateFilter(field))
+				{
+					this.quickDateFilterFieldMaker();
+					typeHint = "DateTime";
+				}
+				break;
+		}
+		return filterValue;
+	}
+
 	/**
 	 * Notify the filter was changed to other function.
 	 * @param {object} model ViewModel.
 	 * @param {object} e EventData.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.notifyFilterChange = function(model, e)
+	QuickFilterViewModel.prototype.notifyFilterChange = function (model, e)
 	{
 		var self = this, searchParameters;
 		if (!self.shouldDoFilter)
@@ -310,20 +393,8 @@
 
 		searchParameters = self.getDefaultSearchParameters();
 
-		self.obFields().map(function(field)
+		self.obFields().map(function (field)
 		{
-			function quickDateFilterFieldMaker()
-			{
-				filterValue = Number(value);
-				field.filterValue(Number(value));
-				field.type = field.filterType();
-			}
-
-			function isQuickDateFilter()
-			{
-				return self.quickDateFilterTypes.includes(field.filterType());
-			}
-
 			if (field.selectField() && field.selectField().FieldName)
 			{
 				var value = field.filterValue();
@@ -353,9 +424,10 @@
 						{
 							if (typeHint)
 							{
-								field.filterSet.FilterItems.map(function(item)
+								field.filterSet.FilterItems.map(function (item)
 								{
 									item.TypeHint = typeHint;
+									item.Value = self.parseFilterValue(item.Value, field);
 								});
 							}
 							searchParameters.filterSet.FilterSets.push(field.filterSet);
@@ -374,54 +446,13 @@
 					}
 					else
 					{
-						var filterValue;
-						switch (field.typeCode())
+						if (value === " " && field.typeCode()?.toLowerCase() === 'boolean')
 						{
-							case "Boolean":
-								if (value === " ")
-								{
-									searchParameters.fields.push(field.selectField().FieldName);
-									return true;
-								}
-								filterValue = value.toLowerCase() === "true" ? true : false;
-								break;
-							case "Time":
-								if (moment(value).isValid())
-								{
-									filterValue = toISOStringWithoutTimeZone(moment(value));
-								}
-								else if (moment(kendo.parseDate(value)).isValid())
-								{
-									var format1 = 'h:m tt';
-									var timeValue = kendo.parseDate(value, format1) || kendo.parseDate(value);
-									filterValue = toISOStringWithoutTimeZone(moment(timeValue));
-								}
-								break;
-							case "Date":
-								if (isQuickDateFilter()) //we only need this here because these are required to use input number as type.
-								{
-									quickDateFilterFieldMaker();
-									break;
-								}
-								filterValue = toISOStringWithoutTimeZone(moment(value));
-								break;
-							case "DateTime":
-								if (isQuickDateFilter())
-								{
-									quickDateFilterFieldMaker();
-									break;
-								}
-								filterValue = toISOStringWithoutTimeZone(moment(value));
-								break;
-							default:
-								filterValue = value;
-								if (isQuickDateFilter())
-								{
-									quickDateFilterFieldMaker();
-									typeHint = "DateTime";
-								}
-								break;
+							searchParameters.fields.push(field.selectField().FieldName);
+							return true;
 						}
+
+						var filterValue = self.parseFilterValue(value, field);
 						let item = {
 							FieldName: field.selectField().FieldName,
 							Operator: field.typeCode() === "Boolean" ? "EqualTo" : TF.Grid.LightKendoGrid.prototype.operatorKendoMapTF[field.filterType()],
@@ -437,7 +468,7 @@
 					}
 				}
 
-				if (value === "" && (self.quickDateFilterTypesWithoutInput.includes(field.filterType()) || isQuickDateFilter()))
+				if (value === "" && (self.quickDateFilterTypesWithoutInput.includes(field.filterType()) || self.isQuickDateFilter()))
 				{
 					field.filterValue("");
 					field.type = field.filterType();
@@ -447,7 +478,7 @@
 						Value: self.quickDateFilterTypesWithoutInput.includes(field.filterType()) ? "X" : ""
 					};
 					item.TypeHint = "DateTime";
-					if (!isQuickDateFilter())
+					if (!self.isQuickDateFilter())
 					{
 						searchParameters.filterSet.FilterItems.push(item);
 					}
@@ -465,7 +496,7 @@
 	 * Gets the default search params.
 	 * @return {object} search params.
 	 */
-	QuickFilterViewModel.prototype.getDefaultSearchParameters = function()
+	QuickFilterViewModel.prototype.getDefaultSearchParameters = function ()
 	{
 		return {
 			fields: [],
@@ -483,14 +514,14 @@
 		};
 	};
 
-	QuickFilterViewModel.prototype.isQuickDateFilter = function(filterType)
+	QuickFilterViewModel.prototype.isQuickDateFilter = function (filterType)
 	{
 		return this.quickDateFilterTypes.includes(filterType) ||
 			this.quickDateFilterTypesWithoutInput.includes(filterType) ||
 			this.quickDateFilterTypesDateTimeOnly.includes(filterType);
 	}
 
-	QuickFilterViewModel.prototype.valuedQuickDateFilter = function(filterType, val)
+	QuickFilterViewModel.prototype.valuedQuickDateFilter = function (filterType, val)
 	{
 		if (this.isValuedQuickDateFilter(filterType) && val)
 		{
@@ -512,13 +543,13 @@
 		return null;
 	}
 
-	QuickFilterViewModel.prototype.isValuedQuickDateFilter = function(filterType)
+	QuickFilterViewModel.prototype.isValuedQuickDateFilter = function (filterType)
 	{
 		return this.quickDateFilterTypes.includes(filterType) ||
 			this.quickDateFilterTypesDateTimeOnly.includes(filterType);
 	}
 
-	QuickFilterViewModel.prototype.quickDateFilterElement = function($dateTimeElem, el)
+	QuickFilterViewModel.prototype.quickDateFilterElement = function ($dateTimeElem, el)
 	{
 
 		const validateFilterValue = (el, value) =>
@@ -568,7 +599,7 @@
 			format: "{0:0}",
 			decimals: 0,
 			min: 1,
-			change: function(e) { }
+			change: function (e) { }
 		});
 		$numberInput.on('focus', (e) =>
 		{
@@ -658,7 +689,7 @@
 		$dateTimeElem.parent().find('.clearButton').css('right', '0');
 	}
 
-	QuickFilterViewModel.prototype.validateDateTimeInteger = function(operator, value)
+	QuickFilterViewModel.prototype.validateDateTimeInteger = function (operator, value)
 	{
 		let allowRange = 0;
 
@@ -703,7 +734,7 @@
 	}
 
 	// for quick date filter that are with nil values to show the typeNames in the input in the UI as a hint title.
-	QuickFilterViewModel.prototype.getDateQuickFilterTypeHint = function(newType, value)
+	QuickFilterViewModel.prototype.getDateQuickFilterTypeHint = function (newType, value)
 	{
 		if (this.quickDateFilterTypesWithoutInput.includes(newType))
 		{
@@ -717,7 +748,7 @@
 		return "";
 	}
 
-	QuickFilterViewModel.prototype.addDateTimePickerFormatForSpecialFields = function($input, filterType)
+	QuickFilterViewModel.prototype.addDateTimePickerFormatForSpecialFields = function ($input, filterType)
 	{
 		let dateTimePicker = $input.data('kendoDateTimePicker');
 		if (!dateTimePicker) dateTimePicker = $input.data('kendoDatePicker');
@@ -741,7 +772,7 @@
 			}
 		}
 
-		const isOnXPatternItem = function()
+		const isOnXPatternItem = function ()
 		{
 			const span = $(dateTimePicker.element[0].parentElement).closest('.text-input');
 			return span && (span.hasClass('onx') || span.hasClass('onorafterx') || span.hasClass('onorbeforex'));
@@ -783,7 +814,7 @@
 		});
 	}
 
-	QuickFilterViewModel.prototype.dateQuickFilterHideSwitch = function($dateTimeElem, isQuickDateFilter, newType)
+	QuickFilterViewModel.prototype.dateQuickFilterHideSwitch = function ($dateTimeElem, isQuickDateFilter, newType)
 	{
 		if (!isQuickDateFilter)
 		{
@@ -821,7 +852,7 @@
 	 * @return {void}
 	 * @param filterField - Entire field and related filter info
 	 */
-	QuickFilterViewModel.prototype.quickDateFilterOnDragHandler = function(filterField)
+	QuickFilterViewModel.prototype.quickDateFilterOnDragHandler = function (filterField)
 	{
 		const filterType = filterField.filterMenuData.filterType;
 		const value = filterField.filterValue();
@@ -992,7 +1023,7 @@
 		inputGroup.css('display', 'none');
 	}
 
-	QuickFilterViewModel.prototype.dateQuickFilterElementEditorInit = function(el)
+	QuickFilterViewModel.prototype.dateQuickFilterElementEditorInit = function (el)
 	{
 		let $input = this.$el.find(".text-input[role=" + el.role + "]");
 		let $inputElem = $input.find('.text-input-group');
@@ -1034,7 +1065,7 @@
 	 * @param {object} result Which filter type is selected.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.filterMenuChange = function(e, result)
+	QuickFilterViewModel.prototype.filterMenuChange = function (e, result)
 	{
 		let index = this.index,
 			self = this.self,
@@ -1073,7 +1104,7 @@
 		}
 	};
 
-	QuickFilterViewModel.prototype.filterMenuChangeOnQuickDateFilter = function(oldType, newType, $input, field)
+	QuickFilterViewModel.prototype.filterMenuChangeOnQuickDateFilter = function (oldType, newType, $input, field)
 	{
 		let self = this;
 
@@ -1143,7 +1174,7 @@
 	 * @param {boolean} noDisplay Whether the custom filter panel should display.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.LaunchCustomFilter = function(field, $input, noDisplay)
+	QuickFilterViewModel.prototype.LaunchCustomFilter = function (field, $input, noDisplay)
 	{
 		var self = this;
 		if (!field.customFilter)
@@ -1164,7 +1195,7 @@
 	 * @param {object} field The data of the field which attempts to open the modal.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.createCustomFilter = function(field, shouldDisplay)
+	QuickFilterViewModel.prototype.createCustomFilter = function (field, shouldDisplay)
 	{
 		var self = this;
 		field.customFilter = new TF.Map.Thematics.CustomFilterViewModel(
@@ -1173,11 +1204,11 @@
 			field.selectField().FieldName,
 			self.typeCodeMenuEmun[self.fieldType(field.type)],
 			field.typeCode());
-		field.customFilter.onCustomFilterInit.subscribe(function(e, $el)
+		field.customFilter.onCustomFilterInit.subscribe(function (e, $el)
 		{
 			$el.toggleClass("active", shouldDisplay)
 		});
-		field.customFilter.onCustomFilterApply.subscribe(function(e, result)
+		field.customFilter.onCustomFilterApply.subscribe(function (e, result)
 		{
 			field.filterSet = result.filterSet;
 			field.filterValue(result.value);
@@ -1189,14 +1220,14 @@
 	 * @param {object} field The data of the field which attempts to open the modal.
 	 * @return {Promise}
 	 */
-	QuickFilterViewModel.prototype.openListFilter = function(field, isNew)
+	QuickFilterViewModel.prototype.openListFilter = function (field, isNew)
 	{
 		var self = this, filterSet, value,
 			columnObj = field.selectField(),
 			fieldName = columnObj.FieldName,
 			listFilterTemplate = columnObj.ListFilterTemplate;
 
-		return self.listFilterTool.open(fieldName, listFilterTemplate, isNew).then(function(filterSet)
+		return self.listFilterTool.open(fieldName, listFilterTemplate, isNew).then(function (filterSet)
 		{
 			if (filterSet)
 			{
@@ -1211,7 +1242,7 @@
 	 * @param {object} field the field info include filter info.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.changeFilter = function(field)
+	QuickFilterViewModel.prototype.changeFilter = function (field)
 	{
 		let self = this, selectField = field.selectField();
 		field.discardDefaultValue = self.discardDefaultValue;
@@ -1252,7 +1283,7 @@
 	 * @param {object} feild the feild type include the type from database and user defined feild.
 	 * @return {String}
 	 */
-	QuickFilterViewModel.prototype.fieldType = function(type)
+	QuickFilterViewModel.prototype.fieldType = function (type)
 	{
 		switch (type)
 		{
@@ -1279,10 +1310,10 @@
 	 * @param {object} field the field info include filter info.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.resetFilterInput = function(field)
+	QuickFilterViewModel.prototype.resetFilterInput = function (field)
 	{
 		var self = this, $input = self.$el.find(".text-input[role=" + field.role + "]");
-		$input.off('keydown').on('keydown', function(e)
+		$input.off('keydown').on('keydown', function (e)
 		{
 			// Capture enter key
 			if (e.keyCode === 13)
@@ -1291,14 +1322,15 @@
 			}
 		})
 		field.filterSet = null;
-		field.filterValue("");
+		const filterValue = field.typeCode() === "Date" ? null : "";
+		field.filterValue(filterValue);
 	};
 
 	/**
 	 * Get initialized fields' info.
 	 * @return {object} the fields' info
 	 */
-	QuickFilterViewModel.prototype.getInitFields = function()
+	QuickFilterViewModel.prototype.getInitFields = function ()
 	{
 		var self = this, isEnabled, filterInfo, idx, fieldTemp,
 			fields = [],
@@ -1348,7 +1380,7 @@
 	 * @param {Object} field The field to apply the filter info.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.applyFilterInfoToField = function(filterInfo, field)
+	QuickFilterViewModel.prototype.applyFilterInfoToField = function (filterInfo, field)
 	{
 		var self = this, filterValue = "", filterSet, typeCode, filterStyle;
 
@@ -1406,7 +1438,7 @@
 	 * @param {Boolean} isDisabled Whether the data field should be dissabled.
 	 * @return {object} The empty data field object.
 	 */
-	QuickFilterViewModel.prototype.createEmptyField = function(fieldIdx, dataType, isDisabled)
+	QuickFilterViewModel.prototype.createEmptyField = function (fieldIdx, dataType, isDisabled)
 	{
 		let self = this, result,
 			role = "field-role-" + (fieldIdx + 1),
@@ -1436,7 +1468,7 @@
 
 		let filterValue = "";
 
-		result.filterValue.subscribe(function(value)
+		result.filterValue.subscribe(function (value)
 		{
 			//special, the string '1234' is same to int 1234 on this function.
 			let valueString = (value !== null && value !== undefined) ? Number(value) ? Number(value).toString() : value.toString() : "";
@@ -1463,10 +1495,10 @@
 	 * Find the last enbale drag icon which was shown, and change this to be pointing up
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.UpdateLastEnableDargHandleStyle = function()
+	QuickFilterViewModel.prototype.UpdateLastEnableDargHandleStyle = function ()
 	{
 		var self = this, index;
-		self.obFields().forEach(function(item)
+		self.obFields().forEach(function (item)
 		{
 			if (!item.filterDisabled())
 			{
@@ -1486,7 +1518,7 @@
 	 * @param {string} value The value.
 	 * @return {boolean} Whether it is valid.
 	 */
-	QuickFilterViewModel.prototype.isValidSQLDateTime = function(type, value, filterType)
+	QuickFilterViewModel.prototype.isValidSQLDateTime = function (type, value, filterType)
 	{
 		if (filterType === "custom")
 		{
@@ -1520,10 +1552,10 @@
 	 * The filter menu events init.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.filterMenuEventsInit = function()
+	QuickFilterViewModel.prototype.filterMenuEventsInit = function ()
 	{
 		var self = this;
-		$("body").on("mousedown.closeFilterMenu", function(e)
+		$("body").on("mousedown.closeFilterMenu", function (e)
 		{
 			var role = $(e.target).closest(".menu-button").attr("role"), $menu = self.$el.find(".filter-menu");
 			for (var i = 0; i < $menu.length; i++)
@@ -1540,10 +1572,10 @@
 	 * The autocompletion events init.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.autoncompletionEventsInit = function()
+	QuickFilterViewModel.prototype.autoncompletionEventsInit = function ()
 	{
 		var self = this;
-		$("body").on("mousedown.closeAutocompletion", function(e)
+		$("body").on("mousedown.closeAutocompletion", function (e)
 		{
 			var role = $(e.target).closest(".text-input").attr("role"), $menu = self.$el.find(".autocompletion");
 			for (var i = 0; i < $menu.length; i++)
@@ -1560,10 +1592,10 @@
 	 * The custom filter events init.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.customfilterEventsInit = function()
+	QuickFilterViewModel.prototype.customfilterEventsInit = function ()
 	{
 		var self = this;
-		$("body").on("mousedown.closeCustomFilter", function(e)
+		$("body").on("mousedown.closeCustomFilter", function (e)
 		{
 			let target = $(e.target);
 			if (target.hasClass("bootstrap-datetimepicker-overlay") || target.closest(".k-calendar-container").length > 0)
@@ -1587,7 +1619,7 @@
 	 * @param {object} e element.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.filterMenuButtonClick = function(model, e)
+	QuickFilterViewModel.prototype.filterMenuButtonClick = function (model, e)
 	{
 		var self = this, $filterMenu = $(e.currentTarget).next(".filter-menu"),
 			$activeFilter = $filterMenu.find("li." + model.filterStyle());
@@ -1605,7 +1637,7 @@
 	 * @param {object} e element.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.clearButtonClick = function(model, e)
+	QuickFilterViewModel.prototype.clearButtonClick = function (model, e)
 	{
 		let data = this;
 		if (data.customFilter && data.filterType() === "custom")
@@ -1629,7 +1661,7 @@
 	 * autocompletion mouse down event.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.autocompletionMouseDownEvent = function()
+	QuickFilterViewModel.prototype.autocompletionMouseDownEvent = function ()
 	{
 		this.focusInAutoCompletion = true;
 	};
@@ -1640,7 +1672,7 @@
 	 * @param {object} e element.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.filterCustomButtonClick = function(model, e)
+	QuickFilterViewModel.prototype.filterCustomButtonClick = function (model, e)
 	{
 		$(e.currentTarget).next(".custom-filter").toggleClass("active");
 	};
@@ -1651,7 +1683,7 @@
 	 * @param {object} e element.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.autocompletionItemClick = function(model, e)
+	QuickFilterViewModel.prototype.autocompletionItemClick = function (model, e)
 	{
 		var self = this.parents[1], data = this.data, dataModel = this.parents[0];
 		self.focusInAutoCompletion = false;
@@ -1665,7 +1697,7 @@
 	 * @param {object} e element.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.filterTextInput = function(model, e)
+	QuickFilterViewModel.prototype.filterTextInput = function (model, e)
 	{
 		var self = this.parent, data = this.data, $target = $(e.currentTarget);
 		if (self.dataType == "gpsevent") { return; }
@@ -1684,7 +1716,7 @@
 			var options = { data: searchParameters, paramData: paramData }, $loading = $target.closest(".text-input").find(".k-loading");
 
 			$loading.addClass("active");
-			tf.ajax["post"](pathCombine(tf.dataTypeHelper.getSearchApiPrefix(self.dataType), "aggregate"), options, { overlay: false }).then(function(result)
+			tf.ajax["post"](pathCombine(tf.dataTypeHelper.getSearchApiPrefix(self.dataType), "aggregate"), options, { overlay: false }).then(function (result)
 			{
 				var $autocompletion = $target.closest(".text-input").find(".autocompletion");
 				if (result.Items[0] && result.Items[0].length > 0)
@@ -1708,7 +1740,7 @@
 		}
 	};
 
-	QuickFilterViewModel.prototype.adjustCalendarPosition = function(target, calendar)
+	QuickFilterViewModel.prototype.adjustCalendarPosition = function (target, calendar)
 	{
 		if (!(calendar instanceof $)) return;
 
@@ -1746,7 +1778,7 @@
 	 * @param {object} e EventData.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.onFieldSelectChange = function(model, e)
+	QuickFilterViewModel.prototype.onFieldSelectChange = function (model, e)
 	{
 		const hideQuickDateFilterOnInit = (self, role) =>
 		{
@@ -1819,7 +1851,7 @@
 	 * @param {Boolean} isEmpty Whether the data field's input is empty.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.resetFieldDisableStatus = function(fieldIdx, isEmpty)
+	QuickFilterViewModel.prototype.resetFieldDisableStatus = function (fieldIdx, isEmpty)
 	{
 		var self = this, idx,
 			selector = ".field-item",
@@ -1854,7 +1886,7 @@
 	 * Reset the drop-downs for data fields.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.resetDataFieldDropdownOptions = function(index)
+	QuickFilterViewModel.prototype.resetDataFieldDropdownOptions = function (index)
 	{
 		var self = this, idx;
 
@@ -1868,11 +1900,11 @@
 	 * Get available data columns (not selected yet).
 	 * @return {Array} The filtered data columns.
 	 */
-	QuickFilterViewModel.prototype.getAvailableOptions = function(fieldName)
+	QuickFilterViewModel.prototype.getAvailableOptions = function (fieldName)
 	{
 		var self = this;
 
-		return self.availableFieldOptions.filter(function(item)
+		return self.availableFieldOptions.filter(function (item)
 		{
 			if (fieldName === "DisabililityCode" || fieldName === "EthnicCode")
 			{
@@ -1897,7 +1929,7 @@
 	 * @param {number} curIndex The index of the data field that is to be moved.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.moveDataFieldForward = function(curIndex)
+	QuickFilterViewModel.prototype.moveDataFieldForward = function (curIndex)
 	{
 		var self = this,
 			targetIndex = curIndex - 1,
@@ -1932,7 +1964,7 @@
 	 * @param {object} targetField The object to be updated.
 	 * @return {object} The updated data field object.
 	 */
-	QuickFilterViewModel.prototype.copyFieldDataToAnother = function(fieldData, targetField)
+	QuickFilterViewModel.prototype.copyFieldDataToAnother = function (fieldData, targetField)
 	{
 		var self = this;
 
@@ -1974,7 +2006,7 @@
 	 * @param {string} displayName The FieldName or DisplayName of the selected data column.
 	 * @return {object} The matched data column object.
 	 */
-	QuickFilterViewModel.prototype.getFieldObjectByName = function(value)
+	QuickFilterViewModel.prototype.getFieldObjectByName = function (value)
 	{
 		const self = this;
 
@@ -1993,7 +2025,7 @@
 	 * @param {number} index The index of the data field to be checked.
 	 * @return {Boolean} Whether the data field is empty.
 	 */
-	QuickFilterViewModel.prototype.isFieldEmptyAtIndex = function(index)
+	QuickFilterViewModel.prototype.isFieldEmptyAtIndex = function (index)
 	{
 		return this.obFields()[index].selectField().FieldName === this.emptyColumn.FieldName;
 	};
@@ -2004,7 +2036,7 @@
 	 * @param {event} e The click event.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.openListFilterButtonClick = function(model, e)
+	QuickFilterViewModel.prototype.openListFilterButtonClick = function (model, e)
 	{
 		this.openListFilter(model);
 	};
@@ -2013,7 +2045,7 @@
 	 * Fields drag and drop event.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.bindDragAndDropEvent = function()
+	QuickFilterViewModel.prototype.bindDragAndDropEvent = function ()
 	{
 		var self = this, distance = 100, $activeEl,
 			fieldItems = self.$el.find(".field-item"),
@@ -2023,18 +2055,18 @@
 		fieldItems.draggable({
 			cursor: "move",
 			handle: ".drag-handle",
-			helper: function(event, ui)
+			helper: function (event, ui)
 			{
 				return $(this).clone(true).width(283);
 			},
 			axis: "y",
 			containment: self.$el,
-			start: function(e)
+			start: function (e)
 			{
 				var $item, itemOffset;
 				$(".drag-handle").addClass("moving");
 				//Sticky all field items offset before drag.
-				fieldItems.each(function(index, item)
+				fieldItems.each(function (index, item)
 				{
 					$item = $(item);
 					itemOffset = $item.offset();
@@ -2051,7 +2083,7 @@
 					self.isDragActiveEl = true;
 				}
 			},
-			drag: function(e, obj)
+			drag: function (e, obj)
 			{
 				$dragItemTarget = self.$el.find(".ui-draggable-dragging");
 				dragItemOffset = $dragItemTarget.offset();
@@ -2059,7 +2091,7 @@
 				movedItemIndex = -1;
 				var $item, itemOffset, itemIndex;
 				//Find the position which is being dragged.
-				fieldItems.each(function(index, item)
+				fieldItems.each(function (index, item)
 				{
 					if (movedItemIndex !== -1)
 					{
@@ -2084,7 +2116,7 @@
 				{
 					lastMovedItemIndex = null;
 					//If the position which is being dragged is same to the start position. Reset all field items' position.
-					fieldItems.each(function(index, item)
+					fieldItems.each(function (index, item)
 					{
 						var top, originalTop;
 						$item = $(item);
@@ -2103,7 +2135,7 @@
 									top: top
 								}, {
 									duration: 150,
-									complete: function()
+									complete: function ()
 									{
 									}
 								});
@@ -2115,7 +2147,7 @@
 				{
 					lastMovedItemIndex = movedItemIndex;
 					//Move field item.
-					fieldItems.each(function(index, item)
+					fieldItems.each(function (index, item)
 					{
 						$item = $(item);
 						itemIndex = $item.attr("index");
@@ -2139,7 +2171,7 @@
 									top: top
 								}, {
 									duration: 150,
-									complete: function()
+									complete: function ()
 									{
 									}
 								});
@@ -2148,9 +2180,9 @@
 					});
 				}
 			},
-			stop: function(e)
+			stop: function (e)
 			{
-				var interval, dropItem = function()
+				var interval, dropItem = function ()
 				{
 					if (lastMovedItemIndex)
 					{
@@ -2162,7 +2194,7 @@
 
 						var itemIndex,
 							fieldList = self.obFields(),
-							selectFields = self.obFields().filter(function(field)
+							selectFields = self.obFields().filter(function (field)
 							{
 								if (field.selectField() && field.selectField().FieldName)
 								{
@@ -2226,7 +2258,7 @@
 						}
 					}
 					var $item, itemOffset;
-					fieldItems.each(function(index, item)
+					fieldItems.each(function (index, item)
 					{
 						$item = $(item);
 						itemOffset = $item.data("offset");
@@ -2255,7 +2287,7 @@
 
 				if (isAnimated)
 				{
-					interval = setInterval(function()
+					interval = setInterval(function ()
 					{
 						for (var i = 0; i < fieldItems.length; i++)
 						{
@@ -2280,7 +2312,7 @@
 	 * Dispose quick filter template.
 	 * @return {void}
 	 */
-	QuickFilterViewModel.prototype.dispose = function()
+	QuickFilterViewModel.prototype.dispose = function ()
 	{
 		var self = this;
 		self.onFilterChange.unsubscribeAll();
@@ -2289,7 +2321,7 @@
 		$("body").off("mousedown.closeFilterMenu");
 		$("body").off("mousedown.closeAutocompletion");
 		$("body").off("mouseup.drag-handle");
-		self.obFields().map(function(field)
+		self.obFields().map(function (field)
 		{
 			if (field.filterMenuData && typeof (field.filterMenuData.dispose) === "function")
 			{
