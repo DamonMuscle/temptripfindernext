@@ -186,8 +186,10 @@
 				}
 			});
 			return Promise.all([
-				openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
-				viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
+				// openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
+				// viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
+				openTrips.length > 0 && self.setOpenFieldTrips(self.getEditTrips().concat(openTrips)),
+				viewTrips.length > 0 && self.setViewFieldTrips(self.getViewTrips().concat(viewTrips))
 			]);
 		});
 	};
@@ -227,8 +229,10 @@
 				}
 			});
 			return Promise.all([
-				openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
-				viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
+				// openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
+				// viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
+				openTrips.length > 0 && self.setOpenFieldTrips(self.getEditTrips().concat(openTrips)),
+				viewTrips.length > 0 && self.setViewFieldTrips(self.getViewTrips().concat(viewTrips))
 			]);
 		});
 	};
@@ -277,7 +281,8 @@
 	RoutingDataModel.prototype.displayByFindCandidateTripStops = function(trips)
 	{
 		var self = this;
-		self.setOpenTrips(trips).then(function()
+		// self.setOpenTrips(trips).then(function()
+		self.setOpenFieldTrips(trips).then(function()
 		{
 			var tripStops = self._viewModal.DocumentData.data.tripStops;
 			if (tripStops)
@@ -2484,7 +2489,8 @@
 			trip.id = trip.Id;
 			trip.visible = true;
 			trip.TripStops = [];
-			trip.type = "trip";
+			trip.FieldTripStops = [];
+			trip.type = "fieldtrip";
 			return trip;
 		});
 	};
@@ -5322,14 +5328,15 @@
 			{
 				return;
 			}
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "trips"), {
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips"), {
 				paramData: {
 					"@filter": "in(Id," + reopenTrips.map(function(t) { return t.Id; }).join(",") + ")"
 				}
 			}).then(function(response)
 			{
 				response.Items.forEach((trip) => { trip.TravelScenarioName = travelScenarios.get(trip.TravelScenarioId); })
-				return self.setOpenTrips(response.Items, true).then(function()
+				// return self.setOpenTrips(response.Items, true).then(function()
+				return self.setOpenFieldTrips(response.Items, true).then(function()
 				{
 					return self.showRevertSuccessToastMessage();
 				});
@@ -5404,7 +5411,8 @@
 			self.trips = self.getViewTrips();
 			self.changeDataStack([]);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: trips });
-			self.setOpenTrips(refreshTrips);
+			// self.setOpenTrips(refreshTrips);
+			self.setOpenFieldTrips(refreshTrips);
 		}
 	};
 

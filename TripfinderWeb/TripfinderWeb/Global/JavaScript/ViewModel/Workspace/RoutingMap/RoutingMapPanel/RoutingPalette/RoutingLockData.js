@@ -61,7 +61,8 @@
 			}
 		});
 		self.dataModel.closeByViewTrips(refreshViewTrips);
-		return self.dataModel.setViewTrips(refreshViewTrips.concat(remainViewTrips));
+		// return self.dataModel.setViewTrips(refreshViewTrips.concat(remainViewTrips));
+		return self.dataModel.setViewFieldTrips(refreshViewTrips.concat(remainViewTrips));
 	};
 
 	RoutingLockData.prototype.calcSelfChangeCount = function() { };
