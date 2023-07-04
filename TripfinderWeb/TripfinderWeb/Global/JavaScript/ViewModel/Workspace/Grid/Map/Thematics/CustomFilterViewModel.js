@@ -71,10 +71,10 @@
 	CustomFilterViewModel.prototype.changeType = function(fieldName, type, filterType)
 	{
 		var self = this;
-		self.reset();
 		self.fieldName = fieldName;
 		self.obFilterType(filterType);
 		self.obType(type);
+		self.reset(filterType);
 	};
 
 	/**
@@ -189,23 +189,23 @@
 	 * Reset custom filter info.
 	 * @return {void}
 	 */
-	CustomFilterViewModel.prototype.reset = function()
+	CustomFilterViewModel.prototype.reset = function(filterType)
 	{
 		var self = this;
-
+		const filterValue = ["Date","DateTime"].indexOf(filterType) > -1 ? null : "";
 		self.obFirstFilterType("Equal To");
 		self.obFirstFilterTypeCode("eq");
-		self.obFirstFilterValue("");
+		self.obFirstFilterValue(filterValue);
 		self.laseFirstFilterTypeCode = "eq";
-		self.lastFirstFilterValue = "";
+		self.lastFirstFilterValue = filterValue;
 		self.obFilterState("And");
 		self.obFilterStateCode("and");
 		self.lattFilterStateCode = "and";
 		self.obSecondFilterType("Equal To");
 		self.obSecondFilterTypeCode("eq");
-		self.obSecondFilterValue("");
+		self.obSecondFilterValue(filterValue);
 		self.lastSecondFilterTypeCode = "eq";
-		self.lastSecondFilterValue = "";
+		self.lastSecondFilterValue = filterValue;
 
 		self.filtersInfo = {};
 	};
