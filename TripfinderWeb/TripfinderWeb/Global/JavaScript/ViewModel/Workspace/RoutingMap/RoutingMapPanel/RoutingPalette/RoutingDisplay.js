@@ -10,7 +10,7 @@
 		self.eventsManager = self.viewModel.eventsManager;
 		self.isInitial = true;
 		self.dataSource = [];
-		self.obFooterDisplay = ko.observable("0 Trips, 0 Trip Stops, 0 Students");
+		self.obFooterDisplay = ko.observable("0 Field Trips, 0 Field Trip Stops");
 		self.expandStatusDictionary = {};
 		self.treeview;
 		self.stopLocationDisctionary = {};
@@ -967,29 +967,11 @@
 
 	RoutingDisplay.prototype.setFootInfo = function()
 	{
-		var self = this;
-		var tripCount = self.dataModel.trips.length;
-		var tripStopCount = 0;
-		var studentCount = 0;
-		self.dataModel.trips.map(function(trip)
-		{
-			tripStopCount += trip.TripStops.length;
-			trip.TripStops.map(function(tripStop)
-			{
-				tripStop.Students.map(function(student)
-				{
-					if (student.IsAssigned)
-					{
-						studentCount++;
-					}
-				});
-			});
-		});
-		var info = tripCount + ' ' + self.routingDisplayHelper.getSingleOrMultiple(tripCount, 'Trip') + ', ' +
-			tripStopCount + ' ' + self.routingDisplayHelper.getSingleOrMultiple(tripStopCount, 'Trip Stop') + ', ' +
-			studentCount + ' ' + self.routingDisplayHelper.getSingleOrMultiple(studentCount, 'Student');
+		const self = this,
+			tripCount = self.dataModel.trips.length,
+			tripStopCount = self.dataModel.trips.reduce((result, trip) => result + trip.FieldTripStops.length, 0);
 
-		self.obFooterDisplay(info);
+		self.obFooterDisplay(`${tripCount} ${self.routingDisplayHelper.getSingleOrMultiple(tripCount, 'Field Trip')}, ${tripStopCount} ${self.routingDisplayHelper.getSingleOrMultiple(tripStopCount, 'Field Trip Stop')}`);
 	}
 
 	RoutingDisplay.prototype.initSchoolLocationDropDownList = function(schoolLocationContainer, tripStop)
