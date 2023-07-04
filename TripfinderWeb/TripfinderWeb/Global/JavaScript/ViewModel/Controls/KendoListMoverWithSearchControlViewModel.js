@@ -1392,7 +1392,7 @@
 	KendoListMoverWithSearchControlViewModel.prototype._getRightColumns = function()
 	{
 		var self = this;
-		var currentColumns = this._gridDefinition.Columns;
+		var currentColumns = this._gridDefinition.Columns.map(x => $.extend({}, x));
 		var columns = currentColumns.map(function(definition)
 		{
 			var column = definition;
