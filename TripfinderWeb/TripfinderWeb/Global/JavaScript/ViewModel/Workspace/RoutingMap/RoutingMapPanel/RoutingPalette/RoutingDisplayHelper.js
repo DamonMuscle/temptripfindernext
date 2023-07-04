@@ -1088,7 +1088,7 @@
 										<div class="icon copy copyTrip #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="New Copy"></div>
 										<div class="icon info trip-info" title="Info"></div>
 										<div class="icon zoom-map-to-layers" title="Center Map"></div>
-										<div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide trip" ></div>
+										<div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide field trip" ></div>
 									</div>
 
 									#if(item.customData.openType == "View") {#
@@ -1120,7 +1120,7 @@
 								<div class="tree-buttons k-tripstop-state-hover">
 									<div class="icon lock-time k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
 									<div class="icon delete stop-delete k-tripstop-state-hover #: item.customData.openType == "View"||!item.customData.deletable ? "view-disabled-button" : ""#" title="Delete"></div>
-									<div class="icon copy copyStop  #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div><div class="icon info stop-info k-tripstop-state-hover" title="Trip Stop Details"></div>
+									<div class="icon copy copyStop  #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div><div class="icon info stop-info k-tripstop-state-hover" title="Field Trip Stop Details"></div>
 									<div class="icon zoom-map-to-layers k-tripstop-state-hover" title="Center Map" ></div></div></div>
 									<div class="trip-info k-tripstop-state-hover"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">
 

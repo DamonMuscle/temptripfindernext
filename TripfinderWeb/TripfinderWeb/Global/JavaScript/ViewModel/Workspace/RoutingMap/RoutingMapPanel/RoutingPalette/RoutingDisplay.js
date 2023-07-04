@@ -1381,7 +1381,7 @@
 
 		return tf.promiseBootbox.confirm(
 			{
-				message: "You are about to Copy Calculated Duration for all trip stops. The Duration and the locked trip stop time (" +
+				message: "You are about to Copy Calculated Duration for all field trip stops. The Duration and the locked field trip stop time (" +
 					moment(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
 				title: "Confirmation"
 			})

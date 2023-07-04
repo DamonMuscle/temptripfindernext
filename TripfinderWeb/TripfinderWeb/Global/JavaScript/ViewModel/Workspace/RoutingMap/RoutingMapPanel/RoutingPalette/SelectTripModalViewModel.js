@@ -5,7 +5,7 @@
 	function SelectTripModalViewModel(trips, options, dataModel)
 	{
 		TF.Modal.BaseModalViewModel.call(this);
-		var defaults = { multiple: true, title: "Close Trips", description: "" };
+		var defaults = { multiple: true, title: "Close Field Trips", description: "" };
 		options = $.extend(defaults, options);
 		this.title(options.title);
 		this.description = ko.observable(options.description);

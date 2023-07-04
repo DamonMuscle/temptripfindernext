@@ -8,7 +8,7 @@
 		</div>
 	</div>
 	<div class="title">Field Trips</div>
-	<div class="head-icon show-eye" data-bind="click:toggleShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide Trips':'Show Trips'}"></div>
+	<div class="head-icon show-eye" data-bind="click:toggleShow,css:{'hide-eye':!isShowMode()},attr:{title:isShowMode()?'Hide Field Trips':'Show Field Trips'}"></div>
 	<div class="head-icon save-icon" title="Save Changes On Current Tab" data-bind="click:eventsManager.saveClick.bind(eventsManager),visible:dataModel.obSelfChangeCount()>0">
 		<div class="badge" data-bind="text:dataModel.obSelfChangeCount()"></div>
 	</div>
@@ -47,7 +47,7 @@
 								<div class="text"><span>Optimize Sequence</span></div>
 							</li>
 							<li data-bind="clickButton:{disable:!obVrpableTripsSelected(),click:vrpRouteClick}">
-								<div class="text"><span>Optimize Trips</span></div>
+								<div class="text"><span>Optimize Field Trips</span></div>
 							</li>
 							<li class="menu-divider">
 								<div class="rule"></div>
@@ -126,7 +126,7 @@
 				</div>
 				<div class="vertical-line"></div>
 				<div class="print-setting-group" data-bind="dropDownMenu">
-					<div class="icon map-pinpoint black fixed-menu-btn" title="Trip Stop Geo Select" data-bind="css:{disable:!obEditTripSelected()}"></div>
+					<div class="icon map-pinpoint black fixed-menu-btn" title="Field Trip Stop Geo Select" data-bind="css:{disable:!obEditTripSelected()}"></div>
 					<div class="menu map-pinpoint-white withsub-menu">
 						<ul>
 							<li class="polygon" data-bind="click:changeStopSelectAreaClick.bind($data,'polygon'),mapModeStyleButton">
@@ -154,7 +154,7 @@
 				<div class="icon collapse-all" title="Collapse All" data-bind="clickButton:{disable:!obTripSelected(),click:collapseAllClick}"></div>
 				<div class="vertical-line"></div>
 				<div class="print-setting-group" data-bind="dropDownMenu">
-					<div class="icon black" title="Trip Path" data-bind="css:{disable:!obTripSelected(), 'path-lines': !obSequencePath(), 'sequence-lines': obSequencePath()}"></div>
+					<div class="icon black" title="Field Trip Path" data-bind="css:{disable:!obTripSelected(), 'path-lines': !obSequencePath(), 'sequence-lines': obSequencePath()}"></div>
 					<div class="menu withsub-menu" data-bind="css:{'path-lines-white': !obSequencePath(), 'sequence-lines-white': obSequencePath()}">
 						<ul>
 							<li class="sequence-lines" data-bind="click:toggleTripPath.bind($data,TF.Helper.TripHelper.PathLineTypes.Sequence),mapModeStyleButton:{autoActive:false}">
@@ -185,7 +185,7 @@
 					</div>
 				</div>
 				<div class="vertical-line"></div> -->
-				<div class="icon vrp-line" title="Optimize Trips" data-bind="clickButton:{disable:!obVrpableTripsSelected(),click:vrpRouteClick}"></div>
+				<div class="icon vrp-line" title="Optimize Field Trips" data-bind="clickButton:{disable:!obVrpableTripsSelected(),click:vrpRouteClick}"></div>
 			</div>
 			<div class="pannel-item-content" data-bind="panelContentDrag,with: display">
 				<div id="routingtreeview" class="routing-tree-view"></div>

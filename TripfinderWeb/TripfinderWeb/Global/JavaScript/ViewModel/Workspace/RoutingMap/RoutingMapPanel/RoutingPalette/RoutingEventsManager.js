@@ -309,7 +309,7 @@
 		if (!tripsData)
 		{
 			promise = tf.modalManager.showModal(
-				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { otherButtonName: "Close All Trips", optionType: "close" }, self.dataModel)
+				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { otherButtonName: "Close All Field Trips", optionType: "close" }, self.dataModel)
 			);
 		}
 		promise.then(function(data)
@@ -976,7 +976,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		if (trips.length > 0)
 		{
 			tf.modalManager.showModal(
-				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Trip", otherButtonName: "Save All Trips", optionType: "save" }, self.dataModel)
+				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trip", otherButtonName: "Save All Field Trips", optionType: "save" }, self.dataModel)
 			).then(function(data)
 			{
 				if (data && data.length > 0)
@@ -999,7 +999,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		if (trips.length > 0)
 		{
 			tf.modalManager.showModal(
-				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Trip", otherButtonName: "Revert All Trips", optionType: "revert" }, self.dataModel)
+				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trip", otherButtonName: "Revert All Field Trips", optionType: "revert" }, self.dataModel)
 			).then(function(data)
 			{
 				if (data && data.length > 0)
@@ -1202,7 +1202,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		const trips = this.dataModel.getEditTrips();
 		if (!trips || !trips.length) return;
 		let promise = trips.length == 1 ? this.dataModel.autoUnassignStudentConfirmation(trips) : tf.modalManager.showModal(
-			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Trip", otherButtonName: "Unassign All Trips", optionType: "unassign" }, this.dataModel)
+			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trip", otherButtonName: "Unassign All Field Trips", optionType: "unassign" }, this.dataModel)
 		);
 		promise.then(trips =>
 		{
@@ -1219,7 +1219,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		if (trips.length > 1)
 		{
 			tf.modalManager.showModal(
-				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Trip", otherButtonName: "Assign All Trips" })
+				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trip", otherButtonName: "Assign All Field Trips" })
 			).then(function(data)
 			{
 				if (data && data.length > 0)
@@ -1265,7 +1265,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		self.viewModel.routingChangePath.stop();
 		var promise = Promise.resolve(trips);
 		promise = tf.modalManager.showModal(
-			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Trips", otherButtonName: "Optimize All Trips", isVrpClick: true })
+			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trips", otherButtonName: "Optimize All Field Trips", isVrpClick: true })
 		);
 		promise.then(function(data)
 		{
@@ -1827,7 +1827,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		var self = this;
 		self.viewModel.routingChangePath.stop();
 		tf.modalManager.showModal(
-			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(this.dataModel.getEditTrips(), { otherButtonName: "Optimize Sequence All Trips", title: "Select Trip" }, self.dataModel)
+			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(this.dataModel.getEditTrips(), { otherButtonName: "Optimize Sequence All Field Trips", title: "Select Field Trip" }, self.dataModel)
 		).then(function(data)
 		{
 			if (data && data.length > 0)

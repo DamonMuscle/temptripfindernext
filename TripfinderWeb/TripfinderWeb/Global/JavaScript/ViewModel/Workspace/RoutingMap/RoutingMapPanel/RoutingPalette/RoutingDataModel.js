@@ -4599,7 +4599,7 @@
 			{
 				if (trips[i].Name === trips[j].Name)
 				{
-					return `The trip name '${trips[i].Name}' is not unique. Please keep each trip name unique before saving.`;
+					return `The field trip name '${trips[i].Name}' is not unique. Please keep each field trip name unique before saving.`;
 				}
 			}
 			for (j = 0; j < trips[i].TripStops.length; j++)
@@ -6604,13 +6604,13 @@
 		var tripId = id || 0;
 		if (name.trim() === '')
 		{
-			tf.promiseBootbox.alert("Trip name is required.");
+			tf.promiseBootbox.alert("Field trip name is required.");
 			return Promise.reject();
 		}
 
 		if (name.length > 150)
 		{
-			tf.promiseBootbox.alert("Trip name should be less than 151 characters.");
+			tf.promiseBootbox.alert("Field trip name should be less than 151 characters.");
 			return Promise.reject();
 		}
 

@@ -33,7 +33,7 @@
 				sort: { field: "Name", dir: "asc" },
 			}),
 			columns: [{
-				title: "Trip Name",
+				title: "Field Trip Name",
 				field: "Name",
 				template: "<div><div style='height:20px;width:10px;float:left;margin-right:10px;background:#: color #;'></div>#: Name #</div>",
 			}],
@@ -185,7 +185,7 @@
 
 	SelectTripViewModel.prototype.setFooterDisplay = function()
 	{
-		var name = TF.getSingularOrPluralTitle("Trips", this.trips.length);
+		var name = TF.getSingularOrPluralTitle("Field Trips", this.trips.length);
 		this.$element.find(".kendo-grid").find(".k-grid-pager").css("text-align", "left").html(String.format("{0} of {1} {2}", this.selectedTrips.length, this.trips.length, name));
 	};
 
