@@ -506,21 +506,21 @@
 	{
 		var self = this, newTrips = [], newTripIds = [], remainTripIds = [], remainTrips = [];
 
-		// if (data.length == 0)
-		// {
-		// 	// if no need to open,close all
-		// 	return self.closeAllEditTrips();
-		// }
+		if (data.length == 0)
+		{
+			// if no need to open,close all
+			return self.closeAllEditTrips();
+		}
 
-		// data = Enumerable.From(data).OrderBy("$.Name").ToArray();
-		// var viewTrips = self.getViewTrips().filter(function(trip)
-		// {
-		// 	return Enumerable.From(data).Any(function(c) { return c.Id == trip.id; });
-		// });
-		// if (viewTrips && viewTrips.length > 0)
-		// {
-		// 	self.closeByViewTrips(viewTrips);
-		// }
+		data = Enumerable.From(data).OrderBy("$.Name").ToArray();
+		var viewTrips = self.getViewTrips().filter(function(trip)
+		{
+			return Enumerable.From(data).Any(function(c) { return c.Id == trip.id; });
+		});
+		if (viewTrips && viewTrips.length > 0)
+		{
+			self.closeByViewTrips(viewTrips);
+		}
 		tf.loadingIndicator.showImmediately();
 		return self._filterNotLockTripIds(data).then(function(availableIds)
 		{
