@@ -1322,7 +1322,7 @@
 			}
 		})
 		field.filterSet = null;
-		const filterValue = field.typeCode() === "Date" ? null : "";
+		const filterValue = ["Date","DateTime"].indexOf(field.typeCode()) > -1 ? null : "";
 		field.filterValue(filterValue);
 	};
 
@@ -1642,7 +1642,7 @@
 		let data = this;
 		if (data.customFilter && data.filterType() === "custom")
 		{
-			data.customFilter.reset();
+			data.customFilter.reset(data.typeCode());
 		}
 		let $textInput = $(e.target).parent().find('.text-input-group');
 		if ($textInput.length === 1)
