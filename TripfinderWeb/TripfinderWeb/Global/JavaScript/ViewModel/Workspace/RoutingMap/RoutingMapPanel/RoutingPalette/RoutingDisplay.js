@@ -3364,10 +3364,10 @@
 				treeview.setDataSource(homogeneous);
 			}
 
-			if (data.options && data.options.resetScheduleTime)
-			{
-				promise = self.resetTripInfo(data.add, null, null, data.options.resetScheduleTime);
-			}
+			// if (data.options && data.options.resetScheduleTime)
+			// {
+			// 	promise = self.resetTripInfo(data.add, null, null, data.options.resetScheduleTime);
+			// }
 			//newAddList.forEach(function(trip) { self.dataModel.refreshOptimizeSequenceRate(trip.id) });
 			// this.refreshNextTripData(newAddList);
 		}
@@ -3498,7 +3498,7 @@
 				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
 				students: totalAssignedStudents,
 				stops: trip.FieldTripStops.length,
-				tripTotalTime: convertToMoment(trip.EstimatedReturnDatetime).diff(convertToMoment(trip.DepartDateTime), 'minutes'),
+				tripTotalTime: convertToMoment(trip.EstimatedReturnDateTime).diff(convertToMoment(trip.DepartDateTime), 'minutes'),
 				distance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance).toFixed(2),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
 				startTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
