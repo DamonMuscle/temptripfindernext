@@ -4128,7 +4128,7 @@
 		});
 	};
 
-	RoutingDataModel.prototype.closeUnsavedNewFieldTrips = function(fieldTrips, noSaveCheck, exceptfieldTrips)
+	RoutingDataModel.prototype.closeUnsavedNewFieldTrips = function(fieldTrips, noSaveCheck, exceptTrips)
 	{
 		var self = this, p = Promise.resolve(false);
 		if (!noSaveCheck)
@@ -4140,7 +4140,7 @@
 			var savePromise = Promise.resolve(ans);
 			if (ans)
 			{
-				savePromise = self.saveRoutingFieldfieldTrips(fieldTrips);
+				savePromise = self.saveRoutingFieldTrips(fieldTrips);
 			}
 			return savePromise.then(function(result)
 			{
@@ -4148,16 +4148,16 @@
 
 				if (fieldTrips.length > 0)
 				{
-					self.removeNeedDeleteTrip(trips);
-					self.onfieldTripsChangeEvent.notify({
+					self.removeNeedDeleteTrip(fieldTrips);
+					self.onTripsChangeEvent.notify({
 						add: [],
-						edit: self.getEditfieldTrips().filter(function(a) { return !Enumerable.From(exceptfieldTrips).Any(function(b) { return b.id == a.id; }); }),
+						edit: self.getEditTrips().filter(function(a) { return !Enumerable.From(exceptTrips).Any(function(b) { return b.id == a.id; }); }),
 						delete: fieldTrips
 					});
 				}
 
 				self.clearContextMenuOperation();
-				self.viewModel.editfieldTripstopModal.closeEditModal();
+				self.viewModel.editTripStopModal.closeEditModal();
 				self._viewModal.setMode("Routing", "Normal");
 				tf.loadingIndicator.tryHide();
 				// self._updateTravelScenarioLock();

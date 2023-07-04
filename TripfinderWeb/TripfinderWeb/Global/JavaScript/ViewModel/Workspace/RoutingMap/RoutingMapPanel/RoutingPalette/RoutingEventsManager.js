@@ -349,11 +349,13 @@
 					var promiseList = [];
 					if (unsavedNewTrips.length > 0)
 					{
-						promiseList.push(self.dataModel.closeUnsavedNewTrips(unsavedNewTrips, false));
+						// promiseList.push(self.dataModel.closeUnsavedNewTrips(unsavedNewTrips, false));
+						promiseList.push(self.dataModel.closeUnsavedNewFieldTrips(unsavedNewTrips, false));
 					}
 					if (viewTrips.length > 0)
 					{
-						promiseList.push(self.dataModel.closeByViewTrips(viewTrips));
+						// promiseList.push(self.dataModel.closeByViewTrips(viewTrips));
+						promiseList.push(self.dataModel.closeByViewFieldTrips(viewTrips));
 					}
 					if (editTrips.length > 0)
 					{
@@ -363,7 +365,8 @@
 							{
 								if (result)
 								{
-									self.dataModel.closeByTrips(editTrips);
+									// self.dataModel.closeByTrips(editTrips);
+									self.dataModel.closeByFieldTrips(editTrips);
 								}
 							});
 						});
