@@ -419,8 +419,7 @@
 	RoutingEventsManager.prototype._onTripsChangeEvent = function()
 	{
 		var self = this;
-		// self.obTripSelected(self.dataModel.trips.length > 0);
-		self.obTripSelected(false);
+		self.obTripSelected(self.dataModel.trips.length > 0);
 		
 		// self.obEditTripSelected(self.dataModel.getEditTrips().length > 0);
 		self.obEditTripSelected(false);

@@ -83,7 +83,7 @@
 							<li class="menu-divider">
 								<div class="rule"></div>
 							</li>
-							<li class="firstMenuItem disable" data-bind="clickButton:{disable:!obTripSelected(),click:playBackClick}, style: {fontWeight: playBackControl.obPlayBackControlVisible() ? 'bold' : '' }">
+							<li class="firstMenuItem disable" data-bind="clickButton:{disable:true || !obTripSelected(),click:playBackClick}, style: {fontWeight: playBackControl.obPlayBackControlVisible() ? 'bold' : '' }">
 								<div class="menuIcon"></div>
 								<div class="text"><span>Playback</span></div>
 							</li>
