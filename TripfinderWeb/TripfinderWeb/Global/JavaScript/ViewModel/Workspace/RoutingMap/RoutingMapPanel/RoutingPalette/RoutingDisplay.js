@@ -1304,9 +1304,6 @@
 
 	function copyTripClick(e)
 	{
-		console.log("Tripfinder Next TODO: copyTripClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
@@ -1393,9 +1390,13 @@
 				if (result)
 				{
 					var trips = [self.dataModel.getTripById(data.id)];
-					self.dataModel.setActualStopTime(trips);
-					self.dataModel.copyStopTimeWithActualTime(trips);
-					self.dataModel.setStudentTravelTime(trips);
+
+					self.dataModel.setFieldTripActualStopTime(trips);
+					self.dataModel.copyFieldTripStopTimeWithActualTime(trips);
+
+					// self.dataModel.setActualStopTime(trips);
+					// self.dataModel.copyStopTimeWithActualTime(trips);
+					// self.dataModel.setStudentTravelTime(trips);
 					var tripNode = self.routingDisplayHelper.getExpandedTreeNode(data.id, 'trip', self.treeview.dataSource);
 					var tripElement = self.treeview.findByUid(tripNode.uid);
 					self.setTripNodeProperty(tripNode, tripElement);

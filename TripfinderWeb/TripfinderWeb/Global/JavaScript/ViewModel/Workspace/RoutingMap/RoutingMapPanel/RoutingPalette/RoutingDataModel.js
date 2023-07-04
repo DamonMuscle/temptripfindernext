@@ -3014,6 +3014,37 @@
 		this.onTripStopTimeChangeEvent.notify({});
 	};
 
+	RoutingDataModel.prototype.copyFieldTripStopTimeWithActualTime = function(trips)
+	{
+		var stopTimeFormat = "YYYY-MM-DDTHH:mm:ss";
+		for (var i = 0; i < trips.length; i++)
+		{
+			for (var j = 0; j < trips[i].FieldTripStops.length; j++)
+			{
+				const actualStopTime = trips[i].FieldTripStops[j].ActualStopTime;
+
+				if(j == 0)
+				{
+					trips[i].FieldTripStops[j].StopTimeArrive = null;
+					trips[i].FieldTripStops[j].StopTimeDepart = actualStopTime;
+				}
+				else if(j == trips[i].FieldTripStops.length - 1)
+				{
+					trips[i].FieldTripStops[j].StopTimeArrive = actualStopTime;
+					trips[i].FieldTripStops[j].StopTimeDepart = null;
+				}
+				else
+				{
+					trips[i].FieldTripStops[j].StopTimeArrive = actualStopTime;
+					trips[i].FieldTripStops[j].StopTimeDepart = moment(actualStopTime).add(Math.ceil(moment.duration(trips[i].FieldTripStops[j].Duration).asMinutes()), "minutes").format(stopTimeFormat);
+				}
+
+				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j].ActualStopTime).format("HH:mm:ss");
+			}
+		}
+		this.onTripStopTimeChangeEvent.notify({});
+	};
+
 	RoutingDataModel.prototype.setStudentDayValueByIndex = function(students, dayIndex, value)
 	{
 		if (students.length > 0)
@@ -3360,6 +3391,88 @@
 			{
 				trips[i].ActualStartTime = trips[i].TripStops[0].ActualStopTime;
 				trips[i].ActualEndTime = trips[i].TripStops[trips[i].TripStops.length - 1].ActualStopTime;
+			}
+		}
+	};
+
+	RoutingDataModel.prototype.setFieldTripActualStopTime = function(trips, reset, resetDateTime)
+	{
+		var j = 0;
+		var stopTimeFormat = "YYYY-MM-DDTHH:mm:ss";
+		for (var i = 0; i < trips.length; i++)
+		{
+			let lockStop;
+			let lockStopIndex;
+			if (!reset)
+			{
+				for (j = 0; j < trips[i].FieldTripStops.length; j++)
+				{
+					if (trips[i].FieldTripStops[j].LockStopTime)
+					{
+
+						trips[i].FieldTripStops[j].ActualStopTime = trips[i].FieldTripStops[j].StopTimeArrive;
+						
+						lockStop = trips[i].FieldTripStops[j];
+						lockStopIndex = j;
+						break;
+					}
+				}
+				if (!lockStopIndex && trips[i].FieldTripStops.length > 0)
+				{
+					trips[i].FieldTripStops[0].LockStopTime = true;
+					trips[i].FieldTripStops[0].ActualStopTime = trips[i].FieldTripStops[0].StopTimeDepart;
+					lockStop = trips[i].FieldTripStops[0];
+					lockStopIndex = 0;
+				}
+			}
+			else
+			{
+				lockStop = trips[i].FieldTripStops[0];
+				lockStopIndex = 0;
+
+				lockStop.ActualStopTime = moment(resetDateTime).format(stopTimeFormat);;
+
+				for (j = 0; j < trips[i].FieldTripStops.length; j++)
+				{
+					if (trips[i].FieldTripStops[j].id == lockStop.id)
+					{
+						trips[i].FieldTripStops[j].LockStopTime = true;
+
+					}
+					else
+					{
+						trips[i].FieldTripStops[j].LockStopTime = false;
+					}
+				}
+			}
+
+			for (j = lockStopIndex + 1; j < trips[i].FieldTripStops.length; j++)
+			{
+				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart, "HH:mm:ss").subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive, "HH:mm:ss")).format("HH:mm:ss");
+				let stopsDuration = moment(trips[i].FieldTripStops[j].StopTimeArrive).subtract(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart)).format("HH:mm:ss");
+				let actualStopTime = moment(trips[i].FieldTripStops[j - 1].ActualStopTime, stopTimeFormat)
+											.add(Math.ceil(moment.duration(stopsDuration).asMinutes()), "minutes").format(stopTimeFormat);
+
+				trips[i].FieldTripStops[j].Duration = duration;
+				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;		
+			}
+			for (j = lockStopIndex - 1; j > -1; j--)
+			{
+				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart, "HH:mm:ss").subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive, "HH:mm:ss")).format("HH:mm:ss");
+				let stopsDuration = moment(trips[i].FieldTripStops[j].StopTimeArrive).subtract(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart)).format("HH:mm:ss");
+				let actualStopTime = moment(trips[i].FieldTripStops[j + 1].ActualStopTime, stopTimeFormat)
+											.subtract(Math.ceil(moment.duration(stopsDuration).asMinutes()), "minutes").format(stopTimeFormat);
+
+				trips[i].FieldTripStops[j].Duration = duration;
+				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;
+			}
+			if (trips[i].FieldTripStops.length > 0)
+			{
+				trips[i].FieldTripStops[0].StopTimeDepart = trips[i].FieldTripStops[0].ActualStopTime.format(stopTimeFormat);
+				trips[i].FieldTripStops[0].Duration = "00:00:00";
+
+				trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].StopTimeArrive = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime.format(stopTimeFormat);
+				trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].Duration = "00:00:00";
 			}
 		}
 	};
@@ -3895,6 +4008,52 @@
 		});
 	};
 
+	RoutingDataModel.prototype.closeByFieldTrips = function(tripsToClose, notifyChange)
+	{
+		var self = this;
+		var promise = Promise.resolve();
+		if (tripsToClose && tripsToClose.length > 0)
+		{
+			tripsToClose.forEach(function(trip)
+			{
+				self.deleteChangeDataStackByTripId(trip.id);
+			});
+			// promise = self._releaseStudentToUnAssign(tripsToClose);
+			self.unLockTripData(tripsToClose);
+			self.removeNeedDeleteTrip(tripsToClose);
+			if (notifyChange != false)
+			{
+				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose });
+			}
+
+			// self.routingStudentManager.refresh();
+		}
+
+		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
+		self.clearContextMenuOperation();
+		self.viewModel.editTripStopModal.closeEditModal();
+		self._viewModal.setMode("Routing", "Normal");
+		// self.clearTripOriginalData(tripsToClose);
+		// self.clearFindCandidates(tripsToClose);
+		return promise.then(function()
+		{
+			self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
+			// self._updateTravelScenarioLock(tripsToClose);
+			// if (self.getEditTrips().length == 0)
+			// {
+			// 	var promise = self.clearCandidateStudents();
+			// 	self.updateManuallyChangedStatusWhenClose();
+			// 	self.routingStudentManager.refreshStudentLock(true);
+			// 	return promise;
+			// } else if (tripsToClose && tripsToClose.length > 0)
+			// {//RW-32613 If Scheduled Elsewhere is not checked there is no need to send RoutingCandidateStudents request.
+			// 	self._candidateSetting.inCriteriaScheduledElsewhere || self._candidateSetting.notInCriteriaScheduledElsewhere ? self.refreshCandidateStudent() :
+			// 		self.refreshCandidateStudent(null, null, null, tripsToClose);
+			// 	self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
+			// }
+		});
+	};	
+
 	RoutingDataModel.prototype.closeAllEditTrips = function()
 	{
 		var self = this;
@@ -3965,6 +4124,43 @@
 					tf.loadingIndicator.tryHide();
 					self._updateTravelScenarioLock();
 				});
+			});
+		});
+	};
+
+	RoutingDataModel.prototype.closeUnsavedNewFieldTrips = function(fieldTrips, noSaveCheck, exceptfieldTrips)
+	{
+		var self = this, p = Promise.resolve(false);
+		if (!noSaveCheck)
+		{
+			p = self.unSaveConfirmBox(fieldTrips);
+		}
+		return p.then(function(ans)
+		{
+			var savePromise = Promise.resolve(ans);
+			if (ans)
+			{
+				savePromise = self.saveRoutingFieldfieldTrips(fieldTrips);
+			}
+			return savePromise.then(function(result)
+			{
+				tf.loadingIndicator.showImmediately();
+
+				if (fieldTrips.length > 0)
+				{
+					self.removeNeedDeleteTrip(trips);
+					self.onfieldTripsChangeEvent.notify({
+						add: [],
+						edit: self.getEditfieldTrips().filter(function(a) { return !Enumerable.From(exceptfieldTrips).Any(function(b) { return b.id == a.id; }); }),
+						delete: fieldTrips
+					});
+				}
+
+				self.clearContextMenuOperation();
+				self.viewModel.editfieldTripstopModal.closeEditModal();
+				self._viewModal.setMode("Routing", "Normal");
+				tf.loadingIndicator.tryHide();
+				// self._updateTravelScenarioLock();
 			});
 		});
 	};
@@ -4056,6 +4252,21 @@
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 			// self.clearSchoolLocation(viewTripsToClose);
 			// self.routingStudentManager.refresh();
+		}
+		self.clearContextMenuOperation();
+		self.viewModel.editTripStopModal.closeEditModal();
+		self._viewModal.setMode("Routing", "Normal");
+		return promise;
+	};
+
+	RoutingDataModel.prototype.closeByViewFieldTrips = function(viewTripsToClose)
+	{
+		var self = this;
+		var promise = Promise.resolve();
+		if (viewTripsToClose.length > 0)
+		{
+			self.removeNeedDeleteTrip(viewTripsToClose);
+			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editTripStopModal.closeEditModal();

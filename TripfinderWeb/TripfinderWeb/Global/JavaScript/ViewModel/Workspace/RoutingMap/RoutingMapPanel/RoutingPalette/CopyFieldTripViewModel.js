@@ -254,6 +254,10 @@
 						// fieldTripPathPromise = self.dataModel.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops);
 					}
 
+					let newTrips = [newTrip];
+					self.dataModel.setFieldTripActualStopTime(newTrips, true, self.obDepartureDateTime());
+					self.dataModel.copyFieldTripStopTimeWithActualTime(newTrips);
+
 					return fieldTripPathPromise.then(function()
 					{
 						for (var i = 0; i < newTrip.FieldTripStops.length - 1; i++)
@@ -285,7 +289,7 @@
 						
 						if (self.obCreateTrip() && self.obOpenType() == 1)
 						{
-							self.dataModel.saveFieldTrip([newTrip]);
+							self.dataModel.saveFieldTrip(newTrips);
 							// self.dataModel.copyFieldTrip(newTrip);
 						}
 						tf.loadingIndicator.tryHide();
