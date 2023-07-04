@@ -107,9 +107,9 @@
 			if (docData && docData.trips)
 			{
 				var trips = docData.trips;
-				if (docData.tryOpenTrip)
+				if (docData.tryOpenFieldTrip)
 				{
-					self.tryOpenTrip(trips);
+					self.tryOpenFieldTrip(trips);
 					return;
 				}
 
@@ -542,7 +542,7 @@
 			newTripIds = newTrips.map(function(c) { return c.id; });
 			self.trips = self.trips.concat(newTrips);
 			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
-			// self._removeNotOpenEditTrips(data);
+			self._removeNotOpenEditTrips(data);
 			self.bindColor();
 			
 			var p1 = self._fetchTripData(newTripIds);
@@ -562,8 +562,7 @@
 		{
 			tf.loadingIndicator.tryHide();
 
-			// const fetchedTripsData = tripsData[0].Trips;
-			const fetchedTripsData = self.trips;
+			const fetchedTripsData = tripsData[0].FieldTrips;
 
 			// remove not exist new trip
 			newTrips = newTrips.filter(function(trip)
@@ -2268,11 +2267,11 @@
 			data.FieldTrips.forEach(function(trip)
 			{
 				trip.visible = true;
-				trip.type = "trip";
+				trip.type = "fieldtrip";
 				trip.FieldTripStops.forEach(function(fieldTripStop)
 				{
-					fieldTripStop.TripId = trip.id;
-					fieldTripStop.type = "tripStop";
+					fieldTripStop.FieldTripId = trip.id;
+					fieldTripStop.type = "fieldTripStop";
 					fieldTripStop.vehicleCurbApproach = fieldTripStop.VehicleCurbApproach;
 					if (fieldTripStop.SchoolLocation)
 					{
@@ -6503,7 +6502,10 @@
 			case "tripStop":
 			case "tripBoundary":
 				return data.TripId;
+			case "fieldTripStop":
+				return data.FieldTripId;
 			case "trip":
+			case "fieldtrip":
 				return data.id;
 		}
 	};
