@@ -136,9 +136,9 @@
 
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
 	{
+		let results = [];
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
-			const results = [];
 			const items = this.layer.graphics.items;
 			if (geometry === null)
 			{
@@ -155,12 +155,9 @@
 					}
 				}
 			}
-
-			return Promise.resolve(results);
 		}
 		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
-			console.warn(`TODO: query features on FeatureLayer`);
 			const queryParams = this.layer.createQuery();
 			if (geometry !== null)
 			{
@@ -171,7 +168,48 @@
 			queryParams.returnGeometry = true;
 			queryParams.outFields = ['*'];
 
-			return this.layer.queryFeatures(queryParams);
+			results = await this.layer.queryFeatures(queryParams);
 		}
+
+		return Promise.resolve(results);
+	}
+
+	Layer.prototype.queryFeatureCount = async function(geometry, condition = '1 = 1')
+	{
+		let featureCount = 0;
+		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
+			const items = this.layer.graphics.items;
+			if (geometry === null)
+			{
+				featureCount = items.length;
+			}
+			else
+			{
+				for (let i = 0; i < items.length; i++)
+				{
+					const item = items[i];
+					if (TF.GIS.SDK.geometryEngine.intersects(geometry, item.geometry))
+					{
+						featureCount++;
+					}
+				}
+			}
+		}
+		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			const queryParams = this.layer.createQuery();
+			if (geometry !== null)
+			{
+				queryParams.geometry = geometry;
+			}
+			queryParams.where = condition;
+			queryParams.returnGeometry = false;
+			queryParams.outFields = [];
+
+			featureCount = await this.layer.queryFeatureCount(queryParams);
+		}
+
+		return Promise.resolve(featureCount);
 	}
 })();
