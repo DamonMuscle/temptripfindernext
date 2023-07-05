@@ -197,7 +197,7 @@
 	RoutingDataModel.prototype.tryOpenFieldTrip = function(fieldTrips)
 	{
 		var self = this;
-		var openedTripIds = self.fieldTrips.map(function(c) { return c.Id; });
+		var openedTripIds = self.trips.map(function(c) { return c.Id; });
 		fieldTrips = fieldTrips.filter((t) => { return openedTripIds.indexOf(t.Id) < 0; });
 		if (fieldTrips.length == 0)
 		{
@@ -2337,7 +2337,10 @@
 					existTrip.originalStudents = [];
 					for (var key in trip)
 					{
-						existTrip[key] = trip[key] || existTrip[key];
+						if(trip[key] !== null && trip[key] !== undefined)
+						{
+							existTrip[key] = trip[key];
+						}
 						if (typeof existTrip[key] == "undefined")
 						{
 							existTrip[key] = trip[key];
@@ -4578,7 +4581,7 @@
 				self.routingStudentManager.refresh(null, true);
 				self.showSaveSuccessToastMessage();
 				self.updateTripOriginalData(fieldTrips);
-				self.onTripDisplayRefreshEvent.notify(self.fieldTrips);
+				self.onTripDisplayRefreshEvent.notify(self.trips);
 				self.tripLockData.lockIds(fieldTrips.filter(function(trip)
 				{
 					return trip.Id && trip.OpenType != "View";
