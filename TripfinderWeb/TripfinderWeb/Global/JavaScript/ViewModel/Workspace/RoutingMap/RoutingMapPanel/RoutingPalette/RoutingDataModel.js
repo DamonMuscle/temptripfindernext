@@ -3448,18 +3448,18 @@
 
 			for (j = lockStopIndex + 1; j < trips[i].FieldTripStops.length; j++)
 			{
-				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart, "HH:mm:ss").subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive, "HH:mm:ss")).format("HH:mm:ss");
+				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart).subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive)).format("HH:mm:ss");
 				let stopsDuration = moment(trips[i].FieldTripStops[j].StopTimeArrive).subtract(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart)).format("HH:mm:ss");
 				let actualStopTime = moment(trips[i].FieldTripStops[j - 1].ActualStopTime, stopTimeFormat)
 											.add(Math.ceil(moment.duration(trips[i].FieldTripStops[j - 1].Duration).asMinutes()), "minutes")
 											.add(Math.ceil(moment.duration(stopsDuration).asMinutes()), "minutes").format(stopTimeFormat);
 
 				trips[i].FieldTripStops[j].Duration = duration;
-				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;		
+				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;
 			}
 			for (j = lockStopIndex - 1; j > -1; j--)
 			{
-				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart, "HH:mm:ss").subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive, "HH:mm:ss")).format("HH:mm:ss");
+				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart).subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive)).format("HH:mm:ss");
 				let stopsDuration = moment(trips[i].FieldTripStops[j].StopTimeArrive).subtract(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart)).format("HH:mm:ss");
 				let actualStopTime = moment(trips[i].FieldTripStops[j + 1].ActualStopTime, stopTimeFormat)
 											.add(Math.ceil(moment.duration(trips[i].FieldTripStops[j + 1].Duration).asMinutes()), "minutes")
