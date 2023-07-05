@@ -1435,7 +1435,7 @@
 			return Promise.resolve(trips);
 		}
 
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "RoutingTrips", "routing", "recalculate"),
+		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "RoutingFieldTrips", "routing", "recalculate"),
 			{
 				data: trips
 			}, { overlay: false }).then(function(response)
@@ -5184,13 +5184,15 @@
 			self.clearRevertInfo();
 			tf.loadingIndicator.show();
 	
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripresources"), {
-				paramData: {
-					"DBID": tf.datasourceManager.databaseId,
-					"@filter": "in(TripId," + fieldTrips.map(x => x.id).join(",") + ")",
-					"@fields": "TripId,StartDate,EndDate,IsTripLevel"
-				}
-			}).then(function(response)
+			// return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripresources"), {
+			// 	paramData: {
+			// 		"DBID": tf.datasourceManager.databaseId,
+			// 		"@filter": "in(TripId," + fieldTrips.map(x => x.id).join(",") + ")",
+			// 		"@fields": "TripId,StartDate,EndDate,IsTripLevel"
+			// 	}
+			// })
+			return Promise.resolve(null)
+			.then(function(response)
 			{
 				const tripResources = response && response.Items && response.Items.length > 0 ? response.Items.filter(c => !c.IsTripLevel) : null;
 				// Check if any trip's assignment has been updated.

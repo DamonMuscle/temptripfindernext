@@ -102,7 +102,7 @@
 		}
 		tripIds.forEach(function(tripId)
 		{
-			TF.RoutingMap.RoutingPalette.RoutingDataModel.unLockRoutingStudentByTrip(tripId);
+			// TF.RoutingMap.RoutingPalette.RoutingDataModel.unLockRoutingStudentByTrip(tripId);
 		});
 	};
 
