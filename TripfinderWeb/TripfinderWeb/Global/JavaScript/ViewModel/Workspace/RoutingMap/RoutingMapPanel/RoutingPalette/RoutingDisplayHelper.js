@@ -1054,7 +1054,7 @@
 	RoutingDisplayHelper.prototype.clearExpandedDictionary = function(trips)
 	{
 		let self = this;
-		trips.map(function(trip)
+		trips?.map(function(trip)
 		{
 			delete self.routingDisplay.expandStatusDictionary["Trip" + trip.id];
 			trip.TripStops.map(function(tripStop)
