@@ -566,7 +566,7 @@
 		routingtreeview.kendoTreeView({
 			template: self.routingDisplayHelper.getTreeViewTemplate(),
 			dataSource: [],
-			dragAndDrop: true,
+			dragAndDrop: false,
 			sortable: true,
 			loadOnDemand: true,
 			animation: {
