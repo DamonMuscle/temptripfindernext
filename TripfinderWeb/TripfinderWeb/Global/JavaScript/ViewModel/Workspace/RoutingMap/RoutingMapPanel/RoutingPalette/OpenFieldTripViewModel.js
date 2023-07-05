@@ -245,7 +245,7 @@
 	OpenFieldTripViewModel.prototype.afterInit = function()
 	{
 		// do not create clear all filter button
-		this.leftSearchGrid.createFilterClearAll = function() { };
+		// this.leftSearchGrid.createFilterClearAll = function() { };
 	};
 
 	OpenFieldTripViewModel.prototype.apply = function()
