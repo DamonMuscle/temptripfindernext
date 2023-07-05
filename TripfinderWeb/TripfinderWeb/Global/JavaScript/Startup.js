@@ -849,15 +849,8 @@
 						settings[obj.InfoID] = obj.InfoValue;
 					});
 					
-					if (settings["ExagoBIServerUrl"])
-					{
-						window.ExagoBIServerUrl = settings["ExagoBIServerUrl"];
-					}
-
-					if (settings["ReportAPIURL"])
-					{
-						window.reportAPIURL = settings["ReportAPIURL"];
-					}
+					window.ExagoBIServerUrl = settings["ExagoBIServerUrl"];
+					window.reportAPIURL = settings["ReportAPIURL"];
 				}
 			});
 	};
