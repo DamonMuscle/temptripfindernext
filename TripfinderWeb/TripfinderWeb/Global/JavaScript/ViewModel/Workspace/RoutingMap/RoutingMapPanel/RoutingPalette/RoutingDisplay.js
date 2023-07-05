@@ -2991,10 +2991,16 @@
 		return `${(speed ? self.convertToCurrentMeasurementUnit(speed).toLocaleString(undefined, { maximumFractionDigits: 2 }) : 0)} ${(self.isImperialUnit ? "mph" : "kph")}`;
 	}
 
+	/**
+	 * Perhaps, we can check the property PrimaryDestination to determine whether a stop is the terminal stop
+	 * @param {*} trip 
+	 * @param {*} tripStop 
+	 * @returns 
+	 */
 	RoutingDisplay.prototype.isLastStop = function(trip, tripStop)
 	{
-		var index = trip.TripStops.findIndex(function(i) { return i.id === tripStop.id; });
-		return index === trip.TripStops.length - 1;
+		var index = trip.FieldTripStops.findIndex(function(i) { return i.id === tripStop.id; });
+		return index === trip.FieldTripStops.length - 1;
 	};
 
 	RoutingDisplay.prototype.newTripStop = function(tripStop, session, tripName)
