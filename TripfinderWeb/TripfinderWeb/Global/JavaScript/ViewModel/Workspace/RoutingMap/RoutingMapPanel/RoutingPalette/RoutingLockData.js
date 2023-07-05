@@ -9,9 +9,9 @@
 		this.viewModel = dataModel.viewModel;
 		options.type = function()
 		{
-			return "trip";
+			return "fieldtrip";
 		};
-		options.displayName = "Trip";
+		options.displayName = "Field Trip";
 		options.featureData = this.dataModel.featureData;
 		options.viewModel = dataModel.viewModel.viewModel;
 		options.getAutoRefreshSetting = this.dataModel.getAutoRefreshSetting;
