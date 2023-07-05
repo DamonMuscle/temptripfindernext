@@ -13,7 +13,7 @@
 		var self = this;
 		self._serverUrl = !window.ExagoBIServerUrl ? DEFAULT_EXAGOBI_SERVER_URL : window.ExagoBIServerUrl;
 		self._webBaseUrl = self._serverUrl + "/Exago/";
-		self._reportAPIURL = window.reportAPIURL && window.reportAPIURL.trim() || tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "routefinderapi").Uri;
+		self._reportAPIURL = `${window.reportAPIURL && window.reportAPIURL.trim() || tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "routefinderapi").Uri}/v2`;
 
 		// Page urls for aspx endpoints in Exago Extensions web app
 		self._exagoAdminPageUrl = self._webBaseUrl + "Admin.aspx";
