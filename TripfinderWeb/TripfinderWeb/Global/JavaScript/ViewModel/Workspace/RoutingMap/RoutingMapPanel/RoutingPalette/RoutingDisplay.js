@@ -2798,19 +2798,19 @@
 		if (nodeData.customData.isTrip)
 		{
 			var tripData = self.dataModel.getTripById(nodeData.id);
-			var totalAssignedStudents = tripData.TripStops
+			var totalAssignedStudents = tripData.FieldTripStops
 				.reduce((prev, curr) => prev.concat(curr.Students), [])
 				.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
 				.length;
 			var totalDistance = 0;
-			tripData.TripStops.map(function(tripStop)
+			tripData.FieldTripStops.map(function(tripStop)
 			{
 				totalDistance += tripStop.Distance;
 			});
-			if (tripData.TripStops.length > 0)
+			if (tripData.FieldTripStops.length > 0)
 			{
-				tripData.StartTime = tripData.TripStops[0].StopTime;
-				tripData.FinishTime = tripData.TripStops[tripData.TripStops.length - 1].StopTime;
+				tripData.StartTime = tripData.FieldTripStops[0].StopTime;
+				tripData.FinishTime = tripData.FieldTripStops[tripData.FieldTripStops.length - 1].StopTime;
 			}
 			tripData.NumTransport = totalAssignedStudents;
 			tripData.Distance = totalDistance;
@@ -2821,16 +2821,16 @@
 			nodeData.set('customData.actualStartTime', tripData.ActualStartTime);
 			nodeData.set('customData.actualEndTime', tripData.ActualEndTime);
 			nodeData.set('customData.color', tripData.color);
-			nodeData.set('customData.stops', tripData.TripStops.length);
+			nodeData.set('customData.stops', tripData.FieldTripStops.length);
 			nodeData.set('customData.distance', self.convertToCurrentMeasurementUnit(totalDistance).toFixed(2));
 			nodeData.set('customData.startTime', convertToMoment(tripData.StartTime).format('h:mm a'));
 			nodeData.set('customData.endTime', convertToMoment(tripData.FinishTime).format('h:mm a'));
 			nodeData.set('customData.tripTotalTime', convertToMoment(tripData.FinishTime).diff(convertToMoment(tripData.StartTime), 'minutes'));
-			nodeData.set('customData.hasDistrictPolicyError', self.viewModel.analyzeTripByDistrictPolicy.hasError(tripData.id));
-			if (self.dataModel.showImpactDifferenceChart())
-			{
-				self.showOptimizeInfo(null, nodeData);
-			}
+			// nodeData.set('customData.hasDistrictPolicyError', self.viewModel.analyzeTripByDistrictPolicy.hasError(tripData.id));
+			// if (self.dataModel.showImpactDifferenceChart())
+			// {
+			// 	self.showOptimizeInfo(null, nodeData);
+			// }
 			if (!notAffectTripStop)
 			{
 				if (self.routingDisplayHelper.checkNodeWasExpanded(nodeData) && nodeData.children && nodeData.children._data)
