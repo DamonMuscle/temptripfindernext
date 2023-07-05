@@ -1070,6 +1070,7 @@
 
 	RoutingDisplayHelper.prototype.getTreeViewTemplate = function()
 	{
+		const hideClassName = 'hide';
 		return `#if(item.level() == 0) {#
 
 				<div class="row tree-trip-row #: item.customData.openType == "View" ? "view-trip" : ""#">
@@ -1086,7 +1087,7 @@
 										<div class="icon refresh #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Refresh Path"></div>
 										<div class="icon delete trip-delete view-disabled-button" title="Delete"></div>
 										<div class="icon copy copyTrip #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="New Copy"></div>
-										<div class="icon info trip-info" title="Info"></div>
+										<div class="icon info trip-info ${hideClassName}" title="Info"></div>
 										<div class="icon zoom-map-to-layers" title="Center Map"></div>
 										<div class="icon show-eye #: item.visible? "" : "hide-eye"#" title="Hide field trip" ></div>
 									</div>
@@ -1118,11 +1119,12 @@
 							<div class="text-hover-overflow-hidden">
 								<div class="text-name k-tripstop-state-hover">#: item.text# </div>
 								<div class="tree-buttons k-tripstop-state-hover">
-									<div class="icon lock-time k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
+									<div class="icon lock-time k-tripstop-state-hover ${hideClassName} #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
 									<div class="icon delete stop-delete k-tripstop-state-hover #: item.customData.openType == "View"||!item.customData.deletable ? "view-disabled-button" : ""#" title="Delete"></div>
-									<div class="icon copy copyStop  #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div><div class="icon info stop-info k-tripstop-state-hover" title="Field Trip Stop Details"></div>
+									<div class="icon copy copyStop ${hideClassName} #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div>
+									<div class="icon info stop-info k-tripstop-state-hover ${hideClassName}" title="Field Trip Stop Details"></div>
 									<div class="icon zoom-map-to-layers k-tripstop-state-hover" title="Center Map" ></div></div></div>
-									<div class="trip-info k-tripstop-state-hover"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">
+									<div class="trip-info k-tripstop-state-hover ${hideClassName}"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">
 
 									#if(!item.customData.schoolCode){#
 									<div style="display:none;" class="student-count-info k-tripstop-state-hover">#:item.customData.session == 2 ? "" : (item.customData.assignedStudentCount==0&&item.customData.totalStudentCount==0?"No Students":(item.customData.assignedStudentCount + " of " + item.customData.totalStudentCount + (item.customData.totalStudentCount == 1 ? " Student " : " Students "))) #</div>
