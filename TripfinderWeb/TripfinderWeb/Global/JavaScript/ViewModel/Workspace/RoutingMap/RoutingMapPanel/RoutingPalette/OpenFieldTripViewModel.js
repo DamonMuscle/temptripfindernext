@@ -18,47 +18,11 @@
 	OpenFieldTripViewModel.prototype.columnSources = {
 		fieldtrip: [
 			{
-				FieldName: "ID",
-				DisplayName: "FieldTripID",
-				DBName: "FieldTripID",
-				Width: '150px',
-				type: "integer",
-				hidden: true,
-				onlyForFilter: true
-			},
-			{
-				FieldName: "PublicId",
-				DisplayName: "ID",
-				Width: '150px',
-				type: "string"
-			},
-			{
-				FieldName: "TotalAmount",
-				DisplayName: "Total Amount",
-				Width: '150px',
-				type: "number"
-			},
-			{
-				FieldName: "FieldTripStageID",
-				Width: '150px',
-				type: "string",
-				hidden: true,
-				onlyForFilter: true
-			},
-			{
-				FieldName: "FieldTripStageName",
-				DisplayName: "Status",
-				Width: '250px',
-				type: "string",
-				template: `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);
-				background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#:FieldTripStageName#</span>`
-			},
-			{
 				FieldName: "Name",
 				DisplayName: "Name",
-				Width: '150px',
+				Width: "150px",
 				type: "string",
-				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.FieldTrip
+				isSortItem: true
 			},
 			{
 				FieldName: "DepartFromSchool",
