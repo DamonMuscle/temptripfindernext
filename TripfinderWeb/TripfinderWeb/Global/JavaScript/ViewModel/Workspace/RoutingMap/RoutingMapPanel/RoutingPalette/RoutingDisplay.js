@@ -2977,7 +2977,7 @@
 
 	function durationToString(text)
 	{
-		return text.substring(1, text.length);
+		return text.startsWith("0") ? text.substring(1, text.length) : text;
 	}
 
 	function loadTimeToString(text)
