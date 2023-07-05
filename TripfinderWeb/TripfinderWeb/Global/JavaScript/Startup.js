@@ -837,13 +837,27 @@
 	Startup.prototype.loadExagoBIServerUrl = function()
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tfsysinfo"), {
-			paramData: { InfoID: 'ExagoBIServerUrl' }
+			 paramData: { "@filter": "in(InfoID,ExagoBIServerUrl,ReportAPIURL)" }
 		}, { overlay: false })
 			.then(function(response)
 			{
 				if (response.Items && response.Items.length > 0)
 				{
-					window.ExagoBIServerUrl = response.Items[0].InfoValue;
+					let settings = {};
+					response.Items.forEach(obj =>
+					{
+						settings[obj.InfoID] = obj.InfoValue;
+					});
+					
+					if (settings["ExagoBIServerUrl"])
+					{
+						window.ExagoBIServerUrl = settings["ExagoBIServerUrl"];
+					}
+
+					if (settings["ReportAPIURL"])
+					{
+						window.reportAPIURL = settings["ReportAPIURL"];
+					}
 				}
 			});
 	};
