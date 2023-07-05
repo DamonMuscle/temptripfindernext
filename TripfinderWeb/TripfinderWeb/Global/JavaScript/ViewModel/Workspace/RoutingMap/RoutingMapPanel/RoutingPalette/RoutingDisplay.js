@@ -2247,7 +2247,7 @@
 	RoutingDisplay.prototype.refreshAllStopNode = function(trip, onlyAffectSchool)
 	{
 		var self = this;
-		trip.TripStops.map(function(tripStop)
+		trip.FieldTripStops.map(function(tripStop)
 		{
 			// if (!IsEmptyString(tripStop.SchoolCode))
 			// {
@@ -2305,7 +2305,7 @@
 		var self = this, students = self.getVisibleStudent(tripStop), nodes = [];
 		var currentMissionId = TF.generateUUID();
 		self.updateMissionDictionary[tripStop.id] = currentMissionId;
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.TripId, 'trip', self.treeview.dataSource);
+		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 		var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
 		if (!tripStopNode)
@@ -3022,7 +3022,7 @@
 				sequence: tripStop.Sequence,
 				geometry: tripStop.geometry,
 				schoolCode: tripStop.SchoolCode,
-				tripId: tripStop.TripId,
+				tripId: tripStop.FieldTripId,
 				tripName: tripName,
 				distance: self.convertToCurrentMeasurementUnit(tripStop.Distance).toFixed(2),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),

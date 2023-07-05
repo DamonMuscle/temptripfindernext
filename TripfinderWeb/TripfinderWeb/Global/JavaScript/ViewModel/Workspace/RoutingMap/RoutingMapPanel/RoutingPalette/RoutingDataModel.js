@@ -3592,7 +3592,7 @@
 		var trips = this.trips;
 		for (var i = 0, l = trips.length; i < l; i++)
 		{
-			var tripStops = trips[i].TripStops;
+			var tripStops = trips[i].FieldTripStops;
 			for (var j = 0; j < tripStops.length; j++)
 			{
 				if (tripStops[j].id == tripStopId || tripStops[j].oldId == tripStopId)
@@ -3923,9 +3923,9 @@
 			{
 				var color = force ? self.colors[index] : self.generateColor(index);
 				trip.color = color;
-				trip.TripStops.map(function(tripStop)
+				trip.FieldTripStops.map(function(fieldTripStop)
 				{
-					tripStop.color = color;
+					fieldTripStop.color = color;
 				});
 			}
 		});
