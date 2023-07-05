@@ -144,6 +144,11 @@
 		}
 	}
 
+	MapCanvasPage.prototype.onMapViewExtentChanges = function(previous, extent, _)
+	{
+		PubSub.publish("on_MapCanvas_MapExtentChange", {previous, extent});
+	}
+
 	MapCanvasPage.prototype._initRevertOperation = function()
 	{
 		var self = this;
@@ -720,7 +725,8 @@
 				onMapViewCreated: () => {
 					self._mapView.extent = TF.createDefaultMapExtent();
 				},
-				onMapViewUpdated: self.onMapViewUpdated.bind(self)
+				onMapViewUpdated: self.onMapViewUpdated.bind(self),
+				onMapViewExtentChanges: self.onMapViewExtentChanges.bind(self),
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;

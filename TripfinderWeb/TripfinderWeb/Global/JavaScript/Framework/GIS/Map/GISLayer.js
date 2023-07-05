@@ -140,12 +140,19 @@
 		{
 			const results = [];
 			const items = this.layer.graphics.items;
-			for (let i = 0; i < items.length; i++)
+			if (geometry === null)
 			{
-				const item = items[i];
-				if (TF.GIS.SDK.geometryEngine.intersects(geometry, item.geometry))
+				results = [].concat(items);
+			}
+			else
+			{
+				for (let i = 0; i < items.length; i++)
 				{
-					results.push(item);
+					const item = items[i];
+					if (TF.GIS.SDK.geometryEngine.intersects(geometry, item.geometry))
+					{
+						results.push(item);
+					}
 				}
 			}
 
@@ -155,7 +162,10 @@
 		{
 			console.warn(`TODO: query features on FeatureLayer`);
 			const queryParams = this.layer.createQuery();
-			queryParams.geometry = geometry;
+			if (geometry !== null)
+			{
+				queryParams.geometry = geometry;
+			}
 			queryParams.where = condition;
 			queryParams.outSpatialReference = { wkid: 102100 };
 			queryParams.returnGeometry = true;

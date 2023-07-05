@@ -139,13 +139,15 @@
 		if (data && (data.add.length > 0))
 		{
 			const addFieldTrips = data.add;
-			// this.fieldTripMap.updatePathArrowLayerRenderer(addFieldTrips);
+			this.fieldTripMap.updatePathArrowLayerRenderer(addFieldTrips);
 
 			for (let i = 0; i < addFieldTrips.length; i++)
 			{
 				const fieldTrip = addFieldTrips[i];
-				this.fieldTripMap.addFieldTrip(fieldTrip);
+				await this.fieldTripMap.addFieldTrip(fieldTrip);
 			}
+
+			this.fieldTripMap.goToStopsExtent();
 		}
 		
 		if (data && (data.delete.length > 0))

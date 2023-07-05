@@ -109,17 +109,18 @@
 	FieldTripMap.prototype.drawStops = function(fieldTrip)
 	{
 		const color = this.getColor(fieldTrip),
+			Color = color,
 			DBID = fieldTrip.DBID,
 			Id = fieldTrip.Id;
 
 		if (fieldTrip.FieldTripStops.length === 0)
 		{
-			let Sequence = 1, attributes = {DBID, Id, Sequence};
+			let Sequence = 1, attributes = {DBID, Id, Sequence, Color};
 			let symbol = this.symbol.tripStop(Sequence, color);
 			this.fieldTripStopLayerInstance?.addPoint(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, symbol, attributes);
 
 			Sequence = 2;
-			attributes = {DBID, Id, Sequence};
+			attributes = {DBID, Id, Sequence, Color};
 			symbol = this.symbol.tripStop(Sequence, color);
 			this.fieldTripStopLayerInstance?.addPoint(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, symbol, attributes);
 		}
@@ -129,12 +130,15 @@
 			for (let i = 0; i < fieldTripStops.length; i++)
 			{
 				const stop = fieldTripStops[i];
-				let Sequence = stop.Sequence, attributes = {DBID, Id, Sequence};
+				let Sequence = stop.Sequence, attributes = {DBID, Id, Sequence, Color};
 				let symbol = this.symbol.tripStop(Sequence, color);
 				this.fieldTripStopLayerInstance?.addPoint(stop.XCoord, stop.YCoord, symbol, attributes);
 			}
 		}
+	}
 
+	FieldTripMap.prototype.goToStopsExtent = function()
+	{
 		const graphics = this.getStopFeatures();
 		this.mapInstance.setExtent(graphics);
 	}
@@ -167,7 +171,8 @@
 		const pathSymbol = this.computePathSymbol(fieldTrip);
 		const DBID = fieldTrip.DBID,
 			Id = fieldTrip.Id,
-			attributes = { DBID, Id };
+			Color = this.getColor(fieldTrip),
+			attributes = { DBID, Id, Color };
 
 		this.fieldTripSequenceLineLayerInstance?.addPolyline(sequencePath, pathSymbol, attributes, afterAdd);
 	}
@@ -197,6 +202,7 @@
 			if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
 			{
 				stopFeature.symbol = this.symbol.tripStop(stopFeature.attributes.Sequence, color);
+				stopFeature.attributes.Color = color;
 			}
 		}
 
@@ -206,6 +212,7 @@
 			if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
 			{
 				pathFeature.symbol = this.symbol.tripPath(color);
+				pathFeature.attributes.Color = color;
 			}
 		}
 
@@ -215,6 +222,7 @@
 			if (sequenceLineFeature.attributes.DBID === DBID && sequenceLineFeature.attributes.Id === Id)
 			{
 				sequenceLineFeature.symbol = this.symbol.tripPath(color);
+				sequenceLineFeature.attributes.Color = color;
 			}
 		}
 	}
@@ -285,9 +293,10 @@
 	FieldTripMap.prototype.computePathAttributes = function(fieldTrip, routeResult)
 	{
 		const DBID = fieldTrip.DBID,
+			Color = this.getColor(fieldTrip),
 			Id = fieldTrip.Id,
 			route = routeResult?.route,
-			attributes = Object.assign({}, route.attributes, {DBID, Id});
+			attributes = Object.assign({}, route.attributes, {DBID, Id, Color});
 		return attributes;
 	}
 
@@ -574,4 +583,5 @@
 
 		return renderer;
 	}
+
 })();
