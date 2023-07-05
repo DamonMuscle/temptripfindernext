@@ -13,6 +13,7 @@
 		var self = this;
 		self._serverUrl = !window.ExagoBIServerUrl ? DEFAULT_EXAGOBI_SERVER_URL : window.ExagoBIServerUrl;
 		self._webBaseUrl = self._serverUrl + "/Exago/";
+		self._reportAPIURL = window.reportAPIURL && window.reportAPIURL.trim() || tf.authManager.supportedProducts.find(p => p.Name && p.Name.toLowerCase() == "routefinderapi").Uri;
 
 		// Page urls for aspx endpoints in Exago Extensions web app
 		self._exagoAdminPageUrl = self._webBaseUrl + "Admin.aspx";
@@ -85,9 +86,8 @@
 
 	ExagoBIHelper.prototype.createReportContextParameter = function(dataSourceId, reportItems, tfVariablesDict)
 	{
-		var apiBaseUrl = tf.api.server(),
-			contextParameter = {
-				APIServer: apiBaseUrl,
+		var contextParameter = {
+				APIServer: this._reportAPIURL,
 				Token: tf.entStorageManager.get("token", true),
 				ClientKey: tf.authManager.clientKey.toLowerCase(),
 				DBID: dataSourceId,
@@ -112,10 +112,9 @@
 	////////////////////////////////////////////////////////////////////////////////////////
 	ExagoBIHelper.prototype.createTFClientContextData = function(dataSourceId)
 	{
-		var apiBaseUrl = tf.api.server(),
-			contextData = {
+		var contextData = {
 				ClientKey: tf.authManager.clientKey.toLowerCase(),
-				ApiServer: apiBaseUrl,
+				ApiServer: this._reportAPIURL,
 				ApiToken: tf.entStorageManager.get("token", true),
 				DBID: dataSourceId,
 				TotalTimeZoneOffsetInMiniutesFromUtc: tf.timezonetotalminutes,
