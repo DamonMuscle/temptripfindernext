@@ -488,7 +488,7 @@
 		return Promise.all([ self._fetchTripData(ids)]).then(function()
 		{
 			self._setOpenType(newTrips, "View");
-			// return self._removeNotOpenViewTrips(data, newTrips);
+			return self._removeNotOpenViewTrips(data, newTrips);
 		}).then(function()
 		{
 			// return self._getSchoolLocations(newTrips);
@@ -519,7 +519,7 @@
 		});
 		if (viewTrips && viewTrips.length > 0)
 		{
-			self.closeByViewTrips(viewTrips);
+			self.closeByViewFieldTrips(viewTrips);
 		}
 		tf.loadingIndicator.showImmediately();
 		return self._filterNotLockTripIds(data).then(function(availableIds)
@@ -664,10 +664,10 @@
 			newTripIds = newTrips.map(function(c) { return c.id; });
 			self.trips = self.trips.concat(newTrips);
 			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
-			// self._removeNotOpenEditTrips(data);
+			self._removeNotOpenEditTrips(data);
 			self.bindColor();
-			
-			/*var p1 = self._fetchTripData(newTripIds);
+
+			var p1 = self._fetchTripData(newTripIds);
 			var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
 			{
 				if (!disableAutoZoom)
@@ -675,12 +675,8 @@
 					self.viewModel.eventsManager.zoomClick({});
 				}
 			});
-			
 			var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
-			
 			return Promise.all([p1, p2, p3]);
-			*/
-			return Promise.resolve();
 		}).then(function(tripsData)
 		{
 			tf.loadingIndicator.tryHide();
@@ -2573,7 +2569,8 @@
 				deleteTrips.push(trip);
 			}
 		});
-		self.closeByTrips(deleteTrips, true);
+		// self.closeByTrips(deleteTrips, true);
+		self.closeByFieldTrips(deleteTrips, true);
 	};
 
 	RoutingDataModel.prototype._removeNotOpenViewTrips = function(openTrips, newTrips)
@@ -2587,7 +2584,8 @@
 				deleteTrips.push(trip);
 			}
 		});
-		return this.closeByViewTrips(deleteTrips, newTrips);
+		// return this.closeByViewTrips(deleteTrips, newTrips);
+		return this.closeByViewFieldTrips(deleteTrips, newTrips);
 	};
 
 	RoutingDataModel.prototype._filterNotLockTripIds = function(trips)
@@ -4059,7 +4057,8 @@
 	RoutingDataModel.prototype.closeAllEditTrips = function()
 	{
 		var self = this;
-		return self.closeByTrips(self.getEditTrips());
+		// return self.closeByTrips(self.getEditTrips());
+		return self.closeByFieldTrips(self.getEditTrips());
 	};
 
 	RoutingDataModel.prototype.closeUnsavedNewTrips = function(trips, noSaveCheck, exceptTrips)
@@ -4253,7 +4252,7 @@
 			self.removeNeedDeleteTrip(viewTripsToClose);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 			// self.clearSchoolLocation(viewTripsToClose);
-			// self.routingStudentManager.refresh();
+			self.routingStudentManager.refresh();
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editTripStopModal.closeEditModal();
@@ -4279,7 +4278,8 @@
 	RoutingDataModel.prototype.closeAllViewTrips = function()
 	{
 		var self = this;
-		return self.closeByViewTrips(self.getViewTrips());
+		// return self.closeByViewTrips(self.getViewTrips());
+		return self.closeByViewFieldTrips(self.getViewTrips());
 	};
 
 	RoutingDataModel.prototype.getViewTrips = function()
@@ -5582,7 +5582,8 @@
 		});
 		if (viewTrips && viewTrips.length > 0)
 		{
-			self.closeByViewTrips(viewTrips);
+			// self.closeByViewTrips(viewTrips);
+			self.closeByViewFieldTrips(viewTrips);
 		}
 		var promise = Promise.resolve();
 		if (unsavedNewTrips.length > 0)
@@ -5593,7 +5594,8 @@
 		{
 			return promise.then(function()
 			{
-				return self.closeByTrips(editTrips, notifyChange);
+				// return self.closeByTrips(editTrips, notifyChange);
+				return self.closeByFieldTrips(editTrips, notifyChange);
 			});
 		}
 		else
