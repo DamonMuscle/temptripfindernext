@@ -799,7 +799,7 @@
 							{
 								for (var key in self.allRecords[i])
 								{
-									if (self.allRecords[i].hasOwnProperty(key) && data.hasOwnProperty(key))
+									if (self.allRecords[i].hasOwnProperty(key) && data.hasOwnProperty(key) && data[key] !== null && data[key] !== undefined)
 									{
 										self.allRecords[i][key] = data[key];
 									}
