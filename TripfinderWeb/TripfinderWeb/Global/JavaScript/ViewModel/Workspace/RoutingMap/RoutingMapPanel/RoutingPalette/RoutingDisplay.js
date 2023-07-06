@@ -477,71 +477,46 @@
 		}
 	}
 
-	RoutingDisplay.prototype.resetTripInfo = function(trips, notReset, clearOptimizeImpact, resetScheduleTime)
+	RoutingDisplay.prototype.resetTripInfo = function(fieldTrips, notReset, clearOptimizeImpact, resetScheduleTime)
 	{
-		var self = this, tripStopRouteDictionary = {};
-		if (trips === null || trips === undefined)
+		const self = this;
+		if (fieldTrips === null || fieldTrips === undefined)
 		{
 			return Promise.resolve(true);
 		}
-		//remove route stop path, cause route stop property contain _map property, json copy would catch circular sturcture error
-		trips.map(function(trip)
+
+		return self.dataModel.recalculate(fieldTrips).then(function(response)
 		{
-			trip.TripStops.map(function(tripStop)
+			var fieldTripData = response;
+			for (var i = 0; i < fieldTripData.length; i++)
 			{
-				if (tripStop.routeStops)
-				{
-					if (isNullObj(tripStopRouteDictionary[tripStop.id]))
-					{
-						tripStopRouteDictionary[tripStop.id] = tripStop.routeStops;
-					}
-					delete tripStop.routeStops;
-				}
-			});
-		})
-		return self.dataModel.recalculate(trips).then(function(response)
-		{
-			trips.map(function(trip)
-			{
-				//revert removed route stop property
-				trip.TripStops.map(function(tripStop)
-				{
-					if (tripStopRouteDictionary[tripStop.id])
-					{
-						tripStop.routeStops = tripStopRouteDictionary[tripStop.id];
-					}
-				});
-			})
-			var tripData = response;
-			for (var i = 0; i < tripData.length; i++)
-			{
-				if (trips[i].TripStops.length != tripData[i].TripStops.length)
+				if (fieldTrips[i].FieldTripStops.length != fieldTripData[i].FieldTripStops.length)
 				{
 					continue;
 				}
-				trips[i].NumTransport = tripData[i].NumTransport;
-				trips[i].MaxOnBus = tripData[i].MaxOnBus;
-				trips[i].Distance = tripData[i].Distance;
-				let tripDataTrip = tripData.find(r => r.id == trips[i].id);
+				fieldTrips[i].NumTransport = fieldTripData[i].NumTransport;
+				fieldTrips[i].MaxOnBus = fieldTripData[i].MaxOnBus;
+				fieldTrips[i].Distance = fieldTripData[i].Distance;
+				let tripDataTrip = fieldTripData.find(r => r.id == fieldTrips[i].id);
 				if (tripDataTrip)
 				{
-					for (var j = 0; j < trips[i].TripStops.length; j++)
+					for (var j = 0; j < fieldTrips[i].FieldTripStops.length; j++)
 					{
-						let tripDataStop = tripDataTrip.TripStops.find(n => n.id == trips[i].TripStops[j].id);
+						let tripDataStop = tripDataTrip.FieldTripStops.find(n => n.id == fieldTrips[i].FieldTripStops[j].id);
 						if (!tripDataStop) { continue; }
-						trips[i].TripStops[j].TotalStopTime = tripDataStop.TotalStopTime;
-						trips[i].TripStops[j].Duration = tripDataStop.Duration;
+						fieldTrips[i].FieldTripStops[j].TotalStopTime = tripDataStop.TotalStopTime;
+						fieldTrips[i].FieldTripStops[j].Duration = tripDataStop.Duration;
 					}
 				}
-				self.dataModel.setActualStopTime([trips[i]]);
-				self.dataModel.setStopTimeForEmptyRecords(trips[i]);
+				self.dataModel.setActualStopTime([fieldTrips[i]]);
+				self.dataModel.setStopTimeForEmptyRecords(fieldTrips[i]);
 				if (resetScheduleTime)
 				{
-					self.dataModel.copyStopTimeWithActualTime([trips[i]]);
+					self.dataModel.copyStopTimeWithActualTime([fieldTrips[i]]);
 				}
 				if (!notReset)
 				{
-					var tripNode = self.treeview.dataSource.getFirst(trips[i].id, function(data)
+					var tripNode = self.treeview.dataSource.getFirst(fieldTrips[i].id, function(data)
 					{
 						return data.customData && data.customData.isTrip;
 					});
@@ -555,7 +530,7 @@
 					}
 				}
 			}
-			return Promise.resolve(true);
+			return true;
 		});
 	};
 
