@@ -66,7 +66,6 @@
 		self.routingPaletteViewModel = new TF.RoutingMap.RoutingPaletteViewModel(self, true, routeState);  // {obShow: ko.observable(false)}; // 
 		self.customMapPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.CustomMapPaletteViewModel(self, true, routeState);
 		self.gpsPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GPSPaletteViewModel(self, true, routeState);
-		self.fieldTripViewModel = {obShow: ko.observable(false)};
 		self.geoSearchPaletteViewModel = {obShow: ko.observable(false)}; // new TF.RoutingMap.GeoSearchPaletteViewModel(self, true, routeState);
 		self.routingMapPanelManager = new TF.RoutingMap.RoutingMapPanelManager(self);
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
@@ -670,7 +669,6 @@
 					TF.Map.RoutingMapTool.buildMenuItem('Directions', 'direction', self.directionPaletteViewModel, self.togglePalettePanel, 0),
 					// TF.Map.RoutingMapTool.buildMenuItem('Parcels & Address Points', 'parcels', self.parcelPaletteViewModel, self.togglePalettePanel),
 					TF.Map.RoutingMapTool.buildMenuItem('Geo Search', 'geoSearch', self.geoSearchPaletteViewModel, self.togglePalettePanel, 3),
-					TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.fieldTripViewModel, self.togglePalettePanel, 2),
 					// TF.Map.RoutingMapTool.buildMenuItem('My Base Map Layers', 'maplayers', self.mapLayersPaletteViewModel, self.togglePalettePanel)
 				];
 
@@ -686,7 +684,7 @@
 				}
 				if (tf.authManager.isAuthorizedFor("routingMap", 'read'))
 				{
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Routing', 'routing', self.routingPaletteViewModel, self.togglePalettePanel, 5));
+					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.routingPaletteViewModel, self.togglePalettePanel, 2));
 				}
 
 				// if (tf.authManager.hasWayfinder())
