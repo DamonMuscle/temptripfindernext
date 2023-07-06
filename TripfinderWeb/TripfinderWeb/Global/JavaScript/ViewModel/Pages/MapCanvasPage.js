@@ -684,7 +684,9 @@
 				}
 				if (tf.authManager.isAuthorizedFor("routingMap", 'read'))
 				{
-					palettes.push(TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.routingPaletteViewModel, self.togglePalettePanel, 2));
+					const fieldTripsMenuItem = TF.Map.RoutingMapTool.buildMenuItem('Field Trips', 'fieldTrips', self.routingPaletteViewModel, self.togglePalettePanel, 2);
+					fieldTripsMenuItem.headerAlias = "Routing";
+					palettes.push(fieldTripsMenuItem);
 				}
 
 				// if (tf.authManager.hasWayfinder())

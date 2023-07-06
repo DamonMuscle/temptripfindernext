@@ -179,7 +179,8 @@
 		var menuItem = null;
 		mapTool.rootMenuItem.enum(mapTool.rootMenuItem, function(item)
 		{
-			if (item.header && item.header == self.title)
+			const header = item.headerAlias || item.header;
+			if (header && header === self.title)
 			{
 				menuItem = item;
 			}
