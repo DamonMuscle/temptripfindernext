@@ -40,7 +40,8 @@
 		filterSetField: "",
 		overlay: true,
 		serverPaging: false,
-		getSelectableRecords: null
+		getSelectableRecords: null,
+		additionalFilterItems: [] // this property is taken advantage to control the datasource in the list mover. for example, we show fieldtrips who have been geocoded only.
 	};
 
 	function KendoListMoverWithSearchControlViewModel(selectedData, options)
@@ -1119,7 +1120,7 @@
 			}
 		}
 
-		if(this.options && requestOptions && requestOptions.data)
+		if(this.options && this.options.additionalFilterItems && this.options.additionalFilterItems.length > 0 && requestOptions && requestOptions.data)
 		{
 			requestOptions.data.filterSet = requestOptions.data.filterSet || {};
 			requestOptions.data.filterSet.FilterItems = requestOptions.data.filterSet.FilterItems || [];
@@ -1128,10 +1129,7 @@
 			switch(this.options.GridType)
 			{
 				case "FieldTrip":
-					requestOptions.data.filterSet.FilterItems.splice(0, 0,
-						{ FieldName: "SchoolGeocoded", Operator: "EqualTo", Value: "True"},
-						{ FieldName: "FieldTripDestinationGeocoded", Operator: "EqualTo", Value: "True" }
-					);
+					requestOptions.data.filterSet.FilterItems.splice(0, 0, ...this.options.additionalFilterItems);
 					break;
 				default:
 					break;

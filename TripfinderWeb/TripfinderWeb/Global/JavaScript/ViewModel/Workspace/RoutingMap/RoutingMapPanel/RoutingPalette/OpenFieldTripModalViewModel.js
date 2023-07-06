@@ -19,6 +19,8 @@
 			displayCheckbox: true,
 			type: "fieldtrip",
 			GridType:"FieldTrip",
+			additionalFilterItems: [{ FieldName: "SchoolGeocoded", Operator: "EqualTo", Value: "True"},
+				{ FieldName: "FieldTripDestinationGeocoded", Operator: "EqualTo", Value: "True" }],
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("fieldtrip"));
