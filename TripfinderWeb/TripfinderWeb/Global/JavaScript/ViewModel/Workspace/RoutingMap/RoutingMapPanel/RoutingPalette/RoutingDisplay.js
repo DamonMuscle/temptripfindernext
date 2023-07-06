@@ -1634,7 +1634,7 @@
 		}
 		else if (data.level() == 1)
 		{
-			type = 'tripStop';
+			type = 'fieldTripStop';
 		}
 		else if (data.level() == 2)
 		{

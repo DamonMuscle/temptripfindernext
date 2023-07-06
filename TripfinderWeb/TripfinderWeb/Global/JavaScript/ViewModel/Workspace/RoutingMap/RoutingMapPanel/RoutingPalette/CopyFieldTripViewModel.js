@@ -202,7 +202,7 @@
 			}
 		});
 		var newTrip = JSON.parse(JSON.stringify(fieldTrip));
-		// TF.loopCloneGeometry(newTrip, fieldTrip);
+		TF.loopCloneGeometry(newTrip, fieldTrip);
 		return newTrip;
 	};
 
@@ -296,7 +296,7 @@
 							// self.dataModel.copyFieldTrip(newTrip);
 						}
 						tf.loadingIndicator.tryHide();
-						return newTrip;						
+						return newTrip;
 					});
 				
 				});

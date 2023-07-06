@@ -28,6 +28,7 @@
 
 		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ZoomToLayers", self.onFieldTripMapZoomToLayers.bind(self));
+		PubSub.subscribe("on_FieldTripMap_ZoomToStop", self.onFieldTripMapZoomToStop.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ShowHide", self.onFieldTripMapShowHide.bind(self));
 		PubSub.subscribe("on_FieldTripMap_UpdateColor", self.onFieldTripMapUpdateColor.bind(self));
 		PubSub.subscribe("on_FieldTripMap_TripPathTypeChange", self.onFieldTripMapTripPathTypeChange.bind(self));
@@ -169,6 +170,11 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToLayers = function(_, data)
 	{
 		this.fieldTripMap?.zoomToFieldTripLayers(data);
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToStop = function(_, data)
+	{
+		this.fieldTripMap?.zoomToFieldTripStop(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)

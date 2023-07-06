@@ -192,6 +192,21 @@
 			return;
 		}
 
+		if (type === 'fieldTripStop')
+		{
+			if (data && data.customData && data.customData.geometry)
+			{
+				const { longitude, latitude } = data.customData.geometry;
+				PubSub.publish("on_FieldTripMap_ZoomToStop", { longitude, latitude });
+			}
+			else
+			{
+				console.warn(`Center Map at field trip stop.`);
+			}
+
+			return;
+		}
+
 		var map = this._viewModal._map;
 		var trips = [];
 		if (type != "trip" && data.customData && data.customData.geometry)
