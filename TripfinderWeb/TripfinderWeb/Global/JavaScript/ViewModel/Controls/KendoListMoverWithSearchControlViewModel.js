@@ -263,6 +263,7 @@
 			{
 				leftGrid.obSelectedGridFilterId(null);
 				leftGrid.obSelectedGridFilterClause("");
+				leftGrid.clearKendoGridQuickFilter();
 			}
 
 			self.getAllRecords().then(function()
