@@ -3480,7 +3480,7 @@
 				students: totalAssignedStudents,
 				stops: trip.FieldTripStops.length,
 				tripTotalTime: self.getDurationForFieldTrip(trip),
-				distance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance || 0).toFixed(2),
+				distance: self.getDistanceForFieldTrip(trip),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
 				startTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
 				endTime: convertToMoment(trip.EstimatedReturnDatetime).format('MM-DD-YYYY h:mm a'),
@@ -3514,6 +3514,15 @@
 		let lastStop  = fieldTrip.FieldTripStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
 
 		return moment.duration(moment(lastStop.StopTimeArrive).subtract(moment(firstStop.StopTimeDepart))).asMinutes();
+	}
+
+	RoutingDisplay.prototype.getDistanceForFieldTrip = function(fieldTrip)
+	{
+		let distance = 0;
+
+		fieldTrip.FieldTripStops.forEach((stop) => distance += stop.Distance);
+
+		return this.convertToCurrentMeasurementUnit(distance).toFixed(2);
 	}
 
 	// RoutingDisplay.prototype.refreshNextTripData = function(trips)
