@@ -132,8 +132,8 @@
 				that._value = value;
 				if (moment(value).isValid())
 				{
-					var kendoDateTimePicker = that.inputElement.data('DateTimePicker');
-					kendoDateTimePicker.date(moment(value));
+					var kendoDateTimePicker = that.inputElement.data('kendoDateTimePicker');
+					kendoDateTimePicker.value(moment(value).toDate());
 					var operatorName = getOperatorName(that.inputElement);
 					var format = "MM/dd/yyyy hh:mm tt";
 					var timeOut = that.options.init === true ? 0 : 500;
