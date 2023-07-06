@@ -1304,7 +1304,7 @@
 			<span class="splitter"></span>
 			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
 			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.DepartDateTime #<br/>#: item.customData.EstimatedReturnDateTime #</span>
+			<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
 		</div>`;
 	}
 })();

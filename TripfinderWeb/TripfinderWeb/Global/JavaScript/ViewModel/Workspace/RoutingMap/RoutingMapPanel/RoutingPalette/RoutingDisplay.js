@@ -3482,8 +3482,8 @@
 				tripTotalTime: self.getDurationForFieldTrip(trip),
 				distance: self.getDistanceForFieldTrip(trip),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
-				startTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
-				endTime: convertToMoment(trip.EstimatedReturnDatetime).format('MM-DD-YYYY h:mm a'),
+				startTime: convertToMoment(self.getStartTimeForFieldTrip(trip)).format('MM-DD-YYYY h:mm a'),
+				endTime: convertToMoment(self.getEndTimeForFieldTrip(trip)).format('MM-DD-YYYY h:mm a'),
 				actualStartTime: trip.ActualStartTime,
 				actualEndTime: trip.ActualEndTime,
 				//originalTrip: trip,
@@ -3501,6 +3501,18 @@
 			},
 			items: self.newTripStopData(trip.FieldTripStops, trip)
 		};
+	}
+
+	RoutingDisplay.prototype.getStartTimeForFieldTrip = function(fieldTrip)
+	{
+		const firstStop = fieldTrip.FieldTripStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
+		return firstStop?.StopTimeDepart;
+	}
+
+	RoutingDisplay.prototype.getEndTimeForFieldTrip = function(fieldTrip)
+	{
+		const lastStop = fieldTrip.FieldTripStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
+		return lastStop?.StopTimeArrive;
 	}
 
 	RoutingDisplay.prototype.getDurationForFieldTrip = function(fieldTrip)
