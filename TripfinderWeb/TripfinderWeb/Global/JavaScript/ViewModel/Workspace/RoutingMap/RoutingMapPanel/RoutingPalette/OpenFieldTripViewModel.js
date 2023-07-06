@@ -18,6 +18,20 @@
 	OpenFieldTripViewModel.prototype.columnSources = {
 		fieldtrip: [
 			{
+				FieldName: "PublicId",
+				DisplayName: "ID",
+				Width: '150px',
+				type: "string"
+			},
+			{
+				FieldName: "FieldTripStageName",
+				DisplayName: "Status",
+				Width: '250px',
+				type: "string",
+				template: `<div style='height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);
+				background-color:#: tf.fieldTripGridDefinition.gridDefinition().stageFormatter(data.FieldTripStageId)#;float:left'></div><span>#:FieldTripStageName#</span>`
+			},
+			{
 				FieldName: "Name",
 				DisplayName: "Name",
 				Width: "150px",
@@ -31,85 +45,16 @@
 				type: "string"
 			},
 			{
-				FieldName: "School",
-				DisplayName: "School",
-				Width: '150px',
-				type: "string",
-				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.School.SchoolCode
-			},
-			{
-				FieldName: "SchoolName",
-				DisplayName: "School Name",
-				Width: '250px',
-				type: "string",
-				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.School
-			},
-			{
 				FieldName: "ReturnDate",
 				DisplayName: "Return Date",
 				Width: '160px',
 				type: "date"
 			},
 			{
-				FieldName: "FieldTripContact",
-				DisplayName: "Contact",
-				Width: '150px',
-				type: "string"
-			},
-			{
-				FieldName: "ContactPhone",
-				DisplayName: "Contact Phone",
-				Width: '150px',
-				type: "string",
-				formatType: "phone",
-				template: function(item)
-				{
-					return tf.dataFormatHelper.phoneFormatter(item.ContactPhone) || '';
-				}
-			},
-			{
-				FieldName: "ContactPhoneExt",
-				DisplayName: "Contact Phone Ext.",
-				Width: '130px',
-				type: "string"
-			},
-			{
-				FieldName: "ContactEmail",
-				DisplayName: "Contact Email",
-				Width: '170px',
-				type: "string",
-				attributes: {
-					"class": "k-link"
-				}
-			},
-			{
-				FieldName: "Notes",
-				DisplayName: "Notes",
-				Width: '150px',
-				type: "string"
-			},
-			{
 				FieldName: "Destination",
 				Width: '150px',
 				type: "string",
 				ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.DistinctListValue("FieldTripDestination", "fieldtrip", "Destination")
-			},
-			{
-				FieldName: "DestinationContact",
-				DisplayName: "Destination Contact",
-				Width: '160px',
-				type: "string"
-			},
-			{
-				FieldName: "DestinationContactPhone",
-				DisplayName: "Destination Contact Phone",
-				Width: '190px',
-				type: "string",
-				formatType: "phone",
-				template: function(item)
-				{
-					return tf.dataFormatHelper.phoneFormatter(item.DestinationContactPhone) || '';
-				}
 			},
 			{
 				FieldName: "DepartDate",
