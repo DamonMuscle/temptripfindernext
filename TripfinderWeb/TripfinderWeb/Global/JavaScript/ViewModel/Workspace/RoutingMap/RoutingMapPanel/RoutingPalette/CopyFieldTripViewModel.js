@@ -40,8 +40,8 @@
 		newTrip.Name = this.obName();
 		
 		newTrip.DepartDate = moment(this.obDepartureDateTime()).format("YYYY-MM-DDT00:00:00");
-		newTrip.DepartDateTime = moment(this.obDepartureDateTime()).format("YYYY-MM-DDThh:mm:ss");
-		newTrip.DepartTime = moment(this.obDepartureDateTime()).format("hh:mm");
+		newTrip.DepartDateTime = moment(this.obDepartureDateTime()).format("YYYY-MM-DDTHH:mm:ss");
+		newTrip.DepartTime = moment(this.obDepartureDateTime()).format("HH:mm");
 
 		// when copying from a copied trip, [this.trip.Id] equals to 0. So we take advantage of [this.trip.copyFromFieldTripId]
 		newTrip.copyFromFieldTripId = this.fieldTrip.Id || this.fieldTrip.copyFromFieldTripId;
