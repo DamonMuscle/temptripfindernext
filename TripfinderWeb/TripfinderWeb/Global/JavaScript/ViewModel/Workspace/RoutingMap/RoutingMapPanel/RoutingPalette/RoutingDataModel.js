@@ -603,7 +603,7 @@
 		{
 			self.routingStudentManager.refreshDictionary(null, null);
 			// self.viewModel.drawTool.stopTool.attachClosetStreetToStop(allTripStops); //comment for improve open trip performance.RW-11855
-			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false });
+			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
 			self.setTripOriginalData(newTrips);
 			if (self.showImpactDifferenceChart()) { newTrips.forEach(function(trip) { self.refreshOptimizeSequenceRate(trip.id); }); }
 			/*

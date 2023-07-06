@@ -7,29 +7,24 @@
 	const RoutingPalette_FieldTripPathArrowLayer_Index = 1;
 	const RoutingPalette_FieldTripPathLayerId = "RoutingPalette_FieldTrip_PathLayer";
 	const RoutingPalette_FieldTripPathLayer_Index = 2;
+	const RoutingPalette_FieldTripSequenceLineArrowLayerId = "RoutingPalette_FieldTrip_SequenceLineArrowLayer";
+	const RoutingPalette_FieldTripSequenceLineArrowLayer_Index = 3;
 	const RoutingPalette_FieldTripSequenceLineLayerId = "RoutingPalette_FieldTrip_SequenceLineLayer";
-	const RoutingPalette_FieldTripSequenceLineLayer_Index = 3;
+	const RoutingPalette_FieldTripSequenceLineLayer_Index = 4;
 	const RoutingPalette_FieldTripStopLayerId = "RoutingPalette_FieldTrip_StopLayer";
-	const RoutingPalette_FieldTripStopLayer_Index = 4;
+	const RoutingPalette_FieldTripStopLayer_Index = 5;
 	const PATH_LINE_TYPE = {
 		Path: "Path",
 		Sequence: "Sequence"
 	};
+	const DEBUG_ROUTE = false;
 
 	function FieldTripMap(mapInstance)
 	{
 		this.symbol = new TF.Map.Symbol(),
 		this.mapInstance = mapInstance;
-		this.fieldTripPathArrowLayerInstance = this.mapInstance.getMapLayerInstance(RoutingPalette_FieldTripPathArrowLayerId);
-		this.fieldTripPathLayerInstance = this.mapInstance.getMapLayerInstance(RoutingPalette_FieldTripPathLayerId);
-		this.fieldTripSequenceLineLayerInstance = this.mapInstance.getMapLayerInstance(RoutingPalette_FieldTripSequenceLineLayerId);
-		this.fieldTripStopLayerInstance = this.mapInstance.getMapLayerInstance(RoutingPalette_FieldTripStopLayerId);
-		this.pathLineType = null;
+		this._pathLineType = PATH_LINE_TYPE.Path;
 		this.initLayers();
-		this.defineReadOnlyProperty("fieldTripPathArrowLayerInstance", this.fieldTripPathArrowLayerInstance);
-		this.defineReadOnlyProperty("fieldTripPathLayerInstance", this.fieldTripPathLayerInstance);
-		this.defineReadOnlyProperty("fieldTripSequenceLineLayerInstance", this.fieldTripSequenceLineLayerInstance);
-		this.defineReadOnlyProperty("fieldTripStopLayerInstance", this.fieldTripStopLayerInstance);
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 	}
 
@@ -42,9 +37,20 @@
 		});
 	};
 
+	Object.defineProperty(FieldTripMap.prototype, 'pathLineType', {
+		get() { return this._pathLineType; },
+		set(value)
+		{
+			this._pathLineType = value;
+		},
+		enumerable: false,
+		configurable: false
+	});
+
 	FieldTripMap.prototype.initLayers = async function()
 	{
 		const self = this;
+
 		const totalLayerCount = 3;
 		let layerCount = 0;
 		const onLayerCreatedHandler = (resolve) => {
@@ -55,84 +61,98 @@
 			}
 		};
 
-		return new Promise((resolve, reject) =>
-		{
-			if (self.fieldTripStopLayerInstance &&
-				self.fieldTripPathLayerInstance &&
-				self.fieldTripSequenceLineLayerInstance &&
-				self.fieldTripPathArrowLayerInstance)
-			{
-				resolve();
-			}
-
-			self.fieldTripPathArrowLayerInstance = self.addPathArrowLayer();
-
-			self.fieldTripPathLayerInstance = self.mapInstance.addLayer({
-				id: RoutingPalette_FieldTripPathLayerId,
-				index: RoutingPalette_FieldTripPathLayer_Index,
-				eventHandlers: {
-					onLayerCreated: onLayerCreatedHandler.bind(self, resolve)
-				}
-			})
-
-			self.fieldTripSequenceLineLayerInstance = self.mapInstance.addLayer({
-				id: RoutingPalette_FieldTripSequenceLineLayerId,
-				index: RoutingPalette_FieldTripSequenceLineLayer_Index,
-				eventHandlers: {
-					onLayerCreated: onLayerCreatedHandler.bind(self, resolve)
-				}
-			})
-
-			self.fieldTripStopLayerInstance = self.mapInstance.addLayer({
-				id: RoutingPalette_FieldTripStopLayerId,
-				index: RoutingPalette_FieldTripStopLayer_Index,
+		const addFieldTripMapLayer = (layerId, layerIndex, resolve) => {
+			return self.mapInstance.addLayer({
+				id: layerId,
+				index: layerIndex,
 				eventHandlers: {
 					onLayerCreated: onLayerCreatedHandler.bind(self, resolve)
 				}
 			});
+		};
+
+		return new Promise((resolve, _) =>
+		{
+			if (self.fieldTripStopLayerInstance &&
+				self.fieldTripPathLayerInstance &&
+				self.fieldTripSequenceLineLayerInstance)
+			{
+				resolve();
+			}
+
+			self.fieldTripPathLayerInstance = addFieldTripMapLayer(RoutingPalette_FieldTripPathLayerId, RoutingPalette_FieldTripPathLayer_Index, resolve);
+			self.defineReadOnlyProperty("fieldTripPathLayerInstance", this.fieldTripPathLayerInstance);
+
+			self.fieldTripSequenceLineLayerInstance = addFieldTripMapLayer(RoutingPalette_FieldTripSequenceLineLayerId, RoutingPalette_FieldTripSequenceLineLayer_Index, resolve);
+			self.defineReadOnlyProperty("fieldTripSequenceLineLayerInstance", this.fieldTripSequenceLineLayerInstance);
+
+			self.fieldTripStopLayerInstance = addFieldTripMapLayer(RoutingPalette_FieldTripStopLayerId, RoutingPalette_FieldTripStopLayer_Index, resolve);
+			self.defineReadOnlyProperty("fieldTripStopLayerInstance", this.fieldTripStopLayerInstance);
 		});
+	}
+
+	FieldTripMap.prototype.initArrowLayers = function(fieldTrips)
+	{
+		const self = this;
+		if (self.fieldTripPathArrowLayerInstance && self.fieldTripSequenceLineArrowLayerInstance)
+		{
+			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathArrowLayerId);
+			self.fieldTripPathArrowLayerInstance = null;
+
+			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
+			self.fieldTripSequenceLineArrowLayerInstance = null;
+		}
+
+		const renderer = self.getPathArrowRenderer(fieldTrips);
+		self.fieldTripPathArrowLayerInstance = self.addPathArrowLayer(RoutingPalette_FieldTripPathArrowLayerId, RoutingPalette_FieldTripPathArrowLayer_Index, renderer);
+		self.fieldTripSequenceLineArrowLayerInstance = self.addPathArrowLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId, RoutingPalette_FieldTripSequenceLineArrowLayer_Index, renderer);
 	}
 
 	FieldTripMap.prototype.addFieldTrip = async function(fieldTrip)
 	{
-		this.setPathLineType([fieldTrip], this.PATH_LINE_TYPE.Path);
+		this.sortBySequence(fieldTrip.FieldTripStops);
+
 		this.drawStops(fieldTrip);
 
-		// const routeResult = await this.calculateRoute(fieldTrip);
-		// this.drawFieldTripPath(fieldTrip, routeResult);
+		if (DEBUG_ROUTE)
+		{
+			const routeResult = await this.calculateRoute(fieldTrip);
+			this.drawFieldTripPath(fieldTrip, routeResult);
+		}
 
 		this.drawSequenceLine(fieldTrip, () => {
-			this.hideSequenceLineByDefault(fieldTrip);
+			this.updateFieldTripPathVisible([fieldTrip]);
 		});
 	}
 
 	FieldTripMap.prototype.drawStops = function(fieldTrip)
 	{
-		const color = this.getColor(fieldTrip),
+		const self = this,
+		 	color = self.getColor(fieldTrip),
 			Color = color,
 			DBID = fieldTrip.DBID,
 			Id = fieldTrip.Id;
 
 		if (fieldTrip.FieldTripStops.length === 0)
 		{
-			let Sequence = 1, attributes = {DBID, Id, Sequence, Color};
-			let symbol = this.symbol.tripStop(Sequence, color);
-			this.fieldTripStopLayerInstance?.addPoint(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, symbol, attributes);
+			let Sequence = 2, attributes = {DBID, Id, Sequence, Color};
+			let symbol = self.symbol.tripStop(Sequence, color);
+			self.fieldTripStopLayerInstance?.addPoint(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, symbol, attributes);
 
-			Sequence = 2;
-			attributes = {DBID, Id, Sequence, Color};
-			symbol = this.symbol.tripStop(Sequence, color);
-			this.fieldTripStopLayerInstance?.addPoint(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, symbol, attributes);
+			Sequence = 1, attributes = {DBID, Id, Sequence, Color};
+			symbol = self.symbol.tripStop(Sequence, color);
+			self.fieldTripStopLayerInstance?.addPoint(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, symbol, attributes);
 		}
 		else
 		{
 			const fieldTripStops = fieldTrip.FieldTripStops;
-			for (let i = 0; i < fieldTripStops.length; i++)
+
+			for (let i = fieldTripStops.length - 1; i >= 0; i--)
 			{
 				const stop = fieldTripStops[i];
 				let Sequence = stop.Sequence, attributes = {DBID, Id, Sequence, Color};
-				let symbol = this.symbol.tripStop(Sequence, color);
-				this.fieldTripStopLayerInstance?.addPoint(stop.XCoord, stop.YCoord, symbol, attributes);
+				let symbol = self.symbol.tripStop(Sequence, color);
+				self.fieldTripStopLayerInstance?.addPoint(stop.XCoord, stop.YCoord, symbol, attributes);
 			}
 		}
 	}
@@ -154,7 +174,7 @@
 		}
 		else
 		{
-			const fieldTripStops = fieldTrip.FieldTripStops.sort((a, b) => a.Sequence - b.Sequence);
+			const fieldTripStops = fieldTrip.FieldTripStops;
 			for (let i = 0; i < fieldTripStops.length; i++)
 			{
 				const stop = fieldTripStops[i];
@@ -187,7 +207,12 @@
 		return fieldTrip.color;
 	}
 
-	FieldTripMap.prototype.updateSymbolColor = function(fieldTrip)
+	FieldTripMap.prototype.sortBySequence = function(stops)
+	{
+		return stops.sort((a, b) => a.Sequence - b.Sequence);
+	}
+
+	FieldTripMap.prototype.updateSymbolColor = async function(fieldTrip)
 	{
 		const color = this.getColor(fieldTrip),
 			DBID = fieldTrip.DBID,
@@ -195,35 +220,29 @@
 			stopFeatures = this.getStopFeatures(),
 			pathFeatures = this.getPathFeatures(),
 			sequenceLineFeatures = this.getSequenceLineFeatures();
-		
-		for (let i = 0; i < stopFeatures.length; i++)
+
+		const fieldTripStops = this.queryMapFeatures(stopFeatures, DBID, Id);
+		for (let i = 0; i < fieldTripStops.length; i++)
 		{
-			const stopFeature = stopFeatures[i];
-			if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
-			{
-				stopFeature.symbol = this.symbol.tripStop(stopFeature.attributes.Sequence, color);
-				stopFeature.attributes.Color = color;
-			}
+			const stopFeature = fieldTripStops[i];
+			stopFeature.symbol = this.symbol.tripStop(stopFeature.attributes.Sequence, color);
+			stopFeature.attributes.Color = color;
 		}
 
-		for (let i = 0; i < pathFeatures.length; i++)
+		const fieldTripPaths = this.queryMapFeatures(pathFeatures, DBID, Id);
+		for (let i = 0; i < fieldTripPaths.length; i++)
 		{
-			const pathFeature = pathFeatures[i];
-			if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
-			{
-				pathFeature.symbol = this.symbol.tripPath(color);
-				pathFeature.attributes.Color = color;
-			}
+			const pathFeature = fieldTripPaths[i];
+			pathFeature.symbol = this.symbol.tripPath(color);
+			pathFeature.attributes.Color = color;
 		}
 
-		for (let i = 0; i < sequenceLineFeatures.length; i++)
+		const fieldTripSequenceLines = this.queryMapFeatures(sequenceLineFeatures, DBID, Id);
+		for (let i = 0; i < fieldTripSequenceLines.length; i++)
 		{
-			const sequenceLineFeature = sequenceLineFeatures[i];
-			if (sequenceLineFeature.attributes.DBID === DBID && sequenceLineFeature.attributes.Id === Id)
-			{
-				sequenceLineFeature.symbol = this.symbol.tripPath(color);
-				sequenceLineFeature.attributes.Color = color;
-			}
+			const sequenceLineFeature = fieldTripSequenceLines[i];
+			sequenceLineFeature.symbol = this.symbol.tripPath(color);
+			sequenceLineFeature.attributes.Color = color;
 		}
 	}
 
@@ -252,8 +271,7 @@
 		}
 		else
 		{
-			
-			const fieldTripStops = fieldTrip.FieldTripStops.sort((a, b) => a.Sequence - b.Sequence);;
+			const fieldTripStops = fieldTrip.FieldTripStops;
 			for (let i = 0; i < fieldTripStops.length; i++)
 			{
 				const stop = fieldTripStops[i];
@@ -327,44 +345,23 @@
 			pathFeatures = this.getPathFeatures(),
 			sequenceLineFeatures = this.getSequenceLineFeatures();
 
+		const fieldTripStops = this.queryMapFeatures(stopFeatures, DBID, Id);
+		this.removeMapLayerFeatures(this.fieldTripStopLayerInstance, fieldTripStops);
 
-		for (let i = 0; i < stopFeatures.length; i++)
-		{
-			const stopFeature = stopFeatures[i];
-			if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
-			{
-				this.fieldTripStopLayerInstance?.layer.remove(stopFeature);
-				i--;
-			}
-		}
+		const fieldTripPaths = this.queryMapFeatures(pathFeatures, DBID, Id);
+		this.removeMapLayerFeatures(this.fieldTripPathLayerInstance, fieldTripPaths);
 
-		for (let i = 0; i < pathFeatures.length; i++)
-		{
-			const pathFeature = pathFeatures[i];
-			if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
-			{
-				this.fieldTripPathLayerInstance?.layer.remove(pathFeature);
-				i--;
-			}
-		}
-
-		for (let i = 0; i < sequenceLineFeatures.length; i++)
-		{
-			const sequenceLineFeature = sequenceLineFeatures[i];
-			if (sequenceLineFeature.attributes.DBID === DBID && sequenceLineFeature.attributes.Id === Id)
-			{
-				this.fieldTripSequenceLineLayerInstance?.layer.remove(sequenceLineFeature);
-				i--;
-			}
-		}
+		const fieldTripSequenceLines = this.queryMapFeatures(sequenceLineFeatures, DBID, Id);
+		this.removeMapLayerFeatures(this.fieldTripSequenceLineLayerInstance, fieldTripSequenceLines);
 	}
 
 	FieldTripMap.prototype.zoomToFieldTripLayers = function(fieldTrips)
 	{
-		const graphics = [],
-			stopFeatures = this.getStopFeatures(),
+		const stopFeatures = this.getStopFeatures(),
 			pathFeatures = this.getPathFeatures(),
 			sequenceLineFeatures = this.getSequenceLineFeatures();
+
+		let graphics = [];
 
 		for (let j = 0; j < fieldTrips.length; j++)
 		{
@@ -372,41 +369,44 @@
 			 	DBID = fieldTrip.DBID,
 				Id = fieldTrip.Id;
 
-			for (let i = 0; i < stopFeatures.length; i++)
-			{
-				const stopFeature = stopFeatures[i];
-				if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
-				{
-					graphics.push(stopFeature);
-				}
-			}
-
-			for (let i = 0; i < pathFeatures.length; i++)
-			{
-				const pathFeature = pathFeatures[i];
-				if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
-				{
-					graphics.push(pathFeature);
-				}
-			}
-
-			for (let i = 0; i < sequenceLineFeatures.length; i++)
-			{
-				const sequenceLineFeature = sequenceLineFeatures[i];
-				if (sequenceLineFeature.attributes.DBID === DBID && sequenceLineFeature.attributes.Id === Id)
-				{
-					graphics.push(sequenceLineFeature);
-				}
-			}
+			graphics = graphics.concat(this.queryMapFeatures(stopFeatures, DBID, Id));
+			graphics = graphics.concat(this.queryMapFeatures(pathFeatures, DBID, Id));
+			graphics = graphics.concat(this.queryMapFeatures(sequenceLineFeatures, DBID, Id));
 		}
 
 		this.mapInstance.setExtent(graphics);
 	}
 
-	FieldTripMap.prototype.setFieldTripVisible = function(fieldTrips)
+	FieldTripMap.prototype.queryMapFeatures = function(features, DBID, Id)
+	{
+		const results = [];
+		for (let i = 0; i < features.length; i++)
+		{
+			const feature = features[i];
+			if (feature.attributes.DBID === DBID && feature.attributes.Id === Id)
+			{
+				results.push(feature);
+			}
+		}
+
+		return results;
+	}
+
+	FieldTripMap.prototype.removeMapLayerFeatures = function(layerInstance, removeFeatures)
+	{
+		for (let i = 0; i < removeFeatures.length; i++)
+		{
+			const feature = removeFeatures[i];
+			layerInstance?.layer.remove(feature);
+		}
+	}
+
+	FieldTripMap.prototype.setFieldTripVisible = async function(fieldTrips)
 	{
 		this.setFieldTripStopVisible(fieldTrips);
+
 		this.setFieldTripPathVisible(fieldTrips);
+
 		this.setFieldTripSequenceLineVisible(fieldTrips);
 	}
 
@@ -420,14 +420,8 @@
 				Id = fieldTrip.Id,
 				visible = fieldTrip.visible;
 
-			for (let j = 0; j < stopFeatures.length; j++)
-			{
-				const stopFeature = stopFeatures[j];
-				if (stopFeature.attributes.DBID === DBID && stopFeature.attributes.Id === Id)
-				{
-					stopFeature.visible = visible;
-				}
-			}
+			const fieldTripStops = this.queryMapFeatures(stopFeatures, DBID, Id);
+			this.updateMapFeaturesVisible(fieldTripStops, visible);
 		}
 	}
 
@@ -446,14 +440,8 @@
 				visible = false;
 			}
 
-			for (let j = 0; j < pathFeatures.length; j++)
-			{
-				const pathFeature = pathFeatures[j];
-				if (pathFeature.attributes.DBID === DBID && pathFeature.attributes.Id === Id)
-				{
-					pathFeature.visible = visible;
-				}
-			}
+			const fieldTripPaths = this.queryMapFeatures(pathFeatures, DBID, Id);
+			this.updateMapFeaturesVisible(fieldTripPaths, visible);
 		}
 	}
 
@@ -472,14 +460,17 @@
 				visible = false;
 			}
 
-			for (let j = 0; j < sequenceLineFeatures.length; j++)
-			{
-				const sequenceLineFeature = sequenceLineFeatures[j];
-				if (sequenceLineFeature.attributes.DBID === DBID && sequenceLineFeature.attributes.Id === Id)
-				{
-					sequenceLineFeature.visible = visible;
-				}
-			}
+			const fieldTripSequenceLines = this.queryMapFeatures(sequenceLineFeatures, DBID, Id);
+			this.updateMapFeaturesVisible(fieldTripSequenceLines, visible);
+		}
+	}
+
+
+	FieldTripMap.prototype.updateMapFeaturesVisible = function(features, visible)
+	{
+		for (let i = 0; i < features.length; i++)
+		{
+			features[i].visible = visible;
 		}
 	}
 
@@ -498,25 +489,24 @@
 		return this.fieldTripSequenceLineLayerInstance?.layer.graphics.items || [];
 	}
 
-	FieldTripMap.prototype.setPathLineType = function(fieldTrips, type)
+	FieldTripMap.prototype.setPathLineType = function(isSequencePath)
 	{
-		if (this.pathLineType === type)
-		{
-			return;
-		}
+		this.pathLineType = isSequencePath ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
+	}
 
-		this.pathLineType = type;
-
+	FieldTripMap.prototype.updateFieldTripPathVisible = async function(fieldTrips)
+	{
 		this.setFieldTripPathVisible(fieldTrips);
+
 		this.setFieldTripSequenceLineVisible(fieldTrips);
 	}
 
-	FieldTripMap.prototype.addPathArrowLayer = function()
+	FieldTripMap.prototype.addPathArrowLayer = function(layerId, layerIndex, renderer)
 	{
 		const self = this;
 		const arrowLayer = self.mapInstance.addLayer({
-			id: RoutingPalette_FieldTripPathArrowLayerId,
-			index: RoutingPalette_FieldTripPathArrowLayer_Index,
+			id: layerId,
+			index: layerIndex,
 			geometryType: self.mapInstance.GEOMETRY_TYPE.POINT,
 			objectIdField: "oid",
 			spatialReference: {
@@ -531,29 +521,20 @@
 					name: "angle",
 					type: "double"
 				}, {
-					name: "entityId",
-					type: "string"
+					name: "DBID",
+					type: "integer"
 				}, {
-					name: "color",
+					name: "Id",
+					type: "integer"
+				}, {
+					name: "Color",
 					type: "string"
 				}],
 			source: [],
-			renderer: null
+			renderer: renderer
 		}, self.mapInstance.LAYER_TYPE.FEATURE);
 
 		return arrowLayer;
-	}
-
-	FieldTripMap.prototype.updatePathArrowLayerRenderer = function(fieldTrips)
-	{
-		const self = this;
-		if (!self.fieldTripPathArrowLayerInstance)
-		{
-			return;
-		}
-
-		const renderer = self.getPathArrowRenderer(fieldTrips);
-		self.fieldTripPathArrowLayerInstance.layer.renderer = renderer;
 	}
 
 	FieldTripMap.prototype.getPathArrowRenderer = function(fieldTrips)
@@ -571,7 +552,7 @@
 
 		const renderer = {
 			type: "unique-value",
-			field: "color",
+			field: "Color",
 			defaultSymbol: this.symbol.arrow(),
 			visualVariables: [{
 				type: "rotation",
@@ -583,5 +564,4 @@
 
 		return renderer;
 	}
-
 })();

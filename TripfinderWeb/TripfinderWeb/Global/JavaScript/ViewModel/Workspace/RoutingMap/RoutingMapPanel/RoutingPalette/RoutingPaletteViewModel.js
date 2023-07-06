@@ -131,6 +131,7 @@
 		{
 			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
 		}
+		this.fieldTripMap.setPathLineType(data.isSequencePath);
 		await this.displayFieldTripPath(data);
 	}
 
@@ -139,7 +140,7 @@
 		if (data && (data.add.length > 0))
 		{
 			const addFieldTrips = data.add;
-			this.fieldTripMap.updatePathArrowLayerRenderer(addFieldTrips);
+			this.fieldTripMap.initArrowLayers(addFieldTrips);
 
 			for (let i = 0; i < addFieldTrips.length; i++)
 			{
@@ -176,9 +177,10 @@
 		this.fieldTripMap?.updateSymbolColor(data);
 	}
 
-	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, type)
+	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequencePath)
 	{
-		this.fieldTripMap?.setPathLineType(this.dataModel.trips, type);
+		this.fieldTripMap?.setPathLineType(isSequencePath);
+		this.fieldTripMap?.updateFieldTripPathVisible(this.dataModel.trips);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()
