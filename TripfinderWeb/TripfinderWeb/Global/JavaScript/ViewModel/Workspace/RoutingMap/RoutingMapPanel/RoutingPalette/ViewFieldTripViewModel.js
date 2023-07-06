@@ -187,8 +187,9 @@
 		});
 	};
 
-	ViewFieldTripViewModel.prototype.filterMenuClick = function()
+	ViewFieldTripViewModel.prototype.filterMenuClick = function(model, e)
 	{
+		this.createFilterMenu(model, e);
 	};
 
 	ViewFieldTripViewModel.prototype.onBeforeLeftGridDataBound = function()
