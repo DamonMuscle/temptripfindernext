@@ -86,7 +86,8 @@
 	OpenFieldTripViewModel.prototype._getSourceFromResponse = function(response)
 	{
 		let p1 = TF.Control.KendoListMoverWithSearchControlViewModel.prototype._getSourceFromResponse.call(this, response).then(records => records);
-		let p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase("v2"), "travelscenarios")).then(data => data.Items);
+		// let p2 = tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase("v2"), "travelscenarios")).then(data => data.Items);
+		let p2 = Promise.resolve([]);
 		let p3 = this.options.getLockedInfo().then(lockedInfo => lockedInfo);
 		return Promise.all([p1, p2, p3]).then(result =>
 		{
