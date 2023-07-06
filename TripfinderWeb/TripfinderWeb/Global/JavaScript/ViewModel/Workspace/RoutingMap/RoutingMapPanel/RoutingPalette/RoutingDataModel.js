@@ -4149,6 +4149,15 @@
 			{
 				tf.loadingIndicator.showImmediately();
 
+				if (!result)
+				{
+					fieldTrips.forEach(function(trip)
+					{
+						self.deleteChangeDataStackByTripId(trip.id);
+					});
+
+				}
+
 				if (fieldTrips.length > 0)
 				{
 					self.removeNeedDeleteTrip(fieldTrips);
