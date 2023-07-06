@@ -232,6 +232,9 @@
 		return self.dataModel.validateUniqueFieldTripName(self.obName()).then(function()
 		{
 			return true;
+		}, function()
+		{
+			return false;
 		});
 	};
 
