@@ -15,7 +15,7 @@
 		this.obCreateTrip = ko.observable(true);
 		this.obTripType = ko.observable(fieldTrip.Session);
 		this.obName = ko.observable(fieldTrip.Name + ' Copy');
-		this.obDepartureDateTime = ko.observable(new Date());
+		this.obDepartureDateTime = ko.observable(fieldTrip.DepartDateTime);
 		this.disableEditOption = ko.computed(function()
 		{
 			if (self.obTripType() != self.fieldTrip.Session)
