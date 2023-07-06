@@ -183,7 +183,7 @@
 				addingItems = [],
 				updateinItems = [];
 
-			 fieldTrips.forEach(function(fieldTrip)
+			 fieldTrips.filter(fieldTrip => fieldTrip.Id != 0).forEach(function(fieldTrip)
 			 {
 				const schoolStop = {
 						DBID: fieldTrip.DBID,
