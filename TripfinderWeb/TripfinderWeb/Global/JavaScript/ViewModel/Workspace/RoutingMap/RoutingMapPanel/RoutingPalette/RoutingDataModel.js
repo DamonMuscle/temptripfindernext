@@ -498,7 +498,7 @@
 			// self.setStudentTravelTime(self.trips);
 			// self.setAllStudentValidProperty(self.trips);
 			// self.routingStudentManager.refresh();
-			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false });
+			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
 		});
 	};
 

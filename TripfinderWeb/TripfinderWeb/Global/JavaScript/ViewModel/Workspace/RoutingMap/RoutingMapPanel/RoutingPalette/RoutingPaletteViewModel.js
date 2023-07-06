@@ -147,8 +147,6 @@
 				const fieldTrip = addFieldTrips[i];
 				await this.fieldTripMap.addFieldTrip(fieldTrip);
 			}
-
-			this.fieldTripMap.goToStopsExtent();
 		}
 		
 		if (data && (data.delete.length > 0))
@@ -159,6 +157,12 @@
 				const fieldTrip = deleteFieldTrips[i];
 				this.fieldTripMap.removeFieldTrip(fieldTrip);
 			}
+		}
+
+		const fieldTrips = this.dataModel.trips;
+		if (fieldTrips.length > 0)
+		{
+			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
 		}
 	}
 
