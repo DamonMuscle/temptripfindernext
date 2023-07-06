@@ -3035,8 +3035,9 @@
 				}
 				else
 				{
+					let pauseDuration = moment.duration(moment(trips[i].FieldTripStops[j].StopTimeDepart).diff(moment(trips[i].FieldTripStops[j].StopTimeArrive))).asMinutes();
 					trips[i].FieldTripStops[j].StopTimeArrive = actualStopTime;
-					trips[i].FieldTripStops[j].StopTimeDepart = moment(actualStopTime).add(Math.ceil(moment.duration(trips[i].FieldTripStops[j].Duration).asMinutes()), "minutes").format(stopTimeFormat);
+					trips[i].FieldTripStops[j].StopTimeDepart = moment(actualStopTime).add(Math.ceil(pauseDuration), "minutes").format(stopTimeFormat);
 				}
 
 				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j].ActualStopTime).format("HH:mm:ss");
@@ -3448,33 +3449,43 @@
 
 			for (j = lockStopIndex + 1; j < trips[i].FieldTripStops.length; j++)
 			{
-				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart).subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive)).format("HH:mm:ss");
-				let stopsDuration = moment(trips[i].FieldTripStops[j].StopTimeArrive).subtract(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart)).format("HH:mm:ss");
-				let actualStopTime = moment(trips[i].FieldTripStops[j - 1].ActualStopTime, stopTimeFormat)
-											.add(Math.ceil(moment.duration(trips[i].FieldTripStops[j - 1].Duration).asMinutes()), "minutes")
-											.add(Math.ceil(moment.duration(stopsDuration).asMinutes()), "minutes").format(stopTimeFormat);
+				let previousPauseDuration = 0;
+				let previousStop = trips[i].FieldTripStops[j - 1];
+				if (previousStop.StopTimeArrive && previousStop.StopTimeDepart)
+				{
+					previousPauseDuration = moment.duration(moment(previousStop.StopTimeDepart).diff(moment(previousStop.StopTimeArrive))).asMinutes();
+				}
+				
+				let stopsDuration = moment.duration(moment(trips[i].FieldTripStops[j].StopTimeArrive).diff(moment(previousStop.StopTimeDepart))).asMinutes();
+				let actualStopTime = moment(previousStop.ActualStopTime, stopTimeFormat)
+											.add(Math.ceil(previousPauseDuration), "minutes")
+											.add(Math.ceil(stopsDuration), "minutes")
+											.format(stopTimeFormat);
 
-				trips[i].FieldTripStops[j].Duration = duration;
 				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;
 			}
 			for (j = lockStopIndex - 1; j > -1; j--)
 			{
-				let duration = moment(trips[i].FieldTripStops[j].StopTimeDepart).subtract(moment(trips[i].FieldTripStops[j].StopTimeArrive)).format("HH:mm:ss");
-				let stopsDuration = moment(trips[i].FieldTripStops[j].StopTimeArrive).subtract(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart)).format("HH:mm:ss");
-				let actualStopTime = moment(trips[i].FieldTripStops[j + 1].ActualStopTime, stopTimeFormat)
-											.add(Math.ceil(moment.duration(trips[i].FieldTripStops[j + 1].Duration).asMinutes()), "minutes")
-											.subtract(Math.ceil(moment.duration(stopsDuration).asMinutes()), "minutes").format(stopTimeFormat);
+				let nextPauseDuration = 0;
+				let nextPauseStop = trips[i].FieldTripStops[j + 1];
+				if (nextPauseStop.StopTimeArrive && nextPauseStop.StopTimeDepart)
+				{
+					nextPauseDuration = moment.duration(moment(nextPauseStop.StopTimeDepart).diff(moment(nextPauseStop.StopTimeArrive))).asMinutes();
+				}
 
-				trips[i].FieldTripStops[j].Duration = duration;
+				let stopsDuration = moment.duration(moment(trips[i].FieldTripStops[j].StopTimeArrive).diff(moment(trips[i].FieldTripStops[j - 1].StopTimeDepart))).asMinutes();
+				let actualStopTime = moment(trips[i].FieldTripStops[j + 1].ActualStopTime, stopTimeFormat)
+											.add(Math.ceil(nextPauseDuration), "minutes")
+											.subtract(Math.ceil(stopsDuration), "minutes")
+											.format(stopTimeFormat);
+
 				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;
 			}
 			if (trips[i].FieldTripStops.length > 0)
 			{
 				trips[i].FieldTripStops[0].StopTimeDepart = trips[i].FieldTripStops[0].ActualStopTime.format(stopTimeFormat);
-				trips[i].FieldTripStops[0].Duration = "00:00:00";
 
 				trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].StopTimeArrive = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime.format(stopTimeFormat);
-				trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].Duration = "00:00:00";
 			}
 		}
 	};
