@@ -180,8 +180,7 @@
 			}
 		}).then(function(response){
 			const existingItems = response.Items,
-				addingItems = [],
-				updateinItems = [];
+				addingItems = [];
 
 			 fieldTrips.filter(fieldTrip => fieldTrip.Id != 0).forEach(function(fieldTrip)
 			 {
@@ -194,7 +193,7 @@
 						Street: fieldTrip.SchoolName,
 						FieldTripDestinationId: 0,
 						Sequence: 1,
-						StopTimeDepart: fieldTrip.DepartDate
+						StopTimeDepart: clientTimeZoneToUtc(fieldTrip.DepartDateTime)
 					},
 					terminalStop = {
 						DBID: fieldTrip.DBID,
@@ -205,6 +204,7 @@
 						FieldTripDestinationId: fieldTrip.FieldTripDestinationId,
 						Street: fieldTrip.DestinationStreet || fieldTrip.Destination,
 						Sequence: existingItems.filter(x => x.FieldTripId == fieldTrip.Id && !x.PrimaryDeparture && !x.PrimaryDestination).length + 2,
+						StopTimeArrive: clientTimeZoneToUtc(fieldTrip.EstimatedReturnDateTime)
 					};
 
 				if(!existingItems.find(x => x.FieldTripId == fieldTrip.Id && x.LockStopTime))
@@ -216,18 +216,10 @@
 				{
 					addingItems.push(schoolStop);
 				}
-				else
-				{
-					updateinItems.push($.extend({},existingItems.find(item => item.PrimaryDeparture && item.FieldTripId == fieldTrip.Id),schoolStop));
-				}
 
 				if(!existingItems.some(item => item.PrimaryDestination && item.FieldTripId == fieldTrip.Id))
 				{
 					addingItems.push(terminalStop);
-				}
-				else
-				{
-					updateinItems.push($.extend({},existingItems.find(item => item.PrimaryDestination && item.FieldTripId == fieldTrip.Id),terminalStop));
 				}
 			});
 
@@ -235,10 +227,6 @@
 			if(addingItems.length)
 			{
 				p.push(tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(),"fieldtripstops"), {data: addingItems}));
-			}
-			if(updateinItems.length)
-			{
-				p.push(tf.promiseAjax.put(pathCombine(tf.api.apiPrefix(),"fieldtripstops"), {data: updateinItems}));
 			}
 
 			return Promise.all(p);

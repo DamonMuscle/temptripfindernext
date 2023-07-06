@@ -1172,7 +1172,7 @@
 
 									#if(!item.customData.schoolCode){#
 									<span class="arrival-time-span k-tripstop-state-hover"><div class="locked-time #: item.customData.lockStopTime ? "active" : ""#"></div>
-									<span title="Scheduled time" class="schedule-time">#:item.customData.stopTime#</span> #:" | "#
+									<span title="Scheduled time" class="schedule-time">#:utcToClientTimeZone(item.customData.stopTime).format("MM/DD/YYYY hh:mm A")#</span> #:" | "#
 									<span title="Avg. Speed" class="#: item.customData.isLast ? "" : "avg-speed" #">#:item.customData.isLast ? "<none>" : item.customData.avgSpeed #</span>#:" | "#
 									<span title="Distance">#:item.customData.isLast ? "<none>" : item.customData.distance + " " + item.customData.measurementUnit #</span>#:" | "#
 									<span title="Duration">#:item.customData.isLast ? "<none>" : item.customData.duration#</span>
@@ -1304,7 +1304,7 @@
 			<span class="splitter"></span>
 			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
 			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
+			<span class="info-block">#: utcToClientTimeZone(item.customData.startTime).format("MM/DD/YYYY hh:mm A") #<br/>#: utcToClientTimeZone(item.customData.endTime).format("MM/DD/YYYY hh:mm A") #</span>
 		</div>`;
 	}
 })();
