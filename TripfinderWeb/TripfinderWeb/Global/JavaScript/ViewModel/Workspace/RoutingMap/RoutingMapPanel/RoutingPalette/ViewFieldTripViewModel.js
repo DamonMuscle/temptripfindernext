@@ -19,7 +19,8 @@
 				FieldName: "PublicId",
 				DisplayName: "ID",
 				Width: '150px',
-				type: "string"
+				type: "string",
+				isSortItem: true
 			},
 			{
 				FieldName: "FieldTripStageName",
@@ -34,7 +35,6 @@
 				DisplayName: "Name",
 				Width: "150px",
 				type: "string",
-				isSortItem: true
 			},
 			{
 				FieldName: "DepartFromSchool",
