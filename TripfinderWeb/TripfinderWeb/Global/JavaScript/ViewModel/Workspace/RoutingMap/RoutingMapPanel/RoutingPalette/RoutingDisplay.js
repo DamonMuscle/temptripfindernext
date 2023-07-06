@@ -3504,7 +3504,7 @@
 				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
 				students: totalAssignedStudents,
 				stops: trip.FieldTripStops.length,
-				tripTotalTime: convertToMoment(trip.EstimatedReturnDateTime).diff(convertToMoment(trip.DepartDateTime), 'minutes'),
+				tripTotalTime: self.getDurationForFieldTrip(trip),
 				distance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance || 0).toFixed(2),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
 				startTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
@@ -3526,6 +3526,19 @@
 			},
 			items: self.newTripStopData(trip.FieldTripStops, trip)
 		};
+	}
+
+	RoutingDisplay.prototype.getDurationForFieldTrip = function(fieldTrip)
+	{
+		if(fieldTrip.FieldTripStops.length < 2)
+		{
+			return 0;
+		}
+
+		let firstStop = fieldTrip.FieldTripStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
+		let lastStop  = fieldTrip.FieldTripStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
+
+		return moment.duration(moment(lastStop.StopTimeArrive).subtract(moment(firstStop.StopTimeDepart))).asMinutes();
 	}
 
 	// RoutingDisplay.prototype.refreshNextTripData = function(trips)
