@@ -2621,7 +2621,7 @@
 			}
 
 			var trip = self.dataModel.getTripById(nodeData.customData.tripId),
-				isLast = self.isLastStop(trip, tripStopData);
+				isLast = self.isLastStop(tripStopData);
 			if (tripStopData && tripStopData.TotalStudentCount != null)
 			{
 				nodeData.set('customData.totalStudentCount', tripStopData.TotalStudentCount);
@@ -2972,17 +2972,16 @@
 	 * @param {*} tripStop 
 	 * @returns 
 	 */
-	RoutingDisplay.prototype.isLastStop = function(trip, tripStop)
+	RoutingDisplay.prototype.isLastStop = function(tripStop)
 	{
-		var index = trip.FieldTripStops.findIndex(function(i) { return i.id === tripStop.id; });
-		return index === trip.FieldTripStops.length - 1;
+		return tripStop.PrimaryDestination;
 	};
 
 	RoutingDisplay.prototype.newTripStop = function(tripStop, session, tripName)
 	{
 		var self = this,
 			trip = self.dataModel.trips.find(function(i) { return i.Name === tripName; }),
-			isLast = self.isLastStop(trip, tripStop);
+			isLast = self.isLastStop(tripStop);
 		return {
 			id: tripStop.id,
 			text: tripStop.Street,
