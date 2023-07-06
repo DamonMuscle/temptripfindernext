@@ -3525,7 +3525,7 @@
 		let firstStop = fieldTrip.FieldTripStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
 		let lastStop  = fieldTrip.FieldTripStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
 
-		return moment.duration(moment(lastStop.StopTimeArrive).subtract(moment(firstStop.StopTimeDepart))).asMinutes();
+		return moment.duration(moment(lastStop.StopTimeArrive).diff(moment(firstStop.StopTimeDepart))).asMinutes();
 	}
 
 	RoutingDisplay.prototype.getDistanceForFieldTrip = function(fieldTrip)
