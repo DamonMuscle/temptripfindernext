@@ -720,16 +720,6 @@
 				requestOption.data.filterSet.UDGridID = uDGridID;
 				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
 				break;
-			case 'FieldTrip':
-				requestOption.data.filterSet = {
-					FilterItems:[ 
-						{ FieldName: "SchoolGeocoded", Operator: "EqualTo", Value: "True"},
-						{ FieldName: "FieldTripDestinationGeocoded", Operator: "EqualTo", Value: "True" }
-					],
-					LogicalOperator: "and"
-				};
-				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
-				break;
 			default:
 				promise = tf.promiseAjax.post(self.setLeftGridRequestURL(self.options.getUrl(self.options.type, self.options)), requestOption);
 				break;
@@ -1126,6 +1116,25 @@
 			else
 			{
 				requestOptions.data.filterSet.FilterItems.push(this.options.gridOptions.filter);
+			}
+		}
+
+		if(this.options && requestOptions && requestOptions.data)
+		{
+			requestOptions.data.filterSet = requestOptions.data.filterSet || {};
+			requestOptions.data.filterSet.FilterItems = requestOptions.data.filterSet.FilterItems || [];
+			requestOptions.data.filterSet.LogicalOperator = requestOptions.data.filterSet.LogicalOperator || "and";
+
+			switch(this.options.GridType)
+			{
+				case "FieldTrip":
+					requestOptions.data.filterSet.FilterItems.splice(0, 0,
+						{ FieldName: "SchoolGeocoded", Operator: "EqualTo", Value: "True"},
+						{ FieldName: "FieldTripDestinationGeocoded", Operator: "EqualTo", Value: "True" }
+					);
+					break;
+				default:
+					break;
 			}
 		}
 
