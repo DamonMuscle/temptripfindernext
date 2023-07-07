@@ -127,7 +127,7 @@
 						Street: fieldTrip.SchoolName,
 						FieldTripDestinationId: 0,
 						Sequence: 1,
-						StopTimeDepart: clientTimeZoneToUtc(fieldTrip.DepartDateTime)
+						StopTimeDepart: moment(fieldTrip.DepartDateTime).isValid() ? clientTimeZoneToUtc(fieldTrip.DepartDateTime) : null
 					},
 					terminalStop = {
 						DBID: fieldTrip.DBID,
@@ -138,7 +138,7 @@
 						FieldTripDestinationId: fieldTrip.FieldTripDestinationId,
 						Street: fieldTrip.DestinationStreet || fieldTrip.Destination,
 						Sequence: existingItems.filter(x => x.FieldTripId == fieldTrip.Id && !x.PrimaryDeparture && !x.PrimaryDestination).length + 2,
-						StopTimeArrive: clientTimeZoneToUtc(fieldTrip.EstimatedReturnDateTime)
+						StopTimeArrive: moment(fieldTrip.EstimatedReturnDateTime).isValid() ? clientTimeZoneToUtc(fieldTrip.EstimatedReturnDateTime) : null
 					};
 
 				if(!existingItems.find(x => x.FieldTripId == fieldTrip.Id && x.LockStopTime))
