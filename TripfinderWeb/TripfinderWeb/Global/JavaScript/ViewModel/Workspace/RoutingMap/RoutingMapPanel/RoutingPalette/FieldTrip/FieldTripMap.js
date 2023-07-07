@@ -26,8 +26,14 @@
 
 	function FieldTripMap(mapInstance)
 	{
-		this.symbol = new TF.Map.Symbol(),
+		if (!mapInstance)
+		{
+			console.error("FieldTripMap constructor failed! No valid mapInstance.");
+			return;
+		}
+
 		this.mapInstance = mapInstance;
+		this.symbol = new TF.Map.Symbol(),
 		this._pathLineType = PATH_LINE_TYPE.Path;
 		this.initLayers();
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
@@ -110,6 +116,11 @@
 	FieldTripMap.prototype.initArrowLayers = function(fieldTrips)
 	{
 		const self = this;
+		if (!self.mapInstance)
+		{
+			return;
+		}
+
 		if (self.fieldTripPathArrowLayerInstance && self.fieldTripSequenceLineArrowLayerInstance)
 		{
 			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathArrowLayerId);
@@ -132,6 +143,11 @@
 
 	FieldTripMap.prototype.addFieldTrip = async function(fieldTrip)
 	{
+		if (!this.mapInstance)
+		{
+			return;
+		}
+
 		this._sortBySequence(fieldTrip.FieldTripStops);
 
 		this.drawStops(fieldTrip);

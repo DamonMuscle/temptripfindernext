@@ -259,6 +259,14 @@
 			this.fieldTripMap = null;
 		}
 
+		PubSub.unsubscribe("on_FieldTripMap_Change");
+		PubSub.unsubscribe("on_FieldTripMap_ZoomToLayers");
+		PubSub.unsubscribe("on_FieldTripMap_ZoomToStop");
+		PubSub.unsubscribe("on_FieldTripMap_ShowHide");
+		PubSub.unsubscribe("on_FieldTripMap_UpdateColor");
+		PubSub.unsubscribe("on_FieldTripMap_TripPathTypeChange");
+		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
+
 		tfdispose(this);
 	};
 })();
