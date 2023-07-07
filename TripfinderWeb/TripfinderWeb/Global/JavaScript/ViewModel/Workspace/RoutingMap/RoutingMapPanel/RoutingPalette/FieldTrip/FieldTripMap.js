@@ -326,10 +326,13 @@
 		const fieldTripSequenceLines = this._queryMapFeatures(sequenceLineFeatures, DBID, Id, TripNameHash);
 		this._updatePathGraphicColor(fieldTripSequenceLines, color);
 
-		const description = `DBID = ${DBID}, Id = ${Id}`;
-		this._updatePathArrowFeatureColor(this.fieldTripPathArrowLayerInstance, description, color);
-		this._updatePathArrowFeatureColor(this.fieldTripSequenceLineArrowLayerInstance, description, color);
-		this.redrawFieldTripArrows([fieldTrip]);
+		if (DEBUG_ARROW)
+		{
+			const description = `DBID = ${DBID}, Id = ${Id}`;
+			this._updatePathArrowFeatureColor(this.fieldTripPathArrowLayerInstance, description, color);
+			this._updatePathArrowFeatureColor(this.fieldTripSequenceLineArrowLayerInstance, description, color);
+			this.redrawFieldTripArrows([fieldTrip]);
+		}
 	}
 
 	FieldTripMap.prototype._updatePathGraphicColor = function(graphics, color)
