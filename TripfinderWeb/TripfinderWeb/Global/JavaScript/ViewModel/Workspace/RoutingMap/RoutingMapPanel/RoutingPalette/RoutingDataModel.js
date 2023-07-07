@@ -1841,7 +1841,7 @@
 				// });
 
 				// self.onStopCandidateStudentChangeEvent.notify({ add: [], edit: deleteCandidateStudents, delete: deleteCandidateStudents });
-				self.onTripsChangeEvent.notify({ add: [data], edit: [], delete: [], options: { resetScheduleTime: true } });
+				self.onTripsChangeEvent.notify({ add: [data], edit: [], delete: [], options: { resetScheduleTime: true }, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
 				if (data.OpenType === 'Edit')
 				{
 					// if (self.showImpactDifferenceChart())
