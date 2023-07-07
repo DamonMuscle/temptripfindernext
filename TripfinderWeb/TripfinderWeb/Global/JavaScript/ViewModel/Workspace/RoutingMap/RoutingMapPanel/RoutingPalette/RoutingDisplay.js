@@ -1357,7 +1357,7 @@
 		return tf.promiseBootbox.confirm(
 			{
 				message: "You are about to Copy Calculated Duration for all field trip stops. The Duration and the locked field trip stop time (" +
-					moment(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
+						utcToClientTimeZone(lockedTripStop.StopTimeArrive || lockedTripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a') + ") will be used to determine the Times. Any manual adjustments to Time will be overwritten. Are you sure you want to continue?",
 				title: "Confirmation"
 			})
 			.then(function(result)
@@ -3524,7 +3524,9 @@
 		let firstStop = fieldTrip.FieldTripStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
 		let lastStop  = fieldTrip.FieldTripStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
 
-		return moment.duration(moment(lastStop.StopTimeArrive).diff(moment(firstStop.StopTimeDepart))).asMinutes();
+		let minutes = Math.ceil(moment.duration(moment(lastStop.StopTimeArrive).diff(moment(firstStop.StopTimeDepart))).asMinutes());
+
+		return minutes;
 	}
 
 	RoutingDisplay.prototype.getDistanceForFieldTrip = function(fieldTrip)
