@@ -1658,8 +1658,8 @@
 			// FieldTripStop TODO: Reset FieldTripStop field here
 			tripStop.id = tripStopTempId++;
 			tripStop.color = trip.color;
-			tripStop.TripStopId = tripStop.id;
-			tripStop.TripId = trip.id;
+			tripStop.FieldTripStopId = tripStop.id;
+			tripStop.FieldTripId = trip.id;
 			
 		});
 	};
@@ -4034,20 +4034,19 @@
 		// self.clearFindCandidates(tripsToClose);
 		return promise.then(function()
 		{
-			self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
 			// self._updateTravelScenarioLock(tripsToClose);
-			// if (self.getEditTrips().length == 0)
-			// {
-			// 	var promise = self.clearCandidateStudents();
-			// 	self.updateManuallyChangedStatusWhenClose();
-			// 	self.routingStudentManager.refreshStudentLock(true);
-			// 	return promise;
-			// } else if (tripsToClose && tripsToClose.length > 0)
-			// {//RW-32613 If Scheduled Elsewhere is not checked there is no need to send RoutingCandidateStudents request.
-			// 	self._candidateSetting.inCriteriaScheduledElsewhere || self._candidateSetting.notInCriteriaScheduledElsewhere ? self.refreshCandidateStudent() :
-			// 		self.refreshCandidateStudent(null, null, null, tripsToClose);
-			// 	self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
-			// }
+			if (self.getEditTrips().length == 0)
+			{
+				// var promise = self.clearCandidateStudents();
+				// self.updateManuallyChangedStatusWhenClose();
+				// self.routingStudentManager.refreshStudentLock(true);
+				// return promise;
+			} else if (tripsToClose && tripsToClose.length > 0)
+			{//RW-32613 If Scheduled Elsewhere is not checked there is no need to send RoutingCandidateStudents request.
+				// self._candidateSetting.inCriteriaScheduledElsewhere || self._candidateSetting.notInCriteriaScheduledElsewhere ? self.refreshCandidateStudent() :
+				// 	self.refreshCandidateStudent(null, null, null, tripsToClose);
+				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
+			}
 		});
 	};	
 
