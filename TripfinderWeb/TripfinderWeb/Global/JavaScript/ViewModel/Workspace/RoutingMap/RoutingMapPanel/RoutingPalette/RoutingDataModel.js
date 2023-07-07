@@ -4096,13 +4096,13 @@
 				{
 					trips.forEach(function(trip)
 					{
-						RoutingDataModel.unLockRoutingStudentByTrip(trip.id);
+						// RoutingDataModel.unLockRoutingStudentByTrip(trip.id);
 						self.deleteChangeDataStackByTripId(trip.id);
 					});
-					releaseStudentPromise = self._releaseStudentToUnAssign(trips).then(function(unassignedStudents)
-					{
-						self.onStopCandidateStudentChangeEvent.notify({ add: unassignedStudents, edit: [], delete: [] });
-					});
+					// releaseStudentPromise = self._releaseStudentToUnAssign(trips).then(function(unassignedStudents)
+					// {
+					// 	self.onStopCandidateStudentChangeEvent.notify({ add: unassignedStudents, edit: [], delete: [] });
+					// });
 				} else
 				{
 					trips.forEach(function(trip)
