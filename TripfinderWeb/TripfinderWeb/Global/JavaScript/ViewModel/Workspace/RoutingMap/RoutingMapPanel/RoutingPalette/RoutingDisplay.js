@@ -2998,7 +2998,7 @@
 				isLast: isLast,
 				duration: durationToString(tripStop.Duration),
 				avgSpeed: self.speedToString(tripStop.Speed),
-				stopTime: moment(tripStop.StopTimeArrive||tripStop.StopTimeDepart).format('MM-DD-YYYY h:mm a'),
+				stopTime: tripStop.StopTimeArrive || tripStop.StopTimeDepart,
 				sequence: tripStop.Sequence,
 				geometry: tripStop.geometry,
 				schoolCode: tripStop.SchoolCode,
@@ -3481,8 +3481,8 @@
 				tripTotalTime: self.getDurationForFieldTrip(trip),
 				distance: self.getDistanceForFieldTrip(trip),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
-				startTime: convertToMoment(self.getStartTimeForFieldTrip(trip)).format('MM-DD-YYYY h:mm a'),
-				endTime: convertToMoment(self.getEndTimeForFieldTrip(trip)).format('MM-DD-YYYY h:mm a'),
+				startTime: self.getStartTimeForFieldTrip(trip),
+				endTime: self.getEndTimeForFieldTrip(trip),
 				actualStartTime: trip.ActualStartTime,
 				actualEndTime: trip.ActualEndTime,
 				//originalTrip: trip,
@@ -3491,14 +3491,9 @@
 				openType: trip.OpenType,
 				hasDistrictPolicyError: self.viewModel.analyzeTripByDistrictPolicy.hasError(trip.id),
 				isTrip: true,
-
-				EstimatedHours: trip.EstimatedHours ? trip.EstimatedHours * 60 : 0,
-				EstimatedDistance: self.convertToCurrentMeasurementUnit(trip.EstimatedDistance || 0).toFixed(2),
-				DepartDateTime: convertToMoment(trip.DepartDateTime).format('MM-DD-YYYY h:mm a'),
-				EstimatedReturnDateTime: convertToMoment(trip.EstimatedReturnDateTime).format('MM-DD-YYYY h:mm a'),
 				//durationOptimizeNmber: ""
 			},
-			items: self.newTripStopData(trip.FieldTripStops, trip)
+			items: self.newFieldTripStopData(trip.FieldTripStops, trip)
 		};
 	}
 
@@ -3648,11 +3643,11 @@
 		}
 	}
 
-	RoutingDisplay.prototype.newTripStopData = function(tripStops, fieldTrip)
+	RoutingDisplay.prototype.newFieldTripStopData = function(tripStops, fieldTrip)
 	{
 		var self = this, {Session:session, Name: tripName} = fieldTrip;
 		var result = [];
-		function setTripStops(tripStop)
+		function setFieldTripStops(tripStop)
 		{
 			tripStop.OpenType = fieldTrip.OpenType;
 			result.push(self.newTripStop(tripStop, session, tripName));
@@ -3663,7 +3658,7 @@
 			for (var i = 0; i < tslength; i++)
 			{
 				var tripStopTemp = $.extend(true, {}, tripStops[i]);
-				setTripStops(tripStopTemp);
+				setFieldTripStops(tripStopTemp);
 			}
 		}
 		else
@@ -3671,7 +3666,7 @@
 			for (var j = tslength - 1; j > -1; j--)
 			{
 				var tripStopTemp = $.extend(true, {}, tripStops[j]);
-				setTripStops(tripStopTemp);
+				setFieldTripStops(tripStopTemp);
 			}
 			result = result.reverse();
 		}

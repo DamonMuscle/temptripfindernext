@@ -1274,26 +1274,6 @@
 				//adding this code snippet to the template to debug #console.log(item);console.log($kendoOutput);#
 	};
 
-	RoutingDisplayHelper.prototype.getTripInfoTemplate = function()
-	{
-		return `
-		<div class="trip-info-text">
-			<span class="info-block" data-bind="css:{loadingInfo:prevLayover()==null}"><span data-bind="text:prevLayover"></span><br/>Prev. Layover</span>
-			<span class="splitter"></span>
-			<span class="info-block">#:item.customData.students #<br/>Student#: item.customData.students==1 ? "" : "s" #</span>
-			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
-			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.tripTotalTime #<br/>min</span>
-			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
-			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.startTime #<br/>#: item.customData.endTime #</span>
-			<span class="splitter"></span>
-			<span class="info-block" data-bind="css:{loadingInfo:nextLayover()==null}"><span data-bind="text:nextLayover"></span><br/>Next Layover</span>
-		</div>`;
-	}
-
 	RoutingDisplayHelper.prototype.getFieldTripInfoTemplate = function()
 	{
 		return `
