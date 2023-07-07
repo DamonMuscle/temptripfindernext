@@ -166,7 +166,7 @@
 		esriConfig.apiKey = null;
 	}
 
-	NetworkService.prototype.createStopFeatureSet = async function(stops, options)
+	NetworkService.prototype.createStopFeatureSet = async function(stops)
 	{
 		const defaultOptions = {
 			curbApproach: CURB_APPROACH.EITHER_SIDE,
@@ -183,21 +183,25 @@
 				let graphics = [], featureSet = null;
 				for (let i = 0; i < stops.length; i++)
 				{
-					const stopOptions = Object.assign({}, defaultOptions, options);
-					const longitude = stops[i].longitude, latitude = stops[i].latitude;
+					const stop = stops[i],
+						stopOptions = Object.assign({}, defaultOptions, stop),
+						longitude = stop.longitude,
+						latitude = stop.latitude;
 					if (longitude == 0 || latitude == 0)
 					{
 						continue;
 					}
-					const pointProperties = { longitude, latitude };
-					const geometry = webMercatorUtils.geographicToWebMercator(new Point(pointProperties));
-					const attributes = {
-						CurbApproach: stopOptions.curbApproach,
-						Name: stopOptions.name,
-						LocationType: stopOptions.locationType,
-						Sequence: stopOptions.sequence
-					}
-					const graphic = new Graphic(geometry, null, attributes);
+
+					const pointProperties = { longitude, latitude },
+						geometry = webMercatorUtils.geographicToWebMercator(new Point(pointProperties)),
+						attributes = {
+							CurbApproach: stopOptions.curbApproach,
+							Name: stopOptions.name,
+							LocationType: stopOptions.locationType,
+							Sequence: stopOptions.sequence
+						},
+						graphic = new Graphic(geometry, null, attributes);
+
 					graphics.push(graphic);
 				}
 

@@ -304,6 +304,28 @@ function getQueryString(name)
 	return r != null ? r[2] : null;
 }
 
+createNamespace("TF").getHashCode = function(str)
+{
+	return str.split("").reduce(function(a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+};
+
+function sortFilter(filters)
+{
+	return filters.sort((left, right) =>
+	{
+		if (left.Id < 0 && right.Id > 0)
+		{
+			return 1;
+		}
+		if (left.Id > 0 && right.Id < 0)
+		{
+			return -1;
+		}
+		let leftName = left.Name.toLowerCase(), rightName = right.Name.toLowerCase();
+		return leftName == rightName ? 0 : (leftName < rightName ? -1 : 1);
+	});
+};
+
 Array.remove = function(array, item)
 {
 	let index = array.indexOf(item);
@@ -1126,6 +1148,8 @@ if (!String.prototype.format)
 		});
 	};
 }
+
+
 
 Math.tfRound = function(value, precision = 0)
 {
