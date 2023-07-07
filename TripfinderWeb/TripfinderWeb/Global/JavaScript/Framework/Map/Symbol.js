@@ -937,10 +937,9 @@
 
 	MapSymbol.prototype.arrow = function(color)
 	{
-		const self = this;
 		color = color || "#000000";
 		return {
-			type: self.Str_SimpleMarker,
+			type: "simple-marker",
 			size: 17,
 			path: "M0 0 L14 12 L0 24 L0 22 L 12 12 L 0 2 Z",
 			angle: 0,
@@ -954,10 +953,9 @@
 
 	MapSymbol.prototype.arrowToPoint = function(color)
 	{
-		const self = this;
 		color = color || "#000000";
 		return {
-			type: self.Str_SimpleMarker,
+			type: "simple-marker",
 			size: 24,
 			color: color,
 			outline: {
@@ -973,9 +971,8 @@
 
 	MapSymbol.prototype.arrowOnSide = function(color)
 	{
-		const self = this;
 		return {
-			type: self.Str_SimpleMarker,
+			type: "simple-marker",
 			size: 20,
 			path: "M45 2 L45 13 L2 13 L2 19 L45 19 L45 30 L75 16 Z",
 			color: color || "#000000",

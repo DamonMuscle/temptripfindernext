@@ -134,6 +134,52 @@
 		console.warn(`TODO: add graphic to FeatureLayer, promise`);
 	}
 
+	Layer.prototype.remove = function(graphic, afterRemove = null)
+	{
+		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
+			this.removeGraphic(graphic, afterRemove);
+		}
+		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			this.removeFeature(graphic, afterRemove);
+		}
+	}
+
+	Layer.prototype.removeGraphic = function(graphic, afterRemove = null)
+	{
+		if (afterRemove !== null)
+		{
+			let total = 1;
+			let handler = this.layer.graphics.on("after-remove", (event) =>
+			{
+				total--;
+				if (total === 0)
+				{
+					handler.remove();
+					handler = null;
+
+					afterRemove();
+				}
+			});
+		}
+
+		this.layer.remove(graphic);
+	}
+
+	Layer.prototype.removeFeature = async function(feature, afterRemove = null)
+	{
+		const edits = {
+			deleteFeatures: [feature]
+		};
+
+		const editsResult = await this.layer.applyEdits(edits);
+		if (afterRemove)
+		{
+			afterRemove();
+		}
+	}
+
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
 	{
 		let results = [];

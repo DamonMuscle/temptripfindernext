@@ -32,6 +32,7 @@
 		PubSub.subscribe("on_FieldTripMap_ShowHide", self.onFieldTripMapShowHide.bind(self));
 		PubSub.subscribe("on_FieldTripMap_UpdateColor", self.onFieldTripMapUpdateColor.bind(self));
 		PubSub.subscribe("on_FieldTripMap_TripPathTypeChange", self.onFieldTripMapTripPathTypeChange.bind(self));
+		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -193,6 +194,26 @@
 		this.fieldTripMap?.updateFieldTripPathVisible(this.dataModel.trips);
 	}
 
+	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
+	{
+		if (this.routingMapExtentChangeTimeout !== null)
+		{
+			window.clearTimeout(this.routingMapExtentChangeTimeout);
+			this.routingMapExtentChangeTimeout = null;
+		}
+
+		this.routingMapExtentChangeTimeout = window.setTimeout(() =>
+		{
+			if (this.mapInstance?.map.mapView.stationary)
+			{
+				const fieldTrips = this.dataModel.trips;
+				this.fieldTripMap?.redrawFieldTripArrows(fieldTrips);
+			}
+
+			this.routingMapExtentChangeTimeout = null;
+		}, 500);
+	}
+
 	RoutingPaletteViewModel.prototype.close = function()
 	{
 		var self = this;
@@ -231,6 +252,18 @@
 		{
 			childViewModel.dispose();
 		});
+
+		if (this.fieldTripMap)
+		{
+			this.fieldTripMap.dispose();
+			this.fieldTripMap = null;
+		}
+
+		if (this.mapInstance)
+		{
+			TF.GIS.MapFactory.destroyMapInstanceById(this.mapInstance.settings.mapId);
+			this.mapInstance = null;
+		}
 
 		tfdispose(this);
 	};
