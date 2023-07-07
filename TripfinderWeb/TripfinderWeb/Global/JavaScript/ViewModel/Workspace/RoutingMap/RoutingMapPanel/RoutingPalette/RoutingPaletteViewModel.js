@@ -259,12 +259,6 @@
 			this.fieldTripMap = null;
 		}
 
-		if (this.mapInstance)
-		{
-			TF.GIS.MapFactory.destroyMapInstanceById(this.mapInstance.settings.mapId);
-			this.mapInstance = null;
-		}
-
 		tfdispose(this);
 	};
 })();

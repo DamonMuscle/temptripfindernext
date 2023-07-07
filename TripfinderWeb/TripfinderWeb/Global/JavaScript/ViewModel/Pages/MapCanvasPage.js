@@ -1237,6 +1237,7 @@
 		if (this.mapInstance)
 		{
 			TF.GIS.MapFactory.destroyMapInstanceById(this.mapInstance.settings.mapId);
+			this.mapInstance = null;
 		}
 
 		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));

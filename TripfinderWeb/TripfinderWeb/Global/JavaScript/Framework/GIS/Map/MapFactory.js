@@ -26,6 +26,12 @@
 		destroyMapInstanceById: function(id)
 		{
 			const index = instances.findIndex(x=>x.id === id);
+			if (index === -1)
+			{
+				console.warn(`Map instance ${id} has been destroyed.`);
+				return;
+			}
+
 			const [{instance, container}] = instances.splice(index, 1);
 			$(container).removeAttr(attrKey);
 			instance.dispose();
