@@ -258,7 +258,9 @@
 					}
 
 					let newTrips = [newTrip];
-					self.dataModel.setFieldTripActualStopTime(newTrips, true, self.obDepartureDateTime());
+
+					const departureDateTime = moment(self.obDepartureDateTime()).format("YYYY-MM-DDTHH:mm:ss");
+					self.dataModel.setFieldTripActualStopTime(newTrips, true, clientTimeZoneToUtc(departureDateTime));
 					self.dataModel.copyFieldTripStopTimeWithActualTime(newTrips);
 
 					return fieldTripPathPromise.then(function()
