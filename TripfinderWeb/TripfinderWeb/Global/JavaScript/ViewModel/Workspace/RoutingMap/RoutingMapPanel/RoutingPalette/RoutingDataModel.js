@@ -4041,7 +4041,7 @@
 			{//RW-32613 If Scheduled Elsewhere is not checked there is no need to send RoutingCandidateStudents request.
 				// self._candidateSetting.inCriteriaScheduledElsewhere || self._candidateSetting.notInCriteriaScheduledElsewhere ? self.refreshCandidateStudent() :
 				// 	self.refreshCandidateStudent(null, null, null, tripsToClose);
-				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
+				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
 			}
 		});
 	};	
