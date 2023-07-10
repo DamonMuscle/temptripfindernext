@@ -468,9 +468,11 @@
 	FieldTripMap.prototype.sortMapFeatures = async function(fieldTrips)
 	{
 		const self = this;
-		const fieldTripNames = fieldTrips.map(item => item.Name).sort((a, b) => a.localeCompare(b));
-		const fieldTripNamesHash = fieldTripNames.map(item => TF.getHashCode(item));
-		// console.log(fieldTripNamesHash);
+		const fieldTripNames = fieldTrips.map(item => {
+			return { Name: item.Name, Id: item.Id };
+		}).sort((a, b)=> a.Name.localeCompare(b.Name));
+		const fieldTripIds = fieldTripNames.map(item => item.Id);
+
 		const fieldTripStops = this.fieldTripStopLayerInstance?.layer.graphics.clone().items || [];
 		if (fieldTripStops.length === 0)
 		{
@@ -479,13 +481,13 @@
 
 		fieldTripStops.sort((a, b) => {
 			// sort by tripName
-			const aHash = a.attributes.TripNameHash, bHash = b.attributes.TripNameHash;
-			if (aHash === bHash)
+			const aId = a.attributes.Id, bId = b.attributes.Id;
+			if (aId === bId)
 			{
 				// sort by sequence desc
 				return (-1) * (a.attributes.Sequence - b.attributes.Sequence);
 			}
-			return fieldTripNamesHash.indexOf(aHash) - fieldTripNamesHash.indexOf(bHash);
+			return fieldTripIds.indexOf(aId) - fieldTripIds.indexOf(bId);
 		});
 
 		await self.fieldTripStopLayerInstance?.clearLayer();
