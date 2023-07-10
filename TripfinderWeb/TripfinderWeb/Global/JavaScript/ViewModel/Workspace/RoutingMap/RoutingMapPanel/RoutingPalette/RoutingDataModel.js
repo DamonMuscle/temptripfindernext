@@ -3039,8 +3039,6 @@
 					trips[i].FieldTripStops[j].StopTimeArrive = actualStopTime;
 					trips[i].FieldTripStops[j].StopTimeDepart = moment(actualStopTime).add(Math.ceil(pauseDuration), "minutes").format(stopTimeFormat);
 				}
-
-				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j].ActualStopTime).format("HH:mm:ss");
 			}
 		}
 		this.onTripStopTimeChangeEvent.notify({});
@@ -3410,9 +3408,7 @@
 				{
 					if (trips[i].FieldTripStops[j].LockStopTime)
 					{
-
-						trips[i].FieldTripStops[j].ActualStopTime = trips[i].FieldTripStops[j].StopTimeDepart;
-						
+						trips[i].FieldTripStops[j].ActualStopTime = trips[i].FieldTripStops[j].StopTimeArrive || trips[i].FieldTripStops[j].StopTimeDepart;
 						lockStop = trips[i].FieldTripStops[j];
 						lockStopIndex = j;
 						break;
