@@ -4268,7 +4268,7 @@
 		if (viewTripsToClose.length > 0)
 		{
 			self.removeNeedDeleteTrip(viewTripsToClose);
-			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
+			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editTripStopModal.closeEditModal();
