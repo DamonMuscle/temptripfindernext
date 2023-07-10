@@ -421,15 +421,15 @@
 				}
 			});
 
-			let datatypeId = tf.dataTypeHelper.getId(self.dataType.toLowerCase());
+			let filterType = 'all';
 			if (self.dataType === "fieldtrip")
 			{
 				if (self.mapGrid.pageType === "approvals")
 				{
-					datatypeId = 4001;
+					filterType = 'permission';
 				} else if (self.mapGrid.pageType === "myrequests") 
 				{
-					datatypeId = 4002;
+					filterType = 'submitted';
 				}
 			}
 
@@ -438,7 +438,8 @@
 					data: fieldsData,
 					paramData: {
 						dbid: self.mapGrid._gridType === 'forms' ? 0 : tf.datasourceManager.databaseId,
-						datatypeid: datatypeId
+						datatypeid: tf.dataTypeHelper.getId(self.dataType.toLowerCase()),
+						filterType: filterType
 					},
 					headers: { Prefix: tf.storageManager?.prefix?.split('.')[0] }
 				}).then(function (response)
