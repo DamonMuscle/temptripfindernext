@@ -393,9 +393,9 @@
 			{
 				node.customData[property] = convertToMoment(data.FinishTime).format('h:mm a');
 			}
-			else if (property.toLowerCase() == 'stoptime')
+			else if (['StopTimeArrive', 'StopTimeDepart'].map(x=>x.toLowerCase()).includes(property.toLowerCase()))
 			{
-				node.customData[property] = moment(data.StopTime, "HH:mm:ss").format('h:mm a');
+				node.customData[property] = data.StopTimeArrive || data.StopTimeDepart;
 			}
 			else if (property.toLowerCase() == 'isvalid')
 			{
