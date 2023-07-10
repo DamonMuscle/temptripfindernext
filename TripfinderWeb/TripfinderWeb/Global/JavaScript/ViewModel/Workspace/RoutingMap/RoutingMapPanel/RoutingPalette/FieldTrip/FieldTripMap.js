@@ -150,7 +150,7 @@
 
 		this._sortBySequence(fieldTrip.FieldTripStops);
 
-		this.drawStops(fieldTrip);
+		await this.drawStops(fieldTrip);
 
 		if (DEBUG_ROUTE)
 		{
@@ -401,7 +401,7 @@
 
 	//#region Map Visualization
 
-	FieldTripMap.prototype.drawStops = function(fieldTrip)
+	FieldTripMap.prototype.drawStops = async function(fieldTrip)
 	{
 		const self = this,
 		 	color = self._getColor(fieldTrip),
@@ -421,14 +421,16 @@
 		else
 		{
 			const fieldTripStops = fieldTrip.FieldTripStops;
-
+			const graphics = [];
 			for (let i = fieldTripStops.length - 1; i >= 0; i--)
 			{
 				const stop = fieldTripStops[i];
 				let Sequence = stop.Sequence, attributes = {DBID, Id, TripNameHash, Sequence, Color};
 				let symbol = self.symbol.tripStop(Sequence, color);
-				self.fieldTripStopLayerInstance?.addPoint(stop.XCoord, stop.YCoord, symbol, attributes);
+				// console.log(stop.XCoord, stop.YCoord, Sequence);
+				graphics.push(self.fieldTripStopLayerInstance?.createPointGraphic(stop.XCoord, stop.YCoord, symbol, attributes));
 			}
+			await self.fieldTripStopLayerInstance?.addGraphicsByOrder(graphics);
 		}
 	}
 
@@ -454,6 +456,33 @@
 			attributes = { DBID, Id, TripNameHash, Color };
 
 		this.fieldTripSequenceLineLayerInstance?.addPolyline(sequencePath, pathSymbol, attributes, afterAdd);
+	}
+
+	FieldTripMap.prototype.sortMapFeatures = async function(fieldTrips)
+	{
+		const self = this;
+		const fieldTripNames = fieldTrips.map(item => item.Name).sort((a, b) => a.localeCompare(b));
+		const fieldTripNamesHash = fieldTripNames.map(item => TF.getHashCode(item));
+		// console.log(fieldTripNamesHash);
+		const fieldTripStops = this.fieldTripStopLayerInstance?.layer.graphics.clone().items || [];
+		if (fieldTripStops.length === 0)
+		{
+			return;
+		}
+
+		fieldTripStops.sort((a, b) => {
+			// sort by tripName
+			const aHash = a.attributes.TripNameHash, bHash = b.attributes.TripNameHash;
+			if (aHash === bHash)
+			{
+				// sort by sequence desc
+				return (-1) * (a.attributes.Sequence - b.attributes.Sequence);
+			}
+			return fieldTripNamesHash.indexOf(aHash) - fieldTripNamesHash.indexOf(bHash);
+		});
+
+		await self.fieldTripStopLayerInstance?.clearLayer();
+		await self.fieldTripStopLayerInstance?.addGraphicsByOrder(fieldTripStops);
 	}
 
 	//#region - Path Arrows

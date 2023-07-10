@@ -275,7 +275,7 @@
 		self.searches = self.searches || [];
 		if (!self.ArcGisSearch ||
 			!self.ArcGisExtent ||
-			!self.ArcGisRegistry ||
+			// !self.ArcGisRegistry ||
 			!self.map
 		)
 			return;
@@ -442,7 +442,7 @@
 		var self = this;
 		self.element = $(el);
 		self.ArcGisSearch = self._viewModal._arcgis.Search;
-		self.ArcGisRegistry = self._viewModal._arcgis.registry;
+		// self.ArcGisRegistry = self._viewModal._arcgis.registry;
 		self.ArcGisExtent = self._viewModal._arcgis.Extent;
 		self.ArcGisDirections = self._viewModal._arcgis.Directions;
 		self.ArcGisLocator = self._viewModal._arcgis.Locator;

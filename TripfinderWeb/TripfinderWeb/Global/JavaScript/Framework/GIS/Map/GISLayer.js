@@ -78,40 +78,32 @@
 
 	}
 
-	Layer.prototype.addPoint = function(longitude, latitude, symbol, attributes)
+	Layer.prototype.addPoint = function(longitude, latitude, symbol, attributes, afterAdd = null)
 	{
-		const point = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
-		this.add(point, symbol, attributes);
+		const graphic = this.createPointGraphic(longitude, latitude, symbol, attributes);
+		this.add(graphic, afterAdd);
 	}
 
 	Layer.prototype.addPolyline = function(paths, symbol, attributes, afterAdd = null)
 	{
-		const polyline = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Polyline({
-			hasZ: false,
-			hasM: false,
-			paths: paths,
-			spatialReference: { wkid: 4326 }
-		}));
-
-		this.add(polyline, symbol, attributes, afterAdd);
+		const graphic = this.createPolylineGraphic(paths, symbol, attributes);
+		this.add(graphic, afterAdd);
 	}
 
-	Layer.prototype.add = function(geometry, symbol, attributes, afterAdd = null)
+	Layer.prototype.add = function(graphic, afterAdd = null)
 	{
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
-			this.addGraphic(geometry, symbol, attributes, afterAdd);
+			this._addGraphic(graphic, afterAdd);
 		}
 		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
-			this.addFeature(geometry, symbol, attributes, afterAdd);
+			this._addFeature(graphic, afterAdd);
 		}
 	}
 
-	Layer.prototype.addGraphic = function(geometry, symbol, attributes, afterAdd = null)
+	Layer.prototype._addGraphic = function(graphic, afterAdd = null)
 	{
-		const graphic = new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
-
 		if (afterAdd !== null)
 		{
 			let total = 1;
@@ -122,14 +114,17 @@
 					handler.remove();
 					handler = null;
 
+					console.log(`after-add: ${graphic.attributes.Sequence}`);
 					afterAdd();
 				}
 			});
 		}
+
+		console.log(`add: ${graphic.attributes.Sequence}`);
 		this.layer.add(graphic);
 	}
 
-	Layer.prototype.addFeature = function(geometry, symbol, attributes, afterAdd = null)
+	Layer.prototype._addFeature = function(geometry, symbol, attributes, afterAdd = null)
 	{
 		console.warn(`TODO: add graphic to FeatureLayer, promise`);
 	}
@@ -138,15 +133,15 @@
 	{
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
-			this.removeGraphic(graphic, afterRemove);
+			this._removeGraphic(graphic, afterRemove);
 		}
 		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
-			this.removeFeature(graphic, afterRemove);
+			this._removeFeature(graphic, afterRemove);
 		}
 	}
 
-	Layer.prototype.removeGraphic = function(graphic, afterRemove = null)
+	Layer.prototype._removeGraphic = function(graphic, afterRemove = null)
 	{
 		if (afterRemove !== null)
 		{
@@ -167,7 +162,7 @@
 		this.layer.remove(graphic);
 	}
 
-	Layer.prototype.removeFeature = async function(feature, afterRemove = null)
+	Layer.prototype._removeFeature = async function(feature, afterRemove = null)
 	{
 		const edits = {
 			deleteFeatures: [feature]
@@ -178,6 +173,71 @@
 		{
 			afterRemove();
 		}
+	}
+
+	Layer.prototype.createPointGraphic = function(longitude, latitude, symbol, attributes)
+	{
+		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Point({ x: longitude, y: latitude }));
+		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });
+	}
+
+	Layer.prototype.createPolylineGraphic = function(paths, symbol, attributes)
+	{
+		const geometry = TF.GIS.SDK.webMercatorUtils.geographicToWebMercator(new TF.GIS.SDK.Polyline({
+			hasZ: false,
+			hasM: false,
+			paths: paths,
+			spatialReference: { wkid: 4326 }
+		}));
+		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });		
+	}
+
+	Layer.prototype.addGraphicsByOrder = async function(graphics)
+	{
+		return new Promise(async (resolve, reject) =>
+		{
+			if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+			{
+				return reject("addGraphicsByOrder doesn't support FeatureLayer");
+			}
+
+			const p = [];
+			for (let i = 0; i < graphics.length; i++)
+			{
+				p.push(this._addAGraphic(graphics[i]));
+			}
+
+			return Promise.all(p).then(() =>
+			{
+				resolve();
+			});
+		});
+	}
+
+	Layer.prototype._addAGraphic = async function(graphic)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+			{
+				return reject("addGraphicsByOrder doesn't support FeatureLayer");
+			}
+
+			let total = 1;
+			let handler = this.layer.graphics.on("after-add", (event) =>
+			{
+				total--;
+				if (total === 0) {
+					handler.remove();
+					handler = null;
+	
+					console.log(`${event.item.geometry.longitude}, ${event.item.geometry.latitude} ${event.item.attributes.Sequence}`);
+					resolve();
+				}
+			});
+
+			this.layer.add(graphic);
+		});
 	}
 
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
