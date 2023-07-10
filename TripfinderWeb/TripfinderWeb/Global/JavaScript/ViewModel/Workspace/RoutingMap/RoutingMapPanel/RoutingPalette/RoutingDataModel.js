@@ -3456,16 +3456,15 @@
 			{
 				let nextPauseStop = trips[i].FieldTripStops[j + 1];
 				let actualStopTime = moment(nextPauseStop.ActualStopTime, stopTimeFormat)
-											.subtract(Math.ceil(moment.duration(nextPauseStop.Duration).asMinutes()), "minutes")
+											.subtract(Math.ceil(moment.duration(trips[i].FieldTripStops[j].Duration).asMinutes()), "minutes")
 											.format(stopTimeFormat);
 
 				trips[i].FieldTripStops[j].ActualStopTime = actualStopTime;
 			}
 			if (trips[i].FieldTripStops.length > 0)
 			{
-				trips[i].FieldTripStops[0].StopTimeDepart = trips[i].FieldTripStops[0].ActualStopTime.format(stopTimeFormat);
-
-				trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].StopTimeArrive = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime.format(stopTimeFormat);
+				trips[i].ActualStartTime = trips[i].FieldTripStops[0].ActualStopTime.format(stopTimeFormat);
+				trips[i].ActualEndTime = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime.format(stopTimeFormat);
 			}
 		}
 	};

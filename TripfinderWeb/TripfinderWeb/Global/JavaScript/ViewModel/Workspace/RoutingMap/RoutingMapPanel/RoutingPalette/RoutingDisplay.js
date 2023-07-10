@@ -2675,7 +2675,7 @@
 			}
 			if (tripStopData && (tripStopData.StopTimeArrive || tripStopData.StopTimeDepart))
 			{
-				nodeData.set('customData.stopTime', moment(tripStopData.StopTimeArrive || tripStopData.StopTimeDepart));
+				nodeData.set('customData.stopTime', tripStopData.StopTimeArrive || tripStopData.StopTimeDepart);
 			}
 			if (tripStopData && tripStopData.Duration)
 			{
