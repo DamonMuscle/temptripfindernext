@@ -4016,7 +4016,7 @@
 			self.removeNeedDeleteTrip(tripsToClose);
 			if (notifyChange != false)
 			{
-				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose });
+				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
 			}
 
 			// self.routingStudentManager.refresh();
@@ -4154,7 +4154,8 @@
 					self.onTripsChangeEvent.notify({
 						add: [],
 						edit: self.getEditTrips().filter(function(a) { return !Enumerable.From(exceptTrips).Any(function(b) { return b.id == a.id; }); }),
-						delete: fieldTrips
+						delete: fieldTrips,
+						isSequencePath: self.viewModel.eventsManager.obSequencePath()
 					});
 				}
 
