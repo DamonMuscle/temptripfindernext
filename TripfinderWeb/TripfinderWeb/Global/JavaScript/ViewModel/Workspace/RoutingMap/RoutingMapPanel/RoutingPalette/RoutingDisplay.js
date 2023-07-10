@@ -2673,9 +2673,9 @@
 			{
 				nodeData.set('customData.distance', parseFloat(self.convertToCurrentMeasurementUnit(tripStopData.Distance)).toFixed(2));
 			}
-			if (tripStopData && tripStopData.StopTime)
+			if (tripStopData && (tripStopData.StopTimeArrive || tripStopData.StopTimeDepart))
 			{
-				nodeData.set('customData.stopTime', moment(tripStopData.StopTime, "HH:mm:ss").format('h:mm a'));
+				nodeData.set('customData.stopTime', moment(tripStopData.StopTimeArrive || tripStopData.StopTimeDepart));
 			}
 			if (tripStopData && tripStopData.Duration)
 			{
