@@ -114,13 +114,13 @@
 					handler.remove();
 					handler = null;
 
-					console.log(`after-add: ${graphic.attributes.Sequence}`);
+					// console.log(`after-add: ${graphic.attributes.Sequence}`);
 					afterAdd();
 				}
 			});
 		}
 
-		console.log(`add: ${graphic.attributes.Sequence}`);
+		// console.log(`add: ${graphic.attributes.Sequence}`);
 		this.layer.add(graphic);
 	}
 
@@ -231,7 +231,7 @@
 					handler.remove();
 					handler = null;
 	
-					console.log(`${event.item.geometry.longitude}, ${event.item.geometry.latitude} ${event.item.attributes.Sequence}`);
+					// console.log(`${event.item.geometry.longitude}, ${event.item.geometry.latitude} ${event.item.attributes.Sequence}`);
 					resolve();
 				}
 			});
