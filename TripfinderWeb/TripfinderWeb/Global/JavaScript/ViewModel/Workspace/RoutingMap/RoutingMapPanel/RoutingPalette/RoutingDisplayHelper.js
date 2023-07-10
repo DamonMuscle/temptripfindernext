@@ -393,7 +393,7 @@
 			{
 				node.customData[property] = convertToMoment(data.FinishTime).format('h:mm a');
 			}
-			else if (['StopTimeArrive', 'StopTimeDepart'].map(x=>x.toLowerCase()).includes(property.toLowerCase()))
+			else if (property.toLowerCase() == 'stopTime'.toLowerCase())
 			{
 				node.customData[property] = data.StopTimeArrive || data.StopTimeDepart;
 			}
