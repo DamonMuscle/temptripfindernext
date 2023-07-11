@@ -449,7 +449,7 @@
 	*/
 	RoutingTripStopDataModel.prototype.updatePath = function(tripStopChanged, isFromBroadCastSync)
 	{
-		var tripStop = this.dataModel.getTripStop(tripStopChanged.id);
+		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
 		if (!tripStop) return;
 		var originalData = [this.dataModel.tripEditBroadcast.copyTripStop(tripStop)];
 		this.copyPathInfoToStop(tripStopChanged);
@@ -460,7 +460,7 @@
 
 	RoutingTripStopDataModel.prototype.copyPathInfoToStop = function(tripStopChanged)
 	{
-		var tripStop = this.dataModel.getTripStop(tripStopChanged.id);
+		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
 
 		if (tripStopChanged.path && tripStopChanged.path.geometry)
 		{
@@ -527,7 +527,7 @@
 		var originalData = [];
 		modifyDataArray.forEach(function(modifyData)
 		{
-			var data = self.dataModel.getTripStop(modifyData.id);
+			var data = self.dataModel.getFieldTripStop(modifyData.id);
 			originalData.push(self.dataModel.tripEditBroadcast.copyTripStop(data));
 			if (data.geometry.x != modifyData.geometry.x ||
 				data.geometry.y != modifyData.geometry.y ||
@@ -551,7 +551,7 @@
 		{
 			moveTripStops.forEach(function(stop)
 			{
-				self.dataModel.getTripStop(stop.id).StreetSegment = stop.StreetSegment;
+				self.dataModel.getFieldTripStop(stop.id).StreetSegment = stop.StreetSegment;
 			});
 			var pathPromise = Promise.resolve();
 			if (moveTripStops.length > 0)
@@ -669,7 +669,7 @@
 		var studentsTripStops = [];
 		deleteArray.forEach(function(tripStop)
 		{
-			var deleteData = self.dataModel.getTripStop(tripStop.id);
+			var deleteData = self.dataModel.getFieldTripStop(tripStop.id);
 			deleteData.routeStops = null;
 			if (!isMoveToOtherTrip)
 			{
@@ -690,7 +690,7 @@
 
 		deleteArray.forEach(function(tripStop)
 		{
-			var deleteData = self.dataModel.getTripStop(tripStop.id);
+			var deleteData = self.dataModel.getFieldTripStop(tripStop.id);
 			deleteData.routeStops = null;
 			if (!isMoveToOtherTrip)
 			{
@@ -889,7 +889,7 @@
 			var currentStop = data.length > 1 ? data[1] : null;
 			if (currentStop)
 			{
-				var stop = self.dataModel.getTripStop(currentStop.id);
+				var stop = self.dataModel.getFieldTripStop(currentStop.id);
 				if (stop)
 				{
 					stop.path.geometry = currentStop.path.geometry;
@@ -996,7 +996,7 @@
 		var originalData = [];
 		modifyDataArray.forEach(function(modifyData)
 		{
-			var tripStop = self.dataModel.getTripStop(modifyData.TripStopId);
+			var tripStop = self.dataModel.getFieldTripStop(modifyData.TripStopId);
 			if (tripStop.boundary && !tripStop.boundary.id)
 			{
 				tripStop.boundary = self.createTripBoundary(tripStop);
@@ -1075,7 +1075,7 @@
 			}
 			if (currentStop)
 			{
-				var stop = self.dataModel.getTripStop(currentStop.id);
+				var stop = self.dataModel.getFieldTripStop(currentStop.id);
 				stop.path.geometry = currentStop.path.geometry;
 				currentStop.path = stop.path;
 				stop.Speed = currentStop.Speed;
@@ -1148,7 +1148,7 @@
 			if (boundary.TripStopId)
 			{
 				var newCandidateStudents = [];
-				var tripStop = self.dataModel.getTripStop(boundary.TripStopId);
+				var tripStop = self.dataModel.getFieldTripStop(boundary.TripStopId);
 				if (tripStops)
 				{
 					tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.TripStopId; });
@@ -1197,7 +1197,7 @@
 			{
 				return Enumerable.From(allNewAssignStudents).Any(function(c) { return c.id == student.id; });
 			});
-			var tripStop = self.dataModel.getTripStop(boundary.TripStopId);
+			var tripStop = self.dataModel.getFieldTripStop(boundary.TripStopId);
 			if (tripStop && !trips[tripStop.TripId])
 			{
 				trips[tripStop.TripId] = self.dataModel.getTripById(tripStop.TripId);

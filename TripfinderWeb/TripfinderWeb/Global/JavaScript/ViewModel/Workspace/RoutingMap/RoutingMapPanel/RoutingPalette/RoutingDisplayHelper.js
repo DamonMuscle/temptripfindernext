@@ -815,7 +815,7 @@
 	// 	students = students.reduce((prev, item) => prev.some(x => x.id === item.id) ? prev : prev.concat(item), []);
 	// 	students.map(function(s)
 	// 	{
-	// 		var directionStop = self.routingDisplay.dataModel.getTripStopByStopId(s.AnotherTripStopID);
+	// 		var directionStop = self.routingDisplay.dataModel.getFieldTripStopByStopId(s.AnotherTripStopID);
 	// 		if (directionStop == null)
 	// 		{
 	// 			return;
@@ -1122,7 +1122,7 @@
 									<div class="icon lock-time k-tripstop-state-hover ${hideClassName} #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
 									<div class="icon delete stop-delete k-tripstop-state-hover #: item.customData.openType == "View"||!item.customData.deletable ? "view-disabled-button" : ""#" title="Delete"></div>
 									<div class="icon copy copyStop ${hideClassName} #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div>
-									<div class="icon info stop-info k-tripstop-state-hover ${hideClassName}" title="Field Trip Stop Details"></div>
+									<div class="icon info stop-info k-tripstop-state-hover" title="Field Trip Stop Details"></div>
 									<div class="icon zoom-map-to-layers k-tripstop-state-hover" title="Center Map" ></div></div></div>
 									<div class="trip-info k-tripstop-state-hover"><div class="student-info #: item.customData.schoolCode ? "school-student-info" : ""#">
 

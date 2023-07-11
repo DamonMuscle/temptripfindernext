@@ -892,7 +892,7 @@
 		{
 			(function(key)
 			{
-				var tripStop = self.dataModel.getTripStopByStopId(key);
+				var tripStop = self.dataModel.getFieldTripStopByStopId(key);
 				let needCalcuAcrossStreetStudents = tripStopIds[key].entities.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
 				promises.push(self.dataModel.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, needCalcuAcrossStreetStudents, true).then(function(crossStudentArray)
 				{
@@ -1088,7 +1088,7 @@
 			}
 			if (data && data.id)
 			{
-				tripStop = self.dataModel.getTripStopByStopId(data.id);
+				tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
 				if (isNullObj(tripStop) || (tripStop && IsEmptyString(tripStop.SchoolCode)))
 				{
 					return;
@@ -1273,7 +1273,7 @@
 		{
 			return;
 		}
-		var tripStop = self.dataModel.getTripStopByStopId(data.id);
+		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
 		self.dataModel.viewModel.eventsManager.createFromSearchResultClick(null, null, null, tripStop);
 	}
 
@@ -1396,7 +1396,7 @@
 			return;
 		}
 
-		var tripStop = self.dataModel.getTripStopByStopId(data.id);
+		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
 		this.eventsManager.setScheduledTimeClick(tripStop).then(function(result)
 		{
 			if (result.isUpdatedRelatedTime != undefined)
@@ -1456,7 +1456,7 @@
 			return;
 		}
 
-		var tripStop = self.dataModel.getTripStopByStopId(data.id),
+		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id),
 			trip = self.dataModel.getTripById(tripStop.TripId),
 			generatedPath = self.dataModel.getGeneratedPath(tripStop.id);
 		let result = await tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.DrivingPathModalViewModel(tripStop, trip, generatedPath));
@@ -1503,7 +1503,7 @@
 			self.setTripNodeProperty(tripNode, tripElement, false, true);
 		}
 
-		self.dataModel.changeDataStack.push(self.dataModel.getTripStopByStopId(data.id));
+		self.dataModel.changeDataStack.push(self.dataModel.getFieldTripStopByStopId(data.id));
 	}
 
 	async function assignStudentForStopClick(e)
@@ -1541,7 +1541,7 @@
 		e.preventDefault();
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
-		var tripStop = self.dataModel.getTripStopByStopId(data.id);
+		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
 		if (!tripStop)
 		{
 			return false;
@@ -1558,17 +1558,12 @@
 
 	function infoClick(e)
 	{
-		e.preventDefault();
-		e.stopPropagation();
-		console.log("Tripfinder Next TODO: field trip stop info infoClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
-		var tripStop = self.dataModel.getTripStopByStopId(data.id);
-		this.eventsManager.infoClick(tripStop);
+		var fieldTripStop = self.dataModel.getFieldTripStopByStopId(data.id);
+		this.eventsManager.infoClick(fieldTripStop);
 	}
 
 	function tripInfoClick(e)
@@ -1668,7 +1663,7 @@
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
 		var student = [self.dataModel.getStudent(data.id, data.customData.tripStopId, data.customData.anotherTripStopID, data.customData.requirementId, data.customData.previousScheduleID)];
-		var tripStop = self.dataModel.getTripStopByStopId(data.customData.tripStopId);
+		var tripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
 		self.dataModel.unAssignStudent(student, tripStop, true);
 		self.dataModel.changeDataStack.push(tripStop);
 	}
@@ -1698,11 +1693,11 @@
 		}
 
 		var studentArray = [student];
-		var tripStop = self.dataModel.getTripStopByStopId(data.parent().parent().id), schoolAssigned;
+		var tripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id), schoolAssigned;
 		if (tripStop.SchoolCode && ((student.TransSchoolCode != null && tripStop.SchoolCode != student.TransSchoolCode) || !student.TransSchoolCode))
 		{
 			schoolAssigned = tripStop;
-			tripStop = self.dataModel.getTripStopByStopId(data.customData.tripStopId);
+			tripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
 		}
 
 		var tripStopNode = self.treeview.dataSource.getFirst(tripStop.id, function(_data)
@@ -1748,12 +1743,12 @@
 		$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[1 - currentIndex]).removeClass("checked");
 		var data = self.treeview.dataItem(currentElement.closest('li'));
 		var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
-		var currentTripStop = self.dataModel.getTripStopByStopId(data.parent().parent().id);
+		var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
 		var student = self.dataModel.getStudent(studentId, currentTripStop.id, data.customData.anotherTripStopID, requirementId, previousScheduleID);
 		var isSchool = currentTripStop.SchoolCode ? true : false;
 		if (isNullObj(student) && isSchool)
 		{
-			currentTripStop = self.dataModel.getTripStopByStopId(data.customData.tripStopId);
+			currentTripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
 			student = self.getStudentFromSchoolNode(data.customData.tripStopId, data.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
 		}
 		return self.dataModel.updateStudentPUDOStatus(student, 1 - student.Session, currentTripStop.TripId).then(function()
@@ -1780,7 +1775,7 @@
 		var data = self.treeview.dataItem(currentElement.closest('li'));
 
 		var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
-		var currentTripStop = self.dataModel.getTripStopByStopId(data.parent().parent().id);
+		var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(currentTripStop.TripId, 'trip', self.treeview.dataSource);
 		var trip = self.dataModel.getTripById(currentTripStop.TripId);
 
@@ -1792,7 +1787,7 @@
 			var student = self.dataModel.getStudent(studentId, currentTripStop.id, studentNode.customData.anotherTripStopID, requirementId, previousScheduleID);
 			if (isNullObj(student) && currentTripStop.SchoolCode)
 			{
-				currentTripStop = self.dataModel.getTripStopByStopId(studentNode.customData.tripStopId);
+				currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
 				student = self.getStudentFromSchoolNode(studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
 				tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
 				studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
@@ -1829,7 +1824,7 @@
 			{
 				var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
 				var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
-				currentTripStop = self.dataModel.getTripStopByStopId(studentNode.customData.tripStopId);
+				currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
 			}
 
 			self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, data.customData.anotherTripStopID);
@@ -1903,7 +1898,7 @@
 		}
 		self.dataModel.studentsDictionary[key].map(function(item)
 		{
-			var tripStopData = self.dataModel.getTripStopByStopId(item.id);
+			var tripStopData = self.dataModel.getFieldTripStopByStopId(item.id);
 			var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStopData.TripId, 'trip', self.treeview.dataSource);
 			var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(item.id, tripNode, 'tripstop');
 			var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(student.id, tripStopNode, 'student', student.RequirementID, item.id, student.PreviousScheduleID);
@@ -2543,7 +2538,7 @@
 
 		if (nodeData.customData.isStudent)
 		{
-			var tripStop = self.dataModel.getTripStopByStopId(nodeData.customData.tripStopId);
+			var tripStop = self.dataModel.getFieldTripStopByStopId(nodeData.customData.tripStopId);
 			if (isNullObj(tripStop))
 			{
 				return;
@@ -2614,7 +2609,7 @@
 		var self = this;
 		if (nodeData.customData.isStop)
 		{
-			var tripStopData = self.dataModel.getTripStop(nodeData.id, nodeData.customData.tripId);
+			var tripStopData = self.dataModel.getFieldTripStop(nodeData.id, nodeData.customData.tripId);
 			if (isNullObj(tripStopData))
 			{
 				return;
@@ -3059,7 +3054,7 @@
 				stopIds.map(function(stopId)
 				{
 					var promise = Promise.resolve(true);
-					var tripStop = self.dataModel.getTripStopByStopId(stopId);
+					var tripStop = self.dataModel.getFieldTripStopByStopId(stopId);
 					if (isNullObj(tripStop) || tripStop.OpenType != 'Edit')
 					{
 						return;
@@ -3171,7 +3166,7 @@
 				}
 				trip.TripStops.forEach(function(tripStopEntity)
 				{
-					var tripStop = self.dataModel.getTripStopByStopId(tripStopEntity.id);
+					var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopEntity.id);
 					var ts = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
 					if (!ts) return;
 					var studentNodes = self.routingDisplayHelper.getAllTreeNodeFromParentNode(ts).slice();

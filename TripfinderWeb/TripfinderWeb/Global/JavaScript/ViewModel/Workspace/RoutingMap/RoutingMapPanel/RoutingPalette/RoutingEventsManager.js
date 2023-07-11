@@ -213,7 +213,7 @@
 		{
 			if (type == "tripStop" && data.customData.schoolCode && data.customData.schoolCode.length > 0)
 			{
-				var schoolStop = this.dataModel.getTripStopByStopId(data.id);
+				var schoolStop = this.dataModel.getFieldTripStopByStopId(data.id);
 				if (schoolStop.SchoolLocation)
 				{
 					TF.RoutingMap.EsriTool.centerSingleItem(map, schoolStop.SchoolLocation);
@@ -406,7 +406,7 @@
 			self._viewModal.setMode("Routing", "Normal");
 		}
 		this.viewModel.routingChangePath.stop();
-		var tripStop = self.dataModel.getTripStopByStopId(tripStopId);
+		var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopId);
 		tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.CopyTripStopModalViewModel(tripStop, self.dataModel))
 			.then(function(tripName)
 			{
@@ -572,17 +572,17 @@
 			self._viewModal.setMode("Routing", "Normal");
 		}
 		// this item is boundary ,so change it to trip stop
-		var tripStop = self.dataModel.getTripStop(item.TripStopId ? item.TripStopId : item.id, item.TripId);
+		var fieldTripStop = self.dataModel.getFieldTripStop(item.FieldTripStopId ? item.FieldTripStopId : item.id, item.FieldTripId);
 
-		self.viewModel.editTripStopModal.showEditModal([tripStop]).then(function()
+		self.viewModel.editFieldTripStopModal.showEditModal([fieldTripStop]).then(function()
 		{
 			self.viewModel.drawTool.changeSymbolToEditing(item.id);
 			function closeEvent()
 			{
 				self.viewModel.drawTool.changeSymbolToNotEditing();
-				self.viewModel.editTripStopModal.onCloseEditModalEvent.unsubscribe(closeEvent);
+				self.viewModel.editFieldTripStopModal.onCloseEditModalEvent.unsubscribe(closeEvent);
 			}
-			self.viewModel.editTripStopModal.onCloseEditModalEvent.subscribe(closeEvent);
+			self.viewModel.editFieldTripStopModal.onCloseEditModalEvent.subscribe(closeEvent);
 		}).catch(function() { });
 	};
 
@@ -655,7 +655,7 @@
 	RoutingEventsManager.prototype.copytoStopPoolClick = function(tripStopId)
 	{
 		var self = this;
-		var tripStop = self.dataModel.getTripStopByStopId(tripStopId);
+		var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopId);
 		return self.viewModel.viewModel.stopPoolViewModel.drawTool.copyToStopPool(tripStop);
 	};
 
@@ -954,7 +954,7 @@ This action cannot be undone.  Do you wish to continue?`;
 			{
 				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
 				this._viewModal.setMode("Routing", "Normal");
-				var tripStop = this.dataModel.getTripStop(tripStopId);
+				var tripStop = this.dataModel.getFieldTripStop(tripStopId);
 				tf.loadingIndicator.show();
 				this.dataModel.tripStopDataModel.delete(tripStop).finally(() => tf.loadingIndicator.tryHide());
 			}
@@ -1763,7 +1763,7 @@ This action cannot be undone.  Do you wish to continue?`;
 				tripStop.Sequence = index + 1;
 				tripStop.Students.forEach(function(student)
 				{
-					var schoolCode = self.dataModel.getTripStopByStopId(student.AnotherTripStopID).SchoolCode;
+					var schoolCode = self.dataModel.getFieldTripStopByStopId(student.AnotherTripStopID).SchoolCode;
 					var schoolStops = unassignedStopsTrip.TripStops.filter(function(stop) { return stop.SchoolCode == schoolCode });
 					if (schoolStops.length > 0)
 					{

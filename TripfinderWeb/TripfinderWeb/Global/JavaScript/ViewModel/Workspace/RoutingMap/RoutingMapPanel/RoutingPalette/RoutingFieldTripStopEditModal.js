@@ -1,11 +1,11 @@
 (function()
 {
-	createNamespace("TF.RoutingMap.RoutingPalette").RoutingTripStopEditModal = RoutingTripStopEditModal;
+	createNamespace("TF.RoutingMap.RoutingPalette").RoutingFieldTripStopEditModal = RoutingFieldTripStopEditModal;
 	var TripStopHelper = TF.Helper.TripStopHelper;
 
-	function RoutingTripStopEditModal(viewModel)
+	function RoutingFieldTripStopEditModal(viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingTripStop");
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingFieldTripStop");
 
 		this.viewModel = viewModel;
 		this.dataModel = viewModel.dataModel;
@@ -66,15 +66,15 @@
 		this.initSequenceSubscribe();
 	}
 
-	RoutingTripStopEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype);
-	RoutingTripStopEditModal.prototype.constructor = RoutingTripStopEditModal;
+	RoutingFieldTripStopEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype);
+	RoutingFieldTripStopEditModal.prototype.constructor = RoutingFieldTripStopEditModal;
 
-	RoutingTripStopEditModal.prototype.getWalkoutBufferVisible = function()
+	RoutingFieldTripStopEditModal.prototype.getWalkoutBufferVisible = function()
 	{
 		return this.isNoWalkoutType() && !this.isCopied() && this.mode() == 'new' && this.walkoutType() == 0 && this.obSelectedStopType() == 'Walkout';
 	};
 
-	RoutingTripStopEditModal.prototype.init = function(options)
+	RoutingFieldTripStopEditModal.prototype.init = function(options)
 	{
 		var self = this;
 		this.availableTrips = Enumerable.From(self.dataModel.getEditTrips()).OrderBy("$.Name").ToArray();
@@ -98,7 +98,7 @@
 			self._bindParamsChange("#stopTypeDropDown>input", "stopType");
 			self.bindTag = true;
 		}
-		return TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype.init.call(self, options).then(function()
+		return TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(self, options).then(function()
 		{
 			return self.calculateTotalStopTime(options);
 		}).then(function()
@@ -112,7 +112,7 @@
 		});
 	};
 
-	RoutingTripStopEditModal.prototype.initSequenceSubscribe = function()
+	RoutingFieldTripStopEditModal.prototype.initSequenceSubscribe = function()
 	{
 		this.obSelectedTrip.subscribe(this.initStopSequenceSelector.bind(this));
 		this.updateStopGraphicSequence = this.updateStopGraphicSequence.bind(this);
@@ -123,7 +123,7 @@
 		this.obSelectedSequence.extend({ notify: 'always' });
 	};
 
-	RoutingTripStopEditModal.prototype.initStopSequenceSelector = function()
+	RoutingFieldTripStopEditModal.prototype.initStopSequenceSelector = function()
 	{
 		var trip = this.obSelectedTrip();
 		if (!trip || this.obIsMultipleCreate())
@@ -136,7 +136,7 @@
 		{
 			sequences.push(x.Sequence);
 		});
-		var tripChanged = this.data.length == 1 && this.obSelectedTrip().id != this.original[0].TripId;
+		var tripChanged = this.data.length == 1 && this.obSelectedTrip().id != this.original[0].FieldTripId;
 		if (this.mode() === 'new' || tripChanged)
 		{
 			sequences.push(sequences[sequences.length - 1] + 1);
@@ -151,7 +151,7 @@
 	/**
 	 * update the sequence number on trip stop graphic
 	 */
-	RoutingTripStopEditModal.prototype.updateStopGraphicSequence = function()
+	RoutingFieldTripStopEditModal.prototype.updateStopGraphicSequence = function()
 	{
 		// update stop point sequence when user manually set stop sequence
 		var stopSequence = 0;
@@ -205,7 +205,7 @@
 	/**
 	 * highlight current stop to previous and after
 	 */
-	RoutingTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(stopSequence)
+	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(stopSequence)
 	{
 		var trip = this.obSelectedTrip(),
 			beforeStop,
@@ -252,7 +252,7 @@
 		this.stopSequenceGraphics.push({ layer: layer, graphic: graphic });
 	};
 
-	RoutingTripStopEditModal.prototype.createStopHighlightSymbol = function(stop, symbolHelper, color)
+	RoutingFieldTripStopEditModal.prototype.createStopHighlightSymbol = function(stop, symbolHelper, color)
 	{
 		var symbol = {
 			type: "simple-marker",
@@ -273,7 +273,7 @@
 		return symbol;
 	};
 
-	RoutingTripStopEditModal.prototype.removeStopSequenceGraphics = function()
+	RoutingFieldTripStopEditModal.prototype.removeStopSequenceGraphics = function()
 	{
 		if (this.stopSequenceGraphics.length > 0)
 		{
@@ -285,7 +285,7 @@
 		}
 	};
 
-	RoutingTripStopEditModal.prototype.initWalkoutData = function()
+	RoutingFieldTripStopEditModal.prototype.initWalkoutData = function()
 	{
 		var self = this;
 		var d = self.getWalkoutData();
@@ -295,7 +295,7 @@
 		if (d.bufferUnit) self.obSelectedBufferUnit(d.bufferUnit);
 	};
 
-	RoutingTripStopEditModal.prototype.onTripStopsChangeEvent = function(e, items)
+	RoutingFieldTripStopEditModal.prototype.onTripStopsChangeEvent = function(e, items)
 	{
 		var self = this;
 		if (items.delete.length > 0 && Enumerable.From(items.delete).Any(function(c) { return c.id == self.obDataModel.id(); }))
@@ -304,21 +304,21 @@
 		}
 	};
 
-	RoutingTripStopEditModal.prototype.getDataModel = function()
+	RoutingFieldTripStopEditModal.prototype.getDataModel = function()
 	{
 		return this.dataModel.tripStopDataModel.getDataModel();
 	};
 
-	RoutingTripStopEditModal.prototype.getAllHighlight = function()
+	RoutingFieldTripStopEditModal.prototype.getAllHighlight = function()
 	{
 		return [];
 	};
 
-	RoutingTripStopEditModal.prototype.getSelectedTrip = function()
+	RoutingFieldTripStopEditModal.prototype.getSelectedTrip = function()
 	{
 		if (this.mode() != "new" && this.data.length > 0)
 		{
-			return this.dataModel.getTripById(this.data[0].TripId);
+			return this.dataModel.getTripById(this.data[0].FieldTripId);
 		}
 		if (this.availableTrips.length == 0) return {};
 		if (tf.storageManager.get("routing-selectedTripId"))
@@ -332,7 +332,7 @@
 		return this.availableTrips[0];
 	};
 
-	RoutingTripStopEditModal.prototype.getWalkoutData = function()
+	RoutingFieldTripStopEditModal.prototype.getWalkoutData = function()
 	{
 		var data = {};
 		data.walkoutBuffer = tf.storageManager.get("routing-walkoutBuffer");
@@ -342,7 +342,7 @@
 		return data;
 	};
 
-	RoutingTripStopEditModal.prototype.saveWalkoutData = function(data)
+	RoutingFieldTripStopEditModal.prototype.saveWalkoutData = function(data)
 	{
 		tf.storageManager.save("routing-walkoutBuffer", data.walkoutBuffer);
 		tf.storageManager.save("routing-walkoutDistance", data.walkoutDistance);
@@ -351,19 +351,19 @@
 		tf.storageManager.save("routing-selectedTripId", this.obSelectedTrip().id);
 	};
 
-	RoutingTripStopEditModal.prototype.tripSelectTemplate = function(tripName)
+	RoutingFieldTripStopEditModal.prototype.tripSelectTemplate = function(tripName)
 	{
 
 		var trip = Enumerable.From(this.availableTrips).FirstOrDefault({}, function(c) { return c.Name == tripName; });
 		return "<a href=\"#\" role=\"option\" style=\"line-height: 22px\"><div style=\"float: left; width: 10px; height: 22px; background: " + trip.color + "; margin-right: 10px\"></div>" + tripName + "</a>";
 	};
 
-	RoutingTripStopEditModal.prototype.initTitle = function(isNew, openType)
+	RoutingFieldTripStopEditModal.prototype.initTitle = function(isNew, openType)
 	{
 		TF.RoutingMap.BaseEditModal.prototype.initTitle.call(this, isNew, "Stop", null, openType);
 	};
 
-	RoutingTripStopEditModal.prototype._create = function()
+	RoutingFieldTripStopEditModal.prototype._create = function()
 	{
 		var self = this;
 		self.createdTripBoundary = [];
@@ -388,7 +388,7 @@
 		});
 	};
 
-	RoutingTripStopEditModal.prototype._createStop = function(stop)
+	RoutingFieldTripStopEditModal.prototype._createStop = function(stop)
 	{
 		var self = this;
 		return self._createOneStop(stop).then(function(tripStop)
@@ -421,7 +421,7 @@
 		}, function() { });
 	};
 
-	RoutingTripStopEditModal.prototype._createMultipleStops = function(tripStops)
+	RoutingFieldTripStopEditModal.prototype._createMultipleStops = function(tripStops)
 	{
 		var self = this;
 		tf.loadingIndicator.show();
@@ -470,7 +470,7 @@
 			{
 				tripStops.forEach(function(stop)
 				{
-					stop.TripId = self.obSelectedTrip().id;
+					stop.FieldTripId = self.obSelectedTrip().id;
 				});
 				promises.push(Promise.resolve(tripStops));
 			}
@@ -484,7 +484,7 @@
 			{
 				tripStops.forEach(function(tripStop)
 				{
-					tripStop.TripId = self.obIsSmartAssignment() ? self.availableTrips[0].id : self.obSelectedTrip().id;
+					tripStop.FieldTripId = self.obIsSmartAssignment() ? self.availableTrips[0].id : self.obSelectedTrip().id;
 					createTripBoundaryAndAssignPromises.push(self._createOneStop(tripStop));
 				});
 			}
@@ -492,7 +492,7 @@
 			{
 				outTripStops.forEach(function(tripStop)
 				{
-					// tripStops[index].TripId = tripId;
+					// tripStops[index].FieldTripId = tripId;
 					createTripBoundaryAndAssignPromises.push(self._createOneStop(tripStop));
 
 				});
@@ -503,7 +503,7 @@
 			// {
 			// 	tripStops.map(function(tripStop)
 			// 	{
-			// 		tripStop.TripId = self.obSelectedTrip().id;
+			// 		tripStop.FieldTripId = self.obSelectedTrip().id;
 			// 		createTripBoundaryAndAssignPromises.push(self._createOneStop(tripStop));
 			// 	});
 			// }
@@ -536,7 +536,7 @@
 				});
 		});
 	};
-	RoutingTripStopEditModal.prototype._createOneStop = function(tripStop)
+	RoutingFieldTripStopEditModal.prototype._createOneStop = function(tripStop)
 	{
 		var self = this;
 		var travelScenarioId = self.dataModel.trips ? self.dataModel.trips[0].TravelScenarioId : 1;
@@ -551,7 +551,7 @@
 				}
 				var data = self.trimStringSpace(tripStop);
 				var tripStopPromise = Promise.resolve(tripStop);
-				data.TripId = tripStop.TripId ? tripStop.TripId : self.obSelectedTrip().id;
+				data.FieldTripId = tripStop.FieldTripId ? tripStop.FieldTripId : self.obSelectedTrip().id;
 				if (!self.obIsMultipleCreate() && !self.obIsInsertToSpecialStop())
 				{
 					if (self.obIsSmartAssignment())
@@ -560,12 +560,12 @@
 						//tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool);
 					} else
 					{
-						data.TripId = self.obSelectedTrip().id;
+						data.FieldTripId = self.obSelectedTrip().id;
 						tripStopPromise = Promise.resolve(data);
 					}
 				} else if (self.obIsInsertToSpecialStop())
 				{
-					data.TripId = self.obSelectedTrip().id;
+					data.FieldTripId = self.obSelectedTrip().id;
 					tripStopPromise = Promise.resolve(data);
 				}
 
@@ -576,7 +576,7 @@
 					{
 						return false;
 					}
-					data.TripId = tripStop.TripId;
+					data.FieldTripId = tripStop.FieldTripId;
 					data.boundary = tripBoundary;
 					data.color = self.obSelectedTrip().color;
 					data.Sequence = tripStop.Sequence;
@@ -589,17 +589,17 @@
 			});
 	};
 
-	RoutingTripStopEditModal.prototype.stopCreate = function()
+	RoutingFieldTripStopEditModal.prototype.stopCreate = function()
 	{
 		var self = this;
 		self.viewModel.drawTool._clearTempDrawing();
 		self.reject();
 	};
 
-	RoutingTripStopEditModal.prototype._update = function(data)
+	RoutingFieldTripStopEditModal.prototype._update = function(data)
 	{
 		const canNotEditFields = ['LockStopTime', 'Speed', 'DrivingDirections', 'SchoolLocation'];
-		var tripStopData = this.dataModel.getTripStop(data[0].id);
+		var tripStopData = this.dataModel.getFieldTripStop(data[0].id);
 		canNotEditFields.forEach(function(field)
 		{
 			data[0][field] = tripStopData[field];
@@ -607,18 +607,18 @@
 		var self = this;
 		const isSetSmartSequence = !self.obIsSmartAssignment() && self.obIsSmartSequence();
 		var sequenceChanged = self.data.length == 1 && (self.obSelectedSequence() != self.original[0].Sequence || isSetSmartSequence);
-		var tripChanged = self.data.length == 1 && self.obSelectedTrip().id != self.original[0].TripId;
+		var tripChanged = self.data.length == 1 && self.obSelectedTrip().id != self.original[0].FieldTripId;
 		if (sequenceChanged || tripChanged)
 		{
 			// use changeStopPosition to change sequence, so revert it to original here.
 			data[0].Sequence = self.original[0].Sequence;
-			data[0].TripId = self.original[0].TripId;
+			data[0].FieldTripId = self.original[0].FieldTripId;
 		}
 		return this.dataModel.tripStopDataModel.update(data).then(async function()
 		{
 			if (!data[0].SchoolCode && (sequenceChanged || tripChanged || self.obIsSmartAssignment()))
 			{
-				var tripId = data[0].TripId, targetTripId = self.obSelectedTrip().id;
+				var tripId = data[0].FieldTripId, targetTripId = self.obSelectedTrip().id;
 				var tripStop = self.data[0];
 				self.viewModel.display.deleteNode(tripStop, !tripChanged);
 
@@ -631,7 +631,7 @@
 					const res = await self.viewModel.drawTool.NAtool.getSmartAssignment(_tripStop, self.availableTrips);
 					if (res)
 					{
-						targetTripId = res.TripId;
+						targetTripId = res.FieldTripId;
 						position = res.Sequence - 1;
 					}
 
@@ -641,7 +641,7 @@
 					const _tripStop = { ...tripStop };
 					if (tripChanged)
 					{
-						_tripStop.TripId = targetTripId;
+						_tripStop.FieldTripId = targetTripId;
 					}
 					const res = await self.viewModel.drawTool.NAtool.calculateSmartSequence(_tripStop);
 					if (res.sequence != null)
@@ -662,7 +662,7 @@
 		});
 	};
 
-	RoutingTripStopEditModal.prototype.subscribeDataChange = function(key)
+	RoutingFieldTripStopEditModal.prototype.subscribeDataChange = function(key)
 	{
 		var self = this;
 		return function(value)
@@ -691,7 +691,7 @@
 	};
 
 	// stop time
-	RoutingTripStopEditModal.prototype.calculateTotalStopTime = function(options)
+	RoutingFieldTripStopEditModal.prototype.calculateTotalStopTime = function(options)
 	{
 		var self = this;
 		var trip = this.obTrips()[0];
@@ -722,23 +722,23 @@
 		});
 	};
 
-	RoutingTripStopEditModal.prototype.calculateTotalStopTimeClick = function()
+	RoutingFieldTripStopEditModal.prototype.calculateTotalStopTimeClick = function()
 	{
 		var stop = this.data[this.obCurrentPage()];
 		this.obDataModel.TotalStopTime(stop.totalStopTimeCalc);
 	};
 
-	RoutingTripStopEditModal.prototype.addTotalStopTimeClick = function()
+	RoutingFieldTripStopEditModal.prototype.addTotalStopTimeClick = function()
 	{
 		this.changeTotalStopTime(1);
 	};
 
-	RoutingTripStopEditModal.prototype.minusTotalStopTimeClick = function()
+	RoutingFieldTripStopEditModal.prototype.minusTotalStopTimeClick = function()
 	{
 		this.changeTotalStopTime(-1);
 	};
 
-	RoutingTripStopEditModal.prototype.changeTotalStopTime = function(changeNumber)
+	RoutingFieldTripStopEditModal.prototype.changeTotalStopTime = function(changeNumber)
 	{
 		var totalStopTime = TripStopHelper.convertToSeconds(this.obDataModel.TotalStopTime());
 		totalStopTime = totalStopTime + changeNumber;
@@ -749,7 +749,7 @@
 		this.obDataModel.TotalStopTime(TripStopHelper.convertToMinuteSecond(totalStopTime || 0, "HH:mm:ss"));
 	};
 
-	RoutingTripStopEditModal.prototype.totalStopTimeChange = function()
+	RoutingFieldTripStopEditModal.prototype.totalStopTimeChange = function()
 	{
 		var stop = this.data[this.obCurrentPage()];
 		this.obRedAlertTotalStopTimeControl(stop.totalStopTimeCalc !== this.obDataModel.TotalStopTime());
@@ -757,7 +757,7 @@
 		this.obTotalStopTimeShow(formatTotalStopTimeDisplay(this.obDataModel.TotalStopTime()));
 	};
 
-	RoutingTripStopEditModal.prototype.obTotalStopTimeShowChange = function()
+	RoutingFieldTripStopEditModal.prototype.obTotalStopTimeShowChange = function()
 	{
 		var minutesSecond = this.obTotalStopTimeShow();
 		if (/^[0-5]\d:[0-5]\d$/g.exec(minutesSecond))
@@ -769,9 +769,9 @@
 		}
 	};
 
-	RoutingTripStopEditModal.prototype.hide = function()
+	RoutingFieldTripStopEditModal.prototype.hide = function()
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype.hide.call(this);
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);
 		this.removeStopSequenceGraphics();
 	};
 

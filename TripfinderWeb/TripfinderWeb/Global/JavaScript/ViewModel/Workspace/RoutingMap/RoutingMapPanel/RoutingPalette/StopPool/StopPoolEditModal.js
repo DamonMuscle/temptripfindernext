@@ -4,7 +4,7 @@
 	var TripStopHelper = TF.Helper.TripStopHelper;
 	function StopPoolEditModal(viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditStopPool");
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditStopPool");
 		this.obDataModel = this.createObservableDataModel(TF.RoutingMap.RoutingPalette.StopPoolFeatureData.StopPoolData.getDataModel());
 		this.isCopied = ko.observable(false);
 		this.dataModel.highlightChangedEvent.subscribe(this.onHighLightChangedEvent.bind(this));
@@ -17,7 +17,7 @@
 
 	}
 
-	StopPoolEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype);
+	StopPoolEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype);
 	StopPoolEditModal.prototype.constructor = StopPoolEditModal;
 
 	StopPoolEditModal.prototype.getWalkoutBufferVisible = function()
@@ -38,7 +38,7 @@
 			self._bindParamsChange(".stopPoolCurbApproachRadio", "vehicleCurbApproach");
 			self.bindTag = true;
 		}
-		return TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype.init.call(this, options);
+		return TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(this, options);
 	};
 
 	StopPoolEditModal.prototype.initWalkoutData = function()

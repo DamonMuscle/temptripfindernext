@@ -102,7 +102,7 @@
 					inclusive: false
 				},
 				lessThan: {
-					value: TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.unitMax(self.obSelectedDistanceUnit()),
+					value: TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.unitMax(self.obSelectedDistanceUnit()),
 				}
 			}
 		};
@@ -119,7 +119,7 @@
 					inclusive: false
 				},
 				lessThan: {
-					value: TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.unitMax(self.obSelectedBufferUnit()),
+					value: TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.unitMax(self.obSelectedBufferUnit()),
 				}
 			}
 		};

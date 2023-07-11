@@ -7,7 +7,7 @@
 		self._map = viewModel._viewModal._map;
 		self.dataModel = viewModel.dataModel;
 		self._arcgis = tf.map.ArcGIS;
-		self.editModal = viewModel.editTripStopModal;
+		self.editModal = viewModel.editFieldTripStopModal;
 		self._viewModal = viewModel._viewModal;
 		self.viewModel = viewModel;
 		TF.RoutingMap.EsriTool.call(self, self._map, self._arcgis, viewModel.viewModel);
@@ -1720,7 +1720,7 @@
 				return;
 			}
 		}
-		return self.viewModel.editTripStopModal.create({
+		return self.viewModel.editFieldTripStopModal.create({
 			geometry: tripStop.geometry,
 			Street: tripStop.Street,
 			City: tripStop.City,

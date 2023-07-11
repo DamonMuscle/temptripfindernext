@@ -122,7 +122,7 @@
 				{
 					if (data.type == "tripBoundary")
 					{
-						var tripStop = $.extend({}, routingDataModel.getTripStopByStopId(data.TripStopId));
+						var tripStop = $.extend({}, routingDataModel.getFieldTripStopByStopId(data.TripStopId));
 						//tripStop.boundary.geometry = TF.cloneGeometry(tripStop.boundary.geometry);
 						var newBoundaryGeom = new tf.map.ArcGIS.Polygon({ spatialReference: 102100 });
 						newBoundaryGeom.rings = syncEditTripStopsData.newData[i].boundary.rings;
@@ -138,19 +138,19 @@
 					}
 					else if (data.type == "sequenceChange")
 					{
-						var tripStop = $.extend({}, routingDataModel.getTripStopByStopId(data.TripStopId));
+						var tripStop = $.extend({}, routingDataModel.getFieldTripStopByStopId(data.TripStopId));
 						self.dataModel._reorderTripStopSequenceInOneTrip(tripStop, data.newSequence, true);
 						var trip = routingDataModel.getTripById(tripStop.TripId);
 						routingDataModel.updateTrip(trip);
 					}
 					else if (data.type == "tripStopDelete")
 					{
-						var tripStop = $.extend({}, routingDataModel.getTripStopByStopId(data.TripStopId));
+						var tripStop = $.extend({}, routingDataModel.getFieldTripStopByStopId(data.TripStopId));
 						self.dataModel.delete(tripStop, false, true);
 					}
 					else if (data.type == "tripStop")
 					{
-						var tripStop = $.extend({}, routingDataModel.getTripStopByStopId(data.TripStopId)),
+						var tripStop = $.extend({}, routingDataModel.getFieldTripStopByStopId(data.TripStopId)),
 							newStopGeom = new tf.map.ArcGIS.Point({ x: syncEditTripStopsData.newData[i].x, y: syncEditTripStopsData.newData[i].y, spatialReference: 102100 });
 						tripStop.geometry = newStopGeom;
 						tripStop.XCoord = newStopGeom.longitude;
@@ -168,7 +168,7 @@
 					}
 					else if (data.type == "tripStopCreate")
 					{
-						// var stop = routingDataModel.getTripStopByStopId(syncEditTripStopsData.createStop.id);
+						// var stop = routingDataModel.getFieldTripStopByStopId(syncEditTripStopsData.createStop.id);
 						var newStop = self._copyTripStop(syncEditTripStopsData.createStop);
 						newStop.TripId = data.TripId;
 						newStop.TripStopId = data.TripStopId;
@@ -179,7 +179,7 @@
 					}
 					else
 					{
-						var tripStop = $.extend({}, routingDataModel.getTripStopByStopId(data.TripStopId));
+						var tripStop = $.extend({}, routingDataModel.getFieldTripStopByStopId(data.TripStopId));
 						tripStop.path.geometry = TF.cloneGeometry(tripStop.path.geometry);
 						if (data.linkedPathSegments)
 						{
@@ -243,7 +243,7 @@
 				{
 					geoLinkedStops.forEach(function(gs)
 					{
-						var s = self.dataModel.dataModel.getTripStopByStopId(gs.TripStopId);
+						var s = self.dataModel.dataModel.getFieldTripStopByStopId(gs.TripStopId);
 						var editStop = {
 							id: s.id,
 							name: s.Street,

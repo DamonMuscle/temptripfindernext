@@ -4,7 +4,7 @@
 
 	function WalkoutStopBoundaryViewModel(stop, viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel.viewModel, "");
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, viewModel.viewModel, "");
 		this.dataModel = viewModel.dataModel;
 		this.tripStop = stop;
 		this.updateWalkoutZone = this.updateWalkoutZone.bind(this);
@@ -12,7 +12,7 @@
 		this.symbol = new TF.Map.Symbol();
 	}
 
-	WalkoutStopBoundaryViewModel.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype);
+	WalkoutStopBoundaryViewModel.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype);
 	WalkoutStopBoundaryViewModel.prototype.constructor = WalkoutStopBoundaryViewModel;
 
 	WalkoutStopBoundaryViewModel.prototype.init = function(model, el)

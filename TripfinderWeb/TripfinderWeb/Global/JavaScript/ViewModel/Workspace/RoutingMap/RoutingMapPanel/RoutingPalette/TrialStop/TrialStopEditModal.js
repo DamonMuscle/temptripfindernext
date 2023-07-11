@@ -4,7 +4,7 @@
 
 	function TrialStopEditModal(viewModel)
 	{
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.call(this, viewModel.parentViewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditTrialStop");
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, viewModel.parentViewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditTrialStop");
 		this.dataModel = viewModel.dataModel;
 		this.obDataModel = this.createObservableDataModel(this.getDataModel());
 		this.color = ko.observable("#0000ff");
@@ -14,13 +14,13 @@
 		this.type = "trialStop";
 	}
 
-	TrialStopEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype);
+	TrialStopEditModal.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype);
 	TrialStopEditModal.prototype.constructor = TrialStopEditModal;
 
 	TrialStopEditModal.prototype.init = function(options)
 	{
 		var self = this;
-		TF.RoutingMap.RoutingPalette.BaseTripStopEditModal.prototype.init.call(self, options);
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(self, options);
 		self.isDoorToDoor(false);
 		if (!self.bindTag)
 		{

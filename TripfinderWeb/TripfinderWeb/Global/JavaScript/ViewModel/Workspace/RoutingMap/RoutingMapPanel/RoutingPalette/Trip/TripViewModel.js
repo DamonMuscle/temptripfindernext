@@ -21,7 +21,7 @@
 		self.playBackControl = new TF.RoutingMap.RoutingPalette.TripPlayBackControl(self);
 		self.eventsManager = new TF.RoutingMap.RoutingPalette.RoutingEventsManager(self, routeState);
 		self.display = new TF.RoutingMap.RoutingPalette.RoutingDisplay(self);
-		self.editTripStopModal = new TF.RoutingMap.RoutingPalette.RoutingTripStopEditModal(self);
+		self.editFieldTripStopModal = new TF.RoutingMap.RoutingPalette.RoutingFieldTripStopEditModal(self);
 		self.analyzeTripByDistrictPolicy = new TF.RoutingMap.RoutingPalette.AnalyzeTripByDistrictPolicy(self);
 		// self.editStudentModal = new TF.RoutingMap.RoutingPalette.RoutingStudentEditModal(self);
 		self.dataModel.onChangeTripVisibilityEvent.subscribe(this.onChangeTripVisibilityEvent.bind(this));
@@ -144,7 +144,7 @@
 		var self = this;
 		var layers = this.getLayers();
 		this.viewModel._viewModal.setMode("Routing", "Normal");
-		this.editTripStopModal.closeEditModal();
+		this.editFieldTripStopModal.closeEditModal();
 		return this.dataModel.close().then(function()
 		{
 			if (self.viewModel.showCount == 0)

@@ -13,7 +13,7 @@
 		self._arcgis = tf.map.ArcGIS;
 		self.tripViewModel = self.viewModel.viewModel.tripViewModel;
 		self.routingDataModel = self.viewModel.viewModel.dataModel;
-		self.editModal = self.viewModel.viewModel.tripViewModel.editTripStopModal;
+		self.editModal = self.viewModel.viewModel.tripViewModel.editFieldTripStopModal;
 		self.dataModel.highlightChangedEvent.subscribe(self.onHighlightChangedEvent.bind(this));
 		self.routingDataModel.onCandidatesStudentsChangeToMapEvent.subscribe(function(e, data)
 		{

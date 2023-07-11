@@ -337,7 +337,7 @@
 					existingStop.IsCustomDirection = false;
 				} else
 				{
-					var oldStop = $.extend(true, {}, drawTool.dataModel.getTripStopByStopId(stop.attributes.Name));
+					var oldStop = $.extend(true, {}, drawTool.dataModel.getFieldTripStopByStopId(stop.attributes.Name));
 					oldStop.Sequence = stop.attributes.Sequence;
 					oldStop.Speed = stop.Speed;
 					oldStop.Distance = stop.Distance;
@@ -957,7 +957,7 @@
 				var unassignedStop = tripStops.filter(s => s.orderName == stop.attributes.Name)[0];
 				if (!unassignedStop)
 				{
-					unassignedStop = drawTool.dataModel.getTripStopByStopId(stop.attributes.Name);
+					unassignedStop = drawTool.dataModel.getFieldTripStopByStopId(stop.attributes.Name);
 				}
 				stopName = unassignedStop.Street;
 				tripName = drawTool.dataModel.getTripById(unassignedStop.TripId).Name;

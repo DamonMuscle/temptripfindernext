@@ -138,7 +138,7 @@
 
 	RoutingDataModel.prototype.getExceptions = function(stopId)
 	{
-		return ((this.getTripStop(stopId) || {}).Students || [])
+		return ((this.getFieldTripStop(stopId) || {}).Students || [])
 			.filter(s => !s.RequirementID)
 			.concat((this.expiredExceptions[stopId] || []).filter(e => e.TripStopID == stopId));
 	};
@@ -2632,19 +2632,23 @@
 		}
 	};
 
-	RoutingDataModel.prototype.getTripStopByStopId = function(tripStopId)
+	RoutingDataModel.prototype.getFieldTripStopByStopId = function(fieldTripStopId)
 	{
 		var self = this;
 		for (var i = 0; i < self.trips.length; i++)
 		{
-			for (var j = 0; j < self.trips[i].TripStops.length; j++)
+			const fieldTrip = self.trips[i];
+			for (var j = 0; j < fieldTrip.FieldTripStops.length; j++)
 			{
-				if (self.trips[i].TripStops[j].id == tripStopId || self.trips[i].TripStops[j].oldId == tripStopId)
+				const fieldTripStop = fieldTrip.FieldTripStops[j];
+				if (fieldTripStop.id === fieldTripStopId || fieldTripStop.oldId === fieldTripStopId)
 				{
-					return self.trips[i].TripStops[j];
+					return fieldTripStop;
 				}
 			}
 		}
+
+		return null;
 	};
 
 	RoutingDataModel.prototype.getTripStopByTripId = function(tripId)
@@ -2753,7 +2757,7 @@
 		var groupResults = Enumerable.From(students).GroupBy("$.TripStopID").ToArray();
 		groupResults.forEach(function(result)
 		{
-			var stop = hasBoundary ? self.getTripStopByStopId(result.Key()) : tripStop;
+			var stop = hasBoundary ? self.getFieldTripStopByStopId(result.Key()) : tripStop;
 			promises.push(self.calculateStudentCrossStatus(stop, result.source));
 		});
 
@@ -3577,7 +3581,7 @@
 		}
 	};
 
-	RoutingDataModel.prototype.getTripStop = function(tripStopId)
+	RoutingDataModel.prototype.getFieldTripStop = function(tripStopId)
 	{
 		var trips = this.trips;
 		for (var i = 0, l = trips.length; i < l; i++)
@@ -3687,7 +3691,7 @@
 
 	RoutingDataModel.prototype.isSchoolStop = function(tripStopId)
 	{
-		var stop = this.getTripStopByStopId(tripStopId);
+		var stop = this.getFieldTripStopByStopId(tripStopId);
 		if (!IsEmptyString(stop.SchoolCode))
 		{
 			return true;
@@ -3772,7 +3776,7 @@
 		{
 			if (student.AnotherTripStopID)
 			{
-				var oldSchoolStop = self.getTripStopByStopId(student.AnotherTripStopID);
+				var oldSchoolStop = self.getFieldTripStopByStopId(student.AnotherTripStopID);
 				if (!oldSchoolStop)
 				{
 					return;
@@ -3978,7 +3982,7 @@
 
 		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
 		self.clearContextMenuOperation();
-		self.viewModel.editTripStopModal.closeEditModal();
+		self.viewModel.editFieldTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
 		// self.clearTripOriginalData(tripsToClose);
 		// self.clearFindCandidates(tripsToClose);
@@ -4023,7 +4027,7 @@
 
 		self.viewModel.routingChangePath && self.viewModel.routingChangePath.clearAll();
 		self.clearContextMenuOperation();
-		self.viewModel.editTripStopModal.closeEditModal();
+		self.viewModel.editFieldTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
 		// self.clearTripOriginalData(tripsToClose);
 		// self.clearFindCandidates(tripsToClose);
@@ -4111,7 +4115,7 @@
 						self.clearCandidateStudents();
 					}
 					self.clearContextMenuOperation();
-					self.viewModel.editTripStopModal.closeEditModal();
+					self.viewModel.editFieldTripStopModal.closeEditModal();
 					self._viewModal.setMode("Routing", "Normal");
 					tf.loadingIndicator.tryHide();
 					self._updateTravelScenarioLock();
@@ -4158,7 +4162,7 @@
 				}
 
 				self.clearContextMenuOperation();
-				self.viewModel.editTripStopModal.closeEditModal();
+				self.viewModel.editFieldTripStopModal.closeEditModal();
 				self._viewModal.setMode("Routing", "Normal");
 				tf.loadingIndicator.tryHide();
 				// self._updateTravelScenarioLock();
@@ -4255,7 +4259,7 @@
 			self.routingStudentManager.refresh();
 		}
 		self.clearContextMenuOperation();
-		self.viewModel.editTripStopModal.closeEditModal();
+		self.viewModel.editFieldTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
 		return promise;
 	};
@@ -4270,7 +4274,7 @@
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 		}
 		self.clearContextMenuOperation();
-		self.viewModel.editTripStopModal.closeEditModal();
+		self.viewModel.editFieldTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
 		return promise;
 	};
@@ -4403,7 +4407,7 @@
 	RoutingDataModel.prototype.unSaveCheck = function(tripsToClose)
 	{
 		var self = this;
-		return self.viewModel.editTripStopModal.beforeChangeData().then(function(ans)
+		return self.viewModel.editFieldTripStopModal.beforeChangeData().then(function(ans)
 		{
 			if (ans)
 			{
@@ -4680,7 +4684,7 @@
 		var self = this;
 		if (isSelf)
 		{
-			var _tripStop = self.getTripStopByStopId(student.TripStopID);
+			var _tripStop = self.getFieldTripStopByStopId(student.TripStopID);
 			if (_tripStop)
 			{
 				return _tripStop.SchoolCode;
@@ -4712,7 +4716,7 @@
 		}
 		else
 		{
-			var _tripStop = self.getTripStopByStopId(student.TripStopID);
+			var _tripStop = self.getFieldTripStopByStopId(student.TripStopID);
 			tripId = _tripStop.TripId;
 		}
 		var schoolStops = self.getSchoolStopsByTripId(tripId);
@@ -4891,7 +4895,7 @@
 				var tripStopEntities = self.tripStopDictionary[tripStop.id];
 				if (tripStopEntities)
 				{
-					tripStop = tripStop ? tripStop : self.getTripStopByStopId(tripStopId);
+					tripStop = tripStop ? tripStop : self.getFieldTripStopByStopId(tripStopId);
 					var students = tripStopEntities.map(function(tripStopEntity)
 					{
 						return tripStopEntity.student;
@@ -4909,7 +4913,7 @@
 				if (self.tripStopDictionary.hasOwnProperty(tripStopId))
 				{
 					var tripStopEntities = self.tripStopDictionary[tripStopId];
-					var tripStop = self.getTripStopByStopId(tripStopId);
+					var tripStop = self.getFieldTripStopByStopId(tripStopId);
 					if (tripStop)
 					{
 						var students = tripStopEntities.filter(function(t)

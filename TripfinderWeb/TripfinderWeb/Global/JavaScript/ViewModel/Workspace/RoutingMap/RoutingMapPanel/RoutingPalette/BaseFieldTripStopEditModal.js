@@ -1,8 +1,8 @@
 (function()
 {
-	createNamespace("TF.RoutingMap.RoutingPalette").BaseTripStopEditModal = BaseTripStopEditModal;
+	createNamespace("TF.RoutingMap.RoutingPalette").BaseFieldTripStopEditModal = BaseFieldTripStopEditModal;
 
-	function BaseTripStopEditModal(viewModel, template)
+	function BaseFieldTripStopEditModal(viewModel, template)
 	{
 		var self = this;
 		TF.RoutingMap.BaseEditModal.call(this, {
@@ -99,16 +99,16 @@
 		});
 	}
 
-	BaseTripStopEditModal.prototype = Object.create(TF.RoutingMap.BaseEditModal.prototype);
-	BaseTripStopEditModal.prototype.constructor = BaseTripStopEditModal;
+	BaseFieldTripStopEditModal.prototype = Object.create(TF.RoutingMap.BaseEditModal.prototype);
+	BaseFieldTripStopEditModal.prototype.constructor = BaseFieldTripStopEditModal;
 
-	BaseTripStopEditModal.prototype.isShowWalkoutGuideType = function(stopType)
+	BaseFieldTripStopEditModal.prototype.isShowWalkoutGuideType = function(stopType)
 	{
 		return stopType != "Door-to-Door" && stopType != "None" && stopType != this.copyBoundariesText;
 	};
 
 	//buildKey
-	BaseTripStopEditModal.prototype.buildUserPreferenceKey = function()
+	BaseFieldTripStopEditModal.prototype.buildUserPreferenceKey = function()
 	{
 		return {
 			userPreferenceDefaultStopBoundaryType: tf.storageManager.prefix + 'mapcanvas.defaultStopBoundaryType'
@@ -116,7 +116,7 @@
 	};
 
 	//set key to Modal
-	BaseTripStopEditModal.prototype.initUserPreferenceKey = function()
+	BaseFieldTripStopEditModal.prototype.initUserPreferenceKey = function()
 	{
 		var self = this;
 		var userPreferenceKeys = self.buildUserPreferenceKey();
@@ -124,7 +124,7 @@
 	};
 
 	//get All UserPreference
-	BaseTripStopEditModal.prototype.getUserPreferenceData = function()
+	BaseFieldTripStopEditModal.prototype.getUserPreferenceData = function()
 	{
 		var self = this;
 		var userPreferenceKeys = {
@@ -134,18 +134,18 @@
 	};
 
 	//get UserPreference by keys
-	BaseTripStopEditModal.prototype.getUserPreferenceDataCommon = function(userPreferenceKeys)
+	BaseFieldTripStopEditModal.prototype.getUserPreferenceDataCommon = function(userPreferenceKeys)
 	{
 		var defaultStopBoundaryType = tf.userPreferenceManager.get(userPreferenceKeys.userPreferenceDefaultStopBoundaryType)
 		return { defaultStopBoundaryType };
 	};
 
-	BaseTripStopEditModal.prototype.getWalkoutBufferVisible = function()
+	BaseFieldTripStopEditModal.prototype.getWalkoutBufferVisible = function()
 	{
 		return true;
 	};
 
-	BaseTripStopEditModal.prototype.init = function(options)
+	BaseFieldTripStopEditModal.prototype.init = function(options)
 	{
 		var self = this;
 		options = $.extend({
@@ -192,7 +192,7 @@
 		return Promise.resolve();
 	};
 
-	BaseTripStopEditModal.prototype.initMap = function(stop)
+	BaseFieldTripStopEditModal.prototype.initMap = function(stop)
 	{
 		var self = this;
 		var stopTool = self.dataModel.viewModel.drawTool.stopTool;
@@ -226,7 +226,7 @@
 		}
 		stopTool.initStopInfoControlOnJunction(stop, self.map);
 	};
-	BaseTripStopEditModal.prototype._disableMapNavagation = function(view)
+	BaseFieldTripStopEditModal.prototype._disableMapNavagation = function(view)
 	{
 		view.ui.components = [];
 		view.on("drag", stopEvtPropagation);
@@ -240,7 +240,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.checkImplement = function()
+	BaseFieldTripStopEditModal.prototype.checkImplement = function()
 	{
 		if (!this.getDataModel)
 		{
@@ -248,7 +248,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.changeLocation = function(geometry, address)
+	BaseFieldTripStopEditModal.prototype.changeLocation = function(geometry, address)
 	{
 		if (this.obVisible())
 		{
@@ -260,7 +260,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.create = function(data, createTripBoundary, options)
+	BaseFieldTripStopEditModal.prototype.create = function(data, createTripBoundary, options)
 	{
 		var self = this;
 
@@ -323,7 +323,7 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype._setTripsByOption = function(options)
+	BaseFieldTripStopEditModal.prototype._setTripsByOption = function(options)
 	{
 		if (options.Trips && options.Trips.length > 0 && this.obTrips)
 		{
@@ -332,7 +332,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.createMultiple = function(data, createTripBoundary, options)
+	BaseFieldTripStopEditModal.prototype.createMultiple = function(data, createTripBoundary, options)
 	{
 		var self = this;
 		return self.beforeChangeData().then(function()
@@ -400,7 +400,7 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype.afterCreateInit = function(isDoorToDoor)
+	BaseFieldTripStopEditModal.prototype.afterCreateInit = function(isDoorToDoor)
 	{
 		if (isDoorToDoor)
 		{
@@ -415,7 +415,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.addOverlayToPanels = function()
+	BaseFieldTripStopEditModal.prototype.addOverlayToPanels = function()
 	{
 		var panels = this.element.closest(".map-page").find(".routingmap_panel");
 		panels.each(function(index, panel)
@@ -426,12 +426,12 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype.removeOverlayToPanels = function()
+	BaseFieldTripStopEditModal.prototype.removeOverlayToPanels = function()
 	{
 		// this.element.closest(".map-page").find(".routingmap_panel>.overlay").remove();
 	};
 
-	BaseTripStopEditModal.prototype.computeObStopTypes = function()
+	BaseFieldTripStopEditModal.prototype.computeObStopTypes = function()
 	{
 		var types = this.singleTypes;
 		if (this.obIsMultipleCreate())
@@ -450,7 +450,7 @@
 		return types;
 	};
 
-	BaseTripStopEditModal.prototype.isCreateUseLastSetting = function(isCopied, isDoorToDoor, tryUseLastSettings)
+	BaseFieldTripStopEditModal.prototype.isCreateUseLastSetting = function(isCopied, isDoorToDoor, tryUseLastSettings)
 	{
 		if (isCopied || isDoorToDoor || !this.lastCreateData)
 		{
@@ -460,7 +460,7 @@
 		return !!tryUseLastSettings;
 	};
 
-	BaseTripStopEditModal.prototype.createUseLastSetting = function(data)
+	BaseFieldTripStopEditModal.prototype.createUseLastSetting = function(data)
 	{
 		var self = this;
 		var dataModel = $.extend(self.getDataModel(), this.lastCreateData, data);
@@ -476,7 +476,7 @@
 	/**
 	* this is the enter to open edit boundary modal
 	*/
-	BaseTripStopEditModal.prototype.showEditModal = function(editData)
+	BaseFieldTripStopEditModal.prototype.showEditModal = function(editData)
 	{
 		var self = this;
 
@@ -511,7 +511,7 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype.initValidation = function()
+	BaseFieldTripStopEditModal.prototype.initValidation = function()
 	{
 		var self = this;
 		setTimeout(function()
@@ -520,7 +520,7 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype._setValidation = function()
+	BaseFieldTripStopEditModal.prototype._setValidation = function()
 	{
 		var self = this;
 		self.$form = $(self.element);
@@ -551,7 +551,7 @@
 					inclusive: false
 				},
 				lessThan: {
-					value: BaseTripStopEditModal.unitMax(self.type == "trialStop" ? self.$form.find("[name=distanceUnit]").val() : self.obSelectedDistanceUnit()),
+					value: BaseFieldTripStopEditModal.unitMax(self.type == "trialStop" ? self.$form.find("[name=distanceUnit]").val() : self.obSelectedDistanceUnit()),
 				}
 			}
 		};
@@ -567,7 +567,7 @@
 					inclusive: false
 				},
 				lessThan: {
-					value: BaseTripStopEditModal.unitMax(self.type == "trialStop" ? self.$form.find("[name=bufferUnit]").val() : self.obSelectedBufferUnit()),
+					value: BaseFieldTripStopEditModal.unitMax(self.type == "trialStop" ? self.$form.find("[name=bufferUnit]").val() : self.obSelectedBufferUnit()),
 				}
 			}
 		};
@@ -593,14 +593,14 @@
 		if (self.$form.data("bootstrapValidator")) self.$form.data("bootstrapValidator").validate();
 	};
 
-	BaseTripStopEditModal.prototype.show = function()
+	BaseFieldTripStopEditModal.prototype.show = function()
 	{
 		TF.RoutingMap.BaseEditModal.prototype.show.call(this, arguments);
 		this.element.find("[name=street]").focus();
 		this.element.find("div.body").scrollTop(0);
 	};
 
-	BaseTripStopEditModal.prototype.hide = function()
+	BaseFieldTripStopEditModal.prototype.hide = function()
 	{
 		this.obVisible(false);
 		this.obOverlayVisible(false);
@@ -613,12 +613,12 @@
 		this.viewModel._viewModal.onStopEditingEvent.notify();
 	};
 
-	BaseTripStopEditModal.prototype.getAllHighlight = function()
+	BaseFieldTripStopEditModal.prototype.getAllHighlight = function()
 	{
 		return [];
 	};
 
-	BaseTripStopEditModal.prototype.showCurrentData = function()
+	BaseFieldTripStopEditModal.prototype.showCurrentData = function()
 	{
 		var self = this;
 		var data = this.data[this.obCurrentPage()];
@@ -639,11 +639,11 @@
 		}, 50);
 	};
 
-	BaseTripStopEditModal.prototype.initTitle = function()
+	BaseFieldTripStopEditModal.prototype.initTitle = function()
 	{
 	};
 
-	BaseTripStopEditModal.prototype.applyClick = function()
+	BaseFieldTripStopEditModal.prototype.applyClick = function()
 	{
 		var self = this;
 		var drawTool = self.dataModel.viewModel.drawTool;
@@ -663,7 +663,7 @@
 		//drawTool._previewLayer.removeAll();
 	};
 
-	BaseTripStopEditModal.prototype.cancelClick = function(modal, e)
+	BaseFieldTripStopEditModal.prototype.cancelClick = function(modal, e)
 	{
 		e.stopPropagation();
 		var self = this;
@@ -703,7 +703,7 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype.createData = function()
+	BaseFieldTripStopEditModal.prototype.createData = function()
 	{
 		this.hide();
 		this._create();
@@ -713,14 +713,14 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.updateData = function()
+	BaseFieldTripStopEditModal.prototype.updateData = function()
 	{
 		var data = this.trimStringSpace(this.data);
 		this._update(data);
 		this.resolve(data);
 	};
 
-	BaseTripStopEditModal.prototype.save = function()
+	BaseFieldTripStopEditModal.prototype.save = function()
 	{
 		var self = this;
 		self.data.forEach(function(stop)
@@ -760,7 +760,7 @@
 		});
 	};
 
-	BaseTripStopEditModal.prototype.bindWalkOutData = function()
+	BaseFieldTripStopEditModal.prototype.bindWalkOutData = function()
 	{
 		var self = this;
 		this.data.forEach(function(d)
@@ -773,12 +773,12 @@
 		self.saveWalkoutData(this.data[0]);
 	};
 
-	BaseTripStopEditModal.prototype.saveWalkoutData = function(data)
+	BaseFieldTripStopEditModal.prototype.saveWalkoutData = function(data)
 	{
 
 	}
 
-	BaseTripStopEditModal.prototype._bindParamsChange = function(elem, param)
+	BaseFieldTripStopEditModal.prototype._bindParamsChange = function(elem, param)
 	{
 		var self = this;
 		self.element.find(elem).bind("change", function()
@@ -847,7 +847,7 @@
 		}.bind(self));
 	};
 
-	BaseTripStopEditModal.prototype.hasWalkoutGuideOnMap = function()
+	BaseFieldTripStopEditModal.prototype.hasWalkoutGuideOnMap = function()
 	{
 		return this.dataModel.viewModel.drawTool.stopPreviewTool._previewLayer.graphics.items.filter((graphic) =>
 		{
@@ -855,7 +855,7 @@
 		}).length > 0;
 	};
 
-	BaseTripStopEditModal.prototype.removeWalkoutGuideOnMap = function()
+	BaseFieldTripStopEditModal.prototype.removeWalkoutGuideOnMap = function()
 	{
 		var previewLayer = this.dataModel.viewModel.drawTool.stopPreviewTool._previewLayer;
 		previewLayer.removeAll(previewLayer.graphics.items.filter((graphic) =>
@@ -864,7 +864,7 @@
 		}));
 	};
 
-	BaseTripStopEditModal.prototype._updateFirstCreate = function(modifyData, isShow)
+	BaseFieldTripStopEditModal.prototype._updateFirstCreate = function(modifyData, isShow)
 	{
 		var self = this;
 		var data = modifyData[0];
@@ -901,17 +901,17 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype._isWalkoutValid = function(distance, distanceUnit, buffer, bufferUnit, walkoutType)
+	BaseFieldTripStopEditModal.prototype._isWalkoutValid = function(distance, distanceUnit, buffer, bufferUnit, walkoutType)
 	{
 		if (walkoutType == 1) return true;
 		if (distance == 0) return false;
 		if (buffer == 0) return false;
 		// large distance will take a long time to calculate.
-		if ((distance > BaseTripStopEditModal.unitMax(distanceUnit)) || (buffer > BaseTripStopEditModal.unitMax(bufferUnit))) return false;
+		if ((distance > BaseFieldTripStopEditModal.unitMax(distanceUnit)) || (buffer > BaseFieldTripStopEditModal.unitMax(bufferUnit))) return false;
 		return true;
 	};
 
-	BaseTripStopEditModal.unitMax = function(unit)
+	BaseFieldTripStopEditModal.unitMax = function(unit)
 	{
 		switch (unit)
 		{
@@ -928,7 +928,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.lastStopBoundaryTypeSave = function()
+	BaseFieldTripStopEditModal.prototype.lastStopBoundaryTypeSave = function()
 	{
 		let self = this;
 		if (self.userPreferenceDefaultStopBoundaryType)
@@ -939,7 +939,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.setLastStopBoundaryType = function()
+	BaseFieldTripStopEditModal.prototype.setLastStopBoundaryType = function()
 	{
 		var defaultStopBoundaryType = this.getLastStopBoundaryType();
 		if (defaultStopBoundaryType && this.obStopTypes().indexOf(defaultStopBoundaryType) >= 0)
@@ -948,7 +948,7 @@
 		}
 	};
 
-	BaseTripStopEditModal.prototype.getLastStopBoundaryType = function()
+	BaseFieldTripStopEditModal.prototype.getLastStopBoundaryType = function()
 	{
 		let self = this;
 		//init keys 
@@ -959,7 +959,7 @@
 		return defaultStopBoundaryType;
 	};
 
-	BaseTripStopEditModal.prototype.draggable = function()
+	BaseFieldTripStopEditModal.prototype.draggable = function()
 	{
 		TF.RoutingMap.BaseEditModal.prototype.draggable.call(this, ".resizable-doc");
 	};

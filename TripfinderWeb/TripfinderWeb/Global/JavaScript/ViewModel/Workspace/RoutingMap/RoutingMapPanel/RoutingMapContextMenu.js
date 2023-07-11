@@ -874,7 +874,7 @@
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.TripId),
 						tripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.TripStopId,
-						tripStop = routingPaletteViewModel.tripViewModel.dataModel.getTripStop(tripStopId),
+						tripStop = routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(tripStopId),
 						tripName = trip.Name;
 					if (!tripItems[tripName])
 					{

@@ -112,7 +112,7 @@
 			var studentInfo = self.students[key];
 			if (studentInfo.XCoord == (student.XCoord || student.Xcoord) && studentInfo.YCoord == (student.YCoord || student.Ycoord) && availableSession.indexOf(studentInfo.Session) < 0)
 			{
-				tripStop = !!tripStop ? self.dataModel.getTripStopByStopId(tripStop.id) : null;
+				tripStop = !!tripStop ? self.dataModel.getFieldTripStopByStopId(tripStop.id) : null;
 				if (!!tripStop)
 				{
 					var trip = self.dataModel.getTripById(tripStop.TripId);

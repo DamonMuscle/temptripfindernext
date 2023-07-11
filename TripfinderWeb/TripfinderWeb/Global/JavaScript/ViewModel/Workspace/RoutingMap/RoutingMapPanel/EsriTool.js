@@ -140,7 +140,7 @@
 	EsriTool.prototype.redrawByWalkout = function(boundary, graphic)
 	{
 		var self = this;
-		var tripStop = this.dataModel.getTripStopByStopId(boundary.TripStopId);
+		var tripStop = this.dataModel.getFieldTripStopByStopId(boundary.TripStopId);
 		graphic = graphic || self._findGraphicInLayerById(self._polygonLayer, boundary.id);
 		self._oldBoundarySymbol = graphic.symbol.clone();
 		graphic.symbol = self.symbol.editPolygonSymbol();

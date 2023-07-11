@@ -7,7 +7,7 @@
 	function AssignStudentForStop(tripStopId, dataModel)
 	{
 		assignWeekdayInfos = {};
-		var tripStop = dataModel.getTripStopByStopId(tripStopId);
+		var tripStop = dataModel.getFieldTripStopByStopId(tripStopId);
 		var trip = Enumerable.From(dataModel.trips).FirstOrDefault(null, function(c)
 		{
 			return c.id == tripStop.TripId;
@@ -180,7 +180,7 @@
 										var assignData = {};
 										groupResults.forEach(function(result)
 										{
-											var stop = dataModel.getTripStopByStopId(result.Key());
+											var stop = dataModel.getFieldTripStopByStopId(result.Key());
 											result.source.forEach(function(student)
 											{
 												var schoolAssigned;
@@ -251,7 +251,7 @@
 										groupResults = Enumerable.From(unassignedList).GroupBy("$.TripStopID").ToArray();
 										groupResults.forEach(function(result)
 										{
-											var stop = dataModel.getTripStopByStopId(result.Key());
+											var stop = dataModel.getFieldTripStopByStopId(result.Key());
 
 											var studentsTripStop = Enumerable.From(unassignedData).FirstOrDefault(null, function(c) { return c.tripStop == stop; });
 											if (studentsTripStop)
@@ -544,7 +544,7 @@
 						return false;
 					}
 					// if student cross street and trip stop not allow cross street, return false
-					if (student.CrossToStop && dataModel.getTripStopByStopId(student.TripStopID).ProhibitCrosser)
+					if (student.CrossToStop && dataModel.getFieldTripStopByStopId(student.TripStopID).ProhibitCrosser)
 					{
 						return false;
 					}
@@ -660,7 +660,7 @@
 							{
 								changed = true;
 								var student = assignWeekdayInfos[key].student;
-								dataModel.changeAssignedStudentDay(student.id, student.RequirementID, student.PreviousScheduleID, assignAfter, index, dataModel.getTripStopByStopId(student.TripStopID), student.AnotherTripStopID);
+								dataModel.changeAssignedStudentDay(student.id, student.RequirementID, student.PreviousScheduleID, assignAfter, index, dataModel.getFieldTripStopByStopId(student.TripStopID), student.AnotherTripStopID);
 							}
 						});
 					});
