@@ -1716,12 +1716,14 @@
 
 			if (self.dataType === "fieldtrip")
 			{
-				if (self.pageType === "approvals")
+				switch (self.pageType)
 				{
-					paramData["filterType"] = 'permission';
-				} else if (self.pageType === "myrequests") 
-				{
-					paramData["filterType"] = 'submitted';
+					case "approvals":
+						paramData["filterType"] = 'permission';
+						break;
+					case "myrequests":
+						paramData["filterType"] = 'submitted';
+						break;
 				}
 			}
 
