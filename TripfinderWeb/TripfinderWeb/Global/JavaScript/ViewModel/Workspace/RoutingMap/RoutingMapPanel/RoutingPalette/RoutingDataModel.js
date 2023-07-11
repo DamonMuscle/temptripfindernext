@@ -498,7 +498,7 @@
 			// self.setStudentTravelTime(self.trips);
 			// self.setAllStudentValidProperty(self.trips);
 			// self.routingStudentManager.refresh();
-			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
+			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false });
 		});
 	};
 
@@ -603,7 +603,7 @@
 		{
 			self.routingStudentManager.refreshDictionary(null, null);
 			// self.viewModel.drawTool.stopTool.attachClosetStreetToStop(allTripStops); //comment for improve open trip performance.RW-11855
-			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
+			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false });
 			self.setTripOriginalData(newTrips);
 			if (self.showImpactDifferenceChart()) { newTrips.forEach(function(trip) { self.refreshOptimizeSequenceRate(trip.id); }); }
 			/*
@@ -1841,7 +1841,7 @@
 				// });
 
 				// self.onStopCandidateStudentChangeEvent.notify({ add: [], edit: deleteCandidateStudents, delete: deleteCandidateStudents });
-				self.onTripsChangeEvent.notify({ add: [data], edit: [], delete: [], options: { resetScheduleTime: true }, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
+				self.onTripsChangeEvent.notify({ add: [data], edit: [], delete: [], options: { resetScheduleTime: true } });
 				if (data.OpenType === 'Edit')
 				{
 					// if (self.showImpactDifferenceChart())
@@ -4015,7 +4015,7 @@
 			self.removeNeedDeleteTrip(tripsToClose);
 			if (notifyChange != false)
 			{
-				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
+				self.onTripsChangeEvent.notify({ add: [], edit: [], delete: tripsToClose });
 			}
 
 			// self.routingStudentManager.refresh();
@@ -4040,7 +4040,7 @@
 			{//RW-32613 If Scheduled Elsewhere is not checked there is no need to send RoutingCandidateStudents request.
 				// self._candidateSetting.inCriteriaScheduledElsewhere || self._candidateSetting.notInCriteriaScheduledElsewhere ? self.refreshCandidateStudent() :
 				// 	self.refreshCandidateStudent(null, null, null, tripsToClose);
-				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
+				self.onTripsChangeEvent.notify({ add: [], edit: self.getEditTrips(), delete: [], draw: false });
 			}
 		});
 	};	
@@ -4153,8 +4153,7 @@
 					self.onTripsChangeEvent.notify({
 						add: [],
 						edit: self.getEditTrips().filter(function(a) { return !Enumerable.From(exceptTrips).Any(function(b) { return b.id == a.id; }); }),
-						delete: fieldTrips,
-						isSequencePath: self.viewModel.eventsManager.obSequencePath()
+						delete: fieldTrips
 					});
 				}
 
@@ -4268,7 +4267,7 @@
 		if (viewTripsToClose.length > 0)
 		{
 			self.removeNeedDeleteTrip(viewTripsToClose);
-			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose, isSequencePath: self.viewModel.eventsManager.obSequencePath() });
+			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editTripStopModal.closeEditModal();

@@ -33,7 +33,7 @@
 
 		this.mapInstance = mapInstance;
 		this.symbol = new TF.Map.Symbol(),
-		this._pathLineType = PATH_LINE_TYPE.Path;
+		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 		this.initLayers();
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 	}

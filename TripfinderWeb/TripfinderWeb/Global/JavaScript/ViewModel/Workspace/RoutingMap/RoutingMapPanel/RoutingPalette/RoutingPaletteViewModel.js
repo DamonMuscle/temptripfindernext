@@ -133,7 +133,6 @@
 		{
 			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
 		}
-		this.fieldTripMap.setPathLineType(data.isSequencePath);
 		await this.displayFieldTripPath(data);
 	}
 
@@ -164,7 +163,7 @@
 		const fieldTrips = this.dataModel.trips;
 		if (fieldTrips.length > 0)
 		{
-			// await this.fieldTripMap.sortMapFeatures(fieldTrips);
+			await this.fieldTripMap.sortMapFeatures(fieldTrips);
 			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
 		}
 	}
