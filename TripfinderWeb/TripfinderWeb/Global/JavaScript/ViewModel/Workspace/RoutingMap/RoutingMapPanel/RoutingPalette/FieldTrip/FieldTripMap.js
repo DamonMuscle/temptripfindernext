@@ -19,7 +19,6 @@
 		Path: "Path",
 		Sequence: "Sequence"
 	};
-	const DEBUG_ROUTE = false;
 	const DEBUG_ARROW = false;
 
 	//#endregion
@@ -152,14 +151,14 @@
 
 		await this.drawStops(fieldTrip);
 
-		if (DEBUG_ROUTE)
+		if (!fieldTrip.routePath)
 		{
 			const routeResult = await this.calculateRoute(fieldTrip);
-			this.drawFieldTripPath(fieldTrip, routeResult);
-
-			const routeDirections = routeResult.directions;
-			console.log(routeDirections);
+			fieldTrip.routePath = this._computeRoutePath(routeResult);
+			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
+			fieldTrip.directions = this._computeDirections(routeResult);
 		}
+		this.drawFieldTripPath(fieldTrip);
 
 		this.drawSequenceLine(fieldTrip, () => {
 			this.updateFieldTripPathVisible([fieldTrip]);
@@ -433,7 +432,6 @@
 				Sequence = stop.Sequence;
 				attributes = {DBID, Id, Sequence, Color};
 				symbol = self.symbol.tripStop(Sequence, color);
-				// console.log(stop.XCoord, stop.YCoord, Sequence);
 				graphics.push(self.fieldTripStopLayerInstance?.createPointGraphic(stop.XCoord, stop.YCoord, symbol, attributes));
 			}
 
@@ -441,15 +439,15 @@
 		}
 	}
 
-	FieldTripMap.prototype.drawFieldTripPath = function(fieldTrip, routeResult)
+	FieldTripMap.prototype.drawFieldTripPath = function(fieldTrip)
 	{
-		const routePath = this._computeRoutePath(routeResult);
+		const routePath = fieldTrip.routePath;
 		if (!routePath)
 		{
 			return;
 		}
 
-		const pathAttributes = this._computePathAttributes(fieldTrip, routeResult);
+		const pathAttributes = fieldTrip.routePathAttributes;
 		const pathSymbol = this._computePathSymbol(fieldTrip);
 		this.fieldTripPathLayerInstance?.addPolyline(routePath, pathSymbol, pathAttributes);
 	}
@@ -753,7 +751,7 @@
 		const Color = this._getColor(fieldTrip),
 			{ DBID, Id } = this._extractFieldTripFeatureFields(fieldTrip),
 			route = routeResult?.route,
-			attributes = Object.assign({}, route.attributes, {DBID, Id, Color});
+			attributes = Object.assign({}, route?.attributes, {DBID, Id, Color});
 		return attributes;
 	}
 
@@ -783,6 +781,13 @@
 		}
 
 		return paths;
+	}
+
+	FieldTripMap.prototype._computeDirections = function(routeResult)
+	{
+		const { features, routeName, strings, totalDriveTime, totalLength, totalTime } = routeResult.directions;
+		const routeDirections = { features, routeName, strings, totalDriveTime, totalLength, totalTime };
+		return routeDirections;
 	}
 
 	//#endregion
