@@ -73,6 +73,7 @@
 
 		var type = grid.dataType === 'unassignedStudents' ? grid.dataType : self.gridType;
 		var dataColumns = self.mapGrid && self.mapGrid.kendoGrid ? self.mapGrid.kendoGrid.columns : null;
+		var pageType = self.mapGrid && self.mapGrid.pageType;
 		var availableColumns = self.dataFieldHelper.getColumnsByType(type, dataColumns);
 		self.quickfilterData = ko.observable();
 
@@ -88,7 +89,7 @@
 			self.availableColumns = Array.sortBy(availableColumns, "DisplayName");
 
 			// QuickFilter
-			let quickFilterData = new TF.Map.Thematics.QuickFilterViewModel(self.gridType, self.availableColumns, self.quickFilterInfo, self.thematicType);
+			let quickFilterData = new TF.Map.Thematics.QuickFilterViewModel(self.gridType, self.availableColumns, self.quickFilterInfo, self.thematicType, pageType);
 			quickFilterData.onFilterChange.subscribe(self.updateGridData.bind(self));
 			quickFilterData.onFieldReordered.subscribe(self.setInitDisplaySetting.bind(self));
 			self.quickfilterData(quickFilterData);
