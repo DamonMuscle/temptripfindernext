@@ -3,7 +3,7 @@
 	createNamespace("TF.Map.Thematics").QuickFilterViewModel = QuickFilterViewModel;
 
 
-	function QuickFilterViewModel(dataType, dataColumns, filtersInfo, thematicType)
+	function QuickFilterViewModel(dataType, dataColumns, filtersInfo, thematicType, pageType)
 	{
 		var self = this;
 
@@ -14,6 +14,7 @@
 		self.dataType = dataType;
 		self.filtersInfo = filtersInfo;
 		self.shouldDoFilter = true;
+		self.pageType = pageType;
 		self.dataColumns = dataColumns.sort(function (a, b)
 		{
 			var displayNameA = a.DisplayName || a.FieldName, displayNameB = b.DisplayName || b.FieldName;
@@ -1712,6 +1713,19 @@
 				Operator: "Contains",
 				Value: $target.val()
 			});
+
+			if (self.dataType === "fieldtrip")
+			{
+				switch (self.pageType)
+				{
+					case "approvals":
+						paramData["filterType"] = 'permission';
+						break;
+					case "myrequests":
+						paramData["filterType"] = 'submitted';
+						break;
+				}
+			}
 
 			var options = { data: searchParameters, paramData: paramData }, $loading = $target.closest(".text-input").find(".k-loading");
 
