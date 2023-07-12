@@ -912,7 +912,7 @@
 		trips.map(function(trip)
 		{
 			trip.OpenType = openType;
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				tripStop.OpenType = openType;
 				tripStop.Students.map(function(student)

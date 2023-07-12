@@ -1374,6 +1374,8 @@
 			SchoolCode: "",
 			SchoolId: -1,
 			Sequence: 0,
+			PrimaryDeparture: false,
+			PrimaryDestination: false,
 			StopTime: "00:00:00",
 			TotalStopTime: "00:00:00",
 			StopTimeArrive: "",

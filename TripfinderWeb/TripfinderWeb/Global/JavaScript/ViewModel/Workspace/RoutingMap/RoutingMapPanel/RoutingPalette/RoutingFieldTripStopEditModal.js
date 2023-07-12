@@ -47,6 +47,7 @@
 		this.obIncludeNoStudStop = ko.observable(false);
 
 		// stop time arrive
+		this.obStopTimeArriveDisable = ko.observable(false);
 		this.obStopTimeArriveDate = ko.observable(null);
 		this.obStopTimeArriveTime = ko.observable(null);
 		this.obDataModel.StopTimeArrive.subscribe(this.stopTimeArriveChange, this);
@@ -54,6 +55,7 @@
 		this.obStopTimeArriveTime.subscribe(this.obStopTimeArriveTimeChange, this);
 
 		// stop time depart
+		this.obStopTimeDepartDisable = ko.observable(false);
 		this.obStopTimeDepartDate = ko.observable(null);
 		this.obStopTimeDepartTime = ko.observable(null);
 		this.obDataModel.StopTimeDepart.subscribe(this.stopTimeDepartChange, this);
@@ -79,6 +81,7 @@
 
 		this.obSelectedSequenceDisable = ko.computed(() => this.stopSequenceDisable || (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
 
+		// disable for future implementation
 		this.obSelectedFieldTripDisable = ko.observable(true);
 		this.obSmartSequenceDisable = ko.observable(true);
 		this.obStopSequenceDisable = ko.computed(() => this.obSmartSequenceDisable() || this.obSelectedSequenceDisable());
@@ -793,6 +796,8 @@
 	{
 		this.obStopTimeArriveDate(getDatePart(this.obDataModel.StopTimeArrive(), true));
 		this.obStopTimeArriveTime(getTimePart(this.obDataModel.StopTimeArrive(), true));
+		this.obStopTimeArriveDisable(this.isReadOnly() || this.obDataModel.PrimaryDeparture());
+		this.obStopTimeDepartDisable(this.isReadOnly() || this.obDataModel.PrimaryDestination());
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveDateChange = function()
