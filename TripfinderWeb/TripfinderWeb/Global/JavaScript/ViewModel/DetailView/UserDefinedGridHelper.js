@@ -2822,7 +2822,10 @@
 
 		//filter menu by Assigned Rights
 		var key = tf.dataTypeHelper.getKeyById(udgrid.DataTypeId);
-		tf.authManager.isAuthorizedForDataType(key, 'read') || (udgrid.UDGridFields = []);
+		if (!isPublic)
+		{
+			tf.authManager.isAuthorizedForDataType(key, 'read') || (udgrid.UDGridFields = []);
+		}
 
 		return udgrid;
 	};
