@@ -1376,6 +1376,8 @@
 			Sequence: 0,
 			StopTime: "00:00:00",
 			TotalStopTime: "00:00:00",
+			StopTimeArrive: "",
+			StopTimeDepart: "",
 			TotalStopTimeManualChanged: false,
 			IShow: true,
 			IsCustomDirection: false,

@@ -10,7 +10,7 @@
 		this.viewModel = viewModel;
 		this.dataModel = viewModel.dataModel;
 		this.availableTrips = [];
-		this.obDataModel = this.createObservableDataModel(this.dataModel.tripStopDataModel.getDataModel());
+		this.obDataModel = this.createObservableDataModel(this.dataModel.fieldTripStopDataModel.getDataModel());
 
 		this.obIsSmartAssignment = ko.observable(false);
 		this.obIsSmartSequence = ko.observable(false);
@@ -46,6 +46,13 @@
 
 		this.obIncludeNoStudStop = ko.observable(false);
 
+		// stop time arrive/depart
+		this.obStopTimeArriveDate = ko.observable(null);
+		this.obStopTimeArriveTime = ko.observable("00:00");
+		this.obDataModel.StopTimeArrive.subscribe(this.stopTimeArriveChange, this);
+		this.obStopTimeArriveDate.subscribe(this.obStopTimeArriveDateChange, this);
+		this.obStopTimeArriveTime.subscribe(this.obStopTimeArriveTimeChange, this);
+
 		// total stop time
 		this.obRedAlertTotalStopTimeControl = ko.observable(false);
 		this.obTotalStopTimeShow = ko.observable("00:00");
@@ -62,7 +69,13 @@
 		{
 			return this.obSelectedSequence();
 		});
-		this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
+
+		this.obSelectedSequenceDisable = ko.computed(() => this.stopSequenceDisable || (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
+
+		this.obSelectedFieldTripDisable = ko.observable(true);
+		this.obSmartSequenceDisable = ko.observable(true);
+		this.obStopSequenceDisable = ko.computed(() => this.obSmartSequenceDisable() || this.obSelectedSequenceDisable());
+
 		this.initSequenceSubscribe();
 	}
 
@@ -132,7 +145,7 @@
 		}
 		// init sequence source
 		var sequences = [];
-		trip.TripStops.forEach(x =>
+		trip.FieldTripStops.forEach(x =>
 		{
 			sequences.push(x.Sequence);
 		});
@@ -143,7 +156,7 @@
 		}
 		this.obSequenceSource(sequences);
 		// set sequence number
-		var defaultSequence = TF.Helper.TripHelper.getTripStopInsertSequence(trip.TripStops, trip.Session);
+		var defaultSequence = TF.Helper.TripHelper.getTripStopInsertSequence(trip.FieldTripStops, trip.Session);
 		var sequence = this.data[0].Sequence ? this.data[0].Sequence : defaultSequence;
 		this.obSelectedSequence(sequence);
 	};
@@ -211,7 +224,7 @@
 			beforeStop,
 			afterStop,
 			currentStop = this.data[0],
-			tripStops = trip.TripStops.filter(x => x.id != currentStop.id),
+			tripStops = trip.FieldTripStops.filter(x => x.id != currentStop.id),
 			pathPoints = [],
 			stopGraphics = [],
 			color = [253, 245, 53, 0.7],
@@ -306,7 +319,7 @@
 
 	RoutingFieldTripStopEditModal.prototype.getDataModel = function()
 	{
-		return this.dataModel.tripStopDataModel.getDataModel();
+		return this.dataModel.fieldTripStopDataModel.getDataModel();
 	};
 
 	RoutingFieldTripStopEditModal.prototype.getAllHighlight = function()
@@ -399,7 +412,7 @@
 			}
 			if (self.dataModel.getRemoveOverlappingSetting() && tripStop.boundary.BdyType != 0)
 			{
-				return self.dataModel.tripStopDataModel.viewModel.drawTool.removeOverlapBoundaries([tripStop]);
+				return self.dataModel.fieldTripStopDataModel.viewModel.drawTool.removeOverlapBoundaries([tripStop]);
 			}
 			return Promise.resolve(tripStop);
 		}).then(function(tripStop)
@@ -416,7 +429,7 @@
 					sequence = parseInt(self.obSelectedSequence() - 1);
 				}
 
-				return self.dataModel.tripStopDataModel.create(tripStop, null, sequence);
+				return self.dataModel.fieldTripStopDataModel.create(tripStop, null, sequence);
 			}
 		}, function() { });
 	};
@@ -434,12 +447,12 @@
 			} else
 			{
 				var canVrp = true;
-				var start = self.availableTrips[0].TripStops[0].geometry.x;
-				var end = self.availableTrips[0].TripStops[self.availableTrips[0].TripStops.length - 1].geometry.x;
+				var start = self.availableTrips[0].FieldTripStops[0].geometry.x;
+				var end = self.availableTrips[0].FieldTripStops[self.availableTrips[0].FieldTripStops.length - 1].geometry.x;
 				for (var i = 1; i < self.availableTrips.length; i++)
 				{
-					if (self.availableTrips[i].TripStops[0].geometry.x.toFixed(4) != start.toFixed(4) ||
-						self.availableTrips[i].TripStops[self.availableTrips[i].TripStops.length - 1].geometry.x.toFixed(4) != end.toFixed(4))
+					if (self.availableTrips[i].FieldTripStops[0].geometry.x.toFixed(4) != start.toFixed(4) ||
+						self.availableTrips[i].FieldTripStops[self.availableTrips[i].FieldTripStops.length - 1].geometry.x.toFixed(4) != end.toFixed(4))
 					{
 						canVrp = false;
 						break;
@@ -512,7 +525,7 @@
 				{
 					if (self.dataModel.getRemoveOverlappingSetting())
 					{
-						return self.dataModel.tripStopDataModel.viewModel.drawTool.removeOverlapBoundaries(stops);
+						return self.dataModel.fieldTripStopDataModel.viewModel.drawTool.removeOverlapBoundaries(stops);
 					}
 					return stops;
 				}).then(function(stops)
@@ -527,7 +540,7 @@
 						{
 							sequences = stops.filter(function(stop) { return stop.Sequence; }).map(function(stop) { return stop.Sequence; });
 						}
-						self.dataModel.tripStopDataModel.createMultiple(stops, sequences).then(() =>
+						self.dataModel.fieldTripStopDataModel.createMultiple(stops, sequences).then(() =>
 						{
 							tf.loadingIndicator.tryHide();
 						});
@@ -614,7 +627,7 @@
 			data[0].Sequence = self.original[0].Sequence;
 			data[0].FieldTripId = self.original[0].FieldTripId;
 		}
-		return this.dataModel.tripStopDataModel.update(data).then(async function()
+		return this.dataModel.fieldTripStopDataModel.update(data).then(async function()
 		{
 			if (!data[0].SchoolCode && (sequenceChanged || tripChanged || self.obIsSmartAssignment()))
 			{
@@ -696,7 +709,7 @@
 		var self = this;
 		var trip = this.obTrips()[0];
 		var newTrip = $.extend({}, trip);
-		newTrip.TripStops = this.data.map(function(d)
+		newTrip.FieldTripStops = this.data.map(function(d)
 		{
 			var stop = $.extend({}, d);
 			stop.TotalStopTimeManualChanged = false;
@@ -708,7 +721,7 @@
 			{
 				self.data.forEach(function(stop)
 				{
-					var tripStopCalculated = Enumerable.From(trip.TripStops).FirstOrDefault(null, function(c) { return c.id == stop.id; });
+					var tripStopCalculated = Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(c) { return c.id == stop.id; });
 					if (tripStopCalculated)
 					{
 						stop.totalStopTimeCalc = tripStopCalculated.TotalStopTime;
@@ -769,6 +782,21 @@
 		}
 	};
 
+	RoutingFieldTripStopEditModal.prototype.stopTimeArriveChange = function()
+	{
+
+	};
+
+	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveDateChange = function()
+	{
+
+	};
+
+	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveTimeChange = function()
+	{
+
+	};
+	
 	RoutingFieldTripStopEditModal.prototype.hide = function()
 	{
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);

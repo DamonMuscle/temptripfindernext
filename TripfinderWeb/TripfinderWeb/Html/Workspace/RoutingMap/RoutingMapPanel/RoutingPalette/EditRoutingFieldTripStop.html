@@ -38,24 +38,14 @@
 								<textarea class="form-control verticalResize" style="height: 68px;resize: none;" name="comments" data-bind="value:obDataModel.Comment, disable:isReadOnly"></textarea>
 							</div>
 						</div>
-						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&!obDataModel.SchoolCode()">
-							<div class="form-group small-form-group">
-								<div class="checkbox">
-									<label>
-										<input id="includeNoStudStopCheckbox" type="checkbox" data-bind="checked:obDataModel.IncludeNoStudStop,checkedValue:1, disable:isReadOnly">
-										<span>Include stop when no students assigned</span>
-									</label>
-								</div>
-							</div>
-						</div>
 						<div class="col-xs-24" data-bind="visible:mode()=='new'||(mode()=='edit'&&!obDataModel.SchoolCode())|| obIsMultipleCreate()">
 							<div class="form-group small-form-group">
 								<div style="height:24px;line-height:24px;">
-									<label>Trip</label>
+									<label>Field Trip</label>
 									<div class="pull-right" data-bind="visible:!obIsInsertToSpecialStop()">
 										<div class="checkbox">
 											<label>
-												<input id="smartSequenceCheckbox" data-bind="checked:obIsSmartSequence,checkedValue:0,disable:obIsSmartAssignment()" type="checkbox">
+												<input id="smartSequenceCheckbox" data-bind="checked:obIsSmartSequence,checkedValue:0,disable:obSmartSequenceDisable()||obIsSmartAssignment()" type="checkbox">
 												<span>Smart Sequence </span>
 											</label>
 										</div>
@@ -72,11 +62,11 @@
 								<div class="input-group" data-bind="visible:!obIsSmartAssignment()">
 									<div data-bind="style:{background:obSelectedTrip()&&obSelectedTrip().color}" style="position: absolute;background: red;width: 10px;height: 22px;top: 0;left: 0;z-index: 10;"></div>
 									<div data-bind="typeahead:{source:obTrips,drowDownShow:true,template:tripSelectTemplate,format:function(obj){return obj.Name;},notSort:true,selectedValue:obSelectedTrip}">
-										<!-- ko customInput:{type:"Select",value:obSelectedTripText,attributes:{class:"form-control",style:"padding-left:16px"}} -->
+										<!-- ko customInput:{type:"Select",value:obSelectedTripText,disable:obSelectedFieldTripDisable,attributes:{class:"form-control",style:"padding-left:16px"}} -->
 										<!-- /ko -->
 									</div>
 									<div class="input-group-btn">
-										<button type="button" class="btn btn-default btn-sharp">
+										<button type="button" data-bind="disable:obSelectedFieldTripDisable" class="btn btn-default btn-sharp">
 											<span class="caret"></span>
 										</button>
 									</div>
@@ -118,7 +108,7 @@
 						</div>
 						<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()=='edit'">
 							<div class="form-group small-form-group">
-								<label>Stop Time</label>
+								<label>Stop Time Arrive</label>
 								<!-- ko customInput:{type:"Time",value:obDataModel.StopTime,attributes:{class:"form-control",name:"stopTime",placeholder:"hh:mm"}, disable:isReadOnly} -->
 								<!-- /ko -->
 							</div>
@@ -128,11 +118,11 @@
 								<label>Stop Sequence #</label>
 								<div class="input-group">
 									<div data-bind="typeahead:{source:obSequenceSource,drowDownShow:true,notSort:true,selectedValue:obSelectedSequence}">
-										<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obSelectedSequenceDisable,attributes:{class:"form-control"}} -->
+										<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obStopSequenceDisable,attributes:{class:"form-control"}} -->
 										<!-- /ko -->
 									</div>
 									<div class="input-group-btn">
-										<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obSelectedSequenceDisable">
+										<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obStopSequenceDisable">
 											<span class="caret"></span>
 										</button>
 									</div>
@@ -166,11 +156,11 @@
 										<label>Stop Sequence #</label>
 										<div class="input-group">
 											<div data-bind="typeahead:{source:obSequenceSource,drowDownShow:true,notSort:true,selectedValue:obSelectedSequence}">
-												<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obSelectedSequenceDisable,attributes:{class:"form-control"}} -->
+												<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obStopSequenceDisable,attributes:{class:"form-control"}} -->
 												<!-- /ko -->
 											</div>
 											<div class="input-group-btn">
-												<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obSelectedSequenceDisable">
+												<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obStopSequenceDisable">
 													<span class="caret"></span>
 												</button>
 											</div>
@@ -204,29 +194,6 @@
 									<label>
 										<input type="radio" data-bind="checked:obDataModel.vehicleCurbApproach,checkedValue:2, disable:(isReadOnly() || obDataModel.isSnapped() || isJunction())" value="2">
 										<span data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Left side of vehicle')"></span>
-									</label>
-								</div>
-							</div>
-						</div>
-
-						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&!obDataModel.SchoolCode()">
-							<div class="form-group small-form-group">
-								<label>Street Crossing</label>
-								<div class="checkbox">
-									<label>
-										<input type="checkbox" data-bind="checked:obDataModel.ProhibitCrosser,checkedValue:1, disable:isReadOnly">
-										<span>Prohibit</span>
-									</label>
-								</div>
-							</div>
-						</div>
-						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&tf.authManager.hasInfofinderi()">
-							<div class="form-group small-form-group">
-								<label>Infofinder i Visible</label>
-								<div class="checkbox">
-									<label>
-										<input type="checkbox" data-bind="checked:obDataModel.IShow,checkedValue:1, disable:isReadOnly">
-										<span>Visible</span>
 									</label>
 								</div>
 							</div>
