@@ -185,7 +185,7 @@
 						data: menuItemData,
 						disable: fieldTripStopDisable,
 						id: 'tripSessionMovePoint',
-						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStopId)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStopId, trip.id)
 					}));
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 						isDevider: true
