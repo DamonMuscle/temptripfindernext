@@ -62,18 +62,30 @@
       <div class="item-label">Reports</div>
     </div>
     <!-- /ko -->
+
+    <!-- ko if: !TF.isMobileDevice -->
     <div class="navigation-item settings" pageType="settings"
       data-bind="click:navigationPageCategoryClick.bind($data, 'settings')">
       <div class="item-icon settings"></div>
       <div class="item-label">Settings</div>
       <div class="item-menu">
         <ul data-bind="foreach: { data: obSettingPages, afterRender: afterPageMenuOptionUIRender.bind($data) }">
-          <li
-            data-bind="css:{active:isOpen},attr:{pagetype:pageType, title: text},text:text,click:$parent.openPageButtonClick.bind($parent, pageType)">
+          <li data-bind="attr:{clicktype:$data.pageType}, css:{'has-submenu menu-container': ($data.items && $data.items.length > 0)}, click:$data.items ? $parent.showSubMenu.bind($parent):$parent.navigationPageCategoryClick.bind($parent, 'settings'), event: { mouseenter: $parent.showSubMenu.bind($parent), mouseleave: $parent.hideSubMenu.bind($parent)}, contextMenuClick:$parent.menuViewClick">
+            <span class="menu-text" data-bind="text:text"></span>
+            <!-- ko if: $data.items && $data.items.length > 0 -->
+            <span class="right-arrow"></span>
+            <ul class="submenu-container" data-bind="foreach: $data.items">
+              <li data-bind="attr:{clicktype:$data.pageType}">
+                <span class="menu-text" data-bind="text:text"></span>
+              </li>
+            </ul>
+            <!-- /ko -->
           </li>
         </ul>
       </div>
     </div>
+    <!-- /ko -->
+
     <div class="navigation-item messages" pageType="messages"
       data-bind="click:navigationPageCategoryClick.bind($data, 'messages'), visible:obShowMessageCenter">
       <div class="item-icon messages"></div>

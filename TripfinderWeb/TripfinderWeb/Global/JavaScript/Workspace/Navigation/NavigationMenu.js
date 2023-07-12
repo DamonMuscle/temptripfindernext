@@ -1,5 +1,7 @@
 (function()
 {
+	const CLASS_HEIGHT_FITTED = "height-fitted";
+
 	createNamespace("TF").NavigationMenu = NavigationMenu;
 
 	function NavigationMenu()
@@ -89,27 +91,100 @@
 				}
 			}
 		});
-	};	
+	};
+
+	NavigationMenu.prototype.updateUpDownArrowStyle = function(submenuContainer)
+	{
+		if ((submenuContainer.scrollHeight - submenuContainer.offsetHeight) <= 24/*24: two paddings' height*/)
+		{
+			$(submenuContainer).addClass(CLASS_HEIGHT_FITTED);
+		} else
+		{
+			$(submenuContainer).removeClass(CLASS_HEIGHT_FITTED);
+		}
+
+		if (Sys.firefox)
+		{
+			$(submenuContainer).addClass("is-firefox");
+		}
+
+		if (submenuContainer.scrollTop === 0)
+		{
+			$(submenuContainer).addClass("scroll-at-top");
+		} else
+		{
+			$(submenuContainer).removeClass("scroll-at-top");
+		}
+
+		if (submenuContainer.offsetHeight === 0 || submenuContainer.scrollTop === (submenuContainer.scrollHeight - submenuContainer.offsetHeight))
+		{
+			$(submenuContainer).addClass("scroll-at-bottom");
+		} else
+		{
+			$(submenuContainer).removeClass("scroll-at-bottom");
+		}
+	}
+
+	NavigationMenu.prototype.repositionUpDownArrows = function(ulPanel, immediateRefresh)
+	{
+		var self = this;
+		var $upArrow = $(ulPanel).find(">.up-arrow-container");
+		if ($upArrow.length === 0)
+		{
+			return;
+		}
+		var $downArrow = $(ulPanel).find(">.down-arrow-container");
+		if (self.needRefreshArrows)
+		{
+			self.needRefreshArrows = false;
+			$upArrow.css({ position: "absolute", top: 0, left: 0 });
+			$downArrow.css({ position: "absolute", bottom: 0, left: 0 });
+		}
+
+		if ($upArrow.css("position") !== "fixed")
+		{
+			var upArrowOffsetPosition = $upArrow.offset();
+			var downArrowOffsetPosition = $downArrow.offset();
+			$upArrow.css({ position: "fixed", top: 0, left: upArrowOffsetPosition.left + "px" });
+			$downArrow.css({ position: "fixed", bottom: 0, left: downArrowOffsetPosition.left + "px" });
+		}
+	}
 
 	NavigationMenu.prototype.menuViewClick = function(viewModel, e)
 	{
-		var type = $(e.target).closest('[clicktype]').attr("clicktype");
-		if (type !== 'form')
+		const self = this,
+			type = $(e.target).closest('[clicktype]').attr("clicktype");
+		if(!type)
 		{
-			// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
-			
-			tf.pageManager.openNewPage(type);
-
-			// close the navigation menu in mobile device after click
-			if (TF.isPhoneDevice)
-			{
-				this.closeNavigation();
-			}
+			return;
 		}
-		else
+
+		switch(type)
 		{
-			e.stopPropagation();
-			e.preventDefault();
+			case "form":
+				e.stopPropagation();
+				e.preventDefault();
+				break;
+			case "changePassword":
+				tf.PasswordChangeModalViewModel(tf.pageManager.currentDatabaseName());
+				self.closeOpenedNavigationItemMenu(false);
+
+				if (TF.isPhoneDevice)
+				{
+					self.closeNavigation();
+				}
+				break;
+			default:
+				// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
+			
+				tf.pageManager.openNewPage(type);
+
+				// close the navigation menu in mobile device after click
+				if (TF.isPhoneDevice)
+				{
+					this.closeNavigation();
+				}
+				break;
 		}
 	};
 
@@ -569,7 +644,7 @@
 				case "settings":
 					tf.pageManager.loadDataSourceName().then(function()
 					{
-						pageList = tf.pageManager.obAdministrationPagesMenu();
+						pageList = tf.pageManager.getSettingsMenuList();
 						self.obSettingPages(pageList);
 						categoryName = pageList.length === 1 ? pageList[0].text : (type.charAt(0).toUpperCase() + type.slice(1));
 						$item.find(".item-label").text(categoryName);
@@ -603,21 +678,47 @@
 			$pageList = $itemMenu.find("li"),
 			alreadyOpened = $item.hasClass("menu-opened");
 
-		if (type === "messages")
+		switch (type)
 		{
-			ga('send', 'event', 'Area', 'Message');
-			if (TF.isPhoneDevice)
-			{
-				self.closeNavigation();
-			}
-			tf.pageManager.showMessageModal();
-			return;
-		}
-
-		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
-		{
-			redirectWindow.location = "#/?pagetype=" + type, "new-pageWindow_" + $.now();
-			return;
+			case "messages":
+				ga('send', 'event', 'Area', 'Message');
+				if (TF.isPhoneDevice)
+				{
+					self.closeNavigation();
+				}
+				tf.pageManager.showMessageModal();
+				break;
+			case "settings":
+				if ((evt.ctrlKey || evt.metaKey))
+				{
+					redirectWindow.location = "#/?pagetype=" + type, "new-pageWindow_" + $.now();
+					return;
+				}
+				ga('send', 'event', 'Area', 'Settings');
+				break;
+			case "approvals":
+				ga('send', 'event', 'Area', 'My Pending Approvals');
+				break;
+			case "contacts":
+				ga('send', 'event', 'Area', 'Contacts');
+				break;
+			case "fieldtrips":
+				ga('send', 'event', 'Area', 'Field Trips');
+				break;
+			case "vehicles":
+				ga('send', 'event', 'Area', 'Vehicles');
+				break;
+			case "myrequests":
+				ga('send', 'event', 'Area', 'My Submitted Requests');
+				break;
+			case "reports":
+				ga('send', 'event', 'Area', 'Reports');
+				break;
+			case "datagrid":
+				ga('send', 'event', 'Area', 'Data Grids');
+				break;
+			default:
+				break;
 		}
 
 		//skip the method if user click the link to the same page.
@@ -654,49 +755,18 @@
 			{
 				self.closeNavigation();
 			}
-		} else if (alreadyOpened)
+		}
+		else if (alreadyOpened)
 		{
 			self.togglePageMenuDisplay($item, false, self.defaultOpenMenuAnimationDuration).then(() => {
 				$item.removeClass("small-screen");
 				$item.removeClass("menu-opened");
 			});
 			$item.addClass("hoverState");
-		} else
-		{
-			if (!self.closeOpenedNavigationItemMenu(false))
-			{
-				self.togglePageMenuDisplay($item, true, self.defaultOpenMenuAnimationDuration);
-			}
 		}
-
-		switch (type)
+		else if (!self.closeOpenedNavigationItemMenu(false))
 		{
-			case "approvals":
-				ga('send', 'event', 'Area', 'My Pending Approvals');
-				break;
-			case "contacts":
-				ga('send', 'event', 'Area', 'Contacts');
-				break;
-			case "fieldtrips":
-				ga('send', 'event', 'Area', 'Field Trips');
-				break;
-			case "vehicles":
-				ga('send', 'event', 'Area', 'Vehicles');
-				break;
-			case "myrequests":
-				ga('send', 'event', 'Area', 'My Submitted Requests');
-				break;
-			case "reports":
-				ga('send', 'event', 'Area', 'Reports');
-				break;
-			case "settings":
-				ga('send', 'event', 'Area', 'Settings');
-				break;
-			case "datagrid":
-				ga('send', 'event', 'Area', 'Data Grids');
-				break;
-			default:
-				break;
+			self.togglePageMenuDisplay($item, true, self.defaultOpenMenuAnimationDuration);
 		}
 	};
 

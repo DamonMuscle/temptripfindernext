@@ -32,8 +32,6 @@
 		self.applicationSwitcherList = [];
 		self.applicationURLMappingList = [];
 
-		//Pages menu
-		self.obAdministrationPagesMenu = ko.computed(self.administrationPagesMenuComputer.bind(self));
 		self.logOffClick = self.logOffClick.bind(this);
 
 		//Initial parameters
@@ -460,6 +458,10 @@
 				pageData = new TF.Page.LocationPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
+			case "datalist":
+				pageData = {};
+				templateName = "workspace/page/datalist";
+				break;
 			// if type is not matched use fieldtrip page as default
 			default:
 				pageData = new TF.Page.FieldTripPage(gridOptions);
@@ -660,19 +662,52 @@
 		}
 	};
 
-	/**
-	 * Gets page menu for administration.
-	 * @returns {array} The array of administration
-	 */
-	PageManager.prototype.administrationPagesMenuComputer = function()
+	PageManager.prototype.getSettingsMenuList = function()
 	{
-		var self = this,
-			menu = [];
+		const list = [],
+			configurationSection = _.sortBy([
+				{ text: "Automation", pageType: "automation" },
+				{ text: tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + ' ' + tf.applicationTerm.getApplicationTermPluralByName("Config"), pageType: 'fieldtripconfigs' },
+				{ text: tf.applicationTerm.getApplicationTermPluralByName("Required Field"), pageType: "requiredfield" },
+				{ text: "System Configurations", pageType: "settingsConfig" },
+				{ text: "User Defined Fields", pageType: "userdefinedlabelfields" },
+				{ text: "Change Password", pageType: "changePassword" }
+			], "text");
+		
+		if (tf.authManager.hasWayNav())
+		{
+			configurationSection.push({ text: "Wayfinder", pageType: "wayfinderdetailview" });
+		}
 
-		self.addMenuPage("settingsConfig", menu, "Settings & Configuration", "Settings & Configuration", tf.permissions.obIsAdmin(), false);
-		// self.addMenuPage("dataSource", menu, dataSourceText, "Data Source", !tf.permissions.isSupport, false);
-		self.addMenuPage("changePassword", menu, "Change Password", "Change Password", true, false);
-		return menu;
+		list.push({
+			text: "Configuration",
+			items: tf.authManager.authorizationInfo.isAdmin ? configurationSection : [{ text: "Change Password", pageType: "changePassword" }],
+		});
+
+		if (tf.authManager.authorizationInfo.isAdmin)
+		{
+			list.push({
+				text: "Data List",
+				pageType: 'datalist'
+			});
+
+			list.push({
+				text: "Tools",
+				items: _.sortBy([
+					{ text: "Auto Assign Vehicles", pageType: "autoassignvehicles", hidden: !tf.authManager.hasGPS() || !tf.authManager.GPSConnectValid },
+					{ text: "Current User Sessions", pageType: "session", hidden: !tf.authManager.authorizationInfo.isAdmin },
+					{ text: "Import Data", pageType: "importdata" },
+					{ text: "Import Pictures", pageType: "recordpictures" },
+					{ text: "Recapture GPS Data", pageType: "recapturegpsdata", hidden: ko.pureComputed(() => !(tf.authManager.hasGPS() && tf.authManager.authorizationInfo.isAdmin)) },
+				], 'text'),
+			});
+		}
+
+		list.forEach(category => {
+			category.items?.forEach(item => item.isOpen = item.pageType === tf.storageManager.get(`${TF.productName.toLowerCase()}.page`));
+		});
+
+		return _.sortBy(list, 'text');
 	};
 
 	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm)

@@ -399,6 +399,11 @@
 		return this.supportedProducts.some((c) => { return c.Name.toLowerCase() == "wayfinder"; });
 	};
 
+	AuthManager.prototype.hasWayNav = function()
+	{
+		return this.supportedProducts.some((c) => { return c.Name.toLowerCase() == "waynav"; });
+	};
+
 	AuthManager.prototype.hasInfofinderi = function()
 	{
 		return this.supportedProducts.some(c => c.Name === "Infofinderi");
