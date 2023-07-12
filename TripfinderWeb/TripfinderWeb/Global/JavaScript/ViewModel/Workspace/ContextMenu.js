@@ -245,7 +245,32 @@
 				var arrowItem = $('<span class="k-icon k-i-arrow-e"></span>');
 				textDiv.append(arrowItem);
 			}
-			self.initMenuInternalEvent(child, listItem, textDiv, outterUl);
+			listItem.on('mouseover', menuItemMouseOver.bind(this, child));
+			listItem.on('mouseleave', menuItemMouseLeave.bind(this, child));
+			outterUl.append(listItem);
+
+			var returnDiv = this.showMenuInternal(menuItem.children[i]);
+			child.childMenuHtml = returnDiv;
+			textDiv.append(returnDiv);
+			if (!child.isDisable)
+			{
+				listItem.on('click', null, child, child.onclick.createInterceptor(function(e)
+				{
+					var menuItem = e.data;
+					var result = self.onClickEvent.call(self, menuItem, e);
+					if (menuItem.config.click)
+					{
+						self.removeContextMenu.call(self);
+					}
+
+					if (!result && menuItem.config.cancelClick)
+					{
+						menuItem.config.cancelClick();
+					}
+
+					return result;
+				}));
+			}
 		}
 		return outterDiv;
 	};

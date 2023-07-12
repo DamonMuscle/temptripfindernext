@@ -505,7 +505,7 @@
 			previousElement,
 			removeElementIndex,
 			tripStopId = viewModel.id,
-			exceptions = this.dataModel.getExceptions(tripStopId), msg = "Are you sure you want to delete this trip stop?";
+			exceptions = this.dataModel.getExceptions(tripStopId), msg = "Are you sure you want to delete this field trip stop?";
 		if (exceptions.length)
 		{
 			exceptions = Enumerable.From(exceptions).OrderBy(i => (i.LastName || "").toLowerCase()).ThenBy(i => (i.FirstName || "").toLowerCase()).ToArray();

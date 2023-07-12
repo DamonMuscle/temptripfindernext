@@ -115,7 +115,7 @@
 			// 	clearTimeout(self._draggingTimeout);
 			// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
 			// }, 50);
-			// self._map.mapView.on("click", self.onRightClickMenu.bind(self));
+			self._map.mapView.on("click", self.onRightClickMenu.bind(self));
 			// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
 			self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
 			self.autoPan.initialize(self.element, 20);

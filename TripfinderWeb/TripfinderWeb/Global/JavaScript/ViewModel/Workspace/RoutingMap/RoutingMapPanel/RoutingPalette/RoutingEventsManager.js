@@ -565,6 +565,7 @@
 
 	RoutingEventsManager.prototype.infoClick = function(item)
 	{
+		console.log("Info clicked");
 		PubSub.publish("clear_ContextMenu_Operation");
 		var self = this;
 		if (self._viewModal.mode === 'Routing-Create')
@@ -874,6 +875,9 @@
 
 	RoutingEventsManager.prototype.editTripStopClick = function(type, stopId)
 	{
+		console.log("Move Stop Location clicked");
+		return;
+
 		this.viewModel.routingChangePath.stop();
 		this.viewModel.drawTool.movePoint(stopId);
 	};
@@ -950,6 +954,9 @@ This action cannot be undone.  Do you wish to continue?`;
 			closeButton: true
 		}, "Confirmation").then(result =>
 		{
+			console.log("Stop Delete clicked");
+			return;
+
 			if (result)
 			{
 				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
