@@ -33,6 +33,14 @@
 					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Staff.BusAide
 				},
 				{
+					FieldName: "CurrentBusAide",
+					DisplayName: "Current Bus Aide",
+					Width: '150px',
+					type: "string",
+					ListFilterTemplate: TF.ListFilterDefinition.ListFilterTemplate.Staff.BusAide,
+					ParentField: "AideName"
+				},
+				{
 					FieldName: "Tstopcount",
 					DisplayName: "# Stops",
 					Width: '150px',

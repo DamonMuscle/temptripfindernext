@@ -28,15 +28,20 @@
 		let dataTypeId = this.dataTypeId;
 		let editType = this.field.editType;
 		let systemFieldType = this.field.FieldOptions.SystemFieldType;
+		let attributeFlag = this.field.OriginItem ? this.field.OriginItem.AttributeFlag : 0;
+		let numberPrecision = 2; // set default number Precision to 2 for normal Grid fields
 		let trueDisplayName = "true";
 		let falseDisplayName = "false";
 		if (udfs && udfs.length > 0)
 		{
 			let defaultText = this.field.FieldOptions.DefaultText; // default text is UDF Guid
 			let udf = udfs.find(u => u.Guid === defaultText);
-			numberPrecision = udf ? udf.NumberPrecision : 0;
-			udf && (trueDisplayName = udf.TrueDisplayName ? udf.TrueDisplayName : "true");
-			udf && (falseDisplayName = udf.FalseDisplayName ? udf.FalseDisplayName : "false");
+			if (udf)
+			{
+				numberPrecision = udf.NumberPrecision ? udf.NumberPrecision : 0;
+				trueDisplayName = udf.TrueDisplayName ? udf.TrueDisplayName : "true";
+				falseDisplayName = udf.FalseDisplayName ? udf.FalseDisplayName : "false";
+			}
 		}
 
 		if (systemFieldType === 'Roll-up')
@@ -48,26 +53,23 @@
 			}
 		}
 		let targetField = editType.targetField;
-		let formType = TF.Form.FormConfigHelper.systemFieldsConfig[dataTypeId];
-		if (formType)
+		const fieldFormatConfig = tf.udgHelper.getSystemFieldsConfig(dataTypeId, targetField);
+		
+		if (fieldFormatConfig)
 		{
-			let fieldFormatDef = TF.Form.FormConfigHelper.systemFieldsConfig[dataTypeId][targetField];
-			if (fieldFormatDef)
-			{
-				displayValue = TF.Form.FormConfigHelper.systemFieldsFormat(fieldFormatDef.type, value, this.$el, trueDisplayName, falseDisplayName);
-			} else if (systemFieldType)
-			{
-				displayValue = TF.Form.FormConfigHelper.systemFieldsFormat(systemFieldType, value, this.$el, trueDisplayName, falseDisplayName);
-			} else
-			{
-				displayValue = value !== null ? value : "";
-			}
-		} else
+			displayValue = tf.systemFieldsFormat(fieldFormatConfig.type, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName);
+			value = tf.systemFieldsFormatValue(fieldFormatConfig.type, value);
+		} 
+		else if (systemFieldType)
+		{
+			displayValue = tf.systemFieldsFormat(systemFieldType, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName);
+		}
+		else
 		{
 			displayValue = value !== null ? value : "";
 		}
 
-		this.value = value
+		this.value = value;
 		this.$el.val(displayValue);
 		this.autoFoldContent();
 	}

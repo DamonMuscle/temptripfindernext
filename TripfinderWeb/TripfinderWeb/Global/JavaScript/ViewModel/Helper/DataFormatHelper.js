@@ -160,10 +160,23 @@
 			let column = self.options.originalGridDefinition ?
 				_getColumnByFieldName(self.options.originalGridDefinition.Columns, item) :
 				_getColumnByFieldName(self.options.gridDefinition.Columns, item);
-			if (column &&
-				(column.formatType?.toLowerCase() === "phone" ||
+
+			const _isSystemFieldPhoneNumberType = function(column) 
+			{
+				let systemFieldConfig = tf.systemFieldsConfig[column.questionFieldOptions?.DataTypeId];
+				if (!systemFieldConfig) return false;
+				let type = systemFieldConfig[column.questionFieldOptions?.DefaultText]?.type;
+				return column.questionType === "SystemField" && type === 'Phone Number';
+			}
+
+			const _isPhoneNumberType = function(column)
+			{
+				return column.formatType?.toLowerCase() === "phone" ||
 					column.questionType?.toLowerCase() === "phone" ||
-					column.UDFType === "phone number"))
+					column.UDFType === "phone number";
+			}
+
+			if (column && (_isPhoneNumberType(column) || _isSystemFieldPhoneNumberType(column)))
 			{
 				item.Value = _stripValue(item.Value);
 			}
