@@ -1535,22 +1535,22 @@
 	function deleteClick(e)
 	{
 		console.log("Tripfinder Next TODO: deleteClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
-		var tripStop = self.dataModel.getFieldTripStopByStopId(data.id);
-		if (!tripStop)
+		var fieldTripStop = self.dataModel.getFieldTripStopByStopId(data.id);
+		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, c => c.id === fieldTripStop.FieldTripId);
+
+		if (!fieldTripStop)
 		{
 			return false;
 		}
-		this.eventsManager.deleteOneClick(tripStop.id, e).then(function(result)
+		this.eventsManager.deleteOneClick(fieldTripStop.id, trip.id, e).then(function(result)
 		{
 			if (result)
 			{
-				self.dataModel.changeDataStack.push(tripStop);
+				self.dataModel.changeDataStack.push(fieldTripStop);
 			}
 		});
 
@@ -2182,124 +2182,26 @@
 
 	RoutingDisplay.prototype.refreshStopNode = function(tripStop, trip)
 	{
-		function getTypeStudents(students, nodes)
-		{
-			var newStudents = [];
-			var updateStudents = [];
-			var deleteStudents = [];
-			nodes.map(function(node)
-			{
-				for (var i = 0; i < students.length; i++)
-				{
-					if (node.id == students[i].id
-						&& node.customData.previousScheduleID == students[i].PreviousScheduleID
-						&& node.customData.requirementId == students[i].RequirementID
-						&& node.customData.isAssigned == students[i].IsAssigned
-						&& node.customData.tripStopId == students[i].TripStopID
-						&& node.customData.anotherTripStopID == students[i].AnotherTripStopID)
-					{
-						updateStudents.push(node);
-						return;
-					}
-				}
-				deleteStudents.push(node);
-			});
-
-			for (var i = 0; i < students.length; i++)
-			{
-				if (Enumerable.From(updateStudents).FirstOrDefault(null, function(s)
-				{
-					return s.id == students[i].id
-						&& s.customData.previousScheduleID == students[i].PreviousScheduleID
-						&& s.customData.requirementId == students[i].RequirementID
-						&& s.customData.tripStopId == students[i].TripStopID
-						&& s.customData.anotherTripStopID == students[i].AnotherTripStopID;
-				}) === null)
-				{
-					newStudents.push(students[i]);
-				}
-			}
-			return { new: newStudents, update: updateStudents, delete: deleteStudents };
-		}
-
-		var self = this, students = self.getVisibleStudent(tripStop), nodes = [];
+		var self = this;
 		var currentMissionId = TF.generateUUID();
 		self.updateMissionDictionary[tripStop.id] = currentMissionId;
 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 		var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
-		if (!tripStopNode)
+
+		if (currentMissionId != self.updateMissionDictionary[tripStop.id])
 		{
 			return;
 		}
-		var nodeElement = self.treeview.findByUid(tripStopNode.uid);
-		removeSchoolLocation(nodeElement);
-		if (self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode) && tripStopNode.children && tripStopNode.children.options)
+
+		if (!tripWasExpanded)
 		{
-			nodes = tripStopNode.children._data;
+			self.routingDisplayHelper.resetUnexpandedTreeNodeValue(tripStopNode, tripStop);
 		}
 		else
 		{
-			nodes = tripStopNode.items.length > 0 ? tripStopNode.items : ((tripStopNode.children && tripStopNode.children.options) ? tripStopNode.children.options.data.items : tripStopNode.items);
+			self.setTripStopNodeProperty(tripStopNode, self.treeview.findByUid(tripStopNode.uid));
 		}
-
-		var data = getTypeStudents(students, nodes);
-		var pList = [];
-		data['new'].map(function(student)
-		{
-			self.setTripStopStudentStatus(student, tripStop);
-			var newStudent = self.newStudent(student, tripStop, tripStop.ProhibitCrosser);
-			pList.push(self.routingDisplayHelper.addTreeNode(newStudent, tripStopNode, 'student', currentMissionId));
-		});
-
-		data['update'].map(function(studentNode)
-		{
-			var student = self.dataModel.getStudent(studentNode.id, studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentNode.customData.requirementId, studentNode.customData.previousScheduleID);
-			if (self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode))
-			{
-				let promise = Promise.resolve(true);
-				if (student.CrossToStop === null)
-				{
-					promise = self.handleUnknowCrossingStatusStudents([studentNode]);
-				}
-				promise.then(() =>
-				{
-					self.setStudentNodeProperty(studentNode, self.treeview.findByUid(studentNode.uid));
-				});
-			}
-			else
-			{
-				var stuTemp = $.extend(true, {}, student);
-				if (trip.Session == self.routingDisplayHelper.tripType.MidDay && tripStop.SchoolCode != student.TransSchoolCode)
-				{
-					stuTemp.Session = 1 - stuTemp.Session;
-				}
-				self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, stuTemp);
-				studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopNode.customData.prohibitCrosser;
-			}
-		});
-
-		data['delete'].map(function(studentNode)
-		{
-			self.routingDisplayHelper.removeTreeNode(studentNode, tripStopNode);
-		});
-
-		Promise.all(pList).then(function()
-		{
-			if (currentMissionId != self.updateMissionDictionary[tripStop.id])
-			{
-				return;
-			}
-
-			if (!tripWasExpanded)
-			{
-				self.routingDisplayHelper.resetUnexpandedTreeNodeValue(tripStopNode, tripStop);
-			}
-			else
-			{
-				self.setTripStopNodeProperty(tripStopNode, self.treeview.findByUid(tripStopNode.uid));
-			}
-		});
 	}
 
 	function removeSchoolLocation(nodeElement)

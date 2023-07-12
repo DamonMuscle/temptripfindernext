@@ -27,7 +27,7 @@
 			return self.setTripStopPathAndSequence(data, "new", insertToSpecialSequence > 0).then(function(prevStop)
 			{
 				// set stop time to new trip stop by calculate
-				self.dataModel.setActualStopTime([self.dataModel.getTripById(data.TripId)]);
+				self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
 				if (!isDuplicate) data.StopTime = data.ActualStopTime;
 				self.insertToRevertData(data);
 				self.dataModel.routingStudentManager.refreshDictionary(true);
@@ -50,7 +50,7 @@
 						edit: prevStop ? [prevStop] : []
 					});
 				});
-				self.dataModel.changeTripVisibility(data.TripId, true);
+				self.dataModel.changeTripVisibility(data.FieldTripId, true);
 				self._runAfterPathChanged([data], null, true);
 				self.changeRevertStack(data, isFromRevert);
 				return true;
@@ -77,11 +77,11 @@
 				{
 					return;
 				}
-				if (!grouped[tripStop.TripId])
+				if (!grouped[tripStop.FieldTripId])
 				{
-					grouped[tripStop.TripId] = {
-						tripId: tripStop.TripId,
-						existsStops: self.dataModel.getTripById(tripStop.TripId).TripStops,
+					grouped[tripStop.FieldTripId] = {
+						tripId: tripStop.FieldTripId,
+						existsStops: self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops,
 						newStops: []
 					};
 				}
@@ -90,7 +90,7 @@
 				tripStop.OpenType = "Edit";
 				boundary.push(tripStop.boundary);
 				stops.push(tripStop);
-				grouped[tripStop.TripId].newStops.push(tripStop);
+				grouped[tripStop.FieldTripId].newStops.push(tripStop);
 			});
 
 			var index = 0;
@@ -142,7 +142,7 @@
 		var tripIds = new Set();
 		stops.forEach(x =>
 		{
-			tripIds.add(x.TripId);
+			tripIds.add(x.FieldTripId);
 		});
 		var trips = [];
 		tripIds.forEach(x => trips.push(this.dataModel.getTripById(x)));
@@ -169,7 +169,7 @@
 
 		return solvePromise.then(function(tripStops)
 		{
-			targetTrip.TripStops = targetTrip.TripStops.concat(newTripStops);
+			targetTrip.FieldTripStops = targetTrip.FieldTripStops.concat(newTripStops);
 
 			// trip stops is solved
 			if (tripStops && tripStops[0])
@@ -177,7 +177,7 @@
 				tripStops.forEach(function(data, i)
 				{
 					var sequence = i + 1;
-					var sourceTripStop = Enumerable.From(targetTrip.TripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
+					var sourceTripStop = Enumerable.From(targetTrip.FieldTripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
 					if (sourceTripStop)
 					{
 						sourceTripStop.path = data.path;
@@ -185,7 +185,7 @@
 					}
 				});
 
-				targetTrip.TripStops = self._sortTripStops(targetTrip.TripStops);
+				targetTrip.FieldTripStops = self._sortTripStops(targetTrip.FieldTripStops);
 			}
 
 			return targetTrip;
@@ -196,9 +196,9 @@
 	{
 		newTripStops.forEach(function(tripStop)
 		{
-			tripStop.TripId = trip.id;
-			if (tripStop.path) tripStop.path.TripId = trip.id;
-			tripStop.boundary.TripId = trip.id;
+			tripStop.FieldTripId = trip.id;
+			if (tripStop.path) tripStop.path.FieldTripId = trip.id;
+			tripStop.boundary.FieldTripId = trip.id;
 			tripStop.routeStops = null;
 			tripStop.color = trip.color;
 		});
@@ -226,7 +226,7 @@
 			data.boundary = this.createTripBoundary(data);
 		} else
 		{
-			data.boundary.TripId = data.TripId;
+			data.boundary.FieldTripId = data.FieldTripId;
 			data.boundary.TripStopId = data.id;
 		}
 		data.routeStops = null;
@@ -239,7 +239,7 @@
 		self._viewModal.revertMode = "";
 		self._viewModal.revertData = [];
 		insertToStops = self._sortTripStops(insertToStops);
-		var targetTrip = self.dataModel.getTripById(insertToStops[0].TripId);
+		var targetTrip = self.dataModel.getTripById(insertToStops[0].FieldTripId);
 		var sequenceOffset = insertToStops[0].Sequence;
 		self.bindTripDataToTripStop(newTripStops, targetTrip);
 		var solvePromise = Promise.resolve([]);
@@ -263,7 +263,7 @@
 		{
 			// add one stop smart sequence
 			var stop = newTripStops[0];
-			stop.TripId = insertToStops[0].TripId;
+			stop.FieldTripId = insertToStops[0].FieldTripId;
 			solvePromise = self._refreshTripByAddStopSmart(newTripStops[0]);
 		}
 		else if (isSequenceOptimize)
@@ -296,7 +296,7 @@
 			if (response.err) tf.promiseBootbox.alert(response.err);
 			// if (isSmartSequence)
 			// {
-			// 	targetTrip.TripStops = tripStops.concat(newTripStops);
+			// 	targetTrip.FieldTripStops = tripStops.concat(newTripStops);
 			// } else
 			// {
 			if (!tripStops)
@@ -309,40 +309,40 @@
 				});
 				if (!atSequences && !isSequenceOptimize)
 				{
-					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+					targetTrip.FieldTripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.FieldTripStops);
 				}
 				else if (atSequences)
 				{
-					targetTrip.TripStops = stops ? stops : self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+					targetTrip.FieldTripStops = stops ? stops : self.appendNewStopsToTrip(newTripStops, targetTrip.FieldTripStops);
 				}
 				else
 				{
-					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);//targetTrip.TripStops.concat(newTripStops);
+					targetTrip.FieldTripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.FieldTripStops);//targetTrip.FieldTripStops.concat(newTripStops);
 				}
-				targetTrip.TripStops.forEach(function(stop, index) { stop.Sequence = index + 1; });
+				targetTrip.FieldTripStops.forEach(function(stop, index) { stop.Sequence = index + 1; });
 			}
 			else
 			{
 				if (!atSequences && !isSequenceOptimize)
 				{
-					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+					targetTrip.FieldTripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.FieldTripStops);
 				}
 				else if (isSequenceOptimize && isPreserve)
 				{
-					targetTrip.TripStops = tripStops;
+					targetTrip.FieldTripStops = tripStops;
 				}
 				else if (atSequences)
 				{
-					targetTrip.TripStops = stops ? stops : self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);
+					targetTrip.FieldTripStops = stops ? stops : self.appendNewStopsToTrip(newTripStops, targetTrip.FieldTripStops);
 				}
 				else
 				{
-					targetTrip.TripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.TripStops);//targetTrip.TripStops.concat(newTripStops);
+					targetTrip.FieldTripStops = self.appendNewStopsToTrip(newTripStops, targetTrip.FieldTripStops);//targetTrip.FieldTripStops.concat(newTripStops);
 				}
 				tripStops.forEach(function(data, i)
 				{
 					var sequence = i + sequenceOffset;
-					var sourceTripStop = Enumerable.From(targetTrip.TripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
+					var sourceTripStop = Enumerable.From(targetTrip.FieldTripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
 					var newTripStop = Enumerable.From(newTripStops).FirstOrDefault(null, function(c) { return c.id == data.id; });
 					if (newTripStop)
 					{
@@ -384,7 +384,7 @@
 			}
 			//}
 
-			targetTrip.TripStops = self._sortTripStops(targetTrip.TripStops);
+			targetTrip.FieldTripStops = self._sortTripStops(targetTrip.FieldTripStops);
 			if (!tripStops)
 			{
 				self.clearPreviousStopPathIfUnsolved(newTripStops, targetTrip);
@@ -408,7 +408,7 @@
 				});
 			}
 
-			self.dataModel.onTripSequenceChangeEvent.notify(targetTrip.TripStops);
+			self.dataModel.onTripSequenceChangeEvent.notify(targetTrip.FieldTripStops);
 			self.changeRevertStack(newTripStops, false);
 			return newTripStops;
 		});
@@ -422,7 +422,7 @@
 			return tripStop.Sequence;
 		}));
 
-		var previousStop = Enumerable.From(trip.TripStops).FirstOrDefault(null, function(ts)
+		var previousStop = Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(ts)
 		{
 			return ts.Sequence == minSequence - 1;
 		});
@@ -611,7 +611,7 @@
 		var self = this;
 		if (self.dataModel.showImpactDifferenceChart())
 		{
-			var tripIds = stops.map(function(s) { return s.TripId; });
+			var tripIds = stops.map(function(s) { return s.FieldTripId; });
 			var uniqueIds = Enumerable.From(tripIds).Distinct().ToArray();
 			uniqueIds.forEach(function(tripId)
 			{
@@ -639,7 +639,7 @@
 	{
 		var self = this;
 		var deleteArray = this.dataModel.singleToArray(toDeleteData);
-		var tripStopsGroup = Enumerable.From(deleteArray).GroupBy("$.TripId").ToArray();
+		var tripStopsGroup = Enumerable.From(deleteArray).GroupBy("$.FieldTripId").ToArray();
 		var promiseArray = [];
 		for (var i = 0; i < tripStopsGroup.length; i++)
 		{
@@ -665,7 +665,7 @@
 		var deleteTripStops = [];
 		var editTripStops = [];
 		var changePathTripStops = [];
-		var trip = self.dataModel.getTripById(deleteArray[0].TripId);
+		var trip = self.dataModel.getTripById(deleteArray[0].FieldTripId);
 		var studentsTripStops = [];
 		deleteArray.forEach(function(tripStop)
 		{
@@ -675,7 +675,7 @@
 			{
 				studentsTripStops.push({ students: deleteData.Students, tripStop: deleteData });
 
-				trip.TripStops.forEach(function(stop)
+				trip.FieldTripStops.forEach(function(stop)
 				{
 					var anotherStudents = Enumerable.From(stop.Students).Where(function(c) { return c.AnotherTripStopID == deleteData.id; }).ToArray();
 					if (anotherStudents.length > 0)
@@ -711,7 +711,7 @@
 			}
 		});
 
-		var tripStops = trip.TripStops.filter(function(stop)
+		var tripStops = trip.FieldTripStops.filter(function(stop)
 		{
 			return !Enumerable.From(deleteTripStops).Any(function(c) { return c.id == stop.id; });
 		});
@@ -724,13 +724,13 @@
 				// commented to fix bug RW-6524
 				// if (i > 1)
 				// {
-				// 	editTripStops.push(trip.TripStops[i - 1]);
+				// 	editTripStops.push(trip.FieldTripStops[i - 1]);
 				// }
 				stop.Sequence = newSequence;
 			}
 		});
 		tripStops = self._sortTripStops(tripStops);
-		trip.TripStops = tripStops;
+		trip.FieldTripStops = tripStops;
 		return self._refreshTripPathByTripStops(tripStops, deleteTripStops).then(function(tripStops)
 		{
 			editTripStops.forEach(function(stop)
@@ -752,7 +752,7 @@
 	RoutingFieldTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, tripId, newSequence)
 	{
 		var self = this;
-		if (tripStop.TripId == tripId)
+		if (tripStop.FieldTripId == tripId)
 		{
 			return self._reorderTripStopSequenceInOneTrip(tripStop, newSequence);
 		}
@@ -763,7 +763,7 @@
 	{
 		var self = this;
 		var trip = self.dataModel.getTripById(tripId);
-		var tripDeleteStop = self.dataModel.getTripById(tripStops[0].TripId);
+		var tripDeleteStop = self.dataModel.getTripById(tripStops[0].FieldTripId);
 		var stopAssignedStudentsDictionary = {};
 		tripStops.map(function(tripStop)
 		{
@@ -780,7 +780,7 @@
 				if (!stops || !$.isArray(stops) || stops.length == 0) return stops;
 				var sequences = newSequence ? [newSequence] : null;
 				if (stops && $.isArray(stops)) sequences = stops.map(function(stop) { return stop.Sequence; })
-				return self.moveTripStopsFromOtherTrip(stops, trip.TripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
+				return self.moveTripStopsFromOtherTrip(stops, trip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
 			}).then(function(edits)
 			{
 				if (!edits || !$.isArray(edits) || edits.length == 0) return edits;
@@ -807,7 +807,7 @@
 				return getSequencePromise.then(function(stops)
 				{
 					var sequences = newSequence ? [newSequence] : null;
-					return self.moveTripStopsFromOtherTrip(stops, trip.TripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
+					return self.moveTripStopsFromOtherTrip(stops, trip.FieldTripStops, sequences, false, isSequenceOptimize, isSmartSequence, isPreserve);
 				})
 
 			}).then(function(edits)
@@ -834,7 +834,7 @@
 		self._viewModal.revertData = [];
 		var oldSequence = tripStop.Sequence;
 		var editTripPathStops = [];
-		var trip = self.dataModel.getTripById(tripStop.TripId);
+		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
 		if (!isFromBroadCastSync) self.dataModel.tripEditBroadcast.moveTripStop(trip, tripStop, newSequence);
 		var newPrevStop = newSequence > 1 ? self.dataModel.getTripStopBySequence(trip, newSequence - 1) : null;
 		var oldPrevStop = oldSequence > 1 ? self.dataModel.getTripStopBySequence(trip, oldSequence - 1) : null;
@@ -851,13 +851,13 @@
 		{
 			editTripPathStops.push(oldPrevStop);
 		}
-		trip.TripStops.splice(oldSequence - 1, 1);
-		trip.TripStops.splice(newSequence - 1, 0, tripStop);
-		trip.TripStops.forEach(function(stop, i)
+		trip.FieldTripStops.splice(oldSequence - 1, 1);
+		trip.FieldTripStops.splice(newSequence - 1, 0, tripStop);
+		trip.FieldTripStops.forEach(function(stop, i)
 		{
 			stop.Sequence = i + 1;
 		});
-		return self._refreshTripPathByTripStops(trip.TripStops).then(function(tripStops)
+		return self._refreshTripPathByTripStops(trip.FieldTripStops).then(function(tripStops)
 		{
 			editTripPathStops.forEach(function(stop)
 			{
@@ -872,7 +872,7 @@
 					stop.IsCustomDirection = false;
 				}
 			});
-			var sequenceChanges = trip.TripStops.filter(function(c) { return c.Sequence <= Math.max(oldSequence, newSequence); });
+			var sequenceChanges = trip.FieldTripStops.filter(function(c) { return c.Sequence <= Math.max(oldSequence, newSequence); });
 			self.dataModel.onTripSequenceChangeEvent.notify(sequenceChanges);
 			self.changeRevertStack(editTripPathStops, false);
 		});
@@ -901,7 +901,7 @@
 			{
 				prevStop.routeStops = null;
 			}
-			var tripStops = self.dataModel.getTripById(tripStop.TripId).TripStops;
+			var tripStops = self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops;
 			tripStops = self._sortTripStops(tripStops);
 			var startSequence = currentStop ? currentStop.Sequence : prevStop.Sequence;
 
@@ -936,7 +936,7 @@
 		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentTripStops, true).then(function(currentStops)
 		{
 			currentStops.forEach(function(stop, index) { stop.Sequence = index + 1; })
-			return self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(newTripStops, { TripStops: currentStops }, self.viewModel.drawTool).then(function(newStops)
+			return self.viewModel.eventsManager.contiguousHelper.getSmartAssignment(newTripStops, { FieldTripStops: currentStops }, self.viewModel.drawTool).then(function(newStops)
 			{
 				newStops.forEach(function(stop)
 				{
@@ -954,7 +954,7 @@
 	// RoutingFieldTripStopDataModel.prototype._refreshTipPathByInsertToEnd = function(currentTripStops, newTripStops)
 	// {
 	// 	var self = this;
-	// 	var trip = self.dataModel.getTripById(currentTripStops[0].TripId);
+	// 	var trip = self.dataModel.getTripById(currentTripStops[0].FieldTripId);
 	// 	var currentEndStops = trip.Session == 0 ? currentTripStops.slice(currentTripStops.length - 2) : currentEndStops.slice(0, 2);
 	// 	currentEndStops = [currentEndStops[0]].concat(newTripStops).concat([currentEndStops[1]]);
 	// 	return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentEndStops, true).then(function(stops)
@@ -1031,7 +1031,7 @@
 		modifyDataArray.forEach(function(data)
 		{
 			var afterStopIndex = type == "delete" ? data.Sequence - 1 : data.Sequence;
-			var afterStop = self.dataModel.getTripById(data.TripId).TripStops[afterStopIndex];
+			var afterStop = self.dataModel.getTripById(data.FieldTripId).FieldTripStops[afterStopIndex];
 			if (afterStop && (!afterStop.SchoolCode || afterStop.SchoolCode.length == 0)
 				&& StudentCrossChangesStops.filter(function(c) { return c.id == afterStop.id; }).length == 0 && !afterStop.solvePathGeometryNotChange)
 			{
@@ -1089,7 +1089,7 @@
 				prevStop.routeStops = null;
 			}
 			if (type == "move") { return prevStop; }
-			var tripStops = self.dataModel.getTripById(tripStop.TripId).TripStops;
+			var tripStops = self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops;
 			tripStops = self._sortTripStops(tripStops);
 			var startSequence = currentStop ? currentStop.Sequence : prevStop.Sequence;
 			if (type == "delete")
@@ -1122,7 +1122,7 @@
 
 				tripStops[i].solvePathGeometryNotChange = solvePathGeometryNotChange;
 			}
-			self.dataModel.getTripById(tripStop.TripId).TripStops = self._sortTripStops(tripStops);
+			self.dataModel.getTripById(tripStop.FieldTripId).FieldTripStops = self._sortTripStops(tripStops);
 			PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), tripStops);
 			if (sequenceChanges.length > 0)
 			{
@@ -1198,9 +1198,9 @@
 				return Enumerable.From(allNewAssignStudents).Any(function(c) { return c.id == student.id; });
 			});
 			var tripStop = self.dataModel.getFieldTripStop(boundary.TripStopId);
-			if (tripStop && !trips[tripStop.TripId])
+			if (tripStop && !trips[tripStop.FieldTripId])
 			{
-				trips[tripStop.TripId] = self.dataModel.getTripById(tripStop.TripId);
+				trips[tripStop.FieldTripId] = self.dataModel.getTripById(tripStop.FieldTripId);
 			}
 			if (tripStops)
 			{
@@ -1286,16 +1286,16 @@
 	RoutingFieldTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
 	{
 		var self = this;
-		var trip = this.dataModel.getTripById(data.TripId);
+		var trip = this.dataModel.getTripById(data.FieldTripId);
 		if (positionIndex == undefined)
 		{
-			if (data.doorToDoorSchoolId) { trip.TripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.TripStops.filter(s => s.id != data.id), trip.Session, data.doorToDoorSchoolId) - 1, 0, data); }
-			else { trip.TripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequence(trip.TripStops, trip.Session) - 1, 0, data); }
+			if (data.doorToDoorSchoolId) { trip.FieldTripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.FieldTripStops.filter(s => s.id != data.id), trip.Session, data.doorToDoorSchoolId) - 1, 0, data); }
+			else { trip.FieldTripStops.splice(TF.Helper.TripHelper.getTripStopInsertSequence(trip.FieldTripStops, trip.Session) - 1, 0, data); }
 
 		}
 		else
 		{
-			trip.TripStops.splice(positionIndex, 0, data);
+			trip.FieldTripStops.splice(positionIndex, 0, data);
 		}
 
 		if (!this.dataModel.getSmartSequenceSetting() ||
@@ -1313,7 +1313,7 @@
 	RoutingFieldTripStopDataModel.prototype.calculateSmartSequence = function(trip, tripStop)
 	{
 		var self = this;
-		var tripStopToCalc = $.extend({}, tripStop, { TripId: trip.id });
+		var tripStopToCalc = $.extend({}, tripStop, { FieldTripId: trip.id });
 		return self.viewModel.drawTool.NAtool.refreshTrip(tripStopToCalc, "new").then(function(data)
 		{
 			return Enumerable.From(data).FirstOrDefault({}, function(c) { return c.id == tripStopToCalc.id; }).Sequence;
@@ -1338,9 +1338,9 @@
 
 	RoutingFieldTripStopDataModel.prototype.updateSequence = function(trip)
 	{
-		for (var i = 0; i < trip.TripStops.length; i++)
+		for (var i = 0; i < trip.FieldTripStops.length; i++)
 		{
-			trip.TripStops[i].Sequence = i + 1;
+			trip.FieldTripStops[i].Sequence = i + 1;
 		}
 	};
 
@@ -1354,7 +1354,7 @@
 		return {
 			OBJECTID: 0,
 			id: TF.createId(),
-			TripId: tripStop.TripId,
+			FieldTripId: tripStop.FieldTripId,
 			TripStopId: tripStop.id,
 			geometry: tripStop.boundary ? tripStop.boundary.geometry : null,
 			type: "tripBoundary",
@@ -1387,7 +1387,7 @@
 			XCoord: "",
 			YCoord: "",
 			Comment: "",
-			TripId: "",
+			FieldTripId: "",
 			StopType: "",
 			Students: [],
 			type: "tripStop",

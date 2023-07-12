@@ -196,7 +196,7 @@
 						icon: 'delete',
 						data: menuItemData,
 						disable: fieldTripStopDisable,
-						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStopId)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStopId, trip.id)
 					}));
 					contextMenuCategories.tripSessions.push(tempParentMenuItem);
 				}

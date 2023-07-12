@@ -932,20 +932,10 @@
 		this.viewModel.drawTool.reshape(data.id);
 	};
 
-	RoutingEventsManager.prototype.deleteOneClick = function(tripStopId, e)
+	RoutingEventsManager.prototype.deleteOneClick = function(fieldTripStopId, fieldTripId, e)
 	{
 		e.stopPropagation();
-		let exceptions = this.dataModel.getExceptions(tripStopId), msg = "Are you sure you want to delete this trip stop?";
-		if (exceptions.length)
-		{
-			exceptions = Enumerable.From(exceptions).OrderBy(i => (i.LastName || "").toLowerCase()).ThenBy(i => (i.FirstName || "").toLowerCase()).ToArray();
-			let names = exceptions.map(i => `${i.FirstName} ${i.LastName}`);
-			msg = `Deleting this trip stop will also remove the following student exceptions:
-
-${names.join('\r\n')}
-
-This action cannot be undone.  Do you wish to continue?`;
-		}
+		let  msg = "Are you sure you want to delete this field trip stop?";
 
 		return tf.promiseBootbox.yesNo({
 			message: msg,
@@ -953,14 +943,12 @@ This action cannot be undone.  Do you wish to continue?`;
 			closeButton: true
 		}, "Confirmation").then(result =>
 		{
-			console.log("Stop Delete clicked");
-			return;
-
+			console.log("Stop Delete clicked", fieldTripStopId, fieldTripId);
 			if (result)
 			{
 				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
 				this._viewModal.setMode("Routing", "Normal");
-				var tripStop = this.dataModel.getFieldTripStop(tripStopId);
+				var tripStop = this.dataModel.getFieldTripStop(fieldTripStopId);
 				tf.loadingIndicator.show();
 				this.dataModel.fieldTripStopDataModel.delete(tripStop).finally(() => tf.loadingIndicator.tryHide());
 			}

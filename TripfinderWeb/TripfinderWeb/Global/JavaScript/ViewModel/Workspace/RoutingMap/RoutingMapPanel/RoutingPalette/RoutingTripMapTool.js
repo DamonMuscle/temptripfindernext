@@ -456,7 +456,7 @@
 			items.delete.forEach(function(item)
 			{
 				self._deleteTripStop(item);
-				self._deleteTripBoundary(item.boundary);
+				// self._deleteTripBoundary(item.boundary);
 				self._deleteTripPathSegment(item);
 				self._deleteTripStopArrow(item);
 			});
@@ -466,7 +466,7 @@
 			items.add.forEach(function(item)
 			{
 				self._addTripStop(item, item.FieldTripId);
-				self._addTripBoundary(item.boundary, item.FieldTripId);
+				// self._addTripBoundary(item.boundary, item.FieldTripId);
 				self._addTripPathSegment(item);
 			});
 		}
@@ -475,12 +475,11 @@
 			items.edit.forEach(function(item)
 			{
 				self._updateTripStop(item);
-				self._updateTripBoundary(item);
+				// self._updateTripBoundary(item);
 				self._updateTripPathSegment(item);
 			});
 		}
-		self.updateStudentCountLabel();
-		self.refreshStudentStopAssignment();
+
 		// // self.updateStudentVisible();
 		if (items.refreshTrip != false)
 		{
