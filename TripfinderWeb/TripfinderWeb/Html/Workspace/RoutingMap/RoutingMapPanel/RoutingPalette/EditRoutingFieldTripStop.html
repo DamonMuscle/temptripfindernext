@@ -106,51 +106,64 @@
             					</div> -->
 							</div>
 						</div>
-						<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()=='edit'">
-							<div class="form-group small-form-group">
-								<label>Stop Time Arrive</label>
-								<!-- ko customInput:{type:"Time",value:obDataModel.StopTime,attributes:{class:"form-control",name:"stopTime",placeholder:"hh:mm"}, disable:isReadOnly} -->
-								<!-- /ko -->
+						<div class="col-xs-24">
+							<div class="row">
+								<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()!='new'">
+									<div class="form-group small-form-group">
+										<label>Stop Sequence #</label>
+										<div class="input-group">
+											<div data-bind="typeahead:{source:obSequenceSource,drowDownShow:true,notSort:true,selectedValue:obSelectedSequence}">
+												<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obStopSequenceDisable,attributes:{class:"form-control"}} -->
+												<!-- /ko -->
+											</div>
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obStopSequenceDisable">
+													<span class="caret"></span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-						<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()!='new'">
-							<div class="form-group small-form-group">
-								<label>Stop Sequence #</label>
-								<div class="input-group">
-									<div data-bind="typeahead:{source:obSequenceSource,drowDownShow:true,notSort:true,selectedValue:obSelectedSequence}">
-										<!-- ko customInput:{type:"Select",value:obSelectedSequenceText,disable:obStopSequenceDisable,attributes:{class:"form-control"}} -->
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&mode()=='edit'">
+							<div class="row">
+								<div class="col-xs-12">
+									<div class="form-group small-form-group">
+										<label>Stop Time Arrive</label>
+										<!-- ko customInput:{type:"Date",value:obStopTimeArriveDate,attributes:{class:"form-control",name:"stopTimeArriveDate",placeholder:"MM/DD/YYYY"}, disable:isReadOnly} -->
 										<!-- /ko -->
 									</div>
-									<div class="input-group-btn">
-										<button type="button" class="btn btn-default btn-sharp" data-bind="disable:obStopSequenceDisable">
-											<span class="caret"></span>
-										</button>
+								</div>
+								<div class="col-xs-12">
+									<div class="form-group small-form-group">
+										<label></label>
+										<!-- ko customInput:{type:"Time",value:obStopTimeArriveTime,attributes:{class:"form-control",name:"stopTimeArriveTime",placeholder:"hh:mm tt"}, disable:isReadOnly} -->
+										<!-- /ko -->
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&mode()=='edit'">
+							<div class="row">
+								<div class="col-xs-12" >
+									<div class="form-group small-form-group">
+										<label>Stop Time Depart</label>
+										<!-- ko customInput:{type:"Date",value:obStopTimeDepartDate,attributes:{class:"form-control",name:"stopTimeDepartDate",placeholder:"MM/DD/YYYY"}, disable:isReadOnly} -->
+										<!-- /ko -->
+									</div>
+								</div>
+								<div class="col-xs-12">
+									<div class="form-group small-form-group">
+										<label></label>
+										<!-- ko customInput:{type:"Time",value:obStopTimeDepartTime,attributes:{class:"form-control",name:"stopTimeDepartTime",placeholder:"hh:mm tt"}, disable:isReadOnly} -->
+										<!-- /ko -->
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="col-xs-24">
 							<div class="row">
-								<div class="col-xs-12">
-									<div class="form-group has-feedback has-feedback-left" data-bind="css:{'has-info-error':obRedAlertTotalStopTimeControl}">
-										<label>Total Stop Time</label>
-										<div class="input-group">
-											<input type="text" class="form-control" data-bind="value:obTotalStopTimeShow, disable:isReadOnly" name="totalStopTime" />
-											<div class="icon-input-alert form-control-feedback" title='The Total Stop Time has been manually changed'></div>
-											<div class="input-group-btn">
-												<button type="button" class="btn btn-default btn-sharp" data-bind="click:minusTotalStopTimeClick,disable:isReadOnly">
-													<span class="glyphicon glyphicon-minus"></span>
-												</button>
-												<button type="button" class="btn btn-default btn-sharp" data-bind="click:addTotalStopTimeClick,disable:isReadOnly">
-													<span class="glyphicon glyphicon-plus"></span>
-												</button>
-												<button type="button" class="btn btn-default btn-sharp btn-calculateStopTime" data-bind="click:calculateTotalStopTimeClick,disable:isReadOnly">
-													<span class="glyphicon glyphicon-list-alt"></span>
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
 								<div class="col-xs-12" data-bind="visible:!obIsMultipleCreate()&&mode()=='new'">
 									<div class="form-group small-form-group">
 										<label>Stop Sequence #</label>

@@ -565,7 +565,6 @@
 
 	RoutingEventsManager.prototype.infoClick = function(item)
 	{
-		console.log("Info clicked");
 		PubSub.publish("clear_ContextMenu_Operation");
 		var self = this;
 		if (self._viewModal.mode === 'Routing-Create')

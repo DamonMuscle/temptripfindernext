@@ -46,12 +46,19 @@
 
 		this.obIncludeNoStudStop = ko.observable(false);
 
-		// stop time arrive/depart
+		// stop time arrive
 		this.obStopTimeArriveDate = ko.observable(null);
-		this.obStopTimeArriveTime = ko.observable("00:00");
+		this.obStopTimeArriveTime = ko.observable(null);
 		this.obDataModel.StopTimeArrive.subscribe(this.stopTimeArriveChange, this);
 		this.obStopTimeArriveDate.subscribe(this.obStopTimeArriveDateChange, this);
 		this.obStopTimeArriveTime.subscribe(this.obStopTimeArriveTimeChange, this);
+
+		// stop time depart
+		this.obStopTimeDepartDate = ko.observable(null);
+		this.obStopTimeDepartTime = ko.observable(null);
+		this.obDataModel.StopTimeDepart.subscribe(this.stopTimeDepartChange, this);
+		this.obStopTimeDepartDate.subscribe(this.obStopTimeDepartDateChange, this);
+		this.obStopTimeDepartTime.subscribe(this.obStopTimeDepartTimeChange, this);
 
 		// total stop time
 		this.obRedAlertTotalStopTimeControl = ko.observable(false);
@@ -784,19 +791,52 @@
 
 	RoutingFieldTripStopEditModal.prototype.stopTimeArriveChange = function()
 	{
-
+		this.obStopTimeArriveDate(getDatePart(this.obDataModel.StopTimeArrive(), true));
+		this.obStopTimeArriveTime(getTimePart(this.obDataModel.StopTimeArrive(), true));
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveDateChange = function()
 	{
-
+		const value = getDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true);
+		if (value)
+		{
+			this.obDataModel.StopTimeArrive(value);
+		}
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveTimeChange = function()
 	{
-
+		const value = getDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true);
+		if (value)
+		{
+			this.obDataModel.StopTimeArrive(value);
+		}
 	};
-	
+
+	RoutingFieldTripStopEditModal.prototype.stopTimeDepartChange = function()
+	{
+		this.obStopTimeDepartDate(getDatePart(this.obDataModel.StopTimeDepart(), true));
+		this.obStopTimeDepartTime(getTimePart(this.obDataModel.StopTimeDepart(), true));
+	};
+
+	RoutingFieldTripStopEditModal.prototype.obStopTimeDepartDateChange = function()
+	{
+		const value = getDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true);
+		if (value)
+		{
+			this.obDataModel.StopTimeDepart(value);
+		}
+	};
+
+	RoutingFieldTripStopEditModal.prototype.obStopTimeDepartTimeChange = function()
+	{
+		const value = getDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true);
+		if (value)
+		{
+			this.obDataModel.StopTimeDepart(value);
+		}
+	};
+
 	RoutingFieldTripStopEditModal.prototype.hide = function()
 	{
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);
@@ -807,6 +847,55 @@
 	{
 		var totalStopTime = TripStopHelper.convertToSeconds(stopTime);
 		return TripStopHelper.convertToMinuteSecond(totalStopTime || 0, "mm:ss");
+	}
+
+	function getDatePart(value, isUtc)
+	{
+		if (!value)
+		{
+			return null;
+		}
+
+		const dt = isUtc ? utcToClientTimeZone(value) : moment(value);
+		return dt.format("MM/DD/YYYY");
+	}
+
+	function getTimePart(value, isUtc)
+	{
+		if (!value)
+		{
+			return null;
+		}
+
+		const dt = isUtc ? utcToClientTimeZone(value) : moment(value);
+		return dt.format("hh:mm A");
+	}
+
+	function getDateTime(datePart, timePart, isUtc)
+	{
+		if (!datePart || !timePart)
+		{
+			return null;
+		}
+
+		const dtDate = moment(datePart), dtTime = moment(timePart);
+		if (!dtDate.isValid() || !dtTime.isValid())
+		{
+			return null;
+		}
+
+		let dtString = dtDate.format("YYYY-MM-DD") + "T" + dtTime.format("HH:mm:ss");
+		if (isUtc)
+		{
+			const dt = clientTimeZoneToUtc(dtString);
+			if (!dt.isValid)
+			{
+				return null;
+			}
+			dtString = dt.format("YYYY-MM-DDTHH:mm:ss");
+		}
+
+		return dtString;
 	}
 
 })();

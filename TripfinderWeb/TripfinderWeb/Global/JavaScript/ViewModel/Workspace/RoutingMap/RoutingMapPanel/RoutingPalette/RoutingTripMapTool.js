@@ -396,7 +396,7 @@
 		{
 			if (graphic.attributes.type == "tripStop")
 			{
-				var trip = self.dataModel.getTripById(graphic.attributes.dataModel.TripId);
+				var trip = self.dataModel.getTripById(graphic.attributes.dataModel.FieldTripId);
 				if (!graphic.attributes.dataModel.SchoolCode
 					&& graphic.attributes.dataModel.OpenType === 'Edit' && ((trip && trip.visible) || (!trip)))
 				{
@@ -465,8 +465,8 @@
 		{
 			items.add.forEach(function(item)
 			{
-				self._addTripStop(item, item.TripId);
-				self._addTripBoundary(item.boundary, item.TripId);
+				self._addTripStop(item, item.FieldTripId);
+				self._addTripBoundary(item.boundary, item.FieldTripId);
 				self._addTripPathSegment(item);
 			});
 		}
@@ -499,7 +499,7 @@
 	RoutingTripMapTool.prototype.onTripColorChangeEvent = function(e, data)
 	{
 		var self = this;
-		var tripId = data.TripId;
+		var tripId = data.FieldTripId;
 		var stopColor = self.dataModel.getColorByTripId(tripId);
 		self._getTripRelateGraphics(tripId).items.forEach(function(graphic)
 		{
@@ -558,7 +558,7 @@
 			var tripStopGraphic = self._findGraphicInLayerById(self._pointLayer, item.id);
 			if (tripStopGraphic)
 			{
-				var color = self.dataModel.getColorByTripId(item.TripId);
+				var color = self.dataModel.getColorByTripId(item.FieldTripId);
 				var stopSymbol = self.symbol.tripStopSimpleMarker(color, 23);
 				if (item.SchoolCode && item.SchoolCode.length > 0)
 				{
@@ -576,7 +576,7 @@
 				self._updateTripPathSegment(item);
 			}
 		});
-		var trip = self.dataModel.getTripById(items[0].TripId);
+		var trip = self.dataModel.getTripById(items[0].FieldTripId);
 		self.redrawPath(trip);
 		self.refreshTrips();
 	};
@@ -606,7 +606,7 @@
 		}
 		if (tripStop.path && tripStop.path.geometry)
 		{
-			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.TripId);
+			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.FieldTripId);
 			if (tripPath)
 			{
 				tripPath.geometry.paths.splice(tripStop.Sequence - 1, 1);
@@ -618,7 +618,7 @@
 				tripPath.geometry = geometry;
 			}
 		}
-		self.redrawPath(self.dataModel.getTripById(tripStop.TripId));
+		self.redrawPath(self.dataModel.getTripById(tripStop.FieldTripId));
 	};
 
 	RoutingTripMapTool.prototype._addTripPathSegment = function(tripStop)
@@ -630,7 +630,7 @@
 		}
 		if (tripStop.path && tripStop.path.geometry)
 		{
-			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.TripId);
+			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.FieldTripId);
 			if (tripPath)
 			{
 				tripPath.geometry.paths.splice(tripStop.Sequence - 1, 0, tripStop.path.geometry.paths[0]);
@@ -642,15 +642,15 @@
 				tripPath.geometry = geometry;
 			}
 		}
-		self.redrawPath(self.dataModel.getTripById(tripStop.TripId));
+		self.redrawPath(self.dataModel.getTripById(tripStop.FieldTripId));
 	};
 
 	RoutingTripMapTool.prototype._updateTripPathSegment = function(tripStop)
 	{
-		var self = this, trip = self.dataModel.getTripById(tripStop.TripId), visible = trip.visible;
+		var self = this, trip = self.dataModel.getTripById(tripStop.FieldTripId), visible = trip.visible;
 		if (tripStop.path && tripStop.path.geometry)
 		{
-			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.TripId);
+			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.FieldTripId);
 			if (tripPath)
 			{
 				tripPath.geometry.paths[tripStop.Sequence - 1] = tripStop.path.geometry.paths ? tripStop.path.geometry.paths[0] : [];
@@ -666,7 +666,7 @@
 				}
 			}
 		}
-		self.redrawPath(self.dataModel.getTripById(tripStop.TripId));
+		self.redrawPath(self.dataModel.getTripById(tripStop.FieldTripId));
 	};
 
 	RoutingTripMapTool.prototype.redrawPath = function(trip)
@@ -674,7 +674,7 @@
 		var self = this;
 		self._deleteTripPath(trip);
 		var tripPaths = [];
-		trip.TripStops.forEach(stop =>
+		trip.FieldTripStops.forEach(stop =>
 		{
 			var path = TF.Helper.TripHelper.getDrawTripPathGeometry(stop, trip);
 			if (path)
@@ -691,7 +691,7 @@
 		var graphics = self._polylineLayer.graphics.items;
 		for (var i = 0; i < graphics.length; i++)
 		{
-			if (graphics[i].attributes.TripId == trip.id)
+			if (graphics[i].attributes.FieldTripId == trip.id)
 			{
 				self._polylineLayer.remove(graphics[i]);
 				return;
@@ -743,7 +743,7 @@
 	{
 		this._getTripRelateGraphics(oldTripId).forEach(function(graphic)
 		{
-			graphic.attributes.TripId = newTripId;
+			graphic.attributes.FieldTripId = newTripId;
 		});
 	};
 
@@ -755,7 +755,7 @@
 		{
 			return layer.graphics.items.filter(function(graphic)
 			{
-				return graphic.attributes && graphic.attributes.TripId == tripId;
+				return graphic.attributes && graphic.attributes.FieldTripId == tripId;
 			});
 		}
 
@@ -773,7 +773,7 @@
 	{
 		var self = this;
 		var tripPaths = [];
-		trip.TripStops.forEach(function(stop)
+		trip.FieldTripStops.forEach(function(stop)
 		{
 			var path = TF.Helper.TripHelper.getDrawTripPathGeometry(stop, trip);
 			if (path)
@@ -862,8 +862,8 @@
 
 	RoutingTripMapTool.prototype._updateTripStop = function(tripStop)
 	{
-		var self = this, stopSymbol, trip = self.dataModel.getTripById(tripStop.TripId), visible = trip.visible;
-		var stopColor = self.dataModel.getColorByTripId(tripStop.TripId);
+		var self = this, stopSymbol, trip = self.dataModel.getTripById(tripStop.FieldTripId), visible = trip.visible;
+		var stopColor = self.dataModel.getColorByTripId(tripStop.FieldTripId);
 		var stopGraphic = self._pointLayer.graphics.items.filter(function(graphic)
 		{
 			return graphic.attributes && graphic.attributes.dataModel && tripStop.id == graphic.attributes.dataModel.id;
@@ -874,14 +874,14 @@
 			var labelSymbol = self.symbol.tripStopLabel(stopColor);
 			labelSymbol.text = tripStop.Sequence;
 			stopGraphic.attributes.label.symbol = labelSymbol;
-			stopGraphic.attributes.label.attributes.TripId = tripStop.TripId;
+			stopGraphic.attributes.label.attributes.FieldTripId = tripStop.FieldTripId;
 			stopGraphic.attributes.label.attributes.dataModel = tripStop;
 			stopGraphic.attributes.label.geometry = tripStop.geometry;
 			// self._pointLayer.remove(stopGraphic.attributes.label);
 		}
 		stopGraphic.attributes = {
 			"dataModel": tripStop,
-			TripId: tripStop.TripId,
+			FieldTripId: tripStop.FieldTripId,
 			type: "tripStop",
 			label: stopGraphic.attributes.label
 		};
@@ -899,7 +899,7 @@
 			}
 		} else
 		{
-			stopSymbol = self.symbol.tripStopSimpleMarker(stopColor, 23);// self.symbol.tripStop(tripStop.Sequence, self.dataModel.getColorByTripId(tripStop.TripId));
+			stopSymbol = self.symbol.tripStopSimpleMarker(stopColor, 23);// self.symbol.tripStop(tripStop.Sequence, self.dataModel.getColorByTripId(tripStop.FieldTripId));
 		}
 
 		if (visible == false)
@@ -968,7 +968,7 @@
 
 	RoutingTripMapTool.prototype._updateTripBoundary = function(tripStop)
 	{
-		var self = this, trip = self.dataModel.getTripById(tripStop.TripId), visible = trip.visible && this._showStopBoundary;
+		var self = this, trip = self.dataModel.getTripById(tripStop.FieldTripId), visible = trip.visible && this._showStopBoundary;
 		if (tripStop.boundary && tripStop.boundary.geometry)
 		{
 			if (!self._arcgis.geometryEngine.intersects(tripStop.geometry, tripStop.boundary.geometry))
@@ -980,7 +980,7 @@
 			if (!boundaryGraphic) return;
 			boundaryGraphic.attributes = {
 				"dataModel": tripStop.boundary,
-				TripId: tripStop.TripId,
+				FieldTripId: tripStop.FieldTripId,
 				type: "boundary"
 			};
 			if (visible == false)
@@ -988,7 +988,7 @@
 				boundaryGraphic.visible = false;
 			}
 			boundaryGraphic.geometry = tripStop.boundary.geometry;
-			boundaryGraphic.symbol = self._getTripBoundarySymbol(tripStop.TripId);
+			boundaryGraphic.symbol = self._getTripBoundarySymbol(tripStop.FieldTripId);
 		}
 	};
 
@@ -1190,7 +1190,7 @@
 				var graphics = self._arrowLayer.graphics.items.slice();
 				graphics.forEach(function(graphic)
 				{
-					if (graphic.attributes.TripId == tripId)
+					if (graphic.attributes.FieldTripId == tripId)
 					{
 						self._arrowLayer.remove(graphic);
 					}
@@ -1248,7 +1248,7 @@
 		var self = this;
 		if (!self._showAssignedStudentsCount) return;
 		if (!stop || (stop.SchoolCode && stop.SchoolCode.length > 0)) return;
-		var trip = self.dataModel.getTripById(stop.TripId);
+		var trip = self.dataModel.getTripById(stop.FieldTripId);
 		if (trip)
 		{
 			// var screenPoint = self._arcgis.screenUtils.toScreenPoint(self._map.extent, self._map.width, self._map.height, stop.geometry);
@@ -1260,7 +1260,7 @@
 			var graphic = new self._arcgis.Graphic({
 				geometry: stop.geometry,
 				symbol: stopSymbol,
-				attributes: { dataModel: stop, type: "studentCount", TripId: stop.TripId }
+				attributes: { dataModel: stop, type: "studentCount", TripId: stop.FieldTripId }
 			});
 			if (trip.visible == false)
 			{
@@ -1277,7 +1277,7 @@
 	// {
 	// 	if (graphic.attributes.dataModel.IsAssigned)
 	// 	{
-	// 		var trip = self.dataModel.getTripById(graphic.attributes.TripId);
+	// 		var trip = self.dataModel.getTripById(graphic.attributes.FieldTripId);
 	// 		if (!self._showAssignedStudents || (trip && trip.visible == false)) graphic.visible = false;
 	// 		else { graphic.visible = true; }
 	// 	}
@@ -1289,7 +1289,7 @@
 		let self = this,
 			intersectGeometries = [];
 		let editTripIds = self.dataModel.trips.filter(r=> r.OpenType == "Edit" && r.Id > 0).map(r=> r.Id);
-		let graphics = self._polygonLayer.graphics.items.filter(r=> r.attributes.dataModel.OBJECTID == 0 || !editTripIds.indexOf(r.attributes.dataModel.TripId));
+		let graphics = self._polygonLayer.graphics.items.filter(r=> r.attributes.dataModel.OBJECTID == 0 || !editTripIds.indexOf(r.attributes.dataModel.FieldTripId));
 
 		graphics.map(function(graphic)
 		{
@@ -1331,9 +1331,9 @@
 		stops.forEach(function(stop)
 		{
 			stop.address = stop.Street;
-			var trip = self.dataModel.getTripById(stop.TripId);
-			trip.TripStops.forEach(ts => currentStops.add(ts));
-			if (stop.boundary.BdyType == 0 || !self._isContainedByCurrentPolygons(stop, self._polygonLayer.graphics.items.filter(x => { return x.attributes.dataModel.TripId == stop.TripId; })))
+			var trip = self.dataModel.getTripById(stop.FieldTripId);
+			trip.FieldTripStops.forEach(ts => currentStops.add(ts));
+			if (stop.boundary.BdyType == 0 || !self._isContainedByCurrentPolygons(stop, self._polygonLayer.graphics.items.filter(x => { return x.attributes.dataModel.FieldTripId == stop.FieldTripId; })))
 			{
 				nonOverlapedStops.push(stop);
 			}
@@ -1371,9 +1371,9 @@
 		for (var i = 0; i < trips.length; i++)
 		{
 			var isContained = false;
-			for (var j = 0; j < trips[i].TripStops.length; j++)
+			for (var j = 0; j < trips[i].FieldTripStops.length; j++)
 			{
-				var boundary = trips[i].TripStops[j].boundary;
+				var boundary = trips[i].FieldTripStops[j].boundary;
 				if (boundary && boundary.geometry && contains(boundary, graphic))
 				{
 					isContained = true;
@@ -1602,7 +1602,7 @@
 		}
 		if (tripStopGraphic.attributes.label)
 		{
-			var tripId = tripStopGraphic.attributes.TripId, labelGrapic = tripStopGraphic.attributes.label, tripStopSequence = labelGrapic.symbol.text, stopSymbol = self.symbol.tripStop(tripStopSequence, self.dataModel.getColorByTripId(tripId));
+			var tripId = tripStopGraphic.attributes.FieldTripId, labelGrapic = tripStopGraphic.attributes.label, tripStopSequence = labelGrapic.symbol.text, stopSymbol = self.symbol.tripStop(tripStopSequence, self.dataModel.getColorByTripId(tripId));
 			tripStopGraphic.symbol = stopSymbol;
 			//labelGrapic.visible = false;
 			self._pointLayer.remove(labelGrapic);
@@ -1636,7 +1636,7 @@
 				var stopGraphic = self._findGraphicInLayerById(self._pointLayer, graphic.attributes.dataModel.id);
 				if (stopGraphic)
 				{
-					var stopColor = self.dataModel.getColorByTripId(graphic.attributes.TripId);
+					var stopColor = self.dataModel.getColorByTripId(graphic.attributes.FieldTripId);
 					stopGraphic.symbol = self.symbol.tripStopSimpleMarker(stopColor, 23);
 					if (stopGraphic.attributes.label)
 					{
@@ -1864,7 +1864,7 @@
 					{
 						if (!currentGraphic)
 						{
-							currentGraphic = self.createStopBoundaryGraphic(d, d.geometry, d.TripId);
+							currentGraphic = self.createStopBoundaryGraphic(d, d.geometry, d.FieldTripId);
 							self._polygonLayer.add(currentGraphic);
 						} else
 						{
@@ -1967,7 +1967,7 @@
 		{
 			this.dataModel.trips.forEach((trip) =>
 			{
-				trip.TripStops.forEach((tripStop) =>
+				trip.FieldTripStops.forEach((tripStop) =>
 				{
 					this.drawStudentStopAssignment(tripStop.Students, tripStop, trip);
 				});

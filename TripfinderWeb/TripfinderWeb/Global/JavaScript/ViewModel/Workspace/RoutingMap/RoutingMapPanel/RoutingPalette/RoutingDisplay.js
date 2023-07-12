@@ -1963,14 +1963,14 @@
 		var changeTripIds = {};
 		dataAll.map(function(d)
 		{
-			if (!changeTripIds[d.TripId])
+			if (!changeTripIds[d.FieldTripId])
 			{
-				changeTripIds[d.TripId] = true;
+				changeTripIds[d.FieldTripId] = true;
 			}
 		});
 		for (var changeTripId in changeTripIds)
 		{
-			var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == changeTripId || c.TripID == changeTripId });
+			var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == changeTripId || c.FieldTripID == changeTripId });
 			self.resetTripInfo([trip], null, null, data.options ? data.options.resetScheduleTime : null);
 			self.refreshAllStopNode(trip);
 		}
@@ -1979,13 +1979,10 @@
 	RoutingDisplay.prototype._addTripStop = function(tripStop)
 	{
 		var self = this;
-		var total = tripStop.Students.length;
-		var studentData = [];
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.TripId; });
+		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, c => c.id === tripStop.FieldTripId);
 
 		var tripStopTreeViewNode = self.newTripStop(tripStop, self.routingDisplayHelper.getTripType(), trip.Name);
-
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.TripId, 'trip', self.treeview.dataSource);
+		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 		var insertPositionElement;
 		var insertPositionSequence;
@@ -2059,70 +2056,23 @@
 
 	RoutingDisplay.prototype._editTripStop = function(tripStop)
 	{
-		if (tripStop.SchoolCode)
+		var self = this;
+		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
+		if (!tripNode)
 		{
 			return;
 		}
 
-		var self = this;
-		var studentData = [];
-		var total = 0;
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.TripId, 'trip', self.treeview.dataSource);
-		if (!tripNode) return;
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 		var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
 
-		self.removeUnassignedStudentElementFromStop(tripStopNode);
-		if (tripStopNode)
-		{
-			if (self.dataModel.tripStopDictionary[tripStop.id])
-			{
-				self.dataModel.tripStopDictionary[tripStop.id].map(function(studentEntity)
-				{
-					var alreadyContain = false;
-					for (var i = 0; i < tripStop.Students.length; i++)
-					{
-						if (tripStop.Students[i].id == studentEntity.student.id && tripStop.Students[i].RequirementID == studentEntity.student.RequirementID && tripStop.Students[i].PreviousScheduleID == studentEntity.student.PreviousScheduleID)
-						{
-							alreadyContain = true;
-							break;
-						}
-					}
-					if (!alreadyContain && studentEntity.canBeAssigned)
-					{
-						self.setTripStopStudentStatus(studentEntity.student, tripStop);
-						studentData.push(self.newStudent(studentEntity.student, tripStop, tripStop.ProhibitCrosser));
-
-						total++;
-					}
-				});
-			}
-		}
-		if (studentData.length > 0)
-		{
-			if (tripWasExpanded && self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode))
-			{
-				studentData.map(function(student)
-				{
-					self.routingDisplayHelper.insertStudentsByAlphaOrder(student, tripStopNode);
-				});
-			}
-			else
-			{
-				self.routingDisplayHelper.addNodeDataOnDemand(studentData, tripStopNode);
-			}
-		}
-		var totalStudentCount = tripStopNode.customData.assignedStudentCount + total;
 		if (tripWasExpanded)
 		{
 			var changedTripStop = self.treeview.findByUid(tripStopNode.uid);
-			changedTripStop.TotalStudentCount = totalStudentCount;
 			self.setTripStopNodeProperty(tripStopNode, changedTripStop);
 		}
 		else
 		{
-			tripStopNode.customData.totalStudentCount = totalStudentCount;
-			tripStop.TotalStudentCount = totalStudentCount;
 			self.routingDisplayHelper.resetUnexpandedTreeNodeValue(tripStopNode, tripStop);
 		}
 	}
@@ -2130,16 +2080,16 @@
 	RoutingDisplay.prototype._deleteTripStop = function(tripStop)
 	{
 		var self = this;
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.TripId });
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.TripId, 'trip', self.treeview.dataSource);
+		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, c => c.id === tripStop.FieldTripId);
+		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
 		var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 		var newLockStopId;
-		if (tripStop.LockStopTime && trip.TripStops.length > 0)
+		if (tripStop.LockStopTime && trip.FieldTripStops.length > 0)
 		{
-			if (trip.TripStops[0].id != tripStop.id)
+			if (trip.FieldTripStops[0].id != tripStop.id)
 			{
-				self.dataModel.setLockTime(trip.TripStops[0].id, trip.id);
-				newLockStopId = trip.TripStops[0].id;
+				self.dataModel.setLockTime(trip.FieldTripStops[0].id, trip.id);
+				newLockStopId = trip.FieldTripStops[0].id;
 			}
 		}
 

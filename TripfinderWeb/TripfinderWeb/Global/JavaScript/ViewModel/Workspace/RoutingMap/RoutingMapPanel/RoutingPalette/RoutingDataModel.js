@@ -1421,7 +1421,7 @@
 		var cannotCalculate = false;
 		trips.map(function(trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				if (!tripStop)
 				{
