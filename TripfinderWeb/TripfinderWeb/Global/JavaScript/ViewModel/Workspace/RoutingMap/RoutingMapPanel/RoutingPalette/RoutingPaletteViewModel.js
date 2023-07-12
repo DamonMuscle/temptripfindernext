@@ -163,7 +163,8 @@
 		const fieldTrips = this.dataModel.trips;
 		if (fieldTrips.length > 0)
 		{
-			await this.fieldTripMap.sortMapFeatures(fieldTrips);
+			this.fieldTripMap.updateArrowRenderer(fieldTrips);
+			// await this.fieldTripMap.sortMapFeatures(fieldTrips);
 			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
 		}
 	}

@@ -97,13 +97,22 @@
 		for (var i = 0; i < polylinePoints.length - 1; i++)
 		{
 			var x = polylinePoints[i][0], y = polylinePoints[i][1];
+			var startPoint = polylinePoints[i];
+			var endPoint = polylinePoints[i + 1];
+			var paths = [[startPoint, endPoint]]
+			var pathGeometry = new tf.map.ArcGIS.Polyline({
+				hasZ: false,
+				hasM: false,
+				paths: paths,
+				spatialReference: { wkid: 3857 }
+			});
 
-			if (isInExtent && extent && (extent.xmax < x || extent.xmin > x || extent.ymax < y || extent.ymin > y))
+			if (isInExtent && extent &&
+				!tf.map.ArcGIS.geometryEngine.intersects(pathGeometry, extent) &&
+				(extent.xmax < x || extent.xmin > x || extent.ymax < y || extent.ymin > y))
 			{
 				continue;
 			}
-			var startPoint = polylinePoints[i];
-			var endPoint = polylinePoints[i + 1];
 			var len = calculateDistance(startPoint, endPoint);
 			length += len;
 			if (length > splitBuffer)
