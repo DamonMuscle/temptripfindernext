@@ -123,16 +123,16 @@
 						}));
 						contextMenuCategories.tripPaths.push(tempParentMenuItem);
 					}
-				} else if (/*type == 'tripboundary' || */type == 'fieldtripstop')
+				} else if (type == 'fieldtripstop')
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.TripId),
-						tripStopId = menuItemData.type === "fieldTripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
-						tripStop = routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(tripStopId),
+						fieldTripStopId = menuItemData.type === "fieldTripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
+						fieldTripStop = routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 						tripName = trip.Name;
 					if (!tripItems[tripName])
 					{
 						let tripItem = new TF.RoutingMap.MenuItem({
-							header: "<span class='trip-color-icon' style='background-color:" + tripStop.color + "'></span>" + tripName,
+							header: "<span class='trip-color-icon' style='background-color:" + fieldTripStop.color + "'></span>" + tripName,
 							title: tripName,
 							type: 'trip'
 						});
@@ -148,14 +148,12 @@
 						tripItems[tripName] = tripItem;
 					}
 
-					var labelColor = TF.isLightness(tripStop.color) ? "#000000" : "#ffffff";
-					var tripStopDisable = !hasAuthForRoutingMap || trip.OpenType === 'View' /*|| (tripStop.SchoolCode !== null && tripStop.SchoolCode !== '')*/;
-					var tripStopHasBoundaryDisable = tripStopDisable || menuItemData.type === "tripBoundary";
-					var isShowStopBoundary = tf.storageManager.get("showStopBoundary") ?? true;
-					var tripStopNoBoundaryDisable = tripStopDisable || menuItemData.type === "tripStop" || !isShowStopBoundary;
+					var labelColor = TF.isLightness(fieldTripStop.color) ? "#000000" : "#ffffff";
+					var fieldTripStopDisable = !hasAuthForRoutingMap || trip.OpenType === 'View' || fieldTripStop.PrimaryDestination || fieldTripStop.PrimaryDeparture;
+
 					tempParentMenuItem = new TF.RoutingMap.MenuItem({
-						header: "<span class='trip-stop-color-icon' style='border-color:rgb(0,0,0);color:" + labelColor + ";background-color:" + tripStop.color + "'>" + tripStop.Sequence + "</span>" + tripStop.Street,
-						title: tripStop.Street,
+						header: "<span class='trip-stop-color-icon' style='border-color:rgb(0,0,0);color:" + labelColor + ";background-color:" + fieldTripStop.color + "'>" + fieldTripStop.Sequence + "</span>" + fieldTripStop.Street,
+						title: fieldTripStop.Street,
 						icon: null,
 						type: 'tripSession'
 					});
@@ -174,7 +172,7 @@
 						icon: 'copy',
 						data: menuItemData,
 						disable: true, // FT-3291: Disabled for Future Implementation
-						click: routingPaletteViewModel.tripViewModel.eventsManager.copyTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, tripStopId)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.copyTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStopId)
 					}));
 
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
@@ -185,9 +183,9 @@
 						header: 'Move Stop Location',
 						icon: 'movePoint',
 						data: menuItemData,
-						disable: tripStopDisable,
+						disable: fieldTripStopDisable,
 						id: 'tripSessionMovePoint',
-						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', tripStopId)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStopId)
 					}));
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 						isDevider: true
@@ -197,8 +195,8 @@
 						header: 'Delete',
 						icon: 'delete',
 						data: menuItemData,
-						disable: tripStopDisable,
-						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, tripStopId)
+						disable: fieldTripStopDisable,
+						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStopId)
 					}));
 					contextMenuCategories.tripSessions.push(tempParentMenuItem);
 				}
@@ -389,53 +387,53 @@
 			// RCM option only when nothing is returned
 			if (data.length == 0)
 			{
-				tempParentMenuItem = new TF.RoutingMap.MenuItem({
-					header: 'Default',
-					icon: null,
-					type: 'Default'
-				});
-				tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
-					header: 'Geo Search',
-					icon: null,
-					data: { id: -1000 },
-					children: [new TF.RoutingMap.MenuItem({
-						header: 'Polygon',
-						icon: 'polygon',
-						id: 'geoSearchPolygon',
-						children: [],
-						disable: false,
-						data: { id: -1000 },
-						click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'polygon', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
-					}),
-					new TF.RoutingMap.MenuItem({
-						header: 'Rectangle',
-						icon: 'rectangle',
-						id: 'geoSearchRectangle',
-						children: [],
-						disable: false,
-						data: { id: -1000 },
-						click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'rectangle', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
-					}),
-					new TF.RoutingMap.MenuItem({
-						header: 'Draw',
-						icon: 'draw',
-						id: 'geoSearchDraw',
-						children: [],
-						disable: false,
-						data: { id: -1000 },
-						click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'draw', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
-					}),
-					new TF.RoutingMap.MenuItem({
-						header: 'Circle',
-						icon: 'circle',
-						id: 'geoSearchCircle',
-						children: [],
-						disable: false,
-						data: { id: -1000 },
-						click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'circle', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
-					})
-					]
-				}));
+				// tempParentMenuItem = new TF.RoutingMap.MenuItem({
+				// 	header: 'Default',
+				// 	icon: null,
+				// 	type: 'Default'
+				// });
+				// tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
+				// 	header: 'Geo Search',
+				// 	icon: null,
+				// 	data: { id: -1000 },
+				// 	children: [new TF.RoutingMap.MenuItem({
+				// 		header: 'Polygon',
+				// 		icon: 'polygon',
+				// 		id: 'geoSearchPolygon',
+				// 		children: [],
+				// 		disable: false,
+				// 		data: { id: -1000 },
+				// 		click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'polygon', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
+				// 	}),
+				// 	new TF.RoutingMap.MenuItem({
+				// 		header: 'Rectangle',
+				// 		icon: 'rectangle',
+				// 		id: 'geoSearchRectangle',
+				// 		children: [],
+				// 		disable: false,
+				// 		data: { id: -1000 },
+				// 		click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'rectangle', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
+				// 	}),
+				// 	new TF.RoutingMap.MenuItem({
+				// 		header: 'Draw',
+				// 		icon: 'draw',
+				// 		id: 'geoSearchDraw',
+				// 		children: [],
+				// 		disable: false,
+				// 		data: { id: -1000 },
+				// 		click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'draw', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
+				// 	}),
+				// 	new TF.RoutingMap.MenuItem({
+				// 		header: 'Circle',
+				// 		icon: 'circle',
+				// 		id: 'geoSearchCircle',
+				// 		children: [],
+				// 		disable: false,
+				// 		data: { id: -1000 },
+				// 		click: geoSearchPaletteViewModel.eventsManager.selectAreaOptionClick.bind(geoSearchPaletteViewModel.eventsManager, 'circle', geoSearchPaletteViewModel.eventsManager, $('.routingmap_panel' + routeState).find('.geosearch-section'))
+				// 	})
+				// 	]
+				// }));
 
 				var travelRegionDisable = !travelScenariosPaletteViewModel.obShow() || !travelScenariosPaletteViewModel.travelRegionsViewModel.isShowMode();
 
@@ -495,8 +493,6 @@
 				contextMenuCategories.default.push(tempParentMenuItem);
 				*/
 			}
-
-			
 
 			$.each(tripItems, (k, v) => contextMenuCategories.trips.push(v));
 			var allLength = 0;
@@ -723,17 +719,17 @@
 					tripPathIntersectsResult.forEach(function(trip)
 					{
 						var matchCount = 0;
-						for (var i = 0; i < trip.TripStops.length; i++)
+						for (var i = 0; i < trip.FieldTripStops.length; i++)
 						{
 							var pathLineType = tf.storageManager.get("pathLineType") || "Path";
-							var path = TF.Helper.TripHelper.getDrawTripPathGeometry(trip.TripStops[i], trip, pathLineType);
-							if (path && tf.map.ArcGIS.geometryEngine.intersects(extent, path) && i < trip.TripStops.length - 1)
+							var path = TF.Helper.TripHelper.getDrawTripPathGeometry(trip.FieldTripStops[i], trip, pathLineType);
+							if (path && tf.map.ArcGIS.geometryEngine.intersects(extent, path) && i < trip.FieldTripStops.length - 1)
 							{
 								matchCount++;
 								tripPathResult.push({
 									trip: trip,
-									tripStop: trip.TripStops[i],
-									tripStops: [trip.TripStops[i], trip.TripStops[i + 1]],
+									fieldTripStop: trip.FieldTripStops[i],
+									fieldTripStops: [trip.FieldTripStops[i], trip.FieldTripStops[i + 1]],
 									type: trip.type,
 									id: trip.id,
 									Name: trip.Name,
@@ -748,7 +744,7 @@
 							for (i = 0; i < matchCount; i++)
 							{
 								var result = tripPathResult[tripPathResult.length - 1 - i];
-								result.Name = result.Name + " " + result.tripStop.Sequence;
+								result.Name = result.Name + " " + result.fieldTripStop.Sequence;
 							}
 						}
 					});
@@ -924,6 +920,11 @@
 					}
 
 					var contextMenu = buildContextMenuInternal(container, data, parcelPointsViewModel, boundaryViewModel, mapEditingPaletteViewModel, routingPaletteViewModel, geoSearchPaletteViewModel, routeState, documentViewModel);
+
+					if (contextMenu.root.children.length == 0)
+					{
+						return;
+					}
 
 					contextMenu.onClickEvent = function(menuItem, e)
 					{
