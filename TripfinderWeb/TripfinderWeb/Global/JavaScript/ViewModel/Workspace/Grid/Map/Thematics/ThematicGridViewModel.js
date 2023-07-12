@@ -421,13 +421,28 @@
 				}
 			});
 
+			let paramData = {
+				dbid: self.mapGrid._gridType === 'forms' ? 0 : tf.datasourceManager.databaseId,
+				datatypeid: tf.dataTypeHelper.getId(self.dataType.toLowerCase()),
+			}
+
+			if (self.dataType === "fieldtrip")
+			{
+				switch (self.mapGrid.pageType)
+				{
+					case "approvals":
+						paramData["filterType"] = 'permission';
+						break;
+					case "myrequests":
+						paramData["filterType"] = 'submitted';
+						break;
+				}
+			}
+
 			promise = tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "thematicdisplaysettings"),
 				{
 					data: fieldsData,
-					paramData: {
-						dbid: self.mapGrid._gridType === 'forms' ? 0 : tf.datasourceManager.databaseId,
-						datatypeid: tf.dataTypeHelper.getId(self.dataType.toLowerCase())
-					},
+					paramData: paramData,
 					headers: { Prefix: tf.storageManager?.prefix?.split('.')[0] }
 				}).then(function (response)
 				{
