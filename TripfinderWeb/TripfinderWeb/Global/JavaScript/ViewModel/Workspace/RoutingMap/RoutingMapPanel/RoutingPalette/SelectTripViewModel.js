@@ -28,7 +28,7 @@
 				data: this.trips.map(function(trip)
 				{
 					// fix trip stop geometry data will cause call stack error
-					return $.extend({}, trip, { TripStops: [], extent: null });
+					return $.extend({}, trip, { TripStops: [], FieldTripStops: [], directions: null, routePath: [], extent: null });
 				}),
 				sort: { field: "Name", dir: "asc" },
 			}),
