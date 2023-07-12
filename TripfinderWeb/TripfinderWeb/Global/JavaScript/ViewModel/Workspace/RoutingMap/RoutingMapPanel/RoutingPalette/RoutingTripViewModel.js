@@ -1133,7 +1133,7 @@ This action cannot be undone.  Do you wish to continue?`;
 
 			schools.forEach(function(school, index)
 			{
-				var tripStop = self.dataModel.tripStopDataModel.getDataModel();
+				var tripStop = self.dataModel.fieldTripStopDataModel.getDataModel();
 				tripStop.id = TF.createId();
 				tripStop.TripStopId = tripStop.id;
 				tripStop.TripId = self.trip.id;
@@ -1582,7 +1582,7 @@ This action cannot be undone.  Do you wish to continue?`;
 					{
 						if (newTrip.TripStops[i].id === newStopList[index].id)
 						{
-							newTrip.TripStops[i] = self.dataModel.tripStopDataModel.createNewData(newStopList[index], true);
+							newTrip.TripStops[i] = self.dataModel.fieldTripStopDataModel.createNewData(newStopList[index], true);
 							break;
 						}
 					}
@@ -1958,7 +1958,7 @@ This action cannot be undone.  Do you wish to continue?`;
 			{
 				if (boundaries.length > 0)
 				{
-					return self.dataModel.tripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, trip, true);
+					return self.dataModel.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, trip, true);
 				}
 			});
 

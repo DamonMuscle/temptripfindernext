@@ -1014,7 +1014,7 @@
 		}
 
 		tripStop.StreetSegment = null;
-		self.dataModel.tripStopDataModel.update([tripStop], true);
+		self.dataModel.fieldTripStopDataModel.update([tripStop], true);
 		self.dataModel.lockSchoolLocation(tripStop);
 	};
 

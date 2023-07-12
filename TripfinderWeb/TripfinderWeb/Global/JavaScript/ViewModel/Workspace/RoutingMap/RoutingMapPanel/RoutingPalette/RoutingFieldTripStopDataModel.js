@@ -1,8 +1,8 @@
 (function()
 {
-	createNamespace("TF.RoutingMap.RoutingPalette").RoutingTripStopDataModel = RoutingTripStopDataModel;
+	createNamespace("TF.RoutingMap.RoutingPalette").RoutingFieldTripStopDataModel = RoutingFieldTripStopDataModel;
 
-	function RoutingTripStopDataModel(dataModel)
+	function RoutingFieldTripStopDataModel(dataModel)
 	{
 		var self = this;
 		self.dataModel = dataModel;
@@ -14,7 +14,7 @@
 		self.currentTripStudentsCount = 0;
 	}
 
-	RoutingTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequence, isDuplicate, notBroadcast)
+	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequence, isDuplicate, notBroadcast)
 	{
 		var self = this;
 		self._viewModal.revertMode = "create-TripStop";
@@ -58,7 +58,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.createMultiple = function(tripStops, insertBehindSpecialSequences, resetScheduleTime)
+	RoutingFieldTripStopDataModel.prototype.createMultiple = function(tripStops, insertBehindSpecialSequences, resetScheduleTime)
 	{
 		var self = this;
 		if (!tripStops)
@@ -137,7 +137,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.refreshTripByStops = function(stops)
+	RoutingFieldTripStopDataModel.prototype.refreshTripByStops = function(stops)
 	{
 		var tripIds = new Set();
 		stops.forEach(x =>
@@ -149,7 +149,7 @@
 		this.dataModel.onTripsChangeEvent.notify({ add: [], edit: trips, delete: [] });
 	}
 
-	RoutingTripStopDataModel.prototype.addTripStopsToNewTrip = function(newTripStops, insertToStops, targetTrip)
+	RoutingFieldTripStopDataModel.prototype.addTripStopsToNewTrip = function(newTripStops, insertToStops, targetTrip)
 	{
 		var self = this, stops;
 		self.bindTripDataToTripStop(newTripStops, targetTrip);
@@ -192,7 +192,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.bindTripDataToTripStop = function(newTripStops, trip)
+	RoutingFieldTripStopDataModel.prototype.bindTripDataToTripStop = function(newTripStops, trip)
 	{
 		newTripStops.forEach(function(tripStop)
 		{
@@ -204,7 +204,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.createNewData = function(newData, isKeepStopId, ignoreBoundary)
+	RoutingFieldTripStopDataModel.prototype.createNewData = function(newData, isKeepStopId, ignoreBoundary)
 	{
 		var data = this.getDataModel();
 		if ($.isArray(newData))
@@ -233,7 +233,7 @@
 		return data;
 	};
 
-	RoutingTripStopDataModel.prototype.moveTripStopsFromOtherTrip = function(newTripStops, insertToStops, atSequences, isNotifyTripStopChangeEvent, isSequenceOptimize, isSmartSequence, isPreserve, resetScheduleTime, notNotifyTreeAndMap)
+	RoutingFieldTripStopDataModel.prototype.moveTripStopsFromOtherTrip = function(newTripStops, insertToStops, atSequences, isNotifyTripStopChangeEvent, isSequenceOptimize, isSmartSequence, isPreserve, resetScheduleTime, notNotifyTreeAndMap)
 	{
 		var self = this, stops;
 		self._viewModal.revertMode = "";
@@ -414,7 +414,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.clearPreviousStopPathIfUnsolved = function(tripStops, trip)
+	RoutingFieldTripStopDataModel.prototype.clearPreviousStopPathIfUnsolved = function(tripStops, trip)
 	{
 		// clear previous stop path If inserted stops can not calculate path.
 		var minSequence = Math.min(tripStops.map(function(tripStop)
@@ -432,7 +432,7 @@
 		}
 	};
 
-	RoutingTripStopDataModel.prototype.appendNewStopsToTrip = function(newTripStops, stops, targetTrip)
+	RoutingFieldTripStopDataModel.prototype.appendNewStopsToTrip = function(newTripStops, stops, targetTrip)
 	{
 		var session = targetTrip && targetTrip.Session ? targetTrip.Session : this.dataModel.getSession();
 		var sequence = TF.Helper.TripHelper.getTripStopInsertSequence(stops, session);
@@ -447,7 +447,7 @@
 	/**
 	* change trip stop path
 	*/
-	RoutingTripStopDataModel.prototype.updatePath = function(tripStopChanged, isFromBroadCastSync)
+	RoutingFieldTripStopDataModel.prototype.updatePath = function(tripStopChanged, isFromBroadCastSync)
 	{
 		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
 		if (!tripStop) return;
@@ -458,7 +458,7 @@
 		if (!isFromBroadCastSync) { this.dataModel.tripEditBroadcast.send(originalData, [tripStop], tripStopChanged.routeStops); }
 	};
 
-	RoutingTripStopDataModel.prototype.copyPathInfoToStop = function(tripStopChanged)
+	RoutingFieldTripStopDataModel.prototype.copyPathInfoToStop = function(tripStopChanged)
 	{
 		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
 
@@ -483,7 +483,7 @@
 		return tripStop;
 	};
 
-	RoutingTripStopDataModel.prototype.updateAnotherTripStop = function(newTripStops)
+	RoutingFieldTripStopDataModel.prototype.updateAnotherTripStop = function(newTripStops)
 	{
 		let exceptionMap = {};
 		this.dataModel.candidateStudents.forEach(s =>
@@ -515,7 +515,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync)
+	RoutingFieldTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync)
 	{
 		var self = this;
 		self._viewModal.revertMode = "update-TripStop";
@@ -573,20 +573,20 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip)
+	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip)
 	{
 		this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
 		this.changeRevertStack(tripStops, false);
 		this._runAfterPathChanged(tripStops, null, tf.storageManager.get("notAutoAssignUnassignedStudent") === false);
 	};
 
-	RoutingTripStopDataModel.prototype._runAfterPathChanged = function(tripStops, type, autoAssign, isCreateMultiple)
+	RoutingFieldTripStopDataModel.prototype._runAfterPathChanged = function(tripStops, type, autoAssign, isCreateMultiple)
 	{
 		this.refreshOptimizeSequenceRate(tripStops);
 		return this.updateStudentCross(tripStops, type, autoAssign, isCreateMultiple);
 	};
 
-	RoutingTripStopDataModel.prototype.updateStudentCross = function(modifyDataArray, type, autoAssign, isCreateMultiple)
+	RoutingFieldTripStopDataModel.prototype.updateStudentCross = function(modifyDataArray, type, autoAssign, isCreateMultiple)
 	{
 		modifyDataArray = modifyDataArray.filter(x => x.boundary && x.boundary.geometry);
 		var self = this;
@@ -606,7 +606,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.refreshOptimizeSequenceRate = function(stops)
+	RoutingFieldTripStopDataModel.prototype.refreshOptimizeSequenceRate = function(stops)
 	{
 		var self = this;
 		if (self.dataModel.showImpactDifferenceChart())
@@ -620,7 +620,7 @@
 		}
 	};
 
-	RoutingTripStopDataModel.prototype.delete = function(deleteArray, isFromRevert, isFromBroadCastSync)
+	RoutingFieldTripStopDataModel.prototype.delete = function(deleteArray, isFromRevert, isFromBroadCastSync)
 	{
 		var self = this;
 		return this.deleteTripStop(deleteArray, true, isFromRevert).then(function(deleteTripStops)
@@ -635,7 +635,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.deleteTripStop = function(toDeleteData, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip)
+	RoutingFieldTripStopDataModel.prototype.deleteTripStop = function(toDeleteData, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip)
 	{
 		var self = this;
 		var deleteArray = this.dataModel.singleToArray(toDeleteData);
@@ -656,7 +656,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype._deleteTripStopInOneTrip = function(deleteArray, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip)
+	RoutingFieldTripStopDataModel.prototype._deleteTripStopInOneTrip = function(deleteArray, isNotifyUnAssignStudentEvent, isFromRevert, isMoveToOtherTrip)
 	{
 		var self = this;
 		self._viewModal.revertMode = "delete-TripStop";
@@ -749,7 +749,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, tripId, newSequence)
+	RoutingFieldTripStopDataModel.prototype.reorderTripStopSequence = function(tripStop, tripId, newSequence)
 	{
 		var self = this;
 		if (tripStop.TripId == tripId)
@@ -759,7 +759,7 @@
 		return self.moveTripStopsToOtherTrip([tripStop], tripId, newSequence);
 	};
 
-	RoutingTripStopDataModel.prototype.moveTripStopsToOtherTrip = function(tripStops, tripId, newSequence, isSequenceOptimize, isSmartSequence, isPreserve)
+	RoutingFieldTripStopDataModel.prototype.moveTripStopsToOtherTrip = function(tripStops, tripId, newSequence, isSequenceOptimize, isSmartSequence, isPreserve)
 	{
 		var self = this;
 		var trip = self.dataModel.getTripById(tripId);
@@ -827,7 +827,7 @@
 
 	};
 
-	RoutingTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, isFromBroadCastSync)
+	RoutingFieldTripStopDataModel.prototype._reorderTripStopSequenceInOneTrip = function(tripStop, newSequence, isFromBroadCastSync)
 	{
 		var self = this;
 		self._viewModal.revertMode = "";
@@ -878,7 +878,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype._refreshTripByAddStopSmart = function(tripStop)
+	RoutingFieldTripStopDataModel.prototype._refreshTripByAddStopSmart = function(tripStop)
 	{
 		var self = this;
 		var sequenceChanges = [];
@@ -924,13 +924,13 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype._refreshTripByAddMultiStopsSmart = function(newTripStops, currentTripStops, newTrip)
+	RoutingFieldTripStopDataModel.prototype._refreshTripByAddMultiStopsSmart = function(newTripStops, currentTripStops, newTrip)
 	{
 		var self = this;
 		return self.viewModel.drawTool.NAtool.refreshTripByAddMultiStopsSmart(newTripStops, currentTripStops, newTrip);
 	};
 
-	RoutingTripStopDataModel.prototype._refreshTripSequenceOptimizeAndPreserve = function(newTripStops, currentTripStops)
+	RoutingFieldTripStopDataModel.prototype._refreshTripSequenceOptimizeAndPreserve = function(newTripStops, currentTripStops)
 	{
 		var self = this;
 		return self.viewModel.drawTool.NAtool.refreshTripByMultiStops(currentTripStops, true).then(function(currentStops)
@@ -951,7 +951,7 @@
 		})
 	}
 
-	// RoutingTripStopDataModel.prototype._refreshTipPathByInsertToEnd = function(currentTripStops, newTripStops)
+	// RoutingFieldTripStopDataModel.prototype._refreshTipPathByInsertToEnd = function(currentTripStops, newTripStops)
 	// {
 	// 	var self = this;
 	// 	var trip = self.dataModel.getTripById(currentTripStops[0].TripId);
@@ -970,7 +970,7 @@
 	// 	})
 	// }
 
-	RoutingTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
+	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
 	{
 		var self = this;
 		var tripStopsCopy = JSON.parse(JSON.stringify({ stops: tripStops }));
@@ -986,7 +986,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.updateTripBoundary = function(modifyDataArray, isFromRevert)
+	RoutingFieldTripStopDataModel.prototype.updateTripBoundary = function(modifyDataArray, isFromRevert)
 	{
 		var self = this;
 		self._viewModal.revertMode = "update-TripBoundary";
@@ -1023,7 +1023,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype._getStudentCrossChangeStops = function(modifyDataArray, type)
+	RoutingFieldTripStopDataModel.prototype._getStudentCrossChangeStops = function(modifyDataArray, type)
 	{
 		var self = this;
 		if (!$.isArray(modifyDataArray)) { modifyDataArray = [modifyDataArray]; }
@@ -1042,7 +1042,7 @@
 		return StudentCrossChangesStops;
 	};
 
-	RoutingTripStopDataModel.prototype.updateTripBoundaryStudents = function(boundaries, tripStops, notifyEvent, notifyMapEvent, trip, autoAssign)
+	RoutingFieldTripStopDataModel.prototype.updateTripBoundaryStudents = function(boundaries, tripStops, notifyEvent, notifyMapEvent, trip, autoAssign)
 	{
 		var self = this;
 		return self.assignStudentInBoundary(boundaries, notifyEvent, tripStops, notifyMapEvent, trip, autoAssign).then((studentsNeedToUnassign) =>
@@ -1051,7 +1051,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.setTripStopPathAndSequence = function(tripStop, type, hasSpecialSequence)
+	RoutingFieldTripStopDataModel.prototype.setTripStopPathAndSequence = function(tripStop, type, hasSpecialSequence)
 	{
 		var self = this;
 		var sequenceChanges = [];
@@ -1132,14 +1132,14 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.bindCoordinate = function(data)
+	RoutingFieldTripStopDataModel.prototype.bindCoordinate = function(data)
 	{
 		var geoGraphic = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(data.geometry);
 		data.XCoord = geoGraphic.x.toFixed(11);
 		data.YCoord = geoGraphic.y.toFixed(11);
 	};
 
-	RoutingTripStopDataModel.prototype.unAssignStudentInBoundary = function(boundaries, tripStops, studentsNeedToUnassign)
+	RoutingFieldTripStopDataModel.prototype.unAssignStudentInBoundary = function(boundaries, tripStops, studentsNeedToUnassign)
 	{
 		var self = this;
 		var intersects = tf.map.ArcGIS.geometryEngine.intersects;
@@ -1179,7 +1179,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.assignStudentInBoundary = function(boundaries, notifyEvent, tripStops, notifyMapEvent, trip, autoAssign)
+	RoutingFieldTripStopDataModel.prototype.assignStudentInBoundary = function(boundaries, notifyEvent, tripStops, notifyMapEvent, trip, autoAssign)
 	{
 		var self = this;
 		boundaries = boundaries.filter(function(c) { return c.TripStopId; });
@@ -1238,7 +1238,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.autoAssignStudent = function(tripStops)
+	RoutingFieldTripStopDataModel.prototype.autoAssignStudent = function(tripStops)
 	{
 		var self = this, students = [];
 		tripStops.map(function(tripStop)
@@ -1274,7 +1274,7 @@
 		return self.dataModel.assignStudentMultiple(studentsTripStops, false, null, false, null, true, null, null, null, false);
 	};
 
-	RoutingTripStopDataModel.prototype.getStudentInCandidateStudents = function(studentIds)
+	RoutingFieldTripStopDataModel.prototype.getStudentInCandidateStudents = function(studentIds)
 	{
 		var self = this;
 		return self.dataModel.candidateStudents.filter(function(student)
@@ -1283,7 +1283,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
+	RoutingFieldTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
 	{
 		var self = this;
 		var trip = this.dataModel.getTripById(data.TripId);
@@ -1310,7 +1310,7 @@
 	 * @param {*} trip
 	 * @param {*} tripStop
 	 */
-	RoutingTripStopDataModel.prototype.calculateSmartSequence = function(trip, tripStop)
+	RoutingFieldTripStopDataModel.prototype.calculateSmartSequence = function(trip, tripStop)
 	{
 		var self = this;
 		var tripStopToCalc = $.extend({}, tripStop, { TripId: trip.id });
@@ -1320,7 +1320,7 @@
 		});
 	};
 
-	RoutingTripStopDataModel.prototype.changeRevertStack = function(data, isFromRevert)
+	RoutingFieldTripStopDataModel.prototype.changeRevertStack = function(data, isFromRevert)
 	{
 		if (!isFromRevert)
 		{
@@ -1336,7 +1336,7 @@
 		}
 	};
 
-	RoutingTripStopDataModel.prototype.updateSequence = function(trip)
+	RoutingFieldTripStopDataModel.prototype.updateSequence = function(trip)
 	{
 		for (var i = 0; i < trip.TripStops.length; i++)
 		{
@@ -1344,12 +1344,12 @@
 		}
 	};
 
-	RoutingTripStopDataModel.prototype.insertToRevertData = function(data)
+	RoutingFieldTripStopDataModel.prototype.insertToRevertData = function(data)
 	{
 		this._viewModal.revertData.push($.extend({}, data, { geometry: data && data.geometry ? TF.cloneGeometry(data.geometry) : null }));
 	};
 
-	RoutingTripStopDataModel.prototype.createTripBoundary = function(tripStop)
+	RoutingFieldTripStopDataModel.prototype.createTripBoundary = function(tripStop)
 	{
 		return {
 			OBJECTID: 0,
@@ -1362,12 +1362,12 @@
 		};
 	};
 
-	RoutingTripStopDataModel.prototype._sortTripStops = function(stops)
+	RoutingFieldTripStopDataModel.prototype._sortTripStops = function(stops)
 	{
 		return stops.sort(function(a, b) { return a.Sequence > b.Sequence ? 1 : -1; });
 	};
 
-	RoutingTripStopDataModel.prototype.getDataModel = function()
+	RoutingFieldTripStopDataModel.prototype.getDataModel = function()
 	{
 		return {
 			id: 0,

@@ -62,7 +62,7 @@
 			});
 			this.points.map(function(stop)
 			{
-				self.tripStops.push($.extend(self.dataModel.tripStopDataModel.getDataModel(), {
+				self.tripStops.push($.extend(self.dataModel.fieldTripStopDataModel.getDataModel(), {
 					Street: !!stop.address ? stop.address : 'Unknown',
 					XCoord: stop.x,
 					YCoord: stop.y,
@@ -140,7 +140,7 @@
 
 	NewRoutingTripStopViewModel.prototype.getDataModel = function()
 	{
-		return this.dataModel.tripStopDataModel.getDataModel();
+		return this.dataModel.fieldTripStopDataModel.getDataModel();
 	};
 
 	NewRoutingTripStopViewModel.prototype._createMultipleStops = function()
@@ -192,7 +192,7 @@
 			data.walkoutBuffer = self.walkoutBuffer();
 			data.BufferUnit = self.obSelectedBufferUnitText();
 			data.walkoutType = self.walkoutType() == 0 ? 'Street Path' : 'Radius';
-			data = self.dataModel.tripStopDataModel.createNewData(data, self.isEditModal ? true : false, true);
+			data = self.dataModel.fieldTripStopDataModel.createNewData(data, self.isEditModal ? true : false, true);
 			return Promise.resolve(data);
 		});
 	};

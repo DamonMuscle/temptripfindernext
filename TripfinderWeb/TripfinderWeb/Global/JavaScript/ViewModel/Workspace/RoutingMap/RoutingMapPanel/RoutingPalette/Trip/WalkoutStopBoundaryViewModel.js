@@ -36,7 +36,7 @@
 
 	WalkoutStopBoundaryViewModel.prototype.getDataModel = function()
 	{
-		return this.dataModel.tripStopDataModel.getDataModel();
+		return this.dataModel.fieldTripStopDataModel.getDataModel();
 	};
 
 	WalkoutStopBoundaryViewModel.prototype.updateWalkoutZone = function()

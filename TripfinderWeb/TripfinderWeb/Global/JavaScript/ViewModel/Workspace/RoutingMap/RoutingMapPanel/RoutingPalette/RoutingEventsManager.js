@@ -414,7 +414,7 @@
 				{
 					return;
 				}
-				var stop = self.dataModel.tripStopDataModel.createNewData(tripStop);
+				var stop = self.dataModel.fieldTripStopDataModel.createNewData(tripStop);
 				stop.LockStopTime = false;
 				stop.Street = tripName;
 				stop.path = null;
@@ -427,7 +427,7 @@
 				stop.TransToTrans = { PUTransToTrans: 0, DOTransToTrans: 0 };
 				stop.PUTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
 				stop.DOTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
-				self.dataModel.tripStopDataModel.create(stop, false, tripStop.Sequence, true);
+				self.dataModel.fieldTripStopDataModel.create(stop, false, tripStop.Sequence, true);
 			});
 	};
 
@@ -691,7 +691,7 @@
 				if (result && $.isArray(result) && result.length > 0)
 				{
 					var stopsToDelete = trip.TripStops.filter(function(stop) { return result.filter(function(so) { return so.id == stop.id }).length > 0 });
-					self.dataModel.tripStopDataModel.delete(stopsToDelete, false, true);
+					self.dataModel.fieldTripStopDataModel.delete(stopsToDelete, false, true);
 					result = result.sort(function(a, b) { return parseInt(a.TripId) - parseInt(b.TripId) });
 
 					var sequences = result.filter(function(stop) { return stop.Sequence; }).map(
@@ -708,7 +708,7 @@
 						var newStops = result.filter(function(stop) { return stop.TripId == targetTrip.id });
 						if (newStops.length > 0)
 						{
-							stopCreatePromises.push(self.dataModel.tripStopDataModel.moveTripStopsFromOtherTrip(newStops, targetTrip.TripStops, sequences, true, null, null, null, true));
+							stopCreatePromises.push(self.dataModel.fieldTripStopDataModel.moveTripStopsFromOtherTrip(newStops, targetTrip.TripStops, sequences, true, null, null, null, true));
 						}
 					});
 
@@ -889,7 +889,7 @@
 	RoutingEventsManager.prototype.addTripStopBoundaryClick = function(type, tripStop)
 	{
 		this.viewModel.routingChangePath.stop();
-		var boundary = this.dataModel.tripStopDataModel.createTripBoundary(tripStop);
+		var boundary = this.dataModel.fieldTripStopDataModel.createTripBoundary(tripStop);
 		var graphic = this.viewModel.drawTool.createStopBoundaryGraphic(boundary, null, tripStop.TripId);
 		if (type === "walkout")
 		{
@@ -956,7 +956,7 @@ This action cannot be undone.  Do you wish to continue?`;
 				this._viewModal.setMode("Routing", "Normal");
 				var tripStop = this.dataModel.getFieldTripStop(tripStopId);
 				tf.loadingIndicator.show();
-				this.dataModel.tripStopDataModel.delete(tripStop).finally(() => tf.loadingIndicator.tryHide());
+				this.dataModel.fieldTripStopDataModel.delete(tripStop).finally(() => tf.loadingIndicator.tryHide());
 			}
 
 			PubSub.publish("clear_ContextMenu_Operation");
@@ -1141,12 +1141,12 @@ This action cannot be undone.  Do you wish to continue?`;
 			{
 				if (result && $.isArray(result))
 				{
-					self.dataModel.tripStopDataModel.updatePath(tripStopStart);
+					self.dataModel.fieldTripStopDataModel.updatePath(tripStopStart);
 				} else
 				{
 					var tripStopChanged = $.extend(true, {}, tripStopStart);
 					if (tripStopChanged.path && tripStopChanged.path.geometry) tripStopChanged.path.geometry.paths = [];
-					self.dataModel.tripStopDataModel.updatePath(tripStopChanged);
+					self.dataModel.fieldTripStopDataModel.updatePath(tripStopChanged);
 				}
 
 			});
@@ -1191,7 +1191,7 @@ This action cannot be undone.  Do you wish to continue?`;
 		this.clearMode();
 		var tripStop = data.tripStop;
 		tripStop.path = {};
-		this.dataModel.tripStopDataModel.updatePath(tripStop);
+		this.dataModel.fieldTripStopDataModel.updatePath(tripStop);
 	};
 
 	//TODO: right click student

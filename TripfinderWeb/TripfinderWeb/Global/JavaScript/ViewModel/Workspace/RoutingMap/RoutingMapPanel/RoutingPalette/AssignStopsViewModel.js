@@ -318,7 +318,7 @@
 				}
 
 				tf.loadingIndicator.showImmediately();
-				var promise = self.routingDataModel.tripStopDataModel.delete(tripStops, false, true);
+				var promise = self.routingDataModel.fieldTripStopDataModel.delete(tripStops, false, true);
 
 				promise.then(function()
 				{

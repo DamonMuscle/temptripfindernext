@@ -1224,10 +1224,10 @@
 				});
 				break;
 			// case "create-TripStop":
-			// 	self.drawTool.getDataModel().tripStopDataModel.delete(self.viewModel._viewModal.revertData, true);
+			// 	self.drawTool.getDataModel().fieldTripStopDataModel.delete(self.viewModel._viewModal.revertData, true);
 			// 	break;
 			// case "delete-TripStop":
-			// 	self.drawTool.getDataModel().tripStopDataModel.create(self.viewModel._viewModal.revertData, true);
+			// 	self.drawTool.getDataModel().fieldTripStopDataModel.create(self.viewModel._viewModal.revertData, true);
 			// 	break;
 			case "update-TripStop":
 				self.viewModel._viewModal.revertData.forEach(function(oldData)
@@ -1241,7 +1241,7 @@
 					currentGraphic = self.drawTool._findGraphicInLayerById(self.drawTool._studentCountLayer, oldData.id);
 					currentGraphic && currentGraphic.setGeometry(TF.cloneGeometry(oldData.geometry));
 				});
-				self.drawTool.getDataModel().tripStopDataModel.update(self.viewModel._viewModal.revertData, true);
+				self.drawTool.getDataModel().fieldTripStopDataModel.update(self.viewModel._viewModal.revertData, true);
 				break;
 			case "update-TripBoundary":
 				self.viewModel._viewModal.revertData.forEach(function(oldData)
@@ -1249,7 +1249,7 @@
 					var currentGraphic = self.drawTool._findGraphicInLayerById(self.drawTool._polygonLayer, oldData.id);
 					currentGraphic.setGeometry(TF.cloneGeometry(oldData.geometry));
 				});
-				self.drawTool.getDataModel().tripStopDataModel.updateTripBoundary(self.viewModel._viewModal.revertData, true);
+				self.drawTool.getDataModel().fieldTripStopDataModel.updateTripBoundary(self.viewModel._viewModal.revertData, true);
 				break;
 			case "create-StopPool":
 				self.drawTool.getDataModel().delete(self.viewModel._viewModal.revertData);

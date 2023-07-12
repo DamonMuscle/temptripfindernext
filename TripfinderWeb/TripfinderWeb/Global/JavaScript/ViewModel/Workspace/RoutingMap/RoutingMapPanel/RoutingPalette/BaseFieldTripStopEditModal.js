@@ -284,9 +284,9 @@
 
 			if (options.selectLastSelectedTrip)
 			{
-				if (self.lastCreateData && self.lastCreateData.TripId)
+				if (self.lastCreateData && self.lastCreateData.FieldTripId)
 				{
-					dataModel.TripId = self.lastCreateData.TripId;
+					dataModel.FieldTripId = self.lastCreateData.FieldTripId;
 				}
 			}
 			self.addOverlayToPanels();
@@ -303,7 +303,7 @@
 					self.obIsInsertToSpecialStop(true);
 					self.obTrips(self.obTrips().filter(function(trip)
 					{
-						return trip.id == options.insertBehindSpecialStop.TripId;
+						return trip.id == options.insertBehindSpecialStop.FieldTripId;
 					}));
 					self.obSelectedTrip(self.obTrips()[0]);
 				}
@@ -383,7 +383,7 @@
 					self.obIsInsertToSpecialStop(true);
 					self.obTrips(self.obTrips().filter(function(trip)
 					{
-						return trip.id == options.insertBehindSpecialStop.TripId;
+						return trip.id == options.insertBehindSpecialStop.FieldTripId;
 					}));
 					self.obSelectedTrip(self.obTrips()[0]);
 				}

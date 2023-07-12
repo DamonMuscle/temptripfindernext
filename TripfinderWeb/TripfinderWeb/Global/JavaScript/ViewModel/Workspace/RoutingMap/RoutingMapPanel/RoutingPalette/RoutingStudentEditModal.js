@@ -102,7 +102,7 @@
 				else
 				{
 					var data = self.trimStringSpace(self.data);
-					self.dataModel.tripStopDataModel.update(data);
+					self.dataModel.fieldTripStopDataModel.update(data);
 					self.resolve(data);
 				}
 				self.pageLevelViewModel.clearError();

@@ -195,7 +195,7 @@
 									return data;
 								}).then(function()
 								{
-									return self.dataModel.tripStopDataModel.addTripStopsToNewTrip(data, option.trip.TripStops, option.trip);
+									return self.dataModel.fieldTripStopDataModel.addTripStopsToNewTrip(data, option.trip.TripStops, option.trip);
 								}).then(function(trip)
 								{
 									return Promise.resolve(trip);

@@ -1854,7 +1854,7 @@
 					var currentStudentCount = self._findGraphicInLayerById(self._studentCountLayer, d.id);
 					if (currentStudentCount) currentStudentCount.geometry = TF.cloneGeometry(d.geometry);
 				});
-				self.dataModel.tripStopDataModel.update(data, true);
+				self.dataModel.fieldTripStopDataModel.update(data, true);
 			} else if (data[0].type == "tripBoundary")
 			{
 				data.forEach(function(d)
@@ -1872,17 +1872,17 @@
 						}
 					}
 				});
-				self.dataModel.tripStopDataModel.updateTripBoundary(data, true);
+				self.dataModel.fieldTripStopDataModel.updateTripBoundary(data, true);
 			}
 		}
 		else if (type == "create")
 		{
-			self.dataModel.tripStopDataModel.delete(data);
+			self.dataModel.fieldTripStopDataModel.delete(data);
 		} else if (type == "delete")
 		{
 			data.forEach(function(d)
 			{
-				self.dataModel.tripStopDataModel.create(d);
+				self.dataModel.fieldTripStopDataModel.create(d);
 			});
 		}
 	};

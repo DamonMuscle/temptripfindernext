@@ -56,7 +56,7 @@
 		self.featureData = new TF.RoutingMap.RoutingPalette.RoutingFeatureData(self);
 		self.tripLockData = new TF.RoutingMap.RoutingPalette.RoutingLockData(self);
 		self.schoolLockData = new TF.RoutingMap.RoutingPalette.SchoolLockData(self);
-		self.tripStopDataModel = new TF.RoutingMap.RoutingPalette.RoutingTripStopDataModel(self);
+		self.fieldTripStopDataModel = new TF.RoutingMap.RoutingPalette.RoutingFieldTripStopDataModel(self);
 		self.routingStudentManager = new TF.RoutingMap.RoutingPalette.RoutingStudentManager(self);
 
 		// change count
@@ -78,7 +78,7 @@
 		// PubSub.subscribe("DistrictPolicyChange", this.districtPolicyChange);
 		this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
 		this.tripEditBroadcast = new TF.RoutingMap.RoutingPalette.TripEditBroadcast(this);
-		self.geoLinkTool = new TF.RoutingMap.RoutingPalette.GeoLinkTool(self.tripStopDataModel);
+		self.geoLinkTool = new TF.RoutingMap.RoutingPalette.GeoLinkTool(self.fieldTripStopDataModel);
 		this.needUpdateTrip = ko.observable(true);
 		this.needUpdateTripColor = ko.observable(false);
 
@@ -1690,7 +1690,7 @@
 			}
 			else if (boundaries.length > 0 && !notAutoAssignStudent)
 			{
-				promise = self.tripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
+				promise = self.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
 			}
 			return promise.then(function(newTripCandidateStudents)
 			{
@@ -1746,7 +1746,7 @@
 			// }
 			// else if (boundaries.length > 0 && !notAutoAssignStudent)
 			// {
-			// 	promise = self.tripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
+			// 	promise = self.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
 			// }
 			return promise.then(function(newTripCandidateStudents)
 			{
@@ -1910,7 +1910,7 @@
 			});
 			schools.forEach(function(school, i)
 			{
-				var tripStop = self.tripStopDataModel.getDataModel();
+				var tripStop = self.fieldTripStopDataModel.getDataModel();
 				tripStop.id = TF.createId();
 				tripStop.TripStopId = tripStop.id;
 				tripStop.TripId = trip.id;
@@ -1945,7 +1945,7 @@
 				var promise = Promise.resolve(true);
 				if (!notAutoAssign)
 				{
-					promise = self.tripStopDataModel.assignStudentInBoundary(boundaries, false);
+					promise = self.fieldTripStopDataModel.assignStudentInBoundary(boundaries, false);
 				}
 				promise.then(function()
 				{
@@ -2520,7 +2520,7 @@
 		{
 			setTimeout(function()
 			{
-				self.tripStopDataModel.moveTripStopsToOtherTrip(tripStopArray, tripId, null, isSequenceOptimize, isSmartSequence, isPreserve).then(function(stops)
+				self.fieldTripStopDataModel.moveTripStopsToOtherTrip(tripStopArray, tripId, null, isSequenceOptimize, isSmartSequence, isPreserve).then(function(stops)
 				{
 					tf.loadingIndicator.tryHide();
 					if (!stops || !$.isArray(stops))
@@ -2548,13 +2548,13 @@
 		{
 			return Promise.resolve(TF.Helper.TripHelper.getTripStopInsertSequence(trip.TripStops, trip.Session));
 		}
-		return this.tripStopDataModel.calculateSmartSequence(trip, tripStop);
+		return this.fieldTripStopDataModel.calculateSmartSequence(trip, tripStop);
 	};
 
 	RoutingDataModel.prototype.changeStopPosition = function(tripStop, tripId, newPositionIndex)
 	{
 		var self = this;
-		return self.tripStopDataModel.reorderTripStopSequence(tripStop, tripId, newPositionIndex + 1);
+		return self.fieldTripStopDataModel.reorderTripStopSequence(tripStop, tripId, newPositionIndex + 1);
 	};
 
 	RoutingDataModel.prototype._removeNotOpenEditTrips = function(openTrips)
@@ -4454,11 +4454,11 @@
 
 		if (tripBoundary.length > 0)
 		{
-			return this.tripStopDataModel.updateTripBoundary(tripBoundary);
+			return this.fieldTripStopDataModel.updateTripBoundary(tripBoundary);
 		}
 		if (tripStops.length > 0)
 		{
-			return self.tripStopDataModel.update(tripStops);
+			return self.fieldTripStopDataModel.update(tripStops);
 		}
 	};
 
@@ -5782,7 +5782,7 @@
 	RoutingDataModel.prototype.autoAssignStudent = function(trips)
 	{
 		var self = this, allTripStudentsCount = 0;
-		var tripStopDataModel = self.tripStopDataModel;
+		var tripStopDataModel = self.fieldTripStopDataModel;
 		var promiseList = [];
 		tf.loadingIndicator.show();
 		if (trips && trips.length > 0)
