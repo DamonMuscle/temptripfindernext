@@ -351,7 +351,7 @@
 					let value = item[col.Guid];
 					if (IsEmptyString(value)) { return ""; }
 
-					return self.getSystemFieldValue(col, dataTypeId, value, { isGrid: true });
+					return self.getSystemFieldValue(col, dataTypeId, value);
 				};
 				break;
 			case "date/time":
@@ -525,7 +525,7 @@
 	/*
 	* Returns the grid column's extension attributes (expect Type and Template) for the given column
 	*/
-	UserDefinedGridHelper.prototype.getGridColumnExtension = function(col, column)
+	UserDefinedGridHelper.prototype.getGridColumnExtension = function(col, column, dataTypeId)
 	{
 		let columnExtension = null;
 
@@ -622,8 +622,22 @@
 				columnExtension = $.extend(columnExtension, coordColumnExtension);
 			}
 
-			return columnExtension;
+			if (!col.FieldOptions.IsUDFSystemField)
+			{
+				// Get the isUTC from the systemField's targetField
+				let gridDefinition = TF.Form.FormConfigHelper.getSystemFieldRelatedColumnDefinition(col.editType.targetField, dataTypeId);
+				if (gridDefinition && gridDefinition.isUTC == true)
+				{
+					utcColumnExtension = {
+						isUTC: true
+					}
+
+					columnExtension = $.extend(columnExtension, utcColumnExtension);
+				}
+			}
 		}
+
+		return columnExtension;
 	}
 
 	UserDefinedGridHelper.isIncludeUDGridColumn = function(udgridField, includeSystemField)
@@ -704,7 +718,7 @@
 				column.template = template;
 			}
 
-			const columnExtension = self.getGridColumnExtension(col, column); // Returns the grid column extension (expect Type and Template) for the given column
+			const columnExtension = self.getGridColumnExtension(col, column, dataTypeId); // Returns the grid column extension (expect Type and Template) for the given column
 			if (columnExtension)
 			{
 				column = $.extend(column, columnExtension);
@@ -2624,7 +2638,7 @@
 		return type;
 	}
 
-	UserDefinedGridHelper.prototype.getSystemFieldValue = function(col, dataTypeId, value, options = { isGrid: false })
+	UserDefinedGridHelper.prototype.getSystemFieldValue = function(col, dataTypeId, value)
 	{
 		let self = this;
 		let editType = col.editType;
@@ -2634,14 +2648,18 @@
 		let falseDisplayName = col.FieldOptions.FalseDisplayName ? col.FieldOptions.FalseDisplayName : "false";
 		let attributeFlag = col.FieldOptions.AttributeFlag ? col.FieldOptions.AttributeFlag : 0;
 		let $el = null;
+		let contentOption = { isGrid: true }
+		let formatOption = { isGrid: true, isUTC: false }
 
 		const isUDFSystemField = col.FieldOptions.IsUDFSystemField;
 		if (!isUDFSystemField)
 		{
-			$el = TF.Form.FormConfigHelper.getFormColumnContent(editType.targetField, dataTypeId, { isGrid: true });
+			let gridDefinition = TF.Form.FormConfigHelper.getSystemFieldRelatedColumnDefinition(col.editType.targetField, dataTypeId);
+			formatOption.isUTC = (gridDefinition && gridDefinition.isUTC == true);
+			$el = TF.Form.FormConfigHelper.getFormColumnContent(editType.targetField, dataTypeId, contentOption);
 		}
 
-		let val = tf.systemFieldsFormat(type, value, $el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, options);
+		let val = tf.systemFieldsFormat(type, value, $el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, formatOption);
 		if ($el)
 		{
 			$el.val(val);

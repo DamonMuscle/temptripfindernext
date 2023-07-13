@@ -32,6 +32,7 @@
 		let numberPrecision = 2; // set default number Precision to 2 for normal Grid fields
 		let trueDisplayName = "true";
 		let falseDisplayName = "false";
+		let options = { isGrid: false, isUTC: false };
 		if (udfs && udfs.length > 0)
 		{
 			let defaultText = this.field.FieldOptions.DefaultText; // default text is UDF Guid
@@ -52,17 +53,24 @@
 				systemFieldType = udfField.OriginalType;
 			}
 		}
+
+		if (!this.field.FieldOptions.IsUDFSystemField)
+		{
+			let gridDefinition = TF.Form.FormConfigHelper.getSystemFieldRelatedColumnDefinition(this.field.editType.targetField, dataTypeId);
+			options.isUTC = (gridDefinition && gridDefinition.isUTC == true)
+		}
+
 		let targetField = editType.targetField;
 		const fieldFormatConfig = tf.udgHelper.getSystemFieldsConfig(dataTypeId, targetField);
 		
 		if (fieldFormatConfig)
 		{
-			displayValue = tf.systemFieldsFormat(fieldFormatConfig.type, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName);
+			displayValue = tf.systemFieldsFormat(fieldFormatConfig.type, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, options);
 			value = tf.systemFieldsFormatValue(fieldFormatConfig.type, value);
 		} 
 		else if (systemFieldType)
 		{
-			displayValue = tf.systemFieldsFormat(systemFieldType, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName);
+			displayValue = tf.systemFieldsFormat(systemFieldType, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, options);
 		}
 		else
 		{
