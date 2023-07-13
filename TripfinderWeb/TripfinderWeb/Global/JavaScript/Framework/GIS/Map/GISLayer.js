@@ -280,7 +280,7 @@
 		return Promise.resolve(results);
 	}
 
-	Layer.prototype.queryFeatureCount = async function(geometry, condition = '1 = 1')
+	Layer.prototype.queryFeatureCount = async function(geometry = null, condition = '1 = 1')
 	{
 		let featureCount = 0;
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)

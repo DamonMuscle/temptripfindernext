@@ -875,10 +875,14 @@
 	RoutingEventsManager.prototype.editTripStopClick = function(type, stopId, fieldTripId)
 	{
 		console.log("Move Stop Location clicked", stopId, fieldTripId);
+
+		const data = { fieldTripId, stopId };
+		PubSub.publish("on_FieldTripMap_MoveStopLocation", data);
+
 		return;
 
-		this.viewModel.routingChangePath.stop();
-		this.viewModel.drawTool.movePoint(stopId);
+		// this.viewModel.routingChangePath.stop();
+		// this.viewModel.drawTool.movePoint(stopId);
 	};
 
 	RoutingEventsManager.prototype.removeTripStopBoundaryClick = function(boundary)

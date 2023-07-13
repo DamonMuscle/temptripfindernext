@@ -34,6 +34,9 @@
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		this.symbol = new TF.Map.Symbol();
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
+		this._mapEditingFeatures = {
+			movingStop: null
+		};
 		this.initLayers();
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 	}
@@ -63,6 +66,12 @@
 	{
 		this.pathLineType = isSequencePath ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 	}
+
+	Object.defineProperty(FieldTripMap.prototype, 'mapEditingFeatures', {
+		get() { return this._mapEditingFeatures; },
+		enumerable: false,
+		configurable: false
+	});
 
 	//#endregion
 
@@ -150,17 +159,26 @@
 		this._sortBySequence(fieldTrip.FieldTripStops);
 
 		await this.drawStops(fieldTrip);
+		await this.addFieldTripPath(fieldTrip);
+	}
 
+	FieldTripMap.prototype.addFieldTripPath = async function(fieldTrip)
+	{
 		await this.drawFieldTripPath(fieldTrip);
 
-		this.drawSequenceLine(fieldTrip, () => {
-			this.updateFieldTripPathVisible([fieldTrip]);
+		return new Promise((resolve, reject) =>
+		{
+			this.drawSequenceLine(fieldTrip, () => {
+				this.updateFieldTripPathVisible([fieldTrip]);
+	
+				if (fieldTrip.visible === false)
+				{
+					// the Field Trips are hidden.
+					this.setFieldTripVisible([fieldTrip]);
+				}
 
-			if (fieldTrip.visible === false)
-			{
-				// the Field Trips are hidden.
-				this.setFieldTripVisible([fieldTrip]);
-			}
+				resolve();
+			});
 		});
 	}
 
@@ -359,6 +377,8 @@
 		this.setFieldTripSequenceLineVisible(fieldTrips);
 	}
 
+	//#endregion
+
 	//#region TODO: Add / Insert Field Trip Stop
 
 	//#endregion
@@ -381,11 +401,109 @@
 
 	//#region TODO: RCM on Map
 
-	//#endregion
+	//#region Field Trip Stop
+
+	//#region Move Stop Location
+
+	FieldTripMap.prototype.moveStopLocation = async function(fieldTrip, stop, sketchTool)
+	{
+		const self = this;
+		if (!self.fieldTripStopLayerInstance || !sketchTool)
+		{
+			return;
+		}
+
+		const sequence = stop.Sequence, tripId = fieldTrip.id;
+		const fieldTripStops = await self.fieldTripStopLayerInstance.queryFeatures(null);
+		const stopGraphic = fieldTripStops.find(item => item.attributes.Id === tripId && item.attributes.Sequence === sequence);
+		if (!stopGraphic)
+		{
+			return;
+		}
+
+		this.mapEditingFeatures.movingStop = {
+			fieldTrip: fieldTrip,
+			graphic: stopGraphic,
+			stop: stop
+		};
+
+		const options = {
+			moveDuplicateNode: self._getMoveDuplicateNode.bind(self),
+			isFeatureLayer: false,
+		};
+		sketchTool.transform(stopGraphic.clone(), options, self.moveStopLocationCallback.bind(self));
+	}
+	
+	FieldTripMap.prototype.moveStopLocationCallback = async function(graphics)
+	{
+		if (!graphics)
+		{
+			return;
+		}
+
+		const self = this,
+			fieldTrip = self.mapEditingFeatures.movingStop.fieldTrip,
+			movingStop = self.mapEditingFeatures.movingStop.stop,
+			movingStopGraphic = self.mapEditingFeatures.movingStop.graphic;
+
+		// get updated graphic
+		let updateGraphic = null;
+		graphics.forEach(function(graphic)
+		{
+			if (graphic.attributes.Id === movingStopGraphic.attributes.Id &&
+				graphic.attributes.Sequence === movingStopGraphic.attributes.Sequence)
+			{
+				updateGraphic = graphic;
+				return;
+			}
+		});
+
+		// stop moving
+		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
+		
+		// update stop street by geocode
+		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
+		let { longitude, latitude } = updateGraphic.geometry;
+		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
+
+		if (geocodeResult?.errorMessage)
+		{
+			console.error(geocodeResult.errorMessage);
+			return;
+		}
+
+		if (geocodeResult?.attributes)
+		{
+			movingStop.Street = geocodeResult.attributes.Address;
+			movingStop.XCoord = +longitude.toFixed(6);
+			movingStop.YCoord = +latitude.toFixed(6);
+		}
+	}
+
+	FieldTripMap.prototype.clearStops = function(fieldTrip, stops = null)
+	{
+		const self = this,
+			{ DBID, Id } = self._extractFieldTripFeatureFields(fieldTrip),
+			stopFeatures = self._getStopFeatures(),
+			fieldTripStops = self._queryMapFeatures(stopFeatures, DBID, Id);
+
+		if (stops)
+		{
+			stops.forEach(stop =>
+			{
+				const sequence = stop.Sequence,
+					stopFeature = fieldTripStops.find(item => item.attributes.Sequence === sequence);
+				self.fieldTripStopLayerInstance.remove(stopFeature);
+			});
+		}
+	}
 
 	//#endregion
 
 	//#endregion
+
+	//#endregion
+
 
 	//#region Map Visualization
 
@@ -793,12 +911,39 @@
 
 		const stopFeatureSet = await networkService.createStopFeatureSet(stops);
 		const params = {
+			impedanceAttribute: null,
 			stops: stopFeatureSet,
 		};
 		const response = await networkService.solveRoute(params);
 
 		const result = response?.results?.routeResults[0];
 		return result;
+	}
+
+	//#endregion
+
+	//#region Settings for sketchTool
+
+	FieldTripMap.prototype._getMoveDuplicateNode = function()
+	{
+		return true;
+	}
+
+	FieldTripMap.prototype.forceStopToJunction = function(fieldTripStop)
+	{
+		return Promise.resolve(fieldTripStop)
+	}
+
+	FieldTripMap.prototype.getHeartBoundaryId = function()
+	{
+		return null;
+	}
+
+	FieldTripMap.prototype.updateDataModel = function(graphics)
+	{
+		console.log("TODO: updateDataModel");
+		// pubsub.publish
+		return;
 	}
 
 	//#endregion
