@@ -2357,7 +2357,7 @@
 						});
 						fieldTripStop.originalStudents = fieldTripStop.Students.map(function(c) { return $.extend({ InCriteriaUnassigned: true }, c); });// save students data to trip stop to get the original students bind on the trip stop
 						existTrip.originalStudents = existTrip.originalStudents.concat(fieldTripStop.originalStudents);
-						self.viewModel.drawTool && self.viewModel.drawTool._addTripStop(fieldTripStop, existTrip.id);
+						// self.viewModel.drawTool && self.viewModel.drawTool._addTripStop(fieldTripStop, existTrip.id);
 						assignedStudents = assignedStudents.concat(fieldTripStop.originalStudents);
 					});
 				}

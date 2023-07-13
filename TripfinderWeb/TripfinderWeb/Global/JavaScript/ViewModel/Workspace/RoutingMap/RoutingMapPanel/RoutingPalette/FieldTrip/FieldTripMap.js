@@ -159,6 +159,7 @@
 		this._sortBySequence(fieldTrip.FieldTripStops);
 
 		await this.drawStops(fieldTrip);
+
 		await this.addFieldTripPath(fieldTrip);
 	}
 
@@ -503,9 +504,31 @@
 
 	//#region Delete Stop
 
-	FieldTripMap.prototype.deleteStopLocation = async function(fieldTrip, stop, sketchTool)
+	FieldTripMap.prototype.deleteStopLocation = async function(fieldTrip, stop)
 	{
-		console.log(`Delete Stop on map, fieldTrip id = ${fieldTrip.id}, stop sequence = ${stop.Sequence}`);
+		const self = this;
+		if (!self.fieldTripStopLayerInstance)
+		{
+			return;
+		}
+
+		const { DBID, Id } = self._extractFieldTripFeatureFields(fieldTrip),
+			sequence = stop.Sequence,
+			fieldTripStops = self._getStopFeatures();
+
+		for (let i = 0; i < fieldTripStops.length; i++)
+		{
+			const stop = fieldTripStops[i],
+				attributes = stop.attributes;
+			if (attributes.DBID === DBID && attributes.Id === Id && attributes.Sequence === sequence)
+			{
+				self.fieldTripStopLayerInstance.layer.remove(stop);
+				break;
+			}
+		}
+
+		const data = { fieldTripStopId: stop.id };
+		PubSub.publish("on_FieldTripMap_DeleteStopLocationCompleted", data);
 	}
 
 	//#endregion
