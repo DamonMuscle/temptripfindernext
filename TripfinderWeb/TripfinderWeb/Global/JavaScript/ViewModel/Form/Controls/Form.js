@@ -370,6 +370,23 @@
 					//filter out attachment since multi-documents saved in sperate table
 					if (q.field.questionType !== 'AttachBlock')
 					{
+						const _isPhoneType = function(q) {
+							let systemFieldConfig = tf.systemFieldsConfig[q.dataTypeId];
+							if (!systemFieldConfig) 
+							{
+								return q.field.FieldOptions.TypeName === 'Phone Number';
+							}
+							
+							let type = systemFieldConfig[q.field.FieldOptions.DefaultText]?.type;
+							return q.field.FieldOptions.TypeName === 'Phone Number' || 
+								(q.field.FieldOptions.TypeName === 'System Field' && type === 'Phone Number')
+						}
+
+						if (q.field && q.field.FieldOptions && _isPhoneType(q) && q.value !== null)
+						{
+							q.value = tf.dataFormatHelper.getPurePhoneNumber(q.value);
+						}
+
 						udgRecord[q.field.Guid] = q.value;
 
 						// format phone

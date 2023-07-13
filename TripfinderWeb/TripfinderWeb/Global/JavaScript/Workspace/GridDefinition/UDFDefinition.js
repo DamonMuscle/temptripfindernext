@@ -246,6 +246,7 @@
 				OriginalName: item.DisplayName,
 				DisplayName: item.DisplayName,
 				Width: "150px",
+				PickListMultiSelect: item.PickListMultiSelect,
 				UDFType: item.Type.toLowerCase(),
 				Required: item.Required,
 				SystemDefined: item.SystemDefined,
@@ -319,11 +320,35 @@
 				{
 					return tf.dataFormatHelper.phoneFormatter(dataItem[columnDefinition.OriginalName]) || '';
 				};
+				columnDefinition["formatType"] = "phone";
 				break;
 			case "Date/Time":
 				columnDefinition["template"] = function(dataItem)
 				{
 					return dataItem[columnDefinition.OriginalName] ? moment(dataItem[columnDefinition.OriginalName]).format("MM/DD/YYYY hh:mm A") : '';
+				};
+				break;
+			case "Date":
+				columnDefinition["template"] = function(dataItem)
+				{
+					return dataItem[columnDefinition.OriginalName] ? moment(dataItem[columnDefinition.OriginalName]).format("MM/DD/YYYY") : '';
+				};
+				break;
+			case "Time":
+				columnDefinition["template"] = function(dataItem)
+				{
+					let value = dataItem[columnDefinition.OriginalName];
+					if (value === "")
+					{
+						return "";
+					}
+					let time = moment(value);
+					if (time.isValid())
+					{
+						return time.format("hh:mm A");
+					}
+					time = moment("1900-1-1 " + value);
+					return time.isValid() ? time.format("hh:mm A") : "";
 				};
 				break;
 			default:
