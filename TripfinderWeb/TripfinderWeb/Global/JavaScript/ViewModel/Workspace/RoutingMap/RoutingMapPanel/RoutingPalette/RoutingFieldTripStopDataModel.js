@@ -219,7 +219,7 @@
 		{
 			data.id = TF.createId();
 		}
-		data.TripStopId = data.id;
+		data.FieldTripStopId = data.id;
 		this.bindCoordinate(data);
 		if (!ignoreBoundary)
 		{
@@ -227,7 +227,7 @@
 		} else
 		{
 			data.boundary.FieldTripId = data.FieldTripId;
-			data.boundary.TripStopId = data.id;
+			data.boundary.FieldTripStopId = data.id;
 		}
 		data.routeStops = null;
 		return data;
@@ -996,7 +996,7 @@
 		var originalData = [];
 		modifyDataArray.forEach(function(modifyData)
 		{
-			var tripStop = self.dataModel.getFieldTripStop(modifyData.TripStopId);
+			var tripStop = self.dataModel.getFieldTripStop(modifyData.FieldTripStopId);
 			if (tripStop.boundary && !tripStop.boundary.id)
 			{
 				tripStop.boundary = self.createTripBoundary(tripStop);
@@ -1145,13 +1145,13 @@
 		var intersects = tf.map.ArcGIS.geometryEngine.intersects;
 		boundaries.forEach(function(boundary)
 		{
-			if (boundary.TripStopId)
+			if (boundary.FieldTripStopId)
 			{
 				var newCandidateStudents = [];
-				var tripStop = self.dataModel.getFieldTripStop(boundary.TripStopId);
+				var tripStop = self.dataModel.getFieldTripStop(boundary.FieldTripStopId);
 				if (tripStops)
 				{
-					tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.TripStopId; });
+					tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.FieldTripStopId; });
 				}
 				var assignStudents = tripStop.Students;
 				assignStudents.forEach(function(student)
@@ -1182,7 +1182,7 @@
 	RoutingFieldTripStopDataModel.prototype.assignStudentInBoundary = function(boundaries, notifyEvent, tripStops, notifyMapEvent, trip, autoAssign)
 	{
 		var self = this;
-		boundaries = boundaries.filter(function(c) { return c.TripStopId; });
+		boundaries = boundaries.filter(function(c) { return c.FieldTripStopId; });
 		if (boundaries.length == 0)
 		{
 			return Promise.resolve();
@@ -1197,14 +1197,14 @@
 			{
 				return Enumerable.From(allNewAssignStudents).Any(function(c) { return c.id == student.id; });
 			});
-			var tripStop = self.dataModel.getFieldTripStop(boundary.TripStopId);
+			var tripStop = self.dataModel.getFieldTripStop(boundary.FieldTripStopId);
 			if (tripStop && !trips[tripStop.FieldTripId])
 			{
 				trips[tripStop.FieldTripId] = self.dataModel.getTripById(tripStop.FieldTripId);
 			}
 			if (tripStops)
 			{
-				tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.TripStopId; });
+				tripStop = Enumerable.From(tripStops).FirstOrDefault(null, function(c) { return c.id == boundary.FieldTripStopId; });
 			}
 			if (tripStop.unassignStudent && tripStop.unassignStudent.length > 0) students = tripStop.unassignStudent;
 
@@ -1355,7 +1355,7 @@
 			OBJECTID: 0,
 			id: TF.createId(),
 			FieldTripId: tripStop.FieldTripId,
-			TripStopId: tripStop.id,
+			FieldTripStopId: tripStop.id,
 			geometry: tripStop.boundary ? tripStop.boundary.geometry : null,
 			type: "tripBoundary",
 			BdyType: tripStop.boundary ? tripStop.boundary.BdyType : 1

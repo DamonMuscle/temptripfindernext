@@ -544,20 +544,19 @@
 			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
 			self._removeNotOpenEditTrips(data);
 			self.bindColor();
-			
+
 			var p1 = self._fetchTripData(newTripIds);
-			/*var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
+			var p2 = self._getFieldTripPathFeatureData(newTripIds, p1).then(function()
 			{
 				if (!disableAutoZoom)
 				{
 					self.viewModel.eventsManager.zoomClick({});
 				}
 			});
-			
-			var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
-			*/
 
-			return Promise.all([p1]);
+			// var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
+
+			return Promise.all([p1, p2]);
 		}).then(function(tripsData)
 		{
 			tf.loadingIndicator.tryHide();
@@ -2263,11 +2262,11 @@
 			data.FieldTrips.forEach(function(trip)
 			{
 				trip.visible = true;
-				trip.type = "fieldtrip";
+				trip.type = "trip";
 				trip.FieldTripStops.forEach(function(fieldTripStop)
 				{
 					fieldTripStop.FieldTripId = trip.id;
-					fieldTripStop.type = "fieldTripStop";
+					fieldTripStop.type = "tripStop";
 					fieldTripStop.vehicleCurbApproach = fieldTripStop.VehicleCurbApproach;
 					if (fieldTripStop.SchoolLocation)
 					{
@@ -2488,7 +2487,7 @@
 			trip.visible = true;
 			trip.TripStops = [];
 			trip.FieldTripStops = [];
-			trip.type = "fieldtrip";
+			trip.type = "trip";
 			return trip;
 		});
 	};
@@ -2898,6 +2897,49 @@
 				self.tripPathFeatureServerRecords = records;
 				return records;
 			});
+	};
+
+	RoutingDataModel.prototype._getFieldTripPathFeatureData = function(tripIds, tripDataPromise)
+	{
+		if (tripIds.length === 0)
+		{
+			return Promise.resolve([]);
+		}
+
+		var self = this;
+		return tripDataPromise.then(function()
+		{
+			const records = [];
+			self.trips.forEach(function(trip)
+			{
+				// only refresh new trips
+				if (tripIds.indexOf(trip.id) < 0)
+				{
+					return;
+				}
+				trip.FieldTripStops.forEach(function(tripStop)
+				{
+					let tripPath = {};
+					if (tripStop.GeoPath)
+					{
+						tripPath = {
+							id: TF.createId(),
+							OBJECTID: 0,
+							type: "tripPath",
+							FieldTripId: tripStop.FieldTripId,
+							FieldTripStopId: tripStop.id,
+							// geometry: // todo, convert geo path to geometry
+							AvgSpeed: tripStop.Speed || 0,
+							Dist: tripStop.Distance
+						};
+						records.push(tripPath);
+					}
+					tripStop.path = tripPath;
+				});
+			});
+			self.tripPathFeatureServerRecords = records;
+			return records;
+		});
 	};
 
 	RoutingDataModel.prototype._getTripBoundaryFeatureData = function(tripIds, tripDataPromise)
@@ -6510,10 +6552,7 @@
 			case "tripStop":
 			case "tripBoundary":
 				return data.TripId;
-			case "fieldTripStop":
-				return data.FieldTripId;
 			case "trip":
-			case "fieldtrip":
 				return data.id;
 		}
 	};

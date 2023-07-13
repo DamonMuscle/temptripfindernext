@@ -51,7 +51,7 @@
 	NetworkAnalysisTool.prototype.refreshTrip = function(tripStop, type, hasSpecialOrder, isSmartAddStop)
 	{
 		var self = this;
-		var trip = self.dataModel.getTripById(tripStop.TripId);
+		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
 		return self.stopTool.attachClosetStreetToStop(trip.TripStops.concat(tripStop).filter(function(stop) { return !stop.StreetSegment })).then(function()
 		{
 			//var routeParameters = self._getRouteParameters(self.initRouteParameters(), tripStop.TripId);
@@ -63,11 +63,11 @@
 					{
 						return self._recalculateTripMove(tripStop, true);
 					}
-					if (self._isSchoolLastStop(trip, tripStop, trip.TripStops))
+					if (self._isSchoolLastStop(trip, tripStop, trip.FieldTripStops))
 					{
-						if (trip.Session <= 1 || (trip.Session > 1 && trip.TripStops.length <= 2))
+						if (trip.Session <= 1 || (trip.Session > 1 && trip.FieldTripStops.length <= 2))
 						{
-							tripStop.Sequence = TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.TripStops.filter(s => s.id != tripStop.id), trip.Session, tripStop.doorToDoorSchoolId);
+							tripStop.Sequence = TF.Helper.TripHelper.getTripStopInsertSequenceBeforeSchool(trip.FieldTripStops.filter(s => s.id != tripStop.id), trip.Session, tripStop.doorToDoorSchoolId);
 							return self._recalculateTripMove(tripStop);
 						}
 					}
@@ -84,7 +84,7 @@
 	{
 		if (newTripStop.doorToDoorSchoolId)
 		{
-			if (tripStops.filter(function(stop) { return stop.SchoolCode && stop.SchoolId == newTripStop.doorToDoorSchoolId })[0].Sequence == (trip.Session == 0 ? 1 : trip.TripStops.length - 1)) return true;
+			if (tripStops.filter(function(stop) { return stop.SchoolCode && stop.SchoolId == newTripStop.doorToDoorSchoolId })[0].Sequence == (trip.Session == 0 ? 1 : trip.FieldTripStops.length - 1)) return true;
 			return false;
 		} else
 		{

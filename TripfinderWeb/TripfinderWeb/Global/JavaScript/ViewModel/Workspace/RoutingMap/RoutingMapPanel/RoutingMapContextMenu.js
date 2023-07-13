@@ -123,10 +123,10 @@
 						}));
 						contextMenuCategories.tripPaths.push(tempParentMenuItem);
 					}
-				} else if (type == 'fieldtripstop')
+				} else if (type == 'tripstop')
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.FieldTripId),
-						fieldTripStopId = menuItemData.type === "fieldTripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
+						fieldTripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
 						fieldTripStop = routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 						tripName = trip.Name;
 					if (!tripItems[tripName])
