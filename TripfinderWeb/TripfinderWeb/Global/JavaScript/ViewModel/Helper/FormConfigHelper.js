@@ -147,7 +147,9 @@
 			"WalkToSchoolPolicy": { type: "numner" },
 			"WalkToStopPolicy": { type: "number" },
 			"Xcoord": { type: "Coord" },
-			"Ycoord": { type: "Coord" }
+			"Ycoord": { type: "Coord" },
+			"PrimaryContactPhone": { type: TYPE_PHONE_NUMBER },
+			"PrimaryContactMobile": { type: TYPE_PHONE_NUMBER }
 		},
 		13: {
 			"AppPoint": { type: "Checkbox" },
@@ -206,6 +208,18 @@
 			"InspectionExp": { type: "Date" },
 			"YearMade": { type: "integer" }
 		},
+	}
+
+	FormConfigHelper.getSystemFieldRelatedColumnDefinition = function(fieldName, dataTypeId)
+	{
+		let gridColumnData = TF.Grid.FilterHelper.getGridDefinitionByType(tf.dataTypeHelper.getKeyById(dataTypeId));
+		let targetColumn = gridColumnData.Columns.filter(c => c.FieldName == fieldName);
+		if (Array.isArray(targetColumn) && targetColumn.length > 0)
+		{
+			return targetColumn[0];
+		}
+
+		return null;
 	}
 
 	var getCommaSeparatedTwoDecimalsNumber = function(number, numberPrecision)
@@ -281,9 +295,9 @@
 	}
 
 	tf.systemFieldsFormat = function(type, value, el, attributeFlag, numberPrecision, 
-		trueDisplayName, falseDisplayName, options = { isGrid: false })
+		trueDisplayName, falseDisplayName, options = { isGrid: false, isUTC: false })
 	{
-		const { isGrid } = options;
+		const { isGrid, isUTC } = options;
 
 		function clearEmptyImagePlacehold(_el)
 		{
@@ -377,6 +391,12 @@
 			case "Date":
 			case "date":
 				if (IsEmptyString(value)) { return ""; }
+				if (isUTC)
+				{
+					let dt = utcToClientTimeZone(value);
+					return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
+				}
+
 				return _formatDataSysField(value);
 			case "Time":
 			case "time":
@@ -384,6 +404,12 @@
 				return getFormattedTime(value);
 			case "Date/Time":
 				if (IsEmptyString(value)) { return ""; }
+				if (isUTC)
+				{
+					let dt = utcToClientTimeZone(value);
+					return dt.isValid() ? dt.format("MM/DD/YYYY h:mm A") : "";
+				}
+
 				return _formatDateTimeSysField(value);
 			case "Coord":
 				if (IsEmptyString(value)) { return ""; }

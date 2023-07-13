@@ -268,7 +268,7 @@
 				column.template = template;
 			}
 
-			const columnExtension = tf.udgHelper.getGridColumnExtension(udgField, column);
+			const columnExtension = tf.udgHelper.getGridColumnExtension(udgField, column, dataTypeId);
 			if (columnExtension)
 			{
 				column = $.extend(column, columnExtension);
