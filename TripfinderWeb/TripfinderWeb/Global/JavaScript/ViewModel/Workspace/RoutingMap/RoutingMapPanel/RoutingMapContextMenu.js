@@ -125,7 +125,7 @@
 					}
 				} else if (type == 'fieldtripstop')
 				{
-					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.TripId),
+					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.FieldTripId),
 						fieldTripStopId = menuItemData.type === "fieldTripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
 						fieldTripStop = routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 						tripName = trip.Name;

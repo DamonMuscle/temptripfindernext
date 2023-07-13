@@ -955,9 +955,6 @@
 
 				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
 				this._viewModal.setMode("Routing", "Normal");
-				var tripStop = this.dataModel.getFieldTripStop(fieldTripStopId);
-				tf.loadingIndicator.show();
-				this.dataModel.fieldTripStopDataModel.delete(tripStop).finally(() => tf.loadingIndicator.tryHide());
 			}
 
 			PubSub.publish("clear_ContextMenu_Operation");

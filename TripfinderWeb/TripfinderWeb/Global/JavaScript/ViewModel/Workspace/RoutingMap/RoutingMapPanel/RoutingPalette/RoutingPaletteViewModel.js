@@ -35,6 +35,7 @@
 		PubSub.subscribe("on_FieldTripMap_MoveStopLocation", self.onFieldTripMapMoveStopLocation.bind(self));
 		PubSub.subscribe("on_FieldTripMap_DeleteStopLocation", self.onFieldTripMapDeleteStopLocation.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
+		PubSub.subscribe("on_FieldTripMap_DeleteStopLocationCompleted", self.onFieldTripMapDeleteStopLocationComplete.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -259,6 +260,23 @@
 		}, 500);
 	}
 
+	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationComplete = function(type, stopId)
+	{
+		var self = this;
+
+		var tripStop = self.dataModel.getFieldTripStop(stopId);
+		
+		tf.loadingIndicator.show();
+		
+		self.dataModel.fieldTripStopDataModel.delete(tripStop).finally(() => {
+			var fieldTrip = Enumerable.From(self.dataModel.trips).FirstOrDefault(function(c) { return c.id == tripStop.FieldTripId; })
+
+			PubSub.publish("on_FieldTripPalette_DeleteStopLocationCompleted", fieldTrip);
+
+			tf.loadingIndicator.tryHide();
+		});
+	}
+
 	RoutingPaletteViewModel.prototype.close = function()
 	{
 		var self = this;
@@ -313,6 +331,7 @@
 		PubSub.unsubscribe("on_FieldTripMap_MoveStopLocation");
 		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocation");
 		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
+		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocationCompleted");
 
 		tfdispose(this);
 	};
