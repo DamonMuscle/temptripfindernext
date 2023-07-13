@@ -500,6 +500,16 @@
 
 	//#endregion
 
+
+	//#region Delete Stop
+
+	FieldTripMap.prototype.deleteStopLocation = async function(fieldTrip, stop, sketchTool)
+	{
+		console.log(`Delete Stop on map, fieldTrip id = ${fieldTrip.id}, stop sequence = ${stop.Sequence}`);
+	}
+
+	//#endregion
+
 	//#endregion
 
 	//#endregion

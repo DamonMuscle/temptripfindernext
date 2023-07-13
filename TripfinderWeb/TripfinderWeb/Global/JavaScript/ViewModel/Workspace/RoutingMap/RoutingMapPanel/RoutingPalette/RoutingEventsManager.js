@@ -950,6 +950,9 @@
 			console.log("Stop Delete clicked", fieldTripStopId, fieldTripId);
 			if (result)
 			{
+				const data = { fieldTripId, fieldTripStopId };
+				PubSub.publish("on_FieldTripMap_DeleteStopLocation", data);
+
 				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
 				this._viewModal.setMode("Routing", "Normal");
 				var tripStop = this.dataModel.getFieldTripStop(fieldTripStopId);
