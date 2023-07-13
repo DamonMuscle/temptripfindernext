@@ -148,6 +148,11 @@
 		PubSub.publish("on_MapCanvas_MapExtentChange", {previous, extent});
 	}
 
+	MapCanvasPage.prototype.onMapViewClick = function(event)
+	{
+		PubSub.publish("on_MapCanvas_MapViewClick", { event });
+	}
+
 	MapCanvasPage.prototype._initRevertOperation = function()
 	{
 		var self = this;
@@ -727,6 +732,7 @@
 				},
 				onMapViewUpdated: self.onMapViewUpdated.bind(self),
 				onMapViewExtentChanges: self.onMapViewExtentChanges.bind(self),
+				onMapViewClick: self.onMapViewClick.bind(self),
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;

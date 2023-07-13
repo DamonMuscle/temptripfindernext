@@ -34,8 +34,9 @@
 		PubSub.subscribe("on_FieldTripMap_TripPathTypeChange", self.onFieldTripMapTripPathTypeChange.bind(self));
 		PubSub.subscribe("on_FieldTripMap_MoveStopLocation", self.onFieldTripMapMoveStopLocation.bind(self));
 		PubSub.subscribe("on_FieldTripMap_DeleteStopLocation", self.onFieldTripMapDeleteStopLocation.bind(self));
+		PubSub.subscribe("on_FieldTripMap_DeleteStopLocationCompleted", self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
-		PubSub.subscribe("on_FieldTripMap_DeleteStopLocationCompleted", self.onFieldTripMapDeleteStopLocationComplete.bind(self));
+		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -237,33 +238,14 @@
 			return;
 		}
 
-		this.fieldTripMap?.deleteStopLocation(fieldTrip, fieldTripStop, this._viewModal.sketchTool);
+		this.fieldTripMap?.deleteStopLocation(fieldTrip, fieldTripStop);
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
-	{
-		if (this.routingMapExtentChangeTimeout !== null)
-		{
-			window.clearTimeout(this.routingMapExtentChangeTimeout);
-			this.routingMapExtentChangeTimeout = null;
-		}
-
-		this.routingMapExtentChangeTimeout = window.setTimeout(() =>
-		{
-			if (this.mapInstance?.map.mapView.stationary)
-			{
-				const fieldTrips = this.dataModel.trips;
-				this.fieldTripMap?.redrawFieldTripArrows(fieldTrips);
-			}
-
-			this.routingMapExtentChangeTimeout = null;
-		}, 500);
-	}
-
-	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationComplete = function(type, stopId)
+	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocationCompleted = function(_, data)
 	{
 		var self = this;
 
+		var stopId = data.fieldTripStopId;
 		var tripStop = self.dataModel.getFieldTripStop(stopId);
 		
 		tf.loadingIndicator.show();
@@ -275,6 +257,17 @@
 
 			tf.loadingIndicator.tryHide();
 		});
+	}
+
+	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
+	{
+		const fieldTrips = this.dataModel.trips;
+		this.fieldTripMap?.onMapCanvasMapExtentChangeEvent(fieldTrips);
+	}
+
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, event)
+	{
+		this.fieldTripMap?.onMapClickEvent(event);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()
@@ -330,8 +323,9 @@
 		PubSub.unsubscribe("on_FieldTripMap_TripPathTypeChange");
 		PubSub.unsubscribe("on_FieldTripMap_MoveStopLocation");
 		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocation");
-		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
 		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocationCompleted");
+		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
+		PubSub.unsubscribe("on_MapCanvas_MapViewClick");
 
 		tfdispose(this);
 	};

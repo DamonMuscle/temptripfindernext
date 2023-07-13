@@ -501,7 +501,6 @@
 
 	//#endregion
 
-
 	//#region Delete Stop
 
 	FieldTripMap.prototype.deleteStopLocation = async function(fieldTrip, stop)
@@ -534,6 +533,49 @@
 	//#endregion
 
 	//#endregion
+
+	//#region Map Events
+
+	FieldTripMap.prototype.onMapCanvasMapExtentChangeEvent = function(fieldTrips)
+	{
+		const self = this;
+		if (self.mapExtentChangeTimeout !== null)
+		{
+			window.clearTimeout(self.mapExtentChangeTimeout);
+			self.mapExtentChangeTimeout = null;
+		}
+
+		self.mapExtentChangeTimeout = window.setTimeout(() =>
+		{
+			if (self.mapInstance?.map.mapView.stationary)
+			{
+				self.redrawFieldTripArrows(fieldTrips);
+			}
+
+			self.mapExtentChangeTimeout = null;
+		}, 500);
+	}
+
+	FieldTripMap.prototype.onMapClickEvent = async function(data)
+	{
+		const self = this, event = data.event;
+		if (event.button === 2)
+		{
+			// right click
+			const response = await self.mapInstance?.map.mapView.hitTest(event);
+			if (response.results.length > 0)
+			{
+				const graphics = response.results.map(item => item.graphic);
+				const stopGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripStopLayerId);
+				const data = stopGraphics.map(stop => {
+					return { DBID: stop.attributes.DBID, TripId: stop.attributes.Id, Sequence: stop.attributes.Sequence };
+				});
+
+				console.log(data);
+				PubSub.publish("FieldTripMap_onMapClick_FieldTripStop", data);
+			}
+		}
+	}
 
 	//#endregion
 
