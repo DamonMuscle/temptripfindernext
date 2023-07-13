@@ -130,7 +130,7 @@
 							<div class="row">
 								<div class="col-xs-12">
 									<div class="form-group small-form-group">
-										<label>Stop Time Arrive</label>
+										<label>Stop Arrive Time</label>
 										<!-- ko customInput:{type:"Date",value:obStopTimeArriveDate,attributes:{class:"form-control",name:"stopTimeArriveDate",placeholder:"MM/DD/YYYY"}, disable:obStopTimeArriveDisable} -->
 										<!-- /ko -->
 									</div>
@@ -148,7 +148,7 @@
 							<div class="row">
 								<div class="col-xs-12" >
 									<div class="form-group small-form-group">
-										<label>Stop Time Depart</label>
+										<label>Stop Departure Time</label>
 										<!-- ko customInput:{type:"Date",value:obStopTimeDepartDate,attributes:{class:"form-control",name:"stopTimeDepartDate",placeholder:"MM/DD/YYYY"}, disable:obStopTimeDepartDisable} -->
 										<!-- /ko -->
 									</div>
@@ -182,7 +182,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&obShowStopLocationMap()">
+						<div class="col-xs-24" data-bind="visible:!obIsMultipleCreate()&&obShowStopLocationMap()&&obCornerStopVisible()">
 							<div class="form-group small-form-group">
 								<label>Corner Stop</label>
 								<div class="stopLocationMap"></div>

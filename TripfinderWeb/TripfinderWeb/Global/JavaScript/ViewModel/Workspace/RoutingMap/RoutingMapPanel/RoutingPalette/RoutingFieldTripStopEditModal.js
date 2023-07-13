@@ -85,6 +85,7 @@
 		this.obSelectedFieldTripDisable = ko.observable(true);
 		this.obSmartSequenceDisable = ko.observable(true);
 		this.obStopSequenceDisable = ko.computed(() => this.obSmartSequenceDisable() || this.obSelectedSequenceDisable());
+		this.obCornerStopVisible = ko.observable(false);
 
 		this.initSequenceSubscribe();
 	}
