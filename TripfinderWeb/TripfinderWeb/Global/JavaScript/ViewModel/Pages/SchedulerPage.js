@@ -812,7 +812,7 @@
 		ga('send', 'event', 'Area', 'Details');
 		if (self.fieldTripId.length > 0)
 		{
-			idFromScheduler = self.fieldTripId;
+			idFromScheduler = self.fieldTripId[0];
 		}
 		var detailView = new TF.DetailView.DetailViewViewModel(idFromScheduler);
 		detailView.onCloseDetailEvent.subscribe(
