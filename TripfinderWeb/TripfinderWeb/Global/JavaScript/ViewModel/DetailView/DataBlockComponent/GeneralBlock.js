@@ -16,7 +16,7 @@
 				&& (typeof options.editType.allowEdit !== "function" || options.editType.allowEdit()),
 			uniqueClassName = options.uniqueClassName || detailViewHelper.generateUniqueClassName(),
 			title = (options.customizedTitle || options.title),
-			$itemContent = detailViewHelper.getItemContent(content, dataBlockStyles),
+			$itemContent = detailViewHelper.getItemContent(content, dataBlockStyles, { type: options.type }),
 			$wrapper = $("<div class='grid-stack-item-content general-stack-item' data-block-field-name='" + options.field + "'>\
 							<input class='item-title' type='text' style='color:" + dataBlockStyles.titleColor + "' value='" + title + "' />\
 							<div class='item-title' style='color:" + dataBlockStyles.titleColor + "'>" + title + (options.badgevalue ? "<span class='badge-right'>" + options.badgevalue + "</span>" : "") + "</div>\

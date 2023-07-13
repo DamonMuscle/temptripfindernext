@@ -1191,12 +1191,24 @@
 	 *
 	 * @param {string} content
 	 * @param {object} dataBlockStyles
+	 * @param {option} dataBlockOptions
 	 * @returns
 	 */
-	DetailViewHelper.prototype.getItemContent = function(content, dataBlockStyles)
+	DetailViewHelper.prototype.getItemContent = function(content, dataBlockStyles, option)
 	{
-		content = (content.split ? content.split(" ").join("&nbsp;") : content);
-		return $(String.format("<div data-placeholder='None' class='item-content' style='color:{0}'>{1}</div>", dataBlockStyles.contentColor, content));
+		var $content = $(String.format("<div data-placeholder='None' class='item-content' style='color:{0}'></div>", dataBlockStyles.contentColor));
+		var contentAsRawHTML = (option && option.type === 'Note');
+		if (contentAsRawHTML)
+		{
+			$content.addClass('item-note');
+			$content.html(content);
+		}
+		else
+		{
+			$content.text(content);
+		}
+
+		return $content;
 	};
 
 	/**
