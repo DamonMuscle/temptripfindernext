@@ -53,7 +53,7 @@
 									<div class="pull-right" data-bind="visible:!obIsInsertToSpecialStop()&&obIsOpenMultipleTrips()" style="margin-right:3px;">
 										<div class="checkbox">
 											<label>
-												<input id="smartAssignmentCheckbox" data-bind="checked:obIsSmartAssignment,checkedValue:0" type="checkbox">
+												<input id="smartAssignmentCheckbox" data-bind="checked:obIsSmartAssignment,checkedValue:0,disable:obSmartAssignmentDisable()" type="checkbox">
 												<span>Smart Assignment </span>
 											</label>
 										</div>
