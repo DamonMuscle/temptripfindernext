@@ -458,10 +458,10 @@
 				pageData = new TF.Page.LocationPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
-			case "datalist":
-				pageData = {};
-				templateName = "workspace/page/datalist";
-				break;
+			// case "datalist":
+			// 	pageData = {};
+			// 	templateName = "workspace/page/datalist";
+			// 	break;
 			// if type is not matched use fieldtrip page as default
 			default:
 				pageData = new TF.Page.FieldTripPage(gridOptions);
