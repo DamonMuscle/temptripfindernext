@@ -570,10 +570,14 @@
 				const data = stopGraphics.map(stop => {
 					return { DBID: stop.attributes.DBID, TripId: stop.attributes.Id, Sequence: stop.attributes.Sequence };
 				});
-				data.event = event;
 
-				console.log(data);
-				PubSub.publish("FieldTripMap_onMapClick_FieldTripStop", data);
+				const dataWrapper = {
+					data: data,
+					event: event
+				};
+
+				console.log(dataWrapper);
+				PubSub.publish("FieldTripMap_onMapClick_FieldTripStop", dataWrapper);
 			}
 		}
 	}

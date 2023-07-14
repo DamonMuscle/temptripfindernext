@@ -267,7 +267,7 @@
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, event)
 	{
-		this.fieldTripMap?.onMapClickEvent(event);
+		this.fieldTripMap?.onMapClickEvent(event, this);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

@@ -2,15 +2,53 @@
 {
 	createNamespace('TF.RoutingMap.RoutingMapPanel').RoutingMapContextMenu = (function RoutingMapContextMenu()
 	{
+		var self = this;
 		var selectedMenuItemHeader = [];
 		var currentTabRouteState;
+		
+		self.routingPaletteViewModel = null;
 
+		PubSub.subscribe("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", FieldTripMap_onMapClick_InitRoutingPaletteViewModel);
 		PubSub.subscribe("DocumentManagerViewModel_TabChange", getCurrentTabRouteState);
+		PubSub.subscribe("FieldTripMap_onMapClick_FieldTripStop", onFieldTripMapClick_FieldTripStop);
 
 		function getCurrentTabRouteState(event, document)
 		{
 			currentTabRouteState = document.routeState;
 		}
+
+
+		function FieldTripMap_onMapClick_InitRoutingPaletteViewModel(event, routingPaletteViewModel)
+		{
+			self.routingPaletteViewModel = routingPaletteViewModel;
+		}
+
+		function onFieldTripMapClick_FieldTripStop(event, dataWrapper)
+		{
+			var container = $(".map").closest('#pageContent');
+
+			var data = dataWrapper.data?.map((item) => {
+				return {
+					type: "tripstop",
+					FieldTripId: item.TripId,
+					Sequence: item.Sequence,
+					DBID: item.DBID
+				};
+			});
+
+			var contextMenu = buildContextMenuInternal(container, data, null, null, null, self.routingPaletteViewModel);
+
+			if (contextMenu.root.children.length == 0)
+			{
+				return;
+			}
+
+			contextMenu.showMenu(dataWrapper.event.native, null, 75, ".map-page");
+
+		}
+
+
+		
 
 		function setFontToBold(menuItem)
 		{
@@ -30,7 +68,7 @@
 			}
 		}
 
-		function buildContextMenuInternal(container, data, parcelPointsViewModel, boundaryViewModel, mapEditingPaletteViewModel, routingPaletteViewModel, geoSearchPaletteViewModel, routeState, documentViewModel)
+		function buildContextMenuInternal(container, data, parcelPointsViewModel, boundaryViewModel, mapEditingPaletteViewModel, routingPaletteViewModel, geoSearchPaletteViewModel, routeState, travelScenariosPaletteViewModel)
 		{
 			var tempParentMenuItem;
 			var contextMenu = new TF.RoutingMap.ContextMenu(container);
@@ -46,7 +84,6 @@
 				hasAuthForRoutingMapEdit = tf.authManager.isAuthorizedFor("routingMap", "edit"),
 				hasAuthForRoutingMap = hasAuthForRoutingMapAdd || hasAuthForRoutingMapEdit,
 				hasAuthForEditMap = tf.authManager.isAuthorizedFor('mapEdit', ['edit', 'add']),
-				travelScenariosPaletteViewModel = documentViewModel.travelScenariosPaletteViewModel,
 				tripItems = {};
 			for (var i = 0; i < data.length; i++)
 			{
@@ -127,7 +164,8 @@
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.FieldTripId),
 						fieldTripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
-						fieldTripStop = routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
+						fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStopBySequence(menuItemData.Sequence) : 
+																routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 						tripName = trip.Name;
 					if (!tripItems[tripName])
 					{
@@ -172,7 +210,7 @@
 						icon: 'copy',
 						data: menuItemData,
 						disable: true, // FT-3291: Disabled for Future Implementation
-						click: routingPaletteViewModel.tripViewModel.eventsManager.copyTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStopId)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.copyTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStop.id)
 					}));
 
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
@@ -185,7 +223,7 @@
 						data: menuItemData,
 						disable: fieldTripStopDisable,
 						id: 'tripSessionMovePoint',
-						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStopId, trip.id)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStop.id, trip.id)
 					}));
 					tempParentMenuItem.addChild(new TF.RoutingMap.MenuItem({
 						isDevider: true
@@ -196,7 +234,7 @@
 						icon: 'delete',
 						data: menuItemData,
 						disable: fieldTripStopDisable,
-						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStopId, trip.id)
+						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStop.id, trip.id)
 					}));
 					contextMenuCategories.tripSessions.push(tempParentMenuItem);
 				}

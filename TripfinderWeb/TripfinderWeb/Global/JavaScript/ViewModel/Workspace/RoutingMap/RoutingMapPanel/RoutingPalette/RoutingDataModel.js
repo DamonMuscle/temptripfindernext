@@ -3639,6 +3639,23 @@
 		}
 	};
 
+
+	RoutingDataModel.prototype.getFieldTripStopBySequence = function(sequenceId)
+	{
+		var trips = this.trips;
+		for (var i = 0, l = trips.length; i < l; i++)
+		{
+			var tripStops = trips[i].FieldTripStops;
+			for (var j = 0; j < tripStops.length; j++)
+			{
+				if (tripStops[j].Sequence == sequenceId)
+				{
+					return tripStops[j];
+				}
+			}
+		}
+	};
+
 	RoutingDataModel.prototype.getTripStopBySequence = function(trip, sequence)
 	{
 		return Enumerable.From(trip.TripStops).FirstOrDefault(null, function(c) { return c.Sequence == sequence; });

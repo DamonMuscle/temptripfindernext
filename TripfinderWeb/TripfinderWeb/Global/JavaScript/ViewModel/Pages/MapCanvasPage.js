@@ -1091,7 +1091,7 @@
 				{
 					if (!self.prevent && self._lastPreventKey == lastPreventKey)
 					{
-						TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.showContextMenu(self, self._map, self._arcgis, e, self.routeState, lastPreventKey);
+						PubSub.publish("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", self.routingPaletteViewModel);
 					}
 				}(self._lastPreventKey), 200);
 			}
