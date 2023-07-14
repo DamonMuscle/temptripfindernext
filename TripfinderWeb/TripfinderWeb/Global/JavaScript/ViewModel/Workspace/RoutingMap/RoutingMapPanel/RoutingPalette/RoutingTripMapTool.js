@@ -14,22 +14,22 @@
 
 		self.initialize();
 
-		self.dataModel.onAssignStudentsChangeToMapEvent.subscribe(self.onAssignStudentsChangeEvent.bind(this));
-		self.dataModel.onTripsChangeEvent.subscribe(self.onTripsChangeEvent.bind(this));
-		self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChangeEvent.bind(self));
-		self.dataModel.onChangeTripVisibilityEvent.subscribe(self.onChangeTripVisibilityEvent.bind(self));
+		// self.dataModel.onAssignStudentsChangeToMapEvent.subscribe(self.onAssignStudentsChangeEvent.bind(this));
+		// self.dataModel.onTripsChangeEvent.subscribe(self.onTripsChangeEvent.bind(this));
+		// self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChangeEvent.bind(self));
+		// self.dataModel.onChangeTripVisibilityEvent.subscribe(self.onChangeTripVisibilityEvent.bind(self));
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(self);
 		self.stopPreviewTool = new TF.RoutingMap.RoutingPalette.StopPreviewTool(self, self._map);
 		self.NAtool = new TF.RoutingMap.RoutingPalette.NetworkAnalysisTool(self);
 
 		self.initializeSettings();
 
-		self.dataModel.onTrialStopWalkoutPreviewChange.subscribe(self.stopPreviewTool.onTrialStopWalkoutPreviewChange.bind(self.stopPreviewTool));
-		self.dataModel.onSettingChangeEvent.subscribe(self.onSettingChangeEvent.bind(this));
-		self.dataModel.onTripColorChangeEvent.subscribe(self.refreshTrips.bind(self));
-		self.dataModel.onTripSequenceChangeEvent.subscribe(self.refreshTrips.bind(this));
-		self.dataModel.onTripPathLineDisplayChange.subscribe(self.onTripPathLineDisplayChange.bind(this));
-		self.dataModel.onStopBoundaryShowChange.subscribe(self.onStopBoundaryShowChange.bind(this));
+		// self.dataModel.onTrialStopWalkoutPreviewChange.subscribe(self.stopPreviewTool.onTrialStopWalkoutPreviewChange.bind(self.stopPreviewTool));
+		// self.dataModel.onSettingChangeEvent.subscribe(self.onSettingChangeEvent.bind(this));
+		// self.dataModel.onTripColorChangeEvent.subscribe(self.refreshTrips.bind(self));
+		// self.dataModel.onTripSequenceChangeEvent.subscribe(self.refreshTrips.bind(this));
+		// self.dataModel.onTripPathLineDisplayChange.subscribe(self.onTripPathLineDisplayChange.bind(this));
+		// self.dataModel.onStopBoundaryShowChange.subscribe(self.onStopBoundaryShowChange.bind(this));
 		self.schoolSymbol = self.symbol.school("#cf39dc", 1, 16);
 	}
 
@@ -807,7 +807,7 @@
 				symbol: stopSymbol,
 				attributes: {
 					"dataModel": tripStop,
-					TripId: tripId,
+					FieldTripId: tripId,
 					type: "tripStop"
 				}
 			});
@@ -830,7 +830,7 @@
 				symbol: labelSymbol,
 				attributes: {
 					dataModel: tripStop,
-					TripId: tripId,
+					FieldTripId: tripId,
 					type: "tripStopLabel"
 				}
 			});
@@ -839,7 +839,7 @@
 				symbol: stopSymbol,
 				attributes: {
 					"dataModel": tripStop,
-					TripId: tripId,
+					FieldTripId: tripId,
 					label: stopLabel,
 					type: "tripStop"
 				}
@@ -959,7 +959,7 @@
 			symbol: symbol,
 			attributes: {
 				"dataModel": dataModel,
-				TripId: tripId,
+				FieldTripId: tripId,
 				type: "boundary"
 			}
 		});
@@ -1083,7 +1083,7 @@
 	// 					symbol: studentSymbol,
 	// 					attributes: {
 	// 						"dataModel": student,
-	// 						TripId: tripId,
+	// 						FieldTripId: tripId,
 	// 						type: "student"
 	// 					}
 	// 				});
@@ -1131,7 +1131,7 @@
 			attributes: {
 				type: "tripPath",
 				"dataModel": trip,
-				TripId: trip.id
+				FieldTripId: trip.id
 			}
 		});
 		if (trip.visible == false)
@@ -1215,7 +1215,7 @@
 							{
 								arrowGraphic.attributes = {
 									dataModel: trip,
-									TripId: trip.id,
+									FieldTripId: trip.id,
 									type: "tripArrow"
 								};
 								arrowGraphic.visible = trip.visible;
@@ -1259,7 +1259,7 @@
 			var graphic = new self._arcgis.Graphic({
 				geometry: stop.geometry,
 				symbol: stopSymbol,
-				attributes: { dataModel: stop, type: "studentCount", TripId: stop.FieldTripId }
+				attributes: { dataModel: stop, type: "studentCount", FieldTripId: stop.FieldTripId }
 			});
 			if (trip.visible == false)
 			{
@@ -1949,7 +1949,7 @@
 				studentRequirementId: student.RequirementID,
 				tripStopId: stop.id,
 				studentId: student.id,
-				TripId: trip.id
+				FieldTripId: trip.id
 			};
 			graphic.symbol.width = 2;
 			return graphic;

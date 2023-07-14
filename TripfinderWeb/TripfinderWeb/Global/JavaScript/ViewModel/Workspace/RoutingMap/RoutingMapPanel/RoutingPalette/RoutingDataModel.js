@@ -6568,7 +6568,7 @@
 		{
 			case "tripStop":
 			case "tripBoundary":
-				return data.TripId;
+				return data.FieldTripId;
 			case "trip":
 				return data.id;
 		}
