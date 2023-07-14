@@ -62,11 +62,6 @@
 		this.obStopTimeDepartDate.subscribe(this.obStopTimeDepartDateChange, this);
 		this.obStopTimeDepartTime.subscribe(this.obStopTimeDepartTimeChange, this);
 
-		// total stop time
-		this.obRedAlertTotalStopTimeControl = ko.observable(false);
-		this.obTotalStopTimeShow = ko.observable("00:00");
-		this.obTotalStopTimeShow.subscribe(this.obTotalStopTimeShowChange, this);
-		this.obDataModel.TotalStopTime.subscribe(this.totalStopTimeChange, this);
 		this.vrpTool = new TF.RoutingMap.RoutingPalette.VRPTool();
 		this.dataModel.onTripStopsChangeEvent.subscribe(this.onTripStopsChangeEvent.bind(this));
 
@@ -123,18 +118,7 @@
 			self._bindParamsChange("#stopTypeDropDown>input", "stopType");
 			self.bindTag = true;
 		}
-		return TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(self, options).then(function()
-		{
-			return self.calculateTotalStopTime(options);
-		}).then(function()
-		{
-			self.data.forEach((record) =>
-			{
-				record.StopTime = convertToMoment(record.StopTime).format("HH:mm:00");
-			});
-			// calculate total stop time will change stop time ,so reset original data for check change
-			self.normalizeData(self.data);
-		});
+		return TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(self, options);
 	};
 
 	RoutingFieldTripStopEditModal.prototype.initSequenceSubscribe = function()
@@ -715,85 +699,6 @@
 		};
 	};
 
-	// stop time
-	RoutingFieldTripStopEditModal.prototype.calculateTotalStopTime = function(options)
-	{
-		var self = this;
-		var trip = this.obTrips()[0];
-		var newTrip = $.extend({}, trip);
-		newTrip.FieldTripStops = this.data.map(function(d)
-		{
-			var stop = $.extend({}, d);
-			stop.TotalStopTimeManualChanged = false;
-			return stop;
-		});
-		return this.dataModel.recalculate([newTrip]).then(function(trips)
-		{
-			trips.forEach(function(trip)
-			{
-				self.data.forEach(function(stop)
-				{
-					var tripStopCalculated = Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(c) { return c.id == stop.id; });
-					if (tripStopCalculated)
-					{
-						stop.totalStopTimeCalc = tripStopCalculated.TotalStopTime;
-						if (!stop.TotalStopTimeManualChanged && (!options || !options.isCopied))
-						{
-							stop.TotalStopTime = tripStopCalculated.TotalStopTime;
-						}
-					}
-				});
-			});
-		});
-	};
-
-	RoutingFieldTripStopEditModal.prototype.calculateTotalStopTimeClick = function()
-	{
-		var stop = this.data[this.obCurrentPage()];
-		this.obDataModel.TotalStopTime(stop.totalStopTimeCalc);
-	};
-
-	RoutingFieldTripStopEditModal.prototype.addTotalStopTimeClick = function()
-	{
-		this.changeTotalStopTime(1);
-	};
-
-	RoutingFieldTripStopEditModal.prototype.minusTotalStopTimeClick = function()
-	{
-		this.changeTotalStopTime(-1);
-	};
-
-	RoutingFieldTripStopEditModal.prototype.changeTotalStopTime = function(changeNumber)
-	{
-		var totalStopTime = TripStopHelper.convertToSeconds(this.obDataModel.TotalStopTime());
-		totalStopTime = totalStopTime + changeNumber;
-		if (totalStopTime < 0)
-		{
-			totalStopTime = 0;
-		}
-		this.obDataModel.TotalStopTime(TripStopHelper.convertToMinuteSecond(totalStopTime || 0, "HH:mm:ss"));
-	};
-
-	RoutingFieldTripStopEditModal.prototype.totalStopTimeChange = function()
-	{
-		var stop = this.data[this.obCurrentPage()];
-		this.obRedAlertTotalStopTimeControl(stop.totalStopTimeCalc !== this.obDataModel.TotalStopTime());
-		this.obDataModel.TotalStopTimeManualChanged(this.obRedAlertTotalStopTimeControl());
-		this.obTotalStopTimeShow(formatTotalStopTimeDisplay(this.obDataModel.TotalStopTime()));
-	};
-
-	RoutingFieldTripStopEditModal.prototype.obTotalStopTimeShowChange = function()
-	{
-		var minutesSecond = this.obTotalStopTimeShow();
-		if (/^[0-5]\d:[0-5]\d$/g.exec(minutesSecond))
-		{
-			this.obDataModel.TotalStopTime("00:" + minutesSecond);
-		} else
-		{
-			this.obTotalStopTimeShow(formatTotalStopTimeDisplay(this.obDataModel.TotalStopTime()));
-		}
-	};
-
 	RoutingFieldTripStopEditModal.prototype.stopTimeArriveChange = function()
 	{
 		this.obStopTimeArriveDate(getDatePart(this.obDataModel.StopTimeArrive(), true));
@@ -849,12 +754,6 @@
 		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.hide.call(this);
 		this.removeStopSequenceGraphics();
 	};
-
-	function formatTotalStopTimeDisplay(stopTime)
-	{
-		var totalStopTime = TripStopHelper.convertToSeconds(stopTime);
-		return TripStopHelper.convertToMinuteSecond(totalStopTime || 0, "mm:ss");
-	}
 
 	function getDatePart(value, isUtc)
 	{
