@@ -238,6 +238,12 @@
 			filterField: "School"
 		}, true);
 
+	ListFilterDefinition.ListFilterTemplate.School.Name = $.extend(
+		{}, TF.ListFilterDefinition.ListFilterTemplate.School,
+		{
+			filterField: "Name"
+		}, true);
+
 	ListFilterDefinition.ListFilterTemplate.School.TransferSchool = $.extend(
 		{}, TF.ListFilterDefinition.ListFilterTemplate.School,
 		{
@@ -402,6 +408,18 @@
 			getUrl: function()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripaccounts");
+			}
+		}, true);
+
+	ListFilterDefinition.ListFilterTemplate.FieldTripBillingClassification = $.extend(
+		{}, ListFilterTemplateDataManagementOption,
+		{
+			DisplayFilterTypeName: "Field Trip Billing Classifications",
+			GridType: "FieldTripBillingClassification",
+			filterField: "Classification",
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripBillingClassifications");
 			}
 		}, true);
 
@@ -628,6 +646,18 @@
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "tripAlias");
+			}
+		}, true);
+
+	ListFilterDefinition.ListFilterTemplate.Route = $.extend(
+		{}, ListFilterTemplateDefaultOption,
+		{
+			DisplayFilterTypeName: "Routes",
+			GridType: "Route",
+			filterField: "Name",
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("route"));
 			}
 		}, true);
 
@@ -929,6 +959,25 @@
 			Width: '150px',
 			type: "string"
 		}];
+	ListFilterDefinition.ListFilterTemplate.StaffContractorName = $.extend(
+		{}, ListFilterTemplateDefaultOption,
+		{
+			DisplayFilterTypeName: "Contractor Name",
+			GridType: "Staff",
+			filterField: "ContractorName",
+			serverPaging: false,
+			columnSources: [
+				{
+					FieldName: "ContractorName",
+					Width: '260px',
+					type: "string",
+					isSortItem: true
+				}],
+			getUrl: function()
+			{
+				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("staff"));
+			}
+		}, true);
 	ListFilterDefinition.ColumnSource.District = [
 		{
 			FieldName: "Name",

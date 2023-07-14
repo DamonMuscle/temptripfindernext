@@ -9,9 +9,10 @@
 		//constructor
 	}
 
-	FormConfigHelper.getFormColumnContent = function(columnName, dataTypeId)
+	FormConfigHelper.getFormColumnContent = function(columnName, dataTypeId, options = { isGrid: false })
 	{
 
+		let { isGrid } = options;
 		switch (columnName)
 		{
 			case "HasObject":
@@ -26,14 +27,14 @@
 			case "Shuttle":
 			case "NonDisabled":
 			case "GpsenabledFlag":
-				return $("<input type='checkbox' onclick='return false' disabled/>");
+				return $("<input type='checkbox' onclick='return false'/>");
 			case "InActive":
 			case "Disabled":
 				if (dataTypeId !== 9)
 				{
-					return $("<input type='checkbox' onclick='return false' disabled/>");
+					return $("<input type='checkbox' onclick='return false'/>");
 				}
-				return $(`<input type="text" class="question systemfield-question" disabled />`);
+				return isGrid ? null : $(`<input type="text" class="question systemfield-question" disabled />`);
 			case "Geo":
 			case "PolicyDeviation":
 			case "RidershipStatus":
@@ -41,12 +42,12 @@
 			case "FieldTripStageName":
 				return $("<div></div><span></span>");
 			default:
-				return $(`<textarea class="question systemfield-question" rows="1" disabled></textarea>`);
+				return isGrid ? null : $(`<textarea class="question systemfield-question" rows="1" disabled></textarea>`);
 		}
 
 	}
 
-	FormConfigHelper.systemFieldsConfig =
+	tf.systemFieldsConfig =
 	{
 		1: {
 			"LastUpdated": { type: "Date" },
@@ -73,6 +74,7 @@
 			"DepartTime": { type: "Time" },
 			"DepartDate": { type: "Date" },
 			"DestinationContactPhone": { type: TYPE_PHONE_NUMBER },
+			"DestinationFax": { type: TYPE_PHONE_NUMBER },
 			"DriverOtrate": { type: "number" },
 			"DriverRate": { type: "number" },
 			"EstimatedCost": { type: "number" },
@@ -145,7 +147,9 @@
 			"WalkToSchoolPolicy": { type: "numner" },
 			"WalkToStopPolicy": { type: "number" },
 			"Xcoord": { type: "Coord" },
-			"Ycoord": { type: "Coord" }
+			"Ycoord": { type: "Coord" },
+			"PrimaryContactPhone": { type: TYPE_PHONE_NUMBER },
+			"PrimaryContactMobile": { type: TYPE_PHONE_NUMBER }
 		},
 		13: {
 			"AppPoint": { type: "Checkbox" },
@@ -206,10 +210,34 @@
 		},
 	}
 
-	var getCommaSeparatedTwoDecimalsNumber = function(number)
+	FormConfigHelper.getSystemFieldRelatedColumnDefinition = function(fieldName, dataTypeId)
 	{
-		const fixedNumber = Number.parseFloat(number).toFixed(2);
+		let gridColumnData = TF.Grid.FilterHelper.getGridDefinitionByType(tf.dataTypeHelper.getKeyById(dataTypeId));
+		let targetColumn = gridColumnData.Columns.filter(c => c.FieldName == fieldName);
+		if (Array.isArray(targetColumn) && targetColumn.length > 0)
+		{
+			return targetColumn[0];
+		}
+
+		return null;
+	}
+
+	var getCommaSeparatedTwoDecimalsNumber = function(number, numberPrecision)
+	{
+		const fixedNumber = Number.parseFloat(number).toFixed(numberPrecision);
 		return String(fixedNumber).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	tf.systemFieldsFormatValue = function(type, value)
+	{
+		switch (type)
+		{
+			case "HasObject":
+				let boolVal = value == '33';
+				return boolVal;
+			default:
+				return value;
+		}
 	}
 
 	var stageFormatter = function(value)
@@ -265,35 +293,151 @@
 				</div>`);
 		}
 	}
-	FormConfigHelper.systemFieldsFormat = function(type, value, el, trueDisplayName, falseDisplayName)
+
+	tf.systemFieldsFormat = function(type, value, el, attributeFlag, numberPrecision, 
+		trueDisplayName, falseDisplayName, options = { isGrid: false, isUTC: false })
 	{
+		const { isGrid, isUTC } = options;
+
+		function clearEmptyImagePlacehold(_el)
+		{
+			_el.empty();
+		}
+
+		function appendEmptyImagePlacehold(_el)
+		{
+			if (!_el.find(".no-image-container").length &&
+				_el.parents().find('input.form-entity-input') &&
+				_el.parents().find('input.form-entity-input').val())
+			{
+				const img = isGrid ? `<div></div>` :
+					`<div class="no-image-container">
+						<div class="grid-icon grid-icon-no-image"></div>
+						<span class="no-image-label">No image available</span>
+					</div>`;
+
+				_el.append(img);
+			}
+		}
+
+		// Do not format PDE1049 number type RW-27957
+		if (attributeFlag === 4 && type.toLowerCase() === "number")
+		{
+			return value ? value.toFixed(numberPrecision) : "";
+		}
+
+		function getFormattedTime(value)
+		{
+			if (!value)
+			{
+				return "";
+			}
+
+			if (value instanceof Date)
+			{
+				return moment(value).format("h:mm A");
+			}
+
+			return moment("2018-01-01T" + value).format("h:mm A");
+		}
+
+		function _getRealBooleanValue(value)
+		{
+			if (value === true || value === "true" || value === "True")
+			{
+				return true;
+			}
+			else if (value === false || value === "false" || value === "False")
+			{
+				return false;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		function _getRealBooleanDisplayName(value, options = { trueDisplayName: "true", falseDisplayName: "false" })
+		{
+			const { trueDisplayName, falseDisplayName } = options;
+
+			const flag = _getRealBooleanValue(value)
+			if (flag === null)
+			{
+				return "";
+			}
+
+			return flag ? trueDisplayName : falseDisplayName;
+		}
+
+		function setCheckbox($el, value)
+		{
+			value = _getRealBooleanValue(value);
+			if (value === null)
+			{
+				$el.hide();
+				return;
+			}
+
+			$el.show();
+			$el.prop('checked', value);
+			value ? $el.attr('checked', 'checked') : $el.removeAttr('checked');
+		}
 
 		switch (type)
 		{
 			case "Boolean":
-				return (value === null || value === '') ? "" : (value ? trueDisplayName : falseDisplayName);
+				return _getRealBooleanDisplayName(value, { trueDisplayName: trueDisplayName, falseDisplayName: falseDisplayName });
 			case "Date":
 			case "date":
+				if (IsEmptyString(value)) { return ""; }
+				if (isUTC)
+				{
+					let dt = utcToClientTimeZone(value);
+					return dt.isValid() ? dt.format("MM/DD/YYYY") : "";
+				}
+
 				return _formatDataSysField(value);
 			case "Time":
 			case "time":
-				return _formatTimeSysField(value);
+				if (IsEmptyString(value)) { return ""; }
+				return getFormattedTime(value);
 			case "Date/Time":
+				if (IsEmptyString(value)) { return ""; }
+				if (isUTC)
+				{
+					let dt = utcToClientTimeZone(value);
+					return dt.isValid() ? dt.format("MM/DD/YYYY h:mm A") : "";
+				}
+
 				return _formatDateTimeSysField(value);
 			case "Coord":
-				return _formatCoordSysField(value);
+				if (IsEmptyString(value)) { return ""; }
+				return Number.parseFloat(value).toFixed(6);
+			case "Currency":
+			case "currency":
+				if (IsEmptyString(value)) { return ""; }
+				return Number.parseFloat(value).toFixed(numberPrecision);
 			case "Number":
-				return _formatNumberSysField(value);
 			case "number":
-				return _formatnumberSysField(value);
+				if (IsEmptyString(value)) { return ""; }
+				return getCommaSeparatedTwoDecimalsNumber(value, numberPrecision);
 			case TYPE_PHONE_NUMBER:
+				if (IsEmptyString(value)) { return ""; }
 				return _formatPhoneNumberSysField(value);
 			case "FieldTripStage":
 				return _formatFieldTripStageSysField(el, value);
 			case "HasObject":
-				return _formatHasObjectSysField(value)
+				let boolVal = _getRealBooleanValue(value);
+				if (boolVal === null)
+				{
+					boolVal = value == '33';
+				}
+				setCheckbox(el, boolVal);
+				return boolVal;
 			case "Checkbox":
-				return _formatCheckboxSysField(value);
+				setCheckbox(el, value);
+				return value;
 			case "Geo":
 				return _formatGeoSysField(value);
 			case "PolicyDeviation":
@@ -348,11 +492,11 @@
 		if (value !== null && value !== "")
 		{
 			$(el[0]).attr("style", `height:15px;width:15px;margin-right:.5em;border:1px solid rgb(213, 213, 213);background-color:${stageFormatter(value)};float:left`);
+			$(el[1]).text(value);
 		} else
 		{
 			$(el[0]).removeAttr("style");
 		}
-		$(el[1]).text(value);
 		return value;
 	}
 
@@ -388,7 +532,7 @@
 	function _formatPolicyDeviationSysField(value)
 	{
 		clearEmptyImagePlacehold(el);
-		if (value === '37')
+		if (value === '37' || value === 37)
 		{
 			el.addClass('grid-icon grid-icon-reddot');
 		}

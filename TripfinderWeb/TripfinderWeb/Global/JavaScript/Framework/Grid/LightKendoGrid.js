@@ -3762,7 +3762,8 @@
 						{
 							args.element.kendoDropDownList({
 								dataSource: {
-									data: this.getImageFilterableDataSource(definition.FieldName)
+									data: this.getImageFilterableDataSource(definition.questionType === "SystemField" ? 
+										definition.questionFieldOptions?.DefaultText : definition.FieldName)
 								},
 								dataTextField: "someField",
 								dataValueField: "valueField",
@@ -4075,8 +4076,21 @@
 
 	function isPhoneColumn(self, autoCompleteSelectedColumn)
 	{
+
+		const _isSystemFieldPhoneNumber = function(column) 
+		{
+			let fieldConfig = tf.systemFieldsConfig[column.questionFieldOptions?.DataTypeId];
+			if (fieldConfig)
+			{
+				let type = fieldConfig[column.questionFieldOptions?.DefaultText]?.type;
+				return type === "Phone Number";
+			}
+			return false;
+		}
+
 		let columnField = self.options.gridDefinition.Columns?.find(x => x.FieldName === autoCompleteSelectedColumn);
-		return columnField && columnField.questionType?.toLowerCase() === "phone";
+		return columnField && (columnField.questionType?.toLowerCase() === "phone" || 
+				(columnField.questionType?.toLowerCase() === "systemfield" && _isSystemFieldPhoneNumber(columnField)));
 	}
 
 	LightKendoGrid.prototype.getApiRequestOption = function(kendoOptions)

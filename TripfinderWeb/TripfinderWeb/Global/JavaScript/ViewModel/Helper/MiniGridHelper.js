@@ -236,184 +236,58 @@
 	 * Update UDGrid columns settings
 	 *
 	 */
-	MiniGridHelper.prototype.updateUDGridColumns = function(columns, col, self)
+	MiniGridHelper.prototype.updateUDGridColumns = function(columns, colGuid, self)
 	{
+
+		const dataTypeId = self.options.DataTypeId;
+
 		let specialColumns = [];
 		let originFieldMapping = tf.udgHelper.getGuidToNameMappingOfGridFields(self.options, true, true);
-		let isXCoordField = TF.DetailView.UserDefinedGridHelper.isXCoordField(col);
-		let isYCoordField = TF.DetailView.UserDefinedGridHelper.isYCoordField(col);
-		let dateTimeTemplate = function(item)
-		{
-			let value = item[col];
-			let dt = moment(value);
-			return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
-		};
 
-		if (originFieldMapping[col])
+		if (originFieldMapping[colGuid])
 		{
-			let udgField = self.options.UDGridFields.find(field => field.Guid == col),
-				column = {
-					FieldName: col,
-					DisplayName: originFieldMapping[col],
-					width: 165,
-					lockWidth: true,
-					type: 'string',
-					originalUdfField: udgField
-				};
+			let udgField = self.options.UDGridFields.find(field => field.Guid == colGuid);
+			const isIncludeUDGridColumn = TF.DetailView.UserDefinedGridHelper.isIncludeUDGridColumn(udgField);
+			if (!isIncludeUDGridColumn) return;
 
-			switch (udgField.FieldOptions.TypeName)
+			let	column = {
+				FieldName: colGuid,
+				DisplayName: originFieldMapping[colGuid],
+				width: 165,
+				lockWidth: true,
+				type: tf.udgHelper.convertUDGFieldType2KendoGridType(udgField),
+				originalUdfField: udgField,
+				QuestionTypeId: udgField.editType.TypeId,
+				questionType: udgField.questionType,
+				questionFieldOptions: udgField.FieldOptions,
+			};
+
+			const template = tf.udgHelper.getGridColumnTemplate(udgField, dataTypeId);
+			if (template)
 			{
-				case "Attachment":
-					column.type = "integer";
-					break;
-				case "Map":
-					let xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
-					if (isXCoordField)
-					{
-						specialColumns = [xyCoordColumns[0]];
-					}
-					else if (isYCoordField)
-					{
-						specialColumns = [xyCoordColumns[1]];
-					}
-					else
-					{
-						specialColumns = xyCoordColumns;
-					}
-					break;
-				case "Signature":
-					column.type = "boolean";
-					column.udfType = "SignatureBlock";
-					column.template = function(item)
-					{
-						return `<div class='signature-checkbox-container'>
-										<input type='checkbox' disabled class='signature-checkbox' ${item[col] === 'true' ? 'checked' : ''}/>
-									</div>`;
-					};
-					column.formatCopyValue = function(value)
-					{
-						return value == null ? "" : `${value}`;
-					};
-					break;
-				case "Date/Time":
-					column.template = dateTimeTemplate;
-					column.type = "datetime";
-					break;
-				case "Date":
-					column.template = function(item)
-					{
-						let value = item[col];
-						let date = moment(value);
-						return date.isValid() ? moment(value).format("MM/DD/YYYY") : "";
-					};
-					column.type = "date";
-					break;
-				case "Time":
-					column.template = function(item)
-					{
-						let value = item[col];
-						let time = moment(value);
-						if (time.isValid())
-						{
-							return time.format("hh:mm A");
-						}
-						time = moment("1900-1-1 " + value);
-						return time.isValid() ? time.format("hh:mm A") : "";
-					};
-					column.type = "time";
-					break;
-				case "List":
-					column.template = function(item)
-					{
-						let value = item[col];
-						if (value instanceof Array)
-						{
-							return value.join(", ");
-						}
-						return isNullObj(value) ? "" : value;
-					};
-					break;
-				case "Boolean":
-					column.template = function(item)
-					{
-						let value = item[col];
-						if (isNullObj(value)) return '';
-						return (value === 'true' || value === true) ? udgField.positiveLabel : udgField.negativeLabel || value;
-					};
-					column.type = "boolean";
-					break;
-				case "Number":
-				case "Currency":
-					const formatStr = 0;
-					column.Precision = udgField.FieldOptions.TypeName === 'Currency' ? udgField.FieldOptions.MaxLength : udgField.FieldOptions.NumberPrecision;
-					column.format = "{0:" + formatStr.toFixed(parseInt(column.Precision)).toString() + "}";
-					column.template = function(item)
-					{
-						let value = item[col];
-						if (value == null || value === "")
-						{
-							return "";
-						}
+				column.template = template;
+			}
 
-						const precision = column.Precision;
-						if (isNaN(Number(value)))
-						{
-							value = 0;
-						}
-						return Number(value).toFixed(_.isNumber(precision) ? precision : 0);
+			const columnExtension = tf.udgHelper.getGridColumnExtension(udgField, column, dataTypeId);
+			if (columnExtension)
+			{
+				column = $.extend(column, columnExtension);
+			}
 
-					};
-					column.type = "number";
-					break;
-				case "Phone Number":
-					column.template = function(item)
-					{
-						let value = item[col];
-						if (isNullObj(value)) return '';
-						value = tf.dataFormatHelper.phoneFormatter(value);
-						return value;
-					};
-					break;
-				case "System Field":
-					{
-						let isUDFSystemField = udgField.FieldOptions.IsUDFSystemField;
-						if (isUDFSystemField)
-						{
-							let targetUdfFieldGuid = self.options.UDGridFields.find(x => x.Guid === col).editType.targetField;
-							let targetUdf = self.recordEntity.UserDefinedFields.find(x => x.Guid === targetUdfFieldGuid);
-							if (targetUdf)
-							{
-								let udfDatasourceIds = targetUdf.UDFDataSources.map(x => x.DBID);
-								if (udfDatasourceIds.indexOf(tf.datasourceManager.databaseId) < 0)
-								{
-									self._ignoredColumnNames.push(col);
-									return;
-								}
-							} else
-							{
-								self._ignoredColumnNames.push(col);
-								return;
-							}
-						}
-					}
-					break;
-				case "List From Data":
-					const fieldName = udgField.FieldOptions.UDFPickListOptions.field.name;
-					if (fieldName === "RidershipStatus")
-					{
-						column.template = function(resValue)
-						{
-							return TF.DetailView.UserDefinedGridHelper.getRidershipStatusTemp(resValue, udgField.Guid);
-						}
-					}
-					else if (fieldName === "PolicyDeviation")
-					{
-						column.template = function(resValue)
-						{
-							return TF.DetailView.UserDefinedGridHelper.getPolicyDeviationTemp(resValue, udgField.Guid);
-						}
-					}
-					break;
+			const columnListFilter = tf.udgHelper.getGridColumnListFilter(udgField, column, dataTypeId);
+			if (columnListFilter)
+			{
+				column = $.extend(column, columnListFilter);
+			}
+
+			if (udgField.type.toLowerCase() === "map")
+			{
+				const xyCoordColumns = TF.DetailView.UserDefinedGridHelper.convertMapColumnToMapXYCoordColumns(column);
+				specialColumns = xyCoordColumns;
+			}
+			else if (udgField.type.toLowerCase() === "signature")
+			{
+				column.udfType = "SignatureBlock";
 			}
 
 			if (specialColumns.length)
@@ -427,42 +301,8 @@
 			}
 			else
 			{
-				column.headerTemplate = GetQuestionHeaderTemplate(originFieldMapping[col]);
+				column.headerTemplate = GetQuestionHeaderTemplate(originFieldMapping[colGuid]);
 				columns.push(column);
-			}
-
-			if (udgField.questionType === "ListFromData" || (udgField.questionType === "List" && udgField.FieldOptions.PickListMultiSelect))
-			{
-				let fieldName = column.FieldName;
-				column.type = "select";
-				column.ListFilterTemplate = tf.udgHelper.generateListFilterTemplate(udgField, "");
-				column.ListFilterTemplate.filterField = fieldName;
-				column.ListFilterTemplate.columnSources = [{ FieldName: fieldName, DisplayName: column.DisplayName, Width: "150px", type: "string", isSortItem: true }];
-				// add AllItems
-				column.ListFilterTemplate.requestOptions = tf.udgHelper.getRequestOption(udgField);
-
-			}
-
-			if (udgField.questionType === "ListFromData" && udgField.template !== undefined && column.template === undefined)
-			{
-				column.template = udgField.template;
-			}
-
-			if (udgField.questionType === "List" && !udgField.FieldOptions.PickListMultiSelect)
-			{
-				let pickUpList = [];
-				udgField.FieldOptions.UDFPickListOptions.forEach(plo =>
-				{
-					pickUpList.push(plo.PickList);
-				});
-				column.ListFilterTemplate = {
-					listFilterType: 'Enum',
-					sortType: 'byAllItems',
-					AllItems: pickUpList,
-					leftGridWithSearch: true,
-					EnumListFilterColumnName: "Display Name",
-					DisplayFilterTypeName: "Options"
-				}
 			}
 
 			function GetQuestionHeaderTemplate(displayName)
