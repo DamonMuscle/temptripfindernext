@@ -6,7 +6,7 @@
 		var selectedMenuItemHeader = [];
 		var currentTabRouteState;
 		
-		self.routingPaletteViewModel = null;
+		self.mapCanvas = null;
 
 		PubSub.subscribe("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", FieldTripMap_onMapClick_InitRoutingPaletteViewModel);
 		PubSub.subscribe("DocumentManagerViewModel_TabChange", getCurrentTabRouteState);
@@ -18,9 +18,9 @@
 		}
 
 
-		function FieldTripMap_onMapClick_InitRoutingPaletteViewModel(event, routingPaletteViewModel)
+		function FieldTripMap_onMapClick_InitRoutingPaletteViewModel(event, mapCanvas)
 		{
-			self.routingPaletteViewModel = routingPaletteViewModel;
+			self.mapCanvas = mapCanvas;
 		}
 
 		function onFieldTripMapClick_FieldTripStop(event, dataWrapper)
@@ -36,7 +36,7 @@
 				};
 			});
 
-			var contextMenu = buildContextMenuInternal(container, data, null, null, null, self.routingPaletteViewModel);
+			var contextMenu = buildContextMenuInternal(container, data, null, null, null, self.mapCanvas.routingPaletteViewModel, null, null, self.mapCanvas.travelScenariosPaletteViewModel);
 
 			if (contextMenu.root.children.length == 0)
 			{
@@ -164,7 +164,7 @@
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.FieldTripId),
 						fieldTripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
-						fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStopBySequence(menuItemData.Sequence) : 
+						fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.tripViewModel.dataModel.getTripStopBySequence(trip, menuItemData.Sequence) : 
 																routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 						tripName = trip.Name;
 					if (!tripItems[tripName])

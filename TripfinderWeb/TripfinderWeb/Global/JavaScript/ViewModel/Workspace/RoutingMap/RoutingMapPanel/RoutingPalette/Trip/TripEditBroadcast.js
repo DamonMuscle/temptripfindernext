@@ -87,8 +87,8 @@
 			x: tripStop.geometry.x,
 			y: tripStop.geometry.y,
 			id: tripStop.id,
-			tripId: tripStop.TripId,
-			Session: this.dataModel.getTripById(tripStop.TripId).Session,
+			tripId: tripStop.FieldTripId,
+			Session: this.dataModel.getTripById(tripStop.FieldTripId).Session,
 			boundary: tripStop.boundary && tripStop.boundary.geometry ? tripStop.boundary.geometry.toJSON() : null,
 			path: tripStop.path && tripStop.path.geometry ? tripStop.path.geometry.toJSON() : null,
 			scenarioId: this.findScenarioId(tripStop.id)
@@ -112,7 +112,7 @@
 			ProhibitCrosser: tripStop.ProhibitCrosser,
 			//geometry: TF.cloneGeometry(tripStop.geometry),
 			boundary: tripStop.boundary && tripStop.boundary.geometry && tripStop.boundary.geometry.toJSON(),
-			Session: this.dataModel.getTripById(tripStop.TripId).Session
+			Session: this.dataModel.getTripById(tripStop.FieldTripId).Session
 		};
 	};
 
@@ -126,7 +126,7 @@
 		var oldPrevIndex = tripStop.Sequence - 2;
 		oldPrevIndex = oldPrevIndex < 0 ? 0 : oldPrevIndex;
 		var oldNextIndex = tripStop.Sequence;
-		oldNextIndex = oldNextIndex > trip.TripStops.length - 1 ? trip.TripStops.length - 1 : oldNextIndex;
+		oldNextIndex = oldNextIndex > trip.FieldTripStops.length - 1 ? trip.FieldTripStops.length - 1 : oldNextIndex;
 		var newPrevIndex = newSequence - 1;
 		var newNextIndex = newSequence;
 		if (tripStop.Sequence > newSequence)
@@ -135,11 +135,11 @@
 			newNextIndex = newSequence - 1;
 		}
 		newPrevIndex = newPrevIndex < 0 ? 0 : newPrevIndex;
-		newNextIndex = newNextIndex > trip.TripStops.length - 1 ? trip.TripStops.length - 1 : newNextIndex;
+		newNextIndex = newNextIndex > trip.FieldTripStops.length - 1 ? trip.FieldTripStops.length - 1 : newNextIndex;
 		var startIndex = Math.min(oldPrevIndex, oldNextIndex, newPrevIndex, newNextIndex);
 		var endIndex = Math.max(oldPrevIndex, oldNextIndex, newPrevIndex, newNextIndex);
 		var stops = [];
-		trip.TripStops.forEach(function(tripStop, index)
+		trip.FieldTripStops.forEach(function(tripStop, index)
 		{
 			if (index >= startIndex && index <= endIndex)
 			{
@@ -153,22 +153,22 @@
 	TripEditBroadcast.prototype.createTripStop = function(tripStop)
 	{
 		var self = this;
-		var data = { prevStop: {}, createStop: {}, nextStop: {}, tripId: tripStop.TripId };
-		var trip = this.dataModel.getTripById(tripStop.TripId);
+		var data = { prevStop: {}, createStop: {}, nextStop: {}, tripId: tripStop.FieldTripId };
+		var trip = this.dataModel.getTripById(tripStop.FieldTripId);
 
 		data.createStop = self._copyTripStopGeo(tripStop);
 
-		trip.TripStops.forEach(function(stop, index)
+		trip.FieldTripStops.forEach(function(stop, index)
 		{
 			if (stop.id == tripStop.id)
 			{
 				if (index != 0)
 				{
-					data.prevStop = self._copyTripStopGeo(trip.TripStops[index - 1]);
+					data.prevStop = self._copyTripStopGeo(trip.FieldTripStops[index - 1]);
 				}
-				if (index < trip.TripStops.length - 1)
+				if (index < trip.FieldTripStops.length - 1)
 				{
-					data.nextStop = self._copyTripStopGeo(trip.TripStops[index + 1]);
+					data.nextStop = self._copyTripStopGeo(trip.FieldTripStops[index + 1]);
 				}
 			}
 		});
@@ -178,18 +178,18 @@
 
 	TripEditBroadcast.prototype.getTripStopPreAndNex = function(tripStop)
 	{
-		var self = this, trip = self.dataModel.getTripById(tripStop.tripId ? tripStop.tripId : tripStop.TripId);
-		trip.TripStops.forEach(function(stop, index)
+		var self = this, trip = self.dataModel.getTripById(tripStop.tripId ? tripStop.tripId : tripStop.FieldTripId);
+		trip.FieldTripStops.forEach(function(stop, index)
 		{
 			if (stop.id == tripStop.id)
 			{
 				if (index != 0)
 				{
-					tripStop.prevStop = self._copyTripStopGeo(trip.TripStops[index - 1]);
+					tripStop.prevStop = self._copyTripStopGeo(trip.FieldTripStops[index - 1]);
 				}
-				if (index < trip.TripStops.length - 1)
+				if (index < trip.FieldTripStops.length - 1)
 				{
-					tripStop.nextStop = self._copyTripStopGeo(trip.TripStops[index + 1]);
+					tripStop.nextStop = self._copyTripStopGeo(trip.FieldTripStops[index + 1]);
 				}
 			}
 		});
@@ -209,12 +209,12 @@
 		}
 
 		var self = this;
-		var data = { prevStop: {}, deleteStop: {}, nextStop: {}, tripId: tripStop.TripId };
-		var trip = this.dataModel.getTripById(tripStop.TripId);
+		var data = { prevStop: {}, deleteStop: {}, nextStop: {}, tripId: tripStop.FieldTripId };
+		var trip = this.dataModel.getTripById(tripStop.FieldTripId);
 
 		data.deleteStop = self._copyTripStopGeo(tripStop);
 
-		trip.TripStops.forEach(function(stop)
+		trip.FieldTripStops.forEach(function(stop)
 		{
 			if (stop.Sequence == tripStop.Sequence - 1)
 			{
@@ -235,9 +235,9 @@
 		var trips = this.dataModel.trips;
 		for (var i = 0; i < trips.length; i++)
 		{
-			for (var j = 0; j < trips[i].TripStops.length; j++)
+			for (var j = 0; j < trips[i].FieldTripStops.length; j++)
 			{
-				if (trips[i].TripStops[j].id == tripStopId)
+				if (trips[i].FieldTripStops[j].id == tripStopId)
 				{
 					return trips[i].TravelScenarioId;
 				}

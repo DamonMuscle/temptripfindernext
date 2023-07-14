@@ -223,7 +223,18 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(_, data)
 	{
+		const trip = this.dataModel.getTripById(data.FieldTripId);
+		const stop = this.dataModel.getTripStopBySequence(trip, data.Sequence);
+
+		let updateStop = {...stop};
+
+		updateStop.Street = data.Name;
+		updateStop.XCoord = data.XCoord;
+		updateStop.YCoord = data.YCoord;
+		
 		console.log(data);
+
+		this.dataModel.update([updateStop]);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocation = function(_, data)

@@ -1091,7 +1091,7 @@
 				{
 					if (!self.prevent && self._lastPreventKey == lastPreventKey)
 					{
-						PubSub.publish("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", self.routingPaletteViewModel);
+						PubSub.publish("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", self);
 					}
 				}(self._lastPreventKey), 200);
 			}

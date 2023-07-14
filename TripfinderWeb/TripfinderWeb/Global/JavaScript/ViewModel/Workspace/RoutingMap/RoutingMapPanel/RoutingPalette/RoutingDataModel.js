@@ -117,11 +117,11 @@
 				{
 					self.trips = trips;
 					self.bindColor(true);
-					self.routingStudentManager.calculateStudentPUDOStatus();
-					self.routingStudentManager.refreshStudent();
+					// self.routingStudentManager.calculateStudentPUDOStatus();
+					// self.routingStudentManager.refreshStudent();
 					self._getSchoolLocations(trips).then(function()
 					{
-						self.routingStudentManager.refreshDictionary(null, null);
+						// self.routingStudentManager.refreshDictionary(null, null);
 						self.setActualStopTime(self.trips);
 						self.setStudentTravelTime(self.trips);
 						self.setAllStudentValidProperty(self.trips);
@@ -146,8 +146,8 @@
 	RoutingDataModel.prototype.getTripAllExceptions = function(tripId)
 	{
 		let trip = this.trips.find(t => t.id == tripId),
-			exceptions = trip.TripStops.flatMap(s => s.Students).filter(s => !s.RequirementID),
-			expired = trip.TripStops.flatMap(i => this.expiredExceptions[i.id] || []);
+			exceptions = trip.FieldTripStops.flatMap(s => s.Students).filter(s => !s.RequirementID),
+			expired = trip.FieldTripStops.flatMap(i => this.expiredExceptions[i.id] || []);
 		return exceptions.concat(expired);
 	};
 
@@ -292,8 +292,8 @@
 					self.viewModel.drawTool.drawArrowToPoints(
 						{
 							geometry: TF.xyToGeometry(stop.XCoord, stop.YCoord),
-							color: self.getColorByTripId(stop.TripId),
-							attributes: { TripId: stop.TripId, Id: stop.id, type: "tripStopPointer" }
+							color: self.getColorByTripId(stop.FieldTripId),
+							attributes: { FieldTripId: stop.FieldTripId, Id: stop.id, type: "tripStopPointer" }
 						});
 				});
 			}
@@ -448,7 +448,7 @@
 			self.setActualStopTime(self.trips);
 			self.setStudentTravelTime(self.trips);
 			self.setAllStudentValidProperty(self.trips);
-			self.routingStudentManager.refresh();
+			// self.routingStudentManager.refresh();
 			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false });
 		});
 	};
@@ -600,7 +600,7 @@
 			// return self._getSchoolLocations(newTrips);
 		}).then(function()
 		{
-			self.routingStudentManager.refreshDictionary(null, null);
+			// self.routingStudentManager.refreshDictionary(null, null);
 			// self.viewModel.drawTool.stopTool.attachClosetStreetToStop(allTripStops); //comment for improve open trip performance.RW-11855
 			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false });
 			self.setTripOriginalData(newTrips);
@@ -611,7 +611,7 @@
 				self.viewModel.analyzeTripByDistrictPolicy.analyze(self.trips, false, true);
 			});
 			*/
-			self.routingStudentManager.refreshStudentLock();
+			// self.routingStudentManager.refreshStudentLock();
 			self._updateTravelScenarioLock();
 		}).catch(function(args)
 		{
@@ -741,7 +741,7 @@
 		var self = this, promises = [];
 		self.trips.map(function(trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				var unknowStudents = tripStop.Students.filter(function(s)
 				{
@@ -929,7 +929,7 @@
 		{
 			return Promise.resolve([]);
 		}
-		trips[0].TripStops.map(function(tripStop)
+		trips[0].FieldTripStops.map(function(tripStop)
 		{
 			if (tripStop.SchoolCode)
 			{
@@ -980,7 +980,7 @@
 				});
 			}
 
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				self.stopPathDictionary[tripStop.id] = tripStop.DrivingDirections;
 				self.tripStopOriginalData[tripStop.id] = trip.id;
@@ -1030,7 +1030,7 @@
 			{
 				delete self.tripOriginalData[trip.id];
 			}
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				self.expiredExceptions[tripStop.id] && delete self.expiredExceptions[tripStop.id];
 				if (self.tripStopOriginalData[tripStop.id])
@@ -1113,7 +1113,7 @@
 		{
 			trips.map(function(trip)
 			{
-				trip.TripStops.map(function(tripStop)
+				trip.FieldTripStops.map(function(tripStop)
 				{
 					var tripId = self.tripStopOriginalData[tripStop.id];
 					if (tripId)
@@ -1159,13 +1159,13 @@
 						{
 							self.trips.map(function(tripTemp)
 							{
-								tripTemp.TripStops.map(function(tripStop)
+								tripTemp.FieldTripStops.map(function(tripStop)
 								{
 									if (tripStop.id == tripStopId)
 									{
-										if (!relatedTripsDictionary[tripStop.TripId])
+										if (!relatedTripsDictionary[tripStop.FieldTripId])
 										{
-											relatedTripsDictionary[tripStop.TripId] = tripTemp;
+											relatedTripsDictionary[tripStop.FieldTripId] = tripTemp;
 										}
 									}
 								});
@@ -1191,7 +1191,7 @@
 									return;
 								}
 
-								tripTemp.TripStops.map(function(tripStop)
+								tripTemp.FieldTripStops.map(function(tripStop)
 								{
 									tripStop.Students.map(function(student)
 									{
@@ -1199,9 +1199,9 @@
 											student.PreviousScheduleID == previousScheduleID &&
 											student[weekDayName])
 										{
-											if (!relatedTripsDictionary[tripStop.TripId])
+											if (!relatedTripsDictionary[tripStop.FieldTripId])
 											{
-												relatedTripsDictionary[tripStop.TripId] = tripTemp;
+												relatedTripsDictionary[tripStop.FieldTripId] = tripTemp;
 											}
 										}
 									});
@@ -1259,7 +1259,7 @@
 	{
 		var self = this, tripStopRouteDictionary = {};
 		var oldTrip = trip ? trip : self.getTripById(tripId);
-		if (oldTrip.TripStops.length <= 1)
+		if (oldTrip.FieldTripStops.length <= 1)
 		{
 			if (!noNeedTriggerEvent)
 			{
@@ -1285,7 +1285,7 @@
 			canvas_container.append(loadingElement);
 		}
 		// remove route stop path, cause route stop property contain _map property, json copy would catch circular sturcture error
-		oldTrip.TripStops.map(function(tripStop)
+		oldTrip.FieldTripStops.map(function(tripStop)
 		{
 			if (tripStop.routeStops)
 			{
@@ -1298,7 +1298,7 @@
 		});
 		var newTrip = JSON.parse(JSON.stringify(oldTrip));
 		// revert removed route stop property
-		oldTrip.TripStops.map(function(tripStop)
+		oldTrip.FieldTripStops.map(function(tripStop)
 		{
 			if (tripStopRouteDictionary[tripStop.id])
 			{
@@ -1309,16 +1309,16 @@
 		var newTripStops = [];
 		var promiseList = [];
 		var startIndex = 0;
-		for (var i = 0; i < newTrip.TripStops.length; i++)
+		for (var i = 0; i < newTrip.FieldTripStops.length; i++)
 		{
-			if (i != 0 && newTrip.TripStops[i].SchoolCode)
+			if (i != 0 && newTrip.FieldTripStops[i].SchoolCode)
 			{
-				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops.slice(startIndex, i + 1), true));
+				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), true));
 				startIndex = i;
 			}
-			else if (i == newTrip.TripStops.length - 1 && (newTrip.TripStops[i].SchoolCode === "" || newTrip.TripStops[i].SchoolCode === null))
+			else if (i == newTrip.FieldTripStops.length - 1 && (newTrip.FieldTripStops[i].SchoolCode === "" || newTrip.FieldTripStops[i].SchoolCode === null))
 			{
-				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.TripStops.slice(startIndex, i + 1), true));
+				promiseList.push(self.viewModel.drawTool.NAtool.refreshTripByMultiStops(newTrip.FieldTripStops.slice(startIndex, i + 1), true));
 			}
 		}
 		return Promise.all(promiseList).then(function(newList)
@@ -1346,12 +1346,12 @@
 						}
 					} else
 					{
-						newTripStops = newTrip.TripStops;
+						newTripStops = newTrip.FieldTripStops;
 					}
 
 				});
-				newTrip.TripStops = newTripStops;
-				newTrip.TripStops.map(function(tripStop, index)
+				newTrip.FieldTripStops = newTripStops;
+				newTrip.FieldTripStops.map(function(tripStop, index)
 				{
 					tripStop.Sequence = index + 1;
 				});
@@ -1361,10 +1361,10 @@
 				var tripData = response[0];
 				newTrip.Distance = tripData.Distance;
 				newTrip.Name = newTrip.Name + ' Copy';
-				for (var j = 0; j < newTrip.TripStops.length; j++)
+				for (var j = 0; j < newTrip.FieldTripStops.length; j++)
 				{
-					newTrip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-					newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+					newTrip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
+					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
 				self.setActualStopTime([newTrip]);
 				if (!inactiveHideLocator)
@@ -1507,14 +1507,14 @@
 				var tripCount = self.getEditTrips().length;
 				self.tripLockData.lockIds([trip.id]);
 				self.trips.push(trip);
-				self.refreshCandidateStudent().then(function()
-				{
-					if (tripCount == 0)
-						self.autoAssignStudent([trip]);
+				// self.refreshCandidateStudent().then(function()
+				// {
+					// if (tripCount == 0)
+					// 	self.autoAssignStudent([trip]);
 					self.onTripsChangeEvent.notify({ add: [trip], edit: [], delete: [] });
 					self.changeDataStack.push(trip);
-					self.viewModel.drawTool.stopTool.attachClosetStreetToStop(trip.TripStops);
-				});
+					self.viewModel.drawTool.stopTool.attachClosetStreetToStop(trip.FieldTripStops);
+				// });
 				self._updateTravelScenarioLock();
 			});
 		});
@@ -1556,7 +1556,7 @@
 
 	RoutingDataModel.prototype.updateTrip = function(trip)
 	{
-		this.routingStudentManager.refresh();
+		// this.routingStudentManager.refresh();
 		this.onTripsChangeEvent.notify({ add: [], edit: [trip], delete: [] });
 		this.changeDataStack.push(trip);
 		if (this.showImpactDifferenceChart())
@@ -1590,9 +1590,9 @@
 	{
 		var self = this;
 		self.trips.push(trip);
-		self.routingStudentManager.refresh();
+		// self.routingStudentManager.refresh();
 		var deleteCandidateStudents = [];
-		trip.TripStops.map(function(ts)
+		trip.FieldTripStops.map(function(ts)
 		{
 			deleteCandidateStudents = deleteCandidateStudents.concat(ts.Students);
 		});
@@ -1615,12 +1615,12 @@
 		trip.oldId = trip.id;
 		let tripStopTempId = TF.createId();
 		let stopBoundaryTempId = TF.createId();
-		trip.TripStops.map(function(tripStop)
+		trip.FieldTripStops.map(function(tripStop)
 		{
 			tripStop.id = tripStopTempId++;
 			tripStop.color = trip.color;
 			tripStop.TripStopId = tripStop.id;
-			tripStop.TripId = trip.id;
+			tripStop.FieldTripId = trip.id;
 			tripStop.Students = [];
 			tripStop.ToSchoolStudents = { HomeToSchool: 0, SchoolToHome: 0 };
 			tripStop.ToTransStudents = { HomeToTrans: 0, TransToHome: 0 };
@@ -1633,7 +1633,7 @@
 			if (tripStop.boundary)
 			{
 				tripStop.boundary.OBJECTID = 0;
-				tripStop.boundary.TripId = trip.id;
+				tripStop.boundary.FieldTripId = trip.id;
 				tripStop.boundary.TripStopId = tripStop.id;
 				tripStop.boundary.id = stopBoundaryTempId++;
 				tripStop.boundary.newAssignStudent = [];
@@ -1671,7 +1671,7 @@
 		var self = this, promise = Promise.resolve(true), boundaries = [];
 		if (trip.OpenType === 'Edit')
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				if (tripStop.boundary.TripStopId)
 				{
@@ -1689,7 +1689,7 @@
 			}
 			else if (boundaries.length > 0 && !notAutoAssignStudent)
 			{
-				promise = self.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
+				promise = self.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.FieldTripStops, false, false, null, true);
 			}
 			return promise.then(function(newTripCandidateStudents)
 			{
@@ -1704,10 +1704,10 @@
 					{
 						var tripData = response[0];
 						trip.Distance = tripData.Distance;
-						for (var j = 0; j < trip.TripStops.length; j++)
+						for (var j = 0; j < trip.FieldTripStops.length; j++)
 						{
-							trip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-							trip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+							trip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
+							trip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 						}
 						self.setActualStopTime([trip]);
 						self.setStudentTravelTime([trip]);
@@ -1727,7 +1727,7 @@
 		var self = this, promise = Promise.resolve(true), boundaries = [];
 		// if (trip.OpenType === 'Edit')
 		// {
-		// 	trip.TripStops.map(function(tripStop)
+		// 	trip.FieldTripStops.map(function(tripStop)
 		// 	{
 		// 		if (tripStop.boundary.TripStopId)
 		// 		{
@@ -1745,7 +1745,7 @@
 			// }
 			// else if (boundaries.length > 0 && !notAutoAssignStudent)
 			// {
-			// 	promise = self.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, null, true);
+			// 	promise = self.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.FieldTripStops, false, false, null, true);
 			// }
 			return promise.then(function(newTripCandidateStudents)
 			{
@@ -1760,10 +1760,10 @@
 					{
 						var tripData = response[0];
 						trip.Distance = tripData.Distance;
-						for (var j = 0; j < trip.TripStops.length; j++)
+						for (var j = 0; j < trip.FieldTripStops.length; j++)
 						{
-							trip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-							trip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+							trip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
+							trip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 						}
 						self.setActualStopTime([trip]);
 						self.setStudentTravelTime([trip]);
@@ -1792,7 +1792,7 @@
 		{
 			allNewAssignStudents = self.candidateStudents;
 		}
-		trip.TripStops.map(function(tripStop)
+		trip.FieldTripStops.map(function(tripStop)
 		{
 			if (tripStop.boundary.TripStopId)
 			{
@@ -1802,7 +1802,7 @@
 		boundaries = boundaries.filter(function(c) { return c.geometry && c.TripStopId; });
 		var studentIds = self.getUnAssignStudentInBoundary(boundaries, allNewAssignStudents, true);
 		var promiseList = [];
-		trip.TripStops.forEach(tripStop =>
+		trip.FieldTripStops.forEach(tripStop =>
 		{
 			let students = [];
 			if (tripStop.boundary && tripStop.boundary.TripStopId && tripStop.boundary.geometry) // assign student for boundary stop
@@ -1834,7 +1834,7 @@
 				// self.routingStudentManager.refresh();
 				// var deleteCandidateStudents = [];
 
-				// data.TripStops.map(function(ts)
+				// data.FieldTripStops.map(function(ts)
 				// {
 				// 	deleteCandidateStudents = deleteCandidateStudents.concat(ts.Students);
 				// });
@@ -1862,10 +1862,10 @@
 				{
 					return;
 				}
-				self.routingStudentManager.refresh();
+				// self.routingStudentManager.refresh();
 				var deleteCandidateStudents = [];
 
-				data.TripStops.map(function(ts)
+				data.FieldTripStops.map(function(ts)
 				{
 					deleteCandidateStudents = deleteCandidateStudents.concat(ts.Students);
 				});
@@ -1912,7 +1912,7 @@
 				var tripStop = self.fieldTripStopDataModel.getDataModel();
 				tripStop.id = TF.createId();
 				tripStop.TripStopId = tripStop.id;
-				tripStop.TripId = trip.id;
+				tripStop.FieldTripId = trip.id;
 				tripStop.StopTime = trip.Session != TF.Helper.TripHelper.Sessions.FromSchool ? (school.ArrivalTime ? school.ArrivalTime : "08:00:00") : (school.DepartTime ? school.DepartTime : "14:00:00");
 				tripStop.XCoord = school.Xcoord;
 				tripStop.YCoord = school.Ycoord;
@@ -1928,9 +1928,9 @@
 				tripStop.DOTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
 				tripStop.vehicleCurbApproach = 1;
 				tripStop.geometry = TF.xyToGeometry(school.Xcoord, school.Ycoord);
-				trip.TripStops.push(tripStop);
+				trip.FieldTripStops.push(tripStop);
 			});
-			var boundaries = trip.TripStops.map(function(stop)
+			var boundaries = trip.FieldTripStops.map(function(stop)
 			{
 				return stop.boundary;
 			});
@@ -1938,7 +1938,7 @@
 			self.trips.push(trip);
 			self.bindColor();
 			var copyTrip = $.extend({}, true, trip);
-			copyTrip.TripStops = trip.TripStops.filter(function(stop) { return stop.SchoolCode && stop.SchoolCode.length > 0; });
+			copyTrip.FieldTripStops = trip.FieldTripStops.filter(function(stop) { return stop.SchoolCode && stop.SchoolCode.length > 0; });
 			self.refreshCandidateStudent(copyTrip).then(function()
 			{
 				var promise = Promise.resolve(true);
@@ -2300,7 +2300,7 @@
 				{
 					data.Trips.forEach(function(trip)
 					{
-						trip.TripStops.forEach(function(fieldTripStop)
+						trip.FieldTripStops.forEach(function(fieldTripStop)
 						{
 							if (fieldTripStop.SchoolId > 0)
 							{
@@ -2380,7 +2380,7 @@
 		{
 			fieldTrip.FieldTripStops.unshift({
 				DBID: fieldTrip.DBID,
-				TripId: fieldTrip.Id,
+				FieldTripId: fieldTrip.Id,
 				type: "tripStop",
 				ActualStopTime: "00:00:00",
 
@@ -2415,7 +2415,7 @@
 		{
 			fieldTrip.FieldTripStops.push({
 				DBID: fieldTrip.DBID,
-				TripId: fieldTrip.Id,
+				FieldTripId: fieldTrip.Id,
 				type: "tripStop",
 				ActualStopTime: "00:00:00",
 
@@ -2485,7 +2485,7 @@
 		{
 			trip.id = trip.Id;
 			trip.visible = true;
-			trip.TripStops = [];
+			trip.FieldTripStops = [];
 			trip.FieldTripStops = [];
 			trip.type = "trip";
 			return trip;
@@ -2497,9 +2497,9 @@
 		var self = this, tripStopArray = [], affectedTrips = [self.getTripById(tripId)];
 		tripStops.map(function(tripStop)
 		{
-			if (tripStop.TripId != tripId)
+			if (tripStop.FieldTripId != tripId)
 			{
-				var affectedTrip = self.getTripById(tripStop.TripId);
+				var affectedTrip = self.getTripById(tripStop.FieldTripId);
 				if (!affectedTrips.includes(affectedTrip))
 				{
 					affectedTrips.push(affectedTrip);
@@ -2545,7 +2545,7 @@
 	{
 		if (!this.getSmartSequenceSetting())
 		{
-			return Promise.resolve(TF.Helper.TripHelper.getTripStopInsertSequence(trip.TripStops, trip.Session));
+			return Promise.resolve(TF.Helper.TripHelper.getTripStopInsertSequence(trip.FieldTripStops, trip.Session));
 		}
 		return this.fieldTripStopDataModel.calculateSmartSequence(trip, tripStop);
 	};
@@ -2615,15 +2615,15 @@
 		{
 			if (self.trips[i].id == tripId)
 			{
-				for (var j = 0; j < self.trips[i].TripStops.length; j++)
+				for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 				{
-					if (self.trips[i].TripStops[j].id == tripStopId)
+					if (self.trips[i].FieldTripStops[j].id == tripStopId)
 					{
-						self.trips[i].TripStops[j].LockStopTime = true;
+						self.trips[i].FieldTripStops[j].LockStopTime = true;
 					}
 					else
 					{
-						self.trips[i].TripStops[j].LockStopTime = false;
+						self.trips[i].FieldTripStops[j].LockStopTime = false;
 					}
 				}
 				break;
@@ -2659,7 +2659,7 @@
 			{
 				continue;
 			}
-			return self.trips[i].TripStops;
+			return self.trips[i].FieldTripStops;
 		}
 	};
 
@@ -2672,7 +2672,7 @@
 			{
 				continue;
 			}
-			return self.trips[i].TripStops.filter(function(item)
+			return self.trips[i].FieldTripStops.filter(function(item)
 			{
 				return !IsEmptyString(item.SchoolCode);
 			});
@@ -2681,7 +2681,7 @@
 
 	RoutingDataModel.prototype.getSchoolStopsByTrip = function(trip)
 	{
-		return trip.TripStops.filter(function(item)
+		return trip.FieldTripStops.filter(function(item)
 		{
 			return !IsEmptyString(item.SchoolCode);
 		});
@@ -2696,7 +2696,7 @@
 
 	RoutingDataModel.prototype.getSchoolStopsBySchoolCode = function(trip, schoolCode)
 	{
-		return trip.TripStops.filter(function(item)
+		return trip.FieldTripStops.filter(function(item)
 		{
 			return item.SchoolCode == schoolCode;
 		});
@@ -2711,13 +2711,13 @@
 			{
 				continue;
 			}
-			for (var j = 0; j < self.trips[i].TripStops.length; j++)
+			for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 			{
-				for (var k = 0; k < self.trips[i].TripStops[j].Students.length; k++)
+				for (var k = 0; k < self.trips[i].FieldTripStops[j].Students.length; k++)
 				{
-					if (self.trips[i].TripStops[j].Students[k].id == studentId)
+					if (self.trips[i].FieldTripStops[j].Students[k].id == studentId)
 					{
-						return self.trips[i].TripStops;
+						return self.trips[i].FieldTripStops;
 					}
 				}
 			}
@@ -2733,13 +2733,13 @@
 			{
 				continue;
 			}
-			for (var j = 0; j < self.trips[i].TripStops.length; j++)
+			for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 			{
-				for (var k = 0; k < self.trips[i].TripStops[j].Students.length; k++)
+				for (var k = 0; k < self.trips[i].FieldTripStops[j].Students.length; k++)
 				{
-					if (self.trips[i].TripStops[j].Students[k].id == studentId)
+					if (self.trips[i].FieldTripStops[j].Students[k].id == studentId)
 					{
-						return self.trips[i].TripStops[j];
+						return self.trips[i].FieldTripStops[j];
 					}
 				}
 			}
@@ -2811,18 +2811,18 @@
 		}
 		for (var i = 0; i < trips.length; i++)
 		{
-			for (var j = 0; j < trips[i].TripStops.length; j++)
+			for (var j = 0; j < trips[i].FieldTripStops.length; j++)
 			{
-				if (tripStopId !== trips[i].TripStops[j].id)
+				if (tripStopId !== trips[i].FieldTripStops[j].id)
 				{
 					continue;
 				}
 
-				for (var k = 0; k < trips[i].TripStops[j].Students.length; k++)
+				for (var k = 0; k < trips[i].FieldTripStops[j].Students.length; k++)
 				{
-					if (trips[i].TripStops[j].Students[k].RequirementID == requirementID && trips[i].TripStops[j].Students[k].PreviousScheduleID == previousScheduleID && studentId == trips[i].TripStops[j].Students[k].id)
+					if (trips[i].FieldTripStops[j].Students[k].RequirementID == requirementID && trips[i].FieldTripStops[j].Students[k].PreviousScheduleID == previousScheduleID && studentId == trips[i].FieldTripStops[j].Students[k].id)
 					{
-						return trips[i].TripStops[j].Students[k];
+						return trips[i].FieldTripStops[j].Students[k];
 					}
 				}
 			}
@@ -2883,9 +2883,9 @@
 						return;
 					}
 					var tripPaths = [];
-					trip.TripStops.forEach(function(tripStop)
+					trip.FieldTripStops.forEach(function(tripStop)
 					{
-						tripStop.path = enumerable.FirstOrDefault({}, function(c) { return c.TripStopId == tripStop.id && c.TripId == trip.id; });
+						tripStop.path = enumerable.FirstOrDefault({}, function(c) { return c.TripStopId == tripStop.id && c.FieldTripId == trip.id; });
 						var geometry = TF.Helper.TripHelper.getDrawTripPathGeometry(tripStop, trip, self.viewModel.drawTool.pathLineType);
 						if (geometry)
 						{
@@ -2964,9 +2964,9 @@
 					{
 						return;
 					}
-					trip.TripStops.forEach(function(tripStop)
+					trip.FieldTripStops.forEach(function(tripStop)
 					{
-						tripStop.boundary = tripBoundaryEnumerable.FirstOrDefault({}, function(c) { return c.TripStopId == tripStop.id && c.TripId == trip.id; });
+						tripStop.boundary = tripBoundaryEnumerable.FirstOrDefault({}, function(c) { return c.TripStopId == tripStop.id && c.FieldTripId == trip.id; });
 						self.viewModel.drawTool._addTripBoundary(tripStop.boundary, trip.id);
 
 					});
@@ -2982,7 +2982,7 @@
 		var allStudents = self.candidateStudents;
 		self.trips.forEach(function(trip)
 		{
-			trip.TripStops.forEach(function(tripStop)
+			trip.FieldTripStops.forEach(function(tripStop)
 			{
 				allStudents = allStudents.concat(tripStop.Students);
 			});
@@ -3030,11 +3030,11 @@
 		var tripStops = [];
 		for (var i = 0; i < self.trips.length; i++)
 		{
-			for (var j = 0; j < self.trips[i].TripStops.length; j++)
+			for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 			{
-				if (tripStopIds.indexOf(self.trips[i].TripStops[j].id) > -1)
+				if (tripStopIds.indexOf(self.trips[i].FieldTripStops[j].id) > -1)
 				{
-					tripStops.push(self.trips[i].TripStops[j]);
+					tripStops.push(self.trips[i].FieldTripStops[j]);
 				}
 			}
 		}
@@ -3052,9 +3052,9 @@
 	{
 		for (var i = 0; i < trips.length; i++)
 		{
-			for (var j = 0; j < trips[i].TripStops.length; j++)
+			for (var j = 0; j < trips[i].FieldTripStops.length; j++)
 			{
-				trips[i].TripStops[j].StopTime = trips[i].TripStops[j].ActualStopTime;
+				trips[i].FieldTripStops[j].StopTime = trips[i].FieldTripStops[j].ActualStopTime;
 			}
 		}
 		this.onTripStopTimeChangeEvent.notify({});
@@ -3127,13 +3127,13 @@
 				{
 					continue;
 				}
-				for (var j = 0; j < self.trips[i].TripStops.length; j++)
+				for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 				{
-					if (self.trips[i].TripStops[j].id != tripStopId)
+					if (self.trips[i].FieldTripStops[j].id != tripStopId)
 					{
 						continue;
 					}
-					studentsHasOtherRoute = studentsHasOtherRoute.concat(self.trips[i].TripStops[j].Students.filter(function(c)
+					studentsHasOtherRoute = studentsHasOtherRoute.concat(self.trips[i].FieldTripStops[j].Students.filter(function(c)
 					{
 						return c.id == studentId && c.RequirementID == requirementId;
 					}));
@@ -3148,7 +3148,7 @@
 		var self = this;
 		self.trips.map(function(trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				tripStop.Students.map(function(student)
 				{
@@ -3167,11 +3167,11 @@
 		var self = this;
 		trips.map(function(trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				tripStop.Students.map(function(student)
 				{
-					self.calculateStudentTravelTimeVRP(student, tripStop, trip.TripStops);
+					self.calculateStudentTravelTimeVRP(student, tripStop, trip.FieldTripStops);
 				});
 			});
 		});
@@ -3225,11 +3225,11 @@
 		var self = this;
 		trips.map(function(trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				tripStop.Students.map(function(student)
 				{
-					self.calculateStudentTravelTime(student, tripStop, trip.TripStops);
+					self.calculateStudentTravelTime(student, tripStop, trip.FieldTripStops);
 				});
 			});
 		});
@@ -3313,7 +3313,7 @@
 		var self = this, promises = [];
 		var trip = self.getTripById(tripId);
 
-		trip.TripStops.forEach(function(tripStop)
+		trip.FieldTripStops.forEach(function(tripStop)
 		{
 			tripStop.Students.forEach(function(stud)
 			{
@@ -3388,54 +3388,54 @@
 			let lockStopIndex;
 			if (!reset)
 			{
-				for (j = 0; j < trips[i].TripStops.length; j++)
+				for (j = 0; j < trips[i].FieldTripStops.length; j++)
 				{
-					if (trips[i].TripStops[j].LockStopTime)
+					if (trips[i].FieldTripStops[j].LockStopTime)
 					{
-						trips[i].TripStops[j].ActualStopTime = trips[i].TripStops[j].StopTime;
-						lockStop = trips[i].TripStops[j];
+						trips[i].FieldTripStops[j].ActualStopTime = trips[i].FieldTripStops[j].StopTime;
+						lockStop = trips[i].FieldTripStops[j];
 						lockStopIndex = j;
 						break;
 					}
 				}
-				if (!lockStopIndex && trips[i].TripStops.length > 0)
+				if (!lockStopIndex && trips[i].FieldTripStops.length > 0)
 				{
-					trips[i].TripStops[0].LockStopTime = true;
-					trips[i].TripStops[0].ActualStopTime = trips[i].TripStops[0].StopTime;
-					lockStop = trips[i].TripStops[0];
+					trips[i].FieldTripStops[0].LockStopTime = true;
+					trips[i].FieldTripStops[0].ActualStopTime = trips[i].FieldTripStops[0].StopTime;
+					lockStop = trips[i].FieldTripStops[0];
 					lockStopIndex = 0;
 				}
 			}
 			else
 			{
-				lockStop = trips[i].TripStops[0];
+				lockStop = trips[i].FieldTripStops[0];
 				lockStopIndex = 0;
-				for (j = 0; j < trips[i].TripStops.length; j++)
+				for (j = 0; j < trips[i].FieldTripStops.length; j++)
 				{
-					if (trips[i].TripStops[j].id == lockStop.id)
+					if (trips[i].FieldTripStops[j].id == lockStop.id)
 					{
-						trips[i].TripStops[j].LockStopTime = true;
+						trips[i].FieldTripStops[j].LockStopTime = true;
 					}
 					else
 					{
-						trips[i].TripStops[j].LockStopTime = false;
+						trips[i].FieldTripStops[j].LockStopTime = false;
 					}
 				}
 			}
-			for (j = lockStopIndex + 1; j < trips[i].TripStops.length; j++)
+			for (j = lockStopIndex + 1; j < trips[i].FieldTripStops.length; j++)
 			{
-				trips[i].TripStops[j].ActualStopTime = moment(trips[i].TripStops[j - 1].ActualStopTime, "HH:mm:ss")
-					.add(Math.ceil(moment.duration(moment(trips[i].TripStops[j - 1].Duration, "HH:mm:ss")).asMinutes()), "minutes").format("HH:mm:ss");
+				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j - 1].ActualStopTime, "HH:mm:ss")
+					.add(Math.ceil(moment.duration(moment(trips[i].FieldTripStops[j - 1].Duration, "HH:mm:ss")).asMinutes()), "minutes").format("HH:mm:ss");
 			}
 			for (j = lockStopIndex - 1; j > -1; j--)
 			{
-				trips[i].TripStops[j].ActualStopTime = moment(trips[i].TripStops[j + 1].ActualStopTime, "HH:mm:ss")
-					.subtract(Math.ceil(moment.duration(moment(trips[i].TripStops[j].Duration, "HH:mm:ss")).asMinutes()), "minutes").format("HH:mm:ss");
+				trips[i].FieldTripStops[j].ActualStopTime = moment(trips[i].FieldTripStops[j + 1].ActualStopTime, "HH:mm:ss")
+					.subtract(Math.ceil(moment.duration(moment(trips[i].FieldTripStops[j].Duration, "HH:mm:ss")).asMinutes()), "minutes").format("HH:mm:ss");
 			}
-			if (trips[i].TripStops.length > 0)
+			if (trips[i].FieldTripStops.length > 0)
 			{
-				trips[i].ActualStartTime = trips[i].TripStops[0].ActualStopTime;
-				trips[i].ActualEndTime = trips[i].TripStops[trips[i].TripStops.length - 1].ActualStopTime;
+				trips[i].ActualStartTime = trips[i].FieldTripStops[0].ActualStopTime;
+				trips[i].ActualEndTime = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime;
 			}
 		}
 	};
@@ -3523,14 +3523,14 @@
 		}
 
 		const emptyValue = "00:00:00";
-		for (var i = 0; i < trip.TripStops.length; i++)
+		for (var i = 0; i < trip.FieldTripStops.length; i++)
 		{
-			let stop = trip.TripStops[i];
+			let stop = trip.FieldTripStops[i];
 			if (stop.StopTime == emptyValue)
 			{
 				stop.StopTime = stop.ActualStopTime;
-				var prevStop = i == 0 ? null : trip.TripStops[i - 1];
-				var nextStop = i == trip.TripStops.length - 1 ? null : trip.TripStops[i + 1];
+				var prevStop = i == 0 ? null : trip.FieldTripStops[i - 1];
+				var nextStop = i == trip.FieldTripStops.length - 1 ? null : trip.FieldTripStops[i + 1];
 				if (prevStop && prevStop.StopTime != emptyValue && moment(stop.StopTime, "HH:mm:ss").diff(moment(prevStop.StopTime, "HH:mm:ss")) < 0)
 				{
 					stop.StopTime = prevStop.StopTime;
@@ -3549,38 +3549,38 @@
 		let lockStop;
 		let lockStopIndex;
 		let i;
-		for (i = 0; i < trip.TripStops.length; i++)
+		for (i = 0; i < trip.FieldTripStops.length; i++)
 		{
-			if (trip.TripStops[i].LockStopTime)
+			if (trip.FieldTripStops[i].LockStopTime)
 			{
-				trip.TripStops[i].ActualStopTime = trip.TripStops[i].StopTime;
-				lockStop = trip.TripStops[i];
+				trip.FieldTripStops[i].ActualStopTime = trip.FieldTripStops[i].StopTime;
+				lockStop = trip.FieldTripStops[i];
 				lockStopIndex = i;
 				break;
 			}
 		}
-		if (!lockStopIndex && trip.TripStops.length > 0)
+		if (!lockStopIndex && trip.FieldTripStops.length > 0)
 		{
-			trip.TripStops[0].LockStopTime = true;
-			trip.TripStops[0].ActualStopTime = trip.TripStops[0].StopTime;
-			lockStop = trip.TripStops[0];
+			trip.FieldTripStops[0].LockStopTime = true;
+			trip.FieldTripStops[0].ActualStopTime = trip.FieldTripStops[0].StopTime;
+			lockStop = trip.FieldTripStops[0];
 			lockStopIndex = 0;
 		}
 		if (changeSpeedStop.Sequence >= lockStopIndex + 1)
 		{
-			for (i = lockStopIndex + 1; i < trip.TripStops.length; i++)
+			for (i = lockStopIndex + 1; i < trip.FieldTripStops.length; i++)
 			{
 				let nextStopSequence = changeSpeedStop.Sequence + 1;
-				if (trip.TripStops[i].Sequence == nextStopSequence)
+				if (trip.FieldTripStops[i].Sequence == nextStopSequence)
 				{
-					let stopTimeNew = moment(trip.TripStops[i - 1].StopTime, "HH:mm:ss")
-						.add(moment.duration(moment(trip.TripStops[i - 1].Duration, "HH:mm:ss")).asMinutes(), "minutes").format("HH:mm:ss");
-					secondsDiff = moment(stopTimeNew, "HH:mm:ss").diff(moment(trip.TripStops[i].StopTime, "HH:mm:ss"), "seconds");
-					trip.TripStops[i].StopTime = stopTimeNew;
+					let stopTimeNew = moment(trip.FieldTripStops[i - 1].StopTime, "HH:mm:ss")
+						.add(moment.duration(moment(trip.FieldTripStops[i - 1].Duration, "HH:mm:ss")).asMinutes(), "minutes").format("HH:mm:ss");
+					secondsDiff = moment(stopTimeNew, "HH:mm:ss").diff(moment(trip.FieldTripStops[i].StopTime, "HH:mm:ss"), "seconds");
+					trip.FieldTripStops[i].StopTime = stopTimeNew;
 				}
-				else if (trip.TripStops[i].Sequence > nextStopSequence)
+				else if (trip.FieldTripStops[i].Sequence > nextStopSequence)
 				{
-					trip.TripStops[i].StopTime = moment(trip.TripStops[i].StopTime, "HH:mm:ss").add(secondsDiff, "seconds").format("HH:mm:ss");
+					trip.FieldTripStops[i].StopTime = moment(trip.FieldTripStops[i].StopTime, "HH:mm:ss").add(secondsDiff, "seconds").format("HH:mm:ss");
 				}
 			}
 		}
@@ -3588,16 +3588,16 @@
 		{
 			for (i = lockStopIndex - 1; i > -1; i--)
 			{
-				if (trip.TripStops[i].Sequence == changeSpeedStop.Sequence)
+				if (trip.FieldTripStops[i].Sequence == changeSpeedStop.Sequence)
 				{
-					let stopTimeNew = moment(trip.TripStops[i + 1].StopTime, "HH:mm:ss")
-						.subtract(moment.duration(moment(trip.TripStops[i].Duration, "HH:mm:ss")).asMinutes(), "minutes").format("HH:mm:ss");
-					secondsDiff = moment(stopTimeNew, "HH:mm:ss").diff(moment(trip.TripStops[i].StopTime, "HH:mm:ss"), "seconds");
-					trip.TripStops[i].StopTime = stopTimeNew;
+					let stopTimeNew = moment(trip.FieldTripStops[i + 1].StopTime, "HH:mm:ss")
+						.subtract(moment.duration(moment(trip.FieldTripStops[i].Duration, "HH:mm:ss")).asMinutes(), "minutes").format("HH:mm:ss");
+					secondsDiff = moment(stopTimeNew, "HH:mm:ss").diff(moment(trip.FieldTripStops[i].StopTime, "HH:mm:ss"), "seconds");
+					trip.FieldTripStops[i].StopTime = stopTimeNew;
 				}
-				else if (trip.TripStops[i].Sequence < changeSpeedStop.Sequence)
+				else if (trip.FieldTripStops[i].Sequence < changeSpeedStop.Sequence)
 				{
-					trip.TripStops[i].StopTime = moment(trip.TripStops[i].StopTime, "HH:mm:ss").add(secondsDiff, "seconds").format("HH:mm:ss");
+					trip.FieldTripStops[i].StopTime = moment(trip.FieldTripStops[i].StopTime, "HH:mm:ss").add(secondsDiff, "seconds").format("HH:mm:ss");
 				}
 			}
 		}
@@ -3640,25 +3640,9 @@
 	};
 
 
-	RoutingDataModel.prototype.getFieldTripStopBySequence = function(sequenceId)
-	{
-		var trips = this.trips;
-		for (var i = 0, l = trips.length; i < l; i++)
-		{
-			var tripStops = trips[i].FieldTripStops;
-			for (var j = 0; j < tripStops.length; j++)
-			{
-				if (tripStops[j].Sequence == sequenceId)
-				{
-					return tripStops[j];
-				}
-			}
-		}
-	};
-
 	RoutingDataModel.prototype.getTripStopBySequence = function(trip, sequence)
 	{
-		return Enumerable.From(trip.TripStops).FirstOrDefault(null, function(c) { return c.Sequence == sequence; });
+		return Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(c) { return c.Sequence == sequence; });
 	};
 
 	RoutingDataModel.prototype.getAssignStudent = function(tripId)
@@ -3672,9 +3656,9 @@
 				continue;
 			}
 
-			for (var j = 0; j < this.trips[i].TripStops.length; j++)
+			for (var j = 0; j < this.trips[i].FieldTripStops.length; j++)
 			{
-				students = students.concat(this.trips[i].TripStops[j].Students);
+				students = students.concat(this.trips[i].FieldTripStops[j].Students);
 			}
 		}
 		return students;
@@ -3689,7 +3673,7 @@
 		let studentsExceptions = {};
 		trips.forEach(function(trip)
 		{
-			trip.TripStops.forEach(function(tripStop)
+			trip.FieldTripStops.forEach(function(tripStop)
 			{
 				let stopStudentExceptions = tripStop.Students.filter((i) => !i.RequirementID);
 				if (stopStudentExceptions.length)
@@ -3732,7 +3716,7 @@
 		var assignedStudents = [];
 		self.trips.forEach(function(trip)
 		{
-			trip.TripStops.forEach(function(tripStop)
+			trip.FieldTripStops.forEach(function(tripStop)
 			{
 				assignedStudents = assignedStudents.concat(tripStop.Students);
 			});
@@ -3793,13 +3777,13 @@
 		var length = this.trips.length;
 		for (var i = 0; i < length; i++)
 		{
-			for (var j = 0; j < this.trips[i].TripStops.length; j++)
+			for (var j = 0; j < this.trips[i].FieldTripStops.length; j++)
 			{
-				if (this.trips[i].TripStops[j].id != tripStopId)
+				if (this.trips[i].FieldTripStops[j].id != tripStopId)
 				{
 					continue;
 				}
-				var students = this.trips[i].TripStops[j].Students;
+				var students = this.trips[i].FieldTripStops[j].Students;
 				return Enumerable.From(students).FirstOrDefault(null, function(c)
 				{
 					return c.id == studentId &&
@@ -3840,9 +3824,9 @@
 				{
 					return;
 				}
-				var desTrip = self.getTripById(oldSchoolStop.TripId);
+				var desTrip = self.getTripById(oldSchoolStop.FieldTripId);
 				var curSequence = tripStop.Sequence, desSequence = oldSchoolStop.Sequence;
-				var sequenceRanges = self.schoolSequences[tripStop.TripId];
+				var sequenceRanges = self.schoolSequences[tripStop.FieldTripId];
 				if (!sequenceRanges) return;
 				var schoolSequenceRange = sequenceRanges[oldSchoolStop.SchoolCode];
 				var tripStopSequenceRange = sequenceRanges[tripStop.SchoolCode];
@@ -3880,7 +3864,7 @@
 					desSequence = tripStop.Sequence;
 					if (desSequence < maxSchoolSequence && desSequence > oldSchoolStop.Sequence)
 					{
-						var sequences = self.getSchoolSequence(tripStop.TripId, oldSchoolStop.SchoolCode);
+						var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
 						var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq > desSequence; });
 						var schlStop = self.getTripStopBySequence(desTrip, validSequence);
 						if (schlStop)
@@ -3918,7 +3902,7 @@
 					desSequence = tripStop.Sequence;
 					if (desSequence > minSchoolSequence && desSequence < oldSchoolStop.Sequence)
 					{
-						var sequences = self.getSchoolSequence(tripStop.TripId, oldSchoolStop.SchoolCode);
+						var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
 						var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq < desSequence; });
 						var schlStop = self.getTripStopBySequence(desTrip, validSequence);
 						if (schlStop)
@@ -3949,7 +3933,7 @@
 			if (trip.id == tripId)
 			{
 				trip.color = color;
-				trip.TripStops.map(function(tripStop)
+				trip.FieldTripStops.map(function(tripStop)
 				{
 					tripStop.color = color;
 				});
@@ -3957,10 +3941,10 @@
 		});
 		if (onlyRefreshTree)
 		{
-			self.onTripTreeColorChangeEvent.notify({ TripId: tripId, color: color });
+			self.onTripTreeColorChangeEvent.notify({ FieldTripId: tripId, color: color });
 		}
 
-		self.onTripColorChangeEvent.notify({ TripId: tripId, color: color });
+		self.onTripColorChangeEvent.notify({ FieldTripId: tripId, color: color });
 		// self.routingStudentManager.refreshAssignStudents();
 		const fieldTrip = self.trips.filter(item => item.id === tripId)[0];
 		PubSub.publish("on_FieldTripMap_UpdateColor", fieldTrip);
@@ -4015,7 +3999,7 @@
 
 		const trips = self.trips.filter(trip => tripIds.includes(trip.id));
 		PubSub.publish("on_FieldTripMap_ShowHide", trips);
-		self.routingStudentManager.refreshAssignStudents();
+		// self.routingStudentManager.refreshAssignStudents();
 	};
 
 	RoutingDataModel.prototype.closeByTrips = function(tripsToClose, notifyChange)
@@ -4050,9 +4034,10 @@
 			self._updateTravelScenarioLock(tripsToClose);
 			if (self.getEditTrips().length == 0)
 			{
-				var promise = self.clearCandidateStudents();
-				self.updateManuallyChangedStatusWhenClose();
-				self.routingStudentManager.refreshStudentLock(true);
+				var promise = Promise.resolve(true);
+				// var promise = self.clearCandidateStudents();
+				// self.updateManuallyChangedStatusWhenClose();
+				// self.routingStudentManager.refreshStudentLock(true);
 				return promise;
 			} else if (tripsToClose && tripsToClose.length > 0)
 			{//RW-32613 If Scheduled Elsewhere is not checked there is no need to send RoutingCandidateStudents request.
@@ -4162,17 +4147,17 @@
 					if (trips.length > 0)
 					{
 						self.removeNeedDeleteTrip(trips);
-						self.routingStudentManager.refresh();
+						// self.routingStudentManager.refresh();
 						self.onTripsChangeEvent.notify({
 							add: [],
 							edit: self.getEditTrips().filter(function(a) { return !Enumerable.From(exceptTrips).Any(function(b) { return b.id == a.id; }); }),
 							delete: trips
 						});
 					}
-					if (self.getEditTrips().length == 0)
-					{
-						self.clearCandidateStudents();
-					}
+					// if (self.getEditTrips().length == 0)
+					// {
+					// 	self.clearCandidateStudents();
+					// }
 					self.clearContextMenuOperation();
 					self.viewModel.editFieldTripStopModal.closeEditModal();
 					self._viewModal.setMode("Routing", "Normal");
@@ -4268,7 +4253,7 @@
 		trips.forEach(function(trip)
 		{
 			var studentsTripStops = [];
-			trip.TripStops.forEach(function(tripStop)
+			trip.FieldTripStops.forEach(function(tripStop)
 			{
 				var unAssignStudents = [];
 				if (!tripStop.originalStudents)
@@ -4315,7 +4300,7 @@
 			self.removeNeedDeleteTrip(viewTripsToClose);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: viewTripsToClose });
 			// self.clearSchoolLocation(viewTripsToClose);
-			self.routingStudentManager.refresh();
+			// self.routingStudentManager.refresh();
 		}
 		self.clearContextMenuOperation();
 		self.viewModel.editFieldTripStopModal.closeEditModal();
@@ -4369,7 +4354,7 @@
 		{
 			var promise = this.onCandidatesStudentsChangeToMapEvent?.notify({ add: [], edit: [], delete: this.candidateStudents });
 			this.candidateStudents = [];
-			this.routingStudentManager.oldCandidateStudentsToShow = "";
+			//this.routingStudentManager.oldCandidateStudentsToShow = "";
 			this.viewModel.drawTool && this.viewModel.drawTool.clearCandidateStudents();
 			return promise;
 		}
@@ -4385,7 +4370,7 @@
 		var remainSchools = [];
 		remainTrips.forEach(function(trip)
 		{
-			trip.TripStops.forEach(function(tripStop)
+			trip.FieldTripStops.forEach(function(tripStop)
 			{
 				if (tripStop.SchoolCode)
 				{
@@ -4606,7 +4591,7 @@
 		{
 			if (success)
 			{
-				self.routingStudentManager.refresh(null, true);
+				//self.routingStudentManager.refresh(null, true);
 				self.showSaveSuccessToastMessage();
 				self.updateTripOriginalData(trips);
 				self.onTripDisplayRefreshEvent.notify(self.trips);
@@ -4641,7 +4626,7 @@
 		{
 			if (success)
 			{
-				self.routingStudentManager.refresh(null, true);
+				// self.routingStudentManager.refresh(null, true);
 				self.showSaveSuccessToastMessage();
 				self.updateTripOriginalData(fieldTrips);
 				self.onTripDisplayRefreshEvent.notify(self.trips);
@@ -4667,15 +4652,15 @@
 					return `The field trip name '${trips[i].Name}' is not unique. Please keep each field trip name unique before saving.`;
 				}
 			}
-			for (j = 0; j < trips[i].TripStops.length; j++)
+			for (j = 0; j < trips[i].FieldTripStops.length; j++)
 			{
-				if (j + 1 < trips[i].TripStops.length
-					&& convertToMoment(trips[i].TripStops[j].StopTime) > convertToMoment(trips[i].TripStops[j + 1].StopTime))
+				if (j + 1 < trips[i].FieldTripStops.length
+					&& convertToMoment(trips[i].FieldTripStops[j].StopTime) > convertToMoment(trips[i].FieldTripStops[j + 1].StopTime))
 				{
 					return `The trip '${trips[i].Name}' contains invalid or out of order times. Please correct before saving.`;
 				}
 
-				if (trips[i].TripStops[j].Students.some(function(item) { return !item.IsValid; }))
+				if (trips[i].FieldTripStops[j].Students.some(function(item) { return !item.IsValid; }))
 				{
 					if (trips[i].Session == TF.Helper.TripHelper.Sessions.ToSchool)
 					{
@@ -4692,7 +4677,7 @@
 	{
 		var self = this;
 		var invalidStudents = [];
-		if (tripStop.TripId == tripId)
+		if (tripStop.FieldTripId == tripId)
 		{
 			return invalidStudents;
 		}
@@ -4711,7 +4696,7 @@
 	RoutingDataModel.prototype.getStudentValidValue = function(student, tripStop)
 	{
 		var self = this;
-		var schoolStop = self.getSchoolStopsByTripId(tripStop.TripId).filter(function(s)
+		var schoolStop = self.getSchoolStopsByTripId(tripStop.FieldTripId).filter(function(s)
 		{
 			return student.AnotherTripStopID == s.id;
 		});
@@ -4771,12 +4756,12 @@
 		var tripId;
 		if (tripStop)
 		{
-			tripId = tripStop.TripId;
+			tripId = tripStop.FieldTripId;
 		}
 		else
 		{
 			var _tripStop = self.getFieldTripStopByStopId(student.TripStopID);
-			tripId = _tripStop.TripId;
+			tripId = _tripStop.FieldTripId;
 		}
 		var schoolStops = self.getSchoolStopsByTripId(tripId);
 		if (schoolStops.length > 0)
@@ -4811,13 +4796,13 @@
 	RoutingDataModel.prototype.findRealSchoolStops = function(tripStop, student)
 	{
 		var self = this;
-		var trip = self.getTripById(tripStop.TripId);
+		var trip = self.getTripById(tripStop.FieldTripId);
 		var _schoolCode = self.getStudentSchoolCode(student, tripStop, false);
 		if (!_schoolCode)
 		{
 			return { id: 0 };
 		}
-		var allSchools = Enumerable.From(trip.TripStops).Where(function(c) { return c.SchoolCode == _schoolCode; }).ToArray();
+		var allSchools = Enumerable.From(trip.FieldTripStops).Where(function(c) { return c.SchoolCode == _schoolCode; }).ToArray();
 		var session = $.isNumeric(student.Session) ? student.Session : trip.Session;
 		if (allSchools.length == 0)
 		{
@@ -4846,7 +4831,7 @@
 		var self = this;
 		trips.map(function(trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				self.setAssignedStudentValidProperty(tripStop, trip);
 			});
@@ -4869,7 +4854,7 @@
 	// 		promiseList = [];
 	// 	self.trips.forEach(function(trip)
 	// 	{
-	// 		trip.TripStops.forEach(function(tripStop)
+	// 		trip.FieldTripStops.forEach(function(tripStop)
 	// 		{
 	// 			if (tripStop.Students.length == 0)
 	// 			{
@@ -4949,7 +4934,7 @@
 			studentList = [];
 		if (trip)
 		{
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				var tripStopEntities = self.tripStopDictionary[tripStop.id];
 				if (tripStopEntities)
@@ -5016,7 +5001,7 @@
 	{
 		trips.forEach((trip) => 
 		{
-			trip.TripStops.forEach((tripStop) => 
+			trip.FieldTripStops.forEach((tripStop) => 
 			{
 				var exceptions = expiredExceptions[tripStop.id];
 				if (!exceptions)
@@ -5037,8 +5022,8 @@
 						continue;
 					}
 
-					var stop1 = trip.TripStops.find((stop) => { return stop.id == exception.TripStopID });
-					var stop2 = trip.TripStops.find((stop) => { return stop.id == exception.AnotherTripStopID });
+					var stop1 = trip.FieldTripStops.find((stop) => { return stop.id == exception.TripStopID });
+					var stop2 = trip.FieldTripStops.find((stop) => { return stop.id == exception.AnotherTripStopID });
 					if (!stop1 || !stop2 || (trip.Session != TF.Helper.TripHelper.Sessions.FromSchool && stop1.Sequence > stop2.Sequence))
 					{
 						continue;
@@ -5077,8 +5062,8 @@
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripresources"), {
 				paramData: {
 					"DBID": tf.datasourceManager.databaseId,
-					"@filter": "in(TripId," + trips.map(x => x.id).join(",") + ")",
-					"@fields": "TripId,StartDate,EndDate,IsTripLevel"
+					"@filter": "in(FieldTripId," + trips.map(x => x.id).join(",") + ")",
+					"@fields": "FieldTripId,StartDate,EndDate,IsTripLevel"
 				}
 			}).then(function(response)
 			{
@@ -5090,7 +5075,7 @@
 				{
 					trip.oldId = trip.id;
 					trip.UnsavedNewTrip = false;
-					const relatedTripResources = tripResources && tripResources.length > 0 ? tripResources.filter(c => c.TripId == trip.id) : null;
+					const relatedTripResources = tripResources && tripResources.length > 0 ? tripResources.filter(c => c.FieldTripId == trip.id) : null;
 					const originalAssignment = self.originalTripAssignment[trip.id];
 					if (self.hasFutureResource(relatedTripResources))
 					{
@@ -5140,7 +5125,7 @@
 								{
 									const tripData = savedTrips[i];
 									self.originalTripAssignment[tripData.id] = tripData;
-									let tripStopStudents = tripData.TripStops.map(ts => ts.Students);
+									let tripStopStudents = tripData.FieldTripStops.map(ts => ts.Students);
 									let isExistsExceptionStds = tripStopStudents.some(stds => stds.some(std => std.IsExceptionScheduleChanged));
 									if (isExistsExceptionStds)
 									{
@@ -5160,11 +5145,11 @@
 									self.featureData.changeId(trip, savedTrip);
 									self.viewModel.drawTool.updateTripId(trip.oldId, trip.id);
 									trip.originalStudents = [];
-									self.clearExpiredExceptionCacheOfStops(trip.TripStops, self.expiredExceptions);
+									self.clearExpiredExceptionCacheOfStops(trip.FieldTripStops, self.expiredExceptions);
 									// refresh trip stop original student
-									trip.TripStops.forEach(function(tripStop)
+									trip.FieldTripStops.forEach(function(tripStop)
 									{
-										var savedTripStop = Enumerable.From(savedTrip.TripStops).FirstOrDefault(null, function(stop) { return stop.id == tripStop.id; });
+										var savedTripStop = Enumerable.From(savedTrip.FieldTripStops).FirstOrDefault(null, function(stop) { return stop.id == tripStop.id; });
 										tripStop.originalStudents = savedTripStop.Students.map(function(c) { return $.extend({}, c); });
 										trip.originalStudents = trip.originalStudents.concat(tripStop.originalStudents);
 										for (var i = 0; i < tripStop.Students.length; i++)
@@ -5250,8 +5235,8 @@
 			// return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripresources"), {
 			// 	paramData: {
 			// 		"DBID": tf.datasourceManager.databaseId,
-			// 		"@filter": "in(TripId," + fieldTrips.map(x => x.id).join(",") + ")",
-			// 		"@fields": "TripId,StartDate,EndDate,IsTripLevel"
+			// 		"@filter": "in(FieldTripId," + fieldTrips.map(x => x.id).join(",") + ")",
+			// 		"@fields": "FieldTripId,StartDate,EndDate,IsTripLevel"
 			// 	}
 			// })
 			return Promise.resolve(null)
@@ -5265,7 +5250,7 @@
 				{
 					trip.oldId = trip.id;
 					trip.UnsavedNewTrip = false;
-					const relatedTripResources = tripResources && tripResources.length > 0 ? tripResources.filter(c => c.TripId == trip.id) : null;
+					const relatedTripResources = tripResources && tripResources.length > 0 ? tripResources.filter(c => c.FieldTripId == trip.id) : null;
 					const originalAssignment = self.originalTripAssignment[trip.id];
 					if (self.hasFutureResource(relatedTripResources))
 					{
@@ -5335,11 +5320,11 @@
 									self.featureData.changeId(trip, savedTrip);
 									self.viewModel.drawTool.updateTripId(trip.oldId, trip.id);
 									trip.originalStudents = [];
-									self.clearExpiredExceptionCacheOfStops(trip.TripStops, self.expiredExceptions);
+									self.clearExpiredExceptionCacheOfStops(trip.FieldTripStops, self.expiredExceptions);
 									// refresh trip stop original student
-									// trip.TripStops.forEach(function(tripStop)
+									// trip.FieldTripStops.forEach(function(tripStop)
 									// {
-									// 	var savedTripStop = Enumerable.From(savedTrip.TripStops).FirstOrDefault(null, function(stop) { return stop.id == tripStop.id; });
+									// 	var savedTripStop = Enumerable.From(savedTrip.FieldTripStops).FirstOrDefault(null, function(stop) { return stop.id == tripStop.id; });
 									// 	tripStop.originalStudents = savedTripStop.Students.map(function(c) { return $.extend({}, c); });
 									// 	trip.originalStudents = trip.originalStudents.concat(tripStop.originalStudents);
 									// 	for (var i = 0; i < tripStop.Students.length; i++)
@@ -5437,9 +5422,9 @@
 			return;
 		}
 
-		prevTrip.TripStops.forEach(ts =>
+		prevTrip.FieldTripStops.forEach(ts =>
 		{
-			let curTripStop = curTrip.TripStops.find(tripStop => tripStop.id === ts.id);
+			let curTripStop = curTrip.FieldTripStops.find(tripStop => tripStop.id === ts.id);
 			ts.Students.forEach(std =>
 			{
 				let curStudent = curTripStop.Students.find(curStd => curStd.id === std.id);
@@ -5544,7 +5529,7 @@
 	// 	var stops = [];
 	// 	self.trips.forEach(function(trip)
 	// 	{
-	// 		trip.TripStops.forEach(function(tripStop)
+	// 		trip.FieldTripStops.forEach(function(tripStop)
 	// 		{
 	// 			if (tripStop.boundary && tripStop.boundary.geometry)
 	// 			{
@@ -5578,7 +5563,7 @@
 	// 	}
 	// 	self.trips.forEach(function(trip)
 	// 	{
-	// 		trip.TripStops.forEach(function(tripStop)
+	// 		trip.FieldTripStops.forEach(function(tripStop)
 	// 		{
 	// 			if (ids.indexOf(tripStop.id) >= 0)
 	// 			{
@@ -5713,7 +5698,7 @@
 	{
 		trips.forEach(function(trip)
 		{
-			trip.TripStops.forEach(function(tripStop)
+			trip.FieldTripStops.forEach(function(tripStop)
 			{
 				if (tripStop.SchoolLocation != null)
 				{
@@ -5825,7 +5810,7 @@
 			trips.forEach(function(trip)
 			{
 				var studentsTripStops = [];
-				trip.TripStops.forEach(function(tripStop)
+				trip.FieldTripStops.forEach(function(tripStop)
 				{
 					studentsTripStops.push({ students: tripStop.Students, tripStop: tripStop });
 				});
@@ -5848,7 +5833,7 @@
 		{
 			trips.forEach(function(trip)
 			{
-				trip.TripStops.map(function(tripStop)
+				trip.FieldTripStops.map(function(tripStop)
 				{
 					if (self.tripStopDictionary[tripStop.id])
 					{
@@ -5858,7 +5843,7 @@
 			});
 			trips.forEach(function(trip)
 			{
-				promiseList.push(tripStopDataModel.autoAssignStudent(trip.TripStops));
+				promiseList.push(tripStopDataModel.autoAssignStudent(trip.FieldTripStops));
 				self.changeDataStack.push(trip);
 			});
 			return Promise.all(promiseList).then(function()
@@ -5933,7 +5918,7 @@
 		var tripIds = new Set();
 		studentsTripStops.forEach(x =>
 		{
-			tripIds.add(x.tripStop.TripId);
+			tripIds.add(x.tripStop.FieldTripId);
 			x.students.forEach(s =>
 			{
 				s.key = s.key || self.getKey(s.id, s.RequirementID, s.TripStopID, s.AnotherTripStopID, s.PreviousScheduleID);
@@ -6001,9 +5986,9 @@
 	{
 		this.trips.forEach(trip =>
 		{
-			let tripStops = trip.TripStops.filter(tripStop =>
+			let tripStops = trip.FieldTripStops.filter(tripStop =>
 			{
-				return studentTripStop.path && tripStop.path.TripId === studentTripStop.path.TripId && tripStop.path.TripStopId === studentTripStop.path.TripStopId;
+				return studentTripStop.path && tripStop.path.FieldTripId === studentTripStop.path.FieldTripId && tripStop.path.TripStopId === studentTripStop.path.TripStopId;
 			});
 			tripStops.forEach(tripStop =>
 			{
@@ -6103,7 +6088,7 @@
 			// student session must same for mid day trip
 			students = students.filter(function(student)
 			{
-				return student.Session == self.routingStudentManager.getStudentPUDOStatusByTripId(student, tripStop.TripId);
+				return student.Session == self.routingStudentManager.getStudentPUDOStatusByTripId(student, tripStop.FieldTripId);
 			});
 
 			if (students.length == 0)
@@ -6132,7 +6117,7 @@
 
 				if (trip === null || trip === undefined)
 				{
-					trip = self.getTripById(tripStop.TripId);
+					trip = self.getTripById(tripStop.FieldTripId);
 				}
 				self.initSchoolSequence(trip.id, [trip]);
 				students.forEach(function(student)
@@ -6226,7 +6211,7 @@
 			// alert student can not assign when locked by other trip
 			var studentsUnassignedToShow = studentsUnassigned.filter(function(s)
 			{
-				return !Enumerable.From(self.studentsDictionary[s.key]).Any(function(c) { return c.tripId == tripStop.TripId && c.IsAssigned; });
+				return !Enumerable.From(self.studentsDictionary[s.key]).Any(function(c) { return c.tripId == tripStop.FieldTripId && c.IsAssigned; });
 			}).map(function(s)
 			{
 				return s.FirstName + " " + s.LastName;
@@ -6392,7 +6377,7 @@
 
 		if (!students)
 		{
-			students = self.routingStudentManager.getCandidates(boundaries[0].TripId);
+			students = self.routingStudentManager.getCandidates(boundaries[0].FieldTripId);
 		}
 
 		boundaries.forEach(function(boundary)
@@ -6416,10 +6401,10 @@
 						var isInSchoolStopIds = false;
 						if (needCopyStudent)
 						{
-							var trip = self.getTripById(boundary.TripId);
+							var trip = self.getTripById(boundary.FieldTripId);
 							if (trip)
 							{
-								var tripstop = trip.TripStops.filter(r => r.boundary.TripStopId == boundary.TripStopId)[0];
+								var tripstop = trip.FieldTripStops.filter(r => r.boundary.TripStopId == boundary.TripStopId)[0];
 								if (tripstop)
 								{
 									var schoolStopIds = self.routingStudentManager.findSchoolStopIds(trip, tripstop, student);
@@ -6874,7 +6859,7 @@
 					PreviousScheduleID: student.PreviousScheduleID,
 					StudId: student.id,
 					DBID: tf.datasourceManager.databaseId,
-					TripId: tripStop.TripId,
+					FieldTripId: tripStop.FieldTripId,
 					TripStopId: tripStop.id
 				};
 				RoutingDataModel.weekdays.forEach(function(weekday)
@@ -6894,7 +6879,7 @@
 				PreviousScheduleID: 0,
 				StudId: 0,
 				DBID: tf.datasourceManager.databaseId,
-				TripId: 0,
+				FieldTripId: 0,
 				TripStopId: 0,
 				StartDate: trips && trips[0] && trips[0].StartDate,
 				EndDate: trips && trips[0] && trips[0].EndDate,
@@ -6958,7 +6943,7 @@
 					PreviousScheduleID: student.PreviousScheduleID,
 					DBID: tf.datasourceManager.databaseId,
 					StudId: student.id,
-					TripId: tripStop.TripId,
+					FieldTripId: tripStop.FieldTripId,
 					StartDate: trips && trips[0] && trips[0].StartDate,
 					EndDate: trips && trips[0] && trips[0].EndDate,
 					TripStopId: tripStop.id
@@ -7003,7 +6988,7 @@
 		};
 		if (trip)
 		{
-			dayOption = $.extend(dayOption, { TripId: trip.id });
+			dayOption = $.extend(dayOption, { FieldTripId: trip.id });
 		}
 		return dayOption;
 	};
@@ -7116,13 +7101,13 @@
 	// 			trips.forEach((trip) =>
 	// 			{
 	// 				var tripData = Enumerable.From(response).FirstOrDefault(null, function(c) { return c.id == trip.id; });
-	// 				for (var j = 0; j < trip.TripStops.length; j++)
+	// 				for (var j = 0; j < trip.FieldTripStops.length; j++)
 	// 				{
-	// 					trip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-	// 					trip.TripStops[j].Duration = tripData.TripStops[j].Duration;
-	// 					trip.TripStops[j].Students.forEach((student, k) =>
+	// 					trip.FieldTripStops[j].TotalStopTime = tripData.FieldTripStops[j].TotalStopTime;
+	// 					trip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
+	// 					trip.FieldTripStops[j].Students.forEach((student, k) =>
 	// 					{
-	// 						student.LoadTime = tripData.TripStops[j].Students[k].LoadTime;
+	// 						student.LoadTime = tripData.FieldTripStops[j].Students[k].LoadTime;
 	// 						(candidateStudentDict[student.id] || []).concat(originalStudentsDict[student.id] || []).forEach((c) =>
 	// 						{
 	// 							c.LoadTime = student.LoadTime;
