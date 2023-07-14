@@ -198,6 +198,7 @@
 				location.reload();
 				return Promise.reject("login failed");
 			}
+			tf.loadingIndicator.showByName("authorizing");
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 				paramData: {
 					prefix: 'tfweb'
@@ -260,6 +261,7 @@
 			// used for cached data, no need to login again.
 			loginViewModal.loginViewModel.obLoginErrorMessage(message);
 		}
+		tf.loadingIndicator.hideByName("authorizing");
 		return tf.modalManager.showModal(loginViewModal)
 			.then(function(result)
 			{

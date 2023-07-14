@@ -308,6 +308,7 @@
 			tf.authManager.auth(new TF.Modal.TripfinderLoginModel()).then(function()
 			{
 				tf.loadingIndicator.showByName(startupIndicatorName);
+				tf.loadingIndicator.hideByName("authorizing");
 				tf.measurementUnitConverter = new TF.MeasurementUnitConverter();
 				return tf.measurementUnitConverter.init();
 			})
@@ -621,6 +622,7 @@
 					})
 					.finally(function()
 					{
+						tf.loadingIndicator.hideByName("authorizing");
 						tf.loadingIndicator.hideByName(startupIndicatorName); // force to hide indicator in finally
 					});
 			});
