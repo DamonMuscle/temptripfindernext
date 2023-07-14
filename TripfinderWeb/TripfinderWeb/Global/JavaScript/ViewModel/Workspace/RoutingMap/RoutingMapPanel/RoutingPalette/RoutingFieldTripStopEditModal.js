@@ -50,6 +50,7 @@
 		this.obStopTimeArriveDisable = ko.observable(false);
 		this.obStopTimeArriveDate = ko.observable(null);
 		this.obStopTimeArriveTime = ko.observable(null);
+		this.obStopTimeArriveDisplay = ko.observable("");
 		this.obDataModel.StopTimeArrive.subscribe(this.stopTimeArriveChange, this);
 		this.obStopTimeArriveDate.subscribe(this.obStopTimeArriveDateChange, this);
 		this.obStopTimeArriveTime.subscribe(this.obStopTimeArriveTimeChange, this);
@@ -58,6 +59,7 @@
 		this.obStopTimeDepartDisable = ko.observable(false);
 		this.obStopTimeDepartDate = ko.observable(null);
 		this.obStopTimeDepartTime = ko.observable(null);
+		this.obStopTimeDepartDisplay = ko.observable("");
 		this.obDataModel.StopTimeDepart.subscribe(this.stopTimeDepartChange, this);
 		this.obStopTimeDepartDate.subscribe(this.obStopTimeDepartDateChange, this);
 		this.obStopTimeDepartTime.subscribe(this.obStopTimeDepartTimeChange, this);
@@ -703,8 +705,8 @@
 	{
 		this.obStopTimeArriveDate(getDatePart(this.obDataModel.StopTimeArrive(), true));
 		this.obStopTimeArriveTime(getTimePart(this.obDataModel.StopTimeArrive(), true));
+		this.obStopTimeArriveDisplay(getDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true) || "");
 		this.obStopTimeArriveDisable(this.isReadOnly() || this.obDataModel.PrimaryDeparture());
-		this.obStopTimeDepartDisable(this.isReadOnly() || this.obDataModel.PrimaryDestination());
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveDateChange = function()
@@ -714,6 +716,7 @@
 		{
 			this.obDataModel.StopTimeArrive(value);
 		}
+		this.obStopTimeArriveDisplay(getDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true) || "");
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeArriveTimeChange = function()
@@ -723,12 +726,15 @@
 		{
 			this.obDataModel.StopTimeArrive(value);
 		}
+		this.obStopTimeArriveDisplay(getDateTime(this.obStopTimeArriveDate(), this.obStopTimeArriveTime(), true) || "");
 	};
 
 	RoutingFieldTripStopEditModal.prototype.stopTimeDepartChange = function()
 	{
 		this.obStopTimeDepartDate(getDatePart(this.obDataModel.StopTimeDepart(), true));
 		this.obStopTimeDepartTime(getTimePart(this.obDataModel.StopTimeDepart(), true));
+		this.obStopTimeDepartDisplay(getDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true) || "");
+		this.obStopTimeDepartDisable(this.isReadOnly() || this.obDataModel.PrimaryDestination());
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeDepartDateChange = function()
@@ -738,6 +744,7 @@
 		{
 			this.obDataModel.StopTimeDepart(value);
 		}
+		this.obStopTimeDepartDisplay(getDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true) || "");
 	};
 
 	RoutingFieldTripStopEditModal.prototype.obStopTimeDepartTimeChange = function()
@@ -747,6 +754,7 @@
 		{
 			this.obDataModel.StopTimeDepart(value);
 		}
+		this.obStopTimeDepartDisplay(getDateTime(this.obStopTimeDepartDate(), this.obStopTimeDepartTime(), true) || "");
 	};
 
 	RoutingFieldTripStopEditModal.prototype.hide = function()
@@ -784,13 +792,25 @@
 			return null;
 		}
 
-		const dtDate = moment(datePart), dtTime = moment(timePart);
-		if (!dtDate.isValid() || !dtTime.isValid())
+		const tDateIndex = datePart.indexOf("T");
+		if (tDateIndex > -1)
+		{
+			datePart = datePart.substring(0, tDateIndex);
+		}
+
+		const tTimeIndex = timePart.indexOf("T")
+		if (tTimeIndex > -1)
+		{
+			timePart = timePart.substring(tTimeIndex + 1);
+		}
+
+		const dtDate = moment(`${datePart} ${timePart}`);
+		if (!dtDate.isValid())
 		{
 			return null;
 		}
 
-		let dtString = dtDate.format("YYYY-MM-DD") + "T" + dtTime.format("HH:mm:ss");
+		let dtString = dtDate.format("YYYY-MM-DDTHH:mm:ss");
 		if (isUtc)
 		{
 			const dt = clientTimeZoneToUtc(dtString);

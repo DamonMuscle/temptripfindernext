@@ -572,6 +572,68 @@
 			}
 		};
 
+		validatorFields.stopTimeArriveDate = {
+			trigger: "blur change",
+			validators: {
+				notEmpty: {
+					message: "required"
+				}
+			}
+		};
+
+		validatorFields.stopTimeArriveTime = {
+			trigger: "blur change",
+			validators: {
+				notEmpty: {
+					message: "required"
+				}
+			}
+		};
+
+		validatorFields.stopTimeArriveDisplay = {
+			trigger: "change",
+			validators: {
+				callback: {
+					message: "Stop arrive time should before departure time",
+					callback: function(value, validator, $field)
+					{
+						return self.validateStopTimeArriveAndDepart();
+					}
+				}
+			}
+		};
+
+		validatorFields.stopTimeDepartDate = {
+			trigger: "blur change",
+			validators: {
+				notEmpty: {
+					message: "required"
+				}
+			}
+		};
+
+		validatorFields.stopTimeDepartTime = {
+			trigger: "blur change",
+			validators: {
+				notEmpty: {
+					message: "required"
+				}
+			}
+		};
+
+		validatorFields.stopTimeDepartDisplay = {
+			trigger: "change",
+			validators: {
+				callback: {
+					message: "Stop departure time should after arrive time",
+					callback: function(value, validator, $field)
+					{
+						return self.validateStopTimeArriveAndDepart();
+					}
+				}
+			}
+		};
+
 		self.$form.bootstrapValidator({
 			excluded: [":disabled", function(field)
 			{
@@ -592,6 +654,26 @@
 		self.pageLevelViewModel.load(self.$form.data("bootstrapValidator"));
 		if (self.$form.data("bootstrapValidator")) self.$form.data("bootstrapValidator").validate();
 	};
+
+	BaseFieldTripStopEditModal.prototype.validateStopTimeArriveAndDepart = function()
+	{
+		const self = this;
+		const arrive = self.element.find('[name="stopTimeArriveDisplay"]').val();
+		const depart = self.element.find('[name="stopTimeDepartDisplay"]').val();
+
+		if(!arrive || !depart)
+		{
+			return true;
+		}
+
+		const dtArrive = moment(arrive), dtDepart = moment(depart);
+		if(!dtArrive.isValid() || !dtDepart.isValid())
+		{
+			return true;
+		}
+
+		return !dtArrive.isAfter(dtDepart);
+	}
 
 	BaseFieldTripStopEditModal.prototype.show = function()
 	{
