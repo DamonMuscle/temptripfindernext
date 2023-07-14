@@ -579,7 +579,7 @@
 				// 	icon: null
 				// });
 				var tripSessionsMenuItem = new TF.RoutingMap.MenuItem({
-					header: 'Trip Stop',
+					header: 'Field Trip Stop',
 					icon: null
 				});
 				var tripPathsMenuItem = new TF.RoutingMap.MenuItem({
