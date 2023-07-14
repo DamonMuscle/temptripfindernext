@@ -33,6 +33,7 @@
 		PubSub.subscribe("on_FieldTripMap_UpdateColor", self.onFieldTripMapUpdateColor.bind(self));
 		PubSub.subscribe("on_FieldTripMap_TripPathTypeChange", self.onFieldTripMapTripPathTypeChange.bind(self));
 		PubSub.subscribe("on_FieldTripMap_MoveStopLocation", self.onFieldTripMapMoveStopLocation.bind(self));
+		PubSub.subscribe("on_FieldTripMap_MoveStopLocationCompleted", self.onFieldTripMapMoveStopLocationCompleted.bind(self));
 		PubSub.subscribe("on_FieldTripMap_DeleteStopLocation", self.onFieldTripMapDeleteStopLocation.bind(self));
 		PubSub.subscribe("on_FieldTripMap_DeleteStopLocationCompleted", self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
@@ -220,6 +221,11 @@
 		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this._viewModal.sketchTool);
 	}
 
+	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(_, data)
+	{
+		console.log(data);
+	}
+
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocation = function(_, data)
 	{
 		const { fieldTripId, fieldTripStopId } = data;
@@ -322,6 +328,7 @@
 		PubSub.unsubscribe("on_FieldTripMap_UpdateColor");
 		PubSub.unsubscribe("on_FieldTripMap_TripPathTypeChange");
 		PubSub.unsubscribe("on_FieldTripMap_MoveStopLocation");
+		PubSub.unsubscribe("on_FieldTripMap_MoveStopLocationCompleted");
 		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocation");
 		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocationCompleted");
 		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");

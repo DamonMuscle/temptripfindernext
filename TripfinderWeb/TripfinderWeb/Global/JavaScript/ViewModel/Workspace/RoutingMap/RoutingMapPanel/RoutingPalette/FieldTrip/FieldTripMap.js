@@ -433,6 +433,8 @@
 			isFeatureLayer: false,
 		};
 		sketchTool.transform(stopGraphic.clone(), options, self.moveStopLocationCallback.bind(self));
+
+		stopGraphic.visible = false;
 	}
 	
 	FieldTripMap.prototype.moveStopLocationCallback = async function(graphics)
@@ -459,26 +461,19 @@
 			}
 		});
 
+		let { longitude, latitude } = updateGraphic.geometry;
+		const geocodeStreet = await this._getGeocodeStopAddress(longitude, latitude);
+		if (geocodeStreet !== "")
+		{
+			movingStop.Street = geocodeStreet;
+		}
+		movingStop.XCoord = +longitude.toFixed(6);
+		movingStop.YCoord = +latitude.toFixed(6);
+
 		// stop moving
 		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
-		
-		// update stop street by geocode
-		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
-		let { longitude, latitude } = updateGraphic.geometry;
-		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
 
-		if (geocodeResult?.errorMessage)
-		{
-			console.error(geocodeResult.errorMessage);
-			return;
-		}
-
-		if (geocodeResult?.attributes)
-		{
-			movingStop.Street = geocodeResult.attributes.Address;
-			movingStop.XCoord = +longitude.toFixed(6);
-			movingStop.YCoord = +latitude.toFixed(6);
-		}
+		// this.clearStops([movingStopGraphic]);
 	}
 
 	FieldTripMap.prototype.clearStops = function(fieldTrip, stops = null)
@@ -497,6 +492,20 @@
 				self.fieldTripStopLayerInstance.remove(stopFeature);
 			});
 		}
+	}
+
+	FieldTripMap.prototype._getGeocodeStopAddress = async function(longitude, latitude)
+	{
+		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
+		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
+
+		if (geocodeResult?.errorMessage)
+		{
+			console.error(geocodeResult.errorMessage);
+			return null;
+		}
+
+		return geocodeResult?.attributes.Address;
 	}
 
 	//#endregion
@@ -1021,8 +1030,32 @@
 
 	FieldTripMap.prototype.updateDataModel = function(graphics)
 	{
-		console.log("TODO: updateDataModel");
-		// pubsub.publish
+		if (graphics && graphics.length !== 1)
+		{
+			console.warn(`updateDataModel: Multiple graphics updated! Failed.`);
+			return;
+		}
+
+		const stop = this.mapEditingFeatures.movingStop.stop,
+			graphic = graphics[0],
+			attributes = graphic.attributes;
+		if (stop.FieldTripId === attributes.Id && stop.Sequence === attributes.Sequence)
+		{
+			const data = {
+				DBID: attributes.DBID,
+				FieldTripId: stop.FieldTripId,
+				Sequence: stop.Sequence,
+				Name: stop.Street,
+				XCoord: stop.XCoord,
+				YCoord: stop.YCoord,
+			};
+			PubSub.publish("on_FieldTripMap_MoveStopLocationCompleted", data);
+		}
+		else
+		{
+			console.warn(`updateDataModel: stop does not match!`);
+		}
+
 		return;
 	}
 
