@@ -408,7 +408,11 @@
 	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip)
 	{
 		this.clearFieldTripPath(fieldTrip);
+		await this.clearFieldTripPathArrow(fieldTrip);
+
 		this.clearSequenceLine(fieldTrip);
+		await this.clearSequenceLineArrow(fieldTrip);
+
 		await this.addFieldTripPath(fieldTrip);
 	}
 
@@ -442,6 +446,38 @@
 		}
 	}
 
+	FieldTripMap.prototype.clearFieldTripPathArrow = async function(fieldTrip)
+	{
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			edits = {},
+			condition = `DBID = ${DBID} and Id = ${FieldTripId}`;
+			deleteArrows = await self._getPathArrowFeatures(condition);
+
+		if (deleteArrows.length >= 0)
+		{
+			edits.deleteFeatures = deleteArrows;
+		}
+
+		await self.fieldTripPathArrowLayerInstance.layer.applyEdits(edits);
+	}
+
+	FieldTripMap.prototype.clearSequenceLineArrow = async function(fieldTrip)
+	{
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			edits = {},
+			condition = `DBID = ${DBID} and Id = ${FieldTripId}`;
+			deleteArrows = await self._getSequenceLineArrowFeatures(condition);
+
+		if (deleteArrows.length >= 0)
+		{
+			edits.deleteFeatures = deleteArrows;
+		}
+
+		await self.fieldTripSequenceLineArrowLayerInstance.layer.applyEdits(edits);
+	}
+
 	//#endregion
 
 	//#region TODO: RCM on Map
@@ -459,12 +495,14 @@
 		}
 
 		const sequence = stop.Sequence, fieldTripId = fieldTrip.id;
-		const fieldTripStops = await self.fieldTripStopLayerInstance.queryFeatures(null);
+		const fieldTripStops = self._getStopFeatures();
 		const stopGraphic = fieldTripStops.find(item => item.attributes.FieldTripId === fieldTripId && item.attributes.Sequence === sequence);
 		if (!stopGraphic)
 		{
 			return;
 		}
+
+		console.log(stopGraphic.attributes.Name);
 
 		this.mapEditingFeatures.movingStop = {
 			fieldTrip: fieldTrip,
@@ -510,16 +548,18 @@
 		if (geocodeStreet !== "")
 		{
 			movingStop.Street = geocodeStreet;
+			updateGraphic.attributes.Name = geocodeStreet;
 		}
 		movingStop.XCoord = +longitude.toFixed(6);
 		movingStop.YCoord = +latitude.toFixed(6);
 
-		// stop moving
+		// remove previous stop graphic.
+		self.fieldTripStopLayerInstance.remove(movingStopGraphic);
+
+		// STOP moving
 		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
 
-		// this.clearStops([movingStopGraphic]);
-
-		this.refreshFieldTripPath(fieldTrip);
+		self.refreshFieldTripPath(fieldTrip);
 	}
 
 	FieldTripMap.prototype.clearStops = function(fieldTrip, stops = null)
