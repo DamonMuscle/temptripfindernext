@@ -79,7 +79,7 @@
 			return this.obSelectedSequence();
 		});
 
-		this.obSelectedSequenceDisable = ko.computed(() => this.stopSequenceDisable || (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
+		this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
 
 		// disable for future implementation
 		this.obSelectedFieldTripDisable = ko.observable(true);
