@@ -379,7 +379,7 @@
 			}
 			else if (property.toLowerCase() == 'stops')
 			{
-				node.customData[property] = data.TripStops.length;
+				node.customData[property] = data.FieldTripStops.length;
 			}
 			else if (property.toLowerCase() == 'distance')
 			{
@@ -505,7 +505,7 @@
 		var stopNodes = tripNode.items.length > 0 ? tripNode.items : ((tripNode.children && tripNode.children.options) ? tripNode.children.options.data.items : tripNode.items);
 		stopNodes.map(function(tripStopNode)
 		{
-			var tripStopData = Enumerable.From(trip.TripStops).FirstOrDefault(null, function(p)
+			var tripStopData = Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(p)
 			{
 				if (!tripStopNode)
 				{
@@ -1057,7 +1057,7 @@
 		trips?.map(function(trip)
 		{
 			delete self.routingDisplay.expandStatusDictionary["Trip" + trip.id];
-			trip.TripStops.map(function(tripStop)
+			trip.FieldTripStops.map(function(tripStop)
 			{
 				delete self.routingDisplay.expandStatusDictionary["Stop" + tripStop.id];
 				tripStop.Students.map(function(student)
