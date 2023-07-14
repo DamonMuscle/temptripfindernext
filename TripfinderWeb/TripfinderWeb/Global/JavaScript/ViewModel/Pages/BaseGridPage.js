@@ -240,7 +240,7 @@
 			});
 		}
 
-		const isAuthorizedForChatfinder = tf.pageManager.navigationData.supportedProducts?.includes('chatfinder');
+		const isAuthorizedForChatfinder = tf.authManager.supportedProducts.some(({Name}) => (Name || "").toLowerCase() == "chatfinder");
 		self.obIsAuthorizedForChatFinder = ko.observable(isAuthorizedForChatfinder);
 	};
 
