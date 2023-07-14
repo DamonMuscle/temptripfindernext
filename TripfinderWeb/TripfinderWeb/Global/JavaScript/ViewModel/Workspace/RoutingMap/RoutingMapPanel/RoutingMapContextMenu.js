@@ -164,7 +164,7 @@
 				{
 					let trip = routingPaletteViewModel.tripViewModel.dataModel.getTripById(menuItemData.FieldTripId),
 						fieldTripStopId = menuItemData.type === "tripStop" ? menuItemData.id : menuItemData.FieldTripStopId,
-						fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.tripViewModel.dataModel.getTripStopBySequence(trip, menuItemData.Sequence) : 
+						fieldTripStop = menuItemData.Sequence ? routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStopBySequence(trip, menuItemData.Sequence) : 
 																routingPaletteViewModel.tripViewModel.dataModel.getFieldTripStop(fieldTripStopId),
 						tripName = trip.Name;
 					if (!tripItems[tripName])

@@ -3640,7 +3640,7 @@
 	};
 
 
-	RoutingDataModel.prototype.getTripStopBySequence = function(trip, sequence)
+	RoutingDataModel.prototype.getFieldTripStopBySequence = function(trip, sequence)
 	{
 		return Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(c) { return c.Sequence == sequence; });
 	};
@@ -3843,7 +3843,7 @@
 					{
 						if (minTsSequence < maxSchoolSequence)
 						{
-							var schlStop = self.getTripStopBySequence(desTrip, minTsSequence);
+							var schlStop = self.getFieldTripStopBySequence(desTrip, minTsSequence);
 							if (schlStop)
 							{
 								self.viewModel.display.changeSchoolStop(student, tripStop, schlStop, false, refreshDictionary);
@@ -3866,7 +3866,7 @@
 					{
 						var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
 						var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq > desSequence; });
-						var schlStop = self.getTripStopBySequence(desTrip, validSequence);
+						var schlStop = self.getFieldTripStopBySequence(desTrip, validSequence);
 						if (schlStop)
 						{
 							self.viewModel.display.changeSchoolStop(student, oldSchoolStop, schlStop, true, refreshDictionary);
@@ -3881,7 +3881,7 @@
 					{
 						if (maxTsSequence > minSchoolSequence)
 						{
-							var schlStop = self.getTripStopBySequence(desTrip, maxTsSequence);
+							var schlStop = self.getFieldTripStopBySequence(desTrip, maxTsSequence);
 							if (schlStop)
 							{
 								self.viewModel.display.changeSchoolStop(student, tripStop, schlStop, false, refreshDictionary);
@@ -3904,7 +3904,7 @@
 					{
 						var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
 						var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq < desSequence; });
-						var schlStop = self.getTripStopBySequence(desTrip, validSequence);
+						var schlStop = self.getFieldTripStopBySequence(desTrip, validSequence);
 						if (schlStop)
 						{
 							self.viewModel.display.changeSchoolStop(student, oldSchoolStop, schlStop, true, refreshDictionary);

@@ -66,7 +66,7 @@
 		var tripStopIdMap = {};
 		oldTrip.TripStops.forEach(function(stop)
 		{
-			tripStopIdMap[stop.id] = self.dataModel.getTripStopBySequence(newTrip, stop.Sequence).id;
+			tripStopIdMap[stop.id] = self.dataModel.getFieldTripStopBySequence(newTrip, stop.Sequence).id;
 		});
 		([this.tripPathFeatureData, this.tripBoundaryFeatureData]).forEach(function(featureData)
 		{

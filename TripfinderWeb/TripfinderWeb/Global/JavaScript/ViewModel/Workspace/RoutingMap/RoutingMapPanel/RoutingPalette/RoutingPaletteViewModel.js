@@ -224,7 +224,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(_, data)
 	{
 		const trip = this.dataModel.getTripById(data.FieldTripId);
-		const stop = this.dataModel.getTripStopBySequence(trip, data.Sequence);
+		const stop = this.dataModel.getFieldTripStopBySequence(trip, data.Sequence);
 
 		let updateStop = {...stop};
 

@@ -699,7 +699,7 @@
 			deleteTripStops.push(tripStop);
 			if (tripStop.Sequence > 1)
 			{
-				var prevStop = self.dataModel.getTripStopBySequence(trip, tripStop.Sequence - 1);
+				var prevStop = self.dataModel.getFieldTripStopBySequence(trip, tripStop.Sequence - 1);
 				if (prevStop)
 				{
 					if (changePathTripStops.length == 0)
@@ -836,11 +836,11 @@
 		var editTripPathStops = [];
 		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
 		if (!isFromBroadCastSync) self.dataModel.tripEditBroadcast.moveTripStop(trip, tripStop, newSequence);
-		var newPrevStop = newSequence > 1 ? self.dataModel.getTripStopBySequence(trip, newSequence - 1) : null;
-		var oldPrevStop = oldSequence > 1 ? self.dataModel.getTripStopBySequence(trip, oldSequence - 1) : null;
+		var newPrevStop = newSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, newSequence - 1) : null;
+		var oldPrevStop = oldSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, oldSequence - 1) : null;
 		if (oldSequence < newSequence)
 		{
-			newPrevStop = self.dataModel.getTripStopBySequence(trip, newSequence);
+			newPrevStop = self.dataModel.getFieldTripStopBySequence(trip, newSequence);
 		}
 		editTripPathStops.push(tripStop);
 		if (newPrevStop)
