@@ -36,6 +36,7 @@
 		PubSub.subscribe("on_FieldTripMap_MoveStopLocationCompleted", self.onFieldTripMapMoveStopLocationCompleted.bind(self));
 		PubSub.subscribe("on_FieldTripMap_DeleteStopLocation", self.onFieldTripMapDeleteStopLocation.bind(self));
 		PubSub.subscribe("on_FieldTripMap_DeleteStopLocationCompleted", self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
+		PubSub.subscribe("on_FieldTripMap_DirectionUpdated", self.onFieldTripMapDirectionUpdated.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
 	}
@@ -194,9 +195,9 @@
 		this.fieldTripMap?.updateSymbolColor(data);
 	}
 
-	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequencePath)
+	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
-		this.fieldTripMap?.setPathLineType(isSequencePath);
+		this.fieldTripMap?.setPathLineType(isSequenceLine);
 		this.fieldTripMap?.updateFieldTripPathVisible(this.dataModel.trips);
 	}
 
@@ -274,6 +275,11 @@
 
 			tf.loadingIndicator.tryHide();
 		});
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
+	{
+		console.log(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
