@@ -319,4 +319,12 @@
 
 		return Promise.resolve(featureCount);
 	}
+
+	Layer.prototype.setFeaturesVisible = function(features, visible)
+	{
+		for (let i = 0; i < features.length; i++)
+		{
+			features[i].visible = visible;
+		}
+	}
 })();

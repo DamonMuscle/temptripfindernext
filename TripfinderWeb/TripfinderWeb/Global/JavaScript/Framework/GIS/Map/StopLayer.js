@@ -101,6 +101,16 @@
 		this.remove(stopGraphic);
 	}
 
+	StopLayer.prototype.updateColor = function(graphics, color)
+	{
+		for (let i = 0; i < graphics.length; i++)
+		{
+			const graphic = graphics[i];
+			graphic.symbol =  this.symbol.tripStop(graphic.attributes.Sequence, color);
+			graphic.attributes.Color = color;
+		}
+	}
+
 	StopLayer.prototype.getFeatures = function()
 	{
 		return this.layer.graphics.items || [];
