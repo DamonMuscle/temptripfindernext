@@ -803,7 +803,7 @@
 				DBID = fieldTrip.DBID,
 				FieldTripId = fieldTrip.Id,
 				description = `DBID = ${DBID}, Id = ${FieldTripId}`;
-			const symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
+			const symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
 			uniqueValueInfos.push({ value, symbol, description });
 		}
 
