@@ -671,7 +671,7 @@
 				const graphics = response.results.map(item => item.graphic);
 				const stopGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripStopLayerId);
 				const data = stopGraphics.map(stop => {
-					return { DBID: stop.attributes.DBID, TripId: stop.attributes.FieldTripId, Sequence: stop.attributes.Sequence };
+					return { DBID: stop.attributes.DBID, FieldTripId: stop.attributes.FieldTripId, Sequence: stop.attributes.Sequence };
 				});
 
 				const dataWrapper = {

@@ -30,7 +30,7 @@
 			var data = dataWrapper.data?.map((item) => {
 				return {
 					type: "tripstop",
-					FieldTripId: item.TripId,
+					FieldTripId: item.FieldTripId,
 					Sequence: item.Sequence,
 					DBID: item.DBID
 				};
