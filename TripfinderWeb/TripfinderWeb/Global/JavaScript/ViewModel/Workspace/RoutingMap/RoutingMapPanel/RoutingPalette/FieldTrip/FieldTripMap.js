@@ -545,7 +545,7 @@
 				XCoord: stop.XCoord,
 				YCoord: stop.YCoord,
 			};
-			PubSub.publish("on_FieldTripMap_MoveStopLocationCompleted", data);
+			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted, data);
 		}
 		else
 		{
@@ -608,7 +608,7 @@
 		}
 
 		const data = { fieldTripStopId: stop.id };
-		PubSub.publish("on_FieldTripMap_DeleteStopLocationCompleted", data);
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data);
 
 		self.refreshFieldTripPath(fieldTrip);
 	}
@@ -724,7 +724,7 @@
 			});
 
 			const data = { fieldTrip };
-			PubSub.publish("on_FieldTripMap_DirectionUpdated", data);
+			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data);
 		}
 
 		const routePath = fieldTrip.routePath;

@@ -3630,13 +3630,13 @@
 			result.then(function()
 			{
 				self.afterDataSourceBinding(data);
-				PubSub.publish("on_FieldTripMap_Change", data);
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, data);
 			});
 		}
 		else
 		{
 			self.afterDataSourceBinding(data);
-			PubSub.publish("on_FieldTripMap_Change", data);
+			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, data);
 		}
 	}
 

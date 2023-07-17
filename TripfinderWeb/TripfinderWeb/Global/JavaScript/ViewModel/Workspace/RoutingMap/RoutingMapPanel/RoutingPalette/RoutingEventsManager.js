@@ -188,7 +188,7 @@
 				data = [data];
 			}
 
-			PubSub.publish("on_FieldTripMap_ZoomToLayers", data);
+			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, data);
 			return;
 		}
 
@@ -197,7 +197,7 @@
 			if (data && data.customData && data.customData.geometry)
 			{
 				const { longitude, latitude } = data.customData.geometry;
-				PubSub.publish("on_FieldTripMap_ZoomToStop", { longitude, latitude });
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop, { longitude, latitude });
 			}
 			else
 			{
@@ -274,7 +274,7 @@
 		tf.storageManager.save("pathLineType", type);
 		this.obSequencePath(type === 'Sequence');
 		this.dataModel.onTripPathLineDisplayChange.notify(type);
-		PubSub.publish("on_FieldTripMap_TripPathTypeChange", this.obSequencePath());
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.TripPathTypeChange, this.obSequencePath());
 	};
 
 	RoutingEventsManager.prototype._getLockedByOtherTrips = function()
@@ -877,7 +877,7 @@
 		console.log("Move Stop Location clicked", stopId, fieldTripId);
 
 		const data = { fieldTripId, stopId };
-		PubSub.publish("on_FieldTripMap_MoveStopLocation", data);
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation, data);
 	};
 
 	RoutingEventsManager.prototype.removeTripStopBoundaryClick = function(boundary)
@@ -946,7 +946,7 @@
 			if (result)
 			{
 				const data = { fieldTripId, fieldTripStopId };
-				PubSub.publish("on_FieldTripMap_DeleteStopLocation", data);
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation, data);
 
 				this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
 				this._viewModal.setMode("Routing", "Normal");

@@ -27,17 +27,17 @@
 
 		self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChange.bind(self));
 
-		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
-		PubSub.subscribe("on_FieldTripMap_ZoomToLayers", self.onFieldTripMapZoomToLayers.bind(self));
-		PubSub.subscribe("on_FieldTripMap_ZoomToStop", self.onFieldTripMapZoomToStop.bind(self));
-		PubSub.subscribe("on_FieldTripMap_ShowHide", self.onFieldTripMapShowHide.bind(self));
-		PubSub.subscribe("on_FieldTripMap_UpdateColor", self.onFieldTripMapUpdateColor.bind(self));
-		PubSub.subscribe("on_FieldTripMap_TripPathTypeChange", self.onFieldTripMapTripPathTypeChange.bind(self));
-		PubSub.subscribe("on_FieldTripMap_MoveStopLocation", self.onFieldTripMapMoveStopLocation.bind(self));
-		PubSub.subscribe("on_FieldTripMap_MoveStopLocationCompleted", self.onFieldTripMapMoveStopLocationCompleted.bind(self));
-		PubSub.subscribe("on_FieldTripMap_DeleteStopLocation", self.onFieldTripMapDeleteStopLocation.bind(self));
-		PubSub.subscribe("on_FieldTripMap_DeleteStopLocationCompleted", self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
-		PubSub.subscribe("on_FieldTripMap_DirectionUpdated", self.onFieldTripMapDirectionUpdated.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.Change, self.onFieldTripMapChange.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.onFieldTripMapZoomToLayers.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop, self.onFieldTripMapZoomToStop.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ShowHide, self.onFieldTripMapShowHide.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.UpdateColor, self.onFieldTripMapUpdateColor.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.TripPathTypeChange, self.onFieldTripMapTripPathTypeChange.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation, self.onFieldTripMapMoveStopLocation.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted, self.onFieldTripMapMoveStopLocationCompleted.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation, self.onFieldTripMapDeleteStopLocation.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, self.onFieldTripMapDirectionUpdated.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
 	}
@@ -380,16 +380,17 @@
 			this.fieldTripMap = null;
 		}
 
-		PubSub.unsubscribe("on_FieldTripMap_Change");
-		PubSub.unsubscribe("on_FieldTripMap_ZoomToLayers");
-		PubSub.unsubscribe("on_FieldTripMap_ZoomToStop");
-		PubSub.unsubscribe("on_FieldTripMap_ShowHide");
-		PubSub.unsubscribe("on_FieldTripMap_UpdateColor");
-		PubSub.unsubscribe("on_FieldTripMap_TripPathTypeChange");
-		PubSub.unsubscribe("on_FieldTripMap_MoveStopLocation");
-		PubSub.unsubscribe("on_FieldTripMap_MoveStopLocationCompleted");
-		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocation");
-		PubSub.unsubscribe("on_FieldTripMap_DeleteStopLocationCompleted");
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.Change);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ShowHide);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.UpdateColor);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.TripPathTypeChange);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocationCompleted);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated);
 		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
 		PubSub.unsubscribe("on_MapCanvas_MapViewClick");
 

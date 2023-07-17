@@ -3947,7 +3947,7 @@
 		self.onTripColorChangeEvent.notify({ FieldTripId: tripId, color: color });
 		// self.routingStudentManager.refreshAssignStudents();
 		const fieldTrip = self.trips.filter(item => item.id === tripId)[0];
-		PubSub.publish("on_FieldTripMap_UpdateColor", fieldTrip);
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.UpdateColor, fieldTrip);
 	};
 
 	RoutingDataModel.prototype.bindColor = function(force = false)
@@ -3998,7 +3998,7 @@
 		self.onChangeTripVisibilityEvent.notify({ TripIds: tripIds, visible: visible });
 
 		const trips = self.trips.filter(trip => tripIds.includes(trip.id));
-		PubSub.publish("on_FieldTripMap_ShowHide", trips);
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ShowHide, trips);
 		// self.routingStudentManager.refreshAssignStudents();
 	};
 
