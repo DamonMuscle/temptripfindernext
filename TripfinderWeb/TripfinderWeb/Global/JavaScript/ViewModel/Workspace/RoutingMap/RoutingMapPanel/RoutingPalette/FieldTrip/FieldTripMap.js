@@ -496,6 +496,17 @@
 
 	//#region Field Trip Stop
 
+	//#region Edit Stop
+	FieldTripMap.prototype.onStopsChange = async function(data)
+	{
+		const self = this;
+		(data.trips || []).forEach(trip =>
+		{
+			self.refreshFieldTripPath(trip);
+		});
+	}
+	//#endregion
+
 	//#region Move Stop Location
 
 	FieldTripMap.prototype.moveStopLocation = async function(fieldTrip, stop, sketchTool)
@@ -714,7 +725,7 @@
 				const stop = fieldTripStops[i];
 				Name = stop.Street;
 				Sequence = stop.Sequence;
-				CurbApproach = stop.VehicleCurbApproach;
+				CurbApproach = stop.vehicleCurbApproach;
 				attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
 				graphics.push(self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes));
 			}
@@ -1092,7 +1103,7 @@
 		{
 			const stop = fieldTripStops[i];
 			const stopObject = {
-				curbApproach: stop.VehicleCurbApproach,
+				curbApproach: stop.vehicleCurbApproach,
 				name: stop.Street,
 				sequence: stop.Sequence,
 				longitude: stop.XCoord,

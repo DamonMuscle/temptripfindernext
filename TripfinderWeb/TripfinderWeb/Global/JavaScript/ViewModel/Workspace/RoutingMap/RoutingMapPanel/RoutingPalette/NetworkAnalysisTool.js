@@ -190,7 +190,8 @@
 			var _afterStopToInsert = afterStop ? afterStop : trip.FieldTripStops[tripStop.Sequence];
 			if (_afterStopToInsert) stops.push(_afterStopToInsert);
 		}
-		return self.refreshTripByMultiStops(stops, false, true, isCurbApproachChange);
+		// return self.refreshTripByMultiStops(stops, false, true, isCurbApproachChange);
+		return Promise.resolve(stops); // does not refresh the trip stops here, FieldTripMap will refresh the trip including all trip stops
 	};
 
 	// calculate the start sequence and end sequene for a new stop to be smart inserted into the trip.

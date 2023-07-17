@@ -25,6 +25,8 @@
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
+		self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChange.bind(self));
+
 		PubSub.subscribe("on_FieldTripMap_Change", self.onFieldTripMapChange.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ZoomToLayers", self.onFieldTripMapZoomToLayers.bind(self));
 		PubSub.subscribe("on_FieldTripMap_ZoomToStop", self.onFieldTripMapZoomToStop.bind(self));
@@ -304,6 +306,33 @@
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, event)
 	{
 		this.fieldTripMap?.onMapClickEvent(event);
+	}
+
+	RoutingPaletteViewModel.prototype.onTripStopsChange = function(event, data)
+	{
+		const self = this;
+		const stops = [].concat(...(data.add || [])).concat(...(data.edit || []));
+		const tripIds = [];
+		stops.forEach(stop =>
+		{
+			if (stop.FieldTripId && tripIds.indexOf(stop.FieldTripId) === -1)
+			{
+				tripIds.push(stop.FieldTripId);
+			}
+		});
+
+		const trips = [];
+		tripIds.forEach((id) =>
+		{
+			const trip = self.dataModel.getTripById(id);
+			if (trip)
+			{
+				trips.push(trip);
+			}
+		});
+
+		data.trips = trips;
+		this.fieldTripMap?.onStopsChange(data);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()
