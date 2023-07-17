@@ -32,7 +32,7 @@
 		const DEFAULT_STOP_COLOR = "#FFFFFF", DEFAULT_STOP_SEQUENCE = 0;
 		const Color = attributes.Color || DEFAULT_STOP_COLOR;
 		const Sequence = attributes.Sequence || DEFAULT_STOP_SEQUENCE;
-		const symbol = this.symbolHelper.tripStop(Sequence, Color);
+		const symbol = this.getStopSymbol(Sequence, Color);
 		const graphic = this.createPointGraphic(longitude, latitude, symbol, attributes);
 		return graphic;
 	}
@@ -105,7 +105,7 @@
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol =  this.symbol.tripStop(graphic.attributes.Sequence, color);
+			graphic.symbol = this.getStopSymbol(graphic.attributes.Sequence, color);
 			graphic.attributes.Color = color;
 		}
 	}
@@ -118,6 +118,11 @@
 	StopLayer.prototype.getCloneFeatures = function()
 	{
 		return this.layer.graphics.clone().items || [];
+	}
+
+	StopLayer.prototype.getStopSymbol = function(sequence, color)
+	{
+		return this.symbolHelper.tripStop(sequence, color);
 	}
 
 	StopLayer.prototype._getGeocodeStopAddress = async function(longitude, latitude)

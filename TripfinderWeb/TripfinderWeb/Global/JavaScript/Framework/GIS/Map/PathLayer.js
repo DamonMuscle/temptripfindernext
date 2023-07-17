@@ -51,4 +51,13 @@
 	{
 		return this.layer.graphics.items || [];
 	}
+
+	PathLayer.prototype.dispose = function()
+	{
+		if (this.symbolHelper)
+		{
+			this.symbolHelper.dispose();
+			this.symbolHelper = null;
+		}
+	}
 })();

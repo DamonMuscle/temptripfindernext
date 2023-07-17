@@ -602,7 +602,7 @@
 				else if (attributes.Sequence > sequence)
 				{
 					attributes.Sequence -= 1;
-					stop.symbol = self.symbol.tripStop(attributes.Sequence, attributes.Color);
+					stop.symbol = self.fieldTripStopLayerInstance.getStopSymbol(attributes.Sequence, attributes.Color);
 				}
 			}
 		}
