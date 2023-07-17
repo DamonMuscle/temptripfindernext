@@ -22,7 +22,6 @@
 		configurable: false
 	});
 
-
 	StopLayer.prototype.create = function()
 	{
 		TF.GIS.Layer.prototype.create.call(this, this.LAYER_TYPE.GRAPHIC);

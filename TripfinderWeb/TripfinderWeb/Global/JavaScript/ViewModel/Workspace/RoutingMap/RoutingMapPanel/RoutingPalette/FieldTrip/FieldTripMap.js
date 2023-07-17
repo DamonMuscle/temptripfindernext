@@ -745,8 +745,8 @@
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
 			attributes = { DBID, FieldTripId, Color };
 
-		const graphic = this.fieldTripPathLayerInstance?.createPath(sequenceLine, attributes);
-		this.fieldTripPathLayerInstance?.addPath(graphic, afterAdd);
+		const graphic = this.fieldTripSequenceLineLayerInstance?.createPath(sequenceLine, attributes);
+		this.fieldTripSequenceLineLayerInstance?.addPath(graphic, afterAdd);
 	}
 
 	FieldTripMap.prototype.sortMapFeatures = async function(fieldTrips)
