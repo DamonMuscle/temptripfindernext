@@ -32,7 +32,6 @@
 
 		this.mapInstance = mapInstance;
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
-		this.symbol = new TF.Map.Symbol();
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 		this._mapEditingFeatures = {
 			movingStop: null
@@ -357,7 +356,7 @@
 		const layerRenderer = layerInstance.layer.renderer.clone();
 		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === description)[0];
 		valueInfo.value = color;
-		valueInfo.symbol = arrowOnPath ? this.symbol.arrow(color) : this.symbol.arrowOnSide(color);
+		valueInfo.symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
 
 		layerInstance.layer.renderer = layerRenderer;
 	}
@@ -795,7 +794,7 @@
 				DBID = fieldTrip.DBID,
 				FieldTripId = fieldTrip.Id,
 				description = `DBID = ${DBID}, Id = ${FieldTripId}`;
-			const symbol = arrowOnPath ? this.symbol.arrow(value) : this.symbol.arrowOnSide(value);
+			const symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
 			uniqueValueInfos.push({ value, symbol, description });
 		}
 

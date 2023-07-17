@@ -97,6 +97,11 @@
 		return arrows;
 	}
 
+	ArrowLayerHelper.prototype.getArrowSymbol = function(arrowOnPath, color)
+	{
+		return arrowOnPath ? this.symbol.arrow(color) : this.symbol.arrowOnSide(color);
+	}
+
 	ArrowLayerHelper.prototype.dispose = function()
 	{
 		if (this.symbol)
