@@ -651,7 +651,7 @@
 				const graphics = response.results.map(item => item.graphic);
 				const stopGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripStopLayerId);
 				const data = stopGraphics.map(stop => {
-					return { DBID: stop.attributes.DBID, FieldTripId: stop.attributes.FieldTripId, Sequence: stop.attributes.Sequence };
+					return { DBID: stop.attributes.DBID, FieldTripId: stop.attributes.FieldTripId, id: stop.attributes.id, Sequence: stop.attributes.Sequence };
 				});
 
 				const dataWrapper = {
@@ -678,17 +678,19 @@
 			Color = color,
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip);
 
-		let Sequence = null, Name = null, CurbApproach = 0, attributes = null;
+		let Sequence = null, Name = null, CurbApproach = 0, attributes = null, id = 0;
 		if (fieldTrip.FieldTripStops.length === 0)
 		{
 			Sequence = 1;
+			id = TF.createId();
 			Name = fieldTrip.SchoolName;
-			attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
+			attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 			const school = self.fieldTripStopLayerInstance?.createStop(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, attributes);
 
 			Sequence = 2;
+			id = TF.createId();
 			Name = fieldTrip.Destination;
-			attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
+			attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 			const destination = self.fieldTripStopLayerInstance?.createStop(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, attributes);
 
 			await self.fieldTripStopLayerInstance?.addStops([destination, school]);
@@ -700,10 +702,11 @@
 			for (let i = fieldTripStops.length - 1; i >= 0; i--)
 			{
 				const stop = fieldTripStops[i];
+				id = stop.id;
 				Name = stop.Street;
 				Sequence = stop.Sequence;
 				CurbApproach = stop.vehicleCurbApproach;
-				attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
+				attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 				graphics.push(self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes));
 			}
 

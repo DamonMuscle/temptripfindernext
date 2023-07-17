@@ -31,6 +31,7 @@
 				return {
 					type: "tripstop",
 					FieldTripId: item.FieldTripId,
+					id: item.id,
 					Sequence: item.Sequence,
 					DBID: item.DBID
 				};
