@@ -1084,7 +1084,7 @@
 			{
 				const stop = fieldTripStops[i];
 				const stopObject = {
-					curbApproach: networkService.CURB_APPROACH.RIGHT_SIDE,
+					curbApproach: stop.VehicleCurbApproach,
 					name: stop.Street,
 					sequence: stop.Sequence,
 					longitude: stop.XCoord,
