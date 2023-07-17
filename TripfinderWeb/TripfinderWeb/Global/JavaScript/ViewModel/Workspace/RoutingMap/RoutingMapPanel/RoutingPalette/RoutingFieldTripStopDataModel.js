@@ -540,7 +540,7 @@
 			}
 			self.insertToRevertData(data);
 			$.extend(data, modifyData, { Students: data.Students });
-			self.bindCoordinate(data);
+
 			if (modifyData.geometry)
 			{
 				data.geometry = TF.cloneGeometry(modifyData.geometry);
