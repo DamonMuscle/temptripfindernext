@@ -11,6 +11,8 @@
 		MoveStopLocationCompleted: "on_FieldTripMap_MoveStopLocationCompleted",
 		DeleteStopLocation: "on_FieldTripMap_DeleteStopLocation",
 		DeleteStopLocationCompleted: "on_FieldTripMap_DeleteStopLocationCompleted",
-		DirectionUpdated: "on_FieldTripMap_DirectionUpdated"
+		DirectionUpdated: "on_FieldTripMap_DirectionUpdated",
+		InitMapCanvasObject: "on_FieldTripMap_onMapClick_InitMapCanvasObject",
+		FieldTripStopClick: "on_FieldTripMap_onMapClick_FieldTripStop",
 	};
 })();

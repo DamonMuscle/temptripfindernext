@@ -8,9 +8,9 @@
 		
 		self.mapCanvas = null;
 
-		PubSub.subscribe("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", FieldTripMap_onMapClick_InitRoutingPaletteViewModel);
 		PubSub.subscribe("DocumentManagerViewModel_TabChange", getCurrentTabRouteState);
-		PubSub.subscribe("FieldTripMap_onMapClick_FieldTripStop", onFieldTripMapClick_FieldTripStop);
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.InitMapCanvasObject, onFieldTripMapClick_InitMapCanvasObject);
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, onFieldTripMapClick_FieldTripStop);
 
 		function getCurrentTabRouteState(event, document)
 		{
@@ -18,7 +18,7 @@
 		}
 
 
-		function FieldTripMap_onMapClick_InitRoutingPaletteViewModel(event, mapCanvas)
+		function onFieldTripMapClick_InitMapCanvasObject(event, mapCanvas)
 		{
 			self.mapCanvas = mapCanvas;
 		}
@@ -47,9 +47,6 @@
 			contextMenu.showMenu(dataWrapper.event.native, null, 75, ".map-page");
 
 		}
-
-
-		
 
 		function setFontToBold(menuItem)
 		{

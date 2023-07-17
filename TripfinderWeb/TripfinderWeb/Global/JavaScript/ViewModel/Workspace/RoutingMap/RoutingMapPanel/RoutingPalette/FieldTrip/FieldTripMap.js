@@ -660,7 +660,7 @@
 				};
 
 				console.log(dataWrapper);
-				PubSub.publish("FieldTripMap_onMapClick_FieldTripStop", dataWrapper);
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, dataWrapper);
 			}
 		}
 	}

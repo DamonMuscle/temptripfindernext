@@ -1091,7 +1091,7 @@
 				{
 					if (!self.prevent && self._lastPreventKey == lastPreventKey)
 					{
-						PubSub.publish("FieldTripMap_onMapClick_InitRoutingPaletteViewModel", self);
+						PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.InitMapCanvasObject, self);
 					}
 				}(self._lastPreventKey), 200);
 			}
