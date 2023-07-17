@@ -737,10 +737,13 @@
 	{
 		if (!fieldTrip.routePath)
 		{
-			const routeResult = await this.calculateRoute(fieldTrip);
-			fieldTrip.routePath = this._computeRoutePath(routeResult);
-			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
-			fieldTrip.directions = this._computeDirections(routeResult);
+			const routeResults = await this.calculateRoute(fieldTrip);
+
+			routeResults.forEach(routeResult => {
+				fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];
+				fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
+				fieldTrip.directions = this._computeDirections(routeResult);
+			});
 
 			const data = { fieldTrip };
 			PubSub.publish("on_FieldTripMap_DirectionUpdated", data);
@@ -1056,42 +1059,56 @@
 
 	FieldTripMap.prototype.calculateRoute = async function(fieldTrip)
 	{
-		const networkService = TF.GIS.Analysis.getInstance().networkService;
-		const stops = [], MIN_ROUTING_STOPS = 2;
-
-		if (fieldTrip.FieldTripStops.length === 0)
+		try
 		{
-			const stop1 = {
-				curbApproach: networkService.CURB_APPROACH.RIGHT_SIDE,
-				name: fieldTrip.SchoolName,
-				sequence: 1,
-				longitude: fieldTrip.SchoolXCoord,
-				latitude: fieldTrip.SchoolYCoord,
-			}, stop2 = {
-				curbApproach: networkService.CURB_APPROACH.RIGHT_SIDE,
-				name: fieldTrip.Destination,
-				sequence: 2,
-				longitude: fieldTrip.FieldTripDestinationXCoord,
-				latitude: fieldTrip.FieldTripDestinationYCoord,
-			};
-			stops.push(stop1);
-			stops.push(stop2);
+			return [await this.calculateRouteByStops(fieldTrip.FieldTripStops)];
 		}
-		else
+		catch (ex)
 		{
-			const fieldTripStops = fieldTrip.FieldTripStops;
-			for (let i = 0; i < fieldTripStops.length; i++)
+			if(ex?.unlocatedStopNames?.length)
 			{
-				const stop = fieldTripStops[i];
-				const stopObject = {
-					curbApproach: stop.VehicleCurbApproach,
-					name: stop.Street,
-					sequence: stop.Sequence,
-					longitude: stop.XCoord,
-					latitude: stop.YCoord,
+				const indexList = ex?.unlocatedStopNames?.reduce(function(result, stopName){
+					const index = fieldTrip.FieldTripStops.findIndex(x=>x.Street == stopName);
+					const temp = [...result, index];
+					return index >= 0 ? [...new Set(temp)] : result;
+				}, []);
+				indexList.sort((a,b) => a-b);
+
+				tf.promiseBootbox.alert(`Cannot solve path. No solution found from Stop ${fieldTrip.FieldTripStops[indexList[0]].Sequence - 1} to Stop ${fieldTrip.FieldTripStops[indexList[0]].Sequence + 1}`)
+
+				const chunks = [];
+				for(let i = 0; i < indexList.length; i++)
+				{
+					const lowBound = i === 0 ? 0 : indexList[i-1];
+					const highBound = indexList[i];
+					chunks.push(fieldTrip.FieldTripStops.slice(lowBound, highBound));
+					if(highBound + 1 <= fieldTrip.FieldTripStops.length -1)
+					{
+						chunks.push(fieldTrip.FieldTripStops.slice(highBound + 1));
+					}
 				}
-				stops.push(stopObject);
+
+				return await Promise.all(chunks.filter(c=>c,length>1).map(c=>this.calculateRouteByStops(c)));
 			}
+		}
+	}
+
+	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTripStops)
+	{
+		const networkService = TF.GIS.Analysis.getInstance().networkService,
+		stops = [], MIN_ROUTING_STOPS = 2;
+
+		for (let i = 0; i < fieldTripStops.length; i++)
+		{
+			const stop = fieldTripStops[i];
+			const stopObject = {
+				curbApproach: stop.VehicleCurbApproach,
+				name: stop.Street,
+				sequence: stop.Sequence,
+				longitude: stop.XCoord,
+				latitude: stop.YCoord,
+			}
+			stops.push(stopObject);
 		}
 
 		if (stops.length < MIN_ROUTING_STOPS)
@@ -1104,10 +1121,9 @@
 			impedanceAttribute: null,
 			stops: stopFeatureSet,
 		};
-		const response = await networkService.solveRoute(params);
 
-		const result = response?.results?.routeResults[0];
-		return result;
+		const response = await networkService.solveRoute(params);
+		return response?.results?.routeResults[0];
 	}
 
 	//#endregion

@@ -113,10 +113,13 @@
 					self.clearOnlineToken(esriConfig);
 					resolve( { results, errorMessage });
 				}).catch((error) => {
-					errorMessage = `RouteTask.solve failed. ${JSON.stringify(params)}`;
-					
 					self.clearOnlineToken(esriConfig);
-					reject({ results, errorMessage });
+
+					const unlocatedStopNames = (error?.details?.messages || []).reduce((result, message) => {
+						const mateched = (params.stops.features || []).find(stop => message === `Location "${stop.attributes.Name}" in "Stops" is unlocated.  Invalid locations detected.`);
+						return mateched ? result.concat(mateched.attributes.Name) : result;
+					}, []);
+					reject({ results, originalParameters: params, ...error, unlocatedStopNames });
 				});
 			});
 		});
