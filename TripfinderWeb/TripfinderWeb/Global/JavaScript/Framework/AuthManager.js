@@ -209,46 +209,50 @@
 					noInterupt: true
 				}
 			})
-				.then(function(apiResponse)
-				{
-					self.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
-					tf.userEntity = apiResponse.Items[0].UserEntity;
-					return tf.authManager.getPurchasedProducts()
-						.then(function(purchasedProducts)
-						{
-							if (!purchasedProducts.find(x => x.Name == 'Tripfinder'))
-							{
-								return self._loginUseModal(loginViewModal);
-							}
-
-							var ft1 = self.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
-							var ft2 = self.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
-							var ft3 = self.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
-							var ft4 = self.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
-							var ft5 = self.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
-							var ft = ft1 || ft2 || ft3 || ft4 || ft5;
-
-							var flt = self.authorizationInfo.isAuthorizedFor("filters", "read");
-
-							var pfiledtrip = self.authorizationInfo.isAuthorizedFor("filedtrip", "read");
-
-							if (!(ft || pfiledtrip))
-							{
-								return self._loginUseModal(loginViewModal);
-							}
-
-							tf.entStorageManager.save("isLoggedin", true);
-							self.obIsLogIn(true);
-						});
-
-				}).catch(function(apiResponse)
-				{
-					if (apiResponse.StatusCode == 401)
+			.then(function(apiResponse)
+			{
+				self.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
+				tf.userEntity = apiResponse.Items[0].UserEntity;
+				return tf.authManager.getPurchasedProducts()
+					.then(function(purchasedProducts)
 					{
-						return self._loginUseModal(loginViewModal, "Have no permission to this product");
-					}
-				});
+						if (!purchasedProducts.find(x => x.Name == 'Tripfinder'))
+						{
+							return self._loginUseModal(loginViewModal);
+						}
 
+						var ft1 = self.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
+						var ft2 = self.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
+						var ft3 = self.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
+						var ft4 = self.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
+						var ft5 = self.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
+						var ft = ft1 || ft2 || ft3 || ft4 || ft5;
+
+						var flt = self.authorizationInfo.isAuthorizedFor("filters", "read");
+
+						var pfiledtrip = self.authorizationInfo.isAuthorizedFor("filedtrip", "read");
+
+						if (!(ft || pfiledtrip))
+						{
+							return self._loginUseModal(loginViewModal);
+						}
+
+						tf.entStorageManager.save("isLoggedin", true);
+						self.obIsLogIn(true);
+					});
+
+			})
+			.catch(function(apiResponse)
+			{
+				if (apiResponse.StatusCode == 401)
+				{
+					return self._loginUseModal(loginViewModal, "Have no permission to this product");
+				}
+			})
+			.finally(function()
+			{
+				tf.loadingIndicator.hideByName("authorizing");
+			});
 		});
 	};
 
