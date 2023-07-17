@@ -525,6 +525,40 @@
 		return layerInstance;
 	}
 
+	Map.prototype.addLayerInstance = function(layerInstance, options)
+	{
+		if (this.map === null)
+		{
+			console.warn(`this.map is null, return.`);
+			return null;
+		}
+
+		const defaultOptions = {
+			eventHandlers: {
+				onLayerCreated: null
+			}
+		};
+
+		const settings = Object.assign({}, defaultOptions, options);
+		const layer = layerInstance.layer;
+
+		if (settings.eventHandlers.onLayerCreated)
+		{
+			this.map.mapView.whenLayerView(layer).then((result) => settings.eventHandlers.onLayerCreated.call(result));
+		}
+
+		if (layerInstance.index && layerInstance.index >= 0)
+		{
+			this.map.add(layer, layerInstance.index);
+		}
+		else
+		{
+			this.map.add(layer);
+		}
+
+		this.mapLayerInstances.push(layerInstance);
+	}
+
 	Map.prototype.removeLayer = function(layerId)
 	{
 		const self = this;

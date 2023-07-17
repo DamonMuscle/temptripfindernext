@@ -39,6 +39,9 @@
 		};
 		this.initLayers();
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
+
+		PubSub.subscribe("GISLayer.StopLayer.MoveStopCompleted", this.onStopLayerMoveStopCompleted.bind(this));
+		PubSub.subscribe("GISLayer.StopLayer.MoveStopCompleted_UpdateDataModel", this.onStopLayerMoveStopCompleted_UpdateDataModel.bind(this));
 	}
 
 	//#region Property
@@ -116,7 +119,16 @@
 			self.fieldTripSequenceLineLayerInstance = addFieldTripMapLayer(RoutingPalette_FieldTripSequenceLineLayerId, RoutingPalette_FieldTripSequenceLineLayer_Index, resolve);
 			self.defineReadOnlyProperty("fieldTripSequenceLineLayerInstance", this.fieldTripSequenceLineLayerInstance);
 
-			self.fieldTripStopLayerInstance = addFieldTripMapLayer(RoutingPalette_FieldTripStopLayerId, RoutingPalette_FieldTripStopLayer_Index, resolve);
+
+			self.fieldTripStopLayerInstance = new TF.GIS.Layer.StopLayer({
+				id: RoutingPalette_FieldTripStopLayerId,
+				index: RoutingPalette_FieldTripStopLayer_Index
+			});
+			self.mapInstance.addLayerInstance(self.fieldTripStopLayerInstance, {
+				eventHandlers: {
+					onLayerCreated: onLayerCreatedHandler.bind(self, resolve)
+				}
+			});
 			self.defineReadOnlyProperty("fieldTripStopLayerInstance", this.fieldTripStopLayerInstance);
 		});
 	}
@@ -504,62 +516,56 @@
 
 		console.log(stopGraphic.attributes.Name);
 
-		this.mapEditingFeatures.movingStop = {
+		self.mapEditingFeatures.movingStop = {
 			fieldTrip: fieldTrip,
-			graphic: stopGraphic,
 			stop: stop
 		};
 
-		const options = {
-			moveDuplicateNode: self._getMoveDuplicateNode.bind(self),
-			isFeatureLayer: false,
-		};
-		sketchTool.transform(stopGraphic.clone(), options, self.moveStopLocationCallback.bind(self));
+		self.fieldTripStopLayerInstance?.moveStop(stopGraphic, sketchTool);
 
 		stopGraphic.visible = false;
 	}
-	
-	FieldTripMap.prototype.moveStopLocationCallback = async function(graphics)
-	{
-		if (!graphics)
-		{
-			return;
-		}
 
+	FieldTripMap.prototype.onStopLayerMoveStopCompleted = function(_, data)
+	{
 		const self = this,
 			fieldTrip = self.mapEditingFeatures.movingStop.fieldTrip,
 			movingStop = self.mapEditingFeatures.movingStop.stop,
-			movingStopGraphic = self.mapEditingFeatures.movingStop.graphic;
+			{ longitude, latitude, geocodeStreet } = data;
 
-		// get updated graphic
-		let updateGraphic = null;
-		graphics.forEach(function(graphic)
-		{
-			if (graphic.attributes.FieldTripId === movingStopGraphic.attributes.FieldTripId &&
-				graphic.attributes.Sequence === movingStopGraphic.attributes.Sequence)
-			{
-				updateGraphic = graphic;
-				return;
-			}
-		});
-
-		let { longitude, latitude } = updateGraphic.geometry;
-		const geocodeStreet = await this._getGeocodeStopAddress(longitude, latitude);
 		if (geocodeStreet !== "")
 		{
 			movingStop.Street = geocodeStreet;
-			updateGraphic.attributes.Name = geocodeStreet;
 		}
 		movingStop.XCoord = +longitude.toFixed(6);
 		movingStop.YCoord = +latitude.toFixed(6);
 
-		// remove previous stop graphic.
-		self.fieldTripStopLayerInstance.remove(movingStopGraphic);
-
-		// STOP moving
-		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
-
 		self.refreshFieldTripPath(fieldTrip);
+	}
+
+	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(_, data)
+	{
+		const stop = this.mapEditingFeatures.movingStop.stop,
+			graphic = data.graphic,
+			attributes = graphic.attributes;
+		if (stop.FieldTripId === attributes.FieldTripId && stop.Sequence === attributes.Sequence)
+		{
+			const data = {
+				DBID: attributes.DBID,
+				FieldTripId: stop.FieldTripId,
+				Sequence: stop.Sequence,
+				Name: stop.Street,
+				XCoord: stop.XCoord,
+				YCoord: stop.YCoord,
+			};
+			PubSub.publish("on_FieldTripMap_MoveStopLocationCompleted", data);
+		}
+		else
+		{
+			console.warn(`updateDataModel: stop does not match!`);
+		}
+
+		return;
 	}
 
 	FieldTripMap.prototype.clearStops = function(fieldTrip, stops = null)
@@ -575,23 +581,9 @@
 			{
 				const sequence = stop.Sequence,
 					stopFeature = fieldTripStops.find(item => item.attributes.Sequence === sequence);
-				self.fieldTripStopLayerInstance.remove(stopFeature);
+				self.fieldTripStopLayerInstance.deleteStop(stopFeature);
 			});
 		}
-	}
-
-	FieldTripMap.prototype._getGeocodeStopAddress = async function(longitude, latitude)
-	{
-		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
-		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
-
-		if (geocodeResult?.errorMessage)
-		{
-			console.error(geocodeResult.errorMessage);
-			return null;
-		}
-
-		return geocodeResult?.attributes.Address;
 	}
 
 	//#endregion
@@ -618,7 +610,7 @@
 			{
 				if (attributes.Sequence === sequence)
 				{
-					self.fieldTripStopLayerInstance.layer.remove(stop);
+					self.fieldTripStopLayerInstance.deleteStop(stop);
 				}
 				else if (attributes.Sequence > sequence)
 				{
@@ -687,6 +679,7 @@
 
 	//#endregion
 
+	//#endregion
 
 	//#region Map Visualization
 
@@ -697,22 +690,20 @@
 			Color = color,
 			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip);
 
-		let Sequence = null, Name = null, CurbApproach = 0, attributes = null, symbol = null;
+		let Sequence = null, Name = null, CurbApproach = 0, attributes = null;
 		if (fieldTrip.FieldTripStops.length === 0)
 		{
 			Sequence = 1;
 			Name = fieldTrip.SchoolName;
 			attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
-			symbol = self.symbol.tripStop(Sequence, color);
-			const school = self.fieldTripStopLayerInstance?.createPointGraphic(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, symbol, attributes);
+			const school = self.fieldTripStopLayerInstance?.createStop(fieldTrip.SchoolXCoord, fieldTrip.SchoolYCoord, attributes);
 
 			Sequence = 2;
 			Name = fieldTrip.Destination;
 			attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
-			symbol = self.symbol.tripStop(Sequence, color);
-			const destination = self.fieldTripStopLayerInstance?.createPointGraphic(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, symbol, attributes);
+			const destination = self.fieldTripStopLayerInstance?.createStop(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, attributes);
 
-			await self.fieldTripStopLayerInstance?.addGraphicsByOrder([destination, school]);
+			await self.fieldTripStopLayerInstance?.addStops([destination, school]);
 		}
 		else
 		{
@@ -725,11 +716,10 @@
 				Sequence = stop.Sequence;
 				CurbApproach = stop.VehicleCurbApproach;
 				attributes = {DBID, FieldTripId, Name, CurbApproach, Sequence, Color};
-				symbol = self.symbol.tripStop(Sequence, color);
-				graphics.push(self.fieldTripStopLayerInstance?.createPointGraphic(stop.XCoord, stop.YCoord, symbol, attributes));
+				graphics.push(self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes));
 			}
 
-			await self.fieldTripStopLayerInstance?.addGraphicsByOrder(graphics);
+			await self.fieldTripStopLayerInstance?.addStops(graphics);
 		}
 	}
 
@@ -779,7 +769,7 @@
 		}).sort((a, b)=> a.Name.localeCompare(b.Name));
 		const fieldTripIds = fieldTripNames.map(item => item.FieldTripId);
 
-		const fieldTripStops = this.fieldTripStopLayerInstance?.layer.graphics.clone().items || [];
+		const fieldTripStops = this.fieldTripStopLayerInstance?.getCloneFeatures();
 		if (fieldTripStops.length === 0)
 		{
 			return;
@@ -797,7 +787,7 @@
 		});
 
 		await self.fieldTripStopLayerInstance?.clearLayer();
-		await self.fieldTripStopLayerInstance?.addGraphicsByOrder(fieldTripStops);
+		await self.fieldTripStopLayerInstance?.addStops(fieldTripStops);
 	}
 
 	//#region - Path Arrows
@@ -1128,61 +1118,11 @@
 
 	//#endregion
 
-	//#region Settings for sketchTool
-
-	FieldTripMap.prototype._getMoveDuplicateNode = function()
-	{
-		return true;
-	}
-
-	FieldTripMap.prototype.forceStopToJunction = function(fieldTripStop)
-	{
-		return Promise.resolve(fieldTripStop)
-	}
-
-	FieldTripMap.prototype.getHeartBoundaryId = function()
-	{
-		return null;
-	}
-
-	FieldTripMap.prototype.updateDataModel = function(graphics)
-	{
-		if (graphics && graphics.length !== 1)
-		{
-			console.warn(`updateDataModel: Multiple graphics updated! Failed.`);
-			return;
-		}
-
-		const stop = this.mapEditingFeatures.movingStop.stop,
-			graphic = graphics[0],
-			attributes = graphic.attributes;
-		if (stop.FieldTripId === attributes.FieldTripId && stop.Sequence === attributes.Sequence)
-		{
-			const data = {
-				DBID: attributes.DBID,
-				FieldTripId: stop.FieldTripId,
-				Sequence: stop.Sequence,
-				Name: stop.Street,
-				XCoord: stop.XCoord,
-				YCoord: stop.YCoord,
-			};
-			PubSub.publish("on_FieldTripMap_MoveStopLocationCompleted", data);
-		}
-		else
-		{
-			console.warn(`updateDataModel: stop does not match!`);
-		}
-
-		return;
-	}
-
-	//#endregion
-
 	//#region Private Methods
 
 	FieldTripMap.prototype._getStopFeatures = function()
 	{
-		return this.fieldTripStopLayerInstance?.layer.graphics.items || [];
+		return this.fieldTripStopLayerInstance?.getFeatures();
 	}
 
 	FieldTripMap.prototype._getPathFeatures = function()
@@ -1291,6 +1231,9 @@
 			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
 			self.fieldTripSequenceLineArrowLayerInstance = null;
 		}
+
+		PubSub.unsubscribe("GISLayer.StopLayer.MoveStopCompleted");
+		PubSub.unsubscribe("GISLayer.StopLayer.MoveStopCompleted_UpdateDataModel");
 	}
 
 })();

@@ -19,6 +19,7 @@
 	{
 		this.settings = Object.assign({}, defaultOptions, options);
 		this.defineReadOnlyProperty('index', this.settings.index);
+		this.defineReadOnlyProperty('LAYER_TYPE', LAYER_TYPE);
 		this.create(layerType);
 	}
 
