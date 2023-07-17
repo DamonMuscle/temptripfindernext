@@ -8,7 +8,7 @@
 		TF.GIS.Layer.call(self, options);
 		
 		self.symbolHelper = new TF.Map.Symbol();
-		self.editing = {
+		self._editing = {
 			movingStop: null
 		};
 	}
@@ -17,7 +17,7 @@
 	StopLayer.prototype.constructor = StopLayer;
 
 	Object.defineProperty(StopLayer.prototype, 'editing', {
-		get() { return this.editing; },
+		get() { return this._editing; },
 		enumerable: false,
 		configurable: false
 	});
