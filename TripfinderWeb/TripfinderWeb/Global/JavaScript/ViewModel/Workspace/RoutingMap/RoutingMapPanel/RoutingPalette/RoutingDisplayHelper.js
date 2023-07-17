@@ -385,6 +385,10 @@
 			{
 				node.customData[property] = parseFloat(self.convertToCurrentMeasurementUnit(data.Distance)).toFixed(2);
 			}
+			else if(property.toLowerCase() == 'avgspeed')
+			{
+				node.customData[property] = self.routingDisplay.speedToString(data.Speed);
+			}
 			else if (property.toLowerCase() == 'starttime')
 			{
 				node.customData[property] = convertToMoment(data.StartTime).format('h:mm a');

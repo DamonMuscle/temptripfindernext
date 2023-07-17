@@ -7121,6 +7121,73 @@
 	// 	});
 	// };
 
+	RoutingDataModel.prototype.recalculateStopTime = function(directions, fieldTripStops)
+	{
+		var stopTimeFormat = "YYYY-MM-DDTHH:mm:ss";
+		var totalDuration = 0;
+		var totalDistance = 0;
+
+		var features = directions.features.map((item, index) => {
+
+			totalDuration += item.attributes.time;
+			totalDistance += item.attributes.length * 1.60934; // from miles to km
+
+			item.attributes.totalDuration = totalDuration;
+			item.attributes.totalDistance = totalDistance;
+
+			return { 
+				attributes: item.attributes, 
+				strings: directions.strings[index] 
+			}
+		});
+
+		var featureStops = fieldTripStops.filter(stop => stop.Sequence > 1)
+										 .map((stop) => features.find(feature => feature.strings.some((str => str.stringType == "esriDSTStreetName" && str.string == stop.Street)) && 
+																				 feature.attributes.maneuverType == "esriDMTStop"));
+
+		if(featureStops.length >= 2 && featureStops.length == fieldTripStops.length - 1)
+		{
+			for(var i = 0; i < fieldTripStops.length; ++i)
+			{
+				const stop = fieldTripStops[i];
+				const currDuration = featureStops[i] ? featureStops[i].attributes.totalDuration : totalDuration;
+				const currDistance = featureStops[i] ? featureStops[i].attributes.totalDistance : totalDistance;
+				const pauseDuration = moment.duration(moment(stop.StopTimeDepart).diff(moment(stop.StopTimeArrive))).asMinutes();
+
+				if(i == 0)
+				{
+					const currDurationMoment = moment.duration(currDuration,'minute');
+
+					stop.Duration = moment.utc(currDurationMoment.asMilliseconds()).format("HH:mm:ss");
+					stop.Travel = moment.utc(currDurationMoment.add(pauseDuration, 'minute').asMilliseconds()).format("HH:mm:ss");
+					stop.Distance = currDistance;
+					stop.Speed = currDistance / currDurationMoment.asHours();
+				}
+				else
+				{
+					const subDuration = currDuration - featureStops[i - 1].attributes.totalDuration;
+					const subDistance = currDistance - featureStops[i - 1].attributes.totalDistance;
+					const subDurationMoment = moment.duration(subDuration, 'minute');
+
+					stop.Duration = moment.utc(subDurationMoment.asMilliseconds()).format("HH:mm:ss");
+					stop.Travel = moment.utc(subDurationMoment.add(pauseDuration, 'minute').asMilliseconds()).format("HH:mm:ss");
+					stop.Distance = subDistance;
+					stop.Speed = subDurationMoment.asHours() > 0 ? subDistance / subDurationMoment.asHours() : 0;
+
+					const stopTimeArriveDuration = moment(fieldTripStops[i - 1].StopTimeDepart).add(moment.duration(fieldTripStops[i - 1].Duration));
+					stop.StopTimeArrive = stopTimeArriveDuration.format(stopTimeFormat);
+					
+					if(!stop.PrimaryDestination && !stop.PrimaryDeparture)
+					{
+						stop.StopTimeDepart = stopTimeArriveDuration.add(Math.ceil(pauseDuration), "minutes").format(stopTimeFormat);
+					}
+				}
+			}
+		}
+
+		return fieldTripStops;
+	}
+
 	RoutingDataModel.prototype.dispose = function()
 	{
 		this.tripLockData.unLockCurrentDocument();

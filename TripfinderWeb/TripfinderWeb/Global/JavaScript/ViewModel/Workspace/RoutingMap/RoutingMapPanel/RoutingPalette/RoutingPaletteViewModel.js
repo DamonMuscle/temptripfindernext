@@ -280,6 +280,20 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
 	{
 		console.log(data);
+
+		const updateStops = this.dataModel.recalculateStopTime(data.fieldTrip.directions, data.fieldTrip.FieldTripStops);
+
+		const trip = this.dataModel.getTripById(data.FieldTripId);
+		trip.FieldTripStops.forEach((stop,index) => {
+			stop.StopTimeDepart = updateStops[index].StopTimeDepart;
+			stop.StopTimeArrive = updateStops[index].StopTimeArrive;
+			stop.Travel = updateStops[index].Travel;
+			stop.Distance = updateStops[index].Distance;
+			stop.Speed = updateStops[index].Speed;
+			stop.Duration = updateStops[index].Duration;
+		})
+
+		this.tripViewModel.display.resetTripInfo([trip]);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)

@@ -508,7 +508,7 @@
 						fieldTrips[i].FieldTripStops[j].Duration = tripDataStop.Duration;
 					}
 				}
-				self.dataModel.setActualStopTime([fieldTrips[i]]);
+				self.dataModel.setFieldTripActualStopTime([fieldTrips[i]]);
 				self.dataModel.setStopTimeForEmptyRecords(fieldTrips[i]);
 				if (resetScheduleTime)
 				{
