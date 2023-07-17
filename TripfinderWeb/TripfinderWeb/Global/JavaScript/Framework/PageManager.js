@@ -667,8 +667,8 @@
 		const list = [],
 			configurationSection = _.sortBy([
 				{ text: "Automation", pageType: "automation" },
-				{ text: tf.applicationTerm.getApplicationTermSingularByName("Field Trip") + ' ' + tf.applicationTerm.getApplicationTermPluralByName("Config"), pageType: 'fieldtripconfigs' },
-				{ text: tf.applicationTerm.getApplicationTermPluralByName("Required Field"), pageType: "requiredfield" },
+				{ text: "Field Trip Configurations", pageType: 'fieldtripconfigs' },
+				{ text: "Required Fields", pageType: "requiredfield" },
 				{ text: "System Configurations", pageType: "settingsConfig" },
 				{ text: "User Defined Fields", pageType: "userdefinedlabelfields" },
 				{ text: "Change Password", pageType: "changePassword" }
