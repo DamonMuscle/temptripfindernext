@@ -282,18 +282,23 @@
 	{
 		console.log(data);
 
-		const updateStops = this.dataModel.recalculateStopTime(data.fieldTrip.directions, data.fieldTrip.FieldTripStops);
+		const trip = this.dataModel.getTripById(data.fieldTrip.Id);
 
-		const trip = this.dataModel.getTripById(data.FieldTripId);
-		trip.FieldTripStops.forEach((stop,index) => {
-			stop.StopTimeDepart = updateStops[index].StopTimeDepart;
-			stop.StopTimeArrive = updateStops[index].StopTimeArrive;
-			stop.Travel = updateStops[index].Travel;
-			stop.Distance = updateStops[index].Distance;
-			stop.Speed = updateStops[index].Speed;
-			stop.Duration = updateStops[index].Duration;
-		})
+		data.fieldTrip.directions.forEach(directions => {
+			const updateStops = this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);
 
+			trip.FieldTripStops.forEach((stop,index) => {
+				stop.StopTimeDepart = updateStops[index].StopTimeDepart;
+				stop.StopTimeArrive = updateStops[index].StopTimeArrive;
+				stop.Travel = updateStops[index].Travel;
+				stop.Distance = updateStops[index].Distance;
+				stop.Speed = updateStops[index].Speed;
+				stop.Duration = updateStops[index].Duration;
+			})
+		});
+
+
+		this.dataModel.update(trip.FieldTripStops);
 		this.tripViewModel.display.resetTripInfo([trip]);
 	}
 

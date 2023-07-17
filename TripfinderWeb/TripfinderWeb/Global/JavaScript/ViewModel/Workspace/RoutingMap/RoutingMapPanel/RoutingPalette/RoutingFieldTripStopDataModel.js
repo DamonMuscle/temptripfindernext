@@ -529,8 +529,8 @@
 		{
 			var data = self.dataModel.getFieldTripStop(modifyData.id);
 			originalData.push(self.dataModel.tripEditBroadcast.copyTripStop(data));
-			if (data.geometry.x != modifyData.geometry.x ||
-				data.geometry.y != modifyData.geometry.y ||
+			if (data.XCoord != modifyData.XCoord ||
+				data.YCoord != modifyData.YCoord ||
 				data.vehicleCurbApproach != modifyData.vehicleCurbApproach ||
 				data.SchoolLocation != modifyData.SchoolLocation)
 			{

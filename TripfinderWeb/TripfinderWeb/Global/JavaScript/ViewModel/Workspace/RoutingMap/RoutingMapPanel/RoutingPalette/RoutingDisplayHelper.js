@@ -1064,10 +1064,12 @@
 			trip.FieldTripStops.map(function(tripStop)
 			{
 				delete self.routingDisplay.expandStatusDictionary["Stop" + tripStop.id];
-				tripStop.Students.map(function(student)
-				{
-					delete self.routingDisplay.expandStatusDictionary["Student" + student.id];
-				});
+
+				// remove student
+				// tripStop.Students.map(function(student)
+				// {
+				// 	delete self.routingDisplay.expandStatusDictionary["Student" + student.id];
+				// });
 			});
 		});
 	}

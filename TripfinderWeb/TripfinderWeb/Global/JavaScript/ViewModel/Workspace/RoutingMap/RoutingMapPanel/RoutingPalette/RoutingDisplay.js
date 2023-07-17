@@ -2620,10 +2620,10 @@
 		if (nodeData.customData.isTrip)
 		{
 			var tripData = self.dataModel.getTripById(nodeData.id);
-			var totalAssignedStudents = tripData.FieldTripStops
-				.reduce((prev, curr) => prev.concat(curr.Students), [])
-				.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
-				.length;
+			// var totalAssignedStudents = tripData.FieldTripStops
+			// 	.reduce((prev, curr) => prev.concat(curr.Students), [])
+			// 	.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
+			// 	.length;
 			var totalDistance = 0;
 			tripData.FieldTripStops.map(function(tripStop)
 			{
@@ -2634,7 +2634,7 @@
 				tripData.StartTime = tripData.FieldTripStops[0].StopTime;
 				tripData.FinishTime = tripData.FieldTripStops[tripData.FieldTripStops.length - 1].StopTime;
 			}
-			tripData.NumTransport = totalAssignedStudents;
+			tripData.NumTransport = 0;
 			tripData.Distance = totalDistance;
 			nodeData.set('visible', tripData.visible);
 			nodeData.set('id', tripData.id);
@@ -3308,10 +3308,10 @@
 	{
 		const self = this;
 		let = totalAssignedStudents = 0;
-		totalAssignedStudents = trip.FieldTripStops
-			.reduce((prev, curr) => prev.concat(curr.Students), [])
-			.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
-			.length;
+		// totalAssignedStudents = trip.FieldTripStops
+		// 	.reduce((prev, curr) => prev.concat(curr.Students), [])
+		// 	.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
+		// 	.length;
 		return {
 			id: trip.id,
 			text: trip.Name,
@@ -3323,7 +3323,7 @@
 			nextLayover: ko.observable(null),
 			customData: {
 				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
-				students: totalAssignedStudents,
+				// students: totalAssignedStudents,
 				stops: trip.FieldTripStops.length,
 				tripTotalTime: self.getDurationForFieldTrip(trip),
 				distance: self.getDistanceForFieldTrip(trip),

@@ -84,8 +84,8 @@
 	TripEditBroadcast.prototype.copyTripStop = function(tripStop)
 	{
 		return {
-			x: tripStop.geometry.x,
-			y: tripStop.geometry.y,
+			x: tripStop.XCoord,
+			y: tripStop.YCoord,
 			id: tripStop.id,
 			tripId: tripStop.FieldTripId,
 			Session: this.dataModel.getTripById(tripStop.FieldTripId).Session,

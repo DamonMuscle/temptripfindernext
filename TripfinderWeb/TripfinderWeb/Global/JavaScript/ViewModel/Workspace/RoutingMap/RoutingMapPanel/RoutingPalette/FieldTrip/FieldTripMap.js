@@ -722,7 +722,16 @@
 			routeResults.forEach(routeResult => {
 				fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];
 				fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
-				fieldTrip.directions = this._computeDirections(routeResult);
+
+				if (!fieldTrip.directions) 
+				{
+					fieldTrip.directions = [this._computeDirections(routeResult)];
+				}
+				else
+				{
+					const directions = this._computeDirections(routeResult);
+					fieldTrip.directions.push(directions);
+				}
 			});
 
 			const data = { fieldTrip };
