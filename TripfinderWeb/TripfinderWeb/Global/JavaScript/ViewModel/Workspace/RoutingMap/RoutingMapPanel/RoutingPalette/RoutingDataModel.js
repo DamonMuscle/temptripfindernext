@@ -93,7 +93,6 @@
 		// self.subscribeStreetChange();
 		this._viewModal.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
 
-		// return Promise.all([self.setLoadTimeSettings(), self.setUserProfileTripColor()])
 		return Promise.all([self.setUserProfileTripColor()]).then(function()
 		{
 			var docData = self._viewModal.DocumentData.data;
@@ -298,15 +297,6 @@
 	RoutingDataModel.prototype.getGeneratedPath = function(stopId)
 	{
 		return this.stopPathDictionary[stopId];
-	};
-
-	RoutingDataModel.prototype.setLoadTimeSettings = function()
-	{
-		var self = this;
-		return self.loadDistrictPolicy().then(function(responses)
-		{
-			self.loadTimeSettings = responses;
-		});
 	};
 
 	RoutingDataModel.prototype.loadDistrictPolicy = function()
