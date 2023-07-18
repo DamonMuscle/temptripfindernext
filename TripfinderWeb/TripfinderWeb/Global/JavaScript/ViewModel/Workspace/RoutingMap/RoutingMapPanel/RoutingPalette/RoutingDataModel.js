@@ -11,8 +11,6 @@
 		self.trips = [];
 		self.candidateStudents = [];
 		self.removedCandidateIds = [];//store the unassigned student ids being removed from unassigned palette. 
-		self.tripPathFeatureServerRecords = [];
-		self.tripBoundaryFeatureServerRecords = [];
 		self.tripStopDictionary = {};
 		self.studentsDictionary = {};
 		self.prohibitStreets = [];
@@ -156,49 +154,6 @@
 		return exceptions.concat(expired);
 	};
 
-	RoutingDataModel.prototype.tryOpenTrip = function(trips)
-	{
-		var self = this;
-		var openedTripIds = self.trips.map(function(c) { return c.Id; });
-		trips = trips.filter((t) => { return openedTripIds.indexOf(t.Id) < 0; });
-		if (trips.length == 0)
-		{
-			return Promise.resolve();
-		}
-		return self.tripLockData.getLockInfo().then(function(lockInfo)
-		{
-			return lockInfo.selfLockedList.filter(function(item)
-			{
-				return item.ExtraInfo != self.routeState;
-			}).concat(lockInfo.lockedByOtherList).filter(item =>
-			{
-				return item.Type == "trip";
-			});
-		}).then(items =>
-		{
-			var openTrips = [],
-				viewTrips = [],
-				editTrips = self.getEditTrips(),
-				tripA = editTrips.length > 0 ? editTrips[0] : trips[0];
-			trips.forEach((trip) =>
-			{
-				if (items.some(i => i.Id == trip.Id) || !RoutingDataModel.checkCriteria(trip, tripA))
-				{
-					viewTrips.push(trip);
-				} else
-				{
-					openTrips.push(trip);
-				}
-			});
-			return Promise.all([
-				// openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
-				// viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
-				openTrips.length > 0 && self.setOpenFieldTrips(self.getEditTrips().concat(openTrips)),
-				viewTrips.length > 0 && self.setViewFieldTrips(self.getViewTrips().concat(viewTrips))
-			]);
-		});
-	};
-
 	RoutingDataModel.prototype.tryOpenFieldTrip = function(fieldTrips)
 	{
 		var self = this;
@@ -234,8 +189,6 @@
 				}
 			});
 			return Promise.all([
-				// openTrips.length > 0 && self.setOpenTrips(self.getEditTrips().concat(openTrips)),
-				// viewTrips.length > 0 && self.setViewTrips(self.getViewTrips().concat(viewTrips))
 				openTrips.length > 0 && self.setOpenFieldTrips(self.getEditTrips().concat(openTrips)),
 				viewTrips.length > 0 && self.setViewFieldTrips(self.getViewTrips().concat(viewTrips))
 			]);
@@ -286,7 +239,6 @@
 	RoutingDataModel.prototype.displayByFindCandidateTripStops = function(trips)
 	{
 		var self = this;
-		// self.setOpenTrips(trips).then(function()
 		self.setOpenFieldTrips(trips).then(function()
 		{
 			var tripStops = self._viewModal.DocumentData.data.tripStops;
@@ -403,59 +355,6 @@
 		}, { overlay: false }).then(function(data)
 		{
 			return data.Items;
-		});
-	};
-
-	/**
-	* open read only trip
-	*/
-	RoutingDataModel.prototype.setViewTrips = function(data)
-	{
-		var self = this;
-		if (data.length == 0)
-		{
-			// if no need to open,close all view trips
-			return self.closeAllViewTrips();
-		}
-		var newTrips = self._getNewTrip(data);
-		var ids = newTrips.map(function(c) { return c.id; });
-		self.trips = self.trips.concat(newTrips);
-		self.bindColor();
-
-		var p1 = self._fetchTripData(newTrips.filter(function(trip)
-		{
-			return trip.Session == TF.Helper.TripHelper.Sessions.ToSchool;
-		}).map(function(c) { return c.Id; }));
-		var p2 = self._fetchTripData(newTrips.filter(function(trip)
-		{
-			return trip.Session == TF.Helper.TripHelper.Sessions.FromSchool;
-		}).map(function(c) { return c.Id; }));
-		var p3 = self._fetchTripData(newTrips.filter(function(trip)
-		{
-			return trip.Session == TF.Helper.TripHelper.Sessions.Both;
-		}).map(function(c) { return c.Id; }));
-		var p4 = self._fetchTripData(newTrips.filter(function(trip)
-		{
-			return trip.Session == TF.Helper.TripHelper.Sessions.Shuttle;
-		}).map(function(c) { return c.Id; }));
-
-		var p5 = self._getTripPathFeatureData(ids, Promise.all([p1, p2, p3]));
-		var p6 = self._getTripBoundaryFeatureData(ids, Promise.all([p1, p2, p3]));
-		return Promise.all([p1, p2, p3, p4, p5, p6]).then(function()
-		{
-			self._setOpenType(newTrips, "View");
-			return self._removeNotOpenViewTrips(data, newTrips);
-		}).then(function()
-		{
-			return self._getSchoolLocations(newTrips);
-		}).then(function()
-		{
-			self.setActualStopTime(self.trips);
-			// remove student
-			// self.setStudentTravelTime(self.trips);
-			// self.setAllStudentValidProperty(self.trips);
-			// self.routingStudentManager.refresh();
-			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false });
 		});
 	};
 
@@ -623,125 +522,6 @@
 			});
 			*/
 
-			// remove student
-			// self.routingStudentManager.refreshStudentLock();
-			self._updateTravelScenarioLock();
-		}).catch(function(args)
-		{
-			console.log(args);
-			self.tripLockData.unLock(data.map(x => x.Id));
-			tf.loadingIndicator.tryHide();
-		});		
-	}
-
-	/**
-	* open trip
-	*/
-	RoutingDataModel.prototype.setOpenTrips = function(data, disableAutoZoom)
-	{
-		var self = this, newTrips = [], newTripIds = [], remainTripIds = [], remainTrips = [];
-
-		if (data.length == 0)
-		{
-			// if no need to open,close all
-			return self.closeAllEditTrips();
-		}
-		data = Enumerable.From(data).OrderBy("$.Name").ToArray();
-		var viewTrips = self.getViewTrips().filter(function(trip)
-		{
-			return Enumerable.From(data).Any(function(c) { return c.Id == trip.id; });
-		});
-		if (viewTrips && viewTrips.length > 0)
-		{
-			self.closeByViewTrips(viewTrips);
-		}
-		tf.loadingIndicator.showImmediately();
-		return self._filterNotLockTripIds(data).then(function(availableIds)
-		{
-			data = data.filter(function(c) { return availableIds.indexOf(c.Id + "") >= 0; });
-			if (data.length == 0)
-			{
-				return Promise.reject();
-			}
-			self.trips.forEach(function(trip)
-			{
-				if (Enumerable.From(data).Any(function(c) { return c.Id == trip.id; }))
-				{
-					remainTripIds.push(trip.id);
-					remainTrips.push(trip);
-				}
-			});
-
-			newTrips = self._getNewTrip(data);
-			newTripIds = newTrips.map(function(c) { return c.id; });
-			self.trips = self.trips.concat(newTrips);
-			self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
-			self._removeNotOpenEditTrips(data);
-			self.bindColor();
-
-			var p1 = self._fetchTripData(newTripIds);
-			var p2 = self._getTripPathFeatureData(newTripIds, p1).then(function()
-			{
-				if (!disableAutoZoom)
-				{
-					self.viewModel.eventsManager.zoomClick({});
-				}
-			});
-			var p3 = self._getTripBoundaryFeatureData(newTripIds, p1);
-			return Promise.all([p1, p2, p3]);
-		}).then(function(tripsData)
-		{
-			tf.loadingIndicator.tryHide();
-
-			const fetchedTripsData = tripsData[0].Trips;
-
-			// remove not exist new trip
-			newTrips = newTrips.filter(function(trip)
-			{
-				var exist = Enumerable.From(fetchedTripsData).Any(function(t) { return t.id == trip.id; });
-				if (!exist)
-				{
-					self.trips = self.trips.filter(function(t) { return t.id != trip.id; });
-				}
-				return exist;
-			});
-
-			// remember trip original assignment info.
-			for (let i = 0; i < fetchedTripsData.length; i++)
-			{
-				const tripData = fetchedTripsData[i];
-				self.originalTripAssignment[tripData.id] = tripData;
-			}
-
-			self._setOpenType(newTrips, "Edit");
-			// if (remainTripIds.length == 0)
-			// {
-			// 	self._setCandidateStudent(tripsData[0].CandidateStudents);
-			// }
-			// self.routingStudentManager.calculateStudentPUDOStatus();
-			self.setFieldTripActualStopTime(self.trips);
-
-			// remove student
-			// self.setStudentTravelTime(self.trips);
-			// self.setAllStudentValidProperty(self.trips);
-			// self.routingStudentManager.refreshStudent();
-			// self.viewModel.analyzeTripByDistrictPolicy.initCacheFromAssignedStudent();
-			return Promise.resolve();
-		}).then(function()
-		{
-			return self._getSchoolLocations(newTrips);
-		}).then(function()
-		{
-			// remove student
-			// self.routingStudentManager.refreshDictionary(null, null);
-			//self.viewModel.drawTool.stopTool.attachClosetStreetToStop(allTripStops); //comment for improve open trip performance.RW-11855
-			self.onTripsChangeEvent.notify({ add: newTrips, edit: remainTrips, delete: [], draw: false });
-			self.setTripOriginalData(newTrips);
-			if (self.showImpactDifferenceChart()) { newTrips.forEach(function(trip) { self.refreshOptimizeSequenceRate(trip.id); }); }
-			self.viewModel.analyzeTripByDistrictPolicy._getDistrictPolicies().then(function()
-			{
-				self.viewModel.analyzeTripByDistrictPolicy.analyze(self.trips, false, true);
-			});
 			// remove student
 			// self.routingStudentManager.refreshStudentLock();
 			self._updateTravelScenarioLock();
@@ -2932,7 +2712,6 @@
 					});
 					self.viewModel.drawTool && self.viewModel.drawTool._addTripPath(tripPaths, trip);
 				});
-				self.tripPathFeatureServerRecords = records;
 				return records;
 			});
 	};
@@ -2975,7 +2754,6 @@
 					tripStop.path = tripPath;
 				});
 			});
-			self.tripPathFeatureServerRecords = records;
 			return records;
 		});
 	};
@@ -3009,7 +2787,6 @@
 
 					});
 				});
-				self.tripBoundaryFeatureServerRecords = records;
 				return records;
 			});
 	};
@@ -5666,7 +5443,6 @@
 			}).then(function(response)
 			{
 				response.Items.forEach((trip) => { trip.TravelScenarioName = travelScenarios.get(trip.TravelScenarioId); })
-				// return self.setOpenTrips(response.Items, true).then(function()
 				return self.setOpenFieldTrips(response.Items, true).then(function()
 				{
 					return self.showRevertSuccessToastMessage();
@@ -5744,7 +5520,6 @@
 			self.trips = self.getViewTrips();
 			self.changeDataStack([]);
 			self.onTripsChangeEvent.notify({ add: [], edit: [], delete: trips });
-			// self.setOpenTrips(refreshTrips);
 			self.setOpenFieldTrips(refreshTrips);
 		}
 	};

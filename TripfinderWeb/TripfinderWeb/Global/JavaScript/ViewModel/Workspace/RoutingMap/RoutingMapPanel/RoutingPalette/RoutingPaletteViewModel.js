@@ -298,7 +298,7 @@
 		});
 
 
-		this.dataModel.update(trip.FieldTripStops);
+		// this.dataModel.update(trip.FieldTripStops);
 		this.tripViewModel.display.resetTripInfo([trip]);
 	}
 

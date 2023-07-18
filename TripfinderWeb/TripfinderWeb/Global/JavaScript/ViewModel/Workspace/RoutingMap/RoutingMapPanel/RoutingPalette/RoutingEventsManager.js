@@ -87,6 +87,10 @@
 		this.openTrip(true);
 	};
 
+	/**
+	 * Open field trip in Palette level
+	 * @param {*} isViewTrip 
+	 */
 	RoutingEventsManager.prototype.openTrip = function(isViewTrip)
 	{
 		var self = this;
@@ -137,7 +141,6 @@
 							{
 								if (result)
 								{
-									// self.dataModel.setOpenTrips(data);
 									self.dataModel.setOpenFieldTrips(data);
 								}
 							});
@@ -146,7 +149,6 @@
 				}
 				else
 				{
-					// self.dataModel.setViewTrips(data);
 					self.dataModel.setViewFieldTrips(data);
 				}
 			}

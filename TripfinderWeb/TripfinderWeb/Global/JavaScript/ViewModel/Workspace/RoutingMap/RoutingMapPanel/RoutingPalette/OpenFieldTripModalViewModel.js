@@ -1,3 +1,4 @@
+// select a field trip to display in the map (editable) through this dialog
 (function()
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").OpenFieldTripModalViewModel = OpenFieldTripModalViewModel;
