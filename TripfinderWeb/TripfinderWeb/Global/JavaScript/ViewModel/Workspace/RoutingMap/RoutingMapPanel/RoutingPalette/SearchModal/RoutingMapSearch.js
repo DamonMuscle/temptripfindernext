@@ -799,58 +799,10 @@
 
 		if (type == "unassignedStudentsRouting")
 		{
-			return this.getSuggestedResultByUnassignedStudentRouting(type, value, count);
+			throw "unassignedStudentsRouting";
 		}
 
 		return this.getSuggestedResultByNormalType(type, value, count);
-	};
-
-	RoutingMapSearch.prototype.getSuggestedResultByUnassignedStudentRouting = function(type, value, count)
-	{
-		var self = this;
-		var document = tf.documentManagerViewModel.obCurrentDocument();
-		var allData = Enumerable.From(Object.values(document.routingPaletteViewModel.tripViewModel.dataModel.routingStudentManager.students)).Where(function(c)
-		{
-			return (c.FirstName + " " + c.LastName).toLowerCase().indexOf(value.toLowerCase()) >= 0 && c.geometry && c.isShowOnCandidateMap && c.isCandidate;
-		}).ToArray(),
-			allCards = allData.map(function(item)
-			{
-				var schoolGrade = item.SchoolCode || "";
-				if (item.Grade != null)
-				{
-					if (schoolGrade)
-					{
-						schoolGrade += " | ";
-					}
-
-					schoolGrade += item.Grade;
-				}
-
-				return {
-					Id: item.id,
-					title: item.FirstName + " " + item.LastName,
-					subtitle: item.Address,
-					address: item.Address,
-					type: type,
-					whereQuery: "",
-					imageSrc: undefined,
-					x: item.geometry.x,
-					y: item.geometry.y,
-					geometry: item.geometry,
-					schoolGrade: schoolGrade,
-					rightInfo: self.createStudentRightInfo(item)
-				};
-			});
-
-		var style = self.cardStyle[type];
-		return Promise.resolve({
-			type: type,
-			title: style.title,
-			color: style.color,
-			count: allData.length,
-			cards: allCards.slice(0, count),
-			whereQuery: ""
-		});
 	};
 
 	RoutingMapSearch.prototype.createStudentRightInfo = function(student)

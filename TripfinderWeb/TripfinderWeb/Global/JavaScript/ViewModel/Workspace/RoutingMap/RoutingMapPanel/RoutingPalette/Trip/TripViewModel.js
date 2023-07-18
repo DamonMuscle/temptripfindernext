@@ -22,7 +22,6 @@
 		self.eventsManager = new TF.RoutingMap.RoutingPalette.RoutingEventsManager(self, routeState);
 		self.display = new TF.RoutingMap.RoutingPalette.RoutingDisplay(self);
 		self.editFieldTripStopModal = new TF.RoutingMap.RoutingPalette.RoutingFieldTripStopEditModal(self);
-		self.analyzeTripByDistrictPolicy = new TF.RoutingMap.RoutingPalette.AnalyzeTripByDistrictPolicy(self);
 		// self.editStudentModal = new TF.RoutingMap.RoutingPalette.RoutingStudentEditModal(self);
 		self.dataModel.onChangeTripVisibilityEvent.subscribe(this.onChangeTripVisibilityEvent.bind(this));
 		self.drawTool = null;
@@ -186,7 +185,6 @@
 			this.routingChangePath.dispose();
 		}
 		this.documentChange && this.documentChange.dispose();
-		this.analyzeTripByDistrictPolicy && this.analyzeTripByDistrictPolicy.dispose();
 		tfdispose(this);
 	};
 })();

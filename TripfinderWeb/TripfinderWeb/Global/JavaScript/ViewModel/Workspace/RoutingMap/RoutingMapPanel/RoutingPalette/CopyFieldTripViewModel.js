@@ -57,23 +57,6 @@
 		this.dataModel.trips.push(newTrip);
 		this.dataModel._setOpenType([newTrip], openType);
 		return Promise.resolve(newTrip);
-		// return self.dataModel.initialNewTripInfo(newTrip, !self.obAutoAssignStudent(), self.trip.Session != self.obTripType()).then(function()
-		// {
-		// 	newTrip.TripStops.map(function(tripStop)
-		// 	{
-		// 		// view trip only show assigned students
-		// 		if (tripStop.OpenType === 'View')
-		// 		{
-		// 			tripStop.TotalStudentCount = tripStop.AssignedStudentCount;
-		// 		}
-		// 		tripStop.Students.map(function(student)
-		// 		{
-		// 			student.OpenType = openType;
-		// 		});
-		// 	});
-		// 	self.initTripStopTime(newTrip);
-		// 	return newTrip;
-		// });
 	};
 
 	CopyFieldTripViewModel.prototype.initTripStopTime = function(newTrip)

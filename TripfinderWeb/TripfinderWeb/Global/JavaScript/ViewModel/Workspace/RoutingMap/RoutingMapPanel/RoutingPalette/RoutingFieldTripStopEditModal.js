@@ -666,10 +666,7 @@
 
 				return self.dataModel.changeStopPosition(tripStop, targetTripId, position).then(function()
 				{
-					self.viewModel.display.afterChangeStopPosition(tripStop, !tripChanged, tripId).then(() =>
-					{
-						self.viewModel.analyzeTripByDistrictPolicy.analyze(Enumerable.From(self.dataModel.trips).Where(x => x.id == tripId || x.id == targetTripId).ToArray());
-					});
+					self.viewModel.display.afterChangeStopPosition(tripStop, !tripChanged, tripId);
 					tf.loadingIndicator.tryHide()
 				});
 			}

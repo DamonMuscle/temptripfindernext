@@ -30,7 +30,6 @@
 				self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
 				if (!isDuplicate) data.StopTime = data.ActualStopTime;
 				self.insertToRevertData(data);
-				// self.dataModel.routingStudentManager.refreshDictionary(true);
 				self.dataModel.recalculateAble = false;
 				self.dataModel.onTripStopsChangeEvent.notify({
 					add: [data],
@@ -389,11 +388,8 @@
 			{
 				self.clearPreviousStopPathIfUnsolved(newTripStops, targetTrip);
 			}
-			// update routingStudentManager.schoolStopDictionary
 			self.updateAnotherTripStop(newTripStops);
-			// self.dataModel.routingStudentManager.calculateStudentPUDOStatus();
 
-			// self.dataModel.routingStudentManager.refresh();
 			if (isNotifyTripStopChangeEvent)
 			{
 				newTripStops = Enumerable.From(newTripStops).OrderBy("$.Sequence").ToArray();
@@ -630,7 +626,6 @@
 		var self = this;
 		return this.deleteTripStop(deleteArray, true, isFromRevert).then(function(deleteTripStops)
 		{
-			// self.dataModel.routingStudentManager.refreshDictionary(true);
 			self.dataModel.onTripStopsChangeEvent.notify({ add: [], edit: [], delete: deleteTripStops });
 			if (!isFromBroadCastSync && !isFromRevert)
 			{
@@ -690,8 +685,6 @@
 				});
 			}
 		});
-
-		// self.dataModel.unAssignStudentMultiple(studentsTripStops, false);
 
 		deleteArray.forEach(function(tripStop)
 		{
@@ -796,7 +789,6 @@
 					{
 						changedStudents = changedStudents.concat(stop.Students);
 					});
-					// self.dataModel.routingStudentManager.refresh();
 					self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
 					self.viewModel.drawTool.onAssignStudentsChangeEvent(null, { add: [], edit: changedStudents, delete: [] });
 					self.viewModel.drawTool.redrawPath(trip);
@@ -822,7 +814,6 @@
 				{
 					changedStudents = changedStudents.concat(stop.Students);
 				});
-				// self.dataModel.routingStudentManager.refresh();
 				self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
 				self.viewModel.drawTool.onAssignStudentsChangeEvent(null, { add: [], edit: changedStudents, delete: [] });
 				self.viewModel.drawTool.redrawPath(trip);
@@ -1021,13 +1012,9 @@
 		});
 		boundaries = changeData.map(function(tripStop) { return tripStop.boundary; });
 		self.dataModel.tripEditBroadcast.send(originalData, changeData);
-		// self.dataModel.routingStudentManager.refreshDictionary();
-		// return self.updateTripBoundaryStudents(boundaries, null, null, null, null, tf.storageManager.get("notAutoAssignUnassignedStudent") === false).then(function()
-		// {
-			self.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: changeData });
-			self.changeRevertStack(modifyDataArray, isFromRevert);
-			return Promise.resolve(changeData);
-		// });
+		self.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: changeData });
+		self.changeRevertStack(modifyDataArray, isFromRevert);
+		return Promise.resolve(changeData);
 	};
 
 	RoutingFieldTripStopDataModel.prototype._getStudentCrossChangeStops = function(modifyDataArray, type)
@@ -1181,7 +1168,6 @@
 						}
 					}
 				});
-				self.dataModel.unAssignStudent(newCandidateStudents, tripStop);
 			}
 		});
 	};

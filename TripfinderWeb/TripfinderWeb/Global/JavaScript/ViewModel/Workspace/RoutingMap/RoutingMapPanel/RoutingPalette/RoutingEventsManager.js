@@ -396,7 +396,6 @@
 	RoutingEventsManager.prototype.copyTripClick = function(tripData)
 	{
 		this.viewModel.routingChangePath.stop();
-		// this.dataModel.copyAsNewTrip(tripData);
 		this.dataModel.copyAsNewFieldTrip(tripData);
 	};
 
@@ -802,7 +801,7 @@
 				break;
 			}
 		}
-		self.dataModel.onTripsChangeEvent.notify({ add: [], edit: [], delete: [oldTrip], notClearStudentCache: true });
+		self.dataModel.onTripsChangeEvent.notify({ add: [], edit: [], delete: [oldTrip] });
 		self.dataModel.onTripsChangeEvent.notify({ add: [newTrip], edit: [], delete: [], notZoom: true, options: { resetScheduleTime: true } });
 		self.dataModel.changeDataStack.push(newTrip);
 	};
@@ -1184,76 +1183,9 @@
 		this.dataModel.fieldTripStopDataModel.updatePath(tripStop);
 	};
 
-	//TODO: right click student
-	RoutingEventsManager.prototype.studentInfoClick = function(data)
-	{
-		this.requireDetails.notify({ dataType: "student", ids: [data.id] });
-	};
-
 	RoutingEventsManager.prototype.tripDetailsClick = function(data)
 	{
 		this.requireDetails.notify({ dataType: "trip", ids: [data.id] });
-	};
-
-	RoutingEventsManager.prototype.createDoorToDoorClick = function(data)
-	{
-		var self = this;
-		self.viewModel.drawTool.createDoorToDoorStop(data);
-	};
-
-	RoutingEventsManager.prototype.autoUnassignStudentClick = function()
-	{
-		const trips = this.dataModel.getEditTrips();
-		if (!trips || !trips.length) return;
-		let promise = trips.length == 1 ? this.dataModel.autoUnassignStudentConfirmation(trips) : tf.modalManager.showModal(
-			new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trip", otherButtonName: "Unassign All Field Trips", optionType: "unassign" }, this.dataModel)
-		);
-		promise.then(trips =>
-		{
-			if (!trips || !trips.length) return;
-			tf.loadingIndicator.showImmediately();
-			this.dataModel.autoUnassignStudent(trips).finally(() => tf.loadingIndicator.tryHide());
-		});
-	};
-
-	RoutingEventsManager.prototype.autoAssignStudentClick = function()
-	{
-		var self = this;
-		var trips = this.dataModel.getEditTrips();
-		if (trips.length > 1)
-		{
-			tf.modalManager.showModal(
-				new TF.RoutingMap.RoutingPalette.SelectTripModalViewModel(trips, { title: "Select Field Trip", otherButtonName: "Assign All Field Trips" })
-			).then(function(data)
-			{
-				if (data && data.length > 0)
-				{
-					tf.loadingIndicator.showImmediately();
-					self.dataModel.autoAssignStudent(data).then(function()
-					{
-						tf.loadingIndicator.tryHide();
-					}).catch(function()
-					{
-						tf.loadingIndicator.tryHide();
-					});
-				}
-				else
-				{
-					tf.loadingIndicator.tryHide();
-				}
-			});
-		}
-		else if (trips.length == 1)
-		{
-			tf.loadingIndicator.showImmediately();
-			self.dataModel.autoAssignStudent(trips).then(function()
-			{
-				tf.loadingIndicator.tryHide();
-			}).catch(function()
-			{
-				tf.loadingIndicator.tryHide();
-			});
-		}
 	};
 
 	// #region vrp 
@@ -1460,7 +1392,6 @@
 				// }
 				self.dataModel.copyStopTimeWithActualTime([newTrip]);
 				self.dataModel.setStudentTravelTimeVRP([newTrip]);
-				//self.dataModel.setStudentTravelTime([newTrip]);
 				newTrips.push(newTrip);
 				return Promise.resolve(newTrip);
 			}));

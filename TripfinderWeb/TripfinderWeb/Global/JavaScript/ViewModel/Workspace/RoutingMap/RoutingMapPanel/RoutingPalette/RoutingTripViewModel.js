@@ -1610,7 +1610,6 @@ This action cannot be undone.  Do you wish to continue?`;
 						}
 						self.dataModel.setActualStopTime([newTrip]);
 						self.dataModel.setStudentTravelTime([newTrip]);
-						// self.dataModel.setAllStudentValidProperty([newTrip]);
 						return self.setTripOptimizeInfo(newTrip).then(function()
 						{
 							tf.loadingIndicator.tryHide();
@@ -2120,56 +2119,6 @@ This action cannot be undone.  Do you wish to continue?`;
 		});
 
 		return result;
-	};
-
-	RoutingTripViewModel.prototype.applyExceptionsChange = function(exceptionItems, trip, remove)
-	{
-		if (!exceptionItems.length)
-		{
-			return;
-		}
-
-		let weekdays = TF.RoutingMap.RoutingPalette.RoutingDataModel.weekdays,
-			stops = trip.TripStops.reduce((obj, item) => ({ ...obj, [item.id]: item }), {}),
-			removed = {},
-			routingStudentManager = this.dataModel.routingStudentManager;;
-		exceptionItems.forEach(e =>
-		{
-			let exception = e.exception,
-				intersection = e.intersection,
-				stop = stops[exception.TripStopID],
-				eIndex = stop.Students.findIndex(s => s.id == exception.id && !s.RequirementID && s.AnotherTripStopID == exception.AnotherTripStopID);
-			if (eIndex == -1)
-			{
-				return;
-			}
-
-			if (remove || !intersection)
-			{
-				stop.Students.splice(eIndex, 1);
-				removed[routingStudentManager._getKey(exception)] = exception;
-				return;
-			}
-
-			let student = stop.Students[eIndex];
-			student.StartDate = moment(intersection.StartDate).format("YYYY-MM-DDT00:00:00");
-			student.EndDate = moment(intersection.EndDate).format("YYYY-MM-DDT00:00:00");
-			weekdays.forEach(day =>
-			{
-				let dayValue = TF.DayOfWeek[day], valid = intersection[dayValue];
-				student[day] = valid;
-				student["Valid" + day] = valid;
-			});
-		});
-
-		if (Object.keys(removed).length)
-		{
-			this.dataModel.candidateStudents = this.dataModel.candidateStudents.filter(s =>
-			{
-				let key = routingStudentManager._getKey(s);
-				return !removed[key];
-			});
-		}
 	};
 
 	RoutingTripViewModel.prototype._calculateTripPath = function(newTrip)
