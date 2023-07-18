@@ -982,7 +982,7 @@
 		}
 
 		let stopsNotInCache = [],
-			getGeometry = s => s.SchoolLocation ? s.SchoolLocation.geometry : s.geometry;
+			getGeometry = s => (s.SchoolLocation ? s.SchoolLocation.geometry : s.geometry) || (s.geometry = TF.xyToGeometry(s.XCoord, s.YCoord));
 
 		stops.forEach(stop =>
 		{
