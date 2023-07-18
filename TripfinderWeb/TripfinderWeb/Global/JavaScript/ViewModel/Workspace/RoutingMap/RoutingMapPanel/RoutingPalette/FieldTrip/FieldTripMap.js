@@ -717,7 +717,15 @@
 	{
 		if (!fieldTrip.routePath)
 		{
-			const routeResults = (await this.calculateRoute(fieldTrip)).filter(routeResult => !!routeResult);
+			let routeResults = await this.calculateRoute(fieldTrip);
+
+			if(!routeResults)
+			{
+				console.error("routeResults is empty, the fieldTrip is ->", fieldTrip);
+				return;
+			}
+
+			routeResults = routeResults.filter(routeResult => !!routeResult);
 
 			routeResults.forEach(routeResult => {
 				fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];
