@@ -1024,6 +1024,11 @@
 
 	RoutingMapTool.prototype.zoomToLayersExtent = function ()
 	{
+		const mapInstance = this.routingMapDocumentViewModel.mapInstance;
+		mapInstance.zoomToFullVisibleExtent();
+
+		return;
+
 		var map = this.routingMapDocumentViewModel._map;
 
 		if (!!this.routingMapDocumentViewModel._mapPoints)

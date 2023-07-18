@@ -645,9 +645,29 @@
 		this.map.mapView.center = point;
 	}
 
+	Map.prototype.zoomToFullVisibleExtent = async function()
+	{
+		const fullExtent = await this.getFullVisibleFeatures();
+		await this.setExtent(fullExtent);
+	}
+
 	Map.prototype.setExtent = async function(target)
 	{
 		await this.map.mapView.goTo(target, { duration: 0, easing: "linear" });
+	}
+
+	Map.prototype.getFullVisibleFeatures = async function()
+	{
+		const layerInstances = this.mapLayerInstances;
+		let visibleFeatures = [];
+		for (let i = 0; i < layerInstances.length; i++)
+		{
+			const layerInstance = layerInstances[i];
+			const features = await layerInstance.queryVisibleFeatures();
+			visibleFeatures = visibleFeatures.concat(features);
+		}
+
+		return visibleFeatures;
 	}
 
 	Map.prototype.centerAndZoom = function(longitude, latitude, scale)

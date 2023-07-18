@@ -103,6 +103,18 @@
 		}
 	}
 
+	Layer.prototype.addMany = function(graphics)
+	{
+		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
+			this.layer.addMany(graphics);
+		}
+		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			console.warn(`TODO: add many graphics to FeatureLayer`);
+		}
+	}
+
 	Layer.prototype._addGraphic = function(graphic, afterAdd = null)
 	{
 		if (afterAdd !== null)
@@ -326,5 +338,21 @@
 		{
 			features[i].visible = visible;
 		}
+	}
+
+	Layer.prototype.queryVisibleFeatures = async function()
+	{
+		let features = [];
+		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
+			features = await this.queryFeatures(null);
+		}
+		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			const results = await this.queryFeatures(null);
+			features = results.features;
+		}
+		
+		return features.filter(item => item.visible === true);
 	}
 })();
