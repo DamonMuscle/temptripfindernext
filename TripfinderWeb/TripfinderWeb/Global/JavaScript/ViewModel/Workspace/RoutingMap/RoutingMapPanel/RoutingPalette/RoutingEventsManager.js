@@ -869,10 +869,11 @@
 		});
 	};
 
-	RoutingEventsManager.prototype.assignStudentForStopClick = function(tripStopId)
-	{
-		return TF.RoutingMap.RoutingPalette.AssignStudentForStop(tripStopId, this.dataModel);
-	};
+	// remove student
+	// RoutingEventsManager.prototype.assignStudentForStopClick = function(tripStopId)
+	// {
+	// 	return TF.RoutingMap.RoutingPalette.AssignStudentForStop(tripStopId, this.dataModel);
+	// };
 
 	RoutingEventsManager.prototype.editTripStopClick = function(type, stopId, fieldTripId)
 	{

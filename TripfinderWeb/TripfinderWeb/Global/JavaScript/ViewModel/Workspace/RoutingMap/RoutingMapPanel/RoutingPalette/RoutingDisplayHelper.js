@@ -19,10 +19,11 @@
 			{
 				if (parentNode.expanded)
 				{
-					if (node.customData.crossToStop === null || node.customData.crossToStop === undefined)
-					{
-						promise = self.routingDisplay.handleUnknowCrossingStatusStudents([node]);
-					}
+					// remove student
+					// if (node.customData.crossToStop === null || node.customData.crossToStop === undefined)
+					// {
+					// 	promise = self.routingDisplay.handleUnknowCrossingStatusStudents([node]);
+					// }
 				}
 
 				return promise.then(function()
@@ -32,8 +33,9 @@
 						return;
 					}
 
-					var element = self.insertStudentsByAlphaOrder(node, parentNode);
-					self.routingDisplay.bindStudentNodeEvent.call(self.routingDisplay, element);
+					// remove student
+					// var element = self.insertStudentsByAlphaOrder(node, parentNode);
+					// self.routingDisplay.bindStudentNodeEvent.call(self.routingDisplay, element);
 				});
 			}
 		}
@@ -576,30 +578,31 @@
 		studentNode.set('customData.dayDisableList', nowDayDisableList);
 	}
 
-	RoutingDisplayHelper.prototype.updateStudentOnTree = function(stopId, tripNode, students)
-	{
-		var self = this;
-		var tripStopNode = self.getTreeNodeFromParentNode(stopId, tripNode, 'tripstop');
-		if (!tripStopNode)
-		{
-			return;
-		}
-		for (var i = 0; i < students.length; i++)
-		{
-			var studentNode = self.getTreeNodeFromParentNode(students[i].id, tripStopNode, 'student', students[i].RequirementID, students[i].TripStopID, students[i].PreviousScheduleID);
-			if (studentNode != null)
-			{
-				if (self.checkNodeWasExpanded(tripStopNode))
-				{
-					self.routingDisplay.updateStudentNode(studentNode);
-				}
-				else
-				{
-					self.resetUnexpandedTreeNodeValue(studentNode, students[i]);
-				}
-			}
-		}
-	}
+	// remove student
+	// RoutingDisplayHelper.prototype.updateStudentOnTree = function(stopId, tripNode, students)
+	// {
+	// 	var self = this;
+	// 	var tripStopNode = self.getTreeNodeFromParentNode(stopId, tripNode, 'tripstop');
+	// 	if (!tripStopNode)
+	// 	{
+	// 		return;
+	// 	}
+	// 	for (var i = 0; i < students.length; i++)
+	// 	{
+	// 		var studentNode = self.getTreeNodeFromParentNode(students[i].id, tripStopNode, 'student', students[i].RequirementID, students[i].TripStopID, students[i].PreviousScheduleID);
+	// 		if (studentNode != null)
+	// 		{
+	// 			if (self.checkNodeWasExpanded(tripStopNode))
+	// 			{
+	// 				self.routingDisplay.updateStudentNode(studentNode);
+	// 			}
+	// 			else
+	// 			{
+	// 				self.resetUnexpandedTreeNodeValue(studentNode, students[i]);
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	RoutingDisplayHelper.prototype.NoSelectedDay = function(student)
 	{

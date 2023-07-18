@@ -19,16 +19,19 @@
 
 		self.dataModel.onTripsChangeEvent.subscribe(self.onTripChange.bind(self));
 		self.dataModel.onTripTreeColorChangeEvent.subscribe(self.onTripTreeColorChange.bind(self));
-		self.dataModel.onAssignStudentsChangeEvent.subscribe(self.onAssignStudentsChange.bind(self));
+		// remove student
+		// self.dataModel.onAssignStudentsChangeEvent.subscribe(self.onAssignStudentsChange.bind(self));
 		self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChange.bind(self));
-		self.dataModel.onStudentChangeEvent.subscribe(self.onStudentChange.bind(self));
-		self.dataModel.onStudentCrossStreetStopChangeEvent.subscribe(self.onStudentCrossStreetStopChangeEvent.bind(self));
+		// remove student
+		// self.dataModel.onStudentChangeEvent.subscribe(self.onStudentChange.bind(self));
+		// self.dataModel.onStudentCrossStreetStopChangeEvent.subscribe(self.onStudentCrossStreetStopChangeEvent.bind(self));
 		self.changeVisible = self.changeVisible.bind(self);
 		self.dataModel.onTripDisplayRefreshEvent.subscribe(self.onTripDisplayRefresh.bind(self));
 		self.dataModel.onOptimizeSequenceDiffRateChange.subscribe(self.showOptimizeInfo.bind(self));
 		self.dataModel.onShowChartChangeEvent.subscribe(self.onShowChartChange.bind(self));
 		self.dataModel.onSchoolLocationChangeEvent.subscribe(self.onSchoolLocationChange.bind(self));
-		self.dataModel.onStopCandidateStudentChangeEvent.subscribe(self.onStopCandidateStudentChange.bind(self));
+		// remove students
+		// self.dataModel.onStopCandidateStudentChangeEvent.subscribe(self.onStopCandidateStudentChange.bind(self));
 		self.dataModel.onTripSaveEvent.subscribe(self.onTripSaveEvent.bind(self));
 
 		self.routingDisplayFixTitle = new TF.RoutingMap.RoutingPalette.RoutingDisplayFixTitle();
@@ -140,40 +143,43 @@
 		if (isNullObj(tripStop)) return;
 
 		var originalTripId = tripStop.FieldTripId;
-		var invalidStudents = self.dataModel.getInvalidStudentByPUDOStatus(tripStop, destination.customData.tripId);
-		var executeCoreInsertion = Promise.resolve(false);
-		if (invalidStudents.length > 0)
-		{
-			// prompt
-			executeCoreInsertion = tf.promiseBootbox.confirm(
-				{
-					message: "As there are students with different PUDO status in destination trip, would you like to unassign students to continue?",
-					title: "PUDO Status CONFLICT",
-					buttons:
-					{
-						OK:
-						{
-							label: "Yes"
-						},
-						Cancel:
-						{
-							label: "No"
-						}
-					}
-				})
-				.then(function(result)
-				{
-					if (result)
-					{
-						self.dataModel.unAssignStudent(invalidStudents, tripStop);
-					}
-					return result;
-				});
-		}
-		else
-		{
-			executeCoreInsertion = Promise.resolve(true);
-		}
+		// remove student
+		// var invalidStudents = self.dataModel.getInvalidStudentByPUDOStatus(tripStop, destination.customData.tripId);
+		var executeCoreInsertion = Promise.resolve(true);
+
+		// remove student
+		// if (invalidStudents.length > 0)
+		// {
+		// 	// prompt
+		// 	executeCoreInsertion = tf.promiseBootbox.confirm(
+		// 		{
+		// 			message: "As there are students with different PUDO status in destination trip, would you like to unassign students to continue?",
+		// 			title: "PUDO Status CONFLICT",
+		// 			buttons:
+		// 			{
+		// 				OK:
+		// 				{
+		// 					label: "Yes"
+		// 				},
+		// 				Cancel:
+		// 				{
+		// 					label: "No"
+		// 				}
+		// 			}
+		// 		})
+		// 		.then(function(result)
+		// 		{
+		// 			if (result)
+		// 			{
+		// 				self.dataModel.unAssignStudent(invalidStudents, tripStop);
+		// 			}
+		// 			return result;
+		// 		});
+		// }
+		// else
+		// {
+		// 	executeCoreInsertion = Promise.resolve(true);
+		// }
 
 		executeCoreInsertion.then(function(result)
 		{
@@ -208,7 +214,8 @@
 		{
 			if (!isSameTrip)
 			{
-				self.setIsValidPropertyOnTree(oldTrip[0]);
+				// remove student
+				// self.setIsValidPropertyOnTree(oldTrip[0]);
 				self.refreshAllStopNode(oldTrip[0]);
 			}
 		}));
@@ -221,7 +228,8 @@
 		var currentTrip = [Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; })];
 		promises.push(self.resetTripInfo(currentTrip, null, true).then(function()
 		{
-			self.setIsValidPropertyOnTree(currentTrip[0]);
+			// remove student
+			// self.setIsValidPropertyOnTree(currentTrip[0]);
 			if (self.dataModel.showImpactDifferenceChart())
 			{
 				self.dataModel.refreshOptimizeSequenceRate(currentTrip[0].id, null, null, true);
@@ -259,7 +267,8 @@
 		{
 			tripStopNodes = tripNode.children.options.data.items;
 		}
-		var schoolStudents = [];
+		// remove student
+		// var schoolStudents = [];
 		if (trip.Session != TF.Helper.TripHelper.Sessions.ToSchool)
 		{
 			trip.FieldTripStops.sort(function(a, b) 
@@ -308,7 +317,8 @@
 			else
 			{
 				var tripStopTreeView = self.newTripStop(tripStop, trip.Session, trip.Name);
-				schoolStudents = schoolStudents.concat(tripStop.Students);
+				// remove student
+				// schoolStudents = schoolStudents.concat(tripStop.Students);
 				self._insertNode(tripStop, tripStopTreeView, tripNode, trip, tripStopNodes);
 			}
 		});
@@ -570,31 +580,33 @@
 				{
 					return item.customData.crossToStop === null || item.customData.crossToStop === undefined;
 				});
-				if (dataItem.customData.isStop &&
-					items.length > 0)
-				{
-					var result = self.handleUnknowCrossingStatusStudents(items);
-					if (result != null)
-					{
-						result.then(function(nodes)
-						{
-							nodes.map(function(node)
-							{
-								var studentNodeData = dataItem.children.getFirst(node.id, function(data)
-								{
-									return data.customData && data.customData.isStudent
-										&& data.customData.requirementId == node.customData.requirementId
-										&& data.customData.previousScheduleID == node.customData.previousScheduleID
-										&& data.customData.tripStopId == node.customData.tripStopId;
-								});
-								if (studentNodeData)
-								{
-									self.setStudentNodeProperty(studentNodeData, self.treeview.findByUid(studentNodeData.uid), node.customData.crossToStop);
-								}
-							});
-						});
-					}
-				}
+
+				// remove student
+				// if (dataItem.customData.isStop &&
+				// 	items.length > 0)
+				// {
+				// 	var result = self.handleUnknowCrossingStatusStudents(items);
+				// 	if (result != null)
+				// 	{
+				// 		result.then(function(nodes)
+				// 		{
+				// 			nodes.map(function(node)
+				// 			{
+				// 				var studentNodeData = dataItem.children.getFirst(node.id, function(data)
+				// 				{
+				// 					return data.customData && data.customData.isStudent
+				// 						&& data.customData.requirementId == node.customData.requirementId
+				// 						&& data.customData.previousScheduleID == node.customData.previousScheduleID
+				// 						&& data.customData.tripStopId == node.customData.tripStopId;
+				// 				});
+				// 				if (studentNodeData)
+				// 				{
+				// 					self.setStudentNodeProperty(studentNodeData, self.treeview.findByUid(studentNodeData.uid), node.customData.crossToStop);
+				// 				}
+				// 			});
+				// 		});
+				// 	}
+				// }
 			},
 			collapse: function(e)
 			{
@@ -827,7 +839,8 @@
 			prevLayover: data.prevLayover,
 			nextLayover: data.nextLayover,
 			customData: {
-				students: data.customData.students,
+				// remove student
+				// students: data.customData.students,
 				stops: data.customData.stops,
 				tripTotalTime: data.customData.tripTotalTime,
 				distance: data.customData.distance,
@@ -838,84 +851,85 @@
 		}, textInfoNode);
 	};
 
-	RoutingDisplay.prototype.handleUnknowCrossingStatusStudents = function(studentNodes)
-	{
-		var self = this, unknowCrossingStatusStudentNodes = [], unknowCrossingStatusStudents = [];
+	// remove student
+	// RoutingDisplay.prototype.handleUnknowCrossingStatusStudents = function(studentNodes)
+	// {
+	// 	var self = this, unknowCrossingStatusStudentNodes = [], unknowCrossingStatusStudents = [];
 
-		var tripStopIds = {};
-		studentNodes.map(function(student)
-		{
-			if (self.dataModel.tripStopDictionary[student.customData.tripStopId])
-			{
-				var studentEntities = self.dataModel.tripStopDictionary[student.customData.tripStopId].map(function(p) { return p.student });
-				var studentCrossStatusCache = Enumerable.From(studentEntities).FirstOrDefault(null, function(p)
-				{
-					return p.id == student.id && student.customData.requirementId == p.RequirementID && student.customData.previousScheduleID == p.PreviousScheduleID;
-				});
-				if (studentCrossStatusCache && studentCrossStatusCache.CrossToStop != null)
-				{
-					return student.customData.crossToStop = studentCrossStatusCache.CrossToStop;
-				}
-				else
-				{
-					var studentEntity
-					if (!student.customData.isAssigned)
-					{
-						studentEntity = self.dataModel.getCandidateStudentById(student.id);
-					}
-					else
-					{
-						studentEntity = self.dataModel.getAssignedStudentById(student.customData.requirementId, student.customData.tripId, student.customData.previousScheduleID, student.customData.tripStopId, student.id);
-					}
+	// 	var tripStopIds = {};
+	// 	studentNodes.map(function(student)
+	// 	{
+	// 		if (self.dataModel.tripStopDictionary[student.customData.tripStopId])
+	// 		{
+	// 			var studentEntities = self.dataModel.tripStopDictionary[student.customData.tripStopId].map(function(p) { return p.student });
+	// 			var studentCrossStatusCache = Enumerable.From(studentEntities).FirstOrDefault(null, function(p)
+	// 			{
+	// 				return p.id == student.id && student.customData.requirementId == p.RequirementID && student.customData.previousScheduleID == p.PreviousScheduleID;
+	// 			});
+	// 			if (studentCrossStatusCache && studentCrossStatusCache.CrossToStop != null)
+	// 			{
+	// 				return student.customData.crossToStop = studentCrossStatusCache.CrossToStop;
+	// 			}
+	// 			else
+	// 			{
+	// 				var studentEntity
+	// 				if (!student.customData.isAssigned)
+	// 				{
+	// 					studentEntity = self.dataModel.getCandidateStudentById(student.id);
+	// 				}
+	// 				else
+	// 				{
+	// 					studentEntity = self.dataModel.getAssignedStudentById(student.customData.requirementId, student.customData.tripId, student.customData.previousScheduleID, student.customData.tripStopId, student.id);
+	// 				}
 
-					if (!isNullObj(studentEntity))
-					{
-						unknowCrossingStatusStudents.push(studentEntity);
-						unknowCrossingStatusStudentNodes.push(student);
+	// 				if (!isNullObj(studentEntity))
+	// 				{
+	// 					unknowCrossingStatusStudents.push(studentEntity);
+	// 					unknowCrossingStatusStudentNodes.push(student);
 
-						if (isNullObj(tripStopIds[student.customData.tripStopId]))
-						{
-							tripStopIds[student.customData.tripStopId] = { entities: [], nodes: [] };
-						}
-						tripStopIds[student.customData.tripStopId].entities.push(studentEntity);
-						tripStopIds[student.customData.tripStopId].nodes.push(student);
-					}
-				}
-			}
-		});
-		if (unknowCrossingStatusStudents.length == 0)
-		{
-			return Promise.resolve(studentNodes);
-		}
-		var promises = [];
-		for (var key in tripStopIds)
-		{
-			(function(key)
-			{
-				var tripStop = self.dataModel.getFieldTripStopByStopId(key);
-				let needCalcuAcrossStreetStudents = tripStopIds[key].entities.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
-				promises.push(self.dataModel.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, needCalcuAcrossStreetStudents, true).then(function(crossStudentArray)
-				{
-					tripStopIds[key].nodes.map(function(student)
-					{
-						if (crossStudentArray[0].indexOf(student.id) == -1)
-						{
-							student.customData.crossToStop = false;
-						}
-						else
-						{
-							student.customData.crossToStop = true;
-						}
-						self.dataModel.updateStudentCrossStatus(tripStop.id, student, student.customData.crossToStop);
-					});
-				}));
-			})(key);
-		}
-		return Promise.all(promises).then(function()
-		{
-			return studentNodes;
-		});
-	};
+	// 					if (isNullObj(tripStopIds[student.customData.tripStopId]))
+	// 					{
+	// 						tripStopIds[student.customData.tripStopId] = { entities: [], nodes: [] };
+	// 					}
+	// 					tripStopIds[student.customData.tripStopId].entities.push(studentEntity);
+	// 					tripStopIds[student.customData.tripStopId].nodes.push(student);
+	// 				}
+	// 			}
+	// 		}
+	// 	});
+	// 	if (unknowCrossingStatusStudents.length == 0)
+	// 	{
+	// 		return Promise.resolve(studentNodes);
+	// 	}
+	// 	var promises = [];
+	// 	for (var key in tripStopIds)
+	// 	{
+	// 		(function(key)
+	// 		{
+	// 			var tripStop = self.dataModel.getFieldTripStopByStopId(key);
+	// 			let needCalcuAcrossStreetStudents = tripStopIds[key].entities.filter(stu => stu.XCoord != 0 && stu.YCoord != 0 && stu.RequirementID);
+	// 			promises.push(self.dataModel.viewModel.drawTool.NAtool._getAcrossStreetStudents(tripStop, needCalcuAcrossStreetStudents, true).then(function(crossStudentArray)
+	// 			{
+	// 				tripStopIds[key].nodes.map(function(student)
+	// 				{
+	// 					if (crossStudentArray[0].indexOf(student.id) == -1)
+	// 					{
+	// 						student.customData.crossToStop = false;
+	// 					}
+	// 					else
+	// 					{
+	// 						student.customData.crossToStop = true;
+	// 					}
+	// 					self.dataModel.updateStudentCrossStatus(tripStop.id, student, student.customData.crossToStop);
+	// 				});
+	// 			}));
+	// 		})(key);
+	// 	}
+	// 	return Promise.all(promises).then(function()
+	// 	{
+	// 		return studentNodes;
+	// 	});
+	// };
 
 	RoutingDisplay.prototype.bindEventAndCustomElement = function()
 	{
@@ -1127,8 +1141,9 @@
 		var $deleteButtons = routingtreeview.find(".icon.stop-delete");
 		$deleteButtons.off('click').on('click', deleteClick.bind(self));
 
-		var $assignStudentForStopButtons = routingtreeview.find(".icon.assign");
-		$assignStudentForStopButtons.off('click').on('click', assignStudentForStopClick.bind(self));
+		// remove student
+		// var $assignStudentForStopButtons = routingtreeview.find(".icon.assign");
+		// $assignStudentForStopButtons.off('click').on('click', assignStudentForStopClick.bind(self));
 
 		var $infoButtons = routingtreeview.find(".icon.stop-info");
 		$infoButtons.off('click').on('click', infoClick.bind(self));
@@ -1142,8 +1157,9 @@
 		var $minusButtons = routingtreeview.find(".icon.minus");
 		$minusButtons.off('click').on('click', minusClick.bind(self));
 
-		var $addButtons = routingtreeview.find(".icon.add");
-		$addButtons.off('click').on('click', addClick.bind(self));
+		// remove student
+		// var $addButtons = routingtreeview.find(".icon.add");
+		// $addButtons.off('click').on('click', addClick.bind(self));
 
 		var $scheduledTimeButtons = routingtreeview.find(".schedule-time");
 		$scheduledTimeButtons.off('click').on('click', scheduledTimeClick.bind(self));
@@ -1190,11 +1206,13 @@
 		$insertTripStopsButton.off('mouseover').on('mouseover', insertStopButtonMouseOver.bind(self));
 		$insertTripStopsButton.off('mouseout').on('mouseout', insertStopButtonMouseOut.bind(self));
 
-		var $dayButtons = routingtreeview.find(".student-requirement .day");
-		$dayButtons.off('click').on('click', studentDayClick.bind(self));
+		// remove student
+		// var $dayButtons = routingtreeview.find(".student-requirement .day");
+		// $dayButtons.off('click').on('click', studentDayClick.bind(self));
 
-		var $sessionStatusButtons = routingtreeview.find(".student-PUDOStatus .status");
-		$sessionStatusButtons.off('click').on('click', studentStatusClick.bind(self));
+		// remove student
+		// var $sessionStatusButtons = routingtreeview.find(".student-PUDOStatus .status");
+		// $sessionStatusButtons.off('click').on('click', studentStatusClick.bind(self));
 
 	}
 
@@ -1506,19 +1524,20 @@
 		self.dataModel.changeDataStack.push(self.dataModel.getFieldTripStopByStopId(data.id));
 	}
 
-	async function assignStudentForStopClick(e)
-	{
-		var self = this;
-		e.preventDefault();
-		e.stopPropagation();
-		var data = self.treeview.dataItem(e.target.closest('li'));
+	// remove student
+	// async function assignStudentForStopClick(e)
+	// {
+	// 	var self = this;
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	var data = self.treeview.dataItem(e.target.closest('li'));
 
-		let result = await this.eventsManager.assignStudentForStopClick(data.id);
-		if (result && result.prohibitStudents && result.prohibitStudents.length > 0)
-		{
-			return tf.promiseBootbox.alert(result.prohibitStudents.map(s => { return `${s.FirstName} ${s.LastName}` }).join(', ') + ` ${result.prohibitStudents.length == 1 ? 'is' : 'are'} not allowed to cross the road.`, 'Message');
-		}
-	}
+	// 	let result = await this.eventsManager.assignStudentForStopClick(data.id);
+	// 	if (result && result.prohibitStudents && result.prohibitStudents.length > 0)
+	// 	{
+	// 		return tf.promiseBootbox.alert(result.prohibitStudents.map(s => { return `${s.FirstName} ${s.LastName}` }).join(', ') + ` ${result.prohibitStudents.length == 1 ? 'is' : 'are'} not allowed to cross the road.`, 'Message');
+	// 	}
+	// }
 
 	function showClick(e)
 	{
@@ -1668,170 +1687,173 @@
 		self.dataModel.changeDataStack.push(tripStop);
 	}
 
-	function addClick(e)
-	{
-		var self = this;
-		e.preventDefault();
-		e.stopPropagation();
-		let data = self.treeview.dataItem(e.target.closest('li')), student;
-		if (data.customData.requirementId)
-		{
-			student = self.dataModel.getCanAssignCandidateStudentById(data.id, data.customData.requirementId, data.customData.previousScheduleID);
-		}
-		else
-		{
-			let stopStudents = self.dataModel.tripStopDictionary[data.customData.tripStopId] || [],
-				exception = stopStudents.find(s => s.student.id === data.id);
-			if (exception)
-			{
-				student = self.dataModel.getCanAssignCandidateStudentById(data.id, null, data.customData.previousScheduleID, exception.student);
-			}
-		}
-		if (isNullObj(student))
-		{
-			return;
-		}
+	// remove student
+	// function addClick(e)
+	// {
+	// 	var self = this;
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	let data = self.treeview.dataItem(e.target.closest('li')), student;
+	// 	if (data.customData.requirementId)
+	// 	{
+	// 		student = self.dataModel.getCanAssignCandidateStudentById(data.id, data.customData.requirementId, data.customData.previousScheduleID);
+	// 	}
+	// 	else
+	// 	{
+	// 		let stopStudents = self.dataModel.tripStopDictionary[data.customData.tripStopId] || [],
+	// 			exception = stopStudents.find(s => s.student.id === data.id);
+	// 		if (exception)
+	// 		{
+	// 			student = self.dataModel.getCanAssignCandidateStudentById(data.id, null, data.customData.previousScheduleID, exception.student);
+	// 		}
+	// 	}
+	// 	if (isNullObj(student))
+	// 	{
+	// 		return;
+	// 	}
 
-		var studentArray = [student];
-		var tripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id), schoolAssigned;
-		if (tripStop.SchoolCode && ((student.TransSchoolCode != null && tripStop.SchoolCode != student.TransSchoolCode) || !student.TransSchoolCode))
-		{
-			schoolAssigned = tripStop;
-			tripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
-		}
+	// 	var studentArray = [student];
+	// 	var tripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id), schoolAssigned;
+	// 	if (tripStop.SchoolCode && ((student.TransSchoolCode != null && tripStop.SchoolCode != student.TransSchoolCode) || !student.TransSchoolCode))
+	// 	{
+	// 		schoolAssigned = tripStop;
+	// 		tripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
+	// 	}
 
-		var tripStopNode = self.treeview.dataSource.getFirst(tripStop.id, function(_data)
-		{
-			return _data.customData && _data.customData.isStop;
-		});
-		var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(data.id, tripStopNode, 'student', data.customData.requirementId, tripStop.id, data.customData.previousScheduleID);
-		if (studentNode && self.routingDisplayHelper.filterArray(studentNode.customData.dayCheckList, true).length == 0)
-		{
-			return tf.promiseBootbox.alert('Please select a day to assign.');
-		}
-		self.dataModel.assignStudent(studentArray, tripStop, null, null, null, null, true, schoolAssigned).then(function(result)
-		{
-			self.dataModel.changeDataStack.push(tripStop);
-			if (result && result.prohibitStudents && result.prohibitStudents.length > 0)
-			{
-				return tf.promiseBootbox.alert(result.prohibitStudents.map(s => { return `${s.FirstName} ${s.LastName}` }).join(', ') + ` ${result.prohibitStudents.length == 1 ? 'is' : 'are'} not allowed to cross the road.`, 'Message');
-			}
-		});
+	// 	var tripStopNode = self.treeview.dataSource.getFirst(tripStop.id, function(_data)
+	// 	{
+	// 		return _data.customData && _data.customData.isStop;
+	// 	});
+	// 	var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(data.id, tripStopNode, 'student', data.customData.requirementId, tripStop.id, data.customData.previousScheduleID);
+	// 	if (studentNode && self.routingDisplayHelper.filterArray(studentNode.customData.dayCheckList, true).length == 0)
+	// 	{
+	// 		return tf.promiseBootbox.alert('Please select a day to assign.');
+	// 	}
+	// 	self.dataModel.assignStudent(studentArray, tripStop, null, null, null, null, true, schoolAssigned).then(function(result)
+	// 	{
+	// 		self.dataModel.changeDataStack.push(tripStop);
+	// 		if (result && result.prohibitStudents && result.prohibitStudents.length > 0)
+	// 		{
+	// 			return tf.promiseBootbox.alert(result.prohibitStudents.map(s => { return `${s.FirstName} ${s.LastName}` }).join(', ') + ` ${result.prohibitStudents.length == 1 ? 'is' : 'are'} not allowed to cross the road.`, 'Message');
+	// 		}
+	// 	});
 
-	}
+	// }
 
-	function studentStatusClick(e)
-	{
-		var self = this;
-		e.preventDefault();
-		e.stopPropagation();
-		var currentElement = e.target;
-		if (currentElement.classList.contains("checked") || currentElement.classList.contains("cannot-checked"))
-		{
-			return;
-		}
+	// remove student
+	// function studentStatusClick(e)
+	// {
+	// 	var self = this;
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	var currentElement = e.target;
+	// 	if (currentElement.classList.contains("checked") || currentElement.classList.contains("cannot-checked"))
+	// 	{
+	// 		return;
+	// 	}
 
-		var currentIndex = 0;
-		for (var i = 0; i < 2; i++)
-		{
-			if (currentElement == $(currentElement.closest('li')).find('.student-PUDOStatus .status')[i])
-			{
-				currentIndex = i; break;
-			}
-		}
-		$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[currentIndex]).addClass("checked");
-		$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[1 - currentIndex]).removeClass("checked");
-		var data = self.treeview.dataItem(currentElement.closest('li'));
-		var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
-		var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
-		var student = self.dataModel.getStudent(studentId, currentTripStop.id, data.customData.anotherTripStopID, requirementId, previousScheduleID);
-		var isSchool = currentTripStop.SchoolCode ? true : false;
-		if (isNullObj(student) && isSchool)
-		{
-			currentTripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
-			student = self.getStudentFromSchoolNode(data.customData.tripStopId, data.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
-		}
-		return self.dataModel.updateStudentPUDOStatus(student, 1 - student.Session, currentTripStop.FieldTripId).then(function()
-		{
-			self.dataModel.setAssignedStudentValidProperty(currentTripStop);
-			self.refreshAffectStopByStudentId(student.id);
-			self.dataModel.changeDataStack.push(currentTripStop);
-		});
-	}
+	// 	var currentIndex = 0;
+	// 	for (var i = 0; i < 2; i++)
+	// 	{
+	// 		if (currentElement == $(currentElement.closest('li')).find('.student-PUDOStatus .status')[i])
+	// 		{
+	// 			currentIndex = i; break;
+	// 		}
+	// 	}
+	// 	$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[currentIndex]).addClass("checked");
+	// 	$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[1 - currentIndex]).removeClass("checked");
+	// 	var data = self.treeview.dataItem(currentElement.closest('li'));
+	// 	var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
+	// 	var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
+	// 	var student = self.dataModel.getStudent(studentId, currentTripStop.id, data.customData.anotherTripStopID, requirementId, previousScheduleID);
+	// 	var isSchool = currentTripStop.SchoolCode ? true : false;
+	// 	if (isNullObj(student) && isSchool)
+	// 	{
+	// 		currentTripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
+	// 		student = self.getStudentFromSchoolNode(data.customData.tripStopId, data.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
+	// 	}
+	// 	return self.dataModel.updateStudentPUDOStatus(student, 1 - student.Session, currentTripStop.FieldTripId).then(function()
+	// 	{
+	// 		self.dataModel.setAssignedStudentValidProperty(currentTripStop);
+	// 		self.refreshAffectStopByStudentId(student.id);
+	// 		self.dataModel.changeDataStack.push(currentTripStop);
+	// 	});
+	// }
 
-	function studentDayClick(e)
-	{
-		var self = this;
-		e.preventDefault();
-		e.stopPropagation();
-		var currentElement = e.target;
-		var dayIndex = $(currentElement).parent().children().index(currentElement);
-		var destinationDayValue = !currentElement.classList.contains("checked");
-		var canExecuteClick = !currentElement.classList.contains("disabled") && !currentElement.classList.contains("cannot-checked");
-		if (!canExecuteClick)
-		{
-			return;
-		}
-		var data = self.treeview.dataItem(currentElement.closest('li'));
+	// remove student
+	// function studentDayClick(e)
+	// {
+	// 	var self = this;
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	var currentElement = e.target;
+	// 	var dayIndex = $(currentElement).parent().children().index(currentElement);
+	// 	var destinationDayValue = !currentElement.classList.contains("checked");
+	// 	var canExecuteClick = !currentElement.classList.contains("disabled") && !currentElement.classList.contains("cannot-checked");
+	// 	if (!canExecuteClick)
+	// 	{
+	// 		return;
+	// 	}
+	// 	var data = self.treeview.dataItem(currentElement.closest('li'));
 
-		var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
-		var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
-		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(currentTripStop.FieldTripId, 'trip', self.treeview.dataSource);
-		var trip = self.dataModel.getTripById(currentTripStop.FieldTripId);
+	// 	var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
+	// 	var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
+	// 	var tripNode = self.routingDisplayHelper.getExpandedTreeNode(currentTripStop.FieldTripId, 'trip', self.treeview.dataSource);
+	// 	var trip = self.dataModel.getTripById(currentTripStop.FieldTripId);
 
-		if (!data.customData.isAssigned)
-		{
-			var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
-			var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
+	// 	if (!data.customData.isAssigned)
+	// 	{
+	// 		var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
+	// 		var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
 
-			var student = self.dataModel.getStudent(studentId, currentTripStop.id, studentNode.customData.anotherTripStopID, requirementId, previousScheduleID);
-			if (isNullObj(student) && currentTripStop.SchoolCode)
-			{
-				currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
-				student = self.getStudentFromSchoolNode(studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
-				tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
-				studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
-			}
-			self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, studentNode.customData.anotherTripStopID, true);
-			self.updateStudentDay(tripStopNode, studentNode, student, dayIndex, destinationDayValue);
-			self.refreshAllStopNode(trip, true);
-			return;
-		}
+	// 		var student = self.dataModel.getStudent(studentId, currentTripStop.id, studentNode.customData.anotherTripStopID, requirementId, previousScheduleID);
+	// 		if (isNullObj(student) && currentTripStop.SchoolCode)
+	// 		{
+	// 			currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
+	// 			student = self.getStudentFromSchoolNode(studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
+	// 			tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
+	// 			studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
+	// 		}
+	// 		self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, studentNode.customData.anotherTripStopID, true);
+	// 		self.updateStudentDay(tripStopNode, studentNode, student, dayIndex, destinationDayValue);
+	// 		self.refreshAllStopNode(trip, true);
+	// 		return;
+	// 	}
 
-		var lockInfo = {
-			RequirementId: requirementId,
-			PreviousScheduleID: previousScheduleID,
-			StudId: studentId,
-			TripId: trip.id,
-			TripStopId: data.customData.tripStopId
-		};
+	// 	var lockInfo = {
+	// 		RequirementId: requirementId,
+	// 		PreviousScheduleID: previousScheduleID,
+	// 		StudId: studentId,
+	// 		TripId: trip.id,
+	// 		TripStopId: data.customData.tripStopId
+	// 	};
 
-		var studentAssigned = currentTripStop.Students.find(function(c) { return c.RequirementID == requirementId && c.id == studentId });
-		if (studentAssigned)
-		{
-			lockInfo.EndDate = studentAssigned.EndDate;
-			lockInfo.StartDate = studentAssigned.StartDate;
-		}
+	// 	var studentAssigned = currentTripStop.Students.find(function(c) { return c.RequirementID == requirementId && c.id == studentId });
+	// 	if (studentAssigned)
+	// 	{
+	// 		lockInfo.EndDate = studentAssigned.EndDate;
+	// 		lockInfo.StartDate = studentAssigned.StartDate;
+	// 	}
 
-		for (var i = 0; i < 7; i++)
-		{
-			lockInfo[self.dataModel.getWeekdayAttributeNameByIndex(i)] = i == dayIndex ? destinationDayValue : data.customData.dayCheckList[i];
-		}
+	// 	for (var i = 0; i < 7; i++)
+	// 	{
+	// 		lockInfo[self.dataModel.getWeekdayAttributeNameByIndex(i)] = i == dayIndex ? destinationDayValue : data.customData.dayCheckList[i];
+	// 	}
 
-		self.dataModel.lockRoutingStudent([lockInfo], null, null, true).then(function()
-		{
-			if (currentTripStop.SchoolCode)
-			{
-				var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
-				var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
-				currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
-			}
+	// 	self.dataModel.lockRoutingStudent([lockInfo], null, null, true).then(function()
+	// 	{
+	// 		if (currentTripStop.SchoolCode)
+	// 		{
+	// 			var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
+	// 			var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
+	// 			currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
+	// 		}
 
-			self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, data.customData.anotherTripStopID);
-			self.refreshAffectStopByStudentId(studentId, requirementId ? null : currentTripStop);
-			self.dataModel.changeDataStack.push(currentTripStop);
-		});
-	}
+	// 		self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, data.customData.anotherTripStopID);
+	// 		self.refreshAffectStopByStudentId(studentId, requirementId ? null : currentTripStop);
+	// 		self.dataModel.changeDataStack.push(currentTripStop);
+	// 	});
+	// }
 
 	RoutingDisplay.prototype.updatePUDOStatus = function(tripStopNode, studentNode, student)
 	{
@@ -1869,25 +1891,16 @@
 		return self.dataModel.getStudent(studentId, relatedTripStopId, anotherTripStopID, requirementId, previousScheduleID);
 	}
 
-	RoutingDisplay.prototype.updateStudentNode = function(studentNode)
-	{
-		var self = this;
-		var studentElement = self.treeview.findByUid(studentNode.uid);
-		self.setStudentNodeProperty(studentNode, studentElement);
-	}
+	// remove student
+	// RoutingDisplay.prototype.updateStudentNode = function(studentNode)
+	// {
+	// 	var self = this;
+	// 	var studentElement = self.treeview.findByUid(studentNode.uid);
+	// 	self.setStudentNodeProperty(studentNode, studentElement);
+	// }
 
-	RoutingDisplay.prototype.isStudentExist = function(tripStop, student)
-	{
-		for (var i = 0; i < tripStop.Students.length; i++)
-		{
-			if (tripStop.Students[i].id == student.id)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
+	// remove student
+	/*
 	RoutingDisplay.prototype.onStudentChange = function(e, student)
 	{
 		var self = this;
@@ -1926,6 +1939,7 @@
 			}
 		});
 	}
+	*/
 
 	RoutingDisplay.prototype.onTripStopsChange = function(e, data)
 	{
@@ -2213,98 +2227,102 @@
 		}
 	}
 
-	RoutingDisplay.prototype.getVisibleStudent = function(tripStop)
-	{
-		var students = [], self = this;
-		if (self.dataModel.tripStopDictionary[tripStop.id])
-		{
-			students = students.concat(self.dataModel.tripStopDictionary[tripStop.id].filter(function(ts)
-			{
-				return ts.canBeAssigned || ts.student.IsAssigned;
-			}).map(function(ts)
-			{
-				return ts.student;
-			}));
-		}
-		if (self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id])
-		{
-			students = students.concat(self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(ts)
-			{
-				return ts.canBeAssigned || ts.student.IsAssigned;
-			}).map(function(ts)
-			{
-				return ts.student;
-			}));
-		}
+	// remove student
+	// RoutingDisplay.prototype.getVisibleStudent = function(tripStop)
+	// {
+	// 	var students = [], self = this;
+	// 	if (self.dataModel.tripStopDictionary[tripStop.id])
+	// 	{
+	// 		students = students.concat(self.dataModel.tripStopDictionary[tripStop.id].filter(function(ts)
+	// 		{
+	// 			return ts.canBeAssigned || ts.student.IsAssigned;
+	// 		}).map(function(ts)
+	// 		{
+	// 			return ts.student;
+	// 		}));
+	// 	}
+	// 	if (self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id])
+	// 	{
+	// 		students = students.concat(self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(ts)
+	// 		{
+	// 			return ts.canBeAssigned || ts.student.IsAssigned;
+	// 		}).map(function(ts)
+	// 		{
+	// 			return ts.student;
+	// 		}));
+	// 	}
 
-		return students;
-	}
+	// 	return students;
+	// }
 
-	RoutingDisplay.prototype.onStudentCrossStreetStopChangeEvent = function(e, data)
-	{
-		this.resetStudentCrossStatus(data);
-	}
+	// remove student
+	// RoutingDisplay.prototype.onStudentCrossStreetStopChangeEvent = function(e, data)
+	// {
+	// 	this.resetStudentCrossStatus(data);
+	// }
 
-	RoutingDisplay.prototype.resetStudentCrossStatus = function(changeTripStopList)
-	{
-		var self = this;
-		var trips = {};
-		changeTripStopList.map(function(tripStop)
-		{
-			var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
-			var tripStopData = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
-			var allStudents = self.dataModel.tripStopDictionary.hasOwnProperty(tripStop.id) ? self.dataModel.tripStopDictionary[tripStop.id] : [];
-			if (isNullObj(trips[tripStop.FieldTripId]))
-			{
-				trips[tripStop.FieldTripId] = self.dataModel.getTripById(tripStop.FieldTripId);
-			}
-			allStudents.map(function(studentEntity)
-			{
-				var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentEntity.student.id, tripStopData, 'student', studentEntity.student.RequirementID, tripStop.id, studentEntity.student.PreviousScheduleID);
-				if (studentNode && self.routingDisplayHelper.checkNodeWasExpanded(tripStopData))
-				{
-					var studentNodeElement = self.treeview.findByUid(studentNode.uid);
-					self.setStudentNodeProperty(studentNode, studentNodeElement, studentEntity.student.CrossToStop);
-				}
-				else if (studentNode)
-				{
-					studentNode.customData.crossToStop = studentEntity.student.CrossToStop;
-				}
-				if (!studentEntity.canBeAssigned)
-				{
-					tripStop.Students.map(function(student)
-					{
-						if (student.id == studentEntity.student.id)
-						{
-							return student.CrossToStop = studentEntity.student.CrossToStop;
-						}
-					});
-				}
-			});
-		});
-		for (var key in trips)
-		{
-			self.refreshAllStopNode(trips[key], true);
-		}
-	};
+	// RoutingDisplay.prototype.resetStudentCrossStatus = function(changeTripStopList)
+	// {
+	// 	var self = this;
+	// 	var trips = {};
+	// 	changeTripStopList.map(function(tripStop)
+	// 	{
+	// 		var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
+	// 		var tripStopData = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
+	// 		var allStudents = self.dataModel.tripStopDictionary.hasOwnProperty(tripStop.id) ? self.dataModel.tripStopDictionary[tripStop.id] : [];
+	// 		if (isNullObj(trips[tripStop.FieldTripId]))
+	// 		{
+	// 			trips[tripStop.FieldTripId] = self.dataModel.getTripById(tripStop.FieldTripId);
+	// 		}
+	// 		allStudents.map(function(studentEntity)
+	// 		{
+	// 			var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentEntity.student.id, tripStopData, 'student', studentEntity.student.RequirementID, tripStop.id, studentEntity.student.PreviousScheduleID);
+	// 			if (studentNode && self.routingDisplayHelper.checkNodeWasExpanded(tripStopData))
+	// 			{
+	// 				var studentNodeElement = self.treeview.findByUid(studentNode.uid);
+	// 				self.setStudentNodeProperty(studentNode, studentNodeElement, studentEntity.student.CrossToStop);
+	// 			}
+	// 			else if (studentNode)
+	// 			{
+	// 				studentNode.customData.crossToStop = studentEntity.student.CrossToStop;
+	// 			}
+	// 			if (!studentEntity.canBeAssigned)
+	// 			{
+	// 				tripStop.Students.map(function(student)
+	// 				{
+	// 					if (student.id == studentEntity.student.id)
+	// 					{
+	// 						return student.CrossToStop = studentEntity.student.CrossToStop;
+	// 					}
+	// 				});
+	// 			}
+	// 		});
+	// 	});
+	// 	for (var key in trips)
+	// 	{
+	// 		self.refreshAllStopNode(trips[key], true);
+	// 	}
+	// };
 
-	RoutingDisplay.prototype.removeUnassignedStudentElementFromStop = function(tripStopData)
-	{
-		var self = this, students;
-		function getStudents(tripStopData)
-		{
-			return tripStopData.items.length > 0 ? tripStopData.items : ((tripStopData.children && tripStopData.children.options) ? tripStopData.children.options.data.items : [])
-		}
 
-		students = getStudents(tripStopData);
-		for (var i = students.length - 1; i > -1; i--)
-		{
-			if (!students[i].customData.isAssigned)
-			{
-				self.routingDisplayHelper.removeTreeNode(students[i], tripStopData);
-			}
-		}
-	}
+	// remove student
+	// RoutingDisplay.prototype.removeUnassignedStudentElementFromStop = function(tripStopData)
+	// {
+	// 	var self = this, students;
+	// 	function getStudents(tripStopData)
+	// 	{
+	// 		return tripStopData.items.length > 0 ? tripStopData.items : ((tripStopData.children && tripStopData.children.options) ? tripStopData.children.options.data.items : [])
+	// 	}
+
+	// 	students = getStudents(tripStopData);
+	// 	for (var i = students.length - 1; i > -1; i--)
+	// 	{
+	// 		if (!students[i].customData.isAssigned)
+	// 		{
+	// 			self.routingDisplayHelper.removeTreeNode(students[i], tripStopData);
+	// 		}
+	// 	}
+	// }
 
 	RoutingDisplay.prototype.IsConfusedStudent = function(studentId, requirementID, previousScheduleID, tripStopId)
 	{
@@ -2324,137 +2342,144 @@
 		return false;
 	}
 
-	RoutingDisplay.prototype.changeSchoolStop = function(student, oldSchoolStop, newSchoolStop, changeDestinationStop, refresh)
-	{
-		var self = this;
-		if (changeDestinationStop)
-		{
-			student.AnotherTripStopID = newSchoolStop.id;
-			if (refresh)
-			{
-				self.refreshAllTripsSchoolStop();
-			}
-		}
-		else
-		{
-			student.TripStopID = newSchoolStop.id;
-			var studentCopy = $.extend({}, student);
-			self.dataModel.unAssignStudent([student], oldSchoolStop);
-			var studentsInDictionary = self.dataModel.tripStopDictionary[newSchoolStop.id];
-			var studInDict = Enumerable.From(studentsInDictionary).FirstOrDefault(null, function(c)
-			{
-				return c.student.id == student.id && c.student.RequirementID == student.RequirementID && c.student.PreviousScheduleID == student.PreviousScheduleID;
-			});
-			if (studInDict)
-			{
-				var weekdays = TF.RoutingMap.RoutingPalette.RoutingDataModel.weekdays;
-				var studentMap = self.dataModel.routingStudentManager.students[self.dataModel.routingStudentManager._getKey(student)];
-				studentMap.availableWeekdays.forEach(function(weekday, index)
-				{
-					studInDict.student[weekdays[index]] = studentCopy[weekdays[index]];
-					studInDict.student["Valid" + weekdays[index]] = studentCopy["Valid" + weekdays[index]];
-				});
-			}
-			self.dataModel.assignStudent([student], newSchoolStop, null, null, null, null, true);
-		}
-	};
+	// remove student
+	// RoutingDisplay.prototype.changeSchoolStop = function(student, oldSchoolStop, newSchoolStop, changeDestinationStop, refresh)
+	// {
+	// 	var self = this;
+	// 	if (changeDestinationStop)
+	// 	{
+	// 		student.AnotherTripStopID = newSchoolStop.id;
+	// 		if (refresh)
+	// 		{
+	// 			self.refreshAllTripsSchoolStop();
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		student.TripStopID = newSchoolStop.id;
+	// 		var studentCopy = $.extend({}, student);
+	// 		self.dataModel.unAssignStudent([student], oldSchoolStop);
+	// 		var studentsInDictionary = self.dataModel.tripStopDictionary[newSchoolStop.id];
+	// 		var studInDict = Enumerable.From(studentsInDictionary).FirstOrDefault(null, function(c)
+	// 		{
+	// 			return c.student.id == student.id && c.student.RequirementID == student.RequirementID && c.student.PreviousScheduleID == student.PreviousScheduleID;
+	// 		});
+	// 		if (studInDict)
+	// 		{
+	// 			var weekdays = TF.RoutingMap.RoutingPalette.RoutingDataModel.weekdays;
+	// 			var studentMap = self.dataModel.routingStudentManager.students[self.dataModel.routingStudentManager._getKey(student)];
+	// 			studentMap.availableWeekdays.forEach(function(weekday, index)
+	// 			{
+	// 				studInDict.student[weekdays[index]] = studentCopy[weekdays[index]];
+	// 				studInDict.student["Valid" + weekdays[index]] = studentCopy["Valid" + weekdays[index]];
+	// 			});
+	// 		}
+	// 		self.dataModel.assignStudent([student], newSchoolStop, null, null, null, null, true);
+	// 	}
+	// };
 
-	RoutingDisplay.prototype.onAssignStudentsChange = function(e, data)
-	{
-		var self = this, affectedStudentIds = [];
-		var tripStop = data.tripStop;
-		self.setFootInfo();
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; });
-		data.isRecalculate != false && self.resetTripInfo([trip]);
-		var affectedStudents = affectedStudentIds.concat(data.add, data.delete);
-		affectedStudents.map(function(student)
-		{
-			self.refreshAffectStopByStudentId(student.id, student.RequirementID ? null : tripStop);
-		});
-	}
+	// remove student
+	// RoutingDisplay.prototype.onAssignStudentsChange = function(e, data)
+	// {
+	// 	var self = this, affectedStudentIds = [];
+	// 	var tripStop = data.tripStop;
+	// 	self.setFootInfo();
+	// 	var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; });
+	// 	data.isRecalculate != false && self.resetTripInfo([trip]);
+	// 	var affectedStudents = affectedStudentIds.concat(data.add, data.delete);
+	// 	affectedStudents.map(function(student)
+	// 	{
+	// 		self.refreshAffectStopByStudentId(student.id, student.RequirementID ? null : tripStop);
+	// 	});
+	// }
 
-	RoutingDisplay.prototype.setTripStopStudentStatus = function(student, tripStop)
-	{
-		var self = this;
-		self.routingDisplayHelper.setStudentStatus(student, tripStop);
-	};
+	// remove student
+	// RoutingDisplay.prototype.setTripStopStudentStatus = function(student, tripStop)
+	// {
+	// 	var self = this;
+	// 	self.routingDisplayHelper.setStudentStatus(student, tripStop);
+	// };
 
-	RoutingDisplay.prototype.setStudentNodeProperty = function(nodeData, nodeElement, crossStatus)
-	{
-		var self = this, inNotTransferSchool = false;
-		if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay && nodeElement.parent().parent().find('.school-row').length > 0)
-		{
-			var stopNode = self.treeview.dataItem(nodeElement.parent().parent());
-			inNotTransferSchool = (nodeData.customData.transSchoolCode === undefined || nodeData.customData.transSchoolCode === null) || (stopNode.customData.schoolCode.toLowerCase() != nodeData.customData.transSchoolCode.toLowerCase());
-		}
+	// remove student
+	// RoutingDisplay.prototype.setStudentNodeProperty = function(nodeData, nodeElement, crossStatus)
+	// {
+	// 	var self = this, inNotTransferSchool = false;
+	// 	if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay && nodeElement.parent().parent().find('.school-row').length > 0)
+	// 	{
+	// 		var stopNode = self.treeview.dataItem(nodeElement.parent().parent());
+	// 		inNotTransferSchool = (nodeData.customData.transSchoolCode === undefined || nodeData.customData.transSchoolCode === null) || (stopNode.customData.schoolCode.toLowerCase() != nodeData.customData.transSchoolCode.toLowerCase());
+	// 	}
 
-		if (nodeData.customData.isStudent)
-		{
-			var tripStop = self.dataModel.getFieldTripStopByStopId(nodeData.customData.tripStopId);
-			if (isNullObj(tripStop))
-			{
-				return;
-			}
-			var stopId = tripStop.id;
-			//schoolstop may contains multiple same students
-			if (!IsEmptyString(tripStop.SchoolCode))
-			{
-				stopId = nodeData.customData.tripStopId;
-			}
+	// 	if (nodeData.customData.isStudent)
+	// 	{
+	// 		var tripStop = self.dataModel.getFieldTripStopByStopId(nodeData.customData.tripStopId);
+	// 		if (isNullObj(tripStop))
+	// 		{
+	// 			return;
+	// 		}
+	// 		var stopId = tripStop.id;
+	// 		//schoolstop may contains multiple same students
+	// 		if (!IsEmptyString(tripStop.SchoolCode))
+	// 		{
+	// 			stopId = nodeData.customData.tripStopId;
+	// 		}
 
-			var student = self.dataModel.getStudent(nodeData.id, stopId, nodeData.customData.anotherTripStopID, nodeData.customData.requirementId, nodeData.customData.previousScheduleID);
-			if (crossStatus != null && crossStatus != undefined)
-			{
-				nodeData.set('customData.crossToStop', crossStatus);
-			}
-			if (student && student.TotalTime)
-			{
-				nodeData.set('customData.totalTime', student.TotalTime);
-			}
-			if (student && student.IsValid != undefined)
-			{
-				nodeData.set('customData.isValid', student.IsAssigned ? !!student.IsValid : true);
-			}
-			if (student)
-			{
-				var parentStopData = nodeData.parent().parent();
-				var isConfused = self.IsConfusedStudent(student.id, student.RequirementID, student.PreviousScheduleID, parentStopData.id);
-				nodeData.set('customData.isConfused', isConfused);
-			}
-			if (student)
-			{
-				nodeData.set('customData.walkToStopDistance', student.IsAssigned ? parseFloat(self.convertToCurrentMeasurementUnit(student.WalkToStopDistance)).toFixed(2) : "--");
-				nodeData.set('customData.walkToStopDistanceWarning', student.WalkToStopDistanceWarning);
-				nodeData.set('customData.prohibitCross', student.ProhibitCross == true || tripStop.ProhibitCrosser == true);
-			}
-			if (student)
-			{
-				self.routingDisplayHelper.updateStudentDayStatus(nodeData, student);
-				if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay)
-				{
-					self.routingDisplayHelper.updateStudentPUDOStatus(nodeData, student, inNotTransferSchool, tripStop);
-				}
-			}
+	// 		var student = self.dataModel.getStudent(nodeData.id, stopId, nodeData.customData.anotherTripStopID, nodeData.customData.requirementId, nodeData.customData.previousScheduleID);
+	// 		if (crossStatus != null && crossStatus != undefined)
+	// 		{
+	// 			nodeData.set('customData.crossToStop', crossStatus);
+	// 		}
+	// 		if (student && student.TotalTime)
+	// 		{
+	// 			nodeData.set('customData.totalTime', student.TotalTime);
+	// 		}
+	// 		if (student && student.IsValid != undefined)
+	// 		{
+	// 			nodeData.set('customData.isValid', student.IsAssigned ? !!student.IsValid : true);
+	// 		}
+	// 		if (student)
+	// 		{
+	// 			var parentStopData = nodeData.parent().parent();
+	// 			var isConfused = self.IsConfusedStudent(student.id, student.RequirementID, student.PreviousScheduleID, parentStopData.id);
+	// 			nodeData.set('customData.isConfused', isConfused);
+	// 		}
+	// 		if (student)
+	// 		{
+	// 			nodeData.set('customData.walkToStopDistance', student.IsAssigned ? parseFloat(self.convertToCurrentMeasurementUnit(student.WalkToStopDistance)).toFixed(2) : "--");
+	// 			nodeData.set('customData.walkToStopDistanceWarning', student.WalkToStopDistanceWarning);
+	// 			nodeData.set('customData.prohibitCross', student.ProhibitCross == true || tripStop.ProhibitCrosser == true);
+	// 		}
+	// 		if (student)
+	// 		{
+	// 			self.routingDisplayHelper.updateStudentDayStatus(nodeData, student);
+	// 			if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay)
+	// 			{
+	// 				self.routingDisplayHelper.updateStudentPUDOStatus(nodeData, student, inNotTransferSchool, tripStop);
+	// 			}
+	// 		}
 
-			var color = self.dataModel.getColorByTripId(nodeData.parent().parent().parent().parent().id);
-			self.routingDisplayHelper.setSequenceLineColor(color, nodeElement, 'student');
-			if (nodeData.customData.isAssigned)
-			{
-				nodeElement.find(".icon.minus").off('click').on('click', minusClick.bind(self));
-			}
-			else
-			{
-				nodeElement.find(".icon.add").off('click').on('click', addClick.bind(self));
-			}
-			nodeElement.find(".icon.zoom-map-to-layers").off('click').on('click', zoomClick.bind(self));
-			nodeElement.find(".student-requirement .day").off('click').on('click', studentDayClick.bind(self));
+	// 		var color = self.dataModel.getColorByTripId(nodeData.parent().parent().parent().parent().id);
+	// 		self.routingDisplayHelper.setSequenceLineColor(color, nodeElement, 'student');
+	// 		if (nodeData.customData.isAssigned)
+	// 		{
+	// 			nodeElement.find(".icon.minus").off('click').on('click', minusClick.bind(self));
+	// 		}
+	// 		else
+	// 		{
+	// 			nodeElement.find(".icon.add").off('click').on('click', addClick.bind(self));
+	// 		}
+	// 		nodeElement.find(".icon.zoom-map-to-layers").off('click').on('click', zoomClick.bind(self));
 
-			if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay)
-			{
-				nodeElement.find(".student-PUDOStatus .status").off('click').on('click', studentStatusClick.bind(self));
-			}
-		}
-	}
+	// 		// remove student
+	// 		// nodeElement.find(".student-requirement .day").off('click').on('click', studentDayClick.bind(self));
+
+	// 		// remove student
+	// 		// if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay)
+	// 		// {
+	// 		// 	nodeElement.find(".student-PUDOStatus .status").off('click').on('click', studentStatusClick.bind(self));
+	// 		// }
+	// 	}
+	// }
 
 	RoutingDisplay.prototype.setTripStopNodeProperty = function(nodeData, nodeElement, onlyAffectCurrentNode)
 	{
@@ -2496,14 +2521,15 @@
 			{
 				nodeData.set('id', tripStopData.id);
 			}
-			if (tripStopData && tripStopData.SchoolCode && tripStopData.ToSchoolStudents)
-			{
-				nodeData.set('customData.toSchoolStudents', tripStopData.ToSchoolStudents);
-			}
-			if (tripStopData && tripStopData.SchoolCode && tripStopData.ToTransStudents)
-			{
-				nodeData.set('customData.toTransStudents', tripStopData.ToTransStudents);
-			}
+			// remove student
+			// if (tripStopData && tripStopData.SchoolCode && tripStopData.ToSchoolStudents)
+			// {
+			// 	nodeData.set('customData.toSchoolStudents', tripStopData.ToSchoolStudents);
+			// }
+			// if (tripStopData && tripStopData.SchoolCode && tripStopData.ToTransStudents)
+			// {
+			// 	nodeData.set('customData.toTransStudents', tripStopData.ToTransStudents);
+			// }
 			if (tripStopData && tripStopData.SchoolCode && tripStopData.TransToTrans)
 			{
 				nodeData.set('customData.transToTrans', tripStopData.TransToTrans);
@@ -2545,60 +2571,62 @@
 			//fix last stop style will be return to bottom style not respect the stop expended status after changing its property
 			var nodeWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(nodeData);
 			self.routingDisplayHelper.fixStopLineStyle(nodeData, nodeElement);
-			if (!onlyAffectCurrentNode)
-			{
-				if (nodeWasExpanded && nodeData.children && nodeData.children._data)
-				{
-					nodeData.children._data.map(function(student)
-					{
-						var studentNodeElement = self.treeview.findByUid(student.uid);
-						self.setStudentNodeProperty(student, studentNodeElement, null);
-					});
-				}
-				else
-				{
-					var studentNodes = nodeData.items.length > 0 ? nodeData.items : ((nodeData.children && nodeData.children.options) ? nodeData.children.options.data.items : nodeData.items);
-					studentNodes.map(function(studentNode)
-					{
-						var student = Enumerable.From(tripStopData.Students).FirstOrDefault(null, function(p)
-						{
-							return p.id == studentNode.id && p.RequirementID == studentNode.customData.requirementId && p.TripStopID == studentNode.customData.tripStopId;
-						});
+			
+			// remove student
+			// if (!onlyAffectCurrentNode)
+			// {
+			// 	if (nodeWasExpanded && nodeData.children && nodeData.children._data)
+			// 	{
+			// 		nodeData.children._data.map(function(student)
+			// 		{
+			// 			var studentNodeElement = self.treeview.findByUid(student.uid);
+			// 			self.setStudentNodeProperty(student, studentNodeElement, null);
+			// 		});
+			// 	}
+			// 	else
+			// 	{
+			// 		var studentNodes = nodeData.items.length > 0 ? nodeData.items : ((nodeData.children && nodeData.children.options) ? nodeData.children.options.data.items : nodeData.items);
+			// 		studentNodes.map(function(studentNode)
+			// 		{
+			// 			var student = Enumerable.From(tripStopData.Students).FirstOrDefault(null, function(p)
+			// 			{
+			// 				return p.id == studentNode.id && p.RequirementID == studentNode.customData.requirementId && p.TripStopID == studentNode.customData.tripStopId;
+			// 			});
 
-						if (isNullObj(student) && self.dataModel.routingStudentManager.schoolStopDictionary[tripStopData.id])
-						{
-							var studentInSchool = Enumerable.From(self.dataModel.routingStudentManager.schoolStopDictionary[tripStopData.id]).FirstOrDefault(null, function(data)
-							{
-								return data.student.id == studentNode.id && data.student.RequirementID == studentNode.customData.requirementId && data.student.TripStopID == studentNode.customData.tripStopId;
-							});
-							if (studentInSchool)
-							{
-								student = studentInSchool.student;
-							}
-						}
+			// 			if (isNullObj(student) && self.dataModel.routingStudentManager.schoolStopDictionary[tripStopData.id])
+			// 			{
+			// 				var studentInSchool = Enumerable.From(self.dataModel.routingStudentManager.schoolStopDictionary[tripStopData.id]).FirstOrDefault(null, function(data)
+			// 				{
+			// 					return data.student.id == studentNode.id && data.student.RequirementID == studentNode.customData.requirementId && data.student.TripStopID == studentNode.customData.tripStopId;
+			// 				});
+			// 				if (studentInSchool)
+			// 				{
+			// 					student = studentInSchool.student;
+			// 				}
+			// 			}
 
-						if (student)
-						{
-							self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, student);
-							studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopData.ProhibitCrosser;
+			// 			if (student)
+			// 			{
+			// 				self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, student);
+			// 				studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopData.ProhibitCrosser;
 
-							if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay && tripStopData.SchoolCode && tripStopData.SchoolCode != studentNode.customData.transSchoolCode)
-							{
-								var studentData = self.dataModel.getStudent(studentNode.id, studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentNode.customData.requirementId, studentNode.customData.previousScheduleID);
-								var availableSession = self.dataModel.routingStudentManager.getAvailableSession(student, tripStopData.FieldTripId, tripStopData);
-								var puValid = availableSession.indexOf(0) < 0 ? false : true;
-								var doValid = availableSession.indexOf(1) < 0 ? false : true;
-								studentNode.customData.session = 1 - studentData.Session;
-								if (!(puValid && doValid))
-								{
-									studentNode.customData.PUValid = !puValid;
-									studentNode.customData.DOValid = !doValid;
-								}
-							}
-						}
-					});
-				}
-			}
+			// 				if (self.routingDisplayHelper.getTripType() == self.routingDisplayHelper.tripType.MidDay && tripStopData.SchoolCode && tripStopData.SchoolCode != studentNode.customData.transSchoolCode)
+			// 				{
+			// 					var studentData = self.dataModel.getStudent(studentNode.id, studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentNode.customData.requirementId, studentNode.customData.previousScheduleID);
+			// 					var availableSession = self.dataModel.routingStudentManager.getAvailableSession(student, tripStopData.FieldTripId, tripStopData);
+			// 					var puValid = availableSession.indexOf(0) < 0 ? false : true;
+			// 					var doValid = availableSession.indexOf(1) < 0 ? false : true;
+			// 					studentNode.customData.session = 1 - studentData.Session;
+			// 					if (!(puValid && doValid))
+			// 					{
+			// 						studentNode.customData.PUValid = !puValid;
+			// 						studentNode.customData.DOValid = !doValid;
+			// 					}
+			// 				}
+			// 			}
+			// 		});
+			// 	}
+			// }
 			nodeElement.find(".icon.stop-delete").off('click').on('click', deleteClick.bind(self));
 			nodeElement.find(".icon.stop-info").off('click').on('click', infoClick.bind(self));
 			nodeElement.find(".icon.copyStop").off('click').on('click', copyStopClick.bind(self));
@@ -2606,7 +2634,8 @@
 			nodeElement.find('.schedule-time').off('click').on('click', scheduledTimeClick.bind(self));
 			nodeElement.find('.avg-speed').off('click').on('click', avgSpeedClick.bind(self));
 			nodeElement.find('.icon.lock-time').off('click').on('click', setLockTimeClick.bind(self));
-			nodeElement.find('.icon.assign').off('click').on('click', assignStudentForStopClick.bind(self));
+			// remove student
+			// nodeElement.find('.icon.assign').off('click').on('click', assignStudentForStopClick.bind(self));
 			if (tripStopData && tripStopData.SchoolCode)
 			{
 				self.bindSchoolLocation(nodeElement);
@@ -2620,6 +2649,7 @@
 		if (nodeData.customData.isTrip)
 		{
 			var tripData = self.dataModel.getTripById(nodeData.id);
+			// remove student
 			// var totalAssignedStudents = tripData.FieldTripStops
 			// 	.reduce((prev, curr) => prev.concat(curr.Students), [])
 			// 	.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
@@ -2753,11 +2783,13 @@
 			session = !session;
 		}
 
-		if (tripStop && !tripStop.SchoolCode && isAssigned)
-		{
-			self.dataModel.getStudentValidValue(student, tripStop);
-		}
-		var isConfused = self.IsConfusedStudent(student.id, student.RequirementID, student.PreviousScheduleID, tripStop.id);
+		// remove student
+		// if (tripStop && !tripStop.SchoolCode && isAssigned)
+		// {
+		// 	self.dataModel.getStudentValidValue(student, tripStop);
+		// }
+		
+		// var isConfused = self.IsConfusedStudent(student.id, student.RequirementID, student.PreviousScheduleID, tripStop.id);
 		return {
 			id: student.id,
 			text: student.FirstName + ' ' + student.LastName,
@@ -2837,8 +2869,9 @@
 			customData: {
 				totalStudentCount: tripStop.TotalStudentCount,
 				assignedStudentCount: tripStop.AssignedStudentCount,
-				toSchoolStudents: tripStop.ToSchoolStudents,
-				toTransStudents: tripStop.ToTransStudents,
+				// remove student
+				// toSchoolStudents: tripStop.ToSchoolStudents,
+				// toTransStudents: tripStop.ToTransStudents,
 				transToTrans: tripStop.TransToTrans,
 				puTransToSchool: tripStop.PUTransToSchool,
 				doTransToSchool: tripStop.DOTransToSchool,
@@ -2870,9 +2903,10 @@
 		return !(tripStop.PrimaryDeparture || tripStop.PrimaryDestination);
 	};
 
-	RoutingDisplay.prototype.onCandidatesStudentsChange = function(e, data)
-	{
-	}
+	// remove student
+	// RoutingDisplay.prototype.onCandidatesStudentsChange = function(e, data)
+	// {
+	// }
 
 	RoutingDisplay.prototype.onTripSaveEvent = function(evt, trips)
 	{
@@ -2887,156 +2921,158 @@
 		});
 	};
 
-	RoutingDisplay.prototype.onStopCandidateStudentChange = function(e, data)
-	{
-		var self = this;
-		data.add.map(function(student)
-		{
-			var pList = [];
-			var tripStopEntities = self.dataModel.studentsDictionary[self.dataModel.routingStudentManager._getKey(student)];
-			if (tripStopEntities && tripStopEntities.length > 0 && self.treeview)
-			{
-				var stopIds = [];
-				tripStopEntities.forEach(function(stop)
-				{
-					stopIds.push(stop.id);
-					stopIds = stopIds.concat($.isArray(stop.schoolStopId) ? stop.schoolStopId : [stop.schoolStopId]);
-				});
-				stopIds = Enumerable.From(stopIds).Distinct().ToArray();
-				stopIds.map(function(stopId)
-				{
-					var promise = Promise.resolve(true);
-					var tripStop = self.dataModel.getFieldTripStopByStopId(stopId);
-					if (isNullObj(tripStop) || tripStop.OpenType != 'Edit')
-					{
-						return;
-					}
-					var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
-					if (isNullObj(tripNode))
-					{
-						return;
-					}
 
-					var ts = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
-					var studentTemp = null;
-					if (self.dataModel.tripStopDictionary[stopId].length > 0)
-					{
-						var studentEntity = Enumerable.From(self.dataModel.tripStopDictionary[stopId]).FirstOrDefault(null, function(s) { return s && s.student.RequirementID == student.RequirementID && s.student.PreviousScheduleID == student.PreviousScheduleID; });
-						if (studentEntity != null)
-						{
-							if (!studentEntity.canBeAssigned)
-							{
-								return;
-							}
-							studentTemp = studentEntity.student;
-						}
-					}
-					if (studentTemp === null && self.dataModel.routingStudentManager.schoolStopDictionary[stopId].length > 0)
-					{
-						var studentEntity = Enumerable.From(self.dataModel.routingStudentManager.schoolStopDictionary[stopId]).FirstOrDefault(null, function(s) { return s && s.student.RequirementID == student.RequirementID && s.student.PreviousScheduleID == student.PreviousScheduleID; });
-						if (studentEntity != null)
-						{
-							if (!studentEntity.canBeAssigned)
-							{
-								return;
-							}
-							studentTemp = studentEntity.student;
-						}
-					}
-					if (studentTemp !== null)
-					{
-						student = studentTemp;
-					}
-					if (!student.PUDOStatus)
-					{
-						self.routingDisplayHelper.setStudentStatus(student, tripStop);
-					}
+	// remove student
+	// RoutingDisplay.prototype.onStopCandidateStudentChange = function(e, data)
+	// {
+	// 	var self = this;
+	// 	data.add.map(function(student)
+	// 	{
+	// 		var pList = [];
+	// 		var tripStopEntities = self.dataModel.studentsDictionary[self.dataModel.routingStudentManager._getKey(student)];
+	// 		if (tripStopEntities && tripStopEntities.length > 0 && self.treeview)
+	// 		{
+	// 			var stopIds = [];
+	// 			tripStopEntities.forEach(function(stop)
+	// 			{
+	// 				stopIds.push(stop.id);
+	// 				stopIds = stopIds.concat($.isArray(stop.schoolStopId) ? stop.schoolStopId : [stop.schoolStopId]);
+	// 			});
+	// 			stopIds = Enumerable.From(stopIds).Distinct().ToArray();
+	// 			stopIds.map(function(stopId)
+	// 			{
+	// 				var promise = Promise.resolve(true);
+	// 				var tripStop = self.dataModel.getFieldTripStopByStopId(stopId);
+	// 				if (isNullObj(tripStop) || tripStop.OpenType != 'Edit')
+	// 				{
+	// 					return;
+	// 				}
+	// 				var tripNode = self.routingDisplayHelper.getExpandedTreeNode(tripStop.FieldTripId, 'trip', self.treeview.dataSource);
+	// 				if (isNullObj(tripNode))
+	// 				{
+	// 					return;
+	// 				}
 
-					var newStudent = self.newStudent(student, tripStop, tripStop.ProhibitCrosser);
+	// 				var ts = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
+	// 				var studentTemp = null;
+	// 				if (self.dataModel.tripStopDictionary[stopId].length > 0)
+	// 				{
+	// 					var studentEntity = Enumerable.From(self.dataModel.tripStopDictionary[stopId]).FirstOrDefault(null, function(s) { return s && s.student.RequirementID == student.RequirementID && s.student.PreviousScheduleID == student.PreviousScheduleID; });
+	// 					if (studentEntity != null)
+	// 					{
+	// 						if (!studentEntity.canBeAssigned)
+	// 						{
+	// 							return;
+	// 						}
+	// 						studentTemp = studentEntity.student;
+	// 					}
+	// 				}
+	// 				if (studentTemp === null && self.dataModel.routingStudentManager.schoolStopDictionary[stopId].length > 0)
+	// 				{
+	// 					var studentEntity = Enumerable.From(self.dataModel.routingStudentManager.schoolStopDictionary[stopId]).FirstOrDefault(null, function(s) { return s && s.student.RequirementID == student.RequirementID && s.student.PreviousScheduleID == student.PreviousScheduleID; });
+	// 					if (studentEntity != null)
+	// 					{
+	// 						if (!studentEntity.canBeAssigned)
+	// 						{
+	// 							return;
+	// 						}
+	// 						studentTemp = studentEntity.student;
+	// 					}
+	// 				}
+	// 				if (studentTemp !== null)
+	// 				{
+	// 					student = studentTemp;
+	// 				}
+	// 				if (!student.PUDOStatus)
+	// 				{
+	// 					self.routingDisplayHelper.setStudentStatus(student, tripStop);
+	// 				}
 
-					promise = self.routingDisplayHelper.addTreeNode(newStudent, ts, 'student').then(function()
-					{
-						if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode))
-						{
-							var element = self.treeview.findByUid(ts.uid);
-							self.setTripStopNodeProperty(ts, element);
-						}
-					});
+	// 				var newStudent = self.newStudent(student, tripStop, tripStop.ProhibitCrosser);
 
-					pList.push(promise);
-				});
-			}
-		});
-		data.edit.map(function(student)
-		{
-			self.dataModel.trips.forEach(function(trip)
-			{
-				var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
-				if (isNullObj(tripNode))
-				{
-					return;
-				}
-				trip.FieldTripStops.forEach(function(tripStopEntity)
-				{
-					var studentInDictionary = Enumerable.From(self.dataModel.tripStopDictionary[tripStopEntity.id]).FirstOrDefault(null, function(c) { return c.student.RequirementID == student.RequirementID && c.student.PreviousScheduleID == student.PreviousScheduleID });
-					if (studentInDictionary)
-					{
-						student = studentInDictionary.student;
-						var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStopEntity.id, tripNode, 'tripstop');
-						var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(student.id, tripStopNode, 'student', student.RequirementID, tripStopEntity.id, student.PreviousScheduleID);
-						if (studentNode)
-						{
-							if (self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode))
-							{
-								self.setStudentNodeProperty(studentNode, self.treeview.findByUid(studentNode.uid), studentNode.customData.crossToStop);
-							} else
-							{
-								self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, student);
-								studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopEntity.ProhibitCrosser;
-							}
-						}
-					}
+	// 				promise = self.routingDisplayHelper.addTreeNode(newStudent, ts, 'student').then(function()
+	// 				{
+	// 					if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode))
+	// 					{
+	// 						var element = self.treeview.findByUid(ts.uid);
+	// 						self.setTripStopNodeProperty(ts, element);
+	// 					}
+	// 				});
 
-				});
-			});
-		});
-		// deletes
-		if (data.delete && data.delete.length > 0)
-		{
-			var deleteStudentDictionary = {};
-			data.delete.forEach(function(student)
-			{
-				deleteStudentDictionary[student.id + "_" + student.RequirementID + "_" + student.PreviousScheduleID] = true;
-			});
+	// 				pList.push(promise);
+	// 			});
+	// 		}
+	// 	});
+	// 	data.edit.map(function(student)
+	// 	{
+	// 		self.dataModel.trips.forEach(function(trip)
+	// 		{
+	// 			var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
+	// 			if (isNullObj(tripNode))
+	// 			{
+	// 				return;
+	// 			}
+	// 			trip.FieldTripStops.forEach(function(tripStopEntity)
+	// 			{
+	// 				var studentInDictionary = Enumerable.From(self.dataModel.tripStopDictionary[tripStopEntity.id]).FirstOrDefault(null, function(c) { return c.student.RequirementID == student.RequirementID && c.student.PreviousScheduleID == student.PreviousScheduleID });
+	// 				if (studentInDictionary)
+	// 				{
+	// 					student = studentInDictionary.student;
+	// 					var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStopEntity.id, tripNode, 'tripstop');
+	// 					var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(student.id, tripStopNode, 'student', student.RequirementID, tripStopEntity.id, student.PreviousScheduleID);
+	// 					if (studentNode)
+	// 					{
+	// 						if (self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode))
+	// 						{
+	// 							self.setStudentNodeProperty(studentNode, self.treeview.findByUid(studentNode.uid), studentNode.customData.crossToStop);
+	// 						} else
+	// 						{
+	// 							self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, student);
+	// 							studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopEntity.ProhibitCrosser;
+	// 						}
+	// 					}
+	// 				}
 
-			self.dataModel.trips.forEach(function(trip)
-			{
-				var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
-				if (isNullObj(tripNode))
-				{
-					return;
-				}
-				trip.FieldTripStops.forEach(function(tripStopEntity)
-				{
-					var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopEntity.id);
-					var ts = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
-					if (!ts) return;
-					var studentNodes = self.routingDisplayHelper.getAllTreeNodeFromParentNode(ts).slice();
-					studentNodes.forEach(function(studentNode)
-					{
-						if (studentNode && studentNode.customData.isAssigned == false && deleteStudentDictionary[studentNode.id + "_" + studentNode.customData.requirementId + "_" + studentNode.customData.previousScheduleID])
-						{
-							self.routingDisplayHelper.removeTreeNode(studentNode, ts);
-							if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode))
-							{
-								self.setTripStopNodeProperty(ts, self.treeview.findByUid(ts.uid), true);
-							}
-						}
-					});
-				});
-			});
-		}
-	};
+	// 			});
+	// 		});
+	// 	});
+	// 	// deletes
+	// 	if (data.delete && data.delete.length > 0)
+	// 	{
+	// 		var deleteStudentDictionary = {};
+	// 		data.delete.forEach(function(student)
+	// 		{
+	// 			deleteStudentDictionary[student.id + "_" + student.RequirementID + "_" + student.PreviousScheduleID] = true;
+	// 		});
+
+	// 		self.dataModel.trips.forEach(function(trip)
+	// 		{
+	// 			var tripNode = self.routingDisplayHelper.getExpandedTreeNode(trip.id, 'trip', self.treeview.dataSource);
+	// 			if (isNullObj(tripNode))
+	// 			{
+	// 				return;
+	// 			}
+	// 			trip.FieldTripStops.forEach(function(tripStopEntity)
+	// 			{
+	// 				var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopEntity.id);
+	// 				var ts = self.routingDisplayHelper.getTreeNodeFromParentNode(tripStop.id, tripNode, 'tripstop');
+	// 				if (!ts) return;
+	// 				var studentNodes = self.routingDisplayHelper.getAllTreeNodeFromParentNode(ts).slice();
+	// 				studentNodes.forEach(function(studentNode)
+	// 				{
+	// 					if (studentNode && studentNode.customData.isAssigned == false && deleteStudentDictionary[studentNode.id + "_" + studentNode.customData.requirementId + "_" + studentNode.customData.previousScheduleID])
+	// 					{
+	// 						self.routingDisplayHelper.removeTreeNode(studentNode, ts);
+	// 						if (self.routingDisplayHelper.checkNodeWasExpanded(tripNode))
+	// 						{
+	// 							self.setTripStopNodeProperty(ts, self.treeview.findByUid(ts.uid), true);
+	// 						}
+	// 					}
+	// 				});
+	// 			});
+	// 		});
+	// 	}
+	// };
 
 	RoutingDisplay.prototype.showOptimizeInfo = function(e, data)
 	{
@@ -3211,35 +3247,37 @@
 					treeview.remove(treeview.findByUid(deleteTrip[0].uid));
 					self.cleanRemovedTreeViewItem(deletingDom, deleteTrip[0]);
 				}
-				if (!data.notClearStudentCache)
-				{
-					trip.FieldTripStops.map(function(tripStop)
-					{
-						var students = tripStop.Students;
-						if (self.dataModel.tripStopDictionary[tripStop.id])
-						{
-							students = self.dataModel.tripStopDictionary[tripStop.id].map(function(studentEntity)
-							{
-								return studentEntity.student;
-							});
-							delete self.dataModel.tripStopDictionary[tripStop.id];
-						}
-						students.map(function(student)
-						{
-							var key = self.dataModel.routingStudentManager._getKey(student);
-							if (self.dataModel.studentsDictionary[key])
-							{
-								for (var i = self.dataModel.studentsDictionary[key].length - 1; i > -1; i--)
-								{
-									if (self.dataModel.studentsDictionary[key][i].id == tripStop.id)
-									{
-										self.dataModel.studentsDictionary[key].splice(i, 1);
-									}
-								}
-							}
-						});
-					});
-				}
+
+				// remove student
+				// if (!data.notClearStudentCache)
+				// {
+				// 	trip.FieldTripStops.map(function(tripStop)
+				// 	{
+				// 		var students = tripStop.Students;
+				// 		if (self.dataModel.tripStopDictionary[tripStop.id])
+				// 		{
+				// 			students = self.dataModel.tripStopDictionary[tripStop.id].map(function(studentEntity)
+				// 			{
+				// 				return studentEntity.student;
+				// 			});
+				// 			delete self.dataModel.tripStopDictionary[tripStop.id];
+				// 		}
+				// 		students.map(function(student)
+				// 		{
+				// 			var key = self.dataModel.routingStudentManager._getKey(student);
+				// 			if (self.dataModel.studentsDictionary[key])
+				// 			{
+				// 				for (var i = self.dataModel.studentsDictionary[key].length - 1; i > -1; i--)
+				// 				{
+				// 					if (self.dataModel.studentsDictionary[key][i].id == tripStop.id)
+				// 					{
+				// 						self.dataModel.studentsDictionary[key].splice(i, 1);
+				// 					}
+				// 				}
+				// 			}
+				// 		});
+				// 	});
+				// }
 			});
 		}
 		if (data.edit.length > 0)
@@ -3308,6 +3346,7 @@
 	{
 		const self = this;
 		let = totalAssignedStudents = 0;
+		// remove student
 		// totalAssignedStudents = trip.FieldTripStops
 		// 	.reduce((prev, curr) => prev.concat(curr.Students), [])
 		// 	.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
@@ -3521,61 +3560,62 @@
 		return result;
 	}
 
-	RoutingDisplay.prototype.newStudentData = function(tripStop)
-	{
-		var self = this;
-		var result = [];
-		var students = tripStop.Students;
-		var tripStopId = tripStop.id;
-		var studentList = students;
-		if (tripStop.OpenType != 'View' && self.dataModel.tripStopDictionary[tripStopId])
-		{
-			studentList = studentList.concat(self.dataModel.tripStopDictionary[tripStopId].filter(function(item)
-			{
-				return item.canBeAssigned;
-			}).map(function(item)
-			{
-				return item.student;
-			}));
-		}
-		if (tripStop.SchoolCode && self.dataModel.routingStudentManager.schoolStopDictionary)
-		{
-			if (self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id])
-			{
-				if (tripStop.OpenType == 'View')
-				{
-					studentList = studentList.concat(self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(item)
-					{
-						return item.student.IsAssigned;
-					}).map(function(item)
-					{
-						return item.student;
-					}));
-				}
-				else
-				{
-					studentList = studentList.concat(self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(item)
-					{
-						return item.canBeAssigned || item.student.IsAssigned;
-					}).map(function(item)
-					{
-						return item.student;
-					}));
-				}
-			}
-		}
-		result = studentList.map(function(student)
-		{
-			if (!student.PUDOStatus || tripStop.SchoolCode)
-			{
-				self.routingDisplayHelper.setStudentStatus(student, tripStop);
-			}
-			var newStudent = $.extend(true, {}, student, { tripStopId: tripStopId });
+	// remove student
+	// RoutingDisplay.prototype.newStudentData = function(tripStop)
+	// {
+	// 	var self = this;
+	// 	var result = [];
+	// 	var students = tripStop.Students;
+	// 	var tripStopId = tripStop.id;
+	// 	var studentList = students;
+	// 	if (tripStop.OpenType != 'View' && self.dataModel.tripStopDictionary[tripStopId])
+	// 	{
+	// 		studentList = studentList.concat(self.dataModel.tripStopDictionary[tripStopId].filter(function(item)
+	// 		{
+	// 			return item.canBeAssigned;
+	// 		}).map(function(item)
+	// 		{
+	// 			return item.student;
+	// 		}));
+	// 	}
+	// 	if (tripStop.SchoolCode && self.dataModel.routingStudentManager.schoolStopDictionary)
+	// 	{
+	// 		if (self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id])
+	// 		{
+	// 			if (tripStop.OpenType == 'View')
+	// 			{
+	// 				studentList = studentList.concat(self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(item)
+	// 				{
+	// 					return item.student.IsAssigned;
+	// 				}).map(function(item)
+	// 				{
+	// 					return item.student;
+	// 				}));
+	// 			}
+	// 			else
+	// 			{
+	// 				studentList = studentList.concat(self.dataModel.routingStudentManager.schoolStopDictionary[tripStop.id].filter(function(item)
+	// 				{
+	// 					return item.canBeAssigned || item.student.IsAssigned;
+	// 				}).map(function(item)
+	// 				{
+	// 					return item.student;
+	// 				}));
+	// 			}
+	// 		}
+	// 	}
+	// 	result = studentList.map(function(student)
+	// 	{
+	// 		if (!student.PUDOStatus || tripStop.SchoolCode)
+	// 		{
+	// 			self.routingDisplayHelper.setStudentStatus(student, tripStop);
+	// 		}
+	// 		var newStudent = $.extend(true, {}, student, { tripStopId: tripStopId });
 
-			return self.newStudent(student, tripStop, tripStop.ProhibitCrosser);
-		});
-		return result;
-	}
+	// 		return self.newStudent(student, tripStop, tripStop.ProhibitCrosser);
+	// 	});
+	// 	return result;
+	// }
 
 	RoutingDisplay.prototype.afterDataSourceBinding = function(data)
 	{
@@ -3590,7 +3630,8 @@
 			data.edit.map(function(trip)
 			{
 				self.showOptimizeInfo(null, trip);
-				self.setIsValidPropertyOnTree(trip);
+				// remove student
+				// self.setIsValidPropertyOnTree(trip);
 				self.refreshAllStopNode(trip);
 				if (data.isAfterDistrictPolicyChanged)
 				{
@@ -3640,74 +3681,76 @@
 		}
 	}
 
-	RoutingDisplay.prototype.refreshAffectStopByStudentId = function(ids, tripStop)
-	{
-		var self = this;
-		if (!$.isArray(ids))
-		{
-			ids = [ids];
-		}
-		var affectTripIds = [];
-		var affectTrips = [];
-		if (tripStop)
-		{
-			var trip = self.dataModel.getTripById(tripStop.FieldTripId);
-			affectTrips.push(trip);
-			self.refreshStopNode(tripStop, trip);
-		}
-		else
-		{
-			ids.forEach(function(id)
-			{
-				var stops = self.getAffectedStopByStudentId(id);
-				stops.map(function(stop)
-				{
-					var trip = self.dataModel.getTripById(stop.FieldTripId);
-					if (affectTripIds.indexOf(trip.id) < 0)
-					{
-						affectTripIds.push(trip.id);
-						affectTrips.push(trip);
-					}
-					self.refreshStopNode(stop, trip);
-				});
-			});
-		}
+	// remove student
+	// RoutingDisplay.prototype.refreshAffectStopByStudentId = function(ids, tripStop)
+	// {
+	// 	var self = this;
+	// 	if (!$.isArray(ids))
+	// 	{
+	// 		ids = [ids];
+	// 	}
+	// 	var affectTripIds = [];
+	// 	var affectTrips = [];
+	// 	if (tripStop)
+	// 	{
+	// 		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
+	// 		affectTrips.push(trip);
+	// 		self.refreshStopNode(tripStop, trip);
+	// 	}
+	// 	else
+	// 	{
+	// 		ids.forEach(function(id)
+	// 		{
+	// 			var stops = self.getAffectedStopByStudentId(id);
+	// 			stops.map(function(stop)
+	// 			{
+	// 				var trip = self.dataModel.getTripById(stop.FieldTripId);
+	// 				if (affectTripIds.indexOf(trip.id) < 0)
+	// 				{
+	// 					affectTripIds.push(trip.id);
+	// 					affectTrips.push(trip);
+	// 				}
+	// 				self.refreshStopNode(stop, trip);
+	// 			});
+	// 		});
+	// 	}
 
-		affectTrips.map(function(trip)
-		{
-			self.refreshAllStopNode(trip, true);
-		});
-	}
+	// 	affectTrips.map(function(trip)
+	// 	{
+	// 		self.refreshAllStopNode(trip, true);
+	// 	});
+	// }
 
-	RoutingDisplay.prototype.getAffectedStopByStudentId = function(id)
-	{
-		var self = this, nodes, stopIds = [], requirementIds = [];
-		nodes = self.routingDisplayHelper.getNodesByIdAndType(id, 'student');
-		nodes.map(function(node)
-		{
-			if (stopIds.indexOf(node.customData.tripStopId) < 0)
-			{
-				stopIds.push(node.customData.tripStopId);
-			}
-		});
-		requirementIds = requirementIds.concat(self.dataModel.getStudentRequirementIdsBySession(id, 0));
-		requirementIds = requirementIds.concat(self.dataModel.getStudentRequirementIdsBySession(id, 1));
-		requirementIds = requirementIds.concat(self.dataModel.getStudentRequirementIdsBySession(id, 2));
-		requirementIds.map(function(requirementIdTemp)
-		{
-			var key = id + '_' + requirementIdTemp.RequirementID + "_" + requirementIdTemp.PreviousScheduleID;
-			var tripStopEntities = self.dataModel.studentsDictionary[key];
-			tripStopEntities.map(function(tripStopEntity)
-			{
-				if (stopIds.indexOf(tripStopEntity.id) < 0)
-				{
-					stopIds.push(tripStopEntity.id);
-				}
-			});
-		});
+	// remove student
+	// RoutingDisplay.prototype.getAffectedStopByStudentId = function(id)
+	// {
+	// 	var self = this, nodes, stopIds = [], requirementIds = [];
+	// 	nodes = self.routingDisplayHelper.getNodesByIdAndType(id, 'student');
+	// 	nodes.map(function(node)
+	// 	{
+	// 		if (stopIds.indexOf(node.customData.tripStopId) < 0)
+	// 		{
+	// 			stopIds.push(node.customData.tripStopId);
+	// 		}
+	// 	});
+	// 	requirementIds = requirementIds.concat(self.dataModel.getStudentRequirementIdsBySession(id, 0));
+	// 	requirementIds = requirementIds.concat(self.dataModel.getStudentRequirementIdsBySession(id, 1));
+	// 	requirementIds = requirementIds.concat(self.dataModel.getStudentRequirementIdsBySession(id, 2));
+	// 	requirementIds.map(function(requirementIdTemp)
+	// 	{
+	// 		var key = id + '_' + requirementIdTemp.RequirementID + "_" + requirementIdTemp.PreviousScheduleID;
+	// 		var tripStopEntities = self.dataModel.studentsDictionary[key];
+	// 		tripStopEntities.map(function(tripStopEntity)
+	// 		{
+	// 			if (stopIds.indexOf(tripStopEntity.id) < 0)
+	// 			{
+	// 				stopIds.push(tripStopEntity.id);
+	// 			}
+	// 		});
+	// 	});
 
-		return self.dataModel.getTripStopsByStopIds(stopIds);
-	}
+	// 	return self.dataModel.getTripStopsByStopIds(stopIds);
+	// }
 
 	// RoutingDisplay.prototype.recalculateAllSchoolStudentCount = function(trips)
 	// {
@@ -3724,22 +3767,25 @@
 	// 	});
 	// }
 
-	RoutingDisplay.prototype.setIsValidPropertyOnTree = function(trip)
-	{
-		var self = this;
-		self.dataModel.initSchoolSequence(trip.id, [trip]);
-		for (var j = 0; j < trip.FieldTripStops.length; j++)
-		{
-			var _tripStop = trip.FieldTripStops[j];
-			var students = _tripStop.Students;
-			if (isNullObj(students) || students.length == 0)
-			{
-				continue;
-			}
-			self.dataModel.tryValidateSchoolStop(students, _tripStop, false);
-		}
-		self.dataModel.routingStudentManager.refresh();
-	}
+	// remove student
+	// RoutingDisplay.prototype.setIsValidPropertyOnTree = function(trip)
+	// {
+	// 	var self = this;
+	// 	self.dataModel.initSchoolSequence(trip.id, [trip]);
+	// 	for (var j = 0; j < trip.FieldTripStops.length; j++)
+	// 	{
+	// 		var _tripStop = trip.FieldTripStops[j];
+	// 		var students = _tripStop.Students;
+	// 		if (isNullObj(students) || students.length == 0)
+	// 		{
+	// 			continue;
+	// 		}
+	// 		self.dataModel.tryValidateSchoolStop(students, _tripStop, false);
+	// 	}
+
+	// 	// remove student
+	// 	//self.dataModel.routingStudentManager.refresh();
+	// }
 
 	RoutingDisplay.prototype.bindStudentNodeEvent = function(element)
 	{
@@ -3749,8 +3795,9 @@
 			element.find(".icon.minus").off('click').on('click', minusClick.bind(self));
 			element.find(".icon.add").off('click').on('click', addClick.bind(self));
 			element.find(".icon.zoom-map-to-layers").off('click').on('click', zoomClick.bind(self));
-			element.find(".student-requirement .day").off('click').on('click', studentDayClick.bind(self));
-			element.find(".student-PUDOStatus .status").off('click').on('click', studentStatusClick.bind(self));
+			// remove student
+			// element.find(".student-requirement .day").off('click').on('click', studentDayClick.bind(self));
+			// element.find(".student-PUDOStatus .status").off('click').on('click', studentStatusClick.bind(self));
 		}
 	};
 

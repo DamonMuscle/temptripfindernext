@@ -3639,113 +3639,113 @@
 
 		return result;
 	};
+	// remove student
+	// RoutingDataModel.prototype.tryValidateSchoolStop = function(students, tripStop, refreshDictionary)
+	// {
+	// 	var self = this;
+	// 	students.map(function(student)
+	// 	{
+	// 		if (student.AnotherTripStopID)
+	// 		{
+	// 			var oldSchoolStop = self.getFieldTripStopByStopId(student.AnotherTripStopID);
+	// 			if (!oldSchoolStop)
+	// 			{
+	// 				return;
+	// 			}
+	// 			var desTrip = self.getTripById(oldSchoolStop.FieldTripId);
+	// 			var curSequence = tripStop.Sequence, desSequence = oldSchoolStop.Sequence;
+	// 			var sequenceRanges = self.schoolSequences[tripStop.FieldTripId];
+	// 			if (!sequenceRanges) return;
+	// 			var schoolSequenceRange = sequenceRanges[oldSchoolStop.SchoolCode];
+	// 			var tripStopSequenceRange = sequenceRanges[tripStop.SchoolCode];
+	// 			if (!schoolSequenceRange)
+	// 			{
+	// 				return;
+	// 			}
+	// 			var maxSchoolSequence = schoolSequenceRange.maxSequence, minSchoolSequence = schoolSequenceRange.minSequence;
+	// 			if (student.Session == TF.Helper.TripHelper.Sessions.ToSchool || student.Session == TF.Helper.TripHelper.Sessions.Shuttle)
+	// 			{
+	// 				var minTsSequence = tripStopSequenceRange ? tripStopSequenceRange.minSequence : curSequence;
+	// 				// currentStop is a school, we need to tryValid itself first
+	// 				if (tripStop.SchoolCode && curSequence > desSequence && minTsSequence < maxSchoolSequence)
+	// 				{
+	// 					if (minTsSequence < maxSchoolSequence)
+	// 					{
+	// 						var schlStop = self.getFieldTripStopBySequence(desTrip, minTsSequence);
+	// 						if (schlStop)
+	// 						{
+	// 							self.viewModel.display.changeSchoolStop(student, tripStop, schlStop, false, refreshDictionary);
+	// 						}
+	// 						student.IsValid = true;
+	// 					}
+	// 					else
+	// 					{
+	// 						student.IsValid = false;
+	// 					}
+	// 				}
+	// 				else
+	// 				{
+	// 					student.IsValid = (curSequence <= maxSchoolSequence);
+	// 				}
 
-	RoutingDataModel.prototype.tryValidateSchoolStop = function(students, tripStop, refreshDictionary)
-	{
-		var self = this;
-		students.map(function(student)
-		{
-			if (student.AnotherTripStopID)
-			{
-				var oldSchoolStop = self.getFieldTripStopByStopId(student.AnotherTripStopID);
-				if (!oldSchoolStop)
-				{
-					return;
-				}
-				var desTrip = self.getTripById(oldSchoolStop.FieldTripId);
-				var curSequence = tripStop.Sequence, desSequence = oldSchoolStop.Sequence;
-				var sequenceRanges = self.schoolSequences[tripStop.FieldTripId];
-				if (!sequenceRanges) return;
-				var schoolSequenceRange = sequenceRanges[oldSchoolStop.SchoolCode];
-				var tripStopSequenceRange = sequenceRanges[tripStop.SchoolCode];
-				if (!schoolSequenceRange)
-				{
-					return;
-				}
-				var maxSchoolSequence = schoolSequenceRange.maxSequence, minSchoolSequence = schoolSequenceRange.minSequence;
-				if (student.Session == TF.Helper.TripHelper.Sessions.ToSchool || student.Session == TF.Helper.TripHelper.Sessions.Shuttle)
-				{
-					var minTsSequence = tripStopSequenceRange ? tripStopSequenceRange.minSequence : curSequence;
-					// currentStop is a school, we need to tryValid itself first
-					if (tripStop.SchoolCode && curSequence > desSequence && minTsSequence < maxSchoolSequence)
-					{
-						if (minTsSequence < maxSchoolSequence)
-						{
-							var schlStop = self.getFieldTripStopBySequence(desTrip, minTsSequence);
-							if (schlStop)
-							{
-								self.viewModel.display.changeSchoolStop(student, tripStop, schlStop, false, refreshDictionary);
-							}
-							student.IsValid = true;
-						}
-						else
-						{
-							student.IsValid = false;
-						}
-					}
-					else
-					{
-						student.IsValid = (curSequence <= maxSchoolSequence);
-					}
+	// 				// try to change
+	// 				desSequence = tripStop.Sequence;
+	// 				if (desSequence < maxSchoolSequence && desSequence > oldSchoolStop.Sequence)
+	// 				{
+	// 					var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
+	// 					var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq > desSequence; });
+	// 					var schlStop = self.getFieldTripStopBySequence(desTrip, validSequence);
+	// 					if (schlStop)
+	// 					{
+	// 						self.viewModel.display.changeSchoolStop(student, oldSchoolStop, schlStop, true, refreshDictionary);
+	// 					}
+	// 				}
+	// 			}
+	// 			else if (student.Session == TF.Helper.TripHelper.Sessions.FromSchool)
+	// 			{
+	// 				var maxTsSequence = tripStopSequenceRange ? tripStopSequenceRange.maxSequence : curSequence;
+	// 				// currentStop is a school, we need to tryValid itself first
+	// 				if (tripStop.SchoolCode && curSequence < desSequence && maxTsSequence > minSchoolSequence)
+	// 				{
+	// 					if (maxTsSequence > minSchoolSequence)
+	// 					{
+	// 						var schlStop = self.getFieldTripStopBySequence(desTrip, maxTsSequence);
+	// 						if (schlStop)
+	// 						{
+	// 							self.viewModel.display.changeSchoolStop(student, tripStop, schlStop, false, refreshDictionary);
+	// 						}
+	// 						student.IsValid = true;
+	// 					}
+	// 					else
+	// 					{
+	// 						student.IsValid = false;
+	// 					}
+	// 				}
+	// 				else
+	// 				{
+	// 					student.IsValid = (curSequence >= minSchoolSequence);
+	// 				}
 
-					// try to change
-					desSequence = tripStop.Sequence;
-					if (desSequence < maxSchoolSequence && desSequence > oldSchoolStop.Sequence)
-					{
-						var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
-						var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq > desSequence; });
-						var schlStop = self.getFieldTripStopBySequence(desTrip, validSequence);
-						if (schlStop)
-						{
-							self.viewModel.display.changeSchoolStop(student, oldSchoolStop, schlStop, true, refreshDictionary);
-						}
-					}
-				}
-				else if (student.Session == TF.Helper.TripHelper.Sessions.FromSchool)
-				{
-					var maxTsSequence = tripStopSequenceRange ? tripStopSequenceRange.maxSequence : curSequence;
-					// currentStop is a school, we need to tryValid itself first
-					if (tripStop.SchoolCode && curSequence < desSequence && maxTsSequence > minSchoolSequence)
-					{
-						if (maxTsSequence > minSchoolSequence)
-						{
-							var schlStop = self.getFieldTripStopBySequence(desTrip, maxTsSequence);
-							if (schlStop)
-							{
-								self.viewModel.display.changeSchoolStop(student, tripStop, schlStop, false, refreshDictionary);
-							}
-							student.IsValid = true;
-						}
-						else
-						{
-							student.IsValid = false;
-						}
-					}
-					else
-					{
-						student.IsValid = (curSequence >= minSchoolSequence);
-					}
-
-					// try to change
-					desSequence = tripStop.Sequence;
-					if (desSequence > minSchoolSequence && desSequence < oldSchoolStop.Sequence)
-					{
-						var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
-						var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq < desSequence; });
-						var schlStop = self.getFieldTripStopBySequence(desTrip, validSequence);
-						if (schlStop)
-						{
-							self.viewModel.display.changeSchoolStop(student, oldSchoolStop, schlStop, true, refreshDictionary);
-						}
-					}
-				}
-			}
-		});
-		if (refreshDictionary)
-		{
-			self.routingStudentManager.refresh();
-		}
-	};
+	// 				// try to change
+	// 				desSequence = tripStop.Sequence;
+	// 				if (desSequence > minSchoolSequence && desSequence < oldSchoolStop.Sequence)
+	// 				{
+	// 					var sequences = self.getSchoolSequence(tripStop.FieldTripId, oldSchoolStop.SchoolCode);
+	// 					var validSequence = Enumerable.From(sequences).FirstOrDefault(null, function(seq) { return seq < desSequence; });
+	// 					var schlStop = self.getFieldTripStopBySequence(desTrip, validSequence);
+	// 					if (schlStop)
+	// 					{
+	// 						self.viewModel.display.changeSchoolStop(student, oldSchoolStop, schlStop, true, refreshDictionary);
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	});
+	// 	if (refreshDictionary)
+	// 	{
+	// 		self.routingStudentManager.refresh();
+	// 	}
+	// };
 
 	RoutingDataModel.prototype.getColorByTripId = function(tripId)
 	{
@@ -5986,7 +5986,8 @@
 					if (schoolStop && schoolStop.id != 0)
 					{
 						student.AnotherTripStopID = schoolStop.id;
-						self.tryValidateSchoolStop([student], tripStop, false);
+						// remove student
+						// self.tryValidateSchoolStop([student], tripStop, false);
 						if (student.Session == TF.Helper.TripHelper.Sessions.ToSchool || student.Session == TF.Helper.TripHelper.Sessions.Shuttle)
 						{
 							student.DOSchoolCode = schoolStop.SchoolCode;
