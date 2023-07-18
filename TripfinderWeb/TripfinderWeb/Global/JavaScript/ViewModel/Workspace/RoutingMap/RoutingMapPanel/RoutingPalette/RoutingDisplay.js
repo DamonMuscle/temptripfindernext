@@ -1141,10 +1141,6 @@
 		var $deleteButtons = routingtreeview.find(".icon.stop-delete");
 		$deleteButtons.off('click').on('click', deleteClick.bind(self));
 
-		// remove student
-		// var $assignStudentForStopButtons = routingtreeview.find(".icon.assign");
-		// $assignStudentForStopButtons.off('click').on('click', assignStudentForStopClick.bind(self));
-
 		var $infoButtons = routingtreeview.find(".icon.stop-info");
 		$infoButtons.off('click').on('click', infoClick.bind(self));
 
@@ -1524,21 +1520,6 @@
 		self.dataModel.changeDataStack.push(self.dataModel.getFieldTripStopByStopId(data.id));
 	}
 
-	// remove student
-	// async function assignStudentForStopClick(e)
-	// {
-	// 	var self = this;
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	var data = self.treeview.dataItem(e.target.closest('li'));
-
-	// 	let result = await this.eventsManager.assignStudentForStopClick(data.id);
-	// 	if (result && result.prohibitStudents && result.prohibitStudents.length > 0)
-	// 	{
-	// 		return tf.promiseBootbox.alert(result.prohibitStudents.map(s => { return `${s.FirstName} ${s.LastName}` }).join(', ') + ` ${result.prohibitStudents.length == 1 ? 'is' : 'are'} not allowed to cross the road.`, 'Message');
-	// 	}
-	// }
-
 	function showClick(e)
 	{
 		var self = this;
@@ -1686,174 +1667,6 @@
 		self.dataModel.unAssignStudent(student, tripStop, true);
 		self.dataModel.changeDataStack.push(tripStop);
 	}
-
-	// remove student
-	// function addClick(e)
-	// {
-	// 	var self = this;
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	let data = self.treeview.dataItem(e.target.closest('li')), student;
-	// 	if (data.customData.requirementId)
-	// 	{
-	// 		student = self.dataModel.getCanAssignCandidateStudentById(data.id, data.customData.requirementId, data.customData.previousScheduleID);
-	// 	}
-	// 	else
-	// 	{
-	// 		let stopStudents = self.dataModel.tripStopDictionary[data.customData.tripStopId] || [],
-	// 			exception = stopStudents.find(s => s.student.id === data.id);
-	// 		if (exception)
-	// 		{
-	// 			student = self.dataModel.getCanAssignCandidateStudentById(data.id, null, data.customData.previousScheduleID, exception.student);
-	// 		}
-	// 	}
-	// 	if (isNullObj(student))
-	// 	{
-	// 		return;
-	// 	}
-
-	// 	var studentArray = [student];
-	// 	var tripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id), schoolAssigned;
-	// 	if (tripStop.SchoolCode && ((student.TransSchoolCode != null && tripStop.SchoolCode != student.TransSchoolCode) || !student.TransSchoolCode))
-	// 	{
-	// 		schoolAssigned = tripStop;
-	// 		tripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
-	// 	}
-
-	// 	var tripStopNode = self.treeview.dataSource.getFirst(tripStop.id, function(_data)
-	// 	{
-	// 		return _data.customData && _data.customData.isStop;
-	// 	});
-	// 	var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(data.id, tripStopNode, 'student', data.customData.requirementId, tripStop.id, data.customData.previousScheduleID);
-	// 	if (studentNode && self.routingDisplayHelper.filterArray(studentNode.customData.dayCheckList, true).length == 0)
-	// 	{
-	// 		return tf.promiseBootbox.alert('Please select a day to assign.');
-	// 	}
-	// 	self.dataModel.assignStudent(studentArray, tripStop, null, null, null, null, true, schoolAssigned).then(function(result)
-	// 	{
-	// 		self.dataModel.changeDataStack.push(tripStop);
-	// 		if (result && result.prohibitStudents && result.prohibitStudents.length > 0)
-	// 		{
-	// 			return tf.promiseBootbox.alert(result.prohibitStudents.map(s => { return `${s.FirstName} ${s.LastName}` }).join(', ') + ` ${result.prohibitStudents.length == 1 ? 'is' : 'are'} not allowed to cross the road.`, 'Message');
-	// 		}
-	// 	});
-
-	// }
-
-	// remove student
-	// function studentStatusClick(e)
-	// {
-	// 	var self = this;
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	var currentElement = e.target;
-	// 	if (currentElement.classList.contains("checked") || currentElement.classList.contains("cannot-checked"))
-	// 	{
-	// 		return;
-	// 	}
-
-	// 	var currentIndex = 0;
-	// 	for (var i = 0; i < 2; i++)
-	// 	{
-	// 		if (currentElement == $(currentElement.closest('li')).find('.student-PUDOStatus .status')[i])
-	// 		{
-	// 			currentIndex = i; break;
-	// 		}
-	// 	}
-	// 	$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[currentIndex]).addClass("checked");
-	// 	$($(currentElement.closest('li')).find('.student-PUDOStatus .status')[1 - currentIndex]).removeClass("checked");
-	// 	var data = self.treeview.dataItem(currentElement.closest('li'));
-	// 	var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
-	// 	var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
-	// 	var student = self.dataModel.getStudent(studentId, currentTripStop.id, data.customData.anotherTripStopID, requirementId, previousScheduleID);
-	// 	var isSchool = currentTripStop.SchoolCode ? true : false;
-	// 	if (isNullObj(student) && isSchool)
-	// 	{
-	// 		currentTripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
-	// 		student = self.getStudentFromSchoolNode(data.customData.tripStopId, data.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
-	// 	}
-	// 	return self.dataModel.updateStudentPUDOStatus(student, 1 - student.Session, currentTripStop.FieldTripId).then(function()
-	// 	{
-	// 		self.dataModel.setAssignedStudentValidProperty(currentTripStop);
-	// 		self.refreshAffectStopByStudentId(student.id);
-	// 		self.dataModel.changeDataStack.push(currentTripStop);
-	// 	});
-	// }
-
-	// remove student
-	// function studentDayClick(e)
-	// {
-	// 	var self = this;
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	var currentElement = e.target;
-	// 	var dayIndex = $(currentElement).parent().children().index(currentElement);
-	// 	var destinationDayValue = !currentElement.classList.contains("checked");
-	// 	var canExecuteClick = !currentElement.classList.contains("disabled") && !currentElement.classList.contains("cannot-checked");
-	// 	if (!canExecuteClick)
-	// 	{
-	// 		return;
-	// 	}
-	// 	var data = self.treeview.dataItem(currentElement.closest('li'));
-
-	// 	var studentId = data.id, requirementId = data.customData.requirementId, previousScheduleID = data.customData.previousScheduleID;
-	// 	var currentTripStop = self.dataModel.getFieldTripStopByStopId(data.parent().parent().id);
-	// 	var tripNode = self.routingDisplayHelper.getExpandedTreeNode(currentTripStop.FieldTripId, 'trip', self.treeview.dataSource);
-	// 	var trip = self.dataModel.getTripById(currentTripStop.FieldTripId);
-
-	// 	if (!data.customData.isAssigned)
-	// 	{
-	// 		var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
-	// 		var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
-
-	// 		var student = self.dataModel.getStudent(studentId, currentTripStop.id, studentNode.customData.anotherTripStopID, requirementId, previousScheduleID);
-	// 		if (isNullObj(student) && currentTripStop.SchoolCode)
-	// 		{
-	// 			currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
-	// 			student = self.getStudentFromSchoolNode(studentNode.customData.tripStopId, studentNode.customData.anotherTripStopID, studentId, requirementId, previousScheduleID);
-	// 			tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
-	// 			studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
-	// 		}
-	// 		self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, studentNode.customData.anotherTripStopID, true);
-	// 		self.updateStudentDay(tripStopNode, studentNode, student, dayIndex, destinationDayValue);
-	// 		self.refreshAllStopNode(trip, true);
-	// 		return;
-	// 	}
-
-	// 	var lockInfo = {
-	// 		RequirementId: requirementId,
-	// 		PreviousScheduleID: previousScheduleID,
-	// 		StudId: studentId,
-	// 		TripId: trip.id,
-	// 		TripStopId: data.customData.tripStopId
-	// 	};
-
-	// 	var studentAssigned = currentTripStop.Students.find(function(c) { return c.RequirementID == requirementId && c.id == studentId });
-	// 	if (studentAssigned)
-	// 	{
-	// 		lockInfo.EndDate = studentAssigned.EndDate;
-	// 		lockInfo.StartDate = studentAssigned.StartDate;
-	// 	}
-
-	// 	for (var i = 0; i < 7; i++)
-	// 	{
-	// 		lockInfo[self.dataModel.getWeekdayAttributeNameByIndex(i)] = i == dayIndex ? destinationDayValue : data.customData.dayCheckList[i];
-	// 	}
-
-	// 	self.dataModel.lockRoutingStudent([lockInfo], null, null, true).then(function()
-	// 	{
-	// 		if (currentTripStop.SchoolCode)
-	// 		{
-	// 			var tripStopNode = self.routingDisplayHelper.getTreeNodeFromParentNode(currentTripStop.id, tripNode, 'tripstop');
-	// 			var studentNode = self.routingDisplayHelper.getTreeNodeFromParentNode(studentId, tripStopNode, 'student', requirementId, data.customData.tripStopId, previousScheduleID);
-	// 			currentTripStop = self.dataModel.getFieldTripStopByStopId(studentNode.customData.tripStopId);
-	// 		}
-
-	// 		self.dataModel.changeAssignedStudentDay(studentId, requirementId, previousScheduleID, destinationDayValue, dayIndex, currentTripStop, data.customData.anotherTripStopID);
-	// 		self.refreshAffectStopByStudentId(studentId, requirementId ? null : currentTripStop);
-	// 		self.dataModel.changeDataStack.push(currentTripStop);
-	// 	});
-	// }
 
 	RoutingDisplay.prototype.updatePUDOStatus = function(tripStopNode, studentNode, student)
 	{
@@ -2342,41 +2155,19 @@
 		return false;
 	}
 
-	// remove student
-	// RoutingDisplay.prototype.changeSchoolStop = function(student, oldSchoolStop, newSchoolStop, changeDestinationStop, refresh)
-	// {
-	// 	var self = this;
-	// 	if (changeDestinationStop)
-	// 	{
-	// 		student.AnotherTripStopID = newSchoolStop.id;
-	// 		if (refresh)
-	// 		{
-	// 			self.refreshAllTripsSchoolStop();
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		student.TripStopID = newSchoolStop.id;
-	// 		var studentCopy = $.extend({}, student);
-	// 		self.dataModel.unAssignStudent([student], oldSchoolStop);
-	// 		var studentsInDictionary = self.dataModel.tripStopDictionary[newSchoolStop.id];
-	// 		var studInDict = Enumerable.From(studentsInDictionary).FirstOrDefault(null, function(c)
-	// 		{
-	// 			return c.student.id == student.id && c.student.RequirementID == student.RequirementID && c.student.PreviousScheduleID == student.PreviousScheduleID;
-	// 		});
-	// 		if (studInDict)
-	// 		{
-	// 			var weekdays = TF.RoutingMap.RoutingPalette.RoutingDataModel.weekdays;
-	// 			var studentMap = self.dataModel.routingStudentManager.students[self.dataModel.routingStudentManager._getKey(student)];
-	// 			studentMap.availableWeekdays.forEach(function(weekday, index)
-	// 			{
-	// 				studInDict.student[weekdays[index]] = studentCopy[weekdays[index]];
-	// 				studInDict.student["Valid" + weekdays[index]] = studentCopy["Valid" + weekdays[index]];
-	// 			});
-	// 		}
-	// 		self.dataModel.assignStudent([student], newSchoolStop, null, null, null, null, true);
-	// 	}
-	// };
+	RoutingDisplay.prototype.onAssignStudentsChange = function(e, data)
+	{
+		var self = this, affectedStudentIds = [];
+		var tripStop = data.tripStop;
+		self.setFootInfo();
+		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; });
+		data.isRecalculate != false && self.resetTripInfo([trip]);
+		var affectedStudents = affectedStudentIds.concat(data.add, data.delete);
+		affectedStudents.map(function(student)
+		{
+			self.refreshAffectStopByStudentId(student.id, student.RequirementID ? null : tripStop);
+		});
+	}
 
 	// remove student
 	// RoutingDisplay.prototype.onAssignStudentsChange = function(e, data)
@@ -2634,8 +2425,7 @@
 			nodeElement.find('.schedule-time').off('click').on('click', scheduledTimeClick.bind(self));
 			nodeElement.find('.avg-speed').off('click').on('click', avgSpeedClick.bind(self));
 			nodeElement.find('.icon.lock-time').off('click').on('click', setLockTimeClick.bind(self));
-			// remove student
-			// nodeElement.find('.icon.assign').off('click').on('click', assignStudentForStopClick.bind(self));
+
 			if (tripStopData && tripStopData.SchoolCode)
 			{
 				self.bindSchoolLocation(nodeElement);

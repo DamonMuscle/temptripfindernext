@@ -49,46 +49,6 @@
 		return tf.colorSource[tripId % tf.colorSource.length];
 	};
 
-	TripHelper.loadUnassignedStudents = function(schoolCodes, trip, viewModal, map)
-	{
-		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "student", "unassignedWithUngeo?timePeriod=" + (trip.Session == 0 ? "AM" : "PM")),
-			{
-				data: {
-					schoolCodes: schoolCodes,
-					HomeSchl: trip.HomeSchl,
-					HomeTrans: trip.HomeTrans,
-					Shuttle: trip.Shuttle
-				}
-			})
-			.then(function(apiResponse)
-			{
-				var ungeoStudents = [];
-				var studentDataModels = [];
-
-				var students = apiResponse.Items;
-				for (var i = 0, len = students.length; i < len; i++)
-				{
-					if (students[i].GeometryPoint == null)
-					{
-						ungeoStudents.push(students[i]);
-					}
-					else
-					{
-						studentDataModels.push(new TF.DataModel.StudentDataModel(students[i]));
-					}
-				}
-				var unassignedStudentViewModel = new TF.Map.RoutingMap.UnassignedStudentViewModel(studentDataModels, trip.Session, viewModal, map);
-				unassignedStudentViewModel.Show();
-
-				return {
-					ungeoStudents: ungeoStudents,
-					studentDataModels: studentDataModels,
-					unassignedStudentViewModel: unassignedStudentViewModel
-				};
-
-			}.bind(this));
-	};
-
 	TripHelper.LoadSchools = function(trip)
 	{
 		var schoolCodes = [];
@@ -100,32 +60,6 @@
 			}
 		});
 		return schoolCodes;
-	};
-
-	TripHelper.assignStudents = function(object, viewModal, map)
-	{// assign students to trip stops
-		return TripHelper.loadUnassignedStudents(TripHelper.LoadSchools(object.TripEntity), object.TripEntity, viewModal, map)
-			.then(function(data)
-			{
-				object.TripStopEntities.forEach(function(item)
-				{
-					var geometry = item.GeometryBoundary;
-					if (geometry)
-					{
-						// olFeature=MapPageView.CreatePolygonFeature(feature.geometry,this.stopBoundaryLayer,undefined,"#"+self.colorTheme);
-						var olFeature = new OpenLayers.Feature.Vector(tf.converter.GeoJson2OlGeometry(geometry), {
-							type: "stopboundary"
-						});
-						item.olFeatureStopBoundary = olFeature;
-						olFeature.geometryBoundary = geometry;
-						olFeature.isStopBoundary = true;
-					}
-
-					TF.Helper.TripStopHelper.assignStudents(item, data.unassignedStudentViewModel);
-				}.bind(this));
-
-				return true;
-			});
 	};
 
 	TripHelper.CalculateTripTransport = function(lNumAssigned, Id)
@@ -154,51 +88,6 @@
 
 			return lEstimatedRiders;
 		}.bind(this));
-	};
-
-	TripHelper.getCopyTrip = function(copyOption, tripData)
-	{
-		var tripStopData = this.processTripStops(tripData.TripStops);
-		var assistVM = new TF.DataEntry.TripTripStopDataEntryMapViewModel();
-		assistVM.load(null, tripData);
-
-		var entity = {
-			TripEntity: tripData,
-			TripStopEntities: []
-		};
-		entity.TripEntity.TripStops = [];
-		entity.TripEntity.APIIsNew = true;
-		entity.TripEntity.Id = undefined;
-		entity.TripEntity.Day = 7;
-		entity.TripEntity.Name = copyOption.Name;
-		entity.TripEntity.IName = copyOption.Name;
-		entity.TripEntity.Session = copyOption.Session;
-		entity.TripEntity.DriverId = 0;
-		entity.TripEntity.AideId = 0;
-		entity.TripEntity.VehicleId = 0;
-		entity.TripEntity.Dhdistance = 0;// this need recalculate
-		if (copyOption.ReverseTripStop)
-		{
-			entity.TripStopEntities = this.convertToCopyStops(tripStopData, copyOption.AssignStudent, true);
-		}
-		else
-		{
-			entity.TripStopEntities = this.convertToCopyStops(tripStopData, copyOption.AssignStudent);
-		}
-
-		entity.TripEntity.StartTime = entity.TripStopEntities[0].StopTime;
-		entity.TripEntity.FinishTime = entity.TripStopEntities[entity.TripStopEntities.length - 1].StopTime;
-
-		return (copyOption.AssignStudent ? this.assignStudents(entity, assistVM, assistVM.map) : Promise.resolve(true))
-			.then(function()
-			{
-				this.updateCopyStopsTotalInfo(entity.TripStopEntities, tripData.SchoolCodes, tripData.Session);
-				this.CalculateTotalInfo(entity);
-				return entity;
-			}.bind(this)).catch(function(args)
-			{
-
-			});
 	};
 
 	TripHelper.convertToCopyStops = function(tripStopData, isAssignStudent, isReverse)

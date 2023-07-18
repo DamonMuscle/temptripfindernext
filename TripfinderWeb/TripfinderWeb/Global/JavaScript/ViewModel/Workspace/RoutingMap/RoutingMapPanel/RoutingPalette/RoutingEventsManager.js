@@ -869,12 +869,6 @@
 		});
 	};
 
-	// remove student
-	// RoutingEventsManager.prototype.assignStudentForStopClick = function(tripStopId)
-	// {
-	// 	return TF.RoutingMap.RoutingPalette.AssignStudentForStop(tripStopId, this.dataModel);
-	// };
-
 	RoutingEventsManager.prototype.editTripStopClick = function(type, stopId, fieldTripId)
 	{
 		console.log("Move Stop Location clicked", stopId, fieldTripId);

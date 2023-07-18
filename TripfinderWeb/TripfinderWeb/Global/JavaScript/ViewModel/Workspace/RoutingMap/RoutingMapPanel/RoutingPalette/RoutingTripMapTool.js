@@ -98,8 +98,6 @@
 		self._map.add(self._pointLayer);
 		self.viewModel.layers.push(layerIds.pointLayerId);
 
-		// self.viewModel.viewModel.unassignedStudentViewModel.drawTool.initialize();// For correct layer order.
-
 		self._studentCountLayer = new self._arcgis.GraphicsLayer({
 			"id": "studentCountLayer"
 		});
@@ -1493,26 +1491,7 @@
 
 	RoutingTripMapTool.prototype.onCandidatesStudentsChangeEvent = function(event, items)
 	{
-		// var self = this,
-		// 	unassignStudentMapTool = self.viewModel.viewModel.unassignedStudentViewModel.drawTool;
-		// if (items.delete.length > 0)
-		// {
-		// 	items.delete = items.delete.filter(function(c) { return c.IsShowOnMap; });
-		// 	self.viewModel.viewModel.unassignedStudentViewModel.drawTool.clearArrow(items.delete);
-		// }
-		// if (items.add.length > 0)
-		// {
-		// 	items.add = items.add.filter(function(c)
-		// 	{
-		// 		c.type = "student";// add type for RCM;
-		// 		return c.IsShowOnMap;
-		// 	});
-		// }
-		// if (items.edit.length > 0)
-		// {
-		// 	items.edit = items.edit.filter(function(c) { return c.IsShowOnMap; });
-		// }
-		// return unassignStudentMapTool.onChangeEvent(event, items);
+
 	};
 
 	RoutingTripMapTool.prototype.onSettingChangeEvent = function()
@@ -1908,18 +1887,6 @@
 			return graphic.attributes && graphic.attributes.Id == tripStop.id;
 		});
 		self._pointArrowLayer.removeMany(graphics);
-	};
-
-	RoutingTripMapTool.prototype.clearCandidateStudents = function()
-	{
-		var layer = this.viewModel.viewModel.unassignedStudentViewModel.drawTool?._pointLayer;
-		return layer?.queryFeatures().then(function(result)
-		{
-			if (result.features.length > 0)
-			{
-				return layer.applyEdits({ deleteFeatures: result.features });
-			}
-		});
 	};
 
 	RoutingTripMapTool.prototype.onStopBoundaryShowChange = function(model, visible)

@@ -1593,33 +1593,30 @@ This action cannot be undone.  Do you wish to continue?`;
 			{
 				newTrip.TripStops = newTripStops;
 				self.changeTripStopSpeeds(newTrip.TripStops);
-				return self.changeTripByCriteriaChanged(newTrip).then(function()
+				return self.initCandidateStudentsCrossStatus(newTrip, newStopList, isTripStopBoundaryChanged).then(function()
 				{
-					return self.initCandidateStudentsCrossStatus(newTrip, newStopList, isTripStopBoundaryChanged).then(function()
+					// self.dataModel.resetAllStopsTotalStudentCount(newTrip);
+					return self.dataModel.recalculate([newTrip]).then(function(response)
 					{
-						// self.dataModel.resetAllStopsTotalStudentCount(newTrip);
-						return self.dataModel.recalculate([newTrip]).then(function(response)
+						var tripData = response[0];
+						newTrip.Distance = tripData.Distance;
+						newTrip.FinishTime = tripData.FinishTime;
+						newTrip.StartTime = tripData.StartTime;
+						for (var j = 0; j < newTrip.TripStops.length; j++)
 						{
-							var tripData = response[0];
-							newTrip.Distance = tripData.Distance;
-							newTrip.FinishTime = tripData.FinishTime;
-							newTrip.StartTime = tripData.StartTime;
-							for (var j = 0; j < newTrip.TripStops.length; j++)
-							{
-								newTrip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-								newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
-								newTrip.TripStops[j].OpenType = newTrip.OpenType;
-							}
-							self.dataModel.setActualStopTime([newTrip]);
-							self.dataModel.setStudentTravelTime([newTrip]);
-							// self.dataModel.setAllStudentValidProperty([newTrip]);
-							return self.setTripOptimizeInfo(newTrip).then(function()
-							{
-								tf.loadingIndicator.tryHide();
-								self.needUpdateTrip();
-								self.dataModel.needUpdateTripColor(!self.needUpdateTrip() && self.isColorChanged());
-								return Promise.resolve(newTrip);
-							});
+							newTrip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
+							newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+							newTrip.TripStops[j].OpenType = newTrip.OpenType;
+						}
+						self.dataModel.setActualStopTime([newTrip]);
+						self.dataModel.setStudentTravelTime([newTrip]);
+						// self.dataModel.setAllStudentValidProperty([newTrip]);
+						return self.setTripOptimizeInfo(newTrip).then(function()
+						{
+							tf.loadingIndicator.tryHide();
+							self.needUpdateTrip();
+							self.dataModel.needUpdateTripColor(!self.needUpdateTrip() && self.isColorChanged());
+							return Promise.resolve(newTrip);
 						});
 					});
 				});
@@ -2078,275 +2075,6 @@ This action cannot be undone.  Do you wish to continue?`;
 				self.obEntityDataModel().friday(false);
 			}
 			self._lockWeekDayChange = false;
-		}
-	};
-
-	RoutingTripViewModel.prototype.changeTripByCriteriaChanged = function(trip)
-	{
-		var self = this;
-		var emptyPromise = Promise.resolve(true);
-		if (this.mode != "edit")
-		{
-			return emptyPromise;
-		}
-
-		// check criteria is changed
-		var originalTrip = this.options.trip;
-		var criteriaIsSame = TF.RoutingMap.RoutingPalette.RoutingDataModel.checkCriteria(originalTrip, trip);
-		if (criteriaIsSame)
-		{
-			return emptyPromise;
-		}
-		var schoolChanged = trip.Schools.split("!").filter((c) => { return c; }).sort().join().indexOf(originalTrip.Schools.split("!").filter((c) => { return c; }).sort().join()) < 0;
-		var isOtherSame = otherSame(originalTrip, trip);
-		var isDateReduce = dateReduce(originalTrip, trip);
-		var isDateChanged = dateChanged(originalTrip, trip);
-		var weekdays = TF.RoutingMap.RoutingPalette.RoutingDataModel.weekdays;
-
-		// delete cache data 
-		trip.originalStudents = [];
-		this.dataModel.tripStopDictionary = {};
-		this.dataModel.studentsDictionary = {};
-		this.dataModel.trips.forEach(function(trip)
-		{
-			trip.originalStudents = [];
-		});
-
-		let allExceptions = self.dataModel.getTripAllExceptions(trip.id);
-		return Promise.all([
-			self.dataModel.refreshCandidateStudent(trip, [trip.id]),
-			self.dataModel._getSchoolLocations([trip])
-		]).then(function()
-		{
-			if (schoolChanged)
-			{
-				var studentsTripStops = [];
-				trip.TripStops.forEach(function(tripStop)
-				{
-					if (!tripStop.Students.length)
-					{
-						return;
-					}
-
-					let unassignStudents = [];
-					tripStop.Students.forEach(function(student)
-					{
-						let schoolCode = student.TransSchoolCode || student.DOSchoolCode || student.PUSchoolCode;
-						if (schoolCode && !trip.Schools.split("!").includes(schoolCode))
-						{
-							unassignStudents.push(student);
-						}
-					});
-
-					studentsTripStops.push({ students: unassignStudents, tripStop: tripStop });
-				});
-				self.dataModel.unAssignStudentMultiple(studentsTripStops, false, false);
-				return true;
-			}
-
-			// update students
-			var routingStudentManager = self.dataModel.routingStudentManager;
-			var candidates = self.dataModel.candidateStudents;
-			var candidatesMapping = {};
-			var tripAvailableWeekDays = routingStudentManager.getAvailableWeekdaysByTripDataRange(trip);
-
-			candidates.forEach(student =>
-			{
-				routingStudentManager.createOrGet(student, candidatesMapping, tripAvailableWeekDays);
-			});
-
-			let unAssignStudents = {},
-				updateStudents = {},
-				changedStudents = {};
-			trip.TripStops.forEach(function(tripStop)
-			{
-				tripStop.Students.forEach(function(student)
-				{
-					if (!student.RequirementID)
-					{
-						return;
-					}
-
-					var studentInCandidate = candidatesMapping[routingStudentManager._getKey(student)];
-					if (!studentInCandidate)
-					{
-						// unassign if not available
-						if (!unAssignStudents[tripStop.id])
-						{
-							unAssignStudents[tripStop.id] = { students: [] };
-						}
-
-						unAssignStudents[tripStop.id].tripStop = tripStop;
-						unAssignStudents[tripStop.id].students.push(student);
-						changedStudents[student.id] = student;
-						return;
-					}
-
-					// change week day 
-					var anyAssign = false;
-					var days = {}, validDays = {};
-					weekdays.forEach(function(day, index)
-					{
-						days[day] = studentInCandidate.availableWeekdays[index] && student[day];
-						validDays[day] = studentInCandidate.availableWeekdays[index];
-						if (days[day])
-						{
-							anyAssign = true;
-						}
-					});
-
-					// if original assign weekday not valid ,change student week day to available weekdays
-					if (!anyAssign)
-					{
-						weekdays.forEach(function(day, index)
-						{
-							days[day] = studentInCandidate.availableWeekdays[index];
-						});
-					}
-
-					if (!updateStudents[tripStop.id])
-					{
-						updateStudents[tripStop.id] = { students: [] };
-					}
-
-					updateStudents[tripStop.id].tripStop = tripStop;
-					updateStudents[tripStop.id].students.push({ student: student, days: days, validDays: validDays });
-				});
-			});
-
-			Object.values(updateStudents).forEach(i =>
-			{
-				i.students.forEach(stud =>
-				{
-					if (isWeekdayChanged(stud.days, stud.student) || isDateReduce)
-					{
-						changedStudents[stud.student.id] = stud.student;
-					}
-				});
-			});
-
-			changedStudents = Object.values(changedStudents);
-			let changedExceptionItems = self.getChangedExceptionItems(trip, allExceptions);
-			changedExceptionItems.forEach(e =>
-			{
-				if (!e.exception.IsAssigned)
-				{
-					return;
-				}
-
-				changedStudents.push(e.exception);
-			});
-
-			return dateChangeConfirm(changedStudents).then(ans =>
-			{
-				if (ans == "cancel")
-				{
-					revertDate(originalTrip, trip);
-					return true;
-				}
-
-				self.applyExceptionsChange(changedExceptionItems, trip, ans == "remove");
-				applyChange(unAssignStudents, updateStudents, ans);
-				return true;
-			});
-		});
-
-		function isWeekdayChanged(studentA, studentB)
-		{
-			return !(studentA.Monday == studentB.Monday
-				&& studentA.Tuesday == studentB.Tuesday
-				&& studentA.Wednesday == studentB.Wednesday
-				&& studentA.Thursday == studentB.Thursday
-				&& studentA.Friday == studentB.Friday
-				&& studentA.Saturday == studentB.Saturday
-				&& studentA.Sunday == studentB.Sunday);
-		}
-
-		function dateChanged(tripA, tripB)
-		{
-			return isWeekdayChanged(tripA, tripB) || tripA.StartDate != tripB.StartDate || tripA.EndDate != tripB.EndDate;
-		}
-
-		function otherSame(oriTrip, newTrip)
-		{
-			return oriTrip.Session == newTrip.Session
-				&& TF.RoutingMap.RoutingPalette.RoutingDataModel.isSchoolsEqual(oriTrip.Schools, newTrip.Schools)
-				&& !!oriTrip.HasBusAide == !!newTrip.HasBusAide
-				&& oriTrip.Disabled == newTrip.Disabled
-				&& (oriTrip.FilterName || "") == (newTrip.FilterName || "")
-				&& oriTrip.NonDisabled == newTrip.NonDisabled
-				&& (oriTrip.FilterSpec || "") == (newTrip.FilterSpec || "");
-		}
-
-		function dateReduce(oriTrip, newTrip)
-		{
-			return TF.Helper.TripHelper.isTripDateReduce(oriTrip, newTrip);
-		}
-
-		function revertDate(originalTrip, trip)
-		{
-			trip.StartDate = originalTrip.StartDate;
-			trip.EndDate = originalTrip.EndDate;
-			trip.Monday = originalTrip.Monday;
-			trip.Tuesday = originalTrip.Tuesday;
-			trip.Wednesday = originalTrip.Wednesday;
-			trip.Thursday = originalTrip.Thursday;
-			trip.Friday = originalTrip.Friday;
-			trip.Saturday = originalTrip.Saturday;
-			trip.Sunday = originalTrip.Sunday;
-		}
-
-		function applyChange(unAssignStudents, updateStudents, changeType)
-		{
-			var updates = Object.values(updateStudents), removes = Object.values(unAssignStudents);
-			if (changeType == "remove")
-			{
-				removes = removes.concat(updates.map((update) =>
-				{
-					return {
-						students: update.students.map((c) => { return c.student; }),
-						tripStop: update.tripStop
-					};
-				}));
-				updates = [];
-			}
-
-			// unassign
-			removes.forEach((remove) =>
-			{
-				self.dataModel.unAssignStudent(remove.students, remove.tripStop, false, false);
-			});
-
-			// update
-			updates.forEach((update) =>
-			{
-				let normalStudents = update.students.filter(s => s.RequirementID);
-				if (!normalStudents.length)
-				{
-					return;
-				}
-
-				normalStudents.forEach(student =>
-				{
-					weekdays.forEach(day =>
-					{
-						student.student[day] = student.days[day];
-						student.student["Valid" + day] = student.validDays[day];
-					});
-				});
-
-				self.dataModel.lockRoutingStudent([{}], normalStudents.map(c => c.student), update.tripStop, false, trip);
-			});
-		}
-
-		function dateChangeConfirm(updateStudents)
-		{
-			if (updateStudents.length && isDateChanged && isOtherSame)
-			{
-				return TF.Helper.TripHelper.confirmDateChangeAffectStudent(updateStudents);
-			}
-
-			return Promise.resolve(true);
 		}
 	};
 

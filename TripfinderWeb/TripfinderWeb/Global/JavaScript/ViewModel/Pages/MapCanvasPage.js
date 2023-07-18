@@ -71,10 +71,6 @@
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
 		self.routingSnapManager = new TF.Document.RoutingSnapManger(self);
 		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
-		// self.routingPaletteViewModel.unassignedStudentViewModel.eventsManager.requireDetails.subscribe((e, data) =>
-		// {
-		// 	self.requireDetails.notify(data);
-		// });
 		// self.routingPaletteViewModel.tripViewModel.eventsManager.requireDetails.subscribe((e, data) =>
 		// {
 		// 	self.requireDetails.notify(data);
@@ -703,17 +699,6 @@
 				return palettes;
 			}
 		});
-
-		function onCandidatesStudentsChangeEvent()
-		{
-			self.RoutingMapTool.onCandidatesStudentsChangeEvent(self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.all, self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlighted);
-		}
-		// this.routingPaletteViewModel.tripViewModel.dataModel.onCandidatesStudentsChangeToMapEvent.subscribe(onCandidatesStudentsChangeEvent);
-		// this.routingPaletteViewModel.tripViewModel.dataModel.onStudentChangeEvent.subscribe(onCandidatesStudentsChangeEvent);
-		// this.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlightChangedEvent.subscribe(function()
-		// {
-		// 	self.RoutingMapTool.highlightChangedEvent(self.routingPaletteViewModel.unassignedStudentViewModel.dataModel.highlighted);
-		// });
 
 		self.palettes().forEach(function(palette)
 		{

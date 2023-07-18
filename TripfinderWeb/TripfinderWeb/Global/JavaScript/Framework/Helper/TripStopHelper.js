@@ -118,22 +118,6 @@
 		tripStop.StopTime = moment(stopTime).add('seconds', tripStop.TotalStopTime).add('seconds', travelTimeSeconds).format();
 	};
 
-	TripStopHelper.assignStudents = function(stop, unassignedStudentViewModel)
-	{
-		if (!stop.olFeatureStopBoundary || !stop.olFeatureStopBoundary.geometry)
-		{
-			stop.NumStuds = 0;
-			return;
-		}
-		var studentViewModel_all_in_geometry = unassignedStudentViewModel.GetWithinPolygon(stop.olFeatureStopBoundary.geometry);
-
-		stop.StudentList = studentViewModel_all_in_geometry.map(function(item)
-		{
-			return item.toData();
-		});
-		stop.NumStuds = studentViewModel_all_in_geometry.length;
-	};
-
 	TripStopHelper.loadUnassignedSchoolStudents = function(schoolCodes, session, stopSchool)
 	{
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "student", "loadUnassignedTransferStudents?timePeriod=" + (session == 0 ? "AM" : "PM")),

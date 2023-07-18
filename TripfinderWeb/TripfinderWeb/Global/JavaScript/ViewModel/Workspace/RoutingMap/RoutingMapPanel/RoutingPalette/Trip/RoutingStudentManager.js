@@ -19,16 +19,7 @@
 
 	RoutingStudentManager.prototype.refresh = function(students, reset)
 	{
-		this.refreshStudent(reset);
 		this.refreshDictionary(null, this._getKeys(students));
-	};
-
-	RoutingStudentManager.prototype.refreshStudent = function(reset)
-	{
-		this.tripAvailableWeekdays = this.getAvailableWeekdaysByTripDataRange();
-		this.calculateStudentStatus(reset);
-		this.refreshCandidates();
-		this.refreshAssignStudents();
 	};
 
 	RoutingStudentManager.prototype.getAvailableWeekdaysByTripDataRange = function(trip)
@@ -573,89 +564,6 @@
 		return requirementIds;
 	};
 
-	RoutingStudentManager.prototype.refreshCandidates = function()
-	{
-		var self = this;
-		clearTimeout(self.candidateRefreshTimeout);
-		self.candidateRefreshTimeout = setTimeout(function()
-		{
-			self._refreshCandidates();
-		}, 10);
-	};
-
-	RoutingStudentManager.prototype._refreshCandidates = function()
-	{
-		var self = this;
-		var candidateStudentsToShow = {};
-		for (var key in this.students)
-		{
-			var student = this.students[key];
-			if (student.isShowOnCandidateMap)
-			{
-				candidateStudentsToShow[key] = $.extend({}, student, { id: key, studId: student.id, criteriaStatus: self.getCriteriaStatus(student) });
-			}
-		}
-
-		var drawTool = this.getUnassignedStudentDrawTool();
-		var query = new tf.map.ArcGIS.Query();
-		query.outFields = ["*"];
-		drawTool?._pointLayer.queryFeatures(query).then(function(featureSet)
-		{
-			if (self.dataModel.getEditTrips().length == 0)
-			{
-				return;
-			}
-			var deletes = [];
-			var deleteArrows = [];
-			var adds = [];
-			var edits = [];
-			var onMapStudents = featureSet.features;
-			var onMapStudentsMapping = {};
-			onMapStudents.forEach(function(student)
-			{
-				onMapStudentsMapping[student.attributes.id] = student;
-				if (!candidateStudentsToShow[student.attributes.id])
-				{
-					deletes.push(student);
-					deleteArrows.push({
-						id: student.attributes.id.split("_")[0]
-					});
-				}
-			});
-			for (var key in candidateStudentsToShow)
-			{
-				if (!onMapStudentsMapping[key])
-				{
-					adds.push(candidateStudentsToShow[key]);
-				}
-				else if (candidateStudentsToShow[key].criteriaStatus != onMapStudentsMapping[key].attributes.criteriaStatus)
-				{
-					onMapStudentsMapping[key].attributes.criteriaStatus = candidateStudentsToShow[key].criteriaStatus;
-					edits.push(onMapStudentsMapping[key]);
-				}
-			}
-
-			drawTool?._applyEditsForAdd(adds).then(function()
-			{
-				self.students && adds.forEach(function(add)
-				{
-					if (self.students[add.id]) self.students[add.id].oid = add.oid;
-					self.oidMapping[add.id] = add.oid;
-				});
-			});
-			if (deletes.length > 0 || edits.length > 0)
-			{
-				drawTool?._pointLayer.applyEdits({ deleteFeatures: deletes, updateFeatures: edits });
-			}
-			if (deleteArrows.length > 0)
-			{
-				drawTool?.clearArrow(deleteArrows);
-			}
-
-			self.dataModel.onCandidatesStudentsChangeToMapEvent.notify({ add: adds, edit: [], delete: deleteArrows });
-		});
-	};
-
 	RoutingStudentManager.prototype.getCriteriaStatus = function(student)
 	{
 		if (!student)
@@ -979,11 +887,6 @@
 		{
 			drawTool._studentLayer.addMany(adds);
 		}
-	};
-
-	RoutingStudentManager.prototype.getUnassignedStudentDrawTool = function()
-	{
-		return this.dataModel.viewModel.viewModel.unassignedStudentViewModel.drawTool;
 	};
 
 	RoutingStudentManager.prototype.refreshDictionary = function(recalculate, refreshStudentKeys)
@@ -1387,78 +1290,8 @@
 		}).ToArray();
 	};
 
-	RoutingStudentManager.prototype.refreshStudentLock = function(clearAll)
-	{
-		var alreadyLockStudentsMap = {},
-			allRequirementsMap = {},
-			toLockStudents = [],
-			toUnLockStudents = [];
-		this.lockStudents.forEach(function(student)
-		{
-			alreadyLockStudentsMap[student.RequirementID] = true;
-		});
-
-		for (var key in this.students)
-		{
-			allRequirementsMap[this.students[key].RequirementID] = true;
-			if (!alreadyLockStudentsMap[this.students[key].RequirementID] && this.students[key].XCoord)
-			{
-				toLockStudents.push(this.students[key]);
-				this.lockStudents.push(this.students[key]);
-			}
-		}
-
-		if (clearAll)
-		{
-			toUnLockStudents = toUnLockStudents.concat(this.lockStudents);
-			this.lockStudents = [];
-		}
-		else
-		{
-			for (var i = 0; i < this.lockStudents.length; i++)
-			{
-				var student = this.lockStudents[i];
-				if (!allRequirementsMap[student.RequirementID])
-				{
-					toUnLockStudents.push(student);
-					this.lockStudents.splice(i, 1);
-					i--;
-				}
-			}
-		}
-
-		var studentRequirementLockData = this.dataModel._getUnassignedStudentViewModel().dataModel.studentRequirementLockData;
-		if (toLockStudents.length > 0)
-		{
-			studentRequirementLockData.lockIds(getStudentRequirementIds(toLockStudents));
-			this.dataModel.getStudentLockData().lockIds(getStudentIds(toLockStudents));
-		}
-		if (toUnLockStudents.length > 0)
-		{
-			studentRequirementLockData.unLock(getStudentRequirementIds(toUnLockStudents));
-			this.dataModel.getStudentLockData().unLock(getStudentIds(toUnLockStudents));
-		}
-
-		function getStudentRequirementIds(students)
-		{
-			return students.map(function(student)
-			{
-				return student.RequirementID;
-			});
-		}
-
-		function getStudentIds(students)
-		{
-			return Enumerable.From(students.map(function(student)
-			{
-				return student.id;
-			})).Distinct().ToArray();
-		}
-	};
-
 	RoutingStudentManager.prototype.dispose = function()
 	{
-		this.refreshStudentLock(true);
 		this.lockStudents = null;
 		this.students = null;
 		this.dataModel = null;

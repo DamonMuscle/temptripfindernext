@@ -20,8 +20,7 @@
 		self.dataModel = self.tripViewModel.dataModel;
 		self.stopPoolViewModel = new TF.RoutingMap.RoutingPalette.StopPoolViewModel(self);
 		self.trialStopViewModel = new TF.RoutingMap.RoutingPalette.TrialStopViewModel(self);
-		self.unassignedStudentViewModel = new TF.RoutingMap.RoutingPalette.UnassignedStudentViewModel(self);
-		self.childViewModels =[self.tripViewModel]; // [self.stopPoolViewModel, self.unassignedStudentViewModel, self.tripViewModel, self.trialStopViewModel];
+		self.childViewModels =[self.tripViewModel]; // [self.stopPoolViewModel, self.tripViewModel, self.trialStopViewModel];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
@@ -79,11 +78,6 @@
 		if (self.showCount == 0)
 		{
 			// tf.gaHelper.send('Area', 'Routing');
-			if (self.unassignedStudentViewModel.drawTool && self._viewModal.RoutingMapTool.thematicTool && self.unassignedStudentViewModel.drawTool.getSettingDisplayCount(self.unassignedStudentViewModel.dataModel.getCandidateSetting()) > 1)
-			{
-				self._viewModal.RoutingMapTool.thematicTool.thematicMenu.clearThematicSelection(true);
-				self._viewModal.RoutingMapTool.$offMapTool.find(".tool-icon.thematics").addClass("disable");
-			}
 			self.childViewModels.forEach(function(childViewModel)
 			{
 				childViewModel.show();
