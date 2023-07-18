@@ -196,10 +196,10 @@
 
 		if (type === 'fieldTripStop')
 		{
-			if (data && data.customData && data.customData.geometry)
+			if (data && data.customData)
 			{
-				const { longitude, latitude } = data.customData.geometry;
-				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop, { longitude, latitude });
+				const { tripId, sequence } = data.customData;
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop, { tripId, sequence });
 			}
 			else
 			{

@@ -183,7 +183,12 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapZoomToStop = function(_, data)
 	{
-		this.fieldTripMap?.zoomToFieldTripStop(data);
+		const { tripId, sequence } = data;
+		const fieldTrip = this.dataModel.trips.find(item => item.id === tripId);
+		const stop = fieldTrip?.FieldTripStops.find(item => item.Sequence === sequence);
+		const coordinates = { longitude: stop?.XCoord, latitude: stop?.YCoord };
+
+		this.fieldTripMap?.zoomToFieldTripStop(coordinates);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
