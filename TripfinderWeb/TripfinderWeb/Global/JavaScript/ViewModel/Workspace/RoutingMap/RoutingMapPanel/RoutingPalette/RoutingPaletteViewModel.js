@@ -292,13 +292,27 @@
 		data.fieldTrip.directions.forEach(directions => {
 			const updateStops = this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);
 
-			trip.FieldTripStops.forEach((stop,index) => {
-				stop.StopTimeDepart = updateStops[index].StopTimeDepart;
-				stop.StopTimeArrive = updateStops[index].StopTimeArrive;
-				stop.Travel = updateStops[index].Travel;
-				stop.Distance = updateStops[index].Distance;
-				stop.Speed = updateStops[index].Speed;
-				stop.Duration = updateStops[index].Duration;
+			const startStop = updateStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
+			const endStop = updateStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
+
+			trip.FieldTripStops.forEach((stop) => {
+				const updateStop = updateStops.find(updatedStop => updatedStop.Sequence == stop.Sequence);
+
+				if (updateStop)
+				{
+					stop.Travel = updateStop.Travel;
+					stop.Distance = updateStop.Distance;
+					stop.Speed = updateStop.Speed;
+					stop.Duration = updateStop.Duration;
+				}
+				else if (stop.Sequence == startStop.Sequence - 1 || stop.Sequence == endStop.Sequence + 1)
+				{
+					stop.Travel = "00:00:00";
+					stop.Distance = 0;
+					stop.Speed = 0;
+					stop.Duration = "00:00:00";
+				}
+
 			})
 		});
 

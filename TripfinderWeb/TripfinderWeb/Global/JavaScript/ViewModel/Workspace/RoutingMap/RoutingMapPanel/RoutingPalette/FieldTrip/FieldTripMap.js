@@ -717,7 +717,7 @@
 	{
 		if (!fieldTrip.routePath)
 		{
-			const routeResults = await this.calculateRoute(fieldTrip);
+			const routeResults = (await this.calculateRoute(fieldTrip)).filter(routeResult => !!routeResult);
 
 			routeResults.forEach(routeResult => {
 				fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];

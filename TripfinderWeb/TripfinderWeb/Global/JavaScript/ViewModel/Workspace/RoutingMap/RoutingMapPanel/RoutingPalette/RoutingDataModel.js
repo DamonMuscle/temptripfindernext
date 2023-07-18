@@ -7004,6 +7004,7 @@
 		});
 
 		var featureStops = this._getFeatureFieldTripStops(fieldTripStops, features);
+		var updatedStops = [];
 
 		if(featureStops.length >= 1)
 		{
@@ -7033,19 +7034,13 @@
 					stop.Travel = moment.utc(subDurationMoment.add(pauseDuration, 'minute').asMilliseconds()).format("HH:mm:ss");
 					stop.Distance = subDistance;
 					stop.Speed = subDurationMoment.asHours() > 0 ? subDistance / subDurationMoment.asHours() : 0;
-
-					const stopTimeArriveDuration = moment(fieldTripStops[i - 1].StopTimeDepart).add(moment.duration(fieldTripStops[i - 1].Duration));
-					stop.StopTimeArrive = stopTimeArriveDuration.format(stopTimeFormat);
-					
-					if(!stop.PrimaryDestination && !stop.PrimaryDeparture)
-					{
-						stop.StopTimeDepart = stopTimeArriveDuration.add(Math.ceil(pauseDuration), "minutes").format(stopTimeFormat);
-					}
 				}
+
+				updatedStops.push(stop);
 			}
 		}
 
-		return fieldTripStops;
+		return updatedStops;
 	}
 
 	RoutingDataModel.prototype.dispose = function()
