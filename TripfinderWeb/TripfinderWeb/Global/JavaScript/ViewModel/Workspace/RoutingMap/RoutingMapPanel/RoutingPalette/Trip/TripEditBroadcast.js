@@ -97,9 +97,10 @@
 
 	TripEditBroadcast.prototype._copyTripStopGeo = function(tripStop)
 	{
+		const geometry = TF.xyToGeometry(tripStop.XCoord, tripStop.YCoord);
 		return {
-			x: tripStop.geometry.x,
-			y: tripStop.geometry.y,
+			x: geometry.x,
+			y: geometry.y,
 			id: tripStop.id,
 			Street: tripStop.Street,
 			StreetSegment: tripStop.StreetSegment,
