@@ -973,6 +973,9 @@
 	*/
 	StopTool.prototype.attachClosetStreetToStop = function(stops, type = "file", streets)
 	{
+		console.log("todo: attach closest street to stop");
+		return Promise.resolve();
+
 		if (stops.length == 0) return Promise.resolve(true);
 		var self = this;
 
