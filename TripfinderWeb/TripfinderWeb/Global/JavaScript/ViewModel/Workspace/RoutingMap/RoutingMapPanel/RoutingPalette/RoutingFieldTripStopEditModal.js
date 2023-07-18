@@ -218,6 +218,9 @@
 	 */
 	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(stopSequence)
 	{
+		console.log("todo: use FieldTripMap to highligh stop sequence path and point.");
+		return;
+
 		var trip = this.obSelectedTrip(),
 			beforeStop,
 			afterStop,

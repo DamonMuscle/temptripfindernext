@@ -224,7 +224,8 @@
 			});
 			self.map.mapView = view;
 		}
-		stopTool.initStopInfoControlOnJunction(stop, self.map);
+		console.log("todo: init stop info control on junction");
+		//stopTool.initStopInfoControlOnJunction(stop, self.map);
 	};
 	BaseFieldTripStopEditModal.prototype._disableMapNavagation = function(view)
 	{
