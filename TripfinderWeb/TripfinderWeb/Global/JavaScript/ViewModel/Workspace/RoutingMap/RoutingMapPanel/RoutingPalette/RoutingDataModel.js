@@ -4313,7 +4313,7 @@
 
 	// #region edit
 
-	RoutingDataModel.prototype.update = function(items)
+	RoutingDataModel.prototype.update = function(items, isNoStopChange)
 	{
 		var self = this,
 			tripStops = [],
@@ -4338,7 +4338,7 @@
 		}
 		if (tripStops.length > 0)
 		{
-			return self.fieldTripStopDataModel.update(tripStops);
+			return self.fieldTripStopDataModel.update(tripStops, false, isNoStopChange);
 		}
 	};
 

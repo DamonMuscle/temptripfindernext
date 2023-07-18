@@ -515,7 +515,7 @@
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync)
+	RoutingFieldTripStopDataModel.prototype.update = function(modifyDataArray, isFromBroadCastSync, isNoStopChange)
 	{
 		var self = this;
 		self._viewModal.revertMode = "update-TripStop";
@@ -566,16 +566,20 @@
 			}
 			return pathPromise.then(function()
 			{
-				self._updateTripStops(changeData);
+				self._updateTripStops(changeData, null, isNoStopChange);
 				if (!isFromBroadCastSync) { self.dataModel.tripEditBroadcast.send(originalData, changeData); }
 				return Promise.resolve(modifyDataArray);
 			});
 		});
 	};
 
-	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip)
+	RoutingFieldTripStopDataModel.prototype._updateTripStops = function(tripStops, refreshTrip, isNoStopChange)
 	{
-		this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
+		if (!isNoStopChange)
+		{
+			this.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: tripStops, refreshTrip: refreshTrip });
+		}
+		
 		this.changeRevertStack(tripStops, false);
 		this._runAfterPathChanged(tripStops, null, tf.storageManager.get("notAutoAssignUnassignedStudent") === false);
 	};
