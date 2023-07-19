@@ -79,6 +79,7 @@
 
 		// toggle stop boundary
 		self.onStopBoundaryShowChange = new TF.Events.Event();
+		self.momentHelper = new TF.Document.MomentHelper();
 	}
 
 	RoutingDataModel.weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -4625,8 +4626,8 @@
 				{
 					const currDurationMoment = moment.duration(currDuration,'minute');
 
-					stop.Duration = moment.utc(currDurationMoment.asMilliseconds()).format("HH:mm:ss");
-					stop.Travel = moment.utc(currDurationMoment.add(pauseDuration, 'minute').asMilliseconds()).format("HH:mm:ss");
+					stop.Travel = this.momentHelper.minsToHHMMSS(currDurationMoment.asMinutes());
+					stop.Duration = this.momentHelper.minsToHHMMSS(currDurationMoment.asMinutes() + pauseDuration);
 					stop.Distance = currDistance;
 					stop.Speed = currDistance / currDurationMoment.asHours();
 				}
@@ -4636,8 +4637,8 @@
 					const subDistance = currDistance - featureStops[i - 1].attributes.totalDistance;
 					const subDurationMoment = moment.duration(subDuration, 'minute');
 
-					stop.Duration = moment.utc(subDurationMoment.asMilliseconds()).format("HH:mm:ss");
-					stop.Travel = moment.utc(subDurationMoment.add(pauseDuration, 'minute').asMilliseconds()).format("HH:mm:ss");
+					stop.Travel = this.momentHelper.minsToHHMMSS(subDurationMoment.asMinutes());
+					stop.Duration = this.momentHelper.minsToHHMMSS(subDurationMoment.asMinutes() + pauseDuration);
 					stop.Distance = subDistance;
 					stop.Speed = subDurationMoment.asHours() > 0 ? subDistance / subDurationMoment.asHours() : 0;
 				}
