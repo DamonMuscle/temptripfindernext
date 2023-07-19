@@ -1213,7 +1213,6 @@
 		e.stopPropagation();
 		var data = self.treeview.dataItem(e.target.closest('li'));
 		var trip = self.dataModel.getTripById(data.id);
-		self.dataModel.autoAssignStudent([trip]);
 	}
 
 	function optimizeSequenceClick(e)

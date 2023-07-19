@@ -299,15 +299,6 @@
 
 	StopPoolDataModel.prototype.updateStudent = function(data)
 	{
-		var self = this;
-		var students = self.tripDataModel.getUnAssignStudentInBoundary([data.boundary]);
-		data.Students = students;
-		// return self.tripDataModel.getUnAssignStudentInBoundaryProhibitCross(data).then(function(students)
-		// {
-		// 	data.Students = students;
-		// 	data.StudentCountDisplay = students.length + TF.getSingularOrPluralTitle(" Students", students.length);
-		// 	self.onAllChangeEvent.notify({ add: [], edit: [data], delete: [] });
-		// });
 	};
 
 	StopPoolDataModel.prototype.findByStopId = function(stopId)

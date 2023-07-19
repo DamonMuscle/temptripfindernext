@@ -1593,30 +1593,27 @@ This action cannot be undone.  Do you wish to continue?`;
 			{
 				newTrip.TripStops = newTripStops;
 				self.changeTripStopSpeeds(newTrip.TripStops);
-				return self.initCandidateStudentsCrossStatus(newTrip, newStopList, isTripStopBoundaryChanged).then(function()
+
+				return self.dataModel.recalculate([newTrip]).then(function(response)
 				{
-					// self.dataModel.resetAllStopsTotalStudentCount(newTrip);
-					return self.dataModel.recalculate([newTrip]).then(function(response)
+					var tripData = response[0];
+					newTrip.Distance = tripData.Distance;
+					newTrip.FinishTime = tripData.FinishTime;
+					newTrip.StartTime = tripData.StartTime;
+					for (var j = 0; j < newTrip.TripStops.length; j++)
 					{
-						var tripData = response[0];
-						newTrip.Distance = tripData.Distance;
-						newTrip.FinishTime = tripData.FinishTime;
-						newTrip.StartTime = tripData.StartTime;
-						for (var j = 0; j < newTrip.TripStops.length; j++)
-						{
-							newTrip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
-							newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
-							newTrip.TripStops[j].OpenType = newTrip.OpenType;
-						}
-						self.dataModel.setActualStopTime([newTrip]);
-						self.dataModel.setStudentTravelTime([newTrip]);
-						return self.setTripOptimizeInfo(newTrip).then(function()
-						{
-							tf.loadingIndicator.tryHide();
-							self.needUpdateTrip();
-							self.dataModel.needUpdateTripColor(!self.needUpdateTrip() && self.isColorChanged());
-							return Promise.resolve(newTrip);
-						});
+						newTrip.TripStops[j].TotalStopTime = tripData.TripStops[j].TotalStopTime;
+						newTrip.TripStops[j].Duration = tripData.TripStops[j].Duration;
+						newTrip.TripStops[j].OpenType = newTrip.OpenType;
+					}
+					self.dataModel.setActualStopTime([newTrip]);
+					self.dataModel.setStudentTravelTime([newTrip]);
+					return self.setTripOptimizeInfo(newTrip).then(function()
+					{
+						tf.loadingIndicator.tryHide();
+						self.needUpdateTrip();
+						self.dataModel.needUpdateTripColor(!self.needUpdateTrip() && self.isColorChanged());
+						return Promise.resolve(newTrip);
 					});
 				});
 			});
@@ -1935,31 +1932,6 @@ This action cannot be undone.  Do you wish to continue?`;
 				}
 			}
 		}
-	};
-
-	RoutingTripViewModel.prototype.initCandidateStudentsCrossStatus = function(trip, newStops, isTripStopBoundaryChanged)
-	{
-		var self = this;
-		if (self.options.saveToNewTrip || isTripStopBoundaryChanged || self.obOptimizeSequence() || newStops.length > 0)
-		{
-			var boundaries = [];
-			newStops.forEach(function(tripStop)
-			{
-				if (tripStop.boundary.TripStopId)
-				{
-					boundaries.push(tripStop.boundary);
-				}
-			});
-			return this.dataModel.initCandidateStudentsCrossStatus(trip).then(function()
-			{
-				if (boundaries.length > 0)
-				{
-					return self.dataModel.fieldTripStopDataModel.updateTripBoundaryStudents(boundaries, trip.TripStops, false, false, trip, true);
-				}
-			});
-
-		}
-		return Promise.resolve(trip);
 	};
 
 	RoutingTripViewModel.prototype.isTripStopPathChanged = function()
