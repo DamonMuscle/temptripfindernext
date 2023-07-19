@@ -37,6 +37,8 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation, self.onFieldTripMapDeleteStopLocation.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, self.onFieldTripMapDeleteStopLocationCompleted.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, self.onFieldTripMapDirectionUpdated.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, self.onFieldTripMapHighlightFieldTripStop.bind(self));
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
 	}
@@ -233,8 +235,6 @@
 		updateStop.XCoord = data.XCoord;
 		updateStop.YCoord = data.YCoord;
 		
-		console.log(data);
-
 		this.dataModel.update([updateStop]);
 	}
 
@@ -279,8 +279,6 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
 	{
-		console.log(data);
-
 		const trip = this.dataModel.getTripById(data.fieldTrip.Id);
 
 		data.fieldTrip.directions.forEach(directions => {
@@ -313,6 +311,40 @@
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
 		this.tripViewModel.display.resetTripInfo([trip]);
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
+	{
+		const { tripId, sequence } = data;
+		const fieldTrips = this.dataModel.trips;
+		const fieldTrip = fieldTrips.find(item => item.id === tripId);
+		const fieldTripStops = fieldTrip.FieldTripStops;
+		const currentStop = fieldTripStops.find(item => item.Sequence === sequence);
+		let beforeStop = null, afterStop = null;
+		if (sequence > 1)
+		{
+			beforeStop = fieldTripStops.find(item => item.Sequence === (sequence - 1));
+		}
+
+		if (sequence <= fieldTripStops.length)
+		{
+			afterStop = fieldTripStops.find(item => item.Sequence === (sequence + 1));
+		}
+
+		const DBID = fieldTrip.DBID,
+			FieldTripId = tripId,
+			Color = fieldTrip.color,
+			params = { DBID, FieldTripId, Color, beforeStop, currentStop, afterStop };
+
+		this.fieldTripMap?.addHighlightFeatures(params);
+	}
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapClearHighlightFieldTripStop = function(_, data)
+	{
+		const { tripId } = data;
+		const fieldTrips = this.dataModel.trips;
+		const fieldTrip = fieldTrips.find(item => item.id === tripId);
+		this.fieldTripMap?.clearHighlightFeatures(fieldTrip);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
@@ -409,6 +441,8 @@
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocation);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop);
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop);
 		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
 		PubSub.unsubscribe("on_MapCanvas_MapViewClick");
 

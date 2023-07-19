@@ -37,6 +37,19 @@
 		return graphic;
 	}
 
+	StopLayer.prototype.createHighlightStop = function(longitude, latitude, attributes)
+	{
+		const color = [253, 245, 53, 0.7];
+		const symbol = {
+			type: "simple-marker",
+			color: color,
+			size: 32,
+			outline: null
+		};
+		const graphic = this.createPointGraphic(longitude, latitude, symbol, attributes);
+		return graphic;
+	}
+
 	StopLayer.prototype.addStops = async function(stopGraphics)
 	{
 		await this.addGraphicsByOrder(stopGraphics);
@@ -108,11 +121,6 @@
 			graphic.symbol = this.getStopSymbol(graphic.attributes.Sequence, color);
 			graphic.attributes.Color = color;
 		}
-	}
-
-	StopLayer.prototype.getFeatures = function()
-	{
-		return this.layer.graphics.items || [];
 	}
 
 	StopLayer.prototype.getCloneFeatures = function()

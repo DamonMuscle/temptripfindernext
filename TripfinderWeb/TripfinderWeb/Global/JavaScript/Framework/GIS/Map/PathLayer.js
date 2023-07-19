@@ -27,6 +27,15 @@
 		return graphic;
 	}
 
+	PathLayer.prototype.createHighlightPath = function(paths, attributes)
+	{
+		const Color = [253, 245, 53, 0.7];
+		const symbol = this.symbolHelper.tripPath(Color);
+		symbol.width = symbol.width + 4;
+		const graphic = this.createPolylineGraphic(paths, symbol, attributes);
+		return graphic;
+	}
+
 	PathLayer.prototype.addPath = function(pathGraphic, afterAdd = null)
 	{
 		this.add(pathGraphic, afterAdd);
@@ -45,11 +54,6 @@
 			graphic.symbol =  this.symbolHelper.tripPath(color);
 			graphic.attributes.Color = color;
 		}
-	}
-
-	PathLayer.prototype.getFeatures = function()
-	{
-		return this.layer.graphics.items || [];
 	}
 
 	PathLayer.prototype.dispose = function()

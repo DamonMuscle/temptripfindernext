@@ -232,87 +232,23 @@
 	/**
 	 * highlight current stop to previous and after
 	 */
-	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(stopSequence)
+	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(sequence)
 	{
-		console.log("todo: use FieldTripMap to highligh stop sequence path and point.");
-		return;
+		const trip = this.obSelectedTrip(),
+			tripId = trip.id,
+			data = { tripId, sequence };
+		
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, data);
 
-		var trip = this.obSelectedTrip(),
-			beforeStop,
-			afterStop,
-			currentStop = this.data[0],
-			tripStops = trip.FieldTripStops.filter(x => x.id != currentStop.id),
-			pathPoints = [],
-			stopGraphics = [],
-			color = [253, 245, 53, 0.7],
-			symbolHelper = new TF.Map.Symbol();
-		if (stopSequence > 1)
-		{
-			beforeStop = tripStops[stopSequence - 2];
-		}
-		if (stopSequence <= tripStops.length)
-		{
-			afterStop = tripStops[stopSequence - 1];
-		}
-		[beforeStop, currentStop, afterStop].filter(x => x).forEach(stop =>
-		{
-			var stopGeometry = stop.geometry;
-			if (stop.SchoolLocation)
-			{
-				stopGeometry = TF.xyToGeometry(stop.SchoolLocation.Xcoord, stop.SchoolLocation.Ycoord);
-			}
-			// create path highlight
-			pathPoints.push([stopGeometry.x, stopGeometry.y]);
-			// create stop highlight
-			stopGraphics.push(new tf.map.ArcGIS.Graphic({
-				symbol: this.createStopHighlightSymbol(stop, symbolHelper, color),
-				geometry: stopGeometry
-			}));
-		});
-
-		var graphic = this.viewModel.drawTool.createPathGraphic([pathPoints], trip);
-		var graphicHighlight = graphic.clone(), symbol = graphicHighlight.symbol.clone();
-		symbol.width = graphicHighlight.symbol.width + 4;
-		symbol.color = color;
-		graphicHighlight.symbol = symbol;
-		var layer = this.viewModel.drawTool._studentLayer;
-		layer.addMany(stopGraphics.concat([graphicHighlight, graphic]));
-		this.stopSequenceGraphics.push({ layer: layer, graphic: graphicHighlight });
-		stopGraphics.forEach(x => this.stopSequenceGraphics.push({ layer: layer, graphic: x }));
-		this.stopSequenceGraphics.push({ layer: layer, graphic: graphic });
-	};
-
-	RoutingFieldTripStopEditModal.prototype.createStopHighlightSymbol = function(stop, symbolHelper, color)
-	{
-		var symbol = {
-			type: "simple-marker",
-			color: color,
-			size: 32,
-			outline: null
-		};
-		if (stop.SchoolCode)
-		{
-			if (stop.SchoolLocation)
-			{
-				symbol = symbolHelper.schoolLocation(color, color, new tf.map.ArcGIS.SimpleLineSymbol({ width: 6, color: color }));
-			} else
-			{
-				symbol = symbolHelper.school(null, 0, null, new tf.map.ArcGIS.SimpleLineSymbol({ width: 4, color: color }));
-			}
-		}
-		return symbol;
 	};
 
 	RoutingFieldTripStopEditModal.prototype.removeStopSequenceGraphics = function()
 	{
-		if (this.stopSequenceGraphics.length > 0)
-		{
-			this.stopSequenceGraphics.forEach(item =>
-			{
-				item.layer && item.layer.remove(item.graphic);
-			});
-			this.stopSequenceGraphics = [];
-		}
+		const trip = this.obSelectedTrip(),
+			tripId = trip.id,
+			data = { tripId };
+
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, data);
 	};
 
 	RoutingFieldTripStopEditModal.prototype.initWalkoutData = function()

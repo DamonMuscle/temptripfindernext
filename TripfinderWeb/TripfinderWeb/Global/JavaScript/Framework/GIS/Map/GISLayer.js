@@ -58,6 +58,12 @@
 			if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 			{
 				let total = this.layer.graphics.items.length;
+				if (total === 0)
+				{
+					resolve();
+					return;
+				}
+
 				let handler = this.layer.graphics.on("after-remove", (event) =>
 				{
 					total--;
@@ -70,7 +76,8 @@
 				});
 
 				this.layer.removeAll();
-			} else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+			}
+			else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 			{
 				console.warn(`TODO: clear FeatureLayer, promise`);
 				resolve();
@@ -354,5 +361,18 @@
 		}
 		
 		return features.filter(item => item.visible === true);
+	}
+
+	Layer.prototype.getFeatures = function()
+	{
+		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+		{
+			return this.layer.graphics.items || [];
+		}
+		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+		{
+			console.warn("TODO: getFeatures for FeatureLayer, promise")
+			return [];
+		}		
 	}
 })();
