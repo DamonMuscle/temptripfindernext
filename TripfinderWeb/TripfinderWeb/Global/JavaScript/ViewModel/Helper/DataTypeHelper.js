@@ -342,7 +342,7 @@
 		form: {
 			endpoint: "formResults",
 			idParamName: 'ID',
-			name: "Forms",
+			name: "Form",
 			gridDefinition: "formGridDefinition",
 			isMajorType: true,
 			hasDBID: true,

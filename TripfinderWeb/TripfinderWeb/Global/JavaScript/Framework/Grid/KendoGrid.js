@@ -159,23 +159,23 @@
 			})
 			.then(() =>
 			{
-					if (this.options.isMiniGrid)
-					{
-						var promise = Promise.resolve();
-					}
-					else
-					{
-						var promise = Promise.all([self.loadGridFilter(), self.loadGridThematic()]);
-					}
+				if (this.options.isMiniGrid)
+				{
+					var promise = Promise.resolve();
+				}
+				else
+				{
+					var promise = Promise.all([self.loadGridFilter(), self.loadGridThematic()]);
+				}
 
-					return promise.then(function()
-					{
-						self._applyingLayout = true;
-						self._setGridColumnConfiguration(self.options.fromSearch);
-						self._applyingLayout = false;
-						return;
-					});
-			})			
+				return promise.then(function()
+				{
+					self._applyingLayout = true;
+					self._setGridColumnConfiguration(self.options.fromSearch);
+					self._applyingLayout = false;
+					return;
+				});
+			})
 	};
 
 	KendoGrid.prototype.loadGridDefaults = function()
@@ -703,6 +703,10 @@
 
 									var gridLayoutExtendedEntity = self._obCurrentGridLayoutExtendedDataModel().toData();
 									gridLayoutExtendedEntity.LayoutColumns = self._obSelectedColumns();
+									if (self.options.gridType === "form" && self.options.exportColumns)
+									{
+										gridLayoutExtendedEntity.LayoutColumns = self.options.exportColumns;
+									}
 
 									var getDataUrl = url + '/';
 									var getDataOption = {

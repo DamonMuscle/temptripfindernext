@@ -181,7 +181,19 @@
 
 		signatureFields.forEach(f =>
 		{
-			dataItem[f] = !!dataItem[f];
+			var value = dataItem[f];
+			if (value === true || value === "true" || value === "True")
+			{
+				dataItem[f] = true;
+			}
+			else if (value === false || value === "false" || value === "False")
+			{
+				dataItem[f] = false;
+			}
+			else
+			{
+				dataItem[f] = !!value;
+			}
 		});
 		return dataItem;
 	};
@@ -2962,7 +2974,7 @@
 				paramData: {
 					DBID: tf.datasourceManager.databaseId,
 					RecordDataType: dataTypeId,
-					RecordId:recordId,
+					RecordId: recordId,
 					UDGridID: udGridId
 				}
 			},
