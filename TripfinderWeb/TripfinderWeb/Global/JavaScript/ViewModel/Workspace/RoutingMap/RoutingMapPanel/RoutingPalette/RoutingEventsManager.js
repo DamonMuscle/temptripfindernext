@@ -876,14 +876,6 @@
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation, data);
 	};
 
-	RoutingEventsManager.prototype.removeTripStopBoundaryClick = function(boundary)
-	{
-		this.viewModel.routingChangePath.stop();
-		var updateBoundary = $.extend({}, boundary);
-		updateBoundary.geometry = null;
-		this.dataModel.update([updateBoundary]);
-	};
-
 	RoutingEventsManager.prototype.addRegionClick = function(type, data)
 	{
 		this.viewModel.routingChangePath.stop();
