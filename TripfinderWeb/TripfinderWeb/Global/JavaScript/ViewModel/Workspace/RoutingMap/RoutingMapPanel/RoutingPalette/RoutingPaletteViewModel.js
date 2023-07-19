@@ -166,7 +166,6 @@
 		if (fieldTrips.length > 0)
 		{
 			this.fieldTripMap.updateArrowRenderer(fieldTrips);
-			// await this.fieldTripMap.sortMapFeatures(fieldTrips);
 			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
 		}
 	}

@@ -888,11 +888,6 @@
 			const data = { fieldTrip };
 			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data);
 		}
-		
-		if (this.isNewCopy(fieldTrip))
-		{
-			this.updateCopyFieldTripAttribute(fieldTrip);
-		}
 
 		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath)
 											    .map(stop => stop._geoPath);
@@ -905,7 +900,12 @@
 		if (!fieldTrip.routePathAttributes)
 		{
 			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, null);
-		}		
+		}
+
+		if (this.isNewCopy(fieldTrip))
+		{
+			this.updateCopyFieldTripAttribute(fieldTrip);
+		}
 
 		const pathAttributes = fieldTrip.routePathAttributes;
 		const graphic = this.fieldTripPathLayerInstance?.createPath(routePath, pathAttributes);
@@ -925,35 +925,6 @@
 		// hide by default for UX.
 		this.fieldTripSequenceLineLayerInstance?.setFeaturesVisible(graphic, false);
 		this.fieldTripSequenceLineLayerInstance?.addPath(graphic, afterAdd);
-	}
-
-	FieldTripMap.prototype.sortMapFeatures = async function(fieldTrips)
-	{
-		const self = this;
-		const fieldTripNames = fieldTrips.map(item => {
-			return { Name: item.Name, FieldTripId: item.Id };
-		}).sort((a, b)=> a.Name.localeCompare(b.Name));
-		const fieldTripIds = fieldTripNames.map(item => item.FieldTripId);
-
-		const fieldTripStops = this.fieldTripStopLayerInstance?.getCloneFeatures();
-		if (fieldTripStops.length === 0)
-		{
-			return;
-		}
-
-		fieldTripStops.sort((a, b) => {
-			// sort by tripName
-			const aId = a.attributes.FieldTripId, bId = b.attributes.FieldTripId;
-			if (aId === bId)
-			{
-				// sort by sequence desc
-				return (-1) * (a.attributes.Sequence - b.attributes.Sequence);
-			}
-			return fieldTripIds.indexOf(aId) - fieldTripIds.indexOf(bId);
-		});
-
-		await self.fieldTripStopLayerInstance?.clearLayer();
-		await self.fieldTripStopLayerInstance?.addStops(fieldTripStops);
 	}
 
 	//#region - Path Arrows
