@@ -396,11 +396,6 @@
 
 		self.obFields().map(function (field)
 		{
-			function isQuickDateFilter()
-			{
-				return self.quickDateFilterTypes.includes(field.filterType());
-			}
-
 			if (field.selectField() && field.selectField().FieldName)
 			{
 				var value = field.filterValue();
@@ -474,7 +469,7 @@
 					}
 				}
 
-				if (value === "" && (self.quickDateFilterTypesWithoutInput.includes(field.filterType()) || isQuickDateFilter()))
+				if (value === "" && (self.quickDateFilterTypesWithoutInput.includes(field.filterType()) || self.isQuickDateFilterByField(field)))
 				{
 					field.filterValue("");
 					field.type = field.filterType();
@@ -484,7 +479,7 @@
 						Value: self.quickDateFilterTypesWithoutInput.includes(field.filterType()) ? "X" : ""
 					};
 					item.TypeHint = "DateTime";
-					if (!isQuickDateFilter())
+					if (!self.isQuickDateFilterByField(field))
 					{
 						searchParameters.filterSet.FilterItems.push(item);
 					}
