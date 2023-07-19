@@ -521,17 +521,6 @@
 
 	//#region Field Trip Stop
 
-	//#region Edit Stop
-	FieldTripMap.prototype.onStopsChange = async function(data)
-	{
-		const self = this;
-		(data.trips || []).forEach(trip =>
-		{
-			self.refreshFieldTripPath(trip);
-		});
-	}
-	//#endregion
-
 	//#region Move Stop Location
 
 	FieldTripMap.prototype.moveStopLocation = async function(fieldTrip, stop, sketchTool)
@@ -619,7 +608,6 @@
 			});
 		}
 	}
-
 	//#endregion
 
 	//#region Delete Stop

@@ -24,8 +24,6 @@
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
-		self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChange.bind(self));
-
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.Change, self.onFieldTripMapChange.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.onFieldTripMapZoomToLayers.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop, self.onFieldTripMapZoomToStop.bind(self));
@@ -41,6 +39,7 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
+		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -203,6 +202,27 @@
 		this.fieldTripMap?.updateFieldTripPathVisible(this.dataModel.trips);
 	}
 
+	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)
+	{
+		const { fieldTripId, stopId } = data;
+		const fieldTrips = this.dataModel.trips;
+		const fieldTrip = fieldTrips.find(item => item.id === fieldTripId);
+		if (!fieldTrip)
+		{
+			console.warn(`Cannot find field trip id=${fieldTripId}`);
+			return;
+		}
+
+		const fieldTripStop = fieldTrip.FieldTripStops.find(item=>item.id === stopId);
+		if (!fieldTripStop)
+		{
+			console.warn(`Cannot find field trip stop id=${stopId} in field trip id=${fieldTripId}`);
+			return;
+		}
+
+		this.fieldTripMap?.refreshFieldTripPath(fieldTrip, { moveStop: fieldTripStop });
+	};
+
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocation = function(_, data)
 	{
 		const { fieldTripId, stopId } = data;
@@ -361,33 +381,6 @@
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, event)
 	{
 		this.fieldTripMap?.onMapClickEvent(event);
-	}
-
-	RoutingPaletteViewModel.prototype.onTripStopsChange = function(event, data)
-	{
-		const self = this;
-		const stops = [].concat(...(data.add || [])).concat(...(data.edit || []));
-		const tripIds = [];
-		stops.forEach(stop =>
-		{
-			if (stop.FieldTripId && tripIds.indexOf(stop.FieldTripId) === -1)
-			{
-				tripIds.push(stop.FieldTripId);
-			}
-		});
-
-		const trips = [];
-		tripIds.forEach((id) =>
-		{
-			const trip = self.dataModel.getTripById(id);
-			if (trip)
-			{
-				trips.push(trip);
-			}
-		});
-
-		data.trips = trips;
-		this.fieldTripMap?.onStopsChange(data);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()

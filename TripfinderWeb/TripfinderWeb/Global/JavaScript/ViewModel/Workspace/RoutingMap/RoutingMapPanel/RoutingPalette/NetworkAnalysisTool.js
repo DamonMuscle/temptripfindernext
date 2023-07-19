@@ -73,6 +73,8 @@
 					}
 					return self._recalculateTripSmart(tripStop);
 				case "move":
+					const data = { fieldTripId: tripStop.FieldTripId, stopId: tripStop.id };
+					PubSub.publish("on_MapCanvas_RecalculateTripMove", data);
 					return self._recalculateTripMove(tripStop, true);
 				case "delete":
 					return self._recalculateTripDelete(tripStop);
