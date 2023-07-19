@@ -137,30 +137,6 @@
 		});
 	}
 
-	EsriTool.prototype.redrawByWalkout = function(boundary, graphic)
-	{
-		var self = this;
-		var tripStop = this.dataModel.getFieldTripStopByStopId(boundary.TripStopId);
-		graphic = graphic || self._findGraphicInLayerById(self._polygonLayer, boundary.id);
-		self._oldBoundarySymbol = graphic.symbol.clone();
-		graphic.symbol = self.symbol.editPolygonSymbol();
-		self._oldBoundaryGraphic = graphic;
-		return tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.WalkoutStopBoundaryModalViewModel(tripStop, this.viewModel))
-			.then(function(g)
-			{
-				self._tempWalkoutRedrawLayer.removeAll();
-				if (self._oldBoundaryGraphic) self._oldBoundaryGraphic.symbol = self._oldBoundarySymbol;
-				if (g)
-				{
-					var centroid = self._findGraphicInLayerById(self._pointLayer, graphic.attributes.dataModel.TripStopId);
-					graphic.geometry = g.geometry;
-					graphic.geometry = self.removeOverlapBoundary(graphic, centroid).geometry;
-					graphic.symbol = self._oldBoundarySymbol;
-					self.updateDataModel([graphic]);
-				}
-			});
-	};
-
 	EsriTool.prototype.reshape = function(id)
 	{
 		var self = this;

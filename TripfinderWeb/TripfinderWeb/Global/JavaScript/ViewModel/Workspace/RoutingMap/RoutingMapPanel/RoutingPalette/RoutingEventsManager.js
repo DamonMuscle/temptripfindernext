@@ -884,20 +884,6 @@
 		this.dataModel.update([updateBoundary]);
 	};
 
-	RoutingEventsManager.prototype.addTripStopBoundaryClick = function(type, tripStop)
-	{
-		this.viewModel.routingChangePath.stop();
-		var boundary = this.dataModel.fieldTripStopDataModel.createTripBoundary(tripStop);
-		var graphic = this.viewModel.drawTool.createStopBoundaryGraphic(boundary, null, tripStop.FieldTripId);
-		if (type === "walkout")
-		{
-			this.viewModel.drawTool.redrawByWalkout(boundary, graphic);
-		} else
-		{
-			this.viewModel.drawTool.redrawRegion(type, tripStop.id, graphic);
-		}
-	};
-
 	RoutingEventsManager.prototype.addRegionClick = function(type, data)
 	{
 		this.viewModel.routingChangePath.stop();
@@ -914,11 +900,6 @@
 	{
 		this.viewModel.routingChangePath.stop();
 		this.viewModel.drawTool.redrawRegion(type, data.id);
-	};
-
-	RoutingEventsManager.prototype.redrawWalkoutClick = function(data)
-	{
-		this.viewModel.drawTool.redrawByWalkout(data);
 	};
 
 	RoutingEventsManager.prototype.reshapeClick = function(type, data)
