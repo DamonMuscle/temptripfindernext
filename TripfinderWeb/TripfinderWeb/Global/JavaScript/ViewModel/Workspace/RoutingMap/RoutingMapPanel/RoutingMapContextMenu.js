@@ -25,6 +25,11 @@
 
 		function onFieldTripMapClick_FieldTripStop(event, dataWrapper)
 		{
+			if(this.mapCanvas.editModals().filter((c) => c.obVisible()).length > 0)
+			{
+				return;
+			}
+
 			var container = $(".map").closest('#pageContent');
 
 			var data = dataWrapper.data?.map((item) => {
