@@ -430,7 +430,7 @@
 
 	//#region Refresh Field Trip Path
 
-	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip, {moveStop, deleteStop})
+	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip, {moveStop, deleteStop} = {})
 	{
 		let effectSequences = [];
 		if (moveStop)
