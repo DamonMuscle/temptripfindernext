@@ -235,7 +235,7 @@
 		updateStop.XCoord = data.XCoord;
 		updateStop.YCoord = data.YCoord;
 		
-		this.dataModel.update([updateStop]);
+		this.dataModel.update([updateStop], true); // pass true to stop calling onTripStopsChangeEvent
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDeleteStopLocation = function(_, data)
@@ -280,6 +280,11 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
 	{
 		const trip = this.dataModel.getTripById(data.fieldTrip.Id);
+
+		if (!data.fieldTrip.directions)
+		{
+			return;
+		}
 
 		data.fieldTrip.directions.forEach(directions => {
 			const updateStops = this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);

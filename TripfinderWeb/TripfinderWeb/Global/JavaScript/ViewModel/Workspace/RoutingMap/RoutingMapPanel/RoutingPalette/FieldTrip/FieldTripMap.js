@@ -186,9 +186,9 @@
 		await this.addFieldTripPath(fieldTrip);
 	}
 
-	FieldTripMap.prototype.addFieldTripPath = async function(fieldTrip)
+	FieldTripMap.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
 	{
-		await this.drawFieldTripPath(fieldTrip);
+		await this.drawFieldTripPath(fieldTrip, effectSequences);
 
 		return new Promise((resolve, reject) =>
 		{
@@ -412,15 +412,27 @@
 
 	//#region Refresh Field Trip Path
 
-	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip)
+	FieldTripMap.prototype.refreshFieldTripPath = async function(fieldTrip, {moveStop, deleteStop})
 	{
+		let effectSequences = [];
+		if (moveStop)
+		{	
+			effectSequences = fieldTrip.FieldTripStops.filter(stop => stop.Sequence >= moveStop.Sequence - 1 && stop.Sequence <= moveStop.Sequence + 1)
+													  .map(stop => stop.Sequence);
+		}
+		else if(deleteStop)
+		{
+			effectSequences = fieldTrip.FieldTripStops.filter(stop => stop.Sequence == deleteStop.Sequence - 1 || stop.Sequence == deleteStop.Sequence)
+												      .map(stop => stop.Sequence);
+		}
+
 		this.clearFieldTripPath(fieldTrip);
 		await this.clearFieldTripPathArrow(fieldTrip);
 
 		this.clearSequenceLine(fieldTrip);
 		await this.clearSequenceLineArrow(fieldTrip);
 
-		await this.addFieldTripPath(fieldTrip);
+		await this.addFieldTripPath(fieldTrip, effectSequences);
 	}
 
 	FieldTripMap.prototype.clearFieldTripPath = function(fieldTrip)
@@ -544,7 +556,7 @@
 		movingStop.XCoord = +longitude.toFixed(6);
 		movingStop.YCoord = +latitude.toFixed(6);
 
-		self.refreshFieldTripPath(fieldTrip);
+		self.refreshFieldTripPath(fieldTrip, {moveStop: movingStop});
 	}
 
 	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(_, data)
@@ -627,7 +639,7 @@
 		const data = { fieldTripStopId: stop.id };
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DeleteStopLocationCompleted, data);
 
-		self.refreshFieldTripPath(fieldTrip);
+		self.refreshFieldTripPath(fieldTrip, {deleteStop: stop});
 	}
 
 	//#endregion
@@ -808,44 +820,81 @@
 		}
 	}
 
-	FieldTripMap.prototype.drawFieldTripPath = async function(fieldTrip)
+	FieldTripMap.prototype.drawFieldTripPath = async function(fieldTrip, effectSequences)
 	{
+		let changedStops = [];
+
 		if (!fieldTrip.routePath)
 		{
-			let routeResults = await this.calculateRoute(fieldTrip);
+			let routeResults = [];
+
+			if (!effectSequences)
+			{
+				changedStops = fieldTrip.FieldTripStops
+				routeResults = await this.calculateRoute(fieldTrip);
+			}
+			else
+			{
+				changedStops = fieldTrip.FieldTripStops.filter(stop => effectSequences.includes(stop.Sequence));
+				routeResults = await this.calculateRouteByStops(changedStops, true);
+
+				if (!Array.isArray(routeResults)) 
+				{
+					routeResults = [routeResults];
+				}
+			}
 
 			if(!routeResults)
 			{
-				console.error("routeResults is empty, the fieldTrip is ->", fieldTrip);
+				console.error("routeResults is empty, the FieldTripStops is ->", changedStops);
 				return;
 			}
 
 			routeResults = routeResults.filter(routeResult => !!routeResult);
 
-			routeResults.forEach(routeResult => {
-				fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];
-				fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
 
-				if (!fieldTrip.directions) 
-				{
-					fieldTrip.directions = [this._computeDirections(routeResult)];
-				}
-				else
-				{
-					const directions = this._computeDirections(routeResult);
-					fieldTrip.directions.push(directions);
-				}
-			});
+			if (routeResults.length > 0)
+			{
+				routeResults.forEach(routeResult => {
+					fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];
+					fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
+	
+					if (!fieldTrip.directions) 
+					{
+						fieldTrip.directions = [this._computeDirections(routeResult)];
+					}
+					else
+					{
+						const directions = this._computeDirections(routeResult);
+						fieldTrip.directions.push(directions);
+					}
+	
+					this._computeRoutePathForStop(changedStops, routeResult);
+					this._computeDirectionsForStop(fieldTrip.FieldTripStops, routeResult);
+				});
+			}
+			else
+			{
+				// if there is unsolved path, clear the changed stop's original path data
+				this._clearRoutePathForStop(changedStops); 
+			}
 
 			const data = { fieldTrip };
 			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data);
 		}
 
-		const routePath = fieldTrip.routePath;
+		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath)
+											    .map(stop => stop._geoPath);
+
 		if (!routePath)
 		{
 			return;
 		}
+
+		if (!fieldTrip.routePathAttributes)
+		{
+			fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, null);
+		}		
 
 		const pathAttributes = fieldTrip.routePathAttributes;
 		const graphic = this.fieldTripPathLayerInstance?.createPath(routePath, pathAttributes);
@@ -1098,6 +1147,35 @@
 		 	paths = route?.geometry?.paths; 
 		return paths;
 	}
+
+	FieldTripMap.prototype._computeRoutePathForStop = function(changedStops, routeResult)
+	{
+		const route = routeResult?.route,
+		 	paths = route?.geometry?.paths,
+			stops = routeResult?.stops;
+
+		paths.forEach((path, index) => {
+			const matchedStop = changedStops[index];
+			matchedStop._geoPath = path;
+		});
+	}
+
+	FieldTripMap.prototype._clearRoutePathForStop = function(changedStops)
+	{
+		for(var i = 0; i < changedStops.length - 1; i++)
+		{
+			changedStops[i]._geoPath = null;
+		}
+	}
+
+	FieldTripMap.prototype._computeDirectionsForStop = function(changedStops, routeResult)
+	{
+		const { features, routeName, strings, totalDriveTime, totalLength, totalTime } = routeResult.directions;
+		const routeDirections = { features, routeName, strings, totalDriveTime, totalLength, totalTime };
+		const stops = routeResult?.stops;
+
+		// TODO: extract directions for changed stops
+	}	
 
 	FieldTripMap.prototype._computePathAttributes = function(fieldTrip, routeResult)
 	{
