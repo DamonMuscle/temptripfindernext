@@ -1065,7 +1065,12 @@
 				}, []);
 				indexList.sort((a,b) => a-b);
 
-				tf.promiseBootbox.alert(`Cannot solve path. No solution found from Stop ${fieldTrip.FieldTripStops[indexList[0]].Sequence - 1} to Stop ${fieldTrip.FieldTripStops[indexList[0]].Sequence + 1}`)
+				const [minSequence, maxSequence] = fieldTrip.FieldTripStops.reduce(function([min, max], current)
+				{
+					return [Math.min(min, current.Sequence), Math.max(max, current.Sequence)];
+				},[Number.MAX_SAFE_INTEGER, 0]);
+
+				tf.promiseBootbox.alert(`Cannot solve path. No solution found from Stop ${Math.max(fieldTrip.FieldTripStops[indexList[0]].Sequence - 1,minSequence)} to Stop ${Math.min(maxSequence,fieldTrip.FieldTripStops[indexList[0]].Sequence + 1)}`)
 
 				const chunks = [];
 				for(let i = 0; i < indexList.length; i++)
