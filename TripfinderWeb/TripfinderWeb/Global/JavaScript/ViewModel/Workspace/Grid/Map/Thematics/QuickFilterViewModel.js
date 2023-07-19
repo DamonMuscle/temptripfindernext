@@ -301,7 +301,7 @@
 		return filterValue;
 	}
 
-	QuickFilterViewModel.prototype.isQuickDateFilter = function (field)
+	QuickFilterViewModel.prototype.isQuickDateFilterByField = function (field)
 	{
 		return this.quickDateFilterTypes.includes(field.filterType());
 	}
@@ -349,26 +349,26 @@
 				}
 				break;
 			case "Date":
-				if (this.isQuickDateFilter(field)) //we only need this here because these are required to use input number as type.
+				if (this.isQuickDateFilterByField(field)) //we only need this here because these are required to use input number as type.
 				{
-					this.quickDateFilterFieldMaker();
+					filterValue = this.quickDateFilterFieldMaker(value, field);
 					break;
 				}
 				filterValue = toISOStringWithoutTimeZone(moment(value));
 				break;
 			case "DateTime":
-				if (this.isQuickDateFilter(field))
+				if (this.isQuickDateFilterByField(field))
 				{
-					this.quickDateFilterFieldMaker();
+					filterValue = this.quickDateFilterFieldMaker(value, field);
 					break;
 				}
 				filterValue = toISOStringWithoutTimeZone(moment(value));
 				break;
 			default:
 				filterValue = value;
-				if (this.isQuickDateFilter(field))
+				if (this.isQuickDateFilterByField(field))
 				{
-					this.quickDateFilterFieldMaker();
+					filterValue = this.quickDateFilterFieldMaker(value, field);
 					typeHint = "DateTime";
 				}
 				break;
@@ -396,6 +396,11 @@
 
 		self.obFields().map(function (field)
 		{
+			function isQuickDateFilter()
+			{
+				return self.quickDateFilterTypes.includes(field.filterType());
+			}
+
 			if (field.selectField() && field.selectField().FieldName)
 			{
 				var value = field.filterValue();
@@ -469,7 +474,7 @@
 					}
 				}
 
-				if (value === "" && (self.quickDateFilterTypesWithoutInput.includes(field.filterType()) || self.isQuickDateFilter()))
+				if (value === "" && (self.quickDateFilterTypesWithoutInput.includes(field.filterType()) || isQuickDateFilter()))
 				{
 					field.filterValue("");
 					field.type = field.filterType();
@@ -479,7 +484,7 @@
 						Value: self.quickDateFilterTypesWithoutInput.includes(field.filterType()) ? "X" : ""
 					};
 					item.TypeHint = "DateTime";
-					if (!self.isQuickDateFilter())
+					if (!isQuickDateFilter())
 					{
 						searchParameters.filterSet.FilterItems.push(item);
 					}
