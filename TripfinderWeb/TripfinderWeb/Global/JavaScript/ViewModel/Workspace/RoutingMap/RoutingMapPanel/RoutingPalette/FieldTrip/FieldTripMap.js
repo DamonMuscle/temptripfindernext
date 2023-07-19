@@ -1151,40 +1151,11 @@
 		}
 		catch (ex)
 		{
-			if(ex?.unlocatedStopNames?.length)
-			{
-				const indexList = ex?.unlocatedStopNames?.reduce(function(result, stopName){
-					const index = fieldTrip.FieldTripStops.findIndex(x=>x.Street == stopName);
-					const temp = [...result, index];
-					return index >= 0 ? [...new Set(temp)] : result;
-				}, []);
-				indexList.sort((a,b) => a-b);
-
-				const [minSequence, maxSequence] = fieldTrip.FieldTripStops.reduce(function([min, max], current)
-				{
-					return [Math.min(min, current.Sequence), Math.max(max, current.Sequence)];
-				},[Number.MAX_SAFE_INTEGER, 0]);
-
-				tf.promiseBootbox.alert(`Cannot solve path. No solution found from Stop ${Math.max(fieldTrip.FieldTripStops[indexList[0]].Sequence - 1,minSequence)} to Stop ${Math.min(maxSequence,fieldTrip.FieldTripStops[indexList[0]].Sequence + 1)}`)
-
-				const chunks = [];
-				for(let i = 0; i < indexList.length; i++)
-				{
-					const lowBound = i === 0 ? 0 : indexList[i-1];
-					const highBound = indexList[i];
-					chunks.push(fieldTrip.FieldTripStops.slice(lowBound, highBound));
-					if(highBound + 1 <= fieldTrip.FieldTripStops.length -1)
-					{
-						chunks.push(fieldTrip.FieldTripStops.slice(highBound + 1));
-					}
-				}
-
-				return await Promise.all(chunks.filter(c=>c,length>1).map(c=>this.calculateRouteByStops(c)));
-			}
+			return this.calculateRouteErrorHandler(ex, fieldTrip.FieldTripStops);
 		}
 	}
 
-	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTripStops)
+	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTripStops, needErrorHandler = false)
 	{
 		const networkService = TF.GIS.Analysis.getInstance().networkService,
 		stops = [], MIN_ROUTING_STOPS = 2;
@@ -1213,8 +1184,61 @@
 			stops: stopFeatureSet,
 		};
 
-		const response = await networkService.solveRoute(params);
-		return response?.results?.routeResults[0];
+		if(needErrorHandler)
+		{
+			try
+			{
+				const response = await networkService.solveRoute(params);
+				return response?.results?.routeResults[0];
+			}
+			catch(ex)
+			{
+				return this.calculateRouteErrorHandler(ex, fieldTripStops);
+			}
+		}
+		else
+		{
+			const response = await networkService.solveRoute(params);
+			return response?.results?.routeResults[0];
+		}
+	}
+
+	FieldTripMap.prototype.calculateRouteErrorHandler = async function(ex, fieldTripStops)
+	{
+		if(!ex?.unlocatedStopNames?.length && ex?.details?.httpStatus === 400 && ex?.details?.messages && ex?.details?.messages[0])
+		{
+			tf.promiseBootbox.alert(`Cannot solve path. ${ex?.details?.messages[0]}`);
+		}
+		else if(ex?.unlocatedStopNames?.length)
+		{
+			const indexList = ex?.unlocatedStopNames?.reduce(function(result, stopName){
+				const index = fieldTripStops.findIndex(x=>x.Street == stopName);
+				const temp = [...result, index];
+				return index >= 0 ? [...new Set(temp)] : result;
+			}, []);
+			indexList.sort((a,b) => a-b);
+
+			const [minSequence, maxSequence] = fieldTripStops.reduce(function([min, max], current)
+			{
+				return [Math.min(min, current.Sequence), Math.max(max, current.Sequence)];
+			},[Number.MAX_SAFE_INTEGER, 0]);
+
+			tf.promiseBootbox.alert(`Cannot solve path. No solution found from Stop ${Math.max(fieldTripStops[indexList[0]].Sequence - 1,minSequence)} to Stop ${Math.min(maxSequence,fieldTripStops[indexList[0]].Sequence + 1)}`)
+
+			const chunks = [];
+			for(let i = 0; i < indexList.length; i++)
+			{
+				const lowBound = i === 0 ? 0 : indexList[i-1];
+				const highBound = indexList[i];
+				chunks.push(fieldTripStops.slice(lowBound, highBound));
+				if(highBound + 1 <= fieldTripStops.length -1)
+				{
+					chunks.push(fieldTripStops.slice(highBound + 1));
+				}
+			}
+
+			return await Promise.all(chunks.filter(c=>c,length>1).map(c=>this.calculateRouteByStops(c)));
+		}
 	}
 
 	//#endregion
