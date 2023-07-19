@@ -42,61 +42,16 @@
 
 	UDGridRightClickMenu.prototype.saveAsClick = function()
 	{
-		const operationType = "saveAs";
-		var title = this.gridBlock.options.title;
-		const columns = this.getColumns();
-		const items = TF.Helper.KendoGridHelper.getListOfRecords(this.getSelectedItems(operationType, columns), columns);
-		tf.promiseBootbox.dialog(
-			{
-				closeButton: true,
-				title: "Save As",
-				message: "Select the file format that you would like to save the selected records in." +
-					"<div class='col-xs-24'>" +
-					"<br/><label>Type</label>" +
-					"<div class='save-content'>" +
-					"<input id='csvradio' type='radio' checked='checked' name='type' value='csv' />" +
-					"<label for='csvradio'>Comma Separated Value (.csv)</label>" +
-					"<br/><input id='xlsradio' type='radio' name='type' value='xls' />" +
-					"<label for='xlsradio'>Excel 97 - 2003 Workbook (.xls)</label>" +
-					"<div>" +
-					"</div>",
-				buttons:
-				{
-					save:
-					{
-						label: "Save",
-						className: "btn tf-btn-black btn-sm",
-						callback: function()
-						{
-							var fileFormat = $("#csvradio").is(':checked') ? 'csv' : 'xls';
-							var getDataUrl = pathCombine(tf.api.apiPrefixWithoutDatabase(), "DataExportFiles");
-							var getDataOption = {
-								paramData:
-								{
-									fileFormat: fileFormat
-								},
-								data: items
-							};
-
-							tf.promiseAjax.post(getDataUrl, getDataOption).then(function(keyApiResponse)
-							{
-								var fileUrl = `${getDataUrl}?key=${keyApiResponse.Items[0]}&fileFormat=${fileFormat}&fileName=${title}`;
-								var link = document.createElement("a");
-								link.setAttribute('download', name);
-								link.href = fileUrl;
-								document.body.appendChild(link);
-								link.click();
-								link.remove();
-							});
-						}
-					},
-					cancel:
-					{
-						label: "Cancel",
-						className: "btn btn-link btn-sm"
-					}
-				}
-			});
+		var lightKendoGrid = this.gridBlock.lightKendoGrid;
+		var selectedIds = lightKendoGrid.getSelectedIds();
+		if (selectedIds.length > 0)
+		{
+			let title = this.gridBlock.options.title;
+			let columns = this.getColumns();
+			lightKendoGrid.options.gridData.text = title;
+			lightKendoGrid.options.exportColumns = columns;
+			lightKendoGrid.exportCurrentGrid(selectedIds);
+		}
 	};
 
 	UDGridRightClickMenu.prototype.allSelectionClick = function()
@@ -157,7 +112,7 @@
 				return;
 			}
 
-			let dataItem = JSON.parse(JSON.stringify(this.gridBlock.grid.dataItem(item)));
+			let dataItem = $.extend(true, {}, this.gridBlock.grid.dataItem(item));
 			switch (operationType)
 			{
 				case "saveAs":
