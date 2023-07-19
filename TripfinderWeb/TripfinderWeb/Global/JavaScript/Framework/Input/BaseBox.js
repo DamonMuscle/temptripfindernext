@@ -90,7 +90,22 @@
 	{
 		for (var key in attributes)
 		{
-			$el.attr(key, attributes[key]);
+			const value = attributes[key];
+			if (ko.isObservable(value))
+			{
+				$el.attr(key, value());
+				value.subscribe(function(newKey)
+				{
+					return (newValue) =>
+					{
+						$el.attr(newKey, newValue);
+					};
+				}(key));
+			}
+			else
+			{
+				$el.attr(key, value);
+			}
 		}
 	};
 

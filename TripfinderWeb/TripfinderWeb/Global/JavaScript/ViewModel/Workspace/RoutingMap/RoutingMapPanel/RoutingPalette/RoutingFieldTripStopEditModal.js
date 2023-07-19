@@ -54,6 +54,14 @@
 		this.obDataModel.StopTimeArrive.subscribe(this.stopTimeArriveChange, this);
 		this.obStopTimeArriveDate.subscribe(this.obStopTimeArriveDateChange, this);
 		this.obStopTimeArriveTime.subscribe(this.obStopTimeArriveTimeChange, this);
+		this.obStopTimeArriveDatePlaceholder = ko.computed(()=>
+		{
+			return this.obStopTimeArriveDisable() ? "None" : "MM/DD/YYYY";
+		}, this);
+		this.obStopTimeArriveTimePlaceholder = ko.computed(()=>
+		{
+			return this.obStopTimeArriveDisable() ? "None" : "hh:mm tt";
+		}, this);
 
 		// stop time depart
 		this.obStopTimeDepartDisable = ko.observable(false);
@@ -63,6 +71,14 @@
 		this.obDataModel.StopTimeDepart.subscribe(this.stopTimeDepartChange, this);
 		this.obStopTimeDepartDate.subscribe(this.obStopTimeDepartDateChange, this);
 		this.obStopTimeDepartTime.subscribe(this.obStopTimeDepartTimeChange, this);
+		this.obStopTimeDepartDatePlaceholder = ko.computed(()=>
+		{
+			return this.obStopTimeDepartDisable() ? "None" : "MM/DD/YYYY";
+		}, this);
+		this.obStopTimeDepartTimePlaceholder = ko.computed(()=>
+		{
+			return this.obStopTimeDepartDisable() ? "None" : "hh:mm tt";
+		}, this);
 
 		this.vrpTool = new TF.RoutingMap.RoutingPalette.VRPTool();
 		this.dataModel.onTripStopsChangeEvent.subscribe(this.onTripStopsChangeEvent.bind(this));
