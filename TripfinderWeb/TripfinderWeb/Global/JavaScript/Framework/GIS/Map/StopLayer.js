@@ -50,9 +50,9 @@
 		return graphic;
 	}
 
-	StopLayer.prototype.addStops = async function(stopGraphics)
+	StopLayer.prototype.addStops = function(stopGraphics)
 	{
-		await this.addGraphicsByOrder(stopGraphics);
+		this.addMany(stopGraphics);
 	}
 
 	StopLayer.prototype.moveStop = function(stopGraphic, sketchTool)

@@ -181,7 +181,7 @@
 
 		this._sortBySequence(fieldTrip.FieldTripStops);
 
-		await this.drawStops(fieldTrip);
+		this.drawStops(fieldTrip);
 
 		await this.addFieldTripPath(fieldTrip);
 	}
@@ -256,9 +256,13 @@
 			const fieldTrip = fieldTrips[i],
 				{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
 				visible = (precondition === null) ? fieldTrip.visible : (precondition && fieldTrip.visible),
-				features = this._queryMapFeatures(layerFeatures, DBID, FieldTripId);
+				features = this._queryMapFeatures(layerFeatures, DBID, FieldTripId),
+				updateFeatures = features.filter(item => item.visible !== visible);
 
-			layerInstance.setFeaturesVisible(features, visible);
+			if (updateFeatures.length > 0)
+			{
+				layerInstance.setFeaturesVisible(updateFeatures, visible);
+			}
 		}
 	}
 
@@ -362,17 +366,17 @@
 		this.fieldTripSequenceLineLayerInstance.updateColor(highlightLines, color);
 
 		// update path arrow color
-		const description = `DBID = ${DBID}, id = ${FieldTripId}`;
-		this._updatePathArrowFeatureColor(this.fieldTripPathArrowLayerInstance, description, color);
-		this._updatePathArrowFeatureColor(this.fieldTripSequenceLineArrowLayerInstance, description, color);
+		const condition = this._extractArrowCondition(DBID, FieldTripId);
+		this._updatePathArrowFeatureColor(this.fieldTripPathArrowLayerInstance, condition, color);
+		this._updatePathArrowFeatureColor(this.fieldTripSequenceLineArrowLayerInstance, condition, color);
 		this.redrawFieldTripArrows([fieldTrip]);
 	}
 
-	FieldTripMap.prototype._updatePathArrowFeatureColor = function(layerInstance, description, color)
+	FieldTripMap.prototype._updatePathArrowFeatureColor = function(layerInstance, condition, color)
 	{
 		const arrowOnPath = this._isArrowOnPath();
 		const layerRenderer = layerInstance.layer.renderer.clone();
-		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === description)[0];
+		const valueInfo = layerRenderer.uniqueValueInfos.filter(item => item.description === condition)[0];
 		valueInfo.value = color;
 		valueInfo.symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, color);
 
@@ -488,7 +492,7 @@
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			edits = {},
-			condition = `DBID = ${DBID} and id = ${FieldTripId}`;
+			condition = self._extractArrowCondition(DBID, FieldTripId);
 			deleteArrows = await self._getPathArrowFeatures(condition);
 
 		if (deleteArrows.length >= 0)
@@ -504,7 +508,7 @@
 		const self = this,
 			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			edits = {},
-			condition = `DBID = ${DBID} and id = ${FieldTripId}`;
+			condition = self._extractArrowCondition(DBID, FieldTripId);
 			deleteArrows = await self._getSequenceLineArrowFeatures(condition);
 
 		if (deleteArrows.length >= 0)
@@ -783,7 +787,7 @@
 
 	//#region Map Visualization
 
-	FieldTripMap.prototype.drawStops = async function(fieldTrip)
+	FieldTripMap.prototype.drawStops = function(fieldTrip)
 	{
 		const self = this,
 		 	color = self._getColor(fieldTrip),
@@ -805,7 +809,7 @@
 			attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
 			const destination = self.fieldTripStopLayerInstance?.createStop(fieldTrip.FieldTripDestinationXCoord, fieldTrip.FieldTripDestinationYCoord, attributes);
 
-			await self.fieldTripStopLayerInstance?.addStops([destination, school]);
+			self.fieldTripStopLayerInstance?.addStops([destination, school]);
 		}
 		else
 		{
@@ -822,7 +826,7 @@
 				graphics.push(self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes));
 			}
 
-			await self.fieldTripStopLayerInstance?.addStops(graphics);
+			self.fieldTripStopLayerInstance?.addStops(graphics);
 		}
 	}
 
@@ -910,7 +914,7 @@
 		const pathAttributes = fieldTrip.routePathAttributes;
 		const graphic = this.fieldTripPathLayerInstance?.createPath(routePath, pathAttributes);
 		// hide by default for UX.
-		this.fieldTripPathLayerInstance?.setFeaturesVisible(graphic, false);
+		this.fieldTripPathLayerInstance?.setFeaturesVisible([graphic], false);
 		this.fieldTripPathLayerInstance?.addPath(graphic);
 	}
 
@@ -923,7 +927,7 @@
 
 		const graphic = this.fieldTripSequenceLineLayerInstance?.createPath(sequenceLine, attributes);
 		// hide by default for UX.
-		this.fieldTripSequenceLineLayerInstance?.setFeaturesVisible(graphic, false);
+		this.fieldTripSequenceLineLayerInstance?.setFeaturesVisible([graphic], false);
 		this.fieldTripSequenceLineLayerInstance?.addPath(graphic, afterAdd);
 	}
 
@@ -938,10 +942,8 @@
 		{
 			const fieldTrip = fieldTrips[i],
 				value = this._getColor(fieldTrip),
-				DBID = fieldTrip.DBID,
-				FieldTripId = fieldTrip.id,
-				description = `DBID = ${DBID}, id = ${FieldTripId}`;
-			const symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
+				description = this._extractArrowCondition(fieldTrip.DBID, fieldTrip.id),
+				symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
 			uniqueValueInfos.push({ value, symbol, description });
 		}
 
@@ -984,7 +986,7 @@
 			arrows = self._computeArrowFeatures(pathFeature);
 
 		const edits = {};
-		const condition = `DBID = ${fieldTrip.DBID} and id = ${fieldTrip.id}`;
+		const condition = self._extractArrowCondition(fieldTrip.DBID, fieldTrip.id);
 		const deleteArrows = await self._getPathArrowFeatures(condition);
 		if (deleteArrows.length > 0)
 		{
@@ -1011,7 +1013,7 @@
 			arrows = self._computeArrowFeatures(lineFeature);
 
 		const edits = {};
-		const condition = `DBID = ${fieldTrip.DBID} and id = ${fieldTrip.id}`;
+		const condition = self._extractArrowCondition(fieldTrip.DBID, fieldTrip.id);
 		const deleteArrows = await self._getSequenceLineArrowFeatures(condition);
 		if (deleteArrows.length > 0)
 		{
@@ -1123,6 +1125,11 @@
 	FieldTripMap.prototype._isArrowOnPath = function()
 	{
 		return this.pathLineType === PATH_LINE_TYPE.Sequence;
+	}
+
+	FieldTripMap.prototype._extractArrowCondition = function(DBID, fieldTripId)
+	{
+		return `DBID = ${DBID} and id = ${fieldTripId}`;
 	}
 
 	//#endregion

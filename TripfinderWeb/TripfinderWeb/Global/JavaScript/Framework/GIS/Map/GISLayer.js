@@ -212,54 +212,6 @@
 		return new TF.GIS.SDK.Graphic({ geometry, symbol, attributes });		
 	}
 
-	Layer.prototype.addGraphicsByOrder = async function(graphics)
-	{
-		return new Promise(async (resolve, reject) =>
-		{
-			if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
-			{
-				return reject("addGraphicsByOrder doesn't support FeatureLayer");
-			}
-
-			const p = [];
-			for (let i = 0; i < graphics.length; i++)
-			{
-				p.push(this._addAGraphic(graphics[i]));
-			}
-
-			return Promise.all(p).then(() =>
-			{
-				resolve();
-			});
-		});
-	}
-
-	Layer.prototype._addAGraphic = async function(graphic)
-	{
-		return new Promise((resolve, reject) =>
-		{
-			if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
-			{
-				return reject("addGraphicsByOrder doesn't support FeatureLayer");
-			}
-
-			let total = 1;
-			let handler = this.layer.graphics.on("after-add", (event) =>
-			{
-				total--;
-				if (total === 0) {
-					handler.remove();
-					handler = null;
-	
-					// console.log(`${event.item.geometry.longitude}, ${event.item.geometry.latitude} ${event.item.attributes.Sequence}`);
-					resolve();
-				}
-			});
-
-			this.layer.add(graphic);
-		});
-	}
-
 	Layer.prototype.queryFeatures = async function(geometry, condition = '1 = 1')
 	{
 		let results = [];
