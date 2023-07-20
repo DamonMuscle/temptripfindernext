@@ -975,28 +975,32 @@
 		});
 	};
 
-	RoutingDataModel.prototype.recalculate = function(trips)
+	RoutingDataModel.prototype.recalculate = function(fieldTrips)
 	{
 		var cannotCalculate = false;
-		trips.map(function(trip)
+		var data = $.extend(true, [], fieldTrips);
+		data.forEach(function(fieldTrip)
 		{
-			trip.FieldTripStops.map(function(tripStop)
+			delete fieldTrip.directions;
+			delete fieldTrip.routePath;
+			delete fieldTrip.routePathAttributes;
+			fieldTrip.FieldTripStops.forEach(function(fieldTripStop)
 			{
-				if (!tripStop)
+				delete fieldTripStop._geoPath;
+				if (!fieldTripStop)
 				{
 					cannotCalculate = true;
-					return;
 				}
 			});
 		});
 		if (cannotCalculate || this.recalculateAble === false)
 		{
-			return Promise.resolve(trips);
+			return Promise.resolve(fieldTrips);
 		}
 
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "RoutingFieldTrips", "routing", "recalculate"),
 			{
-				data: trips
+				data: data
 			}, { overlay: false }).then(function(response)
 			{
 				return response.Items;
