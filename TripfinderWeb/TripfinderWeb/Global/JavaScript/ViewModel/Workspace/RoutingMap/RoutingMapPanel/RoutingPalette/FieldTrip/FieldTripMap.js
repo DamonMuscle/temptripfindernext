@@ -1278,11 +1278,7 @@
 
 	FieldTripMap.prototype.calculateRouteErrorHandler = async function(ex, fieldTripStops)
 	{
-		if(!ex?.unlocatedStopNames?.length && ex?.details?.httpStatus === 400 && ex?.details?.messages && ex?.details?.messages[0])
-		{
-			tf.promiseBootbox.alert(`Cannot solve path. ${ex?.details?.messages[0]}`);
-		}
-		else if(ex?.unlocatedStopNames?.length)
+		if(ex?.unlocatedStopNames?.length)
 		{
 			const indexList = ex?.unlocatedStopNames?.reduce(function(result, stopName){
 				const index = fieldTripStops.findIndex(x=>x.Street == stopName);
@@ -1311,6 +1307,10 @@
 			}
 
 			return await Promise.all(chunks.filter(c=>c,length>1).map(c=>this.calculateRouteByStops(c)));
+		}
+		else
+		{
+			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
 		}
 	}
 
