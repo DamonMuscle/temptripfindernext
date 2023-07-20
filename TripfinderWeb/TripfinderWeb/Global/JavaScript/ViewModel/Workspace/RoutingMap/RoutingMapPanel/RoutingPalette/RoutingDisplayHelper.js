@@ -365,6 +365,11 @@
 		return TF.isLightness(color) ? '#333333' : '#ffffff'
 	};
 
+	RoutingDisplayHelper.durationToString = function(text)
+	{
+		return text.startsWith("0") ? text.substring(1, text.length) : text;
+	}
+
 	RoutingDisplayHelper.prototype.resetUnexpandedTreeNodeValue = function(node, data)
 	{
 		const self = this;
@@ -402,6 +407,10 @@
 			else if (property.toLowerCase() == 'stopTime'.toLowerCase())
 			{
 				node.customData[property] = data.StopTimeArrive || data.StopTimeDepart;
+			}
+			else if (property.toLowerCase() == 'duration')
+			{
+				node.customData[property] = TF.RoutingMap.RoutingPalette.RoutingDisplayHelper.durationToString(data.Duration);
 			}
 			else if (property.toLowerCase() == 'isvalid')
 			{

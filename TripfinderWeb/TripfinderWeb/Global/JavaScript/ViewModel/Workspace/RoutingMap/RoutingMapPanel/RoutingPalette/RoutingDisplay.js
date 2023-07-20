@@ -1936,7 +1936,7 @@
 			}
 			if (tripStopData && tripStopData.Duration)
 			{
-				nodeData.set('customData.duration', durationToString(tripStopData.Duration));
+				nodeData.set('customData.duration', TF.RoutingMap.RoutingPalette.RoutingDisplayHelper.durationToString(tripStopData.Duration));
 			}
 			if (tripStopData && tripStopData.Speed)
 			{
@@ -2069,11 +2069,6 @@
 		}
 	}
 
-	function durationToString(text)
-	{
-		return text.startsWith("0") ? text.substring(1, text.length) : text;
-	}
-
 	RoutingDisplay.prototype.speedToString = function(speed)
 	{
 		const self = this;
@@ -2111,7 +2106,7 @@
 				puTransToSchool: tripStop.PUTransToSchool,
 				doTransToSchool: tripStop.DOTransToSchool,
 				isLast: isLast,
-				duration: durationToString(tripStop.Duration),
+				duration: TF.RoutingMap.RoutingPalette.RoutingDisplayHelper.durationToString(tripStop.Duration),
 				avgSpeed: self.speedToString(tripStop.Speed),
 				stopTime: tripStop.StopTimeArrive || tripStop.StopTimeDepart,
 				sequence: tripStop.Sequence,
