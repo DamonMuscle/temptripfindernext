@@ -963,7 +963,7 @@
 							<div class="text-hover-overflow-hidden">
 								<div class="text-name k-tripstop-state-hover">#: item.text# </div>
 								<div class="tree-buttons k-tripstop-state-hover">
-									<div class="icon lock-time k-tripstop-state-hover ${hideClassName} #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
+									<div class="icon lock-time k-tripstop-state-hover #: item.customData.openType == "View" ? "view-disabled-button" : ""#" title="Set Lock Time"></div>
 									<div class="icon delete stop-delete k-tripstop-state-hover #: item.customData.openType == "View"||!item.customData.deletable ? "view-disabled-button" : ""#" title="Delete"></div>
 									<div class="icon copy copyStop ${hideClassName} #: item.customData.openType == "View" ? "view-disabled-button" : ""#"  title="Duplicate Stop"></div>
 									<div class="icon info stop-info k-tripstop-state-hover" title="Field Trip Stop Details"></div>

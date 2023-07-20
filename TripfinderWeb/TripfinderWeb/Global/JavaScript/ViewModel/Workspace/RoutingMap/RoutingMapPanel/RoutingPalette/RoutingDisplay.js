@@ -1378,9 +1378,6 @@
 
 	function setLockTimeClick(e)
 	{
-		console.log("Tripfinder Next TODO: setLockTimeClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();

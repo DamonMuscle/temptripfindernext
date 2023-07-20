@@ -1537,23 +1537,17 @@
 		});
 	};
 
-	RoutingDataModel.prototype.setLockTime = function(tripStopId, tripId)
+	RoutingDataModel.prototype.setLockTime = function(fieldTripStopId, fieldTripId)
 	{
 		var self = this;
 		for (var i = 0; i < self.trips.length; i++)
 		{
-			if (self.trips[i].id == tripId)
+			if (self.trips[i].id == fieldTripId)
 			{
 				for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
 				{
-					if (self.trips[i].FieldTripStops[j].id == tripStopId)
-					{
-						self.trips[i].FieldTripStops[j].LockStopTime = true;
-					}
-					else
-					{
-						self.trips[i].FieldTripStops[j].LockStopTime = false;
-					}
+					const mateched = self.trips[i].FieldTripStops[j].id == fieldTripStopId;
+					self.trips[i].FieldTripStops[j].LockStopTime = !!mateched;
 				}
 				break;
 			}
