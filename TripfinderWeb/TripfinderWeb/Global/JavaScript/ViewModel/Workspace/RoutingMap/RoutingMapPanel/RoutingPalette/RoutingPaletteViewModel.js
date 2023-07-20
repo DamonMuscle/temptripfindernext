@@ -226,7 +226,8 @@
 			return;
 		}
 
-		this.fieldTripMap?.refreshFieldTripPath(fieldTrip, { moveStop: fieldTripStop });
+		const effectSequences = this.fieldTripMap?._computeEffectSequences(fieldTrip, {moveStop: fieldTripStop});
+		this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences);
 	};
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocation = function(_, data)
