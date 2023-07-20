@@ -546,11 +546,12 @@
 		const self = this,
 			fieldTrip = self.mapEditingFeatures.movingStop.fieldTrip,
 			movingStop = self.mapEditingFeatures.movingStop.stop,
-			{ longitude, latitude, geocodeStreet } = data;
+			{ longitude, latitude, Address, City } = data;
 
-		if (geocodeStreet !== "")
+		if (Address !== "")
 		{
-			movingStop.Street = geocodeStreet;
+			movingStop.Street = Address;
+			movingStop.City = City;
 		}
 		movingStop.XCoord = +longitude.toFixed(6);
 		movingStop.YCoord = +latitude.toFixed(6);

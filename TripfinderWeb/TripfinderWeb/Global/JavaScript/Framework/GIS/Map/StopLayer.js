@@ -92,10 +92,10 @@
 		});
 
 		let { longitude, latitude } = updateGraphic.geometry;
-		const geocodeStreet = await this._getGeocodeStopAddress(longitude, latitude);
-		if (geocodeStreet !== "")
+		const geocodeStop = await this._getGeocodeStop(longitude, latitude);
+		if (geocodeStop?.Address !== "")
 		{
-			updateGraphic.attributes.Name = geocodeStreet;
+			updateGraphic.attributes.Name = geocodeStop.Address;
 		}
 
 		// remove previous stop graphic.
@@ -104,7 +104,7 @@
 		// STOP moving
 		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
 
-		const data = { longitude, latitude, geocodeStreet };
+		const data = Object.assign({}, {longitude, latitude}, geocodeStop);
 		PubSub.publish("GISLayer.StopLayer.MoveStopCompleted", data);
 	}
 
@@ -133,7 +133,7 @@
 		return this.symbolHelper.tripStop(sequence, color);
 	}
 
-	StopLayer.prototype._getGeocodeStopAddress = async function(longitude, latitude)
+	StopLayer.prototype._getGeocodeStop = async function(longitude, latitude)
 	{
 		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
 		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
@@ -144,7 +144,10 @@
 			return null;
 		}
 
-		return geocodeResult?.attributes.Address;
+		const { Address, City, RegionAbbr, CountryCode } = geocodeResult?.attributes;
+		const data = { Address, City, RegionAbbr, CountryCode };
+
+		return data;
 	}
 
 	//#region Settings for sketchTool
