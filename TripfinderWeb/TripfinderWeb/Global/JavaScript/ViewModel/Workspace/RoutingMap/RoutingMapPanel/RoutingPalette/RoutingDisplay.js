@@ -2644,25 +2644,18 @@
 		{
 			return;
 		}
+
+		tf.loadingIndicator.showImmediately();
 		if (self.isInitial)
 		{
 			self.initialTreeView();
 		}
 		// self.recalculateAllSchoolStudentCount(data.add.concat(data.edit));
-		var result = self.getDataSource(data);
-		if (result != null)
-		{
-			result.then(function()
-			{
-				self.afterDataSourceBinding(data);
-				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, data);
-			});
-		}
-		else
+		Promise.resolve(self.getDataSource(data)).then(function()
 		{
 			self.afterDataSourceBinding(data);
-			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, data);
-		}
+			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, {...data, onCompleted: ()=> tf.loadingIndicator.tryHide() });
+		});
 	}
 
 	RoutingDisplay.prototype.bindStudentNodeEvent = function(element)

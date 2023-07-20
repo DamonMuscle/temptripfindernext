@@ -417,8 +417,6 @@
 			return Promise.all([p1, p2]);
 		}).then(function(tripsData)
 		{
-			tf.loadingIndicator.tryHide();
-
 			const fetchedTripsData = tripsData[0].FieldTrips;
 
 			// remove not exist new trip
@@ -446,7 +444,6 @@
 			self.setActualStopTime(self.trips);
 			self.setStudentTravelTime(self.trips);
 			*/
-			return Promise.resolve();
 		}).then(function()
 		{
 			// return self._getSchoolLocations(newTrips);
@@ -461,8 +458,7 @@
 		{
 			console.log(args);
 			self.tripLockData.unLock(data.map(x => x.Id));
-			tf.loadingIndicator.tryHide();
-		});
+		}).finally(()=>tf.loadingIndicator.tryHide());
 	};
 
 	RoutingDataModel.prototype._setOpenType = function(trips, openType)

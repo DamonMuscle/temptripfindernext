@@ -135,7 +135,14 @@
 		{
 			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
 		}
+		const onCompleted = data.onCompleted;
+		delete data.onCompleted;
 		await this.displayFieldTripPath(data);
+
+		if (typeof onCompleted === "function")
+		{
+			onCompleted();
+		}
 	}
 
 	RoutingPaletteViewModel.prototype.displayFieldTripPath = async function(data)
