@@ -316,8 +316,8 @@
 		data.fieldTrip.directions.forEach(directions => {
 			const updateStops = this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);
 
-			const startStop = updateStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
-			const endStop = updateStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
+			const startStop = updateStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val, { Sequence: -1});
+			const endStop = updateStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val, { Sequence: -1});
 
 			trip.FieldTripStops.forEach((stop) => {
 				const updateStop = updateStops.find(updatedStop => updatedStop.Sequence == stop.Sequence);
