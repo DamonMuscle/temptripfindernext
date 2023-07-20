@@ -145,7 +145,7 @@
 			const addFieldTrips = data.add;
 			this.fieldTripMap.initArrowLayers(addFieldTrips);
 
-			for (let i = 0; i < addFieldTrips.length; i++)
+			for (let i = addFieldTrips.length - 1; i >= 0; i--)
 			{
 				const fieldTrip = addFieldTrips[i];
 				await this.fieldTripMap.addFieldTrip(fieldTrip);
