@@ -4283,7 +4283,7 @@
 	RoutingDataModel.prototype._getFeatureFieldTripStops = function(fieldTripStops, features)
 	{
 		var featureStops = fieldTripStops.map((stop) => {
-			var feature = features.find(feature => feature.strings.some((str => str.stringType == "esriDSTStreetName" && str.string == stop.Street)) && 
+			var feature = features.find(feature => feature.strings.some((str => str.stringType == "esriDSTStreetName" && str.string == stop.Sequence)) && 
 													feature.attributes.maneuverType == "esriDMTStop");
 			if (feature)
 			{
