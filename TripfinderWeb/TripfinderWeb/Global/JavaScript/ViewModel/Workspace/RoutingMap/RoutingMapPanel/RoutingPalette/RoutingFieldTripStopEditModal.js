@@ -185,11 +185,9 @@
 		this.removeStopSequenceGraphics();
 		if (this.data.length == 1 && !this.obIsMultipleCreate())
 		{
-			if (!this.obSelectedSequenceDisable())
-			{
-				stopSequence = this.obSelectedSequence();
-				this.highlightStopSequencePathAndPoint(stopSequence);
-			}
+			stopSequence = this.obSelectedSequence();
+			this.highlightStopSequencePathAndPoint(stopSequence);
+
 			var symbol = new TF.Map.Symbol();
 			var stopGraphic = this.data[0].graphic;
 			var layer = this.viewModel.drawTool._pointLayer;

@@ -190,7 +190,8 @@
 					}
 
 					var labelColor = TF.isLightness(fieldTripStop.color) ? "#000000" : "#ffffff";
-					var fieldTripStopDisable = !hasAuthForRoutingMap || trip.OpenType === 'View' || fieldTripStop.PrimaryDestination || fieldTripStop.PrimaryDeparture;
+					var disableDelete = !hasAuthForRoutingMap || trip.OpenType === 'View' || fieldTripStop.PrimaryDestination || fieldTripStop.PrimaryDeparture;
+					var disableMove = !hasAuthForRoutingMap || trip.OpenType === 'View';
 
 					tempParentMenuItem = new TF.RoutingMap.MenuItem({
 						header: "<span class='trip-stop-color-icon' style='border-color:rgb(0,0,0);color:" + labelColor + ";background-color:" + fieldTripStop.color + "'>" + fieldTripStop.Sequence + "</span>" + fieldTripStop.Street,
@@ -224,7 +225,7 @@
 						header: 'Move Stop Location',
 						icon: 'movePoint',
 						data: menuItemData,
-						disable: false,
+						disable: disableMove,
 						id: 'tripSessionMovePoint',
 						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStop.id, trip.id)
 					}));
@@ -236,7 +237,7 @@
 						header: 'Delete',
 						icon: 'delete',
 						data: menuItemData,
-						disable: fieldTripStopDisable,
+						disable: disableDelete,
 						click: routingPaletteViewModel.tripViewModel.eventsManager.deleteOneClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, fieldTripStop.id, trip.id)
 					}));
 					contextMenuCategories.tripSessions.push(tempParentMenuItem);
