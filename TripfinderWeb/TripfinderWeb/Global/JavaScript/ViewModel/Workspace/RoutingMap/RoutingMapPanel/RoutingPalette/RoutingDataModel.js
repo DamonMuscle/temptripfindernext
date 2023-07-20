@@ -4325,14 +4325,10 @@
 				const stop = fieldTripStops.find(stop => stop.Sequence == featureStops[i].Sequence);
 				const currDuration = featureStops[i] ? featureStops[i].attributes.totalDuration : totalDuration;
 				const currDistance = featureStops[i] ? featureStops[i].attributes.totalDistance : totalDistance;
-				const pauseDuration = moment.duration(moment(stop.StopTimeDepart).diff(moment(stop.StopTimeArrive))).asMinutes();
 
 				if(i == 0)
 				{
 					const currDurationMoment = moment.duration(currDuration,'minute');
-
-					stop.Travel = this.momentHelper.minsToHHMMSS(currDurationMoment.asMinutes());
-					stop.Duration = this.momentHelper.minsToHHMMSS(currDurationMoment.asMinutes() + pauseDuration);
 					stop.Distance = currDistance;
 					stop.Speed = currDistance / currDurationMoment.asHours();
 				}
@@ -4341,9 +4337,6 @@
 					const subDuration = currDuration - featureStops[i - 1].attributes.totalDuration;
 					const subDistance = currDistance - featureStops[i - 1].attributes.totalDistance;
 					const subDurationMoment = moment.duration(subDuration, 'minute');
-
-					stop.Travel = this.momentHelper.minsToHHMMSS(subDurationMoment.asMinutes());
-					stop.Duration = this.momentHelper.minsToHHMMSS(subDurationMoment.asMinutes() + pauseDuration);
 					stop.Distance = subDistance;
 					stop.Speed = subDurationMoment.asHours() > 0 ? subDistance / subDurationMoment.asHours() : 0;
 				}
