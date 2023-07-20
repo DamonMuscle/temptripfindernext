@@ -224,7 +224,7 @@
 						header: 'Move Stop Location',
 						icon: 'movePoint',
 						data: menuItemData,
-						disable: fieldTripStopDisable,
+						disable: false,
 						id: 'tripSessionMovePoint',
 						click: routingPaletteViewModel.tripViewModel.eventsManager.editTripStopClick.bind(routingPaletteViewModel.tripViewModel.eventsManager, 'movePoint', fieldTripStop.id, trip.id)
 					}));
