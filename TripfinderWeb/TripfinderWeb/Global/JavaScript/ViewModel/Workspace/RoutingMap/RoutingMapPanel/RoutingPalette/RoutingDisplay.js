@@ -1544,36 +1544,6 @@
 		self.dataModel.changeDataStack.push(tripStop);
 	}
 
-	RoutingDisplay.prototype.updatePUDOStatus = function(tripStopNode, studentNode, student)
-	{
-		var self = this;
-		if (tripStopNode && self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode))
-		{
-			self.updateStudentNode(studentNode);
-		}
-		else
-		{
-			self.dataModel.setStudentDayValue(dayIndex, destinationDayValue, student);
-			self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, student);
-			studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopNode.customData.prohibitCrosser;
-		}
-	}
-
-	RoutingDisplay.prototype.updateStudentDay = function(tripStopNode, studentNode, student, dayIndex, destinationDayValue)
-	{
-		var self = this;
-		if (tripStopNode && self.routingDisplayHelper.checkNodeWasExpanded(tripStopNode))
-		{
-			self.updateStudentNode(studentNode);
-		}
-		else
-		{
-			self.dataModel.setStudentDayValue(dayIndex, destinationDayValue, student);
-			self.routingDisplayHelper.resetUnexpandedTreeNodeValue(studentNode, student);
-			studentNode.customData.prohibitCross = studentNode.customData.prohibitCross || tripStopNode.customData.prohibitCrosser;
-		}
-	}
-
 	RoutingDisplay.prototype.onTripStopsChange = function(e, data)
 	{
 		var self = this;
@@ -1799,16 +1769,6 @@
 				tripNode.items.splice(indexes[0], 1);
 			}
 		}
-	}
-
-	RoutingDisplay.prototype.refreshAllTripsSchoolStop = function()
-	{
-		var self = this;
-		var trips = self.dataModel.getEditTrips();
-		trips.map(function(tripTemp)
-		{
-			self.refreshAllStopNode(tripTemp, true);
-		});
 	}
 
 	RoutingDisplay.prototype.refreshAllStopNode = function(trip, onlyAffectSchool)

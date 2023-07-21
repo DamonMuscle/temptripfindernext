@@ -173,21 +173,6 @@
 		}
 	};
 
-	RoutingTripMapTool.prototype.drawSchoolLocation = function(schoolLocations)
-	{
-		var self = this;
-		self._schoolLocationLayer.removeAll();
-		var symbol = self.symbol.schoolLocation();
-		schoolLocations.forEach(function(schoolLocation)
-		{
-			var graphic = new self._arcgis.Graphic({
-				geometry: schoolLocation.geometry,
-				symbol: symbol
-			});
-			self._schoolLocationLayer.add(graphic);
-		});
-	};
-
 	RoutingTripMapTool.prototype.addPolygonToLayer = function(graphic)
 	{
 		var self = this;
