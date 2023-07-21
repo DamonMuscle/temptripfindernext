@@ -133,7 +133,7 @@
 	{
 		if (!this.fieldTripMap)
 		{
-			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance);
+			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance, this.drawTool);
 		}
 		const onCompleted = data.onCompleted;
 		delete data.onCompleted;
@@ -307,20 +307,6 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
 	{
 		const trip = this.dataModel.getTripById(data.fieldTrip.Id);
-
-		data.fieldTrip.directions?.forEach(directions => {
-			this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);
-		});
-
-		trip.FieldTripStops.forEach((stop) => {
-			if (stop._geoPath == null)
-			{
-				stop.Travel = "00:00:00";
-				stop.Distance = 0;
-				stop.Speed = 0;
-			}
-		});
-
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
 		this.tripViewModel.display.resetTripInfo([trip]);

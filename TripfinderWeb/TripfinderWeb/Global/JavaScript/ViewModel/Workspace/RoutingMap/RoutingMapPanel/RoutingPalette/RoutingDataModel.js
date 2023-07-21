@@ -3688,59 +3688,6 @@
 		return featureStops.filter(featureStop => !!featureStop);
 	}
 
-	RoutingDataModel.prototype.recalculateStopTime = function(directions, fieldTripStops)
-	{
-		var stopTimeFormat = "YYYY-MM-DDTHH:mm:ss";
-		var totalDuration = 0;
-		var totalDistance = 0;
-
-		var features = directions.features.map((item, index) => {
-
-			totalDuration += item.attributes.time;
-			totalDistance += item.attributes.length;
-
-			item.attributes.totalDuration = totalDuration;
-			item.attributes.totalDistance = totalDistance;
-
-			return { 
-				attributes: item.attributes, 
-				strings: directions.strings[index] 
-			}
-		});
-
-		var featureStops = this._getFeatureFieldTripStops(fieldTripStops, features);
-		var updatedStops = [];
-
-		if(featureStops.length >= 1)
-		{
-			for (var i = 0; i < featureStops.length; ++i)
-			{
-				const stop = fieldTripStops.find(stop => stop.Sequence == featureStops[i].Sequence);
-				const currDuration = featureStops[i] ? featureStops[i].attributes.totalDuration : totalDuration;
-				const currDistance = featureStops[i] ? featureStops[i].attributes.totalDistance : totalDistance;
-
-				if(i == 0)
-				{
-					const currDurationMoment = moment.duration(currDuration,'minute');
-					stop.Distance = currDistance;
-					stop.Speed = currDistance / currDurationMoment.asHours();
-				}
-				else
-				{
-					const subDuration = currDuration - featureStops[i - 1].attributes.totalDuration;
-					const subDistance = currDistance - featureStops[i - 1].attributes.totalDistance;
-					const subDurationMoment = moment.duration(subDuration, 'minute');
-					stop.Distance = subDistance;
-					stop.Speed = subDurationMoment.asHours() > 0 ? subDistance / subDurationMoment.asHours() : 0;
-				}
-
-				updatedStops.push(stop);
-			}
-		}
-
-		return updatedStops;
-	}
-
 	RoutingDataModel.prototype.dispose = function()
 	{
 		this.tripLockData.unLockCurrentDocument();

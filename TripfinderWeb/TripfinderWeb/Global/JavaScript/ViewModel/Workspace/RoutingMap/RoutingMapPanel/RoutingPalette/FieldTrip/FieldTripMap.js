@@ -26,7 +26,7 @@
 
 	//#endregion
 
-	function FieldTripMap(mapInstance)
+	function FieldTripMap(mapInstance, drawTool)
 	{
 		if (!mapInstance)
 		{
@@ -34,6 +34,7 @@
 			return;
 		}
 
+		this.stopTool = drawTool.stopTool;
 		this.mapInstance = mapInstance;
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
@@ -1097,51 +1098,8 @@
 	{
 		if (!fieldTrip.routePath)
 		{
-			let routeResults = [];
-			let effectedStops = [];
-
-			effectedStops = this._getEffectStops(fieldTrip, effectSequences);
-
-			routeResults = await this.calculateRouteByStops(effectedStops, true);
-
-			if (!Array.isArray(routeResults)) 
-			{
-				routeResults = [routeResults];
-			}
-			
-			if(!routeResults)
-			{
-				console.error("routeResults is empty, the FieldTripStops is ->", effectedStops);
-				return;
-			}
-
-			routeResults = routeResults.filter(routeResult => !!routeResult);
-
-			if (routeResults.length > 0)
-			{
-				routeResults.forEach(routeResult => {
-					fieldTrip.routePath = [...(fieldTrip.routePath||[]), ...this._computeRoutePath(routeResult)];
-					fieldTrip.routePathAttributes = this._computePathAttributes(fieldTrip, routeResult);
-	
-					if (!fieldTrip.directions) 
-					{
-						fieldTrip.directions = [this._computeDirections(routeResult)];
-					}
-					else
-					{
-						const directions = this._computeDirections(routeResult);
-						fieldTrip.directions.push(directions);
-					}
-
-					this._computeRoutePathForStop(effectedStops, routeResult);
-					this._computeDirectionsForStop(effectedStops, routeResult);
-				});
-			}
-			else
-			{
-				// if there is unsolved path, clear the changed stop's original path data
-				this._clearRoutePathForStop(effectedStops); 
-			}
+			let effectedStops = this._getEffectStops(fieldTrip, effectSequences);
+			await this.calculateRouteByStops(fieldTrip, effectedStops);
 
 			const data = { fieldTrip };
 
@@ -1149,8 +1107,8 @@
 		}
 
 		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath)
-												.map(stop => stop._geoPath);
-
+												.map(stop => stop._geoPath.paths);
+		routePath = _.flatMap(routePath);
 		return routePath;
 	}
 	
@@ -1182,20 +1140,6 @@
 		});
 	}
 
-	FieldTripMap.prototype._computeRoutePathForStop = function(changedStops, routeResult)
-	{
-		const route = routeResult?.route,
-		 	paths = route?.geometry?.paths,
-			stops = routeResult?.stops;
-
-		paths.forEach((path, index) => {
-			const sequence = stops[index].attributes.OriginalSequence;
-			const matchedStop = changedStops.find(stop => stop.Sequence == sequence);
-
-			matchedStop._geoPath = path;
-		});
-	}
-
 	FieldTripMap.prototype._clearRoutePathForStop = function(changedStops)
 	{
 		for(var i = 0; i < changedStops.length - 1; i++)
@@ -1203,15 +1147,6 @@
 			changedStops[i]._geoPath = null;
 		}
 	}
-
-	FieldTripMap.prototype._computeDirectionsForStop = function(changedStops, routeResult)
-	{
-		const { features, routeName, strings, totalDriveTime, totalLength, totalTime } = routeResult.directions;
-		const routeDirections = { features, routeName, strings, totalDriveTime, totalLength, totalTime };
-		const stops = routeResult?.stops;
-
-		// TODO: extract directions for changed stops
-	}	
 
 	FieldTripMap.prototype._computePathAttributes = function(fieldTrip, routeResult)
 	{
@@ -1257,19 +1192,46 @@
 
 	//#region Routing
 
-	FieldTripMap.prototype.calculateRoute = async function(fieldTrip)
+	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTrip, fieldTripStops)
 	{
+		const MIN_ROUTING_STOPS = 2;
+		if (fieldTripStops.length < MIN_ROUTING_STOPS)
+		{
+			return null;
+		}
+
+		const self = this, networkService = TF.GIS.Analysis.getInstance().networkService;
+		const stops = self.createStopObjects(fieldTripStops);
+		const stopFeatureSet = await networkService.createStopFeatureSet(stops);
+		const params = self.createRouteParams(stopFeatureSet);
+
+		let response = null;
 		try
 		{
-			return [await this.calculateRouteByStops(fieldTrip.FieldTripStops)];
+			response = await networkService.solveRoute(params);
 		}
-		catch (ex)
+		catch(err)
 		{
-			return this.calculateRouteErrorHandler(ex, fieldTrip.FieldTripStops);
+			if (err.details.messages && err.details.messages.length > 0)
+			{
+				if (err.details.messages[0].indexOf("No solution found.") > 0 || err.details.messages[0].indexOf("Invalid locations detected") > 0)
+				{
+					tf.promiseBootbox.alert(self._getAlertMessage(err));
+					return self.refreshTripByStopsSeperately(fieldTrip, fieldTripStops, networkService);
+				}
+			}
+			return Promise.resolve({ stops: false, err: self._getAlertMessage(err) });
 		}
+
+		const result = response?.results?.routeResults[0];
+		var pathSegments = this._createPathSegments(response?.results);
+		fieldTripStops = this._createTripStops(fieldTrip, fieldTripStops, pathSegments);
+		this._swapAttributeForStop(fieldTripStops, result);
+
+		return fieldTripStops;
 	}
 
-	FieldTripMap.prototype._computeRouteStop = function(fieldTripStops)
+	FieldTripMap.prototype.createStopObjects = function(fieldTripStops)
 	{
 		const stops = [];
 
@@ -1289,98 +1251,303 @@
 		return stops;
 	}
 
-	FieldTripMap.prototype._isValidRouteStops = function(routeStops)
+	FieldTripMap.prototype.createRouteParams = function(stopFeatureSet)
 	{
-		const MIN_ROUTING_STOPS = 2;
-		return MIN_ROUTING_STOPS <= routeStops.length;
+		return {
+			impedanceAttribute: null,
+			preserveFirstStop: true,
+			preserveLastStop: true,
+			stops: stopFeatureSet
+		};
+	};
+
+	FieldTripMap.prototype._isLastStop = function(trip, stop, allStops)
+	{
+		if (!trip)
+		{
+			return stop.Sequence === allStops.length;
+		}
+		return trip.FieldTripStops.length === stop.Sequence;
+	};
+
+	//if refresh path fail, will solve path one by one for each stop
+	FieldTripMap.prototype.refreshTripByStopsSeperately = function(trip, tripStops, networkService)
+	{
+		var self = this,
+			index = 0,
+			resolve = null,
+			errMessage = null,
+			promise = new Promise(function(solve) { resolve = solve; });
+
+		function solveRequest()
+		{
+			if (index < tripStops.length - 1)
+			{
+				var stops = self.createStopObjects([tripStops[index], tripStops[index + 1]]);
+				var createStopsPromise = networkService.createStopFeatureSet(stops);
+				let beforeStop = tripStops[index - 1] ? tripStops[index - 1] : self._getBeforeStop(trip, tripStops[index]);
+				var vertexPromise = self._getVertexesCloseToStopOnPathSeperately(beforeStop, tripStops[index], networkService);
+				return Promise.all([createStopsPromise, vertexPromise]).then(function(res)
+				{
+					var stopFeatureSet = res[0];
+					var vertexFeatureSet = res[1];
+					var vertex = null;
+					if (vertexFeatureSet  && vertexFeatureSet.features && vertexFeatureSet.features[0])
+					{
+						vertex = vertexFeatureSet.features[0];
+						stopFeatureSet.features.unshift(vertex);
+					}
+					const params = self.createRouteParams(stopFeatureSet);
+					return networkService.solveRoute(params).then(function(res)
+					{
+						var result = res.results;
+						if (!result.routeResults)
+						{
+							tripStops[index]._geoPath = null;
+						} else
+						{
+							var pathSegments = self._createPathSegments(result);
+							pathSegments = self._updatePathSegments(pathSegments, [vertex, null]);
+							tripStops[index] = self._createTripStops(trip, [tripStops[index]], pathSegments)[0];
+						}
+						index++;
+						solveRequest();
+						return promise;
+					}, function(err)
+					{
+						errMessage = err;
+						tripStops[index]._geoPath = null;
+						tripStops[index].Distance = 0;
+						tripStops[index].DrivingDirections = "";
+						tripStops[index].Speed = 0;
+						index++;
+						solveRequest();
+						return promise;
+					});
+				});
+			}
+			else
+			{
+				return resolve(tripStops);
+			}
+		}
+		return solveRequest().then(function(tripStops)
+		{
+			return tripStops;
+		});
 	}
 
-	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTripStops, needErrorHandler = false)
+	FieldTripMap.prototype._updatePathSegments = function(pathSegments, vertexes)
 	{
-		const networkService = TF.GIS.Analysis.getInstance().networkService,
-			routeStops = this._computeRouteStop(fieldTripStops);
-
-		if (!this._isValidRouteStops(routeStops))
+		if (vertexes && vertexes[0] && vertexes[0].geometry)
 		{
+			var firstSegmentGeom = tf.map.ArcGIS.geometryEngine.simplify(pathSegments[0].geometry);
+			if (firstSegmentGeom && firstSegmentGeom.paths[0].length > 2 && pathSegments[0] && pathSegments[1])
+			{
+				firstSegmentGeom.removePoint(0, 0);
+				var allPoints = [];
+				firstSegmentGeom.paths.forEach(function(path)
+				{
+					allPoints = allPoints.concat(path);
+				});
+				pathSegments[1].geometry.paths[0] = allPoints.concat(pathSegments[1].geometry.paths[0]);
+				pathSegments[1].length = parseFloat(pathSegments[0].length) + parseFloat(pathSegments[1].length);
+				pathSegments[1].time = parseFloat(pathSegments[0].time) + parseFloat(pathSegments[1].time);
+			}
+			pathSegments = pathSegments.slice(1, pathSegments.length);
+		}
+		if (vertexes && vertexes[1] && vertexes[1].geometry)
+		{
+			var lastSegmentGeom = tf.map.ArcGIS.geometryEngine.simplify(pathSegments[pathSegments.length - 1].geometry);
+			if (lastSegmentGeom && lastSegmentGeom.paths[0].length > 2 && pathSegments[pathSegments.length - 2] && pathSegments[pathSegments.length - 1])
+			{
+				lastSegmentGeom.removePoint(0, lastSegmentGeom.paths[0].length - 1);
+				lastSegmentGeom.paths.forEach(function(path)
+				{
+					pathSegments[pathSegments.length - 2].geometry.paths[0] = pathSegments[pathSegments.length - 2].geometry.paths[0].concat(path);
+				});
+				pathSegments[pathSegments.length - 2].length = parseFloat(pathSegments[pathSegments.length - 2].length) + parseFloat(pathSegments[pathSegments.length - 1].length);
+				pathSegments[pathSegments.length - 2].time = parseFloat(pathSegments[pathSegments.length - 2].time) + parseFloat(pathSegments[pathSegments.length - 1].time);
+			}
+			pathSegments = pathSegments.slice(0, pathSegments.length - 1);
+		}
+		return pathSegments;
+	}
+
+	FieldTripMap.prototype._getBeforeStop = function(trip, tripStop)
+	{
+		var beforeStops = trip.FieldTripStops.filter(s => s.Sequence < tripStop.Sequence);
+		return beforeStops[beforeStops.length - 1];
+	}
+
+	FieldTripMap.prototype._getVertexesCloseToStopOnPathSeperately = function(beforeStop, afterStop, networkService)
+	{
+		var self = this, vertex = null;
+		vertex = getPrevVertex();
+		return Promise.resolve(vertex);
+
+		function getPrevVertex()
+		{
+			if (beforeStop)
+			{
+				var prevPath = beforeStop._geoPath;
+				if (!prevPath)
+				{
+					return null;
+				}
+				return self._findVertexToStopOnPath(prevPath, afterStop, networkService);
+			}
 			return null;
 		}
+	}
 
-		const stopFeatureSet = await networkService.createStopFeatureSet(routeStops);
-		const params = {
-			impedanceAttribute: null,
-			stops: stopFeatureSet,
+	FieldTripMap.prototype._findVertexToStopOnPath = function(path, stop, networkService)
+	{
+		var self = this;
+		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
+		path = tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(TF.cloneGeometry(path));
+		var point = TF.xyToGeometry(stop.XCoord, stop.YCoord);
+		var startPoint = path.paths[0][0];
+		var distance1 = Math.sqrt((startPoint[0] - point.x) * (startPoint[0] - point.x) + (startPoint[1] - point.y) * (startPoint[1] - point.y));
+		var endIndex = path.paths[0].length - 1;
+		var endPoint = path.paths[0][endIndex];
+		var distance2 = Math.sqrt((endPoint[0] - point.x) * (endPoint[0] - point.x) + (endPoint[1] - point.y) * (endPoint[1] - point.y));
+		var vertexGeom = self.stopTool._getPointOnPolylineByDistanceToPoint(path, 3, distance1 < distance2);
+		var location = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(vertexGeom);
+
+		const stopObject = {
+			curbApproach: stop.vehicleCurbApproach,
+			name: stop.Sequence,
+			sequence: stop.Sequence,
+			longitude: location.x,
+			latitude: location.y,
 		};
-
-		if(needErrorHandler)
-		{
-			try
-			{
-				const result = await this._computeRouteResult(fieldTripStops, params);
-				return result;
-			}
-			catch(ex)
-			{
-				return this.calculateRouteErrorHandler(ex, fieldTripStops);
-			}
-		}
-		else
-		{
-			const result = await this._computeRouteResult(fieldTripStops, params);
-			return result;
-		}
+		return networkService.createStopFeatureSet([stopObject]);
 	}
 
-	FieldTripMap.prototype._computeRouteResult = async function(fieldTripStops, routeParameters)
+	FieldTripMap.prototype._getAlertMessage = function(err)
 	{
-		const networkService = TF.GIS.Analysis.getInstance().networkService;
-
-		const response = await networkService.solveRoute(routeParameters);
-		const result = response?.results?.routeResults[0];
-
-		this._swapAttributeForStop(fieldTripStops, result);
-
-		return result;
-	}
-
-	FieldTripMap.prototype.calculateRouteErrorHandler = async function(ex, fieldTripStops)
-	{
-		const self = this;
-
-		if(ex?.unlocatedStopNames?.length)
+		let stopErrMessage = [];
+		let message = "Cannot solve path.";
+		if (err.stops && err.stops.length > 1)
 		{
-			const indexList = ex?.unlocatedStopNames?.reduce(function(result, stopName){
-				const index = fieldTripStops.findIndex(x=>x.Sequence == stopName);
-				const temp = [...result, index];
-				return index >= 0 ? [...new Set(temp)] : result;
-			}, []);
-			indexList.sort((a,b) => a-b);
-
-			const [minSequence, maxSequence] = fieldTripStops.reduce(function([min, max], current)
+			message += " No solution found from Stop " + err.stops[0] + " to stop " + err.stops[1] + "."
+			return message;
+		}
+		if (err.details.messages && err.details.messages.length > 0 && !err.stops)
+		{
+			let infos = err.details.messages[0].split(".");
+			if (err.details.messages[0].indexOf("No solution found.") > 0)
 			{
-				return [Math.min(min, current.Sequence), Math.max(max, current.Sequence)];
-			},[Number.MAX_SAFE_INTEGER, 0]);
-
-			tf.promiseBootbox.alert(`Cannot solve path. No solution found from Stop ${Math.max(fieldTripStops[indexList[0]].Sequence - 1,minSequence)} to Stop ${Math.min(maxSequence,fieldTripStops[indexList[0]].Sequence + 1)}`)
-
-			const chunks = [];
-			for(let i = 0; i < indexList.length; i++)
-			{
-				const lowBound = i === 0 ? 0 : indexList[i-1];
-				const highBound = indexList[i];
-				chunks.push(fieldTripStops.slice(lowBound, highBound));
-				if(highBound + 1 <= fieldTripStops.length -1)
+				for (let i = 0; i < infos.length; i++)
 				{
-					chunks.push(fieldTripStops.slice(highBound + 1));
+					if (infos[i].indexOf("No route from location") >= 0 && infos[i].indexOf("to location") > 0)
+					{
+						const stopIndexes = infos[i].match(/\d+/g).map(Number);
+						stopErrMessage.push(" No solution found from Stop " + (stopIndexes[0]) + " to stop " + (stopIndexes[1]) + ".");
+					}
+				}
+				if (stopErrMessage.length > 0)
+				{
+					message += stopErrMessage.join(".")
+					return message;
 				}
 			}
+			if (err.details.messages[0].indexOf("Invalid locations detected") > 0)
+			{
 
-			return await Promise.all(chunks.filter(c=>c,length>1).map(c=>this.calculateRouteByStops(c)));
+				for (let i = 0; i < infos.length; i++)
+				{
+					if (infos[i].indexOf("Location") >= 0 && infos[i].indexOf("unlocated") > 0)
+					{
+						const stopIndexes = infos[i].match(/\d+/g).map(Number);
+						stopErrMessage.push(" stop " + (stopIndexes[0]));
+					}
+				}
+				if (stopErrMessage.length > 0)
+				{
+					message += " Invalid" + stopErrMessage.join(",") + "."
+					return message;
+				}
+			}
+		}
+		return message + " Please check your Routing Settings.";
+	};
+
+	FieldTripMap.prototype._createPathSegments = function(result)
+	{
+		var self = this, pathSegments = [];
+		var stopToStopPathGeometry = new tf.map.ArcGIS.Polyline({ spatialReference: { wkid: 102100 } });
+		var stopToStopPathDirections = "";
+		stopToStopPathGeometry.paths = [
+			[]
+		];
+		var stopToStopPathLength = 0;
+		var stopToStopPathTime = 0;
+		if (result && result.routeResults)
+		{
+			result.routeResults[0].directions.features.forEach(function(feature)
+			{
+				if (feature.attributes.maneuverType == "esriDMTStop")
+				{
+					pathSegments.push({
+						geometry: TF.cloneGeometry(stopToStopPathGeometry),
+						length: stopToStopPathLength.toString(),
+						time: stopToStopPathTime.toString(),
+						direction: stopToStopPathDirections
+					});
+					stopToStopPathGeometry.paths[0] = [];
+					stopToStopPathLength = 0;
+					stopToStopPathTime = 0;
+					stopToStopPathDirections = "";
+				}
+
+				if (feature.attributes.maneuverType == "railroadStop")
+				{
+					stopToStopPathDirections += "WARNING CROSS OVER RAILROAD.\n";
+				}
+				else if (feature.attributes.maneuverType != "esriDMTDepart" && feature.attributes.maneuverType != "esriDMTStop")
+				{
+					stopToStopPathDirections += feature.attributes.text + " " + feature.attributes.length.toFixed(2) + " km. \n";
+				}
+				stopToStopPathGeometry.paths[0] = stopToStopPathGeometry.paths[0].concat(feature.geometry.paths[0]);
+				stopToStopPathLength += feature.attributes.length;
+				stopToStopPathTime += feature.attributes.time;
+			});
 		}
 		else
 		{
-			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
+			pathSegments.push({
+				geometry: new self._arcgis.Polyline(self._map.mapView.spatialReference).addPath([])
+			});
 		}
+		return pathSegments;
 	}
+
+	FieldTripMap.prototype._createTripStops = function(fieldTrip, tripStops, pathSegments)
+	{
+		var self = this;
+		tripStops.forEach(function(stop, index)
+		{
+			if (pathSegments[index] && !stop.failedStop)
+			{
+				stop.DrivingDirections = pathSegments[index].direction;
+				stop.RouteDrivingDirections = stop.DrivingDirections;
+				stop.IsCustomDirection = false;
+				stop.Speed = (pathSegments[index].time && pathSegments[index].time != 0) ? (pathSegments[index].length / pathSegments[index].time) * 60 : 0;
+				stop.StreetSpeed = stop.Speed;
+				stop.Distance = pathSegments[index].length ? pathSegments[index].length * 1 : -1;
+				stop._geoPath = pathSegments[index].geometry;
+			} else if (stop.failedStop || self._isLastStop(fieldTrip, stop, tripStops))
+			{
+				stop.path = {};
+				stop.Distance = 0;
+				stop.Speed = 0;
+				stop.DrivingDirections = "";
+			}
+		});
+		return tripStops;
+	};
 
 	//#endregion
 
