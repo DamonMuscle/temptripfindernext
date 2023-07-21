@@ -1219,11 +1219,36 @@
 			{
 				if (err.details.messages[0].indexOf("No solution found.") > -1 || err.details.messages[0].indexOf("Invalid locations detected") > -1)
 				{
-					tf.promiseBootbox.alert(self._getAlertMessage(err));
-					return self.refreshTripByStopsSeperately(fieldTrip, fieldTripStops, networkService);
+					return self.refreshTripByStopsSeperately(fieldTrip, fieldTripStops, networkService).then(function(tripStops)
+					{
+						let errorMessage = tripStops.reduce(({message, findInvalidStop}, stop, index, array) =>
+						{
+							const isTerminalStop = _.last(array) == stop;
+							if (!findInvalidStop)
+							{
+								if (!stop._geoPath && !isTerminalStop)
+								{
+									message += ` No solution found from Stop ${stop.Sequence}`
+									return { message, findInvalidStop: true };
+								}
+							}
+							else if (findInvalidStop && (stop._geoPath || isTerminalStop))
+							{
+								message +=` to Stop ${ stop.Sequence }.`
+								return { message, findInvalidStop: false};
+							}
+
+							return { message, findInvalidStop };
+						}, { message: "Cannot solve path.", findInvalidStop: false});
+
+						tf.promiseBootbox.alert(errorMessage);
+						return tripStops;
+					});
 				}
 			}
-			return Promise.resolve({ stops: false, err: self._getAlertMessage(err) });
+
+			tf.promiseBootbox.alert(`Cannot solve path. One or more of your stops is invalid or unreachable.`);
+			return Promise.resolve();
 		}
 
 		const result = response?.results?.routeResults[0];
@@ -1334,10 +1359,7 @@
 				return resolve(tripStops);
 			}
 		}
-		return solveRequest().then(function(tripStops)
-		{
-			return tripStops;
-		});
+		return solveRequest();
 	}
 
 	FieldTripMap.prototype._updatePathSegments = function(pathSegments, vertexes)
@@ -1427,55 +1449,6 @@
 		};
 		return networkService.createStopFeatureSet([stopObject]);
 	}
-
-	FieldTripMap.prototype._getAlertMessage = function(err)
-	{
-		let stopErrMessage = [];
-		let message = "Cannot solve path.";
-		if (err.stops && err.stops.length > 1)
-		{
-			message += " No solution found from Stop " + err.stops[0] + " to stop " + err.stops[1] + "."
-			return message;
-		}
-		if (err.details.messages && err.details.messages.length > 0 && !err.stops)
-		{
-			let infos = err.details.messages[0].split(".");
-			if (err.details.messages[0].indexOf("No solution found.") > 0)
-			{
-				for (let i = 0; i < infos.length; i++)
-				{
-					if (infos[i].indexOf("No route from location") >= 0 && infos[i].indexOf("to location") > 0)
-					{
-						const stopIndexes = infos[i].match(/\d+/g).map(Number);
-						stopErrMessage.push(" No solution found from Stop " + (stopIndexes[0]) + " to stop " + (stopIndexes[1]) + ".");
-					}
-				}
-				if (stopErrMessage.length > 0)
-				{
-					message += stopErrMessage.join(".")
-					return message;
-				}
-			}
-			if (err.details.messages[0].indexOf("Invalid locations detected") > 0)
-			{
-
-				for (let i = 0; i < infos.length; i++)
-				{
-					if (infos[i].indexOf("Location") >= 0 && infos[i].indexOf("unlocated") > 0)
-					{
-						const stopIndexes = infos[i].match(/\d+/g).map(Number);
-						stopErrMessage.push(" stop " + (stopIndexes[0]));
-					}
-				}
-				if (stopErrMessage.length > 0)
-				{
-					message += " Invalid" + stopErrMessage.join(",") + "."
-					return message;
-				}
-			}
-		}
-		return message + " Please check your Routing Settings.";
-	};
 
 	FieldTripMap.prototype._createPathSegments = function(result)
 	{
