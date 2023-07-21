@@ -193,12 +193,12 @@
 		return new Promise((resolve, reject) =>
 		{
 			this.drawSequenceLine(fieldTrip, () => {
-				this.updateFieldTripPathVisible([fieldTrip]);
+				this.updateFieldTripPathVisibility([fieldTrip]);
 	
 				if (fieldTrip.visible === false)
 				{
 					// the Field Trips are hidden.
-					this.setFieldTripVisible([fieldTrip]);
+					this.setFieldTripVisibility([fieldTrip]);
 				}
 
 				resolve();
@@ -210,46 +210,46 @@
 
 	//#region - Show / Hide Layers
 
-	FieldTripMap.prototype.setFieldTripVisible = async function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripVisibility = async function(fieldTrips)
 	{
-		this.setFieldTripStopVisible(fieldTrips);
+		this.setFieldTripStopVisibility(fieldTrips);
 
-		this.setFieldTripPathVisible(fieldTrips);
-		await this.setFieldTripPathArrowVisible(fieldTrips);
+		this.setFieldTripPathVisibility(fieldTrips);
+		await this.setFieldTripPathArrowVisibility(fieldTrips);
 
-		this.setFieldTripSequenceLineVisible(fieldTrips);
-		await this.setFieldTripSequenceLineArrowVisible(fieldTrips);
+		this.setFieldTripSequenceLineVisibility(fieldTrips);
+		await this.setFieldTripSequenceLineArrowVisibility(fieldTrips);
 
-		this.setFieldTripHighlightLayerVisible(fieldTrips);
+		this.setFieldTripHighlightLayerVisibility(fieldTrips);
 	}
 
-	FieldTripMap.prototype.setFieldTripStopVisible = function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripStopVisibility = function(fieldTrips)
 	{
 		const stopFeatures = this._getStopFeatures();
-		this._setFieldTripLayerVisible(fieldTrips, this.fieldTripStopLayerInstance, stopFeatures);
+		this._setFieldTripLayerVisibility(fieldTrips, this.fieldTripStopLayerInstance, stopFeatures);
 	}
 
-	FieldTripMap.prototype.setFieldTripPathVisible = function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripPathVisibility = function(fieldTrips)
 	{
 		const pathFeatures = this._getPathFeatures();
 		const precondition = this.pathLineType === PATH_LINE_TYPE.Path;
-		this._setFieldTripLayerVisible(fieldTrips, this.fieldTripPathLayerInstance, pathFeatures, precondition);
+		this._setFieldTripLayerVisibility(fieldTrips, this.fieldTripPathLayerInstance, pathFeatures, precondition);
 	}
 
-	FieldTripMap.prototype.setFieldTripSequenceLineVisible = function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripSequenceLineVisibility = function(fieldTrips)
 	{
 		const sequenceLineFeatures = this._getSequenceLineFeatures();
 		const precondition = this.pathLineType === PATH_LINE_TYPE.Sequence;
-		this._setFieldTripLayerVisible(fieldTrips, this.fieldTripSequenceLineLayerInstance, sequenceLineFeatures, precondition);
+		this._setFieldTripLayerVisibility(fieldTrips, this.fieldTripSequenceLineLayerInstance, sequenceLineFeatures, precondition);
 	}
 
-	FieldTripMap.prototype.setFieldTripHighlightLayerVisible = function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripHighlightLayerVisibility = function(fieldTrips)
 	{
 		const fieldTripHighlightFeatures = this._getHighlightFeatures();
-		this._setFieldTripLayerVisible(fieldTrips, this.fieldTripHighlightLayerInstance, fieldTripHighlightFeatures);
+		this._setFieldTripLayerVisibility(fieldTrips, this.fieldTripHighlightLayerInstance, fieldTripHighlightFeatures);
 	}
 
-	FieldTripMap.prototype._setFieldTripLayerVisible = function(fieldTrips, layerInstance, layerFeatures, precondition = null)
+	FieldTripMap.prototype._setFieldTripLayerVisibility = function(fieldTrips, layerInstance, layerFeatures, precondition = null)
 	{
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
@@ -261,7 +261,7 @@
 
 			if (updateFeatures.length > 0)
 			{
-				layerInstance.setFeaturesVisible(updateFeatures, visible);
+				layerInstance.setFeaturesVisibility(updateFeatures, visible);
 			}
 		}
 	}
@@ -387,13 +387,13 @@
 
 	//#region - Switch Field Trip Path Type (Sequence Lines / Path Lines)
 
-	FieldTripMap.prototype.updateFieldTripPathVisible = async function(fieldTrips)
+	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
 	{
 		this.updateArrowRenderer(fieldTrips);
 		await this.redrawFieldTripArrows(fieldTrips);
 
-		this.setFieldTripPathVisible(fieldTrips);
-		this.setFieldTripSequenceLineVisible(fieldTrips);
+		this.setFieldTripPathVisibility(fieldTrips);
+		this.setFieldTripSequenceLineVisibility(fieldTrips);
 	}
 
 	//#endregion
@@ -845,7 +845,7 @@
 		const pathAttributes = fieldTrip.routePathAttributes;
 		const graphic = this.fieldTripPathLayerInstance?.createPath(routePath, pathAttributes);
 		// hide by default for UX.
-		this.fieldTripPathLayerInstance?.setFeaturesVisible([graphic], false);
+		this.fieldTripPathLayerInstance?.setFeaturesVisibility([graphic], false);
 		this.fieldTripPathLayerInstance?.addPath(graphic);
 	}
 
@@ -858,7 +858,7 @@
 
 		const graphic = this.fieldTripSequenceLineLayerInstance?.createPath(sequenceLine, attributes);
 		// hide by default for UX.
-		this.fieldTripSequenceLineLayerInstance?.setFeaturesVisible([graphic], false);
+		this.fieldTripSequenceLineLayerInstance?.setFeaturesVisibility([graphic], false);
 		this.fieldTripSequenceLineLayerInstance?.addPath(graphic, afterAdd);
 	}
 
@@ -900,8 +900,8 @@
 			}
 		}
 
-		await this.setFieldTripPathArrowVisible(fieldTrips);
-		await this.setFieldTripSequenceLineArrowVisible(fieldTrips);
+		await this.setFieldTripPathArrowVisibility(fieldTrips);
+		await this.setFieldTripSequenceLineArrowVisibility(fieldTrips);
 	}
 
 	FieldTripMap.prototype.drawFieldTripPathArrow = async function(fieldTrip)
@@ -985,7 +985,7 @@
 		return arrows;
 	}
 
-	FieldTripMap.prototype.setFieldTripPathArrowVisible = async function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripPathArrowVisibility = async function(fieldTrips)
 	{
 		const self = this;
 		const pathArrowFeatures = await self._getPathArrowFeatures();
@@ -1009,7 +1009,7 @@
 		self.fieldTripPathArrowLayerInstance.layer.refresh();
 	}
 
-	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisible = async function(fieldTrips)
+	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = async function(fieldTrips)
 	{
 		const self = this;
 		const sequenceLineArrowFeatures = await self._getSequenceLineArrowFeatures();

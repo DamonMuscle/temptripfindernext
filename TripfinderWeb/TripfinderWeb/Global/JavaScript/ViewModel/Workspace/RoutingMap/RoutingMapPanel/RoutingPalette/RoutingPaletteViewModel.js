@@ -194,7 +194,7 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
 	{
-		this.fieldTripMap?.setFieldTripVisible(data);
+		this.fieldTripMap?.setFieldTripVisibility(data);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapUpdateColor = function(_, data)
@@ -205,7 +205,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
 		this.fieldTripMap?.setPathLineType(isSequenceLine);
-		this.fieldTripMap?.updateFieldTripPathVisible(this.dataModel.trips);
+		this.fieldTripMap?.updateFieldTripPathVisibility(this.dataModel.trips);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)
