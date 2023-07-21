@@ -1214,7 +1214,7 @@
 		{
 			if (err.details.messages && err.details.messages.length > 0)
 			{
-				if (err.details.messages[0].indexOf("No solution found.") > 0 || err.details.messages[0].indexOf("Invalid locations detected") > 0)
+				if (err.details.messages[0].indexOf("No solution found.") > -1 || err.details.messages[0].indexOf("Invalid locations detected") > -1)
 				{
 					tf.promiseBootbox.alert(self._getAlertMessage(err));
 					return self.refreshTripByStopsSeperately(fieldTrip, fieldTripStops, networkService);
