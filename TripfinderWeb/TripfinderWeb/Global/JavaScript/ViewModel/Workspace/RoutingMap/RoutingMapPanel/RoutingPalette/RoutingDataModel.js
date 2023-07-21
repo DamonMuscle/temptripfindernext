@@ -50,7 +50,6 @@
 		// lock data
 		self.featureData = new TF.RoutingMap.RoutingPalette.RoutingFeatureData(self);
 		self.tripLockData = new TF.RoutingMap.RoutingPalette.RoutingLockData(self);
-		self.schoolLockData = new TF.RoutingMap.RoutingPalette.SchoolLockData(self);
 		self.fieldTripStopDataModel = new TF.RoutingMap.RoutingPalette.RoutingFieldTripStopDataModel(self);
 
 		// change count
@@ -3758,7 +3757,6 @@
 		this.onSchoolLocationChangeEvent.unsubscribeAll();
 		PubSub.unsubscribe(this.setUserProfileTripColor);
 		PubSub.unsubscribe(this.stopPathChange);
-		this.schoolLockData.dispose();
 		this.tripLockData.dispose();
 		tfdispose(this);
 	};
