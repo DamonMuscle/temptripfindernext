@@ -1682,7 +1682,6 @@
 				self.dataModel.viewModel.display.clearSchoolStudentInfo([unassignedStopsTrip]);
 				self.dataModel.resetCopyTripValue(unassignedStopsTrip);
 				self.dataModel.copyStopTimeWithActualTime([unassignedStopsTrip]);
-				self.dataModel.setStudentTravelTime([unassignedStopsTrip]);
 				unassignedStopsTrip.color = "#000000";
 				return unassignedStopsTrip;
 			});

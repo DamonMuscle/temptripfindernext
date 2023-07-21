@@ -594,10 +594,6 @@
 			{
 				if (result)
 				{
-					if (result.isUpdatedRelatedTime != undefined)
-					{
-						self.dataModel.setStudentTravelTime([result.trip]);
-					}
 					self.obTripStops([]);
 					self.obTripStops(self.trip.TripStops);
 				}
@@ -1596,7 +1592,6 @@
 						newTrip.TripStops[j].OpenType = newTrip.OpenType;
 					}
 					self.dataModel.setActualStopTime([newTrip]);
-					self.dataModel.setStudentTravelTime([newTrip]);
 					return self.setTripOptimizeInfo(newTrip).then(function()
 					{
 						tf.loadingIndicator.tryHide();

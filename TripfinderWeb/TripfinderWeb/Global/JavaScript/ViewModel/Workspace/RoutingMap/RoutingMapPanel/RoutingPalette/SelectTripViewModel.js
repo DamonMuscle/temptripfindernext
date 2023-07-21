@@ -216,10 +216,6 @@
 				return Promise.resolve(resultObject.trips);
 			}
 		}
-		else if (this.options && this.options.optionType == 'unassign')
-		{
-			return this.dataModel.autoUnassignStudentConfirmation(this.selectedTrips);
-		}
 		else
 		{
 			return Promise.resolve(this.selectedTrips);
@@ -228,15 +224,7 @@
 
 	SelectTripViewModel.prototype.applyToAllClick = function()
 	{
-		if (this.options && this.options.optionType == 'unassign')
-		{
-			return this.dataModel.autoUnassignStudentConfirmation(this.trips);
-		}
-		else
-		{
-			return Promise.resolve(this.trips);
-		}
-
+		return Promise.resolve(this.trips);
 	};
 
 	SelectTripViewModel.prototype.cancel = function()

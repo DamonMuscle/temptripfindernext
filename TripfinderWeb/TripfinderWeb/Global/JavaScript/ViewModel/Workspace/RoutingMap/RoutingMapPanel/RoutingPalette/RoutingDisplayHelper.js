@@ -17,25 +17,12 @@
 		{
 			if (nodeType == 'student')
 			{
-				if (parentNode.expanded)
-				{
-					// remove student
-					// if (node.customData.crossToStop === null || node.customData.crossToStop === undefined)
-					// {
-					// 	promise = self.routingDisplay.handleUnknowCrossingStatusStudents([node]);
-					// }
-				}
-
 				return promise.then(function()
 				{
 					if (currentMissionId !== null && currentMissionId !== undefined && currentMissionId != self.routingDisplay.updateMissionDictionary[parentNode.id])
 					{
 						return;
 					}
-
-					// remove student
-					// var element = self.insertStudentsByAlphaOrder(node, parentNode);
-					// self.routingDisplay.bindStudentNodeEvent.call(self.routingDisplay, element);
 				});
 			}
 		}
@@ -566,32 +553,6 @@
 		studentNode.set('customData.dayDisableList', nowDayDisableList);
 	}
 
-	// remove student
-	// RoutingDisplayHelper.prototype.updateStudentOnTree = function(stopId, tripNode, students)
-	// {
-	// 	var self = this;
-	// 	var tripStopNode = self.getTreeNodeFromParentNode(stopId, tripNode, 'tripstop');
-	// 	if (!tripStopNode)
-	// 	{
-	// 		return;
-	// 	}
-	// 	for (var i = 0; i < students.length; i++)
-	// 	{
-	// 		var studentNode = self.getTreeNodeFromParentNode(students[i].id, tripStopNode, 'student', students[i].RequirementID, students[i].TripStopID, students[i].PreviousScheduleID);
-	// 		if (studentNode != null)
-	// 		{
-	// 			if (self.checkNodeWasExpanded(tripStopNode))
-	// 			{
-	// 				self.routingDisplay.updateStudentNode(studentNode);
-	// 			}
-	// 			else
-	// 			{
-	// 				self.resetUnexpandedTreeNodeValue(studentNode, students[i]);
-	// 			}
-	// 		}
-	// 	}
-	// }
-
 	RoutingDisplayHelper.prototype.NoSelectedDay = function(student)
 	{
 		if (!student.ValidMonday
@@ -911,12 +872,6 @@
 			trip.FieldTripStops.map(function(tripStop)
 			{
 				delete self.routingDisplay.expandStatusDictionary["Stop" + tripStop.id];
-
-				// remove student
-				// tripStop.Students.map(function(student)
-				// {
-				// 	delete self.routingDisplay.expandStatusDictionary["Student" + student.id];
-				// });
 			});
 		});
 	}

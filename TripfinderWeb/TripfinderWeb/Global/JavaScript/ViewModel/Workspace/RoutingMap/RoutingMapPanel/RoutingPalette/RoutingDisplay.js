@@ -19,19 +19,12 @@
 
 		self.dataModel.onTripsChangeEvent.subscribe(self.onTripChange.bind(self));
 		self.dataModel.onTripTreeColorChangeEvent.subscribe(self.onTripTreeColorChange.bind(self));
-		// remove student
-		// self.dataModel.onAssignStudentsChangeEvent.subscribe(self.onAssignStudentsChange.bind(self));
 		self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChange.bind(self));
-		// remove student
-		// self.dataModel.onStudentChangeEvent.subscribe(self.onStudentChange.bind(self));
-		// self.dataModel.onStudentCrossStreetStopChangeEvent.subscribe(self.onStudentCrossStreetStopChangeEvent.bind(self));
 		self.changeVisible = self.changeVisible.bind(self);
 		self.dataModel.onTripDisplayRefreshEvent.subscribe(self.onTripDisplayRefresh.bind(self));
 		self.dataModel.onOptimizeSequenceDiffRateChange.subscribe(self.showOptimizeInfo.bind(self));
 		self.dataModel.onShowChartChangeEvent.subscribe(self.onShowChartChange.bind(self));
 		self.dataModel.onSchoolLocationChangeEvent.subscribe(self.onSchoolLocationChange.bind(self));
-		// remove students
-		// self.dataModel.onStopCandidateStudentChangeEvent.subscribe(self.onStopCandidateStudentChange.bind(self));
 		self.dataModel.onTripSaveEvent.subscribe(self.onTripSaveEvent.bind(self));
 
 		self.routingDisplayFixTitle = new TF.RoutingMap.RoutingPalette.RoutingDisplayFixTitle();
@@ -178,8 +171,6 @@
 		{
 			if (!isSameTrip)
 			{
-				// remove student
-				// self.setIsValidPropertyOnTree(oldTrip[0]);
 				self.refreshAllStopNode(oldTrip[0]);
 			}
 		}));
@@ -192,8 +183,6 @@
 		var currentTrip = [Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; })];
 		promises.push(self.resetTripInfo(currentTrip, null, true).then(function()
 		{
-			// remove student
-			// self.setIsValidPropertyOnTree(currentTrip[0]);
 			if (self.dataModel.showImpactDifferenceChart())
 			{
 				self.dataModel.refreshOptimizeSequenceRate(currentTrip[0].id, null, null, true);
@@ -231,8 +220,7 @@
 		{
 			tripStopNodes = tripNode.children.options.data.items;
 		}
-		// remove student
-		// var schoolStudents = [];
+
 		if (trip.Session != TF.Helper.TripHelper.Sessions.ToSchool)
 		{
 			trip.FieldTripStops.sort(function(a, b) 
@@ -281,8 +269,6 @@
 			else
 			{
 				var tripStopTreeView = self.newTripStop(tripStop, trip.Session, trip.Name);
-				// remove student
-				// schoolStudents = schoolStudents.concat(tripStop.Students);
 				self._insertNode(tripStop, tripStopTreeView, tripNode, trip, tripStopNodes);
 			}
 		});
@@ -544,33 +530,6 @@
 				{
 					return item.customData.crossToStop === null || item.customData.crossToStop === undefined;
 				});
-
-				// remove student
-				// if (dataItem.customData.isStop &&
-				// 	items.length > 0)
-				// {
-				// 	var result = self.handleUnknowCrossingStatusStudents(items);
-				// 	if (result != null)
-				// 	{
-				// 		result.then(function(nodes)
-				// 		{
-				// 			nodes.map(function(node)
-				// 			{
-				// 				var studentNodeData = dataItem.children.getFirst(node.id, function(data)
-				// 				{
-				// 					return data.customData && data.customData.isStudent
-				// 						&& data.customData.requirementId == node.customData.requirementId
-				// 						&& data.customData.previousScheduleID == node.customData.previousScheduleID
-				// 						&& data.customData.tripStopId == node.customData.tripStopId;
-				// 				});
-				// 				if (studentNodeData)
-				// 				{
-				// 					self.setStudentNodeProperty(studentNodeData, self.treeview.findByUid(studentNodeData.uid), node.customData.crossToStop);
-				// 				}
-				// 			});
-				// 		});
-				// 	}
-				// }
 			},
 			collapse: function(e)
 			{
@@ -802,8 +761,6 @@
 			prevLayover: data.prevLayover,
 			nextLayover: data.nextLayover,
 			customData: {
-				// remove student
-				// students: data.customData.students,
 				stops: data.customData.stops,
 				tripTotalTime: data.customData.tripTotalTime,
 				distance: data.customData.distance,
@@ -1036,10 +993,6 @@
 		var $minusButtons = routingtreeview.find(".icon.minus");
 		$minusButtons.off('click').on('click', minusClick.bind(self));
 
-		// remove student
-		// var $addButtons = routingtreeview.find(".icon.add");
-		// $addButtons.off('click').on('click', addClick.bind(self));
-
 		var $scheduledTimeButtons = routingtreeview.find(".schedule-time");
 		$scheduledTimeButtons.off('click').on('click', scheduledTimeClick.bind(self));
 
@@ -1084,15 +1037,6 @@
 		$insertTripStopsButton.off('click').on('click', insertTripStopsClick.bind(self));
 		$insertTripStopsButton.off('mouseover').on('mouseover', insertStopButtonMouseOver.bind(self));
 		$insertTripStopsButton.off('mouseout').on('mouseout', insertStopButtonMouseOut.bind(self));
-
-		// remove student
-		// var $dayButtons = routingtreeview.find(".student-requirement .day");
-		// $dayButtons.off('click').on('click', studentDayClick.bind(self));
-
-		// remove student
-		// var $sessionStatusButtons = routingtreeview.find(".student-PUDOStatus .status");
-		// $sessionStatusButtons.off('click').on('click', studentStatusClick.bind(self));
-
 	}
 
 	function insertBeforeButtonMouseOver(e)
@@ -1296,7 +1240,6 @@
 		{
 			if (result.isUpdatedRelatedTime != undefined)
 			{
-				self.dataModel.setStudentTravelTime([result.trip]);
 				var tripNode = self.routingDisplayHelper.getExpandedTreeNode(result.trip.id, 'trip', self.treeview.dataSource);
 				var tripWasExpanded = self.routingDisplayHelper.checkNodeWasExpanded(tripNode);
 				var tripElement = self.treeview.findByUid(tripNode.uid);
@@ -1865,15 +1808,6 @@
 			{
 				nodeData.set('id', tripStopData.id);
 			}
-			// remove student
-			// if (tripStopData && tripStopData.SchoolCode && tripStopData.ToSchoolStudents)
-			// {
-			// 	nodeData.set('customData.toSchoolStudents', tripStopData.ToSchoolStudents);
-			// }
-			// if (tripStopData && tripStopData.SchoolCode && tripStopData.ToTransStudents)
-			// {
-			// 	nodeData.set('customData.toTransStudents', tripStopData.ToTransStudents);
-			// }
 			if (tripStopData && tripStopData.SchoolCode && tripStopData.TransToTrans)
 			{
 				nodeData.set('customData.transToTrans', tripStopData.TransToTrans);
@@ -1936,11 +1870,6 @@
 		if (nodeData.customData.isTrip)
 		{
 			var tripData = self.dataModel.getTripById(nodeData.id);
-			// remove student
-			// var totalAssignedStudents = tripData.FieldTripStops
-			// 	.reduce((prev, curr) => prev.concat(curr.Students), [])
-			// 	.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
-			// 	.length;
 			var totalDistance = 0;
 			tripData.FieldTripStops.map(function(tripStop)
 			{
@@ -2059,9 +1988,6 @@
 			customData: {
 				totalStudentCount: tripStop.TotalStudentCount,
 				assignedStudentCount: tripStop.AssignedStudentCount,
-				// remove student
-				// toSchoolStudents: tripStop.ToSchoolStudents,
-				// toTransStudents: tripStop.ToTransStudents,
 				transToTrans: tripStop.TransToTrans,
 				puTransToSchool: tripStop.PUTransToSchool,
 				doTransToSchool: tripStop.DOTransToSchool,
@@ -2092,11 +2018,6 @@
 	{
 		return !(tripStop.PrimaryDeparture || tripStop.PrimaryDestination);
 	};
-
-	// remove student
-	// RoutingDisplay.prototype.onCandidatesStudentsChange = function(e, data)
-	// {
-	// }
 
 	RoutingDisplay.prototype.onTripSaveEvent = function(evt, trips)
 	{
@@ -2352,11 +2273,7 @@
 	{
 		const self = this;
 		let = totalAssignedStudents = 0;
-		// remove student
-		// totalAssignedStudents = trip.FieldTripStops
-		// 	.reduce((prev, curr) => prev.concat(curr.Students), [])
-		// 	.reduce((prev, curr) => prev.concat(!prev.some(x => x.id === curr.id) ? curr : []), [])
-		// 	.length;
+
 		return {
 			id: trip.id,
 			text: trip.Name,
@@ -2578,8 +2495,6 @@
 			data.edit.map(function(trip)
 			{
 				self.showOptimizeInfo(null, trip);
-				// remove student
-				// self.setIsValidPropertyOnTree(trip);
 				self.refreshAllStopNode(trip);
 			});
 		}
@@ -2626,9 +2541,6 @@
 			element.find(".icon.minus").off('click').on('click', minusClick.bind(self));
 			element.find(".icon.add").off('click').on('click', addClick.bind(self));
 			element.find(".icon.zoom-map-to-layers").off('click').on('click', zoomClick.bind(self));
-			// remove student
-			// element.find(".student-requirement .day").off('click').on('click', studentDayClick.bind(self));
-			// element.find(".student-PUDOStatus .status").off('click').on('click', studentStatusClick.bind(self));
 		}
 	};
 
