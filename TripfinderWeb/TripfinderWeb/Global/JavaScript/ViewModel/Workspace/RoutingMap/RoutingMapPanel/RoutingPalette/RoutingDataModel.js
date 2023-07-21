@@ -3697,7 +3697,7 @@
 		var features = directions.features.map((item, index) => {
 
 			totalDuration += item.attributes.time;
-			totalDistance += item.attributes.length * 1.60934; // from miles to km
+			totalDistance += item.attributes.length;
 
 			item.attributes.totalDuration = totalDuration;
 			item.attributes.totalDistance = totalDistance;

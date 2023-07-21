@@ -69,7 +69,7 @@
 		}
 
 		const defaultParameters = {
-			directionsLengthUnits: 'miles',
+			directionsLengthUnits: 'kilometers',
 			findBestSequence: false,
 			ignoreInvalidLocations: false,
 			impedanceAttribute: null,
