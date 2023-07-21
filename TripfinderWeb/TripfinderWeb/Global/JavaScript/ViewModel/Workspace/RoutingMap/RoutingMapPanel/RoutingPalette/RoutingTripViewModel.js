@@ -504,18 +504,7 @@
 		let removeElement = e.currentTarget.parentElement.parentElement,
 			previousElement,
 			removeElementIndex,
-			tripStopId = viewModel.id,
-			exceptions = this.dataModel.getExceptions(tripStopId), msg = "Are you sure you want to delete this field trip stop?";
-		if (exceptions.length)
-		{
-			exceptions = Enumerable.From(exceptions).OrderBy(i => (i.LastName || "").toLowerCase()).ThenBy(i => (i.FirstName || "").toLowerCase()).ToArray();
-			let names = exceptions.map(i => `${i.FirstName} ${i.LastName}`);
-			msg = `Deleting this trip stop will also remove the following student exceptions:
-
-${names.join('\r\n')}
-
-This action cannot be undone.  Do you wish to continue?`;
-		}
+			msg = "Are you sure you want to delete this field trip stop?";
 
 		return tf.promiseBootbox.yesNo({
 			message: msg,

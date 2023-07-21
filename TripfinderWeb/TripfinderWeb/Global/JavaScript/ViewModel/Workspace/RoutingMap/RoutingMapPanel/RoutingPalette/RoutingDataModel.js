@@ -126,21 +126,6 @@
 		});
 	};
 
-	RoutingDataModel.prototype.getExceptions = function(stopId)
-	{
-		return ((this.getFieldTripStop(stopId) || {}).Students || [])
-			.filter(s => !s.RequirementID)
-			.concat((this.expiredExceptions[stopId] || []).filter(e => e.TripStopID == stopId));
-	};
-
-	RoutingDataModel.prototype.getTripAllExceptions = function(tripId)
-	{
-		let trip = this.trips.find(t => t.id == tripId),
-			exceptions = trip.FieldTripStops.flatMap(s => s.Students).filter(s => !s.RequirementID),
-			expired = trip.FieldTripStops.flatMap(i => this.expiredExceptions[i.id] || []);
-		return exceptions.concat(expired);
-	};
-
 	RoutingDataModel.prototype.tryOpenFieldTrip = function(fieldTrips)
 	{
 		var self = this;
@@ -242,22 +227,6 @@
 				});
 			}
 		});
-	};
-
-	RoutingDataModel.prototype.clearFindCandidates = function(trips)
-	{
-		var self = this;
-		if (self._viewModal.DocumentData.data?.trips)
-		{
-			for (var i = 0; i < trips.length; i++)
-			{
-				if (Enumerable.From(self._viewModal.DocumentData.data.trips).Any(function(c) { return c.Id == trips[i].Id; }))
-				{
-					self.viewModel.drawTool.clearArrowToPoints();
-					break;
-				}
-			}
-		}
 	};
 
 	RoutingDataModel.prototype.toggleShowOptimizeChart = function()
@@ -2276,7 +2245,6 @@
 		self.viewModel.editFieldTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
 		// self.clearTripOriginalData(tripsToClose);
-		// self.clearFindCandidates(tripsToClose);
 		return promise.then(function()
 		{
 			self._updateTravelScenarioLock(tripsToClose);
@@ -2314,7 +2282,6 @@
 		self.viewModel.editFieldTripStopModal.closeEditModal();
 		self._viewModal.setMode("Routing", "Normal");
 		// self.clearTripOriginalData(tripsToClose);
-		// self.clearFindCandidates(tripsToClose);
 		return promise.then(function()
 		{
 			if (tripsToClose && tripsToClose.length > 0)

@@ -1874,11 +1874,6 @@
 		}));
 	};
 
-	RoutingTripMapTool.prototype.clearArrowToPoints = function()
-	{
-		this._pointArrowLayer.removeAll();
-	};
-
 	RoutingTripMapTool.prototype._deleteTripStopArrow = function(tripStop)
 	{
 		var self = this;
