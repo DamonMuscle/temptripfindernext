@@ -23,8 +23,6 @@
 		});
 		self.bindRefreshMissingTripPathEvent();
 		self.requireDetails = new TF.Events.Event();
-		var setting = self.dataModel.getSetting(null, true);
-		self.obShowStopBoundary = ko.observable(setting.showStopBoundary);
 	}
 
 	RoutingEventsManager.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.prototype);
@@ -1750,12 +1748,5 @@
 				});
 			}
 		});
-	};
-
-	RoutingEventsManager.prototype.toggleStopBoundaryClick = function(showStopBoundary)
-	{
-		tf.storageManager.save("showStopBoundary", showStopBoundary);
-		this.obShowStopBoundary(showStopBoundary);
-		this.dataModel.onStopBoundaryShowChange.notify(showStopBoundary);
 	};
 })();

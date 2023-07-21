@@ -93,10 +93,6 @@
 		this.schoolFormatter = this.schoolFormatter.bind(this);
 		this.selectSchools = this.selectSchools.bind(this);
 
-		// Special equipments
-		this.obSelectedSpecialEquipments = ko.observableArray();
-		this.selectSpecialEquipments = this.selectSpecialEquipments.bind(this);
-
 		// criteria
 		this.obCriteriaDisable = ko.observable(false);
 		this.obCriteriaTextList = ko.observableArray();
@@ -740,7 +736,6 @@
 			{
 				this.obEntityDataModel().defaultSpeed(Number(this.trip.DefaultSpeed));
 			}
-			this.obSelectedSpecialEquipments(this.trip.SpecialEquipments);
 			this.addStopExtendAttributes(this.trip.TripStops);
 			this.obTripStops(this.trip.TripStops);
 			this.bindValueInArray(this.trip.VehicleId, this.obVehicles(), this.obSelectedVehicle);
@@ -929,24 +924,6 @@
 			this.$form.find("input[name=\"criteria\"]").change();
 		}
 	};
-	// #endregion
-
-	// #region Special equipment
-	RoutingTripViewModel.prototype.selectSpecialEquipments = function()
-	{
-		var self = this;
-		tf.modalManager.showModal(
-			new TF.Modal.ListMoverSelectSpecialEquipmentModalViewModel(this.obSelectedSpecialEquipments())
-		).then(function(selected)
-		{
-			if (selected && $.isArray(selected))
-			{
-				self.obSelectedSpecialEquipments(selected);
-				self.obEntityDataModel().specialEquipments(selected);
-			}
-		});
-	};
-
 	// #endregion
 
 	// #region School
@@ -1510,7 +1487,6 @@
 		var self = this, stopTool = self.dataModel.viewModel.drawTool.stopTool;
 		self.setTripByDataModel(self.trip);
 		var isTripStopPathChanged = this.isTripStopPathChanged();
-		var isTripStopBoundaryChanged = this.isTripStopBoundaryChanged();
 		var newTrip = self.trip;
 		var pList = [];
 		var newStopList = [];
@@ -1606,7 +1582,7 @@
 
 	RoutingTripViewModel.prototype.needUpdateTrip = function()
 	{
-		if (this.isTripStopPathChanged() || this.isTripStopBoundaryChanged() || this.isDirectionChanged() || this.isTripStopsChanged())
+		if (this.isTripStopPathChanged() || this.isDirectionChanged() || this.isTripStopsChanged())
 		{
 			this.dataModel.needUpdateTrip(true);
 			return;
@@ -1936,26 +1912,6 @@
 		return JSON.stringify(oldCompare) != JSON.stringify(newCompare);
 	};
 
-	RoutingTripViewModel.prototype.isTripStopBoundaryChanged = function()
-	{
-		if (this.mode == "create" && !this.options.saveToNewTrip)
-		{
-			return true;
-		}
-		var originalTrip = this.options.saveToNewTrip ? this.options.saveToNewTrip : this.options.trip;
-		function getBoundariesJson(tripStops)
-		{
-			return tripStops.filter(function(c) { return !!c.boundary.geometry; }).sort(function(a, b) { return a.id > b.id ? 1 : -1; }).map(function(item)
-			{
-				return item.id + "-" + JSON.stringify(item.boundary.geometry ? item.boundary.geometry.rings : "");
-			});
-		}
-		var oldCompare = getBoundariesJson(originalTrip.TripStops);
-		var newCompare = getBoundariesJson(this.obTripStops());
-
-		return JSON.stringify(oldCompare) != JSON.stringify(newCompare);
-	};
-
 	RoutingTripViewModel.prototype.isDirectionChanged = function()
 	{
 		return this.trip.TripStops.some(x => x.openDirections && x.DrivingDirections && JSON.stringify(x.DrivingDirections) !== JSON.stringify(x.openDirections))
@@ -2031,50 +1987,6 @@
 			}
 			self._lockWeekDayChange = false;
 		}
-	};
-
-	RoutingTripViewModel.prototype.getChangedExceptionItems = function(trip, allExceptions)
-	{
-		if (!allExceptions.length)
-		{
-			return [];
-		}
-
-		let tripDateRanges = TF.Helper.FindStudentScheduleHelper.getDateRanges(trip), result = [];
-		allExceptions.forEach(e =>
-		{
-			let dateRanges = TF.Helper.FindStudentScheduleHelper.getDateRanges(e),
-				intersection = TF.Helper.FindStudentScheduleHelper.getIntersection(dateRanges, tripDateRanges, true);
-			if (intersection.fullIntersected)
-			{
-				return;
-			}
-
-			let item = { exception: e };
-			result.push(item);
-			if (!intersection.intersected)
-			{
-				return;
-			}
-
-			let itemIntersection = {};
-			item.intersection = itemIntersection;
-			TF.DayOfWeek.allValues.forEach(dayOfWeek =>
-			{
-				let dateRange = intersection.dateRanges[dayOfWeek];
-				itemIntersection[dayOfWeek] = false;
-				if (!dateRange || !dateRange.length)
-				{
-					return;
-				}
-
-				itemIntersection[dayOfWeek] = true;
-				itemIntersection.StartDate = itemIntersection.StartDate || dateRange[0].startDate;
-				itemIntersection.EndDate = itemIntersection.EndDate || dateRange[0].endDate;
-			});
-		});
-
-		return result;
 	};
 
 	RoutingTripViewModel.prototype._calculateTripPath = function(newTrip)

@@ -14,7 +14,6 @@
 
 		self.initialize();
 
-		// self.dataModel.onAssignStudentsChangeToMapEvent.subscribe(self.onAssignStudentsChangeEvent.bind(this));
 		// self.dataModel.onTripsChangeEvent.subscribe(self.onTripsChangeEvent.bind(this));
 		// self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChangeEvent.bind(self));
 		// self.dataModel.onChangeTripVisibilityEvent.subscribe(self.onChangeTripVisibilityEvent.bind(self));
@@ -29,7 +28,6 @@
 		// self.dataModel.onTripColorChangeEvent.subscribe(self.refreshTrips.bind(self));
 		// self.dataModel.onTripSequenceChangeEvent.subscribe(self.refreshTrips.bind(this));
 		// self.dataModel.onTripPathLineDisplayChange.subscribe(self.onTripPathLineDisplayChange.bind(this));
-		// self.dataModel.onStopBoundaryShowChange.subscribe(self.onStopBoundaryShowChange.bind(this));
 		self.schoolSymbol = self.symbol.school("#cf39dc", 1, 16);
 	}
 
@@ -420,10 +418,6 @@
 				});
 			}
 		}
-		self.updateStudentCountLabel();
-		self.refreshStudentStopAssignment();
-		// self.updateStudentVisible();
-		// self.refreshTrips(); //comment for improve open trip performance. RW-11855
 	};
 
 	RoutingTripMapTool.prototype.onTripStopsChangeEvent = function(evt, items)
@@ -463,7 +457,6 @@
 			});
 		}
 
-		// // self.updateStudentVisible();
 		if (items.refreshTrip != false)
 		{
 			self.refreshTrips();//reorder the trips to fix label/stop layer order issue. 
@@ -574,8 +567,6 @@
 		{
 			self.addTrip(trip);
 		});
-		self.updateStudentCountLabel();
-		self.refreshStudentStopAssignment();
 		self._map.reorder(self._pointLayer, self._map.layers.length + 1);//always keeps stop on top of other. 
 	};
 
@@ -1211,61 +1202,6 @@
 		}.bind(self, tripId), 20);
 	};
 
-	RoutingTripMapTool.prototype.updateStudentCountLabel = function()
-	{
-		var self = this;
-		if (!self._showAssignedStudentsCount) return;
-		self._studentCountLayer.removeAll();
-		self._pointLayer.graphics.items.forEach(function(graphic)
-		{
-			if (graphic.attributes && graphic.attributes.dataModel && graphic.attributes.type == "tripStop")
-			{
-				self._addStudentCountLabel(graphic.attributes.dataModel);
-			}
-		});
-	};
-
-	RoutingTripMapTool.prototype._addStudentCountLabel = function(stop)
-	{
-		var self = this;
-		if (!self._showAssignedStudentsCount) return;
-		if (!stop || (stop.SchoolCode && stop.SchoolCode.length > 0)) return;
-		var trip = self.dataModel.getTripById(stop.FieldTripId);
-		if (trip)
-		{
-			// var screenPoint = self._arcgis.screenUtils.toScreenPoint(self._map.extent, self._map.width, self._map.height, stop.geometry);
-			// var labelPoint = self._arcgis.screenUtils.toMapPoint(self._map.extent, self._map.width, self._map.height, screenPoint.offset(15, -15));
-			var count = stop.Students.length; // .filter(function(student) { return student.IsAssigned; }).length;
-			var stopSymbol = self.symbol.studentCount(count, "#000000");
-			stopSymbol.xoffset = 13;
-			stopSymbol.yoffset = 13;
-			var graphic = new self._arcgis.Graphic({
-				geometry: stop.geometry,
-				symbol: stopSymbol,
-				attributes: { dataModel: stop, type: "studentCount", FieldTripId: stop.FieldTripId }
-			});
-			if (trip.visible == false)
-			{
-				graphic.visible = false;
-			}
-			self._studentCountLayer.add(graphic);
-		}
-	};
-
-	// RoutingTripMapTool.prototype.updateStudentVisible = function()
-	// {
-	// var self = this;
-	// self._studentLayer.graphics.forEach(function(graphic)
-	// {
-	// 	if (graphic.attributes.dataModel.IsAssigned)
-	// 	{
-	// 		var trip = self.dataModel.getTripById(graphic.attributes.FieldTripId);
-	// 		if (!self._showAssignedStudents || (trip && trip.visible == false)) graphic.visible = false;
-	// 		else { graphic.visible = true; }
-	// 	}
-	// });
-	// };
-
 	RoutingTripMapTool.prototype._intersectWithCurrentPolygons = function(g)
 	{
 		let self = this,
@@ -1444,36 +1380,6 @@
 		return this.dataModel.getHeartBoundaryId(pointGraphic);
 	};
 
-	RoutingTripMapTool.prototype.onAssignStudentsChangeEvent = function(evt, items)
-	{
-		var self = this;
-		// if (items.add.length > 0)
-		// {
-		// 	self._addStudent({
-		// 		Students: items.add
-		// 	}, items.add[0].Dly_TripID);
-		// }
-		// if (items.delete.length > 0)
-		// {
-		// 	items.delete.forEach(function(student)
-		// 	{
-		// 		self._deleteStudent(student);
-		// 	});
-		// }
-		// if (items.edit.length > 0)
-		// {
-		// 	items.edit.forEach(function(student)
-		// 	{
-		// 		self._deleteStudent(student);
-		// 		self._addStudent({
-		// 			Students: [student]
-		// 		}, student.Dly_TripID);
-		// 	});
-		// }
-		self.updateStudentCountLabel();
-		self.refreshStudentStopAssignment();
-	};
-
 	RoutingTripMapTool.prototype.onCandidatesStudentsChangeEvent = function(event, items)
 	{
 
@@ -1537,8 +1443,6 @@
 				graphic.symbol = symbol;
 			});
 
-			self.updateStudentCountLabel();
-			self.refreshStudentStopAssignment();
 			self._studentLayer.visible = !!self._showAssignedStudents;
 			self._studentLayer.graphics.items.forEach(graphic =>
 			{
@@ -1867,61 +1771,6 @@
 			return graphic.attributes && graphic.attributes.Id == tripStop.id;
 		});
 		self._pointArrowLayer.removeMany(graphics);
-	};
-
-	RoutingTripMapTool.prototype.onStopBoundaryShowChange = function(model, visible)
-	{
-		this._showStopBoundary = visible;
-		this._polygonLayer.graphics.items.forEach(graphic =>
-		{
-			if (graphic && graphic.attributes.type && graphic.attributes.type === "boundary")
-			{
-				graphic.visible = visible;
-			}
-		});
-		this.refreshStudentStopAssignment();
-	};
-
-	RoutingTripMapTool.prototype.drawStudentStopAssignment = function(students, stop, trip)
-	{
-		if (!stop || !stop.geometry || !this._showAssignedStudents || this._showStopBoundary)
-		{
-			return;
-		}
-		var graphics = students.filter(x => x.geometry && x.geometry.x != 0).map(student =>
-		{
-			var graphic = this.createPathGraphic([[[student.geometry.x, student.geometry.y], [stop.geometry.x, stop.geometry.y]]], trip);
-			graphic.attributes = {
-				type: "StudentStopAssignment",
-				studentRequirementId: student.RequirementID,
-				tripStopId: stop.id,
-				studentId: student.id,
-				FieldTripId: trip.id
-			};
-			graphic.symbol.width = 2;
-			return graphic;
-		});
-
-		this._studentStopAssignmentLayer.addMany(graphics);
-	};
-
-	RoutingTripMapTool.prototype.refreshStudentStopAssignment = function()
-	{
-		this._studentStopAssignmentLayer.removeAll();
-		var isVisible = !this._showStopBoundary;
-		if (isVisible)
-		{
-			this.dataModel.trips.forEach((trip) =>
-			{
-				trip.FieldTripStops.forEach((tripStop) =>
-				{
-					this.drawStudentStopAssignment(tripStop.Students, tripStop, trip);
-				});
-			});
-		} else
-		{
-			this._studentStopAssignmentLayer.removeAll();
-		}
 	};
 
 	RoutingTripMapTool.prototype.dispose = function()

@@ -22,7 +22,6 @@
 		self.eventsManager = new TF.RoutingMap.RoutingPalette.RoutingEventsManager(self, routeState);
 		self.display = new TF.RoutingMap.RoutingPalette.RoutingDisplay(self);
 		self.editFieldTripStopModal = new TF.RoutingMap.RoutingPalette.RoutingFieldTripStopEditModal(self);
-		// self.editStudentModal = new TF.RoutingMap.RoutingPalette.RoutingStudentEditModal(self);
 		self.dataModel.onChangeTripVisibilityEvent.subscribe(this.onChangeTripVisibilityEvent.bind(this));
 		self.drawTool = null;
 		self.editTool = null;

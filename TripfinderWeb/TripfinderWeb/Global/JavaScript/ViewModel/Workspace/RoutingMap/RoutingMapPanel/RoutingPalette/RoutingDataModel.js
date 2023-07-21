@@ -30,7 +30,6 @@
 		self.onTripStopsChangeEvent = new TF.Events.Event();
 		self.onChangeTripVisibilityEvent = new TF.Events.Event();
 		self.onSettingChangeEvent = new TF.Events.Event();
-		self.onAssignStudentsChangeEvent = new TF.Events.Event();
 		self.onTripSequenceChangeEvent = new TF.Events.Event();
 		self.onAssignStudentsChangeToMapEvent = new TF.Events.Event();
 		self.onCandidatesStudentsChangeToMapEvent = new TF.Events.PromiseEvent();
@@ -74,9 +73,6 @@
 		self.geoLinkTool = new TF.RoutingMap.RoutingPalette.GeoLinkTool(self.fieldTripStopDataModel);
 		this.needUpdateTrip = ko.observable(true);
 		this.needUpdateTripColor = ko.observable(false);
-
-		// toggle stop boundary
-		self.onStopBoundaryShowChange = new TF.Events.Event();
 	}
 
 	RoutingDataModel.weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -3752,7 +3748,6 @@
 		this.onTripsChangeEvent.unsubscribeAll();
 		this.tripEditBroadcast.dispose();
 		this.onCandidatesStudentsChangeToMapEvent.unsubscribeAll();
-		this.onAssignStudentsChangeEvent.unsubscribeAll();
 		this.onAssignStudentsChangeToMapEvent.unsubscribeAll();
 		this.onTripColorChangeEvent.unsubscribeAll();
 		this.onChangeTripVisibilityEvent.unsubscribeAll();

@@ -769,7 +769,6 @@
 						changedStudents = changedStudents.concat(stop.Students);
 					});
 					self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
-					self.viewModel.drawTool.onAssignStudentsChangeEvent(null, { add: [], edit: changedStudents, delete: [] });
 					self.viewModel.drawTool.redrawPath(trip);
 					return edits;
 				})
@@ -794,7 +793,6 @@
 					changedStudents = changedStudents.concat(stop.Students);
 				});
 				self.viewModel.drawTool.onTripStopsChangeEvent(null, { add: [], edit: edits, delete: [] });
-				self.viewModel.drawTool.onAssignStudentsChangeEvent(null, { add: [], edit: changedStudents, delete: [] });
 				self.viewModel.drawTool.redrawPath(trip);
 				return edits;
 			});

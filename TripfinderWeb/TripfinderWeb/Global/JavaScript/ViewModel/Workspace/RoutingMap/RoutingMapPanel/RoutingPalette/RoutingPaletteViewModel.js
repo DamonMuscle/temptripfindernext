@@ -20,7 +20,7 @@
 		self.dataModel = self.tripViewModel.dataModel;
 		self.stopPoolViewModel = new TF.RoutingMap.RoutingPalette.StopPoolViewModel(self);
 		self.trialStopViewModel = new TF.RoutingMap.RoutingPalette.TrialStopViewModel(self);
-		self.childViewModels =[self.tripViewModel]; // [self.stopPoolViewModel, self.tripViewModel, self.trialStopViewModel];
+		self.childViewModels =[self.tripViewModel];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
