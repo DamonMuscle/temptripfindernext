@@ -709,16 +709,19 @@
 
 		if (fieldTrip)
 		{
-			const color = fieldTrip.color,
-				fieldTripStops = self._getStopFeatures(),
-				features = fieldTripStops.filter(item =>
-					item.attributes.DBID === fieldTrip.DBID &&
-					item.attributes.FieldTripId === fieldTrip.id),
-				currentStopFeature = features.find(item => item.attributes.Color !== fieldTrip.color);
-
-			if (currentStopFeature)
+			const fieldTripStops = self._getStopFeatures(),
+				highlightStopFeature = fieldTripStops.find(item => item.attributes.Color === INFO_STOP_COLOR);
+			if (highlightStopFeature)
 			{
-				self.fieldTripStopLayerInstance.updateColor([currentStopFeature], color);
+				const fieldTripId = highlightStopFeature.attributes.FieldTripId,
+					fieldTripPaths = self._getPathFeatures(),
+					highlightPathFeature = fieldTripPaths.find(item => item.attributes.FieldTripId === fieldTripId);
+
+				if (highlightPathFeature)
+				{
+					const color = highlightPathFeature.attributes.Color;
+					self.fieldTripStopLayerInstance.updateColor([highlightStopFeature], color);
+				}
 			}
 		}
 	}
