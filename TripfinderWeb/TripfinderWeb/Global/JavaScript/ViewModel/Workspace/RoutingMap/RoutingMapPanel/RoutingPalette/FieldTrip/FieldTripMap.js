@@ -1269,30 +1269,43 @@
 		}
 	}
 
-	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTripStops, needErrorHandler = false)
+	FieldTripMap.prototype._computeRouteStop = function(fieldTripStops)
 	{
-		const networkService = TF.GIS.Analysis.getInstance().networkService,
-		stops = [], MIN_ROUTING_STOPS = 2;
+		const stops = [];
 
 		for (let i = 0; i < fieldTripStops.length; i++)
 		{
 			const stop = fieldTripStops[i];
-			const stopObject = {
+			const routeStop = {
 				curbApproach: stop.vehicleCurbApproach,
 				name: stop.Sequence,
 				sequence: stop.Sequence,
 				longitude: stop.XCoord,
 				latitude: stop.YCoord,
 			};
-			stops.push(stopObject);
+			stops.push(routeStop);
 		}
 
-		if (stops.length < MIN_ROUTING_STOPS)
+		return stops;
+	}
+
+	FieldTripMap.prototype._isValidRouteStops = function(routeStops)
+	{
+		const MIN_ROUTING_STOPS = 2;
+		return MIN_ROUTING_STOPS <= routeStops.length;
+	}
+
+	FieldTripMap.prototype.calculateRouteByStops = async function(fieldTripStops, needErrorHandler = false)
+	{
+		const networkService = TF.GIS.Analysis.getInstance().networkService,
+			routeStops = this._computeRouteStop(fieldTripStops);
+
+		if (!this._isValidRouteStops(routeStops))
 		{
 			return null;
 		}
 
-		const stopFeatureSet = await networkService.createStopFeatureSet(stops);
+		const stopFeatureSet = await networkService.createStopFeatureSet(routeStops);
 		const params = {
 			impedanceAttribute: null,
 			stops: stopFeatureSet,
