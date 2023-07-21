@@ -1315,11 +1315,7 @@
 		{
 			try
 			{
-				const response = await networkService.solveRoute(params);
-				const result = response?.results?.routeResults[0];
-		
-				this._swapAttributeForStop(fieldTripStops, result);
-
+				const result = await this._computeRouteResult(fieldTripStops, params);
 				return result;
 			}
 			catch(ex)
@@ -1329,13 +1325,21 @@
 		}
 		else
 		{
-			const response = await networkService.solveRoute(params);
-			const result = response?.results?.routeResults[0];
-	
-			this._swapAttributeForStop(fieldTripStops, result);
-
+			const result = await this._computeRouteResult(fieldTripStops, params);
 			return result;
 		}
+	}
+
+	FieldTripMap.prototype._computeRouteResult = async function(fieldTripStops, routeParameters)
+	{
+		const networkService = TF.GIS.Analysis.getInstance().networkService;
+
+		const response = await networkService.solveRoute(routeParameters);
+		const result = response?.results?.routeResults[0];
+
+		this._swapAttributeForStop(fieldTripStops, result);
+
+		return result;
 	}
 
 	FieldTripMap.prototype.calculateRouteErrorHandler = async function(ex, fieldTripStops)
