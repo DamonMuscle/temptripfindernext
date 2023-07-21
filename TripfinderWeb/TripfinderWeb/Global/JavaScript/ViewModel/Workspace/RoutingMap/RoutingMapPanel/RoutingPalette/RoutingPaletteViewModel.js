@@ -308,36 +308,17 @@
 	{
 		const trip = this.dataModel.getTripById(data.fieldTrip.Id);
 
-		if (!data.fieldTrip.directions)
-		{
-			return;
-		}
+		data.fieldTrip.directions?.forEach(directions => {
+			this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);
+		});
 
-		data.fieldTrip.directions.forEach(directions => {
-			const updateStops = this.dataModel.recalculateStopTime(directions, data.fieldTrip.FieldTripStops);
-
-			const startStop = updateStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val, { Sequence: -1});
-			const endStop = updateStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val, { Sequence: -1});
-
-			trip.FieldTripStops.forEach((stop) => {
-				const updateStop = updateStops.find(updatedStop => updatedStop.Sequence == stop.Sequence);
-
-				if (updateStop)
-				{
-					stop.Travel = updateStop.Travel;
-					stop.Distance = updateStop.Distance;
-					stop.Speed = updateStop.Speed;
-					stop.Duration = updateStop.Duration;
-				}
-				else if (stop.Sequence == startStop.Sequence - 1 || stop.Sequence == endStop.Sequence + 1)
-				{
-					stop.Travel = "00:00:00";
-					stop.Distance = 0;
-					stop.Speed = 0;
-					stop.Duration = "00:00:00";
-				}
-
-			})
+		trip.FieldTripStops.forEach((stop) => {
+			if (stop._geoPath == null)
+			{
+				stop.Travel = "00:00:00";
+				stop.Distance = 0;
+				stop.Speed = 0;
+			}
 		});
 
 
