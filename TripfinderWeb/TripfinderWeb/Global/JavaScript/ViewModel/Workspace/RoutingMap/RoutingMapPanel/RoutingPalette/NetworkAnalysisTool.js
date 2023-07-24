@@ -54,7 +54,7 @@
 		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
 		return self.stopTool.attachClosetStreetToStop(trip.FieldTripStops.concat(tripStop).filter(function(stop) { return !stop.StreetSegment })).then(function()
 		{
-			//var routeParameters = self._getRouteParameters(self.initRouteParameters(), tripStop.TripId);
+			//var routeParameters = self._getRouteParameters(self.initRouteParameters(), tripStop.FieldTripId);
 			switch (type)
 			{
 				case "new":
@@ -161,7 +161,7 @@
 	NetworkAnalysisTool.prototype._getBeforeStop = function(tripStop)
 	{
 		var self = this,
-			trip = self.dataModel.getTripById(tripStop.TripId),
+			trip = self.dataModel.getTripById(tripStop.FieldTripId),
 			beforeStops = trip.FieldTripStops.filter(s => s.Sequence < tripStop.Sequence);
 		return beforeStops[beforeStops.length - 1];
 	}
@@ -169,7 +169,7 @@
 	NetworkAnalysisTool.prototype._getAfterStop = function(tripStop)
 	{
 		var self = this,
-			trip = self.dataModel.getTripById(tripStop.TripId),
+			trip = self.dataModel.getTripById(tripStop.FieldTripId),
 			afterStops = trip.FieldTripStops.filter(s => s.Sequence >= tripStop.Sequence && s.id != (tripStop.id || tripStop.Id));
 		return afterStops[0];
 	}
@@ -177,7 +177,7 @@
 	NetworkAnalysisTool.prototype._recalculateTripMove = function(tripStop, isCurbApproachChange)
 	{
 		var self = this;
-		var trip = self.dataModel.getTripById(tripStop.TripId);
+		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
 		var stops = [];
 		if (tripStop.Sequence != 1)
 		{
@@ -250,7 +250,7 @@
 
 	NetworkAnalysisTool.prototype.calculateSmartSequence = function(newTripStop)
 	{
-		var trip = this.dataModel.getTripById(newTripStop.TripId),
+		var trip = this.dataModel.getTripById(newTripStop.FieldTripId),
 			promises = [], vertexPromises = [], allStopsList = [],
 			tripStops = trip.FieldTripStops.sort((a, b) => a.Sequence - b.Sequence).filter(s => s.id != newTripStop.id);
 		function getStopGeometry(tripStop)
@@ -436,7 +436,7 @@
 
 	NetworkAnalysisTool.prototype._recalculateTripSmart = function(newTripStop)
 	{
-		var trip = this.dataModel.getTripById(newTripStop.TripId);
+		var trip = this.dataModel.getTripById(newTripStop.FieldTripId);
 		return this.calculateSmartSequence(newTripStop).then(res =>
 		{
 			this.drawTool._clearTempDrawing();
@@ -546,7 +546,7 @@
 	NetworkAnalysisTool.prototype._recalculateTripDelete = function(tripStop)
 	{
 		var self = this;
-		var trip = self.dataModel.getTripById(tripStop.TripId);
+		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
 
 		var _beforeStop = self._getBeforeStop(tripStop);
 		if (!_beforeStop)
@@ -572,7 +572,7 @@
 		var vertexPromise = self._getVertexesCloseToStopOnPath(_beforeStop, _afterStop)
 		var urlPromise = tf.startup.loadArcgisUrls();
 		var routeParameters = self.initRouteParameters();
-		var routeBarriersPromise = self._getRouteParameters(routeParameters, tripStop.TripId);
+		var routeBarriersPromise = self._getRouteParameters(routeParameters, tripStop.FieldTripId);
 		return Promise.all([vertexPromise, routeBarriersPromise, urlPromise]).then(function(result)
 		{
 			var vertexes = result[0];
@@ -656,7 +656,7 @@
 	{
 		var self = this, vertexes = [null, null];
 		if (!beforeStop && !afterStop) return [null, null];
-		var tripId = beforeStop ? beforeStop.TripId : afterStop.TripId;
+		var tripId = beforeStop ? beforeStop.FieldTripId : afterStop.FieldTripId;
 		var trip = self.dataModel.getTripById(tripId);
 
 		vertexes[0] = getPrevVertex();
@@ -786,7 +786,7 @@
 	{
 		var self = this;
 		var results = [];
-		var trip = self.dataModel.getTripById(newStop.TripId);
+		var trip = self.dataModel.getTripById(newStop.FieldTripId);
 		if (pathSegments.length == 0)
 		{
 			pathSegments.push({
@@ -827,7 +827,7 @@
 					id: TF.createId(),
 					OBJECTID: 0,
 					type: "tripPath",
-					TripId: newStop.TripId,
+					TripId: newStop.FieldTripId,
 					TripStopId: newStop.id,
 					geometry: parseFloat(pathSegments[pathSegments.length - 1].length) && pathSegments[pathSegments.length - 1].geometry ? pathSegments[pathSegments.length - 1].geometry : new self._arcgis.Polyline(self._map.mapView.spatialReference).addPath([])
 				};
@@ -872,7 +872,7 @@
 				promise = self._getVertexesCloseToStopOnPath(tripStops[0], tripStops[1]);
 			}
 			var routeParameters = self.initRouteParameters();
-			var routeParamPromise = self._getRouteParameters(routeParameters, tripStops[0].TripId, newTrip);
+			var routeParamPromise = self._getRouteParameters(routeParameters, tripStops[0].FieldTripId, newTrip);
 			return Promise.all([promise, routeParamPromise]).then(function(res)
 			{
 				var vertexes = res[0];
@@ -892,7 +892,7 @@
 				routeParameters.restrictUTurns = self.drawTool._uTurnPolicy ? self.drawTool._uTurnPolicy : self.stopTool._getUturnPolicy(tf.storageManager.get("uTurnPolicyRouting"));
 				routeParameters.ignoreInvalidLocations = false;
 				routeParameters.findBestSequence = isBestSequence ? true : false;
-				// = self._getRouteParameters(routeParameters, tripStops[0].TripId, newTrip);
+				// = self._getRouteParameters(routeParameters, tripStops[0].FieldTripId, newTrip);
 
 				return self.solve(routeParameters).then(function(result)
 				{
@@ -1283,7 +1283,7 @@
 	{
 		if (!trip && stops.length > 0 && this.dataModel.trips)
 		{
-			trip = this.dataModel.trips.find(t => t.id === stops[0].TripId)
+			trip = this.dataModel.trips.find(t => t.id === stops[0].FieldTripId)
 		}
 
 		if (stops.length > 0 &&
@@ -1396,7 +1396,7 @@
 		{
 			return stop.Sequence == allStops.length;
 		}
-		if (self.dataModel.getTripById(stop.TripId) && self.dataModel.getTripById(stop.TripId).FieldTripStops.length == stop.Sequence)
+		if (self.dataModel.getTripById(stop.FieldTripId) && self.dataModel.getTripById(stop.FieldTripId).FieldTripStops.length == stop.Sequence)
 			return true;
 		return false;
 	};
@@ -1409,7 +1409,7 @@
 		{
 			if (!trip)
 			{
-				trip = self.drawTool.dataModel.getTripById(tripStop.TripId);
+				trip = self.drawTool.dataModel.getTripById(tripStop.FieldTripId);
 			}
 			var _stop = tripStop.Sequence == 1 ? trip.FieldTripStops[0] : trip.FieldTripStops[tripStop.Sequence - 2];
 			if (_stop && _stop.path && _stop.path.geometry && self._arcgis.geometryEngine.simplify(_stop.path.geometry)
@@ -1600,7 +1600,7 @@
 			tf.loadingIndicator.tryHide();
 			if (res.filter(function(r) { return !r.err }).length == 0)
 			{
-				tripStop.TripId = res[0].insertTrip.id;
+				tripStop.FieldTripId = res[0].insertTrip.id;
 				tripStop.Sequence = TF.Helper.TripHelper.getTripStopInsertSequence(res[0].insertTrip.FieldTripStops, res[0].insertTrip.Session);
 				return Promise.resolve(tripStop);
 			}
@@ -1608,7 +1608,7 @@
 			{
 				return a.distanceAdded - b.distanceAdded
 			});
-			tripStop.TripId = res[0].insertTrip.id;
+			tripStop.FieldTripId = res[0].insertTrip.id;
 			tripStop.Sequence = res[0].insertIndex + 1;
 			return Promise.resolve(tripStop);
 		})
