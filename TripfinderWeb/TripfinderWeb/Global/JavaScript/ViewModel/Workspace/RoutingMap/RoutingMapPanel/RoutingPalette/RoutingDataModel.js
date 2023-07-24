@@ -82,7 +82,7 @@
 	RoutingDataModel.prototype.init = function()
 	{
 		var self = this;
-		this.tripEditBroadcast.init();
+		// this.tripEditBroadcast.init();
 		// self.subscribeStreetChange();
 		this._viewModal.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
 
