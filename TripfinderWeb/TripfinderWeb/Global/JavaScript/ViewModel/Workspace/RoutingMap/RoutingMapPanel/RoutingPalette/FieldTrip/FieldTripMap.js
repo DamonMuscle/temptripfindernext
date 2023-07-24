@@ -17,6 +17,8 @@
 	const RoutingPalette_FieldTripSequenceLineLayer_Index = 5;
 	const RoutingPalette_FieldTripStopLayerId = "RoutingPalette_FieldTrip_StopLayer";
 	const RoutingPalette_FieldTripStopLayer_Index = 6;
+	const RoutingPalette_FieldTripHighlightStopLayerId = "RoutingPalette_FieldTrip_HighlightStopLayer";
+	const RoutingPalette_FieldTripHighlightStopLayer_Index = 8;
 
 	const PATH_LINE_TYPE = {
 		Path: "Path",
@@ -88,7 +90,7 @@
 	{
 		const self = this;
 
-		const totalLayerCount = 4;
+		const totalLayerCount = 5;
 		let layerCount = 0;
 		const onLayerCreatedHandler = (resolve) => {
 			layerCount++;
@@ -142,6 +144,13 @@
 			});
 			addFieldTripMapLayer(self.fieldTripHighlightLayerInstance, resolve);
 			self.defineReadOnlyProperty("fieldTripHighlightLayerInstance", self.fieldTripHighlightLayerInstance);
+
+			self.fieldTripHighlightStopLayerInstance = new TF.GIS.Layer.StopLayer({
+				id: RoutingPalette_FieldTripHighlightStopLayerId,
+				index: RoutingPalette_FieldTripHighlightStopLayer_Index
+			});
+			addFieldTripMapLayer(self.fieldTripHighlightStopLayerInstance, resolve);
+			self.defineReadOnlyProperty("fieldTripHighlightStopLayerInstance", self.fieldTripHighlightStopLayerInstance);
 		});
 	}
 
@@ -248,6 +257,9 @@
 	{
 		const fieldTripHighlightFeatures = this._getHighlightFeatures();
 		this._setFieldTripLayerVisibility(fieldTrips, this.fieldTripHighlightLayerInstance, fieldTripHighlightFeatures);
+
+		const fieldTripHighlightStopFeatures = this._getHighlightStopFeatures();
+		this._setFieldTripLayerVisibility(fieldTrips, this.fieldTripHighlightStopLayerInstance, fieldTripHighlightStopFeatures);
 	}
 
 	FieldTripMap.prototype._setFieldTripLayerVisibility = function(fieldTrips, layerInstance, layerFeatures, precondition = null)
@@ -351,9 +363,7 @@
 			fieldTripHighlightFeatures = this._getHighlightFeatures();
 
 		const fieldTripStops = this._queryMapFeatures(stopFeatures, DBID, FieldTripId);
-		// prevent update info stop symbol.
-		const stops = fieldTripStops.filter(item => item.attributes.Color !== INFO_STOP_COLOR);
-		this.fieldTripStopLayerInstance.updateColor(stops, color);
+		this.fieldTripStopLayerInstance.updateColor(fieldTripStops, color);
 
 		const fieldTripPaths = this._queryMapFeatures(pathFeatures, DBID, FieldTripId);
 		this.fieldTripPathLayerInstance.updateColor(fieldTripPaths, color);
@@ -703,13 +713,18 @@
 
 		self.fieldTripHighlightLayerInstance.addMany(highlightGraphics);
 
-		// update currentStop color
+		// add highlight currentStop
 		const fieldTripStops = self._getStopFeatures(),
 			features = fieldTripStops.filter(item =>
 				item.attributes.DBID === DBID &&
 				item.attributes.FieldTripId === FieldTripId),
-			currentStopFeature = features.find(item => item.attributes.Sequence === currentStop.Sequence);
-		self.fieldTripStopLayerInstance.updateColor([currentStopFeature], INFO_STOP_COLOR);
+			currentStopFeature = features.find(item => item.attributes.Sequence === currentStop.Sequence),
+			attributes = { ...currentStopFeature.attributes },
+			{ longitude, latitude } = currentStopFeature.geometry;
+
+		attributes.Color = INFO_STOP_COLOR;
+		const highlightStopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes);
+		self.fieldTripHighlightStopLayerInstance.addStops([highlightStopGraphic]);
 	}
 
 	FieldTripMap.prototype.clearHighlightFeatures = async function(fieldTrip = null)
@@ -722,23 +737,7 @@
 
 		await self.fieldTripHighlightLayerInstance.clearLayer();
 
-		if (fieldTrip)
-		{
-			const fieldTripStops = self._getStopFeatures(),
-				highlightStopFeature = fieldTripStops.find(item => item.attributes.Color === INFO_STOP_COLOR);
-			if (highlightStopFeature)
-			{
-				const fieldTripId = highlightStopFeature.attributes.FieldTripId,
-					fieldTripPaths = self._getPathFeatures(),
-					highlightPathFeature = fieldTripPaths.find(item => item.attributes.FieldTripId === fieldTripId);
-
-				if (highlightPathFeature)
-				{
-					const color = highlightPathFeature.attributes.Color;
-					self.fieldTripStopLayerInstance.updateColor([highlightStopFeature], color);
-				}
-			}
-		}
+		await self.fieldTripHighlightStopLayerInstance.clearLayer();
 	}
 
 	//#endregion
@@ -1559,6 +1558,11 @@
 		return this.fieldTripHighlightLayerInstance?.getFeatures();
 	}
 
+	FieldTripMap.prototype._getHighlightStopFeatures = function()
+	{
+		return this.fieldTripHighlightStopLayerInstance?.getFeatures();
+	}
+
 	FieldTripMap.prototype._getPathArrowFeatures = async function(condition = '1 = 1')
 	{
 		const queryResult = await this.fieldTripPathArrowLayerInstance?.queryFeatures(null, condition);
@@ -1653,6 +1657,9 @@
 
 			self.mapInstance.removeLayer(RoutingPalette_FieldTripHighlightLayerId);
 			self.fieldTripHighlightLayerInstance = null;
+
+			self.mapInstance.removeLayer(RoutingPalette_FieldTripHighlightStopLayerId);
+			self.fieldTripHighlightStopLayerInstance = null;
 		}
 
 		if (self.fieldTripPathArrowLayerInstance && self.fieldTripSequenceLineArrowLayerInstance)
