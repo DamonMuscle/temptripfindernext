@@ -266,6 +266,17 @@
 	{
 		var self = this;
 		var treeView = self.viewModel.$element.find("#routingtreeview").data('kendoTreeView');
+
+		// set suspend attribute to false if its true to ensure the collapse method works
+		self.viewModel.$element.find("#routingtreeview .k-item").each((index,element) => {
+			var isSuspend = $(element).attr('suspend');
+
+			if(isSuspend == 'true')
+			{
+				$(element).attr('suspend', false);
+			}
+		});
+
 		treeView.collapse(".k-item");
 	};
 
