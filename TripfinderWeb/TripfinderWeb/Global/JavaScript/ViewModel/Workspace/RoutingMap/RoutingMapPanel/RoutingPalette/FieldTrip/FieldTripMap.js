@@ -1024,7 +1024,7 @@
 			await self.fieldTripPathArrowLayerInstance.layer.applyEdits(edits);
 		}
 
-		self.fieldTripPathArrowLayerInstance.layer.refresh();
+		// self.fieldTripPathArrowLayerInstance.layer.refresh();
 	}
 
 	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = async function(fieldTrips)
@@ -1048,7 +1048,7 @@
 			await self.fieldTripSequenceLineArrowLayerInstance.layer.applyEdits(edits);
 		}
 
-		self.fieldTripSequenceLineArrowLayerInstance.layer.refresh();
+		// self.fieldTripSequenceLineArrowLayerInstance.layer.refresh();
 	}
 
 	FieldTripMap.prototype._computeUpdateArrow = function(fieldTrip, baseArrowFeatures, updateColor)
