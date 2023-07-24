@@ -1,4 +1,4 @@
-﻿(function()
+﻿(function ()
 {
 	createNamespace("TF").AuthManager = AuthManager;
 
@@ -19,7 +19,7 @@
 		form: "formsResults"
 	}
 
-	
+
 	/**
 	 * Restore userName, password and rememberMe from cookie to local storage, so that we can retain previous behavior.
 	 * 
@@ -85,7 +85,7 @@
 		this.obIsLogIn = ko.observable(this.getLoginStatus());
 	}
 
-	AuthManager.prototype.getLoginStatus = function()
+	AuthManager.prototype.getLoginStatus = function ()
 	{
 		const isLoggedInStorage = tf.entStorageManager.get("isLoggedin");
 		const potentialClientKey = (location.hostname.split(".")[0] || "").trim().toLowerCase();
@@ -95,38 +95,38 @@
 		return !isVanityUrl ? isLogged : (isLogged && potentialClientKey === (this.clientKey || "").toLowerCase());
 	};
 
-	AuthManager.prototype.logOff = function()
+	AuthManager.prototype.logOff = function ()
 	{
 		var self = this,
 			prefix = tf.storageManager.prefix;
 		prefix = prefix.split('.')[0];
 
 		var password = tf.entStorageManager.get("password");
-		return this.logOffWithoutRefresh().then(function()
+		return this.logOffWithoutRefresh().then(function ()
+		{
+			return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
+				data: {
+					Prefix: prefix,
+					UserName: tf.authManager.userName,
+					Password: password
+				}
+			}).then(function ()
 			{
-				return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
-					data: {
-						Prefix: prefix,
-						UserName: tf.authManager.userName,
-						Password: password
-					}
-				}).then(function()
+				if (self.token === tf.entStorageManager.get("token"))
 				{
-					if (self.token === tf.entStorageManager.get("token"))
-					{
-						tf.entStorageManager.save("token", "");
-					}
+					tf.entStorageManager.save("token", "");
+				}
 
-					tf.chatfinderHelper && tf.chatfinderHelper.stop();
-				});
+				tf.chatfinderHelper && tf.chatfinderHelper.stop();
 			});
+		});
 	};
 
-	AuthManager.prototype.logOffWithoutRefresh = function()
+	AuthManager.prototype.logOffWithoutRefresh = function ()
 	{
 		this.logOffTag = true;
 		return this.beforeLogOff.notify()
-			.then(function(results)
+			.then(function (results)
 			{
 				tf.entStorageManager.save("isLoggedin", false);
 				if (tf.cfConnection) 
@@ -136,9 +136,9 @@
 			})
 	};
 
-	AuthManager.prototype.isAuthorizedForDataType = function(dataType, right)
+	AuthManager.prototype.isAuthorizedForDataType = function (dataType, right)
 	{
-		if (dataType == "fieldtrip")
+		if (dataType == "fieldtrip" || dataType == "fieldtripinvoice")
 		{
 			return tf.helpers.fieldTripAuthHelper.isAuthorizedFor(right);
 		}
@@ -146,7 +146,7 @@
 		return this.authorizationInfo.isAuthorizedFor.call(this.authorizationInfo, securedItemDataMap[dataType], right);
 	};
 
-	AuthManager.prototype.auth = function(loginViewModal)
+	AuthManager.prototype.auth = function (loginViewModal)
 	{
 		let self = this;
 		var prefix = tf.storageManager.prefix;
@@ -165,12 +165,12 @@
 					noInterupt: true
 				},
 				overlay: false
-			}).then(function()
+			}).then(function ()
 			{
 				if (self.clientKey !== "support")
 				{
 					return tf.datasourceManager.validateAllDBs()
-						.then(function(valResult)
+						.then(function (valResult)
 						{
 							if (!valResult.Items[0].AnyDatabasePass)
 							{
@@ -181,7 +181,7 @@
 				}
 				return Promise.resolve(true);
 			})
-				.catch(function()
+				.catch(function ()
 				{
 					return Promise.resolve(false);
 				})
@@ -190,7 +190,7 @@
 		{
 			p = self._loginUseModal(loginViewModal);
 		}
-		return p.then(function(result)
+		return p.then(function (result)
 		{
 			if (result === false)
 			{
@@ -209,54 +209,54 @@
 					noInterupt: true
 				}
 			})
-			.then(function(apiResponse)
-			{
-				self.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
-				tf.userEntity = apiResponse.Items[0].UserEntity;
-				return tf.authManager.getPurchasedProducts()
-					.then(function(purchasedProducts)
-					{
-						if (!purchasedProducts.find(x => x.Name == 'Tripfinder'))
-						{
-							return self._loginUseModal(loginViewModal);
-						}
-
-						var ft1 = self.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
-						var ft2 = self.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
-						var ft3 = self.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
-						var ft4 = self.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
-						var ft5 = self.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
-						var ft = ft1 || ft2 || ft3 || ft4 || ft5;
-
-						var flt = self.authorizationInfo.isAuthorizedFor("filters", "read");
-
-						var pfiledtrip = self.authorizationInfo.isAuthorizedFor("filedtrip", "read");
-
-						if (!(ft || pfiledtrip))
-						{
-							return self._loginUseModal(loginViewModal);
-						}
-
-						tf.entStorageManager.save("isLoggedin", true);
-						self.obIsLogIn(true);
-					});
-
-			})
-			.catch(function(apiResponse)
-			{
-				if (apiResponse.StatusCode == 401)
+				.then(function (apiResponse)
 				{
-					return self._loginUseModal(loginViewModal, "Have no permission to this product");
-				}
-			})
-			.finally(function()
-			{
-				tf.loadingIndicator.hideByName("authorizing");
-			});
+					self.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
+					tf.userEntity = apiResponse.Items[0].UserEntity;
+					return tf.authManager.getPurchasedProducts()
+						.then(function (purchasedProducts)
+						{
+							if (!purchasedProducts.find(x => x.Name == 'Tripfinder'))
+							{
+								return self._loginUseModal(loginViewModal);
+							}
+
+							var ft1 = self.authorizationInfo.isAuthorizedFor("level1Requestor", "read");
+							var ft2 = self.authorizationInfo.isAuthorizedFor("level2Administrator", "read");
+							var ft3 = self.authorizationInfo.isAuthorizedFor("level3Administrator", "read");
+							var ft4 = self.authorizationInfo.isAuthorizedFor("level4Administrator", "read");
+							var ft5 = self.authorizationInfo.isAuthorizedFor("transportationAdministrator", "read");
+							var ft = ft1 || ft2 || ft3 || ft4 || ft5;
+
+							var flt = self.authorizationInfo.isAuthorizedFor("filters", "read");
+
+							var pfiledtrip = self.authorizationInfo.isAuthorizedFor("filedtrip", "read");
+
+							if (!(ft || pfiledtrip))
+							{
+								return self._loginUseModal(loginViewModal);
+							}
+
+							tf.entStorageManager.save("isLoggedin", true);
+							self.obIsLogIn(true);
+						});
+
+				})
+				.catch(function (apiResponse)
+				{
+					if (apiResponse.StatusCode == 401)
+					{
+						return self._loginUseModal(loginViewModal, "Have no permission to this product");
+					}
+				})
+				.finally(function ()
+				{
+					tf.loadingIndicator.hideByName("authorizing");
+				});
 		});
 	};
 
-	AuthManager.prototype._loginUseModal = function(loginViewModal, message)
+	AuthManager.prototype._loginUseModal = function (loginViewModal, message)
 	{
 		var self = this;
 		var loginViewModal = loginViewModal || new TF.Modal.LoginModalViewModel(this.clientKey);
@@ -267,7 +267,7 @@
 		}
 		tf.loadingIndicator.hideByName("authorizing");
 		return tf.modalManager.showModal(loginViewModal)
-			.then(function(result)
+			.then(function (result)
 			{
 				this.clientKey = result.clientKey;
 				this.userName = result.username;
@@ -289,19 +289,19 @@
 	};
 
 
-	AuthManager.prototype.isAuthorizedFor = function()
+	AuthManager.prototype.isAuthorizedFor = function ()
 	{
 		return this.authorizationInfo.isAuthorizedFor.apply(this.authorizationInfo, arguments);
 	};
 
-	AuthManager.prototype.authorizationUrl = function()
+	AuthManager.prototype.authorizationUrl = function ()
 	{
 		// TODO-V2, need to research
 		Array.prototype.unshift.call(arguments, tf.api.apiPrefix());
 		return pathCombine.apply(null, arguments);
 	};
 
-	AuthManager.prototype.hasMergeDocumentAccess = function(type)
+	AuthManager.prototype.hasMergeDocumentAccess = function (type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
 		if (authInfo.isAdmin)
@@ -318,7 +318,7 @@
 		return false;
 	}
 
-	AuthManager.prototype.hasMergeEmailMessageAccess = function(type)
+	AuthManager.prototype.hasMergeEmailMessageAccess = function (type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
 		if (authInfo.isAdmin)
@@ -335,7 +335,7 @@
 		return false;
 	}
 
-		AuthManager.prototype.hasScheduledMergeDocumentAccess = function(type)
+	AuthManager.prototype.hasScheduledMergeDocumentAccess = function (type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
 		if (authInfo.isAdmin)
@@ -352,7 +352,7 @@
 		return false;
 	}
 
-	AuthManager.prototype.hasScheduledReportsAccess = function(type)
+	AuthManager.prototype.hasScheduledReportsAccess = function (type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
 		if (authInfo.isAdmin)
@@ -369,7 +369,7 @@
 		return false;
 	}
 
-	AuthManager.prototype.hasMergeLibraryAccess = function(type)
+	AuthManager.prototype.hasMergeLibraryAccess = function (type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
 		if (authInfo.isAdmin)
@@ -388,14 +388,14 @@
 		return false;
 	}
 
-	AuthManager.prototype.updateInfo = function()
+	AuthManager.prototype.updateInfo = function ()
 	{
 		this.clientKey = tf.storageManager.get("clientKey", true);
 		this.userName = tf.storageManager.get("userName", true);
 		this.password = tf.storageManager.get("password", true);
 	};
 
-	AuthManager.prototype.hasFormsResultsAccess = function(type)
+	AuthManager.prototype.hasFormsResultsAccess = function (type)
 	{
 		const authInfo = tf.authManager.authorizationInfo;
 		if (authInfo.isAdmin)
@@ -413,7 +413,7 @@
 		return false;
 	}
 
-	AuthManager.prototype.updateAuthInfos = function()
+	AuthManager.prototype.updateAuthInfos = function ()
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "authinfos"), {
 			paramData: {
@@ -425,18 +425,18 @@
 				noInterupt: true
 			}
 		})
-			.then(function(apiResponse)
+			.then(function (apiResponse)
 			{
 				this.authorizationInfo = new AuthorizationInfo(apiResponse.Items[0]);
 				tf.userEntity = apiResponse.Items[0].UserEntity;
 			}.bind(this));
 	};
 
-	AuthManager.prototype.getPurchasedProducts = function()
+	AuthManager.prototype.getPurchasedProducts = function ()
 	{
 		var self = this;
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "vendoraccessinfo"))
-			.then(function(response)
+			.then(function (response)
 			{
 				self.supportedProducts = response.Items[0].ProductDetails || [];;
 				return self.supportedProducts;
@@ -451,12 +451,12 @@
 		this.onUpdateAuthorized = new TF.Events.Event();
 	}
 
-	AuthorizationInfo.prototype.checkOnlyLevel1 = function()
+	AuthorizationInfo.prototype.checkOnlyLevel1 = function ()
 	{
 		if (this.isAdmin || this.isFieldTripAdmin) return false;
 
 		var securedItems = this.authorizationTree.securedItems;
-		return !["level2Administrator", "level3Administrator", "level4Administrator"].some(function(item)
+		return !["level2Administrator", "level3Administrator", "level4Administrator"].some(function (item)
 		{
 			var securedItem = securedItems[item];
 			return securedItem && securedItem.length;
@@ -469,7 +469,7 @@
 	 * @param {object} authorizationInfoJson the newest authorization info.
 	 * @returns {void}
 	 */
-	AuthorizationInfo.prototype.updateAuthorized = function(authorizationInfoJson)
+	AuthorizationInfo.prototype.updateAuthorized = function (authorizationInfoJson)
 	{
 		this.isAdmin = authorizationInfoJson.IsAdmin;
 		this.authorizationTree = authorizationInfoJson.AuthorizationTree;
@@ -481,7 +481,7 @@
 		}
 	};
 
-	AuthorizationInfo.prototype.isAuthorizedFor = function()
+	AuthorizationInfo.prototype.isAuthorizedFor = function ()
 	{
 		if (this.isAdmin)
 		{
@@ -499,7 +499,7 @@
 			}
 
 			var ownedAllRights = true;
-			section1.forEach(function(right) 
+			section1.forEach(function (right) 
 			{
 				if (!Array.contain(securedItems[section0], right))
 				{

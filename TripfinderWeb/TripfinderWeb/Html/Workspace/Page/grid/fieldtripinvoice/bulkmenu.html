@@ -1,64 +1,14 @@
 ﻿<div style="margin:-5px;padding-top:5px;padding-bottom:5px">
 	<div class="tf-contextmenu-wrap bulkmenu-wrap" style="margin:5px;">
 		<ul class="tf-contextmenu grid-menu">
-			<!-- ko if:gridViewModel.changeStatusButton || gridViewModel.cancelButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemEditable()}">
-				<div class="menu-icon edit">
-				</div>
-				<div class="menu-label" data-bind="text: 'Edit ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-				</div>
-			</li>
-			<!-- /ko -->
-			<!-- ko if:gridViewModel.copyButton -->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyFieldTrip.bind(gridViewModel),css:{disabled:!gridViewModel.obCanCopyFieldTrip()}">
-				<div class="menu-icon copy">
-				</div>
-				<div class="menu-label" data-bind="text: 'Copy ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-				</div>
-			</li>
-			<!-- /ko -->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showDetails.bind(gridViewModel),css:{disabled:gridViewModel.obNoRecordsSelected}">
-				<div class="menu-icon showdetails">
-				</div>
-				<div class="menu-label">
-					Detail View
-					<span class="hotkey">Enter</span>
-				</div>
-			</li>
-			<li class="menu-divider">
-				<div class="rule"></div>
-			</li>
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.showHideColumns.bind(gridViewModel)">
 				<div class="menu-icon showhidecolumns">
 				</div>
 				<div class="menu-label" data-bind="text: 'Show/Hide Grid Columns'"></div>
 			</li>
-			<!-- ko if:gridViewModel.changeStatusButton||gridViewModel.cancelButton-->
 			<li class="menu-divider">
 				<div class="rule"></div>
 			</li>
-			<!-- ko if:gridViewModel.changeStatusButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.editFieldTripStatus.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
-				<div class="menu-icon approve">
-				</div>
-				<div class="menu-label" data-bind="text:tf.applicationTerm.getApplicationTermPluralByName('Change Status')">
-					<span class="hotkey"></span>
-				</div>
-			</li>
-			<!-- /ko -->
-			<!-- ko if:gridViewModel.cancelButton-->
-			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.cancelClick.bind(gridViewModel),css:{disabled:!gridViewModel.selectedItemsEditable()}">
-				<div class="menu-icon decline">
-				</div>
-				<div class="menu-label" data-bind="text:gridViewModel.selectedRecordIds.length>1? 'Cancel ' + tf.applicationTerm.getApplicationTermPluralByName('Trip'): 'Cancel ' + tf.applicationTerm.getApplicationTermSingularByName('Trip')">
-					<span class="hotkey"></span>
-				</div>
-			</li>
-			<!-- /ko -->
-			<li class="menu-divider">
-				<div class="rule"></div>
-			</li>
-			<!-- /ko -->
 			<li class="menu-item" data-bind="contextMenuClick:gridViewModel.copyToClipboardClick">
 				<div class="menu-icon copytoclipboard">
 				</div>
@@ -116,15 +66,16 @@
 					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.openSelectedClick.bind(gridViewModel)">
 						<div class="menu-icon">
 						</div>
-						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('Field Trips')"></div>
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip Invoice')">
+						</div>
 					</li>
 					<li class="menu-divider">
 						<div class="rule"></div>
 					</li>
-					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('fieldtripinvoice')">
+					<li class="menu-item" data-bind="contextMenuClick:gridViewModel.relatedClickGen('fieldtrip')">
 						<div class="menu-icon">
 						</div>
-						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip Invoice')">
+						<div class="menu-label" data-bind="text: tf.applicationTerm.getApplicationTermPluralByName('Field Trip')">
 						</div>
 					</li>
 				</ul>

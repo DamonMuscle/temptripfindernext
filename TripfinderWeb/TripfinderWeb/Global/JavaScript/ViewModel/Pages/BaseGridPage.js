@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").BaseGridPage = BaseGridPage;
 
@@ -34,7 +34,7 @@
 		self.sendToClick = self.sendToClick.bind(self);
 		self.sendEmailClick = self.sendEmailClick.bind(self);
 		self.viewReportClick = self.viewReportClick.bind(self);
-		self.obEmail = ko.computed(function()
+		self.obEmail = ko.computed(function ()
 		{
 			if (self.searchGridInited())
 			{
@@ -56,7 +56,7 @@
 
 	BaseGridPage.prototype.constructor = BaseGridPage;
 
-	BaseGridPage.prototype.init = function(model, element)
+	BaseGridPage.prototype.init = function (model, element)
 	{
 		var self = this;
 		self.$element = $(element);
@@ -65,10 +65,11 @@
 		{
 			self.updateOptions();
 		}
+		self.setRelatedFilterData();
 		self.createGrid(self.options);
 		self.initSearchGridCompute();
 		self.bindButtonEvent();
-		tf.pageManager.resizablePage.onSizeChanged.subscribe(function()
+		tf.pageManager.resizablePage.onSizeChanged.subscribe(function ()
 		{
 			if (self.detailView)
 			{
@@ -90,7 +91,7 @@
 		{
 			var canceling = false;
 
-			self.searchGrid.getSelectedIds.subscribe(function()
+			self.searchGrid.getSelectedIds.subscribe(function ()
 			{
 				self.updateEditable();
 
@@ -106,7 +107,7 @@
 					return;
 				}
 
-				var next = function()
+				var next = function ()
 				{
 					self.obIsSelectRow(current.length !== 0);
 					self.obCanCopyFieldTrip(current.length === 1 && self.obNewRequest());
@@ -134,14 +135,14 @@
 
 				if (self.obShowFieldTripDEPanel() && self.fieldTripDataEntry && self.fieldTripDataEntry.obApiIsDirty())
 				{
-					var cancelAction = function()
+					var cancelAction = function ()
 					{
 						canceling = true;
 						self.searchGrid.getSelectedIds(self.selectedRecordIds);
 						canceling = false;
 					};
 					tf.promiseBootbox.yesNo({ message: "You have unsaved changes.  Would you like to save your changes first?", backdrop: true, title: "Unsaved Changes", closeButton: true })
-						.then(function(result)
+						.then(function (result)
 						{
 							if (result === false)
 							{
@@ -149,7 +150,7 @@
 							}
 							else if (result === true)
 							{
-								self.fieldTripDataEntry.trySave().then(function(valid)
+								self.fieldTripDataEntry.trySave().then(function (valid)
 								{
 									if (valid)
 									{
@@ -173,17 +174,44 @@
 			});
 
 			self.loadReportLists();
-			tf.pageManager.resizablePage.$leftPage.on("focus.shortcutKeys", function()
+			tf.pageManager.resizablePage.$leftPage.on("focus.shortcutKeys", function ()
 			{
 				tf.shortCutKeys.changeHashKey(self.searchGrid.options.routeState);
-			}).on("blur.shortcutKeys", function()
+			}).on("blur.shortcutKeys", function ()
 			{
 				tf.shortCutKeys.changeHashKey();
 			});
 		}
 	};
 
-	BaseGridPage.prototype.sendEmailClick = function(viewModel, e)
+	BaseGridPage.prototype.setRelatedFilterData = function ()
+	{
+		var self = this,
+			openRelatedData = sessionStorage.getItem("openRelated");
+		if (!openRelatedData)
+		{
+			return;
+		}
+
+		sessionStorage.removeItem("openRelated");
+		try
+		{
+			openRelatedData = JSON.parse(openRelatedData);
+		}
+		catch
+		{
+			return;
+		}
+
+		if (!openRelatedData || openRelatedData.pageType !== self.pageType)
+		{
+			return;
+		}
+
+		self.options.openRelatedData = openRelatedData;
+	};
+
+	BaseGridPage.prototype.sendEmailClick = function (viewModel, e)
 	{
 		var option = { clickType: 'Email' };
 		//total 2 attachments, but will be added by manual
@@ -194,7 +222,7 @@
 				message: "We recommend you send this message as a blind copy (Bcc) email to avoid disclosing email addresses publicly. Send this message as a Bcc?",
 				title: "Confirmation",
 				closeButton: true
-			}).then(function(data)
+			}).then(function (data)
 			{
 				if (data)
 				{
@@ -205,7 +233,7 @@
 					}
 					else
 					{ //with filter
-						this.searchGrid.getBasicFilterCount().then(function(result)
+						this.searchGrid.getBasicFilterCount().then(function (result)
 						{
 							return this.setEmailSubject(result, option);
 						}.bind(this));
@@ -220,7 +248,7 @@
 					}
 					else
 					{ //with filter
-						this.searchGrid.getBasicFilterCount().then(function(result)
+						this.searchGrid.getBasicFilterCount().then(function (result)
 						{
 							return this.setEmailSubject(result, option);
 						}.bind(this));
@@ -229,7 +257,7 @@
 			}.bind(this));
 	};
 
-	BaseGridPage.prototype.sendToClick = function(viewModel, e)
+	BaseGridPage.prototype.sendToClick = function (viewModel, e)
 	{
 		var option = { clickType: 'SendTo' };
 		if (this.searchGrid.obSelectedGridFilterName() == 'None')
@@ -238,14 +266,14 @@
 		}
 		else
 		{ //with filter
-			return this.searchGrid.getBasicFilterCount().then(function(result)
+			return this.searchGrid.getBasicFilterCount().then(function (result)
 			{
 				return this.setEmailSubject(result, option);
 			}.bind(this));
 		}
 	};
 
-	BaseGridPage.prototype.setEmailSubject = function(compareCount, option)
+	BaseGridPage.prototype.setEmailSubject = function (compareCount, option)
 	{
 		var self = this, selectedIds = self.searchGrid.getSelectedIds(),
 			subject = tf.applicationTerm.getApplicationTermPluralByName(tf.pageManager.typeToTerm(self.type)),
@@ -264,7 +292,7 @@
 				recordsStr = "Records: Selected";
 			}
 
-			return TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(self.searchGrid).then(function(data)
+			return TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(self.searchGrid).then(function (data)
 			{
 				selectedIds = data;
 				subject += " (" + recordsStr + filterStr + ") " + nowStr;
@@ -287,7 +315,7 @@
 		}
 	};
 
-	BaseGridPage.prototype._popupSendEmailOfGridModalViewModel = function(selectedIds, subject, option)
+	BaseGridPage.prototype._popupSendEmailOfGridModalViewModel = function (selectedIds, subject, option)
 	{
 		var self = this;
 		var gridLayoutExtendedEntity = self.searchGrid._obCurrentGridLayoutExtendedDataModel().toData();
@@ -315,7 +343,7 @@
 					setRequestOption: self.setRequestOption ? self.setRequestOption.bind(self) : undefined,
 				})
 		)
-			.then(function(result)
+			.then(function (result)
 			{
 				if (result)
 				{
@@ -325,24 +353,24 @@
 			}.bind(this));
 	};
 
-	BaseGridPage.prototype.updateEditable = function()
+	BaseGridPage.prototype.updateEditable = function ()
 	{
 		var records = this.getCurrentFieldTripRecords();
 		this.selectedItemEditable(tf.helpers.fieldTripAuthHelper.checkFieldTripEditable(records[0]));
 		this.selectedItemsEditable(tf.helpers.fieldTripAuthHelper.checkFieldTripsEditable(records));
 	};
 
-	BaseGridPage.prototype.getCurrentFieldTripRecords = function()
+	BaseGridPage.prototype.getCurrentFieldTripRecords = function ()
 	{
 		return this.searchGrid.getSelectedRecords();
 	};
 
-	BaseGridPage.prototype.getCurrentFieldTripIds = function()
+	BaseGridPage.prototype.getCurrentFieldTripIds = function ()
 	{
 		return this.searchGrid.getSelectedIds();
 	};
 
-	BaseGridPage.prototype.createGrid = function(option)
+	BaseGridPage.prototype.createGrid = function (option)
 	{
 		var self = this, iconRow, statusRow, toolRow, containerWidth,
 			baseOptions = {
@@ -355,7 +383,7 @@
 				showSelectedCount: option ? option.showSelectedCount : false,
 				gridTypeInPageInfo: option ? option.gridTypeInPageInfo : false,
 				url: pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(self.type)),
-				onDataBound: self.isGridPage ? function(option)
+				onDataBound: self.isGridPage ? function (option)
 				{
 					self.onDataBound.bind(self)(option);
 				} : null
@@ -370,9 +398,9 @@
 
 		if (!TF.isPhoneDevice)
 		{
-			self.searchGrid.onDoubleClick.subscribe(function(e, data)
+			self.searchGrid.onDoubleClick.subscribe(function (e, data)
 			{
-				if (self.pageType === "reports")
+				if (self.disableDoubleClick)
 				{
 					return;
 				}
@@ -394,7 +422,7 @@
 			statusRow.width("100%");
 			toolRow.width("100%");
 			statusRow.removeClass("pull-right");
-			detectswipe(self.$element.find(".grid-icons"), function(el, d)
+			detectswipe(self.$element.find(".grid-icons"), function (el, d)
 			{
 				containerWidth = iconRow.outerWidth();
 				if (d === "l" && toolRow.css("marginLeft") === "0px")
@@ -408,7 +436,7 @@
 					statusRow.animate({ marginLeft: containerWidth }, 200);
 				}
 			});
-			$(window).on("resize.toolbar", function()
+			$(window).on("resize.toolbar", function ()
 			{
 				iconRow = self.$element.find(".grid-icons");
 				containerWidth = iconRow.outerWidth();
@@ -439,7 +467,7 @@
 		}
 	};
 
-	BaseGridPage.prototype.onEnterPress = function()
+	BaseGridPage.prototype.onEnterPress = function ()
 	{
 		if (this.obShowDetailPanel() || this.obShowFieldTripDEPanel())
 		{
@@ -449,12 +477,12 @@
 		this.showDetailsPreClick();
 	};
 
-	BaseGridPage.prototype._openBulkMenu = function()
+	BaseGridPage.prototype._openBulkMenu = function ()
 	{
 		var self = this;
 		if (!TF.isPhoneDevice)
 		{
-			self.$element.delegate("table.k-selectable tr", "contextmenu", function(e, parentE)
+			self.$element.delegate("table.k-selectable tr", "contextmenu", function (e, parentE)
 			{
 				var element = e;
 				if (parentE)
@@ -474,10 +502,10 @@
 			});
 		}
 
-		self.$element.delegate(".kendogrid-blank-fullfill .fillItem", "mousedown", function(e)
+		self.$element.delegate(".kendogrid-blank-fullfill .fillItem", "mousedown", function (e)
 		{
 			var uid = $(e.currentTarget).data("id");
-			var items = self.$element.find("table.k-selectable tr").filter(function(a, b)
+			var items = self.$element.find("table.k-selectable tr").filter(function (a, b)
 			{
 				return $(b).data("kendoUid") === uid;
 			});
@@ -487,7 +515,7 @@
 			}
 		});
 
-		self.searchGrid.baseKeyPress = self.searchGrid.baseKeyPress.createInterceptor(function()
+		self.searchGrid.baseKeyPress = self.searchGrid.baseKeyPress.createInterceptor(function ()
 		{
 			self.hideBlukMenu();
 		});
@@ -497,7 +525,7 @@
 	 * Hide bluk menu when the hot key was triggered.
 	 * @returns {void} 
 	 */
-	BaseGridPage.prototype.hideBlukMenu = function()
+	BaseGridPage.prototype.hideBlukMenu = function ()
 	{
 		var self = this;
 		if (self.bulkMenu && !self.bulkMenu.disposed)
@@ -506,7 +534,7 @@
 		}
 	}
 
-	BaseGridPage.prototype.selectRowInGridById = function(id)
+	BaseGridPage.prototype.selectRowInGridById = function (id)
 	{
 		if (TF.isMobileDevice || !this.searchGrid)
 		{
@@ -528,62 +556,62 @@
 		this.searchGrid.isRowSelectedWhenInit = true;
 	};
 
-	BaseGridPage.prototype.initSearchGridCompute = function()
+	BaseGridPage.prototype.initSearchGridCompute = function ()
 	{
 		var self = this;
-		self.obSelectedGridLayoutModified = ko.computed(function()
+		self.obSelectedGridLayoutModified = ko.computed(function ()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutModified();
 		}, self);
 
-		self.obSelectedGridFilterName = ko.computed(function()
+		self.obSelectedGridFilterName = ko.computed(function ()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridFilterName();
 		}, self);
-		self.obSelectedGridLayoutName = ko.computed(function()
+		self.obSelectedGridLayoutName = ko.computed(function ()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridLayoutName();
 		}, self);
-		self.obSelectedGridThematicName = ko.computed(function()
+		self.obSelectedGridThematicName = ko.computed(function ()
 		{
 			return self.searchGridInited() && self.searchGrid.obSelectedGridThematicName();
 		}, self);
-		self.obSummaryGridVisible = ko.computed(function()
+		self.obSummaryGridVisible = ko.computed(function ()
 		{
 			return self.searchGridInited() && self.searchGrid.obSummaryGridVisible();
 		}, self);
-		self.noApplyFilterNoModified = ko.computed(function()
+		self.noApplyFilterNoModified = ko.computed(function ()
 		{
 			return self.searchGridInited() && self.searchGrid.noApplyFilterNoModified();
 		}, self);
 	};
 
-	BaseGridPage.prototype.bindEvent = function(buttonSelector, bindEvent)
+	BaseGridPage.prototype.bindEvent = function (buttonSelector, bindEvent)
 	{
 		var self = this;
-		self.$element.find(buttonSelector).on("click", function(e)
+		self.$element.find(buttonSelector).on("click", function (e)
 		{
 			bindEvent.call(self, self, e);
 		});
 	};
 
-	BaseGridPage.prototype.bindButtonEvent = function()
+	BaseGridPage.prototype.bindButtonEvent = function ()
 	{
 		var self = this;
-		self.bindEvent(".iconbutton.summarybar", function(model, e)
+		self.bindEvent(".iconbutton.summarybar", function (model, e)
 		{
 			ga('send', 'event', 'Area', 'Summary Bar');
 			self.searchGrid.summarybarIconClick(model, e);
 		});
 		self.bindEvent(".iconbutton.filter", self.filterMenuClick);
 		self.bindEvent(".iconbutton.thematic", self.thematicMenuClick);
-		self.bindEvent(".iconbutton.addremovecolumn", function(model, e)
+		self.bindEvent(".iconbutton.addremovecolumn", function (model, e)
 		{
 			ga('send', 'event', 'Action', 'Grid Columns');
 			self.searchGrid.addRemoveColumnClick(model, e);
 		});
 
-		self.bindEvent(".iconbutton.details", function(model, e)
+		self.bindEvent(".iconbutton.details", function (model, e)
 		{
 			self.showDetailsPreClick();
 		});
@@ -609,7 +637,7 @@
 		}
 
 		self.bindEvent(".iconbutton.layout", self.layoutIconClick);
-		self.bindEvent(".iconbutton.refresh", function(model, e)
+		self.bindEvent(".iconbutton.refresh", function (model, e)
 		{
 			self.refreshClick();
 		});
@@ -620,7 +648,7 @@
 		}
 	};
 
-	BaseGridPage.prototype.layoutIconClick = function(viewModel, e)
+	BaseGridPage.prototype.layoutIconClick = function (viewModel, e)
 	{
 		var cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e);
 		var cacheOperatorBeforeOpenMenu = TF.menuHelper.needOpenCurrentMenu(e);
@@ -631,7 +659,7 @@
 		if (cacheOperatorBeforeOpenMenu)
 		{
 			tf.pageManager.showContextMenu(e.currentTarget);
-			tf.contextMenuManager.showMenu(e.currentTarget, new TF.ContextMenu.TemplateContextMenu("workspace/grid/layoutcontextmenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid), function()
+			tf.contextMenuManager.showMenu(e.currentTarget, new TF.ContextMenu.TemplateContextMenu("workspace/grid/layoutcontextmenu", new TF.Grid.GridMenuViewModel(this, this.searchGrid), function ()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
 				if (iconWrap.length > 0)
@@ -642,15 +670,15 @@
 		}
 	};
 
-	BaseGridPage.prototype.openReportUserInformationModel = function(viewModel, e)
+	BaseGridPage.prototype.openReportUserInformationModel = function (viewModel, e)
 	{
 	};
 
-	BaseGridPage.prototype.openManageYouReportsModel = function(viewModel, e)
+	BaseGridPage.prototype.openManageYouReportsModel = function (viewModel, e)
 	{
 	};
 
-	BaseGridPage.prototype.filterMenuClick = function(viewModel, e)
+	BaseGridPage.prototype.filterMenuClick = function (viewModel, e)
 	{
 		var self = this,
 			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
@@ -662,7 +690,7 @@
 		if (cacheOperatorBeforeOpenMenu)
 		{
 			tf.pageManager.showContextMenu(e.currentTarge);
-			self.searchGrid.filterMenuClick(e, function()
+			self.searchGrid.filterMenuClick(e, function ()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
 				if (iconWrap.length > 0)
@@ -673,7 +701,7 @@
 		}
 	};
 
-	BaseGridPage.prototype.thematicMenuClick = function(viewModel, e)
+	BaseGridPage.prototype.thematicMenuClick = function (viewModel, e)
 	{
 		var self = this,
 			cacheOperatorBeforeHiddenMenu = TF.menuHelper.needHiddenOpenedMenu(e),
@@ -687,7 +715,7 @@
 		if (cacheOperatorBeforeOpenMenu)
 		{
 			tf.pageManager.showContextMenu(e.currentTarge);
-			self.searchGrid.thematicMenuClick(e, function()
+			self.searchGrid.thematicMenuClick(e, function ()
 			{
 				var iconWrap = $(e.target).closest(".grid-icons").find(".grid-staterow-wrap");
 				if (iconWrap.length > 0)
@@ -698,7 +726,7 @@
 		}
 	};
 
-	BaseGridPage.prototype.openNavigationClick = function()
+	BaseGridPage.prototype.openNavigationClick = function ()
 	{
 		var self = this, navigationData,
 			$content, $navigationContent = $(".navigation-container").addClass("mobile");
@@ -707,7 +735,7 @@
 
 		navigationData = new TF.NavigationMenu();
 
-		tf.pageManager.getMessageSettings().then(function(result)
+		tf.pageManager.getMessageSettings().then(function (result)
 		{
 			if (!result.Items || !result.Items.length || result.Items.length <= 0 || (!result.Items[0].EnglishMessage && !result.Items[0].SpanishMessage))
 			{
@@ -722,7 +750,7 @@
 		});
 	};
 
-	BaseGridPage.prototype.onDataBound = function(option)
+	BaseGridPage.prototype.onDataBound = function (option)
 	{
 		var self = this;
 		self.selectedRecordIds = [];
@@ -736,7 +764,7 @@
 			delete option.IsCallout;
 		}
 
-		self.obGridNoAction = ko.computed(function()
+		self.obGridNoAction = ko.computed(function ()
 		{
 			self.obNoRecordsSelected(false);
 			var ids = self.searchGrid.getSelectedIds();
@@ -757,13 +785,13 @@
 		}.bind(this));
 	};
 
-	BaseGridPage.prototype.autoScrollInit = function()
+	BaseGridPage.prototype.autoScrollInit = function ()
 	{
 		var self = this;
 		if (!self.kendoGridScroll)
 		{
 			self.kendoGridScroll = new TF.KendoGrid.AutoScroll(self.searchGrid);
-			self.kendoGridScroll.onScrollAtBottom.subscribe(function()
+			self.kendoGridScroll.onScrollAtBottom.subscribe(function ()
 			{
 				self.releaseHoldEvent.notify();
 				self.startAutoScroll();
@@ -776,7 +804,7 @@
 		}
 	};
 
-	BaseGridPage.prototype.startAutoScroll = function()
+	BaseGridPage.prototype.startAutoScroll = function ()
 	{
 		var self = this;
 		if (self.kendoGridScroll !== null)
@@ -786,12 +814,12 @@
 		}
 	};
 
-	BaseGridPage.prototype.editFieldTripStatus = function()
+	BaseGridPage.prototype.editFieldTripStatus = function ()
 	{
 		this.editFieldTripStatusCore();
 	};
 
-	BaseGridPage.prototype.copyFieldTrip = function()
+	BaseGridPage.prototype.copyFieldTrip = function ()
 	{
 		var self = this, selectedId, selectedName,
 			selectedIds = self.searchGrid.getSelectedIds(), selectedRecords = self.searchGrid.getSelectedRecords();
@@ -804,7 +832,7 @@
 			return;
 		}
 
-		return self.validateFieldTrip(selectedRecords[0]).then(function(result)
+		return self.validateFieldTrip(selectedRecords[0]).then(function (result)
 		{
 			if (!result.valid)
 			{
@@ -818,39 +846,39 @@
 				paramData: {
 					copyFromId: selectedId,
 					fieldTripName: TF.Helper.NewCopyNameHelper.generateNewCopyName(selectedName,
-						self.searchGrid.kendoGrid.dataSource._data.map(function(d)
+						self.searchGrid.kendoGrid.dataSource._data.map(function (d)
 						{
 							return d.Name;
 						}))
 				}
 			})
-			.then(function(response)
-			{
-				if (response && response.StatusCode === 404)
-				{//change the api side to avoid http error, using response status 404 to identify the nonexistence.
-					return Promise.reject(response);
-				}
-				self.pageLevelViewModel.popupSuccessMessage("Field Trip Copied");
-				self.searchGrid.refreshClick();
-				return true;
-			}.bind(self))
-			.catch(function(response)
-			{
-				if (response && response.StatusCode === 412)
+				.then(function (response)
 				{
-					self.pageLevelViewModel.popupErrorMessage(response.Message);
-					return Promise.reject(response);
-				}
+					if (response && response.StatusCode === 404)
+					{//change the api side to avoid http error, using response status 404 to identify the nonexistence.
+						return Promise.reject(response);
+					}
+					self.pageLevelViewModel.popupSuccessMessage("Field Trip Copied");
+					self.searchGrid.refreshClick();
+					return true;
+				}.bind(self))
+				.catch(function (response)
+				{
+					if (response && response.StatusCode === 412)
+					{
+						self.pageLevelViewModel.popupErrorMessage(response.Message);
+						return Promise.reject(response);
+					}
 
-				if (response && response.StatusCode === 404)
-				{
-					return Promise.reject(response);
-				}
-			}.bind(self));
+					if (response && response.StatusCode === 404)
+					{
+						return Promise.reject(response);
+					}
+				}.bind(self));
 		});
 	};
 
-	BaseGridPage.prototype.validateFieldTrip = function(record)
+	BaseGridPage.prototype.validateFieldTrip = function (record)
 	{
 		if (tf.helpers.fieldTripAuthHelper.isFieldTripAdmin())
 		{
@@ -860,7 +888,7 @@
 		return this.checkFieldTripDeadline(record.DepartDateTime);
 	};
 
-	BaseGridPage.prototype.checkFieldTripDeadline = function(dateTime)
+	BaseGridPage.prototype.checkFieldTripDeadline = function (dateTime)
 	{
 		if (!dateTime)
 		{
@@ -868,7 +896,7 @@
 		}
 
 		const mmtObj = moment(dateTime);
-		if(!mmtObj.isValid())
+		if (!mmtObj.isValid())
 		{
 			return Promise.resolve({ valid: false, message: "Depart Date is invalid." });
 		}
@@ -876,7 +904,7 @@
 		return this._validateScheduleDaysInAdvance(dateTime);
 	};
 
-	BaseGridPage.prototype._validateScheduleDaysInAdvance = function(dateTime)
+	BaseGridPage.prototype._validateScheduleDaysInAdvance = function (dateTime)
 	{
 		const mmtObj = moment(dateTime);
 		let daysInAdvance = tf.fieldTripConfigsDataHelper.fieldTripConfigs.ScheduleDaysInAdvance;
@@ -886,14 +914,14 @@
 		}
 
 		return tf.fieldTripConfigsDataHelper.getHolidayMap()
-			.then(function(holidayMap)
+			.then(function (holidayMap)
 			{
-				const isSchoolDay = function(mmtDay)	// helper function for detect if a given day (moment date) is school day
+				const isSchoolDay = function (mmtDay)	// helper function for detect if a given day (moment date) is school day
 				{
 					var dateStr = mmtDay.format("YYYY-MM-DD"), weekdayIndex = mmtDay.weekday();
 					const notWeekend = weekdayIndex > 0 && weekdayIndex < 6,
 						notHoliday = !holidayMap[dateStr];
-					return  notWeekend && notHoliday;
+					return notWeekend && notHoliday;
 				};
 
 				if (!isSchoolDay(mmtObj))
@@ -922,7 +950,7 @@
 			});
 	};
 
-	BaseGridPage.prototype.editFieldTripStatusCore = function(cancel)
+	BaseGridPage.prototype.editFieldTripStatusCore = function (cancel)
 	{
 		var selectedRecords = this.getCurrentFieldTripRecords();
 		if (!selectedRecords || !selectedRecords.length)
@@ -931,7 +959,7 @@
 		}
 
 		tf.modalManager.showModal(new TF.Modal.EditFieldTripStatusModalViewModel(selectedRecords, cancel))
-			.then(function(data)
+			.then(function (data)
 			{
 				if (data)
 				{
@@ -942,18 +970,18 @@
 			}.bind(this));
 	};
 
-	BaseGridPage.prototype.refreshClick = function()
+	BaseGridPage.prototype.refreshClick = function ()
 	{
 		tf.pageManager.resizablePage.closeRightPage();
 		this.searchGrid.refreshClick();
 	};
 
-	BaseGridPage.prototype.cancelClick = function()
+	BaseGridPage.prototype.cancelClick = function ()
 	{
 		this.editFieldTripStatusCore(true);
 	};
 
-	BaseGridPage.prototype.addClick = function(viewModel, e)
+	BaseGridPage.prototype.addClick = function (viewModel, e)
 	{
 		var self = this,
 			view = {
@@ -979,12 +1007,12 @@
 		self.obShowFieldTripDEPanel(true);
 	};
 
-	BaseGridPage.prototype.gridViewClick = function(viewModel, e)
+	BaseGridPage.prototype.gridViewClick = function (viewModel, e)
 	{
 		var self = this;
 		if (tf.pageManager.obFieldTripEditPage() && tf.pageManager.obFieldTripEditPage().obEntityDataModel() && tf.pageManager.obFieldTripEditPage().tryGoAway)
 		{
-			tf.pageManager.obFieldTripEditPage().tryGoAway("", "You have unsaved changes. Would you like to save your changes first?").then(function(result)
+			tf.pageManager.obFieldTripEditPage().tryGoAway("", "You have unsaved changes. Would you like to save your changes first?").then(function (result)
 			{
 				if (result)
 				{
@@ -1001,12 +1029,12 @@
 		}
 	};
 
-	BaseGridPage.prototype.showDetailsPreClick = function(viewModel, e)
+	BaseGridPage.prototype.showDetailsPreClick = function (viewModel, e)
 	{
 		var self = this;
 		if (tf.pageManager.obFieldTripEditPage() && tf.pageManager.obFieldTripEditPage().obEntityDataModel() && tf.pageManager.obFieldTripEditPage().tryGoAway)
 		{
-			tf.pageManager.obFieldTripEditPage().tryGoAway("", "You have unsaved changes. Would you like to save your changes first?").then(function(result)
+			tf.pageManager.obFieldTripEditPage().tryGoAway("", "You have unsaved changes. Would you like to save your changes first?").then(function (result)
 			{
 				if (result)
 				{
@@ -1021,14 +1049,69 @@
 		}
 	};
 
-	BaseGridPage.prototype.schedulerViewClick = function(viewModel, e)
+	BaseGridPage.prototype.schedulerViewClick = function (viewModel, e)
 	{
 		var self = this;
 		ga('send', 'event', 'Area', 'Field Trip Scheduler');
 		tf.pageManager.openNewPage(self.pageType + "Scheduler");
 	};
 
-	BaseGridPage.prototype._getValidReportIds = async function()
+	BaseGridPage.prototype._getIdsFromRelated = function (relatedType, descriptor, relatedIds)
+	{
+		const self = this;
+		const dataType = self.type;
+
+		if (relatedType === "contact")
+		{
+			return self._getContactsRelatedGridRecords(dataType, relatedIds);
+		}
+		else if (relatedType === "document")
+		{
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "documentrelationships"), {
+				paramData: {
+					"DBID": tf.datasourceManager.databaseId,
+					"AttachedToType": tf.dataTypeHelper.getId(dataType),
+					"@fields": "DocumentID",
+					"@filter": "in(AttachedToID," + relatedIds.join(',') + ")"
+				}
+			}).then(function (idResponse)
+			{
+				return idResponse.Items.map(function (item)
+				{
+					return item.DocumentID;
+				});
+			});
+		}
+		else if (dataType === "contact")
+		{
+			return self._getRelatesToContactGridRecords(relatedType, relatedIds);
+		}
+		else
+		{
+			const urlNode = tf.dataTypeHelper.getEndpoint(relatedType);
+			const idsParamName = tf.dataTypeHelper.getIdsParamName(dataType);
+			const paramData = { "@fields": "Id" };
+
+			paramData[idsParamName] = relatedIds.join(",");
+
+			if (descriptor)
+			{
+				paramData["type"] = descriptor;
+			}
+
+			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), urlNode),
+				{
+					paramData: paramData
+				})
+				.then(res =>
+				{
+					return Array.isArray(res.Items) && res.Items.length > 0
+						? res.Items.map((o) => o.Id) : [-1];
+				});
+		}
+	};
+
+	BaseGridPage.prototype._getValidReportIds = async function ()
 	{
 		var self = this;
 		return tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "search/exagoreports", "id"),
@@ -1041,18 +1124,18 @@
 					"filterSet": { "FilterItems": [], "FilterSets": [], "LogicalOperator": "and" }
 				}
 			}
-		).then(function(apiResponse)
+		).then(function (apiResponse)
 		{
 			self.allIds = apiResponse.Items;
 			return self.allIds.slice(0);
-		}).catch(function(ex)
+		}).catch(function (ex)
 		{
 			console.log(ex);
 			return [];
 		});
 	}
 
-	BaseGridPage.prototype.loadReportLists = async function()
+	BaseGridPage.prototype.loadReportLists = async function ()
 	{
 		var self = this;
 		const validReportIds = await self._getValidReportIds();
@@ -1083,14 +1166,14 @@
 	};
 
 
-	BaseGridPage.prototype.viewReportClick = function(reportViewModel, e)
+	BaseGridPage.prototype.viewReportClick = function (reportViewModel, e)
 	{
 		var self = this;
 		var selectedIds = self.searchGrid.getSelectedIds();
 		if (selectedIds.length === 0)
 		{
 			self.searchGrid.getIdsWithCurrentFiltering()
-				.then(function(data)
+				.then(function (data)
 				{
 					selectedIds = data;
 					self.openReportConfigure(reportViewModel, selectedIds);
@@ -1102,12 +1185,12 @@
 		}
 	};
 
-	BaseGridPage.prototype.openReportConfigure = function(reportViewModel, ids)
+	BaseGridPage.prototype.openReportConfigure = function (reportViewModel, ids)
 	{
 		var reportId = reportViewModel.Id;
 
 		tf.exagoReportDataHelper.fetchReportWithMetadata(reportId)
-			.then(function(entity)
+			.then(function (entity)
 			{
 				if (!entity) return;
 
@@ -1119,7 +1202,7 @@
 					}
 				));
 			})
-			.then(function(execResult)
+			.then(function (execResult)
 			{
 				if (execResult && execResult.externalReportViewerUrl)
 				{
@@ -1128,7 +1211,7 @@
 			});
 	};
 
-	BaseGridPage.prototype.dispose = function()
+	BaseGridPage.prototype.dispose = function ()
 	{
 		var self = this;
 		self.$element.find(".grid-icons").off(".swipe");

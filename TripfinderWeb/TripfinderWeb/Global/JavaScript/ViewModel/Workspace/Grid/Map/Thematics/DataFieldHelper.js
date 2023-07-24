@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Map.Thematics").DataFieldHelper = DataFieldHelper;
 	function DataFieldHelper()
@@ -2536,7 +2536,7 @@
 				DisplayName: "Form Color",
 				Width: '100px',
 				type: "string",
-				template: function(item)
+				template: function (item)
 				{
 					if (!item.FormColor)
 					{
@@ -2552,7 +2552,7 @@
 				DisplayName: "Required Location",
 				Width: '150px',
 				type: "boolean",
-				template: function(item)
+				template: function (item)
 				{
 					return booleanToCheckboxFormatter(item.RequiredLocation);
 				}
@@ -2606,7 +2606,7 @@
 	 * @param {string} type The data type.
 	 * @returns {void}
 	 */
-	DataFieldHelper.prototype.getColumnsByType = function(type, dataColumns)
+	DataFieldHelper.prototype.getColumnsByType = function (type, dataColumns)
 	{
 		var self = this, type = type && type.toLowerCase(), columns;
 
@@ -2716,6 +2716,9 @@
 			case "mergedocumentlibrary":
 				columns = tf.mergeDocumentLibraryGridDefinition.gridDefinition().Columns;
 				break;
+			case "fieldtripinvoice":
+				columns = tf.fieldTripInvoicePageGridDefinition.gridDefinition().Columns;
+				break;
 		};
 
 		return columns ? columns.filter(c => !c.hasOwnProperty("UDFGuid") && !c.hiddenForThematic) : columns;
@@ -2727,10 +2730,10 @@
 	 * @param {string} fieldName The field name
 	 * @return {Object} The matched field data object.
 	 */
-	DataFieldHelper.prototype.getDisplayName = function(gridType, fieldName)
+	DataFieldHelper.prototype.getDisplayName = function (gridType, fieldName)
 	{
 		var self = this, displayName;
-		$.each(self.getColumnsByType(gridType), function(index, item)
+		$.each(self.getColumnsByType(gridType), function (index, item)
 		{
 			if (item.FieldName === fieldName)
 			{
@@ -2742,16 +2745,16 @@
 	};
 
 
-	DataFieldHelper.prototype._updateDisplayNameWithApplicationTerm = function()
+	DataFieldHelper.prototype._updateDisplayNameWithApplicationTerm = function ()
 	{
 		var self = this, resultStr, displayName,
-			replaceAt = function(str, replacement, startIndex, length)
+			replaceAt = function (str, replacement, startIndex, length)
 			{
 				return str.substr(0, startIndex) + replacement + str.substr(startIndex + length, str.length);
 			},
-			updateString = function(str)
+			updateString = function (str)
 			{
-				$.each(tf.APPLICATIONTERMDEFAULTVALUES, function(index, defaultTerm)
+				$.each(tf.APPLICATIONTERMDEFAULTVALUES, function (index, defaultTerm)
 				{
 					resultStr = str;
 					strIndex = str.indexOf(defaultTerm.Plural);
@@ -2773,9 +2776,9 @@
 
 				return resultStr;
 			},
-			updateColumns = function(columns)
+			updateColumns = function (columns)
 			{
-				$.each(columns, function(index, col)
+				$.each(columns, function (index, col)
 				{
 					displayName = col.DisplayName || col.FieldName;
 					displayName = updateString(displayName);
@@ -2798,7 +2801,7 @@
 		updateColumns(self.formsDataColumns);
 	};
 
-	DataFieldHelper.equals = function(type, value1, value2)
+	DataFieldHelper.equals = function (type, value1, value2)
 	{
 		if (!type)
 		{
@@ -2840,7 +2843,7 @@
 		}
 	}
 
-	DataFieldHelper.compareValuesByFormat = function(value1, value2, format)
+	DataFieldHelper.compareValuesByFormat = function (value1, value2, format)
 	{
 		var m1 = moment(value1), m2 = moment(value2);
 
@@ -2864,7 +2867,7 @@
 		return m1.format(format) === m2.format(format);
 	}
 
-	DataFieldHelper.prototype.dispose = function()
+	DataFieldHelper.prototype.dispose = function ()
 	{
 		tfdispose(this);
 	}

@@ -2,10 +2,10 @@ if (typeof kendo != 'undefined')
 {
 	kendo.ns = "kendo-";
 }
-$(function()
+$(function ()
 {
 	var redirectingPromise = window.determineRedirect2VanityUrlPromise || Promise.resolve(false);
-	redirectingPromise.then(function(redirecting)
+	redirectingPromise.then(function (redirecting)
 	{
 		if (!redirecting)
 		{
@@ -29,7 +29,7 @@ pb.DELETE = "delete";
 function topicCombine()
 {
 	var args = Array.prototype.slice.call(arguments);
-	if (Enumerable.From(args).Where(function(c)
+	if (Enumerable.From(args).Where(function (c)
 	{
 		return c == null || c == undefined
 	}).ToArray().length != 0)
@@ -87,7 +87,7 @@ function pathCombine()
 
 function sortArray(array, sortField, isNum)
 {
-	return array.sort(function(a, b)
+	return array.sort(function (a, b)
 	{
 		if (isNum)
 		{
@@ -266,7 +266,7 @@ createNamespace("TF").isLandscape = isLandscape();
 createNamespace("TF").isAndroid = isAndroid();
 createNamespace("TF").getIOSVersion = getIOSVersion();
 
-createNamespace("TF").getSingularOrPluralTitle = function(title, count)
+createNamespace("TF").getSingularOrPluralTitle = function (title, count)
 {
 	if (title.toLowerCase() === "water")
 	{
@@ -283,7 +283,7 @@ createNamespace("TF").getSingularOrPluralTitle = function(title, count)
 	return title;
 };
 
-TF.isIE = (function()
+TF.isIE = (function ()
 {
 	var ua = window.navigator.userAgent;
 	var matches = /Edg\/(\d{2})/g.exec(ua);
@@ -304,7 +304,7 @@ function getQueryString(name)
 	return r != null ? r[2] : null;
 }
 
-Array.remove = function(array, item)
+Array.remove = function (array, item)
 {
 	let index = array.indexOf(item);
 	while ((index) > -1)
@@ -314,7 +314,7 @@ Array.remove = function(array, item)
 	}
 };
 
-Array.extend = function(arr1, arr2)
+Array.extend = function (arr1, arr2)
 {
 	if (arguments.length <= 2)
 	{
@@ -329,15 +329,15 @@ Array.extend = function(arr1, arr2)
 	return arr1;
 };
 
-Array.contain = function(arr, item)
+Array.contain = function (arr, item)
 {
 	return arr.indexOf(item) != -1;
 };
 
-Array.sortBy = function(arr, fieldName, desc)
+Array.sortBy = function (arr, fieldName, desc)
 {
 	var factor = desc ? -1 : 1;
-	var sort = function(a, b)
+	var sort = function (a, b)
 	{
 		var aField = a[fieldName], bField = b[fieldName];
 		if (aField === null && bField === null)
@@ -373,13 +373,13 @@ Array.sortBy = function(arr, fieldName, desc)
 		return aField > bField ? 1 : -1;
 	};
 
-	return arr.sort(function(a, b)
+	return arr.sort(function (a, b)
 	{
 		return sort(a, b) * factor;
 	});
 };
 
-Array.equals = function(arr1, arr2)
+Array.equals = function (arr1, arr2)
 {
 	arr1 = arr1.sort();
 	arr2 = arr2.sort();
@@ -417,7 +417,7 @@ Array.equals = function(arr1, arr2)
 if (!Array.prototype.findIndex)
 {
 	Object.defineProperty(Array.prototype, 'findIndex', {
-		value: function(predicate)
+		value: function (predicate)
 		{
 			// 1. Let O be ? ToObject(this value).
 			if (this == null)
@@ -467,7 +467,7 @@ if (!Array.prototype.findIndex)
 if (!Array.prototype.includes)
 {
 	Object.defineProperty(Array.prototype, 'includes', {
-		value: function(searchElement, fromIndex)
+		value: function (searchElement, fromIndex)
 		{
 
 			// 1. Let O be ? ToObject(this value).
@@ -517,21 +517,21 @@ if (!Array.prototype.includes)
 		}
 	});
 }
-String.format = function(format)
+String.format = function (format)
 {
 	var args = Array.prototype.slice.call(arguments, 1);
-	return format.replace(/{(\d+)}/g, function(match, number)
+	return format.replace(/{(\d+)}/g, function (match, number)
 	{
 		return typeof args[number] != 'undefined' ? args[number] : match;
 	});
 };
 
-String.prototype.endsWith = function(suffix)
+String.prototype.endsWith = function (suffix)
 {
 	return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
-String.convertToBoolean = function(value)
+String.convertToBoolean = function (value)
 {
 	if (value === 'True')
 	{
@@ -572,20 +572,20 @@ function detectswipe(ele, func)
 		move,
 		end;
 
-	start = function(e)
+	start = function (e)
 	{
 		var t = e.originalEvent.touches[0];
 		swipe_det.sX = t.screenX;
 		swipe_det.sY = t.screenY;
 	};
-	move = function(e)
+	move = function (e)
 	{
 		e.preventDefault();
 		var t = e.originalEvent.touches[0];
 		swipe_det.eX = t.screenX;
 		swipe_det.eY = t.screenY;
 	};
-	end = function(e)
+	end = function (e)
 	{
 		//horizontal detection
 		if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX))
@@ -716,6 +716,9 @@ function getTitleByType(type)
 		case "fieldtrip":
 			pageTitle = tf.applicationTerm.getApplicationTermSingularByName("Field Trip");
 			break;
+		case "fieldtripinvoices":
+			pageTitle = tf.applicationTerm.getApplicationTermPluralByName("Field Trip Invoice");
+			break;
 		case "myrequests":
 			pageTitle = "My Submitted Requests";
 			break;
@@ -795,10 +798,10 @@ function booleanToCheckboxFormatter(value)
 	}
 	return checked;
 }
-(function()
+(function ()
 {
 	//disable default right click menu
-	document.oncontextmenu = function(event)
+	document.oncontextmenu = function (event)
 	{
 		let srcElement = event.target || event.srcElement;
 		if (srcElement
@@ -824,12 +827,12 @@ function booleanToCheckboxFormatter(value)
 		// This is intentional
 	}
 
-	Color.toHTMLColorFromLongColor = function(longColor)
+	Color.toHTMLColorFromLongColor = function (longColor)
 	{
 		return "#" + _toHex(longColor % 65536 % 256) + _toHex(longColor % 65536 / 256) + _toHex((longColor / 65536));
 	};
 
-	Color.toLongColorFromHTMLColor = function(htmlColor)
+	Color.toLongColorFromHTMLColor = function (htmlColor)
 	{
 		htmlColor = htmlColor.substr(1, 6);
 		return parseInt(htmlColor.substr(0, 2), 16) + parseInt(htmlColor.substr(2, 2), 16) * 256 + parseInt(htmlColor.substr(4, 2), 16) * 65536;
@@ -850,14 +853,14 @@ function booleanToCheckboxFormatter(value)
 	}
 })();
 
-createNamespace("TF").isLightness = function(color)
+createNamespace("TF").isLightness = function (color)
 {
 	var arcgisColor = new tf.map.ArcGIS.Color(color);
 	var brightness = (arcgisColor.r * 299 + arcgisColor.g * 587 + arcgisColor.b * 114) / 1000;
 	return brightness >= 123;
 };
 
-(function()
+(function ()
 {
 	createNamespace("TF").menuHelper = menuHelper;
 
@@ -866,19 +869,19 @@ createNamespace("TF").isLightness = function(color)
 		// This is intentional
 	}
 
-	menuHelper.hiddenMenu = function()
+	menuHelper.hiddenMenu = function ()
 	{
 		tf.contextMenuManager.dispose();
 	};
 
-	menuHelper.isCurrentMenuOpened = function(e)
+	menuHelper.isCurrentMenuOpened = function (e)
 	{
 		var $btn = $(e.target);
 		var isCurrentlyBtnHasOpened = $btn.hasClass('contextmenu-open');
 		return isCurrentlyBtnHasOpened;
 	};
 
-	menuHelper.isOtherMenuOpened = function(e)
+	menuHelper.isOtherMenuOpened = function (e)
 	{
 		if (TF.menuHelper.isCurrentMenuOpened(e))
 		{
@@ -888,7 +891,7 @@ createNamespace("TF").isLightness = function(color)
 		return $('.contextmenu-open').hasClass('mobile');
 	};
 
-	menuHelper.needHiddenOpenedMenu = function(e)
+	menuHelper.needHiddenOpenedMenu = function (e)
 	{
 		return (
 			TF.isPhoneDevice &&
@@ -899,16 +902,16 @@ createNamespace("TF").isLightness = function(color)
 		);
 	};
 
-	menuHelper.needOpenCurrentMenu = function(e)
+	menuHelper.needOpenCurrentMenu = function (e)
 	{
 		return !TF.isPhoneDevice || !TF.menuHelper.isCurrentMenuOpened(e);
 	};
 })();
 
-(function($)
+(function ($)
 {
 	$.fn.bootstrapValidator.validators.phoneinplus = {
-		validate: function(validator, $field, options)
+		validate: function (validator, $field, options)
 		{
 			var value = $field.val();
 
@@ -919,11 +922,11 @@ createNamespace("TF").isLightness = function(color)
 
 tf.isTripfinder = true;
 
-createNamespace("TF").fixGeometryErrorInKendo = function(data)
+createNamespace("TF").fixGeometryErrorInKendo = function (data)
 {
 	if (toString.call(data) == "[object Array]")
 	{
-		data.forEach(function(c)
+		data.forEach(function (c)
 		{
 			TF.fixGeometryErrorInKendo(c);
 		});
@@ -942,30 +945,30 @@ createNamespace("TF").fixGeometryErrorInKendo = function(data)
 	}
 };
 
-moment().constructor.prototype.currentTimeZoneTime = function()
+moment().constructor.prototype.currentTimeZoneTime = function ()
 {
 	var now = this.utcOffset(tf.timezonetotalminutes);
 	return moment([now.year(), now.month(), now.date(), now.hour(), now.minutes(), now.seconds(), now.millisecond()]);
 };
 
-moment().constructor.prototype.currentTimeZoneTimeFormat = function(format)
+moment().constructor.prototype.currentTimeZoneTimeFormat = function (format)
 {
 	return this.utcOffset(tf.timezonetotalminutes).format(format || "");
 };
 
 if (!String.prototype.format)
 {
-	String.prototype.format = function()
+	String.prototype.format = function ()
 	{
 		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number)
+		return this.replace(/{(\d+)}/g, function (match, number)
 		{
 			return typeof args[number] != 'undefined' ? args[number] : match;
 		});
 	};
 }
 
-Math.tfRound = function(value, precision = 0)
+Math.tfRound = function (value, precision = 0)
 {
 	if (precision < 0 || !Number.isInteger(precision))
 	{
