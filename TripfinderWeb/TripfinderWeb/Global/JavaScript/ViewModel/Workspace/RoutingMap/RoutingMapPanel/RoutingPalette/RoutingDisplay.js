@@ -1405,11 +1405,6 @@
 
 	function refreshPathClick(e)
 	{
-		e.preventDefault();
-		e.stopPropagation();
-		console.log("Tripfinder Next TODO: refreshPathClick");
-		return;
-
 		var self = this;
 		e.preventDefault();
 		e.stopPropagation();

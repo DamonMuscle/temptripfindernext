@@ -1008,34 +1008,8 @@
 	{
 		this.clearMode();
 		this.viewModel.routingChangePath && this.viewModel.routingChangePath.clearAll();
-		var trip = this.dataModel.getTripById(data.id);
-		trip.FieldTripStops.forEach(tripStop => tripStop.routeStops = null);
-		tf.loadingIndicator.show();
-		this.viewModel.drawTool.NAtool.refreshTripByMultiStops(trip.FieldTripStops).then(result =>
-		{
-			tf.loadingIndicator.tryHide();
-			if (result[0])
-			{
-				this.dataModel.updateTrip(trip);
-				return;
-			}
 
-			let message;
-			if (result[1])
-			{
-				message = result[1];
-			}
-			else
-			{
-				message = "Refresh path failed!";
-				if (result.err)
-				{
-					message += "  " + result.err;
-				}
-			}
-
-			tf.promiseBootbox.alert(message);
-		});
+		tf.loadingIndicator.enhancedShow(this.viewModel.viewModel.onRefreshFieldTripPath({fieldTripId: data.id}));
 	};
 
 	/**

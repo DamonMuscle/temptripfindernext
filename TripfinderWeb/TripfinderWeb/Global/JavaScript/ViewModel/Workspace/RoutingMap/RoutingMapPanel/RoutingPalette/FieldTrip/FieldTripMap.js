@@ -1110,7 +1110,6 @@
 		return effectSequences;
 	}
 
-	
 	FieldTripMap.prototype._updateRoutepathAndDirection = async function(fieldTrip, effectSequences)
 	{
 		if (!fieldTrip.routePath)

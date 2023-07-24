@@ -249,7 +249,13 @@
 		}
 
 		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this._viewModal.sketchTool);
-	}
+	};
+
+	RoutingPaletteViewModel.prototype.onRefreshFieldTripPath = async function({fieldTripId})
+	{
+		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
+		await this.fieldTripMap?.refreshFieldTripPath(fieldTrip);
+	};
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocationCompleted = function(_, data)
 	{
