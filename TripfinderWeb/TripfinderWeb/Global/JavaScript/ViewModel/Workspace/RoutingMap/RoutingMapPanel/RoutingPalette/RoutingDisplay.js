@@ -80,21 +80,6 @@
 		});
 	}
 
-	RoutingDisplay.prototype.clearSchoolStudentInfo = function(trips)
-	{
-		trips.map(function(trip)
-		{
-			trip.FieldTripStops.map(function(tripStop)
-			{
-				tripStop.ToSchoolStudents = { HomeToSchool: 0, SchoolToHome: 0 };
-				tripStop.ToTransStudents = { HomeToTrans: 0, TransToHome: 0 };
-				tripStop.TransToTrans = { PUTransToTrans: 0, DOTransToTrans: 0 };
-				tripStop.PUTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
-				tripStop.DOTransToSchool = { TransToSchool: 0, SchoolToTrans: 0 };
-			});
-		});
-	}
-
 	RoutingDisplay.prototype.newSummaryTripObject = function(name, studentCount, stopCount, time, distance)
 	{
 		return {
@@ -869,7 +854,6 @@
 
 		tripStop.StreetSegment = null;
 		self.dataModel.fieldTripStopDataModel.update([tripStop], true);
-		self.dataModel.lockSchoolLocation(tripStop);
 	};
 
 	RoutingDisplay.prototype.fixSchoolNodeStyle = function(nodeElement)
@@ -989,9 +973,6 @@
 
 		var $tripDeleteButtons = routingtreeview.find(".icon.trip-delete");
 		$tripDeleteButtons.off('click').on('click', tripDeleteClick.bind(self));
-
-		var $minusButtons = routingtreeview.find(".icon.minus");
-		$minusButtons.off('click').on('click', minusClick.bind(self));
 
 		var $scheduledTimeButtons = routingtreeview.find(".schedule-time");
 		$scheduledTimeButtons.off('click').on('click', scheduledTimeClick.bind(self));
@@ -1477,16 +1458,6 @@
 		$(e.target.closest('li')).attr('suspend', 'true');
 	}
 
-	function minusClick(e)
-	{
-		var self = this;
-		e.preventDefault();
-		e.stopPropagation();
-		var data = self.treeview.dataItem(e.target.closest('li'));
-		var tripStop = self.dataModel.getFieldTripStopByStopId(data.customData.tripStopId);
-		self.dataModel.changeDataStack.push(tripStop);
-	}
-
 	RoutingDisplay.prototype.onTripStopsChange = function(e, data)
 	{
 		var self = this;
@@ -1752,20 +1723,6 @@
 		{
 			self.setTripStopNodeProperty(tripStopNode, self.treeview.findByUid(tripStopNode.uid));
 		}
-	}
-
-	RoutingDisplay.prototype.onAssignStudentsChange = function(e, data)
-	{
-		var self = this, affectedStudentIds = [];
-		var tripStop = data.tripStop;
-		self.setFootInfo();
-		var trip = Enumerable.From(self.dataModel.trips).FirstOrDefault(null, function(c) { return c.id == tripStop.FieldTripId; });
-		data.isRecalculate != false && self.resetTripInfo([trip]);
-		var affectedStudents = affectedStudentIds.concat(data.add, data.delete);
-		affectedStudents.map(function(student)
-		{
-			self.refreshAffectStopByStudentId(student.id, student.RequirementID ? null : tripStop);
-		});
 	}
 
 	RoutingDisplay.prototype.setTripStopNodeProperty = function(nodeData, nodeElement, onlyAffectCurrentNode)
@@ -2212,7 +2169,6 @@
 			promise = self.resetTripInfo(data.edit, true).then(function()
 			{
 				var newAddList = [];
-				// self.clearSchoolStudentInfo(data.edit);
 				data.edit.map(function(trip)
 				{
 					var deleteTrip = self.routingDisplayHelper.getTripNodeById(trip);
@@ -2532,17 +2488,6 @@
 			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.Change, {...data, onCompleted: ()=> tf.loadingIndicator.tryHide() });
 		});
 	}
-
-	RoutingDisplay.prototype.bindStudentNodeEvent = function(element)
-	{
-		var self = this;
-		if (element)
-		{
-			element.find(".icon.minus").off('click').on('click', minusClick.bind(self));
-			element.find(".icon.add").off('click').on('click', addClick.bind(self));
-			element.find(".icon.zoom-map-to-layers").off('click').on('click', zoomClick.bind(self));
-		}
-	};
 
 	RoutingDisplay.prototype.convertToCurrentMeasurementUnit = function(value)
 	{

@@ -1327,10 +1327,6 @@
 		}
 	};
 
-	RoutingTripMapTool.prototype.reshapeBoundaryDialog = function()
-	{
-		return this._warningDialogBox("The stop boundary shape will be reverted to original since it leads to the trip stop falls outside of the bounary. ");
-	};
 	RoutingTripMapTool.prototype.redrawRegionDialog = function()
 	{
 		return this._warningDialogBox("Region needs to contain the trip stop!");

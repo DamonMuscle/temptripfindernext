@@ -159,47 +159,6 @@
 		});
 	};
 
-	RoutingDataModel.prototype.initSchoolSequence = function(tripId, initTrips)
-	{
-		var self = this;
-		var filteredTrips = initTrips;
-		if (tripId != null)
-		{
-			filteredTrips = initTrips.filter(function(trip)
-			{
-				return trip.id == tripId;
-			});
-		}
-		filteredTrips.forEach(function(trip)
-		{
-			var _tripId = trip.id;
-			self.schoolSequences[_tripId] = {};
-			var schools = self.getSchoolStopsByTrip(trip);
-			schools.forEach(function(item)
-			{
-				var relation = self.schoolSequences[_tripId][item.SchoolCode];
-				if (relation != null)
-				{
-					if (item.Sequence < relation.minSequence)
-					{
-						relation.minSequence = item.Sequence;
-					}
-					if (item.Sequence > relation.maxSequence)
-					{
-						relation.maxSequence = item.Sequence;
-					}
-				}
-				else
-				{
-					self.schoolSequences[_tripId][item.SchoolCode] = {
-						minSequence: item.Sequence,
-						maxSequence: item.Sequence
-					};
-				}
-			});
-		});
-	};
-
 	RoutingDataModel.prototype.displayByFindCandidateTripStops = function(trips)
 	{
 		var self = this;
@@ -2617,11 +2576,6 @@
 		}
 	};
 
-	RoutingDataModel.prototype.isTransfer = function(student, tripStop)
-	{
-		return student.SchoolCode && tripStop.SchoolCode && student.SchoolCode != tripStop.SchoolCode && student.RequirementID;
-	};
-
 	RoutingDataModel.prototype.saveTrips = function(trips)
 	{
 		var self = this;
@@ -3083,7 +3037,6 @@
 	{
 		var self = this,
 			isCloseAll = trips.length == self.trips.length;
-		this.unLockSchoolLocation(trips);
 
 		if (isCloseAll)
 		{
@@ -3093,41 +3046,6 @@
 			var tripIds = trips.map(function(trip) { return trip.id || trip.Id; });
 			this.tripLockData.unLock(tripIds);
 		}
-	};
-
-	RoutingDataModel.prototype.unLockSchoolLocation = function(trips)
-	{
-		trips.forEach(function(trip)
-		{
-			trip.FieldTripStops.forEach(function(tripStop)
-			{
-				if (tripStop.SchoolLocation != null)
-				{
-					tf.lockData.unLockByExtraInfo(tripStop.id, "SchoolLocation");
-				}
-			});
-		});
-	};
-
-	RoutingDataModel.prototype.lockSchoolLocation = function(tripStop)
-	{
-		var releaseLockPromise = Promise.resolve();
-		if (tripStop.SchoolCode)
-		{
-			releaseLockPromise = tf.lockData.unLockByExtraInfo(tripStop.oldId || tripStop.id, "SchoolLocation");
-		}
-		return releaseLockPromise.then(function()
-		{
-			if (tripStop.SchoolLocation)
-			{
-				tf.lockData.setLock({
-					ids: [tripStop.SchoolLocation.Id],
-					extraInfo: tripStop.id,
-					type: "SchoolLocation",
-					isLock: true
-				});
-			}
-		});
 	};
 
 	// #region setting

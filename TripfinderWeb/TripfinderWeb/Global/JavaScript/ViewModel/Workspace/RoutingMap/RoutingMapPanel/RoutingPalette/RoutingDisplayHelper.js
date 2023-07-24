@@ -68,35 +68,6 @@
 		});
 	}
 
-	RoutingDisplayHelper.prototype.insertStudentsByAlphaOrder = function(newStudentNode, tripStopNode)
-	{
-		var self = this,
-			isAdd = false;
-		var tripStopNodeElement = self.routingDisplay.treeview.findByUid(tripStopNode.uid);
-		var studentsNodeElements = tripStopNodeElement.find('ul li');
-		var node = null;
-		for (var i = 0; i < studentsNodeElements.length; i++)
-		{
-			var studentsNodeData = self.routingDisplay.treeview.dataItem(studentsNodeElements[i]);
-			if (studentsNodeData.customData.sortValue < newStudentNode.customData.sortValue)
-			{
-				continue;
-			}
-			else
-			{
-				node = self.routingDisplay.treeview.insertBefore(newStudentNode, $(studentsNodeElements[i]));
-				isAdd = true;
-				break;
-			}
-		}
-		if (!isAdd && tripStopNodeElement.length > 0)
-		{
-			node = self.routingDisplay.treeview.append(newStudentNode, tripStopNodeElement, null, self.routingDisplay.expandStatusDictionary[tripStopNode.id] ? self.routingDisplay.expandStatusDictionary[tripStopNode.id] : null);
-		}
-
-		return node;
-	}
-
 	RoutingDisplayHelper.prototype.checkNodeWasExpanded = function(node)
 	{
 		var self = this;
@@ -303,45 +274,6 @@
 		return [];
 	}
 
-	RoutingDisplayHelper.prototype.getNodesByIdAndType = function(id, type)
-	{
-		var self = this, nodesData;
-		if (type == 'trip')
-		{
-			nodesData = self.routingDisplay.treeview.dataSource.getAll(id, function(data)
-			{
-				return data.customData && data.customData.isTrip;
-			});
-		}
-		else if (type == 'tripStop')
-		{
-			nodesData = self.routingDisplay.treeview.dataSource.getAll(id, function(data)
-			{
-				return data.customData && data.customData.isStop;
-			});
-		}
-		else
-		{
-			nodesData = self.routingDisplay.treeview.dataSource.getAll(id, function(data)
-			{
-				return data.customData && data.customData.isStudent;
-			});
-		}
-
-		return nodesData;
-	}
-
-	RoutingDisplayHelper.prototype.getLoadTimeByGrade = function(student)
-	{
-		var self = this;
-		var setting = self.routingDisplay.dataModel.loadTimeSettings.find(function(loadTimeSetting)
-		{
-			return loadTimeSetting.Category == student.Grade;
-		});
-		var loadTime = setting ? setting.LoadTime : 0;
-		return moment(new Date(1900, 0, 0, 0, 0, loadTime)).format("00:mm:ss");
-	};
-
 	RoutingDisplayHelper.prototype.getFontColor = function(color)
 	{
 		return RoutingDisplayHelper.getFontColor(color);
@@ -405,7 +337,7 @@
 			}
 			else if (property.toLowerCase() == 'loadtime')
 			{
-				node.customData[property] = (data.LoadTime != null && data.LoadTime != 0) ? data.LoadTime : self.getLoadTimeByGrade(data);
+				// remove later
 			}
 			else if (property.toLowerCase() == 'totalTime')
 			{
@@ -532,113 +464,6 @@
 				});
 			}
 		});
-	}
-
-	RoutingDisplayHelper.prototype.updateStudentDayStatus = function(studentNode, student)
-	{
-		var nowDayCheckList = [!!student.Monday, !!student.Tuesday, !!student.Wednesday, !!student.Thursday, !!student.Friday, !!student.Saturday, !!student.Sunday]
-		studentNode.set('customData.dayCheckList', nowDayCheckList);
-
-		var nowDayDisableList = [!student.ValidMonday, !student.ValidTuesday, !student.ValidWednesday, !student.ValidThursday, !student.ValidFriday, !student.ValidSaturday, !student.ValidSunday];
-		var initCannotCheckableList = [!student.ValidMonday, !student.ValidTuesday, !student.ValidWednesday, !student.ValidThursday, !student.ValidFriday, !student.ValidSaturday, !student.ValidSunday];
-		studentNode.set('customData.initDayUncheckableList', initCannotCheckableList);
-		// assigned students apply 'at least one day is checked', candidate students do not apply this rule
-		if (this.filterArray(nowDayCheckList, true).length == 1 && ((student.IsAssigned != null && student.IsAssigned) || (student.canBeAssigned != null && !student.canBeAssigned)))
-		{
-			nowDayDisableList = nowDayCheckList.map(function(value, index)
-			{
-				return value || studentNode.customData.initDayUncheckableList[index];
-			});
-		}
-		studentNode.set('customData.dayDisableList', nowDayDisableList);
-	}
-
-	RoutingDisplayHelper.prototype.NoSelectedDay = function(student)
-	{
-		if (!student.ValidMonday
-			&& !student.ValidTuesday
-			&& !student.ValidWednesday
-			&& !student.ValidThursday
-			&& !student.ValidFriday
-			&& !student.ValidSaturday
-			&& !student.ValidSunday)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	RoutingDisplayHelper.prototype.setStudentStatus = function(student, tripStop)
-	{
-		var self = this;
-		var isTransfer = self.routingDisplay.dataModel.isTransfer(student, tripStop);
-		if (tripStop.SchoolCode)
-		{
-			var status;
-			if (isTransfer)
-			{
-				if (tripStop.SchoolCode == student.TransSchoolCode)
-				{
-					if (student.Session == 0)
-					{
-						status = student.PreviousScheduleID == 0 ? 'PU - home To trans' : 'PU - transfer student';
-					}
-					else if (student.Session == 1)
-					{
-						status = student.PreviousScheduleID == 0 ? 'DO - trans To home' : 'DO - transfer student';
-					}
-					else
-					{
-						status = 'PU - school to school';
-					}
-				}
-				else
-				{
-					if (student.Session == 0)
-					{
-						status = student.PreviousScheduleID == 0 ? 'DO - home To trans' : 'DO - transfer student';
-					}
-					else if (student.Session == 1)
-					{
-						status = student.PreviousScheduleID == 0 ? 'PU - trans To home' : 'PU - transfer student';
-					}
-					else
-					{
-						status = 'DO - school to school';
-					}
-				}
-			}
-			else
-			{
-				if (student.PreviousScheduleID == 0)
-				{
-					switch (student.Session)
-					{
-						case 2:
-							status = 'DO - school To school';
-							break;
-						case 0:
-							status = student.TripStopID == tripStop.id ? 'PU - home To school' : 'DO - home To school';
-							break;
-						default:
-							status = student.TripStopID == tripStop.id ? 'DO - school To home' : 'PU - school To home';
-							break;
-					}
-				}
-				else
-				{
-					status = student.Session == 0 ? 'DO - trans To school' : 'PU - school To trans';
-				}
-			}
-			student.PUDOStatus = status;
-		}
-		else
-		{
-			student.PUDOStatus = student.Session == 0 ? 'PU' : 'DO';
-		}
 	}
 
 	RoutingDisplayHelper.prototype.toggleLastStopStyle = function(tripStopNode, isExpand)

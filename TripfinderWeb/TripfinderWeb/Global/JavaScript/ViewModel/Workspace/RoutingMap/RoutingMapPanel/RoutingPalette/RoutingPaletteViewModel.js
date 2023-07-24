@@ -2,9 +2,9 @@
 {
 	createNamespace("TF.RoutingMap").RoutingPaletteViewModel = RoutingPaletteViewModel;
 
-	function RoutingPaletteViewModel(viewModal, isOpen, routeState, trips)
+	function RoutingPaletteViewModel(mapCanvasPage, isOpen, routeState, trips)
 	{
-		TF.RoutingMap.BasePaletteViewModel.call(this, viewModal, isOpen, routeState);
+		TF.RoutingMap.BasePaletteViewModel.call(this, mapCanvasPage, isOpen, routeState);
 		var self = this;
 		self.obShow(false);
 		self.routeState = routeState;
@@ -15,7 +15,7 @@
 		self.isOpen = !!isOpen;
 		self.templateName = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingPalette";
 		self.$element = null;
-		self._viewModal = viewModal;
+		self._viewModal = mapCanvasPage;
 		self.tripViewModel = new TF.RoutingMap.RoutingPalette.TripViewModel(self, routeState, trips);
 		self.dataModel = self.tripViewModel.dataModel;
 		self.stopPoolViewModel = new TF.RoutingMap.RoutingPalette.StopPoolViewModel(self);

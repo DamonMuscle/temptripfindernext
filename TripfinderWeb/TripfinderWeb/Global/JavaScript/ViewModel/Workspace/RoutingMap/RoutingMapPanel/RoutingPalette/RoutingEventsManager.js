@@ -860,7 +860,6 @@
 					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
 				self.dataModel.setActualStopTime([newTrip]);
-				self.dataModel.viewModel.display.clearSchoolStudentInfo([newTrip]);
 				return newTrip;
 			});
 		});
@@ -1356,7 +1355,6 @@
 					newTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
 				self.dataModel.setActualStopTime([newTrip], true);
-				self.dataModel.viewModel.display.clearSchoolStudentInfo([newTrip]);
 				// if (oldTrips.filter(function(trip) { return trip.id == newTrip.id }).length == 0)
 				// {
 				// 	self.dataModel.resetCopyTripValue(newTrip);
@@ -1677,7 +1675,6 @@
 					unassignedStopsTrip.FieldTripStops[j].Duration = tripData.FieldTripStops[j].Duration;
 				}
 				self.dataModel.setActualStopTime([unassignedStopsTrip], true);
-				self.dataModel.viewModel.display.clearSchoolStudentInfo([unassignedStopsTrip]);
 				self.dataModel.resetCopyTripValue(unassignedStopsTrip);
 				self.dataModel.copyStopTimeWithActualTime([unassignedStopsTrip]);
 				unassignedStopsTrip.color = "#000000";
