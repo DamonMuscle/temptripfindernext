@@ -1044,6 +1044,6 @@
 
 	BaseFieldTripStopEditModal.prototype.draggable = function()
 	{
-		TF.RoutingMap.BaseEditModal.prototype.draggable.call(this, ".resizable-doc");
+		TF.RoutingMap.BaseEditModal.prototype.draggable.call(this, ".resizable-page");
 	};
 })();
