@@ -561,16 +561,17 @@
 
 	GeoLinkTool.prototype._getIdenticalDeleteStops = function(deleteItem)
 	{
-		var self = this, tripId = deleteItem.tripId, deleteG = new tf.map.ArcGIS.Polygon({ spatialReference: 102100 }), deleteS = deleteItem.deleteStop;
-		deleteG.rings = deleteS.boundary ? deleteS.boundary.rings : [];
-		var identicalStops = [];
+		var self = this,
+			tripId = deleteItem.tripId,
+			identicalStops = [];
+
 		self.dataModel.dataModel.trips.filter(function(trip) { return trip.OpenType == "Edit" }).forEach(function(trip)
 		{
 			if (trip.id != tripId)
 			{
-				trip.TripStops.forEach(function(tripStop, index)
+				trip.FieldTripStops.forEach(function(tripStop, index)
 				{
-					var isCurrentStopIdentical = self._isPrevAfterStopsSameByTripSession(trip, deleteItem.deleteStop, trip.TripStops[index - 1], trip.TripStops[index + 1], deleteItem.prevStop, deleteItem.nextStop)
+					var isCurrentStopIdentical = self._isPrevAfterStopsSameByTripSession(trip, deleteItem.deleteStop, trip.FieldTripStops[index - 1], trip.FieldTripStops[index + 1], deleteItem.prevStop, deleteItem.nextStop)
 
 					if (isCurrentStopIdentical)
 					{

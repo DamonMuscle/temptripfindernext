@@ -306,7 +306,7 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapDirectionUpdated = function(_, data)
 	{
-		const trip = this.dataModel.getTripById(data.fieldTrip.Id);
+		const trip = this.dataModel.getTripById(data.fieldTrip.id);
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
 		this.tripViewModel.display.resetTripInfo([trip]);
