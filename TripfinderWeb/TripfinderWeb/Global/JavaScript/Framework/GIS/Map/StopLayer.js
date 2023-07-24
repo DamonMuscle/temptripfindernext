@@ -66,10 +66,10 @@
 			moveDuplicateNode: self._getMoveDuplicateNode.bind(self),
 			isFeatureLayer: false,
 		};
-		sketchTool.transform(stopGraphic.clone(), options, self.moveStopCallback.bind(self));
+		sketchTool.transform(stopGraphic.clone(), options, self._moveStopCallback.bind(self));
 	}
 
-	StopLayer.prototype.moveStopCallback = async function(graphics)
+	StopLayer.prototype._moveStopCallback = async function(graphics)
 	{
 		if (!graphics)
 		{
@@ -82,36 +82,17 @@
 			// loadingIndicator should be hide onStopLayerMoveStopCompleted
 		}
 
-		const self = this,
-			movingStopGraphic = self.editing.movingStop.graphic;
+		const self = this;
+		const updateGraphic = self._getMovedStopGraphic(graphics);
+		const movedStopData = await self._updateMovedStop(updateGraphic);
 
-		// get updated graphic
-		let updateGraphic = null;
-		graphics.forEach(function(graphic)
-		{
-			if (graphic.attributes.FieldTripId === movingStopGraphic.attributes.FieldTripId &&
-				graphic.attributes.Sequence === movingStopGraphic.attributes.Sequence)
-			{
-				updateGraphic = graphic;
-				return;
-			}
-		});
-
-		let { longitude, latitude } = updateGraphic.geometry;
-		const geocodeStop = await this._getGeocodeStop(longitude, latitude);
-		if (geocodeStop?.Address !== "")
-		{
-			updateGraphic.attributes.Name = geocodeStop.Address;
-		}
-
-		// remove previous stop graphic.
-		this.deleteStop(movingStopGraphic);
+		// remove edit moving stop graphic.
+		self.deleteStop(updateGraphic);
 
 		// STOP moving
 		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
 
-		const data = Object.assign({}, {longitude, latitude}, geocodeStop);
-		PubSub.publish("GISLayer.StopLayer.MoveStopCompleted", data);
+		PubSub.publish("GISLayer.StopLayer.MoveStopCompleted", movedStopData);
 	}
 
 	StopLayer.prototype.deleteStop = function(stopGraphic)
@@ -139,6 +120,26 @@
 		return this.symbolHelper.tripStop(sequence, color);
 	}
 
+	StopLayer.prototype._getMovedStopGraphic = function(graphics)
+	{
+		const self = this,
+			movingStopGraphic = self.editing.movingStop.graphic,
+			{ FieldTripId, Sequence } = movingStopGraphic.attributes;
+
+		let updateGraphic = null;
+		graphics.forEach(function(graphic)
+		{
+			if (graphic.attributes.FieldTripId === FieldTripId &&
+				graphic.attributes.Sequence === Sequence)
+			{
+				updateGraphic = graphic;
+				return;
+			}
+		});
+
+		return updateGraphic;
+	}
+
 	StopLayer.prototype._getGeocodeStop = async function(longitude, latitude)
 	{
 		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
@@ -153,6 +154,28 @@
 		const { Address, City, RegionAbbr, CountryCode } = geocodeResult?.attributes;
 		const data = { Address, City, RegionAbbr, CountryCode };
 
+		return data;
+	}
+
+	StopLayer.prototype._updateMovedStop = async function(updateGraphic)
+	{
+		const self = this,
+			movingStopGraphic = self.editing.movingStop.graphic;
+
+		// update previous stop to avoid z-index changed.
+		const updateGeometry = updateGraphic.geometry;
+		movingStopGraphic.geometry = updateGeometry;
+		movingStopGraphic.visible = true;
+
+		// update stop name by geocoding.
+		const { longitude, latitude } = updateGeometry;
+		const geocodeStop = await this._getGeocodeStop(longitude, latitude);
+		if (geocodeStop?.Address !== "")
+		{
+			movingStopGraphic.attributes.Name = geocodeStop.Address;
+		}
+
+		const data = Object.assign({}, { longitude, latitude }, geocodeStop);
 		return data;
 	}
 
