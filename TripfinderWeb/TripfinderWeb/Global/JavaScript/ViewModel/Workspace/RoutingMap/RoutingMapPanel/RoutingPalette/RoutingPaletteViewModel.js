@@ -336,6 +336,7 @@
 			params = { DBID, FieldTripId, Color, beforeStop, currentStop, afterStop };
 
 		this.fieldTripMap?.addHighlightFeatures(params);
+		this.fieldTripMap?.setFieldTripHighlightLayerVisibility(fieldTrips);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapClearHighlightFieldTripStop = function(_, data)
