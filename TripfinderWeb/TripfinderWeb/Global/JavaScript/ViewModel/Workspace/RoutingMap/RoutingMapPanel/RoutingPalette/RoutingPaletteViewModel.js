@@ -248,6 +248,7 @@
 			return;
 		}
 
+		
 		this.fieldTripMap?.moveStopLocation(fieldTrip, fieldTripStop, this._viewModal.sketchTool);
 	};
 
@@ -347,10 +348,7 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapClearHighlightFieldTripStop = function(_, data)
 	{
-		const { tripId } = data;
-		const fieldTrips = this.dataModel.trips;
-		const fieldTrip = fieldTrips.find(item => item.id === tripId);
-		this.fieldTripMap?.clearHighlightFeatures(fieldTrip);
+		this.fieldTripMap?.clearHighlightFeatures();
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)

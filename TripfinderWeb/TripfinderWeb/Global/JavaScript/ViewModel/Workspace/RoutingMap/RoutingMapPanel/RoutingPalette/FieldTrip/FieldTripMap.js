@@ -727,7 +727,7 @@
 		self.fieldTripHighlightStopLayerInstance.addStops([highlightStopGraphic]);
 	}
 
-	FieldTripMap.prototype.clearHighlightFeatures = async function(fieldTrip = null)
+	FieldTripMap.prototype.clearHighlightFeatures = async function()
 	{
 		const self = this;
 		if (!self.fieldTripHighlightLayerInstance)

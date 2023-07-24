@@ -242,11 +242,7 @@
 
 	RoutingFieldTripStopEditModal.prototype.removeStopSequenceGraphics = function()
 	{
-		const trip = this.obSelectedTrip(),
-			tripId = trip.id,
-			data = { tripId };
-
-		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, data);
+		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop);
 	};
 
 	RoutingFieldTripStopEditModal.prototype.initWalkoutData = function()
