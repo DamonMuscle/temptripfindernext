@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").BasePage = BasePage;
 
@@ -18,15 +18,16 @@
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		self.openSelectedClick = self.openSelectedClick.bind(self);
+		self.relatedClickGen = self.relatedClickGen.bind(self);
 	}
 
 	BasePage.prototype.constructor = BasePage;
 
-	BasePage.prototype.init = function(model, element)
+	BasePage.prototype.init = function (model, element)
 	{
 	};
 
-	BasePage.prototype.onCtrlSPress = function(e, keyCombination)
+	BasePage.prototype.onCtrlSPress = function (e, keyCombination)
 	{
 		e.preventDefault();
 		this.hideBlukMenu();
@@ -37,7 +38,7 @@
 		this.saveAsClick();
 	};
 
-	BasePage.prototype.onCtrlCPress = function(e, keyCombination)
+	BasePage.prototype.onCtrlCPress = function (e, keyCombination)
 	{
 		e.preventDefault();
 		this.hideBlukMenu();
@@ -52,7 +53,7 @@
 	 * Hide bluk menu when the hot key was triggered.
 	 * @returns {void} 
 	 */
-	BasePage.prototype.hideBlukMenu = function()
+	BasePage.prototype.hideBlukMenu = function ()
 	{
 		if (this.bulkMenu && !this.bulkMenu.disposed)
 		{
@@ -60,7 +61,7 @@
 		}
 	}
 
-	BasePage.prototype.clearRelatedRightPage = function(type)
+	BasePage.prototype.clearRelatedRightPage = function (type)
 	{
 		var self = this;
 
@@ -72,7 +73,7 @@
 				break;
 			case "fieldtripde":
 				self.fieldTripDataEntry = null;
-				if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+				if (tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
 				{
 					self.obShowFieldTripDEPanel(false);
 				}
@@ -80,7 +81,7 @@
 			default:
 				self.detailView = null;
 				self.fieldTripDataEntry = null;
-				if(tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
+				if (tf.helpers.fieldTripAuthHelper.checkFieldTripAddable())
 				{
 					self.obShowFieldTripDEPanel(false);
 				}
@@ -89,12 +90,12 @@
 		}
 	};
 
-	BasePage.prototype.showDetails = function()
+	BasePage.prototype.showDetails = function ()
 	{
 		this.showDetailsClick();
 	};
 
-	BasePage.prototype.showDetailsClick = function(rowSelectedId)
+	BasePage.prototype.showDetailsClick = function (rowSelectedId)
 	{
 		var self = this, selectedId;
 		if (rowSelectedId)
@@ -137,7 +138,7 @@
 		self.obShowDetailPanel(true);
 	};
 
-	BasePage.prototype.closeDetailClick = function(filter)
+	BasePage.prototype.closeDetailClick = function (filter)
 	{
 		var self = this,
 			isReadRecordMode = self.detailView.isReadMode(),
@@ -146,7 +147,7 @@
 				: self.detailView.checkLayoutChangeAndClose();
 
 		return Promise.resolve(exitEditing)
-			.then(function(result)
+			.then(function (result)
 			{
 				if (result)
 				{
@@ -180,7 +181,7 @@
 	 * @param {Event} e
 	 * @param {Number} recordId
 	 */
-	BasePage.prototype.onEditRecordSuccessHandler = function(e, recordEntity)
+	BasePage.prototype.onEditRecordSuccessHandler = function (e, recordEntity)
 	{
 		var self = this;
 		if (TF.isMobileDevice)
@@ -193,20 +194,20 @@
 		}
 	};
 
-	BasePage.prototype.updateGridRecord = function(recordId, updateDetailView)
+	BasePage.prototype.updateGridRecord = function (recordId, updateDetailView)
 	{
 		const self = this;
 		self.refreshPage();
 
-		self._validateGridFilter(recordId).then(function(match)
+		self._validateGridFilter(recordId).then(function (match)
 		{
 			if (!match)
 			{
-				self._confirmResetFilter().then(function(result)
+				self._confirmResetFilter().then(function (result)
 				{
 					if (result)
 					{
-						self.searchGrid.runOnNextDataBound && self.searchGrid.runOnNextDataBound(function()
+						self.searchGrid.runOnNextDataBound && self.searchGrid.runOnNextDataBound(function ()
 						{
 							self._selectRecordAndShowDetailView(recordId);
 						});
@@ -224,37 +225,37 @@
 		});
 	};
 
-	BasePage.prototype.refreshPage = function()
+	BasePage.prototype.refreshPage = function ()
 	{
 		const self = this;
 		self.searchGrid.kendoGrid.dataSource.read();
 		self.detailView?.refresh();
 	}
 
-	BasePage.prototype._validateGridFilter = function(recordId)
+	BasePage.prototype._validateGridFilter = function (recordId)
 	{
 		const self = this,
-		grid = self.searchGrid,
-		promise = new Promise(function(resolve, reject)
-		{
-			TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(grid).then(function(ids)
+			grid = self.searchGrid,
+			promise = new Promise(function (resolve, reject)
 			{
-				resolve(ids.includes(recordId));
+				TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(grid).then(function (ids)
+				{
+					resolve(ids.includes(recordId));
+				});
 			});
-		});
 		return promise;
 	}
 
-	BasePage.prototype._confirmResetFilter = function()
+	BasePage.prototype._confirmResetFilter = function ()
 	{
 		const self = this,
 			grid = self.searchGrid,
 			message = 'The saved record would not be displayed in grid because of the applied filter, do you want to reset the filter?';
-		return self.detailView.showConfirmation(message).then(function(result)
+		return self.detailView.showConfirmation(message).then(function (result)
 		{
 			if (result && grid.clearGridFilterClick)
 			{
-				return grid.clearGridFilterClick().then(function()
+				return grid.clearGridFilterClick().then(function ()
 				{
 					return true;
 				});
@@ -266,7 +267,7 @@
 		});
 	};
 
-	BasePage.prototype._selectRecordAndShowDetailView = function(recordId)
+	BasePage.prototype._selectRecordAndShowDetailView = function (recordId)
 	{
 		const self = this, grid = self.searchGrid;
 		grid.scrollToRowById && grid.scrollToRowById(recordId);
@@ -276,7 +277,8 @@
 		const records = grid.getSelectedRecords()
 		if (!records || !records.length)
 		{
-			const subscription = grid.getSelectedRecords.subscribe(function() {
+			const subscription = grid.getSelectedRecords.subscribe(function ()
+			{
 				subscription?.dispose();
 				self.updateEditable();
 				const isReadOnly = !self.selectedItemEditable();
@@ -285,7 +287,7 @@
 		}
 	};
 
-	BasePage.prototype.editClick = function(viewModel, e)
+	BasePage.prototype.editClick = function (viewModel, e)
 	{
 		var self = this, view, selectedIds, gridVM = viewModel ? viewModel.gridViewModel : self;
 		if (gridVM.isGridPage)
@@ -314,7 +316,7 @@
 		self.obShowFieldTripDEPanel(true);
 	};
 
-	BasePage.prototype.getStatusChangedMessage = function(selectedRecords)
+	BasePage.prototype.getStatusChangedMessage = function (selectedRecords)
 	{
 		var msg = "",
 			stageId = selectedRecords[0].FieldTripStageId;
@@ -347,13 +349,13 @@
 		return msg;
 	};
 
-	BasePage.prototype.showHideColumns = function(viewModel, e)
+	BasePage.prototype.showHideColumns = function (viewModel, e)
 	{
 		var self = this;
 		self.searchGrid.addRemoveColumnClick(viewModel, e);
 	};
 
-	BasePage.prototype.copyToClipboardClick = function(viewModel, e)
+	BasePage.prototype.copyToClipboardClick = function (viewModel, e)
 	{
 		var self = this, selectedIds = this.searchGrid.getSelectedIds();
 
@@ -362,7 +364,7 @@
 			return Promise.resolve();
 		}
 		return self.searchGrid.getSelectedRecordsFromServer()
-			.then(function(response)
+			.then(function (response)
 			{
 				var el = document.createElement('textarea');
 				el.value = TF.Helper.KendoGridHelper.getStringOfRecords(response.Items, self.searchGrid._obSelectedColumns());
@@ -375,9 +377,9 @@
 			});
 	};
 
-	BasePage.prototype.dateCheck = function(fieldtrips, field, newValue)
+	BasePage.prototype.dateCheck = function (fieldtrips, field, newValue)
 	{
-		var result = $.grep(fieldtrips, function(trip)
+		var result = $.grep(fieldtrips, function (trip)
 		{
 			if ("DepartDateTime" === field)
 			{
@@ -400,16 +402,16 @@
 				return true;
 			}
 		});
-		return result.map(function(item) { return item.Id });
+		return result.map(function (item) { return item.Id });
 	};
 
-	BasePage.prototype.saveAsClick = function()
+	BasePage.prototype.saveAsClick = function ()
 	{
 		var self = this, selectedIds = self.searchGrid.getSelectedIds();
 
 		if (selectedIds.length === 0 && this.searchGrid.kendoGrid.dataSource._total > 0)
 		{
-			TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(this.searchGrid).then(function(data)
+			TF.Grid.LightKendoGrid.prototype.getIdsWithCurrentFiltering.call(this.searchGrid).then(function (data)
 			{
 				selectedIds = data;
 				self.searchGrid.exportCurrentGrid(selectedIds);
@@ -421,14 +423,82 @@
 		}
 	};
 
-	BasePage.prototype.openSelectedClick = function(viewModel, e)
+	BasePage.prototype.relatedClickGen = function (type, descriptor)
+	{
+		return function (viewModel, e)
+		{
+			this._openRelated(type, descriptor, e);
+		}.bind(this)
+	};
+
+	BasePage.prototype._openRelated = function (gridType, descriptor, e)
+	{
+		const self = this;
+		const selectedIds = self.searchGrid.getSelectedIds();
+		if (selectedIds.length > 0)
+		{
+			self._getIdsFromRelated(gridType, descriptor, selectedIds).then(function (ids)
+			{
+				//Maybe sooner change the data get from DB of new page loading
+				const fromMenu = $(e.currentTarget).find(".menu-label").text().trim();
+
+				let toGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[gridType]);
+				const fromGridType = tf.applicationTerm.getApplicationTermPluralByName(tf.modalHelper.Mappings[self.type]);
+
+				const dataType = tf.dataTypeHelper.getAvailableDataTypes().find(d => d.key === gridType);
+				const pageType = dataType ? dataType.pageType : gridType;
+				toGridType = toGridType || tf.applicationTerm.getApplicationTermPluralByName(dataType.name);
+
+				const filterName = `${toGridType} (${fromMenu} for Selected ${fromGridType})`;
+
+				sessionStorage.setItem("openRelated", JSON.stringify(
+					{
+						"gridType": gridType,
+						"type": self.type,
+						"pageType": pageType,
+						"filterName": filterName,
+						"selectedIds": ids,
+					}));
+
+				const location = "#/?pagetype=" + pageType;
+				const redirectWindow = window.open(location, "_blank");
+				redirectWindow.name = "new-pageWindow_" + $.now();
+
+				sessionStorage.removeItem("openRelated");
+			}.bind(self));
+		}
+		else
+		{
+			self.searchGrid.gridAlert.show(
+				{
+					message: "no data selected!"
+				});
+		}
+	};
+
+	BasePage.prototype._getIdsFromRelated = function (type, descriptor, relatedIds)
+	{
+		return new Promise(function (resolve, reject)
+		{
+			tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), type, "ids", descriptor),
+				{
+					data: relatedIds,
+				})
+				.then(function (result)
+				{
+					resolve(result.Items[0]);
+				}.bind(this))
+		}.bind(this));
+	};
+
+	BasePage.prototype.openSelectedClick = function (viewModel, e)
 	{
 		var redirectWindow = window.open('', '_blank');
 		redirectWindow.blur();
 		this._openSelected(this.pageType, e, redirectWindow);
 	};
 
-	BasePage.prototype._openSelected = function(gridType, e, redirectWindow)
+	BasePage.prototype._openSelected = function (gridType, e, redirectWindow)
 	{
 		var selectedIds = this.searchGrid.getSelectedIds();
 		//the filter will sticky once open a new grid, so save the sticky information in DB
@@ -445,7 +515,7 @@
 						"filteredIds": selectedIds,
 						"filterName": filterName
 					})
-			]).then(function()
+			]).then(function ()
 			{
 				redirectWindow.location = "#/?pagetype=" + this.pageType, redirectWindow.name = "new-pageWindow_" + $.now();
 
@@ -460,7 +530,7 @@
 		}
 	};
 
-	BasePage.prototype.dispose = function()
+	BasePage.prototype.dispose = function ()
 	{
 		var self = this;
 

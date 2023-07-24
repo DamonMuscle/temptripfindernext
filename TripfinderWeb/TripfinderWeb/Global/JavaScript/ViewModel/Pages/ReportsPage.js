@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").ReportsPage = ReportsPage;
 
@@ -10,13 +10,14 @@
 		TF.Page.BaseGridPage.apply(self, arguments);
 		self.cancelButton = false;
 		self.detailButton = false;
+		self.disableDoubleClick = true;
 		self.schedulerButton = false;
 	}
 
 	ReportsPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	ReportsPage.prototype.constructor = ReportsPage;
 
-	ReportsPage.prototype.updateOptions = function()
+	ReportsPage.prototype.updateOptions = function ()
 	{
 		var self = this;
 		self.options.gridDefinition = tf.reportGridDefinition.gridDefinition();
@@ -26,7 +27,7 @@
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";
 		var staticFilter = new TF.FilterItem("DataTypeName", "EqualTo", "Field Trip");
-		self.options.setRequestOption = function(options)
+		self.options.setRequestOption = function (options)
 		{
 			if (options.data.filterSet && options.data.filterSet.FilterItems)
 			{
@@ -43,18 +44,18 @@
 			return options;
 
 		}
-		self.options.setRequestURL = function()
+		self.options.setRequestURL = function ()
 		{
 			return tf.api.apiPrefixWithoutDatabase() + "/search/ExagoReports";
 		};
 
 	};
 
-	ReportsPage.prototype.bindButtonEvent = function()
+	ReportsPage.prototype.bindButtonEvent = function ()
 	{
 		var self = this;
 		TF.Page.BaseGridPage.prototype.bindButtonEvent.call(self);
-		self.bindEvent(".iconbutton.mail", function(model, e)
+		self.bindEvent(".iconbutton.mail", function (model, e)
 		{
 			self.sendReportAsMail();
 		});
@@ -66,18 +67,18 @@
 		// {
 		// 	self.viewReport();
 		// });
-		self.bindEvent(".iconbutton.runreport", function(model, e)
+		self.bindEvent(".iconbutton.runreport", function (model, e)
 		{
 			self.runSelectedReportClick();
 		});
 	};
-	ReportsPage.prototype.runSelectedReportClick = function(vm, e)
+	ReportsPage.prototype.runSelectedReportClick = function (vm, e)
 	{
 		var self = this,
 			selectedId = self.searchGrid.getSelectedIds()[0];
 
 		tf.exagoReportDataHelper.fetchReportWithMetadata(selectedId)
-			.then(function(entity)
+			.then(function (entity)
 			{
 				if (!entity) 
 				{
@@ -90,18 +91,18 @@
 						entity: entity
 					}
 				));
-			}).catch(function(err)
+			}).catch(function (err)
 			{
 				tf.promiseBootbox.alert(err);
 			});
 	};
 
-	ReportsPage.prototype._openBulkMenu = function()
+	ReportsPage.prototype._openBulkMenu = function ()
 	{
 		if (!TF.isPhoneDevice)
 		{
 			var self = this;
-			self.$element.delegate("table.k-selectable tr", "contextmenu", function(e)
+			self.$element.delegate("table.k-selectable tr", "contextmenu", function (e)
 			{
 				$(e.currentTarget).trigger('click');
 				self.targetID(self.searchGrid.kendoGrid.dataItem(e.currentTarget).Id);
@@ -117,21 +118,21 @@
 		}
 	};
 
-	ReportsPage.prototype.sendReportAsMail = function()
+	ReportsPage.prototype.sendReportAsMail = function ()
 	{
 		this.generateReport(null, "email", { gridViewModel: this });
 	};
 
-	ReportsPage.prototype.saveReportAsFile = function()
+	ReportsPage.prototype.saveReportAsFile = function ()
 	{
 		this.generateReport(null, "saveas", { gridViewModel: this });
 	};
-	ReportsPage.prototype.viewReport = function()
+	ReportsPage.prototype.viewReport = function ()
 	{
 		this.generateReport(null, "view", { gridViewModel: this });
 	};
 
-	ReportsPage.prototype.generateReport = function(udReport, type, gridMenuViewModel)
+	ReportsPage.prototype.generateReport = function (udReport, type, gridMenuViewModel)
 	{
 		var self = this;
 		if (!udReport)
@@ -143,7 +144,7 @@
 		tf.modalManager.showModal(new TF.Modal.GenerateReportModalViewModel(udReport, type));
 	};
 
-	ReportsPage.prototype.dispose = function()
+	ReportsPage.prototype.dispose = function ()
 	{
 		var self = this;
 		TF.Page.BaseGridPage.prototype.dispose.call(self);

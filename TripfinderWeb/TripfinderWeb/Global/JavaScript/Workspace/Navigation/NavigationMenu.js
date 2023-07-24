@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF").NavigationMenu = NavigationMenu;
 
@@ -32,22 +32,165 @@
 		self.obSettingPages = ko.observableArray([]);
 		self.obDashboardLoRes = ko.observable(false);
 		self.obShowMessageCenter = ko.observable(false);
+		const availableGridPages = tf.dataTypeHelper.getAvailableDataTypes({ includeFakeMajorType: true });
+		self.availableGridPages = availableGridPages.filter(val => val.key !== 'form' && val.key !== "document");
+		self.obGridPages = ko.observableArray(self.availableGridPages);
 
 		self.bindWithKnockout();
 		self.tooltip = new TF.Helper.TFTooltip();
 		self.obIsRefreshing = ko.observable(false);
 		self.obIsRefreshAvailable = ko.observable(true);
+		self.menuViewClick = self.menuViewClick.bind(self);
 
 		self.logoItemClick = self.logoItemClick.bind(self);
 		self.onSwitchAppClick = self.onSwitchAppClick.bind(self);
 		tf.pageManager ? tf.pageManager.changedPageEvent.subscribe(self.setActiveState.bind(self)) : "";
 	}
 
+	NavigationMenu.prototype.showSubMenu = function (data, evt)
+	{
+		evt.stopPropagation();
+		var subMenu = $(evt.currentTarget).find("ul")[0];
+		this.showSubMenuImpl(subMenu, evt.currentTarget);
+	};
+
+	NavigationMenu.prototype.hideSubMenu = function (data, evt)
+	{
+		var $subMenu = $(evt.currentTarget).find("ul");
+		if ($subMenu.length > 0)
+		{
+			$subMenu.hide();
+		}
+	}
+
+	NavigationMenu.prototype.showSubMenuImpl = function (element, of)
+	{
+		if (!element) { return; }
+		var self = this;
+		this.$navigationMenu.find("li.menu-container ul").each(function ()
+		{
+			if (((this == element) || (element.parent && element.parent.parent && this == element.parent.parent)
+				|| (element.parent && element.parent.parent
+					&& element.parent.parent.parent && element.parent.parent.parent.parent
+					&& this == element.parent.parent.parent.parent))
+				&& $('.navigation-item.menu-opened .item-menu').width() >= 300)
+			{
+				const positionOptions = { my: "left top", at: "right top", of: of, collision: "none flipfit" };
+				$(this).show();
+				$(this).position(positionOptions);
+				this.scrollTop = 0;
+				self.repositionUpDownArrows(this);
+				self.updateUpDownArrowStyle(this);
+
+				// The up/down arrow is hidden, need reposition the submenu
+				if (this.classList.contains(CLASS_HEIGHT_FITTED))
+				{
+					$(this).position(positionOptions);
+				}
+			}
+		});
+	};
+
+	NavigationMenu.prototype.updateUpDownArrowStyle = function (submenuContainer)
+	{
+		if ((submenuContainer.scrollHeight - submenuContainer.offsetHeight) <= 24/*24: two paddings' height*/)
+		{
+			$(submenuContainer).addClass(CLASS_HEIGHT_FITTED);
+		} else
+		{
+			$(submenuContainer).removeClass(CLASS_HEIGHT_FITTED);
+		}
+
+		if (Sys.firefox)
+		{
+			$(submenuContainer).addClass("is-firefox");
+		}
+
+		if (submenuContainer.scrollTop === 0)
+		{
+			$(submenuContainer).addClass("scroll-at-top");
+		} else
+		{
+			$(submenuContainer).removeClass("scroll-at-top");
+		}
+
+		if (submenuContainer.offsetHeight === 0 || submenuContainer.scrollTop === (submenuContainer.scrollHeight - submenuContainer.offsetHeight))
+		{
+			$(submenuContainer).addClass("scroll-at-bottom");
+		} else
+		{
+			$(submenuContainer).removeClass("scroll-at-bottom");
+		}
+	}
+
+	NavigationMenu.prototype.repositionUpDownArrows = function (ulPanel, immediateRefresh)
+	{
+		var self = this;
+		var $upArrow = $(ulPanel).find(">.up-arrow-container");
+		if ($upArrow.length === 0)
+		{
+			return;
+		}
+		var $downArrow = $(ulPanel).find(">.down-arrow-container");
+		if (self.needRefreshArrows)
+		{
+			self.needRefreshArrows = false;
+			$upArrow.css({ position: "absolute", top: 0, left: 0 });
+			$downArrow.css({ position: "absolute", bottom: 0, left: 0 });
+		}
+
+		if ($upArrow.css("position") !== "fixed")
+		{
+			var upArrowOffsetPosition = $upArrow.offset();
+			var downArrowOffsetPosition = $downArrow.offset();
+			$upArrow.css({ position: "fixed", top: 0, left: upArrowOffsetPosition.left + "px" });
+			$downArrow.css({ position: "fixed", bottom: 0, left: downArrowOffsetPosition.left + "px" });
+		}
+	}
+
+	NavigationMenu.prototype.menuViewClick = function (viewModel, e)
+	{
+		const self = this,
+			type = $(e.target).closest('[clicktype]').attr("clicktype");
+		if (!type)
+		{
+			return;
+		}
+
+		switch (type)
+		{
+			case "form":
+				e.stopPropagation();
+				e.preventDefault();
+				break;
+			case "changePassword":
+				tf.PasswordChangeModalViewModel(tf.pageManager.currentDatabaseName());
+				self.closeOpenedNavigationItemMenu(false);
+
+				if (TF.isPhoneDevice)
+				{
+					self.closeNavigation();
+				}
+				break;
+			default:
+				// this._addDocument(TF.Document.DocumentData.GridInfo.create(type), e);
+
+				tf.pageManager.openNewPage(type);
+
+				// close the navigation menu in mobile device after click
+				if (TF.isPhoneDevice)
+				{
+					this.closeNavigation();
+				}
+				break;
+		}
+	};
+
 	/**
 	 * Bind data with html elements using knockout.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.bindWithKnockout = function()
+	NavigationMenu.prototype.bindWithKnockout = function ()
 	{
 		tf.loadingIndicator.show();
 
@@ -60,7 +203,7 @@
 	 * Init, called when knockout binding is done.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.init = function()
+	NavigationMenu.prototype.init = function ()
 	{
 		var self = this,
 			$nav = self.$container.find(".navigation-menu");
@@ -68,7 +211,7 @@
 		self.$navigationMenu = $nav;
 		self.$navigationHeader = $nav.find(".navigation-header");
 
-		self.initApplicationSwitcher().then(function(result)
+		self.initApplicationSwitcher().then(function (result)
 		{
 			self.appSwitcherEnabled = result;
 			if (!result)
@@ -92,7 +235,7 @@
 	 * Initialize the navigation menu state.
 	  * @return {void}
 	  */
-	NavigationMenu.prototype.initNavigationMenuState = function()
+	NavigationMenu.prototype.initNavigationMenuState = function ()
 	{
 		var self = this,
 			typeList = ["fieldtrips", "myrequests", "approvals", "settings"],
@@ -104,7 +247,7 @@
 		}
 		if (isExpand && isExpand === "True") { self.toggleNavigationMenu(true); }
 
-		$.each(typeList, function(index, item)
+		$.each(typeList, function (index, item)
 		{
 			self.updateMenuContent(item);
 		});
@@ -116,7 +259,7 @@
 	 * @param {Object} data 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.afterPageMenuOptionUIRender = function($el, data)
+	NavigationMenu.prototype.afterPageMenuOptionUIRender = function ($el, data)
 	{
 		var self = this;
 		if (data.isOpen)
@@ -129,7 +272,7 @@
 	 * Bind events.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.bindRelatedEvents = function()
+	NavigationMenu.prototype.bindRelatedEvents = function ()
 	{
 		var self = this,
 			menuItems = self.appSwitcherEnabled
@@ -145,7 +288,7 @@
 		{
 			self.searchControlTemplate.onSearchStatusToggle.subscribe(self.onQuickSearchStatusChange.bind(self));
 			self.searchControlTemplate.onSearchButtonClickEvent.subscribe(self.onQuickSearchIconClick.bind(self));
-			self.searchControlTemplate.onNavComplete.subscribe(function()
+			self.searchControlTemplate.onNavComplete.subscribe(function ()
 			{
 				if (self.isBeginWithCollapse)
 				{
@@ -160,7 +303,7 @@
 	 * Event handler when quick search icon is clicked.
 	 * @param {Event} evt 
 	 */
-	NavigationMenu.prototype.onQuickSearchButtonClick = function(evt)
+	NavigationMenu.prototype.onQuickSearchButtonClick = function (evt)
 	{
 		var self = this;
 		if (!self.obIsExpand())
@@ -175,7 +318,7 @@
 	 * @param {Event} evt 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.onNavigationItemToggleHoverStatus = function(onHover, evt)
+	NavigationMenu.prototype.onNavigationItemToggleHoverStatus = function (onHover, evt)
 	{
 		var self = this, hoverWidth,
 			widthBuffer = 1,
@@ -216,7 +359,7 @@
 	 * @param {boolean} noAnimation
 	 * @return {Deferred}
 	 */
-	NavigationMenu.prototype.closeOpenedNavigationItemMenu = function(noAnimation, isCollapse)
+	NavigationMenu.prototype.closeOpenedNavigationItemMenu = function (noAnimation, isCollapse)
 	{
 		var self = this,
 			duration = noAnimation ? 0 : self.defaultOpenMenuAnimationDuration,
@@ -241,7 +384,7 @@
 	 * @param {Event} evt
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.toggleMenuBtnClick = function(data, evt)
+	NavigationMenu.prototype.toggleMenuBtnClick = function (data, evt)
 	{
 		evt.stopPropagation();
 
@@ -256,7 +399,7 @@
 	 * @param {boolean} status Whether it is to expand or collapse
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.toggleNavigationMenu = function(status, duration)
+	NavigationMenu.prototype.toggleNavigationMenu = function (status, duration)
 	{
 		var self = this,
 			duration = duration || 0;
@@ -271,7 +414,7 @@
 		if (!tf.permissions.isSupport)
 		{
 			tf.storageManager.save(self.NavigationMenuExpandStatueKey, status)
-				.catch(function(error)
+				.catch(function (error)
 				{
 					// Catch the error so it would not appear in console.
 				});
@@ -282,7 +425,7 @@
 	 * Toggle the status on "more" button
 	 * @param {boolean} status 
 	 */
-	NavigationMenu.prototype.toggleMoreIcon = function(status)
+	NavigationMenu.prototype.toggleMoreIcon = function (status)
 	{
 		var self = this;
 		var $moreBtn = $('.navigation-menu .more');
@@ -303,7 +446,7 @@
 	 * @param {boolean} duration The animation duration
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.easeToggleNavigationAnimation = function(flag, duration)
+	NavigationMenu.prototype.easeToggleNavigationAnimation = function (flag, duration)
 	{
 		var self = this, prevWidth, targetWidth, refreshObj,
 			fadeDuration = duration / 2,
@@ -321,7 +464,7 @@
 			$gridMap = $("#pageContent"),
 			totalWidth = $(document).width(),
 			isToolbarOpened = $toolbar.hasClass("menu-opened"),
-			removeInlineOpacityFunc = function()
+			removeInlineOpacityFunc = function ()
 			{
 
 				$fadeOutElements.css("opacity", "");
@@ -353,7 +496,7 @@
 			$navItems.css({ opacity: 1 }).stop().animate({ opacity: isQuickSearchActive ? 0 : 1 }, { duration: fadeDuration, queue: false, done: removeInlineOpacityFunc });
 			$spinner.css("left", "2px");
 			$moreBtn.css("opacity", 0).stop().animate({ opacity: 0 }, {
-				duration: fadeDuration, queue: false, done: function()
+				duration: fadeDuration, queue: false, done: function ()
 				{
 					$navContent.css("display", "");
 					$quickSearch.css("height", "");
@@ -379,7 +522,7 @@
 			$caret.css("transform", "rotate(180deg)");
 			$fadeOutElements.css("opacity", 0).stop().animate({ opacity: 0 }, { duration: fadeDuration, queue: false });
 			$moreBtn.css("opacity", 0).stop().animate({ opacity: 1 }, {
-				duration: fadeDuration, queue: false, done: function()
+				duration: fadeDuration, queue: false, done: function ()
 				{
 					if (isQuickSearchActive)
 					{
@@ -402,12 +545,12 @@
 			self.isOnAnimation = true;
 			$navMenu.addClass("on-animation");
 			$gridMap.stop().animate({ width: totalWidth - targetWidth }, {
-				duration: duration, queue: false, step: function()
+				duration: duration, queue: false, step: function ()
 				{
 				}
 			});
 			$navMenu.stop().animate({ width: targetWidth }, {
-				duration: duration, queue: false, done: function()
+				duration: duration, queue: false, done: function ()
 				{
 					// Use calc to avoid display issue when there is vertical scroll in gridMap, remove if this is not happending.
 					if (refreshObj.currentInterval)
@@ -446,7 +589,7 @@
 	 * Update the map view/grid view's width after click the expand button.
 	 * @returns {Object} 
 	 */
-	NavigationMenu.prototype.updatePageContentWidth = function()
+	NavigationMenu.prototype.updatePageContentWidth = function ()
 	{
 		var self = this, refreshObj = {}, updateRefreshObj, templateName,
 			leftPanelWidth = $(".left-panel:not(.hide)").width(), $container,
@@ -456,16 +599,16 @@
 			leftPanelWidth = $(".resize-wrap").width();
 		}
 
-		updateRefreshObj = function()
+		updateRefreshObj = function ()
 		{
-			refreshObj.function = function()
+			refreshObj.function = function ()
 			{
 				if (tf.pageManager.resizablePage)
 				{
 					tf.pageManager.resizablePage.reLayoutPage();
 				}
 			};
-			refreshObj.currentInterval = setInterval(function()
+			refreshObj.currentInterval = setInterval(function ()
 			{
 				refreshObj.function();
 			}, 50);
@@ -479,7 +622,7 @@
 	 * @param {string} type The page type
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.updateMenuContent = function(type, hover)
+	NavigationMenu.prototype.updateMenuContent = function (type, hover)
 	{
 		var self = this, pageList, categoryName,
 			$item = self.$navigationMenu.find(".navigation-item." + type);
@@ -489,7 +632,7 @@
 			switch (type)
 			{
 				case "settings":
-					tf.pageManager.loadDataSourceName().then(function()
+					tf.pageManager.loadDataSourceName().then(function ()
 					{
 						pageList = tf.pageManager.obAdministrationPagesMenu();
 						self.obSettingPages(pageList);
@@ -511,7 +654,7 @@
 	 * @param {Event} evt The event object
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.navigationPageCategoryClick = function(type, data, evt)
+	NavigationMenu.prototype.navigationPageCategoryClick = function (type, data, evt)
 	{
 		if ((evt.ctrlKey || evt.metaKey) && type !== "settings")
 		{
@@ -543,7 +686,7 @@
 		}
 
 		//skip the method if user click the link to the same page.
-		if (($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active")) && type !== "settings")
+		if (($(evt.target).closest(".navigation-item,.toolbar-button").hasClass("active")) && type !== "settings" && type !== "datagrid")
 		{
 			return;
 		}
@@ -596,6 +739,9 @@
 			case "fieldtrips":
 				ga('send', 'event', 'Area', 'Field Trips');
 				break;
+			case "fieldtripinvoices":
+				ga('send', 'event', 'Area', 'Field Trip Invoices');
+				break;
 			case "myrequests":
 				ga('send', 'event', 'Area', 'My Submitted Requests');
 				break;
@@ -616,12 +762,12 @@
 	 * @param {number} duration
 	 * @return {Deferred}
 	 */
-	NavigationMenu.prototype.togglePageMenuDisplay = function($item, flag, duration)
+	NavigationMenu.prototype.togglePageMenuDisplay = function ($item, flag, duration)
 	{
 		var self = this, animationDeferred = $.Deferred(),
 			$itemMenu = $item.find(".item-menu"),
 			isOpened = $item.hasClass("menu-opened"),
-			pageCount = $itemMenu.find("ul:first-child>li").length;
+			pageCount = $itemMenu.find("ul:first-child>li").filter((index, el) => $(el).css('display') != 'none').length;
 
 		var contentHeight = $(".navigation-toolbar").offset().top - $item.offset().top;
 
@@ -629,7 +775,26 @@
 			menuHeight = pageCount * self.pageItemHeight + self.pageCategoryHeight, targetWidth,
 			initWidth = self.obIsExpand() ?
 				self.expandWidth :
-				$item.find(".item-icon").outerWidth() + $item.find(".item-label").outerWidth();
+				$item.find(".item-icon").outerWidth() + $item.find(".item-label").outerWidth(),
+			$ul = $itemMenu.find('>ul'),
+			$label = $item.find(".item-label");
+
+		if (!TF.isPhoneDevice)
+		{
+			if (self.obIsExpand())
+			{
+				$itemMenu.css({ paddingTop: 0 });
+			}
+			else 
+			{
+				$itemMenu.css({ paddingTop: 54 }); // reserve display space for menu label
+			}
+
+			menuHeight = self.obIsExpand() ? pageCount * self.pageItemHeight : pageCount * self.pageItemHeight + self.pageCategoryHeight;
+		}
+
+		var menuLeft = self.obIsExpand() ? $item[0].clientWidth : $item.find(".item-icon").outerWidth();
+
 		if ($itemMenu.width() == 620) 
 		{
 			targetWidth = 620;
@@ -652,8 +817,27 @@
 			self.isOnAnimation = true;
 			$item.addClass("onAnimation");
 			$item.addClass("menu-opened");
-			$itemMenu.stop().animate({ width: targetWidth, height: menuHeight }, {
-				duration: duration, queue: false, done: function()
+
+			var itemTop = this.getCoords($item[0]).top,
+				bodyHeight = $(document.body).height(),
+				menuTop = Math.min($(window).height() - itemTop - menuHeight, 0);
+
+			var openAnimateParameters = { width: targetWidth, height: menuHeight };
+
+			if (!TF.isPhoneDevice)
+			{
+				$item.addClass("small-screen");
+
+				if (!self.obIsExpand())
+				{
+					$ul.before($label[0].outerHTML); // duplicate menu label
+				}
+
+				openAnimateParameters = { width: targetWidth, height: menuHeight, top: menuTop, left: menuLeft };
+			}
+
+			$itemMenu.stop().animate(openAnimateParameters, {
+				duration: duration, queue: false, done: function ()
 				{
 					self.isOnAnimation = false;
 					$item.removeClass("onAnimation");
@@ -663,22 +847,31 @@
 		}
 		else if (!flag && isOpened)
 		{
+			var closeAnimateParameters = TF.isPhoneDevice ?
+				{ width: initWidth, height: self.pageCategoryHeight } :
+				{ width: initWidth, height: self.pageCategoryHeight, top: 0, left: menuLeft };
 			//If the item text is greater than 310, get the width.
 			targetWidth = targetWidth > $itemMenu.width() ? targetWidth : $itemMenu.width();
 
 			$itemMenu.css({ width: targetWidth, height: menuHeight });
+
 			self.isOnAnimation = true;
 			$item.addClass("onAnimation");
 			$item.removeClass("menu-opened");
-			$itemMenu.stop().animate({ width: initWidth, height: self.pageCategoryHeight }, {
-				duration: duration, queue: false, done: function()
+			$itemMenu.stop().animate(closeAnimateParameters, {
+				duration: duration, queue: false, done: function ()
 				{
 					self.isOnAnimation = false;
 					$item.removeClass("onAnimation");
-					$itemMenu.css({ width: "", height: "", display: "" });
+					$itemMenu.css({ width: "", height: "", display: "", left: "", top: "" });
 					animationDeferred.resolve();
 				}
 			});
+
+			if ($itemMenu.find('.item-label'))
+			{
+				$itemMenu.find('.item-label').remove();
+			}
 		}
 		else
 		{
@@ -688,13 +881,28 @@
 		return animationDeferred;
 	};
 
+
+	NavigationMenu.prototype.getCoords = function (elem)
+	{
+		var box = elem.getBoundingClientRect(),
+			body = document.body,
+			docEl = document.documentElement,
+			scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop,
+			scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft,
+			clientTop = docEl.clientTop || body.clientTop || 0,
+			clientLeft = docEl.clientLeft || body.clientLeft || 0,
+			top = box.top + scrollTop - clientTop,
+			left = box.left + scrollLeft - clientLeft;
+		return { top: Math.round(top), left: Math.round(left) };
+	};
+
 	/**
 	 * Click event for showMore button.
 	 * @param {Object} data
 	 * @param {Event} evt
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.showMoreButtonClick = function(data, evt)
+	NavigationMenu.prototype.showMoreButtonClick = function (data, evt)
 	{
 		evt.stopPropagation();
 
@@ -712,7 +920,7 @@
 	 * @param {number} duration
 	 * @return {Deferred} 
 	 */
-	NavigationMenu.prototype.toggleMoreToolbarButtonsDisplay = function(flag, duration)
+	NavigationMenu.prototype.toggleMoreToolbarButtonsDisplay = function (flag, duration)
 	{
 		var self = this, animationDeferred = $.Deferred(),
 			duration = duration || 0,
@@ -727,7 +935,7 @@
 			$toolbar.addClass("onAnimation");
 			$toolbar.addClass("menu-opened");
 			$toolbar.stop().animate({ width: self.moreToolbarExpandWidth }, {
-				duration: duration, queue: false, done: function()
+				duration: duration, queue: false, done: function ()
 				{
 					self.isOnAnimation = false;
 					$toolbar.removeClass("onAnimation");
@@ -743,7 +951,7 @@
 			$toolbar.addClass("onAnimation");
 			$toolbar.removeClass("menu-opened");
 			$toolbar.stop().animate({ width: self.collapseWidth }, {
-				duration: duration, queue: false, done: function()
+				duration: duration, queue: false, done: function ()
 				{
 					self.isOnAnimation = false;
 					$toolbar.removeClass("onAnimation");
@@ -766,7 +974,7 @@
 	 * @param {Event} evt 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.openPageButtonClick = function(pageType, data, evt)
+	NavigationMenu.prototype.openPageButtonClick = function (pageType, data, evt)
 	{
 		if (evt.ctrlKey || evt.metaKey)
 		{
@@ -796,7 +1004,7 @@
 			{
 				self.setActiveStateByPageType(pageType);
 				var pList = [self.closeOpenedNavigationItemMenu(false)];
-				Promise.all(pList).then(function()
+				Promise.all(pList).then(function ()
 				{
 					if (TF.isPhoneDevice)
 					{
@@ -818,7 +1026,7 @@
 		}
 	};
 
-	NavigationMenu.prototype.openDataSourceButtonClick = function()
+	NavigationMenu.prototype.openDataSourceButtonClick = function ()
 	{
 		var self = this;
 		tf.showSelectDataSourceModel(tf.pageManager.currentDatabaseName());
@@ -830,7 +1038,7 @@
 		}
 	};
 
-	NavigationMenu.prototype.setActiveState = function(e, type)
+	NavigationMenu.prototype.setActiveState = function (e, type)
 	{
 		var self = this;
 		self.setActiveStateByPageType(type);
@@ -841,7 +1049,7 @@
 	 * @param {number} pageId 
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.setActiveStateByPageType = function(type)
+	NavigationMenu.prototype.setActiveStateByPageType = function (type)
 	{
 		if (TF.isPhoneDevice && type === "settingsConfig")
 		{
@@ -850,7 +1058,7 @@
 
 		var self = this,
 			pageType = type.replace("Scheduler", ""),
-			$pageItem = $(".item-menu li[pageType='" + pageType + "']"),
+			$pageItem = $(".item-menu li[pageType='" + pageType + "'], [clicktype='" + pageType + "']"),
 			$categoryItem = $pageItem.length > 0 ? $pageItem.closest(".navigation-item") : $(".navigation-item[pageType='" + pageType + "']");
 
 		if (self.$navigationMenu)
@@ -865,11 +1073,11 @@
 	 * Initialize the tooltip.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.initTooltip = function()
+	NavigationMenu.prototype.initTooltip = function ()
 	{
 		var self = this;
 		if (TF.isPhoneDevice) { return; }
-		$('.navigation-menu .toolbar-button').each(function(index, element)
+		$('.navigation-menu .toolbar-button').each(function (index, element)
 		{
 			var options = {};
 			if ($(element).hasClass('more'))
@@ -891,7 +1099,7 @@
 	 * Destroy the tooltip.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.destroyTooltip = function()
+	NavigationMenu.prototype.destroyTooltip = function ()
 	{
 		this.tooltip.destroy($('.toolbar-button'));
 	};
@@ -902,10 +1110,10 @@
 	 * 
 	 * Do not remove setTimeout
 	 */
-	NavigationMenu.prototype.reinitTooltip = function()
+	NavigationMenu.prototype.reinitTooltip = function ()
 	{
 		this.destroyTooltip();
-		setTimeout(function()
+		setTimeout(function ()
 		{
 			this.initTooltip();
 		}.bind(this), 500);
@@ -916,7 +1124,7 @@
 	 * @param {Event} evt
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.onQuickSearchIconClick = function(evt, data)
+	NavigationMenu.prototype.onQuickSearchIconClick = function (evt, data)
 	{
 		var self = this,
 			isActive = self.isQuicKSearchActive();
@@ -938,7 +1146,7 @@
 	 * @param {boolean} status
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.onQuickSearchStatusChange = function(evt, status)
+	NavigationMenu.prototype.onQuickSearchStatusChange = function (evt, status)
 	{
 		var self = this,
 			isActive = self.isQuicKSearchActive();
@@ -962,7 +1170,7 @@
 	 * Check if quick search is currently active.
 	 * @return {boolean} 
 	 */
-	NavigationMenu.prototype.isQuicKSearchActive = function()
+	NavigationMenu.prototype.isQuicKSearchActive = function ()
 	{
 		var self = this;
 		return self.searchControlTemplate && self.searchControlTemplate.obIsActive();
@@ -974,7 +1182,7 @@
 	 * @param {number} duration The animation duration
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.toggleQuickSearchDisplay = function(flag, duration)
+	NavigationMenu.prototype.toggleQuickSearchDisplay = function (flag, duration)
 	{
 		var self = this, fadeDuration = duration / 2,
 			$navMenu = self.$navigationMenu,
@@ -992,12 +1200,12 @@
 		fadeOutElements.css({ display: "block", opacity: 1 });
 		$navMenu.toggleClass("on-quick-search", flag);
 		fadeOutElements.stop().animate({ opacity: 0 }, {
-			duration: fadeDuration, queue: false, done: function()
+			duration: fadeDuration, queue: false, done: function ()
 			{
 				$quickSearch.css("height", "");
 				fadeOutElements.css({ display: "", opacity: "" });
 				fadeInElements.css("display", "block").stop().animate({ opacity: 1 }, {
-					duration: fadeDuration, queue: false, done: function()
+					duration: fadeDuration, queue: false, done: function ()
 					{
 						fadeInElements.css({ display: "", opacity: "" });
 					}
@@ -1010,7 +1218,7 @@
 	 * The close navigation page for mobile.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.closeNavigation = function()
+	NavigationMenu.prototype.closeNavigation = function ()
 	{
 		$(".navigation-container.mobile").empty();
 		$(".navigation-container").removeClass("mobile");
@@ -1020,7 +1228,7 @@
 	 * Initialize application switcher.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.initApplicationSwitcher = function(needGenerateApplication)
+	NavigationMenu.prototype.initApplicationSwitcher = function (needGenerateApplication)
 	{
 		var self = this;
 		if (tf.permissions.isSupport)
@@ -1035,10 +1243,10 @@
 		self.$logoItem = self.$navigationMenu.find(".navigation-header .item-logo")
 		self.$appSwitcherMenu = self.$navigationMenu.find(".navigation-header .item-menu");
 
-		return promise.then(function()
+		return promise.then(function ()
 		{
 			var applications = [];
-			$.each(tf.authManager.supportedProducts, function(_, item)
+			$.each(tf.authManager.supportedProducts, function (_, item)
 			{
 				var productName = item.Name.toLowerCase();
 				if (self.availableApplications.hasOwnProperty(productName)
@@ -1067,7 +1275,7 @@
 	 * @param {Event} event
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.logoItemClick = function(data, event)
+	NavigationMenu.prototype.logoItemClick = function (data, event)
 	{
 		var self = this;
 		event.stopPropagation();
@@ -1093,7 +1301,7 @@
 	 * @param {Boolean} flag
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.toggleAppSwitcherMenu = function(flag, isCollapse)
+	NavigationMenu.prototype.toggleAppSwitcherMenu = function (flag, isCollapse)
 	{
 		var self = this, bkgColor, targetWidth, targetHeight, opacity,
 			animationDuration = 300,
@@ -1128,7 +1336,7 @@
 			self.$navigationHeader.find(".toggle-button, .app-switcher").css("display", flag ? "none" : "block");
 		}
 
-		setTimeout(function()
+		setTimeout(function ()
 		{
 			$container.removeClass("on-animation");
 			$container.toggleClass("menu-opened", flag);
@@ -1149,7 +1357,7 @@
 	 * @param {String} data 
 	 * @param {Event} evt 
 	 */
-	NavigationMenu.prototype.onSwitchAppClick = function(data, evt)
+	NavigationMenu.prototype.onSwitchAppClick = function (data, evt)
 	{
 		var self = this;
 		evt.stopPropagation();
@@ -1159,7 +1367,7 @@
 			routeTitle = self.availableApplications[data].title;
 		var redirectWindow = window.open('', '_blank');
 		redirectWindow.location.href = "loading.html";
-		setTimeout(function()
+		setTimeout(function ()
 		{
 			var doc = redirectWindow.document;
 			var head = doc.head;
@@ -1175,7 +1383,7 @@
 		});
 		redirectWindow.blur();
 
-		var prod = tf.pageManager.applicationURLMappingList.filter(function(prod)
+		var prod = tf.pageManager.applicationURLMappingList.filter(function (prod)
 		{
 			return prod.Name.toLowerCase() == routeName.toLowerCase()
 		}),
@@ -1190,7 +1398,7 @@
 			if (prodName.indexOf("stopfinder admin") !== -1 || prodName.indexOf("stopfinderadmin") !== -1)
 			{
 				var sfStoreTokenKey = "sfaweb.token", sfEntTokenKey = "ent.stopfinderToken";
-				var _getDomain = function()
+				var _getDomain = function ()
 				{
 					var parts = location.hostname.split('.');
 					return parts.slice(-2).join('.');
@@ -1227,7 +1435,7 @@
 		self.toggleAppSwitcherMenu(false);
 	};
 
-	NavigationMenu.prototype.resolveUrl = function(url, routeTitle)
+	NavigationMenu.prototype.resolveUrl = function (url, routeTitle)
 	{
 		return new Promise((resolve, reject) =>
 		{
@@ -1263,7 +1471,7 @@
 	 * The dispose function.
 	 * @return {void}
 	 */
-	NavigationMenu.prototype.dispose = function()
+	NavigationMenu.prototype.dispose = function ()
 	{
 		var self = this,
 			menuItems = self.$navigationMenu.find(".navigation-item, .item-logo");
