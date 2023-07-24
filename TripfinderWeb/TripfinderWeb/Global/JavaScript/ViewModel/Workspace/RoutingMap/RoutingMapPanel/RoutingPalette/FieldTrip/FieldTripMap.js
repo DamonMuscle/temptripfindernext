@@ -542,7 +542,7 @@
 		stopGraphic.visible = false;
 	}
 
-	FieldTripMap.prototype.onStopLayerMoveStopCompleted = function(_, data)
+	FieldTripMap.prototype.onStopLayerMoveStopCompleted = async function(_, data)
 	{
 		const self = this,
 			fieldTrip = self.mapEditingFeatures.movingStop.fieldTrip,
@@ -559,7 +559,12 @@
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {moveStop: movingStop});
 
-		self.refreshFieldTripPath(fieldTrip, effectSequences);
+		await self.refreshFieldTripPath(fieldTrip, effectSequences);
+
+		if (tf.loadingIndicator)
+		{
+			tf.loadingIndicator.tryHide();
+		}
 	}
 
 	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(_, data)
@@ -616,6 +621,11 @@
 			return;
 		}
 
+		if (tf.loadingIndicator)
+		{
+			tf.loadingIndicator.showImmediately();
+		}
+
 		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			sequence = stop.Sequence,
 			fieldTripStops = self._getStopFeatures();
@@ -643,7 +653,12 @@
 
 		const effectSequences = self._computeEffectSequences(fieldTrip, {deleteStop: stop});
 
-		self.refreshFieldTripPath(fieldTrip, effectSequences);
+		await self.refreshFieldTripPath(fieldTrip, effectSequences);
+
+		if (tf.loadingIndicator)
+		{
+			tf.loadingIndicator.tryHide();
+		}
 	}
 
 	//#endregion

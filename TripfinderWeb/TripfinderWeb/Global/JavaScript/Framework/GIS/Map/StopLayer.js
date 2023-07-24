@@ -76,6 +76,12 @@
 			return;
 		}
 
+		if (tf.loadingIndicator)
+		{
+			tf.loadingIndicator.showImmediately();
+			// loadingIndicator should be hide onStopLayerMoveStopCompleted
+		}
+
 		const self = this,
 			movingStopGraphic = self.editing.movingStop.graphic;
 
