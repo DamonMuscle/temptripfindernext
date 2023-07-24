@@ -45,6 +45,8 @@
 		this.prevent = false;
 		self._borderTool = null;
 		self.togglePalettePanel = self.togglePalettePanel.bind(self);
+
+		self.routingMapContextMenu = new TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu(self);
 	}
 
 	MapCanvasPage.prototype = Object.create(TF.Document.BaseDocumentViewModel.prototype);
@@ -123,7 +125,7 @@
 			self._initMapTool();
 			self.routingMapPanelManager.init();
 			// tf.loadingIndicator.tryHide();
-			PubSub.subscribe("clear_ContextMenu_Operation", TF.RoutingMap.RoutingMapPanel.RoutingMapContextMenu.clearOperation);
+			PubSub.subscribe("clear_ContextMenu_Operation", self.routingMapContextMenu.clearOperation.bind(self.routingMapContextMenu));
 
 			self._onMapLoad();
 
@@ -1066,21 +1068,7 @@
 		{
 			return;
 		}
-		if (e.button == 2)
-		{
-			if (this.editModals().filter(function(c) { return c.obVisible(); }).length == 0)
-			{
-				self._lastPreventKey = (new Date()).getTime();
-				clearTimeout(self.rightClickTimer);
-				self.rightClickTimer = setTimeout(function(lastPreventKey)
-				{
-					if (!self.prevent && self._lastPreventKey == lastPreventKey)
-					{
-						PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.InitMapCanvasObject, self);
-					}
-				}(self._lastPreventKey), 200);
-			}
-		}
+
 		if (e.button == 0)
 		{
 			PubSub.publish("clear_ContextMenu_Operation");
@@ -1230,6 +1218,8 @@
 			TF.GIS.MapFactory.destroyMapInstanceById(this.mapInstance.settings.mapId);
 			this.mapInstance = null;
 		}
+
+		this.routingMapContextMenu?.dispose();
 
 		// TF.RoutingMap.MapEditSaveHelper.complete().then(() => tfdispose(this));
 		// TODO: Use the method above if MapEditPalette is added in the future.
