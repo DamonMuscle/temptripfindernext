@@ -107,7 +107,6 @@
 				"esri/rest/support/ServiceAreaParameters",
 				"esri/rest/locator",
 				"esri/rest/support/ProjectParameters",
-				"esri/core/watchUtils",
 				"esri/core/reactiveUtils",
 				"esri/rest/support/Query",
 				"esri/geometry/Geometry",
@@ -157,7 +156,6 @@
 				ServiceAreaParameters,
 				Locator,
 				ProjectParameters,
-				watchUtils,
 				reactiveUtils,
 				Query,
 				Geometry,
@@ -207,7 +205,6 @@
 					ServiceAreaParameters: ServiceAreaParameters,
 					Locator: Locator,
 					ProjectParameters: ProjectParameters,
-					watchUtils: watchUtils,
 					reactiveUtils: reactiveUtils,
 					Query: Query,
 					Geometry: Geometry,
@@ -305,7 +302,11 @@
 
 		if (self.settings.eventHandlers.onMapViewUpdated)
 		{
-			self.eventHandler.onMapViewUpdated = TF.GIS.SDK.watchUtils.whenFalseOnce(mapView, "updating", self.settings.eventHandlers.onMapViewUpdated);
+			const executeOnce = async () => {
+				await TF.GIS.SDK.reactiveUtils.whenOnce(() => !mapView.updating);
+				self.settings.eventHandlers.onMapViewUpdated();
+			};
+			executeOnce();
 		}
 
 		if (self.settings.eventHandlers.onMapViewPointerMove)

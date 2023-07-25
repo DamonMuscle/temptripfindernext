@@ -25,6 +25,10 @@
 		Sequence: "Sequence"
 	};
 	const INFO_STOP_COLOR = "#FFFFFF";
+	const FIELD_TRIP_LAYER_TYPE = {
+		PATH: "PathLayer",
+		STOP: "StopLayer"
+	};
 
 	//#endregion
 
@@ -39,11 +43,11 @@
 		this.stopTool = drawTool.stopTool;
 		this.mapInstance = mapInstance;
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
+		this.layerManager = new TF.GIS.LayerManager(mapInstance);
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 		this._mapEditingFeatures = {
 			movingStop: null
 		};
-		this.initLayers();
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 
 		PubSub.subscribe("GISLayer.StopLayer.MoveStopCompleted", this.onStopLayerMoveStopCompleted.bind(this));
@@ -89,69 +93,49 @@
 	FieldTripMap.prototype.initLayers = async function()
 	{
 		const self = this;
-
-		const totalLayerCount = 5;
-		let layerCount = 0;
-		const onLayerCreatedHandler = (resolve) => {
-			layerCount++;
-			if (layerCount === totalLayerCount)
-			{
-				resolve();
-			}
-		};
-
-		const addFieldTripMapLayer = (layerInstance, resolve) => {
-			return self.mapInstance.addLayerInstance(layerInstance, {
-				eventHandlers: {
-					onLayerCreated: onLayerCreatedHandler.bind(self, resolve)
-				}
-			});
-		};
-
-		return new Promise((resolve, _) =>
+		if (self.fieldTripStopLayerInstance &&
+			self.fieldTripPathLayerInstance &&
+			self.fieldTripSequenceLineLayerInstance)
 		{
-			if (self.fieldTripStopLayerInstance &&
-				self.fieldTripPathLayerInstance &&
-				self.fieldTripSequenceLineLayerInstance)
-			{
-				resolve();
-			}
+			return;
+		}
 
-			self.fieldTripPathLayerInstance = new TF.GIS.Layer.PathLayer({
-				id: RoutingPalette_FieldTripPathLayerId,
-				index: RoutingPalette_FieldTripPathLayer_Index
-			});
-			addFieldTripMapLayer(self.fieldTripPathLayerInstance, resolve);
-			self.defineReadOnlyProperty("fieldTripPathLayerInstance", self.fieldTripPathLayerInstance);
+		const layerOptions = [{
+			id: RoutingPalette_FieldTripPathLayerId,
+			index: RoutingPalette_FieldTripPathLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.PATH
+		}, {
+			id: RoutingPalette_FieldTripSequenceLineLayerId,
+			index: RoutingPalette_FieldTripSequenceLineLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.PATH
+		}, {
+			id: RoutingPalette_FieldTripStopLayerId,
+			index: RoutingPalette_FieldTripStopLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.STOP
+		}, {
+			id: RoutingPalette_FieldTripHighlightLayerId,
+			index: RoutingPalette_FieldTripHighlightLayer_Index
+		}, {
+			id: RoutingPalette_FieldTripHighlightStopLayerId,
+			index: RoutingPalette_FieldTripHighlightStopLayer_Index,
+			layerType: FIELD_TRIP_LAYER_TYPE.STOP
+		}];
+		const layerInstances = await self.layerManager.createLayerInstances(layerOptions);
 
-			self.fieldTripSequenceLineLayerInstance = new TF.GIS.Layer.PathLayer({
-				id: RoutingPalette_FieldTripSequenceLineLayerId,
-				index: RoutingPalette_FieldTripSequenceLineLayer_Index
-			});
-			addFieldTripMapLayer(self.fieldTripSequenceLineLayerInstance, resolve);
-			self.defineReadOnlyProperty("fieldTripSequenceLineLayerInstance", self.fieldTripSequenceLineLayerInstance);
+		self.fieldTripPathLayerInstance = layerInstances[0];
+		self.defineReadOnlyProperty("fieldTripPathLayerInstance", self.fieldTripPathLayerInstance);
 
-			self.fieldTripStopLayerInstance = new TF.GIS.Layer.StopLayer({
-				id: RoutingPalette_FieldTripStopLayerId,
-				index: RoutingPalette_FieldTripStopLayer_Index
-			});
-			addFieldTripMapLayer(self.fieldTripStopLayerInstance, resolve);
-			self.defineReadOnlyProperty("fieldTripStopLayerInstance", self.fieldTripStopLayerInstance);
+		self.fieldTripSequenceLineLayerInstance = layerInstances[1];
+		self.defineReadOnlyProperty("fieldTripSequenceLineLayerInstance", self.fieldTripSequenceLineLayerInstance);
 
-			self.fieldTripHighlightLayerInstance = new TF.GIS.Layer({
-				id: RoutingPalette_FieldTripHighlightLayerId,
-				index: RoutingPalette_FieldTripHighlightLayer_Index
-			});
-			addFieldTripMapLayer(self.fieldTripHighlightLayerInstance, resolve);
-			self.defineReadOnlyProperty("fieldTripHighlightLayerInstance", self.fieldTripHighlightLayerInstance);
+		self.fieldTripStopLayerInstance = layerInstances[2];
+		self.defineReadOnlyProperty("fieldTripStopLayerInstance", self.fieldTripStopLayerInstance);
 
-			self.fieldTripHighlightStopLayerInstance = new TF.GIS.Layer.StopLayer({
-				id: RoutingPalette_FieldTripHighlightStopLayerId,
-				index: RoutingPalette_FieldTripHighlightStopLayer_Index
-			});
-			addFieldTripMapLayer(self.fieldTripHighlightStopLayerInstance, resolve);
-			self.defineReadOnlyProperty("fieldTripHighlightStopLayerInstance", self.fieldTripHighlightStopLayerInstance);
-		});
+		self.fieldTripHighlightLayerInstance = layerInstances[3];
+		self.defineReadOnlyProperty("fieldTripHighlightLayerInstance", self.fieldTripHighlightLayerInstance);
+
+		self.fieldTripHighlightStopLayerInstance = layerInstances[4];
+		self.defineReadOnlyProperty("fieldTripHighlightStopLayerInstance", self.fieldTripHighlightStopLayerInstance);
 	}
 
 	FieldTripMap.prototype.initArrowLayers = function(fieldTrips)

@@ -22,7 +22,7 @@
 	{
 		const DEFAULT_STOP_COLOR = "#FFFFFF"
 		const Color = attributes.Color || DEFAULT_STOP_COLOR;
-		const symbol = this.symbolHelper.tripPath(Color);
+		const symbol = this.getSymbol(Color);
 		const graphic = this.createPolylineGraphic(paths, symbol, attributes);
 		return graphic;
 	}
@@ -30,7 +30,7 @@
 	PathLayer.prototype.createHighlightPath = function(paths, attributes)
 	{
 		const Color = [253, 245, 53, 0.7];
-		const symbol = this.symbolHelper.tripPath(Color);
+		const symbol = this.getSymbol(Color);
 		symbol.width = symbol.width + 4;
 		const graphic = this.createPolylineGraphic(paths, symbol, attributes);
 		return graphic;
@@ -51,9 +51,14 @@
 		for (let i = 0; i < graphics.length; i++)
 		{
 			const graphic = graphics[i];
-			graphic.symbol =  this.symbolHelper.tripPath(color);
+			graphic.symbol =  this.getSymbol(color);
 			graphic.attributes.Color = color;
 		}
+	}
+
+	PathLayer.prototype.getSymbol = function(color)
+	{
+		return this.symbolHelper.tripPath(color);
 	}
 
 	PathLayer.prototype.dispose = function()

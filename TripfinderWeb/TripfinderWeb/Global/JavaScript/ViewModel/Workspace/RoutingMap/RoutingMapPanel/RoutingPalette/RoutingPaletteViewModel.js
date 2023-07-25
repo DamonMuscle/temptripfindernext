@@ -134,6 +134,7 @@
 		if (!this.fieldTripMap)
 		{
 			this.fieldTripMap = new TF.RoutingPalette.FieldTripMap(this.mapInstance, this.drawTool);
+			await this.fieldTripMap.initLayers();
 		}
 		const onCompleted = data.onCompleted;
 		delete data.onCompleted;
