@@ -1112,7 +1112,6 @@
 
 	Form.prototype.toggleSystemFieldValue = function(recordId)
 	{
-		var self = this;
 		this.initUDFSystemFieldStatePromise && this.initUDFSystemFieldStatePromise.then(() =>
 		{
 			let systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
@@ -1152,7 +1151,7 @@
 						systemFieldQuestions.forEach(q =>
 						{
 							const value = this.getSystemFieldValue(data.Items[0], q);
-							q.setValue(value, self.udfs);
+							q.setValue(value, this.udfs);
 						});
 					}
 				});
