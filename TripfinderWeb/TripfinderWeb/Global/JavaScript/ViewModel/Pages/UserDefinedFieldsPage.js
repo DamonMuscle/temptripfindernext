@@ -78,7 +78,7 @@
 	function UserDefinedFieldsPage()
 	{
 		var self = this,
-			availableTypes = tf.dataTypeHelper.getAvailableDataTypesForUDFManagement();
+			availableTypes = tf.dataTypeHelper.getAvailableDataTypesForUDFManagement().filter(t => t.key !== _REPORT_GRID_TYPE);
 
 		self.commandGridColumns = [
 			{
@@ -120,6 +120,8 @@
 		self.pageType = "userdefinedfields";
 
 		TF.Page.BaseGridPage.apply(self, arguments);
+
+		self.skipSavePage = true;
 
 		//  Properties
 		self.$element = null;
@@ -926,13 +928,6 @@
 		return count + " User Defined " + self.pageType.substr(0, self.pageType.length - 1) + (count !== 1 ? "s" : "");
 	};
 
-	UserDefinedFieldsPage.prototype.dispose = function()
-	{
-		this.selectedItemChanged.unsubscribeAll();
-		this.udfChangedEvent.unsubscribeAll();
-		this.pageLevelViewModel.dispose();
-	};
-
 	UserDefinedFieldsPage.prototype._backupScrollPosition = function()
 	{
 		const $content = this.kendoGrid.content;
@@ -957,7 +952,8 @@
 
 	UserDefinedFieldsPage.prototype.dispose = function()
 	{
-		var self = this;
-		// TF.Page.BaseGridPage.prototype.dispose.call(self);
+		this.selectedItemChanged.unsubscribeAll();
+		this.udfChangedEvent.unsubscribeAll();
+		TF.Page.BaseGridPage.prototype.dispose.apply(this);
 	};
 })();

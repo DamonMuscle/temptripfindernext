@@ -20,6 +20,7 @@
 		self.mapviewButton = false;
 		self.massUpdateButton = false;
 		self.geocodeButton = false;
+		self.skipSavePage = false;
 
 		self.isAdmin = tf.authManager.authorizationInfo.isAdmin || tf.authManager.authorizationInfo.isAuthorizedFor("transportationAdministrator", "edit");
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();

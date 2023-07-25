@@ -16,6 +16,7 @@
 		self.obSelectedClientId = ko.observable();
 		self.pageLevelViewModel = new TF.PageLevel.BasePageLevelViewModel();
 		TF.Page.BaseGridPage.apply(self, arguments);
+		self.skipSavePage = true;
 		self.displayPassword = "****fake*password****";
 		self.englishEditor = null;
 		self.spanishEditor = null;

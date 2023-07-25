@@ -493,7 +493,7 @@
 		}
 		if (!skipSavePage)
 		{
-			if (type != "settingsConfig")
+			if (!pageData.skipSavePage)
 			{
 				tf.storageManager.save(storageKey, type);
 			}
