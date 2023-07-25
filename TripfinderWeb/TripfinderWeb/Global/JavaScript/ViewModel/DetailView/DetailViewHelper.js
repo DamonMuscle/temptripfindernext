@@ -45,6 +45,11 @@
 		{
 			self.updateRequiredFields(gridType);
 		});
+
+		PubSub.subscribe(pb.REQUIRED_UDF_FIELDS_CHANGED, function(name, gridType)
+		{
+			self.updateUDFRequiredFields(gridType);
+		});
 	};
 
 	DetailViewHelper.prototype.updateRequiredFields = function(gridType)
