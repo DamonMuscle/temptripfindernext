@@ -33,7 +33,7 @@
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.common.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.default.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/Kendo/Styles/kendo.fiori.min.css" />
-	<link rel="stylesheet" href="Global/ThirdParty/4.18/esri/css/main.css" />
+	<link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
 	<link rel="stylesheet" href="Global/ThirdParty/bootstrapslider/css/bootstrap-slider.min.css" />
 	<link rel="stylesheet" href="Global/ThirdParty/StackBlock/gridstack.css" />
 	<!-- build:cssconcat Global/Css/tripfinder.css -->
@@ -79,14 +79,6 @@
 		if (broswerInfo.broswer === "IE" || (broswerInfo.broswer === "Edge" && broswerInfo.version.split('.')[0] < 79))
 		{
 			window.location.href = 'ie.html';
-		}
-		window.dojoConfig = {
-			sync: true,
-			parseOnLoad: false,
-			baseUrl: "./Global/ThirdParty/4.18/dojo",
-			has: {
-				"esri-native-promise": true
-			}
 		}
 	</script>
 	<!--  Override above variables  in local_settings.js if you want them to be different-->
@@ -810,7 +802,7 @@
 	<script src="Global/JavaScript/ViewModel/Workspace/Grid/Map/Thematics/ListFilterTool.js"></script>
 	<script src="Global/JavaScript/ViewModel/Workspace/Grid/GeocodeTool.js"></script>
 	<!-- endbuild -->
-	<script src="Global/ThirdParty/4.18/dojo/dojo.js" data-dojo-config="async: true"></script>
+	<script src="https://js.arcgis.com/4.27/" data-dojo-config="async: true"></script>
 </head>
 
 <body>

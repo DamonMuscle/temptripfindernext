@@ -774,7 +774,7 @@
 			let canvas = mapView.container && mapView.container.querySelector('canvas');
 			if (canvas)
 			{
-				let gl = canvas.getContext('webgl');
+				let gl =  canvas.getContext('webgl2') || canvas.getContext('webgl');
 				gl.getExtension('WEBGL_lose_context').loseContext();
 				mapView.container = null;
 			}

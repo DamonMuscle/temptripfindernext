@@ -11,6 +11,7 @@
 		mode: MODE.ONLINE,
 		onlineToken: "AAPK831e30fbca2e488eb45497c69f753bc6ufPNUlFdFwgUJODDnT0wC1wWks-xJN2dLidH1m9x3bB-Mov6i1RbGoVAVwLgjn8P",
 		onlineNetworkServiceRouteUrl: "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World",
+		onlineNetworkServiceTravelModesUrl: "https://route-api.arcgis.com/GetTravelModes/execute?f=pjson&token=",
 		serverNetworkServiceRouteUrl: null,
 	};
 
@@ -89,6 +90,9 @@
 			returnPolygonBarriers: false,
 			returnPolylineBarriers: false,
 			returnPointBarriers: false,
+			returnTraversedEdges: false,
+			returnTraversedJunctions: false,
+			returnTraversedTurns: false,
 			returnRoutes: true,
 			returnStops: true,
 			returnZ: false,
@@ -97,18 +101,16 @@
 
 		return new Promise((resolve, reject) =>
 		{
-			require({}, ["esri/config", "esri/tasks/RouteTask", "esri/tasks/support/RouteParameters"], (esriConfig, RouteTask, RouteParameters) =>
+			require({}, ["esri/config", "esri/rest/route", "esri/rest/support/RouteParameters"], (esriConfig, route, RouteParameters) =>
 			{
 				self.setOnlineToken(esriConfig);
 
 				let results = null, errorMessage = null;
-				const routeTask = new RouteTask(url);
 				const params = Object.assign({}, defaultParameters, parameters);
 				const routeParameters = new RouteParameters(params);
 
-				return routeTask.solve(routeParameters).then((response) => {
+				return route.solve(url, routeParameters).then((response) => {
 					results = response;
-					// console.log(results);
 
 					self.clearOnlineToken(esriConfig);
 					resolve( { results, errorMessage });
@@ -180,7 +182,7 @@
 
 		return new Promise((resolve, reject) =>
 		{
-			require(["esri/Graphic", "esri/geometry/Point", "esri/geometry/support/webMercatorUtils", "esri/tasks/support/FeatureSet"],
+			require(["esri/Graphic", "esri/geometry/Point", "esri/geometry/support/webMercatorUtils", "esri/rest/support/FeatureSet"],
 				(Graphic, Point, webMercatorUtils, FeatureSet) =>
 			{
 				let graphics = [], featureSet = null;
@@ -214,6 +216,30 @@
 				}
 
 				resolve(featureSet);
+			});
+		});
+	}
+
+	NetworkService.prototype.fetchSupportedTravelModes = async function()
+	{
+		const self = this;
+
+		const url = self.getValidRouteUrl("fetchSupportedTravelModes");
+		if (url === null) {
+			return;
+		}
+
+		return new Promise((resolve, reject) =>
+		{
+			require(["esri/rest/networkService"], (networkService) =>
+			{
+				(async function()
+				{
+					const serviceDescription = await networkService.fetchServiceDescription(url, self.settings.onlineToken);
+					const { supportedTravelModes } = serviceDescription;
+					
+					resolve(supportedTravelModes);
+				})();
 			});
 		});
 	}

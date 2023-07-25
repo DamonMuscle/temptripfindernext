@@ -19,15 +19,15 @@
 		}
 
 		var serviceAreaUrl = arcgisUrls.WalkoutRoute;
-		self._serviceAreaTask = new self._arcgis.ServiceAreaTask(serviceAreaUrl);
+		// self._serviceAreaTask = new self._arcgis.ServiceAreaTask(serviceAreaUrl);
 
 		var locatorUrl = arcgisUrls.StreetGeocodeServiceFile;
-		self._geocoder = new self._arcgis.Locator(locatorUrl);
+		// self._geocoder = new self._arcgis.Locator(locatorUrl);
 
 		self.streetUrl = arcgisUrls.MapEditingOneService + "/43";
 		self.generateWalkoutZone = self.generateWalkoutZone.bind(self);
 		self.generateThissenUrl = arcgisUrls.TFUtilitiesGPService + "/Create%20Thiessen%20Polygons";
-		self.generateThissenProcessor = new self._arcgis.Geoprocessor(self.generateThissenUrl);
+		// self.generateThissenProcessor = new self._arcgis.Geoprocessor(self.generateThissenUrl);
 
 		self.candidateGraphics = [];
 
@@ -128,8 +128,8 @@
 
 			tf.startup.loadArcgisUrls().then(function()
 			{
-				self._serviceAreaTask.url = arcgisUrls.WalkoutRoute;
-				self._serviceAreaTask.solve(serviceAreaParameters).then(showResult)
+				// self._serviceAreaTask.url = arcgisUrls.WalkoutRoute;
+				// self._serviceAreaTask.solve(serviceAreaParameters).then(showResult)
 			})
 
 			function showResult(result)

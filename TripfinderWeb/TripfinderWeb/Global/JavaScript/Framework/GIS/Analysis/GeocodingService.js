@@ -126,7 +126,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 
 		return new Promise((resolve, reject) =>
 		{
-			require({}, ["esri/config", "esri/tasks/Locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
+			require({}, ["esri/config", "esri/rest/locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
 			{
 				self.setOnlineToken(esriConfig);
 
@@ -169,7 +169,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 
 		return new Promise((resolve, reject) =>
 		{
-			require({}, ["esri/config", "esri/tasks/Locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
+			require({}, ["esri/config", "esri/rest/locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
 			{
 				self.setOnlineToken(esriConfig);
 
@@ -214,15 +214,14 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 		{
 			try 
 			{
-				require({}, ["esri/config", "esri/tasks/Locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
+				require({}, ["esri/config", "esri/rest/locator", "esri/geometry/SpatialReference"], (esriConfig, locator, SpatialReference) =>
 				{
 					self.setOnlineToken(esriConfig);
 
 					let address = null, errorMessage = null;
 					const outSpatialReference = SpatialReference.WGS84;
-					const locator = new Locator({ url, outSpatialReference });
-					
-					locator.locationToAddress({ location }).then((response) => {
+
+					locator.locationToAddress(url, { outSpatialReference, location }).then((response) => {
 						address = response.address;
 						const score = response.score;
 						const attributes = response.attributes;
@@ -254,7 +253,7 @@ analysis.geocodeService.suggestLocations(searchAddress).then((result) => {
 
 		return new Promise((resolve, reject) =>
 		{
-			require({}, ["esri/config", "esri/tasks/Locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
+			require({}, ["esri/config", "esri/rest/locator", "esri/geometry/SpatialReference"], (esriConfig, Locator, SpatialReference) =>
 			{
 				self.setOnlineToken(esriConfig);
 

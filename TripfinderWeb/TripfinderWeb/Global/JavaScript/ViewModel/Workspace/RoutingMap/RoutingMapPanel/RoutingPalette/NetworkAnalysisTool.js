@@ -24,7 +24,7 @@
 	{
 		var self = this;
 		var localRouteUrl = arcgisUrls.LocalRouteFile;
-		self._router = new self._arcgis.RouteTask(localRouteUrl);
+		// self._router = new self._arcgis.RouteTask(localRouteUrl);
 		self.streetSourceOid = tf.streetSourceOid;
 	}
 

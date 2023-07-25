@@ -8,7 +8,7 @@
 		self._arcgis = tf.map.ArcGIS;
 		self.vrpURL = arcgisUrls.TFUtilitiesGPService + "/VRPTool";
 		var localRouteUrl = arcgisUrls.LocalRouteFile;
-		self._router = new self._arcgis.RouteTask(localRouteUrl);
+		// self._router = new self._arcgis.RouteTask(localRouteUrl);
 		self._routeParameters = new self._arcgis.RouteParameters();
 		// self._routeParameters.outSpatialReference = self._webMercator;
 		self._routeParameters.outputLines = "true-shape"; // the start point of route geometry is difference in round trip mode, use TRUE_SHAPE instead.
