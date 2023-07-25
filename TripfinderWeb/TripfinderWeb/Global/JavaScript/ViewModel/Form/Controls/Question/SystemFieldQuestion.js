@@ -30,8 +30,8 @@
 		let systemFieldType = this.field.FieldOptions.SystemFieldType;
 		let attributeFlag = this.field.OriginItem ? this.field.OriginItem.AttributeFlag : 0;
 		let numberPrecision = 2; // set default number Precision to 2 for normal Grid fields
-		let trueDisplayName = "true";
-		let falseDisplayName = "false";
+		let trueDisplayName = this.field.positiveLabel ?? "true";
+		let falseDisplayName = this.field.negativeLabel ?? "false";
 		let options = { isGrid: false, isUTC: false };
 		if (udfs && udfs.length > 0)
 		{
