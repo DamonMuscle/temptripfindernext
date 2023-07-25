@@ -919,7 +919,7 @@
 					if (udfs === undefined && udfUniqueIds.length > 0)
 					{
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
-							{ paramData: { "@Relationships": "UDFDataSources", "@fields": "DisplayName,Guid,UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
+							{ paramData: { "@Relationships": "UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
 							{ overlay: false })
 							.then(data =>
 							{
@@ -1112,6 +1112,7 @@
 
 	Form.prototype.toggleSystemFieldValue = function(recordId)
 	{
+		var self = this;
 		this.initUDFSystemFieldStatePromise && this.initUDFSystemFieldStatePromise.then(() =>
 		{
 			let systemFieldQuestions = this.questions.filter(el => el.field.FieldOptions && el.field.FieldOptions.TypeName === QUESTION_TYPE_SYSTEM_FIELD);
