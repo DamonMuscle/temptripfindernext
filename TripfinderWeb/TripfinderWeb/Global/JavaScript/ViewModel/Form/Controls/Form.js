@@ -919,7 +919,7 @@
 					if (udfs === undefined && udfUniqueIds.length > 0)
 					{
 						return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userDefinedFields"),
-							{ paramData: { "@Relationships": "UDFDataSources", "@fields": "DisplayName,Guid,UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
+							{ paramData: { "@Relationships": "UDFDataSources", "@filter": `eq(DataTypeId,${this.options.DataTypeId})&in(Guid,${udfUniqueIds.join(",")})` } },
 							{ overlay: false })
 							.then(data =>
 							{
@@ -1151,7 +1151,7 @@
 						systemFieldQuestions.forEach(q =>
 						{
 							const value = this.getSystemFieldValue(data.Items[0], q);
-							q.setValue(value, self.udfs);
+							q.setValue(value, this.udfs);
 						});
 					}
 				});
