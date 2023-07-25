@@ -1,0 +1,131 @@
+<div class="Edit-UDF-Modal" data-bind="uiInit:init">
+	<!-- ko if: isUDFGroup -->
+	<div class="row">
+		<div class="col-xs-24 form-group editor-wrapper question-wrapper">
+			<label for="question" class="requirestar"><strong>Question</strong></label>
+			<div class="text-editor-wrapper">
+				<textarea id="QuestionBodyEditor" rows="5" cols="150" required></textarea>
+			</div>
+			<div class="html-editor-wrapper">
+				<textarea id="QuestionBodyHtmlEditor" data-bind="value: obName" required></textarea>
+			</div>
+			<div class="editor-options-wrap">
+				<div class="option design" data-bind="click:changePattern">Design</div>
+				<div class="option html" data-bind="click:changePattern">HTML</div>
+			</div>
+			<input type="text" class="form-control notinput-required-messagebody" data-bind="value:obName" name="name" />
+		</div>
+		<small class="name-text-counter" style="position: absolute;top: 17px;right: 15px;display:none"></small>
+	</div>
+	<!-- /ko -->
+	<div class="row">
+		<!-- ko if: !isUDFGroup -->
+		<div class="col-xs-12 form-group ">
+			<div class="row">
+				<div class="col-xs-24 form-group name">
+					<label class="requirestar">Field</label>
+					<!-- ko customInput:{type:"String",value:obName,disable:isSystemDefined,attributes:{class:"form-control",name:"name",maxlength:nameMaxlength,tabindex:"1",autocomplete:'off'}} -->
+					<!-- /ko -->
+				</div>
+				<div class="col-xs-24 form-group">
+					<label>Description</label>
+					<!-- ko customInput:{type:"String",value:obDescription,disable:isSystemDefined,attributes:{class:"form-control",name:"description",maxlength:"60",tabindex:"2",autocomplete:'off'}} -->
+					<!-- /ko -->
+				</div>
+				<div class="col-xs-24 form-group">
+					<label>External ID</label>
+					<input type="text" name="ExternalID" class="form-control external-id-input" data-bind="value:obExternalID,enable:!isSystemDefined" maxlength="50" tabindex="12" autocomplete="off" />
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+		<div class="col-xs-12 form-group">
+			<!-- ko if: gridType !== "report" && !isSystemDefined && !isUDFGroup -->
+			<div class="row">
+				<div class="col-xs-24 form-group name">
+					<label>Data Sources</label>
+					<div class="input-group">
+
+						<div class="form-control" style="height:80px;" data-bind="foreach:obSelectedDataSources().map(displayDsText)">
+							<div data-bind="text:$data"></div>
+						</div>
+						<div class="input-group-btn" style="vertical-align:top;">
+							<button type="button" class="btn btn-default btn-sharp" data-bind="event:{click:selectDatasource}">
+								<span class="glyphicon glyphicon-option-horizontal"></span>
+							</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!-- /ko -->
+			<!-- ko if: gridType === "report" || isSystemDefined -->
+			<div class="row">
+				<div class="col-xs-24 form-group">
+					<label>Type</label>
+					<div class="input-group" data-bind="attr:{tabindex:obTypeEnabled()?3:-1}">
+						<div data-bind="typeahead:{source:obTypeSource,drowDownShow:true,notSort:true,selectedValue:obSelectedType}">
+							<!-- ko customInput:{type:"Select",value:obSelectedType,attributes:{class:"form-control",name:"status"},disable:!obTypeEnabled()} -->
+							<!-- /ko -->
+						</div>
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sharp">
+								<span class="caret"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-24 form-group" data-bind="css: {'default-value-wrapper': obNeedAdditionalValidator}">
+					<!-- ko if: gridType === "report" -->
+					<label>Value</label>
+					<!-- /ko -->
+					<!-- ko if: isSystemDefined -->
+					<label>Default Value</label>
+					<!-- /ko -->
+					<div class="default-value"></div>
+				</div>
+			</div>
+			<!-- /ko -->
+		</div>
+
+	</div>
+
+	<!-- ko if: gridType !== "report" && !isSystemDefined -->
+	<div class="row">
+		<div class="col-xs-12 form-group">
+			<label>Type</label>
+			<div class="input-group" data-bind="attr:{tabindex:obTypeEnabled()?3:-1}">
+				<div data-bind="typeahead:{source:obTypeSource,drowDownShow:true,notSort:true,selectedValue:obSelectedType,class:'udf-type-typeahead-height'}">
+					<!-- ko customInput:{type:"Select",value:obSelectedType,attributes:{class:"form-control",name:"status"},disable:!obTypeEnabled()} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 form-group" data-bind="css: {'default-value-wrapper': obNeedAdditionalValidator},visible:obDefaultValueVisible">
+			<label>Default Value</label>
+			<div class="default-value"></div>
+		</div>
+	</div>
+	<!-- /ko -->
+	<!--ko if: obTypeModal() !== null-->
+	<!-- ko template :{ name : obTypeModal(), data:obTypeModalData() }-->
+	<!-- /ko -->
+	<!-- /ko -->
+	<!-- ko if: obShowRequired() -->
+	<div class="row">
+		<div class="col-xs-24 form-group">
+			<label class="checkbox-inline">
+				<input type="checkbox" id="questionRequired" name="questionRequired" data-bind="checked:obRequired, enable: obRequiredEnable"><strong>Required</strong>
+			</label>
+		</div>
+	</div>
+	<!-- /ko -->
+	<div class="duplicate-message" style="color:#ff0000;font-size:12px;font-weight:normal;" data-bind="visible: obShowDuplicateMessage">
+		You cannot have a duplicated question unless it is added to a different section.
+	</div>
+</div>

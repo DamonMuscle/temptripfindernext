@@ -1,0 +1,36 @@
+<div class="add-IPAddress-Modal" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-20 form-group left-panel ipAddress-add-button-row">
+			<div class="ipAddress-add-button" data-bind="click:addIPRangeRowBtnClick">Add</div>
+		</div>
+	</div>
+	<div class="row ipAddress-line-title">
+		<div class="col-xs-10 form-group left-panel title-label">
+			<span class="">From</span>
+		</div>
+		<div class="col-xs-10 form-group left-panel title-label">
+			<span class="">To</span>
+		</div>
+	</div>
+	<!--ko foreach: obIPRangeList -->
+	<div class="ipAddress-block">
+		<div class="row ipAddress-line">
+			<div class="col-xs-10 form-group left-panel ipAddress-row">
+				<input type="text" name="LeftIPAddress" class="form-control ipAddress-input" data-bind="value:$data.leftIPAddress, event:{blur: $parent.ipAddressInputOnBlur.bind($parent)}"
+					maxlength="50" tabindex="12" autocomplete="off" />
+			</div>
+			<div class="col-xs-10 form-group left-panel ipAddress-row">
+				<input type="text" name="RightIPAddress" class="form-control ipAddress-input"
+					data-bind="value:$data.rightIPAddress, event:{blur: $parent.ipAddressInputOnBlur.bind($parent),focus: $parent.ipAddressInputOnFocus.bind($parent)}" maxlength="50" tabindex="12" autocomplete="off" />
+			</div>
+			<div class="col-xs-4 form-group left-panel ipAddress-row delete-button">
+				<a class="ipAddress-delete-button" title="Delete"
+					data-bind="click:$parent.deleteIPRangeRowBtnClick.bind($parent)"><span class=""></span>delete</a>
+			</div>
+		</div>
+		<div class="row help-block-row">
+			<small class="help-block" data-bind='visible:$data.hasError,text:$data.errorMessage'></small>
+		</div>
+	</div>
+	<!-- /ko -->
+</div>

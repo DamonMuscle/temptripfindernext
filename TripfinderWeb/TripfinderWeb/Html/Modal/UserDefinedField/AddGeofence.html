@@ -1,0 +1,15 @@
+<div class="Add-Geofence-Modal map-page" data-bind="uiInit:init">
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div>
+		<div class="map-container doc">
+			<div class="map"></div>
+		</div>
+		<!-- ko foreach: palettes -->
+		<div data-bind="template: { name: 'workspace/Routing Map/RoutingMapPanel/RoutingMapPanel', data: $data}"></div>
+		<!-- /ko -->
+		<!-- ko foreach: editModals -->
+		<div data-bind="template: { name: $data.template, data: $data}"></div>
+		<!-- /ko -->
+	</div>
+</div>

@@ -1,0 +1,57 @@
+<div class="row" data-bind="uiInit:init">
+	<div class="col-xs-3 form-group">
+		<div class="location-marker" name="marker">
+			<div>
+				<label class="checkbox-inline">
+					<strong>Pin</strong> <input type="radio" id="pin" name="locationMarker" value="Pin" data-bind="checked: obPinChecked, checkedValue: true">
+				</label>
+			</div>
+			<div>
+				<label class="checkbox-inline">
+					<strong>Region</strong> <input type="radio" id="drawing" name="locationMarker" value="Drawing" data-bind="checked: obPinChecked, checkedValue: false">
+				</label>
+			</div>
+
+		</div>
+	</div>
+	<div class="col-xs-9 form-group map-options">
+		<div class="symbol-option">
+			<div id="symbol-selector">
+				<div class="symbol-container">
+					<div class="currentSymbol"></div>
+				</div>
+			</div>
+		</div>
+		<div class="drawing-option">
+			<div class="drawing-shape">
+				<label class="checkbox-inline">
+					<strong>Polygon</strong> <input class="shape" type="checkbox" id="polygon" name="polygon" value="Polygon">
+				</label>
+			</div>
+			<div class="drawing-shape">
+				<label class="checkbox-inline">
+					<strong>Rectangle</strong> <input class="shape" type="checkbox" id="rectangle" name="rectangle" value="Rectangle">
+				</label>
+			</div>
+			<div class="drawing-shape">
+				<label class="checkbox-inline">
+					<strong>Draw</strong> <input class="shape" type="checkbox" id="draw" name="draw" value="Draw">
+				</label>
+			</div>
+			<div class="drawing-shape">
+				<label class="checkbox-inline">
+					<strong>Circle</strong> <input class="shape" type="checkbox" id="circle" name="circle" value="Circle">
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 form-group map-home-location" name="udfMapType">
+		<label>Select map center and default map settings</label>
+		<div class="map-container">
+			<div class="map doc"></div>
+		</div>
+	</div>
+	<div class="symbols-panel">
+
+	</div>
+</div>

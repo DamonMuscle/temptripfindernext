@@ -1,0 +1,27 @@
+
+	<div class="row">
+		<div class="col-xs-4 form-group">
+			<label class="requirestar">Scale (Starts at 1)</label>
+			<div class="input-group" data-bind="attr:{tabindex:3}">
+				<div data-bind="typeahead:{source:obScaleSource,drowDownShow:true,notSort:true,selectedValue:obSelectedScale}">
+					<!-- ko customInput:{type:"Select",value:obSelectedScale,attributes:{class:"form-control",name:"scale"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" data-bind="uiInit:init">
+		<div class="col-xs-12 form-group">
+			<label class="requirestar">Left Side Rating Label</label>
+			<input type="text" name="leftSideRatingLabel" class="form-control" data-bind="value:obLeftSideRatingLabel" maxlength="50" tabindex="4" enableRightClickMenu="true" required />
+		</div>
+		<div class="col-xs-12 form-group">
+			<label class="requirestar">Right Side Rating Label</label>
+			<input type="text" name="rightSideRatingLabel" class="form-control" data-bind="value:obRightSideRatingLabel" maxlength="50" tabindex="4" enableRightClickMenu="true" required />
+		</div>
+	</div>

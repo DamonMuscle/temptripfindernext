@@ -1,0 +1,38 @@
+<div class="List-UDF-Fields" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-4 form-group">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked:obAllowMultiple" tabindex="5" />Allow Multiple
+				</label>
+			</div>
+		</div>
+		<!-- ko if: isUDFGroup -->
+		<div class="col-xs-4 form-group">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked:obPickListIsDropdown" tabindex="6" />Dropdown
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-6 form-group">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked:obPickListAddOtherOption" tabindex="7" />Add "Other" option
+				</label>
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+	<div class="row">
+		<div class="col-xs-24 form-group" name="udfListType">
+			<div class="grid-wrapper" data-type="list-item">
+				<div class="grid-header">
+					<div class="header-title"><label for="question" class="requirestar">List Item</label></div>
+					<div class="header-add-button" data-bind="click:onAddBtnClick" tabindex="8">Add Item</div>
+				</div>
+				<div class="kendo-grid"></div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,27 @@
+<div class="Edit-UDF-Modal" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-24 form-group editor-wrapper question-wrapper">
+			<label for="question" class="requirestar"><strong>Section Name</strong></label>
+			<div class="text-editor-wrapper">
+				<textarea id="QuestionBodyEditor" rows="5" cols="150" required></textarea>
+			</div>
+			<div class="html-editor-wrapper">
+				<textarea id="QuestionBodyHtmlEditor" data-bind="value: obName" required></textarea>
+			</div>
+			<div class="editor-options-wrap">
+				<div class="option design" data-bind="click:changePattern">Design</div>
+				<div class="option html" data-bind="click:changePattern">HTML</div>
+			</div>
+			<input type="text" class="form-control notinput-required-messagebody" data-bind="value:obName" name="name" />
+		</div>
+		<small class="name-text-counter" style="position: absolute;top: 17px;right: 15px;display:none"></small>
+	</div>
+	<div class="row">
+		<div class="col-xs-24 form-group editor-wrapper question-wrapper">
+			<label for="question"><strong>Section Access by Role</strong></label>
+			<div class="section-select-wrapper">
+				<select id="sectionRoles" data-placeholder="Select roles..."></select>
+			</div>
+		</div>
+	</div>
+</div>

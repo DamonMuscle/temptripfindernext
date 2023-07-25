@@ -1,6 +1,6 @@
 (function()
 {
-	createNamespace("TF.Page").UserDefinedFieldsPage = UserDefinedFieldsPage;
+	createNamespace("TF.Document").UserDefinedFieldDocumentViewModel = UserDefinedFieldDocumentViewModel;
 
 	var _REPORT_GRID_TYPE = "report",
 		_PRIMARY_GRID_COLUMNS = [
@@ -63,22 +63,27 @@
 				field: "ExternalID",
 				title: "External ID",
 				width: "200px"
-			},
-			{
-				field: "Public",
-				width: "100px",
-				template: function(item)
-				{
-					return "";
-				},
-				onlyForForm: true
 			}
 		];
 
-	function UserDefinedFieldsPage()
+	function UserDefinedFieldDocumentViewModel(documentData, documentManager)
 	{
+		_PRIMARY_GRID_COLUMNS.push({
+			field: "Public",
+			width: "100px",
+			template: function(item)
+			{
+				return "";
+			},
+			onlyForForm: true
+
+		});
+
 		var self = this,
-			availableTypes = tf.dataTypeHelper.getAvailableDataTypesForUDFManagement().filter(t => t.key !== _REPORT_GRID_TYPE);
+			routeState = documentData.routeState,
+			typeName = documentData.data.type,
+			pageType = documentData.data.pageType,
+			availableTypes = tf.dataTypeHelper.getAvailableDataTypesForUDFManagement();
 
 		self.commandGridColumns = [
 			{
@@ -116,18 +121,20 @@
 			}
 		];
 
-		self.type = "userdefinedfield";
-		self.pageType = "userdefinedfields";
+		TF.Document.BaseDocumentViewModel.call(self, routeState, typeName);
 
-		TF.Page.BaseGridPage.apply(self, arguments);
-
-		self.skipSavePage = true;
+		self.DocumentData = documentData;
+		self.documentType = documentData.documentType;
+		self.documentManager = documentManager;
+		self.pageType = pageType;
+		self.obtabName(documentData.data.tabName);
 
 		//  Properties
 		self.$element = null;
 		self.$gridWrapper = null;
 		self.kendoGrid = null;
 
+		self.type = "userdefinedfield";
 		self.endpoint = tf.dataTypeHelper.getEndpoint(self.type);
 
 		self.obCurrentUdfCount = ko.observable(0);
@@ -149,62 +156,16 @@
 			"DUPLICATED_NAME_AND_NEW_NAME_GREATE_THAN_UDF_NAME_MAX_LENGTH_MSG": "Name must be unique and less than 30 characters."
 		};
 		self.onUDFJsonFileSelected = self.onUDFJsonFileSelected.bind(self);
+		this.pageLevelViewModel = new TF.PageLevel.BaseDataEntryPageLevelViewModel();
 	}
 
-	UserDefinedFieldsPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
+	UserDefinedFieldDocumentViewModel.prototype = Object.create(TF.Document.BaseDocumentViewModel.prototype);
 
-	UserDefinedFieldsPage.prototype.constructor = UserDefinedFieldsPage;
+	UserDefinedFieldDocumentViewModel.prototype.constructor = UserDefinedFieldDocumentViewModel;
 
-	UserDefinedFieldsPage.prototype.init = function(viewModel, el)
-	{
-		var self = this;
-		self.authValidation().then(function(response)
-		{
-			if (response)
-			{
-				self.$element = $(el);
-				self.$gridWrapper = self.$element.find(".grid-wrapper");
+	UserDefinedFieldDocumentViewModel.prototype.templateName = "workspace/UserDefinedField/Panel";
 
-				self.initGrid(self.$gridWrapper, self.obSelected().key);
-
-				self.$gridWrapper.find(".selected-label,.bottom-caret").on("click", function(e)
-				{
-					var contextmenu = new TF.ContextMenu.TemplateContextMenu(
-						"workspace/switchgridmenu",
-						new TF.SwitchGridMenuViewModel({
-							availableTypes: self.obAvailableTypes(),
-							selectedItem: self.obSelected(),
-							selectedItemChanged: self.selectedItemChanged
-						})
-					);
-					tf.contextMenuManager.showMenu(self.$gridWrapper.find(".bottom-caret"), contextmenu);
-				});
-
-				self.selectedItemChanged.subscribe(function(e, value)
-				{
-					self.obSelected(value);
-					self.refreshGridByType(value.key);
-				});
-
-				self.udfChangedEvent.subscribe(self.onUdfChangedCallback.bind(self));
-				self.$importLayoutInput = self.$element.find("#import-layout");
-			}
-		}.bind(this));
-	};
-
-	UserDefinedFieldsPage.prototype.authValidation = function()
-	{
-		if (!tf.permissions.obIsAdmin())
-		{
-			return tf.pageManager.handlePermissionDenied("User Defined Fields").then(function()
-			{
-				return Promise.resolve(false);
-			});
-		}
-		return Promise.resolve(true);
-	};
-
-	UserDefinedFieldsPage.prototype._fullfillGridBlank = function()
+	UserDefinedFieldDocumentViewModel.prototype._fullfillGridBlank = function()
 	{
 		var $canver = this.$container.find(".k-grid-content");
 		$canver.children('.kendogrid-blank-fullfill').remove();
@@ -230,12 +191,49 @@
 	};
 
 
-	UserDefinedFieldsPage.prototype.getHash = function()
+	UserDefinedFieldDocumentViewModel.prototype.getHash = function()
 	{
 		return "UserDefinedFields";
 	};
 
-	UserDefinedFieldsPage.prototype.getGridColumnsByType = function(type)
+	/**
+	 * Initialization.
+	 *
+	 * @param {DOM} el
+	 * @param {object} data
+	 */
+	UserDefinedFieldDocumentViewModel.prototype.initialize = function(el, data)
+	{
+		var self = this;
+		self.$element = $(el);
+		self.$gridWrapper = self.$element.find(".grid-wrapper");
+
+		self.initGrid(self.$gridWrapper, self.obSelected().key);
+
+		self.$gridWrapper.find(".selected-label,.bottom-caret").on("click", function(e)
+		{
+			var contextmenu = new TF.ContextMenu.TemplateContextMenu(
+				"workspace/switchgridmenu",
+				new TF.SwitchGridMenuViewModel({
+					availableTypes: self.obAvailableTypes(),
+					selectedItem: self.obSelected(),
+					selectedItemChanged: self.selectedItemChanged
+				})
+			);
+			tf.contextMenuManager.showMenu(self.$gridWrapper.find(".bottom-caret"), contextmenu);
+		});
+
+		self.selectedItemChanged.subscribe(function(e, value)
+		{
+			self.obSelected(value);
+			self.refreshGridByType(value.key);
+		});
+
+		self.udfChangedEvent.subscribe(self.onUdfChangedCallback.bind(self));
+		self.$importLayoutInput = self.$element.find("#import-layout");
+	};
+
+	UserDefinedFieldDocumentViewModel.prototype.getGridColumnsByType = function(type)
 	{
 		var self = this,
 			isForReportUDFs = type === _REPORT_GRID_TYPE,
@@ -256,7 +254,7 @@
 			});
 		}
 
-		if (self.pageType === "userdefinedfields")
+		if (self.pageType === "Fields")
 		{
 			gridColumns = gridColumns.filter(function(item)
 			{
@@ -281,7 +279,7 @@
 	 * @param {JQuery} $grid
 	 * @param {string} type
 	 */
-	UserDefinedFieldsPage.prototype.initGrid = function($container, type)
+	UserDefinedFieldDocumentViewModel.prototype.initGrid = function($container, type)
 	{
 		var self = this,
 			gridColumns = self.getGridColumnsByType(type);
@@ -359,7 +357,7 @@
 	 * @param {string} type
 	 * @returns
 	 */
-	UserDefinedFieldsPage.prototype.fetchGridData = function(type)
+	UserDefinedFieldDocumentViewModel.prototype.fetchGridData = function(type)
 	{
 		let self = this,
 			udfPromise = tf.UDFDefinition.RetrieveByType(type).then(function(response)
@@ -391,7 +389,7 @@
 	 * Add user defined field button clicked.
 	 *
 	 */
-	UserDefinedFieldsPage.prototype.onAddBtnClick = function()
+	UserDefinedFieldDocumentViewModel.prototype.onAddBtnClick = function()
 	{
 		var self = this,
 			type = self.obSelected().key;
@@ -408,7 +406,7 @@
 			});
 	};
 
-	UserDefinedFieldsPage.prototype.onExportGroupFieldBtnClick = function(evt)
+	UserDefinedFieldDocumentViewModel.prototype.onExportGroupFieldBtnClick = function(evt)
 	{
 		let self = this,
 			$tr = $(evt.currentTarget).closest("tr"),
@@ -428,13 +426,13 @@
 		TF.URLHelper.downloadFileGenerator([exprotDataText], { type: contentType }, fileName);
 	}
 
-	UserDefinedFieldsPage.prototype.onImportGroupBtnClick = function()
+	UserDefinedFieldDocumentViewModel.prototype.onImportGroupBtnClick = function()
 	{
 		var self = this;
 		self.$importLayoutInput.click();
 	};
 
-	UserDefinedFieldsPage.prototype.onUDFJsonFileSelected = function()
+	UserDefinedFieldDocumentViewModel.prototype.onUDFJsonFileSelected = function()
 	{
 		var self = this,
 			fileInput = self.$importLayoutInput[0],
@@ -512,7 +510,7 @@
 	* Copy and New user defined field button clicked.
 	*
 	*/
-	UserDefinedFieldsPage.prototype.onCopyAndNewBtnClick = function(evt)
+	UserDefinedFieldDocumentViewModel.prototype.onCopyAndNewBtnClick = function(evt)
 	{
 		var self = this,
 			$tr = $(evt.currentTarget).closest("tr"),
@@ -545,7 +543,7 @@
 	 * Edit user defined field button clicked.
 	 *
 	 */
-	UserDefinedFieldsPage.prototype.onEditBtnClick = function(evt)
+	UserDefinedFieldDocumentViewModel.prototype.onEditBtnClick = function(evt)
 	{
 		var self = this,
 			$tr = $(evt.currentTarget).closest("tr"),
@@ -562,12 +560,10 @@
 				{
 					self._backupScrollPosition();
 					self.refreshGridByType(dataType);
-
-					// Since multiple tab is not supported in TripfinderNext yet, comment the following code at this moment.
-					// if (dataType !== _REPORT_GRID_TYPE)
-					// {
-					// 	tf.documentManagerViewModel.modifiedUDFIds.push(dataItem.Id);
-					// }
+					if (dataType !== _REPORT_GRID_TYPE)
+					{
+						tf.documentManagerViewModel.modifiedUDFIds.push(dataItem.Id);
+					}
 				}
 			});
 	};
@@ -576,7 +572,7 @@
 	 * Delete user defined field button clicked.
 	 *
 	 */
-	UserDefinedFieldsPage.prototype.onDeleteBtnClick = function(evt)
+	UserDefinedFieldDocumentViewModel.prototype.onDeleteBtnClick = function(evt)
 	{
 		var self = this, $tr = $(evt.currentTarget).closest("tr"),
 			gridType = self.obSelected().key,
@@ -712,7 +708,7 @@
 		});
 	};
 
-	UserDefinedFieldsPage.prototype.checkUdfInDetailViewTemplate = function(gridType, udfId)
+	UserDefinedFieldDocumentViewModel.prototype.checkUdfInDetailViewTemplate = function(gridType, udfId)
 	{
 		var dataTypeId = tf.dataTypeHelper.getId(gridType);
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "detailscreens"), { paramData: { dataTypeId: dataTypeId } })
@@ -732,7 +728,7 @@
 			});
 	};
 
-	UserDefinedFieldsPage.prototype.removeUdfInDetailViewTemplates = function(templates, udfId)
+	UserDefinedFieldDocumentViewModel.prototype.removeUdfInDetailViewTemplates = function(templates, udfId)
 	{
 		var self = this;
 
@@ -748,7 +744,7 @@
 		});
 	};
 
-	UserDefinedFieldsPage.prototype.checkUdfInGridLayout = function(gridType, udfId)
+	UserDefinedFieldDocumentViewModel.prototype.checkUdfInGridLayout = function(gridType, udfId)
 	{
 		return Promise.all([
 			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridlayouts"),
@@ -775,7 +771,7 @@
 		});
 	}
 
-	UserDefinedFieldsPage.prototype.checkUdfInGridFilter = function(gridType, udfName)
+	UserDefinedFieldDocumentViewModel.prototype.checkUdfInGridFilter = function(gridType, udfName)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "gridfilters"), {
 			paramData: {
@@ -791,7 +787,7 @@
 		});
 	};
 
-	UserDefinedFieldsPage.prototype.checkUdfInCaseUDF = function(gridType, udfName)
+	UserDefinedFieldDocumentViewModel.prototype.checkUdfInCaseUDF = function(gridType, udfName)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "userdefinedfields"), {
 			paramData: {
@@ -813,7 +809,7 @@
 	 * Will return the Ids of reports that have used the given Udf
 	 * 
 	 */
-	UserDefinedFieldsPage.prototype.checkUdfInAllReportLayouts = function(udfGuid)
+	UserDefinedFieldDocumentViewModel.prototype.checkUdfInAllReportLayouts = function(udfGuid)
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "ExagoReportParameters"), {
 			paramData: {
@@ -837,7 +833,7 @@
 	/**
 	 * if filter or case is using this udf, this udf can not be deleted
 	 */
-	UserDefinedFieldsPage.prototype.deleteCheck = function(gridType, dataItem)
+	UserDefinedFieldDocumentViewModel.prototype.deleteCheck = function(gridType, dataItem)
 	{
 		return Promise.all([
 			this.checkUdfInGridFilter(gridType, dataItem.DisplayName),
@@ -875,7 +871,7 @@
 	 *
 	 * @param {string} type
 	 */
-	UserDefinedFieldsPage.prototype.refreshGridByType = function(type)
+	UserDefinedFieldDocumentViewModel.prototype.refreshGridByType = function(type)
 	{
 		var self = this,
 			gridColumns = self.getGridColumnsByType(type);
@@ -905,7 +901,7 @@
 
 		if (type !== _REPORT_GRID_TYPE)
 		{
-			// tf.documentManagerViewModel.gridTypesContainModifiedUDF.push(type);
+			tf.documentManagerViewModel.gridTypesContainModifiedUDF.push(type);
 		}
 
 	};
@@ -916,7 +912,7 @@
 	 *
 	 * @param {string} type
 	 */
-	UserDefinedFieldsPage.prototype.onUdfChangedCallback = function(e, gridType)
+	UserDefinedFieldDocumentViewModel.prototype.onUdfChangedCallback = function(e, gridType)
 	{
 		var self = this,
 			dataTypeId = tf.dataTypeHelper.getId(gridType);
@@ -924,13 +920,20 @@
 		tf.exagoBIHelper.updateColumnMetadataForUDFs([dataTypeId]);
 	};
 
-	UserDefinedFieldsPage.prototype._getGridFooterLabel = function(count)
+	UserDefinedFieldDocumentViewModel.prototype._getGridFooterLabel = function(count)
 	{
 		var self = this;
 		return count + " User Defined " + self.pageType.substr(0, self.pageType.length - 1) + (count !== 1 ? "s" : "");
 	};
 
-	UserDefinedFieldsPage.prototype._backupScrollPosition = function()
+	UserDefinedFieldDocumentViewModel.prototype.dispose = function()
+	{
+		this.selectedItemChanged.unsubscribeAll();
+		this.udfChangedEvent.unsubscribeAll();
+		this.pageLevelViewModel.dispose();
+	};
+
+	UserDefinedFieldDocumentViewModel.prototype._backupScrollPosition = function()
 	{
 		const $content = this.kendoGrid.content;
 		if ($content)
@@ -939,7 +942,7 @@
 		}
 	}
 
-	UserDefinedFieldsPage.prototype._restoreScrollPosition = function()
+	UserDefinedFieldDocumentViewModel.prototype._restoreScrollPosition = function()
 	{
 		if (this._scrollPosition)
 		{
@@ -951,11 +954,4 @@
 			this._scrollPosition = null;
 		}
 	}
-
-	UserDefinedFieldsPage.prototype.dispose = function()
-	{
-		this.selectedItemChanged.unsubscribeAll();
-		this.udfChangedEvent.unsubscribeAll();
-		TF.Page.BaseGridPage.prototype.dispose.apply(this);
-	};
 })();

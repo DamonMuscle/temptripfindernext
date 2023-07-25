@@ -1,0 +1,65 @@
+<div class="List-UDF-Fields" data-bind="uiInit:init">
+	<div class="row">
+		<div class="col-xs-6 form-group">
+			<label class="requirestar">Data Type</label>
+			<div class="input-group">
+				<div data-bind="typeahead:{source:obDataTypeSource,format:function(obj){return obj.name;}, afterSelect: afterDataTypeSelect.bind($data), drowDownShow:true,notSort:true,selectedValue:obSelectedDataType}">
+					<!-- ko customInput:{type:"Select",value:obSelectedDataTypeText,attributes:{class:"form-control",name:"dataType"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-6 form-group">
+			<label class="requirestar">Field</label>
+			<div class="input-group">
+				<div data-bind="typeahead:{source:obFieldSource,format:function(obj){return obj.DisplayName;}, drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
+					<!-- ko customInput:{type:"Select",value:obSelectedFieldText,attributes:{class:"form-control",name:"field"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-6 form-group">
+			<label>Filter</label>
+			<div class="input-group">
+				<div data-bind="typeahead:{source:obFilterSource,format:function(obj){return obj.name;}, afterRender:afterFilterRender.bind($data),  drowDownShow:true,notSort:true,selectedValue:obSelectedFilter}">
+					<!-- ko customInput:{type:"Select",value:obSelectedFilterText,attributes:{class:"form-control",name:"filter"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-6 form-group">
+			<div class="checkbox" style="padding-top:10px">
+				<label>
+					<input type="checkbox" data-bind="checked:obIsUniqueValues" tabindex="5" />Unique Value
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-18 form-group">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" data-bind="checked:obAllowMultiple" tabindex="5" />Allow Multiple
+				</label>
+			</div>
+		</div>
+		<div class="col-xs-6 form-group">
+			<div class="preview-button disabled" data-bind="click:onPreviewBtnClick" tabindex="7">Preview</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,25 @@
+<div class="row" data-bind="uiInit:init">
+	<div class="col-xs-12 form-group">
+		<div class="form-group">
+			<label class="bold-Label">Field</label>
+			<div class="input-group">
+				<div data-bind="typeahead:{source:obGridDefinitionColumns,format:function(obj){return obj.DisplayName;},drowDownShow:true,notSort:true,selectedValue:obSelectedField},disable:obIsDisabled">
+					<!-- ko customInput:{disable:obIsDisabled,type:"Select",value:obSelectedFieldText,attributes:{class:"form-control"}} -->
+					<!-- /ko -->
+				</div>
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-default btn-sharp">
+						<span class="caret"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-24 form-group">
+		<label class="checkbox-inline">
+			<input type="checkbox" id="saveValueWithForm" name="saveValueWithForm" data-bind="checked:obSaveValueWithForm" /><strong>Save Value with Form</strong>
+		</label>
+	</div>
+</div>

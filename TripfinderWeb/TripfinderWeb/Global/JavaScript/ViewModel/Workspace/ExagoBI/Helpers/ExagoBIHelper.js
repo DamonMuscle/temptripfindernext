@@ -911,4 +911,31 @@
 				break;
 		}
 	};
+
+	const unsafeTagsRegEx = /<(\/?)(script|embed|iframe|object)/ig; // These tags are not allowed even if not closed	
+	const unsupportTagsRegEx = /<(\/?)(b|i)[^>]*?>/ig; // These tags are not allowed if closed
+	const htmlEscapesRegEx = /&(lt|gt|nbsp|amp|quot|iexcl|cent|pound|copy);/gi; // These escapes will be converted in Exago design panel
+	
+	ExagoBIHelper.prototype.removeUnsupportChars = function(str, isHtmlEditor = true)
+	{
+		if (!str)
+		{
+			return str;
+		}
+
+		if (isHtmlEditor)
+		{
+			// If the value is from an HTML editor, format it first
+			var wrapper = $("<div/>").html(str),
+				tables = wrapper.find("table");
+			tables.remove();
+			str = wrapper.text();
+		}
+
+		str = str.replace(unsafeTagsRegEx, "")
+		str = str.replace(unsupportTagsRegEx, "");
+		str = str.replace(htmlEscapesRegEx, "");
+		str = str.trim();
+		return str;
+	};	
 })();

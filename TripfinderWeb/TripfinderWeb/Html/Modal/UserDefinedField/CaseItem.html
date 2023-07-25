@@ -1,0 +1,63 @@
+<form data-bind="uiInit:init" class="Edit-UDF-Modal">
+	<div class="row">
+		<div class="col-xs-24 description">
+			<pre class="titleNotify" data-bind="text:obDescription"></pre>
+		</div>
+	</div>
+	<div class="document-dataentry">
+		<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+		<!-- /ko -->
+	</div>
+	<div class="row">
+		<div class="col-xs-10">
+			<div class="form-group">
+				<label class="bold-Label">Field</label>
+				<div class="input-group">
+					<div data-bind="typeahead:{source:obAllFields,format:function(obj){return obj.DisplayName == ' '?' ':obj.DisplayName+' ('+obj.FieldName+')';},drowDownShow:true,notSort:true,selectedValue:obSelectedField}">
+						<!-- ko customInput:{type:"Select",value:obSelectedFieldText,attributes:{class:"form-control"}} -->
+						<!-- /ko -->
+					</div>
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-default btn-sharp">
+							<span class="caret"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-10">
+			<div class="form-group">
+				<label class="bold-Label">Function</label>
+				<div class="input-group">
+					<input name="dropdownFunctions" style="width: 100%" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" style="margin-bottom: 15px;" data-bind="style:{display: obIsDefaultCase() ? 'none' : ''}">
+		<div class="col-xs-24">
+			<div class="form-group" style="height:112px">
+				<label>Case</label>
+				<textarea data-bv-error-name="Case field error: " class="form-control verticalResize" rows="5" name="caseStatement" data-bind="value:obCase,valueUpdate:'keyup',domReference:caseAreaElement,event:{focus:focus}"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" style="margin-bottom: 15px;">
+		<div class="col-xs-24">
+			<div class="form-group" style="height:112px">
+				<label>Value</label>
+				<textarea data-bv-error-name="Value field error: " class="form-control verticalResize" rows="5" name="valueStatement" data-bind="value:obValue,valueUpdate:'keyup',domReference:valueAreaElement,event:{focus:focus}"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-4">
+			<div class="form-group verifybutton-form-group">
+				<button type="button" data-bind="event:{click: verifyClick.bind($data)}" class="btn tf-btn-light-grey btn-sm">Verify</button>
+			</div>
+		</div>
+	</div>
+</form>
