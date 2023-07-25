@@ -14,7 +14,6 @@
 		DirectionUpdated: "on_FieldTripMap_DirectionUpdated",
 		HighlightFieldTripStop: "on_FieldTripMap_HighlightFieldTripStop",
 		ClearHighlightFieldTripStop: "on_FieldTripMap_ClearHighlightFieldTripStop",
-		InitMapCanvasObject: "on_FieldTripMap_onMapClick_InitMapCanvasObject",
 		FieldTripStopClick: "on_FieldTripMap_onMapClick_FieldTripStop",
 	};
 })();

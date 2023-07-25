@@ -1098,16 +1098,14 @@
 
 		if (moveStop)
 		{	
-			effectSequences = fieldTrip.FieldTripStops.filter(stop => stop.Sequence >= moveStop.Sequence - 1 && stop.Sequence <= moveStop.Sequence + 1)
-													  .map(stop => stop.Sequence);
+			effectSequences = fieldTrip.FieldTripStops.filter(stop => stop.Sequence >= moveStop.Sequence - 1 && stop.Sequence <= moveStop.Sequence + 1);
 		}
 		else if(deleteStop)
 		{
-			effectSequences = fieldTrip.FieldTripStops.filter(stop => stop.Sequence == deleteStop.Sequence - 1 || stop.Sequence == deleteStop.Sequence)
-												      .map(stop => stop.Sequence);
+			effectSequences = fieldTrip.FieldTripStops.filter(stop => stop.Sequence == deleteStop.Sequence - 1 || stop.Sequence == deleteStop.Sequence);
 		}
 
-		return effectSequences;
+		return effectSequences.map(stop => stop.Sequence);
 	}
 
 	FieldTripMap.prototype._updateRoutepathAndDirection = async function(fieldTrip, effectSequences)
@@ -1122,8 +1120,7 @@
 			PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, data);
 		}
 
-		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath)
-												.map(stop => stop._geoPath.paths);
+		let routePath = fieldTrip.FieldTripStops.filter(stop => !!stop._geoPath).map(stop => stop._geoPath.paths);
 		routePath = _.flatMap(routePath);
 		return routePath;
 	}
