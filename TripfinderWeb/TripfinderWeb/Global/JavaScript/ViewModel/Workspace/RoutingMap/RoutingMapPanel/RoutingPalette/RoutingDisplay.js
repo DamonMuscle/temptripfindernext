@@ -1844,7 +1844,7 @@
 			nodeData.set('customData.stops', tripData.FieldTripStops.length);
 			nodeData.set('customData.distance', self.convertToCurrentMeasurementUnit(totalDistance).toFixed(2));
 			nodeData.set('customData.startTime', self.getStartTimeForFieldTrip(tripData).format('MM-DD-YYYY h:mm a'));
-			nodeData.set('customData.endTime', self.getEndTimeForFieldTrip(tripData).format('MM-DD-YYYY h:mm a'));
+			nodeData.set('customData.endTime', self.getEndTimeForFieldTrip(tripData)?.format('MM-DD-YYYY h:mm a') ?? "Invalid date");
 			nodeData.set('customData.tripTotalTime', self.getDurationForFieldTrip(tripData));
 
 			if (!notAffectTripStop)

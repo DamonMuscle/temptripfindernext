@@ -1683,7 +1683,6 @@
 					if (trips[i].FieldTripStops[j].id == lockStop.id)
 					{
 						trips[i].FieldTripStops[j].LockStopTime = true;
-
 					}
 					else
 					{
@@ -1713,7 +1712,7 @@
 			if (trips[i].FieldTripStops.length > 0)
 			{
 				trips[i].ActualStartTime = trips[i].FieldTripStops[0].ActualStopTime.format(stopTimeFormat);
-				trips[i].ActualEndTime = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime.format(stopTimeFormat);
+				trips[i].ActualEndTime = trips[i].FieldTripStops[trips[i].FieldTripStops.length - 1].ActualStopTime?.format(stopTimeFormat);
 			}
 		}
 	};
