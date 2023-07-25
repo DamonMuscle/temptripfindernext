@@ -1,4 +1,4 @@
-﻿(function()
+﻿(function ()
 {
 	createNamespace("TF.GridDefinition").ReportGridDefinition = ReportGridDefinition;
 	function ReportGridDefinition()
@@ -6,7 +6,7 @@
 
 	}
 
-	ReportGridDefinition.prototype.gridDefinition = function()
+	ReportGridDefinition.prototype.gridDefinition = function ()
 	{
 		return {
 			Columns: [
@@ -27,7 +27,6 @@
 					DisplayName: "Data Type",
 					Width: '300px',
 					type: "string",
-					AllowFiltering: false
 				},
 				{
 					FieldName: "DataSchemaDisplayName",
@@ -40,11 +39,12 @@
 					DisplayName: "Created On",
 					Width: '150px',
 					type: "datetime",
-					template: function(dataItem)
+					template: function (dataItem)
 					{
 						let dt = utcToClientTimeZone(dataItem["CreatedOn"]);
 						return dt.isValid() ? dt.format("MM/DD/YYYY hh:mm A") : "";
-					}
+					},
+					isUTC: true,
 				},
 				{
 					FieldName: "CreatedByName",
@@ -63,7 +63,7 @@
 					DisplayName: "Favorite",
 					Width: '150px',
 					type: "boolean",
-					template: function(item)
+					template: function (item)
 					{
 						if (item.IsFavorite && item.IsFavorite !== "false")
 							return "<div class='icon-inner favorite-report'></div>";
