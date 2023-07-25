@@ -181,7 +181,19 @@
 
 		signatureFields.forEach(f =>
 		{
-			dataItem[f] = !!dataItem[f];
+			var value = dataItem[f];
+			if (value === true || value === "true" || value === "True")
+			{
+				dataItem[f] = true;
+			}
+			else if (value === false || value === "false" || value === "False")
+			{
+				dataItem[f] = false;
+			}
+			else
+			{
+				dataItem[f] = !!value;
+			}
 		});
 		return dataItem;
 	};
@@ -339,6 +351,45 @@
 		})
 	}
 
+	const _boolToCharFieldDict = {
+		5: {
+			'HasObject': {},
+			'Geo': { 'positiveValue': '4' }
+		},
+		9: {
+			'Geo': { 'positiveValue': '4' }
+		},
+		13: {
+			'AppPoint': {},
+		},
+	}
+
+	UserDefinedGridHelper.prototype.isBoolToCharField = function(fieldOptions)
+	{
+		if (!fieldOptions)
+		{
+			return false;
+		}
+
+		const { DataTypeId, DefaultText } = fieldOptions;
+
+		const dict = _boolToCharFieldDict[DataTypeId];
+		return !!dict &&
+			Object.keys(dict) &&
+			Object.keys(dict).includes(DefaultText);
+	}
+
+	UserDefinedGridHelper.prototype.boolToCharFieldPositiveValue = function(fieldOptions)
+	{
+		if (!this.isBoolToCharField(fieldOptions))
+		{
+			return '';
+		}
+
+		const { DataTypeId, DefaultText } = fieldOptions;
+		return _boolToCharFieldDict[DataTypeId][DefaultText].positiveValue;
+	}
+
 	UserDefinedGridHelper.prototype.getGridColumnTemplate = function(col, dataTypeId)
 	{
 		var self = this;
@@ -346,12 +397,13 @@
 		switch (col.type.toLowerCase())
 		{
 			case "systemfield":
-				template = function(item)
+				template = function(item, isCopy)
 				{
 					let value = item[col.Guid];
-					if (IsEmptyString(value)) { return ""; }
+					const isBoolToCharField = self.isBoolToCharField(col.FieldOptions);
+					if (!isBoolToCharField && IsEmptyString(value)) { return ""; }
 
-					return self.getSystemFieldValue(col, dataTypeId, value);
+					return self.getSystemFieldValue(col, dataTypeId, value, { isCopy: !!isCopy });
 				};
 				break;
 			case "date/time":
@@ -525,17 +577,20 @@
 	/*
 	* Returns the grid column's extension attributes (expect Type and Template) for the given column
 	*/
-	UserDefinedGridHelper.prototype.getGridColumnExtension = function(col, column, dataTypeId)
+	UserDefinedGridHelper.prototype.getGridColumnExtension = function(col, dataTypeId)
 	{
+		var self = this;
 		let columnExtension = null;
 
 		const type = col.type.toLowerCase();
 		const questionType = col.questionType.toLowerCase();
 
 		let _systemFieldQuestionType;
+		let _positiveValue;
 		if (type === "systemfield")
 		{
 			_systemFieldQuestionType = _getSystemFieldGridColumnType(col);
+			_positiveValue = self.boolToCharFieldPositiveValue(col.FieldOptions);
 		}
 
 		if (type === "signatureblock")
@@ -582,6 +637,11 @@
 						showOperators: false
 					}
 				}
+			}
+
+			if (_positiveValue)
+			{
+				columnExtension.positiveValue = _positiveValue;
 			}
 		}
 		else if (type === "image" || _systemFieldQuestionType === "image")
@@ -718,7 +778,7 @@
 				column.template = template;
 			}
 
-			const columnExtension = self.getGridColumnExtension(col, column, dataTypeId); // Returns the grid column extension (expect Type and Template) for the given column
+			const columnExtension = self.getGridColumnExtension(col, dataTypeId); // Returns the grid column extension (expect Type and Template) for the given column
 			if (columnExtension)
 			{
 				column = $.extend(column, columnExtension);
@@ -2638,8 +2698,9 @@
 		return type;
 	}
 
-	UserDefinedGridHelper.prototype.getSystemFieldValue = function(col, dataTypeId, value)
+	UserDefinedGridHelper.prototype.getSystemFieldValue = function(col, dataTypeId, value, options = { isCopy: false })
 	{
+		const { isCopy } = options;
 		let self = this;
 		let editType = col.editType;
 		let type = self.getSystemFieldType(col, dataTypeId);
@@ -2649,7 +2710,7 @@
 		let attributeFlag = col.FieldOptions.AttributeFlag ? col.FieldOptions.AttributeFlag : 0;
 		let $el = null;
 		let contentOption = { isGrid: true }
-		let formatOption = { isGrid: true, isUTC: false }
+		let formatOption = { isGrid: true, isUTC: false, isCopy: isCopy }
 
 		const isUDFSystemField = col.FieldOptions.IsUDFSystemField;
 		if (!isUDFSystemField)
@@ -2659,7 +2720,13 @@
 			$el = TF.Form.FormConfigHelper.getFormColumnContent(editType.targetField, dataTypeId, contentOption);
 		}
 
-		let val = tf.systemFieldsFormat(type, value, $el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, formatOption);
+		const val = tf.systemFieldsFormat(type, value, $el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, formatOption);
+
+		if (isCopy)
+		{
+			return val;
+		}
+
 		if ($el)
 		{
 			$el.val(val);
@@ -2962,7 +3029,7 @@
 				paramData: {
 					DBID: tf.datasourceManager.databaseId,
 					RecordDataType: dataTypeId,
-					RecordId:recordId,
+					RecordId: recordId,
 					UDGridID: udGridId
 				}
 			},

@@ -43,29 +43,25 @@
 				</ul>
 			</div>
 		</div>
-    <div class="navigation-item myrequests" pageType="myrequests"
-      data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
+    <div class="navigation-item myrequests" pageType="myrequests" data-bind="click:navigationPageCategoryClick.bind($data, 'myrequests')">
       <div class="item-icon myrequests"></div>
       <div class="item-label">My Submitted Requests</div>
     </div>
     <!-- ko if: !tf.authManager.authorizationInfo.onlyLevel1 -->
-    <div class="navigation-item approvals" pageType="approvals"
-      data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
+    <div class="navigation-item approvals" pageType="approvals" data-bind="click:navigationPageCategoryClick.bind($data, 'approvals')">
       <div class="item-icon approvals"></div>
       <div class="item-label">My Pending Approvals</div>
     </div>
     <!-- /ko -->
     <!-- ko if: tf.authManager.authorizationInfo.isAuthorizedFor("reports", "read") -->
-    <div class="navigation-item reports" pageType="reports"
-      data-bind="click:navigationPageCategoryClick.bind($data, 'reports')">
+    <div class="navigation-item reports" pageType="reports" data-bind="click:navigationPageCategoryClick.bind($data, 'reports')">
       <div class="item-icon reports"></div>
       <div class="item-label">Reports</div>
     </div>
     <!-- /ko -->
 
     <!-- ko if: !TF.isMobileDevice -->
-    <div class="navigation-item settings" pageType="settings"
-      data-bind="click:navigationPageCategoryClick.bind($data, 'settings')">
+    <div class="navigation-item settings" pageType="settings" data-bind="click:navigationPageCategoryClick.bind($data, 'settings')">
       <div class="item-icon settings"></div>
       <div class="item-label">Settings</div>
       <div class="item-menu">
@@ -86,8 +82,7 @@
     </div>
     <!-- /ko -->
 
-    <div class="navigation-item messages" pageType="messages"
-      data-bind="click:navigationPageCategoryClick.bind($data, 'messages'), visible:obShowMessageCenter">
+    <div class="navigation-item messages" pageType="messages" data-bind="click:navigationPageCategoryClick.bind($data, 'messages'), visible:obShowMessageCenter">
       <div class="item-icon messages"></div>
       <div class="item-label">Messages</div>
     </div>

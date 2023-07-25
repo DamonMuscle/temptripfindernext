@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").FieldTripPage = FieldTripPage;
 
@@ -18,7 +18,7 @@
 	FieldTripPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	FieldTripPage.prototype.constructor = FieldTripPage;
 
-	FieldTripPage.prototype.updateOptions = function()
+	FieldTripPage.prototype.updateOptions = function ()
 	{
 		var self = this;
 		if (self.gridOptions)
@@ -41,7 +41,7 @@
 		self.options.summaryFilterFunction = tf.fieldTripGridDefinition.getSummaryFunction();
 	};
 
-	FieldTripPage.prototype.createGrid = function(option)
+	FieldTripPage.prototype.createGrid = function (option)
 	{
 		var self = this,
 			shouldShowDetails = self.options.showRecordDetails;
@@ -54,17 +54,17 @@
 		}
 	};
 
-	FieldTripPage.prototype.openTripRecordDetailsOnInitialLoad = function()
+	FieldTripPage.prototype.openTripRecordDetailsOnInitialLoad = function ()
 	{
 		var self = this,
 			recordIdToOpen = self.options.filteredIds[0];
 
 		// Setup a databound callback for searchgrid to open the specific FieldTrip record (only for on-demand page access with specified tripid in url)
-		var initialDataBoundCallback = function()
+		var initialDataBoundCallback = function ()
 		{
 			self.searchGrid.onDataBoundEvent.unsubscribe(initialDataBoundCallback);
 
-			var recordIdInGrid = self.searchGrid.allIds.filter(function(id)
+			var recordIdInGrid = self.searchGrid.allIds.filter(function (id)
 			{
 				return id == recordIdToOpen;
 			})[0];
@@ -97,5 +97,35 @@
 			}
 			tf.promiseBootbox.alert("No users are associated with the selected Staff record(s).");
 		});
+	};
+
+	FieldTripPage.prototype._getIdsFromRelated = function (relatedType, descriptor, relatedIds)
+	{
+		if (relatedType == 'fieldtripinvoice')
+		{
+			return this.getSelectedFieldTripIds(relatedIds);
+		}
+
+		return BaseGridPage.prototype._getIdsFromRelated.apply(this, arguments);
+	};
+
+	FieldTripPage.prototype.getSelectedFieldTripIds = function (relatedIds)
+	{
+		if (!relatedIds || !relatedIds.length)
+		{
+			return Promise.resolve([]);
+		};
+
+		const ids = relatedIds.join(',');
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripInvoices"),
+			{
+				paramData: {
+					'@filter': `in(FieldTripID,${ids})`,
+					"@fields": "Id"
+				}
+			}).then(res =>
+			{
+				return [...new Set(res.Items.map(s => s.Id))];
+			});
 	};
 })();

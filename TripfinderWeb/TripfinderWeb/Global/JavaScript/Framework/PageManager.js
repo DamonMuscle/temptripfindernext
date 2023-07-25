@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").PageManager = PageManager;
 
@@ -8,7 +8,7 @@
 		self.obContextMenuVisible = ko.observable(false);
 		self.datasourceId = tf.storageManager.get("datasourceId");
 		self.currentDatabaseName = ko.observable();
-		self.currentDatabaseName.subscribe(function(v)
+		self.currentDatabaseName.subscribe(function (v)
 		{
 			if (!v)
 			{
@@ -73,7 +73,7 @@
 
 	}
 
-	PageManager.prototype.showConfirmation = function(message)
+	PageManager.prototype.showConfirmation = function (message)
 	{
 		return tf.promiseBootbox.yesNo({
 			message: message,
@@ -81,26 +81,26 @@
 		});
 	};
 
-	PageManager.prototype.initApplicationSwitcher = function()
+	PageManager.prototype.initApplicationSwitcher = function ()
 	{
 		var self = this, supportedProducts = tf.authManager.supportedProducts;
 
 		if (supportedProducts.length > 0)
 		{
-			supportedProducts = tf.authManager.supportedProducts.filter(function(prod)
+			supportedProducts = tf.authManager.supportedProducts.filter(function (prod)
 			{
 				var productName = prod.Name.toLowerCase();
 				return self.availableApplications.hasOwnProperty(productName);
-			}).map(function(v)
+			}).map(function (v)
 			{
 				return v.Name.toLowerCase();
 			});
 
-			var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function(app)
+			var accessApps = tf.authManager.authorizationInfo.authorizationTree.applications.map(function (app)
 			{
 				return transformAppName(app)
 			});
-			supportedProducts = supportedProducts.filter(function(app)
+			supportedProducts = supportedProducts.filter(function (app)
 			{
 				return accessApps.includes(app)
 			});
@@ -115,7 +115,7 @@
 				paramData: {
 					ids: "VENDORVALIDATIONSERVER,VENDORACCESSINFOPATH"
 				}
-			}).then(function(apiResponse)
+			}).then(function (apiResponse)
 			{
 				var path = apiResponse.Items[0].InfoID === "VENDORACCESSINFOPATH" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue,
 					server = apiResponse.Items[0].InfoID === "VENDORVALIDATIONSERVER" ? apiResponse.Items[0].InfoValue : apiResponse.Items[1].InfoValue;
@@ -139,9 +139,9 @@
 					},
 					dataType: 'json'
 				}))
-					.then(function(res)
+					.then(function (res)
 					{
-						hasURLProducts = res ? res.Products.filter(function(prod)
+						hasURLProducts = res ? res.Products.filter(function (prod)
 						{
 							return !!prod.Uri && supportedProducts.indexOf(prod.Name.toLowerCase()) != -1;
 						}) : [];
@@ -149,17 +149,17 @@
 						if (hasURLProducts.length > 0)
 						{
 							self.applicationURLMappingList = hasURLProducts;
-							self.applicationSwitcherList = hasURLProducts.map(function(item)
+							self.applicationSwitcherList = hasURLProducts.map(function (item)
 							{
 								return item.Name.toLowerCase();
 							});
-							self.applicationSwitcherList = self.applicationSwitcherList.sort(function(a, b)
+							self.applicationSwitcherList = self.applicationSwitcherList.sort(function (a, b)
 							{
 								return self.availableApplications[a].title.localeCompare(self.availableApplications[b].title);
 							});
 						}
 					})
-					.then(function()
+					.then(function ()
 					{
 						registerChatfinderHub();
 					})
@@ -199,12 +199,12 @@
 		}
 	}
 
-	PageManager.prototype.initNavgationBar = function()
+	PageManager.prototype.initNavgationBar = function ()
 	{
 		var self = this,
 			$content, $navigationContent = $(".navigation-container");
 		self.navigationData = new TF.NavigationMenu();
-		return self.getMessageSettings().then(function(result)
+		return self.getMessageSettings().then(function (result)
 		{
 			if (!result.Items || !result.Items.length || result.Items.length <= 0 || (!result.Items[0].EnglishMessage && !result.Items[0].SpanishMessage))
 			{
@@ -221,7 +221,7 @@
 		});
 	};
 
-	PageManager.prototype.initResizePanel = function()
+	PageManager.prototype.initResizePanel = function ()
 	{
 		var self = this,
 			$content, $pageContent = $("#pageContent");
@@ -232,7 +232,7 @@
 		ko.applyBindings(ko.observable(self.resizablePage), $content[0]);
 	};
 
-	PageManager.prototype.isDateBeforeToday = function(target)
+	PageManager.prototype.isDateBeforeToday = function (target)
 	{
 		var targetDate = new Date(target);
 		targetDate.setHours(0, 0, 0, 0);
@@ -246,15 +246,15 @@
 		return false;
 	};
 
-	PageManager.prototype.getMessageSettings = function()
+	PageManager.prototype.getMessageSettings = function ()
 	{
 		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripfindermessages"));
 	};
 
-	PageManager.prototype.showMessageModal = function(isInitPage)
+	PageManager.prototype.showMessageModal = function (isInitPage)
 	{
 		var self = this;
-		return self.getMessageSettings().then(function(result)
+		return self.getMessageSettings().then(function (result)
 		{
 			if (result.Items && result.Items.length > 0)
 			{
@@ -325,18 +325,21 @@
 			case "settingsConfig":
 				ageTitle = "Settings";
 				break;
+			case "fieldtripinvoices":
+				pageTitle = "Field Trip Invoices";
+				break;
 			default:
 				break;
 		}
 		return pageTitle;
 	}
 
-	PageManager.prototype.openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
+	PageManager.prototype.openNewPage = function (type, gridOptions, firstLoad, skipSavePage)
 	{
 		var self = this;
 		if (self.isTryGoAway && self.obPages() && self.obPages().length > 0 && self.obPages()[0] && self.obPages()[0].data && self.obPages()[0].data.tryGoAway)
 		{
-			self.obPages()[0].data.tryGoAway(getTitleByName(type)).then(function(result)
+			self.obPages()[0].data.tryGoAway(getTitleByName(type)).then(function (result)
 			{
 				if (result)
 				{
@@ -346,7 +349,7 @@
 		}
 		else if (self.obFieldTripEditPage() && self.obFieldTripEditPage().obEntityDataModel() && self.obFieldTripEditPage().tryGoAway)
 		{
-			self.obFieldTripEditPage().tryGoAway(getTitleByName(type)).then(function(result)
+			self.obFieldTripEditPage().tryGoAway(getTitleByName(type)).then(function (result)
 			{
 				if (result)
 				{
@@ -377,7 +380,7 @@
 		self.isTryGoAway = self;
 	};
 
-	PageManager.prototype._openNewPage = function(type, gridOptions, firstLoad, skipSavePage)
+	PageManager.prototype._openNewPage = function (type, gridOptions, firstLoad, skipSavePage)
 	{
 		var self = this,
 			pageData, templateName,
@@ -409,6 +412,10 @@
 			case "contact":
 			case "contacts":
 				pageData = new TF.Page.ContactPage(gridOptions);
+				templateName = "workspace/page/basegridpage";
+				break;
+			case "fieldtripinvoices":
+				pageData = new TF.Page.FieldTripInvoicePage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
 			case "fieldtrip":
@@ -486,7 +493,7 @@
 
 		if (self.navigationData)
 		{
-			setTimeout(function()
+			setTimeout(function ()
 			{
 				self.navigationData.setActiveStateByPageType(type);
 			}, 100);
@@ -535,7 +542,7 @@
 		if (this.datasourceId)
 		{
 			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "databases", this.datasourceId))
-				.then(function(apiResponse)
+				.then(function (apiResponse)
 				{
 					this.currentDatabaseName(apiResponse.Items[0].Name);
 					this.onCurrentDatabaseNameChanged.notify();
@@ -550,7 +557,7 @@
 		return Promise.resolve();
 	};
 
-	PageManager.prototype.logOffClick = function()
+	PageManager.prototype.logOffClick = function ()
 	{
 		var self = this;
 		tf.promiseBootbox.confirm({
@@ -575,7 +582,7 @@
 			},
 			title: "Log Out",
 			message: "Are you sure you want to log out?"
-		}).then(function(result)
+		}).then(function (result)
 		{
 			if (result)
 			{
@@ -584,9 +591,9 @@
 		})
 	};
 
-	PageManager.prototype.logout = function(flag)
+	PageManager.prototype.logout = function (flag)
 	{
-		tf.authManager.logOff().then(function()
+		tf.authManager.logOff().then(function ()
 		{
 			const rememberMe = tf.storageManager.get("rememberMe", true) || false;
 			if (!rememberMe)
@@ -606,17 +613,17 @@
 		});
 	};
 
-	PageManager.prototype.showContextMenu = function(model, event)
+	PageManager.prototype.showContextMenu = function (model, event)
 	{
-		setTimeout((function()
+		setTimeout((function ()
 		{
 			this.obContextMenuVisible(true);
 		}).bind(this), 0);
 	};
 
-	PageManager.prototype.initContextMenuEvent = function()
+	PageManager.prototype.initContextMenuEvent = function ()
 	{
-		var clickHideContextMenu = (function(evt)
+		var clickHideContextMenu = (function (evt)
 		{
 			var $target = $(evt.target);
 			if ((($target.closest(".tf-contextmenu-wrap").length === 0 && !$target.hasClass("tf-contextmenu-wrap")) ||
@@ -630,14 +637,14 @@
 		// when the context menu is open, listen for clicks outside of
 		// the menu. When the click occurs, remove the listener and
 		// close the context menu.
-		this.obContextMenuVisible.subscribe(function(newValue)
+		this.obContextMenuVisible.subscribe(function (newValue)
 		{
 			var event = TF.isMobileDevice ? "touchstart" : "click";
 			if (newValue)
 			{
 				$(window).off(event + '.contextmenu');
 				//use timeout to prevent close contextmenu on ipad , after open on touchstart this close event will occur immeditatly
-				setTimeout(function()
+				setTimeout(function ()
 				{
 					$(window).on(event + '.contextmenu', clickHideContextMenu);
 				}, 100);
@@ -654,7 +661,7 @@
 	 * @param {String} pageName
 	 * @return {String} 
 	 */
-	PageManager.prototype.getPageTitleByPageName = function(pageName)
+	PageManager.prototype.getPageTitleByPageName = function (pageName)
 	{
 		var self = this;
 		switch (pageName)
@@ -714,7 +721,7 @@
 		return _.sortBy(list, 'text');
 	};
 
-	PageManager.prototype.addMenuPage = function(pageType, menu, name, displayText, permission, hasApplicationTerm)
+	PageManager.prototype.addMenuPage = function (pageType, menu, name, displayText, permission, hasApplicationTerm)
 	{
 		var self = this, isOpen = pageType === tf.storageManager.get(TF.productName.toLowerCase() + ".page");
 		if (permission)
@@ -735,7 +742,7 @@
 		}
 	};
 
-	PageManager.prototype.handlePermissionDenied = function(pageName)
+	PageManager.prototype.handlePermissionDenied = function (pageName)
 	{
 		pageName = this.getPageTitleByPageName(pageName);
 		var self = this, desc = "You do not have permissions to view" + (pageName ? " " + pageName : ".");
@@ -743,14 +750,14 @@
 		{
 			desc += " You are not authorized for any page.";
 			return tf.promiseBootbox.alert(desc, "Invalid Permissions")
-				.then(function()
+				.then(function ()
 				{
 					self.logout(false);
 				}.bind(this));
 		}
 		desc += " You will be redirected to your default login screen.";
 		return tf.promiseBootbox.alert(desc, "Invalid Permissions")
-			.then(function()
+			.then(function ()
 			{
 				self.openNewPage("fieldtrips");
 				tf.promiseBootbox.hideAllBox();
@@ -761,14 +768,14 @@
 	* Get all data types that current user has permission to access.
 	* @return {Array}
 	*/
-	PageManager.prototype.getAvailableDataTypes = function()
+	PageManager.prototype.getAvailableDataTypes = function ()
 	{
 		var allDataTypes = [
 			{ name: "contact", label: "Contacts", permission: tf.permissions.obContact() },
 			{ name: "fieldtrip", label: "Field Trips", permission: tf.permissions.obFieldTrips() },
 			{ name: "vehicle", label: "Vehicles", permission: tf.permissions.obVehicle() }
 		];
-		return allDataTypes.filter(function(item) { return item.permission; });
+		return allDataTypes.filter(function (item) { return item.permission; });
 	};
 
 	/**
@@ -776,7 +783,7 @@
 	 * @param {String} gridType
 	 * @returns {String} The application term related to grid type.
 	 */
-	PageManager.prototype.typeToTerm = function(gridType)
+	PageManager.prototype.typeToTerm = function (gridType)
 	{
 		switch (gridType)
 		{
