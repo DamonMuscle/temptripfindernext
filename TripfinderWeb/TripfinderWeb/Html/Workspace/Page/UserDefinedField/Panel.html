@@ -1,0 +1,21 @@
+<div class="document-grid page-container tabstrip-userdefinedfields" data-bind="uiInit:init">
+	<div class="page-title">User Defined Fields</span></div>
+	<!-- ko template :{ name : "workspace/pagelevel/base",data:pageLevelViewModel }-->
+	<!-- /ko -->
+	<div class="page-content">
+		<div class="grid-wrapper">
+			<div class="grid-header">
+				<div class="header-title">
+					<span class="selected-label" data-bind="text:obSelected().label"></span>
+					<span class="icon bottom-caret"></span>
+				</div>
+				<div class="header-add-button" data-bind="click:onImportGroupBtnClick">Import</div>
+				<div class="header-add-button" data-bind="click:onAddBtnClick">Add</div>
+			</div>
+			<div class="kendo-grid grid-container"></div>
+		</div>
+	</div>
+	<div style="display:none;">
+		<input type="file" id="import-layout" accept=".tfUDFConfiguration" data-bind="event:{change:onUDFJsonFileSelected}" />
+	</div>
+</div>

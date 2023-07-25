@@ -465,6 +465,10 @@
 				pageData = new TF.Page.LocationPage(gridOptions);
 				templateName = "workspace/page/basegridpage";
 				break;
+			case "userdefinedfields":
+				pageData = new TF.Page.UserDefinedFieldsPage();
+				templateName = "workspace/page/userdefinedfield/panel";
+				break;
 			// case "datalist":
 			// 	pageData = {};
 			// 	templateName = "workspace/page/datalist";
@@ -677,7 +681,7 @@
 				{ text: "Field Trip Configurations", pageType: 'fieldtripconfigs' },
 				{ text: "Required Fields", pageType: "requiredfield" },
 				{ text: "System Configurations", pageType: "settingsConfig" },
-				{ text: "User Defined Fields", pageType: "userdefinedlabelfields" },
+				{ text: "User Defined Fields", pageType: "userdefinedfields" },
 				{ text: "Change Password", pageType: "changePassword" }
 			], "text");
 		

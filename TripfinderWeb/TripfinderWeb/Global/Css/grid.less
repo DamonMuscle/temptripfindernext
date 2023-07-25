@@ -1523,6 +1523,7 @@
 		background: url('../../global/img/grid/export.svg') no-repeat center center;
 	}
 
+	.k-grid-export,
 	.k-grid-edit,
 	.k-grid-copyandnew,
 	.k-grid-delete {
@@ -2430,7 +2431,8 @@
 	}
 }
 
-.k-virtual-scrollable-wrap {
+.k-virtual-scrollable-wrap,
+.tabstrip-userdefinedfields .k-grid-content {
 	background-color: #ffffff;
 
 	.kendogrid-blank-fullfill {
@@ -2448,6 +2450,10 @@
 			background-color: #ecf2f9;
 			height: @gridRowHeight;
 		}
+	}
+
+	table.kendogrid-blank-fullfill {
+		position: absolute;
 	}
 
 	.table-blank-fullfill {
