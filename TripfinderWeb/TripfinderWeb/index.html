@@ -6,11 +6,9 @@
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link href="Global/img/Transfinder-TripfinderText-Only.png" rel="shortcut icon" type="image/png">
-	<meta name="viewport"
-		  content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0" />
 	<meta name="format-detection" content="telephone=no" />
-	<meta name="description"
-		  content="Tripfinder is a solution for managing field trip requests, approvals and resource allocations. Tripfinder provides district personnel secure access to data via a browser on your PC or mobile device enabling them to submit requests, identify students for the trips, and track approvals.">
+	<meta name="description" content="Tripfinder is a solution for managing field trip requests, approvals and resource allocations. Tripfinder provides district personnel secure access to data via a browser on your PC or mobile device enabling them to submit requests, identify students for the trips, and track approvals.">
 	<meta property="og:image" content="Global/img/Logo-tripfinder.png">
 
 	<script>
@@ -42,13 +40,13 @@
 	<style>
 		@media screen and (min-color-index:0) and (-webkit-min-device-pixel-ratio:0) {
 			@media {
-				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content {
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content {
 					background-color: #efefef;
 				}
 
-					.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item > .grid-stack-item-content input:disabled {
-						color: #202020;
-					}
+				.detail-view-panel .detail-view .container-fluid .grid-stack .grid-stack-item.section-header-stack-item>.grid-stack-item-content input:disabled {
+					color: #202020;
+				}
 			}
 		}
 	</style>
@@ -85,10 +83,10 @@
 	<script>
 		var tfRegion = "US";
 	</script>
-	<script src="local_settings.js"></script>	
+	<script src="local_settings.js"></script>
 	<script src="checkAuth.js"></script>
 	<script>
-		(function()
+		(function ()
 		{
 			window.determineRedirect2VanityUrlPromise = vanitySessionGuard.determineRedirect2VanityUrl();
 		})();
@@ -279,6 +277,7 @@
 	<script src="Global/JavaScript/Workspace/GridDefinition/VehicleGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripLocationGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/GridDefinition/StaffGridDefinition.js"></script>
+	<script src="Global/JavaScript/Workspace/GridDefinition/FieldTripInvoicePageGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/GridDefinition/ContactGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/GridDefinition/ContactGridDefinition.js"></script>
 	<script src="Global/JavaScript/Workspace/GridDefinition/DistrictGridDefinition.js"></script>
@@ -357,6 +356,7 @@
 	<script src="Global/JavaScript/ViewModel/Pages/FieldTripPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/VehiclePage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/LocationPage.js"></script>
+	<script src="Global/JavaScript/ViewModel/Pages/FieldTripInvoicePage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/MyRequestPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/SchedulerPage.js"></script>
 	<script src="Global/JavaScript/ViewModel/Pages/MyRequestSchedulerPage.js"></script>
@@ -818,13 +818,11 @@
 				<div class="modal-content">
 					<!-- ko if: title() -->
 					<div class="modal-header">
-						<button type="button" class="close" aria-hidden="true"
-							data-bind="visible:obCloseButtonVisible,event:{click:closeClick}"></button>
+						<button type="button" class="close" aria-hidden="true" data-bind="visible:obCloseButtonVisible,event:{click:closeClick}"></button>
 						<div class="panel-heading" data-bind="text: title"></div>
 					</div>
 					<!-- /ko -->
-					<div class="modal-body"
-						data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
+					<div class="modal-body" data-bind="css:modalClass, template:{ name:contentTemplate, data: data,afterRender:$parent.modalAdd.bind(this,$element,$data,$parent) }">
 					</div>
 					<!-- ko if: buttonTemplate() -->
 					<div class="modal-footer">
@@ -956,41 +954,29 @@
 						}
 					</style>
 					<div class="uil-default-css" style="transform: scale(0.22);">
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(0deg) translate(0px, -58px); -webkit-transform: rotate(0deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(30deg) translate(0px, -58px); -webkit-transform: rotate(30deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(60deg) translate(0px, -58px); -webkit-transform: rotate(60deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(90deg) translate(0px, -58px); -webkit-transform: rotate(90deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(120deg) translate(0px, -58px); -webkit-transform: rotate(120deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(150deg) translate(0px, -58px); -webkit-transform: rotate(150deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(180deg) translate(0px, -58px); -webkit-transform: rotate(180deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(210deg) translate(0px, -58px); -webkit-transform: rotate(210deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(240deg) translate(0px, -58px); -webkit-transform: rotate(240deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(270deg) translate(0px, -58px); -webkit-transform: rotate(270deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(300deg) translate(0px, -58px); -webkit-transform: rotate(300deg) translate(0, -58px);">
 						</div>
-						<div
-							style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);">
+						<div style="background: rgb(255, 255, 255); border-radius: 8px; left: 93px; top: 80px; width: 16px; height: 40px; position: absolute; transform: rotate(330deg) translate(0px, -58px); -webkit-transform: rotate(330deg) translate(0, -58px);">
 						</div>
 					</div>
 				</div>

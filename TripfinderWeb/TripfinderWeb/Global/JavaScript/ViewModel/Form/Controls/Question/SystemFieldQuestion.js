@@ -62,12 +62,11 @@
 
 		let targetField = editType.targetField;
 		const fieldFormatConfig = tf.udgHelper.getSystemFieldsConfig(dataTypeId, targetField);
-		
+
 		if (fieldFormatConfig)
 		{
 			displayValue = tf.systemFieldsFormat(fieldFormatConfig.type, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, options);
-			value = tf.systemFieldsFormatValue(fieldFormatConfig.type, value);
-		} 
+		}
 		else if (systemFieldType)
 		{
 			displayValue = tf.systemFieldsFormat(systemFieldType, value, this.$el, attributeFlag, numberPrecision, trueDisplayName, falseDisplayName, options);

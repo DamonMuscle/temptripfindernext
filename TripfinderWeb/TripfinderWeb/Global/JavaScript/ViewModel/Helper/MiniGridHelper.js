@@ -250,7 +250,7 @@
 			const isIncludeUDGridColumn = TF.DetailView.UserDefinedGridHelper.isIncludeUDGridColumn(udgField);
 			if (!isIncludeUDGridColumn) return;
 
-			let	column = {
+			let column = {
 				FieldName: colGuid,
 				DisplayName: originFieldMapping[colGuid],
 				width: 165,
@@ -268,7 +268,7 @@
 				column.template = template;
 			}
 
-			const columnExtension = tf.udgHelper.getGridColumnExtension(udgField, column, dataTypeId);
+			const columnExtension = tf.udgHelper.getGridColumnExtension(udgField, dataTypeId);
 			if (columnExtension)
 			{
 				column = $.extend(column, columnExtension);
