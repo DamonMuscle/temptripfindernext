@@ -43,7 +43,7 @@
 							<li class="menu-divider">
 								<div class="rule"></div>
 							</li>
-							<li data-bind="clickButton:{disable:!obEditTripSelected(),click:optimizeSequenceMenuClick}">
+							<li data-bind="clickButton:{disable:(true||!obEditFieldTripSelected()),click:optimizeSequenceMenuClick}">
 								<div class="text"><span>Optimize Sequence</span></div>
 							</li>
 							<li data-bind="clickButton:{disable:!obVrpableTripsSelected(),click:vrpRouteClick}">
@@ -59,7 +59,7 @@
 							<li class="menu-divider">
 								<div class="rule"></div>
 							</li>
-							<li class="firstMenuItem" data-bind="clickButton:{disable:!obEditTripSelected(),click:showImpactDifferenceChartClick}, style: {fontWeight: dataModel.showImpactDifferenceChart() ? 'bold' : '' } ">
+							<li class="firstMenuItem" data-bind="clickButton:{disable:(true||!obEditFieldTripSelected()),click:showImpactDifferenceChartClick}, style: {fontWeight: dataModel.showImpactDifferenceChart() ? 'bold' : '' } ">
 								<div class="menuIcon"></div>
 								<div class="text"><span>Show Impact Difference Chart</span></div>
 							</li>
@@ -86,7 +86,7 @@
 				</div>
 				<div class="vertical-line"></div>
 				<div class="print-setting-group create-dropdown-list" data-bind="dropDownMenu">
-					<div class="icon fixed-menu-btn destination add-tripstop" title="Add Stop" data-bind="css:{disable:!obEditTripSelected()||!viewModel.isShowMode()},click:addStopClick.bind($data)"></div>
+					<div class="icon fixed-menu-btn destination add-tripstop" title="Add Stop" data-bind="css:{disable:!obEditFieldTripSelected()||!viewModel.isShowMode()},click:addStopClick.bind($data)"></div>
 					<div class="menu map-pinpoint-white withsub-menu">
 						<ul>
 							<li data-bind="click:createClick,mapModeStyleButton">
@@ -109,7 +109,7 @@
 				</div>
 				<div class="vertical-line"></div>
 				<div class="print-setting-group" data-bind="dropDownMenu">
-					<div class="icon map-pinpoint black fixed-menu-btn" title="Field Trip Stop Geo Select" data-bind="css:{disable:!obEditTripSelected()}"></div>
+					<div class="icon map-pinpoint black fixed-menu-btn" title="Field Trip Stop Geo Select" data-bind="css:{disable:(true||!obEditFieldTripSelected())}"></div>
 					<div class="menu map-pinpoint-white withsub-menu">
 						<ul>
 							<li class="polygon" data-bind="click:changeStopSelectAreaClick.bind($data,'polygon'),mapModeStyleButton">

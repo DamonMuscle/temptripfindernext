@@ -13,7 +13,7 @@
 		self.playBackControl = viewModel.playBackControl;
 		self.display = viewModel.display;
 		self.obTripSelected = ko.observable(false);
-		self.obEditTripSelected = ko.observable(false);
+		self.obEditFieldTripSelected = ko.observable(false);
 		self.obVrpableTripsSelected = ko.observable(false);
 		self.dataModel.onTripsChangeEvent.subscribe(this._onTripsChangeEvent.bind(this));
 		self.obSequencePath = ko.observable(tf.storageManager.get('pathLineType') === 'Sequence');
@@ -446,8 +446,7 @@
 		var self = this;
 		self.obTripSelected(self.dataModel.trips.length > 0);
 		
-		// self.obEditTripSelected(self.dataModel.getEditTrips().length > 0);
-		self.obEditTripSelected(false);
+		self.obEditFieldTripSelected(self.dataModel.getEditTrips().length > 0);
 
 		// self.obVrpableTripsSelected(self.dataModel.getEditTrips().length > 0);
 		self.obVrpableTripsSelected(false);
