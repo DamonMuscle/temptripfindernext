@@ -1836,7 +1836,7 @@
 			}
 			tripData.NumTransport = 0;
 			tripData.Distance = totalDistance;
-			
+
 			var tripTotalTime = self.getDurationForFieldTrip(tripData);
 			nodeData.set('visible', tripData.visible);
 			nodeData.set('id', tripData.id);
@@ -1847,8 +1847,8 @@
 			nodeData.set('customData.color', tripData.color);
 			nodeData.set('customData.stops', tripData.FieldTripStops.length);
 			nodeData.set('customData.distance', self.convertToCurrentMeasurementUnit(totalDistance).toFixed(2));
-			nodeData.set('customData.startTime', self.getStartTimeForFieldTrip(tripData).format('MM-DD-YYYY h:mm a'));
-			nodeData.set('customData.endTime', self.getEndTimeForFieldTrip(tripData)?.format('MM-DD-YYYY h:mm a') ?? "Invalid date");
+			nodeData.set('customData.startTime', self.getStartTimeForFieldTrip(tripData));
+			nodeData.set('customData.endTime', self.getEndTimeForFieldTrip(tripData));
 			nodeData.set('customData.tripTotalTime', tripTotalTime);
 			nodeData.set('customData.tripTotalTimeArray', self.momentHelper.minsToDDHHMM(tripTotalTime));
 
@@ -2281,6 +2281,11 @@
 
 		let firstStop = fieldTrip.FieldTripStops.reduce((min, val) => min.Sequence < val.Sequence ? min : val);
 		let lastStop  = fieldTrip.FieldTripStops.reduce((max, val) => max.Sequence > val.Sequence ? max : val);
+
+		if (!firstStop.StopTimeDepart || !lastStop.StopTimeArrive)
+		{
+			return 0;
+		}
 
 		let minutes = Math.ceil(moment.duration(moment(lastStop.StopTimeArrive).diff(moment(firstStop.StopTimeDepart))).asMinutes());
 
