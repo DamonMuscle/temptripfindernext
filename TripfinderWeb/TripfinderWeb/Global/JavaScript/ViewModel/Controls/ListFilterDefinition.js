@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace('TF').ListFilterDefinition = ListFilterDefinition;
 
@@ -25,7 +25,7 @@
 			GridType: "GPSEventType",
 			filterField: "EventTypeName",
 			editCurrentDefinitionColumns: true,
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "gpsEventType");
@@ -39,11 +39,11 @@
 			GridType: "BusfinderHistoricalVehicle",
 			filterField: "BusNum",
 			editCurrentDefinitionColumns: true,
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
 			},
-			setLeftGridRequestURL: function(obShowEnabled, type)
+			setLeftGridRequestURL: function (obShowEnabled, type)
 			{
 				// TODO-V2, need to research
 				if (obShowEnabled)
@@ -51,7 +51,7 @@
 				else
 					return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
 			},
-			setLeftGridRequestOption: function(requestOptions, obShowEnabled)
+			setLeftGridRequestOption: function (requestOptions, obShowEnabled)
 			{
 				requestOptions = TF.Control.KendoListMoverWithSearchControlViewModel.prototype.setLeftRequestOption.call(this, requestOptions);
 
@@ -84,7 +84,7 @@
 			DisplayFilterTypeName: "Alternate Sites",
 			GridType: "AlternateSite",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("altsite"));
@@ -97,7 +97,7 @@
 			DisplayFilterTypeName: "Contractors",
 			GridType: "Contractor",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("contractor"));
 			}
@@ -129,7 +129,7 @@
 			DisplayFilterTypeName: "Districts",
 			GridType: "District",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("district"));
@@ -156,7 +156,7 @@
 			DisplayFilterTypeName: "Geo Regions",
 			GridType: "GeoRegion",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("georegion"));
@@ -169,7 +169,7 @@
 			DisplayFilterTypeName: "Trips",
 			GridType: "Trip",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("trip"));
@@ -182,7 +182,7 @@
 			DisplayFilterTypeName: "Field Trips",
 			GridType: "FieldTrip",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("fieldTrip"));
 			}
@@ -194,7 +194,7 @@
 			DisplayFilterTypeName: "Trip Aliases",
 			GridType: "TripAlias",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("tripAlias"));
@@ -207,7 +207,7 @@
 			DisplayFilterTypeName: "Trip Stops",
 			GridType: "TripStop",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("tripStop"));
@@ -226,7 +226,7 @@
 			DisplayFilterTypeName: "Schools",
 			GridType: "School",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("school"));
 			}
@@ -249,7 +249,7 @@
 		{
 			DisplayFilterTypeName: "Schools",
 			filterField: "School",
-			setLeftGridRequestOption: function(requestOptions)
+			setLeftGridRequestOption: function (requestOptions)
 			{
 				requestOptions.data.filterSet = requestOptions.data.filterSet ||
 				{
@@ -272,11 +272,11 @@
 		{
 			DisplayFilterTypeName: "Staff",
 			GridType: "Staff",
-			filterField: function(item)
+			filterField: function (item)
 			{
 				return getFullName(item.LastName, item.FirstName, ', ')
 			},
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("staff"));
 			}
@@ -304,11 +304,11 @@
 		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff,
 		{
 			DisplayFilterTypeName: "Staff",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("staff") + "?staffType=Driver");
 			},
-			setLeftGridRequestOption: function(requestOptions)
+			setLeftGridRequestOption: function (requestOptions)
 			{
 				requestOptions.paramData = requestOptions.paramData ||
 					{};
@@ -320,7 +320,7 @@
 	ListFilterDefinition.ListFilterTemplate.Staff.Driver.DriverName = $.extend(
 		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff.Driver,
 		{
-			filterField: function(item)
+			filterField: function (item)
 			{
 				return getFullName(item.LastName, item.FirstName, ' ')
 			}
@@ -329,7 +329,7 @@
 	ListFilterDefinition.ListFilterTemplate.Staff.Driver.FirstNameInFront = $.extend(
 		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff.Driver,
 		{
-			filterField: function(item)
+			filterField: function (item)
 			{
 				return getFullName(item.FirstName, item.LastName, ' ')
 			}
@@ -339,11 +339,11 @@
 		{}, TF.ListFilterDefinition.ListFilterTemplate.Staff,
 		{
 			DisplayFilterTypeName: "Staff",//"Bus Aides",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("staff") + "?staffType=Bus Aide");
 			},
-			setLeftGridRequestOption: function(requestOptions)
+			setLeftGridRequestOption: function (requestOptions)
 			{
 				requestOptions.paramData = requestOptions.paramData ||
 					{};
@@ -363,7 +363,7 @@
 			DisplayFilterTypeName: "Students",
 			GridType: "Student",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("student"));
 			}
@@ -375,7 +375,7 @@
 			DisplayFilterTypeName: "Vehicles",
 			GridType: "Vehicle",
 			filterField: "BusNum",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint("vehicle"));
 			}
@@ -393,7 +393,7 @@
 			DisplayFilterTypeName: "Field Trip Activities",
 			GridType: "FieldTripActivity",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripActivities");
 			}
@@ -405,7 +405,7 @@
 			DisplayFilterTypeName: "Field Trip Account Billing Codes",
 			GridType: "FieldTripAccountBillingCode",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripaccounts");
 			}
@@ -417,7 +417,7 @@
 			DisplayFilterTypeName: "Field Trip Billing Classifications",
 			GridType: "FieldTripBillingClassification",
 			filterField: "Classification",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripBillingClassifications");
 			}
@@ -429,7 +429,7 @@
 			DisplayFilterTypeName: "Field Trip Classifications",
 			GridType: "FieldTripClassification",
 			filterField: "Code",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "fieldtripclassifications");
 			}
@@ -441,7 +441,7 @@
 			DisplayFilterTypeName: "District Departments",
 			GridType: "FieldTripDistrictDepartment",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "DistrictDepartments");
 			}
@@ -453,7 +453,7 @@
 			DisplayFilterTypeName: "Field Trip Destinations",
 			GridType: "FieldTripDestination",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripDestinations");
 			}
@@ -465,7 +465,7 @@
 			DisplayFilterTypeName: "Field Trip Equipment",
 			GridType: "FieldTripEquipment",
 			filterField: "EquipmentName",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripEquipments");
 			}
@@ -477,7 +477,7 @@
 			DisplayFilterTypeName: "Field Trip Templates",
 			GridType: "FieldTripTemplate",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "FieldTripTemplates");
 			}
@@ -489,7 +489,7 @@
 			DisplayFilterTypeName: "Body Types",
 			GridType: "VehicleBodyType",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleBodyType");
@@ -502,7 +502,7 @@
 			DisplayFilterTypeName: "Brake Types",
 			GridType: "VehicleBrakeType",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleBrakeType");
@@ -515,7 +515,7 @@
 			DisplayFilterTypeName: "Categories",
 			GridType: "VehicleCategory",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleCategory");
@@ -528,7 +528,7 @@
 			DisplayFilterTypeName: "Equipement Codes",
 			GridType: "VehicleEquipementCode",
 			filterField: "Code",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "vehicleequipment");
@@ -541,7 +541,7 @@
 			DisplayFilterTypeName: "Fuel Types",
 			GridType: "VehicleFuelType",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleFuelType");
@@ -554,7 +554,7 @@
 			DisplayFilterTypeName: "Makes",
 			GridType: "VehicleMake",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleMake");
@@ -567,7 +567,7 @@
 			DisplayFilterTypeName: "Makes of Bodies",
 			GridType: "VehicleMakeBody",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleMakeOfBody");
@@ -580,7 +580,7 @@
 			DisplayFilterTypeName: "Models",
 			GridType: "VehicleModel",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "VehicleModel");
@@ -593,7 +593,7 @@
 			DisplayFilterTypeName: "Disability Codes",
 			GridType: "GeneralDataListsDisabilityCode",
 			filterField: "Code",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "disabilitycodes");
 			}
@@ -605,7 +605,7 @@
 			DisplayFilterTypeName: "Ethnic Codes",
 			GridType: "GeneralDataListsEthnicCode",
 			filterField: "Code",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "ethniccodes");
 			}
@@ -617,7 +617,7 @@
 			DisplayFilterTypeName: "Document Classifications",
 			GridType: "GeneralDataListsDocumentClassification",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "documentClassifications");
 			}
@@ -629,7 +629,7 @@
 			DisplayFilterTypeName: "NEZ",
 			GridType: "GeneralDataListsNEZ",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "dataListsNEZ");
@@ -642,7 +642,7 @@
 			DisplayFilterTypeName: "Trip Aliases",
 			GridType: "GeneralDataListsTripAlias",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "tripAlias");
@@ -655,7 +655,7 @@
 			DisplayFilterTypeName: "Routes",
 			GridType: "Route",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("route"));
 			}
@@ -667,7 +667,7 @@
 			DisplayFilterTypeName: "Geo Region Type",
 			GridType: "GeneralDataListsGeoRegionType",
 			filterField: "Name",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefix(), "search", "georegiontype");
@@ -680,7 +680,7 @@
 			DisplayFilterTypeName: "Cities",
 			GridType: "GeoCity",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", "cities");
 			}
@@ -700,16 +700,16 @@
 			DisplayFilterTypeName: "Map Sets",
 			GridType: "Mapset",
 			filterField: "GeoCounty",
-			getUrl: function()
+			getUrl: function ()
 			{
 				// TODO-V2, need to remove
 				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "mapdata", "mapsetandzipcode");
 			},
-			modifySource: function(source)
+			modifySource: function (source)
 			{
 				var geoDataSource = source[0];
 				var geoCounties = Object.keys(geoDataSource);
-				geoCounties = geoCounties.map(function(geoCounty)
+				geoCounties = geoCounties.map(function (geoCounty)
 				{
 					return {
 						Id: geoCounty,
@@ -732,7 +732,7 @@
 			DisplayFilterTypeName: "Cities",
 			GridType: "GeoCity",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities");
 			}
@@ -744,7 +744,7 @@
 			DisplayFilterTypeName: "Geo Cities",
 			GridType: "GeoCity",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefixWithoutDatabase(), "mailingcities");
 			}
@@ -762,13 +762,13 @@
 			DisplayFilterTypeName: "Mailing State/Provinces",
 			GridType: "MailingState",
 			filterField: "Item",
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "mailingstate");
 			}
 		}, true);
 
-	ListFilterDefinition.ListFilterTemplate.GeoZipCode = function(gridType, fieldName)
+	ListFilterDefinition.ListFilterTemplate.GeoZipCode = function (gridType, fieldName)
 	{
 		return $.extend(
 			{}, ListFilterTemplateMapDataOption,
@@ -776,7 +776,7 @@
 				DisplayFilterTypeName: "Geo Zip Codes",
 				GridType: "GeoZipCode",
 				requestMethod: "post",
-				getUrl: function()
+				getUrl: function ()
 				{
 					return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(gridType), "aggregate") + "?" + $.param(
 						{
@@ -793,7 +793,7 @@
 			DisplayFilterTypeName: "Zip Codes"
 		}, true);
 
-	ListFilterDefinition.ListFilterTemplate.DistinctListValue = function(listFilterColumnSourceName, gridType, fieldName)
+	ListFilterDefinition.ListFilterTemplate.DistinctListValue = function (listFilterColumnSourceName, gridType, fieldName)
 	{
 		var tmp = TF.ListFilterDefinition.ListFilterTemplate[listFilterColumnSourceName];
 		if ((typeof (tmp)) === 'function')
@@ -806,7 +806,7 @@
 				DisplayFilterTypeName: tmp.DisplayFilterTypeName,
 				GridType: tmp.GridType,
 				requestMethod: "post",
-				getUrl: function()
+				getUrl: function ()
 				{
 					return pathCombine(tf.api.apiPrefix(), "search", tf.DataTypeHelper.getEndpoint(gridType), "aggregate") + "?" + $.param(
 						{
@@ -817,7 +817,7 @@
 			}, true);
 	};
 
-	ListFilterDefinition.ListFilterTemplate.GeneralDataListsMailingZipCode = function(gridType, fieldName)
+	ListFilterDefinition.ListFilterTemplate.GeneralDataListsMailingZipCode = function (gridType, fieldName)
 	{
 		return $.extend(
 			{}, TF.ListFilterDefinition.ListFilterTemplate.GeoZipCode(gridType, fieldName),
@@ -973,7 +973,7 @@
 					type: "string",
 					isSortItem: true
 				}],
-			getUrl: function()
+			getUrl: function ()
 			{
 				return pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint("staff"));
 			}
@@ -1047,9 +1047,10 @@
 			type: "date",
 			isSortItem: true,
 			sortIdx: 1,
-			template: function(dataItem)
+			template: function (dataItem)
 			{
-				return moment(dataItem.DepartDate).format("MM/DD/YYYY");
+				let date = moment(dataItem.DepartDateTime);
+				return date.isValid() ? date.format("MM/DD/YYYY") : "";
 			}
 		},
 		{
@@ -1059,9 +1060,10 @@
 			type: "time",
 			isSortItem: true,
 			sortIdx: 2,
-			template: function(dataItem)
+			template: function (dataItem)
 			{
-				return moment(dataItem.DepartTime).format("hh:mm A");
+				let date = moment(dataItem.DepartDateTime);
+				return date.isValid() ? date.format("hh:mm A") : "";
 			}
 		},
 		{
@@ -1091,9 +1093,10 @@
 			DisplayName: "Return Date",
 			Width: "160px",
 			type: "date",
-			template: function(dataItem)
+			template: function (dataItem)
 			{
-				return moment(dataItem.ReturnDate).format("MM/DD/YYYY");
+				let date = moment(dataItem.EstimatedReturnDateTime);
+				return date.isValid() ? date.format("MM/DD/YYYY") : "";
 			}
 		},
 		{
@@ -1101,9 +1104,10 @@
 			DisplayName: "Return Time",
 			Width: "160px",
 			type: "time",
-			template: function(dataItem)
+			template: function (dataItem)
 			{
-				return moment(dataItem.ReturnTime).format("hh:mm A");
+				let date = moment(dataItem.EstimatedReturnDateTime);
+				return date.isValid() ? date.format("hh:mm A") : "";
 			}
 		}];
 

@@ -27,30 +27,62 @@
 		//self.options.url = pathCombine(tf.api.apiPrefixWithoutDatabase(), "search", "ExagoReports?dataTypeId=7");
 		self.options.loadUserDefined = false;
 		self.options.selectable = "row";
-		var staticFilter = new TF.FilterItem("DataTypeName", "EqualTo", "Field Trip");
+
+		var filterSets = [
+			{
+				LogicalOperator: "or",
+				FilterItems: [
+					new TF.FilterItem("DataTypeName", "EqualTo", "Field Trip"),
+					new TF.FilterItem("DataTypeName", "EqualTo", "Field Trip Invoice")
+				],
+				FilterSets: []
+			}
+		];
+
+		var filterSet = {
+			LogicalOperator: "And",
+			FilterItems: [],
+			FilterSets: filterSets
+		};
+
 		self.options.setRequestOption = function (options)
 		{
 			if (options.data.filterSet && options.data.filterSet.FilterItems)
 			{
-				options.data.filterSet.FilterItems.push(staticFilter);
+				options.data.filterSet = self.mergeFilterSet(options.data.filterSet, filterSet);
 			}
 			else
 			{
-				options.data.filterSet = {
-					FilterItems: [staticFilter],
-					FilterSets: []
-				}
+				options.data.filterSet = filterSet;
 			}
 			//options.paramData.filterSet = [staticFilter];
 			return options;
 
 		}
+
 		self.options.setRequestURL = function ()
 		{
 			return tf.api.apiPrefixWithoutDatabase() + "/search/ExagoReports";
 		};
 
 	};
+
+	ReportsPage.prototype.mergeFilterSet = function (requsetFilterSet, reduceRecordsFilterSet)
+	{
+		if (!requsetFilterSet)
+			requsetFilterSet = TF.FilterHelper.buildEmptyDSFilterSet();
+
+		reduceRecordsFilterSet.FilterItems.map(function (item) { item.IsReduceRecordsFilterSet = true; });
+		reduceRecordsFilterSet.FilterSets.map(function (item) { item.IsReduceRecordsFilterSet = true; });
+
+		requsetFilterSet.FilterItems = requsetFilterSet.FilterItems.filter(function (item) { return !item.IsReduceRecordsFilterSet; });
+		requsetFilterSet.FilterSets = requsetFilterSet.FilterSets.filter(function (item) { return !item.IsReduceRecordsFilterSet; });
+
+		requsetFilterSet.FilterItems = requsetFilterSet.FilterItems.concat(reduceRecordsFilterSet.FilterItems);
+		requsetFilterSet.FilterSets = requsetFilterSet.FilterSets.concat(reduceRecordsFilterSet.FilterSets);
+
+		return requsetFilterSet;
+	}
 
 	ReportsPage.prototype.bindButtonEvent = function ()
 	{
