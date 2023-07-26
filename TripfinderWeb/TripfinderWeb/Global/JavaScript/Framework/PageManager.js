@@ -705,6 +705,8 @@
 				return "Trip Stop";
 			case "fieldtrip":
 				return "Field Trip";
+			case "fieldtripinvoice":
+				return "Field Trip Invoice";
 			case "georegion":
 				return "Geo Region";
 			case "busfinderhistorical":
