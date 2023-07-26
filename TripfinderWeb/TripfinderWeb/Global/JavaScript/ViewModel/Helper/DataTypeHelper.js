@@ -679,7 +679,7 @@
 		function isUDFAvailableDataTypeFun(dataTypeAttribute, dataTypeKey)
 		{
 			return (dataTypeKey === "report") ||
-				(dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary);
+				(dataTypeAttribute.name && dataTypeAttribute.isMajorType && !dataTypeAttribute.isTemporary && _tripfinderDataTypes.includes(dataTypeKey.toLowerCase()));
 		}
 
 		return TF.Helper.DataTypeHelper.getValidDataTypes(isUDFAvailableDataTypeFun);

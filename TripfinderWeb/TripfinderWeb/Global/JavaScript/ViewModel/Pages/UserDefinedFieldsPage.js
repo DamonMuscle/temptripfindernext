@@ -454,7 +454,9 @@
 				delete dataItem.Id;
 				delete dataItem.ID;
 
-				var udfGridTypeObj = tf.dataTypeHelper.getUDFAvailableDataTypes().filter(function(item) { return item.key === dataType; })[0];
+				var udfGridTypeObj = tf.dataTypeHelper.getUDFAvailableDataTypes().filter(function(item) {
+					return item.key === dataType && item.key !== _REPORT_GRID_TYPE;
+				})[0];
 				if (!udfGridTypeObj)
 				{
 					throw "NO_PERMISSION_MSG";
