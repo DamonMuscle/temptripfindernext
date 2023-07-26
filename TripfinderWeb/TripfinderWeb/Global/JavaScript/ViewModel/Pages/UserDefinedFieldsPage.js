@@ -759,8 +759,21 @@
 			tf.userPreferenceManager.getAllKey()
 		]).then(function(values)
 		{
-			var currentAppliedLayouts = tf.userPreferenceManager.get(tf.storageManager.prefix + tf.storageManager.gridCurrentLayout(gridType)) || {};
-			currentAppliedLayouts.inUserPreference = true;
+			const pageTypes = [];
+			const dataType = tf.dataTypeHelper.getAvailableDataTypes().find(d => d.key === gridType);
+			pageTypes.push(dataType ? dataType.pageType : gridType);
+			if (gridType === "fieldtrip")
+			{
+				pageTypes.push("approvals", "myrequests");
+			}
+
+			var currentAppliedLayouts = pageTypes.map(pageType =>
+			{
+				const layout = tf.userPreferenceManager.get(tf.storageManager.prefix + tf.storageManager.gridCurrentLayout(pageType)) || {};
+				layout.inUserPreference = true;
+				return layout;
+			});
+
 			return values[0].Items.concat(currentAppliedLayouts).filter(function(item)
 			{
 				var layoutColumns = item.LayoutColumns;
