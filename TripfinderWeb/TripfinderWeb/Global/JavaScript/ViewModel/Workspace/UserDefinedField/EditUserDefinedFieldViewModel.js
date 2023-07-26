@@ -268,7 +268,7 @@
 			{
 				return item.id === self.dataEntity.TypeId;
 			})[0],
-				typeName = type.name;
+				typeName = type?.name;
 			self.obSelectedType(typeName);
 		}
 		else
@@ -734,6 +734,12 @@
 
 	EditUserDefinedFieldViewModel.prototype.onTypeSourceChanged = function(type)
 	{
+		if (!type)
+		{
+			this.obDefaultValueVisible(false);
+			return;
+		}
+
 		var self = this,
 			selectedType = self.TYPES.filter(function(item) { return item.name === type; })[0],
 			typeData = selectedType.getTypeData(),

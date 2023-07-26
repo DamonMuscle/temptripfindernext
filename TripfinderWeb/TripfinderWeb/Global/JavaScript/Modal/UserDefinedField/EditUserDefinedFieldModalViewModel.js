@@ -35,6 +35,11 @@
 		self.obPositiveButtonLabel("Save");
 		self.editUserDefinedFieldViewModel = new TF.UserDefinedField.EditUserDefinedFieldViewModel(self.options);
 		self.data(self.editUserDefinedFieldViewModel);
+
+		self.editUserDefinedFieldViewModel.obSelectedType.subscribe((type) =>
+		{
+			self.obDisableControl(!type);
+		});
 	};
 
 	EditUserDefinedFieldModalViewModel.prototype.init = function()
