@@ -9,6 +9,7 @@
 		self.pageType = "fieldtripinvoices";
 		self.gridOptions = gridOptions;
 		TF.Page.BaseGridPage.apply(self, arguments);
+		self.disableAdd = true;
 		self.changeStatusButton = false;
 		self.copyButton = false;
 		self.disableDoubleClick = true;

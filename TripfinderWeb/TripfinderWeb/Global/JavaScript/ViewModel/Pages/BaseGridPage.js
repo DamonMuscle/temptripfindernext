@@ -1211,6 +1211,42 @@
 			});
 	};
 
+	BaseGridPage.prototype.getSubmitLabel = function () 
+	{
+		var label = "";
+
+		switch (this.type)
+		{
+			case "contact":
+				label = "Add New Contact";
+				break;
+			case "staff":
+				label = "Add New Staff";
+				break;
+			case "vehicle":
+				label = "Add New Vehicle";
+				break;
+			case "fieldtriplocation":
+				label = "Add New Location";
+				break;
+			default:
+				label = "Submit New Request";
+		}
+
+		return label;
+	}
+
+	BaseGridPage.prototype.isAddVisible = function ()
+	{
+		var self = this;
+		if (self.disableAdd)
+		{
+			return false;
+		}
+		var dataTypes = tf.dataTypeHelper.getAvailableDataTypes();
+		return dataTypes.some(item => item.key === self.type) && (!self.obShowFieldTripDEPanel() || !self.obShowDetailPanel()) && self.obNewRequest();
+	}
+
 	BaseGridPage.prototype.dispose = function ()
 	{
 		var self = this;
