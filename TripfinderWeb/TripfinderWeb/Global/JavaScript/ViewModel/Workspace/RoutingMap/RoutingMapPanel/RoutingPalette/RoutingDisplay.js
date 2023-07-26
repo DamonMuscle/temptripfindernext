@@ -31,6 +31,7 @@
 		self.routingDisplayAutoScroll = new TF.RoutingMap.RoutingPalette.RoutingDisplayAutoScroll();
 		self.routingDisplayHelper = new TF.RoutingMap.RoutingPalette.RoutingDisplayHelper(self);
 		self.isImperialUnit = tf.measurementUnitConverter.isImperial();
+		self.momentHelper = new TF.Document.MomentHelper();
 	}
 
 	RoutingDisplay.prototype.onTripDisplayRefresh = function(e, trips, displaySummaryModal)
@@ -748,6 +749,7 @@
 			customData: {
 				stops: data.customData.stops,
 				tripTotalTime: data.customData.tripTotalTime,
+				tripTotalTimeArray: data.customData.tripTotalTimeArray,
 				distance: data.customData.distance,
 				measurementUnit: data.customData.measurementUnit,
 				startTime: data.customData.startTime,
@@ -1834,6 +1836,8 @@
 			}
 			tripData.NumTransport = 0;
 			tripData.Distance = totalDistance;
+			
+			var tripTotalTime = self.getDurationForFieldTrip(tripData);
 			nodeData.set('visible', tripData.visible);
 			nodeData.set('id', tripData.id);
 			nodeData.set('text', tripData.Name);
@@ -1845,7 +1849,8 @@
 			nodeData.set('customData.distance', self.convertToCurrentMeasurementUnit(totalDistance).toFixed(2));
 			nodeData.set('customData.startTime', self.getStartTimeForFieldTrip(tripData).format('MM-DD-YYYY h:mm a'));
 			nodeData.set('customData.endTime', self.getEndTimeForFieldTrip(tripData)?.format('MM-DD-YYYY h:mm a') ?? "Invalid date");
-			nodeData.set('customData.tripTotalTime', self.getDurationForFieldTrip(tripData));
+			nodeData.set('customData.tripTotalTime', tripTotalTime);
+			nodeData.set('customData.tripTotalTimeArray', self.momentHelper.minsToDDHHMM(tripTotalTime));
 
 			if (!notAffectTripStop)
 			{
@@ -2225,6 +2230,8 @@
 		const self = this;
 		let = totalAssignedStudents = 0;
 
+		const tripTotalTime = self.getDurationForFieldTrip(trip);
+
 		return {
 			id: trip.id,
 			text: trip.Name,
@@ -2235,22 +2242,19 @@
 			prevLayover: ko.observable(null),
 			nextLayover: ko.observable(null),
 			customData: {
-				//students: trip.Session == 0 ? trip.PickUpStudents.length : trip.DropOffStudents.length,
-				// students: totalAssignedStudents,
 				stops: trip.FieldTripStops.length,
-				tripTotalTime: self.getDurationForFieldTrip(trip),
+				tripTotalTime: tripTotalTime,
+				tripTotalTimeArray: self.momentHelper.minsToDDHHMM(tripTotalTime),
 				distance: self.getDistanceForFieldTrip(trip),
 				measurementUnit: tf.measurementUnitConverter.getShortUnits(),
 				startTime: self.getStartTimeForFieldTrip(trip),
 				endTime: self.getEndTimeForFieldTrip(trip),
 				actualStartTime: trip.ActualStartTime,
 				actualEndTime: trip.ActualEndTime,
-				//originalTrip: trip,
 				color: trip.color,
 				sortValue: trip.Name,
 				openType: trip.OpenType,
 				isTrip: true,
-				//durationOptimizeNmber: ""
 			},
 			items: self.newFieldTripStopData(trip.FieldTripStops, trip)
 		};

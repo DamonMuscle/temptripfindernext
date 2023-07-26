@@ -909,11 +909,16 @@
 
 	RoutingDisplayHelper.prototype.getFieldTripInfoTemplate = function()
 	{
+		const hideClassName = 'hide';
 		return `
 		<div class="trip-info-text">
 			<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
 			<span class="splitter"></span>
-			<span class="info-block">#: item.customData.tripTotalTime #<br/>min</span>
+			
+			<span class="info-block #: item.customData.tripTotalTimeArray[0] == "00" ? "${hideClassName}" : ""#">#: item.customData.tripTotalTimeArray[0] #<br/>day</span>
+			<span class="info-block #: item.customData.tripTotalTimeArray[1] == "00" ? "${hideClassName}" : ""#">#: item.customData.tripTotalTimeArray[1] #<br/>hr</span>
+			<span class="info-block">#: item.customData.tripTotalTimeArray[2] #<br/>min</span>
+			
 			<span class="splitter"></span>
 			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
 			<span class="splitter"></span>
