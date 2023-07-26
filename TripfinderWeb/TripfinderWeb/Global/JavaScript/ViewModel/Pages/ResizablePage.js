@@ -375,7 +375,7 @@
 		var self = this, $grid, lockedHeaderWidth, paddingRight, width, totalWidth = self.$element.outerWidth(),
 			iconRow, wrapRow, iconRowTop, iconRowLeft, pageHeader, pageTitle, newRequest, newRequestTop, newRequestLeft;
 
-		$grid = self.$leftPage.find(".kendo-grid");
+		$grid = self.$leftPage.find(".kendo-grid:not(.detail-grid)");
 		if ($grid.length > 0)
 		{
 			lockedHeaderWidth = $grid.find('.k-grid-header-locked').width();
