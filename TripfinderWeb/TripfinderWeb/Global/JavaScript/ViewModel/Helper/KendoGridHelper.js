@@ -59,7 +59,7 @@
 		}
 		var kendoGridElement = $(kendoGrid.element);
 
-		kendoGrid.bind("change", function()
+		kendoGrid.bind("change", function ()
 		{
 			var $container = kendoGridElement.find(".k-grid-content"),
 				$onDemandContainer = $container.find(".on-demand-container"),
@@ -869,7 +869,7 @@
 		return columns;
 	};
 
-	KendoGridHelper.prototype.getDateTimeFields = function(gridType)
+	KendoGridHelper.prototype.getDateTimeFields = function (gridType)
 	{
 		let specificGridDefinition = null;
 		switch (gridType)
@@ -1013,6 +1013,9 @@
 			case "vehicle":
 				sortFields = ["BusNum"];
 				break;
+			case "fieldtripinvoice":
+				sortFields = ["PublicID"];
+				break;
 		}
 
 		return sortFields.map(field => ({
@@ -1022,7 +1025,7 @@
 		}));
 	};
 
-	KendoGridHelper.prototype.isCurrentDBFilter = function(filterDBID)
+	KendoGridHelper.prototype.isCurrentDBFilter = function (filterDBID)
 	{
 		return filterDBID == null || filterDBID === tf.datasourceManager.databaseId;
 	}
