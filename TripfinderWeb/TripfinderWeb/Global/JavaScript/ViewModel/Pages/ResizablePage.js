@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").ResizablePage = ResizablePage;
 
@@ -38,7 +38,7 @@
 
 	ResizablePage.prototype.constructor = ResizablePage;
 
-	ResizablePage.prototype.init = function(model, element)
+	ResizablePage.prototype.init = function (model, element)
 	{
 		var self = this;
 		self.$element = $(element);
@@ -57,7 +57,7 @@
 		$(window).off(".resizepage").on("resize.resizepage", self.reLayoutPage.bind(self, null));
 	};
 
-	ResizablePage.prototype.setLeftPage = function(templateName, data, newGrid, firstLoad)
+	ResizablePage.prototype.setLeftPage = function (templateName, data, newGrid, firstLoad)
 	{
 		var self = this, $content;
 
@@ -165,14 +165,14 @@
 		grid.dataSource.read();
 	};
 
-	ResizablePage.prototype.refreshLeftGridKeepSelectItems = function()
+	ResizablePage.prototype.refreshLeftGridKeepSelectItems = function ()
 	{
 		var self = this, $grid;
 		$grid = self.$leftPage.find(".kendo-grid");
 		self.leftGrid = $grid.data("kendoGrid");
 		var items = self.leftGrid.items();
 		self.leftGridSelectItems = [];
-		items.each(function(idx, row)
+		items.each(function (idx, row)
 		{
 			var dataItem = self.leftGrid.dataItem(row);
 			if (row !== null && row.className.toString().indexOf('selected') >= 0 && self.leftGridSelectItems.indexOf(dataItem.id) === -1)
@@ -186,7 +186,7 @@
 
 	};
 
-	ResizablePage.prototype.reLeftGridSelectSavedValue = function()
+	ResizablePage.prototype.reLeftGridSelectSavedValue = function ()
 	{
 		var self = this;
 		if (self.leftGridSelectItems.length > 0)
@@ -196,7 +196,7 @@
 		self.obGridData().searchGrid.onGridReadCompleted.unsubscribeAll();
 	}
 
-	ResizablePage.prototype.reLayoutPage = function(width)
+	ResizablePage.prototype.reLayoutPage = function (width)
 	{
 		var self = this, leftWidth, totalWidth, result;
 
@@ -255,7 +255,7 @@
 		}
 	};
 
-	ResizablePage.prototype.initDragHandler = function()
+	ResizablePage.prototype.initDragHandler = function ()
 	{
 		var self = this, totalWidth = self.$element.outerWidth(), hasDragMoved, offsetLeftOnDragStart, savedWidth;
 		self.$dragHandler.draggable(
@@ -263,7 +263,7 @@
 				distance: 0,
 				axis: "x",
 				containment: "parent",
-				start: function(e, ui)
+				start: function (e, ui)
 				{
 					if ($(e.originalEvent.target).hasClass("sliderbar-button"))
 					{
@@ -274,7 +274,7 @@
 					savedWidth = (leftPanelWidth === self.minLeftWidth) ? (savedWidth || (totalWidth - self.minLeftWidth)) : leftPanelWidth;
 					hasDragMoved = false;
 				},
-				stop: function(e, ui)
+				stop: function (e, ui)
 				{
 					var currentLeft = ui.position.left;
 					$(e.currentTarget).find(".sliderbar-button").removeClass("slider-tapped");
@@ -291,7 +291,7 @@
 					}
 					self.savePageRate();
 				},
-				drag: function(e, ui)
+				drag: function (e, ui)
 				{
 					if (!ui.position || ui.position.left === null || ui.position.left === undefined) { return; }
 
@@ -344,7 +344,7 @@
 		tf.storageManager.save(self.leftPageSizeKey + self.leftPageType, self.$leftPage.width() / totalWidth);
 	};
 
-	ResizablePage.prototype.resize = function(left)
+	ResizablePage.prototype.resize = function (left)
 	{
 		var self = this, totalWidth = self.$element.outerWidth();
 		left = self.determineLeftPageWidth(totalWidth, left);
@@ -370,7 +370,7 @@
 		self.onSizeChanged.notify();
 	};
 
-	ResizablePage.prototype.resizeGrid = function(left)
+	ResizablePage.prototype.resizeGrid = function (left)
 	{
 		var self = this, $grid, lockedHeaderWidth, paddingRight, width, totalWidth = self.$element.outerWidth(),
 			iconRow, wrapRow, iconRowTop, iconRowLeft, pageHeader, pageTitle, newRequest, newRequestTop, newRequestLeft;
@@ -382,7 +382,7 @@
 			paddingRight = parseInt($grid.find(".k-grid-content").css("padding-right"));
 			width = left - lockedHeaderWidth - paddingRight;
 
-			$.each($grid, function(index, container)
+			$.each($grid, function (index, container)
 			{
 				if ($(container).hasClass("kendo-summarygrid-container"))
 				{
@@ -416,7 +416,8 @@
 						|| self.obRightContentType() === RightPageContentType.detailview 
 						|| self.obRightContentType() === RightPageContentType.splitmap
 					)
-					&& self.leftPageType !== "reports")
+					&& self.leftPageType !== "reports"
+					&& self.leftPageType !== "fieldtripinvoices")
 				{
 					pageTitle.css({ "display": "block", "width": "auto" });
 					if (tf.helpers.fieldTripAuthHelper.checkAddable(self.leftPageType))
@@ -433,7 +434,7 @@
 					if (pageHeader.outerHeight() > 56)
 					{
 						newRequest.hide();
-						pageHeader.on("mousemove.newRequestHover", function()
+						pageHeader.on("mousemove.newRequestHover", function ()
 						{
 							pageTitle.css({ "display": "none", "width": "100%" });
 							pageHeader.css({ "height": "56px" });
@@ -442,7 +443,7 @@
 								newRequest.removeClass("pull-right").addClass("pull-left").css("display", "block");
 							}
 						});
-						$(document).on("mousemove.newRequestHover", function(e)
+						$(document).on("mousemove.newRequestHover", function (e)
 						{
 							var pageHeaderTop = pageHeader.offset().top;
 							var pageHeaderLeft = pageHeader.offset().left;
@@ -472,7 +473,7 @@
 				{
 					iconRow.css("display", "none");
 					wrapRow.removeClass("pull-right").addClass("pull-left").css("width", "100%");
-					wrapRow.on("mousemove.iconhover", function()
+					wrapRow.on("mousemove.iconhover", function ()
 					{
 						wrapRow.css("display", "none");
 						iconRow.css("display", "flex");
@@ -481,7 +482,7 @@
 
 					if (!TF.isMobileDevice)
 					{
-						$(document).on("mousemove.iconhover", function(e)
+						$(document).on("mousemove.iconhover", function (e)
 						{
 							iconRowTop = iconRow.offset().top, iconRowLeft = iconRow.offset().left;
 							if (!(e.pageY > iconRowTop && e.pageY < iconRowTop + iconRow.outerHeight()
@@ -505,7 +506,7 @@
 		}
 	};
 
-	ResizablePage.prototype.clearRightContent = function()
+	ResizablePage.prototype.clearRightContent = function ()
 	{
 		var self = this;
 
@@ -536,7 +537,7 @@
 		}
 	};
 
-	ResizablePage.prototype.clearLeftGridContent = function()
+	ResizablePage.prototype.clearLeftGridContent = function ()
 	{
 		var self = this;
 
@@ -549,7 +550,7 @@
 		self.obGridData(null);
 	};
 
-	ResizablePage.prototype.clearLeftOtherContent = function()
+	ResizablePage.prototype.clearLeftOtherContent = function ()
 	{
 		var self = this;
 
@@ -574,7 +575,7 @@
 		}
 	};
 
-	ResizablePage.prototype.clearLeftContent = function()
+	ResizablePage.prototype.clearLeftContent = function ()
 	{
 		var self = this;
 
@@ -582,7 +583,7 @@
 		self.clearLeftOtherContent();
 	};
 
-	ResizablePage.prototype.closeRightPage = function()
+	ResizablePage.prototype.closeRightPage = function ()
 	{
 		var self = this;
 
@@ -592,7 +593,7 @@
 		tf.pageManager.obFieldTripEditPage(null);
 	};
 
-	ResizablePage.prototype.clearContent = function()
+	ResizablePage.prototype.clearContent = function ()
 	{
 		var self = this;
 		self.clearRightContent();

@@ -814,7 +814,9 @@
 			case "fieldtrip":
 				return "Field Trip";
 			case "gpsevent":
-				return "GPS Event"
+				return "GPS Event";
+			case "fieldtripinvoice":
+				return "Field Trip Invoice";
 			case "georegion":
 				return "Geo Region";
 			case "form":
