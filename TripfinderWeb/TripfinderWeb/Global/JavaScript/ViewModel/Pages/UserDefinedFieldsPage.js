@@ -701,7 +701,7 @@
 
 					if (gridType !== _REPORT_GRID_TYPE)	//for Non-Report UDFs, update DetailView and GridView related Udf profile
 					{
-						tf.documentManagerViewModel.modifiedUDFIds.push(udfId);
+						// tf.documentManagerViewModel.modifiedUDFIds.push(udfId);
 						self.removeUdfInDetailViewTemplates(detailViewTemplates, udfId);
 					}
 
