@@ -21,7 +21,7 @@
 			'view': self._map.mapView,
 			sources: [
 				{
-					locator: new self._arcgis.Locator({ url: arcgisUrls.StreetGeocodeServiceFile }),
+					locator: self._arcgis.Locator,
 					singleLineFieldName: "SingleLine",
 					outFields: ["Addr_type"],
 					name: "Geocoding Service",

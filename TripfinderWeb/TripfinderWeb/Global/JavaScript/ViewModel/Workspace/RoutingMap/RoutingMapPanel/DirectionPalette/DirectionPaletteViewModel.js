@@ -306,7 +306,7 @@
 				searchTerm: destItem ? destItem.address() : "",
 				sources: [
 					{
-						locator: new self.ArcGisLocator({ url: arcgisUrls.StreetGeocodeServiceFile }),
+						locator: self.ArcGisLocator,
 						singleLineFieldName: "SingleLine",
 						outFields: ["Addr_type"],
 						name: "Geocoding Service",
