@@ -3,6 +3,7 @@
 	createNamespace("TF.Page").UserDefinedFieldsPage = UserDefinedFieldsPage;
 
 	var _REPORT_GRID_TYPE = "report",
+		_HIDDEN_GRID_TYPES = [_REPORT_GRID_TYPE, "document", "fieldtriplocation"],
 		_PRIMARY_GRID_COLUMNS = [
 			{
 				field: "Id",
@@ -78,8 +79,7 @@
 	function UserDefinedFieldsPage()
 	{
 		var self = this,
-			availableTypes = tf.dataTypeHelper.getAvailableDataTypesForUDFManagement().filter(t => t.key !== _REPORT_GRID_TYPE);
-
+			availableTypes = tf.dataTypeHelper.getAvailableDataTypesForUDFManagement().filter(t => _HIDDEN_GRID_TYPES.indexOf(t.key) === -1);
 		self.commandGridColumns = [
 			{
 				command: [
@@ -455,7 +455,7 @@
 				delete dataItem.ID;
 
 				var udfGridTypeObj = tf.dataTypeHelper.getUDFAvailableDataTypes().filter(function(item) {
-					return item.key === dataType && item.key !== _REPORT_GRID_TYPE;
+					return item.key === dataType && _HIDDEN_GRID_TYPES.indexOf(item.key) === -1;
 				})[0];
 				if (!udfGridTypeObj)
 				{
