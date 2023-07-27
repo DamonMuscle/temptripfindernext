@@ -915,9 +915,11 @@
 			<span class="info-block">#: item.customData.stops #<br/>Stop#: item.customData.stops==1 ? "" : "s" #</span>
 			<span class="splitter"></span>
 			
-			<span class="info-block #: item.customData.tripTotalTimeArray[0] == "00" ? "${hideClassName}" : ""#">#: item.customData.tripTotalTimeArray[0] #<br/>day</span>
-			<span class="info-block #: item.customData.tripTotalTimeArray[1] == "00" ? "${hideClassName}" : ""#">#: item.customData.tripTotalTimeArray[1] #<br/>hr</span>
-			<span class="info-block">#: item.customData.tripTotalTimeArray[2] #<br/>min</span>
+			<span class="info-block">
+				<span class="time-info-block #: item.customData.tripTotalTimeArray[0] == "00" ? "${hideClassName}" : ""#">#: item.customData.tripTotalTimeArray[0] #<br/>day</span>
+				<span class="time-info-block #: item.customData.tripTotalTimeArray[1] == "00" ? "${hideClassName}" : ""#">#: item.customData.tripTotalTimeArray[1] #<br/>hr</span>
+				<span class="time-info-block">#: item.customData.tripTotalTimeArray[2] #<br/>min</span>
+			</span>
 			
 			<span class="splitter"></span>
 			<span class="info-block">#: item.customData.distance #<br/>#: item.customData.measurementUnit#</span>
