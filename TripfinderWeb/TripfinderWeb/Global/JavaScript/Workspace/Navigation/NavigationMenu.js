@@ -686,7 +686,7 @@
 					self.closeNavigation();
 				}
 				tf.pageManager.showMessageModal();
-				break;
+				return;
 			case "settings":
 				if ((evt.ctrlKey || evt.metaKey))
 				{
