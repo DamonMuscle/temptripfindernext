@@ -183,22 +183,105 @@
 	FieldTripMap.prototype.addFieldTripPath = async function(fieldTrip, effectSequences)
 	{
 		await this.drawFieldTripPath(fieldTrip, effectSequences);
-
-		return new Promise((resolve, reject) =>
-		{
-			this.drawSequenceLine(fieldTrip, () => {
-				this.updateFieldTripPathVisibility([fieldTrip]);
-	
-				if (fieldTrip.visible === false)
-				{
-					// the Field Trips are hidden.
-					this.setFieldTripVisibility([fieldTrip]);
-				}
-
-				resolve();
-			});
-		});
+		await this.drawSequenceLine(fieldTrip);
 	}
+
+	FieldTripMap.prototype.orderFeatures = async function(fieldTrips)
+	{
+		const self = this;
+		const sortedFieldTrips = self._sortFieldTripByName(fieldTrips);
+		const sortedStopFeatures = self._sortStopFeaturesByFieldTrips(sortedFieldTrips);
+		const sortedPathFeatures = self._sortPathFeaturesByFieldTrips(sortedFieldTrips);
+
+		// update map features
+		await self.fieldTripStopLayerInstance.clearLayer();
+		await self.fieldTripStopLayerInstance.addMany(sortedStopFeatures);
+
+		await self.fieldTripPathLayerInstance.clearLayer();
+		await self.fieldTripPathLayerInstance.addMany(sortedPathFeatures);
+	}
+
+	FieldTripMap.prototype._sortFieldTripByName = function(fieldTrips)
+	{
+		const fieldTripIdMapping = fieldTrips.map(item => {
+			const { DBID, Name, id } = item;
+			return { DBID, Name, id };
+		});
+		console.log(fieldTripIdMapping);
+
+		const sortedFieldTrips = fieldTripIdMapping.sort((a, b) => a.Name.localeCompare(b.Name)).map(item => {
+			const { DBID, id } = item;
+			return { DBID, id };
+		});
+
+		return sortedFieldTrips;
+	}
+
+	FieldTripMap.prototype._sortStopFeaturesByFieldTrips = function(sortedFieldTrips)
+	{
+		const self = this,
+			stopFeatures = self._getStopFeatures();
+		
+		const sortedStopFeatures = stopFeatures.sort((a, b) =>
+		{
+			let aValue, bValue;
+			{
+				let { DBID, FieldTripId, Sequence } = a.attributes;
+				aValue = Object.assign({}, { DBID, FieldTripId, Sequence });
+			}
+
+			{
+				let { DBID, FieldTripId, Sequence } = b.attributes;
+				bValue = Object.assign({}, { DBID, FieldTripId, Sequence });
+			}
+
+			const aIndex = sortedFieldTrips.findIndex(item => item.DBID === aValue.DBID && item.id === aValue.FieldTripId);
+			const bIndex = sortedFieldTrips.findIndex(item => item.DBID === bValue.DBID && item.id === bValue.FieldTripId);;
+
+			if (aIndex === bIndex)
+			{
+				// order by sequence desc
+				return (-1) * (aValue.Sequence - bValue.Sequence);
+			}
+			
+			return aIndex - bIndex;
+		});
+
+		return [...sortedStopFeatures];
+	}
+
+	FieldTripMap.prototype._sortPathFeaturesByFieldTrips = function(sortedFieldTrips)
+	{
+		const self = this,
+			pathFeatures = self._getPathFeatures();
+		const sortedPathFeatures = pathFeatures.sort((a, b) =>
+		{
+			let aValue, bValue;
+			{
+				let { DBID, FieldTripId } = a.attributes;
+				aValue = Object.assign({}, { DBID, FieldTripId });
+			}
+
+			{
+				let { DBID, FieldTripId } = b.attributes;
+				bValue = Object.assign({}, { DBID, FieldTripId });
+			}
+
+			let aIndex = sortedFieldTrips.findIndex(item => item.DBID === aValue.DBID && item.id === aValue.FieldTripId);
+			let bIndex = sortedFieldTrips.findIndex(item => item.DBID === bValue.DBID && item.id === bValue.FieldTripId);
+
+			if (aIndex === bIndex)
+			{
+				// keep the original order.
+				return 0;
+			}
+			
+			return aIndex - bIndex;
+		});
+
+		return [...sortedPathFeatures];
+	}
+
 
 	//#endregion
 
@@ -382,9 +465,14 @@
 
 	//#region - Switch Field Trip Path Type (Sequence Lines / Path Lines)
 
-	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
+	FieldTripMap.prototype.switchPathType = async function(fieldTrips)
 	{
 		this.updateArrowRenderer(fieldTrips);
+		await this.updateFieldTripPathVisibility(fieldTrips);
+	}
+
+	FieldTripMap.prototype.updateFieldTripPathVisibility = async function(fieldTrips)
+	{
 		await this.redrawFieldTripArrows(fieldTrips);
 
 		this.setFieldTripPathVisibility(fieldTrips);
@@ -438,6 +526,8 @@
 		await this.clearSequenceLineArrow(fieldTrip);
 
 		await this.addFieldTripPath(fieldTrip, effectSequences);
+		await this.updateFieldTripPathVisibility([fieldTrip]);
+		this.zoomToFieldTripLayers([fieldTrip]);
 	}
 
 	FieldTripMap.prototype.clearFieldTripPath = function(fieldTrip)
@@ -695,7 +785,7 @@
 		// add highlight stop
 		highlightGraphics = highlightGraphics.concat(stops);
 
-		self.fieldTripHighlightLayerInstance.addMany(highlightGraphics);
+		await self.fieldTripHighlightLayerInstance.addMany(highlightGraphics);
 
 		// add highlight currentStop
 		const fieldTripStops = self._getStopFeatures(),
@@ -844,24 +934,36 @@
 			this.updateCopyFieldTripAttribute(fieldTrip);
 		}
 
-		const pathAttributes = fieldTrip.routePathAttributes;
-		const graphic = this.fieldTripPathLayerInstance?.createPath(routePath, pathAttributes);
-		// hide by default for UX.
-		this.fieldTripPathLayerInstance?.setFeaturesVisibility([graphic], false);
-		this.fieldTripPathLayerInstance?.addPath(graphic);
+		for (let i = 0; i < routePath.length; i++)
+		{
+			// draw route path split by stop.
+			const stopPath = routePath[i];
+			const pathAttributes = fieldTrip.routePathAttributes;
+			const graphic = this.fieldTripPathLayerInstance?.createPath([stopPath], pathAttributes);
+			// hide by default for UX.
+			this.fieldTripPathLayerInstance?.setFeaturesVisibility([graphic], false);
+			this.fieldTripPathLayerInstance?.addPath(graphic);
+		}
 	}
 
-	FieldTripMap.prototype.drawSequenceLine = function(fieldTrip, afterAdd = null)
+	FieldTripMap.prototype.drawSequenceLine = async function(fieldTrip)
 	{
-		const sequenceLine = this._computeSequenceLine(fieldTrip);
-		const Color = this._getColor(fieldTrip),
-			{ DBID, FieldTripId } = this._extractFieldTripFeatureFields(fieldTrip),
-			attributes = { DBID, FieldTripId, Color };
-
-		const graphic = this.fieldTripSequenceLineLayerInstance?.createPath(sequenceLine, attributes);
-		// hide by default for UX.
-		this.fieldTripSequenceLineLayerInstance?.setFeaturesVisibility([graphic], false);
-		this.fieldTripSequenceLineLayerInstance?.addPath(graphic, afterAdd);
+		const self = this;
+		return new Promise((resolve, reject) =>
+		{
+			const sequenceLine = self._computeSequenceLine(fieldTrip);
+			const Color = self._getColor(fieldTrip),
+				{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+				attributes = { DBID, FieldTripId, Color };
+	
+			const graphic = self.fieldTripSequenceLineLayerInstance?.createPath(sequenceLine, attributes);
+			// hide by default for UX.
+			self.fieldTripSequenceLineLayerInstance?.setFeaturesVisibility([graphic], false);
+			self.fieldTripSequenceLineLayerInstance?.addPath(graphic, () =>
+			{
+				resolve();
+			});
+		});
 	}
 
 	//#region - Path Arrows
@@ -914,10 +1016,6 @@
 			return;
 		}
 
-		const pathFeatures = self._getPathFeatures(),
-			pathFeature = pathFeatures.filter(feature => feature.attributes.DBID === fieldTrip.DBID && feature.attributes.FieldTripId === fieldTrip.id)[0],
-			arrows = self._computeArrowFeatures(pathFeature);
-
 		const edits = {};
 		const condition = self._extractArrowCondition(fieldTrip.DBID, fieldTrip.id);
 		const deleteArrows = await self._getPathArrowFeatures(condition);
@@ -925,6 +1023,8 @@
 		{
 			edits.deleteFeatures = deleteArrows;
 		}
+
+		const arrows = self._computeStopPathArrowFeatures(fieldTrip);
 		if (arrows.length >= 0)
 		{
 			edits.addFeatures = arrows;
@@ -958,6 +1058,23 @@
 		}
 
 		await self.fieldTripSequenceLineArrowLayerInstance.layer.applyEdits(edits);
+	}
+
+	FieldTripMap.prototype._computeStopPathArrowFeatures = function(fieldTrip)
+	{
+		const self = this,
+			{ DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			pathFeatures =  self._getPathFeatures(),
+			stopPathFeatures = pathFeatures.filter(feature => feature.attributes.DBID === DBID && feature.attributes.FieldTripId === FieldTripId);
+
+		let arrows = [];
+		for (let i = 0; i < stopPathFeatures.length; i++)
+		{
+			const stopPathFeature = stopPathFeatures[i];
+			arrows = arrows.concat(self._computeArrowFeatures(stopPathFeature));
+		}
+
+		return arrows;
 	}
 
 	FieldTripMap.prototype._computeArrowFeatures = function(polylineFeature)

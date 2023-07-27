@@ -148,18 +148,6 @@
 
 	RoutingPaletteViewModel.prototype.displayFieldTripPath = async function(data)
 	{
-		if (data && (data.add.length > 0))
-		{
-			const addFieldTrips = data.add;
-			this.fieldTripMap.initArrowLayers(addFieldTrips);
-
-			for (let i = addFieldTrips.length - 1; i >= 0; i--)
-			{
-				const fieldTrip = addFieldTrips[i];
-				await this.fieldTripMap.addFieldTrip(fieldTrip);
-			}
-		}
-		
 		if (data && (data.delete.length > 0))
 		{
 			const deleteFieldTrips = data.delete;
@@ -170,10 +158,29 @@
 			}
 		}
 
-		const fieldTrips = this.dataModel.trips;
-		if (fieldTrips.length > 0)
+		const fieldTrips = this.dataModel.trips,
+			fieldTripCount = fieldTrips.length;
+		if (fieldTripCount > 0)
 		{
+			this.fieldTripMap.initArrowLayers(fieldTrips);
+		}
+
+		if (data && (data.add.length > 0))
+		{
+			const addFieldTrips = data.add;
+
+			for (let i = addFieldTrips.length - 1; i >= 0; i--)
+			{
+				const fieldTrip = addFieldTrips[i];
+				await this.fieldTripMap.addFieldTrip(fieldTrip);
+			}
+		}
+		
+		if (fieldTripCount > 0)
+		{
+			await this.fieldTripMap.orderFeatures(fieldTrips);
 			this.fieldTripMap.updateArrowRenderer(fieldTrips);
+			await this.fieldTripMap.updateFieldTripPathVisibility(fieldTrips);
 			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
 		}
 	}
@@ -206,7 +213,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapTripPathTypeChange = function(_, isSequenceLine)
 	{
 		this.fieldTripMap?.setPathLineType(isSequenceLine);
-		this.fieldTripMap?.updateFieldTripPathVisibility(this.dataModel.trips);
+		this.fieldTripMap?.switchPathType(this.dataModel.trips);
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvas_RecalculateTripMove = function(_, data)

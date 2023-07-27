@@ -102,7 +102,7 @@
 	{
 		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
 		{
-			this._addGraphic(graphic, afterAdd);
+			this._addGraphics([graphic], afterAdd);
 		}
 		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
 		{
@@ -110,23 +110,30 @@
 		}
 	}
 
-	Layer.prototype.addMany = function(graphics)
+	Layer.prototype.addMany = async function(graphics)
 	{
-		if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+		return new Promise((resolve, reject) =>
 		{
-			this.layer.addMany(graphics);
-		}
-		else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
-		{
-			console.warn(`TODO: add many graphics to FeatureLayer`);
-		}
+			if (this.layer instanceof TF.GIS.SDK.GraphicsLayer)
+			{
+				this._addGraphics(graphics, () =>
+				{
+					resolve();
+				});
+			}
+			else if (this.layer instanceof TF.GIS.SDK.FeatureLayer)
+			{
+				console.warn(`TODO: add many graphics to FeatureLayer`);
+				resolve();
+			}
+		});
 	}
 
-	Layer.prototype._addGraphic = function(graphic, afterAdd = null)
+	Layer.prototype._addGraphics = function(graphics, afterAdd = null)
 	{
 		if (afterAdd !== null)
 		{
-			let total = 1;
+			let total = graphics.length;
 			let handler = this.layer.graphics.on("after-add", (event) =>
 			{
 				total--;
@@ -134,14 +141,19 @@
 					handler.remove();
 					handler = null;
 
-					// console.log(`after-add: ${graphic.attributes.Sequence}`);
 					afterAdd();
 				}
 			});
 		}
 
-		// console.log(`add: ${graphic.attributes.Sequence}`);
-		this.layer.add(graphic);
+		if (graphics.length === 1)
+		{
+			this.layer.add(graphics[0]);
+		}
+		else
+		{
+			this.layer.addMany(graphics);
+		}
 	}
 
 	Layer.prototype._addFeature = function(geometry, symbol, attributes, afterAdd = null)
