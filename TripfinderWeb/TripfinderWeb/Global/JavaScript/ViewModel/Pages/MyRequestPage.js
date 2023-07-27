@@ -1,4 +1,4 @@
-(function()
+(function ()
 {
 	createNamespace("TF.Page").MyRequestPage = MyRequestPage;
 
@@ -17,7 +17,7 @@
 	MyRequestPage.prototype = Object.create(TF.Page.BaseGridPage.prototype);
 	MyRequestPage.prototype.constructor = MyRequestPage;
 
-	MyRequestPage.prototype.updateOptions = function()
+	MyRequestPage.prototype.updateOptions = function ()
 	{
 		var self = this;
 		self.options.gridDefinition = tf.fieldTripGridDefinition.gridDefinition();
@@ -37,5 +37,35 @@
 			self.options.summaryFilters = tf.fieldTripGridDefinition.getSummaryFilters();
 		}
 		self.options.summaryFilterFunction = tf.fieldTripGridDefinition.getSummaryFunction();
+	};
+
+	MyRequestPage.prototype._getIdsFromRelated = function (relatedType, descriptor, relatedIds)
+	{
+		if (relatedType == 'fieldtripinvoice')
+		{
+			return this.getSelectedFieldTripIds(relatedIds);
+		}
+
+		return BaseGridPage.prototype._getIdsFromRelated.apply(this, arguments);
+	};
+
+	MyRequestPage.prototype.getSelectedFieldTripIds = function (relatedIds)
+	{
+		if (!relatedIds || !relatedIds.length)
+		{
+			return Promise.resolve([]);
+		};
+
+		const ids = relatedIds.join(',');
+		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "FieldTripInvoices"),
+			{
+				paramData: {
+					'@filter': `in(FieldTripID,${ids})`,
+					"@fields": "Id"
+				}
+			}).then(res =>
+			{
+				return [...new Set(res.Items.map(s => s.Id))];
+			});
 	};
 })();
