@@ -182,6 +182,7 @@
 		if (fieldTripCount > 0)
 		{
 			this.fieldTripMap.updateArrowRenderer(fieldTrips);
+			await this.fieldTripMap.setFieldTripStopVisibility(fieldTrips);
 			await this.fieldTripMap.updateFieldTripPathVisibility(fieldTrips);
 			await this.fieldTripMap.orderFeatures(fieldTrips);
 			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);

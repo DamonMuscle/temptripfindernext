@@ -201,6 +201,18 @@
 		await self.fieldTripPathLayerInstance.addMany(sortedPathFeatures);
 	}
 
+	FieldTripMap.prototype._compareFieldTripNames = function(a, b)
+	{
+		// get the field trip data from palette.
+		// sort the result as same as palette.
+		const paletteFieldTripsData = tf.pageManager.obPages()[0].data.routingPaletteViewModel.fieldTripPaletteSection.display.treeview.dataSource.data();
+		const paletteNameData = paletteFieldTripsData.map(item => item.text);
+		const aIndex = paletteNameData.find(a.Name);
+		const bIndex = paletteNameData.find(b.Name);
+
+		return aIndex - bIndex;
+	}
+
 	FieldTripMap.prototype._sortFieldTripByName = function(fieldTrips)
 	{
 		const fieldTripIdMapping = fieldTrips.map(item => {
@@ -208,7 +220,7 @@
 			return { DBID, Name, id };
 		});
 
-		const sortedFieldTrips = fieldTripIdMapping.sort((a, b) => a.Name.localeCompare(b.Name)).map(item => {
+		const sortedFieldTrips = fieldTripIdMapping.sort(self._compareFieldTripNames).map(item => {
 			const { DBID, id } = item;
 			return { DBID, id };
 		});
@@ -290,6 +302,9 @@
 
 	FieldTripMap.prototype.setFieldTripVisibility = async function(fieldTrips)
 	{
+		// make sure the arrows is correct after map extent changes when layer is hide.
+		this.updateArrowRenderer(fieldTrips);
+
 		this.setFieldTripStopVisibility(fieldTrips);
 
 		this.setFieldTripPathVisibility(fieldTrips);
@@ -928,7 +943,10 @@
 				Sequence = stop.Sequence;
 				CurbApproach = stop.vehicleCurbApproach;
 				attributes = {DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color};
-				graphics.push(self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes));
+				// hide by default for UX.
+				const graphic = self.fieldTripStopLayerInstance?.createStop(stop.XCoord, stop.YCoord, attributes);
+				self.fieldTripStopLayerInstance?.setFeaturesVisibility([graphic], false);
+				graphics.push(graphic);
 			}
 
 			self.fieldTripStopLayerInstance?.addStops(graphics);
@@ -990,19 +1008,24 @@
 
 	FieldTripMap.prototype._getArrowRenderer = function(fieldTrips)
 	{
-		const uniqueValueInfos = [],
-			arrowOnPath = this._isArrowOnPath();
+		const self = this,
+		 	uniqueValueInfos = [],
+			arrowOnPath = self._isArrowOnPath();
 		
-		for (let i = 0; i < fieldTrips.length; i++)
+		// sort by Name to make sure the arrow z-index is correct.
+		const fieldTripsClone = [...fieldTrips];
+		fieldTripsClone.sort(self._compareFieldTripNames);
+
+		for (let i = 0; i < fieldTripsClone.length; i++)
 		{
-			const fieldTrip = fieldTrips[i],
-				value = this._getColor(fieldTrip),
-				description = this._extractArrowCondition(fieldTrip.DBID, fieldTrip.id),
-				symbol = this.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
+			const fieldTrip = fieldTripsClone[i],
+				value = self._getColor(fieldTrip),
+				description = self._extractArrowCondition(fieldTrip.DBID, fieldTrip.id),
+				symbol = self.arrowLayerHelper.getArrowSymbol(arrowOnPath, value);
 			uniqueValueInfos.push({ value, symbol, description });
 		}
 
-		return this.arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
+		return self.arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
 	}
 
 	FieldTripMap.prototype.updateArrowRenderer = function(fieldTrips)
