@@ -16,7 +16,7 @@
 		self.obMode = ko.observable();
 		self.obDisableCreateTripStop = ko.observable(true);
 		self.obDisableCreatePoolStop = ko.observable(true);
-		self.routingTripDataModel = viewModel.viewModel.tripViewModel.dataModel;
+		self.routingTripDataModel = viewModel.viewModel.fieldTripPaletteSection.dataModel;
 		self.routingTripDataModel.onTripsChangeEvent.subscribe(self.onTripsChangeEvent.bind(self));
 
 	}
@@ -69,7 +69,7 @@
 	TrialStopEventsManager.prototype.createTripStop = function(trialStop)
 	{
 		var self = this;
-		return self.viewModel.tripViewModel.drawTool.copyToTripStop(trialStop);
+		return self.viewModel.fieldTripPaletteSection.drawTool.copyToTripStop(trialStop);
 	};
 
 	TrialStopEventsManager.prototype.editTrialStopClick = function(trialStop)
@@ -218,7 +218,7 @@
 	TrialStopEventsManager.prototype.createTripStopFromSelectionClick = function()
 	{
 		var self = this;
-		var drawTool = this.viewModel.viewModel.tripViewModel.drawTool;
+		var drawTool = this.viewModel.viewModel.fieldTripPaletteSection.drawTool;
 		var currentStops = drawTool._pointLayer.graphics.items.map(function(graphic) { return graphic.attributes.dataModel; });
 		drawTool.copyToTripStops(this.dataModel.highlighted).then(function(tripStops)
 		{
@@ -295,8 +295,8 @@
 		return Promise.all(promises).then(function()
 		{
 
-			self.viewModel.tripViewModel.drawTool.drawTempTripStopsOnMap(points.map(function(c) { return c.geometry; }));
-			self.viewModel.tripViewModel.drawTool.stopTool.addMultipleStopAddressAndBoundary(points, {
+			self.viewModel.fieldTripPaletteSection.drawTool.drawTempTripStopsOnMap(points.map(function(c) { return c.geometry; }));
+			self.viewModel.fieldTripPaletteSection.drawTool.stopTool.addMultipleStopAddressAndBoundary(points, {
 				isCreateFromUnassignStudent: false,
 				isCreateFromSelection: false,
 				isCreateFromStopSearch: true,

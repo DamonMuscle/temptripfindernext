@@ -20,7 +20,7 @@
 		});
 		// self.dataModel.onAllChangeEvent.subscribe(this.continueDrawTripStop.bind(this));
 		self.obMode = ko.observable();
-		self.routingTripDataModel = viewModel.viewModel.tripViewModel.dataModel;
+		self.routingTripDataModel = viewModel.viewModel.fieldTripPaletteSection.dataModel;
 		self.routingTripDataModel.onTripsChangeEvent.subscribe(self.onTripsChangeEvent.bind(self));
 	}
 
@@ -155,14 +155,14 @@
 	{
 		var self = this;
 		var tripStop = self.dataModel.findById(item.id);
-		return self.viewModel.viewModel.tripViewModel.drawTool.copyToTripStop(tripStop);
+		return self.viewModel.viewModel.fieldTripPaletteSection.drawTool.copyToTripStop(tripStop);
 	};
 
 	StopPoolEventsManager.prototype.createTripStopFromSelectionClick = function()
 	{
 		var self = this;
 		tf.loadingIndicator.showImmediately();
-		var drawTool = this.viewModel.viewModel.tripViewModel.drawTool;
+		var drawTool = this.viewModel.viewModel.fieldTripPaletteSection.drawTool;
 		drawTool.copyToTripStops(this.dataModel.highlighted).then(function(tripStops)
 		{
 			tf.loadingIndicator.tryHide();
@@ -172,7 +172,7 @@
 				stops.push(self.copyTripStop(stop));
 			});
 
-			if (drawTool._allowOverlap) return self.viewModel.viewModel.tripViewModel.eventsManager.createFromMultiple(stops, { isCopied: true });
+			if (drawTool._allowOverlap) return self.viewModel.viewModel.fieldTripPaletteSection.eventsManager.createFromMultiple(stops, { isCopied: true });
 			var nonOverlapedStops = [];
 			var notContainTrips = new Set();
 			stops.forEach(function(stop)
@@ -203,7 +203,7 @@
 
 			function createTripStops(stops)
 			{
-				self.viewModel.viewModel.tripViewModel.eventsManager.createFromMultiple(stops, { isCreateFromSelection: true, isCopied: true, Trips: Array.from(notContainTrips) });
+				self.viewModel.viewModel.fieldTripPaletteSection.eventsManager.createFromMultiple(stops, { isCreateFromSelection: true, isCopied: true, Trips: Array.from(notContainTrips) });
 			}
 		});
 	};

@@ -16,11 +16,11 @@
 		self.templateName = "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/RoutingPalette";
 		self.$element = null;
 		self._viewModal = mapCanvasPage;
-		self.tripViewModel = new TF.RoutingMap.RoutingPalette.TripViewModel(self, routeState, trips);
-		self.dataModel = self.tripViewModel.dataModel;
+		self.fieldTripPaletteSection = new TF.RoutingMap.RoutingPalette.FieldTripPaletteSectionViewModel(self, routeState, trips);
+		self.dataModel = self.fieldTripPaletteSection.dataModel;
 		self.stopPoolViewModel = new TF.RoutingMap.RoutingPalette.StopPoolViewModel(self);
 		self.trialStopViewModel = new TF.RoutingMap.RoutingPalette.TrialStopViewModel(self);
-		self.childViewModels =[self.tripViewModel];
+		self.childViewModels =[self.fieldTripPaletteSection];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
@@ -324,7 +324,7 @@
 		const trip = this.dataModel.getTripById(data.fieldTrip.id);
 
 		this.dataModel.update(trip.FieldTripStops, true); // pass true to stop calling onTripStopsChangeEvent
-		this.tripViewModel.display.resetTripInfo([trip]);
+		this.fieldTripPaletteSection.display.resetTripInfo([trip]);
 	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
@@ -398,7 +398,7 @@
 
 	RoutingPaletteViewModel.prototype.unSaveCheck = function(openingName)
 	{
-		var viewModels = [this.tripViewModel, this.stopPoolViewModel];
+		var viewModels = [this.fieldTripPaletteSection, this.stopPoolViewModel];
 		return this._multiViewUnSaveCheck(openingName, viewModels);
 	};
 

@@ -79,7 +79,7 @@
 								var stop = { geometry: mapPoint, boundary: { geometry: result.walkoutZone.geometry }, ProhibitCrosser: self.drawTool._prohibitCrosser };
 								if (isTrial)
 								{
-									self.viewModel.viewModel.tripViewModel.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
+									self.viewModel.viewModel.fieldTripPaletteSection.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
 									{
 										self._tempWalkoutLayer.removeAll();
 										self._tempWalkoutLayer.add(previewGraphic);
@@ -197,7 +197,7 @@
 				if (isTrial)
 				{
 					var stop = { geometry: pointCllicked, boundary: { geometry: result.walkoutZone.geometry }, ProhibitCrosser: self.drawTool._prohibitCrosser };
-					self.viewModel.viewModel.tripViewModel.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
+					self.viewModel.viewModel.fieldTripPaletteSection.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop).then(function(students)
 					{
 						self._previewLayer.add(previewGraphic);
 						stop.studentCount = students.length;
@@ -262,7 +262,7 @@
 				}
 				var stop = { geometry: pointCllicked, boundary: { geometry: result.walkoutZone.geometry }, ProhibitCrosser: self.drawTool._prohibitCrosser };
 				previewGraphics.push(previewGraphic);
-				ps.push(self.viewModel.viewModel.tripViewModel.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop));
+				ps.push(self.viewModel.viewModel.fieldTripPaletteSection.dataModel.getUnAssignStudentInBoundaryProhibitCross(stop));
 			})
 			Promise.all(ps).then(function(results)
 			{

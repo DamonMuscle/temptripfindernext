@@ -53,22 +53,22 @@
 							</li>
 							<li class="menu-item">
 								<div class="menuIcon"></div>
-								<div class="menu-label text" data-bind="css:{disable:!viewModel.tripViewModel.eventsManager.obTripSelected()}" ><span>Add Stop from Unassigned Students Selection</span><span class="k-icon k-i-arrow-e"></span></div>
+								<div class="menu-label text" data-bind="css:{disable:!viewModel.fieldTripPaletteSection.eventsManager.obTripSelected()}" ><span>Add Stop from Unassigned Students Selection</span><span class="k-icon k-i-arrow-e"></span></div>
 								<div>
 									<ul class="sub-menu sub-context-menu sub-context-menu-contain-icon">
-										<li class="polygon" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'polygon'),disable:!viewModel.tripViewModel.eventsManager.obTripSelected()}">
+										<li class="polygon" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'polygon'),disable:!viewModel.fieldTripPaletteSection.eventsManager.obTripSelected()}">
 											<div class="menuIcon polygon"></div>
 											<div class="text"><span>Polygon</span></div>
 										</li>
-										<li class="rectangle" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'rectangle'),disable:!viewModel.tripViewModel.eventsManager.obTripSelected()}">
+										<li class="rectangle" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'rectangle'),disable:!viewModel.fieldTripPaletteSection.eventsManager.obTripSelected()}">
 											<div class="menuIcon rectangle"></div>
 											<div class="text"><span>Rectangle</span></div>
 										</li>
-										<li class="draw" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'draw'),disable:!viewModel.tripViewModel.eventsManager.obTripSelected()}">
+										<li class="draw" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'draw'),disable:!viewModel.fieldTripPaletteSection.eventsManager.obTripSelected()}">
 											<div class="menuIcon draw"></div>
 											<div class="text"><span>Draw</span></div>
 										</li>
-										<li class="circle" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'circle'),disable:!viewModel.tripViewModel.eventsManager.obTripSelected()}">
+										<li class="circle" data-bind="clickButton:{click:selectStudentJunctionAreaOptionClick.bind($data,'circle'),disable:!viewModel.fieldTripPaletteSection.eventsManager.obTripSelected()}">
 											<div class="menuIcon circle"></div>
 											<div class="text"><span>Circle</span></div>
 										</li>

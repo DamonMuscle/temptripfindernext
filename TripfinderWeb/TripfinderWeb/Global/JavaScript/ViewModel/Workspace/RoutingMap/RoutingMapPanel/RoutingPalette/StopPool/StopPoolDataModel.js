@@ -9,7 +9,7 @@
 		self.viewModel = viewModel;
 		self.parentViewModel = self.viewModel.parentViewModel;
 		self.routeState = self.parentViewModel.routeState;
-		self.tripDataModel = self.parentViewModel.tripViewModel.dataModel;
+		self.tripDataModel = self.parentViewModel.fieldTripPaletteSection.dataModel;
 		self.all = [];
 		self.highlighted = [];
 		self.selected = [];

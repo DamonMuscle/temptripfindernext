@@ -1,8 +1,8 @@
 (function()
 {
-	createNamespace("TF.RoutingMap.RoutingPalette").TripViewModel = TripViewModel;
+	createNamespace("TF.RoutingMap.RoutingPalette").FieldTripPaletteSectionViewModel = FieldTripPaletteSectionViewModel;
 
-	function TripViewModel(viewModel, routeState, trips)
+	function FieldTripPaletteSectionViewModel(viewModel, routeState, trips)
 	{
 		var self = this;
 		self.viewModel = viewModel;
@@ -31,7 +31,7 @@
 		self.layers = [];
 	}
 
-	TripViewModel.prototype.uiInit = function(model, element)
+	FieldTripPaletteSectionViewModel.prototype.uiInit = function(model, element)
 	{
 		var self = this;
 		this.$element = $(element);
@@ -47,7 +47,7 @@
 		// });
 	};
 
-	TripViewModel.prototype._onMapLoad = function()
+	FieldTripPaletteSectionViewModel.prototype._onMapLoad = function()
 	{
 		var self = this;
 		if (!self.drawTool)
@@ -58,24 +58,24 @@
 		self.routingChangePath = new TF.RoutingMap.RoutingPalette.RoutingChangePath(self);
 	};
 
-	TripViewModel.prototype.addStopClick = function()
+	FieldTripPaletteSectionViewModel.prototype.addStopClick = function()
 	{
 		this.eventsManager.createClick();
 		this.viewModel.$element.find(".print-setting-group .icon.destination.add-stop").addClass("active");
 	};
 
-	TripViewModel.prototype.cancelStopClick = function()
+	FieldTripPaletteSectionViewModel.prototype.cancelStopClick = function()
 	{
 		this.viewModel.$element.find(".print-setting-group .icon.destination.add-stop").removeClass("active");
 	};
 
-	TripViewModel.prototype.show = function()
+	FieldTripPaletteSectionViewModel.prototype.show = function()
 	{
 		var self = this;
 		return self.dataModel.init();
 	};
 
-	TripViewModel.prototype.toggleShow = function(data, event)
+	FieldTripPaletteSectionViewModel.prototype.toggleShow = function(data, event)
 	{
 		event.stopPropagation();
 		var self = this;
@@ -83,7 +83,7 @@
 		self.changeVisibility(isShowMode);
 	};
 
-	TripViewModel.prototype.changeVisibility = function(isShowMode)
+	FieldTripPaletteSectionViewModel.prototype.changeVisibility = function(isShowMode)
 	{
 		this.isShowMode(isShowMode);
 		if (!isShowMode)
@@ -92,7 +92,7 @@
 		}
 	};
 
-	TripViewModel.prototype._changeShow = function()
+	FieldTripPaletteSectionViewModel.prototype._changeShow = function()
 	{
 		var self = this;
 		if (self.editTool && self.editTool.isEditing)
@@ -113,7 +113,7 @@
 		self.viewModel.childViewShowChange();
 	};
 
-	TripViewModel.prototype.onChangeTripVisibilityEvent = function()
+	FieldTripPaletteSectionViewModel.prototype.onChangeTripVisibilityEvent = function()
 	{
 		var self = this;
 		if (self.dataModel.trips.length > 0)
@@ -125,7 +125,7 @@
 		}
 	};
 
-	TripViewModel.prototype.getLayers = function()
+	FieldTripPaletteSectionViewModel.prototype.getLayers = function()
 	{
 		var self = this;
 		return self.layers.map(function(item)
@@ -137,7 +137,7 @@
 		});
 	};
 
-	TripViewModel.prototype.close = function()
+	FieldTripPaletteSectionViewModel.prototype.close = function()
 	{
 		var self = this;
 		var layers = this.getLayers();
@@ -156,23 +156,23 @@
 		});
 	};
 
-	TripViewModel.prototype.unSaveCheck = function()
+	FieldTripPaletteSectionViewModel.prototype.unSaveCheck = function()
 	{
 		var self = this;
 		return self.dataModel.unSaveCheck();
 	};
 
-	TripViewModel.prototype.save = function()
+	FieldTripPaletteSectionViewModel.prototype.save = function()
 	{
 		return this.dataModel.saveTrips(this.dataModel.trips);
 	};
 
-	TripViewModel.prototype.revert = function()
+	FieldTripPaletteSectionViewModel.prototype.revert = function()
 	{
 		return this.dataModel.revert(false);
 	};
 
-	TripViewModel.prototype.dispose = function()
+	FieldTripPaletteSectionViewModel.prototype.dispose = function()
 	{
 		this.playBackControl.dispose();
 		// this.drawTool && this.drawTool.dispose();

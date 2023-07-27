@@ -8,9 +8,9 @@
 		self.viewModel = viewModel;
 		self._viewModal = viewModel._viewModal;
 		self.stopPoolViewModel = viewModel.stopPoolViewModel;
-		self.tripViewModel = viewModel.tripViewModel;
+		self.fieldTripPaletteSection = viewModel.fieldTripPaletteSection;
 		self.isShowMode = ko.observable(true);
-		self.tripDataModel = self.tripViewModel.dataModel;
+		self.tripDataModel = self.fieldTripPaletteSection.dataModel;
 		self.parentViewModel = viewModel;
 		self.dataModel = new TF.RoutingMap.RoutingPalette.TrialStopDataModel(self);
 		self.eventsManager = new TF.RoutingMap.RoutingPalette.TrialStopEventsManager(self);
