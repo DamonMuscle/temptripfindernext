@@ -192,6 +192,7 @@
 		const sortedFieldTrips = self._sortFieldTripByName(fieldTrips);
 		const sortedStopFeatures = self._sortStopFeaturesByFieldTrips(sortedFieldTrips);
 		const sortedPathFeatures = self._sortPathFeaturesByFieldTrips(sortedFieldTrips);
+		const sortedSequenceLineFeatures = self._sortSequenceLineFeaturesByFieldTrips(sortedFieldTrips);
 
 		// update map features
 		await self.fieldTripStopLayerInstance.clearLayer();
@@ -199,6 +200,9 @@
 
 		await self.fieldTripPathLayerInstance.clearLayer();
 		await self.fieldTripPathLayerInstance.addMany(sortedPathFeatures);
+
+		await self.fieldTripSequenceLineLayerInstance.clearLayer();
+		await self.fieldTripSequenceLineLayerInstance.addMany(sortedSequenceLineFeatures);
 	}
 
 	FieldTripMap.prototype._compareFieldTripNames = function(a, b)
@@ -207,8 +211,8 @@
 		// sort the result as same as palette.
 		const paletteFieldTripsData = tf.pageManager.obPages()[0].data.routingPaletteViewModel.fieldTripPaletteSection.display.treeview.dataSource.data();
 		const paletteNameData = paletteFieldTripsData.map(item => item.text);
-		const aIndex = paletteNameData.find(a.Name);
-		const bIndex = paletteNameData.find(b.Name);
+		const aIndex = paletteNameData.findIndex(item => item === a.Name);
+		const bIndex = paletteNameData.findIndex(item => item === b.Name);
 
 		return aIndex - bIndex;
 	}
@@ -293,6 +297,39 @@
 		});
 
 		return [...sortedPathFeatures];
+	}
+
+	FieldTripMap.prototype._sortSequenceLineFeaturesByFieldTrips = function(sortedFieldTrips)
+	{
+		const self = this,
+			sequenceLineFeatures = self._getSequenceLineFeatures();
+		const sortedSequenceLienFeatures = sequenceLineFeatures.sort((a, b) =>
+		{
+			let aValue, bValue;
+			{
+				let { DBID, FieldTripId } = a.attributes;
+				aValue = Object.assign({}, { DBID, FieldTripId });
+			}
+
+			{
+				let { DBID, FieldTripId } = b.attributes;
+				bValue = Object.assign({}, { DBID, FieldTripId });
+			}
+
+			let aIndex = sortedFieldTrips.findIndex(item => item.DBID === aValue.DBID && item.id === aValue.FieldTripId);
+			let bIndex = sortedFieldTrips.findIndex(item => item.DBID === bValue.DBID && item.id === bValue.FieldTripId);
+
+			if (aIndex === bIndex)
+			{
+				// keep the original order.
+				return 0;
+			}
+			
+			// draw bottom layer (larger index) first.
+			return (-1) * (aIndex - bIndex);
+		});
+
+		return [...sortedSequenceLienFeatures];
 	}
 
 
