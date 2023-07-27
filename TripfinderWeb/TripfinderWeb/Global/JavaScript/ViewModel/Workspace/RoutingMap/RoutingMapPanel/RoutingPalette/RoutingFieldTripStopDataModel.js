@@ -826,9 +826,32 @@
 		}
 		trip.FieldTripStops.splice(oldSequence - 1, 1);
 		trip.FieldTripStops.splice(newSequence - 1, 0, tripStop);
+		const stopsCount = trip.FieldTripStops.length;
 		trip.FieldTripStops.forEach(function(stop, i)
 		{
 			stop.Sequence = i + 1;
+			if (i === 0)
+			{
+				stop.PrimaryDeparture = true;
+				stop.PrimaryDestination = false;
+				stop.StopTimeDepart = stop.StopTimeDepart || stop.StopTimeArrive;
+				stop.StopTimeArrive = null;
+			}
+			else if (i === stopsCount - 1)
+			{
+				stop.PrimaryDeparture = false;
+				stop.PrimaryDestination = true;
+				stop.StopTimeArrive = stop.StopTimeArrive || stop.StopTimeDepart;
+				stop.StopTimeDepart = null;
+				stop._geoPath = null;
+			}
+			else
+			{
+				stop.PrimaryDeparture = false;
+				stop.PrimaryDestination = false;
+				stop.StopTimeArrive = stop.StopTimeArrive || stop.StopTimeDepart;
+				stop.StopTimeDepart = stop.StopTimeDepart || stop.StopTimeArrive;
+			}
 		});
 		return self._refreshTripPathByTripStops(trip.FieldTripStops).then(function(tripStops)
 		{
@@ -946,8 +969,10 @@
 	RoutingFieldTripStopDataModel.prototype._refreshTripPathByTripStops = function(tripStops, deleteStops, isBestSequence)
 	{
 		var self = this;
-
+		const data = { tripStops, deleteStops, isBestSequence };
+		PubSub.publish("on_MapCanvas_RefreshTripByStops", data);
 		return Promise.resolve(tripStops);
+
 		var tripStopsCopy = JSON.parse(JSON.stringify({ stops: tripStops }));
 		TF.loopCloneGeometry(tripStopsCopy, { stops: tripStops });
 

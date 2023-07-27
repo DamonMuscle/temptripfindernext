@@ -188,31 +188,6 @@
 			stopSequence = this.obSelectedSequence();
 			this.highlightStopSequencePathAndPoint(stopSequence);
 
-			var symbol = new TF.Map.Symbol();
-			var stopGraphic = this.data[0].graphic;
-			var layer = this.viewModel.drawTool._pointLayer;
-			var stopSequenceGraphic = {};
-			if (!this.data[0].SchoolCode)
-			{
-				if (!stopGraphic || (this.mode() != "new" && !this.obIsSmartSequence()))
-				{
-					stopGraphic = new tf.map.ArcGIS.Graphic({
-						symbol: symbol.tripStop("0", "#FFFFFF"),
-						geometry: this.data[0].geometry,
-					});
-					this.data[0].graphic = stopGraphic;
-				}
-
-				if (!stopGraphic.layer)
-				{
-					layer.add(stopGraphic);
-					stopSequenceGraphic = { layer: layer, graphic: layer.graphics.items[layer.graphics.items.length - 1] };
-				}
-
-				this.stopSequenceGraphics.push(stopSequenceGraphic);
-				stopGraphic.symbol = symbol.tripStop(stopSequence, "#FFFFFF");
-			}
-
 			// update sequence for check data changed when cancel click
 			if (this.mode() != "new" && !this.obIsSmartSequence())
 			{
@@ -232,10 +207,9 @@
 	 */
 	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(sequence)
 	{
-		const trip = this.obSelectedTrip(),
-			tripId = trip.id,
-			data = { tripId, sequence };
-		
+		const currentStop = this.data[0],
+			data = { tripId: currentStop.FieldTripId, stopId: currentStop.id, stopSequence: sequence };
+
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, data);
 
 	};

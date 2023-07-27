@@ -748,6 +748,25 @@
 
 	//#endregion
 
+	//#region Update Stop
+	FieldTripMap.prototype.updateStopSymbol = function(fieldTrip, stops)
+	{
+		const self = this;
+		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
+			stopFeatures = self._getStopFeatures().filter(f => f.attributes.DBID === DBID && f.attributes.FieldTripId === FieldTripId);
+
+		stops.forEach(stop =>
+		{
+			const stopFeature = stopFeatures.find(s => s.attributes.id === stop.id);
+			if (stopFeature)
+			{
+				stopFeature.attributes.Sequence = stop.Sequence;
+				stopFeature.symbol = self.fieldTripStopLayerInstance.getStopSymbol(stop.Sequence, stopFeature.attributes.Color);
+			}
+		});
+	};
+	//#endregion
+
 	//#region Stop Info
 
 	FieldTripMap.prototype.addHighlightFeatures = async function(data)
@@ -760,7 +779,7 @@
 
 		const vertex = [],
 			stops = [],
-			{ DBID, FieldTripId, Color, beforeStop, currentStop, afterStop} = data,
+			{ DBID, FieldTripId, Color, beforeStop, currentStop, afterStop, stopSequence} = data,
 			stopObjects = [beforeStop, currentStop, afterStop].filter(item => item);
 
 		stopObjects.forEach(stop =>
@@ -793,12 +812,12 @@
 			features = fieldTripStops.filter(item =>
 				item.attributes.DBID === DBID &&
 				item.attributes.FieldTripId === FieldTripId),
-			currentStopFeature = features.find(item => item.attributes.Sequence === currentStop.Sequence),
+			currentStopFeature = features.find(item => item.attributes.id === currentStop.id),
 			attributes = { ...currentStopFeature.attributes },
 			{ longitude, latitude } = currentStopFeature.geometry;
 
 		attributes.Color = INFO_STOP_COLOR;
-		const highlightStopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes);
+		const highlightStopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes, stopSequence);
 		self.fieldTripHighlightStopLayerInstance.addStops([highlightStopGraphic]);
 	}
 

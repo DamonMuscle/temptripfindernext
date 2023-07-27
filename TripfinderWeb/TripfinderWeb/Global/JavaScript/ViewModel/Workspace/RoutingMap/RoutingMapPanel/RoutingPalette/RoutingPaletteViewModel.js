@@ -40,6 +40,9 @@
 		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
 		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
 		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
+		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
+
+		self.dataModel.onTripSequenceChangeEvent.subscribe(self.onTripSequenceChange.bind(this));
 	}
 
 	RoutingPaletteViewModel.prototype = Object.create(TF.RoutingMap.BasePaletteViewModel.prototype);
@@ -238,6 +241,35 @@
 		this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSequences);
 	};
 
+	RoutingPaletteViewModel.prototype.onMapCanvas_RefreshPathByStops = function(_, data)
+	{
+		const { tripStops, deleteStops, isBestSequence } = data;
+		if (deleteStops && deleteStops.length == 1)
+		{
+			console.log("todo: refresh trip path by delete one stop")
+		}
+
+		if (tripStops && tripStops.length > 0)
+		{
+			const fieldTripId = tripStops[0].FieldTripId;
+			const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
+			const effectSuquences = tripStops.map(s => s.Sequence);
+			this.fieldTripMap?.refreshFieldTripPath(fieldTrip, effectSuquences);
+		}
+	}
+
+	RoutingPaletteViewModel.prototype.onTripSequenceChange = function(evt, items)
+	{
+		if (!items || items.length === 0)
+		{
+			return;
+		}
+
+		const fieldTripId = items[0].FieldTripId;
+		const fieldTrip = this.dataModel.trips.find(item => item.id === fieldTripId);
+		this.fieldTripMap?.updateStopSymbol(fieldTrip, items);
+	};
+
 	RoutingPaletteViewModel.prototype.onFieldTripMapMoveStopLocation = function(_, data)
 	{
 		const { fieldTripId, stopId } = data;
@@ -329,26 +361,27 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapHighlightFieldTripStop = function(_, data)
 	{
-		const { tripId, sequence } = data;
+		const { tripId, stopId, stopSequence } = data;
 		const fieldTrips = this.dataModel.trips;
 		const fieldTrip = fieldTrips.find(item => item.id === tripId);
-		const fieldTripStops = fieldTrip.FieldTripStops;
-		const currentStop = fieldTripStops.find(item => item.Sequence === sequence);
+		let fieldTripStops = fieldTrip.FieldTripStops;
+		const currentStop = fieldTripStops.find(item => item.id === stopId);
+		fieldTripStops = fieldTripStops.filter(x => x.id !== stopId);
 		let beforeStop = null, afterStop = null;
-		if (sequence > 1)
+		if (stopSequence > 1)
 		{
-			beforeStop = fieldTripStops.find(item => item.Sequence === (sequence - 1));
+			beforeStop = fieldTripStops[stopSequence - 2];
 		}
 
-		if (sequence <= fieldTripStops.length)
+		if (stopSequence <= fieldTripStops.length)
 		{
-			afterStop = fieldTripStops.find(item => item.Sequence === (sequence + 1));
+			afterStop = fieldTripStops[stopSequence - 1];
 		}
 
 		const DBID = fieldTrip.DBID,
 			FieldTripId = tripId,
 			Color = fieldTrip.color,
-			params = { DBID, FieldTripId, Color, beforeStop, currentStop, afterStop };
+			params = { DBID, FieldTripId, Color, beforeStop, currentStop, afterStop, stopSequence };
 
 		this.fieldTripMap?.addHighlightFeatures(params);
 		this.fieldTripMap?.setFieldTripHighlightLayerVisibility(fieldTrips);
