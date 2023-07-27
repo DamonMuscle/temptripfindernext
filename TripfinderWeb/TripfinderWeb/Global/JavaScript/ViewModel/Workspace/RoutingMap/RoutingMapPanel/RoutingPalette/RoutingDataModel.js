@@ -68,7 +68,7 @@
 		self.stopPathChange = self.stopPathChange.bind(this);
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "stoppath"), this.stopPathChange);
 		this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
-		this.tripEditBroadcast = new TF.RoutingMap.RoutingPalette.TripEditBroadcast(this);
+		this.fieldTripEditBroadcast = new TF.RoutingMap.RoutingPalette.FieldTripEditBroadcast(this);
 		self.geoLinkTool = new TF.RoutingMap.RoutingPalette.GeoLinkTool(self.fieldTripStopDataModel);
 		this.needUpdateTrip = ko.observable(true);
 		this.needUpdateTripColor = ko.observable(false);
@@ -82,7 +82,7 @@
 	RoutingDataModel.prototype.init = function()
 	{
 		var self = this;
-		// this.tripEditBroadcast.init();
+		// this.fieldTripEditBroadcast.init();
 		// self.subscribeStreetChange();
 		this._viewModal.onUpdateRecordsEvent.subscribe(this.onSchoolLocationDataSourceChange);
 
@@ -3539,14 +3539,14 @@
 		var self = this;
 		if (self.getEditTrips().length > 0)
 		{
-			this.tripEditBroadcast.addNeedEditWindow(data.key);
-			if (data.changeType == TF.RoutingMap.RoutingPalette.TripEditBroadcast.changeType.create)
+			this.fieldTripEditBroadcast.addNeedEditWindow(data.key);
+			if (data.changeType == TF.RoutingMap.RoutingPalette.FieldTripEditBroadcast.changeType.create)
 			{
 				this.geoLinkTool.getGeoLinkedData(data).then(function()
 				{
 					self.syncEditTripStopsData = data;
 					var editTripStops = self.geoLinkTool.getEditGeoLinkedData(data);
-					self.tripEditBroadcast.setEditTripStop(editTripStops, data.key);
+					self.fieldTripEditBroadcast.setEditTripStop(editTripStops, data.key);
 				});
 			} else
 			{
@@ -3554,7 +3554,7 @@
 				{
 					self.syncEditTripStopsData = data;
 					var editTripStops = self.geoLinkTool.getEditGeoLinkedData(data);
-					self.tripEditBroadcast.setEditTripStop(editTripStops, data.key);
+					self.fieldTripEditBroadcast.setEditTripStop(editTripStops, data.key);
 				});
 			}
 		}
@@ -3574,7 +3574,7 @@
 				{
 					return;
 				}
-				self.tripEditBroadcast.syncEditTripStops(tripStops);
+				self.fieldTripEditBroadcast.syncEditTripStops(tripStops);
 			});
 	};
 
@@ -3609,7 +3609,7 @@
 	{
 		this.tripLockData.unLockCurrentDocument();
 		this.onTripsChangeEvent.unsubscribeAll();
-		this.tripEditBroadcast.dispose();
+		this.fieldTripEditBroadcast.dispose();
 		this.onCandidatesStudentsChangeToMapEvent.unsubscribeAll();
 		this.onAssignStudentsChangeToMapEvent.unsubscribeAll();
 		this.onTripColorChangeEvent.unsubscribeAll();

@@ -38,7 +38,7 @@
 				});
 				if (!isFromRevert && !notBroadcast)
 				{
-					self.dataModel.tripEditBroadcast.createTripStop(data);
+					self.dataModel.fieldTripEditBroadcast.createTripStop(data);
 				}
 				setTimeout(function()
 				{
@@ -447,11 +447,11 @@
 	{
 		var tripStop = this.dataModel.getFieldTripStop(tripStopChanged.id);
 		if (!tripStop) return;
-		var originalData = [this.dataModel.tripEditBroadcast.copyTripStop(tripStop)];
+		var originalData = [this.dataModel.fieldTripEditBroadcast.copyTripStop(tripStop)];
 		this.copyPathInfoToStop(tripStopChanged);
 		this._updateTripStops([tripStop], false);
 		PubSub.publish(topicCombine(pb.DATA_CHANGE, "stoppath"), [tripStop]);
-		if (!isFromBroadCastSync) { this.dataModel.tripEditBroadcast.send(originalData, [tripStop], tripStopChanged.routeStops); }
+		if (!isFromBroadCastSync) { this.dataModel.fieldTripEditBroadcast.send(originalData, [tripStop], tripStopChanged.routeStops); }
 	};
 
 	RoutingFieldTripStopDataModel.prototype.copyPathInfoToStop = function(tripStopChanged)
@@ -524,7 +524,7 @@
 		modifyDataArray.forEach(function(modifyData)
 		{
 			var data = self.dataModel.getFieldTripStop(modifyData.id);
-			originalData.push(self.dataModel.tripEditBroadcast.copyTripStop(data));
+			originalData.push(self.dataModel.fieldTripEditBroadcast.copyTripStop(data));
 			if (data.XCoord != modifyData.XCoord ||
 				data.YCoord != modifyData.YCoord ||
 				data.vehicleCurbApproach != modifyData.vehicleCurbApproach ||
@@ -563,7 +563,7 @@
 			return pathPromise.then(function()
 			{
 				self._updateTripStops(changeData, null, isNoStopChange);
-				if (!isFromBroadCastSync) { self.dataModel.tripEditBroadcast.send(originalData, changeData); }
+				if (!isFromBroadCastSync) { self.dataModel.fieldTripEditBroadcast.send(originalData, changeData); }
 				return Promise.resolve(modifyDataArray);
 			});
 		});
@@ -608,7 +608,7 @@
 			self.dataModel.onTripStopsChangeEvent.notify({ add: [], edit: [], delete: deleteTripStops });
 			if (!isFromBroadCastSync && !isFromRevert)
 			{
-				self.dataModel.tripEditBroadcast.deleteTripStop(deleteArray);
+				self.dataModel.fieldTripEditBroadcast.deleteTripStop(deleteArray);
 			}
 			self._runAfterPathChanged(deleteTripStops, "delete");
 		});
@@ -808,7 +808,7 @@
 		var oldSequence = tripStop.Sequence;
 		var editTripPathStops = [];
 		var trip = self.dataModel.getTripById(tripStop.FieldTripId);
-		if (!isFromBroadCastSync) self.dataModel.tripEditBroadcast.moveTripStop(trip, tripStop, newSequence);
+		if (!isFromBroadCastSync) self.dataModel.fieldTripEditBroadcast.moveTripStop(trip, tripStop, newSequence);
 		var newPrevStop = newSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, newSequence - 1) : null;
 		var oldPrevStop = oldSequence > 1 ? self.dataModel.getFieldTripStopBySequence(trip, oldSequence - 1) : null;
 		if (oldSequence < newSequence)
@@ -977,7 +977,7 @@
 				tripStop.boundary = self.createTripBoundary(tripStop);
 			}
 			tripStop.originalBoundaryGeometry = tripStop.boundary && tripStop.boundary.geometry;
-			originalData.push(self.dataModel.tripEditBroadcast.copyTripStop(tripStop));
+			originalData.push(self.dataModel.fieldTripEditBroadcast.copyTripStop(tripStop));
 			var data = tripStop.boundary;
 			!isFromRevert && self.insertToRevertData(data);
 			$.extend(data, modifyData);
@@ -988,7 +988,7 @@
 			changeData.push(tripStop);
 		});
 		boundaries = changeData.map(function(tripStop) { return tripStop.boundary; });
-		self.dataModel.tripEditBroadcast.send(originalData, changeData);
+		self.dataModel.fieldTripEditBroadcast.send(originalData, changeData);
 		self.dataModel.onTripStopsChangeEvent.notify({ add: [], delete: [], edit: changeData });
 		self.changeRevertStack(modifyDataArray, isFromRevert);
 		return Promise.resolve(changeData);

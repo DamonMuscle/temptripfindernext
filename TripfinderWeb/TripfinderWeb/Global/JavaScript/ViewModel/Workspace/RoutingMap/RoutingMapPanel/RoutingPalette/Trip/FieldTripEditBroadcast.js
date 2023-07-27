@@ -4,11 +4,11 @@
 	* Geo link change broadcast
 	* If user change trip stop, other stops with same point or path or boundary will change together
 	*/
-	createNamespace("TF.RoutingMap.RoutingPalette").TripEditBroadcast = TripEditBroadcast;
+	createNamespace("TF.RoutingMap.RoutingPalette").FieldTripEditBroadcast = FieldTripEditBroadcast;
 
-	function TripEditBroadcast(dataModel)
+	function FieldTripEditBroadcast(dataModel)
 	{
-		this.broadcastName = "TripEditBroadcast";
+		this.broadcastName = "FieldTripEditBroadcast";
 		this.dataModel = dataModel;
 		this.changeStops = [];
 		this.increaseCountTimeout = 1000;
@@ -21,9 +21,9 @@
 		delete: "delete",
 		move: "move"
 	};
-	TripEditBroadcast.changeType = changeType;
+	FieldTripEditBroadcast.changeType = changeType;
 
-	TripEditBroadcast.prototype.init = function()
+	FieldTripEditBroadcast.prototype.init = function()
 	{
 		if (window.BroadcastChannel)
 		{
@@ -33,7 +33,7 @@
 		this.key = TF.createId();
 	};
 
-	TripEditBroadcast.prototype.send = function(originalData, newData)
+	FieldTripEditBroadcast.prototype.send = function(originalData, newData)
 	{
 		var self = this, newTripStops = [];
 		self.changeType = changeType.path;
@@ -81,7 +81,7 @@
 		this.changeSend({ originalData: originalData, newData: newTripStops });
 	};
 
-	TripEditBroadcast.prototype.copyTripStop = function(tripStop)
+	FieldTripEditBroadcast.prototype.copyTripStop = function(tripStop)
 	{
 		return {
 			x: tripStop.XCoord,
@@ -95,7 +95,7 @@
 		};
 	};
 
-	TripEditBroadcast.prototype._copyTripStopGeo = function(tripStop)
+	FieldTripEditBroadcast.prototype._copyTripStopGeo = function(tripStop)
 	{
 		const geometry = TF.xyToGeometry(tripStop.XCoord, tripStop.YCoord);
 		return {
@@ -117,7 +117,7 @@
 		};
 	};
 
-	TripEditBroadcast.prototype.moveTripStop = function(trip, tripStop, newSequence)
+	FieldTripEditBroadcast.prototype.moveTripStop = function(trip, tripStop, newSequence)
 	{
 		var self = this;
 		if (tripStop.Sequence == newSequence)
@@ -151,7 +151,7 @@
 		this.changeSend({ tripId: trip.id, stops: stops, from: tripStop.Sequence - startIndex, to: newSequence - startIndex });
 	};
 
-	TripEditBroadcast.prototype.createTripStop = function(tripStop)
+	FieldTripEditBroadcast.prototype.createTripStop = function(tripStop)
 	{
 		var self = this;
 		var data = { prevStop: {}, createStop: {}, nextStop: {}, tripId: tripStop.FieldTripId };
@@ -177,7 +177,7 @@
 		this.changeSend(data);
 	};
 
-	TripEditBroadcast.prototype.getTripStopPreAndNex = function(tripStop)
+	FieldTripEditBroadcast.prototype.getTripStopPreAndNex = function(tripStop)
 	{
 		var self = this, trip = self.dataModel.getTripById(tripStop.tripId ? tripStop.tripId : tripStop.FieldTripId);
 		trip.FieldTripStops.forEach(function(stop, index)
@@ -198,7 +198,7 @@
 
 
 
-	TripEditBroadcast.prototype.deleteTripStop = function(tripStop)
+	FieldTripEditBroadcast.prototype.deleteTripStop = function(tripStop)
 	{
 		if ($.isArray(tripStop))
 		{
@@ -231,7 +231,7 @@
 		this.changeSend(data);
 	};
 
-	TripEditBroadcast.prototype.findScenarioId = function(tripStopId)
+	FieldTripEditBroadcast.prototype.findScenarioId = function(tripStopId)
 	{
 		var trips = this.dataModel.trips;
 		for (var i = 0; i < trips.length; i++)
@@ -247,7 +247,7 @@
 		return 0;
 	};
 
-	TripEditBroadcast.prototype.receive = function(response)
+	FieldTripEditBroadcast.prototype.receive = function(response)
 	{
 		if (response.data.type == "setEditTripStop")
 		{
@@ -267,12 +267,12 @@
 		}
 	};
 
-	TripEditBroadcast.prototype.addNeedEditWindow = function(key)
+	FieldTripEditBroadcast.prototype.addNeedEditWindow = function(key)
 	{
 		this.postMessage({ type: "editWindow", key: key });
 	};
 
-	TripEditBroadcast.prototype.setEditTripStop = function(tripStops, key)
+	FieldTripEditBroadcast.prototype.setEditTripStop = function(tripStops, key)
 	{
 		var self = this;
 		setTimeout(function()
@@ -281,7 +281,7 @@
 		}, 500);
 	};
 
-	TripEditBroadcast.prototype.syncEditTripStops = function(tripStops)
+	FieldTripEditBroadcast.prototype.syncEditTripStops = function(tripStops)
 	{
 		try
 		{
@@ -292,14 +292,14 @@
 		}
 	};
 
-	TripEditBroadcast.prototype.changeSend = function(changeData)
+	FieldTripEditBroadcast.prototype.changeSend = function(changeData)
 	{
 		this.editWindow = 0;
 		this.changeStops = [];
 		this.postMessage($.extend({ type: "change", key: this.key, changeType: this.changeType }, changeData));
 	};
 
-	TripEditBroadcast.prototype.postMessage = function(data)
+	FieldTripEditBroadcast.prototype.postMessage = function(data)
 	{
 		if (this.channel)
 		{
@@ -308,12 +308,12 @@
 		this.receive({ data: data });
 	};
 
-	TripEditBroadcast.prototype.getSyncEditTripStopsCount = function(data)
+	FieldTripEditBroadcast.prototype.getSyncEditTripStopsCount = function(data)
 	{
 		this.dataModel && this.dataModel.getSyncEditTripStopsCount(data);
 	};
 
-	TripEditBroadcast.prototype.addTripStops = function(tripStops, key)
+	FieldTripEditBroadcast.prototype.addTripStops = function(tripStops, key)
 	{
 		if (key == this.key)
 		{
@@ -328,7 +328,7 @@
 		}
 	};
 
-	TripEditBroadcast.prototype.dispose = function()
+	FieldTripEditBroadcast.prototype.dispose = function()
 	{
 		this.channel && this.channel.close();
 	};
