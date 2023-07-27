@@ -207,7 +207,6 @@
 			const { DBID, Name, id } = item;
 			return { DBID, Name, id };
 		});
-		console.log(fieldTripIdMapping);
 
 		const sortedFieldTrips = fieldTripIdMapping.sort((a, b) => a.Name.localeCompare(b.Name)).map(item => {
 			const { DBID, id } = item;
@@ -244,7 +243,8 @@
 				return (-1) * (aValue.Sequence - bValue.Sequence);
 			}
 			
-			return aIndex - bIndex;
+			// draw bottom layer (larger index) first.
+			return (-1) * (aIndex - bIndex);
 		});
 
 		return [...sortedStopFeatures];
@@ -276,7 +276,8 @@
 				return 0;
 			}
 			
-			return aIndex - bIndex;
+			// draw bottom layer (larger index) first.
+			return (-1) * (aIndex - bIndex);
 		});
 
 		return [...sortedPathFeatures];
@@ -1124,8 +1125,6 @@
 			const edits = { updateFeatures };
 			await self.fieldTripPathArrowLayerInstance.layer.applyEdits(edits);
 		}
-
-		// self.fieldTripPathArrowLayerInstance.layer.refresh();
 	}
 
 	FieldTripMap.prototype.setFieldTripSequenceLineArrowVisibility = async function(fieldTrips)

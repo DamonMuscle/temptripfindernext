@@ -10,6 +10,7 @@
 	const defaultOptions = {
 		id: `layerId_${Date.now()}`,
 		index: null,
+		spatialReference: { wkid: 102100 },
 		eventHandlers: {
 			onLayerCreated: null
 		}
@@ -38,7 +39,10 @@
 		switch (layerType)
 		{
 			case LAYER_TYPE.GRAPHIC:
-				layer = new TF.GIS.SDK.GraphicsLayer({ id: this.settings.id });
+				layer = new TF.GIS.SDK.GraphicsLayer({
+					id: this.settings.id,
+					spatialReference: this.settings.spatialReference
+				});
 				break;
 			case LAYER_TYPE.FEATURE:
 				layer = new TF.GIS.SDK.FeatureLayer({ ...this.settings });

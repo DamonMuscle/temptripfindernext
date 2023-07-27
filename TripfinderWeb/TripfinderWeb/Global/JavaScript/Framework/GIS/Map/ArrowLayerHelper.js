@@ -70,6 +70,7 @@
 				field: "angle",
 				rotationType: "geographic"
 			}],
+			orderByClassesEnabled: true,
 			uniqueValueInfos: uniqueValueInfos
 		};
 
