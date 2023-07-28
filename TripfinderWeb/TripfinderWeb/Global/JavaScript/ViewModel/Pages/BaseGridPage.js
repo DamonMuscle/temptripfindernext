@@ -1661,11 +1661,11 @@
 			});
 	};
 
-	BaseGridPage.prototype.getSubmitLabel = function() 
+	BaseGridPage.prototype.getSubmitLabel = function () 
 	{
 		var label = "";
-		
-		switch(this.type)
+
+		switch (this.type)
 		{
 			case "contact":
 				label = "Add New Contact";
@@ -1684,13 +1684,6 @@
 		}
 
 		return label;
-	}
-
-	BaseGridPage.prototype.isAddVisible = function()
-	{
-		var self = this;
-		var dataTypes = tf.dataTypeHelper.getAvailableDataTypes();
-		return dataTypes.some(item => item.key === self.type) && (!self.obShowFieldTripDEPanel() || !self.obShowDetailPanel()) && self.obNewRequest();
 	}
 
 	BaseGridPage.prototype._openGlobalReplaceModal = function()
@@ -2088,7 +2081,18 @@
 			});
 	};
 
-	BaseGridPage.prototype.dispose = function()
+	BaseGridPage.prototype.isAddVisible = function ()
+	{
+		var self = this;
+		if (self.disableAdd)
+		{
+			return false;
+		}
+		var dataTypes = tf.dataTypeHelper.getAvailableDataTypes();
+		return dataTypes.some(item => item.key === self.type) && (!self.obShowFieldTripDEPanel() || !self.obShowDetailPanel()) && self.obNewRequest();
+	}
+
+	BaseGridPage.prototype.dispose = function ()
 	{
 		var self = this;
 		TF.Page.BasePage.prototype.dispose.apply(self);

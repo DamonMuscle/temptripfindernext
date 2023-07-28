@@ -90,8 +90,7 @@
 		}
 		else if (isLocal)
 		{
-			
-			if(allowCookieList.includes(key) && CheckDomain())
+			if (allowCookieList.includes(key) && CheckDomain())
 			{
 				expireCookie(key);
 			}
@@ -115,7 +114,7 @@
 		}
 		else if (isLocal)
 		{
-			if(allowCookieList.includes(relatedKey) && CheckDomain())
+			if (allowCookieList.includes(relatedKey) && CheckDomain())
 			{
 				expireCookie(relatedKey);
 			}
