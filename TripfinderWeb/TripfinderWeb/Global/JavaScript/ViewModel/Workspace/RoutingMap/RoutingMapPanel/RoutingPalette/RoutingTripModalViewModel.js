@@ -1,3 +1,9 @@
+/***
+ * 3 entrances to invoke this module
+ * 1.click 'New' in the palette level(subitem of folder icon) to create a new Field Trip(it's removed in Tripfinder Next)
+ * 2.click 'Optimize Sequence' in Field Trip level we will get a dialog who has a 'Save as New Field Trip' button
+ * 3.click 'Info' in Field Trip level
+ */
 (function()
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingTripModalViewModel = RoutingTripModalViewModel;

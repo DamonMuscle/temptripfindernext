@@ -1,3 +1,7 @@
+/**
+ * when user want to save changes, revert changes, close field trips, optimize sequence, optimize trip,
+ * user will have a changce to select field trips to apply these operations by this dialog
+ */
 (function()
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").SelectTripModalViewModel = SelectTripModalViewModel;

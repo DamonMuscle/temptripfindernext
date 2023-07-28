@@ -1,3 +1,6 @@
+/**
+ * clicking 'New Copy' in field trip level will invoke this module
+ */
 (function()
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").CopyFieldTripModalViewModel = CopyFieldTripModalViewModel;
