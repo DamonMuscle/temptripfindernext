@@ -941,8 +941,7 @@
 
 	UserDefinedFieldsPage.prototype._getGridFooterLabel = function(count)
 	{
-		var self = this;
-		return count + " User Defined " + self.pageType.substr(0, self.pageType.length - 1) + (count !== 1 ? "s" : "");
+		return `${count} User Defined Field${count !== 1 ? "s" : ""}`;
 	};
 
 	UserDefinedFieldsPage.prototype._backupScrollPosition = function()
