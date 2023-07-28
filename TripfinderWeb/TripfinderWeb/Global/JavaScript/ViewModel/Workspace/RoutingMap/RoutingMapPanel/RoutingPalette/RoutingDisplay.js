@@ -2080,30 +2080,53 @@
 		let promise = null;
 		tf.loadingIndicator.showImmediately();
 		var treeview = self.viewModel.$element.find("#routingtreeview").data('kendoTreeView');
-		var sortItems = (list) =>
+		function sortRiders(fieldTrips)
 		{
-			list.forEach(item =>
+			fieldTrips.forEach(fieldTrip =>
 			{
-				item.items.forEach(el =>
+				fieldTrip.items.forEach(fieldTripStop =>
 				{
-					el.items = el.items.sort((a, b) =>
+					fieldTripStop.items = fieldTripStop.items.sort((riderA, riderB) =>
 					{
-						const v1 = a.customData.sortValue && a.customData.sortValue.toLowerCase();
-						const v2 = a.customData.sortValue && b.customData.sortValue.toLowerCase();
+						const v1 = riderA.customData.sortValue && riderA.customData.sortValue.toLowerCase();
+						const v2 = riderA.customData.sortValue && riderB.customData.sortValue.toLowerCase();
 						return v1 > v2 ? 1 : (v1 < v2 ? -1 : 0);
 					});
 				})
 			})
 		}
+
+		function compareFieldTrip(a, b)
+		{
+			const v1 = a.text && a.text.toLowerCase();
+			const v2 = b.text && b.text.toLowerCase();
+			if(v1 === v2)
+			{
+				return v1.id > v2.id ? 1: -1;
+			}
+			return v1 > v2 ? 1 : -1;
+		}
+
+		function insertFieldTrip2TreeView(insertingList)
+		{
+			insertingList.forEach(function(fieldTrip)
+			{
+				for (var i = 0; i < treeview.dataSource._data.length; i++)
+				{
+					if (compareFieldTrip(fieldTrip, treeview.dataSource._data[i]) === -1)
+					{
+						return treeview.insertBefore(fieldTrip, treeview.findByUid(treeview.dataSource._data[i].uid));
+					}
+				}
+				treeview.append(fieldTrip);
+			});
+		}
+
 		if (data.add.length > 0)
 		{
-			var newAddList = [];
-			data.add.map(function(trip)
-			{
-				var newTrip = self.newFieldTripData(trip);
-				newAddList.push(newTrip);
-			});
-			sortItems(newAddList);
+			const newAddList = data.add.map((fieldTrip)=>self.newFieldTripData(fieldTrip));
+			newAddList.sort(compareFieldTrip);
+			sortRiders(newAddList);
 			var homogeneous = new kendo.data.HierarchicalDataSource({
 				data: newAddList,
 				sort: { field: "customData.sortValue", dir: "asc" },
@@ -2113,29 +2136,10 @@
 					expand: false
 				},
 			});
+
 			if (treeview.dataSource._data && treeview.dataSource._data.length > 0)
 			{
-				newAddList.map(function(newTrip)
-				{
-					treeview.dataSource._data.sort(function(a, b)
-					{
-						const v1 = a.text && a.text.toLowerCase();
-						const v2 = b.text && b.text.toLowerCase();
-						return v1 > v2 ? 1 : (v1 < v2 ? -1 : 0);
-					});
-					for (var i = 0; i < treeview.dataSource._data.length; i++)
-					{
-						if (newTrip.text > treeview.dataSource._data[i].text)
-						{
-							continue;
-						}
-						else
-						{
-							return treeview.insertBefore(newTrip, treeview.findByUid(treeview.dataSource._data[i].uid));
-						}
-					}
-					treeview.append(newTrip);
-				});
+				insertFieldTrip2TreeView(newAddList);
 			}
 			else
 			{
@@ -2168,51 +2172,32 @@
 		{
 			promise = self.resetTripInfo(data.edit, true).then(function()
 			{
-				var newAddList = [];
-				data.edit.map(function(trip)
+				const editingList = [];
+				data.edit.forEach(function(fieldTrip)
 				{
-					var deleteTrip = self.routingDisplayHelper.getTripNodeById(trip);
+					var deleteTrip = self.routingDisplayHelper.getTripNodeById(fieldTrip);
 					if (deleteTrip.length > 0)
 					{
 						const deletingDom = Array.from(treeview.element.find("ul > li")).find(el => $(el).data("kendoUid") === deleteTrip[0].uid);
 						treeview.remove(treeview.findByUid(deleteTrip[0].uid));
 						self.cleanRemovedTreeViewItem(deletingDom, deleteTrip[0]);
 					}
-					if (self.dataModel.trips.some(i => i.Name === trip.Name))
+					if (self.dataModel.trips.some(i => i.Name === fieldTrip.Name))
 					{
-						let newTrip = self.newFieldTripData(trip);
-						newAddList.push(newTrip);
+						let newTrip = self.newFieldTripData(fieldTrip);
+						editingList.push(newTrip);
 					}
 				});
-				// self.refreshNextTripData(newAddList);
-				sortItems(newAddList);
+				// self.refreshNextTripData(editingList);
+				editingList.sort(compareFieldTrip);
+				sortRiders(editingList);
 				var homogeneous = new kendo.data.HierarchicalDataSource({
-					data: newAddList,
+					data: editingList,
 					sort: { field: "customData.sortValue", dir: "asc" }
 				});
 				if (treeview.dataSource._data && treeview.dataSource._data.length > 0)
 				{
-					newAddList.map(function(newTrip)
-					{
-						treeview.dataSource._data.sort(function(a, b)
-						{
-							const v1 = a.text && a.text.toLowerCase();
-							const v2 = b.text && b.text.toLowerCase();
-							return v1 > v2 ? 1 : (v1 < v2 ? -1 : 0);
-						});
-						for (var i = 0; i < treeview.dataSource._data.length; i++)
-						{
-							if (newTrip.text > treeview.dataSource._data[i].text)
-							{
-								continue;
-							}
-							else
-							{
-								return treeview.insertBefore(newTrip, treeview.findByUid(treeview.dataSource._data[i].uid));
-							}
-						}
-						treeview.append(newTrip);
-					});
+					insertFieldTrip2TreeView(editingList);
 				}
 				else
 				{
