@@ -218,6 +218,8 @@
 							</div>
 						</div>
 					</div>
+
+					<!--
 					<h4 data-bind="visible:isNoWalkoutType()&&mode()=='new'&&!isCopied()&&!obIsMultipleCreate()"><strong>Walkout Guide</strong></h4>
 					<div class="row">
 						<div class="col-xs-24" data-bind="visible:isNoWalkoutType()&&mode()=='new'&&!isCopied()&&!obIsMultipleCreate()">
@@ -259,8 +261,8 @@
 									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('')"></label>
 									<div class="input-group" data-bind="css:disabled() ? 'disabled' : ''">
 										<div id="tripStopDistanceUnit" data-bind="typeahead:{source:obUnits,drowDownShow:true,notSort:true,selectedValue:obSelectedDistanceUnit}">
-											<!-- ko customInput:{type:"Select",value:obSelectedDistanceUnitText,attributes:{class:"form-control",name:"distanceUnit"},disable:disabled} -->
-											<!-- /ko -->
+											customInput:{type:"Select",value:obSelectedDistanceUnitText,attributes:{class:"form-control",name:"distanceUnit"},disable:disabled}
+											
 										</div>
 										<div class="input-group-btn">
 											<button data-bind="" type="button" class="btn btn-default btn-sharp">
@@ -283,8 +285,8 @@
 									<label data-bind="text: tf.applicationTerm.getApplicationTermSingularByName('')"></label>
 									<div class="input-group">
 										<div data-bind="typeahead:{source:obUnits,drowDownShow:true,notSort:true,selectedValue:obSelectedBufferUnit}">
-											<!-- ko customInput:{type:"Select",value:obSelectedBufferUnitText,attributes:{class:"form-control",name:"bufferUnit"}} -->
-											<!-- /ko -->
+											customInput:{type:"Select",value:obSelectedBufferUnitText,attributes:{class:"form-control",name:"bufferUnit"}}
+											
 										</div>
 										<div class="input-group-btn">
 											<button type="button" class="btn btn-default btn-sharp">
@@ -296,6 +298,8 @@
 							</div>
 						</div>
 					</div>
+					-->
+
 				</div>
 				<!--<h4><strong>Approach Point</strong></h4>
 					<div class="row">

@@ -23,6 +23,8 @@
 		});
 		self.bindRefreshMissingTripPathEvent();
 		self.requireDetails = new TF.Events.Event();
+
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, self.onAddStopFromMapCompleted.bind(self));
 	}
 
 	RoutingEventsManager.prototype = Object.create(TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.prototype);
@@ -592,6 +594,28 @@
 			self.viewModel.editFieldTripStopModal.onCloseEditModalEvent.subscribe(closeEvent);
 		}).catch(function() { });
 	};
+
+	RoutingEventsManager.prototype.onAddStopFromMapCompleted = function (_, stop)
+	{
+		var defaultOptions = {
+			isDoorToDoor: false,
+			student: null,
+			isCreateFromUnassignStudent: false,
+			isCreateFromStopSearch: false,
+			isCreateFromSearch: false,
+			boundary: null,
+			insertBehindSpecialStop: null,
+			streetName: "",
+			isCopied: false,
+			selectLastSelectedTrip: true,
+			tryUseLastSettings: false
+		};
+
+		this.viewModel.editFieldTripStopModal.create({
+			Street: stop.Name,
+			City: stop.City
+		}, null, defaultOptions);
+	}
 
 	RoutingEventsManager.prototype.changeStopSelectAreaClick = function(type, data, e)
 	{

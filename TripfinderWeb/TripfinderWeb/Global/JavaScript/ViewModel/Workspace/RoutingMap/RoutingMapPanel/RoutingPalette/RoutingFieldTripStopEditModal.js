@@ -92,13 +92,15 @@
 			return this.obSelectedSequence();
 		});
 
-		this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
+		// this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
+		this.obSelectedSequenceDisable = ko.computed(() => this.isReadOnly());
 
 		// disable for future implementation
 		this.obSelectedFieldTripDisable = ko.observable(true);
 		this.obSmartAssignmentDisable = ko.observable(true);
 		this.obSmartSequenceDisable = ko.observable(true);
-		this.obStopSequenceDisable = ko.computed(() => this.obSmartSequenceDisable() || this.obSelectedSequenceDisable());
+		// this.obStopSequenceDisable = ko.computed(() => this.obSmartSequenceDisable() || this.obSelectedSequenceDisable());
+		this.obStopSequenceDisable = ko.computed(() => this.obSelectedSequenceDisable());
 		this.obCornerStopVisible = ko.observable(false);
 
 		this.initSequenceSubscribe();
@@ -170,7 +172,14 @@
 		}
 		this.obSequenceSource(sequences);
 		// set sequence number
-		var defaultSequence = TF.Helper.TripHelper.getTripStopInsertSequence(trip.FieldTripStops, trip.Session);
+		var lastSequence = _.last(sequences);
+		var defaultSequence = lastSequence - 1;
+
+		if(this.mode() === 'edit')
+		{
+			defaultSequence = TF.Helper.TripHelper.getTripStopInsertSequence(trip.FieldTripStops, trip.Session);
+		}
+		
 		var sequence = this.data[0].Sequence ? this.data[0].Sequence : defaultSequence;
 		this.obSelectedSequence(sequence);
 	};
@@ -207,8 +216,15 @@
 	 */
 	RoutingFieldTripStopEditModal.prototype.highlightStopSequencePathAndPoint = function(sequence)
 	{
-		const currentStop = this.data[0],
-			data = { tripId: currentStop.FieldTripId, stopId: currentStop.id, stopSequence: sequence };
+		const currentTrip = this.obSelectedTrip();
+		const currentStop = this.data[0];
+
+		if(!currentStop.FieldTripId)
+		{
+			currentStop.FieldTripId = currentTrip.id;
+		}
+
+		const data = { tripId: currentStop.FieldTripId, stopId: currentStop.id, stopSequence: sequence };
 
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, data);
 
@@ -473,54 +489,42 @@
 	RoutingFieldTripStopEditModal.prototype._createOneStop = function(tripStop)
 	{
 		var self = this;
-		var travelScenarioId = self.dataModel.trips ? self.dataModel.trips[0].TravelScenarioId : 1;
-		var travelScenario = self.dataModel._viewModal.travelScenariosPaletteViewModel.travelScenariosViewModel.dataModel.getTravelScenariosById(travelScenarioId);
-		return self.createTripBoundary(self.studentSelectionCreate() && tripStop.unassignStudent ? "Door-to-Door" : (self.isCopied() ? "" : self.obSelectedStopType()), tripStop, travelScenario)
-			.then(function(tripBoundary)
+		// var travelScenarioId = self.dataModel.trips ? self.dataModel.trips[0].TravelScenarioId : 1;
+		// var travelScenario = self.dataModel._viewModal.travelScenariosPaletteViewModel.travelScenariosViewModel.dataModel.getTravelScenariosById(travelScenarioId);
+		
+		var data = self.trimStringSpace(tripStop);
+		var tripStopPromise = Promise.resolve(tripStop);
+		data.FieldTripId = tripStop.FieldTripId ? tripStop.FieldTripId : self.obSelectedTrip().id;
+		if (!self.obIsMultipleCreate() && !self.obIsInsertToSpecialStop())
+		{
+			if (self.obIsSmartAssignment())
 			{
-				self.createdTripBoundary.push(tripBoundary);
-				if (!tripBoundary)
-				{
-					return;
-				}
-				var data = self.trimStringSpace(tripStop);
-				var tripStopPromise = Promise.resolve(tripStop);
-				data.FieldTripId = tripStop.FieldTripId ? tripStop.FieldTripId : self.obSelectedTrip().id;
-				if (!self.obIsMultipleCreate() && !self.obIsInsertToSpecialStop())
-				{
-					if (self.obIsSmartAssignment())
-					{
-						tripStopPromise = self.viewModel.drawTool.NAtool.getSmartAssignment(data, self.availableTrips);
-						//tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool);
-					} else
-					{
-						data.FieldTripId = self.obSelectedTrip().id;
-						tripStopPromise = Promise.resolve(data);
-					}
-				} else if (self.obIsInsertToSpecialStop())
-				{
-					data.FieldTripId = self.obSelectedTrip().id;
-					tripStopPromise = Promise.resolve(data);
-				}
-
-				return tripStopPromise.then(function(tripStop)
-				{
-
-					if (tripStop == false)
-					{
-						return false;
-					}
-					data.FieldTripId = tripStop.FieldTripId;
-					data.boundary = tripBoundary;
-					data.color = self.obSelectedTrip().color;
-					data.Sequence = tripStop.Sequence;
-					return data;
-				});
-
-			}).catch(function()
+				tripStopPromise = self.viewModel.drawTool.NAtool.getSmartAssignment(data, self.availableTrips);
+				//tripStopPromise = self.vrpTool.getSmartAssignment([data], self.availableTrips, self.obIsSmartSequence(), self.viewModel.drawTool);
+			} else
 			{
-				self.reject();
-			});
+				data.FieldTripId = self.obSelectedTrip().id;
+				tripStopPromise = Promise.resolve(data);
+			}
+		} else if (self.obIsInsertToSpecialStop())
+		{
+			data.FieldTripId = self.obSelectedTrip().id;
+			tripStopPromise = Promise.resolve(data);
+		}
+
+		return tripStopPromise.then(function(tripStop)
+		{
+
+			if (tripStop == false)
+			{
+				return false;
+			}
+			data.FieldTripId = tripStop.FieldTripId;
+			// data.boundary = tripBoundary;
+			data.color = self.obSelectedTrip().color;
+			data.Sequence = tripStop.Sequence;
+			return data;
+		});
 	};
 
 	RoutingFieldTripStopEditModal.prototype.stopCreate = function()
