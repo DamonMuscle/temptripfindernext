@@ -556,8 +556,10 @@
 
 	FieldTripMap.prototype._addNewStop = async function(mapPoint)
 	{
-		const self = this,
-			{ longitude, latitude } = mapPoint,
+		const self = this;
+		self.showLoadingIndicator();
+
+		const { longitude, latitude } = mapPoint,
 			{ Address, City, RegionAbbr, CountryCode } = await self.fieldTripHighlightStopLayerInstance.getGeocodeStop(longitude, latitude),
 			Name = Address || "unnamed",
 			attributes = {
@@ -579,6 +581,7 @@
 			self.fieldTripHighlightStopLayerInstance.addStops([newStopGraphic]);
 		}
 
+		self.hideLoadingIndicator();
 		return { Name, City, RegionAbbr, CountryCode };
 	}
 
@@ -732,11 +735,7 @@
 
 		self.editing.isMovingStop = false;
 		self.editing.features.movingStop = null;
-
-		if (tf.loadingIndicator)
-		{
-			tf.loadingIndicator.tryHide();
-		}
+		self.hideLoadingIndicator();
 	}
 
 	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(_, data)
@@ -793,10 +792,7 @@
 			return;
 		}
 
-		if (tf.loadingIndicator)
-		{
-			tf.loadingIndicator.showImmediately();
-		}
+		self.showLoadingIndicator();
 
 		const { DBID, FieldTripId } = self._extractFieldTripFeatureFields(fieldTrip),
 			sequence = stop.Sequence,
@@ -827,10 +823,7 @@
 
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 
-		if (tf.loadingIndicator)
-		{
-			tf.loadingIndicator.tryHide();
-		}
+		self.hideLoadingIndicator();
 	}
 
 	//#endregion
@@ -925,6 +918,8 @@
 
 	//#endregion
 
+	//#endregion
+
 	//#region Map Events
 
 	FieldTripMap.prototype.onMapCanvasMapExtentChangeEvent = function(fieldTrips)
@@ -965,27 +960,41 @@
 		}
 		else if (event.button === 2)
 		{
+			// right click
 			if (this.editing.isAddingStop)
 			{
 				this.stopAddFieldTripStop();
 			}
 
-			// right click
 			const response = await self.mapInstance?.map.mapView.hitTest(event);
 			if (response.results.length > 0)
 			{
 				const graphics = response.results.map(item => item.graphic);
 				const stopGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripStopLayerId);
-				const data = stopGraphics.map(stop => {
-					return { DBID: stop.attributes.DBID, FieldTripId: stop.attributes.FieldTripId, id: stop.attributes.id, Sequence: stop.attributes.Sequence };
-				});
-				const dataWrapper = { data, event };
-				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, dataWrapper);
+				if (stopGraphics.length > 0)
+				{
+					const data = stopGraphics.map(stop => {
+						const { DBID, FieldTripId, id, Sequence } = stop.attributes;
+						return { DBID, FieldTripId, id, Sequence };
+					});
+					const dataWrapper = { data, event };
+					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, dataWrapper);
+				}
+
+				const pathGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripPathLayerId);
+				if (pathGraphics.length > 0)
+				{
+					const data = pathGraphics.map(path => {
+						const { DBID, FieldTripId, Sequence } = path.attributes;
+						return { DBID, FieldTripId, Sequence };
+					});
+					const dataWrapper = { data, event };
+					console.log(dataWrapper);
+					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, dataWrapper);
+				}
 			}
 		}
 	}
-
-	//#endregion
 
 	//#endregion
 
@@ -1850,6 +1859,22 @@
 			FieldTripId = fieldTrip.id;
 
 		return { DBID, FieldTripId };
+	}
+
+	FieldTripMap.prototype.showLoadingIndicator = function()
+	{
+		if (tf.loadingIndicator)
+		{
+			tf.loadingIndicator.showImmediately();
+		}
+	}
+
+	FieldTripMap.prototype.hideLoadingIndicator = function()
+	{
+		if (tf.loadingIndicator)
+		{
+			tf.loadingIndicator.tryHide();
+		}
 	}
 
 	//#endregion

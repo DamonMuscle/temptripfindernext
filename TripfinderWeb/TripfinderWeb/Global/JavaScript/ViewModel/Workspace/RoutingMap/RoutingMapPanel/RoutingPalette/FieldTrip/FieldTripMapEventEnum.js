@@ -17,5 +17,6 @@
 		HighlightFieldTripStop: "on_FieldTripMap_HighlightFieldTripStop",
 		ClearHighlightFieldTripStop: "on_FieldTripMap_ClearHighlightFieldTripStop",
 		FieldTripStopClick: "on_FieldTripMap_onMapClick_FieldTripStop",
+		FieldTripPathClick: "on_FieldTripMap_onMapClick_FieldTripPath",
 	};
 })();

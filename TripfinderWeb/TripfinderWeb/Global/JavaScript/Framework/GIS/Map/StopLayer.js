@@ -210,6 +210,8 @@
 		return;
 	}
 
+	//#endregion
+
 	StopLayer.prototype.dispose = function()
 	{
 		if (this.symbolHelper)
@@ -217,8 +219,6 @@
 			this.symbolHelper.dispose();
 			this.symbolHelper = null;
 		}
-	}
-
-	//#endregion
+	}	
 
 })();
