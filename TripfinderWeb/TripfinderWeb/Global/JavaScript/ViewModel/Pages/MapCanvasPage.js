@@ -151,6 +151,16 @@
 		PubSub.publish("on_MapCanvas_MapViewClick", { event });
 	}
 
+	MapCanvasPage.prototype.onMapViewPointerMove = function(event)
+	{
+		PubSub.publish("on_MapCanvas_MapViewPointerMove", { event });
+	}
+
+	MapCanvasPage.prototype.onMapViewKeyUp = function(event)
+	{
+		PubSub.publish("on_MapCanvas_MapViewKeyUp", { event });
+	}
+
 	MapCanvasPage.prototype._initRevertOperation = function()
 	{
 		var self = this;
@@ -720,6 +730,8 @@
 				onMapViewUpdated: self.onMapViewUpdated.bind(self),
 				onMapViewExtentChanges: self.onMapViewExtentChanges.bind(self),
 				onMapViewClick: self.onMapViewClick.bind(self),
+				onMapViewPointerMove: self.onMapViewPointerMove.bind(self),
+				onMapViewKeyUp: self.onMapViewKeyUp.bind(self),
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;

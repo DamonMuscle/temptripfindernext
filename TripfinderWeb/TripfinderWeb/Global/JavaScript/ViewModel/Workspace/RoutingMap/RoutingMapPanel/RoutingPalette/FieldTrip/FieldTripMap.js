@@ -558,14 +558,14 @@
 	{
 		const self = this,
 			newStopData = await self._createNewStop(stopLayerInstance, mapPoint),
-			{ Name, City, RegionAbbr, CountryCode } = newStopData,
-			highlightStops = self._getHighlightStopFeatures(),
+			{ Name, City, RegionAbbr, CountryCode, XCoord, YCoord } = newStopData,
+			highlightStop = self.getHighlightStop(),
 			addGraphic = newStopData.newStop;
 
 		let newStopGraphic = null;
-		if (highlightStops && highlightStops.length === 1)
+		if (highlightStop)
 		{
-			newStopGraphic = highlightStops[0];
+			newStopGraphic = highlightStop;
 			newStopGraphic.geometry = addGraphic.geometry;
 			newStopGraphic.attributes.Name = addGraphic.attributes.Name;
 		}
@@ -575,7 +575,7 @@
 			stopLayerInstance.addStops([newStopGraphic]);
 		}
 
-		return { Name, City, RegionAbbr, CountryCode };
+		return { Name, City, RegionAbbr, CountryCode, XCoord, YCoord };
 	}
 
 	FieldTripMap.prototype._createNewStop = async function(stopLayerInstance, mapPoint)
@@ -593,7 +593,7 @@
 			},
 			newStop = stopLayerInstance.createStop(longitude, latitude, attributes);
 
-		return { Name, City, RegionAbbr, CountryCode, newStop };
+		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
 	FieldTripMap.prototype._applyNewStop = function(stopLayerInstance)
@@ -1090,6 +1090,17 @@
 					console.log(dataWrapper);
 					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripPathClick, dataWrapper);
 				}
+			}
+		}
+	}
+
+	FieldTripMap.prototype.onMapKeyUpEvent = function(data)
+	{
+		if (data.event.key === "Escape")
+		{
+			if (this.editing.isAddingStop)
+			{
+				this.stopAddFieldTripStop();
 			}
 		}
 	}

@@ -41,6 +41,7 @@
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
+			onMapViewKeyUp: null,
 		}
 	};
 
@@ -55,6 +56,7 @@
 			onMapViewUpdated: null,
 			onMapViewUpdating: null,
 			onMapViewExtentChanges: null,
+			onMapViewKeyUp: null,
 		};
 
 		this.defineReadOnlyProperty('mapLayerInstances', []);
@@ -322,6 +324,11 @@
 		if (self.settings.eventHandlers.onMapViewExtentChanges)
 		{
 			self.eventHandler.onMapViewExtentChanges = mapView.watch('extent', self.settings.eventHandlers.onMapViewExtentChanges);
+		}
+
+		if (self.settings.eventHandlers.onMapViewKeyUp)
+		{
+			self.eventHandler.onMapViewKeyUp = mapView.on('key-up', self.settings.eventHandlers.onMapViewKeyUp);
 		}
 	}
 
