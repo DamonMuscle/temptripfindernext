@@ -350,7 +350,7 @@
 
 	Map.prototype.setMapCursor = function(cursorType)
 	{
-		const availableCursorTypes = ["default", "locate", "locate-white", "pin", "pointer"];
+		const availableCursorTypes = ["default", "locate", "locate-white", "pin", "pointer", "crosshair"];
 
 		$(this.map.mapView.container).removeClass("pin-cursor");
 
@@ -368,6 +368,7 @@
 				$(this.map.mapView.container).addClass("pin-cursor");
 				break;
 			case "pointer":
+			case "crosshair":
 			default:
 				cursor = cursorType;
 				break;

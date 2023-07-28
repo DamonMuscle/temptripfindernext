@@ -1,6 +1,8 @@
 (function()
 {
 	createNamespace("TF.RoutingPalette").FieldTripMapEventEnum = {
+		AddStopFromMap: "on_FieldTripMap_AddStopFromMap",
+		AddStopFromMapCompleted: "on_FieldTripMap_AddStopFromMapCompleted",
 		Change: "on_FieldTripMap_Change",
 		ZoomToLayers: "on_FieldTripMap_ZoomToLayers",
 		ZoomToStop: "on_FieldTripMap_ZoomToStop",

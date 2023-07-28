@@ -45,8 +45,13 @@
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		this.layerManager = new TF.GIS.LayerManager(mapInstance);
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
-		this._mapEditingFeatures = {
-			movingStop: null
+		this._editing = {
+			isAddingStop: false,
+			isMovingStop: false,
+			features: {
+				addingStop: null,
+				movingStop: null
+			}
 		};
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
 
@@ -80,8 +85,8 @@
 		this.pathLineType = isSequenceLine ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 	}
 
-	Object.defineProperty(FieldTripMap.prototype, 'mapEditingFeatures', {
-		get() { return this._mapEditingFeatures; },
+	Object.defineProperty(FieldTripMap.prototype, 'editing', {
+		get() { return this._editing; },
 		enumerable: false,
 		configurable: false
 	});
@@ -214,6 +219,8 @@
 		const aIndex = paletteNameData.findIndex(item => item === a.Name);
 		const bIndex = paletteNameData.findIndex(item => item === b.Name);
 
+		console.log(`paletteNameData: ${JSON.stringify(paletteNameData)}`);
+
 		return aIndex - bIndex;
 	}
 
@@ -270,40 +277,21 @@
 	{
 		const self = this,
 			pathFeatures = self._getPathFeatures();
-		const sortedPathFeatures = pathFeatures.sort((a, b) =>
-		{
-			let aValue, bValue;
-			{
-				let { DBID, FieldTripId } = a.attributes;
-				aValue = Object.assign({}, { DBID, FieldTripId });
-			}
 
-			{
-				let { DBID, FieldTripId } = b.attributes;
-				bValue = Object.assign({}, { DBID, FieldTripId });
-			}
-
-			let aIndex = sortedFieldTrips.findIndex(item => item.DBID === aValue.DBID && item.id === aValue.FieldTripId);
-			let bIndex = sortedFieldTrips.findIndex(item => item.DBID === bValue.DBID && item.id === bValue.FieldTripId);
-
-			if (aIndex === bIndex)
-			{
-				// keep the original order.
-				return 0;
-			}
-			
-			// draw bottom layer (larger index) first.
-			return (-1) * (aIndex - bIndex);
-		});
-
-		return [...sortedPathFeatures];
+		return self._sortLineFeatures(sortedFieldTrips, pathFeatures);
 	}
 
 	FieldTripMap.prototype._sortSequenceLineFeaturesByFieldTrips = function(sortedFieldTrips)
 	{
 		const self = this,
 			sequenceLineFeatures = self._getSequenceLineFeatures();
-		const sortedSequenceLienFeatures = sequenceLineFeatures.sort((a, b) =>
+
+		return self._sortLineFeatures(sortedFieldTrips, sequenceLineFeatures);
+	}
+
+	FieldTripMap.prototype._sortLineFeatures = function(sortedFieldTrips, lineFeatures)
+	{
+		const sortedLineFeatures = lineFeatures.sort((a, b) =>
 		{
 			let aValue, bValue;
 			{
@@ -329,9 +317,8 @@
 			return (-1) * (aIndex - bIndex);
 		});
 
-		return [...sortedSequenceLienFeatures];
+		return [...sortedLineFeatures];
 	}
-
 
 	//#endregion
 
@@ -552,7 +539,52 @@
 
 	//#endregion
 	
-	//#region TODO: Add / Insert Field Trip Stop
+	//#region Add Field Trip Stop
+
+	FieldTripMap.prototype.startAddFieldTripStop = function()
+	{
+		this.editing.isAddingStop = true;
+		this.mapInstance.setMapCursor("crosshair");
+	}
+
+	FieldTripMap.prototype.stopAddFieldTripStop = async function()
+	{
+		this.editing.isAddingStop = false;
+		this.mapInstance.setMapCursor("default");
+		await this.clearHighlightFeatures();
+	}
+
+	FieldTripMap.prototype._addNewStop = async function(mapPoint)
+	{
+		const self = this,
+			{ longitude, latitude } = mapPoint,
+			{ Address, City, RegionAbbr, CountryCode } = await self.fieldTripHighlightStopLayerInstance.getGeocodeStop(longitude, latitude),
+			Name = Address || "unnamed",
+			attributes = {
+				id: -1,
+				Name,
+				Sequence: 0
+			},
+			highlightStops = self._getHighlightStopFeatures(),
+			addGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes);
+		let newStopGraphic = null;
+		if (highlightStops && highlightStops.length === 1)
+		{
+			newStopGraphic = highlightStops[0];
+			newStopGraphic.geometry = addGraphic.geometry;
+		}
+		else
+		{
+			newStopGraphic = addGraphic;
+			self.fieldTripHighlightStopLayerInstance.addStops([newStopGraphic]);
+		}
+
+		return { Name, City, RegionAbbr, CountryCode };
+	}
+
+	//#endregion
+
+	//#region TODO: Insert Field Trip Stop
 
 	//#endregion
 
@@ -669,7 +701,8 @@
 			return;
 		}
 
-		self.mapEditingFeatures.movingStop = {
+		self.editing.isMovingStop = true;
+		self.editing.features.movingStop = {
 			fieldTrip: fieldTrip,
 			stop: stop
 		};
@@ -682,21 +715,23 @@
 	FieldTripMap.prototype.onStopLayerMoveStopCompleted = async function(_, data)
 	{
 		const self = this,
-			fieldTrip = self.mapEditingFeatures.movingStop.fieldTrip,
-			movingStop = self.mapEditingFeatures.movingStop.stop,
+			{ fieldTrip, stop } = self.editing.features.movingStop,
 			{ longitude, latitude, Address, City } = data;
 
 		if (Address !== "")
 		{
-			movingStop.Street = Address;
-			movingStop.City = City;
+			stop.Street = Address;
+			stop.City = City;
 		}
-		movingStop.XCoord = +longitude.toFixed(6);
-		movingStop.YCoord = +latitude.toFixed(6);
+		stop.XCoord = +longitude.toFixed(6);
+		stop.YCoord = +latitude.toFixed(6);
 
-		const effectSequences = self._computeEffectSequences(fieldTrip, {moveStop: movingStop});
+		const effectSequences = self._computeEffectSequences(fieldTrip, {moveStop: stop});
 
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
+
+		self.editing.isMovingStop = false;
+		self.editing.features.movingStop = null;
 
 		if (tf.loadingIndicator)
 		{
@@ -706,7 +741,7 @@
 
 	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(_, data)
 	{
-		const stop = this.mapEditingFeatures.movingStop.stop,
+		const stop = this.editing.features.movingStop.stop,
 			graphic = data.graphic,
 			attributes = graphic.attributes;
 		if (stop.FieldTripId === attributes.FieldTripId && stop.Sequence === attributes.Sequence)
@@ -915,8 +950,26 @@
 	FieldTripMap.prototype.onMapClickEvent = async function(data)
 	{
 		const self = this, event = data.event;
-		if (event.button === 2)
+
+		if (event.button === 0)
 		{
+			// click on map
+			if (this.editing.isAddingStop)
+			{
+				const mapPoint = data.event.mapPoint;
+				const newStopData = await this._addNewStop(mapPoint);
+
+				console.log(newStopData);
+				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, newStopData);
+			}
+		}
+		else if (event.button === 2)
+		{
+			if (this.editing.isAddingStop)
+			{
+				this.stopAddFieldTripStop();
+			}
+
 			// right click
 			const response = await self.mapInstance?.map.mapView.hitTest(event);
 			if (response.results.length > 0)
@@ -926,13 +979,7 @@
 				const data = stopGraphics.map(stop => {
 					return { DBID: stop.attributes.DBID, FieldTripId: stop.attributes.FieldTripId, id: stop.attributes.id, Sequence: stop.attributes.Sequence };
 				});
-
-				const dataWrapper = {
-					data: data,
-					event: event
-				};
-
-				console.log(dataWrapper);
+				const dataWrapper = { data, event };
 				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, dataWrapper);
 			}
 		}

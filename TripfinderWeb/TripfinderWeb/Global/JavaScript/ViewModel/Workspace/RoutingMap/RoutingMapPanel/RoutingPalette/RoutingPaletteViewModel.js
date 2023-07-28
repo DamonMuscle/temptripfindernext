@@ -24,6 +24,7 @@
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];
 
+		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap, self.onFieldTripMapAddStopFromMap.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.Change, self.onFieldTripMapChange.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers, self.onFieldTripMapZoomToLayers.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop, self.onFieldTripMapZoomToStop.bind(self));
@@ -131,6 +132,11 @@
 		});
 		return layers;
 	};
+
+	RoutingPaletteViewModel.prototype.onFieldTripMapAddStopFromMap = function(_)
+	{
+		this.fieldTripMap?.startAddFieldTripStop();
+	}
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapChange = async function(_, data)
 	{
@@ -449,6 +455,7 @@
 			this.fieldTripMap = null;
 		}
 
+		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.Change);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToLayers);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ZoomToStop);

@@ -140,7 +140,7 @@
 		return updateGraphic;
 	}
 
-	StopLayer.prototype._getGeocodeStop = async function(longitude, latitude)
+	StopLayer.prototype.getGeocodeStop = async function(longitude, latitude)
 	{
 		const geocodeService = TF.GIS.Analysis.getInstance().geocodeService;
 		const geocodeResult = await geocodeService.locationToAddress({x: longitude, y: latitude});
@@ -169,7 +169,7 @@
 
 		// update stop name by geocoding.
 		const { longitude, latitude } = updateGeometry;
-		const geocodeStop = await this._getGeocodeStop(longitude, latitude);
+		const geocodeStop = await this.getGeocodeStop(longitude, latitude);
 		if (geocodeStop?.Address !== "")
 		{
 			movingStopGraphic.attributes.Name = geocodeStop.Address;
