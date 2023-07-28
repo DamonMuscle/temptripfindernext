@@ -2672,7 +2672,6 @@
 								var unSuccessAssignStudents = [];
 								trips.forEach(function(trip)
 								{
-									RoutingDataModel.unLockRoutingStudentByTrip(trip.oldId || trip.id);
 									self.deleteChangeDataStackByTripId(trip.oldId);
 									var savedTrip = Enumerable.From(savedTrips).FirstOrDefault({}, function(c) { return c.Name == trip.Name; });
 									// change id from local create to match the create after save 
@@ -3500,16 +3499,6 @@
 			return `${studentId}_StopID${tripStopId}_${anotherTripStopID}_${previousScheduleID}`;
 		}
 	}
-
-	/**
-	* unlock routing student when close trip
-	*/
-	RoutingDataModel.unLockRoutingStudentByTrip = function(tripId)
-	{
-		return tf.promiseAjax.delete(pathCombine(tf.api.apiPrefix(), "RoutingStudentLockDatas"), {
-			paramData: { tripId: tripId }
-		});
-	};
 
 	RoutingDataModel.prototype.getWeekdayAttributeNameByIndex = function(dayIndex)
 	{

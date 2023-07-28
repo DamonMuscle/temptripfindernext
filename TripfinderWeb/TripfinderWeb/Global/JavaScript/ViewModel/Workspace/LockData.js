@@ -256,13 +256,6 @@
 									}
 								});
 							});
-							if (selfLocks[key].type == "trip")
-							{
-								selfLocks[key].ids.forEach(function(id)
-								{
-									TF.RoutingMap.RoutingPalette.RoutingDataModel.unLockRoutingStudentByTrip(id, selfLocks[key].dbid);
-								});
-							}
 							changed = true;
 							cleared = true;
 							delete selfLocks[key];

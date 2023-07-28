@@ -89,20 +89,7 @@
 	RoutingLockData.prototype.unLock = function(tripIds)
 	{
 		var self = this;
-		TF.RoutingMap.LockData.prototype.unLock.apply(this, arguments);
-		if (tripIds && !$.isArray(tripIds))
-		{
-			tripIds = [tripIds];
-		}
-		tripIds = tripIds || (this.lockInfo.selfLockedList || []).map(function(c) { return c.id; });
-		if (tripIds.length == 0)
-		{
-			return;
-		}
-		tripIds.forEach(function(tripId)
-		{
-			// TF.RoutingMap.RoutingPalette.RoutingDataModel.unLockRoutingStudentByTrip(tripId);
-		});
+		TF.RoutingMap.LockData.prototype.unLock.apply(self, arguments);
 	};
 
 })();
