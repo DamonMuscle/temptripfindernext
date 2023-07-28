@@ -554,35 +554,58 @@
 		await this.clearHighlightFeatures();
 	}
 
-	FieldTripMap.prototype._addNewStop = async function(mapPoint)
+	FieldTripMap.prototype._addNewStop = async function(stopLayerInstance, mapPoint)
 	{
-		const self = this;
-		self.showLoadingIndicator();
-
-		const { longitude, latitude } = mapPoint,
-			{ Address, City, RegionAbbr, CountryCode } = await self.fieldTripHighlightStopLayerInstance.getGeocodeStop(longitude, latitude),
-			Name = Address || "unnamed",
-			attributes = {
-				id: -1,
-				Name,
-				Sequence: 0
-			},
+		const self = this,
+			newStopData = await self._createNewStop(stopLayerInstance, mapPoint),
+			{ Name, City, RegionAbbr, CountryCode } = newStopData,
 			highlightStops = self._getHighlightStopFeatures(),
-			addGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes);
+			addGraphic = newStopData.newStop;
+
 		let newStopGraphic = null;
 		if (highlightStops && highlightStops.length === 1)
 		{
 			newStopGraphic = highlightStops[0];
 			newStopGraphic.geometry = addGraphic.geometry;
+			newStopGraphic.attributes.Name = addGraphic.attributes.Name;
 		}
 		else
 		{
 			newStopGraphic = addGraphic;
-			self.fieldTripHighlightStopLayerInstance.addStops([newStopGraphic]);
+			stopLayerInstance.addStops([newStopGraphic]);
 		}
 
-		self.hideLoadingIndicator();
 		return { Name, City, RegionAbbr, CountryCode };
+	}
+
+	FieldTripMap.prototype._createNewStop = async function(stopLayerInstance, mapPoint)
+	{
+		const NEW_STOP_ID = 0,
+			NEW_STOP_SEQUENCE = 0,
+			UNNAMED_ADDRESS = "unnamed",
+			{ longitude, latitude } = mapPoint,
+			{ Address, City, RegionAbbr, CountryCode } = await stopLayerInstance.getGeocodeStop(longitude, latitude),
+			Name = Address || UNNAMED_ADDRESS,
+			attributes = {
+				id: NEW_STOP_ID,
+				Name,
+				Sequence: NEW_STOP_SEQUENCE
+			},
+			newStop = stopLayerInstance.createStop(longitude, latitude, attributes);
+
+		return { Name, City, RegionAbbr, CountryCode, newStop };
+	}
+
+	FieldTripMap.prototype._applyNewStop = function(stopLayerInstance)
+	{
+		const self = this,
+			highlightStops = self._getHighlightStopFeatures();
+
+		let newStopGraphic = null;
+		if (highlightStops && highlightStops.length === 1)
+		{
+			newStopGraphic = highlightStops[0];
+		}
 	}
 
 	//#endregion
@@ -852,15 +875,37 @@
 	FieldTripMap.prototype.addHighlightFeatures = async function(data)
 	{
 		const self = this;
-		if (!self.fieldTripStopLayerInstance || !self.fieldTripPathLayerInstance)
+		if (!self.fieldTripStopLayerInstance ||
+			!self.fieldTripPathLayerInstance ||
+			!self.fieldTripHighlightLayerInstance)
 		{
 			return;
 		}
 
+		// avoid add duplicate features.
+		await self.fieldTripHighlightLayerInstance.clearLayer();
+
 		const vertex = [],
 			stops = [],
-			{ DBID, FieldTripId, Color, beforeStop, currentStop, afterStop, stopSequence} = data,
+			{ DBID, FieldTripId, beforeStop, currentStop, afterStop, stopSequence} = data,
+			isEditStop = !!currentStop;
+
+		let stopObjects = null;
+		if (isEditStop)
+		{
 			stopObjects = [beforeStop, currentStop, afterStop].filter(item => item);
+		}
+		else
+		{
+			// beforeStop and afterStop must be existing for new stop.
+			const highlightStop = self.getHighlightStop();
+			const midStop = {
+				XCoord: highlightStop.geometry.longitude,
+				YCoord: highlightStop.geometry.latitude,
+				id: 0
+			};
+			stopObjects = [beforeStop, midStop, afterStop].filter(item => item);
+		}
 
 		stopObjects.forEach(stop =>
 		{
@@ -872,33 +917,10 @@
 			vertex.push([XCoord, YCoord]);
 		});
 
-		let highlightGraphics = [];
-		// add highlight sequence line
-		const paths = [vertex],
-			pathAttributes = { DBID, FieldTripId, Color },
-			basePathGraphic = self.fieldTripPathLayerInstance.createHighlightPath(paths, pathAttributes);
-		highlightGraphics.push(basePathGraphic);
+		const paths = [vertex];
+		await self.drawHighlightFeatures(data, paths, stops);
 
-		const topPathGraphic = self.fieldTripPathLayerInstance.createPath(paths, pathAttributes);
-		highlightGraphics.push(topPathGraphic);
-
-		// add highlight stop
-		highlightGraphics = highlightGraphics.concat(stops);
-
-		await self.fieldTripHighlightLayerInstance.addMany(highlightGraphics);
-
-		// add highlight currentStop
-		const fieldTripStops = self._getStopFeatures(),
-			features = fieldTripStops.filter(item =>
-				item.attributes.DBID === DBID &&
-				item.attributes.FieldTripId === FieldTripId),
-			currentStopFeature = features.find(item => item.attributes.id === currentStop.id),
-			attributes = { ...currentStopFeature.attributes },
-			{ longitude, latitude } = currentStopFeature.geometry;
-
-		attributes.Color = INFO_STOP_COLOR;
-		const highlightStopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes, stopSequence);
-		self.fieldTripHighlightStopLayerInstance.addStops([highlightStopGraphic]);
+		self.drawHighlightStop(data, currentStop, stopSequence, isEditStop);
 	}
 
 	FieldTripMap.prototype.clearHighlightFeatures = async function()
@@ -912,6 +934,80 @@
 		await self.fieldTripHighlightLayerInstance.clearLayer();
 
 		await self.fieldTripHighlightStopLayerInstance.clearLayer();
+	}
+
+	FieldTripMap.prototype.drawHighlightFeatures = async function(data, paths, stops)
+	{
+		const self = this;
+		if (!self.fieldTripPathLayerInstance)
+		{
+			return;
+		}
+
+		let highlightGraphics = [];
+		// add highlight sequence line
+		const { DBID, FieldTripId, Color } = data,
+			pathAttributes = { DBID, FieldTripId, Color },
+			basePathGraphic = self.fieldTripPathLayerInstance.createHighlightPath(paths, pathAttributes);
+		highlightGraphics.push(basePathGraphic);
+
+		const topPathGraphic = self.fieldTripPathLayerInstance.createPath(paths, pathAttributes);
+		highlightGraphics.push(topPathGraphic);
+
+		// add highlight stop
+		highlightGraphics = highlightGraphics.concat(stops);
+
+		await self.fieldTripHighlightLayerInstance.addMany(highlightGraphics);
+	}
+
+	FieldTripMap.prototype.drawHighlightStop = function(data, currentStop, stopSequence, isEditStop)
+	{
+		const self = this;
+		let stopGraphic = null;
+		if (isEditStop)
+		{
+			const attributes = {
+				id: currentStop.id,
+				DBID: data.DBID,
+				FieldTripId: data.FieldTripId,
+				CurbApproach: currentStop.vehicleCurbApproach,
+				Name: currentStop.Street,
+				Sequence: currentStop.Sequence,
+				Color: INFO_STOP_COLOR
+			},
+			longitude = currentStop.XCoord,
+			latitude = currentStop.YCoord;
+
+			stopGraphic = self.fieldTripHighlightStopLayerInstance.createStop(longitude, latitude, attributes, stopSequence);
+		}
+
+		const highlightStop = self.getHighlightStop();
+		if (highlightStop)
+		{
+			if (isEditStop)
+			{
+				highlightStop.geometry = stopGraphic.geometry;
+				highlightStop.attributes = stopGraphic.attributes;
+			}
+			highlightStop.symbol = self.fieldTripHighlightStopLayerInstance.getStopSymbol(stopSequence, INFO_STOP_COLOR);
+		}
+		else
+		{
+			self.fieldTripHighlightStopLayerInstance.addStops([stopGraphic]);
+		}
+	}
+
+	FieldTripMap.prototype.getHighlightStop = function()
+	{
+		const self = this;
+		const features = self._getHighlightStopFeatures();
+		let highlightStop = null;
+		if (features && features.length === 1)
+		{
+			highlightStop = features[0];
+		}
+
+		return highlightStop;
 	}
 
 	//#endregion
@@ -952,7 +1048,9 @@
 			if (this.editing.isAddingStop)
 			{
 				const mapPoint = data.event.mapPoint;
-				const newStopData = await this._addNewStop(mapPoint);
+				self.showLoadingIndicator();
+				const newStopData = await self._addNewStop(self.fieldTripHighlightStopLayerInstance, mapPoint);
+				self.hideLoadingIndicator();
 
 				console.log(newStopData);
 				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, newStopData);

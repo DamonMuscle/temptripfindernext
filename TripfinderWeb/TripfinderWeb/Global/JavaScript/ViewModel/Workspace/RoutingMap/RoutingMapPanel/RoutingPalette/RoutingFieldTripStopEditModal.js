@@ -191,11 +191,12 @@
 	{
 		// update stop point sequence when user manually set stop sequence
 		var stopSequence = 0;
-		this.removeStopSequenceGraphics();
+		// this.removeStopSequenceGraphics();
 		if (this.data.length == 1 && !this.obIsMultipleCreate())
 		{
 			stopSequence = this.obSelectedSequence();
 			this.highlightStopSequencePathAndPoint(stopSequence);
+			console.log(`selected stop sequence: ${stopSequence}`);
 
 			// update sequence for check data changed when cancel click
 			if (this.mode() != "new" && !this.obIsSmartSequence())
@@ -203,7 +204,8 @@
 				if (stopSequence)
 				{
 					this.data[0].Sequence = stopSequence;
-				} else
+				}
+				else
 				{
 					this.data[0].Sequence = this.original[0].Sequence;
 				}
@@ -227,7 +229,6 @@
 		const data = { tripId: currentStop.FieldTripId, stopId: currentStop.id, stopSequence: sequence };
 
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, data);
-
 	};
 
 	RoutingFieldTripStopEditModal.prototype.removeStopSequenceGraphics = function()
