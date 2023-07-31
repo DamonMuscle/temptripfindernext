@@ -888,11 +888,12 @@
 	{
 		var self = this,
 			p = Promise.resolve(),
+			selectedIds = this.obSelectedDataSources().map(({value}) => value),
 			originalSelectedIds = (self.dataEntity && self.dataEntity.isCopy) ? [] : Array.from((self.dataEntity || {}).UDFDataSources || []).map(function(i) { return i.DBID; });
 
-		if (!_.isEqual(originalSelectedIds, self.selectedIds))
+		if (!_.isEqual(originalSelectedIds, selectedIds))
 		{
-			if (!self.selectedIds.length)
+			if (!selectedIds.length)
 			{
 				p = tf.promiseAjax.delete(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udfdatasources"), {
 					paramData: {
@@ -903,7 +904,7 @@
 			else
 			{
 				p = tf.promiseAjax.post(pathCombine(tf.api.apiPrefixWithoutDatabase(), "udfdatasources"), {
-					data: self.selectedIds.map(function(item)
+					data: selectedIds.map(function(item)
 					{
 						return {
 							UDFID: udfId, DBID: item
