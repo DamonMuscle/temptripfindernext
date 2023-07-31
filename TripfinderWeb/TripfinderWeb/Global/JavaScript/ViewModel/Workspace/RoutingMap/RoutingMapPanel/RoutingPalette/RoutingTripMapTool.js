@@ -1,16 +1,16 @@
 (function()
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingTripMapTool = RoutingTripMapTool;
-	function RoutingTripMapTool(viewModel)
+	function RoutingTripMapTool(fieldTripPaletteSectionVM)
 	{
 		var self = this;
-		self._map = viewModel._viewModal._map;
-		self.dataModel = viewModel.dataModel;
+		self._map = fieldTripPaletteSectionVM._viewModal._map;
+		self.dataModel = fieldTripPaletteSectionVM.dataModel;
 		self._arcgis = tf.map.ArcGIS;
-		self.editModal = viewModel.editFieldTripStopModal;
-		self._viewModal = viewModel._viewModal;
-		self.viewModel = viewModel;
-		TF.RoutingMap.EsriTool.call(self, self._map, self._arcgis, viewModel.viewModel);
+		self.editModal = fieldTripPaletteSectionVM.editFieldTripStopModal;
+		self._viewModal = fieldTripPaletteSectionVM._viewModal;
+		self.viewModel = fieldTripPaletteSectionVM;
+		TF.RoutingMap.EsriTool.call(self, self._map, self._arcgis, fieldTripPaletteSectionVM.viewModel);
 
 		self.initialize();
 

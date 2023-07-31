@@ -1,14 +1,13 @@
 (function()
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingFieldTripStopEditModal = RoutingFieldTripStopEditModal;
-	var TripStopHelper = TF.Helper.TripStopHelper;
 
-	function RoutingFieldTripStopEditModal(viewModel)
+	function RoutingFieldTripStopEditModal(fieldTripPaletteSectionVM)
 	{
-		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, viewModel, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingFieldTripStop");
+		TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.call(this, fieldTripPaletteSectionVM, "workspace/RoutingMap/RoutingMapPanel/RoutingPalette/EditRoutingFieldTripStop");
 
-		this.viewModel = viewModel;
-		this.dataModel = viewModel.dataModel;
+		this.viewModel = fieldTripPaletteSectionVM;
+		this.dataModel = fieldTripPaletteSectionVM.dataModel;
 		this.availableTrips = [];
 		this.obDataModel = this.createObservableDataModel(this.dataModel.fieldTripStopDataModel.getDataModel());
 

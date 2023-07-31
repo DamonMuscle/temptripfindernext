@@ -2,11 +2,11 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").FieldTripPaletteSectionViewModel = FieldTripPaletteSectionViewModel;
 
-	function FieldTripPaletteSectionViewModel(viewModel, routeState, trips)
+	function FieldTripPaletteSectionViewModel(routingPaletteVM, routeState, trips)
 	{
 		var self = this;
-		self.viewModel = viewModel;
-		self._viewModal = viewModel._viewModal;
+		self.viewModel = routingPaletteVM;
+		self._viewModal = routingPaletteVM._viewModal;
 		self.isEyeVisible = ko.observable(true);
 		self.isShowMode = ko.observable(true);
 		self.isShowMode.subscribe(self._changeShow.bind(self));
@@ -37,7 +37,7 @@
 		this.$element = $(element);
 		// this.documentChange = tf.documentManagerViewModel.obCurrentDocument.subscribe(function(document)
 		// {
-		// 	if (document == self._viewModal)
+		// 	if (document == self.viewModel._viewModal)
 		// 	{
 		// 		setTimeout(function()
 		// 		{

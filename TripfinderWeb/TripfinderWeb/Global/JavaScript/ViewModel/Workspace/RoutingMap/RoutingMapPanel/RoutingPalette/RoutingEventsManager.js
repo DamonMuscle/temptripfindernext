@@ -2,16 +2,16 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingEventsManager = RoutingEventsManager;
 
-	function RoutingEventsManager(viewModel, routeState)
+	function RoutingEventsManager(fieldTripPaletteSectionVM, routeState)
 	{
 		var self = this;
-		TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.call(this, viewModel, viewModel._viewModal);
+		TF.RoutingMap.RoutingPalette.BaseRoutingEventsManager.call(this, fieldTripPaletteSectionVM, fieldTripPaletteSectionVM.viewModel._viewModal);
 		self.routeState = routeState;
 		self.vrpTool = new TF.RoutingMap.RoutingPalette.VRPTool();
 		self.contiguousHelper = new TF.RoutingMap.RoutingPalette.ContiguousHelper();
-		self.dataModel = viewModel.dataModel;
-		self.playBackControl = viewModel.playBackControl;
-		self.display = viewModel.display;
+		self.dataModel = fieldTripPaletteSectionVM.dataModel;
+		self.playBackControl = fieldTripPaletteSectionVM.playBackControl;
+		self.display = fieldTripPaletteSectionVM.display;
 		self.obTripSelected = ko.observable(false);
 		self.obEditFieldTripSelected = ko.observable(false);
 		self.obVrpableTripsSelected = ko.observable(false);

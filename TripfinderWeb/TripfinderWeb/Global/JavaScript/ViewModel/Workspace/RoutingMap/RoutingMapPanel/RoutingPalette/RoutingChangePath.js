@@ -4,14 +4,14 @@
 	var CurbApproachEnum = TF.RoutingMap.Directions.Enum.CurbApproachEnum;
 	var LocationTypeEnum = TF.RoutingMap.Directions.Enum.LocationTypeEnum;
 
-	function RoutingChangePath(viewModel)
+	function RoutingChangePath(fieldTripPaletteSectionVM)
 	{
 		var self = this;
-		self.viewModel = viewModel;
-		self.routeState = viewModel._viewModal.routeState;
-		self._map = viewModel._viewModal._map;
-		self._arcgis = viewModel._viewModal._arcgis;
-		TF.RoutingMap.Directions.Tool.call(this, self._map, self._arcgis, viewModel._viewModal);
+		self.viewModel = fieldTripPaletteSectionVM;
+		self.routeState = fieldTripPaletteSectionVM._viewModal.routeState;
+		self._map = fieldTripPaletteSectionVM._viewModal._map;
+		self._arcgis = fieldTripPaletteSectionVM._viewModal._arcgis;
+		TF.RoutingMap.Directions.Tool.call(this, self._map, self._arcgis, fieldTripPaletteSectionVM._viewModal);
 		self.isChangeRouteChecked = true;
 		self.isMapDetailsChecked = true;
 		self.isDirectionDetailsRequired = true;

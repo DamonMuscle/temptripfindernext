@@ -2,12 +2,12 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingDisplay = RoutingDisplay;
 
-	function RoutingDisplay(viewModel)
+	function RoutingDisplay(fieldTripPaletteSectionVM)
 	{
 		var self = this;
-		self.viewModel = viewModel;
-		self.dataModel = self.viewModel.dataModel;
-		self.eventsManager = self.viewModel.eventsManager;
+		self.viewModel = fieldTripPaletteSectionVM;
+		self.dataModel = fieldTripPaletteSectionVM.dataModel;
+		self.eventsManager = fieldTripPaletteSectionVM.eventsManager;
 		self.isInitial = true;
 		self.dataSource = [];
 		self.obFooterDisplay = ko.observable("0 Field Trips, 0 Field Trip Stops");

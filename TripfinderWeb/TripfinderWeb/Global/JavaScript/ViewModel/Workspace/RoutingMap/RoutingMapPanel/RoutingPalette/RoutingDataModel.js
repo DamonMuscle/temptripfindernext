@@ -2,12 +2,12 @@
 {
 	createNamespace("TF.RoutingMap.RoutingPalette").RoutingDataModel = RoutingDataModel;
 
-	function RoutingDataModel(viewModel)
+	function RoutingDataModel(fieldTripPaletteSectionVM)
 	{
 		var self = this;
-		TF.RoutingMap.BaseMapDataModel.call(this, viewModel.viewModel._viewModal);
-		self.viewModel = viewModel;
-		self.routeState = viewModel.viewModel._viewModal.routeState;
+		TF.RoutingMap.BaseMapDataModel.call(this, fieldTripPaletteSectionVM.viewModel._viewModal);
+		self.viewModel = fieldTripPaletteSectionVM;
+		self.routeState = fieldTripPaletteSectionVM.viewModel._viewModal.routeState;
 		self.trips = [];
 		self.candidateStudents = [];
 		self.tripStopDictionary = {};
