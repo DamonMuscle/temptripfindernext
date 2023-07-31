@@ -14,6 +14,41 @@
 	}
 }
 
+.tabstrip-userdefinedfields {
+	.page-content {
+		.kendo-grid {
+			.k-command-cell
+			{
+				.k-button {
+					opacity: 0.6;
+					&:hover{
+						opacity: 0.8;
+					}
+
+					&.k-grid-export {
+						opacity: 0.8;
+						&:hover {
+							opacity: 1;
+						}
+					}
+
+					&.k-grid-copyandnew {
+						background: url('../../global/img/grid/Copy-and-New-5.png') no-repeat center center;
+					}
+
+					&.k-grid-edit {
+						background: url('../../global/img/grid/editor_pencil.png') no-repeat center center;
+					}
+
+					&.k-grid-delete {
+						background: url('../../global/img/menu/Delete-Black.png') no-repeat center center;
+					}
+				}
+			}
+		}
+	}
+}
+
 .switch-grid-menu.tf-contextmenu-white {
 	width: 195px;
 
