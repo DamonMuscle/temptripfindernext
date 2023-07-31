@@ -130,9 +130,10 @@
 		{
 			var phoneNumberWithCountryCodePatterns = PHONE_NUMBER_PATTERNS;
 			let longPhoneNumberMatched = false;
+			let longCleanPhone = cleanPhone.substr(0, 13); // long clean phone total length is 13
 			for (const pattern of phoneNumberWithCountryCodePatterns)
 			{
-				groups = cleanPhone.match(pattern.mode);
+				groups = longCleanPhone.match(pattern.mode);
 				if (groups)
 				{
 					content = pattern.display.format(groups[1], groups[2], groups[3]);
