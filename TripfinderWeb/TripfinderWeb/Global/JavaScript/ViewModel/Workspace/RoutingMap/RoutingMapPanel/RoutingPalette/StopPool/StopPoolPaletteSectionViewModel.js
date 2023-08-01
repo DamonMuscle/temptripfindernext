@@ -1,8 +1,8 @@
 (function()
 {
-	createNamespace("TF.RoutingMap.RoutingPalette").StopPoolViewModel = StopPoolViewModel;
+	createNamespace("TF.RoutingMap.RoutingPalette").StopPoolPaletteSectionViewModel = StopPoolPaletteSectionViewModel;
 
-	function StopPoolViewModel(viewModel)
+	function StopPoolPaletteSectionViewModel(viewModel)
 	{
 		var self = this;
 		self.viewModel = viewModel;
@@ -23,12 +23,12 @@
 		});
 	}
 
-	StopPoolViewModel.prototype.uiInit = function(model, element)
+	StopPoolPaletteSectionViewModel.prototype.uiInit = function(model, element)
 	{
 		this.$element = $(element);
 	};
 
-	StopPoolViewModel.prototype._onMapLoad = function()
+	StopPoolPaletteSectionViewModel.prototype._onMapLoad = function()
 	{
 		var self = this;
 		if (!self.drawTool)
@@ -42,20 +42,20 @@
 		}
 	};
 
-	StopPoolViewModel.prototype.show = function()
+	StopPoolPaletteSectionViewModel.prototype.show = function()
 	{
 		this.dataModel.init();
 		return Promise.resolve(true);
 	};
 
-	StopPoolViewModel.prototype.toggleShow = function(data, event)
+	StopPoolPaletteSectionViewModel.prototype.toggleShow = function(data, event)
 	{
 		event.stopPropagation();
 		var self = this;
 		self.isShowMode(!self.isShowMode());
 	};
 
-	StopPoolViewModel.prototype._changeShow = function()
+	StopPoolPaletteSectionViewModel.prototype._changeShow = function()
 	{
 		var self = this;
 		if (self.editTool && self.editTool.isEditing)
@@ -71,7 +71,7 @@
 		self.viewModel.childViewShowChange();
 	};
 
-	StopPoolViewModel.prototype.getLayers = function()
+	StopPoolPaletteSectionViewModel.prototype.getLayers = function()
 	{
 		var self = this;
 		return self.layers.map(function(item)
@@ -80,7 +80,7 @@
 		}).filter(function(c) { return c; });
 	};
 
-	StopPoolViewModel.prototype.close = function()
+	StopPoolPaletteSectionViewModel.prototype.close = function()
 	{
 		var layers = this.getLayers();
 		this._viewModal.setMode("StopPool", "Normal");
@@ -96,23 +96,23 @@
 		return Promise.resolve(true);
 	};
 
-	StopPoolViewModel.prototype.unSaveCheck = function()
+	StopPoolPaletteSectionViewModel.prototype.unSaveCheck = function()
 	{
 		var self = this;
 		return self.dataModel.unSaveCheck();
 	};
 
-	StopPoolViewModel.prototype.save = function()
+	StopPoolPaletteSectionViewModel.prototype.save = function()
 	{
 		return this.dataModel.save();
 	};
 
-	StopPoolViewModel.prototype.revert = function()
+	StopPoolPaletteSectionViewModel.prototype.revert = function()
 	{
 		return this.dataModel.revert(false);
 	};
 
-	StopPoolViewModel.prototype.dispose = function()
+	StopPoolPaletteSectionViewModel.prototype.dispose = function()
 	{
 		this.dataModel.dispose();
 		this.drawTool && this.drawTool.dispose && this.drawTool.dispose();

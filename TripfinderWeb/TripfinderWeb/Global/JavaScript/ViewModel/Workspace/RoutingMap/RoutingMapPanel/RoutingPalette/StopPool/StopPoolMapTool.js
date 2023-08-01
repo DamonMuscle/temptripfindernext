@@ -6,11 +6,11 @@
 	{
 		var self = this;
 		self.viewModel = viewModel.parentViewModel;
-		self.stopPoolViewModel = viewModel;
+		self.stopPoolPaletteSection = viewModel;
 		self._map = viewModel.parentViewModel._viewModal._map;
 		self.dataModel = viewModel.dataModel;
 		self._arcgis = tf.map.ArcGIS;
-		self.editModal = self.viewModel.stopPoolViewModel.editModal;
+		self.editModal = self.viewModel.stopPoolPaletteSection.editModal;
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(self);
 		self.NAtool = new TF.RoutingMap.RoutingPalette.NetworkAnalysisTool(self);
 		self.initialize();
@@ -32,8 +32,8 @@
 		var self = this;
 		var layerIds = { pointLayerId: "stopPoolPointLayer", polygonLayerId: "stopPoolFeatureLayer" };
 		self.initializeBase.apply(self, [layerIds]);
-		self.stopPoolViewModel.layers.push(layerIds.pointLayerId);
-		self.stopPoolViewModel.layers.push(layerIds.polygonLayerId);
+		self.stopPoolPaletteSection.layers.push(layerIds.pointLayerId);
+		self.stopPoolPaletteSection.layers.push(layerIds.polygonLayerId);
 		self.initializeOtherLayers();
 		self.initializeSettings();
 	}
@@ -45,19 +45,19 @@
 			"id": "stopPoolPreviewLayer"
 		});
 		self._map.add(self._previewLayer);
-		self.stopPoolViewModel.layers.push(self._previewLayer.id);
+		self.stopPoolPaletteSection.layers.push(self._previewLayer.id);
 
 		self._tempWalkoutLayer = new self._arcgis.GraphicsLayer({
 			"id": "stopPoolTempWalkoutLayer"
 		});
 		self._map.add(self._tempWalkoutLayer);
-		self.stopPoolViewModel.layers.push(self._tempWalkoutLayer.id);
+		self.stopPoolPaletteSection.layers.push(self._tempWalkoutLayer.id);
 
 		self._walkoutGuideLayer = new self._arcgis.GraphicsLayer({
 			"id": "stopPoolWalkoutGuideLayer"
 		});
 		self._map.add(self._walkoutGuideLayer);
-		self.stopPoolViewModel.layers.push(self._walkoutGuideLayer.id);
+		self.stopPoolPaletteSection.layers.push(self._walkoutGuideLayer.id);
 	};
 
 	StopPoolMapTool.prototype.initializeSettings = function()
@@ -79,7 +79,7 @@
 
 	StopPoolMapTool.prototype.getDataModel = function()
 	{
-		return this.stopPoolViewModel.dataModel;
+		return this.stopPoolPaletteSection.dataModel;
 	};
 
 	StopPoolMapTool.prototype.startPreview = function(geometryType)
@@ -614,7 +614,7 @@
 				TotalStopTime: tripStop.TotalStopTime,
 				ProhibitCrosser: tripStop.ProhibitCrosser
 			};
-			self.viewModel.stopPoolViewModel.dataModel.create(data);
+			self.viewModel.stopPoolPaletteSection.dataModel.create(data);
 		});
 	};
 
@@ -642,7 +642,7 @@
 			}
 		}
 
-		return self.viewModel.stopPoolViewModel.editModal.create({
+		return self.viewModel.stopPoolPaletteSection.editModal.create({
 			geometry: tripStop.geometry,
 			Street: tripStop.Street,
 			City: tripStop.City,

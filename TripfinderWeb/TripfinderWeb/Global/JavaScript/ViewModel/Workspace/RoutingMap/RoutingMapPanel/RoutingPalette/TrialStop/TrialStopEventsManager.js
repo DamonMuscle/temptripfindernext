@@ -63,7 +63,7 @@
 	TrialStopEventsManager.prototype.createPoolStop = function(trialStop)
 	{
 		var self = this;
-		return self.viewModel.stopPoolViewModel.drawTool.copyToStopPool(trialStop);
+		return self.viewModel.stopPoolPaletteSection.drawTool.copyToStopPool(trialStop);
 	};
 
 	TrialStopEventsManager.prototype.createTripStop = function(trialStop)
@@ -311,7 +311,7 @@
 
 	TrialStopEventsManager.prototype.createPoolStopFromSelectionClick = function()
 	{
-		var self = this, stops = [], drawTool = self.viewModel.viewModel.stopPoolViewModel.drawTool;
+		var self = this, stops = [], drawTool = self.viewModel.viewModel.stopPoolPaletteSection.drawTool;
 		var currentStops = drawTool._pointLayer.graphics.items.map(function(graphic) { return graphic.attributes.dataModel; });
 		this.dataModel.highlighted.forEach(function(stop)
 		{

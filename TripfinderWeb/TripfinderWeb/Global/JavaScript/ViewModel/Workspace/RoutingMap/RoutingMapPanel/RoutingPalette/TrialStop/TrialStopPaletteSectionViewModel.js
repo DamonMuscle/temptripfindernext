@@ -1,13 +1,13 @@
 (function()
 {
-	createNamespace("TF.RoutingMap.RoutingPalette").TrialStopViewModel = TrialStopViewModel;
+	createNamespace("TF.RoutingMap.RoutingPalette").TrialStopPaletteSectionViewModel = TrialStopPaletteSectionViewModel;
 
-	function TrialStopViewModel(viewModel)
+	function TrialStopPaletteSectionViewModel(viewModel)
 	{
 		var self = this;
 		self.viewModel = viewModel;
 		self._viewModal = viewModel._viewModal;
-		self.stopPoolViewModel = viewModel.stopPoolViewModel;
+		self.stopPoolPaletteSection = viewModel.stopPoolPaletteSection;
 		self.fieldTripPaletteSection = viewModel.fieldTripPaletteSection;
 		self.isShowMode = ko.observable(true);
 		self.tripDataModel = self.fieldTripPaletteSection.dataModel;
@@ -24,16 +24,16 @@
 		});
 		self.newPoolStopHeaderName = ko.computed(function()
 		{
-			return 'Copy to ' + (viewModel.stopPoolViewModel.display.obStopPoolName() != '' ? viewModel.stopPoolViewModel.display.obStopPoolName() : 'Pool Stop') + ' from Selection';
+			return 'Copy to ' + (viewModel.stopPoolPaletteSection.display.obStopPoolName() != '' ? viewModel.stopPoolPaletteSection.display.obStopPoolName() : 'Pool Stop') + ' from Selection';
 		});
 	}
 
-	TrialStopViewModel.prototype.uiInit = function(model, element)
+	TrialStopPaletteSectionViewModel.prototype.uiInit = function(model, element)
 	{
 		this.$element = $(element);
 	};
 
-	TrialStopViewModel.prototype._onMapLoad = function()
+	TrialStopPaletteSectionViewModel.prototype._onMapLoad = function()
 	{
 		var self = this;
 		if (!self.drawTool)
@@ -43,19 +43,19 @@
 		self.drawTool.selectionChange.subscribe(self.eventsManager.selectionChange.bind(this));
 	};
 
-	TrialStopViewModel.prototype.show = function()
+	TrialStopPaletteSectionViewModel.prototype.show = function()
 	{
 		return Promise.resolve(true);
 	};
 
-	TrialStopViewModel.prototype.toggleShow = function(data, event)
+	TrialStopPaletteSectionViewModel.prototype.toggleShow = function(data, event)
 	{
 		event.stopPropagation();
 		var self = this;
 		self.isShowMode(!self.isShowMode());
 	};
 
-	TrialStopViewModel.prototype._changeShow = function()
+	TrialStopPaletteSectionViewModel.prototype._changeShow = function()
 	{
 		var self = this;
 		var layers = this.getLayers();
@@ -66,7 +66,7 @@
 		self.parentViewModel.childViewShowChange();
 	};
 
-	TrialStopViewModel.prototype.getLayers = function()
+	TrialStopPaletteSectionViewModel.prototype.getLayers = function()
 	{
 		var self = this;
 		return self.layers.map(function(item)
@@ -75,12 +75,12 @@
 		}).filter(function(c) { return c; });
 	};
 
-	TrialStopViewModel.prototype.close = function()
+	TrialStopPaletteSectionViewModel.prototype.close = function()
 	{
 		return this.dataModel.close();
 	};
 
-	TrialStopViewModel.prototype.dispose = function()
+	TrialStopPaletteSectionViewModel.prototype.dispose = function()
 	{
 		this.dataModel.dispose();
 		this.drawTool && this.drawTool.dispose && this.drawTool.dispose();

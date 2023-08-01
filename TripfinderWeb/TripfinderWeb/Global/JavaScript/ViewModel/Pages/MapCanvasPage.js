@@ -175,10 +175,10 @@
 					self.routingPaletteViewModel.drawTool.revert(self.revertData, revertType);
 				} else if (self.revertMode.toLowerCase().indexOf("stoppool") > 0)
 				{
-					self.routingPaletteViewModel.stopPoolViewModel.drawTool.revert(self.revertData, revertType);
+					self.routingPaletteViewModel.stopPoolPaletteSection.drawTool.revert(self.revertData, revertType);
 				} else if (self.revertMode.toLowerCase().indexOf("trialstop") > 0)
 				{
-					self.routingPaletteViewModel.trialStopViewModel.drawTool.revert(self.revertData, revertType);
+					self.routingPaletteViewModel.trialStopPaletteSection.drawTool.revert(self.revertData, revertType);
 				} else if (self.revertMode.toLowerCase().indexOf("mystreets") > 0)
 				{
 					self.mapEditingPaletteViewModel.myStreetsViewModel.drawTool.revert(self.revertData, revertType);

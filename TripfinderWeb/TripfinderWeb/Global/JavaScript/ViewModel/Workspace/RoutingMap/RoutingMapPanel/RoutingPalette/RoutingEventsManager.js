@@ -641,8 +641,8 @@
 				routingDataModel: self.dataModel,
 				tripStops: selectedItems,
 				trips: self.dataModel.getEditTrips(),
-				stopPoolName: self.viewModel.stopPoolViewModel.display.obStopPoolName(),
-				stopPoolColor: self.viewModel.stopPoolViewModel.display.obStopPoolColor()
+				stopPoolName: self.viewModel.stopPoolPaletteSection.display.obStopPoolName(),
+				stopPoolColor: self.viewModel.stopPoolPaletteSection.display.obStopPoolColor()
 			};
 
 			tf.modalManager.showModal(new TF.RoutingMap.RoutingPalette.AssignStopsModalViewModel(options))
@@ -659,7 +659,7 @@
 					}
 					else
 					{
-						self.viewModel.stopPoolViewModel.drawTool.copyToStopPools(data.selectedTripStops);
+						self.viewModel.stopPoolPaletteSection.drawTool.copyToStopPools(data.selectedTripStops);
 					}
 				});
 		}
@@ -687,7 +687,7 @@
 	{
 		var self = this;
 		var tripStop = self.dataModel.getFieldTripStopByStopId(tripStopId);
-		return self.viewModel.viewModel.stopPoolViewModel.drawTool.copyToStopPool(tripStop);
+		return self.viewModel.viewModel.stopPoolPaletteSection.drawTool.copyToStopPool(tripStop);
 	};
 
 	RoutingEventsManager.prototype._toDictionary = function(data)
