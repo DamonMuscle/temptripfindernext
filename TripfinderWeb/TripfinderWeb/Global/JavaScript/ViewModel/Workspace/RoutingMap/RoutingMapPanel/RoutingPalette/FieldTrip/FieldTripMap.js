@@ -45,6 +45,7 @@
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		this.layerManager = new TF.GIS.LayerManager(mapInstance);
 		this._pathLineType = tf.storageManager.get('pathLineType') === 'Sequence' ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
+		this._fieldTripsData = null;
 		this._editing = {
 			isAddingStop: false,
 			isMovingStop: false,
@@ -81,6 +82,16 @@
 	{
 		this.pathLineType = isSequenceLine ? PATH_LINE_TYPE.Sequence : PATH_LINE_TYPE.Path;
 	}
+
+	Object.defineProperty(FieldTripMap.prototype, 'fieldTripsData', {
+		get() { return this._fieldTripsData; },
+		set(value)
+		{
+			this._fieldTripsData = value;
+		},
+		enumerable: false,
+		configurable: false
+	});
 
 	Object.defineProperty(FieldTripMap.prototype, 'editing', {
 		get() { return this._editing; },
@@ -140,7 +151,7 @@
 		self.defineReadOnlyProperty("fieldTripHighlightStopLayerInstance", self.fieldTripHighlightStopLayerInstance);
 	}
 
-	FieldTripMap.prototype.initArrowLayers = function(fieldTrips)
+	FieldTripMap.prototype.initArrowLayers = function()
 	{
 		const self = this;
 		if (!self.mapInstance)
@@ -157,7 +168,7 @@
 			self.fieldTripSequenceLineArrowLayerInstance = null;
 		}
 
-		const arrowRenderer = self._getArrowRenderer(fieldTrips);
+		const arrowRenderer = self._getArrowRenderer();
 		self.fieldTripPathArrowLayerInstance = self.arrowLayerHelper.create(RoutingPalette_FieldTripPathArrowLayerId, RoutingPalette_FieldTripPathArrowLayer_Index, arrowRenderer);
 		self.fieldTripSequenceLineArrowLayerInstance = self.arrowLayerHelper.create(RoutingPalette_FieldTripSequenceLineArrowLayerId, RoutingPalette_FieldTripSequenceLineArrowLayer_Index, arrowRenderer);
 	}
@@ -188,9 +199,10 @@
 		await this.drawSequenceLine(fieldTrip);
 	}
 
-	FieldTripMap.prototype.orderFeatures = async function(fieldTrips)
+	FieldTripMap.prototype.orderFeatures = async function()
 	{
-		const self = this;
+		const self = this,
+			fieldTrips = self.fieldTripsData,
 			sortedFieldTrips = self._sortFieldTripByName(fieldTrips),
 			sortedStopFeatures = self._sortStopFeaturesByFieldTrips(sortedFieldTrips),
 			sortedPathFeatures = self._sortPathFeaturesByFieldTrips(sortedFieldTrips),
@@ -499,7 +511,7 @@
 
 	FieldTripMap.prototype.switchPathType = async function(fieldTrips)
 	{
-		this.updateArrowRenderer(fieldTrips);
+		this.updateArrowRenderer();
 		await this.updateFieldTripPathVisibility(fieldTrips);
 	}
 
@@ -630,6 +642,8 @@
 
 		await this.addFieldTripPath(fieldTrip, effectSequences);
 		await this.updateFieldTripPathVisibility([fieldTrip]);
+
+		this.orderFeatures();
 		this.zoomToFieldTripLayers([fieldTrip]);
 	}
 
@@ -1201,11 +1215,12 @@
 
 	//#region - Path Arrows
 
-	FieldTripMap.prototype._getArrowRenderer = function(fieldTrips)
+	FieldTripMap.prototype._getArrowRenderer = function()
 	{
 		const self = this,
 		 	uniqueValueInfos = [],
-			arrowOnPath = self._isArrowOnPath();
+			arrowOnPath = self._isArrowOnPath(),
+			fieldTrips = this.fieldTripsData;
 		
 		// sort by Name to make sure the arrow z-index is correct.
 		const fieldTripsClone = [...fieldTrips];
@@ -1223,9 +1238,9 @@
 		return self.arrowLayerHelper.createUniqueValueRenderer(uniqueValueInfos);
 	}
 
-	FieldTripMap.prototype.updateArrowRenderer = function(fieldTrips)
+	FieldTripMap.prototype.updateArrowRenderer = function()
 	{
-		const arrowRenderer = this._getArrowRenderer(fieldTrips);
+		const arrowRenderer = this._getArrowRenderer();
 		this.fieldTripPathArrowLayerInstance.layer.renderer = arrowRenderer;
 		this.fieldTripSequenceLineArrowLayerInstance.layer.renderer = arrowRenderer;
 	}

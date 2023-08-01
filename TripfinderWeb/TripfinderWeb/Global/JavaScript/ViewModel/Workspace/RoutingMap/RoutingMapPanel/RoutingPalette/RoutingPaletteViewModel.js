@@ -172,7 +172,8 @@
 			fieldTripCount = fieldTrips.length;
 		if (fieldTripCount > 0)
 		{
-			this.fieldTripMap.initArrowLayers(fieldTrips);
+			this.fieldTripMap.fieldTripsData = fieldTrips;
+			this.fieldTripMap.initArrowLayers();
 		}
 
 		if (data && (data.add.length > 0))
@@ -188,10 +189,10 @@
 		
 		if (fieldTripCount > 0)
 		{
-			this.fieldTripMap.updateArrowRenderer(fieldTrips);
+			this.fieldTripMap.updateArrowRenderer();
 			await this.fieldTripMap.setFieldTripStopVisibility(fieldTrips);
 			await this.fieldTripMap.updateFieldTripPathVisibility(fieldTrips);
-			await this.fieldTripMap.orderFeatures(fieldTrips);
+			await this.fieldTripMap.orderFeatures();
 			this.fieldTripMap.zoomToFieldTripLayers(fieldTrips);
 		}
 	}
@@ -214,7 +215,7 @@
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
 	{
 		// make sure the arrows is correct after map extent changes when layer is hide.
-		this.fieldTripMap?.updateArrowRenderer(this.dataModel.trips);
+		this.fieldTripMap?.updateArrowRenderer();
 		this.fieldTripMap?.setFieldTripVisibility(data);
 	}
 
