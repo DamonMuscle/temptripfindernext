@@ -22,7 +22,7 @@
 			return self.dataModel.obSelfChangeCount() > 0;
 		});
 		self.bindRefreshMissingTripPathEvent();
-		self.requireDetails = new TF.Events.Event();
+		self.requireDetailsEvent = new TF.Events.Event();
 
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, self.onAddStopFromMapCompleted.bind(self));
 	}
@@ -1161,7 +1161,7 @@
 
 	RoutingEventsManager.prototype.tripDetailsClick = function(data)
 	{
-		this.requireDetails.notify({ dataType: "trip", ids: [data.id] });
+		this.requireDetailsEvent.notify({ dataType: "trip", ids: [data.id] });
 	};
 
 	// #region vrp 

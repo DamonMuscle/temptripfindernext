@@ -30,7 +30,11 @@
 		self.onUpdateRecordsEvent = new TF.Events.Event();
 		self.menuDataUpdateEvent = new TF.Events.Event();
 		self.onStopEditingEvent = new TF.Events.Event();
-		self.requireDetails = new TF.Events.Event();
+
+		self.onMapViewExtentChangeEvent = new TF.Events.Event();
+		self.onMapViewClickEvent = new TF.Events.Event();
+		self.onMapViewPointerMoveEvent = new TF.Events.Event();
+		self.onMapViewKeyUpEvent = new TF.Events.Event();
 
 		// arrange the panels and palettes.
 
@@ -72,9 +76,8 @@
 		self.traceManager = {obShow: ko.observable(false)}; // new TF.RoutingMap.TracingManager();
 		self.routingSnapManager = new TF.Document.RoutingSnapManger(self);
 		// self.routingSnapManager.snapToggleEvent.subscribe(self.snapToggleEvent.bind(self));
-		// self.routingPaletteViewModel.fieldTripPaletteSection.eventsManager.requireDetails.subscribe((e, data) =>
+		// self.routingPaletteViewModel.fieldTripPaletteSection.eventsManager.requireDetailsEvent.subscribe((e, data) =>
 		// {
-		// 	self.requireDetails.notify(data);
 		// });
 	};
 
@@ -142,22 +145,22 @@
 
 	MapCanvasPage.prototype.onMapViewExtentChanges = function(previous, extent, _)
 	{
-		PubSub.publish("on_MapCanvas_MapExtentChange", {previous, extent});
+		this.onMapViewExtentChangeEvent.notify({previous, extent});
 	}
 
 	MapCanvasPage.prototype.onMapViewClick = function(event)
 	{
-		PubSub.publish("on_MapCanvas_MapViewClick", { event });
+		this.onMapViewClickEvent.notify({event});
 	}
 
 	MapCanvasPage.prototype.onMapViewPointerMove = function(event)
 	{
-		PubSub.publish("on_MapCanvas_MapViewPointerMove", { event });
+		this.onMapViewPointerMoveEvent.notify({event});
 	}
 
 	MapCanvasPage.prototype.onMapViewKeyUp = function(event)
 	{
-		PubSub.publish("on_MapCanvas_MapViewKeyUp", { event });
+		this.onMapViewKeyUpEvent.notify({event});
 	}
 
 	MapCanvasPage.prototype._initRevertOperation = function()
@@ -1197,6 +1200,11 @@
 		this.onUpdateRecordsEvent?.unsubscribeAll();
 		this.menuDataUpdateEvent?.unsubscribeAll();
 		this.onStopEditingEvent?.unsubscribeAll();
+		this.onMapViewExtentChangeEvent?.unsubscribeAll();
+		this.onMapViewClickEvent?.unsubscribeAll();
+		this.onMapViewPointerMoveEvent?.unsubscribeAll();
+		this.onMapViewKeyUpEvent?.unsubscribeAll();
+
 		// this.routingSnapManager.dispose();
 
 		this.directionPaletteViewModel?.dispose();
