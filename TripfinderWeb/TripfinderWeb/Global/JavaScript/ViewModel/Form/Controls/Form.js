@@ -278,7 +278,7 @@
 			let udGridRecords = await tf.udgHelper.getUDGridRecordsWithRecordId(self.options.ID, self.options.DataTypeId, this.obRecordID());
 			if (udGridRecords && udGridRecords.length > 0)
 			{
-				return tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED, 'Warning').then(()=>
+				return tf.promiseBootbox.alert(TF.DetailView.UserDefinedGridHelper.ONE_RESPONSE_HAS_SUBMITTED, 'Warning').then(() =>
 				{
 					return null;
 				});
@@ -370,15 +370,16 @@
 					//filter out attachment since multi-documents saved in sperate table
 					if (q.field.questionType !== 'AttachBlock')
 					{
-						const _isPhoneType = function(q) {
+						const _isPhoneType = function(q)
+						{
 							let systemFieldConfig = tf.systemFieldsConfig[q.dataTypeId];
 							if (!systemFieldConfig) 
 							{
 								return q.field.FieldOptions.TypeName === 'Phone Number';
 							}
-							
+
 							let type = systemFieldConfig[q.field.FieldOptions.DefaultText]?.type;
-							return q.field.FieldOptions.TypeName === 'Phone Number' || 
+							return q.field.FieldOptions.TypeName === 'Phone Number' ||
 								(q.field.FieldOptions.TypeName === 'System Field' && type === 'Phone Number')
 						}
 
@@ -1287,6 +1288,9 @@
 
 	Form.prototype.createQuestions = function(element, newFields, currentSection)
 	{
+		const fieldExtension = {
+			isPublicForm: this.options.Public,
+		};
 		let fields = newFields.sort((a, b) => a.Index - b.Index),
 			questionContainer = element;
 
@@ -1305,7 +1309,9 @@
 			{
 				return;
 			}
-			let questionControl = new TF.Control.Form[field.questionType + 'Question'](field, this.options.DataTypeId, this.onFormElementInit);
+
+			const config = $.extend({}, field, fieldExtension);
+			let questionControl = new TF.Control.Form[field.questionType + 'Question'](config, this.options.DataTypeId, this.onFormElementInit);
 			this.questions.push(questionControl);
 			if (currentSection)
 			{

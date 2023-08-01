@@ -175,6 +175,9 @@
 
 	ListFromDataQuestion.prototype.getDataItems = function(listDataOptions)
 	{
+		const isPublicForm = this.field.isPublicForm;
+		const listDataType = listDataOptions.dataType;
+
 		const formatValue = (col, value) =>
 		{
 			if (!col)
@@ -309,7 +312,12 @@
 
 		const getItems = function(whereClause)
 		{
-			const requestUrl = pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(listDataOptions.dataType));
+			if (!isPublicForm && !tf.authManager.isAuthorizedForDataType(listDataType, 'read'))
+			{
+				return Promise.resolve([]);
+			}
+
+			const requestUrl = pathCombine(tf.api.apiPrefix(), "search", tf.dataTypeHelper.getEndpoint(listDataType));
 			const requestOption = {
 				data: { fields: ["Id", listDataOptions.field.name], filterClause: whereClause, sortItems: [{ Name: listDataOptions.field.name, isAscending: 'asc', Direction: 'Ascending' }] }
 			};
@@ -324,7 +332,7 @@
 
 					if (col === null)
 					{
-						const gridColumns = TF.Grid.FilterHelper.getGridDefinitionByType(listDataOptions.dataType);
+						const gridColumns = TF.Grid.FilterHelper.getGridDefinitionByType(listDataType);
 						col = gridColumns.Columns.find(x => x.FieldName === listDataOptions.field.name);
 						if (col)
 						{
@@ -348,7 +356,7 @@
 									School: schoolListProcess
 								}
 							};
-							const listItemConverter = specialConvertFunctions[listDataOptions.dataType] && specialConvertFunctions[listDataOptions.dataType][listDataOptions.field.name];
+							const listItemConverter = specialConvertFunctions[listDataType] && specialConvertFunctions[listDataType][listDataOptions.field.name];
 							if (listItemConverter)
 							{
 								col.listItemConverter = listItemConverter;
