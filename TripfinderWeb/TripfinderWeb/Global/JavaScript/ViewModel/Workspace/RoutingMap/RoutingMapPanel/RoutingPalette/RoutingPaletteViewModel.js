@@ -38,9 +38,9 @@
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated, self.onFieldTripMapDirectionUpdated.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop, self.onFieldTripMapHighlightFieldTripStop.bind(self));
 		PubSub.subscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop, self.onFieldTripMapClearHighlightFieldTripStop.bind(self));
-		PubSub.subscribe("on_MapCanvas_MapExtentChange", self.onMapCanvasMapExtentChange.bind(self));
-		PubSub.subscribe("on_MapCanvas_MapViewClick", self.onMapCanvasMapViewClick.bind(self));
-		PubSub.subscribe("on_MapCanvas_MapViewKeyUp", self.onMapCanvasMapViewKeyUp.bind(self));
+		mapCanvasPage.onMapViewExtentChangeEvent.subscribe(self.onMapCanvasMapExtentChange.bind(self));
+		mapCanvasPage.onMapViewClickEvent.subscribe(self.onMapCanvasMapViewClick.bind(self));
+		mapCanvasPage.onMapViewKeyUpEvent.subscribe(self.onMapCanvasMapViewKeyUp.bind(self));
 		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
 		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
 
@@ -403,20 +403,20 @@
 		this.fieldTripMap?.clearHighlightFeatures();
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(_, data)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapExtentChange = function(event, data)
 	{
 		const fieldTrips = this.dataModel.trips;
 		this.fieldTripMap?.onMapCanvasMapExtentChangeEvent(fieldTrips);
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, event)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(event, data)
 	{
-		this.fieldTripMap?.onMapClickEvent(event);
+		this.fieldTripMap?.onMapClickEvent(data);
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapViewKeyUp = function(_, event)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewKeyUp = function(event, data)
 	{
-		this.fieldTripMap?.onMapKeyUpEvent(event);
+		this.fieldTripMap?.onMapKeyUpEvent(data);
 	}
 
 	RoutingPaletteViewModel.prototype.close = function()
@@ -478,9 +478,6 @@
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.DirectionUpdated);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.HighlightFieldTripStop);
 		PubSub.unsubscribe(TF.RoutingPalette.FieldTripMapEventEnum.ClearHighlightFieldTripStop);
-		PubSub.unsubscribe("on_MapCanvas_MapExtentChange");
-		PubSub.unsubscribe("on_MapCanvas_MapViewClick");
-		PubSub.unsubscribe("on_MapCanvas_MapViewKeyUp");
 		PubSub.unsubscribe("on_MapCanvas_RecalculateTripMove");
 		PubSub.unsubscribe("on_MapCanvas_RefreshTripByStops");
 
