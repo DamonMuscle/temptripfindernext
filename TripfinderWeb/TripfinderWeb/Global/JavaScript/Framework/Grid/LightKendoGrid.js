@@ -4094,6 +4094,22 @@
 			(columnField.questionType?.toLowerCase() === "systemfield" && _isSystemFieldPhoneNumber(columnField)));
 	}
 
+	function updateFilterItemsForEmptyType(filterSet)
+	{
+		if (!filterSet)
+			return filterSet;
+
+		filterSet.FilterItems.map(function (item)
+		{
+			if (["isnull", "isnotnull"].includes(item.Operator.toLowerCase()))
+			{
+				item.value = '';
+			}
+		});
+
+		return filterSet;
+	}
+
 	LightKendoGrid.prototype.getApiRequestOption = function (kendoOptions)
 	{
 		let paramData = {
@@ -4350,6 +4366,7 @@
 		if (options.data.filterSet && options.data.filterSet.FilterItems && options.data.filterSet.FilterItems.length > 0)
 		{
 			updateFilterItemsUDFFilterName(options.data.filterSet);
+			updateFilterItemsForEmptyType(options.data.filterSet);
 		}
 
 		if (options.data.filterSet && options.data.filterSet.FilterSets && options.data.filterSet.FilterSets.length > 0)
