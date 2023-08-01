@@ -566,7 +566,6 @@
 		this._drawNewStopFromMap(data);
 		this.clearHighlightFeatures();
 		await this._drawNewStopPathFromMap(data);
-		await this.orderFeatures();
 
 		callback();
 	}
@@ -638,7 +637,7 @@
 			stopLayerInstance = self.fieldTripStopLayerInstance,
 			{ id, DBID, FieldTripId, Name, Notes, Sequence, VehicleCurbApproach, XCoord, YCoord } = data,
 			CurbApproach = VehicleCurbApproach,
-			Color = self.fieldTripsData.find(item => item.id === FieldTripId)?.color,
+			Color = self.fieldTripsData.find(item => item.id === FieldTripId)?.color || INFO_STOP_COLOR,  // prevent Color is undefined
 			attributes = { DBID, FieldTripId, id, Name, CurbApproach, Sequence, Color},
 			newStopGraphic = stopLayerInstance.createStop(XCoord, YCoord, attributes);
 
