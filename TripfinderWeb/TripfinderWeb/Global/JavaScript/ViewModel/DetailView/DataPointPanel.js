@@ -419,108 +419,71 @@
 		var self = this,
 			dataPointGroup,
 			requiredFields = tf.helpers.detailViewHelper.getRequiredFields(self.gridType),
-			dataTypeName = tf.dataTypeHelper.getFormalDataTypeName(self.gridType),
-			dataTypeId = tf.dataTypeHelper.getId(self.gridType),
+			dataTypeName = tf.dataTypeHelper.getDisplayNameByDataType(self.gridType),
 			dataPointsForCurrentPage = dataPointsJSON[self.gridType];
 
 		self.pageTitle(tf.applicationTerm.getApplicationTermPluralByName(dataTypeName).toUpperCase());
 		self.updateHighlightBlocks(blocks);
 
+		var isAdd = !self.detailView || !self.detailView.recordId;
 		return Promise.all([
-			self.userDefinedFieldHelper.get(self.gridType),
-			tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "datapointgroups"), {
-				paramData: {
-					DataTypeId: dataTypeId
-				}
-			}),
-			tf.udgHelper.getUDGridsByDataType(self.gridType),
-			tf.UDFDefinition.RetrieveByType(self.gridType)
+			tf.dataPointHelper.updateDataPointUDF(self.gridType, isAdd),
+			tf.dataPointHelper.getDataPointGroups(self.gridType)
 		]).then(function(values)
 		{
-			var udfResult = values[0];
+			if (!self.gridType) return;
 
 			self.groups.length = 0;
 			self.allColumns.length = 0;
 
-			if (udfResult)
+			if (dataPointsForCurrentPage)
 			{
-				var userdefinedpoints = []
-				var drtrspoints = []
-				udfResult.forEach(function(i)
+				Object.keys(dataPointsForCurrentPage).forEach(function(key)
 				{
-					if (!!i)
+					if (dataPointsForCurrentPage[key].length > 0)
 					{
-
-						if ((i.AttributeFlag & 1) == 1) //if it contains DRTRS enum id
+						let dataPointsColumns = dataPointsForCurrentPage[key].map(column =>
 						{
-							drtrspoints.push(i);
-						}
-						else
+							var c = {
+								...column
+							};
+							if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
+							{
+								c.isRequired = true;
+							}
+							c.obIsMultiCount = ko.observable();
+							c.obIsMultiCount = ko.computed(function()
+							{
+								return c.multiCount >= 1 ? true : false;
+							}, this);
+
+							let existBlocks = c.field === 'UDGridId' ?
+								self.highlightBlocks().filter(el => el.UDGridId === c.UDGridId) :
+								c.UDFId ? self.highlightBlocks().filter(el => el.UDFId === c.UDFId) :
+									self.highlightBlocks().filter(el => el.field === c.field);
+							if (existBlocks.length > 0)
+							{
+								c.hasHighlight = true;
+								c.multiCount = existBlocks.length;
+							} else
+							{
+								c.hasHighlight = false;
+								c.multiCount = 0;
+							}
+							return c;
+						});
+						if (key === 'Grid')
 						{
-							userdefinedpoints.push(i)
+							dataPointsColumns.sort((dp1, dp2) => dp1.title > dp2.title ? 1 : -1);
 						}
+						self.allColumns.push({
+							title: self.formatSectionLabel(key),
+							gridType: self.gridType,
+							columns: ko.observableArray(dataPointsColumns)
+						})
 					}
-				})
-
-				if (drtrspoints.length > 0)
-				{
-					dataPointsForCurrentPage["State Report Fields"] = drtrspoints
-				}
-				else
-				{
-					delete dataPointsForCurrentPage["State Report Fields"]
-				}
-				if (userdefinedpoints.length > 0)
-				{
-					dataPointsForCurrentPage["User Defined"] = userdefinedpoints
-				}
-			}
-
-			if (values[2])
-			{
-				values[2] = values[2].filter(obj =>
-				{
-					obj = TF.DetailView.UserDefinedGridHelper.handleFilterFormData(obj);
-					return obj.UDGridFields.length > 0;
 				});
-				tf.udgHelper.updateDataPoint(self.gridType, values[2]);
 			}
-
-			Object.keys(dataPointsForCurrentPage).forEach(function(key)
-			{
-				let dataPointsColumns = dataPointsForCurrentPage[key].map(column =>
-				{
-					var c = { ...column };
-					if (requiredFields.some(r => (r.udfId === c.UDFId && r.udfId > 0) || r.field === c.field))
-					{
-						c.isRequired = true;
-					}
-					let existBlocks = c.field === 'UDGridId' ?
-						self.highlightBlocks().filter(el => el.UDGridId === c.UDGridId) :
-						c.UDFId ? self.highlightBlocks().filter(el => el.UDFId === c.UDFId) :
-							self.highlightBlocks().filter(el => el.field === c.field);
-					if (existBlocks.length > 0)
-					{
-						c.hasHighlight = true;
-						c.multiCount = existBlocks.length;
-					} else
-					{
-						c.hasHighlight = false;
-						c.multiCount = 0;
-					}
-					return c;
-				});
-
-				if (key === 'Grid')
-				{
-					dataPointsColumns.sort((dp1, dp2) => dp1.title > dp2.title ? 1 : -1);
-				}
-
-				self.allColumns.push({
-                    title: self.formatSectionLabel(key),
-					columns: ko.observableArray(dataPointsColumns)
-				})
-			});
 
 			var result = values[1].Items;
 			if (result && result.length > 0)
@@ -543,6 +506,7 @@
 				});
 				self.allColumns.unshift({
 					title: "Groups",
+					gridType: self.gridType,
 					columns: ko.observableArray(self.groups)
 				});
 			}
