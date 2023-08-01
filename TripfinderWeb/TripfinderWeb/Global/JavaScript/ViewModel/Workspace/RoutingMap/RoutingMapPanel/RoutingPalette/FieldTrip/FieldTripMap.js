@@ -191,11 +191,10 @@
 	FieldTripMap.prototype.orderFeatures = async function(fieldTrips)
 	{
 		const self = this;
-		const sortedFieldTrips = self._sortFieldTripByName(fieldTrips);
-		const sortedStopFeatures = self._sortStopFeaturesByFieldTrips(sortedFieldTrips);
-		const sortedPathFeatures = self._sortPathFeaturesByFieldTrips(sortedFieldTrips);
-		const sortedSequenceLineFeatures = self._sortSequenceLineFeaturesByFieldTrips(sortedFieldTrips);
-
+			sortedFieldTrips = self._sortFieldTripByName(fieldTrips),
+			sortedStopFeatures = self._sortStopFeaturesByFieldTrips(sortedFieldTrips),
+			sortedPathFeatures = self._sortPathFeaturesByFieldTrips(sortedFieldTrips),
+			sortedSequenceLineFeatures = self._sortSequenceLineFeaturesByFieldTrips(sortedFieldTrips);
 		// update map features
 		await self.fieldTripStopLayerInstance.clearLayer();
 		await self.fieldTripStopLayerInstance.addMany(sortedStopFeatures);
@@ -216,13 +215,12 @@
 		const aIndex = paletteNameData.findIndex(item => item === a.Name);
 		const bIndex = paletteNameData.findIndex(item => item === b.Name);
 
-		console.log(`paletteNameData: ${JSON.stringify(paletteNameData)}`);
-
 		return aIndex - bIndex;
 	}
 
 	FieldTripMap.prototype._sortFieldTripByName = function(fieldTrips)
 	{
+		const self = this;
 		const fieldTripIdMapping = fieldTrips.map(item => {
 			const { DBID, Name, id } = item;
 			return { DBID, Name, id };
@@ -323,9 +321,6 @@
 
 	FieldTripMap.prototype.setFieldTripVisibility = async function(fieldTrips)
 	{
-		// make sure the arrows is correct after map extent changes when layer is hide.
-		this.updateArrowRenderer(fieldTrips);
-
 		this.setFieldTripStopVisibility(fieldTrips);
 
 		this.setFieldTripPathVisibility(fieldTrips);
@@ -1240,11 +1235,9 @@
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
 			const fieldTrip = fieldTrips[i];
-			if (fieldTrip.visible)
-			{
-				await this.drawFieldTripPathArrow(fieldTrip);
-				await this.drawSequenceLineArrow(fieldTrip);
-			}
+			// update path arrow position no matter whether field trip is visible or not.
+			await this.drawFieldTripPathArrow(fieldTrip);
+			await this.drawSequenceLineArrow(fieldTrip);
 		}
 
 		await this.setFieldTripPathArrowVisibility(fieldTrips);

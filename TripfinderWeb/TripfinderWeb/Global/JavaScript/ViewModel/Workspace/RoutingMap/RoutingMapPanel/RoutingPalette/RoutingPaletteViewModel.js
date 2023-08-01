@@ -213,6 +213,8 @@
 
 	RoutingPaletteViewModel.prototype.onFieldTripMapShowHide = function(_, data)
 	{
+		// make sure the arrows is correct after map extent changes when layer is hide.
+		this.fieldTripMap?.updateArrowRenderer(this.dataModel.trips);
 		this.fieldTripMap?.setFieldTripVisibility(data);
 	}
 
