@@ -54,9 +54,6 @@
 			}
 		};
 		this.defineReadOnlyProperty("PATH_LINE_TYPE", PATH_LINE_TYPE);
-
-		PubSub.subscribe("GISLayer.StopLayer.MoveStopCompleted", this.onStopLayerMoveStopCompleted.bind(this));
-		PubSub.subscribe("GISLayer.StopLayer.MoveStopCompleted_UpdateDataModel", this.onStopLayerMoveStopCompleted_UpdateDataModel.bind(this));
 	}
 
 	//#region Property
@@ -733,12 +730,15 @@
 			stop: stop
 		};
 
-		self.fieldTripStopLayerInstance?.moveStop(stopGraphic, sketchTool);
+		self.fieldTripStopLayerInstance?.moveStop(stopGraphic, sketchTool, function(movedStopData){
+			self.onStopLayerMoveStopCompleted(movedStopData);
+			self.onStopLayerMoveStopCompleted_UpdateDataModel({graphic: stopGraphic});
+		});
 
 		stopGraphic.visible = false;
 	}
 
-	FieldTripMap.prototype.onStopLayerMoveStopCompleted = async function(_, data)
+	FieldTripMap.prototype.onStopLayerMoveStopCompleted = async function(data)
 	{
 		const self = this,
 			{ fieldTrip, stop } = self.editing.features.movingStop,
@@ -761,7 +761,7 @@
 		self.hideLoadingIndicator();
 	}
 
-	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(_, data)
+	FieldTripMap.prototype.onStopLayerMoveStopCompleted_UpdateDataModel = function(data)
 	{
 		const stop = this.editing.features.movingStop.stop,
 			graphic = data.graphic,
@@ -782,8 +782,6 @@
 		{
 			console.warn(`updateDataModel: stop does not match!`);
 		}
-
-		return;
 	}
 
 	FieldTripMap.prototype.clearStops = function(fieldTrip, stops = null)
@@ -2026,9 +2024,5 @@
 			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
 			self.fieldTripSequenceLineArrowLayerInstance = null;
 		}
-
-		PubSub.unsubscribe("GISLayer.StopLayer.MoveStopCompleted");
-		PubSub.unsubscribe("GISLayer.StopLayer.MoveStopCompleted_UpdateDataModel");
 	}
-
 })();

@@ -55,7 +55,7 @@
 		this.addMany(stopGraphics);
 	}
 
-	StopLayer.prototype.moveStop = function(stopGraphic, sketchTool)
+	StopLayer.prototype.moveStop = function(stopGraphic, sketchTool, callback = ()=>{})
 	{
 		const self = this;
 		self.editing.movingStop = {
@@ -66,10 +66,10 @@
 			moveDuplicateNode: self._getMoveDuplicateNode.bind(self),
 			isFeatureLayer: false,
 		};
-		sketchTool.transform(stopGraphic.clone(), options, self._moveStopCallback.bind(self));
+		sketchTool.transform(stopGraphic.clone(), options, self._moveStopCallback.bind(self, callback));
 	}
 
-	StopLayer.prototype._moveStopCallback = async function(graphics)
+	StopLayer.prototype._moveStopCallback = async function(callback, graphics)
 	{
 		if (!graphics)
 		{
@@ -89,10 +89,7 @@
 		// remove edit moving stop graphic.
 		self.deleteStop(updateGraphic);
 
-		// STOP moving
-		TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
-
-		PubSub.publish("GISLayer.StopLayer.MoveStopCompleted", movedStopData);
+		callback(movedStopData);
 	}
 
 	StopLayer.prototype.deleteStop = function(stopGraphic)
@@ -196,20 +193,6 @@
 		return null;
 	}
 
-	StopLayer.prototype.updateDataModel = function(graphics)
-	{
-		if (graphics && graphics.length !== 1)
-		{
-			console.warn(`updateDataModel: Multiple graphics updated! Failed.`);
-			return;
-		}
-
-		const data = { graphic: graphics[0] };
-		PubSub.publish("GISLayer.StopLayer.MoveStopCompleted_UpdateDataModel", data);
-
-		return;
-	}
-
 	//#endregion
 
 	StopLayer.prototype.dispose = function()
@@ -219,6 +202,5 @@
 			this.symbolHelper.dispose();
 			this.symbolHelper = null;
 		}
-	}	
-
+	}
 })();
