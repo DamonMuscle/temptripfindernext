@@ -558,6 +558,12 @@
 		await this.clearHighlightFeatures();
 	}
 
+	FieldTripMap.prototype.applyAddFieldTripStop = function(data)
+	{
+		console.log(data);
+		this._applyNewStop(this.fieldTripHighlightStopLayerInstance, data);
+	}
+
 	FieldTripMap.prototype._addNewStop = async function(stopLayerInstance, mapPoint)
 	{
 		const self = this,
@@ -600,7 +606,7 @@
 		return { Name, City, RegionAbbr, CountryCode, newStop, XCoord: +longitude.toFixed(6), YCoord: +latitude.toFixed(6) };
 	}
 
-	FieldTripMap.prototype._applyNewStop = function(stopLayerInstance)
+	FieldTripMap.prototype._applyNewStop = function(stopLayerInstance, stop)
 	{
 		const self = this,
 			highlightStops = self._getHighlightStopFeatures();
