@@ -134,7 +134,6 @@
 			self._bindParamsChange("#smartSequenceCheckbox", "SmartSequence");
 			self._bindParamsChange(".tripStopCurbApproachRadio", "vehicleCurbApproach");
 			self._bindParamsChange("#includeNoStudStopCheckbox", "IncludeNoStudStop");
-			self._bindParamsChange("#stopTypeDropDown>input", "stopType");
 			self.bindTag = true;
 		}
 		return TF.RoutingMap.RoutingPalette.BaseFieldTripStopEditModal.prototype.init.call(self, options);
