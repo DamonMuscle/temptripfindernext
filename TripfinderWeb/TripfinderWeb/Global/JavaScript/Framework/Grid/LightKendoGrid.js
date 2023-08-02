@@ -48,6 +48,8 @@
 
 	function LightKendoGrid($container, options, gridState, geoFields)
 	{
+		this.gridDefinitionHelper = new TF.Helper.GridDefinitionHelper();
+
 		// make click event namespace unique in each instance.
 		this.randomKey = (new Date()).getTime();
 		customClickAndTouchEvent = `click.LightKendoGrid${this.randomKey} touchend.LightKendoGrid${this.randomKey}`;
@@ -6259,49 +6261,23 @@
 		}.bind(this));
 	};
 
-	LightKendoGrid.prototype.extendAdditionGridDefinition = function (gridDefinition, additionGridDefinition)
+	LightKendoGrid.prototype.extendAdditionGridDefinition = function(gridDefinition, additionGridDefinition)
 	{
 		for (var i = 0; i < gridDefinition.Columns.length; i++)
 		{
 			var column = gridDefinition.Columns[i],
 				additionColumn = Enumerable.From(additionGridDefinition.Columns).
-					Where(function (x) { return x.FieldName === column.FieldName }).SingleOrDefault();
+					Where(function(x) { return x.FieldName === column.FieldName }).SingleOrDefault();
 			column = $.extend(column, additionColumn);
-			this.updateGridDefinitionWidth(column);
-			this._updateGridDefinitionDisplayNameFromTerm(column);
+			if (!this.options.isMiniGrid)
+			{
+				this.gridDefinitionHelper.updateGridDefinitionWidth(column);
+			}
+
+			this.gridDefinitionHelper.updateGridDefinitionDisplayNameFromTerm(column);
 		}
 
 		return gridDefinition;
-	};
-
-
-	LightKendoGrid.prototype._updateGridDefinitionDisplayNameFromTerm = function (column)
-	{
-		if (column.NotReplaceApplicationTermDefaultValue && column.NotReplaceApplicationTermDefaultValue)
-		{
-			return;
-		}
-
-		if (!column.DisplayName)
-		{
-			column.DisplayName = column.FieldName;
-		}
-
-		var temp = column.DisplayName;
-
-		for (var i = 0; i < tf.APPLICATIONTERMDEFAULTVALUES.length; i++)
-		{
-			var key = tf.APPLICATIONTERMDEFAULTVALUES[i];
-
-			if (tf.applicationTerm[key.Term])
-			{
-				temp = temp.replace(new RegExp('\\b' + key.Singular + '\\b', 'ig'), tf.applicationTerm[key.Term].Singular);
-				temp = temp.replace(new RegExp('\\b' + key.Plural + '\\b', 'ig'), tf.applicationTerm[key.Term].Plural);
-				temp = temp.replace(new RegExp('\\b' + key.Abbreviation + '\\b', 'ig'), tf.applicationTerm[key.Term].Abbreviation);
-			}
-		}
-
-		column.DisplayName = temp;
 	};
 
 
