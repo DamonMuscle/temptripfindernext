@@ -176,7 +176,7 @@
 			gridDefinition: "contactGridDefinition",
 			isMajorType: true,
 			entityUpdateConfirmBlackList: ["RecordPicture"],
-			hasDBID: false,
+			hasDBID: true,
 			enableDetailView: true
 		},
 		document: {
