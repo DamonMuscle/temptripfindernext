@@ -91,15 +91,15 @@
 			return this.obSelectedSequence();
 		});
 
+		this.obIsFirstStop = ko.observable(false);
+		this.obIsLastStop = ko.observable(false);
 		// this.obSelectedSequenceDisable = ko.computed(() => (this.obIsSmartSequence() && (this.mode() == "new" || this.mode() === 'edit')) || this.isReadOnly());
-		this.obSelectedSequenceDisable = ko.computed(() => this.isReadOnly());
+		this.obSelectedSequenceDisable = ko.computed(() => this.obIsFirstStop() || this.obIsLastStop() || this.isReadOnly());
 
 		// disable for future implementation
 		this.obSelectedFieldTripDisable = ko.observable(true);
 		this.obSmartAssignmentDisable = ko.observable(true);
 		this.obSmartSequenceDisable = ko.observable(true);
-		// this.obStopSequenceDisable = ko.computed(() => this.obSmartSequenceDisable() || this.obSelectedSequenceDisable());
-		this.obStopSequenceDisable = ko.computed(() => this.obSelectedSequenceDisable());
 		this.obCornerStopVisible = ko.observable(false);
 
 		this.initSequenceSubscribe();
@@ -158,17 +158,21 @@
 			return;
 		}
 		// init sequence source
-		var sequences = [];
-		trip.FieldTripStops.forEach(x =>
-		{
-			sequences.push(x.Sequence);
-		});
+		var sequences = trip.FieldTripStops.map(x => x.Sequence);
 		var tripChanged = this.data.length == 1 && this.obSelectedTrip().id != this.original[0].FieldTripId;
 		if (this.mode() === 'new' || tripChanged)
 		{
 			sequences.push(sequences[sequences.length - 1] + 1);
 		}
-		this.obSequenceSource(sequences);
+		sequences.sort();
+		this.obSequenceSource(sequences.map((x, index, array) =>
+		{
+			if(index === 0 || _.last(array) === x)
+			{
+				return `[disable]${x}`
+			}
+			return `${x}`;
+		}));
 		// set sequence number
 		var lastSequence = _.last(sequences);
 		var defaultSequence = lastSequence - 1;
@@ -180,6 +184,8 @@
 		
 		var sequence = this.data[0].Sequence ? this.data[0].Sequence : defaultSequence;
 		this.obSelectedSequence(sequence);
+		this.obIsFirstStop(sequence==_.first(sequences));
+		this.obIsLastStop(sequence==_.last(sequences));
 	};
 
 	/**
@@ -486,6 +492,7 @@
 				});
 		});
 	};
+
 	RoutingFieldTripStopEditModal.prototype._createOneStop = function(tripStop)
 	{
 		var self = this;

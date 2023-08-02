@@ -147,6 +147,15 @@ div.form-control {
 	text-overflow: ellipsis;
 }
 
+.typeahead.dropdown-menu > li.disable {
+	cursor: not-allowed;
+	pointer-events: all;
+
+	a {
+		pointer-events: none;
+	}
+}
+
 .bootstrap-typeahead-wrap .typeahead > li > strong {
 	padding-left: 8px;
 }
