@@ -1129,7 +1129,7 @@
 			if (response.results.length > 0)
 			{
 				const graphics = response.results.map(item => item.graphic);
-				const stopGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripStopLayerId);
+				const stopGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripStopLayerId);
 				if (stopGraphics.length > 0)
 				{
 					const data = stopGraphics.map(stop => {
@@ -1140,7 +1140,7 @@
 					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.FieldTripStopClick, dataWrapper);
 				}
 
-				const pathGraphics = graphics.filter(item => item.layer.id === RoutingPalette_FieldTripPathLayerId);
+				const pathGraphics = graphics.filter(item => item.layer?.id === RoutingPalette_FieldTripPathLayerId);
 				if (pathGraphics.length > 0)
 				{
 					const data = pathGraphics.map(path => {
