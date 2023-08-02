@@ -471,13 +471,14 @@
 		});
 	};
 
-	FieldEditorHelper.prototype._updateAllFieldsContent = function(fieldName, format, $currentElement, value, text, existingError, updateAll)
+	FieldEditorHelper.prototype._updateAllFieldsContent = function(fieldName, format, $currentElement, value, text, existingError, updateAll, options)
 	{
 		var self = this,
 			initParams = {
 				existingError: existingError,
 				updateAll: updateAll
 			};
+		options = options || {};
 
 		switch (format)
 		{
@@ -507,7 +508,7 @@
 				var decimalPlaces = self._editor.getCurrentPrecisionValue();
 				value = parseFloat(value).toFixed(decimalPlaces);
 
-				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format);
+				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format, options.UDFItem || null);
 				initParams.updateAll = true;
 
 				self._updateGeneralFieldsContent(fieldName, value, initParams);
@@ -645,8 +646,13 @@
 		}
 
 		result.UDFId ? self._onUDFEditorApplied(result) : self._onNonUDFEditorApplied(result);
+		var options = {};
+		if (result.UDFId)
+		{
+			options['UDFItem'] = tf.UDFDefinition.getUDFById(result.UDFId);
+		}
 
-		self._updateAllFieldsContent(result.blockName, format, editor._$parent, result.recordValue, result.text, !!result.errorMessages);
+		self._updateAllFieldsContent(result.blockName, format, editor._$parent, result.recordValue, result.text, !!result.errorMessages, undefined, options);
 	};
 
 	FieldEditorHelper.prototype._onUDFEditorApplied = function(result)
@@ -1972,6 +1978,10 @@
 						if (field.Type === "Phone Number")
 						{
 							field['RecordValue'] = item.RecordValue.replace(/\D/g, '');
+						}
+						else if (field.Type == "Currency" || field.Type == "Number")
+						{
+							field['RecordValue'] = tf.dataFormatHelper.clearNumberFormatter(item.RecordValue);
 						}
 						else
 						{
