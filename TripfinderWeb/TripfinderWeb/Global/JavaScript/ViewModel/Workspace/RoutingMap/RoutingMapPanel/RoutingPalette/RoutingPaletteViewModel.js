@@ -409,8 +409,14 @@
 		this.fieldTripMap?.onMapCanvasMapExtentChangeEvent(fieldTrips);
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(event, data)
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, data)
 	{
+		const { event } = data;
+		if (event.button === 2 && this._viewModal.mode === "Routing-Create")
+		{
+			this._viewModal.setMode("", "Normal");
+		}
+
 		this.fieldTripMap?.onMapClickEvent(data);
 	}
 

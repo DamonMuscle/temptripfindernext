@@ -859,21 +859,26 @@
 		});
 	};
 
+	/***
+	 * this method is aimed at toggling palette section level icons' status
+	 * (with the help of mapModeStyleButton.js)
+	 */
 	MapCanvasPage.prototype.setMode = function(type, mode)
 	{
 		var self = this,
-			newMode = type + "-" + mode;
+			newMode = `${type}-${mode}`;
 		if (self.mode == newMode && self.mode.indexOf("Normal") < 0)
 		{
 			// toggle
-			self.mode = type + "-Normal";
-		} else
+			self.mode = `${type}-Normal`;
+		}
+		else
 		{
 			self.mode = newMode;
 		}
 		if (self.mode.indexOf("Normal") >= 0)
 		{
-			self.sketchTool && self.sketchTool.stop();
+			self.sketchTool?.stop();
 		}
 		self.onModeChangeEvent.notify(self.mode);
 	};
