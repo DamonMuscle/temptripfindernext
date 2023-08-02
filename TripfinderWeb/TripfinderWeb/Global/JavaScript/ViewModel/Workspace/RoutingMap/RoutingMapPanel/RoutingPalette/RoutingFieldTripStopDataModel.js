@@ -14,16 +14,16 @@
 		self.currentTripStudentsCount = 0;
 	}
 
-	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequence, isDuplicate, notBroadcast)
+	RoutingFieldTripStopDataModel.prototype.create = function(newData, isFromRevert, insertToSpecialSequenceIndex, isDuplicate, notBroadcast)
 	{
 		var self = this;
 		self._viewModal.revertMode = "create-TripStop";
 		self._viewModal.revertData = [];
 		var data = self.createNewData(newData);
 		data.OpenType = "Edit";
-		self.insertTripStopToTrip(data, insertToSpecialSequence);
+		self.insertTripStopToTrip(data, insertToSpecialSequenceIndex);
 
-		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequence, VehicleCurbApproach: data.vehicleCurbApproach}, function(prevStop){
+		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}, function(prevStop){
 			// set stop time to new trip stop by calculate
 			self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
 			if (!isDuplicate) data.StopTime = data.ActualStopTime;

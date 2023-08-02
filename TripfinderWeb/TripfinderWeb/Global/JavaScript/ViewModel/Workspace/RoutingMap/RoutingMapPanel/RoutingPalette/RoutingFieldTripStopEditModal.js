@@ -356,16 +356,17 @@
 			if (tripStop)
 			{
 				var sequence = self.insertBehindSpecialStop ? self.insertBehindSpecialStop.Sequence : null;
+				let sequenceIndex = null;
 				if (!sequence)
 				{
-					sequence = tripStop.Sequence ? tripStop.Sequence - 1 : null;
+					sequenceIndex = tripStop.Sequence ? tripStop.Sequence - 1 : null;
 				}
 				if (self.obSelectedSequence() && !self.obSelectedSequenceDisable())
 				{
-					sequence = parseInt(self.obSelectedSequence() - 1);
+					sequenceIndex = parseInt(self.obSelectedSequence() - 1);
 				}
 
-				return self.dataModel.fieldTripStopDataModel.create(tripStop, null, sequence);
+				return self.dataModel.fieldTripStopDataModel.create(tripStop, null, sequenceIndex);
 			}
 		}, function() { });
 	};
