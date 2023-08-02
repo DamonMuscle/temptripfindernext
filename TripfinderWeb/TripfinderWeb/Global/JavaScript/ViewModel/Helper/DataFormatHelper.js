@@ -95,6 +95,35 @@
 		return longPhoneNumberMatched;
 	};
 
+	DataFormatHelper.prototype.numberFormatter = function(value, precision, thousandSeparator = true)
+	{
+		if (isNullObj(value))
+		{
+			return value;
+		}
+
+		precision = _.isNumber(precision) ? precision : 0;
+		value = parseFloat(value).toFixed(precision);
+
+		if (isNaN(value))
+		{
+			return "";
+		}
+
+		const option = { minimumFractionDigits: precision, maximumFractionDigits: precision, useGrouping: thousandSeparator };
+		return Intl.NumberFormat(undefined, option).format(value);
+	}
+
+	DataFormatHelper.prototype.clearNumberFormatter = function(value)
+	{
+		if (isNullObj(value))
+		{
+			return value;
+		}
+
+		return value.toString().replace(",", "");
+	}
+
 	DataFormatHelper.prototype.getPurePhoneNumber = function(value)
 	{
 		if (!value)

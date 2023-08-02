@@ -1101,7 +1101,12 @@
 		if (UDFItem)
 		{
 			var precision = UDFItem.Type === "Currency" ? UDFItem.MaxLength : UDFItem.NumberPrecision;
-			return value.toFixed(_.isNumber(precision) ? precision : 0);
+			if (_.isNumber(UDFItem.Precision))
+			{
+				precision = UDFItem.Precision;
+			}
+
+			return tf.dataFormatHelper.numberFormatter(value, _.isNumber(precision) ? precision : 0);
 		}
 
 		var precisionRegExp = new RegExp(/^([0][.]*[0]*)$/);

@@ -137,7 +137,7 @@
 	NumberFieldEditor.prototype.onFocusout = function(decimalBox, e)
 	{
 		var self = this,
-			number = parseFloat(decimalBox.$input.val()),
+			number = parseFloat(tf.dataFormatHelper.clearNumberFormatter(decimalBox.$input.val())),
 			precision = self.getCurrentPrecisionValue(),
 			maxValue = decimalBox.attributes.max;
 
@@ -163,7 +163,7 @@
 	NumberFieldEditor.prototype._fieldContentFormatter = function(value, options)
 	{
 		var self = this, precision = self.getCurrentPrecisionValue();
-
+		value = tf.dataFormatHelper.clearNumberFormatter(value);
 		value = parseFloat(value).toFixed(precision || 0);
 
 		return isNaN(value) ? "" : value;

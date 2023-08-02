@@ -454,27 +454,6 @@
 		});
 	};
 
-	FieldEditorHelper.prototype._updateAssignRolesFieldsContent = function(fieldName, value, additionalParamter, options)
-	{
-		fieldName = kendo.htmlEncode(fieldName);
-		var value = (value === '' || value === null) ? 'None' : value;
-		var self = this,
-			$fields = self._detailView.$element.find(`[data-block-field-name='${fieldName}']`);
-
-		if (!(additionalParamter && additionalParamter.updateAll) && $fields.length < 2)
-		{
-			return;
-		}
-
-		$fields.each(function(_, field)
-		{
-			var $field = $(field).find('select.typeRoles'),
-				typeRoles = $field.data("kendoMultiSelect");
-			typeRoles.value(value);
-			$field.parent().find("ul>li.k-button").filter((_, e) => $(e).text() === 'Administrator').addClass("k-state-disabled");
-		});
-	};
-
 	FieldEditorHelper.prototype._updateAllFieldsContent = function(fieldName, format, $currentElement, value, text, existingError, updateAll, options)
 	{
 		var self = this,
@@ -512,7 +491,7 @@
 				var decimalPlaces = options.precision ?? 0,
 					value = parseFloat(value).toFixed(decimalPlaces);
 
-				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format);
+				value = isNaN(value) ? null : tf.helpers.detailViewHelper.formatDataContent(value, "Number", format, options.UDFItem || null);
 				initParams.updateAll = true;
 
 				self._updateGeneralFieldsContent(fieldName, value, initParams, options);
@@ -651,17 +630,13 @@
 		if (!self._detailView) return;
 
 		result.UDFId ? self._onUDFEditorApplied(result) : self._onNonUDFEditorApplied(result);
-
 		var options = {};
-		if (result.UDGridField_Guid)
+		if (result.UDFId)
 		{
-			options['UDGridField_Guid'] = result.UDGridField_Guid;
+			options['UDFItem'] = tf.UDFDefinition.getUDFById(result.UDFId);
 		}
-		if (editor.getCurrentPrecisionValue)
-		{
-			options['precision'] = editor.getCurrentPrecisionValue();
-		}
-		self._updateAllFieldsContent(result.blockName, format, editor._$parent, result.recordValue, result.text || (result.selectedItem && result.selectedItem.text), !!result.errorMessages, undefined, options);
+
+		self._updateAllFieldsContent(result.blockName, format, editor._$parent, result.recordValue, result.text, !!result.errorMessages, undefined, options);
 	};
 
 	FieldEditorHelper.prototype._onUDFEditorApplied = function(result)
@@ -2125,6 +2100,10 @@
 						if (field.Type == "Phone Number")
 						{
 							field['RecordValue'] = item.RecordValue.replace(/\D/g, '');
+						}
+						else if (field.Type == "Currency" || field.Type == "Number")
+						{
+							field['RecordValue'] = tf.dataFormatHelper.clearNumberFormatter(item.RecordValue);
 						}
 						else
 						{
