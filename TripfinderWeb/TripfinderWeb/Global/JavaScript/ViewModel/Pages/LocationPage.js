@@ -299,7 +299,7 @@
 		this.updateRecords(data, "Ungeocode success");
 	}
 
-	LocationPage.prototype._addLocationGraphic = function(records)
+	LocationPage.prototype._addLocationGraphic = async function(records)
 	{
 		const self = this;
 		if (!self.obShowSplitmap() || !self.locationGridLayerInstance)
@@ -307,7 +307,7 @@
 			return;
 		}
 		
-		self.drawLocationPoints(records);
+		await self.drawLocationPoints(records);
 		self.zoomToLocationGridLayerExtent();
 	}
 
@@ -357,7 +357,7 @@
 				timer = setTimeout(async () =>
 				{
 					const records = await self.getLocationRecords();
-					self.drawLocationPoints(records);
+					await self.drawLocationPoints(records);
 					self.zoomToLocationGridLayerExtent();
 					timer = null;
 				});
@@ -383,10 +383,11 @@
 		}
 	}
 
-	LocationPage.prototype.drawLocationPoints = function(records)
+	LocationPage.prototype.drawLocationPoints = async function(records)
 	{
 		const self = this,
-			symbol = new TF.Map.Symbol();
+			symbol = new TF.Map.Symbol(),
+			locationGraphics = [];
 
 		for (let i = 0; i < records.length; i++)
 		{
@@ -396,9 +397,12 @@
 			}
 			if (item.XCoord && item.YCoord)
 			{
-				self.locationGridLayerInstance.addPoint(item.XCoord, item.YCoord, symbol.fieldTripLocation(), attributes);
+				const graphic = self.locationGridLayerInstance.createPointGraphic(item.XCoord, item.YCoord, symbol.fieldTripLocation(), attributes);
+				locationGraphics.push(graphic);
 			}
 		}
+
+		await self.locationGridLayerInstance.addMany(locationGraphics);
 	}
 
 	LocationPage.prototype.showDetailsClick = function(id)
@@ -430,8 +434,8 @@
 
 	LocationPage.prototype.zoomToLocationGridLayerExtent = function()
 	{
-		const graphics = this.locationGridLayerInstance.layer.graphics;
-		this.mapInstance.setExtent(graphics);
+		const graphics = this.locationGridLayerInstance?.layer.graphics;
+		this.mapInstance?.setExtent(graphics);
 	}
 
 	LocationPage.prototype.onMapViewCreated = function()

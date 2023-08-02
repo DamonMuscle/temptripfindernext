@@ -131,8 +131,8 @@
 
 		layerInstance.clearLayer();
 
-		if (geometry && geometry.x && geometry.y) {
-			layerInstance.add(geometry, markerSymbol, attributes);
+		if (geometry && geometry.latitude && geometry.longitude) {
+			layerInstance.addPoint(geometry.latitude, geometry.longitude, markerSymbol, attributes);
 			return;
 		}
 

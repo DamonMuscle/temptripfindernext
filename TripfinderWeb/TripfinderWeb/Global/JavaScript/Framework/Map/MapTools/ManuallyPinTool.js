@@ -8,6 +8,7 @@
 		self.symbol = new TF.Map.Symbol();
 		self.routingMapTool = routingMapTool;
 		self.map = self.routingMapTool.routingMapDocumentViewModel._map;
+		self.mapInstance = self.routingMapTool.routingMapDocumentViewModel.mapInstance;
 		self.routeState = self.routingMapTool.routingMapDocumentViewModel.routeState;
 		self.record = self.routingMapTool.routingMapDocumentViewModel.data;
 		self.type = self.routingMapTool.routingMapDocumentViewModel.type;
@@ -186,9 +187,20 @@
 		{
 			self.layer = self.map.findLayerById("ManuallyPinLayer");
 		}
-		return Enumerable.From(self.layer.graphics.items).FirstOrDefault(null, function(c)
+		if (this.type === "geocodeInteractive")
 		{
-			return c.attributes.type === self.type;
+			self.layer = self.mapInstance.getMapLayer("geocodeInteractiveLayer");
+		}
+
+		const graphics = self.layer.graphics.items;
+		if (graphics.length === 0)
+		{
+			return null;
+		}
+
+		return Enumerable.From(graphics).FirstOrDefault(null, function(c)
+		{
+			return c.attributes?.type === self.type;
 		});
 	};
 
