@@ -759,6 +759,17 @@
 		return styles;
 	};
 
+	LightGridStack.prototype.checkSpecificConditionTypeFieldField = function(typeField)
+	{
+		switch (typeField)
+		{
+			case "AttendanceSchoolName":
+				return "SchoolName";
+			default:
+				return typeField;
+		}
+	}
+
 	LightGridStack.prototype.checkConditionMatch = function(condition, fieldDefinition)
 	{
 		if (this.detailView.isCreateGridNewRecord)
@@ -767,9 +778,10 @@
 		}
 
 		var self = this,
-			helper = self.detailViewHelper,
+			conditionField = self.checkSpecificConditionTypeFieldField(condition.field);
+		var helper = self.detailViewHelper,
 			entity = self.detailView.recordEntity,
-			entityFieldValue = entity[condition.field] || '',
+			entityFieldValue = entity[conditionField] || '',
 			conditionType = condition.type.toLowerCase(),
 			conditionValue = condition.value,
 			conditionOperator = condition.operator.name;
@@ -785,12 +797,12 @@
 			});
 		}
 
-		if (entity[condition.field] == null &&
+		if (entity[conditionField] == null &&
 			entity.UserDefinedFields !== null)
 		{
 			var udf = entity.UserDefinedFields.filter(function(item)
 			{
-				return item.DisplayName === condition.field;
+				return item.DisplayName === conditionField;
 			});
 			if (udf.length === 0 || udf[0].RecordValue == null)
 			{
@@ -816,6 +828,7 @@
 				conditionValue = (conditionValue === NULL_AVATAR) ? null : conditionValue;
 				return helper.compareTwoValues([entityFieldValue, conditionValue], conditionOperator);
 			case "date":
+			case "date/time":
 				var actualDate = moment(entityFieldValue),
 					beforeDate = moment(conditionValue),
 					afterDate = moment(condition.extraValue);
@@ -826,7 +839,12 @@
 					afterTime = moment(_.last((condition.extraValue || "").split("T")), "hh:mm:ss A");
 				return helper.compareTwoValues([actualTime, beforeTime, afterTime], conditionOperator);
 			case "boolean":
+				if (typeof entityFieldValue === "string")
+				{
+					return entityFieldValue.toUpperCase() === conditionValue.toString().toUpperCase();
+				}
 				return entityFieldValue == conditionValue;
+
 			default:
 				return false;
 		}
