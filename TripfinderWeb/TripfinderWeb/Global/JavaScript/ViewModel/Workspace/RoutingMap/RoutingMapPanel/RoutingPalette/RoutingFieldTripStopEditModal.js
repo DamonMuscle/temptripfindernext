@@ -329,7 +329,6 @@
 
 		return promise && promise.then(function()
 		{
-
 			self.resolve(self.createdTripBoundary);
 		}).catch(e =>
 		{
@@ -350,7 +349,8 @@
 			{
 				return self.dataModel.fieldTripStopDataModel.viewModel.drawTool.removeOverlapBoundaries([tripStop]);
 			}
-			return Promise.resolve(tripStop);
+
+			return tripStop;
 		}).then(function(tripStop)
 		{
 			if (tripStop)
@@ -494,6 +494,7 @@
 		var data = self.trimStringSpace(tripStop);
 		var tripStopPromise = Promise.resolve(tripStop);
 		data.FieldTripId = tripStop.FieldTripId ? tripStop.FieldTripId : self.obSelectedTrip().id;
+		data.DBID = self.obSelectedTrip().DBID;
 		if (!self.obIsMultipleCreate() && !self.obIsInsertToSpecialStop())
 		{
 			if (self.obIsSmartAssignment())
@@ -550,6 +551,7 @@
 			// use changeStopPosition to change sequence, so revert it to original here.
 			data[0].Sequence = self.original[0].Sequence;
 			data[0].FieldTripId = self.original[0].FieldTripId;
+			data[0].DBID = self.obSelectedTrip().DBID;
 		}
 		return this.dataModel.fieldTripStopDataModel.update(data).then(async function()
 		{

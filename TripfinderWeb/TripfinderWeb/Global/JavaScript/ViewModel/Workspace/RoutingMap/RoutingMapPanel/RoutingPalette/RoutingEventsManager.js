@@ -613,7 +613,7 @@
 
 		this.viewModel.editFieldTripStopModal.create({
 			Street: stop.Name,
-			City: stop.City
+			...stop
 		}, null, defaultOptions);
 	}
 

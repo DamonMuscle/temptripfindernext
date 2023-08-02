@@ -22,38 +22,30 @@
 		var data = self.createNewData(newData);
 		data.OpenType = "Edit";
 		self.insertTripStopToTrip(data, insertToSpecialSequence);
-		return self.viewModel.drawTool.stopTool.attachClosetStreetToStop([data]).then(function()
-		{
-			return self.setTripStopPathAndSequence(data, "new", insertToSpecialSequence > 0).then(function(prevStop)
-			{
-				// set stop time to new trip stop by calculate
-				self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
-				if (!isDuplicate) data.StopTime = data.ActualStopTime;
-				self.insertToRevertData(data);
-				self.dataModel.recalculateAble = false;
-				self.dataModel.onTripStopsChangeEvent.notify({
-					add: [data],
-					delete: [],
-					edit: []
-				});
-				if (!isFromRevert && !notBroadcast)
-				{
-					self.dataModel.fieldTripEditBroadcast.createTripStop(data);
-				}
-				setTimeout(function()
-				{
-					self.dataModel.recalculateAble = true;
-					self.dataModel.onTripStopsChangeEvent.notify({
-						add: [],
-						delete: [],
-						edit: prevStop ? [prevStop] : []
-					});
-				});
-				self.dataModel.changeTripVisibility(data.FieldTripId, true);
-				self._runAfterPathChanged([data], null, true);
-				self.changeRevertStack(data, isFromRevert);
-				return true;
+
+		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequence, VehicleCurbApproach: data.vehicleCurbApproach}, function(prevStop){
+			// set stop time to new trip stop by calculate
+			self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
+			if (!isDuplicate) data.StopTime = data.ActualStopTime;
+			self.insertToRevertData(data);
+			self.dataModel.recalculateAble = false;
+			self.dataModel.onTripStopsChangeEvent.notify({
+				add: [data],
+				delete: [],
+				edit: []
 			});
+
+			// setTimeout(function()
+			// {
+			// 	self.dataModel.recalculateAble = true;
+			// 	self.dataModel.onTripStopsChangeEvent.notify({
+			// 		add: [],
+			// 		delete: [],
+			// 		edit: prevStop ? [prevStop] : []
+			// 	});
+			// });
+			self.dataModel.changeTripVisibility(data.FieldTripId, true);
+			self.changeRevertStack(data, isFromRevert);
 		});
 	};
 
@@ -219,7 +211,6 @@
 			data.id = TF.createId();
 		}
 		data.FieldTripStopId = data.id;
-		this.bindCoordinate(data);
 		if (!ignoreBoundary)
 		{
 			data.boundary = this.createTripBoundary(data);
@@ -1098,13 +1089,6 @@
 			}
 			return prevStop;
 		});
-	};
-
-	RoutingFieldTripStopDataModel.prototype.bindCoordinate = function(data)
-	{
-		var geoGraphic = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(data.geometry);
-		data.XCoord = geoGraphic.x.toFixed(11);
-		data.YCoord = geoGraphic.y.toFixed(11);
 	};
 
 	RoutingFieldTripStopDataModel.prototype.insertTripStopToTrip = function(data, positionIndex)
