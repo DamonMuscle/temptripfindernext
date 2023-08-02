@@ -992,7 +992,7 @@
 		if (!recordId)
 		{
 			self.startCreateNewMode();
-			promiseTask = Promise.all([self.updateGridType(gridType), self.userDefinedFieldHelper.get(gridType)])
+			promiseTask = Promise.all([self.updateGridType(gridType), self.userDefinedFieldHelper.get(gridType, true)])
 				.then(function(values)
 				{
 					self._userDefinedFields = values[1];
