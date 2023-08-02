@@ -264,7 +264,7 @@
 				var disableMove = !hasAuthForRoutingMap || trip.OpenType === 'View';
 
 				tempParentMenuItem = new TF.RoutingMap.MenuItem({
-					header: "<span class='trip-stop-color-icon' style='border-color:rgb(0,0,0);color:" + labelColor + ";background-color:" + fieldTripStop.color + "'>" + fieldTripStop.Sequence + "</span>" + fieldTripStop.Street,
+					header: "<span class='trip-stop-color-icon' style='border-color:rgb(0,0,0);color:" + labelColor + ";background-color:" + trip.color + "'>" + fieldTripStop.Sequence + "</span>" + fieldTripStop.Street,
 					title: fieldTripStop.Street,
 					icon: null,
 					type: 'tripSession'
