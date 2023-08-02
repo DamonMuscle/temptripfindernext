@@ -112,6 +112,7 @@ module.exports = function(grunt)
 						'**/*.eot',
 						'**/*.svg',
 						'**/*.ttf',
+						'**/*.json',
 						'**/*.woff',
 						'**/*.woff2'
 					],
