@@ -158,6 +158,9 @@
 			validators: {
 				notEmpty: {
 					message: 'Decimal places is required'
+				},
+				integer: {
+					message: 'Please enter a valid number'
 				}
 			}
 		};

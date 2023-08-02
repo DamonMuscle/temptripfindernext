@@ -156,6 +156,9 @@
 			validators: {
 				notEmpty: {
 					message: 'Decimal place is required'
+				},
+				numeric: {
+					message: 'Please enter a valid currency'
 				}
 			}
 		};
