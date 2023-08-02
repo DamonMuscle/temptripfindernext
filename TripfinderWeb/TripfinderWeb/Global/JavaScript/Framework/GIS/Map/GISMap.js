@@ -248,7 +248,6 @@
 			center: self.settings.center,
 			zoom: self.settings.zoom,
 			popup: {
-				autoOpenEnabled: false,
 				autoCloseEnabled: false,
 				collapseEnabled: false,
 				dockEnabled: false,
@@ -258,6 +257,7 @@
 					breakpoint: false
 				}
 			},
+			popupEnabled: false,
 			background: self.settings.background,
 			constraints: self.settings.constraints
 		});
@@ -663,9 +663,9 @@
 		return this.map.mapView && this.map.mapView.hitTest(event) || null;
 	}
 
-	Map.prototype.showPopup = function({content, location})
+	Map.prototype.showPopup = async function({content, location})
 	{
-		this.map.mapView.popup.open({content, location});
+		await this.map.mapView.openPopup({content, location});
 		return this.map.mapView.popup.container;
 	}
 

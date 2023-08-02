@@ -495,7 +495,6 @@
 			},
 			zoom: options.zoomLevel,
 			popup: {
-				autoOpenEnabled: false,
 				autoCloseEnabled: false,
 				collapseEnabled: false,
 				dockEnabled: false,
@@ -505,6 +504,7 @@
 					breakpoint: false
 				}
 			},
+			popupEnabled: false,
 			background: {
 				color: [240, 237, 229]
 			},

@@ -262,10 +262,10 @@
 
 		let p = data ? Promise.resolve(data): self.getData(ids).then(response => response.Items || []);
 
-		p.then(function(dataModels)
+		p.then(async function(dataModels)
 		{
 			self.dataModels = dataModels;
-			self.popupContainer = self.options.map.showPopup({
+			self.popupContainer = await self.options.map.showPopup({
 				content: self.buildContent(),
 				location: graphics[0].geometry,
 			});
