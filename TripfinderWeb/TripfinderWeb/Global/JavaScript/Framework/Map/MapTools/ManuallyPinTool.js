@@ -190,6 +190,7 @@
 		if (this.type === "geocodeInteractive")
 		{
 			self.layer = self.mapInstance.getMapLayer("geocodeInteractiveLayer");
+			self.layerInstance = self.mapInstance.getMapLayerInstance("geocodeInteractiveLayer");
 		}
 
 		const graphics = self.layer.graphics.items;
@@ -206,15 +207,28 @@
 
 	ManuallyPinTool.prototype.addGraphic = function(geometry)
 	{
-		var graphic = new tf.map.ArcGIS.Graphic({
-			geometry: geometry,
-			symbol: this.getSymbol(),
-			attributes: {
-				id: this.record ? this.record.Id : TF.createId(),
-				type: this.type
-			}
-		});
-		this.layer.add(graphic);
+		const symbol = this.getSymbol();
+		const attributes = {
+			id: this.record ? this.record.Id : TF.createId(),
+			type: this.type
+		};
+		let graphic = null;
+		if (this.type === "geocodeInteractive")
+		{
+			const { longitude, latitude } = geometry;
+			graphic = this.layerInstance.createPointGraphic(longitude, latitude, symbol, attributes);
+			this.layerInstance.add(graphic);
+		}
+		else
+		{
+			graphic = new tf.map.ArcGIS.Graphic({
+				geometry: geometry,
+				symbol: symbol,
+				attributes: attributes
+			});
+			this.layer.add(graphic);
+		}
+
 		this.graphic = graphic;
 	};
 

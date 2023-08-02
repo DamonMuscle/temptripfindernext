@@ -110,7 +110,7 @@
 				});
 			};
 
-		self.mapInstance.addLayer({ id: GeocodeInteractiveLayerId, eventHandlers:{onLayerCreated: function(){ invalidateCoordinate();}}});
+		self.mapInstance.addLayer({ id: GeocodeInteractiveLayerId, index: 0, eventHandlers:{onLayerCreated: function(){ invalidateCoordinate();}}});
 
 		self.obSelectedAddress.subscribe(invalidateCoordinate);
 	}
@@ -131,8 +131,8 @@
 
 		layerInstance.clearLayer();
 
-		if (geometry && geometry.latitude && geometry.longitude) {
-			layerInstance.addPoint(geometry.latitude, geometry.longitude, markerSymbol, attributes);
+		if (geometry && geometry.longitude && geometry.latitude) {
+			layerInstance.addPoint(geometry.longitude, geometry.latitude, markerSymbol, attributes);
 			return;
 		}
 
