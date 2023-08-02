@@ -671,7 +671,7 @@
 
 	Map.prototype.updatePopup = function(content)
 	{
-		$(this.map.mapView.popup.container).find("article>div").html(content);
+		$(this.map.mapView.popup.container).find(".tfweb-esri-popup-container").parent().html(content);
 	}
 
 	Map.prototype.closePopup = function()
