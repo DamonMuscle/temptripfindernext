@@ -306,7 +306,7 @@
 		{
 			const executeOnce = async () => {
 				await TF.GIS.SDK.reactiveUtils.whenOnce(() => !mapView.updating);
-				self.settings.eventHandlers.onMapViewUpdated();
+				self.settings.eventHandlers.onMapViewUpdated && self.settings.eventHandlers.onMapViewUpdated();
 			};
 			executeOnce();
 		}
