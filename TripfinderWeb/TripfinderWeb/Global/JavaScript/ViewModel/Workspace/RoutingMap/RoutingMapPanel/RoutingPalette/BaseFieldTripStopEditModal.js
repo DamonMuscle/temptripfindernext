@@ -429,7 +429,7 @@
 
 	BaseFieldTripStopEditModal.prototype.removeOverlayToPanels = function()
 	{
-		// this.element.closest(".map-page").find(".routingmap_panel>.overlay").remove();
+		this.element.closest(".map-page").find(".routingmap_panel>.overlay").remove();
 	};
 
 	BaseFieldTripStopEditModal.prototype.computeObStopTypes = function()
