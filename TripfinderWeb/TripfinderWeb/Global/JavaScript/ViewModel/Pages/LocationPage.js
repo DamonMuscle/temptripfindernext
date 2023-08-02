@@ -163,7 +163,7 @@
 				onMapViewPointerMove: self.onMapViewPointerMove.bind(self)
 			};
 			await tf.pageManager.resizablePage.showMapView(eventHandlers);
-			self.locationMapViewInstance = tf.pageManager.resizablePage.getRightData();
+			self.mapInstance = tf.pageManager.resizablePage.getRightData();
 			self.initMapTools();
 			self.initLocationMapGraphics();
 		}
@@ -192,13 +192,13 @@
 			}
 		};
 
-		self._map = self.locationMapViewInstance.map;  // self._map is used for RoutingMapTool.
+		self._map = self.mapInstance.map;  // self._map is used for RoutingMapTool.
 		self.element = tf.pageManager.resizablePage.$rightPage.find(".splitmap");
 		self.RoutingMapTool = new TF.Map.RoutingMapTool(self, $.extend({
 			thematicLayerId: "",
 		}, options));
 
-		self.sketchTool = new TF.RoutingMap.SketchTool(self.locationMapViewInstance.map, self);
+		self.sketchTool = new TF.RoutingMap.SketchTool(self.mapInstance.map, self);
 	}
 
 	LocationPage.prototype.globalReplaceClick = function(viewModel, e)
@@ -365,7 +365,7 @@
 
 		if (!self.locationGridLayerInstance)
 		{
-			self.locationGridLayerInstance = self.locationMapViewInstance.addLayer({
+			self.locationGridLayerInstance = self.mapInstance.addLayer({
 				id: LocationGridLayerId,
 				eventHandlers:{
 					onLayerCreated: () => {
@@ -431,7 +431,7 @@
 	LocationPage.prototype.zoomToLocationGridLayerExtent = function()
 	{
 		const graphics = this.locationGridLayerInstance.layer.graphics;
-		this.locationMapViewInstance.setExtent(graphics);
+		this.mapInstance.setExtent(graphics);
 	}
 
 	LocationPage.prototype.onMapViewCreated = function()
@@ -443,7 +443,7 @@
 	{
 		const self = this;
 		const locationGridLayerSearchFactor = 300; // The experience value, it depends on the point symbol size.
-		const locationGraphics = await self.locationMapViewInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
+		const locationGraphics = await self.mapInstance.find(event.mapPoint, [self.locationGridLayerInstance], locationGridLayerSearchFactor);
 
 		self.gridMapPopup && self.gridMapPopup.close();
 		if(!locationGraphics || !locationGraphics.length)
@@ -466,7 +466,7 @@
 		const self = this;
 		self.gridMapPopup = self.gridMapPopup || new TF.Grid.LocationMapPopup({
 			parentPage: self,
-			map: self.locationMapViewInstance,
+			map: self.mapInstance,
 			canShowDetailView: true,
 			type: self.type,
 			isDetailView: false,
@@ -486,7 +486,7 @@
 
 	LocationPage.prototype.onMapViewPointerMove = function(event)
 	{
-		if (!this.locationMapViewInstance)
+		if (!this.mapInstance)
 		{
 			return;
 		}
@@ -494,11 +494,11 @@
 		if (this.RoutingMapTool.measurementTool && this.RoutingMapTool.measurementTool.isActive)
 		{
 			const cursor = "crosshair";
-			this.locationMapViewInstance.setMapCursor(cursor);
+			this.mapInstance.setMapCursor(cursor);
 			return;
 		}
 
-		this.locationMapViewInstance.hitTest(event).then((response) =>
+		this.mapInstance.hitTest(event).then((response) =>
 		{
 			let graphics = null, cursor = "default";
 			if (response && response.results.length > 0)
@@ -511,7 +511,7 @@
 				}
 			}
 			
-			this.locationMapViewInstance.setMapCursor(cursor);
+			this.mapInstance.setMapCursor(cursor);
 		});
 	}
 
