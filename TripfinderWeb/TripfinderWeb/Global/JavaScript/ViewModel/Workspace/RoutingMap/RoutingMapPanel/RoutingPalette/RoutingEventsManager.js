@@ -466,7 +466,9 @@
 
 	RoutingEventsManager.prototype.createClick = function()
 	{
+		var self = this;
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
+		self._viewModal.setMode("Routing", "Create");
 	};
 
 	RoutingEventsManager.prototype.createFromSelectionClick = function()

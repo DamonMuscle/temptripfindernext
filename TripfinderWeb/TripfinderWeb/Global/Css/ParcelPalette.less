@@ -479,10 +479,6 @@
 				background-image: url('../img/Routing Map/menuicon/street-line-white.png');
 			}
 
-			&.destination {
-				background-image: url('../img/direction-setting-panel/Drop-Destination-Light.png');
-			}
-
 			&.path-lines {
 				background-image: url('../img/Routing Map/menuicon/trip-path-white.svg');
 			}
@@ -631,6 +627,15 @@
 		
 		&.sequence-lines {
 			background-image: url('../img/Routing Map/menuicon/trip-sequence.svg');
+		}
+	}
+
+	
+	.print-setting-group.active {
+		.icon {
+			&.destination {
+				background-image: url('../img/direction-setting-panel/Drop-Destination-Light.png') !important;
+			}
 		}
 	}
 }

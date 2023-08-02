@@ -61,12 +61,12 @@
 	FieldTripPaletteSectionViewModel.prototype.addStopClick = function()
 	{
 		this.eventsManager.createClick();
-		this.viewModel.$element.find(".print-setting-group .icon.destination.add-stop").addClass("active");
+		this.viewModel.$element.find(".print-setting-group .icon.destination.add-tripstop").addClass("active");
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.cancelStopClick = function()
 	{
-		this.viewModel.$element.find(".print-setting-group .icon.destination.add-stop").removeClass("active");
+		this.viewModel.$element.find(".print-setting-group .icon.destination.add-tripstop").removeClass("active");
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.show = function()
