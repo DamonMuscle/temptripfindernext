@@ -631,7 +631,7 @@
 
 		for (let i = 0; i < stopGraphics.length; i++)
 		{
-			const stop = fieldTripStops[i],
+			const stop = stopGraphics[i],
 				attributes = stop.attributes;
 			if (attributes.Sequence >= Sequence)
 			{
