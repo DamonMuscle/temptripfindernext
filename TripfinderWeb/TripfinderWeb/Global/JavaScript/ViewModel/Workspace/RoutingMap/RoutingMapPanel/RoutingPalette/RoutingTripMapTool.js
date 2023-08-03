@@ -16,7 +16,6 @@
 
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(self);
 		self.stopPreviewTool = new TF.RoutingMap.RoutingPalette.StopPreviewTool(self, self._map);
-		self.NAtool = new TF.RoutingMap.RoutingPalette.NetworkAnalysisTool(self);
 
 		self.initializeSettings();
 
