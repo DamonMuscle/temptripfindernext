@@ -153,13 +153,6 @@
 		// direction
 		this.routingDirectionDetailViewModel = new TF.RoutingMap.RoutingPalette.RoutingDirectionDetailViewModel(this, this.isDisabled);
 
-		this.routingMapSearch = new TF.RoutingMap.RoutingMapSearch(this.dataModel.viewModel._viewModal._map, {
-			addButtonVisible: true,
-			onChoseFromFileEvent: this.addStopsFromFile.bind(this),
-			onAddButtonClick: this.addStopsFromSearch.bind(this),
-			isDisabled: this.isDisabled
-		});
-
 		this._lockWeekDayChange = false;
 		this._lockDateChange = false;
 

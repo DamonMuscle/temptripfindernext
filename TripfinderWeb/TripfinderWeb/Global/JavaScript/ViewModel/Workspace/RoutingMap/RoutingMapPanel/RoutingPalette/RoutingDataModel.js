@@ -67,7 +67,6 @@
 		PubSub.subscribe(topicCombine(pb.DATA_CHANGE, "stoppath"), this.stopPathChange);
 		this.onSchoolLocationDataSourceChange = this.onSchoolLocationDataSourceChange.bind(this);
 		this.fieldTripEditBroadcast = new TF.RoutingMap.RoutingPalette.FieldTripEditBroadcast(this);
-		self.geoLinkTool = new TF.RoutingMap.RoutingPalette.GeoLinkTool(self.fieldTripStopDataModel);
 		this.needUpdateTrip = ko.observable(true);
 		this.needUpdateTripColor = ko.observable(false);
 	}
@@ -3030,28 +3029,7 @@
 
 	RoutingDataModel.prototype.getSyncEditTripStopsCount = function(data)
 	{
-		var self = this;
-		if (self.getEditTrips().length > 0)
-		{
-			this.fieldTripEditBroadcast.addNeedEditWindow(data.key);
-			if (data.changeType == TF.RoutingMap.RoutingPalette.FieldTripEditBroadcast.changeType.create)
-			{
-				this.geoLinkTool.getGeoLinkedData(data).then(function()
-				{
-					self.syncEditTripStopsData = data;
-					var editTripStops = self.geoLinkTool.getEditGeoLinkedData(data);
-					self.fieldTripEditBroadcast.setEditTripStop(editTripStops, data.key);
-				});
-			} else
-			{
-				this.geoLinkTool.getGeoLinkedData(data).then(function()
-				{
-					self.syncEditTripStopsData = data;
-					var editTripStops = self.geoLinkTool.getEditGeoLinkedData(data);
-					self.fieldTripEditBroadcast.setEditTripStop(editTripStops, data.key);
-				});
-			}
-		}
+
 	};
 
 	RoutingDataModel.prototype.confirmSyncEditTripStops = function(tripStops, type)
@@ -3074,8 +3052,6 @@
 
 	RoutingDataModel.prototype.syncEditTripStops = function(tripStops)
 	{
-		var self = this;
-		self.geoLinkTool.syncGeoLinkedData(this.syncEditTripStopsData, tripStops.map(function(stop) { return stop.id; }));
 	};
 
 	RoutingDataModel.prototype.isMidTrip = function()

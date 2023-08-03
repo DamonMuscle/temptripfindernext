@@ -18,8 +18,6 @@
 		self._viewModal = mapCanvasPage;
 		self.fieldTripPaletteSection = new TF.RoutingMap.RoutingPalette.FieldTripPaletteSectionViewModel(self, routeState, trips);
 		self.dataModel = self.fieldTripPaletteSection.dataModel;
-		self.stopPoolPaletteSection = new TF.RoutingMap.RoutingPalette.StopPoolPaletteSectionViewModel(self);
-		self.trialStopPaletteSection = new TF.RoutingMap.RoutingPalette.TrialStopPaletteSectionViewModel(self);
 		self.childViewModels =[self.fieldTripPaletteSection];
 		self._viewModal.onMapLoad.subscribe(this._onMapLoad.bind(this));
 		self.layers = [];

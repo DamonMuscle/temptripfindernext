@@ -33,12 +33,6 @@
 		var options = {
 			onChoseFromFileEvent: self.createChangeEvent.bind(self)
 		};
-		self.routingSearchViewmodel = new TF.RoutingMap.RoutingPalette.RoutingSearchModalViewModel(map, options);
-		return tf.modalManager.showModal(self.routingSearchViewmodel)
-			.then(function(data)
-			{
-				self.createTripStopFromSearchResult(data, option);
-			});
 	};
 
 	BaseRoutingEventsManager.prototype.createTripStopFromSearchResult = function(data, option)
@@ -339,10 +333,7 @@
 				{
 					return;
 				}
-				if (self.routingSearchViewmodel)
-				{
-					self.routingSearchViewmodel.hide();
-				}
+
 				getXYByGeometry(result);
 				if (self.fileOpenOption)
 				{
