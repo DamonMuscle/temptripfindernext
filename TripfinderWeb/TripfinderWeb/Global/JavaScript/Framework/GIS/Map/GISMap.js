@@ -482,6 +482,15 @@
 		this.map.remove(layer);
 	}
 
+	Map.prototype.removeLayerInstance = function(layerInstance)
+	{
+		const layerId = layerInstance.layer.id;
+		this.removeLayer(layerId);
+
+		const index = this.mapLayerInstances.findIndex(item => item === layerInstance);
+		this.mapLayerInstances.splice(index, 1);
+	}
+
 	Map.prototype.removeAllLayers = function()
 	{
 		if (this.map)

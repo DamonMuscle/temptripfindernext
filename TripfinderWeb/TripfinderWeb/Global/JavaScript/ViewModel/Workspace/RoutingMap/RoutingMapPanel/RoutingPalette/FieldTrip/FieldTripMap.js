@@ -2064,33 +2064,23 @@
 			self.arrowLayerHelper = null;
 		}
 
-		if (self.fieldTripStopLayerInstance &&
-			self.fieldTripPathLayerInstance &&
-			self.fieldTripSequenceLineLayerInstance)
-		{
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripStopLayerId);
-			self.fieldTripStopLayerInstance = null;
+		const layerInstances = [
+			self.fieldTripStopLayerInstance,
+			self.fieldTripPathLayerInstance,
+			self.fieldTripSequenceLineLayerInstance,
+			self.fieldTripHighlightLayerInstance,
+			self.fieldTripHighlightStopLayerInstance,
+			self.fieldTripPathArrowLayerInstance,
+			self.fieldTripSequenceLineArrowLayerInstance,
+		];
+		self.layerManager.removeLayerInstances(layerInstances);
 
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathLayerId);
-			self.fieldTripPathLayerInstance = null;
-
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineLayerId);
-			self.fieldTripSequenceLineLayerInstance = null;
-
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripHighlightLayerId);
-			self.fieldTripHighlightLayerInstance = null;
-
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripHighlightStopLayerId);
-			self.fieldTripHighlightStopLayerInstance = null;
-		}
-
-		if (self.fieldTripPathArrowLayerInstance && self.fieldTripSequenceLineArrowLayerInstance)
-		{
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripPathArrowLayerId);
-			self.fieldTripPathArrowLayerInstance = null;
-
-			self.mapInstance.removeLayer(RoutingPalette_FieldTripSequenceLineArrowLayerId);
-			self.fieldTripSequenceLineArrowLayerInstance = null;
-		}
+		self.fieldTripStopLayerInstance = null;
+		self.fieldTripPathLayerInstance = null;
+		self.fieldTripSequenceLineLayerInstance = null;
+		self.fieldTripHighlightLayerInstance = null;
+		self.fieldTripHighlightStopLayerInstance = null;
+		self.fieldTripPathArrowLayerInstance = null;
+		self.fieldTripSequenceLineArrowLayerInstance = null;
 	}
 })();

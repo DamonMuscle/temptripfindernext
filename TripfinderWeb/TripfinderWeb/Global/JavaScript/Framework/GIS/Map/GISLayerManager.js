@@ -43,4 +43,19 @@
 			}
 		});
 	}
+
+	LayerManager.prototype.removeLayerInstances = function(layerInstances)
+	{
+		const self = this,
+			totalLayerCount = layerInstances.length;
+		
+		for (let i = 0; i < totalLayerCount; i++)
+		{
+			const instance = layerInstances[i];
+			if (instance)
+			{
+				self.mapInstance.removeLayerInstance(instance);
+			}
+		}
+	}
 })();
