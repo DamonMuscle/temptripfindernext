@@ -14,6 +14,7 @@
 		this.maxLengthChanged = this.maxLengthChanged.bind(this);
 		this.parent.onBlur = this.onBlur.bind(this);
 		this.obIsEnable = ko.observable(false);
+		this.obComponentLoaded = ko.observable(false);
 	}
 
 	CurrencyUserDefinedFieldViewModel.prototype.constructor = CurrencyUserDefinedFieldViewModel;
@@ -26,6 +27,7 @@
 	CurrencyUserDefinedFieldViewModel.prototype.init = function(vm, e)
 	{
 		this.$parent = $(e).closest(".Edit-UDF-Modal");
+		setTimeout(() => self.obComponentLoaded(true));
 	};
 
 	CurrencyUserDefinedFieldViewModel.prototype.getTemplate = function()

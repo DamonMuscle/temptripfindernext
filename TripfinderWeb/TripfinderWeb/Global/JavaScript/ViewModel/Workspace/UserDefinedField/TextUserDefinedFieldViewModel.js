@@ -12,6 +12,7 @@
 		this.maxLengthChanged.bind(this);
 		this.maxLengthChanged = this.maxLengthChanged.bind(this);
 		this.obIsEnable = ko.observable(false);
+		this.obComponentLoaded = ko.observable(false);
 	}
 
 	TextUserDefinedFieldViewModel.prototype.constructor = TextUserDefinedFieldViewModel;
@@ -24,6 +25,7 @@
 	TextUserDefinedFieldViewModel.prototype.init = function(vm, e)
 	{
 		this.$parent = $(e).closest(".Edit-UDF-Modal");
+		setTimeout(() => self.obComponentLoaded(true));
 	};
 
 	TextUserDefinedFieldViewModel.prototype.getTemplate = function()
