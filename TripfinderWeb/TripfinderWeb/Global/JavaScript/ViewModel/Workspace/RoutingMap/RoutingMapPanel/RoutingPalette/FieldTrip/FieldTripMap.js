@@ -1306,11 +1306,24 @@
 		this.fieldTripSequenceLineArrowLayerInstance.layer.renderer = arrowRenderer;
 	}
 
-	FieldTripMap.prototype.redrawFieldTripArrows = async function(fieldTrips)
+	FieldTripMap.prototype._showArrowLayer = function()
+	{
+		const self = this;
+		self.fieldTripPathArrowLayerInstance.show();
+		self.fieldTripSequenceLineArrowLayerInstance.show();
+	}
+
+	FieldTripMap.prototype.hideArrowLayer = function()
 	{
 		const self = this;
 		self.fieldTripPathArrowLayerInstance.hide();
 		self.fieldTripSequenceLineArrowLayerInstance.hide();
+	}
+
+	FieldTripMap.prototype.redrawFieldTripArrows = async function(fieldTrips)
+	{
+		const self = this;
+		self.hideArrowLayer();
 
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
@@ -1323,8 +1336,7 @@
 		await self.setFieldTripPathArrowVisibility(fieldTrips);
 		await self.setFieldTripSequenceLineArrowVisibility(fieldTrips);
 
-		self.fieldTripPathArrowLayerInstance.show();
-		self.fieldTripSequenceLineArrowLayerInstance.show();
+		self._showArrowLayer();
 	}
 
 	FieldTripMap.prototype.drawFieldTripPathArrow = async function(fieldTrip)

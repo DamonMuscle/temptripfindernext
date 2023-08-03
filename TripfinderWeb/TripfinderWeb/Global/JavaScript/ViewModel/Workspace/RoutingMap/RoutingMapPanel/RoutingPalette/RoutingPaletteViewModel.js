@@ -430,6 +430,7 @@
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewMouseWheel = function(_, data)
 	{
 		TF.RoutingMap.ContextMenuBase.prototype.removeContextMenu();
+		this.fieldTripMap?.hideArrowLayer();
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasModeChange = function(event, data)
