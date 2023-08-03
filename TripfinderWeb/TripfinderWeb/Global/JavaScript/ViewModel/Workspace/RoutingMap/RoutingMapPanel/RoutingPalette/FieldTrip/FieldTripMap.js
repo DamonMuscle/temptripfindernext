@@ -556,11 +556,16 @@
 
 	FieldTripMap.prototype.stopAddFieldTripStop = async function()
 	{
+		this._stopAddingStop();
+		await this.clearHighlightFeatures();
+	}
+
+	FieldTripMap.prototype._stopAddingStop = function()
+	{
 		if (this.editing.isAddingStop)
 		{
 			this.editing.isAddingStop = false;
 			this.mapInstance.setMapCursor("default");
-			await this.clearHighlightFeatures();
 		}
 	}
 
@@ -570,6 +575,7 @@
 		this._drawNewStopFromMap(data);
 		this.clearHighlightFeatures();
 		await this._drawNewStopPathFromMap(data);
+		this.startAddFieldTripStop();
 
 		callback();
 	}
@@ -1121,6 +1127,7 @@
 				self.hideLoadingIndicator();
 
 				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, newStopData);
+				self._stopAddingStop();
 			}
 		}
 		else if (event.button === 2)
