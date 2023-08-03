@@ -243,7 +243,7 @@
 				if (!tripItems[tripName])
 				{
 					let tripItem = new TF.RoutingMap.MenuItem({
-						header: "<span class='trip-color-icon' style='background-color:" + fieldTripStop.color + "'></span>" + tripName,
+						header: "<span class='trip-color-icon' style='background-color:" + trip.color + "'></span>" + tripName,
 						title: tripName,
 						type: 'trip'
 					});
@@ -259,7 +259,7 @@
 					tripItems[tripName] = tripItem;
 				}
 
-				var labelColor = TF.isLightness(fieldTripStop.color) ? "#000000" : "#ffffff";
+				var labelColor = TF.isLightness(trip.color) ? "#000000" : "#ffffff";
 				var disableDelete = !hasAuthForRoutingMap || trip.OpenType === 'View' || fieldTripStop.PrimaryDestination || fieldTripStop.PrimaryDeparture;
 				var disableMove = !hasAuthForRoutingMap || trip.OpenType === 'View';
 

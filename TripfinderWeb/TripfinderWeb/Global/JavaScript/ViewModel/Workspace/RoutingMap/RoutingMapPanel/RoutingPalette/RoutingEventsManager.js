@@ -883,8 +883,6 @@
 
 	RoutingEventsManager.prototype.editTripStopClick = function(type, stopId, fieldTripId)
 	{
-		console.log("Move Stop Location clicked", stopId, fieldTripId);
-
 		const data = { fieldTripId, stopId };
 		PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.MoveStopLocation, data);
 	};
