@@ -556,12 +556,6 @@
 
 	FieldTripMap.prototype.stopAddFieldTripStop = async function()
 	{
-		this._stopAddingStop();
-		await this.clearHighlightFeatures();
-	}
-
-	FieldTripMap.prototype._stopAddingStop = function()
-	{
 		if (this.editing.isAddingStop)
 		{
 			this.editing.isAddingStop = false;
@@ -1127,7 +1121,7 @@
 				self.hideLoadingIndicator();
 
 				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, newStopData);
-				self._stopAddingStop();
+				self.stopAddFieldTripStop();
 			}
 		}
 		else if (event.button === 2)
@@ -1165,11 +1159,12 @@
 		}
 	}
 
-	FieldTripMap.prototype.onMapKeyUpEvent = function(data)
+	FieldTripMap.prototype.onMapKeyUpEvent = async function(data)
 	{
 		if (data.event.key === "Escape")
 		{
 			this.stopAddFieldTripStop();
+			await this.fieldTripMap?.clearHighlightFeatures();
 		}
 	}
 

@@ -413,6 +413,12 @@
 
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewClick = function(_, data)
 	{
+		if (this.fieldTripPaletteSection.eventsManager.viewModel.editFieldTripStopModal.obVisible())
+		{
+			// on Creating/Editing New Stop, skip map click event.
+			return;
+		}
+
 		const { event } = data;
 		if (event.button === 2 && this._viewModal.mode === "Routing-Create")
 		{
@@ -433,11 +439,12 @@
 		this.fieldTripMap?.hideArrowLayer();
 	}
 
-	RoutingPaletteViewModel.prototype.onMapCanvasModeChange = function(event, data)
+	RoutingPaletteViewModel.prototype.onMapCanvasModeChange = async function(event, data)
 	{
 		if (data.endsWith("Normal"))
 		{
 			this.fieldTripMap?.stopAddFieldTripStop();
+			await this.fieldTripMap?.clearHighlightFeatures();
 		}
 	}
 
