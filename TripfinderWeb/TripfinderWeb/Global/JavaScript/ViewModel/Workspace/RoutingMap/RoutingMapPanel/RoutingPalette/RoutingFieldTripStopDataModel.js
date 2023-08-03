@@ -25,7 +25,7 @@
 
 		self.viewModel.viewModel.fieldTripMap?.applyAddFieldTripStop({...data, Sequence: insertToSpecialSequenceIndex + 1, VehicleCurbApproach: data.vehicleCurbApproach}, function(prevStop){
 			// set stop time to new trip stop by calculate
-			self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
+			self.dataModel.setFieldTripActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
 			if (!isDuplicate) data.StopTime = data.ActualStopTime;
 			self.insertToRevertData(data);
 
@@ -1200,7 +1200,7 @@
 			StopType: "",
 			Students: [],
 			type: "tripStop",
-			ActualStopTime: "00:00:00",
+			ActualStopTime: "0001-01-01 00:00:00",
 			AssignedStudentCount: 0,
 			Distance: 0,
 			Duration: "00:00:00",
