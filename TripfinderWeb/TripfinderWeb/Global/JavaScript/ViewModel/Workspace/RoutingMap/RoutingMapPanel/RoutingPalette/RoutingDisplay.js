@@ -1575,11 +1575,6 @@
 				tripNode.children.options.data.items.push(tripStopTreeViewNode);
 			}
 		}
-		// after create stop continue to add stop from map
-		if (self.viewModel._viewModal.mode === "Routing-Create")
-		{
-			self.viewModel.drawTool.create("point");
-		}
 	};
 
 	RoutingDisplay.prototype._editTripStop = function(tripStop)
