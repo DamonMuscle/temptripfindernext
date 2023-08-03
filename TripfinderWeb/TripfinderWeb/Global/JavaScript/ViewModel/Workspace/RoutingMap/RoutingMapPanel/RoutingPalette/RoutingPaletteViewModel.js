@@ -41,6 +41,7 @@
 		mapCanvasPage.onMapViewExtentChangeEvent.subscribe(self.onMapCanvasMapExtentChange.bind(self));
 		mapCanvasPage.onMapViewClickEvent.subscribe(self.onMapCanvasMapViewClick.bind(self));
 		mapCanvasPage.onMapViewKeyUpEvent.subscribe(self.onMapCanvasMapViewKeyUp.bind(self));
+		mapCanvasPage.onMapViewMouseWheelEvent.subscribe(self.onMapCanvasMapViewMouseWheel.bind(self));
 		mapCanvasPage.onModeChangeEvent.subscribe(self.onMapCanvasModeChange.bind(self));
 		PubSub.subscribe("on_MapCanvas_RecalculateTripMove", self.onMapCanvas_RecalculateTripMove.bind(self));
 		PubSub.subscribe("on_MapCanvas_RefreshTripByStops", self.onMapCanvas_RefreshPathByStops.bind(self));
@@ -424,6 +425,11 @@
 	RoutingPaletteViewModel.prototype.onMapCanvasMapViewKeyUp = function(event, data)
 	{
 		this.fieldTripMap?.onMapKeyUpEvent(data);
+	}
+
+	RoutingPaletteViewModel.prototype.onMapCanvasMapViewMouseWheel = function(_, data)
+	{
+		TF.RoutingMap.ContextMenuBase.prototype.removeContextMenu();
 	}
 
 	RoutingPaletteViewModel.prototype.onMapCanvasModeChange = function(event, data)

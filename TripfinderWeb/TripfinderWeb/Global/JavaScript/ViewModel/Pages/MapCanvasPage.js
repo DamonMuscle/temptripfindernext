@@ -35,6 +35,7 @@
 		self.onMapViewClickEvent = new TF.Events.Event();
 		self.onMapViewPointerMoveEvent = new TF.Events.Event();
 		self.onMapViewKeyUpEvent = new TF.Events.Event();
+		self.onMapViewMouseWheelEvent = new TF.Events.Event();
 
 		// arrange the panels and palettes.
 
@@ -161,6 +162,11 @@
 	MapCanvasPage.prototype.onMapViewKeyUp = function(event)
 	{
 		this.onMapViewKeyUpEvent.notify({event});
+	}
+
+	MapCanvasPage.prototype.onMapViewMouseWheel = function(event)
+	{
+		this.onMapViewMouseWheelEvent.notify({event});
 	}
 
 	MapCanvasPage.prototype._initRevertOperation = function()
@@ -734,6 +740,7 @@
 				onMapViewClick: self.onMapViewClick.bind(self),
 				onMapViewPointerMove: self.onMapViewPointerMove.bind(self),
 				onMapViewKeyUp: self.onMapViewKeyUp.bind(self),
+				onMapViewMouseWheel: self.onMapViewMouseWheel.bind(self),
 			};
 
 		self.mapInstance = await TF.Helper.MapHelper.createMapInstance(self.$mapDiv, eventHandlers);;
@@ -1209,6 +1216,7 @@
 		this.onMapViewClickEvent?.unsubscribeAll();
 		this.onMapViewPointerMoveEvent?.unsubscribeAll();
 		this.onMapViewKeyUpEvent?.unsubscribeAll();
+		this.onMapViewMouseWheelEvent?.unsubscribeAll();
 
 		// this.routingSnapManager.dispose();
 
