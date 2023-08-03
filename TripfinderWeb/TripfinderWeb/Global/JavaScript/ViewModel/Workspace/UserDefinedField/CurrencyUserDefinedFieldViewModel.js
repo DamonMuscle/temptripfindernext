@@ -26,6 +26,7 @@
 
 	CurrencyUserDefinedFieldViewModel.prototype.init = function(vm, e)
 	{
+		var self = this;
 		this.$parent = $(e).closest(".Edit-UDF-Modal");
 		setTimeout(() => self.obComponentLoaded(true));
 	};

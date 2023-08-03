@@ -14,8 +14,9 @@
 
 	EmailUserDefinedFieldViewModel.prototype.init = function(vm, e)
 	{
+		var self = this;
 		this.$parent = $(e).closest(".Edit-UDF-Modal");
-		this.obComponentLoaded(true);
+		setTimeout(() => self.obComponentLoaded(true));
 	};
 
 	EmailUserDefinedFieldViewModel.prototype.getTemplate = function()
