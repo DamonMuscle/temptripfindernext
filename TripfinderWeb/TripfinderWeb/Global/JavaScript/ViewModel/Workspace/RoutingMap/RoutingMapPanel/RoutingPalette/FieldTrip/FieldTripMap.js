@@ -32,7 +32,7 @@
 
 	//#endregion
 
-	function FieldTripMap(mapInstance, drawTool)
+	function FieldTripMap(mapInstance)
 	{
 		if (!mapInstance)
 		{
@@ -40,7 +40,6 @@
 			return;
 		}
 
-		this.stopTool = drawTool.stopTool;
 		this.mapInstance = mapInstance;
 		this.arrowLayerHelper = new TF.GIS.ArrowLayerHelper(mapInstance);
 		this.layerManager = new TF.GIS.LayerManager(mapInstance);
@@ -1867,7 +1866,6 @@
 
 	FieldTripMap.prototype._findVertexToStopOnPath = function(path, stop, networkService)
 	{
-		var self = this;
 		if (!path || !path.paths || !path.paths[0] || !path.paths[0][0]) return;
 		path = tf.map.ArcGIS.webMercatorUtils.geographicToWebMercator(TF.cloneGeometry(path));
 		var point = TF.xyToGeometry(stop.XCoord, stop.YCoord);
@@ -1876,7 +1874,7 @@
 		var endIndex = path.paths[0].length - 1;
 		var endPoint = path.paths[0][endIndex];
 		var distance2 = Math.sqrt((endPoint[0] - point.x) * (endPoint[0] - point.x) + (endPoint[1] - point.y) * (endPoint[1] - point.y));
-		var vertexGeom = self.stopTool._getPointOnPolylineByDistanceToPoint(path, 3, distance1 < distance2);
+		var vertexGeom = TF.GIS.StopHelper.GetPointOnPolylineByDistanceToPoint(path, 3, distance1 < distance2);
 		var location = tf.map.ArcGIS.webMercatorUtils.webMercatorToGeographic(vertexGeom);
 
 		const stopObject = {
