@@ -28,7 +28,7 @@
 			self.dataModel.setActualStopTime([self.dataModel.getTripById(data.FieldTripId)]);
 			if (!isDuplicate) data.StopTime = data.ActualStopTime;
 			self.insertToRevertData(data);
-			self.dataModel.recalculateAble = false;
+
 			self.dataModel.onTripStopsChangeEvent.notify({
 				add: [data],
 				delete: [],
@@ -37,7 +37,6 @@
 
 			// setTimeout(function()
 			// {
-			// 	self.dataModel.recalculateAble = true;
 			// 	self.dataModel.onTripStopsChangeEvent.notify({
 			// 		add: [],
 			// 		delete: [],

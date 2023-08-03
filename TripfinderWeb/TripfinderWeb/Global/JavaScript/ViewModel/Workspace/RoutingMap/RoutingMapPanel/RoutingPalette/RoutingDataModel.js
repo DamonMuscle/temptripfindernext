@@ -820,7 +820,7 @@
 				}
 			});
 		});
-		if (cannotCalculate || this.recalculateAble === false)
+		if (cannotCalculate)
 		{
 			return Promise.resolve(fieldTrips);
 		}
