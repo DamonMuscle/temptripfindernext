@@ -1296,16 +1296,23 @@
 
 	FieldTripMap.prototype.redrawFieldTripArrows = async function(fieldTrips)
 	{
+		const self = this;
+		self.fieldTripPathArrowLayerInstance.hide();
+		self.fieldTripSequenceLineArrowLayerInstance.hide();
+
 		for (let i = 0; i < fieldTrips.length; i++)
 		{
 			const fieldTrip = fieldTrips[i];
 			// update path arrow position no matter whether field trip is visible or not.
-			await this.drawFieldTripPathArrow(fieldTrip);
-			await this.drawSequenceLineArrow(fieldTrip);
+			await self.drawFieldTripPathArrow(fieldTrip);
+			await self.drawSequenceLineArrow(fieldTrip);
 		}
 
-		await this.setFieldTripPathArrowVisibility(fieldTrips);
-		await this.setFieldTripSequenceLineArrowVisibility(fieldTrips);
+		await self.setFieldTripPathArrowVisibility(fieldTrips);
+		await self.setFieldTripSequenceLineArrowVisibility(fieldTrips);
+
+		self.fieldTripPathArrowLayerInstance.show();
+		self.fieldTripSequenceLineArrowLayerInstance.show();
 	}
 
 	FieldTripMap.prototype.drawFieldTripPathArrow = async function(fieldTrip)

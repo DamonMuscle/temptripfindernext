@@ -307,6 +307,22 @@
 		return Promise.resolve(featureCount);
 	}
 
+	Layer.prototype.show = function()
+	{
+		if (!this.layer.visible)
+		{
+			this.layer.visible = true;
+		}
+	}
+
+	Layer.prototype.hide = function()
+	{
+		if (this.layer.visible)
+		{
+			this.layer.visible = false;
+		}
+	}
+
 	Layer.prototype.setFeaturesVisibility = function(features, visible)
 	{
 		for (let i = 0; i < features.length; i++)

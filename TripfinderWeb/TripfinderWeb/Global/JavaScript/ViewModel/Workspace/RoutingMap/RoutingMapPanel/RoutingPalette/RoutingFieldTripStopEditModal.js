@@ -195,12 +195,10 @@
 	{
 		// update stop point sequence when user manually set stop sequence
 		var stopSequence = 0;
-		// this.removeStopSequenceGraphics();
 		if (this.data.length == 1 && !this.obIsMultipleCreate())
 		{
 			stopSequence = this.obSelectedSequence();
 			this.highlightStopSequencePathAndPoint(stopSequence);
-			console.log(`selected stop sequence: ${stopSequence}`);
 
 			// update sequence for check data changed when cancel click
 			if (this.mode() != "new" && !this.obIsSmartSequence())
