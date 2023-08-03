@@ -566,8 +566,6 @@
 
 	FieldTripMap.prototype.applyAddFieldTripStop = async function(data, callback = ()=>{})
 	{
-		console.log(data);
-
 		this._refreshStopSequenceLabel(data);
 		this._drawNewStopFromMap(data);
 		this.clearHighlightFeatures();
@@ -665,8 +663,6 @@
 			{ DBID, FieldTripId, Sequence } = data,
 			fieldTrip = self.fieldTripsData.find(item => item.DBID === DBID && item.id === FieldTripId),
 			effectSequences = self._computeEffectSequences(fieldTrip, { addStop: { Sequence } });
-
-		console.log(`TODO: _drawNewStopPathFromMap, fieldTripId: ${FieldTripId}, ${JSON.stringify(effectSequences)}`);
 
 		await self.refreshFieldTripPath(fieldTrip, effectSequences);
 	}
@@ -1119,7 +1115,6 @@
 				const newStopData = await self._addNewStop(self.fieldTripHighlightStopLayerInstance, mapPoint);
 				self.hideLoadingIndicator();
 
-				console.log(newStopData);
 				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMapCompleted, newStopData);
 			}
 		}
