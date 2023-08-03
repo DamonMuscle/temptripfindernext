@@ -777,10 +777,6 @@
 					self.dataModel.viewModel.drawTool._clearTempDrawing();
 				}
 				self.dataModel.viewModel.drawTool.stopTool.clearCandidateGraphics();
-				if (self.viewModel._viewModal.mode === 'Routing-Create')
-				{
-					self.dataModel.viewModel.drawTool.create("point");
-				}
 				self.resolve();
 			}
 		});

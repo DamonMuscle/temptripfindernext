@@ -296,7 +296,7 @@
 				eventName = "pointer-move";
 				break;
 			case "mouse-down":
-				eventName = "pointer-move";
+				eventName = "pointer-down";
 				break;
 			case "mouse-up":
 				eventName = "pointer-up";
