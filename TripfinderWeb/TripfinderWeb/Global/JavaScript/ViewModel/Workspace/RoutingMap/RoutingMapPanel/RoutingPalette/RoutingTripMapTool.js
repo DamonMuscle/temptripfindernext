@@ -1155,104 +1155,6 @@
 		}, { isCopied: true, Trips: trips });
 	};
 
-	RoutingTripMapTool.prototype.copyToTripStops = function(tripStops)
-	{
-		var self = this;
-		var students = [];
-		tripStops = tripStops.map(function(stop)
-		{
-			(stop.Students || []).forEach(function(student)
-			{
-				students.push(student);
-			});
-			return $.extend({}, stop,
-				{
-					geometry: stop.geometry.clone(),
-					address: stop.Street,
-					Students: stop.Students.slice(),
-					ProhibitCrosser: stop.ProhibitCrosser,
-					TotalStopTime: stop.TotalStopTime,
-					boundary: {
-						OBJECTID: 0,
-						id: TF.createId(),
-						geometry: stop.boundary.geometry,
-						type: "tripBoundary",
-						BdyType: stop.boundary.BdyType
-					}
-				});
-		});
-		var uniqueStudents = Enumerable.From(students).Distinct(function(c) { return c.id; }).ToArray();
-		if (uniqueStudents.length == 0) return Promise.resolve(tripStops);
-
-		var promises = [];
-		for (var index = 0; index < uniqueStudents.length; index++)
-		{
-			var student = uniqueStudents[index];
-			promises.push(self._containedByHowManyStops(student, tripStops).then(function(result)
-			{
-				var intersectedStops = result[0], minIndex = result[1];
-				if (intersectedStops.length > 1)
-				{
-					intersectedStops.forEach(function(stop, i)
-					{
-						stop.unassignStudent = $.extend([], true, stop.Students);
-						if (i != minIndex)
-						{
-							stop.unassignStudent = stop.unassignStudent.filter(function(s) { return s.id != student.id; });
-						}
-					});
-
-				}
-			}));
-		}
-
-		return Promise.all(promises).then(function()
-		{
-			return tripStops;
-		});
-	};
-
-	RoutingTripMapTool.prototype._containedByHowManyStops = function(student, stops)
-	{
-		var self = this, promises = [], intersectedStops = [], distances = [];
-		stops.forEach(function(stop)
-		{
-			var isStopContainsStudent = stop.Students.filter(function(s) { return s.id == student.id; }).length > 0;
-			if (self._arcgis.geometryEngine.intersects(student.geometry, stop.boundary.geometry) && isStopContainsStudent)
-			{
-				intersectedStops.push(stop);
-				var stops = new self._arcgis.FeatureSet();
-				stops.features = self.NAtool._getStops([student, stop]);
-				var routeParameters = new self._arcgis.RouteParameters();
-				routeParameters.stops = stops;
-				// routeParameters = self.stopTool.getWalkRouteParameters(routeParameters);
-				var promise = self.stopTool.getWalkRouteParameters(routeParameters).then(function(routeParameters)
-				{
-					return routeParameters;
-				}).then(function(routeParameters)
-				{
-					new self._arcgis.RouteTask(arcgisUrls.LocalRouteFile).solve(routeParameters)
-						.then(function(data)
-						{
-							return data;
-						}, function()
-						{
-							return;
-						});
-				});
-				promises.push(promise);
-			}
-		});
-		return Promise.all(promises).then(function(results)
-		{
-			results.forEach(function(result)
-			{
-				distances.push(result ? result.routeResults[0].route.attributes.Shape_Length : Number.MAX_VALUE);
-			});
-			return [intersectedStops, distances.indexOf(Math.min.apply(null, distances))];
-		});
-	};
-
 	RoutingTripMapTool.prototype.revert = function(data, type)
 	{
 		var self = this;
@@ -1306,15 +1208,6 @@
 				self.dataModel.fieldTripStopDataModel.create(d);
 			});
 		}
-	};
-
-	RoutingTripMapTool.prototype.drawArrowToPoints = function(arrow)
-	{
-		this._pointArrowLayer.add(new tf.map.ArcGIS.Graphic({
-			geometry: arrow.geometry,
-			symbol: this.symbol.arrowToPoint(arrow.color),
-			attributes: arrow.attributes
-		}));
 	};
 
 	RoutingTripMapTool.prototype._deleteTripStopArrow = function(tripStop)

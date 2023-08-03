@@ -21,7 +21,6 @@
 		self.viewModel.dataModel.settingChangeEvent.subscribe(this.settingChangeEvent.bind(this));
 
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(self);
-		self.NAtool = new TF.RoutingMap.RoutingPalette.NetworkAnalysisTool(self);
 		self.stopPreviewTool = new TF.RoutingMap.RoutingPalette.StopPreviewTool(self, self._map);
 		self.dataModel.onTrialStopWalkoutPreviewChange.subscribe(self.stopPreviewTool.onTrialStopWalkoutPreviewChange.bind(self.stopPreviewTool));
 

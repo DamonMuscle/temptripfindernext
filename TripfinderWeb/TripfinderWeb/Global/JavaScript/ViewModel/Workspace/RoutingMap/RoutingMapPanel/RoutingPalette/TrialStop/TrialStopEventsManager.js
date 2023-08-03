@@ -217,51 +217,6 @@
 
 	TrialStopEventsManager.prototype.createTripStopFromSelectionClick = function()
 	{
-		var self = this;
-		var drawTool = this.viewModel.viewModel.fieldTripPaletteSection.drawTool;
-		var currentStops = drawTool._pointLayer.graphics.items.map(function(graphic) { return graphic.attributes.dataModel; });
-		drawTool.copyToTripStops(this.dataModel.highlighted).then(function(tripStops)
-		{
-			var stops = [];
-			tripStops.forEach(function(stop)
-			{
-				stops.push(self.copyTripStop(stop));
-			});
-
-			if (drawTool._allowOverlap) return self.createFromMultiple(stops);
-			var nonOverlapedStops = [];
-			var notContainTrips = new Set();
-			stops.forEach(function(stop)
-			{
-				var trips = drawTool.getNotContainTrips(stop);
-				if (trips.length > 0)
-				{
-					trips.forEach(t => { notContainTrips.add(t); });
-					nonOverlapedStops.push(stop);
-				}
-			});
-
-			if (nonOverlapedStops.length == 0)
-			{
-				return tf.promiseBootbox.alert("Remove Overlapping Boundaries is set as true! Since " + (stops.length == 1 ? "stop is" : "stops are") + " falling in current trip stop boundaries, no trip stops will be created", "Warning");
-			}
-			if (nonOverlapedStops.length < stops.length)
-			{
-				tf.promiseBootbox.alert("Remove Overlapping Boundaries is set as true! Some " + (stops.length - nonOverlapedStops.length == 1 ? "stop is" : "stops are") + " falling in current trip stop boundaries", "Warning").then(function()
-				{
-					createTripStops(nonOverlapedStops, currentStops);
-				});
-			}
-			else if (nonOverlapedStops.length == stops.length)
-			{
-				createTripStops(stops, currentStops);
-			}
-			function createTripStops(stops)
-			{
-				self.createFromMultiple(stops, { Trips: Array.from(notContainTrips) });
-			}
-
-		});
 	};
 
 	TrialStopEventsManager.prototype.createFromMultiple = function(pointArray, options = {})

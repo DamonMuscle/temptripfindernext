@@ -12,7 +12,6 @@
 		self._arcgis = tf.map.ArcGIS;
 		self.editModal = self.viewModel.stopPoolPaletteSection.editModal;
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(self);
-		self.NAtool = new TF.RoutingMap.RoutingPalette.NetworkAnalysisTool(self);
 		self.initialize();
 		self.stopPreviewTool = new TF.RoutingMap.RoutingPalette.StopPreviewTool(self, self._map);
 		TF.RoutingMap.EsriTool.call(self, self._map);

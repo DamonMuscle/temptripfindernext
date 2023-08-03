@@ -162,19 +162,6 @@
 		var self = this;
 		self.setOpenFieldTrips(trips).then(function()
 		{
-			var tripStops = self._viewModal.DocumentData.data.tripStops;
-			if (tripStops)
-			{
-				tripStops.forEach(function(stop)
-				{
-					self.viewModel.drawTool.drawArrowToPoints(
-						{
-							geometry: TF.xyToGeometry(stop.XCoord, stop.YCoord),
-							color: self.getColorByTripId(stop.FieldTripId),
-							attributes: { FieldTripId: stop.FieldTripId, Id: stop.id, type: "tripStopPointer" }
-						});
-				});
-			}
 		});
 	};
 
@@ -271,9 +258,6 @@
 		{
 			self._setOpenType(newTrips, "View");
 			return self._removeNotOpenViewTrips(data, newTrips);
-		}).then(function()
-		{
-			// return self._getSchoolLocations(newTrips);
 		}).then(function()
 		{
 			self.onTripsChangeEvent.notify({ add: newTrips, edit: [], delete: [], draw: false });
