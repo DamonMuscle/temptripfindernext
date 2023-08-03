@@ -547,15 +547,21 @@
 
 	FieldTripMap.prototype.startAddFieldTripStop = function()
 	{
-		this.editing.isAddingStop = true;
-		this.mapInstance.setMapCursor("crosshair");
+		if (!this.editing.isAddingStop)
+		{
+			this.editing.isAddingStop = true;
+			this.mapInstance.setMapCursor("crosshair");
+		}
 	}
 
 	FieldTripMap.prototype.stopAddFieldTripStop = async function()
 	{
-		this.editing.isAddingStop = false;
-		this.mapInstance.setMapCursor("default");
-		await this.clearHighlightFeatures();
+		if (this.editing.isAddingStop)
+		{
+			this.editing.isAddingStop = false;
+			this.mapInstance.setMapCursor("default");
+			await this.clearHighlightFeatures();
+		}
 	}
 
 	FieldTripMap.prototype.applyAddFieldTripStop = async function(data, callback = ()=>{})
@@ -1120,10 +1126,7 @@
 		else if (event.button === 2)
 		{
 			// right click
-			if (this.editing.isAddingStop)
-			{
-				this.stopAddFieldTripStop();
-			}
+			this.stopAddFieldTripStop();
 
 			const response = await self.mapInstance?.map.mapView.hitTest(event);
 			if (response.results.length > 0)
@@ -1159,10 +1162,7 @@
 	{
 		if (data.event.key === "Escape")
 		{
-			if (this.editing.isAddingStop)
-			{
-				this.stopAddFieldTripStop();
-			}
+			this.stopAddFieldTripStop();
 		}
 	}
 
