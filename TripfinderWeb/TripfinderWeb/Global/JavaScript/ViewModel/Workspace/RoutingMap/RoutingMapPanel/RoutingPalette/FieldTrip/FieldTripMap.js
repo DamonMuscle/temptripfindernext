@@ -781,6 +781,11 @@
 			return;
 		}
 
+		if (self.editing.isMovingStop)
+		{
+			return;
+		}
+
 		const sequence = stop.Sequence, fieldTripId = fieldTrip.id;
 		const fieldTripStops = self._getStopFeatures();
 		const stopGraphic = fieldTripStops.find(item => item.attributes.FieldTripId === fieldTripId && item.attributes.Sequence === sequence);
