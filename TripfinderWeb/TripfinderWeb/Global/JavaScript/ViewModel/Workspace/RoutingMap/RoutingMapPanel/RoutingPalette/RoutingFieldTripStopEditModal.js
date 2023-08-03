@@ -164,7 +164,7 @@
 		{
 			sequences.push(sequences[sequences.length - 1] + 1);
 		}
-		sequences.sort();
+		sequences.sort((a,b) => a-b);
 		this.obSequenceSource(sequences.map((x, index, array) =>
 		{
 			if(index === 0 || _.last(array) === x)
