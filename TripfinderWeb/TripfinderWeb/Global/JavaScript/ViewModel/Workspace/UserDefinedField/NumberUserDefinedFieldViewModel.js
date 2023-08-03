@@ -22,7 +22,14 @@
 		this.obFormatChecked = ko.observable();
 		this.obFormatChecked.subscribe(this.setFormatValue.bind(this));
 		this.obDecimalPlaces.subscribe(this.setFormatValue.bind(this));
+		this.obComponentLoaded = ko.observable(false);
 	}
+
+	NumberUserDefinedFieldViewModel.prototype.init = function()
+	{
+		var self = this;
+		setTimeout(() => self.obComponentLoaded(true));
+	};	
 
 	NumberUserDefinedFieldViewModel.prototype.getInitDecimalPlaces = function()
 	{
