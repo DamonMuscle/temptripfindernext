@@ -512,4 +512,9 @@
 		}
 		return false;
 	};
+
+	AuthManager.prototype.hasInfofinderi = function()
+	{
+		return this.supportedProducts.some(c => c.Name === "Infofinderi");
+	};
 })();
