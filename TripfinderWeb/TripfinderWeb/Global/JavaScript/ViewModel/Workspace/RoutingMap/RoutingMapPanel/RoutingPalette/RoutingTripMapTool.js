@@ -14,9 +14,6 @@
 
 		self.initialize();
 
-		// self.dataModel.onTripsChangeEvent.subscribe(self.onTripsChangeEvent.bind(this));
-		// self.dataModel.onTripStopsChangeEvent.subscribe(self.onTripStopsChangeEvent.bind(self));
-		// self.dataModel.onChangeTripVisibilityEvent.subscribe(self.onChangeTripVisibilityEvent.bind(self));
 		self.stopTool = new TF.RoutingMap.RoutingPalette.StopTool(self);
 		self.stopPreviewTool = new TF.RoutingMap.RoutingPalette.StopPreviewTool(self, self._map);
 		self.NAtool = new TF.RoutingMap.RoutingPalette.NetworkAnalysisTool(self);
@@ -25,9 +22,6 @@
 
 		// self.dataModel.onTrialStopWalkoutPreviewChange.subscribe(self.stopPreviewTool.onTrialStopWalkoutPreviewChange.bind(self.stopPreviewTool));
 		// self.dataModel.onSettingChangeEvent.subscribe(self.onSettingChangeEvent.bind(this));
-		// self.dataModel.onTripColorChangeEvent.subscribe(self.refreshTrips.bind(self));
-		// self.dataModel.onTripSequenceChangeEvent.subscribe(self.refreshTrips.bind(this));
-		// self.dataModel.onTripPathLineDisplayChange.subscribe(self.onTripPathLineDisplayChange.bind(this));
 		self.schoolSymbol = self.symbol.school("#cf39dc", 1, 16);
 	}
 
@@ -389,259 +383,6 @@
 		self._viewModal.setMode("", "Normal");
 	};
 
-	RoutingTripMapTool.prototype.onTripsChangeEvent = function(event, items)
-	{
-		var self = this;
-		if (items.draw != false)
-		{
-			if (items.delete.length > 0)
-			{
-				items.delete.forEach(function(item)
-				{
-					self.deleteTrip(item);
-				});
-			} else if (items.add.length > 0)
-			{
-				items.add.forEach(function(item)
-				{
-					self.addTrip(item);
-				});
-			} else if (items.edit.length > 0)
-			{
-				items.edit.forEach(function(item)
-				{
-					self.deleteTrip(item);
-				});
-				items.edit.forEach(function(item)
-				{
-					self.addTrip(item);
-				});
-			}
-		}
-	};
-
-	RoutingTripMapTool.prototype.onTripStopsChangeEvent = function(evt, items)
-	{
-		if (items && items.options && items.options.notNotifyTreeAndMap)
-		{
-			return;
-		}
-		var self = this;
-
-		if (items.delete.length > 0)
-		{
-			items.delete.forEach(function(item)
-			{
-				self._deleteTripStop(item);
-				// self._deleteTripBoundary(item.boundary);
-				self._deleteTripPathSegment(item);
-				self._deleteTripStopArrow(item);
-			});
-		}
-		if (items.add.length > 0)
-		{
-			items.add.forEach(function(item)
-			{
-				self._addTripStop(item, item.FieldTripId);
-				// self._addTripBoundary(item.boundary, item.FieldTripId);
-				self._addTripPathSegment(item);
-			});
-		}
-		if (items.edit.length > 0)
-		{
-			items.edit.forEach(function(item)
-			{
-				self._updateTripStop(item);
-				// self._updateTripBoundary(item);
-				self._updateTripPathSegment(item);
-			});
-		}
-
-		if (items.refreshTrip != false)
-		{
-			self.refreshTrips();//reorder the trips to fix label/stop layer order issue. 
-		}
-	};
-
-	RoutingTripMapTool.prototype.onTripPathLineDisplayChange = function()
-	{
-		this.dataModel.trips.forEach(trip =>
-		{
-			this.redrawPath(trip);
-		});
-	};
-
-	RoutingTripMapTool.prototype.onTripColorChangeEvent = function(e, data)
-	{
-		var self = this;
-		var tripId = data.FieldTripId;
-		var stopColor = self.dataModel.getColorByTripId(tripId);
-		self._getTripRelateGraphics(tripId).items.forEach(function(graphic)
-		{
-			if (graphic.attributes.type == "crossRoute")
-			{
-				return;
-			}
-			if (graphic.attributes.type == "tripPath")
-			{
-				graphic.symbol = self._getTripPathSymbol(tripId);
-			}
-			if (graphic.attributes.type == "boundary")
-			{
-				graphic.symbol = self._getTripBoundarySymbol(tripId); // .color = new tf.map.ArcGIS.Color([color.r, color.g, color.b, self._fillPattern]);
-			}
-			// if (graphic.attributes.type == "student")
-			// {
-			// 	graphic.symbol = self.getStudentSymbol(graphic.attributes.dataModel);
-			// }
-			if (graphic.attributes.type == "tripStopPointer")
-			{
-				graphic.symbol = self.symbol.arrowToPoint(stopColor);
-			}
-			if (graphic.attributes.type == "tripStop")
-			{
-				if (!graphic.attributes.dataModel.SchoolCode)
-				{
-					if (graphic.attributes.label)
-					{
-						var text = graphic.attributes.label.symbol.text;
-						var labelSymbol = self.symbol.tripStopLabel(stopColor);
-						labelSymbol.text = text;
-						graphic.symbol.color = stopColor;
-						graphic.attributes.label.symbol = labelSymbol;
-					} else
-					{
-						graphic.symbol = self.symbol.tripStop(graphic.attributes.dataModel.Sequence, stopColor);
-					}
-				}
-			}
-		});
-		self.refreshTripArrow(tripId);
-		self.refreshTrips();
-	};
-
-	RoutingTripMapTool.prototype.onTripSequenceChangeEvent = function(evt, items)
-	{
-		var self = this;
-		if (!items || items.length == 0)
-		{
-			return;
-		}
-
-		items.forEach(function(item)
-		{
-			var tripStopGraphic = self._findGraphicInLayerById(self._pointLayer, item.id);
-			if (tripStopGraphic)
-			{
-				var color = self.dataModel.getColorByTripId(item.FieldTripId);
-				var stopSymbol = self.symbol.tripStopSimpleMarker(color, 23);
-				if (item.SchoolCode && item.SchoolCode.length > 0)
-				{
-					stopSymbol = self.schoolSymbol;
-				}
-				if (tripStopGraphic.attributes.label)
-				{
-					var labelSymbol = self.symbol.tripStopLabel(color);
-					labelSymbol.text = item.Sequence;
-					tripStopGraphic.attributes.label.symbol = labelSymbol;
-					// self._pointLayer.remove(tripStopGraphic.attributes.label);
-					// delete tripStopGraphic.attributes.label;
-				}
-				tripStopGraphic.symbol = stopSymbol;
-				self._updateTripPathSegment(item);
-			}
-		});
-		var trip = self.dataModel.getTripById(items[0].FieldTripId);
-		self.redrawPath(trip);
-		self.refreshTrips();
-	};
-
-	RoutingTripMapTool.prototype.refreshTrips = function()
-	{
-		var self = this;
-		self._pointLayer.removeAll();
-		self._polygonLayer.removeAll();
-		self._polylineLayer.removeAll();
-		self._arrowLayer.removeAll();
-		self.dataModel.trips.forEach(function(trip)
-		{
-			self.addTrip(trip);
-		});
-		self._map.reorder(self._pointLayer, self._map.layers.length + 1);//always keeps stop on top of other. 
-	};
-
-	RoutingTripMapTool.prototype._deleteTripPathSegment = function(tripStop)
-	{
-		var self = this;
-		if (!tripStop)
-		{
-			return;
-		}
-		if (tripStop.path && tripStop.path.geometry)
-		{
-			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.FieldTripId);
-			if (tripPath)
-			{
-				tripPath.geometry.paths.splice(tripStop.Sequence - 1, 1);
-				var geometry = {
-					type: "polyline",
-					spatialReference: self._map.mapView.spatialReference,
-					paths: tripPath.geometry.paths
-				};
-				tripPath.geometry = geometry;
-			}
-		}
-		self.redrawPath(self.dataModel.getTripById(tripStop.FieldTripId));
-	};
-
-	RoutingTripMapTool.prototype._addTripPathSegment = function(tripStop)
-	{
-		var self = this;
-		if (!tripStop)
-		{
-			return;
-		}
-		if (tripStop.path && tripStop.path.geometry)
-		{
-			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.FieldTripId);
-			if (tripPath)
-			{
-				tripPath.geometry.paths.splice(tripStop.Sequence - 1, 0, tripStop.path.geometry.paths[0]);
-				var geometry = {
-					type: "polyline",
-					spatialReference: self._map.mapView.spatialReference,
-					paths: tripPath.geometry.paths
-				};
-				tripPath.geometry = geometry;
-			}
-		}
-		self.redrawPath(self.dataModel.getTripById(tripStop.FieldTripId));
-	};
-
-	RoutingTripMapTool.prototype._updateTripPathSegment = function(tripStop)
-	{
-		var self = this, trip = self.dataModel.getTripById(tripStop.FieldTripId), visible = trip.visible;
-		if (tripStop.path && tripStop.path.geometry)
-		{
-			var tripPath = self._findGraphicInLayerById(self._polylineLayer, tripStop.FieldTripId);
-			if (tripPath)
-			{
-				tripPath.geometry.paths[tripStop.Sequence - 1] = tripStop.path.geometry.paths ? tripStop.path.geometry.paths[0] : [];
-				var geometry = new self._arcgis.Polyline({
-					type: "polyline",
-					spatialReference: self._map.mapView.spatialReference,
-					paths: tripPath.geometry.paths
-				});
-				tripPath.geometry = geometry;
-				if (visible == false)
-				{
-					tripPath.visible = false;
-				}
-			}
-		}
-		self.redrawPath(self.dataModel.getTripById(tripStop.FieldTripId));
-	};
-
 	RoutingTripMapTool.prototype.redrawPath = function(trip)
 	{
 		var self = this;
@@ -671,6 +412,7 @@
 			}
 		}
 	};
+
 	RoutingTripMapTool.prototype.deleteTrip = function(trip)
 	{
 		var self = this;
@@ -687,29 +429,6 @@
 				graphic.layer.remove(graphic);
 			}
 		});
-	};
-
-	RoutingTripMapTool.prototype.onChangeTripVisibilityEvent = function(e, data)
-	{
-		var self = this;
-		var visible = data.visible;
-		var tripIds = data.TripIds;
-		self.viewModel.routingChangePath && self.viewModel.routingChangePath.stop();
-		for (var i = 0; i < tripIds.length; i++)
-		{
-			var tripId = tripIds[i];
-			self._getTripRelateGraphics(tripId).forEach(function(graphic)
-			{
-				var isVisible = visible;
-				if (graphic.attributes.type === "boundary")
-				{
-					isVisible = isVisible && self._showStopBoundary;
-				}
-				graphic.visible = !!isVisible;
-			});
-			self.refreshTripArrow(tripId);
-		}
-		self.viewModel.viewModel.tripStopLabelSetting.labelDisplay._refreshGraphicsLazyRun();
 	};
 
 	RoutingTripMapTool.prototype.updateTripId = function(oldTripId, newTripId)
@@ -740,24 +459,6 @@
 			.concat(getGraphicsByFilter(self._studentCountLayer))
 			.concat(getGraphicsByFilter(self._pointArrowLayer))
 			.concat(getGraphicsByFilter(self._studentStopAssignmentLayer));
-	};
-
-	RoutingTripMapTool.prototype.addTrip = function(trip)
-	{
-		var self = this;
-		var tripPaths = [];
-		trip.FieldTripStops.forEach(function(stop)
-		{
-			var path = TF.Helper.TripHelper.getDrawTripPathGeometry(stop, trip);
-			if (path)
-			{
-				tripPaths.push(path);
-			}
-			self._addTripStop(stop, trip.id);
-			self._addTripBoundary(stop.boundary, trip.id);
-			// self._addStudent(stop, trip.id);
-		});
-		self._addTripPath(tripPaths, trip);
 	};
 
 	RoutingTripMapTool.prototype._addTripStop = function(tripStop, tripId)
@@ -906,24 +607,6 @@
 		});
 
 	};
-	RoutingTripMapTool.prototype._addTripBoundary = function(boundary, tripId)
-	{
-		var self = this;
-		if (!boundary || !boundary.geometry)
-		{
-			return;
-		}
-		var trip = self.dataModel.getTripById(tripId);
-		var geometry = boundary.geometry;
-		// var newBoundary = JSON.parse(JSON.stringify(boundary));
-		// TF.loopCloneGeometry(newBoundary, boundary);
-		var graphic = this.createStopBoundaryGraphic(boundary, geometry, tripId);
-		if (trip.visible == false || !self._showStopBoundary)
-		{
-			graphic.visible = false;
-		}
-		self._polygonLayer.add(graphic);
-	};
 
 	RoutingTripMapTool.prototype.createStopBoundaryGraphic = function(dataModel, geometry, tripId)
 	{
@@ -939,38 +622,6 @@
 		});
 	};
 
-	RoutingTripMapTool.prototype._updateTripBoundary = function(tripStop)
-	{
-		var self = this, trip = self.dataModel.getTripById(tripStop.FieldTripId), visible = trip.visible && this._showStopBoundary;
-		if (tripStop.boundary && tripStop.boundary.geometry)
-		{
-			if (!self._arcgis.geometryEngine.intersects(tripStop.geometry, tripStop.boundary.geometry))
-			{
-				var nearestPointGeometry = self._arcgis.geometryEngine.nearestCoordinate(tripStop.boundary.geometry, tripStop.geometry).coordinate;
-				tripStop.boundary.geometry = self._createFinger(nearestPointGeometry, tripStop.geometry, tripStop.boundary);
-			}
-			var boundaryGraphic = self._findGraphicInLayerById(self._polygonLayer, tripStop.boundary.id);
-			if (!boundaryGraphic) return;
-			boundaryGraphic.attributes = {
-				"dataModel": tripStop.boundary,
-				FieldTripId: tripStop.FieldTripId,
-				type: "boundary"
-			};
-			if (visible == false)
-			{
-				boundaryGraphic.visible = false;
-			}
-			boundaryGraphic.geometry = tripStop.boundary.geometry;
-			boundaryGraphic.symbol = self._getTripBoundarySymbol(tripStop.FieldTripId);
-		}
-	};
-
-	RoutingTripMapTool.prototype._deleteTripBoundary = function(tripBoundary)
-	{
-		var self = this;
-		var boundary = self._findGraphicInLayerById(self._polygonLayer, tripBoundary.id);
-		self._polygonLayer.remove(boundary);
-	};
 	RoutingTripMapTool.prototype._getTripBoundarySymbol = function(tripId)
 	{
 		var self = this;
@@ -999,6 +650,7 @@
 		};
 		return symbol;
 	};
+
 	RoutingTripMapTool.prototype._getTripPathSymbol = function(tripId)
 	{
 		var self = this;
@@ -1036,47 +688,6 @@
 	{
 		this.stopPreviewTool._stopWalkoutPreview();
 	};
-
-	// RoutingTripMapTool.prototype._addStudent = function(tripStop, tripId)
-	// {
-	// 	var self = this;
-	// 	var students = null;
-	// 	students = tripStop.Students;
-	// 	var visible = self.dataModel.getTripById(tripId).visible;
-	// 	if (students)
-	// 	{
-	// 		students.forEach(function(student)
-	// 		{
-	// 			student.type = "student";
-	// 			if (student.XCoord)
-	// 			{
-	// 				var geometry = student.geometry;
-	// 				var studentSymbol = self.getStudentSymbol(student);
-	// 				var studentGraphic = new self._arcgis.Graphic({
-	// 					geometry: geometry,
-	// 					symbol: studentSymbol,
-	// 					attributes: {
-	// 						"dataModel": student,
-	// 						FieldTripId: tripId,
-	// 						type: "student"
-	// 					}
-	// 				});
-	// 				studentGraphic.visible = visible && self._showAssignedStudents;
-	// 				self._studentLayer.add(studentGraphic);
-	// 			}
-	// 		});
-	// 	}
-	// };
-
-	// RoutingTripMapTool.prototype.getStudentSymbol = function(student)
-	// {
-	// 	var self = this;
-	// 	if (student.IsAssigned)
-	// 	{
-	// 		return self.symbol.getAssignedStudentSymbol(self.dataModel.getColorByTripId(student.TripID));
-	// 	}
-	// 	return self.symbol.getUnassignedStudentSymbol();
-	// };
 
 	RoutingTripMapTool.prototype._addTripPath = function(paths, trip)
 	{
@@ -1376,11 +987,6 @@
 		return this.dataModel.getHeartBoundaryId(pointGraphic);
 	};
 
-	RoutingTripMapTool.prototype.onCandidatesStudentsChangeEvent = function(event, items)
-	{
-
-	};
-
 	RoutingTripMapTool.prototype.onSettingChangeEvent = function()
 	{
 		var self = this;
@@ -1449,6 +1055,7 @@
 			self.viewModel._viewModal.geoSearchPaletteViewModel.childSections.TripStopSection.highlightedChangeSymbol();
 		});
 	};
+
 	RoutingTripMapTool.prototype.movePoint = function(id)
 	{
 		var self = this, tripStopGraphic = self._findGraphicInLayerById(self._pointLayer, id);
@@ -1510,55 +1117,6 @@
 			});
 			TF.RoutingMap.EsriTool.prototype.movePointCallback.call(self, graphics);
 		});
-	};	
-
-	RoutingTripMapTool.prototype.createDoorToDoorStop = function(student)
-	{
-		var self = this;
-		self.stopTool.findClosestLocationOnStreetForDoorToDoor({ geometry: student.geometry, address: student.Address }).then(function(result)
-		{
-			var stopLocation = student.geometry;
-			if (result)
-			{
-				stopLocation = result.geometry;
-			}
-			var midPoint = self.stopTool.getDoorToDoorLocation(stopLocation, student.geometry);
-			var pointGraphic = new self._arcgis.Graphic({
-				geometry: midPoint,
-				attributes: { id: TF.createId() },
-				symbol: self.symbol.tripStop("0", "#FFFFFF")
-			});
-			self._pointLayer.add(pointGraphic);
-			self._newTripStopGraphic = pointGraphic;
-			var addressPromise = Promise.resolve();
-			if (student.Address && student.Address.split(",")[0].length > 0)
-			{
-				addressPromise = Promise.resolve(student.Address.split(",")[0]);
-			} else
-			{
-				addressPromise = self.stopTool.reverseGeocodeStop(midPoint);
-			}
-			addressPromise.then(function(result)
-			{
-				if (result)
-				{
-					var options = {
-						isDoorToDoor: true,
-						student: student,
-						isCreateFromUnassignStudent: true,
-						isCreateFromStopSearch: false,
-						isCreateFromSearch: false,
-						boundary: null,
-						insertBehindSpecialStop: false,
-						streetName: result
-					};
-					self.stopTool.addStopAddressAndBoundary(pointGraphic, options);
-				} else
-				{
-					self._pointLayer.remove(self._newTripStopGraphic);
-				}
-			});
-		});			
 	};
 
 	RoutingTripMapTool.prototype.copyToTripStop = function(tripStop)

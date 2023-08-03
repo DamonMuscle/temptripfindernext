@@ -27,7 +27,6 @@
 		self.featureData = new TF.RoutingMap.RoutingPalette.StopPoolFeatureData(self);
 		self.lockData = new TF.RoutingMap.RoutingPalette.StopPoolLockData(self);
 		self.lockData.onLockedChangeEvent.subscribe(self.onLockedChange.bind(self));
-		self.tripDataModel.onCandidatesStudentsChangeToMapEvent.subscribe(this.onCandidatesStudentsChangeEvent.bind(this));
 	}
 
 	StopPoolDataModel.prototype = Object.create(TF.RoutingMap.BaseMapDataModel.prototype);
@@ -129,7 +128,6 @@
 			{
 				self.all = items;
 				self.onAllChangeEvent.notify({ add: items, delete: [], edit: [] });
-				self.onCandidatesStudentsChangeEvent();
 			}
 		}).catch(function(error)
 		{
@@ -278,23 +276,6 @@
 		});
 		self.refreshSelectAndHighlighted();
 		self.calcSelfChangeCount();
-	};
-
-	StopPoolDataModel.prototype.onCandidatesStudentsChangeEvent = function()
-	{
-		var self = this;
-		clearTimeout(self.onCandidatesStudentsChangeEventTimeout);
-		self.onCandidatesStudentsChangeEventTimeout = setTimeout(function()
-		{
-			if (self.all)
-			{
-				self.all.forEach(function(stop)
-				{
-					self.updateStudent(stop);
-				});
-				self.onAllChangeEvent.notify({ add: [], edit: self.all, delete: [] });
-			}
-		}, 100);
 	};
 
 	StopPoolDataModel.prototype.updateStudent = function(data)

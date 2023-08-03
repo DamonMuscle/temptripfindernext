@@ -50,7 +50,6 @@
 				return !Enumerable.From(refreshIds).Any(function(c) { return c == d.OBJECTID; });
 			});
 			self.dataModel.all = self.dataModel.all.concat(source);
-			self.dataModel.onCandidatesStudentsChangeEvent();
 			self.dataModel.onAllChangeEvent.notify({ add: source, edit: [], delete: [] });
 		});
 	};

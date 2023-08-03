@@ -9,7 +9,6 @@
 		self.routeState = viewModel.viewModel._viewModal.routeState;
 		self.viewModel = viewModel;
 		self.tripDataModel = viewModel.tripDataModel;
-		self.tripDataModel.onCandidatesStudentsChangeToMapEvent.subscribe(this.onCandidatesStudentsChangeEvent.bind(this));
 		self.settingChangeEvent = new TF.Events.Event();
 		self.studentUpdateEvent = new TF.Events.Event();
 		self.onTrialStopWalkoutPreviewChange = new TF.Events.Event();
@@ -169,27 +168,6 @@
 			{
 				return self.all[i];
 			}
-		}
-	};
-
-	TrialStopDataModel.prototype.onCandidatesStudentsChangeEvent = function()
-	{
-		var self = this;
-		if (self.all && self.all.length > 0)
-		{
-			var promises = [];
-			self.all.forEach(function(stop)
-			{
-				promises.push(self.updateStudent(stop));
-			});
-			Promise.all(promises).then(function()
-			{
-				self.onAllChangeEvent.notify({
-					add: [],
-					delete: [],
-					edit: self.all
-				});
-			});
 		}
 	};
 

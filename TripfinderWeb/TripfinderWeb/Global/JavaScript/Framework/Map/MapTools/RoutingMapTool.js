@@ -45,7 +45,6 @@
 				mapToolOptions: options.mapToolOptions,
 			}
 		);
-		self.onCandidatesStudentsChangeEvent = self.onCandidatesStudentsChangeEvent.bind(self);
 		self.highlightChangedEvent = self.highlightChangedEvent.bind(self);
 		self.baseMapTools = null;
 	}
@@ -508,14 +507,6 @@
 		});
 	};
 
-	RoutingMapTool.prototype.onCandidatesStudentsChangeEvent = function (allStudents, highlightedStudents)
-	{
-		if (this.thematicTool && this.thematicTool.thematicMenu.obSelectThematicId() > 0)
-		{
-			this.reloadThematicsTool(allStudents, highlightedStudents);
-		}
-	};
-
 	RoutingMapTool.prototype.highlightChangedEvent = function (highlightedStudents)
 	{
 		var self = this;
@@ -533,41 +524,6 @@
 	RoutingMapTool.prototype.hasApplyThematic = function ()
 	{
 		return this.thematicTool.thematicMenu.obAppliedThematic() !== null;
-	};
-
-	/**
-	* Initialize the thematics tool
-	* @return {void}
-	*/
-	RoutingMapTool.prototype.reloadThematicsTool = function (allStudents, highlightedStudents)
-	{
-		var self = this;
-		allStudents = allStudents ? allStudents : [];
-		highlightedStudents = highlightedStudents ? highlightedStudents : [];
-		if (self.thematicTool)
-		{
-			allStudents = allStudents.filter(item => !!item.geometry || !!item.XCoord || !!item.Ycoord);
-			self.thematicTool.grid.result = { TotalRecordCount: allStudents.length };
-			self.thematicTool.grid.allIds = allStudents.map(function (s)
-			{
-				if (s.entityId && (self.thematicTool.grid._gridType === "district" || self.thematicTool.grid._gridType === "trip"))
-				{
-					return s.entityId;
-				}
-				else
-				{
-					return s.id;
-				}
-			});
-			self.thematicTool.grid.allData = allStudents;
-			self.thematicTool.grid.highLightedData = highlightedStudents.length > 0 ?
-				highlightedStudents.filter(item => !!item.geometry || !!item.XCoord || !!item.Ycoord)
-				: highlightedStudents;
-			if (self.thematicTool.thematicInfo !== null)
-			{
-				self.thematicTool.thematicMenu.refreshThematic();
-			}
-		}
 	};
 
 	/**

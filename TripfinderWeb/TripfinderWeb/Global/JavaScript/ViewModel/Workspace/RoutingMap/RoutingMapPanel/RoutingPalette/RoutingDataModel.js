@@ -31,8 +31,6 @@
 		self.onChangeTripVisibilityEvent = new TF.Events.Event();
 		self.onSettingChangeEvent = new TF.Events.Event();
 		self.onTripSequenceChangeEvent = new TF.Events.Event();
-		self.onAssignStudentsChangeToMapEvent = new TF.Events.Event();
-		self.onCandidatesStudentsChangeToMapEvent = new TF.Events.PromiseEvent();
 		self.onTripDisplayRefreshEvent = new TF.Events.Event();
 		self.onStudentCrossStreetStopChangeEvent = new TF.Events.Event();
 		self.onWalkTSRestrictionChangeEvent = new TF.Events.Event();
@@ -45,7 +43,7 @@
 		self.onSchoolLocationChangeEvent = new TF.Events.Event();
 		self.onStopCandidateStudentChangeEvent = new TF.Events.Event();
 		self.onTripTreeColorChangeEvent = new TF.Events.Event();
-		self.onTripPathLineDisplayChange = new TF.Events.Event();
+		self.onTripPathLineDisplayChangeEvent = new TF.Events.Event();
 
 		// lock data
 		self.featureData = new TF.RoutingMap.RoutingPalette.RoutingFeatureData(self);
@@ -3122,8 +3120,6 @@
 		this.tripLockData.unLockCurrentDocument();
 		this.onTripsChangeEvent.unsubscribeAll();
 		this.fieldTripEditBroadcast.dispose();
-		this.onCandidatesStudentsChangeToMapEvent.unsubscribeAll();
-		this.onAssignStudentsChangeToMapEvent.unsubscribeAll();
 		this.onTripColorChangeEvent.unsubscribeAll();
 		this.onChangeTripVisibilityEvent.unsubscribeAll();
 		this.onWalkTSRestrictionChangeEvent.unsubscribeAll();

@@ -109,7 +109,6 @@
 			{
 				self.mapInstance.eventHandler.onMapViewUpdated.remove();
 			}
-			// self._map.mapView.watch(["extent", "rotation"], self._refreshMapArrow.bind(self));
 			// self._map.mapView.on("drag", () =>
 			// {
 			// 	self._dragging = true;
@@ -117,7 +116,6 @@
 			// 	self._draggingTimeout = setTimeout(() => { self._dragging = false; });
 			// }, 50);
 			self._map.mapView.on("click", self.onRightClickMenu.bind(self));
-			// self._map.mapView.on("double-click", self._zoomOutMapOnDoubleRightClick.bind(self));
 			self.autoPan = TF.RoutingMap.AutoPanManager.getAutoPan(self._map);
 			self.autoPan.initialize(self.element, 20);
 			self.directionPaletteViewModel.onOpenDestinationDropModeClicked.subscribe(self._clickOpenDestinationDropMode.bind(self));
@@ -767,31 +765,6 @@
 		PubSub.subscribe("MenuDataUpdatedHub", this.menuDataUpdatd);
 	};
 
-	MapCanvasPage.prototype._refreshMapArrow = function()
-	{
-		var self = this;
-		clearTimeout(self.extentChangeTimeout);
-		self.extentChangeTimeout = setTimeout(function()
-		{
-			TF.RoutingMap.ContextMenu.prototype.removeContextMenu();
-
-			if (!self._map)
-			{
-				return;
-			}
-			if (self._map.mapView.zoom != self._lastZoomLevel || self._dragging != true)
-			{
-				self._lastZoomLevel = parseInt(self._map.mapView.zoom);
-				var routingLayer = self._map.findLayerById("routingFeatureLayer");
-				if (routingLayer && routingLayer.graphics.length > 0)
-				{
-					self.routingPaletteViewModel.drawTool.refreshTripArrow();
-				}
-				self._directionsTool.mapZoomHandler();
-			}
-		}, 500);
-	};
-
 	MapCanvasPage.prototype._clickOpenDestinationDropMode = function()
 	{
 		var self = this;
@@ -1098,24 +1071,6 @@
 		if (e.button == 0)
 		{
 			PubSub.publish("clear_ContextMenu_Operation");
-		}
-	};
-	
-	MapCanvasPage.prototype._zoomOutMapOnDoubleRightClick = function(e)
-	{
-		var self = this, currentCenter = self._map.mapView.center, xoffset = e.mapPoint.latitude - currentCenter.latitude, yoffset = e.mapPoint.longitude - currentCenter.longitude;
-		if (e.button == 2)
-		{
-			self._map.mapView.zoom = self._map.mapView.zoom - 1;
-			self._map.mapView.center = [e.mapPoint.longitude - yoffset * 2, e.mapPoint.latitude - xoffset * 2];
-			self._lastPreventKey = (new Date()).getTime();
-			// // use prevent to avoid context menu when zoom
-			self.prevent = true;
-			clearTimeout(self._preventTimeout);
-			self._preventTimeout = setTimeout(function()
-			{
-				self.prevent = false;
-			}, 1000);
 		}
 	};
 
