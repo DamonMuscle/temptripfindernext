@@ -212,13 +212,7 @@
 	CopyFieldTripViewModel.prototype.saveValidate = function()
 	{
 		var self = this;
-		return self.dataModel.validateUniqueFieldTripName(self.obName()).then(function()
-		{
-			return true;
-		}, function()
-		{
-			return false;
-		});
+		return Promise.resolve(true);
 	};
 
 	CopyFieldTripViewModel.prototype.fieldTripTypeEnum = { 'NotReverseAndToSchool': 0, 'ReverseAndToSchool': 1, 'ReverseAndFromSchool': 2, 'NotReverseAndFromSchool': 3 };

@@ -1344,26 +1344,6 @@
 		return Promise.resolve();
 	};
 
-	RoutingTripViewModel.prototype.validateUniqueName = function()
-	{
-		var self = this;
-		// There is another trip in the database with the same name as this trip.Please change this trip"s name before saving it.
-		return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "trips"), {
-			paramData: {
-				name: this.obEntityDataModel().name()
-			}
-		})
-			.then(function(data)
-			{
-				if (data.Items.length == 0 || self.obEntityDataModel().id() == data.Items[0].Id)
-				{
-					return Promise.resolve();
-				}
-				tf.promiseBootbox.alert("There is another trip in the database with the same name as this trip. Please change this trip's name before saving it.");
-				return Promise.reject();
-			});
-	};
-
 	RoutingTripViewModel.prototype.saveValidate = function()
 	{
 		var self = this;
@@ -1371,7 +1351,7 @@
 		{
 			if (result)
 			{
-				return Promise.all([self.validateShuttle(), self.validateUniqueName()]).then(function()
+				return Promise.all([self.validateShuttle()]).then(function()
 				{
 					return true;
 				}).catch(function()

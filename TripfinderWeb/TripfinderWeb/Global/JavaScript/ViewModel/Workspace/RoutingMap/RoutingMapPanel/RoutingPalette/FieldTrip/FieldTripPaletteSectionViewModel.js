@@ -164,7 +164,7 @@
 
 	FieldTripPaletteSectionViewModel.prototype.save = function()
 	{
-		return this.dataModel.saveTrips(this.dataModel.trips);
+		return this.dataModel.saveRoutingFieldTrips(this.dataModel.trips);
 	};
 
 	FieldTripPaletteSectionViewModel.prototype.revert = function()

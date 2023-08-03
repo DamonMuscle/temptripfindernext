@@ -48,11 +48,6 @@
 		}
 	};
 
-	RoutingEventsManager.prototype.createTripClick = function()
-	{
-		this.dataModel.createTrip();
-	};
-
 	RoutingEventsManager.prototype.tripInfoClick = function(data)
 	{
 		var trip = this.dataModel.getTripById(data.id);
@@ -69,17 +64,6 @@
 	{
 		var self = this;
 		self.openTrip();
-		// if (self.dataModel.trips.length == 1 && self.dataModel.hasUnsavedRestrictions())
-		// {
-		// 	tf.promiseBootbox.alert({
-		// 		message: "There are unsaved restriction changes. You must save or revert changes before opening new trips.",
-		// 		title: "Confirmation"
-		// 	});
-		// }
-		// else
-		// {
-		// 	self.openTrip();
-		// }
 	};
 
 	RoutingEventsManager.prototype.openReadOnlyTripClick = function()
@@ -377,7 +361,6 @@
 					var promiseList = [];
 					if (unsavedNewTrips.length > 0)
 					{
-						// promiseList.push(self.dataModel.closeUnsavedNewTrips(unsavedNewTrips, false));
 						promiseList.push(self.dataModel.closeUnsavedNewFieldTrips(unsavedNewTrips, false));
 					}
 					if (viewTrips.length > 0)
@@ -393,7 +376,6 @@
 							{
 								if (result)
 								{
-									// self.dataModel.closeByTrips(editTrips);
 									self.dataModel.closeByFieldTrips(editTrips);
 								}
 							});

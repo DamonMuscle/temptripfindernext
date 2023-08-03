@@ -860,34 +860,6 @@
 		return this.colors[this.trips.length % this.colors.length];
 	};
 
-	RoutingDataModel.prototype.createTrip = function()
-	{
-		var self = this;
-		tf.modalManager.showModal(
-			new TF.RoutingMap.RoutingPalette.RoutingTripModalViewModel({
-				currentOpenTrip: self.trips.length > 0 ? self.trips[0] : null,
-				dataModel: self,
-				newTripColor: self.getNewTripColor()
-			})
-		).then(function(trip)
-		{
-			if (!trip)
-			{
-				return;
-			}
-
-			return self._getSchoolLocations([trip]).then(function()
-			{
-				self.tripLockData.lockIds([trip.id]);
-				self.trips.push(trip);
-				self.onTripsChangeEvent.notify({ add: [trip], edit: [], delete: [] });
-				self.changeDataStack.push(trip);
-				self.viewModel.drawTool.stopTool.attachClosetStreetToStop(trip.FieldTripStops);
-				self._updateTravelScenarioLock();
-			});
-		});
-	};
-
 	RoutingDataModel.prototype.editTrip = function(trip)
 	{
 		var self = this;
@@ -1304,7 +1276,6 @@
 				deleteTrips.push(trip);
 			}
 		});
-		// self.closeByTrips(deleteTrips, true);
 		self.closeByFieldTrips(deleteTrips, true);
 	};
 
@@ -1406,51 +1377,6 @@
 			{
 				return !IsEmptyString(item.SchoolCode);
 			});
-		}
-	};
-
-	RoutingDataModel.prototype.getSchoolStopsByTrip = function(trip)
-	{
-		return trip.FieldTripStops.filter(function(item)
-		{
-			return !IsEmptyString(item.SchoolCode);
-		});
-	};
-
-	RoutingDataModel.prototype.getSchoolStopsByTripIdSchoolCode = function(tripId, schoolCode)
-	{
-		var self = this;
-		var trip = self.getTripById(tripId);
-		return self.getSchoolStopsBySchoolCode(trip, schoolCode);
-	};
-
-	RoutingDataModel.prototype.getSchoolStopsBySchoolCode = function(trip, schoolCode)
-	{
-		return trip.FieldTripStops.filter(function(item)
-		{
-			return item.SchoolCode == schoolCode;
-		});
-	};
-
-	RoutingDataModel.prototype.getTripStopsByTripIdStudentId = function(tripId, studentId)
-	{
-		var self = this;
-		for (var i = 0; i < self.trips.length; i++)
-		{
-			if (tripId && self.trips[i].id != tripId)
-			{
-				continue;
-			}
-			for (var j = 0; j < self.trips[i].FieldTripStops.length; j++)
-			{
-				for (var k = 0; k < self.trips[i].FieldTripStops[j].Students.length; k++)
-				{
-					if (self.trips[i].FieldTripStops[j].Students[k].id == studentId)
-					{
-						return self.trips[i].FieldTripStops;
-					}
-				}
-			}
 		}
 	};
 
@@ -1846,16 +1772,6 @@
 		return Enumerable.From(trip.FieldTripStops).FirstOrDefault(null, function(c) { return c.Sequence == sequence; });
 	};
 
-	RoutingDataModel.prototype.isSchoolStop = function(tripStopId)
-	{
-		var stop = this.getFieldTripStopByStopId(tripStopId);
-		if (!IsEmptyString(stop.SchoolCode))
-		{
-			return true;
-		}
-		return false;
-	};
-
 	RoutingDataModel.prototype.getColorByTripId = function(tripId)
 	{
 		var trip = this.getTripById(tripId);
@@ -2009,56 +1925,7 @@
 	RoutingDataModel.prototype.closeAllEditTrips = function()
 	{
 		var self = this;
-		// return self.closeByTrips(self.getEditTrips());
 		return self.closeByFieldTrips(self.getEditTrips());
-	};
-
-	RoutingDataModel.prototype.closeUnsavedNewTrips = function(trips, noSaveCheck, exceptTrips)
-	{
-		var self = this, p = Promise.resolve(false);
-		if (!noSaveCheck)
-		{
-			p = self.unSaveConfirmBox(trips);
-		}
-		return p.then(function(ans)
-		{
-			var savePromise = Promise.resolve(ans);
-			if (ans)
-			{
-				savePromise = self.saveTrips(trips);
-			}
-			return savePromise.then(function(result)
-			{
-				tf.loadingIndicator.showImmediately();
-				var releaseStudentPromise = Promise.resolve();
-				if (!result)
-				{
-					trips.forEach(function(trip)
-					{
-						self.deleteChangeDataStackByTripId(trip.id);
-					});
-				}
-
-				return releaseStudentPromise.then(function()
-				{
-					if (trips.length > 0)
-					{
-						self.removeNeedDeleteTrip(trips);
-						self.onTripsChangeEvent.notify({
-							add: [],
-							edit: self.getEditTrips().filter(function(a) { return !Enumerable.From(exceptTrips).Any(function(b) { return b.id == a.id; }); }),
-							delete: trips
-						});
-					}
-
-					self.clearContextMenuOperation();
-					self.viewModel.editFieldTripStopModal.closeEditModal();
-					self._viewModal.setMode("Routing", "Normal");
-					tf.loadingIndicator.tryHide();
-					self._updateTravelScenarioLock();
-				});
-			});
-		});
 	};
 
 	RoutingDataModel.prototype.closeUnsavedNewFieldTrips = function(fieldTrips, noSaveCheck, exceptTrips)
@@ -2396,7 +2263,7 @@
 			return Promise.resolve();
 		}
 		self.viewModel.routingChangePath.stop();
-		return self.saveTrips(trips).then(function(success)
+		return self.saveRoutingFieldTrips(trips).then(function(success)
 		{
 			if (success)
 			{
@@ -2533,15 +2400,6 @@
 		}
 	};
 
-	RoutingDataModel.prototype.getSchoolSequence = function(tripId, schoolCode)
-	{
-		var self = this;
-		return self.getSchoolStopsByTripIdSchoolCode(tripId, schoolCode).map(function(item)
-		{
-			return item.Sequence;
-		});
-	};
-
 	RoutingDataModel.prototype.findRealSchoolStops = function(tripStop, student)
 	{
 		var self = this;
@@ -2575,154 +2433,6 @@
 		}
 	};
 
-	RoutingDataModel.prototype.saveTrips = function(trips)
-	{
-		var self = this;
-		if (self.saving)
-		{
-			return Promise.resolve(false);
-		}
-
-		let copiedTrips = trips.filter(t => !!t.copyFromTripId);
-
-		return self.validateName(trips).then(function(valid)
-		{
-			if (!valid)
-			{
-				return Promise.reject();
-			}
-
-			self.clearRevertInfo();
-			tf.loadingIndicator.show();
-
-			return tf.promiseAjax.get(pathCombine(tf.api.apiPrefixWithoutDatabase(), "tripresources"), {
-				paramData: {
-					"DBID": tf.datasourceManager.databaseId,
-					"@filter": "in(FieldTripId," + trips.map(x => x.id).join(",") + ")",
-					"@fields": "FieldTripId,StartDate,EndDate,IsTripLevel"
-				}
-			}).then(function(response)
-			{
-				const tripResources = response && response.Items && response.Items.length > 0 ? response.Items.filter(c => !c.IsTripLevel) : null;
-				// Check if any trip's assignment has been updated.
-				let shouldUpdateTripResource = false;
-
-				trips.forEach((trip) =>
-				{
-					trip.oldId = trip.id;
-					trip.UnsavedNewTrip = false;
-					const relatedTripResources = tripResources && tripResources.length > 0 ? tripResources.filter(c => c.FieldTripId == trip.id) : null;
-					const originalAssignment = self.originalTripAssignment[trip.id];
-					if (self.hasFutureResource(relatedTripResources))
-					{
-						if (!shouldUpdateTripResource && originalAssignment)
-						{
-							if (self.compareTripAssignment(trip, originalAssignment))
-							{
-								shouldUpdateTripResource = true;
-							}
-						}
-					}
-				});
-
-				if (shouldUpdateTripResource)
-				{
-					shouldUpdateTripResource = tf.promiseBootbox.yesNo(
-						"Future resource substitution exist.  Do you want to replace them with this change?",
-						"Confirmation"
-					);
-				}
-
-				return Promise.resolve(shouldUpdateTripResource)
-					.then(result =>
-					{
-						return tf.promiseAjax.post(pathCombine(tf.api.apiPrefix(), "RoutingTrips"),
-							{
-								paramData: { affectFutureResource: result },
-								data: trips
-							})
-							.then((response) =>
-							{
-								const savedTrips = response.Items;
-
-								copiedTrips = savedTrips.reduce(function(result, st)
-								{
-									const matched = copiedTrips.find(x => x.Name === st.Name);
-									if (!matched)
-									{
-										return result;
-									}
-
-									return result.concat({ ...st, copyFromTripId: matched.copyFromTripId })
-								}, []);
-
-								for (let i = 0; i < savedTrips.length; i++)
-								{
-									const tripData = savedTrips[i];
-									self.originalTripAssignment[tripData.id] = tripData;
-									let tripStopStudents = tripData.FieldTripStops.map(ts => ts.Students);
-									let isExistsExceptionStds = tripStopStudents.some(stds => stds.some(std => std.IsExceptionScheduleChanged));
-									if (isExistsExceptionStds)
-									{
-										self.changeExceptionStopInfo(tripData);
-									}
-								}
-
-								var promises = [];
-								var unSuccessAssignStudents = [];
-								trips.forEach(function(trip)
-								{
-									self.deleteChangeDataStackByTripId(trip.oldId);
-									var savedTrip = Enumerable.From(savedTrips).FirstOrDefault({}, function(c) { return c.Name == trip.Name; });
-									// change id from local create to match the create after save 
-									self.featureData.changeId(trip, savedTrip);
-									self.viewModel.drawTool.updateTripId(trip.oldId, trip.id);
-
-									// save trip geometry data
-									promises.push(self.featureData.save(trip.id));
-								});
-								// alert unsuccess assign student message
-								if (unSuccessAssignStudents.length > 0)
-								{
-									var names = unSuccessAssignStudents.map(function(student)
-									{
-										return student.FirstName + " " + student.LastName;
-									}).join(', ');
-									var message = "Student " + names + " is assigned to other trips.";
-									if (unSuccessAssignStudents.length > 1)
-									{
-										message = "Students " + names + " are assigned to other trips.";
-									}
-									tf.promiseBootbox.alert(
-										{
-											message: message,
-											title: "Warning"
-										});
-								}
-
-								return Promise.all(promises).then(function()
-								{
-									self.onTripSaveEvent.notify(trips);
-									self.tripLockData.saveData(trips);
-									self.saving = false;
-									tf.loadingIndicator.tryHide();
-									return Promise.resolve(true);
-								});
-							}).catch(function(error)
-							{
-								tf.loadingIndicator.tryHide();
-								if (error.Message) { tf.promiseBootbox.alert({ message: error.Message, title: "Error" }); }
-								self.saving = false;
-								return false;
-							});
-					});
-			});
-		}).then(function(result)
-		{
-			return self.copyTripUDFs(copiedTrips).then(() => result);
-		});
-	};
-
 	RoutingDataModel.prototype.saveRoutingFieldTrips = function(fieldTrips)
 	{
 		var self = this;
@@ -2733,7 +2443,7 @@
 	
 		let copiedTrips = fieldTrips.filter(t => !!t.copyFromFieldTripId);
 	
-		return self.validateFieldTripName(fieldTrips).then(function(valid)
+		return Promise.resolve(fieldTrips.every(x => (x.Name || "").trim() !== "")).then(function(valid)
 		{
 			if (!valid)
 			{
@@ -2870,40 +2580,6 @@
 		})));
 	};
 
-	RoutingDataModel.prototype.changeExceptionStopInfo = function(curTrip)
-	{
-		let prevTrip = this.trips.find(trip => trip.id === curTrip.id);
-		if (!prevTrip)
-		{
-			return;
-		}
-
-		prevTrip.FieldTripStops.forEach(ts =>
-		{
-			let curTripStop = curTrip.FieldTripStops.find(tripStop => tripStop.id === ts.id);
-			ts.Students.forEach(std =>
-			{
-				let curStudent = curTripStop.Students.find(curStd => curStd.id === std.id);
-				std.StartDate = curStudent.StartDate;
-				std.EndDate = curStudent.EndDate;
-				std.Monday = curStudent.Monday;
-				std.Tuesday = curStudent.Tuesday;
-				std.Wednesday = curStudent.Wednesday;
-				std.Thursday = curStudent.Thursday;
-				std.Friday = curStudent.Friday;
-				std.Saturday = curStudent.Saturday;
-				std.Sunday = curStudent.Sunday;
-				std.ValidMonday = curStudent.ValidMonday;
-				std.ValidTuesday = curStudent.ValidTuesday;
-				std.ValidWednesday = curStudent.ValidWednesday;
-				std.ValidThursday = curStudent.ValidThursday;
-				std.ValidFriday = curStudent.ValidFriday;
-				std.ValidSaturday = curStudent.ValidSaturday;
-				std.ValidSunday = curStudent.ValidSunday;
-			});
-		});
-	};
-
 	RoutingDataModel.prototype.compareTripAssignment = function(prev, cur)
 	{
 		return (((cur.DriverId || prev.DriverId) && cur.DriverId !== prev.DriverId)
@@ -2992,13 +2668,12 @@
 		var promise = Promise.resolve();
 		if (unsavedNewTrips.length > 0)
 		{
-			promise = self.closeUnsavedNewTrips(unsavedNewTrips, true, editTrips);
+			promise = self.closeUnsavedNewFieldTrips(unsavedNewTrips, true, editTrips);
 		}
 		if (editTrips.length > 0)
 		{
 			return promise.then(function()
 			{
-				// return self.closeByTrips(editTrips, notifyChange);
 				return self.closeByFieldTrips(editTrips, notifyChange);
 			});
 		}
@@ -3335,158 +3010,6 @@
 			this.onSchoolLocationChangeEvent.notify();
 		}
 	};
-
-	RoutingDataModel.prototype.hasUnsavedRestrictions = function()
-	{
-		var self = this;
-		var trips = self.getEditTrips();
-		if (trips.length == 0)
-		{
-			return false;
-		}
-
-		function restrictionsHaveBeenModified(currentTrip, originalTrip)
-		{
-			if (self.restrictions.some(function(r)
-			{
-				if (r === 'Schools')
-				{
-					return !RoutingDataModel.isSchoolsEqual(currentTrip[r], originalTrip[r]);
-				}
-				else
-				{
-					return currentTrip[r] != originalTrip[r];
-				}
-			}))
-			{
-				return true;
-			}
-			return false;
-		}
-
-		return restrictionsHaveBeenModified(trips[0], self.tripOriginalRestrictions);
-
-	};
-
-	RoutingDataModel.prototype.validateName = function(trips)
-	{
-		var self = this;
-		function valid(index)
-		{
-			if (index == trips.length)
-			{
-				return Promise.resolve(true);
-			}
-			return self.validateUniqueName(trips[index].Name, trips[index].Id).then(function()
-			{
-				return valid(++index);
-			});
-		}
-		return valid(0);
-	};
-
-	RoutingDataModel.prototype.validateFieldTripName = function(fieldTrips)
-	{
-		var self = this;
-		function valid(index)
-		{
-			if (index == fieldTrips.length)
-			{
-				return Promise.resolve(true);
-			}
-			return self.validateUniqueFieldTripName(fieldTrips[index].Name, fieldTrips[index].Id).then(function()
-			{
-				return valid(++index);
-			});
-		}
-		return valid(0);
-	}
-
-	RoutingDataModel.prototype.validateUniqueName = function(name, id)
-	{
-		var self = this;
-		var tripId = id || 0;
-		if (name.trim() === '')
-		{
-			tf.promiseBootbox.alert("Field trip name is required.");
-			return Promise.reject();
-		}
-
-		if (name.length > 150)
-		{
-			tf.promiseBootbox.alert("Field trip name should be less than 151 characters.");
-			return Promise.reject();
-		}
-
-		return Promise.resolve(Enumerable.From(self.trips).Any(function(c) { return c.Name == name && c.Id != tripId; }))
-			.then(function(nameDuplicate)
-			{
-				if (nameDuplicate)
-				{
-					return false;
-				}
-				// There is another trip in the database with the same name as this trip.Please change this trip"s name before saving it.
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "trips"), {
-					paramData: {
-						name: name
-					}
-				}).then(function(data)
-				{
-					return data.Items.length == 0 || tripId == data.Items[0].Id;
-				});
-			}).then(function(valid)
-			{
-				if (valid)
-				{
-					return Promise.resolve();
-				}
-				tf.promiseBootbox.alert("There is another trip with the same name as this trip. Please change this trip's name before saving it.");
-				return Promise.reject();
-			});
-	};
-
-	RoutingDataModel.prototype.validateUniqueFieldTripName = function(name, id)
-	{
-		var self = this;
-		var tripId = id || 0;
-		if (name.trim() === '')
-		{
-			tf.promiseBootbox.alert("Field trip name is required.");
-			return Promise.reject();
-		}
-
-		// if (name.length > 150)
-		// {
-		// 	tf.promiseBootbox.alert("Field trip name should be less than 151 characters.");
-		// 	return Promise.reject();
-		// }
-
-		return Promise.resolve(Enumerable.From(self.trips).Any(function(c) { return c.Name == name && c.Id != tripId; }))
-			.then(function(nameDuplicate)
-			{
-				if (nameDuplicate)
-				{
-					return false;
-				}
-				// There is another trip in the database with the same name as this trip.Please change this trip"s name before saving it.
-				return tf.promiseAjax.get(pathCombine(tf.api.apiPrefix(), "fieldtrips"), {
-					paramData: {
-						name: name
-					}
-				}).then(function(data)
-				{
-					return data.Items.length == 0 || tripId == data.Items[0].Id;
-				});
-			}).then(function(valid)
-			{
-				if (valid)
-				{
-					return Promise.resolve();
-				}
-				tf.promiseBootbox.alert("There is another field trip with the same name as this field trip. Please change this field trip's name before saving it.");
-				return Promise.reject();
-			});
-	};	
 
 	RoutingDataModel.prototype.getKey = function(studentId, requirementId, tripStopId, anotherTripStopID, previousScheduleID)
 	{
