@@ -479,7 +479,7 @@
 					let value = item[col.Guid];
 					if (IsEmptyString(value)) { return ""; }
 
-					const precision = col.FieldOptions.TypeName === 'Currency' ? col.FieldOptions.MaxLength : col.FieldOptions.NumberPrecision;
+					const precision = tf.udgHelper.getPrecisionByType(col.FieldOptions.TypeName, col.FieldOptions);
 					if (isNaN(Number(value)))
 					{
 						value = 0;
@@ -606,7 +606,7 @@
 			_systemFieldQuestionType === "number" || _systemFieldQuestionType === "currency")
 		{
 			const formatStr = 0;
-			const precision = questionType === 'currency' ? col.FieldOptions.MaxLength : col.FieldOptions.NumberPrecision
+			const precision = tf.udgHelper.getPrecisionByType(questionType, col.FieldOptions);
 			columnExtension = {
 				Precision: precision,
 				format: "{0:" + formatStr.toFixed(parseInt(precision)).toString() + "}",
@@ -2737,6 +2737,25 @@
 			return val;
 		}
 	}
+
+	UserDefinedGridHelper.prototype.getPrecisionByType = function(type, options)
+	{
+		const DEFAULT_UDF_PRECISION = 0;
+		let precision = 0;
+		options = options || {};
+
+		switch (type.toLowerCase())
+		{
+			case "currency":
+				precision = options.MaxLength;
+				break;
+			case "number":
+				precision = options.NumberPrecision;
+				break;
+		}
+
+		return _.isNumber(precision) ? precision : DEFAULT_UDF_PRECISION;
+	};
 
 	UserDefinedGridHelper.getPureFieldName = function(fieldName)
 	{

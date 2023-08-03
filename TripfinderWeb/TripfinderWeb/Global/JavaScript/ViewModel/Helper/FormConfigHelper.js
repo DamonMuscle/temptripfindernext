@@ -222,12 +222,6 @@
 		return null;
 	}
 
-	var getCommaSeparatedTwoDecimalsNumber = function(number, numberPrecision)
-	{
-		const fixedNumber = Number.parseFloat(number).toFixed(numberPrecision);
-		return String(fixedNumber).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-	}
-
 	var stageFormatter = function(value)
 	{
 		switch (value)
@@ -409,12 +403,10 @@
 				return Number.parseFloat(value).toFixed(6);
 			case "Currency":
 			case "currency":
-				if (IsEmptyString(value)) { return ""; }
-				return Number.parseFloat(value).toFixed(numberPrecision);
 			case "Number":
 			case "number":
 				if (IsEmptyString(value)) { return ""; }
-				return getCommaSeparatedTwoDecimalsNumber(value, numberPrecision);
+				return tf.dataFormatHelper.numberFormatter(value, numberPrecision);
 			case TYPE_PHONE_NUMBER:
 				if (IsEmptyString(value)) { return ""; }
 				return _formatPhoneNumberSysField(value);

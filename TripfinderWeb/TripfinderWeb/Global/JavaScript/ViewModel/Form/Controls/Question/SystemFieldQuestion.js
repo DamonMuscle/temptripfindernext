@@ -39,7 +39,7 @@
 			let udf = udfs.find(u => u.Guid === defaultText);
 			if (udf)
 			{
-				numberPrecision = udf.NumberPrecision ? udf.NumberPrecision : 0;
+				numberPrecision = tf.udgHelper.getPrecisionByType(systemFieldType, udf);
 				trueDisplayName = udf.TrueDisplayName ? udf.TrueDisplayName : "true";
 				falseDisplayName = udf.FalseDisplayName ? udf.FalseDisplayName : "false";
 			}
