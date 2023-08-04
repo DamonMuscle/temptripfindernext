@@ -1203,7 +1203,7 @@
 
 		if (!needConfirmation)
 		{
-			await apply();
+			return await apply();
 		}
 
 		const response = await tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
