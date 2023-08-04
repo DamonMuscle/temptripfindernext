@@ -560,11 +560,13 @@
 
 	FieldTripMap.prototype.applyAddFieldTripStop = async function(data, callback = ()=>{})
 	{
+		this.showLoadingIndicator();
 		this._refreshStopSequenceLabel(data);
 		this._drawNewStopFromMap(data);
 		this.clearHighlightFeatures();
 		await this._drawNewStopPathFromMap(data);
 		this.startAddFieldTripStop();
+		this.hideLoadingIndicator();
 
 		callback();
 	}
