@@ -815,13 +815,6 @@
 
 		// if (mapEditingPaletteViewModel.obShow() || travelScenariosPaletteViewModel.obShow())
 		// {
-		// 	if (TF.Helper.MapHelper.layerVisible(map, mapEditingPaletteViewModel.myStreetsViewModel.drawTool._polylineLayer))
-		// 	{
-		// 		featureLayerQueryPromises.push(getFeatureLayerIntersects(mapEditingPaletteViewModel.myStreetsViewModel, extent).then(function(items)
-		// 		{
-		// 			streetResult = items;
-		// 		}));
-		// 	}
 		// }
 
 		// Routing Palette Graphics
@@ -927,62 +920,6 @@
 					});
 				});
 
-		});
-	}
-
-	RoutingMapContextMenu.prototype.getFeatureLayerIntersects = function(viewModel, extent, options)
-	{
-		var query = new tf.map.ArcGIS.Query();
-		query.outFields = ["id"];
-		query.where = "1=1";
-		query.geometry = extent;
-
-		var dataModel = viewModel.dataModel;
-		var drawTool = viewModel.drawTool;
-		var ids = [];
-		function queryFeatures(featureLayer)
-		{
-			return featureLayer.queryFeatures(query).then(function(featureSet)
-			{
-				ids = ids.concat(featureSet.features.map(function(graphic)
-				{
-					return graphic.attributes.id;
-				}));
-			});
-		}
-		var promises = [];
-
-		drawTool._polygonLayer && promises.push(queryFeatures(drawTool._polygonLayer));
-		drawTool._polylineLayer && promises.push(queryFeatures(drawTool._polylineLayer));
-		drawTool._pointLayer && promises.push(queryFeatures(drawTool._pointLayer));
-
-		return Promise.all(promises).then(function()
-		{
-			if (drawTool.isEditing)
-			{
-				drawTool.sketchTool._drawingLayer.graphics.items.forEach(function(graphic)
-				{
-					if (graphic && graphic.visible && extent.intersects(graphic.geometry))
-					{
-						ids.push(graphic.attributes.id);
-					}
-				});
-			}
-			if (ids.length == 0)
-			{
-				return [];
-			}
-			var all = (options && options.all) || dataModel.all;
-			all = TF.toMapping(all, options ? options.getKey : null);
-			var result = {};
-			for (var i = 0; i < ids.length; i++)
-			{
-				if (all[ids[i]])
-				{
-					result[ids[i]] = all[ids[i]];
-				}
-			}
-			return Object.values(result);
 		});
 	}
 

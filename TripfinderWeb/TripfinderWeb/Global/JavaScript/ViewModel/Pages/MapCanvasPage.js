@@ -751,13 +751,10 @@
 		var self = this;
 		tf.loadingIndicator.tryHide();
 		self.routingSnapManager.init(this._map);
-		self._initShortKeyDownEvent();
 		// self._initToggleTrace();
 		self._initSketchTool();
 		self._initRevertOperation();
 		self.onMapLoad.notify();
-		// self.traceManager.addTraceInstance(new TF.RoutingMap.TraceBoundary(self._map, self._arcgis));
-		// self.traceManager.addTraceInstance(new TF.RoutingMap.TraceStreet(self._map, self._arcgis));
 
 		self.mapCanvasUpdatedRecord = self.mapCanvasUpdatedRecord.bind(self);
 		PubSub.subscribe("MapCanvasUpdatedRecordsHub", this.mapCanvasUpdatedRecord);
@@ -871,71 +868,6 @@
 	{
 		var self = this;
 		self.sketchTool = new TF.RoutingMap.SketchTool(self._map, self);
-	};
-
-	/**
-	 * esc, enter, delete key
-	 * @returns {void} 
-	 */
-	MapCanvasPage.prototype._initShortKeyDownEvent = function()
-	{
-		var self = this;
-		tf.documentEvent.bind("keydown.shortCutKey", self.routeState, function(e)
-		{
-			var isActive = self.RoutingMapTool && self.RoutingMapTool.googleStreetTool && self.RoutingMapTool.googleStreetTool.isActive;
-			if (e.keyCode === 16 && !isActive)
-			{
-				TF.Helper.MapHelper.setMapCursor(self._map, "default");
-			}
-			if (e.keyCode === 27)
-			{
-				self.RoutingMapTool.hideSubMenu();
-			}
-			if (e.key == "Escape")
-			{
-				if (self.sketchTool.currentDrawTool)
-				{
-					if (self.sketchTool.isDrawing)
-					{
-						self.restartDraw();
-					}
-					else
-					{
-						tf.promiseBootbox.yesNo({
-							message: "Are you sure you want to cancel?",
-							title: "Confirmation Message",
-						}).then(function(res)
-						{
-							if (res)
-							{
-								if (self.sketchTool.currentDrawStatus.indexOf("Region") > 0)
-								{
-									self.sketchTool.currentDrawTool.endRegionCallback();
-								}
-								self.sketchTool.currentDrawTool && self.sketchTool.currentDrawTool._clearTempDrawing();
-								self.sketchTool.currentDrawTool && self.sketchTool.currentDrawTool.stopPreview();
-								self.sketchTool.stopAndClear();
-								self.setMode("", "Normal");
-								// TF.RoutingMap.ContextMenuBase.prototype.removeContextMenu();
-							} else
-							{
-								self.restartDraw();
-							}
-						});
-					}
-				} else
-				{
-					if (self.sketchTool)
-					{
-						self.sketchTool.stopAndClear();
-						PubSub.publish("clear_ContextMenu_Operation");
-						self.setMode("", "Normal");
-					}
-					// TODO: Use the above method if mapEditingPaletteViewModel is added in the future.
-					self.RoutingMapTool.googleStreetTool?.deactivate();
-				}
-			}
-		});
 	};
 
 	MapCanvasPage.prototype.restartDraw = function()
