@@ -223,10 +223,7 @@
 		const currentTrip = this.obSelectedTrip();
 		const currentStop = this.data[0];
 
-		if(!currentStop.FieldTripId)
-		{
-			currentStop.FieldTripId = currentTrip.id;
-		}
+		currentStop.FieldTripId = currentTrip.id;
 
 		const data = { tripId: currentStop.FieldTripId, stopId: currentStop.id, stopSequence: sequence };
 
