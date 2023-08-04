@@ -777,7 +777,10 @@
 					self.dataModel.viewModel.drawTool._clearTempDrawing();
 				}
 				self.dataModel.viewModel.drawTool.stopTool.clearCandidateGraphics();
-				PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
+				if (this.mode() == "new")
+				{
+					PubSub.publish(TF.RoutingPalette.FieldTripMapEventEnum.AddStopFromMap);
+				}
 				self.resolve();
 			}
 		});
