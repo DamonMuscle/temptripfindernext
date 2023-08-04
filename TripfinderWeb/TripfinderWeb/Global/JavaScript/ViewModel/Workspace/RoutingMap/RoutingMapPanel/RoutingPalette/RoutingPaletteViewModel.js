@@ -441,8 +441,7 @@
 	{
 		if (data.endsWith("Normal"))
 		{
-			this.fieldTripMap?.stopAddFieldTripStop();
-			await this.fieldTripMap?.clearHighlightFeatures();
+			await this.fieldTripMap?.confirmToStopAddingStop();
 		}
 	}
 

@@ -1162,8 +1162,22 @@
 	{
 		if (data.event.key === "Escape")
 		{
+			await this.confirmToStopAddingStop();
+		}
+	}
+
+	FieldTripMap.prototype.confirmToStopAddingStop = async function()
+	{
+		if (!this.editing.isAddingStop)
+		{
+			return;
+		}
+
+		const response = await tf.promiseBootbox.yesNo("Are you sure you want to cancel?", "Confirmation Message");
+		if (response === true)
+		{
 			this.stopAddFieldTripStop();
-			await this.fieldTripMap?.clearHighlightFeatures();
+			await this.clearHighlightFeatures();
 		}
 	}
 
